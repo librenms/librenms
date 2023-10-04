@@ -29,6 +29,7 @@ use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Enum\PortAssociationMode;
 use LibreNMS\Util\Clean;
+use LibreNMS\Util\StringHelpers;
 use LibreNMS\Util\Validate;
 
 class CommonFunctionsTest extends TestCase
@@ -106,11 +107,11 @@ class CommonFunctionsTest extends TestCase
 
     public function testStringToClass(): void
     {
-        $this->assertSame('LibreNMS\OS\Os', str_to_class('OS', 'LibreNMS\\OS\\'));
-        $this->assertSame('SpacesName', str_to_class('spaces name'));
-        $this->assertSame('DashName', str_to_class('dash-name'));
-        $this->assertSame('UnderscoreName', str_to_class('underscore_name'));
-        $this->assertSame('LibreNMS\\AllOfThemName', str_to_class('all OF-thEm_NaMe', 'LibreNMS\\'));
+        $this->assertSame('LibreNMS\OS\Os', StringHelpers::toClass('OS', 'LibreNMS\\OS\\'));
+        $this->assertSame('SpacesName', StringHelpers::toClass('spaces name', null));
+        $this->assertSame('DashName', StringHelpers::toClass('dash-name', null));
+        $this->assertSame('UnderscoreName', StringHelpers::toClass('underscore_name', null));
+        $this->assertSame('LibreNMS\\AllOfThemName', StringHelpers::toClass('all OF-thEm_NaMe', 'LibreNMS\\'));
     }
 
     public function testIsValidHostname(): void
