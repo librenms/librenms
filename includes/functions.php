@@ -1182,6 +1182,11 @@ function cache_peeringdb()
             sleep($rand);
             $peer_keep = [];
             $ix_keep = [];
+            // Exclude Private and reserved ASN ranges
+            // 64512 - 65534 (Private)
+            // 65535 (Well Known)
+            // 4200000000 - 4294967294 (Private)
+            // 4294967295 (Reserved)
             foreach (dbFetchRows('SELECT `bgpLocalAs` FROM `devices` WHERE `disabled` = 0 AND `ignore` = 0 AND `bgpLocalAs` > 0 AND (`bgpLocalAs` < 64512 OR `bgpLocalAs` > 65535) AND `bgpLocalAs` < 4200000000 GROUP BY `bgpLocalAs`') as $as) {
                 $asn = $as['bgpLocalAs'];
                 $get = \LibreNMS\Util\Http::client()->get($peeringdb_url . '/net?depth=2&asn=' . $asn);
