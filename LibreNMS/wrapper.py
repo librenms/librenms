@@ -282,7 +282,9 @@ def poll_worker(
                     os.path.dirname(os.path.dirname(os.path.realpath(__file__))),
                     wrappers[wrapper_type]["executable"],
                 )
-                command = "/usr/bin/env php {} {} {}".format(executable, wrappers[wrapper_type]["option"], device_id)
+                command = "/usr/bin/env php {} {} {}".format(
+                    executable, wrappers[wrapper_type]["option"], device_id
+                )
                 if modules is not None and len(str(modules).strip()):
                     module_str = re.sub("\s", "", str(modules).strip())
                     command = command + " -m {}".format(module_str)
