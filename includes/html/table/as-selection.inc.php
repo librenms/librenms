@@ -38,7 +38,7 @@ if ($rowCount != -1) {
 $sql = "SELECT `bgpLocalAs` $sql";
 
 foreach (dbFetchRows($sql, $param) as $asn) {
-    $astext = get_astext($asn['bgpLocalAs']);
+    $astext = \LibreNMS\Util\AutonomousSystem::get($asn['bgpLocalAs'])->name();
     $response[] = [
         'bgpLocalAs'    => $asn['bgpLocalAs'],
         'asname' => $astext,

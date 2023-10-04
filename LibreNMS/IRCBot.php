@@ -27,6 +27,7 @@ use App\Models\Service;
 use App\Models\User;
 use LibreNMS\DB\Eloquent;
 use LibreNMS\Enum\AlertState;
+use LibreNMS\Util\Mail;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\Time;
 use LibreNMS\Util\Version;
@@ -706,7 +707,7 @@ class IRCBot
                     $this->log("Auth for '" . $params[0] . "', ID: '" . $user->user_id . "', Token: '" . $token . "', Mail: '" . $user->email . "'");
                 }
 
-                if (send_mail($user->email, 'LibreNMS IRC-Bot Authtoken', "Your Authtoken for the IRC-Bot:\r\n\r\n" . $token . "\r\n\r\n") === true) {
+                if (Mail::send($user->email, 'LibreNMS IRC-Bot Authtoken', "Your Authtoken for the IRC-Bot:\r\n\r\n" . $token . "\r\n\r\n", false) === true) {
                     return $this->respond('Token sent!');
                 } else {
                     return $this->respond('Sorry, seems like mail doesnt like us.');
