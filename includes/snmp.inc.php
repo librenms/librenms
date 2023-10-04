@@ -19,6 +19,7 @@ use App\Models\Device;
 use App\Polling\Measure\Measurement;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
+use LibreNMS\Util\Oid;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 
 function prep_snmp_setting($device, $setting)
