@@ -13,7 +13,7 @@ IMPORTS
         FROM LLDP-MIB;
 
 lldpXdot3MIB MODULE-IDENTITY
-    LAST-UPDATED "200411220000Z" -- November 22, 2004
+    LAST-UPDATED "200505060000Z" -- May 06, 2005
     ORGANIZATION "IEEE 802.1 Working Group"
     CONTACT-INFO 
             "  WG-URL: http://grouper.ieee.org/groups/802/1/index.html
@@ -35,14 +35,16 @@ lldpXdot3MIB MODULE-IDENTITY
             as the node.  An OUI/'company_id' is a 24 bit globally unique
             assigned number referenced by various standards.
 
-            Copyright (C) IEEE (2004).  This version of this MIB module
-            is published as Annex G.6.1 of IEEE Std 802.1AB-2004;
+            Copyright (C) IEEE (2005).  This version of this MIB module
+            is published as Annex G.6.1 of IEEE Std 802.1AB-2005;
             see the standard itself for full legal notices."
-    REVISION        "200411220000Z" -- November 22, 2004
+    REVISION        "200505060000Z" -- May 06, 2005
     DESCRIPTION
-            "Published as part of IEEE Std 802.1AB-2004 initial version."
+            "Published as part of IEEE Std 802.1AB-2005 initial version."
 -- OUI for IEEE 802.3 is 4623 (00-12-0F)
    ::= { lldpExtensions 4623 } 
+--UnComment For MIBCOMPLIER TOOL
+--   ::= { iso std(0) iso8802(8802) ieee802dot1(1) ieee802dot1mibs(1) lldPMIB(2)  lldpObjects(1)                lldpExtensions(5) 4623}
 
 ------------------------------------------------------------------------------
 ------------------------------------------------------------------------------
@@ -158,8 +160,8 @@ lldpXdot3PortConfigTLVsTxEnable  OBJECT-TYPE
             The value of this object must be restored from non-volatile
             storage after a re-initialization of the management system."
     REFERENCE 
-            "IEEE 802.1AB-2004 10.2.1.1"
-    DEFVAL  { { } }
+            "IEEE 802.1AB-2005 10.2.1.1"
+--    DEFVAL  { { } }
     ::= { lldpXdot3PortConfigEntry  1 }
 
 
@@ -205,7 +207,7 @@ lldpXdot3LocPortAutoNegSupported OBJECT-TYPE
             "The truth value used to indicate whether the given port
             (associated with the local system) supports Auto-negotiation."
     REFERENCE 
-            "IEEE 802.1AB-2004 G.2.1"
+            "IEEE 802.1AB-2005 G.2.1"
     ::= { lldpXdot3LocPortEntry 1 }
 
 lldpXdot3LocPortAutoNegEnabled  OBJECT-TYPE
@@ -217,7 +219,7 @@ lldpXdot3LocPortAutoNegEnabled  OBJECT-TYPE
             Auto-negotiation is enabled on the given port associated
             with the local system."
     REFERENCE 
-            "IEEE 802.1AB-2004 G.2.1"
+            "IEEE 802.1AB-2005 G.2.1"
     ::= { lldpXdot3LocPortEntry 2 }
 
 lldpXdot3LocPortAutoNegAdvertisedCap OBJECT-TYPE
@@ -230,7 +232,7 @@ lldpXdot3LocPortAutoNegAdvertisedCap OBJECT-TYPE
             3636) which is associated with the given port on the
             local system."
     REFERENCE 
-            "IEEE 802.1AB-2004 G.2.2"
+            "IEEE 802.1AB-2005 G.2.2"
     ::= { lldpXdot3LocPortEntry 3 }
 
 lldpXdot3LocPortOperMauType  OBJECT-TYPE
@@ -252,7 +254,7 @@ lldpXdot3LocPortOperMauType  OBJECT-TYPE
             (or subsequent revisions), the value of this field shall be
             set to zero."
     REFERENCE 
-            "IEEE 802.1AB-2004 G.2.3"
+            "IEEE 802.1AB-2005 G.2.3"
     ::= { lldpXdot3LocPortEntry 4 }
 
 ---
@@ -296,7 +298,7 @@ lldpXdot3LocPowerPortClass  OBJECT-TYPE
             "The value that identifies the port Class of the given port
             associated with the local system."
     REFERENCE 
-            "IEEE 802.1AB-2004 G.3.1"
+            "IEEE 802.1AB-2005 G.3.1"
     ::= { lldpXdot3LocPowerEntry 1 }
 
 lldpXdot3LocPowerMDISupported  OBJECT-TYPE
@@ -307,7 +309,7 @@ lldpXdot3LocPowerMDISupported  OBJECT-TYPE
             "The truth value used to indicate whether the MDI power is
             supported on the given port associated with the local system."
     REFERENCE 
-            "IEEE 802.1AB-2004 G.3.1"
+            "IEEE 802.1AB-2005 G.3.1"
     ::= { lldpXdot3LocPowerEntry 2 }
 
 lldpXdot3LocPowerMDIEnabled  OBJECT-TYPE
@@ -318,7 +320,7 @@ lldpXdot3LocPowerMDIEnabled  OBJECT-TYPE
             "The truth value used to identify whether MDI power is
             enabled on the given port associated with the local system."
     REFERENCE 
-            "IEEE 802.1AB-2004 G.3.1"
+            "IEEE 802.1AB-2005 G.3.1"
     ::= { lldpXdot3LocPowerEntry 3 }
 
 lldpXdot3LocPowerPairControlable  OBJECT-TYPE
@@ -332,7 +334,7 @@ lldpXdot3LocPowerPairControlable  OBJECT-TYPE
             can be controlled on the given port associated with the
             local system."
     REFERENCE 
-            "IEEE 802.1AB-2004 G.3.1"
+            "IEEE 802.1AB-2005 G.3.1"
     ::= { lldpXdot3LocPowerEntry 4 }
 
 lldpXdot3LocPowerPairs  OBJECT-TYPE
@@ -344,7 +346,7 @@ lldpXdot3LocPowerPairs  OBJECT-TYPE
             object (defined in IETF RFC 3621) which is associated with
             the given port on the local system."
     REFERENCE 
-            "IEEE 802.1AB-2004 G.3.2"
+            "IEEE 802.1AB-2005 G.3.2"
     ::= { lldpXdot3LocPowerEntry 5 }
 
 lldpXdot3LocPowerClass  OBJECT-TYPE
@@ -357,7 +359,7 @@ lldpXdot3LocPowerClass  OBJECT-TYPE
             RFC 3621) which is associated with the given port on the
             local system."
     REFERENCE 
-            "IEEE 802.1AB-2004 G.3.3"
+            "IEEE 802.1AB-2005 G.3.3"
     ::= { lldpXdot3LocPowerEntry 6 }
 
 ---
@@ -398,7 +400,7 @@ lldpXdot3LocLinkAggStatus OBJECT-TYPE
             "The bitmap value contains the link aggregation capabilities
             and the current aggregation status of the link."
     REFERENCE 
-            "IEEE 802.1AB-2004 G.4.1"
+            "IEEE 802.1AB-2005 G.4.1"
     ::= { lldpXdot3LocLinkAggEntry 1 }
 
 lldpXdot3LocLinkAggPortId OBJECT-TYPE
@@ -415,7 +417,7 @@ lldpXdot3LocLinkAggPortId OBJECT-TYPE
             does not support link aggregation, this value should be set
             to zero."
     REFERENCE 
-            "IEEE 802.1AB-2004 G.4.2"
+            "IEEE 802.1AB-2005 G.4.2"
     ::= { lldpXdot3LocLinkAggEntry 2 }
 
 ---
@@ -455,7 +457,7 @@ lldpXdot3LocMaxFrameSize OBJECT-TYPE
             "An integer value indicating the maximum supported frame 
              size in octets on the given port of the local system."
     REFERENCE 
-            "IEEE 802.1AB-2004 G.5.1"
+            "IEEE 802.1AB-2005 G.5.1"
     ::= { lldpXdot3LocMaxFrameSizeEntry 1 }
 
 
@@ -503,7 +505,7 @@ lldpXdot3RemPortAutoNegSupported OBJECT-TYPE
             "The truth value used to indicate whether the given port
             (associated with remote system) supports Auto-negotiation."
     REFERENCE 
-            "IEEE 802.1AB-2004 G.2.1"
+            "IEEE 802.1AB-2005 G.2.1"
     ::= { lldpXdot3RemPortEntry 1 }
 
 lldpXdot3RemPortAutoNegEnabled  OBJECT-TYPE
@@ -515,7 +517,7 @@ lldpXdot3RemPortAutoNegEnabled  OBJECT-TYPE
             Auto-negotiation is enabled on the given port associated
             with the remote system."
     REFERENCE 
-            "IEEE 802.1AB-2004 G.2.1"
+            "IEEE 802.1AB-2005 G.2.1"
     ::= { lldpXdot3RemPortEntry 2 }
 
 lldpXdot3RemPortAutoNegAdvertisedCap  OBJECT-TYPE
@@ -528,7 +530,7 @@ lldpXdot3RemPortAutoNegAdvertisedCap  OBJECT-TYPE
             3636) which is associated with the given port on the
             remote system."
     REFERENCE 
-            "IEEE 802.1AB-2004 G.2.2"
+            "IEEE 802.1AB-2005 G.2.2"
     ::= { lldpXdot3RemPortEntry 3 }
 
 lldpXdot3RemPortOperMauType OBJECT-TYPE
@@ -550,7 +552,7 @@ lldpXdot3RemPortOperMauType OBJECT-TYPE
             (or subsequent revisions), the value of this field shall be
             set to zero."
     REFERENCE 
-            "IEEE 802.1AB-2004 G.2.3"
+            "IEEE 802.1AB-2005 G.2.3"
     ::= { lldpXdot3RemPortEntry 4 }
 
 ---
@@ -596,7 +598,7 @@ lldpXdot3RemPowerPortClass  OBJECT-TYPE
             "The value that identifies the port Class of the given port
             associated with the remote system."
     REFERENCE 
-            "IEEE 802.1AB-2004 G.3.1"
+            "IEEE 802.1AB-2005 G.3.1"
     ::= { lldpXdot3RemPowerEntry 1 }
 
 lldpXdot3RemPowerMDISupported  OBJECT-TYPE
@@ -608,7 +610,7 @@ lldpXdot3RemPowerMDISupported  OBJECT-TYPE
             is supported on the given port associated with the remote
             system."
     REFERENCE 
-            "IEEE 802.1AB-2004 G.3.1"
+            "IEEE 802.1AB-2005 G.3.1"
     ::= { lldpXdot3RemPowerEntry 2 }
 
 lldpXdot3RemPowerMDIEnabled  OBJECT-TYPE
@@ -619,7 +621,7 @@ lldpXdot3RemPowerMDIEnabled  OBJECT-TYPE
             "The truth value used to identify whether MDI power is
             enabled on the given port associated with the remote system."
     REFERENCE 
-            "IEEE 802.1AB-2004 G.3.1"
+            "IEEE 802.1AB-2005 G.3.1"
     ::= { lldpXdot3RemPowerEntry 3 }
 
 lldpXdot3RemPowerPairControlable  OBJECT-TYPE
@@ -633,7 +635,7 @@ lldpXdot3RemPowerPairControlable  OBJECT-TYPE
             can be controlled on the given port associated with the
             remote system."
     REFERENCE 
-            "IEEE 802.1AB-2004 G.3.1"
+            "IEEE 802.1AB-2005 G.3.1"
     ::= { lldpXdot3RemPowerEntry 4 }
 
 lldpXdot3RemPowerPairs  OBJECT-TYPE
@@ -645,7 +647,7 @@ lldpXdot3RemPowerPairs  OBJECT-TYPE
             object (defined in IETF RFC 3621) which is associated with
             the given port on the remote system."
     REFERENCE 
-            "IEEE 802.1AB-2004 G.3.2"
+            "IEEE 802.1AB-2005 G.3.2"
     ::= { lldpXdot3RemPowerEntry 5 }
 
 lldpXdot3RemPowerClass  OBJECT-TYPE
@@ -658,7 +660,7 @@ lldpXdot3RemPowerClass  OBJECT-TYPE
             RFC 3621) which is associated with the given port on the
             remote system."
     REFERENCE 
-            "IEEE 802.1AB-2004 G.3.3"
+            "IEEE 802.1AB-2005 G.3.3"
     ::= { lldpXdot3RemPowerEntry 6 }
 
 ---
@@ -701,7 +703,7 @@ lldpXdot3RemLinkAggStatus OBJECT-TYPE
             "The bitmap value contains the link aggregation capabilities
             and the current aggregation status of the link."
     REFERENCE 
-            "IEEE 802.1AB-2004 G.4.1"
+            "IEEE 802.1AB-2005 G.4.1"
     ::= { lldpXdot3RemLinkAggEntry 1 }
 
 lldpXdot3RemLinkAggPortId OBJECT-TYPE
@@ -718,7 +720,7 @@ lldpXdot3RemLinkAggPortId OBJECT-TYPE
             it does not support link aggregation, this value should be
             zero."
     REFERENCE 
-            "IEEE 802.1AB-2004 G.4.2"
+            "IEEE 802.1AB-2005 G.4.2"
     ::= { lldpXdot3RemLinkAggEntry 2 }
 
 
@@ -762,7 +764,7 @@ lldpXdot3RemMaxFrameSize OBJECT-TYPE
              size in octets on the port component associated with the 
              remote system."
     REFERENCE 
-            "IEEE 802.1AB-2004 G.5.1"
+            "IEEE 802.1AB-2005 G.5.1"
     ::= { lldpXdot3RemMaxFrameSizeEntry 1 }
 
 
