@@ -1,0 +1,50 @@
+modules:
+    os:
+        hardware: LLDP-EXT-MED-CAMBIUM-MIB::lldpXMedLocModelName.0
+        version: LLDP-EXT-MED-CAMBIUM-MIB::lldpXMedLocSoftwareRev.0
+        serial: LLDP-EXT-MED-CAMBIUM-MIB::lldpXMedLocSerialNum.0
+    processors:
+        data:
+            -
+                oid: ARICENT-ISS-MIB::issSwitchCurrentCPUThreshold
+                num_oid: '.1.3.6.1.4.1.2076.81.1.68.{{ $index }}'
+                type: cpuUsage
+    mempools:
+        data:
+            -
+                percent_used: ARICENT-ISS-MIB::issSwitchCurrentRAMUsage
+    sensors:
+        temperature:
+            data:
+                -
+                    oid: ARICENT-ISS-MIB::issSwitchCurrentTemperature
+                    num_oid: '.1.3.6.1.4.1.2076.81.1.66.{{ $index }}'
+                    index: 'issSwitchCurrentTemperature.{{ $index }}'
+                    descr: 'System Temperature'
+        voltage:
+            data:
+                -
+                    oid: ARICENT-POE-MIB::fsPethPsePortTable
+                    value: ARICENT-POE-MIB::fsPethPsPortPowerMeasurementsVoltage
+                    num_oid: '.1.3.6.1.4.1.2076.103.1.3.1.4.{{ $index }}'
+                    index: 'fsPethPsPortPowerMeasurementsVoltage.{{ $index }}'
+                    descr: 'Port {{ $subindex1 }} Voltage'
+                    divisor: 10
+        current:
+            data:
+                -
+                    oid: ARICENT-POE-MIB::fsPethPsePortTable
+                    value: ARICENT-POE-MIB::fsPethPsPortPowerMeasurementsAmperage
+                    num_oid: '.1.3.6.1.4.1.2076.103.1.3.1.3.{{ $index }}'
+                    index: 'fsPethPsPortPowerMeasurementsAmperage.{{ $index }}'
+                    descr: 'Port {{ $subindex1 }} Amperage'
+                    divisor: 1000
+        power:
+            data:
+                -
+                    oid: ARICENT-POE-MIB::fsPethPsePortTable
+                    value: ARICENT-POE-MIB::fsPethPsPortPowerMeasurementsWattage
+                    num_oid: '.1.3.6.1.4.1.2076.103.1.3.1.5.{{ $index }}'
+                    index: 'fsPethPsPortPowerMeasurementsWattage.{{ $index }}'
+                    descr: 'Port {{ $subindex1 }} Wattage'
+                    divisor: 1000
