@@ -62,7 +62,7 @@ foreach ($bgpPeers as $vrfId => $vrf) {
     }
     foreach ($vrf as $address => $value) {
         $bgpLocalAs = $value['fbBgpPeerLocalAS'] ?? $bgpLocalAs;
-        $astext = get_astext($value['fbBgpPeerRemoteAS']);
+        $astext = \LibreNMS\Util\AutonomousSystem::get($value['fbBgpPeerRemoteAS'])->name();
         if (! DeviceCache::getPrimary()->bgppeers()->where('bgpPeerIdentifier', $address)->where('vrf_id', $vrfId)->exists()) {
             $peers = [
                 'vrf_id' => $vrfId,
