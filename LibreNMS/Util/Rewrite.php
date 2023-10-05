@@ -146,7 +146,7 @@ class Rewrite
      */
     public static function readableMac($mac)
     {
-        return rtrim(chunk_split($mac, 2, ':'), ':');
+        return \LibreNMS\Util\Mac::parse($mac)->readable();
     }
 
     /**
@@ -157,27 +157,7 @@ class Rewrite
      */
     public static function readableOUI($mac): string
     {
-        $oui = substr($mac, 0, 6);
-
-        $results = Cache::remember($oui, 21600, function () use ($oui) {
-            return DB::table('vendor_ouis')
-                ->where('oui', 'like', "$oui%") // possible matches
-                ->orderBy('oui', 'desc') // so we can check longer ones first if we have them
-                ->pluck('vendor', 'oui');
-        });
-
-        if (count($results) == 1) {
-            return Arr::first($results);
-        }
-
-        // Then we may have a shorter prefix, so let's try them one after the other
-        foreach ($results as $oui => $vendor) {
-            if (str_starts_with($mac, $oui)) {
-                return $vendor;
-            }
-        }
-
-        return '';
+        return \LibreNMS\Util\Mac::parse($mac)->vendor();
     }
 
     /**
@@ -193,7 +173,7 @@ class Rewrite
      */
     public static function oidMac($mac)
     {
-        return implode('.', array_map('hexdec', explode(':', $mac)));
+        return \LibreNMS\Util\Mac::parse($mac)->oid();
     }
 
     /**
@@ -214,13 +194,7 @@ class Rewrite
      */
     public static function macToHex(string $mac): string
     {
-        // split it apart
-        $mac_array = explode(':', str_replace(['-', '.', ' '], ':', strtolower(trim($mac))));
-        $len = count($mac_array);
-        $mac_padding = array_fill(0, $len, ceil(12 / $len));
-
-        // pad the parts to prefix 0s and only take the last 12 digits
-        return substr(implode(array_map('zeropad', $mac_array, $mac_padding)), -12);
+        return \LibreNMS\Util\Mac::parse($mac)->hex();
     }
 
     /**
