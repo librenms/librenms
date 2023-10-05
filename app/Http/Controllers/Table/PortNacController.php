@@ -26,7 +26,7 @@
 namespace App\Http\Controllers\Table;
 
 use App\Models\PortsNac;
-use LibreNMS\Util\Rewrite;
+use LibreNMS\Util\Mac;
 use LibreNMS\Util\Url;
 
 class PortNacController extends TableController
@@ -86,9 +86,10 @@ class PortNacController extends TableController
     public function formatItem($nac)
     {
         $item = $nac->toArray();
+        $mac = Mac::parse($item['mac_address']);
         $item['port_id'] = Url::portLink($nac->port, $nac->port->getShortLabel());
-        $item['mac_oui'] = Rewrite::readableOUI($item['mac_address']);
-        $item['mac_address'] = Rewrite::readableMac($item['mac_address']);
+        $item['mac_oui'] = $mac->vendor();
+        $item['mac_address'] = $mac->readable();
         $item['port'] = null; //free some unused data to be sent to the browser
         $item['device_id'] = Url::deviceLink($nac->device);
 

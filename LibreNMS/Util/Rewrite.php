@@ -26,7 +26,6 @@
 namespace LibreNMS\Util;
 
 use App\Models\Device;
-use Illuminate\Support\Facades\DB;
 use LibreNMS\Config;
 
 class Rewrite
@@ -134,65 +133,6 @@ class Rewrite
         ];
 
         return str_ireplace(array_keys($rewrite_shortif), array_values($rewrite_shortif), $name);
-    }
-
-    /**
-     * Reformat a mac stored in the DB (only hex) to a nice readable format
-     *
-     * @param  string  $mac
-     * @return string
-     */
-    public static function readableMac($mac)
-    {
-        return \LibreNMS\Util\Mac::parse($mac)->readable();
-    }
-
-    /**
-     * Extract the OUI and match it against database values
-     *
-     * @param  string  $mac
-     * @return string
-     */
-    public static function readableOUI($mac): string
-    {
-        return \LibreNMS\Util\Mac::parse($mac)->vendor();
-    }
-
-    /**
-     * Reformat hex MAC as oid MAC (dotted-decimal)
-     *
-     * 00:12:34:AB:CD:EF becomes 0.18.52.171.205.239
-     * 0:12:34:AB:CD:EF  becomes 0.18.52.171.205.239
-     * 00:02:04:0B:0D:0F becomes 0.2.4.11.13.239
-     * 0:2:4:B:D:F       becomes 0.2.4.11.13.15
-     *
-     * @param  string  $mac
-     * @return string oid representation of a MAC address
-     */
-    public static function oidMac($mac)
-    {
-        return \LibreNMS\Util\Mac::parse($mac)->oid();
-    }
-
-    /**
-     * Reformat Hex MAC with delimiters to Hex String without delimiters
-     *
-     * Assumes the MAC address is well-formed and in a common format.
-     * 00:12:34:ab:cd:ef becomes 001234abcdef
-     * 00:12:34:AB:CD:EF becomes 001234abcdef
-     * 0:12:34:AB:CD:EF  becomes 001234abcdef
-     * 00-12-34-AB-CD-EF becomes 001234abcdef
-     * 001234-ABCDEF     becomes 001234abcdef
-     * 0012.34AB.CDEF    becomes 001234abcdef
-     * 00:02:04:0B:0D:0F becomes 0002040b0d0f
-     * 0:2:4:B:D:F       becomes 0002040b0d0f
-     *
-     * @param  string  $mac  hexadecimal MAC address with or without common delimiters
-     * @return string undelimited hexadecimal MAC address
-     */
-    public static function macToHex(string $mac): string
-    {
-        return \LibreNMS\Util\Mac::parse($mac)->hex();
     }
 
     /**

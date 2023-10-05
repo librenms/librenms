@@ -34,7 +34,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use LibreNMS\Util\IP;
-use LibreNMS\Util\Rewrite;
+use LibreNMS\Util\Mac;
 use LibreNMS\Util\Url;
 
 class FdbTablesController extends TableController
@@ -159,10 +159,11 @@ class FdbTablesController extends TableController
      */
     public function formatItem($fdb_entry)
     {
+        $mac = Mac::parse($fdb_entry->mac_address);
         $item = [
             'device' => $fdb_entry->device ? Url::deviceLink($fdb_entry->device) : '',
-            'mac_address' => Rewrite::readableMac($fdb_entry->mac_address),
-            'mac_oui' => Rewrite::readableOUI($fdb_entry->mac_address),
+            'mac_address' => $mac->readable(),
+            'mac_oui' => $mac->vendor(),
             'ipv4_address' => $fdb_entry->ipv4Addresses->implode(', '),
             'interface' => '',
             'vlan' => $fdb_entry->vlan ? $fdb_entry->vlan->vlan_vlan : '',

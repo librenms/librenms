@@ -37,7 +37,7 @@ class Mac
     {
         $mac = strtolower(trim($mac));
 
-        if (preg_match('/^([0-9a-f]{1,2})[-:.]?([0-9a-f]{1,2})[-:.]?([0-9a-f]{1,2})[-:.]?([0-9a-f]{1,2})[-:.]?([0-9a-f]{1,2})[-:.]?([0-9a-f]{1,2})$/', $mac, $matches)) {
+        if (preg_match('/([0-9a-f]{1,2})[-:. ]?([0-9a-f]{1,2})[-:. ]?([0-9a-f]{1,2})[-:. ]?([0-9a-f]{1,2})[-:. ]?([0-9a-f]{1,2})[-:. ]?([0-9a-f]{1,2})$/', $mac, $matches)) {
             // strings without delimiters must have 12 characters
             if (! preg_match('/^[0-9a-f]{0,11}$/', $mac)) {
                 $this->mac = [

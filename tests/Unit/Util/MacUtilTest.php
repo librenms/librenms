@@ -3,10 +3,20 @@
 namespace LibreNMS\Tests\Unit\Util;
 
 use LibreNMS\Tests\TestCase;
-use LibreNMS\Util\Rewrite;
+use LibreNMS\Util\Mac;
 
-class RewriteTest extends TestCase
+class MacUtilTest extends TestCase
 {
+    public function testMacOutput(): void
+    {
+        $mac = Mac::parse('DeadBeefa0c3');
+        $this->assertTrue($mac->isValid());
+        $this->assertEquals('de:ad:be:ef:a0:c3', $mac->readable());
+        $this->assertEquals('deadbeefa0c3', $mac->hex());
+        $this->assertEquals('222.173.190.239.160.195', $mac->oid());
+        $this->assertEquals(['de', 'ad', 'be', 'ef', 'a0', 'c3'], $mac->array());
+    }
+
     /**
      * @test
      *
@@ -14,7 +24,7 @@ class RewriteTest extends TestCase
      */
     public function testMacToHex(string $from, string $to): void
     {
-        $this->assertEquals($to, Rewrite::macToHex($from));
+        $this->assertEquals($to, Mac::parse($from)->hex());
     }
 
     public function validMacProvider(): array
