@@ -128,7 +128,7 @@ class SmokepingGenerateCommand extends LnmsCommand
         $smokelist = [];
         foreach ($devices as $device) {
             $smokelist[$device->type][$device->hostname] = ['transport' => $device->transport];
-            $smokelist[$device->type][$device->hostname]['displayname'] = $device->displayName() ?? $device->hostname;
+            $smokelist[$device->type][$device->hostname]['displayname'] = $device->displayName() ?: $device->hostname;
         }
 
         $targets = $this->buildTargets($smokelist, Config::get('smokeping.probes'), $this->option('single-process'));
