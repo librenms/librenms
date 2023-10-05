@@ -153,8 +153,8 @@ if (! isset($vars['app_page']) || ! isset($app->data['pools'])) {
             $lease['state'],
             $mac,
             // display the time as UTC as that keeps things most simple
-            strftime('%FT%TZ', $lease['starts']),
-            strftime('%FT%TZ', $lease['ends']),
+            date('Y-m-d\TH:i:s\Z', $lease['starts']),
+            date('Y-m-d\TH:i:s\Z', $lease['ends']),
             $lease['client_hostname'],
             $lease['vendor_class_identifier'],
         ];
