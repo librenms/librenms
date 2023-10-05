@@ -18,8 +18,7 @@ if (isset($app->data['pools'])) {
     print_optionbar_end();
 }
 
-
-if (!isset($vars['app_page']) || !isset($app->data['pools'])) {
+if (! isset($vars['app_page']) || ! isset($app->data['pools'])) {
     $graphs = [
         'dhcp-stats_stats' => 'Stats',
         'dhcp-stats_pools_percent' => 'Pools Percent',
@@ -45,7 +44,7 @@ if (!isset($vars['app_page']) || !isset($app->data['pools'])) {
         'rows' => [],
     ];
     foreach ($pools as $key => $pool) {
-        $pool_table['rows'][$key]=[
+        $pool_table['rows'][$key] = [
             $pool['cidr'],
             $pool['first_ip'],
             $pool['last_ip'],
@@ -60,28 +59,28 @@ if (!isset($vars['app_page']) || !isset($app->data['pools'])) {
     print_optionbar_start();
     echo '<center><b>Subnets Details</b></center>';
     print_optionbar_start();
-    $pool_detail_table=[
+    $pool_detail_table = [
         'headers'=>[
             'Key',
             'Value',
-        ]
+        ],
     ];
     foreach ($pools as $pool_key => $pool) {
         // re-init the rows the pools detail table
         unset($pool_detail_table['rows']);
-        $pool_detail_table['rows']=[];
+        $pool_detail_table['rows'] = [];
         // display it this way as a CIDR may have more than one pool defined for it
         // especially true if both IPv4 and IPv6 are in use
-        echo '<center><b>'.$pool['cidr'].', '.$pool['first_ip'].'-'.$pool['last_ip'].'</b></center>';
-        $option_row_int=0;
+        echo '<center><b>' . $pool['cidr'] . ', ' . $pool['first_ip'] . '-' . $pool['last_ip'] . '</b></center>';
+        $option_row_int = 0;
         // remove these as they are stats and no options related info for the subnet
         unset($pool['cur']);
         unset($pool['max']);
         unset($pool['percent']);
         foreach ($pool as $pool_option => $option_value) {
-            $pool_detail_table['rows'][$option_row_int]=[
+            $pool_detail_table['rows'][$option_row_int] = [
                 $pool_option,
-                $option_value
+                $option_value,
             ];
             $option_row_int++;
         }
@@ -104,7 +103,7 @@ if (!isset($vars['app_page']) || !isset($app->data['pools'])) {
         'rows' => [],
     ];
     foreach ($subnets as $key => $subnet) {
-        $subnets_table['rows'][$key]=[
+        $subnets_table['rows'][$key] = [
             $subnet['network'],
             $subnet['max'],
             $subnet['cur'],
@@ -130,17 +129,17 @@ if (!isset($vars['app_page']) || !isset($app->data['pools'])) {
     ];
     foreach ($leases as $key => $lease) {
         // look and see if we know what that mac belongs to and if so create a link for the device and port
-        $mac=$lease['hw_address'];
+        $mac = $lease['hw_address'];
         $port = Port::with('device')->firstWhere(['ifPhysAddress' => str_replace(':', '', $mac)]);
         if (isset($port)) {
-            $mac= $mac.' ('.
-                generate_device_link(['device_id'=>$port->device_id]).', '.
+            $mac = $mac . ' (' .
+                generate_device_link(['device_id'=>$port->device_id]) . ', ' .
                 generate_port_link([
                     'label' => $port->label,
                     'port_id' => $port->port_id,
                     'ifName' => $port->ifName,
                     'device_id' => $port->device_id,
-            ]).')';
+                ]) . ')';
         }
 
         if ($lease['client_hostname'] != '') {
@@ -149,7 +148,7 @@ if (!isset($vars['app_page']) || !isset($app->data['pools'])) {
         if ($lease['vendor_class_identifier'] != '') {
             $lease['vendor_class_identifier'] = base64_decode($lease['vendor_class_identifier']);
         }
-        $table_info['rows'][$key]=[
+        $table_info['rows'][$key] = [
             $lease['ip'],
             $lease['state'],
             $mac,
