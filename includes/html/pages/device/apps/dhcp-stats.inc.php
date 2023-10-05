@@ -9,16 +9,17 @@ $link_array = [
     'app'    => 'dhcp-stats',
 ];
 
-print_optionbar_start();
+// app data is only going to exist for this for extend 3+, so don't both displaying it otherwise
+if (isset($app->data['pools'])) {
+    print_optionbar_start();
+    echo generate_link('General', $link_array);
+    echo ' | ' . generate_link('Pools', $link_array, ['app_page'=>'pools']);
+    echo ' | ' . generate_link('Leases', $link_array, ['app_page'=>'leases']);
+    print_optionbar_end();
+}
 
-echo generate_link('General', $link_array);
-echo ' | ' . generate_link('Pools', $link_array, ['app_page'=>'pools']);
-echo ' | ' . generate_link('Leases', $link_array, ['app_page'=>'leases']);
 
-print_optionbar_end();
-
-
-if (!isset($vars['app_page'])) {
+if (!isset($vars['app_page']) || !isset($app->data['pools'])) {
     $graphs = [
         'dhcp-stats_stats' => 'Stats',
         'dhcp-stats_pools_percent' => 'Pools Percent',
