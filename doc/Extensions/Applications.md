@@ -955,8 +955,8 @@ A small python3 script that reports current DHCP leases stats and pool usage of 
 
 Also you have to install the dhcpd-pools and the required Perl
 modules. Under Ubuntu/Debian just run `apt install
-cpanminus ; cpanm Net::ISC::DHCPd::Leases Mime::Base64` or under FreeBSD
-`pkg install p5-JSON p5-MIME-Base64 p5-App-cpanminus ; cpanm Net::ISC::DHCPd::Leases`.
+cpanminus ; cpanm Net::ISC::DHCPd::Leases Mime::Base64 File::Slurp` or under FreeBSD
+`pkg install p5-JSON p5-MIME-Base64 p5-App-cpanminus p5-File-Slurp ; cpanm Net::ISC::DHCPd::Leases`.
 
 ### SNMP Extend
 
@@ -972,7 +972,15 @@ chmod +x /etc/snmp/dhcp
 
 3. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
 ```
-extend dhcpstats /etc/snmp/dhcp
+# without using cron
+extend dhcpstats /etc/snmp/dhcp -Z
+# using cron
+extend dhcpstats /bin/cat /var/cache/dhcp_extend
+```
+
+4. If on a slow system running it via cron may be needed.
+```
+*/5 * * * * /etc/snmp/dhcp -Z -w /var/cache/dhcp_extend
 ```
 
 The following options are also supported.
@@ -983,6 +991,7 @@ The following options are also supported.
 | `-l $file` | Path to lease file.             |
 | `-Z`       | Enable GZip+Base64 compression. |
 | `-d`       | Do not de-dup.                  |
+| `-w $file` | File to write it out to.        |
 
 5. Restart snmpd on your host
 
