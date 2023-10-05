@@ -33,8 +33,10 @@ use App\Models\OspfNbr;
 use App\Models\OspfPort;
 use App\Observers\ModuleModelObserver;
 use Illuminate\Support\Collection;
+use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
+use LibreNMS\Polling\ModuleStatus;
 use LibreNMS\RRD\RrdDefinition;
 use SnmpQuery;
 
@@ -48,6 +50,11 @@ class Ospf implements Module
         return ['ports'];
     }
 
+    public function shouldDiscover(OS $os, ModuleStatus $status): bool
+    {
+        return false;
+    }
+
     /**
      * @inheritDoc
      */
@@ -56,10 +63,15 @@ class Ospf implements Module
         // no discovery
     }
 
+    public function shouldPoll(OS $os, ModuleStatus $status): bool
+    {
+        return $status->isEnabled() && ! $os->getDevice()->snmp_disable && $os->getDevice()->status;
+    }
+
     /**
      * @inheritDoc
      */
-    public function poll(OS $os): void
+    public function poll(OS $os, DataStorageInterface $datastore): void
     {
         foreach ($os->getDevice()->getVrfContexts() as $context_name) {
             echo ' Processes: ';
@@ -216,7 +228,7 @@ class Ospf implements Module
                 ];
 
                 $tags = compact('rrd_def');
-                app('Datastore')->put($os->getDeviceArray(), 'ospf-statistics', $tags, $fields);
+                $datastore->put($os->getDeviceArray(), 'ospf-statistics', $tags, $fields);
             }
         }
     }

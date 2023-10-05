@@ -30,8 +30,10 @@ use App\Models\Eventlog;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Enum\Severity;
+use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
+use LibreNMS\Polling\ModuleStatus;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Compare;
 use LibreNMS\Util\Number;
@@ -47,6 +49,11 @@ class Core implements Module
     public function dependencies(): array
     {
         return [];
+    }
+
+    public function shouldDiscover(OS $os, ModuleStatus $status): bool
+    {
+        return ! $os->getDevice()->snmp_disable && $os->getDevice()->status;
     }
 
     public function discover(OS $os): void
@@ -88,7 +95,12 @@ class Core implements Module
         echo 'OS: ' . Config::getOsSetting($device->os, 'text') . " ($device->os)\n\n";
     }
 
-    public function poll(OS $os): void
+    public function shouldPoll(OS $os, ModuleStatus $status): bool
+    {
+        return ! $os->getDevice()->snmp_disable && $os->getDevice()->status;
+    }
+
+    public function poll(OS $os, DataStorageInterface $datastore): void
     {
         $device = $os->getDevice();
         $oids = [];
@@ -109,7 +121,7 @@ class Core implements Module
             'sysObjectID' => $snmpdata['.1.3.6.1.2.1.1.2.0'] ?? $device->sysObjectID,
         ]);
 
-        $this->calculateUptime($os, $snmpdata['.1.3.6.1.2.1.1.3.0'] ?? null);
+        $this->calculateUptime($os, $snmpdata['.1.3.6.1.2.1.1.3.0'] ?? null, $datastore);
         $device->save();
     }
 
@@ -247,7 +259,7 @@ class Core implements Module
         return true;
     }
 
-    private function calculateUptime(OS $os, ?string $sysUpTime): void
+    private function calculateUptime(OS $os, ?string $sysUpTime, DataStorageInterface $datastore): void
     {
         global $agent_data;
         $device = $os->getDevice();
@@ -280,13 +292,13 @@ class Core implements Module
                 }
             }
 
-            app('Datastore')->put($os->getDeviceArray(), 'uptime', [
+            $datastore->put($os->getDeviceArray(), 'uptime', [
                 'rrd_def' => RrdDefinition::make()->addDataset('uptime', 'GAUGE', 0),
             ], $uptime);
 
             $os->enableGraph('uptime');
 
-            echo 'Uptime: ' . Time::formatInterval($uptime) . PHP_EOL;
+            Log::info('Uptime: ' . Time::formatInterval($uptime));
             $device->uptime = $uptime;
         }
     }

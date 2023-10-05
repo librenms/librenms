@@ -10,11 +10,10 @@
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
-use LibreNMS\Config;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
 use LibreNMS\Util\Http;
 
-class LineMessagingAPI extends Transport
+class Linemessagingapi extends Transport
 {
     protected string $name = 'LINE Messaging API';
 

@@ -44,7 +44,7 @@ if ($device['os'] == 'timos') {
         $vrfId = dbFetchCell('SELECT vrf_id from `vrfs` WHERE vrf_oid = ?', [$vrfOid]);
         d_echo($vrfId);
         foreach ($vrf as $address => $value) {
-            $astext = get_astext($value['tBgpPeerNgPeerAS4Byte']);
+            $astext = \LibreNMS\Util\AutonomousSystem::get($value['tBgpPeerNgPeerAS4Byte'])->name();
 
             if (dbFetchCell('SELECT COUNT(*) from `bgpPeers` WHERE device_id = ? AND bgpPeerIdentifier = ? AND vrf_id = ?', [$device['device_id'], $address, $vrfId]) < '1') {
                 $peers = [

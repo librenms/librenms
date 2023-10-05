@@ -249,8 +249,11 @@ if (! Auth::user()->hasGlobalRead()) {
             $peer_type = "<span style='color: #00f;'>iBGP</span>";
         } else {
             $peer_type = "<span style='color: #0a0;'>eBGP</span>";
-            if ($peer['bgpPeerRemoteAS'] >= '64512' && $peer['bgpPeerRemoteAS'] <= '65535') {
-                $peer_type = "<span style='color: #f00;'>Priv eBGP</span>";
+            // Private ASN ranges
+            // 64512 - 65534 (Private)
+            // 4200000000 - 4294967294 (Private)
+            if (($peer['bgpPeerRemoteAs'] >= 64512 && $peer['bgpPeerRemoteAs'] <= 65534) || ($peer['bgpPeerRemoteAs'] >= 4200000000 && $peer['bgpPeerRemoteAs'] <= 4294967294)) {
+                $peer_type = "<span style='color: #0af;'>Priv eBGP</span>";
             }
         }
 
@@ -263,7 +266,7 @@ if (! Auth::user()->hasGlobalRead()) {
         try {
             $peer_addr = new IPv6($peer['bgpPeerRemoteAddr'] != '0.0.0.0' ? $peer['bgpPeerRemoteAddr'] : $peer['bgpPeerIdentifier']);
         } catch (InvalidIpException $e) {
-            $peer_ident = $peer['bgpPeerIdentifier'];
+            $peer_addr = $peer['bgpPeerIdentifier'];
         }
 
         // display overlib graphs

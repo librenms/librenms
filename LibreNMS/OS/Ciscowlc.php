@@ -27,6 +27,7 @@ namespace LibreNMS\OS;
 
 use App\Models\AccessPoint;
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessApCountDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 use LibreNMS\Interfaces\Polling\OSPolling;
@@ -38,7 +39,7 @@ class Ciscowlc extends Cisco implements
     WirelessClientsDiscovery,
     WirelessApCountDiscovery
 {
-    public function pollOS(): void
+    public function pollOS(DataStorageInterface $datastore): void
     {
         $device = $this->getDeviceArray();
         $apNames = \SnmpQuery::enumStrings()->walk('AIRESPACE-WIRELESS-MIB::bsnAPName')->table(1);
@@ -65,7 +66,7 @@ class Ciscowlc extends Cisco implements
         ];
 
         $tags = compact('rrd_def');
-        data_update($device, 'ciscowlc', $tags, $fields);
+        $datastore->put($device, 'ciscowlc', $tags, $fields);
 
         $db_aps = $this->getDevice()->accessPoints->keyBy->getCompositeKey();
         $valid_ap_ids = [];
@@ -105,7 +106,7 @@ class Ciscowlc extends Cisco implements
                     ->addDataset('numasoclients', 'GAUGE', 0, 500)
                     ->addDataset('interference', 'GAUGE', 0, 2000);
 
-                data_update($device, 'arubaap', [
+                $datastore->put($device, 'arubaap', [
                     'name' => $ap->name,
                     'radionum' => $ap->radio_number,
                     'rrd_name' => ['arubaap', $ap->name . $ap->radio_number],

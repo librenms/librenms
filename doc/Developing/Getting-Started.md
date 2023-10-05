@@ -64,7 +64,7 @@ mode by adding a `-d` flag.
 
 ```bash
 ./discovery.php -d -h HOSTNAME
-./poller.php -d -h HOSTNAME
+lnms device:poll HOSTNAME -vv
 ```
 
 ### Inspecting variables
