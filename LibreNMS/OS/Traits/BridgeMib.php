@@ -67,7 +67,7 @@ trait BridgeMib
             return new Collection;
         }
 
-        $bridge = Mac::parse($stp['BRIDGE-MIB::dot1dBaseBridgeAddress.0'] ?? '');
+        $bridge = Mac::parseBridge($stp['BRIDGE-MIB::dot1dBaseBridgeAddress.0'] ?? '');
         $bridgeMac = $bridge->hex();
         $drBridge = Mac::parseBridge($stp['BRIDGE-MIB::dot1dStpDesignatedRoot.0'] ?? '');
         \Log::info(sprintf('VLAN: %s Bridge: %s DR: %s', $vlan ?: 1, $bridge->readable(), $drBridge->readable()));
