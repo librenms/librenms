@@ -17,6 +17,13 @@ class MacUtilTest extends TestCase
         $this->assertEquals(['de', 'ad', 'be', 'ef', 'a0', 'c3'], $mac->array());
     }
 
+    public function testBridgeParsing(): void
+    {
+        $this->assertEquals('0c85255ce500', Mac::parseBridge('80 62 0c 85 25 5c e5 00')->hex());
+        $this->assertEquals('000000000000', Mac::parseBridge('00 00 00 00 00 00 00 00 ')->hex());
+        $this->assertEquals('0c85255ce500', Mac::parseBridge('80620c85255ce500')->hex());
+    }
+
     /**
      * @test
      *
@@ -43,8 +50,6 @@ class MacUtilTest extends TestCase
             ['00:02:04:0B:0D:0F', '0002040b0d0f'],
             ['0:2:4:B:D:F',       '0002040b0d0f'],
             ['0:2:4:B:D:F',       '0002040b0d0f'],
-            ['80 62 0c 85 25 5c e5 00',  '0c85255ce500'],  // BridgeId format
-            ['80620c85255ce500',  '0c85255ce500'],
         ];
     }
 }

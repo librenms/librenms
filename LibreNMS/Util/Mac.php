@@ -37,7 +37,7 @@ class Mac
     {
         $mac = strtolower(trim($mac));
 
-        if (preg_match('/([0-9a-f]{1,2})[-:. ]?([0-9a-f]{1,2})[-:. ]?([0-9a-f]{1,2})[-:. ]?([0-9a-f]{1,2})[-:. ]?([0-9a-f]{1,2})[-:. ]?([0-9a-f]{1,2})$/', $mac, $matches)) {
+        if (preg_match('/^([0-9a-f]{1,2})[-:.]?([0-9a-f]{1,2})[-:.]?([0-9a-f]{1,2})[-:.]?([0-9a-f]{1,2})[-:.]?([0-9a-f]{1,2})[-:.]?([0-9a-f]{1,2})$/', $mac, $matches)) {
             // strings without delimiters must have 12 characters
             if (! preg_match('/^[0-9a-f]{0,11}$/', $mac)) {
                 $this->mac = [
@@ -66,6 +66,15 @@ class Mac
     public static function parse(?string $mac): static
     {
         return new static($mac ?? '');
+    }
+
+    /**
+     * Remove prefix from STP bridge addresses to parse MAC
+     * Example: 80 00 3C 2C 99 7A 5D 80
+     */
+    public static function parseBridge(string $bridge): static
+    {
+        return new static(substr(str_replace(' ', '', $bridge), -12));
     }
 
     /**
