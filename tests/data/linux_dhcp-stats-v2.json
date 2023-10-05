@@ -102,7 +102,7 @@
                 },
                 {
                     "metric": "dhcp-stats_stats_dhcp_released",
-                    "value": 1,
+                    "value": 0,
                     "value_prev": null,
                     "app_type": "dhcp-stats"
                 },
