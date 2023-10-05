@@ -19,7 +19,6 @@ discovery_modules:
     mpls: false
 poller_modules:
     printer-supplies:   true
-    ports-stack: false
     arp-table: false
     bgp-peers: false
     vlans: false
