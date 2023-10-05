@@ -342,11 +342,7 @@ if ($options['f'] === 'refresh_device_groups') {
 
 if ($options['f'] === 'notify') {
     if (\LibreNMS\Config::has('alert.default_mail')) {
-        send_mail(
-            \LibreNMS\Config::get('alert.default_mail'),
-            '[LibreNMS] Auto update has failed for ' . Config::get('distributed_poller_name'),
-            "We just attempted to update your install but failed. The information below should help you fix this.\r\n\r\n" . $options['o']
-        );
+        \LibreNMS\Util\Mail::send(\LibreNMS\Config::get('alert.default_mail'), '[LibreNMS] Auto update has failed for ' . Config::get('distributed_poller_name'), "We just attempted to update your install but failed. The information below should help you fix this.\r\n\r\n" . $options['o'], false);
     }
 }
 

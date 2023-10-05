@@ -30,6 +30,7 @@ use LibreNMS\Interfaces\Discovery\DiscoveryModule;
 use LibreNMS\Interfaces\Polling\PollerModule;
 use LibreNMS\OS;
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Util\StringHelpers;
 
 class Sensor implements DiscoveryModule, PollerModule
 {
@@ -510,22 +511,22 @@ class Sensor implements DiscoveryModule, PollerModule
 
     protected static function getDiscoveryInterface($type)
     {
-        return str_to_class($type, 'LibreNMS\\Interfaces\\Discovery\\Sensors\\') . 'Discovery';
+        return StringHelpers::toClass($type, 'LibreNMS\\Interfaces\\Discovery\\Sensors\\') . 'Discovery';
     }
 
     protected static function getDiscoveryMethod($type)
     {
-        return 'discover' . str_to_class($type);
+        return 'discover' . StringHelpers::toClass($type, null);
     }
 
     protected static function getPollingInterface($type)
     {
-        return str_to_class($type, 'LibreNMS\\Interfaces\\Polling\\Sensors\\') . 'Polling';
+        return StringHelpers::toClass($type, 'LibreNMS\\Interfaces\\Polling\\Sensors\\') . 'Polling';
     }
 
     protected static function getPollingMethod($type)
     {
-        return 'poll' . str_to_class($type);
+        return 'poll' . StringHelpers::toClass($type, null);
     }
 
     /**

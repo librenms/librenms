@@ -27,6 +27,7 @@ namespace LibreNMS\Util;
 
 use App\Models\Device;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use LibreNMS\Config;
 
@@ -158,10 +159,12 @@ class Rewrite
     {
         $oui = substr($mac, 0, 6);
 
-        $results = DB::table('vendor_ouis')
-            ->where('oui', 'like', "$oui%") // possible matches
-            ->orderBy('oui', 'desc') // so we can check longer ones first if we have them
-            ->pluck('vendor', 'oui');
+        $results = Cache::remember($oui, 21600, function () use ($oui) {
+            return DB::table('vendor_ouis')
+                ->where('oui', 'like', "$oui%") // possible matches
+                ->orderBy('oui', 'desc') // so we can check longer ones first if we have them
+                ->pluck('vendor', 'oui');
+        });
 
         if (count($results) == 1) {
             return Arr::first($results);
