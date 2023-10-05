@@ -1291,6 +1291,10 @@ return [
                 'description' => 'Dump debug errors (Will break your install)',
                 'help' => 'Dump out errors that are normally hidden so you as a developer can find and fix the possible issues.',
             ],
+            'throttle' => [
+                'description' => 'Throttle Error Reports',
+                'help' => 'Reports will only be sent every specified amount of seconds. Without this if you have an error in common code reporting can get out of hand. Set to 0 to disable throttling.',
+            ],
         ],
         'route_purge' => [
             'description' => 'Route entries older than',
