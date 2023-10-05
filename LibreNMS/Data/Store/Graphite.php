@@ -104,13 +104,8 @@ class Graphite extends BaseDatastore
         $measurement = preg_replace(['/\./', '/\//'], '_', $measurement);
         $measurement = preg_replace('/\|/', '.', $measurement);
 
-        $ms_name = $tags['rrd_name'] ?? '';
-        if (is_array($ms_name)) {
-            $ms_name = implode('.', $ms_name);
-        } else {
-            $ms_name = preg_replace('/\./', '_', $ms_name);
-        }
-
+        $measurement_name = preg_replace('/\./', '_', $tags['rrd_name'] ?? '');
+        $ms_name = is_array($measurement_name) ? implode('.', $measurement_name) : $measurement_name;
         // remove the port-id tags from the metric
         if (preg_match('/^port-id\d+/', $ms_name)) {
             $ms_name = '';
