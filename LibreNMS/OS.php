@@ -230,7 +230,7 @@ class OS implements
      * If no specific OS is found, Try the OS group.
      * Otherwise, returns Generic
      */
-    public static function make(array &$device): static
+    public static function make(array &$device): OS
     {
         if (isset($device['os'])) {
             // load os definition and populate os_group

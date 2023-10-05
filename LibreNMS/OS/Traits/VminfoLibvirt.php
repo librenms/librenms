@@ -142,7 +142,7 @@ trait VminfoLibvirt
                         }
 
                         // Save the discovered Virtual Machine.
-                        $libvirt_vmlist[] = new \App\Models\Vminfo([
+                        $vms->push(new \App\Models\Vminfo([
                             'vmtype' => 'libvirt',
                             'vmwVmVMID' => $dom_id,
                             'vmwVmState' => $vmwVmState,
@@ -150,7 +150,7 @@ trait VminfoLibvirt
                             'vmwVmDisplayName' => $xml->name,
                             'vmwVmMemSize' => $vmwVmMemSize,
                             'vmwVmCpus' => $xml->vcpu['current'] ?? $xml->vcpu,
-                        ]);
+                        ]));
                     }
                 }
             }

@@ -27,10 +27,13 @@ namespace LibreNMS\Modules;
 
 use App\Models\Device;
 use App\Observers\ModuleModelObserver;
+use LibreNMS\Config;
 use LibreNMS\DB\SyncsModels;
+use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Discovery\VminfoDiscovery;
 use LibreNMS\Interfaces\Polling\VminfoPolling;
 use LibreNMS\OS;
+use LibreNMS\Polling\ModuleStatus;
 
 class Vminfo implements \LibreNMS\Interfaces\Module
 {
@@ -44,26 +47,14 @@ class Vminfo implements \LibreNMS\Interfaces\Module
         return [];
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function poll(OS $os): void
+    public function shouldDiscover(OS $os, ModuleStatus $status): bool
     {
-        if ($os->getDevice()->vminfo->isEmpty()) {
-            return;
+        // libvirt does not use snmp, only ssh tunnels
+        if (! Config::get('enable_libvirt') && $os->getDevice()->snmp_disable) {
+            return false;
         }
 
-        if ($os instanceof VminfoPolling) {
-            $vms = $os->pollVminfo($os->getDevice()->vminfo);
-
-            ModuleModelObserver::observe(Vminfo::class);
-            $this->syncModels($os->getDevice(), 'vminfo', $vms);
-
-            return;
-        }
-
-        // just run discovery again
-        $this->discover($os);
+        return $status->isEnabled() && $os->getDevice()->status && $os instanceof VminfoDiscovery;
     }
 
     /**
@@ -74,10 +65,37 @@ class Vminfo implements \LibreNMS\Interfaces\Module
         if ($os instanceof VminfoDiscovery) {
             $vms = $os->discoverVminfo();
 
-            ModuleModelObserver::observe(Vminfo::class);
+            ModuleModelObserver::observe(\App\Models\Vminfo::class);
             $this->syncModels($os->getDevice(), 'vminfo', $vms);
         }
         echo PHP_EOL;
+    }
+
+    public function shouldPoll(OS $os, ModuleStatus $status): bool
+    {
+        return $status->isEnabled() && ! $os->getDevice()->snmp_disable && $os->getDevice()->status && $os instanceof VminfoPolling;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function poll(OS $os, DataStorageInterface $datastore): void
+    {
+        if ($os->getDevice()->vminfo->isEmpty()) {
+            return;
+        }
+
+        if ($os instanceof VminfoPolling) {
+            $vms = $os->pollVminfo($os->getDevice()->vminfo);
+
+            ModuleModelObserver::observe(\App\Models\Vminfo::class);
+            $this->syncModels($os->getDevice(), 'vminfo', $vms);
+
+            return;
+        }
+
+        // just run discovery again
+        $this->discover($os);
     }
 
     /**
