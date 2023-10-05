@@ -5,11 +5,12 @@
                 {
                     "app_type": "dhcp-stats",
                     "app_state": "UNKNOWN",
-                    "discovered": "1",
+                    "discovered": 1,
                     "app_state_prev": null,
                     "app_status": "",
                     "app_instance": "",
                     "data": null
+                    "deleted_at": null
                 }
             ]
         },
@@ -18,23 +19,24 @@
                 {
                     "app_type": "dhcp-stats",
                     "app_state": "OK",
-                    "discovered": "1",
+                    "discovered": 1,
                     "app_state_prev": "UNKNOWN",
                     "app_status": "",
                     "app_instance": "",
                     "data": null
+                    "deleted_at": null
                 }
             ],
             "application_metrics": [
                 {
                     "metric": "all_networks_cur",
-                    "value": "1",
+                    "value": 1,
                     "value_prev": null,
                     "app_type": "dhcp-stats"
                 },
                 {
                     "metric": "all_networks_max",
-                    "value": "65",
+                    "value": 65,
                     "value_prev": null,
                     "app_type": "dhcp-stats"
                 },
@@ -100,13 +102,13 @@
                 },
                 {
                     "metric": "networks_0_cur",
-                    "value": "1",
+                    "value": 1,
                     "value_prev": null,
                     "app_type": "dhcp-stats"
                 },
                 {
                     "metric": "networks_0_max",
-                    "value": "65",
+                    "value": 65,
                     "value_prev": null,
                     "app_type": "dhcp-stats"
                 },
@@ -124,7 +126,7 @@
                 },
                 {
                     "metric": "pools_0_cur",
-                    "value": "1",
+                    "value": 1,
                     "value_prev": null,
                     "app_type": "dhcp-stats"
                 },
@@ -142,7 +144,7 @@
                 },
                 {
                     "metric": "pools_0_max",
-                    "value": "65",
+                    "value": 65,
                     "value_prev": null,
                     "app_type": "dhcp-stats"
                 },
