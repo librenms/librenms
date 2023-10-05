@@ -20,7 +20,8 @@ class MacUtilTest extends TestCase
     public function testBridgeParsing(): void
     {
         $this->assertEquals('0c85255ce500', Mac::parseBridge('80 62 0c 85 25 5c e5 00')->hex());
-        $this->assertEquals('000000000000', Mac::parseBridge('00 00 00 00 00 00 00 00 ')->hex());
+        $this->assertEquals('000000000001', Mac::parseBridge('00 00 00 00 00 00 00 01 ')->hex());
+        $this->assertEquals('000000000002', Mac::parseBridge('0-00.00.00.00.00.02')->hex());
         $this->assertEquals('0c85255ce500', Mac::parseBridge('80620c85255ce500')->hex());
     }
 

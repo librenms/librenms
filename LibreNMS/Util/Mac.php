@@ -70,11 +70,12 @@ class Mac
 
     /**
      * Remove prefix from STP bridge addresses to parse MAC
-     * Example: 80 00 3C 2C 99 7A 5D 80
+     * Examples: 80 00 3C 2C 99 7A 5D 80
+     *           0-1C.2C.99.7A.5D.80
      */
     public static function parseBridge(string $bridge): static
     {
-        return new static(substr(str_replace(' ', '', $bridge), -12));
+        return new static(substr(preg_replace('/[^0-9a-f]/', '', strtolower($bridge)), -12));
     }
 
     /**
