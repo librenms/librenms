@@ -44,7 +44,7 @@ class DeviceObserver
             $reason = $device->status ? $device->getOriginal('status_reason') : $device->status_reason;
             $polled_by = Config::get('distributed_poller') ? (' by ' . \config('librenms.node_id')) : '';
 
-            Eventlog::log(sprintf('Device status changed to %s from %s check%s.', ucfirst($type), $reason, $polled_by, $device, $type));
+            Eventlog::log(sprintf('Device status changed to %s from %s check%s.', ucfirst($type), $reason, $polled_by), $device, $type);
         }
 
         // key attribute changes
