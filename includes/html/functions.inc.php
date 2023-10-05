@@ -1241,14 +1241,14 @@ function nfsen_live_dir($hostname)
  */
 function render_table($table_info)
 {
-    $table_id = 'renderTable'.random_int(1, 100000000);
-    $function_id='sortTable'.$table_id;
+    $table_id = 'renderTable' . random_int(1, 100000000);
+    $function_id = 'sortTable' . $table_id;
 
-    $to_return = '<table id="'.$table_id.'">'."\n";
+    $to_return = '<table id="' . $table_id . '">' . "\n";
     if (isset($table_info['headers']) && is_array($table_info['headers']) && isset($table_info['headers'][0])) {
         $to_return = $to_return . "  <tr>\n";
         foreach ($table_info['headers'] as $key => $header) {
-            $to_return = $to_return . '    <th onclick="'.$function_id.'('.$key.')">'.$header."</th>\n";
+            $to_return = $to_return . '    <th onclick="' . $function_id . '(' . $key . ')">' . $header . "</th>\n";
         }
         $to_return = $to_return . "  </tr>\n";
     }
@@ -1257,7 +1257,7 @@ function render_table($table_info)
             $to_return = $to_return . "  <tr>\n";
             if (is_array($row) && isset($row[0])) {
                 foreach ($row as $data) {
-                    $to_return = $to_return . '    <td>'.$data."</td>\n";
+                    $to_return = $to_return . '    <td>' . $data . "</td>\n";
                 }
             }
             $to_return = $to_return . "  </tr>\n";
@@ -1266,10 +1266,10 @@ function render_table($table_info)
     $to_return = $to_return . "</table>\n\n";
 
     // copied and vaguely modified from https://www.w3schools.com/howto/howto_js_sort_table.asp
-    $to_return=$to_return.'<script>
-function '.$function_id.'(n) {
+    $to_return = $to_return . '<script>
+function ' . $function_id . '(n) {
   var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
-  table = document.getElementById("'.$table_id.'");
+  table = document.getElementById("' . $table_id . '");
   switching = true;
   // Set the sorting direction to ascending:
   dir = "asc";
