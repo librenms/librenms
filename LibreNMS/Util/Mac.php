@@ -53,7 +53,7 @@ class Mac
     }
 
     /**
-     *  Parse a MAC address from a well-formed and in a common format.
+     *  Parse a MAC address from a well-formed MAC string and in a common format.
      *  00:12:34:ab:cd:ef
      *  00:12:34:AB:CD:EF
      *  0:12:34:AB:CD:EF
