@@ -440,15 +440,7 @@ class Cisco extends OS implements
 
             echo 'SLA ' . $sla_nr . ': ' . $rtt_type . ' ' . $sla['owner'] . ' ' . $sla['tag'] . '... ' . $sla->rtt . 'ms at ' . $time . "\n";
 
-            $fields = [
-                'rtt' => $sla->rtt,
-            ];
-
-            // The base RRD
-            $rrd_name = ['sla', $sla['sla_nr']];
-            $rrd_def = RrdDefinition::make()->addDataset('rtt', 'GAUGE', 0, 300000);
-            $tags = compact('sla_nr', 'rrd_name', 'rrd_def');
-            data_update($device, 'sla', $tags, $fields);
+            $collected = ['rtt' => $sla->rtt];
 
             // Let's gather some per-type fields.
             switch ($rtt_type) {
@@ -480,8 +472,8 @@ class Cisco extends OS implements
                         ->addDataset('AvgSDJ', 'GAUGE', 0)
                         ->addDataset('AvgDSJ', 'GAUGE', 0);
                     $tags = compact('rrd_name', 'rrd_def', 'sla_nr', 'rtt_type');
-                    data_update($device, 'sla', $tags, $jitter);
-                    $fields = array_merge($fields, $jitter);
+                    app('Datastore')->put($device, 'sla', $tags, $jitter);
+                    $collected = array_merge($collected, $jitter);
                     // Additional rrd for total number packet in sla
                     $numPackets = [
                         'NumPackets' => $data[$sla_nr]['rttMonEchoAdminNumPackets'],
@@ -490,8 +482,8 @@ class Cisco extends OS implements
                     $rrd_def = RrdDefinition::make()
                         ->addDataset('NumPackets', 'GAUGE', 0);
                     $tags = compact('rrd_name', 'rrd_def', 'sla_nr', 'rtt_type');
-                    data_update($device, 'sla', $tags, $numPackets);
-                    $fields = array_merge($fields, $numPackets);
+                    app('Datastore')->put($device, 'sla', $tags, $numPackets);
+                    $collected = array_merge($collected, $numPackets);
                     break;
                 case 'icmpjitter':
                     $icmpjitter = [
@@ -519,13 +511,13 @@ class Cisco extends OS implements
                         ->addDataset('JitterIAJOut', 'GAUGE', 0)
                         ->addDataset('JitterIAJIn', 'GAUGE', 0);
                     $tags = compact('rrd_name', 'rrd_def', 'sla_nr', 'rtt_type');
-                    data_update($device, 'sla', $tags, $icmpjitter);
-                    $fields = array_merge($fields, $icmpjitter);
+                    app('Datastore')->put($device, 'sla', $tags, $icmpjitter);
+                    $collected = array_merge($collected, $icmpjitter);
                     break;
             }
 
             d_echo('The following datasources were collected for #' . $sla['sla_nr'] . ":\n");
-            d_echo($fields);
+            d_echo($collected);
         }
     }
 

@@ -35,6 +35,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use LibreNMS\Device\Processor;
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
@@ -107,7 +108,7 @@ class Vrp extends OS implements
         }
     }
 
-    public function pollOS(): void
+    public function pollOS(DataStorageInterface $datastore): void
     {
         // Polling the Wireless data TODO port to module
         $apTable = snmpwalk_group($this->getDeviceArray(), 'hwWlanApName', 'HUAWEI-WLAN-AP-MIB', 2);
@@ -162,7 +163,7 @@ class Vrp extends OS implements
             ];
 
             $tags = compact('rrd_def');
-            data_update($this->getDeviceArray(), 'vrp', $tags, $fields);
+            $datastore->put($this->getDeviceArray(), 'vrp', $tags, $fields);
 
             $ap_db = dbFetchRows('SELECT * FROM `access_points` WHERE `device_id` = ?', [$this->getDeviceArray()['device_id']]);
 
@@ -223,7 +224,7 @@ class Vrp extends OS implements
                     ];
 
                     $tags = compact('name', 'radionum', 'rrd_name', 'rrd_def');
-                    data_update($this->getDeviceArray(), 'arubaap', $tags, $fields);
+                    $datastore->put($this->getDeviceArray(), 'arubaap', $tags, $fields);
 
                     $foundid = 0;
 
@@ -541,15 +542,7 @@ class Vrp extends OS implements
             $time = Carbon::parse($data[$owner][$test]['pingResultsLastGoodProbe'] ?? null)->toDateTimeString();
             echo 'SLA : ' . $rtt_type . ' ' . $owner . ' ' . $test . '... ' . $sla->rtt . 'ms at ' . $time . "\n";
 
-            $fields = [
-                'rtt' => $sla->rtt,
-            ];
-
-            // The base RRD
-            $rrd_name = ['sla', $sla['sla_nr']];
-            $rrd_def = RrdDefinition::make()->addDataset('rtt', 'GAUGE', 0, 300000);
-            $tags = compact('sla_nr', 'rrd_name', 'rrd_def');
-            data_update($device, 'sla', $tags, $fields);
+            $collected = ['rtt' => $sla->rtt];
 
             // Let's gather some per-type fields.
             switch ($rtt_type) {
@@ -567,13 +560,13 @@ class Vrp extends OS implements
                         ->addDataset('ProbeResponses', 'GAUGE', 0, 300000)
                         ->addDataset('ProbeLoss', 'GAUGE', 0, 300000);
                     $tags = compact('rrd_name', 'rrd_def', 'sla_nr', 'rtt_type');
-                    data_update($device, 'sla', $tags, $icmp);
-                    $fields = array_merge($fields, $icmp);
+                    app('Datastore')->put($device, 'sla', $tags, $icmp);
+                    $collected = array_merge($collected, $icmp);
                     break;
             }
 
-            d_echo('The following datasources were collected for #' . $sla['sla_nr'] . ":\n");
-            d_echo($fields);
+            d_echo('The following datasources were collected for #' . $sla->sla_nr . ":\n");
+            d_echo($collected);
         }
     }
 }

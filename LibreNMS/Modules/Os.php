@@ -29,8 +29,10 @@ use App\Models\Device;
 use App\Models\Eventlog;
 use App\Models\Location;
 use LibreNMS\Enum\Severity;
+use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\Interfaces\Polling\OSPolling;
+use LibreNMS\Polling\ModuleStatus;
 use LibreNMS\Util\Url;
 
 class Os implements Module
@@ -41,6 +43,11 @@ class Os implements Module
     public function dependencies(): array
     {
         return [];
+    }
+
+    public function shouldDiscover(\LibreNMS\OS $os, ModuleStatus $status): bool
+    {
+        return $status->isEnabled() && ! $os->getDevice()->snmp_disable && $os->getDevice()->status;
     }
 
     public function discover(\LibreNMS\OS $os): void
@@ -61,11 +68,16 @@ class Os implements Module
         $this->handleChanges($os);
     }
 
-    public function poll(\LibreNMS\OS $os): void
+    public function shouldPoll(\LibreNMS\OS $os, ModuleStatus $status): bool
+    {
+        return $status->isEnabled() && ! $os->getDevice()->snmp_disable && $os->getDevice()->status;
+    }
+
+    public function poll(\LibreNMS\OS $os, DataStorageInterface $datastore): void
     {
         $deviceModel = $os->getDevice(); /** @var \App\Models\Device $deviceModel */
         if ($os instanceof OSPolling) {
-            $os->pollOS();
+            $os->pollOS($datastore);
         } else {
             $device = $os->getDeviceArray();
             $location = null;

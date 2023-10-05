@@ -26,6 +26,7 @@
 namespace LibreNMS\OS;
 
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessNoiseFloorDiscovery;
@@ -49,7 +50,7 @@ class XirrusAos extends OS implements
     WirelessRssiDiscovery,
     WirelessSnrDiscovery
 {
-    public function pollOS(): void
+    public function pollOS(DataStorageInterface $datastore): void
     {
         $associations = [];
 
@@ -75,7 +76,7 @@ class XirrusAos extends OS implements
                     'stations' => $count,
                 ];
                 $tags = compact('radio', 'rrd_name', 'rrd_def');
-                data_update($this->getDeviceArray(), $measurement, $tags, $fields);
+                $datastore->put($this->getDeviceArray(), $measurement, $tags, $fields);
             }
             $this->enableGraph('xirrus_stations');
         }
