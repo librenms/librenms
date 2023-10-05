@@ -32,6 +32,7 @@ use Illuminate\Support\Facades\DB;
 class Mac
 {
     private array $mac = [];
+
     public function __construct(string $mac)
     {
         $mac = strtolower(trim($mac));

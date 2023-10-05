@@ -26,8 +26,6 @@
 namespace LibreNMS\Util;
 
 use App\Models\Device;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use LibreNMS\Config;
 
