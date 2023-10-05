@@ -93,7 +93,7 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
         // handle string indexes
         if (Str::contains($oid, '"')) {
             $oid = preg_replace_callback('/"([^"]+)"/', function ($matches) {
-                return string_to_oid($matches[1]);
+                return \LibreNMS\Util\Oid::ofString($matches[1]);
             }, $oid);
         }
         $proc->processor_oid = '.' . ltrim($oid, '.');
