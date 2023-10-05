@@ -21,7 +21,7 @@
                     "app_state": "OK",
                     "discovered": 1,
                     "app_state_prev": "UNKNOWN",
-                    "app_status": "",
+                    "app_status": "1/65",
                     "app_instance": "",
                     "data": null,
                     "deleted_at": null
@@ -29,128 +29,92 @@
             ],
             "application_metrics": [
                 {
-                    "metric": "all_networks_cur",
+                    "metric": "192.168.14.0_23_networks_current",
                     "value": 1,
                     "value_prev": null,
                     "app_type": "dhcp-stats"
                 },
                 {
-                    "metric": "all_networks_max",
+                    "metric": "192.168.14.0_23_networks_max",
                     "value": 65,
                     "value_prev": null,
                     "app_type": "dhcp-stats"
                 },
                 {
-                    "metric": "all_networks_percent",
-                    "value": "1.538",
+                    "metric": "192.168.14.0_23_networks_percent",
+                    "value": 1.538,
                     "value_prev": null,
                     "app_type": "dhcp-stats"
                 },
                 {
-                    "metric": "leases_abandoned",
+                    "metric": "192.168.15.128_-_192.168.15.192_pools_current",
+                    "value": 1,
+                    "value_prev": null,
+                    "app_type": "dhcp-stats"
+                },
+                {
+                    "metric": "192.168.15.128_-_192.168.15.192_pools_max",
+                    "value": 65,
+                    "value_prev": null,
+                    "app_type": "dhcp-stats"
+                },
+                {
+                    "metric": "192.168.15.128_-_192.168.15.192_pools_percent",
+                    "value": 1.538,
+                    "value_prev": null,
+                    "app_type": "dhcp-stats"
+                },
+                {
+                    "metric": "dhcp-stats_stats_dhcp_abandoned",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "dhcp-stats"
                 },
                 {
-                    "metric": "leases_active",
+                    "metric": "dhcp-stats_stats_dhcp_active",
                     "value": 3,
                     "value_prev": null,
                     "app_type": "dhcp-stats"
                 },
                 {
-                    "metric": "leases_backup",
+                    "metric": "dhcp-stats_stats_dhcp_backup",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "dhcp-stats"
                 },
                 {
-                    "metric": "leases_bootp",
+                    "metric": "dhcp-stats_stats_dhcp_bootp",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "dhcp-stats"
                 },
                 {
-                    "metric": "leases_expired",
+                    "metric": "dhcp-stats_stats_dhcp_expired",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "dhcp-stats"
                 },
                 {
-                    "metric": "leases_free",
+                    "metric": "dhcp-stats_stats_dhcp_free",
                     "value": 52,
                     "value_prev": null,
                     "app_type": "dhcp-stats"
                 },
                 {
-                    "metric": "leases_released",
+                    "metric": "dhcp-stats_stats_dhcp_released",
+                    "value": 1,
+                    "value_prev": null,
+                    "app_type": "dhcp-stats"
+                },
+                {
+                    "metric": "dhcp-stats_stats_dhcp_reset",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "dhcp-stats"
                 },
                 {
-                    "metric": "leases_reset",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "dhcp-stats"
-                },
-                {
-                    "metric": "leases_total",
+                    "metric": "dhcp-stats_stats_dhcp_total",
                     "value": 52,
-                    "value_prev": null,
-                    "app_type": "dhcp-stats"
-                },
-                {
-                    "metric": "networks_0_cur",
-                    "value": 1,
-                    "value_prev": null,
-                    "app_type": "dhcp-stats"
-                },
-                {
-                    "metric": "networks_0_max",
-                    "value": 65,
-                    "value_prev": null,
-                    "app_type": "dhcp-stats"
-                },
-                {
-                    "metric": "networks_0_network",
-                    "value": "192.168.14.0\/23",
-                    "value_prev": null,
-                    "app_type": "dhcp-stats"
-                },
-                {
-                    "metric": "networks_0_percent",
-                    "value": "1.538",
-                    "value_prev": null,
-                    "app_type": "dhcp-stats"
-                },
-                {
-                    "metric": "pools_0_cur",
-                    "value": 1,
-                    "value_prev": null,
-                    "app_type": "dhcp-stats"
-                },
-                {
-                    "metric": "pools_0_first_ip",
-                    "value": "192.168.15.128",
-                    "value_prev": null,
-                    "app_type": "dhcp-stats"
-                },
-                {
-                    "metric": "pools_0_last_ip",
-                    "value": "192.168.15.192",
-                    "value_prev": null,
-                    "app_type": "dhcp-stats"
-                },
-                {
-                    "metric": "pools_0_max",
-                    "value": 65,
-                    "value_prev": null,
-                    "app_type": "dhcp-stats"
-                },
-                {
-                    "metric": "pools_0_percent",
-                    "value": "1.538",
                     "value_prev": null,
                     "app_type": "dhcp-stats"
                 }
