@@ -67,7 +67,7 @@ trait BridgeMib
             return new Collection;
         }
 
-        $bridge = Mac::parseBridge($stp['BRIDGE-MIB::dot1dBaseBridgeAddress.0'] ?? '');
+        $bridge = Mac::parse($stp['BRIDGE-MIB::dot1dBaseBridgeAddress.0'] ?? '');
         $bridgeMac = $bridge->hex();
         $drBridge = Mac::parseBridge($stp['BRIDGE-MIB::dot1dStpDesignatedRoot.0'] ?? '');
         \Log::info(sprintf('VLAN: %s Bridge: %s DR: %s', $vlan ?: 1, $bridge->readable(), $drBridge->readable()));
@@ -80,7 +80,7 @@ trait BridgeMib
             'priority' => $stp['BRIDGE-MIB::dot1dStpPriority.0'] ?? 0,
             'timeSinceTopologyChange' => substr($stp['BRIDGE-MIB::dot1dStpTimeSinceTopologyChange.0'] ?? '', 0, -2) ?: 0,
             'topChanges' => $stp['BRIDGE-MIB::dot1dStpTopChanges.0'] ?? 0,
-            'designatedRoot' => $drBridge,
+            'designatedRoot' => $drBridge->hex(),
             'rootCost' => $stp['BRIDGE-MIB::dot1dStpRootCost.0'] ?? 0,
             'rootPort' => $stp['BRIDGE-MIB::dot1dStpRootPort.0'] ?? 0,
             'maxAge' => ($stp['BRIDGE-MIB::dot1dStpMaxAge.0'] ?? 0) * $timeFactor,
@@ -158,7 +158,7 @@ trait BridgeMib
             $instance->timeSinceTopologyChange = substr($data['BRIDGE-MIB::dot1dStpTimeSinceTopologyChange.0'] ?? '', 0, -2) ?: 0;
             $instance->topChanges = $data['BRIDGE-MIB::dot1dStpTopChanges.0'] ?? 0;
             $instance->designatedRoot = Mac::parseBridge($data['BRIDGE-MIB::dot1dStpDesignatedRoot.0'] ?? '')->hex();
-            $instance->rootBridge = $instance->bridgeAddress == $instance->designatedRoot ? 1 : 0; // dr might have changed
+            $instance->rootBridge = $instance->bridgeAddress == $instance->designatedRoot; // dr might have changed
         });
     }
 
