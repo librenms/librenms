@@ -31,6 +31,7 @@ use App\Logging\Reporting\Middleware\SetGroups;
 use App\Logging\Reporting\Middleware\SetInstanceId;
 use App\Models\Callback;
 use ErrorException;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
@@ -49,8 +50,12 @@ class ErrorReportingProvider extends \Spatie\LaravelIgnition\IgnitionServiceProv
     /** @var string|null */
     private static $instanceId;
 
+    private $throttle = 300;
+
     public function boot(): void
     {
+        $this->throttle = Config::get('reporting.throttle', 300);
+
         /* @phpstan-ignore-next-line */
         if (! method_exists(\Spatie\FlareClient\Flare::class, 'filterReportsUsing')) {
             Log::debug("Flare client too old, disabling Ignition to avoid bug.\n");
@@ -122,6 +127,11 @@ class ErrorReportingProvider extends \Spatie\LaravelIgnition\IgnitionServiceProv
             return false;
         }
 
+        // lock to throttle error reports, completely turn off reporting for this run if it is already locked
+        if ($this->throttle && Cache::get('recently_reported_error')) {
+            return false;
+        }
+
         // Check git
         $git = Git::make(180);
         if ($git->isAvailable()) {
@@ -163,6 +173,11 @@ class ErrorReportingProvider extends \Spatie\LaravelIgnition\IgnitionServiceProv
      */
     public function handleError($level, $message, $file = '', $line = 0, $context = []): bool
     {
+        if ($this->throttle) {
+            Cache::put('recently_reported_error', true, $this->throttle);
+            $this->reportingEnabled = false; // disable reporting for the rest of this run
+        }
+
         // report errors if they are allowed
         if ($this->errorReportingLevel & $level) {
             Flare::report(new ErrorException($message, 0, $level, $file, $line));
