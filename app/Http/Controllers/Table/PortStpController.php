@@ -87,6 +87,7 @@ class PortStpController extends TableController
     {
         $drMac = Mac::parse($stpPort->designatedRoot);
         $dbMac = Mac::parse($stpPort->designatedBridge);
+
         return [
             'port_id' => Url::portLink($stpPort->port, $stpPort->port->getShortLabel()) . '<br />' . $stpPort->port->getDescription(),
             'vlan' => $stpPort->vlan ?: 1,

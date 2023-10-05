@@ -2960,7 +2960,7 @@ function del_service_from_host(Illuminate\Http\Request $request)
 
 function search_by_mac(Illuminate\Http\Request $request)
 {
-    $macAddress = Mac::parse((string)$request->route('search'))->hex();
+    $macAddress = Mac::parse((string) $request->route('search'))->hex();
 
     $rules = [
         'macAddress' => 'required|string|regex:/^[0-9a-fA-F]{12}$/',
