@@ -68,7 +68,8 @@ class ErrorReportingProvider extends \Spatie\LaravelIgnition\IgnitionServiceProv
                 dump('Exception: ' . $e->getMessage(), $e->getFile() . ':' . $e->getLine());
             }
 
-            return $this->isReportingEnabled();
+            // check if reporting is enabled and not throttled
+            return $this->isReportingEnabled() && ! $this->isThrottled();
         });
 
         Flare::filterReportsUsing(function (Report $report) {
@@ -127,11 +128,6 @@ class ErrorReportingProvider extends \Spatie\LaravelIgnition\IgnitionServiceProv
             return false;
         }
 
-        // lock to throttle error reports, completely turn off reporting for this run if it is already locked
-        if ($this->throttle && Cache::get('recently_reported_error')) {
-            return false;
-        }
-
         // Check git
         $git = Git::make(180);
         if ($git->isAvailable()) {
@@ -159,6 +155,26 @@ class ErrorReportingProvider extends \Spatie\LaravelIgnition\IgnitionServiceProv
         return true;
     }
 
+    private function isThrottled(): bool
+    {
+        if ($this->throttle) {
+            $this->reportingEnabled = false; // disable future reporting (to avoid this cache check)
+
+            try {
+                if (Cache::get('recently_reported_error')) {
+                    return true; // reporting is currently throttled
+                }
+
+                // let this report go and disable reporting for the next error
+                Cache::put('recently_reported_error', true, $this->throttle);
+            } catch (\Exception $e) {
+                // ignore throttling exception (Such as database or redis not running for cache)
+            }
+        }
+
+        return false;
+    }
+
     /**
      * Report PHP deprecations, or convert PHP errors to ErrorException instances.
      *
@@ -173,11 +189,6 @@ class ErrorReportingProvider extends \Spatie\LaravelIgnition\IgnitionServiceProv
      */
     public function handleError($level, $message, $file = '', $line = 0, $context = []): bool
     {
-        if ($this->throttle) {
-            Cache::put('recently_reported_error', true, $this->throttle);
-            $this->reportingEnabled = false; // disable reporting for the rest of this run
-        }
-
         // report errors if they are allowed
         if ($this->errorReportingLevel & $level) {
             Flare::report(new ErrorException($message, 0, $level, $file, $line));
