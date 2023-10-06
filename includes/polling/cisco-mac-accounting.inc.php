@@ -27,7 +27,7 @@ if ($device['os_group'] == 'cisco') {
         foreach ($cip_response->table(3) as $ifIndex => $port_data) {
             foreach ($port_data as $direction => $dir_data) {
                 foreach ($dir_data as $mac => $mac_data) {
-                    $mac = \LibreNMS\Util\Rewrite::macToHex($mac);
+                    $mac = Mac::parse($mac)->hex();
                     $cip_array[$ifIndex][$mac]['cipMacHCSwitchedBytes'][$direction] = $mac_data['CISCO-IP-STAT-MIB::cipMacHCSwitchedBytes'] ?? $mac_data['CISCO-IP-STAT-MIB::cipMacSwitchedBytes'] ?? null;
                     $cip_array[$ifIndex][$mac]['cipMacHCSwitchedPkts'][$direction] = $mac_data['CISCO-IP-STAT-MIB::cipMacHCSwitchedPkts'] ?? $mac_data['CISCO-IP-STAT-MIB::cipMacSwitchedPkts'] ?? null;
                 }
