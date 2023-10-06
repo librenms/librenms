@@ -100,17 +100,22 @@ class Poller
             $helper->saveMetrics();
             $helper->isUp(); // check and save status
 
-            $polled_modules = $this->pollModules();
+            $this->pollModules();
 
             $measurement->end();
 
-            // if modules are not overridden, record performance
             if (empty($this->module_override)) {
-                // check that we ran some modules (exclude availabliltiy because it always runs)
-                $valid_polled_modules = array_filter($polled_modules, fn ($module) => $module !== 'availability');
-                if (! empty($valid_polled_modules)) {
-                    $this->recordPerformance($measurement);
-                }
+                // record performance
+                $measurement->manager()->record('device', $measurement);
+                $this->device->last_polled = Carbon::now();
+                $this->device->last_polled_timetaken = $measurement->getDuration();
+                app('Datastore')->put($this->deviceArray, 'poller-perf', [
+                    'rrd_def' => RrdDefinition::make()->addDataset('poller', 'GAUGE', 0),
+                    'module' => 'ALL',
+                ], [
+                    'poller' => $measurement->getDuration(),
+                ]);
+                $this->os->enableGraph('poller_perf');
 
                 if ($helper->canPing()) {
                     $this->os->enableGraph('ping_perf');
@@ -155,7 +160,7 @@ class Poller
         return $this->buildDeviceQuery()->count();
     }
 
-    private function pollModules(): array
+    private function pollModules(): void
     {
         // update $device array status
         $this->deviceArray['status'] = $this->device->status;
@@ -168,7 +173,6 @@ class Poller
         include_once base_path('includes/snmp.inc.php');
 
         $datastore = app('Datastore');
-        $polled_modules = [];
 
         foreach (array_keys(Config::get('poller_modules')) as $module) {
             $module_status = Module::status($module, $this->device, $this->isModuleManuallyEnabled($module));
@@ -185,7 +189,6 @@ class Poller
                     $this->logger->debug($module_status);
 
                     $instance->poll($this->os, $datastore);
-                    $polled_modules[] = $module;
                 }
             } catch (Throwable $e) {
                 // isolate module exceptions so they don't disrupt the polling process
@@ -201,8 +204,6 @@ class Poller
                 $this->logger->info("#### Unload poller module $module ####\n");
             }
         }
-
-        return $polled_modules;
     }
 
     private function saveModulePerformance(string $module, float $start_time, int $start_memory): void
@@ -337,21 +338,5 @@ EOH, $this->device->hostname, $group ? " ($group)" : '', $this->device->device_i
         if (Debug::isEnabled() || Debug::isVerbose()) {
             $this->logger->info(Version::get()->header());
         }
-    }
-
-    private function recordPerformance(Measurement $measurement): void
-    {
-        $measurement->manager()->record('device', $measurement);
-
-        $this->device->last_polled = Carbon::now();
-        $this->device->last_polled_timetaken = $measurement->getDuration();
-
-        app('Datastore')->put($this->deviceArray, 'poller-perf', [
-            'rrd_def' => RrdDefinition::make()->addDataset('poller', 'GAUGE', 0),
-            'module' => 'ALL',
-        ], [
-            'poller' => $measurement->getDuration(),
-        ]);
-        $this->os->enableGraph('poller_perf');
     }
 }
