@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\View\SimpleTemplate;
+use Carbon\Carbon;
 use Fico7489\Laravel\Pivot\Traits\PivotEventTrait;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -257,6 +258,16 @@ class Device extends BaseModel
         }
 
         return $name;
+    }
+
+    /**
+     * Get the time this device went down
+     */
+    public function downSince(): Carbon
+    {
+        $outages = $this->relationLoaded('outages') ? $this->outages : $this->outages();
+
+        return new Carbon($outages->whereNull('up_again')->first()?->going_down);
     }
 
     /**
