@@ -85,6 +85,7 @@ disable it for one device then you can do this within the WebUI Device
     lnms config:set poller_modules.applications true
     lnms config:set poller_modules.availability true
     lnms config:set poller_modules.stp true
+    lnms config:set poller_modules.vminfo false
     lnms config:set poller_modules.ntp true
     lnms config:set poller_modules.services true
     lnms config:set poller_modules.loadbalancers false

@@ -2169,7 +2169,7 @@ vminfo:
     - { Field: vm_type, Type: varchar(16), 'Null': false, Extra: '', Default: vmware }
     - { Field: vmwVmVMID, Type: int, 'Null': false, Extra: '' }
     - { Field: vmwVmDisplayName, Type: varchar(128), 'Null': false, Extra: '' }
-    - { Field: vmwVmGuestOS, Type: varchar(128), 'Null': false, Extra: '' }
+    - { Field: vmwVmGuestOS, Type: varchar(128), 'Null': true, Extra: '' }
     - { Field: vmwVmMemSize, Type: int, 'Null': false, Extra: '' }
     - { Field: vmwVmCpus, Type: int, 'Null': false, Extra: '' }
     - { Field: vmwVmState, Type: 'smallint unsigned', 'Null': false, Extra: '' }
