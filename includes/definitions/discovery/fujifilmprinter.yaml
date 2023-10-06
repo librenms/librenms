@@ -1,5 +1,4 @@
 modules:
     os:
         sysDescr_regex: '/FUJIFILM (?<hardware>[^;]+)/'
-        hardware: .1.3.6.1.4.1.297.1.11.93.2.1
         serial: Printer-MIB::prtGeneralSerialNumber.1

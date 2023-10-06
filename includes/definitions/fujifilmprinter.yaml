@@ -9,21 +9,5 @@ discovery:
         - .1.3.6.1.4.1.297.1.11.93.2.1
 discovery_modules:
     printer-supplies:   true
-    ports-stack: false
-    arp-table: false
-    bgp-peers: false
-    vlans: false
-    ucd-diskio: false
-    stp: false
-    fdb-table: false
-    mpls: false
 poller_modules:
     printer-supplies:   true
-    arp-table: false
-    bgp-peers: false
-    vlans: false
-    ucd-diskio: false
-    stp: false
-    mpls: false
-    ucd-mib: false
-    ospf: false
