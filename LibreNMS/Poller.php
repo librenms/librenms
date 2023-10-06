@@ -108,7 +108,7 @@ class Poller
                 // record performance
                 $measurement->manager()->record('device', $measurement);
                 $this->device->last_polled = Carbon::now();
-                $this->device->last_ping_timetaken = $measurement->getDuration();
+                $this->device->last_polled_timetaken = $measurement->getDuration();
                 app('Datastore')->put($this->deviceArray, 'poller-perf', [
                     'rrd_def' => RrdDefinition::make()->addDataset('poller', 'GAUGE', 0),
                     'module' => 'ALL',

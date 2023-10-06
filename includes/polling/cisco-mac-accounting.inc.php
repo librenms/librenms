@@ -1,6 +1,7 @@
 <?php
 
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Util\Mac;
 
 if ($device['os_group'] == 'cisco') {
     $acc_rows = dbFetchRows('SELECT *, A.poll_time AS poll_time FROM `mac_accounting` as A, `ports` AS I where A.port_id = I.port_id AND I.device_id = ?', [$device['device_id']]);
@@ -27,7 +28,7 @@ if ($device['os_group'] == 'cisco') {
         foreach ($cip_response->table(3) as $ifIndex => $port_data) {
             foreach ($port_data as $direction => $dir_data) {
                 foreach ($dir_data as $mac => $mac_data) {
-                    $mac = \LibreNMS\Util\Rewrite::macToHex($mac);
+                    $mac = Mac::parse($mac)->hex();
                     $cip_array[$ifIndex][$mac]['cipMacHCSwitchedBytes'][$direction] = $mac_data['CISCO-IP-STAT-MIB::cipMacHCSwitchedBytes'] ?? $mac_data['CISCO-IP-STAT-MIB::cipMacSwitchedBytes'] ?? null;
                     $cip_array[$ifIndex][$mac]['cipMacHCSwitchedPkts'][$direction] = $mac_data['CISCO-IP-STAT-MIB::cipMacHCSwitchedPkts'] ?? $mac_data['CISCO-IP-STAT-MIB::cipMacSwitchedPkts'] ?? null;
                 }

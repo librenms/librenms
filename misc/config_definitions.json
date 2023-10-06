@@ -1297,15 +1297,8 @@
             "default": true,
             "type": "boolean"
         },
-        "discovery_modules.vmware-vminfo": {
+        "discovery_modules.vminfo": {
             "order": 350,
-            "group": "discovery",
-            "section": "discovery_modules",
-            "default": false,
-            "type": "boolean"
-        },
-        "discovery_modules.libvirt-vminfo": {
-            "order": 170,
             "group": "discovery",
             "section": "discovery_modules",
             "default": false,
@@ -4841,6 +4834,13 @@
             "group": "poller",
             "section": "poller_modules",
             "default": true,
+            "type": "boolean"
+        },
+        "poller_modules.vminfo": {
+            "order": 410,
+            "group": "poller",
+            "section": "poller_modules",
+            "default": false,
             "type": "boolean"
         },
         "poller_modules.wifi": {
