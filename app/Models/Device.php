@@ -261,13 +261,21 @@ class Device extends BaseModel
     }
 
     /**
+     * Get the current DeviceOutage if there is one (if device is down)
+     */
+    public function getCurrentOutage(): ?DeviceOutage
+    {
+        return $this->relationLoaded('outages')
+            ? $this->outages->whereNull('up_again')->sortBy('going_down', descending: true)->first()
+            : $this->outages()->whereNull('up_again')->orderBy('going_down', 'desc')->first();
+    }
+
+    /**
      * Get the time this device went down
      */
     public function downSince(): Carbon
     {
-        $outages = $this->relationLoaded('outages') ? $this->outages : $this->outages();
-
-        return new Carbon($outages->whereNull('up_again')->first()?->going_down);
+        return Carbon::createFromTimestamp((int) $this->getCurrentOutage()?->going_down);
     }
 
     /**
