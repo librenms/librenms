@@ -445,7 +445,7 @@ class NetSnmpQuery implements SnmpQueryInterface
         }
 
         // os directory
-        if ($os_mibdir = Config::getOsSetting($this->device->os, 'mib_dir')) {
+        if ($os_mibdir = Config::getOsSetting($this->device->os, 'mib_dir') && is_string($os_mibdir)) {
             $dirs[] = "$base/$os_mibdir";
         } elseif (file_exists($base . '/' . $this->device->os)) {
             $dirs[] = $base . '/' . $this->device->os;
