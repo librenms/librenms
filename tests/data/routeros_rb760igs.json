@@ -2761,7 +2761,7 @@
                     "priority": 32768,
                     "timeSinceTopologyChange": "0",
                     "topChanges": 0,
-                    "designatedRoot": "000000000000",
+                    "designatedRoot": "",
                     "rootCost": 0,
                     "rootPort": 0,
                     "maxAge": 0,
@@ -2783,7 +2783,7 @@
                     "pathCost": 10,
                     "designatedRoot": "000000000000",
                     "designatedCost": 0,
-                    "designatedBridge": "000000000000",
+                    "designatedBridge": "",
                     "designatedPort": 0,
                     "forwardTransitions": 0,
                     "ifIndex": 1
@@ -2797,7 +2797,7 @@
                     "pathCost": 10,
                     "designatedRoot": "c006c3a13f46",
                     "designatedCost": 20000,
-                    "designatedBridge": "000000000000",
+                    "designatedBridge": "",
                     "designatedPort": 9,
                     "forwardTransitions": 0,
                     "ifIndex": 6
@@ -2811,7 +2811,7 @@
                     "pathCost": 10,
                     "designatedRoot": "000000000000",
                     "designatedCost": 0,
-                    "designatedBridge": "000000000000",
+                    "designatedBridge": "",
                     "designatedPort": 0,
                     "forwardTransitions": 0,
                     "ifIndex": 5
@@ -2825,7 +2825,7 @@
                     "pathCost": 10,
                     "designatedRoot": "000000000000",
                     "designatedCost": 0,
-                    "designatedBridge": "000000000000",
+                    "designatedBridge": "",
                     "designatedPort": 0,
                     "forwardTransitions": 0,
                     "ifIndex": 4

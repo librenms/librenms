@@ -1,6 +1,7 @@
 <?php
 
 use LibreNMS\Util\IP;
+use LibreNMS\Util\Mac;
 
 $param = [];
 
@@ -87,8 +88,9 @@ foreach (dbFetchRows($sql, $param) as $interface) {
     if ($vars['search_type'] == 'ipv6') {
         $address = (string) IP::parse($interface['ipv6_address'], true) . '/' . $interface['ipv6_prefixlen'];
     } elseif ($vars['search_type'] == 'mac') {
-        $address = \LibreNMS\Util\Rewrite::readableMac($interface['ifPhysAddress']);
-        $mac_oui = \LibreNMS\Util\Rewrite::readableOUI($interface['ifPhysAddress']);
+        $mac = Mac::parse($interface['ifPhysAddress']);
+        $address = $mac->readable();
+        $mac_oui = $mac->vendor();
     } else {
         $address = (string) IP::parse($interface['ipv4_address'], true) . '/' . $interface['ipv4_prefixlen'];
     }

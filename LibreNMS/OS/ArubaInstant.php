@@ -41,8 +41,8 @@ use LibreNMS\Interfaces\Polling\Sensors\WirelessApCountPolling;
 use LibreNMS\Interfaces\Polling\Sensors\WirelessClientsPolling;
 use LibreNMS\Interfaces\Polling\Sensors\WirelessFrequencyPolling;
 use LibreNMS\OS;
+use LibreNMS\Util\Mac;
 use LibreNMS\Util\Number;
-use LibreNMS\Util\Rewrite;
 
 class ArubaInstant extends OS implements
     OSDiscovery,
@@ -77,10 +77,11 @@ class ArubaInstant extends OS implements
 
         foreach ($ai_ap_data as $ai_ap => $ai_ap_oid) {
             $value = $ai_ap_oid['aiAPCPUUtilization'];
-            $combined_oid = sprintf('%s::%s.%s', $ai_mib, 'aiAPCPUUtilization', Rewrite::oidMac($ai_ap));
+            $mac = Mac::parse($ai_ap);
+            $combined_oid = sprintf('%s::%s.%s', $ai_mib, 'aiAPCPUUtilization', $mac->oid());
             $oid = snmp_translate($combined_oid, 'ALL', 'arubaos', '-On');
             $description = $ai_ap_data[$ai_ap]['aiAPSerialNum'];
-            $processors[] = Processor::discover('aruba-instant', $this->getDeviceId(), $oid, Rewrite::macToHex($ai_ap), $description, 1, $value);
+            $processors[] = Processor::discover('aruba-instant', $this->getDeviceId(), $oid, $mac->hex(), $description, 1, $value);
         } // end foreach
 
         return $processors;
@@ -126,10 +127,10 @@ class ArubaInstant extends OS implements
             // Clients Per Radio
             foreach ($ap_data as $index => $entry) {
                 foreach ($entry['aiRadioClientNum'] as $radio => $value) {
-                    $combined_oid = sprintf('%s::%s.%s.%s', $ai_mib, 'aiRadioClientNum', Rewrite::oidMac($index), $radio);
+                    $combined_oid = sprintf('%s::%s.%s.%s', $ai_mib, 'aiRadioClientNum', Mac::parse($index)->oid(), $radio);
                     $oid = snmp_translate($combined_oid, 'ALL', 'arubaos', '-On');
                     $description = sprintf('%s Radio %s', $entry['aiAPSerialNum'], $radio);
-                    $sensor_index = sprintf('%s.%s', Rewrite::macToHex($index), $radio);
+                    $sensor_index = sprintf('%s.%s', Mac::parse($index)->hex(), $radio);
                     $sensors[] = new WirelessSensor('clients', $this->getDeviceId(), $oid, 'aruba-instant', $sensor_index, $description, $value);
                 }
             }
@@ -250,10 +251,10 @@ class ArubaInstant extends OS implements
                         $value = $value * $multiplier;
                     }
 
-                    $combined_oid = sprintf('%s::%s.%s.%s', $ai_mib, $mib, Rewrite::oidMac($ai_ap), $ai_ap_radio);
+                    $combined_oid = sprintf('%s::%s.%s.%s', $ai_mib, $mib, Mac::parse($ai_ap)->oid(), $ai_ap_radio);
                     $oid = snmp_translate($combined_oid, 'ALL', 'arubaos', '-On');
                     $description = sprintf($desc, $ai_sg_data[$ai_ap]['aiAPSerialNum'], $ai_ap_radio);
-                    $index = sprintf('%s.%s', Rewrite::macToHex($ai_ap), $ai_ap_radio);
+                    $index = sprintf('%s.%s', Mac::parse($ai_ap)->hex(), $ai_ap_radio);
 
                     $sensors[] = new WirelessSensor($type, $this->getDeviceId(), $oid, 'aruba-instant', $index, $description, $value, $multiplier);
                 } // end foreach
