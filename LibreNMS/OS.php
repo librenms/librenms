@@ -94,10 +94,8 @@ class OS implements
 
     /**
      * OS constructor. Not allowed to be created directly.  Use OS::make()
-     *
-     * @param  array  $device
      */
-    protected function __construct(&$device)
+    protected function __construct(array &$device)
     {
         $this->device = &$device;
         $this->graphs = [];
@@ -231,11 +229,8 @@ class OS implements
      * OS Factory, returns an instance of the OS for this device
      * If no specific OS is found, Try the OS group.
      * Otherwise, returns Generic
-     *
-     * @param  array  $device  device array, must have os set
-     * @return OS
      */
-    public static function make(&$device)
+    public static function make(array &$device): OS
     {
         if (isset($device['os'])) {
             // load os definition and populate os_group
