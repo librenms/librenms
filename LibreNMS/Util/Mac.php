@@ -75,6 +75,11 @@ class Mac
      */
     public static function parseBridge(string $bridge): static
     {
+        $plainMac = new static($bridge);
+        if ($plainMac->isValid()) {
+            return $plainMac;
+        }
+
         return new static(substr(preg_replace('/[^0-9a-f]/', '', strtolower($bridge)), -12));
     }
 
