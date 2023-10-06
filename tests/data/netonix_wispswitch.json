@@ -3746,7 +3746,7 @@
                     "priority": 0,
                     "timeSinceTopologyChange": "21474836",
                     "topChanges": 0,
-                    "designatedRoot": "000000000000",
+                    "designatedRoot": "",
                     "rootCost": 0,
                     "rootPort": 0,
                     "maxAge": 0,

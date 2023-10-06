@@ -2733,7 +2733,7 @@
                 {
                     "vlan": null,
                     "rootBridge": 0,
-                    "bridgeAddress": "000000000000",
+                    "bridgeAddress": "",
                     "protocolSpecification": "ieee8021d",
                     "priority": 24576,
                     "timeSinceTopologyChange": "0",

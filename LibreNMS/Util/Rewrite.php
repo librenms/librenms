@@ -26,9 +26,6 @@
 namespace LibreNMS\Util;
 
 use App\Models\Device;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\DB;
 use LibreNMS\Config;
 
 class Rewrite
@@ -136,91 +133,6 @@ class Rewrite
         ];
 
         return str_ireplace(array_keys($rewrite_shortif), array_values($rewrite_shortif), $name);
-    }
-
-    /**
-     * Reformat a mac stored in the DB (only hex) to a nice readable format
-     *
-     * @param  string  $mac
-     * @return string
-     */
-    public static function readableMac($mac)
-    {
-        return rtrim(chunk_split($mac, 2, ':'), ':');
-    }
-
-    /**
-     * Extract the OUI and match it against database values
-     *
-     * @param  string  $mac
-     * @return string
-     */
-    public static function readableOUI($mac): string
-    {
-        $oui = substr($mac, 0, 6);
-
-        $results = Cache::remember($oui, 21600, function () use ($oui) {
-            return DB::table('vendor_ouis')
-                ->where('oui', 'like', "$oui%") // possible matches
-                ->orderBy('oui', 'desc') // so we can check longer ones first if we have them
-                ->pluck('vendor', 'oui');
-        });
-
-        if (count($results) == 1) {
-            return Arr::first($results);
-        }
-
-        // Then we may have a shorter prefix, so let's try them one after the other
-        foreach ($results as $oui => $vendor) {
-            if (str_starts_with($mac, $oui)) {
-                return $vendor;
-            }
-        }
-
-        return '';
-    }
-
-    /**
-     * Reformat hex MAC as oid MAC (dotted-decimal)
-     *
-     * 00:12:34:AB:CD:EF becomes 0.18.52.171.205.239
-     * 0:12:34:AB:CD:EF  becomes 0.18.52.171.205.239
-     * 00:02:04:0B:0D:0F becomes 0.2.4.11.13.239
-     * 0:2:4:B:D:F       becomes 0.2.4.11.13.15
-     *
-     * @param  string  $mac
-     * @return string oid representation of a MAC address
-     */
-    public static function oidMac($mac)
-    {
-        return implode('.', array_map('hexdec', explode(':', $mac)));
-    }
-
-    /**
-     * Reformat Hex MAC with delimiters to Hex String without delimiters
-     *
-     * Assumes the MAC address is well-formed and in a common format.
-     * 00:12:34:ab:cd:ef becomes 001234abcdef
-     * 00:12:34:AB:CD:EF becomes 001234abcdef
-     * 0:12:34:AB:CD:EF  becomes 001234abcdef
-     * 00-12-34-AB-CD-EF becomes 001234abcdef
-     * 001234-ABCDEF     becomes 001234abcdef
-     * 0012.34AB.CDEF    becomes 001234abcdef
-     * 00:02:04:0B:0D:0F becomes 0002040b0d0f
-     * 0:2:4:B:D:F       becomes 0002040b0d0f
-     *
-     * @param  string  $mac  hexadecimal MAC address with or without common delimiters
-     * @return string undelimited hexadecimal MAC address
-     */
-    public static function macToHex(string $mac): string
-    {
-        // split it apart
-        $mac_array = explode(':', str_replace(['-', '.', ' '], ':', strtolower(trim($mac))));
-        $len = count($mac_array);
-        $mac_padding = array_fill(0, $len, ceil(12 / $len));
-
-        // pad the parts to prefix 0s and only take the last 12 digits
-        return substr(implode(array_map('zeropad', $mac_array, $mac_padding)), -12);
     }
 
     /**

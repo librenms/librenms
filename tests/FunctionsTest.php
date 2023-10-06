@@ -27,16 +27,10 @@ namespace LibreNMS\Tests;
 
 use LibreNMS\Device\YamlDiscovery;
 use LibreNMS\Util\Number;
-use LibreNMS\Util\Rewrite;
 use LibreNMS\Util\Time;
 
 class FunctionsTest extends TestCase
 {
-    public function testMacCleanToReadable(): void
-    {
-        $this->assertEquals('de:ad:be:ef:a0:c3', Rewrite::readableMac('deadbeefa0c3'));
-    }
-
     public function testHex2Str(): void
     {
         $this->assertEquals('Big 10 UP', hex2str('426967203130205550'));
