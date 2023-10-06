@@ -85,6 +85,7 @@ class LegacyModule implements Module
 
         include_once base_path('includes/datastore.inc.php');
         include_once base_path('includes/dbFacile.php');
+        include base_path('includes/rewrites.php');
         include base_path("includes/discovery/$this->name.inc.php");
 
         Debug::enableErrorReporting(); // and back to normal
@@ -118,6 +119,7 @@ class LegacyModule implements Module
 
         include_once base_path('includes/datastore.inc.php');
         include_once base_path('includes/dbFacile.php');
+        include base_path('includes/rewrites.php');
         include base_path("includes/polling/$this->name.inc.php");
 
         Debug::enableErrorReporting(); // and back to normal
