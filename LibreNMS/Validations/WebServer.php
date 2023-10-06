@@ -64,7 +64,7 @@ class WebServer extends BaseValidation
             }
 
             if (request()->secure() && ! \config('session.secure')) {
-                $validator->fail('Secure session cookies are not enabled', 'Set SESSION_SECURE_COOKIE=true');
+                $validator->fail('Secure session cookies are not enabled', 'Set SESSION_SECURE_COOKIE=true and run lnms config:cache');
             }
         }
     }
