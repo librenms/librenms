@@ -1,6 +1,8 @@
 <?php
 /**
- * Beagleboard.php
+ * VmwareEsxi.php
+ *
+ * -Description-
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,25 +19,28 @@
  *
  * @link       https://www.librenms.org
  *
- * @copyright  2017 Tony Murray
+ * @copyright  2023 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
 namespace LibreNMS\OS;
 
-use App\Models\Device;
-use LibreNMS\Interfaces\Discovery\OSDiscovery;
+use Illuminate\Support\Collection;
+use LibreNMS\Interfaces\Discovery\VminfoDiscovery;
+use LibreNMS\Interfaces\Polling\VminfoPolling;
+use LibreNMS\OS\Traits\VminfoVmware;
 
-class Beagleboard extends Linux implements OSDiscovery
+class VmwareEsxi extends \LibreNMS\OS implements VminfoDiscovery, VminfoPolling
 {
-    /**
-     * Retrieve basic information about the OS / device
-     */
-    public function discoverOS(Device $device): void
+    use VminfoVmware;
+
+    public function pollVminfo(Collection $vms): Collection
     {
-        $oids = ['NET-SNMP-EXTEND-MIB::nsExtendOutputFull."distro"', 'NET-SNMP-EXTEND-MIB::nsExtendOutputFull."hardware"'];
-        $info = snmp_get_multi($this->getDeviceArray(), $oids);
-        $device->version = str_replace('BeagleBoard.org ', '', $info['"distro"']['nsExtendOutputFull']);
-        $device->hardware = $info['"hardware"']['nsExtendOutputFull'];
+        // no VMs, assume there aren't any
+        if ($vms->isEmpty()) {
+            return $vms;
+        }
+
+        return $this->discoverVmInfo(); // just do the same thing as discovery.
     }
 }
