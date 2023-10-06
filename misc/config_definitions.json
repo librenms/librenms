@@ -5167,15 +5167,26 @@
             }
         },
         "reporting.error": {
+            "group": "system",
+            "section": "reporting",
+            "order": 1,
             "default": false,
             "type": "boolean"
         },
         "reporting.dump_errors": {
             "group": "system",
             "section": "reporting",
-            "order": 1,
+            "order": 2,
             "default": false,
             "type": "boolean"
+        },
+        "reporting.throttle": {
+            "default": 300,
+            "type": "integer",
+            "units": "seconds",
+            "group": "system",
+            "section": "reporting",
+            "order": 3
         },
         "reporting.usage": {
             "group": "system",
