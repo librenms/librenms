@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Util\Mac;
+
 $param = [];
 
 $sql = ' FROM `ipv4_mac` AS M, `ports` AS P, `devices` AS D ';
@@ -95,9 +97,10 @@ foreach (dbFetchRows($sql, $param) as $entry) {
             $arp_if = 'Local port';
         }
 
+        $mac = Mac::parse($entry['mac_address']);
         $response[] = [
-            'mac_address'      => \LibreNMS\Util\Rewrite::readableMac($entry['mac_address']),
-            'mac_oui'          => \LibreNMS\Util\Rewrite::readableOUI($entry['mac_address']),
+            'mac_address'      => $mac->readable(),
+            'mac_oui'          => $mac->vendor(),
             'ipv4_address'     => $entry['ipv4_address'],
             'hostname'         => generate_device_link($entry),
             'interface'        => generate_port_link($entry, makeshortif($entry['label'])) . ' ' . $error_img,
