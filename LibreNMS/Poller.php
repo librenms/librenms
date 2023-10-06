@@ -107,7 +107,7 @@ class Poller
             // if modules are not overridden, record performance
             if (empty($this->module_override)) {
                 // check that we ran some modules (exclude availabliltiy because it always runs)
-                $valid_polled_modules = array_filter($polled_modules, fn($module) => $module !== 'availability');
+                $valid_polled_modules = array_filter($polled_modules, fn ($module) => $module !== 'availability');
                 if (! empty($valid_polled_modules)) {
                     $this->recordPerformance($measurement);
                 }
