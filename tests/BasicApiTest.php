@@ -36,6 +36,7 @@ class BasicApiTest extends DBTestCase
 
     public function testListDevices(): void
     {
+        /** @var User $user */
         $user = User::factory()->admin()->create();
         $token = ApiToken::generateToken($user);
         $device = Device::factory()->create();

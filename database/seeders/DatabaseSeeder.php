@@ -14,7 +14,7 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call(DefaultAlertTemplateSeeder::class);
-        $this->call(DefaultLegacySchemaSeeder::class);
         $this->call(ConfigSeeder::class);
+        $this->call(RolesSeeder::class);
     }
 }

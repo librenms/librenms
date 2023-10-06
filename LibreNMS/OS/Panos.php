@@ -26,6 +26,7 @@
 namespace LibreNMS\OS;
 
 use Illuminate\Support\Str;
+use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\RRD\RrdDefinition;
 
@@ -36,7 +37,7 @@ class Panos extends \LibreNMS\OS implements OSPolling
         'Packet Buffers',
     ];
 
-    public function pollOS(): void
+    public function pollOS(DataStorageInterface $datastore): void
     {
         $data = snmp_get_multi($this->getDeviceArray(), [
             'panSessionActive.0',
@@ -76,7 +77,7 @@ class Panos extends \LibreNMS\OS implements OSPolling
             ];
 
             $tags = compact('rrd_def');
-            data_update($this->getDeviceArray(), 'panos-sessions', $tags, $fields);
+            $datastore->put($this->getDeviceArray(), 'panos-sessions', $tags, $fields);
 
             $this->enableGraph('panos_sessions');
         }
@@ -89,7 +90,7 @@ class Panos extends \LibreNMS\OS implements OSPolling
             ];
 
             $tags = compact('rrd_def');
-            data_update($this->getDeviceArray(), 'panos-sessions-tcp', $tags, $fields);
+            $datastore->put($this->getDeviceArray(), 'panos-sessions-tcp', $tags, $fields);
 
             $this->enableGraph('panos_sessions_tcp');
         }
@@ -102,7 +103,7 @@ class Panos extends \LibreNMS\OS implements OSPolling
             ];
 
             $tags = compact('rrd_def');
-            data_update($this->getDeviceArray(), 'panos-sessions-udp', $tags, $fields);
+            $datastore->put($this->getDeviceArray(), 'panos-sessions-udp', $tags, $fields);
 
             $this->enableGraph('panos_sessions_udp');
         }
@@ -115,7 +116,7 @@ class Panos extends \LibreNMS\OS implements OSPolling
             ];
 
             $tags = compact('rrd_def');
-            data_update($this->getDeviceArray(), 'panos-sessions-icmp', $tags, $fields);
+            $datastore->put($this->getDeviceArray(), 'panos-sessions-icmp', $tags, $fields);
 
             $this->enableGraph('panos_sessions_icmp');
         }
@@ -128,7 +129,7 @@ class Panos extends \LibreNMS\OS implements OSPolling
             ];
 
             $tags = compact('rrd_def');
-            data_update($this->getDeviceArray(), 'panos-sessions-ssl', $tags, $fields);
+            $datastore->put($this->getDeviceArray(), 'panos-sessions-ssl', $tags, $fields);
 
             $this->enableGraph('panos_sessions_ssl');
         }
@@ -141,7 +142,7 @@ class Panos extends \LibreNMS\OS implements OSPolling
             ];
 
             $tags = compact('rrd_def');
-            data_update($this->getDeviceArray(), 'panos-sessions-sslutil', $tags, $fields);
+            $datastore->put($this->getDeviceArray(), 'panos-sessions-sslutil', $tags, $fields);
 
             $this->enableGraph('panos_sessions_sslutil');
         }
@@ -154,7 +155,7 @@ class Panos extends \LibreNMS\OS implements OSPolling
             ];
 
             $tags = compact('rrd_def');
-            data_update($this->getDeviceArray(), 'panos-activetunnels', $tags, $fields);
+            $datastore->put($this->getDeviceArray(), 'panos-activetunnels', $tags, $fields);
 
             $this->enableGraph('panos_activetunnels');
         }
@@ -166,7 +167,7 @@ class Panos extends \LibreNMS\OS implements OSPolling
             ];
 
             $tags = compact('rrd_def');
-            data_update($this->getDeviceArray(), 'panos-panFlowDosBlkNumEntries', $tags, $fields);
+            $datastore->put($this->getDeviceArray(), 'panos-panFlowDosBlkNumEntries', $tags, $fields);
 
             $this->enableGraph('panos_panFlowDosBlkNumEntries');
         }
@@ -178,7 +179,7 @@ class Panos extends \LibreNMS\OS implements OSPolling
             ];
 
             $tags = compact('rrd_def');
-            data_update($this->getDeviceArray(), 'panos-panFlowMeterVsysThrottle', $tags, $fields);
+            $datastore->put($this->getDeviceArray(), 'panos-panFlowMeterVsysThrottle', $tags, $fields);
 
             $this->enableGraph('panos_panFlowMeterVsysThrottle');
         }
@@ -190,7 +191,7 @@ class Panos extends \LibreNMS\OS implements OSPolling
             ];
 
             $tags = compact('rrd_def');
-            data_update($this->getDeviceArray(), 'panos-panFlowPolicyDeny', $tags, $fields);
+            $datastore->put($this->getDeviceArray(), 'panos-panFlowPolicyDeny', $tags, $fields);
 
             $this->enableGraph('panos_panFlowPolicyDeny');
         }
@@ -202,7 +203,7 @@ class Panos extends \LibreNMS\OS implements OSPolling
             ];
 
             $tags = compact('rrd_def');
-            data_update($this->getDeviceArray(), 'panos-panFlowPolicyNat', $tags, $fields);
+            $datastore->put($this->getDeviceArray(), 'panos-panFlowPolicyNat', $tags, $fields);
 
             $this->enableGraph('panos_panFlowPolicyNat');
         }
@@ -214,7 +215,7 @@ class Panos extends \LibreNMS\OS implements OSPolling
             ];
 
             $tags = compact('rrd_def');
-            data_update($this->getDeviceArray(), 'panos-panFlowScanDrop', $tags, $fields);
+            $datastore->put($this->getDeviceArray(), 'panos-panFlowScanDrop', $tags, $fields);
 
             $this->enableGraph('panos_panFlowScanDrop');
         }
@@ -226,7 +227,7 @@ class Panos extends \LibreNMS\OS implements OSPolling
             ];
 
             $tags = compact('rrd_def');
-            data_update($this->getDeviceArray(), 'panos-panFlowDosDropIpBlocked', $tags, $fields);
+            $datastore->put($this->getDeviceArray(), 'panos-panFlowDosDropIpBlocked', $tags, $fields);
 
             $this->enableGraph('panos_panFlowDosDropIpBlocked');
         }
@@ -238,7 +239,7 @@ class Panos extends \LibreNMS\OS implements OSPolling
             ];
 
             $tags = compact('rrd_def');
-            data_update($this->getDeviceArray(), 'panos-panFlowDosRedIcmp', $tags, $fields);
+            $datastore->put($this->getDeviceArray(), 'panos-panFlowDosRedIcmp', $tags, $fields);
 
             $this->enableGraph('panos_panFlowDosRedIcmp');
         }
@@ -250,7 +251,7 @@ class Panos extends \LibreNMS\OS implements OSPolling
             ];
 
             $tags = compact('rrd_def');
-            data_update($this->getDeviceArray(), 'panos-panFlowDosRedIcmp6', $tags, $fields);
+            $datastore->put($this->getDeviceArray(), 'panos-panFlowDosRedIcmp6', $tags, $fields);
 
             $this->enableGraph('panos_panFlowDosRedIcmp6');
         }
@@ -262,7 +263,7 @@ class Panos extends \LibreNMS\OS implements OSPolling
             ];
 
             $tags = compact('rrd_def');
-            data_update($this->getDeviceArray(), 'panos-panFlowDosRedIp', $tags, $fields);
+            $datastore->put($this->getDeviceArray(), 'panos-panFlowDosRedIp', $tags, $fields);
 
             $this->enableGraph('panos_panFlowDosRedIp');
         }
@@ -274,7 +275,7 @@ class Panos extends \LibreNMS\OS implements OSPolling
             ];
 
             $tags = compact('rrd_def');
-            data_update($this->getDeviceArray(), 'panos-panFlowDosRedTcp', $tags, $fields);
+            $datastore->put($this->getDeviceArray(), 'panos-panFlowDosRedTcp', $tags, $fields);
 
             $this->enableGraph('panos_panFlowDosRedTcp');
         }
@@ -286,7 +287,7 @@ class Panos extends \LibreNMS\OS implements OSPolling
             ];
 
             $tags = compact('rrd_def');
-            data_update($this->getDeviceArray(), 'panos-panFlowDosRedUdp', $tags, $fields);
+            $datastore->put($this->getDeviceArray(), 'panos-panFlowDosRedUdp', $tags, $fields);
 
             $this->enableGraph('panos_panFlowDosRedUdp');
         }
@@ -298,7 +299,7 @@ class Panos extends \LibreNMS\OS implements OSPolling
             ];
 
             $tags = compact('rrd_def');
-            data_update($this->getDeviceArray(), 'panos-panFlowDosPbpDrop', $tags, $fields);
+            $datastore->put($this->getDeviceArray(), 'panos-panFlowDosPbpDrop', $tags, $fields);
 
             $this->enableGraph('panos_panFlowDosPbpDrop');
         }
@@ -310,7 +311,7 @@ class Panos extends \LibreNMS\OS implements OSPolling
             ];
 
             $tags = compact('rrd_def');
-            data_update($this->getDeviceArray(), 'panos-panFlowDosRuleDeny', $tags, $fields);
+            $datastore->put($this->getDeviceArray(), 'panos-panFlowDosRuleDeny', $tags, $fields);
 
             $this->enableGraph('panos_panFlowDosRuleDeny');
         }
@@ -322,7 +323,7 @@ class Panos extends \LibreNMS\OS implements OSPolling
             ];
 
             $tags = compact('rrd_def');
-            data_update($this->getDeviceArray(), 'panos-panFlowDosRuleDrop', $tags, $fields);
+            $datastore->put($this->getDeviceArray(), 'panos-panFlowDosRuleDrop', $tags, $fields);
 
             $this->enableGraph('panos_panFlowDosRuleDrop');
         }
@@ -334,7 +335,7 @@ class Panos extends \LibreNMS\OS implements OSPolling
             ];
 
             $tags = compact('rrd_def');
-            data_update($this->getDeviceArray(), 'panos-panFlowDosZoneRedAct', $tags, $fields);
+            $datastore->put($this->getDeviceArray(), 'panos-panFlowDosZoneRedAct', $tags, $fields);
 
             $this->enableGraph('panos_panFlowDosZoneRedAct');
         }
@@ -346,7 +347,7 @@ class Panos extends \LibreNMS\OS implements OSPolling
             ];
 
             $tags = compact('rrd_def');
-            data_update($this->getDeviceArray(), 'panos-panFlowDosZoneRedMax', $tags, $fields);
+            $datastore->put($this->getDeviceArray(), 'panos-panFlowDosZoneRedMax', $tags, $fields);
 
             $this->enableGraph('panos_panFlowDosZoneRedMax');
         }
@@ -358,7 +359,7 @@ class Panos extends \LibreNMS\OS implements OSPolling
             ];
 
             $tags = compact('rrd_def');
-            data_update($this->getDeviceArray(), 'panos-panFlowDosSyncookieNotTcpSyn', $tags, $fields);
+            $datastore->put($this->getDeviceArray(), 'panos-panFlowDosSyncookieNotTcpSyn', $tags, $fields);
 
             $this->enableGraph('panos_panFlowDosSyncookieNotTcpSyn');
         }
@@ -370,7 +371,7 @@ class Panos extends \LibreNMS\OS implements OSPolling
             ];
 
             $tags = compact('rrd_def');
-            data_update($this->getDeviceArray(), 'panos-panFlowDosSyncookieNotTcpSynAck', $tags, $fields);
+            $datastore->put($this->getDeviceArray(), 'panos-panFlowDosSyncookieNotTcpSynAck', $tags, $fields);
 
             $this->enableGraph('panos_panFlowDosSyncookieNotTcpSynAck');
         }
@@ -382,7 +383,7 @@ class Panos extends \LibreNMS\OS implements OSPolling
             ];
 
             $tags = compact('rrd_def');
-            data_update($this->getDeviceArray(), 'panos-panFlowDosBlkSwEntries', $tags, $fields);
+            $datastore->put($this->getDeviceArray(), 'panos-panFlowDosBlkSwEntries', $tags, $fields);
 
             $this->enableGraph('panos_panFlowDosBlkSwEntries');
         }
@@ -394,7 +395,7 @@ class Panos extends \LibreNMS\OS implements OSPolling
             ];
 
             $tags = compact('rrd_def');
-            data_update($this->getDeviceArray(), 'panos-panFlowDosBlkHwEntries', $tags, $fields);
+            $datastore->put($this->getDeviceArray(), 'panos-panFlowDosBlkHwEntries', $tags, $fields);
 
             $this->enableGraph('panos_panFlowDosBlkHwEntries');
         }

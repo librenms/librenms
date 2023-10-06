@@ -23,6 +23,8 @@
 namespace LibreNMS\Validations;
 
 use Illuminate\Support\Facades\Cache;
+use LibreNMS\Config;
+use LibreNMS\ValidationResult;
 use LibreNMS\Validator;
 
 class Scheduler extends BaseValidation
@@ -36,8 +38,47 @@ class Scheduler extends BaseValidation
     public function validate(Validator $validator): void
     {
         if (! Cache::has('scheduler_working')) {
-            $validator->fail('Scheduler is not running',
-                "cp /opt/librenms/dist/librenms-scheduler.service /opt/librenms/dist/librenms-scheduler.timer /etc/systemd/system/\nsystemctl enable librenms-scheduler.timer\nsystemctl start librenms-scheduler.timer");
+            $commands = $this->generateCommands($validator);
+            $validator->result(ValidationResult::fail('Scheduler is not running')->setFix($commands));
         }
+    }
+
+    /**
+     * @param  Validator  $validator
+     * @return array
+     */
+    private function generateCommands(Validator $validator): array
+    {
+        $commands = [];
+        $systemctl_bin = Config::locateBinary('systemctl');
+        $base_dir = rtrim($validator->getBaseDir(), '/');
+
+        if (is_executable($systemctl_bin)) {
+            // systemd exists
+            if ($base_dir === '/opt/librenms') {
+                // standard install dir
+                $commands[] = 'sudo cp /opt/librenms/dist/librenms-scheduler.service /opt/librenms/dist/librenms-scheduler.timer /etc/systemd/system/';
+            } else {
+                // non-standard install dir
+                $commands[] = "sudo sh -c 'sed \"s#/opt/librenms#$base_dir#\" $base_dir/dist/librenms-scheduler.service > /etc/systemd/system/librenms-scheduler.service'";
+                $commands[] = "sudo sh -c 'sed \"s#/opt/librenms#$base_dir#\" $base_dir/dist/librenms-scheduler.timer > /etc/systemd/system/librenms-scheduler.timer'";
+            }
+            $commands[] = 'sudo systemctl enable librenms-scheduler.timer';
+            $commands[] = 'sudo systemctl start librenms-scheduler.timer';
+
+            return $commands;
+        }
+
+        // non-systemd use cron
+        if ($base_dir === '/opt/librenms') {
+            $commands[] = 'sudo cp /opt/librenms/dist/librenms-scheduler.cron /etc/cron.d/';
+
+            return $commands;
+        }
+
+        // non-standard install dir
+        $commands[] = "sudo sh -c 'sed \"s#/opt/librenms#$base_dir#\" $base_dir/dist/librenms-scheduler.cron > /etc/cron.d/librenms-scheduler.cron'";
+
+        return $commands;
     }
 }

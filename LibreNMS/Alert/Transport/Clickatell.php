@@ -55,7 +55,7 @@ class Clickatell extends Transport
                     'title' => 'Token',
                     'name'  => 'clickatell-token',
                     'descr' => 'Clickatell Token',
-                    'type'  => 'text',
+                    'type'  => 'password',
                 ],
                 [
                     'title' => 'Mobile Numbers',

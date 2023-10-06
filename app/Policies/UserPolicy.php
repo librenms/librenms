@@ -10,34 +10,14 @@ class UserPolicy
     use HandlesAuthorization;
 
     /**
-     * Determine whether the user can manage users.
-     *
-     * @param  User  $user
-     */
-    public function manage(User $user): bool
-    {
-        return $user->isAdmin();
-    }
-
-    /**
      * Determine whether the user can view the user.
      *
      * @param  User  $user
      * @param  User  $target
      */
-    public function view(User $user, User $target): bool
+    public function view(User $user, User $target): ?bool
     {
-        return $user->isAdmin() || $target->is($user);
-    }
-
-    /**
-     * Determine whether the user can view any user.
-     *
-     * @param  User  $user
-     */
-    public function viewAny(User $user): bool
-    {
-        return $user->isAdmin();
+        return $target->is($user) ?: null;  // allow users to view themselves
     }
 
     /**
@@ -45,9 +25,14 @@ class UserPolicy
      *
      * @param  User  $user
      */
-    public function create(User $user): bool
+    public function create(User $user): ?bool
     {
-        return $user->isAdmin();
+        // if not mysql, forbid, otherwise defer to bouncer
+        if (\LibreNMS\Config::get('auth_mechanism') != 'mysql') {
+            return false;
+        }
+
+        return null;
     }
 
     /**
@@ -56,9 +41,13 @@ class UserPolicy
      * @param  User  $user
      * @param  User  $target
      */
-    public function update(User $user, User $target): bool
+    public function update(User $user, User $target = null): ?bool
     {
-        return $user->isAdmin() || $target->is($user);
+        if ($target == null) {
+            return null;
+        }
+
+        return $target->is($user) ?: null; // allow user to update self or defer to bouncer
     }
 
     /**
@@ -67,8 +56,8 @@ class UserPolicy
      * @param  User  $user
      * @param  User  $target
      */
-    public function delete(User $user, User $target): bool
+    public function delete(User $user, User $target): ?bool
     {
-        return $user->isAdmin();
+        return $target->is($user) ? false : null; // do not allow users to delete themselves or defer to bouncer
     }
 }

@@ -1,0 +1,171 @@
+mib: DELL-MM-MIB-SMIv2
+modules:
+    os:
+        hardware: DELL-MM-MIB-SMIv2::dmmProductName.0
+        version: DELL-MM-MIB-SMIv2::dmmProductVersion.0
+        serial: DELL-MM-MIB-SMIv2::dmmChassisServiceTag.0
+    sensors:
+        state:
+            data:
+                -
+                    oid: dmmGlobalSystemStatus
+                    value: dmmGlobalSystemStatus
+                    num_oid: '.1.3.6.1.4.1.674.10892.6.2.1.{{ $index }}'
+                    descr: 'Global System Status'
+                    index: 'dmmGlobalSystemStatus.{{ $index }}'
+                    states:
+                        - { value: 1, descr: other, graph: 1, generic: 3 }
+                        - { value: 2, descr: unknown, graph: 1, generic: 3 }
+                        - { value: 3, descr: ok, graph: 1, generic: 0 }
+                        - { value: 4, descr: nonCritical, graph: 1, generic: 1 }
+                        - { value: 5, descr: critical, graph: 1, generic: 2 }
+                        - { value: 6, descr: nonRecoverable, graph: 1, generic: 2 }
+                -
+                    oid: dmmIOMCurrStatus
+                    value: dmmIOMCurrStatus
+                    num_oid: '.1.3.6.1.4.1.674.10892.6.3.1.1.{{ $index }}'
+                    descr: 'IOM Status'
+                    index: 'dmmIOMCurrStatus.{{ $index }}'
+                    states:
+                        - { value: 1, descr: other, graph: 1, generic: 3 }
+                        - { value: 2, descr: unknown, graph: 1, generic: 3 }
+                        - { value: 3, descr: ok, graph: 1, generic: 0 }
+                        - { value: 4, descr: nonCritical, graph: 1, generic: 1 }
+                        - { value: 5, descr: critical, graph: 1, generic: 2 }
+                        - { value: 6, descr: nonRecoverable, graph: 1, generic: 2 }
+                -
+                    oid: dmmRedCurrStatus
+                    value: dmmRedCurrStatus
+                    num_oid: '.1.3.6.1.4.1.674.10892.6.3.1.2.{{ $index }}'
+                    descr: 'Redundancy Status'
+                    index: 'dmmRedCurrStatus.{{ $index }}'
+                    states:
+                        - { value: 1, descr: other, graph: 1, generic: 3 }
+                        - { value: 2, descr: unknown, graph: 1, generic: 3 }
+                        - { value: 3, descr: ok, graph: 1, generic: 0 }
+                        - { value: 4, descr: nonCritical, graph: 1, generic: 1 }
+                        - { value: 5, descr: critical, graph: 1, generic: 2 }
+                        - { value: 6, descr: nonRecoverable, graph: 1, generic: 2 }
+                -
+                    oid: dmmPowerCurrStatus
+                    value: dmmPowerCurrStatus
+                    num_oid: '.1.3.6.1.4.1.674.10892.6.3.1.3.{{ $index }}'
+                    descr: 'Power Status'
+                    index: 'dmmPowerCurrStatus.{{ $index }}'
+                    states:
+                        - { value: 1, descr: other, graph: 1, generic: 3 }
+                        - { value: 2, descr: unknown, graph: 1, generic: 3 }
+                        - { value: 3, descr: ok, graph: 1, generic: 0 }
+                        - { value: 4, descr: nonCritical, graph: 1, generic: 1 }
+                        - { value: 5, descr: critical, graph: 1, generic: 2 }
+                        - { value: 6, descr: nonRecoverable, graph: 1, generic: 2 }
+                -
+                    oid: dmmPSUTable
+                    value: dmmPSUCurrStatus
+                    num_oid: '.1.3.6.1.4.1.674.10892.6.4.2.1.8.{{ $index }}'
+                    descr: 'Chassis {{ $dmmPSUChassisIndex }} PS-{{ $dmmPSUIndex }} Status'
+                    states:
+                        - { value: 1, descr: other, graph: 1, generic: 3 }
+                        - { value: 2, descr: unknown, graph: 1, generic: 3 }
+                        - { value: 3, descr: ok, graph: 1, generic: 0 }
+                        - { value: 4, descr: nonCritical, graph: 1, generic: 1 }
+                        - { value: 5, descr: critical, graph: 1, generic: 2 }
+                        - { value: 6, descr: nonRecoverable, graph: 1, generic: 2 }
+                -
+                    oid: dmmFanCurrStatus
+                    value: dmmFanCurrStatus
+                    num_oid: '.1.3.6.1.4.1.674.10892.6.3.1.4.{{ $index }}'
+                    descr: 'FAN Status'
+                    index: 'dmmFanCurrStatus.{{ $index }}'
+                    states:
+                        - { value: 1, descr: other, graph: 1, generic: 3 }
+                        - { value: 2, descr: unknown, graph: 1, generic: 3 }
+                        - { value: 3, descr: ok, graph: 1, generic: 0 }
+                        - { value: 4, descr: nonCritical, graph: 1, generic: 1 }
+                        - { value: 5, descr: critical, graph: 1, generic: 2 }
+                        - { value: 6, descr: nonRecoverable, graph: 1, generic: 2 }
+                -
+                    oid: dmmBladeCurrStatus
+                    num_oid: '.1.3.6.1.4.1.674.10892.6.3.1.5.{{ $index }}'
+                    descr: 'Blade Status'
+                    index: 'dmmBladeCurrStatus.{{ $index }}'
+                    states:
+                        - { value: 1, descr: other, graph: 1, generic: 3 }
+                        - { value: 2, descr: unknown, graph: 1, generic: 3 }
+                        - { value: 3, descr: ok, graph: 1, generic: 0 }
+                        - { value: 4, descr: nonCritical, graph: 1, generic: 1 }
+                        - { value: 5, descr: critical, graph: 1, generic: 2 }
+                        - { value: 6, descr: nonRecoverable, graph: 1, generic: 2 }
+                -
+                    oid: dmmTempCurrStatus
+                    num_oid: '.1.3.6.1.4.1.674.10892.6.3.1.6.{{ $index }}'
+                    descr: 'Temperature Status'
+                    index: 'dmmTempCurrStatus.{{ $index }}'
+                    states:
+                        - { value: 1, descr: other, graph: 1, generic: 3 }
+                        - { value: 2, descr: unknown, graph: 1, generic: 3 }
+                        - { value: 3, descr: ok, graph: 1, generic: 0 }
+                        - { value: 4, descr: nonCritical, graph: 1, generic: 1 }
+                        - { value: 5, descr: critical, graph: 1, generic: 2 }
+                        - { value: 6, descr: nonRecoverable, graph: 1, generic: 2 }
+                -
+                    oid: dmmMMCurrStatus
+                    num_oid: '.1.3.6.1.4.1.674.10892.6.3.1.7.{{ $index }}'
+                    descr: 'MM Status'
+                    index: 'dmmMMCurrStatus.{{ $index }}'
+                    states:
+                        - { value: 1, descr: other, graph: 1, generic: 3 }
+                        - { value: 2, descr: unknown, graph: 1, generic: 3 }
+                        - { value: 3, descr: ok, graph: 1, generic: 0 }
+                        - { value: 4, descr: nonCritical, graph: 1, generic: 1 }
+                        - { value: 5, descr: critical, graph: 1, generic: 2 }
+                        - { value: 6, descr: nonRecoverable, graph: 1, generic: 2 }
+        temperature:
+            data:
+                -
+                    oid: dmmChassisFrontPanelAmbientTemperature
+                    value: dmmChassisFrontPanelAmbientTemperature
+                    num_oid: '.1.3.6.1.4.1.674.10892.6.3.1.8.{{ $index }}'
+                    index: 'dmmChassisFrontPanelAmbientTemperature.{{ $index }}'
+                    descr: 'Chassis {{ $dmmChassisIndex }} Front Panel Temperature'
+        power:
+            data:
+                -
+                    oid: dmmPowerTable
+                    value: dmmPowerIdlePower
+                    num_oid: '.1.3.6.1.4.1.674.10892.6.4.1.1.2.{{ $index }}'
+                    index: 'dmmPowerIdlePower.{{ $index }}'
+                    descr: 'Chassis {{ $dmmPowerChassisIndex }} Idle Power'
+                -
+                    oid: dmmPowerTable
+                    value: dmmPowerWattsPeakUsage
+                    num_oid: '.1.3.6.1.4.1.674.10892.6.4.1.1.5.{{ $index }}'
+                    index: 'dmmPowerWattsPeakUsage.{{ $index }}'
+                    descr: 'Chassis {{ $dmmPowerChassisIndex }} Peak Usage'
+                -
+                    oid: dmmPowerTable
+                    value: dmmPowerWattsMinUsage
+                    num_oid: '.1.3.6.1.4.1.674.10892.6.4.1.1.7.{{ $index }}'
+                    index: 'dmmPowerWattsMinUsage.{{ $index }}'
+                    descr: 'Chassis {{ $dmmPowerChassisIndex }} Min Usage'
+                -
+                    oid: dmmPowerTable
+                    value: dmmPowerWattsReading
+                    num_oid: '.1.3.6.1.4.1.674.10892.6.4.1.1.9.{{ $index }}'
+                    index: 'dmmPowerWattsReading.{{ $index }}'
+                    descr: 'Chassis {{ $dmmPowerChassisIndex }}'
+        power_consumed:
+            data:
+                -
+                    oid: dmmPowerTable
+                    value: dmmPowerKWhCumulative
+                    num_oid: '.1.3.6.1.4.1.674.10892.6.4.1.1.3.{{ $index }}'
+                    index: 'dmmPowerKWhCumulative.{{ $index }}'
+                    descr: 'Chassis {{ $dmmPowerChassisIndex }}'
+        voltage:
+            data:
+                -
+                    oid: dmmPSUTable
+                    value: dmmPSUVoltage
+                    num_oid: '.1.3.6.1.4.1.674.10892.6.4.2.1.7.{{ $index }}'
+                    descr: 'Chassis {{ $dmmPSUChassisIndex }} PS-{{ $dmmPSUIndex }}'

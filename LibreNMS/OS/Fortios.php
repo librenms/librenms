@@ -26,6 +26,7 @@
 namespace LibreNMS\OS;
 
 use App\Models\Device;
+use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\OS\Shared\Fortinet;
 use LibreNMS\RRD\RrdDefinition;
@@ -40,7 +41,7 @@ class Fortios extends Fortinet implements OSPolling
         $device->features = snmp_get($this->getDeviceArray(), 'fmDeviceEntMode.1', '-OQv', 'FORTINET-FORTIMANAGER-FORTIANALYZER-MIB') == 'fmg-faz' ? 'with Analyzer features' : null;
     }
 
-    public function pollOS(): void
+    public function pollOS(DataStorageInterface $datastore): void
     {
         // Log rate only for FortiAnalyzer features enabled FortiManagers
         if ($this->getDevice()->features == 'with Analyzer features') {
@@ -49,7 +50,7 @@ class Fortios extends Fortinet implements OSPolling
             $rrd_def = RrdDefinition::make()->addDataset('lograte', 'GAUGE', 0, 100000000);
             $fields = ['lograte' => $log_rate];
             $tags = compact('rrd_def');
-            app()->make('Datastore')->put($this->getDeviceArray(), 'fortios_lograte', $tags, $fields);
+            $datastore->put($this->getDeviceArray(), 'fortios_lograte', $tags, $fields);
             $this->enableGraph('fortios_lograte');
         }
     }

@@ -38,7 +38,7 @@ class TimezoneController extends Controller
         if ($request->timezone) {
             // Only accept valid timezones
             if (! in_array($request->timezone, timezone_identifiers_list())) {
-                return session('preferences.timezone');
+                return session('preferences.timezone', '');
             }
 
             $request->session()->put('preferences.timezone', $request->timezone);
@@ -46,6 +46,6 @@ class TimezoneController extends Controller
             return $request->timezone;
         }
 
-        return session('preferences.timezone');
+        return session('preferences.timezone', '');
     }
 }

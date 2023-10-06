@@ -1,4 +1,3 @@
-mib: MIKROTIK-MIB
 modules:
     os:
         sysDescr_regex: '/RouterOS (?<hardware>.*)/'
@@ -11,135 +10,114 @@ modules:
             data:
                 -
                     oid:
-                        - mtxrInterfaceStatsName
+                        - MIKROTIK-MIB::mtxrInterfaceStatsName
         temperature:
             data:
                 -
-                    oid: mtxrOpticalTable
-                    value: mtxrOpticalTemperature
+                    oid: MIKROTIK-MIB::mtxrOpticalTable
+                    value: MIKROTIK-MIB::mtxrOpticalTemperature
                     num_oid: '.1.3.6.1.4.1.14988.1.1.19.1.1.6.{{ $index }}'
-                    descr: mtxrOpticalName
+                    descr: MIKROTIK-MIB::mtxrOpticalName
+                    group: Ports
                     index: 'mtxrOpticalTemperature.{{ $index }}'
                 -
-                    oid: mtxrHlSensorTemperature
-                    num_oid: '.1.3.6.1.4.1.14988.1.1.3.5.{{ $index }}'
-                    divisor: 10
-                    descr: 'Sensor chip'
-                    index: 'mtxrHlSensorTemperature.{{ $index }}'
-                -
-                    oid: mtxrHlCpuTemperature
-                    num_oid: '.1.3.6.1.4.1.14988.1.1.3.6.{{ $index }}'
-                    divisor: 10
-                    descr: 'Processor'
-                    index: 'mtxrHlCpuTemperature.{{ $index }}'
-                -
-                    oid: mtxrHlBoardTemperature
-                    num_oid: '.1.3.6.1.4.1.14988.1.1.3.7.{{ $index }}'
-                    divisor: 10
-                    descr: 'System board'
-                    index: 'mtxrHlBoardTemperature.{{ $index }}'
-                -
-                    oid: mtxrHlTemperature
-                    num_oid: '.1.3.6.1.4.1.14988.1.1.3.10.{{ $index }}'
-                    index: 0
-                    divisor: 10
-                    descr: 'Temperature {{ $index }}'
-                    low_limit: -40
-                    low_warn_limit: -35
-                    warn_limit: 65
-                    high_limit: 70
-                -
-                    oid: mtxrHlProcessorTemperature
-                    num_oid: '.1.3.6.1.4.1.14988.1.1.3.11.{{ $index }}'
-                    index: 1
-                    divisor: 10
-                    descr: 'Processor Temperature {{ $index }}'
+                    oid: MIKROTIK-MIB::mtxrGaugeTable
+                    value: MIKROTIK-MIB::mtxrGaugeValue
+                    num_oid: '.1.3.6.1.4.1.14988.1.1.3.100.1.3.{{ $index }}'
+                    descr: MIKROTIK-MIB::mtxrGaugeName
+                    group: System
+                    index: 'mtxrGaugeTemperature.{{ $index }}'
+                    skip_values:
+                        -   oid: MIKROTIK-MIB::mtxrGaugeUnit
+                            op: '!='
+                            value: 1
         voltage:
             data:
                 -
-                    oid: mtxrOpticalTable
-                    value: mtxrOpticalSupplyVoltage
+                    oid: MIKROTIK-MIB::mtxrOpticalTable
+                    value: MIKROTIK-MIB::mtxrOpticalSupplyVoltage
                     num_oid: '.1.3.6.1.4.1.14988.1.1.19.1.1.7.{{ $index }}'
                     divisor: 1000
-                    descr: mtxrOpticalName
+                    descr: MIKROTIK-MIB::mtxrOpticalName
+                    group: Ports
                     index: 'mtxrOpticalSupplyVoltage.{{ $index }}'
                 -
-                    oid: mtxrPOETable
-                    value: mtxrPOEVoltage
+                    oid: MIKROTIK-MIB::mtxrPOETable
+                    value: MIKROTIK-MIB::mtxrPOEVoltage
                     num_oid: '.1.3.6.1.4.1.14988.1.1.15.1.1.4.{{ $index }}'
                     divisor: 10
-                    descr: '{{ $mtxrPOEName }} POE'
+                    descr: '{{ MIKROTIK-MIB::mtxrPOEName }} POE'
+                    group: Ports
                     index: 'mtxrPOEVoltage.{{ $index }}'
                 -
-                    oid: mtxrHlCoreVoltage
-                    num_oid: '.1.3.6.1.4.1.14988.1.1.3.1.{{ $index }}'
-                    descr: 'Core'
-                    index: 'mtxrHlCoreVoltage.{{ $index }}'
-                -
-                    oid: mtxrHlThreeDotThreeVoltage
-                    num_oid: '.1.3.6.1.4.1.14988.1.1.3.2.{{ $index }}'
-                    descr: '3.3V'
-                    index: 'mtxrHlThreeDotThreeVoltage.{{ $index }}'
-                -
-                    oid: mtxrHlFiveVoltage
-                    num_oid: '.1.3.6.1.4.1.14988.1.1.3.3.{{ $index }}'
-                    descr: '5V'
-                    index: 'mtxrHlFiveVoltage.{{ $index }}'
-                -
-                    oid: mtxrHlTwelveVoltage
-                    num_oid: '.1.3.6.1.4.1.14988.1.1.3.4.{{ $index }}'
-                    descr: '12V'
-                    index: 'mtxrHlTwelveVoltage.{{ $index }}'
-                -
-                    oid: mtxrHlVoltage
-                    num_oid: '.1.3.6.1.4.1.14988.1.1.3.8.{{ $index }}'
+                    oid: MIKROTIK-MIB::mtxrGaugeTable
+                    value: MIKROTIK-MIB::mtxrGaugeValue
+                    num_oid: '.1.3.6.1.4.1.14988.1.1.3.100.1.3.{{ $index }}'
+                    descr: MIKROTIK-MIB::mtxrGaugeName
+                    group: System
                     divisor: 10
-                    descr: 'Voltage {{ $index }}'
+                    index: 'mtxrGaugeVoltage.{{ $index }}'
+                    skip_values:
+                        -   oid: MIKROTIK-MIB::mtxrGaugeUnit
+                            op: '!='
+                            value: 3
         current:
             data:
                 -
-                    oid: mtxrOpticalTable
-                    value: mtxrOpticalTxBiasCurrent
+                    oid: MIKROTIK-MIB::mtxrOpticalTable
+                    value: MIKROTIK-MIB::mtxrOpticalTxBiasCurrent
                     num_oid: '.1.3.6.1.4.1.14988.1.1.19.1.1.8.{{ $index }}'
+                    descr: '{{ MIKROTIK-MIB::mtxrOpticalName }} Tx'
+                    group: Ports
                     divisor: 1000
-                    descr: '{{ $mtxrOpticalName }} Tx'
                     index: 'mtxrOpticalTxBiasCurrent.{{ $index }}'
                 -
-                    oid: mtxrPOETable
-                    value: mtxrPOECurrent
+                    oid: MIKROTIK-MIB::mtxrPOETable
+                    value: MIKROTIK-MIB::mtxrPOECurrent
                     num_oid: '.1.3.6.1.4.1.14988.1.1.15.1.1.5.{{ $index }}'
+                    descr: '{{ MIKROTIK-MIB::mtxrPOEName }} POE'
+                    group: Ports
                     divisor: 1000
-                    descr: '{{ $mtxrPOEName }} POE'
                     index: 'mtxrPOECurrent.{{ $index }}'
                 -
-                    oid: mtxrHlCurrent
-                    num_oid: '.1.3.6.1.4.1.14988.1.1.3.13.{{ $index }}'
-                    divisor: 1000
-                    descr: 'Current'
-                    index: '0'
+                    oid: MIKROTIK-MIB::mtxrGaugeTable
+                    value: MIKROTIK-MIB::mtxrGaugeValue
+                    num_oid: '.1.3.6.1.4.1.14988.1.1.3.100.1.3.{{ $index }}'
+                    descr: MIKROTIK-MIB::mtxrGaugeName
+                    group: System
+                    divisor: 10
+                    index: 'mtxrGaugeCurrent.{{ $index }}'
+                    skip_values:
+                        -   oid: MIKROTIK-MIB::mtxrGaugeUnit
+                            op: '!='
+                            value: 4
+
         dbm:
             data:
                 -
-                    oid: mtxrOpticalTable
-                    value: mtxrOpticalTxPower
+                    oid: MIKROTIK-MIB::mtxrOpticalTable
+                    value: MIKROTIK-MIB::mtxrOpticalTxPower
                     num_oid: '.1.3.6.1.4.1.14988.1.1.19.1.1.9.{{ $index }}'
+                    descr: '{{ MIKROTIK-MIB::mtxrOpticalName }} Tx'
+                    group: Ports
                     divisor: 1000
-                    descr: '{{ $mtxrOpticalName }} Tx'
                     index: 'mtxrOpticalTxPower.{{ $index }}'
                 -
-                    oid: mtxrOpticalTable
-                    value: mtxrOpticalRxPower
+                    oid: MIKROTIK-MIB::mtxrOpticalTable
+                    value: MIKROTIK-MIB::mtxrOpticalRxPower
                     num_oid: '.1.3.6.1.4.1.14988.1.1.19.1.1.10.{{ $index }}'
+                    descr: '{{ MIKROTIK-MIB::mtxrOpticalName }} Rx'
+                    group: Ports
                     divisor: 1000
-                    descr: '{{ $mtxrOpticalName }} Rx'
                     index: 'mtxrOpticalRxPower.{{ $index }}'
         state:
             data:
                 -
-                    oid: mtxrOpticalTable
-                    value: mtxrOpticalRxLoss
+                    oid: MIKROTIK-MIB::mtxrOpticalTable
+                    value: MIKROTIK-MIB::mtxrOpticalRxLoss
                     num_oid: '.1.3.6.1.4.1.14988.1.1.19.1.1.3.{{ $index }}'
-                    descr: '{{ $mtxrOpticalName }} Rx'
+                    descr: '{{ MIKROTIK-MIB::mtxrOpticalName }} Rx'
+                    group: Ports
                     index: 'mtxrOpticalRxLoss.{{ $index }}'
                     state_name: mtxrOpticalRxLoss
                     states:
@@ -147,10 +125,11 @@ modules:
                         - { descr: yes, graph: 1, value: 1, generic: 2 }
                         - { descr: 'null', graph: 1, value: 2, generic: 3 }
                 -
-                    oid: mtxrOpticalTable
-                    value: mtxrOpticalTxFault
+                    oid: MIKROTIK-MIB::mtxrOpticalTable
+                    value: MIKROTIK-MIB::mtxrOpticalTxFault
                     num_oid: '.1.3.6.1.4.1.14988.1.1.19.1.1.4.{{ $index }}'
-                    descr: '{{ $mtxrOpticalName }} Tx'
+                    descr: '{{ MIKROTIK-MIB::mtxrOpticalName }} Tx'
+                    group: Ports
                     index: 'mtxrOpticalTxFault.{{ $index }}'
                     state_name: mtxrOpticalTxFault
                     states:
@@ -158,10 +137,11 @@ modules:
                         - { descr: yes, graph: 1, value: 1, generic: 2 }
                         - { descr: 'null', graph: 1, value: 2, generic: 3 }
                 -
-                    oid: mtxrPOETable
-                    value: mtxrPOEStatus
+                    oid: MIKROTIK-MIB::mtxrPOETable
+                    value: MIKROTIK-MIB::mtxrPOEStatus
                     num_oid: '.1.3.6.1.4.1.14988.1.1.15.1.1.3.{{ $index }}'
-                    descr: '{{ $mtxrPOEName }} POE'
+                    descr: '{{ MIKROTIK-MIB::mtxrPOEName }} POE'
+                    group: Ports
                     index: 'mtxrPOEStatus.{{ $index }}'
                     state_name: mtxrPOEStatus
                     states:
@@ -170,36 +150,34 @@ modules:
                         - { descr: 'poweredOn', graph: 1, value: 3, generic: 0 }
                         - { descr: 'overload', graph: 1, value: 4, generic: 2 }
                 -
-                    oid: mtxrHlPowerSupplyState
-                    num_oid: '.1.3.6.1.4.1.14988.1.1.3.15.{{ $index }}'
-                    descr: Primary PSU
-                    index: 'mtxrHlPowerSupplyState.{{ $index }}'
-                    state_name: mtxrHlPowerSupplyState
+                    oid: MIKROTIK-MIB::mtxrGaugeTable
+                    value: MIKROTIK-MIB::mtxrGaugeValue
+                    num_oid: '.1.3.6.1.4.1.14988.1.1.3.100.1.3.{{ $index }}'
+                    descr: MIKROTIK-MIB::mtxrGaugeName
+                    group: System
+                    state_name: mtxrGaugeStatus
+                    skip_values:
+                        -   oid: MIKROTIK-MIB::mtxrGaugeUnit
+                            op: '!='
+                            value: 6
                     states:
-                        - { value: 0, generic: 2, graph: 1, descr: 'false' }
-                        - { value: 1, generic: 0, graph: 1, descr: 'true' }
+                        - { value: 0, generic: 0, graph: 1, descr: 'ok' }
+                        - { value: 1, generic: 2, graph: 1, descr: 'fail' }
                 -
-                    oid: mtxrHlBackupPowerSupplyState
-                    num_oid: '.1.3.6.1.4.1.14988.1.1.3.16.{{ $index }}'
-                    descr: Backup PSU
-                    index: 'mtxrHlBackupPowerSupplyState.{{ $index }}'
-                    state_name: mtxrHlBackupPowerSupplyState
-                    states:
-                        - { value: 0, generic: 2, graph: 1, descr: 'false' }
-                        - { value: 1, generic: 0, graph: 1, descr: 'true' }
-                -
-                    oid: mtxrWl60GConnected
+                    oid: MIKROTIK-MIB::mtxrWl60GConnected
                     num_oid: '.1.3.6.1.4.1.14988.1.1.1.8.1.4.{{ $index }}'
                     descr: Station Connected
+                    group: Wireless
                     index: 'mtxrWl60GConnected.{{ $index }}'
                     state_name: mtxrWl60GConnected
                     states:
                         - { value: 0, generic: 2, graph: 1, descr: 'disconnected' }
                         - { value: 1, generic: 0, graph: 1, descr: 'connected' }
                 -
-                    oid: mtxrWl60GMode
+                    oid: MIKROTIK-MIB::mtxrWl60GMode
                     num_oid: '.1.3.6.1.4.1.14988.1.1.1.8.1.2.{{ $index }}'
                     descr: Mode
+                    group: Wireless
                     index: 'mtxrWl60GMode.{{ $index }}'
                     state_name: mtxrWl60GMode
                     states:
@@ -210,27 +188,35 @@ modules:
         power:
             data:
                 -
-                    oid: mtxrPOETable
-                    value: mtxrPOEPower
+                    oid: MIKROTIK-MIB::mtxrPOETable
+                    value: MIKROTIK-MIB::mtxrPOEPower
                     num_oid: '.1.3.6.1.4.1.14988.1.1.15.1.1.6.{{ $index }}'
+                    descr: '{{ MIKROTIK-MIB::mtxrPOEName }} POE'
+                    group: Ports
                     divisor: 10
-                    descr: '{{ $mtxrPOEName }} POE'
                     index: 'mtxrPOEPower.{{ $index }}'
                 -
-                    oid: mtxrHlPower
-                    num_oid: '.1.3.6.1.4.1.14988.1.1.3.12.{{ $index }}'
+                    oid: MIKROTIK-MIB::mtxrGaugeTable
+                    value: MIKROTIK-MIB::mtxrGaugeValue
+                    num_oid: '.1.3.6.1.4.1.14988.1.1.3.100.1.3.{{ $index }}'
+                    descr: MIKROTIK-MIB::mtxrGaugeName
+                    group: System
                     divisor: 10
-                    descr: 'Power Usage'
-                    index: '1'
+                    index: 'mtxrGaugePower.{{ $index }}'
+                    skip_values:
+                        -   oid: MIKROTIK-MIB::mtxrGaugeUnit
+                            op: '!='
+                            value: 5
         fanspeed:
             data:
                 -
-                    oid: mtxrHlFanSpeed1
-                    num_oid: '.1.3.6.1.4.1.14988.1.1.3.17.{{ $index }}'
-                    descr: 'Fan #1'
-                    index: '0'
-                -
-                    oid: mtxrHlFanSpeed2
-                    num_oid: '.1.3.6.1.4.1.14988.1.1.3.18.{{ $index }}'
-                    descr: 'Fan #2'
-                    index: '1'
+                    oid: MIKROTIK-MIB::mtxrGaugeTable
+                    value: MIKROTIK-MIB::mtxrGaugeValue
+                    num_oid: '.1.3.6.1.4.1.14988.1.1.3.100.1.3.{{ $index }}'
+                    descr: MIKROTIK-MIB::mtxrGaugeName
+                    group: System
+                    index: 'mtxrGuageFanspeed.{{ $index }}'
+                    skip_values:
+                        -   oid: MIKROTIK-MIB::mtxrGaugeUnit
+                            op: '!='
+                            value: 2

@@ -154,6 +154,12 @@ foreach (dbFetchRows("SELECT * FROM `bgpPeers` WHERE `device_id` = ? $extra_sql 
         $peer_type = "<span style='color: #00f;'>iBGP</span>";
     } else {
         $peer_type = "<span style='color: #0a0;'>eBGP</span>";
+        // Private ASN ranges
+        // 64512 - 65534 (Private)
+        // 4200000000 - 4294967294 (Private)
+        if (($peer['bgpPeerRemoteAs'] >= 64512 && $peer['bgpPeerRemoteAs'] <= 65534) || ($peer['bgpPeerRemoteAs'] >= 4200000000 && $peer['bgpPeerRemoteAs'] <= 4294967294)) {
+            $peer_type = "<span style='color: #0af;'>Priv eBGP</span>";
+        }
     }
 
     $query = 'SELECT * FROM ipv4_addresses AS A, ports AS I, devices AS D WHERE ';

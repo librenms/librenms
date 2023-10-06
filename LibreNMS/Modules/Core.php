@@ -29,8 +29,11 @@ use App\Models\Device;
 use App\Models\Eventlog;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
+use LibreNMS\Enum\Severity;
+use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
+use LibreNMS\Polling\ModuleStatus;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Compare;
 use LibreNMS\Util\Number;
@@ -48,6 +51,11 @@ class Core implements Module
         return [];
     }
 
+    public function shouldDiscover(OS $os, ModuleStatus $status): bool
+    {
+        return ! $os->getDevice()->snmp_disable && $os->getDevice()->status;
+    }
+
     public function discover(OS $os): void
     {
         $snmpdata = SnmpQuery::numeric()->get(['SNMPv2-MIB::sysObjectID.0', 'SNMPv2-MIB::sysDescr.0', 'SNMPv2-MIB::sysName.0'])
@@ -61,7 +69,7 @@ class Core implements Module
         ]);
 
         foreach ($device->getDirty() as $attribute => $value) {
-            Eventlog::log($value . ' -> ' . $device->$attribute, $device, 'system', 3);
+            Eventlog::log($value . ' -> ' . $device->$attribute, $device, 'system', Severity::Notice);
             $os->getDeviceArray()[$attribute] = $value; // update device array
         }
 
@@ -69,7 +77,7 @@ class Core implements Module
         $device->os = self::detectOS($device, false);
 
         if ($device->isDirty('os')) {
-            Eventlog::log('Device OS changed: ' . $device->getOriginal('os') . ' -> ' . $device->os, $device, 'system', 3);
+            Eventlog::log('Device OS changed: ' . $device->getOriginal('os') . ' -> ' . $device->os, $device, 'system', Severity::Notice);
             $os->getDeviceArray()['os'] = $device->os;
 
             echo 'Changed ';
@@ -87,7 +95,12 @@ class Core implements Module
         echo 'OS: ' . Config::getOsSetting($device->os, 'text') . " ($device->os)\n\n";
     }
 
-    public function poll(OS $os): void
+    public function shouldPoll(OS $os, ModuleStatus $status): bool
+    {
+        return ! $os->getDevice()->snmp_disable && $os->getDevice()->status;
+    }
+
+    public function poll(OS $os, DataStorageInterface $datastore): void
     {
         $device = $os->getDevice();
         $oids = [];
@@ -108,7 +121,7 @@ class Core implements Module
             'sysObjectID' => $snmpdata['.1.3.6.1.2.1.1.2.0'] ?? $device->sysObjectID,
         ]);
 
-        $this->calculateUptime($os, $snmpdata['.1.3.6.1.2.1.1.3.0'] ?? null);
+        $this->calculateUptime($os, $snmpdata['.1.3.6.1.2.1.1.3.0'] ?? null, $datastore);
         $device->save();
     }
 
@@ -246,7 +259,7 @@ class Core implements Module
         return true;
     }
 
-    private function calculateUptime(OS $os, ?string $sysUpTime): void
+    private function calculateUptime(OS $os, ?string $sysUpTime, DataStorageInterface $datastore): void
     {
         global $agent_data;
         $device = $os->getDevice();
@@ -272,20 +285,20 @@ class Core implements Module
         // set it if unless it is wrong
         if ($uptime > 0) {
             if ($uptime < $device->uptime) {
-                Eventlog::log('Device rebooted after ' . Time::formatInterval($device->uptime) . " -> {$uptime}s", $device, 'reboot', 4, $device->uptime);
+                Eventlog::log('Device rebooted after ' . Time::formatInterval($device->uptime) . " -> {$uptime}s", $device, 'reboot', Severity::Warning, $device->uptime);
                 if (Config::get('discovery_on_reboot')) {
                     $device->last_discovered = null;
                     $device->save();
                 }
             }
 
-            app('Datastore')->put($os->getDeviceArray(), 'uptime', [
+            $datastore->put($os->getDeviceArray(), 'uptime', [
                 'rrd_def' => RrdDefinition::make()->addDataset('uptime', 'GAUGE', 0),
             ], $uptime);
 
             $os->enableGraph('uptime');
 
-            echo 'Uptime: ' . Time::formatInterval($uptime) . PHP_EOL;
+            Log::info('Uptime: ' . Time::formatInterval($uptime));
             $device->uptime = $uptime;
         }
     }

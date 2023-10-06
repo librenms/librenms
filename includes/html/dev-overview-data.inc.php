@@ -113,8 +113,14 @@ if (! empty($device['last_discovered'])) {
     echo "<div class='row'><div class='col-sm-4'>$last_discovered_text</div><div class='col-sm-8' title='$last_discovered_text at " . $device['last_discovered'] . "'>$last_discovered</div></div>";
 }
 
-$uptime = (\LibreNMS\Util\Time::formatInterval($device['status'] ? $device['uptime'] : time() - strtotime($device['last_polled'])));
-$uptime_text = ($device['status'] ? 'Uptime' : 'Downtime');
+
+if (! $device['status'] && ! $device['last_polled']) {
+    $uptime = __('Never polled');
+    $uptime_text = 'Uptime';
+} else {
+    $uptime = (\LibreNMS\Util\Time::formatInterval($device['status'] ? $device['uptime'] : time() - strtotime($device['last_polled'])));
+    $uptime_text = ($device['status'] ? 'Uptime' : 'Downtime');
+}
 
 if ($uptime) {
     echo "<div class='row'><div class='col-sm-4'>$uptime_text</div><div class='col-sm-8'>$uptime</div></div>";

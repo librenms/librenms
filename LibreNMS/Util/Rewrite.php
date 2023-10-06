@@ -26,7 +26,9 @@
 namespace LibreNMS\Util;
 
 use App\Models\Device;
-use Cache;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use LibreNMS\Config;
 
 class Rewrite
@@ -148,20 +150,34 @@ class Rewrite
     }
 
     /**
-     * Extract the OUI and match it against cached values
+     * Extract the OUI and match it against database values
      *
      * @param  string  $mac
      * @return string
      */
-    public static function readableOUI($mac)
+    public static function readableOUI($mac): string
     {
-        $cached = Cache::get('OUIDB-' . substr($mac, 0, 6), '');
-        if ($cached == 'IEEE Registration Authority') {
-            // Then we may have a shorter prefix, so let's try them one ater the other, ordered by probability
-            return Cache::get('OUIDB-' . substr($mac, 0, 9)) ?: Cache::get('OUIDB-' . substr($mac, 0, 7));
+        $oui = substr($mac, 0, 6);
+
+        $results = Cache::remember($oui, 21600, function () use ($oui) {
+            return DB::table('vendor_ouis')
+                ->where('oui', 'like', "$oui%") // possible matches
+                ->orderBy('oui', 'desc') // so we can check longer ones first if we have them
+                ->pluck('vendor', 'oui');
+        });
+
+        if (count($results) == 1) {
+            return Arr::first($results);
         }
 
-        return $cached;
+        // Then we may have a shorter prefix, so let's try them one after the other
+        foreach ($results as $oui => $vendor) {
+            if (str_starts_with($mac, $oui)) {
+                return $vendor;
+            }
+        }
+
+        return '';
     }
 
     /**

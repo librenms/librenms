@@ -30,6 +30,7 @@ namespace LibreNMS\Tests\Feature\SnmpTraps;
 use App\Models\Device;
 use App\Models\Port;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Tests\Traits\RequiresDatabase;
 
 class JnxDomAlarmTest extends SnmpTrapTestCase
@@ -52,7 +53,7 @@ JUNIPER-DOM-MIB::jnxDomCurrentAlarmDate.$port->ifIndex 2019-4-17,0:4:51.0,-5:0
 SNMPv2-MIB::snmpTrapEnterprise.0 JUNIPER-CHASSIS-DEFINES-MIB::jnxProductNameMX480",
             "DOM alarm set for interface $port->ifDescr. Current alarm(s): input loss of signal",
             'Could not handle JnxDomAlarmSet',
-            [5],
+            [Severity::Error],
             $device,
         );
     }
@@ -72,7 +73,7 @@ JUNIPER-DOM-MIB::jnxDomCurrentAlarmDate.$port->ifIndex 2019-4-17,0:4:51.0,-5:0
 SNMPv2-MIB::snmpTrapEnterprise.0 JUNIPER-CHASSIS-DEFINES-MIB::jnxProductNameMX480",
             "DOM alarm cleared for interface $port->ifDescr. Cleared alarm(s): input loss of signal, input loss of lock, input rx path not ready, input laser power low, module not ready",
             'Could not handle JnxDomAlarmCleared',
-            [1],
+            [Severity::Ok],
             $device,
         );
     }

@@ -6,7 +6,7 @@
             "units": "days",
             "group": "auth",
             "section": "ad",
-            "order": 2,
+            "order": 20,
             "type": "integer"
         },
         "addhost_alwayscheckip": {
@@ -26,6 +26,13 @@
             "section": "general",
             "order": 2,
             "type": "boolean"
+        },
+        "alert.macros.rule": {
+            "type": "array",
+            "validate": {
+                 "value": "array",
+                 "value.*": "string"
+             }
         },
         "alert_colour.ok": {
             "default": "#00ff00",
@@ -370,12 +377,6 @@
             },
             "type": "array"
         },
-        "auth_ad_base_dn": {
-            "group": "auth",
-            "section": "ad",
-            "order": 1,
-            "type": "text"
-        },
         "auth.socialite.redirect": {
             "group": "auth",
             "section": "socialite",
@@ -390,7 +391,6 @@
             "type": "boolean",
             "default": false
         },
-
         "auth.socialite.configs": {
             "group": "auth",
             "section": "socialite",
@@ -399,57 +399,79 @@
             "validate": {
                 "value": "array",
                 "value.*": "array",
-                "value.*.listener": ["not_regex:/[:|@]/"],
-                "value.*.listener": ["regex:/^\\\\SocialiteProviders\\\\[^\\\\]+\\\\[^\\\\]+ExtendSocialite$/"],
+                "value.*.listener": ["not_regex:/[:|@]/", "regex:/^\\\\SocialiteProviders\\\\[^\\\\]+\\\\[^\\\\]+ExtendSocialite$/"],
                 "value.*.redirect": "url",
                 "value.saml.metadata": "url_or_xml",
                 "value.saml.acs": "url",
                 "value.saml.entityid": "url"
             }
         },
-
+        "auth_ad_base_dn": {
+            "group": "auth",
+            "section": "ad",
+            "order": 3,
+            "type": "text"
+        },
         "auth_ad_check_certificates": {
             "default": false,
             "group": "auth",
             "section": "ad",
-            "order": 1,
+            "order": 5,
             "type": "boolean"
+        },
+        "auth_ad_debug": {
+            "default": false,
+            "group": "auth",
+            "section": "ad",
+            "order": 20,
+            "type": "boolean"
+        },
+        "auth_ad_domain": {
+            "group": "auth",
+            "section": "ad",
+            "order": 2,
+            "type": "text"
         },
         "auth_ad_group_filter": {
             "default": "(objectclass=group)",
             "group": "auth",
             "section": "ad",
-            "order": 1,
+            "order": 7,
             "type": "text"
         },
         "auth_ad_groups": {
             "default": {},
             "group": "auth",
             "section": "ad",
-            "order": 4,
-            "type": "ldap-groups",
+            "order": 8,
+            "type": "group-role-map",
+            "options": {
+                "groupPlaceholder": "Group Name"
+            },
             "validate": {
                 "value": "array",
-                "value.*": "array"
+                "value.*": "array",
+                "value.*.roles": "array|required",
+                "value.*.roles.*": "string"
             }
         },
         "auth_ad_user_filter": {
             "default": "(objectclass=user)",
             "group": "auth",
             "section": "ad",
-            "order": 0,
+            "order": 6,
             "type": "text"
         },
         "auth_ad_binddn": {
             "group": "auth",
             "section": "ad",
-            "order": 9,
+            "order": 11,
             "type": "text"
         },
         "auth_ad_bindpassword": {
             "group": "auth",
             "section": "ad",
-            "order": 8,
+            "order": 12,
             "type": "password"
         },
         "auth_ad_binduser": {
@@ -461,20 +483,24 @@
         "auth_ad_url": {
             "group": "auth",
             "section": "ad",
-            "order": 11,
-            "type": "text"
+            "order": 1,
+            "type": "text",
+            "validate": {
+                "value": "regex:#(ldaps?://[\\w.]+\\s+)+#"
+            }
         },
-        "auth_ad_domain": {
+        "auth_ad_require_groupmembership": {
+            "default": false,
             "group": "auth",
             "section": "ad",
-            "order": 12,
-            "type": "text"
+            "order": 8,
+            "type": "boolean"
         },
         "auth_ad_starttls": {
             "default": "disabled",
             "group": "auth",
             "section": "ad",
-            "order": 13,
+            "order": 4,
             "type": "select",
             "options": {
                 "disabled": "Disabled",
@@ -567,10 +593,15 @@
             "group": "auth",
             "section": "ldap",
             "order": 4,
-            "type": "ldap-groups",
+            "type": "group-role-map",
+            "options": {
+                "groupPlaceholder": "Group DN"
+            },
             "validate": {
                 "value": "array",
-                "value.*": "array"
+                "value.*": "array",
+                "value.*.roles": "array|required",
+                "value.*.roles.*": "string"
             }
         },
         "auth_ldap_port": {
@@ -1049,6 +1080,13 @@
             "default": false,
             "type": "boolean"
         },
+        "discovery_modules.core": {
+            "default": true,
+            "type": "boolean",
+            "validate": {
+                "value": "boolean|accepted"
+            }
+        },
         "discovery_modules.os": {
             "order": 230,
             "group": "discovery",
@@ -1259,15 +1297,8 @@
             "default": true,
             "type": "boolean"
         },
-        "discovery_modules.vmware-vminfo": {
+        "discovery_modules.vminfo": {
             "order": 350,
-            "group": "discovery",
-            "section": "discovery_modules",
-            "default": false,
-            "type": "boolean"
-        },
-        "discovery_modules.libvirt-vminfo": {
-            "order": 170,
             "group": "discovery",
             "section": "discovery_modules",
             "default": false,
@@ -1396,12 +1427,16 @@
             "section": "availability",
             "order": 1,
             "default": [
-                "86400",
-                "604800",
-                "2592000",
-                "31536000"
+                86400,
+                604800,
+                2592000,
+                31536000
             ],
-            "type": "array"
+            "type": "array",
+            "validate": {
+                "value": "array",
+                "value.*": "int"
+            }
         },
         "graphing.availability_consider_maintenance": {
             "group": "poller",
@@ -4045,7 +4080,7 @@
         },
         "leaflet.default_zoom": {
             "default": 2,
-            "type": "integer"
+            "type": "float"
         },
         "leaflet.group_radius": {
             "default": 10,
@@ -4663,6 +4698,13 @@
         "plugin_dir": {
             "type": "directory"
         },
+        "poller_modules.core": {
+            "default": true,
+            "type": "boolean",
+            "validate": {
+                "value": "boolean|accepted"
+            }
+        },
         "poller_modules.unix-agent": {
             "order": 420,
             "group": "poller",
@@ -4792,6 +4834,13 @@
             "group": "poller",
             "section": "poller_modules",
             "default": true,
+            "type": "boolean"
+        },
+        "poller_modules.vminfo": {
+            "order": 410,
+            "group": "poller",
+            "section": "poller_modules",
+            "default": false,
             "type": "boolean"
         },
         "poller_modules.wifi": {
@@ -5087,6 +5136,20 @@
             "order": 7,
             "type": "boolean"
         },
+        "radius.default_roles": {
+            "default": [],
+            "group": "auth",
+            "section": "radius",
+            "order": 3,
+            "type": "array"
+        },
+        "radius.enforce_roles": {
+            "default": true,
+            "group": "auth",
+            "section": "radius",
+            "order": 4,
+            "type": "boolean"
+        },
         "rancid_configs": {
             "default": [],
             "type": "array"
@@ -5104,15 +5167,26 @@
             }
         },
         "reporting.error": {
+            "group": "system",
+            "section": "reporting",
+            "order": 1,
             "default": false,
             "type": "boolean"
         },
         "reporting.dump_errors": {
             "group": "system",
             "section": "reporting",
-            "order": 1,
+            "order": 2,
             "default": false,
             "type": "boolean"
+        },
+        "reporting.throttle": {
+            "default": 300,
+            "type": "integer",
+            "units": "seconds",
+            "group": "system",
+            "section": "reporting",
+            "order": 3
         },
         "reporting.usage": {
             "group": "system",
@@ -5390,11 +5464,19 @@
                 "CRITICAL": "CRITICAL"
             }
         },
+        "service_master_timeout": {
+            "default": 20,
+            "group": "poller",
+            "section": "distributed",
+            "order": 25,
+            "type": "integer",
+            "units": "seconds"
+        },
         "service_watchdog_enabled": {
             "default": false,
             "group": "poller",
             "section": "distributed",
-            "order": 25,
+            "order": 26,
             "type": "boolean"
         },
         "sfdp": {

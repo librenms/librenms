@@ -289,8 +289,8 @@ extend backupninja /etc/snmp/backupninja.py
 
 1. Create stats file with appropriate permissions:
 ```bash
-~$ touch /var/cache/bind/stats
-~$ chown bind:bind /var/cache/bind/stats
+touch /var/cache/bind/stats
+chown bind:bind /var/cache/bind/stats
 ```
 Change `user:group` to the user and group that's running bind/named.
 
@@ -387,6 +387,52 @@ chmod +x /usr/lib/check_mk_agent/local/bind
 ```
 
 3. Set the variable 'agent' to '1' in the config.
+
+## BIRD2
+
+The BIRD Internet Routing Daemon (BGP) 
+
+Due to the lack of SNMP support in the BIRD daemon, this application extracts all configured BGP protocols and parses it into LibreNMS.
+This application supports both IPv4 and IPv6 Peer processing.
+
+### SNMP Extend
+
+1. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
+
+```
+extend bird2 '/usr/bin/sudo /usr/sbin/birdc -r show protocols all'
+```
+
+2.  Edit your sudo users (usually `visudo`) and add at the bottom:
+
+```
+Debian-snmp ALL=(ALL) NOPASSWD: /usr/sbin/birdc
+```
+
+_If your snmp daemon is running on a user that isnt `Debian-snmp` make sure that user has the correct permission to execute `birdc`_
+
+3. Verify the time format for bird2 is defined. Otherwise `iso short
+   ms` (hh:mm:ss) is the default value that will be used. Which is not
+   compatible with the datetime parsing logic used to parse the output
+   from the bird show command. `timeformat protocol` is the one
+   important to be defibned for the bird2 app parsing logic to work.
+
+Example starting point using Bird2 shorthand `iso long` (YYYY-MM-DD hh:mm:ss):
+
+```
+timeformat base iso long;
+timeformat log iso long;
+timeformat protocol iso long;
+timeformat route iso long;
+```
+
+*Timezone can be manually specified, example "%F %T %z" (YYYY-MM-DD
+hh:mm:ss +11:45). See the [Bird
+2 docs](https://bird.network.cz/?get_doc&v=20&f=bird-3.html) for more information*
+
+4. Restart snmpd on your host
+
+The application should be auto-discovered as described at the top of the page. If it is not, please follow the steps set out under `SNMP Extend` heading top of page.
 
 ## Certificate
 
@@ -930,7 +976,8 @@ extend icecast /etc/snmp/icecast-stats.sh
 A small python3 script that reports current DHCP leases stats and pool usage of ISC DHCP Server.
 
 Also you have to install the dhcpd-pools Package.
-Under Ubuntu/Debian just run `apt install dhcpd-pools`
+Under Ubuntu/Debian just run `apt install dhcpd-pools` or under
+FreeBSD `pkg install dhcpd-pools`.
 
 ### SNMP Extend
 
@@ -960,6 +1007,74 @@ extend dhcpstats /etc/snmp/dhcp.py
 The application should be auto-discovered as described at the top of
 the page. If it is not, please follow the steps set out under `SNMP
 Extend` heading top of page.
+
+## Logsize
+
+### SNMP Extend
+
+1. Download the script and make it executable.
+
+```
+wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/logsize -O /etc/snmp/logsize
+chmod +x /etc/snmp/logsize
+```
+
+2. Install the requirements.
+
+```
+# FreeBSD
+pkg install p5-File-Find-Rule p5-JSON p5-TOML p5-Time-Piece p5-MIME-Base64 p5-File-Slurp p5-Statistics-Lite
+# Debian
+apt-get install cpanminus
+cpanm File::Find::Rule JSON TOML Time::Piece MIME::Base64 File::Slurp Statistics::Lite
+```
+
+3. Configure the config at `/usr/local/etc/logsize.conf`. You can find
+   the documentation for the config file in the extend. Below is a
+   small example.
+
+```
+# monitor log sizes of logs directly udner /var/log
+[sets.var_log]
+dir="/var/log/"
+
+# monitor remote logs from network devices
+[sets.remote_network]
+dir="/var/log/remote/network/"
+
+# monitor remote logs from windows sources
+[sets.remote_windows]
+dir="/var/log/remote/windows/"
+
+# monitor suricata flows logs sizes
+[sets.suricata_flows]
+dir="/var/log/suricata/flows/current"
+```
+
+4. If the directories all readable via SNMPD, this script can be ran
+   via snmpd. Otherwise it needs setup in cron. Similarly is
+   processing a large number of files, it may also need setup in cron
+   if it takes the script awhile to run.
+
+```
+*/5 * * * * /etc/snmp/logsize -b 2> /dev/null > /dev/null
+```
+
+5. Make sure that `/var/cache/logsize_extend` exists and is writable
+   by the user running the extend.
+
+```
+mkdir -p /var/cache/logsize_extend
+```
+
+6. Configure it in the SNMPD config.
+
+```
+# if not using cron
+extend logsize  /etc/snmp/logsize -b
+# if using cron
+extend logsize /bin/cat /var/cache/logsize_extend/extend_return
+```
 
 ## linux_config_files
 
@@ -1157,6 +1272,20 @@ extend memcached /etc/snmp/memcached
 The application should be auto-discovered as described at the top of
 the page. If it is not, please follow the steps set out under `SNMP
 Extend` heading top of page.
+
+## Mojo CAPE Submit
+
+### SNMP
+
+This assumes you've already configured mojo_cape_submit from CAPE::Utils.
+
+1. Add the following to `snmpd.conf` and restarted SNMPD
+```
+extend mojo_cape_submit /usr/local/bin/mojo_cape_submit_extend
+```
+
+Then just wait for the machine in question to be rediscovered or
+enabled it in the device settings app page.
 
 ## Munin
 
@@ -1595,6 +1724,9 @@ Extend` heading top of page.
 
 [Install the agent](Agent-Setup.md) on this device if it isn't already
 and copy the `osupdate` script to `/usr/lib/check_mk_agent/local/`
+
+Then uncomment the line towards the top marked to be uncommented if
+using it as a agent.
 
 ## PHP-FPM
 
@@ -2465,20 +2597,29 @@ hide_monitoring_account = With this Boolean you can hide the Account which you
 
 1. Copy the Perl script, smart, to the desired host.
 ```
-wget https://github.com/librenms/librenms-agent/raw/master/snmp/smart -O /etc/snmp/smart
+wget https://github.com/librenms/librenms-agent/raw/master/snmp/smart-v1 -O /etc/snmp/smart
 ```
 
-2. Make the script executable
+2. Install the depends.
+```
+# FreeBSD
+pkg install p5-JSON p5-MIME-Base64 smartmontools
+# Debian
+apt-get install cpanminus smartmontools
+cpanm MIME::Base64 JSON
+```
+
+3. Make the script executable
 ```
 chmod +x /etc/snmp/smart
 ```
 
-3. Edit your snmpd.conf file and add:
+4. Edit your snmpd.conf file and add:
 ```
 extend smart /etc/snmp/smart
 ```
 
-4. You will also need to create the config file, which defaults to the same path as the script,
+5. You will also need to create the config file, which defaults to the same path as the script,
 but with .config appended. So if the script is located at /etc/snmp/smart, the config file
 will be `/etc/snmp/smart.config`. Alternatively you can also specific a config via `-c`.
 
@@ -2516,23 +2657,24 @@ used for reporting and everything after that is used as the argument to be passe
 If you want to guess at the configuration, call it with -g and it will print out what it thinks
 it should be.
 
-5. Restart snmpd on your host
+6. Restart snmpd on your host
 
 If you have a large number of more than one or two disks on a system,
 you should consider adding this to cron. Also make sure the cache file
 is some place it can be written to.
 
 ```
- */3 * * * * /etc/snmp/smart -u
+ */5 * * * * /etc/snmp/smart -u
 ```
 
-6. If your snmp agent runs as user "snmp", edit your sudo users
+7. If your snmp agent runs as user "snmp", edit your sudo users
    (usually `visudo`) and add at the bottom:
 ```
 snmp ALL=(ALL) NOPASSWD: /etc/snmp/smart, /usr/bin/env smartctl
 ```
 
-and modify your snmpd.conf file accordingly:
+and modify your snmpd.conf file accordingly, sudo can be excluded if
+running it via cron:
 
 ```
 extend smart /usr/bin/sudo /etc/snmp/smart
@@ -2542,15 +2684,13 @@ The application should be auto-discovered as described at the top of
 the page. If it is not, please follow the steps set out under `SNMP
 Extend` heading top of page.
 
-If you set useSN to 1, it is worth noting that you will loose
-history(not able to access it from the web interface) for that device
-each time you change it. You will also need to run camcontrol or the
-like on said server to figure out what device actually corresponds
-with that serial number.
+8. Optionally setup nightly self tests for the disks. The exend will
+   run the specified test on all configured disks if called with the
+   -t flag and the name of the SMART test to run.
 
-Also if the system you are using uses non-static device naming based
-on bus information, it may be worthwhile just using the SN as the
-device ID is going to be irrelevant in that case.
+```
+ 0 0 * * * /etc/snmp/smart -t long
+```
 
 ## Sneck
 

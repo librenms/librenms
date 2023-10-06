@@ -75,7 +75,7 @@ foreach ($sensors as $sensor_name) {
         //strtolower because 'dBm - dbm' difference
         $lowname = strtolower($sensor_name);
         $datas[] = $lowname;
-        $type_text[$lowname] = trans('sensors.' . $lowname)['short'];
+        $type_text[$lowname] = trans('sensors.' . $lowname . '.short');
     }
 }
 

@@ -720,7 +720,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
                 'rrd_def' => $rrd_def,
             ];
 
-            data_update($this->getDeviceArray(), 'sap', $tags, $fields);
+            app('Datastore')->put($this->getDeviceArray(), 'sap', $tags, $fields);
             $this->enableGraph('sap');
         }
 
@@ -912,10 +912,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
                 '.1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.8.' . $index,
                 'timos',
                 $index,
-                'RSSI: ' . $carrier[$index]['ifName'],
-                null,
-                1,
-                10
+                'RSSI: ' . $carrier[$index]['ifName']
             );
         }
 
@@ -935,10 +932,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
                 '.1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.9.' . $index,
                 'timos',
                 $index,
-                'RSRP: ' . $carrier[$index]['ifName'],
-                null,
-                1,
-                10
+                'RSRP: ' . $carrier[$index]['ifName']
             );
         }
 

@@ -26,7 +26,9 @@
 namespace LibreNMS\Interfaces;
 
 use App\Models\Device;
+use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\OS;
+use LibreNMS\Polling\ModuleStatus;
 
 interface Module
 {
@@ -34,6 +36,16 @@ interface Module
      * An array of all modules this module depends on
      */
     public function dependencies(): array;
+
+    /**
+     * Should this module be run?
+     */
+    public function shouldDiscover(OS $os, ModuleStatus $status): bool;
+
+    /**
+     * Should polling run for this device?
+     */
+    public function shouldPoll(OS $os, ModuleStatus $status): bool;
 
     /**
      * Discover this module. Heavier processes can be run here
@@ -49,8 +61,9 @@ interface Module
      * Run frequently (default every 5 minutes)
      *
      * @param  \LibreNMS\OS  $os
+     * @param  \LibreNMS\Interfaces\Data\DataStorageInterface  $datastore
      */
-    public function poll(OS $os): void;
+    public function poll(OS $os, DataStorageInterface $datastore): void;
 
     /**
      * Remove all DB data for this module.

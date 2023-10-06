@@ -1,0 +1,250 @@
+{
+    "applications": {
+        "discovery": {
+            "applications": [
+                {
+                    "app_type": "smart",
+                    "app_state": "UNKNOWN",
+                    "discovered": 1,
+                    "app_state_prev": null,
+                    "app_status": "",
+                    "app_instance": "",
+                    "data": null,
+                    "deleted_at": null
+                }
+            ]
+        },
+        "poller": {
+            "applications": [
+                {
+                    "app_type": "smart",
+                    "app_state": "OK",
+                    "discovered": 1,
+                    "app_state_prev": "UNKNOWN",
+                    "app_status": "",
+                    "app_instance": "",
+                    "data": "{\"disks\":{\"da0\":{\"10\":\"0\",\"173\":\"null\",\"177\":\"null\",\"183\":\"0\",\"184\":\"0\",\"187\":\"0\",\"188\":0,\"190\":\"34\",\"194\":\"34\",\"196\":\"null\",\"197\":\"0\",\"198\":\"0\",\"199\":\"0\",\"231\":\"null\",\"232\":\"null\",\"233\":\"null\",\"5\":\"0\",\"9\":\"63417\",\"completed\":5,\"conveyance\":\"0\",\"device_model\":\"ST4000DM000-1F2168\",\"disk\":\"da0 -d sat\",\"exit\":0,\"extended\":6,\"fw_version\":\"CC54\",\"health_pass\":1,\"interrupted\":1,\"max_temp\":\"34\",\"model_family\":\"Seagate Desktop HDD.15\",\"offline\":\"0\",\"read_failure\":\"0\",\"selective\":\"0\",\"selftest_log\":\"Num  Test_Description    Status                  Remaining  LifeTime(hours)  LBA_of_first_errorn# 1  Extended offline    Completed without error       00%     63322         -n# 2  Extended offline    Completed without error       00%     32177         -n# 3  Extended offline    Completed without error       00%      9042         -n# 4  Extended offline    Completed without error       00%      8432         -n# 5  Extended offline    Completed without error       00%        29         -n# 6  Extended offline    Interrupted (host reset)      00%         0         -\",\"serial\":\"Z304VCFY\",\"short\":\"0\",\"unknown_failure\":\"0\",\"is_ssd\":0}},\"exit_nonzero\":0,\"unhealthy\":0,\"disks_with_failed_tests\":[],\"disks_with_failed_health\":[],\"has\":{\"id5\":1,\"id9\":1,\"id10\":1,\"id173\":0,\"id177\":0,\"id183\":1,\"id184\":1,\"id187\":1,\"id188\":1,\"id190\":1,\"id194\":1,\"id196\":0,\"id197\":1,\"id198\":1,\"id199\":1,\"id231\":0,\"id232\":0,\"id233\":0}}",
+                    "deleted_at": null
+                }
+            ],
+            "application_metrics": [
+                {
+                    "metric": "disk_da0",
+                    "value": 1,
+                    "value_prev": null,
+                    "app_type": "smart"
+                },
+                {
+                    "metric": "disk_da0_completed",
+                    "value": 5,
+                    "value_prev": null,
+                    "app_type": "smart"
+                },
+                {
+                    "metric": "disk_da0_conveyance",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "smart"
+                },
+                {
+                    "metric": "disk_da0_exit",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "smart"
+                },
+                {
+                    "metric": "disk_da0_extended",
+                    "value": 6,
+                    "value_prev": null,
+                    "app_type": "smart"
+                },
+                {
+                    "metric": "disk_da0_health",
+                    "value": 1,
+                    "value_prev": null,
+                    "app_type": "smart"
+                },
+                {
+                    "metric": "disk_da0_id10",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "smart"
+                },
+                {
+                    "metric": "disk_da0_id173",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "smart"
+                },
+                {
+                    "metric": "disk_da0_id177",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "smart"
+                },
+                {
+                    "metric": "disk_da0_id183",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "smart"
+                },
+                {
+                    "metric": "disk_da0_id184",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "smart"
+                },
+                {
+                    "metric": "disk_da0_id187",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "smart"
+                },
+                {
+                    "metric": "disk_da0_id188",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "smart"
+                },
+                {
+                    "metric": "disk_da0_id190",
+                    "value": 34,
+                    "value_prev": null,
+                    "app_type": "smart"
+                },
+                {
+                    "metric": "disk_da0_id194",
+                    "value": "34",
+                    "value_prev": null,
+                    "app_type": "smart"
+                },
+                {
+                    "metric": "disk_da0_id196",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "smart"
+                },
+                {
+                    "metric": "disk_da0_id197",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "smart"
+                },
+                {
+                    "metric": "disk_da0_id198",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "smart"
+                },
+                {
+                    "metric": "disk_da0_id199",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "smart"
+                },
+                {
+                    "metric": "disk_da0_id231",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "smart"
+                },
+                {
+                    "metric": "disk_da0_id232",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "smart"
+                },
+                {
+                    "metric": "disk_da0_id233",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "smart"
+                },
+                {
+                    "metric": "disk_da0_id5",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "smart"
+                },
+                {
+                    "metric": "disk_da0_id9",
+                    "value": 63417,
+                    "value_prev": null,
+                    "app_type": "smart"
+                },
+                {
+                    "metric": "disk_da0_interrupted",
+                    "value": 1,
+                    "value_prev": null,
+                    "app_type": "smart"
+                },
+                {
+                    "metric": "disk_da0_max_temp",
+                    "value": 34,
+                    "value_prev": null,
+                    "app_type": "smart"
+                },
+                {
+                    "metric": "disk_da0_readfailure",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "smart"
+                },
+                {
+                    "metric": "disk_da0_selective",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "smart"
+                },
+                {
+                    "metric": "disk_da0_short",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "smart"
+                },
+                {
+                    "metric": "disk_da0_unknownfail",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "smart"
+                },
+                {
+                    "metric": "disks_with_failed_health_count",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "smart"
+                },
+                {
+                    "metric": "disks_with_failed_tests_count",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "smart"
+                },
+                {
+                    "metric": "exit_nonzero",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "smart"
+                },
+                {
+                    "metric": "new_disks_with_failed_health_count",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "smart"
+                },
+                {
+                    "metric": "new_disks_with_failed_tests_count",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "smart"
+                },
+                {
+                    "metric": "unhealthy",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "smart"
+                }
+            ]
+        }
+    }
+}

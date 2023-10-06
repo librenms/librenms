@@ -48,6 +48,10 @@ If you need to debug the output of discovery-wrapper.py then you can
 add `-d` to the end of the command - it is NOT recommended to do this
 in cron.
 
+You also may use `-m` to pass a list of comma-separated modules.
+Please refer to [Command options](#command-options) of discovery.php.
+Example: `/opt/librenms/discovery-wrapper.py 1 -m bgp-peers`
+
 If you want to switch back to discovery.php then you can replace:
 
 `33  */6   * * *   librenms    /opt/librenms/discovery-wrapper.py 1 >> /dev/null 2>&1`
@@ -92,8 +96,7 @@ Modules.
     lnms config:set discovery_modules.junose-atm-vp false
     lnms config:set discovery_modules.bgp-peers true
     lnms config:set discovery_modules.vlans true
-    lnms config:set discovery_modules.vmware-vminfo false
-    lnms config:set discovery_modules.libvirt-vminfo false
+    lnms config:set discovery_modules.vminfo false
     lnms config:set discovery_modules.printer-supplies false
     lnms config:set discovery_modules.ucd-diskio true
     lnms config:set discovery_modules.applications false
@@ -181,9 +184,7 @@ device, with history data.
 
 `slas`: SLA detection and support.
 
-`vmware-vminfo`: Detection of vmware guests on an ESXi host
-
-`libvirt-vminfo`: Detection of libvirt guests.
+`vminfo`: Detection of vm guests for VMware ESXi and libvert
 
 `printer-supplies`: Toner levels support.
 
