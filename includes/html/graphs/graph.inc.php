@@ -39,54 +39,54 @@ if (session('preferences.timezone')) {
     $env['TZ'] = session('preferences.timezone');
 }
 
-require Config::get('install_dir') . "/includes/html/graphs/$type/auth.inc.php";
-
-if ($auth && is_customoid_graph($type, $subtype)) {
-    $unit = $vars['unit'];
-    include Config::get('install_dir') . '/includes/html/graphs/customoid/customoid.inc.php';
-} elseif ($auth && is_file(Config::get('install_dir') . "/includes/html/graphs/$type/$subtype.inc.php")) {
-    include Config::get('install_dir') . "/includes/html/graphs/$type/$subtype.inc.php";
-} else {
-    graph_error("$type*$subtype Graph Template Missing", "$type*$subtype");
-}
-
-if ($auth === null) {
-    // We are unauthenticated :(
-    graph_error('No Authorization', 'No Auth');
-
-    return;
-}
-
-$rrd_options = $graph_params . ' ' . $rrd_options;
-
-// command output requested
-if (! empty($command_only)) {
-    echo "<div class='infobox'>";
-    echo "<p style='font-size: 16px; font-weight: bold;'>RRDTool Command</p>";
-    echo "<pre class='rrd-pre'>";
-    echo escapeshellcmd('rrdtool ' . Rrd::buildCommand('graph', Config::get('temp_dir') . '/' . strgen(), $rrd_options));
-    echo '</pre>';
-    try {
-        Rrd::graph($rrd_options, $env);
-    } catch (\LibreNMS\Exceptions\RrdGraphException $e) {
-        echo "<p style='font-size: 16px; font-weight: bold;'>RRDTool Output</p>";
-        echo "<pre class='rrd-pre'>";
-        echo $e->getMessage();
-        echo '</pre>';
-    }
-    echo '</div>';
-
-    return;
-}
-
-if (empty($rrd_options)) {
-    graph_error('Graph Definition Error', 'Def Error');
-
-    return;
-}
-
-// Generating the graph!
 try {
+    require Config::get('install_dir') . "/includes/html/graphs/$type/auth.inc.php";
+
+    if ($auth && is_customoid_graph($type, $subtype)) {
+        $unit = $vars['unit'];
+        include Config::get('install_dir') . '/includes/html/graphs/customoid/customoid.inc.php';
+    } elseif ($auth && is_file(Config::get('install_dir') . "/includes/html/graphs/$type/$subtype.inc.php")) {
+        include Config::get('install_dir') . "/includes/html/graphs/$type/$subtype.inc.php";
+    } else {
+        graph_error("$type*$subtype Graph Template Missing", "$type*$subtype");
+    }
+
+    if ($auth === null) {
+        // We are unauthenticated :(
+        graph_error('No Authorization', 'No Auth');
+
+        return;
+    }
+
+    $rrd_options = $graph_params . ' ' . $rrd_options;
+
+    // command output requested
+    if (! empty($command_only)) {
+        echo "<div class='infobox'>";
+        echo "<p style='font-size: 16px; font-weight: bold;'>RRDTool Command</p>";
+        echo "<pre class='rrd-pre'>";
+        echo escapeshellcmd('rrdtool ' . Rrd::buildCommand('graph', Config::get('temp_dir') . '/' . strgen(), $rrd_options));
+        echo '</pre>';
+        try {
+            Rrd::graph($rrd_options, $env);
+        } catch (\LibreNMS\Exceptions\RrdGraphException $e) {
+            echo "<p style='font-size: 16px; font-weight: bold;'>RRDTool Output</p>";
+            echo "<pre class='rrd-pre'>";
+            echo $e->getMessage();
+            echo '</pre>';
+        }
+        echo '</div>';
+
+        return;
+    }
+
+    if (empty($rrd_options)) {
+        graph_error('Graph Definition Error', 'Def Error');
+
+        return;
+    }
+
+    // Generating the graph!
     $image_data = Rrd::graph($rrd_options, $env);
 
     // output the graph
