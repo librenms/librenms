@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\View\SimpleTemplate;
+use Carbon\Carbon;
 use Fico7489\Laravel\Pivot\Traits\PivotEventTrait;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -257,6 +258,24 @@ class Device extends BaseModel
         }
 
         return $name;
+    }
+
+    /**
+     * Get the current DeviceOutage if there is one (if device is down)
+     */
+    public function getCurrentOutage(): ?DeviceOutage
+    {
+        return $this->relationLoaded('outages')
+            ? $this->outages->whereNull('up_again')->sortBy('going_down', descending: true)->first()
+            : $this->outages()->whereNull('up_again')->orderBy('going_down', 'desc')->first();
+    }
+
+    /**
+     * Get the time this device went down
+     */
+    public function downSince(): Carbon
+    {
+        return Carbon::createFromTimestamp((int) $this->getCurrentOutage()?->going_down);
     }
 
     /**
