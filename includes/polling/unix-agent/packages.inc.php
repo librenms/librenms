@@ -44,7 +44,7 @@ $managers = [
             [$name, $version, $arch, $size] = explode(' ', $line);
 
             return new Package([
-                'manager' => 'rpm',
+                'manager' => 'pacman',
                 'name' => $name,
                 'arch' => $arch,
                 'version' => $version,
