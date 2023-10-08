@@ -40,7 +40,7 @@ class Clean
      */
     public static function fileName($file)
     {
-        return preg_replace('/[^a-zA-Z0-9\-._]/', '', $file);
+        return preg_replace('/[^a-zA-Z0-9\-._]/', '', $file ?? '');
     }
 
     /**
