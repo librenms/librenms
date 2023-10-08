@@ -1740,7 +1740,7 @@ processes:
     - { Field: pid, Type: int, 'Null': false, Extra: '' }
     - { Field: vsz, Type: int, 'Null': false, Extra: '' }
     - { Field: rss, Type: int, 'Null': false, Extra: '' }
-    - { Field: cputime, Type: varchar(12), 'Null': false, Extra: '' }
+    - { Field: cputime, Type: varchar(14), 'Null': false, Extra: '' }
     - { Field: user, Type: varchar(50), 'Null': false, Extra: '' }
     - { Field: command, Type: text, 'Null': false, Extra: '' }
   Indexes:
