@@ -87,6 +87,19 @@ class Number
     }
 
     /**
+     * Convert an Si or Bi formatted value to bytes (or bits)
+     */
+    public static function toBytes(string $formatted): int|float
+    {
+        preg_match('/^([\d.]+)([KMGTPEZY]?)(\w?)\w?$/', $formatted, $matches);
+        [, $number, $magnitude, $baseIndicator] = $matches;
+        $base = $baseIndicator == 'i' ? 1024 : 1000;
+        $exponent = ['K' => 1, 'M' => 2, 'G' => 3, 'T' => 4, 'P' => 5, 'E' => 6, 'Z' => 7, 'Y' => 8];
+
+        return self::cast($number) * pow($base, $exponent[$magnitude] ?? 0);
+    }
+
+    /**
      * Cast string to int or float.
      * Returns 0 if string is not numeric
      *
