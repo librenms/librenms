@@ -12,6 +12,7 @@
  * See COPYING for more details.
  */
 
+use App\Models\Eventlog;
 use App\Models\Ipv6Address;
 use App\Models\Ipv6Network;
 use App\Models\Port;
@@ -26,7 +27,16 @@ use LibreNMS\Util\IP;
 use LibreNMS\Util\IPv6;
 use LibreNMS\Util\UserFuncHelper;
 
-function discover_new_device($hostname, $device = [], $method = '', $interface = '')
+/**
+ * @param  string  $hostname
+ * @param  array  $device
+ * @param  string  $method  name of process discoverying this device
+ * @param  array|null  $interface  Interface this device was discovered on
+ * @return false|int
+ *
+ * @throws InvalidIpException
+ */
+function discover_new_device($hostname, $device, $method, $interface = null)
 {
     d_echo("discovering $hostname\n");
 
@@ -77,25 +87,26 @@ function discover_new_device($hostname, $device = [], $method = '', $interface =
     }
 
     try {
-        $remote_device_id = addHost($hostname, '', '161', 'udp', $device['poller_group']); // discover with actual poller group
-        $remote_device = device_by_id_cache($remote_device_id, 1);
-        echo '+[' . $remote_device['hostname'] . '(' . $remote_device['device_id'] . ')]';
-        discover_device($remote_device);
-        device_by_id_cache($remote_device_id, 1);
+        $remote_device = new \App\Models\Device([
+            'hostname' => $hostname,
+            'poller_group' => $device['poller_group'],
+        ]);
+        $result = \App\Actions\Device\ValidateDeviceAndCreate($remote_device)->execute();
 
-        if ($remote_device_id && is_array($device) && ! empty($method)) {
+        if ($result) {
+            echo '+[' . $remote_device->hostname . '(' . $remote_device->device_id . ')]';
+
             $extra_log = is_array($interface) ? ' (port ' . cleanPort($interface)['label'] . ') ' : '';
+            Eventlog::log('Device ' . $remote_device->hostname . " ($ip) $extra_log autodiscovered through $method on " . $device['hostname'], $device['device_id'], 'discovery', Severity::Ok);
 
-            log_event('Device ' . $remote_device['hostname'] . " ($ip) $extra_log autodiscovered through $method on " . $device['hostname'], $remote_device_id, 'discovery', 1);
-        } else {
-            log_event("$method discovery of " . $remote_device['hostname'] . " ($ip) failed - Check ping and SNMP access", $device['device_id'], 'discovery', 5);
+            return $remote_device->device_id;
         }
 
-        return $remote_device_id;
+        Eventlog::log("$method discovery of " . $remote_device->hostname . " ($ip) failed - Check ping and SNMP access", $device['device_id'], 'discovery', Severity::Error);
     } catch (HostExistsException $e) {
         // already have this device
     } catch (Exception $e) {
-        log_event("$method discovery of " . $hostname . " ($ip) failed - " . $e->getMessage(), $device['device_id'], 'discovery', 5);
+        Eventlog::log("$method discovery of " . $hostname . " ($ip) failed - " . $e->getMessage(), $device['device_id'], 'discovery', Severity::Error);
     }
 
     return false;
@@ -153,7 +164,7 @@ function discover_device(&$device, $force_module = false)
             } catch (Throwable $e) {
                 // isolate module exceptions so they don't disrupt the polling process
                 Log::error("%rError discovering $module module for {$device['hostname']}.%n $e", ['color' => true]);
-                \App\Models\Eventlog::log("Error discovering $module module. Check log file for more details.", $device['device_id'], 'discovery', Severity::Error);
+                Eventlog::log("Error discovering $module module. Check log file for more details.", $device['device_id'], 'discovery', Severity::Error);
                 report($e);
 
                 // Re-throw exception if we're in CI
