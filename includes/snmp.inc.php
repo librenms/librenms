@@ -20,7 +20,6 @@ use App\Polling\Measure\Measurement;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Util\Oid;
-use Symfony\Component\Process\Exception\ProcessTimedOutException;
 
 function prep_snmp_setting($device, $setting)
 {
@@ -368,34 +367,6 @@ function snmp_getnext_multi($device, $oids, $options = '-OQUs', $mib = null, $mi
 
     return $array;
 }//end snmp_getnext_multi()
-
-/**
- * @param  $device
- * @return bool
- */
-function snmp_check($device)
-{
-    $measure = Measurement::start('snmpget');
-
-    try {
-        $oid = '.1.3.6.1.2.1.1.2.0';
-        $cmd = gen_snmpget_cmd($device, $oid, '-Oqvn');
-        $proc = new \Symfony\Component\Process\Process($cmd);
-        $proc->run();
-        $code = $proc->getExitCode();
-        Log::debug("SNMP Check response code: $code");
-    } catch (ProcessTimedOutException $e) {
-        Log::debug("Device didn't respond to snmpget before {$e->getExceededTimeout()}s timeout");
-    }
-
-    $measure->manager()->recordSnmp($measure->end());
-
-    if ($code === 0) {
-        return true;
-    }
-
-    return false;
-}//end snmp_check()
 
 function snmp_walk($device, $oid, $options = null, $mib = null, $mibdir = null)
 {
