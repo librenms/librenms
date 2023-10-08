@@ -419,7 +419,7 @@ class Billing
         $data = [];
         $average = 0;
         if ($imgtype == 'day') {
-            foreach (dbFetchRows1('SELECT DISTINCT UNIX_TIMESTAMP(timestamp) as timestamp, SUM(delta) as traf_total, SUM(in_delta) as traf_in, SUM(out_delta) as traf_out FROM bill_data WHERE `bill_id` = ? AND `timestamp` >= FROM_UNIXTIME(?) AND `timestamp` <= FROM_UNIXTIME(?) GROUP BY DATE(timestamp) ORDER BY timestamp ASC', [$bill_id, $from, $to]) as $data) {
+            foreach (dbFetchRows('SELECT DISTINCT UNIX_TIMESTAMP(timestamp) as timestamp, SUM(delta) as traf_total, SUM(in_delta) as traf_in, SUM(out_delta) as traf_out FROM bill_data WHERE `bill_id` = ? AND `timestamp` >= FROM_UNIXTIME(?) AND `timestamp` <= FROM_UNIXTIME(?) GROUP BY DATE(timestamp) ORDER BY timestamp ASC', [$bill_id, $from, $to]) as $data) {
                 array_push($ticklabels, date('Y-m-d', $data['timestamp']));
                 array_push($in_data, isset($data['traf_in']) ? $data['traf_in'] : 0);
                 array_push($out_data, isset($data['traf_out']) ? $data['traf_out'] : 0);
