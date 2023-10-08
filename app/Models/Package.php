@@ -53,6 +53,6 @@ class Package extends DeviceRelatedModel implements Keyable
 
     public function isValid(): bool
     {
-        return $this->name && $this->manager && $this->arch;
+        return $this->name && $this->manager && $this->arch && $this->version;
     }
 }
