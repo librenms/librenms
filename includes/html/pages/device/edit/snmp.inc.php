@@ -5,24 +5,24 @@ use LibreNMS\Enum\PortAssociationMode;
 
 $device = DeviceCache::getPrimary();
 
-if ($_POST['editing']) {
+if (isset($_POST['editing'])) {
     if (Auth::user()->hasGlobalAdmin()) {
-        $force_save = ($_POST['force_save'] == 'on');
-        $device->poller_group = isset($_POST['poller_group']) ? $_POST['poller_group'] : 0;
+        $force_save = isset($_POST['force_save']) && $_POST['force_save'] == 'on';
+        $device->poller_group = $_POST['poller_group'] ?? 0;
         $snmp_enabled = ($_POST['snmp'] == 'on');
 
         if ($snmp_enabled) {
             $device->snmp_disable = 0;
             $device->snmpver = $_POST['snmpver'];
-            $device->port = $_POST['port'] ? $_POST['port'] : Config::get('snmp.port');
-            $device->transport = $_POST['transport'] ? $_POST['transport'] : $transport = 'udp';
+            $device->port = $_POST['port'] ?: Config::get('snmp.port');
+            $device->transport = $_POST['transport'] ?: $transport = 'udp';
             $device->port_association_mode = $_POST['port_assoc_mode'];
-            $max_repeaters = $_POST['max_repeaters'];
+            $max_repeaters = $_POST['max_repeaters'] ?? '';
             $max_oid = $_POST['max_oid'];
             $device->retries = $_POST['retries'] ?: null;
             $device->timeout = $_POST['timeout'] ?: null;
 
-            if ($snmpver == 'v3') {
+            if ($device->snmpver == 'v3') {
                 $device->community = ''; // if v3 works, we don't need a community
                 $device->authalgo = $_POST['authalgo'];
                 $device->authlevel = $_POST['authlevel'];
@@ -39,9 +39,8 @@ if ($_POST['editing']) {
             $device->hardware = $_POST['hardware'];
             $device->icon = null;
             $device->os = $_POST['os'] ? $_POST['os_id'] : 'ping';
-            $device->poller_group = $poller_group;
             $device->snmp_disable = 1;
-            $device->sysName = $_POST['sysName'] ? $_POST['sysName'] : null;
+            $device->sysName = $_POST['sysName'] ?: null;
             $device->version = null;
         }
 
@@ -203,13 +202,13 @@ echo "
     <div class='form-group'>
     <label for='sysName' class='col-sm-2 control-label'>sysName (optional)</label>
     <div class='col-sm-4'>
-    <input id='sysName' class='form-control' name='sysName' value='" . htmlspecialchars($device->sysName) . "'/>
+    <input id='sysName' class='form-control' name='sysName' value='" . htmlspecialchars($device->sysName ?? '') . "'/>
     </div>
     </div>
     <div class='form-group'>
     <label for='hardware' class='col-sm-2 control-label'>Hardware (optional)</label>
     <div class='col-sm-4'>
-    <input id='hardware' class='form-control' name='hardware' value='" . htmlspecialchars($device->hardware) . "'/>
+    <input id='hardware' class='form-control' name='hardware' value='" . htmlspecialchars($device->hardware ?? '') . "'/>
     </div>
     </div>
     <div class='form-group'>
@@ -280,13 +279,13 @@ echo "        </select>
     <div class='form-group'>
         <label for='max_repeaters' class='col-sm-2 control-label'>Max Repeaters</label>
         <div class='col-sm-1'>
-            <input type='number' id='max_repeaters' name='max_repeaters' class='form-control input-sm' value='" . htmlspecialchars($max_repeaters) . "' placeholder='max repeaters' />
+            <input type='number' id='max_repeaters' name='max_repeaters' class='form-control input-sm' value='" . htmlspecialchars($max_repeaters ?? '') . "' placeholder='max repeaters' />
         </div>
     </div>
     <div class='form-group'>
         <label for='max_oid' class='col-sm-2 control-label'>Max OIDs</label>
         <div class='col-sm-1'>
-            <input type='number' id='max_oid' name='max_oid' class='form-control input-sm' value='" . htmlspecialchars($max_oid) . "' placeholder='max oids' />
+            <input type='number' id='max_oid' name='max_oid' class='form-control input-sm' value='" . htmlspecialchars($max_oid ?? '') . "' placeholder='max oids' />
         </div>
     </div>
     <div id='snmpv1_2'>
@@ -296,7 +295,7 @@ echo "        </select>
     <div class='form-group'>
     <label for='community' class='col-sm-2 control-label'>SNMP Community</label>
     <div class='col-sm-4'>
-    <input id='community' class='form-control' name='community' value='********' onfocus='this.value=(this.value==\"********\" ? decodeURIComponent(\"" . rawurlencode($device->community) . "\") : this.value);'/>
+    <input id='community' class='form-control' name='community' value='********' onfocus='this.value=(this.value===\"********\" ? decodeURIComponent(\"" . rawurlencode($device->community) . "\") : this.value);'/>
     </div>
     </div>
     </div>
@@ -317,13 +316,13 @@ echo "        </select>
     <div class='form-group'>
     <label for='authname' class='col-sm-2 control-label'>Auth User Name</label>
     <div class='col-sm-4'>
-    <input type='text' id='authname' name='authname' class='form-control' value='" . htmlspecialchars($device->authname) . "' autocomplete='off'>
+    <input type='text' id='authname' name='authname' class='form-control' value='" . htmlspecialchars($device->authname ?? '') . "' autocomplete='off'>
     </div>
     </div>
     <div class='form-group'>
     <label for='authpass' class='col-sm-2 control-label'>Auth Password</label>
     <div class='col-sm-4'>
-    <input type='password' id='authpass' name='authpass' class='form-control' value='" . htmlspecialchars($device->authpass) . "' autocomplete='off'>
+    <input type='password' id='authpass' name='authpass' class='form-control' value='" . htmlspecialchars($device->authpass ?? '') . "' autocomplete='off'>
     </div>
     </div>
     <div class='form-group'>
@@ -344,7 +343,7 @@ echo "
     <div class='form-group'>
     <label for='cryptopass' class='col-sm-2 control-label'>Crypto Password</label>
     <div class='col-sm-4'>
-    <input type='password' id='cryptopass' name='cryptopass' class='form-control' value='" . htmlspecialchars($device->cryptopass) . "' autocomplete='off'>
+    <input type='password' id='cryptopass' name='cryptopass' class='form-control' value='" . htmlspecialchars($device->cryptopass ?? '') . "' autocomplete='off'>
     </div>
     </div>
     <div class='form-group'>
@@ -414,11 +413,11 @@ $('[name="force_save"]').bootstrapSwitch();
 
 function changeForm() {
     snmpVersion = $("#snmpver").val();
-    if(snmpVersion == 'v1' || snmpVersion == 'v2c') {
+    if(snmpVersion === 'v1' || snmpVersion === 'v2c') {
         $('#snmpv1_2').show();
         $('#snmpv3').hide();
     }
-    else if(snmpVersion == 'v3') {
+    else if(snmpVersion === 'v3') {
         $('#snmpv1_2').hide();
         $('#snmpv3').show();
     }
