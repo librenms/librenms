@@ -193,6 +193,7 @@ applications:
     applications_device_id_app_type_unique: { Name: applications_device_id_app_type_unique, Columns: [device_id, app_type], Unique: true, Type: BTREE }
 application_metrics:
   Columns:
+    - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
     - { Field: app_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: metric, Type: varchar(64), 'Null': false, Extra: '' }
     - { Field: value, Type: double, 'Null': true, Extra: '' }
