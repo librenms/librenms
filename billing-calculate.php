@@ -70,7 +70,7 @@ foreach (dbFetchRows('SELECT * FROM `bills` ORDER BY `bill_id`') as $bill) {
                 $percent = Number::calculatePercent($rate_data['total_data'], $bill['bill_quota']);
             }
 
-            echo \Carbon\Carbon::parse($datefrom)->toDateTimeString() . ' to ' . \Carbon\Carbon::parse($dateto)->toDateTimeString()  . ' ' . str_pad($type, 8) . ' ' . str_pad($allowed_text, 10) . ' ' . str_pad($used_text, 10) . ' ' . $percent . '%';
+            echo \Carbon\Carbon::parse($datefrom)->toDateTimeString() . ' to ' . \Carbon\Carbon::parse($dateto)->toDateTimeString() . ' ' . str_pad($type, 8) . ' ' . str_pad($allowed_text, 10) . ' ' . str_pad($used_text, 10) . ' ' . $percent . '%';
 
             if ($i == '0') {
                 $update = [
