@@ -314,7 +314,7 @@ parameters:
 
 		-
 			message: """
-				#^Call to deprecated function dbFetch\\(\\)\\:
+				#^Call to deprecated function dbFetchRows\\(\\)\\:
 				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
 			"""
 			count: 1
@@ -322,7 +322,7 @@ parameters:
 
 		-
 			message: """
-				#^Call to deprecated function dbFetch\\(\\)\\:
+				#^Call to deprecated function dbFetchRows\\(\\)\\:
 				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
 			"""
 			count: 2
@@ -346,7 +346,7 @@ parameters:
 
 		-
 			message: """
-				#^Call to deprecated function dbFetch\\(\\)\\:
+				#^Call to deprecated function dbFetchRows\\(\\)\\:
 				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
 			"""
 			count: 3
@@ -2994,7 +2994,7 @@ parameters:
 
 		-
 			message: """
-				#^Call to deprecated function dbFetch\\(\\)\\:
+				#^Call to deprecated function dbFetchRows\\(\\)\\:
 				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
 			"""
 			count: 1
@@ -4858,7 +4858,7 @@ parameters:
 
 		-
 			message: """
-				#^Call to deprecated function dbFetch\\(\\)\\:
+				#^Call to deprecated function dbFetchRows\\(\\)\\:
 				Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
 			"""
 			count: 1
