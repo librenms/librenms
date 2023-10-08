@@ -65,7 +65,7 @@ class ErrorReportingProvider extends \Spatie\LaravelIgnition\IgnitionServiceProv
 
         Flare::filterExceptionsUsing(function (\Exception $e) {
             if (Config::get('reporting.dump_errors')) {
-                dump('Exception: ' . $e->getMessage(), $e->getFile() . ':' . $e->getLine());
+                \Log::critical('%RException: ' . $e->getMessage() . '%n @ %G' . $e->getFile() . ':' . $e->getLine() . '%n', ['color' => true]);
             }
 
             // check if reporting is enabled and not throttled
