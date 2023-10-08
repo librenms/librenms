@@ -326,16 +326,6 @@ parameters:
 			path: database/seeders/RolesSeeder.php
 
 		-
-			message: "#^Parameter \\#4 \\$transport of function addHost expects string, int given\\.$#"
-			count: 1
-			path: tests/AddHostTest.php
-
-		-
-			message: "#^Parameter \\#5 \\$poller_group of function addHost expects string, int given\\.$#"
-			count: 4
-			path: tests/AddHostTest.php
-
-		-
 			message: "#^Parameter \\#1 \\$attr of method LibreNMS\\\\Authentication\\\\SSOAuthorizer\\:\\:authSSOGetAttr\\(\\) expects string, int given\\.$#"
 			count: 2
 			path: tests/AuthSSOTest.php
