@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('application_metrics', function (Blueprint $table) {
-            $table->id()->first();
-        });
+        if (! Schema::hasColumn('application_metrics', 'id')) {
+            Schema::table('application_metrics', function (Blueprint $table) {
+                $table->id()->first();
+            });
+        }
     }
 
     /**
@@ -21,8 +23,5 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('application_metrics', function (Blueprint $table) {
-            $table->dropColumn('id');
-        });
     }
 };
