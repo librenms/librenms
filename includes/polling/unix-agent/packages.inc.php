@@ -53,7 +53,7 @@ $managers = [
                 'status' => 1,
             ]);
         },
-    ]
+    ],
 ];
 
 foreach ($managers as $key => $manager) {
