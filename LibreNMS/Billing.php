@@ -267,7 +267,7 @@ class Billing
 
         $bill_data = dbFetchRow('SELECT * from `bills` WHERE `bill_id`= ? LIMIT 1', [$bill_id]);
 
-        foreach (dbFetchRows2('SELECT *, UNIX_TIMESTAMP(timestamp) AS formatted_date FROM bill_data WHERE bill_id = ? AND `timestamp` >= FROM_UNIXTIME( ? ) AND `timestamp` <= FROM_UNIXTIME( ? ) ORDER BY timestamp ASC', [$bill_id, $from, $to]) as $row) {
+        foreach (dbFetchRows('SELECT *, UNIX_TIMESTAMP(timestamp) AS formatted_date FROM bill_data WHERE bill_id = ? AND `timestamp` >= FROM_UNIXTIME( ? ) AND `timestamp` <= FROM_UNIXTIME( ? ) ORDER BY timestamp ASC', [$bill_id, $from, $to]) as $row) {
             $timestamp = $row['formatted_date'];
             if (! $first) {
                 $first = $timestamp;
