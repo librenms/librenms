@@ -8,7 +8,6 @@
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  */
 
-use App\Models\Device;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Enum\Severity;
@@ -129,7 +128,7 @@ function device_discovery_trigger($id)
         set_time_limit(0);
     }
 
-    $update = dbUpdate(['last_discovered' => ['NULL']], 'devices', '`device_id` = ?', [$id]);
+    $update = dbUpdate(['last_discovered' => null], 'devices', '`device_id` = ?', [$id]);
     if (! empty($update) || $update == '0') {
         $message = 'Device will be rediscovered';
     } else {

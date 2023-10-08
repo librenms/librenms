@@ -294,7 +294,7 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
         }
 
         if ((string) $high_limit != (string) $sensor_entry['sensor_limit'] && $sensor_entry['sensor_custom'] == 'No') {
-            $update = ['sensor_limit' => ($high_limit == null ? ['NULL'] : $high_limit)];
+            $update = ['sensor_limit' => $high_limit];
             $updated = dbUpdate($update, 'sensors', '`sensor_id` = ?', [$sensor_entry['sensor_id']]);
             d_echo("( $updated updated )\n");
 
@@ -303,7 +303,7 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
         }
 
         if ((string) $sensor_entry['sensor_limit_low'] != (string) $low_limit && $sensor_entry['sensor_custom'] == 'No') {
-            $update = ['sensor_limit_low' => ($low_limit == null ? ['NULL'] : $low_limit)];
+            $update = ['sensor_limit_low' => $low_limit];
             $updated = dbUpdate($update, 'sensors', '`sensor_id` = ?', [$sensor_entry['sensor_id']]);
             d_echo("( $updated updated )\n");
 
@@ -312,7 +312,7 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
         }
 
         if ((string) $warn_limit != (string) $sensor_entry['sensor_limit_warn'] && $sensor_entry['sensor_custom'] == 'No') {
-            $update = ['sensor_limit_warn' => ($warn_limit == null ? ['NULL'] : $warn_limit)];
+            $update = ['sensor_limit_warn' => $warn_limit];
             $updated = dbUpdate($update, 'sensors', '`sensor_id` = ?', [$sensor_entry['sensor_id']]);
             d_echo("( $updated updated )\n");
 
@@ -321,7 +321,7 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
         }
 
         if ((string) $sensor_entry['sensor_limit_low_warn'] != (string) $low_warn_limit && $sensor_entry['sensor_custom'] == 'No') {
-            $update = ['sensor_limit_low_warn' => ($low_warn_limit == null ? ['NULL'] : $low_warn_limit)];
+            $update = ['sensor_limit_low_warn' => $low_warn_limit];
             $updated = dbUpdate($update, 'sensors', '`sensor_id` = ?', [$sensor_entry['sensor_id']]);
             d_echo("( $updated updated )\n");
 
