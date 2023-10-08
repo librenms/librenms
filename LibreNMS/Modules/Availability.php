@@ -88,7 +88,7 @@ class Availability implements Module
                 'rrd_def' => RrdDefinition::make()->addDataset('availability', 'GAUGE', 0, 100),
                 'rrd_name' => ['availability', $duration],
             ], [
-                'availability' => $avail,
+                'availability' => $avail->availability_perc,
             ]);
 
             // output info
