@@ -131,7 +131,7 @@ if (! isset($vars['app_page']) || ! isset($app->data['pools'])) {
         // look and see if we know what that mac belongs to and if so create a link for the device and port
         $mac = $lease['hw_address'];
         $mac_raw = false;
-        if (preg_match("/^[A-Ea-e0-9][A-Ea-e0-9]:[A-Ea-e0-9][A-Ea-e0-9]:[A-Ea-e0-9][A-Ea-e0-9]:[A-Ea-e0-9][A-Ea-e0-9]:[A-Ea-e0-9][A-Ea-e0-9]:[A-Ea-e0-9][A-Ea-e0-9]$/", $mac)) {
+        if (preg_match('/^[A-Ea-e0-9][A-Ea-e0-9]:[A-Ea-e0-9][A-Ea-e0-9]:[A-Ea-e0-9][A-Ea-e0-9]:[A-Ea-e0-9][A-Ea-e0-9]:[A-Ea-e0-9][A-Ea-e0-9]:[A-Ea-e0-9][A-Ea-e0-9]$/', $mac)) {
             $port = Port::with('device')->firstWhere(['ifPhysAddress' => str_replace(':', '', $mac)]);
         }
         if (isset($port)) {
