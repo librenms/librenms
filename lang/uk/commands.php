@@ -148,7 +148,7 @@ return [
     ],
     'smokeping:generate' => [
         'args-nonsense' => 'Використати --probes або --targets',
-        'config-insufficient' => 'Для генерації конфігурації smokeping необхідно задати у конфігурації "smokeping.probes", "fping", та "fping6"',
+        'config-insufficient' => 'Для генерації конфігурації smokeping необхідно задати у конфігурації "smokeping.probes" та "fping"',
         'dns-fail' => 'Не міг бути визначеним через DNS та було виключено з конфігурації',
         'description' => 'Згенерувати конфігурацію придатну для використання з smokeping',
         'header-first' => 'Цей файл було автоматично згенеровано за допомогою "lnms smokeping:generate',

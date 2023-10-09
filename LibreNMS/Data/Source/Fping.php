@@ -38,25 +38,21 @@ class Fping
      * @param  int  $count  (min 1)
      * @param  int  $interval  (min 20)
      * @param  int  $timeout  (not more than $interval)
-     * @param  string  $address_family  ipv4 or ipv6
      * @return \LibreNMS\Data\Source\FpingResponse
      */
-    public function ping($host, $count = 3, $interval = 1000, $timeout = 500, $address_family = 'ipv4'): FpingResponse
+    public function ping($host, $count = 3, $interval = 1000, $timeout = 500): FpingResponse
     {
         $interval = max($interval, 20);
 
         $fping = Config::get('fping');
-        $fping6 = Config::get('fping6');
         $fping_tos = Config::get('fping_options.tos', 0);
 
-        if ($address_family == 'ipv6') {
-            $cmd = is_executable($fping6) ? [$fping6] : [$fping, '-6'];
-        } else {
-            $cmd = is_executable($fping6) ? [$fping] : [$fping, '-4'];
-        }
+        // fping will automatically handle
+        //   - ipv6 and ipv4 adresses
+        //   - hostnames as ipv6 or ipv4 using host DNS resolution
 
         // build the command
-        $cmd = array_merge($cmd, [
+        $cmd = [$fping,
             '-e',
             '-q',
             '-c',
@@ -68,7 +64,7 @@ class Fping
             '-O',
             $fping_tos,
             $host,
-        ]);
+        ];
 
         $process = app()->make(Process::class, ['command' => $cmd]);
         Log::debug('[FPING] ' . $process->getCommandLine() . PHP_EOL);

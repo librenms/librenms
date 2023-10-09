@@ -579,9 +579,6 @@ return [
         'fping' => [
             'description' => 'Chemin vers `fping`',
         ],
-        'fping6' => [
-            'description' => 'Chemin vers `fping6`',
-        ],
         'fping_options' => [
             'count' => [
                 'description' => 'Nombre de paquets fping',

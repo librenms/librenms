@@ -409,9 +409,6 @@ return [
         'fping' => [
             'description' => 'Pfad zu fping',
         ],
-        'fping6' => [
-            'description' => 'Pfad zu fping6',
-        ],
         'fping_options' => [
             'count' => [
                 'description' => 'fping Anzahl',

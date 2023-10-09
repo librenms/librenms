@@ -29,6 +29,8 @@ if (! function_exists('systemd_data_update_helper')) {
      */
     function systemd_data_update_helper($device, $app_id, $fields, $metrics, $name, $polling_type, $rrd_def, $state_type)
     {
+        global $device;
+
         $rrd_name = [$polling_type, $name, $app_id, $state_type];
         $metrics[$state_type] = $fields;
         $tags = [

@@ -163,17 +163,17 @@ class SmokepingGenerateCommand extends LnmsCommand
 
         return array_merge(
             $this->buildProbes('FPing', self::DEFAULTIP4PROBE, self::IP4PROBE, Config::get('fping'), $probeCount),
-            $this->buildProbes('FPing6', self::DEFAULTIP6PROBE, self::IP6PROBE, Config::get('fping6'), $probeCount)
+            $this->buildProbes('FPing6', self::DEFAULTIP6PROBE, self::IP6PROBE, Config::get('fping'), $probeCount)
         );
     }
 
     /**
      * Determine if a list of probes is needed, and write one if so
      *
-     * @param  string  $module  The smokeping module to use for this probe (FPing or FPing6, typically)
+     * @param  string  $module  The smokeping module to use for this probe (FPing typically)
      * @param  string  $defaultProbe  A default probe, needed by the smokeping configuration parser
      * @param  string  $probe  The first part of the probe name, e.g. 'lnmsFPing' or 'lnmsFPing6'
-     * @param  string  $binary  Path to the relevant probe binary (i.e. the output of `which fping` or `which fping6`)
+     * @param  string  $binary  Path to the relevant probe binary (i.e. the output of `which fping`)
      * @param  int  $probeCount  Number of processes to create
      * @return array
      */
@@ -257,8 +257,7 @@ class SmokepingGenerateCommand extends LnmsCommand
     private function validateOptions()
     {
         if (! Config::has('smokeping.probes') ||
-            ! Config::has('fping') ||
-            ! Config::has('fping6')
+            ! Config::has('fping')
         ) {
             $this->error(__('commands.smokeping:generate.config-insufficient'));
 

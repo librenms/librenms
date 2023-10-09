@@ -57,10 +57,7 @@ class Programs extends BaseValidation
 
     public function checkFping6(Validator $validator, $fping)
     {
-        $fping6 = $this->findExecutable('fping6');
-        $fping6 = (! is_executable($fping6) && is_executable($fping)) ? "$fping -6" : $fping6;
-
-        $validator->execAsUser("$fping6 ::1 2>&1", $output, $return);
+        $validator->execAsUser("$fping ::1 2>&1", $output, $return);
         $output = implode(' ', $output);
 
         if ($return === 0 && $output == '::1 is alive') {
@@ -77,10 +74,6 @@ class Programs extends BaseValidation
             $validator->warn('IPv6 is disabled on your server, you will not be able to add IPv6 devices.');
 
             return;
-        }
-
-        if (substr($fping6, -6) == 'fping6') {
-            $this->failFping($validator, $fping6, $output);
         }
     }
 

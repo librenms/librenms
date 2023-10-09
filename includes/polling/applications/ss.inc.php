@@ -16,9 +16,9 @@ $metrics = [];
 if (! function_exists('ss_data_update_helper')) {
     /**
      * Performs a data update and returns the updated metrics.
-     *
+     * 
      * @param  class  $device
-     * @param  string  $app_id
+    * @param  string  $app_id
      * @param  array  $fields
      * @param  array  $metrics
      * @param  string  $name
@@ -29,6 +29,8 @@ if (! function_exists('ss_data_update_helper')) {
      */
     function ss_data_update_helper($device, $app_id, $fields, $metrics, $name, $polling_type, $rrd_def, $gen_type)
     {
+        global $device;
+
         $rrd_name = [$polling_type, $name, $app_id, $gen_type];
         $metrics[$gen_type] = $fields;
         $tags = [

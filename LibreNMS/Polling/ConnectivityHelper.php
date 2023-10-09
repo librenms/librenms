@@ -121,8 +121,7 @@ class ConnectivityHelper
             $this->target,
             Config::get('fping_options.count', 3),
             Config::get('fping_options.interval', 500),
-            Config::get('fping_options.timeout', 500),
-            $this->ipFamily()
+            Config::get('fping_options.timeout', 500)
         );
 
         if ($status->duplicates > 0) {
