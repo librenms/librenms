@@ -45,15 +45,15 @@ if (! isset($vars['app_page']) || ! isset($app->data['pools'])) {
     ];
     foreach ($pools as $key => $pool) {
         $pool_table['rows'][$key] = [
-            $pool['cidr'],
-            $pool['first_ip'],
-            $pool['last_ip'],
-            $pool['max'],
-            $pool['cur'],
-            $pool['percent'],
+            ['data'=>$pool['cidr']],
+            ['data'=>$pool['first_ip']],
+            ['data'=>$pool['last_ip']],
+            ['data'=>$pool['max']],
+            ['data'=>$pool['cur']],
+            ['data'=>$pool['percent']],
         ];
     }
-    echo render_table($pool_table);
+    echo view('widgets/sortable_table', $pool_table);
     print_optionbar_end();
 
     print_optionbar_start();
@@ -79,12 +79,12 @@ if (! isset($vars['app_page']) || ! isset($app->data['pools'])) {
         unset($pool['percent']);
         foreach ($pool as $pool_option => $option_value) {
             $pool_detail_table['rows'][$option_row_int] = [
-                $pool_option,
-                $option_value,
+                ['data'=>$pool_option],
+                ['data'=>$option_value],
             ];
             $option_row_int++;
         }
-        echo render_table($pool_detail_table);
+        echo view('widgets/sortable_table', $pool_detail_table);
     }
     print_optionbar_end();
     print_optionbar_end();
@@ -104,14 +104,14 @@ if (! isset($vars['app_page']) || ! isset($app->data['pools'])) {
     ];
     foreach ($subnets as $key => $subnet) {
         $subnets_table['rows'][$key] = [
-            $subnet['network'],
-            $subnet['max'],
-            $subnet['cur'],
-            $subnet['percent'],
-            json_encode($subnet['pools']),
+            ['data'=>$subnet['network']],
+            ['data'=>$subnet['max']],
+            ['data'=>$subnet['cur']],
+            ['data'=>$subnet['percent']],
+            ['data'=>json_encode($subnet['pools'])],
         ];
     }
-    echo render_table($subnets_table);
+    echo view('widgets/sortable_table', $subnets_table);
     print_optionbar_end();
 } elseif (isset($vars['app_page']) && $vars['app_page'] == 'leases') {
     $leases = $app->data['found_leases'] ?? [];
@@ -130,8 +130,11 @@ if (! isset($vars['app_page']) || ! isset($app->data['pools'])) {
     foreach ($leases as $key => $lease) {
         // look and see if we know what that mac belongs to and if so create a link for the device and port
         $mac = $lease['hw_address'];
+        $mac_raw=false;
         $port = Port::with('device')->firstWhere(['ifPhysAddress' => str_replace(':', '', $mac)]);
         if (isset($port)) {
+            // safe to set given we know we got a valid MAC if a $port is set
+            $mac_raw=true;
             $mac = $mac . ' (' .
                 generate_device_link(['device_id'=>$port->device_id]) . ', ' .
                 generate_port_link([
@@ -149,17 +152,17 @@ if (! isset($vars['app_page']) || ! isset($app->data['pools'])) {
             $lease['vendor_class_identifier'] = base64_decode($lease['vendor_class_identifier']);
         }
         $table_info['rows'][$key] = [
-            $lease['ip'],
-            $lease['state'],
-            $mac,
-            // display the time as UTC as that keeps things most simple
-            date('Y-m-d\TH:i:s\Z', $lease['starts']),
-            date('Y-m-d\TH:i:s\Z', $lease['ends']),
-            $lease['client_hostname'],
-            $lease['vendor_class_identifier'],
+            ['data'=>$lease['ip']],
+                        ['data'=>$lease['state']],
+            ['data'=>$mac, 'raw'=>$mac_raw],
+            //  display the time as UTC as that keeps things most simple
+                        ['data'=>date('Y-m-d\TH:i:s\Z', $lease['starts'])],
+                        ['data'=>date('Y-m-d\TH:i:s\Z', $lease['ends'])],
+                        ['data'=>$lease['client_hostname']],
+                        ['data'=>$lease['vendor_class_identifier']],
         ];
     }
-    echo render_table($table_info);
+    echo view('widgets/sortable_table', $table_info);
 }
 
 foreach ($graphs as $key => $text) {
