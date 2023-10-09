@@ -130,11 +130,11 @@ if (! isset($vars['app_page']) || ! isset($app->data['pools'])) {
     foreach ($leases as $key => $lease) {
         // look and see if we know what that mac belongs to and if so create a link for the device and port
         $mac = $lease['hw_address'];
-        $mac_raw=false;
+        $mac_raw = false;
         $port = Port::with('device')->firstWhere(['ifPhysAddress' => str_replace(':', '', $mac)]);
         if (isset($port)) {
             // safe to set given we know we got a valid MAC if a $port is set
-            $mac_raw=true;
+            $mac_raw = true;
             $mac = $mac . ' (' .
                 generate_device_link(['device_id'=>$port->device_id]) . ', ' .
                 generate_port_link([
@@ -153,13 +153,13 @@ if (! isset($vars['app_page']) || ! isset($app->data['pools'])) {
         }
         $table_info['rows'][$key] = [
             ['data'=>$lease['ip']],
-                        ['data'=>$lease['state']],
+            ['data'=>$lease['state']],
             ['data'=>$mac, 'raw'=>$mac_raw],
             //  display the time as UTC as that keeps things most simple
-                        ['data'=>date('Y-m-d\TH:i:s\Z', $lease['starts'])],
-                        ['data'=>date('Y-m-d\TH:i:s\Z', $lease['ends'])],
-                        ['data'=>$lease['client_hostname']],
-                        ['data'=>$lease['vendor_class_identifier']],
+            ['data'=>date('Y-m-d\TH:i:s\Z', $lease['starts'])],
+            ['data'=>date('Y-m-d\TH:i:s\Z', $lease['ends'])],
+            ['data'=>$lease['client_hostname']],
+            ['data'=>$lease['vendor_class_identifier']],
         ];
     }
     echo view('widgets/sortable_table', $table_info);
