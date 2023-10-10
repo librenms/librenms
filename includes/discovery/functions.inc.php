@@ -127,8 +127,6 @@ function discover_device(&$device, $force_module = false)
     global $valid;
 
     $valid = [];
-    // Reset $valid array
-    $device['attribs'] = DeviceCache::getPrimary()->getAttribs();
 
     // Start counting device poll time
     echo $device['hostname'] . ' ' . $device['device_id'] . ' ' . $device['os'] . ' ';
@@ -147,13 +145,14 @@ function discover_device(&$device, $force_module = false)
 
     foreach ($discovery_modules as $module => $module_status) {
         $os_module_status = Config::getOsSetting($device['os'], "discovery_modules.$module");
+        $device_module_status = DeviceCache::getPrimary()->getAttrib('discover_' . $module);
         d_echo('Modules status: Global' . (isset($module_status) ? ($module_status ? '+ ' : '- ') : '  '));
         d_echo('OS' . (isset($os_module_status) ? ($os_module_status ? '+ ' : '- ') : '  '));
-        d_echo('Device' . (isset($device['attribs']['discover_' . $module]) ? ($device['attribs']['discover_' . $module] ? '+ ' : '- ') : '  '));
+        d_echo('Device' . ($device_module_status !== null ? ($device_module_status ? '+ ' : '- ') : '  '));
         if ($force_module === true ||
-            ! empty($device['attribs']['discover_' . $module]) ||
-            ($os_module_status && ! isset($device['attribs']['discover_' . $module])) ||
-            ($module_status && ! isset($os_module_status) && ! isset($device['attribs']['discover_' . $module]))
+            $device_module_status ||
+            ($os_module_status && $device_module_status === null) ||
+            ($module_status && ! isset($os_module_status) && $device_module_status === null)
         ) {
             $module_start = microtime(true);
             $start_memory = memory_get_usage();
@@ -179,7 +178,7 @@ function discover_device(&$device, $force_module = false)
             printf("\n>> Runtime for discovery module '%s': %.4f seconds with %s bytes\n", $module, $module_time, $module_mem);
             $measurements->printChangedStats();
             echo "#### Unload disco module $module ####\n\n";
-        } elseif (isset($device['attribs']['discover_' . $module]) && $device['attribs']['discover_' . $module] == '0') {
+        } elseif ($device_module_status == '0') {
             echo "Module [ $module ] disabled on host.\n\n";
         } elseif (isset($os_module_status) && $os_module_status == '0') {
             echo "Module [ $module ] disabled on os.\n\n";
