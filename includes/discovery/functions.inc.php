@@ -12,6 +12,8 @@
  * See COPYING for more details.
  */
 
+use App\Actions\Device\ValidateDeviceAndCreate;
+use App\Models\Device;
 use App\Models\Eventlog;
 use App\Models\Ipv6Address;
 use App\Models\Ipv6Network;
@@ -87,11 +89,11 @@ function discover_new_device($hostname, $device, $method, $interface = null)
     }
 
     try {
-        $remote_device = new \App\Models\Device([
+        $remote_device = new Device([
             'hostname' => $hostname,
             'poller_group' => $device['poller_group'],
         ]);
-        $result = \App\Actions\Device\ValidateDeviceAndCreate($remote_device)->execute();
+        $result = (new ValidateDeviceAndCreate($remote_device))->execute();
 
         if ($result) {
             echo '+[' . $remote_device->hostname . '(' . $remote_device->device_id . ')]';
