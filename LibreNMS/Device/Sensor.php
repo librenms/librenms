@@ -161,11 +161,11 @@ class Sensor implements DiscoveryModule, PollerModule
             if (empty($update)) {
                 echo '.';
             } else {
-                dbUpdate($value, $this->getTable(), '`sensor_id`=?', [$this->sensor_id]);
+                dbUpdate($update, $this->getTable(), '`sensor_id`=?', [$this->sensor_id]);
                 echo 'U';
             }
         } else {
-            $this->sensor_id = dbInsert($value, $this->getTable());
+            $this->sensor_id = dbInsert($new_sensor, $this->getTable());
             if ($this->sensor_id !== null) {
                 $name = static::$name;
                 $message = "$name Discovered: {$this->type} {$this->subtype} {$this->index} {$this->description}";
