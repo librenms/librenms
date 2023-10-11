@@ -8,7 +8,6 @@
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  */
 
-use App\Models\Device;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Enum\Severity;
@@ -362,7 +361,8 @@ function port_fill_missing_and_trim(&$port, $device)
         $port['ifDescr'] = $port['ifName'];
         d_echo(' Using ifName as ifDescr');
     }
-    if (! empty($device['attribs']['ifName:' . $port['ifName']])) {
+    $attrib = DeviceCache::get($device['device_id'] ?? null)->getAttrib('ifName:' . $port['ifName']);
+    if (! empty($attrib)) {
         // ifAlias overridden by user, don't update it
         unset($port['ifAlias']);
         d_echo(' ifAlias overriden by user');
@@ -885,8 +885,9 @@ function cache_peeringdb()
 function get_device_oid_limit($device)
 {
     // device takes priority
-    if (! empty($device['attribs']['snmp_max_oid'])) {
-        return $device['attribs']['snmp_max_oid'];
+    $attrib = DeviceCache::get($device['device_id'] ?? null)->getAttrib('snmp_max_oid');
+    if ($attrib !== null) {
+        return $attrib;
     }
 
     // then os
