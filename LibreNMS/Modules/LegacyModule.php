@@ -80,7 +80,6 @@ class LegacyModule implements Module
         }
 
         $device = &$os->getDeviceArray();
-        $device['attribs'] = $os->getDevice()->attribs->toArray();
         Debug::disableErrorReporting(); // ignore errors in legacy code
 
         include_once base_path('includes/datastore.inc.php');
@@ -114,7 +113,6 @@ class LegacyModule implements Module
         }
 
         $device = &$os->getDeviceArray();
-        $device['attribs'] = $os->getDevice()->attribs->toArray();
         Debug::disableErrorReporting(); // ignore errors in legacy code
 
         include_once base_path('includes/datastore.inc.php');
