@@ -93,7 +93,7 @@ function discover_new_device($hostname, $device, $method, $interface = null)
             'hostname' => $hostname,
             'poller_group' => $device['poller_group'],
         ]);
-        $result =  (new ValidateDeviceAndCreate($remote_device))->execute();
+        $result = (new ValidateDeviceAndCreate($remote_device))->execute();
 
         if ($result) {
             echo '+[' . $remote_device->hostname . '(' . $remote_device->device_id . ')]';
