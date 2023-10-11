@@ -146,7 +146,7 @@ require_once 'includes/html/modal/delete_service.inc.php';
                     $header = true;
 
                     $service_iteration = 0;
-                    $services = dbFetchRows("SELECT * FROM `services` WHERE `device_id` = ? $where ORDER BY service_type", $sql_param);
+                    $services = dbFetchRows("SELECT * FROM `services` WHERE `device_id` = ? $where ORDER BY service_type, service_name", $sql_param);
                     $services_count = count($services);
                     foreach ($services as $service) {
                         if ($service['service_status'] == '2') {

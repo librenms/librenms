@@ -30,9 +30,11 @@ use App\Models\Mempool;
 use App\Observers\MempoolObserver;
 use Illuminate\Support\Collection;
 use LibreNMS\DB\SyncsModels;
+use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\Interfaces\Polling\MempoolsPolling;
 use LibreNMS\OS;
+use LibreNMS\Polling\ModuleStatus;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Number;
 use Log;
@@ -47,6 +49,11 @@ class Mempools implements Module
     public function dependencies(): array
     {
         return [];
+    }
+
+    public function shouldDiscover(OS $os, ModuleStatus $status): bool
+    {
+        return $status->isEnabled() && ! $os->getDevice()->snmp_disable && $os->getDevice()->status;
     }
 
     public function discover(OS $os): void
@@ -70,7 +77,12 @@ class Mempools implements Module
         });
     }
 
-    public function poll(OS $os): void
+    public function shouldPoll(OS $os, ModuleStatus $status): bool
+    {
+        return $status->isEnabled() && ! $os->getDevice()->snmp_disable && $os->getDevice()->status;
+    }
+
+    public function poll(OS $os, DataStorageInterface $datastore): void
     {
         $mempools = $os->getDevice()->mempools;
 
@@ -82,7 +94,7 @@ class Mempools implements Module
             ? $os->pollMempools($mempools)
             : $this->defaultPolling($os, $mempools);
 
-        $this->calculateAvailable($mempools)->each(function (Mempool $mempool) use ($os) {
+        $this->calculateAvailable($mempools)->each(function (Mempool $mempool) use ($os, $datastore) {
             $this->printMempool($mempool);
 
             if (empty($mempool->mempool_class)) {
@@ -109,7 +121,7 @@ class Mempools implements Module
                 'free' => $mempool->mempool_free,
             ];
 
-            data_update($os->getDeviceArray(), 'mempool', $tags, $fields);
+            $datastore->put($os->getDeviceArray(), 'mempool', $tags, $fields);
         });
     }
 

@@ -4855,8 +4855,8 @@
             "stp": [
                 {
                     "vlan": null,
-                    "rootBridge": 1,
-                    "bridgeAddress": "000000000000",
+                    "rootBridge": 0,
+                    "bridgeAddress": "",
                     "protocolSpecification": "ieee8021d",
                     "priority": 0,
                     "timeSinceTopologyChange": "0",

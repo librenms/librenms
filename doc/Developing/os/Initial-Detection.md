@@ -248,7 +248,7 @@ Discovery
 Polling
 
 ```bash
-./poller.php -h HOSTNAME
+lnms device:poll HOSTNAME
 ```
 
 At this step we should see all the values retrieved in LibreNMS.

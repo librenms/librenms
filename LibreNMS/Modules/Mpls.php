@@ -30,10 +30,12 @@ namespace LibreNMS\Modules;
 use App\Models\Device;
 use App\Observers\ModuleModelObserver;
 use LibreNMS\DB\SyncsModels;
+use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Discovery\MplsDiscovery;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\Interfaces\Polling\MplsPolling;
 use LibreNMS\OS;
+use LibreNMS\Polling\ModuleStatus;
 
 class Mpls implements Module
 {
@@ -45,6 +47,11 @@ class Mpls implements Module
     public function dependencies(): array
     {
         return ['ports', 'vrf'];
+    }
+
+    public function shouldDiscover(OS $os, ModuleStatus $status): bool
+    {
+        return $status->isEnabled() && ! $os->getDevice()->snmp_disable && $os->getDevice()->status && $os instanceof MplsDiscovery;
     }
 
     /**
@@ -92,6 +99,11 @@ class Mpls implements Module
         }
     }
 
+    public function shouldPoll(OS $os, ModuleStatus $status): bool
+    {
+        return $status->isEnabled() && ! $os->getDevice()->snmp_disable && $os->getDevice()->status && $os instanceof MplsPolling;
+    }
+
     /**
      * Poll data for this module and update the DB / RRD.
      * Try to keep this efficient and only run if discovery has indicated there is a reason to run.
@@ -99,7 +111,7 @@ class Mpls implements Module
      *
      * @param  \LibreNMS\OS  $os
      */
-    public function poll(OS $os): void
+    public function poll(OS $os, DataStorageInterface $datastore): void
     {
         if ($os instanceof MplsPolling) {
             $device = $os->getDevice();

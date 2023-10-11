@@ -28,9 +28,11 @@ namespace LibreNMS\Modules;
 use App\Models\Device;
 use App\Models\PortsNac;
 use App\Observers\ModuleModelObserver;
+use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\Interfaces\Polling\NacPolling;
 use LibreNMS\OS;
+use LibreNMS\Polling\ModuleStatus;
 
 class Nac implements Module
 {
@@ -40,6 +42,11 @@ class Nac implements Module
     public function dependencies(): array
     {
         return ['ports'];
+    }
+
+    public function shouldDiscover(OS $os, ModuleStatus $status): bool
+    {
+        return false;
     }
 
     /**
@@ -53,6 +60,11 @@ class Nac implements Module
         // not implemented
     }
 
+    public function shouldPoll(OS $os, ModuleStatus $status): bool
+    {
+        return $status->isEnabled() && ! $os->getDevice()->snmp_disable && $os->getDevice()->status && $os instanceof NacPolling;
+    }
+
     /**
      * Poll data for this module and update the DB / RRD.
      * Try to keep this efficient and only run if discovery has indicated there is a reason to run.
@@ -60,7 +72,7 @@ class Nac implements Module
      *
      * @param  \LibreNMS\OS  $os
      */
-    public function poll(OS $os): void
+    public function poll(OS $os, DataStorageInterface $datastore): void
     {
         if ($os instanceof NacPolling) {
             // discovery output (but don't install it twice (testing can can do this)
