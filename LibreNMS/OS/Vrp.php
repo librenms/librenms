@@ -25,14 +25,17 @@
 
 namespace LibreNMS\OS;
 
+use App\Models\AccessPoint;
 use App\Models\Device;
 use App\Models\Mempool;
 use App\Models\PortsNac;
 use App\Models\Sla;
+use App\Observers\ModuleModelObserver;
 use Carbon\Carbon;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use LibreNMS\DB\SyncsModels;
 use LibreNMS\Device\Processor;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
@@ -59,6 +62,8 @@ class Vrp extends OS implements
     SlaPolling,
     OSDiscovery
 {
+    use SyncsModels;
+
     public function discoverMempools()
     {
         $mempools = new Collection();
@@ -165,7 +170,7 @@ class Vrp extends OS implements
             $tags = compact('rrd_def');
             $datastore->put($this->getDeviceArray(), 'vrp', $tags, $fields);
 
-            $ap_db = dbFetchRows('SELECT * FROM `access_points` WHERE `device_id` = ?', [$this->getDeviceArray()['device_id']]);
+            $aps = new Collection;
 
             foreach ($radioTable as $ap_id => $ap) {
                 foreach ($ap as $r_id => $radio) {
@@ -226,63 +231,26 @@ class Vrp extends OS implements
                     $tags = compact('name', 'radionum', 'rrd_name', 'rrd_def');
                     $datastore->put($this->getDeviceArray(), 'arubaap', $tags, $fields);
 
-                    $foundid = 0;
-
-                    for ($z = 0; $z < count($ap_db); $z++) {
-                        if ($ap_db[$z]['name'] == $name && $ap_db[$z]['radio_number'] == $radionum) {
-                            $foundid = $ap_db[$z]['accesspoint_id'];
-                            $ap_db[$z]['seen'] = 1;
-                            continue;
-                        }
-                    }
-
-                    if ($foundid == 0) {
-                        $ap_id = dbInsert(
-                            [
-                                'device_id' => $this->getDeviceArray()['device_id'],
-                                'name' => $name,
-                                'radio_number' => $radionum,
-                                'type' => $type,
-                                'mac_addr' => $mac,
-                                'channel' => $channel,
-                                'txpow' => $txpow,
-                                'radioutil' => $radioutil,
-                                'numasoclients' => $numasoclients,
-                                'nummonclients' => $nummonclients,
-                                'numactbssid' => $numactbssid,
-                                'nummonbssid' => $nummonbssid,
-                                'interference' => $interference,
-                            ],
-                            'access_points'
-                        );
-                    } else {
-                        dbUpdate(
-                            [
-                                'mac_addr' => $mac,
-                                'type' => $type,
-                                'deleted' => 0,
-                                'channel' => $channel,
-                                'txpow' => $txpow,
-                                'radioutil' => $radioutil,
-                                'numasoclients' => $numasoclients,
-                                'nummonclients' => $nummonclients,
-                                'numactbssid' => $numactbssid,
-                                'nummonbssid' => $nummonbssid,
-                                'interference' => $interference,
-                            ],
-                            'access_points',
-                            '`accesspoint_id` = ?',
-                            [$foundid]
-                        );
-                    }
-                }//end foreach 1
-            }//end foreach 2
-
-            for ($z = 0; $z < count($ap_db); $z++) {
-                if (! isset($ap_db[$z]['seen']) && $ap_db[$z]['deleted'] == 0) {
-                    dbUpdate(['deleted' => 1], 'access_points', '`accesspoint_id` = ?', [$ap_db[$z]['accesspoint_id']]);
+                    $aps->push(new AccessPoint([
+                        'device_id' => $this->getDeviceId(),
+                        'name' => $name,
+                        'radio_number' => $radionum,
+                        'type' => $type,
+                        'mac_addr' => $mac,
+                        'channel' => $channel,
+                        'txpow' => $txpow,
+                        'radioutil' => $radioutil,
+                        'numasoclients' => $numasoclients,
+                        'nummonclients' => $nummonclients,
+                        'numactbssid' => $numactbssid,
+                        'nummonbssid' => $nummonbssid,
+                        'interference' => $interference,
+                    ]));
                 }
             }
+
+            ModuleModelObserver::observe(AccessPoint::class);
+            $this->syncModels($this->getDevice(), 'accessPoints', $aps);
         }
     }
 
