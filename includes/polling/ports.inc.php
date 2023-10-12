@@ -213,7 +213,8 @@ if ($device['os'] === 'f5' && (version_compare($device['version'], '11.2.0', '>=
 } elseif ($device['os'] === 'exalink-fusion') {
     require 'ports/exalink-fusion.inc.php';
 } else {
-    if (Config::getOsSetting($device['os'], 'polling.selected_ports') || (isset($device['attribs']['selected_ports']) && $device['attribs']['selected_ports'] == 'true')) {
+    $selected_attrib = DeviceCache::get($device['device_id'] ?? null)->getAttrib('selected_ports');
+    if ($selected_attrib !== null ? $selected_attrib == 'true' : Config::getOsSetting($device['os'], 'polling.selected_ports')) {
         echo 'Selected ports polling ';
 
         // remove the deleted and disabled ports and mark them skipped
@@ -225,7 +226,7 @@ if ($device['os'] === 'f5' && (version_compare($device['version'], '11.2.0', '>=
 
         // only try to guess if we should walk base oids if selected_ports is set only globally
         $walk_base = false;
-        if (! Config::has("os.{$device['os']}.polling.selected_ports") && ! array_key_exists('selected_ports', $device['attribs'])) {
+        if (! Config::has("os.{$device['os']}.polling.selected_ports") && $selected_attrib === null) {
             // if less than 5 ports or less than 10% of the total ports are skipped, walk the base oids instead of get
             $polled_port_count = count($polled_ports);
             $total_port_count = count($ports);
@@ -690,8 +691,8 @@ foreach ($ports as $port) {
                 // if the value is different, update it
 
                 // rrdtune if needed
-                $port_tune = $device['attribs']['ifName_tune:' . $port['ifName']] ?? null;
-                $device_tune = $device['attribs']['override_rrdtool_tune'] ?? null;
+                $port_tune = DeviceCache::getPrimary()->getAttrib('ifName_tune:' . $port['ifName']);
+                $device_tune = DeviceCache::getPrimary()->getAttrib('override_rrdtool_tune');
                 if ($port_tune == 'true' ||
                     ($device_tune == 'true' && $port_tune != 'false') ||
                     (Config::get('rrdtool_tune') == 'true' && $port_tune != 'false' && $device_tune != 'false')) {
