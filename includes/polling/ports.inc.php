@@ -684,7 +684,7 @@ foreach ($ports as $port) {
             }
 
             if ($port[$oid] != $current_oid && ! isset($current_oid)) {
-                $port['update'][$oid] = ['NULL'];
+                $port['update'][$oid] = null;
                 log_event($oid . ': ' . $port[$oid] . ' -> NULL', $device, 'interface', 4, $port['port_id']);
                 d_echo($oid . ': ' . $port[$oid] . ' -> NULL ', $oid . ' ');
             } elseif ($port[$oid] != $current_oid) {
