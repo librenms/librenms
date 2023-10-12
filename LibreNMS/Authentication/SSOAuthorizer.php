@@ -159,27 +159,46 @@ class SSOAuthorizer extends MysqlAuthorizer
     public function getRoles(string $username): array|false
     {
         if (Config::get('sso.group_strategy') === 'attribute') {
-            if (Config::get('sso.level_attr')) {
-                if (is_numeric($this->authSSOGetAttr(Config::get('sso.level_attr')))) {
-                    return Arr::wrap(LegacyAuthLevel::tryFrom((int) $this->authSSOGetAttr(Config::get('sso.level_attr')))?->getName());
-                } else {
-                    throw new AuthenticationException('group assignment by attribute requested, but httpd is not setting the attribute to a number');
+            $role = Config::get('sso.role_attr');
+            if ($role) {
+                return Arr::wrap($this->authSSOGetAttr($role));
+            }
+
+            $level = Config::get('sso.level_attr');
+            if ($level) {
+                if (is_numeric($this->authSSOGetAttr($level))) {
+                    return Arr::wrap(LegacyAuthLevel::tryFrom((int) $this->authSSOGetAttr($level))?->getName());
                 }
-            } else {
-                throw new AuthenticationException('group assignment by attribute requested, but \'sso.level_attr\' not set in your config');
+
+                throw new AuthenticationException('group assignment by attribute requested, but httpd is not setting the attribute to a number');
             }
+
+            throw new AuthenticationException('group assignment by attribute requested, but \'sso.role_attr\' not set in your config');
         } elseif (Config::get('sso.group_strategy') === 'map') {
-            if (Config::get('sso.group_level_map') && is_array(Config::get('sso.group_level_map')) && Config::get('sso.group_delimiter') && Config::get('sso.group_attr')) {
-                return Arr::wrap(LegacyAuthLevel::tryFrom((int) $this->authSSOParseGroups())?->getName());
-            } else {
-                throw new AuthenticationException('group assignment by level map requested, but \'sso.group_level_map\', \'sso.group_attr\', or \'sso.group_delimiter\' are not set in your config');
+            $group_attr = Config::get('sso.group_attr');
+            $role_map = Config::get('sso.group_role_map');
+            if ($role_map && is_array($role_map) && $group_attr) {
+                return $this->authSSOParseGroups();
             }
+
+            $level_map = Config::get('sso.group_level_map');
+            if ($level_map && is_array($level_map) && $group_attr) {
+                return $this->authSSOParseGroups();
+            }
+
+            throw new AuthenticationException('group assignment by role map requested, but \'sso.group_role_map\', \'sso.group_attr\', or \'sso.group_delimiter\' are not set in your config');
         } elseif (Config::get('sso.group_strategy') === 'static') {
-            if (Config::get('sso.static_level')) {
-                return Arr::wrap(LegacyAuthLevel::tryFrom((int) Config::get('sso.static_level'))?->getName());
-            } else {
-                throw new AuthenticationException('group assignment by static level was requested, but \'sso.group_level_map\' was not set in your config');
+            $role = Config::get('sso.static_role');
+            if ($role) {
+                return Arr::wrap($role);
             }
+
+            $level = Config::get('sso.static_level');
+            if ($level) {
+                return Arr::wrap(LegacyAuthLevel::tryFrom((int)$level)?->getName());
+            }
+
+            throw new AuthenticationException('group assignment by static level was requested, but \'sso.group_level_map\' was not set in your config');
         }
 
         throw new AuthenticationException('\'sso.group_strategy\' is not set to one of attribute in your config, map or static - configuration is unsafe');
@@ -190,39 +209,33 @@ class SSOAuthorizer extends MysqlAuthorizer
      *
      * @return int
      */
-    public function authSSOParseGroups()
+    public function authSSOParseGroups(): array
     {
         // Parse a delimited group list
         $groups = explode(Config::get('sso.group_delimiter', ';'), $this->authSSOGetAttr(Config::get('sso.group_attr')) ?? '');
 
-        $valid_groups = [];
-
         // Only consider groups that match the filter expression - this is an optimisation for sites with thousands of groups
-        if (Config::get('sso.group_filter')) {
-            foreach ($groups as $group) {
-                if (preg_match(Config::get('sso.group_filter'), $group)) {
-                    array_push($valid_groups, $group);
-                }
-            }
-
-            $groups = $valid_groups;
+        $filter = Config::get('sso.group_filter');
+        if ($filter) {
+            $groups = array_filter($groups, fn($group) => preg_match($filter, $group));
         }
 
-        $level = (int) Config::get('sso.static_level', 0);
+        $default_role = Config::get('sso.static_role') ?: LegacyAuthLevel::tryFrom((int) Config::get('sso.static_level', 0));
 
-        $config_map = Config::get('sso.group_level_map');
+        // current supported role map
+        $role_map = Config::get('sso.group_role_map');
+        if ($role_map && is_array($role_map)) {
+            $roles = collect($groups)->map(fn($group) => $role_map[$group]['roles'] ?? [])->flatten()->unique()->all();
 
+            return $roles ?: Arr::wrap($default_role?->getName());
+        }
+
+        // legacy level map
+        $level_map = Config::get('sso.group_level_map');
         // Find the highest level the user is entitled to
-        foreach ($groups as $value) {
-            if (isset($config_map[$value])) {
-                $map = $config_map[$value];
+        $level = array_reduce($groups, fn($current, $group) => max((int)($level_map[$group] ?? 0), $current), (int) $default_role?->value);
+        $role = LegacyAuthLevel::tryFrom($level)?->getName();
 
-                if (is_int($map) && $level < $map) {
-                    $level = $map;
-                }
-            }
-        }
-
-        return $level;
+        return Arr::wrap($role);
     }
 }

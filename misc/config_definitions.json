@@ -5679,14 +5679,116 @@
         },
         "sso.create_users": {
             "default": true,
+            "group": "auth",
+            "section": "sso",
+            "order": 10,
             "type": "boolean"
+        },
+        "sso.descr_attr": {
+            "group": "auth",
+            "section": "sso",
+            "order": 23,
+            "type": "text"
+        },
+        "sso.email_attr": {
+            "group": "auth",
+            "section": "sso",
+            "order": 21,
+            "type": "text"
+        },
+        "sso.group_attr": {
+            "group": "auth",
+            "section": "sso",
+            "order": 31,
+            "type": "text"
+        },
+        "sso.group_delimiter": {
+            "default": ";",
+            "group": "auth",
+            "section": "sso",
+            "order": 32,
+            "type": "text"
+        },
+        "sso.group_filter": {
+            "group": "auth",
+            "section": "sso",
+            "order": 34,
+            "type": "text",
+            "validate": {
+                "value": "regex"
+            }
+        },
+        "sso.group_role_map": {
+            "default": {},
+            "group": "auth",
+            "section": "sso",
+            "order": 33,
+            "type": "group-role-map",
+            "validate": {
+                "value": "array",
+                "value.role.*": "string"
+            }
+
+        },
+        "sso.group_strategy": {
+            "group": "auth",
+            "section": "sso",
+            "order": 30,
+            "type": "select",
+            "options": {
+                "": "None",
+                "map": "Role Map",
+                "attribute": "Role Attribute",
+                "static": "Static Role"
+            }
+        },
+        "sso.mode": {
+            "default": "env",
+            "group": "auth",
+            "section": "sso",
+            "order": 1,
+            "type": "select",
+            "options": {
+                "env": "ENV",
+                "header": "Header"
+            }
+        },
+        "sso.realname_attr": {
+            "group": "auth",
+            "section": "sso",
+            "order": 22,
+            "type": "text"
+        },
+        "sso.role_attr": {
+            "group": "auth",
+            "section": "sso",
+            "order": 35,
+            "type": "text"
+        },
+        "sso.static_role": {
+            "group": "auth",
+            "section": "sso",
+            "order": 36,
+            "type": "text"
+        },
+        "sso.trusted_proxies": {
+            "group": "auth",
+            "section": "sso",
+            "order": 40,
+            "type": "text"
         },
         "sso.update_users": {
             "default": true,
+            "group": "auth",
+            "section": "sso",
+            "order": 11,
             "type": "boolean"
         },
         "sso.user_attr": {
             "default": "REMOTE_USER",
+            "group": "auth",
+            "section": "sso",
+            "order": 20,
             "type": "text"
         },
         "storage_perc_warn": {
