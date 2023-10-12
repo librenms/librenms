@@ -195,7 +195,7 @@ class SSOAuthorizer extends MysqlAuthorizer
 
             $level = Config::get('sso.static_level');
             if ($level) {
-                return Arr::wrap(LegacyAuthLevel::tryFrom((int)$level)?->getName());
+                return Arr::wrap(LegacyAuthLevel::tryFrom((int) $level)?->getName());
             }
 
             throw new AuthenticationException('group assignment by static level was requested, but \'sso.group_level_map\' was not set in your config');
@@ -217,7 +217,7 @@ class SSOAuthorizer extends MysqlAuthorizer
         // Only consider groups that match the filter expression - this is an optimisation for sites with thousands of groups
         $filter = Config::get('sso.group_filter');
         if ($filter) {
-            $groups = array_filter($groups, fn($group) => preg_match($filter, $group));
+            $groups = array_filter($groups, fn ($group) => preg_match($filter, $group));
         }
 
         $default_role = Config::get('sso.static_role') ?: LegacyAuthLevel::tryFrom((int) Config::get('sso.static_level', 0));
@@ -225,7 +225,7 @@ class SSOAuthorizer extends MysqlAuthorizer
         // current supported role map
         $role_map = Config::get('sso.group_role_map');
         if ($role_map && is_array($role_map)) {
-            $roles = collect($groups)->map(fn($group) => $role_map[$group]['roles'] ?? [])->flatten()->unique()->all();
+            $roles = collect($groups)->map(fn ($group) => $role_map[$group]['roles'] ?? [])->flatten()->unique()->all();
 
             return $roles ?: Arr::wrap($default_role?->getName());
         }
@@ -233,7 +233,7 @@ class SSOAuthorizer extends MysqlAuthorizer
         // legacy level map
         $level_map = Config::get('sso.group_level_map');
         // Find the highest level the user is entitled to
-        $level = array_reduce($groups, fn($current, $group) => max((int)($level_map[$group] ?? 0), $current), (int) $default_role?->value);
+        $level = array_reduce($groups, fn ($current, $group) => max((int) ($level_map[$group] ?? 0), $current), (int) $default_role?->value);
         $role = LegacyAuthLevel::tryFrom($level)?->getName();
 
         return Arr::wrap($role);
