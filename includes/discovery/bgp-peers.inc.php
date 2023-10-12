@@ -48,7 +48,7 @@ foreach (DeviceCache::getPrimary()->getVrfContexts() as $context_name) {
     } else {
         echo 'No BGP on host';
         if ($device['bgpLocalAs']) {
-            dbUpdate(['bgpLocalAs' => ['NULL']], 'devices', 'device_id=?', [$device['device_id']]);
+            dbUpdate(['bgpLocalAs' => null], 'devices', 'device_id=?', [$device['device_id']]);
             echo ' (Removed ASN) ';
         }
     }
