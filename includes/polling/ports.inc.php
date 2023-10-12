@@ -684,7 +684,7 @@ foreach ($ports as $port) {
             }
 
             if ($port[$oid] != $current_oid && ! isset($current_oid)) {
-                $port['update'][$oid] = ['NULL'];
+                $port['update'][$oid] = null;
                 log_event($oid . ': ' . $port[$oid] . ' -> NULL', $device, 'interface', 4, $port['port_id']);
                 d_echo($oid . ': ' . $port[$oid] . ' -> NULL ', $oid . ' ');
             } elseif ($port[$oid] != $current_oid) {
@@ -750,7 +750,7 @@ foreach ($ports as $port) {
                 $attrib_key = 'port_descr_' . $attrib;
                 if (($port_ifAlias[$attrib] ?? null) != $port[$attrib_key]) {
                     if (! isset($port_ifAlias[$attrib])) {
-                        $port_ifAlias[$attrib] = ['NULL'];
+                        $port_ifAlias[$attrib] = null;
                         $log_port = 'NULL';
                     } else {
                         $log_port = $port_ifAlias[$attrib];

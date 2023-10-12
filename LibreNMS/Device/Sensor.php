@@ -161,11 +161,11 @@ class Sensor implements DiscoveryModule, PollerModule
             if (empty($update)) {
                 echo '.';
             } else {
-                dbUpdate($this->escapeNull($update), $this->getTable(), '`sensor_id`=?', [$this->sensor_id]);
+                dbUpdate($update, $this->getTable(), '`sensor_id`=?', [$this->sensor_id]);
                 echo 'U';
             }
         } else {
-            $this->sensor_id = dbInsert($this->escapeNull($new_sensor), $this->getTable());
+            $this->sensor_id = dbInsert($new_sensor, $this->getTable());
             if ($this->sensor_id !== null) {
                 $name = static::$name;
                 $message = "$name Discovered: {$this->type} {$this->subtype} {$this->index} {$this->description}";
@@ -240,20 +240,6 @@ class Sensor implements DiscoveryModule, PollerModule
             'entPhysicalIndex_measured' => $this->entPhysicalMeasured,
             'rrd_type' => $this->rrd_type,
         ];
-    }
-
-    /**
-     * Escape null values so dbFacile doesn't mess them up
-     * honestly, this should be the default, but could break shit
-     *
-     * @param  array  $array
-     * @return array
-     */
-    private function escapeNull($array)
-    {
-        return array_map(function ($value) {
-            return is_null($value) ? ['NULL'] : $value;
-        }, $array);
     }
 
     /**

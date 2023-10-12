@@ -21,7 +21,7 @@ $param = [];
 $device_id = (int) $vars['device'];
 
 if (isset($vars['action']) && $vars['action'] == 'expunge' && \Auth::user()->hasGlobalAdmin()) {
-    dbQuery('TRUNCATE TABLE `syslog`');
+    \App\Models\Syslog::truncate();
     print_message('syslog truncated');
 }
 
