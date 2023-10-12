@@ -750,7 +750,7 @@ foreach ($ports as $port) {
                 $attrib_key = 'port_descr_' . $attrib;
                 if (($port_ifAlias[$attrib] ?? null) != $port[$attrib_key]) {
                     if (! isset($port_ifAlias[$attrib])) {
-                        $port_ifAlias[$attrib] = ['NULL'];
+                        $port_ifAlias[$attrib] = null;
                         $log_port = 'NULL';
                     } else {
                         $log_port = $port_ifAlias[$attrib];
