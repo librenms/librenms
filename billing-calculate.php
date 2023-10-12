@@ -19,7 +19,7 @@ $options = getopt('r');
 
 if (isset($options['r'])) {
     echo "Clearing history table.\n";
-    dbQuery('TRUNCATE TABLE `bill_history`');
+    DB::table('bill_history')->truncate();
 }
 
 foreach (dbFetchRows('SELECT * FROM `bills` ORDER BY `bill_id`') as $bill) {
