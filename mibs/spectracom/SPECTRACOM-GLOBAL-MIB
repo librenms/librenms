@@ -1,0 +1,260 @@
+--******************************************************************************
+--  Module  : SPECTRACOM-GLOBAL-REG.mib
+--  Date    : 01/07/04
+--  Author  : Kevin Golder
+--  Purpose : This MIB defines the global registration module for the private
+--            Spectracom MIB.
+--
+--  Copyright(C) 2003-2004, 2009-2010 Spectracom Corporation.
+--  All Rights Reserved.
+--..............................................................................
+
+SPECTRACOM-GLOBAL-REG-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-IDENTITY, enterprises
+        FROM SNMPv2-SMI;
+
+spectracomGlobalRegModule MODULE-IDENTITY
+--               "YYYYMMDDHHMMZ"
+    LAST-UPDATED "202201070000Z"
+    ORGANIZATION "Spectracom"
+    CONTACT-INFO
+        "Postal: Orolia USA, Inc. dba Spectracom
+                 45 Becker Road, Suite A
+                 West Henrietta, NY 14586 USA
+         Tel:    +1 (585) 321-5800
+         Fax:    +1 (585) 321-5218
+         Email:  timingsupport@orolia.com"
+    DESCRIPTION
+        "Spectracom Corporation's Global MIB."
+
+    REVISION     "202201070000Z"
+    DESCRIPTION
+        "Rev 1.10 - Updated address and email."
+
+    REVISION     "202003290000Z"
+    DESCRIPTION
+        "Rev 1.9 - Added specSkydelProducts."
+
+    REVISION     "201205170000Z"
+    DESCRIPTION
+        "Rev 1.8 - Added specNetClockProducts.
+                 - Added nc9483Reg, nc9489Reg.
+                 - Changed contact info"
+
+    REVISION     "201004170000Z"
+    DESCRIPTION
+        "Rev 1.7 - Added specSecureSyncProducts.
+                 - Added specSecureSyncProducts, tf9283Reg, tf9288Reg,
+                   tf9289Reg, tf9383Reg, tf9388Reg, tf9389Reg, and
+                   ssSecureSyncReg.
+                 - Cleaned up formatting."
+
+    REVISION     "200906191200Z"
+    DESCRIPTION
+        "Rev 1.6 - Used libsmi (http://www.ibr.cs.tu-bs.de/projects/libsmi)
+                   to detect and remove warnings and errors."
+
+    REVISION     "200408300200Z"
+    DESCRIPTION
+        "Rev 1.5 - Added revision history for 1.4 and 1.5"
+
+    REVISION     "200408300100Z"
+    DESCRIPTION
+        "Rev 1.4 - Added tf240oReg, tf240rbReg, tf260rbReg."
+
+    REVISION     "200408300000Z"
+    DESCRIPTION
+        "Rev 1.3 - Added tf9183esReg."
+
+    REVISION     "200407130000Z"
+    DESCRIPTION
+        "Rev 1.2 - Added tfTTS280Reg, tf9183Reg, tf9188Reg, tf9188sReg, and
+                   tf9189Reg."
+
+    REVISION     "200405210000Z"
+    DESCRIPTION
+        "Rev 1.1 - Reboot functionality was moved from the specGeneric portion
+                   of the MIB to tfSystem."
+
+    REVISION     "200405180000Z"
+    DESCRIPTION
+        "Rev 1.0 - Initial version of Spectracom's MIB module
+                   SPECTRACOM-GLOBAL-REG-MIB."
+    ::= { specModules 1 }
+
+--******************************************************************************
+-- Tree definition
+--..............................................................................
+spectracom             OBJECT IDENTIFIER ::= { enterprises 18837 }
+
+--spectracom subtree
+specReg                OBJECT IDENTIFIER ::= { spectracom 1 }
+specGeneric            OBJECT IDENTIFIER ::= { spectracom 2 }
+specProducts           OBJECT IDENTIFIER ::= { spectracom 3 }
+specCaps               OBJECT IDENTIFIER ::= { spectracom 4 }
+specReqs               OBJECT IDENTIFIER ::= { spectracom 5 }
+specExpr               OBJECT IDENTIFIER ::= { spectracom 6 }
+
+--specReg subtree
+specModules            OBJECT IDENTIFIER ::= { specReg 1 }
+specTimeFreqProducts   OBJECT IDENTIFIER ::= { specReg 2 }
+specSecureSyncProducts OBJECT IDENTIFIER ::= { specReg 3 }
+specNetClockProducts   OBJECT IDENTIFIER ::= { specReg 4 }
+specSkydelProducts     OBJECT IDENTIFIER ::= { specReg 5 }
+
+-- specGeneric subtree
+
+-- specProducts subtree
+-- Spectracom's NetClock products' mib is defined in specTimeFreqMIB.
+-- Spectracom's SecureSysnc products' mib is defined in specSecureSyncMIB.
+
+-- specCaps subtree
+
+-- specReqs subtree
+
+-- specExpr subtree
+
+--******************************************************************************
+-- Registration of Spectracom's time and frequency products
+--..............................................................................
+tfTTS200Reg     OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Spectracom Total Timing Solution Model 200"
+    ::= { specTimeFreqProducts 1 }
+
+tfTTS220Reg     OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Spectracom Total Timing Solution Model 220"
+    ::= { specTimeFreqProducts 2 }
+
+tfTTS240Reg     OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Spectracom Total Timing Solution Model 240"
+    ::= { specTimeFreqProducts 3 }
+
+tfTTS260Reg     OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Spectracom Total Timing Solution Model 260"
+    ::= { specTimeFreqProducts 4 }
+
+tfTTS280Reg     OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Spectracom Total Timing Solution Model 280"
+    ::= { specTimeFreqProducts 5 }
+
+tf9183Reg       OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Spectracom Model 9183"
+    ::= { specTimeFreqProducts 6 }
+
+tf9188Reg       OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Spectracom Model 9188"
+    ::= { specTimeFreqProducts 7 }
+
+tf9188sReg      OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Spectracom Model 9188s"
+    ::= { specTimeFreqProducts 8 }
+
+tf9189Reg       OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Spectracom Model 9189"
+    ::= { specTimeFreqProducts 9 }
+
+tf9183esReg     OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Spectarcom Model 9183es"
+    ::= { specTimeFreqProducts 10 }
+
+tf240oReg       OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Spectracom Total Timing Solution Model 240o"
+    ::= { specTimeFreqProducts 11 }
+
+tf240rbReg      OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Spectracom Total Timing Solution Model 240rb"
+    ::= { specTimeFreqProducts 12 }
+
+tf260rbReg      OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Spectracom Total Timing Solution Model 260rb"
+    ::= { specTimeFreqProducts 13 }
+
+tf9283Reg       OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Spectracom Model 9283"
+    ::= { specTimeFreqProducts 14 }
+
+tf9288Reg       OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Spectracom Model 9288"
+    ::= { specTimeFreqProducts 15 }
+
+tf9289Reg       OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Spectracom Model 9289"
+    ::= { specTimeFreqProducts 16 }
+
+tf9383Reg       OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Spectracom Model 9383"
+    ::= { specTimeFreqProducts 17 }
+
+tf9388Reg       OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Spectracom Model 9388"
+    ::= { specTimeFreqProducts 18 }
+
+tf9389Reg       OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Spectracom Model 9389"
+    ::= { specTimeFreqProducts 19 }
+
+--******************************************************************************
+-- Registration of Spectracom's SecureSync products
+--..............................................................................
+ssSecureSyncReg OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Spectracom SecureSync Model"
+    ::= { specSecureSyncProducts 1 }
+
+--******************************************************************************
+-- Registration of Spectracom's NetClock products
+--..............................................................................
+nc9483Reg OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Spectracom NetClock Model 9483"
+    ::= { specNetClockProducts 1 }
+
+nc9489Reg OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Spectracom NetClock Model 9489"
+    ::= { specNetClockProducts 2 }
+
+END
