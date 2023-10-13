@@ -103,7 +103,7 @@ class GraylogApi
         }
 
         if ($device) {
-            $query[] = 'source: ("' . $this->getAddresses($device)->implode('" OR "') . '")';
+            $query[] = 'gl2_remote_ip: ("' . $this->getAddresses($device)->implode('" OR "') . '")';
         }
 
         if (empty($query)) {
