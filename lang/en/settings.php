@@ -160,6 +160,10 @@ return [
                 'description' => 'Disable alerting',
                 'help' => 'Stop alerts being generated',
             ],
+            'acknowledged' => [
+                'description' => 'Send Acknowledged Alerts',
+                'help' => 'Notify if Alert has been acknowledged',
+            ],
             'fixed-contacts' => [
                 'description' => 'Updates to contact email addresses not honored',
                 'help' => 'If TRUE any changes to sysContact or users emails will not be honoured whilst alert is active',
