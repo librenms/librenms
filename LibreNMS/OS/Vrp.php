@@ -174,14 +174,14 @@ class Vrp extends OS implements
 
             foreach ($radioTable as $ap_id => $ap) {
                 foreach ($ap as $r_id => $radio) {
-                    $channel = $radio['hwWlanRadioWorkingChannel'] ?? null;
-                    $mac = $radio['hwWlanRadioMac'] ?? null;
+                    $channel = $radio['hwWlanRadioWorkingChannel'] ?? 0;
+                    $mac = $radio['hwWlanRadioMac'] ?? '';
                     $name = ($apTable[$ap_id]['hwWlanApName'] ?? '') . ' Radio ' . $r_id;
                     $radionum = $r_id;
-                    $txpow = $radio['hwWlanRadioActualEIRP'] ?? null;
-                    $interference = $radio['hwWlanRadioChInterferenceRate'] ?? null;
-                    $radioutil = $radio['hwWlanRadioChUtilizationRate'] ?? null;
-                    $numasoclients = $clientPerRadio[$ap_id][$r_id] ?? null;
+                    $txpow = $radio['hwWlanRadioActualEIRP'] ?? 0;
+                    $interference = $radio['hwWlanRadioChInterferenceRate'] ?? 0;
+                    $radioutil = $radio['hwWlanRadioChUtilizationRate'] ?? 0;
+                    $numasoclients = $clientPerRadio[$ap_id][$r_id] ?? 0;
 
                     switch ($radio['hwWlanRadioFreqType'] ?? null) {
                         case 1:
