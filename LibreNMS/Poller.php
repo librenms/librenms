@@ -278,7 +278,7 @@ class Poller
     private function initRrdDirectory(): void
     {
         $host_rrd = \Rrd::name($this->device->hostname, '', '');
-        if (Config::get('rrd.enable', true) && ! Config::get('rrdcached') && ! is_dir($host_rrd)) {
+        if (Config::get('rrd.enable', true) && ! is_dir($host_rrd)) {
             try {
                 mkdir($host_rrd);
                 $this->logger->info("Created directory : $host_rrd");
