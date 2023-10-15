@@ -4,42 +4,43 @@ use LibreNMS\Config;
 use LibreNMS\Data\Graphing\GraphParameters;
 use LibreNMS\Enum\ImageFormat;
 
-global $debug;
-
-if (isset($vars['device'])) {
-    $device = is_numeric($vars['device'])
-        ? device_by_id_cache($vars['device'])
-        : device_by_name($vars['device']);
-    DeviceCache::setPrimary($device['device_id']);
-}
-
-// variables for included graphs
-$graph_params = new GraphParameters($vars);
-// set php variables for legacy graphs
-$type = $graph_params->type;
-$subtype = $graph_params->subtype;
-$height = $graph_params->height;
-$width = $graph_params->width;
-$from = $graph_params->from;
-$to = $graph_params->to;
-$period = $graph_params->period;
-$prev_from = $graph_params->prev_from;
-$inverse = $graph_params->inverse;
-$in = $graph_params->in;
-$out = $graph_params->out;
-$float_precision = $graph_params->float_precision;
-$title = $graph_params->visible('title');
-$nototal = ! $graph_params->visible('total');
-$nodetails = ! $graph_params->visible('details');
-$noagg = ! $graph_params->visible('aggregate');
-$rrd_options = '';
-$env = [];
-
-if (session('preferences.timezone')) {
-    $env['TZ'] = session('preferences.timezone');
-}
-
 try {
+    if (isset($vars['device'])) {
+        $device = is_numeric($vars['device'])
+            ? device_by_id_cache($vars['device'])
+            : device_by_name($vars['device']);
+        if (empty($device['device_id'])) {
+            throw new \LibreNMS\Exceptions\RrdGraphException('Device not found');
+        }
+        DeviceCache::setPrimary($device['device_id']);
+    }
+
+    // variables for included graphs
+    $graph_params = new GraphParameters($vars);
+    // set php variables for legacy graphs
+    $type = $graph_params->type;
+    $subtype = $graph_params->subtype;
+    $height = $graph_params->height;
+    $width = $graph_params->width;
+    $from = $graph_params->from;
+    $to = $graph_params->to;
+    $period = $graph_params->period;
+    $prev_from = $graph_params->prev_from;
+    $inverse = $graph_params->inverse;
+    $in = $graph_params->in;
+    $out = $graph_params->out;
+    $float_precision = $graph_params->float_precision;
+    $title = $graph_params->visible('title');
+    $nototal = ! $graph_params->visible('total');
+    $nodetails = ! $graph_params->visible('details');
+    $noagg = ! $graph_params->visible('aggregate');
+    $rrd_options = '';
+    $env = [];
+
+    if (session('preferences.timezone')) {
+        $env['TZ'] = session('preferences.timezone');
+    }
+
     require Config::get('install_dir') . "/includes/html/graphs/$type/auth.inc.php";
 
     if ($auth && is_customoid_graph($type, $subtype)) {
