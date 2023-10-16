@@ -14,31 +14,22 @@ return new class extends Migration
         Schema::table('ports_statistics', function (Blueprint $table) {
             $table->bigInteger('ifInNUcastPkts')->unsigned()->nullable()->change();
             $table->bigInteger('ifInNUcastPkts_prev')->unsigned()->nullable()->change();
-            $table->bigInteger('ifInNUcastPkts_delta')->unsigned()->nullable()->change();
             $table->bigInteger('ifOutNUcastPkts')->unsigned()->nullable()->change();
             $table->bigInteger('ifOutNUcastPkts_prev')->unsigned()->nullable()->change();
-            $table->bigInteger('ifOutNUcastPkts_delta')->unsigned()->nullable()->change();
             $table->bigInteger('ifInDiscards')->unsigned()->nullable()->change();
             $table->bigInteger('ifInDiscards_prev')->unsigned()->nullable()->change();
-            $table->bigInteger('ifInDiscards_delta')->unsigned()->nullable()->change();
             $table->bigInteger('ifOutDiscards')->unsigned()->nullable()->change();
             $table->bigInteger('ifOutDiscards_prev')->unsigned()->nullable()->change();
-            $table->bigInteger('ifOutDiscards_delta')->unsigned()->nullable()->change();
             $table->bigInteger('ifInUnknownProtos')->unsigned()->nullable()->change();
             $table->bigInteger('ifInUnknownProtos_prev')->unsigned()->nullable()->change();
-            $table->bigInteger('ifInUnknownProtos_delta')->unsigned()->nullable()->change();
             $table->bigInteger('ifInBroadcastPkts')->unsigned()->nullable()->change();
             $table->bigInteger('ifInBroadcastPkts_prev')->unsigned()->nullable()->change();
-            $table->bigInteger('ifInBroadcastPkts_delta')->unsigned()->nullable()->change();
             $table->bigInteger('ifOutBroadcastPkts')->unsigned()->nullable()->change();
             $table->bigInteger('ifOutBroadcastPkts_prev')->unsigned()->nullable()->change();
-            $table->bigInteger('ifOutBroadcastPkts_delta')->unsigned()->nullable()->change();
             $table->bigInteger('ifInMulticastPkts')->unsigned()->nullable()->change();
             $table->bigInteger('ifInMulticastPkts_prev')->unsigned()->nullable()->change();
-            $table->bigInteger('ifInMulticastPkts_delta')->unsigned()->nullable()->change();
             $table->bigInteger('ifOutMulticastPkts')->unsigned()->nullable()->change();
             $table->bigInteger('ifOutMulticastPkts_prev')->unsigned()->nullable()->change();
-            $table->bigInteger('ifOutMulticastPkts_delta')->unsigned()->nullable()->change();
         });
     }
 
