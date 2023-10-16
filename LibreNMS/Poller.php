@@ -175,7 +175,7 @@ class Poller
         $datastore = app('Datastore');
 
         foreach (array_keys(Config::get('poller_modules')) as $module) {
-            $module_status = Module::status($module, $this->device, $this->isModuleManuallyEnabled($module));
+            $module_status = Module::pollingStatus($module, $this->device, $this->isModuleManuallyEnabled($module));
             $should_poll = false;
             $start_memory = memory_get_usage();
             $module_start = microtime(true);

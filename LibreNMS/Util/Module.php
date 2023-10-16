@@ -39,12 +39,12 @@ class Module
         return class_exists($module_class) ? new $module_class : new LegacyModule($name);
     }
 
-    public static function status(string $name, Device $device, ?bool $manual = null): ModuleStatus
+    public static function pollingStatus(string $name, Device $device, ?bool $manual = null): ModuleStatus
     {
         return new ModuleStatus(
-            Config::get('poller_modules.' . $name),
+            Config::get("poller_modules.$name"),
             Config::get("os.{$device->os}.poller_modules.$name"),
-            $device->getAttrib('poll_' . $name),
+            $device->getAttrib("poll_$name"),
             $manual,
         );
     }
