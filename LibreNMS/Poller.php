@@ -300,7 +300,7 @@ class Poller
                 Config::set("poller_submodules.$module", $existing_submodules);
             }
 
-            if (! Module::exists($module)) {
+            if (! Module::exists($module) && ! Module::legacyPollingExists($module)) {
                 unset($this->module_override[$index]);
                 continue;
             }
