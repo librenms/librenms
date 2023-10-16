@@ -7,7 +7,6 @@ $oid = '.1.3.6.1.4.1.8072.1.3.2.4';
 
 $nfsstats = snmp_walk($device, $oid, '-Oqv', 'NET-SNMP-EXTEND-MIB');
 
-$rrd_name = ['app', $name, $app->app_id];
 $rrd_def = RrdDefinition::make()
     ->addDataset('total', 'GAUGE', 0)
     ->addDataset('null', 'GAUGE', 0)
@@ -44,8 +43,13 @@ $fields = [
     'fsstat' => $data[14],
 ];
 
-$tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
+$tags = [
+    'name' => $name,
+    'app_id' => $app->app_id,
+    'rrd_name' => ['app', $name, $app->app_id],
+    'rrd_def' => $rrd_def,
+];
 data_update($device, 'app', $tags, $fields);
 update_application($app, $nfsstats, $fields);
 
-unset($nfsstats, $rrd_name, $rrd_def, $data, $fields, $tags);
+unset($nfsstats, $rrd_def, $data, $fields, $tags);
