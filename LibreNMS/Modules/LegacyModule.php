@@ -73,7 +73,7 @@ class LegacyModule implements Module
 
     public function discover(OS $os): void
     {
-        if (! is_file(base_path("includes/discovery/$this->name.inc.php"))) {
+        if (! \LibreNMS\Util\Module::legacyDiscoveryExists($this->name)) {
             echo "Module $this->name does not exist, please remove it from your configuration";
 
             return;
@@ -92,21 +92,13 @@ class LegacyModule implements Module
 
     public function shouldPoll(OS $os, ModuleStatus $status): bool
     {
-        if (! $status->isEnabled()) {
-            return false;
-        }
-
-        if (! $os->getDevice()->status) {
-            return false;
-        }
-
         // all legacy modules require snmp except ipmi and unix-agent
-        return ! $os->getDevice()->snmp_disable || in_array($this->name, ['ipmi', 'unix-agent']);
+        return $status->isEnabledAndDeviceUp($os->getDevice(), check_snmp: ! in_array($this->name, ['ipmi', 'unix-agent']));
     }
 
     public function poll(OS $os, DataStorageInterface $datastore): void
     {
-        if (! is_file(base_path("includes/polling/$this->name.inc.php"))) {
+        if (! \LibreNMS\Util\Module::legacyPollingExists($this->name)) {
             echo "Module $this->name does not exist, please remove it from your configuration";
 
             return;
