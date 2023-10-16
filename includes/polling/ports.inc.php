@@ -613,7 +613,8 @@ foreach ($ports as $port) {
 
         if (isset($this_port['ifHighSpeed']) && is_numeric($this_port['ifHighSpeed'])) {
             d_echo("ifHighSpeed ({$this_port['ifHighSpeed']}) ");
-            $this_port['ifSpeed'] = $this_port['ifHighSpeed'] . '000000'; // * 1000000, but handle in sql
+            $this_port['ifSpeed'] = $this_port['ifHighSpeed'] == '0' ? 0
+                : $this_port['ifHighSpeed'] . '000000'; // * 1000000, but handle in sql
         } elseif (isset($this_port['ifSpeed']) && is_numeric($this_port['ifSpeed'])) {
             d_echo("ifSpeed ({$this_port['ifSpeed']}) ");
         } else {
@@ -917,12 +918,6 @@ foreach ($ports as $port) {
 
             if ($device['os'] == 'ios' || $device['os'] == 'iosxe') {
                 include 'ports/cisco-if-extension.inc.php';
-            }
-        }
-
-        foreach ($port['update'] as $key => $val_check) {
-            if (! isset($val_check)) {
-                unset($port['update'][$key]);
             }
         }
 
