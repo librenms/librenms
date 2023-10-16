@@ -100,6 +100,12 @@ $mapping = [
 
 $data = explode("\n", $mysql);
 
+if (count($data) < 80) {
+    echo " Incorrect number of datapoints returned from device, skipping\n";
+
+    return;
+}
+
 $map = [];
 foreach ($data as $str) {
     [$key, $value] = explode(':', $str);
@@ -195,7 +201,12 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('CUMi', 'DERIVE', 0, 125000000000)
     ->addDataset('SlLa', 'GAUGE', 0, 125000000000);
 
-$tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
+$tags = [
+    'name' => $name,
+    'app_id' => $app->app_id,
+    'rrd_name' => $rrd_name,
+    'rrd_def' => $rrd_def,
+];
 data_update($device, 'app', $tags, $fields);
 
 // Process state statistics
@@ -218,7 +229,6 @@ $mapping_status = [
     'State_other'                => 'dh',
 ];
 
-$rrd_name = ['app', $name, $app->app_id, 'status'];
 $rrd_def = new RrdDefinition();
 // because this sends different names for rrd and compared to other datastores, disable $fields name checks
 $rrd_def->disableNameChecking();
@@ -229,7 +239,12 @@ foreach ($mapping_status as $desc => $id) {
     $rrd_def->addDataset($id, 'GAUGE', 0, 125000000000);
 }
 $metrics += $fields;
-$status = true;
-$tags = compact('name', 'app_id', 'status', 'rrd_name', 'rrd_def');
+$tags = [
+    'name' => $name,
+    'app_id' => $app->app_id,
+    'status' => true,
+    'rrd_name' => ['app', $name, $app->app_id, 'status'],
+    'rrd_def' => $rrd_def,
+];
 data_update($device, 'app', $tags, $fields);
 update_application($app, $mysql, $metrics);

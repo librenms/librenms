@@ -41,7 +41,6 @@ $fields = [
     'update_interval'       => $chronyd['tracking']['update_interval'],
 ];
 
-// $tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
 $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
 data_update($device, 'app', $tags, $fields);
 
