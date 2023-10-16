@@ -77,7 +77,7 @@ class ModuleStatus
             return false;
         }
 
-        return $status->isEnabled() && $device->status;
+        return $this->isEnabled() && $device->status;
     }
 
     public function __toString(): string
