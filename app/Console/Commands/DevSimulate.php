@@ -61,7 +61,6 @@ class DevSimulate extends LnmsCommand
             $this->snmpsim->setupVenv($this->getOutput()->isVeryVerbose());
         }
 
-
         if ($this->option('setup-venv')) {
             return 0; // venv is set up exit
         }

@@ -58,6 +58,7 @@ class Snmpsim extends Process
         $listen = $this->ip . ':' . $this->port;
         $this->waitUntil(function ($type, $buffer) use ($listen, &$last) {
             $last = $buffer;
+
             return $type == Process::ERR && str_contains($buffer, $listen);
         });
 
