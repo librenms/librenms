@@ -20,15 +20,10 @@ return new class extends Migration
             $table->integer('AdvertisedPrefixes')->unsigned()->change();
             $table->integer('SuppressedPrefixes')->unsigned()->change();
             $table->integer('WithdrawnPrefixes')->unsigned()->change();
-            $table->integer('AcceptedPrefixes_delta')->unsigned()->change();
             $table->integer('AcceptedPrefixes_prev')->unsigned()->change();
-            $table->integer('DeniedPrefixes_delta')->unsigned()->change();
             $table->integer('DeniedPrefixes_prev')->unsigned()->change();
-            $table->integer('AdvertisedPrefixes_delta')->unsigned()->change();
             $table->integer('AdvertisedPrefixes_prev')->unsigned()->change();
-            $table->integer('SuppressedPrefixes_delta')->unsigned()->change();
             $table->integer('SuppressedPrefixes_prev')->unsigned()->change();
-            $table->integer('WithdrawnPrefixes_delta')->unsigned()->change();
             $table->integer('WithdrawnPrefixes_prev')->unsigned()->change();
         });
     }
