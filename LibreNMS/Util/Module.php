@@ -32,26 +32,35 @@ use LibreNMS\Polling\ModuleStatus;
 
 class Module
 {
-    public static function fromName(string $name): \LibreNMS\Interfaces\Module
+    public static function exists(string $module_name): bool
     {
-        $module_class = StringHelpers::toClass($name, '\\LibreNMS\\Modules\\');
-
-        return class_exists($module_class) ? new $module_class : new LegacyModule($name);
+        return class_exists(StringHelpers::toClass($module_name, '\\LibreNMS\\Modules\\'));
     }
 
-    public static function status(string $name, Device $device, ?bool $manual = null): ModuleStatus
+    public static function fromName(string $module_name): \LibreNMS\Interfaces\Module
+    {
+        $module_class = StringHelpers::toClass($module_name, '\\LibreNMS\\Modules\\');
+
+        return class_exists($module_class) ? new $module_class : new LegacyModule($module_name);
+    }
+
+    public static function legacyDiscoveryExists(string $module_name): bool
+    {
+        return is_file(base_path("includes/discovery/$module_name.inc.php"));
+    }
+
+    public static function legacyPollingExists(string $module_name): bool
+    {
+        return is_file(base_path("includes/polling/$module_name.inc.php"));
+    }
+
+    public static function pollingStatus(string $module_name, Device $device, ?bool $manual = null): ModuleStatus
     {
         return new ModuleStatus(
-            Config::get('poller_modules.' . $name),
-            Config::get("os.{$device->os}.poller_modules.$name"),
-            $device->getAttrib('poll_' . $name),
+            Config::get("poller_modules.$module_name"),
+            Config::get("os.{$device->os}.poller_modules.$module_name"),
+            $device->getAttrib("poll_$module_name"),
             $manual,
         );
-    }
-
-    public static function exists(string $module): bool
-    {
-        return class_exists(StringHelpers::toClass($module, '\\LibreNMS\\Modules\\'))
-            || is_file(base_path("includes/polling/$module.inc.php"));
     }
 }

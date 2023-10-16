@@ -48,7 +48,7 @@ class Stp implements Module
 
     public function shouldDiscover(OS $os, ModuleStatus $status): bool
     {
-        return $status->isEnabled() && ! $os->getDevice()->snmp_disable && $os->getDevice()->status;
+        return $status->isEnabledAndDeviceUp($os->getDevice());
     }
 
     public function discover(OS $os): void
@@ -70,7 +70,7 @@ class Stp implements Module
 
     public function shouldPoll(OS $os, ModuleStatus $status): bool
     {
-        return $status->isEnabled() && ! $os->getDevice()->snmp_disable && $os->getDevice()->status;
+        return $status->isEnabledAndDeviceUp($os->getDevice());
     }
 
     public function poll(OS $os, DataStorageInterface $datastore): void

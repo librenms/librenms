@@ -60,7 +60,7 @@ class Isis implements Module
 
     public function shouldDiscover(OS $os, ModuleStatus $status): bool
     {
-        return $status->isEnabled() && ! $os->getDevice()->snmp_disable && $os->getDevice()->status;
+        return $status->isEnabledAndDeviceUp($os->getDevice());
     }
 
     /**
@@ -81,7 +81,7 @@ class Isis implements Module
 
     public function shouldPoll(OS $os, ModuleStatus $status): bool
     {
-        return $status->isEnabled() && ! $os->getDevice()->snmp_disable && $os->getDevice()->status;
+        return $status->isEnabledAndDeviceUp($os->getDevice());
     }
 
     /**
