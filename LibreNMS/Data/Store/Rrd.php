@@ -524,6 +524,7 @@ class Rrd extends BaseDatastore
     {
         if ($this->rrdcached && version_compare($this->version, '1.5', '>=')) {
             $check_output = implode($this->command('last', $filename, ''));
+            $filename = str_replace([$this->rrd_dir . '/', $this->rrd_dir], '', $filename);
 
             return ! (str_contains($check_output, $filename) && str_contains($check_output, 'No such file or directory'));
         } else {

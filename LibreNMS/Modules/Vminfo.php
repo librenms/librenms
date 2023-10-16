@@ -50,11 +50,7 @@ class Vminfo implements \LibreNMS\Interfaces\Module
     public function shouldDiscover(OS $os, ModuleStatus $status): bool
     {
         // libvirt does not use snmp, only ssh tunnels
-        if (! Config::get('enable_libvirt') && $os->getDevice()->snmp_disable) {
-            return false;
-        }
-
-        return $status->isEnabled() && $os->getDevice()->status && $os instanceof VminfoDiscovery;
+        return $status->isEnabledAndDeviceUp($os->getDevice(), check_snmp: ! Config::get('enable_libvirt')) && $os instanceof VminfoDiscovery;
     }
 
     /**
@@ -73,7 +69,7 @@ class Vminfo implements \LibreNMS\Interfaces\Module
 
     public function shouldPoll(OS $os, ModuleStatus $status): bool
     {
-        return $status->isEnabled() && ! $os->getDevice()->snmp_disable && $os->getDevice()->status && $os instanceof VminfoPolling;
+        return $status->isEnabledAndDeviceUp($os->getDevice()) && $os instanceof VminfoPolling;
     }
 
     /**

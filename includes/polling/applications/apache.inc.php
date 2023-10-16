@@ -13,12 +13,18 @@ if (! empty($agent_data['app'][$name])) {
     $apache = snmp_get($device, $oid, $options);
 }
 
+$apache_data = explode("\n", $apache);
+if (count($apache_data) !== 20) {
+    echo " Incorrect number of datapoints returned from device, skipping\n";
+
+    return;
+}
+
 [$total_access, $total_kbyte, $cpuload, $uptime, $reqpersec, $bytespersec,
     $bytesperreq, $busyworkers, $idleworkers, $score_wait, $score_start,
     $score_reading, $score_writing, $score_keepalive, $score_dns,
-    $score_closing, $score_logging, $score_graceful, $score_idle, $score_open] = explode("\n", $apache);
+    $score_closing, $score_logging, $score_graceful, $score_idle, $score_open] = $apache_data;
 
-$rrd_name = ['app', $name, $app->app_id];
 $rrd_def = RrdDefinition::make()
     ->addDataset('access', 'DERIVE', 0, 125000000000)
     ->addDataset('kbyte', 'DERIVE', 0, 125000000000)
@@ -64,6 +70,11 @@ $fields = [
     'sb_open'      => intval(trim($score_open, '"')),
 ];
 
-$tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
+$tags = [
+    'name' => $name,
+    'app_id' => $app->app_id,
+    'rrd_name' => ['app', $name, $app->app_id],
+    'rrd_def' => $rrd_def,
+];
 data_update($device, 'app', $tags, $fields);
 update_application($app, $apache, $fields);

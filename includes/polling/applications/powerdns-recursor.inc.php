@@ -112,7 +112,8 @@ if (! empty($data)) {
 
     //decode and flatten the data
     $stats = [];
-    foreach (json_decode($data, true) as $stat) {
+    [$json_data] = explode("\n", $data, 2);
+    foreach (json_decode($json_data, true) as $stat) {
         $stats[$stat['name']] = $stat['value'];
     }
     d_echo($stats);
@@ -130,10 +131,14 @@ if (! empty($data)) {
         }
     }
 
-    $rrd_name = ['app', 'powerdns', 'recursor', $app->app_id];
-    $tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
+    $tags = [
+        'name' => $name,
+        'app_id' => $app->app_id,
+        'rrd_name' => ['app', 'powerdns', 'recursor', $app->app_id],
+        'rrd_def' => $rrd_def,
+    ];
     data_update($device, 'app', $tags, $fields);
     update_application($app, $data, $fields);
 }
 
-unset($data, $stats, $rrd_def, $rrd_name, $rrd_keys, $tags, $fields);
+unset($data, $stats, $rrd_def, $rrd_keys, $tags, $fields);
