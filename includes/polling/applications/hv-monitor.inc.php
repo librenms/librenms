@@ -4,8 +4,6 @@ use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\RRD\RrdDefinition;
 
 $name = 'hv-monitor';
-$app_id = $app['app_id'];
-
 try {
     $return_data = json_app_get($device, 'hv-monitor')['data'];
 } catch (JsonAppException $e) {
@@ -139,8 +137,8 @@ $totals_fields = [
     'coll' => $return_data['totals']['coll'],
 ];
 
-$rrd_name = ['app', $name, $app_id];
-$tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
+$rrd_name = ['app', $name, $app->app_id];
+$tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
 data_update($device, 'app', $tags, $totals_fields);
 
 //
@@ -235,8 +233,8 @@ foreach ($return_data['VMs'] as $vm => $vm_info) {
         'coll' => $vm_info['coll'],
     ];
 
-    $rrd_name = ['app', $name, $app_id, 'vm', $vm];
-    $tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $vm_rrd_def, 'rrd_name' => $rrd_name];
+    $rrd_name = ['app', $name, $app->app_id, 'vm', $vm];
+    $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $vm_rrd_def, 'rrd_name' => $rrd_name];
     data_update($device, 'app', $tags, $vm_fields);
 }
 sort($VMs);
@@ -278,8 +276,8 @@ foreach ($VMs as $vm) {
             'freqs' => $disk_info['freqs'],
         ];
 
-        $rrd_name = ['app', $name, $app_id, 'vmdisk', $vm, '__-__', $disk];
-        $tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $disk_rrd_def, 'rrd_name' => $rrd_name];
+        $rrd_name = ['app', $name, $app->app_id, 'vmdisk', $vm, '__-__', $disk];
+        $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $disk_rrd_def, 'rrd_name' => $rrd_name];
         data_update($device, 'app', $tags, $disk_fields);
     }
     sort($vm_disks);
@@ -323,8 +321,8 @@ foreach ($VMs as $vm) {
             'coll' => $if_info['coll'],
         ];
 
-        $rrd_name = ['app', $name, $app_id, 'vmif', $vm, '__-__', $vm_if];
-        $tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $if_rrd_def, 'rrd_name' => $rrd_name];
+        $rrd_name = ['app', $name, $app->app_id, 'vmif', $vm, '__-__', $vm_if];
+        $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $if_rrd_def, 'rrd_name' => $rrd_name];
         data_update($device, 'app', $tags, $if_fields);
     }
 

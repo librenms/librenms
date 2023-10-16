@@ -4712,19 +4712,19 @@
         "plugin_dir": {
             "type": "directory"
         },
-        "poller_modules.core": {
-            "default": true,
-            "type": "boolean",
-            "validate": {
-                "value": "boolean|accepted"
-            }
-        },
         "poller_modules.unix-agent": {
             "order": 420,
             "group": "poller",
             "section": "poller_modules",
             "default": false,
             "type": "boolean"
+        },
+        "poller_modules.core": {
+            "default": true,
+            "type": "boolean",
+            "validate": {
+                "value": "boolean|accepted"
+            }
         },
         "poller_modules.os": {
             "order": 320,

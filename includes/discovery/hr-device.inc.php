@@ -1,8 +1,8 @@
 <?php
 
 $hrDevice_oids = [
-    'hrDeviceTable',
     'hrProcessorTable',
+    'hrDeviceTable',
 ];
 
 $hrDevices = [];
@@ -22,7 +22,7 @@ if (is_array($hrDevices)) {
                     'hrDeviceStatus' => $hrDevice['hrDeviceStatus'] ?? 'unknown',
                     'hrDeviceErrors' => $hrDevice['hrDeviceErrors'] ?? 0,
                 ];
-                if ($hrDevice['hrDeviceType'] == 'hrDeviceProcessor') {
+                if ($hrDevice['hrDeviceType'] == 'hrDeviceProcessor' && isset($hrDevice['hrProcessorLoad'])) {
                     $update_array['hrProcessorLoad'] = $hrDevice['hrProcessorLoad'];
                 }
 
