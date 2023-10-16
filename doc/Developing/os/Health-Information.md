@@ -304,7 +304,7 @@ entry for the sensor class.
 - `includes/html/pages/device/overview.inc.php`: add `require 'overview/sensors/$class.inc.php'`
 in the desired order for the device overview page.
 - `includes/html/pages/health.inc.php`: add a $type_text[] entry for the sensor class.
-- `resources/lang/en/sensors.php`: add human-readable names and units for the sensor class
+- `lang/en/sensors.php`: add human-readable names and units for the sensor class
 in English, feel free to do so for other languages as well.
 
 Create and populate new files for the sensor class in the following places:
@@ -316,7 +316,7 @@ files are stored. Not used for yaml discovery.
 - `includes/html/pages/device/overview.inc.php`: add `require 'overview/sensors/$class.inc.php'` in the desired
 order for the device overview page.
 - `includes/html/pages/health.inc.php`: add a $type_text[] entry for the sensor class.
-- `resources/lang/en/sensors.php`: add human-readable names and units for the sensor class in English, feel
+- `lang/en/sensors.php`: add human-readable names and units for the sensor class in English, feel
 free to do so for other languages as well.
 
 Create and populate new files for the sensor class in the following places:

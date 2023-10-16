@@ -3,14 +3,14 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 
-class MigrateDevicesAttribsTable extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::table('devices', function (Blueprint $table) {
             $table->boolean('disable_notify')->default(0);
@@ -27,7 +27,7 @@ class MigrateDevicesAttribsTable extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         // revert migrate disable_notify data into devices table
         $attribs = DB::table('devices')->where('disable_notify', 1)->pluck('device_id')->map(function ($device_id) {
@@ -43,4 +43,4 @@ class MigrateDevicesAttribsTable extends Migration
             $table->dropColumn('disable_notify');
         });
     }
-}
+};

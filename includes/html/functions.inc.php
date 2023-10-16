@@ -825,7 +825,7 @@ function dynamic_override_config($type, $name, $device)
  * One or an array of strings can be provided as an argument; if an array is passed, all ports matching
  * any of the types in the array are returned.
  *
- * @param $types mixed String or strings matching 'port_descr_type's.
+ * @param  $types  mixed String or strings matching 'port_descr_type's.
  * @return array Rows from the ports table for matching ports.
  */
 function get_ports_from_type($given_types)
@@ -877,8 +877,8 @@ function get_ports_from_type($given_types)
 }
 
 /**
- * @param $filename
- * @param $content
+ * @param  $filename
+ * @param  $content
  */
 function file_download($filename, $content)
 {
@@ -938,7 +938,7 @@ function search_oxidized_config($search_in_conf_textbox)
 }
 
 /**
- * @param $data
+ * @param  $data
  * @return bool|mixed
  */
 function array_to_htmljson($data)
@@ -1010,9 +1010,9 @@ function get_oxidized_nodes_list()
  * @param  string  $transparency  value of desired transparency applied to rrdtool options (values 01 - 99)
  * @return array containing transparency and stacked setup
  */
-function generate_stacked_graphs($transparency = '88')
+function generate_stacked_graphs($force_stack = false, $transparency = '88')
 {
-    if (Config::get('webui.graph_stacked') == true) {
+    if (Config::get('webui.graph_stacked') == true || $force_stack == true) {
         return ['transparency' => $transparency, 'stacked' => '1'];
     } else {
         return ['transparency' => '', 'stacked' => '-1'];
@@ -1100,10 +1100,14 @@ function get_sensor_label_color($sensor, $type = 'sensors')
 
         return "<span class='label $label_style'>" . trim($sensor['sensor_current']) . '</span>';
     }
+
     if ($sensor['sensor_class'] == 'frequency' && $sensor['sensor_type'] == 'openwrt') {
         return "<span class='label $label_style'>" . trim($sensor['sensor_current']) . ' ' . $unit . '</span>';
     }
 
+    if ($sensor['sensor_class'] == 'power_consumed') {
+        return "<span class='label $label_style'>" . trim(Number::formatSi($sensor['sensor_current'] * 1000, 5, 5, 'Wh')) . '</span>';
+    }
     if (in_array($sensor['rrd_type'], ['COUNTER', 'DERIVE', 'DCOUNTER', 'DDERIVE'])) {
         //compute and display an approx rate for this sensor
         return "<span class='label $label_style'>" . trim(Number::formatSi(max(0, $sensor['sensor_current'] - $sensor['sensor_prev']) / Config::get('rrd.step', 300), 2, 3, $unit)) . '</span>';

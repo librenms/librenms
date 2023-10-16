@@ -15,7 +15,7 @@ if (isset($oids) && $oids) {
         if ($data) {
             [$oid,$kind] = explode(' ', $data);
             $split_oid = explode('.', $oid);
-            $index = $split_oid[(count($split_oid) - 1)];
+            $index = $split_oid[count($split_oid) - 1];
             $current_oid = '.1.3.6.1.4.1.318.1.1.12.2.3.1.1.2.' . $index;
             // rPDULoadStatusLoad
             $phase_oid = '.1.3.6.1.4.1.318.1.1.12.2.3.1.1.4.' . $index;
@@ -62,7 +62,7 @@ if (isset($oids) && $oids) {
                 continue;
             }
             $split_oid = explode('.', $oid);
-            $index = $split_oid[(count($split_oid) - 1)];
+            $index = $split_oid[count($split_oid) - 1];
             $current_oid = '.1.3.6.1.4.1.318.1.1.12.2.3.1.1.2.' . $index;
             // rPDULoadStatusLoad
             $phase_oid = '.1.3.6.1.4.1.318.1.1.12.2.3.1.1.4.' . $index;
@@ -112,7 +112,7 @@ if (isset($oids) && $oids) {
                 continue;
             }
             $split_oid = explode('.', $oid);
-            $index = $split_oid[(count($split_oid) - 1)];
+            $index = $split_oid[count($split_oid) - 1];
             $descr = 'Bank ' . $banknum;
             $current_oid = '.1.3.6.1.4.1.318.1.1.12.2.3.1.1.2.' . $index;
             // rPDULoadStatusLoad
@@ -150,7 +150,7 @@ if (isset($oids) && $oids) {
         if ($data) {
             [$oid,$kind] = explode(' ', $data);
             $split_oid = explode('.', $oid);
-            $index = $split_oid[(count($split_oid) - 1)];
+            $index = $split_oid[count($split_oid) - 1];
             $voltage_oid = '.1.3.6.1.4.1.318.1.1.26.6.3.1.6';
             // rPDU2PhaseStatusVoltage
             $current_oid = '.1.3.6.1.4.1.318.1.1.26.9.4.3.1.6.' . $index;
@@ -238,8 +238,8 @@ if (isset($in_oids)) {
         }
     }
 }
-    unset($index);
-    unset($data);
+unset($index);
+unset($data);
 foreach ($oids as $index => $data) {
     $type = 'apcUPS';
     $descr = 'Phase ' . substr($index, -1) . ' Output';
@@ -256,5 +256,5 @@ foreach ($oids as $index => $data) {
         discover_sensor($valid['sensor'], 'current', $device, $current_oid, $index, $type, $descr, $divisor, 1, null, null, null, null, $current);
     }
 }
-    unset($index);
-    unset($data);
+unset($index);
+unset($data);

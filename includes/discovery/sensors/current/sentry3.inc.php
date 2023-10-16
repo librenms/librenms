@@ -23,7 +23,7 @@ while ($towers <= $tower_count) {
         if ($infeed_data) {
             [$infeed_oid,$descr] = explode(' ', $infeed_data, 2);
             $split_oid = explode('.', $infeed_oid);
-            $infeed_index = $split_oid[(count($split_oid) - 1)];
+            $infeed_index = $split_oid[count($split_oid) - 1];
 
             // infeedLoadValue
             $infeed_oid = '.1.3.6.1.4.1.1718.3.2.2.1.7.' . $towers . '.' . $infeed_index;
@@ -55,7 +55,7 @@ while ($towers <= $tower_count) {
                 if ($outlet_data) {
                     [$outlet_oid,$outlet_descr] = explode(' ', $outlet_data, 2);
                     $outlet_split_oid = explode('.', $outlet_oid);
-                    $outlet_index = $outlet_split_oid[(count($outlet_split_oid) - 1)];
+                    $outlet_index = $outlet_split_oid[count($outlet_split_oid) - 1];
 
                     $outletsuffix = "$towers.$infeed_index.$outlet_index";
 

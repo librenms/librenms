@@ -28,8 +28,8 @@ unset($oids);
 //Three Phase Detection & Support
 
 $phasecount = $pre_cache['apcups_phase_count'];
-    d_echo($phasecount);
-    d_echo($pre_cache['apcups_phase_count']);
+d_echo($phasecount);
+d_echo($pre_cache['apcups_phase_count']);
 // Check for three phase UPS devices - else skip to normal discovery
 if ($phasecount > 1) {
     $oids = snmpwalk_cache_oid($device, 'upsPhaseOutputVoltage', $oids, 'PowerNet-MIB');
@@ -72,7 +72,7 @@ if ($phasecount > 1) {
             if ($data) {
                 [$oid, $current] = explode(' ', $data, 2);
                 $split_oid = explode('.', $oid);
-                $index = $split_oid[(count($split_oid) - 3)];
+                $index = $split_oid[count($split_oid) - 3];
                 $oid = '.1.3.6.1.4.1.318.1.1.8.5.3.3.1.3.' . $index . '.1.1';
                 $descr = 'Input Feed ' . chr(64 + $index);
                 discover_sensor($valid['sensor'], 'voltage', $device, $oid, "3.3.1.3.$index", $type, $descr, $divisor, '1', null, null, null, null, $current);
@@ -90,7 +90,7 @@ if ($phasecount > 1) {
             if ($data) {
                 [$oid, $current] = explode(' ', $data, 2);
                 $split_oid = explode('.', $oid);
-                $index = $split_oid[(count($split_oid) - 3)];
+                $index = $split_oid[count($split_oid) - 3];
                 $oid = '.1.3.6.1.4.1.318.1.1.8.5.4.3.1.3.' . $index . '.1.1';
                 $descr = 'Output Feed';
                 if (count(explode("\n", $oids)) > 1) {

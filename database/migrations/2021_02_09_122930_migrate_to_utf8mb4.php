@@ -3,14 +3,14 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\DB;
 
-class MigrateToUtf8mb4 extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         $this->migrateCharsetTo('utf8mb4', 'utf8mb4_unicode_ci');
     }
@@ -20,7 +20,7 @@ class MigrateToUtf8mb4 extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         $this->migrateCharsetTo('utf8', 'utf8_unicode_ci');
     }
@@ -77,4 +77,4 @@ class MigrateToUtf8mb4 extends Migration
             DB::unprepared($sql);
         }
     }
-}
+};

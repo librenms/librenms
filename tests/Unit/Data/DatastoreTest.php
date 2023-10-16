@@ -46,7 +46,7 @@ class DatastoreTest extends TestCase
         ]);
     }
 
-    public function testDefaultInitialization()
+    public function testDefaultInitialization(): void
     {
         $ds = $this->app->make('Datastore');
         $stores = $ds->getStores();
@@ -55,7 +55,7 @@ class DatastoreTest extends TestCase
         $this->assertEquals('LibreNMS\Data\Store\Rrd', get_class($stores[0]), 'The default enabled store should be Rrd');
     }
 
-    public function testInitialization()
+    public function testInitialization(): void
     {
         Config::set('rrd.enable', false);
         Config::set('graphite.enable', true);

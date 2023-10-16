@@ -25,21 +25,16 @@
 
 namespace LibreNMS\Tests\Unit\Data;
 
-use GuzzleHttp\Exception\RequestException;
-use GuzzleHttp\Psr7\Request;
-use GuzzleHttp\Psr7\Response;
+use Illuminate\Support\Facades\Http as LaravelHttp;
 use LibreNMS\Config;
 use LibreNMS\Data\Store\Prometheus;
 use LibreNMS\Tests\TestCase;
-use LibreNMS\Tests\Traits\MockGuzzleClient;
 
 /**
  * @group datastores
  */
 class PrometheusStoreTest extends TestCase
 {
-    use MockGuzzleClient;
-
     protected function setUp(): void
     {
         parent::setUp();
@@ -48,26 +43,20 @@ class PrometheusStoreTest extends TestCase
         Config::set('prometheus.url', 'http://fake:9999');
     }
 
-    public function testFailWrite()
+    public function testFailWrite(): void
     {
-        $this->mockGuzzleClient([
-            new Response(422, [], 'Bad response'),
-            new RequestException('Exception thrown', new Request('POST', 'test')),
-        ]);
-
+        LaravelHttp::fakeSequence()->push('Bad response', 422);
         $prometheus = app(Prometheus::class);
 
         \Log::shouldReceive('debug');
-        \Log::shouldReceive('error')->once()->with("Prometheus Exception: Client error: `POST http://fake:9999/metrics/job/librenms/instance/test/measurement/none` resulted in a `422 Unprocessable Entity` response:\nBad response\n");
-        \Log::shouldReceive('error')->once()->with('Prometheus Exception: Exception thrown');
-        $prometheus->put(['hostname' => 'test'], 'none', [], ['one' => 1]);
+        \Log::shouldReceive('error')->once()->with('Prometheus Error: Bad response');
         $prometheus->put(['hostname' => 'test'], 'none', [], ['one' => 1]);
     }
 
-    public function testSimpleWrite()
+    public function testSimpleWrite(): void
     {
-        $this->mockGuzzleClient([
-            new Response(200),
+        LaravelHttp::fake([
+            '*' => LaravelHttp::response(),
         ]);
 
         $prometheus = app(Prometheus::class);
@@ -82,12 +71,11 @@ class PrometheusStoreTest extends TestCase
 
         $prometheus->put($device, $measurement, $tags, $fields);
 
-        $history = $this->guzzleRequestHistory();
-        $this->assertCount(1, $history, 'Did not receive the expected number of requests');
-        $this->assertEquals('POST', $history[0]->getMethod());
-        $this->assertEquals('/metrics/job/librenms/instance/testhost/measurement/testmeasure/ifName/testifname/type/testtype', $history[0]->getUri()->getPath());
-        $this->assertEquals('fake', $history[0]->getUri()->getHost());
-        $this->assertEquals(9999, $history[0]->getUri()->getPort());
-        $this->assertEquals("ifIn 234234\nifOut 53453\n", (string) $history[0]->getBody());
+        LaravelHttp::assertSentCount(1);
+        LaravelHttp::assertSent(function (\Illuminate\Http\Client\Request $request) {
+            return $request->method() == 'POST' &&
+                $request->url() == 'http://fake:9999/metrics/job/librenms/instance/testhost/measurement/testmeasure/ifName/testifname/type/testtype' &&
+                $request->body() == "ifIn 234234\nifOut 53453\n";
+        });
     }
 }

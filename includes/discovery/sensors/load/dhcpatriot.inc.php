@@ -44,7 +44,7 @@ if (! empty($dhcp_networks[$dhcp_networks_base_oid])) {
     foreach ($dhcp_networks[$dhcp_networks_base_oid] as $dhcp_type_index => $ignore_this) {
         if (! empty($dhcp_networks[$dhcp_networks_base_oid][$dhcp_type_index])) {
             foreach ($dhcp_networks[$dhcp_networks_base_oid][$dhcp_type_index] as $index => $entry) {
-                $description = (explode('[', $entry));
+                $description = explode('[', $entry);
                 $data_array[$array_index]['index'] = $index;
                 if ($dhcp_type_index === intval($auth_dhcp_index)) {
                     $data_array[$array_index]['type'] = 'dhcpatriotAuthDHCP';
@@ -71,7 +71,7 @@ if (! empty($dhcp_networks[$dhcp_networks_base_oid])) {
         $type = $value['type'];
         $divisor = $pool_data[$value['size_oid']];
         $descr = $value['description'] . ' (' . $pool_data[$value['oid']] . '/' . $divisor . ')';
-        $current = (($pool_data[$value['oid']] / $divisor) * 100);
+        $current = \LibreNMS\Util\Number::calculatePercent($pool_data[$value['oid']], $divisor);
         $group = $value['group'];
 
         discover_sensor(

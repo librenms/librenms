@@ -22,7 +22,6 @@ if (! empty($agent_data['app']['memcached'])) {
 echo ' memcached(' . $app->app_instance . ')';
 $data = $data[$app->app_instance] ?? reset($data);  // specified instance or just the first one
 
-$rrd_name = ['app', $name, $app->app_id];
 $rrd_def = RrdDefinition::make()
     ->addDataset('uptime', 'GAUGE', 0, 125000000000)
     ->addDataset('threads', 'GAUGE', 0, 125000000000)
@@ -64,7 +63,11 @@ $fields = [
     'bytes_written'     => $data['bytes_written'] ?? null,
 ];
 
-$app_id = $app->app_id;
-$tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
+$tags = [
+    'name' => $name,
+    'app_id' => $app->app_id,
+    'rrd_name' => ['app', $name, $app->app_id],
+    'rrd_def' => $rrd_def,
+];
 data_update($device, 'app', $tags, $fields);
 update_application($app, empty($data) ? 'ERROR: No Data' : 'OK', $fields);

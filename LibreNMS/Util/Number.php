@@ -45,14 +45,14 @@ class Number
         if ($value >= '0.1') {
             $sizes = ['', 'k', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y'];
             $ext = $sizes[0];
-            for ($i = 1; (($i < count($sizes)) && ($value >= 1000)); $i++) {
+            for ($i = 1; ($i < count($sizes)) && ($value >= 1000); $i++) {
                 $value = $value / 1000;
                 $ext = $sizes[$i];
             }
         } else {
             $sizes = ['', 'm', 'u', 'n', 'p'];
             $ext = $sizes[0];
-            for ($i = 1; (($i < count($sizes)) && ($value != 0) && ($value <= 0.1)); $i++) {
+            for ($i = 1; ($i < count($sizes)) && ($value != 0) && ($value <= 0.1); $i++) {
                 $value = $value * 1000;
                 $ext = $sizes[$i];
             }
@@ -74,7 +74,7 @@ class Number
         }
         $sizes = ['', 'Ki', 'Mi', 'Gi', 'Ti', 'Pi', 'Ei', 'Zi', 'Yi'];
         $ext = $sizes[0];
-        for ($i = 1; (($i < count($sizes)) && ($value >= 1024)); $i++) {
+        for ($i = 1; ($i < count($sizes)) && ($value >= 1024); $i++) {
             $value = $value / 1024;
             $ext = $sizes[$i];
         }
@@ -87,13 +87,26 @@ class Number
     }
 
     /**
+     * Convert an Si or Bi formatted value to bytes (or bits)
+     */
+    public static function toBytes(string $formatted): int|float
+    {
+        preg_match('/^([\d.]+)([KMGTPEZY]?)(\w?)\w?$/', $formatted, $matches);
+        [, $number, $magnitude, $baseIndicator] = $matches;
+        $base = $baseIndicator == 'i' ? 1024 : 1000;
+        $exponent = ['K' => 1, 'M' => 2, 'G' => 3, 'T' => 4, 'P' => 5, 'E' => 6, 'Z' => 7, 'Y' => 8];
+
+        return self::cast($number) * pow($base, $exponent[$magnitude] ?? 0);
+    }
+
+    /**
      * Cast string to int or float.
      * Returns 0 if string is not numeric
      *
      * @param  mixed  $number
      * @return float|int
      */
-    public static function cast($number)
+    public static function cast(mixed $number): float|int
     {
         if (! is_numeric($number)) {
             // match pre-PHP8 behavior
@@ -107,6 +120,21 @@ class Number
         $int = (int) $number;
 
         return $float == $int ? $int : $float;
+    }
+
+    /**
+     * Extract the first number found from a string
+     */
+    public static function extract(mixed $string): float|int
+    {
+        if (! is_numeric($string)) {
+            preg_match('/-?\d*\.?\d+/', $string, $matches);
+            if (! empty($matches[0])) {
+                $string = $matches[0];
+            }
+        }
+
+        return self::cast($string);
     }
 
     /**

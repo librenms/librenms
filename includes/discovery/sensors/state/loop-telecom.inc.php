@@ -9,7 +9,7 @@ if (! empty($oids)) {
         ['value' => 1, 'generic' => 3, 'graph' => 0, 'descr' => 'Empty'],
         ['value' => 2, 'generic' => 1, 'graph' => 0, 'descr' => 'Initializing'],
         ['value' => 3, 'generic' => 0, 'graph' => 0, 'descr' => 'Working'],
-        ['value' => 4, 'generic' => 0, 'graph' => 0, 'descr' => 'Unplugged'],
+        ['value' => 4, 'generic' => 1, 'graph' => 0, 'descr' => 'Unplugged'],
         ['value' => 5, 'generic' => 2, 'graph' => 0, 'descr' => 'Failed'],
         ['value' => 6, 'generic' => 1, 'graph' => 0, 'descr' => 'UnknownCard'],
         ['value' => 11, 'generic' => 1, 'graph' => 0, 'descr' => 'BrandMismatch'],

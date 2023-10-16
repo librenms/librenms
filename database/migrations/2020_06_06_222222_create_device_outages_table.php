@@ -3,14 +3,14 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 
-class CreateDeviceOutagesTable extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::create('device_outages', function (Blueprint $table) {
             $table->bigIncrements('id');
@@ -34,9 +34,9 @@ class CreateDeviceOutagesTable extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::drop('device_outages');
         Schema::drop('availability');
     }
-}
+};

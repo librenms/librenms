@@ -1,0 +1,407 @@
+-- **********************************************************
+-- Copyright 2013-2018 VMware, Inc.  All rights reserved.
+-- **********************************************************
+
+VMWARE-VROPS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+    VmwLongDisplayString
+        FROM VMWARE-TC-MIB
+    vmwVrops
+       FROM VMWARE-PRODUCTS-MIB;
+
+vmwVropsMIB MODULE-IDENTITY
+    LAST-UPDATED "201806270000Z"
+    ORGANIZATION "VMware, Inc"
+    CONTACT-INFO
+        "VMware, Inc
+        3401 Hillview Ave
+        Palo Alto, CA 94304
+        Tel: 1-877-486-9273 or 650-427-5000
+        Fax: 650-427-5001
+        Web: http://kb.vmware.com/kb/1013445
+        "
+    DESCRIPTION
+        "This first versin of VMWARE-VROPS-MIB, it replaces VMWARE-VCOPS-MIB."
+    REVISION     "201806270000Z"
+    DESCRIPTION
+        "Initial MIB design."
+       ::= { vmwVrops 1 }
+
+--
+-- Top-level MIB groups
+--
+
+-- Group 0: Alerts sent as traps
+vmwAlertTrap OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+     "This group is actually the prefix one uses when creating
+      enterprise-specific trap OID's for an SNMP trap.  It is
+      used in the VMware MIB when defining traps."
+    ::= { vmwVropsMIB 0 }
+--
+-- Group 2: Generic data sent in All Alerts
+-- Generic data, in var-binds, that is associated with EVERY Alert
+--
+vmwGenericAlertData OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+     "This members of this group are the OIDs for VarBinds
+      that contain data for ALL Alerts."
+    ::= { vmwVropsMIB 2 }
+
+vmwAlertAliveServerName OBJECT-TYPE
+    SYNTAX VmwLongDisplayString
+    MAX-ACCESS accessible-for-notify
+    STATUS  current
+    DESCRIPTION
+    "The name of the vRealize Operations server that generated this alert."
+    ::= { vmwGenericAlertData 1 }
+
+vmwAlertEntityName OBJECT-TYPE
+    SYNTAX VmwLongDisplayString
+    MAX-ACCESS accessible-for-notify
+    STATUS  current
+    DESCRIPTION
+    "The resource name on which this alert was generated."
+    ::= { vmwGenericAlertData 2 }
+
+vmwAlertEntityType OBJECT-TYPE
+    SYNTAX VmwLongDisplayString
+    MAX-ACCESS accessible-for-notify
+    STATUS  current
+    DESCRIPTION
+    "The resource kind type on which this alert was generated."
+    ::= { vmwGenericAlertData 3 }
+
+vmwAlertTimestamp OBJECT-TYPE
+    SYNTAX VmwLongDisplayString
+    MAX-ACCESS accessible-for-notify
+    STATUS  current
+    DESCRIPTION
+    "The timestamp of the alert in UTC format."
+    ::= { vmwGenericAlertData 4 }
+
+vmwAlertCriticality OBJECT-TYPE
+    SYNTAX VmwLongDisplayString
+    MAX-ACCESS accessible-for-notify
+    STATUS  current
+    DESCRIPTION
+    "A text string describing the alert criticality level,
+    i.e. Info, Warning, Immediate and Critical."
+    ::= { vmwGenericAlertData 5 }
+
+vmwAlertRootCause OBJECT-TYPE
+    SYNTAX VmwLongDisplayString
+    MAX-ACCESS accessible-for-notify
+    STATUS  current
+    DESCRIPTION
+    "A text string describing the root-cause of the notification that was generated,
+    i.e. state, date  (human readable) and of the alert that was triggered."
+    ::= { vmwGenericAlertData 6 }
+
+vmwAlertURL OBJECT-TYPE
+    SYNTAX VmwLongDisplayString
+    MAX-ACCESS accessible-for-notify
+    STATUS  current
+    DESCRIPTION
+    "The URL of the 'Alert Summary' page of the alert that was generated."
+    ::= { vmwGenericAlertData 7 }
+
+vmwAlertID OBJECT-TYPE
+    SYNTAX VmwLongDisplayString
+    MAX-ACCESS accessible-for-notify
+    STATUS  current
+    DESCRIPTION
+    "The unique vRealize Operations identifier of the alert that was generated."
+    ::= { vmwGenericAlertData 8 }
+
+vmwAlertMessage OBJECT-TYPE
+   SYNTAX VmwLongDisplayString
+   MAX-ACCESS accessible-for-notify
+   STATUS   current
+   DESCRIPTION
+   "The detailed symptom level info message of the alert that was generated,
+   i.e. Symptom set id, affected object count,
+   name, criticality and id of the symptom,
+   metric/property name and violation"
+
+   ::= { vmwGenericAlertData 9 }
+
+vmwAlertType OBJECT-TYPE
+   SYNTAX VmwLongDisplayString
+   MAX-ACCESS accessible-for-notify
+   STATUS   current
+   DESCRIPTION
+   "The textual type description of the alert that was generated,
+   i.e. Application, Virtualization/Hypervisor, Hardware(OSI), Storage or Network"
+   ::= { vmwGenericAlertData 10 }
+
+
+vmwAlertSubtype OBJECT-TYPE
+   SYNTAX VmwLongDisplayString
+   MAX-ACCESS accessible-for-notify
+   STATUS   current
+   DESCRIPTION
+   "The textual subtype description of the alert that was generated, i.e.
+   Performance, Configuration, Availability, Capacity or Compliance"
+   ::= { vmwGenericAlertData 11 }
+
+vmwAlertHealth OBJECT-TYPE
+    SYNTAX SnmpAdminString
+    MAX-ACCESS accessible-for-notify
+    STATUS  current
+    DESCRIPTION
+    "Health badge state, i.e. Info, Warning, Immediate and Critical."
+    ::= { vmwGenericAlertData 12 }
+
+vmwAlertRisk OBJECT-TYPE
+    SYNTAX SnmpAdminString
+    MAX-ACCESS accessible-for-notify
+    STATUS  current
+    DESCRIPTION
+    "Risk badge state, i.e. Info, Warning, Immediate and Critical."
+    ::= { vmwGenericAlertData 13 }
+
+vmwAlertEfficiency OBJECT-TYPE
+    SYNTAX SnmpAdminString
+    MAX-ACCESS accessible-for-notify
+    STATUS  current
+    DESCRIPTION
+    "Efficiency badge state, i.e. Info, Warning, Immediate and Critical."
+    ::= { vmwGenericAlertData 14 }
+
+vmwAlertMetricName OBJECT-TYPE
+   SYNTAX SnmpAdminString
+    MAX-ACCESS accessible-for-notify
+    STATUS   current
+    DESCRIPTION
+    "The textual violated metric name of the one of the alarm of the alert that was generated."
+    ::= { vmwGenericAlertData 15 }
+
+vmwAlertResourceKind OBJECT-TYPE
+    SYNTAX SnmpAdminString
+    MAX-ACCESS accessible-for-notify
+    STATUS   current
+    DESCRIPTION
+    "Resource kind name of the object on which alert was generated."
+    ::= { vmwGenericAlertData 16 }
+
+vmwAlertDefinitionName OBJECT-TYPE
+    SYNTAX SnmpAdminString
+    MAX-ACCESS accessible-for-notify
+    STATUS  current
+    DESCRIPTION
+    "Description of the alert that was triggered"
+    ::= { vmwGenericAlertData 17 }
+
+vmwAlertDefinitionDesc OBJECT-TYPE
+    SYNTAX SnmpAdminString
+    MAX-ACCESS accessible-for-notify
+    STATUS  current
+    DESCRIPTION
+    "Detailed description of the alert that was triggered"
+    ::= { vmwGenericAlertData 18 }
+
+vmwAlertImpact OBJECT-TYPE
+    SYNTAX SnmpAdminString
+    MAX-ACCESS accessible-for-notify
+    STATUS  current
+    DESCRIPTION
+    "Badge impact of the alert that was triggered, i.e. Health, Risk or Efficiency
+    See More:
+    https://docs-staging.vmware.com/en/vRealize-Operations-Manager/6.7/com.vmware.vcom.metrics.doc/GUID-D04D495F-6FA7-483F-9EC9-C0EC35A6D887.html"
+    ::= { vmwGenericAlertData 19 }
+
+vmwAlertNotificationRules OBJECT-TYPE
+    SYNTAX VmwLongDisplayString
+    MAX-ACCESS accessible-for-notify
+    STATUS  current
+    DESCRIPTION
+    "The notification rules through which notification was generated.
+    See more;
+    https://docs-staging.vmware.com/en/vRealize-Operations-Manager/6.7/com.vmware.vcom.config.doc/GUID-A81D8798-46D5-43E6-B717-226769B5A9B0.html"
+    ::= { vmwGenericAlertData 20 }
+
+vmwTrapProblemActive NOTIFICATION-TYPE
+   OBJECTS {
+       vmwAlertAliveServerName,
+       vmwAlertEntityName,
+       vmwAlertEntityType,
+       vmwAlertTimestamp,
+       vmwAlertCriticality,
+       vmwAlertRootCause,
+       vmwAlertURL,
+       vmwAlertID,
+       vmwAlertMessage,
+       vmwAlertType,
+       vmwAlertSubtype,
+       vmwAlertHealth,
+       vmwAlertRisk,
+       vmwAlertEfficiency,
+       vmwAlertMetricName,
+       vmwAlertResourceKind,
+       vmwAlertDefinitionName,
+       vmwAlertDefinitionDesc,
+       vmwAlertImpact,
+       vmwAlertNotificationRules
+   }
+   STATUS current
+   DESCRIPTION
+   "A trap describing a Problem Alert that indicates a Abnormality condition
+    became active."
+   ::= { vmwAlertTrap 46 }
+
+vmwTrapProblemClear NOTIFICATION-TYPE
+   OBJECTS {
+       vmwAlertAliveServerName,
+       vmwAlertEntityName,
+       vmwAlertEntityType,
+       vmwAlertTimestamp,
+       vmwAlertCriticality,
+       vmwAlertRootCause,
+       vmwAlertURL,
+       vmwAlertID,
+       vmwAlertMessage,
+       vmwAlertType,
+       vmwAlertSubtype,
+       vmwAlertHealth,
+       vmwAlertRisk,
+       vmwAlertEfficiency,
+       vmwAlertMetricName,
+       vmwAlertResourceKind,
+       vmwAlertDefinitionName,
+       vmwAlertDefinitionDesc,
+       vmwAlertImpact,
+       vmwAlertNotificationRules
+   }
+   STATUS current
+   DESCRIPTION
+   "A trap describing a Problem Alert that indicates a Abnormality condition
+    became inactive."
+   ::= { vmwAlertTrap 47 }
+
+vmwTrapProblemChange NOTIFICATION-TYPE
+    OBJECTS {
+        vmwAlertAliveServerName,
+        vmwAlertEntityName,
+        vmwAlertEntityType,
+        vmwAlertTimestamp,
+        vmwAlertCriticality,
+        vmwAlertRootCause,
+        vmwAlertURL,
+        vmwAlertID,
+        vmwAlertMessage,
+        vmwAlertType,
+        vmwAlertSubtype,
+        vmwAlertMetricName,
+        vmwAlertResourceKind,
+        vmwAlertHealth,
+        vmwAlertRisk,
+        vmwAlertEfficiency,
+        vmwAlertDefinitionName,
+        vmwAlertDefinitionDesc,
+        vmwAlertImpact,
+        vmwAlertNotificationRules
+    }
+    STATUS current
+    DESCRIPTION
+    "A trap describing a Problem Alert that indicates a Abnormality condition
+     has changed one of its parameters' value."
+    ::= { vmwAlertTrap 48 }
+
+-- Trap for functional testing.
+--
+
+vmwTrapTest NOTIFICATION-TYPE
+   OBJECTS {
+      vmwAlertAliveServerName,
+      vmwAlertEntityName,
+      vmwAlertEntityType,
+      vmwAlertTimestamp,
+      vmwAlertCriticality,
+      vmwAlertRootCause,
+      vmwAlertURL,
+      vmwAlertID,
+      vmwAlertMessage,
+      vmwAlertType,
+      vmwAlertSubtype,
+      vmwAlertMetricName,
+      vmwAlertResourceKind,
+      vmwAlertHealth,
+      vmwAlertRisk,
+      vmwAlertEfficiency,
+      vmwAlertDefinitionName,
+      vmwAlertDefinitionDesc,
+      vmwAlertImpact,
+      vmwAlertNotificationRules
+   }
+   STATUS current
+   DESCRIPTION
+   "Trap for testing purposes."
+   ::= { vmwAlertTrap 200 }
+
+-- conformance information
+vmwVROPSMIBConformance OBJECT IDENTIFIER ::= { vmwVropsMIB 99 }
+vmwVROPSMIBCompliances OBJECT IDENTIFIER ::= { vmwVROPSMIBConformance 1 }
+vmwVROPSMIBGroups OBJECT IDENTIFIER ::= { vmwVROPSMIBConformance 2 }
+
+-- compliance statements
+vmwVROPSMIBBasicCompliance MODULE-COMPLIANCE
+    STATUS     current
+    DESCRIPTION
+        "The compliance statement for entities which implement VMWARE-VROPS-MIB."
+    MODULE -- this module
+    MANDATORY-GROUPS { vmwVROPSNotificationInfoGroup, vmwVROPSNotificationGroup }
+    ::= { vmwVROPSMIBCompliances 1 }
+
+vmwVROPSNotificationInfoGroup OBJECT-GROUP
+    OBJECTS {
+        vmwAlertAliveServerName,
+        vmwAlertEntityName,
+        vmwAlertEntityType,
+        vmwAlertTimestamp,
+        vmwAlertCriticality,
+        vmwAlertRootCause,
+        vmwAlertURL,
+        vmwAlertID,
+        vmwAlertMessage,
+        vmwAlertType,
+        vmwAlertSubtype,
+        vmwAlertMetricName,
+        vmwAlertResourceKind,
+        vmwAlertHealth,
+        vmwAlertRisk,
+        vmwAlertEfficiency,
+        vmwAlertDefinitionName,
+        vmwAlertDefinitionDesc,
+        vmwAlertImpact,
+        vmwAlertNotificationRules
+    }
+    STATUS current
+    DESCRIPTION
+        "These objects provide details in vRealize Operations notifications."
+    ::= { vmwVROPSMIBGroups 1 }
+
+
+vmwVROPSNotificationGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        vmwTrapTest,
+        vmwTrapProblemActive,
+        vmwTrapProblemClear,
+        vmwTrapProblemChange
+    }
+    STATUS current
+    DESCRIPTION
+        "Group of objects describing traps supported for this
+        version of this mib modules."
+    ::= { vmwVROPSMIBGroups 2 }
+
+END

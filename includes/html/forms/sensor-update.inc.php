@@ -38,7 +38,7 @@ if (! is_numeric($device_id)) {
 } elseif (! isset($data)) {
     $message = 'Missing data';
 } else {
-    if (dbUpdate([$value_type => set_null($data, ['NULL']), 'sensor_custom' => 'Yes'], 'sensors', '`sensor_id` = ? AND `device_id` = ?', [$sensor_id, $device_id]) >= 0) {
+    if (dbUpdate([$value_type => set_null($data), 'sensor_custom' => 'Yes'], 'sensors', '`sensor_id` = ? AND `device_id` = ?', [$sensor_id, $device_id]) >= 0) {
         $message = 'Sensor value updated';
         $status = 'ok';
     } else {

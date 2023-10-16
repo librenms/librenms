@@ -26,7 +26,7 @@
 namespace App\Http\Controllers\Device\Tabs;
 
 use App\Models\Device;
-use DB;
+use Illuminate\Support\Facades\DB;
 use LibreNMS\Interfaces\UI\DeviceTab;
 
 class ProcessesController implements DeviceTab

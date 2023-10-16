@@ -31,15 +31,17 @@
 
 namespace LibreNMS\Alert;
 
+use App\Models\Eventlog;
 use Carbon\Carbon;
+use Illuminate\Database\QueryException;
 use LibreNMS\Enum\AlertState;
+use LibreNMS\Enum\Severity;
 use Log;
 
 class AlertRules
 {
     public function runRules($device_id)
     {
-
         //Check to see if under maintenance
         if (AlertUtil::isMaintenance($device_id) > 0) {
             echo "Under Maintenance, skipping alert rules check.\r\n";
@@ -70,14 +72,26 @@ class AlertRules
                 $rule['query'] = AlertDB::genSQL($rule['rule'], $rule['builder']);
             }
             $sql = $rule['query'];
-            $qry = dbFetchRows($sql, [$device_id]);
+
+            // set fetch assoc
+            global $PDO_FETCH_ASSOC;
+            $PDO_FETCH_ASSOC = true;
+            try {
+                $qry = \DB::select($sql, [$device_id]);
+            } catch (QueryException $e) {
+                c_echo('%RError: %n' . $e->getMessage() . PHP_EOL);
+                Eventlog::log("Error in alert rule {$rule['name']} ({$rule['id']}): " . $e->getMessage(), $device_id, 'alert', Severity::Error);
+                continue; // skip this rule
+            }
+            $PDO_FETCH_ASSOC = false;
+
             $cnt = count($qry);
             for ($i = 0; $i < $cnt; $i++) {
                 if (isset($qry[$i]['ip'])) {
                     $qry[$i]['ip'] = inet6_ntop($qry[$i]['ip']);
                 }
             }
-            $s = sizeof($qry);
+            $s = count($qry);
             if ($s == 0 && $inv === false) {
                 $doalert = false;
             } elseif ($s > 0 && $inv === false) {

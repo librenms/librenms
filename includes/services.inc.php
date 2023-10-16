@@ -165,7 +165,7 @@ function poll_service($service)
         // rrd definition
         $rrd_def = new RrdDefinition();
         foreach ($perf as $k => $v) {
-            if (($v['uom'] == 'c') && ! (preg_match('/[Uu]ptime/', $k))) {
+            if (($v['uom'] == 'c') && ! preg_match('/[Uu]ptime/', $k)) {
                 // This is a counter, create the DS as such
                 $rrd_def->addDataset($k, 'COUNTER', 0);
             } else {
@@ -259,7 +259,7 @@ function check_service($command)
         [$ds,$values] = explode('=', trim($string));
 
         // Keep the first value, discard the others.
-        [$value,,,] = explode(';', trim($values));
+        [$value] = explode(';', trim($values));
         $value = trim($value);
 
         // Set an empty uom

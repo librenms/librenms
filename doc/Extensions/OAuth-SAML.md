@@ -392,6 +392,7 @@ Now we just need to define the listener service within LibreNMS:
 ### SESSION_SAME_SITE_COOKIE
 
 You most likely will need to set `SESSION_SAME_SITE_COOKIE=none` in `.env` if you use SAML2!
+If you get an error with http code 419, you should try to remove `SESSION_SAME_SITE_COOKIE=none` from your `.env`.
 
 !!! note
     Don't forget to run `lnms config:clear` after you modify `.env` to flush the config cache

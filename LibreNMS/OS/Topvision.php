@@ -26,6 +26,7 @@
 namespace LibreNMS\OS;
 
 use App\Models\Device;
+use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\RRD\RrdDefinition;
 
@@ -40,7 +41,7 @@ class Topvision extends \LibreNMS\OS implements OSPolling
         }
     }
 
-    public function pollOS(): void
+    public function pollOS(DataStorageInterface $datastore): void
     {
         $cmstats = snmp_get_multi_oid($this->getDeviceArray(), ['.1.3.6.1.4.1.32285.11.1.1.2.2.3.1.0', '.1.3.6.1.4.1.32285.11.1.1.2.2.3.6.0', '.1.3.6.1.4.1.32285.11.1.1.2.2.3.5.0']);
         if (is_numeric($cmstats['.1.3.6.1.4.1.32285.11.1.1.2.2.3.1.0'])) {
@@ -49,7 +50,7 @@ class Topvision extends \LibreNMS\OS implements OSPolling
                 'cmtotal' => $cmstats['.1.3.6.1.4.1.32285.11.1.1.2.2.3.1.0'],
             ];
             $tags = compact('rrd_def');
-            data_update($this->getDeviceArray(), 'topvision_cmtotal', $tags, $fields);
+            $datastore->put($this->getDeviceArray(), 'topvision_cmtotal', $tags, $fields);
             $this->enableGraph('topvision_cmtotal');
         }
 
@@ -59,7 +60,7 @@ class Topvision extends \LibreNMS\OS implements OSPolling
                 'cmreg' => $cmstats['.1.3.6.1.4.1.32285.11.1.1.2.2.3.6.0'],
             ];
             $tags = compact('rrd_def');
-            data_update($this->getDeviceArray(), 'topvision_cmreg', $tags, $fields);
+            $datastore->put($this->getDeviceArray(), 'topvision_cmreg', $tags, $fields);
             $this->enableGraph('topvision_cmreg');
         }
 
@@ -69,7 +70,7 @@ class Topvision extends \LibreNMS\OS implements OSPolling
                 'cmoffline' => $cmstats['.1.3.6.1.4.1.32285.11.1.1.2.2.3.5.0'],
             ];
             $tags = compact('rrd_def');
-            data_update($this->getDeviceArray(), 'topvision_cmoffline', $tags, $fields);
+            $datastore->put($this->getDeviceArray(), 'topvision_cmoffline', $tags, $fields);
             $this->enableGraph('topvision_cmoffline');
         }
     }

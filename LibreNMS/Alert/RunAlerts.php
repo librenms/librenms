@@ -31,10 +31,11 @@
 namespace LibreNMS\Alert;
 
 use App\Facades\DeviceCache;
+use App\Models\AlertTransport;
 use App\Models\Eventlog;
 use LibreNMS\Config;
-use LibreNMS\Enum\Alert;
 use LibreNMS\Enum\AlertState;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
 use LibreNMS\Polling\ConnectivityHelper;
 use LibreNMS\Util\Time;
@@ -253,8 +254,9 @@ class RunAlerts
         $obj = $this->describeAlert($alert);
         if (is_array($obj)) {
             echo 'Issuing Alert-UID #' . $alert['id'] . '/' . $alert['state'] . ':' . PHP_EOL;
-            $this->extTransports($obj);
-
+            if ($alert['state'] != AlertState::ACKNOWLEDGED || Config::get('alert.acknowledged') === true) {
+                $this->extTransports($obj);
+            }
             echo "\r\n";
         }
 
@@ -299,8 +301,8 @@ class RunAlerts
                         $chk[$i]['ip'] = inet6_ntop($chk[$i]['ip']);
                     }
                 }
-                $o = sizeof($alert['details']['rule']);
-                $n = sizeof($chk);
+                $o = count($alert['details']['rule']);
+                $n = count($chk);
                 $ret = 'Alert #' . $alert['id'];
                 $state = AlertState::CLEAR;
                 if ($n > $o) {
@@ -448,7 +450,7 @@ class RunAlerts
 
             if ($this->isParentDown($alert['device_id'])) {
                 $noiss = true;
-                Eventlog::log('Skipped alerts because all parent devices are down', $alert['device_id'], 'alert', 1);
+                Eventlog::log('Skipped alerts because all parent devices are down', $alert['device_id'], 'alert', Severity::Ok);
             }
 
             if ($alert['state'] == AlertState::RECOVERED && $rextra['recovery'] == false) {
@@ -506,11 +508,11 @@ class RunAlerts
                 $obj['msg'] = $type->getBody($obj);
                 c_echo(" :: $transport_title => ");
                 try {
-                    $instance = new $class($item['transport_id']);
+                    $instance = new $class(AlertTransport::find($item['transport_id']));
                     $tmp = $instance->deliverAlert($obj, $item['opts'] ?? []);
                     $this->alertLog($tmp, $obj, $obj['transport']);
                 } catch (AlertTransportDeliveryException $e) {
-                    Eventlog::log($e->getMessage(), $obj['device_id'], 'alert', Alert::ERROR);
+                    Eventlog::log($e->getTraceAsString() . PHP_EOL . $e->getMessage(), $obj['device_id'], 'alert', Severity::Error);
                     $this->alertLog($e->getMessage(), $obj, $obj['transport']);
                 } catch (\Exception $e) {
                     $this->alertLog($e, $obj, $obj['transport']);
@@ -536,25 +538,22 @@ class RunAlerts
             AlertState::BETTER => 'got better',
         ];
 
-        if ($obj['state'] == AlertState::RECOVERED) {
-            $severity = Alert::OK;
-        } elseif ($obj['state'] == AlertState::ACTIVE) {
-            $severity = Alert::SEVERITIES[$obj['severity']] ?? Alert::UNKNOWN;
-        } elseif ($obj['state'] == AlertState::ACKNOWLEDGED) {
-            $severity = Alert::NOTICE;
-        } else {
-            $severity = Alert::UNKNOWN;
-        }
+        $severity = match ($obj['state']) {
+            AlertState::RECOVERED => Severity::Ok,
+            AlertState::ACTIVE => Severity::tryFrom((int) $obj['severity']) ?? Severity::Unknown,
+            AlertState::ACKNOWLEDGED => Severity::Notice,
+            default => Severity::Unknown,
+        };
 
         if ($result === true) {
             echo 'OK';
             Eventlog::log('Issued ' . $prefix[$obj['state']] . " for rule '" . $obj['name'] . "' to transport '" . $transport . "'", $obj['device_id'], 'alert', $severity);
         } elseif ($result === false) {
             echo 'ERROR';
-            Eventlog::log('Could not issue ' . $prefix[$obj['state']] . " for rule '" . $obj['name'] . "' to transport '" . $transport . "'", $obj['device_id'], null, Alert::ERROR);
+            Eventlog::log('Could not issue ' . $prefix[$obj['state']] . " for rule '" . $obj['name'] . "' to transport '" . $transport . "'", $obj['device_id'], null, Severity::Error);
         } else {
             echo "ERROR: $result\r\n";
-            Eventlog::log('Could not issue ' . $prefix[$obj['state']] . " for rule '" . $obj['name'] . "' to transport '" . $transport . "' Error: " . $result, $obj['device_id'], 'error', Alert::ERROR);
+            Eventlog::log('Could not issue ' . $prefix[$obj['state']] . " for rule '" . $obj['name'] . "' to transport '" . $transport . "' Error: " . $result, $obj['device_id'], 'error', Severity::Error);
         }
     }
 

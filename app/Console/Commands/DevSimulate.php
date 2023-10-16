@@ -116,14 +116,14 @@ class DevSimulate extends LnmsCommand
     {
         if (function_exists('pcntl_signal')) {
             pcntl_signal(SIGINT, function () {
-                exit(); // exit normally on SIGINT
+                exit; // exit normally on SIGINT
             });
         }
 
         register_shutdown_function(function () use ($device_id) {
             Device::findOrNew($device_id)->delete();
             $this->info(trans('commands.dev:simulate.removed', ['id' => $device_id]));
-            exit();
+            exit;
         });
     }
 

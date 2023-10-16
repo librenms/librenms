@@ -4,6 +4,7 @@ type: server
 text: VMware vCenter
 icon: vmware
 mib_dir: vmware
+ifname: true
 over:
     - { graph: device_bits, text: 'Device Traffic' }
 discovery:

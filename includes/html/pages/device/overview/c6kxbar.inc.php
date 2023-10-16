@@ -85,7 +85,7 @@ foreach ($entity_state['group']['c6kxbar'] as $index => $entry) {
                 <td></td>
                 <td><strong>Fabric ' . $subindex . "</strong></td>
                 <td><span style='font-weight: bold;' class=" . $fabric['mode_class'] . '>' . $fabric['cc6kxbarModuleChannelFabStatus'] . '</span></td>
-                <td>' . \LibreNMS\Util\Number::formatSi(($fabric['cc6kxbarModuleChannelSpeed'] * 1000000), 2, 3, 'bps') . '</td>
+                <td>' . \LibreNMS\Util\Number::formatSi($fabric['cc6kxbarModuleChannelSpeed'] * 1000000, 2, 3, 'bps') . '</td>
                 <td>' . \LibreNMS\Util\Url::overlibLink($link, $minigraph, $overlib_content) . '</td>
                 <td>' . print_percentage_bar(125, 20, $percent_in, 'Ingress', 'ffffff', $background_in['left'], $percent_in . '%', 'ffffff', $background_in['right']) . '</td>
                 <td>' . print_percentage_bar(125, 20, $percent_out, 'Egress', 'ffffff', $background_out['left'], $percent_out . '%', 'ffffff', $background_out['right']) . '</td>

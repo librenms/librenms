@@ -16,8 +16,6 @@ discovery_modules:
     applications: false
     bgp-peers: false
     stp: false
-    vmware-vminfo: false
-    libvirt-vminfo: false
     wireless: false
 processor_stacked: true
 discovery:

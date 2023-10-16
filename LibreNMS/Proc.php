@@ -260,7 +260,6 @@ class Proc
      */
     public function isRunning()
     {
-        /* @phpstan-ignore-next-line */
         if (! is_resource($this->_process)) {
             return false;
         }

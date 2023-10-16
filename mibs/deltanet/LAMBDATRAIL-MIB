@@ -1,0 +1,1147 @@
+LAMBDATRAIL-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+   enterprises, private, NetworkAddress,
+   IpAddress, Counter, Gauge, TimeTicks
+      FROM RFC1155-SMI
+   OBJECT-TYPE
+      FROM RFC-1212;
+
+          DisplayString ::=
+              OCTET STRING
+          -- This data type is used to model textual information taken
+          -- from the NVT ASCII character set.  By convention, objects
+          -- with this syntax are declared as having
+
+
+
+          --
+          --      SIZE (0..255)
+
+          PhysAddress ::=
+              OCTET STRING
+          -- This data type is used to model media addresses.  For many
+          -- types of media, this will be in a binary representation.
+          -- For example, an ethernet address would be represented as
+          -- a string of 6 octets.
+
+-- revision date: Apr. 09, 2010
+
+deltanet OBJECT IDENTIFIER ::= { enterprises 35616 }
+
+-- Deltanet AG Specific Objects
+
+snmpAgent         OBJECT IDENTIFIER ::= { deltanet 1 }
+productType       OBJECT IDENTIFIER ::= { deltanet 2 }
+
+cwdm              OBJECT IDENTIFIER ::= { productType 1 }
+
+lambdatrail       OBJECT IDENTIFIER ::= { cwdm 1 }
+
+-- Software group
+
+agentSw           OBJECT IDENTIFIER ::= { snmpAgent 1 }
+
+agentSoftwareMajorVer OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The major software version number of the agent
+                run time image."
+        ::= { agentSw 1 }
+
+agentSoftwareMinorVer OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The minor software version number of the agent
+                run time image."
+        ::= { agentSw 2 }
+
+agentOutBandBaudRate OBJECT-TYPE
+        SYNTAX  INTEGER {
+                b9600(9600),
+                b19200(19200),
+                b38400(38400),
+                b57600(57600),
+                b115200(115200)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "The baud rate setting for the out-of-band port."
+        ::= { snmpAgent 2 }
+
+agentConsoleIdleTimeouts OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "timeouts is 0 or 60-86400, unit is second, 0: never idle,
+                default is 600"
+        ::= { snmpAgent 3 }
+
+agentPrompt OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (1..31))
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                " "
+        ::= { snmpAgent 4 }
+
+agentBootMethod OBJECT-TYPE
+        SYNTAX  INTEGER {
+                manual(1),
+                dhcp(2)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                " "
+        ::= { snmpAgent 5 }
+
+agentIpAddr OBJECT-TYPE
+        SYNTAX  IpAddress
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+              "The agent's administrative IP address.  The
+              current operational IP address can be obtained from
+              the ipAdEntAddr in the ipAddrTable.  This parameter
+              will take effect only after a agent restart or
+              agent reset.  This parameter will always be updated
+              in the EEPROM."
+        ::= { snmpAgent 6 }
+
+agentIpNetMask OBJECT-TYPE
+        SYNTAX  IpAddress
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+              "The agent's administrative IP subnet mask.  The
+              current operational IP subnet mask can be obtained from
+              the ipAdEntMask in the ipAddrTable.  This parameter
+              will take effect only after a agent restart or
+              agent reset.  This parameter will always be updated
+              in the EEPROM."
+        ::= { snmpAgent 7 }
+
+agentDefaultGateway OBJECT-TYPE
+        SYNTAX  IpAddress
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+              "The agent's administrative default gateway IP address.
+              The current operational IP default gateway IP address
+              can be obtained from the ipRouteDest in the ipRouteTable.
+              This parameter will take effect only after a agent restart or
+              agent reset.  This parameter will always be updated
+              in the EEPROM."
+        ::= { snmpAgent 8 }
+
+agentPrimaryDnsServer OBJECT-TYPE
+        SYNTAX  IpAddress
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                " "
+        ::= { snmpAgent 9 }
+
+agentSecondaryDnsServer OBJECT-TYPE
+        SYNTAX  IpAddress
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                " "
+        ::= { snmpAgent 10 }
+
+agentSnmpServer OBJECT-TYPE
+        SYNTAX  INTEGER {
+                off(1),
+                on(2)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                " "
+        ::= { snmpAgent 11 }
+
+agentHttpServer OBJECT-TYPE
+        SYNTAX  INTEGER {
+                off(1),
+                on(2)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                " "
+        ::= { snmpAgent 12 }
+
+agentTelnet OBJECT IDENTIFIER ::= { snmpAgent 13 }
+
+agentTelnetServer OBJECT-TYPE
+        SYNTAX  INTEGER {
+                off(1),
+                on(2)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                " "
+        ::= { agentTelnet 1 }
+
+agentTelnetIdleTimeouts OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "timeouts is 0 or 60-86400, unit is second, 0: never idle,
+                default is 600"
+        ::= { agentTelnet 2 }
+
+agentTelnetMaxSessions OBJECT-TYPE
+        SYNTAX  INTEGER (1..4)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                " "
+        ::= { agentTelnet 3 }
+
+agentFtpServer OBJECT-TYPE
+        SYNTAX  INTEGER {
+                off(1),
+                on(2)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                " "
+        ::= { snmpAgent 14 }
+
+agentTftpServer OBJECT-TYPE
+        SYNTAX  INTEGER {
+                off(1),
+                on(2)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                " "
+        ::= { snmpAgent 15 }
+
+-- the agent trap target group
+
+agentSendTrap OBJECT-TYPE
+        SYNTAX  INTEGER {
+                off(1),
+                on(2)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                " "
+        ::= { snmpAgent 16 }
+
+agentTrapTargetTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF AgentTrapTargetEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                " "
+        ::= { snmpAgent 17 }
+
+agentTrapTargetEntry OBJECT-TYPE
+        SYNTAX  AgentTrapTargetEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                " "
+        INDEX { agentTrapIndex }
+        ::= { agentTrapTargetTable 1 }
+
+AgentTrapTargetEntry ::= SEQUENCE {
+        agentTrapIndex            INTEGER,
+        agentTrapTargetIpAddr     IpAddress,
+        agentTrapTargetComm       DisplayString
+        }
+
+agentTrapIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                " "
+        ::= { agentTrapTargetEntry 1 }
+
+agentTrapTargetIpAddr OBJECT-TYPE
+        SYNTAX  IpAddress
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                " "
+        ::= { agentTrapTargetEntry 2 }
+
+agentTrapTargetComm OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..31))
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                " "
+        ::= { agentTrapTargetEntry 3 }
+
+-- the agent email alert group
+
+agentEmailAlert OBJECT IDENTIFIER ::= { snmpAgent 18 }
+
+agentSendEmailAlert OBJECT-TYPE
+        SYNTAX  INTEGER {
+                off(1),
+                on(2)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                " "
+        ::= { agentEmailAlert 1 }
+
+agentEmailServerIpAddr OBJECT-TYPE
+        SYNTAX  IpAddress
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                " "
+        ::= { agentEmailAlert 2 }
+
+agentRecipientTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF AgentRecipientEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                " "
+        ::= { agentEmailAlert 3 }
+
+agentRecipientEntry OBJECT-TYPE
+        SYNTAX  AgentRecipientEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                " "
+        INDEX { agentRecipientIndex }
+        ::= { agentRecipientTable 1 }
+
+AgentRecipientEntry ::= SEQUENCE {
+        agentRecipientIndex            INTEGER,
+        agentRecipientEmailAddress       DisplayString
+        }
+
+agentRecipientIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                " "
+        ::= { agentRecipientEntry 1 }
+
+agentRecipientEmailAddress OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..47))
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                " "
+        ::= { agentRecipientEntry 2 }
+
+-- the agent syslog group
+
+agentSyslog OBJECT IDENTIFIER ::= { snmpAgent 19 }
+
+agentSyslogOnOff OBJECT-TYPE
+        SYNTAX  INTEGER {
+                off(1),
+                on(2)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                " "
+        ::= { agentSyslog 1 }
+
+agentSaveLogsToFlash OBJECT-TYPE
+        SYNTAX  INTEGER {
+                off(1),
+                on(2)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                " "
+        ::= { agentSyslog 2 }
+
+agentClearAllLogs OBJECT-TYPE
+        SYNTAX  INTEGER {
+                none(1),
+                access(2)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                " "
+        ::= { agentSyslog 3 }
+
+agentSyslogServerTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF AgentSyslogServerEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                " "
+        ::= { agentSyslog 4 }
+
+agentSyslogServerEntry OBJECT-TYPE
+        SYNTAX  AgentSyslogServerEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                " "
+        INDEX { agentSyslogServerIndex }
+        ::= { agentSyslogServerTable 1 }
+
+AgentSyslogServerEntry ::= SEQUENCE {
+        agentSyslogServerIndex            INTEGER,
+        agentSyslogServerIpAddr           IpAddress
+        }
+
+agentSyslogServerIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                " "
+        ::= { agentSyslogServerEntry 1 }
+
+agentSyslogServerIpAddr OBJECT-TYPE
+        SYNTAX  IpAddress
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                " "
+        ::= { agentSyslogServerEntry 2 }
+
+-- the agent secure ip group
+
+agentSecureIp OBJECT IDENTIFIER ::= { snmpAgent 20 }
+
+agentSecureIpOnOff OBJECT-TYPE
+        SYNTAX  INTEGER {
+                off(1),
+                on(2)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                " "
+        ::= { agentSecureIp 1 }
+
+agentSecureIpTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF AgentSecureIpEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                " "
+        ::= { agentSecureIp 2 }
+
+agentSecureIpEntry OBJECT-TYPE
+        SYNTAX  AgentSecureIpEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                " "
+        INDEX { agentSecureIpIndex }
+        ::= { agentSecureIpTable 1 }
+
+AgentSecureIpEntry ::= SEQUENCE {
+        agentSecureIpIndex            INTEGER,
+        agentSecureIpAddr             IpAddress
+        }
+
+agentSecureIpIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                " "
+        ::= { agentSecureIpEntry 1 }
+
+agentSecureIpAddr OBJECT-TYPE
+        SYNTAX  IpAddress
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                " "
+        ::= { agentSecureIpEntry 2 }
+
+-- the agent ntp group
+
+agentTime OBJECT IDENTIFIER ::= { snmpAgent 21 }
+
+agentNtpClientOnOff OBJECT-TYPE
+        SYNTAX  INTEGER {
+                off(1),
+                on(2)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                " "
+        ::= { agentTime 1 }
+
+agentNtpServerIpAddr OBJECT-TYPE
+        SYNTAX  IpAddress
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                " "
+        ::= { agentTime 2 }
+
+agentNtpUpdateInterval OBJECT-TYPE
+        SYNTAX  INTEGER (60..86400)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "unit is second"
+        ::= { agentTime 3 }
+
+agentTimeZoneName OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..8))
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                " "
+        ::= { agentTime 4 }
+
+agentTimeZoneHoursOffsetWithGMT OBJECT-TYPE
+        SYNTAX  INTEGER (-23..23)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                " "
+        ::= { agentTime 5 }
+
+agentTimeZoneMinutesOffsetWithGMT OBJECT-TYPE
+        SYNTAX  INTEGER (0..59)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                " "
+        ::= { agentTime 6 }
+
+agentSummerTime OBJECT-TYPE
+        SYNTAX  INTEGER {
+                summer(1),
+                Sun(2),
+                lastSun(3),
+                manual(4)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                " "
+        ::= { agentTime 7 }
+
+agentSummerTimeBeginMonth OBJECT-TYPE
+        SYNTAX  INTEGER {
+                jan(1),
+                feb(2),
+                mar(3),
+                apr(4),
+                may(5),
+                jun(6),
+                jul(7),
+                aug(8),
+                sep(9),
+                oct(10),
+                nov(11),
+                dec(12)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                " "
+        ::= { agentTime 8 }
+
+agentSummerTimeBeginNth OBJECT-TYPE
+        SYNTAX  INTEGER {
+                first(1),
+                second(2),
+                third(3),
+                fourth(4),
+                last(5)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                " "
+        ::= { agentTime 9 }
+
+agentSummerTimeBeginWeekday OBJECT-TYPE
+        SYNTAX  INTEGER {
+                sun(1),
+                mon(2),
+                tue(3),
+                wed(4),
+                thu(5),
+                fri(6),
+                sat(7)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                " "
+        ::= { agentTime 10 }
+
+agentSummerTimeBeginHour OBJECT-TYPE
+        SYNTAX  INTEGER (0..23)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                " "
+        ::= { agentTime 11 }
+
+agentSummerTimeBeginMinute OBJECT-TYPE
+        SYNTAX  INTEGER (0..59)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                " "
+        ::= { agentTime 12 }
+
+agentSummerTimeEndMonth OBJECT-TYPE
+        SYNTAX  INTEGER {
+                jan(1),
+                feb(2),
+                mar(3),
+                apr(4),
+                may(5),
+                jun(6),
+                jul(7),
+                aug(8),
+                sep(9),
+                oct(10),
+                nov(11),
+                dec(12)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                " "
+        ::= { agentTime 13 }
+
+agentSummerTimeEndNth OBJECT-TYPE
+        SYNTAX  INTEGER {
+                first(1),
+                second(2),
+                third(3),
+                fourth(4),
+                last(5)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                " "
+        ::= { agentTime 14 }
+
+agentSummerTimeEndWeekday OBJECT-TYPE
+        SYNTAX  INTEGER {
+                sun(1),
+                mon(2),
+                tue(3),
+                wed(4),
+                thu(5),
+                fri(6),
+                sat(7)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                " "
+        ::= { agentTime 15 }
+
+agentSummerTimeEndHour OBJECT-TYPE
+        SYNTAX  INTEGER (0..23)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                " "
+        ::= { agentTime 16 }
+
+agentSummerTimeEndMinute OBJECT-TYPE
+        SYNTAX  INTEGER (0..59)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                " "
+        ::= { agentTime 17 }
+
+agentSaveRunningCfg OBJECT-TYPE
+        SYNTAX  INTEGER {
+                none(1),
+                saveConfiguration(2)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+              "Set this variable will save current configuration.
+              the value will be reset to 1 after succeed."
+        ::= { snmpAgent 22 }
+
+agentDefault OBJECT IDENTIFIER ::= { snmpAgent 23 }
+
+agentKeepCurrentIP OBJECT-TYPE
+        SYNTAX  INTEGER {
+                none(1),
+                keepCurrentIP(2)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+              "Set this variable will keep current IP configuration
+               (IP address, Subnet Mask, Default Gateway and Domain Name Servers).
+              the value will be reset to 1 after succeed."
+        ::= { agentDefault 1 }
+
+agentKeepCurrentSNMP OBJECT-TYPE
+        SYNTAX  INTEGER {
+                none(1),
+                keepCurrentSNMP(2)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+              "Set this variable will keep current SNMP settings
+              (System information, SNMP communities and SNMP Trap information).
+              the value will be reset to 1 after succeed."
+        ::= { agentDefault 2 }
+
+agentKeepCurrentPort OBJECT-TYPE
+        SYNTAX  INTEGER {
+                none(1),
+                keepCurrentPort(2)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+              "Set this variable will keep current port settings.
+              the value will be reset to 1 after succeed."
+        ::= { agentDefault 3 }
+
+agentKeepCurrentUser OBJECT-TYPE
+        SYNTAX  INTEGER {
+                none(1),
+                keepCurrentUser(2)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+              "Set this variable will keep current User settings.
+              the value will be reset to 1 after succeed."
+        ::= { agentDefault 4 }
+
+agentFactoryDefault OBJECT-TYPE
+        SYNTAX  INTEGER {
+                none(1),
+                factoryDefault(2)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+              "Set this variable will use factory default configuration and reload.
+              the value will be reset to 1 after succeed."
+        ::= { agentDefault 5 }
+
+agentReloadSystem OBJECT-TYPE
+        SYNTAX  INTEGER {
+                none(1),
+                reloadSystem(2)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+              "Set this variable will reload system.
+              the value will be reset to 1 after succeed."
+        ::= { snmpAgent 24 }
+
+agentTftpUpgrade OBJECT IDENTIFIER ::= { snmpAgent 25 }
+
+agentTftpServerIpAddr OBJECT-TYPE
+        SYNTAX  IpAddress
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+              "Specify the IP address of the TFTP server where the binary
+              code is stored."
+        ::= { agentTftpUpgrade 1 }
+
+agentUpgradeFileName OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..31))
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+              "Specify the file name of the binary code to be upgraded."
+        ::= { agentTftpUpgrade 2 }
+
+agentUpgradeState OBJECT-TYPE
+        SYNTAX  INTEGER {
+                none(1),
+                start(2),
+                inProgress(3)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+              "Set the variable 1 will start the upgrade process."
+        ::= { agentTftpUpgrade 3 }
+
+-- system
+
+systemTemperature OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { lambdatrail 1 }
+
+systemPower1 OBJECT-TYPE
+        SYNTAX  INTEGER {
+                notplugged(1),
+                off(2),
+                on(3)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { lambdatrail 2 }
+
+systemPower2 OBJECT-TYPE
+        SYNTAX  INTEGER {
+                notplugged(1),
+                off(2),
+                on(3)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { lambdatrail 3 }
+
+systemFan1 OBJECT-TYPE
+        SYNTAX  INTEGER {
+                failure(1),
+                off(2),
+                on(3)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { lambdatrail 4 }
+
+systemFan1Selection OBJECT-TYPE
+        SYNTAX  INTEGER {
+                alwaysOff(1),
+                alwaysOn(2),
+                byTemperature(3)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { lambdatrail 5 }
+
+systemFan1OnTemperature OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { lambdatrail 6 }
+
+systemFan1OffTemperature OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { lambdatrail 7 }
+
+systemFan2 OBJECT-TYPE
+        SYNTAX  INTEGER {
+                failure(1),
+                off(2),
+                on(3)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { lambdatrail 8 }
+
+systemFan2Selection OBJECT-TYPE
+        SYNTAX  INTEGER {
+                alwaysOff(1),
+                alwaysOn(2),
+                byTemperature(3)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { lambdatrail 9 }
+
+systemFan2OnTemperature OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { lambdatrail 10 }
+
+systemFan2OffTemperature OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { lambdatrail 11 }
+
+-- port table
+
+portTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF PortEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "A list of interface entries."
+        ::= { lambdatrail 12 }
+
+portEntry OBJECT-TYPE
+        SYNTAX  PortEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "A port entry containing objects
+                below for a port."
+        INDEX { portId }
+        ::= { portTable 1 }
+
+PortEntry ::= SEQUENCE {
+        portId                INTEGER,
+        portLicensed          INTEGER,
+        portEnabled           INTEGER,
+        portAPSD              INTEGER,
+        portLinePlugged       INTEGER,
+        portLineLink          INTEGER,
+        portLineWavelength    INTEGER,
+        portLineTxPower       INTEGER,
+        portLineRxPower       INTEGER,
+        portLineLaserTemp     INTEGER,
+        portLineLaserBias     INTEGER,
+        portClientPlugged     INTEGER,
+        portClientLink        INTEGER,
+        portClientWavelength  INTEGER,
+        portClientTxPower     INTEGER,
+        portClientRxPower     INTEGER,
+        portClientLaserTemp   INTEGER,
+        portClientLaserBias   INTEGER,
+        portName              DisplayString
+        }
+
+portId OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "A unique value for each interface."
+        ::= { portEntry 1 }
+
+portLicensed OBJECT-TYPE
+        SYNTAX  INTEGER {
+                no(1),
+                yes(2)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { portEntry 2 }
+
+portEnabled OBJECT-TYPE
+        SYNTAX  INTEGER {
+                disabled(1),
+                enabled(2)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { portEntry 3 }
+
+portAPSD OBJECT-TYPE
+        SYNTAX  INTEGER {
+                disabled(1),
+                enabled(2)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { portEntry 4 }
+
+portLinePlugged OBJECT-TYPE
+        SYNTAX  INTEGER {
+                notPlugged(1),
+                plugged(2),
+                notAvailable(3)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { portEntry 5 }
+
+portLineLink OBJECT-TYPE
+        SYNTAX  INTEGER {
+                down(1),
+                up(2),
+                notAvailable(3)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { portEntry 6 }
+
+portLineWavelength OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "unit is nanometer, -1 means not available"
+        ::= { portEntry 7 }
+
+portLineTxPower OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "unit is 1/1000 dBm, for example, 1234 means 1.234 dBm, -1234 means -1.234dBm, -1 means not available"
+        ::= { portEntry 8 }
+
+portLineRxPower OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "unit is 1/1000 dBm, for example, 1234 means 1.234 dBm, -1234 means -1.234dBm, -1 means not available"
+        ::= { portEntry 9 }
+
+portLineLaserTemp OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "unit is Celsius degree, -1 means not available"
+        ::= { portEntry 10 }
+
+portLineLaserBias OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "unit is mini ampere, -1 means not available"
+        ::= { portEntry 11 }
+
+portClientPlugged OBJECT-TYPE
+        SYNTAX  INTEGER {
+                notPlugged(1),
+                plugged(2),
+                notAvailable(3)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { portEntry 12 }
+
+portClientLink OBJECT-TYPE
+        SYNTAX  INTEGER {
+                down(1),
+                up(2),
+                notAvailable   (3)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { portEntry 13 }
+
+portClientWavelength OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "unit is nanometer, -1 means not available"
+        ::= { portEntry 14 }
+
+portClientTxPower OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "unit is 1/1000 dBm, for example, 1234 means 1.234 dBm, -1234 means -1.234dBm, -1 means not available"
+        ::= { portEntry 15 }
+
+portClientRxPower OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "unit is 1/1000 dBm, for example, 1234 means 1.234 dBm, -1234 means -1.234dBm, -1 means not available"
+        ::= { portEntry 16 }
+
+portClientLaserTemp OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "unit is Celsius degree, -1 means not available"
+        ::= { portEntry 17 }
+
+portClientLaserBias OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "unit is mini ampere, -1 means not available"
+        ::= { portEntry 18 }
+
+portName OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..31))
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { portEntry 19 }
+
+--
+
+usablePorts OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { lambdatrail 13 }
+
+END

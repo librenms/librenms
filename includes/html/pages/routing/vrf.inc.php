@@ -92,7 +92,7 @@ if (! Auth::user()->hasGlobalRead()) {
         echo "<div style='margin: 5px;'><table border=0 cellspacing=0 cellpadding=5 width=100%>";
         $i = '1';
         foreach (dbFetchRows('SELECT `vrf_name`, `mplsVpnVrfRouteDistinguisher`, `mplsVpnVrfDescription` FROM `vrfs` GROUP BY `mplsVpnVrfRouteDistinguisher`, `mplsVpnVrfDescription`,`vrf_name`') as $vrf) {
-            if (($i % 2)) {
+            if ($i % 2) {
                 $bg_colour = Config::get('list_colour.even');
             } else {
                 $bg_colour = Config::get('list_colour.odd');
@@ -107,14 +107,14 @@ if (! Auth::user()->hasGlobalRead()) {
             echo '<td><table border=0 cellspacing=0 cellpadding=5 width=100%>';
             $x = 1;
             foreach ($vrf_devices[$vrf['vrf_name']][$vrf['mplsVpnVrfRouteDistinguisher']] as $device) {
-                if (($i % 2)) {
-                    if (($x % 2)) {
+                if ($i % 2) {
+                    if ($x % 2) {
                         $dev_colour = Config::get('list_colour.even_alt');
                     } else {
                         $dev_colour = Config::get('list_colour.even_alt2');
                     }
                 } else {
-                    if (($x % 2)) {
+                    if ($x % 2) {
                         $dev_colour = Config::get('list_colour.odd_alt2');
                     } else {
                         $dev_colour = Config::get('list_colour.odd_alt');

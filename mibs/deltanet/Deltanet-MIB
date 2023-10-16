@@ -1,0 +1,19 @@
+Deltanet-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+   enterprises, MODULE-IDENTITY
+      FROM SNMPv2-SMI;
+
+deltanet MODULE-IDENTITY
+   LAST-UPDATED 	"201411060000Z"
+   ORGANIZATION   "DeltaNet AG  Switzerland"
+   CONTACT-INFO   "http://www.deltanet.ch"
+   DESCRIPTION    "MIB module for defining Deltanet headers."
+   REVISION       "201411060000Z"
+   DESCRIPTION    "Initial Version"
+   ::= { enterprises 35616 }
+
+productType OBJECT IDENTIFIER ::= { deltanet 2 }
+xwdm        OBJECT IDENTIFIER ::= { productType 1 }
+
+END

@@ -12,18 +12,18 @@ class DefaultAlertTemplateSeeder extends Seeder
      *
      * @return void
      */
-    public function run()
+    public function run(): void
     {
         $templates = [
             [
                 'name' => 'BGP Sessions.',
-                'template' => '{{ $alert->title }}' . PHP_EOL . 'Severity: {{ $alert->severity }}' . PHP_EOL . '@if ($alert->state == 0) Time elapsed: {{ $alert->elapsed }} @endif' . PHP_EOL . 'Timestamp: {{ $alert->timestamp }}' . PHP_EOL . 'Unique-ID: {{ $alert->uid }}' . PHP_EOL . 'Rule: @if ($alert->name) {{ $alert->name }} @else {{ $alert->rule }} @endif' . PHP_EOL . '@if ($alert->faults) Faults:' . PHP_EOL . '@foreach ($alert->faults as $key => $value)' . PHP_EOL . '  #{{ $key }}: {{ $value[\'string\'] }}' . PHP_EOL . '  Peer: {{ $value[\'astext\'] }}' . PHP_EOL . '  Peer IP: {{ $value[\'bgpPeerIdentifier\'] }}' . PHP_EOL . '  Peer AS: {{ $value[\'bgpPeerRemoteAs\'] }}' . PHP_EOL . '  Peer EstTime: {{ $value[\'bgpPeerFsmEstablishedTime\'] }}' . PHP_EOL . '  Peer State: {{ $value[\'bgpPeerState\'] }}' . PHP_EOL . '@endforeach' . PHP_EOL . '@endif',
+                'template' => '{{ $alert->title }}' . PHP_EOL . 'Severity: {{ $alert->severity }}' . PHP_EOL . '@if ($alert->state == 0)Time elapsed: {{ $alert->elapsed }} @endif' . PHP_EOL . 'Timestamp: {{ $alert->timestamp }}' . PHP_EOL . 'Unique-ID: {{ $alert->uid }}' . PHP_EOL . 'Rule: @if ($alert->name) {{ $alert->name }} @else {{ $alert->rule }} @endif' . PHP_EOL . '@if ($alert->faults) Faults:' . PHP_EOL . '@foreach ($alert->faults as $key => $value)' . PHP_EOL . '  #{{ $key }}: {{ $value[\'string\'] }}' . PHP_EOL . '  Peer: {{ $value[\'astext\'] }}' . PHP_EOL . '  Peer IP: {{ $value[\'bgpPeerIdentifier\'] }}' . PHP_EOL . '  Peer AS: {{ $value[\'bgpPeerRemoteAs\'] }}' . PHP_EOL . '  Peer EstTime: {{ $value[\'bgpPeerFsmEstablishedTime\'] }}' . PHP_EOL . '  Peer State: {{ $value[\'bgpPeerState\'] }}' . PHP_EOL . '@endforeach' . PHP_EOL . '@endif',
                 'title' => '',
                 'title_rec' => '',
             ],
             [
                 'name' => 'Ports',
-                'template' => '{{ $alert->title }}' . PHP_EOL . 'Severity: {{ $alert->severity }}' . PHP_EOL . '@if ($alert->state == 0) Time elapsed: {{ $alert->elapsed }} @endif' . PHP_EOL . 'Timestamp: {{ $alert->timestamp }}' . PHP_EOL . 'Unique-ID: {{ $alert->uid }}' . PHP_EOL . 'Rule: @if ($alert->name) {{ $alert->name }} @else {{ $alert->rule }} @endif' . PHP_EOL . '@if ($alert->faults) Faults:' . PHP_EOL . '@foreach ($alert->faults as $key => $value)' . PHP_EOL . '  #{{ $key }}: {{ $value[\'string\'] }}' . PHP_EOL . '  Port: {{ $value[\'ifName\'] }}' . PHP_EOL . '  Port Name: {{ $value[\'ifAlias\'] }}' . PHP_EOL . '  Port Status: {{ $value[\'message\'] }}' . PHP_EOL . '@endforeach' . PHP_EOL . '@endif',
+                'template' => '{{ $alert->title }}' . PHP_EOL . 'Severity: {{ $alert->severity }}' . PHP_EOL . '@if ($alert->state == 0)Time elapsed: {{ $alert->elapsed }} @endif' . PHP_EOL . 'Timestamp: {{ $alert->timestamp }}' . PHP_EOL . 'Unique-ID: {{ $alert->uid }}' . PHP_EOL . 'Rule: @if ($alert->name) {{ $alert->name }} @else {{ $alert->rule }} @endif' . PHP_EOL . '@if ($alert->faults) Faults:' . PHP_EOL . '@foreach ($alert->faults as $key => $value)' . PHP_EOL . '  #{{ $key }}: {{ $value[\'string\'] }}' . PHP_EOL . '  Port: {{ $value[\'ifName\'] }}' . PHP_EOL . '  Port Name: {{ $value[\'ifAlias\'] }}' . PHP_EOL . '  Port Status: {{ $value[\'message\'] }}' . PHP_EOL . '@endforeach' . PHP_EOL . '@endif',
                 'title' => '',
                 'title_rec' => '',
             ],
@@ -64,7 +64,7 @@ class DefaultAlertTemplateSeeder extends Seeder
             ],
             [
                 'name' => 'Default Alert Template',
-                'template' => '{{ $alert->title }}' . PHP_EOL . 'Severity: {{ $alert->severity }}' . PHP_EOL . '@if ($alert->state == 0) Time elapsed: {{ $alert->elapsed }} @endif' . PHP_EOL . 'Timestamp: {{ $alert->timestamp }}' . PHP_EOL . 'Unique-ID: {{ $alert->uid }}' . PHP_EOL . 'Rule: @if ($alert->name) {{ $alert->name }} @else {{ $alert->rule }} @endif' . PHP_EOL . '@if ($alert->faults) Faults:' . PHP_EOL . '@foreach ($alert->faults as $key => $value)' . PHP_EOL . '  #{{ $key }}: {{ $value[\'string\'] }}' . PHP_EOL . '@endforeach' . PHP_EOL . '@endif' . PHP_EOL . 'Alert sent to:' . PHP_EOL . '@foreach ($alert->contacts as $key => $value)' . PHP_EOL . '  {{ $value }} <{{ $key }}>' . PHP_EOL . '@endforeach',
+                'template' => '{{ $alert->title }}' . PHP_EOL . 'Severity: {{ $alert->severity }}' . PHP_EOL . '@if ($alert->state == 0)Time elapsed: {{ $alert->elapsed }} @endif' . PHP_EOL . 'Timestamp: {{ $alert->timestamp }}' . PHP_EOL . 'Unique-ID: {{ $alert->uid }}' . PHP_EOL . 'Rule: @if ($alert->name) {{ $alert->name }} @else {{ $alert->rule }} @endif' . PHP_EOL . '@if ($alert->faults) Faults:' . PHP_EOL . '@foreach ($alert->faults as $key => $value)' . PHP_EOL . '  #{{ $key }}: {{ $value[\'string\'] }}' . PHP_EOL . '@endforeach' . PHP_EOL . '@endif' . PHP_EOL . 'Alert sent to:' . PHP_EOL . '@foreach ($alert->contacts as $key => $value)' . PHP_EOL . '  {{ $value }} <{{ $key }}>' . PHP_EOL . '@endforeach',
                 'title' => null,
                 'title_rec' => null,
             ],

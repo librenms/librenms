@@ -148,32 +148,6 @@ trait ActiveDirectoryCommon
         return $ldap_groups;
     }
 
-    public function getUserlist()
-    {
-        $connection = $this->getConnection();
-
-        $userlist = [];
-        $ldap_groups = $this->getGroupList();
-
-        foreach ($ldap_groups as $ldap_group) {
-            $search_filter = "(&(memberOf:1.2.840.113556.1.4.1941:=$ldap_group)(!(userAccountControl:1.2.840.113556.1.4.803:=2)))";
-            if (Config::get('auth_ad_user_filter')) {
-                $search_filter = '(&' . Config::get('auth_ad_user_filter') . $search_filter . ')';
-            }
-            $attributes = ['samaccountname', 'displayname', 'objectsid', 'mail'];
-            $search = ldap_search($connection, Config::get('auth_ad_base_dn'), $search_filter, $attributes);
-            $results = ldap_get_entries($connection, $search);
-
-            foreach ($results as $result) {
-                if (isset($result['samaccountname'][0])) {
-                    $userlist[$result['samaccountname'][0]] = $this->userFromAd($result);
-                }
-            }
-        }
-
-        return array_values($userlist);
-    }
-
     /**
      * Generate a user array from an AD LDAP entry
      * Must have the attributes: objectsid, samaccountname, displayname, mail
@@ -191,7 +165,6 @@ trait ActiveDirectoryCommon
             'realname' => $entry['displayname'][0],
             'email' => isset($entry['mail'][0]) ? $entry['mail'][0] : null,
             'descr' => '',
-            'level' => $this->getUserlevel($entry['samaccountname'][0]),
             'can_modify_passwd' => 0,
         ];
     }

@@ -24,70 +24,42 @@
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
-use LibreNMS\Util\Proxy;
+use LibreNMS\Exceptions\AlertTransportDeliveryException;
+use LibreNMS\Util\Http;
 
 class Mattermost extends Transport
 {
-    public function deliverAlert($obj, $opts)
+    public function deliverAlert(array $alert_data): bool
     {
-        $mattermost_opts = [
-            'url' => $this->config['mattermost-url'],
-            'username' => $this->config['mattermost-username'],
-            'icon' => $this->config['mattermost-icon'],
-            'channel' => $this->config['mattermost-channel'],
-            'author_name' => $this->config['mattermost-author_name'],
-        ];
-
-        return $this->contactMattermost($obj, $mattermost_opts);
-    }
-
-    public static function contactMattermost($obj, $api)
-    {
-        $host = $api['url'];
-        $curl = curl_init();
-        $mattermost_msg = strip_tags($obj['msg']);
-        $color = self::getColorForState($obj['state']);
+        $host = $this->config['mattermost-url'];
+        $mattermost_msg = strip_tags($alert_data['msg']);
+        $color = self::getColorForState($alert_data['state']);
         $data = [
             'attachments' => [
                 0 => [
                     'fallback' => $mattermost_msg,
                     'color' => $color,
-                    'title' => $obj['title'],
-                    'text' => $obj['msg'],
+                    'title' => $alert_data['title'],
+                    'text' => $alert_data['msg'],
                     'mrkdwn_in' => ['text', 'fallback'],
-                    'author_name' => $api['author_name'],
+                    'author_name' => $this->config['mattermost-author_name'],
                 ],
             ],
-            'channel' => $api['channel'],
-            'username' => $api['username'],
-            'icon_url' => $api['icon'],
+            'channel' => $this->config['mattermost-channel'],
+            'username' => $this->config['mattermost-username'],
+            'icon_url' => $this->config['mattermost-icon'],
         ];
 
-        Proxy::applyToCurl($curl);
+        $res = Http::client()->acceptJson()->post($host, $data);
 
-        $httpheaders = ['Accept: application/json', 'Content-Type: application/json'];
-        $alert_payload = json_encode($data);
-
-        curl_setopt($curl, CURLOPT_HTTPHEADER, $httpheaders);
-        curl_setopt($curl, CURLOPT_URL, $host);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($curl, CURLOPT_POST, true);
-        curl_setopt($curl, CURLOPT_POSTFIELDS, $alert_payload);
-
-        $ret = curl_exec($curl);
-        $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-        if ($code != 200) {
-            d_echo('Mattermost Connection Error: ' . $ret);
-
-            return 'HTTP Status code ' . $code;
-        } else {
-            d_echo('Mattermost message sent for ' . $obj['hostname']);
-
+        if ($res->successful()) {
             return true;
         }
+
+        throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), $alert_data['msg'], $data);
     }
 
-    public static function configTemplate()
+    public static function configTemplate(): array
     {
         return [
             'config' => [

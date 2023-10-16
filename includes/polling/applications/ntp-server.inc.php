@@ -17,9 +17,9 @@ try {
     ];
 
     [$ntp['data']['stratum'], $ntp['data']['offset'], $ntp['data']['frequency'], $ntp['data']['jitter'],
-          $ntp['data']['noise'], $ntp['data']['stability'], $ntp['data']['uptime'], $ntp['data']['buffer_recv'],
-          $ntp['data']['buffer_free'], $ntp['data']['buffer_used'], $ntp['data']['packets_drop'],
-          $ntp['data']['packets_ignore'], $ntp['data']['packets_recv'], $ntp['data']['packets_sent']] = explode("\n", $legacy);
+        $ntp['data']['noise'], $ntp['data']['stability'], $ntp['data']['uptime'], $ntp['data']['buffer_recv'],
+        $ntp['data']['buffer_free'], $ntp['data']['buffer_used'], $ntp['data']['packets_drop'],
+        $ntp['data']['packets_ignore'], $ntp['data']['packets_recv'], $ntp['data']['packets_sent']] = explode("\n", $legacy);
 } catch (JsonAppException $e) {
     echo PHP_EOL . $name . ':' . $e->getCode() . ':' . $e->getMessage() . PHP_EOL;
     update_application($app, $e->getCode() . ':' . $e->getMessage(), []); // Set empty metrics and error message
@@ -27,7 +27,6 @@ try {
     return;
 }
 
-$rrd_name = ['app', $name, $app->app_id];
 $rrd_def = RrdDefinition::make()
     ->addDataset('stratum', 'GAUGE', 0, 1000)
     ->addDataset('offset', 'GAUGE', -1000, 1000)
@@ -61,6 +60,11 @@ $fields = [
     'packets_sent'   => $ntp['data']['packets_sent'],
 ];
 
-$tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
+$tags = [
+    'name' => $name,
+    'app_id' => $app->app_id,
+    'rrd_name' => ['app', $name, $app->app_id],
+    'rrd_def' => $rrd_def,
+];
 data_update($device, 'app', $tags, $fields);
 update_application($app, 'OK', $fields);

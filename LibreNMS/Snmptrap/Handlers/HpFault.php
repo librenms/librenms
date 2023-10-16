@@ -3,6 +3,7 @@
 namespace LibreNMS\Snmptrap\Handlers;
 
 use App\Models\Device;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
 
@@ -20,18 +21,18 @@ class HpFault implements SnmptrapHandler
     {
         $type = $trap->getOidData($trap->findOid('HP-ICF-FAULT-FINDER-MIB::hpicfFfLogFaultType'));
         switch ($type) {
-    case 'badXcvr':
-        $trap->log('Fault - CRC Error ' . $trap->getOidData($trap->findOid('HP-ICF-FAULT-FINDER-MIB::hpicfFfFaultInfoURL')), 4, $type);
-        break;
-    case 'badCable':
-        $trap->log('Fault - Bad Cable ' . $trap->getOidData($trap->findOid('HP-ICF-FAULT-FINDER-MIB::hpicfFfFaultInfoURL')), 4, $type);
-        break;
-    case 'bcastStorm':
-        $trap->log('Fault - Broadcaststorm ' . $trap->getOidData($trap->findOid('HP-ICF-FAULT-FINDER-MIB::hpicfFfFaultInfoURL')), 5, $type);
-        break;
-    default:
-        $trap->log('Fault - Unhandled ' . $trap->getOidData($trap->findOid('HP-ICF-FAULT-FINDER-MIB::hpicfFfFaultInfoURL')), 2, $type);
-        break;
-    }
+            case 'badXcvr':
+                $trap->log('Fault - CRC Error ' . $trap->getOidData($trap->findOid('HP-ICF-FAULT-FINDER-MIB::hpicfFfFaultInfoURL')), Severity::Warning, $type);
+                break;
+            case 'badCable':
+                $trap->log('Fault - Bad Cable ' . $trap->getOidData($trap->findOid('HP-ICF-FAULT-FINDER-MIB::hpicfFfFaultInfoURL')), Severity::Warning, $type);
+                break;
+            case 'bcastStorm':
+                $trap->log('Fault - Broadcaststorm ' . $trap->getOidData($trap->findOid('HP-ICF-FAULT-FINDER-MIB::hpicfFfFaultInfoURL')), Severity::Error, $type);
+                break;
+            default:
+                $trap->log('Fault - Unhandled ' . $trap->getOidData($trap->findOid('HP-ICF-FAULT-FINDER-MIB::hpicfFfFaultInfoURL')), Severity::Info, $type);
+                break;
+        }
     }
 }

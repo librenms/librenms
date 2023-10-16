@@ -183,19 +183,6 @@ You need a token you can find on your personnal space.
 | API URL | https://soap.aspsms.com/aspsmsx.asmx/SimpleTextSMS |
 | Options | UserKey=USERKEY<br />Password=APIPASSWORD<br />Recipient=RECIPIENT<br/> Originator=ORIGINATOR<br />MessageText={{ $msg }} |
 
-## Boxcar
-
-Copy your access token from the Boxcar app or from the Boxcar.io
-website and setup the transport.
-
-[Boxcar Docs](http://developer.boxcar.io/api/publisher/)
-
-**Example:**
-
-| Config | Example |
-| ------ | ------- |
-| Access Token | i23f23mr23rwerw |
-
 ## Browser Push
 
 Browser push notifications can send a notification to the user's
@@ -322,9 +309,9 @@ for details on acceptable values.
 | API URL | <https://api.hipchat.com/v1/rooms/message?auth_token=109jawregoaihj> |
 | Room ID | 7654321 |
 | From Name | LibreNMS |
-| Options | color = red <br/> notify = 1 <br/> message_format = text |
+| Options | color=red |
 
-At present the following options are supported: `color`, `notify` and `message_format`.
+At present the following options are supported: `color`.
 
 > Note: The default message format for HipChat messages is HTML.  It is
 > recommended that you specify the `text` message format to prevent unexpected
@@ -364,6 +351,65 @@ LibreNMS database.
 | Issue Type | Myissuetype |
 | Jira Username | myjirauser |
 | Jira Password | myjirapass |
+
+## LINE Messaging API
+
+[LINE Messaging API Docs](https://developers.line.biz/en/docs/messaging-api/overview/)
+
+Here is the step for setup a LINE bot and using it in LibreNMS.
+
+1. Use your real LINE account register in [developer protal](https://developers.line.biz/).
+
+1. Add a new channel, choose `Messaging API` and continue fill up the forms, note that `Channel name` cannot edit later.
+
+1. Go to "Messaging API" tab of your channel, here listing some important value.
+
+	- `Bot basic ID` and `QR code` is your LINE bot's ID and QR code.
+	- `Channel access token (long-lived)`, will use it in LibreNMS, keep it safe.
+
+1. Use your real Line account add your LINE bot as a friend.
+
+1. Recipient ID can be `groupID`, `userID` or `roomID`, it will be used in LibreNMS to send message to a group or a user. Use the following NodeJS program and `ngrok` for temporally https webhook to listen it.
+
+	[LINE-bot-RecipientFetcher](https://github.com/j796160836/LINE-bot-RecipientFetcher)
+
+1. Run the program and using `ngrok` expose port to public
+
+	```
+	$ node index.js
+	$ ngrok http 3000
+	```
+
+1. Go to "Messaging API" tab of your channel, fill up Webhook URL to `https://<your ngrok domain>/webhook`
+
+
+1. If you want to let LINE bot send message to a yourself, use your real account to send a message to your LINE bot. Program will print out the `userID` in console.
+
+	sample value:  
+	
+	```
+	{"type":"user","userId":"U527xxxxxxxxxxxxxxxxxxxxxxxxxc0ee"}
+	```
+	
+1. If you want to let LINE bot send message to a group, do the following steps.
+
+	- Add your LINE bot into group
+	- Use your real account to send a message to group
+	
+	Program will print out the `groupID` in console, it will be Recipient ID, keep it safe.
+
+	sample value:
+
+	```
+	{"type":"group","groupId":"Ce51xxxxxxxxxxxxxxxxxxxxxxxxxx6ef","userId":"U527xxxxxxxxxxxxxxxxxxxxxxxxxc0ee"} ```
+	```
+
+**Example:**
+
+| Config | Example |
+| ------ | ------- |
+| Access token | fhJ9vH2fsxxxxxxxxxxxxxxxxxxxxlFU= |
+| Recipient (groupID, userID or roomID) | Ce51xxxxxxxxxxxxxxxxxxxxxxxxxx6ef |
 
 ## LINE Notify
 
@@ -416,6 +462,30 @@ beginning of the ``_matrix/client/r0/...`` API-part.
 | Room | !ajPbbPalmVbNuQoBDK:example.com |
 | Auth_token: | MDAyYmxvY2F0aW9uI...z1DCn6lz_uOhtW3XRICg |
 | Message: | Alert: {{ $msg }} https://librenms.example.com |
+
+## Messagebird
+
+LibreNMS can send text messages through Messagebird Rest API transport.
+
+| Config | Example |
+| ------ | ------- |
+| Api Key | Api rest key given in the messagebird dashboard |
+| Originator | E.164 formatted originator |
+| Recipient | E.164 formatted recipient for multi recipents comma separated |
+| Character limit | Range 1..480 (max 3 split messages)  |
+
+## Messagebird Voice
+
+LibreNMS can send messages through Messagebird voice Rest API transport (text to speech).
+
+| Config | Example |
+| ------ | ------- |
+| Api Key | Api rest key given in the messagebird dashboard |
+| Originator | E.164 formatted originator |
+| Recipient | E.164 formatted recipient for multi recipents comma separated |
+| Language | Select box for options  |
+| Spoken voice | Female or Male  |
+| Repeat | X times the message is repeated  |
 
 ## Microsoft Teams
 
@@ -536,7 +606,7 @@ Here an example using 3 numbers, any amount of numbers is supported:
 
 | Config | Example |
 | ------ | ------- |
-| PlaySMS | <https://localhost/index.php?app=ws> |
+| PlaySMS | <https://localhost/index.php> |
 | User | user1 |
 | Token | MYFANCYACCESSTOKEN |
 | From | My Name |

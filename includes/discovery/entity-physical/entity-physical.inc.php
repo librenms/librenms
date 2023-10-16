@@ -15,26 +15,26 @@ if ($device['os'] == 'junos') {
     $ai_mib = 'AI-AP-MIB';
     $ai_ig_data = snmpwalk_group($device, 'aiInfoGroup', $ai_mib);
     discover_entity_physical(
-         $valid,
-         $device,
-         1,                                              // entPhysicalIndex
-         $ai_ig_data['aiVirtualControllerIPAddress.0'],  // entPhysicalDescr
-         'chassis',                                      // entPhysicalClass
-         $ai_ig_data['aiVirtualControllerName.0'],       // entPhysicalName
-         'Instant Virtual Controller Cluster',           // entPhysicalModelName
-         $ai_ig_data['aiVirtualControllerKey.0'],        // entPhysicalSerialNum
-         '0',                                            // entPhysicalContainedIn
-         'Aruba',                                        // entPhysicalMfgName
-         '-1',                                           // entPhysicalParentRelPos
-         'Aruba',                                        // entPhysicalVendorType
-         null,                                           // entPhysicalHardwareRev
-         null,                                           // entPhysicalFirmwareRev
-         null,                                           // entPhysicalSoftwareRev
-         null,                                           // entPhysicalIsFRU
-         null,                                           // entPhysicalAlias
-         null,                                           // entPhysicalAssetID
-         null                                            // ifIndex
-     );
+        $valid,
+        $device,
+        1,                                              // entPhysicalIndex
+        $ai_ig_data['aiVirtualControllerIPAddress.0'],  // entPhysicalDescr
+        'chassis',                                      // entPhysicalClass
+        $ai_ig_data['aiVirtualControllerName.0'],       // entPhysicalName
+        'Instant Virtual Controller Cluster',           // entPhysicalModelName
+        $ai_ig_data['aiVirtualControllerKey.0'],        // entPhysicalSerialNum
+        '0',                                            // entPhysicalContainedIn
+        'Aruba',                                        // entPhysicalMfgName
+        '-1',                                           // entPhysicalParentRelPos
+        'Aruba',                                        // entPhysicalVendorType
+        null,                                           // entPhysicalHardwareRev
+        null,                                           // entPhysicalFirmwareRev
+        null,                                           // entPhysicalSoftwareRev
+        null,                                           // entPhysicalIsFRU
+        null,                                           // entPhysicalAlias
+        null,                                           // entPhysicalAssetID
+        null                                            // ifIndex
+    );
 
     $entity_array = snmpwalk_group($device, 'aiAccessPointEntry', $ai_mib);
     $instant_index = 2;

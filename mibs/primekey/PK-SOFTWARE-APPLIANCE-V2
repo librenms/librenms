@@ -1,0 +1,428 @@
+PK-SOFTWARE-APPLIANCE-V2 DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, enterprises, Integer32 FROM SNMPv2-SMI ;
+
+primekey MODULE-IDENTITY
+    LAST-UPDATED "202205160000Z"
+    ORGANIZATION "PrimeKey Solutions AB"
+    CONTACT-INFO
+        "postal:    PrimeKey Solutions AB
+                    Solna Access, Plan A8,
+                    Sundbybergsvagen 1
+                    SE-171 73 Solna
+                    Sweden
+          email:    support@primekey.com"
+    DESCRIPTION
+        "PrimeKey EJBCA Software Appliance V2 MIB"
+    REVISION "202205160000Z"
+    DESCRIPTION "Version 2"
+    REVISION "202107220000Z"
+    DESCRIPTION "Initial Version"
+    ::= { enterprises 22408 }
+
+--
+-- List of OIDs
+--
+
+primeKeyProducts OBJECT IDENTIFIER ::= { primekey 1 }
+primeKeySoftwareApplianceSubTree OBJECT IDENTIFIER ::= { primeKeyProducts 4 }
+pk-Software-Appliance-V2 OBJECT IDENTIFIER ::= { primeKeySoftwareApplianceSubTree 1 }
+
+pk-SAV2-component-readyness OBJECT IDENTIFIER ::= { pk-Software-Appliance-V2 1 } -- This subtree contains the status/readyness of the Software Appliance's components.
+pk-SAV2-network-subtree OBJECT IDENTIFIER ::= { pk-Software-Appliance-V2 2 } -- This subtree contains the networking related information of the Software Appliance.
+pk-SAV2-database-subtree OBJECT IDENTIFIER ::= { pk-Software-Appliance-V2 3 } -- This subtree contains all database related information of the Software Appliance.
+pk-SAV2-internal-database OBJECT IDENTIFIER ::= { pk-SAV2-database-subtree 1 } -- This subtree contains all information about the internal database of the Software Appliance.
+pk-SAV2-version-subtree OBJECT IDENTIFIER ::= { pk-Software-Appliance-V2 4 } -- This subtree contains all information about important version related information of the Software Appliance.
+pk-SAV2-application-subtree OBJECT IDENTIFIER ::= { pk-Software-Appliance-V2 5 } -- This subtree contains all information about customer facing applications on the Software Appliance.
+pk-SAV2-ejbca OBJECT IDENTIFIER ::= { pk-SAV2-application-subtree 1 } -- This subtree contains all the information from EJBCA.
+pk-SAV2-signserver OBJECT IDENTIFIER ::= { pk-SAV2-application-subtree 2 } -- This subtree contains all the information from SignSever.
+pk-SAV2-hsm-subtree OBJECT IDENTIFIER ::= { pk-Software-Appliance-V2 6 } -- This subtree contains all the information about the HSM components on the Software Appliance.
+pk-SAV2-hsm-utimaco-subtree OBJECT IDENTIFIER ::= { pk-SAV2-hsm-subtree 3 } -- This subtree contains all information regarding the Utimaco CryptoServer LAN
+
+--
+-- Scalars
+--
+
+pk-SAV2-authentication-service-status OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Authentication service status. Possible values: 
+[0 (status ok),
+1 (status not ok),
+-1 (internal error)]"
+    ::= { pk-SAV2-component-readyness 1 } -- .1.3.6.1.4.1.22408.1.4.1.1.1.0
+
+pk-SAV2-crs-status OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Container runtime system status. Possible values: 
+[0 (status ok),
+1 (status not ok),
+-1 (internal error)]"
+    ::= { pk-SAV2-component-readyness 2 } -- .1.3.6.1.4.1.22408.1.4.1.1.2.0
+
+pk-SAV2-documentation-status OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Documentation service status. Possible values: 
+[0 (status ok),
+1 (status not ok),
+-1 (internal error)]"
+    ::= { pk-SAV2-component-readyness 3 } -- .1.3.6.1.4.1.22408.1.4.1.1.3.0
+
+pk-SAV2-monitoring-status OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Monitoring service status. Possible values: 
+[0 (status ok),
+1 (status not ok),
+-1 (internal error)]"
+    ::= { pk-SAV2-component-readyness 4 } -- .1.3.6.1.4.1.22408.1.4.1.1.4.0
+
+pk-SAV2-persistence-status OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Persistent data storage service status. Possible values: 
+[0 (status ok),
+1 (status not ok),
+-1 (internal error)]"
+    ::= { pk-SAV2-component-readyness 5 } -- .1.3.6.1.4.1.22408.1.4.1.1.5.0
+
+pk-SAV2-snmp-status OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "SNMP service status. Possible values: 
+[0 (status ok),
+1 (status not ok),
+-1 (internal error)]"
+    ::= { pk-SAV2-component-readyness 6 } -- .1.3.6.1.4.1.22408.1.4.1.1.6.0
+
+pk-SAV2-spc-status OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Support package creator service status. Possible values: 
+[0 (status ok),
+1 (status not ok),
+-1 (internal error)]"
+    ::= { pk-SAV2-component-readyness 7 } -- .1.3.6.1.4.1.22408.1.4.1.1.7.0
+
+pk-SAV2-vs-status OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Valuestore service status. Possible values: 
+[0 (status ok),
+1 (status not ok),
+-1 (internal error)]"
+    ::= { pk-SAV2-component-readyness 8 } -- .1.3.6.1.4.1.22408.1.4.1.1.8.0
+
+pk-SAV2-vsapi-status OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Valuestore API service status. Possible values: 
+[0 (status ok),
+1 (status not ok),
+-1 (internal error)]"
+    ::= { pk-SAV2-component-readyness 9 } -- .1.3.6.1.4.1.22408.1.4.1.1.9.0
+
+pk-SAV2-webconf-status OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "WebConf service status. Possible values: 
+[0 (status ok),
+1 (status not ok),
+-1 (internal error)]"
+    ::= { pk-SAV2-component-readyness 10 } -- .1.3.6.1.4.1.22408.1.4.1.1.10.0
+
+pk-SAV2-vault-status OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Vault service status. Possible values: 
+[0 (status ok),
+1 (status not ok),
+-1 (internal error)]"
+    ::= { pk-SAV2-component-readyness 11 } -- .1.3.6.1.4.1.22408.1.4.1.1.11.0
+
+pk-SAV2-networkLink-status OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Network link status. Possible values: 
+[0 (status ok),
+1 (status not ok),
+-1 (internal error)]"
+    ::= { pk-SAV2-network-subtree 1 } -- .1.3.6.1.4.1.22408.1.4.1.2.1.0
+
+pk-SAV2-networkIpv4 OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Network IPV4 address. Possible values: 
+[STRING,
+ERROR (internal error)]"
+    ::= { pk-SAV2-network-subtree 2 } -- .1.3.6.1.4.1.22408.1.4.1.2.2.0
+
+pk-SAV2-networkIpv4Prefix OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Network IPV4 Prefix (CIDR notation of subnet mask). Possible values: 
+[INTEGER,
+ERROR (internal error)]"
+    ::= { pk-SAV2-network-subtree 3 } -- .1.3.6.1.4.1.22408.1.4.1.2.3.0
+
+pk-SAV2-networkIpv6 OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Network IPV6 address. Possible values: 
+[STRING,
+ERROR (internal error)]"
+    ::= { pk-SAV2-network-subtree 4 } -- .1.3.6.1.4.1.22408.1.4.1.2.4.0
+
+pk-SAV2-networkIpv6Prefix OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Network IPV6 Prefix (CIDR notation of subnet mask). Possible values: 
+[INTEGER,
+ERROR (internal error)]"
+    ::= { pk-SAV2-network-subtree 5 } -- .1.3.6.1.4.1.22408.1.4.1.2.5.0
+
+pk-SAV2-systemHostname OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Hostname, that is currently in use by the Software Appliance. Possible values: 
+[STRING,
+ERROR (internal error)]"
+    ::= { pk-SAV2-network-subtree 6 } -- .1.3.6.1.4.1.22408.1.4.1.2.6.0
+
+pk-SAV2-internal-database-status OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Status of the database service. Possible values: 
+[0 (status ok),
+1 (status not ok),
+-1 (internal error)]"
+    ::= { pk-SAV2-internal-database 1 } -- .1.3.6.1.4.1.22408.1.4.1.3.1.1.0
+
+pk-SAV2-internal-databaseAvailableStorage OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Available storage reported by the database in MB. Possible values: 
+[INTEGER,
+-1 (internal error)]"
+    ::= { pk-SAV2-internal-database 2 } -- .1.3.6.1.4.1.22408.1.4.1.3.1.2.0
+
+pk-SAV2-internal-databaseTotalStorage OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Available total storage reported by the database in MB. Possible values: 
+[INTEGER,
+-1 (internal error)]"
+    ::= { pk-SAV2-internal-database 3 } -- .1.3.6.1.4.1.22408.1.4.1.3.1.3.0
+
+pk-SAV2-internal-databaseUsage OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Used storage reported by the database as percentage. Possible values: 
+[0-100,
+-1 (internal error)]"
+    ::= { pk-SAV2-internal-database 4 } -- .1.3.6.1.4.1.22408.1.4.1.3.1.4.0
+
+pk-SAV2-systemVersion OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Software Appliance version. Possible values: 
+[STRING,
+ERROR (internal error)]"
+    ::= { pk-SAV2-version-subtree 1 } -- .1.3.6.1.4.1.22408.1.4.1.4.1.0
+
+pk-SAV2-ejbca-status OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "EJBCA application status. Possible values: 
+[0 (status ok),
+1 (status not ok),
+-1 (internal error)]"
+    ::= { pk-SAV2-ejbca 1 } -- .1.3.6.1.4.1.22408.1.4.1.5.1.1.0
+
+pk-SAV2-ejbcaVersion OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "EJBCA version string. Possible values: 
+[STRING,
+ERROR (internal error)]"
+    ::= { pk-SAV2-ejbca 2 } -- .1.3.6.1.4.1.22408.1.4.1.5.1.2.0
+
+pk-SAV2-ejbcaHealthCheck OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Boolean interpretation of the EJBCA health check output. Possible values: 
+[0 (status ok),
+1 (status not ok),
+-1 (internal error)]"
+    ::= { pk-SAV2-ejbca 3 } -- .1.3.6.1.4.1.22408.1.4.1.5.1.3.0
+
+pk-SAV2-signserver-status OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "SignServer application status. Possible values: 
+[0 (status ok),
+1 (status not ok),
+-1 (internal error)]"
+    ::= { pk-SAV2-signserver 1 } -- .1.3.6.1.4.1.22408.1.4.1.5.2.1.0
+
+pk-SAV2-signserverVersion OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "SignServer version string. Possible values: 
+[STRING,
+ERROR (internal error)]"
+    ::= { pk-SAV2-signserver 2 } -- .1.3.6.1.4.1.22408.1.4.1.5.2.2.0
+
+pk-SAV2-signserverHealthCheck OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Boolean interpretation of the SignServer health check output. Possible values: 
+[0 (status ok),
+1 (status not ok),
+-1 (internal error)]"
+    ::= { pk-SAV2-signserver 3 } -- .1.3.6.1.4.1.22408.1.4.1.5.2.3.0
+
+pk-SAV2-hsm-driver-luna7-status OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Luna7 HSM service status. Possible values: 
+[0 (status ok),
+1 (status not ok),
+-1 (internal error)]"
+    ::= { pk-SAV2-hsm-subtree 2 } -- .1.3.6.1.4.1.22408.1.4.1.6.2.0
+
+pk-SAV2-hsm-driver-softhsm-status OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Soft HSM service status. Possible values: 
+[0 (status ok),
+1 (status not ok),
+-1 (internal error)]"
+    ::= { pk-SAV2-hsm-subtree 1 } -- .1.3.6.1.4.1.22408.1.4.1.6.1.0
+
+pk-SAV2-hsm-driver-utimaco-status OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "The Utimaco CryptoServer LAN service status. Possible values: 
+[0 (status ok),
+1 (status not ok),
+-1 (internal error)]"
+    ::= { pk-SAV2-hsm-utimaco-subtree 1 } -- .1.3.6.1.4.1.22408.1.4.1.6.3.1.0
+
+pk-SAV2-hsm-driver-utimaco-serialNumber OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "The Utimaco CryptoServer LAN serial number. Possible values: 
+[STRING,
+ERROR (internal error)]"
+    ::= { pk-SAV2-hsm-utimaco-subtree 2 } -- .1.3.6.1.4.1.22408.1.4.1.6.3.2.0
+
+pk-SAV2-hsm-driver-utimaco-model OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "The Utimaco CryptoServer LAN model. Possible values: 
+[STRING,
+ERROR (internal error)]"
+    ::= { pk-SAV2-hsm-utimaco-subtree 3 } -- .1.3.6.1.4.1.22408.1.4.1.6.3.3.0
+
+pk-SAV2-hsm-driver-utimaco-state OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "The Utimaco CryptoServer LAN state. Possible values: 
+[STRING,
+ERROR (internal error)]"
+    ::= { pk-SAV2-hsm-utimaco-subtree 4 } -- .1.3.6.1.4.1.22408.1.4.1.6.3.4.0
+
+pk-SAV2-hsm-driver-utimaco-mode OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "The Utimaco CryptoServer LAN mode of operation. Possible values: 
+[STRING,
+ERROR (internal error)]"
+    ::= { pk-SAV2-hsm-utimaco-subtree 5 } -- .1.3.6.1.4.1.22408.1.4.1.6.3.5.0
+
+pk-SAV2-hsm-driver-ncipher OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Entrust nCipher HSM service status. Possible values: 
+[0 (status ok),
+1 (status not ok),
+-1 (internal error)]"
+    ::= { pk-SAV2-hsm-subtree 4 } -- .1.3.6.1.4.1.22408.1.4.1.6.4.0
+
+END

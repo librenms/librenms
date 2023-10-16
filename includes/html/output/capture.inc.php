@@ -24,7 +24,7 @@
  */
 if (! Auth::user()->hasGlobalAdmin()) {
     echo 'Insufficient Privileges';
-    exit();
+    exit;
 }
 
 $hostname = escapeshellcmd($_REQUEST['hostname']);
@@ -32,7 +32,7 @@ $type = $_REQUEST['type'];
 
 switch ($type) {
     case 'poller':
-        $cmd = ['php', \LibreNMS\Config::get('install_dir') . '/poller.php', '-h', $hostname, '-r', '-f', '-d'];
+        $cmd = ['php', \LibreNMS\Config::get('install_dir') . '/lnms', 'device:poll', $hostname, '--no-data', '-vv'];
         $filename = "poller-$hostname.txt";
         break;
     case 'snmpwalk':

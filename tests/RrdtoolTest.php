@@ -30,7 +30,7 @@ use LibreNMS\Data\Store\Rrd;
 
 class RrdtoolTest extends TestCase
 {
-    public function testBuildCommandLocal()
+    public function testBuildCommandLocal(): void
     {
         Config::set('rrdcached', '');
         Config::set('rrdtool_version', '1.4');
@@ -58,7 +58,7 @@ class RrdtoolTest extends TestCase
         $this->assertEquals('update /opt/librenms/rrd/f o', $cmd);
     }
 
-    public function testBuildCommandRemote()
+    public function testBuildCommandRemote(): void
     {
         Config::set('rrdcached', 'server:42217');
         Config::set('rrdtool_version', '1.4');
@@ -86,7 +86,7 @@ class RrdtoolTest extends TestCase
         $this->assertEquals('update f o --daemon server:42217', $cmd);
     }
 
-    public function testBuildCommandException()
+    public function testBuildCommandException(): void
     {
         Config::set('rrdcached', '');
         Config::set('rrdtool_version', '1.4');

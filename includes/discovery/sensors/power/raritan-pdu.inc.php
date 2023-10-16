@@ -13,7 +13,7 @@ if ($inlet_oids) {
         if ($inlet_data) {
             [$inlet_oid,$inlet_descr] = explode(' ', $inlet_data, 2);
             $inlet_split_oid = explode('.', $inlet_oid);
-            $inlet_index = $inlet_split_oid[(count($inlet_split_oid) - 2)] . '.' . $inlet_split_oid[(count($inlet_split_oid) - 1)];
+            $inlet_index = $inlet_split_oid[count($inlet_split_oid) - 2] . '.' . $inlet_split_oid[count($inlet_split_oid) - 1];
             $inlet_oid = ".1.3.6.1.4.1.13742.6.5.2.3.1.4.$inlet_index.5";
             $inlet_divisor = pow(10, snmp_get($device, "inletSensorDecimalDigits.$inlet_index.activePower", '-Ovq', 'PDU2-MIB'));
             $inlet_power = (snmp_get($device, "measurementsInletSensorValue.$inlet_index.activePower", '-Ovq', 'PDU2-MIB') / $inlet_divisor);
@@ -34,12 +34,12 @@ if ($outlet_oids) {
         if ($outlet_data) {
             [$outlet_oid,$outlet_descr] = explode(' ', $outlet_data, 2);
             $outlet_split_oid = explode('.', $outlet_oid);
-            $outlet_index = $outlet_split_oid[(count($outlet_split_oid) - 1)];
+            $outlet_index = $outlet_split_oid[count($outlet_split_oid) - 1];
             $outletsuffix = "$outlet_index";
             $outlet_insert_index = $outlet_index;
             $outlet_oid = ".1.3.6.1.4.1.13742.4.1.2.2.1.8.$outletsuffix";
             $outlet_descr = snmp_get($device, "outletLabel.$outletsuffix", '-Ovq', 'PDU-MIB');
-            $outlet_power = (snmp_get($device, "outletApparentPower.$outletsuffix", '-Ovq', 'PDU-MIB'));
+            $outlet_power = snmp_get($device, "outletApparentPower.$outletsuffix", '-Ovq', 'PDU-MIB');
             if ($outlet_power >= 0) {
                 discover_sensor($valid['sensor'], 'power', $device, $outlet_oid, $outlet_insert_index, 'raritan', $outlet_descr, $divisor, $multiplier, null, null, null, null, $outlet_power);
             }
@@ -57,7 +57,7 @@ if ($outlet_oids) {
         if ($outlet_data) {
             [$outlet_oid,$outlet_descr] = explode(' ', $outlet_data, 2);
             $outlet_split_oid = explode('.', $outlet_oid);
-            $outlet_index = $outlet_split_oid[(count($outlet_split_oid) - 1)];
+            $outlet_index = $outlet_split_oid[count($outlet_split_oid) - 1];
             $outletsuffix = "$outlet_index";
             $outlet_insert_index = $outlet_index;
             $outlet_oid = ".1.3.6.1.4.1.13742.6.5.4.3.1.4.1.$outletsuffix.5";
