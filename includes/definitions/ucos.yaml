@@ -33,4 +33,3 @@ discovery:
     -
         sysDescr:
             - 'Software:UCOS'
-            - 'Cisco NX-OS(tm) ucs'
