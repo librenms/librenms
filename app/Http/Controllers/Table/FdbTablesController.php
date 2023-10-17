@@ -46,7 +46,7 @@ class FdbTablesController extends TableController
         return [
             'port_id' => 'nullable|integer',
             'device_id' => 'nullable|integer',
-            'serachby' => 'in:mac,vlan,dnsname,ip,description,first_seen,last_seen',
+            'searchby' => 'in:mac,vlan,dnsname,ip,description,first_seen,last_seen',
             'dns' => 'nullable|in:true,false',
         ];
     }
