@@ -254,12 +254,6 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
             'rrd_type' => $rrd_type,
         ];
 
-        foreach ($insert as $key => $val_check) {
-            if (! isset($val_check)) {
-                unset($insert[$key]);
-            }
-        }
-
         $inserted = dbInsert($insert, 'sensors');
 
         d_echo("( $inserted inserted )\n");

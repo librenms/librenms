@@ -19,5 +19,5 @@ $divisor = 1;
 $temperature = (float) snmp_get($device, $oid, '-Oqv', 'PT-MONITOR-MIB');
 
 if ($temperature != 0.0) {
-    discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, $sensor_type, $descr, $divisor, null, null, null, null, null, $temperature);
+    discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, $sensor_type, $descr, $divisor, 1, null, null, null, null, $temperature);
 }
