@@ -3735,6 +3735,13 @@
                 "other": "Other"
             }
         },
+        "graylog.query.field": {
+            "default": "source",
+            "type": "text",
+            "group": "external",
+            "section": "graylog",
+            "order": 10
+        },
         "group": {
             "type": "text",
             "default": "librenms"
