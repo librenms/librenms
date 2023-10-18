@@ -21605,7 +21605,7 @@
                     "ifMtu": 1514,
                     "ifType": "ethernetCsmacd",
                     "ifAlias": "fxp0",
-                    "ifPhysAddress": "33303a62363a",
+                    "ifPhysAddress": "30b64f709cc2",
                     "ifLastChange": 0,
                     "ifVlan": null,
                     "ifTrunk": null,
