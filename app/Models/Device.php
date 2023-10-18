@@ -470,7 +470,7 @@ class Device extends BaseModel
 
     public function setIpAttribute($ip): void
     {
-        $this->attributes['ip'] = inet_pton($ip ?? '');
+        $this->attributes['ip'] = $ip ? inet_pton($ip) : null;
     }
 
     public function setStatusAttribute($status): void
