@@ -24,6 +24,7 @@
  */
 
 use LibreNMS\Config;
+use LibreNMS\Util\Mac;
 
 foreach (DeviceCache::getPrimary()->getVrfContexts() as $context_name) {
     if (file_exists(Config::get('install_dir') . "/includes/discovery/arp-table/{$device['os']}.inc.php")) {
