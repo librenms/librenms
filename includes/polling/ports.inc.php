@@ -578,7 +578,7 @@ foreach ($ports as $port) {
             $this_port['ifName'] = $matches[1];
         }
 
-        $polled_period = ($polled - $port['poll_time']);
+        $polled_period = max($polled - $port['poll_time'], 1);
 
         $port['update'] = [];
         $port['update_extended'] = [];
