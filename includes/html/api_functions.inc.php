@@ -413,6 +413,7 @@ function add_device(Illuminate\Http\Request $request)
             'hostname',
             'display',
             'overwrite_ip',
+            'location_id',
             'port',
             'transport',
             'poller_group',
@@ -426,6 +427,10 @@ function add_device(Illuminate\Http\Request $request)
             'cryptopass',
             'cryptoalgo',
         ]));
+
+        if (! empty($data['location'])) {
+            $device->location_id = \App\Models\Location::firstOrCreate(['location' => $data['location']])->id;
+        }
 
         // uses different name in legacy call
         if (! empty($data['version'])) {

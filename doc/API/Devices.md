@@ -1189,6 +1189,7 @@ Input (JSON):
 - port_association_mode: method to identify ports: ifIndex (default), ifName, ifDescr, ifAlias
 - poller_group: This is the poller_group id used for distributed
   poller setup. Defaults to 0.
+- location or location_id: set the location by text or location id
 - force_add: Set to true to force the device to be added regardless of it being able
   to respond to snmp or icmp.
 
