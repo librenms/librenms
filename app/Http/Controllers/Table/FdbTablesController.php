@@ -160,15 +160,17 @@ class FdbTablesController extends TableController
     public function formatItem($fdb_entry)
     {
         $mac = Mac::parse($fdb_entry->mac_address);
+        $ips = $fdb_entry->ipv4Addresses->pluck('ipv4_address');
+
         $item = [
             'device' => $fdb_entry->device ? Url::deviceLink($fdb_entry->device) : '',
             'mac_address' => $mac->readable(),
             'mac_oui' => $mac->vendor(),
-            'ipv4_address' => $fdb_entry->ipv4Addresses->implode(', '),
+            'ipv4_address' => $ips->implode(', '),
             'interface' => '',
             'vlan' => $fdb_entry->vlan ? $fdb_entry->vlan->vlan_vlan : '',
             'description' => '',
-            'dnsname' => $this->resolveDns($fdb_entry->ipv4Addresses),
+            'dnsname' => $this->resolveDns($ips),
             'first_seen' => 'unknown',
             'last_seen' => 'unknown',
         ];
