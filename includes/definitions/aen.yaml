@@ -9,5 +9,7 @@ over:
 mib_dir: accedian
 discovery:
     -
-        sysObjectID:
-            - .1.3.6.1.4.1.22420.1.1
+        sysDescr_regex:
+            - '^AMN-'
+            - '^AEN-'
+            - '^AMO-'
