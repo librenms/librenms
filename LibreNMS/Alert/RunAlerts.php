@@ -254,8 +254,9 @@ class RunAlerts
         $obj = $this->describeAlert($alert);
         if (is_array($obj)) {
             echo 'Issuing Alert-UID #' . $alert['id'] . '/' . $alert['state'] . ':' . PHP_EOL;
-            $this->extTransports($obj);
-
+            if ($alert['state'] != AlertState::ACKNOWLEDGED || Config::get('alert.acknowledged') === true) {
+                $this->extTransports($obj);
+            }
             echo "\r\n";
         }
 

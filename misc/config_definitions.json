@@ -90,6 +90,13 @@
             "order": 1,
             "type": "boolean"
         },
+        "alert.acknowledged": {
+            "default": true,
+            "group": "alerting",
+            "section": "general",
+            "order": 1,
+            "type": "boolean"
+        },
         "alert.fixed-contacts": {
             "default": true,
             "group": "alerting",
@@ -198,26 +205,33 @@
             "section": "rules",
             "order": 4
         },
+        "alert_rule.acknowledged_alerts": {
+            "default": true,
+            "type": "boolean",
+            "group": "alerting",
+            "section": "rules",
+            "order": 5
+        },
         "alert_rule.invert_rule_match": {
             "default": false,
             "type": "boolean",
             "group": "alerting",
             "section": "rules",
-            "order": 5
+            "order": 6
         },
         "alert_rule.recovery_alerts": {
             "default": true,
             "type": "boolean",
             "group": "alerting",
             "section": "rules",
-            "order": 6
+            "order": 7
         },
         "alert_rule.invert_map": {
             "default": false,
             "type": "boolean",
             "group": "alerting",
             "section": "rules",
-            "order": 7
+            "order": 8
         },
         "discovery_on_reboot": {
             "default": false,
