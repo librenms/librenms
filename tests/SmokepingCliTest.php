@@ -61,7 +61,7 @@ class SmokepingCliTest extends DBTestCase
         'Psv9oZcxdC' => [
             'oHiPfLzrmU' => [
                 'transport' => 'udp',
-                'displayname' => 'Psv9oZcxdC',
+                'displayname' => 'oHiPfLzrmU',
             ],
             'kEn7hZ7N37' => [
                 'transport' => 'udp6',
@@ -83,7 +83,7 @@ class SmokepingCliTest extends DBTestCase
         '4diY0pWFik' => [
             'example.org' => [
                 'transport' => 'udp',
-                'displayname' => '4diY0pWFik',
+                'displayname' => 'example.org',
             ],
             'host_with_under_score.example.org' => [
                 'transport' => 'udp6',
