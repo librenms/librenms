@@ -124,7 +124,7 @@ class SmokepingGenerateCommand extends LnmsCommand
      */
     public function buildTargetsConfiguration($devices)
     {
-        $targets = $this->buildTargets($smokelist, Config::get('smokeping.probes'), $this->option('single-process'));
+        $targets = $this->buildTargets($devices, Config::get('smokeping.probes'), $this->option('single-process'));
         $header = $this->buildHeader($this->option('no-header'), $this->option('compat'));
 
         return $this->render($header, $targets);
