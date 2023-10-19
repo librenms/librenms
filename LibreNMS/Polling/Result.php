@@ -46,6 +46,7 @@ class Result
     {
         return $this->attempted == 0;
     }
+
     public function hasNoCompleted(): bool
     {
         return $this->completed == 0;
