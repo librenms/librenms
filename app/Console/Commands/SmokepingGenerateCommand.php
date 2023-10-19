@@ -77,7 +77,7 @@ class SmokepingGenerateCommand extends LnmsCommand
             return 1;
         }
 
-        $devices = Device::isNotDisabled()->orderBy('type')->orderBy('hostname')->groupBy(['type', 'hostname'])->get();
+        $devices = Device::isNotDisabled()->orderBy('type')->orderBy('hostname')->get();
 
         if (count($devices) < 1) {
             $this->error(__('commands.smokeping:generate.no-devices'));
@@ -124,7 +124,16 @@ class SmokepingGenerateCommand extends LnmsCommand
      */
     public function buildTargetsConfiguration($devices)
     {
-        $targets = $this->buildTargets($devices, Config::get('smokeping.probes'), $this->option('single-process'));
+        // Take the devices array and build it into a hierarchical list
+        $smokelist = [];
+        foreach ($devices as $device) {
+            $smokelist[$device->type][$device->hostname] = [
+                'transport' => $device->transport,
+                'displayname' => $device->displayName(),
+            ];
+        }
+
+        $targets = $this->buildTargets($smokelist, Config::get('smokeping.probes'), $this->option('single-process'));
         $header = $this->buildHeader($this->option('no-header'), $this->option('compat'));
 
         return $this->render($header, $targets);
