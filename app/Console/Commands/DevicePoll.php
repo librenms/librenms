@@ -41,14 +41,14 @@ class DevicePoll extends LnmsCommand
         try {
             /** @var \LibreNMS\Poller $poller */
             $poller = app(Poller::class, ['device_spec' => $this->argument('device spec'), 'module_override' => explode(',', $this->option('modules') ?? '')]);
-            $polled = $poller->poll();
+            $result = $poller->poll();
 
-            if ($polled > 0) {
+            if ($result->hasAnyCompleted()) {
                 if (! $this->output->isQuiet()) {
-                    if ($polled > 1) {
+                    if ($result->hasMultipleCompleted()) {
                         $this->output->newLine();
                         $time_spent = sprintf('%0.3fs', $measurements->getCategory('device')->getSummary('poll')->getDuration());
-                        $this->line(trans('commands.device:poll.polled', ['count' => $polled, 'time' => $time_spent]));
+                        $this->line(trans('commands.device:poll.polled', ['count' => $result->getCompleted(), 'time' => $time_spent]));
                     }
                     $this->output->newLine();
                     $measurements->printStats();
@@ -58,10 +58,17 @@ class DevicePoll extends LnmsCommand
             }
 
             // polled 0 devices, maybe there were none to poll
-            if ($poller->totalDevices() == 0) {
+            if ($result->hasNoAttempts()) {
                 $this->error(trans('commands.device:poll.errors.no_devices'));
 
                 return 1;
+            }
+
+            // attempted some devices, but none were up.
+            if ($result->hasNoCompleted()) {
+                $this->line('<fg=red>' . trans_choice('commands.device:poll.errors.none_up', $result->getAttempted()) . '</>');
+
+                return 6;
             }
         } catch (QueryException $e) {
             if ($e->getCode() == 2002) {

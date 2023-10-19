@@ -120,6 +120,7 @@ return [
             'db_connect' => 'Failed to connect to database. Verify database service is running and connection settings.',
             'db_auth' => 'Failed to connect to database. Verify credentials: :error',
             'no_devices' => 'No devices found matching your given device specification.',
+            'none_up' => 'Device was down, unable to poll.|All devices were down, unable to poll.',
             'none_polled' => 'No devices were polled.',
         ],
         'polled' => 'Polled :count devices in :time',
