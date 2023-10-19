@@ -32,6 +32,6 @@ class Valere extends \LibreNMS\OS
     public function discoverOS(Device $device): void
     {
         parent::discoverOS($device); // yaml
-        $device->features = implode(', ', explode(PHP_EOL, snmp_walk($this->getDeviceArray(), 'vpwrModuleOID', '-Oqvs', 'VALERE-DC-POWER-MIB')));
+        $device->features = implode(', ', explode(PHP_EOL, snmp_walk($this->getDeviceArray(), 'vpwrModuleOID', '-Oqvs', 'ELTEK-BC2000-DC-POWER-MIB')));
     }
 }
