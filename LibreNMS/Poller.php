@@ -37,6 +37,7 @@ use Illuminate\Support\Str;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\PollerException;
 use LibreNMS\Polling\ConnectivityHelper;
+use LibreNMS\Polling\Result;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Dns;
@@ -77,9 +78,9 @@ class Poller
         $this->parseModules();
     }
 
-    public function poll(): int
+    public function poll(): Result
     {
-        $polled = 0;
+        $results = new Result;
         $this->printHeader();
 
         if (Debug::isEnabled() && ! defined('PHPUNIT_RUNNING')) {
@@ -89,6 +90,7 @@ class Poller
         $this->logger->info("Starting polling run:\n");
 
         foreach ($this->buildDeviceQuery()->pluck('device_id') as $device_id) {
+            $results->markAttempted();
             $this->initDevice($device_id);
             PollingDevice::dispatch($this->device);
             $this->os = OS::make($this->deviceArray);
@@ -100,15 +102,13 @@ class Poller
             $helper->saveMetrics();
             $helper->isUp(); // check and save status
 
-            $polled_modules = $this->pollModules();
+            $this->pollModules();
 
             $measurement->end();
 
             // if modules are not overridden, record performance
             if (empty($this->module_override)) {
-                // check that we ran some modules (exclude availability because it always runs)
-                $valid_polled_modules = array_filter($polled_modules, fn($module) => $module !== 'availability');
-                if (! empty($valid_polled_modules)) {
+                if ($this->device->status) {
                     $this->recordPerformance($measurement);
                 }
 
@@ -116,16 +116,16 @@ class Poller
                     $this->os->enableGraph('ping_perf');
                 }
 
-                $this->os->persistGraphs();
+                $this->os->persistGraphs($this->device->status); // save graphs but don't delete any if device is down
                 $this->logger->info(sprintf("Enabled graphs (%s): %s\n\n",
                     $this->device->graphs->count(),
                     $this->device->graphs->pluck('graph')->implode(' ')
                 ));
             }
 
+            // finalize the device poll
             $this->device->save();
-            $polled++;
-
+            $results->markCompleted($this->device->status);
             DevicePolled::dispatch($this->device);
 
             $this->logger->info(sprintf("\n>>> Polled %s (%s) in %0.3f seconds <<<",
@@ -139,23 +139,15 @@ class Poller
 
             // check if the poll took too long and log an event
             if ($measurement->getDuration() > Config::get('rrd.step')) {
-                \App\Models\Eventlog::log('Polling took longer than ' . round(Config::get('rrd.step') / 60, 2) .
+                Eventlog::log('Polling took longer than ' . round(Config::get('rrd.step') / 60, 2) .
                     ' minutes!  This will cause gaps in graphs.', $this->device, 'system', Severity::Error);
             }
         }
 
-        return $polled;
+        return $results;
     }
 
-    /**
-     * Get the total number of devices to poll.
-     */
-    public function totalDevices(): int
-    {
-        return $this->buildDeviceQuery()->count();
-    }
-
-    private function pollModules(): array
+    private function pollModules(): void
     {
         // update $device array status
         $this->deviceArray['status'] = $this->device->status;
@@ -168,7 +160,6 @@ class Poller
         include_once base_path('includes/snmp.inc.php');
 
         $datastore = app('Datastore');
-        $polled_modules = [];
 
         foreach (array_keys(Config::get('poller_modules')) as $module) {
             $module_status = Module::pollingStatus($module, $this->device, $this->isModuleManuallyEnabled($module));
@@ -185,12 +176,11 @@ class Poller
                     $this->logger->debug($module_status);
 
                     $instance->poll($this->os, $datastore);
-                    $polled_modules[] = $module;
                 }
             } catch (Throwable $e) {
                 // isolate module exceptions so they don't disrupt the polling process
                 $this->logger->error("%rError polling $module module for {$this->device->hostname}.%n $e", ['color' => true]);
-                \App\Models\Eventlog::log("Error polling $module module. Check log file for more details.", $this->device, 'poller', Severity::Error);
+                Eventlog::log("Error polling $module module. Check log file for more details.", $this->device, 'poller', Severity::Error);
                 report($e);
             }
 
@@ -201,8 +191,6 @@ class Poller
                 $this->logger->info("#### Unload poller module $module ####\n");
             }
         }
-
-        return $polled_modules;
     }
 
     private function saveModulePerformance(string $module, float $start_time, int $start_memory): void
