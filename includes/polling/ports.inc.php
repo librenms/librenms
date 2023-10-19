@@ -4,6 +4,7 @@ use LibreNMS\Config;
 use LibreNMS\Enum\PortAssociationMode;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Debug;
+use LibreNMS\Util\Mac;
 use LibreNMS\Util\Number;
 
 // Build SNMP Cache Array
@@ -589,9 +590,8 @@ foreach ($ports as $port) {
         }
 
         // rewrite the ifPhysAddress
-        if (strpos($this_port['ifPhysAddress'] ?? '', ':')) {
-            $mac_split = explode(':', $this_port['ifPhysAddress']);
-            $this_port['ifPhysAddress'] = zeropad($mac_split[0]) . zeropad($mac_split[1]) . zeropad($mac_split[2]) . zeropad($mac_split[3]) . zeropad($mac_split[4] ?? '') . zeropad($mac_split[5] ?? '');
+        if (isset($this_port['ifPhysAddress'])) {
+            $this_port['ifPhysAddress'] = Mac::parse($this_port['ifPhysAddress'])->hex();
         }
 
         // use HC values if they are available

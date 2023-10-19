@@ -147,11 +147,11 @@ class ModuleTestHelper
 
                 $snmp_options = ['-OUneb', '-Ih', '-m', '+' . $oid_data['mib']];
                 if ($oid_data['method'] == 'walk') {
-                    $data = \SnmpQuery::options($snmp_options)->context($context)->mibDir($oid_data['mibdir'])->walk($oid_data['oid']);
+                    $data = \SnmpQuery::options($snmp_options)->context($context)->mibDir($oid_data['mibdir'] ?? null)->walk($oid_data['oid']);
                 } elseif ($oid_data['method'] == 'get') {
-                    $data = \SnmpQuery::options($snmp_options)->context($context)->mibDir($oid_data['mibdir'])->get($oid_data['oid']);
+                    $data = \SnmpQuery::options($snmp_options)->context($context)->mibDir($oid_data['mibdir'] ?? null)->get($oid_data['oid']);
                 } elseif ($oid_data['method'] == 'getnext') {
-                    $data = \SnmpQuery::options($snmp_options)->context($context)->mibDir($oid_data['mibdir'])->next($oid_data['oid']);
+                    $data = \SnmpQuery::options($snmp_options)->context($context)->mibDir($oid_data['mibdir'] ?? null)->next($oid_data['oid']);
                 }
 
                 if (isset($data) && $data->isValid()) {
@@ -203,7 +203,7 @@ class ModuleTestHelper
         ];
         foreach ($snmp_matches[0] as $index => $line) {
             preg_match("/'-m' '\+?([a-zA-Z0-9:\-]+)'/", $line, $mib_matches);
-            $mib = $mib_matches[1];
+            $mib = $mib_matches[1] ?? null;
             preg_match("/'-M' '\+?([a-zA-Z0-9:\-\/]+)'/", $line, $mibdir_matches);
             $mibdir = $mibdir_matches[1];
             $method = $snmp_matches[1][$index];
@@ -510,6 +510,19 @@ class ModuleTestHelper
                 $parts = explode('|', $data[$oid], 3);
                 $parts[2] = $parts[1] === '4' ? '<private>' : '3C707269766174653E';
                 $data[$oid] = implode('|', $parts);
+            }
+        }
+
+        // IF-MIB::ifPhysAddress, Make sure it is in hex format
+        foreach ($data as $oid => $oid_data) {
+            if (str_starts_with($oid, '1.3.6.1.2.1.2.2.1.6.')) {
+                $parts = explode('|', $oid_data, 3);
+                $mac = Mac::parse($parts[2])->hex();
+                if ($mac) {
+                    $parts[2] = $mac;
+                    $parts[1] = '4x';
+                    $data[$oid] = implode('|', $parts);
+                }
             }
         }
     }
