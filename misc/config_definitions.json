@@ -500,7 +500,7 @@
             "order": 1,
             "type": "text",
             "validate": {
-                "value": "regex:#(ldaps?://[\\w.]+\\s+)+#"
+                "value": ["regex:#^ldaps?://([-0-9a-zA-Z_.]+|\\[[a-fA-F0-9:]{3,39}\\])(\\s+ldaps?://([-0-9a-zA-Z_.]+|\\[[a-fA-F0-9:]{3,39}\\]))*$#"]
             }
         },
         "auth_ad_require_groupmembership": {
