@@ -428,8 +428,8 @@ ciscoASA:
     - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: oid, Type: varchar(255), 'Null': false, Extra: '' }
     - { Field: data, Type: bigint, 'Null': false, Extra: '' }
-    - { Field: high_alert, Type: bigint, 'Null': false, Extra: '' }
-    - { Field: low_alert, Type: bigint, 'Null': false, Extra: '' }
+    - { Field: high_alert, Type: bigint, 'Null': false, Extra: '', Default: '-1' }
+    - { Field: low_alert, Type: bigint, 'Null': false, Extra: '', Default: '0' }
     - { Field: disabled, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [ciscoASA_id], Unique: true, Type: BTREE }
