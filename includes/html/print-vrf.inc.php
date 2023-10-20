@@ -7,7 +7,7 @@ if (is_integer($i / 2)) {
     $bg_colour = \LibreNMS\Config::get('list_colour.odd');
 }
 
-echo "<tr bgcolor='$bg_colour'>";
+echo "<tbody><tr><td></td>";
 
 echo "<td width=200 class=list-large><a href='routing/vrf/" . $vrf['mplsVpnVrfRouteDistinguisher'] . "/'>" . $vrf['vrf_name'] . '</a></td>';
 echo '<td width=150 class=box-desc>' . $vrf['mplsVpnVrfDescription'] . '</td>';
@@ -35,4 +35,4 @@ foreach (dbFetchRows('SELECT * FROM ports WHERE `device_id` = ? AND `ifVrf` = ?'
 }
 
 echo '</td>';
-echo '</tr>';
+echo '</tr></tbody>';
