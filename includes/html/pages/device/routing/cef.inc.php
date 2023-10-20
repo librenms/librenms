@@ -69,7 +69,7 @@ foreach (dbFetchRows('SELECT * FROM `cef_switching` WHERE `device_id` = ?  ORDER
         $entity_descr = $entity['entPhysicalName'] . ' (' . $entity['entPhysicalModelName'] . ')';
     }
 
-    echo "<tbody><tr><td>" . $entity_descr . '</td>
+    echo '<tbody><tr><td>' . $entity_descr . '</td>
         <td>' . $cef['afi'] . '</td>
         <td>';
 

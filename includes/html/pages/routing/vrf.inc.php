@@ -64,19 +64,19 @@ if (! Auth::user()->hasGlobalRead()) {
 
     print_optionbar_end();
 
-        echo '
-            <div>
-              <div class="panel panel-default">
-                <div class="panel-body">
-                  <table class="table table-condensed table-hover" style="border-collapse:collapse;">
-                    <thead>
-                      <tr>
-                        <th>&nbsp;</th>
-                        <th>VRF</th>
-                        <th>RD</th>
-                        <th>Interfaces</th>
-                      </tr>
-                    </thead>';
+    echo '
+      <div>
+        <div class="panel panel-default">
+          <div class="panel-body">
+            <table class="table table-condensed table-hover" style="border-collapse:collapse;">
+              <thead>
+                <tr>
+                  <th>&nbsp;</th>
+                  <th>VRF</th>
+                  <th>RD</th>
+                  <th>Interfaces</th>
+		</tr>
+              </thead>';
 
     if ($vars['view'] == 'basic' || $vars['view'] == 'graphs') {
         // Pre-Cache in arrays
@@ -105,14 +105,8 @@ if (! Auth::user()->hasGlobalRead()) {
 
         $i = '1';
         foreach (dbFetchRows('SELECT `vrf_name`, `mplsVpnVrfRouteDistinguisher`, `mplsVpnVrfDescription` FROM `vrfs` GROUP BY `mplsVpnVrfRouteDistinguisher`, `mplsVpnVrfDescription`,`vrf_name`') as $vrf) {
-            if ($i % 2) {
-                $bg_colour = Config::get('list_colour.even');
-            } else {
-                $bg_colour = Config::get('list_colour.odd');
-            }
 
-            //echo "<tr valign=top bgcolor='$bg_colour'>";
-            echo "<tbody><td></td>";
+            echo '<tbody><td></td>';
             echo '<td width=240>';
             echo '<a class=list-large href=' . \LibreNMS\Util\Url::generate($vars, ['view' => 'detail', 'vrf' => $vrf['vrf_name']]) . '>';
             echo $vrf['vrf_name'] . '</a><br />';
