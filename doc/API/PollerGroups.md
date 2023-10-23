@@ -11,7 +11,7 @@ Output:
 ```json
 {
     "status": "ok",
-    "get_location": [
+    "get_poller_group": [
         {
             "id": 1,
             "group_name": "test",
