@@ -180,7 +180,7 @@ class Isis implements Module
         $data = snmpwalk_cache_twopart_oid($os->getDeviceArray(), 'isisISAdjLastUpTime', $data, 'ISIS-MIB', null, '-OQUst');
 
         $adjacencies->each(function (IsisAdjacency $adjacency) use (&$data) {
-            $adjacency_data = Arr::last($data[$adjacency->ifIndex]);
+            $adjacency_data = Arr::last($data[$adjacency->ifIndex] ?? []);
             $adjacency->isisISAdjState = $adjacency_data['isisISAdjState'] ?? $adjacency->isisISAdjState;
             $adjacency->isisISAdjLastUpTime = $this->parseAdjacencyTime($adjacency_data);
             $adjacency->save();
