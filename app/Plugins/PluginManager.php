@@ -114,7 +114,11 @@ class PluginManager
                     return app()->call([$hook['instance'], 'handle'], $this->fillArgs($args, $hook['plugin_name']));
                 } catch (Exception|\Error $e) {
                     $name = $hook['plugin_name'];
-                    Log::error("Error calling hook $hookType for $name: " . $e->getMessage());
+                    Log::error("Error calling hook $hookType for $name: " . $e->getMessage() . PHP_EOL . $e->getTraceAsString());
+
+                    if (\LibreNMS\Config::get('plugins.show_errors')) {
+                        throw $e;
+                    }
 
                     Notifications::create("Plugin $name disabled", "$name caused an error and was disabled, please check with the plugin creator to fix the error. The error can be found in logs/librenms.log", 'plugins', 2);
                     Plugin::where('plugin_name', $name)->update(['plugin_active' => 0]);
@@ -174,7 +178,7 @@ class PluginManager
      */
     public function pluginEnabled(string $pluginName): bool
     {
-        return (bool) optional($this->getPlugin($pluginName))->plugin_active;
+        return (bool) $this->getPlugin($pluginName)?->plugin_active;
     }
 
     /**
