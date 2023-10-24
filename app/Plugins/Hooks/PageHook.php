@@ -48,7 +48,7 @@ abstract class PageHook
         return array_merge([
             'settings_view' => Str::start($this->view, "$pluginName::"),
         ], $app->call([$this, 'data'], [
-            'settings' => $settings
+            'settings' => $settings,
         ]));
     }
 }
