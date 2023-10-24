@@ -2,6 +2,7 @@
 
 namespace LibreNMS\Interfaces\Authentication;
 
+use App\Models\User;
 use LibreNMS\Exceptions\AuthenticationException;
 
 interface Authorizer
@@ -94,5 +95,5 @@ interface Authorizer
      * @param  string  $username
      * @return string[]|false get a list of roles for the user, they need not exist ahead of time.  Return false to skip roles update.
      */
-    public function getRoles(string $username): array|false;
+    public function getRoles(User $user): array|false;
 }

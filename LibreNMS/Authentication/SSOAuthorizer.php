@@ -156,8 +156,12 @@ class SSOAuthorizer extends MysqlAuthorizer
      *
      * @throws AuthenticationException
      */
-    public function getRoles(string $username): array|false
+    public function getRoles(\App\Models\User $user): array|false
     {
+        if (! $user->wasRecentlyCreated && ! Config::get('sso.update_users')) {
+            return false; // skip update
+        }
+
         if (Config::get('sso.group_strategy') === 'attribute') {
             $role = Config::get('sso.role_attr');
             if ($role) {

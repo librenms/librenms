@@ -93,7 +93,7 @@ class ADAuthorizationAuthorizer extends MysqlAuthorizer
         return false;
     }
 
-    public function getRoles(string $username): array|false
+    public function getRoles(\App\Models\User $user): array|false
     {
         $roles = $this->authLdapSessionCacheGet('roles');
         if ($roles !== null) {
@@ -101,11 +101,11 @@ class ADAuthorizationAuthorizer extends MysqlAuthorizer
         }
         $roles = [];
 
-        // Find all defined groups $username is in
+        // Find all defined groups username is in
         $search = ldap_search(
             $this->ldap_connection,
             Config::get('auth_ad_base_dn'),
-            $this->userFilter($username),
+            $this->userFilter($user->username),
             ['memberOf']
         );
         $entries = ldap_get_entries($this->ldap_connection, $search);

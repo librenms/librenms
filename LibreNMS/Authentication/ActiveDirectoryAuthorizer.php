@@ -125,7 +125,7 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
         return false;
     }
 
-    public function getRoles(string $username): array|false
+    public function getRoles(\App\Models\User $user): array|false
     {
         $roles = [];
         if (! Config::get('auth_ad_require_groupmembership', true)) {
@@ -137,7 +137,7 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
         // cycle through defined groups, test for memberOf-ship
         foreach (Config::get('auth_ad_groups', []) as $group => $data) {
             try {
-                if ($this->userInGroup($username, $group)) {
+                if ($this->userInGroup($user->username, $group)) {
                     if (isset($data['roles']) && is_array($data['roles'])) {
                         $roles = array_merge($roles, $data['roles']);
                     } elseif (isset($data['level'])) {

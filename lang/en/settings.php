@@ -32,6 +32,7 @@ return [
             'ldap' => ['name' => 'LDAP Settings'],
             'radius' => ['name' => 'Radius Settings'],
             'socialite' => ['name' => 'Socialite Settings'],
+            'sso' => ['name' => 'Single Sign On'],
         ],
         'authorization' => [
             'device-group' => ['name' => 'Device Group Settings'],
@@ -1526,6 +1527,64 @@ return [
         ],
         'snmpwalk' => [
             'description' => 'Path to snmpwalk',
+        ],
+        'sso' => [
+            'create_users' => [
+                'description' => 'Create Users',
+                'help' => 'Enable to automatically create user accounts on first login. Users without accounts cannot login',
+            ],
+            'descr_attr' => [
+                'description' => 'Description attribute',
+                'help' => 'Header or environment variable containing the contents of the user\'s description',
+            ],
+            'email_attr' => [
+                'description' => 'Email attribute',
+                'help' => 'Header or environment variable containing the contents of the user\'s email address',
+            ],
+            'group_attr' => [
+                'description' => 'Group attribute',
+                'help' => 'Header or environment variable containing the contents of the user\'s group memebership when using group strategy "map"',
+            ],
+            'group_delimiter' => [
+                'description' => 'Group delimiter',
+                'help' => 'Character seperating groups if group is multi-valued',
+            ],
+            'group_filter' => [
+                'description' => 'Group filter',
+                'help' => 'Regular Expression to apply to restrict groups accepted from SSO',
+            ],
+            'group_role_map' => [
+                'description' => 'Group role map',
+                'help' => 'Mapping of groups received from SSO to LibreNMS roles when group strategy is "map"',
+            ],
+            'group_strategy' => [
+                'description' => 'Group strategy',
+                'help' => 'Method used for selecting a role (see documentation)',
+            ],
+            'mode' => [
+                'description' => 'Attribute reading mode',
+                'help' => 'Enables either environment variables (supported by mod_php) or headers (supported by everything else) for transferring attributes',
+            ],
+            'realname_attr' => [
+                'description' => 'Real name attributed',
+                'help' => 'Header or environment variable containing the contents of the user\'s given and family names',
+            ],
+            'role_attr' => [
+                'description' => 'Role attribute',
+                'help' => 'Header or environment variable containing the contents of the user\'s role when group strategy is "attribute"',
+            ],
+            'static_role' => [
+                'description' => 'Static role',
+                'help' => 'Role to be assigned to all users if group strategy is "static", ignoring SSO fields',
+            ],
+            'trusted_proxies' => [
+                'description' => 'Trusted proxies',
+                'help' => 'Source IP addresses that can provide SSO headers, for use with reverse proxies',
+            ],
+            'update_users' => [
+                'description' => 'Update users',
+                'help' => 'User attributes and roles will be updated to the values from the SSO, overwriting any local changes',
+            ],
         ],
         'syslog_filter' => [
             'description' => 'Filter syslog messages containing',
