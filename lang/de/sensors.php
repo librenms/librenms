@@ -102,10 +102,10 @@ return [
         'unit_long' => 'Watt',
     ],
     'power_consumed' => [
-        'short' => 'Verbrauchsleistung',
-        'long' => 'Verbrauchsleistung',
+        'short' => 'Energiemenge',
+        'long' => 'Energiemenge',
         'unit' => 'kWh',
-        'unit_long' => 'Killowattstunden',
+        'unit_long' => 'Kilowattstunden',
     ],
     'power_factor' => [
         'short' => 'Leistungsfaktor',
