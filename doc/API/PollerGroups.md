@@ -1,10 +1,10 @@
 ###`get_poller_group`
 
-Gets a specific poller group
+Gets a specific poller group or all if none is specified
 
 Route: `/api/v0/poller_group/:poller_group`
 
-- poller_group: name or id of the poller group to get
+- poller_group: optional name or id of the poller group to get
 
 Output:
 

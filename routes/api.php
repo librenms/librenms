@@ -97,7 +97,7 @@ Route::prefix('v0')->namespace('\App\Api\Controllers')->group(function () {
         Route::post('bgp/{id}', 'LegacyApiController@edit_bgp_descr')->name('edit_bgp_descr');
         Route::post('syslogsink', 'LegacyApiController@post_syslogsink')->name('post_syslogsink');
 
-        Route::get('poller_group/{poller_group_id_or_name}', 'LegacyApiController@get_poller_group')->name('get_poller_group');
+        Route::get('poller_group/{poller_group_id_or_name?}', 'LegacyApiController@get_poller_group')->name('get_poller_group');
     });
 
     // restricted by access
