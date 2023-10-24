@@ -14,6 +14,6 @@ return [
     */
 
     'failed' => 'Login fehlgeschlagen.',
-    'throttle' => 'Zuviele Loginversuche. Versuchen Sie es in :seconds Sekunden noch einmal.',
+    'throttle' => 'Zu viele Loginversuche. Versuchen Sie es in :seconds Sekunden noch einmal.',
 
 ];

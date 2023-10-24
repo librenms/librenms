@@ -251,7 +251,7 @@ class Poller
     {
         \DeviceCache::setPrimary($device_id);
         $this->device = \DeviceCache::getPrimary();
-        $this->device->ip = $this->device->overwrite_ip ?: Dns::lookupIp($this->device);
+        $this->device->ip = $this->device->overwrite_ip ?: Dns::lookupIp($this->device) ?: $this->device->ip;
 
         $this->deviceArray = $this->device->toArray();
         if ($os_group = Config::get("os.{$this->device->os}.group")) {
@@ -337,7 +337,7 @@ EOH, $this->device->hostname, $group ? " ($group)" : '', $this->device->device_i
             'rrd_def' => RrdDefinition::make()->addDataset('poller', 'GAUGE', 0),
             'module' => 'ALL',
         ], [
-            'poller' => $this->device->last_ping_timetaken,
+            'poller' => $this->device->last_polled_timetaken,
         ]);
 
         $this->os->enableGraph('poller_perf');
