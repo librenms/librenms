@@ -337,7 +337,7 @@ EOH, $this->device->hostname, $group ? " ($group)" : '', $this->device->device_i
             'rrd_def' => RrdDefinition::make()->addDataset('poller', 'GAUGE', 0),
             'module' => 'ALL',
         ], [
-            'poller' => $this->device->last_ping_timetaken,
+            'poller' => $this->device->last_polled_timetaken,
         ]);
 
         $this->os->enableGraph('poller_perf');
