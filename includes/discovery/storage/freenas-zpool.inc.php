@@ -5,7 +5,8 @@ if ($device['os'] == 'truenas') {
 
     if (is_array($zpooltable_array)) {
         foreach ($zpooltable_array as $index => $zpool) {
-            if (isset($zpool['zpoolDescr'])) {
+            // new devices return a status string at zpoolAllocationUnits (.1.3.6.1.4.1.50536.1.1.1.1.3) and no longer support zpool usage stats
+            if (is_numeric($zpool['zpoolAllocationUnits'])) {
                 $units = (int) $zpool['zpoolAllocationUnits'];
 
                 discover_storage($valid_storage, $device,
