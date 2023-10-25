@@ -71,6 +71,14 @@ plugins:
         'General/Contributing.md': 'Developing/Getting-Started.md'
         'Installation/CentOS-image.md': 'Installation/Install-LibreNMS.md'
         'Installation/index.md': 'Installation/Install-LibreNMS.md'
+        'Installation/Installation-CentOS-6-Apache-Nginx.md': 'Installation/Install-LibreNMS.md'
+        'Installation/Installation-CentOS-7-Apache.md': 'Installation/Install-LibreNMS.md'
+        'Installation/Installation-CentOS-7-Nginx.md': 'Installation/Install-LibreNMS.md'
+        'Installation/Installation-Debian-11-Nginx.md': 'Installation/Install-LibreNMS.md'
+        'Installation/Installation-Ubuntu-1604-Apache.md': 'Installation/Install-LibreNMS.md'
+        'Installation/Installation-Ubuntu-1604-Nginx.md': 'Installation/Install-LibreNMS.md'
+        'Installation/Installation-Ubuntu-1804-Apache.md': 'Installation/Install-LibreNMS.md'
+        'Installation/Installation-Ubuntu-1804-Nginx.md': 'Installation/Install-LibreNMS.md'
         'Installation/Installing-LibreNMS.md': 'Installation/Install-LibreNMS.md'
         'Installation/Ubuntu-image.md': 'Installation/Images.md'
         'Support/Support-New-OS.md': 'Developing/Support-New-OS.md'
@@ -139,14 +147,6 @@ nav:
     - Other Methods:
       - Docker: Installation/Docker.md
       - Virtual machines: Installation/Images.md
-      - Older guides:
-        - RHEL / CentOS 6: Installation/Installation-CentOS-6-Apache-Nginx.md
-        - RHEL / CentOS 7 - Apache: Installation/Installation-CentOS-7-Apache.md
-        - RHEL / CentOS 7 - Nginx: Installation/Installation-CentOS-7-Nginx.md
-        - Ubuntu 16.04 - Apache: Installation/Installation-Ubuntu-1604-Apache.md
-        - Ubuntu 16.04 - Nginx: Installation/Installation-Ubuntu-1604-Nginx.md
-        - Ubuntu 18.04 - Apache: Installation/Installation-Ubuntu-1804-Apache.md
-        - Ubuntu 18.04 - Nginx: Installation/Installation-Ubuntu-1804-Nginx.md
     - Choosing a release: General/Releases.md
     - Updating: General/Updating.md
 
