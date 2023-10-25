@@ -162,4 +162,15 @@ class StringHelpers
     {
         return $var === null || is_scalar($var) || (is_object($var) && method_exists($var, '__toString'));
     }
+
+    public static function asciiToHex(string $ascii, string $seperator = ''): string
+    {
+        $hex = [];
+        $len = strlen($ascii);
+        for ($i = 0; $i < $len; $i++) {
+            $hex[] = str_pad(strtoupper(dechex(ord($ascii[$i]))), 2, '0', STR_PAD_LEFT);
+        }
+
+        return implode($seperator, $hex);
+    }
 }
