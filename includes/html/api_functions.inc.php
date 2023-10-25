@@ -2914,7 +2914,7 @@ function get_location(Illuminate\Http\Request $request)
     if (empty($location)) {
         return api_error(400, 'No location has been provided to get');
     }
-    $data = ctype_digit($location) ? Location::find($location_id) : Location::where('location', $location)->first();
+    $data = ctype_digit($location) ? Location::find($location) : Location::where('location', $location)->first();
     if (empty($data)) {
         return api_error(404, 'Location does not exist');
     }
