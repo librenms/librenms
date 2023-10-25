@@ -304,7 +304,7 @@ You should be able to load the Smokeping web interface at `http://yourlibrenms/s
 ### Nginx Configuration - Ubuntu, Debian and alike
 
 This section assumes you have configured LibreNMS with Nginx as
-specified in [Configure Nginx](../Installation/Installation-Ubuntu-1804-Nginx.md).
+specified in [Configure Nginx](../Installation/Install-LibreNMS.md#configure-web-server).
 
 Note, you need to install fcgiwrap for CGI wrapper interact with Nginx
 
