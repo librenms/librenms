@@ -115,7 +115,7 @@ class TwoFactor
         $bin = str_split($bin, 5);
         $ret = '';
         $x = -1;
-        while (++$x < sizeof($bin)) {
+        while (++$x < count($bin)) {
             $ret .= self::$base32_enc[(int) base_convert(str_pad($bin[$x], 5, '0'), 2, 10)];
         }
 

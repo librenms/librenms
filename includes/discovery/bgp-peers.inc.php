@@ -48,7 +48,7 @@ foreach (DeviceCache::getPrimary()->getVrfContexts() as $context_name) {
     } else {
         echo 'No BGP on host';
         if ($device['bgpLocalAs']) {
-            dbUpdate(['bgpLocalAs' => ['NULL']], 'devices', 'device_id=?', [$device['device_id']]);
+            dbUpdate(['bgpLocalAs' => null], 'devices', 'device_id=?', [$device['device_id']]);
             echo ' (Removed ASN) ';
         }
     }
@@ -61,7 +61,7 @@ foreach (DeviceCache::getPrimary()->getVrfContexts() as $context_name) {
         $af_list = [];
 
         foreach ($peerlist as $peer) {
-            $peer['astext'] = get_astext($peer['as']);
+            $peer['astext'] = \LibreNMS\Util\AutonomousSystem::get($peer['as'])->name();
 
             add_bgp_peer($device, $peer);
 

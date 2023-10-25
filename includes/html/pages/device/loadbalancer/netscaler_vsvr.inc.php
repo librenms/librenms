@@ -138,12 +138,12 @@ if (is_numeric($vars['vsvr'])) {
     switch ($sort_key) {
         case 'vsvr_bps_in':
         case 'vsvr_bps_out':
-            $sort_direction = SORT_DESC;
+            $sort_descending = true;
             break;
         default:
-            $sort_direction = SORT_ASC;
+            $sort_descending = false;
     }
-    $vservers = array_sort_by_column($vservers, $sort_key, $sort_direction);
+    $vservers = collect($vservers)->sortBy($sort_key, descending: $sort_descending)->all();
 
     $i = '0';
     foreach ($vservers as $vsvr) {

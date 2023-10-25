@@ -458,5 +458,8 @@
     "Performance": "效能",
     "History": "歷程",
     "(Un) Acknowledgement note:": "認可/取消認可 備註說明",
-    "Port Groups": "連接埠群組"
+    "Port Groups": "連接埠群組",
+    "Two-Factor Authentication": "雙因子認證",
+    "TwoFactor Type": "雙因子認證類型",
+    "Push Notifications": "推播通知"
 }

@@ -25,12 +25,13 @@
 
 namespace LibreNMS\OS;
 
+use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\RRD\RrdDefinition;
 
 class Procurve extends \LibreNMS\OS implements OSPolling
 {
-    public function pollOS(): void
+    public function pollOS(DataStorageInterface $datastore): void
     {
         $FdbAddressCount = snmp_get($this->getDeviceArray(), 'hpSwitchFdbAddressCount.0', '-Ovqn', 'STATISTICS-MIB');
 
@@ -42,7 +43,7 @@ class Procurve extends \LibreNMS\OS implements OSPolling
             ];
 
             $tags = compact('rrd_def');
-            data_update($this->getDeviceArray(), 'fdb_count', $tags, $fields);
+            $datastore->put($this->getDeviceArray(), 'fdb_count', $tags, $fields);
 
             $this->enableGraph('fdb_count');
         }

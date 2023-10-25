@@ -10,7 +10,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::create('service_templates_device', function (Blueprint $table) {
             $table->unsignedInteger('service_template_id')->unsigned()->index();
@@ -25,7 +25,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::drop('service_templates_device');
     }

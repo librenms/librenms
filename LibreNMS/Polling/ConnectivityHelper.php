@@ -31,6 +31,7 @@ use App\Models\Eventlog;
 use LibreNMS\Config;
 use LibreNMS\Data\Source\Fping;
 use LibreNMS\Data\Source\FpingResponse;
+use LibreNMS\Enum\Severity;
 use LibreNMS\RRD\RrdDefinition;
 use SnmpQuery;
 use Symfony\Component\Process\Process;
@@ -124,7 +125,7 @@ class ConnectivityHelper
         );
 
         if ($status->duplicates > 0) {
-            Eventlog::log('Duplicate ICMP response detected! This could indicate a network issue.', $this->device, 'icmp', 4);
+            Eventlog::log('Duplicate ICMP response detected! This could indicate a network issue.', $this->device, 'icmp', Severity::Warning);
             $status->exit_code = 0;   // when duplicate is detected fping returns 1. The device is up, but there is another issue. Clue admins in with above event.
         }
 
@@ -181,7 +182,7 @@ class ConnectivityHelper
         }
 
         // check for open outage
-        $open_outage = $this->device->outages()->whereNull('up_again')->orderBy('going_down', 'desc')->first();
+        $open_outage = $this->device->getCurrentOutage();
 
         if ($status) {
             if ($open_outage) {

@@ -295,6 +295,12 @@
                             </li>
                         @endif
 
+
+                        @if($port_nac)
+                            <li role="presentation" class="divider"></li>
+                            <li><a href="{{ url('nac') }}"><i class="fa fa-lock fa-fw fa-lg"
+                                                              aria-hidden="true"></i> NAC</a></li>
+                        @endif
                         @if(auth()->user()->hasGlobalRead())
                             @if($port_groups_exist)
                                 <li role="presentation" class="divider"></li>
@@ -761,21 +767,22 @@
         }
     @endif
 
-    $(document).ready(function(){
-    // Function to focus Global Search on Ctrl-F
-    window.addEventListener("keydown",function (e) {
-        if (e.keyCode === 114 || (e.ctrlKey && e.keyCode === 70)){
-            if($('#gsearch').is(":focus")) {
-                //allow normal Ctrl-F on a 2nd Hit
-                return true;
-            } else {
-                //set Focus on Global Search and ignore Browsers defaults
-                e.preventDefault();
-                $('#gsearch').focus();
-            }
-        }
+    @if($global_search_ctrlf_focus)
+        $(document).ready(function(){
+            // Function to focus Global Search on Ctrl-F
+            window.addEventListener("keydown",function (e) {
+                if (e.keyCode === 114 || (e.ctrlKey && e.keyCode === 70)){
+                    if($('#gsearch').is(":focus")) {
+                        //allow normal Ctrl-F on a 2nd Hit
+                        return true;
+                    } else {
+                        //set Focus on Global Search and ignore Browsers defaults
+                        e.preventDefault();
+                        $('#gsearch').focus();
+                    }
+                }
+            })
         })
-
-
-    })
+    @endif
+    
 </script>

@@ -3,34 +3,31 @@
 namespace LibreNMS\Tests\Unit;
 
 use App\Models\AlertTransport;
-use GuzzleHttp\Psr7\Response;
-use LibreNMS\Config;
+use Illuminate\Http\Client\Request;
+use Illuminate\Support\Facades\Http as LaravelHttp;
 use LibreNMS\Tests\TestCase;
-use LibreNMS\Tests\Traits\MockGuzzleClient;
 
 class ApiTransportTest extends TestCase
 {
-    use MockGuzzleClient;
-
     public function testGetMultilineVariables(): void
     {
         /** @var AlertTransport $transport */
         $transport = AlertTransport::factory()->api('text={{ $msg }}')->make();
 
-        $this->mockGuzzleClient([
-            new Response(200),
+        LaravelHttp::fake([
+            '*' => LaravelHttp::response(),
         ]);
 
         $obj = ['msg' => "This is a multi-line\nalert."];
-        $opts = Config::get('alert.transports.' . $transport->transport_type);
-        $result = $transport->instance()->deliverAlert($obj, $opts);
+        $result = $transport->instance()->deliverAlert($obj);
 
         $this->assertTrue($result);
 
-        $history = $this->guzzleRequestHistory();
-        $this->assertCount(1, $history);
-        $this->assertEquals('GET', $history[0]->getMethod());
-        $this->assertEquals('text=This%20is%20a%20multi-line%0Aalert.', $history[0]->getUri()->getQuery());
+        LaravelHttp::assertSentCount(1);
+        LaravelHttp::assertSent(function (Request $request) {
+            return $request->method() == 'GET' &&
+                $request->url() == 'https://librenms.org?text=This%20is%20a%20multi-line%0Aalert.';
+        });
     }
 
     public function testPostMultilineVariables(): void
@@ -42,21 +39,20 @@ class ApiTransportTest extends TestCase
             'bodytext={{ $msg }}',
         )->make();
 
-        $this->mockGuzzleClient([
-            new Response(200),
+        LaravelHttp::fake([
+            '*' => LaravelHttp::response(),
         ]);
 
         $obj = ['msg' => "This is a post multi-line\nalert."];
-        $opts = Config::get('alert.transports.' . $transport->transport_type);
-        $result = $transport->instance()->deliverAlert($obj, $opts);
+        $result = $transport->instance()->deliverAlert($obj);
 
         $this->assertTrue($result);
 
-        $history = $this->guzzleRequestHistory();
-        $this->assertCount(1, $history);
-        $this->assertEquals('POST', $history[0]->getMethod());
-        // FUBAR
-        $this->assertEquals('text=This%20is%20a%20post%20multi-line%0Aalert.', $history[0]->getUri()->getQuery());
-        $this->assertEquals("bodytext=This is a post multi-line\nalert.", (string) $history[0]->getBody());
+        LaravelHttp::assertSentCount(1);
+        LaravelHttp::assertSent(function (Request $request) {
+            return $request->method() == 'POST' &&
+                $request->url() == 'https://librenms.org?text=This%20is%20a%20post%20multi-line%0Aalert.' &&
+                $request->body() == "bodytext=This is a post multi-line\nalert.";
+        });
     }
 }

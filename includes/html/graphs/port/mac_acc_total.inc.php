@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Util\Mac;
+
 $port = $vars['id'];
 $stat = $vars['stat'] ?: 'bits';
 $sort = in_array($vars['sort'], ['in', 'out', 'both']) ? $vars['sort'] : 'in';
@@ -49,7 +51,7 @@ $rrd_options .= " COMMENT:'                                     In\: Current    
 foreach ($accs as $acc) {
     $this_rrd = Rrd::name($acc['hostname'], ['cip', $acc['ifIndex'], $acc['mac']]);
     if (Rrd::checkRrdExists($this_rrd)) {
-        $mac = \LibreNMS\Util\Rewrite::readableMac($acc['mac']);
+        $mac = Mac::parse($acc['mac'])->readable();
         $name = $mac;
 
         $addy = dbFetchRow('SELECT * FROM ipv4_mac where mac_address = ? AND port_id = ?', [$acc['mac'], $acc['port_id']]);

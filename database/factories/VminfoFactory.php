@@ -14,7 +14,7 @@ class VminfoFactory extends Factory
      *
      * @return array
      */
-    public function definition()
+    public function definition(): array
     {
         return [
             'vm_type' => $this->faker->text(16),

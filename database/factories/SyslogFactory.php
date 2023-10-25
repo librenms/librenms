@@ -15,7 +15,7 @@ class SyslogFactory extends Factory
      *
      * @return array
      */
-    public function definition()
+    public function definition(): array
     {
         $facilities = ['kern', 'user', 'mail', 'daemon', 'auth', 'syslog', 'lpr', 'news', 'uucp', 'cron', 'authpriv', 'ftp', 'ntp', 'security', 'console', 'solaris-cron', 'local0', 'local1', 'local2', 'local3', 'local4', 'local5', 'local6', 'local7'];
         $levels = SyslogSeverity::LEVELS;

@@ -46,11 +46,13 @@ class Fping
         $interval = max($interval, 20);
 
         $fping = Config::get('fping');
+        $fping6 = Config::get('fping6');
         $fping_tos = Config::get('fping_options.tos', 0);
-        $cmd = [$fping];
+
         if ($address_family == 'ipv6') {
-            $fping6 = Config::get('fping6');
             $cmd = is_executable($fping6) ? [$fping6] : [$fping, '-6'];
+        } else {
+            $cmd = is_executable($fping6) ? [$fping] : [$fping, '-4'];
         }
 
         // build the command

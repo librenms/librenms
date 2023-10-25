@@ -11,4 +11,4 @@
  * See COPYING for more details.
  */
 
-(new \LibreNMS\Modules\Core())->poll($os);
+(new \LibreNMS\Modules\Core())->poll($os, app('Datastore'));

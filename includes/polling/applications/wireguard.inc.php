@@ -59,8 +59,6 @@ foreach ($interface_client_map as $interface => $client_list) {
             ? $client_data['minutes_since_last_handshake']
             : null;
 
-        $rrd_name = [$polling_type, $name, $app->app_id, $finterface, $fclient];
-
         $fields = [
             'bytes_rcvd' => $bytes_rcvd,
             'bytes_sent' => $bytes_sent,
@@ -73,7 +71,7 @@ foreach ($interface_client_map as $interface => $client_list) {
             'name' => $name,
             'app_id' => $app->app_id,
             'rrd_def' => $rrd_def,
-            'rrd_name' => $rrd_name,
+            'rrd_name' => [$polling_type, $name, $app->app_id, $finterface, $fclient],
         ];
         data_update($device, $polling_type, $tags, $fields);
     }

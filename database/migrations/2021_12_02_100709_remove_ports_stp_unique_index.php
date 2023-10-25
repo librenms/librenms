@@ -11,7 +11,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::table('ports_stp', function (Blueprint $table) {
             $table->dropIndex('ports_stp_device_id_port_id_unique');
@@ -23,7 +23,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::table('ports_stp', function (Blueprint $table) {
             $table->unique(['device_id', 'port_id']);

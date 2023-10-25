@@ -13,7 +13,7 @@ class PortFactory extends Factory
      *
      * @return array
      */
-    public function definition()
+    public function definition(): array
     {
         return [
             'ifIndex' => $this->faker->unique()->numberBetween(),

@@ -103,3 +103,8 @@ The primary button is edit device by default.
 | custom7 | Custom Link 7 |
 | custom8 | Custom Link 8 |
 
+!!! Custom http, ssh, telnet ports
+
+Custom ports can be set through the device setting misc tab and will be appended to the Uri. Empty value will not append anything and automatically default to the standard.
+	- custom ssh port set to 2222 will result in ssh://10.0.0.0:2222
+	- custom telnet port set to 2323 will result in telnet://10.0.0.0:2323

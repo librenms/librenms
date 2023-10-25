@@ -1,0 +1,118 @@
+{
+    "applications": {
+        "discovery": {
+            "applications": [
+                {
+                    "app_type": "suricata_extract",
+                    "app_state": "UNKNOWN",
+                    "discovered": 1,
+                    "app_state_prev": null,
+                    "app_status": "",
+                    "app_instance": "",
+                    "data": null,
+                    "deleted_at": null
+                }
+            ]
+        },
+        "poller": {
+            "applications": [
+                {
+                    "app_type": "suricata_extract",
+                    "app_state": "OK",
+                    "discovered": 1,
+                    "app_state_prev": "UNKNOWN",
+                    "app_status": "",
+                    "app_instance": "",
+                    "data": null,
+                    "deleted_at": null
+                }
+            ],
+            "application_metrics": [
+                {
+                    "metric": "errors",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata_extract"
+                },
+                {
+                    "metric": "ignored_host",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata_extract"
+                },
+                {
+                    "metric": "ignored_ip",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata_extract"
+                },
+                {
+                    "metric": "ignored_ip_dest",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata_extract"
+                },
+                {
+                    "metric": "ignored_ip_src",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata_extract"
+                },
+                {
+                    "metric": "sub",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata_extract"
+                },
+                {
+                    "metric": "sub_2xx",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata_extract"
+                },
+                {
+                    "metric": "sub_3xx",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata_extract"
+                },
+                {
+                    "metric": "sub_4xx",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata_extract"
+                },
+                {
+                    "metric": "sub_5xx",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata_extract"
+                },
+                {
+                    "metric": "sub_fail",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata_extract"
+                },
+                {
+                    "metric": "sub_size",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata_extract"
+                },
+                {
+                    "metric": "truncated",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata_extract"
+                },
+                {
+                    "metric": "zero_sized",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata_extract"
+                }
+            ]
+        }
+    }
+}

@@ -289,8 +289,8 @@ extend backupninja /etc/snmp/backupninja.py
 
 1. Create stats file with appropriate permissions:
 ```bash
-~$ touch /var/cache/bind/stats
-~$ chown bind:bind /var/cache/bind/stats
+touch /var/cache/bind/stats
+chown bind:bind /var/cache/bind/stats
 ```
 Change `user:group` to the user and group that's running bind/named.
 
@@ -387,6 +387,52 @@ chmod +x /usr/lib/check_mk_agent/local/bind
 ```
 
 3. Set the variable 'agent' to '1' in the config.
+
+## BIRD2
+
+The BIRD Internet Routing Daemon (BGP) 
+
+Due to the lack of SNMP support in the BIRD daemon, this application extracts all configured BGP protocols and parses it into LibreNMS.
+This application supports both IPv4 and IPv6 Peer processing.
+
+### SNMP Extend
+
+1. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
+
+```
+extend bird2 '/usr/bin/sudo /usr/sbin/birdc -r show protocols all'
+```
+
+2.  Edit your sudo users (usually `visudo`) and add at the bottom:
+
+```
+Debian-snmp ALL=(ALL) NOPASSWD: /usr/sbin/birdc
+```
+
+_If your snmp daemon is running on a user that isnt `Debian-snmp` make sure that user has the correct permission to execute `birdc`_
+
+3. Verify the time format for bird2 is defined. Otherwise `iso short
+   ms` (hh:mm:ss) is the default value that will be used. Which is not
+   compatible with the datetime parsing logic used to parse the output
+   from the bird show command. `timeformat protocol` is the one
+   important to be defibned for the bird2 app parsing logic to work.
+
+Example starting point using Bird2 shorthand `iso long` (YYYY-MM-DD hh:mm:ss):
+
+```
+timeformat base iso long;
+timeformat log iso long;
+timeformat protocol iso long;
+timeformat route iso long;
+```
+
+*Timezone can be manually specified, example "%F %T %z" (YYYY-MM-DD
+hh:mm:ss +11:45). See the [Bird
+2 docs](https://bird.network.cz/?get_doc&v=20&f=bird-3.html) for more information*
+
+4. Restart snmpd on your host
+
+The application should be auto-discovered as described at the top of the page. If it is not, please follow the steps set out under `SNMP Extend` heading top of page.
 
 ## Certificate
 
@@ -930,7 +976,8 @@ extend icecast /etc/snmp/icecast-stats.sh
 A small python3 script that reports current DHCP leases stats and pool usage of ISC DHCP Server.
 
 Also you have to install the dhcpd-pools Package.
-Under Ubuntu/Debian just run `apt install dhcpd-pools`
+Under Ubuntu/Debian just run `apt install dhcpd-pools` or under
+FreeBSD `pkg install dhcpd-pools`.
 
 ### SNMP Extend
 
@@ -960,6 +1007,74 @@ extend dhcpstats /etc/snmp/dhcp.py
 The application should be auto-discovered as described at the top of
 the page. If it is not, please follow the steps set out under `SNMP
 Extend` heading top of page.
+
+## Logsize
+
+### SNMP Extend
+
+1. Download the script and make it executable.
+
+```
+wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/logsize -O /etc/snmp/logsize
+chmod +x /etc/snmp/logsize
+```
+
+2. Install the requirements.
+
+```
+# FreeBSD
+pkg install p5-File-Find-Rule p5-JSON p5-TOML p5-Time-Piece p5-MIME-Base64 p5-File-Slurp p5-Statistics-Lite
+# Debian
+apt-get install cpanminus
+cpanm File::Find::Rule JSON TOML Time::Piece MIME::Base64 File::Slurp Statistics::Lite
+```
+
+3. Configure the config at `/usr/local/etc/logsize.conf`. You can find
+   the documentation for the config file in the extend. Below is a
+   small example.
+
+```
+# monitor log sizes of logs directly udner /var/log
+[sets.var_log]
+dir="/var/log/"
+
+# monitor remote logs from network devices
+[sets.remote_network]
+dir="/var/log/remote/network/"
+
+# monitor remote logs from windows sources
+[sets.remote_windows]
+dir="/var/log/remote/windows/"
+
+# monitor suricata flows logs sizes
+[sets.suricata_flows]
+dir="/var/log/suricata/flows/current"
+```
+
+4. If the directories all readable via SNMPD, this script can be ran
+   via snmpd. Otherwise it needs setup in cron. Similarly is
+   processing a large number of files, it may also need setup in cron
+   if it takes the script awhile to run.
+
+```
+*/5 * * * * /etc/snmp/logsize -b 2> /dev/null > /dev/null
+```
+
+5. Make sure that `/var/cache/logsize_extend` exists and is writable
+   by the user running the extend.
+
+```
+mkdir -p /var/cache/logsize_extend
+```
+
+6. Configure it in the SNMPD config.
+
+```
+# if not using cron
+extend logsize  /etc/snmp/logsize -b
+# if using cron
+extend logsize /bin/cat /var/cache/logsize_extend/extend_return
+```
 
 ## linux_config_files
 
@@ -995,6 +1110,33 @@ b.) "pkg_tool_cmd" - String path to the package tool binary ["/sbin/rpmconf"]
 ```
 
 5. Restart snmpd.
+
+## Linux Softnet Stat
+
+### SNMP Extend
+
+1: Install the depends, which on a Debian based system would be as below.
+```
+apt-get install -y cpanminus zlib1g-dev
+cpanm File::Slurp MIME::Base64 JSON Gzip::Faster
+```
+
+2. Download the script into the desired host.
+```
+wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/linux_softnet_stat -O /etc/snmp/linux_softnet_stat
+```
+
+3. Make the script executable
+```
+chmod +x /etc/snmp/linux_softnet_stat
+```
+
+4. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
+```
+extend linux_softnet_stat /etc/snmp/linux_softnet_stat -b
+```
+
+Then either enable the application Linux Softnet Stat or wait for it to be re-discovered.
 
 ## mailcow-dockerized postfix
 
@@ -1130,6 +1272,20 @@ extend memcached /etc/snmp/memcached
 The application should be auto-discovered as described at the top of
 the page. If it is not, please follow the steps set out under `SNMP
 Extend` heading top of page.
+
+## Mojo CAPE Submit
+
+### SNMP
+
+This assumes you've already configured mojo_cape_submit from CAPE::Utils.
+
+1. Add the following to `snmpd.conf` and restarted SNMPD
+```
+extend mojo_cape_submit /usr/local/bin/mojo_cape_submit_extend
+```
+
+Then just wait for the machine in question to be rediscovered or
+enabled it in the device settings app page.
 
 ## Munin
 
@@ -1568,6 +1724,9 @@ Extend` heading top of page.
 
 [Install the agent](Agent-Setup.md) on this device if it isn't already
 and copy the `osupdate` script to `/usr/lib/check_mk_agent/local/`
+
+Then uncomment the line towards the top marked to be uncommented if
+using it as a agent.
 
 ## PHP-FPM
 
@@ -2015,6 +2174,50 @@ systemctl reload snmpd
 7. You're now ready to enable the application in LibreNMS.
 
 
+## Privoxy
+
+For this to work, the following log items need enabled for Privoxy.
+
+```
+debug     2 # show each connection status
+debug   512 # Common Log Format
+debug  1024 # Log the destination for requests Privoxy didn't let through, and the reason why.
+debug  4096 # Startup banner and warnings
+debug  8192 # Non-fatal errors
+```
+
+### SNMP Extend
+
+1. Download the extend and make sure it is executable.
+```
+wget https://github.com/librenms/librenms-agent/raw/master/snmp/privoxy -O /etc/snmp/privoxy
+chmod +x /etc/snmp/privoxy
+```
+
+2. Install the depdenencies.
+```
+# FreeBSD
+pkg install p5-File-ReadBackwards p5-Time-Piece p5-JSON p5-IPC-Run3 p5-Gzip-Faster p5-MIME-Base64
+# Debian
+apt-get install cpanminus zlib1g
+cpanm File::ReadBackwards Time::Piece JSON IPC::Run3 MIME::Base64 Gzip::Faster
+```
+
+3. Add the extend to snmpd.conf and restart snmpd.
+```
+extend privoxy /etc/snmp/privoxy
+```
+
+If your logfile is not at `/var/log/privoxy/logfile`, that may be
+changed via the `-f` option.
+
+If `privoxy-log-parser.pl` is not found in your standard `$PATH`
+setting, you may will need up call the extend via `/usr/bin/env` with
+a `$PATH` set to something that includes it.
+
+Once that is done, just wait for the server to be rediscovered or just
+enable it manually.
+
 ## Pwrstatd
 
 Pwrstatd (commonly known as powerpanel) is an application/service available from CyberPower to monitor their PSUs over USB.  It is currently capable of reading the status of only one PSU connected via USB at a time.  The powerpanel software is available here:
@@ -2394,20 +2597,29 @@ hide_monitoring_account = With this Boolean you can hide the Account which you
 
 1. Copy the Perl script, smart, to the desired host.
 ```
-wget https://github.com/librenms/librenms-agent/raw/master/snmp/smart -O /etc/snmp/smart
+wget https://github.com/librenms/librenms-agent/raw/master/snmp/smart-v1 -O /etc/snmp/smart
 ```
 
-2. Make the script executable
+2. Install the depends.
+```
+# FreeBSD
+pkg install p5-JSON p5-MIME-Base64 smartmontools
+# Debian
+apt-get install cpanminus smartmontools
+cpanm MIME::Base64 JSON
+```
+
+3. Make the script executable
 ```
 chmod +x /etc/snmp/smart
 ```
 
-3. Edit your snmpd.conf file and add:
+4. Edit your snmpd.conf file and add:
 ```
 extend smart /etc/snmp/smart
 ```
 
-4. You will also need to create the config file, which defaults to the same path as the script,
+5. You will also need to create the config file, which defaults to the same path as the script,
 but with .config appended. So if the script is located at /etc/snmp/smart, the config file
 will be `/etc/snmp/smart.config`. Alternatively you can also specific a config via `-c`.
 
@@ -2445,23 +2657,24 @@ used for reporting and everything after that is used as the argument to be passe
 If you want to guess at the configuration, call it with -g and it will print out what it thinks
 it should be.
 
-5. Restart snmpd on your host
+6. Restart snmpd on your host
 
 If you have a large number of more than one or two disks on a system,
 you should consider adding this to cron. Also make sure the cache file
 is some place it can be written to.
 
 ```
- */3 * * * * /etc/snmp/smart -u
+ */5 * * * * /etc/snmp/smart -u
 ```
 
-6. If your snmp agent runs as user "snmp", edit your sudo users
+7. If your snmp agent runs as user "snmp", edit your sudo users
    (usually `visudo`) and add at the bottom:
 ```
 snmp ALL=(ALL) NOPASSWD: /etc/snmp/smart, /usr/bin/env smartctl
 ```
 
-and modify your snmpd.conf file accordingly:
+and modify your snmpd.conf file accordingly, sudo can be excluded if
+running it via cron:
 
 ```
 extend smart /usr/bin/sudo /etc/snmp/smart
@@ -2471,15 +2684,108 @@ The application should be auto-discovered as described at the top of
 the page. If it is not, please follow the steps set out under `SNMP
 Extend` heading top of page.
 
-If you set useSN to 1, it is worth noting that you will loose
-history(not able to access it from the web interface) for that device
-each time you change it. You will also need to run camcontrol or the
-like on said server to figure out what device actually corresponds
-with that serial number.
+8. Optionally setup nightly self tests for the disks. The exend will
+   run the specified test on all configured disks if called with the
+   -t flag and the name of the SMART test to run.
 
-Also if the system you are using uses non-static device naming based
-on bus information, it may be worthwhile just using the SN as the
-device ID is going to be irrelevant in that case.
+```
+ 0 0 * * * /etc/snmp/smart -t long
+```
+
+## Sneck
+
+This is for replacing Nagios/Icinga or the LibreNMS service
+integration in regards to NRPE. This allows LibreNMS to query what
+checks were ran on the server and keep track of totals of OK, WARNING,
+CRITICAL, and UNKNOWN statuses.
+
+The big advantage over this compared to a NRPE are as below.
+
+- It does not need to know what checks are configured on it.
+- Also does not need to wait for the tests to run as sneck is meant to
+  be ran via cron and the then return the cache when queried via SNMP,
+  meaning a lot faster response time, especially if slow checks are
+  being performed.
+- Works over proxied SNMP connections.
+
+Included are alert examples. Although for setting up custom ones, the
+metrics below are provided.
+
+| Metric              | Description                                                                                                           |
+|---------------------|-----------------------------------------------------------------------------------------------------------------------|
+| ok                  | Total OK checks                                                                                                       |
+| warning             | Total WARNING checks                                                                                                  |
+| critical            | Total CRITICAL checks                                                                                                 |
+| unknown             | Total UNKNOWN checks                                                                                                  |
+| errored             | Total checks that errored                                                                                             |
+| time_to_polling     | Differnce in seconds between when polling data was generated and when polled                                          |
+| time_to_polling_abs | The absolute value of time_to_polling.                                                                                |
+| check_$CHECK        | Exit status of a specific check `$CHECK` is equal to the name of the check in question. So `foo` would be `check_foo` |
+
+The standard Nagios/Icinga style exit codes are used and those are as
+below.
+
+| Exit | Meaning  |
+|------|----------|
+| 0    | okay     |
+| 1    | warning  |
+| 2    | critical |
+| 3+   | unknown  |
+
+To use `time_to_polling`, it will need to enabled via setting the
+config item below. The default is false. Unless set to true, this
+value will default to 0. If enabling this, one will want to make sure
+that NTP is in use every were or it will alert if it goes over a
+difference of 540s.
+
+```
+lnms config:set app.sneck.polling_time_diff true
+```
+
+For more information on Sneck, check it out at
+[MetaCPAN](https://metacpan.org/dist/Monitoring-Sneck) or
+[Github](https://github.com/VVelox/Monitoring-Sneck).
+
+For poking systems using Sneck, also check out boop_snoot
+if one wants to query those systems via the CLI. Docs on it
+at [MetaCPAN](https://metacpan.org/dist/Monitoring-Sneck-Boop_Snoot) and
+[Github](https://github.com/VVelox/Monitoring-Sneck-Boop_Snoot).
+
+### SNMP Extend
+
+1. Install the extend.
+
+```
+# FreeBSD
+pkg install p5-JSON p5-File-Slurp p5-MIME-Base64 p5-Gzip-Faster p5-App-cpanminus
+cpanm Monitoring::Sneck
+# Debian based systems
+apt-get install zlib1g-dev cpanminus
+cpanm Monitoring::Sneck
+```
+
+2. Configure any of the checks you want to run in
+   `/usr/local/etc/sneck.conf`. You con find it documented
+   [here](https://metacpan.org/pod/Monitoring::Sneck#CONFIG-FORMAT).
+
+3. Set it up in cron. This will mean you don't need to wait for all
+   the checks to complete when polled via SNMP, which for like SMART
+   or other long running checks will mean it timing out. Also means it
+   does not need called via sudo as well.
+
+```
+*/5 * * * * /usr/bin/env PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin /usr/local/bin/sneck -u 2> /dev/null > /dev/null
+```
+
+4. Set it up in the snmpd config and restart snmpd. The `-c` flag will
+   tell read it to read from cache instead of rerunning the checks.
+
+```
+extend sneck /usr/bin/env PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin /usr/local/bin/sneck -c
+```
+
+5. In LibreNMS, enable the application for the server in question or wait for auto
+   discovery to find it.
 
 ## Squid
 
@@ -2602,6 +2908,135 @@ setup. If the default does not work, check the docs for it at
 sagan_stat_check](https://metacpan.org/dist/Sagan-Monitoring/view/bin/sagan_stat_check)
 
 
+## Socket Statistics (ss)
+
+The Socket Statistics application polls ss and scrapes socket statuses.  Individual sockets and address families may be filtered out within the script's optional configuration JSON file.
+
+a. The following socket types are polled directly.  Filtering a socket will disable direct polling as-well-as indirect polling via any address families that list the socket as their child:
+```
+dccp (also exists within AF inet,inet6)
+mptcp (also exists within AF inet,inet6)
+raw (also exists within AF inet,inet6)
+sctp (also exists within AF inet,inet6)
+tcp (also exists within AF inet,inet6)
+udp (also exists within AF inet,inet6)
+xdp
+```
+
+b. The following socket types are polled within an address family only:
+```
+inet6 (within AF inet6)
+p_dgr (within AF link)
+p_raw (within AF link)
+ti_dg (within AF tipc)
+ti_rd (within AF tipc)
+ti_sq (within AF tipc)
+ti_st (within AF tipc)
+v_dgr (within AF vsock)
+v_str (within AF vsock)
+unknown (within AF inet,inet6,link,tipc,vsock)
+```
+
+c. The following address families are polled directly, however, they also have socket types within their address family "umbrella".  Filtering a socket will filter it from the address family.  Filtering an address family will filter out all of its child sockets UNLESS those child sockets are polled directly; see (a) above:
+```
+inet
+    dccp
+    mptcp
+    raw
+    sctp
+    tcp
+    udp
+    unknown
+inet6
+    dccp
+    icmp6
+    mptcp
+    raw
+    sctp
+    tcp
+    udp
+    unknown
+link
+    p_dgr
+    p_raw
+    unknown
+netlink
+tipc
+    ti_dg
+    ti_rd
+    ti_sq
+    ti_st
+    unknown
+unix
+    u_dgr
+    u_seq
+    u_str
+vsock
+    v_dgr
+    v_str
+    unknown
+```
+
+### SNMP Extend
+
+1. Copy the python script, ss.py, to the desired host
+```
+wget https://github.com/librenms/librenms-agent/raw/master/snmp/ss.py -O /etc/snmp/ss.py
+```
+
+2. Make the script executable
+```
+chmod +x /etc/snmp/ss.py
+```
+
+3. Edit your snmpd.conf file and add:
+```
+extend ss /etc/snmp/ss.py
+```
+
+4. (Optional) Create a /etc/snmp/ss.json file and specify:
+    a.) "ss_cmd" - String path to the ss binary: ["/sbin/ss"]
+    b.) "socket_types"  - A comma-delimited list of socket types to include.  The following socket types are valid: dccp, icmp6, mptcp, p_dgr, p_raw, raw, sctp, tcp, ti_dg, ti_rd, ti_sq, ti_st, u_dgr, u_seq, u_str, udp, unknown, v_dgr, v_dgr, xdp.  Please note that the "unknown" socket type is represented in ss output with the netid "???".  Please also note that the p_dgr and p_raw socket types are specific to the "link" address family; the ti_dg, ti_rd, ti_sq, and ti_st socket types are specific to the "tipc" address family; the u_dgr, u_seq, and u_str socket types are specific to the "unix" address family; and the v_dgr and v_str socket types are specific to the "vsock" address family.  Filtering out the parent address families for the aforementioned will also filter out their specific socket types.  Specifying "all" includes all of the socket types.  For example: to include only tcp, udp, icmp6 sockets, you would specify "tcp,udp,icmp6": ["all"]
+    c.) "addr_families" - A comma-delimited list of address families to include.  The following families are valid: inet, inet6, link, netlink, tipc, unix, vsock.  As mentioned above under (b), filtering out the link, tipc, unix, or vsock address families will also filter out their respective socket types.  Specifying "all" includes all of the families.  For example: to include only inet and inet6 families, you would specify "inet,inet6": ["all"]
+```
+{
+    "ss_cmd": "/sbin/ss",
+    "socket_types": "all"
+    "addr_families": "all"
+}
+```
+In order to filter out usually unused socket types, it is recommended to go with the following JSON:
+```
+{
+    "ss_cmd": "/sbin/ss",
+    "socket_types": "icmp6,p_dgr,p_raw,raw,tcp,u_dgr,u_seq,u_str,udp",
+    "addr_families": "inet,inet6,link,netlink,unix"
+}
+```
+
+
+5. (Optional) If you have SELinux in Enforcing mode, you must add a module so the script can access socket state:
+```
+cat << EOF > snmpd_ss.te
+module snmp_ss 1.0;
+
+require {
+	type snmpd_t;
+	class netlink_tcpdiag_socket { bind create getattr nlmsg_read read setopt write };
+}
+
+#============= snmpd_t ==============
+
+allow snmpd_t self:netlink_tcpdiag_socket { bind create getattr nlmsg_read read setopt write };
+EOF
+checkmodule -M -m -o snmpd_ss.mod snmpd_ss.te
+semodule_package -o snmpd_ss.pp -m snmpd_ss.mod
+semodule -i snmpd_ss.pp
+```
+
+6. Restart snmpd.
+
+
 ## Suricata
 
 ### SNMP Extend
@@ -2639,6 +3074,20 @@ setup. If the default does not work, check the docs for it at
 [MetaCPAN for
 suricata_stat_check](https://metacpan.org/dist/Suricata-Monitoring/view/bin/suricata_stat_check)
 
+
+## Suricata Extract
+
+### SNMP
+
+1. Add the following to your snmpd config and restart. Path may have
+to be adjusted depending on where `suricata_extract_submit_extend` is
+installed to.
+```
+extend suricata_extract /usr/local/bin/suricata_extract_submit_extend
+```
+
+Then just wait for the system to be rediscovered or enable it manually
+for the server in question.
 
 ## Systemd
 
@@ -2905,32 +3354,22 @@ b.) "public_key_to_arbitrary_name" - A dictionary to convert between the publick
 
 ### SNMP Extend
 
-`zfs-linux` requires python3 >=python3.5.
-
-The installation steps are:
-
-1. Copy the polling script to the desired host (the host must be added
-   to LibreNMS devices)
-2. Make the script executable
-3. Edit snmpd.conf to include ZFS stats
-
-#### FreeBSD
+1: Install the depends.
 ```
-wget https://github.com/librenms/librenms-agent/raw/master/snmp/zfs-freebsd -O /etc/snmp/zfs-freebsd
-chmod +x /etc/snmp/zfs-freebsd
-echo "extend zfs /etc/snmp/zfs-freebsd" >> /etc/snmp/snmpd.conf
+### FreeBSD
+pkg install p5-JSON p5-MIME-Base64 p5-Gzip-Faster
+### Debian
+apt-get install -y cpanminus zlib1g-dev
+cpanm Mime::Base64 JSON Gzip::Faster
 ```
 
-#### Linux
+2: Fetch the script in question and make it executable.
 ```
-wget https://github.com/librenms/librenms-agent/raw/master/snmp/zfs-linux -O /etc/snmp/zfs-linux
-chmod +x /etc/snmp/zfs-linux
-echo "extend zfs /usr/bin/sudo /etc/snmp/zfs-linux" >> /etc/snmp/snmpd.conf
-```
-
-Edit your sudo users (usually `visudo`) and add at the bottom:
-```
-snmp ALL=(ALL) NOPASSWD: /etc/snmp/zfs-linux
+wget https://github.com/librenms/librenms-agent/raw/master/snmp/zfs -O /etc/snmp/zfs
+chmod +x /etc/snmp/zfs
 ```
 
-Now restart snmpd and you're all set.
+3: Add the following to snmpd.conf and restart snmpd.
+```
+extend zfs /etc/snmp/zfs
+```

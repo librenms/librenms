@@ -42,8 +42,8 @@ modules:
                     oid: e3IpsSensorEntry
                     value: e3IpsSensorTemperatureCelsius
                     num_oid: '.1.3.6.1.4.1.21695.1.10.5.1.4.{{ $index }}'
-                    descr: 'Sensor {{ $subindex1 }}, {{ $e3IpsLabel }}'
-                    group: 'Model {{ $e3IpsModel }} rev{{ $e3IpsHWVersion }}, {{ $e3IpsLabel }}'
+                    descr: 'Sensor {{ $subindex1 }}, {{ $e3IpsLabel:0 }}'
+                    group: 'Model {{ $e3IpsModel:0 }} rev{{ $e3IpsHWVersion:0 }}, {{ $e3IpsLabel:0 }}'
                     index: '{{ $index }}'
                     divisor: 10
                     skip_values:
@@ -61,8 +61,8 @@ modules:
                     oid: e3IpsMeterEntry
                     value: e3IpsFrequency
                     num_oid: '.1.3.6.1.4.1.21695.1.10.4.1.11.{{ $index }}'
-                    descr: 'Phase {{ $subindex1 }}, {{ $e3IpsLabel }}'
-                    group: 'Model {{ $e3IpsModel }} rev{{ $e3IpsHWVersion }}, {{ $e3IpsLabel }}'
+                    descr: 'Phase {{ $subindex1 }}, {{ $e3IpsLabel:0 }}'
+                    group: 'Model {{ $e3IpsModel:0 }} rev{{ $e3IpsHWVersion:0 }}, {{ $e3IpsLabel:0 }}'
                     index: '{{ $index }}'
                     divisor: 1000
                     skip_values:
@@ -76,8 +76,8 @@ modules:
                     oid: e3IpsMeterEntry
                     value: e3IpsPAvg
                     num_oid: '.1.3.6.1.4.1.21695.1.10.4.1.18.{{ $index }}'
-                    descr: 'Phase {{ $subindex1 }}, {{ $e3IpsLabel }}'
-                    group: 'Model {{ $e3IpsModel }} rev{{ $e3IpsHWVersion }}, {{ $e3IpsLabel }}'
+                    descr: 'Phase {{ $subindex1 }}, {{ $e3IpsLabel:0 }}'
+                    group: 'Model {{ $e3IpsModel:0 }} rev{{ $e3IpsHWVersion:0 }}, {{ $e3IpsLabel:0 }}'
                     index: '{{ $index }}'
                     skip_values:
                         -

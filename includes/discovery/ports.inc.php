@@ -22,6 +22,11 @@ $port_stats = snmpwalk_cache_oid($device, 'ifAlias', $port_stats, 'IF-MIB');
 $port_stats = snmpwalk_cache_oid($device, 'ifType', $port_stats, 'IF-MIB', null, $typeSnmpFlags);
 $port_stats = snmpwalk_cache_oid($device, 'ifOperStatus', $port_stats, 'IF-MIB', null, $operStatusSnmpFlags);
 
+// Get Trellix NSP ports
+if ($device['os'] == 'mlos-nsp') {
+    require base_path('includes/discovery/ports/mlos-nsp.inc.php');
+}
+
 //Get UFiber OLT ports
 if ($device['os'] == 'edgeosolt') {
     require base_path('includes/discovery/ports/edgeosolt.inc.php');
@@ -50,6 +55,11 @@ if ($device['os'] == 'luminato') {
 //Moxa Etherdevice portName mapping
 if ($device['os'] == 'moxa-etherdevice') {
     require base_path('includes/discovery/ports/moxa-etherdevice.inc.php');
+}
+
+//Cambium cnMatrix port description mapping
+if ($device['os'] == 'cnmatrix') {
+    require base_path('includes/discovery/ports/cnmatrix.inc.php');
 }
 
 // End Building SNMP Cache Array

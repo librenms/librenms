@@ -26,9 +26,9 @@ modules:
             - HP-SN-AGENT-MIB::snAgImgVer.0
         serial: SEMI-MIB::hpHttpMgSerialNumber.0
         hardware_replace:
-            - ['  ', ' ']
-            - ' Switch'
-            - ' Stack'
+            - ['/  /', ' ']
+            - '/ Switch/'
+            - '/ Stack/'
     processors:
         data:
             -

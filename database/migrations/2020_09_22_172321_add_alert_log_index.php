@@ -11,7 +11,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::table('alert_log', function (Blueprint $table) {
             $table->index(['rule_id', 'device_id']);
@@ -24,7 +24,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::table('alert_log', function (Blueprint $table) {
             $table->dropIndex(['rule_id', 'device_id']);

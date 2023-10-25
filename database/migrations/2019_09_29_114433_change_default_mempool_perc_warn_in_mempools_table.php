@@ -11,7 +11,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::table('mempools', function (Blueprint $table) {
             $table->integer('mempool_perc_warn')->default(null)->change();
@@ -23,7 +23,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::table('mempools', function (Blueprint $table) {
             $table->integer('mempool_perc_warn')->default('75')->change();

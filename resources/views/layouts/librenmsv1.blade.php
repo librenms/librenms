@@ -42,7 +42,7 @@
     <link href="{{ asset('css/query-builder.default.min.css') }}" rel="stylesheet">
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
     <link href="{{ asset('css/bootstrap.min.css') }}" rel="stylesheet">
-    <link href="{{ asset(LibreNMS\Config::get('stylesheet', 'css/styles.css')) }}?ver=20220910" rel="stylesheet">
+    <link href="{{ asset(LibreNMS\Config::get('stylesheet', 'css/styles.css')) }}?ver=20230928" rel="stylesheet">
     <link href="{{ asset('css/' . LibreNMS\Config::get('applied_site_style', 'light') . '.css?ver=632417643') }}" rel="stylesheet">
     @foreach(LibreNMS\Config::get('webui.custom_css', []) as $custom_css)
         <link href="{{ $custom_css }}" rel="stylesheet">
@@ -76,7 +76,7 @@
         });
         var ajax_url = "{{ url('/ajax') }}";
     </script>
-    <script src="{{ asset('js/librenms.js?ver=01112022') }}"></script>
+    <script src="{{ asset('js/librenms.js?ver=07312023') }}"></script>
     <script type="text/javascript" src="{{ asset('js/overlib_mini.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/flasher.min.js?ver=0.6.1') }}"></script>
     <script type="text/javascript" src="{{ asset('js/toastr.min.js?ver=05072021') }}"></script>
@@ -89,17 +89,15 @@
             document.documentElement.classList.remove('tw-dark')
         }
     </script>
-    @if(session('timezone_static') == null || ! session('timezone_static'))
-    <script>
-        $(document).ready(function() {
+    @auth
+        @if(session('preferences.timezone_static') == null || ! session('preferences.timezone_static'))
+        <script>
             var tz = window.Intl.DateTimeFormat().resolvedOptions().timeZone;
-            if(tz !== '{{ session('timezone') }}') {
+            if(tz !== '{{ session('preferences.timezone') }}') {
                 updateTimezone(tz, false);
             }
-        });
-    </script>
-    @endif
-    @auth
+        </script>
+        @endif
         <script src="{{ asset('js/register-service-worker.js') }}" defer></script>
     @endauth
     @yield('javascript')

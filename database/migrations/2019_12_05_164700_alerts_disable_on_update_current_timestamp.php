@@ -10,7 +10,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         if (\LibreNMS\DB\Eloquent::getDriver() == 'mysql') {
             Schema::table('alerts', function (Blueprint $table) {
@@ -24,7 +24,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         if (\LibreNMS\DB\Eloquent::getDriver() == 'mysql') {
             Schema::table('alerts', function (Blueprint $table) {

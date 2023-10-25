@@ -89,6 +89,7 @@ Route::prefix('v0')->namespace('\App\Api\Controllers')->group(function () {
         Route::post('devices/{id}/parents', 'LegacyApiController@add_parents_to_host')->name('add_parents_to_host');
         Route::delete('/devices/{id}/parents', 'LegacyApiController@del_parents_from_host')->name('del_parents_from_host');
         Route::post('locations', 'LegacyApiController@add_location')->name('add_location');
+        Route::get('location/{location_id_or_name}', 'LegacyApiController@get_location')->name('get_location');
         Route::patch('locations/{location_id_or_name}', 'LegacyApiController@edit_location')->name('edit_location');
         Route::delete('locations/{location}', 'LegacyApiController@del_location')->name('del_location');
         Route::delete('services/{id}', 'LegacyApiController@del_service_from_host')->name('del_service_from_host');
@@ -119,6 +120,7 @@ Route::prefix('v0')->namespace('\App\Api\Controllers')->group(function () {
         // consumes the route below, but passes to it when detected
         Route::get('{hostname}/ports/{ifname}', 'LegacyApiController@get_port_stats_by_port_hostname')->name('get_port_stats_by_port_hostname')->where('ifname', '.*');
         Route::get('{hostname}/ports/{ifname}/{type}', 'LegacyApiController@get_graph_by_port_hostname')->name('get_graph_by_port_hostname');
+        Route::get('{hostname}/services/{id}/graphs/{datasource}', 'LegacyApiController@get_graph_by_service')->name('get_graph_by_service');
 
         Route::get('{hostname}/{type}', 'LegacyApiController@get_graph_generic_by_hostname')->name('get_graph_generic_by_hostname');
         Route::get('', 'LegacyApiController@list_devices')->name('list_devices');
@@ -152,6 +154,7 @@ Route::prefix('v0')->namespace('\App\Api\Controllers')->group(function () {
     Route::prefix('resources')->group(function () {
         Route::get('fdb', 'LegacyApiController@list_fdb')->name('list_fdb');
         Route::get('fdb/{mac}', 'LegacyApiController@list_fdb')->name('list_fdb_mac');
+        Route::get('fdb/{mac}/detail', 'LegacyApiController@list_fdb_detail')->name('list_fdb_detail');
         Route::get('links', 'LegacyApiController@list_links')->name('list_links');
         Route::get('sensors', 'LegacyApiController@list_sensors')->name('list_sensors');
         Route::get('vlans', 'LegacyApiController@list_vlans')->name('list_vlans');

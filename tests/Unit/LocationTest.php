@@ -35,7 +35,7 @@ use Mockery\MockInterface;
 
 class LocationTest extends TestCase
 {
-    public function testCanSetLocation()
+    public function testCanSetLocation(): void
     {
         $device = Device::factory()->make(); /** @var Device $device */
         $device->setLocation('Where');
@@ -48,7 +48,7 @@ class LocationTest extends TestCase
         $this->assertNull($device->location);
     }
 
-    public function testCanNotSetLocation()
+    public function testCanNotSetLocation(): void
     {
         $device = Device::factory()->make(); /** @var Device $device */
         $location = Location::factory()->make(); /** @var Location $location */
@@ -57,7 +57,7 @@ class LocationTest extends TestCase
         $this->assertNull($device->location);
     }
 
-    public function testCanSetEncodedLocation()
+    public function testCanSetEncodedLocation(): void
     {
         Config::set('geoloc.dns', false);
         $device = Device::factory()->make(); /** @var Device $device */
@@ -90,7 +90,7 @@ class LocationTest extends TestCase
         $this->assertNull($device->location->lng);
     }
 
-    public function testCanHandleGivenCoordinates()
+    public function testCanHandleGivenCoordinates(): void
     {
         Config::set('geoloc.dns', false);
         $device = Device::factory()->make(); /** @var Device $device */
@@ -103,7 +103,7 @@ class LocationTest extends TestCase
         $this->assertEquals($location->lng, $device->location->lng);
     }
 
-    public function testCanNotSetFixedCoordinates()
+    public function testCanNotSetFixedCoordinates(): void
     {
         $device = Device::factory()->make(); /** @var Device $device */
         $locationOne = Location::factory()->withCoordinates()->make(); /** @var Location $locationOne */
@@ -123,7 +123,7 @@ class LocationTest extends TestCase
         $this->assertEquals($locationTwo->lng, $device->location->lng);
     }
 
-    public function testDnsLookup()
+    public function testDnsLookup(): void
     {
         $example = 'SW1A2AA.find.me.uk';
         $expected = ['lat' => 51.50354111111111, 'lng' => -0.12766972222222223];
@@ -133,7 +133,7 @@ class LocationTest extends TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function testCanSetDnsCoordinate()
+    public function testCanSetDnsCoordinate(): void
     {
         Config::set('geoloc.dns', true);
         $device = Device::factory()->make(); /** @var Device $device */
@@ -154,7 +154,7 @@ class LocationTest extends TestCase
         $this->assertNull($device->location->lng);
     }
 
-    public function testCanSetByApi()
+    public function testCanSetByApi(): void
     {
         $device = Device::factory()->make(); /** @var Device $device */
         $location = Location::factory()->withCoordinates()->make(); /** @var Location $location */
@@ -180,7 +180,7 @@ class LocationTest extends TestCase
         $this->assertEquals($location->lng, $device->location->lng);
     }
 
-    public function testCorrectPrecedence()
+    public function testCorrectPrecedence(): void
     {
         $device = Device::factory()->make(); /** @var Device $device */
         $location_encoded = Location::factory()->withCoordinates()->make(); /** @var Location $location_encoded */

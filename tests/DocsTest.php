@@ -43,7 +43,7 @@ class DocsTest extends TestCase
     /**
      * @group docs
      */
-    public function testDocExist()
+    public function testDocExist(): void
     {
         $mkdocs = Yaml::parse(file_get_contents(__DIR__ . '/../mkdocs.yml'));
         $dir = __DIR__ . '/../doc/';

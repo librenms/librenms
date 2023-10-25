@@ -1,0 +1,897 @@
+F5-PLATFORM-STATS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, Counter64
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, DisplayString, TruthValue
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    platform, f5Compliance
+        FROM F5-COMMON-SMI-MIB
+    ;
+
+--================================================================
+f5PlatformStats MODULE-IDENTITY
+    LAST-UPDATED "202101300000Z"
+    ORGANIZATION "F5 Networks, Inc."
+    CONTACT-INFO
+         "postal: F5 Networks, Inc.
+                  801 Fifth Avenue
+                  Seattle, WA 98104
+          phone:  (206) 272-6500
+          email:  support@f5.com"
+    DESCRIPTION
+        "Top-level infrastructure of the F5 enterprise MIB tree."
+    ::= { platform 2 }
+
+--================================================================
+f5PlatformStatsObjects     OBJECT IDENTIFIER ::= { f5PlatformStats 1 }
+platformCpuStatsTable      OBJECT IDENTIFIER ::= { f5PlatformStatsObjects 1 }
+platformDiskStatsTable     OBJECT IDENTIFIER ::= { f5PlatformStatsObjects 2 }
+platformTemperatureTable   OBJECT IDENTIFIER ::= { f5PlatformStatsObjects 3 }
+platformMemoryStatsTable   OBJECT IDENTIFIER ::= { f5PlatformStatsObjects 4 }
+platformFpgaTable          OBJECT IDENTIFIER ::= { f5PlatformStatsObjects 5 }
+platformFwTable            OBJECT IDENTIFIER ::= { f5PlatformStatsObjects 6 }
+platformFantrayTable       OBJECT IDENTIFIER ::= { f5PlatformStatsObjects 7 }
+
+--
+-- Textual Conventions
+--
+-- PlatformStatsIndex contains the semantics of platform stats component and should be used
+-- for any objects defined in other MIB modules that need these semantics.
+PlatformStatsIndex ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS       current
+    DESCRIPTION
+            "A unique name, not null, for each platform component or
+            sub-component in the managed system."
+    SYNTAX       OCTET STRING(SIZE(1..255))
+
+String ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS       current
+    DESCRIPTION  "Textual-convention for DisplayString"
+    SYNTAX       DisplayString(SIZE(1..255))
+
+--
+-- cpu processor statistics table
+--
+cpuProcessorStatsTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF CPUProcessorStatsEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION  "Information about the CPU processors."
+    ::= { platformCpuStatsTable 1 }
+
+cpuProcessorStatsEntry OBJECT-TYPE
+    SYNTAX       CPUProcessorStatsEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION  "Information about the CPU processors."
+    INDEX   { index, cpuIndex }
+    ::= { cpuProcessorStatsTable 1 }
+
+CPUProcessorStatsEntry ::=
+    SEQUENCE {
+        index                   PlatformStatsIndex,
+        cpuIndex                Integer32,
+        cpuCacheSize            String,
+        cpuCoreCnt              String,
+        cpuFreq                 String,
+        cpuStepping             String,
+        cpuThreadCnt            String,
+        cpuModelName            String
+    }
+
+index OBJECT-TYPE
+    SYNTAX         PlatformStatsIndex
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "Primary index of Platform Stats Table"
+    ::= { cpuProcessorStatsEntry 1 }
+
+cpuIndex OBJECT-TYPE
+    SYNTAX         Integer32 (0..255)
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "The CPU index"
+    ::= { cpuProcessorStatsEntry 2 }
+
+cpuCacheSize OBJECT-TYPE
+    SYNTAX         String
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "CPU cache size"
+    ::= { cpuProcessorStatsEntry 3 }
+
+cpuCoreCnt OBJECT-TYPE
+    SYNTAX         String
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "CPU core count"
+    ::= { cpuProcessorStatsEntry 4 }
+
+cpuFreq OBJECT-TYPE
+    SYNTAX         String
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "CPU frequency"
+    ::= { cpuProcessorStatsEntry 5 }
+
+cpuStepping OBJECT-TYPE
+    SYNTAX         String
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "CPU stepping"
+    ::= { cpuProcessorStatsEntry 6 }
+
+cpuThreadCnt OBJECT-TYPE
+    SYNTAX         String
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "CPU currently running thread count"
+    ::= { cpuProcessorStatsEntry 7 }
+
+cpuModelName OBJECT-TYPE
+    SYNTAX         String
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "CPU model name"
+    ::= { cpuProcessorStatsEntry 8 }
+
+--
+-- cpu-utilization statistics table
+--
+cpuUtilizationStatsTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CPUUtilizationStatsEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "Information about the CPU Utilization."
+    ::= { platformCpuStatsTable 2 }
+
+cpuUtilizationStatsEntry OBJECT-TYPE
+    SYNTAX          CPUUtilizationStatsEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "Information about the CPU Utilization."
+    INDEX   { index }
+    ::= { cpuUtilizationStatsTable 1 }
+
+CPUUtilizationStatsEntry ::=
+     SEQUENCE {
+          cpuCore            DisplayString,
+          cpuCurrent         Integer32,
+          cpuTotal5secAvg    Integer32,
+          cpuTotal1minAvg    Integer32,
+          cpuTotal5minAvg    Integer32
+     }
+
+cpuCore OBJECT-TYPE
+     SYNTAX         DisplayString(SIZE(1..128))
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION    "CPU core index"
+     ::= { cpuUtilizationStatsEntry 1 }
+
+cpuCurrent OBJECT-TYPE
+     SYNTAX         Integer32
+     UNITS          "percentage"
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION    "CPU current utilization percentage"
+     ::= { cpuUtilizationStatsEntry 2 }
+
+cpuTotal5secAvg OBJECT-TYPE
+     SYNTAX         Integer32
+     UNITS          "percentage"
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION    "CPU utilization average over the last five seconds"
+    ::= { cpuUtilizationStatsEntry 3 }
+
+cpuTotal1minAvg OBJECT-TYPE
+     SYNTAX         Integer32
+     UNITS          "percentage"
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION    "CPU utilization average over the last one minute"
+     ::= { cpuUtilizationStatsEntry 4 }
+
+cpuTotal5minAvg OBJECT-TYPE
+     SYNTAX         Integer32
+     UNITS          "percentage"
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION    "CPU utilization average over the last five minute"
+     ::= { cpuUtilizationStatsEntry 5 }
+
+--
+-- CPU-cores statistics table
+--
+cpuCoreStatsTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CPUCoreStatsEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "Information about the CPU cores."
+    ::= { platformCpuStatsTable 3 }
+
+cpuCoreStatsEntry OBJECT-TYPE
+    SYNTAX          CPUCoreStatsEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "Information about the CPU cores."
+    INDEX           { index, coreIndex }
+    ::= { cpuCoreStatsTable 1 }
+
+
+CPUCoreStatsEntry ::=
+    SEQUENCE {
+        coreIndex          Integer32,
+        coreName           DisplayString,
+        coreCurrent        Integer32,
+        coreTotal5secAvg   Integer32,
+        coreTotal1minAvg   Integer32,
+        coreTotal5minAvg   Integer32
+    }
+
+coreIndex OBJECT-TYPE
+    SYNTAX         Integer32 (0..255)
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "CPU core current utilization percentage"
+    ::= { cpuCoreStatsEntry 1 }
+
+coreName OBJECT-TYPE
+     SYNTAX         DisplayString(SIZE(1..128))
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION    "CPU core index"
+     ::= { cpuCoreStatsEntry 2 }
+
+coreCurrent OBJECT-TYPE
+    SYNTAX         Integer32
+    UNITS          "percentage"
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "CPU core current utilization percentage"
+    ::= { cpuCoreStatsEntry 3 }
+
+coreTotal5secAvg OBJECT-TYPE
+    SYNTAX         Integer32
+    UNITS          "percentage"
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "CPU core utilization average over the last five second"
+    ::= { cpuCoreStatsEntry 4 }
+
+coreTotal1minAvg OBJECT-TYPE
+    SYNTAX         Integer32
+    UNITS          "percentage"
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "CPU core utilization average over the last one minute"
+    ::= { cpuCoreStatsEntry 5 }
+
+coreTotal5minAvg OBJECT-TYPE
+    SYNTAX         Integer32
+    UNITS          "percentage"
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "CPU core utilization average over the last five minute"
+    ::= { cpuCoreStatsEntry 6 }
+
+--
+-- Disk table
+--
+diskInfoTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF DiskInfoEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "Information about the disks."
+    ::= { platformDiskStatsTable 1 }
+
+diskInfoEntry OBJECT-TYPE
+    SYNTAX        DiskInfoEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "Information about the disks."
+    INDEX         { index, diskName }
+    ::= { diskInfoTable 1 }
+
+DiskInfoEntry ::=
+    SEQUENCE {
+        diskName                DisplayString,
+        diskModel               DisplayString,
+        diskVendor              DisplayString,
+        diskVersion             DisplayString,
+        diskSerialNo            DisplayString,
+        diskSize                DisplayString,
+        diskType                DisplayString
+    }
+
+diskName OBJECT-TYPE
+    SYNTAX         DisplayString(SIZE(1..128))
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "DISK Name"
+    ::= { diskInfoEntry 2 }
+
+diskModel OBJECT-TYPE
+    SYNTAX         DisplayString(SIZE(1..128))
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "DISK Model name"
+    ::= { diskInfoEntry 3 }
+
+diskVendor OBJECT-TYPE
+    SYNTAX         DisplayString(SIZE(1..128))
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "DISK Vendor name"
+    ::= { diskInfoEntry 4 }
+
+diskVersion OBJECT-TYPE
+    SYNTAX         DisplayString(SIZE(1..128))
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "DISK Version"
+    ::= { diskInfoEntry 5 }
+
+diskSerialNo OBJECT-TYPE
+    SYNTAX         DisplayString(SIZE(1..128))
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "DISK Serial Number"
+    ::= { diskInfoEntry 6 }
+
+diskSize OBJECT-TYPE
+    SYNTAX         DisplayString(SIZE(1..128))
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "DISK Size"
+    ::= { diskInfoEntry 7 }
+
+diskType OBJECT-TYPE
+    SYNTAX         DisplayString(SIZE(1..128))
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "DISK Type:usb, ssd, hdd, cd-rom, nvme"
+    ::= { diskInfoEntry 8 }
+
+--
+-- disk-utilization statistics table
+--
+diskUtilizationStatsTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF DISKUtilizationStatsEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "Information about the DISK Utilization."
+    ::= { platformDiskStatsTable 2 }
+
+diskUtilizationStatsEntry OBJECT-TYPE
+    SYNTAX          DISKUtilizationStatsEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "Information about the DISK Utilization."
+    INDEX   { index, diskName }
+    ::= { diskUtilizationStatsTable 1 }
+
+DISKUtilizationStatsEntry ::=
+     SEQUENCE {
+          diskPercentageUsed   Integer32,
+          diskTotalIops        Counter64,
+          diskReadIops         Counter64,
+          diskReadMerged       Counter64,
+          diskReadBytes        Counter64,
+          diskReadLatencyMs    Counter64,
+          diskWriteIops        Counter64,
+          diskWriteMerged      Counter64,
+          diskWriteBytes       Counter64,
+          diskWriteLatencyMs   Counter64
+     }
+
+diskPercentageUsed OBJECT-TYPE
+    SYNTAX         Integer32 (0..100)
+    UNITS          "percentage"
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "DISK Percent used"
+    ::= { diskUtilizationStatsEntry 3 }
+
+diskTotalIops OBJECT-TYPE
+    SYNTAX         Counter64
+    UNITS          "IOPs"
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "DISK total read/write IOPS"
+    ::= { diskUtilizationStatsEntry 4 }
+
+diskReadIops OBJECT-TYPE
+    SYNTAX         Counter64
+    UNITS          "IOPs"
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "DISK total read IOPS"
+    ::= { diskUtilizationStatsEntry 5 }
+
+diskReadMerged OBJECT-TYPE
+    SYNTAX         Counter64
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "DISK total read merged"
+    ::= { diskUtilizationStatsEntry 6 }
+
+diskReadBytes OBJECT-TYPE
+    SYNTAX         Counter64
+    UNITS          "bytes"
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "DISK total read bytes"
+    ::= { diskUtilizationStatsEntry 7 }
+
+diskReadLatencyMs OBJECT-TYPE
+    SYNTAX         Counter64
+    UNITS          "ms"
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "DISK total read latency ms"
+    ::= { diskUtilizationStatsEntry 8 }
+
+diskWriteIops OBJECT-TYPE
+    SYNTAX         Counter64
+    UNITS          "IOPs"
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "DISK total write IOPS"
+    ::= { diskUtilizationStatsEntry 9 }
+
+diskWriteMerged OBJECT-TYPE
+    SYNTAX         Counter64
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "DISK total write merged"
+    ::= { diskUtilizationStatsEntry 10 }
+
+diskWriteBytes OBJECT-TYPE
+    SYNTAX         Counter64
+    UNITS          "bytes"
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "DISK total write Bytes"
+    ::= { diskUtilizationStatsEntry 11 }
+
+diskWriteLatencyMs OBJECT-TYPE
+    SYNTAX         Counter64
+    UNITS          "ms"
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "DISK total write latency ms"
+    ::= { diskUtilizationStatsEntry 12 }
+
+--
+-- temperature statistics table
+--
+temperatureStatsTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF TEMPERATUREStatsEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION  "Information about the temperature."
+    ::= { platformTemperatureTable 1 }
+
+temperatureStatsEntry OBJECT-TYPE
+    SYNTAX       TEMPERATUREStatsEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION  "Information about the temperature."
+    INDEX   { index }
+    ::= { temperatureStatsTable 1 }
+
+TEMPERATUREStatsEntry ::=
+    SEQUENCE {
+        tempCurrent             DisplayString,
+        tempAverage             DisplayString,
+        tempMinimum             DisplayString,
+        tempMaximum             DisplayString
+    }
+
+tempCurrent OBJECT-TYPE
+    SYNTAX         DisplayString(SIZE(1..128))
+    UNITS          "centigrade"
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "The current temperature in celsius/centigrade"
+    ::= { temperatureStatsEntry 2 }
+
+tempAverage OBJECT-TYPE
+    SYNTAX         DisplayString(SIZE(1..128))
+    UNITS          "centigrade"
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "The arithmetic mean value of the temperature statistic over the
+                   past hour"
+    ::= { temperatureStatsEntry 3 }
+
+tempMinimum OBJECT-TYPE
+    SYNTAX         DisplayString(SIZE(1..128))
+    UNITS          "centigrade"
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "The minimum value of the temperature statistic over the past hour"
+    ::= { temperatureStatsEntry 4 }
+
+tempMaximum OBJECT-TYPE
+    SYNTAX         DisplayString(SIZE(1..128))
+    UNITS          "centigrade"
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "The maximum value of the temperature statistic over the past hour"
+    ::= { temperatureStatsEntry 5 }
+
+--
+-- memory statistics table
+--
+memoryStatsTable OBJECT-TYPE
+    SYNTAX         SEQUENCE OF MemoryStatsEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION    "Information about the memory."
+    ::= { platformMemoryStatsTable 1 }
+
+memoryStatsEntry OBJECT-TYPE
+    SYNTAX         MemoryStatsEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION    "Information about the memory."
+    INDEX          { index }
+    ::= { memoryStatsTable 1 }
+
+MemoryStatsEntry ::=
+    SEQUENCE {
+        memAvailable            Counter64,
+        memFree                 Counter64,
+        memPercentageUsed       Integer32,
+        memPlatformTotal        Counter64,
+        memPlatformUsed         Counter64
+    }
+
+memAvailable OBJECT-TYPE
+    SYNTAX         Counter64
+    UNITS          "bytes"
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "Total system memory"
+    ::= { memoryStatsEntry 2 }
+
+
+memFree OBJECT-TYPE
+    SYNTAX         Counter64
+    UNITS          "bytes"
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "Total amount of free memory in bytes"
+    ::= { memoryStatsEntry 3 }
+
+memPercentageUsed OBJECT-TYPE
+    SYNTAX         Integer32 (0..100)
+    UNITS          "percentage"
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "Total percentage of memory currently in use"
+    ::= { memoryStatsEntry 4 }
+
+memPlatformTotal OBJECT-TYPE
+    SYNTAX         Counter64
+    UNITS          "bytes"
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "Total amount of memory in bytes"
+    ::= { memoryStatsEntry 5 }
+
+memPlatformUsed OBJECT-TYPE
+    SYNTAX         Counter64
+    UNITS          "bytes"
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "Total amount of platform used memory in bytes"
+    ::= { memoryStatsEntry 6 }
+
+--
+-- FPGA table
+--
+fpgaTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF FPGAEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "Information about the FPGA."
+    ::= { platformFpgaTable 1 }
+
+fpgaEntry OBJECT-TYPE
+    SYNTAX        FPGAEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "Information about the FPGA."
+    INDEX   { index, fpgaIndex }
+    ::= { fpgaTable 1 }
+
+FPGAEntry ::=
+    SEQUENCE {
+        fpgaIndex       DisplayString,
+        fpgaVersion     DisplayString
+    }
+
+fpgaIndex OBJECT-TYPE
+    SYNTAX         DisplayString(SIZE(1..128))
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "References the chip and unit of the FPGA"
+    ::= { fpgaEntry 1 }
+
+fpgaVersion OBJECT-TYPE
+    SYNTAX         DisplayString(SIZE(1..128))
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "FPGA Version"
+    ::= { fpgaEntry 2 }
+
+--
+-- FW version table
+--
+fwTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF FWEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "Information about the FW version."
+    ::= { platformFwTable 1 }
+
+fwEntry OBJECT-TYPE
+    SYNTAX        FWEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "Information about the fw version."
+    INDEX   { index, fwName }
+    ::= { fwTable 1 }
+
+FWEntry ::=
+    SEQUENCE {
+        fwName              DisplayString,
+        fwVersion           DisplayString,
+        configurable        TruthValue,
+        fwUpdateStatus      DisplayString
+    }
+
+fwName OBJECT-TYPE
+    SYNTAX         DisplayString(SIZE(1..128))
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "References the FW name"
+    ::= { fwEntry 1 }
+
+fwVersion OBJECT-TYPE
+    SYNTAX         DisplayString(SIZE(1..128))
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "Version of the FW"
+    ::= { fwEntry 2 }
+
+configurable OBJECT-TYPE
+    SYNTAX         TruthValue
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "Configurable"
+    ::= { fwEntry 3 }
+
+fwUpdateStatus OBJECT-TYPE
+    SYNTAX         DisplayString(SIZE(1..128))
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "update status of FW"
+    ::= { fwEntry 4 }
+
+--
+-- Fantray Stats table
+--
+fantrayStatsTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF FANTRAYStatsEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION  "Information about the fantray speed."
+    ::= { platformFantrayTable 1 }
+
+fantrayStatsEntry OBJECT-TYPE
+    SYNTAX       FANTRAYStatsEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION  "Information about the fantray speed."
+    INDEX   { index }
+    ::= { fantrayStatsTable 1 }
+
+FANTRAYStatsEntry ::=
+    SEQUENCE {
+        fan-1-speed     Integer32,
+        fan-2-speed     Integer32,
+        fan-3-speed     Integer32,
+        fan-4-speed     Integer32,
+        fan-5-speed     Integer32,
+        fan-6-speed     Integer32,
+        fan-7-speed     Integer32,
+        fan-8-speed     Integer32,
+        fan-9-speed     Integer32,
+        fan-10-speed    Integer32,
+        fan-11-speed    Integer32,
+        fan-12-speed    Integer32
+    }
+
+fan-1-speed OBJECT-TYPE
+    SYNTAX         Integer32
+    UNITS          "RPM"
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "The current fan speed in RPM"
+    ::= { fantrayStatsEntry 1 }
+
+fan-2-speed OBJECT-TYPE
+    SYNTAX         Integer32
+    UNITS          "RPM"
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "The current fan speed in RPM"
+    ::= { fantrayStatsEntry 2 }
+
+fan-3-speed OBJECT-TYPE
+    SYNTAX         Integer32
+    UNITS          "RPM"
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "The current fan speed in RPM"
+    ::= { fantrayStatsEntry 3 }
+
+fan-4-speed OBJECT-TYPE
+    SYNTAX         Integer32
+    UNITS          "RPM"
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "The current fan speed in RPM"
+    ::= { fantrayStatsEntry 4 }
+
+fan-5-speed OBJECT-TYPE
+    SYNTAX         Integer32
+    UNITS          "RPM"
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "The current fan speed in RPM"
+    ::= { fantrayStatsEntry 5 }
+
+fan-6-speed OBJECT-TYPE
+    SYNTAX         Integer32
+    UNITS          "RPM"
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "The current fan speed in RPM"
+    ::= { fantrayStatsEntry 6 }
+
+fan-7-speed OBJECT-TYPE
+    SYNTAX         Integer32
+    UNITS          "RPM"
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "The current fan speed in RPM"
+    ::= { fantrayStatsEntry 7 }
+
+fan-8-speed OBJECT-TYPE
+    SYNTAX         Integer32
+    UNITS          "RPM"
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "The current fan speed in RPM"
+    ::= { fantrayStatsEntry 8 }
+
+fan-9-speed OBJECT-TYPE
+    SYNTAX         Integer32
+    UNITS          "RPM"
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "The current fan speed in RPM"
+    ::= { fantrayStatsEntry 9 }
+
+fan-10-speed OBJECT-TYPE
+    SYNTAX         Integer32
+    UNITS          "RPM"
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "The current fan speed in RPM"
+    ::= { fantrayStatsEntry  10}
+
+fan-11-speed OBJECT-TYPE
+    SYNTAX         Integer32
+    UNITS          "RPM"
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "The current fan speed in RPM"
+    ::= { fantrayStatsEntry 11 }
+
+fan-12-speed OBJECT-TYPE
+    SYNTAX         Integer32
+    UNITS          "RPM"
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "The current fan speed in RPM"
+    ::= { fantrayStatsEntry 12 }
+
+--
+-- Platform Groups
+--
+platformConformance OBJECT IDENTIFIER ::= { f5PlatformStats 2 }
+
+platformGroups      OBJECT IDENTIFIER ::= { platformConformance 1 }
+platformCompliances OBJECT IDENTIFIER ::= { platformConformance 2 }
+
+platformCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "The compliance statement for SNMP entities which have
+            platform statistics."
+
+    MODULE
+        MANDATORY-GROUPS { platformCPUGroup, platformDiskGroup,
+                           platformTempGroup, platformMemGroup,
+                           platformFpgaGroup, platformFwVersionGroup,
+                           platformFantrayGroup }
+::= { platformCompliances 1 }
+
+platformCPUGroup    OBJECT-GROUP
+    OBJECTS { index, cpuIndex, cpuCacheSize, cpuCoreCnt, cpuFreq, cpuStepping,
+              cpuThreadCnt, cpuModelName, cpuCore, cpuCurrent, cpuTotal5secAvg,
+              cpuTotal1minAvg, cpuTotal5minAvg, coreIndex, coreCurrent, coreTotal5secAvg,
+              coreTotal1minAvg, coreTotal5minAvg }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects providing information about CPUs."
+    ::= { platformGroups 1 }
+
+platformDiskGroup    OBJECT-GROUP
+    OBJECTS { diskName, diskModel, diskVendor, diskVersion, diskSerialNo, diskSize,
+              diskType, diskPercentageUsed, diskTotalIops, diskReadIops, diskReadMerged,
+              diskReadBytes, diskReadLatencyMs, diskWriteIops, diskWriteMerged,
+              diskWriteBytes, diskWriteLatencyMs }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects providing information about system disks."
+    ::= { platformGroups 2 }
+
+platformTempGroup    OBJECT-GROUP
+    OBJECTS { tempCurrent, tempAverage, tempMinimum, tempMaximum }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects providing information about temperature."
+    ::= { platformGroups 3 }
+
+platformMemGroup    OBJECT-GROUP
+    OBJECTS { memAvailable, memFree, memPercentageUsed, memPlatformTotal , memPlatformUsed }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects providing information about system memory."
+    ::= { platformGroups 4 }
+
+platformFpgaGroup    OBJECT-GROUP
+    OBJECTS { fpgaIndex, fpgaVersion }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects providing information about FPGAs."
+    ::= { platformGroups 5 }
+
+platformFwVersionGroup    OBJECT-GROUP
+    OBJECTS { fwName, fwVersion, configurable, fwUpdateStatus }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects providing information about FW version."
+    ::= { platformGroups 6 }
+
+platformFantrayGroup    OBJECT-GROUP
+    OBJECTS { fan-1-speed, fan-2-speed, fan-3-speed, fan-4-speed, fan-5-speed, fan-6-speed, fan-7-speed, fan-8-speed, fan-9-speed, fan-10-speed, fan-11-speed, fan-12-speed }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects providing information about Fantray stats."
+    ::= { platformGroups 7 }
+
+END

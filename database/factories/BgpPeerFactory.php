@@ -13,7 +13,7 @@ class BgpPeerFactory extends Factory
      *
      * @return array
      */
-    public function definition()
+    public function definition(): array
     {
         return [
             'bgpPeerIdentifier' => $this->faker->ipv4(),

@@ -30,6 +30,7 @@ use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use LibreNMS\Interfaces\InstallerStep;
+use Silber\Bouncer\BouncerFacade as Bouncer;
 
 class MakeUserController extends InstallationController implements InstallerStep
 {
@@ -72,9 +73,11 @@ class MakeUserController extends InstallationController implements InstallerStep
             if (! $this->complete()) {
                 $this->configureDatabase();
                 $user = new User($request->only(['username', 'password', 'email']));
-                $user->level = 10; // admin
                 $user->setPassword($request->get('password'));
                 $res = $user->save();
+
+                Bouncer::allow('admin')->everything();  // make sure admin role exists
+                $user->assign('admin');
 
                 if ($res) {
                     $message = trans('install.user.success');

@@ -11,7 +11,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::create('mpls_sdp_binds', function (Blueprint $table) {
             $table->increments('bind_id');
@@ -39,7 +39,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::dropIfExists('mpls_sdp_binds');
     }

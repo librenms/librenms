@@ -11,7 +11,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::table('ports', function (Blueprint $table) {
             $table->string('ifAlias')->change();
@@ -25,7 +25,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::table('ports', function (Blueprint $table) {
             $table->text('ifAlias')->change();

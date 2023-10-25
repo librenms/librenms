@@ -31,7 +31,7 @@ use Rrd;
 class MempoolObserver extends ModuleModelObserver
 {
     /** @param \App\Models\Mempool $model  */
-    public function updated($model)
+    public function updated($model): void
     {
         parent::updated($model);
 

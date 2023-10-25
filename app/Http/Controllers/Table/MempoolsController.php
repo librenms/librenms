@@ -46,7 +46,7 @@ class MempoolsController extends TableController
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     protected function baseQuery($request)
     {

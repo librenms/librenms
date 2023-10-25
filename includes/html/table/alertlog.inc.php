@@ -82,9 +82,9 @@ if ($rowCount != -1) {
     $sql .= " LIMIT $limit_low,$limit_high";
 }
 
-if (session('timezone')) {
+if (session('preferences.timezone')) {
     $sql = "SELECT R.severity, D.device_id,name AS alert,rule_id,state,time_logged,DATE_FORMAT(IFNULL(CONVERT_TZ(time_logged, @@global.time_zone, ?),time_logged), '" . \LibreNMS\Config::get('dateformat.mysql.compact') . "') as humandate,details $sql";
-    $param = array_merge([session('timezone')], $param);
+    $param = array_merge([session('preferences.timezone')], $param);
 } else {
     $sql = "SELECT R.severity, D.device_id,name AS alert,rule_id,state,time_logged,DATE_FORMAT(time_logged, '" . \LibreNMS\Config::get('dateformat.mysql.compact') . "') as humandate,details $sql";
 }

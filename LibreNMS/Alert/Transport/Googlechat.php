@@ -24,60 +24,26 @@
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
-use LibreNMS\Util\Proxy;
-use Log;
+use LibreNMS\Exceptions\AlertTransportDeliveryException;
+use LibreNMS\Util\Http;
 
 class Googlechat extends Transport
 {
-    protected $name = 'Google Chat';
+    protected string $name = 'Google Chat';
 
-    public function deliverAlert($obj, $opts)
+    public function deliverAlert(array $alert_data): bool
     {
-        $googlechat_conf['webhookurl'] = $this->config['googlechat-webhook'];
+        $data = ['text' => $alert_data['msg']];
+        $res = Http::client()->post($this->config['googlechat-webhook'], $data);
 
-        return $this->contactGooglechat($obj, $googlechat_conf);
-    }
-
-    public static function contactGooglechat($obj, $data)
-    {
-        $payload = '{"text": "' . $obj['msg'] . '"}';
-
-        Log::debug($payload);
-
-        // Create a new cURL resource
-        $ch = curl_init($data['webhookurl']);
-        Proxy::applyToCurl($ch);
-
-        // Attach encoded JSON string to the POST fields
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
-
-        // Set the content type to application/json
-        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type:application/json']);
-
-        // Return response instead of outputting
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-
-        // Execute the POST request
-        $result = curl_exec($ch);
-
-        // Close cURL resource
-
-        $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
-
-        Log::debug("$code");
-
-        if ($code != 200) {
-            Log::error('Google Chat Transport Error');
-            Log::error($result);
-
-            return 'HTTP Status code ' . $code;
+        if ($res->successful()) {
+            return true;
         }
 
-        return true;
+        throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), $data['text'], $data);
     }
 
-    public static function configTemplate()
+    public static function configTemplate(): array
     {
         return [
             'config' => [

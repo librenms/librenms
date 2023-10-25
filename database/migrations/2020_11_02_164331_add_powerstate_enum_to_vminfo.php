@@ -13,7 +13,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         Vminfo::select('id', 'vmwVmState')->chunk(100, function ($vms) {
             foreach ($vms as $vm) {
@@ -36,7 +36,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::table('vminfo', function (Blueprint $table) {
             $table->string('vmwVmState', 128)->change();
