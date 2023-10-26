@@ -610,14 +610,7 @@ function report_this($message)
 function hytera_h2f($number, $nd)
 {
     if (strlen(str_replace(' ', '', $number)) == 4) {
-        $hex = '';
-        for ($i = 0; $i < strlen($number); $i++) {
-            $byte = strtoupper(dechex(ord($number[$i])));
-            $byte = str_repeat('0', 2 - strlen($byte)) . $byte;
-            $hex .= $byte . ' ';
-        }
-        $number = $hex;
-        unset($hex);
+        $number = \LibreNMS\Util\StringHelpers::asciiToHex($number, ' ');
     }
     $r = '';
     $y = explode(' ', $number);
