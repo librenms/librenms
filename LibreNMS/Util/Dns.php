@@ -35,9 +35,6 @@ class Dns implements Geocoder
     public function __construct()
     {
         $this->resolver = new \Net_DNS2_Resolver();
-        // Workaround for strlen() null
-        // https://github.com/mikepultz/netdns2/blob/master/Net/DNS2/Socket.php#L132
-        $this->resolver->local_host = '0';
     }
 
     public static function lookupIp(Device $device): ?string
@@ -77,7 +74,9 @@ class Dns implements Geocoder
 
     public function getCoordinates($hostname)
     {
-        foreach ($this->getRecord($hostname, 'LOC') as $record) {
+        $r = $this->getRecord($hostname, 'LOC');
+
+        foreach ($r as $record) {
             return [
                 'lat' => $record->latitude ?? null,
                 'lng' => $record->longitude ?? null,

@@ -25,6 +25,8 @@
 
 namespace LibreNMS\Tests\Feature\SnmpTraps;
 
+use LibreNMS\Enum\Severity;
+
 class AdvaNetworkElementAlmTrapTest extends SnmpTrapTestCase
 {
     public function testElementAlarmCleared(): void
@@ -52,7 +54,7 @@ ADVA-MIB::neEventLogTimeStamp.231 2018-12-10,11:1:43.3,-6:0
 TRAP,
             'Alarming Element: NETWORK PORT-1-1-1-2 Description: Test Alarm Cleared Severity: cleared',
             'Could not handle cmNetworkElementAlmTrap cleared',
-            [1],
+            [Severity::Ok],
         );
     }
 
@@ -81,7 +83,7 @@ ADVA-MIB::neEventLogTimeStamp.231 2018-12-10,11:1:43.3,-6:0
 TRAP,
             'Alarming Element: NETWORK PORT-1-1-1-2 Description: Test Alarm Minor Severity: minor',
             'Could not handle cmNetworkElementAlmTrap minor',
-            [3],
+            [Severity::Notice],
         );
     }
 
@@ -110,7 +112,7 @@ ADVA-MIB::neEventLogTimeStamp.231 2018-12-10,11:1:43.3,-6:0
 TRAP,
             'Alarming Element: NETWORK PORT-1-1-1-2 Description: Test Alarm Major Severity: major',
             'Could not handle cmNetworkElementAlmTrap major',
-            [4],
+            [Severity::Warning],
         );
     }
 
@@ -139,7 +141,7 @@ ADVA-MIB::neEventLogTimeStamp.231 2018-12-10,11:1:43.3,-6:0
 TRAP,
             'Alarming Element: NETWORK PORT-1-1-1-2 Description: Test Alarm Critical Severity: critical',
             'Could not handle cmNetworkElementAlmTrap critical',
-            [5],
+            [Severity::Error],
         );
     }
 }

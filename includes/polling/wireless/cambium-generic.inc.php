@@ -163,7 +163,7 @@ if (strstr($hardware, 'AP') || strstr($hardware, 'Master') || strstr($hardware, 
     }
 }
 //PTP Equipment
-    $lastLevel = str_replace('"', '', snmp_get($device, 'lastPowerLevel.2', '-Ovqn', 'WHISP-APS-MIB'));
+$lastLevel = str_replace('"', '', snmp_get($device, 'lastPowerLevel.2', '-Ovqn', 'WHISP-APS-MIB'));
 if (is_numeric($lastLevel)) {
     $rrd_def = RrdDefinition::make()->addDataset('last', 'GAUGE', -100, 0);
     $fields = [

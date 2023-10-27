@@ -183,19 +183,6 @@ You need a token you can find on your personnal space.
 | API URL | https://soap.aspsms.com/aspsmsx.asmx/SimpleTextSMS |
 | Options | UserKey=USERKEY<br />Password=APIPASSWORD<br />Recipient=RECIPIENT<br/> Originator=ORIGINATOR<br />MessageText={{ $msg }} |
 
-## Boxcar
-
-Copy your access token from the Boxcar app or from the Boxcar.io
-website and setup the transport.
-
-[Boxcar Docs](http://developer.boxcar.io/api/publisher/)
-
-**Example:**
-
-| Config | Example |
-| ------ | ------- |
-| Access Token | i23f23mr23rwerw |
-
 ## Browser Push
 
 Browser push notifications can send a notification to the user's
@@ -213,7 +200,7 @@ alerts on a browser on the user preferences page.
 Canopsis is a hypervision tool. LibreNMS can send alerts to Canopsis
 which are then converted to canopsis events.
 
-[Canopsis Docs](https://doc.canopsis.net/guide-developpement/struct-event/)
+[Canopsis Docs](https://doc.canopsis.net/guide-developpement/structures/#structure-des-evenements)
 
 **Example:**
 
@@ -285,15 +272,13 @@ in the Discord Docs below.
 You can have LibreNMS send alerts to an elasticsearch database. Each
 fault will be sent as a separate document.
 
-The index pattern uses strftime() formatting.
-
 **Example:**
 
 | Config | Example |
 | ------ | ------- |
 | Host | 127.0.0.1 |
 | Port | 9200 |
-| Index Patter | librenms-%Y.%m.%d |
+| Index Pattern | \l\i\b\r\e\n\m\s-Y.m.d |
 
 ## GitLab
 
@@ -308,6 +293,17 @@ tokens to authenticate with GitLab and will store the token in cleartext.
 | Host | <http://gitlab.host.tld> |
 | Project ID | 1 |
 | Personal Access Token | AbCdEf12345 |
+
+
+## Grafana Oncall
+
+Send alerts to Grafana Oncall using a [Formatted Webhook](https://grafana.com/docs/oncall/latest/integrations/webhook/)
+
+**Example:**
+
+| Config | Example |
+| ------ | ------- |
+| Webhook URL | https://a-prod-us-central-0.grafana.net/integrations/v1/formatted_webhook/m12xmIjOcgwH74UF8CN4dk0Dh/ |
 
 ## HipChat
 
@@ -324,9 +320,9 @@ for details on acceptable values.
 | API URL | <https://api.hipchat.com/v1/rooms/message?auth_token=109jawregoaihj> |
 | Room ID | 7654321 |
 | From Name | LibreNMS |
-| Options | color = red <br/> notify = 1 <br/> message_format = text |
+| Options | color=red |
 
-At present the following options are supported: `color`, `notify` and `message_format`.
+At present the following options are supported: `color`.
 
 > Note: The default message format for HipChat messages is HTML.  It is
 > recommended that you specify the `text` message format to prevent unexpected
@@ -366,6 +362,65 @@ LibreNMS database.
 | Issue Type | Myissuetype |
 | Jira Username | myjirauser |
 | Jira Password | myjirapass |
+
+## LINE Messaging API
+
+[LINE Messaging API Docs](https://developers.line.biz/en/docs/messaging-api/overview/)
+
+Here is the step for setup a LINE bot and using it in LibreNMS.
+
+1. Use your real LINE account register in [developer protal](https://developers.line.biz/).
+
+1. Add a new channel, choose `Messaging API` and continue fill up the forms, note that `Channel name` cannot edit later.
+
+1. Go to "Messaging API" tab of your channel, here listing some important value.
+
+	- `Bot basic ID` and `QR code` is your LINE bot's ID and QR code.
+	- `Channel access token (long-lived)`, will use it in LibreNMS, keep it safe.
+
+1. Use your real Line account add your LINE bot as a friend.
+
+1. Recipient ID can be `groupID`, `userID` or `roomID`, it will be used in LibreNMS to send message to a group or a user. Use the following NodeJS program and `ngrok` for temporally https webhook to listen it.
+
+	[LINE-bot-RecipientFetcher](https://github.com/j796160836/LINE-bot-RecipientFetcher)
+
+1. Run the program and using `ngrok` expose port to public
+
+	```
+	$ node index.js
+	$ ngrok http 3000
+	```
+
+1. Go to "Messaging API" tab of your channel, fill up Webhook URL to `https://<your ngrok domain>/webhook`
+
+
+1. If you want to let LINE bot send message to a yourself, use your real account to send a message to your LINE bot. Program will print out the `userID` in console.
+
+	sample value:  
+	
+	```
+	{"type":"user","userId":"U527xxxxxxxxxxxxxxxxxxxxxxxxxc0ee"}
+	```
+	
+1. If you want to let LINE bot send message to a group, do the following steps.
+
+	- Add your LINE bot into group
+	- Use your real account to send a message to group
+	
+	Program will print out the `groupID` in console, it will be Recipient ID, keep it safe.
+
+	sample value:
+
+	```
+	{"type":"group","groupId":"Ce51xxxxxxxxxxxxxxxxxxxxxxxxxx6ef","userId":"U527xxxxxxxxxxxxxxxxxxxxxxxxxc0ee"} ```
+	```
+
+**Example:**
+
+| Config | Example |
+| ------ | ------- |
+| Access token | fhJ9vH2fsxxxxxxxxxxxxxxxxxxxxlFU= |
+| Recipient (groupID, userID or roomID) | Ce51xxxxxxxxxxxxxxxxxxxxxxxxxx6ef |
 
 ## LINE Notify
 
@@ -418,6 +473,30 @@ beginning of the ``_matrix/client/r0/...`` API-part.
 | Room | !ajPbbPalmVbNuQoBDK:example.com |
 | Auth_token: | MDAyYmxvY2F0aW9uI...z1DCn6lz_uOhtW3XRICg |
 | Message: | Alert: {{ $msg }} https://librenms.example.com |
+
+## Messagebird
+
+LibreNMS can send text messages through Messagebird Rest API transport.
+
+| Config | Example |
+| ------ | ------- |
+| Api Key | Api rest key given in the messagebird dashboard |
+| Originator | E.164 formatted originator |
+| Recipient | E.164 formatted recipient for multi recipents comma separated |
+| Character limit | Range 1..480 (max 3 split messages)  |
+
+## Messagebird Voice
+
+LibreNMS can send messages through Messagebird voice Rest API transport (text to speech).
+
+| Config | Example |
+| ------ | ------- |
+| Api Key | Api rest key given in the messagebird dashboard |
+| Originator | E.164 formatted originator |
+| Recipient | E.164 formatted recipient for multi recipents comma separated |
+| Language | Select box for options  |
+| Spoken voice | Female or Male  |
+| Repeat | X times the message is repeated  |
 
 ## Microsoft Teams
 
@@ -538,7 +617,7 @@ Here an example using 3 numbers, any amount of numbers is supported:
 
 | Config | Example |
 | ------ | ------- |
-| PlaySMS | <https://localhost/index.php?app=ws> |
+| PlaySMS | <https://localhost/index.php> |
 | User | user1 |
 | Token | MYFANCYACCESSTOKEN |
 | From | My Name |
@@ -925,3 +1004,26 @@ They can be in international dialling format only.
 | Password | smsfeedback_password |
 | Mobiles | 71234567890 |
 | Sender name| CIA |
+
+## Zenduty
+
+Leveraging LibreNMS<>Zenduty Integration, users can send new LibreNMS 
+alerts to the right team and notify them based on on-call schedules
+via email, SMS, Phone Calls, Slack, Microsoft Teams and mobile push
+notifications. Zenduty provides engineers with detailed context around 
+the LibreNMS alert along with playbooks and a complete incident command
+framework to triage, remediate and resolve incidents with speed.
+
+Create a [LibreNMS
+Integration](https://docs.zenduty.com/docs/librenms) from inside 
+[Zenduty](https://www.zenduty.com), then copy the Webhook URL from Zenduty
+to LibreNMS.
+
+For a detailed guide with screenshots, refer to the 
+[LibreNMS documentation at Zenduty](https://docs.zenduty.com/docs/librenms).
+
+**Example:**
+
+| Config | Example |
+| ------ | ------- |
+| WebHook URL | <https://www.zenduty.com/api/integration/librenms/integration-key/> |

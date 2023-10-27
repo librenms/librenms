@@ -54,7 +54,7 @@ if (Rrd::checkRrdExists(get_port_rrdfile_path($device['hostname'], $port['port_i
         echo '</div></div>';
     }
 
-    if (Rrd::checkRrdExists(get_port_rrdfile_path($device['hostname'], $port['port_id'], 'dot3'))) {
+    if (Config::get('enable_ports_etherlike') && Rrd::checkRrdExists(get_port_rrdfile_path($device['hostname'], $port['port_id'], 'dot3'))) {
         echo '<div class="panel panel-default">
             <div class="panel-heading">
                 <h3 class="panel-title">Ethernet Errors</h3>

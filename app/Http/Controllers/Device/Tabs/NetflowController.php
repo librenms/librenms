@@ -35,7 +35,7 @@ class NetflowController implements DeviceTab
     {
         if (Config::get('nfsen_enable')) {
             foreach ((array) Config::get('nfsen_rrds', []) as $nfsenrrds) {
-                if ($nfsenrrds[(strlen($nfsenrrds) - 1)] != '/') {
+                if ($nfsenrrds[strlen($nfsenrrds) - 1] != '/') {
                     $nfsenrrds .= '/';
                 }
 

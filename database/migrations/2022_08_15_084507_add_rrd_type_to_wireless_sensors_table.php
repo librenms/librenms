@@ -4,14 +4,14 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddRrdTypeToWirelessSensorsTable extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::table('wireless_sensors', function (Blueprint $table) {
             $table->enum('rrd_type', ['GAUGE', 'COUNTER', 'DERIVE', 'DCOUNTER', 'DDERIVE', 'ABSOLUTE'])->after('access_point_id')->default('GAUGE');
@@ -23,10 +23,10 @@ class AddRrdTypeToWirelessSensorsTable extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::table('wireless_sensors', function (Blueprint $table) {
             $table->dropColumn('rrd_type');
         });
     }
-}
+};

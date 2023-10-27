@@ -27,7 +27,7 @@ namespace LibreNMS\Enum;
 
 use LibreNMS\Config;
 
-enum ImageFormat : string
+enum ImageFormat: string
 {
     case png = 'png';
     case svg = 'svg';

@@ -20,7 +20,7 @@ class AppServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function register()
+    public function register(): void
     {
         $this->registerFacades();
         $this->registerGeocoder();
@@ -48,7 +48,7 @@ class AppServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function boot()
+    public function boot(): void
     {
         \Illuminate\Pagination\Paginator::useBootstrap();
 
@@ -60,8 +60,8 @@ class AppServiceProvider extends ServiceProvider
 
     private function bootCustomBladeDirectives()
     {
-        Blade::if('config', function ($key) {
-            return \LibreNMS\Config::get($key);
+        Blade::if('config', function ($key, $value = true) {
+            return \LibreNMS\Config::get($key) == $value;
         });
         Blade::if('notconfig', function ($key) {
             return ! \LibreNMS\Config::get($key);
@@ -142,6 +142,7 @@ class AppServiceProvider extends ServiceProvider
         \App\Models\Service::observe(\App\Observers\ServiceObserver::class);
         \App\Models\Stp::observe(\App\Observers\StpObserver::class);
         \App\Models\User::observe(\App\Observers\UserObserver::class);
+        \App\Models\Vminfo::observe(\App\Observers\VminfoObserver::class);
     }
 
     private function bootCustomValidators()

@@ -23,6 +23,7 @@
  */
 
 use App\Models\Vlan;
+use LibreNMS\Enum\Severity;
 
 echo 'IEEE8021-Q-BRIDGE-MIB VLANs: ';
 
@@ -68,12 +69,12 @@ if ($vlanversion == 'version1' || $vlanversion == '2') {
 
         //vlan does not exist
         if (! $vlanDB->exists) {
-            \App\Models\Eventlog::log("Vlan added: $vlan_id with name $vlan_name ", $device['device_id'], 'vlan', 4);
+            \App\Models\Eventlog::log("Vlan added: $vlan_id with name $vlan_name ", $device['device_id'], 'vlan', Severity::Warning);
         }
 
         if ($vlanDB->vlan_name != $vlan_name) {
             $vlanDB->vlan_name = $vlan_name;
-            \App\Models\Eventlog::log("Vlan changed: $vlan_id new name $vlan_name", $device['device_id'], 'vlan', 4);
+            \App\Models\Eventlog::log("Vlan changed: $vlan_id new name $vlan_name", $device['device_id'], 'vlan', Severity::Warning);
         }
 
         $vlanDB->save();

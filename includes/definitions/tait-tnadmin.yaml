@@ -3,7 +3,7 @@ text: 'Tait TN Admin OS'
 type: network
 icon: tait
 mib_dir: tait
-snmp_max_oid: '1'
+snmp_max_oid: 1
 over:
     - { graph: device_temperature, text: 'Temperature' }
 discovery:

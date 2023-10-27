@@ -26,46 +26,42 @@
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
-use LibreNMS\Util\Proxy;
+use LibreNMS\Exceptions\AlertTransportDeliveryException;
+use LibreNMS\Util\Http;
 
 class Telegram extends Transport
 {
-    public function deliverAlert($obj, $opts)
+    public function deliverAlert(array $alert_data): bool
     {
-        $telegram_opts['chat_id'] = $this->config['telegram-chat-id'];
-        $telegram_opts['token'] = $this->config['telegram-token'];
-        $telegram_opts['format'] = $this->config['telegram-format'];
+        $url = "https://api.telegram.org/bot{$this->config['telegram-token']}/sendMessage";
+        $format = $this->config['telegram-format'];
+        $text = $format == 'Markdown'
+            ? preg_replace('/([a-z0-9]+)_([a-z0-9]+)/', "$1\_$2", $alert_data['msg'])
+            : $alert_data['msg'];
 
-        return $this->contactTelegram($obj, $telegram_opts);
-    }
+        $params = [
+            'chat_id' => $this->config['telegram-chat-id'],
+            'text' => $text,
+        ];
 
-    public static function contactTelegram($obj, $data)
-    {
-        $curl = curl_init();
-        Proxy::applyToCurl($curl);
-        $text = urlencode($obj['msg']);
-        $format = '';
-        if ($data['format']) {
-            $format = '&parse_mode=' . $data['format'];
-            if ($data['format'] == 'Markdown') {
-                $text = urlencode(preg_replace('/([a-z0-9]+)_([a-z0-9]+)/', "$1\_$2", $obj['msg']));
-            }
-        }
-        curl_setopt($curl, CURLOPT_URL, ("https://api.telegram.org/bot{$data['token']}/sendMessage?chat_id={$data['chat_id']}&text=$text{$format}"));
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-        $ret = curl_exec($curl);
-        $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-        if ($code != 200) {
-            var_dump('Telegram returned Error'); //FIXME: propper debuging
-            var_dump('Return: ' . $ret); //FIXME: propper debuging
-
-            return 'HTTP Status code ' . $code . ', Body ' . $ret;
+        if ($format) {
+            $params['parse_mode'] = $this->config['telegram-format'];
         }
 
-        return true;
+        if (! empty($this->config['message-thread-id'])) {
+            $params['message_thread_id'] = $this->config['message-thread-id'];
+        }
+
+        $res = Http::client()->get($url, $params);
+
+        if ($res->successful()) {
+            return true;
+        }
+
+        throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), $text, $params);
     }
 
-    public static function configTemplate()
+    public static function configTemplate(): array
     {
         return [
             'config' => [
@@ -76,10 +72,16 @@ class Telegram extends Transport
                     'type' => 'text',
                 ],
                 [
+                    'title' => 'Thread ID',
+                    'name' => 'message-thread-id',
+                    'descr' => 'If your group support topics, you can put the topicId here',
+                    'type' => 'text',
+                ],
+                [
                     'title' => 'Token',
                     'name' => 'telegram-token',
                     'descr' => 'Telegram Token',
-                    'type' => 'text',
+                    'type' => 'password',
                 ],
                 [
                     'title' => 'Format',
@@ -95,6 +97,7 @@ class Telegram extends Transport
             ],
             'validation' => [
                 'telegram-chat-id' => 'required|string',
+                'message-thread-id' => 'integer',
                 'telegram-token' => 'required|string',
                 'telegram-format' => 'string',
             ],

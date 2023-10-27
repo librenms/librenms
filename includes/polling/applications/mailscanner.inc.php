@@ -12,7 +12,6 @@ $mailscanner = snmp_get($device, $oid, $options);
 
 [$msg_recv, $msg_rejected, $msg_relay, $msg_sent, $msg_waiting, $spam, $virus] = explode("\n", $mailscanner);
 
-$rrd_name = ['app', $name, $app->app_id];
 $rrd_def = RrdDefinition::make()
     ->addDataset('msg_recv', 'COUNTER', 0, 125000000000)
     ->addDataset('msg_rejected', 'COUNTER', 0, 12500000000)
@@ -32,6 +31,11 @@ $fields = [
     'virus'        => $virus,
 ];
 
-$tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
+$tags = [
+    'name' => $name,
+    'app_id' => $app->app_id,
+    'rrd_name' => ['app', $name, $app->app_id],
+    'rrd_def' => $rrd_def,
+];
 data_update($device, 'app', $tags, $fields);
 update_application($app, $mailscanner, $fields);

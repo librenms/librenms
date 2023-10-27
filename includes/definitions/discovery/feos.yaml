@@ -1,0 +1,116 @@
+mib: FE-FIREEYE-MIB
+modules:
+    os:
+        version: FE-FIREEYE-MIB::feSystemImageVersionCurrent.0
+        hardware: FE-FIREEYE-MIB::feHardwareModel.0
+        serial: FE-FIREEYE-MIB::feSerialNumber.0
+    sensors:
+        fanspeed:
+            data:
+                -
+                    oid: feFanStatusTable
+                    value: feFanSpeed
+                    num_oid: '.1.3.6.1.4.1.25597.11.4.1.3.1.4.{{ $index }}'
+                    descr: 'Fan {{ $feFanIndex }}'
+                    index: 'feFanSpeed.{{ $feFanIndex }}'
+        temperature:
+            data:
+                -
+                    oid: feSystemInfo
+                    value: feTemperatureValue
+                    num_oid: '.1.3.6.1.4.1.25597.11.1.1.4.{{ $index }}'
+                    descr: 'System Temperature'
+        state:
+            data:
+                -
+                    oid: feSystemInfo
+                    value: feTemperatureIsHealthy
+                    num_oid: '.1.3.6.1.4.1.25597.11.1.1.6.{{ $index }}'
+                    group: System Health
+                    descr: 'System Temperature Health'
+                    state_name: feTemperatureIsHealthy
+                    states:
+                        - { value: 2, generic: 2, graph: 0, descr: 'Bad' }
+                        - { value: 1, generic: 0, graph: 0, descr: 'Good' } 
+                -
+                    oid: feStorageInfo
+                    value: feRaidIsHealthy
+                    num_oid: '.1.3.6.1.4.1.25597.11.2.1.2.{{ $index }}'
+                    group: System Health
+                    descr: 'System RAID Health'
+                    state_name: feRaidIsHealthy
+                    states:
+                        - { value: 2, generic: 2, graph: 0, descr: 'Bad' }
+                        - { value: 1, generic: 0, graph: 0, descr: 'Good' }
+                -
+                    oid: fePhysicalDiskTable
+                    value: fePhysicalDiskIsHealthy 
+                    num_oid: '.1.3.6.1.4.1.25597.11.2.1.3.1.4.{{ $index }}'
+                    group: Disk Health
+                    descr: 'Disk {{ $fePhysicalDiskName }} Health'
+                    index: fePhysicalDiskIsHealthy.{{ $fePhysicalDiskIndex }}
+                    state_name: fePhysicalDiskIsHealthy
+                    states:
+                        - { value: 2, generic: 2, graph: 0, descr: 'Bad' }
+                        - { value: 1, generic: 0, graph: 0, descr: 'Good' } 
+                -
+                    oid: fePowerSupply
+                    value:  fePowerSupplyOverallIsHealthy
+                    num_oid: '.1.3.6.1.4.1.25597.11.3.1.2.{{ $index }}'
+                    group: System Health
+                    descr: 'System Power Supply Health'
+                    state_name: fePowerSupplyOverallIsHealthy
+                    states:
+                        - { value: 2, generic: 2, graph: 0, descr: 'Bad' }
+                        - { value: 1, generic: 0, graph: 0, descr: 'Good' }
+                -
+                    oid: feFanHealth
+                    value: feFanOverallIsHealthy
+                    num_oid: '.1.3.6.1.4.1.25597.11.4.1.2.{{ $index }}'
+                    group: System Health
+                    descr: 'System Fan Health'
+                    state_name: feFanOverallIsHealthy
+                    states:
+                        - { value: 2, generic: 2, graph: 0, descr: 'Bad' }
+                        - { value: 1, generic: 0, graph: 0, descr: 'Good' }
+                -
+                    oid: feFanStatusTable
+                    value: feFanIsHealthy
+                    num_oid: '.1.3.6.1.4.1.25597.11.4.1.3.1.3.{{ $index }}'
+                    group: Fan Health
+                    descr: 'Fan {{ $feFanIndex }} Health'
+                    state_name: feFanIsHealthy
+                    index: feFanIsHealthy.{{ $feFanIndex }}
+                    states:
+                        - { value: 2, generic: 2, graph: 0, descr: 'Bad' }
+                        - { value: 1, generic: 0, graph: 0, descr: 'Good' }
+                -
+                    oid: feApplication
+                    value: feProductLicenseActive
+                    num_oid: '.1.3.6.1.4.1.25597.11.5.1.10.{{ $index }}'
+                    group: License Status
+                    descr: 'Product License Status'
+                    state_name: feProductLicenseActive
+                    states:
+                        - { value: 2, generic: 2, graph: 0, descr: 'Not Active' }
+                        - { value: 1, generic: 0, graph: 0, descr: 'Active' }
+                -
+                    oid: feApplication
+                    value: feContentLicenseActive 
+                    num_oid: '.1.3.6.1.4.1.25597.11.5.1.11.{{ $index }}'
+                    group: License Status
+                    descr: 'Content License Status'
+                    state_name: feContentLicenseActive
+                    states:
+                        - { value: 2, generic: 2, graph: 0, descr: 'Not Active' }
+                        - { value: 1, generic: 0, graph: 0, descr: 'Active' }
+                -
+                    oid: feApplication
+                    value:  feSupportLicenseActive
+                    num_oid: '.1.3.6.1.4.1.25597.11.5.1.12.{{ $index }}'
+                    group: License Status
+                    descr: 'Support License Status'
+                    state_name: feSupportLicenseActive
+                    states:
+                        - { value: 2, generic: 2, graph: 0, descr: 'Not Active' }
+                        - { value: 1, generic: 0, graph: 0, descr: 'Active' }

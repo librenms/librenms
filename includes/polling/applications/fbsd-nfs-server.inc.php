@@ -16,13 +16,13 @@ try {
         'data' => [],
     ];
     [$nfs['data']['Getattr'], $nfs['data']['Setattr'], $nfs['data']['Lookup'], $nfs['data']['Readlink'],
-         $nfs['data']['Read'], $nfs['data']['Write'], $nfs['data']['Create'], $nfs['data']['Remove'],
-         $nfs['data']['Rename'], $nfs['data']['Link'], $nfs['data']['Symlink'], $nfs['data']['Mkdir'],
-         $nfs['data']['Rmdir'], $nfs['data']['Readdir'], $nfs['data']['RdirPlus'], $nfs['data']['Access'],
-         $nfs['data']['Mknod'], $nfs['data']['Fsstat'], $nfs['data']['Fsinfo'], $nfs['data']['PathConf'],
-         $nfs['data']['Commit'], $nfs['data']['RetFailed'], $nfs['data']['Faults'], $nfs['data']['Inprog'],
-         $nfs['data']['Idem'], $nfs['data']['Nonidem'], $nfs['data']['Misses'], $nfs['data']['WriteOps'],
-         $nfs['data']['WriteRPC'], $nfs['data']['Opsaved']] = explode("\n", $legacy);
+        $nfs['data']['Read'], $nfs['data']['Write'], $nfs['data']['Create'], $nfs['data']['Remove'],
+        $nfs['data']['Rename'], $nfs['data']['Link'], $nfs['data']['Symlink'], $nfs['data']['Mkdir'],
+        $nfs['data']['Rmdir'], $nfs['data']['Readdir'], $nfs['data']['RdirPlus'], $nfs['data']['Access'],
+        $nfs['data']['Mknod'], $nfs['data']['Fsstat'], $nfs['data']['Fsinfo'], $nfs['data']['PathConf'],
+        $nfs['data']['Commit'], $nfs['data']['RetFailed'], $nfs['data']['Faults'], $nfs['data']['Inprog'],
+        $nfs['data']['Idem'], $nfs['data']['Nonidem'], $nfs['data']['Misses'], $nfs['data']['WriteOps'],
+        $nfs['data']['WriteRPC'], $nfs['data']['Opsaved']] = explode("\n", $legacy);
 } catch (JsonAppException $e) {
     echo PHP_EOL . $name . ':' . $e->getCode() . ':' . $e->getMessage() . PHP_EOL;
     update_application($app, $e->getCode() . ':' . $e->getMessage(), []); // Set empty metrics and error message

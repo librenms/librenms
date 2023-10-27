@@ -220,7 +220,7 @@ function ipmiSensorName($hardwareId, $sensorIpmi)
 }
 
 /**
- * @param $descr
+ * @param  $descr
  * @return int
  */
 function get_nagios_state($descr)
@@ -247,7 +247,7 @@ function get_nagios_state($descr)
 }
 
 /**
- * @param $state
+ * @param  $state
  * @return int
  */
 function apc_relay_state($state)

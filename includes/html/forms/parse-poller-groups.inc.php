@@ -17,7 +17,7 @@ if (! Auth::user()->hasGlobalAdmin()) {
     exit('ERROR: You need to be admin');
 }
 
-$group_id = ($_POST['group_id']);
+$group_id = $_POST['group_id'];
 
 if (is_numeric($group_id) && $group_id > 0) {
     $group = dbFetchRow('SELECT * FROM `poller_groups` WHERE `id` = ? LIMIT 1', [$group_id]);

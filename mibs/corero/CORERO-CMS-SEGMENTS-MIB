@@ -1,0 +1,458 @@
+CORERO-CMS-SEGMENTS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+    TimeTicks, Counter32, Unsigned32, Counter64, enterprises, IpAddress
+        FROM SNMPv2-SMI
+    DisplayString, TestAndIncr, TimeStamp, RowStatus, TruthValue, TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+    coreroCMSMIBObjects, coreroCMSMIBCompliances, coreroCMSMIBGroups
+        FROM CORERO-CMS-MIB;
+
+
+segments MODULE-IDENTITY
+    LAST-UPDATED "202006190000Z"
+    ORGANIZATION "Corero Network Security"
+    CONTACT-INFO
+            "info@corero.com"
+    DESCRIPTION
+            "Corero Management Server MIB."
+    REVISION      "201710040000Z"
+    DESCRIPTION
+            "Initial revision"
+    REVISION      "201712190000Z"
+    DESCRIPTION
+            "Updated to support revised operating-modes configuration"
+    REVISION      "201712280000Z"
+    DESCRIPTION
+            "Updated to add a new link status mode - unknown"
+    REVISION      "201802190000Z"
+    DESCRIPTION
+            "Changed bypass mode and state terminology to use inline instead of disabled"
+    REVISION      "201811230000Z"
+    DESCRIPTION
+            "Added 'unused' to Interface Status enumeration"
+    REVISION      "202006190000Z"
+    DESCRIPTION
+            "Added additional values to interface state enumeration"
+
+   ::= { coreroCMSMIBObjects 4 }
+
+segmentTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SegmentEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table of Segments"
+    ::= { segments 1 }
+
+segmentEntry OBJECT-TYPE
+    SYNTAX      SegmentEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry within the Segment table which represents a single Segment"
+    INDEX { segmentIndex }
+    ::= { segmentTable 1 }
+
+SegmentEntry ::= SEQUENCE {
+    segmentIndex                                INTEGER (1..2147483647),
+    segmentDevice                               OCTET STRING,
+    segmentId                                   OCTET STRING,
+    segmentName                                 OCTET STRING,
+    segmentDescription                          OCTET STRING,
+    segmentLinkStatePropagationAdminState       INTEGER,
+    segmentLinkStatePropagationWaitTime         INTEGER,
+    segmentLinkStatePropagationRecoveryTimeout  INTEGER,
+    segmentConfiguredDefenseMode                INTEGER,
+    segmentNtdExternalInterface                 OCTET STRING,
+    segmentNtdExternalInterfaceStatus           INTEGER,
+    segmentNtdExternalInterfaceLinkSpeed        Unsigned32,
+    segmentNtdInternalInterface                 OCTET STRING,
+    segmentNtdInternalInterfaceStatus           INTEGER,
+    segmentNtdInternalInterfaceLinkSpeed        Unsigned32,
+    segmentNbaExternalInterface                 OCTET STRING,
+    segmentNbaExternalInterfaceStatus           INTEGER,
+    segmentNbaExternalInterfaceLinkSpeed        Unsigned32,
+    segmentNbaInternalInterface                 OCTET STRING,
+    segmentNbaInternalInterfaceStatus           INTEGER,
+    segmentNbaInternalInterfaceLinkSpeed        Unsigned32,
+    segmentCurrentDefenseMode                   INTEGER,
+    segmentBypassDevice                         OCTET STRING,
+    segmentConfiguredBypassMode                 INTEGER,
+    segmentCurrentBypassMode                    INTEGER,
+    segmentCurrentBypassState                   INTEGER,
+    segmentDefenseModeOverride                  INTEGER,
+    segmentBypassModeOverride                   INTEGER
+}
+
+segmentIndex OBJECT-TYPE
+    SYNTAX      INTEGER (1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The SNMP index of the Segment"
+    ::= { segmentEntry 1 }
+
+segmentDevice OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The device containing the Segment"
+    ::= { segmentEntry 2 }
+
+segmentId OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The id of the Segment"
+    ::= { segmentEntry 3 }
+
+segmentName OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The name of the Segment"
+    ::= { segmentEntry 4 }
+
+segmentDescription OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The desciption of this Segment. If no description is entered, this is blank."
+    ::= { segmentEntry 5 }
+
+segmentLinkStatePropagationAdminState OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    disabled(1),
+                    enabled(2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Whether this Segment has Link State Propagation enabled or disabled"
+    ::= { segmentEntry 6 }
+
+segmentLinkStatePropagationWaitTime OBJECT-TYPE
+    SYNTAX      INTEGER (0..360)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of seconds the CMS currently waits before propagating a link state change to the partner, when Link State Progagation is enabled"
+    ::= { segmentEntry 7 }
+
+segmentLinkStatePropagationRecoveryTimeout OBJECT-TYPE
+    SYNTAX      INTEGER (0..360)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of seconds the CMS currently waits after a link is brought back up before using its state to change partner state, when Link State Progagation is enabled"
+    ::= { segmentEntry 8 }
+
+segmentConfiguredDefenseMode OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    monitor(0),
+                    mitigate(1),
+                    pass-through(2),
+                    not-applicable(10)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The configured Defense Mode of the Segment"
+    ::= { segmentEntry 9 }
+
+segmentNtdExternalInterface OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The name of the Segment's external NTD interface"
+    ::= { segmentEntry 10 }
+
+segmentNtdExternalInterfaceStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    up(0),
+                    down(1),
+                    down-link-state-propagation(2),
+                    disabled(3),
+                    unknown(4),
+                    unused(5),
+                    partially-down(6),
+                    down-remote-fault(7),
+                    down-local-fault(8)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current status of the Segment's external NTD interface"
+    ::= { segmentEntry 11 }
+
+segmentNtdExternalInterfaceLinkSpeed OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The link speed of the Segment's external NTD interface in Mbit/s"
+    ::= { segmentEntry 12 }
+
+segmentNtdInternalInterface OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The name of the Segment's internal NTD interface"
+    ::= { segmentEntry 13 }
+
+segmentNtdInternalInterfaceStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    up(0),
+                    down(1),
+                    down-link-state-propagation(2),
+                    disabled(3),
+                    unknown(4),
+                    unused(5),
+                    partially-down(6),
+                    down-remote-fault(7),
+                    down-local-fault(8)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current status of the Segment's internal NTD interface"
+    ::= { segmentEntry 14 }
+
+segmentNtdInternalInterfaceLinkSpeed OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The link speed of the Segment's internal NTD interface in Mbit/s"
+    ::= { segmentEntry 15 }
+
+segmentNbaExternalInterface OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The name of the Segment's external NBA interface"
+    ::= { segmentEntry 16 }
+
+segmentNbaExternalInterfaceStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    up(0),
+                    down(1),
+                    down-link-state-propagation(2),
+                    disabled(3),
+                    unknown(4),
+                    unused(5),
+                    partially-down(6),
+                    down-remote-fault(7),
+                    down-local-fault(8)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current status of the Segment's external NBA interface"
+    ::= { segmentEntry 17 }
+
+segmentNbaExternalInterfaceLinkSpeed OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The link speed of the Segment's external NBA interface in Mbit/s"
+    ::= { segmentEntry 18 }
+
+segmentNbaInternalInterface OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The name of the Segment's internal NBA interface"
+    ::= { segmentEntry 19 }
+
+segmentNbaInternalInterfaceStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    up(0),
+                    down(1),
+                    down-link-state-propagation(2),
+                    disabled(3),
+                    unknown(4),
+                    unused(5),
+                    partially-down(6),
+                    down-remote-fault(7),
+                    down-local-fault(8)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current status of the Segment's internal NBA interface"
+    ::= { segmentEntry 20 }
+
+segmentNbaInternalInterfaceLinkSpeed OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The link speed of the Segment's internal NBA interface in Mbit/s"
+    ::= { segmentEntry 21 }
+
+segmentCurrentDefenseMode OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    monitor(0),
+                    mitigate(1),
+                    pass-through(2),
+                    not-applicable(10)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Defense Mode the Segment is currently operating in"
+    ::= { segmentEntry 22 }
+
+segmentBypassDevice OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The name of the external bypass device connected to the Segment. If there is no connected bypass device, this is blank."
+    ::= { segmentEntry 23 }
+
+segmentConfiguredBypassMode OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    inline(0),
+                    automatic(1),
+                    physical-bypass(2),
+                    switched-bypass(3),
+                    monitor-tap(4),
+                    not-applicable(10)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The configured Bypass Mode for the Segment. If the Segment has no bypass capabilty, this shows blank."
+    ::= { segmentEntry 24 }
+
+segmentCurrentBypassMode OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    inline(0),
+                    automatic(1),
+                    physical-bypass(2),
+                    switched-bypass(3),
+                    monitor-tap(4),
+                    not-applicable(10)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current Bypass Mode the Segment is operating in. If the Segment has no bypass capabilty, this shows not-applicable."
+    ::= { segmentEntry 25 }
+
+segmentCurrentBypassState OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    inline(0),
+                    physical-bypass(1),
+                    switched-bypass(2),
+                    monitor-tap(3),
+                    automatic-inline(4),
+                    automatic-bypass(5),
+                    not-applicable(10)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current Bypass State the Segment is operating in. If the Segment has no bypass capabilty, this shows not-applicable."
+    ::= { segmentEntry 26 }
+
+segmentDefenseModeOverride OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    none(0),
+                    segment(1),
+                    device(2),
+                    cluster(3)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The override level applied for the segment defense mode."
+    ::= { segmentEntry 27 }
+
+segmentBypassModeOverride OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    none(0),
+                    segment(1),
+                    device(2),
+                    cluster(3)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The override level applied for the segment bypass mode."
+    ::= { segmentEntry 28 }
+
+-- compliance statements
+
+coreroCMSMIBCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "The compliance statement for SNMPv2 entities which
+            implement the SNMPv2 MIB."
+    MODULE  -- this module
+        -- MANDATORY-GROUPS { snmpGroup, snmpSetGroup, systemGroup,
+        --                   snmpBasicNotificationsGroup }
+
+        GROUP   coreroSegmentGroup
+        DESCRIPTION
+            "This group is mandatory for SNMPv2 entities which
+            support community-based authentication."
+
+    ::= { coreroCMSMIBCompliances 4 }
+
+
+-- units of conformance
+
+coreroSegmentGroup OBJECT-GROUP
+    OBJECTS {
+                segmentIndex,
+                segmentDevice,
+                segmentId,
+                segmentName,
+                segmentDescription,
+                segmentLinkStatePropagationAdminState,
+                segmentLinkStatePropagationWaitTime,
+                segmentLinkStatePropagationRecoveryTimeout,
+                segmentConfiguredDefenseMode,
+                segmentNtdExternalInterface,
+                segmentNtdExternalInterfaceStatus,
+                segmentNtdExternalInterfaceLinkSpeed,
+                segmentNtdInternalInterface,
+                segmentNtdInternalInterfaceStatus,
+                segmentNtdInternalInterfaceLinkSpeed,
+                segmentNbaExternalInterface,
+                segmentNbaExternalInterfaceStatus,
+                segmentNbaExternalInterfaceLinkSpeed,
+                segmentNbaInternalInterface,
+                segmentNbaInternalInterfaceStatus,
+                segmentNbaInternalInterfaceLinkSpeed,
+                segmentCurrentDefenseMode,
+                segmentBypassDevice,
+                segmentConfiguredBypassMode,
+                segmentCurrentBypassMode,
+                segmentCurrentBypassState,
+                segmentDefenseModeOverride,
+                segmentBypassModeOverride
+            }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects providing status and statistics for the site."
+    ::= { coreroCMSMIBGroups 4 }
+
+
+END

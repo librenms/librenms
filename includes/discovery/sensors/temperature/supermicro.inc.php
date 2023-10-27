@@ -10,7 +10,7 @@ if ($oids) {
         if ($data) {
             [$oid, $type] = explode(' ', $data);
             $oid_ex = explode('.', $oid);
-            $index = $oid_ex[(count($oid_ex) - 1)];
+            $index = $oid_ex[count($oid_ex) - 1];
             if ($type == 2) {
                 $temperature_oid = ".1.3.6.1.4.1.10876.2.1.1.1.1.4.$index";
                 $descr_oid = ".1.3.6.1.4.1.10876.2.1.1.1.1.2.$index";

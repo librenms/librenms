@@ -24,10 +24,9 @@ class QueryDebugListener
      * @param  \Illuminate\Database\Events\QueryExecuted  $query
      * @return void
      */
-    public function handle(QueryExecuted $query)
+    public function handle(QueryExecuted $query): void
     {
         if (Debug::queryDebugIsEnabled()) {
-
             // collect bindings and make them a little more readable
             $bindings = collect($query->bindings)->map(function ($item) {
                 if ($item instanceof \Carbon\Carbon) {

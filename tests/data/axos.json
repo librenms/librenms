@@ -26,12 +26,12 @@
                     "sysDescr": "Calix, Inc E5-16F AXOS-R2.2.0",
                     "sysContact": null,
                     "version": null,
-                    "hardware": null,
-                    "features": null,
+                    "hardware": "Calix, Inc E5-16F AXOS-R2.2.0",
+                    "features": "",
                     "location": null,
                     "os": "axos",
                     "type": "network",
-                    "serial": null,
+                    "serial": "071710980001",
                     "icon": "calix.svg"
                 }
             ]

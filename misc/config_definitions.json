@@ -6,7 +6,7 @@
             "units": "days",
             "group": "auth",
             "section": "ad",
-            "order": 2,
+            "order": 20,
             "type": "integer"
         },
         "addhost_alwayscheckip": {
@@ -26,6 +26,13 @@
             "section": "general",
             "order": 2,
             "type": "boolean"
+        },
+        "alert.macros.rule": {
+            "type": "array",
+            "validate": {
+                 "value": "array",
+                 "value.*": "string"
+             }
         },
         "alert_colour.ok": {
             "default": "#00ff00",
@@ -78,6 +85,13 @@
         },
         "alert.disable": {
             "default": false,
+            "group": "alerting",
+            "section": "general",
+            "order": 1,
+            "type": "boolean"
+        },
+        "alert.acknowledged": {
+            "default": true,
             "group": "alerting",
             "section": "general",
             "order": 1,
@@ -191,26 +205,33 @@
             "section": "rules",
             "order": 4
         },
+        "alert_rule.acknowledged_alerts": {
+            "default": true,
+            "type": "boolean",
+            "group": "alerting",
+            "section": "rules",
+            "order": 5
+        },
         "alert_rule.invert_rule_match": {
             "default": false,
             "type": "boolean",
             "group": "alerting",
             "section": "rules",
-            "order": 5
+            "order": 6
         },
         "alert_rule.recovery_alerts": {
             "default": true,
             "type": "boolean",
             "group": "alerting",
             "section": "rules",
-            "order": 6
+            "order": 7
         },
         "alert_rule.invert_map": {
             "default": false,
             "type": "boolean",
             "group": "alerting",
             "section": "rules",
-            "order": 7
+            "order": 8
         },
         "discovery_on_reboot": {
             "default": false,
@@ -359,18 +380,16 @@
             "default": 8082,
             "type": "integer"
         },
+        "apps.sneck.polling_time_diff": {
+            "default": false,
+            "type": "boolean"
+        },
         "astext": {
             "default": {
                 "65332": "Cymru FullBogon Feed",
                 "65333": "Cymru Bogon Feed"
             },
             "type": "array"
-        },
-        "auth_ad_base_dn": {
-            "group": "auth",
-            "section": "ad",
-            "order": 1,
-            "type": "text"
         },
         "auth.socialite.redirect": {
             "group": "auth",
@@ -386,7 +405,6 @@
             "type": "boolean",
             "default": false
         },
-
         "auth.socialite.configs": {
             "group": "auth",
             "section": "socialite",
@@ -395,57 +413,79 @@
             "validate": {
                 "value": "array",
                 "value.*": "array",
-                "value.*.listener": ["not_regex:/[:|@]/"],
-                "value.*.listener": ["regex:/^\\\\SocialiteProviders\\\\[^\\\\]+\\\\[^\\\\]+ExtendSocialite$/"],
+                "value.*.listener": ["not_regex:/[:|@]/", "regex:/^\\\\SocialiteProviders\\\\[^\\\\]+\\\\[^\\\\]+ExtendSocialite$/"],
                 "value.*.redirect": "url",
                 "value.saml.metadata": "url_or_xml",
                 "value.saml.acs": "url",
                 "value.saml.entityid": "url"
             }
         },
-
+        "auth_ad_base_dn": {
+            "group": "auth",
+            "section": "ad",
+            "order": 3,
+            "type": "text"
+        },
         "auth_ad_check_certificates": {
             "default": false,
             "group": "auth",
             "section": "ad",
-            "order": 1,
+            "order": 5,
             "type": "boolean"
+        },
+        "auth_ad_debug": {
+            "default": false,
+            "group": "auth",
+            "section": "ad",
+            "order": 20,
+            "type": "boolean"
+        },
+        "auth_ad_domain": {
+            "group": "auth",
+            "section": "ad",
+            "order": 2,
+            "type": "text"
         },
         "auth_ad_group_filter": {
             "default": "(objectclass=group)",
             "group": "auth",
             "section": "ad",
-            "order": 1,
+            "order": 7,
             "type": "text"
         },
         "auth_ad_groups": {
             "default": {},
             "group": "auth",
             "section": "ad",
-            "order": 4,
-            "type": "ldap-groups",
+            "order": 8,
+            "type": "group-role-map",
+            "options": {
+                "groupPlaceholder": "Group Name"
+            },
             "validate": {
                 "value": "array",
-                "value.*": "array"
+                "value.*": "array",
+                "value.*.roles": "array|required",
+                "value.*.roles.*": "string"
             }
         },
         "auth_ad_user_filter": {
             "default": "(objectclass=user)",
             "group": "auth",
             "section": "ad",
-            "order": 0,
+            "order": 6,
             "type": "text"
         },
         "auth_ad_binddn": {
             "group": "auth",
             "section": "ad",
-            "order": 9,
+            "order": 11,
             "type": "text"
         },
         "auth_ad_bindpassword": {
             "group": "auth",
             "section": "ad",
-            "order": 8,
+            "order": 12,
             "type": "password"
         },
         "auth_ad_binduser": {
@@ -457,20 +497,24 @@
         "auth_ad_url": {
             "group": "auth",
             "section": "ad",
-            "order": 11,
-            "type": "text"
+            "order": 1,
+            "type": "text",
+            "validate": {
+                "value": ["regex:#^ldaps?://([-0-9a-zA-Z_.]+|\\[[a-fA-F0-9:]{3,39}\\])(\\s+ldaps?://([-0-9a-zA-Z_.]+|\\[[a-fA-F0-9:]{3,39}\\]))*$#"]
+            }
         },
-        "auth_ad_domain": {
+        "auth_ad_require_groupmembership": {
+            "default": false,
             "group": "auth",
             "section": "ad",
-            "order": 12,
-            "type": "text"
+            "order": 8,
+            "type": "boolean"
         },
         "auth_ad_starttls": {
             "default": "disabled",
             "group": "auth",
             "section": "ad",
-            "order": 13,
+            "order": 4,
             "type": "select",
             "options": {
                 "disabled": "Disabled",
@@ -563,10 +607,15 @@
             "group": "auth",
             "section": "ldap",
             "order": 4,
-            "type": "ldap-groups",
+            "type": "group-role-map",
+            "options": {
+                "groupPlaceholder": "Group DN"
+            },
             "validate": {
                 "value": "array",
-                "value.*": "array"
+                "value.*": "array",
+                "value.*.roles": "array|required",
+                "value.*.roles.*": "string"
             }
         },
         "auth_ldap_port": {
@@ -727,7 +776,7 @@
         "autodiscovery.xdp_exclude.sysdesc_regexp": {
             "type": "array",
             "default": [
-                "/-K9W8-/"
+                "/-K9W8/"
             ]
         },
         "bad_entity_sensor_regex": {
@@ -1045,6 +1094,13 @@
             "default": false,
             "type": "boolean"
         },
+        "discovery_modules.core": {
+            "default": true,
+            "type": "boolean",
+            "validate": {
+                "value": "boolean|accepted"
+            }
+        },
         "discovery_modules.os": {
             "order": 230,
             "group": "discovery",
@@ -1255,15 +1311,8 @@
             "default": true,
             "type": "boolean"
         },
-        "discovery_modules.vmware-vminfo": {
+        "discovery_modules.vminfo": {
             "order": 350,
-            "group": "discovery",
-            "section": "discovery_modules",
-            "default": false,
-            "type": "boolean"
-        },
-        "discovery_modules.libvirt-vminfo": {
-            "order": 170,
             "group": "discovery",
             "section": "discovery_modules",
             "default": false,
@@ -1392,12 +1441,16 @@
             "section": "availability",
             "order": 1,
             "default": [
-                "86400",
-                "604800",
-                "2592000",
-                "31536000"
+                86400,
+                604800,
+                2592000,
+                31536000
             ],
-            "type": "array"
+            "type": "array",
+            "validate": {
+                "value": "array",
+                "value.*": "int"
+            }
         },
         "graphing.availability_consider_maintenance": {
             "group": "poller",
@@ -1583,10 +1636,6 @@
             "section": "email",
             "order": 1,
             "type": "text"
-        },
-        "enable_bgp": {
-            "default": true,
-            "type": "boolean"
         },
         "enable_billing": {
             "default": false,
@@ -1776,6 +1825,13 @@
             "default": null,
             "type": "array"
         },
+        "graph_stat_percentile_disable": {
+            "default": false,
+            "group": "webui",
+            "section": "graph",
+            "order": 7,
+            "type": "boolean"
+        },
         "graph_colours.blues": {
             "default": [
                 "A9A9F2",
@@ -1931,6 +1987,55 @@
                 "773177",
                 "5B185B",
                 "3F003F"
+            ],
+            "type": "array"
+        },
+        "graph_colours.rainbow": {
+            "default": [
+                "881177",
+                "AA3355",
+                "CC6666",
+                "EE9944",
+                "EEDD00",
+                "99DD55",
+                "44DD88",
+                "22CCBB",
+                "00BBCC",
+                "0099CC",
+                "3366BB",
+                "663399"
+            ],
+            "type": "array"
+        },
+        "graph_colours.rainbow_stats_green": {
+            "default": [
+                "99DD55",
+                "22CCBB",
+                "00BBCC",
+                "0099CC",
+                "3366BB",
+                "AA3355",
+                "881177",
+                "CC6666",
+                "EEDD00",
+                "44DD88",
+                "663399"
+            ],
+            "type": "array"
+        },
+        "graph_colours.rainbow_stats_purple": {
+            "default": [
+                "663399",
+                "22CCBB",
+                "00BBCC",
+                "0099CC",
+                "3366BB",
+                "AA3355",
+                "881177",
+                "CC6666",
+                "EEDD00",
+                "44DD88",
+                "99DD55"
             ],
             "type": "array"
         },
@@ -2728,6 +2833,166 @@
                 "section": "firewall",
                 "order": 0,
                 "descr": "Active UDP Sessions"
+            },
+            "type": "graph"
+        },
+        "graph_types.device.panos_panFlowDosBlkNumEntries": {
+            "default": {
+                "section": "firewall",
+                "order": 0,
+                "descr": "Entries in DOS block table"
+            },
+            "type": "graph"
+        },
+        "graph_types.device.panos_panFlowMeterVsysThrottle": {
+            "default": {
+                "section": "firewall",
+                "order": 0,
+                "descr": "Session Setup Denied - vsys Maximum Sessions"
+            },
+            "type": "graph"
+        },
+        "graph_types.device.panos_panFlowPolicyDeny": {
+            "default": {
+                "section": "firewall",
+                "order": 0,
+                "descr": "Session Setup Denied - Policy"
+            },
+            "type": "graph"
+        },
+        "graph_types.device.panos_panFlowPolicyNat": {
+            "default": {
+                "section": "firewall",
+                "order": 0,
+                "descr": "Session Setup Denied - NAT/IP allocation error"
+            },
+            "type": "graph"
+        },
+        "graph_types.device.panos_panFlowScanDrop": {
+            "default": {
+                "section": "firewall",
+                "order": 0,
+                "descr": "Session Setup Denied - Scan Detection"
+            },
+            "type": "graph"
+        },
+        "graph_types.device.panos_panFlowDosDropIpBlocked": {
+            "default": {
+                "section": "firewall",
+                "order": 0,
+                "descr": "Source flagged for blocking"
+            },
+            "type": "graph"
+        },
+        "graph_types.device.panos_panFlowDosRedIcmp": {
+            "default": {
+                "section": "firewall",
+                "order": 0,
+                "descr": "Zone Protection RED - ICMP"
+            },
+            "type": "graph"
+        },
+        "graph_types.device.panos_panFlowDosRedIcmp6": {
+            "default": {
+                "section": "firewall",
+                "order": 0,
+                "descr": "Zone Protection RED - ICMPv6"
+            },
+            "type": "graph"
+        },
+        "graph_types.device.panos_panFlowDosRedIp": {
+            "default": {
+                "section": "firewall",
+                "order": 0,
+                "descr": "Zone Protection RED - Other IP"
+            },
+            "type": "graph"
+        },
+        "graph_types.device.panos_panFlowDosRedTcp": {
+            "default": {
+                "section": "firewall",
+                "order": 0,
+                "descr": "Zone Protection RED - TCP-SYN"
+            },
+            "type": "graph"
+        },
+        "graph_types.device.panos_panFlowDosRedUdp": {
+            "default": {
+                "section": "firewall",
+                "order": 0,
+                "descr": "Zone Protection RED - UDP"
+            },
+            "type": "graph"
+        },
+        "graph_types.device.panos_panFlowDosPbpDrop": {
+            "default": {
+                "section": "firewall",
+                "order": 0,
+                "descr": "Packet Buffer Protection RED"
+            },
+            "type": "graph"
+        },
+        "graph_types.device.panos_panFlowDosRuleDeny": {
+            "default": {
+                "section": "firewall",
+                "order": 0,
+                "descr": "DOS Rule - Denied"
+            },
+            "type": "graph"
+        },
+        "graph_types.device.panos_panFlowDosRuleDrop": {
+            "default": {
+                "section": "firewall",
+                "order": 0,
+                "descr": "DOS Rule - Rate Limited or IP Blocked"
+            },
+            "type": "graph"
+        },
+        "graph_types.device.panos_panFlowDosZoneRedAct": {
+            "default": {
+                "section": "firewall",
+                "order": 0,
+                "descr": "Zone RED - Activation Threshold Reached"
+            },
+            "type": "graph"
+        },
+        "graph_types.device.panos_panFlowDosZoneRedMax": {
+            "default": {
+                "section": "firewall",
+                "order": 0,
+                "descr": "Zone RED - Maximum Threshold Reached"
+            },
+            "type": "graph"
+        },
+        "graph_types.device.panos_panFlowDosSyncookieNotTcpSyn": {
+            "default": {
+                "section": "firewall",
+                "order": 0,
+                "descr": "Session Discarded - TCP SYN Cookies - Not SYN"
+            },
+            "type": "graph"
+        },
+        "graph_types.device.panos_panFlowDosSyncookieNotTcpSynAck": {
+            "default": {
+                "section": "firewall",
+                "order": 0,
+                "descr": "Session Discarded - TCP SYN Cookies - Not SYN-ACK"
+            },
+            "type": "graph"
+        },
+        "graph_types.device.panos_panFlowDosBlkSwEntries": {
+            "default": {
+                "section": "firewall",
+                "order": 0,
+                "descr": "Entries in software DOS block table"
+            },
+            "type": "graph"
+        },
+        "graph_types.device.panos_panFlowDosBlkHwEntries": {
+            "default": {
+                "section": "firewall",
+                "order": 0,
+                "descr": "Entries in hardware DOS block table"
             },
             "type": "graph"
         },
@@ -3545,7 +3810,25 @@
             "group": "system",
             "section": "proxy",
             "order": 0,
-            "type": "text"
+            "type": "text",
+            "validate": {
+                "value": [
+                    "nullable",
+                    "starts_with:http://,https://,tcp://"
+                ]
+            }
+        },
+        "https_proxy": {
+            "group": "system",
+            "section": "proxy",
+            "order": 1,
+            "type": "text",
+            "validate": {
+                "value": [
+                    "nullable",
+                    "starts_with:http://,https://,tcp://"
+                ]
+            }
         },
         "icmp_check": {
             "default": true,
@@ -3811,7 +4094,7 @@
         },
         "leaflet.default_zoom": {
             "default": 2,
-            "type": "integer"
+            "type": "float"
         },
         "leaflet.group_radius": {
             "default": 10,
@@ -4140,6 +4423,13 @@
             "order": 5,
             "type": "executable"
         },
+        "no_proxy": {
+            "group": "system",
+            "default": "localhost,127.0.0.1,::1",
+            "section": "proxy",
+            "order": 2,
+            "type": "text"
+        },
         "notifications.LibreNMS": {
             "default": "https://www.librenms.org/notifications.rss",
             "type": "text"
@@ -4295,6 +4585,7 @@
                         {"match": "f5", "value": "tmos"},
                         {"match": "fireware", "value": "firewareos"},
                         {"match": "fortigate", "value": "fortios"},
+                        {"match": "fortiswitch", "value": "fortios"},
                         {"match": "vyos", "value": "vyatta"},
                         {"match": "slms", "value": "zhoneolt"},
                         {"match": "oneaccess", "value": "oneos"}
@@ -4428,6 +4719,13 @@
             "default": false,
             "type": "boolean"
         },
+        "poller_modules.core": {
+            "default": true,
+            "type": "boolean",
+            "validate": {
+                "value": "boolean|accepted"
+            }
+        },
         "poller_modules.os": {
             "order": 320,
             "group": "poller",
@@ -4550,6 +4848,13 @@
             "group": "poller",
             "section": "poller_modules",
             "default": true,
+            "type": "boolean"
+        },
+        "poller_modules.vminfo": {
+            "order": 410,
+            "group": "poller",
+            "section": "poller_modules",
+            "default": false,
             "type": "boolean"
         },
         "poller_modules.wifi": {
@@ -4845,6 +5150,20 @@
             "order": 7,
             "type": "boolean"
         },
+        "radius.default_roles": {
+            "default": [],
+            "group": "auth",
+            "section": "radius",
+            "order": 3,
+            "type": "array"
+        },
+        "radius.enforce_roles": {
+            "default": true,
+            "group": "auth",
+            "section": "radius",
+            "order": 4,
+            "type": "boolean"
+        },
         "rancid_configs": {
             "default": [],
             "type": "array"
@@ -4862,10 +5181,31 @@
             }
         },
         "reporting.error": {
+            "group": "system",
+            "section": "reporting",
+            "order": 1,
             "default": false,
             "type": "boolean"
         },
         "reporting.dump_errors": {
+            "group": "system",
+            "section": "reporting",
+            "order": 2,
+            "default": false,
+            "type": "boolean"
+        },
+        "reporting.throttle": {
+            "default": 300,
+            "type": "integer",
+            "units": "seconds",
+            "group": "system",
+            "section": "reporting",
+            "order": 3
+        },
+        "reporting.usage": {
+            "group": "system",
+            "section": "reporting",
+            "order": 0,
             "default": false,
             "type": "boolean"
         },
@@ -5138,11 +5478,19 @@
                 "CRITICAL": "CRITICAL"
             }
         },
+        "service_master_timeout": {
+            "default": 20,
+            "group": "poller",
+            "section": "distributed",
+            "order": 25,
+            "type": "integer",
+            "units": "seconds"
+        },
         "service_watchdog_enabled": {
             "default": false,
             "group": "poller",
             "section": "distributed",
-            "order": 25,
+            "order": 26,
             "type": "boolean"
         },
         "sfdp": {
@@ -5212,6 +5560,13 @@
             "default": 1200,
             "type": "integer",
             "units": "seconds"
+        },
+        "snmp.max_oid": {
+            "group": "poller",
+            "section": "snmp",
+            "order": 5,
+            "type": "integer",
+            "default": 10
         },
         "snmp.max_repeaters": {
             "group": "poller",

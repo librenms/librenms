@@ -61,7 +61,7 @@ class CustomersController extends TableController
     }
 
     /**
-     * @param  \Illuminate\Contracts\Pagination\LengthAwarePaginator  $paginator
+     * @param  \Illuminate\Contracts\Pagination\LengthAwarePaginator&\Countable  $paginator
      * @return \Illuminate\Http\JsonResponse
      */
     protected function formatResponse($paginator)

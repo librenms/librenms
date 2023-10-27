@@ -15,10 +15,11 @@ foreach ($ports as $port) {
     $ignore = 0;
     if (is_array(\LibreNMS\Config::get('device_traffic_iftype'))) {
         foreach (\LibreNMS\Config::get('device_traffic_iftype') as $iftype) {
-            if ($iftype == '/l2vlan/' && $device['os'] == 'asa') {
-                // ASA (at least in multicontext) reports all interfaces as l2vlan even if they are l3
-                // so every context has no graph displayed unless l2vlan are accepted for all.
-                // This patch will ignore l2vlan for ASA.
+            if (in_array($iftype, ['/virtual/', '/l2vlan/']) && $device['os'] == 'asa') {
+                // ASA (at least in multicontext) reports interfaces as l2vlan even if they are l3
+                // or propVirtual in 9.16 (like etherchannels) but without the physical ones.
+                // Filtering those types results in empty device_bits graphs in ASAs.
+                // This patch will avoid filtering l2vlan and propVirtual on ASA devices.
                 continue;
             }
             if (preg_match($iftype . 'i', $port['ifType'])) {

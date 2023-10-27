@@ -1,0 +1,13 @@
+os: lambdatrail
+text: 'Lambdatrail'
+type: network
+icon: lambdatrail
+group: deltanet
+over:
+    - { graph: device_dbm, text: 'Optical values' }
+    - { graph: device_temperature, text: 'Temperature' }
+    - { graph: device_state, text: 'State' }
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.35616
+mib_dir: deltanet

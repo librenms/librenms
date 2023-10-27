@@ -52,7 +52,7 @@ $pagetitle[] = 'Health :: Toner';
         {
             return {
                 id: "toner",
-                view: '<?php echo $vars['view']; ?>'
+                view: '<?php echo htmlspecialchars($vars['view']); ?>'
             };
         },
         url: "ajax_table.php"

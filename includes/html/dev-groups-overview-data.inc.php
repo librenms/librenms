@@ -18,7 +18,7 @@ if (count($device_groups)) {
                         <div class="col-sm-12">
                         <?php foreach ($device_groups as $group) { ?>
                             <span style="margin: 8px;">
-                                <a href="<?=url('devices/group=' . $group['id'])?>" target="_blank"><?=$group['name']?></a>
+                                <a href="<?=url('devices/group=' . $group['id'])?>" target="_blank"><?=htmlspecialchars($group['name'])?></a>
                             </span>
                         <?php } ?>
                         </div>

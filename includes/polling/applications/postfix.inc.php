@@ -12,8 +12,8 @@ $detail = snmp_walk($device, $detailOID, $options);
 [$incomingq, $activeq, $deferredq, $holdq] = explode("\n", $mailq);
 
 [$received, $delivered, $forwarded, $deferred, $bounced, $rejected, $rejectw, $held, $discarded, $bytesr,
-     $bytesd, $senders, $sendinghd, $recipients, $recipienthd, $deferralcr, $deferralhid, $chr, $hcrnfqh, $sardnf,
-     $sarnobu, $bu, $raruu, $hcrin, $sarnfqa, $rardnf, $rarnfqa, $iuscp, $sce, $scp, $urr] = explode("\n", $detail);
+    $bytesd, $senders, $sendinghd, $recipients, $recipienthd, $deferralcr, $deferralhid, $chr, $hcrnfqh, $sardnf,
+    $sarnobu, $bu, $raruu, $hcrin, $sarnfqa, $rardnf, $rarnfqa, $iuscp, $sce, $scp, $urr] = explode("\n", $detail);
 
 $rrd_name = ['app', $name, $app->app_id];
 $rrd_def = RrdDefinition::make()

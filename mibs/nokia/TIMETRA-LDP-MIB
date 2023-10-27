@@ -11989,7 +11989,8 @@ VRtrLdpPeerTemplEntry            ::= SEQUENCE
     vRtrLdpPeerTemplCreateTime       TimeStamp,
     vRtrLdpPeerTemplIndex            Counter64,
     vRtrLdpPeerTemplLsrIdAdvert      TruthValue,
-    vRtrLdpPeerTemplLsrIdCommunity   TPolicyStatementNameOrEmpty
+    vRtrLdpPeerTemplLsrIdCommunity   TPolicyStatementNameOrEmpty,
+    vRtrLdpPeerTemplMcastTunneling   TruthValue
 }
 
 vRtrLdpPeerTemplName             OBJECT-TYPE
@@ -12127,8 +12128,8 @@ vRtrLdpPeerTemplTunneling        OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "The value of vRtrLdpPeerTemplTunneling specifies whether tunneling of
-         LDP over tunnels is enabled. When this object has a value of 'true',
-         tunneling is enabled. When its value is 'false', tunneling is
+         LDP over prefix tunnels is enabled. When this object has a value of
+         'true', tunneling is enabled. When its value is 'false', tunneling is
          disabled."
     DEFVAL      { false }
     ::= { vRtrLdpPeerTemplEntry 10 }
@@ -12232,6 +12233,18 @@ vRtrLdpPeerTemplLsrIdCommunity   OBJECT-TYPE
          associated with a session to a given peer"
     DEFVAL      { ''H }
     ::= { vRtrLdpPeerTemplEntry 18 }
+
+vRtrLdpPeerTemplMcastTunneling   OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrLdpPeerTemplMcastTunneling specifies whether
+         tunneling of LDP over multicast tunnels is enabled. When this object
+         has a value of 'true', tunneling is enabled. When its value is
+         'false', tunneling is disabled."
+    DEFVAL      { false }
+    ::= { vRtrLdpPeerTemplEntry 19 }
 
 vRtrLdpPeerTmplPlcyMpTblLstChgd  OBJECT-TYPE
     SYNTAX      TimeStamp
@@ -12751,6 +12764,17 @@ tmnxLdpV16v0Compliance           MODULE-COMPLIANCE
             tmnxLdpAggrEgrStatsV16v0Group
         }
     ::= { tmnxLdpCompliances 15 }
+
+tmnxLdpV20v0Compliance           MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for management of extended LDP on Nokia SROS
+         series systems release 20.0."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxLdpPeerMcastTunnelingGroup
+        }
+    ::= { tmnxLdpCompliances 16 }
 
 tmnxLdpGroups                    OBJECT IDENTIFIER ::= { tmnxLdpConformance 2 }
 
@@ -14951,6 +14975,16 @@ tmnxLdpAggrEgrStatsV16v0Group    OBJECT-GROUP
         "The group of all global objects in LDP supporting LDP egress statistic
          aggregation feature on Nokia SROS series systems 16.0 release."
     ::= { tmnxLdpGroups 71 }
+
+tmnxLdpPeerMcastTunnelingGroup   OBJECT-GROUP
+    OBJECTS     {
+        vRtrLdpPeerTemplMcastTunneling
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects in LDP supporting multicast tunneling feature on
+         Nokia SROS series systems 20.0 release."
+    ::= { tmnxLdpGroups 72 }
 
 tmnxLdpNotifyPrefix              OBJECT IDENTIFIER ::= { tmnxSRNotifyPrefix 8 }
 

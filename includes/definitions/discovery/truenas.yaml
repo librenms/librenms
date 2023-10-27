@@ -26,24 +26,26 @@ modules:
                     value: zfsArcHits
                     num_oid: .1.3.6.1.4.1.50536.1.4.4.{{ $index }}
                     descr: 'ARC Hits'
-                    index: zfsArcHits.{{ $index }}
+                    index: zfsArcHits_rate.{{ $index }}
+                    rrd_type: COUNTER
                 -
                     oid: zfsArcMisses
                     value: zfsArcMisses
                     num_oid: .1.3.6.1.4.1.50536.1.4.5.{{ $index }}
                     descr: 'ARC Misses'
-                    index: zfsArcMisses.{{ $index }}
+                    index: zfsArcMisses_rate.{{ $index }}
+                    rrd_type: COUNTER
                 -
                     oid: zfsArcC
                     value: zfsArcC
                     num_oid: .1.3.6.1.4.1.50536.1.4.6.{{ $index }}
-                    descr: 'ARC C'
+                    descr: 'ARC Target Size (C)'
                     index: zfsArcC.{{ $index }}
                 -
                     oid: zfsArcP
                     value: zfsArcP
                     num_oid: .1.3.6.1.4.1.50536.1.4.7.{{ $index }}
-                    descr: 'ARC P'
+                    descr: 'ARC MRU Target Size (P)'
                     index: zfsArcP.{{ $index }}
                 -
                     oid: zfsArcMissPercent
@@ -55,7 +57,7 @@ modules:
                     oid: zfsArcHitRatio
                     value: zfsArcHitRatio
                     num_oid: .1.3.6.1.4.1.50536.1.4.9.{{ $index }}
-                    descr: 'ARC Hit  Ratio'
+                    descr: 'ARC Hit Ratio'
                     index: zfsArcHitRatio.{{ $index }}
                 -
                     oid: zfsArcMissRatio
@@ -68,25 +70,29 @@ modules:
                     value: zfsL2ArcHits
                     num_oid: .1.3.6.1.4.1.50536.1.5.1.{{ $index }}
                     descr: 'L2ARC Hits'
-                    index: zfsL2ArcHits.{{ $index }}
+                    index: zfsL2ArcHits_rate.{{ $index }}
+                    rrd_type: COUNTER
                 -
                     oid: zfsL2ArcMisses
                     value: zfsL2ArcMisses
                     num_oid: .1.3.6.1.4.1.50536.1.5.2.{{ $index }}
                     descr: 'L2ARC Misses'
-                    index: zfsL2ArcMisses.{{ $index }}
+                    index: zfsL2ArcMisses_rate.{{ $index }}
+                    rrd_type: COUNTER
                 -
                     oid: zfsL2ArcRead
                     value: zfsL2ArcRead
                     num_oid: .1.3.6.1.4.1.50536.1.5.3.{{ $index }}
                     descr: 'L2ARC Reads'
-                    index: zfsL2ArcRead.{{ $index }}
+                    index: zfsL2ArcRead_rate.{{ $index }}
+                    rrd_type: COUNTER
                 -
                     oid: zfsL2ArcWrite
                     value: zfsL2ArcWrite
                     num_oid: .1.3.6.1.4.1.50536.1.5.4.{{ $index }}
                     descr: 'L2ARC Writes'
-                    index: zfsL2ArcWrite.{{ $index }}
+                    index: zfsL2ArcWrite_rate.{{ $index }}
+                    rrd_type: COUNTER
                 -
                     oid: zfsL2ArcSize
                     value: zfsL2ArcSize

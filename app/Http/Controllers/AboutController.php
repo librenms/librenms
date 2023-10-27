@@ -50,21 +50,23 @@ use App\Models\Syslog;
 use App\Models\Vlan;
 use App\Models\Vrf;
 use App\Models\WirelessSensor;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use LibreNMS\Config;
 use LibreNMS\Data\Store\Rrd;
+use LibreNMS\Util\Http;
 use LibreNMS\Util\Version;
 
 class AboutController extends Controller
 {
     public function index(Request $request)
     {
-        $callback_status = Callback::get('enabled') === '1';
         $version = Version::get();
 
         return view('about.index', [
-            'callback_status' => $callback_status,
-            'callback_uuid'   => $callback_status ? Callback::get('uuid') : null,
+            'usage_reporting_status' => Config::get('reporting.usage'),
+            'error_reporting_status' => Config::get('reporting.error'),
+            'reporting_clearable'   => Callback::whereIn('name', ['uuid', 'error_reporting_uuid'])->exists(),
 
             'db_schema' => $version->database(),
             'git_log' => $version->git->log(),
@@ -104,5 +106,22 @@ class AboutController extends Controller
             'stat_vrf'        => Vrf::count(),
             'stat_wireless'   => WirelessSensor::count(),
         ]);
+    }
+
+    public function clearReportingData(): JsonResponse
+    {
+        $usage_uuid = Callback::get('uuid');
+
+        // try to clear usage data if we have a uuid
+        if ($usage_uuid) {
+            if (! Http::client()->post(Config::get('callback_clear'), ['uuid' => $usage_uuid])->successful()) {
+                return response()->json([], 500); // don't clear if this fails to delete upstream data
+            }
+        }
+
+        // clear all reporting ids
+        Callback::truncate();
+
+        return response()->json();
     }
 }

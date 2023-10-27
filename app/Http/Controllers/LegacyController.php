@@ -72,7 +72,7 @@ class LegacyController extends Controller
             }
 
             // create and set the title
-            $title = join(' - ', $pagetitle);
+            $title = implode(' - ', $pagetitle);
             $html .= "<script type=\"text/javascript\">\ndocument.title = '$title';\n</script>";
         }
 

@@ -5,7 +5,7 @@ namespace App\Listeners;
 use App\Events\UserCreated;
 use App\Models\Notification;
 use App\Models\NotificationAttrib;
-use DB;
+use Illuminate\Support\Facades\DB;
 
 class MarkNotificationsRead
 {
@@ -25,7 +25,7 @@ class MarkNotificationsRead
      * @param  UserCreated  $event
      * @return void
      */
-    public function handle(UserCreated $event)
+    public function handle(UserCreated $event): void
     {
         $user = $event->user;
         // mark pre-existing notifications as read

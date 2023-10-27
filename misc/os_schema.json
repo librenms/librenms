@@ -180,10 +180,7 @@
                 "cisco-vpdn": {
                     "type": "boolean"
                 },
-                "libvirt-vminfo": {
-                    "type": "boolean"
-                },
-                "vmware-vminfo": {
+                "vminfo": {
                     "type": "boolean"
                 },
                 "vlans": {
@@ -345,10 +342,7 @@
                 "junose-atm-vp": {
                     "type": "boolean"
                 },
-                "vmware-vminfo": {
-                    "type": "boolean"
-                },
-                "libvirt-vminfo": {
+                "vminfo": {
                     "type": "boolean"
                 },
                 "mpls": {
@@ -391,7 +385,8 @@
             "type": "boolean"
         },
         "snmp_max_oid": {
-            "type": "string"
+            "type": "integer",
+            "minimum": 1
         },
         "ifXmcbc": {
             "type": "boolean"

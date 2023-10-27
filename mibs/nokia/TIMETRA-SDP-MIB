@@ -42,6 +42,7 @@ IMPORTS
     svcDhcpLseStatePopulateError,
     svcDhcpPacketProblem, svcDhcpProxyError,
     svcDhcpSubAuthError, svcId,
+    svcTlsBackboneVplsSvcId,
     svcTlsMacMoveMaxRate,
     svcTlsStpDesignatedRoot, svcVpnId,
     tlsDhcpPacketProblem, tlsFdbType,
@@ -62,6 +63,7 @@ IMPORTS
     TSdpEgressPolicyID, TSdpIngressPolicyID,
     TmnxActionType, TmnxAdminState,
     TmnxAdminStateTruthValue, TmnxBfdEncap,
+    TmnxBfdSessOperState,
     TmnxBsxAarpIdOrZero,
     TmnxBsxAarpServiceRefType,
     TmnxBsxTransPrefPolicyIdOrZero,
@@ -1058,7 +1060,7 @@ sdpLocalEndInetAddress           OBJECT-TYPE
          the local end of the tunnel defined by this SDP.
 
          An 'inconsistentValue' error is returned when sdpLocalEndInetAddress
-         is set to non-default and sdpDelivery is not set to 'l2tpv3'."
+         is set to non-default and sdpDelivery is not set to 'l2tpv3' or 'gre'."
     DEFVAL      { ''H }
     ::= { sdpInfoEntry 63 }
 
@@ -1561,7 +1563,9 @@ sdpBindOperFlags                 OBJECT-TYPE
         evpnRouteConflict       (28),
         adminLocked             (29),
         evpnP2mpConflict        (30),
-        labelStackLimitExceeded (31)
+        labelStackLimitExceeded (31),
+        vccvBfdDown             (32),
+        stitchingSvcPwFault     (33)
     }
     MAX-ACCESS  read-only
     STATUS      current
@@ -1616,7 +1620,9 @@ sdpBindOperFlags                 OBJECT-TYPE
          adminLocked            (29)  - SDP Bind is admin-locked.
          evpnP2mpConfict        (30)  - Conflict with evpn p2mp.
          labelStackLimitExceeded(31)  - label stack overhead exceeding the
-                                     egress IOM limitation."
+                                     egress IOM limitation.
+         vccvBfdDown(32) - vccv-bfd down
+         stitchingSvcPwFault(33) - stitching-svc-pw-fault"
     ::= { sdpBindEntry 20 }
 
 sdpBindLastStatusChange          OBJECT-TYPE
@@ -2746,7 +2752,9 @@ SdpBindTlsEntry                  ::= SEQUENCE
     sdpBindTlsAutoLearnMacProtect    TruthValue,
     sdpBindDisableSendBvplsEvpnFlush TruthValue,
     sdpBindTlsRestProtSrcMacOper     TruthValue,
-    sdpBindTlsRestProtSrcMacOperAct  INTEGER
+    sdpBindTlsRestProtSrcMacOperAct  INTEGER,
+    sdpBindTlsAutoLrnMacPrtExcList   TNamedItemOrEmpty,
+    sdpBindTlsLastMgmtChange         TimeStamp
 }
 
 sdpBindTlsStpAdminStatus         OBJECT-TYPE
@@ -3441,6 +3449,30 @@ sdpBindTlsRestProtSrcMacOperAct  OBJECT-TYPE
          operational state of the Restrict Protected Source MAC action."
     ::= { sdpBindTlsEntry 57 }
 
+sdpBindTlsAutoLrnMacPrtExcList   OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of sdpBindTlsAutoLrnMacPrtExcList specifies mac-list name
+         which contains MAC addresses to be excluded from auto learn mac
+         protect"
+    DEFVAL      { "" }
+    ::= { sdpBindTlsEntry 58 }
+
+sdpBindTlsLastMgmtChange         OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of sdpBindTlsLastMgmtChange indicates the sysUpTime at the
+         time of the last modification of this entry.
+
+         If no changes were made to the entry since the last re-initialization
+         of the local network management subsystem, then this object contains a
+         zero value."
+    ::= { sdpBindTlsEntry 59 }
+
 sdpBindMeshTlsTable              OBJECT-TYPE
     SYNTAX      SEQUENCE OF SdpBindMeshTlsEntry
     MAX-ACCESS  not-accessible
@@ -3471,7 +3503,8 @@ SdpBindMeshTlsEntry              ::= SEQUENCE
     sdpBindMeshTlsRestProtSrcMacAct  INTEGER,
     sdpBindMeshTlsAutoLearnMacProt   TruthValue,
     sdpBindMeshTlsRPSMacOper         TruthValue,
-    sdpBindMeshTlsRPSMacOperAct      INTEGER
+    sdpBindMeshTlsRPSMacOperAct      INTEGER,
+    sdpBindMeshTlsAutLrnMacPrtExcLs  TNamedItemOrEmpty
 }
 
 sdpBindMeshTlsPortState          OBJECT-TYPE
@@ -3615,6 +3648,17 @@ sdpBindMeshTlsRPSMacOperAct      OBJECT-TYPE
         "The value of the object sdpBindMeshTlsRPSMacOperAct indicates the
          operational state of the Restrict Protected Source MAC action."
     ::= { sdpBindMeshTlsEntry 9 }
+
+sdpBindMeshTlsAutLrnMacPrtExcLs  OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of sdpBindMeshTlsAutLrnMacPrtExcLs specifies mac-list name
+         which contains MAC addresses to be excluded from auto learn mac
+         protect"
+    DEFVAL      { "" }
+    ::= { sdpBindMeshTlsEntry 10 }
 
 sdpBindApipeTable                OBJECT-TYPE
     SYNTAX      SEQUENCE OF SdpBindApipeEntry
@@ -6944,7 +6988,8 @@ SdpBindEthCfmEntry               ::= SEQUENCE
     sdpBindEthCfmSquelchIngress      BITS,
     sdpBindEthCfmCollectLmmStats     TruthValue,
     sdpBindEthCfmCollLmmFcSts        TFCSet,
-    sdpBindEthCfmCollLmmFcStsInP     TFCSet
+    sdpBindEthCfmCollLmmFcStsInP     TFCSet,
+    sdpBindEthCfmSquelchIngressCtag  BITS
 }
 
 sdpBindEthCfmRowLastChanged      OBJECT-TYPE
@@ -7076,6 +7121,33 @@ sdpBindEthCfmCollLmmFcStsInP     OBJECT-TYPE
     DEFVAL      { {} }
     ::= { sdpBindEthCfmEntry 6 }
 
+sdpBindEthCfmSquelchIngressCtag  OBJECT-TYPE
+    SYNTAX      BITS {
+        level0 (0),
+        level1 (1),
+        level2 (2),
+        level3 (3),
+        level4 (4),
+        level5 (5),
+        level6 (6),
+        level7 (7)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of sdpBindEthCfmSquelchIngressCtag specifies the ETH-CFM
+         level or levels of the ETH-CFM PDUs that are silently discarded using
+         additional VLAN space immediately following ingress service
+         delineation.
+
+         Any received ETH-CFM PDU matching a level that has been set will be
+         dropped without regard for the vlan-id in that additional space.
+
+         No statistical information or drop count will be available for any
+         ETH-CFM PDU that is silently discarded by this option."
+    DEFVAL      { {} }
+    ::= { sdpBindEthCfmEntry 7 }
+
 sdpBindTlsSpbTblLastChanged      OBJECT-TYPE
     SYNTAX      TimeStamp
     MAX-ACCESS  read-only
@@ -7206,7 +7278,9 @@ SdpPwPortEntry                   ::= SEQUENCE
     sdpPwPortMonOperGrp              TNamedItemOrEmpty,
     sdpPwPortIngVcLabel              Unsigned32,
     sdpPwPortEgrVcLabel              Unsigned32,
-    sdpPwPortControlWord             TruthValue
+    sdpPwPortControlWord             TruthValue,
+    sdpPwPortEntropyLabel            TruthValue,
+    sdpPwPortAdvSvcMtu               Integer32
 }
 
 sdpPwPortId                      OBJECT-TYPE
@@ -7321,7 +7395,8 @@ sdpPwPortOperFlags               OBJECT-TYPE
         standbySigSlaveTxDown   (22),
         operGrpDown             (23),
         withdrawnIngressVcLabel (24),
-        labelStackLimitExceeded (25)
+        labelStackLimitExceeded (25),
+        stitchingSvcPwFault     (26)
     }
     MAX-ACCESS  read-only
     STATUS      current
@@ -7366,7 +7441,8 @@ sdpPwPortOperFlags               OBJECT-TYPE
          operGrpDown            (23)  - Operational group is down.
          withdrawnIngressVcLabel(24)  - Withdrawn due to incompatibility.
          labelStackLimitExceeded(25)  - label stack overhead exceeding the
-                                     egress IOM limitation."
+                                     egress IOM limitation.
+         stitchingSvcPwFault(26) - stitching-svc-pw-fault"
     ::= { sdpPwPortEntry 8 }
 
 sdpPwPortVcType                  OBJECT-TYPE
@@ -7405,8 +7481,7 @@ sdpPwPortEgrShapDefIntDestId     OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "The value of sdpPwPortEgrShapDefIntDestId specifies the default
-         intermediate destination identifier on the egress side which will
-            eventually map to an HSMDAv2 secondary shaper for this
+         intermediate destination identifier on the egress side for this
          pseudo-wire port entry."
     DEFVAL      { ''H }
     ::= { sdpPwPortEntry 12 }
@@ -7460,6 +7535,26 @@ sdpPwPortControlWord             OBJECT-TYPE
          'ControlWord' is preferred or not."
     DEFVAL      { false }
     ::= { sdpPwPortEntry 17 }
+
+sdpPwPortEntropyLabel            OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The sdpPwPortEntropyLabel specifies whether the use of the
+         entropy-lable is preferred or not."
+    DEFVAL      { false }
+    ::= { sdpPwPortEntry 18 }
+
+sdpPwPortAdvSvcMtu               OBJECT-TYPE
+    SYNTAX      Integer32 (-1 | 0 | 1..9782)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The sdpPwPortAdvSvcMtu specifies the service MTU size used. Value of
+         zero indicates that MTU size is derived from SDP path MTU."
+    DEFVAL      { -1 }
+    ::= { sdpPwPortEntry 19 }
 
 sdpGrpTblLastChanged             OBJECT-TYPE
     SYNTAX      TimeStamp
@@ -8657,7 +8752,8 @@ PwTemplateAugEntry               ::= SEQUENCE
     pwTemplateAugL2ptProtocols       L2ptProtocols,
     pwTemplateAugGreAllowFrag        TruthValue,
     pwTemplateAugAluNgeKeyGroupIn    AluNgeKeygroupIdOrZero,
-    pwTemplateAugAluNgeKeyGroupOut   AluNgeKeygroupIdOrZero
+    pwTemplateAugAluNgeKeyGroupOut   AluNgeKeygroupIdOrZero,
+    pwTemplateAugAtLnMacPrtExcList   TNamedItemOrEmpty
 }
 
 pwTemplateAugLastChgd            OBJECT-TYPE
@@ -8816,6 +8912,17 @@ pwTemplateAugAluNgeKeyGroupOut   OBJECT-TYPE
          the outbound direction."
     DEFVAL      { 0 }
     ::= { pwTemplateAugEntry 13 }
+
+pwTemplateAugAtLnMacPrtExcList   OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of pwTemplateAugAtLnMacPrtExcList specifies mac-list name
+         which contains MAC addresses to be excluded from auto learn mac
+         protect"
+    DEFVAL      { "" }
+    ::= { pwTemplateAugEntry 14 }
 
 sdpSegRouteTableLastChgd         OBJECT-TYPE
     SYNTAX      TimeStamp
@@ -9009,7 +9116,11 @@ sdpBindExtEntry                  OBJECT-TYPE
 SdpBindExtEntry                  ::= SEQUENCE
 {
     sdpBindExtEntropyLabel           TruthValue,
-    sdpBindExtLastMgmtChange         TimeStamp
+    sdpBindExtLastMgmtChange         TimeStamp,
+    sdpBindExtBfdFailAction          INTEGER,
+    sdpBindExtBfdSessStatOperState   TmnxBfdSessOperState,
+    sdpBindExtBfdWaitForUpTimer      Unsigned32,
+    sdpBindExtBfdUpTimeRemain        Integer32
 }
 
 sdpBindExtEntropyLabel           OBJECT-TYPE
@@ -9030,6 +9141,47 @@ sdpBindExtLastMgmtChange         OBJECT-TYPE
         "The value of sysUpTime at the time of the most recent
          management-initiated change to this Service-SDP binding."
     ::= { sdpBindExtEntry 2 }
+
+sdpBindExtBfdFailAction          OBJECT-TYPE
+    SYNTAX      INTEGER {
+        none (0),
+        down (1)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of sdpBindExtBfdFailAction specifies the action to take on
+         BFD failure."
+    DEFVAL      { none }
+    ::= { sdpBindExtEntry 3 }
+
+sdpBindExtBfdSessStatOperState   OBJECT-TYPE
+    SYNTAX      TmnxBfdSessOperState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of sdpBindExtBfdSessStatOperState indicates the operational
+         state of the BFD session the SDP-BIND is relying upon for its fast
+         triggering mechanism."
+    ::= { sdpBindExtEntry 4 }
+
+sdpBindExtBfdWaitForUpTimer      OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..60)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of sdpBindExtBfdWaitForUpTimer specifies the up-timer to
+         wait for on BFD failure."
+    DEFVAL      { 0 }
+    ::= { sdpBindExtEntry 5 }
+
+sdpBindExtBfdUpTimeRemain        OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of sdpBindExtBfdUpTimeRemain indicates the remaining uptime."
+    ::= { sdpBindExtEntry 6 }
 
 sdpSegRouteTeLspTableLastChgd    OBJECT-TYPE
     SYNTAX      TimeStamp
@@ -9192,6 +9344,90 @@ sdpMplsLspLastChanged            OBJECT-TYPE
         "The value of sysUpTime at the time of the most recent change to this
          entry."
     ::= { sdpMplsLspEntry 3 }
+
+sdpBindExt2TableLastChgd         OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of sdpBindExt2TableLastChgd indicates the sysUpTime at the
+         time of the last modification of sdpBindExt2Table.
+
+         If no changes were made to the entry since the last re-initialization
+         of the local network management subsystem, then this object contains a
+         zero value."
+    ::= { tmnxSdpObjs 74 }
+
+sdpBindExt2Table                 OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SdpBindExt2Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table that extends sdpBindTable."
+    ::= { tmnxSdpObjs 75 }
+
+sdpBindExt2Entry                 OBJECT-TYPE
+    SYNTAX      SdpBindExt2Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "sdpBindExt2Entry extends sdpBindEntry."
+    INDEX       {
+        svcId,
+        sdpBindId
+    }
+    ::= { sdpBindExt2Table 1 }
+
+SdpBindExt2Entry                 ::= SEQUENCE
+{
+    sdpBindExt2LastMgmtChange        TimeStamp,
+    sdpBindExt2AdvSvcMtu             Integer32
+}
+
+sdpBindExt2LastMgmtChange        OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of sysUpTime at the time of the most recent
+         management-initiated change to this Service-SDP binding."
+    ::= { sdpBindExt2Entry 1 }
+
+sdpBindExt2AdvSvcMtu             OBJECT-TYPE
+    SYNTAX      Integer32 (-1 | 0..9782)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The sdpBindExt2AdvSvcMtu specifies the service-mtu value which
+         overrides service MTU value for the service."
+    DEFVAL      { -1 }
+    ::= { sdpBindExt2Entry 2 }
+
+sdpBindTableLastChanged          OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of sdpBindTableLastChanged indicates the sysUpTime at the
+         time of the most recent change to the sdpBindTable.
+
+         If no changes were made to the entry since the last re-initialization
+         of the local network management subsystem, then this object contains a
+         zero value."
+    ::= { tmnxSdpObjs 76 }
+
+sdpBindTlsTableLastChanged       OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of sdpBindTlsTableLastChanged indicates the sysUpTime at the
+         time of the most recent change to the sdpBindTlsTable.
+
+         If no changes were made to the entry since the last re-initialization
+         of the local network management subsystem, then this object contains a
+         zero value."
+    ::= { tmnxSdpObjs 77 }
 
 tmnxSdpNotifyObjs                OBJECT IDENTIFIER ::= { tmnxSdpObjs 100 }
 
@@ -10509,7 +10745,8 @@ tmnxSdp7450V16v0Compliance       MODULE-COMPLIANCE
             pwTemplateGreGroup,
             pwTemplateQosV16v0Group,
             pwTemplateFilterNameV16v0Group,
-            tmnxSdpBindQinqV16v0Group
+            tmnxSdpBindQinqV16v0Group,
+            sdpBindSvcMtuGroup
         }
     ::= { tmnxSdpCompliances 31 }
 
@@ -10525,6 +10762,33 @@ tmnxSdpV19v0Compliance           MODULE-COMPLIANCE
             sdpBindMcastSrcV19v0Group
         }
     ::= { tmnxSdpCompliances 32 }
+
+tmnxSdpV20v0Compliance           MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for management of services SDPs on Nokia SROS
+         series systems release 20.0"
+    MODULE
+        MANDATORY-GROUPS {
+            sdpNotifyV20v0Group,
+            sdpBindTlsMacListV20v0Group
+        }
+    ::= { tmnxSdpCompliances 33 }
+
+tmnxSdpV21v0Compliance           MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for management of services SDPs on Nokia SROS
+         series systems release 21.0"
+    MODULE
+        MANDATORY-GROUPS {
+            sdpBindCfmSquelchInCtagGroup,
+            sdpBindVccvBfdGroup,
+            sdpPwPortEntropyGroup,
+            sdpLastChangeV21v0Group,
+            sdpPwPortSvcMtuV21v0Group
+        }
+    ::= { tmnxSdpCompliances 34 }
 
 tmnxSdpGroups                    OBJECT IDENTIFIER ::= { tmnxSdpConformance 2 }
 
@@ -12607,6 +12871,95 @@ sdpBindMcastSrcV19v0Group        OBJECT-GROUP
          feature on Nokia SROS series systems in release 19.0."
     ::= { tmnxSdpGroups 568 }
 
+sdpNotifyV20v0Group              NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        sdpBindReceivedPbbProtSrcMac
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of SDP notifications on Nokia SROS series systems 20.0
+         release."
+    ::= { tmnxSdpGroups 569 }
+
+sdpBindTlsMacListV20v0Group      OBJECT-GROUP
+    OBJECTS     {
+        sdpBindTlsAutoLrnMacPrtExcList,
+        sdpBindMeshTlsAutLrnMacPrtExcLs,
+        pwTemplateAugAtLnMacPrtExcList
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of the auto learn Mac list
+         exclusion feature on Nokia SROS series systems in release 20.0."
+    ::= { tmnxSdpGroups 570 }
+
+sdpBindCfmSquelchInCtagGroup     OBJECT-GROUP
+    OBJECTS     {
+        sdpBindEthCfmSquelchIngressCtag
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting Ethernet Connectivity Fault Management
+         (ETH-CFM) SDP-BIND squelching for the PVLAN space on Nokia SROS series
+         systems."
+    ::= { tmnxSdpGroups 571 }
+
+sdpBindVccvBfdGroup              OBJECT-GROUP
+    OBJECTS     {
+        sdpBindExtBfdFailAction,
+        sdpBindExtBfdSessStatOperState,
+        sdpBindExtBfdWaitForUpTimer,
+        sdpBindExtBfdUpTimeRemain
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting VCCV BFD on Nokia SROS series systems."
+    ::= { tmnxSdpGroups 572 }
+
+sdpBindSvcMtuGroup               OBJECT-GROUP
+    OBJECTS     {
+        sdpBindExt2LastMgmtChange,
+        sdpBindExt2AdvSvcMtu,
+        sdpBindExt2TableLastChgd
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting service MTU override feature on Nokia
+         SROS series systems."
+    ::= { tmnxSdpGroups 573 }
+
+sdpPwPortEntropyGroup            OBJECT-GROUP
+    OBJECTS     {
+        sdpPwPortEntropyLabel
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting SDP pw-port entropy-label feature on
+         Nokia SROS series systems."
+    ::= { tmnxSdpGroups 574 }
+
+sdpLastChangeV21v0Group          OBJECT-GROUP
+    OBJECTS     {
+        sdpBindTableLastChanged,
+        sdpBindTlsTableLastChanged,
+        sdpBindTlsLastMgmtChange
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group pf objects supporting last-changed objects on Nokia SROS
+         series systems release 21.0."
+    ::= { tmnxSdpGroups 575 }
+
+sdpPwPortSvcMtuV21v0Group        OBJECT-GROUP
+    OBJECTS     {
+        sdpPwPortAdvSvcMtu
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group pf objects supporting last-changed objects on Nokia SROS
+         series systems release 21.0."
+    ::= { tmnxSdpGroups 576 }
+
 sdpTrapsPrefix                   OBJECT IDENTIFIER ::= { tmnxServNotifications 4 }
 
 sdpTraps                         OBJECT IDENTIFIER ::= { sdpTrapsPrefix 0 }
@@ -13178,6 +13531,23 @@ sdpControlPwActiveStateChg       NOTIFICATION-TYPE
 
          [RECOVERY] A change in the configuration may be required."
     ::= { sdpTraps 36 }
+
+sdpBindReceivedPbbProtSrcMac     NOTIFICATION-TYPE
+    OBJECTS     {
+        svcTlsBackboneVplsSvcId,
+        sdpBindId,
+        protectedMacForNotify
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] The sdpBindReceivedPbbProtSrcMac notification is generated
+         when a source MAC is protected in a i-vpls is received on SDP-BIND of
+         a b-vpls (svcTlsBackboneVplsSvcId) service.
+
+         [EFFECT] The frame will be discarded.
+
+         [RECOVERY] No action is required."
+    ::= { sdpTraps 37 }
 
 unacknowledgedTCN                NOTIFICATION-TYPE
     OBJECTS     {

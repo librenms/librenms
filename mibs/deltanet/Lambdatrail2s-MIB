@@ -1,0 +1,1143 @@
+Lambdatrail2s-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+   OBJECT-TYPE, NOTIFICATION-TYPE, MODULE-IDENTITY, Integer32,
+   IpAddress
+      FROM SNMPv2-SMI
+   DisplayString
+      FROM SNMPv2-TC
+   MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+      FROM SNMPv2-CONF
+   deltanet
+      FROM Deltanet-MIB;
+
+lambdatrail2s MODULE-IDENTITY
+   LAST-UPDATED 	"201502100000Z"
+   ORGANIZATION 	"DeltaNet AG  Switzerland"
+   CONTACT-INFO 	"http://www.deltanet.ch"
+   DESCRIPTION  	"The MIB module for managing Deltanet Lambdatrail2-S device.
+                  Needs firmware 1.1.0 or higher."
+   REVISION 		"201502100000Z"
+   DESCRIPTION 	"TFTP-Server removed"
+   REVISION 		"201501200000Z"
+   DESCRIPTION 	"Adjust structure to be common"
+   REVISION 		"201501150000Z"
+   DESCRIPTION 	"Initial Lambdatrail2-S Version"
+   ::= { deltanet 5 }
+
+-- Deltanet AG Specific Objects --
+lt2sNotifications OBJECT IDENTIFIER ::= { lambdatrail2s 0 }
+lt2sAgent         OBJECT IDENTIFIER ::= { lambdatrail2s 1 }
+lt2sSystem        OBJECT IDENTIFIER ::= { lambdatrail2s 2 }
+lt2sPorts         OBJECT IDENTIFIER ::= { lambdatrail2s 3 }
+lt2sInfo          OBJECT IDENTIFIER ::= { lambdatrail2s 4 }
+lt2sCompliances   OBJECT IDENTIFIER ::= { lambdatrail2s 8 }
+lt2sGroups        OBJECT IDENTIFIER ::= { lambdatrail2s 9 }
+
+
+-- LT3 agent --
+lt2sDescription OBJECT-TYPE
+   SYNTAX DisplayString (SIZE (1..63))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "Shows the System Description."
+   ::= { lt2sAgent 1 }
+
+lt2sDeviceType OBJECT-TYPE
+   SYNTAX DisplayString (SIZE (1..16))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "Shows the Device Type."
+   ::= { lt2sAgent 2 }
+
+lt2sHwRevision OBJECT-TYPE
+   SYNTAX DisplayString (SIZE (1..16))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "Shows the Device Type."
+   ::= { lt2sAgent 3 }
+
+lt2sManufacturingDate OBJECT-TYPE
+   SYNTAX DisplayString (SIZE (1..16))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "Shows the Device Type."
+   ::= { lt2sAgent 4 }
+
+lt2sSerialNumber OBJECT-TYPE
+   SYNTAX DisplayString (SIZE (1..16))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "Shows the serial number of the device."
+   ::= { lt2sAgent 5 }
+
+lt2sSystemName OBJECT-TYPE
+   SYNTAX DisplayString (SIZE (0..63))
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION "The assigned system name."
+   ::= { lt2sAgent 6 }
+
+lt2sSystemLocation OBJECT-TYPE
+   SYNTAX DisplayString (SIZE (0..63))
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION "System location."
+   ::= { lt2sAgent 7 }
+
+lt2sSystemContact OBJECT-TYPE
+   SYNTAX DisplayString (SIZE (0..63))
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION "The responsible person."
+   ::= { lt2sAgent 8 }
+
+lt2sSystemUptime OBJECT-TYPE
+   SYNTAX DisplayString (SIZE (1..31))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION	"Shows the time since the last restart of the
+               management agent."
+   ::= { lt2sAgent 9 }
+
+lt2sFirmwareVersion OBJECT-TYPE
+   SYNTAX DisplayString (SIZE (1..63))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "Shows the software version of the agent running image."
+   ::= { lt2sAgent 10 }
+
+lt2suCVersion OBJECT-TYPE
+   SYNTAX DisplayString (SIZE (1..63))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "Shows the firmware version of the micro controller."
+   ::= { lt2sAgent 11 }
+
+lt2sSaveRunningCfg OBJECT-TYPE
+   SYNTAX  INTEGER { none(1), saveConfig(2) }
+   MAX-ACCESS  read-write
+   STATUS  current
+   DESCRIPTION	"Set this variable will save current configuration.
+               The value is set back to 1 after succeed."
+   ::= { lt2sAgent 12 }
+
+lt2sResetAgent OBJECT-TYPE
+   SYNTAX  INTEGER { none(1), resetAgent(2) }
+   MAX-ACCESS  read-write
+   STATUS  current
+   DESCRIPTION	"Set this variable will reset the agent.
+               The value is set back to 1 after reset."
+   ::= { lt2sAgent 13 }
+
+lt2sSnmpGetCommunity OBJECT-TYPE
+   SYNTAX DisplayString (SIZE (0..63))
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION "The get community, read only."
+   ::= { lt2sAgent 14 }
+
+lt2sSnmpSetCommunity OBJECT-TYPE
+   SYNTAX DisplayString (SIZE (0..63))
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION "The set community, read/write."
+   ::= { lt2sAgent 15 }
+
+lt2sIp4DHCP OBJECT-TYPE
+   SYNTAX INTEGER { off(1), on(2) }
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION "DHCP enable or disable. Default is off"
+   ::= { lt2sAgent 16 }
+
+lt2sIp4Address OBJECT-TYPE
+   SYNTAX IpAddress
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION "The agent's administrative IP address. The
+      current operational IP address can be obtained from
+      the ipAdEntAddr in the ipAddrTable. This parameter
+      will take effect only after a agent restart or
+      agent reset. This parameter will always be updated
+      in the EEPROM."
+   ::= { lt2sAgent 17 }
+
+lt2sIp4Mask OBJECT-TYPE
+   SYNTAX IpAddress
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION "The agent's administrative IP subnet mask. The
+      current operational IP subnet mask can be obtained from
+      the ipAdEntMask in the ipAddrTable. This parameter
+      will take effect only after a agent restart or
+      agent reset. This parameter will always be updated
+      in the EEPROM."
+   ::= { lt2sAgent 18 }
+
+lt2sIp4Gateway OBJECT-TYPE
+   SYNTAX IpAddress
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION "The agent's administrative default gateway IP address.
+      The current operational IP default gateway IP address
+      can be obtained from the ipRouteDest in the ipRouteTable.
+      This parameter will take effect only after a agent restart or
+      agent reset. This parameter will always be updated
+      in the EEPROM."
+   ::= { lt2sAgent 19 }
+
+lt2sIp4PrimaryDns OBJECT-TYPE
+   SYNTAX IpAddress
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION "First DNS server address."
+   ::= { lt2sAgent 20 }
+
+lt2sIp4SecondaryDns OBJECT-TYPE
+   SYNTAX IpAddress
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION "Second DNS server address."
+   ::= { lt2sAgent 21 }
+
+lt2sSnmpServer OBJECT-TYPE
+   SYNTAX INTEGER { off(1), on(2) }
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION " "
+   ::= { lt2sAgent 22 }
+
+lt2sHttpServer OBJECT-TYPE
+   SYNTAX INTEGER { off(1), on(2) }
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION " "
+   ::= { lt2sAgent 23 }
+
+lt2sTelnetServer OBJECT-TYPE
+   SYNTAX INTEGER { off(1), on(2) }
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION " "
+   ::= { lt2sAgent 24 }
+
+lt2sFtpServer OBJECT-TYPE
+   SYNTAX INTEGER { off(1), on(2) }
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION " "
+   ::= { lt2sAgent 25 }
+
+-- Management port definitions -- 	
+lt2sMgmtPortTable OBJECT-TYPE
+   SYNTAX   SEQUENCE OF Lt2sMgmtPortEntry
+   MAX-ACCESS not-accessible
+   STATUS   current
+   DESCRIPTION	"A list of management port entries."
+   ::= { lt2sAgent 26 }
+
+lt2sMgmtPortEntry OBJECT-TYPE
+   SYNTAX Lt2sMgmtPortEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION "An entry containing information applicable to 
+               the management ports."
+   INDEX { lt2sMgmtPortId }
+   ::= { lt2sMgmtPortTable 1 }
+
+Lt2sMgmtPortEntry ::= SEQUENCE {
+      lt2sMgmtPortId         Integer32,
+      lt2sMgmtPortName       DisplayString,
+      lt2sMgmtPortEnable    INTEGER,
+      lt2sMgmtPortLink       INTEGER,
+      lt2sMgmtPortSpeed      INTEGER,
+      lt2sMgmtPortTxBytes    Integer32,
+      lt2sMgmtPortRxBytes    Integer32,
+      lt2sMgmtSfpPlugged     INTEGER,
+      lt2sMgmtSfpVendor      DisplayString,
+      lt2sMgmtSfpType        DisplayString,
+      lt2sMgmtSfpSerial      DisplayString,
+      lt2sMgmtSfpWavelength  DisplayString,
+      lt2sMgmtSfpTxPower     Integer32,
+      lt2sMgmtSfpRxPower     Integer32,
+      lt2sMgmtSfpLaserTemp   Integer32,
+      lt2sMgmtSfpLaserBias   Integer32,
+      lt2sMgmtSfpTxLow       Integer32,
+      lt2sMgmtSfpTxHigh      Integer32,
+      lt2sMgmtSfpRxLow       Integer32,
+      lt2sMgmtSfpRxHigh      Integer32 }
+
+lt2sMgmtPortId OBJECT-TYPE
+   SYNTAX Integer32 (1..3)
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The management port identification.
+               1 Inband SFP,   2 LAN1,   3 LAN2."
+   ::= { lt2sMgmtPortEntry 1 } 
+
+lt2sMgmtPortName OBJECT-TYPE
+   SYNTAX DisplayString
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The name of the management port"
+   ::= { lt2sMgmtPortEntry 2 } 
+
+lt2sMgmtPortEnable OBJECT-TYPE
+   SYNTAX INTEGER { disabled(1), enabled(2) }
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION "The enabled state of the port."
+   ::= { lt2sMgmtPortEntry 3 }
+
+lt2sMgmtPortLink OBJECT-TYPE
+   SYNTAX INTEGER { down(1), up(2), notAvailable(3) }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The link state of the management port."
+   ::= { lt2sMgmtPortEntry 4 }
+
+lt2sMgmtPortSpeed OBJECT-TYPE
+   SYNTAX INTEGER	{ full1000(1), full100(2), half100(3),
+                  full10(4), half10(5), notAvailable(6) }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The speed mode of the port."
+   ::= { lt2sMgmtPortEntry 5 }
+
+lt2sMgmtPortTxBytes OBJECT-TYPE
+   SYNTAX Integer32 (0..2147483647)
+   UNITS "sent Bytes"
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The total amount of sent bytes."
+   ::= { lt2sMgmtPortEntry 6 }
+
+lt2sMgmtPortRxBytes OBJECT-TYPE
+   SYNTAX Integer32 (0..2147483647)
+   UNITS "sent Bytes"
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The total amount of received bytes."
+   ::= { lt2sMgmtPortEntry 7 }
+
+lt2sMgmtSfpPlugged OBJECT-TYPE
+   SYNTAX INTEGER { removed(1), inserted(2), notAvailable(3) }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The line SFP plugged state of the port."
+   ::= { lt2sMgmtPortEntry 8 }
+
+lt2sMgmtSfpVendor OBJECT-TYPE
+   SYNTAX DisplayString (SIZE (0..16))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The vendor name of the SFP."
+   ::= { lt2sMgmtPortEntry 9 }
+
+lt2sMgmtSfpType OBJECT-TYPE
+   SYNTAX DisplayString (SIZE (0..16))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The vendor part name of the SFP."
+   ::= { lt2sMgmtPortEntry 10 }
+
+lt2sMgmtSfpSerial OBJECT-TYPE
+   SYNTAX DisplayString (SIZE (0..16))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The serial number of the SFP."
+   ::= { lt2sMgmtPortEntry 11 }
+
+lt2sMgmtSfpWavelength OBJECT-TYPE
+   SYNTAX DisplayString (SIZE (0..31))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The SFP wavelength of the port. If the SFP
+               is removed the object contains 'NA'."
+   ::= { lt2sMgmtPortEntry 12 }
+
+lt2sMgmtSfpTxPower OBJECT-TYPE
+   SYNTAX Integer32 (-1 | 0..2147483647)
+   UNITS "0.001 dBm"
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The SFP transmit power of the port. If the SFP
+               is removed, the value is -1."
+   ::= { lt2sMgmtPortEntry 13 }
+
+lt2sMgmtSfpRxPower OBJECT-TYPE
+   SYNTAX Integer32 (-1 | 0..2147483647)
+   UNITS "0.001 dBm"
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The SFP receive power of the port. If the SFP
+               is removed, the value is -1."
+   ::= { lt2sMgmtPortEntry 14 }
+
+lt2sMgmtSfpLaserTemp OBJECT-TYPE
+   SYNTAX Integer32 (-1 | 0..2147483647)
+   UNITS "0.01 degrees Celsius"
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The internal temperature of the SFP. If the SFP
+               is removed, the value is -1."
+   ::= { lt2sMgmtPortEntry 15 }
+
+lt2sMgmtSfpLaserBias OBJECT-TYPE
+   SYNTAX Integer32 (-1 | 0..2147483647)
+   UNITS "0.001 Ampere"
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The SFP laser bias in milli ampere. If the SFP
+               is removed, the value is -1."
+   ::= { lt2sMgmtPortEntry 16 }
+
+lt2sMgmtSfpTxLow OBJECT-TYPE
+   SYNTAX Integer32 (-10..2)
+   UNITS "dBm"
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION "The SFP laser TX low threshold in dBm."
+   ::= { lt2sMgmtPortEntry 17 }
+
+lt2sMgmtSfpTxHigh OBJECT-TYPE
+   SYNTAX Integer32 (-4..8)
+   UNITS "dBm"
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION "The SFP laser TX high threshold in dBm."
+   ::= { lt2sMgmtPortEntry 18 }
+
+lt2sMgmtSfpRxLow OBJECT-TYPE
+   SYNTAX Integer32 (-30..0)
+   UNITS "dBm"
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION "The SFP laser RX low threshold in dBm."
+   ::= { lt2sMgmtPortEntry 19 }
+
+lt2sMgmtSfpRxHigh OBJECT-TYPE
+   SYNTAX Integer32 (-12..6)
+   UNITS "dBm"
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION "The SFP laser RX high threshold in dBm."
+   ::= { lt2sMgmtPortEntry 20 }
+
+
+   -- LT3 system --
+lt2sTemperature OBJECT-TYPE
+   SYNTAX Integer32 ( 0..80 )
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "Shows the ambient temperature."
+   ::= { lt2sSystem 1 }
+
+lt2sPowerType OBJECT-TYPE
+   SYNTAX INTEGER { ac(1), dc(2), notAvailable(3) }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION	"The device's power supply 1 type."
+   ::= { lt2sSystem 2 }
+
+lt2sPowerStatus OBJECT-TYPE
+   SYNTAX INTEGER { normal(1), failed(2), notPlugged(3) }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION	"The device's power supply 1 status."
+   ::= { lt2sSystem 3 }
+
+lt2sPowerFanStatus OBJECT-TYPE
+   SYNTAX INTEGER { failed(1), on(2), off(3) }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION	"The device's power supply 1's fan status."
+   ::= { lt2sSystem 4 }
+
+lt2sPowerFanRPM OBJECT-TYPE
+   SYNTAX Integer32 (0..20000)
+   UNITS "revolutions per minute"
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION	"The device's power supply 1's fan rounds per minute."
+   ::= { lt2sSystem 5 }
+
+lt2sPowerFanMode OBJECT-TYPE
+   SYNTAX INTEGER { alwaysOff(1), alwaysOn(2), byTemperature(3) }
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION	"The device's power supply 1's fan mode."
+   ::= { lt2sSystem 6 }
+
+lt2sPowerFanOnTemp OBJECT-TYPE
+   SYNTAX Integer32 (10..60)
+   UNITS "degrees Celsius"
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION	"The device's power supply 1's fan on temperature."
+   ::= { lt2sSystem 7 }
+
+lt2sPowerFanOffTemp OBJECT-TYPE
+   SYNTAX Integer32 (10..60)
+   UNITS "degrees Celsius"
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION	"The device's power supply 1's fan off temperature."
+   ::= { lt2sSystem 8 }
+
+
+-- LT2-S Ports Section --
+lt2sPortTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF Lt2sPortEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION	"A list of port table entries."
+   ::= { lt2sPorts 1 }
+
+lt2sPortEntry OBJECT-TYPE
+   SYNTAX Lt2sPortEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION	"An entry containing information applicable to a
+               particular port."
+   INDEX { lt2sPortId }
+   ::= { lt2sPortTable 1 }
+
+Lt2sPortEntry ::= SEQUENCE {
+      lt2sPortId            Integer32,
+      lt2sPortEnable        INTEGER,
+      lt2sPortApsd          INTEGER,
+      lt2sPortSpeed         INTEGER,
+      lt2sPortReset         INTEGER,
+      lt2sPortLoop          INTEGER,
+      lt2sPortName          DisplayString,
+      lt2sLinePlugged       INTEGER,
+      lt2sLineLink          INTEGER,
+      lt2sLineApsd          INTEGER,
+      lt2sLineType          DisplayString,
+      lt2sLineWavelength    DisplayString,
+      lt2sLineTxPower       Integer32,
+      lt2sLineRxPower       Integer32,
+      lt2sLineLaserTemp     Integer32,
+      lt2sLineLaserBias     Integer32,
+      lt2sLineTxLow         Integer32,
+      lt2sLineTxHigh        Integer32,
+      lt2sLineRxLow         Integer32,
+      lt2sLineRxHigh        Integer32,
+      lt2sClientPlugged     INTEGER,
+      lt2sClientLink        INTEGER,
+      lt2sClientApsd        INTEGER,
+      lt2sClientType        DisplayString,
+      lt2sClientWavelength  DisplayString,
+      lt2sClientTxPower     Integer32,
+      lt2sClientRxPower     Integer32,
+      lt2sClientLaserTemp   Integer32,
+      lt2sClientLaserBias   Integer32,
+      lt2sClientTxLow       Integer32,
+      lt2sClientTxHigh      Integer32,
+      lt2sClientRxLow       Integer32,
+      lt2sClientRxHigh      Integer32 }
+
+lt2sPortId OBJECT-TYPE
+   SYNTAX Integer32 (1)
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "A unique value for each port."
+   ::= { lt2sPortEntry 1 }
+
+lt2sPortEnable OBJECT-TYPE
+   SYNTAX INTEGER { disable(1), enable(2) }
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION "The status of the port."
+   ::= { lt2sPortEntry 2 }
+
+lt2sPortApsd OBJECT-TYPE
+   SYNTAX INTEGER { disabled(1), enabled(2) }
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION "The automatic power shut down configuration of the port."
+   ::= { lt2sPortEntry 3 }
+
+lt2sPortSpeed OBJECT-TYPE
+   SYNTAX INTEGER { transparent(1), speed10g(2), speed8g(3), speed16g(4) }
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION "The speed mode of the port."
+   ::= { lt2sPortEntry 4 }
+
+lt2sPortReset OBJECT-TYPE
+   SYNTAX INTEGER { no(1), yes(2) }
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION "Reset the port."
+   ::= { lt2sPortEntry 5 }
+
+lt2sPortLoop OBJECT-TYPE
+   SYNTAX INTEGER { off(1), line(2), client(3) }
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION "Set Loop on chosen port."
+   ::= { lt2sPortEntry 6 }
+
+lt2sPortName OBJECT-TYPE
+   SYNTAX DisplayString (SIZE (0..31))
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION "The name of the port."
+   ::= { lt2sPortEntry 7 }
+
+lt2sLinePlugged OBJECT-TYPE
+   SYNTAX INTEGER { notPlugged(1), plugged(2), notAvailable(3) }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The line SFP plugged state of the port."
+   ::= { lt2sPortEntry 8 }
+
+lt2sLineLink OBJECT-TYPE
+   SYNTAX INTEGER { down(1), up(2), notAvailable(3) }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The line SFP link state of the port."
+   ::= { lt2sPortEntry 9 }
+
+lt2sLineApsd OBJECT-TYPE
+   SYNTAX INTEGER { no(1), yes(2), disabled(3), notAvailable(4) }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The automatic power shut down state of the line port."
+   ::= { lt2sPortEntry 10 }
+
+lt2sLineType OBJECT-TYPE
+   SYNTAX DisplayString (SIZE (0..31))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The line SFP type of the port."
+   ::= { lt2sPortEntry 11 }
+
+lt2sLineWavelength OBJECT-TYPE
+   SYNTAX DisplayString (SIZE (0..31))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The line SFP wavelength of the port. If the line SFP is not
+               plugged in, the object should contain the value of 'NA'."
+	::= { lt2sPortEntry 12 }
+
+lt2sLineTxPower OBJECT-TYPE
+   SYNTAX Integer32 (-1 | 0..2147483647)
+   UNITS "0.001 dBm"
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The line SFP transmit power of the port. If the line SFP
+            is not plugged in, the object should contain the value of -1."
+   ::= { lt2sPortEntry 13 }
+
+lt2sLineRxPower OBJECT-TYPE
+   SYNTAX Integer32 (-1 | 0..2147483647)
+   UNITS "0.001 dBm"
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The line SFP receive power of the port. If the line SFP
+            is not plugged in, the object should contain the value of -1."
+   ::= { lt2sPortEntry 14 }
+
+lt2sLineLaserTemp OBJECT-TYPE
+   SYNTAX Integer32 (-1 | 0..2147483647)
+   UNITS "degrees Centigrade"
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The line SFP laser temperature of the port. If the line SFP
+            is not plugged in, the object should contain the value of -1."
+   ::= { lt2sPortEntry 15 }
+
+lt2sLineLaserBias OBJECT-TYPE
+   SYNTAX Integer32 (-1 | 0..2147483647)
+   UNITS "0.001 Amp"
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The line SFP laser bias of the port. If the line SFP
+            is not plugged in, the object should contain the value of -1."
+   ::= { lt2sPortEntry 16 }
+
+lt2sLineTxLow OBJECT-TYPE
+   SYNTAX Integer32 (-10..2)
+   UNITS "dBm"
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION "The line SFP laser TX low threshold of the port."
+   ::= { lt2sPortEntry 17 }
+
+lt2sLineTxHigh OBJECT-TYPE
+   SYNTAX Integer32 (-4..8)
+   UNITS "dBm"
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION "The line SFP laser TX high threshold of the port."
+   ::= { lt2sPortEntry 18 }
+
+lt2sLineRxLow OBJECT-TYPE
+   SYNTAX Integer32 (-30..0)
+   UNITS "dBm"
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION "The line SFP laser RX low threshold of the port."
+   ::= { lt2sPortEntry 19 }
+
+lt2sLineRxHigh OBJECT-TYPE
+   SYNTAX Integer32 (-12..6)
+   UNITS "dBm"
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION "The line SFP laser RX high threshold of the port."
+   ::= { lt2sPortEntry 20 }
+
+lt2sClientPlugged OBJECT-TYPE
+   SYNTAX INTEGER { notPlugged(1), plugged(2), notAvailable(3) }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The client SFP plugged state of the port."
+   ::= { lt2sPortEntry 21 }
+
+lt2sClientLink OBJECT-TYPE
+   SYNTAX INTEGER { down(1), up(2), notAvailable(3) }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The client SFP link state of the port."
+   ::= { lt2sPortEntry 22 }
+
+lt2sClientApsd OBJECT-TYPE
+   SYNTAX INTEGER { no(1), yes(2), disabled(3), notAvailable(4) }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The automatic power shut down state of the client port."
+   ::= { lt2sPortEntry 23 }
+
+lt2sClientType OBJECT-TYPE
+   SYNTAX DisplayString (SIZE (0..31))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The client SFP type of the port."
+   ::= { lt2sPortEntry 24 }
+
+lt2sClientWavelength OBJECT-TYPE
+   SYNTAX DisplayString (SIZE (0..31))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The client SFP wavelength of the port. If the client SFP
+            is not plugged in, the object should contain the value of 'NA'."
+   ::= { lt2sPortEntry 25 }
+
+lt2sClientTxPower OBJECT-TYPE
+   SYNTAX Integer32 (-1 | 0..2147483647)
+   UNITS "0.001 dBm"
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The client SFP transmit power of the port. If the client SFP
+            is not plugged in, the object should contain the value of -1."
+   ::= { lt2sPortEntry 26 }
+
+lt2sClientRxPower OBJECT-TYPE
+   SYNTAX Integer32 (-1 | 0..2147483647)
+   UNITS "0.001 dBm"
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The client SFP receive power of the port. If the client SFP
+            is not plugged in, the object should contain the value of -1."
+   ::= { lt2sPortEntry 27 }
+
+lt2sClientLaserTemp OBJECT-TYPE
+   SYNTAX Integer32 (-1 | 0..2147483647)
+   UNITS "degrees Centigrade"
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The client SFP laser temperature of the port. If the client SFP
+            is not plugged in, the object should contain the value of -1."
+   ::= { lt2sPortEntry 28 }
+
+lt2sClientLaserBias OBJECT-TYPE
+   SYNTAX Integer32 (-1 | 0..2147483647)
+   UNITS "0.001 Amp"
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The client SFP laser bias of the port. If the client SFP
+            is not plugged in, the object should contain the value of -1."
+   ::= { lt2sPortEntry 29 }
+
+lt2sClientTxLow OBJECT-TYPE
+   SYNTAX Integer32 (-10..2)
+   UNITS "dBm"
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION "The client SFP laser TX low threshold of the port."
+   ::= { lt2sPortEntry 30 }
+
+lt2sClientTxHigh OBJECT-TYPE
+   SYNTAX Integer32 (-4..8)
+   UNITS "dBm"
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION "The client SFP laser TX high threshold of the port."
+   ::= { lt2sPortEntry 31 }
+
+lt2sClientRxLow OBJECT-TYPE
+   SYNTAX Integer32 (-30..0)
+   UNITS "dBm"
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION "The client SFP laser RX low threshold of the port."
+   ::= { lt2sPortEntry 32 }
+
+lt2sClientRxHigh OBJECT-TYPE
+   SYNTAX Integer32 (-12..6)
+   UNITS "dBm"
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION "The client SFP laser RX high threshold of the port."
+   ::= { lt2sPortEntry 33 }
+
+
+-- LT2-S Trap Information --
+lt2sTrapDetails OBJECT-TYPE
+   SYNTAX DisplayString
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION	"The trap description."
+   ::= { lt2sInfo 1 }
+
+-- LT2-S Trap Section --
+lt2sMgmtStartup NOTIFICATION-TYPE
+   OBJECTS { lt2sTrapDetails }
+   STATUS current
+   DESCRIPTION "The agent has started up and is running."
+   ::= { lt2sNotifications 1 }
+
+lt2sMgmtAuthenticationFailure NOTIFICATION-TYPE
+   OBJECTS { lt2sTrapDetails }
+   STATUS current
+   DESCRIPTION "Login has failed."
+   ::= { lt2sNotifications 2 }
+
+lt2sTemperatureHigh NOTIFICATION-TYPE
+   OBJECTS { lt2sTrapDetails }
+   STATUS current
+   DESCRIPTION "Device temperature is high."
+   ::= { lt2sNotifications 3 }
+
+lt2sTemperatureNormal NOTIFICATION-TYPE
+   OBJECTS { lt2sTrapDetails }
+   STATUS current
+   DESCRIPTION "Device temperature is back to normal.
+               Lower than 40 degrees celsius."
+   ::= { lt2sNotifications 4 }
+
+lt2sPowerSupplyPluggedIn NOTIFICATION-TYPE
+   OBJECTS { lt2sTrapDetails }
+   STATUS current
+   DESCRIPTION "A power is plugged in."
+   ::= { lt2sNotifications 5 }
+
+lt2sPowerSupplyPluggedOut NOTIFICATION-TYPE
+   OBJECTS { lt2sTrapDetails }
+   STATUS current
+   DESCRIPTION "A power is plugged out."
+   ::= { lt2sNotifications 6 }
+
+lt2sPowerNormal NOTIFICATION-TYPE
+   OBJECTS { lt2sTrapDetails }
+   STATUS current
+   DESCRIPTION "A power goes on."
+   ::= { lt2sNotifications 7 }
+
+lt2sPowerFailure NOTIFICATION-TYPE
+   OBJECTS { lt2sTrapDetails }
+   STATUS current
+   DESCRIPTION "A power goes off."
+   ::= { lt2sNotifications 8 }
+
+lt2sFanOn NOTIFICATION-TYPE
+   OBJECTS { lt2sTrapDetails }
+   STATUS current
+   DESCRIPTION "A fan goes on."
+   ::= { lt2sNotifications 9 }
+
+lt2sFanOff NOTIFICATION-TYPE
+   OBJECTS	{ lt2sTrapDetails }
+   STATUS	current
+   DESCRIPTION	"A fan goes off."
+   ::= { lt2sNotifications 10 }
+
+lt2sFanFailure NOTIFICATION-TYPE
+   OBJECTS { lt2sTrapDetails }
+   STATUS current
+   DESCRIPTION "A fan goes to failure."
+   ::= { lt2sNotifications 11 }
+
+lt2sMgmtSfpPluggedIn NOTIFICATION-TYPE
+   OBJECTS { lt2sMgmtPortId, lt2sTrapDetails, lt2sMgmtPortName }
+   STATUS current
+   DESCRIPTION "SFP transceiver is plugged in on management port."
+   ::= { lt2sNotifications 12 }
+
+lt2sMgmtSfpPluggedOut NOTIFICATION-TYPE
+   OBJECTS { lt2sMgmtPortId, lt2sTrapDetails, lt2sMgmtPortName }
+   STATUS current
+   DESCRIPTION "SFP transceiver is plugged out on management port."
+   ::= { lt2sNotifications 13 }
+
+lt2sMgmtLinkUp NOTIFICATION-TYPE
+   OBJECTS { lt2sMgmtPortId, lt2sTrapDetails, lt2sMgmtPortName }
+   STATUS current
+   DESCRIPTION "A link goes up in one of the management ports."
+   ::= { lt2sNotifications 14 }
+
+lt2sMgmtLinkDown NOTIFICATION-TYPE
+   OBJECTS { lt2sMgmtPortId, lt2sTrapDetails, lt2sMgmtPortName }
+   STATUS current
+   DESCRIPTION "A link goes down in one of the management ports."
+   ::= { lt2sNotifications 15 }
+
+lt2sMgmtTxLow NOTIFICATION-TYPE
+   OBJECTS { lt2sMgmtPortId, lt2sTrapDetails, lt2sMgmtPortName }
+   STATUS current
+   DESCRIPTION "Transceiver TX power is low in the management port."
+   ::= { lt2sNotifications 16 }
+
+lt2sMgmtTxHigh NOTIFICATION-TYPE
+   OBJECTS { lt2sMgmtPortId, lt2sTrapDetails, lt2sMgmtPortName }
+   STATUS current
+   DESCRIPTION "Transceiver TX power is high in the management port."
+   ::= { lt2sNotifications 17 }
+
+lt2sMgmtTxNormal NOTIFICATION-TYPE
+   OBJECTS { lt2sMgmtPortId, lt2sTrapDetails, lt2sMgmtPortName }
+   STATUS current
+   DESCRIPTION "Transceiver TX power is normal in the management port."
+   ::= { lt2sNotifications 18 }
+
+lt2sMgmtRxLow NOTIFICATION-TYPE
+   OBJECTS { lt2sMgmtPortId, lt2sTrapDetails, lt2sMgmtPortName }
+   STATUS current
+   DESCRIPTION "Transceiver RX power is low in the management port."
+   ::= { lt2sNotifications 19 }
+
+lt2sMgmtRxHigh NOTIFICATION-TYPE
+   OBJECTS { lt2sMgmtPortId, lt2sTrapDetails, lt2sMgmtPortName }
+   STATUS current
+   DESCRIPTION "Transceiver RX power is high in the management port."
+   ::= { lt2sNotifications 20 }
+
+lt2sMgmtRxNormal NOTIFICATION-TYPE
+   OBJECTS { lt2sMgmtPortId, lt2sTrapDetails, lt2sMgmtPortName }
+   STATUS current
+   DESCRIPTION "Transceiver RX power is normal in the management port."
+   ::= { lt2sNotifications 21 }
+
+lt2sPortEnabled NOTIFICATION-TYPE
+   OBJECTS { lt2sPortId, lt2sTrapDetails, lt2sPortName }
+   STATUS current
+   DESCRIPTION "Port is administrative enabled."
+   ::= { lt2sNotifications 22 }
+
+lt2sPortDisabled NOTIFICATION-TYPE
+   OBJECTS { lt2sPortId, lt2sTrapDetails, lt2sPortName }
+   STATUS current
+   DESCRIPTION "Port is administrative disabled."
+   ::= { lt2sNotifications 23 }
+
+lt2sPortReseted NOTIFICATION-TYPE
+   OBJECTS { lt2sPortId, lt2sTrapDetails, lt2sPortName }
+   STATUS current
+   DESCRIPTION "A reset in one of the ports."
+   ::= { lt2sNotifications 24 }
+
+lt2sPortThermalShutdown NOTIFICATION-TYPE
+   OBJECTS { lt2sPortId, lt2sTrapDetails, lt2sPortName }
+   STATUS current
+   DESCRIPTION "A thermal shut down in one of the ports."
+   ::= { lt2sNotifications 25 }
+
+lt2sPortThermalWakeup NOTIFICATION-TYPE
+   OBJECTS { lt2sPortId, lt2sTrapDetails, lt2sPortName }
+   STATUS current
+   DESCRIPTION "A thermal wakeup in one of the ports."
+   ::= { lt2sNotifications 26 }
+
+lt2sLinePluggedIn NOTIFICATION-TYPE
+   OBJECTS { lt2sPortId, lt2sTrapDetails, lt2sPortName }
+   STATUS current
+   DESCRIPTION "A SFP transceiver is plugged in, on one of the ports."
+   ::= { lt2sNotifications 27 }
+
+lt2sClientPluggedIn NOTIFICATION-TYPE
+   OBJECTS { lt2sPortId, lt2sTrapDetails, lt2sPortName }
+   STATUS current
+   DESCRIPTION "A SFP transceiver is plugged in, on one of the ports."
+   ::= { lt2sNotifications 28 }
+
+lt2sLinePluggedOut NOTIFICATION-TYPE
+   OBJECTS { lt2sPortId, lt2sTrapDetails, lt2sPortName }
+   STATUS current
+   DESCRIPTION "A SFP transceiver is plugged out, on one of the ports."
+   ::= { lt2sNotifications 29 }
+
+lt2sClientPluggedOut NOTIFICATION-TYPE
+   OBJECTS { lt2sPortId, lt2sTrapDetails, lt2sPortName }
+   STATUS current
+   DESCRIPTION "A SFP transceiver is plugged out, on one of the ports."
+   ::= { lt2sNotifications 30 }
+
+lt2sLineLinkUp NOTIFICATION-TYPE
+   OBJECTS { lt2sPortId, lt2sTrapDetails, lt2sPortName }
+   STATUS current
+   DESCRIPTION "A SFP transceiver's link goes up in one of the ports."
+   ::= { lt2sNotifications 31 }
+
+lt2sClientLinkUp NOTIFICATION-TYPE
+   OBJECTS { lt2sPortId, lt2sTrapDetails, lt2sPortName }
+   STATUS current
+   DESCRIPTION "A SFP transceiver's link goes up in one of the ports."
+   ::= { lt2sNotifications 32 }
+
+lt2sLineLinkDown NOTIFICATION-TYPE
+   OBJECTS { lt2sPortId, lt2sTrapDetails, lt2sPortName }
+   STATUS current
+   DESCRIPTION "A SFP transceiver's link goes down in one of the ports."
+   ::= { lt2sNotifications 33 }
+
+lt2sClientLinkDown NOTIFICATION-TYPE
+   OBJECTS { lt2sPortId, lt2sTrapDetails, lt2sPortName }
+   STATUS current
+   DESCRIPTION "A SFP transceiver's link goes down in one of the ports."
+   ::= { lt2sNotifications 34 }
+
+lt2sLineLoopOn NOTIFICATION-TYPE
+   OBJECTS { lt2sPortId, lt2sTrapDetails, lt2sPortName }
+   STATUS current
+   DESCRIPTION "A Line loop is activated in one of the ports."
+   ::= { lt2sNotifications 35 }
+
+lt2sLineLoopOff NOTIFICATION-TYPE
+   OBJECTS { lt2sPortId, lt2sTrapDetails, lt2sPortName }
+   STATUS current
+   DESCRIPTION "A Line loop is turned off in one of the ports."
+   ::= { lt2sNotifications 36 }
+
+lt2sClientLoopOn NOTIFICATION-TYPE
+   OBJECTS { lt2sPortId, lt2sTrapDetails, lt2sPortName }
+   STATUS current
+   DESCRIPTION "A Client loop is activated in one of the ports."
+   ::= { lt2sNotifications 37 }
+
+lt2sClientLoopOff NOTIFICATION-TYPE
+   OBJECTS { lt2sPortId, lt2sTrapDetails, lt2sPortName }
+   STATUS current
+   DESCRIPTION "A Client loop is turned off in one of the ports."
+   ::= { lt2sNotifications 38 }
+
+lt2sPortTxLow NOTIFICATION-TYPE
+   OBJECTS { lt2sPortId, lt2sTrapDetails, lt2sPortName }
+   STATUS current
+   DESCRIPTION "A SFP transceiver TX power is low in one of the ports."
+   ::= { lt2sNotifications 39 }
+
+lt2sPortTxHigh NOTIFICATION-TYPE
+   OBJECTS { lt2sPortId, lt2sTrapDetails, lt2sPortName }
+   STATUS current
+   DESCRIPTION "A SFP transceiver TX power is high in one of the ports."
+   ::= { lt2sNotifications 40 }
+
+lt2sPortTxNormal NOTIFICATION-TYPE
+   OBJECTS { lt2sPortId, lt2sTrapDetails, lt2sPortName }
+   STATUS current
+   DESCRIPTION "A SFP transceiver TX power is normal in one of the ports."
+   ::= { lt2sNotifications 41 }
+
+lt2sPortRxLow NOTIFICATION-TYPE
+   OBJECTS { lt2sPortId, lt2sTrapDetails, lt2sPortName }
+   STATUS current
+   DESCRIPTION "A SFP transceiver RX power is low in one of the ports."
+   ::= { lt2sNotifications 42 }
+
+lt2sPortRxHigh NOTIFICATION-TYPE
+   OBJECTS { lt2sPortId, lt2sTrapDetails, lt2sPortName }
+   STATUS current
+   DESCRIPTION "A SFP transceiver RX power is high in one of the ports."
+   ::= { lt2sNotifications 43 }
+
+lt2sPortRxNormal NOTIFICATION-TYPE
+   OBJECTS { lt2sPortId, lt2sTrapDetails, lt2sPortName }
+   STATUS current
+   DESCRIPTION "A SFP transceiver RX power is normal in one of the ports."
+   ::= { lt2sNotifications 44 }
+
+  
+lt2sCompliance MODULE-COMPLIANCE
+   STATUS current
+   DESCRIPTION	"Describes the requirements for conformance to the
+               Lambdatrail2 MIB part."
+   MODULE
+      MANDATORY-GROUPS { lt2sAgentGroup, lt2sSystemGroup, lt2sPortsGroup,
+         lt2sInfoGroup, lt2sNotificationGroup }
+	::= { lt2sCompliances 1 }
+
+lt2sAgentGroup OBJECT-GROUP
+   OBJECTS { lt2sDescription, lt2sDeviceType, lt2sHwRevision, lt2sManufacturingDate,
+      lt2sSerialNumber, lt2sSystemName, lt2sSystemLocation, lt2sSystemContact,
+      lt2sSystemUptime, lt2sFirmwareVersion, lt2suCVersion, lt2sSaveRunningCfg,
+      lt2sResetAgent, lt2sSnmpGetCommunity, lt2sSnmpSetCommunity, lt2sIp4DHCP,
+      lt2sIp4Address, lt2sIp4Mask, lt2sIp4Gateway, lt2sIp4PrimaryDns,
+      lt2sIp4SecondaryDns, lt2sSnmpServer, lt2sHttpServer, lt2sTelnetServer,
+      lt2sFtpServer, lt2sMgmtPortId, lt2sMgmtPortName,
+      lt2sMgmtPortEnable, lt2sMgmtPortLink, lt2sMgmtPortSpeed, lt2sMgmtPortTxBytes,
+      lt2sMgmtPortRxBytes, lt2sMgmtSfpPlugged, lt2sMgmtSfpVendor, lt2sMgmtSfpType,
+      lt2sMgmtSfpSerial, lt2sMgmtSfpWavelength, lt2sMgmtSfpTxPower, lt2sMgmtSfpRxPower,
+      lt2sMgmtSfpLaserTemp, lt2sMgmtSfpLaserBias, lt2sMgmtSfpTxLow, lt2sMgmtSfpTxHigh,
+      lt2sMgmtSfpRxLow, lt2sMgmtSfpRxHigh }
+   STATUS current
+   DESCRIPTION "Grouping all LT2-S Agent parameters."
+   ::= { lt2sGroups 1 }
+
+lt2sSystemGroup OBJECT-GROUP
+   OBJECTS { lt2sTemperature, lt2sPowerType, lt2sPowerStatus, lt2sPowerFanStatus,
+      lt2sPowerFanRPM, lt2sPowerFanMode, lt2sPowerFanOnTemp, lt2sPowerFanOffTemp }
+   STATUS current
+   DESCRIPTION "Grouping all LT2-S system parameters."
+   ::= { lt2sGroups 2 }
+
+lt2sPortsGroup OBJECT-GROUP
+   OBJECTS { lt2sPortId, lt2sPortEnable, lt2sPortApsd, lt2sPortSpeed, lt2sPortReset,
+      lt2sPortLoop, lt2sPortName, lt2sLinePlugged, lt2sLineType, lt2sLineLink,
+      lt2sLineApsd, lt2sLineWavelength, lt2sLineTxPower, lt2sLineRxPower,
+      lt2sLineLaserTemp, lt2sLineLaserBias, lt2sClientPlugged, lt2sClientType,
+      lt2sClientLink, lt2sClientApsd, lt2sClientWavelength, lt2sClientTxPower,
+      lt2sClientRxPower, lt2sClientLaserTemp, lt2sClientLaserBias, lt2sLineTxLow,
+      lt2sLineTxHigh, lt2sLineRxLow, lt2sLineRxHigh, lt2sClientTxLow, lt2sClientTxHigh,
+      lt2sClientRxLow, lt2sClientRxHigh }
+   STATUS current
+   DESCRIPTION "Grouping all LT2-S port parameters."
+   ::= { lt2sGroups 3 }
+
+lt2sInfoGroup OBJECT-GROUP
+   OBJECTS { lt2sTrapDetails }
+   STATUS current
+   DESCRIPTION "Grouping all LT2-S info parameters."
+   ::= { lt2sGroups 4 }
+
+lt2sNotificationGroup NOTIFICATION-GROUP
+   NOTIFICATIONS { lt2sMgmtStartup, lt2sMgmtAuthenticationFailure, lt2sTemperatureHigh,
+      lt2sTemperatureNormal, lt2sPowerSupplyPluggedIn, lt2sPowerSupplyPluggedOut,
+      lt2sPowerNormal, lt2sPowerFailure, lt2sFanOn, lt2sFanOff, lt2sFanFailure,
+      lt2sPortEnabled, lt2sPortDisabled, lt2sPortReseted, lt2sPortThermalShutdown,
+      lt2sPortThermalWakeup, lt2sMgmtSfpPluggedIn, lt2sLinePluggedIn, lt2sClientPluggedIn,
+      lt2sMgmtSfpPluggedOut, lt2sLinePluggedOut, lt2sClientPluggedOut, lt2sMgmtLinkUp,
+      lt2sLineLinkUp, lt2sClientLinkUp, lt2sMgmtLinkDown, lt2sLineLinkDown,
+      lt2sClientLinkDown, lt2sLineLoopOn, lt2sLineLoopOff, lt2sClientLoopOn,
+      lt2sClientLoopOff, lt2sMgmtTxLow, lt2sPortTxLow, lt2sMgmtTxHigh, lt2sPortTxHigh,
+      lt2sMgmtTxNormal, lt2sPortTxNormal, lt2sMgmtRxLow, lt2sPortRxLow, lt2sMgmtRxHigh,
+      lt2sPortRxHigh, lt2sMgmtRxNormal, lt2sPortRxNormal }
+   STATUS current
+   DESCRIPTION "All the Traps the Lambdatrail2-S supports."
+   ::= { lt2sGroups 5 }
+
+END

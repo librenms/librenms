@@ -43,6 +43,19 @@ class PortFieldController extends SelectController
     }
 
     /**
+     * Defines fields that can be used as filters
+     *
+     * @param  $request
+     * @return string[]
+     */
+    protected function filterFields($request)
+    {
+        return [
+            'device_id' => 'device',
+        ];
+    }
+
+    /**
      * Defines search fields will be searched in order
      *
      * @param  \Illuminate\Http\Request  $request
@@ -61,14 +74,7 @@ class PortFieldController extends SelectController
      */
     protected function baseQuery($request)
     {
-        /** @var \Illuminate\Database\Eloquent\Builder $query */
-        $query = Port::hasAccess($request->user())
+        return Port::hasAccess($request->user())
             ->select($request->get('field'))->distinct();
-
-        if ($device_id = $request->get('device')) {
-            $query->where('ports.device_id', $device_id);
-        }
-
-        return $query;
     }
 }

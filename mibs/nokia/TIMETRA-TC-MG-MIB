@@ -487,6 +487,13 @@ TmnxMobQci                       ::= TEXTUAL-CONVENTION
         "The data type TmnxMobQci describes the QoS Class Identifier."
     SYNTAX      Unsigned32 (0..9)
 
+TmnxMobExtQci                    ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxMobQci describes the QoS Class Identifier extended
+         range."
+    SYNTAX      Unsigned32 (0..255)
+
 TmnxMobArp                       ::= TEXTUAL-CONVENTION
     STATUS      current
     DESCRIPTION

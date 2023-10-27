@@ -28,6 +28,7 @@
 namespace LibreNMS\Snmptrap\Handlers;
 
 use App\Models\Device;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
 
@@ -44,6 +45,6 @@ class CpUpsDiagFailed implements SnmptrapHandler
     public function handle(Device $device, Trap $trap)
     {
         $diagInfo = CyberPowerUtil::getMessage($trap);
-        $trap->log("$diagInfo", 5);
+        $trap->log("$diagInfo", Severity::Error);
     }
 }

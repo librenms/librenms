@@ -3,14 +3,14 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 
-class CreateVrfLiteCiscoTable extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::create('vrf_lite_cisco', function (Blueprint $table) {
             $table->increments('vrf_lite_cisco_id');
@@ -27,8 +27,8 @@ class CreateVrfLiteCiscoTable extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::drop('vrf_lite_cisco');
     }
-}
+};

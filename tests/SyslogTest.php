@@ -63,7 +63,7 @@ class SyslogTest extends TestCase
         $this->assertEquals($data['result'], $res);
     }
 
-    public function testCiscoSyslog()
+    public function testCiscoSyslog(): void
     {
         // populate fake $dev_cache
         global $dev_cache;
@@ -143,7 +143,7 @@ class SyslogTest extends TestCase
         );
     }
 
-    public function testLinuxSyslog()
+    public function testLinuxSyslog(): void
     {
         // populate fake $dev_cache
         global $dev_cache;
@@ -194,7 +194,7 @@ class SyslogTest extends TestCase
         );
     }
 
-    public function testProcurveSyslog()
+    public function testProcurveSyslog(): void
     {
         // populate fake $dev_cache
         global $dev_cache;
@@ -229,7 +229,7 @@ class SyslogTest extends TestCase
         );
     }
 
-    public function testZywallSyslog()
+    public function testZywallSyslog(): void
     {
         // populate fake $dev_cache
         global $dev_cache;

@@ -23,25 +23,57 @@ if ($oids) {
 }
 
 // Environmental monitoring on UPSes etc
-$apc_env_data = snmpwalk_cache_oid($device, 'iemConfigProbesTable', [], 'PowerNet-MIB', null, '-OQUse');
-$apc_env_data = snmpwalk_cache_oid($device, 'iemStatusProbesTable', $apc_env_data, 'PowerNet-MIB', null, '-OQUse');
-
-foreach (array_keys($apc_env_data) as $index) {
-    // APC connected(2), disconnected(1)
-    if ($apc_env_data[$index]['iemStatusProbeStatus'] != 1) {
-        $descr = $apc_env_data[$index]['iemStatusProbeName'];
-        $current = $apc_env_data[$index]['iemStatusProbeCurrentTemp'];
-        $sensorType = 'apc';
-        $oid = '.1.3.6.1.4.1.318.1.1.10.2.3.2.1.4.' . $index;
-        // APC enum disabled(1), enabled(2)
-        $low_limit = ($apc_env_data[$index]['iemConfigProbeMinTempEnable'] != 1 ? $apc_env_data[$index]['iemConfigProbeMinTempThreshold'] : null);
-        $low_warn_limit = ($apc_env_data[$index]['iemConfigProbeLowTempEnable'] != 1 ? $apc_env_data[$index]['iemConfigProbeLowTempThreshold'] : null);
-        $high_warn_limit = ($apc_env_data[$index]['iemConfigProbeHighTempEnable'] != 1 ? $apc_env_data[$index]['iemConfigProbeHighTempThreshold'] : null);
-        $high_limit = ($apc_env_data[$index]['iemConfigProbeMaxTempEnable'] != 1 ? $apc_env_data[$index]['iemConfigProbeMaxTempThreshold'] : null);
-
+$apc_env_data = snmpwalk_cache_oid($device, 'uioSensor', [], 'PowerNet-MIB', null, '-OQUse');
+if ($apc_env_data) {
+    // NMC2/NMC3/etc. Universal Input Output
+    foreach (array_keys($apc_env_data) as $index) {
+        $current = $apc_env_data[$index]['uioSensorStatusTemperatureDegC'];
         if ($current > 0) {
-            // Temperature = 0 -> Sensor not available
+            // Temperature <= 0 -> Sensor not available
+            $descr = $apc_env_data[$index]['uioSensorConfigSensorName'];
+            $sensorType = 'apc';
+            $oid = '.1.3.6.1.4.1.318.1.1.25.1.2.1.6.' . $index;
+
+            // APC enum disabled(1), enabled(2)
+            $low_limit = ($apc_env_data[$index]['uioSensorConfigMinTemperatureEnable'] != 1 ? $apc_env_data[$index]['uioSensorConfigMinTemperatureThreshold'] : null);
+            $low_warn_limit = ($apc_env_data[$index]['uioSensorConfigLowTemperatureEnable'] != 1 ? $apc_env_data[$index]['uioSensorConfigLowTemperatureThreshold'] : null);
+            $high_warn_limit = ($apc_env_data[$index]['uioSensorConfigHighTemperatureEnable'] != 1 ? $apc_env_data[$index]['uioSensorConfigHighTemperatureThreshold'] : null);
+            $high_limit = ($apc_env_data[$index]['uioSensorConfigMaxTemperatureEnable'] != 1 ? $apc_env_data[$index]['uioSensorConfigMaxTemperatureThreshold'] : null);
+
+            // universalInputOutput sensor entries all have an sub-index, presumably to allow for multiple sensors in the
+            // future. Here we remove the sub-index from the first entry, so 1.1 becomes 1, 2.1 becomes 2, etc. However any
+            // future appearing sub-index will remain untouched, so 1.2 will stay 1.2, 2.2 will stay 2.2, etc.
+            // The reason that we remove the sub-index from the first entry is to preserve compatibility with sensors
+            // created by prior versions using the legacy iemConfig and iemStatus tables.
+            $split_index = explode('.', $index);
+            if (count($split_index) == 2 && $split_index[1] == 1) {
+                $index = $split_index[0];
+            }
             discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, $sensorType, $descr, 1, 1, $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $current);
+        }
+    }
+} else {
+    // NMC1 Integrated Environmental Monitor (legacy)
+    $apc_env_data = snmpwalk_cache_oid($device, 'iemConfigProbesTable', [], 'PowerNet-MIB', null, '-OQUse');
+    $apc_env_data = snmpwalk_cache_oid($device, 'iemStatusProbesTable', $apc_env_data, 'PowerNet-MIB', null, '-OQUse');
+
+    foreach (array_keys($apc_env_data) as $index) {
+        // APC connected(2), disconnected(1)
+        if ($apc_env_data[$index]['iemStatusProbeStatus'] != 1) {
+            $descr = $apc_env_data[$index]['iemStatusProbeName'];
+            $current = $apc_env_data[$index]['iemStatusProbeCurrentTemp'];
+            $sensorType = 'apc';
+            $oid = '.1.3.6.1.4.1.318.1.1.10.2.3.2.1.4.' . $index;
+            // APC enum disabled(1), enabled(2)
+            $low_limit = ($apc_env_data[$index]['iemConfigProbeMinTempEnable'] != 1 ? $apc_env_data[$index]['iemConfigProbeMinTempThreshold'] : null);
+            $low_warn_limit = ($apc_env_data[$index]['iemConfigProbeLowTempEnable'] != 1 ? $apc_env_data[$index]['iemConfigProbeLowTempThreshold'] : null);
+            $high_warn_limit = ($apc_env_data[$index]['iemConfigProbeHighTempEnable'] != 1 ? $apc_env_data[$index]['iemConfigProbeHighTempThreshold'] : null);
+            $high_limit = ($apc_env_data[$index]['iemConfigProbeMaxTempEnable'] != 1 ? $apc_env_data[$index]['iemConfigProbeMaxTempThreshold'] : null);
+
+            if ($current > 0) {
+                // Temperature = 0 -> Sensor not available
+                discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, $sensorType, $descr, 1, 1, $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $current);
+            }
         }
     }
 }

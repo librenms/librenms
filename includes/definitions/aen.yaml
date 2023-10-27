@@ -9,7 +9,8 @@ over:
 mib_dir: accedian
 discovery:
     -
-        sysDescr:
-            - AMN-
-            - AEN-
-            - AMO-
+        sysDescr_regex:
+            - '/^AMN-/'
+            - '/^AEN-/'
+            - '/^AMO-/'
+            

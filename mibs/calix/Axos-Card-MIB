@@ -1,0 +1,297 @@
+Axos-Card-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    Integer32,
+    Counter64,
+    IpAddress,
+    mib-2
+                    FROM SNMPv2-SMI
+    DisplayString,
+    MacAddress
+                    FROM SNMPv2-TC
+
+    axosModules
+        FROM CALIX-PRODUCT-MIB;
+
+    axosCardModule MODULE-IDENTITY
+        LAST-UPDATED "202010230000Z"
+        ORGANIZATION "Calix"
+        CONTACT-INFO
+            "       Calix Networks, Inc.
+
+	    Postal: 1035 North McDowell Boulevard
+	            Petaluma, CA  94954-1173
+		    USA
+
+	     Phone: +1 707 766 3000
+	       Fax: +1 707 766 3100
+
+	    E-mail: mib-info@calix.com"
+        DESCRIPTION
+            "Describes card and OLT ODN port table for Calix Axos
+             based products"
+        REVISION "202010230000Z"
+        DESCRIPTION
+            "Initial revision"
+    ::= { axosModules 4 }
+
+-- Card Table
+
+axosCardTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AxosCardEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Contains Card entries"
+    ::= { axosCardModule 1 }
+
+axosCardEntry OBJECT-TYPE
+    SYNTAX      AxosCardEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "List of attributes related to Card"
+    INDEX { axosCardShelf, axosCardSlot }
+    ::= { axosCardTable 1 }
+
+AxosCardEntry ::= SEQUENCE {
+    axosCardShelf                  Integer32,
+    axosCardSlot                   Integer32,
+	axosCardAdminStatus            INTEGER,
+	axosCardProvType               INTEGER,
+	axosCardActualType             INTEGER,
+	axosCardSoftwareVersion        OCTET STRING,
+	axosCardSerialNumber           DisplayString,
+	axosCardCurrentPowerLevel      INTEGER,
+	axosCardCleiCode               OCTET STRING,
+	axosCardPartNumber             OCTET STRING,
+	axosCardStartMacRange          OCTET STRING,
+	axosCardEndMacRange            OCTET STRING,
+    }
+
+axosCardShelf OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Shelf number"
+    ::= { axosCardEntry 1 }
+
+axosCardSlot OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Slot number"
+    ::= { axosCardEntry 2 }
+
+axosCardAdminStatus OBJECT-TYPE
+	SYNTAX      INTEGER {
+                    unknown(0),
+                    enabled(1),
+                    alarmsuppress(2),
+                    disabled(3)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Administrative status"
+    ::= { axosCardEntry 3 }
+
+axosCardProvType OBJECT-TYPE
+	SYNTAX      INTEGER {
+                    unknown(0),
+                    clx3001(1),
+                    ng1601(2),
+                    gp1601(3),
+                    gp1611(4),
+                    vdsl2r2(5),
+                    ngpon2x4(6),
+                    gpon8r2(7),
+                    ge12(8),
+                    ge24r2(9),
+                    epon(10),
+                    gpon(11),
+                    epon_macsec(12),
+                    e3_2_ngpon(13),
+                    asm3001(14),
+                    gp1612(15),
+                    xg801(16),
+                    ce201(17),
+                    e3_2_xgs(18),
+                    frwy(19),
+                    xg3201(21)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Provisioned card type"
+    ::= { axosCardEntry 4 }
+
+axosCardActualType OBJECT-TYPE
+	SYNTAX      INTEGER {
+                    unknown(0),
+                    clx3001(1),
+                    ng1601(2),
+                    gp1601(3),
+                    gp1611(4),
+                    vdsl2r2(5),
+                    ngpon2x4(6),
+                    gpon8r2(7),
+                    ge12(8),
+                    ge24r2(9),
+                    epon(10),
+                    gpon(11),
+                    epon_macsec(12),
+                    e3_2_ngpon(13),
+                    asm3001(14),
+                    gp1612(15),
+                    xg801(16),
+                    ce201(17),
+                    e3_2_xgs(18),
+                    frwy(19),
+                    xg3201(21)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Actual card type"
+    ::= { axosCardEntry 5 }
+
+axosCardSoftwareVersion OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Running software version, dotted string notation"
+    ::= { axosCardEntry 6 }
+
+axosCardSerialNumber OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Ascii Serial number for card"
+    ::= { axosCardEntry 7 }
+
+axosCardCurrentPowerLevel OBJECT-TYPE
+    SYNTAX INTEGER {
+        notSet(0),
+        powerLevelLow(1),
+        powerLevel2(2),
+        powerLevel3(3),
+        powerLevel4(4),
+        powerLevelFull(5)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Current power level for card"
+    ::= { axosCardEntry 8 }
+
+axosCardCleiCode OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Ascii CLEI code for card"
+    ::= { axosCardEntry 9 }
+
+axosCardPartNumber OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Ascii part number"
+    ::= { axosCardEntry 10 }
+
+axosCardStartMacRange OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Start of MAC range (ascii)"
+    ::= { axosCardEntry 11 }
+
+axosCardEndMacRange OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "End of MAC range (ascii)"
+    ::= { axosCardEntry 12 }
+
+-- Card ODN status
+
+axosOltPonPortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AxosOltPonPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Contains OLT ODN port entries"
+    ::= { axosCardModule 2 }
+
+axosOltPonPortEntry OBJECT-TYPE
+    SYNTAX      AxosOltPonPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "List of attributes related to OLT ODN port"
+    INDEX { axosOltPonPortIfindex }
+    ::= { axosOltPonPortTable 1 }
+
+AxosOltPonPortEntry ::= SEQUENCE {
+        axosOltPonPortIfindex              Integer32,
+        axosOltPonPortName                 OCTET STRING,
+        axosOltPonPortStatus               INTEGER,
+        axosOltPonPortTemperature          Integer32,
+        axosOltPonPortTxBias               Integer32,
+        axosOltPonPortTxPower              Integer32,
+        axosOltPonPortRxPower              Integer32,
+        axosOltPonPortVoltage              Integer32
+    }
+axosOltPonPortIfindex OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "A unique value, greater than zero, for each interface. "
+    ::= { axosOltPonPortEntry 1 }
+
+axosOltPonPortName OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "A textual string containing information about the interface. "
+    ::= { axosOltPonPortEntry 2 }
+
+axosOltPonPortStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    invalid(0),
+                    linkUp(1),
+                    linkDown(2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "ODN-I operational status"
+    ::= { axosOltPonPortEntry 3 }
+
+axosOltPonPortTemperature OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "ODN-I laser temperature ((value/1000)=degrees Celsius)"
+    ::= { axosOltPonPortEntry 4 }
+
+axosOltPonPortTxBias OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "ODN-I laser bias current (muA) "
+    ::= { axosOltPonPortEntry 5 }
+
+axosOltPonPortTxPower OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "ODN-I Tx signal level ((value / 10000) = mW) "
+    ::= { axosOltPonPortEntry 6 }
+
+axosOltPonPortRxPower OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "ODN-I Rx signal level ((value / 10000) = mW) "
+    ::= { axosOltPonPortEntry 7 }
+
+axosOltPonPortVoltage OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "ODN-I voltage in mV "
+    ::= { axosOltPonPortEntry 8 }
+
+END

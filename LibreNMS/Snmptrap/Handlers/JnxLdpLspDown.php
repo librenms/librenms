@@ -26,6 +26,7 @@
 namespace LibreNMS\Snmptrap\Handlers;
 
 use App\Models\Device;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
 
@@ -46,6 +47,6 @@ class JnxLdpLspDown implements SnmptrapHandler
         $reason = $trap->getOidData($trap->findOid('JUNIPER-LDP-MIB::jnxLdpLspDownReason'));
         $instanceName = $trap->getOidData($trap->findOid('JUNIPER-LDP-MIB::jnxLdpInstanceName'));
 
-        $trap->log("LDP session $instanceName from $routerID to $lspForward has gone down due to $reason", 4);
+        $trap->log("LDP session $instanceName from $routerID to $lspForward has gone down due to $reason", Severity::Warning);
     }
 }

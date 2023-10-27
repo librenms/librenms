@@ -14,9 +14,8 @@ class PollerClusterPolicy
      * Determine whether the user can view any poller clusters.
      *
      * @param  \App\Models\User  $user
-     * @return mixed
      */
-    public function viewAny(User $user)
+    public function viewAny(User $user): bool
     {
         return $user->hasGlobalAdmin();
     }
@@ -26,22 +25,20 @@ class PollerClusterPolicy
      *
      * @param  \App\Models\User  $user
      * @param  \App\Models\PollerCluster  $pollerCluster
-     * @return mixed
      */
-    public function view(User $user, PollerCluster $pollerCluster)
+    public function view(User $user, PollerCluster $pollerCluster): bool
     {
-        //
+        return $this->viewAny($user);
     }
 
     /**
      * Determine whether the user can create poller clusters.
      *
      * @param  \App\Models\User  $user
-     * @return mixed
      */
-    public function create(User $user)
+    public function create(User $user): bool
     {
-        //
+        return $this->viewAny($user);
     }
 
     /**
@@ -49,9 +46,8 @@ class PollerClusterPolicy
      *
      * @param  \App\Models\User  $user
      * @param  \App\Models\PollerCluster  $pollerCluster
-     * @return mixed
      */
-    public function update(User $user, PollerCluster $pollerCluster)
+    public function update(User $user, PollerCluster $pollerCluster): bool
     {
         return $user->isAdmin();
     }
@@ -61,9 +57,8 @@ class PollerClusterPolicy
      *
      * @param  \App\Models\User  $user
      * @param  \App\Models\PollerCluster  $pollerCluster
-     * @return mixed
      */
-    public function delete(User $user, PollerCluster $pollerCluster)
+    public function delete(User $user, PollerCluster $pollerCluster): bool
     {
         return $user->isAdmin();
     }
@@ -73,11 +68,10 @@ class PollerClusterPolicy
      *
      * @param  \App\Models\User  $user
      * @param  \App\Models\PollerCluster  $pollerCluster
-     * @return mixed
      */
-    public function restore(User $user, PollerCluster $pollerCluster)
+    public function restore(User $user, PollerCluster $pollerCluster): bool
     {
-        //
+        return $this->viewAny($user);
     }
 
     /**
@@ -85,20 +79,18 @@ class PollerClusterPolicy
      *
      * @param  \App\Models\User  $user
      * @param  \App\Models\PollerCluster  $pollerCluster
-     * @return mixed
      */
-    public function forceDelete(User $user, PollerCluster $pollerCluster)
+    public function forceDelete(User $user, PollerCluster $pollerCluster): bool
     {
-        //
+        return $this->viewAny($user);
     }
 
     /**
      * Determine whether the user can manage the poller cluster.
      *
      * @param  \App\Models\User  $user
-     * @return mixed
      */
-    public function manage(User $user)
+    public function manage(User $user): bool
     {
         return $user->isAdmin();
     }

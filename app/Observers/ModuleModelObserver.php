@@ -57,7 +57,7 @@ class ModuleModelObserver
     /**
      * @param  Eloquent  $model
      */
-    public function updated($model)
+    public function updated($model): void
     {
         d_echo('Updated data:', 'U');
         d_echo($model->getDirty());
@@ -66,7 +66,16 @@ class ModuleModelObserver
     /**
      * @param  Eloquent  $model
      */
-    public function created($model)
+    public function restored($model)
+    {
+        d_echo('Restored data:', 'R');
+        d_echo($model->getDirty());
+    }
+
+    /**
+     * @param  Eloquent  $model
+     */
+    public function created($model): void
     {
         echo '+';
     }
@@ -74,7 +83,7 @@ class ModuleModelObserver
     /**
      * @param  Eloquent  $model
      */
-    public function deleted($model)
+    public function deleted($model): void
     {
         echo '-';
     }
