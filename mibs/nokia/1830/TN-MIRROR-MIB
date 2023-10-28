@@ -1,0 +1,2298 @@
+TN-MIRROR-MIB DEFINITIONS ::= BEGIN
+
+-- (c) Copyright 2023 Nokia Networks.  All rights reserved.
+-- This software is the confidential and proprietary property of
+-- Nokia and may only be used in accordance with the terms of the
+-- license agreement provided with this software.
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Unsigned32
+        FROM SNMPv2-SMI
+
+    TEXTUAL-CONVENTION, RowStatus, TruthValue,
+    MacAddress, TimeStamp
+        FROM SNMPv2-TC
+
+    tnSRMIBModules, tnSRObjs
+        FROM TROPIC-GLOBAL-REG
+
+    TItemDescription, TFCName, ServiceAdminStatus, ServiceOperStatus,
+    TmnxPortID, TmnxEncapVal, TmnxServId,
+    TPolicyID, TMACFilterID
+        FROM TN-TC-MIB
+
+    SdpId
+        FROM TN-SERV-MIB
+
+    TEntryId
+--  TFilterType, TFilterID, TEntryIdOrZero
+        FROM TN-FILTER-MIB
+
+    tnSysSwitchId
+        FROM TROPIC-SYSTEM-MIB
+    ;
+
+tnMirrorMIBModule   MODULE-IDENTITY
+        LAST-UPDATED    "202008140000Z"
+        ORGANIZATION    "Nokia"
+        CONTACT-INFO
+            "Nokia 7x50 Support
+             Web: http://www.nokia.com/comps/pages/carrier_support.jhtml"
+        DESCRIPTION
+        "This document is the SNMP MIB module to manage and provision
+         traffic mirroring on Nokia 7x50 systems.
+
+         This SNMP MIB module (Specification) embodies Nokia's
+         proprietary intellectual property.  Nokia retains
+         all title and ownership in the Specification, including any
+         revisions.
+
+         Nokia grants all interested parties a non-exclusive
+         license to use and distribute an unmodified copy of this
+         Specification in connection with management of Nokia
+         products, and without fee, provided this copyright notice and
+         license appear on all copies.
+
+         This Specification is supplied 'as is', and Nokia
+         makes no warranty, either express or implied, as to the use,
+         operation, condition, or performance of the Specification."
+
+--
+--  Revision History
+--
+
+        REVISION        "202008140000Z"
+        DESCRIPTION     "Marked the following as deprecated:
+                         tnMirrorDestSapStatsCounterEnable."
+
+        REVISION        "201910250000Z"
+        DESCRIPTION     "Added the following to tnMirrorDestinationTable:
+                         tnMirrorDestSapStatsCounterEnable."
+
+        REVISION        "201702100000Z"
+        DESCRIPTION     "Uncommented tnMirrorSourceMacFilterTable MIB table."
+
+        REVISION        "201503100000Z"
+        DESCRIPTION     "Added Service mirroring MIB table - tnMirrorSourceSapTable
+                            tnMirrorSourceSapPortId
+                            tnMirrorSourceSapEncapValue
+                            tnMirrorSourceSapRowStatus
+                            tnMirrorSourceSapEgressEnabled
+                            tnMirrorSourceSapIngressEnabled
+                            tnMirrorSourceSapLastChgd"
+
+        REVISION        "201212050000Z"
+        DESCRIPTION     "Commented out unsupported MIB tables and
+                         attributes for 1830."
+
+        REVISION        "201209010000Z"
+        DESCRIPTION     "Changed the following index from read-only to
+                         not-accessible:
+                         tnMirrorDestinationRemoteSourceAddr."
+
+        REVISION        "200801010000Z"
+        DESCRIPTION     "Rev 6.0                01 Jan 2008 00:00
+                         6.0 release of the TIMETRA-MIRROR-MIB."
+
+        REVISION        "200701010000Z"
+        DESCRIPTION     "Rev 5.0                01 Jan 2007 00:00
+                         5.0 release of the TIMETRA-MIRROR-MIB."
+
+        REVISION        "200501240000Z"
+        DESCRIPTION     "Rev 2.1                24 Jan 2005 00:00
+                         2.1 release of the TIMETRA-MIRROR-MIB."
+
+        REVISION        "200401150000Z"
+        DESCRIPTION     "Rev 2.0                15 Jan 2004 00:00
+                         2.0 release of the TIMETRA-MIRROR-MIB."
+
+        REVISION        "200308150000Z"
+        DESCRIPTION     "Rev 1.2                15 Aug 2003 00:00
+                         1.2 release of the TIMETRA-MIRROR-MIB."
+
+        REVISION        "200301200000Z"
+        DESCRIPTION     "Rev 1.0                20 Jan 2003 00:00b
+                         1.0 Release of the TIMETRA-MIRROR-MIB."
+
+        REVISION        "200203140000Z"
+        DESCRIPTION     "Rev 0.1                14 Mar 2002 00:00
+                         Initial version of the TIMETRA-MIRROR-MIB."
+
+        ::= { tnSRMIBModules 18 }
+
+tnMirrorObjects              OBJECT IDENTIFIER ::= { tnSRObjs 18 }
+-- tnMirrorNotifyPrefix       OBJECT IDENTIFIER ::= { tnSRNotifyPrefix 18 }
+--    tnMirrorNotifications      OBJECT IDENTIFIER ::= { tnMirrorNotifyPrefix 0 }
+-- tnMirrorConformance          OBJECT IDENTIFIER ::= { tnSRConfs 18 }
+
+tnMirrorDestinationObjects   OBJECT IDENTIFIER ::= { tnMirrorObjects 1 }
+tnMirrorSourceObjects        OBJECT IDENTIFIER ::= { tnMirrorObjects 2 }
+-- tnMirrorSourceNotifyObjects  OBJECT IDENTIFIER ::= { tnMirrorObjects 3 }
+
+
+--
+-- textual conventions
+--
+TMplsLabel ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "An MPLS label; the 20-bit label value, excluding the TOS, S,
+         and x bits."
+    REFERENCE
+        "."
+    SYNTAX Unsigned32 (0..1048575)
+
+-- TEtherType ::= TEXTUAL-CONVENTION
+--     STATUS          current
+--     DESCRIPTION     "This is a 16 bit value which represents the stage
+--                      of the PPPoE session. A value of 0x8863 specifies
+--                      the discovery stage and a value of 0x8864 specifies
+--                      the PPP session stage."
+--     SYNTAX          Unsigned32 (1536..65535)
+
+-- TSessionId ::= TEXTUAL-CONVENTION
+--     STATUS          current
+--     DESCRIPTION     "This is a 16 bit field which represents the Session
+--                      Id. It is an unsigned value in network byte order.
+--                      Its value varies depending on the session stage
+--                      (discovery or PPP session). Before the access
+--                      concentrator has assigned a session ID or if the
+--                      session ID is unknown, the value is 0. For the PPP
+--                      session stage, the value is fixed and defines a PPP
+--                      session and the Ethernet SOURCE_ADDR and
+--                      DESTINATION_ADDR. The value 0xffff is reserved for
+--                      future use and must not be used."
+--     SYNTAX          Unsigned32 (1..65535)
+
+TmnxMirrorEncapType ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION     "The TmnxMirrorEncapType data type is an enumerated
+                     integer that describes the encapsulation supported
+                     by a mirror service."
+    SYNTAX  INTEGER {
+                ether     (1),
+                frameRelay(2),
+                ppp       (3),
+                atmSdu    (4),
+                satopE1   (5),
+                satopT1   (6),
+                satopE3   (7),
+                satopT3   (8),
+                cesopsn   (9),
+                cesopsnCas(10),
+                ipOnly    (11)
+            }
+--
+-- mib objects
+--
+
+--
+-- mirror destination table
+--
+
+tnMirrorDestinationTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF TMirrorDestinationEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION  "The tnMirrorDestinationTable has an entry for each
+                  mirror destination configured on the virtual router."
+    ::= { tnMirrorDestinationObjects 1 }
+
+tnMirrorDestinationEntry OBJECT-TYPE
+    SYNTAX       TMirrorDestinationEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Each row represents information about a particular mirror destination.
+         Entries are created by user.
+         Entries are deleted by user.
+
+         Entries in this table have an implied StorageType of 'nonVolatile'.
+         That is, configured destination information is persistent
+         across system restarts."
+    INDEX { tnSysSwitchId, tnMirrorDestinationIndex }
+    ::= { tnMirrorDestinationTable 1 }
+
+TMirrorDestinationEntry ::= SEQUENCE
+    {
+        tnMirrorDestinationIndex                TmnxServId,
+        tnMirrorDestinationRowStatus            RowStatus,
+        tnMirrorDestinationDescription          TItemDescription,
+        tnMirrorDestinationFC                   TFCName,
+        tnMirrorDestinationRemoteSource         TruthValue,
+        tnMirrorDestinationSapPortId            TmnxPortID,
+        tnMirrorDestinationSapEncapValue        TmnxEncapVal,
+        tnMirrorDestinationSdpNumber            SdpId,
+--        tnMirrorDestinationSdpDestEncap         INTEGER,
+        tnMirrorDestinationAdminStatus          ServiceAdminStatus,
+        tnMirrorDestinationOperStatus           ServiceOperStatus,
+--        tnMirrorDestinationTranslateDisable     TruthValue,
+        tnMirrorDestinationSliceSize            Unsigned32,
+--        tnMirrorDestinationPppoeDestMacAddr     MacAddress,
+--        tnMirrorDestinationPppoeSrcMacAddr      MacAddress,
+--        tnMirrorDestinationPppoeEtype           TEtherType,
+--        tnMirrorDestinationPppoeSessionId       TSessionId,
+        tnMirrorDestinationSdpEgrSvcLabel       TMplsLabel,
+        tnMirrorDestinationSapEgressQosPolicyId TPolicyID,
+        tnMirrorDestinationEncapsulation        TmnxMirrorEncapType,
+        tnMirrorDestinationSdpOperEgrSvcLabel   TMplsLabel,
+        tnMirrorDestinationEnablePortId         TruthValue,
+        tnMirrorDestSapEgrIpMirrorSA            MacAddress,
+        tnMirrorDestSapEgrIpMirrorDA            MacAddress,
+        tnMirrorDestLastChanged                 TimeStamp,
+        tnMirrorDestSapStatsCounterEnable       TruthValue  -- deprecated
+    }
+
+tnMirrorDestinationIndex  OBJECT-TYPE
+    SYNTAX       TmnxServId
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "Since packet mirroring is setup like a service,
+         tnMirrorDestinationIndex represents the Service ID
+         associated with this mirror destination. It is
+         used as unique index in to this table. Only 255
+         mirror destination service IDs may be created per
+         system."
+    ::= { tnMirrorDestinationEntry 1 }
+
+tnMirrorDestinationRowStatus  OBJECT-TYPE
+    SYNTAX       RowStatus
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "The row status used for creation and deletion of entries in
+         tnMirrorDestinationTable.
+         The only values supported during a set operation are createAndGo(4),
+         createAndWait(5) and destroy(6)."
+    ::= { tnMirrorDestinationEntry 2 }
+
+tnMirrorDestinationDescription  OBJECT-TYPE
+    SYNTAX       TItemDescription
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "Generic information about this mirror destination."
+    DEFVAL { ''H }
+    ::= { tnMirrorDestinationEntry 3 }
+
+tnMirrorDestinationFC  OBJECT-TYPE
+    SYNTAX       TFCName
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "The forwarding class for all packets transmitted to
+         this mirror destination."
+    DEFVAL { 'be'H }
+   ::= { tnMirrorDestinationEntry 4 }
+
+tnMirrorDestinationRemoteSource  OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "When this value is 'true', the sources of the mirrored
+         packets can be on remote ESRs. If 'false', no remote ESR
+         access is allowed to the mirror destination."
+    DEFVAL { false }
+    ::= { tnMirrorDestinationEntry 5 }
+
+tnMirrorDestinationSapPortId  OBJECT-TYPE
+    SYNTAX       TmnxPortID
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "The ID of the access port where the Service Access Point (SAP)
+         associated with this mirror destination service is defined.
+
+         The default value for this object indicates invalid port-id."
+    DEFVAL { '1E000000'H }
+    ::= { tnMirrorDestinationEntry 6 }
+
+tnMirrorDestinationSapEncapValue  OBJECT-TYPE
+    SYNTAX       TmnxEncapVal
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "The value of the label used to identify the SAP on the
+         access port specified by tnMirrorDestinationSapPortId."
+    DEFVAL { 0 }
+    ::= { tnMirrorDestinationEntry 7 }
+
+tnMirrorDestinationSdpNumber  OBJECT-TYPE
+    SYNTAX       SdpId
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "The ID for the Service Destination Point (SDP) associated
+         with this mirror destination service. A value of 0 indicates
+         that no SDP is associated with the mirror service"
+    DEFVAL { 0 }
+    ::= { tnMirrorDestinationEntry 8 }
+
+-- tnMirrorDestinationSdpDestEncap  OBJECT-TYPE
+--     SYNTAX       INTEGER {
+--                      none(1),
+--                      pos(2),
+--                      ethernet(3)
+--                  }
+--     MAX-ACCESS   read-create
+--     STATUS       obsolete
+--     DESCRIPTION
+--         "The frame type expected by the far end ESR at the other
+--          end of the SDP identified by tnMirrorDestinationSdpNumber."
+--     DEFVAL { none }
+--     ::= { tnMirrorDestinationEntry 9 }
+
+tnMirrorDestinationAdminStatus  OBJECT-TYPE
+    SYNTAX       ServiceAdminStatus
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "The administrative status for this destination entry"
+    DEFVAL { down }
+    ::= { tnMirrorDestinationEntry 10 }
+
+tnMirrorDestinationOperStatus  OBJECT-TYPE
+    SYNTAX       ServiceOperStatus
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The operational status for this destination entry"
+    ::= { tnMirrorDestinationEntry 11 }
+
+-- tnMirrorDestinationTranslateDisable  OBJECT-TYPE
+--     SYNTAX       TruthValue
+--     MAX-ACCESS   read-create
+--     STATUS       obsolete
+--     DESCRIPTION
+--         "When this value is 'true', automatic translation of Ethernet
+--          to PPP/BCP and PPP to PPPoE is disabled. When 'false' the
+--          translation is enabled."
+--     DEFVAL { false }
+--     ::= { tnMirrorDestinationEntry 12 }
+
+tnMirrorDestinationSliceSize  OBJECT-TYPE
+    SYNTAX       Unsigned32 (0|128..9216)
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "The value of the slice-size i.e. maximum portion of the
+         mirrored frame that will be transmitted to the mirror
+         destination. Any frame larger than the slice-size will be
+         truncated to this value before transmission to the mirror
+         destination. A value of 0 indicates that mirrored packet
+         truncation based on slice size is disabled.
+
+         When the miror destination is an ISA-AA Group, this must
+         be set to a value of 0."
+    DEFVAL { 0 }
+    ::= { tnMirrorDestinationEntry 13 }
+
+-- tnMirrorDestinationPppoeDestMacAddr  OBJECT-TYPE
+--     SYNTAX       MacAddress
+--     MAX-ACCESS   read-create
+--     STATUS       obsolete
+--     DESCRIPTION
+--         "This value specifies the MAC address to be used for
+--          the Destination MAC Address field of the PPPoE Header
+--          when using PPPoE encapsulation of PPP mirrored packets.
+--          (The tnMirrorDestinationTranslateDisable should be
+--          'false' to allow such encapsulation). This MAC address
+--          must not be a broadcast or multicast address."
+--     DEFVAL {'0003f8000000'H}
+--     ::= { tnMirrorDestinationEntry 14 }
+--
+-- tnMirrorDestinationPppoeSrcMacAddr  OBJECT-TYPE
+--     SYNTAX       MacAddress
+--     MAX-ACCESS   read-create
+--     STATUS       obsolete
+--     DESCRIPTION
+--         "This value specifies the MAC address to be used for
+--          the Source MAC Address field of the PPPoE Header
+--          when using PPPoE encapsulation of PPP mirrored packets.
+--          This MAC address must not be a broadcast or multicast
+--          address."
+--     DEFVAL {'0003f8000001'H}
+--     ::= { tnMirrorDestinationEntry 15 }
+--
+-- tnMirrorDestinationPppoeEtype  OBJECT-TYPE
+--     SYNTAX       TEtherType
+--     MAX-ACCESS   read-create
+--     STATUS       obsolete
+--     DESCRIPTION
+--         "This value defines the PPPoE Ethertype that will be
+--          included in the PPPoE header for PPPoE encapsulation of
+--          PPP mirrored packets."
+--     DEFVAL { '8864'H }
+--     ::= { tnMirrorDestinationEntry 16 }
+--
+-- tnMirrorDestinationPppoeSessionId  OBJECT-TYPE
+--     SYNTAX       TSessionId
+--     MAX-ACCESS   read-create
+--     STATUS       obsolete
+--     DESCRIPTION
+--         "This value defines the PPPoE session ID that will be
+--          included in the PPPoE header for PPPoE encapsulation of
+--          PPP mirrored packets."
+--     DEFVAL { 1 }
+--     ::= { tnMirrorDestinationEntry 17 }
+
+tnMirrorDestinationSdpEgrSvcLabel OBJECT-TYPE
+    SYNTAX       TMplsLabel (0|16..1048575)
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "This value specifies the egress service label. It is used
+        by the SDP associated with this mirror destination entry
+        to differentiate to the far-end each mirror destination
+        service bound to the SDP. This label is obtained manually
+        or through signalling with the far end."
+    DEFVAL { 0 }
+    ::= { tnMirrorDestinationEntry 18 }
+
+tnMirrorDestinationSapEgressQosPolicyId OBJECT-TYPE
+    SYNTAX       TPolicyID
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "This value indicates a row in the tSapEgressTable
+         corresponding to the egress QoS policy. A value of 0
+         indicates that no QoS policy is specified."
+    DEFVAL { 1 }
+    ::= { tnMirrorDestinationEntry 19 }
+
+tnMirrorDestinationEncapsulation OBJECT-TYPE
+    SYNTAX       TmnxMirrorEncapType
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "This value maintains the encapsulation supported by
+         this service.
+
+         When the miror destination is an ISA-AA Group, this must
+         be set to a value of 'ether'."
+    DEFVAL { ether }
+    ::= { tnMirrorDestinationEntry 20 }
+
+tnMirrorDestinationSdpOperEgrSvcLabel OBJECT-TYPE
+    SYNTAX       TMplsLabel
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "If there is an active sdp being used by this service,
+        tnMirrorDestinationSdpOperEgrSvcLabel maintains the
+        operational label being used by the SDP. If the SDP
+        is being used, a value of '0' means the SDP transport
+        is inactive."
+    ::= { tnMirrorDestinationEntry 21 }
+
+tnMirrorDestinationEnablePortId  OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "The value of tnMirrorDestinationEnablePortId indicates whether the
+        port-id of the system is to be included in the mirrored packets.
+
+        The value of 'true' indicates that the port-id is to be included in the
+        mirrored packets.
+
+        An 'inconsistentValue' error is returned if an attempt is made to set
+        the value of tnMirrorDestinationEnablePortId to 'true' when
+        tnMirrorDestinationEncapsulation is not set to 'ppp (3)'."
+    DEFVAL { false }
+    ::= { tnMirrorDestinationEntry 22 }
+
+tnMirrorDestSapEgrIpMirrorSA  OBJECT-TYPE
+    SYNTAX       MacAddress
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "This value of tnMirrorDestSapEgrIpMirrorSA specifies the MAC address to
+        be used for the Source MAC Address field in the mirrored packets when
+        using IP mirror service.
+
+        This MAC address must not be a broadcast or multicast address.
+
+        An 'inconsistentValue' error is returned if an attempt is made to set
+        the value of tnMirrorDestSapEgrIpMirrorSA to other than default
+        when tnMirrorDestinationEncapsulation is not set to 'ipOnly (11)'."
+    DEFVAL {'000000000000'H}
+    ::= { tnMirrorDestinationEntry 23 }
+
+tnMirrorDestSapEgrIpMirrorDA  OBJECT-TYPE
+    SYNTAX       MacAddress
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "This value of tnMirrorDestSapEgrIpMirrorDA specifies the MAC address to
+        be used for the destination MAC Address field in the mirrored packets
+        when using IP mirror service.
+
+        An 'inconsistentValue' error is returned if an attempt is made to set
+        the value of tnMirrorDestSapEgrIpMirrorDA to other than default
+        when tnMirrorDestinationEncapsulation is not set to 'ipOnly (11)'."
+    DEFVAL {'000000000000'H}
+    ::= { tnMirrorDestinationEntry 24 }
+
+tnMirrorDestLastChanged  OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "The value of  tnMirrorDestLastChanged  indicates the sysUpTime
+          at the time of the last modification of this entry.
+
+          If no changes were made to the entry since the last re-initialization
+          of the local network management subsystem, then this object contains
+          a zero value."
+    ::= { tnMirrorDestinationEntry 25 }
+
+tnMirrorDestSapStatsCounterEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      deprecated
+    DESCRIPTION
+         "When set to true, statistics counters are enabled on the mirror
+          destination service SAP.
+          When set to false, statistics counters are disabled on the mirror
+          destination service SAP."
+    DEFVAL { true }
+    ::= { tnMirrorDestinationEntry 26 }
+
+--
+-- mirror destination remote source table
+--
+
+-- tnMirrorDestinationRemoteSourceTable OBJECT-TYPE
+--     SYNTAX       SEQUENCE OF TMirrorDestinationRemoteSourceEntry
+--     MAX-ACCESS   not-accessible
+--     STATUS       current
+--     DESCRIPTION
+--         "Each row in this table represents a remote source bound to a
+--          the mirror destination service."
+--     ::= { tnMirrorDestinationObjects 2 }
+--
+-- tnMirrorDestinationRemoteSourceEntry OBJECT-TYPE
+--     SYNTAX       TMirrorDestinationRemoteSourceEntry
+--     MAX-ACCESS   not-accessible
+--     STATUS       current
+--     DESCRIPTION
+--         "Each row represents information about a remote source
+--          associated with a mirror destination entry defined in
+--          tnMirrorDestinationTable. Each mirror destination may
+--          be associated with 0 or more remote sources.
+--          Entries are created by user.
+--          Entries are deleted by user, or by agent when the
+--          tnMirrorDestinationTable entry is destroyed.
+--
+--          Entries in this table have an implied StorageType of 'nonVolatile'.
+--          That is, configured destination information is persistent
+--          across system restarts."
+--     INDEX { tnSysSwitchId,
+--             tnMirrorDestinationIndex,
+--             tnMirrorDestinationRemoteSourceAddr }
+--     ::= { tnMirrorDestinationRemoteSourceTable 1 }
+--
+-- TMirrorDestinationRemoteSourceEntry ::= SEQUENCE
+--     {
+--         tnMirrorDestinationRemoteSourceAddr              IpAddress,
+--         tnMirrorDestinationRemoteSourceLabelSignaling    INTEGER,
+--         tnMirrorDestinationRemoteSourceIngSvcLabel       TMplsLabel,
+--         tnMirrorDestinationRemoteSourceRowStatus         RowStatus,
+--         tnMirrorDestinationRemoteSourceOperIngSvcLabel   TMplsLabel,
+--         tnMirrorDestRemoteSrcLastChgd                    TimeStamp
+--     }
+--
+-- tnMirrorDestinationRemoteSourceAddr  OBJECT-TYPE
+--     SYNTAX       IpAddress
+--     MAX-ACCESS   not-accessible
+--     STATUS       current
+--     DESCRIPTION
+--         "The IP address of the remote source or the far-end ESR
+--          which is allowed to be a source of packets for the mirror
+--          destination service defined by tnMirrorDestinationIndex."
+--     ::= { tnMirrorDestinationRemoteSourceEntry 1 }
+--
+-- tnMirrorDestinationRemoteSourceLabelSignaling  OBJECT-TYPE
+--     SYNTAX          INTEGER {
+--                         none(1),
+--                         tldp(2)
+--                     }
+--     MAX-ACCESS      read-create
+--     STATUS          current
+--     DESCRIPTION
+--         "This object specifies the label signaling protocol used to obtain
+--         the ingress labels associated with the far-end ESR. When the
+--         value of this object is none(1) then the labels are manually
+--         assigned at the time the remote source is bound to the mirror
+--         destination service. When this value is tldp(2) the label is
+--         obtained through signaling via the LDP.
+--         This value must be set for the row to become active(1)."
+--     ::= { tnMirrorDestinationRemoteSourceEntry 2 }
+--
+-- tnMirrorDestinationRemoteSourceIngSvcLabel OBJECT-TYPE
+--     SYNTAX       TMplsLabel (0|2048..18431)
+--     MAX-ACCESS   read-create
+--     STATUS       current
+--     DESCRIPTION
+--         "This value specifies the ingress service label. It is used
+--         to identify a remote source bound to the mirror destination
+--         service. This label is obtained manually or through signalling
+--         with the far end.
+--
+--         When tnMirrorDestinationRemoteSourceLabelSignaling is set to
+--         'none(1)', this object can take the values 2048..18431. When
+--         tnMirrorDestinationRemoteSourceLabelSignaling is set to 'tldp(2)',
+--         this object will have a value of zero. Also, setting this object
+--         will reset signalling to 'none(1)'."
+--     DEFVAL { 0 }
+--     ::= { tnMirrorDestinationRemoteSourceEntry 3 }
+--
+-- tnMirrorDestinationRemoteSourceRowStatus OBJECT-TYPE
+--     SYNTAX       RowStatus
+--     MAX-ACCESS   read-create
+--     STATUS       current
+--     DESCRIPTION
+--         "The row status used for creation and deletion of entries in
+--          tnMirrorDestinationRemoteSourceTable.
+--          The only values supported during a set operation are createAndGo(4),
+--          createAndWait(5) and destroy(6)."
+--     ::= { tnMirrorDestinationRemoteSourceEntry 4 }
+--
+-- tnMirrorDestinationRemoteSourceOperIngSvcLabel OBJECT-TYPE
+--     SYNTAX       TMplsLabel
+--     MAX-ACCESS   read-only
+--     STATUS       current
+--     DESCRIPTION
+--         "This value specifies the ingress service label. It is used
+--         by this identify a remote source bound to the mirror destination
+--         service. This label is obtained manually or through signalling
+--         with the far end. A value of '0' implies that the operational
+--         label is unresolved."
+--     ::= { tnMirrorDestinationRemoteSourceEntry 5 }
+--
+-- tnMirrorDestRemoteSrcLastChgd  OBJECT-TYPE
+--     SYNTAX      TimeStamp
+--     MAX-ACCESS  read-only
+--     STATUS      current
+--     DESCRIPTION
+--          "The value of tnMirrorDestRemoteSrcLastChgd  indicates the sysUpTime
+--           at the time of the last modification of this entry.
+--
+--           If no changes were made to the entry since the last re-initialization
+--           of the local network management subsystem, then this object contains
+--           a zero value."
+--     ::= { tnMirrorDestinationRemoteSourceEntry 6 }
+
+-- --------------------------------------
+-- Destination Table Last Changed object
+-- --------------------------------------
+-- tnMirrorDestTableLastChnged OBJECT-TYPE
+--     SYNTAX      TimeStamp
+--     MAX-ACCESS  read-only
+--     STATUS      current
+--     DESCRIPTION
+--          "The value of  tnMirrorDestTableLastChnged indicates the sysUpTime
+--           at the time of the last modification of tnMirrorDestinationTable.
+--
+--           If no changes were made to the table since the last re-initialization
+--           of the local network management subsystem, then this object contains
+--           a zero value."
+--     ::= { tnMirrorDestinationObjects 3 }
+--
+-- tnMirrorDestRemSrcTblLastChgd OBJECT-TYPE
+--     SYNTAX      TimeStamp
+--     MAX-ACCESS  read-only
+--     STATUS      current
+--     DESCRIPTION
+--          "The value of tnMirrorDestRemSrcTblLastChgd indicates the sysUpTime
+--           at the time of the last modification of
+--           tnMirrorDestinationRemoteSourceTable.
+--
+--           If no changes were made to the table since the last re-initialization
+--           of the local network management subsystem, then this object contains
+--           a zero value."
+--     ::= { tnMirrorDestinationObjects 4 }
+
+--
+-- Dummy Scalars
+--
+tnMirrorDestinationScalar1 OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A dummy scalar that satisfies a SNMP get request quickly when
+         there is no 11QPE24 card provisioned.  Otherwise, it has to
+         traverse the remaining 11QPE24 MIB to get to the next applicable
+         item."
+    ::= { tnMirrorDestinationObjects 101 }
+
+tnMirrorDestinationScalar2 OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "."
+    ::= { tnMirrorDestinationObjects 102 }
+
+--
+-- mirror source configuration objects
+--
+
+tnMirrorSourceTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF TMirrorSourceEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "The tnMirrorSourceTable has information about each mirror source."
+    ::= { tnMirrorSourceObjects 1 }
+
+tnMirrorSourceEntry OBJECT-TYPE
+    SYNTAX       TMirrorSourceEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Each row represents information about a particular mirror source.
+         Entries are created and deleted when the mirror destination service
+         associated with this mirror source is created or deleted
+         respectively.
+
+         Entries in this table have an implied StorageType of 'nonVolatile'.
+         That is, mirror source entry will be persistent across system
+         restarts.
+        "
+    INDEX { tnSysSwitchId, tnMirrorSourceIndex }
+    ::= { tnMirrorSourceTable 1 }
+
+TMirrorSourceEntry ::= SEQUENCE
+    {
+        tnMirrorSourceIndex        TmnxServId,
+        tnMirrorSourceAdminStatus  ServiceAdminStatus,
+        tnMirrorSourceRowStatus    RowStatus,
+        tnMirrorSourceLastChgd  TimeStamp
+    }
+
+tnMirrorSourceIndex  OBJECT-TYPE
+    SYNTAX       TmnxServId
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "The mirror destination service ID that defines the context of
+         the mirror source. The mirror destination service represented
+         by this ID must exist as an entry within the tnMirrorDestinationTable."
+    ::= { tnMirrorSourceEntry 1 }
+
+tnMirrorSourceAdminStatus  OBJECT-TYPE
+    SYNTAX       ServiceAdminStatus
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "The admininstrative status for this Mirror source entry."
+    DEFVAL { up }
+    ::= { tnMirrorSourceEntry 2 }
+
+tnMirrorSourceRowStatus  OBJECT-TYPE
+    SYNTAX       RowStatus
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "The row status used for creation and deletion of entries in
+         tnMirrorSourceTable.  The mirror destination service
+         represented by the tnMirrorSourceIndex must exist as an entry
+         within the tnMirrorDestinationTable or row creation will fail
+         with an inconsistentName error.  When the corresponding entry
+         in the tnMirrorDestinationTable is deleted this row entry will
+         also be deleted."
+    ::= { tnMirrorSourceEntry 3 }
+
+tnMirrorSourceLastChgd  OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "The value of  tnMirrorSourceLastChgd  indicates the sysUpTime
+          at the time of the last modification of this entry.
+
+          If no changes were made to the entry since the last re-initialization
+          of the local network management subsystem, then this object contains
+          a zero value."
+    ::= { tnMirrorSourceEntry 4 }
+
+
+--
+-- mirror source ip-filter table
+--
+
+-- tnMirrorSourceIpFilterTable OBJECT-TYPE
+--     SYNTAX       SEQUENCE OF TMirrorSourceIpFilterEntry
+--     MAX-ACCESS   not-accessible
+--     STATUS       current
+--     DESCRIPTION
+--         "Each row in this table represents an IP Filter Entry
+--          associated with a mirror source."
+--     ::= { tnMirrorSourceObjects 2 }
+--
+-- tnMirrorSourceIpFilterEntry OBJECT-TYPE
+--     SYNTAX       TMirrorSourceIpFilterEntry
+--     MAX-ACCESS   not-accessible
+--     STATUS       current
+--     DESCRIPTION
+--         "Each row represents information about a particular IP
+--          Filter Entry associated with a mirror source defined in
+--          the tnMirrorSourceTable.
+--          Entries are created by user.
+--          Entries are deleted by user, or by agent when the tnMirrorSourceTable
+--          entry is destroyed.
+--
+--          Entries in this table have an implied StorageType of 'volatile'.
+--          That is, configured mirror source information is not persistent
+--          across system restarts."
+--     INDEX { tnSysSwitchId,
+--             tnMirrorSourceIndex,
+--             tnMirrorSourceIpFilter,
+--             tnMirrorSourceIpFilterParams }
+--     ::= { tnMirrorSourceIpFilterTable 1 }
+--
+-- TMirrorSourceIpFilterEntry ::= SEQUENCE
+--     {
+--         tnMirrorSourceIpFilter          TIPFilterID,
+--         tnMirrorSourceIpFilterParams    TEntryId,
+--         tnMirrorSourceIpFilterRowStatus RowStatus,
+--         tnMirrorSourceIpFilterLastChgd  TimeStamp
+--     }
+--
+-- tnMirrorSourceIpFilter  OBJECT-TYPE
+--     SYNTAX       TIPFilterID (1..65535)
+--     MAX-ACCESS   not-accessible
+--     STATUS       current
+--     DESCRIPTION
+--         "This value specifies the IP Filter ID of the IP Filter Entry
+--          associated with the mirror source defined by tnMirrorSourceIndex."
+--     ::= { tnMirrorSourceIpFilterEntry 1 }
+--
+-- tnMirrorSourceIpFilterParams  OBJECT-TYPE
+--     SYNTAX       TEntryId
+--     MAX-ACCESS   not-accessible
+--     STATUS       current
+--     DESCRIPTION
+--         "This value corresponds to the Entry ID which identifies a specific
+--          'Entry' within the IP Filter defined by tnMirrorSourceIpFilter above.
+--
+--          Each IP Filter has a number of 'Entries' associated with it and each
+--          Entry within the filter is identified by an Entry ID which is unique
+--          within the filter."
+--     ::= { tnMirrorSourceIpFilterEntry 2 }
+--
+-- tnMirrorSourceIpFilterRowStatus  OBJECT-TYPE
+--     SYNTAX       RowStatus
+--     MAX-ACCESS   read-create
+--     STATUS       current
+--     DESCRIPTION
+--         "The row status used for creation and deletion of entries in
+--          tnMirrorSourceIpFilterTable.
+--          The only values supported during a set operation are createAndGo(4),
+--          createAndWait(5) and destroy(6)."
+--     ::= { tnMirrorSourceIpFilterEntry 3 }
+--
+-- tnMirrorSourceIpFilterLastChgd  OBJECT-TYPE
+--     SYNTAX      TimeStamp
+--     MAX-ACCESS  read-only
+--     STATUS      current
+--     DESCRIPTION
+--          "The value of tnMirrorSourceIpFilterLastChgd  indicates the sysUpTime
+--           at the time of the last modification of this entry.
+--
+--           If no changes were made to the entry since the last re-initialization
+--           of the local network management subsystem, then this object contains
+--           a zero value."
+--     ::= { tnMirrorSourceIpFilterEntry 4 }
+
+--
+-- mirror source mac-filter table
+--
+
+ tnMirrorSourceMacFilterTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF TMirrorSourceMacFilterEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+         "The tnMirrorSourceMacFilterTable contains information
+          about each MAC Filter Entry associated with a mirror
+          source."
+     ::= { tnMirrorSourceObjects 3 }
+
+ tnMirrorSourceMacFilterEntry OBJECT-TYPE
+     SYNTAX       TMirrorSourceMacFilterEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+         "Each row represents information about a MAC Filter Entry
+          assocaited with a mirror source defined in the tnMirrorSourceTable.
+          Entries are created by user.
+          Entries are deleted by user, or by agent when the tnMirrorSourceTable
+          entry is destroyed.
+
+          Entries in this table have an implied StorageType of 'volatile'.
+          That is, configured mirror source information is not persistent
+          across system restarts."
+     INDEX { tnSysSwitchId,
+             tnMirrorSourceIndex,
+             tnMirrorSourceMacFilter,
+             tnMirrorSourceMacFilterParams }
+     ::= { tnMirrorSourceMacFilterTable 1 }
+
+ TMirrorSourceMacFilterEntry ::= SEQUENCE
+     {
+         tnMirrorSourceMacFilter          TMACFilterID,
+         tnMirrorSourceMacFilterParams    TEntryId,
+         tnMirrorSourceMacFilterRowStatus RowStatus,
+         tnMirrorSourceMacFilterLastChgd  TimeStamp
+     }
+
+ tnMirrorSourceMacFilter  OBJECT-TYPE
+     SYNTAX       TMACFilterID (1..65535)
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+         "This value specifies the MAC Filter ID of the MAC Filter Entry
+          associated with the mirror source defined by tnMirrorSourceIndex."
+     ::= { tnMirrorSourceMacFilterEntry 1 }
+
+ tnMirrorSourceMacFilterParams  OBJECT-TYPE
+     SYNTAX       TEntryId
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+         "This value corresponds to the Entry ID which identifies a specific
+          'Entry' within the MAC Filter defined by tnMirrorSourceMacFilter.
+
+          Each MAC Filter has a number of 'Entries' associated with it and each
+          Entry within the filter is identified by an Entry ID which is unique
+          within the filter."
+     ::= { tnMirrorSourceMacFilterEntry 2 }
+
+ tnMirrorSourceMacFilterRowStatus  OBJECT-TYPE
+     SYNTAX       RowStatus
+     MAX-ACCESS   read-create
+     STATUS       current
+     DESCRIPTION
+         "The row status used for creation and deletion of entries in
+          tnMirrorSourceMacFilterTable.
+          The only values supported during a set operation are createAndGo(4),
+          createAndWait(5) and destroy(6)."
+     ::= { tnMirrorSourceMacFilterEntry 3 }
+
+ tnMirrorSourceMacFilterLastChgd  OBJECT-TYPE
+     SYNTAX      TimeStamp
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+          "The value of tnMirrorSourceMacFilterLastChgd  indicates the sysUpTime
+           at the time of the last modification of this entry.
+
+           If no changes were made to the entry since the last re-initialization
+           of the local network management subsystem, then this object contains
+           a zero value."
+     ::= { tnMirrorSourceMacFilterEntry 4 }
+
+--
+-- mirror source ingress-label table
+--
+
+-- tnMirrorSourceIngressLabelTable OBJECT-TYPE
+--     SYNTAX       SEQUENCE OF TMirrorSourceIngressLabelEntry
+--     MAX-ACCESS   not-accessible
+--     STATUS       current
+--     DESCRIPTION
+--         "Each row in this table represents an MPLS ingress label
+--          filter entry associated with a mirror source."
+--     ::= { tnMirrorSourceObjects 4 }
+--
+-- tnMirrorSourceIngressLabelEntry OBJECT-TYPE
+--     SYNTAX       TMirrorSourceIngressLabelEntry
+--     MAX-ACCESS   not-accessible
+--     STATUS       current
+--     DESCRIPTION
+--         "Each row represents information about an MPLS ingress label
+--         filter entry associated with a mirror source.
+--         Entries are created by user.
+--         Entries are deleted by user, or by agent when the tnMirrorSourceTable
+--         entry is destroyed.
+--
+--         Entries in this table have an implied StorageType of 'volatile'.
+--         That is, configured mirror source information is not persistent
+--         across system restarts.
+--         "
+--     INDEX { tnSysSwitchId, tnMirrorSourceIndex, tnMirrorSourceIngressLabelIndex }
+--     ::= { tnMirrorSourceIngressLabelTable 1 }
+--
+-- TMirrorSourceIngressLabelEntry ::= SEQUENCE
+--     {
+--         tnMirrorSourceIngressLabelIndex     TMplsLabel,
+--         tnMirrorSourceIngressLabelRowStatus RowStatus,
+--         tnMirrorSourceIngLabelLastChgd  TimeStamp
+--     }
+--
+-- tnMirrorSourceIngressLabelIndex  OBJECT-TYPE
+--     SYNTAX       TMplsLabel
+--     MAX-ACCESS   not-accessible
+--     STATUS       current
+--     DESCRIPTION
+--         "This value specifies the MPLS label associated with this
+--          MPLS ingress label filter entry. Ingress MPLS frames with
+--          top-of-stack label matching to this value will be mirrored
+--          to a given mirror destination."
+--     ::= { tnMirrorSourceIngressLabelEntry 1 }
+--
+-- tnMirrorSourceIngressLabelRowStatus  OBJECT-TYPE
+--     SYNTAX       RowStatus
+--     MAX-ACCESS   read-create
+--     STATUS       current
+--     DESCRIPTION
+--         "The row status used for creation and deletion of entries in
+--          tnMirrorSourceIngressLabelTable.
+--          The only values supported during a set operation are createAndGo(4),
+--          createAndWait(5) and destroy(6)."
+--     ::= { tnMirrorSourceIngressLabelEntry 2 }
+--
+-- tnMirrorSourceIngLabelLastChgd  OBJECT-TYPE
+--     SYNTAX      TimeStamp
+--     MAX-ACCESS  read-only
+--     STATUS      current
+--     DESCRIPTION
+--          "The value of tnMirrorSourceIngLabelLastChgd  indicates the sysUpTime
+--           at the time of the last modification of this entry.
+--
+--           If no changes were made to the entry since the last re-initialization
+--           of the local network management subsystem, then this object contains
+--           a zero value."
+--     ::= { tnMirrorSourceIngressLabelEntry 3 }
+
+--
+-- mirror source port table
+--
+
+tnMirrorSourcePortTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF TMirrorSourcePortEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "This table defines a list of (physical interface) ports for
+         each mirror source"
+    ::= { tnMirrorSourceObjects 5 }
+
+tnMirrorSourcePortEntry OBJECT-TYPE
+    SYNTAX       TMirrorSourcePortEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Each row reprsents information about a port associated with
+         a Mirror source defined in tnMirrorSourceTable.
+         Entries are created by user.
+         Entries are deleted by user, or by agent when the tnMirrorSourceTable
+         entry is destroyed.
+
+         Entries in this table have an implied StorageType of 'volatile'.
+         That is, configured mirror source information is not persistent
+         across system restarts."
+    INDEX { tnSysSwitchId, tnMirrorSourceIndex, tnMirrorSourcePortIndex }
+    ::= { tnMirrorSourcePortTable 1 }
+
+TMirrorSourcePortEntry ::= SEQUENCE
+    {
+        tnMirrorSourcePortIndex           TmnxPortID,
+        tnMirrorSourcePortRowStatus       RowStatus,
+        tnMirrorSourcePortEgressEnabled   TruthValue,
+        tnMirrorSourcePortIngressEnabled  TruthValue,
+        tnMirrorSourcePortLastChgd        TimeStamp
+    }
+
+tnMirrorSourcePortIndex  OBJECT-TYPE
+    SYNTAX       TmnxPortID
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "This value defines the Ethernet physical interface associated
+         with the mirror source defined by tnMirrorSourceIndex."
+    ::= { tnMirrorSourcePortEntry 1 }
+
+tnMirrorSourcePortRowStatus  OBJECT-TYPE
+    SYNTAX       RowStatus
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "The row status used for creation and deletion of entries in
+         tnMirrorSourcePortTable.
+         The only values supported during a set operation are createAndGo(4),
+         createAndWait(5) and destroy(6)."
+    ::= { tnMirrorSourcePortEntry 2 }
+
+tnMirrorSourcePortEgressEnabled  OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "If this value is set to 'true', packets egressing the
+         port will be mirrored. If 'false', egress packets will
+         not be mirrored."
+    DEFVAL { false }
+    ::= { tnMirrorSourcePortEntry 3 }
+
+tnMirrorSourcePortIngressEnabled  OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "If this value is set to 'true', packets ingressing the
+         port will be mirrored. If 'false', ingress packets will
+         not be mirrored."
+    DEFVAL { false }
+    ::= { tnMirrorSourcePortEntry 4 }
+
+tnMirrorSourcePortLastChgd  OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "The value of tnMirrorSourcePortLastChgd  indicates the sysUpTime
+          at the time of the last modification of this entry.
+
+          If no changes were made to the entry since the last re-initialization
+          of the local network management subsystem, then this object contains
+          a zero value."
+    ::= { tnMirrorSourcePortEntry 5 }
+
+--
+-- mirror source sap table
+--
+
+tnMirrorSourceSapTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF TMirrorSourceSapEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Each row in this table represents a SAP (Service Access Point)
+         associated with a mirror source."
+    ::= { tnMirrorSourceObjects 6 }
+
+tnMirrorSourceSapEntry OBJECT-TYPE
+    SYNTAX       TMirrorSourceSapEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+         "Each row represents information about a SAP associated with a
+          mirror source defined in tnMirrorSourceTable.
+          Entries are created by user.
+          Entries are deleted by user, or by agent when the tnMirrorSourceTable
+          entry is destroyed.
+
+          Entries in this table have an implied StorageType of 'volatile'.
+          That is, configured mirror source information is not persistent
+          across system restarts."
+    INDEX { tnSysSwitchId,
+            tnMirrorSourceIndex,
+            tnMirrorSourceSapPortId,
+            tnMirrorSourceSapEncapValue }
+    ::= { tnMirrorSourceSapTable 1 }
+
+TMirrorSourceSapEntry ::= SEQUENCE
+    {
+        tnMirrorSourceSapPortId         TmnxPortID,
+        tnMirrorSourceSapEncapValue     TmnxEncapVal,
+        tnMirrorSourceSapRowStatus      RowStatus,
+        tnMirrorSourceSapEgressEnabled  TruthValue,
+        tnMirrorSourceSapIngressEnabled TruthValue,
+        tnMirrorSourceSapLastChgd       TimeStamp
+    }
+
+tnMirrorSourceSapPortId  OBJECT-TYPE
+    SYNTAX       TmnxPortID
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "The ID of the access port for the Service Access Point (SAP)
+         associated with the mirror source defined by tnMirrorSourceIndex."
+    ::= { tnMirrorSourceSapEntry 2 }
+
+tnMirrorSourceSapEncapValue  OBJECT-TYPE
+    SYNTAX       TmnxEncapVal
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "The value of the label used to identify the SAP on the
+         access port specified by tnMirrorSourceSapPortId."
+    ::= { tnMirrorSourceSapEntry 3 }
+
+tnMirrorSourceSapRowStatus  OBJECT-TYPE
+    SYNTAX       RowStatus
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "The row status used for creation and deletion of entries in
+         tnMirrorSourceSapTable.
+         The only values supported during a set operation are createAndGo(4),
+         createAndWait(5) and destroy(6)."
+    ::= { tnMirrorSourceSapEntry 4 }
+
+tnMirrorSourceSapEgressEnabled  OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "If this value is set to 'true', packets egressing the
+         SAP will be mirrored. If 'false', egress packets will
+         not be mirrored."
+    DEFVAL { false }
+    ::= { tnMirrorSourceSapEntry 5 }
+
+tnMirrorSourceSapIngressEnabled  OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "If this value is set to 'true', packets ingressing the
+         SAP will be mirrored. If 'false', ingress packets will
+         not be mirrored."
+    DEFVAL { false }
+    ::= { tnMirrorSourceSapEntry 6 }
+
+tnMirrorSourceSapLastChgd  OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tnMirrorSourceSapLastChgd  indicates the sysUpTime
+         at the time of the last modification of this entry.
+
+         If no changes were made to the entry since the last re-initialization
+         of the local network management subsystem, then this object contains
+         a zero value."
+    ::= { tnMirrorSourceSapEntry 7 }
+
+--
+--
+-- mirror source subscriber table
+--
+
+-- tnMirrorSourceSubTableLastChnged OBJECT-TYPE
+--     SYNTAX      TimeStamp
+--     MAX-ACCESS  read-only
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnMirrorSourceSubLastChanged is the timestamp of the
+--          last change to this row in tnMirrorSourceSubscriberTable."
+--     ::= { tnMirrorSourceObjects 7 }
+--
+-- tnMirrorSourceSubscriberTable OBJECT-TYPE
+--     SYNTAX       SEQUENCE OF TMirrorSourceSubscriberEntry
+--     MAX-ACCESS   not-accessible
+--     STATUS       current
+--     DESCRIPTION
+--         "Each row in this table represents a subscriber associated with a
+--         mirror source."
+--     ::= { tnMirrorSourceObjects 8 }
+--
+-- tnMirrorSourceSubscriberEntry OBJECT-TYPE
+--     SYNTAX       TMirrorSourceSubscriberEntry
+--     MAX-ACCESS   not-accessible
+--     STATUS       current
+--     DESCRIPTION
+--         "Each row represents information about a subscriber associated with a
+--          mirror source defined in tnMirrorSourceTable.
+--
+--          Entries are created by user.
+--
+--          Entries are deleted by user, or by agent when the tnMirrorSourceTable
+--          entry is destroyed.
+--
+--          Entries in this table have an implied StorageType of 'volatile'.
+--          That is, configured mirror source information is not persistent
+--          across system restarts."
+--     INDEX { tnSysSwitchId, tnMirrorSourceIndex, tnMirrorSourceSubIdent }
+--     ::= { tnMirrorSourceSubscriberTable 1 }
+--
+-- TMirrorSourceSubscriberEntry ::= SEQUENCE
+--     {
+--         tnMirrorSourceSubIdent          TNamedItem,
+--         tnMirrorSourceSubRowStatus      RowStatus,
+--         tnMirrorSourceSubLastChanged    TimeStamp,
+--         tnMirrorSourceSubPortId         TmnxPortID,
+--         tnMirrorSourceSubEncapValue     TmnxEncapVal,
+--         tnMirrorSourceSubIpAddrType     InetAddressType,
+--         tnMirrorSourceSubIpAddr         InetAddress,
+--         tnMirrorSourceSubMacAddr        MacAddress,
+--         tnMirrorSourceSubSLAProfName    TNamedItemOrEmpty,
+--         tnMirrorSourceSubFC             TFCSet,
+--         tnMirrorSourceSubEgressEnabled  TruthValue,
+--         tnMirrorSourceSubIngressEnabled TruthValue
+--     }
+--
+-- tnMirrorSourceSubIdent OBJECT-TYPE
+--     SYNTAX      TNamedItem
+--     MAX-ACCESS  accessible-for-notify
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnMirrorSourceSubIdent specifies the subscriber
+--          identification of this subscriber on this mirror source."
+--     ::= { tnMirrorSourceSubscriberEntry 1 }
+--
+-- tnMirrorSourceSubRowStatus  OBJECT-TYPE
+--     SYNTAX       RowStatus
+--     MAX-ACCESS   read-create
+--     STATUS       current
+--     DESCRIPTION
+--         "The row status used for creation and deletion of entries in
+--          the tnMirrorSourceSubscriberTable."
+--     ::= { tnMirrorSourceSubscriberEntry 2 }
+--
+-- tnMirrorSourceSubLastChanged  OBJECT-TYPE
+--     SYNTAX      TimeStamp
+--     MAX-ACCESS  read-only
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnMirrorSourceSubLastChanged is the timestamp of the
+--          last change to this row in the tnMirrorSourceSubscriberTable."
+--     ::= { tnMirrorSourceSubscriberEntry 3 }
+--
+-- tnMirrorSourceSubPortId  OBJECT-TYPE
+--     SYNTAX       TmnxPortID
+--     MAX-ACCESS   read-create
+--     STATUS       current
+--     DESCRIPTION
+--         "The value of tnMirrorSourceSubPortId specifies the ID of the access
+--         port for the Service Access Point (SAP) associated with the mirror
+--         source defined by tnMirrorSourceIndex."
+--     DEFVAL { 0 }
+--     ::= { tnMirrorSourceSubscriberEntry 4 }
+--
+-- tnMirrorSourceSubEncapValue  OBJECT-TYPE
+--     SYNTAX       TmnxEncapVal
+--     MAX-ACCESS   read-create
+--     STATUS       current
+--     DESCRIPTION
+--         "The value of tnMirrorSourceSubEncapValue specifies the label used to
+--         identify the SAP on the access port specified by
+--         tnMirrorSourceSubPortId."
+--     DEFVAL { 0 }
+--     ::= { tnMirrorSourceSubscriberEntry 5 }
+--
+-- tnMirrorSourceSubIpAddrType  OBJECT-TYPE
+--     SYNTAX       InetAddressType
+--     MAX-ACCESS   read-create
+--     STATUS       current
+--     DESCRIPTION
+--         "The value of tnMirrorSourceSubIpAddrType indicates the address type of
+--         address in tnMirrorSourceSubIpAddr."
+--     DEFVAL { unknown }
+--     ::= { tnMirrorSourceSubscriberEntry 6 }
+--
+-- tnMirrorSourceSubIpAddr  OBJECT-TYPE
+--     SYNTAX       InetAddress (SIZE (0|4|16|20))
+--     MAX-ACCESS   read-create
+--     STATUS       current
+--     DESCRIPTION
+--         "The value of tnMirrorSourceSubIpAddr specifies the IP address of the
+--         remote source or the far-end ESR which is allowed to be a source of
+--         packets for the mirror destination service defined by
+--         tnMirrorDestinationIndex."
+--     DEFVAL { ''H }
+--     ::= { tnMirrorSourceSubscriberEntry 7 }
+--
+-- tnMirrorSourceSubMacAddr OBJECT-TYPE
+--     SYNTAX       MacAddress
+--     MAX-ACCESS   read-create
+--     STATUS       current
+--     DESCRIPTION
+--         "This value of tnMirrorSourceSubMacAddr specifies the MAC address to be
+--         used to match the packets for tnMirrorSourceSubIdent subscriber on
+--         tnMirrorSourceIndex mirror source."
+--     DEFVAL {'000000000000'H}
+--     ::= { tnMirrorSourceSubscriberEntry 8 }
+--
+-- tnMirrorSourceSubSLAProfName OBJECT-TYPE
+--     SYNTAX      TNamedItemOrEmpty
+--     MAX-ACCESS  read-create
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnMirrorSourceSubSLAProfName specifies the SLA profile
+--         name which identifies the hosts as source for mirroring."
+--      DEFVAL { ''H }
+--     ::= { tnMirrorSourceSubscriberEntry 9 }
+--
+-- tnMirrorSourceSubFC  OBJECT-TYPE
+--     SYNTAX      TFCSet
+--     MAX-ACCESS   read-create
+--     STATUS       current
+--     DESCRIPTION
+--         "The value of tnMirrorSourceSubFC specifies the forwarding classes
+--         traffic which should be mirrored. Setting multiple bits will mirror
+--         traffic from several forwarding classes."
+--     DEFVAL      { {} }
+--     ::= { tnMirrorSourceSubscriberEntry 10 }
+--
+-- tnMirrorSourceSubEgressEnabled  OBJECT-TYPE
+--     SYNTAX       TruthValue
+--     MAX-ACCESS   read-create
+--     STATUS       current
+--     DESCRIPTION
+--         "The value of tnMirrorSourceSubEgressEnabled specifies whether packets
+--         egressing the SAPs will be mirrored.  If set to 'true', egress packets
+--         will be mirrored."
+--     DEFVAL { false }
+--     ::= { tnMirrorSourceSubscriberEntry 11 }
+--
+-- tnMirrorSourceSubIngressEnabled  OBJECT-TYPE
+--     SYNTAX       TruthValue
+--     MAX-ACCESS   read-create
+--     STATUS       current
+--     DESCRIPTION
+--         "The value of tnMirrorSourceSubIngressEnabled specifies whether packets
+--         ingressing the SAPs will be mirrored. If set to 'true', ingress packets
+--         will be mirrored."
+--     DEFVAL { false }
+--     ::= { tnMirrorSourceSubscriberEntry 12 }
+
+--
+-- mirror source isa application-assurance-group table
+--
+
+-- tnMirrorSourceIsaAaGrpTable OBJECT-TYPE
+--     SYNTAX       SEQUENCE OF TMirrorSourceIsaAaGrpEntry
+--     MAX-ACCESS   not-accessible
+--     STATUS       current
+--     DESCRIPTION
+--         "This table defines a list of (physical interface) tmnxBsxIsaAaGrpEntry
+--          rows for each mirror source"
+--     ::= { tnMirrorSourceObjects 9 }
+--
+-- tnMirrorSourceIsaAaGrpEntry OBJECT-TYPE
+--     SYNTAX       TMirrorSourceIsaAaGrpEntry
+--     MAX-ACCESS   not-accessible
+--     STATUS       current
+--     DESCRIPTION
+--         "Each row reprsents information about an tmnxBsxIsaAaGrpEntry associated
+--          with a Mirror source defined in tnMirrorSourceTable.
+--          Entries are created by user.
+--          Entries are deleted by user, or by agent when the tnMirrorSourceTable
+--          entry is destroyed.
+--
+--          Entries in this table have an implied StorageType of 'volatile'.
+--          That is, configured mirror source information is not persistent
+--          across system restarts."
+--     INDEX { tnSysSwitchId, tnMirrorSourceIndex, tnMirrorSourceIsaAaGrpIndex }
+--     ::= { tnMirrorSourceIsaAaGrpTable 1 }
+--
+-- TMirrorSourceIsaAaGrpEntry ::= SEQUENCE
+--     {
+--         tnMirrorSourceIsaAaGrpIndex           Integer32,
+--         tnMirrorSourceIsaAaGrpRowStatus       RowStatus,
+--         tnMirrorSourceIsaAaGrpUnknownOnly     TruthValue,
+--         tnMirrorSourceIsaAaGrpLastChgd        TimeStamp
+--     }
+--
+-- tnMirrorSourceIsaAaGrpIndex  OBJECT-TYPE
+--     SYNTAX       Integer32
+--     MAX-ACCESS   not-accessible
+--     STATUS       current
+--     DESCRIPTION
+--         "tnMirrorSourceIsaAaGrpIndex specifies the ISA Application
+--          Assurance Group TIMETRA-BSX-NG-MIB::tmnxBsxIsaAaGroupIndex
+--          as the mirror source defined by tnMirrorSourceIndex."
+--     ::= { tnMirrorSourceIsaAaGrpEntry 1 }
+--
+-- tnMirrorSourceIsaAaGrpRowStatus  OBJECT-TYPE
+--     SYNTAX       RowStatus
+--     MAX-ACCESS   read-create
+--     STATUS       current
+--     DESCRIPTION
+--         "tnMirrorSourceIsaAaGrpRowStatus specifies the creation and
+--          deletion of entries in tnMirrorSourceIsaAaGrpTable.
+--          The only values supported during a set operation are
+--          createAndGo(4), createAndWait(5) and destroy(6)."
+--     ::= { tnMirrorSourceIsaAaGrpEntry 2 }
+--
+-- tnMirrorSourceIsaAaGrpUnknownOnly  OBJECT-TYPE
+--     SYNTAX       TruthValue
+--     MAX-ACCESS   read-create
+--     STATUS       current
+--     DESCRIPTION
+--         "tnMirrorSourceIsaAaGrpUnknownOnly specifies the
+--          type of traffic to be mirrored by the ISA-AA Group.
+--
+--          If this value is set to 'true', packets traversing the
+--          ISA-AA Group will be mirrored only if not identified as a
+--          particular protocol. If 'false', all packets will be
+--          mirrored."
+--     DEFVAL { true }
+--     ::= { tnMirrorSourceIsaAaGrpEntry 3 }
+--
+-- tnMirrorSourceIsaAaGrpLastChgd  OBJECT-TYPE
+--     SYNTAX      TimeStamp
+--     MAX-ACCESS  read-only
+--     STATUS      current
+--     DESCRIPTION
+--          "The value of tnMirrorSourceIsaAaGrpLastChgd indicates the sysUpTime
+--           at the time of the last modification of this entry.
+--
+--           If no changes were made to the entry since the last re-initialization
+--           of the local network management subsystem, then this object contains
+--           a zero value."
+--     ::= { tnMirrorSourceIsaAaGrpEntry 4 }
+
+------------------------------------
+-- Mirror Source Last Changed Objects
+------------------------------------
+-- tnMirrorSrcTblLastChgd OBJECT-TYPE
+--     SYNTAX      TimeStamp
+--     MAX-ACCESS  read-only
+--     STATUS      current
+--     DESCRIPTION
+--          "The value of  tnMirrorSrcTblLastChgd indicates the sysUpTime
+--           at the time of the last modification of tnMirrorSourceTable.
+--
+--           If no changes were made to the table since the last re-initialization
+--           of the local network management subsystem, then this object contains
+--           a zero value."
+--     ::= { tnMirrorSourceObjects 10 }
+--
+-- tnMirrorSrcIpFltrTblLastChgd OBJECT-TYPE
+--     SYNTAX      TimeStamp
+--     MAX-ACCESS  read-only
+--     STATUS      current
+--     DESCRIPTION
+--          "The value of  tnMirrorSrcIpFltrTblLastChgd indicates the sysUpTime
+--           at the time of the last modification of tnMirrorSourceIpFilterTable.
+--
+--           If no changes were made to the table since the last re-initialization
+--           of the local network management subsystem, then this object contains
+--           a zero value."
+--     ::= { tnMirrorSourceObjects 11 }
+--
+-- tnMirrorSrcMacFltrTblLastChgd OBJECT-TYPE
+--     SYNTAX      TimeStamp
+--     MAX-ACCESS  read-only
+--     STATUS      current
+--     DESCRIPTION
+--          "The value of tnMirrorSrcMacFltrTblLastChgd indicates the sysUpTime
+--           at the time of the last modification of tnMirrorSourceMacFilterTable.
+--
+--           If no changes were made to the table since the last re-initialization
+--           of the local network management subsystem, then this object contains
+--           a zero value."
+--     ::= { tnMirrorSourceObjects 12 }
+--
+-- tnMirrorSrcIngLblTblLastChgd OBJECT-TYPE
+--     SYNTAX      TimeStamp
+--     MAX-ACCESS  read-only
+--     STATUS      current
+--     DESCRIPTION
+--          "The value of  tnMirrorSrcIngLblTblLastChgd indicates the sysUpTime
+--           at the time of the last modification of tnMirrorSourceIngressLabelTable.
+--
+--           If no changes were made to the table since the last re-initialization
+--           of the local network management subsystem, then this object contains
+--           a zero value."
+--     ::= { tnMirrorSourceObjects 13 }
+--
+-- tnMirrorSrcPortTblLastChgd OBJECT-TYPE
+--     SYNTAX      TimeStamp
+--     MAX-ACCESS  read-only
+--     STATUS      current
+--     DESCRIPTION
+--          "The value of  tnMirrorSrcPortTblLastChgd indicates the sysUpTime
+--           at the time of the last modification of tnMirrorSourcePortTable.
+--
+--           If no changes were made to the table since the last re-initialization
+--           of the local network management subsystem, then this object contains
+--           a zero value."
+--     ::= { tnMirrorSourceObjects 14 }
+--
+-- tnMirrorSrcSapTblLastChgd OBJECT-TYPE
+--     SYNTAX      TimeStamp
+--     MAX-ACCESS  read-only
+--     STATUS      current
+--     DESCRIPTION
+--          "The value of  tnMirrorSrcSapTblLastChgd indicates the sysUpTime
+--           at the time of the last modification of tnMirrorSourceSapTable.
+--
+--           If no changes were made to the table since the last re-initialization
+--           of the local network management subsystem, then this object contains
+--           a zero value."
+--     ::= { tnMirrorSourceObjects 15 }
+--
+-- tnMirrorSrcIsaAaGrpTblLastChgd OBJECT-TYPE
+--     SYNTAX      TimeStamp
+--     MAX-ACCESS  read-only
+--     STATUS      current
+--     DESCRIPTION
+--          "The value of tnMirrorSrcIsaAaGrpTblLastChgd indicates the sysUpTime
+--           at the time of the last modification of tnMirrorSourceIsaAaGrpTable.
+--
+--           If no changes were made to the table since the last re-initialization
+--           of the local network management subsystem, then this object contains
+--           a zero value."
+--     ::= { tnMirrorSourceObjects 16 }
+
+--
+-- Notification Objects
+--
+-- tnMirrorSourceChangeType  OBJECT-TYPE
+--     SYNTAX      INTEGER {
+--                     modified (1),
+--                     deleted  (2),
+--                     activated (3),
+--                     deactivated (4)
+--                 }
+--     MAX-ACCESS  accessible-for-notify
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnMirrorSourceChangeType specifies the type of
+--          change made to a IP or MAC filter, IP or MAC filter entry,
+--          sap, or subscriber associated with a configured mirror-source
+--          as indicated by the value of tnMirrorSourceIndex.
+--
+--          The values 'activated' and 'deactivated' apply only to
+--          subscriber IDs as indicated by the value of tnMirrorSourceSubIdent."
+--     ::= { tnMirrorSourceNotifyObjects 1 }
+--
+-- tnMirrorSourceFilterId  OBJECT-TYPE
+--     SYNTAX      TFilterID
+--     MAX-ACCESS  accessible-for-notify
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnMirrorSourceFilterId specifies the filter id
+--          for which this notification is being sent."
+--     ::= { tnMirrorSourceNotifyObjects 3 }
+--
+-- tnMirrorSourceFilterEntryId  OBJECT-TYPE
+--     SYNTAX      TEntryIdOrZero
+--     MAX-ACCESS  accessible-for-notify
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnMirrorSourceFilterEntryId specifies the entry
+--          in the filter for which this notification is being sent.
+--
+--          If set to 0, the attempted modification was to a global
+--          filter parameter."
+--     ::= { tnMirrorSourceNotifyObjects 4 }
+--
+-- tnMirrorSourceFilterObject  OBJECT-TYPE
+--     SYNTAX      OBJECT IDENTIFIER
+--     MAX-ACCESS  accessible-for-notify
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnMirrorSourceFilterObject specifies which
+--          object (containing a filter) the operator tried to change."
+--     ::= { tnMirrorSourceNotifyObjects 7 }
+--
+-- tnMirrorSourceFilterDescr  OBJECT-TYPE
+--     SYNTAX      DisplayString
+--     MAX-ACCESS  accessible-for-notify
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnMirrorSourceFilterDescr specifies additional
+--          information on the reason for sending the event."
+--     ::= { tnMirrorSourceNotifyObjects 8 }
+--
+-- tnMirrorFilterSvcId OBJECT-TYPE
+--     SYNTAX      TmnxServId
+--     MAX-ACCESS  accessible-for-notify
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnMirrorFilterSvcId specifies the service id
+--          to which this notification applies."
+--     ::= { tnMirrorSourceNotifyObjects 9 }
+--
+-- tnMirrorFilterPortId  OBJECT-TYPE
+--     SYNTAX      TmnxPortID
+--     MAX-ACCESS  accessible-for-notify
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnMirrorFilterPortId specifies together
+--          with tnMirrorFilterSapEncapValue the portId
+--          to which this notification applies."
+--     ::= { tnMirrorSourceNotifyObjects 10 }
+--
+-- tnMirrorFilterSapEncapValue  OBJECT-TYPE
+--     SYNTAX      TmnxEncapVal
+--     MAX-ACCESS  accessible-for-notify
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnMirrorFilterSapEncapValue specifies together
+--          with tnMirrorFilterPortId the portId
+--          to which this notification applies."
+--     ::= { tnMirrorSourceNotifyObjects 11 }
+--
+-- tnMirrorFilterSdpBindId  OBJECT-TYPE
+--     SYNTAX      SdpBindId
+--     MAX-ACCESS  accessible-for-notify
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnMirrorFilterSdpBindId specifies the
+--         sdp Bind Id to which this notification applies."
+--     ::= { tnMirrorSourceNotifyObjects 12 }
+--
+-- tnMirrorFilterType  OBJECT-TYPE
+--     SYNTAX      TFilterType
+--     MAX-ACCESS  accessible-for-notify
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnMirrorFilterType specifies the
+--           filter type this notification reports about."
+--     ::= { tnMirrorSourceNotifyObjects 13 }
+--
+-- tnMirrorFilterDirection  OBJECT-TYPE
+--     SYNTAX      INTEGER { ingress(1), egress(2) }
+--     MAX-ACCESS  accessible-for-notify
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnMirrorFilterDirection specifies the
+--          the direction (ingress/egress) the filter is applied
+--          about which this notification reports."
+--     ::= { tnMirrorSourceNotifyObjects 14 }
+--
+-- tnMirrorFilterId  OBJECT-TYPE
+--     SYNTAX      TFilterID
+--     MAX-ACCESS  accessible-for-notify
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnMirrorFilterId specifies the
+--          filter Id about which this notification reports."
+--     ::= { tnMirrorSourceNotifyObjects 15 }
+--
+-- tnMirrorFilterIfIndex  OBJECT-TYPE
+--     SYNTAX      InterfaceIndexOrZero
+--     MAX-ACCESS  accessible-for-notify
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnMirrorFilterIfIndex specifies the
+--          interface about which this notification reports."
+--     ::= { tnMirrorSourceNotifyObjects 16 }
+--
+-- tnMirrorFilterIfName  OBJECT-TYPE
+--     SYNTAX      TNamedItem
+--     MAX-ACCESS  accessible-for-notify
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnMirrorFilterIfName specifies the
+--          interface about which this notification reports."
+--     ::= { tnMirrorSourceNotifyObjects 17 }
+
+--
+-- Notification Information
+--
+
+-- tnMirrorSourceEnabled NOTIFICATION-TYPE
+--     OBJECTS { tnMirrorSourceIndex
+--             }
+--     STATUS  current
+--     DESCRIPTION
+--         "The tnMirrorSourceEnabled event is generated when the mirror
+--          source is enabled."
+--     ::= { tnMirrorNotifications 1 }
+--
+-- tnMirrorSourceDisabled NOTIFICATION-TYPE
+--     OBJECTS { tnMirrorSourceIndex
+--             }
+--     STATUS  current
+--     DESCRIPTION
+--         "The tnMirrorSourceDisabled event is generated when the mirror
+--          source is disabled."
+--     ::= { tnMirrorNotifications 2 }
+--
+-- tnMirrorDestinationEnabled NOTIFICATION-TYPE
+--     OBJECTS { tnMirrorDestinationIndex
+--             }
+--     STATUS  current
+--     DESCRIPTION
+--         "The tnMirrorDestinationEnabled event is generated when the mirror
+--          destination is enabled."
+--     ::= { tnMirrorNotifications 3 }
+--
+-- tnMirrorDestinationDisabled NOTIFICATION-TYPE
+--     OBJECTS { tnMirrorDestinationIndex
+--             }
+--     STATUS  current
+--     DESCRIPTION
+--         "The tnMirrorDestinationDisabled event is generated when the mirror
+--          destination is disabled."
+--     ::= { tnMirrorNotifications 4 }
+--
+-- tnMirrorSourceRemovedBySystem NOTIFICATION-TYPE
+--     OBJECTS { tnMirrorSourceIndex
+--             }
+--     STATUS  current
+--     DESCRIPTION
+--         "The tnMirrorSourceRemovedBySystem event is generated when the
+--          mirror source is removed by the system."
+--     ::= { tnMirrorNotifications 5 }
+--
+-- tnMirrorSourceIpFilterChange       NOTIFICATION-TYPE
+--     OBJECTS { tnMirrorSourceIndex,
+--               tnMirrorSourceFilterId,
+--               tnMirrorSourceFilterEntryId,
+--               tnMirrorSourceChangeType
+--             }
+--     STATUS  current
+--     DESCRIPTION
+--         "The tnMirrorSourceIpFilterChange event is generated when a IP filter or
+--          filter entry associated with the mirror-source indicated by
+--          tnMirrorSourceIndex is 'modified' or 'deleted'.  If the only the base
+--          filter is modified, tnMirrorSourceFilterEntryId will have a value
+--          of 0."
+--     ::= { tnMirrorNotifications 6 }
+--
+-- tnMirrorSourceMacFilterChange       NOTIFICATION-TYPE
+--     OBJECTS { tnMirrorSourceIndex,
+--               tnMirrorSourceFilterId,
+--               tnMirrorSourceFilterEntryId,
+--               tnMirrorSourceChangeType
+--             }
+--     STATUS  current
+--     DESCRIPTION
+--         "The tnMirrorSourceMacFilterChange event is generated when a MAC
+--          filter or filter entry associated with the mirror-source indicated by
+--          tnMirrorSourceIndex is 'modified' or 'deleted'.  If the only the base
+--          filter is modified, tnMirrorSourceFilterEntryId will have a value
+--          of 0."
+--     ::= { tnMirrorNotifications 7 }
+--
+-- tnMirrorSourceSapChange       NOTIFICATION-TYPE
+--     OBJECTS { tnMirrorSourceIndex,
+--               tnMirrorSourceSapPortId,
+--               tnMirrorSourceSapEncapValue,
+--               tnMirrorSourceChangeType
+--             }
+--     STATUS  current
+--     DESCRIPTION
+--         "The tnMirrorSourceSapChange event is generated when a SAP associated
+--          with the mirror-source indicated by tnMirrorSourceIndex is 'modified'
+--          or 'deleted'."
+--     ::=  { tnMirrorNotifications 8 }
+--
+-- tnMirrorSourceSubChange   NOTIFICATION-TYPE
+--     OBJECTS { tnMirrorSourceIndex,
+--               tnMirrorSourceSubIdent,
+--               tnMirrorSourceChangeType
+--             }
+--     STATUS  current
+--     DESCRIPTION
+--         "The tnMirrorSourceSubChange event is generated when a subscriber
+--          associated with the mirror-source indicated by tnMirrorSourceIndex
+--          is 'activated', 'deactivated', 'modified' or 'deleted'."
+--     ::=  { tnMirrorNotifications 9 }
+--
+-- tnMirrorSourceIPFltrChangeReject  NOTIFICATION-TYPE
+--     OBJECTS { tnMirrorSourceIndex,
+--               tnMirrorSourceFilterId,
+--               tnMirrorSourceFilterEntryId
+--             }
+--     STATUS  current
+--     DESCRIPTION
+--         "The tnMirrorSourceIPFltrChangeReject event is generated when
+--          an operator is trying to modify a filter or a filter-entry
+--          of a filter that cannot currently be changed because the
+--          filter is being used for mirrorring."
+--     ::=  { tnMirrorNotifications 10 }
+--
+-- tnMirrorSourceIP6FltrChangeReject  NOTIFICATION-TYPE
+--     OBJECTS { tnMirrorSourceIndex,
+--               tnMirrorSourceFilterId,
+--               tnMirrorSourceFilterEntryId
+--             }
+--     STATUS  current
+--     DESCRIPTION
+--         "The tnMirrorSourceIP6FltrChangeReject event is generated when
+--          an operator is trying to modify a filter or a filter-entry
+--          of a filter that cannot currently be changed because the
+--          filter is being used for mirrorring."
+--     ::=  { tnMirrorNotifications 11 }
+--
+-- tnMirrorSourceMacFltrChangeReject  NOTIFICATION-TYPE
+--     OBJECTS { tnMirrorSourceIndex,
+--               tnMirrorSourceFilterId,
+--               tnMirrorSourceFilterEntryId
+--             }
+--     STATUS  current
+--     DESCRIPTION
+--         "The tnMirrorSourceMacFltrChangeReject event is generated when
+--          an operator is trying to modify a filter or a filter-entry
+--          of a filter that cannot currently be changed because the
+--          filter is being used for mirrorring."
+--     ::=  { tnMirrorNotifications 12 }
+--
+-- tnMirrorSourceFilterAssignReject  NOTIFICATION-TYPE
+--     OBJECTS { tnMirrorSourceFilterObject,
+--               tnMirrorSourceFilterDescr
+--             }
+--     STATUS  current
+--     DESCRIPTION
+--         "The tnMirrorSourceFilterAssignReject event is generated when
+--          an operator is trying to modify a filter assignment
+--          of a filter that cannot currently be changed because the
+--          filter is being used for mirrorring."
+--     ::=  { tnMirrorNotifications 13 }
+--
+-- tnMirrorDestinationChangeReject  NOTIFICATION-TYPE
+--     OBJECTS { tnMirrorDestinationIndex
+--             }
+--     STATUS  current
+--     DESCRIPTION
+--         "The tnMirrorDestinationChangeReject event is generated when
+--          an operator is trying to modify a mirror destination
+--          that cannot currently be changed because the destination
+--          is being used for mirrorring."
+--     ::=  { tnMirrorNotifications 14 }
+--
+-- tnMirrorSourceFilterOverruled  NOTIFICATION-TYPE
+--     OBJECTS { tnMirrorSourceFilterObject,
+--               tnMirrorSourceFilterDescr
+--             }
+--     STATUS  current
+--     DESCRIPTION
+--         "The tnMirrorSourceFilterOverruled event is generated when
+--          an assignment of a filter used for mirroring is overruled
+--          with another filter assignment.
+--
+--          This situation may occur while using Time-Of-Day Suites."
+--     ::=  { tnMirrorNotifications 15 }
+--
+-- tnMirrorSourceFilterAssignWarn  NOTIFICATION-TYPE
+--     OBJECTS { tnMirrorSourceFilterObject,
+--               tnMirrorSourceFilterDescr
+--             }
+--     STATUS  current
+--     DESCRIPTION
+--         "The tnMirrorSourceFilterAssignWarn event is generated when
+--          an operator has made a filter assignment of a filter that is being
+--          used for mirrorring, while that assignment may be overruled."
+--     ::=  { tnMirrorNotifications 16 }
+--
+-- tnMirrorFilterAssignToSapWarn  NOTIFICATION-TYPE
+--     OBJECTS { tnMirrorFilterSvcId,
+--               tnMirrorFilterPortId,
+--               tnMirrorFilterSapEncapValue,
+--               tnMirrorFilterType,
+--               tnMirrorFilterDirection,
+--               tnMirrorFilterId
+--             }
+--     STATUS  current
+--     DESCRIPTION
+--         "The tnMirrorFilterAssignToSapWarn event is generated when
+--          an operator assignes a filter to a SAP while this filter
+--          is being used by LI."
+--     ::=  { tnMirrorNotifications 17 }
+--
+-- tnMirrorFilterAssignToSdpWarn  NOTIFICATION-TYPE
+--     OBJECTS { tnMirrorFilterSvcId,
+--               tnMirrorFilterSdpBindId,
+--               tnMirrorFilterType,
+--               tnMirrorFilterDirection,
+--               tnMirrorFilterId
+--             }
+--     STATUS  current
+--     DESCRIPTION
+--         "The tnMirrorFilterAssignToSdpWarn event is generated when
+--          an operator assignes a filter to a SDP while this filter
+--          is being used by LI."
+--     ::=  { tnMirrorNotifications 18 }
+--
+-- tnMirrorFilterAssignToItfWarn  NOTIFICATION-TYPE
+--     OBJECTS { tnMirrorFilterIfIndex,
+--               tnMirrorFilterIfName,
+--               tnMirrorFilterType,
+--               tnMirrorFilterDirection,
+--               tnMirrorFilterId
+--             }
+--     STATUS  current
+--     DESCRIPTION
+--         "The tnMirrorFilterAssignToItfWarn event is generated when
+--          an operator assignes a filter to an interface while this filter
+--          is being used by LI."
+--     ::=  { tnMirrorNotifications 19 }
+
+--
+-- Conformance Information
+--
+
+-- tnMirrorCompliances  OBJECT IDENTIFIER ::= { tnMirrorConformance 1 }
+-- tnMirrorGroups       OBJECT IDENTIFIER ::= { tnMirrorConformance 2 }
+
+
+-- compliance statements
+
+-- tnMirrorCompliance MODULE-COMPLIANCE
+--    ::= { tnMirrorCompliances 1 }
+
+-- tnMirrorR2r1Compliance MODULE-COMPLIANCE
+--    STATUS  obsolete
+--    DESCRIPTION
+--            "The compliance statement for revision 2.1 of
+--             TIMETRA-MIRROR-MIB for management of extended Mirror
+--             features on Nokia 7x50 SR series systems."
+--    MODULE  this module
+--        MANDATORY-GROUPS {
+--            tnMirrorDestinationR2r1Group,
+--            tnMirrorDestinationR2r1RemoteSourceGroup,
+--            tnMirrorSourceGroup,
+--            tnMirrorNotificationsGroup
+--        }
+--    ::= { tnMirrorCompliances 2 }
+
+-- tnMirrorV6v0Compliance MODULE-COMPLIANCE
+--    STATUS  current
+--    DESCRIPTION
+--            "The compliance statement for revision 2.1 of
+--             TIMETRA-MIRROR-MIB for management of extended Mirror
+--             features on Nokia 7x50 SR series systems."
+--    MODULE  this module
+--        MANDATORY-GROUPS {
+--            tnMirrorDestinationV6v0Group,
+--            tnMirrorDestinationR2r1RemoteSourceGroup,
+--            tnMirrorSourceV6v0Group,
+--            tnMirrorBsxV6v0Group,
+--            tnMirrorNotificationsGroup,
+--            tnMirrorSourceNotificationsV6v0Group
+--        }
+--    ::= { tnMirrorCompliances 3 }
+
+-- units of conformance
+
+-- tnMirrorDestinationGroup OBJECT-GROUP
+--    ::= { tnMirrorGroups 1 }
+
+-- tnMirrorDestinationRemoteSourceGroup OBJECT-GROUP
+--    ::= { tnMirrorGroups 2 }
+
+-- tnMirrorSourceGroup OBJECT-GROUP
+--    OBJECTS {   tnMirrorSourceAdminStatus,
+--                tnMirrorSourceIpFilterRowStatus,
+--                tnMirrorSourceMacFilterRowStatus,
+--                tnMirrorSourceIngressLabelRowStatus,
+--                tnMirrorSourcePortRowStatus,
+--                tnMirrorSourcePortEgressEnabled,
+--                tnMirrorSourcePortIngressEnabled,
+--                tnMirrorSourceSapRowStatus,
+--                tnMirrorSourceSapEgressEnabled,
+--                tnMirrorSourceSapIngressEnabled
+--            }
+--    STATUS      obsolete
+--    DESCRIPTION
+--        "The group of objects supporting management of mirror sources
+--         on Nokia 7x50 SR series systems."
+--    ::= { tnMirrorGroups 3 }
+
+-- tnMirrorNotificationsGroup NOTIFICATION-GROUP
+--    NOTIFICATIONS   {   tnMirrorSourceEnabled,
+--                        tnMirrorSourceDisabled,
+--                        tnMirrorDestinationEnabled,
+--                        tnMirrorDestinationDisabled,
+--                        tnMirrorSourceRemovedBySystem
+--                    }
+--    STATUS      current
+--    DESCRIPTION
+--        "the group of notifications supporting management of mirror
+--        source and destination operational state changes on Nokia
+--        7x50 SR series system.."
+--    ::= { tnMirrorGroups 4 }
+
+-- tnMirrorDestinationR2r1Group OBJECT-GROUP
+--    OBJECTS {   tnMirrorDestinationRowStatus,
+--                tnMirrorDestinationDescription,
+--                tnMirrorDestinationFC,
+--                tnMirrorDestinationRemoteSource,
+--                tnMirrorDestinationSapPortId,
+--                tnMirrorDestinationSapEncapValue,
+--                tnMirrorDestinationSdpNumber,
+--                tnMirrorDestinationAdminStatus,
+--                tnMirrorDestinationOperStatus,
+--                tnMirrorDestinationSliceSize,
+--                tnMirrorDestinationSdpEgrSvcLabel,
+--                tnMirrorDestinationSapEgressQosPolicyId,
+--                tnMirrorDestinationEncapsulation,
+--                tnMirrorDestinationSdpOperEgrSvcLabel
+--            }
+--    STATUS      obsolete
+--    DESCRIPTION
+--        "The group of objects supporting management of mirror destinations
+--         on Nokia 7x50 SR series systems."
+--    ::= { tnMirrorGroups 5 }
+
+-- tnMirrorDestinationR2r1RemoteSourceGroup OBJECT-GROUP
+--    OBJECTS {   tnMirrorDestinationRemoteSourceAddr,
+--                tnMirrorDestinationRemoteSourceLabelSignaling,
+--                tnMirrorDestinationRemoteSourceIngSvcLabel,
+--                tnMirrorDestinationRemoteSourceRowStatus,
+--                tnMirrorDestinationRemoteSourceOperIngSvcLabel
+--            }
+--    STATUS      current
+--    DESCRIPTION
+--        "The group of objects supporting management of remote sources
+--         associated with mirror destinations on Nokia 7x50 SR series
+--         systems."
+--    ::= { tnMirrorGroups 6 }
+
+-- tnMirrorR2r1ObsoleteGroup OBJECT-GROUP
+--    OBJECTS {   tnMirrorDestinationSdpDestEncap,
+--                tnMirrorDestinationTranslateDisable,
+--                tnMirrorDestinationPppoeDestMacAddr,
+--                tnMirrorDestinationPppoeSrcMacAddr,
+--                tnMirrorDestinationPppoeEtype,
+--                tnMirrorDestinationPppoeSessionId
+--            }
+--    STATUS      current
+--    DESCRIPTION
+--        "The group of objects which were obsoleted from 2.0 release
+--         on Nokia 7x50 SR series systems."
+--    ::= { tnMirrorGroups 7 }
+
+-- tnMirrorNotifyObjsV5v0Group OBJECT-GROUP
+--    OBJECTS {   tnMirrorDestinationIndex,
+--                tnMirrorSourceIndex
+--            }
+--    STATUS      obsolete
+--    DESCRIPTION
+--        "The group of objects supporting management of notifications
+--         on Nokia 7x50 SR series systems."
+--    ::= { tnMirrorGroups 8 }
+
+-- tnMirrorDestinationV6v0Group OBJECT-GROUP
+--    OBJECTS {   tnMirrorDestinationRowStatus,
+--                tnMirrorDestinationDescription,
+--                tnMirrorDestinationFC,
+--                tnMirrorDestinationRemoteSource,
+--                tnMirrorDestinationSapPortId,
+--                tnMirrorDestinationSapEncapValue,
+--                tnMirrorDestinationSdpNumber,
+--                tnMirrorDestinationAdminStatus,
+--                tnMirrorDestinationOperStatus,
+--                tnMirrorDestinationSliceSize,
+--                tnMirrorDestinationSdpEgrSvcLabel,
+--                tnMirrorDestinationSapEgressQosPolicyId,
+--                tnMirrorDestinationEncapsulation,
+--                tnMirrorDestinationSdpOperEgrSvcLabel,
+--                tnMirrorDestinationEnablePortId,
+--                tnMirrorDestSapEgrIpMirrorSA,
+--                tnMirrorDestSapEgrIpMirrorDA,
+--                tnMirrorDestLastChanged,
+--                tnMirrorDestTableLastChnged,
+--                tnMirrorDestRemoteSrcLastChgd,
+--                tnMirrorDestRemSrcTblLastChgd
+--            }
+--    STATUS      current
+--    DESCRIPTION
+--        "The group of objects supporting management of mirror destinations
+--         on Nokia 7x50 SR series systems."
+--    ::= { tnMirrorGroups 9 }
+
+-- tnMirrorSourceV6v0Group OBJECT-GROUP
+--    OBJECTS {   tnMirrorSourceAdminStatus,
+--                tnMirrorSourceRowStatus,
+--                tnMirrorSourceIpFilterRowStatus,
+--                tnMirrorSourceMacFilterRowStatus,
+--                tnMirrorSourceIngressLabelRowStatus,
+--                tnMirrorSourcePortRowStatus,
+--                tnMirrorSourcePortEgressEnabled,
+--                tnMirrorSourcePortIngressEnabled,
+--                tnMirrorSourceSapRowStatus,
+--                tnMirrorSourceSapEgressEnabled,
+--                tnMirrorSourceSapIngressEnabled,
+--                tnMirrorSourceSubTableLastChnged,
+--                tnMirrorSourceSubRowStatus,
+--                tnMirrorSourceSubLastChanged,
+--                tnMirrorSourceSubPortId,
+--                tnMirrorSourceSubEncapValue,
+--                tnMirrorSourceSubIpAddrType,
+--                tnMirrorSourceSubIpAddr,
+--                tnMirrorSourceSubMacAddr,
+--                tnMirrorSourceSubSLAProfName,
+--                tnMirrorSourceSubFC,
+--                tnMirrorSourceSubEgressEnabled,
+--                tnMirrorSourceSubIngressEnabled,
+--                tnMirrorSourceLastChgd,
+--                tnMirrorSourceIpFilterLastChgd,
+--                tnMirrorSourceMacFilterLastChgd,
+--                tnMirrorSourceIngLabelLastChgd,
+--                tnMirrorSourcePortLastChgd,
+--                tnMirrorSourceSapLastChgd,
+--                tnMirrorSrcTblLastChgd,
+--                tnMirrorSrcIpFltrTblLastChgd,
+--                tnMirrorSrcMacFltrTblLastChgd,
+--                tnMirrorSrcIngLblTblLastChgd,
+--                tnMirrorSrcPortTblLastChgd,
+--                tnMirrorSrcSapTblLastChgd
+--              }
+--    STATUS      current
+--    DESCRIPTION
+--        "The group of objects supporting management of mirror sources
+--         on Nokia 7xx0 SR series systems."
+--    ::= { tnMirrorGroups 10 }
+
+-- tnMirrorNotifyObjsV6v0Group OBJECT-GROUP
+--    OBJECTS {   tnMirrorDestinationIndex,
+--                tnMirrorSourceIndex,
+--                tnMirrorSourceSapPortId,
+--                tnMirrorSourceSapEncapValue,
+--                tnMirrorSourceSubIdent,
+--                tnMirrorSourceChangeType,
+--                tnMirrorSourceFilterId,
+--                tnMirrorSourceFilterEntryId,
+--                tnMirrorSourceFilterObject,
+--                tnMirrorSourceFilterDescr,
+--                tnMirrorFilterSvcId,
+--                tnMirrorFilterPortId,
+--                tnMirrorFilterSapEncapValue,
+--                tnMirrorFilterSdpBindId,
+--                tnMirrorFilterType,
+--                tnMirrorFilterDirection,
+--                tnMirrorFilterId,
+--                tnMirrorFilterIfIndex,
+--                tnMirrorFilterIfName
+--            }
+--    STATUS      current
+--    DESCRIPTION
+--        "The group of objects supporting management of notifications
+--         on Nokia 7x50 SR series systems."
+--    ::= { tnMirrorGroups 11 }
+
+-- tnMirrorSourceNotificationsV6v0Group     NOTIFICATION-GROUP
+--    NOTIFICATIONS   {   tnMirrorSourceIpFilterChange,
+--                        tnMirrorSourceMacFilterChange,
+--                        tnMirrorSourceSapChange,
+--                        tnMirrorSourceSubChange,
+--                        tnMirrorSourceIPFltrChangeReject,
+--                        tnMirrorSourceIP6FltrChangeReject,
+--                        tnMirrorSourceMacFltrChangeReject,
+--                        tnMirrorSourceFilterAssignReject,
+--                        tnMirrorDestinationChangeReject,
+--                        tnMirrorSourceFilterOverruled,
+--                        tnMirrorSourceFilterAssignWarn,
+--                        tnMirrorFilterAssignToSapWarn,
+--                        tnMirrorFilterAssignToSdpWarn,
+--                        tnMirrorFilterAssignToItfWarn
+--                    }
+--    STATUS      current
+--    DESCRIPTION
+--        "The group of notifications supporting management of mirror
+--        source association changes added for the 6.0 release of Nokia
+--        7xx0 SR series system."
+--    ::= { tnMirrorGroups 12 }
+
+-- tnMirrorBsxV6v0Group OBJECT-GROUP
+--    OBJECTS {   tnMirrorSourceIsaAaGrpRowStatus,
+--                tnMirrorSourceIsaAaGrpUnknownOnly,
+--                tnMirrorSourceIsaAaGrpLastChgd,
+--                tnMirrorSrcIsaAaGrpTblLastChgd
+--            }
+--    STATUS      current
+--    DESCRIPTION
+--        "The group of objects supporting management of BSX
+--        (Application Assurance) mirror changes added for the
+--        6.0 release of Nokia 7xx0 SR series system."
+--    ::= { tnMirrorGroups 13 }
+
+END

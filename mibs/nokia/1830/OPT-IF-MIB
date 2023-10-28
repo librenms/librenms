@@ -1,0 +1,667 @@
+OPT-IF-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32,
+      Unsigned32, transmission
+          FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, TruthValue
+          FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+          FROM SNMPv2-CONF
+    ifIndex
+          FROM IF-MIB;
+
+--  This is the MIB module for the OTN Interface objects.
+
+optIfMibModule MODULE-IDENTITY
+    LAST-UPDATED "200308130000Z"
+    ORGANIZATION "IETF AToM MIB Working Group"
+    CONTACT-INFO
+       "WG charter:
+          http://www.ietf.org/html.charters/atommib-charter.html
+
+        Mailing Lists:
+           General Discussion: atommib@research.telcordia.com
+           To Subscribe: atommib-request@research.telcordia.com
+        Editor: Hing-Kam Lam
+         Email: kam.lam@alcatel-lucent.com"
+    DESCRIPTION
+       "The MIB module to describe pre-OTN and OTN interfaces.
+
+        Copyright (C) The Internet Society (2003).  This version
+        of this MIB module is part of RFC 3591;  see the RFC
+        itself for full legal notices."
+    REVISION  "200308130000Z"
+    DESCRIPTION
+       "Initial version, published as RFC 3591."
+    ::={ transmission 133 }
+
+-- textual conventions
+
+OptIfAcTI ::= TEXTUAL-CONVENTION
+  STATUS  current
+  DESCRIPTION
+    "The trace identifier (TI) accepted at the receiver."
+  SYNTAX  OCTET STRING (SIZE(64))
+
+OptIfBitRateK ::= TEXTUAL-CONVENTION
+  STATUS  current
+  DESCRIPTION
+    "Indicates the index 'k' that is used to
+     represent a supported bit rate and the different
+     versions of OPUk, ODUk and OTUk.
+     Allowed values of k are defined in ITU-T G.709.
+     Currently allowed values in G.709 are:
+        k=1 represents an approximate bit rate of 2.5 Gbit/s,
+        k=2 represents an approximate bit rate of 10 Gbit/s,
+        k=3 represents an approximate bit rate of 40 Gbit/s."
+  SYNTAX  Integer32
+
+OptIfDEGM ::= TEXTUAL-CONVENTION
+  STATUS  current
+  DESCRIPTION
+    "Indicates the threshold level for declaring a Degraded Signal
+     defect (dDEG).  A dDEG shall be declared if OptIfDEGM
+     consecutive bad PM Seconds are detected."
+  SYNTAX  Unsigned32 (2..10)
+
+OptIfDEGThr ::= TEXTUAL-CONVENTION
+  STATUS  current
+  DESCRIPTION
+    "Indicates the threshold level for declaring a performance
+     monitoring (PM) Second to be bad.  A PM Second is declared bad if
+     the percentage of detected errored blocks in that second is
+     greater than or equal to OptIfDEGThr."
+  SYNTAX  Unsigned32 (1..100)
+
+OptIfDirectionality ::= TEXTUAL-CONVENTION
+  STATUS  current
+  DESCRIPTION
+    "Indicates the directionality of an entity."
+  SYNTAX  INTEGER {
+    sink(1),
+    source(2),
+    bidirectional(3)
+    }
+
+OptIfSinkOrSource ::= TEXTUAL-CONVENTION
+  STATUS  current
+  DESCRIPTION
+    "Indicates the directionality of an entity
+     that is allowed only to be a source or sink."
+  SYNTAX  INTEGER {
+    sink(1),
+    source(2)
+    }
+
+OptIfExDAPI ::= TEXTUAL-CONVENTION
+  STATUS  current
+  DESCRIPTION
+    "The Destination Access Point Identifier (DAPI)
+     expected by the receiver."
+  SYNTAX  OCTET STRING (SIZE(16))
+
+OptIfExSAPI ::= TEXTUAL-CONVENTION
+  STATUS  current
+  DESCRIPTION
+    "The Source Access Point Identifier (SAPI)
+     expected by the receiver."
+  SYNTAX  OCTET STRING (SIZE(16))
+
+OptIfIntervalNumber ::= TEXTUAL-CONVENTION
+  STATUS  current
+  DESCRIPTION
+    "Uniquely identifies a 15-minute interval.  The interval
+     identified by 1 is the most recently completed interval, and
+    the interval identified by n is the interval immediately
+     preceding the one identified by n-1."
+  SYNTAX  Unsigned32 (1..96)
+
+OptIfTIMDetMode ::= TEXTUAL-CONVENTION
+  STATUS  current
+  DESCRIPTION
+    "Indicates the mode of the Trace Identifier Mismatch (TIM)
+     Detection function."
+  SYNTAX  INTEGER {
+    off(1),
+    dapi(2),
+    sapi(3),
+    both(4)
+    }
+
+OptIfTxTI ::= TEXTUAL-CONVENTION
+  STATUS  current
+  DESCRIPTION
+    "The trace identifier (TI) transmitted."
+  SYNTAX  OCTET STRING (SIZE(64))
+
+-- object groups
+
+optIfObjects OBJECT IDENTIFIER ::= { optIfMibModule 1 }
+optIfConfs OBJECT IDENTIFIER ::= { optIfMibModule 2 }
+
+optIfOTUk OBJECT IDENTIFIER ::= { optIfObjects 7 }
+optIfODUk OBJECT IDENTIFIER ::= { optIfObjects 8 }
+
+optIfGroups OBJECT IDENTIFIER ::= { optIfConfs 1 }
+optIfCompl OBJECT IDENTIFIER ::= { optIfConfs 2 }
+-- the optIfOTUk group
+-- This group handles the configuration
+-- information for OTUk layers.
+
+-- OTUk config table
+
+optIfOTUkConfigTable OBJECT-TYPE
+  SYNTAX  SEQUENCE OF OptIfOTUkConfigEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "A table of OTUk configuration information."
+  ::= { optIfOTUk 1 }
+
+optIfOTUkConfigEntry OBJECT-TYPE
+  SYNTAX  OptIfOTUkConfigEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "A conceptual row that contains OTUk configuration
+     information of an interface."
+  INDEX  { ifIndex }
+  ::= { optIfOTUkConfigTable 1 }
+
+OptIfOTUkConfigEntry ::=
+  SEQUENCE {
+    optIfOTUkBitRateK                    OptIfBitRateK,
+    optIfOTUkTraceIdentifierTransmitted  OptIfTxTI,
+    optIfOTUkSAPIExpected                OptIfExSAPI,
+    optIfOTUkTraceIdentifierAccepted     OptIfAcTI,
+    optIfOTUkTIMDetMode                  OptIfTIMDetMode,
+    optIfOTUkTIMActEnabled               TruthValue
+    }
+optIfOTUkBitRateK OBJECT-TYPE
+  SYNTAX  OptIfBitRateK
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "Indicates the bit rate of the entity."
+  ::= { optIfOTUkConfigEntry 2 }
+
+optIfOTUkTraceIdentifierTransmitted OBJECT-TYPE
+  SYNTAX  OptIfTxTI
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+    "The trace identifier transmitted.
+     This object is applicable when optIfOTUkDirectionality
+     has the value source(2) or bidirectional(3).  It must not
+     be instantiated in rows where optIfOTUkDirectionality
+     has the value sink(1).
+     If no value is ever set by a management entity for this
+     object, system-specific default value will be used.
+     Any implementation that instantiates this object must
+     document the system-specific default value or how it
+     is derived."
+  ::= { optIfOTUkConfigEntry 3 }
+
+optIfOTUkSAPIExpected OBJECT-TYPE
+  SYNTAX  OptIfExSAPI
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+    "The SAPI expected by the receiver.
+     This object is only applicable to the sink function, i.e.,
+     only when optIfOTUkDirectionality has the value sink(1)
+     or bidirectional(3).  It must not be instantiated in rows
+     where optIfOTUkDirectionality has the value source(2).
+     This object has no effect when optIfOTUkTIMDetMode has
+     the value off(1)."
+  ::= { optIfOTUkConfigEntry 5 }
+
+optIfOTUkTraceIdentifierAccepted OBJECT-TYPE
+  SYNTAX  OptIfAcTI
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The actual trace identifier accepted.
+     This object is only applicable to the sink function, i.e.,
+     only when optIfOTUkDirectionality has the value sink(1)
+     or bidirectional(3).  It must not be instantiated in rows
+     where optIfOTUkDirectionality has the value source(2).
+     The value of this object is unspecified when
+     optIfOTUkCurrentStatus indicates a near-end defect
+     (i.e., ssf(3), lof(4), ais(5), lom(6)) that prevents
+     extraction of the trace message."
+  ::= { optIfOTUkConfigEntry 6 }
+
+optIfOTUkTIMDetMode OBJECT-TYPE
+  SYNTAX  OptIfTIMDetMode
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+    "Indicates the mode of the Trace Identifier Mismatch (TIM)
+     Detection function.
+     This object is only applicable to the sink function, i.e.,
+     only when optIfOTUkDirectionality has the value sink(1)
+     or bidirectional(3).  It must not be instantiated in rows
+     where optIfOTUkDirectionality has the value source(2).
+     The default value of this object is off(1)."
+  ::= { optIfOTUkConfigEntry 7 }
+
+optIfOTUkTIMActEnabled OBJECT-TYPE
+  SYNTAX  TruthValue
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+    "Indicates whether the Trace Identifier Mismatch (TIM)
+     Consequent Action function is enabled.
+     This object is only applicable to the sink function, i.e.,
+     only when optIfOTUkDirectionality has the value sink(1)
+     or bidirectional(3).  It must not be instantiated in rows
+     where optIfOTUkDirectionality has the value source(2).
+     This object has no effect when optIfOTUkTIMDetMode has
+     the value off(1).
+     The default value of this object is false(2)."
+  ::= { optIfOTUkConfigEntry 8 }
+
+-- the optIfODUk group
+-- This group handles the configuration information
+-- for the ODUk layers.
+-- ODUk config table
+
+optIfODUkConfigTable OBJECT-TYPE
+  SYNTAX  SEQUENCE OF OptIfODUkConfigEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "A table of ODUk configuration information."
+  ::= { optIfODUk 1 }
+
+optIfODUkConfigEntry OBJECT-TYPE
+  SYNTAX  OptIfODUkConfigEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "A conceptual row that contains ODUk configuration
+     information of an interface."
+  INDEX  { ifIndex }
+  ::= { optIfODUkConfigTable 1 }
+
+OptIfODUkConfigEntry ::=
+  SEQUENCE {
+    optIfODUkTtpPresent                  TruthValue
+    }
+
+optIfODUkTtpPresent OBJECT-TYPE
+  SYNTAX  TruthValue
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "This object has the value true(1) if the ifEntry under which
+     it is instantiated contains an ODUk Trail Termination Point,
+     i.e., is the endpoint of an ODUk path.  In that case there
+     will be a corresponding row in the ODUk TTP config table and
+     it will not be possible to create corresponding rows in the
+     ODUk NIM config table.  This object has the value false(2)
+     if the ifEntry under which it is instantiated contains an
+     intermediate ODUk Connection Termination Point.  In that case
+     there is no corresponding row in the ODUk TTP config table,
+     but it will be possible to create corresponding rows in the
+     ODUk NIM config table.  This object also affects the allowable
+     options in rows created in the GCC12 config table and in the
+     ODUkT config table, as specified in the DESCRIPTION clauses
+     of the columns in those tables."
+  ::= { optIfODUkConfigEntry 5 }
+
+-- ODUk Trail Termination Point (TTP) config table
+
+optIfODUkTtpConfigTable OBJECT-TYPE
+  SYNTAX  SEQUENCE OF OptIfODUkTtpConfigEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "A table of ODUk TTP configuration information."
+  ::= { optIfODUk 2 }
+
+optIfODUkTtpConfigEntry OBJECT-TYPE
+  SYNTAX  OptIfODUkTtpConfigEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "A conceptual row that contains ODUk TTP configuration
+     information of an interface."
+  INDEX  { ifIndex }
+  ::= { optIfODUkTtpConfigTable 1 }
+
+OptIfODUkTtpConfigEntry ::=
+  SEQUENCE {
+    optIfODUkTtpTraceIdentifierTransmitted  OptIfTxTI,
+    optIfODUkTtpSAPIExpected                OptIfExSAPI,
+    optIfODUkTtpTraceIdentifierAccepted     OptIfAcTI,
+    optIfODUkTtpTIMDetMode                  OptIfTIMDetMode,
+    optIfODUkTtpTIMActEnabled               TruthValue
+    }
+
+optIfODUkTtpTraceIdentifierTransmitted OBJECT-TYPE
+  SYNTAX  OptIfTxTI
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+    "The trace identifier transmitted.
+     This object is applicable when optIfODUkDirectionality
+     has the value source(2) or bidirectional(3).  It must not
+     be instantiated in rows where optIfODUkDirectionality
+     has the value sink(1).
+     If no value is ever set by a management entity for this
+     object, system-specific default value will be used.
+     Any implementation that instantiates this object must
+     document the system-specific default value or how it
+     is derived."
+  ::= { optIfODUkTtpConfigEntry 1 }
+
+optIfODUkTtpSAPIExpected OBJECT-TYPE
+  SYNTAX  OptIfExSAPI
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+    "The SAPI expected by the receiver.
+     This object is only applicable to the sink function, i.e.,
+     only when optIfODUkDirectionality has the value sink(1)
+     or bidirectional(3).  It must not be instantiated in rows
+     where optIfODUkDirectionality has the value source(2).
+     This object has no effect when optIfODUkTtpTIMDetMode has
+     the value off(1)."
+  ::= { optIfODUkTtpConfigEntry 3 }
+
+optIfODUkTtpTraceIdentifierAccepted OBJECT-TYPE
+  SYNTAX  OptIfAcTI
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The actual trace identifier accepted.
+     This object is only applicable to the sink function, i.e.,
+     only when optIfODUkDirectionality has the value sink(1)
+     or bidirectional(3).  It must not be instantiated in rows
+     where optIfODUkDirectionality has the value source(2).
+     The value of this object is unspecified when
+     optIfODUkTtpCurrentStatus indicates a near-end defect
+     (i.e., oci(0), lck(1), ssf(5)) that prevents extraction
+     of the trace message."
+  ::= { optIfODUkTtpConfigEntry 4 }
+
+optIfODUkTtpTIMDetMode OBJECT-TYPE
+  SYNTAX  OptIfTIMDetMode
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+    "Indicates the mode of the Trace Identifier Mismatch (TIM)
+     Detection function.
+     This object is only applicable to the sink function, i.e.,
+     only when optIfODUkDirectionality has the value sink(1)
+     or bidirectional(3).  It must not be instantiated in rows
+     where optIfODUkDirectionality has the value source(2).
+     The default value of this object is off(1)."
+  ::= { optIfODUkTtpConfigEntry 5 }
+
+optIfODUkTtpTIMActEnabled OBJECT-TYPE
+  SYNTAX  TruthValue
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+    "Indicates whether the Trace Identifier Mismatch (TIM)
+     Consequent Action function is enabled.
+     This object is only applicable to the sink function, i.e.,
+     only when optIfODUkDirectionality has the value sink(1)
+     or bidirectional(3).  It must not be instantiated in rows
+     where optIfODUkDirectionality has the value source(2).
+     This object has no effect when optIfODUkTtpTIMDetMode has
+     the value off(1).
+     The default value of this object is false(2)."
+  ::= { optIfODUkTtpConfigEntry 6 }
+
+-- ODUk Non-intrusive monitoring (Nim) config table
+
+optIfODUkNimConfigTable OBJECT-TYPE
+  SYNTAX  SEQUENCE OF OptIfODUkNimConfigEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "A table of ODUkNim configuration information."
+  ::= { optIfODUk 4 }
+
+optIfODUkNimConfigEntry OBJECT-TYPE
+  SYNTAX  OptIfODUkNimConfigEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "A conceptual row that contains ODUkNim configuration
+     information of an interface.  Each instance must
+     correspond to an instance of optIfODUkConfigEntry
+     for which optIfODUkTtpPresent has the value false(2).
+
+     Instances of this conceptual row persist across
+     agent restarts, and read-create columns other
+     than the status column may be modified while the
+     row is active."
+  INDEX  { ifIndex, optIfODUkNimDirectionality }
+  ::= { optIfODUkNimConfigTable 1 }
+
+OptIfODUkNimConfigEntry ::=
+  SEQUENCE {
+    optIfODUkNimDirectionality              OptIfSinkOrSource,
+    optIfODUkNimSAPIExpected                OptIfExSAPI,
+    optIfODUkNimTraceIdentifierAccepted     OptIfAcTI,
+    optIfODUkNimTIMDetMode                  OptIfTIMDetMode,
+    optIfODUkNimTIMActEnabled               TruthValue
+   }
+
+optIfODUkNimDirectionality OBJECT-TYPE
+  SYNTAX  OptIfSinkOrSource
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "Specifies the monitor point for the ODUk Path non-intrusive
+     monitoring function.  The value source(2) is not allowed
+     if the corresponding instance of optIfODUkDirectionality
+     has the value sink(1), and the value sink(1) is not allowed
+     if the corresponding instance of optIfODUkDirectionality
+     has the value source(2).  Either the value sink(1) or
+     source(2) is allowed if the corresponding instance of
+     optIfODUkDirectionality has the value bidirectional(3).
+
+     The value sink(1) means monitoring at the sink direction
+     path signal of the ODUk CTP.
+
+     The value source(2) means monitoring at the source direction
+     path signal of the ODUk CTP.  Monitoring the source direction
+     of an ODUk CTP is necessary in those cases where the ODUk CTP
+     is at an SNCP (Subnetwork Connection Protection) end (e.g., see
+     Figure I.1.2/G.874.1).  If one would like to get the performance
+     of the protected connection, one cannot use the NIM function
+     at both ODUk CTP sinks (before the matrix), instead one should
+     monitor the signal at the source ODUk CTP after the matrix."
+  ::= { optIfODUkNimConfigEntry 1 }
+
+
+optIfODUkNimSAPIExpected OBJECT-TYPE
+  SYNTAX  OptIfExSAPI
+  MAX-ACCESS  read-create
+  STATUS  current
+  DESCRIPTION
+    "The SAPI expected by the receiver.
+     This object has no effect if optIfODUkNimTIMDetMode has
+     the value off(1) or dapi(2)."
+  ::= { optIfODUkNimConfigEntry 3 }
+
+optIfODUkNimTraceIdentifierAccepted OBJECT-TYPE
+  SYNTAX  OptIfAcTI
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The actual trace identifier accepted.  The value of
+     this object is unspecified if optIfODUkNimCurrentStatus
+     has any of the bit positions oci(0), lck(1), or ssf(5)
+     set or if optIfODUkNimRowStatus has any value other
+     than active(1)."
+  ::= { optIfODUkNimConfigEntry 4 }
+
+optIfODUkNimTIMDetMode OBJECT-TYPE
+  SYNTAX  OptIfTIMDetMode
+  MAX-ACCESS  read-create
+  STATUS  current
+  DESCRIPTION
+    "Indicates the mode of the Trace Identifier Mismatch (TIM)
+     Detection function."
+  ::= { optIfODUkNimConfigEntry 5 }
+
+optIfODUkNimTIMActEnabled OBJECT-TYPE
+  SYNTAX  TruthValue
+  MAX-ACCESS  read-create
+  STATUS  current
+  DESCRIPTION
+    "Indicates whether the Trace Identifier Mismatch (TIM)
+     Consequent Action function is enabled."
+  ::= { optIfODUkNimConfigEntry 6 }
+
+-- units of conformance
+optIfOTUkCommonGroup OBJECT-GROUP
+  OBJECTS  {
+    optIfOTUkBitRateK
+    }
+  STATUS  current
+  DESCRIPTION
+    "A collection of configuration objects
+     applicable to all OTUk interfaces."
+  ::= { optIfGroups 30 }
+
+optIfOTUkSourceGroup OBJECT-GROUP
+  OBJECTS  {
+    optIfOTUkTraceIdentifierTransmitted
+    }
+  STATUS  current
+  DESCRIPTION
+    "A collection of configuration objects
+     applicable to OTUk interfaces that
+     support source functions."
+  ::= { optIfGroups 31 }
+
+optIfOTUkSinkGroup OBJECT-GROUP
+  OBJECTS  {
+    optIfOTUkSAPIExpected,
+    optIfOTUkTraceIdentifierAccepted,
+    optIfOTUkTIMDetMode,
+    optIfOTUkTIMActEnabled
+    }
+  STATUS  current
+  DESCRIPTION
+    "A collection of configuration objects
+     applicable to OTUk interfaces that
+     support sink functions."
+  ::= { optIfGroups 32 }
+
+optIfODUkGroup OBJECT-GROUP
+  OBJECTS  {
+    optIfODUkTtpPresent
+    }
+  STATUS  current
+  DESCRIPTION
+    "A collection of configuration objects
+     applicable to all ODUk interfaces."
+  ::= { optIfGroups 34 }
+
+optIfODUkTtpSourceGroup OBJECT-GROUP
+  OBJECTS  {
+    optIfODUkTtpTraceIdentifierTransmitted
+    }
+  STATUS  current
+  DESCRIPTION
+    "A collection of configuration objects
+     applicable to all interfaces that support
+     ODUk trail termination source functions."
+  ::= { optIfGroups 35 }
+
+  optIfODUkTtpSinkGroup OBJECT-GROUP
+  OBJECTS  {
+    optIfODUkTtpSAPIExpected,
+    optIfODUkTtpTraceIdentifierAccepted,
+    optIfODUkTtpTIMDetMode,
+    optIfODUkTtpTIMActEnabled
+    }
+  STATUS  current
+  DESCRIPTION
+    "A collection of ODUk configuration objects
+     applicable to all interfaces that support
+     ODUk trail termination sink functions."
+  ::= { optIfGroups 36 }
+
+optIfODUkNimGroup OBJECT-GROUP
+  OBJECTS  {
+    optIfODUkNimSAPIExpected,
+    optIfODUkNimTraceIdentifierAccepted,
+    optIfODUkNimTIMDetMode,
+    optIfODUkNimTIMActEnabled
+    }
+  STATUS  current
+  DESCRIPTION
+    "A collection of ODUk Nim configuration objects."
+  ::= { optIfGroups 37 }
+
+  -- compliance specifications
+  optIfOtnConfigCompl MODULE-COMPLIANCE
+  STATUS  current
+  DESCRIPTION
+    "Implementation requirements for the OTN configuration
+     functions defined in this MIB module."
+  MODULE -- this module
+
+
+    GROUP  optIfOTUkSourceGroup
+    DESCRIPTION
+      "This group is mandatory for interfaces of ifType
+       opticalChannel(195) that support OTUk layer functions
+       and for which the corresponding instance of
+       optIfOTUkDirectionality has the value source(2) or
+       bidirectional(3)."
+
+    GROUP  optIfOTUkSinkGroup
+    DESCRIPTION
+      "This group is mandatory for interfaces of ifType
+       opticalChannel(195) that support OTUk layer functions
+       and for which the corresponding instance of
+       optIfOTUkDirectionality has the value sink(1) or
+       bidirectional(3)."
+
+    GROUP  optIfOTUkCommonGroup
+    DESCRIPTION
+      "This group is mandatory for interfaces of ifType
+       opticalChannel(195) that support OTUk layer functions."
+
+    GROUP  optIfODUkTtpSourceGroup
+    DESCRIPTION
+      "This group is mandatory for interfaces of ifType
+       opticalChannel(195) for which the corresponding
+       instance of optIfODUkTtpPresent has the value
+       true(1) and for which the corresponding instance of
+       optIfODUkDirectionality has the value source(2) or
+       bidirectional(3).  It may be implemented only if the
+       optIfODUkGroup is also implemented."
+
+    GROUP  optIfODUkTtpSinkGroup
+    DESCRIPTION
+      "This group is mandatory for interfaces of ifType
+       opticalChannel(195) for which the corresponding
+       instance of optIfODUkTtpPresent has the value
+       true(1) and for which the corresponding instance of
+       optIfODUkDirectionality has the value sink(1) or
+       bidirectional(3).  It may be implemented only if the
+       optIfODUkGroup is also implemented."
+
+    GROUP  optIfODUkNimGroup
+    DESCRIPTION
+      "This group is mandatory for interfaces of ifType
+       opticalChannel(195) for which the corresponding
+       instance of optIfODUkTtpPresent has the value
+       false(2).  It may be implemented only if the
+       optIfODUkGroup is also implemented."
+
+    ::= { optIfCompl 1 }
+ END

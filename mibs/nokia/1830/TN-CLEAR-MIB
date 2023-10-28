@@ -1,0 +1,289 @@
+TN-CLEAR-MIB DEFINITIONS ::= BEGIN
+
+-- (c) Copyright 2023 Nokia Networks.  All rights reserved.
+-- This software is the confidential and proprietary property of
+-- Nokia and may only be used in accordance with the terms of the
+-- license agreement provided with this software.
+
+IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE,
+        NOTIFICATION-TYPE, Integer32,
+        Unsigned32                                      FROM SNMPv2-SMI
+
+--      MODULE-COMPLIANCE, OBJECT-GROUP,
+--      NOTIFICATION-GROUP                              FROM SNMPv2-CONF
+
+        TimeStamp                                       FROM SNMPv2-TC
+
+        tnSRMIBModules, tnSRObjs,
+        tnSRNotifyPrefix                                FROM TROPIC-GLOBAL-REG
+
+        TNamedItem, TmnxActionType                      FROM TN-TC-MIB
+
+        tnEventAppIndex                                 FROM TN-LOG-MIB
+
+        tnSysSwitchId                                   FROM TROPIC-SYSTEM-MIB
+        ;
+
+tnClearMIBModule MODULE-IDENTITY
+        LAST-UPDATED    "200501240000Z"
+        ORGANIZATION    "Nokia"
+        CONTACT-INFO
+            "Nokia 7x50 Support
+             Web: http://www.nokia.com/comps/pages/carrier_support.jhtml"
+        DESCRIPTION
+        "This document is the SNMP MIB module to manage and provision the
+        Nokia 7x50 system clear functions.
+
+        This SNMP MIB module (Specification) embodies Nokia's
+        proprietary intellectual property.  Nokia retains
+        all title and ownership in the Specification, including any
+        revisions.
+
+        Nokia grants all interested parties a non-exclusive
+        license to use and distribute an unmodified copy of this
+        Specification in connection with management of Nokia
+        products, and without fee, provided this copyright notice and
+        license appear on all copies.
+
+        This Specification is supplied 'as is', and Nokia
+        makes no warranty, either express or implied, as to the use,
+        operation, condition, or performance of the Specification."
+--
+--  Revision History
+--
+        REVISION        "200501240000Z"
+        DESCRIPTION     "Rev 2.1                24 Jan 2005 00:00
+                         2.1 release of the TIMETRA-CLEAR-MIB."
+
+        REVISION        "200406020000Z"
+        DESCRIPTION     "Rev 2.0R4                015 Jun 2004 00:00
+                         2.0R4 release of the TIMETRA-CLEAR-MIB."
+
+        REVISION        "200401150000Z"
+        DESCRIPTION     "Rev 2.0                15 Jan 2004 00:00
+                         2.0 release of the TIMETRA-CLEAR-MIB."
+
+        REVISION        "200308150000Z"
+        DESCRIPTION     "Rev 1.2                15 Aug 2003 00:00
+                         1.2 release of the TIMETRA-CLEAR-MIB."
+
+        REVISION        "200301200000Z"
+        DESCRIPTION     "Rev 1.0                20 Jan 2003 00:00
+                         1.0 Revision of the TIMETRA-CLEAR-MIB."
+
+        REVISION        "200202270000Z"
+        DESCRIPTION     "Rev 0.1                27 Feb 2002 00:00
+                         Initial version of the TIMETRA-CLEAR-MIB."
+
+        ::= { tnSRMIBModules 13 }
+
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+--
+--  Nokia 7x50 SR series Clear functions
+--
+
+tnClearObjs           OBJECT IDENTIFIER ::= { tnSRObjs 13 }
+tnClearNotificationsPrefix  OBJECT IDENTIFIER ::= { tnSRNotifyPrefix 13 }
+    tnClearNotifications          OBJECT IDENTIFIER ::= { tnClearNotificationsPrefix 0 }
+
+-- tnClearConformance    OBJECT IDENTIFIER ::= { tnSRConfs 13 }
+
+--
+--
+--  Nokia 7x50 SR series Clear Table
+--
+tnClearTable    OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TnClearEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tnClearTable provides the Nokia 7x50 SR series EMS a
+         way to execute the operational clear functions."
+    ::= { tnClearObjs 1 }
+
+tnClearEntry    OBJECT-TYPE
+    SYNTAX      TnClearEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry in the tnClearTable represents an operational clear
+         function.  Rows in this table are created by the agent when the
+         system is initialized.  They can be neither created nor destroyed
+         by SNMP SET requests."
+    INDEX { tnSysSwitchId, tnEventAppIndex, tnClearIndex }
+   ::= { tnClearTable 1 }
+
+TnClearEntry ::=
+    SEQUENCE {
+            tnClearIndex              Integer32,
+            tnClearName               TNamedItem,
+            tnClearParams             OCTET STRING,
+            tnClearAction             TmnxActionType,
+            tnClearLastClearedTime    TimeStamp,
+            tnClearResult             INTEGER,
+            tnClearErrorText          OCTET STRING
+        }
+
+tnClearIndex      OBJECT-TYPE
+        SYNTAX      Integer32 (1..65535)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The value of tnClearIndex specifies a unique clear function
+             within an application group.  The application group indexes,
+             tnEventAppIndex, are given in the tnEventAppTable in the
+             TN-LOG-MIB."
+        ::= { tnClearEntry 1 }
+
+tnClearName            OBJECT-TYPE
+        SYNTAX       TNamedItem
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+            "The name of the application clear function associated with this
+             row entry."
+        ::= { tnClearEntry 2 }
+
+tnClearParams          OBJECT-TYPE
+        SYNTAX        OCTET STRING (SIZE(0..255))
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+        "The tnClearParams string is a sequence of parameter name
+             value pairs to be used to determine the managed object to
+             which to apply the application clear function associated with
+             this row entry."
+        DEFVAL      { ''H }   -- the empty string
+        ::= { tnClearEntry 3 }
+
+tnClearAction          OBJECT-TYPE
+        SYNTAX        TmnxActionType
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "Setting tnClearAction to 'doAction (1)' causes the application
+             clear function associated with this row entry to be enacted."
+        DEFVAL { notApplicable }
+        ::= { tnClearEntry 4 }
+
+tnClearLastClearedTime    OBJECT-TYPE
+        SYNTAX      TimeStamp
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The tnClearLastClearedTime variable contains the sysUpTime
+             value when tnClearAction was last set to 'doAction (1)' to
+             run the application clear function associated with this row entry."
+        ::= { tnClearEntry 5 }
+
+tnClearResult             OBJECT-TYPE
+        SYNTAX       INTEGER {
+                         success (1),
+                         failure (2)
+                     }
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+            "The result of the last attempt to enact the application clear
+             function associated with this row entry."
+        ::= { tnClearEntry 6}
+
+tnClearErrorText         OBJECT-TYPE
+        SYNTAX       OCTET STRING (SIZE(0..255))
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+            "If the result of the last attempt to enact the application clear
+             function associated with this row entry failed, tnClearResult is
+             'failure (2)', tnClearErrorText contains a text string to further
+             explain the cause of the failure."
+        ::= { tnClearEntry 7 }
+
+--
+-- Dummy Scalars
+--
+tnClearScalar1 OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "A dummy scalar that satisfies a SNMP get request
+                     quickly when there is no 11QPE24 card provisioned.
+                     Otherwise, it has to traverse the remaining 11QPE24
+                     MIB to get to the next applicable item."
+    ::= { tnClearObjs 101 }
+
+tnClearScalar2 OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "A dummy scalar that satisfies a SNMP get request
+                     quickly when there is no 11QPE24 card provisioned.
+                     Otherwise, it has to traverse the remaining 11QPE24
+                     MIB to get to the next applicable item."
+    ::= { tnClearObjs 102 }
+
+ --
+ -- Notifications
+ --
+
+ tnClear NOTIFICATION-TYPE
+      OBJECTS {
+            tnClearName,
+            tnClearParams,
+            tnClearLastClearedTime,
+            tnClearResult,
+            tnClearErrorText
+      }
+      STATUS  current
+      DESCRIPTION
+          "The tnClear notification is generated to report the results
+           of the clear function that was run as a result of setting
+           tnClearAction to 'doAction'. "
+      ::= { tnClearNotifications 1 }
+
+--
+-- Conformance Information
+--
+-- tnClearCompliances OBJECT IDENTIFIER ::= { tnClearConformance 1 }
+-- tnClearGroups      OBJECT IDENTIFIER ::= { tnClearConformance 2 }
+
+-- compliance statements
+-- tnClearCompliance  MODULE-COMPLIANCE
+--     STATUS  current
+--     DESCRIPTION
+--             "The compliance statement for management of object clearing
+--              operations on Nokia 7x50 SR series systems."
+--     MODULE  this module
+--         MANDATORY-GROUPS {
+--             tnClearGroup,
+--             tnClearNotificationGroup
+--         }
+--     ::= { tnClearCompliances 1 }
+
+-- units of conformance
+
+-- tnClearGroup   OBJECT-GROUP
+--     OBJECTS {   tnClearName,
+--                 tnClearParams,
+--                 tnClearAction,
+--                 tnClearLastClearedTime,
+--                 tnClearResult,
+--                 tnClearErrorText
+--             }
+--     STATUS        current
+--     DESCRIPTION
+--         "The group of objects supporting management of object clearing
+--          capabilities on Nokia 7x50 SR series systems."
+--     ::= { tnClearGroups 1 }
+
+-- tnClearNotificationGroup NOTIFICATION-GROUP
+--     NOTIFICATIONS   {   tnClear
+--                     }
+--     STATUS        current
+--     DESCRIPTION
+--         "The group of notifications supporting the object clearing feature
+--          on Nokia 7x50 SR series systems."
+--     ::= { tnClearGroups 2 }
+--
+END

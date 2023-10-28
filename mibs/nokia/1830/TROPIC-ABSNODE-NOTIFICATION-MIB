@@ -1,0 +1,200 @@
+TROPIC-ABSNODE-NOTIFICATION-MIB DEFINITIONS ::= BEGIN
+
+-- (c) Copyright 2023 Nokia Networks.  All rights reserved.
+-- This software is the confidential and proprietary property of
+-- Nokia and may only be used in accordance with the terms of the
+-- license agreement provided with this software.
+
+IMPORTS
+      tnNotificationObjs,
+      tnTrapTime,
+      tnTrapObjectIDType,
+      tnTrapObjectID,
+      tnTrapCategory,
+      tnTrapDescr,
+      tnTrapData,
+      tnTrapServiceAffecting,
+      tnTrapEntityType,
+      tnTrapCondition                         FROM TROPIC-NOTIFICATION-MIB
+      MODULE-IDENTITY,
+      NOTIFICATION-TYPE                       FROM SNMPv2-SMI
+      tnAbsNodeMIBModules                       FROM TROPIC-GLOBAL-REG;
+
+  tnAbsNodeNotificationMIBModule MODULE-IDENTITY
+      LAST-UPDATED    "201802231200Z"
+      ORGANIZATION    "Nokia"
+      CONTACT-INFO    "Nokia
+                       Attn: Jeff Donnelly
+                       600 Mountain Avenue
+                       New Providence, NJ 07974
+
+                       Phone: +1 732 221 6408
+                       Email: jeff.donnelly@nokia.com"
+
+      DESCRIPTION "Abstract Node Notifications."
+
+      REVISION    "201802231200Z"
+      DESCRIPTION "Updated the contact info."
+
+      REVISION    "201611161200Z"
+      DESCRIPTION "Updated the contact info."
+
+      REVISION    "201610181200Z"
+      DESCRIPTION "Moved  the following event notifications to TROPIC-NOTIFICATION :
+                   tnAbsNodeCreatedNotif     (tnEventNotificationsAbsNode 1)
+                   tnAbsNodeDeletedNotif     (tnEventNotificationsAbsNode 2)
+                   tnAbsNodeModifiedNotif    (tnEventNotificationsAbsNode 3)."
+
+      REVISION    "201608031200Z"
+      DESCRIPTION "Added the following alarm notifications:
+                   tnAbsNodeDegradedRaisedNotif   (tnAlarmNotificationsAbsNode 3) to
+                   tnAbsNodeFailedClearedNotif    (tnAlarmNotificationsAbsNode 6)."
+
+      REVISION    "201602261200Z"
+      DESCRIPTION "Initial version."
+
+      ::= { tnAbsNodeMIBModules 2 }
+
+---------------------------------------------------------------------------
+-- Top Level Components of This MIB
+---------------------------------------------------------------------------
+  tnNotificationsAbsNode         OBJECT IDENTIFIER ::= { tnNotificationObjs 9 } -- !! see TROPIC-NOTIFICATION-MIB for already used ids
+  tnAlarmNotificationsAbsNode    OBJECT IDENTIFIER ::= { tnNotificationsAbsNode 1 }
+  tnEventNotificationsAbsNode    OBJECT IDENTIFIER ::= { tnNotificationsAbsNode 2 }
+
+-- **************************************************************************
+-- Extensions for TROPIC-TC MIB
+--   1. TnEntityType - Add absNodeSubnode, absNodeTeLink, absNodeOtsPort, absNodeIfGroup, absNodeOtLinePort
+--   2. TnCondition  - Add: ABSNODEOPSTATEUP, ABSNODEOPSTATEDOWN, ABSNODEOPSTATEDEG, ABSNODESHELFUNAVAIL
+--
+-- Extensions for TROPIC-NOTIFICATION-MIB
+--   1. Valid gmpls objectIdTypes:
+--      absNodeSubnodeObjectId     == 128  ?????
+--      absNodeTeLinkObjectId      == 129  ?????
+--      absNodeOtsPortObjectId     == 130  ?????
+--      absNodeIfGroupObjectId     == 131  ?????
+--      absNodeOtLineObjectId      == 132  ?????
+--
+--   2. tnTrapObjectId values
+--
+--        switch(objectIdType){
+--              case absNodeSubnodeObjectId:
+--                      subnodeId = objectId;
+--                      break;
+--
+--              case absNodeTeLinkObjectId:
+--                      teLinkId = objectId;
+--                      break;
+--
+--              case absNodeOtsPortObjectId:
+--                      otsPortId = objectId
+--                      break;
+--
+--              case absNodeIfGroupObjectId:
+--                      ifGroupId = objectId;
+--                      break;
+--
+--              case absNodeOtLineObjectId:
+--                      otLineId = objectId;
+--                      break;
+--        }
+
+-- ------------------------------------------------------------
+-- Abstract Node alarms
+-- ------------------------------------------------------------
+    tnAbsNodeRaisedNotif NOTIFICATION-TYPE
+        OBJECTS {
+            tnTrapTime,
+            tnTrapObjectIDType,
+            tnTrapObjectID,
+            tnTrapCategory,
+            tnTrapDescr,
+            tnTrapData,
+            tnTrapEntityType,
+            tnTrapCondition
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnAlarmNotificationsAbsNode 1 }
+
+    tnAbsNodeClearedNotif NOTIFICATION-TYPE
+        OBJECTS {
+            tnTrapTime,
+            tnTrapObjectIDType,
+            tnTrapObjectID,
+            tnTrapCategory,
+            tnTrapDescr,
+            tnTrapData,
+            tnTrapEntityType,
+            tnTrapCondition
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnAlarmNotificationsAbsNode 2 }
+
+    tnAbsNodeDegradedRaisedNotif  NOTIFICATION-TYPE
+        OBJECTS {
+            tnTrapTime,
+            tnTrapObjectIDType,
+            tnTrapObjectID,
+            tnTrapCategory,
+            tnTrapDescr,
+            tnTrapData,
+            tnTrapServiceAffecting,
+            tnTrapEntityType,
+            tnTrapCondition
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnAlarmNotificationsAbsNode 3 }
+
+    tnAbsNodeDegradedClearedNotif  NOTIFICATION-TYPE
+        OBJECTS {
+            tnTrapTime,
+            tnTrapObjectIDType,
+            tnTrapObjectID,
+            tnTrapCategory,
+            tnTrapDescr,
+            tnTrapData,
+            tnTrapServiceAffecting,
+            tnTrapEntityType,
+            tnTrapCondition
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnAlarmNotificationsAbsNode 4 }
+
+    tnAbsNodeFailedRaisedNotif  NOTIFICATION-TYPE
+        OBJECTS {
+            tnTrapTime,
+            tnTrapObjectIDType,
+            tnTrapObjectID,
+            tnTrapCategory,
+            tnTrapDescr,
+            tnTrapData,
+            tnTrapServiceAffecting,
+            tnTrapEntityType,
+            tnTrapCondition
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnAlarmNotificationsAbsNode 5 }
+
+    tnAbsNodeFailedClearedNotif  NOTIFICATION-TYPE
+        OBJECTS {
+            tnTrapTime,
+            tnTrapObjectIDType,
+            tnTrapObjectID,
+            tnTrapCategory,
+            tnTrapDescr,
+            tnTrapData,
+            tnTrapServiceAffecting,
+            tnTrapEntityType,
+            tnTrapCondition
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnAlarmNotificationsAbsNode 6 }
+
+
+END -- DEFINITION OF TROPIC-ABSNODE-NOTIFICATION-MIB

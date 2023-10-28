@@ -1,0 +1,3716 @@
+TN-SAS-QOS-MIB DEFINITIONS ::= BEGIN
+
+-- (c) Copyright 2023 Nokia Networks.  All rights reserved.
+-- This software is the confidential and proprietary property of
+-- Nokia and may only be used in accordance with the terms of the
+-- license agreement provided with this software.
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Unsigned32, Integer32, Counter64                 FROM SNMPv2-SMI
+
+    TEXTUAL-CONVENTION, RowStatus,
+    TruthValue,
+    TimeStamp                                        FROM SNMPv2-TC
+
+    tnSASObjs,
+    tnSASModules                                     FROM TROPIC-GLOBAL-REG
+
+    Dot1PPriority,
+    TItemDescription,
+    TNamedItem,
+    TDSCPNameOrEmpty,
+    TFCName,
+    TLspExpValue, TQueueId,
+    TEgressQueueId,
+    TSapIngressMeterId, TNetworkIngressMeterId,
+    TMeterMode, TPIRRate, TPlcyMode, TQWeight,
+    TMplsLspExpProfMapID, TPolicyID, TItemScope,
+    TBurstSize, TAdaptationRule, TCIRRate,TQPreempt   FROM TN-TC-MIB
+
+    tnSysSwitchId                                    FROM TROPIC-SYSTEM-MIB
+
+    tnSvcId                                          FROM TN-SERV-MIB
+
+    tnSapPortId, tnSapEncapValue                     FROM TN-SAP-MIB
+
+    tnSapIngressIndex, tnNetworkPolicyIndex,
+    tnSlopePolicyEntry, tnPortSchedulerPlcyEntry,
+    tnSapIngressFCEntry, tnSlopePolicy,
+    tnSapIngressEntry, tnNetworkPolicyEntry,
+    tnNetworkQueueEntry,tnPortSchedulerPlcyName       FROM TN-QOS-MIB
+    ;
+
+tnSASQosMIBModule   MODULE-IDENTITY
+        LAST-UPDATED    "201907120000Z"
+        ORGANIZATION    "Nokia"
+        CONTACT-INFO
+            "Nokia 7x50 Support
+             Web: http://www.nokia.com/comps/pages/carrier_support.jhtml"
+        DESCRIPTION
+            "This document is the SNMP MIB module to manage and provision
+             Quality of Service features on Nokia 7x50 systems.
+
+             This SNMP MIB module (Specification) embodies Nokia's
+             proprietary intellectual property.  Nokia retains
+             all title and ownership in the Specification, including any
+             revisions.
+
+             Nokia grants all interested parties a non-exclusive
+             license to use and distribute an unmodified copy of this
+             Specification in connection with management of Nokia
+             products, and without fee, provided this copyright notice and
+             license appear on all copies.
+
+             This Specification is supplied 'as is', and Nokia
+             makes no warranty, either express or implied, as to the use,
+             operation, condition, or performance of the Specification."
+
+--
+--  Revision History
+--
+
+        REVISION        "201907120000Z"
+        DESCRIPTION     "Added the following MIB table:
+                         tnSASPortPreemptSchedulerPlcyTable."
+
+        REVISION        "201806220000Z"
+        DESCRIPTION     "Modified ranges of the following textual conventions:
+                         TIngressCIRRate
+                         TIngressPIRRate."
+
+        REVISION        "201711100000Z"
+        DESCRIPTION     "Modified ranges of the following textual conventions:
+                         TIngressCIRRate
+                         TIngressPIRRate
+                         TIngressBurstSize."
+
+        REVISION        "201511020000Z"
+        DESCRIPTION     "Added the following MIB table:
+                         tMplsLspExpProfMapTable
+                         tMplsLspExpProfileTable."
+
+        REVISION        "201308220000Z"
+        DESCRIPTION     "Added the following to tnNetworkPolicyExtnTable:
+                         tnNetworkEgressRemarkType."
+
+        REVISION        "201308160000Z"
+        DESCRIPTION     "Added tnQosFrameBasedAccntTable by including
+                         the following previously commented scalars:
+                         tnQosIngressFrameBasedAccnt
+                         tnQosEgressFrameBasedAccnt."
+
+        REVISION        "201212050000Z"
+        DESCRIPTION     "Commented out unsupported MIB tables and
+                         attributes for 1830."
+
+        REVISION        "201209010000Z"
+        DESCRIPTION     "Changed the following index from read-only to
+                         not-accessible:
+                         tnSapIngQosMeterId."
+
+        REVISION        "200801090000Z"
+        DESCRIPTION     "Rev 1.0                09 Jan 2008 00:00
+                This is the 1.0 release of the TIMETRA-SAS-GLOBAL-MIB."
+        ::= { tnSASModules 5 }
+
+tnSASQosObjects                   OBJECT IDENTIFIER ::= { tnSASObjs 1 }
+-- tnSASQosNotifyPrefix              OBJECT IDENTIFIER ::= { tnSASNotifyPrefix 1}
+--     tnSASQosNotifications           OBJECT IDENTIFIER ::= { tnSASQosNotifyPrefix 0}
+-- tnSASQosConformance             OBJECT IDENTIFIER ::= { tnSASConfs 1 }
+
+tnAccessEgressObjects           OBJECT IDENTIFIER ::= { tnSASQosObjects 1 }
+tnSASSapIngressObjects          OBJECT IDENTIFIER ::= { tnSASQosObjects 2 }
+tnSASNetworkIngressObjects      OBJECT IDENTIFIER ::= { tnSASQosObjects 3 }
+tnSASSlopeObjects               OBJECT IDENTIFIER ::= { tnSASQosObjects 4 }
+tnSASSchedulerObjects           OBJECT IDENTIFIER ::= { tnSASQosObjects 5 }
+tnQosFrameBasedAccntObjects     OBJECT IDENTIFIER ::= { tnSASQosObjects 6 }
+tnSASNetworkObjects             OBJECT IDENTIFIER ::= { tnSASQosObjects 7 }
+tnMplsQosObjects                OBJECT IDENTIFIER ::= { tnSASQosObjects 8 }
+-- tnSASQueueMgmtObjects           OBJECT IDENTIFIER ::= { tnSASQosObjects 9 }
+-- tnSASSapEgressObjects           OBJECT IDENTIFIER ::= { tnSASQosObjects 10 }
+tnSASGeneralQosObjects          OBJECT IDENTIFIER ::= { tnSASQosObjects 21 }
+--
+-- TEXTUAL-CONVENTIONs for Nokia 7x50 SR series QoS Elements
+--
+-- TPolicyID ::= TEXTUAL-CONVENTION
+--     STATUS       current
+--     DESCRIPTION
+--         "the identification number of a policy."
+--     SYNTAX Unsigned32 (0..65535)
+
+-- TSapIngressPolicyID ::= TEXTUAL-CONVENTION
+--     STATUS       current
+--     DESCRIPTION
+--         "the identification number of a SAP ingress policy."
+--     SYNTAX TPolicyID
+
+-- TSapEgressPolicyID ::= TEXTUAL-CONVENTION
+--     STATUS       current
+--     DESCRIPTION
+--         "the identification number of a SAP egress policy."
+--     SYNTAX TPolicyID (1..65535)
+
+TAccessEgressPolicyID ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "the identification number of a Access egress policy."
+    SYNTAX TPolicyID (1..65535)
+
+
+-- TNetworkPolicyID ::= TEXTUAL-CONVENTION
+--     STATUS       current
+--     DESCRIPTION
+--         "the identification number of a network policy."
+--     SYNTAX TPolicyID (1..65535)
+
+TRemarkPolicyID ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "the identification number of a Remark policy."
+    SYNTAX TPolicyID (1..65535)
+
+-- TItemScope ::= TEXTUAL-CONVENTION
+--     STATUS       current
+--     DESCRIPTION
+--         "This textual-convention determines some aspects of an item's
+--         behavior regarding creation and use, unused entry garbage collection,
+--         and automated promulgation by Element Management System to
+--         other systems in the service domain.
+--
+--         TItemScope applies to SAP-ingress, SAP-egress, and Network policies,
+--         and to IP filters and MAC filters.
+--
+--         exclusive:
+--
+--             When the scope of an item is defined as exclusive, the item can
+--             only be applied once, for example to a single SAP.  Attempting
+--             to assign the policy to a second SAP is not allowed and will
+--             result in an error.  If the item is removed from the exclusive
+--             SAP, it will become available for assignment to another
+--             exclusive SAP.
+--
+--             A non-applied exclusive scope policy is a candidate to be removed
+--             from the system by a TBD garbage collection command.
+--
+--             The system default policies cannot be put into the exclusive scope.
+--             An error will be generated if scope exclusive is executed in
+--             any policies with a policy-id equal to 1.
+--
+--         template:
+--
+--             When the scope of an item is defined as template, the item can be
+--             applied any number of times.  Policies with template scope
+--             will not be considered for deletion by a TBD garbage collection
+--             command; all items of scope 'template' must be deleted explicitly.
+--
+--             The system default policies will always be scope template.
+--             An error will occur if a policy-id 1 is attempted to be
+--             set to scope exclusive."
+--     SYNTAX INTEGER { exclusive(1), template(2) }
+
+-- TItemMatch  ::= TEXTUAL-CONVENTION
+--     STATUS       current
+--     DESCRIPTION
+--         "when set to off, the item is not matched.
+--          when set to false, packets without the item match the filter.
+--          when set to true, packets with the item match the filter."
+--     SYNTAX INTEGER { off(1), false(2), true(3) }
+
+-- TPriority ::= TEXTUAL-CONVENTION
+--     STATUS       current
+--     DESCRIPTION
+--         "the priority to apply to a packet"
+--     SYNTAX INTEGER { low(1), high(2) }
+
+-- TPriorityOrDefault ::= TEXTUAL-CONVENTION
+--     STATUS       current
+--     DESCRIPTION
+--         "the priority to apply to a packet.
+--          when set to default(3), the priority from the default-action is used."
+--     SYNTAX INTEGER { low(1), high(2), default(3) }
+
+-- TProfile ::= TEXTUAL-CONVENTION
+--     STATUS       current
+--     DESCRIPTION
+--         "the profile marking of a packet at the ingress."
+--     SYNTAX INTEGER { in(1), out(2) }
+
+-- TProfileOrNone ::= TEXTUAL-CONVENTION
+--     STATUS       current
+--     DESCRIPTION
+--         "Profile marking of a packet."
+--     SYNTAX INTEGER { none (0), in(1), out(2) }
+
+-- TAdaptationRule ::= TEXTUAL-CONVENTION
+--     STATUS       current
+--     DESCRIPTION
+--         "The adaptation rule to be applied to calcluate the operational values
+--          for the specified entity."
+--     SYNTAX       INTEGER {
+--                      max    (1),
+--                      min    (2),
+--                      closest(3)
+--                  }
+
+-- TRemarkType ::=  TEXTUAL-CONVENTION
+--     STATUS       current
+--     DESCRIPTION
+--         "The remarking to be used."
+--     SYNTAX       INTEGER {
+--                      none       (1),
+--                      dscp       (2),
+--                      precedence (3)
+--                  }
+
+-- TPrecValue ::= TEXTUAL-CONVENTION
+--     STATUS       current
+--     DESCRIPTION
+--         "The precedence bits as used in the IPv4 header. This constitutes of
+--          3 bits and hence can hold the values from 0 to 7."
+--     SYNTAX       INTEGER (0..7)
+
+-- TPrecValueOrNone ::= TEXTUAL-CONVENTION
+--     STATUS       current
+--     DESCRIPTION
+--         "The precedence bits as used in the IPv4 header. This constitutes of
+--          3 bits and hence can hold the values from 0 to 7. The value '-1'
+--          specifies that the precedence value is undefined/unused."
+--     SYNTAX      INTEGER (-1 | 0..7)
+
+TIngressCIRRate ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "The rate to be used in kbps. The value -1 means maximum rate."
+    SYNTAX       Integer32 (-1 | 0..200000000)
+
+TIngressPIRRate ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The rate to be used in kbps. The value -1 means maximum rate."
+    SYNTAX      Integer32 (-1 | 0..200000000)
+
+-- TCIRRate ::= TEXTUAL-CONVENTION
+--     STATUS       current
+--     DESCRIPTION
+--         "The rate to be used in kbps. The value -1 means maximum rate."
+--     SYNTAX       INTEGER (-1 | 0..100000000)
+
+-- TPIRRate ::= TEXTUAL-CONVENTION
+--     STATUS      current
+--     DESCRIPTION
+--         "The rate to be used in kbps. The value -1 means maximum rate."
+--     SYNTAX      INTEGER (-1 | 1..100000000)
+
+-- TPIRRateOrZero ::= TEXTUAL-CONVENTION
+--     STATUS      current
+--     DESCRIPTION
+--         "The rate to be used in kbps. The value -1 means maximum rate. The
+--          value 0 means undefined rate."
+--     SYNTAX      INTEGER (-1 | 0..100000000)
+
+TIngressBurstSize ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "The amount of buffer space (in Kbits) assigned to a meter.
+         The value -1 means default value"
+    SYNTAX        Integer32 (-1 | 1..2146959)
+
+-- TBurstSize ::= TEXTUAL-CONVENTION
+--     STATUS       current
+--     DESCRIPTION
+--         "The amount of buffer space (in kbytes) assigned to a queue.
+--          The value -1 means that the actual value is derived from the
+--          corresponding buffer policy's default value."
+--     SYNTAX       INTEGER (-1 | 0..131072)
+
+-- TBurstPercent ::= TEXTUAL-CONVENTION
+--     STATUS       current
+--     DESCRIPTION
+--         "The percentage of buffer space assigned to a queue that is
+--          reserved for some purpose."
+--     SYNTAX       INTEGER (0..100)
+
+-- TBurstHundredthsOfPercent ::= TEXTUAL-CONVENTION
+--     STATUS      current
+--     DESCRIPTION
+--         "The percentage of buffer space assigned to a queue that is
+--          reserved for some purpose, defined to two decimal places."
+--    SYNTAX      Integer32 (0..10000)
+
+-- TBurstPercentOrDefault ::= TEXTUAL-CONVENTION
+--     STATUS       current
+--     DESCRIPTION
+--         "The percentage of buffer space assigned to a queue that is
+--          reserved for some purpose.
+--          The value -1 means that the actual value is derived from the
+--          corresponding buffer policy's default value."
+--     SYNTAX       INTEGER (-1 | 0..100)
+
+-- TRatePercent ::= TEXTUAL-CONVENTION
+--     STATUS       current
+--     DESCRIPTION
+--         "The percentage of maximum rate allowed."
+--     SYNTAX       INTEGER (0..100)
+
+-- TLevel ::= TEXTUAL-CONVENTION
+--     STATUS       current
+--     DESCRIPTION
+--         "The level of the specified entity while feeding into the parent."
+--     SYNTAX      INTEGER (1..8)
+
+-- TLevelOrDefault ::= TEXTUAL-CONVENTION
+--     STATUS       current
+--     DESCRIPTION
+--         "The level of the specified entity while feeding into the parent.
+--          The value 0 is used to denote a default value."
+--     SYNTAX       INTEGER (0|1..8)
+
+-- TWeight ::= TEXTUAL-CONVENTION
+--     STATUS       current
+--     DESCRIPTION
+--         "The weight of the specified entity while feeding into the parent."
+--     SYNTAX       INTEGER (0..100)
+
+-- TQWeight ::= TEXTUAL-CONVENTION
+--     STATUS       current
+--     DESCRIPTION
+--         "The Queue weight of the specified entity."
+--     SYNTAX       INTEGER (0 |1..100)
+
+-- TMeterMode ::= TEXTUAL-CONVENTION
+--     STATUS       current
+--     DESCRIPTION
+--         "Meter mode"
+--     SYNTAX       INTEGER {
+--                      priority(1),
+--                      profile (2)
+--                  }
+
+-- TPlcyMode ::= TEXTUAL-CONVENTION
+--     STATUS       current
+--     DESCRIPTION
+--         "Policy mode "
+--     SYNTAX       INTEGER {
+--                      strict (0),
+--                      roundRobin (1),
+--                      weightedRoundRobin (2),
+--                      weightedDeficitRoundRobin (3)
+--                  }
+
+TMeterRateMode ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Meter Rate mode.The mode can be configured as Two Rate Three Color
+        Marker (trTCM) or Single Rate Three Color Marker (srTCM).
+        The mode command can be executed at anytime."
+    SYNTAX       INTEGER {
+                     trtcm (1),
+                     srtcm (2),
+                     trtcm1 (3),
+                     trtcm2 (4)
+                 }
+
+TPlcyQuanta ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Policy Quata"
+    SYNTAX       Integer32
+
+-- TQueueMode ::= TEXTUAL-CONVENTION
+--     STATUS       current
+--     DESCRIPTION
+--         "The mode in which the queue is operating.
+--
+--          If the queue is operating in the 'priority' mode, it is
+--          capable of handling traffic differently with two distinct
+--          priorities. These priorities are assigned by the stages
+--          preceding the queueing framework in the system.
+--
+--          When the queue is operating in the 'profile' mode, in other
+--          words the color aware mode, the queue tries to provide the
+--          appropriate bandwidth to the packets with different profiles.
+--
+--          The profiles are assigned according to the configuration of the
+--          forwarding class or the sub-forwarding class.
+--
+--          In 'priority' mode, the queue does not have the functionality
+--          to support the profiled traffic and in such cases the queue
+--          will have a degraded performance. However, the converse is not
+--          valid and a queue in 'profile' mode should be capable of
+--          supporting the different priorities of traffic."
+--     SYNTAX       INTEGER {
+--                      priority(1),
+--                      profile (2)
+--                  }
+
+-- TEntryIndicator ::= TEXTUAL-CONVENTION
+--     STATUS       current
+--     DESCRIPTION
+--         "Uniquely identifies an entry in a policy or filter table. The
+--          value 0 is not a valid entry-id. When used as insertion point
+--          the value 0 indicates that entries must be inserted at the very
+--          beginning, i.e.before the first entry defined."
+--     SYNTAX Unsigned32 (0..65535)
+
+-- TEntryId ::= TEXTUAL-CONVENTION
+--     STATUS       current
+--     DESCRIPTION
+--         "uniquely identifies an entry in a policy or filter table.
+--          to facilitate insertion of entries in the tables, we recommend
+--          assigning entry IDs by 10s:  10, 20, 30, etc. "
+--     SYNTAX TEntryIndicator (1..65535)
+
+-- TMatchCriteria ::= TEXTUAL-CONVENTION
+--     STATUS       current
+--     DESCRIPTION
+--         "determines whether the entry matches traffic using IP match
+--          entries or MAC match entries."
+--     SYNTAX  INTEGER { ip(1), mac(2), none(3), dscp(4), dot1p(5), prec(6) }
+
+-- TAtmTdpDescrType ::= TEXTUAL-CONVENTION
+--     STATUS       current
+--     DESCRIPTION
+--         "The TAtmTdpDescrType is an enumerated integer whose value
+--          indicates the types of cell loss priority to be used in
+--          conjunction with traffic parameters.
+--
+--         The following values are outlined:
+--           Integer Value               Interpretation
+--           -------------               ------------------------
+--           clp0And1pcr                 PCR applies to CLP 0 and
+--                                       CLP 1 cell flows
+--           clp0And1pcrPlusClp0And1scr  PCR applies to CLP 0 and
+--                                       CLP 1 cell flows.
+--                                       SCR applies to CLP 0 and
+--                                       CLP 1 cell flows.
+--           clp0And1pcrPlusClp0scr      PCR applies to CLP 0 and
+--                                       CLP 1 cell flows.
+--                                       SCR applies to CLP 0 cell flows.
+--           clp0And1pcrPlusClp0scrTag   PCR applies to CLP 0 and
+--                                       CLP 1 cell flows.
+--                                       SCR applies to CLP 0 cell flows. "
+--     SYNTAX INTEGER {
+--                clp0And1pcr(0),
+--                clp0And1pcrPlusClp0And1scr(1),
+--                clp0And1pcrPlusClp0scr(2),
+--                clp0And1pcrPlusClp0scrTag(3)
+--            }
+
+-- TEntryIndicator ::= TEXTUAL-CONVENTION
+--     STATUS       current
+--     DESCRIPTION
+--         "Uniquely identifies an entry in a policy or filter table. The
+--          value 0 is not a valid entry-id. When used as insertion point
+--          the value 0 indicates that entries must be inserted at the very
+--          beginning, i.e.before the first entry defined."
+--     SYNTAX Unsigned32 (0..65535)
+
+-- TEntryId ::= TEXTUAL-CONVENTION
+--     STATUS       current
+--     DESCRIPTION
+--         "uniquely identifies an entry in a policy or filter table.
+--          to facilitate insertion of entries in the tables, we recommend
+--          assigning entry IDs by 10s:  10, 20, 30, etc. "
+--     SYNTAX TEntryIndicator (1..65535)
+
+-- TMatchCriteria ::= TEXTUAL-CONVENTION
+--     STATUS       current
+--     DESCRIPTION
+--         "determines whether the entry matches traffic using IP match
+--          entries or MAC match entries."
+--     SYNTAX  INTEGER { ip(1), mac(2), none(3), dscp(4), dot1p(5), prec(6) }
+
+-- TAtmTdpDescrType ::= TEXTUAL-CONVENTION
+--     STATUS       current
+--     DESCRIPTION
+--         "The TAtmTdpDescrType is an enumerated integer whose value
+--          indicates the types of cell loss priority to be used in
+--          conjunction with traffic parameters.
+--
+--         The following values are outlined:
+--           Integer Value               Interpretation
+--           -------------               ------------------------
+--           clp0And1pcr                 PCR applies to CLP 0 and
+--                                       CLP 1 cell flows
+--           clp0And1pcrPlusClp0And1scr  PCR applies to CLP 0 and
+--                                       CLP 1 cell flows.
+--                                       SCR applies to CLP 0 and
+--                                       CLP 1 cell flows.
+--           clp0And1pcrPlusClp0scr      PCR applies to CLP 0 and
+--                                       CLP 1 cell flows.
+--                                       SCR applies to CLP 0 cell flows.
+--           clp0And1pcrPlusClp0scrTag   PCR applies to CLP 0 and
+--                                       CLP 1 cell flows.
+--                                       SCR applies to CLP 0 cell flows. "
+--     SYNTAX INTEGER {
+--                clp0And1pcr(0),
+--                clp0And1pcrPlusClp0And1scr(1),
+--                clp0And1pcrPlusClp0scr(2),
+--                clp0And1pcrPlusClp0scrTag(3)
+--            }
+
+TSlopeDropRate ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "The slope drop rate.
+         Mapping of drop-rate values in percentage:
+                       0 - 100% cliff drop
+                       1 - 6.25%
+                       2 - 3.125%
+                       3 - 1.5625%
+                       4 - 0.78125%
+                       5 - 0.390625%
+                       6 - 0.1953125%
+                       7 - 0.09765625%
+       "
+    SYNTAX Integer32 (0..7)
+
+TSlopeThreshold ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "The percentage of the shared buffer"
+    SYNTAX Integer32 (0..100)
+
+TMaxProbability ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "The slope between the Start Average and Max Average"
+    SYNTAX Unsigned32 (0..10|25|50|75|100)
+
+TNetworkPolicyType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Network policy type"
+    SYNTAX INTEGER { ipInterface(1), port(2) }
+
+TDot1PLspExpValue ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "MPLS Experimental bits or 802.1p priority. This type is used when
+        these are shared.  -1 means not set."
+    REFERENCE "."
+    SYNTAX      Integer32 (-1 | 0..7)
+
+TMplsLspExpProfileValue ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "MPLS Experimental bits.   -1 means not set."
+    REFERENCE "."
+    SYNTAX      Integer32 (-1 | 0..7)
+
+--
+-- mib objects
+--
+
+ tMplsLspExpProfMapTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF TMplsLspExpProfMapEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+         "Information about all MPLS LSP EXP Profiles."
+     ::= { tnMplsQosObjects 1 }
+
+ tMplsLspExpProfMapEntry OBJECT-TYPE
+     SYNTAX       TMplsLspExpProfMapEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+         "Information about one MPLS LSP EXP Profile"
+     INDEX { tnSysSwitchId, tMplsLspExpProfMapIndex }
+     ::= { tMplsLspExpProfMapTable 1 }
+
+ TMplsLspExpProfMapEntry ::= SEQUENCE
+     {
+         tMplsLspExpProfMapIndex           TMplsLspExpProfMapID,
+         tMplsLspExpProfMapRowStatus       RowStatus,
+         tMplsLspExpProfMapDescription     TItemDescription,
+         tMplsLspExpProfMapLastChanged     TimeStamp
+     }
+
+ tMplsLspExpProfMapIndex OBJECT-TYPE
+     SYNTAX       TMplsLspExpProfMapID
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+         "The tMplsLspExpProfMapIndex is used as index for the table."
+     ::= { tMplsLspExpProfMapEntry 1 }
+
+ tMplsLspExpProfMapRowStatus OBJECT-TYPE
+     SYNTAX       RowStatus
+     MAX-ACCESS   read-create
+     STATUS       current
+     DESCRIPTION
+         "Row Status of this profile entry."
+     ::= { tMplsLspExpProfMapEntry 2 }
+
+ tMplsLspExpProfMapDescription OBJECT-TYPE
+     SYNTAX       TItemDescription
+     MAX-ACCESS   read-create
+     STATUS       current
+     DESCRIPTION
+         "User-provided description of the policy."
+     DEFVAL { ''H }
+     ::= { tMplsLspExpProfMapEntry 3 }
+
+ tMplsLspExpProfMapLastChanged OBJECT-TYPE
+     SYNTAX       TimeStamp
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+         "timestamp of last change to this row in tMplsLspExpProfMapTable."
+     ::= { tMplsLspExpProfMapEntry 4 }
+
+--
+
+ tMplsLspExpProfileTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF TMplsLspExpProfileEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION  "  "
+     ::= { tnMplsQosObjects 4 }
+
+ tMplsLspExpProfileEntry OBJECT-TYPE
+     SYNTAX       TMplsLspExpProfileEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+         "Information about MPLS LSP EXP mapping."
+     INDEX { tnSysSwitchId, tMplsLspExpProfMapIndex, tMplsLspExpProfileBits }
+     ::= { tMplsLspExpProfileTable 1 }
+
+ TMplsLspExpProfileEntry ::= SEQUENCE
+     {
+         tMplsLspExpProfileBits            TMplsLspExpProfileValue,
+         tMplsLspExpProfileRowStatus       RowStatus,
+         tMplsLspExpProfile                TProfile,
+         tMplsLspExpProfileLastChanged     TimeStamp
+     }
+
+ tMplsLspExpProfileBits OBJECT-TYPE
+     SYNTAX       TMplsLspExpProfileValue
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+         "The MPLS Exp value to use for MPLS traffic."
+     ::= { tMplsLspExpProfileEntry 1 }
+
+ tMplsLspExpProfileRowStatus OBJECT-TYPE
+     SYNTAX       RowStatus
+     MAX-ACCESS   read-create
+     STATUS       current
+     DESCRIPTION
+         "Row Status of this profile entry."
+     ::= { tMplsLspExpProfileEntry 2 }
+
+ tMplsLspExpProfile OBJECT-TYPE
+     SYNTAX       TProfile
+     MAX-ACCESS   read-create
+     STATUS       current
+     DESCRIPTION
+         "tMplsLspExpProfile specifies the profile to be used for this
+         EXP value as indicated by tMplsLspExpProfileBits."
+     DEFVAL { out }
+     ::= { tMplsLspExpProfileEntry 3 }
+
+ tMplsLspExpProfileLastChanged OBJECT-TYPE
+     SYNTAX       TimeStamp
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+         "timestamp of last change to this row in tMplsLspExpProfileTable."
+     ::= { tMplsLspExpProfileEntry 4 }
+
+--
+
+-- tGlobalMplsLspExpProfile OBJECT-TYPE
+--     SYNTAX       TMplsLspExpProfMapID
+--     MAX-ACCESS   read-create
+--     STATUS       current
+--     DESCRIPTION
+--         "tGlobalMplsLspExpProfile is used by the LDP packets when the ip
+--         interface is configured in color aware mode. When the ip interface
+--         is configured in color blind mode, tGlobalMplsLspExpProfile is not
+--         applied to LDP packets received on that ip interface"
+--     DEFVAL { 1 }
+--     ::= { tnMplsQosObjects 3 }
+--
+-- tLdpLocalFcEnableAdminStatus OBJECT-TYPE
+--     SYNTAX       TruthValue
+--     MAX-ACCESS   read-create
+--     STATUS       current
+--     DESCRIPTION
+--         "When tLdpLocalFcEnableAdminStatus is not set, the behavior is like
+--         SAS release 3.0 here the profile policy will be attached to one qos
+--         policy. tLdpLocalFcEnableAdminStatus when set to true the system
+--         opertation status .'tLdpLocalFcEnableOperStatus' will also become 'true',
+--
+--         When tLdpLocalFcEnableAdminStatus is set then more than one profile
+--         policy can be attached to network policy
+--
+--         When tLdpLocalFcEnableAdminStatus is reset to 'false', the system  oper
+--         'tLdpLocalFcEnableOperStatus' status would continue to be true until the
+--         system is reset.tLdpLocalFcEnableAdminStatus will take effect when the
+--         system is reset,
+--         "
+--     DEFVAL { false }
+--     ::= { tnMplsQosObjects 5 }
+--
+-- tLdpLocalFcEnableOperStatus OBJECT-TYPE
+--     SYNTAX       TruthValue
+--     MAX-ACCESS   read-only
+--     STATUS       current
+--     DESCRIPTION
+--         "Operational status of how ldp local fc is configured.
+--
+--         After the system init, reseting tLdpLocalFcEnableAdminStatus to false
+--         from 'true' take effect when the system is reset"
+--     ::= { tnMplsQosObjects 6 }
+
+--
+-- access-egress policy table
+--
+tnAccessEgressTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF TAccessEgressEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Information about all Access-egress policies."
+    ::= { tnAccessEgressObjects 1 }
+
+tnAccessEgressEntry OBJECT-TYPE
+    SYNTAX       TAccessEgressEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Access Egress QoS information for a particular port"
+    INDEX {tnSysSwitchId,  tnAccessEgressIndex }
+    ::= { tnAccessEgressTable 1 }
+
+TAccessEgressEntry ::= SEQUENCE
+    {
+        tnAccessEgressIndex              TAccessEgressPolicyID,
+        tnAccessEgressRowStatus          RowStatus,
+        tnAccessEgressScope              TItemScope,
+        tnAccessEgressDescription        TItemDescription,
+        tnAccessEgressLastChanged        TimeStamp,
+        tnAccessEgressRemark             TruthValue,
+        tnAccessEgressRemarkPolicyId     TRemarkPolicyID,
+        tnAccessEgressRemarkType         INTEGER
+    }
+
+tnAccessEgressIndex OBJECT-TYPE
+    SYNTAX       TAccessEgressPolicyID
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "the sap-egress policy ID is used as index for the table."
+    ::= { tnAccessEgressEntry 1 }
+
+tnAccessEgressRowStatus OBJECT-TYPE
+    SYNTAX       RowStatus
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "Row Status of this policy's entry."
+    ::= { tnAccessEgressEntry 2 }
+
+tnAccessEgressScope OBJECT-TYPE
+    SYNTAX       TItemScope
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "scope of the sap-egress policy."
+    DEFVAL { template }
+    ::= { tnAccessEgressEntry 3 }
+
+tnAccessEgressDescription OBJECT-TYPE
+    SYNTAX       TItemDescription
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "user-supplied description of this sap-egress policy."
+    DEFVAL { ''H }
+    ::= { tnAccessEgressEntry 4 }
+
+tnAccessEgressLastChanged OBJECT-TYPE
+    SYNTAX       TimeStamp
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "timestamp of last change to this row in tnAccessEgressTable."
+    ::= { tnAccessEgressEntry 5 }
+
+tnAccessEgressRemark OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "This object specifies if the system
+         will remark the egress packets or not. DEf val is
+         TRUE for STU and FALSE for MTU"
+    DEFVAL { false }
+::= { tnAccessEgressEntry 6 }
+
+tnAccessEgressRemarkPolicyId OBJECT-TYPE
+    SYNTAX       TRemarkPolicyID
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "Remark Policy Id that be used when remarking is enabled."
+    DEFVAL { 1 }
+    ::= { tnAccessEgressEntry 7 }
+
+tnAccessEgressRemarkType OBJECT-TYPE
+    SYNTAX       INTEGER {
+                     use-dot1p  (1),
+                     use-dscp   (2),
+                     all        (3)
+                 }
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "This object specifies system remark type, tnAccessEgressRemark
+        will be set to true and tnAccessEgressRemarkType will specify the
+        remark type."
+    ::= { tnAccessEgressEntry 8 }
+
+--
+-- access-egress policy queue table
+--
+
+tnAccessEgressQueueTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF TAccessEgressQueueEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION  "information about all access-egress policies' queues."
+    ::= {  tnAccessEgressObjects 2 }
+
+tnAccessEgressQueueEntry OBJECT-TYPE
+    SYNTAX       TAccessEgressQueueEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Information about a particular sap-egress queue.
+         Entries are created/deleted by user.
+         There is no StorageType object, entries have a presumed
+         StorageType of nonVolatile."
+    INDEX {tnSysSwitchId,  tnAccessEgressIndex, tnAccessEgressQueueIndex }
+    ::= { tnAccessEgressQueueTable 1 }
+
+TAccessEgressQueueEntry ::= SEQUENCE
+    {
+        tnAccessEgressQueueIndex             TEgressQueueId,
+        tnAccessEgressQueueRowStatus         RowStatus,
+        tnAccessEgressQueueCBS               TBurstSize,
+        tnAccessEgressQueueMBS               TBurstSize,
+        tnAccessEgressQueuePIRAdaptation     TAdaptationRule,
+        tnAccessEgressQueueCIRAdaptation     TAdaptationRule,
+        tnAccessEgressQueueAdminPIR          TPIRRate,
+        tnAccessEgressQueueAdminCIR          TCIRRate,
+        tnAccessEgressQueueOperPIR           TPIRRate,
+        tnAccessEgressQueueOperCIR           TCIRRate,
+        tnAccessEgressQueueLastChanged       TimeStamp
+    }
+
+tnAccessEgressQueueIndex OBJECT-TYPE
+    SYNTAX       TEgressQueueId (1..8)
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "the number of a queue.  zero is not allowed.
+         for sap-egress, only three queues are allowed,
+         so the queue index range is restricted."
+    ::= { tnAccessEgressQueueEntry 1 }
+
+tnAccessEgressQueueRowStatus OBJECT-TYPE
+    SYNTAX       RowStatus
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "Row Status of the entry."
+    ::= { tnAccessEgressQueueEntry 2 }
+
+tnAccessEgressQueueCBS OBJECT-TYPE
+    SYNTAX       TBurstSize
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "The amount of reserved buffer space (in kilo bytes) for the queue."
+    DEFVAL { -1 }
+    ::= { tnAccessEgressQueueEntry 3 }
+
+tnAccessEgressQueueMBS OBJECT-TYPE
+    SYNTAX       TBurstSize
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "The maximum amount of buffer space (in kilo bytes) allowed for the
+        queue."
+    DEFVAL { -1 }
+    ::= { tnAccessEgressQueueEntry 4 }
+
+tnAccessEgressQueuePIRAdaptation OBJECT-TYPE
+    SYNTAX       TAdaptationRule
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "The adaptation rule to be used while computing the operational PIR
+         value. The adaptation rule specifies the rules to compute the
+         operational values while maintaining minimum offset."
+    DEFVAL { closest }
+    ::= { tnAccessEgressQueueEntry 5 }
+
+tnAccessEgressQueueCIRAdaptation OBJECT-TYPE
+    SYNTAX       TAdaptationRule
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "The adaptation rule to be used while computing the operational CIR
+         value. The adaptation rule specifies the rules to compute the
+         operational values while maintaining minimum offset."
+    DEFVAL { closest }
+    ::= { tnAccessEgressQueueEntry 6 }
+
+tnAccessEgressQueueAdminPIR OBJECT-TYPE
+    SYNTAX       TPIRRate
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "The administrative PIR specified by the user."
+    DEFVAL { -1 }
+    ::= { tnAccessEgressQueueEntry 7 }
+
+tnAccessEgressQueueAdminCIR OBJECT-TYPE
+    SYNTAX       TCIRRate
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "The administrative CIR specified by the user."
+    DEFVAL { 0 }
+    ::= { tnAccessEgressQueueEntry 8 }
+
+tnAccessEgressQueueOperPIR OBJECT-TYPE
+    SYNTAX       TPIRRate
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The administrative PIR specified by the user."
+    ::= { tnAccessEgressQueueEntry 9 }
+
+tnAccessEgressQueueOperCIR OBJECT-TYPE
+    SYNTAX       TCIRRate
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The operational value derived by computing the CIR value from
+         the administrative CIR and PIR values and their corresponding
+         adaptation rules."
+    ::= { tnAccessEgressQueueEntry 10 }
+
+tnAccessEgressQueueLastChanged OBJECT-TYPE
+    SYNTAX       TimeStamp
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "timestamp of last change to this row in tnAccessEgressQueueTable."
+    ::= { tnAccessEgressQueueEntry 11 }
+
+--
+-- access-egress policy fc table
+--
+
+tnAccessEgressFCTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF TAccessEgressFCEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION  "  "
+    ::= { tnAccessEgressObjects 3 }
+
+tnAccessEgressFCEntry OBJECT-TYPE
+    SYNTAX       TAccessEgressFCEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Information about a particular access-egress policy's
+         forwarding class mappings to queues and dot1p values.
+         Entries are created/deleted by user.
+         There is no StorageType object, entries have a presumed
+         StorageType of nonVolatile.
+        "
+    INDEX {tnSysSwitchId,  tnAccessEgressIndex, tnAccessEgressFCName }
+    ::= { tnAccessEgressFCTable 1 }
+
+TAccessEgressFCEntry ::= SEQUENCE
+    {
+        tnAccessEgressFCName                TFCName,
+        tnAccessEgressFCRowStatus           RowStatus,
+        tnAccessEgressFCQueue               TEgressQueueId,
+        tnAccessEgressFCDot1PInProfile      Dot1PPriority,
+        tnAccessEgressFCDot1POutProfile     Dot1PPriority,
+        tnAccessEgressFCLastChanged         TimeStamp,
+        tnAccessEgressFCDscpInProfile       TDSCPNameOrEmpty,
+        tnAccessEgressFCDscpOutProfile      TDSCPNameOrEmpty
+    }
+
+tnAccessEgressFCName OBJECT-TYPE
+    SYNTAX       TFCName
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "forwarding class name."
+    ::= { tnAccessEgressFCEntry 1 }
+
+tnAccessEgressFCRowStatus OBJECT-TYPE
+    SYNTAX       RowStatus
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "Row Status."
+    ::= { tnAccessEgressFCEntry 2 }
+
+tnAccessEgressFCQueue OBJECT-TYPE
+    SYNTAX       TEgressQueueId
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "The queue to use for packets in this forwarding class.
+         No FC can map to the same queue being used by 'premium' class.
+         You must specify a valid queue-id before setting the row status
+         to active."
+    ::= { tnAccessEgressFCEntry 3 }
+
+tnAccessEgressFCDot1PInProfile OBJECT-TYPE
+    SYNTAX       Dot1PPriority
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "the Dot1p to use for in-profile traffic."
+    DEFVAL { -1 }
+    ::= { tnAccessEgressFCEntry 4 }
+
+tnAccessEgressFCDot1POutProfile OBJECT-TYPE
+    SYNTAX       Dot1PPriority
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "the Dot1p to use for in-profile traffic."
+    DEFVAL { -1 }
+    ::= { tnAccessEgressFCEntry 5 }
+
+tnAccessEgressFCLastChanged OBJECT-TYPE
+    SYNTAX       TimeStamp
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "timestamp of last change to this row in tnAccessEgressFCTable."
+    ::= { tnAccessEgressFCEntry 6 }
+
+tnAccessEgressFCDscpInProfile OBJECT-TYPE
+    SYNTAX       TDSCPNameOrEmpty
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "The DSCP to use for in-profile traffic."
+    DEFVAL { ''H }
+    ::= { tnAccessEgressFCEntry 7 }
+
+tnAccessEgressFCDscpOutProfile OBJECT-TYPE
+    SYNTAX       TDSCPNameOrEmpty
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "The DSCP to use for out-profile traffic."
+    DEFVAL { ''H }
+    ::= { tnAccessEgressFCEntry 8 }
+
+--
+-- Dummy Scalars
+--
+tnAccessEgressScalar1 OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A dummy scalar that satisfies a SNMP get request quickly when
+         there is no 11QPE24 card provisioned.  Otherwise, it has to
+         traverse the remaining 11QPE24 MIB to get to the next applicable
+         item."
+    ::= { tnAccessEgressObjects 101 }
+
+tnAccessEgressScalar2 OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "."
+    ::= { tnAccessEgressObjects 102 }
+
+--
+-- sap-ingress meter table
+--
+tnSapIngressMeterTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF TSapIngressMeterEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Information about all sap-ingress policies' Meters."
+    ::= { tnSASSapIngressObjects 1 }
+
+tnSapIngressMeterEntry OBJECT-TYPE
+    SYNTAX       TSapIngressMeterEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Information about a particular meter for a sap-ingress policy.
+         Meter (1) is the used as a default for unicast and meter (11) is
+         used as a default for multicast. Both these are created by the
+         agent and can be edited but not removed from the system.
+         Other entries are created by user."
+    INDEX {tnSysSwitchId,  tnSapIngressIndex, tnSapIngressMeter }
+    ::= { tnSapIngressMeterTable 1 }
+
+TSapIngressMeterEntry ::= SEQUENCE
+    {
+        tnSapIngressMeter                 TSapIngressMeterId,
+        tnSapIngressMeterRowStatus        RowStatus,
+        tnSapIngressMeterMCast            TruthValue,
+--        tnSapIngressMeterCBS              TIngressBurstSize,
+--        tnSapIngressMeterMBS              TIngressBurstSize,
+        tnSapIngressMeterPIRAdaptation    TAdaptationRule,
+        tnSapIngressMeterCIRAdaptation    TAdaptationRule,
+        tnSapIngressMeterAdminPIR         TIngressPIRRate,
+        tnSapIngressMeterAdminCIR         TIngressCIRRate,
+        tnSapIngressMeterOperPIR          TPIRRate,
+        tnSapIngressMeterOperCIR          TCIRRate,
+        tnSapIngressMeterLastChanged      TimeStamp,
+        tnSapIngressMeterMode             TMeterMode,
+        tnSapIngressMeterRateMode         TMeterRateMode,
+        tnSapIngressMeterAdminCBS         TIngressBurstSize,
+        tnSapIngressMeterAdminMBS         TIngressBurstSize,
+        tnSapIngressMeterOperCBS          TIngressBurstSize,
+        tnSapIngressMeterOperMBS          TIngressBurstSize
+    }
+
+
+tnSapIngressMeter OBJECT-TYPE
+    SYNTAX       TSapIngressMeterId
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "The Meter ID is used as the secondary index to the table entry."
+    ::= { tnSapIngressMeterEntry 1 }
+
+tnSapIngressMeterRowStatus OBJECT-TYPE
+    SYNTAX       RowStatus
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "Row Status of the entry. This allows creation/deletion of rows in this
+         table."
+    ::= { tnSapIngressMeterEntry 2 }
+
+tnSapIngressMeterMCast OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "This object specifies if this is a multicast meter or not."
+    DEFVAL { false }
+    ::= { tnSapIngressMeterEntry 8 }
+
+-- tnSapIngressMeterCBS OBJECT-TYPE
+--     SYNTAX       TIngressBurstSize
+--     MAX-ACCESS   read-create
+--     STATUS       obsolete
+--     DESCRIPTION
+--         "The amount of committed burst size (in kilo bits) for the meter."
+--     DEFVAL { -1 }
+--     ::= { tnSapIngressMeterEntry 10 }
+--
+-- tnSapIngressMeterMBS OBJECT-TYPE
+--     SYNTAX       TIngressBurstSize
+--     MAX-ACCESS   read-create
+--     STATUS       obsolete
+--     DESCRIPTION
+--         "The maximum amount of burst size (in kilo bits) allowed for the
+--          meter."
+--     DEFVAL { -1 }
+--     ::= { tnSapIngressMeterEntry 11 }
+
+tnSapIngressMeterCIRAdaptation OBJECT-TYPE
+    SYNTAX       TAdaptationRule
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "The adaptation rule to be used while computing the operational CIR
+         value. The adaptation rule specifies the rules to compute the
+         operational values while maintaining minimum offset."
+    DEFVAL { closest }
+    ::= { tnSapIngressMeterEntry 14 }
+
+tnSapIngressMeterPIRAdaptation OBJECT-TYPE
+    SYNTAX       TAdaptationRule
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "The adaptation rule to be used while computing the operational PIR
+         value. The adaptation rule specifies the rules to compute the
+         operational values while maintaining minimum offset."
+    DEFVAL { closest }
+    ::= { tnSapIngressMeterEntry 13 }
+
+
+tnSapIngressMeterAdminPIR OBJECT-TYPE
+    SYNTAX       TIngressPIRRate
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "The administrative PIR specified by the user."
+    DEFVAL { -1 }
+    ::= { tnSapIngressMeterEntry 15 }
+
+tnSapIngressMeterAdminCIR OBJECT-TYPE
+    SYNTAX       TIngressCIRRate
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "The administrative CIR specified by the user."
+    DEFVAL { 0 }
+    ::= { tnSapIngressMeterEntry 16 }
+
+tnSapIngressMeterOperPIR OBJECT-TYPE
+    SYNTAX       TPIRRate
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The operational value derived by computing the PIR value from
+         the administrative PIR value and their corresponding
+         adaptation rules."
+    ::= { tnSapIngressMeterEntry 17 }
+
+tnSapIngressMeterOperCIR OBJECT-TYPE
+    SYNTAX       TCIRRate
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The operational value derived by computing the CIR value from
+         the administrative CIR value and their corresponding
+         adaptation rules."
+    ::= { tnSapIngressMeterEntry 18 }
+
+tnSapIngressMeterLastChanged OBJECT-TYPE
+    SYNTAX       TimeStamp
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Timestamp of last change to this row in tnSapIngressMeterTable."
+    ::= { tnSapIngressMeterEntry 19 }
+
+tnSapIngressMeterMode OBJECT-TYPE
+    SYNTAX       TMeterMode
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "This object is not used on SAS platform currently"
+    DEFVAL { priority }
+    ::= { tnSapIngressMeterEntry 21 }
+
+tnSapIngressMeterRateMode OBJECT-TYPE
+    SYNTAX       TMeterRateMode
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "Sap Ingress Meter Rate mode.The mode can be configured as
+         Two Rate Three Color Marker (trTCM) or Single Rate Three Color
+         Marker (srTCM). The mode command can be executed at anytime."
+    DEFVAL { trtcm1 }
+    ::= { tnSapIngressMeterEntry 22 }
+
+
+tnSapIngressMeterAdminCBS OBJECT-TYPE
+    SYNTAX       TIngressBurstSize
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "The administrative CBS specified by the user. The amount of
+        committed burst size (in kilo bits) for the meter."
+    DEFVAL { -1 }
+    ::= { tnSapIngressMeterEntry 23 }
+
+tnSapIngressMeterAdminMBS OBJECT-TYPE
+    SYNTAX       TIngressBurstSize
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "The administrative MBS specified by the user. The maximum amount
+        of burst size (in kilo bits) allowed for the meter."
+    DEFVAL { -1 }
+    ::= { tnSapIngressMeterEntry 24 }
+
+tnSapIngressMeterOperCBS OBJECT-TYPE
+    SYNTAX       TIngressBurstSize
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The operational value derived by computing the CBS value from
+         the administrative CBS value"
+    ::= { tnSapIngressMeterEntry 25 }
+
+tnSapIngressMeterOperMBS OBJECT-TYPE
+    SYNTAX       TIngressBurstSize
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The operational value derived by computing the MBS value from
+         the administrative MBS value"
+    ::= { tnSapIngressMeterEntry 26 }
+
+tnNetworkIngressFCTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF TNetworkIngressFCEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "This table maintains the mapping of a particular
+         forwarding class traffic into the specified meter."
+    ::= { tnSASNetworkIngressObjects 1 }
+
+tnNetworkIngressFCEntry OBJECT-TYPE
+    SYNTAX       TNetworkIngressFCEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Information about a particular network-ingress policy's
+         forwarding class mappings to meter.
+
+         Entries are created and deleted by user. They have
+         a presumed StorageType of nonVolatile."
+    INDEX {tnSysSwitchId,  tnNetworkPolicyIndex, tnNetworkIngressFCName }
+    ::= { tnNetworkIngressFCTable 1 }
+
+TNetworkIngressFCEntry ::= SEQUENCE
+    {
+        tnNetworkIngressFCName           TNamedItem,
+        tnNetworkIngressFCRowStatus      RowStatus,
+        tnNetworkIngressFCMeter          TNetworkIngressMeterId,
+        tnNetworkIngressFCMCastMeter     TNetworkIngressMeterId,
+        tnNetworkIngressFCLastChanged    TimeStamp
+    }
+
+tnNetworkIngressFCName OBJECT-TYPE
+    SYNTAX       TNamedItem
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "tnNetworkIngressFCName specifies the forwarding class
+        for which this mapping is defined."
+    ::= { tnNetworkIngressFCEntry 1 }
+
+tnNetworkIngressFCRowStatus OBJECT-TYPE
+    SYNTAX       RowStatus
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "Row Status for this Entry."
+    ::= { tnNetworkIngressFCEntry 2 }
+
+tnNetworkIngressFCMeter OBJECT-TYPE
+    SYNTAX       TNetworkIngressMeterId
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "The specific meter to be used for packets in this forwarding class.
+         A value of zero implies that the default meters should be used."
+    ::= { tnNetworkIngressFCEntry 3 }
+
+tnNetworkIngressFCMCastMeter OBJECT-TYPE
+    SYNTAX       TNetworkIngressMeterId
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "The specific multicast meter to be used for packets in this forwarding
+         class. The meter is used only for specific entities and will be
+         ignored wherever it is irrelevant.
+
+         A value of zero implies that the default meters should be used."
+    ::= { tnNetworkIngressFCEntry 4 }
+
+tnNetworkIngressFCLastChanged OBJECT-TYPE
+    SYNTAX       TimeStamp
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "tnNetworkIngressFCLastChanged indicates the value of sysUpTime
+         when the forwarding class entry was last modified."
+    ::= { tnNetworkIngressFCEntry 5 }
+
+
+tnNetworkIngressMeterTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF TNetworkIngressMeterEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "information about all network policies' meters."
+    ::= { tnSASNetworkIngressObjects 2 }
+
+tnNetworkIngressMeterEntry OBJECT-TYPE
+    SYNTAX       TNetworkIngressMeterEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Information about a particular meter for a network policy.
+         Meter (1) is the used as a default for unicast and meter (9) is
+         used as a default for multicast. Both these are created by the
+         agent and can be edited but not removed from the system.
+         Other entries are created by user."
+    INDEX {tnSysSwitchId,  tnNetworkPolicyIndex, tnNetworkIngressMeterIndex }
+    ::= { tnNetworkIngressMeterTable 1 }
+
+TNetworkIngressMeterEntry ::= SEQUENCE
+    {
+         tnNetworkIngressMeterIndex             TNetworkIngressMeterId,
+         tnNetworkIngressMeterRowStatus         RowStatus,
+--         tnNetworkIngressMeterCBS               TIngressBurstSize,
+--         tnNetworkIngressMeterMBS               TIngressBurstSize,
+         tnNetworkIngressMeterCIRAdaptation     TAdaptationRule,
+         tnNetworkIngressMeterPIRAdaptation     TAdaptationRule,
+         tnNetworkIngressMeterAdminPIR          TIngressPIRRate,
+         tnNetworkIngressMeterAdminCIR          TIngressCIRRate,
+         tnNetworkIngressMeterOperPIR           TPIRRate,
+         tnNetworkIngressMeterOperCIR           TCIRRate,
+         tnNetworkIngressMeterLastChanged       TimeStamp,
+         tnNetworkIngressMeterMode              TMeterMode,
+         tnNetworkIngressMeterMCast             TruthValue,
+         tnNetworkIngressMeterRateMode          TMeterRateMode,
+         tnNetworkIngressMeterAdminCBS          TIngressBurstSize,
+         tnNetworkIngressMeterAdminMBS          TIngressBurstSize,
+         tnNetworkIngressMeterOperCBS           TIngressBurstSize,
+         tnNetworkIngressMeterOperMBS           TIngressBurstSize
+    }
+
+tnNetworkIngressMeterIndex OBJECT-TYPE
+    SYNTAX       TNetworkIngressMeterId
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "The Meter ID is used as the secondary index to the table entry."
+    ::= { tnNetworkIngressMeterEntry 1 }
+
+tnNetworkIngressMeterRowStatus OBJECT-TYPE
+    SYNTAX       RowStatus
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "Row Status of the entry. This allows creation/deletion of rows in this
+         table."
+    ::= { tnNetworkIngressMeterEntry 2 }
+
+-- tnNetworkIngressMeterCBS OBJECT-TYPE
+--     SYNTAX       TIngressBurstSize
+--     MAX-ACCESS   read-create
+--     STATUS       obsolete
+--     DESCRIPTION
+--         "The amount of committed burst size (in kilo bits) for the meter."
+--     DEFVAL { -1 }
+--     ::= { tnNetworkIngressMeterEntry 3 }
+--
+-- tnNetworkIngressMeterMBS OBJECT-TYPE
+--     SYNTAX       TIngressBurstSize
+--     MAX-ACCESS   read-create
+--     STATUS       obsolete
+--     DESCRIPTION
+--         "The maximum amount of burst size (in kilo bits) allowed for the
+--          meter."
+--     DEFVAL { -1 }
+--     ::= { tnNetworkIngressMeterEntry 4 }
+
+tnNetworkIngressMeterCIRAdaptation OBJECT-TYPE
+    SYNTAX       TAdaptationRule
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "The adaptation rule to be used while computing the operational CIR
+         value. The adaptation rule specifies the rules to compute the
+         operational values while maintaining minimum offset."
+    DEFVAL { closest }
+    ::= { tnNetworkIngressMeterEntry 5 }
+
+tnNetworkIngressMeterPIRAdaptation OBJECT-TYPE
+    SYNTAX       TAdaptationRule
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "The adaptation rule to be used while computing the operational PIR
+         value. The adaptation rule specifies the rules to compute the
+         operational values while maintaining minimum offset."
+    DEFVAL { closest }
+    ::= { tnNetworkIngressMeterEntry 6 }
+
+
+tnNetworkIngressMeterAdminPIR OBJECT-TYPE
+    SYNTAX       TIngressPIRRate
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "The administrative PIR specified by the user."
+    DEFVAL { -1 }
+    ::= { tnNetworkIngressMeterEntry 7 }
+
+tnNetworkIngressMeterAdminCIR OBJECT-TYPE
+    SYNTAX       TIngressCIRRate
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "The administrative CIR specified by the user."
+    DEFVAL { 0 }
+    ::= { tnNetworkIngressMeterEntry 8 }
+
+tnNetworkIngressMeterOperPIR OBJECT-TYPE
+    SYNTAX       TPIRRate
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The operational value derived by computing the PIR value from
+         the administrative PIR value and their corresponding
+         adaptation rules."
+    ::= { tnNetworkIngressMeterEntry 9 }
+
+tnNetworkIngressMeterOperCIR OBJECT-TYPE
+    SYNTAX       TCIRRate
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The operational value derived by computing the CIR value from
+         the administrative CIR value and their corresponding
+         adaptation rules."
+    ::= { tnNetworkIngressMeterEntry 10 }
+
+tnNetworkIngressMeterLastChanged OBJECT-TYPE
+    SYNTAX       TimeStamp
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Timestamp of last change to this row."
+    ::= { tnNetworkIngressMeterEntry 11 }
+
+tnNetworkIngressMeterMode OBJECT-TYPE
+    SYNTAX       TMeterMode
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "Network Ingress Meter Mode"
+    DEFVAL { priority }
+    ::= { tnNetworkIngressMeterEntry 12 }
+
+tnNetworkIngressMeterMCast OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "This object specifies if this is a multicast meter or not."
+    DEFVAL { false }
+    ::= { tnNetworkIngressMeterEntry 13 }
+
+tnNetworkIngressMeterRateMode OBJECT-TYPE
+    SYNTAX       TMeterRateMode
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        " Network Ingress Meter Rate mode.The mode can be configured
+        as Two Rate Three Color Marker (trTCM) or Single Rate Three
+        Color Marker (srTCM).  The mode command can be executed at
+        anytime."
+    DEFVAL { trtcm1 }
+    ::= { tnNetworkIngressMeterEntry 14 }
+
+tnNetworkIngressMeterAdminCBS OBJECT-TYPE
+    SYNTAX       TIngressBurstSize
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "The administrative CBS specified by the user. The amount of
+        committed burst size (in kilo bits) for the meter."
+    DEFVAL { -1 }
+    ::= { tnNetworkIngressMeterEntry 15 }
+
+tnNetworkIngressMeterAdminMBS OBJECT-TYPE
+    SYNTAX       TIngressBurstSize
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "The administrative MBS specified by the user. The maximum amount
+        of burst size (in kilo bits) allowed for the meter."
+    DEFVAL { -1 }
+    ::= { tnNetworkIngressMeterEntry 16 }
+
+tnNetworkIngressMeterOperCBS OBJECT-TYPE
+    SYNTAX       TIngressBurstSize
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The operational value derived by computing the CBS value from
+         the administrative CBS value"
+    ::= { tnNetworkIngressMeterEntry 17 }
+
+tnNetworkIngressMeterOperMBS OBJECT-TYPE
+    SYNTAX       TIngressBurstSize
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The operational value derived by computing the MBS value from
+         the administrative MBS value"
+    ::= { tnNetworkIngressMeterEntry 26 }
+
+--
+-- Dummy Scalars
+--
+tnSASNetworkIngressScalar1 OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A dummy scalar that satisfies a SNMP get request quickly when
+         there is no 11QPE24 card provisioned.  Otherwise, it has to
+         traverse the remaining 11QPE24 MIB to get to the next applicable
+         item."
+    ::= { tnSASNetworkIngressObjects 101 }
+
+tnSASNetworkIngressScalar2 OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "."
+    ::= { tnSASNetworkIngressObjects 102 }
+
+tnSASSlopePolicyExtnTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF TSasSlopePolicyExtnEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Slope Policy Table. Additions for sas platform"
+    ::= { tnSASSlopeObjects 1 }
+
+tnSASSlopePolicyExtnEntry OBJECT-TYPE
+    SYNTAX       TSasSlopePolicyExtnEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Slope Policy Entry additions for sas platform."
+    AUGMENTS    { tnSlopePolicyEntry }
+    ::= { tnSASSlopePolicyExtnTable 1 }
+
+TSasSlopePolicyExtnEntry ::= SEQUENCE
+    {
+        tnSlopeHiQueue1DropRate TSlopeDropRate,
+        tnSlopeHiQueue2DropRate TSlopeDropRate,
+        tnSlopeHiQueue3DropRate TSlopeDropRate,
+        tnSlopeHiQueue4DropRate TSlopeDropRate,
+        tnSlopeHiQueue5DropRate TSlopeDropRate,
+        tnSlopeHiQueue6DropRate TSlopeDropRate,
+        tnSlopeHiQueue7DropRate TSlopeDropRate,
+        tnSlopeHiQueue8DropRate TSlopeDropRate,
+        tnSlopeLoQueue1DropRate TSlopeDropRate,
+        tnSlopeLoQueue2DropRate TSlopeDropRate,
+        tnSlopeLoQueue3DropRate TSlopeDropRate,
+        tnSlopeLoQueue4DropRate TSlopeDropRate,
+        tnSlopeLoQueue5DropRate TSlopeDropRate,
+        tnSlopeLoQueue6DropRate TSlopeDropRate,
+        tnSlopeLoQueue7DropRate TSlopeDropRate,
+        tnSlopeLoQueue8DropRate TSlopeDropRate,
+        tnSlopeHiStartThreshold TSlopeThreshold,
+        tnSlopeLoStartThreshold TSlopeThreshold
+    }
+
+tnSlopeHiQueue1DropRate OBJECT-TYPE
+    SYNTAX       TSlopeDropRate
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "High Queue Drop Rate"
+    DEFVAL { 1 }
+    ::= { tnSASSlopePolicyExtnEntry 1 }
+
+tnSlopeHiQueue2DropRate OBJECT-TYPE
+    SYNTAX       TSlopeDropRate
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "High Queue Drop Rate"
+    DEFVAL { 1 }
+    ::= { tnSASSlopePolicyExtnEntry 2 }
+
+tnSlopeHiQueue3DropRate OBJECT-TYPE
+    SYNTAX       TSlopeDropRate
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "High Queue Drop Rate"
+    DEFVAL { 1 }
+    ::= { tnSASSlopePolicyExtnEntry 3 }
+
+tnSlopeHiQueue4DropRate OBJECT-TYPE
+    SYNTAX       TSlopeDropRate
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "High Queue Drop Rate"
+    DEFVAL { 1 }
+    ::= { tnSASSlopePolicyExtnEntry 4 }
+
+tnSlopeHiQueue5DropRate OBJECT-TYPE
+    SYNTAX       TSlopeDropRate
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "High Queue Drop Rate"
+    DEFVAL { 1 }
+    ::= { tnSASSlopePolicyExtnEntry 5 }
+
+tnSlopeHiQueue6DropRate OBJECT-TYPE
+    SYNTAX       TSlopeDropRate
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "High Queue Drop Rate"
+    DEFVAL { 1 }
+    ::= { tnSASSlopePolicyExtnEntry 6 }
+
+tnSlopeHiQueue7DropRate OBJECT-TYPE
+    SYNTAX       TSlopeDropRate
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "High Queue Drop Rate"
+    DEFVAL { 1 }
+    ::= { tnSASSlopePolicyExtnEntry 7 }
+
+tnSlopeHiQueue8DropRate OBJECT-TYPE
+    SYNTAX       TSlopeDropRate
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "High Queue Drop Rate"
+    DEFVAL { 1 }
+    ::= { tnSASSlopePolicyExtnEntry 8 }
+
+tnSlopeLoQueue1DropRate OBJECT-TYPE
+    SYNTAX       TSlopeDropRate
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "Low Queue Drop Rate"
+    DEFVAL { 0 }
+    ::= { tnSASSlopePolicyExtnEntry 9 }
+
+tnSlopeLoQueue2DropRate OBJECT-TYPE
+    SYNTAX       TSlopeDropRate
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "Low Queue Drop Rate"
+    DEFVAL { 0 }
+    ::= { tnSASSlopePolicyExtnEntry 10 }
+
+tnSlopeLoQueue3DropRate OBJECT-TYPE
+    SYNTAX       TSlopeDropRate
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "Low Queue Drop Rate"
+    DEFVAL { 0 }
+    ::= { tnSASSlopePolicyExtnEntry 11 }
+
+tnSlopeLoQueue4DropRate OBJECT-TYPE
+    SYNTAX       TSlopeDropRate
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "Low Queue Drop Rate"
+    DEFVAL { 0 }
+    ::= { tnSASSlopePolicyExtnEntry 12 }
+
+tnSlopeLoQueue5DropRate OBJECT-TYPE
+    SYNTAX       TSlopeDropRate
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "Low Queue Drop Rate"
+    DEFVAL { 0 }
+    ::= { tnSASSlopePolicyExtnEntry 13 }
+
+tnSlopeLoQueue6DropRate OBJECT-TYPE
+    SYNTAX       TSlopeDropRate
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "Low Queue Drop Rate"
+    DEFVAL { 0 }
+    ::= { tnSASSlopePolicyExtnEntry 14 }
+
+tnSlopeLoQueue7DropRate OBJECT-TYPE
+    SYNTAX       TSlopeDropRate
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "Low Queue Drop Rate"
+    DEFVAL { 0 }
+    ::= { tnSASSlopePolicyExtnEntry 15 }
+
+tnSlopeLoQueue8DropRate OBJECT-TYPE
+    SYNTAX       TSlopeDropRate
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "Low Queue Drop Rate"
+    DEFVAL { 0 }
+    ::= { tnSASSlopePolicyExtnEntry 16 }
+
+tnSlopeHiStartThreshold OBJECT-TYPE
+    SYNTAX       TSlopeThreshold
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "High slope Start Threshold.This object implies that once the
+        shared buffer utilization reaches the start-threshold
+        level then high-priority packets egressing out from
+        a particular queue would be dropped at configured drop
+        rate."
+    DEFVAL { 75 }
+    ::= { tnSASSlopePolicyExtnEntry 17 }
+
+tnSlopeLoStartThreshold OBJECT-TYPE
+    SYNTAX       TSlopeThreshold
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "Low slope Start Threshold.This implies that once the
+        shared buffer utilization reaches the start-threshold
+        level then low-priority packets egressing out from a
+        particular queue would be dropped at configured drop
+        rate."
+    DEFVAL { 50 }
+    ::= { tnSASSlopePolicyExtnEntry 18 }
+
+tnSlopePolicyQueueTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF TQueueSlopePolicyEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Slope Policy Per Queue Per Port additions for SAS-M platform.
+        In SAS-M there are three slopes associated with a queue.
+        One slope for Tcp Green packets, one for Tcp Yellow packets
+        and one for Non Tcp Packets(both green and yellow packets).
+        Each slope in turn can have four parameters defining its
+        behavior"
+    ::= { tnSASSlopeObjects 2 }
+
+tnSlopePolicyQueueEntry OBJECT-TYPE
+    SYNTAX       TQueueSlopePolicyEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "."
+    INDEX    { tnSysSwitchId, tnSlopePolicy,  tnSlopePolicyQueueId }
+    ::= { tnSlopePolicyQueueTable 1 }
+
+TQueueSlopePolicyEntry ::= SEQUENCE
+    {
+        tnSlopePolicyQueueId                    TQueueId,
+        tnSlopePolicyQueueRowStatus             RowStatus,
+        tnSlopePolicyQueueLastChanged           TimeStamp,
+        tnSlopePolicyQueueHiAdminStatus         INTEGER,
+        tnSlopePolicyQueueHiStartAverage        Unsigned32,
+        tnSlopePolicyQueueHiMaxAverage          Unsigned32,
+        tnSlopePolicyQueueHiMaxProbability      TMaxProbability,
+        tnSlopePolicyQueueLoAdminStatus         INTEGER,
+        tnSlopePolicyQueueLoStartAverage        Unsigned32,
+        tnSlopePolicyQueueLoMaxAverage          Unsigned32,
+        tnSlopePolicyQueueLoMaxProbability      TMaxProbability,
+        tnSlopePolicyQueueNonTcpAdminStatus     INTEGER,
+        tnSlopePolicyQueueNonTcpStartAverage    Unsigned32,
+        tnSlopePolicyQueueNonTcpMaxAverage      Unsigned32,
+        tnSlopePolicyQueueNonTcpMaxProbability  TMaxProbability,
+        tnSlopePolicyQueueTimeAvgFactor         Unsigned32
+    }
+
+tnSlopePolicyQueueId OBJECT-TYPE
+    SYNTAX       TQueueId (1..8)
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Queue for which slope policy is being defined"
+    ::= { tnSlopePolicyQueueEntry 1 }
+
+
+tnSlopePolicyQueueRowStatus OBJECT-TYPE
+    SYNTAX       RowStatus
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "Row Status of the entry. This allows creation/deletion of rows in this
+         table."
+    ::= { tnSlopePolicyQueueEntry 2 }
+
+tnSlopePolicyQueueLastChanged OBJECT-TYPE
+    SYNTAX       TimeStamp
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Timestamp of last change to this row."
+    ::= { tnSlopePolicyQueueEntry 3 }
+
+tnSlopePolicyQueueHiAdminStatus OBJECT-TYPE
+    SYNTAX       INTEGER {
+                     up  (1),
+                     down(2)
+                 }
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "tnSlopePolicyQueueHiAdminStatus specifies the admin state for the queue's
+ high profile (Tcp Green Packets )slope. If the tnSlopePolicyQueueHiAdminStatus
+ is set to 'down',the slope is inactive."
+    DEFVAL { down }
+    ::= { tnSlopePolicyQueueEntry 4 }
+
+tnSlopePolicyQueueHiStartAverage OBJECT-TYPE
+    SYNTAX       Unsigned32 (0..100)
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "The percentage of the buffer utilized after which the drop probability
+        starts to rise above 0."
+    DEFVAL { 70 }
+    ::= { tnSlopePolicyQueueEntry 5 }
+
+tnSlopePolicyQueueHiMaxAverage OBJECT-TYPE
+    SYNTAX       Unsigned32 (0..100)
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "The percentage of the buffer utilized after which the drop probability
+ is 100 percent. This implies that all packets beyond this point will be
+        dropped."
+    DEFVAL { 90 }
+    ::= { tnSlopePolicyQueueEntry 6 }
+
+tnSlopePolicyQueueHiMaxProbability OBJECT-TYPE
+    SYNTAX       TMaxProbability
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "High Profile Max Probability.Defines the slope between the
+        Start Average and Max Average"
+    DEFVAL { 75 }
+    ::= { tnSlopePolicyQueueEntry 7 }
+
+tnSlopePolicyQueueLoAdminStatus OBJECT-TYPE
+    SYNTAX       INTEGER {
+                     up  (1),
+                     down(2)
+                 }
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "tnSlopePolicyQueueLoAdminStatus specifies the admin state for the queue's
+        low profile (Tcp Yellow Packets )slope. If the tnSlopePolicyQueueLoAdminStatus
+ is set to 'down',the slope is inactive."
+    DEFVAL { down }
+    ::= { tnSlopePolicyQueueEntry 8 }
+
+tnSlopePolicyQueueLoStartAverage OBJECT-TYPE
+    SYNTAX       Unsigned32 (0..100)
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "The percentage of the buffer utilized after which the drop probability
+        starts to rise above 0."
+    DEFVAL { 50 }
+    ::= { tnSlopePolicyQueueEntry 9 }
+
+tnSlopePolicyQueueLoMaxAverage OBJECT-TYPE
+    SYNTAX       Unsigned32 (0..100)
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "The percentage of the buffer utilized after which the drop probability
+ is 100 percent. This implies that all packets beyond this point will be
+        dropped."
+    DEFVAL { 75 }
+    ::= { tnSlopePolicyQueueEntry 10 }
+
+tnSlopePolicyQueueLoMaxProbability OBJECT-TYPE
+    SYNTAX       TMaxProbability
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "Low Profile Max Probability.Defines the slope between the
+        Start Average and Max Average"
+    DEFVAL { 75 }
+    ::= { tnSlopePolicyQueueEntry 11 }
+
+tnSlopePolicyQueueNonTcpAdminStatus OBJECT-TYPE
+    SYNTAX       INTEGER {
+                     up  (1),
+                     down(2)
+                 }
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "tnSlopePolicyQueueNonTcpAdminStatus specifies the admin state for the queue's
+         non tcp profile (Non Tcp Packets )slope. If the tnSlopePolicyQueueNonTcpAdminStatus
+ is set to 'down',the slope is inactive."
+    DEFVAL { down }
+    ::= { tnSlopePolicyQueueEntry 12 }
+
+tnSlopePolicyQueueNonTcpStartAverage OBJECT-TYPE
+    SYNTAX       Unsigned32 (0..100)
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "The percentage of the buffer utilized after which the drop probability
+        starts to rise above 0."
+    DEFVAL { 50 }
+    ::= { tnSlopePolicyQueueEntry 13 }
+
+tnSlopePolicyQueueNonTcpMaxAverage OBJECT-TYPE
+    SYNTAX       Unsigned32 (0..100)
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "The percentage of the buffer utilized after which the drop probability
+         is 100 percent. This implies that all packets beyond this point will be
+        dropped."
+    DEFVAL { 75 }
+    ::= { tnSlopePolicyQueueEntry 14 }
+
+tnSlopePolicyQueueNonTcpMaxProbability OBJECT-TYPE
+    SYNTAX       TMaxProbability
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "Non Tcp Profile Max Probability.Defines the slope between the
+        Start Average and Max Average"
+    DEFVAL { 75 }
+    ::= { tnSlopePolicyQueueEntry 15 }
+
+tnSlopePolicyQueueTimeAvgFactor OBJECT-TYPE
+    SYNTAX       Unsigned32 (0..15)
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "The time average factor describes the weighting between the previous
+ shared buffer average utilization result and the new shared buffer
+        utilization in determining the new shared buffer average utilization."
+    DEFVAL { 7 }
+    ::= { tnSlopePolicyQueueEntry 16 }
+
+--
+-- Dummy Scalars
+--
+tnSASSlopeScalar1 OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A dummy scalar that satisfies a SNMP get request quickly when
+         there is no 11QPE24 card provisioned.  Otherwise, it has to
+         traverse the remaining 11QPE24 MIB to get to the next applicable
+         item."
+    ::= { tnSASSlopeObjects 101 }
+
+tnSASSlopeScalar2 OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "."
+    ::= { tnSASSlopeObjects 102 }
+
+tnSASSapIngressFCTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF TSasSapIngressFCEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "This table maintains the mapping of a particular
+         forwarding class traffic into the specified meter."
+    ::= { tnSASSapIngressObjects 2 }
+
+tnSASSapIngressFCEntry OBJECT-TYPE
+    SYNTAX       TSasSapIngressFCEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Information about a particular sap-ingress policy's
+         forwarding class mappings to meters."
+    AUGMENTS    { tnSapIngressFCEntry }
+    ::= { tnSASSapIngressFCTable 1 }
+
+TSasSapIngressFCEntry ::= SEQUENCE
+    {
+        tnSapIngressFCMeter          TSapIngressMeterId,
+        tnSapIngressFCMCastMeter     TSapIngressMeterId,
+        tnSapIngressFCBCastMeter     TSapIngressMeterId,
+        tnSapIngressFCUnknownMeter   TSapIngressMeterId
+    }
+
+tnSapIngressFCMeter OBJECT-TYPE
+    SYNTAX       TSapIngressMeterId
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "The specific meter to be used for packets in this forwarding class.
+         A value of zero implies that the default meter should be used."
+    ::= { tnSASSapIngressFCEntry 1 }
+
+
+tnSapIngressFCMCastMeter OBJECT-TYPE
+    SYNTAX       TSapIngressMeterId
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "The specific multicast meter to be used for packets in this forwarding
+         class. The meter is used only for specific entities and will be
+         ignored wherever it is irrelevant.
+
+         A value of zero implies that the default meters should be used."
+    ::= { tnSASSapIngressFCEntry 2 }
+
+tnSapIngressFCBCastMeter OBJECT-TYPE
+    SYNTAX       TSapIngressMeterId
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "The specific broadcast meter to be used for packets in this forwarding
+         class. The meter is used only for specific entities and will be
+         ignored wherever it is irrelevant.
+
+         A value of zero implies that the default meters should be used."
+    ::= { tnSASSapIngressFCEntry 3 }
+
+tnSapIngressFCUnknownMeter OBJECT-TYPE
+    SYNTAX       TSapIngressMeterId
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "The specific unknown destination meter to be used for packets in this
+         forwarding class. The meter is used only for specific entities and
+         will be ignored wherever it is irrelevant.
+
+         A value of zero implies that the default meters should be used."
+    ::= { tnSASSapIngressFCEntry 4 }
+
+
+tnSASPortSchedulerPlcyTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TSasPortSchedulerPlcyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tnSASPortSchedulerPlcyTable has an entry for each port scheduler
+         configured on this system."
+    ::= { tnSASSchedulerObjects 1 }
+
+tnSASPortSchedulerPlcyEntry OBJECT-TYPE
+    SYNTAX      TSasPortSchedulerPlcyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row represents a particular port scheduler. Entries are created
+         and deleted by the user."
+    AUGMENTS   { tnPortSchedulerPlcyEntry }
+    ::= { tnSASPortSchedulerPlcyTable 1 }
+
+TSasPortSchedulerPlcyEntry ::= SEQUENCE
+    {
+        tnPortSchedulerPlcyMode                  TPlcyMode,
+        tnPortSchedulerPlcyQuanta                TPlcyQuanta,
+        tnPortSchedulerPlcyQueue1Weight          TQWeight,
+        tnPortSchedulerPlcyQueue2Weight          TQWeight,
+        tnPortSchedulerPlcyQueue3Weight          TQWeight,
+        tnPortSchedulerPlcyQueue4Weight          TQWeight,
+        tnPortSchedulerPlcyQueue5Weight          TQWeight,
+        tnPortSchedulerPlcyQueue6Weight          TQWeight,
+        tnPortSchedulerPlcyQueue7Weight          TQWeight,
+        tnPortSchedulerPlcyQueue8Weight          TQWeight
+     }
+
+tnPortSchedulerPlcyMode OBJECT-TYPE
+    SYNTAX      TPlcyMode
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Port Scheduler Policy Mode"
+    DEFVAL      { strict }
+    ::= { tnSASPortSchedulerPlcyEntry 1 }
+
+tnPortSchedulerPlcyQuanta OBJECT-TYPE
+    SYNTAX      TPlcyQuanta
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Port Scheduler Policy Quanta"
+    DEFVAL      { 0 }
+    ::= { tnSASPortSchedulerPlcyEntry 2 }
+
+tnPortSchedulerPlcyQueue1Weight OBJECT-TYPE
+    SYNTAX      TQWeight
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Port Scheduler Policy Queue 1 Weight"
+    DEFVAL      { 1 }
+    ::= { tnSASPortSchedulerPlcyEntry 3 }
+
+
+tnPortSchedulerPlcyQueue2Weight OBJECT-TYPE
+    SYNTAX      TQWeight
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Port Scheduler Policy Queue 2 Weight"
+    DEFVAL      { 1 }
+    ::= { tnSASPortSchedulerPlcyEntry 4 }
+
+
+tnPortSchedulerPlcyQueue3Weight OBJECT-TYPE
+    SYNTAX      TQWeight
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Port Scheduler Policy Queue 3 Weight"
+    DEFVAL      { 1 }
+    ::= { tnSASPortSchedulerPlcyEntry 5 }
+
+
+tnPortSchedulerPlcyQueue4Weight OBJECT-TYPE
+    SYNTAX      TQWeight
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Port Scheduler Policy Queue 4 Weight"
+    DEFVAL      { 1 }
+    ::= { tnSASPortSchedulerPlcyEntry 6 }
+
+
+tnPortSchedulerPlcyQueue5Weight OBJECT-TYPE
+    SYNTAX      TQWeight
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Port Scheduler Policy Queue 5 Weight"
+    DEFVAL      { 1 }
+    ::= { tnSASPortSchedulerPlcyEntry 7 }
+
+
+tnPortSchedulerPlcyQueue6Weight OBJECT-TYPE
+    SYNTAX      TQWeight
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Port Scheduler Policy Queue 6 Weight"
+    DEFVAL      { 1 }
+    ::= { tnSASPortSchedulerPlcyEntry 8 }
+
+
+tnPortSchedulerPlcyQueue7Weight OBJECT-TYPE
+    SYNTAX      TQWeight
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Port Scheduler Policy Queue 7 Weight"
+    DEFVAL      { 1 }
+    ::= { tnSASPortSchedulerPlcyEntry 9 }
+
+
+tnPortSchedulerPlcyQueue8Weight OBJECT-TYPE
+    SYNTAX      TQWeight
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Port Scheduler Policy Queue 8 Weight"
+    DEFVAL      { 1 }
+    ::= { tnSASPortSchedulerPlcyEntry 10 }
+
+-- ----------------------------------------
+-- port scheduler policies for preempt Table
+-- ----------------------------------------
+
+tnSASPortPreemptSchedulerPlcyTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TnSasPortPreemptSchedulerPlcyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tnSASPortPreemptSchedulerPlcyTable has an entry for each port scheduler
+         configured on this system."
+    ::= { tnSASSchedulerObjects 2 }
+
+tnSASPortPreemptSchedulerPlcyEntry OBJECT-TYPE
+    SYNTAX      TnSasPortPreemptSchedulerPlcyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row represents a Preempt mode for particular port scheduler. Entries are created
+         and deleted by the user."
+    INDEX    { tnSysSwitchId, tnPortSchedulerPlcyName }
+    ::= { tnSASPortPreemptSchedulerPlcyTable 1 }
+
+TnSasPortPreemptSchedulerPlcyEntry ::= SEQUENCE
+    {
+        tnPortSchedulerPlcyQueue1Preempt          TQPreempt,
+        tnPortSchedulerPlcyQueue2Preempt          TQPreempt,
+        tnPortSchedulerPlcyQueue3Preempt          TQPreempt,
+        tnPortSchedulerPlcyQueue4Preempt          TQPreempt,
+        tnPortSchedulerPlcyQueue5Preempt          TQPreempt,
+        tnPortSchedulerPlcyQueue6Preempt          TQPreempt,
+        tnPortSchedulerPlcyQueue7Preempt          TQPreempt,
+        tnPortSchedulerPlcyQueue8Preempt          TQPreempt
+     }
+
+tnPortSchedulerPlcyQueue1Preempt OBJECT-TYPE
+    SYNTAX      TQPreempt
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Port Scheduler Policy Queue 1 Preempt"
+    DEFVAL      { 0}
+    ::= { tnSASPortPreemptSchedulerPlcyEntry 1 }
+
+tnPortSchedulerPlcyQueue2Preempt OBJECT-TYPE
+    SYNTAX      TQPreempt
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Port Scheduler Policy Queue 2 Preempt"
+    DEFVAL      { 0 }
+    ::= { tnSASPortPreemptSchedulerPlcyEntry 2 }
+
+tnPortSchedulerPlcyQueue3Preempt OBJECT-TYPE
+    SYNTAX      TQPreempt
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Port Scheduler Policy Queue 3 Preempt"
+    DEFVAL      { 0 }
+    ::= { tnSASPortPreemptSchedulerPlcyEntry 3 }
+
+tnPortSchedulerPlcyQueue4Preempt OBJECT-TYPE
+    SYNTAX      TQPreempt
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Port Scheduler Policy Queue 4 Preempt"
+    DEFVAL      { 0 }
+    ::= { tnSASPortPreemptSchedulerPlcyEntry 4 }
+
+tnPortSchedulerPlcyQueue5Preempt OBJECT-TYPE
+    SYNTAX      TQPreempt
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Port Scheduler Policy Queue 5 Preempt"
+    DEFVAL      { 0 }
+    ::= { tnSASPortPreemptSchedulerPlcyEntry 5 }
+
+tnPortSchedulerPlcyQueue6Preempt OBJECT-TYPE
+    SYNTAX      TQPreempt
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Port Scheduler Policy Queue 6 Preempt"
+    DEFVAL      { 0 }
+    ::= { tnSASPortPreemptSchedulerPlcyEntry 6 }
+
+tnPortSchedulerPlcyQueue7Preempt OBJECT-TYPE
+    SYNTAX      TQPreempt
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Port Scheduler Policy Queue 7 Preempt"
+    DEFVAL      { 0 }
+    ::= { tnSASPortPreemptSchedulerPlcyEntry 7 }
+
+tnPortSchedulerPlcyQueue8Preempt OBJECT-TYPE
+    SYNTAX      TQPreempt
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Port Scheduler Policy Queue 8 Preempt"
+    DEFVAL      { 0 }
+    ::= { tnSASPortPreemptSchedulerPlcyEntry 8 }
+
+-- ----------------------------------------
+-- Ingress QoS Meter SAP Statistics Table
+-- ----------------------------------------
+tnSapIngQosMeterStatsTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF SapIngQosMeterStatsEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "A table that contains ingress QoS meter SAP
+                     statistics."
+    ::= { tnSASSapIngressObjects 3 }
+
+tnSapIngQosMeterStatsEntry OBJECT-TYPE
+    SYNTAX          SapIngQosMeterStatsEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "Ingress statistics about a specific SAP's
+                     QoS meter."
+    INDEX           { tnSysSwitchId, tnSvcId, tnSapPortId, tnSapEncapValue, tnSapIngQosMeterId }
+    ::= { tnSapIngQosMeterStatsTable 1 }
+
+SapIngQosMeterStatsEntry ::=
+    SEQUENCE {
+        tnSapIngQosMeterId                           TSapIngressMeterId,
+        tnSapIngQosMeterStatsForwardedInProfPackets  Counter64,
+        tnSapIngQosMeterStatsForwardedOutProfPackets Counter64,
+        tnSapIngQosMeterStatsForwardedInProfOctets   Counter64,
+        tnSapIngQosMeterStatsForwardedOutProfOctets  Counter64,
+        tnSapIngQosMeterStatsForwardedPackets        Counter64,
+        tnSapIngQosMeterStatsForwardedOctets         Counter64,
+        tnSapIngQosMeterStatsDroppedPackets          Counter64,
+        tnSapIngQosMeterStatsDroppedOctets           Counter64
+    }
+
+tnSapIngQosMeterId OBJECT-TYPE
+    SYNTAX          TSapIngressMeterId
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "The index of the ingress QoS meter of
+                     this SAP."
+    ::= { tnSapIngQosMeterStatsEntry 1 }
+
+tnSapIngQosMeterStatsForwardedInProfPackets OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The number of in-profile packets
+                     (rate below CIR) forwarded by the
+                     ingress Qchip."
+    ::= { tnSapIngQosMeterStatsEntry 10 }
+
+tnSapIngQosMeterStatsForwardedOutProfPackets OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The number of out-of-profile packets
+                     (rate above CIR) forwarded by the
+                     ingress Qchip."
+    ::= { tnSapIngQosMeterStatsEntry 11 }
+
+tnSapIngQosMeterStatsForwardedInProfOctets OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The number of in-profile octets
+                     (rate below CIR) forwarded by the
+                     ingress Qchip."
+    ::= { tnSapIngQosMeterStatsEntry 12 }
+
+tnSapIngQosMeterStatsForwardedOutProfOctets OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The number of out-of-profile octets
+                     (rate above CIR) forwarded by the
+                     ingress Qchip."
+    ::= { tnSapIngQosMeterStatsEntry 13 }
+
+tnSapIngQosMeterStatsForwardedPackets OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The number of packets forwarded by the
+                     ingress Qchip."
+    ::= { tnSapIngQosMeterStatsEntry 14 }
+
+tnSapIngQosMeterStatsForwardedOctets OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The number of octets forwarded
+                    by the ingress Qchip."
+    ::= { tnSapIngQosMeterStatsEntry 15 }
+
+tnSapIngQosMeterStatsDroppedPackets OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The number of packets dropped by the
+                     ingress Qchip."
+    ::= { tnSapIngQosMeterStatsEntry 16 }
+
+tnSapIngQosMeterStatsDroppedOctets OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The number of  octets dropped by the
+                     ingress Qchip."
+    ::= { tnSapIngQosMeterStatsEntry 17 }
+
+-- ----------------------------------------
+-- QoS Frame Based Account Table
+-- ----------------------------------------
+tnQosFrameBasedAccntTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF TnQosFrameBasedAccntEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "A row in this table indicates whether Frame based
+                     accounting is enabled in the ingress and egress
+                     directions."
+    ::= { tnQosFrameBasedAccntObjects 3 }
+
+tnQosFrameBasedAccntEntry OBJECT-TYPE
+    SYNTAX          TnQosFrameBasedAccntEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "An entry indicating the ingress or egress state for
+                     frame based accounting."
+    INDEX           { tnSysSwitchId }
+    ::= { tnQosFrameBasedAccntTable 1 }
+
+TnQosFrameBasedAccntEntry ::=
+    SEQUENCE {
+        tnQosIngressFrameBasedAccnt  TruthValue,
+        tnQosEgressFrameBasedAccnt   TruthValue
+    }
+
+tnQosIngressFrameBasedAccnt OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object is used to enable frame based accounting for all
+         the ingress meters in use by the pack.  When this is enabled
+         the ingress meters account for the IFG (12 bytes) + SFD (8 bytes)
+         overhead associated with Ethernet frame."
+    DEFVAL { false }
+    ::= { tnQosFrameBasedAccntEntry 1 }
+
+tnQosEgressFrameBasedAccnt OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object is used to enable frame based accounting for all
+         the egress queue shapers and the port egress rate shaper in
+         use by the pack.  When this is enabled the shapers account for
+         the IFG (12 bytes) + SFD (8 bytes) overhead associated with
+         Ethernet frame."
+    DEFVAL { false }
+    ::= { tnQosFrameBasedAccntEntry 2 }
+
+
+tnSapIngressExtnTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF TSapIngressExtnEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "."
+    ::= { tnSASSapIngressObjects 4 }
+
+tnSapIngressExtnEntry OBJECT-TYPE
+    SYNTAX          TSapIngressExtnEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "."
+    AUGMENTS   { tnSapIngressEntry }
+    ::= { tnSapIngressExtnTable 1 }
+
+TSapIngressExtnEntry ::=
+    SEQUENCE {
+        tnSapIngressNumQosClassifiers              Unsigned32,
+--        tnSapIngressQosClassifiersUsed             Unsigned32,
+--        tnSapIngressQosMetersUsed                  Unsigned32,
+        tnSapIngressQosClassifiersRequiredInVpls   Unsigned32,
+        tnSapIngressQosClassifiersRequiredInEpipe  Unsigned32,
+        tnSapIngressQosMetersRequiredInVpls        Unsigned32,
+        tnSapIngressQosMetersRequiredInEpipe       Unsigned32,
+        tnSapIngressIPCriteriaMatch                INTEGER,
+        tnSapIngressMacCriteriaMatch               INTEGER,
+        tnSapIngressIPv6CriteriaEnable             TruthValue,
+        tnSapIngressIPv6CriteriaMatch              INTEGER
+    }
+
+tnSapIngressNumQosClassifiers OBJECT-TYPE
+    SYNTAX Unsigned32 (2..256)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The number of ingress QoS classifiers to be allocated
+        to the SAP on which this policy is applied. The number
+        of QoS classifiers required by a SAP ingress QoS policy
+        should be less than or equal to its tnSapIngressNumQosClassifiers.
+        The number of Meters required by a SAP ingress QoS policy
+        should be less than or equal to half the number of
+        tnSapIngressNumQosClassifiers."
+    DEFVAL { 2 }
+    ::= { tnSapIngressExtnEntry 1 }
+
+-- tnSapIngressQosClassifiersUsed OBJECT-TYPE
+--     SYNTAX Unsigned32
+--     MAX-ACCESS read-only
+--     STATUS obsolete
+--     DESCRIPTION
+--         "This value indicates the number of ingress QoS classifiers
+--         required when this policy is applied on a SAP. This value is
+--         calculated based on the number of classifiers required for a
+--         VPLS SAP."
+--     ::= { tnSapIngressExtnEntry 2 }
+--
+-- tnSapIngressQosMetersUsed OBJECT-TYPE
+--     SYNTAX Unsigned32
+--     MAX-ACCESS read-only
+--     STATUS obsolete
+--     DESCRIPTION
+--         "This value indicates the number of ingress QoS meters required
+--         when this policy is applied on a SAP.  This value is calculated
+--         based on the number of meters required for a VPLS SAP."
+--     ::= { tnSapIngressExtnEntry 3 }
+
+tnSapIngressQosClassifiersRequiredInVpls OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This value indicates the number of ingress QoS classifiers
+        required when this policy is applied on a SAP. This value is
+        calculated based on the number of classifiers required for a
+        VPLS SAP."
+    ::= { tnSapIngressExtnEntry 4 }
+
+tnSapIngressQosClassifiersRequiredInEpipe OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This value indicates the number of ingress QoS classifiers
+        required when this policy is applied on a SAP. This value is
+        calculated based on the number of classifiers required for a
+        EPIPE SAP."
+    ::= { tnSapIngressExtnEntry 5 }
+
+tnSapIngressQosMetersRequiredInVpls OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This value indicates the number of ingress QoS meters required
+        when this policy is applied on a SAP.  This value is calculated
+        based on the number of meters required for a VPLS SAP."
+    ::= { tnSapIngressExtnEntry 6 }
+
+tnSapIngressQosMetersRequiredInEpipe OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This value indicates the number of ingress QoS meters required
+        when this policy is applied on a SAP.  This value is calculated
+        based on the number of meters required for a EPIPE SAP."
+    ::= { tnSapIngressExtnEntry 7 }
+
+tnSapIngressIPCriteriaMatch OBJECT-TYPE
+    SYNTAX       INTEGER {
+                     any  (1),
+                     dscp-only(2)
+                 }
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "This object specifies the basic match criteria as 'any' or 'dscp-only'
+        based on ip. The default value is 'dscp-only' "
+    DEFVAL { dscp-only }
+    ::= { tnSapIngressExtnEntry 8 }
+
+tnSapIngressMacCriteriaMatch OBJECT-TYPE
+    SYNTAX       INTEGER {
+                     any  (1),
+                     dot1p-only(2)
+                 }
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+         "This object specifies the basic match criteria as 'any' or 'dot1p-only'
+        based on Mac Address. The default value is 'any' "
+    DEFVAL { any }
+    ::= { tnSapIngressExtnEntry 9 }
+
+tnSapIngressIPv6CriteriaEnable OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "tnSapIngressIPv6CriteriaEnable is a boolean
+        flag which allows/disallows configuring match criteria
+        based on ipv6 address"
+    DEFVAL { false }
+    ::= { tnSapIngressExtnEntry 10 }
+
+tnSapIngressIPv6CriteriaMatch OBJECT-TYPE
+    SYNTAX       INTEGER {
+                     any  (1),
+                     dscp-only(2)
+                 }
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "This object specifies the basic match criteria as 'any' or 'dscp-only'
+        based on ipv6. The default value is 'dscp-only' "
+    DEFVAL { dscp-only }
+    ::= { tnSapIngressExtnEntry 11 }
+
+--
+-- Dummy Scalars
+--
+tnSASSapIngressScalar1 OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A dummy scalar that satisfies a SNMP get request quickly when
+         there is no 11QPE24 card provisioned.  Otherwise, it has to
+         traverse the remaining 11QPE24 MIB to get to the next applicable
+         item."
+    ::= { tnSASSapIngressObjects 101 }
+
+tnSASSapIngressScalar2 OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "."
+    ::= { tnSASSapIngressObjects 102 }
+
+tnNetworkPolicyExtnTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF TNetworkPolicyExtnEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "Extension table to tnNetworkPolicyTable"
+    ::= { tnSASNetworkObjects 1 }
+
+tnNetworkPolicyExtnEntry OBJECT-TYPE
+    SYNTAX          TNetworkPolicyExtnEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "."
+    AUGMENTS   { tnNetworkPolicyEntry }
+    ::= { tnNetworkPolicyExtnTable 1 }
+
+TNetworkPolicyExtnEntry ::=
+    SEQUENCE {
+        tnNetworkPolicyType               TNetworkPolicyType,
+        tnNetworkPolicyRemarkPolicyId     TRemarkPolicyID,
+        tnNetworkIngressMeterColorMode    INTEGER,
+        tnNetworkIngressMplsLspExpProfile TMplsLspExpProfMapID,
+        tnNetworkEgressRemarkType         INTEGER
+    }
+
+tnNetworkPolicyType OBJECT-TYPE
+    SYNTAX       TNetworkPolicyType
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "Network policy Type determines the point of attachment of the
+         network qos policy. Network policy with 'ipInterface' type can be
+         attached to ip interface and 'port' type can be attached to
+         physical port"
+    DEFVAL { ipInterface }
+    ::= { tnNetworkPolicyExtnEntry 1 }
+
+tnNetworkPolicyRemarkPolicyId OBJECT-TYPE
+    SYNTAX       TRemarkPolicyID
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "Remark Policy Id that be used."
+    DEFVAL { 2 }
+    ::= { tnNetworkPolicyExtnEntry 2 }
+
+tnNetworkIngressMeterColorMode OBJECT-TYPE
+    SYNTAX       INTEGER {
+                     color-aware  (1),
+                     color-blind  (2)
+                 }
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "tnNetworkIngressMeterColorMode indicates whether the ip interface is
+        color-aware or color-blind. By default every ip interface is color-aware"
+    DEFVAL { color-aware }
+    ::= { tnNetworkPolicyExtnEntry 3 }
+
+tnNetworkIngressMplsLspExpProfile OBJECT-TYPE
+    SYNTAX      TMplsLspExpProfMapID
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "tnNetworkIngressMplsLspExpProfile attaches the MPLS LSP EXP Profile to
+        this network policy."
+    DEFVAL { 1 }
+    ::= { tnNetworkPolicyExtnEntry 4 }
+
+tnNetworkEgressRemarkType OBJECT-TYPE
+    SYNTAX       INTEGER {
+                     use-dot1p  (1),
+                     use-dscp   (2),
+                     all        (3)
+                 }
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "This object specifies system remark type, tnNetworkPolicyEgressRemark
+        will be set to true and tnNetworkEgressRemarkType will specify the
+        remark type."
+    ::= { tnNetworkPolicyExtnEntry 5 }
+
+--
+
+tnNetworkQueueExtnTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF TNetworkQueueExtnEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "Extension table to tnNetworkQueueTable"
+    ::= { tnSASNetworkObjects 2 }
+
+tnNetworkQueueExtnEntry OBJECT-TYPE
+    SYNTAX          TNetworkQueueExtnEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "."
+    AUGMENTS   { tnNetworkQueueEntry }
+    ::= { tnNetworkQueueExtnTable 1 }
+
+TNetworkQueueExtnEntry ::=
+    SEQUENCE {
+        tnNetworkQueuePolicyName        TNamedItem
+    }
+
+tnNetworkQueuePolicyName OBJECT-TYPE
+    SYNTAX       TNamedItem
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "NetworkQueuePolicyName determines the queue management policy
+        attached to this network queue."
+    DEFVAL { "default" }
+    ::= { tnNetworkQueueExtnEntry 1 }
+
+-- tnQueueMgmtPolicyTable OBJECT-TYPE
+--     SYNTAX       SEQUENCE OF TQueueMgmtPolicyEntry
+--     MAX-ACCESS   not-accessible
+--     STATUS       current
+--     DESCRIPTION
+--         "Queue Management Policy definition for 7210-X platform."
+--     ::= { tnSASQueueMgmtObjects 1 }
+--
+-- tnQueueMgmtPolicyEntry OBJECT-TYPE
+--     SYNTAX       TQueueMgmtPolicyEntry
+--     MAX-ACCESS   not-accessible
+--     STATUS       current
+--     DESCRIPTION
+--         "."
+--     INDEX    { tnSysSwitchId, tnQueueMgmtPolicyName }
+--     ::= { tnQueueMgmtPolicyTable 1 }
+--
+-- TQueueMgmtPolicyEntry ::= SEQUENCE
+--     {
+--         tnQueueMgmtPolicyName                  TNamedItem,
+--         tnQueueMgmtPolicyRowStatus             RowStatus,
+--         tnQueueMgmtPolicyLastChanged           TimeStamp,
+--         tnQueueMgmtPolicyDescription           TItemDescription,
+--         tnQueueMgmtPolicyHiAdminStatus         INTEGER,
+--         tnQueueMgmtPolicyHiStartAverage        Unsigned32,
+--         tnQueueMgmtPolicyHiMaxAverage          Unsigned32,
+--         tnQueueMgmtPolicyHiMaxProbability      Unsigned32,
+--         tnQueueMgmtPolicyLoAdminStatus         INTEGER,
+--         tnQueueMgmtPolicyLoStartAverage        Unsigned32,
+--         tnQueueMgmtPolicyLoMaxAverage          Unsigned32,
+--         tnQueueMgmtPolicyLoMaxProbability      Unsigned32,
+--         tnQueueMgmtPolicyCBS                   INTEGER,
+--         tnQueueMgmtPolicyMBS                   INTEGER,
+--         tnQueueMgmtPolicyTimeAvgFactor         Unsigned32,
+--         tnQueueMgmtPolicyScope                 TItemScope
+--     }
+--
+-- tnQueueMgmtPolicyName OBJECT-TYPE
+--     SYNTAX       TNamedItem
+--     MAX-ACCESS   not-accessible
+--     STATUS       current
+--     DESCRIPTION
+--         "The value of tnQueueMgmtPolicyName specifies the name of the Queue
+--          Management policy."
+--     ::= { tnQueueMgmtPolicyEntry 1 }
+--
+-- tnQueueMgmtPolicyRowStatus OBJECT-TYPE
+--     SYNTAX       RowStatus
+--     MAX-ACCESS   read-create
+--     STATUS       current
+--     DESCRIPTION
+--         "Row Status of the entry. This allows creation/deletion of rows in this
+--          table."
+--     ::= { tnQueueMgmtPolicyEntry 2 }
+--
+-- tnQueueMgmtPolicyLastChanged OBJECT-TYPE
+--     SYNTAX       TimeStamp
+--     MAX-ACCESS   read-only
+--     STATUS       current
+--     DESCRIPTION
+--         "Timestamp of last change to this row."
+--     ::= { tnQueueMgmtPolicyEntry 3 }
+--
+-- tnQueueMgmtPolicyDescription OBJECT-TYPE
+--     SYNTAX       TItemDescription
+--     MAX-ACCESS   read-create
+--     STATUS       current
+--     DESCRIPTION
+--         "User-provided description of the policy."
+--     DEFVAL { ''H }
+--     ::= { tnQueueMgmtPolicyEntry 4 }
+--
+-- tnQueueMgmtPolicyHiAdminStatus OBJECT-TYPE
+--     SYNTAX       INTEGER {
+--                      up  (1),
+--                      down(2)
+--                  }
+--     MAX-ACCESS   read-create
+--     STATUS       current
+--     DESCRIPTION
+--         "tnQueueMgmtPolicyHiAdminStatus specifies the admin state for the queue's
+--  high profile (Green Packets) slope. If the tnQueueMgmtPolicyHiAdminStatus
+--  is set to 'down',the slope is inactive."
+--     DEFVAL { down }
+--     ::= { tnQueueMgmtPolicyEntry 5 }
+--
+-- tnQueueMgmtPolicyHiStartAverage OBJECT-TYPE
+--     SYNTAX       Unsigned32 (0..100)
+--     MAX-ACCESS   read-create
+--     STATUS       current
+--     DESCRIPTION
+--         "The percentage of the buffer utilized after which the drop probability
+--         starts to rise above 0."
+--     DEFVAL { 70 }
+--     ::= { tnQueueMgmtPolicyEntry 6 }
+--
+-- tnQueueMgmtPolicyHiMaxAverage OBJECT-TYPE
+--     SYNTAX       Unsigned32 (0..100)
+--     MAX-ACCESS   read-create
+--     STATUS       current
+--     DESCRIPTION
+--         "The percentage of the buffer utilized after which the drop probability
+--  is 100 percent. This implies that all packets beyond this point will be
+--         dropped."
+--     DEFVAL { 90 }
+--     ::= { tnQueueMgmtPolicyEntry 7 }
+--
+-- tnQueueMgmtPolicyHiMaxProbability OBJECT-TYPE
+--     SYNTAX       Unsigned32 (1..99)
+--     MAX-ACCESS   read-create
+--     STATUS       current
+--     DESCRIPTION
+--         "High Profile Max Probability.Defines the slope between the
+--         Start Average and Max Average"
+--     DEFVAL { 75 }
+--     ::= { tnQueueMgmtPolicyEntry 8 }
+--
+-- tnQueueMgmtPolicyLoAdminStatus OBJECT-TYPE
+--     SYNTAX       INTEGER {
+--                      up  (1),
+--                      down(2)
+--                  }
+--     MAX-ACCESS   read-create
+--     STATUS       current
+--     DESCRIPTION
+--         "tnQueueMgmtPolicyLoAdminStatus specifies the admin state for the queue's
+--         low profile (Yellow Packets) slope. If the tnQueueMgmtPolicyLoAdminStatus
+--  is set to 'down',the slope is inactive."
+--     DEFVAL { down }
+--     ::= { tnQueueMgmtPolicyEntry 9 }
+--
+-- tnQueueMgmtPolicyLoStartAverage OBJECT-TYPE
+--     SYNTAX       Unsigned32 (0..100)
+--     MAX-ACCESS   read-create
+--     STATUS       current
+--     DESCRIPTION
+--         "The percentage of the buffer utilized after which the drop probability
+--         starts to rise above 0."
+--     DEFVAL { 50 }
+--     ::= { tnQueueMgmtPolicyEntry 10 }
+--
+-- tnQueueMgmtPolicyLoMaxAverage OBJECT-TYPE
+--     SYNTAX       Unsigned32 (0..100)
+--     MAX-ACCESS   read-create
+--     STATUS       current
+--     DESCRIPTION
+--         "The percentage of the buffer utilized after which the drop probability
+--  is 100 percent. This implies that all packets beyond this point will be
+--         dropped."
+--     DEFVAL { 75 }
+--     ::= { tnQueueMgmtPolicyEntry 11 }
+--
+-- tnQueueMgmtPolicyLoMaxProbability OBJECT-TYPE
+--     SYNTAX       Unsigned32 (1..99)
+--     MAX-ACCESS   read-create
+--     STATUS       current
+--     DESCRIPTION
+--         "Low Profile Max Probability.Defines the slope between the
+--         Start Average and Max Average"
+--     DEFVAL { 75 }
+--     ::= { tnQueueMgmtPolicyEntry 12 }
+--
+-- tnQueueMgmtPolicyCBS OBJECT-TYPE
+--     SYNTAX       INTEGER (-1 | 0..800000)
+--     MAX-ACCESS   read-create
+--     STATUS       current
+--     DESCRIPTION
+--         "The amount of reserved buffer space (in kilo bytes) for the queue."
+--     DEFVAL { -1 }
+--     ::= { tnQueueMgmtPolicyEntry 13 }
+--
+-- tnQueueMgmtPolicyMBS OBJECT-TYPE
+--     SYNTAX       INTEGER (-1 | 1..800000)
+--     MAX-ACCESS   read-create
+--     STATUS       current
+--     DESCRIPTION
+--         "The maximum amount of buffer space (in kilo bytes) allowed for the
+--         queue."
+--     DEFVAL { -1 }
+--     ::= { tnQueueMgmtPolicyEntry 14 }
+--
+-- tnQueueMgmtPolicyTimeAvgFactor OBJECT-TYPE
+--     SYNTAX       Unsigned32 (0..15)
+--     MAX-ACCESS   read-create
+--     STATUS       current
+--     DESCRIPTION
+--         "The time average factor describes the weighting between the previous
+--  shared buffer average utilization result and the new shared buffer
+--         utilization in determining the new shared buffer average utilization."
+--     DEFVAL { 7 }
+--     ::= { tnQueueMgmtPolicyEntry 15 }
+--
+-- tnQueueMgmtPolicyScope OBJECT-TYPE
+--     SYNTAX       TItemScope
+--     MAX-ACCESS   read-create
+--     STATUS       current
+--     DESCRIPTION
+--         "Scope of the queue management policy."
+--     DEFVAL { template }
+--     ::= { tnQueueMgmtPolicyEntry 16 }
+--
+-- tnSapEgressExtnTable OBJECT-TYPE
+--     SYNTAX          SEQUENCE OF TSapEgressExtnEntry
+--     MAX-ACCESS      not-accessible
+--     STATUS          current
+--     DESCRIPTION
+--         "Extension table to tnSapEgressTable"
+--     ::= { tnSASSapEgressObjects 1 }
+--
+-- tnSapEgressExtnEntry OBJECT-TYPE
+--     SYNTAX          TSapEgressExtnEntry
+--     MAX-ACCESS      not-accessible
+--     STATUS          current
+--     DESCRIPTION     "."
+--     AUGMENTS   { tnSapEgressEntry }
+--     ::= { tnSapEgressExtnTable 1 }
+--
+-- TSapEgressExtnEntry ::=
+--     SEQUENCE {
+--         tnSapEgressRemark             TruthValue,
+--         tnSapEgressRemarkPolicyId     TRemarkPolicyID
+--     }
+--
+-- tnSapEgressRemark OBJECT-TYPE
+--     SYNTAX       TruthValue
+--     MAX-ACCESS   read-create
+--     STATUS       current
+--     DESCRIPTION
+--         "This object specifies if the system
+--          will remark the egress packets on SAP or not."
+--     DEFVAL { false }
+-- ::= { tnSapEgressExtnEntry 1 }
+--
+-- tnSapEgressRemarkPolicyId OBJECT-TYPE
+--     SYNTAX       TRemarkPolicyID
+--     MAX-ACCESS   read-create
+--     STATUS       current
+--     DESCRIPTION
+--         "Remark Policy Id that be used.  The default value is the default
+--         dot1p-dscp policy."
+--     DEFVAL { 1 }
+--     ::= { tnSapEgressExtnEntry 2 }
+--
+-- tnSapEgressQueueExtnTable OBJECT-TYPE
+--     SYNTAX          SEQUENCE OF TSapEgressQueueExtnEntry
+--     MAX-ACCESS      not-accessible
+--     STATUS          current
+--     DESCRIPTION
+--         "Extension table to tnSapEgressQueueTable"
+--     ::= { tnSASSapEgressObjects 2 }
+--
+-- tnSapEgressQueueExtnEntry OBJECT-TYPE
+--     SYNTAX          TSapEgressQueueExtnEntry
+--     MAX-ACCESS      not-accessible
+--     STATUS          current
+--     DESCRIPTION     "."
+--     AUGMENTS   { tnSapEgressQueueEntry }
+--     ::= { tnSapEgressQueueExtnTable 1 }
+--
+-- TSapEgressQueueExtnEntry ::=
+--     SEQUENCE {
+--         tnSapEgressQueuePolicyName           TNamedItem
+--     }
+--
+-- tnSapEgressQueuePolicyName OBJECT-TYPE
+--     SYNTAX       TNamedItem
+--     MAX-ACCESS   read-create
+--     STATUS       current
+--     DESCRIPTION
+--         "SapEgressQueuePolicyName determines the queue management policy
+--         attached to this SAP Egress queue."
+--     DEFVAL { "default" }
+--     ::= { tnSapEgressQueueExtnEntry 1 }
+
+--
+-- remark policy table
+--
+
+tnSASRemarkPolicyTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF TSASRemarkPolicyEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION  "  "
+    ::= { tnSASGeneralQosObjects 1 }
+
+tnSASRemarkPolicyEntry OBJECT-TYPE
+    SYNTAX       TSASRemarkPolicyEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Information about a particular remarking policy's
+         forwarding class mappings to dot1p / dscp / exp
+         values.
+         Entries are created/deleted by user."
+    INDEX {tnSysSwitchId,  tnSASRemarkPolicyId }
+    ::= { tnSASRemarkPolicyTable 1 }
+
+TSASRemarkPolicyEntry ::= SEQUENCE
+    {
+        tnSASRemarkPolicyId                TRemarkPolicyID,
+        tnSASRemarkPolicyRowStatus         RowStatus,
+        tnSASRemarkPolicyDescription       TItemDescription,
+        tnSASRemarkPolicyType              INTEGER,
+        tnSASRemarkPolicyLastChanged       TimeStamp
+    }
+
+tnSASRemarkPolicyId OBJECT-TYPE
+    SYNTAX       TRemarkPolicyID
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "The remark policy ID is used as index for the table."
+    ::= { tnSASRemarkPolicyEntry 1 }
+
+tnSASRemarkPolicyRowStatus OBJECT-TYPE
+    SYNTAX       RowStatus
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "Row Status."
+    ::= { tnSASRemarkPolicyEntry 2 }
+
+tnSASRemarkPolicyDescription OBJECT-TYPE
+    SYNTAX       TItemDescription
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "User-provided description of the policy."
+    DEFVAL { ''H }
+    ::= { tnSASRemarkPolicyEntry 3 }
+
+tnSASRemarkPolicyType OBJECT-TYPE
+    SYNTAX       INTEGER {
+                     dot1p                (1),
+                     dscp                 (2),
+                     lsp-exp              (3),
+                     dot1p-dscp           (4),
+                     dot1p-lsp-exp-shared (5)
+                 }
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "The remarking type of this policy.  This specifies which
+         of the fields will be remarked."
+    DEFVAL { dot1p-lsp-exp-shared }
+    ::= { tnSASRemarkPolicyEntry 4 }
+
+tnSASRemarkPolicyLastChanged OBJECT-TYPE
+    SYNTAX       TimeStamp
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Timestamp of last change to this row in tnSASRemarkPolicyTable."
+    ::= { tnSASRemarkPolicyEntry 5 }
+
+--
+-- remark policy FC table
+--
+
+tnSASRemarkPolicyFCTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF TSASRemarkPolicyFCEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION  "  "
+    ::= { tnSASGeneralQosObjects 2 }
+
+tnSASRemarkPolicyFCEntry OBJECT-TYPE
+    SYNTAX       TSASRemarkPolicyFCEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Information about a particular queue in a remarking policy's
+         forwarding class mappings to dot1p / dscp / exp
+         values.
+         Entries are created/deleted whenever a policy is created/deleted."
+    INDEX {tnSysSwitchId,  tnSASRemarkPolicyId, tnSASRemarkPolicyFCName }
+    ::= { tnSASRemarkPolicyFCTable 1 }
+
+TSASRemarkPolicyFCEntry ::= SEQUENCE
+    {
+        tnSASRemarkPolicyFCName                 TFCName,
+        tnSASRemarkPolicyDot1PInProfile         Dot1PPriority,
+        tnSASRemarkPolicyDot1POutProfile        Dot1PPriority,
+        tnSASRemarkPolicyDSCPInProfile          TDSCPNameOrEmpty,
+        tnSASRemarkPolicyDSCPOutProfile         TDSCPNameOrEmpty,
+        tnSASRemarkPolicyLspExpInProfile        TLspExpValue,
+        tnSASRemarkPolicyLspExpOutProfile       TLspExpValue,
+        tnSASRemarkPolicyDot1PLspExpInProfile   TDot1PLspExpValue,
+        tnSASRemarkPolicyDot1PLspExpOutProfile  TDot1PLspExpValue
+    }
+
+tnSASRemarkPolicyFCName OBJECT-TYPE
+    SYNTAX       TFCName
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "The FC Class Name."
+    ::= { tnSASRemarkPolicyFCEntry 1 }
+
+tnSASRemarkPolicyDot1PInProfile OBJECT-TYPE
+    SYNTAX       Dot1PPriority
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "The Dot1p to use for in-profile traffic.  This field is valid
+         only for the following remarking types:
+              dot1p
+              dot1p-dscp"
+    DEFVAL { -1 }
+    ::= { tnSASRemarkPolicyFCEntry 2 }
+
+tnSASRemarkPolicyDot1POutProfile OBJECT-TYPE
+    SYNTAX       Dot1PPriority
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "The Dot1p to use for out-of-profile traffic.  This field is valid
+         only for the following remarking types:
+              dot1p
+              dot1p-dscp"
+    DEFVAL { -1 }
+    ::= { tnSASRemarkPolicyFCEntry 3 }
+
+tnSASRemarkPolicyDSCPInProfile OBJECT-TYPE
+    SYNTAX       TDSCPNameOrEmpty
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "The DSCP to use for in-profile traffic.  This field is valid
+         only for remarking type of dscp and dot1p-dscp."
+    DEFVAL { ''H }
+    ::= { tnSASRemarkPolicyFCEntry 4 }
+
+tnSASRemarkPolicyDSCPOutProfile OBJECT-TYPE
+    SYNTAX       TDSCPNameOrEmpty
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "The DSCP to use for out-of-profile traffic.  This field is valid
+         only for remarking type of dscp and dot1p-dscp."
+    DEFVAL { ''H }
+    ::= { tnSASRemarkPolicyFCEntry 5 }
+
+tnSASRemarkPolicyLspExpInProfile OBJECT-TYPE
+    SYNTAX       TLspExpValue
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "The lsp-exp value to use for in-profile traffic.  This field is
+         valid only for remarking type of lsp-exp."
+    DEFVAL { -1 }
+    ::= { tnSASRemarkPolicyFCEntry 6 }
+
+tnSASRemarkPolicyLspExpOutProfile OBJECT-TYPE
+    SYNTAX       TLspExpValue
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "The lsp-exp value to use for out-of-profile traffic.  This field is
+         valid only for remarking type of lsp-exp."
+    DEFVAL { -1 }
+    ::= { tnSASRemarkPolicyFCEntry 7 }
+
+tnSASRemarkPolicyDot1PLspExpInProfile OBJECT-TYPE
+    SYNTAX       TDot1PLspExpValue
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "The Dot1p / MPLS Exp value to use for in-profile traffic.
+         This field is valid only for remarking type of dot1p-lsp-exp-shared."
+    DEFVAL { -1 }
+    ::= { tnSASRemarkPolicyFCEntry 8 }
+
+tnSASRemarkPolicyDot1PLspExpOutProfile OBJECT-TYPE
+    SYNTAX       TDot1PLspExpValue
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "The Dot1p / MPLS Exp value to use for out-profile traffic.
+         This field is valid only for remarking type of dot1p-lsp-exp-shared."
+    DEFVAL { -1 }
+    ::= { tnSASRemarkPolicyFCEntry 9 }
+
+--
+-- Conformance Information
+--
+
+-- tnSASQosCompliances OBJECT IDENTIFIER ::= { tnSASQosConformance 1 }
+-- tnSASQosGroups      OBJECT IDENTIFIER ::= { tnSASQosConformance 2 }
+
+-- tnSASQosV1v0Group OBJECT-GROUP
+--    OBJECTS    {
+--        tnAccessEgressRowStatus,
+--        tnAccessEgressScope,
+--        tnAccessEgressDescription,
+--        tnAccessEgressLastChanged,
+--        tnAccessEgressRemark,
+--        tnAccessEgressQueueRowStatus,
+--        tnAccessEgressQueueCBS,
+--        tnAccessEgressQueueMBS,
+--        tnAccessEgressQueuePIRAdaptation,
+--        tnAccessEgressQueueCIRAdaptation,
+--        tnAccessEgressQueueAdminPIR,
+--        tnAccessEgressQueueAdminCIR,
+--        tnAccessEgressQueueOperPIR,
+--        tnAccessEgressQueueOperCIR,
+--        tnAccessEgressQueueLastChanged,
+--        tnAccessEgressFCRowStatus,
+--        tnAccessEgressFCQueue,
+--        tnAccessEgressFCDot1PInProfile,
+--        tnAccessEgressFCDot1POutProfile,
+--        tnAccessEgressFCLastChanged,
+--        tnSapIngressMeterRowStatus,
+--        tnSapIngressMeterMCast,
+--        tnSapIngressMeterAdminCBS,
+--        tnSapIngressMeterAdminMBS,
+--        tnSapIngressMeterOperCBS,
+--        tnSapIngressMeterOperMBS,
+--        tnSapIngressMeterCIRAdaptation,
+--        tnSapIngressMeterPIRAdaptation,
+--        tnSapIngressMeterAdminPIR,
+--        tnSapIngressMeterAdminCIR,
+--        tnSapIngressMeterOperPIR,
+--        tnSapIngressMeterOperCIR,
+--        tnSapIngressMeterLastChanged,
+--        tnSapIngressMeterMode,
+--        tnSapIngressMeterRateMode,
+--        tnNetworkIngressFCRowStatus,
+--        tnNetworkIngressFCMeter,
+--        tnNetworkIngressFCMCastMeter,
+--        tnNetworkIngressFCLastChanged,
+--        tnNetworkIngressMeterRowStatus,
+--        tnNetworkIngressMeterAdminCBS,
+--        tnNetworkIngressMeterAdminMBS,
+--        tnNetworkIngressMeterOperCBS,
+--        tnNetworkIngressMeterOperMBS,
+--        tnNetworkIngressMeterCIRAdaptation,
+--        tnNetworkIngressMeterPIRAdaptation,
+--        tnNetworkIngressMeterAdminPIR,
+--        tnNetworkIngressMeterAdminCIR,
+--        tnNetworkIngressMeterOperPIR,
+--        tnNetworkIngressMeterOperCIR,
+--        tnNetworkIngressMeterLastChanged,
+--        tnNetworkIngressMeterMode,
+--        tnNetworkIngressMeterMCast,
+--        tnNetworkIngressMeterRateMode,
+--        tnSlopeHiQueue1DropRate,
+--        tnSlopeHiQueue2DropRate,
+--        tnSlopeHiQueue3DropRate,
+--        tnSlopeHiQueue4DropRate,
+--        tnSlopeHiQueue5DropRate,
+--        tnSlopeHiQueue6DropRate,
+--        tnSlopeHiQueue7DropRate,
+--        tnSlopeHiQueue8DropRate,
+--        tnSlopeLoQueue1DropRate,
+--        tnSlopeLoQueue2DropRate,
+--        tnSlopeLoQueue3DropRate,
+--        tnSlopeLoQueue4DropRate,
+--        tnSlopeLoQueue5DropRate,
+--        tnSlopeLoQueue6DropRate,
+--        tnSlopeLoQueue7DropRate,
+--        tnSlopeLoQueue8DropRate,
+--        tnSlopeHiStartThreshold,
+--        tnSlopeLoStartThreshold,
+--        tnPortSchedulerPlcyMode,
+--        tnPortSchedulerPlcyQuanta,
+--        tnPortSchedulerPlcyQueue1Weight,
+--        tnPortSchedulerPlcyQueue2Weight,
+--        tnPortSchedulerPlcyQueue3Weight,
+--        tnPortSchedulerPlcyQueue4Weight,
+--        tnPortSchedulerPlcyQueue5Weight,
+--        tnPortSchedulerPlcyQueue6Weight,
+--        tnPortSchedulerPlcyQueue7Weight,
+--        tnPortSchedulerPlcyQueue8Weight,
+--        tnSapIngressFCMeter,
+--        tnSapIngressFCMCastMeter,
+--        tnSapIngressFCBCastMeter,
+--        tnSapIngressFCUnknownMeter,
+--        tnSapIngQosMeterId,
+--        tnSapIngQosMeterStatsForwardedInProfPackets,
+--        tnSapIngQosMeterStatsForwardedOutProfPackets,
+--        tnSapIngQosMeterStatsForwardedInProfOctets,
+--        tnSapIngQosMeterStatsForwardedOutProfOctets,
+--        tnQosIngressFrameBasedAccnt,
+--        tnQosEgressFrameBasedAccnt,
+--        tnSapIngressNumQosClassifiers
+--   }
+--       STATUS current
+--       DESCRIPTION
+--           " sas group object definition "
+--       ::= { tnSASQosGroups 1 }
+
+
+-- tmnxSASMQoSV1v0Group OBJECT-GROUP
+--    OBJECTS    {
+--        tnSlopePolicyQueueRowStatus,
+--        tnSlopePolicyQueueLastChanged,
+--        tnSlopePolicyQueueHiAdminStatus,
+--        tnSlopePolicyQueueHiStartAverage,
+--        tnSlopePolicyQueueHiMaxAverage,
+--        tnSlopePolicyQueueHiMaxProbability,
+--        tnSlopePolicyQueueLoAdminStatus,
+--        tnSlopePolicyQueueLoStartAverage,
+--        tnSlopePolicyQueueLoMaxAverage,
+--        tnSlopePolicyQueueLoMaxProbability,
+--        tnSlopePolicyQueueNonTcpAdminStatus,
+--        tnSlopePolicyQueueNonTcpStartAverage,
+--        tnSlopePolicyQueueNonTcpMaxAverage,
+--        tnSlopePolicyQueueNonTcpMaxProbability,
+--        tnSlopePolicyQueueTimeAvgFactor
+--     }
+--       STATUS current
+--       DESCRIPTION
+--           " SAS M specific group object definition "
+--       ::= { tnSASQosGroups 2 }
+
+--tmnxSASQoSV2v0Group OBJECT-GROUP
+--    OBJECTS    {
+--        tNetworkQueuePolicyName,
+--        tNetworkPolicyRemarkPolicyId,
+--        tNetworkPolicyType,
+--        tSapEgressQueuePolicyName,
+--        tSapEgressRemarkPolicyId,
+--        tSapEgressRemark,
+--        tAccessEgressRemarkPolicyId,
+--        tSASRemarkPolicyRowStatus,
+--        tSASRemarkPolicyDescription,
+--        tSASRemarkPolicyType,
+--        tSASRemarkPolicyDot1PInProfile,
+--        tSASRemarkPolicyDot1POutProfile,
+--        tSASRemarkPolicyDSCPInProfile,
+--        tSASRemarkPolicyDSCPOutProfile,
+--        tSASRemarkPolicyLspExpInProfile,
+--        tSASRemarkPolicyLspExpOutProfile,
+--        tSASRemarkPolicyDot1PLspExpInProfile,
+--        tSASRemarkPolicyDot1PLspExpOutProfile,
+--        tSASRemarkPolicyLastChanged,
+--        tQueueMgmtPolicyDescription,
+--        tQueueMgmtPolicyRowStatus,
+--        tQueueMgmtPolicyLastChanged,
+--        tQueueMgmtPolicyHiAdminStatus,
+--        tQueueMgmtPolicyHiStartAverage,
+--        tQueueMgmtPolicyHiMaxAverage,
+--        tQueueMgmtPolicyHiMaxProbability,
+--        tQueueMgmtPolicyLoAdminStatus,
+--        tQueueMgmtPolicyLoStartAverage,
+--        tQueueMgmtPolicyLoMaxAverage,
+--        tQueueMgmtPolicyLoMaxProbability,
+--        tQueueMgmtPolicyCBS,
+--        tQueueMgmtPolicyMBS,
+--        tQueueMgmtPolicyTimeAvgFactor,
+--        tQueueMgmtPolicyScope,
+--        tAccessEgressRowStatus,
+--        tAccessEgressScope,
+--        tAccessEgressDescription,
+--        tAccessEgressLastChanged,
+--        tAccessEgressRemark,
+--        tAccessEgressQueueRowStatus,
+--        tAccessEgressQueueCBS,
+--        tAccessEgressQueueMBS,
+--        tAccessEgressQueuePIRAdaptation,
+--        tAccessEgressQueueCIRAdaptation,
+--        tAccessEgressQueueAdminPIR,
+--        tAccessEgressQueueAdminCIR,
+--        tAccessEgressQueueOperPIR,
+--        tAccessEgressQueueOperCIR,
+--        tAccessEgressQueueLastChanged,
+--        tAccessEgressFCRowStatus,
+--        tAccessEgressFCQueue,
+--        tAccessEgressFCDot1PInProfile,
+--        tAccessEgressFCDot1POutProfile,
+--        tAccessEgressFCLastChanged,
+--        tSapIngressMeterRowStatus,
+--        tSapIngressMeterMCast,
+--        tSapIngressMeterAdminCBS,
+--        tSapIngressMeterAdminMBS,
+--        tSapIngressMeterOperCBS,
+--        tSapIngressMeterOperMBS,
+--        tSapIngressMeterCIRAdaptation,
+--        tSapIngressMeterPIRAdaptation,
+--        tSapIngressMeterAdminPIR,
+--        tSapIngressMeterAdminCIR,
+--        tSapIngressMeterOperPIR,
+--        tSapIngressMeterOperCIR,
+--        tSapIngressMeterLastChanged,
+--        tSapIngressMeterMode,
+--        tSapIngressMeterRateMode,
+--        tNetworkIngressFCRowStatus,
+--        tNetworkIngressFCMeter,
+--        tNetworkIngressFCMCastMeter,
+--        tNetworkIngressFCLastChanged,
+--        tNetworkIngressMeterRowStatus,
+--        tNetworkIngressMeterAdminCBS,
+--        tNetworkIngressMeterAdminMBS,
+--        tNetworkIngressMeterOperCBS,
+--        tNetworkIngressMeterOperMBS,
+--        tNetworkIngressMeterCIRAdaptation,
+--        tNetworkIngressMeterPIRAdaptation,
+--        tNetworkIngressMeterAdminPIR,
+--        tNetworkIngressMeterAdminCIR,
+--        tNetworkIngressMeterOperPIR,
+--        tNetworkIngressMeterOperCIR,
+--        tNetworkIngressMeterLastChanged,
+--        tNetworkIngressMeterMode,
+--        tNetworkIngressMeterMCast,
+--        tNetworkIngressMeterRateMode,
+--        tSlopeHiQueue1DropRate,
+--        tSlopeHiQueue2DropRate,
+--        tSlopeHiQueue3DropRate,
+--        tSlopeHiQueue4DropRate,
+--        tSlopeHiQueue5DropRate,
+--        tSlopeHiQueue6DropRate,
+--        tSlopeHiQueue7DropRate,
+--        tSlopeHiQueue8DropRate,
+--        tSlopeLoQueue1DropRate,
+--        tSlopeLoQueue2DropRate,
+--        tSlopeLoQueue3DropRate,
+--        tSlopeLoQueue4DropRate,
+--        tSlopeLoQueue5DropRate,
+--        tSlopeLoQueue6DropRate,
+--        tSlopeLoQueue7DropRate,
+--        tSlopeLoQueue8DropRate,
+--        tSlopeHiStartThreshold,
+--        tSlopeLoStartThreshold,
+--        tPortSchedulerPlcyMode,
+--        tPortSchedulerPlcyQuanta,
+--        tPortSchedulerPlcyQueue1Weight,
+--        tPortSchedulerPlcyQueue2Weight,
+--        tPortSchedulerPlcyQueue3Weight,
+--        tPortSchedulerPlcyQueue4Weight,
+--        tPortSchedulerPlcyQueue5Weight,
+--        tPortSchedulerPlcyQueue6Weight,
+--        tPortSchedulerPlcyQueue7Weight,
+--        tPortSchedulerPlcyQueue8Weight,
+--        tSapIngressFCMeter,
+--        tSapIngressFCMCastMeter,
+--        tSapIngressFCBCastMeter,
+--        tSapIngressFCUnknownMeter,
+--        sapIngQosMeterId,
+--        sapIngQosMeterStatsForwardedInProfPackets,
+--        sapIngQosMeterStatsForwardedOutProfPackets,
+--        sapIngQosMeterStatsForwardedInProfOctets,
+--        sapIngQosMeterStatsForwardedOutProfOctets,
+--        tQosIngressFrameBasedAccnt,
+--        tQosEgressFrameBasedAccnt,
+--        tSapIngressNumQosClassifiers,
+--        tSapIngressQosClassifiersRequiredInVpls,
+--        tSapIngressQosClassifiersRequiredInEpipe,
+--        tSapIngressQosMetersRequiredInVpls,
+--        tSapIngressQosMetersRequiredInEpipe,
+--        tSapIngressIPCriteriaMatch,
+--        tSapIngressMacCriteriaMatch
+--}
+--       STATUS current
+--       DESCRIPTION
+--           " sas group object definition "
+--       ::= { tmnxSASQosGroups 3 }
+
+-- tnSASQosObsolete7210V2v0Group OBJECT-GROUP
+--    OBJECTS
+--   {
+--        tnNetworkIngressMeterCBS,
+--        tnNetworkIngressMeterMBS,
+--        tnSapIngressMeterCBS,
+--        tnSapIngressMeterMBS,
+--        tnSapIngressQosClassifiersUsed,
+--        tnSapIngressQosMetersUsed
+--   }
+--    STATUS current
+--    DESCRIPTION
+--        "The group of objects which are obsoleted from version 2.0 of
+--        Nokia 7210 series systems."
+--    ::= { tnSASQosGroups 4}
+
+--tmnxSASQos7210V4v0Group OBJECT-GROUP
+--    OBJECTS
+--{
+--        tGlobalMplsLspExpProfile,
+--        tLdpLocalFcEnableAdminStatus,
+--        tLdpLocalFcEnableOperStatus,
+--        tMplsLspExpProfMapRowStatus,
+--        tMplsLspExpProfMapDescription,
+--       tAccessEgressRemarkType,
+--        tAccessEgressFCDscpInProfile,
+--        tAccessEgressFCDscpOutProfile,
+--        sapIngQosMeterStatsForwardedPackets,
+--        sapIngQosMeterStatsForwardedOctets,
+--        sapIngQosMeterStatsDroppedPackets,
+--        sapIngQosMeterStatsDroppedOctets
+--}
+--    STATUS current
+--    DESCRIPTION
+--        "The group of objects which are obsoleted from version 4.0 of
+--        Nokia 7210 series systems."
+--    ::= { tmnxSASQosGroups 5}
+
+--tmnxSASQoSComp7210V1v0  MODULE-COMPLIANCE
+--    STATUS  current
+--    DESCRIPTION
+--            "The compliance statement for revision 1.0 of TIMETRA-SAS-QOS-MIB."
+--    MODULE  this module
+--        MANDATORY-GROUPS {
+--           tmnxSASQoSV1v0Group
+--        }
+--    ::= { tmnxSASQosCompliances 1 }
+
+-- tnSASQosComp7210V2v0  MODULE-COMPLIANCE
+--    STATUS  current
+--    DESCRIPTION
+--            "The compliance statement for revision 2.0 of TIMETRA-SAS-QOS-MIB."
+--    MODULE  this module
+--        MANDATORY-GROUPS {
+--           tnSASQosV2v0Group
+--        }
+--    ::= { tnSASQosCompliances 2 }
+
+END

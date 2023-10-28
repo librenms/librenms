@@ -1,0 +1,5018 @@
+TN-IGMP-SNOOPING-MIB DEFINITIONS ::= BEGIN
+
+-- (c) Copyright 2023 Nokia Networks.  All rights reserved.
+-- This software is the confidential and proprietary property of
+-- Nokia and may only be used in accordance with the terms of the
+-- license agreement provided with this software.
+
+IMPORTS
+    IpAddress, MODULE-IDENTITY,
+    OBJECT-TYPE, Unsigned32, Counter32,
+    TimeTicks, Integer32                            FROM SNMPv2-SMI
+
+    RowStatus,
+    TEXTUAL-CONVENTION,
+    TruthValue, TimeStamp                           FROM SNMPv2-TC
+
+    tnSRMIBModules, tnSRObjs,
+    tnSRNotifyPrefix                                FROM TROPIC-GLOBAL-REG
+
+    TPolicyStatementNameOrEmpty,
+    TmnxPortID, TmnxEncapVal, TItemDescription,
+    TmnxServId, TmnxVcIdOrNone, TmnxAdminState,
+    TmnxIgmpGroupFilterMode, TmnxIgmpGroupType,
+    TmnxIgmpVersion                                 FROM TN-TC-MIB
+
+    tnSvcId, SdpId                                  FROM TN-SERV-MIB
+    tnSapPortId, tnSapEncapValue                    FROM TN-SAP-MIB
+    sdpBindId                                       FROM TN-SDP-MIB
+
+--     tmnxMcacLevelId, tmnxMcacLagPortsDown        FROM TIMETRA-MCAST-CAC-MIB
+
+    tnSysSwitchId                                   FROM TROPIC-SYSTEM-MIB
+    ;
+
+tnIgmpSnoopingMIBModule MODULE-IDENTITY
+    LAST-UPDATED    "201902150000Z"
+    ORGANIZATION    "Nokia"
+    CONTACT-INFO
+        "Nokia 7x50 Support
+         Web: http://www.nokia.com/comps/pages/carrier_support.jhtml"
+    DESCRIPTION
+        "This document is the SNMP MIB module to manage and
+         provision the IGMP snooping feature protocol for the
+         Nokia 7x50 device.
+
+         This SNMP MIB module (Specification) embodies Nokia's
+         proprietary intellectual property. Nokia retains all title and
+         ownership in the Specification, including any revisions.
+
+         Nokia grants all interested parties a non-exclusive
+         license to use and distribute an unmodified copy of this
+         Specification in connection with management of Nokia products,
+         and without fee, provided this copyright notice and license appear
+         on all copies.
+
+         This Specification is supplied 'as is', and Nokia
+         makes no warranty, either express or implied, as to the use,
+         operation, condition, or performance of the Specification."
+
+    REVISION     "201902150000Z"
+    DESCRIPTION  "1) Added the following to tnSdpBindIgmpSnpgGroupTable:
+                     sdpBndIgmpSnpgGrpNumSrc.
+                  2) Added the following to tnSdpBindIgmpSnpgStatsTable
+                     sdpBndIgmpSnpgNumGrps
+                     sdpBndIgmpSnpgRxQueryDrops."
+
+    REVISION     "201808310000Z"
+    DESCRIPTION  "Added the following tables:
+                  tnSdpBindIgmpSnpgConfigTable
+                  tnSdpBindIgmpSnpgGroupTable
+                  tnSdpBindIgmpSnpgGrpSrcTable
+                  tnSdpBindIgmpSnpgStaticGrpSrcTable
+                  tnSdpBindIgmpSnpgStatsTable."
+
+    REVISION     "201804270000Z"
+    DESCRIPTION  "Added the following table:
+                  tnSvcIgmpSnpgStatsTable."
+
+    REVISION     "201711100000Z"
+    DESCRIPTION  "Added the following to tnSapIgmpSnpgStatsTable:
+                  tnSapIgmpSnpgRxQueryDrops."
+
+    REVISION     "201505080000Z"
+    DESCRIPTION  "1) Added the following to tnSapIgmpSnpgGroupTable:
+                     tnSapIgmpSnpgGrpNumSrc.
+                  2) Added the following to tnSapIgmpSnpgStatsTable:
+                     tnSapIgmpSnpgNumGrps."
+
+    REVISION     "201212050000Z"
+    DESCRIPTION  "Commented out unsupported MIB tables and
+                  attributes for 1830."
+
+    REVISION     "201209010000Z"
+    DESCRIPTION  "Changed the following index from read-only to
+                  not-accessible:
+                  tnTlsIgmpSnpgMRouterAddress."
+
+    REVISION     "200801010000Z"
+    DESCRIPTION  "Rev 6.0                01 Jan 2008 00:00
+                  6.0 release of the NOKIA-IGMP-SNOOPING-MIB."
+
+    REVISION     "200701010000Z"
+    DESCRIPTION  "Rev 5.0                01 Jan 2007 00:00
+                  5.0 release of the NOKIA-IGMP-SNOOPING-MIB."
+
+    REVISION     "200508310000Z"
+    DESCRIPTION  "Rev 3.0                31 Aug 2005 00:00
+                  3.0 release of the NOKIA-IGMP-SNOOPING-MIB."
+
+    REVISION     "200503290000Z"
+    DESCRIPTION  "Rev 2.0                29 Mar 2005 00:00
+                  2.0 release of the NOKIA-IGMP-SNOOPING-MIB."
+
+    REVISION     "200405170000Z"
+    DESCRIPTION  "Rev 1.0                17 May 2004 00:00
+                  1.0 release of the NOKIA-IGMP-SNOOPING-MIB."
+
+        ::= { tnSRMIBModules 2 }
+
+-- ----------------------------------------------------------------------------
+--
+--  Nokia 7x50 series IGMP snooping feature
+--  MIB structure
+--
+-- ----------------------------------------------------------------------------
+
+tnIgmpSnoopingObjs                      OBJECT IDENTIFIER ::= { tnSRObjs 24 }
+    tnIgmpSnoopingTlsObjs               OBJECT IDENTIFIER ::= { tnIgmpSnoopingObjs 1 }
+    tnIgmpSnoopingSapObjs               OBJECT IDENTIFIER ::= { tnIgmpSnoopingObjs 2 }
+    tnIgmpSnoopingSdpBindObjs           OBJECT IDENTIFIER ::= { tnIgmpSnoopingObjs 3 }
+--    tnIgmpSnoopingNotificationObjs      OBJECT IDENTIFIER ::= { tnIgmpSnoopingObjs 4 }
+--    tnIgmpSnoopingTimeStampObjs         OBJECT IDENTIFIER ::= { tnIgmpSnoopingObjs 5 }
+
+-- tnIgmpSnoopingConformance               OBJECT IDENTIFIER ::= { tnSRConfs 24 }
+--     tnIgmpSnoopingTlsConformance        OBJECT IDENTIFIER ::= { tnIgmpSnoopingConformance 1 }
+--         tnIgmpSnoopingTlsCompliancs     OBJECT IDENTIFIER ::= { tnIgmpSnoopingTlsConformance 1 }
+--         tnIgmpSnoopingTlsGroups         OBJECT IDENTIFIER ::= { tnIgmpSnoopingTlsConformance 2 }
+
+--     tnIgmpSnoopingSapConformance        OBJECT IDENTIFIER ::= { tnIgmpSnoopingConformance 2 }
+--         tnIgmpSnoopingSapCompliancs     OBJECT IDENTIFIER ::= { tnIgmpSnoopingSapConformance 1 }
+--         tnIgmpSnoopingSapGroups         OBJECT IDENTIFIER ::= { tnIgmpSnoopingSapConformance 2 }
+
+--     tnIgmpSnoopingSdpBndConformance     OBJECT IDENTIFIER ::= { tnIgmpSnoopingConformance 3 }
+--         tnIgmpSnoopingSdpBndCompliancs  OBJECT IDENTIFIER ::= { tnIgmpSnoopingSdpBndConformance 1 }
+--         tnIgmpSnoopingSdpBndGroups      OBJECT IDENTIFIER ::= { tnIgmpSnoopingSdpBndConformance 2 }
+
+tnIgmpSnoopingNotifyPrefix              OBJECT IDENTIFIER ::= { tnSRNotifyPrefix 24 }
+    tnIgmpSnoopingSapPrefix             OBJECT IDENTIFIER ::= { tnIgmpSnoopingNotifyPrefix 1 }
+        tnIgmpSnpgSapNotifications      OBJECT IDENTIFIER ::= { tnIgmpSnoopingSapPrefix 0 }
+--     tnIgmpSnoopingSdpBndPrefix          OBJECT IDENTIFIER ::= { tnIgmpSnoopingNotifyPrefix 2 }
+--         tnIgmpSnpgSdpBndNotifications   OBJECT IDENTIFIER ::= { tnIgmpSnoopingSdpBndPrefix 0 }
+
+-- ----------------------------------------------------------------------------
+--
+--  Textual Conventions   (alphabetical)
+--
+-- ----------------------------------------------------------------------------
+
+AlxIgmpSnpgAdminState ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+        "The AlxIgmpSnpgAdminState data type is an enumerated integer
+         that describes the values used to identify the administrative state."
+    SYNTAX  INTEGER {
+                enabled(1),
+                disabled(2)
+            }
+
+AlxIgmpSnpgLocation ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+        "The data type AlxIgmpSnpgLocation represents the
+         type of the local 'interface':
+         - 'sap(1)': sap interface
+         - 'sdp(2)': mesh-sdp or spoke-sdp interface."
+    SYNTAX  INTEGER {
+                sap(1),
+                sdp(2)
+            }
+
+-- ----------------------------------------------------------------------------
+--
+--  Tls related IGMP Snooping objects
+--
+-- ----------------------------------------------------------------------------
+
+-- --------------------------------------------------------
+--
+-- tnTlsIgmpSnpgConfigTable
+--
+-- --------------------------------------------------------
+
+tnTlsIgmpSnpgConfigTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TlsIgmpSnpgConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table tnTlsIgmpSnpgConfigTable contains objects to
+         configure the IGMP snooping feature within a Tls
+         service."
+    ::= { tnIgmpSnoopingTlsObjs 1 }
+
+tnTlsIgmpSnpgConfigEntry OBJECT-TYPE
+    SYNTAX      TlsIgmpSnpgConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row represents an instance of IGMP snooping
+         running within a Tls service. Entries in this table
+         cannot be created or deleted via SNMP operations. An
+         entry in this table will be created by the agent upon
+         creation of a new Tls service (svcTlsInfoTable). The
+         entry is destroyed when the Tls service is removed."
+    INDEX { tnSysSwitchId, tnSvcId }
+    ::= { tnTlsIgmpSnpgConfigTable 1 }
+
+TlsIgmpSnpgConfigEntry ::= SEQUENCE {
+    tnTlsIgmpSnpgCfgAdminState        AlxIgmpSnpgAdminState,
+    tnTlsIgmpSnpgCfgGenQueryIntvl     Unsigned32,
+    tnTlsIgmpSnpgCfgRobustCount       Unsigned32,
+    tnTlsIgmpSnpgCfgReportSrcAddress  IpAddress,
+    tnTlsIgmpSnpgCfgMvrAdminState     AlxIgmpSnpgAdminState,
+    tnTlsIgmpSnpgCfgMvrDescription    TItemDescription,
+    tnTlsIgmpSnpgCfgMvrPolicy         TPolicyStatementNameOrEmpty,
+    tnTlsIgmpSnpgCfgQuerySrcAddress   IpAddress,
+    tnTlsIgmpSnpgCfgQuerySrcAddrType  INTEGER,
+    tnTlsIgmpSnpgCfgLastChangeTime    TimeStamp
+}
+
+tnTlsIgmpSnpgCfgAdminState OBJECT-TYPE
+    SYNTAX      AlxIgmpSnpgAdminState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnTlsIgmpSnpgCfgAdminState specifies
+         the administrative state of the IGMP snooping feature
+         associated with this Tls."
+    DEFVAL { disabled }
+    ::= { tnTlsIgmpSnpgConfigEntry 1 }
+
+tnTlsIgmpSnpgCfgGenQueryIntvl OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..65535)
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnTlsIgmpSnpgCfgGenQueryIntvl specifies
+         the Queriers Query Interval, on networks where the active
+         Querier is not running IGMPv3 (meaning that the Query Interval
+         is not sent in the Query PDU).
+
+         For these networks, this object needs to be set to the same
+         value as what is configured on the Querier."
+    DEFVAL { 125 }
+    ::= { tnTlsIgmpSnpgConfigEntry 2 }
+
+tnTlsIgmpSnpgCfgRobustCount OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..255)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnTlsIgmpSnpgCfgRobustCount specifies
+         the Querier's Robustness Variable, on networks where
+         the active Querier is not running IGMPv3 (meaning that
+         the Robustness Variable is not sent in the Query PDU).
+
+         For these networks, this object needs to be set to the same
+         value as what is configured on the Querier."
+    DEFVAL { 2 }
+    ::= { tnTlsIgmpSnpgConfigEntry 3 }
+
+tnTlsIgmpSnpgCfgReportSrcAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnTlsIgmpSnpgCfgReportSrcAddress specifies
+         the source IP address used when generating IGMP reports.
+         Although a zero source address is allowed according to the IGMPv3
+         spec, some routers seem to drop these zero-source reports."
+    DEFVAL { '00000000'H }  -- 0.0.0.0
+    ::= { tnTlsIgmpSnpgConfigEntry 4 }
+
+tnTlsIgmpSnpgCfgMvrAdminState OBJECT-TYPE
+    SYNTAX      AlxIgmpSnpgAdminState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnTlsIgmpSnpgCfgMvrAdminState specifies
+         the administrative state of the IGMP snooping Multicast
+         VPLS Registration feature associated with this Tls."
+    DEFVAL { disabled }
+    ::= { tnTlsIgmpSnpgConfigEntry 5 }
+
+tnTlsIgmpSnpgCfgMvrDescription OBJECT-TYPE
+    SYNTAX      TItemDescription
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnTlsIgmpSnpgCfgMvrDescription specifies
+         a user provided description for the IGMP snooping
+         Multicast VPLS Registration configuration associated
+         with this Tls."
+    DEFVAL { "" }
+    ::= { tnTlsIgmpSnpgConfigEntry 6 }
+
+tnTlsIgmpSnpgCfgMvrPolicy OBJECT-TYPE
+    SYNTAX      TPolicyStatementNameOrEmpty
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnTlsIgmpSnpgCfgMvrPolicy specifies
+         the policy statement that is applied to decide whether or not
+         a multicast group learned on a SAP with the object
+         tnSapIgmpSnpgCfgMvrFromVplsId set to this Tls can be joined to this Tls.
+
+         If an empty string is provided, all groups learned on these SAPs are
+         joined without applying a policy."
+    DEFVAL { "" }
+    ::= { tnTlsIgmpSnpgConfigEntry 7 }
+
+tnTlsIgmpSnpgCfgQuerySrcAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnTlsIgmpSnpgCfgQuerySrcAddress specifies,
+         together with the value of object tnTlsIgmpSnpgCfgQuerySrcAddrType,
+         the source IP address used when generating IGMP queries.
+
+         The value of this object is only used when the value of
+         tnTlsIgmpSnpgCfgQuerySrcAddrType is 'querySrcAddr (1)'."
+    DEFVAL { '00000000'H }  -- 0.0.0.0
+    ::= { tnTlsIgmpSnpgConfigEntry 8 }
+
+tnTlsIgmpSnpgCfgQuerySrcAddrType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                   querySrcAddr (1),
+                   systemIpAddr (2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnTlsIgmpSnpgCfgQuerySrcAddrType specifies,
+         together with the value of object tnTlsIgmpSnpgCfgQuerySrcAddress,
+         the source IP address used when generating IGMP queries.
+
+         When the value of this object is 'querySrcAddr (1)', the value
+         configured in tnTlsIgmpSnpgCfgQuerySrcAddress is used as the query
+         source address. When the value of this object is 'systemIpAddr (2)',
+         the IP address of the system interface is used."
+    DEFVAL { systemIpAddr }
+    ::= { tnTlsIgmpSnpgConfigEntry 9 }
+
+tnTlsIgmpSnpgCfgLastChangeTime OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnTlsIgmpSnpgCfgLastChangeTime indicates
+         the sysUpTime at the time of the last modification of this entry."
+    ::= { tnTlsIgmpSnpgConfigEntry 10 }
+
+-- --------------------------------------------------------
+--
+-- tnTlsIgmpSnpgQuerierTable : read-only
+--
+-- --------------------------------------------------------
+
+tnTlsIgmpSnpgQuerierTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TlsIgmpSnpgQuerierEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table tnTlsIgmpSnpgQuerierTable contains information related
+         to the active IGMP Querier found in each Tls Service."
+    ::= { tnIgmpSnoopingTlsObjs 2 }
+
+tnTlsIgmpSnpgQuerierEntry OBJECT-TYPE
+    SYNTAX      TlsIgmpSnpgQuerierEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row represents information on the active IGMP
+         Querier within a Tls service.
+         Entries in this table cannot be created or deleted via SNMP
+         operations. An entry in this table will be created
+         by the agent upon detection of an IGMP Querier in a Tls
+         service for which IGMP snooping is enabled (via
+         tnTlsIgmpSnpgCfgAdminState)."
+    INDEX { tnSysSwitchId, tnSvcId }
+    ::= { tnTlsIgmpSnpgQuerierTable 1 }
+
+TlsIgmpSnpgQuerierEntry ::= SEQUENCE {
+    tnTlsIgmpSnpgQuerierVersion         TmnxIgmpVersion,
+    tnTlsIgmpSnpgQuerierAddress         IpAddress,
+    tnTlsIgmpSnpgQuerierLocale          AlxIgmpSnpgLocation,
+    tnTlsIgmpSnpgQuerierPortId          TmnxPortID,
+    tnTlsIgmpSnpgQuerierEncapValue      TmnxEncapVal,
+    tnTlsIgmpSnpgQuerierSdpId           SdpId,
+    tnTlsIgmpSnpgQuerierVcId            TmnxVcIdOrNone,
+    tnTlsIgmpSnpgQuerierUpTime          TimeTicks,
+    tnTlsIgmpSnpgQuerierExpiryTime      Unsigned32,
+    tnTlsIgmpSnpgQuerierGenQueryIntvl   Unsigned32,
+    tnTlsIgmpSnpgQuerierGenRespIntvl    Unsigned32,
+    tnTlsIgmpSnpgQuerierRobustCount     Unsigned32
+}
+
+tnTlsIgmpSnpgQuerierVersion OBJECT-TYPE
+    SYNTAX      TmnxIgmpVersion
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnTlsIgmpSnpgQuerierVersion indicates
+         the version of the IGMP protocol that is sent by the active IGMP
+         Querier detected in this Tls."
+    ::= { tnTlsIgmpSnpgQuerierEntry 1 }
+
+tnTlsIgmpSnpgQuerierAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnTlsIgmpSnpgQuerierAddress indicates
+         the source IP address used by IGMP queries sent out by the active
+         Querier."
+    ::= { tnTlsIgmpSnpgQuerierEntry 2 }
+
+tnTlsIgmpSnpgQuerierLocale OBJECT-TYPE
+    SYNTAX      AlxIgmpSnpgLocation
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnTlsIgmpSnpgQuerierLocale indicates
+         where the Querier was detected.
+
+         An IGMP Querier found on a local SAP has the value 'sap(1)'.
+         An IGMP Querier detected on an SDP has the value 'sdp(2)'."
+    ::= { tnTlsIgmpSnpgQuerierEntry 3 }
+
+tnTlsIgmpSnpgQuerierPortId OBJECT-TYPE
+    SYNTAX      TmnxPortID
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnTlsIgmpSnpgQuerierPortId indicates,
+         together with the object tnTlsIgmpSnpgQuerierEncapValue, the SAP
+         on which the active Querier is detected.
+
+         The value of this object is only meaningful when the value of
+         tnTlsIgmpSnpgQuerierLocale is 'sap(1)'."
+    ::= { tnTlsIgmpSnpgQuerierEntry 4 }
+
+tnTlsIgmpSnpgQuerierEncapValue OBJECT-TYPE
+    SYNTAX      TmnxEncapVal
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnTlsIgmpSnpgQuerierEncapValue indicates,
+         together with the object tnTlsIgmpSnpgQuerierPortId, the SAP on which
+         the active Querier is detected.
+
+         The value of this object is only meaningful when the value of
+         tnTlsIgmpSnpgQuerierLocale is 'sap(1)'."
+    ::= { tnTlsIgmpSnpgQuerierEntry 5 }
+
+tnTlsIgmpSnpgQuerierSdpId OBJECT-TYPE
+    SYNTAX      SdpId
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnTlsIgmpSnpgQuerierSdpId indicates,
+         together with the object tnTlsIgmpSnpgQuerierVcId, the SDP Binding
+         on which the active Querier is detected.
+
+         The value of this object is only meaningful when the value of
+         tnTlsIgmpSnpgQuerierLocale is 'sdp(2)'."
+    ::= { tnTlsIgmpSnpgQuerierEntry 6 }
+
+tnTlsIgmpSnpgQuerierVcId OBJECT-TYPE
+    SYNTAX      TmnxVcIdOrNone
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnTlsIgmpSnpgQuerierVcId indicates,
+         together with the object tnTlsIgmpSnpgQuerierSdpId, the SDP Binding
+         on which the active Querier is detected.
+
+         The value of this object is only meaningful when the value of
+         tnTlsIgmpSnpgQuerierLocale is 'sdp(2)'."
+    ::= { tnTlsIgmpSnpgQuerierEntry 7 }
+
+tnTlsIgmpSnpgQuerierUpTime OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnTlsIgmpSnpgQuerierUpTime indicates
+         how long (in hundredths of a second) that this Querier has been known
+         as the current active IGMP Querier."
+    ::= { tnTlsIgmpSnpgQuerierEntry 8 }
+
+tnTlsIgmpSnpgQuerierExpiryTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnTlsIgmpSnpgQuerierExpiryTime indicates
+         the time in seconds after which this Querier is no longer known
+         as the current active IGMP Querier."
+    ::= { tnTlsIgmpSnpgQuerierEntry 9 }
+
+tnTlsIgmpSnpgQuerierGenQueryIntvl OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnTlsIgmpSnpgQuerierGenQueryIntvl
+         indicates the General Query Interval used by the active IGMPv3
+         Querier. For an IGMPv1 or IGMPv2 Querier this value is a copy of
+         tnTlsIgmpSnpgCfgGenQueryIntvl."
+    ::= { tnTlsIgmpSnpgQuerierEntry 10 }
+
+tnTlsIgmpSnpgQuerierGenRespIntvl OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "deci-seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnTlsIgmpSnpgQuerierGenRespIntvl indicates
+         the General Query Response interval (in 1/10 seconds) used by the
+         active IGMPv3 Querier."
+    ::= { tnTlsIgmpSnpgQuerierEntry 11 }
+
+tnTlsIgmpSnpgQuerierRobustCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnTlsIgmpSnpgQuerierRobustCount indicates
+         the Robust Count value used by the active IGMPv3 Querier. For an
+         IGMPv1 or IGMPv2 Querier this value is a copy of
+         tnTlsIgmpSnpgCfgRobustCount."
+    ::= { tnTlsIgmpSnpgQuerierEntry 12 }
+
+-- --------------------------------------------------------
+--
+--  tnTlsIgmpSnpgProxyGroupTable : read-only
+--
+-- --------------------------------------------------------
+
+tnTlsIgmpSnpgProxyGroupTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TlsIgmpSnpgProxyGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table tnTlsIgmpSnpgProxyGroupTable together with the table
+         tnTlsIgmpSnpgProxyGrpSrcTable contains multicast group address
+         information collected by IGMP snooping for this Tls.
+         The content of this table is used by the system to
+         'proxy-report' towards the IGMP Querier."
+    ::= { tnIgmpSnoopingTlsObjs 3 }
+
+tnTlsIgmpSnpgProxyGroupEntry OBJECT-TYPE
+    SYNTAX      TlsIgmpSnpgProxyGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry in this table contains information about a
+         multicast group address known in this Tls. If a group
+         source list is present it is described in the
+         corresponding entries of the tnTlsIgmpSnpgProxyGrpSrcTable table."
+    INDEX { tnSysSwitchId, tnSvcId,
+            tnTlsIgmpSnpgProxyGroupAddress }
+    ::= { tnTlsIgmpSnpgProxyGroupTable 1 }
+
+TlsIgmpSnpgProxyGroupEntry ::= SEQUENCE {
+    tnTlsIgmpSnpgProxyGroupAddress     IpAddress,
+    tnTlsIgmpSnpgProxyGroupFilterMode  TmnxIgmpGroupFilterMode,
+    tnTlsIgmpSnpgProxyGroupUpTime      TimeTicks
+}
+
+tnTlsIgmpSnpgProxyGroupAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnTlsIgmpSnpgProxyGroupAddress indicates
+         the IP multicast group address for which this entry contains
+         information."
+    ::= { tnTlsIgmpSnpgProxyGroupEntry 1 }
+
+tnTlsIgmpSnpgProxyGroupFilterMode OBJECT-TYPE
+    SYNTAX      TmnxIgmpGroupFilterMode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnTlsIgmpSnpgProxyGroupFilterMode indicates
+         the filter-mode for this group."
+    ::= { tnTlsIgmpSnpgProxyGroupEntry 2 }
+
+tnTlsIgmpSnpgProxyGroupUpTime OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnTlsIgmpSnpgProxyGroupUpTime indicates
+         how long (in hundredths of a second) that the group address already
+         exists in the database."
+    ::= { tnTlsIgmpSnpgProxyGroupEntry 3 }
+
+-- --------------------------------------------------------
+--
+--  tnTlsIgmpSnpgProxyGrpSrcTable : read-only
+--
+-- --------------------------------------------------------
+
+tnTlsIgmpSnpgProxyGrpSrcTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TlsIgmpSnpgProxyGrpSrcEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table tnTlsIgmpSnpgProxyGrpSrcTable lists the IPv4 multicast
+         Sources corresponding to the IPv4 multicast groups
+         listed in the tnTlsIgmpSnpgProxyGroupTable."
+    ::= { tnIgmpSnoopingTlsObjs 4 }
+
+tnTlsIgmpSnpgProxyGrpSrcEntry OBJECT-TYPE
+    SYNTAX      TlsIgmpSnpgProxyGrpSrcEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "tnTlsIgmpSnpgProxyGrpSrcEntry describes an entry in the
+         tnTlsIgmpSnpgProxyGrpSrcTable. Each entry represents an IPv4
+         multicast Source for which the system is interested/not
+         interested in receiving multicast traffic from."
+    INDEX { tnSysSwitchId, tnSvcId,
+            tnTlsIgmpSnpgProxyGroupAddress,
+            tnTlsIgmpSnpgProxyGrpSrcAddr }
+    ::= { tnTlsIgmpSnpgProxyGrpSrcTable 1 }
+
+TlsIgmpSnpgProxyGrpSrcEntry ::= SEQUENCE {
+    tnTlsIgmpSnpgProxyGrpSrcAddr    IpAddress,
+    tnTlsIgmpSnpgProxyGrpSrcUpTime  TimeTicks
+}
+
+tnTlsIgmpSnpgProxyGrpSrcAddr OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnTlsIgmpSnpgProxyGrpSrcAddr indicates
+         the IPv4 multicast Source address."
+    ::= { tnTlsIgmpSnpgProxyGrpSrcEntry 1 }
+
+tnTlsIgmpSnpgProxyGrpSrcUpTime OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnTlsIgmpSnpgProxyGrpSrcUpTime indicates
+         how long (in hundredths of a second) that the Source address
+         already exists in the database."
+    ::= { tnTlsIgmpSnpgProxyGrpSrcEntry 2 }
+
+-- --------------------------------------------------------
+--
+-- tnTlsIgmpSnpgMRouterTable : read-only
+--
+-- --------------------------------------------------------
+
+tnTlsIgmpSnpgMRouterTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TlsIgmpSnpgMRouterEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table tnTlsIgmpSnpgMRouterTable contains information related
+         to the multicast routers found in each Tls Service."
+    ::= { tnIgmpSnoopingTlsObjs 5 }
+
+tnTlsIgmpSnpgMRouterEntry OBJECT-TYPE
+    SYNTAX      TlsIgmpSnpgMRouterEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row contains information about one specific
+         multicast router known within a Tls service.
+         Entries in this table cannot be created or deleted via
+         SNMP operations. An entry in this table will be created
+         by the agent upon detection of a multicast router in a
+         Tls service for which IGMP snooping is enabled (via
+         tnTlsIgmpSnpgCfgAdminState)."
+    INDEX { tnSysSwitchId, tnSvcId,
+            tnTlsIgmpSnpgMRouterAddress }
+    ::= { tnTlsIgmpSnpgMRouterTable 1 }
+
+TlsIgmpSnpgMRouterEntry ::= SEQUENCE {
+    tnTlsIgmpSnpgMRouterAddress         IpAddress,
+    tnTlsIgmpSnpgMRouterLocale          AlxIgmpSnpgLocation,
+    tnTlsIgmpSnpgMRouterPortId          TmnxPortID,
+    tnTlsIgmpSnpgMRouterEncapValue      TmnxEncapVal,
+    tnTlsIgmpSnpgMRouterSdpId           SdpId,
+    tnTlsIgmpSnpgMRouterVcId            TmnxVcIdOrNone,
+    tnTlsIgmpSnpgMRouterVersion         TmnxIgmpVersion,
+    tnTlsIgmpSnpgMRouterExpiryTime      Unsigned32,
+    tnTlsIgmpSnpgMRouterUpTime          TimeTicks,
+    tnTlsIgmpSnpgMRouterGenQueryIntvl   Unsigned32,
+    tnTlsIgmpSnpgMRouterGenRespIntvl    Unsigned32,
+    tnTlsIgmpSnpgMRouterRobustCount     Unsigned32
+}
+
+tnTlsIgmpSnpgMRouterAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnTlsIgmpSnpgMRouterAddress indicates the
+         source IP address used by IGMP queries sent out by this multicast
+         router."
+    ::= { tnTlsIgmpSnpgMRouterEntry 1 }
+
+tnTlsIgmpSnpgMRouterLocale OBJECT-TYPE
+    SYNTAX      AlxIgmpSnpgLocation
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnTlsIgmpSnpgMRouterLocale indicates
+         where this multicast router was detected.
+
+         A multicast router found on a local SAP has the value 'sap(1)'.
+         A multicast router detected on an SDP has the value 'sdp(2)'."
+    ::= { tnTlsIgmpSnpgMRouterEntry 2 }
+
+tnTlsIgmpSnpgMRouterPortId OBJECT-TYPE
+    SYNTAX      TmnxPortID
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnTlsIgmpSnpgMRouterPortId indicates,
+         together with the object tnTlsIgmpSnpgMRouterEncapValue, the SAP
+         on which this multicast router is detected.
+
+         The value of this object is only meaningful when the value of
+         tnTlsIgmpSnpgMRouterLocale is 'sap(1)'."
+    ::= { tnTlsIgmpSnpgMRouterEntry 3 }
+
+tnTlsIgmpSnpgMRouterEncapValue OBJECT-TYPE
+    SYNTAX      TmnxEncapVal
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnTlsIgmpSnpgMRouterEncapValue indicates,
+         together with the object tnTlsIgmpSnpgMRouterPortId, the SAP
+         on which this multicast router is detected.
+
+         The value of this object is only meaningful when the value of
+         tnTlsIgmpSnpgMRouterLocale is 'sap(1)'."
+    ::= { tnTlsIgmpSnpgMRouterEntry 4 }
+
+tnTlsIgmpSnpgMRouterSdpId OBJECT-TYPE
+    SYNTAX      SdpId
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnTlsIgmpSnpgMRouterSdpId indicates,
+         together with the object tnTlsIgmpSnpgMRouterVcId, the SDP Bind
+         on which this multicast router is detected.
+
+         The value of this object is only meaningful when the value of
+         tnTlsIgmpSnpgMRouterLocale is 'sdp(2)'."
+    ::= { tnTlsIgmpSnpgMRouterEntry 5 }
+
+tnTlsIgmpSnpgMRouterVcId OBJECT-TYPE
+    SYNTAX      TmnxVcIdOrNone
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnTlsIgmpSnpgMRouterVcId indicates,
+         together with the object tnTlsIgmpSnpgMRouterSdpId, the SDP Bind
+         on which this multicast router is detected.
+
+         The value of this object is only meaningful when the value of
+         tnTlsIgmpSnpgMRouterLocale is 'sdp(2)'."
+    ::= { tnTlsIgmpSnpgMRouterEntry 6 }
+
+tnTlsIgmpSnpgMRouterVersion OBJECT-TYPE
+    SYNTAX      TmnxIgmpVersion
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnTlsIgmpSnpgMRouterVersion indicates
+         the version of the IGMP protocol used by this multicast router."
+    ::= { tnTlsIgmpSnpgMRouterEntry 7 }
+
+tnTlsIgmpSnpgMRouterExpiryTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnTlsIgmpSnpgMRouterExpiryTime indicates
+         the time in seconds after which this multicast router is no longer
+         known in this Tls."
+    ::= { tnTlsIgmpSnpgMRouterEntry 8 }
+
+tnTlsIgmpSnpgMRouterUpTime OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnTlsIgmpSnpgMRouterUpTime indicates
+         how long (in hundredths of a second) that this multicast router has
+         been known in this Tls."
+    ::= { tnTlsIgmpSnpgMRouterEntry 9 }
+
+tnTlsIgmpSnpgMRouterGenQueryIntvl OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the obejct tnTlsIgmpSnpgMRouterGenQueryIntvl indicates
+         the General Query Interval used by this multicast router
+         in case of IGMPv3. For an IGMPv1 or IGMPv2 multicast router this
+         value is a copy of tnTlsIgmpSnpgCfgGenQueryIntvl."
+    ::= { tnTlsIgmpSnpgMRouterEntry 10 }
+
+tnTlsIgmpSnpgMRouterGenRespIntvl OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "deci-seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnTlsIgmpSnpgMRouterGenRespIntvl indicates
+         the General Query Response interval (in 1/10 seconds)
+         used by this multicast router in case of IGMPv3."
+    ::= { tnTlsIgmpSnpgMRouterEntry 11 }
+
+tnTlsIgmpSnpgMRouterRobustCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnTlsIgmpSnpgMRouterRobustCount indicates
+         the Robust Count value used by this multicast router
+         in case of IGMPv3. For an IGMPv1 or IGMPv2 multicast router this
+         value is a copy of tnTlsIgmpSnpgCfgRobustCount."
+    ::= { tnTlsIgmpSnpgMRouterEntry 12 }
+
+--
+-- Dummy Scalars
+--
+tnIgmpSnoopingTlsScalar1 OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A dummy scalar that satisfies a SNMP get request quickly when
+         there is no 11QPE24 card provisioned.  Otherwise, it has to
+         traverse the remaining 11QPE24 MIB to get to the next applicable
+         item."
+    ::= { tnIgmpSnoopingTlsObjs 101 }
+
+tnIgmpSnoopingTlsScalar2 OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "."
+    ::= { tnIgmpSnoopingTlsObjs 102 }
+
+-- ----------------------------------------------------------------------------
+--
+--  Sap related IGMP snooping objects
+--
+-- ----------------------------------------------------------------------------
+
+-- --------------------------------------------------------
+--
+--  tnSapIgmpSnpgConfigTable
+--
+-- --------------------------------------------------------
+
+tnSapIgmpSnpgConfigTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SapIgmpSnpgConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The  tnSapIgmpSnpgConfigTable contains objects to
+         configure the IGMP snooping feature on a SAP within a
+         Tls."
+::= { tnIgmpSnoopingSapObjs 1 }
+
+tnSapIgmpSnpgConfigEntry OBJECT-TYPE
+    SYNTAX      SapIgmpSnpgConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row contains IGMP snooping configuration
+         parameters for a SAP within a Tls. Entries in this
+         table cannot be created or deleted via SNMP operations.
+         An entry in this table will be created by the agent
+         upon creation of a new SAP (sapTlsInfoTable). The entry
+         is destroyed when the SAP or Tls service is removed."
+    INDEX { tnSysSwitchId, tnSvcId,
+            tnSapPortId,
+            tnSapEncapValue }
+::= { tnSapIgmpSnpgConfigTable 1 }
+
+SapIgmpSnpgConfigEntry ::= SEQUENCE {
+    tnSapIgmpSnpgCfgImportPlcy            TPolicyStatementNameOrEmpty,
+    tnSapIgmpSnpgCfgFastLeave             AlxIgmpSnpgAdminState,
+    tnSapIgmpSnpgCfgMRouter               TruthValue,
+    tnSapIgmpSnpgCfgSendQueries           AlxIgmpSnpgAdminState,
+    tnSapIgmpSnpgCfgGenQueryIntvl         Unsigned32,
+    tnSapIgmpSnpgCfgQueryRespIntvl        Unsigned32,
+    tnSapIgmpSnpgCfgRobustCount           Unsigned32,
+    tnSapIgmpSnpgCfgLastMembIntvl         Unsigned32,
+    tnSapIgmpSnpgCfgMaxNbrGrps            INTEGER,
+    tnSapIgmpSnpgCfgMvrFromVplsId         TmnxServId,
+    tnSapIgmpSnpgCfgMvrToSapPortId        TmnxPortID,
+    tnSapIgmpSnpgCfgMvrToSapEncapVal      TmnxEncapVal,
+    tnSapIgmpSnpgCfgVersion               TmnxIgmpVersion,
+    tnSapIgmpSnpgCfgMcacPolicyName        TPolicyStatementNameOrEmpty,
+    tnSapIgmpSnpgCfgMcacUnconstBW         Integer32,
+    tnSapIgmpSnpgCfgMcacConstAdmSt        TmnxAdminState,
+    tnSapIgmpSnpgCfgMcacPrRsvMndBW        Integer32,
+    tnSapIgmpSnpgCfgMcacinUseMandBw       Unsigned32,
+    tnSapIgmpSnpgCfgMcacinUseOpnlBw       Unsigned32,
+    tnSapIgmpSnpgCfgMcacAvailMandBw       Unsigned32,
+    tnSapIgmpSnpgCfgMcacAvailOpnlBw       Unsigned32,
+    tnSapIgmpSnpgCfgMcacValInTrans        TruthValue,
+    tnSapIgmpSnpgCfgLastChangeTime        TimeStamp,
+    tnSapIgmpSnpgCfgMaxNbrSrcs            Unsigned32
+}
+
+tnSapIgmpSnpgCfgImportPlcy OBJECT-TYPE
+    SYNTAX      TPolicyStatementNameOrEmpty
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSapIgmpSnpgCfgImportPlcy specifies
+         the policy statement that must be applied to all
+         incoming IGMP messages on this SAP."
+    DEFVAL { "" }
+    ::= { tnSapIgmpSnpgConfigEntry 1 }
+
+tnSapIgmpSnpgCfgFastLeave OBJECT-TYPE
+    SYNTAX      AlxIgmpSnpgAdminState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSapIgmpSnpgCfgFastLeave specifies
+         whether fast leave is allowed on this SAP.
+
+         If set to 'enabled(1)', the system prunes the port on which an IGMP
+         'leave' message has been received without waiting for the Group
+         Specific Query to timeout."
+    DEFVAL { disabled }
+    ::= { tnSapIgmpSnpgConfigEntry 2 }
+
+tnSapIgmpSnpgCfgMRouter OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSapIgmpSnpgCfgMRouter specifies whether
+         a multicast router is attached behind this SAP.
+
+         If tnSapIgmpSnpgCfgSendQueries is set to 'enabled(1)', the system acts
+         as if this object was set to 'false(2)'."
+    DEFVAL { false }
+    ::= { tnSapIgmpSnpgConfigEntry 3 }
+
+tnSapIgmpSnpgCfgSendQueries OBJECT-TYPE
+    SYNTAX      AlxIgmpSnpgAdminState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSapIgmpSnpgCfgSendQueries specifies
+         whether the system generates General Queries by itself on
+         this SAP."
+    DEFVAL { disabled }
+    ::= { tnSapIgmpSnpgConfigEntry 4 }
+
+tnSapIgmpSnpgCfgGenQueryIntvl OBJECT-TYPE
+    SYNTAX      Unsigned32 (2..1024)
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSapIgmpSnpgCfgGenQueryIntvl specifies
+         the interval (in seconds) between two consecutive general queries sent
+         by the system on this SAP.
+
+         The value of this object is only meaningful when the value of
+         tnSapIgmpSnpgCfgSendQueries is 'enabled(1)'."
+    DEFVAL { 125 }
+    ::= { tnSapIgmpSnpgConfigEntry 5 }
+
+tnSapIgmpSnpgCfgQueryRespIntvl OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..1023)
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSapIgmpSnpgCfgQueryRespIntvl specifies
+         the maximum response time (in seconds) advertised in IGMPv2/v3
+         queries.
+
+         The value of this object is only meaningful when the value of
+         tnSapIgmpSnpgCfgSendQueries is 'enabled(1)'."
+    DEFVAL { 10 }
+    ::= { tnSapIgmpSnpgConfigEntry 6 }
+
+tnSapIgmpSnpgCfgRobustCount OBJECT-TYPE
+    SYNTAX      Unsigned32 (2..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSapIgmpSnpgCfgRobustCount specifies
+         the robustness variable on this SAP.
+
+         This object allows tuning for the expected packet loss on this SAP.
+         If a SAP is expected to be lossy, the Robustness Variable may be
+         increased. IGMP snooping is robust to (Robustness Variable-1) packet
+         losses.
+
+         The value of this object is only meaningful when the value of
+         tnSapIgmpSnpgCfgSendQueries is 'enabled(1)'."
+    DEFVAL { 2 }
+    ::= { tnSapIgmpSnpgConfigEntry 7 }
+
+tnSapIgmpSnpgCfgLastMembIntvl OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..50)
+    UNITS       "deci-seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSapIgmpSnpgCfgLastMembIntvl specifies
+         the Max Response Time (in tenths of a second) used in
+         Group-Specific and Group-Source-Specific Queries sent in response
+         to 'leave' messages. This is also the amount of time between
+         Group-Specific Query messages.
+
+         This value may be tuned to modify the leave latency of the network.
+         A reduced value results in reduced time to detect the loss of the last
+         member of a group."
+    DEFVAL { 10 }
+    ::= { tnSapIgmpSnpgConfigEntry 8 }
+
+tnSapIgmpSnpgCfgMaxNbrGrps OBJECT-TYPE
+    SYNTAX      Integer32 (0..2047)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSapIgmpSnpgCfgMaxNbrGrps specifies
+         how many group addresses are allowed for this SAP.
+
+         The value 0 means that no limit is imposed."
+    DEFVAL { 0 }
+    ::= { tnSapIgmpSnpgConfigEntry 9 }
+
+tnSapIgmpSnpgCfgMvrFromVplsId OBJECT-TYPE
+    SYNTAX      TmnxServId
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSapIgmpSnpgCfgMvrFromVplsId specifies
+         from which Tls the multicast streams corresponding to
+         the groups learned via this SAP are copied.
+
+         Groups which cannot be joined to the corresponding MVR Tls
+         (because MVR is not up or the configured MVR policy rejects the group)
+         copy the multicast streams from the local Tls if IGMP snooping is up
+         (i.e. tnTlsIgmpSnpgCfgAdminState is 'enabled(1)')."
+    DEFVAL { 0 }
+    ::= { tnSapIgmpSnpgConfigEntry 10 }
+
+tnSapIgmpSnpgCfgMvrToSapPortId OBJECT-TYPE
+    SYNTAX      TmnxPortID
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSapIgmpSnpgCfgMvrToSapPortId specifies,
+         together with tnSapIgmpSnpgCfgMvrToSapEncapVal, the SAP to which
+         the multicast streams corresponding to the groups learned via this
+         SAP are copied. As a consequence, the streams will not exit
+         this SAP anymore."
+    DEFVAL { 0 }
+    ::= { tnSapIgmpSnpgConfigEntry 11 }
+
+tnSapIgmpSnpgCfgMvrToSapEncapVal OBJECT-TYPE
+    SYNTAX      TmnxEncapVal
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSapIgmpSnpgCfgMvrToSapEncapVal specifies,
+         together with tnSapIgmpSnpgCfgMvrToSapPortId, the SAP to which the
+         multicast streams corresponding to the groups learned via this SAP
+         are copied. As a consequence, the streams will not exit this SAP
+         anymore."
+    DEFVAL { 0 }
+    ::= { tnSapIgmpSnpgConfigEntry 12 }
+
+tnSapIgmpSnpgCfgVersion OBJECT-TYPE
+    SYNTAX      TmnxIgmpVersion
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSapIgmpSnpgCfgVersion specifies the version
+         of IGMP running on this SAP."
+    DEFVAL { version3 }
+    ::= { tnSapIgmpSnpgConfigEntry 13 }
+
+tnSapIgmpSnpgCfgMcacPolicyName OBJECT-TYPE
+    SYNTAX     TPolicyStatementNameOrEmpty
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "The value of tnSapIgmpSnpgCfgMcacPolicyName specifies the name
+         of the multicast CAC (Connection Admission Control) policy."
+    DEFVAL { "" }
+    ::= { tnSapIgmpSnpgConfigEntry 14 }
+
+tnSapIgmpSnpgCfgMcacUnconstBW OBJECT-TYPE
+    SYNTAX      Integer32 (-1|0..2147483647)
+    UNITS       "kbps"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tnSapIgmpSnpgCfgMcacUnconstBW specifies the bandwidth
+         assigned for interface's multicast CAC policy traffic in kilo-bits per
+         second(kbps).
+
+         If the default value of '-1' is set, there is no constraint on
+         bandwidth allocated at the interface.
+
+         If the value of tnSapIgmpSnpgCfgMcacUnconstBW is set to '0' and if
+         a multicast CAC policy is assigned on the interface, then
+         no group (channel) from that policy is allowed on that interface."
+    DEFVAL { -1 }
+    ::= { tnSapIgmpSnpgConfigEntry 15 }
+
+tnSapIgmpSnpgCfgMcacConstAdmSt OBJECT-TYPE
+    SYNTAX      TmnxAdminState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tnSapIgmpSnpgCfgMcacConstAdmSt specifies the
+         administrative state of the multicast CAC policy's constraints."
+    DEFVAL { inService }
+    ::= { tnSapIgmpSnpgConfigEntry 16 }
+
+tnSapIgmpSnpgCfgMcacPrRsvMndBW OBJECT-TYPE
+    SYNTAX      Integer32 (-1|0..2147483647)
+    UNITS       "kbps"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tnSapIgmpSnpgCfgMcacPrRsvMndBW specifies the bandwidth
+         pre-reserved for all the mandatory channels on a given interface
+         in kilo-bits per second(kbps).
+
+         If the value of tnSapIgmpSnpgCfgMcacUnconstBW is '0', no mandatory
+         channels are allowed. If the value of tnSapIgmpSnpgCfgMcacPrRsvMndBW
+         is '-1', then all mandatory and optional channels are allowed.
+
+         If the value of tnSapIgmpSnpgCfgMcacPrRsvMndBW is equal to the
+         value of tnSapIgmpSnpgCfgMcacUnconstBW, then all the unconstrained
+         bandwidth on a given interface is allocated to mandatory channels
+         configured through multicast CAC policy on that interface and no
+         optional groups (channels) are allowed.
+
+         The value of tnSapIgmpSnpgCfgMcacPrRsvMndBW should always be less
+         than or equal to that of tnSapIgmpSnpgCfgMcacUnconstBW. An attempt
+         to set the value of tnSapIgmpSnpgCfgMcacPrRsvMndBW greater than
+         that of tnSapIgmpSnpgCfgMcacUnconstBW will result in inconsistent
+         value error."
+    DEFVAL { -1 }
+    ::= { tnSapIgmpSnpgConfigEntry 17 }
+
+tnSapIgmpSnpgCfgMcacinUseMandBw  OBJECT-TYPE
+    SYNTAX     Unsigned32
+    UNITS      "kbps"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The value of tnSapIgmpSnpgCfgMcacinUseMandBw indicates the
+         in-use bandwidth in kilo-bits per second(kbps) for the
+         mandatory channels for this protocol interface instance."
+    ::= { tnSapIgmpSnpgConfigEntry 18 }
+
+tnSapIgmpSnpgCfgMcacinUseOpnlBw  OBJECT-TYPE
+    SYNTAX     Unsigned32
+    UNITS      "kbps"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The value of tnSapIgmpSnpgCfgMcacinUseOpnlBw indicates the
+         in-use bandwidth in kilo-bits per second(kbps) for the
+         optional channels for this protocol interface instance."
+    ::= { tnSapIgmpSnpgConfigEntry 19 }
+
+tnSapIgmpSnpgCfgMcacAvailMandBw  OBJECT-TYPE
+    SYNTAX     Unsigned32
+    UNITS      "kbps"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The value of tnSapIgmpSnpgCfgMcacAvailMandBw indicates the
+         pre-reserved bandwidth in kilo-bits per second(kbps)
+         for the mandatory channels for this interface instance."
+    ::= { tnSapIgmpSnpgConfigEntry 20 }
+
+tnSapIgmpSnpgCfgMcacAvailOpnlBw  OBJECT-TYPE
+    SYNTAX     Unsigned32
+    UNITS      "kbps"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The value of tnSapIgmpSnpgCfgMcacAvailOpnlBw indicates the
+         available bandwidth in kilo-bits per second(kbps) for this
+         interface instance."
+    ::= { tnSapIgmpSnpgConfigEntry 21 }
+
+tnSapIgmpSnpgCfgMcacValInTrans   OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tnSapIgmpSnpgCfgMcacValInTrans indicates that the
+         operational (available and in-use mandatory/optional) value for the
+         following objects are in transition due to configuration change:
+
+         tnSapIgmpSnpgCfgMcacinUseMandBw
+         tnSapIgmpSnpgCfgMcacinUseOpnlBw
+         tnSapIgmpSnpgCfgMcacAvailMandBw
+         tnSapIgmpSnpgCfgMcacAvailOpnlBw
+
+         When multicast CAC Policy is applied on the interface for the join
+         of the next channel, the operational values will be recalculated and
+         applied to the above objects and the value for
+         tnSapIgmpSnpgCfgMcacValInTrans will be set to 'false(2)'.
+
+         If the value of tnSapIgmpSnpgCfgMcacValInTrans is 'true(1)' then the
+         values are in transition."
+    ::= { tnSapIgmpSnpgConfigEntry 22 }
+
+tnSapIgmpSnpgCfgLastChangeTime OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSapIgmpSnpgCfgLastChangeTime indicates
+         the sysUpTime at the time of the last modification of this entry."
+    ::= { tnSapIgmpSnpgConfigEntry 23 }
+
+tnSapIgmpSnpgCfgMaxNbrSrcs OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..2047)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSapIgmpSnpgCfgMaxNbrSrcs specifies
+         how many source addresses are allowed per group address
+         for this SAP.
+
+         The value 0 means that no limit is imposed."
+    DEFVAL { 0 }
+    ::= { tnSapIgmpSnpgConfigEntry 24 }
+
+-- --------------------------------------------------------
+--
+--  tnSapIgmpSnpgGroupTable  : read only
+--
+-- --------------------------------------------------------
+
+tnSapIgmpSnpgGroupTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SapIgmpSnpgGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "tnSapIgmpSnpgGroupTable together with the table
+         tnSapIgmpSnpgGrpSrcTable contains multicast group address
+         information collected by IGMP snooping for each SAP."
+    ::= { tnIgmpSnoopingSapObjs 2 }
+
+tnSapIgmpSnpgGroupEntry OBJECT-TYPE
+    SYNTAX      SapIgmpSnpgGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry in this table indicates a multicast group
+         address learned by IGMP snooping on this SAP. If a
+         Source list is present it is described in the
+         corresponding entries of the tnSapIgmpSnpgGrpSrcTable
+         table."
+    INDEX { tnSysSwitchId, tnSvcId,
+            tnSapPortId,
+            tnSapEncapValue,
+            tnSapIgmpSnpgGrpAddress }
+    ::= { tnSapIgmpSnpgGroupTable 1 }
+
+SapIgmpSnpgGroupEntry ::= SEQUENCE {
+    tnSapIgmpSnpgGrpAddress             IpAddress,
+    tnSapIgmpSnpgGrpType                TmnxIgmpGroupType,
+    tnSapIgmpSnpgGrpFilterMode          TmnxIgmpGroupFilterMode,
+    tnSapIgmpSnpgGrpUpTime              TimeTicks,
+    tnSapIgmpSnpgGrpExpiryTime          Unsigned32,
+    tnSapIgmpSnpgGrpCompatMode          Unsigned32,
+    tnSapIgmpSnpgGrpV1HostExpTime       Unsigned32,
+    tnSapIgmpSnpgGrpV2HostExpTime       Unsigned32,
+    tnSapIgmpSnpgGrpMvrFromVplsId       TmnxServId,
+    tnSapIgmpSnpgGrpMvrToSapPortId      TmnxPortID,
+    tnSapIgmpSnpgGrpMvrToSapEncapVal    TmnxEncapVal,
+    tnSapIgmpSnpgGrpNumSrc              Counter32
+}
+
+tnSapIgmpSnpgGrpAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSapIgmpSnpgGrpAddress indicates
+         the IPv4 multicast group address for which this entry contains
+         information."
+    ::= { tnSapIgmpSnpgGroupEntry 1 }
+
+tnSapIgmpSnpgGrpType OBJECT-TYPE
+    SYNTAX      TmnxIgmpGroupType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSapIgmpSnpgGrpType indicates whether
+         this entry was learned dynamically or was statically
+         configured."
+    ::= { tnSapIgmpSnpgGroupEntry 2 }
+
+tnSapIgmpSnpgGrpFilterMode OBJECT-TYPE
+    SYNTAX      TmnxIgmpGroupFilterMode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSapIgmpSnpgGrpFilterMode indicates
+         the filter-mode for this group."
+    ::= { tnSapIgmpSnpgGroupEntry 3 }
+
+tnSapIgmpSnpgGrpUpTime OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSapIgmpSnpgGrpUpTime indicates
+         how long (in hundredths of a second) that the group address
+         already exists in the database for this SAP."
+    ::= { tnSapIgmpSnpgGroupEntry 4 }
+
+tnSapIgmpSnpgGrpExpiryTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSapIgmpSnpgGrpExpiryTime indicates
+         the amount of time remaining before this entry will be aged out."
+    ::= { tnSapIgmpSnpgGroupEntry 5 }
+
+tnSapIgmpSnpgGrpCompatMode OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSapIgmpSnpgGrpCompatMode indicates
+         the IGMP version applicable  on this SAP for this
+         multicast group address. This corresponds to the lowest version
+         seen for this group address on this SAP."
+    ::= { tnSapIgmpSnpgGroupEntry 6 }
+
+tnSapIgmpSnpgGrpV1HostExpTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSapIgmpSnpgGrpV1HostExpTime indicates
+         the time remaining until the system will assume that
+         there are no longer any IGMPv1 members on this SAP.
+
+         Upon hearing any IGMPv1 Membership Report, this value is reset to the
+         group membership interval. While this time remaining is non-zero, the
+         system ignores any IGMPv2 and IGMPv3 'leave' messages for this
+         group that it receives on this SAP."
+    ::= { tnSapIgmpSnpgGroupEntry 7 }
+
+tnSapIgmpSnpgGrpV2HostExpTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSapIgmpSnpgGrpV2HostExpTime indicates
+         the time remaining until the system will assume that
+         there are no longer any IGMPv2 members on the SAP.
+
+         Upon hearing any IGMPv2 Membership Report, this value is reset to the
+         group membership interval. While this time remaining is non-zero, the
+         system ignores any IGMPv3 'leave' messages for this group that it
+         receives on this SAP."
+    ::= { tnSapIgmpSnpgGroupEntry 8 }
+
+tnSapIgmpSnpgGrpMvrFromVplsId OBJECT-TYPE
+    SYNTAX      TmnxServId
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSapIgmpSnpgGrpMvrFromVplsId indicates
+         from which Tls the multicast streams corresponding to this group are
+         copied.
+
+         A value of 0 means that MVR is not applicable for this group and the
+         corresponding streams are copied from the local Tls."
+    ::= { tnSapIgmpSnpgGroupEntry 9 }
+
+tnSapIgmpSnpgGrpMvrToSapPortId OBJECT-TYPE
+    SYNTAX      TmnxPortID
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSapIgmpSnpgGrpMvrToSapPortId indicates
+         together with tnSapIgmpSnpgGrpMvrToSapEncapVal,
+         to which SAP the multicast streams corresponding to this group
+         are copied.
+
+         If both values are 0, the corresponding streams are copied to this
+         local SAP."
+    ::= { tnSapIgmpSnpgGroupEntry 10 }
+
+tnSapIgmpSnpgGrpMvrToSapEncapVal OBJECT-TYPE
+    SYNTAX      TmnxEncapVal
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSapIgmpSnpgGrpMvrToSapEncapVal indicates,
+         together with tnSapIgmpSnpgGrpMvrToSapPortId, to which SAP
+         the multicast streams corresponding to this group are copied.
+
+         If both values are 0, the corresponding streams are copied to this
+         local SAP."
+    ::= { tnSapIgmpSnpgGroupEntry 11 }
+
+tnSapIgmpSnpgGrpNumSrc OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSapIgmpSnpgGrpNumSrc
+        indicates the number of IGMP multicast source
+        corresponding to this IGMP multicast group entry."
+    ::= { tnSapIgmpSnpgGroupEntry 12 }
+
+-- --------------------------------------------------------
+--
+--  tnSapIgmpSnpgGrpSrcTable : read-only
+--
+-- --------------------------------------------------------
+
+tnSapIgmpSnpgGrpSrcTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SapIgmpSnpgGrpSrcEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "tnSapIgmpSnpgGrpSrcTable lists the IPv4 multicast
+         Sources corresponding to the IPv4 multicast groups
+         listed in the tnSapIgmpSnpgGroupTable."
+    ::= { tnIgmpSnoopingSapObjs 3 }
+
+tnSapIgmpSnpgGrpSrcEntry OBJECT-TYPE
+    SYNTAX      SapIgmpSnpgGrpSrcEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the tnSapIgmpSnpgGrpSrcTable. Each entry
+         represents a Source address from which receivers are
+         interested/not interested in receiving multicast
+         traffic from."
+    INDEX { tnSysSwitchId, tnSvcId,
+            tnSapPortId,
+            tnSapEncapValue,
+            tnSapIgmpSnpgGrpAddress,
+            tnSapIgmpSnpgGrpSrcAddr }
+    ::= { tnSapIgmpSnpgGrpSrcTable 1 }
+
+SapIgmpSnpgGrpSrcEntry ::= SEQUENCE {
+    tnSapIgmpSnpgGrpSrcAddr             IpAddress,
+    tnSapIgmpSnpgGrpSrcType             TmnxIgmpGroupType,
+    tnSapIgmpSnpgGrpSrcUpTime           TimeTicks,
+    tnSapIgmpSnpgGrpSrcExpiryTime       Unsigned32
+}
+
+tnSapIgmpSnpgGrpSrcAddr OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSapIgmpSnpgGrpSrcAddr indicates
+         the address of the Source sending multicast
+         traffic to the group identified by tnSapIgmpSnpgGrpAddress.
+
+         If the value of tnSapIgmpSnpgGrpFilterMode corresponding to this entry
+         is 'include(1)', the receivers are interested in receiving traffic from
+         this Source.
+
+         If the value of tnSapIgmpSnpgGrpFilterMode corresponding to this entry
+         is 'exclude(2)', the receivers are not interested in receiving traffic
+         from this Source."
+    ::= { tnSapIgmpSnpgGrpSrcEntry 1 }
+
+tnSapIgmpSnpgGrpSrcType OBJECT-TYPE
+    SYNTAX      TmnxIgmpGroupType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSapIgmpSnpgGrpSrcType indicates how
+         this source entry was learned.
+
+         If this source entry was learned, it is set to 'dynamic(2)'.
+         For statically configured sources, the value is set to 'static(1)'."
+    ::= { tnSapIgmpSnpgGrpSrcEntry 2 }
+
+tnSapIgmpSnpgGrpSrcUpTime OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSapIgmpSnpgGrpSrcUpTime indicates
+         how long (in hundredths of a second) that the Source
+         address already exists in the database for this SAP."
+    ::= { tnSapIgmpSnpgGrpSrcEntry 3 }
+
+tnSapIgmpSnpgGrpSrcExpiryTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSapIgmpSnpgGrpSrcExpiryTime indicates
+         the minimum amount of time remaining before this entry will be aged
+         out.
+
+         If the value of tnSapIgmpSnpgGrpSrcExpiryTime is non-zero and the value
+         of tnSapIgmpSnpgGrpFilterMode corresponding to this entry is
+         'include(1)', it means that there are currently one or more systems
+         which desire to receive multicast traffic for this Source.
+
+         If this timer expires and the value of tnSapIgmpSnpgGrpFilterMode is
+         'include(1)', the system concludes that traffic from this particular
+         Source is no longer desired on the attached network, and deletes this
+         entry.
+
+         If the value of tnSapIgmpSnpgGrpSrcExpiryTime is non-zero and the
+         filter-mode for the group is 'exclude(2)', it means that at least one
+         system desires to receive multicast traffic from this source.
+
+         If the value of tnSapIgmpSnpgGrpSrcExpiryTime is zero and the
+         filter-mode for the group is 'exclude(2)', it means that no system
+         desires to receive multicast traffic from this Source."
+    ::= { tnSapIgmpSnpgGrpSrcEntry 4 }
+
+-- --------------------------------------------------------
+--
+--  tnSapIgmpSnpgStaticGrpSrcTable
+--
+-- --------------------------------------------------------
+
+tnSapIgmpSnpgStaticGrpSrcTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SapIgmpSnpgStaticGrpSrcEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table tnSapIgmpSnpgStaticGrpSrcTable contains
+         statically configured (S,G) entries for each SAP."
+::= { tnIgmpSnoopingSapObjs 4 }
+
+tnSapIgmpSnpgStaticGrpSrcEntry OBJECT-TYPE
+    SYNTAX      SapIgmpSnpgStaticGrpSrcEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the tnSapIgmpSnpgStaticGrpSrcTable. Entries
+         can be created or deleted by an SNMP SET request to
+         tnSapIgmpSnpgStaticRowstatus."
+    INDEX { tnSysSwitchId, tnSvcId,
+            tnSapPortId,
+            tnSapEncapValue,
+            tnSapIgmpSnpgStaticGroupAddr,
+            tnSapIgmpSnpgStaticSourceAddr }
+::= { tnSapIgmpSnpgStaticGrpSrcTable 1 }
+
+SapIgmpSnpgStaticGrpSrcEntry ::= SEQUENCE {
+    tnSapIgmpSnpgStaticGroupAddr        IpAddress,
+    tnSapIgmpSnpgStaticSourceAddr       IpAddress,
+    tnSapIgmpSnpgStaticRowstatus        RowStatus,
+    tnSapIgmpSnpgStaticLastChangeTime   TimeStamp
+}
+
+tnSapIgmpSnpgStaticGroupAddr OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSapIgmpSnpgStaticGroupAddr specifies
+         the group multicast address for this statically configured (S,G)
+         entry for this SAP."
+    ::= { tnSapIgmpSnpgStaticGrpSrcEntry 1 }
+
+tnSapIgmpSnpgStaticSourceAddr OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSapIgmpSnpgStaticSourceAddr specifies
+         the Source IP address for this statically configured
+         (S,G) entry for this SAP.
+
+         For a (*,G) entry this object must be set to 0.0.0.0."
+    ::= { tnSapIgmpSnpgStaticGrpSrcEntry 2 }
+
+tnSapIgmpSnpgStaticRowstatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSapIgmpSnpgStaticRowstatus specifies
+         the row status used for creation or deletion of
+         tnSapIgmpSnpgStaticGrpSrcTable entries."
+    ::= { tnSapIgmpSnpgStaticGrpSrcEntry 3 }
+
+tnSapIgmpSnpgStaticLastChangeTime OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSapIgmpSnpgStaticLastChangeTime indicates
+         the sysUpTime at the time of the last modification of this entry."
+    ::= { tnSapIgmpSnpgStaticGrpSrcEntry 4 }
+
+-- --------------------------------------------------------
+--
+--  tnSapIgmpSnpgStatsTable  : read-only
+--
+-- --------------------------------------------------------
+
+tnSapIgmpSnpgStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SapIgmpSnpgStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "tnSapIgmpSnpgStatsTable contains statistics on IGMP
+         snooping per SAP."
+::= { tnIgmpSnoopingSapObjs 5 }
+
+tnSapIgmpSnpgStatsEntry OBJECT-TYPE
+    SYNTAX      SapIgmpSnpgStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "tnSapIgmpSnpgStatsEntry is an entry in the
+         tnSapIgmpSnpgStatsTable. Each entry contains IGMP
+         snooping statics for a SAP in a Tls."
+    INDEX { tnSysSwitchId, tnSvcId,
+            tnSapPortId,
+            tnSapEncapValue }
+::= { tnSapIgmpSnpgStatsTable 1 }
+
+SapIgmpSnpgStatsEntry ::= SEQUENCE {
+    tnSapIgmpSnpgTxGenQueries          Counter32,
+    tnSapIgmpSnpgTxGrpSpecQueries      Counter32,
+    tnSapIgmpSnpgTxSrcSpecQueries      Counter32,
+    tnSapIgmpSnpgTxV1Reports           Counter32,
+    tnSapIgmpSnpgTxV2Reports           Counter32,
+    tnSapIgmpSnpgTxV3Reports           Counter32,
+    tnSapIgmpSnpgTxV2Leaves            Counter32,
+    tnSapIgmpSnpgRxGenQueries          Counter32,
+    tnSapIgmpSnpgRxGrpSpecQueries      Counter32,
+    tnSapIgmpSnpgRxSrcSpecQueries      Counter32,
+    tnSapIgmpSnpgRxV1Reports           Counter32,
+    tnSapIgmpSnpgRxV2Reports           Counter32,
+    tnSapIgmpSnpgRxV3Reports           Counter32,
+    tnSapIgmpSnpgRxV2Leaves            Counter32,
+    tnSapIgmpSnpgRxUnknownType         Counter32,
+    tnSapIgmpSnpgFwdGenQueries         Counter32,
+    tnSapIgmpSnpgFwdGrpSpecQueries     Counter32,
+    tnSapIgmpSnpgFwdSrcSpecQueries     Counter32,
+    tnSapIgmpSnpgFwdV1Reports          Counter32,
+    tnSapIgmpSnpgFwdV2Reports          Counter32,
+    tnSapIgmpSnpgFwdV3Reports          Counter32,
+    tnSapIgmpSnpgFwdV2Leaves           Counter32,
+    tnSapIgmpSnpgFwdUnknownType        Counter32,
+    tnSapIgmpSnpgRxBadLenPkts          Counter32,
+    tnSapIgmpSnpgRxBadIpChksmPkts      Counter32,
+    tnSapIgmpSnpgRxBadIgmpChksmPkts    Counter32,
+    tnSapIgmpSnpgRxBadEncodedPkts      Counter32,
+    tnSapIgmpSnpgRxNoRtrAlertPkts      Counter32,
+    tnSapIgmpSnpgRxZeroSrcAdrPkts      Counter32,
+    tnSapIgmpSnpgSendQueryCfgDrops     Counter32,
+    tnSapIgmpSnpgImportPolicyDrops     Counter32,
+    tnSapIgmpSnpgMaxNumGroupsDrops     Counter32,
+    tnSapIgmpSnpgMvrFromVplsCfgDrops   Counter32,
+    tnSapIgmpSnpgMvrToSapCfgDrops      Counter32,
+    tnSapIgmpSnpgRxWrongVersionPkts    Counter32,
+    tnSapIgmpSnpgMcacPolicyDrops       Counter32,
+    tnSapIgmpSnpgMcsFailures           Counter32,
+    tnSapIgmpSnpgRxLocalScopePkts      Counter32,
+    tnSapIgmpSnpgRxRsvdScopePkts       Counter32,
+    tnSapIgmpSnpgMaxNumSourcesDrops    Counter32,
+    tnSapIgmpSnpgNumGrps               Counter32,
+    tnSapIgmpSnpgRxQueryDrops          Counter32
+}
+
+tnSapIgmpSnpgTxGenQueries OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSapIgmpSnpgTxGenQueries indicates
+         the number of IGMP General Queries transmitted on this
+         SAP."
+    ::= { tnSapIgmpSnpgStatsEntry 1 }
+
+tnSapIgmpSnpgTxGrpSpecQueries OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSapIgmpSnpgTxGrpSpecQueries indicates
+         the number of IGMP Group-Specific Queries transmitted on this SAP."
+    ::= { tnSapIgmpSnpgStatsEntry 2 }
+
+tnSapIgmpSnpgTxSrcSpecQueries OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSapIgmpSnpgTxSrcSpecQueries indicates
+         the number of IGMP Group-And-Source-Specific Queries transmitted on
+         this SAP."
+    ::= { tnSapIgmpSnpgStatsEntry 3 }
+
+tnSapIgmpSnpgTxV1Reports OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSapIgmpSnpgTxV1Reports indicates the
+         number of IGMPv1 Reports transmitted on this SAP."
+    ::= { tnSapIgmpSnpgStatsEntry 4 }
+
+tnSapIgmpSnpgTxV2Reports OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSapIgmpSnpgTxV2Reports indicates the
+         number of IGMPv2 Reports transmitted on this SAP."
+    ::= { tnSapIgmpSnpgStatsEntry 5 }
+
+tnSapIgmpSnpgTxV3Reports OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSapIgmpSnpgTxV3Reports indicates the
+          number of IGMPv3 Reports transmitted on this SAP."
+    ::= { tnSapIgmpSnpgStatsEntry 6 }
+
+tnSapIgmpSnpgTxV2Leaves OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSapIgmpSnpgTxV2Leaves indicates the
+         number of IGMPv2 Leaves transmitted on this SAP."
+    ::= { tnSapIgmpSnpgStatsEntry 7 }
+
+tnSapIgmpSnpgRxGenQueries OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSapIgmpSnpgRxGenQueries indicates the
+         number of IGMP General Queries received on this SAP."
+    ::= { tnSapIgmpSnpgStatsEntry 8 }
+
+tnSapIgmpSnpgRxGrpSpecQueries OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSapIgmpSnpgRxGrpSpecQueries indicates
+         the number of IGMP Group-Specific Queries received on this SAP."
+    ::= { tnSapIgmpSnpgStatsEntry 9 }
+
+tnSapIgmpSnpgRxSrcSpecQueries OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSapIgmpSnpgRxSrcSpecQueries indicates
+         the number of IGMP Group-And-Source-Specific Queries received on this
+         SAP."
+    ::= { tnSapIgmpSnpgStatsEntry 10 }
+
+tnSapIgmpSnpgRxV1Reports OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSapIgmpSnpgRxV1Reports indicates the
+         number of IGMPv1 Reports received on this SAP."
+    ::= { tnSapIgmpSnpgStatsEntry 11 }
+
+tnSapIgmpSnpgRxV2Reports OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSapIgmpSnpgRxV2Reports indicates the
+         number of IGMPv2 Reports received on this SAP."
+    ::= { tnSapIgmpSnpgStatsEntry 12 }
+
+tnSapIgmpSnpgRxV3Reports OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSapIgmpSnpgRxV3Reports indicates the number
+         of IGMPv3 Reports received on this SAP."
+    ::= { tnSapIgmpSnpgStatsEntry 13 }
+
+tnSapIgmpSnpgRxV2Leaves OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSapIgmpSnpgRxV2Leaves indicates the number
+         of IGMPv2 Leaves received on this SAP."
+    ::= { tnSapIgmpSnpgStatsEntry 14 }
+
+tnSapIgmpSnpgRxUnknownType OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSapIgmpSnpgRxUnknownType indicates the number
+         of IGMP unknown type packets received on this SAP."
+    ::= { tnSapIgmpSnpgStatsEntry 15 }
+
+tnSapIgmpSnpgFwdGenQueries OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSapIgmpSnpgFwdGenQueries indicates
+         the number of IGMP General Queries forwarded on this SAP."
+    ::= { tnSapIgmpSnpgStatsEntry 16 }
+
+tnSapIgmpSnpgFwdGrpSpecQueries OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSapIgmpSnpgFwdGrpSpecQueries indicates
+         the number of IGMP Group-Specific Queries forwarded on this SAP."
+    ::= { tnSapIgmpSnpgStatsEntry 17 }
+
+tnSapIgmpSnpgFwdSrcSpecQueries OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSapIgmpSnpgFwdSrcSpecQueries indicates
+         the number of IGMP Group-And-Source-Specific Queries forwarded on
+         this SAP."
+    ::= { tnSapIgmpSnpgStatsEntry 18 }
+
+tnSapIgmpSnpgFwdV1Reports OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSapIgmpSnpgFwdV1Reports indicates
+         the number of IGMPv1 Reports forwarded on this SAP."
+    ::= { tnSapIgmpSnpgStatsEntry 19 }
+
+tnSapIgmpSnpgFwdV2Reports OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSapIgmpSnpgFwdV2Reports indicates
+         the number of IGMPv2 Reports forwarded on this SAP."
+    ::= { tnSapIgmpSnpgStatsEntry 20 }
+
+tnSapIgmpSnpgFwdV3Reports OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSapIgmpSnpgFwdV3Reports indicates
+         the number of IGMPv3 Reports forwarded on this SAP."
+    ::= { tnSapIgmpSnpgStatsEntry 21 }
+
+tnSapIgmpSnpgFwdV2Leaves OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSapIgmpSnpgFwdV2Leaves indicates
+         the number of IGMPv2 Leaves forwarded on this SAP."
+    ::= { tnSapIgmpSnpgStatsEntry 22 }
+
+tnSapIgmpSnpgFwdUnknownType OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSapIgmpSnpgFwdUnknownType indicates
+         the number of IGMP unknown type packets forwarded on this SAP."
+    ::= { tnSapIgmpSnpgStatsEntry 23 }
+
+tnSapIgmpSnpgRxBadLenPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSapIgmpSnpgRxBadLenPkts indicates
+         the number of IGMP packets dropped on this SAP because of
+         a bad length."
+    ::= { tnSapIgmpSnpgStatsEntry 24 }
+
+tnSapIgmpSnpgRxBadIpChksmPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSapIgmpSnpgRxBadIpChksmPkts indicates
+         the number of dropped IGMP packets on this SAP because of a
+         bad IPv4 header checksum."
+    ::= { tnSapIgmpSnpgStatsEntry 25 }
+
+tnSapIgmpSnpgRxBadIgmpChksmPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSapIgmpSnpgRxBadIgmpChksmPkts indicates
+         the number of dropped IGMP packets on this SAP because of a bad
+         IGMP header checksum."
+    ::= { tnSapIgmpSnpgStatsEntry 26 }
+
+tnSapIgmpSnpgRxBadEncodedPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSapIgmpSnpgRxBadEncodedPkts indicates
+         the number of IGMP packets dropped on this SAP because of a bad
+         encoding."
+    ::= { tnSapIgmpSnpgStatsEntry 27 }
+
+tnSapIgmpSnpgRxNoRtrAlertPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSapIgmpSnpgRxNoRtrAlertPkts indicates
+         the number of IGMP packets dropped on this SAP because the Router
+         Alert Option in the IP packet is not set."
+    ::= { tnSapIgmpSnpgStatsEntry 28 }
+
+tnSapIgmpSnpgRxZeroSrcAdrPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSapIgmpSnpgRxZeroSrcAdrPkts indicates
+         the number of IGMP packets dropped on this SAP because they contain a
+         zero source IPv4 address."
+    ::= { tnSapIgmpSnpgStatsEntry 29 }
+
+tnSapIgmpSnpgSendQueryCfgDrops OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSapIgmpSnpgSendQueryCfgDrops
+         indicates the number of times an IGMP Query is dropped
+         because the object tnSapIgmpSnpgCfgSendQueries for this SAP is set
+         to 'enabled(1)'."
+    ::= { tnSapIgmpSnpgStatsEntry 30 }
+
+tnSapIgmpSnpgImportPolicyDrops OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSapIgmpSnpgImportPolicyDrops indicates the
+         number of times an IGMP Group or Source is dropped
+         because of applying an import policy on this SAP."
+    ::= { tnSapIgmpSnpgStatsEntry 31 }
+
+tnSapIgmpSnpgMaxNumGroupsDrops OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSapIgmpSnpgMaxNumGroupsDrops indicates the
+         number of times an IGMP Group is dropped because of
+         exceeding the configured maximum number of groups on
+         this SAP."
+    ::= { tnSapIgmpSnpgStatsEntry 32 }
+
+tnSapIgmpSnpgMvrFromVplsCfgDrops OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSapIgmpSnpgMvrFromVplsCfgDrops indicates
+         the number of times an IGMP Group or Query is dropped because of
+         applying the tnSapIgmpSnpgCfgMvrFromVplsId configuration
+         on this SAP."
+    ::= { tnSapIgmpSnpgStatsEntry 33 }
+
+tnSapIgmpSnpgMvrToSapCfgDrops OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The value of the object tnSapIgmpSnpgMvrToSapCfgDrops indicates the
+         number times an IGMP Report or Query is dropped because of
+         applying the tnSapIgmpSnpgCfgMvrToSapPortId and
+         tnSapIgmpSnpgCfgMvrToSapEncapVal configuration on this SAP."
+    ::= { tnSapIgmpSnpgStatsEntry 34 }
+
+tnSapIgmpSnpgRxWrongVersionPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSapIgmpSnpgRxWrongVersionPkts indicates the
+         total number of IGMP packets with a wrong version received on
+         this SAP."
+    ::= { tnSapIgmpSnpgStatsEntry 35 }
+
+tnSapIgmpSnpgMcacPolicyDrops OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSapIgmpSnpgMcacPolicyDrops indicates the
+         number of times an IGMP Group is dropped because of applying a
+         multicast CAC policy on this SAP."
+    ::= { tnSapIgmpSnpgStatsEntry 36 }
+
+tnSapIgmpSnpgMcsFailures OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSapIgmpSnpgMcsFailures indicates the
+         number of times an IGMP Group on this SAP could not be synced to
+         the MCS (multi-chassis synchronization) database."
+    ::= { tnSapIgmpSnpgStatsEntry 37 }
+
+tnSapIgmpSnpgRxLocalScopePkts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSapIgmpSnpgRxLocalScopePkts indicates
+         the number of IGMP packets received on the link-local scope IPv6
+         multicast address."
+    ::= { tnSapIgmpSnpgStatsEntry 38 }
+
+tnSapIgmpSnpgRxRsvdScopePkts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSapIgmpSnpgRxRsvdScopePkts indicates
+         the number of IGMP packets received on the reserved scope IPv6
+         multicast address."
+    ::= { tnSapIgmpSnpgStatsEntry 39 }
+
+tnSapIgmpSnpgMaxNumSourcesDrops OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSapIgmpSnpgMaxNumSourcesDrops
+         indicates the number of times an IGMP Source is dropped
+         because of exceeding the configured maximum number of
+         sources per group on this SAP."
+    ::= { tnSapIgmpSnpgStatsEntry 40 }
+
+tnSapIgmpSnpgNumGrps OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The value of the object tnSapIgmpSnpgNumGrps
+        indicates the number of IGMP multicast group address
+        learned by IGMP snooping on this SAP."
+    ::= { tnSapIgmpSnpgStatsEntry 41 }
+
+tnSapIgmpSnpgRxQueryDrops OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSapIgmpSnpgRxQueryDrops indicates the
+         total number of IGMP queries dropped because this is a leaf
+         or branch SAP."
+    ::= { tnSapIgmpSnpgStatsEntry 42 }
+
+-- --------------------------------------------------------
+--
+--  tnSvcIgmpSnpgStatsTable  : read-only
+--
+-- --------------------------------------------------------
+
+tnSvcIgmpSnpgStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SvcIgmpSnpgStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "tnSvcIgmpSnpgStatsTable contains statistics on IGMP
+         snooping per Service."
+    ::= { tnIgmpSnoopingSapObjs 6 }
+
+tnSvcIgmpSnpgStatsEntry OBJECT-TYPE
+    SYNTAX      SvcIgmpSnpgStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "tnSvcIgmpSnpgStatsEntry is an entry in the
+         tnSvcIgmpSnpgStatsTable. Each entry contains IGMP
+         snooping statics for a Service in a Tls."
+    INDEX { tnSysSwitchId,
+            tnSvcId }
+    ::= { tnSvcIgmpSnpgStatsTable 1 }
+
+SvcIgmpSnpgStatsEntry ::= SEQUENCE {
+    tnSvcIgmpSnpgTxGenQueries          Counter32,
+    tnSvcIgmpSnpgTxGrpSpecQueries      Counter32,
+    tnSvcIgmpSnpgTxSrcSpecQueries      Counter32,
+    tnSvcIgmpSnpgTxV1Reports           Counter32,
+    tnSvcIgmpSnpgTxV2Reports           Counter32,
+    tnSvcIgmpSnpgTxV3Reports           Counter32,
+    tnSvcIgmpSnpgTxV2Leaves            Counter32,
+    tnSvcIgmpSnpgRxGenQueries          Counter32,
+    tnSvcIgmpSnpgRxGrpSpecQueries      Counter32,
+    tnSvcIgmpSnpgRxSrcSpecQueries      Counter32,
+    tnSvcIgmpSnpgRxV1Reports           Counter32,
+    tnSvcIgmpSnpgRxV2Reports           Counter32,
+    tnSvcIgmpSnpgRxV3Reports           Counter32,
+    tnSvcIgmpSnpgRxV2Leaves            Counter32,
+    tnSvcIgmpSnpgRxUnknownType         Counter32,
+    tnSvcIgmpSnpgFwdGenQueries         Counter32,
+    tnSvcIgmpSnpgFwdGrpSpecQueries     Counter32,
+    tnSvcIgmpSnpgFwdSrcSpecQueries     Counter32,
+    tnSvcIgmpSnpgFwdV1Reports          Counter32,
+    tnSvcIgmpSnpgFwdV2Reports          Counter32,
+    tnSvcIgmpSnpgFwdV3Reports          Counter32,
+    tnSvcIgmpSnpgFwdV2Leaves           Counter32,
+    tnSvcIgmpSnpgFwdUnknownType        Counter32,
+    tnSvcIgmpSnpgRxBadLenPkts          Counter32,
+    tnSvcIgmpSnpgRxBadIpChksmPkts      Counter32,
+    tnSvcIgmpSnpgRxBadIgmpChksmPkts    Counter32,
+    tnSvcIgmpSnpgRxBadEncodedPkts      Counter32,
+    tnSvcIgmpSnpgRxNoRtrAlertPkts      Counter32,
+    tnSvcIgmpSnpgRxZeroSrcAdrPkts      Counter32,
+    tnSvcIgmpSnpgSendQueryCfgDrops     Counter32,
+    tnSvcIgmpSnpgImportPolicyDrops     Counter32,
+    tnSvcIgmpSnpgMaxNumGroupsDrops     Counter32,
+    tnSvcIgmpSnpgMvrFromVplsCfgDrops   Counter32,
+    tnSvcIgmpSnpgMvrToSapCfgDrops      Counter32,
+    tnSvcIgmpSnpgRxWrongVersionPkts    Counter32,
+    tnSvcIgmpSnpgMcacPolicyDrops       Counter32,
+    tnSvcIgmpSnpgMcsFailures           Counter32,
+    tnSvcIgmpSnpgRxLocalScopePkts      Counter32,
+    tnSvcIgmpSnpgRxRsvdScopePkts       Counter32,
+    tnSvcIgmpSnpgMaxNumSourcesDrops    Counter32,
+    tnSvcIgmpSnpgNumGrps               Counter32,
+    tnSvcIgmpSnpgRxQueryDrops          Counter32
+}
+
+tnSvcIgmpSnpgTxGenQueries OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSvcIgmpSnpgTxGenQueries indicates
+         the number of IGMP General Queries transmitted on this
+         Service."
+    ::= { tnSvcIgmpSnpgStatsEntry 1 }
+
+tnSvcIgmpSnpgTxGrpSpecQueries OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSvcIgmpSnpgTxGrpSpecQueries indicates
+         the number of IGMP Group-Specific Queries transmitted on this Service."
+    ::= { tnSvcIgmpSnpgStatsEntry 2 }
+
+tnSvcIgmpSnpgTxSrcSpecQueries OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSvcIgmpSnpgTxSrcSpecQueries indicates
+         the number of IGMP Group-And-Source-Specific Queries transmitted on
+         this Service."
+    ::= { tnSvcIgmpSnpgStatsEntry 3 }
+
+tnSvcIgmpSnpgTxV1Reports OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSvcIgmpSnpgTxV1Reports indicates the
+         number of IGMPv1 Reports transmitted on this Service."
+    ::= { tnSvcIgmpSnpgStatsEntry 4 }
+
+tnSvcIgmpSnpgTxV2Reports OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSvcIgmpSnpgTxV2Reports indicates the
+         number of IGMPv2 Reports transmitted on this Service."
+    ::= { tnSvcIgmpSnpgStatsEntry 5 }
+
+tnSvcIgmpSnpgTxV3Reports OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSvcIgmpSnpgTxV3Reports indicates the
+          number of IGMPv3 Reports transmitted on this Service."
+    ::= { tnSvcIgmpSnpgStatsEntry 6 }
+
+tnSvcIgmpSnpgTxV2Leaves OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSvcIgmpSnpgTxV2Leaves indicates the
+         number of IGMPv2 Leaves transmitted on this Service."
+    ::= { tnSvcIgmpSnpgStatsEntry 7 }
+
+tnSvcIgmpSnpgRxGenQueries OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSvcIgmpSnpgRxGenQueries indicates the
+         number of IGMP General Queries received on this Service."
+    ::= { tnSvcIgmpSnpgStatsEntry 8 }
+
+tnSvcIgmpSnpgRxGrpSpecQueries OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSvcIgmpSnpgRxGrpSpecQueries indicates
+         the number of IGMP Group-Specific Queries received on this Service."
+    ::= { tnSvcIgmpSnpgStatsEntry 9 }
+
+tnSvcIgmpSnpgRxSrcSpecQueries OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSvcIgmpSnpgRxSrcSpecQueries indicates
+         the number of IGMP Group-And-Source-Specific Queries received on this
+         Service."
+    ::= { tnSvcIgmpSnpgStatsEntry 10 }
+
+tnSvcIgmpSnpgRxV1Reports OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSvcIgmpSnpgRxV1Reports indicates the
+         number of IGMPv1 Reports received on this Service."
+    ::= { tnSvcIgmpSnpgStatsEntry 11 }
+
+tnSvcIgmpSnpgRxV2Reports OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSvcIgmpSnpgRxV2Reports indicates the
+         number of IGMPv2 Reports received on this Service."
+    ::= { tnSvcIgmpSnpgStatsEntry 12 }
+
+tnSvcIgmpSnpgRxV3Reports OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSvcIgmpSnpgRxV3Reports indicates the number
+         of IGMPv3 Reports received on this Service."
+    ::= { tnSvcIgmpSnpgStatsEntry 13 }
+
+tnSvcIgmpSnpgRxV2Leaves OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSvcIgmpSnpgRxV2Leaves indicates the number
+         of IGMPv2 Leaves received on this Service."
+    ::= { tnSvcIgmpSnpgStatsEntry 14 }
+
+tnSvcIgmpSnpgRxUnknownType OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSvcIgmpSnpgRxUnknownType indicates the number
+         of IGMP unknown type packets received on this Service."
+    ::= { tnSvcIgmpSnpgStatsEntry 15 }
+
+tnSvcIgmpSnpgFwdGenQueries OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSvcIgmpSnpgFwdGenQueries indicates
+         the number of IGMP General Queries forwarded on this Service."
+    ::= { tnSvcIgmpSnpgStatsEntry 16 }
+
+tnSvcIgmpSnpgFwdGrpSpecQueries OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSvcIgmpSnpgFwdGrpSpecQueries indicates
+         the number of IGMP Group-Specific Queries forwarded on this Service."
+    ::= { tnSvcIgmpSnpgStatsEntry 17 }
+
+tnSvcIgmpSnpgFwdSrcSpecQueries OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSvcIgmpSnpgFwdSrcSpecQueries indicates
+         the number of IGMP Group-And-Source-Specific Queries forwarded on
+         this Service."
+    ::= { tnSvcIgmpSnpgStatsEntry 18 }
+
+tnSvcIgmpSnpgFwdV1Reports OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSvcIgmpSnpgFwdV1Reports indicates
+         the number of IGMPv1 Reports forwarded on this Service."
+    ::= { tnSvcIgmpSnpgStatsEntry 19 }
+
+tnSvcIgmpSnpgFwdV2Reports OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSvcIgmpSnpgFwdV2Reports indicates
+         the number of IGMPv2 Reports forwarded on this Service."
+    ::= { tnSvcIgmpSnpgStatsEntry 20 }
+
+tnSvcIgmpSnpgFwdV3Reports OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSvcIgmpSnpgFwdV3Reports indicates
+         the number of IGMPv3 Reports forwarded on this Service."
+    ::= { tnSvcIgmpSnpgStatsEntry 21 }
+
+tnSvcIgmpSnpgFwdV2Leaves OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSvcIgmpSnpgFwdV2Leaves indicates
+         the number of IGMPv2 Leaves forwarded on this Service."
+    ::= { tnSvcIgmpSnpgStatsEntry 22 }
+
+tnSvcIgmpSnpgFwdUnknownType OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSvcIgmpSnpgFwdUnknownType indicates
+         the number of IGMP unknown type packets forwarded on this Service."
+    ::= { tnSvcIgmpSnpgStatsEntry 23 }
+
+tnSvcIgmpSnpgRxBadLenPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSvcIgmpSnpgRxBadLenPkts indicates
+         the number of IGMP packets dropped on this Service because of
+         a bad length."
+    ::= { tnSvcIgmpSnpgStatsEntry 24 }
+
+tnSvcIgmpSnpgRxBadIpChksmPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSvcIgmpSnpgRxBadIpChksmPkts indicates
+         the number of dropped IGMP packets on this Service because of a
+         bad IPv4 header checksum."
+    ::= { tnSvcIgmpSnpgStatsEntry 25 }
+
+tnSvcIgmpSnpgRxBadIgmpChksmPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSvcIgmpSnpgRxBadIgmpChksmPkts indicates
+         the number of dropped IGMP packets on this Service because of a bad
+         IGMP header checksum."
+    ::= { tnSvcIgmpSnpgStatsEntry 26 }
+
+tnSvcIgmpSnpgRxBadEncodedPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSvcIgmpSnpgRxBadEncodedPkts indicates
+         the number of IGMP packets dropped on this Service because of a bad
+         encoding."
+    ::= { tnSvcIgmpSnpgStatsEntry 27 }
+
+tnSvcIgmpSnpgRxNoRtrAlertPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSvcIgmpSnpgRxNoRtrAlertPkts indicates
+         the number of IGMP packets dropped on this Service because the Router
+         Alert Option in the IP packet is not set."
+    ::= { tnSvcIgmpSnpgStatsEntry 28 }
+
+tnSvcIgmpSnpgRxZeroSrcAdrPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSvcIgmpSnpgRxZeroSrcAdrPkts indicates
+         the number of IGMP packets dropped on this Service because they contain a
+         zero source IPv4 address."
+    ::= { tnSvcIgmpSnpgStatsEntry 29 }
+
+tnSvcIgmpSnpgSendQueryCfgDrops OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSvcIgmpSnpgSendQueryCfgDrops
+         indicates the number of times an IGMP Query is dropped
+         because the object tnSvcIgmpSnpgCfgSendQueries for this Service is set
+         to 'enabled(1)'."
+    ::= { tnSvcIgmpSnpgStatsEntry 30 }
+
+tnSvcIgmpSnpgImportPolicyDrops OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSvcIgmpSnpgImportPolicyDrops indicates the
+         number of times an IGMP Group or Source is dropped
+         because of applying an import policy on this Service."
+    ::= { tnSvcIgmpSnpgStatsEntry 31 }
+
+tnSvcIgmpSnpgMaxNumGroupsDrops OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSvcIgmpSnpgMaxNumGroupsDrops indicates the
+         number of times an IGMP Group is dropped because of
+         exceeding the configured maximum number of groups on
+         this Service."
+    ::= { tnSvcIgmpSnpgStatsEntry 32 }
+
+tnSvcIgmpSnpgMvrFromVplsCfgDrops OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSvcIgmpSnpgMvrFromVplsCfgDrops indicates
+         the number of times an IGMP Group or Query is dropped because of
+         applying the tnSvcIgmpSnpgCfgMvrFromVplsId configuration
+         on this Service."
+    ::= { tnSvcIgmpSnpgStatsEntry 33 }
+
+tnSvcIgmpSnpgMvrToSapCfgDrops OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The value of the object tnSvcIgmpSnpgMvrToSapCfgDrops indicates the
+         number times an IGMP Report or Query is dropped because of
+         applying the tnSvcIgmpSnpgCfgMvrToSapPortId and
+         tnSvcIgmpSnpgCfgMvrToSapEncapVal configuration on this Service."
+    ::= { tnSvcIgmpSnpgStatsEntry 34 }
+
+tnSvcIgmpSnpgRxWrongVersionPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSvcIgmpSnpgRxWrongVersionPkts indicates the
+         total number of IGMP packets with a wrong version received on
+         this Service."
+    ::= { tnSvcIgmpSnpgStatsEntry 35 }
+
+tnSvcIgmpSnpgMcacPolicyDrops OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSvcIgmpSnpgMcacPolicyDrops indicates the
+         number of times an IGMP Group is dropped because of applying a
+         multicast CAC policy on this Service."
+    ::= { tnSvcIgmpSnpgStatsEntry 36 }
+
+tnSvcIgmpSnpgMcsFailures OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSvcIgmpSnpgMcsFailures indicates the
+         number of times an IGMP Group on this Service could not be synced to
+         the MCS (multi-chassis synchronization) database."
+    ::= { tnSvcIgmpSnpgStatsEntry 37 }
+
+tnSvcIgmpSnpgRxLocalScopePkts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSvcIgmpSnpgRxLocalScopePkts indicates
+         the number of IGMP packets received on the link-local scope IPv6
+         multicast address."
+    ::= { tnSvcIgmpSnpgStatsEntry 38 }
+
+tnSvcIgmpSnpgRxRsvdScopePkts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSvcIgmpSnpgRxRsvdScopePkts indicates
+         the number of IGMP packets received on the reserved scope IPv6
+         multicast address."
+    ::= { tnSvcIgmpSnpgStatsEntry 39 }
+
+tnSvcIgmpSnpgMaxNumSourcesDrops OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSvcIgmpSnpgMaxNumSourcesDrops
+         indicates the number of times an IGMP Source is dropped
+         because of exceeding the configured maximum number of
+         sources per group on this Service."
+    ::= { tnSvcIgmpSnpgStatsEntry 40 }
+
+tnSvcIgmpSnpgNumGrps OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The value of the object tnSvcIgmpSnpgNumGrps
+        indicates the number of IGMP multicast group address
+        learned by IGMP snooping on this Service."
+    ::= { tnSvcIgmpSnpgStatsEntry 41 }
+
+tnSvcIgmpSnpgRxQueryDrops OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tnSvcIgmpSnpgRxQueryDrops indicates the
+         total number of IGMP queries dropped because this is a leaf
+         or branch Service."
+    ::= { tnSvcIgmpSnpgStatsEntry 42 }
+
+-- --------------------------------------------------------
+--
+--  tnSapIgmpSnpgMcacLevelTable
+--
+-- --------------------------------------------------------
+
+-- tnSapIgmpSnpgMcacLevelTable OBJECT-TYPE
+--     SYNTAX      SEQUENCE OF SapIgmpSnpgMcacLevelEntry
+--     MAX-ACCESS  not-accessible
+--     STATUS      current
+--     DESCRIPTION
+--         "The tnSapIgmpSnpgMcacLevelTable has an entry for each multicast
+--          CAC policy constraint level configured on this system."
+--     ::= { tnIgmpSnoopingSapObjs 6 }
+
+-- tnSapIgmpSnpgMcacLevelEntry OBJECT-TYPE
+--     SYNTAX      SapIgmpSnpgMcacLevelEntry
+--     MAX-ACCESS  not-accessible
+--     STATUS      current
+--     DESCRIPTION
+--         "Each row entry represents a particular multicast CAC
+--          policy bundle level constraints. Entries are created/deleted
+--          by the user."
+--     INDEX { tnSvcId,
+--             tnSapPortId,
+--             tnSapEncapValue,
+--             tmnxMcacLevelId }
+--     ::= { tnSapIgmpSnpgMcacLevelTable 1}
+
+-- SapIgmpSnpgMcacLevelEntry ::= SEQUENCE {
+--   tnSapIgmpSnpgCfgMcacLevelRowStat   RowStatus,
+--   tnSapIgmpSnpgCfgMcacLevelBW        Unsigned32,
+--   tnSapIgmpSnpgCfgMcacLevelLastChngT TimeStamp
+-- }
+
+-- tnSapIgmpSnpgCfgMcacLevelRowStat OBJECT-TYPE
+--    SYNTAX      RowStatus
+--    MAX-ACCESS  read-create
+--    STATUS      current
+--    DESCRIPTION
+--        "The value of tnSapIgmpSnpgCfgMcacLevelRowStat is used for
+--         creation/deletion of level constraint in a CAC policy."
+--    ::= { tnSapIgmpSnpgMcacLevelEntry 1 }
+
+-- tnSapIgmpSnpgCfgMcacLevelBW OBJECT-TYPE
+--    SYNTAX      Unsigned32
+--    UNITS       "kbps"
+--    MAX-ACCESS  read-create
+--    STATUS      current
+--    DESCRIPTION
+--        "The value of tnSapIgmpSnpgCfgMcacLevelBW specifies the bandwidth in
+--         kilo-bits per second (kbps) for the level."
+--    DEFVAL { 1 }
+--    ::= { tnSapIgmpSnpgMcacLevelEntry 2 }
+
+-- tnSapIgmpSnpgCfgMcacLevelLastChngT OBJECT-TYPE
+--    SYNTAX      TimeStamp
+--    MAX-ACCESS  read-only
+--    STATUS      current
+--    DESCRIPTION
+--        "The value of the object tnSapIgmpSnpgCfgMcacLevelLastChngT indicates
+--         the sysUpTime at the time of the last modification of this entry."
+--    ::= { tnSapIgmpSnpgMcacLevelEntry 3 }
+
+-- --------------------------------------------------------
+--
+--  tnSapIgmpSnpgMcacLagTable
+--
+-- --------------------------------------------------------
+
+-- tnSapIgmpSnpgMcacLagTable OBJECT-TYPE
+--     SYNTAX      SEQUENCE OF TnSapIgmpSnpgMcacLagEntry
+--     MAX-ACCESS  not-accessible
+--     STATUS      current
+--     DESCRIPTION
+--         "The tnSapIgmpSnpgMcacLagTable has an entry for each lag
+--          port configured for a multicast CAC policy bundle on this system."
+--     ::= { tnIgmpSnoopingSapObjs 7 }
+
+-- tnSapIgmpSnpgMcacLagEntry OBJECT-TYPE
+--     SYNTAX      TnSapIgmpSnpgMcacLagEntry
+--     MAX-ACCESS  not-accessible
+--     STATUS      current
+--     DESCRIPTION
+--         "Each row entry represents a particular multicast CAC
+--          lag port constraints. Entries are created/deleted by the user."
+--     INDEX { tnSvcId,
+--             tnSapPortId,
+--             tnSapEncapValue,
+--             tmnxMcacLagPortsDown }
+--     ::= { tnSapIgmpSnpgMcacLagTable 1}
+
+-- TnSapIgmpSnpgMcacLagEntry ::= SEQUENCE {
+--       tnSapIgmpSnpgCfgMcacLagRowStat     RowStatus,
+--       tnSapIgmpSnpgCfgMcacLagLevel       Unsigned32,
+--       tnSapIgmpSnpgCfgMcacLagLastChangeT TimeStamp
+-- }
+
+-- tnSapIgmpSnpgCfgMcacLagRowStat OBJECT-TYPE
+--    SYNTAX      RowStatus
+--    MAX-ACCESS  read-create
+--    STATUS      current
+--    DESCRIPTION
+--        "The value of tnSapIgmpSnpgCfgMcacLagRowStat is used for
+--         creation/deletion of lag constraint in a CAC policy."
+--    ::= { tnSapIgmpSnpgMcacLagEntry 1 }
+
+-- tnSapIgmpSnpgCfgMcacLagLevel OBJECT-TYPE
+--    SYNTAX      Unsigned32 (1..8)
+--    MAX-ACCESS  read-create
+--    STATUS      current
+--    DESCRIPTION
+--        "The value of tnSapIgmpSnpgCfgMcacLagLevel specifies the level id to use
+--         when the value of tmnxMcacLagPortsDown matches the actual number
+--         of ports down in a lag.
+--
+--         Using the value of tnSapIgmpSnpgCfgMcacLagLevel as an index, the
+--         operational SAP unconstrained bandwidth will be set to
+--         tnSapIgmpSnpgCfgMcacLevelBW.
+
+--         By default, for all lag constraints the link level will be set to 1
+--         at row creation."
+--    DEFVAL { 1 }
+--    ::= { tnSapIgmpSnpgMcacLagEntry 2 }
+
+-- tnSapIgmpSnpgCfgMcacLagLastChangeT OBJECT-TYPE
+--    SYNTAX      TimeStamp
+--    MAX-ACCESS  read-only
+--    STATUS      current
+--    DESCRIPTION
+--        "The value of the object tnSapIgmpSnpgCfgMcacLagLastChangeT indicates
+--         the sysUpTime at the time of the last modification of this entry."
+--    ::= { tnSapIgmpSnpgMcacLagEntry 3 }
+
+--
+-- Dummy Scalars
+--
+tnIgmpSnoopingSapScalar1 OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A dummy scalar that satisfies a SNMP get request quickly when
+         there is no 11QPE24 card provisioned.  Otherwise, it has to
+         traverse the remaining 11QPE24 MIB to get to the next applicable
+         item."
+    ::= { tnIgmpSnoopingSapObjs 101 }
+
+tnIgmpSnoopingSapScalar2 OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "."
+    ::= { tnIgmpSnoopingSapObjs 102 }
+
+-- ----------------------------------------------------------------------------
+--
+--  SdpBind related IGMP snooping objects
+--
+-- ----------------------------------------------------------------------------
+
+-- --------------------------------------------------------
+--
+--  sdpBndIgmpSnpgConfigTable
+--
+-- --------------------------------------------------------
+
+ tnSdpBindIgmpSnpgConfigTable OBJECT-TYPE
+     SYNTAX      SEQUENCE OF SdpBindIgmpSnpgConfigEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+         "The table tnSdpBindIgmpSnpgConfigTable contains objects to
+          configure the IGMP snooping feature on an SDP Bind
+          within a Tls."
+ ::= { tnIgmpSnoopingSdpBindObjs 1 }
+
+ tnSdpBindIgmpSnpgConfigEntry OBJECT-TYPE
+     SYNTAX      SdpBindIgmpSnpgConfigEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+         "Each row contains IGMP snooping configuration
+          parameters for an SDP bind within a Tls. Entries in
+          this table cannot be created or deleted via SNMP operations. An
+          entry in this table will be created by the agent upon creation of
+          a new SDP Bind (sdpBindTlsEntry). The entry is destroyed when the
+          SDP or Tls service is removed."
+     INDEX { tnSysSwitchId,
+             tnSvcId,
+             sdpBindId }
+ ::= { tnSdpBindIgmpSnpgConfigTable 1 }
+
+ SdpBindIgmpSnpgConfigEntry ::= SEQUENCE {
+    sdpBndIgmpSnpgCfgImportPlcy             TPolicyStatementNameOrEmpty,
+    sdpBndIgmpSnpgCfgFastLeave              AlxIgmpSnpgAdminState,
+    sdpBndIgmpSnpgCfgMRouter                TruthValue,
+    sdpBndIgmpSnpgCfgSendQueries            AlxIgmpSnpgAdminState,
+    sdpBndIgmpSnpgCfgGenQueryIntvl          Unsigned32,
+    sdpBndIgmpSnpgCfgQueryRespIntvl         Unsigned32,
+    sdpBndIgmpSnpgCfgRobustCount            Unsigned32,
+    sdpBndIgmpSnpgCfgLastMembIntvl          Unsigned32,
+    sdpBndIgmpSnpgCfgMaxNbrGrps             INTEGER,
+    sdpBndIgmpSnpgCfgVersion                TmnxIgmpVersion,
+    sdpBndIgmpSnpgCfgMcacPolicyName         TPolicyStatementNameOrEmpty,
+    sdpBndIgmpSnpgCfgMcacUnconstBW          Integer32,
+    sdpBndIgmpSnpgCfgMcacPrRsvMndBW         Integer32,
+    sdpBndIgmpSnpgCfgMcacinUseMndBw         Unsigned32,
+    sdpBndIgmpSnpgCfgMcacinUseOplBw         Unsigned32,
+    sdpBndIgmpSnpgCfgMcacAvailMndBw         Unsigned32,
+    sdpBndIgmpSnpgCfgMcacAvailOplBw         Unsigned32,
+    sdpBndIgmpSnpgCfgMcacValInTrans         TruthValue,
+    sdpBndIgmpSnpgCfgLastChangeTime         TimeStamp,
+    sdpBndIgmpSnpgCfgMaxNbrSrcs             Unsigned32
+ }
+
+ sdpBndIgmpSnpgCfgImportPlcy OBJECT-TYPE
+    SYNTAX      TPolicyStatementNameOrEmpty
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the object sdpBndIgmpSnpgCfgImportPlcy specifies
+         a policy statement that must be applied to all
+         incoming IGMP messages on this SDP Bind."
+    DEFVAL { "" }
+    ::= { tnSdpBindIgmpSnpgConfigEntry 1 }
+
+ sdpBndIgmpSnpgCfgFastLeave OBJECT-TYPE
+    SYNTAX      AlxIgmpSnpgAdminState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the object sdpBndIgmpSnpgCfgFastLeave specifies
+         whether or not fastleave is allowed on this SDP bind.
+
+         If set to 'enabled(1)', the system prunes the port on which an IGMP
+         'leave' message has been received without waiting for the Group
+         Specific Query to timeout."
+    DEFVAL { disabled }
+    ::= { tnSdpBindIgmpSnpgConfigEntry 2 }
+
+ sdpBndIgmpSnpgCfgMRouter OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the object sdpBndIgmpSnpgCfgMRouter specifies
+         whether whether a multicast router is attached behind this SDP.
+
+         If sdpBndIgmpSnpgCfgSendQueries is set to 'enabled(1)', the
+         system acts as if this object was set to 'false(2)'."
+    DEFVAL { false }
+    ::= { tnSdpBindIgmpSnpgConfigEntry 3 }
+
+ sdpBndIgmpSnpgCfgSendQueries OBJECT-TYPE
+    SYNTAX      AlxIgmpSnpgAdminState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the object sdpBndIgmpSnpgCfgSendQueries specifies
+         whether the system generates General Queries by itself on this SDP."
+    DEFVAL { disabled }
+    ::= { tnSdpBindIgmpSnpgConfigEntry 4 }
+
+ sdpBndIgmpSnpgCfgGenQueryIntvl OBJECT-TYPE
+    SYNTAX      Unsigned32 (2..1024)
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the object sdpBndIgmpSnpgCfgGenQueryIntvl specifies
+         the interval (in seconds) between two consecutive general
+         queries sent by the system on this SDP.
+
+         The value of this object is only meaningful when the value of
+         sdpBndIgmpSnpgCfgSendQueries is 'enabled(1)'."
+    DEFVAL { 125 }
+    ::= { tnSdpBindIgmpSnpgConfigEntry 5 }
+
+ sdpBndIgmpSnpgCfgQueryRespIntvl OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..1023)
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the object sdpBndIgmpSnpgCfgQueryRespIntvl
+         specifies the maximum response time (in seconds)
+         advertised in IGMPv2/v3 queries.
+
+         The value of this object is only meaningful when the value of
+         sdpBndIgmpSnpgCfgSendQueries is 'enabled(1)'."
+    DEFVAL { 10 }
+    ::= { tnSdpBindIgmpSnpgConfigEntry 6 }
+
+ sdpBndIgmpSnpgCfgRobustCount OBJECT-TYPE
+    SYNTAX      Unsigned32 (2..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the object sdpBndIgmpSnpgCfgRobustCount
+         specifies the value of the Robust count.
+
+         This object allows tuning for the expected packet loss on this SDP.
+         If a SDP is expected to be lossy, the Robustness Variable may be
+         increased. IGMP snooping is robust to (Robustness Variable-1) packet
+         losses.
+
+         The value of this object is only meaningful when the value of
+         sdpBndIgmpSnpgCfgSendQueries is 'enabled(1)'."
+    DEFVAL { 2 }
+    ::= { tnSdpBindIgmpSnpgConfigEntry 7 }
+
+ sdpBndIgmpSnpgCfgLastMembIntvl OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..50)
+    UNITS       "deci-seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the object sdpBndIgmpSnpgCfgLastMembIntvl specifies
+         the Max Response Time (in tenths of a second) used in
+         Group-Specific and Group-Source-Specific Queries sent in response
+         to 'leave' messages. This is also the amount of time between
+         Group-Specific Query messages.
+
+         This value may be tuned to modify the leave latency of the network.
+         A reduced value results in reduced time to detect the loss of the last
+         member of a group."
+    DEFVAL { 10 }
+    ::= { tnSdpBindIgmpSnpgConfigEntry 8 }
+
+ sdpBndIgmpSnpgCfgMaxNbrGrps OBJECT-TYPE
+    SYNTAX      Integer32 (0..2047)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the object sdpBndIgmpSnpgCfgMaxNbrGrps specifies
+         how many group addresses are allowed for this SDP bind.
+         The value 0 means that no limit is imposed."
+    DEFVAL { 0 }
+    ::= { tnSdpBindIgmpSnpgConfigEntry 9 }
+
+ sdpBndIgmpSnpgCfgVersion OBJECT-TYPE
+    SYNTAX      TmnxIgmpVersion
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the object sdpBndIgmpSnpgCfgVersion specifies the version
+         of IGMP running on this SDP bind."
+    DEFVAL { version3 }
+    ::= { tnSdpBindIgmpSnpgConfigEntry 10 }
+
+ sdpBndIgmpSnpgCfgMcacPolicyName OBJECT-TYPE
+    SYNTAX     TPolicyStatementNameOrEmpty
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "The value of sdpBndIgmpSnpgCfgMcacPolicyName indicates the name
+         of the multicast CAC policy."
+    DEFVAL { "" }
+    ::= { tnSdpBindIgmpSnpgConfigEntry 11 }
+
+ sdpBndIgmpSnpgCfgMcacUnconstBW OBJECT-TYPE
+    SYNTAX      Integer32 (-1|0..2147483647)
+    UNITS       "kbps"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of sdpBndIgmpSnpgCfgMcacUnconstBW specifies the bandwidth
+         assigned for interface's multicast CAC policy traffic in kilo-bits per
+         second(kbps).
+
+         If the default value of '-1' is set, there is no constraint on
+         bandwidth allocated at the interface.
+
+         If the value of sdpBndIgmpSnpgCfgMcacUnconstBW is set to '0' and if
+         a multicast CAC policy is assigned on the interface, then
+         no group (channel) from that policy is allowed on that interface."
+    DEFVAL { -1 }
+    ::= { tnSdpBindIgmpSnpgConfigEntry 12 }
+
+ sdpBndIgmpSnpgCfgMcacPrRsvMndBW OBJECT-TYPE
+    SYNTAX      Integer32 (-1|0..2147483647)
+    UNITS       "kbps"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of sdpBndIgmpSnpgCfgMcacPrRsvMndBW specifies the bandwidth
+         pre-reserved for all the mandatory channels on a given interface
+         in kilo-bits per second(kbps).
+
+         If the value of sdpBndIgmpSnpgCfgMcacUnconstBW is '0', no mandatory
+         channels are allowed. If the value of sdpBndIgmpSnpgCfgMcacUnconstBW
+         is '-1', then all mandatory and optional channels are allowed.
+
+         If the value of sdpBndIgmpSnpgCfgMcacPrRsvMndBW is equal to the
+         value of sdpBndIgmpSnpgCfgMcacUnconstBW, then all the unconstrained
+         bandwidth on a given interface is allocated to mandatory channels
+         configured through multicast CAC policy on that interface and no
+         optional groups (channels) are allowed.
+
+         The value of sdpBndIgmpSnpgCfgMcacPrRsvMndBW should always be less
+         than or equal to that of sdpBndIgmpSnpgCfgMcacUnconstBW. An attempt
+         to set the value of sdpBndIgmpSnpgCfgMcacPrRsvMndBW greater than
+         that of sdpBndIgmpSnpgCfgMcacUnconstBW will result in inconsistent
+         value error."
+    DEFVAL { -1 }
+    ::= { tnSdpBindIgmpSnpgConfigEntry 13 }
+
+ sdpBndIgmpSnpgCfgMcacinUseMndBw  OBJECT-TYPE
+    SYNTAX     Unsigned32
+    UNITS      "kbps"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The value of sdpBndIgmpSnpgCfgMcacinUseMndBw indicates the
+         in-use bandwidth in kilo-bits per second(kbps) for the
+         mandatory channels for this protocol interface instance."
+    ::= { tnSdpBindIgmpSnpgConfigEntry 14 }
+
+ sdpBndIgmpSnpgCfgMcacinUseOplBw  OBJECT-TYPE
+    SYNTAX     Unsigned32
+    UNITS      "kbps"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The value of sdpBndIgmpSnpgCfgMcacinUseOplBw indicates the
+         in-use bandwidth in kilo-bits per second(kbps) for the
+         optional channels for this protocol interface instance."
+    ::= { tnSdpBindIgmpSnpgConfigEntry 15 }
+
+ sdpBndIgmpSnpgCfgMcacAvailMndBw  OBJECT-TYPE
+    SYNTAX     Unsigned32
+    UNITS      "kbps"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The value of sdpBndIgmpSnpgCfgMcacAvailMndBw indicates the
+         pre-reserved bandwidth in kilo-bits per second(kbps)
+         for the mandatory channels for this interface instance."
+    ::= { tnSdpBindIgmpSnpgConfigEntry 16 }
+
+ sdpBndIgmpSnpgCfgMcacAvailOplBw  OBJECT-TYPE
+    SYNTAX     Unsigned32
+    UNITS      "kbps"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The value of sdpBndIgmpSnpgCfgMcacAvailOplBw indicates the
+         available bandwidth in kilo-bits per second(kbps) for this
+         interface instance."
+    ::= { tnSdpBindIgmpSnpgConfigEntry 17 }
+
+ sdpBndIgmpSnpgCfgMcacValInTrans   OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of sdpBndIgmpSnpgCfgMcacValInTrans indicates that the
+         operational (available and in-use mandatory/optional) value for the
+         following objects are in transition due to configuration change:
+
+         sdpBndIgmpSnpgCfgMcacinUseMndBw
+         sdpBndIgmpSnpgCfgMcacinUseOplBw
+         sdpBndIgmpSnpgCfgMcacAvailMndBw
+         sdpBndIgmpSnpgCfgMcacAvailOplBw
+
+         When multicast CAC Policy is applied on the interface for the join
+         of the next channel, the operational values will be recalculated and
+         applied to the above objects and the value for
+         sdpBndIgmpSnpgCfgMcacValInTrans will be set to 'false(2)'.
+
+         If the value of sdpBndIgmpSnpgCfgMcacValInTrans is 'true(1)'
+         then the values are in transition."
+    ::= { tnSdpBindIgmpSnpgConfigEntry 18 }
+
+ sdpBndIgmpSnpgCfgLastChangeTime OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object sdpBndIgmpSnpgCfgLastChangeTime indicates
+         the sysUpTime at the time of the last modification of this entry."
+    ::= { tnSdpBindIgmpSnpgConfigEntry 19 }
+
+ sdpBndIgmpSnpgCfgMaxNbrSrcs OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..1000)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the object sdpBndIgmpSnpgCfgMaxNbrSrcs specifies
+         how many source addresses are allowed per group address for
+         this SDP bind.
+
+         The value 0 means that no limit is imposed."
+    DEFVAL { 0 }
+    ::= { tnSdpBindIgmpSnpgConfigEntry 20 }
+
+-- --------------------------------------------------------
+--
+--  tnSdpBindIgmpSnpgGroupTable  : read only
+--
+-- --------------------------------------------------------
+
+ tnSdpBindIgmpSnpgGroupTable OBJECT-TYPE
+     SYNTAX      SEQUENCE OF SdpBindIgmpSnpgGroupEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+         "tnSdpBindIgmpSnpgGroupTable together with the table
+          tnSdpBindIgmpSnpgGrpSrcTable contains multicast group address
+          information collected by IGMP snooping for each SDP Bind."
+     ::= { tnIgmpSnoopingSdpBindObjs 2 }
+
+ tnSdpBindIgmpSnpgGroupEntry OBJECT-TYPE
+     SYNTAX      SdpBindIgmpSnpgGroupEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+         "Each entry in this table indicates a multicast group
+          address learned by IGMP snooping on this SDP Bind. If a
+          Source list is present it is described in the
+          corresponding entries of the  tnSdpBindIgmpSnpgGrpSrcTable
+          table."
+     INDEX { tnSysSwitchId,
+             tnSvcId,
+             sdpBindId,
+             sdpBndIgmpSnpgGrpAddress }
+     ::= { tnSdpBindIgmpSnpgGroupTable 1 }
+
+ SdpBindIgmpSnpgGroupEntry ::= SEQUENCE {
+    sdpBndIgmpSnpgGrpAddress          IpAddress,
+    sdpBndIgmpSnpgGrpType             TmnxIgmpGroupType,
+    sdpBndIgmpSnpgGrpFilterMode       TmnxIgmpGroupFilterMode,
+    sdpBndIgmpSnpgGrpUpTime           TimeTicks,
+    sdpBndIgmpSnpgGrpExpiryTime       Unsigned32,
+    sdpBndIgmpSnpgGrpCompatMode       Unsigned32,
+    sdpBndIgmpSnpgGrpV1HostExpTime    Unsigned32,
+    sdpBndIgmpSnpgGrpV2HostExpTime    Unsigned32,
+    sdpBndIgmpSnpgGrpNumSrc           Counter32
+ }
+
+ sdpBndIgmpSnpgGrpAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of the object sdpBndIgmpSnpgGrpAddress indicates
+         the IPv4 multicast group address for which this
+         entry contains information."
+    ::= { tnSdpBindIgmpSnpgGroupEntry 1 }
+
+ sdpBndIgmpSnpgGrpType OBJECT-TYPE
+    SYNTAX      TmnxIgmpGroupType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object sdpBndIgmpSnpgGrpType indicates
+         whether this entry was learned dynamically or was
+         statically configured."
+    ::= { tnSdpBindIgmpSnpgGroupEntry 2 }
+
+ sdpBndIgmpSnpgGrpFilterMode OBJECT-TYPE
+    SYNTAX      TmnxIgmpGroupFilterMode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object sdpBndIgmpSnpgGrpFilterMode indicates
+         the filter-mode for this group."
+    ::= { tnSdpBindIgmpSnpgGroupEntry 3 }
+
+ sdpBndIgmpSnpgGrpUpTime OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object sdpBndIgmpSnpgGrpUpTime indicates
+         how long (in hundredths of a second) that the group address
+         already exists in the database for this SDP Bind."
+    ::= { tnSdpBindIgmpSnpgGroupEntry 4 }
+
+ sdpBndIgmpSnpgGrpExpiryTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object sdpBndIgmpSnpgGrpExpiryTime indicates
+         the amount of time remaining before this entry will be aged out."
+    ::= { tnSdpBindIgmpSnpgGroupEntry 5 }
+
+ sdpBndIgmpSnpgGrpCompatMode OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object sdpBndIgmpSnpgGrpCompatMode indicates
+         the IGMP version applicable on this SDP Bind for this
+         multicast group address. This corresponds to the lowest version
+         seen for this group address on this SDP Bind."
+    ::= { tnSdpBindIgmpSnpgGroupEntry 6 }
+
+ sdpBndIgmpSnpgGrpV1HostExpTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object sdpBndIgmpSnpgGrpV1HostExpTime indicates
+         the time remaining until the system will assume that
+         there are no longer any IGMPv1 members on this SDP Bind.
+
+         Upon hearing any IGMPv1 Membership Report, this value is reset to the
+         group membership interval. While this time remaining is non-zero,
+         the system ignores any IGMPv2 and IGMPv3 'leave' messages for this
+         group that it receives on this SDP Bind."
+    ::= { tnSdpBindIgmpSnpgGroupEntry 7 }
+
+ sdpBndIgmpSnpgGrpV2HostExpTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object sdpBndIgmpSnpgGrpV2HostExpTime indicates
+         the time remaining until the system will assume that
+         there are no longer any IGMPv2 members on the SDP Bind.
+
+         Upon hearing any IGMPv2 Membership Report, this value is reset to the
+         group membership interval. While this time remaining is non-zero,
+         the system ignores any IGMPv3 'leave' messages for this group that
+         it receives on this SDP Bind."
+    ::= { tnSdpBindIgmpSnpgGroupEntry 8 }
+
+ sdpBndIgmpSnpgGrpNumSrc OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The value of the object sdpBndIgmpSnpgGrpNumSrc
+          indicates the number of IGMP multicast source
+          corresponding to this IGMP multicast group entry."
+    ::= { tnSdpBindIgmpSnpgGroupEntry 9 }
+
+-- --------------------------------------------------------
+--
+--  tnSdpBindIgmpSnpgGrpSrcTable : read-only
+--
+-- --------------------------------------------------------
+
+ tnSdpBindIgmpSnpgGrpSrcTable OBJECT-TYPE
+     SYNTAX      SEQUENCE OF SdpBindIgmpSnpgGrpSrcEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+         "tnSdpBindIgmpSnpgGrpSrcTable lists the IPv4 multicast
+          Sources corresponding to the IPv4 multicast groups
+          listed in the tnSdpBindIgmpSnpgGroupTable."
+     ::= { tnIgmpSnoopingSdpBindObjs 3 }
+
+ tnSdpBindIgmpSnpgGrpSrcEntry OBJECT-TYPE
+     SYNTAX      SdpBindIgmpSnpgGrpSrcEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+         "An entry in the tnSdpBindIgmpSnpgGrpSrcTable. Each entry
+          represents a Source address from which receivers are
+          interested/not interested in receiving multicast
+          traffic from."
+     INDEX { tnSysSwitchId,
+             tnSvcId,
+             sdpBindId,
+             sdpBndIgmpSnpgGrpAddress,
+             sdpBndIgmpSnpgGrpSrcAddr }
+     ::= { tnSdpBindIgmpSnpgGrpSrcTable 1 }
+
+ SdpBindIgmpSnpgGrpSrcEntry ::= SEQUENCE {
+    sdpBndIgmpSnpgGrpSrcAddr          IpAddress,
+    sdpBndIgmpSnpgGrpSrcType          TmnxIgmpGroupType,
+    sdpBndIgmpSnpgGrpSrcUpTime        TimeTicks,
+    sdpBndIgmpSnpgGrpSrcExpiryTime    Unsigned32
+ }
+
+ sdpBndIgmpSnpgGrpSrcAddr OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of the object sdpBndIgmpSnpgGrpSrcAddr indicates
+         the address of the Source sending multicast traffic
+         to the group identified by sdpBndIgmpSnpgGrpAddress.
+
+         If the value of sdpBndIgmpSnpgGrpFilterMode corresponding to this entry
+         is 'include(1)', the receivers are interested in receiving traffic from
+         this Source.
+
+         If the value of sdpBndIgmpSnpgGrpFilterMode corresponding to this entry
+         is 'exclude(2)', the receivers are not interested in receiving traffic
+         from this Source."
+    ::= { tnSdpBindIgmpSnpgGrpSrcEntry 1 }
+
+ sdpBndIgmpSnpgGrpSrcType OBJECT-TYPE
+    SYNTAX      TmnxIgmpGroupType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object sdpBndIgmpSnpgGrpSrcType indicates
+         how this source entry was learned.
+
+         If this source entry was learned, it is set to 'dynamic(2)'.
+         For statically configured sources, the value is set to 'static(1)'."
+    ::= { tnSdpBindIgmpSnpgGrpSrcEntry 2 }
+
+ sdpBndIgmpSnpgGrpSrcUpTime OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object sdpBndIgmpSnpgGrpSrcUpTime indicates
+         how long (in hundredths of a second) that the Source
+         address already exists in the database for this SDP Bind."
+    ::= { tnSdpBindIgmpSnpgGrpSrcEntry 3 }
+
+ sdpBndIgmpSnpgGrpSrcExpiryTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object sdpBndIgmpSnpgGrpSrcExpiryTime
+         indicates the minimum amount of time remaining before this entry
+         will be aged out.
+
+         If  the value of sdpBndIgmpSnpgGrpSrcExpiryTime is non-zero and the
+         value of sdpBndIgmpSnpgGrpFilterMode corresponding to this entry is
+         'include(1)', it means that there are currently one or more systems
+         which desire to receive multicast traffic for this Source.
+
+         If this timer expires and the value of sdpBndIgmpSnpgGrpFilterMode is
+         'include(1)', the system concludes that traffic from this particular
+         Source is no longer desired on the attached network, and deletes this
+         entry.
+
+         If  the value of sdpBndIgmpSnpgGrpSrcExpiryTime is non-zero and the
+         filter-mode for the group is 'exclude(2)', it means that at least one
+         system desires to receive multicast traffic from this Source.
+
+         If the value of sdpBndIgmpSnpgGrpSrcExpiryTime is zero and the
+         filter-mode for the group is 'exclude(2)', it means that no system
+         desires to receive multicast traffic from this Source."
+    ::= { tnSdpBindIgmpSnpgGrpSrcEntry 4 }
+
+-- --------------------------------------------------------
+--
+--  tnSdpBindIgmpSnpgStaticGrpSrcTable
+--
+-- --------------------------------------------------------
+
+ tnSdpBindIgmpSnpgStaticGrpSrcTable OBJECT-TYPE
+     SYNTAX      SEQUENCE OF SdpBindIgmpSnpgStatGrpSrcEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+         "The table tnSdpBindIgmpSnpgStaticGrpSrcTable contains
+          statically configured (S,G) entries for each SDP Bind."
+ ::= { tnIgmpSnoopingSdpBindObjs 4 }
+
+ tnSdpBindIgmpSnpgStaticGrpSrcEntry OBJECT-TYPE
+     SYNTAX      SdpBindIgmpSnpgStatGrpSrcEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+         "An entry in the tnSdpBindIgmpSnpgStaticGrpSrcTable.
+          Entries can be created or deleted by an SNMP SET
+          request to sdpBndIgmpSnpgStaticRowstatus."
+     INDEX { tnSysSwitchId,
+             tnSvcId,
+             sdpBindId,
+             sdpBndIgmpSnpgStaticGroupAddr,
+             sdpBndIgmpSnpgStaticSourceAddr }
+ ::= { tnSdpBindIgmpSnpgStaticGrpSrcTable 1 }
+
+ SdpBindIgmpSnpgStatGrpSrcEntry ::= SEQUENCE {
+    sdpBndIgmpSnpgStaticGroupAddr     IpAddress,
+    sdpBndIgmpSnpgStaticSourceAddr    IpAddress,
+    sdpBndIgmpSnpgStaticRowstatus     RowStatus,
+    sdpBndIgmpSnpgStaticLastChange    TimeStamp
+ }
+
+ sdpBndIgmpSnpgStaticGroupAddr OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of the object sdpBndIgmpSnpgStaticGroupAddr specifies
+         the group multicast address for this statically configured (S,G)
+         entry for this SDP Bind."
+    ::= { tnSdpBindIgmpSnpgStaticGrpSrcEntry 1 }
+
+ sdpBndIgmpSnpgStaticSourceAddr OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of the object sdpBndIgmpSnpgStaticSourceAddr specifies
+         the Source IP address for this statically configured (S,G)
+         entry for this SDP Bind. For a (*,G) entry this object must be
+         set to 0.0.0.0."
+    ::= { tnSdpBindIgmpSnpgStaticGrpSrcEntry 2 }
+
+ sdpBndIgmpSnpgStaticRowstatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object sdpBndIgmpSnpgStaticRowstatus specifies
+         the row status used for creation or deletion of
+         tnSdpBindIgmpSnpgStaticGrpSrcTable entries."
+    ::= { tnSdpBindIgmpSnpgStaticGrpSrcEntry 3 }
+
+ sdpBndIgmpSnpgStaticLastChange OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object sdpBndIgmpSnpgStaticLastChange indicates
+         the sysUpTime at the time of the last modification of this entry."
+    ::= { tnSdpBindIgmpSnpgStaticGrpSrcEntry 4 }
+
+ --------------------------------------------------------
+--
+--  tnSdpBindIgmpSnpgStatsTable  : read-only
+--
+-- --------------------------------------------------------
+
+ tnSdpBindIgmpSnpgStatsTable OBJECT-TYPE
+     SYNTAX      SEQUENCE OF SdpBindIgmpSnpgStatsEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+         "tnSdpBindIgmpSnpgStatsTable contains statistics on IGMP
+          snooping per SDP Bind."
+ ::= { tnIgmpSnoopingSdpBindObjs 5 }
+
+ tnSdpBindIgmpSnpgStatsEntry OBJECT-TYPE
+     SYNTAX      SdpBindIgmpSnpgStatsEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+         "tnSdpBindIgmpSnpgStatsEntry is an entry in the
+          tnSdpBindIgmpSnpgStatsTable. Each entry contains IGMP
+          snooping statics for a SDP Bind in a Tls."
+     INDEX { tnSysSwitchId,
+             tnSvcId,
+             sdpBindId }
+ ::= { tnSdpBindIgmpSnpgStatsTable 1 }
+
+ SdpBindIgmpSnpgStatsEntry ::= SEQUENCE {
+    sdpBndIgmpSnpgTxGenQueries          Counter32,
+    sdpBndIgmpSnpgTxGrpSpecQueries      Counter32,
+    sdpBndIgmpSnpgTxSrcSpecQueries      Counter32,
+    sdpBndIgmpSnpgTxV1Reports           Counter32,
+    sdpBndIgmpSnpgTxV2Reports           Counter32,
+    sdpBndIgmpSnpgTxV3Reports           Counter32,
+    sdpBndIgmpSnpgTxV2Leaves            Counter32,
+    sdpBndIgmpSnpgRxGenQueries          Counter32,
+    sdpBndIgmpSnpgRxGrpSpecQueries      Counter32,
+    sdpBndIgmpSnpgRxSrcSpecQueries      Counter32,
+    sdpBndIgmpSnpgRxV1Reports           Counter32,
+    sdpBndIgmpSnpgRxV2Reports           Counter32,
+    sdpBndIgmpSnpgRxV3Reports           Counter32,
+    sdpBndIgmpSnpgRxV2Leaves            Counter32,
+    sdpBndIgmpSnpgRxUnknownType         Counter32,
+    sdpBndIgmpSnpgFwdGenQueries         Counter32,
+    sdpBndIgmpSnpgFwdGrpSpecQueries     Counter32,
+    sdpBndIgmpSnpgFwdSrcSpecQueries     Counter32,
+    sdpBndIgmpSnpgFwdV1Reports          Counter32,
+    sdpBndIgmpSnpgFwdV2Reports          Counter32,
+    sdpBndIgmpSnpgFwdV3Reports          Counter32,
+    sdpBndIgmpSnpgFwdV2Leaves           Counter32,
+    sdpBndIgmpSnpgFwdUnknownType        Counter32,
+    sdpBndIgmpSnpgRxBadLenPkts          Counter32,
+    sdpBndIgmpSnpgRxBadIpChksmPkts      Counter32,
+    sdpBndIgmpSnpgRxBadIgmpChksmPkts    Counter32,
+    sdpBndIgmpSnpgRxBadEncodedPkts      Counter32,
+    sdpBndIgmpSnpgRxNoRtrAlertPkts      Counter32,
+    sdpBndIgmpSnpgRxZeroSrcAdrPkts      Counter32,
+    sdpBndIgmpSnpgSendQueryCfgDrops     Counter32,
+    sdpBndIgmpSnpgImportPolicyDrops     Counter32,
+    sdpBndIgmpSnpgMaxNumGroupsDrops     Counter32,
+    sdpBndIgmpSnpgRxWrongVersionPkts    Counter32,
+    sdpBndIgmpSnpgMcacPolicyDrops       Counter32,
+    sdpBndIgmpSnpgRxLocalScopePkts      Counter32,
+    sdpBndIgmpSnpgRxRsvdScopePkts       Counter32,
+    sdpBndIgmpSnpgMaxNumSourcesDrops    Counter32,
+    sdpBndIgmpSnpgNumGrps               Counter32,
+    sdpBndIgmpSnpgRxQueryDrops          Counter32
+ }
+
+ sdpBndIgmpSnpgTxGenQueries OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object sdpBndIgmpSnpgTxGenQueries indicates
+         the number of IGMP General Queries transmitted on this SDP Bind."
+    ::= { tnSdpBindIgmpSnpgStatsEntry 1 }
+
+ sdpBndIgmpSnpgTxGrpSpecQueries OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object sdpBndIgmpSnpgTxGrpSpecQueries indicates
+         the number of IGMP Group-Specific Queries transmitted on this SDP
+         Bind."
+    ::= { tnSdpBindIgmpSnpgStatsEntry 2 }
+
+ sdpBndIgmpSnpgTxSrcSpecQueries OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object sdpBndIgmpSnpgTxSrcSpecQueries indicates
+         the number of IGMP Group-And-Source-Specific Queries transmitted on
+         this SDP Bind."
+    ::= { tnSdpBindIgmpSnpgStatsEntry 3 }
+
+ sdpBndIgmpSnpgTxV1Reports OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object sdpBndIgmpSnpgTxV1Reports indicates the
+         number of IGMPv1 Reports transmitted on this SDP Bind."
+    ::= { tnSdpBindIgmpSnpgStatsEntry 4 }
+
+ sdpBndIgmpSnpgTxV2Reports OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object sdpBndIgmpSnpgTxV2Reports indicates the
+         number of IGMPv2 Reports transmitted on this SDP Bind."
+    ::= { tnSdpBindIgmpSnpgStatsEntry 5 }
+
+ sdpBndIgmpSnpgTxV3Reports OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object sdpBndIgmpSnpgTxV3Reports indicates the
+         number of IGMPv3 Reports transmitted on this SDP Bind."
+    ::= { tnSdpBindIgmpSnpgStatsEntry 6 }
+
+ sdpBndIgmpSnpgTxV2Leaves OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object sdpBndIgmpSnpgTxV2Leaves indicates the
+         number of IGMPv2 Leaves transmitted on this SDP Bind."
+    ::= { tnSdpBindIgmpSnpgStatsEntry 7 }
+
+ sdpBndIgmpSnpgRxGenQueries OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object sdpBndIgmpSnpgRxGenQueries indicates
+         the number of IGMP General Queries received on this SDP Bind."
+    ::= { tnSdpBindIgmpSnpgStatsEntry 8 }
+
+ sdpBndIgmpSnpgRxGrpSpecQueries OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object sdpBndIgmpSnpgRxGrpSpecQueries indicates
+         the number of IGMP Group-Specific Queries received on this SDP Bind."
+    ::= { tnSdpBindIgmpSnpgStatsEntry 9 }
+
+ sdpBndIgmpSnpgRxSrcSpecQueries OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object sdpBndIgmpSnpgRxSrcSpecQueries indicates
+         the number of IGMP Group-And-Source-Specific Queries received on this
+         SDP Bind."
+    ::= { tnSdpBindIgmpSnpgStatsEntry 10 }
+
+ sdpBndIgmpSnpgRxV1Reports OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object sdpBndIgmpSnpgRxV1Reports indicates the
+         number of IGMPv1 Reports received on this SDP Bind."
+    ::= { tnSdpBindIgmpSnpgStatsEntry 11 }
+
+ sdpBndIgmpSnpgRxV2Reports OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object sdpBndIgmpSnpgRxV2Reports indicates the
+         number of IGMPv2 Reports received on this SDP Bind."
+    ::= { tnSdpBindIgmpSnpgStatsEntry 12 }
+
+ sdpBndIgmpSnpgRxV3Reports OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object sdpBndIgmpSnpgRxV3Reports indicates the
+         number of IGMPv3 Reports received on this SDP Bind."
+    ::= { tnSdpBindIgmpSnpgStatsEntry 13 }
+
+ sdpBndIgmpSnpgRxV2Leaves OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object sdpBndIgmpSnpgRxV2Leaves indicates the
+         number of IGMPv2 Leaves received on this SDP Bind."
+    ::= { tnSdpBindIgmpSnpgStatsEntry 14 }
+
+ sdpBndIgmpSnpgRxUnknownType OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object sdpBndIgmpSnpgRxUnknownType indicates the
+         number of IGMP unknown type packets received on this SDP Bind."
+    ::= { tnSdpBindIgmpSnpgStatsEntry 15 }
+
+ sdpBndIgmpSnpgFwdGenQueries OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object sdpBndIgmpSnpgFwdGenQueries indicates the
+         number of IGMP General Queries forwarded on this SDP Bind."
+    ::= { tnSdpBindIgmpSnpgStatsEntry 16 }
+
+ sdpBndIgmpSnpgFwdGrpSpecQueries OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object sdpBndIgmpSnpgFwdGrpSpecQueries indicates
+         the number of IGMP Group-Specific Queries forwarded on this SDP
+         Bind."
+    ::= { tnSdpBindIgmpSnpgStatsEntry 17 }
+
+ sdpBndIgmpSnpgFwdSrcSpecQueries OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object sdpBndIgmpSnpgFwdSrcSpecQueries indicates
+         the number of IGMP Group-And-Source-Specific Queries forwarded on
+         this SDP Bind."
+    ::= { tnSdpBindIgmpSnpgStatsEntry 18 }
+
+ sdpBndIgmpSnpgFwdV1Reports OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object sdpBndIgmpSnpgFwdV1Reports indicates
+         the number of IGMPv1 Reports forwarded on this SDP Bind."
+    ::= { tnSdpBindIgmpSnpgStatsEntry 19 }
+
+ sdpBndIgmpSnpgFwdV2Reports OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object sdpBndIgmpSnpgFwdV2Reports indicates
+         the  number of IGMPv2 Reports forwarded on this SDP Bind."
+    ::= { tnSdpBindIgmpSnpgStatsEntry 20 }
+
+ sdpBndIgmpSnpgFwdV3Reports OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object sdpBndIgmpSnpgFwdV3Reports indicates
+         the number of IGMPv3 Reports forwarded on this SDP Bind."
+    ::= { tnSdpBindIgmpSnpgStatsEntry 21 }
+
+ sdpBndIgmpSnpgFwdV2Leaves OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object sdpBndIgmpSnpgFwdV2Leaves indicates the
+         number of IGMPv2 Leaves forwarded on this SDP Bind."
+    ::= { tnSdpBindIgmpSnpgStatsEntry 22 }
+
+ sdpBndIgmpSnpgFwdUnknownType OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object sdpBndIgmpSnpgFwdUnknownType indicates
+         the number of IGMP unknown type packets forwarded on this SDP Bind."
+    ::= { tnSdpBindIgmpSnpgStatsEntry 23 }
+
+ sdpBndIgmpSnpgRxBadLenPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object sdpBndIgmpSnpgRxBadLenPkts indicates the
+         number of IGMP packets dropped on this SDP Bind because of a bad
+         length."
+    ::= { tnSdpBindIgmpSnpgStatsEntry 24 }
+
+ sdpBndIgmpSnpgRxBadIpChksmPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object sdpBndIgmpSnpgRxBadIpChksmPkts indicates
+         the number of dropped IGMP packets on this SDP Bind because of a bad
+         IPv4 header checksum."
+    ::= { tnSdpBindIgmpSnpgStatsEntry 25 }
+
+ sdpBndIgmpSnpgRxBadIgmpChksmPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object sdpBndIgmpSnpgRxBadIgmpChksmPkts indicates
+         the number of  dropped  IGMP packets on this SDP Bind because of a
+         bad IGMP header checksum."
+    ::= { tnSdpBindIgmpSnpgStatsEntry 26 }
+
+ sdpBndIgmpSnpgRxBadEncodedPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object sdpBndIgmpSnpgRxBadEncodedPkts indicates
+         the number of IGMP packets dropped on this SDP Bind because of a bad
+         encoding."
+    ::= { tnSdpBindIgmpSnpgStatsEntry 27 }
+
+ sdpBndIgmpSnpgRxNoRtrAlertPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object sdpBndIgmpSnpgRxNoRtrAlertPkts indicates
+         the number of IGMP packets dropped on this SDP Bind because the
+         Router Alert Option in the IP packet is not set."
+    ::= { tnSdpBindIgmpSnpgStatsEntry 28 }
+
+ sdpBndIgmpSnpgRxZeroSrcAdrPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object sdpBndIgmpSnpgRxZeroSrcAdrPkts indicates
+         the number of IGMP packets dropped on this SDP Bind because
+         they contain a zero source IPv4 address."
+    ::= { tnSdpBindIgmpSnpgStatsEntry 29 }
+
+ sdpBndIgmpSnpgSendQueryCfgDrops OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The  value of the object sdpBndIgmpSnpgSendQueryCfgDrops indicates
+         the number of times an IGMP Query is dropped because the
+         object sdpBndIgmpSnpgCfgSendQueries for this SDP Bind is set to
+         'enabled(1)'."
+    ::= { tnSdpBindIgmpSnpgStatsEntry 30 }
+
+ sdpBndIgmpSnpgImportPolicyDrops OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The  value of the object sdpBndIgmpSnpgImportPolicyDrops indicates
+         the number of times an IGMP Group or Source is dropped
+         because of applying an import policy on this SDP Bind."
+    ::= { tnSdpBindIgmpSnpgStatsEntry 31 }
+
+ sdpBndIgmpSnpgMaxNumGroupsDrops OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The  value of the object sdpBndIgmpSnpgMaxNumGroupsDrops indicates
+         the number of times an IGMP Group is dropped because of
+         exceeding the configured maximum number of groups on this SDP
+         Bind."
+    ::= { tnSdpBindIgmpSnpgStatsEntry 32 }
+
+ sdpBndIgmpSnpgRxWrongVersionPkts OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The value of the object sdpBndIgmpSnpgRxWrongVersionPkts indicates
+         the total number of IGMP packets with a wrong version received on
+         this SDP Bind."
+    ::= { tnSdpBindIgmpSnpgStatsEntry 33 }
+
+ sdpBndIgmpSnpgMcacPolicyDrops OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object sdpBndIgmpSnpgMcacPolicyDrops indicates the
+         number of times an IGMP Group is dropped because of applying a
+         multicast CAC policy on this SDP Bind."
+    ::= { tnSdpBindIgmpSnpgStatsEntry 34 }
+
+ sdpBndIgmpSnpgRxLocalScopePkts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object sdpBndIgmpSnpgRxLocalScopePkts indicates
+         the number of IGMP packets received on the link-local scope IPv6
+         multicast address."
+    ::= { tnSdpBindIgmpSnpgStatsEntry 35 }
+
+ sdpBndIgmpSnpgRxRsvdScopePkts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object sdpBndIgmpSnpgRxRsvdScopePkts indicates
+         the number of IGMP packets received on the reserved scope IPv6
+         multicast address."
+    ::= { tnSdpBindIgmpSnpgStatsEntry 36 }
+
+ sdpBndIgmpSnpgMaxNumSourcesDrops OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object sdpBndIgmpSnpgMaxNumSourcesDrops
+         indicates the number of times an IGMP Source is dropped
+         because of exceeding the configured maximum number of
+         sources per group on this SDP Bind."
+    ::= { tnSdpBindIgmpSnpgStatsEntry 37 }
+
+ sdpBndIgmpSnpgNumGrps OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "The value of the object sdpBndIgmpSnpgNumGrps
+       indicates the number of IGMP multicast group address
+       learned by IGMP snooping on this SDp."
+    ::= { tnSdpBindIgmpSnpgStatsEntry 38 }
+
+ sdpBndIgmpSnpgRxQueryDrops OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The value of the object sdpBndIgmpSnpgRxQueryDrops indicates the
+         total number of IGMP queries dropped because this is a leaf
+         or branch SAP."
+   ::= { tnSdpBindIgmpSnpgStatsEntry 39 }
+
+-- ----------------------------------------------------------------------------
+--
+--  Table Last Changed Time Stamps
+--
+-- ----------------------------------------------------------------------------
+-- tnTlsIgmpSnpgConfigTableLastChange OBJECT-TYPE
+--     SYNTAX      TimeStamp
+--     MAX-ACCESS  read-only
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of the object tnTlsIgmpSnpgConfigTableLastChange indicates
+--          the value of sysUpTime at the time of the last modification of an entry
+--          in the tnTlsIgmpSnpgConfigTable."
+--     ::= { tnIgmpSnoopingTimeStampObjs 1 }
+--
+-- tnSapIgmpSnpgConfigTableLastChange OBJECT-TYPE
+--     SYNTAX      TimeStamp
+--     MAX-ACCESS  read-only
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of the object tnSapIgmpSnpgConfigTableLastChange indicates
+--          the value of sysUpTime at the time of the last modification of an entry
+--          in the tnSapIgmpSnpgConfigTable."
+--     ::= { tnIgmpSnoopingTimeStampObjs 2 }
+--
+-- tnSapIgmpSnpgStaticGrpSrcTablLstCh OBJECT-TYPE
+--     SYNTAX      TimeStamp
+--     MAX-ACCESS  read-only
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of the object tnSapIgmpSnpgStaticGrpSrcTablLstCh indicates
+--          the value of sysUpTime at the time of the last modification of an entry
+--          in the tnSapIgmpSnpgStaticGrpSrcTable."
+--     ::= { tnIgmpSnoopingTimeStampObjs 3 }
+--
+-- tnSapIgmpSnpgMcacLevelTableLstCh OBJECT-TYPE
+--     SYNTAX      TimeStamp
+--     MAX-ACCESS  read-only
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of the object tnSapIgmpSnpgMcacLevelTableLstCh indicates
+--          the value of sysUpTime at the time of the last modification of an entry
+--          in the tnSapIgmpSnpgMcacLevelTable."
+--     ::= { tnIgmpSnoopingTimeStampObjs 4 }
+--
+-- tnSapIgmpSnpgMcacLagTableLastChng OBJECT-TYPE
+--     SYNTAX      TimeStamp
+--     MAX-ACCESS  read-only
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of the object tnSapIgmpSnpgMcacLagTableLastChng indicates
+--          the value of sysUpTime at the time of the last modification of an entry
+--          in the tnSapIgmpSnpgMcacLagTable."
+--     ::= { tnIgmpSnoopingTimeStampObjs 5 }
+--
+-- tnSdpBindIgmpSnpgConfigTableLstCh OBJECT-TYPE
+--     SYNTAX      TimeStamp
+--     MAX-ACCESS  read-only
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of the object tnSdpBindIgmpSnpgConfigTableLstCh indicates
+--          the value of sysUpTime at the time of the last modification of an entry
+--          in the tnSdpBindIgmpSnpgConfigTable."
+--     ::= { tnIgmpSnoopingTimeStampObjs 6 }
+--
+-- tnSdpBindIgmpSnpgStaticGrpSrcTblLC OBJECT-TYPE
+--     SYNTAX      TimeStamp
+--     MAX-ACCESS  read-only
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of the object tnSdpBindIgmpSnpgStaticGrpSrcTblLC indicates
+--          the value of sysUpTime at the time of the last modification of an entry
+--          in the tnSdpBindIgmpSnpgStaticGrpSrcTable."
+--     ::= { tnIgmpSnoopingTimeStampObjs 7 }
+
+-- ----------------------------------------------------------------------------
+--
+--  Notifications
+--
+-- ----------------------------------------------------------------------------
+
+-- --------------------------------------------------------
+--
+--  IGMP snooping Notification Objects
+--
+-- --------------------------------------------------------
+
+-- tnIgmpSnpgGroupAddress OBJECT-TYPE
+--     SYNTAX      IpAddress
+--     MAX-ACCESS  accessible-for-notify
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of the object tnIgmpSnpgGroupAddress indicates an IP
+--          multicast group address."
+--     ::= { tnIgmpSnoopingNotificationObjs 1 }
+--
+-- tnIgmpSnpgMcsFailureReason OBJECT-TYPE
+--     SYNTAX      DisplayString
+--     MAX-ACCESS  accessible-for-notify
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of the object tnIgmpSnpgMcsFailureReason indicates the
+--          reason why the tnSapIgmpSnpgMcsFailure notification is sent."
+--     ::= { tnIgmpSnoopingNotificationObjs 2 }
+--
+-- tnIgmpSnpgSourceAddress OBJECT-TYPE
+--     SYNTAX      IpAddress
+--     MAX-ACCESS  accessible-for-notify
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of the object tnIgmpSnpgGroupAddress indicates an IP
+--          multicast source address."
+--     ::= { tnIgmpSnoopingNotificationObjs 3 }
+
+-- --------------------------------------------------------
+--
+--  Sap IGMP snooping Notifications
+--
+-- --------------------------------------------------------
+
+-- tnSapIgmpSnpgGrpLimitExceeded NOTIFICATION-TYPE
+--     OBJECTS {
+--         tnSvcId,
+--         tnSapPortId,
+--         tnSapEncapValue,
+--         tnSapIgmpSnpgCfgMaxNbrGrps,
+--         tnIgmpSnpgGroupAddress
+--             }
+--     STATUS      current
+--     DESCRIPTION
+--         "The tnSapIgmpSnpgGrpLimitExceeded notification is generated when an
+--          IGMP group is dropped on a given SAP because a user configurable
+--          upper limit given by tnSapIgmpSnpgCfgMaxNbrGrps is reached."
+-- ::= { tnIgmpSnpgSapNotifications 1 }
+--
+-- tnSapIgmpSnpgMcacPlcyDropped NOTIFICATION-TYPE
+--     OBJECTS {
+--         tnSvcId,
+--         tnSapPortId,
+--         tnSapEncapValue,
+--         tnSapIgmpSnpgCfgMcacPolicyName,
+--         tnIgmpSnpgGroupAddress
+--             }
+--     STATUS      current
+--     DESCRIPTION
+--         "The tnSapIgmpSnpgMcacPlcyDropped notification is generated when an
+--          IGMP group is dropped on a given SAP because of applying a
+--          multicast CAC policy given by tnSapIgmpSnpgCfgMcacPolicyName."
+-- ::= { tnIgmpSnpgSapNotifications 2 }
+--
+-- tnSapIgmpSnpgMcsFailure NOTIFICATION-TYPE
+--     OBJECTS {
+--         tnSvcId,
+--         tnSapPortId,
+--         tnSapEncapValue,
+--         tnIgmpSnpgGroupAddress,
+--         tnIgmpSnpgMcsFailureReason
+--             }
+--     STATUS      current
+--     DESCRIPTION
+--         "The tnSapIgmpSnpgMcsFailure notification is generated when an
+--          IGMP group on a given SAP could not be synced to the MCS
+--          (multi-chassis synchronization) database."
+-- ::= { tnIgmpSnpgSapNotifications 3 }
+--
+-- tnSapIgmpSnpgSrcLimitExceeded NOTIFICATION-TYPE
+--     OBJECTS {
+--         tnSvcId,
+--         tnSapPortId,
+--         tnSapEncapValue,
+--         tnSapIgmpSnpgCfgMaxNbrSrcs,
+--         tnIgmpSnpgGroupAddress,
+--         tnIgmpSnpgSourceAddress
+--             }
+--     STATUS      current
+--     DESCRIPTION
+--         "The tnSapIgmpSnpgSrcLimitExceeded notification is generated when an
+--          IGMP source is dropped dropped on a given SAP because a user
+--          configurable upper limit given by tnSapIgmpSnpgCfgMaxNbrSrcs
+--          is reached."
+-- ::= { tnIgmpSnpgSapNotifications 4 }
+
+-- --------------------------------------------------------
+--
+--  SdpBind IGMP snooping Notifications
+--
+-- --------------------------------------------------------
+
+-- sdpBndIgmpSnpgGrpLimitExceeded NOTIFICATION-TYPE
+--     OBJECTS {
+--         tnSvcId,
+--         sdpBindId,
+--         sdpBndIgmpSnpgCfgMaxNbrGrps,
+--         tnIgmpSnpgGroupAddress
+--             }
+--     STATUS      current
+--     DESCRIPTION
+--         "The sdpBndIgmpSnpgGrpLimitExceeded notification is generated when an
+--          IGMP group is dropped on a given SDP bind because a user
+--          configurable upper limit given by sdpBndIgmpSnpgCfgMaxNbrGrps is
+--          reached."
+-- ::= { tnIgmpSnpgSdpBndNotifications 1 }
+
+-- sdpBndIgmpSnpgMcacPlcyDropped NOTIFICATION-TYPE
+--     OBJECTS {
+--         tnSvcId,
+--         sdpBindId,
+--         sdpBndIgmpSnpgCfgMcacPolicyName,
+--         tnIgmpSnpgGroupAddress
+--             }
+--     STATUS      current
+--     DESCRIPTION
+--         "The sdpBndIgmpSnpgMcacPlcyDropped notification is generated when an
+--          IGMP group is dropped on a given SDP bind because of applying a
+--          multicast CAC policy given by sdpBndIgmpSnpgCfgMcacPolicyName."
+-- ::= { tnIgmpSnpgSdpBndNotifications 2 }
+
+-- sdpBndIgmpSnpgSrcLimitExceeded NOTIFICATION-TYPE
+--     OBJECTS {
+--         tnSvcId,
+--         sdpBindId,
+--         sdpBndIgmpSnpgCfgMaxNbrSrcs,
+--         tnIgmpSnpgGroupAddress,
+--         tnIgmpSnpgSourceAddress
+--             }
+--     STATUS      current
+--     DESCRIPTION
+--         "The sdpBndIgmpSnpgSrcLimitExceeded notification is generated when an
+--          IGMP source is dropped on a given SDP Bind because a user
+--          configurable upper limit given by sdpBndIgmpSnpgCfgMaxNbrSrcs is
+--          reached."
+-- ::= { tnIgmpSnpgSdpBndNotifications 3 }
+
+-- ----------------------------------------------------------------------------
+--
+--  Conformance information
+--
+-- ----------------------------------------------------------------------------
+-- --------------------------------------------------------
+--
+--  Igmp Snooping TLS related Groups
+--
+-- --------------------------------------------------------
+-- alxTlsIgmpSnpgConfigV3v0Group OBJECT-GROUP
+--    OBJECTS {
+--        tnTlsIgmpSnpgCfgAdminState,
+--        tnTlsIgmpSnpgCfgGenQueryIntvl,
+--        tnTlsIgmpSnpgCfgRobustCount,
+--        tnTlsIgmpSnpgCfgReportSrcAddress
+--            }
+--    STATUS      obsolete
+--    DESCRIPTION
+--        "The group of objects supporting management of IGMP
+--         snooping on Tls level on Nokia 7x50 SR series
+--         systems."
+--    ::= { tnIgmpSnoopingTlsGroups 1 }
+
+-- alxTlsIgmpSnpgQuerierV3v0Group OBJECT-GROUP
+--    OBJECTS {
+--        tnTlsIgmpSnpgQuerierVersion,
+--        tnTlsIgmpSnpgQuerierAddress,
+--        tnTlsIgmpSnpgQuerierLocale,
+--        tnTlsIgmpSnpgQuerierPortId,
+--        tnTlsIgmpSnpgQuerierEncapValue,
+--        tnTlsIgmpSnpgQuerierSdpId,
+--        tnTlsIgmpSnpgQuerierVcId,
+--        tnTlsIgmpSnpgQuerierUpTime,
+--        tnTlsIgmpSnpgQuerierExpiryTime,
+--        tnTlsIgmpSnpgQuerierGenQueryIntvl,
+--        tnTlsIgmpSnpgQuerierGenRespIntvl,
+--        tnTlsIgmpSnpgQuerierRobustCount
+--            }
+--    STATUS      current
+--    DESCRIPTION
+--        "The group of objects that allow to monitor the IGMP
+--         querier in the Tls service by the IGMP snooping device on
+--         Nokia 7x50 SR series systems."
+--    ::= { tnIgmpSnoopingTlsGroups 2 }
+
+-- alxTlsIgmpSnpgProxyV3v0Group OBJECT-GROUP
+--    OBJECTS {
+--        tnTlsIgmpSnpgProxyGroupFilterMode,
+--        tnTlsIgmpSnpgProxyGroupUpTime,
+--        tnTlsIgmpSnpgProxyGrpSrcUpTime
+--            }
+--    STATUS      current
+--    DESCRIPTION
+--        "The group of objects that allow to monitor the IGMP
+--         snooping information that is being used by the system
+--         when it performs proxy reporting to the MRouter on Nokia 7x50 SR
+--         series systems."
+--    ::= { tnIgmpSnoopingTlsGroups 3 }
+
+-- alxTlsIgmpSnpgMRouterV3v0Group OBJECT-GROUP
+--    OBJECTS {
+--        tnTlsIgmpSnpgMRouterAddress,
+--        tnTlsIgmpSnpgMRouterLocale,
+--        tnTlsIgmpSnpgMRouterPortId,
+--        tnTlsIgmpSnpgMRouterEncapValue,
+--        tnTlsIgmpSnpgMRouterSdpId,
+--        tnTlsIgmpSnpgMRouterVcId,
+--        tnTlsIgmpSnpgMRouterVersion,
+--        tnTlsIgmpSnpgMRouterExpiryTime,
+--        tnTlsIgmpSnpgMRouterUpTime,
+--        tnTlsIgmpSnpgMRouterGenQueryIntvl,
+--        tnTlsIgmpSnpgMRouterGenRespIntvl,
+--        tnTlsIgmpSnpgMRouterRobustCount
+--            }
+--    STATUS      current
+--    DESCRIPTION
+--        "The group of objects that allow to monitor the IGMP
+--         multicast routers in the Tls service by the IGMP
+--         snooping device on Nokia 7x50 SR series systems."
+--    ::= { tnIgmpSnoopingTlsGroups 4 }
+
+-- alxTlsMvrConfigV3v0Group OBJECT-GROUP
+--    OBJECTS {
+--        tnTlsIgmpSnpgCfgMvrAdminState,
+--        tnTlsIgmpSnpgCfgMvrDescription,
+--        tnTlsIgmpSnpgCfgMvrPolicy
+--            }
+--    STATUS      current
+--    DESCRIPTION
+--        "The group of objects supporting management of MVR
+--         on Tls level on Nokia 7x50 SR series
+--         systems."
+--    ::= { tnIgmpSnoopingTlsGroups 5 }
+
+-- alxTlsIgmpSnpgNotObjV5v0Group OBJECT-GROUP
+--    OBJECTS {
+--        tnIgmpSnpgGroupAddress,
+--        tnIgmpSnpgMcsFailureReason
+--            }
+--    STATUS      current
+--    DESCRIPTION
+--        "The group of notification objects supporting management of IGMP
+--         snooping on Nokia 7x50 SR series systems."
+--    ::= { tnIgmpSnoopingTlsGroups 6 }
+
+-- alxTlsIgmpSnpgConfigV6v0Group OBJECT-GROUP
+--    OBJECTS {
+--        tnTlsIgmpSnpgCfgAdminState,
+--        tnTlsIgmpSnpgCfgGenQueryIntvl,
+--        tnTlsIgmpSnpgCfgRobustCount,
+--        tnTlsIgmpSnpgCfgReportSrcAddress,
+--        tnTlsIgmpSnpgCfgQuerySrcAddress,
+--        tnTlsIgmpSnpgCfgQuerySrcAddrType
+--            }
+--    STATUS      current
+--    DESCRIPTION
+--        "The group of objects supporting management of IGMP
+--         snooping on Tls level on Nokia 7x50 SR series systems."
+--    ::= { tnIgmpSnoopingTlsGroups 7 }
+
+-- alxTlsIgmpSnpgTimeStampGroup OBJECT-GROUP
+--    OBJECTS {
+--        tnTlsIgmpSnpgCfgLastChangeTime,
+--        tnTlsIgmpSnpgConfigTableLastChange
+--            }
+--    STATUS      current
+--    DESCRIPTION
+--        "The group of last change timestamps for IGMP snooping on Tls level
+--         on Nokia 7x50 SR series systems."
+--    ::= { tnIgmpSnoopingTlsGroups 8 }
+
+-- alxTlsIgmpSnpgNotifyObjsV6v1Grp OBJECT-GROUP
+--    OBJECTS {
+--        tnIgmpSnpgSourceAddress
+--            }
+--    STATUS      current
+--    DESCRIPTION
+--        "The group of notification objects supporting management of IGMP
+--         snooping on Nokia 7x50 SR series systems added in the
+--         6.1R6 release."
+--    ::= { tnIgmpSnoopingTlsGroups 9 }
+
+-- --------------------------------------------------------
+--
+--  Igmp Snooping SAP related Groups
+--
+-- --------------------------------------------------------
+-- alxSapIgmpSnpgConfigV3v0Group  OBJECT-GROUP
+--    OBJECTS {
+--        tnSapIgmpSnpgCfgImportPlcy,
+--        tnSapIgmpSnpgCfgFastLeave,
+--        tnSapIgmpSnpgCfgMRouter,
+--        tnSapIgmpSnpgCfgSendQueries,
+--        tnSapIgmpSnpgCfgGenQueryIntvl,
+--        tnSapIgmpSnpgCfgQueryRespIntvl,
+--        tnSapIgmpSnpgCfgRobustCount,
+--        tnSapIgmpSnpgCfgLastMembIntvl,
+--        tnSapIgmpSnpgCfgMaxNbrGrps
+--            }
+--    STATUS      obsolete
+--    DESCRIPTION
+--        "The group of objects that allow to configure IGMP
+--         snooping parameters per SAP on Nokia 7x50 SR series
+--         systems."
+--    ::= { tnIgmpSnoopingSapGroups 1 }
+
+-- alxSapIgmpSnpgGroupV3v0  OBJECT-GROUP
+--    OBJECTS {
+--        tnSapIgmpSnpgGrpType,
+--        tnSapIgmpSnpgGrpFilterMode,
+--        tnSapIgmpSnpgGrpUpTime,
+--        tnSapIgmpSnpgGrpExpiryTime,
+--        tnSapIgmpSnpgGrpCompatMode,
+--        tnSapIgmpSnpgGrpV1HostExpTime,
+--        tnSapIgmpSnpgGrpV2HostExpTime,
+--        tnSapIgmpSnpgGrpSrcType,
+--        tnSapIgmpSnpgGrpSrcUpTime,
+--        tnSapIgmpSnpgGrpSrcExpiryTime
+--            }
+--    STATUS      current
+--    DESCRIPTION
+--        "The group of objects that allow to monitor the IGMP
+--         snooping information that is collected for a given SAP
+--         on Nokia 7x50 SR series systems."
+--    ::= { tnIgmpSnoopingSapGroups 2 }
+
+-- alxSapIgmpSnpgStaticV3v0Group  OBJECT-GROUP
+--    OBJECTS {
+--               tnSapIgmpSnpgStaticRowstatus
+--            }
+--    STATUS      current
+--    DESCRIPTION
+--        "The group of objects that allow to statically
+--         configure (S,G) memberships on a SAP on Nokia 7x50 SR
+--         series systems."
+--    ::= { tnIgmpSnoopingSapGroups 3 }
+
+-- alxSapIgmpSnpgStatsV3v0Group   OBJECT-GROUP
+--    OBJECTS {
+--        tnSapIgmpSnpgTxGenQueries,
+--        tnSapIgmpSnpgTxGrpSpecQueries,
+--        tnSapIgmpSnpgTxSrcSpecQueries,
+--        tnSapIgmpSnpgTxV1Reports,
+--        tnSapIgmpSnpgTxV2Reports,
+--        tnSapIgmpSnpgTxV3Reports,
+--        tnSapIgmpSnpgTxV2Leaves,
+--        tnSapIgmpSnpgRxGenQueries,
+--        tnSapIgmpSnpgRxGrpSpecQueries,
+--        tnSapIgmpSnpgRxSrcSpecQueries,
+--        tnSapIgmpSnpgRxV1Reports,
+--        tnSapIgmpSnpgRxV2Reports,
+--        tnSapIgmpSnpgRxV3Reports,
+--        tnSapIgmpSnpgRxV2Leaves,
+--        tnSapIgmpSnpgRxUnknownType,
+--        tnSapIgmpSnpgFwdGenQueries,
+--        tnSapIgmpSnpgFwdGrpSpecQueries,
+--        tnSapIgmpSnpgFwdSrcSpecQueries,
+--        tnSapIgmpSnpgFwdV1Reports,
+--        tnSapIgmpSnpgFwdV2Reports,
+--        tnSapIgmpSnpgFwdV3Reports,
+--        tnSapIgmpSnpgFwdV2Leaves,
+--        tnSapIgmpSnpgFwdUnknownType,
+--        tnSapIgmpSnpgRxBadLenPkts,
+--        tnSapIgmpSnpgRxBadIpChksmPkts,
+--        tnSapIgmpSnpgRxBadIgmpChksmPkts,
+--        tnSapIgmpSnpgRxBadEncodedPkts,
+--        tnSapIgmpSnpgRxNoRtrAlertPkts,
+--        tnSapIgmpSnpgRxZeroSrcAdrPkts,
+--        tnSapIgmpSnpgSendQueryCfgDrops,
+--        tnSapIgmpSnpgImportPolicyDrops,
+--        tnSapIgmpSnpgMaxNumGroupsDrops
+--            }
+--    STATUS      obsolete
+--    DESCRIPTION
+--        "The group of objects that allow to view statistics for
+--         IGMP snooping on a SAP on Nokia 7x50 SR series
+--         systems."
+--    ::= { tnIgmpSnoopingSapGroups 4 }
+
+-- alxSapMvrV3v0Group  OBJECT-GROUP
+--    OBJECTS {
+--        tnSapIgmpSnpgCfgMvrFromVplsId,
+--        tnSapIgmpSnpgCfgMvrToSapPortId,
+--        tnSapIgmpSnpgCfgMvrToSapEncapVal,
+--        tnSapIgmpSnpgGrpMvrFromVplsId,
+--        tnSapIgmpSnpgGrpMvrToSapPortId,
+--        tnSapIgmpSnpgGrpMvrToSapEncapVal,
+--        tnSapIgmpSnpgMvrFromVplsCfgDrops,
+--        tnSapIgmpSnpgMvrToSapCfgDrops
+--            }
+--    STATUS      current
+--    DESCRIPTION
+--        "The group of objects needed to support the MVR
+--         feature on a SAP on Nokia 7x50 SR series
+--         systems."
+--    ::= { tnIgmpSnoopingSapGroups 5 }
+
+-- alxSapIgmpSnpgConfigV5v0Group  OBJECT-GROUP
+--    OBJECTS {
+--        tnSapIgmpSnpgCfgImportPlcy,
+--        tnSapIgmpSnpgCfgFastLeave,
+--        tnSapIgmpSnpgCfgMRouter,
+--        tnSapIgmpSnpgCfgSendQueries,
+--        tnSapIgmpSnpgCfgGenQueryIntvl,
+--        tnSapIgmpSnpgCfgQueryRespIntvl,
+--        tnSapIgmpSnpgCfgRobustCount,
+--        tnSapIgmpSnpgCfgLastMembIntvl,
+--        tnSapIgmpSnpgCfgMaxNbrGrps,
+--        tnSapIgmpSnpgCfgVersion,
+--        tnSapIgmpSnpgCfgMcacPolicyName,
+--        tnSapIgmpSnpgCfgMcacUnconstBW,
+--        tnSapIgmpSnpgCfgMcacConstAdmSt,
+--        tnSapIgmpSnpgCfgMcacLevelRowStat,
+--        tnSapIgmpSnpgCfgMcacLevelBW,
+--        tnSapIgmpSnpgCfgMcacLagRowStat,
+--        tnSapIgmpSnpgCfgMcacLagLevel,
+--        tnSapIgmpSnpgCfgMcacPrRsvMndBW,
+--        tnSapIgmpSnpgCfgMcacinUseMandBw,
+--        tnSapIgmpSnpgCfgMcacinUseOpnlBw,
+--        tnSapIgmpSnpgCfgMcacAvailMandBw,
+--        tnSapIgmpSnpgCfgMcacAvailOpnlBw,
+--        tnSapIgmpSnpgCfgMcacValInTrans
+--            }
+--    STATUS      current
+--    DESCRIPTION
+--        "The group of objects that allow to configure IGMP
+--         snooping parameters per SAP on Nokia 7x50 SR series
+--         systems."
+--    ::= { tnIgmpSnoopingSapGroups 6 }
+
+-- alxSapIgmpSnpgStatsV5v0Group   OBJECT-GROUP
+--    OBJECTS {
+--        tnSapIgmpSnpgTxGenQueries,
+--        tnSapIgmpSnpgTxGrpSpecQueries,
+--        tnSapIgmpSnpgTxSrcSpecQueries,
+--        tnSapIgmpSnpgTxV1Reports,
+--        tnSapIgmpSnpgTxV2Reports,
+--        tnSapIgmpSnpgTxV3Reports,
+--        tnSapIgmpSnpgTxV2Leaves,
+--        tnSapIgmpSnpgRxGenQueries,
+--        tnSapIgmpSnpgRxGrpSpecQueries,
+--        tnSapIgmpSnpgRxSrcSpecQueries,
+--        tnSapIgmpSnpgRxV1Reports,
+--        tnSapIgmpSnpgRxV2Reports,
+--        tnSapIgmpSnpgRxV3Reports,
+--        tnSapIgmpSnpgRxV2Leaves,
+--        tnSapIgmpSnpgRxUnknownType,
+--        tnSapIgmpSnpgFwdGenQueries,
+--        tnSapIgmpSnpgFwdGrpSpecQueries,
+--        tnSapIgmpSnpgFwdSrcSpecQueries,
+--        tnSapIgmpSnpgFwdV1Reports,
+--        tnSapIgmpSnpgFwdV2Reports,
+--        tnSapIgmpSnpgFwdV3Reports,
+--        tnSapIgmpSnpgFwdV2Leaves,
+--        tnSapIgmpSnpgFwdUnknownType,
+--        tnSapIgmpSnpgRxBadLenPkts,
+--        tnSapIgmpSnpgRxBadIpChksmPkts,
+--        tnSapIgmpSnpgRxBadIgmpChksmPkts,
+--        tnSapIgmpSnpgRxBadEncodedPkts,
+--        tnSapIgmpSnpgRxNoRtrAlertPkts,
+--        tnSapIgmpSnpgRxZeroSrcAdrPkts,
+--        tnSapIgmpSnpgSendQueryCfgDrops,
+--        tnSapIgmpSnpgImportPolicyDrops,
+--        tnSapIgmpSnpgMaxNumGroupsDrops,
+--        tnSapIgmpSnpgRxWrongVersionPkts,
+--        tnSapIgmpSnpgMcacPolicyDrops,
+--        tnSapIgmpSnpgMcsFailures
+--            }
+--    STATUS      obsolete
+--    DESCRIPTION
+--        "The group of objects that allow to view statistics for
+--         IGMP snooping on a SAP on Nokia 7x50 SR series
+--         systems."
+--    ::= { tnIgmpSnoopingSapGroups 7 }
+
+-- alxSapIgmpSnpgNotV5v0Group  NOTIFICATION-GROUP
+--    NOTIFICATIONS {
+--        tnSapIgmpSnpgGrpLimitExceeded,
+--        tnSapIgmpSnpgMcacPlcyDropped,
+--        tnSapIgmpSnpgMcsFailure
+--            }
+--    STATUS      current
+--    DESCRIPTION
+--        "The group of notifications supporting IGMP snooping on a SAP on
+--         Nokia 7x50 SR series systems."
+--    ::= { tnIgmpSnoopingSapGroups 8 }
+
+-- alxSapIgmpSnpgTimeStampGroup  OBJECT-GROUP
+--    OBJECTS {
+--        tnSapIgmpSnpgCfgLastChangeTime,
+--        tnSapIgmpSnpgStaticLastChangeTime,
+--        tnSapIgmpSnpgCfgMcacLevelLastChngT,
+--        tnSapIgmpSnpgCfgMcacLagLastChangeT,
+--        tnSapIgmpSnpgConfigTableLastChange,
+--        tnSapIgmpSnpgStaticGrpSrcTablLstCh,
+--        tnSapIgmpSnpgMcacLevelTableLstCh,
+--        tnSapIgmpSnpgMcacLagTableLastChng
+--            }
+--    STATUS      current
+--    DESCRIPTION
+--        "The group of last change timestamps for IGMP snooping on a SAP on
+--         Nokia 7x50 SR series systems."
+--    ::= { tnIgmpSnoopingSapGroups 9 }
+
+-- alxSapIgmpSnpgStatsV6v0Group   OBJECT-GROUP
+--    OBJECTS {
+--        tnSapIgmpSnpgTxGenQueries,
+--        tnSapIgmpSnpgTxGrpSpecQueries,
+--        tnSapIgmpSnpgTxSrcSpecQueries,
+--        tnSapIgmpSnpgTxV1Reports,
+--        tnSapIgmpSnpgTxV2Reports,
+--        tnSapIgmpSnpgTxV3Reports,
+--        tnSapIgmpSnpgTxV2Leaves,
+--        tnSapIgmpSnpgRxGenQueries,
+--        tnSapIgmpSnpgRxGrpSpecQueries,
+--        tnSapIgmpSnpgRxSrcSpecQueries,
+--        tnSapIgmpSnpgRxV1Reports,
+--        tnSapIgmpSnpgRxV2Reports,
+--        tnSapIgmpSnpgRxV3Reports,
+--        tnSapIgmpSnpgRxV2Leaves,
+--        tnSapIgmpSnpgRxUnknownType,
+--        tnSapIgmpSnpgFwdGenQueries,
+--        tnSapIgmpSnpgFwdGrpSpecQueries,
+--        tnSapIgmpSnpgFwdSrcSpecQueries,
+--        tnSapIgmpSnpgFwdV1Reports,
+--        tnSapIgmpSnpgFwdV2Reports,
+--        tnSapIgmpSnpgFwdV3Reports,
+--        tnSapIgmpSnpgFwdV2Leaves,
+--        tnSapIgmpSnpgFwdUnknownType,
+--        tnSapIgmpSnpgRxBadLenPkts,
+--        tnSapIgmpSnpgRxBadIpChksmPkts,
+--        tnSapIgmpSnpgRxBadIgmpChksmPkts,
+--        tnSapIgmpSnpgRxBadEncodedPkts,
+--        tnSapIgmpSnpgRxNoRtrAlertPkts,
+--        tnSapIgmpSnpgRxZeroSrcAdrPkts,
+--        tnSapIgmpSnpgSendQueryCfgDrops,
+--        tnSapIgmpSnpgImportPolicyDrops,
+--        tnSapIgmpSnpgMaxNumGroupsDrops,
+--        tnSapIgmpSnpgRxWrongVersionPkts,
+--        tnSapIgmpSnpgMcacPolicyDrops,
+--        tnSapIgmpSnpgMcsFailures,
+--        tnSapIgmpSnpgRxLocalScopePkts,
+--        tnSapIgmpSnpgRxRsvdScopePkts
+--            }
+--    STATUS      current
+--    DESCRIPTION
+--        "The group of objects that allow to view statistics for
+--         IGMP snooping on a SAP on Nokia 7x50 SR series
+--         systems."
+--    ::= { tnIgmpSnoopingSapGroups 10 }
+
+-- alxSapIgmpSnpgMaxSrcsV6v1Group  OBJECT-GROUP
+--    OBJECTS {
+--        tnSapIgmpSnpgCfgMaxNbrSrcs,
+--        tnSapIgmpSnpgMaxNumSourcesDrops
+--            }
+--    STATUS      current
+--    DESCRIPTION
+--        "The group of objects that allow to configure IGMP
+--         snooping parameters per SAP on Nokia 7x50 SR series
+--         systems."
+--    ::= { tnIgmpSnoopingSapGroups 11 }
+
+-- alxSapIgmpSnpgMaxSrcsNotV6v1Grp  NOTIFICATION-GROUP
+--    NOTIFICATIONS {
+--        tnSapIgmpSnpgSrcLimitExceeded
+--            }
+--    STATUS      current
+--    DESCRIPTION
+--        "The group of notifications supporting IGMP snooping on a SAP on
+--         Nokia 7x50 SR series systems."
+--    ::= { tnIgmpSnoopingSapGroups 12 }
+
+-- --------------------------------------------------------
+--
+--  Igmp Snooping SDP Bind related Groups
+--
+-- --------------------------------------------------------
+-- alxSdpBindIgmpSnpgConfV3v0Group  OBJECT-GROUP
+--    OBJECTS {
+--        sdpBndIgmpSnpgCfgImportPlcy,
+--        sdpBndIgmpSnpgCfgFastLeave,
+--        sdpBndIgmpSnpgCfgMRouter,
+--        sdpBndIgmpSnpgCfgSendQueries,
+--        sdpBndIgmpSnpgCfgGenQueryIntvl,
+--        sdpBndIgmpSnpgCfgQueryRespIntvl,
+--        sdpBndIgmpSnpgCfgRobustCount,
+--        sdpBndIgmpSnpgCfgLastMembIntvl,
+--        sdpBndIgmpSnpgCfgMaxNbrGrps
+--            }
+--    STATUS      obsolete
+--    DESCRIPTION
+--        "The group of objects that allow to configure IGMP
+--         snooping parameters per SDP bind on Nokia 7x50 SR
+--         series systems."
+--    ::= { tnIgmpSnoopingSdpBndGroups 1 }
+
+-- alxSdpBindIgmpSnpgV3v0Group  OBJECT-GROUP
+--    OBJECTS {
+--        sdpBndIgmpSnpgGrpType,
+--        sdpBndIgmpSnpgGrpFilterMode,
+--        sdpBndIgmpSnpgGrpUpTime,
+--        sdpBndIgmpSnpgGrpExpiryTime,
+--        sdpBndIgmpSnpgGrpCompatMode,
+--        sdpBndIgmpSnpgGrpV1HostExpTime,
+--        sdpBndIgmpSnpgGrpV2HostExpTime,
+--        sdpBndIgmpSnpgGrpSrcType,
+--        sdpBndIgmpSnpgGrpSrcUpTime,
+--        sdpBndIgmpSnpgGrpSrcExpiryTime
+--            }
+--    STATUS      current
+--    DESCRIPTION
+--        "The group of objects that allow to monitor the IGMP
+--         snooping information that is collected for a given SDP
+--         Bind on Nokia 7x50 SR series systems."
+--    ::= { tnIgmpSnoopingSdpBndGroups 2 }
+
+-- alxSdpBindIgmpSnpgStatV3v0Group  OBJECT-GROUP
+--    OBJECTS {
+--        sdpBndIgmpSnpgStaticRowstatus
+--            }
+--    STATUS      current
+--    DESCRIPTION
+--        "The  group  of objects that allow to statically
+--         configure (S,G) memberships on a SDP Bind on Nokia
+--         7x50 SR series systems."
+--    ::= { tnIgmpSnoopingSdpBndGroups 3 }
+
+-- alxSdpBindIgmpSnpgStatsV3v0Grp   OBJECT-GROUP
+--    OBJECTS {
+--        sdpBndIgmpSnpgTxGenQueries,
+--        sdpBndIgmpSnpgTxGrpSpecQueries,
+--        sdpBndIgmpSnpgTxSrcSpecQueries,
+--        sdpBndIgmpSnpgTxV1Reports,
+--        sdpBndIgmpSnpgTxV2Reports,
+--        sdpBndIgmpSnpgTxV3Reports,
+--        sdpBndIgmpSnpgTxV2Leaves,
+--        sdpBndIgmpSnpgRxGenQueries,
+--        sdpBndIgmpSnpgRxGrpSpecQueries,
+--        sdpBndIgmpSnpgRxSrcSpecQueries,
+--        sdpBndIgmpSnpgRxV1Reports,
+--        sdpBndIgmpSnpgRxV2Reports,
+--        sdpBndIgmpSnpgRxV3Reports,
+--        sdpBndIgmpSnpgRxV2Leaves,
+--        sdpBndIgmpSnpgRxUnknownType,
+--        sdpBndIgmpSnpgFwdGenQueries,
+--        sdpBndIgmpSnpgFwdGrpSpecQueries,
+--        sdpBndIgmpSnpgFwdSrcSpecQueries,
+--        sdpBndIgmpSnpgFwdV1Reports,
+--        sdpBndIgmpSnpgFwdV2Reports,
+--        sdpBndIgmpSnpgFwdV3Reports,
+--        sdpBndIgmpSnpgFwdV2Leaves,
+--        sdpBndIgmpSnpgFwdUnknownType,
+--        sdpBndIgmpSnpgRxBadLenPkts,
+--        sdpBndIgmpSnpgRxBadIpChksmPkts,
+--        sdpBndIgmpSnpgRxBadIgmpChksmPkts,
+--        sdpBndIgmpSnpgRxBadEncodedPkts,
+--        sdpBndIgmpSnpgRxNoRtrAlertPkts,
+--        sdpBndIgmpSnpgRxZeroSrcAdrPkts,
+--        sdpBndIgmpSnpgSendQueryCfgDrops,
+--        sdpBndIgmpSnpgImportPolicyDrops,
+--        sdpBndIgmpSnpgMaxNumGroupsDrops
+--            }
+--    STATUS      obsolete
+--    DESCRIPTION
+--        "The group of objects that allow to view statistics for
+--         IGMP snooping on a SDP Bind on Nokia 7x50 SR series
+--         systems."
+--    ::= { tnIgmpSnoopingSdpBndGroups 4 }
+
+-- alxSdpBindIgmpSnpgConfV5v0Group  OBJECT-GROUP
+--    OBJECTS {
+--        sdpBndIgmpSnpgCfgImportPlcy,
+--        sdpBndIgmpSnpgCfgFastLeave,
+--        sdpBndIgmpSnpgCfgMRouter,
+--        sdpBndIgmpSnpgCfgSendQueries,
+--        sdpBndIgmpSnpgCfgGenQueryIntvl,
+--        sdpBndIgmpSnpgCfgQueryRespIntvl,
+--        sdpBndIgmpSnpgCfgRobustCount,
+--        sdpBndIgmpSnpgCfgLastMembIntvl,
+--        sdpBndIgmpSnpgCfgMaxNbrGrps,
+--        sdpBndIgmpSnpgCfgVersion,
+--        sdpBndIgmpSnpgCfgMcacPolicyName,
+--        sdpBndIgmpSnpgCfgMcacUnconstBW,
+--        sdpBndIgmpSnpgCfgMcacPrRsvMndBW,
+--        sdpBndIgmpSnpgCfgMcacinUseMndBw,
+--        sdpBndIgmpSnpgCfgMcacinUseOplBw,
+--        sdpBndIgmpSnpgCfgMcacAvailMndBw,
+--        sdpBndIgmpSnpgCfgMcacAvailOplBw,
+--        sdpBndIgmpSnpgCfgMcacValInTrans
+--            }
+--    STATUS      current
+--    DESCRIPTION
+--        "The group of objects that allow to configure IGMP
+--         snooping parameters per SDP bind on Nokia 7x50 SR
+--         series systems."
+--    ::= { tnIgmpSnoopingSdpBndGroups 5 }
+
+-- alxSdpBindIgmpSnpgStatsV5v0Grp   OBJECT-GROUP
+--    OBJECTS {
+--        sdpBndIgmpSnpgTxGenQueries,
+--        sdpBndIgmpSnpgTxGrpSpecQueries,
+--        sdpBndIgmpSnpgTxSrcSpecQueries,
+--        sdpBndIgmpSnpgTxV1Reports,
+--        sdpBndIgmpSnpgTxV2Reports,
+--        sdpBndIgmpSnpgTxV3Reports,
+--        sdpBndIgmpSnpgTxV2Leaves,
+--        sdpBndIgmpSnpgRxGenQueries,
+--        sdpBndIgmpSnpgRxGrpSpecQueries,
+--        sdpBndIgmpSnpgRxSrcSpecQueries,
+--        sdpBndIgmpSnpgRxV1Reports,
+--        sdpBndIgmpSnpgRxV2Reports,
+--        sdpBndIgmpSnpgRxV3Reports,
+--        sdpBndIgmpSnpgRxV2Leaves,
+--        sdpBndIgmpSnpgRxUnknownType,
+--        sdpBndIgmpSnpgFwdGenQueries,
+--        sdpBndIgmpSnpgFwdGrpSpecQueries,
+--        sdpBndIgmpSnpgFwdSrcSpecQueries,
+--        sdpBndIgmpSnpgFwdV1Reports,
+--        sdpBndIgmpSnpgFwdV2Reports,
+--        sdpBndIgmpSnpgFwdV3Reports,
+--        sdpBndIgmpSnpgFwdV2Leaves,
+--        sdpBndIgmpSnpgFwdUnknownType,
+--        sdpBndIgmpSnpgRxBadLenPkts,
+--        sdpBndIgmpSnpgRxBadIpChksmPkts,
+--        sdpBndIgmpSnpgRxBadIgmpChksmPkts,
+--        sdpBndIgmpSnpgRxBadEncodedPkts,
+--        sdpBndIgmpSnpgRxNoRtrAlertPkts,
+--        sdpBndIgmpSnpgRxZeroSrcAdrPkts,
+--        sdpBndIgmpSnpgSendQueryCfgDrops,
+--        sdpBndIgmpSnpgImportPolicyDrops,
+--        sdpBndIgmpSnpgMaxNumGroupsDrops,
+--        sdpBndIgmpSnpgRxWrongVersionPkts,
+--        sdpBndIgmpSnpgMcacPolicyDrops
+--            }
+--    STATUS      obsolete
+--    DESCRIPTION
+--        "The group of objects that allow to view statistics for
+--         IGMP snooping on a SDP Bind on Nokia 7x50 SR series
+--         systems."
+--    ::= { tnIgmpSnoopingSdpBndGroups 6 }
+
+-- alxSdpBindIgmpSnpgNotV5v0Group  NOTIFICATION-GROUP
+--     NOTIFICATIONS {
+--         sdpBndIgmpSnpgGrpLimitExceeded,
+--         sdpBndIgmpSnpgMcacPlcyDropped
+--             }
+--     STATUS      current
+--     DESCRIPTION
+--         "The group of notifications supporting IGMP snooping on an
+--          SDP Bind on Nokia 7x50 SR series systems."
+--     ::= { tnIgmpSnoopingSdpBndGroups 7 }
+
+-- alxSdpBindIgmpSnpgTimeStampGroup  OBJECT-GROUP
+--    OBJECTS {
+--        sdpBndIgmpSnpgCfgLastChangeTime,
+--        sdpBndIgmpSnpgStaticLastChange,
+--        tnSdpBindIgmpSnpgConfigTableLstCh,
+--        tnSdpBindIgmpSnpgStaticGrpSrcTblLC
+--            }
+--    STATUS      current
+--    DESCRIPTION
+--        "The group of last change timestamps for IGMP snooping on an
+--         SDP Bind on Nokia 7x50 SR series systems."
+--    ::= { tnIgmpSnoopingSdpBndGroups 8 }
+
+-- alxSdpBindIgmpSnpgStatsV6v0Grp   OBJECT-GROUP
+--    OBJECTS {
+--        sdpBndIgmpSnpgTxGenQueries,
+--        sdpBndIgmpSnpgTxGrpSpecQueries,
+--        sdpBndIgmpSnpgTxSrcSpecQueries,
+--        sdpBndIgmpSnpgTxV1Reports,
+--        sdpBndIgmpSnpgTxV2Reports,
+--        sdpBndIgmpSnpgTxV3Reports,
+--        sdpBndIgmpSnpgTxV2Leaves,
+--        sdpBndIgmpSnpgRxGenQueries,
+--        sdpBndIgmpSnpgRxGrpSpecQueries,
+--        sdpBndIgmpSnpgRxSrcSpecQueries,
+--        sdpBndIgmpSnpgRxV1Reports,
+--        sdpBndIgmpSnpgRxV2Reports,
+--        sdpBndIgmpSnpgRxV3Reports,
+--        sdpBndIgmpSnpgRxV2Leaves,
+--        sdpBndIgmpSnpgRxUnknownType,
+--        sdpBndIgmpSnpgFwdGenQueries,
+--        sdpBndIgmpSnpgFwdGrpSpecQueries,
+--        sdpBndIgmpSnpgFwdSrcSpecQueries,
+--        sdpBndIgmpSnpgFwdV1Reports,
+--        sdpBndIgmpSnpgFwdV2Reports,
+--        sdpBndIgmpSnpgFwdV3Reports,
+--        sdpBndIgmpSnpgFwdV2Leaves,
+--        sdpBndIgmpSnpgFwdUnknownType,
+--        sdpBndIgmpSnpgRxBadLenPkts,
+--        sdpBndIgmpSnpgRxBadIpChksmPkts,
+--        sdpBndIgmpSnpgRxBadIgmpChksmPkts,
+--        sdpBndIgmpSnpgRxBadEncodedPkts,
+--        sdpBndIgmpSnpgRxNoRtrAlertPkts,
+--        sdpBndIgmpSnpgRxZeroSrcAdrPkts,
+--        sdpBndIgmpSnpgSendQueryCfgDrops,
+--        sdpBndIgmpSnpgImportPolicyDrops,
+--        sdpBndIgmpSnpgMaxNumGroupsDrops,
+--        sdpBndIgmpSnpgRxWrongVersionPkts,
+--        sdpBndIgmpSnpgMcacPolicyDrops,
+--        sdpBndIgmpSnpgRxLocalScopePkts,
+--        sdpBndIgmpSnpgRxRsvdScopePkts
+--            }
+--    STATUS      current
+--    DESCRIPTION
+--        "The group of objects that allow to view statistics for
+--         IGMP snooping on a SDP Bind on Nokia 7x50 SR series
+--         systems."
+--    ::= { tnIgmpSnoopingSdpBndGroups 9 }
+
+-- alxSdpBindIgmpSnpgMaxSrcsV6v1Grp   OBJECT-GROUP
+--    OBJECTS {
+--        sdpBndIgmpSnpgCfgMaxNbrSrcs,
+--        sdpBndIgmpSnpgMaxNumSourcesDrops
+--            }
+--    STATUS      current
+--    DESCRIPTION
+--        "The group of objects that allow to configure IGMP
+--         snooping parameters per SDP bind on Nokia 7x50 SR
+--         series systems added in release 6.1R6."
+--    ::= { tnIgmpSnoopingSdpBndGroups 10 }
+
+-- alxSdpBindIgmpSnpgNotV6v1Group  NOTIFICATION-GROUP
+--     NOTIFICATIONS {
+--         sdpBndIgmpSnpgSrcLimitExceeded
+--             }
+--     STATUS      current
+--     DESCRIPTION
+--         "The group of notifications supporting IGMP snooping on an
+--          SDP Bind on Nokia 7x50 SR series systems added in release
+--          6.1R6."
+--     ::= { tnIgmpSnoopingSdpBndGroups 12 }
+
+-- ----------------------------------------------------------------------------
+--
+--  Conformance information
+--
+-- ----------------------------------------------------------------------------
+-- --------------------------------------------------------
+--
+--  Igmp Snooping TLS related Compliance statements
+--
+-- --------------------------------------------------------
+-- tnIgmpSnoopingTlsCompliance  MODULE-COMPLIANCE
+--    STATUS  obsolete
+--    DESCRIPTION
+--        "The compliance statement for management of IGMP
+--         Snooping on  Tls  level  on Nokia 7x50 SR series
+--         systems."
+--    MODULE  this module
+--        MANDATORY-GROUPS {
+--            alxTlsIgmpSnpgConfigV3v0Group,
+--            alxTlsIgmpSnpgQuerierV3v0Group,
+--            alxTlsIgmpSnpgProxyV3v0Group,
+--            alxTlsIgmpSnpgMRouterV3v0Group,
+--            alxTlsMvrConfigV3v0Group
+--        }
+--    ::= { tnIgmpSnoopingTlsCompliancs 1 }
+
+-- tnIgmpSnoopingTlsV5v0Compliance  MODULE-COMPLIANCE
+--    STATUS  obsolete
+--    DESCRIPTION
+--        "The compliance statement for management of IGMP
+--         Snooping on  Tls  level  on Nokia 7x50 SR series
+--         systems."
+--    MODULE  this module
+--        MANDATORY-GROUPS {
+--            alxTlsIgmpSnpgConfigV3v0Group,
+--            alxTlsIgmpSnpgQuerierV3v0Group,
+--            alxTlsIgmpSnpgProxyV3v0Group,
+--            alxTlsIgmpSnpgMRouterV3v0Group,
+--            alxTlsMvrConfigV3v0Group
+--        }
+--    ::= { tnIgmpSnoopingTlsCompliancs 2 }
+
+-- tnIgmpSnoopingTlsV6v0Compliance  MODULE-COMPLIANCE
+--    STATUS  current
+--    DESCRIPTION
+--        "The compliance statement for management of IGMP
+--         Snooping on  Tls  level  on Nokia 7x50 SR series
+--         systems."
+--    MODULE  this module
+--        MANDATORY-GROUPS {
+--            alxTlsIgmpSnpgConfigV6v0Group,
+--            alxTlsIgmpSnpgQuerierV3v0Group,
+--            alxTlsIgmpSnpgProxyV3v0Group,
+--            alxTlsIgmpSnpgMRouterV3v0Group,
+--            alxTlsMvrConfigV3v0Group,
+--            alxTlsIgmpSnpgTimeStampGroup,
+--            alxSapIgmpSnpgTimeStampGroup,
+--            alxSdpBindIgmpSnpgTimeStampGroup
+--        }
+--    ::= { tnIgmpSnoopingTlsCompliancs 3 }
+
+-- --------------------------------------------------------
+--
+--  Igmp Snooping SAP related Compliance statements
+--
+-- --------------------------------------------------------
+-- tnIgmpSnoopingSapCompliance  MODULE-COMPLIANCE
+--    STATUS  obsolete
+--    DESCRIPTION
+--        "The  compliance  statement  for management of IGMP
+--         Snooping  on  SAP  level  on Nokia 7x50 SR series
+--         systems."
+--    MODULE  this module
+--        MANDATORY-GROUPS {
+--            alxSapIgmpSnpgConfigV3v0Group,
+--            alxSapIgmpSnpgGroupV3v0,
+--            alxSapIgmpSnpgStaticV3v0Group,
+--            alxSapIgmpSnpgStatsV3v0Group,
+--            alxSapMvrV3v0Group
+--        }
+--    ::= { tnIgmpSnoopingSapCompliancs 1 }
+
+-- tnIgmpSnoopingSapV5v0Compliance  MODULE-COMPLIANCE
+--    STATUS  obsolete
+--    DESCRIPTION
+--        "The  compliance  statement  for management of IGMP
+--         Snooping  on  SAP  level  on Nokia 7x50 SR series
+--         systems release R5.0."
+--    MODULE  this module
+--        MANDATORY-GROUPS {
+--            alxSapIgmpSnpgConfigV5v0Group,
+--            alxSapIgmpSnpgGroupV3v0,
+--            alxSapIgmpSnpgStaticV3v0Group,
+--            alxSapIgmpSnpgStatsV5v0Group,
+--            alxSapMvrV3v0Group,
+--            alxSapIgmpSnpgNotV5v0Group
+--        }
+--    ::= { tnIgmpSnoopingSapCompliancs 2 }
+
+-- tnIgmpSnoopingSapV6v0Compliance  MODULE-COMPLIANCE
+--    STATUS  obsolete
+--    DESCRIPTION
+--        "The  compliance  statement  for management of IGMP
+--         Snooping  on  SAP  level  on Nokia 7x50 SR series
+--         systems since release R6.0."
+--    MODULE  this module
+--        MANDATORY-GROUPS {
+--            alxSapIgmpSnpgConfigV5v0Group,
+--            alxSapIgmpSnpgGroupV3v0,
+--            alxSapIgmpSnpgStaticV3v0Group,
+--            alxSapIgmpSnpgStatsV6v0Group,
+--            alxSapMvrV3v0Group,
+--            alxSapIgmpSnpgNotV5v0Group
+--        }
+--    ::= { tnIgmpSnoopingSapCompliancs 3 }
+
+-- tnIgmpSnoopingSapV6v1Compliance  MODULE-COMPLIANCE
+--    STATUS  current
+--    DESCRIPTION
+--        "The  compliance  statement  for management of IGMP
+--         Snooping  on  SAP  level  on Nokia 7x50 SR series
+--         systems since release R6.1."
+--    MODULE  this module
+--        MANDATORY-GROUPS {
+--            alxSapIgmpSnpgConfigV5v0Group,
+--            alxSapIgmpSnpgGroupV3v0,
+--            alxSapIgmpSnpgStaticV3v0Group,
+--            alxSapIgmpSnpgStatsV6v0Group,
+--            alxSapMvrV3v0Group,
+--            alxSapIgmpSnpgMaxSrcsV6v1Group,
+--            alxTlsIgmpSnpgNotObjV5v0Group,
+--            alxTlsIgmpSnpgNotifyObjsV6v1Grp,
+--            alxSapIgmpSnpgNotV5v0Group,
+--            alxSapIgmpSnpgMaxSrcsNotV6v1Grp
+--        }
+--    ::= { tnIgmpSnoopingSapCompliancs 4 }
+
+-- --------------------------------------------------------
+--
+--  Igmp Snooping SDP Bind related Compliance statements
+--
+-- --------------------------------------------------------
+-- tnIgmpSnoopingSdpBndCompliance  MODULE-COMPLIANCE
+--    STATUS  obsolete
+--    DESCRIPTION
+--        "The  compliance  statement  for management of IGMP
+--         Snooping  on  SDP  Bind  level  on  Nokia 7x50 SR
+--         series systems."
+--    MODULE  this module
+--        MANDATORY-GROUPS {
+--            alxSdpBindIgmpSnpgConfV3v0Group,
+--            alxSdpBindIgmpSnpgV3v0Group,
+--            alxSdpBindIgmpSnpgStatV3v0Group,
+--            alxSdpBindIgmpSnpgStatsV3v0Grp
+--        }
+--    ::= { tnIgmpSnoopingSdpBndCompliancs 1 }
+
+-- tnIgmpSnoopingSdpBndV5v0Compliance  MODULE-COMPLIANCE
+--    STATUS  obsolete
+--    DESCRIPTION
+--        "The  compliance  statement  for management of IGMP
+--         Snooping  on  SDP  Bind  level  on  Nokia 7x50 SR
+--         series systems release R5.0."
+--    MODULE  this module
+--        MANDATORY-GROUPS {
+--            alxSdpBindIgmpSnpgConfV5v0Group,
+--            alxSdpBindIgmpSnpgV3v0Group,
+--            alxSdpBindIgmpSnpgStatV3v0Group,
+--            alxSdpBindIgmpSnpgStatsV5v0Grp,
+--            alxSdpBindIgmpSnpgNotV5v0Group
+--        }
+--    ::= { tnIgmpSnoopingSdpBndCompliancs 2 }
+
+-- tnIgmpSnoopingSdpBndV6v0Compliance  MODULE-COMPLIANCE
+--    STATUS  obsolete
+--    DESCRIPTION
+--        "The  compliance  statement  for management of IGMP
+--         Snooping  on  SDP  Bind  level  on  Nokia 7x50 SR
+--         series systems since release R6.0."
+--    MODULE  this module
+--        MANDATORY-GROUPS {
+--            alxSdpBindIgmpSnpgConfV5v0Group,
+--            alxSdpBindIgmpSnpgV3v0Group,
+--            alxSdpBindIgmpSnpgStatV3v0Group,
+--            alxSdpBindIgmpSnpgStatsV6v0Grp,
+--            alxSdpBindIgmpSnpgNotV5v0Group
+--        }
+--    ::= { tnIgmpSnoopingSdpBndCompliancs 3 }
+
+-- tnIgmpSnoopingSdpBndV6v1Compliance  MODULE-COMPLIANCE
+--    STATUS  current
+--    DESCRIPTION
+--        "The  compliance  statement  for management of IGMP
+--         Snooping  on  SDP  Bind  level  on  Nokia 7x50 SR
+--         series systems since release R6.1."
+--    MODULE  this module
+--        MANDATORY-GROUPS {
+--            alxSdpBindIgmpSnpgConfV5v0Group,
+--            alxSdpBindIgmpSnpgV3v0Group,
+--            alxSdpBindIgmpSnpgStatV3v0Group,
+--            alxSdpBindIgmpSnpgStatsV6v0Grp,
+--            alxSdpBindIgmpSnpgMaxSrcsV6v1Grp,
+--            alxTlsIgmpSnpgNotObjV5v0Group,
+--            alxTlsIgmpSnpgNotifyObjsV6v1Grp,
+--            alxSdpBindIgmpSnpgNotV5v0Group,
+--            alxSdpBindIgmpSnpgNotV6v1Group
+--        }
+--    ::= { tnIgmpSnoopingSdpBndCompliancs 4 }
+
+END

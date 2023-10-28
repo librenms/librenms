@@ -1,0 +1,151 @@
+TROPIC-DIAGNOSTIC-MIB DEFINITIONS ::= BEGIN
+
+-- (c) Copyright 2023 Nokia Networks.  All rights reserved.
+-- This software is the confidential and proprietary property of
+-- Nokia and may only be used in accordance with the terms of the
+-- license agreement provided with this software.
+
+IMPORTS
+      SnmpAdminString                         FROM SNMP-FRAMEWORK-MIB
+      OBJECT-TYPE, MODULE-IDENTITY,
+      Unsigned32                              FROM SNMPv2-SMI
+      MODULE-COMPLIANCE, OBJECT-GROUP         FROM SNMPv2-CONF
+      TEXTUAL-CONVENTION                      FROM SNMPv2-TC
+      tnShelfIndex                            FROM TROPIC-SHELF-MIB
+      tnSlotIndex                             FROM TROPIC-SLOT-MIB
+      tnSystemModules, tnDiagnosticMIB        FROM TROPIC-GLOBAL-REG;
+
+  tnDiagnosticMibModule MODULE-IDENTITY
+      LAST-UPDATED    "201802231200Z"
+      ORGANIZATION    "Nokia"
+      CONTACT-INFO    "Nokia
+                       Attn: Jeff Donnelly
+                       600 Mountain Avenue
+                       New Providence, NJ 07974
+
+                       Phone: +1 732 221 6408
+                       Email: jeff.donnelly@nokia.com"
+
+      DESCRIPTION "Diagnostics"
+
+      REVISION    "201802231200Z"
+      DESCRIPTION "Updated the contact info."
+
+      REVISION    "201611161200Z"
+      DESCRIPTION "Updated the contact info."
+
+      REVISION    "201007151200Z"
+      DESCRIPTION "Corrected typo from tnDiagnoticMIB to tnDiagnosticMIB
+                   in IMPORTS."
+
+      ::= { tnSystemModules 4 }
+
+  tnDiagnosticConf        OBJECT IDENTIFIER ::= { tnDiagnosticMIB  1 }
+  tnDiagnosticGroups      OBJECT IDENTIFIER ::= { tnDiagnosticConf 1 }
+  tnDiagnosticCompliances OBJECT IDENTIFIER ::= { tnDiagnosticConf 2 }
+  tnDiagnosticObjs        OBJECT IDENTIFIER ::= { tnDiagnosticMIB  2 }
+
+---------------------------------------------------------------
+-- L2 Textual Conventions
+---------------------------------------------------------------
+    TnEquipDiagDescription ::= TEXTUAL-CONVENTION
+        STATUS         current
+        DESCRIPTION    "."
+        SYNTAX         SnmpAdminString (SIZE(0..60))
+
+---------------------------------------------------------------
+-- Equipment Diagnostics Status Table
+---------------------------------------------------------------
+    tnEquipmentDiagnosticStatusTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnEquipDiagStatusEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnDiagnosticObjs 1 }
+
+    tnEquipDiagStatusEntry OBJECT-TYPE
+        SYNTAX         TnEquipDiagStatusEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { tnShelfIndex,
+                tnSlotIndex,
+                tnEquipDiagPort,
+                tnEquipDiagId,
+                tnEquipDiagUnit }
+        ::= { tnEquipmentDiagnosticStatusTable 1 }
+
+    TnEquipDiagStatusEntry ::=
+        SEQUENCE {
+            tnEquipDiagPort         Unsigned32,
+            tnEquipDiagId           Unsigned32,
+            tnEquipDiagUnit         Unsigned32,
+            tnEquipDiagStatusDescr  TnEquipDiagDescription,
+            tnEquipDiagStatusResult INTEGER
+        }
+
+    tnEquipDiagPort OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnEquipDiagStatusEntry 1 }
+
+    tnEquipDiagId OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnEquipDiagStatusEntry 2 }
+
+    tnEquipDiagUnit OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnEquipDiagStatusEntry 3 }
+
+    tnEquipDiagStatusDescr OBJECT-TYPE
+        SYNTAX         TnEquipDiagDescription
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnEquipDiagStatusEntry 4 }
+
+    tnEquipDiagStatusResult OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         failed(1),
+                         passed(2),
+                         willNotRun(3),
+                         notExecuted(4)
+                       }
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnEquipDiagStatusEntry 5 }
+
+--------------------------------------------------------------------------------
+-- Conformance Group Definitions
+--------------------------------------------------------------------------------
+    tnEquipDiagStatusGroup OBJECT-GROUP
+        OBJECTS {
+            tnEquipDiagStatusDescr,
+            tnEquipDiagStatusResult
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnDiagnosticGroups 1 }
+
+--------------------------------------------------------------------------------
+-- Compliance Statements (mandatory)
+--------------------------------------------------------------------------------
+    tnDiagnosticCompliance MODULE-COMPLIANCE
+        STATUS         current
+        DESCRIPTION    "."
+        MODULE
+        MANDATORY-GROUPS  {
+          tnEquipDiagStatusGroup
+        }
+        ::= { tnDiagnosticCompliances 1 }
+
+END -- DEFINITION OF TROPIC-DIAGNOSTIC-MIB

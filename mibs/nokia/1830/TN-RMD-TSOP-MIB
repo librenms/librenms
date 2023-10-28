@@ -1,0 +1,1146 @@
+TN-RMD-TSOP-MIB DEFINITIONS ::= BEGIN
+
+-- (c) Copyright 2023 Nokia Networks.  All rights reserved.
+-- This software is the confidential and proprietary property of
+-- Nokia and may only be used in accordance with the terms of the
+-- license agreement provided with this software.
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, Unsigned32, Counter64
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, MacAddress, TruthValue
+        FROM SNMPv2-TC
+    tnRmdObjs, tnRmdMIBModules
+        FROM TROPIC-GLOBAL-REG
+    TnRmdUserLabel
+        FROM TN-RMD-TC-MIB
+    tnRmdSystemId
+        FROM TN-RMD-SYSTEM-MIB
+    tnSysSwitchId
+        FROM TROPIC-SYSTEM-MIB
+    tnRmdIfIndex
+        FROM TN-RMD-IF-MIB
+    ;
+
+tnRmdTsopMibModule MODULE-IDENTITY
+    LAST-UPDATED    "201802231200Z"
+    ORGANIZATION    "Nokia"
+    CONTACT-INFO    "Nokia
+                     Attn: Jeff Donnelly
+                     600 Mountain Avenue
+                     New Providence, NJ 07974
+
+                     Phone: +1 732 221 6408
+                     Email: jeff.donnelly@nokia.com"
+
+    DESCRIPTION
+        "MIB for Transparent RMDH/SONET over Packet (TSoP)
+         type of Remote Managed Devices (RMDs)."
+
+    REVISION     "201802231200Z"
+    DESCRIPTION  "Updated the contact info."
+
+    REVISION     "201611160000Z"
+    DESCRIPTION  "Updated the contact info."
+
+    REVISION     "201311160000Z"
+    DESCRIPTION  "Added the following tables:
+                  tnRmdTsopJbBasicApplMonitorTable
+                  tnRmdTsopJbBasicApplIntegrationTable
+                  tnRmdTsopJbBasicApplManagementTable"
+
+    REVISION     "201308010000Z"
+    DESCRIPTION  "Initial revision."
+
+    ::= { tnRmdMIBModules 6 }
+
+
+tnRmdTsopObjects  OBJECT IDENTIFIER ::= { tnRmdObjs 6 }
+
+
+-- =============================================================
+-- Textual Conventions
+-- =============================================================
+
+TnRmdIwfChannelNumber ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Unique number identifying an IWF channel instance."
+    SYNTAX Unsigned32
+
+TnRmdIwfTimingMode ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "IWF (decap) timing modes."
+    SYNTAX INTEGER {
+           iwfReTiming(1),
+           iwfLoopTiming(2),
+           iwfDifferentialTiming(3),
+           iwfTimingNotApplicable(255)
+           }
+
+TnRmdRtpClockSource ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "RTP clock source types."
+    SYNTAX INTEGER {
+           rtpClockEthernet(1),
+           rtpClockTdm(2)
+           }
+
+TnRmdRtpFrequency ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "RTP frequency types."
+    SYNTAX INTEGER {
+           rtpFreq19MHz(1),
+           rtpFreq25MHz(2)
+           }
+
+TnRmdTdmLoopbackType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Tdm loopback types."
+    SYNTAX INTEGER {
+           transparantLoop(1),
+           nonTransparantLoop(2)
+           }
+
+TnRmdTsopJbObservationPeriod ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Jitter buffer Observation periods."
+    SYNTAX INTEGER {
+           period1min(1),
+           period2min(2),
+           period5min(3),
+           period10min(4),
+           periodNotAvailable(254),
+           periodNotApplicable(255)
+           }
+
+--------------------------------------------------------------------------------
+-- RMD System TSOP Scalar
+--------------------------------------------------------------------------------
+tnRmdTsopAttributeTotal OBJECT-TYPE
+    SYNTAX         Integer32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "."
+    ::= { tnRmdTsopObjects 1 }
+
+-- =============================================================
+-- tnRmdTsopSystemTable
+-- =============================================================
+
+tnRmdTsopSystemTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TnRmdTsopSystemEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing the general TSoP data of all RMDs."
+    ::= { tnRmdTsopObjects 2 }
+
+tnRmdTsopSystemEntry OBJECT-TYPE
+    SYNTAX      TnRmdTsopSystemEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of objects containing the general TSoP data of an RMD."
+    INDEX  { tnSysSwitchId, tnRmdSystemId }
+    ::= { tnRmdTsopSystemTable 1 }
+
+TnRmdTsopSystemEntry ::=
+    SEQUENCE {
+        tnRmdTsopSystemMaxNrChannels      Unsigned32,
+        tnRmdTsopSystemMaxJbSize          Unsigned32
+    }
+
+tnRmdTsopSystemMaxNrChannels OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum number of channels supported by the RMD."
+    ::= { tnRmdTsopSystemEntry 1 }
+
+tnRmdTsopSystemMaxJbSize OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum jitter buffer size supported by the RMD."
+    ::= { tnRmdTsopSystemEntry 2 }
+
+-- =============================================================
+-- tnRmdTsopIwfTable
+-- =============================================================
+
+tnRmdTsopIwfTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TnRmdTsopIwfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing the IWF channels of all TSoP RMDs."
+    ::= { tnRmdTsopObjects 3 }
+
+tnRmdTsopIwfEntry OBJECT-TYPE
+    SYNTAX      TnRmdTsopIwfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of objects for an IWF channel of a TSoP RMD."
+    INDEX  { tnSysSwitchId, tnRmdSystemId, tnRmdTsopIwfChannelNumber }
+    ::= { tnRmdTsopIwfTable 1 }
+
+TnRmdTsopIwfEntry ::=
+    SEQUENCE {
+        tnRmdTsopIwfChannelNumber  TnRmdIwfChannelNumber,
+        tnRmdTsopIwfUserLabel      TnRmdUserLabel
+    }
+
+tnRmdTsopIwfChannelNumber OBJECT-TYPE
+    SYNTAX      TnRmdIwfChannelNumber
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "IWF channel number."
+    ::= { tnRmdTsopIwfEntry 1 }
+
+tnRmdTsopIwfUserLabel OBJECT-TYPE
+    SYNTAX      TnRmdUserLabel
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "IWF user label."
+    ::= { tnRmdTsopIwfEntry 2 }
+
+
+-- =============================================================
+-- tnRmdTsopIwfEncapTable
+-- =============================================================
+
+tnRmdTsopIwfEncapTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TnRmdTsopIwfEncapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing the IWF encapsulation parameters of
+         all channels of all TSoP RMDs."
+    ::= { tnRmdTsopObjects 4 }
+
+tnRmdTsopIwfEncapEntry OBJECT-TYPE
+    SYNTAX      TnRmdTsopIwfEncapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of objects containing the IWF encapsulation
+         parameters of a channel of a TSoP RMD."
+    INDEX  { tnSysSwitchId, tnRmdSystemId, tnRmdTsopIwfChannelNumber }
+    ::= { tnRmdTsopIwfEncapTable 1 }
+
+TnRmdTsopIwfEncapEntry ::=
+    SEQUENCE {
+        tnRmdTsopIwfEncapOutput           TruthValue,
+        tnRmdTsopIwfEncapGAisActive       TruthValue,
+        tnRmdTsopIwfEncapGAisIncludeLos   TruthValue,
+        tnRmdTsopIwfEncapGAisIncludeLof   TruthValue,
+        tnRmdTsopIwfEncapEcid             Unsigned32,
+        tnRmdTsopIwfEncapInsertRtpHeader  TruthValue,
+        tnRmdTsopIwfEncapRtpClockSource   TnRmdRtpClockSource,
+        tnRmdTsopIwfEncapRtpFrequency     TnRmdRtpFrequency,
+        tnRmdTsopIwfEncapRtpPayloadType   Unsigned32,
+        tnRmdTsopIwfEncapRtpSsrc          Unsigned32
+    }
+
+tnRmdTsopIwfEncapOutput OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether the IWF encapsulation output is enabled."
+    ::= { tnRmdTsopIwfEncapEntry 1 }
+
+tnRmdTsopIwfEncapGAisActive OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether G-AIS is currently being inserted."
+    ::= { tnRmdTsopIwfEncapEntry 2 }
+
+tnRmdTsopIwfEncapGAisIncludeLos OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether the contribution of dLOS is included in the
+         insertion of G-AIS."
+    ::= { tnRmdTsopIwfEncapEntry 3 }
+
+tnRmdTsopIwfEncapGAisIncludeLof OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether the contribution of dLOF is included in the
+         insertion of G-AIS."
+    ::= { tnRmdTsopIwfEncapEntry 4 }
+
+tnRmdTsopIwfEncapEcid OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The ECID (Ethernet Circuit IDentifier) to be used in the
+         outgoing traffic stream."
+    ::= { tnRmdTsopIwfEncapEntry 5 }
+
+tnRmdTsopIwfEncapInsertRtpHeader OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether an RTP header is inserted."
+    ::= { tnRmdTsopIwfEncapEntry 6 }
+
+tnRmdTsopIwfEncapRtpClockSource OBJECT-TYPE
+    SYNTAX      TnRmdRtpClockSource
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The clock source of the RTP time-stamp counter.
+         Part of the RTP header data."
+    ::= { tnRmdTsopIwfEncapEntry 7 }
+
+tnRmdTsopIwfEncapRtpFrequency OBJECT-TYPE
+    SYNTAX      TnRmdRtpFrequency
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The clock frequency of the RTP time-stamp counter.
+         Part of the RTP header data."
+    ::= { tnRmdTsopIwfEncapEntry 8 }
+
+tnRmdTsopIwfEncapRtpPayloadType OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The RTP payload type.
+         Part of the RTP header data."
+    ::= { tnRmdTsopIwfEncapEntry 9 }
+
+tnRmdTsopIwfEncapRtpSsrc OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The RTP SSRC (Synchronization SouRCe identifier).
+         Part of the RTP header data."
+    ::= { tnRmdTsopIwfEncapEntry 10 }
+
+
+-- =============================================================
+-- tnRmdTsopIwfDecapTable
+-- =============================================================
+
+tnRmdTsopIwfDecapTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TnRmdTsopIwfDecapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing the IWF decapsulation parameters of
+         all channels of all TSoP RMDs."
+    ::= { tnRmdTsopObjects 5 }
+
+tnRmdTsopIwfDecapEntry OBJECT-TYPE
+    SYNTAX      TnRmdTsopIwfDecapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of objects containing the IWF decapsulation
+         parameters of a channel of a TSoP RMD."
+    INDEX  { tnSysSwitchId, tnRmdSystemId, tnRmdTsopIwfChannelNumber }
+    ::= { tnRmdTsopIwfDecapTable 1 }
+
+TnRmdTsopIwfDecapEntry ::=
+    SEQUENCE {
+        tnRmdTsopIwfDecapExpectedEcid                     Unsigned32,
+        tnRmdTsopIwfDecapUnknownEcid                      Unsigned32,
+        tnRmdTsopIwfDecapTimingMode                       TnRmdIwfTimingMode,
+        tnRmdTsopIwfDecapRaiseThreshold                   Unsigned32,
+        tnRmdTsopIwfDecapClearThreshold                   Unsigned32,
+        tnRmdTsopIwfDecapGAisActive                       TruthValue,
+        tnRmdTsopIwfDecapGAis                             TruthValue,
+        tnRmdTsopIwfDecapForceGAis                        TruthValue,
+        tnRmdTsopIwfDecapGAisIncludeInvalidLmBits         TruthValue,
+        tnRmdTsopIwfDecapExpectRtpHeader                  TruthValue,
+        tnRmdTsopIwfDecapRtpClockSource                   TnRmdRtpClockSource,
+        tnRmdTsopIwfDecapRtpFrequency                     TnRmdRtpFrequency,
+        tnRmdTsopIwfDecapRtpExpectedPayloadType           Unsigned32,
+        tnRmdTsopIwfDecapRtpPayloadTypeMismatchDetection  TruthValue,
+        tnRmdTsopIwfDecapRtpExpectedSsrc                  Unsigned32,
+        tnRmdTsopIwfDecapGAisIncludeStray                 TruthValue,
+        tnRmdTsopIwfDecapGAisIncludeMalformed             TruthValue
+    }
+
+tnRmdTsopIwfDecapExpectedEcid OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The ECID (Ethernet Circuit IDentifier) expected to be received."
+    ::= { tnRmdTsopIwfDecapEntry 1 }
+
+tnRmdTsopIwfDecapUnknownEcid OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The last received unknown ECID."
+    ::= { tnRmdTsopIwfDecapEntry 2 }
+
+tnRmdTsopIwfDecapTimingMode OBJECT-TYPE
+    SYNTAX      TnRmdIwfTimingMode
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The IWF decap timing mode."
+    ::= { tnRmdTsopIwfDecapEntry 3 }
+
+tnRmdTsopIwfDecapRaiseThreshold OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Threshold, in number of consecutive packets, to raise dRPL and
+         dNO_TDM_PAYLOAD defects."
+    ::= { tnRmdTsopIwfDecapEntry 4 }
+
+tnRmdTsopIwfDecapClearThreshold OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Threshold, in number of consecutive packets, to clear dRPL and
+         dNO_TDM_PAYLOAD defects."
+    ::= { tnRmdTsopIwfDecapEntry 5 }
+
+tnRmdTsopIwfDecapGAisActive OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether G-AIS is currently inserted."
+    ::= { tnRmdTsopIwfDecapEntry 6 }
+
+tnRmdTsopIwfDecapGAis OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether G-AIS insertion is enabled."
+    ::= { tnRmdTsopIwfDecapEntry 7 }
+
+tnRmdTsopIwfDecapForceGAis OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether G-AIS is forced to be inserted."
+    ::= { tnRmdTsopIwfDecapEntry 8 }
+
+tnRmdTsopIwfDecapGAisIncludeInvalidLmBits OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether the contribution of the detection of
+         invalid LM bits is included in the insertion of G-AIS."
+    ::= { tnRmdTsopIwfDecapEntry 9 }
+
+tnRmdTsopIwfDecapExpectRtpHeader OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether an RTP header is expected to be present
+         in the received signal."
+    ::= { tnRmdTsopIwfDecapEntry 10 }
+
+tnRmdTsopIwfDecapRtpClockSource OBJECT-TYPE
+    SYNTAX      TnRmdRtpClockSource
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The clock source of the RTP time-stamp counter.
+         Part of the RTP header data."
+    ::= { tnRmdTsopIwfDecapEntry 11 }
+
+tnRmdTsopIwfDecapRtpFrequency OBJECT-TYPE
+    SYNTAX      TnRmdRtpFrequency
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The clock frequency of the RTP time-stamp counter.
+         Part of the RTP header data."
+    ::= { tnRmdTsopIwfDecapEntry 12 }
+
+tnRmdTsopIwfDecapRtpExpectedPayloadType OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The expected received RTP payload type.
+         Part of the RTP header data."
+    ::= { tnRmdTsopIwfDecapEntry 13 }
+
+tnRmdTsopIwfDecapRtpPayloadTypeMismatchDetection OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether mismatch detection on the payload type
+         in the received RTP header data is enabled."
+    ::= { tnRmdTsopIwfDecapEntry 14 }
+
+tnRmdTsopIwfDecapRtpExpectedSsrc OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The expected RTP SSRC (Synchronization SouRCe identifier).
+         Part of the RTP header data."
+    ::= { tnRmdTsopIwfDecapEntry 15 }
+
+tnRmdTsopIwfDecapGAisIncludeStray OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether the contribution of a STRAY defect is included
+         in the insertion of G-AIS."
+    ::= { tnRmdTsopIwfDecapEntry 16 }
+
+tnRmdTsopIwfDecapGAisIncludeMalformed OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether the contribution of a MALFORMED defect is
+         included in the insertion of G-AIS."
+    ::= { tnRmdTsopIwfDecapEntry 17 }
+
+
+-- =============================================================
+-- tnRmdTsopIwfJbTable
+-- =============================================================
+
+tnRmdTsopIwfJbTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TnRmdTsopIwfJbEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing the Jitter Buffer (JB) parameters of all
+         channels of all TSoP RMDs."
+    ::= { tnRmdTsopObjects 6 }
+
+tnRmdTsopIwfJbEntry OBJECT-TYPE
+    SYNTAX      TnRmdTsopIwfJbEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of objects containing the Jitter Buffer (JB) parameters
+         of a channel of a TSoP RMD."
+    INDEX  { tnSysSwitchId, tnRmdSystemId, tnRmdTsopIwfChannelNumber }
+    ::= { tnRmdTsopIwfJbTable 1 }
+
+TnRmdTsopIwfJbEntry ::=
+    SEQUENCE {
+        tnRmdTsopIwfJbMaxSize           Unsigned32,
+        tnRmdTsopIwfJbMinimumFillLevel  Unsigned32,
+        tnRmdTsopIwfJbMaximumFillLevel  Unsigned32,
+        tnRmdTsopIwfJbRecenterPosition  Unsigned32,
+        tnRmdTsopIwfJbFillLevelReset    TruthValue,
+        tnRmdTsopIwfJbShiftPosition     Unsigned32,
+        tnRmdTsopIwfJbRecenter          TruthValue,
+        tnRmdTsopIwfJbLowThreshold      Unsigned32,
+        tnRmdTsopIwfJbHighThreshold     Unsigned32,
+        tnRmdTsopIwfJbRecenterThreshold Unsigned32,
+        tnRmdTsopIwfJbRecenterIncrement Unsigned32
+    }
+
+tnRmdTsopIwfJbMaxSize OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The maximum size, in number of packets, of the jitter buffer."
+    ::= { tnRmdTsopIwfJbEntry 1 }
+
+tnRmdTsopIwfJbMinimumFillLevel OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The minimum fill level, in number of packets, of the jitter
+         buffer since the last reset."
+    ::= { tnRmdTsopIwfJbEntry 2 }
+
+tnRmdTsopIwfJbMaximumFillLevel OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum fill level, in number of packets, of the jitter
+         buffer since the last reset."
+    ::= { tnRmdTsopIwfJbEntry 3 }
+
+tnRmdTsopIwfJbRecenterPosition OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The jitter buffer recenter position, in number of packets."
+    ::= { tnRmdTsopIwfJbEntry 4 }
+
+tnRmdTsopIwfJbFillLevelReset OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Setting of this object to value 'true' triggers the resetting
+         of the minimum and maximum fill levels to their initial values,
+         and the start of a new measurement period.
+
+         This object is merely used to invoke the resetting of the
+         levels and the starting of a new measurement period, and its
+         actual value has no meaning."
+    ::= { tnRmdTsopIwfJbEntry 5 }
+
+tnRmdTsopIwfJbShiftPosition OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Setting of this object triggers the shifting of the jitter
+         buffer position. The value to which this object is set
+         determines the size and the direction of the shift.
+
+         Shifting the jitter buffer position is a service-affecting
+         operation.
+
+         This object is merely used to invoke the shifting of the
+         jitter buffer position, and its actual value has no meaning."
+    ::= { tnRmdTsopIwfJbEntry 6 }
+
+tnRmdTsopIwfJbRecenter OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Setting of this object to value 'true' triggers recentering
+         of the jitter buffer to the provisioned (see object
+         tnRmdTsopIwfJbRecenterPosition) position.
+
+         Recentering the jitter buffer is a service-affecting operation.
+
+         This object is merely used to invoke the recentering of the
+         jitter buffer, and its actual value has no meaning."
+    ::= { tnRmdTsopIwfJbEntry 7 }
+
+tnRmdTsopIwfJbLowThreshold OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The jitter buffer low threshold used in the HW recenter algorithm."
+    ::= { tnRmdTsopIwfJbEntry 8 }
+
+tnRmdTsopIwfJbHighThreshold OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The jitter buffer high threshold used in the HW recenter algorithm."
+    ::= { tnRmdTsopIwfJbEntry 9 }
+
+tnRmdTsopIwfJbRecenterThreshold OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The threshold of the HW recenter algorithm, at which a HW recenter
+         of the jitter buffer takes place."
+    ::= { tnRmdTsopIwfJbEntry 10 }
+
+tnRmdTsopIwfJbRecenterIncrement OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The increment value of the recenter counter in the HW recenter
+         algorithm."
+    ::= { tnRmdTsopIwfJbEntry 11 }
+
+-- =============================================================
+-- tnRmdTsopJbBasicApplMonitorTable
+-- =============================================================
+
+tnRmdTsopJbBasicApplMonitorTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TnRmdTsopJbBasicApplMonitorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing the Jitter Buffer (JB) Basic Application
+         Monitor parameters of all channels of all TSoP RMDs."
+    ::= { tnRmdTsopObjects 7 }
+
+tnRmdTsopJbBasicApplMonitorEntry OBJECT-TYPE
+    SYNTAX      TnRmdTsopJbBasicApplMonitorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of objects containing the Jitter Buffer (JB) Basic
+         Application Monitor parameters of a channel of a TSoP RMD."
+    INDEX  { tnSysSwitchId, tnRmdSystemId, tnRmdTsopIwfChannelNumber }
+    ::= { tnRmdTsopJbBasicApplMonitorTable 1 }
+
+TnRmdTsopJbBasicApplMonitorEntry ::=
+    SEQUENCE {
+        tnRmdTsopJbBasicApplMonitorState                  TruthValue,
+        tnRmdTsopJbBasicApplMonitorReportFillLevels       TruthValue,
+        tnRmdTsopJbBasicApplMonitorZeroObservationPeriod  TnRmdTsopJbObservationPeriod
+    }
+
+tnRmdTsopJbBasicApplMonitorState OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether Jitter Buffer fill level monitoring
+         is enabled or not."
+    ::= { tnRmdTsopJbBasicApplMonitorEntry 1 }
+
+tnRmdTsopJbBasicApplMonitorReportFillLevels OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether Jitter Buffer fill levels are reported."
+    ::= { tnRmdTsopJbBasicApplMonitorEntry 2 }
+
+tnRmdTsopJbBasicApplMonitorZeroObservationPeriod OBJECT-TYPE
+    SYNTAX      TnRmdTsopJbObservationPeriod
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Jitter Buffer fill level observation period, in minutes."
+    ::= { tnRmdTsopJbBasicApplMonitorEntry 3 }
+
+
+-- =============================================================
+-- tnRmdTsopJbBasicApplIntegrationTable
+-- =============================================================
+
+tnRmdTsopJbBasicApplIntegrationTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TnRmdTsopJbBasicApplIntegrationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing the Jitter Buffer (JB) basic application
+         Integration parameters of all channels of all TSoP RMDs."
+    ::= { tnRmdTsopObjects 8 }
+
+tnRmdTsopJbBasicApplIntegrationEntry OBJECT-TYPE
+    SYNTAX      TnRmdTsopJbBasicApplIntegrationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of objects containing the Jitter Buffer (JB) basic
+         application Integration parameters of a channel of a TSoP RMD."
+    INDEX  { tnSysSwitchId, tnRmdSystemId, tnRmdTsopIwfChannelNumber }
+    ::= { tnRmdTsopJbBasicApplIntegrationTable 1 }
+
+TnRmdTsopJbBasicApplIntegrationEntry ::=
+    SEQUENCE {
+        tnRmdTsopJbBasicApplIntegrationState                TruthValue,
+        tnRmdTsopJbBasicApplIntegrationObservationStages    Unsigned32,
+        tnRmdTsopJbBasicApplIntegrationMaxObservationPeriod Unsigned32,
+        tnRmdTsopJbBasicApplIntegrationZeroLowThreshold     Unsigned32,
+        tnRmdTsopJbBasicApplIntegrationZeroHighThreshold    Unsigned32,
+        tnRmdTsopJbBasicApplIntegrationMaxLowThreshold      Unsigned32,
+        tnRmdTsopJbBasicApplIntegrationMaxHighThreshold     Unsigned32
+    }
+
+tnRmdTsopJbBasicApplIntegrationState OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether Jitter Buffer fill level integration
+         is enabled or not."
+    ::= { tnRmdTsopJbBasicApplIntegrationEntry 1 }
+
+tnRmdTsopJbBasicApplIntegrationObservationStages OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Number of Jitter Buffer observation integration stages."
+    ::= { tnRmdTsopJbBasicApplIntegrationEntry 2 }
+
+tnRmdTsopJbBasicApplIntegrationMaxObservationPeriod OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Maximum Jitter Buffer observation integration period, in multiples
+         of tnRmdTsopJbBasicApplMonitorZeroObservationPeriod."
+    ::= { tnRmdTsopJbBasicApplIntegrationEntry 3 }
+
+tnRmdTsopJbBasicApplIntegrationZeroLowThreshold OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Tzero observation interval low level threshold, in packets."
+    ::= { tnRmdTsopJbBasicApplIntegrationEntry 4 }
+
+tnRmdTsopJbBasicApplIntegrationZeroHighThreshold OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Tzero observation interval high level threshold, in packets.
+         This must be higher than the
+         tnRmdTsopJbBasicApplIntegrationZeroLowThreshold."
+    ::= { tnRmdTsopJbBasicApplIntegrationEntry 5 }
+
+tnRmdTsopJbBasicApplIntegrationMaxLowThreshold OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "max observation interval low level threshold, in packets.
+         This must be at least as high as the
+         tnRmdTsopJbBasicApplIntegrationZeroLowThreshold."
+    ::= { tnRmdTsopJbBasicApplIntegrationEntry 6 }
+
+tnRmdTsopJbBasicApplIntegrationMaxHighThreshold OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Tmax observation interval high level threshold, in packets.
+         This must be higher than the tnRmdTsopJbBasicApplIntegrationMaxLowThreshold
+         but not higher than the tnRmdTsopJbBasicApplIntegrationZeroHighThreshold."
+    ::= { tnRmdTsopJbBasicApplIntegrationEntry 7 }
+
+-- =============================================================
+-- tnRmdTsopJbBasicApplManagementTable
+-- =============================================================
+
+tnRmdTsopJbBasicApplManagementTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TnRmdTsopJbBasicApplManagementEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing the Jitter Buffer (JB) Basic Application
+         Management parameters of all channels of all TSoP RMDs."
+    ::= { tnRmdTsopObjects 9 }
+
+tnRmdTsopJbBasicApplManagementEntry OBJECT-TYPE
+    SYNTAX      TnRmdTsopJbBasicApplManagementEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of objects containing the Jitter Buffer (JB) Basic Application
+         Management parameters of a channel of a TSoP RMD."
+    INDEX  { tnSysSwitchId, tnRmdSystemId, tnRmdTsopIwfChannelNumber }
+    ::= { tnRmdTsopJbBasicApplManagementTable 1 }
+
+TnRmdTsopJbBasicApplManagementEntry ::=
+    SEQUENCE {
+        tnRmdTsopJbBasicApplManagementState            TruthValue,
+        tnRmdTsopJbBasicApplManagementShiftAllowed     TruthValue
+    }
+
+tnRmdTsopJbBasicApplManagementState OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether Jitter Buffer management is enabled or not."
+    ::= { tnRmdTsopJbBasicApplManagementEntry 1 }
+
+tnRmdTsopJbBasicApplManagementShiftAllowed OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether Jitter Buffer shifts can be performed."
+    ::= { tnRmdTsopJbBasicApplManagementEntry 2 }
+
+-- =============================================================
+-- tnRmdTsopPsnTable
+-- =============================================================
+
+tnRmdTsopPsnTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TnRmdTsopPsnEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing the Packed Switched Network (PSN) parameters
+         of all channels of all TSoP RMDs."
+    ::= { tnRmdTsopObjects 10 }
+
+tnRmdTsopPsnEntry OBJECT-TYPE
+    SYNTAX      TnRmdTsopPsnEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of objects containing the Packed Switched Network (PSN)
+         parameters of a channel of a TSoP RMD."
+    INDEX  { tnSysSwitchId, tnRmdSystemId, tnRmdTsopIwfChannelNumber }
+    ::= { tnRmdTsopPsnTable 1 }
+
+TnRmdTsopPsnEntry ::=
+    SEQUENCE {
+        tnRmdTsopPsnTxDestMac  MacAddress
+    }
+
+tnRmdTsopPsnTxDestMac OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The destination MAC address inserted into the transmitted packets."
+    ::= { tnRmdTsopPsnEntry 1 }
+
+-- =============================================================
+-- tnRmdTsopEthIfTable
+-- =============================================================
+
+tnRmdTsopEthIfTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TnRmdTsopEthIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing the parameters of all ethernet interfaces
+         of all TSoP RMDs."
+    ::= { tnRmdTsopObjects 11 }
+
+tnRmdTsopEthIfEntry OBJECT-TYPE
+    SYNTAX      TnRmdTsopEthIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of objects containing the parameters of an ethernet
+         interface of a TSoP RMD."
+    INDEX  { tnSysSwitchId, tnRmdSystemId, tnRmdIfIndex }
+    ::= { tnRmdTsopEthIfTable 1 }
+
+TnRmdTsopEthIfEntry ::=
+    SEQUENCE {
+        tnRmdTsopEthIfSystemPsnRxDestMacCheck  TruthValue
+    }
+
+tnRmdTsopEthIfSystemPsnRxDestMacCheck OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If enabled, for each received packet the destination MAC address
+         is compared with the device MAC address. In case the addresses
+         are not equal, the packet is not processed."
+    ::= { tnRmdTsopEthIfEntry 1 }
+
+-- =============================================================
+-- tnRmdTsopIwfCountersTable
+-- =============================================================
+
+tnRmdTsopIwfCountersTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TnRmdTsopIwfCountersEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing the counters of all IWF channels of
+         all TSoP RMDs."
+    ::= { tnRmdTsopObjects 12 }
+
+tnRmdTsopIwfCountersEntry OBJECT-TYPE
+    SYNTAX      TnRmdTsopIwfCountersEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of objects containing the counters of an IWF
+         channel of a TSoP RMD."
+    INDEX  { tnSysSwitchId, tnRmdSystemId, tnRmdTsopIwfChannelNumber }
+    ::= { tnRmdTsopIwfCountersTable 1 }
+
+TnRmdTsopIwfCountersEntry ::=
+    SEQUENCE {
+        tnRmdTsopIwfCountersRxPackets                 Counter64,
+        tnRmdTsopIwfCountersTxPackets                 Counter64,
+        tnRmdTsopIwfCountersMalformedPackets          Counter64,
+        tnRmdTsopIwfCountersReorderedPackets          Counter64,
+        tnRmdTsopIwfCountersMisorderedDroppedPackets  Counter64,
+        tnRmdTsopIwfCountersMissingPackets            Counter64,
+        tnRmdTsopIwfCountersPlayedOutPackets          Counter64,
+        tnRmdTsopIwfCountersJbOverrun                 Counter64,
+        tnRmdTsopIwfCountersJbUnderrun                Counter64,
+        tnRmdTsopIwfCountersReset                     TruthValue
+    }
+
+tnRmdTsopIwfCountersRxPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of received packets."
+    ::= { tnRmdTsopIwfCountersEntry 1 }
+
+tnRmdTsopIwfCountersTxPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of transmitted packets."
+    ::= { tnRmdTsopIwfCountersEntry 2 }
+
+tnRmdTsopIwfCountersMalformedPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of malformed packets."
+    ::= { tnRmdTsopIwfCountersEntry 3 }
+
+tnRmdTsopIwfCountersReorderedPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of reordered packets."
+    ::= { tnRmdTsopIwfCountersEntry 4 }
+
+tnRmdTsopIwfCountersMisorderedDroppedPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of dropped misordered packets."
+    ::= { tnRmdTsopIwfCountersEntry 5 }
+
+tnRmdTsopIwfCountersMissingPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of missing packets."
+    ::= { tnRmdTsopIwfCountersEntry 6 }
+
+tnRmdTsopIwfCountersPlayedOutPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of packets of which TDM payload is transmitted as received."
+    ::= { tnRmdTsopIwfCountersEntry 7 }
+
+tnRmdTsopIwfCountersJbOverrun OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of jitter buffer overrun packets."
+    ::= { tnRmdTsopIwfCountersEntry 8 }
+
+tnRmdTsopIwfCountersJbUnderrun OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of jitter buffer underrun packets."
+    ::= { tnRmdTsopIwfCountersEntry 9 }
+
+tnRmdTsopIwfCountersReset OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Setting of this object to 'true' invokes a reset of the counters
+         for this IWF channel.
+         Setting of this object to value 'false' has no effect.
+
+         This object is merely used to invoke a reset, and its actual
+         value has no meaning."
+    ::= { tnRmdTsopIwfCountersEntry 10 }
+
+
+-- =============================================================
+-- tnRmdTsopTdmLoopbackTable
+-- =============================================================
+
+tnRmdTsopTdmLoopbackTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TnRmdTsopTdmLoopbackEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing the TDM Loopback parameters
+         of all TSoP RMDs."
+    ::= { tnRmdTsopObjects 13 }
+
+tnRmdTsopTdmLoopbackEntry OBJECT-TYPE
+    SYNTAX      TnRmdTsopTdmLoopbackEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of objects containing the parameters of TDM Loopback of a TSoP RMD."
+    INDEX  { tnSysSwitchId, tnRmdSystemId, tnRmdIfIndex }
+    ::= { tnRmdTsopTdmLoopbackTable 1 }
+
+TnRmdTsopTdmLoopbackEntry ::=
+    SEQUENCE {
+        tnRmdTsopTdmLoopbackInLoopEnabled  TruthValue,
+        tnRmdTsopTdmLoopbackInLoopType     TnRmdTdmLoopbackType,
+        tnRmdTsopTdmLoopbackOutLoopEnabled TruthValue,
+        tnRmdTsopTdmLoopbackOutLoopType    TnRmdTdmLoopbackType
+    }
+
+tnRmdTsopTdmLoopbackInLoopEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable/disable facility loopback."
+    ::= { tnRmdTsopTdmLoopbackEntry 1 }
+
+tnRmdTsopTdmLoopbackInLoopType OBJECT-TYPE
+    SYNTAX      TnRmdTdmLoopbackType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Configure facility loopback type."
+    ::= { tnRmdTsopTdmLoopbackEntry 2 }
+
+tnRmdTsopTdmLoopbackOutLoopEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable/disable terminal loopback."
+    ::= { tnRmdTsopTdmLoopbackEntry 3 }
+
+tnRmdTsopTdmLoopbackOutLoopType OBJECT-TYPE
+    SYNTAX      TnRmdTdmLoopbackType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Configure terminal loopback type."
+    ::= { tnRmdTsopTdmLoopbackEntry 4 }
+
+
+END

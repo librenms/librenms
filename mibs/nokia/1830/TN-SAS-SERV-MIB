@@ -1,0 +1,722 @@
+TN-SAS-SERV-MIB DEFINITIONS ::= BEGIN
+
+-- (c) Copyright 2023 Nokia Networks.  All rights reserved.
+-- This software is the confidential and proprietary property of
+-- Nokia and may only be used in accordance with the terms of the
+-- license agreement provided with this software.
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Unsigned32, Integer32,
+    Counter64                                   FROM SNMPv2-SMI
+
+    TEXTUAL-CONVENTION,
+    TruthValue
+                                                FROM SNMPv2-TC
+    tnSapBaseStatsEntry, tnSapBaseInfoEntry     FROM TN-SAP-MIB
+
+    tnSvcBaseInfoEntry                          FROM TN-SERV-MIB
+
+    tnSASObjs, tnSASModules                     FROM TROPIC-GLOBAL-REG
+    ;
+
+tnSASServicesMIBModule   MODULE-IDENTITY
+    LAST-UPDATED    "202302170000Z"
+    ORGANIZATION    "Nokia"
+    CONTACT-INFO
+        "Nokia Support
+         Web: http://www.nokia.com/comps/pages/carrier_support.jhtml"
+    DESCRIPTION
+        "This  document  is the SNMP MIB module to manage and provision
+        the various services of the Nokia 7x50 SR system.
+
+        This   SNMP   MIB  module  (Specification)  embodies  Nokia's
+        proprietary  intellectual  property.  Nokia retains all title
+        and ownership in the Specification, including any revisions.
+
+        Nokia  grants  all interested parties a non-exclusive license
+        to  use and distribute an unmodified copy of this Specification
+        in  connection with management of Nokia products, and without
+        fee,  provided  this copyright notice and license appear on all
+        copies.
+
+        This  Specification  is  supplied `as is', and Nokia makes no
+        warranty,  either express or implied, as to the use, operation,
+        condition, or performance of the Specification."
+
+--
+--  Revision History
+--
+
+        REVISION        "202302170000Z"
+        DESCRIPTION     "Updated DESCRIPTION of the following:
+                         tnSapCounterLmmStatsCollectionMode."
+
+        REVISION        "202302030000Z"
+        DESCRIPTION     "Added the following to tnSapBaseInfoExtnTable:
+                         tnSapCounterLmmStatsCollectionMode."
+
+        REVISION        "202008140000Z"
+        DESCRIPTION     "Marked the following as deprecated:
+                         tnSapBaseInfoStatsCounterEnable."
+
+        REVISION        "201908300000Z"
+        DESCRIPTION     "Added the following to tnSapBaseInfoExtnTable:
+                         tnSapBaseInfoStatsCounterEnable."
+
+        REVISION        "201711100000Z"
+        DESCRIPTION     "Modified ranges of the following textual conventions:
+                         TSapIngressAggrMeterBurstSize.
+                         tnSapBaseInfoIngressAggregateMeterRate."
+
+        REVISION        "201702280000Z"
+        DESCRIPTION     "Added the following to tnSapBaseInfoExtnTable:
+                         tnSapBaseInfoMacSwapEnable."
+
+        REVISION        "201504070000Z"
+        DESCRIPTION     "Added the following to tnSvcSapType:
+                         dot1q-range
+                         qinq-inner-tag-preserve."
+
+        REVISION        "201212050000Z"
+        DESCRIPTION     "Commented out unsupported MIB tables and
+                         attributes for 1830."
+
+        REVISION        "201208220000Z"
+        DESCRIPTION     "Added the following to tnSapBaseStatsExtnTable:
+                         tnSapBaseStatsIngressDroppedPackets
+                         tnSapBaseStatsIngressDroppedOctets."
+
+        REVISION        "200907070000Z"
+        DESCRIPTION     "Rev 1.0                07 June 2009 00:00
+                This is the 1.0 release of the TIMETRA-SAS-SERV-MIB."
+
+        ::= { tnSASModules 9 }
+
+-- --------------------------------------------------------------------
+--      TIMETRA-SERV-MIB organisation
+-- --------------------------------------------------------------------
+tnSASServObjs            OBJECT IDENTIFIER ::= { tnSASObjs 8 }
+    tnSASSapObjs             OBJECT IDENTIFIER ::= { tnSASServObjs 1 }
+    tnSASSvcObjs             OBJECT IDENTIFIER ::= { tnSASServObjs 2 }
+
+-- tnSASServConformance     OBJECT IDENTIFIER ::= { tnSASConfs 5 }
+--     tnSASSapConformance      OBJECT IDENTIFIER ::= { tnSASServConformance 1 }
+
+--
+-- Conformance Information
+--
+-- tnSASSapCompliances  OBJECT IDENTIFIER ::= { tnSASSapConformance 1 }
+-- tnSASSapGroups      OBJECT IDENTIFIER  ::= { tnSASSapConformance 2 }
+
+TSapIngressAggrMeterBurstSize ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "The amount of buffer space (in Kbits) assigned to a meter.
+         The value -1 means default value"
+    SYNTAX        Integer32 (-1 | 1..2146959)
+
+
+tnSapBaseStatsExtnTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF SapBaseStatsExtnEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "A table that contains ingress QoS SAP
+                     statistics."
+    ::= { tnSASSapObjs 1 }
+
+tnSapBaseStatsExtnEntry OBJECT-TYPE
+    SYNTAX          SapBaseStatsExtnEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "."
+    AUGMENTS   { tnSapBaseStatsEntry }
+    ::= { tnSapBaseStatsExtnTable 1 }
+
+SapBaseStatsExtnEntry ::=
+    SEQUENCE {
+        tnSapBaseStatsQosClassifiersUsed        Unsigned32,
+        tnSapBaseStatsQosMetersUsed             Unsigned32,
+        tnSapBaseStatsIngressForwardedPackets   Counter64,
+        tnSapBaseStatsIngressForwardedOctets    Counter64,
+        tnSapBaseStatsEgressForwardedPackets    Counter64,
+        tnSapBaseStatsEgressForwardedOctets     Counter64,
+        tnSapBaseStatsIngressExtraTagDroppedPackets Counter64,
+        tnSapBaseStatsIngressExtraTagDroppedOctets  Counter64,
+        tnSapBaseStatsIngressDroppedPackets     Counter64,
+        tnSapBaseStatsIngressDroppedOctets      Counter64
+    }
+
+tnSapBaseStatsQosClassifiersUsed OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This value indicates the number of ingress QoS classifiers
+        used for this SAP."
+    ::= { tnSapBaseStatsExtnEntry 1 }
+
+tnSapBaseStatsQosMetersUsed OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This value indicates the number of ingress QoS meters used
+        for this SAP."
+    ::= { tnSapBaseStatsExtnEntry 2 }
+
+tnSapBaseStatsIngressForwardedPackets OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The number of sap ingress forwarded
+                     packets."
+    ::= { tnSapBaseStatsExtnEntry 3 }
+
+tnSapBaseStatsIngressForwardedOctets OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The number of sap ingress forwarded
+                     octets."
+    ::= { tnSapBaseStatsExtnEntry 4 }
+
+tnSapBaseStatsEgressForwardedPackets OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The number of sap egress forwarded
+                     packets."
+    ::= { tnSapBaseStatsExtnEntry 5 }
+
+tnSapBaseStatsEgressForwardedOctets OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The number of sap egress forwarded
+                     octets."
+    ::= { tnSapBaseStatsExtnEntry 6 }
+
+tnSapBaseStatsIngressExtraTagDroppedPackets OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The number of Ingress Extra Tag Dropped packets"
+    ::= { tnSapBaseStatsExtnEntry 7 }
+tnSapBaseStatsIngressExtraTagDroppedOctets OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The number of Ingress Extra Tag Dropped octets"
+    ::= { tnSapBaseStatsExtnEntry 8 }
+
+tnSapBaseStatsIngressDroppedPackets OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The number of Ingress Dropped packets."
+    ::= { tnSapBaseStatsExtnEntry 9 }
+
+tnSapBaseStatsIngressDroppedOctets OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The number of Ingress Dropped octets."
+    ::= { tnSapBaseStatsExtnEntry 10 }
+
+tnSapBaseInfoExtnTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF SapBaseInfoExtnEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "tnSapBaseInfoExtnTable is an extension of
+        tnSapBaseInfoTable"
+    ::= {  tnSASSapObjs 2 }
+
+tnSapBaseInfoExtnEntry OBJECT-TYPE
+    SYNTAX          SapBaseInfoExtnEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "Information about a specific SAP."
+    AUGMENTS   { tnSapBaseInfoEntry }
+    ::= { tnSapBaseInfoExtnTable 1 }
+
+SapBaseInfoExtnEntry ::=
+    SEQUENCE {
+        tnSapBaseInfoEgressStatsPktsMode        TruthValue,
+        tnSapBaseInfoIngressCounterMode         INTEGER,
+        tnSapBaseInfoIngressAggregateMeterRate  INTEGER,
+        tnSapBaseInfoIngressAggregateMeterBurst TSapIngressAggrMeterBurstSize,
+        tnSapBaseInfoIngressWithAggregateMeter  TruthValue,
+        tnSapBaseInfoIngressExtraTagDropCount   TruthValue,
+        tnSapBaseInfoEgressStatsEnable          TruthValue,
+        tnSapBaseInfoIngressStatsEnable         TruthValue,
+        tnSapBaseInfoIngressCounterType         INTEGER,
+        tnSapBaseInfoEthRingShgEnable           TruthValue,
+        tnSapBaseInfoMacSwapEnable              TruthValue,
+        tnSapBaseInfoStatsCounterEnable         TruthValue,   -- deprecated
+        tnSapCounterLmmStatsCollectionMode      INTEGER
+    }
+
+tnSapBaseInfoEgressStatsPktsMode OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "When set to 'true', egress sap stats is enabled to collect
+        in packets"
+    DEFVAL { false }
+    ::= { tnSapBaseInfoExtnEntry 1 }
+
+tnSapBaseInfoIngressCounterMode OBJECT-TYPE
+    SYNTAX INTEGER {
+                        packet             (1),
+                        octet              (2)
+                    }
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "When set to 'packet', Ingress sap stats collects in packets
+        and when set to 'ocetet',  Ingress sap stats collects in
+        octets"
+    DEFVAL { packet }
+    ::= { tnSapBaseInfoExtnEntry 2 }
+
+tnSapBaseInfoIngressAggregateMeterRate OBJECT-TYPE
+    SYNTAX Integer32 (-1..100000000)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The rate to be used in kbps. The value -1 means maximum rate.
+        tnSapBaseInfoIngressAggregateMeterRate can be set if
+        'tSapIngressMeterRateMode' is set to 'modified-trtcm'. When set
+        to zero aggregate meter is disabled on sap Ingress"
+    DEFVAL { 0 }
+    ::= { tnSapBaseInfoExtnEntry 3 }
+
+tnSapBaseInfoIngressAggregateMeterBurst OBJECT-TYPE
+    SYNTAX TSapIngressAggrMeterBurstSize
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The rate to be used in kbits. tnSapBaseInfoIngressAggregateMeterBurst
+        can be set if 'tSapIngressMeterRateMode' is set to 'modified-trtcm'"
+    DEFVAL { -1 }
+    ::= { tnSapBaseInfoExtnEntry 4 }
+
+
+tnSapBaseInfoIngressWithAggregateMeter OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "When set to 'true', ingress aggregate policer can be configured on
+        this sap. tnSapBaseInfoIngressNeedAggregateMeter can be enabled only
+        during sap creation"
+    DEFVAL { false }
+    ::= { tnSapBaseInfoExtnEntry 5 }
+
+
+tnSapBaseInfoIngressExtraTagDropCount   OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "When set to 'true', couting of extra tag dropped packet will be
+         enabled, It will be set only for required SAP's"
+    DEFVAL { false }
+    ::= { tnSapBaseInfoExtnEntry 6 }
+
+tnSapBaseInfoEgressStatsEnable OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "When set to 'true', egress sap stats is enabled"
+    DEFVAL { false }
+    ::= { tnSapBaseInfoExtnEntry 7 }
+
+tnSapBaseInfoIngressStatsEnable OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "When set to 'true', ingress sap stats is enabled"
+    DEFVAL { false }
+    ::= { tnSapBaseInfoExtnEntry 8 }
+
+
+tnSapBaseInfoIngressCounterType OBJECT-TYPE
+    SYNTAX INTEGER {
+                        in-out-profile-count (1),
+                        forward-drop-count   (2)
+                    }
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "When set to 'forward-drop-count', Ingress sap stats collects the
+        forwarded and drop count, else in/out profile"
+    DEFVAL { in-out-profile-count }
+    ::= { tnSapBaseInfoExtnEntry 9 }
+
+tnSapBaseInfoEthRingShgEnable OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "This command must only be used with the SAPs created in the
+        service for the virtual channel on the interconnection nodes in a
+        topology that uses multiple rings. This command creates a
+        split-horizon group to ensure that Sub-Ring control messages
+        from the major ring are only passed to the Sub-Ring control service."
+    DEFVAL { false }
+    ::= { tnSapBaseInfoExtnEntry 11 }
+
+tnSapBaseInfoMacSwapEnable OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Configured only on the remote node where testhead packets
+         get looped back with MACs swapped.
+         It is not configured on the Testhead node"
+    DEFVAL { false }
+    ::= { tnSapBaseInfoExtnEntry 12 }
+
+tnSapBaseInfoStatsCounterEnable OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-create
+    STATUS deprecated
+    DESCRIPTION
+        "When set to true, statistics counters are enabled on the SAP.
+         When set to false, statistics counters are disabled on the SAP"
+    DEFVAL { true }
+    ::= { tnSapBaseInfoExtnEntry 13 }
+
+tnSapCounterLmmStatsCollectionMode OBJECT-TYPE
+    SYNTAX       INTEGER{
+                     notApplicable(1),
+                     single(2),
+                     fc(3)
+                 }
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "Counter LMM stats collection mode for the SAP.
+
+         notApplicable: This only applies to legacy packet card (11qpe24, 11ope8, 11qce12x) or
+                        Falcon packet switch when its counter mode is sapsdp.
+         single:        It means only one pair of LM counters (TxFCl and RxFCl) is
+                        allocated to count frames, per SAP. This applies to Falcon packet switch
+                        when its counter mode is lm, to a Falcon packet switch with 18CE300 card
+                        and to Sidewinder packet switch.
+         fc:            It means multiple pairs of LM counters (TxFCl and RxFCl) are allocated
+                        to count frames on per FC basis, each for one FC per SAP. This only
+                        applies to Sidewinder packet switch or Falcon packet switch with 18CE300."
+    DEFVAL         { single }
+    ::= { tnSapBaseInfoExtnEntry 14 }
+
+tnSvcBaseInfoExtnTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF SvcBaseInfoExtnEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "tnSvcBaseInfoExtnTable is an extension of
+        tnSvcBaseInfoTable"
+    ::= {  tnSASSvcObjs 1 }
+
+tnSvcBaseInfoExtnEntry OBJECT-TYPE
+    SYNTAX          SvcBaseInfoExtnEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "Information about a specific service."
+    AUGMENTS   { tnSvcBaseInfoEntry }
+    ::= { tnSvcBaseInfoExtnTable 1 }
+
+SvcBaseInfoExtnEntry ::=
+    SEQUENCE {
+        tnSvcMtuCheck           TruthValue,
+        tnSvcSapType            INTEGER,
+        tnSvcUplinkType         INTEGER,
+        tnSvcCustomerVid        INTEGER,
+        tnSvcEpipeType          INTEGER
+    }
+
+tnSvcMtuCheck OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "This `no` form of this command disables the service MTU checks.
+        When the check is disabled the system will pass on packets to the
+        egress as long as the packet length is lesser than or equal to the
+        configured port MTU. In other words, the length of the packet sent
+        out of a SAP is limited by the access port MTU and the length of
+        the packet sent out of a PW is limited by the network port MTU
+        (minus the MPLS encapsulation). When set to 'false', the configured
+        tnSvcMtu value is not enforced"
+    DEFVAL { true }
+    ::= { tnSvcBaseInfoExtnEntry 1 }
+
+tnSvcSapType OBJECT-TYPE
+    SYNTAX          INTEGER {
+                        undefined (0),
+                        null-star (1),
+                        dot1q (2),
+                        dot1q-preserve (3),
+                        any (4),
+                        dot1q-range (5),
+                        qinq-inner-tag-preserve (6)
+                    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+      "The value of tnSvcSapType specifies the type of saps configured
+       in the service. If tnSvcSapType is null-star the allowed access
+       saps are null & star and Network sap is Q.*. If tnSvcSapType
+       is dot1q the allowed access saps is dot1q and Network sap are Q.*.
+       If tnSvcSapType is dot1q-preserve the allowed access saps is dot1q
+       and Network sap is QinQ. If tnSvcSapType is any the allowed access
+       saps are null, dot1q, dot1q explicit null, star and Network
+       sap is Q.*.  If tnSvcSapType is dot1q-range, the allowed saps are
+       dot1q-range saps and Q.*."
+    ::= { tnSvcBaseInfoExtnEntry 2 }
+
+tnSvcUplinkType OBJECT-TYPE
+    SYNTAX          INTEGER {
+                        undefined (0),
+                        l2 (1),
+                        mpls (2)
+                    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+      "The value of tnSvcUplinkType specifies the uplink type of the service.
+       If uplink type is L2 the network SAPs can be Q.* and QinQ. If uplink
+       type is MPLS the network SAPs can be spoke SDPs."
+    ::= { tnSvcBaseInfoExtnEntry 3 }
+
+tnSvcCustomerVid OBJECT-TYPE
+    SYNTAX          Integer32  (1..4094)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+      "The value of tnSvcCustomerVid specifies the encap value when tnSvcSapType is
+       dot1q-preserve. The sapEncapValue of Dot1q SAPs in the service should
+       match this tnSvcCustomerVid. The qtag2 of sapEncapValue of QinQ SAPs
+       in the service should match this tnSvcCustomerVid."
+    ::= { tnSvcBaseInfoExtnEntry 4 }
+
+tnSvcEpipeType OBJECT-TYPE
+    SYNTAX          INTEGER {
+                        none  (1),
+                        pbbepipe (2)
+                    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+      "The value of this particular object indicates that a 'pbb-epipe'
+       service is to be created"
+    DEFVAL     { none }
+    ::= { tnSvcBaseInfoExtnEntry 5 }
+
+--
+-- Dummy Scalars
+--
+tnSASSvcScalar1 OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A dummy scalar that satisfies a SNMP get request quickly when
+         there is no 11QPE24 card provisioned.  Otherwise, it has to
+         traverse the remaining 11QPE24 MIB to get to the next applicable
+         item."
+    ::= {  tnSASSvcObjs 101 }
+
+tnSASSvcScalar2 OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A dummy scalar that satisfies a SNMP get request quickly when
+         there is no 11QPE24 card provisioned.  Otherwise, it has to
+         traverse the remaining 11QPE24 MIB to get to the next applicable
+         item."
+    ::= {  tnSASSvcObjs 102 }
+
+-- tnSapEgrQosQueueStatsExtnTable OBJECT-TYPE
+--     SYNTAX          SEQUENCE OF SapEgrQosQueueStatsExtnEntry
+--     MAX-ACCESS      not-accessible
+--     STATUS          current
+--     DESCRIPTION     "A table that contains egress QoS queue SAP
+--                      statistics. This table extends the capabilities
+--                      of tnSapEgrQosQueueStatsTable"
+--     ::= { tnSASSapObjs 3 }
+--
+-- tnSapEgrQosQueueStatsExtnEntry OBJECT-TYPE
+--     SYNTAX          SapEgrQosQueueStatsExtnEntry
+--     MAX-ACCESS      not-accessible
+--     STATUS          current
+--     DESCRIPTION     "Egress statistics about a specific SAP's
+--                      QoS queue."
+--     AUGMENTS           { tnSapEgrQosQueueStatsEntry }
+--     ::= { tnSapEgrQosQueueStatsExtnTable 1 }
+--
+--  SapEgrQosQueueStatsExtnEntry ::=
+--     SEQUENCE {
+--         tnSapEgrQosQueueStatsFwdPkts         Counter64,
+--         tnSapEgrQosQueueStatsFwdOcts         Counter64,
+--         tnSapEgrQosQueueStatsInprofDroPkts   Counter64,
+--         tnSapEgrQosQueueStatsInprofDroOcts   Counter64,
+--         tnSapEgrQosQueueStatsOutprofDroPkts  Counter64,
+--         tnSapEgrQosQueueStatsOutprofDroOcts  Counter64
+--     }
+--
+-- tnSapEgrQosQueueStatsFwdPkts OBJECT-TYPE
+--     SYNTAX          Counter64
+--     MAX-ACCESS      read-only
+--     STATUS          current
+--     DESCRIPTION     "The number of forwarded packets
+--                      on this egress Queue."
+--     ::= { tnSapEgrQosQueueStatsExtnEntry 1 }
+--
+-- tnSapEgrQosQueueStatsFwdOcts OBJECT-TYPE
+--     SYNTAX          Counter64
+--     MAX-ACCESS      read-only
+--     STATUS          current
+--     DESCRIPTION     "The number of forwarded bytes
+--                      on this egress Queue."
+--     ::= { tnSapEgrQosQueueStatsExtnEntry 2 }
+--
+-- tnSapEgrQosQueueStatsInprofDroPkts OBJECT-TYPE
+--     SYNTAX          Counter64
+--     MAX-ACCESS      read-only
+--     STATUS          current
+--     DESCRIPTION     "The number of dropped packets
+--                      for this in profile egress Queue."
+--     ::= { tnSapEgrQosQueueStatsExtnEntry 3 }
+--
+-- tnSapEgrQosQueueStatsInprofDroOcts OBJECT-TYPE
+--     SYNTAX          Counter64
+--     MAX-ACCESS      read-only
+--     STATUS          current
+--     DESCRIPTION     "The number of dropped bytes
+--                      for this in profile egress Queue."
+--     ::= { tnSapEgrQosQueueStatsExtnEntry 4 }
+--
+-- tnSapEgrQosQueueStatsOutprofDroPkts OBJECT-TYPE
+--     SYNTAX          Counter64
+--     MAX-ACCESS      read-only
+--     STATUS          current
+--     DESCRIPTION     "The number of dropped packets
+--                      for this out profile egress Queue."
+--     ::= { tnSapEgrQosQueueStatsExtnEntry 5 }
+--
+-- tnSapEgrQosQueueStatsOutprofDroOcts OBJECT-TYPE
+--     SYNTAX          Counter64
+--     MAX-ACCESS      read-only
+--     STATUS          current
+--     DESCRIPTION     "The number of dropped bytes
+--                      for this out profile egress Queue."
+--     ::= { tnSapEgrQosQueueStatsExtnEntry 6 }
+
+-- tmnxSapGlobalV1v0Group OBJECT-GROUP
+--    OBJECTS {
+--        tnSapBaseStatsQosClassifiersUsed,
+--        tnSapBaseStatsQosMetersUsed,
+--        tnSapBaseInfoEgressStatsPktsMode,
+--        tnSapBaseInfoIngressCounterMode,
+--        tnSapBaseInfoIngressAggregateMeterRate,
+--        tnSapBaseInfoIngressAggregateMeterBurst,
+--        tnSapBaseInfoIngressWithAggregateMeter,
+--        tnSapBaseInfoIngressExtraTagDropCount,
+--        tnSvcMtuCheck,
+--        tnSvcSapType,
+--        tnSvcUplinkType,
+--        tnSvcCustomerVid,
+--        tnSapBaseStatsIngressForwardedPackets,
+--        tnSapBaseStatsIngressForwardedOctets,
+--        tnSapBaseStatsEgressForwardedPackets,
+--        tnSapBaseStatsEgressForwardedOctets,
+--        tnSapBaseStatsIngressExtraTagDroppedPackets,
+--        tnSapBaseStatsIngressExtraTagDroppedOctets,
+--        tnSapBaseStatsIngressDroppedPackets,
+--        tnSapBaseStatsIngressDroppedOctets
+--    }
+--    STATUS      current
+--    DESCRIPTION
+--        "The group of objects supporting management of Services SAP general
+--         capabilities on Nokia 7210 series systems."
+--    ::= { tnSASSapGroups 28 }
+--
+-- tmnxSasSapQosV2v0Group OBJECT-GROUP
+--    OBJECTS {
+--        tnSapEgrQosQueueStatsFwdPkts,
+--        tnSapEgrQosQueueStatsFwdOcts,
+--        tnSapEgrQosQueueStatsInprofDroPkts,
+--        tnSapEgrQosQueueStatsInprofDroOcts,
+--        tnSapEgrQosQueueStatsOutprofDroPkts,
+--        tnSapEgrQosQueueStatsOutprofDroOcts
+--    }
+--    STATUS current
+--    DESCRIPTION
+--        "The group of objects supporting the management of Qos capabilities
+--         on Nokia 7210 series systems."
+--    ::= { tnSASSapGroups 29 }
+
+-- tmnxSapGlobalV3v0Group OBJECT-GROUP
+--    OBJECTS {
+--        tnSapBaseStatsQosClassifiersUsed,
+--        tnSapBaseStatsQosMetersUsed,
+--        tnSapBaseInfoEgressStatsPktsMode,
+--        tnSapBaseInfoEgressStatsEnable,
+--        tnSapBaseInfoIngressStatsEnable,
+--        tnSapBaseInfoIngressCounterMode,
+--        tnSapBaseInfoIngressAggregateMeterRate,
+--        tnSapBaseInfoIngressAggregateMeterBurst,
+--        tnSapBaseInfoIngressWithAggregateMeter,
+--        tnSapBaseInfoIngressExtraTagDropCount,
+--        tnSvcMtuCheck,
+--        tnSvcEpipeType,
+--        tnSvcSapType,
+--        tnSvcUplinkType,
+--        tnSvcCustomerVid,
+--        tnSapBaseStatsIngressForwardedPackets,
+--        tnSapBaseStatsIngressForwardedOctets,
+--        tnSapBaseStatsEgressForwardedPackets,
+--        tnSapBaseStatsEgressForwardedOctets,
+--        tnSapBaseStatsIngressExtraTagDroppedPackets,
+--        tnSapBaseStatsIngressExtraTagDroppedOctets
+--    }
+--    STATUS      current
+--    DESCRIPTION
+--        "The group of objects supporting management of Services SAP general
+--         capabilities on Nokia 7210 series systems."
+--    ::= { tnSASSapGroups 30 }
+
+--tmnxSapGlobalV4v0Group OBJECT-GROUP
+--    OBJECTS {
+--        sapBaseInfoIngressCounterType,
+--        sapBaseInfoEthRingShgEnable
+--    }
+--    STATUS      current
+--    DESCRIPTION
+--        "The group of objects supporting management of Services SAP general
+--         capabilities on Nokia 7210 series systems."
+--    ::= { tmnxSASSapGroups 31 }
+
+-- tmnxSap72100V1v0Compliance MODULE-COMPLIANCE
+--    STATUS  current
+--    DESCRIPTION
+--        "The compliance statement for management of services SAPs
+--         on Nokia 7210 SAS series systems."
+--    MODULE  this module
+--        MANDATORY-GROUPS
+--        {
+--            tmnxSapGlobalV1v0Group,
+--            tmnxSasSapQosV2v0Group
+--        }
+--    ::= { tnSASSapCompliances 1 }
+
+END

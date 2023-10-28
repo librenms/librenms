@@ -1,0 +1,135 @@
+TN-SAS-IEEE8021-PAE-MIB DEFINITIONS ::= BEGIN
+
+-- (c) Copyright 2023 Nokia Networks.  All rights reserved.
+-- This software is the confidential and proprietary property of
+-- Nokia and may only be used in accordance with the terms of the
+-- license agreement provided with this software.
+
+IMPORTS
+    MODULE-IDENTITY,OBJECT-TYPE                FROM SNMPv2-SMI
+
+    MODULE-COMPLIANCE, OBJECT-GROUP            FROM SNMPv2-CONF
+
+    TruthValue                                 FROM SNMPv2-TC
+
+    tnSASObjs, tnSASModules                    FROM TROPIC-GLOBAL-REG
+
+    dot1xAuthConfigEntry                       FROM IEEE8021-PAE-MIB
+    ;
+
+tnSASIEEE8021PaeMIBModule MODULE-IDENTITY
+    LAST-UPDATED    "201501090000Z"
+    ORGANIZATION    "Nokia"
+    CONTACT-INFO
+        "Nokia SROS Support
+         Web: http://support.nokia.com "
+    DESCRIPTION
+        "This  document  is  the  SNMP MIB module to manage and
+         provision  the 7x50 extensions to the IEEE8021-PAE-MIB
+         (Port Access Entity nodule for managing IEEE 802.X) feature for
+         the Nokia 7210 device.
+
+         This SNMP MIB module (Specification) embodies Nokia's
+         proprietary intellectual property. Nokia retains
+         all title and ownership in the Specification, including any
+         revisions.
+
+         Nokia grants all interested parties a non-exclusive
+         license to use and distribute an unmodified copy of this
+         Specification in connection with management of Nokia
+         products, and without fee, provided this copyright notice and
+         license appear on all copies.
+
+         This Specification is supplied 'as is', and Nokia
+         makes no warranty, either express or implied, as to the use,
+         operation, condition, or performance of the Specification."
+
+   REVISION     "201501090000Z"
+   DESCRIPTION  "Rev 1.0                09 Jan 2015 00:00
+                 1.0 release of the NOKIA-SAS-IEEE8021-PAE-MIB."
+
+   ::= { tnSASModules 17 }
+
+-- ----------------------------------------------------------------------------
+--
+--  Nokia 7210 series IEEE 802.1X PAE feature
+--  MIB structure
+--
+-- ----------------------------------------------------------------------------
+tnSASDot1xMIBObjs                                OBJECT IDENTIFIER ::= { tnSASObjs 16 }
+tnSASDot1xAuthenticatorObjs                      OBJECT IDENTIFIER ::= { tnSASDot1xMIBObjs 1 }
+tnDot1xSASCompliancs                             OBJECT IDENTIFIER ::= { tnSASDot1xMIBObjs 2 }
+tnDot1xSASGroups                                 OBJECT IDENTIFIER ::= { tnSASDot1xMIBObjs 3 }
+
+tnDot1xAuthConfigExtnTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF TnDot1xAuthConfigExtnEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The  table tnDot1xAuthConfigExtnTable allows configuration of
+         RADIUS authentication parameters for the 802.1X PAE
+         feature on port level."
+    ::= { tnSASDot1xAuthenticatorObjs 1 }
+
+tnDot1xAuthConfigExtnEntry OBJECT-TYPE
+    SYNTAX          TnDot1xAuthConfigExtnEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "tnDot1xAuthConfigExtnEntry is an entry (conceptual row) in the
+         tnDot1xAuthConfigExtnTable. Each entry represents the configuration
+         for Radius Authentication on a port. Entries have a presumed
+         StorageType of nonVolatile."
+    AUGMENTS { dot1xAuthConfigEntry }
+    ::= { tnDot1xAuthConfigExtnTable 1 }
+
+TnDot1xAuthConfigExtnEntry ::= SEQUENCE {
+     tnDot1xPortEtherTunnel   TruthValue
+}
+
+tnDot1xPortEtherTunnel OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tnPortEtherDot1xTunnel specifies whether the DOT1X
+         packet tunneling for the ethernet port is enabled or disabled.
+         When tunneling is enabled, the port will not process any DOT1X
+         packets but will tunnel them through instead."
+    DEFVAL { false }
+    ::= { tnDot1xAuthConfigExtnEntry 1 }
+
+ tnDot1xAuthConfigExtnGroup  OBJECT-GROUP
+    OBJECTS {
+          tnDot1xPortEtherTunnel
+        }
+    STATUS      current
+    DESCRIPTION
+        "The  group  of  objects supporting management of Radius
+         authentication   for  the  IEEE801.1X  PAE  feature  on
+         Nokia 7210 SR series systems."
+    ::= { tnDot1xSASGroups 1 }
+
+-- ----------------------------------------------------------------------------
+--
+--  Conformance information
+--
+-- ----------------------------------------------------------------------------
+-- --------------------------------------------------------
+--
+--  Dot1x related Compliance statements
+--
+-- --------------------------------------------------------
+ tnDot1xAuthConfigExtnCompliance  MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "The  compliance statement for management of Radius
+             authentication  for  the  IEEE801.1X PAE feature on
+             Nokia 7210 SR series systems."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+            tnDot1xAuthConfigExtnGroup
+        }
+    ::= { tnDot1xSASCompliancs 1 }
+
+END

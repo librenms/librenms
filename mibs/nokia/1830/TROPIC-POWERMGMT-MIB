@@ -1,0 +1,3684 @@
+TROPIC-POWERMGMT-MIB DEFINITIONS ::= BEGIN
+
+-- (c) Copyright 2023 Nokia Networks.  All rights reserved.
+-- This software is the confidential and proprietary property of
+-- Nokia and may only be used in accordance with the terms of the
+-- license agreement provided with this software.
+
+IMPORTS
+      SnmpAdminString                         FROM SNMP-FRAMEWORK-MIB
+      OBJECT-TYPE,
+      MODULE-IDENTITY,
+      Unsigned32, Integer32                   FROM SNMPv2-SMI
+      MODULE-COMPLIANCE,
+      OBJECT-GROUP                            FROM SNMPv2-CONF
+      TEXTUAL-CONVENTION,
+      TruthValue, RowStatus                   FROM SNMPv2-TC
+      InterfaceIndex, ifIndex,
+      InterfaceIndexOrZero                    FROM IF-MIB
+      TnCommand,
+      AluWdmOtuBitRate,
+      AluWdmOtuEncoding                       FROM TROPIC-TC
+      tnShelfIndex                            FROM TROPIC-SHELF-MIB
+      tnSlotIndex                             FROM TROPIC-SLOT-MIB
+      tnDirection,
+      tnChannel                               FROM TROPIC-WAVEKEY-MIB
+      tnSystemModules, tnPowerMgmtMIB         FROM TROPIC-GLOBAL-REG;
+
+  tnPowerMgmtMibModule MODULE-IDENTITY
+      LAST-UPDATED    "202302241200Z"
+      ORGANIZATION    "Nokia"
+      CONTACT-INFO    "Nokia
+                       Attn: Jeff Donnelly
+                       600 Mountain Avenue
+                       New Providence, NJ 07974
+
+                       Phone: +1 732 221 6408
+                       Email: jeff.donnelly@nokia.com"
+
+      DESCRIPTION "The power management MIB."
+
+      REVISION    "202302241200Z"
+      DESCRIPTION "Added the following table:
+                   tnPowerMgmtPsdTargetTable."
+
+      REVISION    "202301271200Z"
+      DESCRIPTION "1) Added the following to tnPowerMgmtPortTable:
+                      tnPowerMgmtPortPsdModeEnabled.
+                   2) Added the following table:
+                      tnPowerMgmtPsdTable."
+
+      REVISION    "202012111200Z"
+      DESCRIPTION "1) Added the following to tnPowerMgmtPortTable:
+                      tnPowerMgmtPortIsCommissionedMethod.
+                   2) Added the following to tnPowerMgmtTechnologyTypesTable:
+                      tnPowerMgmtTechnologyTypesMinXCWidthValue."
+
+      REVISION    "202006121200Z"
+      DESCRIPTION "1) Added the following to tnPowerMgmtEgressTable:
+                      tnPowerMgmtEgressSmoothing
+                      tnPowerMgmtEgressSmoothingMaxStepSize.
+                   2) Added the following to tnPowerMgmtEgressPortTable:
+                      tnPowerMgmtEgressPortSmoothing
+                      tnPowerMgmtEgressPortSmoothingMaxStepSize."
+
+      REVISION    "202005151200Z"
+      DESCRIPTION "Added the following table:
+                   tnPowerMgmtCapabilitiesPortTable."
+
+      REVISION    "202003271200Z"
+      DESCRIPTION "Added the following to tnPowerMgmtIngressPortTable:
+                   tnPowerMgmtIngressPortSRSTiltCalcOffset
+                   tnPowerMgmtIngressPortSRSTiltCalcOffsetL."
+
+      REVISION    "202003201200Z"
+      DESCRIPTION "1) Added the following to tnPowerMgmtIngressPortTable:
+                      tnPowerMgmtIngressPortGainSetOffset
+                      tnPowerMgmtIngressPortGainSetOffsetL
+                      tnPowerMgmtIngressPortAdjustPowerGainTargetGain
+                      tnPowerMgmtIngressPortAdjustPowerGainTargetGainL
+                      tnPowerMgmtIngressPortCommissionedGain
+                      tnPowerMgmtIngressPortCommissionedGainL.
+                   2) Added the following to tnPowerMgmtEgressPortTable:
+                      tnPowerMgmtEgressPortLHLaunchAtten
+                      tnPowerMgmtEgressPortExternalOTAddLaunchAtten.
+                   3) Added the following tables:
+                      tnPowerMgmtIngressPortPerChannelTable
+                      tnPowerMgmtEgressPortPerChannelTable."
+
+      REVISION    "202003061200Z"
+      DESCRIPTION "1) Changed SYNTAX of the following from Integer32 (-300..300)
+                      to Integer32 (-600..600):
+                      tnPowerMgmtOffsetInPowerOffset.
+                   2) Changed SYNTAX of the following from Integer32 (-300..300)
+                      to Integer32 (-600..600):
+                      tnPowerMgmtOffsetOutPowerOffset."
+
+      REVISION    "202002141200Z"
+      DESCRIPTION "Added the following tables:
+                   tnPowerMgmtIngressPortTable
+                   tnPowerMgmtEgressPortTable."
+
+      REVISION    "201905171200Z"
+      DESCRIPTION "Added the following to tnPowerMgmtIngressTable:
+                   tnPowerMgmtIngressSRSTiltCalcOffsetL."
+
+      REVISION    "201811091200Z"
+      DESCRIPTION "Added the following to tnPowerMgmtEgressTable:
+                   tnPowerMgmtEgressExternalOTAddLaunchAtten."
+
+      REVISION    "201809141200Z"
+      DESCRIPTION "1) Added the following textual convention:
+                      TropicPowerMgmtCapabilitiesCard.
+                   2) Added the following table:
+                      tnPowerMgmtCapabilitiesCardTable."
+
+      REVISION    "201806221200Z"
+      DESCRIPTION "Added the following to tnPowerMgmtTechnologyTypesTable:
+                   tnPowerMgmtTechnologyTypesWtocmfCalib375
+                   tnPowerMgmtTechnologyTypesWtocmfLCalib375."
+
+      REVISION    "201802231200Z"
+      DESCRIPTION "Updated the contact info."
+
+      REVISION    "201709291200Z"
+      DESCRIPTION "Added the following to tnPowerMgmtIngressTable:
+                   tnPowerMgmtIngressCommissionedGainL."
+
+      REVISION    "201703171200Z"
+      DESCRIPTION "Changed SYNTAX of the following from Unsigned32 to Integer32:
+                   tnPowerMgmtPortFiberSpanTilt
+                   tnPowerMgmtPortFiberSpanTiltL
+                   tnPowerMgmtFiberSpanTiltPreComp
+                   tnPowerMgmtFiberSpanTiltPreCompL."
+
+      REVISION    "201703101200Z"
+      DESCRIPTION "Added the following to tnPowerMgmtEgressTable:
+                   tnPowerMgmtEgressSRSCF
+                   tnPowerMgmtEgressSRSCFL."
+
+      REVISION    "201702241200Z"
+      DESCRIPTION " Added the following to tnPowerMgmtIngressTable:
+                    tnPowerMgmtIngressAdjustPowerGainTargetGainL."
+
+      REVISION    "201702101200Z"
+      DESCRIPTION "Changed SYNTAX of the following from InterfaceIndex to
+                   InterfaceIndexOrZero:
+                   tnPowerMgmtEgressAmpIfIndex
+                   tnPowerMgmtEgressWssIfIndex."
+
+      REVISION    "201701271200Z"
+      DESCRIPTION "Added the following to tnPowerMgmtPortTable:
+                   tnPowerMgmtPortWTDecoderUsageTypeInL
+                   tnPowerMgmtPortWTDecoderUsageTypeOutL."
+
+      REVISION    "201612281200Z"
+      DESCRIPTION "Added the following to tnPowerMgmtTechnologyTypesTable:
+                   tnPowerMgmtTechnologyTypesWtocmfLCalib."
+
+      REVISION    "201612191200Z"
+      DESCRIPTION "Added the following to tnPowerMgmtIngressTable:
+                   tnPowerMgmtIngressGainSetOffsetL."
+
+      REVISION    "201611161200Z"
+      DESCRIPTION "Updated the contact info."
+
+      REVISION    "201611111200Z"
+      DESCRIPTION "1) Added the following to tnPowerMgmtPortTable:
+                      tnPowerMgmtPortFiberSpanTiltL.
+                   2) Added the following to tnPowerMgmtEgressTable:
+                      tnPowerMgmtFiberSpanTiltPreCompL
+                      tnPowerMgmtEgressSRSTiltCalcMultiplierL
+                      tnPowerMgmtEgressSRSTiltPreFractionL
+                      tnPowerMgmtEgressSRSTiltCalcACoeffL.
+                   3) Added the following to tnPowerMgmtIngressTable:
+                      tnPowerMgmtIngressSRSTiltPostFractionL."
+
+      REVISION    "201609161200Z"
+      DESCRIPTION "Added the following to AluWdmWTDecoderUsageType:
+                   maint(7)."
+
+      REVISION    "201511041200Z"
+      DESCRIPTION "Marked tnPowerMgmtEgressAdjustPowerWithOptimizationTargetGain as deprecated."
+
+      REVISION    "201411191200Z"
+      DESCRIPTION "1) Added the following to tnPowerMgmtIngressTable:
+                      tnPowerMgmtIngressInternodalOaPpcMaxInCurrent
+                      tnPowerMgmtIngressInternodalOaPpcMaxInReference
+                      tnPowerMgmtIngressInternodalCalculatedSpanLossInCurrent
+                      tnPowerMgmtIngressInternodalCalculatedSpanLossInReference.
+                   2) Added the following to tnPowerMgmtEgressTable:
+                      tnPowerMgmtEgressInternodalPpcMaxInDownstream
+                      tnPowerMgmtEgressInternodalSpanLossInDownstream
+                      tnPowerMgmtEgressInternodalPpcMaxInDownstreamReference
+                      tnPowerMgmtEgressInternodalSpanLossInDownstreamReference
+                   3) Added the following to tnPowerMgmtPortTable:
+                      tnPowerMgmtPortMaxChannels
+                      tnPowerMgmtPortEgressAdjustForDownstreamEnabled.
+                   4) Added the following table:
+                      tnPowerMgmtIroadmTable."
+
+      REVISION    "201411071200Z"
+      DESCRIPTION "Marked tnPowerMgmtPerChannelStatusTable as obsolete."
+
+      REVISION    "201409101200Z"
+      DESCRIPTION "Added the following to tnPowerMgmtPortTable:
+                   tnPowerMgmtPortDegreeFunction."
+
+      REVISION    "201312061200Z"
+      DESCRIPTION "Added the following to tnPowerMgmtTechnologyTypesTable:
+                   tnPowerMgmtTechnologyTypesWtocmfCalib."
+
+      REVISION    "201311251200Z"
+      DESCRIPTION "Updated range of tnPowerMgmtEgressSRSTiltCalcOutputLoss
+                   from (0..1000) to (0.1700)."
+
+      REVISION    "201305201200Z"
+      DESCRIPTION "Marked the following as obsolete:
+                   tnPowerMgmtEgressSRSTiltCalcOffset
+                   tnPowerMgmtEvents."
+
+      REVISION    "201301101200Z"
+      DESCRIPTION "Updated DESCRIPTION of the following:
+                   tnPowerMgmtIngressCommissioned
+                   tnPowerMgmtEgressCommissioned
+                   tnPowerMgmtPortIsCommissioned."
+
+      REVISION    "201211051200Z"
+      DESCRIPTION "Added the following to tnPowerMgmtTechnologyTypesTable:
+                   tnPowerMgmtTechnologyTypesWtocmaCalib."
+
+      REVISION    "201209011200Z"
+      DESCRIPTION "Added the following to tnPowerMgmtTechnologyTypesTable:
+                   tnPowerMgmtTechnologyTypesOsnrCalib."
+
+      REVISION    "201206131200Z"
+      DESCRIPTION "1) Marked the following as deprecated:
+                      tnPowerMgmtEgressSRSTiltCalcOffset.
+                   2) Added the following to tnPowerMgmtIngressTable:
+                      tnPowerMgmtIngressSRSTiltCalcOffset."
+
+      REVISION    "201205181200Z"
+      DESCRIPTION "Marked the following as obsolete:
+                   tnPowerMgmtGlobalNEIsCommissioned
+                   tnPowerMgmtEgressFiberTilt
+                   tnPoweMgmtFiberSpanTiltPreComp."
+
+      REVISION    "201201041200Z"
+      DESCRIPTION "Changed range of tnPowerMgmtEgressSRSTiltCalcOffset
+                   from (0, 5000) to (-500, 500)."
+
+      REVISION    "201112141200Z"
+      DESCRIPTION "1) Marked the following as deprecated:
+                      tnPoweMgmtFiberSpanTiltPreComp.
+                   2) Added the following to tnPowerMgmtEgressTable:
+                      tnPowerMgmtFiberSpanTiltPreComp."
+
+      REVISION    "201111261200Z"
+      DESCRIPTION "Added the following to tnPowerMgmtPortTable:
+                   tnPowerMgmtPortSRSTiltMaintenanceMode."
+
+      REVISION    "201111211200Z"
+      DESCRIPTION "Added UNITS of '100ths' to the following:
+                   tnPowerMgmtEgressSRSTiltCalcMultiplier
+                   tnPowerMgmtEgressSRSTiltPreFraction
+                   tnPowerMgmtIngressSRSTiltPostFraction."
+
+      REVISION    "201111051200Z"
+      DESCRIPTION "Changed the maximum value of the following:
+                   tnPowerMgmtPortGainAdjSchedBase - 863999
+                   tnPowerMgmtPortGainAdjTimerPeriod - 863999."
+
+      REVISION    "201108121200Z"
+      DESCRIPTION "Added the following to tnPowerMgmtAnyAddTable:
+                   tnPowerMgmtAnyAddAdjustPowerGainAbort."
+
+      REVISION    "201108031200Z"
+      DESCRIPTION "1) Added the following to tnPowerMgmtEgressTable:
+                      tnPoweMgmtFiberSpanTiltPreComp.
+                   2) Added the following to tnPowerMgmtPortTable:
+                      tnPowerMgmtPortFiberSpanTilt."
+
+      REVISION    "201107291200Z"
+      DESCRIPTION "Added the following Any Direction MIB tables:
+                   tnPowerMgmtAnyAddTable
+                   tnPowerMgmtAnyDropTable."
+
+      REVISION    "201107221200Z"
+      DESCRIPTION "1) Renamed TropicWTDecoderUsageType to
+                      AluWdmWTDecoderUsageType.
+                   2) Renamed TropicPowerMgmtSRSTiltAdjStatus to
+                      AluWdmPowerMgmtSRSTiltAdjStatus.
+                   3) Added the following to AluWdmWTDecoderUsageType:
+                      wtocmAd(6)."
+
+      REVISION    "201105231200Z"
+      DESCRIPTION "1) Changed configurable range from (-300 to 300) to
+                      (-9900, -300 to 300) for the following:
+                      tnPowerMgmtIngressPerChannelUserTargetOffset
+                      tnPowerMgmtEgressPerChannelUserTargetOffset.
+                   2) Changed range from (-2300 to 1100) to
+                      (-9900, -2300 to 1100) for the following:
+                      tnPowerMgmtEgressPerChannelTargetAbsolute."
+
+      REVISION    "201104031200Z"
+      DESCRIPTION "Added the following new tables:
+                   tnPowerMgmtPowerOffsetInTable
+                   tnPowerMgmtPowerOffsetOutTable
+                   tnPowerMgmtIngressPerChannelTable
+                   tnPowerMgmtEgressPerChannelTable
+                   tnPowerMgmtTechnologyTypesTable."
+
+      REVISION    "201011101200Z"
+      DESCRIPTION "Added the following to TropicWTDecoderUsageType:
+                   wtdInferred(5)."
+
+      REVISION    "201006231200Z"
+      DESCRIPTION "1) Marked the following as obsolete:
+                      tnWTDecoderUsageTypeIn
+                      tnWTDecoderUsageTypeOut.
+                   2) Added the following to tnPowerMgmtPortTable:
+                      tnPowerMgmtPortWTDecoderUsageTypeIn
+                      tnPowerMgmtPortWTDecoderUsageTypeOut."
+
+      REVISION    "201006161200Z"
+      DESCRIPTION "1) Added the following to tnPowerMgmtIngressTable:
+                      tnPowerMgmtIngressGainSetOffset
+                      tnPowerMgmtIngressCommissionedGain
+                      tnPowerMgmtIngressSRSTiltPostFraction
+                      tnPowerMgmtIngressSRSTiltAdjResult
+                      tnPowerMgmtIngressSRSTiltAdjStatus
+                      tnPowerMgmtIngressPassed.
+                   2) Added the following to tnPowerMgmtEgressTable:
+                      tnPowerMgmtEgressSRSTiltCalcMultiplier
+                      tnPowerMgmtEgressSRSTiltPreFraction
+                      tnPowerMgmtEgressSRSTiltCalcACoeff
+                      tnPowerMgmtEgressSRSTiltCalcOutputLoss
+                      tnPowerMgmtEgressSRSTiltCalcOffset
+                      tnPowerMgmtEgressSRSTiltAdjResult
+                      tnPowerMgmtEgressSRSTiltAdjStatus
+                      tnPowerMgmtEgressPassed
+                      tnPowerMgmtEgressLHLaunchAtten.
+                   3) Added the following to tnPowerMgmtPortTable:
+                      tnPowerMgmtPortGainAdjSchedBase
+                      tnPowerMgmtPortGainAdjTimerPeriod
+                      tnPowerMgmtPortGainAdjTimerLength
+                      tnPowerMgmtPortInGainAdjAutoEnabled
+                      tnPowerMgmtPortSRSTiltAdjAutoEnabled."
+
+      REVISION    "201005101200Z"
+      DESCRIPTION "1) Added TropicWTDecoderUsageType.
+                   2) Added the following to tnPowerMgmtPortTable:
+                      tnWTDecoderUsageTypeIn
+                      tnWTDecoderUsageTypeOut."
+
+      REVISION    "200810161200Z"
+      DESCRIPTION "Marked tnPowerMgmtEgressFiberTilt as deprecated."
+
+      REVISION    "200802161200Z"
+      DESCRIPTION "1) Updated the MIB description.
+                   2) Indicated via comments which MIB attributes will
+                      be obsoleted."
+
+      ::= { tnSystemModules 7 }
+
+  tnPowerMgmtConf        OBJECT IDENTIFIER ::= { tnPowerMgmtMIB 1 }
+  tnPowerMgmtGroups      OBJECT IDENTIFIER ::= { tnPowerMgmtConf 1 }
+  tnPowerMgmtCompliances OBJECT IDENTIFIER ::= { tnPowerMgmtConf 2 }
+  tnPowerMgmtObjs        OBJECT IDENTIFIER ::= { tnPowerMgmtMIB 2 }
+  tnPowerMgmtBasics      OBJECT IDENTIFIER ::= { tnPowerMgmtObjs 1 }
+--  obsolete
+--  tnPowerMgmtEvents      OBJECT IDENTIFIER ::= { tnPowerMgmtMIB 3 }
+
+--------------------------------------------------------------------------------
+-- Type Definitions
+--------------------------------------------------------------------------------
+    TropicPowerMgmtStatus ::= TEXTUAL-CONVENTION
+        STATUS         current
+        DESCRIPTION    "The status of the executed power management operation."
+        SYNTAX         INTEGER {
+                         completed(1),
+                         inProgress(2)
+                       }
+
+    TropicPowerMgmtResult ::= TEXTUAL-CONVENTION
+        STATUS         current
+        DESCRIPTION    "The result of the executed power management operation."
+        SYNTAX         SnmpAdminString (SIZE(0..255))
+
+    TropicPowerMgmtPercentCompleted ::= TEXTUAL-CONVENTION
+        STATUS         current
+        DESCRIPTION    "The percent complete of the executed power management
+                        operation."
+        SYNTAX         Unsigned32
+
+    TropicPowerMgmtType ::= TEXTUAL-CONVENTION
+        STATUS         current
+        DESCRIPTION    "The type of power management."
+        SYNTAX         INTEGER {
+                         auto(1),
+                         manual(2)
+                       }
+
+    AluWdmWTDecoderUsageType ::= TEXTUAL-CONVENTION
+        STATUS         current
+        DESCRIPTION    "Specify where and how power per channel measurements and
+                        channel alarms are managed."
+        SYNTAX         INTEGER {
+                         wtdPpcOnAlmOn(1),
+                         wtdPpcOffAlmOff(2),
+                         wtdPpcOnAlmOff(3),
+                         wtocm(4),
+                         wtdInferred(5),
+                         wtocmAd(6),
+                         maint(7)
+                       }
+
+    AluWdmPowerMgmtSRSTiltAdjStatus ::= TEXTUAL-CONVENTION
+        STATUS         current
+        DESCRIPTION    "The status of the tilt adjustment."
+        SYNTAX         INTEGER {
+                         completed(1),
+                         inProgress(2),
+                         notInProgress(3)
+                       }
+
+    TropicPowerMgmtCapabilitiesCard ::= TEXTUAL-CONVENTION
+        STATUS         current
+        DESCRIPTION    "Multiple amplifier degrees."
+        SYNTAX         INTEGER {
+                         none (1),
+                           -- The card does not support egress power management
+                           -- parameters.
+                         runadjustgetstatusresul (2),
+                           -- The card supports running egress power adjustment
+                           -- and getting status and result only.
+                         configandrunadjustgetstatusresult (3),
+                           -- The card supports running egress power adjustment
+                           --  and getting status and result.
+                         getstatusresult (4)
+                           -- The card supports getting egress power adjustment
+                           -- status and result only.
+                       }
+
+--------------------------------------------------------------------------------
+-- PowerMgmt - Node Level Scalars
+--------------------------------------------------------------------------------
+    tnPowerMgmtGlobal OBJECT IDENTIFIER ::= { tnPowerMgmtBasics 1 }
+
+--    obsolete
+--    tnPowerMgmtGlobalUpdateInterval OBJECT-TYPE ::= { tnPowerMgmtGlobal 1 }
+
+    tnPowerMgmtGlobalMinStepSize OBJECT-TYPE
+        SYNTAX         Unsigned32
+        UNITS          "mB"
+        MAX-ACCESS     read-write
+        STATUS         current
+        DESCRIPTION    "If the change in power for a given wavelength
+                        calculated over one auto power adjustment
+                        control loop pass is less than the value of
+                        this attribute, no change in power will
+                        be executed.
+
+                        Sets are not supported."
+        ::= { tnPowerMgmtGlobal 2 }
+
+    tnPowerMgmtGlobalMaxStepSize OBJECT-TYPE
+        SYNTAX         Unsigned32
+        UNITS          "mB"
+        MAX-ACCESS     read-write
+        STATUS         current
+        DESCRIPTION    "The maximum change in power per wavelength
+                        permitted over one auto power adjustment
+                        control loop pass.
+
+                        Sets are not supported."
+        ::= { tnPowerMgmtGlobal 3 }
+
+    tnPowerMgmtGlobalResetToDefaults OBJECT-TYPE
+        SYNTAX         TnCommand
+        MAX-ACCESS     read-write
+        STATUS         current
+        DESCRIPTION    "When read, the value of this attribute is always
+                        noCmd.
+
+                        Sets are not supported."
+        ::= { tnPowerMgmtGlobal 4 }
+
+    tnPowerMgmtGlobalAutoEnabled OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-write
+        STATUS         current
+        DESCRIPTION    "Indicates if the automatic functioning of power
+                        management is enabled.
+
+                        Sets are not supported."
+        ::= { tnPowerMgmtGlobal 5 }
+
+    tnPowerMgmtGlobalNumberOfAutoPowerAdjPoints OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The current number of auto power adjustment
+                        points."
+        ::= { tnPowerMgmtGlobal 6 }
+
+    tnPowerMgmtGlobalAlarmWhenDisabled OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-write
+        STATUS         current
+        DESCRIPTION    "Indicates if the automatic power management
+                        disabled alarm will be raised when auto power
+                        management is disabled.
+
+                        Sets are not supported."
+        ::= { tnPowerMgmtGlobal 7 }
+
+--    obsolete
+--    tnPowerMgmtGlobalNEIsCommissioned OBJECT-TYPE ::= { tnPowerMgmtGlobal 8 }
+
+--------------------------------------------------------------------------------
+-- Power Management Control Table
+--------------------------------------------------------------------------------
+    tnPowerMgmtControlTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnPowerMgmtControlEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "This table provides access to auto power
+                        adjustment operation execution and status."
+        ::= { tnPowerMgmtBasics 2 }
+
+    tnPowerMgmtControlEntry OBJECT-TYPE
+        SYNTAX         TnPowerMgmtControlEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { ifIndex,
+                tnPowerMgmtDirection }
+        ::= { tnPowerMgmtControlTable 1 }
+
+    TnPowerMgmtControlEntry ::=
+        SEQUENCE {
+            tnPowerMgmtDirection                        INTEGER,
+--            obsolete
+--            tnPowerMgmtControlWavelengthsToAutoPowerAdj Unsigned32,
+            tnPowerMgmtControlPercentCompleted          TropicPowerMgmtPercentCompleted,
+--            obsolete
+--            tnPowerMgmtControlWavelengthsAutoPowerAdj   Unsigned32,
+            tnPowerMgmtControlRowStatus                 RowStatus
+--            obsolete
+--            tnPowerMgmtControlWorstCasePower            Integer32
+        }
+
+    tnPowerMgmtDirection OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         tx(1),
+                         rx(2)
+                       }
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The signal direction."
+        ::= { tnPowerMgmtControlEntry 1 }
+
+--    obsolete
+--    tnPowerMgmtControlWavelengthsToAutoPowerAdj OBJECT-TYPE ::= { tnPowerMgmtControlEntry 2 }
+
+    tnPowerMgmtControlPercentCompleted OBJECT-TYPE
+        SYNTAX         TropicPowerMgmtPercentCompleted
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The percent completion of this auto power
+                        adjustment operation.  Only applies when
+                        tnPowerMgmtControlStatus is inProgress.  It
+                        should be 0 at all other times."
+        ::= { tnPowerMgmtControlEntry 3 }
+
+--    obsolete
+--    tnPowerMgmtControlWavelengthsAutoPowerAdj OBJECT-TYPE ::= { tnPowerMgmtControlEntry 4 }
+
+    tnPowerMgmtControlRowStatus OBJECT-TYPE
+        SYNTAX         RowStatus
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The following is a breakdown of each of the
+                        supported values:
+
+                        active
+                          - (r) auto power adjustment operating
+                                at this point.
+                        notInService
+                          - (r) auto power adjustment not
+                                operating at this point."
+        ::= { tnPowerMgmtControlEntry 5 }
+
+--    obsolete
+--    tnPowerMgmtControlWorstCasePower OBJECT-TYPE ::= { tnPowerMgmtControlEntry 6 }
+
+--------------------------------------------------------------------------------
+-- Obsoleted OIDs
+--------------------------------------------------------------------------------
+--    tnPowerMgmtStatusTable OBJECT-TYPE ::= { tnPowerMgmtBasics 3 }
+
+--------------------------------------------------------------------------------
+-- Power Management Ingress Table
+--------------------------------------------------------------------------------
+    tnPowerMgmtIngressTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnPowerMgmtIngressEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The attributes in this table must not be set
+                        together with the same index in the same set
+                        request PDU."
+        ::= { tnPowerMgmtBasics 4 }
+
+    tnPowerMgmtIngressEntry OBJECT-TYPE
+        SYNTAX         TnPowerMgmtIngressEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { tnShelfIndex,
+                tnSlotIndex }
+        ::= { tnPowerMgmtIngressTable 1 }
+
+    TnPowerMgmtIngressEntry ::=
+        SEQUENCE {
+            tnPowerMgmtIngressAdjustPowerGain                         INTEGER,
+            tnPowerMgmtIngressAdjustPowerGainLastResult               TropicPowerMgmtResult,
+            tnPowerMgmtIngressAcceptPowers                            INTEGER,
+            tnPowerMgmtIngressAcceptPowersLastResult                  TropicPowerMgmtResult,
+            tnPowerMgmtIngressRippleAllowance                         Integer32,
+            tnPowerMgmtIngressAdjustPowerGainTargetGain               Unsigned32,
+            tnPowerMgmtIngressAdjustPowerGainStatus                   TropicPowerMgmtStatus,
+            tnPowerMgmtIngressStartAseAdjust                          TnCommand,
+            tnPowerMgmtIngressAseAdjustLastResult                     TropicPowerMgmtResult,
+            tnPowerMgmtIngressAseAdjustStatus                         TropicPowerMgmtStatus,
+            tnPowerMgmtIngressCommissioned                            TruthValue,
+            tnPowerMgmtIngressGainSetOffset                           Integer32,
+            tnPowerMgmtIngressCommissionedGain                        Integer32,
+            tnPowerMgmtIngressSRSTiltPostFraction                     Integer32,
+            tnPowerMgmtIngressSRSTiltAdjResult                        TropicPowerMgmtResult,
+            tnPowerMgmtIngressSRSTiltAdjStatus                        AluWdmPowerMgmtSRSTiltAdjStatus,
+            tnPowerMgmtIngressPassed                                  TruthValue,
+            tnPowerMgmtIngressSRSTiltCalcOffset                       Integer32,
+            tnPowerMgmtIngressInternodalOaPpcMaxInCurrent             Integer32,
+            tnPowerMgmtIngressInternodalOaPpcMaxInReference           Integer32,
+            tnPowerMgmtIngressInternodalCalculatedSpanLossInCurrent   Integer32,
+            tnPowerMgmtIngressInternodalCalculatedSpanLossInReference Integer32,
+            tnPowerMgmtIngressSRSTiltPostFractionL                    Integer32,
+            tnPowerMgmtIngressGainSetOffsetL                          Integer32,
+            tnPowerMgmtIngressAdjustPowerGainTargetGainL              Unsigned32,
+            tnPowerMgmtIngressCommissionedGainL                       Integer32,
+            tnPowerMgmtIngressSRSTiltCalcOffsetL                      Integer32
+        }
+
+    tnPowerMgmtIngressAdjustPowerGain OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         noCmd(1),
+                         execute(2),
+                         executeWithForce(3)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Value executeWithForce is no longer supported."
+        ::= { tnPowerMgmtIngressEntry 1 }
+
+    tnPowerMgmtIngressAdjustPowerGainLastResult OBJECT-TYPE
+        SYNTAX         TropicPowerMgmtResult
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The result of the last executed power gain
+                        adjustment operation."
+        ::= { tnPowerMgmtIngressEntry 2 }
+
+    tnPowerMgmtIngressAcceptPowers OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         noCmd(1),
+                         execute(2),
+                         executeWithClear(3)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Value executeWithClear is no longer supported.
+                        Sets with this value will be failed back to the
+                        network operator."
+        ::= { tnPowerMgmtIngressEntry 3 }
+
+    tnPowerMgmtIngressAcceptPowersLastResult OBJECT-TYPE
+        SYNTAX         TropicPowerMgmtResult
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The result of the last executed power acceptance
+                        operation."
+        ::= { tnPowerMgmtIngressEntry 4 }
+
+    tnPowerMgmtIngressRippleAllowance OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mB"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The ripple allowance."
+        ::= { tnPowerMgmtIngressEntry 5 }
+
+    tnPowerMgmtIngressAdjustPowerGainTargetGain OBJECT-TYPE
+        SYNTAX         Unsigned32
+        UNITS          "mB"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnPowerMgmtIngressEntry 6 }
+
+    tnPowerMgmtIngressAdjustPowerGainStatus OBJECT-TYPE
+        SYNTAX         TropicPowerMgmtStatus
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "This attribute indicates the status of the
+                        executed power gain adjustment operation."
+        ::= { tnPowerMgmtIngressEntry 7 }
+
+    tnPowerMgmtIngressStartAseAdjust OBJECT-TYPE
+        SYNTAX         TnCommand
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Start Amplified Spontaneous Emissions adjustment.
+                        Get requests always return a value of noCmd."
+        ::= { tnPowerMgmtIngressEntry 8 }
+
+    tnPowerMgmtIngressAseAdjustLastResult OBJECT-TYPE
+        SYNTAX         TropicPowerMgmtResult
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The result of the last executed ASE adjustment."
+        ::= { tnPowerMgmtIngressEntry 9 }
+
+    tnPowerMgmtIngressAseAdjustStatus OBJECT-TYPE
+        SYNTAX         TropicPowerMgmtStatus
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "This attribute indicates the status of the
+                        executed ASE adjustment operation."
+        ::= { tnPowerMgmtIngressEntry 10 }
+
+    tnPowerMgmtIngressCommissioned OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "This attribute indicates if the ingress adjustment
+                        point has done a successful adjustment following
+                        being in an un-commissioned state.
+                          true  - Adjusted successfully.
+                          false - NE event has caused the previous adjustment
+                                  to be invalidated."
+        DEFVAL         { false }
+        ::= { tnPowerMgmtIngressEntry 11 }
+
+    tnPowerMgmtIngressGainSetOffset OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mB"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Value added to result of gain adjustment
+                        calculation.
+
+                        Current configurable range: -300 to 300."
+        DEFVAL         { 0 }
+        ::= { tnPowerMgmtIngressEntry 12 }
+
+    tnPowerMgmtIngressCommissionedGain OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mB"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Gain value set while commissioning flag is false.
+
+                        Current range:
+
+                        AHPHG:   0 to 3300
+                        ALPHG:   0 to 3000
+                        AHPLG:   0 to 2400
+                        ALPFGK:  0 to 2300
+                        ALPFGT:  0 to 2300
+                        A2325A:  0 to 3200
+                        AM2325B: 0 to 3200
+                        AM2017B: 0 to 2400"
+        DEFVAL         { 0 }
+        ::= { tnPowerMgmtIngressEntry 13 }
+
+    tnPowerMgmtIngressSRSTiltPostFraction OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "100ths"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Used to modify the fraction of upstream span SRS
+                        tilt post compensated.
+
+                        Current configurable range: 0 to 300."
+        DEFVAL         { 0 }
+        ::= { tnPowerMgmtIngressEntry 14 }
+
+    tnPowerMgmtIngressSRSTiltAdjResult OBJECT-TYPE
+        SYNTAX         TropicPowerMgmtResult
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Result string describing outcome of the tilt
+                        adjustment."
+        DEFVAL         { "Not applicable" }
+        ::= { tnPowerMgmtIngressEntry 15 }
+
+    tnPowerMgmtIngressSRSTiltAdjStatus OBJECT-TYPE
+        SYNTAX         AluWdmPowerMgmtSRSTiltAdjStatus
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Status of the tilt adjustment."
+        DEFVAL         { notInProgress }
+        ::= { tnPowerMgmtIngressEntry 16 }
+
+    tnPowerMgmtIngressPassed OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Indicates the optimization adjustment failed or
+                        passed."
+        DEFVAL         { true }
+        ::= { tnPowerMgmtIngressEntry 17 }
+
+    tnPowerMgmtIngressSRSTiltCalcOffset OBJECT-TYPE
+        SYNTAX         Integer32 (-500..500)
+        UNITS          "mB"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Indicates if the LD setting has been offset to
+                        compensate downstream TiltMismatch.
+
+                        Range: -500 to 500."
+        DEFVAL         { 0 }
+        ::= { tnPowerMgmtIngressEntry 18 }
+
+    tnPowerMgmtIngressInternodalOaPpcMaxInCurrent OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mBm"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Current range:
+
+                        -9900, -2000 to 0."
+        DEFVAL         { -9900 }
+        ::= { tnPowerMgmtIngressEntry 19 }
+
+    tnPowerMgmtIngressInternodalOaPpcMaxInReference OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mBm"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Current range:
+
+                        -9900, -2000 to 0."
+        DEFVAL         { -9900 }
+        ::= { tnPowerMgmtIngressEntry 20 }
+
+    tnPowerMgmtIngressInternodalCalculatedSpanLossInCurrent OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mB"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Current range:
+
+                        -9900, 0 to 4000."
+        DEFVAL         { -9900  }
+        ::= { tnPowerMgmtIngressEntry 21 }
+
+    tnPowerMgmtIngressInternodalCalculatedSpanLossInReference OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mB"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Current range:
+
+                        -9900, 0 to 4000."
+        DEFVAL         { -9900  }
+        ::= { tnPowerMgmtIngressEntry 22 }
+
+    tnPowerMgmtIngressSRSTiltPostFractionL OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "100ths"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Used to modify the fraction of upstream span SRS
+                        tilt post compensated for L Band.
+
+                        Current configurable range: 0 to 300."
+        DEFVAL         { 0 }
+        ::= { tnPowerMgmtIngressEntry 23 }
+
+    tnPowerMgmtIngressGainSetOffsetL OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mB"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Value added to result of gain adjustment
+                        calculation.
+
+                        Current configurable range: -300 to 300."
+        DEFVAL         { 0 }
+        ::= { tnPowerMgmtIngressEntry 24 }
+
+    tnPowerMgmtIngressAdjustPowerGainTargetGainL OBJECT-TYPE
+        SYNTAX         Unsigned32
+        UNITS          "mB"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnPowerMgmtIngressEntry 25 }
+
+    tnPowerMgmtIngressCommissionedGainL OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mB"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The EDFA gain value set when the line was adjusted
+                        while the degree commissioning flag was false."
+        ::= { tnPowerMgmtIngressEntry 26 }
+
+    tnPowerMgmtIngressSRSTiltCalcOffsetL OBJECT-TYPE
+        SYNTAX         Integer32 (-500..500)
+        UNITS          "mB"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Indicates if the LD setting has been offset to
+                        compensate downstream TiltMismatch.
+
+                        Range: -500 to 500."
+        DEFVAL         { 0 }
+        ::= { tnPowerMgmtIngressEntry 27 }
+
+--------------------------------------------------------------------------------
+-- Power Management Egress Table
+--------------------------------------------------------------------------------
+    tnPowerMgmtEgressTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnPowerMgmtEgressEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The attributes in this table must not be set
+                        together with the same index in the same set
+                        request PDU."
+        ::= { tnPowerMgmtBasics 5 }
+
+    tnPowerMgmtEgressEntry OBJECT-TYPE
+        SYNTAX         TnPowerMgmtEgressEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { tnShelfIndex,
+                tnSlotIndex }
+        ::= { tnPowerMgmtEgressTable 1 }
+
+    TnPowerMgmtEgressEntry ::=
+        SEQUENCE {
+            tnPowerMgmtEgressAdjustPowerWithOptimization              TnCommand,
+            tnPowerMgmtEgressAdjustPowerWithOptimizationStatus        TropicPowerMgmtStatus,
+            tnPowerMgmtEgressAdjustPowerWithOptimizationAbort         TnCommand,
+            tnPowerMgmtEgressAcceptPowers                             TnCommand,
+--            obsolete
+--            tnPowerMgmtEgressReset                                    INTEGER,
+            tnPowerMgmtEgressAdjustPowerWithOptimizationLastResult    TropicPowerMgmtResult,
+            tnPowerMgmtEgressAcceptPowersLastResult                   TropicPowerMgmtResult,
+--            obsolete
+--            tnPowerMgmtEgressFiberTilt                                Integer32,
+            tnPowerMgmtEgressAdjustPowerWithOptimizationTargetGain    Unsigned32,   -- deprecated
+            tnPowerMgmtEgressStartAseAdjust                           TnCommand,
+            tnPowerMgmtEgressStopAseAdjust                            TnCommand,
+            tnPowerMgmtEgressAseAdjustLastResult                      TropicPowerMgmtResult,
+            tnPowerMgmtEgressAseAdjustStatus                          TropicPowerMgmtStatus,
+            tnPowerMgmtEgressCommissioned                             TruthValue,
+            tnPowerMgmtEgressAmpIfIndex                               InterfaceIndexOrZero,
+            tnPowerMgmtEgressWssIfIndex                               InterfaceIndexOrZero,
+            tnPowerMgmtEgressSRSTiltCalcMultiplier                    Integer32,
+            tnPowerMgmtEgressSRSTiltPreFraction                       Integer32,
+            tnPowerMgmtEgressSRSTiltCalcACoeff                        Integer32,
+            tnPowerMgmtEgressSRSTiltCalcOutputLoss                    Integer32,
+--            obsolete
+--            tnPowerMgmtEgressSRSTiltCalcOffset                        Integer32,
+            tnPowerMgmtEgressSRSTiltAdjResult                         TropicPowerMgmtResult,
+            tnPowerMgmtEgressSRSTiltAdjStatus                         AluWdmPowerMgmtSRSTiltAdjStatus,
+            tnPowerMgmtEgressPassed                                   TruthValue,
+            tnPowerMgmtEgressLHLaunchAtten                            Integer32,
+--            obsolete
+--            tnPoweMgmtFiberSpanTiltPreComp                            Unsigned32,
+            tnPowerMgmtFiberSpanTiltPreComp                           Integer32,
+            tnPowerMgmtEgressInternodalPpcMaxInDownstream             Integer32,
+            tnPowerMgmtEgressInternodalSpanLossInDownstream           Integer32,
+            tnPowerMgmtEgressInternodalPpcMaxInDownstreamReference    Integer32,
+            tnPowerMgmtEgressInternodalSpanLossInDownstreamReference  Integer32,
+            tnPowerMgmtFiberSpanTiltPreCompL                          Integer32,
+            tnPowerMgmtEgressSRSTiltCalcMultiplierL                   Integer32,
+            tnPowerMgmtEgressSRSTiltPreFractionL                      Integer32,
+            tnPowerMgmtEgressSRSTiltCalcACoeffL                       Integer32,
+            tnPowerMgmtEgressSRSCF                                    Integer32,
+            tnPowerMgmtEgressSRSCFL                                   Integer32,
+            tnPowerMgmtEgressExternalOTAddLaunchAtten                 Unsigned32,
+            tnPowerMgmtEgressSmoothing                                TruthValue,
+            tnPowerMgmtEgressSmoothingMaxStepSize                     Unsigned32
+        }
+
+    tnPowerMgmtEgressAdjustPowerWithOptimization OBJECT-TYPE
+        SYNTAX         TnCommand
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnPowerMgmtEgressEntry 1 }
+
+    tnPowerMgmtEgressAdjustPowerWithOptimizationStatus OBJECT-TYPE
+        SYNTAX         TropicPowerMgmtStatus
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "This attribute indicates the status of the executed
+                        power with optimization adjustment operation."
+        ::= { tnPowerMgmtEgressEntry 2 }
+
+    tnPowerMgmtEgressAdjustPowerWithOptimizationAbort OBJECT-TYPE
+        SYNTAX         TnCommand
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "This attribute allows the network operator to submit
+                        an abort on the currently executing power with
+                        optimization adjustment operation.  When read back,
+                        the value of this attribute is noCmd."
+        ::= { tnPowerMgmtEgressEntry 3 }
+
+    tnPowerMgmtEgressAcceptPowers OBJECT-TYPE
+        SYNTAX         TnCommand
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnPowerMgmtEgressEntry 4 }
+
+--    obsolete
+--    tnPowerMgmtEgressReset OBJECT-TYPE ::= { tnPowerMgmtEgressEntry 5 }
+
+    tnPowerMgmtEgressAdjustPowerWithOptimizationLastResult OBJECT-TYPE
+        SYNTAX         TropicPowerMgmtResult
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The result of the last executed power adjustment
+                        with optimization operation."
+        ::= { tnPowerMgmtEgressEntry 6 }
+
+    tnPowerMgmtEgressAcceptPowersLastResult OBJECT-TYPE
+        SYNTAX         TropicPowerMgmtResult
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The result of the last executed power acceptance
+                        operation."
+        ::= { tnPowerMgmtEgressEntry 7 }
+
+--    obsolete
+--    tnPowerMgmtEgressFiberTilt OBJECT-TYPE ::= { tnPowerMgmtEgressEntry 8 }
+
+    tnPowerMgmtEgressAdjustPowerWithOptimizationTargetGain OBJECT-TYPE
+        SYNTAX         Unsigned32
+        UNITS          "mB"
+        MAX-ACCESS     read-only
+        STATUS         deprecated
+        DESCRIPTION    "."
+        ::= { tnPowerMgmtEgressEntry 9 }
+
+    tnPowerMgmtEgressStartAseAdjust OBJECT-TYPE
+        SYNTAX         TnCommand
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Start Amplified Spontaneous Emissions adjustment.
+                        Get requests always return a value of noCmd."
+        ::= { tnPowerMgmtEgressEntry 10 }
+
+    tnPowerMgmtEgressStopAseAdjust OBJECT-TYPE
+        SYNTAX         TnCommand
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Stop Amplified Spontaneous Emissions adjustment.
+                        Get requests always return a value of noCmd."
+        ::= { tnPowerMgmtEgressEntry 11 }
+
+    tnPowerMgmtEgressAseAdjustLastResult OBJECT-TYPE
+        SYNTAX         TropicPowerMgmtResult
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The result of the last executed ASE adjustment."
+        ::= { tnPowerMgmtEgressEntry 12 }
+
+    tnPowerMgmtEgressAseAdjustStatus OBJECT-TYPE
+        SYNTAX         TropicPowerMgmtStatus
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "This attribute indicates the status of the executed
+                        ASE adjustment operation."
+        ::= { tnPowerMgmtEgressEntry 13 }
+
+    tnPowerMgmtEgressCommissioned OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "This attribute indicates if the egress adjustment
+                        point has done a successful adjustment following
+                        being in an un-commissioned state.
+                          true  - Adjusted successfully.
+                          false - NE event has caused the previous adjustment
+                                  to be invalidated."
+        DEFVAL         { false }
+        ::= { tnPowerMgmtEgressEntry 14 }
+
+    tnPowerMgmtEgressAmpIfIndex OBJECT-TYPE
+        SYNTAX         InterfaceIndexOrZero
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnPowerMgmtEgressEntry 15 }
+
+    tnPowerMgmtEgressWssIfIndex OBJECT-TYPE
+        SYNTAX         InterfaceIndexOrZero
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnPowerMgmtEgressEntry 16 }
+
+    tnPowerMgmtEgressSRSTiltCalcMultiplier OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "100ths"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "This is used to modify the calculated SRS tilt of the
+                        span.
+
+                        Current configurable range: 0 to 300."
+        DEFVAL         { 100 }
+        ::= { tnPowerMgmtEgressEntry 17 }
+
+    tnPowerMgmtEgressSRSTiltPreFraction OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "100ths"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "This is used to modify the fraction of following span
+                        SRS tilt pre compensated.
+
+                        Current configurable range: 0 to 300."
+        DEFVAL         { 0 }
+        ::= { tnPowerMgmtEgressEntry 18 }
+
+    tnPowerMgmtEgressSRSTiltCalcACoeff OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Modeling coefficient for the SRSTilt = A*Pout(mW) equation.
+
+                        Current configurable range: 0 to 10000."
+        DEFVAL         { 0 }
+        ::= { tnPowerMgmtEgressEntry 19 }
+
+    tnPowerMgmtEgressSRSTiltCalcOutputLoss OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mB"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Configurable loss from the egress Line Out to the fiber
+                        span input.
+
+                        Current configurable range: 0 to 1700."
+        DEFVAL         { 0 }
+        ::= { tnPowerMgmtEgressEntry 20 }
+
+--    obsolete
+--    tnPowerMgmtEgressSRSTiltCalcOffset OBJECT-TYPE ::= { tnPowerMgmtEgressEntry 21 }
+
+    tnPowerMgmtEgressSRSTiltAdjResult OBJECT-TYPE
+        SYNTAX         TropicPowerMgmtResult
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Result string describing outcome of the tilt adjustment."
+        DEFVAL         { "Not applicable" }
+        ::= { tnPowerMgmtEgressEntry 22 }
+
+    tnPowerMgmtEgressSRSTiltAdjStatus OBJECT-TYPE
+        SYNTAX         AluWdmPowerMgmtSRSTiltAdjStatus
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Status of the tilt adjustment."
+        DEFVAL         { notInProgress }
+        ::= { tnPowerMgmtEgressEntry 23 }
+
+    tnPowerMgmtEgressPassed OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Indicates the optimization adjust failed or passed."
+        DEFVAL         { true }
+        ::= { tnPowerMgmtEgressEntry 24 }
+
+    tnPowerMgmtEgressLHLaunchAtten OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mB"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Added to the nominal attenuation lookup by WSS
+                        containing pack.  Only applies to connectivity block
+                        in directionless architecture.
+
+                        Current configurable range: 0 to 1000."
+        DEFVAL         { 0 }
+        ::= { tnPowerMgmtEgressEntry 25 }
+
+--    obsolete
+--    tnPoweMgmtFiberSpanTiltPreComp OBJECT-TYPE ::= { tnPowerMgmtEgressEntry 26 }
+
+    tnPowerMgmtFiberSpanTiltPreComp OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mB"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Amount of fiber span tilt to pre compensate.  May not
+                        equal to tnPowerMgmtPortFiberSpanTilt.
+
+                        Current configurable range: -300 to 300."
+        DEFVAL         { 0 }
+        ::= { tnPowerMgmtEgressEntry 27 }
+
+    tnPowerMgmtEgressInternodalPpcMaxInDownstream OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mBm"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Current range:
+
+                        -9900, -2000 to 0."
+        DEFVAL         {-9900  }
+        ::= { tnPowerMgmtEgressEntry 28 }
+
+    tnPowerMgmtEgressInternodalSpanLossInDownstream OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mB"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Current range:
+
+                        -9900, 0 to 4000."
+        DEFVAL         {-9900  }
+        ::= { tnPowerMgmtEgressEntry 29 }
+
+    tnPowerMgmtEgressInternodalPpcMaxInDownstreamReference OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mBm"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Current range:
+
+                        -9900, -2000 to 0."
+        DEFVAL         {-9900  }
+        ::= { tnPowerMgmtEgressEntry 30 }
+
+    tnPowerMgmtEgressInternodalSpanLossInDownstreamReference OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mB"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Current range:
+
+                        -9900, 0 to 4000."
+        DEFVAL         {-9900  }
+        ::= { tnPowerMgmtEgressEntry 31 }
+
+    tnPowerMgmtFiberSpanTiltPreCompL OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mB"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Amount of fiber span tilt to pre compensate.  May not
+                        equal to tnPowerMgmtPortFiberSpanTiltL for L Band.
+
+                        Current configurable range: -300 to 300."
+        DEFVAL         { 0 }
+        ::= { tnPowerMgmtEgressEntry 32 }
+
+    tnPowerMgmtEgressSRSTiltCalcMultiplierL OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "100ths"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "This is used to modify the calculated SRS tilt of the
+                        span for L Band.
+
+                        Current configurable range: 0 to 300."
+        DEFVAL         { 100 }
+        ::= { tnPowerMgmtEgressEntry 33 }
+
+    tnPowerMgmtEgressSRSTiltPreFractionL OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "100ths"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "This is used to modify the fraction of following span
+                        SRS tilt pre compensated for L Band.
+
+                        Current configurable range: 0 to 300."
+        DEFVAL         { 0 }
+        ::= { tnPowerMgmtEgressEntry 34 }
+
+    tnPowerMgmtEgressSRSTiltCalcACoeffL OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Modeling coefficient for the SRSTilt = A*Pout(mW)
+                        equation for L Band.
+
+                        Current configurable range: 0 to 10000."
+        DEFVAL         { 0 }
+        ::= { tnPowerMgmtEgressEntry 35 }
+
+    tnPowerMgmtEgressSRSCF OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "This parameter should be applied immediately when changed.
+                        Applicable only to C+L systems.
+                        Corrects for SRS contribution between the C and L bands.
+
+                        Current configurable range: 0 to 100."
+        DEFVAL         { 100 }
+        ::= { tnPowerMgmtEgressEntry 36 }
+
+    tnPowerMgmtEgressSRSCFL OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "This parameter should be applied immediately when changed.
+                        Applicable only to C+L systems.
+                        Corrects for SRS contribution between the C and L bands.
+
+                        Current configurable range: 0 to 100."
+        DEFVAL         { 100 }
+        ::= { tnPowerMgmtEgressEntry 37 }
+
+    tnPowerMgmtEgressExternalOTAddLaunchAtten OBJECT-TYPE
+        SYNTAX         Unsigned32 (0..1500)
+        UNITS          "mB"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Set the service launch attenuation offset for channels
+                        from external transponders added to the degree."
+        ::= { tnPowerMgmtEgressEntry 38 }
+
+    tnPowerMgmtEgressSmoothing OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Enable or disable power adjustment smoothing."
+        ::= { tnPowerMgmtEgressEntry 39 }
+
+    tnPowerMgmtEgressSmoothingMaxStepSize OBJECT-TYPE
+        SYNTAX         Unsigned32 (0..500)
+        UNITS          "mB"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Set maximum step size for power adjustment smoothing."
+        DEFVAL         { 50 }
+        ::= { tnPowerMgmtEgressEntry 40 }
+
+--------------------------------------------------------------------------------
+-- Obsoleted OIDs
+--------------------------------------------------------------------------------
+--    tnPowerMgmtPerChannelPowerTable OBJECT-TYPE ::= { tnPowerMgmtBasics 6 }
+
+--------------------------------------------------------------------------------
+-- Power Management Port Table
+--------------------------------------------------------------------------------
+    tnPowerMgmtPortTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnPowerMgmtPortEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnPowerMgmtBasics 7 }
+
+    tnPowerMgmtPortEntry OBJECT-TYPE
+        SYNTAX         TnPowerMgmtPortEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { ifIndex }
+        ::= { tnPowerMgmtPortTable 1 }
+
+    TnPowerMgmtPortEntry ::=
+        SEQUENCE {
+            tnPowerMgmtPortIsCommissioned                    TruthValue,
+            tnPowerMgmtPortTypeIn                            TropicPowerMgmtType,
+            tnPowerMgmtPortTypeOut                           TropicPowerMgmtType,
+--          obsolete
+--            tnWTDecoderUsageTypeIn                           AluWdmWTDecoderUsageType,
+--            tnWTDecoderUsageTypeOut                          AluWdmWTDecoderUsageType,
+            tnPowerMgmtPortWTDecoderUsageTypeIn              AluWdmWTDecoderUsageType,
+            tnPowerMgmtPortWTDecoderUsageTypeOut             AluWdmWTDecoderUsageType,
+            tnPowerMgmtPortGainAdjSchedBase                  Integer32,
+            tnPowerMgmtPortGainAdjTimerPeriod                Integer32,
+            tnPowerMgmtPortGainAdjTimerLength                Integer32,
+            tnPowerMgmtPortInGainAdjAutoEnabled              TruthValue,
+            tnPowerMgmtPortSRSTiltAdjAutoEnabled             TruthValue,
+            tnPowerMgmtPortFiberSpanTilt                     Integer32,
+            tnPowerMgmtPortSRSTiltMaintenanceMode            TruthValue,
+            tnPowerMgmtPortDegreeFunction                    INTEGER,
+            tnPowerMgmtPortMaxChannels                       Unsigned32,
+            tnPowerMgmtPortEgressAdjustForDownstreamEnabled  TruthValue,
+            tnPowerMgmtPortFiberSpanTiltL                    Integer32,
+            tnPowerMgmtPortWTDecoderUsageTypeInL             AluWdmWTDecoderUsageType,
+            tnPowerMgmtPortWTDecoderUsageTypeOutL            AluWdmWTDecoderUsageType,
+            tnPowerMgmtPortIsCommissionedMethod              INTEGER,
+            tnPowerMgmtPortPsdModeEnabled                    TruthValue
+        }
+
+    tnPowerMgmtPortIsCommissioned OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Each external LD port whose power management
+                        mode setting is Automatic has a Power Management
+                        Commissioned Flag. When commissioning is completed
+                        these flags are set to complete (true) by users."
+        DEFVAL         { false }
+        ::= { tnPowerMgmtPortEntry 1 }
+
+    tnPowerMgmtPortTypeIn OBJECT-TYPE
+        SYNTAX         TropicPowerMgmtType
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The type of power management ingress."
+        ::= { tnPowerMgmtPortEntry 2 }
+
+    tnPowerMgmtPortTypeOut OBJECT-TYPE
+        SYNTAX         TropicPowerMgmtType
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The type of power management egress."
+        ::= { tnPowerMgmtPortEntry 3 }
+
+--    obsolete
+--    tnWTDecoderUsageTypeIn OBJECT-TYPE ::= { tnPowerMgmtPortEntry 4 }
+--    tnWTDecoderUsageTypeOut OBJECT-TYPE ::= { tnPowerMgmtPortEntry 5 }
+
+    tnPowerMgmtPortWTDecoderUsageTypeIn OBJECT-TYPE
+        SYNTAX         AluWdmWTDecoderUsageType
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The type of WTD used ingress."
+        DEFVAL         { wtdPpcOffAlmOff }
+        ::= { tnPowerMgmtPortEntry 6 }
+
+    tnPowerMgmtPortWTDecoderUsageTypeOut OBJECT-TYPE
+        SYNTAX         AluWdmWTDecoderUsageType
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The type of WTD used egress."
+        DEFVAL         { wtdPpcOffAlmOff }
+        ::= { tnPowerMgmtPortEntry 7 }
+
+    tnPowerMgmtPortGainAdjSchedBase OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "This is used to enter the base period past the
+                        hour for scheduled ingress adjustments.  The
+                        unit is in 100s of ms.  Value of -1 means not
+                        configured.
+
+                        Current configurable range: -1 to 863999."
+        DEFVAL         { -1 }
+        ::= { tnPowerMgmtPortEntry 8 }
+
+    tnPowerMgmtPortGainAdjTimerPeriod OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "This is used to enter the timer length between
+                        enablements for the OMS section.  The unit is in
+                        100s of ms.  Value of -1 means not configured.
+
+                        Current configurable range: -1 to 863999."
+        DEFVAL         { -1 }
+        ::= { tnPowerMgmtPortEntry 9 }
+
+    tnPowerMgmtPortGainAdjTimerLength OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "This is used to enter the length of enablement
+                        time for the OMS section.  The unit is in 100s
+                        of ms.  Value of -1 means not configured.
+
+                        Current configurable range: -1 to 35999."
+        DEFVAL         { -1 }
+        ::= { tnPowerMgmtPortEntry 10 }
+
+    tnPowerMgmtPortInGainAdjAutoEnabled OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "This is used to configure line behaviour:
+                        false - no auto adjusts,
+                        true  - will enable adjustments, or do auto
+                                adjustments."
+        DEFVAL         { false }
+        ::= { tnPowerMgmtPortEntry 11 }
+
+    tnPowerMgmtPortSRSTiltAdjAutoEnabled OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "If this value is true and line is OADM, controls
+                        updates of the channel set information used for
+                        SRS Adjustment.  Value automatically updates at
+                        lines that pull the channel information from
+                        upstream."
+        DEFVAL         { false }
+        ::= { tnPowerMgmtPortEntry 12 }
+
+    tnPowerMgmtPortFiberSpanTilt OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mB"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Linear fit of attenuation vs FREQ across defined
+                        channel min, max for tnPowerMgmtFiberSpanTiltPreComp.
+
+                        Current configurable range: -300 to 300."
+        DEFVAL         { 0 }
+        ::= { tnPowerMgmtPortEntry 13 }
+
+    tnPowerMgmtPortSRSTiltMaintenanceMode OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "A line parameter that sets SCOT into a maintenance
+                        mode where the auto adjustment triggers are not
+                        sent, and the receiving lines do not respond to
+                        auto triggers."
+        DEFVAL         { false }
+        ::= { tnPowerMgmtPortEntry 14 }
+
+    tnPowerMgmtPortDegreeFunction OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         notDefined(1),
+                         ila(2),
+                         dge(3),
+                         oadm(4)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Used to store the function of the degree.  Not
+                        used by power management system."
+        DEFVAL         { notDefined }
+        ::= { tnPowerMgmtPortEntry 15 }
+
+    tnPowerMgmtPortMaxChannels OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Current configurable range:
+
+                        4 to 88."
+        DEFVAL         { 88 }
+        ::= { tnPowerMgmtPortEntry 16 }
+
+    tnPowerMgmtPortEgressAdjustForDownstreamEnabled OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Current defaults:
+
+                        Iroadm Cards: 1
+                        Other Cards:  2."
+        ::= { tnPowerMgmtPortEntry 17 }
+
+    tnPowerMgmtPortFiberSpanTiltL OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mB"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Linear fit of attenuation vs FREQ across defined
+                        channel min, max for tnPowerMgmtFiberSpanTiltPreCompL
+                        for L Band.
+
+                        Current configurable range: -300 to 300."
+        DEFVAL         { 0 }
+        ::= { tnPowerMgmtPortEntry 18 }
+
+    tnPowerMgmtPortWTDecoderUsageTypeInL OBJECT-TYPE
+        SYNTAX         AluWdmWTDecoderUsageType
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The type of WTD used ingress for L Band."
+        DEFVAL         { wtdPpcOffAlmOff }
+        ::= { tnPowerMgmtPortEntry 19 }
+
+    tnPowerMgmtPortWTDecoderUsageTypeOutL OBJECT-TYPE
+        SYNTAX         AluWdmWTDecoderUsageType
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The type of WTD used egress for L Band."
+        DEFVAL         { wtdPpcOffAlmOff }
+        ::= { tnPowerMgmtPortEntry 20 }
+
+    tnPowerMgmtPortIsCommissionedMethod OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         undetermined(1),
+                         manual(2),
+                         autoTurnUp(3)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { undetermined }
+        ::= { tnPowerMgmtPortEntry 21 }
+
+    tnPowerMgmtPortPsdModeEnabled OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Sets whether the channel target powers are
+                        determined from power spectral density targets."
+        DEFVAL         { false }
+        ::= { tnPowerMgmtPortEntry 22 }
+
+--------------------------------------------------------------------------------
+-- Obsoleted OIDs
+--------------------------------------------------------------------------------
+--  obsolete
+--  tnPowerMgmtPerChannelStatusTable OBJECT-TYPE ::= { tnPowerMgmtBasics 8 }
+--  tnPowerMgmtPerChannelStatusEntry OBJECT-TYPE ::= { tnPowerMgmtPerChannelStatusTable 1 }
+--  tnPowerMgmtPerChannelStatusResult OBJECT-TYPE ::= { tnPowerMgmtPerChannelStatusEntry 1 }
+--  tnPowerMgmtPerChannelStatusIntegerResult OBJECT-TYPE ::= { tnPowerMgmtPerChannelStatusEntry 2 }
+--  tnPowerMgmtPerChannelStatusControlPointIfIndex OBJECT-TYPE ::= { tnPowerMgmtPerChannelStatusEntry 3 }
+--  tnPowerMgmtPerChannelStatusControlPointPower OBJECT-TYPE ::= { tnPowerMgmtPerChannelStatusEntry 4 }
+
+--------------------------------------------------------------------------------
+-- Power Management Power Offset Input Table
+--------------------------------------------------------------------------------
+    tnPowerMgmtPowerOffsetInTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnPowerMgmtPowerOffsetInEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnPowerMgmtBasics 9 }
+
+    tnPowerMgmtPowerOffsetInEntry OBJECT-TYPE
+        SYNTAX         TnPowerMgmtPowerOffsetInEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { ifIndex,
+                tnPowerMgmtBitRate,
+                tnPowerMgmtEncoding }
+        ::= { tnPowerMgmtPowerOffsetInTable 1 }
+
+    TnPowerMgmtPowerOffsetInEntry ::=
+        SEQUENCE {
+            tnPowerMgmtBitRate               AluWdmOtuBitRate,
+            tnPowerMgmtEncoding              AluWdmOtuEncoding,
+            tnPowerMgmtOffsetInPowerOffset   Integer32
+        }
+
+    tnPowerMgmtBitRate OBJECT-TYPE
+        SYNTAX         AluWdmOtuBitRate
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "OTU Bit-Rate.
+
+                        Configurable range:  1 to 10000."
+        ::= { tnPowerMgmtPowerOffsetInEntry 1 }
+
+    tnPowerMgmtEncoding OBJECT-TYPE
+        SYNTAX         AluWdmOtuEncoding
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "Signal modulation format.
+
+                        Configurable range:  1 to 10000."
+        ::= { tnPowerMgmtPowerOffsetInEntry 2 }
+
+    tnPowerMgmtOffsetInPowerOffset OBJECT-TYPE
+        SYNTAX         Integer32 (-600..600)
+        UNITS          "mB"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Optical power offset from nominal power level.
+
+                        Current configurable range:  -600 to 600."
+        DEFVAL         { 0 }
+        ::= { tnPowerMgmtPowerOffsetInEntry 3 }
+
+--------------------------------------------------------------------------------
+-- Power Management Power Offset Output Table
+--------------------------------------------------------------------------------
+    tnPowerMgmtPowerOffsetOutTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnPowerMgmtPowerOffsetOutEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnPowerMgmtBasics 10 }
+
+    tnPowerMgmtPowerOffsetOutEntry OBJECT-TYPE
+        SYNTAX         TnPowerMgmtPowerOffsetOutEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { ifIndex,
+                tnPowerMgmtBitRate,
+                tnPowerMgmtEncoding }
+        ::= { tnPowerMgmtPowerOffsetOutTable 1 }
+
+    TnPowerMgmtPowerOffsetOutEntry ::=
+        SEQUENCE {
+            tnPowerMgmtOffsetOutPowerOffset   Integer32
+        }
+
+    tnPowerMgmtOffsetOutPowerOffset OBJECT-TYPE
+        SYNTAX         Integer32 (-600..600)
+        UNITS          "mB"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Optical power offset from nominal power level.
+
+                        Current configurable range: -600 to 600."
+        DEFVAL         { 0 }
+        ::= { tnPowerMgmtPowerOffsetOutEntry 1 }
+
+--------------------------------------------------------------------------------
+-- Power Management Ingress Per Channel Table
+--------------------------------------------------------------------------------
+    tnPowerMgmtIngressPerChannelTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnPowerMgmtIngressPerChannelEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The attributes in this table must not be set
+                        together with the same index in the same set
+                        request PDU."
+        ::= { tnPowerMgmtBasics 11 }
+
+    tnPowerMgmtIngressPerChannelEntry OBJECT-TYPE
+        SYNTAX         TnPowerMgmtIngressPerChannelEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { tnShelfIndex,
+                tnSlotIndex,
+                tnChannel }
+        ::= { tnPowerMgmtIngressPerChannelTable 1 }
+
+    TnPowerMgmtIngressPerChannelEntry ::=
+        SEQUENCE {
+            tnPowerMgmtIngressPerChannelSystemTargetOffset   Integer32,
+            tnPowerMgmtIngressPerChannelUserTargetOffset     Integer32,
+            tnPowerMgmtIngressPerChannelInUseTargetOffset    Integer32,
+            tnPowerMgmtIngressPerChannelTargetAbsolute       Integer32,
+            tnPowerMgmtIngressPerChannelApplicability        INTEGER
+        }
+
+    tnPowerMgmtIngressPerChannelSystemTargetOffset OBJECT-TYPE
+        SYNTAX         Integer32 (-300..300)
+        UNITS          "mB"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The SCOT system derived target power offset
+                        relative to common target power.
+
+                        Current configurable range:  -300 to 300."
+        DEFVAL         { 0 }
+        ::= { tnPowerMgmtIngressPerChannelEntry 1 }
+
+    tnPowerMgmtIngressPerChannelUserTargetOffset OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mB"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The user configured target power offset relative
+                        to common target power.  -9900 means not configured
+                        by user.
+
+                        Current configurable range:  -9900, -300 to 300."
+        DEFVAL         { -9900 }
+        ::= { tnPowerMgmtIngressPerChannelEntry 2 }
+
+    tnPowerMgmtIngressPerChannelInUseTargetOffset OBJECT-TYPE
+        SYNTAX         Integer32 (-300..300)
+        UNITS          "mB"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The target power offset relative to common target
+                        power currently in use.
+
+                        Current configurable range:  -300 to 300."
+        DEFVAL         { 0 }
+        ::= { tnPowerMgmtIngressPerChannelEntry 3 }
+
+    tnPowerMgmtIngressPerChannelTargetAbsolute OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mBm"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The SCOT target power in absolute power.
+
+                        Current range:  -9900 to 1100."
+        DEFVAL         { -9900 }
+        ::= { tnPowerMgmtIngressPerChannelEntry 4 }
+
+    tnPowerMgmtIngressPerChannelApplicability OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         notApplicable(1),
+                         applicable(2)
+                       }
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Values include:
+                        notApplicable - No Och XCo configured for this ITU
+                        applicable    - Och XCo configured for this ITU."
+        ::= { tnPowerMgmtIngressPerChannelEntry 5 }
+
+--------------------------------------------------------------------------------
+-- Power Management Egress Per Channel Table
+--------------------------------------------------------------------------------
+    tnPowerMgmtEgressPerChannelTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnPowerMgmtEgressPerChannelEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The attributes in this table must not be set
+                        together with the same index in the same set
+                        request PDU."
+        ::= { tnPowerMgmtBasics 12 }
+
+    tnPowerMgmtEgressPerChannelEntry OBJECT-TYPE
+        SYNTAX         TnPowerMgmtEgressPerChannelEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { tnShelfIndex,
+                tnSlotIndex,
+                tnChannel }
+        ::= { tnPowerMgmtEgressPerChannelTable 1 }
+
+    TnPowerMgmtEgressPerChannelEntry ::=
+        SEQUENCE {
+            tnPowerMgmtEgressPerChannelSystemTargetOffset   Integer32,
+            tnPowerMgmtEgressPerChannelUserTargetOffset     Integer32,
+            tnPowerMgmtEgressPerChannelInUseTargetOffset    Integer32,
+            tnPowerMgmtEgressPerChannelTargetAbsolute       Integer32,
+            tnPowerMgmtEgressPerChannelApplicability        INTEGER
+        }
+
+    tnPowerMgmtEgressPerChannelSystemTargetOffset OBJECT-TYPE
+        SYNTAX         Integer32 (-300..300)
+        UNITS          "mB"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The SCOT system derived target power offset
+                        relative to common target power.
+
+                        Current configurable range:  -300 to 300."
+        DEFVAL         { 0 }
+        ::= { tnPowerMgmtEgressPerChannelEntry 1 }
+
+    tnPowerMgmtEgressPerChannelUserTargetOffset OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mB"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The user configured target power offset
+                        relative to common target power.  -9900 means
+                        not configured by user.
+
+                        Current configurable range:  -9900, -300 to 300."
+        DEFVAL         { -9900 }
+        ::= { tnPowerMgmtEgressPerChannelEntry 2 }
+
+    tnPowerMgmtEgressPerChannelInUseTargetOffset OBJECT-TYPE
+        SYNTAX         Integer32 (-300..300)
+        UNITS          "mB"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The target power offset relative to common target
+                        power currently in use.
+
+                        Current configurable range:  -300 to 300."
+        DEFVAL         { 0 }
+        ::= { tnPowerMgmtEgressPerChannelEntry 3 }
+
+    tnPowerMgmtEgressPerChannelTargetAbsolute OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mBm"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The SCOT target power in absolute power.  -9900
+                        means not configured by user.
+
+                        Current range:  -9900, -2300 to 1100."
+        DEFVAL         { -9900 }
+        ::= { tnPowerMgmtEgressPerChannelEntry 4 }
+
+    tnPowerMgmtEgressPerChannelApplicability OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         notApplicable(1),
+                         applicable(2)
+                       }
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Values include:
+                        notApplicable - No Och XCo configured for this ITU
+                        applicable    - Och XCo configured for this ITU."
+        ::= { tnPowerMgmtEgressPerChannelEntry 5 }
+
+--------------------------------------------------------------------------------
+-- Power Management Technology Types Table
+--------------------------------------------------------------------------------
+    tnPowerMgmtTechnologyTypesTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnPowerMgmtTechnologyTypesEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnPowerMgmtBasics 13 }
+
+    tnPowerMgmtTechnologyTypesEntry OBJECT-TYPE
+        SYNTAX         TnPowerMgmtTechnologyTypesEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { tnPowerMgmtBitRate,
+                tnPowerMgmtEncoding }
+        ::= { tnPowerMgmtTechnologyTypesTable 1 }
+
+    TnPowerMgmtTechnologyTypesEntry ::=
+        SEQUENCE {
+            tnPowerMgmtTechnologyTypesBitRateText         SnmpAdminString,
+            tnPowerMgmtTechnologyTypesEncodingText        SnmpAdminString,
+            tnPowerMgmtTechnologyTypesWtocmCalib          Integer32,
+            tnPowerMgmtTechnologyTypesRowStatus           RowStatus,
+            tnPowerMgmtTechnologyTypesOsnrCalib           Integer32,
+            tnPowerMgmtTechnologyTypesWtocmaCalib         Integer32,
+            tnPowerMgmtTechnologyTypesWtocmfCalib         Integer32,
+            tnPowerMgmtTechnologyTypesWtocmfLCalib        Integer32,
+            tnPowerMgmtTechnologyTypesWtocmfCalib375      Integer32,
+            tnPowerMgmtTechnologyTypesWtocmfLCalib375     Integer32,
+            tnPowerMgmtTechnologyTypesMinXCWidthValue     Unsigned32
+        }
+
+    tnPowerMgmtTechnologyTypesBitRateText OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..50))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Text description of BitRate."
+        ::= { tnPowerMgmtTechnologyTypesEntry 1 }
+
+    tnPowerMgmtTechnologyTypesEncodingText OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..50))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Text description of Encoding."
+        ::= { tnPowerMgmtTechnologyTypesEntry 2 }
+
+    tnPowerMgmtTechnologyTypesWtocmCalib OBJECT-TYPE
+        SYNTAX         Integer32 (-500..500)
+        UNITS          "mB"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Optical power correction in mB from nominal
+                        power level for wtocm.
+
+                        Current configurable range:  -500 to 500."
+        DEFVAL         { 0 }
+        ::= { tnPowerMgmtTechnologyTypesEntry 3 }
+
+    tnPowerMgmtTechnologyTypesRowStatus OBJECT-TYPE
+        SYNTAX         RowStatus
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Row Status of power offset ingress entry.
+                        Supported values are:
+                        1 - active
+                        4 - createAndGo
+                        6 - destroy."
+        ::= { tnPowerMgmtTechnologyTypesEntry 4 }
+
+    tnPowerMgmtTechnologyTypesOsnrCalib OBJECT-TYPE
+        SYNTAX         Integer32 (-500..500)
+        UNITS          "mB"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "OSNR correction in mB for different optical
+                        technology types.
+
+                        Current configurable range:  -500 to 500."
+        DEFVAL         { 0 }
+        ::= { tnPowerMgmtTechnologyTypesEntry 5 }
+
+    tnPowerMgmtTechnologyTypesWtocmaCalib OBJECT-TYPE
+        SYNTAX         Integer32 (-500..500)
+        UNITS          "mB"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Optical power correction in mB from nominal
+                        power level for WTOCMA.
+
+                        Current configurable range:  -500 to 500."
+        DEFVAL         { 0 }
+        ::= { tnPowerMgmtTechnologyTypesEntry 6 }
+
+    tnPowerMgmtTechnologyTypesWtocmfCalib OBJECT-TYPE
+        SYNTAX         Integer32 (-500..500)
+        UNITS          "mB"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Optical power correction in mB from nominal
+                        power level for WTOCMF.
+
+                        Current configurable range:  -500 to 500."
+        DEFVAL         { 0 }
+        ::= { tnPowerMgmtTechnologyTypesEntry 7 }
+
+    tnPowerMgmtTechnologyTypesWtocmfLCalib OBJECT-TYPE
+        SYNTAX         Integer32 (-500..500)
+        UNITS          "mB"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Optical power correction in mB from nominal
+                        power level for WTOCMFL.
+
+                        Current configurable range:  -500 to 500."
+        DEFVAL         { 0 }
+        ::= { tnPowerMgmtTechnologyTypesEntry 8 }
+
+    tnPowerMgmtTechnologyTypesWtocmfCalib375 OBJECT-TYPE
+        SYNTAX         Integer32 (-500..500)
+        UNITS          "mB"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Optical power correction in mB from nominal
+                        power level for WTOCMFL.
+
+                        Current configurable range:  -500 to 500."
+        DEFVAL         { 0 }
+        ::= { tnPowerMgmtTechnologyTypesEntry 9 }
+
+    tnPowerMgmtTechnologyTypesWtocmfLCalib375 OBJECT-TYPE
+        SYNTAX         Integer32 (-500..500)
+        UNITS          "mB"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Optical power correction in mB from nominal
+                        power level for WTOCMFL.
+
+                        Current configurable range:  -500 to 500."
+        DEFVAL         { 0 }
+        ::= { tnPowerMgmtTechnologyTypesEntry 10 }
+
+    tnPowerMgmtTechnologyTypesMinXCWidthValue OBJECT-TYPE
+        SYNTAX         Unsigned32
+        UNITS          "MHz"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Display the minimum required XC width vs techtype."
+        ::= { tnPowerMgmtTechnologyTypesEntry 11 }
+
+--------------------------------------------------------------------------------
+-- Add Adjustment for A/D Block Table
+--------------------------------------------------------------------------------
+    tnPowerMgmtAnyAddTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnPowerMgmtAnyAddEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "This table provides access to add adjustment for
+                        A/D Block.  The attributes in this table must
+                        not be set together with the same index 16 in
+                        the same set request PDU."
+        ::= { tnPowerMgmtBasics 14 }
+
+    tnPowerMgmtAnyAddEntry OBJECT-TYPE
+        SYNTAX         TnPowerMgmtAnyAddEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { tnShelfIndex,
+                tnSlotIndex }
+        ::= { tnPowerMgmtAnyAddTable 1 }
+
+    TnPowerMgmtAnyAddEntry ::=
+        SEQUENCE {
+            tnPowerMgmtAnyAddAdjustPowerGain            TnCommand,
+            tnPowerMgmtAnyAddAdjustPowerGainLastResult  TropicPowerMgmtResult,
+            tnPowerMgmtAnyAddAdjustPowerGainStatus      TropicPowerMgmtStatus,
+            tnPowerMgmtAnyAddCommissioned               TruthValue,
+            tnPowerMgmtAnyAddPassed                     TruthValue,
+            tnPowerMgmtAnyAddAmpIfIndex                 InterfaceIndex,
+            tnPowerMgmtAnyAddAdjustPowerGainAbort       TnCommand
+        }
+
+    tnPowerMgmtAnyAddAdjustPowerGain OBJECT-TYPE
+        SYNTAX         TnCommand
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Run the Anydirection Add block adjustment."
+        ::= { tnPowerMgmtAnyAddEntry 1 }
+
+    tnPowerMgmtAnyAddAdjustPowerGainLastResult OBJECT-TYPE
+        SYNTAX         TropicPowerMgmtResult
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The result of the last executed Anydirection
+                        add block operation."
+        DEFVAL         { "Not applicable" }
+        ::= { tnPowerMgmtAnyAddEntry 2 }
+
+    tnPowerMgmtAnyAddAdjustPowerGainStatus OBJECT-TYPE
+        SYNTAX         TropicPowerMgmtStatus
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "This attribute indicates the status of the
+                        executed Anydirection Add block operation."
+        DEFVAL         { completed }
+        ::= { tnPowerMgmtAnyAddEntry 3 }
+
+    tnPowerMgmtAnyAddCommissioned OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Indicates state of adjustment point.
+                        true  = Adjusted successfully.
+                        false = NE event has caused the previous
+                                adjustment to be invalidated."
+        DEFVAL         { false }
+        ::= { tnPowerMgmtAnyAddEntry 4 }
+
+    tnPowerMgmtAnyAddPassed OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Indicates the Anydirection Add block operation
+                        failed or passed."
+        DEFVAL         { true }
+        ::= { tnPowerMgmtAnyAddEntry 5 }
+
+    tnPowerMgmtAnyAddAmpIfIndex OBJECT-TYPE
+        SYNTAX         InterfaceIndex
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Interface index of the LD in the add position
+                        of Anydirecton A/D block."
+        ::= { tnPowerMgmtAnyAddEntry 6 }
+
+    tnPowerMgmtAnyAddAdjustPowerGainAbort OBJECT-TYPE
+        SYNTAX         TnCommand
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "This attribute allows the network operator to
+                        submit an abort on the currently executing
+                        power optimization for the Anydirection Add
+                        adjustment."
+        ::= { tnPowerMgmtAnyAddEntry 7 }
+
+--------------------------------------------------------------------------------
+-- Drop Adjustment for A/D Block Table
+--------------------------------------------------------------------------------
+    tnPowerMgmtAnyDropTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnPowerMgmtAnyDropEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The attributes in this table must not be set
+                        together with the same index in the same set
+                        request PDU."
+        ::= { tnPowerMgmtBasics 15 }
+
+    tnPowerMgmtAnyDropEntry OBJECT-TYPE
+        SYNTAX         TnPowerMgmtAnyDropEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { tnShelfIndex,
+                tnSlotIndex }
+        ::= { tnPowerMgmtAnyDropTable 1 }
+
+    TnPowerMgmtAnyDropEntry ::=
+        SEQUENCE {
+            tnPowerMgmtAnyDropAdjustPowerGain            TnCommand,
+            tnPowerMgmtAnyDropAdjustPowerGainLastResult  TropicPowerMgmtResult,
+            tnPowerMgmtAnyDropAdjustPowerGainStatus      TropicPowerMgmtStatus,
+            tnPowerMgmtAnyDropCommissioned               TruthValue,
+            tnPowerMgmtAnyDropPassed                     TruthValue,
+            tnPowerMgmtAnyDropAmpIfIndex                 InterfaceIndex
+        }
+
+    tnPowerMgmtAnyDropAdjustPowerGain OBJECT-TYPE
+        SYNTAX         TnCommand
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Run the Anydirection Drop block adjustment."
+        ::= { tnPowerMgmtAnyDropEntry 1 }
+
+    tnPowerMgmtAnyDropAdjustPowerGainLastResult OBJECT-TYPE
+        SYNTAX         TropicPowerMgmtResult
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The result of the last executed Anydirection
+                        Drop block operation."
+        DEFVAL         { "Not applicable" }
+        ::= { tnPowerMgmtAnyDropEntry 2 }
+
+    tnPowerMgmtAnyDropAdjustPowerGainStatus OBJECT-TYPE
+        SYNTAX         TropicPowerMgmtStatus
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "This attribute indicates the status of the
+                        executed Anydirection Drop block operation."
+        DEFVAL         { completed }
+        ::= { tnPowerMgmtAnyDropEntry 3 }
+
+    tnPowerMgmtAnyDropCommissioned OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Indicates state of adjustment point.
+                        true  = Adjusted successfully.
+                        false = NE event has caused the previous
+                                adjustment to be invalidated."
+        DEFVAL         { false }
+        ::= { tnPowerMgmtAnyDropEntry 4 }
+
+    tnPowerMgmtAnyDropPassed OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Indicates the anydirection Drop block operation
+                        failed or passed."
+        DEFVAL         { true }
+        ::= { tnPowerMgmtAnyDropEntry 5 }
+
+    tnPowerMgmtAnyDropAmpIfIndex OBJECT-TYPE
+        SYNTAX         InterfaceIndex
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Interface index of the LD in the drop position
+                        of Anydirection A/D block."
+        ::= { tnPowerMgmtAnyDropEntry 6 }
+
+--------------------------------------------------------------------------------
+-- Power Management IROADM Scalars
+--------------------------------------------------------------------------------
+    tnPowerMgmtIroadmAttributeTotal OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Total number of attributes in tnPowerMgmtIroadmTable."
+        ::= { tnPowerMgmtBasics 16 }
+
+--------------------------------------------------------------------------------
+-- Power Management IROADM Table
+--------------------------------------------------------------------------------
+    tnPowerMgmtIroadmTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnPowerMgmtIroadmEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnPowerMgmtBasics 17 }
+
+    tnPowerMgmtIroadmEntry OBJECT-TYPE
+        SYNTAX         TnPowerMgmtIroadmEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { tnShelfIndex,
+                tnSlotIndex }
+        ::= { tnPowerMgmtIroadmTable 1 }
+
+    TnPowerMgmtIroadmEntry ::=
+        SEQUENCE {
+            tnPowerMgmtIroadmEgressOAMaxPpcOutFromInputs  Integer32,
+            tnPowerMgmtIroadmEgressOAPpcOut               Integer32
+        }
+
+    tnPowerMgmtIroadmEgressOAMaxPpcOutFromInputs OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mBm"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Current Range:
+                          -1000 to 1000.
+
+                        Current defaults:
+                          IROADMF = -150
+                          IROADMV = 50."
+        ::= { tnPowerMgmtIroadmEntry 1 }
+
+    tnPowerMgmtIroadmEgressOAPpcOut OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mBm"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Current Range:
+                          -1000 to 1000.
+
+                        Current defaults:
+                          IROADMF = -150
+                          IROADMV = 50."
+        ::= { tnPowerMgmtIroadmEntry 2 }
+
+--------------------------------------------------------------------------------
+-- Multiple amplifier Scalars
+--------------------------------------------------------------------------------
+    tnPowerMgmtCapabilitiesCardAttributeTotal OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Total number of attributes in
+                        tnPowerMgmtCapabilitiesCardTable."
+        ::= { tnPowerMgmtBasics 18 }
+
+--------------------------------------------------------------------------------
+--  Multiple amplifier degrees.
+--------------------------------------------------------------------------------
+    tnPowerMgmtCapabilitiesCardTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnPowerMgmtCapabilitiesCardEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnPowerMgmtBasics 19 }
+
+    tnPowerMgmtCapabilitiesCardEntry OBJECT-TYPE
+        SYNTAX         TnPowerMgmtCapabilitiesCardEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { tnShelfIndex,
+                tnSlotIndex }
+        ::= { tnPowerMgmtCapabilitiesCardTable 1 }
+
+    TnPowerMgmtCapabilitiesCardEntry ::=
+        SEQUENCE {
+            tnPowerMgmtCapabilitiesCardEgressPower        TropicPowerMgmtCapabilitiesCard,
+            tnPowerMgmtCapabilitiesCardIngressPower       TropicPowerMgmtCapabilitiesCard,
+            tnPowerMgmtCapabilitiesCardEgressTilt         TropicPowerMgmtCapabilitiesCard,
+            tnPowerMgmtCapabilitiesCardIngressTilt        TropicPowerMgmtCapabilitiesCard
+        }
+
+    tnPowerMgmtCapabilitiesCardEgressPower OBJECT-TYPE
+        SYNTAX         TropicPowerMgmtCapabilitiesCard
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { none }
+        ::= { tnPowerMgmtCapabilitiesCardEntry 1 }
+
+    tnPowerMgmtCapabilitiesCardIngressPower OBJECT-TYPE
+        SYNTAX         TropicPowerMgmtCapabilitiesCard
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { none }
+        ::= { tnPowerMgmtCapabilitiesCardEntry 2 }
+
+    tnPowerMgmtCapabilitiesCardEgressTilt OBJECT-TYPE
+        SYNTAX         TropicPowerMgmtCapabilitiesCard
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { none }
+        ::= { tnPowerMgmtCapabilitiesCardEntry 3 }
+
+    tnPowerMgmtCapabilitiesCardIngressTilt OBJECT-TYPE
+        SYNTAX         TropicPowerMgmtCapabilitiesCard
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { none }
+        ::= { tnPowerMgmtCapabilitiesCardEntry 4 }
+
+--------------------------------------------------------------------------------
+-- Power Management Ingress Port Table
+--------------------------------------------------------------------------------
+    tnPowerMgmtIngressPortTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnPowerMgmtIngressPortEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnPowerMgmtBasics 20 }
+
+    tnPowerMgmtIngressPortEntry OBJECT-TYPE
+        SYNTAX         TnPowerMgmtIngressPortEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { ifIndex }
+        ::= { tnPowerMgmtIngressPortTable 1 }
+
+    TnPowerMgmtIngressPortEntry ::=
+        SEQUENCE {
+            tnPowerMgmtIngressPortAdjustPowerGain               INTEGER,
+            tnPowerMgmtIngressPortAdjustPowerGainLastResult     TropicPowerMgmtResult,
+            tnPowerMgmtIngressPortAdjustPowerGainStatus         TropicPowerMgmtStatus,
+            tnPowerMgmtIngressPortSRSTiltAdjStatus              AluWdmPowerMgmtSRSTiltAdjStatus,
+            tnPowerMgmtIngressPortSRSTiltAdjResult              TropicPowerMgmtResult,
+            tnPowerMgmtIngressPortSRSTiltPostFraction           Integer32,
+            tnPowerMgmtIngressPortSRSTiltPostFractionL          Integer32,
+            tnPowerMgmtIngressPortCommissioned                  TruthValue,
+            tnPowerMgmtIngressPortPassed                        TruthValue,
+            tnPowerMgmtIngressPortGainSetOffset                 Integer32,
+            tnPowerMgmtIngressPortGainSetOffsetL                Integer32,
+            tnPowerMgmtIngressPortAdjustPowerGainTargetGain     Unsigned32,
+            tnPowerMgmtIngressPortAdjustPowerGainTargetGainL    Unsigned32,
+            tnPowerMgmtIngressPortCommissionedGain              Integer32,
+            tnPowerMgmtIngressPortCommissionedGainL             Integer32,
+            tnPowerMgmtIngressPortSRSTiltCalcOffset             Integer32,
+            tnPowerMgmtIngressPortSRSTiltCalcOffsetL            Integer32
+        }
+
+    tnPowerMgmtIngressPortAdjustPowerGain OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         noCmd(1),
+                         execute(2),
+                         executeWithForce(3)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Value executeWithForce is no longer supported."
+        ::= { tnPowerMgmtIngressPortEntry 1 }
+
+    tnPowerMgmtIngressPortAdjustPowerGainLastResult OBJECT-TYPE
+        SYNTAX         TropicPowerMgmtResult
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The result of the last executed power gain adjustment
+                        operation."
+        ::= { tnPowerMgmtIngressPortEntry 2 }
+
+    tnPowerMgmtIngressPortAdjustPowerGainStatus OBJECT-TYPE
+        SYNTAX         TropicPowerMgmtStatus
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "This attribute indicates the status of the executed
+                        power gain adjustment operation."
+        ::= { tnPowerMgmtIngressPortEntry 3 }
+
+    tnPowerMgmtIngressPortSRSTiltAdjStatus OBJECT-TYPE
+        SYNTAX         AluWdmPowerMgmtSRSTiltAdjStatus
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Status of the tilt adjustment."
+        DEFVAL         { notInProgress }
+        ::= { tnPowerMgmtIngressPortEntry 4 }
+
+    tnPowerMgmtIngressPortSRSTiltAdjResult OBJECT-TYPE
+        SYNTAX         TropicPowerMgmtResult
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Result string describing outcome of the tilt adjustment."
+        DEFVAL         { "Not applicable" }
+        ::= { tnPowerMgmtIngressPortEntry 5 }
+
+    tnPowerMgmtIngressPortSRSTiltPostFraction OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "100ths"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Used to modify the fraction of upstream span SRS tilt
+                        post compensated.
+
+                        Current configurable range: 0 to 300."
+        DEFVAL         { 0 }
+        ::= { tnPowerMgmtIngressPortEntry 6 }
+
+    tnPowerMgmtIngressPortSRSTiltPostFractionL OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "100ths"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Used to modify the fraction of upstream span SRS tilt
+                        post compensated for L Band.
+
+                        Current configurable range: 0 to 300."
+        DEFVAL         { 0 }
+        ::= { tnPowerMgmtIngressPortEntry 7 }
+
+    tnPowerMgmtIngressPortCommissioned OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "This attribute indicates if the ingress adjustment
+                        point has done a successful adjustment following being
+                        in an un-commissioned state.
+
+                        true  - Adjusted successfully.
+                        false - NE event has caused the previous adjustment
+                                to be invalidated."
+        DEFVAL         { false }
+        ::= { tnPowerMgmtIngressPortEntry 8 }
+
+    tnPowerMgmtIngressPortPassed OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Indicates the optimization adjustment failed or passed."
+        DEFVAL         { true }
+        ::= { tnPowerMgmtIngressPortEntry 9 }
+
+    tnPowerMgmtIngressPortGainSetOffset OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mB"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Value added to result of gain adjustment calculation.
+
+                        Current configurable range: -300 to 300."
+        DEFVAL         { 0 }
+        ::= { tnPowerMgmtIngressPortEntry 10 }
+
+    tnPowerMgmtIngressPortGainSetOffsetL OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mB"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Value added to result of gain adjustment calculation.
+
+                        Current configurable range: -300 to 300."
+        DEFVAL         { 0 }
+        ::= { tnPowerMgmtIngressPortEntry 11 }
+
+    tnPowerMgmtIngressPortAdjustPowerGainTargetGain OBJECT-TYPE
+        SYNTAX         Unsigned32
+        UNITS          "mB"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnPowerMgmtIngressPortEntry 12 }
+
+    tnPowerMgmtIngressPortAdjustPowerGainTargetGainL OBJECT-TYPE
+        SYNTAX         Unsigned32
+        UNITS          "mB"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnPowerMgmtIngressPortEntry 13 }
+
+    tnPowerMgmtIngressPortCommissionedGain OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mB"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Gain value set while commissioning flag is false."
+        DEFVAL         { 0 }
+        ::= { tnPowerMgmtIngressPortEntry 14 }
+
+    tnPowerMgmtIngressPortCommissionedGainL OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mB"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The EDFA gain value set when the line was adjusted
+                        while the degree commissioning flag was false."
+        ::= { tnPowerMgmtIngressPortEntry 15 }
+
+    tnPowerMgmtIngressPortSRSTiltCalcOffset OBJECT-TYPE
+        SYNTAX         Integer32 (-500..500)
+        UNITS          "mB"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Indicates if the LD setting has been offset to compensate
+                        downstream TiltMismatch.
+
+                        Range: -500 to 500."
+        DEFVAL         { 0 }
+        ::= { tnPowerMgmtIngressPortEntry 16 }
+
+    tnPowerMgmtIngressPortSRSTiltCalcOffsetL OBJECT-TYPE
+        SYNTAX         Integer32 (-500..500)
+        UNITS          "mB"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Indicates if the LD setting has been offset to compensate
+                        downstream TiltMismatch.
+
+                        Range: -500 to 500."
+        DEFVAL         { 0 }
+        ::= { tnPowerMgmtIngressPortEntry 17 }
+
+--------------------------------------------------------------------------------
+-- Power Management Egress Port Table
+--------------------------------------------------------------------------------
+    tnPowerMgmtEgressPortTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnPowerMgmtEgressPortEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The attributes in this table must not be set together
+                        with the same index in the same set request PDU."
+        ::= { tnPowerMgmtBasics 21 }
+
+    tnPowerMgmtEgressPortEntry OBJECT-TYPE
+        SYNTAX         TnPowerMgmtEgressPortEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { ifIndex }
+        ::= { tnPowerMgmtEgressPortTable 1 }
+
+    TnPowerMgmtEgressPortEntry ::=
+        SEQUENCE {
+            tnPowerMgmtEgressPortAdjustPowerWithOptimization            TnCommand,
+            tnPowerMgmtEgressPortAdjustPowerWithOptimizationAbort       TnCommand,
+            tnPowerMgmtEgressPortAdjustPowerWithOptimizationLastResult  TropicPowerMgmtResult,
+            tnPowerMgmtEgressPortAdjustPowerWithOptimizationStatus      TropicPowerMgmtStatus,
+            tnPowerMgmtEgressPortSRSTiltCalcOutputLoss                  Integer32,
+            tnPowerMgmtEgressPortSRSTiltAdjStatus                       AluWdmPowerMgmtSRSTiltAdjStatus,
+            tnPowerMgmtEgressPortSRSTIltAdjResult                       TropicPowerMgmtResult,
+            tnPowerMgmtEgressPortSRSTiltCalcACoeff                      Integer32,
+            tnPowerMgmtEgressPortSRSTiltCalcACoeffL                     Integer32,
+            tnPowerMgmtEgressPortSRSTiltCalcMultiplier                  Integer32,
+            tnPowerMgmtEgressPortSRSTiltCalcMultiplierL                 Integer32,
+            tnPowerMgmtEgressPortFiberSpanTiltPreComp                   Integer32,
+            tnPowerMgmtEgressPortFiberSpanTiltPreCompL                  Integer32,
+            tnPowerMgmtEgressPortSRSCF                                  Integer32,
+            tnPowerMgmtEgressPortSRSCFL                                 Integer32,
+            tnPowerMgmtEgressPortSRSTiltPreFraction                     Integer32,
+            tnPowerMgmtEgressPortSRSTiltPreFractionL                    Integer32,
+            tnPowerMgmtEgressPortCommissioned                           TruthValue,
+            tnPowerMgmtEgressPortPassed                                 TruthValue,
+            tnPowerMgmtEgressPortLHLaunchAtten                          Integer32,
+            tnPowerMgmtEgressPortExternalOTAddLaunchAtten               Unsigned32,
+            tnPowerMgmtEgressPortSmoothing                              TruthValue,
+            tnPowerMgmtEgressPortSmoothingMaxStepSize                   Unsigned32
+        }
+
+    tnPowerMgmtEgressPortAdjustPowerWithOptimization OBJECT-TYPE
+        SYNTAX         TnCommand
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnPowerMgmtEgressPortEntry 1 }
+
+    tnPowerMgmtEgressPortAdjustPowerWithOptimizationAbort OBJECT-TYPE
+        SYNTAX         TnCommand
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "This attribute allows the network operator to submit
+                        an abort on the currently executing power with
+                        optimization adjustment operation.  When read back,
+                        the value of this attribute is noCmd."
+        ::= { tnPowerMgmtEgressPortEntry 2 }
+
+    tnPowerMgmtEgressPortAdjustPowerWithOptimizationLastResult OBJECT-TYPE
+        SYNTAX         TropicPowerMgmtResult
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The result of the last executed power adjustment with
+                        optimization operation."
+        ::= { tnPowerMgmtEgressPortEntry 3 }
+
+    tnPowerMgmtEgressPortAdjustPowerWithOptimizationStatus OBJECT-TYPE
+        SYNTAX         TropicPowerMgmtStatus
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "This attribute indicates the status of the executed
+                        power with optimization adjustment operation."
+        ::= { tnPowerMgmtEgressPortEntry 4 }
+
+    tnPowerMgmtEgressPortSRSTiltCalcOutputLoss OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mB"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Configurable loss from the egress Line Out to the
+                        fiber span input.
+
+                        Current configurable range: 0 to 1700."
+        DEFVAL         { 0 }
+        ::= { tnPowerMgmtEgressPortEntry 5 }
+
+    tnPowerMgmtEgressPortSRSTiltAdjStatus OBJECT-TYPE
+        SYNTAX         AluWdmPowerMgmtSRSTiltAdjStatus
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Status of the tilt adjustment."
+        DEFVAL         { notInProgress }
+        ::= { tnPowerMgmtEgressPortEntry 6 }
+
+    tnPowerMgmtEgressPortSRSTIltAdjResult OBJECT-TYPE
+        SYNTAX         TropicPowerMgmtResult
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Result string describing outcome of the tilt adjustment."
+        DEFVAL         { "Not applicable" }
+        ::= { tnPowerMgmtEgressPortEntry 7 }
+
+    tnPowerMgmtEgressPortSRSTiltCalcACoeff OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Modeling coefficient for the SRSTilt = A*Pout(mW)
+                        equation.
+
+                        Current configurable range: 0 to 10000."
+        DEFVAL         { 0 }
+        ::= { tnPowerMgmtEgressPortEntry 8 }
+
+    tnPowerMgmtEgressPortSRSTiltCalcACoeffL OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Modeling coefficient for the SRSTilt = A*Pout(mW)
+                        equation for L Band.
+
+                        Current configurable range: 0 to 10000."
+        DEFVAL         { 0 }
+        ::= { tnPowerMgmtEgressPortEntry 9 }
+
+    tnPowerMgmtEgressPortSRSTiltCalcMultiplier OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "100ths"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "This is used to modify the calculated SRS tilt of the
+                        span.
+
+                        Current configurable range: 0 to 300."
+        DEFVAL         { 100 }
+        ::= { tnPowerMgmtEgressPortEntry 10 }
+
+    tnPowerMgmtEgressPortSRSTiltCalcMultiplierL OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "100ths"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "This is used to modify the calculated SRS tilt of the
+                        span for L Band.
+
+                        Current configurable range: 0 to 300."
+        DEFVAL         { 100 }
+        ::= { tnPowerMgmtEgressPortEntry 11 }
+
+    tnPowerMgmtEgressPortFiberSpanTiltPreComp OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mB"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Amount of fiber span tilt to pre compensate.  May not
+                        equal to tnPowerMgmtPortFiberSpanTilt.
+
+                        Current configurable range: -300 to 300."
+        DEFVAL         { 0 }
+        ::= { tnPowerMgmtEgressPortEntry 12 }
+
+    tnPowerMgmtEgressPortFiberSpanTiltPreCompL OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mB"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Amount of fiber span tilt to pre compensate.  May not
+                        equal to tnPowerMgmtEgressPortFiberSpanTiltL for L Band.
+
+                        Current configurable range: -300 to 300."
+        DEFVAL         { 0 }
+        ::= { tnPowerMgmtEgressPortEntry 13 }
+
+    tnPowerMgmtEgressPortSRSCF OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "This parameter should be applied immediately when changed.
+                        Applicable only to C+L systems.  Corrects for SRS
+                        contribution between the C and L bands.
+
+                        Current configurable range: 0 to 100."
+        DEFVAL         { 100 }
+        ::= { tnPowerMgmtEgressPortEntry 14 }
+
+    tnPowerMgmtEgressPortSRSCFL OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "This parameter should be applied immediately when
+                        changed.  Applicable only to C+L systems.  Corrects
+                        for SRS contribution between the C and L bands.
+
+                        Current configurable range: 0 to 100."
+        DEFVAL         { 100 }
+        ::= { tnPowerMgmtEgressPortEntry 15 }
+
+    tnPowerMgmtEgressPortSRSTiltPreFraction OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "100ths"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "This is used to modify the fraction of following span
+                        SRS tilt pre compensated.
+
+                        Current configurable range: 0 to 300."
+        DEFVAL         { 0 }
+        ::= { tnPowerMgmtEgressPortEntry 16 }
+
+    tnPowerMgmtEgressPortSRSTiltPreFractionL OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "100ths"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "This is used to modify the fraction of following span
+                        SRS tilt pre compensated for L Band.
+
+                        Current configurable range: 0 to 300."
+        DEFVAL         { 0 }
+        ::= { tnPowerMgmtEgressPortEntry 17 }
+
+    tnPowerMgmtEgressPortCommissioned OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "This attribute indicates if the egress adjustment point
+                        has done a successful adjustment following being in an
+                        un-commissioned state.
+                          true  - Adjusted successfully.
+                          false - NE event has caused the previous adjustment
+                                  to be invalidated."
+        DEFVAL         { false }
+        ::= { tnPowerMgmtEgressPortEntry 18 }
+
+    tnPowerMgmtEgressPortPassed OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Indicates the optimization adjust failed or passed."
+        DEFVAL         { true }
+        ::= { tnPowerMgmtEgressPortEntry 19 }
+
+    tnPowerMgmtEgressPortLHLaunchAtten OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mB"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Added to the nominal attenuation lookup by WSS
+                        containing pack.  Only applies to connectivity block
+                        in directionless architecture.
+
+                        Current configurable range: 0 to 1000."
+        DEFVAL         { 0 }
+        ::= { tnPowerMgmtEgressPortEntry 20 }
+
+    tnPowerMgmtEgressPortExternalOTAddLaunchAtten OBJECT-TYPE
+        SYNTAX         Unsigned32 (0..1500)
+        UNITS          "mB"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Set the service launch attenuation offset for channels
+                        from external transponders added to the degree."
+        ::= { tnPowerMgmtEgressPortEntry 21 }
+
+    tnPowerMgmtEgressPortSmoothing OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Enable or disable power adjustment smoothing."
+        ::= { tnPowerMgmtEgressPortEntry 22 }
+
+
+    tnPowerMgmtEgressPortSmoothingMaxStepSize OBJECT-TYPE
+        SYNTAX         Unsigned32 (0..500)
+        UNITS          "mB"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Set maximum step size for power adjustment smoothing."
+        DEFVAL         { 50 }
+        ::= { tnPowerMgmtEgressPortEntry 23 }
+
+-------------------------------------------------------------------------------
+-- Power Management Ingress Port Per Channel Table
+--------------------------------------------------------------------------------
+    tnPowerMgmtIngressPortPerChannelTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnPowerMgmtIngressPortPerChannelEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The attributes in this table must not be set
+                        together with the same index in the same set
+                        request PDU."
+        ::= { tnPowerMgmtBasics 22 }
+
+    tnPowerMgmtIngressPortPerChannelEntry OBJECT-TYPE
+        SYNTAX         TnPowerMgmtIngressPortPerChannelEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { ifIndex,
+                tnChannel }
+        ::= { tnPowerMgmtIngressPortPerChannelTable 1 }
+
+    TnPowerMgmtIngressPortPerChannelEntry ::=
+        SEQUENCE {
+            tnPowerMgmtIngressPortPerChannelSystemTargetOffset   Integer32,
+            tnPowerMgmtIngressPortPerChannelUserTargetOffset     Integer32,
+            tnPowerMgmtIngressPortPerChannelInUseTargetOffset    Integer32,
+            tnPowerMgmtIngressPortPerChannelTargetAbsolute       Integer32,
+            tnPowerMgmtIngressPortPerChannelApplicability        INTEGER
+        }
+
+    tnPowerMgmtIngressPortPerChannelSystemTargetOffset OBJECT-TYPE
+        SYNTAX         Integer32 (-300..300)
+        UNITS          "mB"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The SCOT system derived target power offset relative
+                        to common target power.
+
+                        Current configurable range:  -300 to 300."
+        DEFVAL         { 0 }
+        ::= { tnPowerMgmtIngressPortPerChannelEntry 1 }
+
+    tnPowerMgmtIngressPortPerChannelUserTargetOffset OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mB"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The user configured target power offset relative to
+                        common target power.  -9900 means not configured by
+                        user.
+
+                        Current configurable range:  -9900, -300 to 300."
+        DEFVAL         { -9900 }
+        ::= { tnPowerMgmtIngressPortPerChannelEntry 2 }
+
+    tnPowerMgmtIngressPortPerChannelInUseTargetOffset OBJECT-TYPE
+        SYNTAX         Integer32 (-300..300)
+        UNITS          "mB"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The target power offset relative to common target
+                        power currently in use.
+
+                        Current configurable range:  -300 to 300."
+        DEFVAL         { 0 }
+        ::= { tnPowerMgmtIngressPortPerChannelEntry 3 }
+
+    tnPowerMgmtIngressPortPerChannelTargetAbsolute OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mBm"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The SCOT target power in absolute power.
+
+                        Current range:  -9900 to 1100."
+        DEFVAL         { -9900 }
+        ::= { tnPowerMgmtIngressPortPerChannelEntry 4 }
+
+    tnPowerMgmtIngressPortPerChannelApplicability OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         notApplicable(1),
+                         applicable(2)
+                       }
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Values include:
+                        notApplicable - No Och XCo configured for this ITU
+                        applicable    - Och XCo configured for this ITU."
+        ::= { tnPowerMgmtIngressPortPerChannelEntry 5 }
+
+--------------------------------------------------------------------------------
+-- Power Management Egress Port Per Channel Table
+--------------------------------------------------------------------------------
+    tnPowerMgmtEgressPortPerChannelTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnPowerMgmtEgressPortPerChannelEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The attributes in this table must not be set
+                        together with the same index in the same set
+                        request PDU."
+        ::= { tnPowerMgmtBasics 23 }
+
+    tnPowerMgmtEgressPortPerChannelEntry OBJECT-TYPE
+        SYNTAX         TnPowerMgmtEgressPortPerChannelEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { ifIndex,
+                tnChannel }
+        ::= { tnPowerMgmtEgressPortPerChannelTable 1 }
+
+    TnPowerMgmtEgressPortPerChannelEntry ::=
+        SEQUENCE {
+            tnPowerMgmtEgressPortPerChannelSystemTargetOffset   Integer32,
+            tnPowerMgmtEgressPortPerChannelUserTargetOffset     Integer32,
+            tnPowerMgmtEgressPortPerChannelInUseTargetOffset    Integer32,
+            tnPowerMgmtEgressPortPerChannelTargetAbsolute       Integer32,
+            tnPowerMgmtEgressPortPerChannelApplicability        INTEGER
+        }
+
+    tnPowerMgmtEgressPortPerChannelSystemTargetOffset OBJECT-TYPE
+        SYNTAX         Integer32 (-300..300)
+        UNITS          "mB"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The SCOT system derived target power offset
+                        relative to common target power.
+
+                        Current configurable range:  -300 to 300."
+        DEFVAL         { 0 }
+        ::= { tnPowerMgmtEgressPortPerChannelEntry 1 }
+
+    tnPowerMgmtEgressPortPerChannelUserTargetOffset OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mB"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The user configured target power offset
+                        relative to common target power.  -9900 means
+                        not configured by user.
+
+                        Current configurable range:  -9900, -300 to 300."
+        DEFVAL         { -9900 }
+        ::= { tnPowerMgmtEgressPortPerChannelEntry 2 }
+
+    tnPowerMgmtEgressPortPerChannelInUseTargetOffset OBJECT-TYPE
+        SYNTAX         Integer32 (-300..300)
+        UNITS          "mB"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The target power offset relative to common target
+                        power currently in use.
+
+                        Current configurable range:  -300 to 300."
+        DEFVAL         { 0 }
+        ::= { tnPowerMgmtEgressPortPerChannelEntry 3 }
+
+    tnPowerMgmtEgressPortPerChannelTargetAbsolute OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mBm"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The SCOT target power in absolute power.  -9900
+                        means not configured by user.
+
+                        Current range:  -9900, -2300 to 1100."
+        DEFVAL         { -9900 }
+        ::= { tnPowerMgmtEgressPortPerChannelEntry 4 }
+
+    tnPowerMgmtEgressPortPerChannelApplicability OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         notApplicable(1),
+                         applicable(2)
+                       }
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Values include:
+                        notApplicable - No Och XCo configured for this ITU
+                        applicable    - Och XCo configured for this ITU."
+        ::= { tnPowerMgmtEgressPortPerChannelEntry 5 }
+
+--------------------------------------------------------------------------------
+--  PowerMgmt Capabilities Port
+--------------------------------------------------------------------------------
+    tnPowerMgmtCapabilitiesPortAttributeTotal OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Total number of attributes in
+                        tnPowerMgmtCapabilitiesPortTable."
+        ::= { tnPowerMgmtBasics 24 }
+
+--------------------------------------------------------------------------------
+--  Multiple amplifier degrees.
+--------------------------------------------------------------------------------
+    tnPowerMgmtCapabilitiesPortTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnPowerMgmtCapabilitiesPortEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnPowerMgmtBasics 25 }
+
+    tnPowerMgmtCapabilitiesPortEntry OBJECT-TYPE
+        SYNTAX         TnPowerMgmtCapabilitiesPortEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { ifIndex }
+        ::= { tnPowerMgmtCapabilitiesPortTable 1 }
+
+    TnPowerMgmtCapabilitiesPortEntry ::=
+        SEQUENCE {
+            tnPowerMgmtCapabilitiesPortEgressPower      TropicPowerMgmtCapabilitiesCard,
+            tnPowerMgmtCapabilitiesPortIngressPower     TropicPowerMgmtCapabilitiesCard,
+            tnPowerMgmtCapabilitiesPortEgressTilt       TropicPowerMgmtCapabilitiesCard,
+            tnPowerMgmtCapabilitiesPortIngressTilt      TropicPowerMgmtCapabilitiesCard
+        }
+
+    tnPowerMgmtCapabilitiesPortEgressPower OBJECT-TYPE
+        SYNTAX         TropicPowerMgmtCapabilitiesCard
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { none }
+        ::= { tnPowerMgmtCapabilitiesPortEntry 1 }
+
+    tnPowerMgmtCapabilitiesPortIngressPower OBJECT-TYPE
+        SYNTAX         TropicPowerMgmtCapabilitiesCard
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { none }
+        ::= { tnPowerMgmtCapabilitiesPortEntry 2 }
+
+    tnPowerMgmtCapabilitiesPortEgressTilt OBJECT-TYPE
+        SYNTAX         TropicPowerMgmtCapabilitiesCard
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { none }
+        ::= { tnPowerMgmtCapabilitiesPortEntry 3 }
+
+    tnPowerMgmtCapabilitiesPortIngressTilt OBJECT-TYPE
+        SYNTAX         TropicPowerMgmtCapabilitiesCard
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { none }
+        ::= { tnPowerMgmtCapabilitiesPortEntry 4 }
+
+--------------------------------------------------------------------------------
+-- Power Management PSD Scalar
+--------------------------------------------------------------------------------
+    tnPowerMgmtPsdAttributeTotal OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Total number of attributes in tnPowerMgmtPsdTable."
+        ::= { tnPowerMgmtBasics 26 }
+
+-------------------------------------------------------------------------------
+-- Power Management PSD Table
+--------------------------------------------------------------------------------
+    tnPowerMgmtPsdTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnPowerMgmtPsdEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnPowerMgmtBasics 27 }
+
+    tnPowerMgmtPsdEntry OBJECT-TYPE
+        SYNTAX         TnPowerMgmtPsdEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { ifIndex,
+                tnPowerMgmtPsdChannel }
+        ::= { tnPowerMgmtPsdTable 1 }
+
+    TnPowerMgmtPsdEntry ::=
+        SEQUENCE {
+            tnPowerMgmtPsdChannel                               Unsigned32,
+            tnPowerMgmtPsdPowerPerThirtySevenDotFiveGHz         Integer32,
+            tnPowerMgmtPsdEquivalentPowerSpectralDensityPerGHz  Integer32
+        }
+
+    tnPowerMgmtPsdChannel OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnPowerMgmtPsdEntry 1 }
+
+    tnPowerMgmtPsdPowerPerThirtySevenDotFiveGHz OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Set the power spectral density target as a power in
+                        37.5 GHz width.  Indexed by the lower frequency edge
+                        of each bin, which must be non-overlapping."
+        ::= { tnPowerMgmtPsdEntry 2 }
+
+    tnPowerMgmtPsdEquivalentPowerSpectralDensityPerGHz OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The power spectral density target power equivalent in
+                        dBm per GHz."
+        ::= { tnPowerMgmtPsdEntry 3 }
+
+--------------------------------------------------------------------------------
+-- Power Management PSD Scalar
+--------------------------------------------------------------------------------
+    tnPowerMgmtPsdTargetAttributeTotal OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Total number of attributes in tnPowerMgmtPsdTargetTable."
+        ::= { tnPowerMgmtBasics 28 }
+
+-------------------------------------------------------------------------------
+-- Power Management PSD Target Table
+--------------------------------------------------------------------------------
+    tnPowerMgmtPsdTargetTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnPowerMgmtPsdTargetEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnPowerMgmtBasics 29 }
+
+    tnPowerMgmtPsdTargetEntry OBJECT-TYPE
+        SYNTAX         TnPowerMgmtPsdTargetEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { ifIndex }
+        ::= { tnPowerMgmtPsdTargetTable 1 }
+
+    TnPowerMgmtPsdTargetEntry ::=
+        SEQUENCE {
+            tnPowerMgmtPsdTargetAll       Integer32,
+            tnPowerMgmtPsdTargetTotal     Integer32
+        }
+
+    tnPowerMgmtPsdTargetAll OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnPowerMgmtPsdTargetEntry 1 }
+
+    tnPowerMgmtPsdTargetTotal OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnPowerMgmtPsdTargetEntry 2 }
+
+--------------------------------------------------------------------------------
+-- Conformance Group Definitions
+--------------------------------------------------------------------------------
+    tnPowerMgmtGlobalGroup OBJECT-GROUP
+        OBJECTS {
+--            obsolete
+--            tnPowerMgmtGlobalUpdateInterval,
+            tnPowerMgmtGlobalMinStepSize,
+            tnPowerMgmtGlobalMaxStepSize,
+            tnPowerMgmtGlobalResetToDefaults,
+            tnPowerMgmtGlobalAutoEnabled,
+            tnPowerMgmtGlobalNumberOfAutoPowerAdjPoints,
+            tnPowerMgmtGlobalAlarmWhenDisabled
+--            obsolete
+--            tnPowerMgmtGlobalNEIsCommissioned
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnPowerMgmtGroups 1 }
+
+    tnPowerMgmtControlGroup OBJECT-GROUP
+        OBJECTS {
+--            obsolete
+--            tnPowerMgmtControlWavelengthsToAutoPowerAdj,
+            tnPowerMgmtControlPercentCompleted,
+--            obsolete
+--            tnPowerMgmtControlWavelengthsAutoPowerAdj,
+            tnPowerMgmtControlRowStatus
+--            obsolete
+--            tnPowerMgmtControlWorstCasePower
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnPowerMgmtGroups 2 }
+
+--------------------------------------------------------------------------------
+-- Obsoleted OIDs
+--------------------------------------------------------------------------------
+--    tnPowerMgmtStatusGroup OBJECT-GROUP ::= { tnPowerMgmtGroups 3 }
+
+    tnPowerMgmtIngressGroup OBJECT-GROUP
+        OBJECTS {
+            tnPowerMgmtIngressAdjustPowerGain,
+            tnPowerMgmtIngressAdjustPowerGainLastResult,
+            tnPowerMgmtIngressAcceptPowers,
+            tnPowerMgmtIngressAcceptPowersLastResult,
+            tnPowerMgmtIngressRippleAllowance,
+            tnPowerMgmtIngressAdjustPowerGainTargetGain,
+            tnPowerMgmtIngressAdjustPowerGainStatus,
+            tnPowerMgmtIngressStartAseAdjust,
+            tnPowerMgmtIngressAseAdjustLastResult,
+            tnPowerMgmtIngressAseAdjustStatus,
+            tnPowerMgmtIngressCommissioned,
+            tnPowerMgmtIngressGainSetOffset,
+            tnPowerMgmtIngressCommissionedGain,
+            tnPowerMgmtIngressSRSTiltPostFraction,
+            tnPowerMgmtIngressSRSTiltAdjResult,
+            tnPowerMgmtIngressSRSTiltAdjStatus,
+            tnPowerMgmtIngressPassed,
+            tnPowerMgmtIngressSRSTiltCalcOffset,
+            tnPowerMgmtIngressInternodalOaPpcMaxInCurrent,
+            tnPowerMgmtIngressInternodalOaPpcMaxInReference,
+            tnPowerMgmtIngressInternodalCalculatedSpanLossInCurrent,
+            tnPowerMgmtIngressInternodalCalculatedSpanLossInReference,
+            tnPowerMgmtIngressSRSTiltPostFractionL,
+            tnPowerMgmtIngressGainSetOffsetL,
+            tnPowerMgmtIngressAdjustPowerGainTargetGainL,
+            tnPowerMgmtIngressCommissionedGainL,
+            tnPowerMgmtIngressSRSTiltCalcOffsetL
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnPowerMgmtGroups 4 }
+
+    tnPowerMgmtEgressGroup OBJECT-GROUP
+        OBJECTS {
+            tnPowerMgmtEgressAdjustPowerWithOptimization,
+            tnPowerMgmtEgressAdjustPowerWithOptimizationStatus,
+            tnPowerMgmtEgressAdjustPowerWithOptimizationAbort,
+            tnPowerMgmtEgressAcceptPowers,
+--            obsolete
+--            tnPowerMgmtEgressReset,
+            tnPowerMgmtEgressAdjustPowerWithOptimizationLastResult,
+            tnPowerMgmtEgressAcceptPowersLastResult,
+--            obsolete
+--            tnPowerMgmtEgressFiberTilt,
+            tnPowerMgmtEgressAdjustPowerWithOptimizationTargetGain,
+            tnPowerMgmtEgressStartAseAdjust,
+            tnPowerMgmtEgressStopAseAdjust,
+            tnPowerMgmtEgressAseAdjustLastResult,
+            tnPowerMgmtEgressAseAdjustStatus,
+            tnPowerMgmtEgressCommissioned,
+            tnPowerMgmtEgressAmpIfIndex,
+            tnPowerMgmtEgressWssIfIndex,
+            tnPowerMgmtEgressSRSTiltCalcMultiplier,
+            tnPowerMgmtEgressSRSTiltPreFraction,
+            tnPowerMgmtEgressSRSTiltCalcACoeff,
+            tnPowerMgmtEgressSRSTiltCalcOutputLoss,
+--            obsolete
+--            tnPowerMgmtEgressSRSTiltCalcOffset,
+            tnPowerMgmtEgressSRSTiltAdjResult,
+            tnPowerMgmtEgressSRSTiltAdjStatus,
+            tnPowerMgmtEgressPassed,
+            tnPowerMgmtEgressLHLaunchAtten,
+--            obsolete
+--            tnPoweMgmtFiberSpanTiltPreComp,
+            tnPowerMgmtFiberSpanTiltPreComp,
+            tnPowerMgmtEgressInternodalPpcMaxInDownstream,
+            tnPowerMgmtEgressInternodalSpanLossInDownstream,
+            tnPowerMgmtEgressInternodalPpcMaxInDownstreamReference,
+            tnPowerMgmtEgressInternodalSpanLossInDownstreamReference,
+            tnPowerMgmtFiberSpanTiltPreCompL,
+            tnPowerMgmtEgressSRSTiltCalcMultiplierL,
+            tnPowerMgmtEgressSRSTiltPreFractionL,
+            tnPowerMgmtEgressSRSTiltCalcACoeffL,
+            tnPowerMgmtEgressSRSCF,
+            tnPowerMgmtEgressSRSCFL,
+            tnPowerMgmtEgressExternalOTAddLaunchAtten,
+            tnPowerMgmtEgressSmoothing,
+            tnPowerMgmtEgressSmoothingMaxStepSize
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnPowerMgmtGroups 5 }
+
+--------------------------------------------------------------------------------
+-- Obsoleted OIDs
+--------------------------------------------------------------------------------
+--    tnPowerMgmtPerChannelPowerGroup OBJECT-GROUP ::= { tnPowerMgmtGroups 6 }
+
+    tnPowerMgmtPortGroup OBJECT-GROUP
+        OBJECTS {
+            tnPowerMgmtPortIsCommissioned,
+            tnPowerMgmtPortTypeIn,
+            tnPowerMgmtPortTypeOut,
+--            obsolete
+--            tnWTDecoderUsageTypeIn,
+--            tnWTDecoderUsageTypeOut,
+            tnPowerMgmtPortWTDecoderUsageTypeIn,
+            tnPowerMgmtPortWTDecoderUsageTypeOut,
+            tnPowerMgmtPortGainAdjSchedBase,
+            tnPowerMgmtPortGainAdjTimerPeriod,
+            tnPowerMgmtPortGainAdjTimerLength,
+            tnPowerMgmtPortInGainAdjAutoEnabled,
+            tnPowerMgmtPortSRSTiltAdjAutoEnabled,
+            tnPowerMgmtPortFiberSpanTilt,
+            tnPowerMgmtPortSRSTiltMaintenanceMode,
+            tnPowerMgmtPortDegreeFunction,
+            tnPowerMgmtPortMaxChannels,
+            tnPowerMgmtPortEgressAdjustForDownstreamEnabled,
+            tnPowerMgmtPortFiberSpanTiltL,
+            tnPowerMgmtPortWTDecoderUsageTypeInL,
+            tnPowerMgmtPortWTDecoderUsageTypeOutL,
+            tnPowerMgmtPortIsCommissionedMethod,
+            tnPowerMgmtPortPsdModeEnabled
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnPowerMgmtGroups 7 }
+----------------------------------------------------------------------------
+--  Obsoleted OIDs
+----------------------------------------------------------------------------
+--  tnPowerMgmtPerChannelStatusGroup OBJECT-GROUP ::= { tnPowerMgmtGroups 8 }
+
+    tnPowerMgmtPowerOffsetInGroup OBJECT-GROUP
+        OBJECTS {
+            tnPowerMgmtOffsetInPowerOffset
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnPowerMgmtGroups 9 }
+
+    tnPowerMgmtPowerOffsetOutGroup OBJECT-GROUP
+        OBJECTS {
+            tnPowerMgmtOffsetOutPowerOffset
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnPowerMgmtGroups 10 }
+
+    tnPowerMgmtIngressPerChannelGroup OBJECT-GROUP
+        OBJECTS {
+            tnPowerMgmtIngressPerChannelSystemTargetOffset,
+            tnPowerMgmtIngressPerChannelUserTargetOffset,
+            tnPowerMgmtIngressPerChannelInUseTargetOffset,
+            tnPowerMgmtIngressPerChannelTargetAbsolute,
+            tnPowerMgmtIngressPerChannelApplicability
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnPowerMgmtGroups 11 }
+
+    tnPowerMgmtEgressPerChannelGroup OBJECT-GROUP
+        OBJECTS {
+            tnPowerMgmtEgressPerChannelSystemTargetOffset,
+            tnPowerMgmtEgressPerChannelUserTargetOffset,
+            tnPowerMgmtEgressPerChannelInUseTargetOffset,
+            tnPowerMgmtEgressPerChannelTargetAbsolute,
+            tnPowerMgmtEgressPerChannelApplicability
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnPowerMgmtGroups 12 }
+
+    tnPowerMgmtTechnologyTypesGroup OBJECT-GROUP
+        OBJECTS {
+            tnPowerMgmtTechnologyTypesBitRateText,
+            tnPowerMgmtTechnologyTypesEncodingText,
+            tnPowerMgmtTechnologyTypesWtocmCalib,
+            tnPowerMgmtTechnologyTypesRowStatus,
+            tnPowerMgmtTechnologyTypesOsnrCalib,
+            tnPowerMgmtTechnologyTypesWtocmaCalib,
+            tnPowerMgmtTechnologyTypesWtocmfCalib,
+            tnPowerMgmtTechnologyTypesWtocmfLCalib,
+            tnPowerMgmtTechnologyTypesWtocmfCalib375,
+            tnPowerMgmtTechnologyTypesWtocmfLCalib375,
+            tnPowerMgmtTechnologyTypesMinXCWidthValue
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnPowerMgmtGroups 13 }
+
+    tnPowerMgmtAnyAddGroup OBJECT-GROUP
+        OBJECTS {
+            tnPowerMgmtAnyAddAdjustPowerGain,
+            tnPowerMgmtAnyAddAdjustPowerGainLastResult,
+            tnPowerMgmtAnyAddAdjustPowerGainStatus,
+            tnPowerMgmtAnyAddCommissioned,
+            tnPowerMgmtAnyAddPassed,
+            tnPowerMgmtAnyAddAmpIfIndex,
+            tnPowerMgmtAnyAddAdjustPowerGainAbort
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnPowerMgmtGroups 14 }
+
+    tnPowerMgmtAnyDropGroup OBJECT-GROUP
+        OBJECTS {
+            tnPowerMgmtAnyDropAdjustPowerGain,
+            tnPowerMgmtAnyDropAdjustPowerGainLastResult,
+            tnPowerMgmtAnyDropAdjustPowerGainStatus,
+            tnPowerMgmtAnyDropCommissioned,
+            tnPowerMgmtAnyDropPassed,
+            tnPowerMgmtAnyDropAmpIfIndex
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnPowerMgmtGroups 15 }
+
+    tnPowerMgmtIroadmScalarsGroup OBJECT-GROUP
+        OBJECTS {
+            tnPowerMgmtIroadmAttributeTotal
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnPowerMgmtGroups 16 }
+
+    tnPowerMgmtIroadmGroup OBJECT-GROUP
+        OBJECTS {
+            tnPowerMgmtIroadmEgressOAMaxPpcOutFromInputs,
+            tnPowerMgmtIroadmEgressOAPpcOut
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnPowerMgmtGroups 17 }
+
+    tnPowerMgmtCapabilitiesCardScalarsGroup OBJECT-GROUP
+        OBJECTS {
+            tnPowerMgmtCapabilitiesCardAttributeTotal
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnPowerMgmtGroups 18 }
+
+    tnPowerMgmtCapabilitiesCardGroup OBJECT-GROUP
+        OBJECTS {
+            tnPowerMgmtCapabilitiesCardEgressPower,
+            tnPowerMgmtCapabilitiesCardIngressPower,
+            tnPowerMgmtCapabilitiesCardEgressTilt,
+            tnPowerMgmtCapabilitiesCardIngressTilt
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnPowerMgmtGroups 19 }
+
+    tnPowerMgmtIngressPortGroup OBJECT-GROUP
+        OBJECTS {
+            tnPowerMgmtIngressPortAdjustPowerGain,
+            tnPowerMgmtIngressPortAdjustPowerGainLastResult,
+            tnPowerMgmtIngressPortAdjustPowerGainStatus,
+            tnPowerMgmtIngressPortSRSTiltAdjStatus,
+            tnPowerMgmtIngressPortSRSTiltAdjResult,
+            tnPowerMgmtIngressPortSRSTiltPostFraction,
+            tnPowerMgmtIngressPortSRSTiltPostFractionL,
+            tnPowerMgmtIngressPortCommissioned,
+            tnPowerMgmtIngressPortPassed,
+            tnPowerMgmtIngressPortGainSetOffset,
+            tnPowerMgmtIngressPortGainSetOffsetL,
+            tnPowerMgmtIngressPortAdjustPowerGainTargetGain,
+            tnPowerMgmtIngressPortAdjustPowerGainTargetGainL,
+            tnPowerMgmtIngressPortCommissionedGain,
+            tnPowerMgmtIngressPortCommissionedGainL,
+            tnPowerMgmtIngressPortSRSTiltCalcOffset,
+            tnPowerMgmtIngressPortSRSTiltCalcOffsetL
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnPowerMgmtGroups 20 }
+
+    tnPowerMgmtEgressPortGroup OBJECT-GROUP
+        OBJECTS {
+            tnPowerMgmtEgressPortAdjustPowerWithOptimization,
+            tnPowerMgmtEgressPortAdjustPowerWithOptimizationAbort,
+            tnPowerMgmtEgressPortAdjustPowerWithOptimizationLastResult,
+            tnPowerMgmtEgressPortAdjustPowerWithOptimizationStatus,
+            tnPowerMgmtEgressPortSRSTiltCalcOutputLoss,
+            tnPowerMgmtEgressPortSRSTiltAdjStatus,
+            tnPowerMgmtEgressPortSRSTIltAdjResult,
+            tnPowerMgmtEgressPortSRSTiltCalcACoeff,
+            tnPowerMgmtEgressPortSRSTiltCalcACoeffL,
+            tnPowerMgmtEgressPortSRSTiltCalcMultiplier,
+            tnPowerMgmtEgressPortSRSTiltCalcMultiplierL,
+            tnPowerMgmtEgressPortFiberSpanTiltPreComp,
+            tnPowerMgmtEgressPortFiberSpanTiltPreCompL,
+            tnPowerMgmtEgressPortSRSCF,
+            tnPowerMgmtEgressPortSRSCFL,
+            tnPowerMgmtEgressPortSRSTiltPreFraction,
+            tnPowerMgmtEgressPortSRSTiltPreFractionL,
+            tnPowerMgmtEgressPortCommissioned,
+            tnPowerMgmtEgressPortPassed,
+            tnPowerMgmtEgressPortLHLaunchAtten,
+            tnPowerMgmtEgressPortExternalOTAddLaunchAtten,
+            tnPowerMgmtEgressPortSmoothing,
+            tnPowerMgmtEgressPortSmoothingMaxStepSize
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnPowerMgmtGroups 21 }
+
+    tnPowerMgmtIngressPortPerChannelGroup OBJECT-GROUP
+        OBJECTS {
+            tnPowerMgmtIngressPortPerChannelSystemTargetOffset,
+            tnPowerMgmtIngressPortPerChannelUserTargetOffset,
+            tnPowerMgmtIngressPortPerChannelInUseTargetOffset,
+            tnPowerMgmtIngressPortPerChannelTargetAbsolute,
+            tnPowerMgmtIngressPortPerChannelApplicability
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnPowerMgmtGroups 22 }
+
+    tnPowerMgmtEgressPortPerChannelGroup OBJECT-GROUP
+        OBJECTS {
+            tnPowerMgmtEgressPortPerChannelSystemTargetOffset,
+            tnPowerMgmtEgressPortPerChannelUserTargetOffset,
+            tnPowerMgmtEgressPortPerChannelInUseTargetOffset,
+            tnPowerMgmtEgressPortPerChannelTargetAbsolute,
+            tnPowerMgmtEgressPortPerChannelApplicability
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnPowerMgmtGroups 23 }
+
+    tnPowerMgmtCapabilitiesPortScalarsGroup OBJECT-GROUP
+        OBJECTS {
+            tnPowerMgmtCapabilitiesPortAttributeTotal
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnPowerMgmtGroups 24 }
+
+    tnPowerMgmtCapabilitiesPortGroup OBJECT-GROUP
+        OBJECTS {
+            tnPowerMgmtCapabilitiesPortEgressPower,
+            tnPowerMgmtCapabilitiesPortIngressPower,
+            tnPowerMgmtCapabilitiesPortEgressTilt,
+            tnPowerMgmtCapabilitiesPortIngressTilt
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnPowerMgmtGroups 25 }
+
+    tnPowerMgmtPsdScalarsGroup OBJECT-GROUP
+        OBJECTS {
+            tnPowerMgmtPsdAttributeTotal
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnPowerMgmtGroups 26 }
+
+    tnPowerMgmtPsdGroup OBJECT-GROUP
+        OBJECTS {
+            tnPowerMgmtPsdPowerPerThirtySevenDotFiveGHz,
+            tnPowerMgmtPsdEquivalentPowerSpectralDensityPerGHz
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnPowerMgmtGroups 27 }
+
+    tnPowerMgmtPsdTargetScalarsGroup OBJECT-GROUP
+        OBJECTS {
+            tnPowerMgmtPsdTargetAttributeTotal
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnPowerMgmtGroups 28 }
+
+    tnPowerMgmtPsdTargetGroup OBJECT-GROUP
+        OBJECTS {
+            tnPowerMgmtPsdTargetAll,
+            tnPowerMgmtPsdTargetTotal
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnPowerMgmtGroups 29 }
+
+--------------------------------------------------------------------------------
+-- Compliance Statements (mandatory)
+--------------------------------------------------------------------------------
+    tnPowerMgmtCompliance MODULE-COMPLIANCE
+        STATUS         current
+        DESCRIPTION    "."
+        MODULE
+        MANDATORY-GROUPS  {
+            tnPowerMgmtGlobalGroup,
+            tnPowerMgmtControlGroup,
+--            obsolete
+--            tnPowerMgmtStatusGroup,
+            tnPowerMgmtIngressGroup,
+            tnPowerMgmtEgressGroup,
+--            obsolete
+--            tnPowerMgmtPerChannelPowerGroup,
+            tnPowerMgmtPortGroup,
+--          obsolete
+--          tnPowerMgmtPerChannelStatusGroup,
+            tnPowerMgmtPowerOffsetInGroup,
+            tnPowerMgmtPowerOffsetOutGroup,
+            tnPowerMgmtIngressPerChannelGroup,
+            tnPowerMgmtEgressPerChannelGroup,
+            tnPowerMgmtTechnologyTypesGroup,
+            tnPowerMgmtAnyAddGroup,
+            tnPowerMgmtAnyDropGroup,
+            tnPowerMgmtIroadmScalarsGroup,
+            tnPowerMgmtIroadmGroup,
+            tnPowerMgmtCapabilitiesCardScalarsGroup,
+            tnPowerMgmtCapabilitiesCardGroup,
+            tnPowerMgmtIngressPortGroup,
+            tnPowerMgmtEgressPortGroup,
+            tnPowerMgmtIngressPortPerChannelGroup,
+            tnPowerMgmtEgressPortPerChannelGroup,
+            tnPowerMgmtCapabilitiesPortScalarsGroup,
+            tnPowerMgmtCapabilitiesPortGroup,
+            tnPowerMgmtPsdScalarsGroup,
+            tnPowerMgmtPsdGroup,
+            tnPowerMgmtPsdTargetScalarsGroup,
+            tnPowerMgmtPsdTargetGroup
+        }
+        ::= { tnPowerMgmtCompliances 1 }
+
+END -- DEFINITION OF TROPIC-POWERMGMT-MIB
+

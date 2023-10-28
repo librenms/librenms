@@ -1,0 +1,1627 @@
+TROPIC-GENERIC-LOG-MIB DEFINITIONS ::= BEGIN
+
+-- (c) Copyright 2023 Nokia Networks.  All rights reserved.
+-- This software is the confidential and proprietary property of
+-- Nokia and may only be used in accordance with the terms of the
+-- license agreement provided with this software.
+
+IMPORTS
+    OBJECT-TYPE, MODULE-IDENTITY,
+    Counter32, Counter64, Integer32,
+    Unsigned32, TimeTicks, IpAddress      FROM SNMPv2-SMI
+    DateAndTime, TruthValue               FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP       FROM SNMPv2-CONF
+    SnmpAdminString                       FROM SNMP-FRAMEWORK-MIB
+    TnCondition, TnTrapCategory,
+    TnEntityType                          FROM TROPIC-TC
+    tnSystemModules, tnGenericLogMIB      FROM TROPIC-GLOBAL-REG
+    TropicGenericTrapObjectValueType      FROM TROPIC-GENERIC-NOTIFICATION-MIB;
+
+tnGenericLogMibModule MODULE-IDENTITY
+    LAST-UPDATED    "201805251200Z"
+    ORGANIZATION    "Nokia"
+    CONTACT-INFO    "Nokia
+                     Attn: Jeff Donnelly
+                     600 Mountain Avenue
+                     New Providence, NJ 07974
+
+                     Phone: +1 732 221 6408
+                     Email: jeff.donnelly@nokia.com"
+
+    DESCRIPTION "The Generic Log MIB."
+
+    REVISION    "201805251200Z"
+    DESCRIPTION "Added tnGenericUserActionLogUserID to
+                 tnGenericUserActionLogBufferTable."
+
+    REVISION    "201802231200Z"
+    DESCRIPTION "Updated the contact info."
+
+    REVISION    "201707071200Z"
+    DESCRIPTION "Added entityType to alarm logs.
+                 Renamed
+                 tnGenericCriticalAlarmDateAndTime to
+                 tnGenericCriticalAlarmLogDateAndTime."
+
+    REVISION    "201703061200Z"
+    DESCRIPTION "Changed the syntax of the following objects to Unsigned32:
+                 tnGenericActiveAlarmTime, tnGenericCriticalAlarmLogTime,
+                 tnGenericMajorAlarmLogTime, tnGenericMinorAlarmLogTime,
+                 tnGenericStateChangeLogTime, tnGenericUserActionLogTime,
+                 tnGenericGeneralEventLogTime, tnGenericNotAlarmedLogTime,
+                 tnGenericSecurityLogTime, tnGenericWarningAlarmLogTime."
+
+    REVISION    "201701311200Z"
+    DESCRIPTION "Changed tnGenericSecurityLogBufferTable
+                 to match with traps and the tnGenericTrapBufferTable.
+                 Changed tnGenericStateChangeLogBufferTable and
+                 tnGenericUserActionLogBufferTable to align with
+                 tnGenericTrapBufferTable.
+                 Modified index ranges of
+                 tnGenericActiveAlarmSerialNumber,
+                 tnGenericCriticalAlarmLogSerialNumber,
+                 tnGenericMajorAlarmLogSerialNumber,
+                 tnGenericMinorAlarmLogSerialNumber,
+                 tnGenericStateChangeLogSerialNumber,
+                 tnGenericUserActionLogSerialNumber,
+                 tnGenericGeneralEventLogSerialNumber,
+                 tnGenericNotAlarmedLogSerialNumber,
+                 tnGenericSecurityLogSerialNumber,
+                 tnGenericWarningAlarmLogSerialNumber."
+
+    REVISION    "201612211200Z"
+    DESCRIPTION "Initial version."
+
+    ::= { tnSystemModules 13 }
+
+-------------------------------------------------------------------------------
+-- Groups in the Generic Log MIB Module
+-------------------------------------------------------------------------------
+
+tnGenericActiveAlarm             OBJECT IDENTIFIER ::= { tnGenericLogMIB 1 }
+tnGenericActiveAlarmObjects      OBJECT IDENTIFIER ::= { tnGenericActiveAlarm 1}
+tnGenericActiveAlarmConformance  OBJECT IDENTIFIER ::= { tnGenericActiveAlarm 2}
+tnGenericActiveAlarmCompliances  OBJECT IDENTIFIER ::= { tnGenericActiveAlarmConformance 1 }
+tnGenericActiveAlarmGroups       OBJECT IDENTIFIER ::= { tnGenericActiveAlarmConformance 2 }
+
+tnGenericLog                     OBJECT IDENTIFIER ::= { tnGenericLogMIB 2 }
+tnGenericLogObjects              OBJECT IDENTIFIER ::= { tnGenericLog 1}
+tnGenericLogConformance          OBJECT IDENTIFIER ::= { tnGenericLog 2}
+tnGenericLogCompliances          OBJECT IDENTIFIER ::= { tnGenericLogConformance 1 }
+tnGenericLogGroups               OBJECT IDENTIFIER ::= { tnGenericLogConformance 2 }
+
+-------------------------------------------------------------------------------
+-- Type Definitions
+-------------------------------------------------------------------------------
+
+
+-------------------------------------------------------------------------------
+-- Generic Active Alarm Table
+-------------------------------------------------------------------------------
+
+    tnGenericActiveAlarmTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnGenericActiveAlarmEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The generic active alarm table. This table includes the
+                        following categories:
+
+                        criticalAlarms(1)
+                        majorAlarms(2)
+                        minorAlarms(3)
+                        notAlarmed(7)
+                        warningAlarms(12)"
+        ::= { tnGenericActiveAlarmObjects 1 }
+
+    tnGenericActiveAlarmEntry OBJECT-TYPE
+        SYNTAX         TnGenericActiveAlarmEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "Entry in tnGenericActiveAlarmTable."
+        INDEX { tnGenericActiveAlarmSerialNumber }
+        ::= { tnGenericActiveAlarmTable 1 }
+
+    TnGenericActiveAlarmEntry ::=
+        SEQUENCE {
+            tnGenericActiveAlarmSerialNumber       Unsigned32,
+            tnGenericActiveAlarmType               OBJECT IDENTIFIER,
+            tnGenericActiveAlarmObject             OBJECT IDENTIFIER,
+            tnGenericActiveAlarmObjectInstance     SnmpAdminString,
+            tnGenericActiveAlarmTime               Unsigned32,
+            tnGenericActiveAlarmCategory           TnTrapCategory,
+            tnGenericActiveAlarmDescr              SnmpAdminString,
+            tnGenericActiveAlarmData               SnmpAdminString,
+            tnGenericActiveAlarmServiceAffecting   TruthValue,
+            tnGenericActiveAlarmCondition          TnCondition,
+            tnGenericActiveAlarmDateAndTime        DateAndTime,
+            tnGenericActiveAlarmEntityType         TnEntityType
+        }
+
+    tnGenericActiveAlarmSerialNumber OBJECT-TYPE
+        SYNTAX         Unsigned32 (1..4294967295)
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The independently incremented number associated
+                        with the sequential ordering of active alarms."
+        ::= { tnGenericActiveAlarmEntry 1 }
+
+    tnGenericActiveAlarmType OBJECT-TYPE
+        SYNTAX         OBJECT IDENTIFIER
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The OID of the active alarm notification."
+        ::= { tnGenericActiveAlarmEntry 2 }
+
+    tnGenericActiveAlarmObject OBJECT-TYPE
+        SYNTAX         OBJECT IDENTIFIER
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "OID of the object instance for which the
+                        active alarm is raised."
+        ::= { tnGenericActiveAlarmEntry 3 }
+
+    tnGenericActiveAlarmObjectInstance OBJECT-TYPE
+        SYNTAX         SnmpAdminString
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Instance in ASCII string format of the object
+                        for which the active alarm is raised."
+        ::= { tnGenericActiveAlarmEntry 4 }
+
+    tnGenericActiveAlarmTime OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The time at which the active alarm occurred,
+                        measured in total time ticks (seconds) from the
+                        year 1970."
+        ::= { tnGenericActiveAlarmEntry 5 }
+
+    tnGenericActiveAlarmCategory OBJECT-TYPE
+        SYNTAX         TnTrapCategory
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The active alarm's category."
+        ::= { tnGenericActiveAlarmEntry 6 }
+
+    tnGenericActiveAlarmDescr OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..255))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "A detailed description of the active alarm."
+        ::= { tnGenericActiveAlarmEntry 7 }
+
+    tnGenericActiveAlarmData OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..255))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Any application specific data relevant to the
+                        active alarm. This could be the value of a
+                        changed attribute or any other formatted
+                        information related to a notification."
+        ::= { tnGenericActiveAlarmEntry 8 }
+
+    tnGenericActiveAlarmServiceAffecting OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "An indication as to whether or not this active
+                        alarm is service affecting."
+        ::= { tnGenericActiveAlarmEntry 9 }
+
+    tnGenericActiveAlarmCondition OBJECT-TYPE
+        SYNTAX         TnCondition
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The condition."
+        ::= { tnGenericActiveAlarmEntry 10 }
+
+    tnGenericActiveAlarmDateAndTime OBJECT-TYPE
+        SYNTAX         DateAndTime
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The date and time (UTC) at which the alarm was raised."
+        ::= { tnGenericActiveAlarmEntry 11 }
+
+    tnGenericActiveAlarmEntityType OBJECT-TYPE
+        SYNTAX         TnEntityType
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The entity type."
+        ::= { tnGenericActiveAlarmEntry 12 }
+
+-------------------------------------------------------------------------------
+-- Generic Critical Alarm Log Table
+-------------------------------------------------------------------------------
+
+    tnGenericCriticalAlarmLogBufferTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnGenericCriticalAlarmLogBufferEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The generic critical alarm log history table."
+        ::= { tnGenericLogObjects 1 }
+
+    tnGenericCriticalAlarmLogBufferEntry OBJECT-TYPE
+        SYNTAX         TnGenericCriticalAlarmLogBufferEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "Entry in tnGenericCriticalAlarmLogBufferTable."
+        INDEX { tnGenericCriticalAlarmLogSerialNumber }
+        ::= { tnGenericCriticalAlarmLogBufferTable 1 }
+
+    TnGenericCriticalAlarmLogBufferEntry ::=
+        SEQUENCE {
+            tnGenericCriticalAlarmLogSerialNumber       Unsigned32,
+            tnGenericCriticalAlarmLogType               OBJECT IDENTIFIER,
+            tnGenericCriticalAlarmLogObject             OBJECT IDENTIFIER,
+            tnGenericCriticalAlarmLogObjectInstance     SnmpAdminString,
+            tnGenericCriticalAlarmLogTime               Unsigned32,
+            tnGenericCriticalAlarmLogDescr              SnmpAdminString,
+            tnGenericCriticalAlarmLogData               SnmpAdminString,
+            tnGenericCriticalAlarmLogServiceAffecting   TruthValue,
+            tnGenericCriticalAlarmLogCondition          TnCondition,
+            tnGenericCriticalAlarmLogDateAndTime        DateAndTime,
+            tnGenericCriticalAlarmLogEntityType         TnEntityType
+        }
+
+    tnGenericCriticalAlarmLogSerialNumber OBJECT-TYPE
+        SYNTAX         Unsigned32 (1..4294967295)
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The independently incremented number associated
+                        with the sequential ordering of incoming critical
+                        alarms."
+        ::= { tnGenericCriticalAlarmLogBufferEntry 1 }
+
+    tnGenericCriticalAlarmLogType OBJECT-TYPE
+        SYNTAX         OBJECT IDENTIFIER
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The OID of the critical alarm event ID."
+        ::= { tnGenericCriticalAlarmLogBufferEntry 2 }
+
+    tnGenericCriticalAlarmLogObject OBJECT-TYPE
+        SYNTAX         OBJECT IDENTIFIER
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "OID of the object instance associated with the
+                        critical alarm."
+        ::= { tnGenericCriticalAlarmLogBufferEntry 3 }
+
+    tnGenericCriticalAlarmLogObjectInstance OBJECT-TYPE
+        SYNTAX         SnmpAdminString
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Instance in ASCII string format of the object
+                        associated with the critical alarm."
+        ::= { tnGenericCriticalAlarmLogBufferEntry 4 }
+
+    tnGenericCriticalAlarmLogTime OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The time at which the critical alarm occurred,
+                        measured in total time ticks (seconds) from the
+                        year 1970."
+        ::= { tnGenericCriticalAlarmLogBufferEntry 5 }
+
+    tnGenericCriticalAlarmLogDescr OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..255))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "A detailed description of the critical alarm."
+        ::= { tnGenericCriticalAlarmLogBufferEntry 6 }
+
+    tnGenericCriticalAlarmLogData OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..255))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Any application specific data relevant to the
+                        critical alarm. This could be the value of a
+                        changed attribute or any other formatted
+                        information related to a notification."
+        ::= { tnGenericCriticalAlarmLogBufferEntry 7 }
+
+    tnGenericCriticalAlarmLogServiceAffecting OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "An indication as to whether or not this critical
+                        alarm is service affecting."
+        ::= { tnGenericCriticalAlarmLogBufferEntry 8 }
+
+    tnGenericCriticalAlarmLogCondition OBJECT-TYPE
+        SYNTAX         TnCondition
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The condition."
+        ::= { tnGenericCriticalAlarmLogBufferEntry 9 }
+
+    tnGenericCriticalAlarmLogDateAndTime OBJECT-TYPE
+        SYNTAX         DateAndTime
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The date and time (UTC) at which the alarm was logged."
+        ::= { tnGenericCriticalAlarmLogBufferEntry 10 }
+
+    tnGenericCriticalAlarmLogEntityType OBJECT-TYPE
+        SYNTAX         TnEntityType
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The entity type."
+        ::= { tnGenericCriticalAlarmLogBufferEntry 11 }
+
+-------------------------------------------------------------------------------
+-- Generic Major Alarm Log Table
+-------------------------------------------------------------------------------
+
+    tnGenericMajorAlarmLogBufferTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnGenericMajorAlarmLogBufferEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The generic major alarm log history table."
+        ::= { tnGenericLogObjects 2 }
+
+    tnGenericMajorAlarmLogBufferEntry OBJECT-TYPE
+        SYNTAX         TnGenericMajorAlarmLogBufferEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "Entry in tnGenericMajorAlarmLogBufferTable."
+        INDEX { tnGenericMajorAlarmLogSerialNumber }
+        ::= { tnGenericMajorAlarmLogBufferTable 1 }
+
+    TnGenericMajorAlarmLogBufferEntry ::=
+        SEQUENCE {
+            tnGenericMajorAlarmLogSerialNumber       Unsigned32,
+            tnGenericMajorAlarmLogType               OBJECT IDENTIFIER,
+            tnGenericMajorAlarmLogObject             OBJECT IDENTIFIER,
+            tnGenericMajorAlarmLogObjectInstance     SnmpAdminString,
+            tnGenericMajorAlarmLogTime               Unsigned32,
+            tnGenericMajorAlarmLogDescr              SnmpAdminString,
+            tnGenericMajorAlarmLogData               SnmpAdminString,
+            tnGenericMajorAlarmLogServiceAffecting   TruthValue,
+            tnGenericMajorAlarmLogCondition          TnCondition,
+            tnGenericMajorAlarmLogDateAndTime        DateAndTime,
+            tnGenericMajorAlarmLogEntityType         TnEntityType
+        }
+
+    tnGenericMajorAlarmLogSerialNumber OBJECT-TYPE
+        SYNTAX         Unsigned32 (1..4294967295)
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The independently incremented number associated
+                        with the sequential ordering of incoming major
+                        alarms."
+        ::= { tnGenericMajorAlarmLogBufferEntry 1 }
+
+    tnGenericMajorAlarmLogType OBJECT-TYPE
+        SYNTAX         OBJECT IDENTIFIER
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The OID of the major alarm event ID."
+        ::= { tnGenericMajorAlarmLogBufferEntry 2 }
+
+    tnGenericMajorAlarmLogObject OBJECT-TYPE
+        SYNTAX         OBJECT IDENTIFIER
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "OID of the object instance associated with the major
+                        alarm."
+        ::= { tnGenericMajorAlarmLogBufferEntry 3 }
+
+    tnGenericMajorAlarmLogObjectInstance OBJECT-TYPE
+        SYNTAX         SnmpAdminString
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Instance in ASCII string format of the object
+                        associated with the major alarm."
+        ::= { tnGenericMajorAlarmLogBufferEntry 4 }
+
+    tnGenericMajorAlarmLogTime OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The time at which the major alarm occurred,
+                        measured in total time ticks (seconds) from the
+                        year 1970."
+        ::= { tnGenericMajorAlarmLogBufferEntry 5 }
+
+    tnGenericMajorAlarmLogDescr OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..255))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "A detailed description of the major alarm."
+        ::= { tnGenericMajorAlarmLogBufferEntry 6 }
+
+    tnGenericMajorAlarmLogData OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..255))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Any application specific data relevant to the
+                        major alarm. This could be the value of a
+                        changed attribute or any other formatted
+                        information related to a notification."
+        ::= { tnGenericMajorAlarmLogBufferEntry 7 }
+
+    tnGenericMajorAlarmLogServiceAffecting OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "An indication as to whether or not this major
+                        alarm is service affecting."
+        ::= { tnGenericMajorAlarmLogBufferEntry 8 }
+
+    tnGenericMajorAlarmLogCondition OBJECT-TYPE
+        SYNTAX         TnCondition
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The condition."
+        ::= { tnGenericMajorAlarmLogBufferEntry 9 }
+
+    tnGenericMajorAlarmLogDateAndTime OBJECT-TYPE
+        SYNTAX         DateAndTime
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The date and time (UTC) at which the alarm was logged."
+        ::= { tnGenericMajorAlarmLogBufferEntry 10 }
+
+    tnGenericMajorAlarmLogEntityType OBJECT-TYPE
+        SYNTAX         TnEntityType
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The entity type."
+        ::= { tnGenericMajorAlarmLogBufferEntry 11 }
+
+
+-------------------------------------------------------------------------------
+-- Generic Minor Alarm Log Table
+-------------------------------------------------------------------------------
+
+    tnGenericMinorAlarmLogBufferTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnGenericMinorAlarmLogBufferEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The generic minor alarm log history table."
+        ::= { tnGenericLogObjects 3 }
+
+    tnGenericMinorAlarmLogBufferEntry OBJECT-TYPE
+        SYNTAX         TnGenericMinorAlarmLogBufferEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "Entry in tnGenericMinorAlarmLogBufferTable."
+        INDEX { tnGenericMinorAlarmLogSerialNumber }
+        ::= { tnGenericMinorAlarmLogBufferTable 1 }
+
+    TnGenericMinorAlarmLogBufferEntry ::=
+        SEQUENCE {
+            tnGenericMinorAlarmLogSerialNumber       Unsigned32,
+            tnGenericMinorAlarmLogType               OBJECT IDENTIFIER,
+            tnGenericMinorAlarmLogObject             OBJECT IDENTIFIER,
+            tnGenericMinorAlarmLogObjectInstance     SnmpAdminString,
+            tnGenericMinorAlarmLogTime               Unsigned32,
+            tnGenericMinorAlarmLogDescr              SnmpAdminString,
+            tnGenericMinorAlarmLogData               SnmpAdminString,
+            tnGenericMinorAlarmLogServiceAffecting   TruthValue,
+            tnGenericMinorAlarmLogCondition          TnCondition,
+            tnGenericMinorAlarmLogDateAndTime        DateAndTime,
+            tnGenericMinorAlarmLogEntityType         TnEntityType
+        }
+
+    tnGenericMinorAlarmLogSerialNumber OBJECT-TYPE
+        SYNTAX         Unsigned32 (1..4294967295)
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The independently incremented number associated
+                        with the sequential ordering of incoming minor
+                        alarms."
+        ::= { tnGenericMinorAlarmLogBufferEntry 1 }
+
+    tnGenericMinorAlarmLogType OBJECT-TYPE
+        SYNTAX         OBJECT IDENTIFIER
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The OID of the minor alarm event ID."
+        ::= { tnGenericMinorAlarmLogBufferEntry 2 }
+
+    tnGenericMinorAlarmLogObject OBJECT-TYPE
+        SYNTAX         OBJECT IDENTIFIER
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "OID of the object instance associated with the minor
+                        alarm."
+        ::= { tnGenericMinorAlarmLogBufferEntry 3 }
+
+    tnGenericMinorAlarmLogObjectInstance OBJECT-TYPE
+        SYNTAX         SnmpAdminString
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Instance in ASCII string format of the object
+                        associated with the minor alarm."
+        ::= { tnGenericMinorAlarmLogBufferEntry 4 }
+
+    tnGenericMinorAlarmLogTime OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The time at which the minor alarm occurred,
+                        measured in total time ticks (seconds) from the
+                        year 1970."
+        ::= { tnGenericMinorAlarmLogBufferEntry 5 }
+
+    tnGenericMinorAlarmLogDescr OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..255))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "A detailed description of the minor alarm."
+        ::= { tnGenericMinorAlarmLogBufferEntry 6 }
+
+    tnGenericMinorAlarmLogData OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..255))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Any application specific data relevant to the
+                        minor alarm. This could be the value of a
+                        changed attribute or any other formatted
+                        information related to a notification."
+        ::= { tnGenericMinorAlarmLogBufferEntry 7 }
+
+    tnGenericMinorAlarmLogServiceAffecting OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "An indication as to whether or not this minor
+                        alarm is service affecting."
+        ::= { tnGenericMinorAlarmLogBufferEntry 8 }
+
+    tnGenericMinorAlarmLogCondition OBJECT-TYPE
+        SYNTAX         TnCondition
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The condition."
+        ::= { tnGenericMinorAlarmLogBufferEntry 9 }
+
+    tnGenericMinorAlarmLogDateAndTime OBJECT-TYPE
+        SYNTAX         DateAndTime
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The date and time (UTC) at which the alarm was logged."
+        ::= { tnGenericMinorAlarmLogBufferEntry 10 }
+
+    tnGenericMinorAlarmLogEntityType OBJECT-TYPE
+        SYNTAX         TnEntityType
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The entity type."
+        ::= { tnGenericMinorAlarmLogBufferEntry 11 }
+
+
+-------------------------------------------------------------------------------
+-- Generic State Change Log Table
+-------------------------------------------------------------------------------
+
+    tnGenericStateChangeLogBufferTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnGenericStateChangeLogBufferEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The generic state change log history table."
+        ::= { tnGenericLogObjects 4 }
+
+    tnGenericStateChangeLogBufferEntry OBJECT-TYPE
+        SYNTAX         TnGenericStateChangeLogBufferEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "Entry in tnGenericStateChangeLogBufferTable."
+        INDEX { tnGenericStateChangeLogSerialNumber }
+        ::= { tnGenericStateChangeLogBufferTable 1 }
+
+    TnGenericStateChangeLogBufferEntry ::=
+        SEQUENCE {
+            tnGenericStateChangeLogSerialNumber         Unsigned32,
+            tnGenericStateChangeLogType                 OBJECT IDENTIFIER,
+            tnGenericStateChangeLogObject               OBJECT IDENTIFIER,
+            tnGenericStateChangeLogObjectInstance       SnmpAdminString,
+            tnGenericStateChangeLogTime                 Unsigned32,
+            tnGenericStateChangeLogObjectValueType      TropicGenericTrapObjectValueType,
+            tnGenericStateChangeLogObjectCounter32Val   Counter32,
+            tnGenericStateChangeLogObjectUnsigned32Val  Unsigned32,
+            tnGenericStateChangeLogObjectTimeTicksVal   TimeTicks,
+            tnGenericStateChangeLogObjectInteger32Val   Integer32,
+            tnGenericStateChangeLogObjectOctetStringVal OCTET STRING,
+            tnGenericStateChangeLogObjectIpAddressVal   IpAddress,
+            tnGenericStateChangeLogObjectOidVal         OBJECT IDENTIFIER,
+            tnGenericStateChangeLogObjectCounter64Val   Counter64,
+            tnGenericStateChangeLogDateAndTime          DateAndTime
+        }
+
+    tnGenericStateChangeLogSerialNumber OBJECT-TYPE
+        SYNTAX         Unsigned32 (1..4294967295)
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The independently incremented number associated
+                        with the sequential ordering of incoming state
+                        changes."
+        ::= { tnGenericStateChangeLogBufferEntry 1 }
+
+    tnGenericStateChangeLogType OBJECT-TYPE
+        SYNTAX         OBJECT IDENTIFIER
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The OID of the state change event ID."
+        ::= { tnGenericStateChangeLogBufferEntry 2 }
+
+    tnGenericStateChangeLogObject OBJECT-TYPE
+        SYNTAX         OBJECT IDENTIFIER
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "OID of the object instance associated with the state
+                        change."
+        ::= { tnGenericStateChangeLogBufferEntry 3 }
+
+    tnGenericStateChangeLogObjectInstance OBJECT-TYPE
+        SYNTAX         SnmpAdminString
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Instance in ASCII string format of the object
+                        associated with the state change."
+        ::= { tnGenericStateChangeLogBufferEntry 4 }
+
+    tnGenericStateChangeLogTime OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The time at which the state change occurred,
+                        measured in total time ticks (seconds) from the
+                        year 1970."
+        ::= { tnGenericStateChangeLogBufferEntry 5 }
+
+   tnGenericStateChangeLogObjectValueType OBJECT-TYPE
+        SYNTAX         TropicGenericTrapObjectValueType
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The type of the value. One and only one of the
+                        value objects that follow must be instantiated,
+                        based on this type."
+        ::= { tnGenericStateChangeLogBufferEntry 6 }
+
+    tnGenericStateChangeLogObjectCounter32Val OBJECT-TYPE
+        SYNTAX         Counter32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The value when tnGenericStateChangeLogObjectType is
+                        'counter32'."
+        ::= { tnGenericStateChangeLogBufferEntry 7 }
+
+    tnGenericStateChangeLogObjectUnsigned32Val OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The value when tnGenericStateChangeLogObjectType is
+                        'unsigned32'."
+        ::= { tnGenericStateChangeLogBufferEntry 8 }
+
+    tnGenericStateChangeLogObjectTimeTicksVal OBJECT-TYPE
+        SYNTAX         TimeTicks
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The value when tnGenericStateChangeLogObjectType is
+                        'timeTicks'."
+        ::= { tnGenericStateChangeLogBufferEntry 9 }
+
+    tnGenericStateChangeLogObjectInteger32Val OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The value when tnGenericStateChangeLogObjectType is
+                        'integer32'."
+        ::= { tnGenericStateChangeLogBufferEntry 10 }
+
+    tnGenericStateChangeLogObjectOctetStringVal OBJECT-TYPE
+        SYNTAX         OCTET STRING
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The value when tnGenericStateChangeLogObjectType is
+                        'octetString'."
+        ::= { tnGenericStateChangeLogBufferEntry 11 }
+
+    tnGenericStateChangeLogObjectIpAddressVal OBJECT-TYPE
+        SYNTAX         IpAddress
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The value when tnGenericStateChangeLogObjectType is
+                        'ipAddress'.
+                        Although this seems to be unfriendly for IPv6, we
+                        have to recognize that there are a number of older
+                        MIBs that do contain an IPv4 format address, known
+                        as IpAddress.
+
+                        IPv6 addresses are represented using TAddress or
+                        InetAddress, and so the underlying datatype is
+                        OCTET STRING, and their value would be stored in
+                        the tnGenericStateChangeLogObjectOctetStringVal
+                        column."
+        ::= { tnGenericStateChangeLogBufferEntry 12 }
+
+    tnGenericStateChangeLogObjectOidVal OBJECT-TYPE
+        SYNTAX         OBJECT IDENTIFIER
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The value when tnGenericStateChangeLogObjectType is
+                        'objectId'."
+        ::= { tnGenericStateChangeLogBufferEntry 13 }
+
+    tnGenericStateChangeLogObjectCounter64Val OBJECT-TYPE
+        SYNTAX         Counter64
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The value when tnGenericStateChangeLogObjectType is
+                        'counter64'."
+        ::= { tnGenericStateChangeLogBufferEntry 14 }
+
+    tnGenericStateChangeLogDateAndTime OBJECT-TYPE
+        SYNTAX         DateAndTime
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The date and time (UTC) at which the state change was
+                        logged."
+        ::= { tnGenericStateChangeLogBufferEntry 15 }
+
+-------------------------------------------------------------------------------
+-- Generic User Action Log Table
+-------------------------------------------------------------------------------
+
+    tnGenericUserActionLogBufferTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnGenericUserActionLogBufferEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The generic user action log history table."
+        ::= { tnGenericLogObjects 5 }
+
+    tnGenericUserActionLogBufferEntry OBJECT-TYPE
+        SYNTAX         TnGenericUserActionLogBufferEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "Entry in tnGenericUserActionLogBufferTable."
+        INDEX { tnGenericUserActionLogSerialNumber }
+        ::= { tnGenericUserActionLogBufferTable 1 }
+
+    TnGenericUserActionLogBufferEntry ::=
+        SEQUENCE {
+            tnGenericUserActionLogSerialNumber                Unsigned32,
+            tnGenericUserActionLogType                        OBJECT IDENTIFIER,
+            tnGenericUserActionLogObject                      OBJECT IDENTIFIER,
+            tnGenericUserActionLogObjectInstance              SnmpAdminString,
+            tnGenericUserActionLogTime                        Unsigned32,
+            tnGenericUserActionLogObjectValueType             TropicGenericTrapObjectValueType,
+            tnGenericUserActionLogObjectCounter32Val          Counter32,
+            tnGenericUserActionLogObjectUnsigned32Val         Unsigned32,
+            tnGenericUserActionLogObjectTimeTicksVal          TimeTicks,
+            tnGenericUserActionLogObjectInteger32Val          Integer32,
+            tnGenericUserActionLogObjectOctetStringVal        OCTET STRING,
+            tnGenericUserActionLogObjectIpAddressVal          IpAddress,
+            tnGenericUserActionLogObjectOidVal                OBJECT IDENTIFIER,
+            tnGenericUserActionLogObjectCounter64Val          Counter64,
+            tnGenericUserActionLogDateAndTime                 DateAndTime,
+            tnGenericUserActionLogConfigurationChangeCounter  Unsigned32,
+            tnGenericUserActionLogUserID                      SnmpAdminString
+        }
+
+    tnGenericUserActionLogSerialNumber OBJECT-TYPE
+        SYNTAX         Unsigned32 (1..4294967295)
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The independently incremented number associated
+                        with the sequential ordering of incoming user actions."
+        ::= { tnGenericUserActionLogBufferEntry 1 }
+
+    tnGenericUserActionLogType OBJECT-TYPE
+        SYNTAX         OBJECT IDENTIFIER
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The OID of the user action event ID."
+        ::= { tnGenericUserActionLogBufferEntry 2 }
+
+    tnGenericUserActionLogObject OBJECT-TYPE
+        SYNTAX         OBJECT IDENTIFIER
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "OID of the object instance associated with the user
+                        action."
+        ::= { tnGenericUserActionLogBufferEntry 3 }
+
+    tnGenericUserActionLogObjectInstance OBJECT-TYPE
+        SYNTAX         SnmpAdminString
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Instance in ASCII string format of the object
+                        associated with the user action."
+        ::= { tnGenericUserActionLogBufferEntry 4 }
+
+    tnGenericUserActionLogTime OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The time at which the user action occurred,
+                        measured in total time ticks (seconds) from the
+                        year 1970."
+        ::= { tnGenericUserActionLogBufferEntry 5 }
+
+    tnGenericUserActionLogObjectValueType OBJECT-TYPE
+        SYNTAX         TropicGenericTrapObjectValueType
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The type of the value. One and only one of the
+                        value objects that follow must be instantiated,
+                        based on this type."
+        ::= { tnGenericUserActionLogBufferEntry 6 }
+
+    tnGenericUserActionLogObjectCounter32Val OBJECT-TYPE
+        SYNTAX         Counter32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The value when tnGenericUserActionLogObjectType is
+                        'counter32'."
+        ::= { tnGenericUserActionLogBufferEntry 7 }
+
+    tnGenericUserActionLogObjectUnsigned32Val OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The value when tnGenericUserActionLogObjectType is
+                        'unsigned32'."
+        ::= { tnGenericUserActionLogBufferEntry 8 }
+
+    tnGenericUserActionLogObjectTimeTicksVal OBJECT-TYPE
+        SYNTAX         TimeTicks
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The value when tnGenericUserActionLogObjectType is
+                        'timeTicks'."
+        ::= { tnGenericUserActionLogBufferEntry 9 }
+
+    tnGenericUserActionLogObjectInteger32Val OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The value when tnGenericUserActionLogObjectType is
+                        'integer32'."
+        ::= { tnGenericUserActionLogBufferEntry 10 }
+
+    tnGenericUserActionLogObjectOctetStringVal OBJECT-TYPE
+        SYNTAX         OCTET STRING
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The value when tnGenericUserActionLogObjectType is
+                        'octetString'."
+        ::= { tnGenericUserActionLogBufferEntry 11 }
+
+    tnGenericUserActionLogObjectIpAddressVal OBJECT-TYPE
+        SYNTAX         IpAddress
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The value when tnGenericUserActionLogObjectType is
+                        'ipAddress'.
+                        Although this seems to be unfriendly for IPv6, we
+                        have to recognize that there are a number of older
+                        MIBs that do contain an IPv4 format address, known
+                        as IpAddress.
+
+                        IPv6 addresses are represented using TAddress or
+                        InetAddress, and so the underlying datatype is
+                        OCTET STRING, and their value would be stored in
+                        the tnGenericUserActionLogObjectOctetStringVal column."
+        ::= { tnGenericUserActionLogBufferEntry 12 }
+
+    tnGenericUserActionLogObjectOidVal OBJECT-TYPE
+        SYNTAX         OBJECT IDENTIFIER
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The value when tnGenericUserActionLogObjectType is
+                        'objectId'."
+        ::= { tnGenericUserActionLogBufferEntry 13 }
+
+    tnGenericUserActionLogObjectCounter64Val OBJECT-TYPE
+        SYNTAX         Counter64
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The value when tnGenericUserActionLogObjectType is
+                        'counter64'."
+        ::= { tnGenericUserActionLogBufferEntry 14 }
+
+    tnGenericUserActionLogDateAndTime OBJECT-TYPE
+        SYNTAX         DateAndTime
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The date and time (UTC) at which the user action was
+                        logged."
+        ::= { tnGenericUserActionLogBufferEntry 15 }
+
+    tnGenericUserActionLogConfigurationChangeCounter OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The configuration change counter related to the user
+                        action."
+        ::= { tnGenericUserActionLogBufferEntry 16 }
+
+    tnGenericUserActionLogUserID OBJECT-TYPE
+        SYNTAX         SnmpAdminString
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The user identification of the user that performed the
+                        change."
+        ::= { tnGenericUserActionLogBufferEntry 17 }
+
+-------------------------------------------------------------------------------
+-- Generic General Event Log Table
+-------------------------------------------------------------------------------
+
+    tnGenericGeneralEventLogBufferTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnGenericGeneralEventLogBufferEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The generic general event log history table."
+        ::= { tnGenericLogObjects 6 }
+
+    tnGenericGeneralEventLogBufferEntry OBJECT-TYPE
+        SYNTAX         TnGenericGeneralEventLogBufferEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "Entry in tnGenericGeneralEventLogBufferTable."
+        INDEX { tnGenericGeneralEventLogSerialNumber }
+        ::= { tnGenericGeneralEventLogBufferTable 1 }
+
+    TnGenericGeneralEventLogBufferEntry ::=
+        SEQUENCE {
+            tnGenericGeneralEventLogSerialNumber       Unsigned32,
+            tnGenericGeneralEventLogType               OBJECT IDENTIFIER,
+            tnGenericGeneralEventLogObject             OBJECT IDENTIFIER,
+            tnGenericGeneralEventLogObjectInstance     SnmpAdminString,
+            tnGenericGeneralEventLogTime               Unsigned32,
+            tnGenericGeneralEventLogDescr              SnmpAdminString,
+            tnGenericGeneralEventLogData               SnmpAdminString,
+            tnGenericGeneralEventLogDateAndTime        DateAndTime
+        }
+
+    tnGenericGeneralEventLogSerialNumber OBJECT-TYPE
+        SYNTAX         Unsigned32 (1..4294967295)
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The independently incremented number associated
+                        with the sequential ordering of incoming general
+                        events."
+        ::= { tnGenericGeneralEventLogBufferEntry 1 }
+
+    tnGenericGeneralEventLogType OBJECT-TYPE
+        SYNTAX         OBJECT IDENTIFIER
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The OID of the general event ID."
+        ::= { tnGenericGeneralEventLogBufferEntry 2 }
+
+    tnGenericGeneralEventLogObject OBJECT-TYPE
+        SYNTAX         OBJECT IDENTIFIER
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "OID of the object instance associated with the
+                        general event."
+        ::= { tnGenericGeneralEventLogBufferEntry 3 }
+
+    tnGenericGeneralEventLogObjectInstance OBJECT-TYPE
+        SYNTAX         SnmpAdminString
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Instance in ASCII string format of the object
+                        associated with the general event."
+        ::= { tnGenericGeneralEventLogBufferEntry 4 }
+
+    tnGenericGeneralEventLogTime OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The time at which the general event occurred,
+                        measured in total time ticks (seconds) from the
+                        year 1970."
+        ::= { tnGenericGeneralEventLogBufferEntry 5 }
+
+    tnGenericGeneralEventLogDescr OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..255))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "A detailed description of the general event."
+        ::= { tnGenericGeneralEventLogBufferEntry 6 }
+
+    tnGenericGeneralEventLogData OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..255))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Any application specific data relevant to the
+                        general event. This could be the value of a
+                        changed attribute or any other formatted
+                        information related to a notification."
+        ::= { tnGenericGeneralEventLogBufferEntry 7 }
+
+    tnGenericGeneralEventLogDateAndTime OBJECT-TYPE
+        SYNTAX         DateAndTime
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The date and time (UTC) at which the general event
+                        occurred."
+        ::= { tnGenericGeneralEventLogBufferEntry 8 }
+
+-------------------------------------------------------------------------------
+-- Generic Not Alarmed Log Table
+-------------------------------------------------------------------------------
+
+    tnGenericNotAlarmedLogBufferTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnGenericNotAlarmedLogBufferEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The generic not alarmed log history table."
+        ::= { tnGenericLogObjects 7 }
+
+    tnGenericNotAlarmedLogBufferEntry OBJECT-TYPE
+        SYNTAX         TnGenericNotAlarmedLogBufferEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "Entry in tnGenericNotAlarmedLogBufferTable."
+        INDEX { tnGenericNotAlarmedLogSerialNumber }
+        ::= { tnGenericNotAlarmedLogBufferTable 1 }
+
+    TnGenericNotAlarmedLogBufferEntry ::=
+        SEQUENCE {
+            tnGenericNotAlarmedLogSerialNumber       Unsigned32,
+            tnGenericNotAlarmedLogType               OBJECT IDENTIFIER,
+            tnGenericNotAlarmedLogObject             OBJECT IDENTIFIER,
+            tnGenericNotAlarmedLogObjectInstance     SnmpAdminString,
+            tnGenericNotAlarmedLogTime               Unsigned32,
+            tnGenericNotAlarmedLogDescr              SnmpAdminString,
+            tnGenericNotAlarmedLogData               SnmpAdminString,
+            tnGenericNotAlarmedLogServiceAffecting   TruthValue,
+            tnGenericNotAlarmedLogCondition          TnCondition,
+            tnGenericNotAlarmedLogDateAndTime        DateAndTime,
+            tnGenericNotAlarmedLogEntityType         TnEntityType
+        }
+
+    tnGenericNotAlarmedLogSerialNumber OBJECT-TYPE
+        SYNTAX         Unsigned32 (1..4294967295)
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The independently incremented number associated
+                        with the sequential ordering of incoming not alarmed
+                        events."
+        ::= { tnGenericNotAlarmedLogBufferEntry 1 }
+
+    tnGenericNotAlarmedLogType OBJECT-TYPE
+        SYNTAX         OBJECT IDENTIFIER
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The OID of the not alarmed event ID."
+        ::= { tnGenericNotAlarmedLogBufferEntry 2 }
+
+    tnGenericNotAlarmedLogObject OBJECT-TYPE
+        SYNTAX         OBJECT IDENTIFIER
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "OID of the object instance associated with the
+                        not alarmed event."
+        ::= { tnGenericNotAlarmedLogBufferEntry 3 }
+
+    tnGenericNotAlarmedLogObjectInstance OBJECT-TYPE
+        SYNTAX         SnmpAdminString
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Instance in ASCII string format of the object
+                        associated with the not alarmed event."
+        ::= { tnGenericNotAlarmedLogBufferEntry 4 }
+
+    tnGenericNotAlarmedLogTime OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The time at which the not alarmed event occurred,
+                        measured in total time ticks (seconds) from the
+                        year 1970."
+        ::= { tnGenericNotAlarmedLogBufferEntry 5 }
+
+    tnGenericNotAlarmedLogDescr OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..255))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "A detailed description of the not alarmed event."
+        ::= { tnGenericNotAlarmedLogBufferEntry 6 }
+
+    tnGenericNotAlarmedLogData OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..255))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Any application specific data relevant to the
+                        not alarmed event. This could be the value of a
+                        changed attribute or any other formatted
+                        information related to a notification."
+        ::= { tnGenericNotAlarmedLogBufferEntry 7 }
+
+    tnGenericNotAlarmedLogServiceAffecting OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "An indication as to whether or not this not alarmed
+                        event is service affecting."
+        ::= { tnGenericNotAlarmedLogBufferEntry 8 }
+
+    tnGenericNotAlarmedLogCondition OBJECT-TYPE
+        SYNTAX         TnCondition
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The condition."
+        ::= { tnGenericNotAlarmedLogBufferEntry 9 }
+
+    tnGenericNotAlarmedLogDateAndTime OBJECT-TYPE
+        SYNTAX         DateAndTime
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The date and time (UTC) at which the not alarmed
+                        event was logged."
+        ::= { tnGenericNotAlarmedLogBufferEntry 10 }
+
+    tnGenericNotAlarmedLogEntityType OBJECT-TYPE
+        SYNTAX         TnEntityType
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The entity type."
+        ::= { tnGenericNotAlarmedLogBufferEntry 11 }
+
+
+-------------------------------------------------------------------------------
+-- Generic Security Log Table
+-------------------------------------------------------------------------------
+
+    tnGenericSecurityLogBufferTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnGenericSecurityLogBufferEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The generic security log history table."
+        ::= { tnGenericLogObjects 8 }
+
+    tnGenericSecurityLogBufferEntry OBJECT-TYPE
+        SYNTAX         TnGenericSecurityLogBufferEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "Entry in tnGenericSecurityLogBufferTable."
+        INDEX { tnGenericSecurityLogSerialNumber }
+        ::= { tnGenericSecurityLogBufferTable 1 }
+
+    TnGenericSecurityLogBufferEntry ::=
+        SEQUENCE {
+            tnGenericSecurityLogSerialNumber        Unsigned32,
+            tnGenericSecurityLogType                OBJECT IDENTIFIER,
+            tnGenericSecurityLogObject              OBJECT IDENTIFIER,
+            tnGenericSecurityLogObjectInstance      SnmpAdminString,
+            tnGenericSecurityLogTime                Unsigned32,
+            tnGenericSecurityLogDescr               SnmpAdminString,
+            tnGenericSecurityLogData                SnmpAdminString,
+            tnGenericSecurityLogDateAndTime         DateAndTime
+        }
+
+    tnGenericSecurityLogSerialNumber OBJECT-TYPE
+        SYNTAX         Unsigned32 (1..4294967295)
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The independently incremented number associated
+                        with the sequential ordering of incoming security
+                        event."
+        ::= { tnGenericSecurityLogBufferEntry 1 }
+
+    tnGenericSecurityLogType OBJECT-TYPE
+        SYNTAX         OBJECT IDENTIFIER
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The OID of the security event ID."
+        ::= { tnGenericSecurityLogBufferEntry 2 }
+
+    tnGenericSecurityLogObject OBJECT-TYPE
+        SYNTAX         OBJECT IDENTIFIER
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "OID of the object instance associated with the
+                        security event."
+        ::= { tnGenericSecurityLogBufferEntry 3 }
+
+    tnGenericSecurityLogObjectInstance OBJECT-TYPE
+        SYNTAX         SnmpAdminString
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Instance in ASCII string format of the object
+                        associated with the security event."
+        ::= { tnGenericSecurityLogBufferEntry 4 }
+
+    tnGenericSecurityLogTime OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The time at which the security event occurred,
+                        measured in total time ticks (seconds) from the
+                        year 1970."
+        ::= { tnGenericSecurityLogBufferEntry 5 }
+
+    tnGenericSecurityLogDescr OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..255))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "A detailed description of the security event."
+        ::= { tnGenericSecurityLogBufferEntry 6 }
+
+    tnGenericSecurityLogData OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..255))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Any application specific data relevant to the
+                        security event. This could be the value of a
+                        changed attribute or any other formatted
+                        information related to a notification."
+        ::= { tnGenericSecurityLogBufferEntry 7 }
+
+    tnGenericSecurityLogDateAndTime OBJECT-TYPE
+        SYNTAX         DateAndTime
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The date and time (UTC) at which the security
+                        event was logged."
+        ::= { tnGenericSecurityLogBufferEntry 8 }
+
+-------------------------------------------------------------------------------
+-- Generic Warning Alarm Log Table
+-------------------------------------------------------------------------------
+
+    tnGenericWarningAlarmLogBufferTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnGenericWarningAlarmLogBufferEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The generic warning alarm log history table."
+        ::= { tnGenericLogObjects 9 }
+
+    tnGenericWarningAlarmLogBufferEntry OBJECT-TYPE
+        SYNTAX         TnGenericWarningAlarmLogBufferEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "Entry in tnGenericWarningAlarmLogBufferTable."
+        INDEX { tnGenericWarningAlarmLogSerialNumber }
+        ::= { tnGenericWarningAlarmLogBufferTable 1 }
+
+    TnGenericWarningAlarmLogBufferEntry ::=
+        SEQUENCE {
+            tnGenericWarningAlarmLogSerialNumber       Unsigned32,
+            tnGenericWarningAlarmLogType               OBJECT IDENTIFIER,
+            tnGenericWarningAlarmLogObject             OBJECT IDENTIFIER,
+            tnGenericWarningAlarmLogObjectInstance     SnmpAdminString,
+            tnGenericWarningAlarmLogTime               Unsigned32,
+            tnGenericWarningAlarmLogDescr              SnmpAdminString,
+            tnGenericWarningAlarmLogData               SnmpAdminString,
+            tnGenericWarningAlarmLogServiceAffecting   TruthValue,
+            tnGenericWarningAlarmLogCondition          TnCondition,
+            tnGenericWarningAlarmLogDateAndTime        DateAndTime,
+            tnGenericWarningAlarmLogEntityType         TnEntityType
+        }
+
+    tnGenericWarningAlarmLogSerialNumber OBJECT-TYPE
+        SYNTAX         Unsigned32 (1..4294967295)
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The independently incremented number associated
+                        with the sequential ordering of incoming warning
+                        alarms."
+        ::= { tnGenericWarningAlarmLogBufferEntry 1 }
+
+    tnGenericWarningAlarmLogType OBJECT-TYPE
+        SYNTAX         OBJECT IDENTIFIER
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The OID of the warning alarm event ID."
+        ::= { tnGenericWarningAlarmLogBufferEntry 2 }
+
+    tnGenericWarningAlarmLogObject OBJECT-TYPE
+        SYNTAX         OBJECT IDENTIFIER
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "OID of the object instance associated with
+                        the warning alarm."
+        ::= { tnGenericWarningAlarmLogBufferEntry 3 }
+
+    tnGenericWarningAlarmLogObjectInstance OBJECT-TYPE
+        SYNTAX         SnmpAdminString
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Instance in ASCII string format of the object
+                        associated with the warning alarm."
+        ::= { tnGenericWarningAlarmLogBufferEntry 4 }
+
+    tnGenericWarningAlarmLogTime OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The time at which the warning alarm occurred,
+                        measured in total time ticks (seconds) from the
+                        year 1970."
+        ::= { tnGenericWarningAlarmLogBufferEntry 5 }
+
+    tnGenericWarningAlarmLogDescr OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..255))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "A detailed description of the warning alarm."
+        ::= { tnGenericWarningAlarmLogBufferEntry 6 }
+
+    tnGenericWarningAlarmLogData OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..255))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Any application specific data relevant to the
+                        warning alarm. This could be the value of a
+                        changed attribute or any other formatted
+                        information related to a notification."
+        ::= { tnGenericWarningAlarmLogBufferEntry 7 }
+
+    tnGenericWarningAlarmLogServiceAffecting OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "An indication as to whether or not this warning
+                        alarm is service affecting."
+        ::= { tnGenericWarningAlarmLogBufferEntry 8 }
+
+    tnGenericWarningAlarmLogCondition OBJECT-TYPE
+        SYNTAX         TnCondition
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The condition."
+        ::= { tnGenericWarningAlarmLogBufferEntry 9 }
+
+    tnGenericWarningAlarmLogDateAndTime OBJECT-TYPE
+        SYNTAX         DateAndTime
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The date and time (UTC) at which the warning alarm
+                        was logged."
+        ::= { tnGenericWarningAlarmLogBufferEntry 10 }
+
+    tnGenericWarningAlarmLogEntityType OBJECT-TYPE
+        SYNTAX         TnEntityType
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The entity type."
+        ::= { tnGenericWarningAlarmLogBufferEntry 11 }
+
+
+-------------------------------------------------------------------------------
+-- Conformance Group Definitions
+-------------------------------------------------------------------------------
+
+tnGenericActiveAlarmGroup OBJECT-GROUP
+    OBJECTS {
+        tnGenericActiveAlarmType,
+        tnGenericActiveAlarmObject,
+        tnGenericActiveAlarmObjectInstance,
+        tnGenericActiveAlarmTime,
+        tnGenericActiveAlarmCategory,
+        tnGenericActiveAlarmDescr,
+        tnGenericActiveAlarmData,
+        tnGenericActiveAlarmServiceAffecting,
+        tnGenericActiveAlarmCondition,
+        tnGenericActiveAlarmDateAndTime,
+        tnGenericActiveAlarmEntityType
+    }
+    STATUS         current
+    DESCRIPTION    "Generic active alarm group."
+    ::= { tnGenericActiveAlarmGroups 1 }
+
+tnGenericCriticalAlarmGroup OBJECT-GROUP
+    OBJECTS {
+        tnGenericCriticalAlarmLogType,
+        tnGenericCriticalAlarmLogObject,
+        tnGenericCriticalAlarmLogObjectInstance,
+        tnGenericCriticalAlarmLogTime,
+        tnGenericCriticalAlarmLogDescr,
+        tnGenericCriticalAlarmLogData,
+        tnGenericCriticalAlarmLogServiceAffecting,
+        tnGenericCriticalAlarmLogCondition,
+        tnGenericCriticalAlarmLogDateAndTime,
+        tnGenericCriticalAlarmLogEntityType
+    }
+    STATUS         current
+    DESCRIPTION    "Generic critical alarm group."
+    ::= { tnGenericLogGroups 1 }
+
+tnGenericMajorAlarmGroup OBJECT-GROUP
+    OBJECTS {
+        tnGenericMajorAlarmLogType,
+        tnGenericMajorAlarmLogObject,
+        tnGenericMajorAlarmLogObjectInstance,
+        tnGenericMajorAlarmLogTime,
+        tnGenericMajorAlarmLogDescr,
+        tnGenericMajorAlarmLogData,
+        tnGenericMajorAlarmLogServiceAffecting,
+        tnGenericMajorAlarmLogCondition,
+        tnGenericMajorAlarmLogDateAndTime,
+        tnGenericMajorAlarmLogEntityType
+    }
+    STATUS         current
+    DESCRIPTION    "Generic major alarm group."
+    ::= { tnGenericLogGroups 2 }
+
+tnGenericMinorAlarmGroup OBJECT-GROUP
+    OBJECTS {
+        tnGenericMinorAlarmLogType,
+        tnGenericMinorAlarmLogObject,
+        tnGenericMinorAlarmLogObjectInstance,
+        tnGenericMinorAlarmLogTime,
+        tnGenericMinorAlarmLogDescr,
+        tnGenericMinorAlarmLogData,
+        tnGenericMinorAlarmLogServiceAffecting,
+        tnGenericMinorAlarmLogCondition,
+        tnGenericMinorAlarmLogDateAndTime,
+        tnGenericMinorAlarmLogEntityType
+    }
+    STATUS         current
+    DESCRIPTION    "Generic minor alarm group."
+    ::= { tnGenericLogGroups 3 }
+
+tnGenericStateChangeGroup OBJECT-GROUP
+    OBJECTS {
+        tnGenericStateChangeLogType,
+        tnGenericStateChangeLogObject,
+        tnGenericStateChangeLogObjectInstance,
+        tnGenericStateChangeLogTime,
+        tnGenericStateChangeLogObjectValueType,
+        tnGenericStateChangeLogObjectCounter32Val,
+        tnGenericStateChangeLogObjectUnsigned32Val,
+        tnGenericStateChangeLogObjectTimeTicksVal,
+        tnGenericStateChangeLogObjectInteger32Val,
+        tnGenericStateChangeLogObjectOctetStringVal,
+        tnGenericStateChangeLogObjectIpAddressVal,
+        tnGenericStateChangeLogObjectOidVal,
+        tnGenericStateChangeLogObjectCounter64Val,
+        tnGenericStateChangeLogDateAndTime
+    }
+    STATUS         current
+    DESCRIPTION    "Generic state change group."
+    ::= { tnGenericLogGroups 4 }
+
+tnGenericUserActionGroup OBJECT-GROUP
+    OBJECTS {
+        tnGenericUserActionLogType,
+        tnGenericUserActionLogObject,
+        tnGenericUserActionLogObjectInstance,
+        tnGenericUserActionLogTime,
+        tnGenericUserActionLogObjectValueType,
+        tnGenericUserActionLogObjectCounter32Val,
+        tnGenericUserActionLogObjectUnsigned32Val,
+        tnGenericUserActionLogObjectTimeTicksVal,
+        tnGenericUserActionLogObjectInteger32Val,
+        tnGenericUserActionLogObjectOctetStringVal,
+        tnGenericUserActionLogObjectIpAddressVal,
+        tnGenericUserActionLogObjectOidVal,
+        tnGenericUserActionLogObjectCounter64Val,
+        tnGenericUserActionLogDateAndTime,
+        tnGenericUserActionLogConfigurationChangeCounter
+    }
+    STATUS         current
+    DESCRIPTION    "Generic user action group."
+    ::= { tnGenericLogGroups 5 }
+
+tnGenericGeneralEventGroup OBJECT-GROUP
+    OBJECTS {
+        tnGenericGeneralEventLogType,
+        tnGenericGeneralEventLogObject,
+        tnGenericGeneralEventLogObjectInstance,
+        tnGenericGeneralEventLogTime,
+        tnGenericGeneralEventLogDescr,
+        tnGenericGeneralEventLogData,
+        tnGenericGeneralEventLogDateAndTime
+    }
+    STATUS         current
+    DESCRIPTION    "Generic general event group."
+    ::= { tnGenericLogGroups 6 }
+
+tnGenericNotAlarmedGroup OBJECT-GROUP
+    OBJECTS {
+        tnGenericNotAlarmedLogType,
+        tnGenericNotAlarmedLogObject,
+        tnGenericNotAlarmedLogObjectInstance,
+        tnGenericNotAlarmedLogTime,
+        tnGenericNotAlarmedLogDescr,
+        tnGenericNotAlarmedLogData,
+        tnGenericNotAlarmedLogServiceAffecting,
+        tnGenericNotAlarmedLogCondition,
+        tnGenericNotAlarmedLogDateAndTime,
+        tnGenericNotAlarmedLogEntityType
+    }
+    STATUS         current
+    DESCRIPTION    "Generic not alarmed group."
+    ::= { tnGenericLogGroups 7 }
+
+tnGenericSecurityGroup OBJECT-GROUP
+    OBJECTS {
+        tnGenericSecurityLogType,
+        tnGenericSecurityLogObject,
+        tnGenericSecurityLogObjectInstance,
+        tnGenericSecurityLogTime,
+        tnGenericSecurityLogDescr,
+        tnGenericSecurityLogData,
+        tnGenericSecurityLogDateAndTime
+    }
+    STATUS         current
+    DESCRIPTION    "Generic security group."
+    ::= { tnGenericLogGroups 8 }
+
+tnGenericWarningAlarmGroup OBJECT-GROUP
+    OBJECTS {
+        tnGenericWarningAlarmLogType,
+        tnGenericWarningAlarmLogObject,
+        tnGenericWarningAlarmLogObjectInstance,
+        tnGenericWarningAlarmLogTime,
+        tnGenericWarningAlarmLogDescr,
+        tnGenericWarningAlarmLogData,
+        tnGenericWarningAlarmLogServiceAffecting,
+        tnGenericWarningAlarmLogCondition,
+        tnGenericWarningAlarmLogDateAndTime,
+        tnGenericWarningAlarmLogEntityType
+    }
+    STATUS         current
+    DESCRIPTION    "Generic warning alarm group."
+    ::= { tnGenericLogGroups 9 }
+
+tnGenericUserActionGroup2 OBJECT-GROUP
+    OBJECTS {
+        tnGenericUserActionLogUserID
+    }
+    STATUS         current
+    DESCRIPTION    "Generic user action group 2."
+    ::= { tnGenericLogGroups 10 }
+
+-------------------------------------------------------------------------------
+-- Compliance Statements
+-------------------------------------------------------------------------------
+
+tnGenericActiveAlarmCompliance MODULE-COMPLIANCE
+    STATUS         current
+    DESCRIPTION    "Generic active alarm compliance."
+    MODULE
+    GROUP          tnGenericActiveAlarmGroup
+    DESCRIPTION    "tnGenericActiveAlarmGroup is optional."
+    ::= { tnGenericActiveAlarmCompliances 1 }
+
+tnGenericLogCompliance MODULE-COMPLIANCE
+    STATUS         current
+    DESCRIPTION    "Generic log compliance."
+    MODULE
+    GROUP          tnGenericCriticalAlarmGroup
+    DESCRIPTION    "tnGenericCriticalAlarmGroup is optional."
+
+    GROUP          tnGenericMajorAlarmGroup
+    DESCRIPTION    "tnGenericMajorAlarmGroup is optional."
+
+    GROUP          tnGenericMinorAlarmGroup
+    DESCRIPTION    "tnGenericMinorAlarmGroup is optional."
+
+    GROUP          tnGenericStateChangeGroup
+    DESCRIPTION    "tnGenericStateChangeGroup is optional."
+
+    GROUP          tnGenericUserActionGroup
+    DESCRIPTION    "tnGenericUserActionGroup is optional."
+
+    GROUP          tnGenericUserActionGroup2
+    DESCRIPTION    "tnGenericUserActionGroup2 is optional."
+
+    GROUP          tnGenericGeneralEventGroup
+    DESCRIPTION    "tnGenericGeneralEventGroup is optional."
+
+    GROUP          tnGenericNotAlarmedGroup
+    DESCRIPTION    "tnGenericNotAlarmedGroup is optional."
+
+    GROUP          tnGenericSecurityGroup
+    DESCRIPTION    "tnGenericSecurityGroup is optional."
+
+    GROUP          tnGenericWarningAlarmGroup
+    DESCRIPTION    "tnGenericWarningAlarmGroup is optional."
+    ::= { tnGenericLogCompliances 1 }
+
+END -- DEFINITION OF TROPIC-GENERAL-LOG-MIB

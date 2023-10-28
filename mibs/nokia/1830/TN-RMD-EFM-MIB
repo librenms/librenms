@@ -1,0 +1,171 @@
+TN-RMD-EFM-MIB DEFINITIONS ::= BEGIN
+
+-- (c) Copyright 2023 Nokia Networks.  All rights reserved.
+-- This software is the confidential and proprietary property of
+-- Nokia and may only be used in accordance with the terms of the
+-- license agreement provided with this software.
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, Counter64
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, TruthValue
+        FROM SNMPv2-TC
+    tnRmdObjs, tnRmdMIBModules
+        FROM TROPIC-GLOBAL-REG
+    tnRmdSystemId
+        FROM TN-RMD-SYSTEM-MIB
+    tnRmdIfIndex
+        FROM TN-RMD-IF-MIB
+    tnSysSwitchId
+        FROM TROPIC-SYSTEM-MIB
+    ;
+
+tnRmdEfmMibModule MODULE-IDENTITY
+    LAST-UPDATED    "201802231200Z"
+    ORGANIZATION    "Nokia"
+    CONTACT-INFO    "Nokia
+                     Attn: Jeff Donnelly
+                     600 Mountain Avenue
+                     New Providence, NJ 07974
+
+                     Phone: +1 732 221 6408
+                     Email: jeff.donnelly@nokia.com"
+
+    DESCRIPTION
+       "Ethernet Fault Management (EFM) MIB for Remote Managed Devices (RMDs)."
+
+    REVISION     "201802231200Z"
+    DESCRIPTION  "Updated the contact info."
+
+    REVISION     "201611160000Z"
+    DESCRIPTION  "Updated the contact info."
+
+    REVISION     "201211280000Z"
+    DESCRIPTION  "Initial revision."
+
+    ::= { tnRmdMIBModules 2 }
+
+
+tnRmdEfmObjects  OBJECT IDENTIFIER ::= { tnRmdObjs 2 }
+
+-- =============================================================
+-- Textual Conventions
+-- =============================================================
+
+TnRmdSystemEfmDefect ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "Indicates Efm defects.
+
+         LOP:    Loss Of Packets (EFM)"
+    SYNTAX  BITS {
+              lop(0)
+          }
+
+--------------------------------------------------------------------------------
+-- RMD EFM Scalar
+--------------------------------------------------------------------------------
+tnRmdEfmAttributeTotal OBJECT-TYPE
+    SYNTAX         Integer32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "."
+    ::= { tnRmdEfmObjects 1 }
+
+-- =============================================================
+-- tnRmdSystemEfmTable
+-- =============================================================
+
+tnRmdSystemEfmTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TnRmdSystemEfmEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing the general EFM data of all interfaces
+         of all RMDs."
+    ::= { tnRmdEfmObjects 2 }
+
+tnRmdSystemEfmEntry OBJECT-TYPE
+    SYNTAX      TnRmdSystemEfmEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of objects containing the general EFM data of an
+         interface of an RMD."
+    INDEX  { tnSysSwitchId, tnRmdSystemId, tnRmdIfIndex }
+    ::= { tnRmdSystemEfmTable 1 }
+
+TnRmdSystemEfmEntry ::=
+    SEQUENCE {
+        tnRmdSystemEfmEnabled  TruthValue,
+        tnRmdSystemEfmDefect   TnRmdSystemEfmDefect
+    }
+
+tnRmdSystemEfmEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether EFM is enabled for the interface."
+    ::= { tnRmdSystemEfmEntry 1 }
+
+tnRmdSystemEfmDefect OBJECT-TYPE
+    SYNTAX      TnRmdSystemEfmDefect
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates Efm defects."
+    ::= { tnRmdSystemEfmEntry  2 }
+
+
+-- =============================================================
+-- tnRmdEfmCountersTable
+-- =============================================================
+
+tnRmdEfmCountersTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TnRmdEfmCountersEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing the EFM counters of all interfaces of
+         all RMDs."
+    ::= { tnRmdEfmObjects 3 }
+
+tnRmdEfmCountersEntry OBJECT-TYPE
+    SYNTAX      TnRmdEfmCountersEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of objects containing the EFM counters of an
+         interface of an RMD."
+    INDEX  { tnSysSwitchId, tnRmdSystemId, tnRmdIfIndex }
+    ::= { tnRmdEfmCountersTable 1 }
+
+TnRmdEfmCountersEntry ::=
+    SEQUENCE {
+        tnRmdEfmCountersRxNrNearEndErroredSymbols  Counter64,
+        tnRmdEfmCountersReset                      TruthValue
+    }
+
+tnRmdEfmCountersRxNrNearEndErroredSymbols OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of EFM received near-end errored symbols."
+    ::= { tnRmdEfmCountersEntry 1 }
+
+tnRmdEfmCountersReset OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Setting of this object to 'true' invokes a reset of EFM counters.
+         Setting of this object to value 'false' has no effect.
+
+         This object is merely used to invoke a reset, and its actual
+         value has no meaning."
+    ::= { tnRmdEfmCountersEntry 2 }
+
+
+END

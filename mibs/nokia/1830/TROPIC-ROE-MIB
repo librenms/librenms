@@ -1,0 +1,2043 @@
+TROPIC-ROE-MIB DEFINITIONS ::= BEGIN
+
+-- (c) Copyright 2023 Nokia Networks.  All rights reserved.
+-- This software is the confidential and proprietary property of
+-- Nokia and may only be used in accordance with the terms of the
+-- license agreement provided with this software.
+
+IMPORTS
+      OBJECT-GROUP,
+      MODULE-COMPLIANCE                       FROM SNMPv2-CONF
+      Integer32, Unsigned32,
+      MODULE-IDENTITY, OBJECT-TYPE            FROM SNMPv2-SMI
+      TEXTUAL-CONVENTION,
+      RowStatus, MacAddress                   FROM SNMPv2-TC
+      TmnxPortID, TItemDescription            FROM TN-TC-MIB
+      tnPortModules, tnRoeMib                 FROM TROPIC-GLOBAL-REG;
+
+tnRoeMibModule MODULE-IDENTITY
+      LAST-UPDATED    "202208121200Z"
+      ORGANIZATION    "Nokia"
+      CONTACT-INFO    "Nokia
+                       Attn: Jeff Donnelly
+                       600 Mountain Avenue
+                       New Providence, NJ 07974
+
+                       Phone: +1 732 221 6408
+                       Email: jeff.donnelly@nokia.com"
+
+      DESCRIPTION "The ROE Managed Solution MIB."
+
+      REVISION    "202208121200Z"
+      DESCRIPTION "Changed SYNTAX range from (256..1500) to (38..1500), changed
+                   DESCRIPTION, and removed DEFVAL of the following:
+                   tnRoeMapperPayloadLen
+                   tnRoeDeMapperPayloadLen."
+
+      REVISION    "202204221200Z"
+      DESCRIPTION "Added the following to tnRoeTable:
+                   tnRoeTimingMode."
+
+      REVISION    "202104301200Z"
+      DESCRIPTION "Added the following to TropicRoeCardType:
+                   s24PS1(4),
+                   s24PS2(5)."
+
+      REVISION    "202101081200Z"
+      DESCRIPTION "Changed the range of SYNTAX of the following from (4..16)
+                   to (4..20):
+                   tnRoeMapperSampleWidth
+                   tnRoeDeMapperSampleWidth."
+
+      REVISION    "202012181200Z"
+      DESCRIPTION "1) Marked the following as obsolete:
+                      tnRoeTgenEnable
+                      tnRoeSlowCmEnable.
+                   2) Added the following to tnRoeTable:
+                      tnRoeMapperStatusEnable
+                      tnRoeSlowcmRate.
+                   3) Added default values in DESCRIPTION for the following:
+                      tnRoePPointer
+                      tnRoeMapperFrameStartOffset
+                      tnRoeDeMapperFrameStartOffset."
+
+      REVISION    "202010231200Z"
+      DESCRIPTION "Added the following to tnRoeTable:
+                   tnRoeCpriProtocolVer."
+
+      REVISION    "202006191200Z"
+      DESCRIPTION "1) Added the following to tnRoeTable:
+                      tnRoeTargetOffsetSubNano
+                      tnRoeTargetOffsetNano
+                      tnRoeMapperSampleWidth
+                      tnRoeTgenEnable
+                      tnRoeSlowCmEnable
+                      tnRoePPointer.
+                   2) Added the following to tnRoeMapperTable:
+                      tnRoeMapperSaType
+                      tnRoeMapperBwID
+                      tnRoeMapperPosition
+                      tnRoeMapperFrameStartOffset
+                      tnRoeMapperSchanStart
+                      tnRoeMapperSchanSize
+                      tnRoeMapperPincrement
+                      tnRoeMapperNa
+                      tnRoeMapperS
+                      tnRoeMapperK
+                      tnRoeMapperNc
+                      tnRoeMapperNv.
+                   3) Added the following to tnRoeDeMapperTable:
+                      tnRoeDeMapperSaType
+                      tnRoeDeMapperBwID
+                      tnRoeDeMapperPosition
+                      tnRoeDeMapperFrameStartOffset
+                      tnRoeDeMapperSchanStart
+                      tnRoeDeMapperSchanSize
+                      tnRoeDeMapperPincrement
+                      tnRoeDeMapperNa
+                      tnRoeDeMapperS
+                      tnRoeDeMapperK
+                      tnRoeDeMapperNc
+                      tnRoeDeMapperNv.
+                   4) Updated descriptions for the following:
+                      tnRoeEthlinkID
+                      tnRoeMapperID
+                      tnRoeDeMapperID."
+
+      REVISION    "202004031200Z"
+      DESCRIPTION "1) Changed DESCRIPTION of the following:
+                      tnRoeMapperPayloadLen.
+                   2) Changed DESCRIPTION and DEFVAL of the following:
+                      tnRoeDeMapperPayloadLen."
+
+      REVISION    "202002281200Z"
+      DESCRIPTION "1) Changed SYNTAX range of the following from (640..1500)
+                      to (256..1500):
+                      tnRoeMapperPayloadLen.
+                   2) Changed SYNTAX range of the following from (64..256) to
+                      (8...128):
+                      tnRoeDeMapperJitterBufferDepth."
+
+      REVISION    "202001241200Z"
+      DESCRIPTION " 1) Added the following to tnRoeTable:
+                       tnRoePresTimeOffsetSubNano
+                       tnRoePresTimeOffsetNano.
+                    2) Marked the following in tnRoeEncapMode as obsolete:
+                       tunneling(0)
+                       to
+                       structure-aware(2).
+                    3) Added the following in tnRoeEncapMode:
+                       tunneling(6)
+                       to
+                       structureAwareControl(9).
+                    4) Changed the DESCRIPTION of the following:
+                       tnRoeEncapMode
+                       tnRoeMapperType
+                       tnRoeDeMapperType.
+                    5) Marked the following in tnRoeAdminState as obsolete:
+                       up(0)
+                       down(1).
+                    6) Added the following in tnRoeAdminState:
+                       down(2)
+                       up(3).
+                    7) Changed MAX-ACCESS of the following from read-only to
+                       read-create:
+                       tnRoeAdminState.
+                    8) Changed SYNTAX of the following from OCTET STRING to
+                       OCTET STRING (SIZE(1..40)):
+                       tnRoeAlmProfName
+                       tnRoeMapperAlmProfName
+                       tnRoeDeMapperAlmProfName.
+                    9) Changed SYNTAX and DEFVAL of the following:
+                       tnRoeMapperPayloadLen
+                       tnRoeDeMapperPayloadLen
+                       tnRoeDeMapperJitterBufferDepth.
+                   10) Marked the following in tnRoeMapperShutdown and
+                       tnRoeDeMapperShutdown as obsolete:
+                       shutdown(0)
+                       no-shutdwn(1).
+                   11) Added the following to tnRoeMapperShutdown and
+                       tnRoeDeMapperShutdown:
+                       shutdown(2)
+                       no-shutdwn(3).
+                   12) Marked the following in tnRoeMapperType as obsolete:
+                       tunneling(0)
+                       to
+                       structure-Aware-Control(3).
+                   13) Added the following to tnRoeMapperType:
+                       tunneling(6)
+                       to
+                       structureAwareControl(9).
+                   14) Marked the following in tnRoeDeMapperType as obsolete:
+                       tunneling(0)
+                       to
+                       structureAwareData(2).
+                   15) Added the following in tnRoeDeMapperType:
+                       tunneling(6)
+                       to
+                       structureAwareControl(9)."
+
+      REVISION    "201909131200Z"
+      DESCRIPTION "1) Added the following to tnRoeTable:
+                      tnRoeAlmProfName.
+                   2) Added the following to tnRoeMapperTable:
+                      tnRoeMapperAlmProfName.
+                   3) Added the following to tnRoeDeMapperTable:
+                      tnRoeDeMapperAlmProfName."
+
+      REVISION    "201808241200Z"
+      DESCRIPTION "Initial version."
+
+      ::= { tnPortModules 10 }
+
+-------------------------------------------------------------------------------
+-- subtrees in the RoE MIB
+-------------------------------------------------------------------------------
+  tnRoeNotifications     OBJECT IDENTIFIER ::= { tnRoeMib 0 }
+  tnRoeObjects           OBJECT IDENTIFIER ::= { tnRoeMib 1 }
+  tnRoeEConf             OBJECT IDENTIFIER ::= { tnRoeMib 2 }
+  tnRoeGroups            OBJECT IDENTIFIER ::= { tnRoeEConf 1 }
+  tnEoeCompliances       OBJECT IDENTIFIER ::= { tnRoeEConf 2 }
+  tnRoeParameters        OBJECT IDENTIFIER ::= { tnRoeObjects 1 }
+
+-------------------------------------------------------------------------------
+-- Type Definitions
+-------------------------------------------------------------------------------
+    TropicRoeCardType ::= TEXTUAL-CONVENTION
+        STATUS         current
+        DESCRIPTION    "Card Type for TPS products."
+        SYNTAX         INTEGER {
+                         t24PS1(1),
+                         t24PS2(2),
+                         t12PS(3),
+                         s24PS1(4),
+                         s24PS2(5)
+                       }
+
+-------------------------------------------------------------------------------
+-- Roe Sequence Number Table
+-------------------------------------------------------------------------------
+    tnRoeSeqProfTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnRoeSeqProfEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "Roe sequence number table."
+        ::= { tnRoeParameters 1 }
+
+    tnRoeSeqProfEntry OBJECT-TYPE
+        SYNTAX         TnRoeSeqProfEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "Entry in tnRoeSeqTable table.  The seq-num-profile is
+                        used to specifie the composition of the sequence number
+                        field in RoE header for the RoE packets.  By default,
+                        the seq-num-profile with seq-num-prof-id = 1 exist,
+                        which is a system-defined profile applied to RoE mapper
+                        and RoE demapper whe no other profile is explicitly
+                        specified.  The seq-num-profile 1 has seq-num-type =
+                        frmr-num.  The system seq-num-profile can be modified
+                        but not deleted.  A profile cannot be modified until all
+                        RoE mapper and demappers using this profile are shutdown.
+                        A profile cannot be deleted until it is removed from all
+                        RoE mapper and demappers where it is applied."
+        INDEX { tnRoeSeqProfCardType,
+                tnRoeSeqProfPortID,
+                tnRoeSeqProfID }
+        ::= { tnRoeSeqProfTable 1 }
+
+    TnRoeSeqProfEntry ::=
+        SEQUENCE {
+            tnRoeSeqProfCardType        TropicRoeCardType,
+            tnRoeSeqProfPortID          TmnxPortID,
+            tnRoeSeqProfID              Integer32,
+            tnRoeSeqProfDescription     TItemDescription,
+            tnRoeSeqProfType            INTEGER,
+            tnRoeSeqProfPMax            Unsigned32,
+            tnRoeSeqProfPIncProp        INTEGER,
+            tnRoeSeqProfPInc            Unsigned32,
+            tnRoeSeqProfQMax            Unsigned32,
+            tnRoeSeqProfQIncProp        INTEGER,
+            tnRoeSeqProfQInc            Unsigned32,
+            tnRoeSeqProfRowStatus       RowStatus
+        }
+
+    tnRoeSeqProfCardType OBJECT-TYPE
+        SYNTAX         TropicRoeCardType
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The card type for TPS."
+        ::= { tnRoeSeqProfEntry 1 }
+
+    tnRoeSeqProfPortID OBJECT-TYPE
+        SYNTAX         TmnxPortID
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "tnRoeSeqProfPortID is an index into this table.  It maps
+                        this port to its entry in the mib-2 interfaces table."
+        ::= { tnRoeSeqProfEntry 2 }
+
+    tnRoeSeqProfID OBJECT-TYPE
+        SYNTAX         Integer32 (1..80)
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The sequency number profile id, unique within a roe
+                        entity."
+        ::= { tnRoeSeqProfEntry 3 }
+
+    tnRoeSeqProfDescription OBJECT-TYPE
+        SYNTAX         TItemDescription
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The description character string.  Strings can be up to
+                        80 characters long composed of printable, 7-bit ASCII
+                        characters.  If the string contains special characters
+                        (#, $, spaces, and so on), the entire string must be
+                        enclosed within double quotes."
+        ::= { tnRoeSeqProfEntry 4 }
+
+    tnRoeSeqProfType OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         frmrnum(0),
+                         seqnum(1)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The type of the composition of sequence number file in
+                        RoE header.
+                          frmrNum - Use 28-bit (BFN,HFN,bFN) in the Sequence
+                                    number field.
+                                    Bit 0-4 are zeroes.
+                                    Bit 5-16 represents BFN.
+                                    Bit 17-24 represents HFN.
+                                    Bit 25-31 represents Basic Frame Number.
+                          seqNum  - Use the compostion of 1914.3 Sequence Numbers.
+                                    The size of p-counter and q-counter are defined
+                                    in sub-commands."
+        DEFVAL         { frmrnum }
+        ::= { tnRoeSeqProfEntry 5 }
+
+    tnRoeSeqProfPMax OBJECT-TYPE
+        SYNTAX         Unsigned32 (0..'ffffffff'h)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Applicable only when seq-num-type = frmrnum.  It configures
+                        the maximum numerical value of the p-counter field."
+        DEFVAL         { 'ffffffff'h }
+        ::= { tnRoeSeqProfEntry 6 }
+
+    tnRoeSeqProfPIncProp OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         fixed(0),
+                         payloadsize(1)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Applicable only when seq-num-type = frmrnum.  It configures
+                        the method to increment the p-counter."
+        DEFVAL         { 0 }
+        ::= { tnRoeSeqProfEntry 7 }
+
+    tnRoeSeqProfPInc OBJECT-TYPE
+        SYNTAX         Unsigned32 (1..'ffffffff'h)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Applicable only when seq-num-type = frmrnum.  It configures
+                        the increment value of p-counter on every sent packet."
+        DEFVAL         { 1 }
+        ::= { tnRoeSeqProfEntry 8 }
+
+    tnRoeSeqProfQMax OBJECT-TYPE
+        SYNTAX         Unsigned32 (0..'ffffffff'h)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Applicable only when seq-num-type = frmrnum.  It configures
+                        the maximum numerical value of the q-counter field."
+        DEFVAL         { 0 }
+        ::= { tnRoeSeqProfEntry 9 }
+
+    tnRoeSeqProfQIncProp OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         fixed(0),
+                         payloadsize(1)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Applicable only when seq-num-type = frmrnum.  This command
+                        enables to increment the q-counter."
+        DEFVAL         { 0 }
+        ::= { tnRoeSeqProfEntry 10 }
+
+    tnRoeSeqProfQInc OBJECT-TYPE
+        SYNTAX         Unsigned32 (1..'ffffffff'h)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Applicable only when seq-num-type = frmrnum.  This command
+                        enables to increment the q-counter."
+        DEFVAL         { 1 }
+        ::= { tnRoeSeqProfEntry 11 }
+
+    tnRoeSeqProfRowStatus OBJECT-TYPE
+        SYNTAX         RowStatus
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The value of tnRoeEthlinkRowStatus defines the status
+                        of the row."
+        ::= { tnRoeSeqProfEntry 12 }
+
+-------------------------------------------------------------------------------
+-- Roe Table
+-------------------------------------------------------------------------------
+    tnRoeTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnRoeEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "Roe table."
+        ::= { tnRoeParameters 2 }
+
+    tnRoeEntry OBJECT-TYPE
+        SYNTAX         TnRoeEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "Entry in Roe table.  The roe entity is automatically
+                        created when the client interface of CPRI/OBSAI type
+                        with the mapping type = tunneling / structure-agnostic
+                        / structure-aware is created.  And it has one-to-one
+                        mapping with CPRI/OBSAI interface.  When the corresponding
+                        interface entity is deleted, the roe entity is deleted
+                        automatically.  The roe entity is automatically
+                        administratively up when the corresponding interface
+                        entity is administratively up.The roe entity is
+                        automatically administratively down when the corresponding
+                        interface entity is administratively down."
+        INDEX { tnRoeCardType,
+                tnRoePortID }
+        ::= { tnRoeTable 1 }
+
+    TnRoeEntry ::=
+        SEQUENCE {
+            tnRoeCardType                  TropicRoeCardType,
+            tnRoePortID                    TmnxPortID,
+            tnRoeDescription               TItemDescription,
+            tnRoeOrderInfoType             INTEGER,
+            tnRoePresTimeOffset            Integer32,
+            tnRoeCpriTxGenOffset           OCTET STRING,
+            tnRoeAutoUponChange            INTEGER,
+            tnRoeSeqNumProfID              Integer32,
+            tnRoeInitialTxBFN              Integer32,
+            tnRoeInitialTxHFN              Integer32,
+            tnRoeEncapMode                 INTEGER,
+            tnRoeAdminState                INTEGER,
+            tnRoePmonPolicy                Integer32,
+            tnRoeRowStatus                 RowStatus,
+            tnRoeAlmProfName               OCTET STRING,
+            tnRoePresTimeOffsetSubNano     Integer32,
+            tnRoePresTimeOffsetNano        Integer32,
+            tnRoeTargetOffsetSubNano       Integer32,
+            tnRoeTargetOffsetNano          Integer32,
+            tnRoeMapperSampleWidth         Integer32,
+            tnRoeDeMapperSampleWidth       Integer32,
+--            obsolete
+--            tnRoeTgenEnable                INTEGER,
+--            tnRoeSlowCmEnable              INTEGER,
+            tnRoePPointer                  Integer32,
+            tnRoeCpriProtocolVer           Integer32,
+            tnRoeMapperStatusEnable        INTEGER,
+            tnRoeSlowcmRate                Integer32,
+            tnRoeTimingMode                INTEGER
+        }
+
+    tnRoeCardType OBJECT-TYPE
+        SYNTAX         TropicRoeCardType
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The card type for TPS."
+        ::= { tnRoeEntry 1 }
+
+    tnRoePortID OBJECT-TYPE
+        SYNTAX         TmnxPortID
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "tnRoePortID is an index into this table.  It maps this
+                        port to its entry in the mib-2 interfaces table."
+        ::= { tnRoeEntry 2 }
+
+    tnRoeDescription OBJECT-TYPE
+        SYNTAX         TItemDescription
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The description character string.  Strings can be up to
+                        80 characters long composed of printable, 7-bit ASCII
+                        characters.  If the string contains special characters
+                        (#, $, spaces, and so on), the entire string must be
+                        enclosed within double quotes."
+        ::= { tnRoeEntry 3 }
+
+    tnRoeOrderInfoType OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         prestime(0),
+                         seqnum(1)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The orderInfo field in RoE header.  This parameter can
+                        be modified only when roe is shutdown.
+                          prestime - Presentation Time filled in OrderInfo field
+                                     of RoE header.
+                          seqnum   - Sequence Number filled in OrderInfo field
+                                     of RoE header."
+        DEFVAL         { 0 }
+        ::= { tnRoeEntry 4 }
+
+    tnRoePresTimeOffset OBJECT-TYPE
+        SYNTAX         Integer32 (0..1677721600)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The time in the unit of 1/100 of nanosecond.  0 is a
+                        specical value, which means the offset is automatically
+                        adjusted by the RoE mapper based on the latency
+                        measurement."
+        DEFVAL         { 0 }
+        ::= { tnRoeEntry 5 }
+
+    tnRoeCpriTxGenOffset OBJECT-TYPE
+        SYNTAX         OCTET STRING (SIZE (7))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The time in the unit of 1/100 of nanosecond.
+                        Applicable only when order-info-type is set to seq-num.
+                        Specifies the offset time to start the transmission of
+                        CPRI frames at CPRI egress.  CPRI egress starts to send
+                        CPRI frame when the global reference time is greater than
+                        or equal to CPRI Tx gen offset.  cpri-tx-gen-offset is
+                        aligned to the time epoc of the time source of this node.
+                        This parameter can be modified only when roe is shutdown."
+        ::= { tnRoeEntry 6 }
+
+    tnRoeAutoUponChange OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         disable(0),
+                         enable(1)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Enable the automatic adjustment of ts-gen-offset when the
+                        network delay changes due to the topology change, e.g.,
+                        protection switch.  Applicable only when order-info-type
+                        is set to seq-num.  This parameter can be modified only
+                        when roe is shutdown."
+        ::= { tnRoeEntry 7 }
+
+    tnRoeSeqNumProfID OBJECT-TYPE
+        SYNTAX         Integer32 (1..80)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Applicable only when order-info-type is set to seq-num.
+                        Associate a sequence number profile with the RoE entity.
+                        This paramete can be modified only when roe is shutdown."
+        DEFVAL         { 1 }
+        ::= { tnRoeEntry 8 }
+
+    tnRoeInitialTxBFN OBJECT-TYPE
+        SYNTAX         Integer32 (0..4095)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The BFN in the initial Hyperframe control word at CPRI
+                        egress.  Applicable only when order-info-type is set to
+                        seq-num.  It configures the bfn (BFN field in CPRI control
+                        word) in the initial hyperframe.  It can be modified only
+                        when roe is shutdown."
+        DEFVAL         { 1 }
+        ::= { tnRoeEntry 9 }
+
+    tnRoeInitialTxHFN OBJECT-TYPE
+        SYNTAX         Integer32 (0..149)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "HFN in the next hyperframe control word.  Aplicable only
+                        when order-info-type is set to seq-num.  It specifies the
+                        HFN in initial CPRI hyperframe control word at CPRI egress.
+                        It can be modified only when roe is shutdown."
+        DEFVAL         { 0 }
+        ::= { tnRoeEntry 10 }
+
+    tnRoeEncapMode OBJECT-TYPE
+        SYNTAX         INTEGER {
+--                         obsolete
+--                         tunneling(0),
+--                         structure-agnostic(1),
+--                         structure-aware(2)
+                         tunneling(6),
+                         linecodeAware(7),
+                         structureAware(8),
+                         structureAwareControl(9)
+                       }
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "tunneling       -    10B or 66B line codes are encapsulted
+                                             into RoE packets.
+                        linecodeAware   -    CPRI basic frames in 8B or 64B
+                                             symbols removing the line coding and
+                                             (if any) scrambling and   FEC, are
+                                             encapsulated into RoE packets.
+                        structureAware  -    CPRI/OBSAI AxC and Control signals are
+                                             extracted and excapsulated into separate
+                                             flows of RoE packets."
+        ::= { tnRoeEntry 11 }
+
+    tnRoeAdminState OBJECT-TYPE
+        SYNTAX         INTEGER {
+--                         obsolete
+--                         up(0),
+--                         down(1)
+                         down(2),
+                         up(3)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "up   - The administrative state is up.
+                        down - The administrative state is down."
+        ::= { tnRoeEntry 12 }
+
+    tnRoePmonPolicy OBJECT-TYPE
+        SYNTAX         Integer32 (0..99)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "PMON policy id assoicated to the RoE."
+        ::= { tnRoeEntry 13 }
+
+    tnRoeRowStatus OBJECT-TYPE
+        SYNTAX         RowStatus
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The value of tnRoeRowStatus defines the status of the row."
+        ::= { tnRoeEntry 14 }
+
+    tnRoeAlmProfName OBJECT-TYPE
+        SYNTAX         OCTET STRING (SIZE(1..40))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnRoeEntry 15 }
+
+    tnRoePresTimeOffsetSubNano OBJECT-TYPE
+        SYNTAX         Integer32 (0..31)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The time in the unit of 1/32 of nanosecond."
+        DEFVAL         { 0 }
+        ::= { tnRoeEntry 16 }
+
+    tnRoePresTimeOffsetNano OBJECT-TYPE
+        SYNTAX         Integer32 (5000..16777216)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The time in the unit of nanosecond."
+        DEFVAL         { 100000 }
+        ::= { tnRoeEntry 17 }
+
+    tnRoeTargetOffsetSubNano OBJECT-TYPE
+        SYNTAX         Integer32 (0..31)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The time in the unit of 1/32 of nanosecond for provisioned
+                        target delay.The parameter is available only when CPRI port
+                        is set to structure-aware mode.
+                        Represent the provisioned target delay
+                         - In DL path : BBU CPRI egress to remote TPS CPRI egress
+                         - In UL path : remote TPS CPRI ingress to BBU CPRI ingress
+                         - For remote TPS provision : target-offset should be based
+                           on DL path.
+                         - For hub TPS provision : target-offset should be based on
+                           UL path.
+                        This parameter is used to calculate the TPS CPRI egress
+                        presentation time setting (i.e., CPRI 10ms frame boundary
+                        is egress at specific presentation time based on TPS
+                        timebase traceable to global time reference).   All demapper
+                        buffers are egress based on this alignment. The offset time
+                        should be designed considering all factors introducing
+                        latency, i.e., network transmission latency, Ethernet switch
+                        forwarding latency, RoE encap/decap latency, jitter buffer
+                        depth, timebase difference between mapper and demapper.
+                        This parameter can be modified at run time, but the
+                        corresponding RoE demapper should be shut-down and no
+                        shutdown so that the decapsulated CPRI signals are played
+                        out at the presentation time."
+        DEFVAL         { 0 }
+        ::= { tnRoeEntry 18 }
+
+    tnRoeTargetOffsetNano OBJECT-TYPE
+        SYNTAX         Integer32 (5000..16777216)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The time is in the unit of nanosecond for provisioned
+                        target delay.  The parameter is available only when CPRI
+                        port is set to structure-aware mode.
+                        Represent the provisioned target delay
+                         - In DL path : BBU CPRI egress to remote TPS CPRI egress
+                         - In UL path : remote TPS CPRI ingress to BBU CPRI ingress
+                         - For remote TPS provision : target-offset should be based
+                           on DL path.
+                         - For hub TPS provision : target-offset should be based on
+                           UL path.
+                        This parameter is used to calculate the TPS CPRI egress
+                        presentation time setting (ie CPRI 10ms frame boundary is
+                        egress at specific presentation time based on TPS timebase
+                        traceable to global time reference).   All demapper buffers
+                        are egress based on this alignment.  The offset time should
+                        be designed considering all factors introducing latency,
+                        i.e., network transmission latency, Ethernet switch
+                        forwarding latency, RoE encap/decap latency, jitter buffer
+                        depth, timebase difference between mapper and demapper.
+                        This parameter can be modified at run time, but the
+                        corresponding RoE demapper should be shut-down and no
+                        shutdown so that the decapsulated CPRI signals are played
+                        out at the presentation time."
+        DEFVAL         { 100000 }
+        ::= { tnRoeEntry 19 }
+
+    tnRoeMapperSampleWidth OBJECT-TYPE
+        SYNTAX         Integer32 (4..20)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The parameter is available only when CPRI port is set to
+                        structure-aware mode.  This command configures the IQ
+                        sample width in the CPRI link as a parameter for all data
+                        mappers (sa-type = 0).   This parameter is needed to
+                        determine payload size.
+                        - For hub TPS provision:    mapper-sample-width = DL IQ
+                                                    sample width
+                        - For remote TPS provision: mapper-sample-width = UL IQ
+                                                    sample width"
+        DEFVAL         { 15 }
+        ::= { tnRoeEntry 20 }
+
+    tnRoeDeMapperSampleWidth OBJECT-TYPE
+        SYNTAX         Integer32 (4..20)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The parameter is available only when CPRI port is set to
+                        structure-aware mode.  This command configures the IQ
+                        sample width in the CPRI link as a global parameter for
+                        all data demappers (sa-type = 1).   This parameter is
+                        needed to determine payload size.
+                        - For hub TPS provision:    demapper-sample-width = UL IQ
+                                                    sample width
+                        - For remote TPS provision: demapper-sample-width = DL IQ
+                                                    sample width "
+        DEFVAL         { 15 }
+        ::= { tnRoeEntry 21 }
+
+--    obsolete
+--    tnRoeTgenEnable OBJECT-TYPE ::= { tnRoeEntry 22 }
+--    tnRoeSlowCmEnable OBJECT-TYPE ::= { tnRoeEntry 23 }
+
+    tnRoePPointer OBJECT-TYPE
+        SYNTAX         Integer32 (20..63)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The parameter is available only when CPRI port is set to
+                        structure-aware mode.  Specifies p-pointer value for
+                        the fast C&M channel in CPRI link associated with the RoE
+                        entity.  p-pointer defines the fast C&M channel region
+                        (starting subchannel) inside the CPRI control word.
+                        Based on CPRI rate and p-pointer value, the fast C&M
+                        Ethernet rate is also defined.  Value = 0 means fast C&M
+                        channel is not used in CPRI link.
+
+                        This parameter can be modified only when roe is shutdown.
+                        And the modification of this parameter may cause traffic
+                        interrupt and need to modify it in both roe mapper and
+                        demapper so that the new value can work.
+
+                        1 set of mapper and demapper (ID = 66) is reserved for
+                        handling fast C&M channel in CPRI link.  Native Ethernet
+                        packet (instead of RoE packet) is used to transport fast
+                        C&M channel content.  p-pointer value specifies the fast
+                        C&M channel region inside the CPRI link control word.
+                        RoE mapper then searches for the Ethernet packet content
+                        (start with SSD sequence, end with ESD sequence) inside
+                        this region and transports the entire Ethernet packet
+                        content as is.  After reception of an Ethernet packet
+                        into the associate demapper (buffer queue), demapper
+                        plays out the Ethernet packet content from buffer queue
+                        sequentially into the fast C&M channel region. Demapper
+                        automatically inserts idle sequence (ie inter-packet gap)
+                        between Ethernet packets into fast C&M channel.
+
+                        Default value for this attribute is 0."
+        ::= { tnRoeEntry 24 }
+
+    tnRoeCpriProtocolVer OBJECT-TYPE
+        SYNTAX         Integer32 (1..10)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "CPRI protocol version"
+        DEFVAL         { 1 }
+        ::= { tnRoeEntry 25 }
+
+    tnRoeMapperStatusEnable OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         disable(1),
+                         enable(2)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The parameter is available only when CPRI port is set
+                        to structure-aware mode and applies to RoE entity for
+                        a CPRI port.
+                        When enabled:
+                          (1) RoE entity disregards slowcm-rate, p-pointer,
+                              protocol-version parameter provision.
+                          (2) CPRI ingress L1inband information (Z.2.0, Z.66.0,
+                              Z.130.0, Z.194.0) is extracted and used by mappers
+                              within RoE entity.   Information is also sent to
+                              the other end RoE entity.
+                          (3) CPRI egress L1inband information is based on
+                              information from the other end RoE entity (traced
+                              to CPRI ingress L1inband information).
+                        When disabled:
+                          (1) RoE entity follows slowcm-rate, p-pointer,
+                              protocol-version parameter provision.
+                              Note:  For structure-aware mode to work properly,
+                                     RoE entities in both ends of RoE transport
+                                     should be set to mapper-status-enable or no
+                                     mapper-status-enable together."
+        DEFVAL         { enable }
+        ::= { tnRoeEntry 26 }
+
+    tnRoeSlowcmRate OBJECT-TYPE
+        SYNTAX         Integer32 (0..7)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The parameter is available only when CPRI port is set to
+                        structure-aware mode.  This command indicates rate of slow
+                        C&M channel in CPRI link.  When slow C&M is not supported
+                        by setting <rate-id> = 0, no slow C&M RoE flow is needed.
+                        RoE entity has 1 mapper and demapper reserved for RoE slow
+                        C&M flow.
+
+                        <rate-id> definition corresponds to CPRI standard Z.66.0
+                        definition.  This value is used to set Z.66.0 in CPRI egress.
+                          0 = HDLC disable
+                          1 = 240kbps
+                          2 = 480kbps
+                          3 = 960kbps
+                          4 = 1920kbps
+                          5 = 2400kbps
+                          6 = 3840/4800/7680kbps based on CPRI-5/6/7 and higher rates
+                          7 = follow CPRI slow C&M negotiation
+
+                        Note:  <rate-id> should be provisioned after CPRI rate
+                               is already provisioned.  Error should be issued when
+                               <rate-id> is set to a value which is invalid for a
+                               specific CPRI rate according to CPRI standard Z.66.0
+                               definition. For example, setting <rate-id> = 5 is
+                               invalid for CPRI-3 rate."
+        DEFVAL         { 0 }
+        ::= { tnRoeEntry 27 }
+
+    tnRoeTimingMode OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         differential(1),
+                         network(2)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The parameter is used to specify the timing-mode, for
+                        structure-agnostic tunneling and line coding aware
+                        mapping type. The value can be changed only when RoE is
+                        deactivated via shutdown command.
+
+                        Restrictions: applies to CPRI7 only."
+        DEFVAL         { differential }
+        ::= { tnRoeEntry 28 }
+
+-------------------------------------------------------------------------------
+-- Roe Mapper Table
+-------------------------------------------------------------------------------
+    tnRoeMapperTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnRoeMapperEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "Roe Mapper table."
+        ::= { tnRoeParameters 3 }
+
+    tnRoeMapperEntry OBJECT-TYPE
+        SYNTAX         TnRoeMapperEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "Entry in Roe Mapper table.  It creates or edits a
+                        mapper of structure-agnostic type when the encap-mode
+                        of the corresponding roe is structure-agnostic.  In
+                        structure-agnostic mode, at most 1 mapper can be created
+                        in a roe entity.  When a mapper is created, the create
+                        keyword must be specified.  By default, no mappers exist
+                        until they are explicitly created.  The mapper can be
+                        deleted only after it is shutdown."
+        INDEX { tnRoeMapperCardType,
+                tnRoeMapperPortID,
+                tnRoeMapperID  }
+        ::= { tnRoeMapperTable 1 }
+
+    TnRoeMapperEntry ::=
+        SEQUENCE {
+            tnRoeMapperCardType             TropicRoeCardType,
+            tnRoeMapperPortID               TmnxPortID,
+            tnRoeMapperID                   Integer32,
+            tnRoeMapperDescription          TItemDescription,
+            tnRoeMapperFlowID               Integer32,
+            tnRoeMappeEtherlinkID           Integer32,
+            tnRoeMapperPayloadLen           Integer32,
+            tnRoeMapperSyncMode             INTEGER,
+            tnRoeMapperBfn                  Integer32,
+            tnRoeMapperHfn                  Integer32,
+            tnRoeMapperBfrm                 Integer32,
+            tnRoeMapperShutdown             INTEGER,
+            tnRoeMapperType                 INTEGER,
+            tnRoeMapperOrderInfoType        INTEGER,
+            tnRoeMapperPmonPolicy           Integer32,
+            tnRoeMapperRowStatus            RowStatus,
+            tnRoeMapperAlmProfName          OCTET STRING,
+            tnRoeMapperSaType               Integer32,
+            tnRoeMapperBwID                 Integer32,
+            tnRoeMapperPosition             Integer32,
+            tnRoeMapperFrameStartOffset     Integer32,
+            tnRoeMapperSchanStart           Integer32,
+            tnRoeMapperSchanSize            Integer32,
+            tnRoeMapperPincrement           Integer32,
+            tnRoeMapperNa                   Integer32,
+            tnRoeMapperS                    Integer32,
+            tnRoeMapperK                    Integer32,
+            tnRoeMapperNc                   Integer32,
+            tnRoeMapperNv                   Integer32
+    }
+
+    tnRoeMapperCardType OBJECT-TYPE
+        SYNTAX         TropicRoeCardType
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The card type for TPS."
+        ::= { tnRoeMapperEntry 1 }
+
+    tnRoeMapperPortID OBJECT-TYPE
+        SYNTAX         TmnxPortID
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "tnRoePortID is an index into this table.  It maps this
+                        port to its entry in the mib-2 interfaces table."
+        ::= { tnRoeMapperEntry 2 }
+
+    tnRoeMapperID OBJECT-TYPE
+        SYNTAX         Integer32 (1..80)
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "Specifies the mapper id, unique within a roe entity.
+                        1 - when structure-agnostic mode (tunneling or line-coding aware) is selected.
+                        1..80 - when structure-aware mode is selected.
+
+                        The following default mapper-id assignment for sa-type is
+                        recommended when structure-aware mode is selected:
+                        1 - 64 for AxC data
+                        65 for fast C&M
+                        66 for slow C&M
+                        69- 76 for VSD raw (covering VSD and Ctrl_AxC)."
+        ::= { tnRoeMapperEntry 3 }
+
+    tnRoeMapperDescription OBJECT-TYPE
+        SYNTAX         TItemDescription
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The description character string.  Strings can be up to
+                        80 characters long composed of printable, 7-bit ASCII
+                        characters.  If the string contains special characters
+                        (#, $, spaces, and so on), the entire string must be
+                        enclosed within double quotes."
+        ::= { tnRoeMapperEntry 4 }
+
+    tnRoeMapperFlowID OBJECT-TYPE
+        SYNTAX         Integer32 (0..254)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "This command configures the flowid used in 'flowID'
+                        field in RoE header.  flowid has no default value, and
+                        must be specified by the user.  This parameter can be
+                        modified only when roe is shutdown."
+        ::= { tnRoeMapperEntry 5 }
+
+    tnRoeMappeEtherlinkID OBJECT-TYPE
+        SYNTAX         Integer32 (1..80)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Specifies the ethlink id, used to configure the ethernet
+                        frame header.  This parameter has no default value.  It
+                        must be explicitly configured.  This parameter can be
+                        modified only when roe is shutdown."
+        ::= { tnRoeMapperEntry 6 }
+
+    tnRoeMapperPayloadLen OBJECT-TYPE
+        SYNTAX         Integer32 (38..1500)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Specifies the length of the payload in RoE packets in
+                        bytes after the RoE common header and beforeFCS.
+                        Please check CLI document for detail definitions about the
+                        payload length usage based on the different rate and mode."
+        ::= { tnRoeMapperEntry 7 }
+
+    tnRoeMapperSyncMode OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         hyper(0),
+                         radio(1),
+                         basic(2)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The sync mode to control when to generate the presentation
+                        time.  Only when the basic frame number and/or bfn/hfn in
+                        received CPRI frame matches the basic frame number and/or
+                        bfn/hfn specified by the user based on the sync mode, roe
+                        mapper generates the presentation time for it.
+
+                        It can be modified only when mapper is shutdown."
+        DEFVAL         { 2 }
+        ::= { tnRoeMapperEntry 8 }
+
+    tnRoeMapperBfn OBJECT-TYPE
+        SYNTAX         Integer32 (0..4095)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Specifies the bfn used for sync."
+        DEFVAL         { 0 }
+        ::= { tnRoeMapperEntry 9 }
+
+    tnRoeMapperHfn OBJECT-TYPE
+        SYNTAX         Integer32 (0..149)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Specifies the bfn used for sync."
+        DEFVAL         { 0 }
+        ::= { tnRoeMapperEntry 10 }
+
+    tnRoeMapperBfrm OBJECT-TYPE
+        SYNTAX         Integer32 (0..255)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Specifies the basic frame number used for sync."
+        DEFVAL         { 0 }
+        ::= { tnRoeMapperEntry 11 }
+
+    tnRoeMapperShutdown OBJECT-TYPE
+        SYNTAX         INTEGER {
+--                         obsolete
+--                         shutdown (0),
+--                         no-shutdwn (1)
+                         shutdown(2),
+                         no-shutdwn(3)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Shutdown an RoE mapper entity.  When disabled, an
+                        entity does not change, reset, or remove any
+                        configuration settings or statistics.  RoE Mappers
+                        must be shut down before they may be deleted.  RoE
+                        mappers are created in the administratively down
+                        (shutdown) state.  When a no shutdown command is
+                        entered, the entity becomes administratively up."
+        ::= { tnRoeMapperEntry 12 }
+
+    tnRoeMapperType OBJECT-TYPE
+        SYNTAX         INTEGER {
+--                         obsolete
+--                         tunneling(0),
+--                         structure-agnostic(1),
+--                         structure-Aware-Data(2),
+--                         structure-Aware-Control(3)
+                         tunneling(6),
+                         linecodeAware(7),
+                         structureAware(8),
+                         structureAwareControl(9)
+                       }
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The Type of the mapper: Tunneling, linecodeAware,
+                        structureAware, structureAwareControl."
+        ::= { tnRoeMapperEntry 13 }
+
+    tnRoeMapperOrderInfoType OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         prestime(0),
+                         seqnum(1)
+                       }
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "SeqNum or Presentation Time."
+        ::= { tnRoeMapperEntry 14 }
+
+    tnRoeMapperPmonPolicy OBJECT-TYPE
+        SYNTAX         Integer32 (0..99)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "PMON policy id assoicated to the RoE Mapper."
+        ::= { tnRoeMapperEntry 15 }
+
+    tnRoeMapperRowStatus OBJECT-TYPE
+        SYNTAX         RowStatus
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The value of tnRoeMapperRowStatus defines the status
+                        of the row."
+        ::= { tnRoeMapperEntry 16 }
+
+    tnRoeMapperAlmProfName OBJECT-TYPE
+        SYNTAX         OCTET STRING (SIZE(1..40))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnRoeMapperEntry 17 }
+
+    tnRoeMapperSaType OBJECT-TYPE
+        SYNTAX         Integer32 (1..4)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The structure-aware mode mapper or demapper type.
+                        <type-id> valid values:
+                        1 = AxC data
+                        2 = fast C&M
+                        3 = slow C&M
+                        4 = VSD raw (covering Ctrl_AxC and VSD)
+                        Default values:
+                          1 for mapper-id/demapper-id = 1 - 64
+                          2 for mapper-id/demapper-id = 65
+                          3 for mapper-id/demapper-id = 66
+                          4 for mapper-id/demapper-id = 69-76"
+        ::= { tnRoeMapperEntry 18 }
+
+    tnRoeMapperBwID OBJECT-TYPE
+        SYNTAX         Integer32 (1..6)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Specifies bw (currently covering all LTE BW). Valid
+                        values:
+                          1 = 1.4MHz
+                          2 = 3MHz
+                          3 = 5MHz
+                          4 = 10MHz
+                          5 = 15MHz
+                          6 = 20MHz
+                        This parameter can be modified only when roe is shutdown.
+                        And the modification of this parameter may cause traffic
+                        interrupt and need to modify it in both roe mapper and
+                        demapper so that the new value can work. "
+        ::= { tnRoeMapperEntry 19 }
+
+    tnRoeMapperPosition OBJECT-TYPE
+        SYNTAX         Integer32 (32..6143)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Valid range based on CPRI rate parameter setting:
+                        384..6143  for CPRI-10
+                        160.. 2559 for CPRI-8
+                        128..2047  for CPRI-7
+                        64.. 1023  for CPRI-5
+                        32.. 511   for CPRI-3 "
+        ::= { tnRoeMapperEntry 20 }
+
+    tnRoeMapperFrameStartOffset OBJECT-TYPE
+        SYNTAX         Integer32 (32..6143)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The parameter is available only when
+                         - CPRI port is set to structure-aware mode
+                         - sa-type = 1 (for AxC data)
+
+                        Specifies each AxC frame start offset relative to CPRI
+                        10ms frame boundary.
+                          - For hub TPS provision:    This parameter is for DL
+                                                      path (in mapper) and UL
+                                                      path (in de-mapper)
+                          - For remote TPS provision: This parameter is for UL
+                                                      path (in mapper) and DL
+                                                      path (in de-mapper)
+
+                        For BBU-TPS application, setting to default value = 0
+                        is sufficient.  This parameter can be modified only when
+                        roe is shutdown. And the modification of this parameter
+                        may cause traffic interrupt and need to modify it in both
+                        roe mapper and demapper so that the new value can work.
+
+                        Default value for this attribute is 0."
+        ::= { tnRoeMapperEntry 21 }
+
+    tnRoeMapperSchanStart OBJECT-TYPE
+        SYNTAX         Integer32 (4..19)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The parameter is available only when
+                        - CPRI port is set to structure-aware mode and
+                        - sa-type = 4 (for VSD raw)
+
+                        This parameter identifies the subchannel number (Ns) in
+                        the CPRI control word as the start of a VSD raw group.
+                        VSD raw group can be used to define a segment of Ctrl_AxC
+                        region or VSD region within the CPRI control word.  The
+                        defined segment is restricted to consecutive subchannels
+                        defined by schan-start and schan-size parameters.
+                        - Ns = [4..7] is the valid range of the Ctrl_AxC region
+                               within CPRI control word.
+                        - Ns = [16 : (p-pointer - 1)] is the valid range of the
+                               VSD region within CPRI control word.
+
+                        Since p-pointer is another provision parameter.  Valid
+                        range of VSD region can only
+                        be known after p-pointer is set by user.
+                        Prior to p-pointer provision, default valid range for
+                        VSD region is restricted to Ns = [16..19]
+
+                        This parameter can be modified only when roe is shutdown.
+                        And the modification of this parameter may cause traffic
+                        interrupt and need to modify it in both roe mapper and
+                        demapper so that the new value can work.  "
+        ::= { tnRoeMapperEntry 22 }
+
+    tnRoeMapperSchanSize OBJECT-TYPE
+        SYNTAX         Integer32 (1..64)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The parameter is available only when
+                        - CPRI port is set to structure-aware mode and
+                        - sa-type = 4 (for VSD raw)
+
+                        This parameter identifies the size of VSD raw group
+                        in number of consecutive subchannels within the CPRI
+                        control word.  A VSD raw group can be used to define
+                        a segment of Ctrl_AxC region or VSD region within the
+                        CPRI control word.
+
+                        The defined segment is restricted to consecutive
+                        sub-channels defined by schan-start and schan-size
+                        parameters.  Since p-pointer is another provision
+                        parameter.  Valid range of VSD region can only be
+                        known after p-pointer is set by user.
+
+                        Prior to p-pointer provision, default valid range for
+                        VSD region is restricted to Ns = [16..19]
+
+                        This parameter can be modified only when roe is shutdown.
+                        And the modification of this parameter may cause traffic
+                        interrupt and need to modify it in both roe mapper and
+                        demapper so that the new value can work. "
+        ::= { tnRoeMapperEntry 23 }
+
+    tnRoeMapperPincrement OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnRoeMapperEntry 24 }
+
+    tnRoeMapperNa OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnRoeMapperEntry 25 }
+
+    tnRoeMapperS OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnRoeMapperEntry 26 }
+
+    tnRoeMapperK OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnRoeMapperEntry 27 }
+
+    tnRoeMapperNc OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnRoeMapperEntry 28 }
+
+    tnRoeMapperNv OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnRoeMapperEntry 29 }
+
+-------------------------------------------------------------------------------
+-- Roe De-Mapper Table
+-------------------------------------------------------------------------------
+    tnRoeDeMapperTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnRoeDeMapperEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "Roe DeMapper table."
+        ::= { tnRoeParameters 4 }
+
+    tnRoeDeMapperEntry OBJECT-TYPE
+        SYNTAX         TnRoeDeMapperEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "Entry in Roe DeMapper table.  It creates or edits a
+                        demapper of structure-agnostic type when the encap-mode
+                        of the corresponding roe is structure-agnostic.  In
+                        structure-agnostic mode, at most 1 demapper can be
+                        created in a roe entity.  When a demapper is created,
+                        the create keyword must be specified.  By default, no
+                        demappers exist until they are explicitly created.  The
+                        demapper can be deleted only after it is shutdown."
+        INDEX { tnRoeDeMapperCardType,
+                tnRoePortID,
+                tnRoeDeMapperID  }
+        ::= { tnRoeDeMapperTable 1 }
+
+    TnRoeDeMapperEntry ::=
+        SEQUENCE {
+            tnRoeDeMapperCardType              TropicRoeCardType,
+            tnRoeDeMapperPortID                TmnxPortID,
+            tnRoeDeMapperID                    Integer32,
+            tnRoeDeMapperDescription           TItemDescription,
+            tnRoeDeMappeEtherlinkID            Integer32,
+            tnRoeDeMapperPayloadLen            Integer32,
+            tnRoeDeMapperSyncMode              INTEGER,
+            tnRoeDeMapperBfn                   Integer32,
+            tnRoeDeMapperHfn                   Integer32,
+            tnRoeDeMapperBfrm                  Integer32,
+            tnRoeDeMapperJitterBufferDepth     Integer32,
+            tnRoeDeMapperShutdown              INTEGER,
+            tnRoeDeMapperType                  INTEGER,
+            tnRoeDeMapperFlowID                Integer32,
+            tnRoeDeMapperOrderInfoType         INTEGER,
+            tnRoeDeMapperPmonPolicy            Integer32,
+            tnRoeDeMapperRowStatus             RowStatus,
+            tnRoeDeMapperAlmProfName           OCTET STRING,
+            tnRoeDeMapperSaType                Integer32,
+            tnRoeDeMapperBwID                  Integer32,
+            tnRoeDeMapperPosition              Integer32,
+            tnRoeDeMapperFrameStartOffset      Integer32,
+            tnRoeDeMapperSchanStart            Integer32,
+            tnRoeDeMapperSchanSize             Integer32,
+            tnRoeDeMapperPincrement            Integer32,
+            tnRoeDeMapperNa                    Integer32,
+            tnRoeDeMapperS                     Integer32,
+            tnRoeDeMapperK                     Integer32,
+            tnRoeDeMapperNc                    Integer32,
+            tnRoeDeMapperNv                    Integer32
+    }
+
+    tnRoeDeMapperCardType OBJECT-TYPE
+        SYNTAX         TropicRoeCardType
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The card type for TPS."
+        ::= { tnRoeDeMapperEntry 1 }
+
+    tnRoeDeMapperPortID OBJECT-TYPE
+        SYNTAX         TmnxPortID
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "tnRoeDeMapperPortID is an index into this table.  It maps
+                        this port to its entry in the mib-2 interfaces table."
+        ::= { tnRoeDeMapperEntry 2 }
+
+    tnRoeDeMapperID OBJECT-TYPE
+        SYNTAX         Integer32 (1..80)
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "Specifies the de-mapper id, unique within a roe entity.
+                        1   when structure-agnostic mode (tunneling or line-coding aware) is selected
+                        1..80 when structure-aware mode is selected
+
+                        The following default demapper-id assignment for sa-type is
+                        recommended when structureaware mode is selected:
+                        1 - 64 for AxC data
+                        65 for fast C&M
+                        66 for slow C&M
+                        69- 76 for VSD raw (covering VSD and Ctrl_AxC)."
+        ::= { tnRoeDeMapperEntry 3 }
+
+    tnRoeDeMapperDescription OBJECT-TYPE
+        SYNTAX         TItemDescription
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The description character string.  Strings can be up to
+                        80 characters long composed of printable, 7-bit ASCII
+                        characters.  If the string contains special characters
+                        (#, $, spaces, and so on), the entire string must be
+                        enclosed within double quotes."
+        ::= { tnRoeDeMapperEntry 4 }
+
+    tnRoeDeMappeEtherlinkID OBJECT-TYPE
+        SYNTAX         Integer32 (1..80)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Specifies the ethlink id, used to configure the ethernet
+                        frame header.  This parameter has no default value.  It
+                        must be explicitly configured.  This parameter can be
+                        modified only when roe is shutdown."
+        ::= { tnRoeDeMapperEntry 5 }
+
+    tnRoeDeMapperPayloadLen OBJECT-TYPE
+        SYNTAX         Integer32 (38..1500)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Specifies the length of the payload in RoE packets in bytes
+                        after the RoE common header and before FCS.
+                        Please check CLI document for detail definitions about the
+                        payload length usage based on the different rate and mode."
+        ::= { tnRoeDeMapperEntry 6 }
+
+    tnRoeDeMapperSyncMode OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         hyper(0),
+                         radio(1),
+                         basic(2)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "This command configures the sync mode to control when to
+                        generate the presentation time.  Only when the basic frame
+                        number and/or bfn/hfn in received CPRI frame matches the
+                        basic frame number and/or bfn/hfn specified by the user
+                        based on the sync mode, roe mapper generates the presentation
+                        time for it.
+
+                        This parameter can be modified only when mapper is shutdown."
+        DEFVAL         { 0 }
+        ::= { tnRoeDeMapperEntry 7 }
+
+    tnRoeDeMapperBfn OBJECT-TYPE
+        SYNTAX         Integer32 (0..4095)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Specifies the bfn used for sync."
+        DEFVAL         { 0 }
+        ::= { tnRoeDeMapperEntry 8 }
+
+    tnRoeDeMapperHfn OBJECT-TYPE
+        SYNTAX         Integer32 (0..149)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Specifies the bfn used for sync."
+        DEFVAL         { 0 }
+        ::= { tnRoeDeMapperEntry 9 }
+
+    tnRoeDeMapperBfrm OBJECT-TYPE
+        SYNTAX         Integer32 (0..255)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Specifies the basic frame number used for sync."
+        DEFVAL         { 0 }
+        ::= { tnRoeDeMapperEntry 10 }
+
+    tnRoeDeMapperJitterBufferDepth OBJECT-TYPE
+        SYNTAX         Integer32 (8..128)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Specifies the basic frame number used for sync."
+        DEFVAL         { 128 }
+        ::= { tnRoeDeMapperEntry 11 }
+
+    tnRoeDeMapperShutdown OBJECT-TYPE
+        SYNTAX         INTEGER {
+--                         obsolete
+--                         shutdown(0),
+--                         no-shutdwn(1)
+                         shutdown(2),
+                         no-shutdwn(3)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "This command administratively disables an RoE mapper
+                        entity.  When disabled, an entity does not change, reset,
+                        or remove any configuration settings or statistics.  RoE
+                        mappers must be shut down before they may be deleted.  RoE
+                        mappers are created in the administratively down (shutdown)
+                        state.  When a no shutdown command is entered, the entity
+                        becomes administratively up."
+        DEFVAL         { no-shutdwn }
+        ::= { tnRoeDeMapperEntry 12 }
+
+    tnRoeDeMapperType OBJECT-TYPE
+        SYNTAX         INTEGER {
+--                         obsolete
+--                         tunneling(0),
+--                         structureAgnostic(1),
+--                         structureAwareData(2)
+                         tunneling(6),
+                         linecodeAware(7),
+                         structureAware(8),
+                         structureAwareControl(9)
+                       }
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The Type of the mapper: Tunneling, linecodeAware,
+                        structureAwareControl."
+        ::= { tnRoeDeMapperEntry 13 }
+
+    tnRoeDeMapperFlowID OBJECT-TYPE
+        SYNTAX         Integer32 (0..254)
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The flowid used in 'flowID' field in RoE header."
+        ::= { tnRoeDeMapperEntry 14 }
+
+    tnRoeDeMapperOrderInfoType OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         prestime(0),
+                         seqnum(1)
+                       }
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The flowid used in 'flowID' field in RoE header."
+        ::= { tnRoeDeMapperEntry 15 }
+
+    tnRoeDeMapperPmonPolicy OBJECT-TYPE
+        SYNTAX         Integer32 (0..99)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "PMON policy id assoicated to the RoE DeMapper."
+        ::= { tnRoeDeMapperEntry 16 }
+
+    tnRoeDeMapperRowStatus OBJECT-TYPE
+        SYNTAX         RowStatus
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The value of tnRoeMapperRowStatus defines the status
+                        of the row."
+        ::= { tnRoeDeMapperEntry 17 }
+
+    tnRoeDeMapperAlmProfName OBJECT-TYPE
+        SYNTAX         OCTET STRING (SIZE(1..40))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnRoeDeMapperEntry 18 }
+
+    tnRoeDeMapperSaType OBJECT-TYPE
+        SYNTAX         Integer32 (1..4)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The structure-aware mode mapper or demapper type.
+                        <type-id> valid values:
+                          1 = AxC data
+                          2 = fast C&M
+                          3 = slow C&M
+                          4 = VSD raw (covering Ctrl_AxC and VSD)
+
+                        Default value:
+                          1 for mapper-id/demapper-id = 1 - 64
+                          2 for mapper-id/demapper-id = 65
+                          3 for mapper-id/demapper-id = 66
+                          4 for mapper-id/demapper-id = 69-76"
+        ::= { tnRoeDeMapperEntry 19 }
+
+    tnRoeDeMapperBwID OBJECT-TYPE
+        SYNTAX         Integer32 (1..6)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Specifies bw (currently covering all LTE BW). Valid
+                        values:
+                          1 = 1.4MHz
+                          2 = 3MHz
+                          3 = 5MHz
+                          4 = 10MHz
+                          5 = 15MHz
+                          6 = 20MHz
+                        This parameter can be modified only when roe is shutdown.
+                        And the modification of this parameter may cause traffic
+                        interrupt and need to modify it in both roe mapper and
+                        demapper so that the new value can work."
+        ::= { tnRoeDeMapperEntry 20 }
+
+    tnRoeDeMapperPosition OBJECT-TYPE
+        SYNTAX         Integer32 (32..6143)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Valid range based on CPRI rate parameter setting:
+                        384..6143  for CPRI-10
+                        160.. 2559 for CPRI-8
+                        128..2047  for CPRI-7
+                        64.. 1023  for CPRI-5
+                        32.. 511   for CPRI-3 "
+        ::= { tnRoeDeMapperEntry 21 }
+
+    tnRoeDeMapperFrameStartOffset OBJECT-TYPE
+        SYNTAX         Integer32 (32..6143)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The parameter is available only when
+                         - CPRI port is set to structure-aware mode
+                         - sa-type = 1 (for AxC data)
+
+                        Specifies each AxC frame start offset relative to CPRI
+                        10ms frame boundary.
+                          - For hub TPS provision:    This parameter is for DL
+                                                      path (in mapper) and UL
+                                                      path (in de-mapper).
+                          - For remote TPS provision: This parameter is for UL
+                                                      path (in mapper) and DL
+                                                      path (in de-mapper).
+
+                        For BBU-TPS application, setting to default value = 0 is
+                        sufficient.  This parameter can be modified only when roe
+                        is shutdown. And the modification of this parameter may
+                        cause traffic interrupt and need to modify it in both roe
+                        mapper and demapper so that the new value can work.
+
+                        Default value for this attribute is 0."
+        ::= { tnRoeDeMapperEntry 22 }
+
+    tnRoeDeMapperSchanStart OBJECT-TYPE
+        SYNTAX         Integer32 (4..19)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The parameter is available only when
+                        - CPRI port is set to structure-aware mode and
+                        - sa-type = 4 (for VSD raw)
+
+                        This parameter identifies the subchannel number (Ns) in
+                        the CPRI control word as the start of a VSD raw group.
+                        VSD raw group can be used to define a segment of Ctrl_AxC
+                        region or VSD region within the CPRI control word.  The
+                        defined segment is restricted to consecutive subchannels
+                        defined by schan-start and schan-size parameters.
+                        - Ns = [4..7] is the valid range of the Ctrl_AxC region
+                               within CPRI control word.
+                        - Ns = [16 : (p-pointer - 1)] is the valid range of the
+                               VSD region within CPRI control word.
+
+                        Since p-pointer is another provision parameter. Valid
+                        range of VSD region can only be known after p-pointer
+                        is set by user.  Prior to p-pointer provision, default
+                        valid range for VSD region is restricted to Ns = [16..19].
+
+                        This parameter can be modified only when roe is shutdown.
+                        And the modification of this parameter may cause traffic
+                        interrupt and need to modify it in both roe mapper and
+                        demapper so that the new value can work."
+        ::= { tnRoeDeMapperEntry 23 }
+
+    tnRoeDeMapperSchanSize OBJECT-TYPE
+        SYNTAX         Integer32 (1..64)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The parameter is available only when
+                        - CPRI port is set to structure-aware mode and
+                        - sa-type = 4 (for VSD raw)
+
+                        This parameter identifies the size of VSD raw group in
+                        number of consecutive subchannels within the CPRI control
+                        word.  A VSD raw group can be used to define a segment of
+                        Ctrl_AxC region or VSD region within the CPRI control word.
+
+                        The defined segment is restricted to consecutive sub-channels
+                        defined by schan-start and schan-size parameters.  Since
+                        p-pointer is another provision parameter.  Valid range
+                        of VSD region can only be known after p-pointer is set by
+                        user.
+
+                        Prior to p-pointer provision, default valid range for VSD
+                        region is restricted to Ns = [16..19].
+
+                        This parameter can be modified only when roe is shutdown.
+                        And the modification of this parameter may cause traffic
+                        interrupt and need to modify it in both roe mapper and
+                        demapper so that the new value can work."
+        ::= { tnRoeDeMapperEntry 24 }
+
+    tnRoeDeMapperPincrement OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnRoeDeMapperEntry 25 }
+
+    tnRoeDeMapperNa OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnRoeDeMapperEntry 26 }
+
+    tnRoeDeMapperS OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnRoeDeMapperEntry 27 }
+
+    tnRoeDeMapperK OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnRoeDeMapperEntry 28 }
+
+    tnRoeDeMapperNc OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnRoeDeMapperEntry 29 }
+
+    tnRoeDeMapperNv OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnRoeDeMapperEntry 30 }
+
+-------------------------------------------------------------------------------
+-- Roe ethlink Table
+-------------------------------------------------------------------------------
+    tnRoeEthlinkTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnRoeEthlinkEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "Roe Eth Link table."
+        ::= { tnRoeParameters 5 }
+
+    tnRoeEthlinkEntry OBJECT-TYPE
+        SYNTAX         TnRoeEthlinkEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "Entry in Roe DeMapper table.  It creates or edits an
+                        ethlink entity, which specifies the Ethernet frame header
+                        for the RoE packets.  The ethlink ID is unique within the
+                        RoE entity.  When a ethlink is created, the create keyword
+                        must be specified.  By default, no ethlink entities exist
+                        until they are explicitly created."
+        INDEX { tnRoeEthlinkCardType,
+                tnRoeEthlinkPortID,
+                tnRoeEthlinkID  }
+        ::= { tnRoeEthlinkTable 1 }
+
+    TnRoeEthlinkEntry ::=
+        SEQUENCE {
+            tnRoeEthlinkCardType           TropicRoeCardType,
+            tnRoeEthlinkPortID             TmnxPortID,
+            tnRoeEthlinkID                 Integer32,
+            tnRoeEthlinkDescription        TItemDescription,
+            tnRoeEthlinkDestMac            MacAddress,
+            tnRoeEthlinkSourceMac          MacAddress,
+            tnRoeEthlinkTagDepth           INTEGER,
+            tnRoeEthlinkOuterEthertype     Integer32,
+            tnRoeEthlinkOuterVid           Integer32,
+            tnRoeEthlinkOuterPri           Integer32,
+            tnRoeEthlinkInnerEthertype     Integer32,
+            tnRoeEthlinkInnerVid           Integer32,
+            tnRoeEthlinkInnerPri           Integer32,
+            tnRoeEthlinkEthertype          Integer32,
+            tnRoeEthlinkRowStatus          RowStatus
+    }
+
+    tnRoeEthlinkCardType OBJECT-TYPE
+        SYNTAX         TropicRoeCardType
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "tnRoeEthlinkCardType is an index into this table.  It
+                        specify the card type for TPS."
+        ::= { tnRoeEthlinkEntry 1 }
+
+    tnRoeEthlinkPortID OBJECT-TYPE
+        SYNTAX         TmnxPortID
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "tnRoeEthlinkPortID is an index into this table.  It maps
+                        this port to its entry in the mib-2 interfaces table."
+        ::= { tnRoeEthlinkEntry 2 }
+
+    tnRoeEthlinkID OBJECT-TYPE
+        SYNTAX         Integer32 (1..80)
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "Specifies the ethlink id, unique within a roe entity.
+                        1..2  when non-structure-aware mode is selected
+                        1..16 when structure-aware mode is selected."
+        ::= { tnRoeEthlinkEntry 3 }
+
+    tnRoeEthlinkDescription OBJECT-TYPE
+        SYNTAX         TItemDescription
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The description character string.  Strings can be up to
+                        80 characters long composed of printable, 7-bit ASCII
+                        characters.  If the string contains special characters
+                        (#, $, spaces, and so on), the entire string must be
+                        enclosed within double quotes."
+        ::= { tnRoeEthlinkEntry 4 }
+
+    tnRoeEthlinkDestMac OBJECT-TYPE
+        SYNTAX         MacAddress
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Specifies the 48-bit MAC address.  Allowed values are any
+                        non-broadcast, non-multicast MAC and non-IEEE reserved MAC
+                        addresses.
+                          {xx:xx:xx:xx:xx:xx | xx-xx-xx-xx-xx-xx} - MAC address,
+                          where xx is hexadecimal numbers."
+        ::= { tnRoeEthlinkEntry 5 }
+
+    tnRoeEthlinkSourceMac OBJECT-TYPE
+        SYNTAX         MacAddress
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Specifies the 48-bit MAC address of the port.  Allowed
+                        values are any non-broadcast, non-multicast MAC and
+                        non-IEEE reserved MAC addresses.
+                          {xx:xx:xx:xx:xx:xx | xx-xx-xx-xx-xx-xx} - MAC address,
+                          where xx is hexadecimal numbers."
+        ::= { tnRoeEthlinkEntry 6 }
+
+    tnRoeEthlinkTagDepth OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         untagged(0),
+                         single(1),
+                         double(2)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The number of VLAN tags used in the Ethernet frame header."
+        DEFVAL         { 0 }
+        ::= { tnRoeEthlinkEntry 7 }
+
+    tnRoeEthlinkOuterEthertype OBJECT-TYPE
+        SYNTAX         Integer32 ('600'H..'ffff'H)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The ethertype for the outer tag when double tags are used
+                        in Ethernet Frame header, i.e., tag-depth is double."
+        DEFVAL         { '8100'H }
+        ::= { tnRoeEthlinkEntry 8 }
+
+    tnRoeEthlinkOuterVid OBJECT-TYPE
+        SYNTAX         Integer32 (0..4094)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The VLAN ID of the outer VLAN tag in Ethernet Frame Header
+                        if double tag is used, i.e., tag-depth is double."
+        ::= { tnRoeEthlinkEntry 9 }
+
+    tnRoeEthlinkOuterPri OBJECT-TYPE
+        SYNTAX         Integer32 (0..7)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Specifies the priority of the outer VLAN tag in Ethernet
+                        Frame Header if double tag is used, i.e., tag-depth is
+                        double.
+
+                        Default: 7."
+        DEFVAL         { 7 }
+        ::= { tnRoeEthlinkEntry 10 }
+
+    tnRoeEthlinkInnerEthertype OBJECT-TYPE
+        SYNTAX         Integer32 ('600'H..'ffff'H)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The ethertype for the inner tag when single or double
+                        tags are used in Ethernet Frame header, i.e., tag-depth
+                        is single or double."
+        DEFVAL         { '8100'H }
+        ::= { tnRoeEthlinkEntry 11 }
+
+    tnRoeEthlinkInnerVid OBJECT-TYPE
+        SYNTAX         Integer32 (0..4094)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The VLAN ID of the inner VLAN tag in Ethernet Frame Header
+                        if either single or double tag is used, i.e., tag-depth is
+                        single or double."
+        ::= { tnRoeEthlinkEntry 12 }
+
+    tnRoeEthlinkInnerPri OBJECT-TYPE
+        SYNTAX         Integer32 (0..7)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The priority of the inner VLAN tag in Ethernet Frame Header
+                        if single or double tag is used, i.e., tag-depth is single
+                        or double."
+        DEFVAL         { 7 }
+        ::= { tnRoeEthlinkEntry 13 }
+
+    tnRoeEthlinkEthertype OBJECT-TYPE
+        SYNTAX         Integer32 ('600'H..'ffff'H)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The ethertype for RoE PDU."
+        DEFVAL         { 'FC3D'H }
+        ::= { tnRoeEthlinkEntry 14}
+
+    tnRoeEthlinkRowStatus OBJECT-TYPE
+        SYNTAX         RowStatus
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The value of tnRoeEthlinkRowStatus defines the status of
+                        the row."
+        ::= { tnRoeEthlinkEntry 15 }
+
+-------------------------------------------------------------------------------
+-- Compliance Statements
+-------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------
+-- Conformance Group Definitions
+-------------------------------------------------------------------------------
+    tnRoeSeqProfGroup OBJECT-GROUP
+        OBJECTS {
+            tnRoeSeqProfDescription,
+            tnRoeSeqProfType,
+            tnRoeSeqProfPMax,
+            tnRoeSeqProfPIncProp,
+            tnRoeSeqProfPInc,
+            tnRoeSeqProfQMax,
+            tnRoeSeqProfQIncProp,
+            tnRoeSeqProfQInc,
+            tnRoeSeqProfRowStatus
+         }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnRoeGroups 1 }
+
+    tnRoeGroup OBJECT-GROUP
+        OBJECTS {
+            tnRoeDescription,
+            tnRoeOrderInfoType,
+            tnRoePresTimeOffset,
+            tnRoeCpriTxGenOffset,
+            tnRoeAutoUponChange,
+            tnRoeSeqNumProfID,
+            tnRoeInitialTxBFN,
+            tnRoeInitialTxHFN,
+            tnRoeEncapMode,
+            tnRoeAdminState,
+            tnRoePmonPolicy,
+            tnRoeRowStatus,
+            tnRoeAlmProfName,
+            tnRoePresTimeOffsetSubNano,
+            tnRoePresTimeOffsetNano,
+            tnRoeTargetOffsetSubNano,
+            tnRoeTargetOffsetNano,
+            tnRoeMapperSampleWidth,
+--            obsolete
+--            tnRoeTgenEnable,
+--            tnRoeSlowCmEnable,
+            tnRoePPointer,
+            tnRoeCpriProtocolVer,
+            tnRoeMapperStatusEnable,
+            tnRoeSlowcmRate,
+            tnRoeTimingMode
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnRoeGroups 2 }
+
+    tnRoeMapperGroup OBJECT-GROUP
+        OBJECTS {
+            tnRoeMapperDescription,
+            tnRoeMapperFlowID,
+            tnRoeMappeEtherlinkID,
+            tnRoeMapperPayloadLen,
+            tnRoeMapperSyncMode,
+            tnRoeMapperBfn,
+            tnRoeMapperHfn,
+            tnRoeMapperBfrm,
+            tnRoeMapperShutdown,
+            tnRoeMapperType,
+            tnRoeMapperOrderInfoType,
+            tnRoeMapperPmonPolicy,
+            tnRoeMapperRowStatus,
+            tnRoeMapperAlmProfName,
+            tnRoeMapperSaType,
+            tnRoeMapperBwID,
+            tnRoeMapperPosition,
+            tnRoeMapperFrameStartOffset,
+            tnRoeMapperSchanStart,
+            tnRoeMapperSchanSize,
+            tnRoeMapperPincrement,
+            tnRoeMapperNa,
+            tnRoeMapperS,
+            tnRoeMapperK,
+            tnRoeMapperNc,
+            tnRoeMapperNv
+          }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnRoeGroups 3 }
+
+    tnRoeDeMapperGroup OBJECT-GROUP
+        OBJECTS {
+            tnRoeDeMapperDescription,
+            tnRoeDeMappeEtherlinkID,
+            tnRoeDeMapperPayloadLen,
+            tnRoeDeMapperSyncMode,
+            tnRoeDeMapperBfn,
+            tnRoeDeMapperHfn,
+            tnRoeDeMapperBfrm,
+            tnRoeDeMapperJitterBufferDepth,
+            tnRoeDeMapperShutdown,
+            tnRoeDeMapperType,
+            tnRoeDeMapperFlowID,
+            tnRoeDeMapperOrderInfoType,
+            tnRoeDeMapperPmonPolicy,
+            tnRoeDeMapperRowStatus,
+            tnRoeDeMapperAlmProfName,
+            tnRoeDeMapperSaType,
+            tnRoeDeMapperBwID,
+            tnRoeDeMapperPosition,
+            tnRoeDeMapperFrameStartOffset,
+            tnRoeDeMapperSchanStart,
+            tnRoeDeMapperSchanSize,
+            tnRoeDeMapperPincrement,
+            tnRoeDeMapperNa,
+            tnRoeDeMapperS,
+            tnRoeDeMapperK,
+            tnRoeDeMapperNc,
+            tnRoeDeMapperNv
+          }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnRoeGroups 4 }
+
+    tnRoeEthlinkGroup OBJECT-GROUP
+        OBJECTS {
+            tnRoeEthlinkDescription,
+            tnRoeEthlinkDestMac,
+            tnRoeEthlinkSourceMac,
+            tnRoeEthlinkTagDepth,
+            tnRoeEthlinkOuterEthertype,
+            tnRoeEthlinkOuterVid,
+            tnRoeEthlinkOuterPri,
+            tnRoeEthlinkInnerEthertype,
+            tnRoeEthlinkInnerVid,
+            tnRoeEthlinkInnerPri,
+            tnRoeEthlinkEthertype,
+            tnRoeEthlinkRowStatus
+          }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnRoeGroups 5 }
+
+-------------------------------------------------------------------------------
+-- Compliance Statements (mandatory)
+-------------------------------------------------------------------------------
+    tnRoeCompliance MODULE-COMPLIANCE
+        STATUS         current
+        DESCRIPTION    "."
+        MODULE
+        MANDATORY-GROUPS  {
+            tnRoeSeqProfGroup,
+            tnRoeGroup,
+            tnRoeMapperGroup,
+            tnRoeDeMapperGroup,
+            tnRoeEthlinkGroup
+        }
+        ::= { tnEoeCompliances 1 }
+
+END -- DEFINITION OF TROPIC-ROE-MIB

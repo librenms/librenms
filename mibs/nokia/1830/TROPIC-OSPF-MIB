@@ -1,0 +1,992 @@
+TROPIC-OSPF-MIB DEFINITIONS ::= BEGIN
+
+-- (c) Copyright 2023 Nokia Networks.  All rights reserved.
+-- This software is the confidential and proprietary property of
+-- Nokia and may only be used in accordance with the terms of the
+-- license agreement provided with this software.
+
+IMPORTS
+      OBJECT-TYPE, MODULE-IDENTITY,
+      IpAddress,
+      Unsigned32, Integer32                   FROM SNMPv2-SMI
+      MODULE-COMPLIANCE, OBJECT-GROUP         FROM SNMPv2-CONF
+      TEXTUAL-CONVENTION,
+      RowStatus                               FROM SNMPv2-TC
+      ifIndex                                 FROM IF-MIB
+      AreaID                                  FROM OSPF-MIB
+      tnProtocolModules, tnOspfMIB            FROM TROPIC-GLOBAL-REG;
+
+  tnOspfMibModule MODULE-IDENTITY
+      LAST-UPDATED    "202303171200Z"
+      ORGANIZATION    "Nokia"
+      CONTACT-INFO    "Nokia
+                       Attn: Jeff Donnelly
+                       600 Mountain Avenue
+                       New Providence, NJ 07974
+
+                       Phone: +1 732 221 6408
+                       Email: jeff.donnelly@nokia.com"
+
+      DESCRIPTION     "The Nokia DWDM OSPF MIB."
+
+      REVISION    "202303171200Z"
+      DESCRIPTION "1) Added the following to tnOspfMultiAreaConfigTable:
+                      tnOspfMultiAreaStatsId.
+                   2) Added the following to tnOspfv3MultiAreaConfigTable:
+                      tnOspfv3MultiAreaStatsId."
+
+      REVISION    "202302171200Z"
+      DESCRIPTION "1) Added the following to tnOspfMultiAreaConfigTable:
+                      tnOspfMultiAreaActiveInterfaces
+                      tnOspfMultiAreaAdjacentNeighbors
+                      tnOspfMultiAreaActiveNodes
+                      tnOspfMultiAreaNumLsas.
+                   2) Added the following to tnOspfv3MultiAreaConfigTable:
+                      tnOspfv3MultiAreaActiveInterfaces
+                      tnOspfv3MultiAreaAdjacentNeighbors
+                      tnOspfv3MultiAreaActiveNodes
+                      tnOspfv3MultiAreaNumLsas."
+
+      REVISION    "202108201200Z"
+      DESCRIPTION "Added the following table:
+                   tnOspfv3MultiAreaConfigTable."
+
+      REVISION    "202107231200Z"
+      DESCRIPTION "Added the following to tnOspfPortTable:
+                   tnOspfv3PortTopologyId."
+
+      REVISION    "201802231200Z"
+      DESCRIPTION "Updated the contact info."
+
+      REVISION    "201611161200Z"
+      DESCRIPTION "Updated the contact info."
+
+      REVISION    "201504031200Z"
+      DESCRIPTION "Added the description to tnOspfMultiAreaConfigDefaultCost"
+
+      REVISION    "201206131200Z"
+      DESCRIPTION "1) Marked the following tables as obsolete:
+                      tnOspfGeneralTable
+                      tnOspfStubAreaTable
+                      tnOspfLsdbTable
+                      tnOspfHostTable
+                      tnOspfIfTable
+                      tnOspfIfMetricTable
+                      tnOspfVirtIfTable
+                      tnOspfNbrTable
+                      tnOspfVirtNbrTable
+                      tnOspfExtLsdbTable
+                      tnOspfAreaAggregateTable
+                      tnOspfRoutingTable
+                      tnOspfRouteHopTable
+                      tnOspfInterfaceStatsTable
+                      tnOspfRtbStatsTable
+                      tnOspfIpToAreaTable
+                      tnOspfAreaConfigTable
+                      tnOspfIfAdjNbrTable
+                      tnOspfPerRtrNbrTable.
+                   2) Marked the following attributes in tnOspfAreaTable
+                      as obsolete:
+                      tnOspfAuthType
+                      tnOspfImportAsExtern
+                      tnOspfSpfRuns
+                      tnOspfAreaBdrRtrCount
+                      tnOspfAsBdrRtrCount
+                      tnOspfAreaLsaCount
+                      tnOspfAreaLsaCksumSum
+                      tnOspfAreaSummary
+                      tnOspfAreaStatus
+                      tnOspfAreaIfCount."
+
+      REVISION    "201109281200Z"
+      DESCRIPTION "Added the following to tnOspfMultiAreaConfigTable:
+                   tnOspfMultiAreaConfigRowStatus."
+
+      REVISION    "201108311200Z"
+      DESCRIPTION "Marked tnOspfAreaConfigTable as obsolete."
+
+      REVISION    "201104151200Z"
+      DESCRIPTION "1) Marked tnOspfAreaConfigTable as deprecated.
+                   2) Added tnOspfMultiAreaConfigTable."
+
+      REVISION    "200901091200Z"
+      DESCRIPTION "Undid previous changes from 20081218:
+                   1) Removed tnOspfPortAreaId.
+                   2) Marked tnOspfPortTopologyId as current."
+
+      REVISION    "200812181200Z"
+      DESCRIPTION "1) Added tnOspfPortAreaId to replace tnOspfPortTopologyId.
+                   2) Marked tnOspfPortTopologyId as deprecated."
+
+      REVISION    "200807241200Z"
+      DESCRIPTION "Removed the topology ID from the index of
+                   tnOspfPortTable."
+
+      REVISION    "200806091200Z"
+      DESCRIPTION "Added tnOspfPortTable."
+
+      REVISION    "200803281200Z"
+      DESCRIPTION "Removed the area stub flag in tnOspfAreaTable,
+                   since the equivalent attribute already exists
+                   in tnOspfAreaConfigTable."
+
+      REVISION    "200803061200Z"
+      DESCRIPTION "1) Updated the MIB file description.
+                   2) Added the area stub flag to tnOspfAreaTable."
+
+      ::= { tnProtocolModules 3 }
+
+  tnOspfConf              OBJECT IDENTIFIER ::= { tnOspfMIB 1 }
+  tnOspfGroups            OBJECT IDENTIFIER ::= { tnOspfConf 1 }
+  tnOspfCompliances       OBJECT IDENTIFIER ::= { tnOspfConf 2 }
+  tnOspfObjs              OBJECT IDENTIFIER ::= { tnOspfMIB 2 }
+
+--------------------------------------------------------------------------------
+-- Type Definitions
+--------------------------------------------------------------------------------
+    TnTopologyId ::= TEXTUAL-CONVENTION
+        STATUS         current
+        DESCRIPTION    "."
+        SYNTAX         Unsigned32
+
+--------------------------------------------------------------------------------
+--  OSPF General Variables
+--------------------------------------------------------------------------------
+--    obsolete
+--    tnOspfGeneralTable OBJECT-TYPE ::= { tnOspfObjs 1 }
+
+--------------------------------------------------------------------------------
+--  OSPF Area Table
+--------------------------------------------------------------------------------
+    tnOspfAreaTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnOspfAreaEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOspfObjs 2 }
+
+    tnOspfAreaEntry OBJECT-TYPE
+        SYNTAX         TnOspfAreaEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { tnOspfAreaTopologyId,
+                tnOspfAreaId }
+        ::= { tnOspfAreaTable 1 }
+
+    TnOspfAreaEntry ::= SEQUENCE {
+        tnOspfAreaTopologyId  TnTopologyId,
+        tnOspfAreaId          AreaID
+--        obsolete
+--        tnOspfAuthType        Integer32,
+--        tnOspfImportAsExtern  INTEGER,
+--        tnOspfSpfRuns         Counter32,
+--        tnOspfAreaBdrRtrCount Gauge32,
+--        tnOspfAsBdrRtrCount   Gauge32,
+--        tnOspfAreaLsaCount    Gauge32,
+--        tnOspfAreaLsaCksumSum Integer32,
+--        tnOspfAreaSummary     INTEGER,
+--        tnOspfAreaStatus      RowStatus,
+--        tnOspfAreaIfCount     Unsigned32
+    }
+
+    tnOspfAreaTopologyId OBJECT-TYPE
+        SYNTAX         TnTopologyId
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOspfAreaEntry 1 }
+
+    tnOspfAreaId OBJECT-TYPE
+        SYNTAX         AreaID
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOspfAreaEntry 2 }
+
+--    obsolete
+--    tnOspfAuthType OBJECT-TYPE ::= { tnOspfAreaEntry 3 }
+--    tnOspfImportAsExtern OBJECT-TYPE ::= { tnOspfAreaEntry 4 }
+--    tnOspfSpfRuns OBJECT-TYPE ::= { tnOspfAreaEntry 5 }
+--    tnOspfAreaBdrRtrCount OBJECT-TYPE ::= { tnOspfAreaEntry 6 }
+--    tnOspfAsBdrRtrCount OBJECT-TYPE ::= { tnOspfAreaEntry 7 }
+--    tnOspfAreaLsaCount OBJECT-TYPE ::= { tnOspfAreaEntry 8 }
+--    tnOspfAreaLsaCksumSum OBJECT-TYPE ::= { tnOspfAreaEntry 9 }
+--    tnOspfAreaSummary OBJECT-TYPE ::= { tnOspfAreaEntry 10 }
+--    tnOspfAreaStatus OBJECT-TYPE ::= { tnOspfAreaEntry 11 }
+--    tnOspfAreaIfCount OBJECT-TYPE ::= { tnOspfAreaEntry 12 }
+
+--------------------------------------------------------------------------------
+--  OSPF Area Default Metric Table
+-------------------------------------------------------------------------------
+--    obsolete
+--    tnOspfStubAreaTable OBJECT-TYPE ::= { tnOspfObjs 3 }
+
+--------------------------------------------------------------------------------
+--  OSPF Link State Database
+-------------------------------------------------------------------------------
+--    obsolete
+--    tnOspfLsdbTable OBJECT-TYPE ::= { tnOspfObjs 4 }
+
+--------------------------------------------------------------------------------
+--  OSPF Host Table
+-------------------------------------------------------------------------------
+--    obsolete
+--    tnOspfHostTable OBJECT-TYPE ::= { tnOspfObjs 5 }
+
+--------------------------------------------------------------------------------
+--  OSPF Interface Table
+-------------------------------------------------------------------------------
+--    obsolete
+--    tnOspfIfTable OBJECT-TYPE ::= { tnOspfObjs 6 }
+
+--------------------------------------------------------------------------------
+--  OSPF Interface Metric Table
+-------------------------------------------------------------------------------
+--    obsolete
+--    tnOspfIfMetricTable OBJECT-TYPE ::= { tnOspfObjs 7 }
+
+--------------------------------------------------------------------------------
+--  OSPF Virtual Interface Table
+-------------------------------------------------------------------------------
+--    obsolete
+--    tnOspfVirtIfTable OBJECT-TYPE ::= { tnOspfObjs 8 }
+
+--------------------------------------------------------------------------------
+--  OSPF Neighbor Table
+-------------------------------------------------------------------------------
+--    obsolete
+--    tnOspfNbrTable OBJECT-TYPE ::= { tnOspfObjs 9 }
+
+--------------------------------------------------------------------------------
+--  OSPF Virtual Neighbor Table
+-------------------------------------------------------------------------------
+--    obsolete
+--    tnOspfVirtNbrTable OBJECT-TYPE ::= { tnOspfObjs 10 }
+
+--------------------------------------------------------------------------------
+--  OSPF Virtual Neighbor Table
+-------------------------------------------------------------------------------
+--    obsolete
+--    tnOspfExtLsdbTable OBJECT-TYPE ::= { tnOspfObjs 11 }
+
+--------------------------------------------------------------------------------
+--  OSPF Virtual Neighbor Table
+--------------------------------------------------------------------------------
+--    obsolete
+--    tnOspfAreaAggregateTable OBJECT-TYPE ::= { tnOspfObjs 12 }
+
+---------------------------------------------------------------
+-- OSPF Routing Table
+---------------------------------------------------------------
+--    obsolete
+--    tnOspfRoutingTable OBJECT-TYPE ::= { tnOspfObjs 13 }
+
+---------------------------------------------------------------
+-- OSPF Routing Table
+---------------------------------------------------------------
+--    obsolete
+--    tnOspfRouteHopTable OBJECT-TYPE ::= { tnOspfObjs 14 }
+
+---------------------------------------------------------------
+-- OSPF Nokia extensions Interface Statistics
+---------------------------------------------------------------
+--    obsolete
+--    tnOspfInterfaceStatsTable OBJECT-TYPE ::= { tnOspfObjs 15 }
+
+---------------------------------------------------------------
+-- OSPF Nokia extensions RTB Statistics
+---------------------------------------------------------------
+--    obsolete
+--    tnOspfRtbStatsTable OBJECT-TYPE ::= { tnOspfObjs 16 }
+
+--------------------------------------------------------------------------------
+--  OSPF IP To Area Table
+--------------------------------------------------------------------------------
+--    obsolete
+--    tnOspfIpToAreaTable OBJECT-TYPE ::= { tnOspfObjs 17 }
+
+--------------------------------------------------------------------------------
+--  OSPF Area Config Table
+--------------------------------------------------------------------------------
+--    obsolete
+--    tnOspfAreaConfigTable OBJECT-TYPE ::= { tnOspfObjs 18 }
+
+--------------------------------------------------------------------------------
+--  OSPF IF Adjacent Neighbor Table
+-------------------------------------------------------------------------------
+--    obsolete
+--    tnOspfIfAdjNbrTable OBJECT-TYPE ::= { tnOspfObjs 19 }
+
+--------------------------------------------------------------------------------
+--  OSPF Per Router Neighbor Table
+-------------------------------------------------------------------------------
+--    obsolete
+--    tnOspfPerRtrNbrTable OBJECT-TYPE ::= { tnOspfObjs 20 }
+
+---------------------------------------------------------------
+-- OSPF Nokia extensions Port
+---------------------------------------------------------------
+    tnOspfPortTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnOspfPortEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOspfObjs 21 }
+
+    tnOspfPortEntry OBJECT-TYPE
+        SYNTAX         TnOspfPortEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { ifIndex }
+        ::= { tnOspfPortTable 1 }
+
+    TnOspfPortEntry ::= SEQUENCE {
+        tnOspfPortTopologyId     TnTopologyId,
+        tnOspfv3PortTopologyId   TnTopologyId
+    }
+
+    tnOspfPortTopologyId OBJECT-TYPE
+        SYNTAX         TnTopologyId
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOspfPortEntry 1 }
+
+    tnOspfv3PortTopologyId OBJECT-TYPE
+        SYNTAX         TnTopologyId
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOspfPortEntry 2 }
+
+--------------------------------------------------------------------------------
+--  OSPF Multi-Area Config Table
+--------------------------------------------------------------------------------
+    tnOspfMultiAreaConfigTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnOspfMultiAreaConfigEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOspfObjs 22 }
+
+    tnOspfMultiAreaConfigEntry OBJECT-TYPE
+        SYNTAX         TnOspfMultiAreaConfigEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { tnOspfAreaTopologyId }
+        ::= { tnOspfMultiAreaConfigTable 1 }
+
+    TnOspfMultiAreaConfigEntry ::= SEQUENCE {
+        tnOspfMultiAreaId                       AreaID,
+        tnOspfMultiAreaConfigType               INTEGER,
+        tnOspfMultiAreaConfigDnsOpaqueLsa       INTEGER,
+        tnOspfMultiAreaConfigWavekeyOpaqueLsa   INTEGER,
+        tnOspfMultiAreaConfigNssaTranslate      INTEGER,
+        tnOspfMultiAreaConfigDefaultCost        Integer32,
+        tnOspfMultiAreaConfigVirtualLinkIp      IpAddress,
+        tnOspfMultiAreaConfigRowStatus          RowStatus,
+        tnOspfMultiAreaActiveInterfaces         Unsigned32,
+        tnOspfMultiAreaAdjacentNeighbors        Unsigned32,
+        tnOspfMultiAreaActiveNodes              Unsigned32,
+        tnOspfMultiAreaNumLsas                  Unsigned32,
+        tnOspfMultiAreaStatsId                  AreaID
+    }
+
+    tnOspfMultiAreaId OBJECT-TYPE
+        SYNTAX         AreaID
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOspfMultiAreaConfigEntry 1 }
+
+    tnOspfMultiAreaConfigType OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         normal(1),
+                         stub(2),
+                         totallyStub(3),
+                         nssa(4),
+                         nssaTotallyStub(5)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Specifies an OSPF area type:
+                          normal areas are defined as areas that can
+                            accept intra-area, inter-area and external
+                            routes.
+                          stub areas do not accept routes belonging to
+                            external autonomous systems (AS); however,
+                            these areas have inter-area and intra-area
+                            routes.  This reduces the size of the routing
+                            databases for the area's internal routers.
+                            Routers in the stub area also contain a
+                            default route which is advertised to the
+                            area by the Area Border Router (ABR).
+                          totallyStub areas do not allow routes other
+                            than intra-area and the default route to be
+                            propagated within the area.  This further
+                            reduces the size of the routing databases
+                            for the area's internal routers.  The ABR
+                            advertises a default route into the area
+                            and all the routers belonging to this area
+                            use the default route to send any traffic
+                            outside the area.
+                          nssa (Not So Stub Areas) can import AS external
+                            routes from within the area and send them to
+                            other areas, but cannot receive AS external
+                            routes from other areas.  Inter-area and
+                            intra-area routes are allowed along with a
+                            default route which is advertised to the
+                            area by the ABR.
+                          nssaTotallyStub areas are similar to nssa
+                            with the added restriction that inter-area
+                            routes are not allowed."
+        DEFVAL         { normal }
+        ::= { tnOspfMultiAreaConfigEntry 2 }
+
+    tnOspfMultiAreaConfigDnsOpaqueLsa OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         yes(1),
+                         no(2)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Opaque LSA status for the DNS application.
+                        Determines whether opaque LSAs for the DNS
+                        application shall be distributed into this OSPF
+                        area, and received from this area.
+
+                        yes - DNS opaque LSAs are distributed to the
+                              area, and received from the area.
+                        no  - DNS opaque LSAs are not distributed to
+                              the area, and not received from the area."
+        DEFVAL         { yes }
+        ::= { tnOspfMultiAreaConfigEntry 3 }
+
+    tnOspfMultiAreaConfigWavekeyOpaqueLsa OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         yes(1),
+                         no(2)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Opaque LSA status for the Wave key application.
+                        Determines, whether opaque LSAs for the Wave key
+                        application shall be distributed into this OSPF
+                        area, and received from this area.  Wave Key
+                        opaque LSAs can only be enabled in one OSPF Area.
+
+                        yes - Wave key opaque LSAs are distributed to
+                              the area, and received from the area
+                        no  - Wave key opaque LSAs are not distributed to
+                              the area, and not received from the area."
+        DEFVAL         { yes }
+        ::= { tnOspfMultiAreaConfigEntry 4 }
+
+    tnOspfMultiAreaConfigNssaTranslate OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         candidate(1),
+                         always(2),
+                         never(3),
+                         notApplicable(4)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Applicable only if area type is nssa or
+                        nssaTotallyStub.  Determines behavior of NSSA
+                        ABR router translation of internal area type
+                        7 LSAs to type 5 LSAs which get propagated into
+                        other areas.
+                          candidate ospf elects one of candidate routers
+                            to be a translator for this area.
+                          always router will be always used as translator
+                            for this area.
+                          never router will never be used as translator
+                            for this area.
+                          notApplicable is when the type is not nssa or
+                            nssaTotallyStub."
+        DEFVAL         { candidate }
+        ::= { tnOspfMultiAreaConfigEntry 5 }
+
+    tnOspfMultiAreaConfigDefaultCost OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Specifies the cost in the range -1 to 16777215
+                        for the default route originated by stub,
+                        totallyStub, nssa or nssaTotallyStub area ABR.
+                        -1 indicates that the default cost is not
+                        applicable.
+
+                        Current configurable range: 0 to 16777215.
+
+                        Note: If the cost is set to the maximum value of 16777215
+                        this prevents the ABR from distributing a default
+                        route within the Stub or NSSA area."
+        DEFVAL         { 10 }
+        ::= { tnOspfMultiAreaConfigEntry 6 }
+
+    tnOspfMultiAreaConfigVirtualLinkIp OBJECT-TYPE
+        SYNTAX         IpAddress
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Applicable only for normal Areas.  Allows for
+                        the creation of a virtual link for this area.
+                        OSPF requires that all areas attach directly
+                        to Area 0.0.0.0 but not that the attachment be
+                        physical.  One can take any physical arrangement
+                        of areas and attach them logically through OSPF
+                        virtual links.  Specifies the Loopback interface
+                        IP Address of the NE to terminate the virtual
+                        link.  This NE should have an interface that is
+                        connected to Area 0.0.0.0 and a non 0.0.0.0 Area.
+
+                        Note: A virtual link must be configured on both
+                        NEs.  Virtual links cannot be established through
+                        Area 0.0.0.0, stub, totallyStub, nssa or
+                        nssaTotallyStub type areas.  The IP address of
+                        0.0.0.0  means no virtual link."
+        DEFVAL         { '00000000'H }
+        ::= { tnOspfMultiAreaConfigEntry 7 }
+
+    tnOspfMultiAreaConfigRowStatus OBJECT-TYPE
+        SYNTAX         RowStatus
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Status of this OSPF area.
+                        supported values:
+                        1 - active
+                        4 - createAndGo
+                        6 - destroy.
+
+                        To create an OSPF area, set the value to 4.  To
+                        delete an OSPF area, set the value to 6.  After
+                        an OSPF area is created, upon a retrieve of this
+                        attribute, 1 is returned.  That is, the active
+                        state is not set but it is transitioned after the
+                        OSPF area has been created."
+        DEFVAL         { destroy }
+        ::= { tnOspfMultiAreaConfigEntry 8 }
+
+    tnOspfMultiAreaActiveInterfaces OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOspfMultiAreaConfigEntry 9 }
+
+    tnOspfMultiAreaAdjacentNeighbors OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOspfMultiAreaConfigEntry 10 }
+
+    tnOspfMultiAreaActiveNodes OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOspfMultiAreaConfigEntry 11 }
+
+    tnOspfMultiAreaNumLsas OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOspfMultiAreaConfigEntry 12 }
+
+    tnOspfMultiAreaStatsId OBJECT-TYPE
+        SYNTAX         AreaID
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOspfMultiAreaConfigEntry 13 }
+
+--------------------------------------------------------------------------------
+--  Ospfv3 Multi-Area Config Table
+--------------------------------------------------------------------------------
+    tnOspfv3MultiAreaConfigTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnOspfv3MultiAreaConfigEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOspfObjs 23 }
+
+    tnOspfv3MultiAreaConfigEntry OBJECT-TYPE
+        SYNTAX         TnOspfv3MultiAreaConfigEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { tnOspfv3MultiAreaTopologyId }
+        ::= { tnOspfv3MultiAreaConfigTable 1 }
+
+    TnOspfv3MultiAreaConfigEntry ::= SEQUENCE {
+        tnOspfv3MultiAreaTopologyId               TnTopologyId,
+        tnOspfv3MultiAreaId                       AreaID,
+        tnOspfv3MultiAreaConfigType               INTEGER,
+        tnOspfv3MultiAreaConfigDnsOpaqueLsa       INTEGER,
+        tnOspfv3MultiAreaConfigWavekeyOpaqueLsa   INTEGER,
+        tnOspfv3MultiAreaConfigNssaTranslate      INTEGER,
+        tnOspfv3MultiAreaConfigDefaultCost        Integer32,
+        tnOspfv3MultiAreaConfigVirtualLinkIp      IpAddress,
+        tnOspfv3MultiAreaConfigRowStatus          RowStatus,
+        tnOspfv3MultiAreaActiveInterfaces         Unsigned32,
+        tnOspfv3MultiAreaAdjacentNeighbors        Unsigned32,
+        tnOspfv3MultiAreaActiveNodes              Unsigned32,
+        tnOspfv3MultiAreaNumLsas                  Unsigned32,
+        tnOspfv3MultiAreaStatsId                  AreaID
+    }
+
+    tnOspfv3MultiAreaTopologyId OBJECT-TYPE
+        SYNTAX         TnTopologyId
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOspfv3MultiAreaConfigEntry 1 }
+
+    tnOspfv3MultiAreaId OBJECT-TYPE
+        SYNTAX         AreaID
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOspfv3MultiAreaConfigEntry 2 }
+
+    tnOspfv3MultiAreaConfigType OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         normal(1),
+                         stub(2),
+                         totallyStub(3),
+                         nssa(4),
+                         nssaTotallyStub(5)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Specifies an OSPFv3 area type:
+                          normal areas are defined as areas that can
+                            accept intra-area, inter-area and external
+                            routes.
+                          stub areas do not accept routes belonging to
+                            external autonomous systems (AS); however,
+                            these areas have inter-area and intra-area
+                            routes.  This reduces the size of the routing
+                            databases for the area's internal routers.
+                            Routers in the stub area also contain a
+                            default route which is advertised to the
+                            area by the Area Border Router (ABR).
+                          totallyStub areas do not allow routes other
+                            than intra-area and the default route to be
+                            propagated within the area.  This further
+                            reduces the size of the routing databases
+                            for the area's internal routers.  The ABR
+                            advertises a default route into the area
+                            and all the routers belonging to this area
+                            use the default route to send any traffic
+                            outside the area.
+                          nssa (Not So Stub Areas) can import AS external
+                            routes from within the area and send them to
+                            other areas, but cannot receive AS external
+                            routes from other areas.  Inter-area and
+                            intra-area routes are allowed along with a
+                            default route which is advertised to the
+                            area by the ABR.
+                          nssaTotallyStub areas are similar to nssa
+                            with the added restriction that inter-area
+                            routes are not allowed."
+        DEFVAL         { normal }
+        ::= { tnOspfv3MultiAreaConfigEntry 3 }
+
+    tnOspfv3MultiAreaConfigDnsOpaqueLsa OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         yes(1),
+                         no(2)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Opaque LSA status for the DNS application.
+                        Determines whether opaque LSAs for the DNS
+                        application shall be distributed into this OSPFv3
+                        area, and received from this area.
+
+                        yes - DNS opaque LSAs are distributed to the
+                              area, and received from the area.
+                        no  - DNS opaque LSAs are not distributed to
+                              the area, and not received from the area."
+        DEFVAL         { yes }
+        ::= { tnOspfv3MultiAreaConfigEntry 4 }
+
+    tnOspfv3MultiAreaConfigWavekeyOpaqueLsa OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         yes(1),
+                         no(2)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Opaque LSA status for the Wave key application.
+                        Determines, whether opaque LSAs for the Wave key
+                        application shall be distributed into this OSPFv3
+                        area, and received from this area.  Wave Key
+                        opaque LSAs can only be enabled in one OSPFv3 Area.
+
+                        yes - Wave key opaque LSAs are distributed to
+                              the area, and received from the area
+                        no  - Wave key opaque LSAs are not distributed to
+                              the area, and not received from the area."
+        DEFVAL         { yes }
+        ::= { tnOspfv3MultiAreaConfigEntry 5 }
+
+    tnOspfv3MultiAreaConfigNssaTranslate OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         candidate(1),
+                         always(2),
+                         never(3),
+                         notApplicable(4)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Applicable only if area type is nssa or
+                        nssaTotallyStub.  Determines behavior of NSSA
+                        ABR router translation of internal area type
+                        7 LSAs to type 5 LSAs which get propagated into
+                        other areas.
+                          candidate OSPFv3 elects one of candidate routers
+                            to be a translator for this area.
+                          always router will be always used as translator
+                            for this area.
+                          never router will never be used as translator
+                            for this area.
+                          notApplicable is when the type is not nssa or
+                            nssaTotallyStub."
+        DEFVAL         { candidate }
+        ::= { tnOspfv3MultiAreaConfigEntry 6 }
+
+    tnOspfv3MultiAreaConfigDefaultCost OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Specifies the cost in the range -1 to 16777215
+                        for the default route originated by stub,
+                        totallyStub, nssa or nssaTotallyStub area ABR.
+                        -1 indicates that the default cost is not
+                        applicable.
+
+                        Current configurable range: 0 to 16777215.
+
+                        Note: If the cost is set to the maximum value of 16777215
+                        this prevents the ABR from distributing a default
+                        route within the Stub or NSSA area."
+        DEFVAL         { 10 }
+        ::= { tnOspfv3MultiAreaConfigEntry 7 }
+
+    tnOspfv3MultiAreaConfigVirtualLinkIp OBJECT-TYPE
+        SYNTAX         IpAddress
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Applicable only for normal Areas.  Allows for
+                        the creation of a virtual link for this area.
+                        OSPFv3 requires that all areas attach directly
+                        to Area 0.0.0.0 but not that the attachment be
+                        physical.  One can take any physical arrangement
+                        of areas and attach them logically through OSPFv3
+                        virtual links.  Specifies the Loopback interface
+                        IP Address of the NE to terminate the virtual
+                        link.  This NE should have an interface that is
+                        connected to Area 0.0.0.0 and a non 0.0.0.0 Area.
+
+                        Note: A virtual link must be configured on both
+                        NEs.  Virtual links cannot be established through
+                        Area 0.0.0.0, stub, totallyStub, nssa or
+                        nssaTotallyStub type areas.  The IP address of
+                        0.0.0.0  means no virtual link."
+        DEFVAL         { '00000000'H }
+        ::= { tnOspfv3MultiAreaConfigEntry 8 }
+
+    tnOspfv3MultiAreaConfigRowStatus OBJECT-TYPE
+        SYNTAX         RowStatus
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Status of this OSPFv3 area.
+                        supported values:
+                        1 - active
+                        4 - createAndGo
+                        6 - destroy.
+
+                        To create an OSPFv3 area, set the value to 4.  To
+                        delete an OSPFv3 area, set the value to 6.  After
+                        an OSPFv3 area is created, upon a retrieve of this
+                        attribute, 1 is returned.  That is, the active
+                        state is not set but it is transitioned after the
+                        OSPFv3 area has been created."
+        DEFVAL         { destroy }
+        ::= { tnOspfv3MultiAreaConfigEntry 9 }
+
+    tnOspfv3MultiAreaActiveInterfaces OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOspfv3MultiAreaConfigEntry 10 }
+
+    tnOspfv3MultiAreaAdjacentNeighbors OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOspfv3MultiAreaConfigEntry 11 }
+
+    tnOspfv3MultiAreaActiveNodes OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOspfv3MultiAreaConfigEntry 12 }
+
+    tnOspfv3MultiAreaNumLsas OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOspfv3MultiAreaConfigEntry 13 }
+
+    tnOspfv3MultiAreaStatsId OBJECT-TYPE
+        SYNTAX         AreaID
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOspfv3MultiAreaConfigEntry 14 }
+
+--------------------------------------------------------------------------------
+-- Conformance Group Definitions
+--------------------------------------------------------------------------------
+--    obsolete
+--    tnOspfGeneralGroup OBJECT-TYPE ::= { tnOspfGroups 1 }
+
+    tnOspfAreaGroup OBJECT-GROUP
+        OBJECTS {
+            tnOspfAreaTopologyId,
+            tnOspfAreaId
+--            obsolete
+--            tnOspfAuthType,
+--            tnOspfImportAsExtern,
+--            tnOspfSpfRuns,
+--            tnOspfAreaBdrRtrCount,
+--            tnOspfAsBdrRtrCount,
+--            tnOspfAreaLsaCount,
+--            tnOspfAreaLsaCksumSum,
+--            tnOspfAreaSummary,
+--            tnOspfAreaStatus,
+--            tnOspfAreaIfCount
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOspfGroups 2 }
+
+--    obsolete
+--    tnOspfStubAreaGroup       OBJECT-TYPE ::= { tnOspfGroups 3 }
+--    tnOspfLsdbGroup           OBJECT-TYPE ::= { tnOspfGroups 4 }
+--    tnOspfHostGroup           OBJECT-TYPE ::= { tnOspfGroups 5 }
+--    tnOspfIfGroup             OBJECT-TYPE ::= { tnOspfGroups 6 }
+--    tnOspfIfMetricGroup       OBJECT-TYPE ::= { tnOspfGroups 7 }
+--    tnOspfVirtIfGroup         OBJECT-TYPE ::= { tnOspfGroups 8 }
+--    tnOspfNbrGroup            OBJECT-TYPE ::= { tnOspfGroups 9 }
+--    tnOspfVirtNbrGroup        OBJECT-TYPE ::= { tnOspfGroups 10 }
+--    tnOspfExtLsdbGroup        OBJECT-TYPE ::= { tnOspfGroups 11 }
+--    tnOspfAreaAggregateGroup  OBJECT-TYPE ::= { tnOspfGroups 12 }
+--    tnOspfRoutingGroup        OBJECT-TYPE ::= { tnOspfGroups 13 }
+--    tnOspfRouteHopGroup       OBJECT-TYPE ::= { tnOspfGroups 14 }
+--    tnOspfInterfaceStatsGroup OBJECT-TYPE ::= { tnOspfGroups 15 }
+--    tnOspfRtbStatsGroup       OBJECT-TYPE ::= { tnOspfGroups 16 }
+--    tnOspfIpToAreaGroup       OBJECT-TYPE ::= { tnOspfGroups 17 }
+--    tnOspfAreaConfigGroup     OBJECT-GROUP ::= { tnOspfGroups 18 }
+--    tnOspfIfAdjNbrGroup       OBJECT-TYPE ::= { tnOspfGroups 19 }
+--    tnOspfPerRtrNbrGroup      OBJECT-TYPE ::= { tnOspfGroups 20 }
+
+    tnOspfPortGroup OBJECT-GROUP
+        OBJECTS {
+            tnOspfPortTopologyId,
+            tnOspfv3PortTopologyId
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOspfGroups 21 }
+
+    tnOspfMultiAreaConfigGroup OBJECT-GROUP
+        OBJECTS {
+            tnOspfMultiAreaId,
+            tnOspfMultiAreaConfigType,
+            tnOspfMultiAreaConfigDnsOpaqueLsa,
+            tnOspfMultiAreaConfigWavekeyOpaqueLsa,
+            tnOspfMultiAreaConfigNssaTranslate,
+            tnOspfMultiAreaConfigDefaultCost,
+            tnOspfMultiAreaConfigVirtualLinkIp,
+            tnOspfMultiAreaConfigRowStatus,
+            tnOspfMultiAreaActiveInterfaces,
+            tnOspfMultiAreaAdjacentNeighbors,
+            tnOspfMultiAreaActiveNodes,
+            tnOspfMultiAreaNumLsas,
+            tnOspfMultiAreaStatsId
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOspfGroups 22 }
+
+    tnOspfv3MultiAreaConfigGroup OBJECT-GROUP
+        OBJECTS {
+            tnOspfv3MultiAreaId,
+            tnOspfv3MultiAreaConfigType,
+            tnOspfv3MultiAreaConfigDnsOpaqueLsa,
+            tnOspfv3MultiAreaConfigWavekeyOpaqueLsa,
+            tnOspfv3MultiAreaConfigNssaTranslate,
+            tnOspfv3MultiAreaConfigDefaultCost,
+            tnOspfv3MultiAreaConfigVirtualLinkIp,
+            tnOspfv3MultiAreaConfigRowStatus,
+            tnOspfv3MultiAreaActiveInterfaces,
+            tnOspfv3MultiAreaAdjacentNeighbors,
+            tnOspfv3MultiAreaActiveNodes,
+            tnOspfv3MultiAreaNumLsas,
+            tnOspfv3MultiAreaStatsId
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOspfGroups 23 }
+
+--------------------------------------------------------------------------------
+-- Compliance Statements (mandatory)
+--------------------------------------------------------------------------------
+    tnOspfCompliance MODULE-COMPLIANCE
+        STATUS         current
+        DESCRIPTION    "."
+        MODULE
+        MANDATORY-GROUPS {
+--            obsolete
+--            tnOspfGeneralGroup,
+            tnOspfAreaGroup,
+--            obsolete
+--            tnOspfStubAreaGroup,
+--            tnOspfLsdbGroup,
+--            tnOspfHostGroup,
+--            tnOspfIfGroup,
+--            tnOspfIfMetricGroup,
+--            tnOspfVirtIfGroup,
+--            tnOspfNbrGroup,
+--            obsolete
+--            tnOspfVirtNbrGroup,
+--            tnOspfExtLsdbGroup,
+--            tnOspfAreaAggregateGroup,
+--            tnOspfRoutingGroup,
+--            tnOspfRouteHopGroup,
+--            tnOspfInterfaceStatsGroup,
+--            tnOspfRtbStatsGroup,
+--            tnOspfIpToAreaGroup,
+--            tnOspfAreaConfigGroup,
+--            tnOspfIfAdjNbrGroup,
+--            tnOspfPerRtrNbrGroup,
+            tnOspfPortGroup,
+            tnOspfMultiAreaConfigGroup,
+            tnOspfv3MultiAreaConfigGroup
+        }
+        ::= { tnOspfCompliances 1 }
+
+END -- DEFINITION OF TROPIC-OSPF-MIB

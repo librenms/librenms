@@ -1,0 +1,1813 @@
+TROPIC-OTUODU-MIB DEFINITIONS ::= BEGIN
+
+-- (c) Copyright 2023 Nokia Networks.  All rights reserved.
+-- This software is the confidential and proprietary property of
+-- Nokia and may only be used in accordance with the terms of the
+-- license agreement provided with this software.
+
+IMPORTS
+      SnmpAdminString                         FROM SNMP-FRAMEWORK-MIB
+      OBJECT-TYPE, MODULE-IDENTITY,
+      Unsigned32, Integer32, Counter64        FROM SNMPv2-SMI
+      MODULE-COMPLIANCE, OBJECT-GROUP         FROM SNMPv2-CONF
+      RowStatus, TruthValue                   FROM SNMPv2-TC
+      ifIndex                                 FROM IF-MIB
+      AluWdmFecMode,
+      AluWdmPortOchOtuRate,
+      AluWdmTtiStatus,
+      AluWdmOdukStatus,
+      TropicOperationalCapabilityType,
+      TropicOperationalStateType,
+      TropicAdminStateType,
+      TropicStateQualifierType                FROM TROPIC-TC
+      tnPortModules, tnOtuOduMIB              FROM TROPIC-GLOBAL-REG;
+
+  tnOtuOduMibModule MODULE-IDENTITY
+      LAST-UPDATED    "202302101200Z"
+      ORGANIZATION    "Nokia"
+      CONTACT-INFO    "Nokia
+                       Attn: Jeff Donnelly
+                       600 Mountain Avenue
+                       New Providence, NJ 07974
+
+                       Phone: +1 732 221 6408
+                       Email: jeff.donnelly@nokia.com"
+
+      DESCRIPTION "OTUk ODUk MIB types."
+
+      REVISION    "202302101200Z"
+      DESCRIPTION "Added the following to tnOtsigFecMode:
+                   eSDFec6(22)."
+
+      REVISION    "202207151200Z"
+      DESCRIPTION "Added the following to tnOtsigTable:
+                   tnOtsigReferenceProfileId."
+
+      REVISION    "202206101200Z"
+      DESCRIPTION "Added the following to tnOtsigTxShape:
+                   superRRC02(5)."
+
+      REVISION    "202206031200Z"
+      DESCRIPTION "1) Added the following table:
+                      tnOtsigCustomProfileTable.
+                   2) Changed SYNTAX of the following from Integer32 (1..1000)
+                      to Integer32 (1..3999):
+                      tnOtsigProfileId."
+
+      REVISION    "202205131200Z"
+      DESCRIPTION "Added the following to tnOtsigTable:
+                   tnOtsigAlmProfName."
+
+      REVISION    "202204151200Z"
+      DESCRIPTION "Added the following to tnOtsigTable:
+                   tnOtsigIncFlexOFrameIIDMap2
+                   tnOtsigIncFlexOFrameIIDMap3
+                   tnOtsigIncFlexOFrameIIDMap4."
+
+      REVISION    "202203251200Z"
+      DESCRIPTION "Added the following to tnOtsigTable:
+                   tnOtsigIncFlexOFrameGid
+                   tnOtsigIncFlexOFrameIID
+                   tnOtsigIncFlexOFrameIIDMap1."
+
+      REVISION    "202203181200Z"
+      DESCRIPTION "Added the following to tnOtsigTable:
+                   tnOtsigAdminState
+                   tnOtsigStateAINS
+                   tnOtsigStateAINSTimerStart
+                   tnOtsigStateAINSDebounce
+                   tnOtsigStateQualifier
+                   tnOtsigOperationalCapability
+                   tnOtsigOperationalState
+                   tnOtsigUsingSysAINSDebounceTime."
+
+      REVISION    "202202251200Z"
+      DESCRIPTION "Added the following to tnOtsigTable:
+                   tnOtsigGroupIdentification
+                   tnOtsigInterfaceIdentification."
+
+      REVISION    "202112101200Z"
+      DESCRIPTION "Added the following to tnOtsigTable:
+                   tnOtsigFacilityDescriptorName
+                   tnOtsigFacilityDescriptorDesc
+                   tnOtsigFacilityDescriptorCirId
+                   tnOtsigFacilityDescriptorConnPtId
+                   tnOtsigFacilityDescCustLifeCycleState
+                   tnOtsigFacilityDescAdminState."
+
+      REVISION    "202112031200Z"
+      DESCRIPTION "Added the following to tnOtukTable:
+                   tnOtuFacilityDescriptorConnPtId
+                   tnOtuFacilityDescCustLifeCycleState
+                   tnOtuFacilityDescAdminState."
+
+      REVISION    "202111121200Z"
+      DESCRIPTION "1) Added the following to tnOtsigFecMode:
+                      eOFec(21).
+                   2) Added the following to tnOtsigIOPMode:
+                      flexO(6)."
+
+      REVISION    "202106181200Z"
+      DESCRIPTION "Changed SYNTAX of the following from INTEGER to Integer32:
+                   tnOtsigBaudrate."
+
+      REVISION    "202105141200Z"
+      DESCRIPTION "Added the following to tnOtsigBaudrate:
+                   gBaud858(10)
+                   to
+                   gBaud842(12)."
+
+      REVISION    "202102261200Z"
+      DESCRIPTION "Added the following to tnOtsigProfileTable:
+                   tnOtsigProfileExternalCategory
+                   tnOtsigProfileExternalCardType."
+
+      REVISION    "202101151200Z"
+      DESCRIPTION "Added the following to tnOtsigIOPMode:
+                   otutcn(4)
+                   otu4(5)."
+
+      REVISION    "202012111200Z"
+      DESCRIPTION "1) Added the following to tnOtsigBaudrate:
+                      gBaud280(7)
+                      to
+                      gBaud900(9).
+                   2) Added the following to tnOtsigFecMode:
+                      sdFecCE(19)
+                      sdFecV(20)."
+
+      REVISION    "202007101200Z"
+      DESCRIPTION "1) Changed MAX-ACCESS of the following from read-only to read-create:
+                      tnOtsigTxShape
+                      tnOtsigPhaseEncode.
+                   2) Added the following to tnOtsigTxShape:
+                      superRRC01(4)."
+
+      REVISION    "202005081200Z"
+      DESCRIPTION "Modified the range of the following from
+                   (-3100..3100) to (-10000..10000):
+                   tnOtsigCdPreComp."
+
+      REVISION    "202003201200Z"
+      DESCRIPTION "Added the following to tnOtsigEncoding:
+                   cohpmsqam64(16),
+                   qam32(17)."
+
+      REVISION    "202002211200Z"
+      DESCRIPTION "Added the following to tnOtukTable:
+                   tnOtuFacilityDescriptorName
+                   tnOtuFacilityDescriptorDesc
+                   tnOtuFacilityDescriptorCirId."
+
+      REVISION    "201911011200Z"
+      DESCRIPTION "1) Changed MAX-ACCESS of the following from read-only to read-create:
+                      tnOtsigPolarizationTrack.
+                   2) Added the following to tnOtsigTable:
+                      tnOtsigMgracd."
+
+      REVISION    "201910251200Z"
+      DESCRIPTION "Changed SYNTAX of the following from Integer32
+                   to OCTET STRING:
+                   tnOtuChanPoolIfIndex."
+
+      REVISION    "201908301200Z"
+      DESCRIPTION "Added the following to tnOtsigProfileTable:
+                   tnOtsigProfileCardType."
+
+      REVISION    "201906071200Z"
+      DESCRIPTION "Added the following to tnOtsigPolarizationTrack:
+                   devDefault(3)."
+
+      REVISION    "201905311200Z"
+      DESCRIPTION "Added the following to tnOtukTable:
+                   tnOtuChanPoolIfIndex."
+
+      REVISION    "201904261200Z"
+      DESCRIPTION "Added the following to tnOtsigIOPMode:
+                   otucn(3)."
+
+      REVISION    "201904121200Z"
+      DESCRIPTION "Added the following table:
+                   tnOtsigProfileTable."
+
+      REVISION    "201904051200Z"
+      DESCRIPTION "Added the following to tnOtsigTable:
+                   tnOtsigProfileId."
+
+      REVISION    "201903081200Z"
+      DESCRIPTION "Added the following to tnOtsigEncoding:
+                   cohpmsqam16(15)."
+
+      REVISION    "201902151200Z"
+      DESCRIPTION "Added the following to tnOtuServerPort:
+                   spL5Ch1(71)
+                   spL5Ch2(72)
+                   spL6Ch1(81)
+                   spL6Ch2(82)."
+
+      REVISION    "201902081200Z"
+      DESCRIPTION "Added the following to tnOtsigFecMode:
+                   ePuncturedSDFecG2(18)."
+
+      REVISION    "201901111200Z"
+      DESCRIPTION "1) Added the following to tnOtukTable:
+                      tnOtuOtsigId.
+                   2) Added the following to tnOtsigTable:
+                      tnOtsigIOPMode
+                      tnOtsigCapacity."
+
+      REVISION    "201812281200Z"
+      DESCRIPTION "Added the following table:
+                   tnOtsigTable."
+
+      REVISION    "201802231200Z"
+      DESCRIPTION "Updated the contact info."
+
+      REVISION    "201707071200Z"
+      DESCRIPTION "Fixed MIB compile issues."
+
+      REVISION    "201702241200Z"
+      DESCRIPTION "Added the following to tnOtukTable:
+                   tnOtukType."
+
+      REVISION    "201701201200Z"
+      DESCRIPTION "Added the following to tnOtuServerPort:
+                   spL3Ch1(41)
+                   spL3Ch2(42)
+                   spL3Ch3(43)
+                   spL3Ch4(44)
+                   spL4Ch1(51)
+                   spL4Ch2(52)
+                   spL3L4Ch1(61)
+                   spL3L4Ch2(62)
+                   spL3L4Ch3(63)
+                   spL3L4Ch4(64)
+                   spL3L4Ch5(65)."
+
+      REVISION    "201611161200Z"
+      DESCRIPTION "Updated the contact info."
+
+      REVISION    "201603251200Z"
+      DESCRIPTION "Added the following to tnOtukTable:
+                   tnOtukMgracd."
+
+      REVISION    "201603021200Z"
+      DESCRIPTION "Added the following table:
+                   tnOtuApaTable."
+
+      REVISION    "201507171200Z"
+      DESCRIPTION "Added the following to tnOtukTable:
+                   tnOtuServerPort."
+
+      REVISION    "201505151200Z"
+      DESCRIPTION "Added the following to tnOtukTable:
+                   tnOtuAlmProfName."
+
+      REVISION    "201411131200Z"
+      DESCRIPTION "Added the following to tnOtukTable:
+                   tnOtukDegThr
+                   tnOtukDegM
+                   tnOtukDapiAccepted
+                   tnOtukDapiExpected
+                   tnOtukDapiTransmitted
+                   tnOtukOsAccepted
+                   tnOtukOsTransmitted."
+
+      REVISION    "201410311200Z"
+      DESCRIPTION "Changed the syntax of tnOtukRate to read-only in tnOtukTable."
+
+      REVISION    "201402261200Z"
+      DESCRIPTION "1) Marked the following as obsolete:
+                      tnOtukForceAdminStatus
+                      tnOtukTtpPresent.
+                   2) Added ranges and DEFVAL to attributes."
+
+      REVISION    "201304161200Z"
+      DESCRIPTION "Marked the following as obsolete:
+                   tnOdukTable
+                   tnOdukXcTable
+                   tnOdukApsGroupTable
+                   tnOdukApsMemberTable
+                   tnTxOptsgTable
+                   tnExpOptsgTable
+                   tnRxOptsgTable
+                   tnOdukApsGroupIdTable."
+
+      REVISION    "201303141200Z"
+      DESCRIPTION "Added the following to tnOtukTable:
+                   tnOtukAsymInterworking."
+
+      REVISION    "201212051200Z"
+      DESCRIPTION "Added the following to tnOtukTable:
+                   tnOtukTtpPresent."
+
+      REVISION    "201210221200Z"
+      DESCRIPTION "Added the following to tnOtukTable:
+                   tnOtukPreFec
+                   tnOtukPostFec."
+
+      REVISION    "201209281200Z"
+      DESCRIPTION "Added the following to tnOtukTable:
+                   tnOtukForceAdminStatus."
+
+      REVISION    "201209241200Z"
+      DESCRIPTION "Added the following to tnOtukTable:
+                   tnOtukAINSDebounceTime
+                   tnOtukUsingSysAINSDebounceTime
+                   tnOtukAINSDebounceTimeRemaining."
+
+      REVISION    "201208221200Z"
+      DESCRIPTION "Added the following to tnOtukTable:
+                   tnOtukAdminStatus
+                   tnOtukStateAINS
+                   tnOtukOperStatus
+                   tnOtukStateQualifier
+                   tnOtukOperationalCapability."
+
+      REVISION    "201204101200Z"
+      DESCRIPTION "Added the following to tnOdukXcRate:
+                   oduflexsdr(6)."
+
+      REVISION    "201107221200Z"
+      DESCRIPTION "Added the following to tnOdukApsGroupTable:
+                   tnOdukApsXcBidirectional."
+
+      REVISION    "201104251200Z"
+      DESCRIPTION "Added the following to tnOdukApsGroupTable:
+                   tnOdukApsGroupK1K2Trans."
+
+      REVISION    "201103301200Z"
+      DESCRIPTION "1) Updated the value of tnOdukXcRate from oduflex(3)
+                      to oduflexFc400(3).
+                   2) Added the following to tnOdukXcRate:
+                      oduflex3gsdi(5)."
+
+      REVISION    "201103041200Z"
+      DESCRIPTION "1) Added the following to tnOdukApsGroupTable:
+                      tnOdukApsGroupID.
+                   2) Added the following entry and table:
+                      tnOdukApsGroupIdAttributeTotal
+                      tnOdukApsGroupIdTable."
+
+      REVISION    "201102231200Z"
+      DESCRIPTION "1) Added the following to tnOtukTable:
+                      tnOtukIncRes.
+                   2) Added the following to tnOdukTable:
+                      tnOdukIncFwFTFLTypeID
+                      tnOdukIncFwFTFLOperID
+                      tnOdukIncBwFTFLTypeID
+                      tnOdukIncBwFTFLOperID
+                      tnOdukIncExp."
+
+      REVISION    "201011241200Z"
+      DESCRIPTION "1) Changed INDEX of the following MIB tables:
+                      tnOdukXcTable
+                      tnOdukApsMemberTable.
+                   2) Renamed tnOdukXcType to tnOdukXcRate in
+                      tnOdukXcTable.
+                   3) Deleted tnOdukApsXcTable.
+                   4) Added tnOdukApsGroupTable.
+                   5) Changed SYNTAX of the following from OCTET STRING
+                      to SnmpAdminString:
+                      tnOdukTxOduStruct
+                      tnOdukRxOduStruct
+                      tnOdukExpOduStruct
+                      tnOdukXcName
+                      tnTxOptsgTSMap
+                      tnExpOptsgTSMap
+                      tnRxOptsgTSMap."
+
+      REVISION    "201011221200Z"
+      DESCRIPTION "Added the following tables:
+                   tnTxOptsgTable
+                   tnExpOptsgTable
+                   tnRxOptsgTable."
+
+      REVISION    "201011141200Z"
+      DESCRIPTION "Added the following tables:
+                   tnOtukTable
+                   tnOdukTable
+                   tnOdukXcTable
+                   tnOdukApsXcTable
+                   tnOdukApsMemberTable."
+
+      ::= { tnPortModules 5 }
+
+  tnOtuOduConf         OBJECT IDENTIFIER ::= { tnOtuOduMIB 1 }
+  tnOtuOduGroups       OBJECT IDENTIFIER ::= { tnOtuOduConf 1 }
+  tnOtuOduCompliances  OBJECT IDENTIFIER ::= { tnOtuOduConf 2 }
+  tnOtuOduObjs         OBJECT IDENTIFIER ::= { tnOtuOduMIB 2 }
+  tnOtuOduBasics       OBJECT IDENTIFIER ::= { tnOtuOduObjs 1 }
+
+--------------------------------------------------------------------------------
+-- Textual Conventions
+--------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------
+-- Otuk Table
+--------------------------------------------------------------------------------
+    tnOtukTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnOtukEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "Table of Otuk attributes."
+        ::= { tnOtuOduBasics 1 }
+
+    tnOtukEntry OBJECT-TYPE
+        SYNTAX         TnOtukEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { ifIndex }
+        ::= { tnOtukTable 1 }
+
+    TnOtukEntry ::=
+        SEQUENCE {
+            tnOtukTtiStatus                         AluWdmTtiStatus,
+            tnOtukFecMode                           AluWdmFecMode,
+            tnOtukRate                              AluWdmPortOchOtuRate,
+            tnOtukIncRes                            OCTET STRING,
+            tnOtukAdminStatus                       AluWdmOdukStatus,
+            tnOtukStateAINS                         TruthValue,
+            tnOtukOperStatus                        AluWdmOdukStatus,
+            tnOtukStateQualifier                    TropicStateQualifierType,
+            tnOtukOperationalCapability             TropicOperationalCapabilityType,
+            tnOtukAINSDebounceTime                  Integer32,
+            tnOtukUsingSysAINSDebounceTime          TruthValue,
+            tnOtukAINSDebounceTimeRemaining         Unsigned32,
+--            obsolete
+--            tnOtukForceAdminStatus                  TnCommand,
+            tnOtukPreFec                            Counter64,
+            tnOtukPostFec                           Counter64,
+--            obsolete
+--            tnOtukTtpPresent                        TruthValue,
+            tnOtukAsymInterworking                  TruthValue,
+            tnOtukDegThr                            Unsigned32,
+            tnOtukDegM                              Unsigned32,
+            tnOtukDapiAccepted                      OCTET STRING,
+            tnOtukDapiExpected                      OCTET STRING,
+            tnOtukDapiTransmitted                   OCTET STRING,
+            tnOtukOsAccepted                        OCTET STRING,
+            tnOtukOsTransmitted                     OCTET STRING,
+            tnOtuAlmProfName                        OCTET STRING,
+            tnOtuServerPort                         INTEGER,
+            tnOtukMgracd                            INTEGER,
+            tnOtukType                              INTEGER,
+            tnOtuOtsigId                            Integer32,
+            tnOtuChanPoolIfIndex                    OCTET STRING,
+            tnOtuFacilityDescriptorName             SnmpAdminString,
+            tnOtuFacilityDescriptorDesc             SnmpAdminString,
+            tnOtuFacilityDescriptorCirId            SnmpAdminString,
+            tnOtuFacilityDescriptorConnPtId         SnmpAdminString,
+            tnOtuFacilityDescCustLifeCycleState     SnmpAdminString,
+            tnOtuFacilityDescAdminState             INTEGER
+        }
+
+    tnOtukTtiStatus OBJECT-TYPE
+        SYNTAX         AluWdmTtiStatus
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Otuk TTI status."
+        DEFVAL         { unspecified }
+        ::= { tnOtukEntry 1 }
+
+    tnOtukFecMode OBJECT-TYPE
+        SYNTAX         AluWdmFecMode
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Otuk FEC mode."
+        DEFVAL         { enhancedFec }
+        ::= { tnOtukEntry 2 }
+
+    tnOtukRate OBJECT-TYPE
+        SYNTAX         AluWdmPortOchOtuRate
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Otuk Rate."
+        DEFVAL         { otm10G709 }
+        ::= { tnOtukEntry 3 }
+
+    tnOtukIncRes OBJECT-TYPE
+        SYNTAX         OCTET STRING
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "OTUk incoming res (reserved for future international
+                        standardization)."
+        DEFVAL         { "" }
+        ::= { tnOtukEntry 4 }
+
+    tnOtukAdminStatus OBJECT-TYPE
+        SYNTAX         AluWdmOdukStatus
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "OTUk administrative state.  It may be used to suppress
+                        the alarms or disable consequent actions on the OTU
+                        entity."
+        DEFVAL         { down }
+        ::= { tnOtukEntry 5 }
+
+    tnOtukStateAINS OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "OTUk state AINS attributes."
+        DEFVAL         { false }
+        ::= { tnOtukEntry 6 }
+
+    tnOtukOperStatus OBJECT-TYPE
+        SYNTAX         AluWdmOdukStatus
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "OTUk operational state of the interface."
+        DEFVAL         { down }
+        ::= { tnOtukEntry 7 }
+
+    tnOtukStateQualifier OBJECT-TYPE
+        SYNTAX         TropicStateQualifierType
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Indicates the state qualifier (i.e., the secondary
+                        state) of the OTUk state."
+        ::= { tnOtukEntry 8 }
+
+    tnOtukOperationalCapability OBJECT-TYPE
+        SYNTAX         TropicOperationalCapabilityType
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The partiallyEnabled(3) state means an abnormal state."
+        DEFVAL         { disabled }
+        ::= { tnOtukEntry 9 }
+
+    tnOtukAINSDebounceTime OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "Seconds"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "This attribute must be set in multiples of 60s.  It is
+                        equal to System AINS Debounce Time when Port AINS Use
+                        System Default is true.  Setting the OTUk AINS Debounce
+                        Time and OTUk AINS Use System Default to true in the
+                        same set request is restricted.
+
+                        Current configurable range: 1m to 96h 0m."
+        ::= { tnOtukEntry 10 }
+
+    tnOtukUsingSysAINSDebounceTime OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Using System AINS Debounce Time.  Sets with a value of
+                        false are restricted.  The network operator must set
+                        OTUk AINS Debounce Time to some valid value to disable
+                        the use of System AINS Debounce Time.  Setting the
+                        Port AINS Debounce Time and Port AINS Use System Default
+                        to true in the same set request is restricted."
+        ::= { tnOtukEntry 11 }
+
+    tnOtukAINSDebounceTimeRemaining OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Number of seconds until the OTUk AINS DebounceTime
+                        expires.  If Port AINS is false or Port AINS Debounce
+                        Time is 0, the value of this attribute will be 0 ."
+        DEFVAL         { 0 }
+        ::= { tnOtukEntry 12 }
+
+--    obsolete
+--    tnOtukForceAdminStatus OBJECT-TYPE ::= { tnOtukEntry 13 }
+
+    tnOtukPreFec OBJECT-TYPE
+        SYNTAX         Counter64
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Real time error bit rate of pre-FEC (Forward Error Correction).
+
+                        Current range: 0 to 4000."
+        ::= { tnOtukEntry 14 }
+
+    tnOtukPostFec OBJECT-TYPE
+        SYNTAX         Counter64
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Real time error bit rate of post-FEC (Forward Error Correction).
+
+                        Current range: 0 to 4000."
+        ::= { tnOtukEntry 15 }
+
+--    obsolete
+--    tnOtukTtpPresent OBJECT-TYPE ::= { tnOtukEntry 16 }
+
+    tnOtukAsymInterworking OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Otuk asymmetric interworking."
+        DEFVAL         { false }
+        ::= { tnOtukEntry 17 }
+
+    tnOtukDegThr OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Specifies the burst threshold as a number of errored
+                        blocks on the ODU layer.  A second is declared as
+                        good if the number of detected errored blocks within
+                        one second is less than tnOtukDegThr, otherwise the
+                        second is declared as bad second."
+        ::= { tnOtukEntry 18 }
+
+    tnOtukDegM OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Specifies the number of consecutive bad seconds to be
+                        detected before declaring a signal degrade defect on
+                        the ODU.  The defect is cleared if tnOtukDegM
+                        consecutive good seconds  are detected.
+
+                        Current Configurable Range:
+
+                        2 to 10."
+        ::= { tnOtukEntry 19 }
+
+    tnOtukDapiAccepted OBJECT-TYPE
+        SYNTAX         OCTET STRING (SIZE(0..15))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The DAPI bytes received."
+        ::= { tnOtukEntry 20 }
+
+    tnOtukDapiExpected OBJECT-TYPE
+        SYNTAX         OCTET STRING (SIZE(0..15))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The DAPI bytes expected by the receiver."
+        ::= { tnOtukEntry 21 }
+
+    tnOtukDapiTransmitted OBJECT-TYPE
+        SYNTAX         OCTET STRING (SIZE(0..15))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The DAPI bytes transmitted.  The TTI[17] to TTI[31]
+                        contain the 15-character destination access point
+                        identifier(DAPI)."
+        ::= { tnOtukEntry 22 }
+
+    tnOtukOsAccepted OBJECT-TYPE
+        SYNTAX         OCTET STRING (SIZE(0..32))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The OS bytes received."
+        ::= { tnOtukEntry 23 }
+
+    tnOtukOsTransmitted OBJECT-TYPE
+        SYNTAX         OCTET STRING (SIZE(0..32))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The OS bytes transmitted.  The TTI[32] to TTI[63]
+                        contain the 32-character Operator Specific(OS)."
+        ::= { tnOtukEntry 24 }
+
+    tnOtuAlmProfName OBJECT-TYPE
+        SYNTAX         OCTET STRING
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOtukEntry 25 }
+
+    tnOtuServerPort OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         unassigned(0),
+                         spL1Ch1(11),
+                         spL1Ch2(12),
+                         spL1Ch3(13),
+                         spL1Ch4(14),
+                         spL2Ch1(21),
+                         spL2Ch2(22),
+                         spL1L2Ch1(31),
+                         spL1L2Ch2(32),
+                         spL1L2Ch3(33),
+                         spL1L2Ch4(34),
+                         spL1L2Ch5(35),
+                         spL3Ch1(41),
+                         spL3Ch2(42),
+                         spL3Ch3(43),
+                         spL3Ch4(44),
+                         spL4Ch1(51),
+                         spL4Ch2(52),
+                         spL3L4Ch1(61),
+                         spL3L4Ch2(62),
+                         spL3L4Ch3(63),
+                         spL3L4Ch4(64),
+                         spL3L4Ch5(65),
+                         spL5Ch1(71),
+                         spL5Ch2(72),
+                         spL6Ch1(81),
+                         spL6Ch2(82)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Server port types."
+        ::= { tnOtukEntry 26 }
+
+    tnOtukMgracd OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         none(1),
+                         cp(2),
+                         mgnpln(3),
+                         cpmgnpln(4)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Indicates if managed by CP, MGNPLN, shared by both or free."
+        DEFVAL         { none }
+        ::= { tnOtukEntry 27 }
+
+    tnOtukType OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         standard(1),
+                         proprietary(2)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { standard }
+        ::= { tnOtukEntry 28 }
+
+    tnOtuOtsigId OBJECT-TYPE
+        SYNTAX         Integer32 (0..255)
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "OTU OtsigId."
+        DEFVAL         { 0 }
+        ::= { tnOtukEntry 29 }
+
+    tnOtuChanPoolIfIndex OBJECT-TYPE
+        SYNTAX         OCTET STRING (SIZE(0..15))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "OTU Chan Pool ifindex."
+        ::= { tnOtukEntry 30 }
+
+    tnOtuFacilityDescriptorName OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..45))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOtukEntry 31 }
+
+    tnOtuFacilityDescriptorDesc OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..255))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOtukEntry 32 }
+
+    tnOtuFacilityDescriptorCirId OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..45))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOtukEntry 33 }
+
+    tnOtuFacilityDescriptorConnPtId OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..64))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Connection Point Id."
+        ::= { tnOtukEntry 34 }
+
+    tnOtuFacilityDescCustLifeCycleState OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..45))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Customer life cycle state."
+        ::= { tnOtukEntry 35 }
+
+    tnOtuFacilityDescAdminState OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         down(1),
+                         mt(2),
+                         unassigned(3),
+                         up(4),
+                         invalid(5)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Admin state."
+        ::= { tnOtukEntry 36 }
+
+--    obsolete
+--    tnOdukTable                    OBJECT-TYPE ::= { tnOtuOduBasics 2 }
+--    tnOdukXcTable                  OBJECT-TYPE ::= { tnOtuOduBasics 3 }
+--    tnOdukApsGroupTable            OBJECT-TYPE ::= { tnOtuOduBasics 4 }
+--    tnOdukApsMemberTable           OBJECT-TYPE ::= { tnOtuOduBasics 5 }
+--    tnTxOptsgTable                 OBJECT-TYPE ::= { tnOtuOduBasics 6 }
+--    tnExpOptsgTable                OBJECT-TYPE ::= { tnOtuOduBasics 7 }
+--    tnRxOptsgTable                 OBJECT-TYPE ::= { tnOtuOduBasics 8 }
+--    tnOdukApsGroupIdAttributeTotal OBJECT-TYPE ::= { tnOtuOduBasics 9 }
+--    tnOdukApsGroupIdTable          OBJECT-TYPE ::= { tnOtuOduBasics 10 }
+
+--------------------------------------------------------------------------------
+-- Automatic Pre-emphasis Adjustment - Table
+--------------------------------------------------------------------------------
+    tnOtuApaTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnOtuApaEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "Table of APA attributes."
+        ::= { tnOtuOduBasics 11 }
+
+    tnOtuApaEntry OBJECT-TYPE
+        SYNTAX         TnOtuApaEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { ifIndex,
+                tnOtuApaInterval }
+        ::= { tnOtuApaTable 1 }
+
+    TnOtuApaEntry ::=
+        SEQUENCE {
+            tnOtuApaInterval         Integer32,
+            tnOtuApaPreFecBer        Counter64,
+            tnOtuApaFecUncorrCnt     Counter64
+    }
+
+    tnOtuApaInterval OBJECT-TYPE
+        SYNTAX         Integer32 (1..60)
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOtuApaEntry 1 }
+
+    tnOtuApaPreFecBer OBJECT-TYPE
+        SYNTAX         Counter64
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOtuApaEntry 2 }
+
+    tnOtuApaFecUncorrCnt OBJECT-TYPE
+        SYNTAX         Counter64
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOtuApaEntry 3 }
+
+--------------------------------------------------------------------------------
+-- OTSIG Table
+--------------------------------------------------------------------------------
+    tnOtsigTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnOtsigEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "Table of Otsig attributes."
+        ::= { tnOtuOduBasics 12 }
+
+    tnOtsigEntry OBJECT-TYPE
+        SYNTAX         TnOtsigEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { tnOtsigIndex }
+        ::= { tnOtsigTable 1 }
+
+    TnOtsigEntry ::=
+        SEQUENCE {
+            tnOtsigIndex                              Integer32,
+            tnOtsigCommand                            INTEGER,
+            tnOtsigOtuStruct                          SnmpAdminString,
+            tnOtsigTransmissionMode                   INTEGER,
+            tnOtsigRegenResponse                      INTEGER,
+            tnOtsigOTSilist                           SnmpAdminString,
+            tnOtsigLLEB                               TruthValue,
+            tnOtsigDLEB                               TruthValue,
+            tnOtsigTSEB                               TruthValue,
+            tnOtsigBaudrate                           Integer32,
+            tnOtsigEncoding                           INTEGER,
+            tnOtsigPhaseEncode                        INTEGER,
+            tnOtsigPolarizationTrack                  INTEGER,
+            tnOtsigTxShape                            INTEGER,
+            tnOtsigFecMode                            INTEGER,
+            tnOtsigNonLinearComp                      TruthValue,
+            tnOtsigCdPreComp                          Integer32,
+            tnOtsigDescription                        SnmpAdminString,
+            tnOtsigPayloadRate                        Integer32,
+            tnOtsigIOPMode                            INTEGER,
+            tnOtsigCapacity                           Integer32,
+            tnOtsigProfileId                          Integer32,
+            tnOtsigMgracd                             INTEGER,
+            tnOtsigFacilityDescriptorName             SnmpAdminString,
+            tnOtsigFacilityDescriptorDesc             SnmpAdminString,
+            tnOtsigFacilityDescriptorCirId            SnmpAdminString,
+            tnOtsigFacilityDescriptorConnPtId         SnmpAdminString,
+            tnOtsigFacilityDescCustLifeCycleState     SnmpAdminString,
+            tnOtsigFacilityDescAdminState             INTEGER,
+            tnOtsigGroupIdentification                Integer32,
+            tnOtsigInterfaceIdentification            SnmpAdminString,
+            tnOtsigAdminState                         TropicAdminStateType,
+            tnOtsigStateAINS                          TruthValue,
+            tnOtsigStateAINSTimerStart                Unsigned32,
+            tnOtsigStateAINSDebounce                  Integer32,
+            tnOtsigStateQualifier                     TropicStateQualifierType,
+            tnOtsigOperationalCapability              TropicOperationalCapabilityType,
+            tnOtsigOperationalState                   TropicOperationalStateType,
+            tnOtsigUsingSysAINSDebounceTime           TruthValue,
+            tnOtsigIncFlexOFrameGid                   OCTET STRING,
+            tnOtsigIncFlexOFrameIID                   OCTET STRING,
+            tnOtsigIncFlexOFrameIIDMap1               SnmpAdminString,
+            tnOtsigIncFlexOFrameIIDMap2               SnmpAdminString,
+            tnOtsigIncFlexOFrameIIDMap3               SnmpAdminString,
+            tnOtsigIncFlexOFrameIIDMap4               SnmpAdminString,
+            tnOtsigAlmProfName                        OCTET STRING,
+            tnOtsigReferenceProfileId                 Integer32
+         }
+
+    tnOtsigIndex OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOtsigEntry 1 }
+
+    tnOtsigCommand OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         noCmd(1),
+                         create(2),
+                         delete(3),
+                         update(4)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Create Delete Update the OTSIG."
+        ::= { tnOtsigEntry 2 }
+
+    tnOtsigOtuStruct OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..192))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "OTU payload structure for the OTSIG."
+        ::= { tnOtsigEntry 3 }
+
+    tnOtsigTransmissionMode OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         addDrop(1),
+                         dropOnly(2),
+                         addOnly(3),
+                         thru(4),
+                         dropContinue(5),
+                         crossRegen(6),
+                         regenGcc0LoopThrough(7)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Specifies the operation mode for each OTSi port in one
+                        OTSIG."
+        DEFVAL         { addDrop }
+        ::= { tnOtsigEntry 4 }
+
+    tnOtsigRegenResponse OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         laserOn(1),
+                         laserOff(2)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Specifies the consequent action of the line TX laser for
+                        each OTSi specidfied in OTSIList if OTSIG is configured
+                        for regeneration mode."
+        DEFVAL         { laserOn }
+        ::= { tnOtsigEntry 5 }
+
+    tnOtsigOTSilist OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..32))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Specifies the OTSi interfaces to be a memeber for OTSiG."
+        ::= { tnOtsigEntry 6 }
+
+    tnOtsigLLEB OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Facility Loopback, also known as line loopback."
+        DEFVAL         { false }
+        ::= { tnOtsigEntry 7 }
+
+    tnOtsigDLEB OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Terminal Loopback, also known as diagnostic loopback."
+        DEFVAL         { false }
+        ::= { tnOtsigEntry 8 }
+
+    tnOtsigTSEB OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Test signal generator."
+        DEFVAL         { false }
+        ::= { tnOtsigEntry 9 }
+
+    tnOtsigBaudrate OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "OTSi Baud Rate."
+        ::= { tnOtsigEntry 10 }
+
+    tnOtsigEncoding OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         nrz(0),
+                         pdpsk(1),
+                         dpsk(2),
+                         bpsk(3),
+                         qpsk(4),
+                         qpskEnhOsnr(5),
+                         nrzCFP1(6),
+                         icohpmqpsk(7),
+                         duobinary(8),
+                         qpskhperf2(9),
+                         qam16(10),
+                         qam8(11),
+                         spqpsk(12),
+                         qam64(13),
+                         cohpm16qam250G(14),
+                         cohpmsqam16(15),
+                         cohpmsqam64(16),
+                         qam32(17),
+                         optimization(9996),
+                         unassigned(9997),
+                         alien(9998),
+                         unknown(9999)
+                       }
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "OTSi Encoding."
+        DEFVAL         { optimization }
+        ::= { tnOtsigEntry 11 }
+
+    tnOtsigPhaseEncode OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         absolute(1),
+                         differential(2)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "OTSi Phase Encoding mode."
+        DEFVAL         { absolute }
+        ::= { tnOtsigEntry 12 }
+
+    tnOtsigPolarizationTrack OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         normal(1),
+                         fast(2),
+                         devDefault(3)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "OTSi Trackpolar."
+        DEFVAL         { normal }
+        ::= { tnOtsigEntry 13 }
+
+    tnOtsigTxShape OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         single(1),
+                         super(2),
+                         alien(3),
+                         superRRC01(4),
+                         superChannel0-05(5),
+                         superChannel0-07(6),
+                         superChannel0-15(7),
+                         superChannel0-25(8),
+                         superChannel0-3(9)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "OTSi Txshape."
+        DEFVAL         { single }
+        ::= { tnOtsigEntry 14 }
+
+    tnOtsigFecMode OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         noFec(1),
+                         g709Fec(2),
+                         enhancedFec(3),
+                         uFec(4),
+                         enhancedFec2(5),
+                         aFec(6),
+                         eSDFec(10),
+                         hpFec(11),
+                         usdFec(12),
+                         bjFec(13),
+                         scFec(14),
+                         sdFecAcc(15),
+                         eSDFecG2(16),
+                         eSDFecExt(17),
+                         ePuncturedSDFecG2(18),
+                         sdFecCE(19),
+                         sdFecV(20),
+                         eOFec(21),
+                         eSDFec6(22)
+                       }
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "OTSi Fec Mode."
+        DEFVAL         { eSDFecG2 }
+        ::= { tnOtsigEntry 15 }
+
+    tnOtsigNonLinearComp OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Non linear Comp."
+        DEFVAL         { false }
+        ::= { tnOtsigEntry 16 }
+
+    tnOtsigCdPreComp OBJECT-TYPE
+        SYNTAX         Integer32 (-10000..10000)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "CD-Pre Comp."
+        DEFVAL         { 0 }
+        ::= { tnOtsigEntry 17 }
+
+    tnOtsigDescription OBJECT-TYPE
+        SYNTAX         SnmpAdminString
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Description."
+        DEFVAL         { "" }
+        ::= { tnOtsigEntry 18 }
+
+    tnOtsigPayloadRate OBJECT-TYPE
+        SYNTAX         Integer32 (0..600)
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Payload Rate."
+        DEFVAL         { 0 }
+        ::= { tnOtsigEntry 19 }
+
+    tnOtsigIOPMode OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         flex(1),
+                         legacy(2),
+                         otucn(3),
+                         otutcn(4),
+                         otu4(5),
+                         flexO(6),
+                         unknown(9999)
+                       }
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "IOP Mode."
+        DEFVAL         { unknown }
+        ::= { tnOtsigEntry 20 }
+
+    tnOtsigCapacity OBJECT-TYPE
+        SYNTAX         Integer32 (0..1200)
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Otsig capacity."
+        DEFVAL         { 0 }
+        ::= { tnOtsigEntry 21 }
+
+    tnOtsigProfileId OBJECT-TYPE
+        SYNTAX         Integer32 (1..3999)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Key to identify one profile."
+        ::= { tnOtsigEntry 22 }
+
+    tnOtsigMgracd OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         none(1),
+                         cp(2),
+                         mgnpln(3),
+                         cpmgnpln(4)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Indicates if managed by CP, MGNPLN, shared by both or free."
+        DEFVAL         { none }
+        ::= { tnOtsigEntry 23 }
+
+    tnOtsigFacilityDescriptorName OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..45))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOtsigEntry 24 }
+
+    tnOtsigFacilityDescriptorDesc OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..255))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOtsigEntry 25 }
+
+    tnOtsigFacilityDescriptorCirId OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..45))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOtsigEntry 26 }
+
+    tnOtsigFacilityDescriptorConnPtId OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..64))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Connection Point Id."
+        ::= { tnOtsigEntry 27 }
+
+    tnOtsigFacilityDescCustLifeCycleState OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..45))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Customer life cycle state."
+        ::= { tnOtsigEntry 28 }
+
+    tnOtsigFacilityDescAdminState OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         down(1),
+                         mt(2),
+                         unassigned(3),
+                         up(4),
+                         invalid(5)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Admin state."
+        ::= { tnOtsigEntry 29 }
+
+    tnOtsigGroupIdentification OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The GID (Group Identification) for the FlexO group as
+                        part of the OTSiG."
+        DEFVAL         { 1 }
+        ::= { tnOtsigEntry 30 }
+
+    tnOtsigInterfaceIdentification OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(1..254))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The IID (Interface Identification) for all FlexO frame
+                        instances of one the FlexO group as part of the OTSiG."
+        ::= { tnOtsigEntry 31 }
+
+    tnOtsigAdminState OBJECT-TYPE
+        SYNTAX         TropicAdminStateType
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Admin state."
+        DEFVAL         { up }
+        ::= { tnOtsigEntry 32 }
+
+    tnOtsigStateAINS OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { false }
+        ::= { tnOtsigEntry 33 }
+
+    tnOtsigStateAINSTimerStart OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOtsigEntry 34 }
+
+    tnOtsigStateAINSDebounce OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOtsigEntry 35 }
+
+    tnOtsigStateQualifier OBJECT-TYPE
+        SYNTAX         TropicStateQualifierType
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { { uas } }
+        ::= { tnOtsigEntry 36 }
+
+    tnOtsigOperationalCapability OBJECT-TYPE
+        SYNTAX         TropicOperationalCapabilityType
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The partiallyEnabled(3) state means an abnormal
+                        state."
+        DEFVAL         { disabled }
+        ::= { tnOtsigEntry 37 }
+
+    tnOtsigOperationalState OBJECT-TYPE
+        SYNTAX         TropicOperationalStateType
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { down }
+        ::= { tnOtsigEntry 38 }
+
+    tnOtsigUsingSysAINSDebounceTime OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOtsigEntry 39 }
+
+    tnOtsigIncFlexOFrameGid OBJECT-TYPE
+        SYNTAX         OCTET STRING
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOtsigEntry 40 }
+
+    tnOtsigIncFlexOFrameIID OBJECT-TYPE
+        SYNTAX         OCTET STRING
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOtsigEntry 41 }
+
+    tnOtsigIncFlexOFrameIIDMap1 OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..2048))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOtsigEntry 42 }
+
+    tnOtsigIncFlexOFrameIIDMap2 OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..2048))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOtsigEntry 43 }
+
+    tnOtsigIncFlexOFrameIIDMap3 OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..2048))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOtsigEntry 44 }
+
+    tnOtsigIncFlexOFrameIIDMap4 OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..2048))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOtsigEntry 45 }
+
+    tnOtsigAlmProfName OBJECT-TYPE
+        SYNTAX         OCTET STRING
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOtsigEntry 46 }
+
+    tnOtsigReferenceProfileId OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOtsigEntry 47 }
+
+--------------------------------------------------------------------------------
+-- OTSIG Profile Table
+--------------------------------------------------------------------------------
+    tnOtsigProfileTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnOtsigProfileEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "Table of Otsig Profile attributes."
+        ::= { tnOtuOduBasics 13 }
+
+    tnOtsigProfileEntry OBJECT-TYPE
+        SYNTAX         TnOtsigProfileEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { tnOtsigProfileId }
+        ::= { tnOtsigProfileTable 1 }
+
+    TnOtsigProfileEntry ::=
+        SEQUENCE {
+            tnOtsigProfile                     SnmpAdminString,
+            tnOtsigProfileCardType             SnmpAdminString,
+            tnOtsigProfileExternalCategory     TruthValue,
+            tnOtsigProfileExternalCardType     SnmpAdminString
+         }
+
+    tnOtsigProfile OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..1024))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { "" }
+        ::= { tnOtsigProfileEntry 1 }
+
+    tnOtsigProfileCardType OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..128))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { "" }
+        ::= { tnOtsigProfileEntry 2 }
+
+    tnOtsigProfileExternalCategory OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Internal purpose to check the category of profile cardType."
+        ::= { tnOtsigProfileEntry 3 }
+
+    tnOtsigProfileExternalCardType OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..128))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "List the External profiles card Types ."
+        DEFVAL         { "" }
+        ::= { tnOtsigProfileEntry 4 }
+
+--------------------------------------------------------------------------------
+-- OTSIG Custom Profile Table
+--------------------------------------------------------------------------------
+    tnOtsigCustomProfileTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnOtsigCustomProfileEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "Table of Otsig Custom Profile attributes."
+        ::= { tnOtuOduBasics 14 }
+
+    tnOtsigCustomProfileEntry OBJECT-TYPE
+        SYNTAX         TnOtsigCustomProfileEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { tnOtsigCustomProfile }
+        ::= { tnOtsigCustomProfileTable 1 }
+
+    TnOtsigCustomProfileEntry ::=
+        SEQUENCE {
+            tnOtsigCustomProfile              Integer32,
+            tnOtsigRefSysProfileId            Integer32,
+            tnOtsigCustomProfileRowStatus     RowStatus,
+            tnOtsigCustomProfileBaudRate      Integer32,
+            tnOtsigCustomProfileIOPMode       INTEGER,
+            tnOtsigCustomProfileEncoding      INTEGER,
+            tnOtsigCustomProfileFecMode       INTEGER,
+            tnOtsigCustomProfilePhaseEnc      INTEGER,
+            tnOtsigCustomDescription          SnmpAdminString,
+            tnOtsigCustomPayloadRate          Integer32,
+            tnOtsigCustomTxShape              INTEGER,
+            tnOtsigCustomProfileCategory      INTEGER,
+            tnOtsigCustomProfileCardType      SnmpAdminString
+         }
+
+    tnOtsigCustomProfile OBJECT-TYPE
+        SYNTAX         Integer32 (1000..3999)
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOtsigCustomProfileEntry 1 }
+
+    tnOtsigRefSysProfileId OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOtsigCustomProfileEntry 2 }
+
+    tnOtsigCustomProfileRowStatus OBJECT-TYPE
+        SYNTAX         RowStatus
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOtsigCustomProfileEntry 3 }
+
+    tnOtsigCustomProfileBaudRate OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Baud Rate."
+        ::= { tnOtsigCustomProfileEntry 4 }
+
+    tnOtsigCustomProfileIOPMode OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         flex(1),
+                         legacy(2),
+                         otucn(3),
+                         otutcn(4),
+                         otu4(5),
+                         flexO(6),
+                         unknown(9999)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "IOP Mode."
+        DEFVAL         { unknown }
+        ::= { tnOtsigCustomProfileEntry 5 }
+
+    tnOtsigCustomProfileEncoding OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         nrz(0),
+                         pdpsk(1),
+                         dpsk(2),
+                         bpsk(3),
+                         qpsk(4),
+                         qpskEnhOsnr(5),
+                         nrzCFP1(6),
+                         icohpmqpsk(7),
+                         duobinary(8),
+                         qpskhperf2(9),
+                         qam16(10),
+                         qam8(11),
+                         spqpsk(12),
+                         qam64(13),
+                         cohpm16qam250G(14),
+                         cohpmsqam16(15),
+                         cohpmsqam64(16),
+                         qam32(17),
+                         optimization(9996),
+                         unassigned(9997),
+                         alien(9998),
+                         unknown(9999)
+                       }
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "OTSi Encoding."
+        DEFVAL         { optimization }
+        ::= { tnOtsigCustomProfileEntry 6 }
+
+    tnOtsigCustomProfileFecMode OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         noFec(1),
+                         g709Fec(2),
+                         enhancedFec(3),
+                         uFec(4),
+                         enhancedFec2(5),
+                         aFec(6),
+                         eSDFec(10),
+                         hpFec(11),
+                         usdFec(12),
+                         bjFec(13),
+                         scFec(14),
+                         sdFecAcc(15),
+                         eSDFecG2(16),
+                         eSDFecExt(17),
+                         ePuncturedSDFecG2(18),
+                         sdFecCE(19),
+                         sdFecV(20),
+                         eOFec(21)
+                       }
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Fec Mode."
+        DEFVAL         { eSDFecG2 }
+        ::= { tnOtsigCustomProfileEntry 7 }
+
+    tnOtsigCustomProfilePhaseEnc OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         absolute(1),
+                         differential(2)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Phase Encoding mode."
+        ::= { tnOtsigCustomProfileEntry 8 }
+
+    tnOtsigCustomDescription OBJECT-TYPE
+        SYNTAX         SnmpAdminString
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Description."
+        DEFVAL         { "" }
+        ::= { tnOtsigCustomProfileEntry 9 }
+
+    tnOtsigCustomPayloadRate OBJECT-TYPE
+        SYNTAX         Integer32 (0..600)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Payload Rate."
+        DEFVAL         { 0 }
+        ::= { tnOtsigCustomProfileEntry 10 }
+
+    tnOtsigCustomTxShape OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         single(1),
+                         super(2),
+                         alien(3),
+                         superRRC01(4),
+                         superChannel0-05(5),
+                         superChannel0-07(6),
+                         superChannel0-15(7),
+                         superChannel0-25(8),
+                         superChannel0-3(9)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Txshape."
+        ::= { tnOtsigCustomProfileEntry 11 }
+
+    tnOtsigCustomProfileCategory OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         user(1),
+                         demo(2)
+                       }
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOtsigCustomProfileEntry 12 }
+
+    tnOtsigCustomProfileCardType OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..128))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { "" }
+        ::= { tnOtsigCustomProfileEntry 13 }
+
+--------------------------------------------------------------------------------
+-- Conformance Group Definitions
+--------------------------------------------------------------------------------
+    tnOtukGroup OBJECT-GROUP
+        OBJECTS {
+            tnOtukTtiStatus,
+            tnOtukFecMode,
+            tnOtukRate,
+            tnOtukIncRes,
+            tnOtukAdminStatus,
+            tnOtukStateAINS,
+            tnOtukOperStatus,
+            tnOtukStateQualifier,
+            tnOtukOperationalCapability,
+            tnOtukAINSDebounceTime,
+            tnOtukUsingSysAINSDebounceTime,
+            tnOtukAINSDebounceTimeRemaining,
+--            obsolete
+--            tnOtukForceAdminStatus,
+            tnOtukPreFec,
+            tnOtukPostFec,
+--            obsolete
+--            tnOtukTtpPresent,
+            tnOtukAsymInterworking,
+            tnOtukDegThr,
+            tnOtukDegM,
+            tnOtukDapiAccepted,
+            tnOtukDapiExpected,
+            tnOtukDapiTransmitted,
+            tnOtukOsAccepted,
+            tnOtukOsTransmitted,
+            tnOtuAlmProfName,
+            tnOtuServerPort,
+            tnOtukMgracd,
+            tnOtukType,
+            tnOtuOtsigId,
+            tnOtuChanPoolIfIndex,
+            tnOtuFacilityDescriptorName,
+            tnOtuFacilityDescriptorDesc,
+            tnOtuFacilityDescriptorCirId,
+            tnOtuFacilityDescriptorConnPtId,
+            tnOtuFacilityDescCustLifeCycleState,
+            tnOtuFacilityDescAdminState
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOtuOduGroups 1 }
+
+--    obsolete
+--    tnOdukGroup                  OBJECT-GROUP ::= { tnOtuOduGroups 2 }
+--    tnOdukXcGroup                OBJECT-GROUP ::= { tnOtuOduGroups 3 }
+--    tnOdukApsGroupGroup          OBJECT-GROUP ::= { tnOtuOduGroups 4 }
+--    tnOdukApsMemberGroup         OBJECT-GROUP ::= { tnOtuOduGroups 5 }
+--    tnTxOptsgGroup               OBJECT-GROUP ::= { tnOtuOduGroups 6 }
+--    tnExpOptsgGroup              OBJECT-GROUP ::= { tnOtuOduGroups 7 }
+--    tnRxOptsgGroup               OBJECT-GROUP ::= { tnOtuOduGroups 8 }
+--    tnOdukApsGroupIdScalarsGroup OBJECT-GROUP ::= { tnOtuOduGroups 9 }
+--    tnOdukApsGroupIdGroup        OBJECT-GROUP ::= { tnOtuOduGroups 10 }
+
+    tnOtuApaGroup OBJECT-GROUP
+        OBJECTS {
+            tnOtuApaPreFecBer,
+            tnOtuApaFecUncorrCnt
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOtuOduGroups 11 }
+
+    tnOtsigGroup OBJECT-GROUP
+        OBJECTS {
+            tnOtsigCommand,
+            tnOtsigOtuStruct,
+            tnOtsigTransmissionMode,
+            tnOtsigRegenResponse,
+            tnOtsigOTSilist,
+            tnOtsigLLEB,
+            tnOtsigDLEB,
+            tnOtsigTSEB,
+            tnOtsigBaudrate,
+            tnOtsigEncoding,
+            tnOtsigPhaseEncode,
+            tnOtsigPolarizationTrack,
+            tnOtsigTxShape,
+            tnOtsigFecMode,
+            tnOtsigNonLinearComp,
+            tnOtsigCdPreComp,
+            tnOtsigDescription,
+            tnOtsigPayloadRate,
+            tnOtsigIOPMode,
+            tnOtsigCapacity,
+            tnOtsigProfileId,
+            tnOtsigMgracd,
+            tnOtsigFacilityDescriptorName,
+            tnOtsigFacilityDescriptorDesc,
+            tnOtsigFacilityDescriptorCirId,
+            tnOtsigFacilityDescriptorConnPtId,
+            tnOtsigFacilityDescCustLifeCycleState,
+            tnOtsigFacilityDescAdminState,
+            tnOtsigGroupIdentification,
+            tnOtsigInterfaceIdentification,
+            tnOtsigAdminState,
+            tnOtsigStateAINS,
+            tnOtsigStateAINSTimerStart,
+            tnOtsigStateAINSDebounce,
+            tnOtsigStateQualifier,
+            tnOtsigOperationalCapability,
+            tnOtsigOperationalState,
+            tnOtsigUsingSysAINSDebounceTime,
+            tnOtsigIncFlexOFrameGid,
+            tnOtsigIncFlexOFrameIID,
+            tnOtsigIncFlexOFrameIIDMap1,
+            tnOtsigIncFlexOFrameIIDMap2,
+            tnOtsigIncFlexOFrameIIDMap3,
+            tnOtsigIncFlexOFrameIIDMap4,
+            tnOtsigAlmProfName,
+            tnOtsigReferenceProfileId
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOtuOduGroups 12 }
+
+    tnOtsigProfileGroup OBJECT-GROUP
+        OBJECTS {
+            tnOtsigProfile,
+            tnOtsigProfileCardType,
+            tnOtsigProfileExternalCategory,
+            tnOtsigProfileExternalCardType
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOtuOduGroups 13 }
+
+    tnOtsigCustomProfileGroup OBJECT-GROUP
+        OBJECTS {
+            tnOtsigRefSysProfileId,
+            tnOtsigCustomProfileRowStatus,
+            tnOtsigCustomProfileCategory,
+            tnOtsigCustomProfileBaudRate,
+            tnOtsigCustomProfileIOPMode,
+            tnOtsigCustomProfileEncoding,
+            tnOtsigCustomProfileFecMode,
+            tnOtsigCustomProfilePhaseEnc,
+            tnOtsigCustomDescription,
+            tnOtsigCustomPayloadRate,
+            tnOtsigCustomTxShape,
+            tnOtsigCustomProfileCardType
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOtuOduGroups 14 }
+
+--------------------------------------------------------------------------------
+-- Compliance Statements (mandatory)
+--------------------------------------------------------------------------------
+    tnOdukCompliance MODULE-COMPLIANCE
+        STATUS         current
+        DESCRIPTION    "."
+        MODULE
+        MANDATORY-GROUPS {
+            tnOtukGroup,
+--            obsolete
+--            tnOdukGroup,
+--            tnOdukXcGroup,
+--            tnOdukApsGroupGroup,
+--            tnOdukApsMemberGroup,
+--            tnTxOptsgGroup,
+--            tnExpOptsgGroup,
+--            tnRxOptsgGroup,
+--            tnOdukApsGroupIdScalarsGroup,
+--            tnOdukApsGroupIdGroup
+            tnOtuApaGroup,
+            tnOtsigGroup,
+            tnOtsigProfileGroup,
+            tnOtsigCustomProfileGroup
+        }
+        ::= { tnOtuOduCompliances 1 }
+
+END -- DEFINITION OF TROPIC-OTUODU-MIB

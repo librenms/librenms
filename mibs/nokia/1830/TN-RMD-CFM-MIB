@@ -1,0 +1,983 @@
+TN-RMD-CFM-MIB DEFINITIONS ::= BEGIN
+
+-- (c) Copyright 2023 Nokia Networks.  All rights reserved.
+-- This software is the confidential and proprietary property of
+-- Nokia and may only be used in accordance with the terms of the
+-- license agreement provided with this software.
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, Unsigned32
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, RowStatus, TruthValue, MacAddress
+        FROM SNMPv2-TC
+    InterfaceIndexOrZero
+        FROM IF-MIB
+    VlanIdOrNone
+        FROM IEEE8021-CFM-MIB
+    Dot1agCfmCcmInterval, Dot1agCfmMDLevel, Dot1agCfmMpDirection,
+    Dot1agCfmMepId, Dot1agCfmMaintDomainNameType, Dot1agCfmMaintDomainName,
+    Dot1agCfmMaintAssocNameType, Dot1agCfmMaintAssocName
+        FROM IEEE8021-CFM-MIB
+    tnRmdObjs, tnRmdMIBModules
+        FROM TROPIC-GLOBAL-REG
+    tnRmdSystemId
+        FROM TN-RMD-SYSTEM-MIB
+    tnSysSwitchId
+        FROM TROPIC-SYSTEM-MIB
+    ;
+
+tnRmdCfmMibModule MODULE-IDENTITY
+    LAST-UPDATED    "202011131200Z"
+    ORGANIZATION    "Nokia"
+    CONTACT-INFO    "Nokia
+                     Attn: Jeff Donnelly
+                     600 Mountain Avenue
+                     New Providence, NJ 07974
+
+                     Phone: +1 732 221 6408
+                     Email: jeff.donnelly@nokia.com"
+
+    DESCRIPTION
+        "Connectivity Fault Management (EFM) MIB for
+         Remote Managed Devices (RMDs).
+
+         This MIB covers management of CFM MEPs, and of the related
+         Delay Measurement (DM), Loss Measurement (LM) and Synthetic
+         Loss Measurement (SLM) mechanisms."
+
+    REVISION     "202011131200Z"
+    DESCRIPTION  "1) Updated DESCRIPTION of the following:
+                     TnRmdCfmMepDefect.
+                  2) Added the following to TnRmdCfmMepDefect:
+                     unpr(6)."
+
+    REVISION     "202011061200Z"
+    DESCRIPTION  "1) Added the following textual conventions:
+                     TnRmdCfmDmInitiatorSessionMode
+                     TnRmdCfmDmTestMeasurementInterval
+                     TnRmdCfmInitiatorSessionState
+                     TnRmdCfmInitiatorSessionType
+                     TnRmdCfmMeasurementInterval
+                     IEEE8021PriorityValue.
+                  2) Added the following tables:
+                     tnRmdCfmMepDmTable
+                     tnRmdCfmMepDmInitiatorSessionTable
+                     tnRmdCfmMepSlmTable."
+
+    REVISION     "202010091200Z"
+    DESCRIPTION  "Added the following to tnRmdCfmMepTable:
+                  tnRmdCfmMepEvcLoopbackEnabled."
+
+    REVISION     "201802231200Z"
+    DESCRIPTION  "Updated the contact info."
+
+    REVISION     "201611160000Z"
+    DESCRIPTION  "Updated the contact info."
+
+    REVISION     "201211280000Z"
+    DESCRIPTION
+        "Initial revision."
+
+    ::= { tnRmdMIBModules 1 }
+
+tnRmdCfmObjects  OBJECT IDENTIFIER ::= { tnRmdObjs 1 }
+
+
+-- =============================================================
+-- Textual Conventions
+-- =============================================================
+
+TnRmdCfmDmInitiatorSessionMode ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Initiator session mode values for CFM DM."
+    SYNTAX      INTEGER {
+                cfmDmInitiatorSessionModeNormal(0),
+                cfmDmInitiatorSessionModeTest(1)
+                }
+
+TnRmdCfmDmTestMeasurementInterval ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Indicates the transmission time between the CFM DM frames for
+         a DM test session, in microseconds."
+    SYNTAX      Unsigned32
+
+TnRmdCfmInitiatorSessionState ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Initiator session state values for CFM DM and LM mechanisms."
+    SYNTAX      INTEGER {
+           cfmInitiatorSessionRunning(0),
+           cfmInitiatorSessionStopped(1)
+           }
+
+TnRmdCfmInitiatorSessionType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Initiator session type values for CFM DM and LM mechanisms."
+    SYNTAX      INTEGER {
+           cfmInitiatorSessionTypeOnDemand(0),
+           cfmInitiatorSessionTypeProActive(1)
+           }
+
+TnRmdCfmMegId ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "The name of a CFM Maintenance Entity Group (MEG)."
+    SYNTAX      OCTET STRING (SIZE(48))
+
+TnRmdCfmMepDefect ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "Indicates Cfm defects.
+
+         UNL:    Unexpected Level
+         MMG:    Mismerge
+         UNM:    Unexpected MEP-ID
+         LOC:    Loss Of Continuity
+         RDI:    Remote Defect Indication
+         UNP:    Unexpected Period
+         UNPR:   Unexpected Priority"
+    SYNTAX  BITS {
+              unl(0),
+              mmg(1),
+              unm(2),
+              loc(3),
+              rdi(4),
+              unp(5),
+              unpr(6)
+          }
+
+TnRmdCfmMepNumber ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The sequence number of a CFM MEP.
+         The value is in the range 1..tnRmdSystemCfmMaxNrMeps."
+    SYNTAX      Unsigned32
+
+TnRmdCfmMeasurementInterval ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Indicates the transmission time between the CFM PM frames for
+         a session, in milliseconds."
+    REFERENCE
+        "[MEF SOAM-PM] R56."
+    SYNTAX      Unsigned32 (3..3600000)
+
+-- =============================================================
+-- Textual Conventions IEEE8021-TC-MIB
+-- =============================================================
+IEEE8021PriorityValue ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION
+        "An 802.1Q user priority value."
+   REFERENCE   "12.13.3.3"
+    SYNTAX      Unsigned32 (0..7)
+
+--------------------------------------------------------------------------------
+-- RMD CFM Scalar
+--------------------------------------------------------------------------------
+tnRmdCfmAttributeTotal OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "."
+    ::= { tnRmdCfmObjects 1 }
+
+-- =============================================================
+-- tnRmdSystemCfmTable
+-- =============================================================
+
+tnRmdSystemCfmTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TnRmdSystemCfmEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing the general CFM data of all RMDs."
+    ::= { tnRmdCfmObjects 2 }
+
+tnRmdSystemCfmEntry OBJECT-TYPE
+    SYNTAX      TnRmdSystemCfmEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of objects containing the general CFM data of an RMD."
+    INDEX  { tnSysSwitchId, tnRmdSystemId }
+    ::= { tnRmdSystemCfmTable 1 }
+
+TnRmdSystemCfmEntry ::=
+    SEQUENCE {
+        tnRmdSystemCfmMaxNrMeps              Unsigned32,
+        tnRmdSystemCfmLmMaxNrPriorityLevels  Unsigned32,
+        tnRmdSystemCfmDmUpdateLocalTime      TruthValue
+    }
+
+tnRmdSystemCfmMaxNrMeps OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum number of MEPs supported by the RMD."
+    ::= { tnRmdSystemCfmEntry 1 }
+
+tnRmdSystemCfmLmMaxNrPriorityLevels OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum number of priority levels for LM supported by the RMD."
+    ::= { tnRmdSystemCfmEntry 2 }
+
+tnRmdSystemCfmDmUpdateLocalTime OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Setting of this object to value 'true' triggers the updating of
+         the local time on a DM responder. After this action has
+         completed successfully, the TxTSf field of the first DMM message
+         received will be used to set the local time.
+         Setting of this object to value 'false' has no effect.
+
+         This object is merely used to invoke the updating of the local
+         time, and its actual value has no meaning."
+    ::= { tnRmdSystemCfmEntry 3 }
+
+
+-- =============================================================
+-- tnRmdCfmMepTable
+-- =============================================================
+
+tnRmdCfmMepTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TnRmdCfmMepEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing the CFM parameters of all MEPs of all RMDs."
+    ::= { tnRmdCfmObjects 3 }
+
+tnRmdCfmMepEntry OBJECT-TYPE
+    SYNTAX      TnRmdCfmMepEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of objects containing the CFM parameters of a MEP of an RMD."
+    INDEX  { tnSysSwitchId, tnRmdSystemId, tnRmdCfmMepNumber }
+    ::= { tnRmdCfmMepTable 1 }
+
+TnRmdCfmMepEntry ::=
+    SEQUENCE {
+        tnRmdCfmMepNumber                 TnRmdCfmMepNumber,
+        tnRmdCfmMepMdIndex                Unsigned32,
+        tnRmdCfmMepMdFormat               Dot1agCfmMaintDomainNameType,
+        tnRmdCfmMepMdName                 Dot1agCfmMaintDomainName,
+        tnRmdCfmMepMaIndex                Unsigned32,
+        tnRmdCfmMepMaNetFormat            Dot1agCfmMaintAssocNameType,
+        tnRmdCfmMepMaNetName              Dot1agCfmMaintAssocName,
+        tnRmdCfmMepMdLevel                Dot1agCfmMDLevel,
+        tnRmdCfmMepMegId                  TnRmdCfmMegId,
+        tnRmdCfmMepDirection              Dot1agCfmMpDirection,
+        tnRmdCfmMepLocalId                Dot1agCfmMepId,
+        tnRmdCfmMepEnabled                TruthValue,
+        tnRmdCfmMepCcmEnabled             TruthValue,
+        tnRmdCfmMepLbrEnabled             TruthValue,
+        tnRmdCfmMepCcmInterval            Dot1agCfmCcmInterval,
+        tnRmdCfmMepIfIndex                InterfaceIndexOrZero,
+        tnRmdCfmMepVlanId                 VlanIdOrNone,
+        tnRmdCfmMepDefect                 TnRmdCfmMepDefect,
+        tnRmdCfmMepRowStatus              RowStatus,
+        tnRmdCfmMepEvcLoopbackEnabled     TruthValue
+    }
+
+tnRmdCfmMepNumber OBJECT-TYPE
+    SYNTAX      TnRmdCfmMepNumber
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The sequence number of the MEP."
+    ::= { tnRmdCfmMepEntry 1 }
+
+tnRmdCfmMepMdIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "The index of the MD in the dot1agCfmMdTable."
+    ::= { tnRmdCfmMepEntry 2 }
+
+tnRmdCfmMepMdFormat OBJECT-TYPE
+    SYNTAX      Dot1agCfmMaintDomainNameType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "The type (and thereby format) of the Maintenance Domain Name."
+    REFERENCE
+       "802.1ag clause 21.6.5.1"
+    DEFVAL { charString }
+    ::= { tnRmdCfmMepEntry 3 }
+
+tnRmdCfmMepMdName OBJECT-TYPE
+    SYNTAX      Dot1agCfmMaintDomainName
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "The name of the domain that the RMD belongs to, the NE does not have to belong to it
+        for more information refer to dot1agCfmMdTable.
+       "
+    REFERENCE
+       "802.1ag clauses 3.23, 12.14.5, and 21.6.5.3"
+    DEFVAL { "DEFAULT" }
+    ::= { tnRmdCfmMepEntry 4 }
+
+tnRmdCfmMepMaIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "The index of the MA in the dot1agCfmMaNetTable."
+    ::= { tnRmdCfmMepEntry 5 }
+
+tnRmdCfmMepMaNetFormat OBJECT-TYPE
+    SYNTAX      Dot1agCfmMaintAssocNameType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "The type (and thereby format) of the Maintenance Association
+        Name.
+       "
+    REFERENCE
+       "802.1ag clauses 21.6.5.4"
+    ::= { tnRmdCfmMepEntry 6 }
+
+tnRmdCfmMepMaNetName OBJECT-TYPE
+    SYNTAX      Dot1agCfmMaintAssocName
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "The name of the association that the RMD belongs to, the NE does not have to belong to it
+        for more information refer to dot1agCfmMaNetTable
+       "
+    REFERENCE
+       "802.1ag clauses 21.6.5.6, and Table 21-20"
+    ::= { tnRmdCfmMepEntry 7 }
+
+
+tnRmdCfmMepMdLevel OBJECT-TYPE
+    SYNTAX      Dot1agCfmMDLevel
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The Maintenance Domain Level of the MEP."
+    ::= { tnRmdCfmMepEntry 8 }
+
+tnRmdCfmMepMegId OBJECT-TYPE
+    SYNTAX      TnRmdCfmMegId
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The name string of the MEG which the MEP is part of."
+    ::= { tnRmdCfmMepEntry 9 }
+
+tnRmdCfmMepDirection OBJECT-TYPE
+    SYNTAX      Dot1agCfmMpDirection
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The direction of the MEP."
+    ::= { tnRmdCfmMepEntry 10 }
+
+tnRmdCfmMepLocalId OBJECT-TYPE
+    SYNTAX      Dot1agCfmMepId
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The local ID of the MEP."
+    ::= { tnRmdCfmMepEntry 11 }
+
+tnRmdCfmMepEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether the MEP is enabled or disabled."
+    ::= { tnRmdCfmMepEntry 12 }
+
+tnRmdCfmMepCcmEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether the MEP generates CCM messages."
+    ::= { tnRmdCfmMepEntry 13 }
+
+tnRmdCfmMepLbrEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether the LoopBack Responder is enabled for the MEP."
+    ::= { tnRmdCfmMepEntry 14 }
+
+tnRmdCfmMepCcmInterval OBJECT-TYPE
+    SYNTAX      Dot1agCfmCcmInterval
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The interval at which CCMs are sent by the MEP."
+    ::= { tnRmdCfmMepEntry 15 }
+
+tnRmdCfmMepIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The interface to which the MEP is related."
+    ::= { tnRmdCfmMepEntry 16 }
+
+tnRmdCfmMepVlanId OBJECT-TYPE
+    SYNTAX      VlanIdOrNone
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The ID of the VLAN to which the MEP is related.
+         Value 0 indicates that the MEP is VLAN unaware."
+    ::= { tnRmdCfmMepEntry 17 }
+
+tnRmdCfmMepDefect OBJECT-TYPE
+    SYNTAX      TnRmdCfmMepDefect
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates Cfm defects."
+    ::= { tnRmdCfmMepEntry 18 }
+
+tnRmdCfmMepRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Used to create, delete or activate an entry in this table."
+    ::= { tnRmdCfmMepEntry 19 }
+
+tnRmdCfmMepEvcLoopbackEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether the EVC (aka Flow) Loopback is enabled for the MEP."
+    DEFVAL { false }
+    ::= { tnRmdCfmMepEntry 20 }
+
+-- =============================================================
+-- tnRmdCfmRemoteMepTable
+-- =============================================================
+
+tnRmdCfmRemoteMepTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TnRmdCfmRemoteMepEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing the remote MEP IDs of all MEPs of all RMDs."
+    ::= { tnRmdCfmObjects 4 }
+
+tnRmdCfmRemoteMepEntry OBJECT-TYPE
+    SYNTAX      TnRmdCfmRemoteMepEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An object containing a remote MEP ID for a MEP of an RMD."
+    INDEX  { tnSysSwitchId,
+             tnRmdSystemId,
+             tnRmdCfmMepNumber,
+             tnRmdCfmRemoteMepId }
+    ::= { tnRmdCfmRemoteMepTable 1 }
+
+TnRmdCfmRemoteMepEntry ::=
+    SEQUENCE {
+        tnRmdCfmRemoteMepId         Dot1agCfmMepId,
+        tnRmdCfmRemoteMepRowStatus  RowStatus
+    }
+
+tnRmdCfmRemoteMepId OBJECT-TYPE
+    SYNTAX      Dot1agCfmMepId
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The ID of a remote MEP."
+    ::= { tnRmdCfmRemoteMepEntry 1 }
+
+tnRmdCfmRemoteMepRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Used to create, delete or activate an entry in this table."
+    ::= { tnRmdCfmRemoteMepEntry 2 }
+
+-- =============================================================
+-- tnRmdCfmMepDmTable
+-- =============================================================
+
+tnRmdCfmMepDmTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TnRmdCfmMepDmEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing the CFM DM parameters of all MEPs of all RMDs."
+    ::= { tnRmdCfmObjects 5 }
+
+tnRmdCfmMepDmEntry OBJECT-TYPE
+    SYNTAX      TnRmdCfmMepDmEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of objects containing the CFM DM parameters of a MEP of
+        an RMD."
+    INDEX  { tnSysSwitchId, tnRmdSystemId, tnRmdCfmMepNumber }
+    ::= { tnRmdCfmMepDmTable 1 }
+
+TnRmdCfmMepDmEntry ::=
+    SEQUENCE {
+        tnRmdCfmMepDmResponder  TruthValue
+    }
+
+tnRmdCfmMepDmResponder OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether the DM Responder is enabled for the MEP."
+    ::= { tnRmdCfmMepDmEntry 1 }
+
+
+-- =============================================================
+-- tnRmdCfmMepDmInitiatorSessionTable
+-- =============================================================
+
+tnRmdCfmMepDmInitiatorSessionTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TnRmdCfmMepDmInitiatorSessionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing the parameters of all CFM DM initiator
+         sessions of all MEPs of all RMDs."
+    ::= { tnRmdCfmObjects 6 }
+
+tnRmdCfmMepDmInitiatorSessionEntry OBJECT-TYPE
+    SYNTAX      TnRmdCfmMepDmInitiatorSessionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of objects containing the parameters of a CFM DM
+         initiator session of a MEP of an RMD."
+    INDEX  { tnSysSwitchId,
+             tnRmdSystemId,
+             tnRmdCfmMepNumber,
+             tnRmdCfmMepDmInitiatorSessionNumber }
+    ::= { tnRmdCfmMepDmInitiatorSessionTable 1 }
+
+TnRmdCfmMepDmInitiatorSessionEntry ::=
+    SEQUENCE {
+        tnRmdCfmMepDmInitiatorSessionNumber           Unsigned32,
+        tnRmdCfmMepDmInitiatorSessionType             TnRmdCfmInitiatorSessionType,
+        tnRmdCfmMepDmInitiatorSessionMode             TnRmdCfmDmInitiatorSessionMode,
+        tnRmdCfmMepDmInitiatorSessionInterval         TnRmdCfmMeasurementInterval,
+        tnRmdCfmMepDmInitiatorSessionTestInterval     TnRmdCfmDmTestMeasurementInterval,
+        tnRmdCfmMepDmInitiatorSessionPriority         IEEE8021PriorityValue,
+        tnRmdCfmMepDmInitiatorSessionDropEligible     TruthValue,
+        tnRmdCfmMepDmInitiatorSessionDestMac          MacAddress,
+        tnRmdCfmMepDmInitiatorSessionInsertTestIdTlv  TruthValue,
+        tnRmdCfmMepDmInitiatorSessionTestId           Unsigned32,
+        tnRmdCfmMepDmInitiatorSessionFrameLength      Unsigned32,
+        tnRmdCfmMepDmInitiatorSessionState            TnRmdCfmInitiatorSessionState,
+        tnRmdCfmMepDmInitiatorSessionRowStatus        RowStatus
+    }
+
+tnRmdCfmMepDmInitiatorSessionNumber OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Unique number identifying the DM initiator session."
+    ::= { tnRmdCfmMepDmInitiatorSessionEntry 1 }
+
+tnRmdCfmMepDmInitiatorSessionType OBJECT-TYPE
+    SYNTAX      TnRmdCfmInitiatorSessionType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The type of the DM initiator session."
+    ::= { tnRmdCfmMepDmInitiatorSessionEntry 2 }
+
+tnRmdCfmMepDmInitiatorSessionMode OBJECT-TYPE
+    SYNTAX      TnRmdCfmDmInitiatorSessionMode
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The mode of the DM initiator session."
+    ::= { tnRmdCfmMepDmInitiatorSessionEntry 3 }
+
+tnRmdCfmMepDmInitiatorSessionInterval OBJECT-TYPE
+    SYNTAX      TnRmdCfmMeasurementInterval
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The interval by which DM messages are sent.
+         This object is only applicable when tnRmdCfmMepDmInitiatorSessionMode
+         has value cfmDmInitiatorSessionModeNormal(0)."
+    ::= { tnRmdCfmMepDmInitiatorSessionEntry 4 }
+
+tnRmdCfmMepDmInitiatorSessionTestInterval OBJECT-TYPE
+    SYNTAX      TnRmdCfmDmTestMeasurementInterval
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The interval by which DM messages are sent.
+         This object is only applicable when tnRmdCfmMepDmInitiatorSessionMode
+         has value cfmDmInitiatorSessionModeTest(1)."
+    ::= { tnRmdCfmMepDmInitiatorSessionEntry 5 }
+
+tnRmdCfmMepDmInitiatorSessionPriority OBJECT-TYPE
+    SYNTAX      IEEE8021PriorityValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The priority value used for the DM initiator session."
+    ::= { tnRmdCfmMepDmInitiatorSessionEntry 6 }
+
+tnRmdCfmMepDmInitiatorSessionDropEligible OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The drop-eligible value used for the DM initiator session."
+    ::= { tnRmdCfmMepDmInitiatorSessionEntry 7 }
+
+tnRmdCfmMepDmInitiatorSessionDestMac OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The destination MAC address used for the DM initiator session."
+    ::= { tnRmdCfmMepDmInitiatorSessionEntry 8 }
+
+tnRmdCfmMepDmInitiatorSessionInsertTestIdTlv OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether a Test-ID TLV is inserted in the DM messages."
+    ::= { tnRmdCfmMepDmInitiatorSessionEntry 9 }
+
+tnRmdCfmMepDmInitiatorSessionTestId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The Test-ID inserted in the DM messages."
+    ::= { tnRmdCfmMepDmInitiatorSessionEntry 10 }
+
+tnRmdCfmMepDmInitiatorSessionFrameLength OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Indicates the length of transmitted DM messages.
+         The minimum possible frame length is 64 octets.
+         The maximum possible frame length depends on product
+         capabilities."
+    ::= { tnRmdCfmMepDmInitiatorSessionEntry 11 }
+
+tnRmdCfmMepDmInitiatorSessionState OBJECT-TYPE
+    SYNTAX      TnRmdCfmInitiatorSessionState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The state of the DM initiator session."
+    ::= { tnRmdCfmMepDmInitiatorSessionEntry 12 }
+
+tnRmdCfmMepDmInitiatorSessionRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Used to create, delete or activate an entry in this table."
+    ::= { tnRmdCfmMepDmInitiatorSessionEntry 13 }
+
+-- =============================================================
+-- tnRmdCfmMepLmTable
+-- =============================================================
+--
+-- tnRmdCfmMepLmTable OBJECT-TYPE
+--     SYNTAX      SEQUENCE OF TnRmdCfmMepLmEntry
+--     MAX-ACCESS  not-accessible
+--     STATUS      current
+--     DESCRIPTION
+--         "A table containing the CFM LM parameters of all MEPs of all RMDs."
+--     ::= { tnRmdCfmObjects 7 }
+--
+-- tnRmdCfmMepLmEntry OBJECT-TYPE
+--     SYNTAX      TnRmdCfmMepLmEntry
+--     MAX-ACCESS  not-accessible
+--     STATUS      current
+--     DESCRIPTION
+--         "A list of objects containing the CFM LM parameters of a MEP of
+--          an RMD."
+--     INDEX  { tnSysSwitchId, tnRmdSystemId, tnRmdCfmMepNumber }
+--     ::= { tnRmdCfmMepLmTable 1 }
+--
+-- TnRmdCfmMepLmEntry ::=
+--     SEQUENCE {
+--         tnRmdCfmMepLmResponder  TruthValue
+--     }
+--
+-- tnRmdCfmMepLmResponder OBJECT-TYPE
+--     SYNTAX      TruthValue
+--     MAX-ACCESS  read-write
+--     STATUS      current
+--     DESCRIPTION
+--         "Indicates whether the LM Responder is enabled for the MEP."
+--     ::= { tnRmdCfmMepLmEntry 1 }
+
+
+-- =============================================================
+-- tnRmdCfmMepLmResponderPriorityDeTable
+-- =============================================================
+--
+-- tnRmdCfmMepLmResponderPriorityDeTable OBJECT-TYPE
+--     SYNTAX      SEQUENCE OF TnRmdCfmMepLmResponderPriorityDeEntry
+--     MAX-ACCESS  not-accessible
+--     STATUS      current
+--     DESCRIPTION
+--         "A table containing the CFM LM priority and drop-eligible values
+--          for the LM responders of all MEPs of all RMDs."
+--     ::= { tnRmdCfmObjects 8 }
+--
+-- tnRmdCfmMepLmResponderPriorityDeEntry OBJECT-TYPE
+--     SYNTAX      TnRmdCfmMepLmResponderPriorityDeEntry
+--     MAX-ACCESS  not-accessible
+--     STATUS      current
+--     DESCRIPTION
+--         "A list of objects containing the CFM LM priority and drop-eligible
+--          value of the LM responder of a MEP of an RMD."
+--     INDEX  { tnSysSwitchId,
+--              tnRmdSystemId,
+--              tnRmdCfmMepNumber,
+--              tnRmdCfmMepLmResponderPriority,
+--              tnRmdCfmMepLmResponderDropEligible }
+--     ::= { tnRmdCfmMepLmResponderPriorityDeTable 1 }
+--
+-- TnRmdCfmMepLmResponderPriorityDeEntry ::=
+--     SEQUENCE {
+--         tnRmdCfmMepLmResponderPriority             IEEE8021PriorityValue,
+--         tnRmdCfmMepLmResponderDropEligible         TruthValue,
+--         tnRmdCfmMepLmResponderPriorityDeRowStatus  RowStatus
+--     }
+--
+-- tnRmdCfmMepLmResponderPriority OBJECT-TYPE
+--     SYNTAX      IEEE8021PriorityValue
+--     MAX-ACCESS  not-accessible
+--     STATUS      current
+--     DESCRIPTION
+--         "An LM priority level value."
+--     ::= { tnRmdCfmMepLmResponderPriorityDeEntry 1 }
+--
+-- tnRmdCfmMepLmResponderDropEligible OBJECT-TYPE
+--     SYNTAX      TruthValue
+--     MAX-ACCESS  not-accessible
+--     STATUS      current
+--     DESCRIPTION
+--         "An LM drop-eligible value."
+--     ::= { tnRmdCfmMepLmResponderPriorityDeEntry 2 }
+--
+-- tnRmdCfmMepLmResponderPriorityDeRowStatus OBJECT-TYPE
+--     SYNTAX      RowStatus
+--     MAX-ACCESS  read-create
+--     STATUS      current
+--     DESCRIPTION
+--         "Used to create, delete or activate an entry in this table."
+--     ::= { tnRmdCfmMepLmResponderPriorityDeEntry 3 }
+
+
+-- =============================================================
+-- tnRmdCfmMepLmInitiatorSessionTable
+-- =============================================================
+--
+-- tnRmdCfmMepLmInitiatorSessionTable OBJECT-TYPE
+--     SYNTAX      SEQUENCE OF TnRmdCfmMepLmInitiatorSessionEntry
+--     MAX-ACCESS  not-accessible
+--     STATUS      current
+--     DESCRIPTION
+--         "A table containing the parameters of all CFM LM initiator
+--          sessions of all MEPs of all RMDs."
+--     ::= { tnRmdCfmObjects 9 }
+--
+-- tnRmdCfmMepLmInitiatorSessionEntry OBJECT-TYPE
+--     SYNTAX      TnRmdCfmMepLmInitiatorSessionEntry
+--     MAX-ACCESS  not-accessible
+--     STATUS      current
+--     DESCRIPTION
+--         "A list of objects containing the parameters of a CFM LM
+--          initiator session of a MEP of an RMD."
+--     INDEX  { tnSysSwitchId,
+--              tnRmdSystemId,
+--              tnRmdCfmMepNumber,
+--              tnRmdCfmMepLmInitiatorSessionNumber }
+--     ::= { tnRmdCfmMepLmInitiatorSessionTable 1 }
+--
+-- TnRmdCfmMepLmInitiatorSessionEntry ::=
+--     SEQUENCE {
+--         tnRmdCfmMepLmInitiatorSessionNumber     Unsigned32,
+--         tnRmdCfmMepLmInitiatorSessionType       TnRmdCfmInitiatorSessionType,
+--         tnRmdCfmMepLmInitiatorSessionDestMac    MacAddress,
+--         tnRmdCfmMepLmInitiatorSessionInterval   TnRmdCfmMeasurementInterval,
+--         tnRmdCfmMepLmInitiatorSessionState      TnRmdCfmInitiatorSessionState,
+--         tnRmdCfmMepLmInitiatorSessionRowStatus  RowStatus
+--     }
+--
+-- tnRmdCfmMepLmInitiatorSessionNumber OBJECT-TYPE
+--     SYNTAX      Unsigned32
+--     MAX-ACCESS  not-accessible
+--     STATUS      current
+--     DESCRIPTION
+--         "Unique number identifying the LM initiator session."
+--     ::= { tnRmdCfmMepLmInitiatorSessionEntry 1 }
+--
+-- tnRmdCfmMepLmInitiatorSessionType OBJECT-TYPE
+--     SYNTAX      TnRmdCfmInitiatorSessionType
+--     MAX-ACCESS  read-create
+--     STATUS      current
+--     DESCRIPTION
+--         "The type of the LM initiator session."
+--     ::= { tnRmdCfmMepLmInitiatorSessionEntry 2 }
+--
+-- tnRmdCfmMepLmInitiatorSessionDestMac OBJECT-TYPE
+--     SYNTAX      MacAddress
+--     MAX-ACCESS  read-create
+--     STATUS      current
+--     DESCRIPTION
+--         "The destination MAC address used for the LM initiator session."
+--     ::= { tnRmdCfmMepLmInitiatorSessionEntry 3 }
+--
+-- tnRmdCfmMepLmInitiatorSessionInterval OBJECT-TYPE
+--     SYNTAX      TnRmdCfmMeasurementInterval
+--     MAX-ACCESS  read-create
+--     STATUS      current
+--     DESCRIPTION
+--         "The interval by which LM messages are sent."
+--     ::= { tnRmdCfmMepLmInitiatorSessionEntry 4 }
+--
+-- tnRmdCfmMepLmInitiatorSessionSessionState OBJECT-TYPE
+--     SYNTAX      TnRmdCfmInitiatorSessionState
+--     MAX-ACCESS  read-create
+--     STATUS      current
+--     DESCRIPTION
+--         "The state of the LM initiator session."
+--     ::= { tnRmdCfmMepLmInitiatorSessionEntry 5 }
+--
+-- tnRmdCfmMepLmInitiatorSessionRowStatus OBJECT-TYPE
+--     SYNTAX      RowStatus
+--     MAX-ACCESS  read-create
+--     STATUS      current
+--     DESCRIPTION
+--         "Used to create, delete or activate an entry in this table."
+--     ::= { tnRmdCfmMepLmInitiatorSessionEntry 6 }
+
+
+-- =============================================================
+-- tnRmdCfmMepLmInitiatorSessionPriorityDeTable
+-- =============================================================
+
+-- tnRmdCfmMepLmInitiatorSessionPriorityDeTable OBJECT-TYPE
+--     SYNTAX      SEQUENCE OF TnRmdCfmMepLmInitiatorSessionPriorityDeEntry
+--     MAX-ACCESS  not-accessible
+--     STATUS      current
+--     DESCRIPTION
+--         "A table containing the CFM LM priority and drop-eligible values
+--          of all LM initiator sessions of all MEPs of all RMDs."
+--     ::= { tnRmdCfmObjects 10 }
+--
+-- tnRmdCfmMepLmInitiatorSessionPriorityDeEntry OBJECT-TYPE
+--     SYNTAX      TnRmdCfmMepLmInitiatorSessionPriorityDeEntry
+--     MAX-ACCESS  not-accessible
+--     STATUS      current
+--     DESCRIPTION
+--         "A list of objects containing the CFM LM priority and drop-eligible
+--          values of an LM initiator session of a MEP of an RMD."
+--     INDEX  { tnSysSwitchId,
+--              tnRmdSystemId,
+--              tnRmdCfmMepNumber,
+--              tnRmdCfmMepLmInitiatorSessionNumber,
+--              tnRmdCfmMepLmInitiatorSessionPriority,
+--              tnRmdCfmMepLmInitiatorSessionDropEligible }
+--     ::= { tnRmdCfmMepLmInitiatorSessionPriorityDeTable 1 }
+--
+-- TnRmdCfmMepLmInitiatorSessionPriorityDeEntry ::=
+--     SEQUENCE {
+--         tnRmdCfmMepLmInitiatorSessionPriority             IEEE8021PriorityValue,
+--         tnRmdCfmMepLmInitiatorSessionDropEligible         TruthValue,
+--         tnRmdCfmMepLmInitiatorSessionPriorityDeRowStatus  RowStatus
+--     }
+--
+-- tnRmdCfmMepLmInitiatorSessionPriority OBJECT-TYPE
+--     SYNTAX      IEEE8021PriorityValue
+--     MAX-ACCESS  not-accessible
+--     STATUS      current
+--     DESCRIPTION
+--         "An LM priority level value."
+--     ::= { tnRmdCfmMepLmInitiatorSessionPriorityDeEntry 1 }
+--
+-- tnRmdCfmMepLmInitiatorSessionDropEligible OBJECT-TYPE
+--     SYNTAX      TruthValue
+--     MAX-ACCESS  not-accessible
+--     STATUS      current
+--     DESCRIPTION
+--         "An LM drop-eligible value."
+--     ::= { tnRmdCfmMepLmInitiatorSessionPriorityDeEntry 2 }
+--
+-- tnRmdCfmMepLmInitiatorSessionPriorityDeRowStatus OBJECT-TYPE
+--     SYNTAX      RowStatus
+--     MAX-ACCESS  read-create
+--     STATUS      current
+--     DESCRIPTION
+--         "Used to create, delete or activate an entry in this table."
+--     ::= { tnRmdCfmMepLmInitiatorSessionPriorityDeEntry 3 }
+
+-- =============================================================
+-- tnRmdCfmMepSlmTable
+-- =============================================================
+
+tnRmdCfmMepSlmTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TnRmdCfmMepSlmEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing the CFM SLM parameters of all MEPs of all RMDs."
+    ::= { tnRmdCfmObjects 11 }
+
+tnRmdCfmMepSlmEntry OBJECT-TYPE
+    SYNTAX      TnRmdCfmMepSlmEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of objects containing the CFM SLM parameters of a MEP of
+         an RMD."
+    INDEX  { tnSysSwitchId, tnRmdSystemId, tnRmdCfmMepNumber }
+    ::= { tnRmdCfmMepSlmTable 1 }
+
+TnRmdCfmMepSlmEntry ::=
+    SEQUENCE {
+        tnRmdCfmMepSlmResponder  TruthValue
+    }
+
+tnRmdCfmMepSlmResponder OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether the SLM Responder is enabled for the MEP."
+    ::= { tnRmdCfmMepSlmEntry 1 }
+
+END

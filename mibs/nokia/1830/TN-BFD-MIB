@@ -1,0 +1,478 @@
+TN-BFD-MIB DEFINITIONS ::= BEGIN
+
+-- (c) Copyright 2023 Nokia Networks.  All rights reserved.
+-- This software is the confidential and proprietary property of
+-- Nokia and may only be used in accordance with the terms of the
+-- license agreement provided with this software.
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32
+        FROM SNMPv2-SMI
+
+--  MODULE-COMPLIANCE, OBJECT-GROUP
+--      FROM SNMPv2-CONF
+
+    DisplayString, RowStatus, TimeInterval
+        FROM SNMPv2-TC
+
+    tnSRMIBModules, tnSRObjs, tnSRNotifyPrefix
+        FROM TROPIC-GLOBAL-REG
+
+    TNamedItem
+        FROM TN-TC-MIB
+
+    tnSysSwitchId
+        FROM TROPIC-SYSTEM-MIB
+
+    ;
+
+tnBfdMIBModule    MODULE-IDENTITY
+    LAST-UPDATED "201509300000Z"
+        ORGANIZATION "Nokia"
+        CONTACT-INFO
+            "Nokia SROS Support
+             Web: http://support.nokia.com"
+        DESCRIPTION
+        "This document is the SNMP MIB module to manage and provision
+        BFD templates on Nokia SROS equipment.
+
+        This SNMP MIB module (Specification) embodies Nokia's
+        proprietary intellectual property. Nokia retains all title and
+        ownership in the Specification, including any revisions.
+
+        Nokia grants all interested parties a non-exclusive
+        license to use and distribute an unmodified copy of this
+        Specification in connection with management of Nokia products,
+        and without fee, provided this copyright notice and license appear
+        on all copies.
+
+        This Specification is supplied 'as is', and Nokia
+        makes no warranty, either express or implied, as to the use,
+        operation, condition, or performance of the Specification."
+
+--
+-- Revision History
+--
+        REVISION                 "201509300000Z"
+        DESCRIPTION              "Changed the DEFVAL for tnBfdAdminTemplateTxInt
+                                  and tnBfdAdminTemplateRxInt:
+                                    From 100 to 3."
+
+        ::= { tnSRMIBModules 85 }
+
+-- ----------------------------------------------------------------------------
+--  Nokia SROS series Delivery Appliance MIB structure
+-- ----------------------------------------------------------------------------
+
+tnBfdObjects         OBJECT IDENTIFIER ::= { tnSRObjs 85 }
+--
+-- tnBfdConformance         OBJECT IDENTIFIER ::= { tnSRConfs 85 }
+--    tnBfdCompliances     OBJECT IDENTIFIER ::= { tnBfdConformance 1 }
+--    tnBfdGroups            OBJECT IDENTIFIER ::= { tnBfdConformance 2 }
+--
+tnBfdOperObjects    OBJECT IDENTIFIER ::= { tnBfdObjects 1 }
+tnBfdAdminObjects   OBJECT IDENTIFIER ::= { tnBfdObjects 2 }
+
+
+
+--
+-- Administrative value objects
+--
+
+tnBfdAdminControlObjects  OBJECT IDENTIFIER ::= { tnBfdAdminObjects 1 }
+tnBfdAdminValueObjects    OBJECT IDENTIFIER ::= { tnBfdAdminObjects 2 }
+
+
+--
+-- Administrative value control objects
+--
+
+tnBfdAdminOwner  OBJECT-TYPE
+    SYNTAX       DisplayString (SIZE (0..32))
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "Who has last initialized the administrative tables,
+         who is making all the changes, and who is expected to
+         either commit or re-initialize (ABORT-TRANSACTION).
+
+         tnBfdAdminOwner is advisory only.  Before beginning a transaction,
+         read tnBfdAdminOwner. If it is empty then proceed with the
+         configuration. Set tnBfdAdminOwner after setting
+         tnBfdAdminControlApply so that other users will be advised to not
+         make changes to the Admin tables.
+
+         Agent sets tnBfdAdminOwner to empty string after
+         tnBfdAdminControlApply is set - either by user initializing or
+         committing, or by agent timing out the uncommitted transactions
+         (tnBfdAdminLastSetTimer)."
+    ::= { tnBfdAdminControlObjects 1 }
+
+tnBfdAdminControlApply  OBJECT-TYPE
+    SYNTAX       INTEGER {
+                    none(1),
+                    initialize(2),
+                    commit(3)
+                 }
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "This object controls the use of tnBfdAdminValueObjects tables.
+
+         This object always reads none(1).
+
+         When set to initialize(2), the objects in tnBfdAdminValueObjects
+         tables are set to the current Operational values, from the
+         corresponding tnBfdOperValueObjects tables. Any uncommitted changes
+         are lost, so setting this value corresponds to both BEGIN-TRANSACTION
+         and ABORT-TRANSACTION.
+
+         When set to commit(3) (END-TRANSACTION), all of the objects from
+         tnBfdAdminValueObjects tables are copied to the corresponding
+         tnBfdOperValueObjects table objects."
+    DEFVAL { none }
+    ::= { tnBfdAdminControlObjects 2 }
+
+tnBfdAdminLastSetTimer  OBJECT-TYPE
+    SYNTAX       TimeInterval
+    UNITS        "centiseconds"
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The time remaining until the agent re-initializes the
+         administrative tables.
+
+         If tnBfdAdminControlApply is not set to commit(3) within
+         tnBfdAdminLastSetTimeout centiseconds, the agent will set it
+         to initialize(2) and all uncommitted changes will be lost.
+
+         This way, uncommitted changes from failed (uncompleted) change sets
+         will eventually be removed, and another transaction can safely begin.
+
+         This object is reset to tnBfdAdminLastSetTimeout after SNMP SET
+         operation to any of the tnBfdAdminValueObjects tables."
+    ::= { tnBfdAdminControlObjects 3 }
+
+tnBfdAdminLastSetTimeout  OBJECT-TYPE
+    SYNTAX       TimeInterval
+    UNITS        "centiseconds"
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "Timeout for tnBfdAdminLastSetTimer.
+         The value zero is not allowed."
+    DEFVAL { 180000 } -- 30 minutes
+    ::= { tnBfdAdminControlObjects 4 }
+
+--
+-- BFD template administrative value objects
+--
+
+tnBfdAdminTemplateTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF TmnxBfdAdminTemplateEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Administrative value table for BFD templates."
+    ::= { tnBfdAdminValueObjects 1 }
+
+tnBfdAdminTemplateEntry OBJECT-TYPE
+    SYNTAX       TmnxBfdAdminTemplateEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Information about a particular BFD template.
+         Entries are created by user.
+         Entries are deleted by user."
+    INDEX { tnSysSwitchId, tnBfdAdminTemplateName }
+    ::= { tnBfdAdminTemplateTable 1 }
+
+TmnxBfdAdminTemplateEntry ::= SEQUENCE
+    {
+        tnBfdAdminTemplateName          TNamedItem,
+        tnBfdAdminTemplateRowStatus     RowStatus,
+        tnBfdAdminTemplateTxInt         Unsigned32,
+        tnBfdAdminTemplateRxInt         Unsigned32,
+        tnBfdAdminTemplateMultiplier    Unsigned32,
+        tnBfdAdminTemplateEchoRxInt     Unsigned32,
+        tnBfdAdminTemplateType          INTEGER
+    }
+
+tnBfdAdminTemplateName  OBJECT-TYPE
+    SYNTAX       TNamedItem
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "The name of this BFD template that uniquely identifies an
+         entry in this table."
+    ::= { tnBfdAdminTemplateEntry 1 }
+
+tnBfdAdminTemplateRowStatus  OBJECT-TYPE
+    SYNTAX       RowStatus
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "RowStatus for this row. Legal values to write are:
+         active(1), createAndGo(4), createAndWait(5), destroy(6).
+
+         To Create a row, set this object to createAndGo or createAndWait.
+         When tnBfdAdminControlApply is set to commit(3), the row will
+         actually be created in the tnBfdOperTemplateTable.
+
+         To destroy a row, set this object to destroy(6). If there are no
+         objects that refer to the entry, when tnBfdAdminControlApply is
+         set to commit(3) the row will actually be removed from the
+         tnBfdOperTemplateTable.
+
+         If there are objects that refer to the entry, the destroy SET request
+         will fail with an error."
+    ::= { tnBfdAdminTemplateEntry 2 }
+
+tnBfdAdminTemplateTxInt  OBJECT-TYPE
+    SYNTAX      Unsigned32 (3 | 10..100000)
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tnBfdAdminTemplateTxInt specifies the transmit
+         timers for the BFD packets. A value of 3 denotes 3.33 ms"
+    DEFVAL { 3 }
+    ::= { tnBfdAdminTemplateEntry 3 }
+
+
+tnBfdAdminTemplateRxInt  OBJECT-TYPE
+    SYNTAX      Unsigned32 (3 | 10..100000)
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tnBfdAdminTemplateRxInt specifies the receive
+         timers for the BFD packets. A value of 3 denotes 3.33 ms"
+    DEFVAL { 3 }
+    ::= { tnBfdAdminTemplateEntry 4 }
+
+tnBfdAdminTemplateMultiplier     OBJECT-TYPE
+    SYNTAX      Unsigned32 (3..20)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tnBfdAdminTemplateMultiplier specifies the number of
+         consecutive BFD messages that must be missed from the peer before
+         the BFD session state is changed to down and the upper level
+         protocols (OSPF, IS-IS or PIM) are notified of the fault."
+    DEFVAL { 3 }
+    ::= { tnBfdAdminTemplateEntry 5 }
+
+tnBfdAdminTemplateEchoRxInt    OBJECT-TYPE
+    SYNTAX      Unsigned32 (100..100000)
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tnBfdAdminTemplateEchoRxInt specifies the minimum echo
+         recieve interval for a BFD session."
+    DEFVAL { 100 }
+    ::= { tnBfdAdminTemplateEntry 6 }
+
+tnBfdAdminTemplateType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    cpmNp(1),
+                    auto(2),
+                    iomHw(3)
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tnBfdAdminTemplateType specifies the configured
+         termination of a BFD session.
+
+         The value of 'cpmNp(1)' specifies termination on the CPM card's
+         Network Processor. The value of 'auto(2)' specifies a
+         system-selected termination other than the CPM Network Processor."
+    DEFVAL { auto }
+    ::= { tnBfdAdminTemplateEntry 7 }
+
+--
+-- BFD template operational value objects
+--
+
+tnBfdOperValueObjects OBJECT IDENTIFIER ::= { tnBfdOperObjects 1 }
+
+tnBfdOperTemplateTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF TmnxBfdOperTemplateEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Operational value table for BFD templates."
+    ::= { tnBfdOperValueObjects 1 }
+
+tnBfdOperTemplateEntry OBJECT-TYPE
+    SYNTAX       TmnxBfdOperTemplateEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Information about a particular BFD template.
+
+         Entries are created by user via tnBfdAdminTemplateTable.
+         Entries are deleted by user via tnBfdAdminTemplateTable."
+    INDEX { tnSysSwitchId, tnBfdOperTemplateName }
+    ::= { tnBfdOperTemplateTable 1 }
+
+TmnxBfdOperTemplateEntry ::= SEQUENCE
+    {
+        tnBfdOperTemplateName          TNamedItem,
+        tnBfdOperTemplateRowStatus     RowStatus,
+        tnBfdOperTemplateTxInt         Unsigned32,
+        tnBfdOperTemplateRxInt         Unsigned32,
+        tnBfdOperTemplateMultiplier    Unsigned32,
+        tnBfdOperTemplateEchoRxInt     Unsigned32,
+        tnBfdOperTemplateType          INTEGER
+    }
+
+tnBfdOperTemplateName  OBJECT-TYPE
+    SYNTAX       TNamedItem
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "The name of this BFD template that uniquely identifies an
+         entry in this table."
+    ::= { tnBfdOperTemplateEntry 1 }
+
+tnBfdOperTemplateRowStatus    OBJECT-TYPE
+    SYNTAX       RowStatus
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "RowStatus for this row. Values read will only be
+         active(1). To create or destroy entries in this table, use the
+         tnBfdAdminTemplateEntry."
+    ::= { tnBfdOperTemplateEntry 2 }
+
+tnBfdOperTemplateTxInt  OBJECT-TYPE
+    SYNTAX      Unsigned32 (10..100000)
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tnBfdOperTemplateTxInt indicates the transmit
+         timers for the BFD packets."
+    ::= { tnBfdOperTemplateEntry 3 }
+
+tnBfdOperTemplateRxInt  OBJECT-TYPE
+    SYNTAX      Unsigned32 (10..100000)
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tnBfdOperTemplateTxInt indicates the recieve
+         timers for the BFD packets."
+    ::= { tnBfdOperTemplateEntry 4 }
+
+tnBfdOperTemplateMultiplier     OBJECT-TYPE
+    SYNTAX      Unsigned32 (3..20)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tnBfdOperTemplateMultiplier indicates the number of
+         consecutive BFD messages that must be missed from the peer before
+         the BFD session state is changed to down and the upper level
+         protocols (OSPF, IS-IS or PIM) are notified of the fault."
+    ::= { tnBfdOperTemplateEntry 5 }
+
+tnBfdOperTemplateEchoRxInt    OBJECT-TYPE
+    SYNTAX      Unsigned32 (100..100000)
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tnBfdOperTemplateEchoRxInt indicates the minimum echo
+         recieve interval for a BFD session."
+    ::= { tnBfdOperTemplateEntry 6 }
+
+tnBfdOperTemplateType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    cpmNp(1),
+                    auto(2),
+                    iomHw(3)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tnBfdOperTemplateType indicates the configured
+         termination of a BFD session.
+
+         The value of 'cpmNp(1)' specifies termination on the CPM card's
+         Network Processor. The value of 'auto(2)' specifies a
+         system-selected termination other than the CPM Network Processor."
+    ::= { tnBfdOperTemplateEntry 7 }
+
+-- ----------------------------------------------
+-- Compliance Statements
+-- ----------------------------------------------
+
+-- tnBfdV11v0Compliance    MODULE-COMPLIANCE
+--     STATUS      current
+--     DESCRIPTION
+--         "The compliance statement for management of BFD features on version 11.0
+--          of the Nokia SROS series systems."
+--     MODULE
+--         MANDATORY-GROUPS {
+--             tnBfdV11v0Group
+--         }
+--     ::= { tnBfdCompliances 1 }
+
+-- ------------------------------------------
+-- Units of Conformance
+-- ------------------------------------------
+
+-- tnBfdV11v0Group    OBJECT-GROUP
+--     OBJECTS {
+--                  tnBfdAdminOwner,
+--                  tnBfdAdminControlApply,
+--                  tnBfdAdminLastSetTimer,
+--                  tnBfdAdminLastSetTimeout,
+--                  tnBfdAdminTemplateRowStatus,
+--                  tnBfdAdminTemplateTxInt,
+--                  tnBfdAdminTemplateRxInt,
+--                  tnBfdAdminTemplateMultiplier,
+--                  tnBfdAdminTemplateEchoRxInt,
+--                  tnBfdAdminTemplateType,
+--                  tnBfdOperTemplateRowStatus,
+--                  tnBfdOperTemplateTxInt,
+--                  tnBfdOperTemplateRxInt,
+--                  tnBfdOperTemplateMultiplier,
+--                  tnBfdOperTemplateEchoRxInt,
+--                  tnBfdOperTemplateType
+--
+--             }
+--     STATUS      current
+--     DESCRIPTION
+--         "The group of objects supporting management of BFD features on version
+--          11.0 of the Nokia SROS series systems."
+--     ::= { tnBfdGroups 1 }
+
+
+
+--
+-- Dummy Scalar
+--
+
+ tnBfdAdminValueScalar1 OBJECT-TYPE
+     SYNTAX      Unsigned32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+         "A dummy scalar that satisfies a SNMP get request quickly.Otherwise,
+     it has to traverse the remaining MIB to get to the next applicable
+          item."
+     ::= { tnBfdAdminValueObjects 101 }
+
+ tnBfdAdminValueScalar2 OBJECT-TYPE
+     SYNTAX      Unsigned32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+         "."
+     ::= { tnBfdAdminValueObjects 102 }
+
+END

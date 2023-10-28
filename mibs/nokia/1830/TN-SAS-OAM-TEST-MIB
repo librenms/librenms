@@ -1,0 +1,3106 @@
+TN-SAS-OAM-TEST-MIB DEFINITIONS ::= BEGIN
+
+-- (c) Copyright 2023 Nokia Networks.  All rights reserved.
+-- This software is the confidential and proprietary property of
+-- Nokia and may only be used in accordance with the terms of the
+-- license agreement provided with this software.
+
+IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, IpAddress,
+        Integer32, Unsigned32, Counter64
+            FROM SNMPv2-SMI
+
+        TEXTUAL-CONVENTION, RowStatus, TruthValue,
+        DateAndTime, MacAddress, TimeStamp
+            FROM SNMPv2-TC
+
+        SnmpAdminString
+            FROM SNMP-FRAMEWORK-MIB
+
+        -- Alphasort
+        TFCName, TItemDescription, TmnxEncapVal,
+        TmnxPortID, TDSCPNameOrEmpty, Dot1PPriority
+            FROM TN-TC-MIB
+
+        tnSASObjs,
+--      tnSASNotifyPrefix,
+        tnSASModules
+            FROM TROPIC-GLOBAL-REG
+
+--     svcId
+--             FROM TN-SERV-MIB
+
+       TAdaptationRule
+            FROM TN-SAS-QOS-MIB
+
+       tnSysSwitchId
+           FROM TROPIC-SYSTEM-MIB
+        ;
+
+tnSASOamTestMIBModule MODULE-IDENTITY
+        LAST-UPDATED "201805040000Z"
+        ORGANIZATION "Alcatel-Lucent"
+        CONTACT-INFO
+            "Alcatel-Lucent SROS Support
+             Web: http://support.alcatel-lucent.com"
+
+        DESCRIPTION
+        "This document is the SNMP MIB module to manage and provision the
+        Alcatel-Lucent SROS OAM tests.
+
+        This SNMP MIB module (Specification) embodies Alcatel-Lucent's
+        proprietary intellectual property.  Alcatel-Lucent retains
+        all title and ownership in the Specification, including any
+        revisions.
+
+        Alcatel-Lucent grants all interested parties a non-exclusive
+        license to use and distribute an unmodified copy of this
+        Specification in connection with management of Alcatel-Lucent
+        products, and without fee, provided this copyright notice and
+        license appear on all copies.
+
+        This Specification is supplied 'as is', and Alcatel-Lucent
+        makes no warranty, either express or implied, as to the use,
+        operation, condition, or performance of the Specification."
+
+--
+--  Revision History
+--
+
+        REVISION    "201805040000Z"
+        DESCRIPTION "Added the following to tnTestHdResultsTable:
+                     tnTestHdResCIRAccptanceResult
+                     tnTestHdResPIRAccptanceResult."
+
+        REVISION    "201707140000Z"
+        DESCRIPTION "1) Added the following to tnTestHdPayLdTable:
+                        tnTestHdPayLdRefCount
+                     2) Added the following to tnTestHdAccCritTable:
+                        tnTestHdAccCritRefCount
+                     3) Added the following to tnTestHdSessTable:
+                        tnTestHdSessColorAware
+                     4) Added the following to tnTestHdResultsTable:
+                        tnTestHdResMinLatencyIn, tnTestHdResMaxLatencyIn
+                        tnTestHdResMeasuredLatencyIn, tnTestHdResMinLatencyOut
+                        tnTestHdResMaxLatencyOut, tnTestHdResMeasuredLatencyOut
+                        tnTestHdResMeasuredJitterIn, tnTestHdResMeasuredJitterOut
+                        tnTestHdResTransCountIn, tnTestHdResRecvCountIn
+                        tnTestHdResTransCountOut, tnTestHdResRecvCountOut
+                        tnTestHdResMeasuredFLRIn, tnTestHdResMeasuredFLROut
+                        tnTestHdResCIR, tnTestHdResPIR
+                        tnTestHdResLatencyTransCount, tnTestHdResLatencyTransCountIn
+                        tnTestHdResLatencyTransCountOut, tnTestHdResTransCountGood
+                        tnTestHdResTransCountFailed, tnTestHdResLatencyAccptanceResultOut
+                        tnTestHdResLatencyAccptanceResultIn, tnTestHdResJitterAccptanceResultOut,
+                        tnTestHdResJitterAccptanceResultIn, tnTestHdResFLRAccptanceResultOut,
+                        tnTestHdResFLRAccptanceResultIn
+                     5) Commented tnTestHdFullResultsTable.
+                     6) Fixed compile issues."
+
+        REVISION    "201704280000Z"
+        DESCRIPTION "Added the following to tnTestHdProfTable:
+                     tnTestHdProfRefCount."
+
+        REVISION    "201704130000Z"
+        DESCRIPTION "Updated the range of tnTestHdProfFrameSize from 64..9212
+                     to 64..9612"
+
+        REVISION    "201703310000Z"
+        DESCRIPTION "1) Changed the max value from 1000000 to 100000000 for the
+                        following:
+                        TTestHdCIRRate
+                        TTestHdPIRRate
+                        tnTestHdAccCritCirThres
+                        tnTestHdAccCritPirThres.
+                     2) Fixed typo in the following attributes:
+                        tnTestHdProfCompetedTests
+                        tnTestHdResultsProfCompetedTests.
+                     3) Changed the description of the following tables:
+                        tnTestHdPayLdTable
+                        tnTestHdAccCritTable."
+
+        REVISION    "201703100000Z"
+        DESCRIPTION "1) Removed the following from tnTestHdSessTable:
+                        tnTestHdSessOwnerName.
+                     2) Removed the following from tnTestHdResultsTable:
+                        tnTestHdOwnerName.
+                     3) Added the following as INDEX of tnTestHdCommandTable:
+                        tnTestHdName."
+
+        REVISION    "201210010000Z"
+        DESCRIPTION "Rev 1.0                1 Nov 2012 00:00
+                     5.0 release of the TIMETRA-SAS-OAM-TEST-MIB."
+
+        ::= { tnSASModules 18 }
+
+  tnSASOamTestObjs         OBJECT IDENTIFIER ::= { tnSASObjs 17 }
+    tnTestHdProfObjects                     OBJECT IDENTIFIER
+        ::= { tnSASOamTestObjs 1 }
+--    tnTestHdResultsGroup                       OBJECT IDENTIFIER
+--        ::= { tnSASOamTestObjs 2 }
+
+--    tnTestHdProfNotifyObjs                     OBJECT IDENTIFIER
+--        ::= { tnSASOamTestObjs 2 }
+
+-- tmnxSASOamNotifyPrefix    OBJECT IDENTIFIER ::= { tnSASNotifyPrefix 3 }
+--    tmnxSASOamNotifications   OBJECT IDENTIFIER ::= { tmnxSASOamNotifyPrefix 1 }
+
+
+--tmnxSASOamTestConformance          OBJECT IDENTIFIER ::= { tnSASConfs 17 }
+--    tnTestHdProfConformance              OBJECT IDENTIFIER
+--        ::= { tmnxSASOamTestConformance 1 }
+--    tnTestHdObjsGroups           OBJECT IDENTIFIER
+--        ::= { tnTestHdProfConformance 1 }
+
+--
+
+TTestHdCIRRate ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "The rate to be used in kbps. "
+    SYNTAX       Integer32 (0..100000000)
+
+TTestHdPIRRate ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "The rate to be used in kbps. The value -1 means pir rate not used."
+    SYNTAX       Integer32 (-1 | 0..100000000)
+
+--
+
+tnTestHdProfTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF TnTestHdProfEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION  "  "
+    ::= { tnTestHdProfObjects 1 }
+
+tnTestHdProfEntry OBJECT-TYPE
+    SYNTAX       TnTestHdProfEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "."
+    INDEX { tnSysSwitchId, tnTestHdProfIndex }
+    ::= { tnTestHdProfTable 1 }
+
+TnTestHdProfEntry ::= SEQUENCE
+    {
+        tnTestHdProfIndex                 Integer32,
+        tnTestHdProfRowStatus             RowStatus,
+        tnTestHdProfDescription           TItemDescription,
+        tnTestHdProfCIRAdaptation         TAdaptationRule,
+        tnTestHdProfOperCIR               TTestHdCIRRate,
+--        tnTestHdProfCIR                   TTestHdCIRRate,
+        tnTestHdProfDurHr                 Integer32,
+        tnTestHdProfDurMin                Integer32,
+        tnTestHdProfDurSec                Integer32,
+        tnTestHdProfFrameSize             Integer32,
+        tnTestHdProfTrapEnable            TruthValue,
+        tnTestHdLastChanged               TimeStamp,
+        tnTestHdProfAdminCIR              TTestHdCIRRate,
+        tnTestHdProfAdminPIR              TTestHdPIRRate,
+        tnTestHdProfOperPIR               TTestHdPIRRate,
+        tnTestHdProfDot1pIn               Dot1PPriority,
+        tnTestHdProfDot1pOut              Dot1PPriority,
+        tnTestHdProfActiveTests           OCTET STRING,
+        tnTestHdProfCompletedTests        OCTET STRING,
+        tnTestHdProfRefCount              Integer32
+    }
+
+tnTestHdProfIndex OBJECT-TYPE
+    SYNTAX       Integer32 (0..10)
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "tnTestHdProfIndex profile index for this entry"
+    ::= { tnTestHdProfEntry 1 }
+
+tnTestHdProfRowStatus OBJECT-TYPE
+    SYNTAX       RowStatus
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "RowStatus for this entry"
+    ::= { tnTestHdProfEntry 2 }
+
+tnTestHdProfDescription OBJECT-TYPE
+    SYNTAX       TItemDescription
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "user description for this profile"
+    DEFVAL { ''H }
+    ::= { tnTestHdProfEntry 3 }
+
+tnTestHdProfCIRAdaptation OBJECT-TYPE
+    SYNTAX       TAdaptationRule
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "cir rule to be used in the test head test"
+    DEFVAL { closest }
+    ::= { tnTestHdProfEntry 4 }
+
+tnTestHdProfOperCIR OBJECT-TYPE
+    SYNTAX       TTestHdCIRRate
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "oper cir used in the payload"
+    ::= { tnTestHdProfEntry 5 }
+
+
+--tnTestHdProfCIR OBJECT-TYPE
+--    SYNTAX       TTestHdCIRRate
+--    MAX-ACCESS   read-create
+--    STATUS       deprecated
+--    DESCRIPTION
+--        "cir to be used in the payload, this object is supported for
+--        backward compatibility of 7210 devices using 5.0R4, tnTestHdProfOperCIR
+--        and tnTestHdProfAdminCIR to be used in 6.0 nodes"
+--    DEFVAL { 1000 }
+--    ::= { tnTestHdProfEntry 6 }
+
+tnTestHdProfDurHr  OBJECT-TYPE
+    SYNTAX      Integer32 (0..24)
+    UNITS       "hours"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "tnTestHdProfDurHr is the number of hours the test head
+        test to be run"
+    DEFVAL { 0 }
+    ::= { tnTestHdProfEntry 8 }
+
+tnTestHdProfDurMin  OBJECT-TYPE
+    SYNTAX      Integer32 (0..60)
+    UNITS       "minutes"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "tnTestHdProfDurMin is the number of minutes the test head
+        test to be run"
+    DEFVAL { 3 }
+    ::= { tnTestHdProfEntry 9 }
+
+
+tnTestHdProfDurSec  OBJECT-TYPE
+    SYNTAX      Integer32 (0..60)
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "tnTestHdProfDurSec is the number of seconds the test head
+        test to be run"
+    DEFVAL { 0 }
+    ::= { tnTestHdProfEntry 10 }
+
+tnTestHdProfFrameSize  OBJECT-TYPE
+    SYNTAX      Integer32 (64..9612)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "tnTestHdProfFrameSize is the frame size to be used in frame
+        payload"
+    DEFVAL { 1514 }
+    ::= { tnTestHdProfEntry 11 }
+
+
+tnTestHdProfTrapEnable OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "tnTestHdProfTrapEnable when set to true tmnxOamTestHeadTestCompleted
+        trap will be sent when the test run completes."
+    DEFVAL { false }
+    ::= { tnTestHdProfEntry 13 }
+
+tnTestHdLastChanged OBJECT-TYPE
+    SYNTAX       TimeStamp
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The value tnTestHdLastChanged indicates the system uptime when
+        an entry in tnTestHdProfTable was last changed."
+    ::= { tnTestHdProfEntry 14 }
+
+tnTestHdProfAdminCIR OBJECT-TYPE
+    SYNTAX       TTestHdCIRRate
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "admin cir to be used in the payload"
+    DEFVAL { 1000 }
+    ::= { tnTestHdProfEntry 15 }
+
+
+tnTestHdProfAdminPIR OBJECT-TYPE
+    SYNTAX       TTestHdPIRRate
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "admin pir to be used in the payload"
+    DEFVAL { -1 }
+    ::= { tnTestHdProfEntry 16 }
+
+tnTestHdProfOperPIR OBJECT-TYPE
+    SYNTAX       TTestHdPIRRate
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "oper pir used in the payload"
+    ::= { tnTestHdProfEntry 17 }
+
+tnTestHdProfDot1pIn OBJECT-TYPE
+    SYNTAX       Dot1PPriority
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "dot1p-in value to for this profile.
+        "
+    DEFVAL { -1 }
+    ::= { tnTestHdProfEntry 18 }
+
+tnTestHdProfDot1pOut OBJECT-TYPE
+    SYNTAX       Dot1PPriority
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "dot1p-out value to for this profile.
+        "
+    DEFVAL { -1 }
+    ::= { tnTestHdProfEntry 19 }
+
+tnTestHdProfActiveTests OBJECT-TYPE
+    SYNTAX       OCTET STRING (SIZE(0..514))
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Active tests that are using this profile
+        "
+    ::= { tnTestHdProfEntry 20 }
+
+tnTestHdProfCompletedTests OBJECT-TYPE
+    SYNTAX       OCTET STRING (SIZE(0..514))
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Completed tests that have used this profile
+        "
+    ::= { tnTestHdProfEntry 21 }
+
+tnTestHdProfRefCount    OBJECT-TYPE
+    SYNTAX      Integer32 (0..1000)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The tnTestHdProfRefCount variable indicates the number of tests
+         that are using this profile."
+    DEFVAL { 0 }
+    ::= { tnTestHdProfEntry 22 }
+--
+
+tnTestHdPayLdTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF TnTestHdPayLdEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "This table maintains the the payload parameters
+         for the test head test."
+    ::= { tnTestHdProfObjects 2 }
+
+tnTestHdPayLdEntry OBJECT-TYPE
+    SYNTAX       TnTestHdPayLdEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Information about a particular sap-ingress policy's
+         forwarding class mappings to queues.
+
+         Entries are created and deleted by user. They have
+         a presumed StorageType of nonVolatile."
+    INDEX { tnSysSwitchId, tnTestHdProfIndex, tnTestHdPayLdIndex }
+    ::= { tnTestHdPayLdTable 1 }
+
+TnTestHdPayLdEntry ::= SEQUENCE
+    {
+        tnTestHdPayLdIndex             Integer32,
+        tnTestHdPayLdRowStatus         RowStatus,
+        tnTestHdPayLdDesc              TItemDescription,
+        tnTestHdPayLddataPattrn        OCTET STRING,
+        tnTestHdPayLdSrcIpv4Addr       IpAddress,
+        tnTestHdPayLdDstIpv4Addr       IpAddress,
+        tnTestHdPayLdDSCP              TDSCPNameOrEmpty,
+        tnTestHdPayLdIpProto           Integer32,
+        tnTestHdPayLdIpTos             Integer32,
+        tnTestHdPayLdIpTTL             Integer32,
+        tnTestHdPayLdSrcMac            MacAddress,
+        tnTestHdPayLdDstMac            MacAddress,
+        tnTestHdPayLdSrcPort           Integer32,
+        tnTestHdPayLdDstPort           Integer32,
+        tnTestHdPayLdLastChanged       TimeStamp,
+        tnTestHdPayLdType              INTEGER,
+        tnTestHdPayLdVTagOne           Integer32,
+        tnTestHdPayLdVTagOneTpid       Unsigned32,
+        tnTestHdPayLdVTagOneDot1p      Dot1PPriority,
+        tnTestHdPayLdVTagTwo           Integer32,
+        tnTestHdPayLdVTagTwoTpid       Unsigned32,
+        tnTestHdPayLdVTagTwoDot1p      Dot1PPriority,
+        tnTestHdPayLdEthertype         Unsigned32,
+        tnTestHdPayLdVTagOneDei        Unsigned32,
+        tnTestHdPayLdVTagTwoDei        Unsigned32,
+        tnTestHdPayLdRefCount          Integer32
+    }
+
+tnTestHdPayLdIndex OBJECT-TYPE
+    SYNTAX       Integer32 (1..4)
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "tnTestHdPayLdIndex is the payload index"
+    ::= { tnTestHdPayLdEntry 1 }
+
+tnTestHdPayLdRowStatus OBJECT-TYPE
+    SYNTAX       RowStatus
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "Row Status for this entry."
+    ::= { tnTestHdPayLdEntry 2 }
+
+tnTestHdPayLdDesc OBJECT-TYPE
+    SYNTAX       TItemDescription
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION "tnTestHdPayLdDesc is the textual description
+                entered by user for this payload"
+    DEFVAL { ''H }
+    ::= { tnTestHdPayLdEntry 3 }
+
+tnTestHdPayLddataPattrn OBJECT-TYPE
+    SYNTAX       OCTET STRING (SIZE (0..64))
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "tnTestHdPayLddataPattrn is string of characters 0-9,a-f
+        It is used to fill up the data field of the payload of the frame,
+        repeating it in the payload field as many time as need to fill
+        up the entire length of the payload"
+    DEFVAL { "a1b2c3d4e5f6" }
+    ::= { tnTestHdPayLdEntry 4 }
+
+tnTestHdPayLdSrcIpv4Addr  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "tnTestHdPayLdSrcIpv4Addr is the source ip address to be used
+        in frame payload"
+    DEFVAL { '00000000'H }
+    ::= { tnTestHdPayLdEntry 5 }
+
+tnTestHdPayLdDstIpv4Addr  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "tnTestHdPayLdDstIpv4Addr is the destination ip address to be used
+        in frame payload"
+    DEFVAL { '00000000'H }
+    ::= { tnTestHdPayLdEntry 6 }
+
+tnTestHdPayLdDSCP OBJECT-TYPE
+    SYNTAX       TDSCPNameOrEmpty
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "tnTestHdPayLdDSCP is the dscp value  to be used in frame payload"
+    DEFVAL { "be" }
+    ::= { tnTestHdPayLdEntry 7 }
+
+tnTestHdPayLdIpProto OBJECT-TYPE
+    SYNTAX       Integer32 (0..255)
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "tnTestHdPayLdIpProto is the ip protocal value  to be used in frame
+        payload"
+    DEFVAL { 0 }
+    ::= { tnTestHdPayLdEntry 8 }
+
+tnTestHdPayLdIpTos OBJECT-TYPE
+    SYNTAX       Integer32 (0..8)
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "tnTestHdPayLdIpTos is the ip type of service value  to be used in frame
+        payload"
+    DEFVAL { 0 }
+    ::= { tnTestHdPayLdEntry 9 }
+
+tnTestHdPayLdIpTTL OBJECT-TYPE
+    SYNTAX       Integer32 (1..255)
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "tnTestHdPayLdIpTTL is the ip time to live value  to be used in frame
+        payload"
+    DEFVAL { 255 }
+    ::= { tnTestHdPayLdEntry 10 }
+
+tnTestHdPayLdSrcMac OBJECT-TYPE
+    SYNTAX          MacAddress
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "Source MAC to be used in the frame payload."
+    DEFVAL { '000000000000'H }
+    ::= { tnTestHdPayLdEntry 11 }
+
+
+tnTestHdPayLdDstMac OBJECT-TYPE
+    SYNTAX          MacAddress
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "Destination MAC to be used in the frame payload."
+    DEFVAL { '000000000000'H }
+    ::= { tnTestHdPayLdEntry 12 }
+
+tnTestHdPayLdSrcPort OBJECT-TYPE
+    SYNTAX          Integer32 (0..65535)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "Source Port to be used in the frame payload."
+    DEFVAL { 0 }
+    ::= { tnTestHdPayLdEntry 13 }
+
+tnTestHdPayLdDstPort OBJECT-TYPE
+    SYNTAX          Integer32 (0..65535)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "Destination Port to be used in the frame payload."
+    DEFVAL { 0 }
+    ::= { tnTestHdPayLdEntry 14 }
+
+tnTestHdPayLdLastChanged OBJECT-TYPE
+    SYNTAX       TimeStamp
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The value tnTestHdPayLdLastChanged indicates the system
+        uptime when an entry in tnTestHdPayLdTable was last changed."
+    ::= { tnTestHdPayLdEntry 15 }
+
+tnTestHdPayLdType OBJECT-TYPE
+    SYNTAX       INTEGER {
+                          tcp-ipv4 (1),
+                          l2 (2),
+                          udp-ipv4 (3),
+                          ipv4 (4)
+                        }
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "tnTestHdPayLdType indicates the payload type for
+        this frame payload."
+    DEFVAL { tcp-ipv4 }
+    ::= { tnTestHdPayLdEntry 16 }
+
+tnTestHdPayLdVTagOne  OBJECT-TYPE
+    SYNTAX      Integer32 (-1..4094)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Vlan tag one to be used in payload , if set to -1 packets are sent out without
+         vlan tag"
+    DEFVAL { -1 }
+    ::= { tnTestHdPayLdEntry 17 }
+
+tnTestHdPayLdVTagOneTpid         OBJECT-TYPE
+    SYNTAX      Unsigned32 ('600'H..'ffff'H)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The tnTestHdPayLdVTagOneTpid variable indicates the ethertype to be set
+        in the payload."
+    DEFVAL { '8100'H }
+    ::= { tnTestHdPayLdEntry 18 }
+
+tnTestHdPayLdVTagOneDot1p OBJECT-TYPE
+    SYNTAX          Dot1PPriority
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+         "IEEE 802.1p priority value for this frame payload.
+         "
+    DEFVAL { 0 }
+    ::= { tnTestHdPayLdEntry 19 }
+
+tnTestHdPayLdVTagTwo  OBJECT-TYPE
+    SYNTAX      Integer32 (-1..4094)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Vlan tag two to be used in payload , if set to -1 packets are sent out without
+         vlan tag"
+    DEFVAL { -1 }
+    ::= { tnTestHdPayLdEntry 20 }
+
+tnTestHdPayLdVTagTwoTpid         OBJECT-TYPE
+    SYNTAX      Unsigned32 ('600'H..'ffff'H)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The tnTestHdPayLdVTagTwoTpid variable indicates the ethertype to be set
+        in the payload."
+    DEFVAL { '8100'H }
+    ::= { tnTestHdPayLdEntry 21 }
+
+tnTestHdPayLdVTagTwoDot1p OBJECT-TYPE
+    SYNTAX          Dot1PPriority
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+         "IEEE 802.1p priority value for this frame payload.
+         "
+    DEFVAL { 0 }
+    ::= { tnTestHdPayLdEntry 22 }
+
+tnTestHdPayLdEthertype         OBJECT-TYPE
+    SYNTAX      Unsigned32 ('600'H..'ffff'H)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The tnTestHdPayLdEthertype variable indicates the ethertype to be set
+        in the payload."
+    DEFVAL { '800'H }
+    ::= { tnTestHdPayLdEntry 23 }
+
+tnTestHdPayLdVTagOneDei OBJECT-TYPE
+    SYNTAX     Unsigned32(0|1)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "tnTestHdPayLdVTagOneDei can have value one or zero."
+    DEFVAL { 0 }
+    ::= { tnTestHdPayLdEntry 24 }
+
+
+tnTestHdPayLdVTagTwoDei OBJECT-TYPE
+    SYNTAX      Unsigned32 (0|1)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "tnTestHdPayLdVTagTwoDei can have value one or zero."
+    DEFVAL { 0 }
+    ::= { tnTestHdPayLdEntry 25 }
+
+tnTestHdPayLdRefCount    OBJECT-TYPE
+    SYNTAX      Integer32 (0..1000)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The tnTestHdPayLdCount variable indicates the number of tests
+         that are using this pay load."
+    DEFVAL { 0 }
+    ::= { tnTestHdPayLdEntry 26 }
+
+tnTestHdAccCritTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF TnTestHdAccCritEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "This table maintains the acceptance criteria
+         for the test head test."
+    ::= { tnTestHdProfObjects 3 }
+
+tnTestHdAccCritEntry OBJECT-TYPE
+    SYNTAX       TnTestHdAccCritEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Information about a particular sap-ingress policy's
+         forwarding class mappings to queues.
+
+         Entries are created and deleted by user. They have
+         a presumed StorageType of nonVolatile."
+    INDEX { tnSysSwitchId, tnTestHdProfIndex, tnTestHdAccCritIndex }
+    ::= { tnTestHdAccCritTable 1 }
+
+TnTestHdAccCritEntry ::= SEQUENCE
+    {
+        tnTestHdAccCritIndex             Integer32,
+        tnTestHdAccCritRowStatus         RowStatus,
+        tnTestHdAccCritJittrRiseThres    Integer32,
+        tnTestHdAccCritLatRiseThres      Integer32,
+        tnTestHdAccCritLossRiseThres     Integer32,
+        tnTestHdAccCritLastChanged       TimeStamp,
+        tnTestHdAccCritLossRiseThresIn   Integer32,
+        tnTestHdAccCritLossRiseThresOut  Integer32,
+        tnTestHdAccCritCirThres          Integer32,
+        tnTestHdAccCritPirThres          Integer32,
+        tnTestHdAccCritLatRiseThresIn    Integer32,
+        tnTestHdAccCritLatRiseThresOut   Integer32,
+        tnTestHdAccCritJittrRiseThresIn  Integer32,
+        tnTestHdAccCritJittrRiseThresOut Integer32,
+        tnTestHdAccCritRefCount          Integer32
+     }
+
+tnTestHdAccCritIndex OBJECT-TYPE
+    SYNTAX       Integer32 (1..4)
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "."
+    ::= { tnTestHdAccCritEntry 1 }
+
+tnTestHdAccCritRowStatus OBJECT-TYPE
+    SYNTAX       RowStatus
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "Row Status for this entry."
+    ::= { tnTestHdAccCritEntry 2 }
+
+tnTestHdAccCritJittrRiseThres OBJECT-TYPE
+    SYNTAX      Integer32 (-1 | 0..2147483000)
+    UNITS       "microseconds"
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "tnTestHdAccCritJittrRiseThres is the acceptance criteria
+        jitter rising threshold to be used for test run"
+    DEFVAL { -1 }
+    ::= { tnTestHdAccCritEntry 3 }
+
+tnTestHdAccCritLatRiseThres OBJECT-TYPE
+    SYNTAX      Integer32 (-1 | 0..2147483000)
+    UNITS       "microseconds"
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "tnTestHdAccCritLatRiseThres is the acceptance criteria
+        latency rising threshold to be used for test run"
+    DEFVAL { -1 }
+    ::= { tnTestHdAccCritEntry 4 }
+
+tnTestHdAccCritLossRiseThres OBJECT-TYPE
+    SYNTAX      Integer32 (-1 | 0..1000000)
+    UNITS       "10000th of a percent"
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "tnTestHdAccCritLossRiseThres is the acceptance criteria
+        loss rising threshold to be used for test run"
+    DEFVAL { -1 }
+    ::= { tnTestHdAccCritEntry 5 }
+
+tnTestHdAccCritLastChanged OBJECT-TYPE
+    SYNTAX       TimeStamp
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The value tnTestHdAccCritLastChanged indicates the system
+        uptime when an entry in tnTestHdAccCritTable was last changed."
+    ::= { tnTestHdAccCritEntry 6 }
+
+tnTestHdAccCritLossRiseThresIn OBJECT-TYPE
+    SYNTAX      Integer32 (-1 | 0..1000000)
+    UNITS       "10000th of a percent"
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "tnTestHdAccCritLossRiseThresIn is the acceptance criteria
+        loss rising threshold in to be used for test run"
+    DEFVAL { -1 }
+    ::= { tnTestHdAccCritEntry 7 }
+
+tnTestHdAccCritLossRiseThresOut OBJECT-TYPE
+    SYNTAX      Integer32 (-1 | 0..1000000)
+    UNITS       "10000th of a percent"
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "tnTestHdAccCritLossRiseThresOut is the acceptance criteria
+        out loss rising threshold to be used for test run"
+    DEFVAL { -1 }
+    ::= { tnTestHdAccCritEntry 8 }
+
+tnTestHdAccCritCirThres OBJECT-TYPE
+    SYNTAX      Integer32 (-1 | 0..100000000)
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "tnTestHdAccCritCirThres is the acceptance criteria
+        cir threshold to be used for test run"
+    DEFVAL { -1 }
+    ::= { tnTestHdAccCritEntry 9 }
+
+tnTestHdAccCritPirThres OBJECT-TYPE
+    SYNTAX      Integer32 (-1 | 0..100000000)
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "tnTestHdAccCritPirThres is the acceptance criteria
+        pir threshold to be used for test run"
+    DEFVAL { -1 }
+    ::= { tnTestHdAccCritEntry 10 }
+
+tnTestHdAccCritLatRiseThresIn OBJECT-TYPE
+    SYNTAX      Integer32 (-1 | 0..2147483000)
+    UNITS       "microseconds"
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "tnTestHdAccCritLatRiseThresIn is the acceptance criteria
+        latency rising threshold-in to be used for test run"
+    DEFVAL { -1 }
+    ::= { tnTestHdAccCritEntry 11 }
+
+tnTestHdAccCritLatRiseThresOut OBJECT-TYPE
+    SYNTAX      Integer32 (-1 | 0..2147483000)
+    UNITS       "microseconds"
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "tnTestHdAccCritLatRiseThresOut is the acceptance criteria
+        latency rising threshold out to be used for test run"
+    DEFVAL { -1 }
+    ::= { tnTestHdAccCritEntry 12 }
+
+tnTestHdAccCritJittrRiseThresIn OBJECT-TYPE
+    SYNTAX      Integer32 (-1 | 0..2147483000)
+    UNITS       "microseconds"
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "tnTestHdAccCritJittrRiseThresIn is the acceptance criteria
+        jitter rising threshold-in to be used for test run"
+    DEFVAL { -1 }
+    ::= { tnTestHdAccCritEntry 13 }
+
+tnTestHdAccCritJittrRiseThresOut OBJECT-TYPE
+    SYNTAX      Integer32 (-1 | 0..2147483000)
+    UNITS       "microseconds"
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "tnTestHdAccCritJittrRiseThresOut is the acceptance criteria
+        jitter rising threshold-out to be used for test run"
+    DEFVAL { -1 }
+    ::= { tnTestHdAccCritEntry 14 }
+
+tnTestHdAccCritRefCount    OBJECT-TYPE
+    SYNTAX      Integer32 (0..1000)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The tnTestHdAccCritRefCount variable indicates the number of tests
+         that are using this acceptance criteria."
+    DEFVAL { 0 }
+    ::= { tnTestHdAccCritEntry 15 }
+--
+
+tnTestHdSessTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF TnTestHdSessEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "This table maintains the mapping of a particular
+         forwarding class traffic into the specified queue."
+    ::= { tnTestHdProfObjects 4 }
+
+tnTestHdSessEntry OBJECT-TYPE
+    SYNTAX       TnTestHdSessEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Information about a particular test head result.
+
+         Entries are read-only for the user."
+    INDEX { tnSysSwitchId,
+--            tnTestHdSessOwnerName,
+            tnTestHdSessTestName  }
+    ::= { tnTestHdSessTable 1 }
+
+TnTestHdSessEntry ::= SEQUENCE
+    {
+--        tnTestHdSessOwnerName                   SnmpAdminString,
+        tnTestHdSessTestName                    SnmpAdminString,
+        tnTestHdSessStartTime                   DateAndTime,
+        tnTestHdSessCompletedTime               DateAndTime,
+        tnTestHdSessTotalTime                   Integer32,
+        tnTestHdSessFc                          TFCName,
+        tnTestHdSessCompleted                   TruthValue,
+        tnTestHdSessStopped                     TruthValue,
+        tnTestHdSessProfId                      Integer32,
+        tnTestHdSessPayLdId                     Integer32,
+        tnTestHdSessAccCritId                   Integer32,
+        tnTestHdSessSapPortId                   TmnxPortID,
+        tnTestHdSessSapEncapValue               TmnxEncapVal,
+        tnTestHdSessTransCount                  Counter64,
+        tnTestHdSessRecvCount                   Counter64,
+        tnTestHdSessMinLatency                  Counter64,
+        tnTestHdSessMaxLatency                  Counter64,
+        tnTestHdSessMeasuredLatency             Counter64,
+        tnTestHdSessMeasuredJitter              Integer32,
+        tnTestHdSessColorAware                  TruthValue
+    }
+
+--tnTestHdSessOwnerName OBJECT-TYPE
+--    SYNTAX      SnmpAdminString (SIZE(1..32))
+--    MAX-ACCESS  not-accessible
+--    STATUS      current
+--    DESCRIPTION
+--        "The test name index of this Test head test session.
+--         "
+--    ::= { tnTestHdSessEntry 1 }
+
+tnTestHdSessTestName OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(1..32))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The test name index of this Test head test session.
+         "
+    ::= { tnTestHdSessEntry 1 }
+
+tnTestHdSessStartTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "tnTestHdSessStartTime test head start time for this session"
+    ::= { tnTestHdSessEntry 2 }
+
+
+tnTestHdSessCompletedTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "tnTestHdSessCompletedTime is the time stamp at which this
+        test head run session has completed."
+    ::= { tnTestHdSessEntry 3 }
+
+
+tnTestHdSessTotalTime OBJECT-TYPE
+    SYNTAX      Integer32 (0..1000000)
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "tnTestHdSessTotalTime is the total time since test head test
+        has started"
+    ::= { tnTestHdSessEntry 4 }
+
+tnTestHdSessFc OBJECT-TYPE
+    SYNTAX       TFCName
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "tnTestHdFc is the fc used in this test head session"
+    ::= { tnTestHdSessEntry 5 }
+
+tnTestHdSessCompleted OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "tnTestHdSessCompleted is true if the test is completed else it is
+        false. "
+    ::= { tnTestHdSessEntry 6 }
+
+tnTestHdSessStopped OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "tnTestHdStopped is true if the test is stopped midway else it is
+        false. "
+    ::= { tnTestHdSessEntry 7 }
+
+tnTestHdSessProfId OBJECT-TYPE
+    SYNTAX       Integer32 (0..10)
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "tnTestHdSessProfId is the profile index for this session"
+    ::= { tnTestHdSessEntry 8 }
+
+
+tnTestHdSessPayLdId OBJECT-TYPE
+    SYNTAX       Integer32 (1..4)
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "tnTestHdSessPayLdId is the payload index used for this session"
+    ::= { tnTestHdSessEntry 9 }
+
+tnTestHdSessAccCritId OBJECT-TYPE
+    SYNTAX       Integer32 (1..4)
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "tnTestHdSessAccCritId is the acceptance criteria id used for
+        this test run"
+    ::= { tnTestHdSessEntry 10 }
+
+tnTestHdSessSapPortId OBJECT-TYPE
+    SYNTAX          TmnxPortID
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The sap port id ID used in for this test run."
+    ::= { tnTestHdSessEntry 11 }
+
+tnTestHdSessSapEncapValue OBJECT-TYPE
+    SYNTAX          TmnxEncapVal
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The sap encap value used in this test run."
+    ::= { tnTestHdSessEntry 12 }
+
+tnTestHdSessTransCount OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The total number of packets injected"
+    ::= { tnTestHdSessEntry 13 }
+
+
+tnTestHdSessRecvCount OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The total number of packets received"
+    ::= { tnTestHdSessEntry 14 }
+
+tnTestHdSessMinLatency OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "microseconds"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The Latency measured minimum for this test"
+    ::= { tnTestHdSessEntry 15 }
+
+tnTestHdSessMaxLatency OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "microseconds"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The Latency measured maximum for this test"
+    ::= { tnTestHdSessEntry 16 }
+
+tnTestHdSessMeasuredLatency OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "microseconds"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The Latency measured for this test"
+    ::= { tnTestHdSessEntry 17 }
+
+
+tnTestHdSessMeasuredJitter OBJECT-TYPE
+    SYNTAX          Integer32 (-1 | 0..2147483647)
+    UNITS           "microseconds"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The Jitter measured for this test"
+    ::= { tnTestHdSessEntry 18 }
+
+tnTestHdSessColorAware OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+         "tnTestHdSessColorAware indicates if color aware is enabled for
+          the test.
+         "
+    ::= { tnTestHdSessEntry 19 }
+--
+
+tnTestHdResultsTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF TnTestHdResultsEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "This table maintains the mapping of a particular
+         forwarding class traffic into the specified queue."
+    ::= { tnTestHdProfObjects 5 }
+
+tnTestHdResultsEntry OBJECT-TYPE
+    SYNTAX       TnTestHdResultsEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Information about a particular test head result.
+
+         Entries are read-only for the user."
+    INDEX { tnSysSwitchId,
+--            tnTestHdOwnerName,
+            tnTestHdTestName  }
+    ::= { tnTestHdResultsTable 1 }
+
+TnTestHdResultsEntry ::= SEQUENCE
+    {
+--        tnTestHdOwnerName                   SnmpAdminString,
+        tnTestHdTestName                    SnmpAdminString,
+        tnTestHdResProfId                   Integer32,
+        tnTestHdResProfPayLdId              Integer32,
+        tnTestHdResProfAccCritId            Integer32,
+        tnTestHdResTransCount               Counter64,
+        tnTestHdResRecvCount                Counter64,
+        tnTestHdResMeasuredThruput          Integer32,
+        tnTestHdResMeasuredFLR              Integer32,
+        tnTestHdResMeasuredLatency          Counter64,
+        tnTestHdResLatencyAccptanceResult   INTEGER,
+        tnTestHdResMeasuredJitter           Integer32,
+        tnTestHdResJitterAccptanceResult    INTEGER,
+        tnTestHdResSapPortId                TmnxPortID,
+        tnTestHdResSapEncapValue            TmnxEncapVal,
+        tnTestHdResFLRAccptanceResult       INTEGER,
+        tnTestHdResMinLatency               Counter64,
+        tnTestHdResMaxLatency               Counter64,
+        tnTestHdResMinLatencyIn             Counter64,
+        tnTestHdResMaxLatencyIn             Counter64,
+        tnTestHdResMeasuredLatencyIn        Counter64,
+        tnTestHdResMinLatencyOut            Counter64,
+        tnTestHdResMaxLatencyOut            Counter64,
+        tnTestHdResMeasuredLatencyOut       Counter64,
+        tnTestHdResMeasuredJitterIn         Integer32,
+        tnTestHdResMeasuredJitterOut        Integer32,
+        tnTestHdResTransCountIn             Counter64,
+        tnTestHdResRecvCountIn              Counter64,
+        tnTestHdResTransCountOut            Counter64,
+        tnTestHdResRecvCountOut             Counter64,
+        tnTestHdResMeasuredFLRIn            Integer32,
+        tnTestHdResMeasuredFLROut           Integer32,
+        tnTestHdResCIR                      TTestHdCIRRate,
+        tnTestHdResPIR                      TTestHdPIRRate,
+        tnTestHdResLatencyTransCount        Integer32,
+        tnTestHdResLatencyTransCountIn      Integer32,
+        tnTestHdResLatencyTransCountOut     Integer32,
+        tnTestHdResTransCountGood           Integer32,
+        tnTestHdResTransCountFailed         Integer32,
+        tnTestHdResLatencyAccptanceResultOut INTEGER,
+        tnTestHdResLatencyAccptanceResultIn INTEGER,
+        tnTestHdResJitterAccptanceResultOut INTEGER,
+        tnTestHdResJitterAccptanceResultIn  INTEGER,
+        tnTestHdResFLRAccptanceResultOut    INTEGER,
+        tnTestHdResFLRAccptanceResultIn     INTEGER,
+        tnTestHdResCIRAccptanceResult       INTEGER,
+        tnTestHdResPIRAccptanceResult       INTEGER
+    }
+
+--tnTestHdOwnerName OBJECT-TYPE
+--    SYNTAX      SnmpAdminString (SIZE(1..32))
+--    MAX-ACCESS  not-accessible
+--    STATUS      current
+--    DESCRIPTION
+--        "The owner name index of the Test head test.
+--         "
+--    ::= { tnTestHdResultsEntry 1 }
+
+tnTestHdTestName OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(1..32))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The test name index of the Test head test."
+    ::= { tnTestHdResultsEntry 1 }
+
+tnTestHdResProfId OBJECT-TYPE
+    SYNTAX          Integer32 (0..10)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The Testhead profile Id used for this test"
+    ::= { tnTestHdResultsEntry 2 }
+
+tnTestHdResProfPayLdId OBJECT-TYPE
+    SYNTAX          Integer32 (0..4)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The Testhead profile Pay Load Id used for this
+                     test"
+    ::= { tnTestHdResultsEntry 3 }
+
+tnTestHdResProfAccCritId OBJECT-TYPE
+    SYNTAX          Integer32 (0..4)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The Testhead profile Acceptance Criteria Id used
+                     for this test"
+    ::= { tnTestHdResultsEntry 4 }
+
+tnTestHdResTransCount OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The total number of packets injected"
+    ::= { tnTestHdResultsEntry 5 }
+
+
+tnTestHdResRecvCount OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The total number of packets received"
+    ::= { tnTestHdResultsEntry 6 }
+
+tnTestHdResMeasuredThruput OBJECT-TYPE
+    SYNTAX          Integer32 (1000000)
+    UNITS           "kbps"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The throughput measured for this test"
+    ::= { tnTestHdResultsEntry 7 }
+
+tnTestHdResMeasuredFLR OBJECT-TYPE
+    SYNTAX          Integer32 (-1 | 0..1000000)
+    UNITS           "10000th of a percent"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The frame loss ratio measured for this test, if
+                     set to -1 tnTestHdResMeasuredFLR is not applicable
+                     for this test"
+    ::= { tnTestHdResultsEntry 8 }
+
+tnTestHdResMeasuredLatency OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "microseconds"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The Latency measured for this test"
+    ::= { tnTestHdResultsEntry 9 }
+
+tnTestHdResLatencyAccptanceResult OBJECT-TYPE
+    SYNTAX          INTEGER {
+                        pass (1),
+                        fail (2),
+                        not-applicable(3)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The Latency Acceptance for this test"
+    ::= { tnTestHdResultsEntry 10 }
+
+tnTestHdResMeasuredJitter OBJECT-TYPE
+    SYNTAX          Integer32 (0..2147483647)
+    UNITS           "microseconds"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The Jitter measured for this test"
+    ::= { tnTestHdResultsEntry 11 }
+
+tnTestHdResJitterAccptanceResult OBJECT-TYPE
+    SYNTAX          INTEGER {
+                        pass (1),
+                        fail (2),
+                        not-applicable(3)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The Jitter Acceptance for this test"
+    ::= { tnTestHdResultsEntry 12 }
+
+tnTestHdResSapPortId OBJECT-TYPE
+    SYNTAX          TmnxPortID
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The sap port id ID used in for this test run."
+    ::= { tnTestHdResultsEntry 13 }
+
+tnTestHdResSapEncapValue OBJECT-TYPE
+    SYNTAX          TmnxEncapVal
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The sap encap value used in this test run."
+    ::= { tnTestHdResultsEntry 14 }
+
+tnTestHdResFLRAccptanceResult OBJECT-TYPE
+    SYNTAX          INTEGER {
+                        pass (1),
+                        fail (2),
+                        not-applicable(3)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The FLR Acceptance for this test"
+    ::= { tnTestHdResultsEntry 15 }
+
+
+tnTestHdResMinLatency OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "microseconds"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The Latency measured minimum for this test"
+    ::= { tnTestHdResultsEntry 16 }
+
+tnTestHdResMaxLatency OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "microseconds"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The Latency measured maximum for this test"
+    ::= { tnTestHdResultsEntry 17 }
+
+tnTestHdResMinLatencyIn OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "microseconds"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The Latency measured in-profile minimum for this test"
+    ::= { tnTestHdResultsEntry 18 }
+
+tnTestHdResMaxLatencyIn OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "microseconds"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The Latency measured in-profile maximum for this test"
+    ::= { tnTestHdResultsEntry 19 }
+
+tnTestHdResMeasuredLatencyIn OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "microseconds"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The measured in-profile latency for this test"
+    ::= { tnTestHdResultsEntry 20 }
+
+tnTestHdResMinLatencyOut OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "microseconds"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The Latency measured out-of-profile minimum for this test"
+    ::= { tnTestHdResultsEntry 21 }
+
+tnTestHdResMaxLatencyOut OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "microseconds"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The Latency measured out-of-profile maximum for this test"
+    ::= { tnTestHdResultsEntry 22 }
+
+tnTestHdResMeasuredLatencyOut OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "microseconds"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The measured out-of-profile latency for this test"
+    ::= { tnTestHdResultsEntry 23 }
+
+tnTestHdResMeasuredJitterIn OBJECT-TYPE
+    SYNTAX          Integer32 (0..2147483647)
+    UNITS           "microseconds"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The measured in-profile jitter for this test"
+    ::= { tnTestHdResultsEntry 24 }
+
+tnTestHdResMeasuredJitterOut OBJECT-TYPE
+    SYNTAX          Integer32 (0..2147483647)
+    UNITS           "microseconds"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The measured out-of-profile jitter for this test"
+    ::= { tnTestHdResultsEntry 25 }
+
+tnTestHdResTransCountIn OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The transmitted in-profile packets for this test"
+    ::= { tnTestHdResultsEntry 26 }
+
+tnTestHdResRecvCountIn OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The received in-profile packets for this test"
+    ::= { tnTestHdResultsEntry 27 }
+
+tnTestHdResTransCountOut OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The transmitted out-of-profile packets for this test"
+    ::= { tnTestHdResultsEntry 28 }
+
+tnTestHdResRecvCountOut OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The received out-of-profile packets for this test"
+    ::= { tnTestHdResultsEntry 29 }
+
+tnTestHdResMeasuredFLRIn OBJECT-TYPE
+    SYNTAX          Integer32 (-1 | 0..1000000)
+    UNITS           "10000th of a percent"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The in-profile frame loss ratio measured for this test, if
+                     set to -1 tnTestHdResMeasuredFLRIn is not applicable
+                     for this test"
+    ::= { tnTestHdResultsEntry 30 }
+
+tnTestHdResMeasuredFLROut OBJECT-TYPE
+    SYNTAX          Integer32 (-1 | 0..1000000)
+    UNITS           "10000th of a percent"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The out-of-profile frame loss ratio measured for this test,
+                     if set to -1 tnTestHdResMeasuredFLRIn is not applicable
+                     for this test"
+    ::= { tnTestHdResultsEntry 31 }
+
+tnTestHdResCIR OBJECT-TYPE
+    SYNTAX       TTestHdCIRRate
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The measured CIR for this test"
+    ::= { tnTestHdResultsEntry 32 }
+
+tnTestHdResPIR OBJECT-TYPE
+    SYNTAX       TTestHdPIRRate
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The measured PIR for this test"
+    ::= { tnTestHdResultsEntry 33 }
+
+tnTestHdResLatencyTransCount OBJECT-TYPE
+    SYNTAX       Integer32 (0..2147483647)
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The latency transmitted packets for this test"
+    ::= { tnTestHdResultsEntry 34 }
+
+tnTestHdResLatencyTransCountIn OBJECT-TYPE
+    SYNTAX       Integer32 (0..2147483647)
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The latency transmitted packets for this test"
+    ::= { tnTestHdResultsEntry 35 }
+
+tnTestHdResLatencyTransCountOut OBJECT-TYPE
+    SYNTAX       Integer32 (0..2147483647)
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The latency transmitted packets for this test"
+    ::= { tnTestHdResultsEntry 36 }
+
+tnTestHdResTransCountGood OBJECT-TYPE
+    SYNTAX       Integer32 (0..2147483647)
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The transmitted successful packets for this test"
+    ::= { tnTestHdResultsEntry 37 }
+
+tnTestHdResTransCountFailed OBJECT-TYPE
+    SYNTAX       Integer32 (0..2147483647)
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The transmitted failed packets for this test"
+    ::= { tnTestHdResultsEntry 38 }
+
+tnTestHdResLatencyAccptanceResultOut OBJECT-TYPE
+    SYNTAX          INTEGER {
+                        pass (1),
+                        fail (2),
+                        not-applicable(3)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The Out of Profile Latency Acceptance for this test"
+    ::= { tnTestHdResultsEntry 39 }
+
+tnTestHdResLatencyAccptanceResultIn OBJECT-TYPE
+    SYNTAX          INTEGER {
+                        pass (1),
+                        fail (2),
+                        not-applicable(3)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The In Profile Latency Acceptance for this test"
+    ::= { tnTestHdResultsEntry 40 }
+
+tnTestHdResJitterAccptanceResultOut OBJECT-TYPE
+    SYNTAX          INTEGER {
+                        pass (1),
+                        fail (2),
+                        not-applicable(3)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The Out of Profile Jitter Acceptance for this test"
+    ::= { tnTestHdResultsEntry 41 }
+
+tnTestHdResJitterAccptanceResultIn OBJECT-TYPE
+    SYNTAX          INTEGER {
+                        pass (1),
+                        fail (2),
+                        not-applicable(3)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The In Profile Jitter Acceptance for this test"
+    ::= { tnTestHdResultsEntry 42 }
+
+tnTestHdResFLRAccptanceResultOut OBJECT-TYPE
+    SYNTAX          INTEGER {
+                        pass (1),
+                        fail (2),
+                        not-applicable(3)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The Out of Profile FLR Acceptance for this test"
+    ::= { tnTestHdResultsEntry 43 }
+
+tnTestHdResFLRAccptanceResultIn OBJECT-TYPE
+    SYNTAX          INTEGER {
+                        pass (1),
+                        fail (2),
+                        not-applicable(3)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The In Profile FLR Acceptance for this test"
+    ::= { tnTestHdResultsEntry 44 }
+
+ tnTestHdResCIRAccptanceResult OBJECT-TYPE
+     SYNTAX          INTEGER {
+                         pass (1),
+                         fail (2),
+                         not-applicable(3)
+                     }
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION     "The CIR Acceptance for this test"
+     ::= { tnTestHdResultsEntry 45 }
+
+ tnTestHdResPIRAccptanceResult OBJECT-TYPE
+     SYNTAX          INTEGER {
+                         pass (1),
+                         fail (2),
+                         not-applicable(3)
+                     }
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION     "The PIR Acceptance for this test"
+     ::= { tnTestHdResultsEntry 46 }
+
+tnTestHdCommandTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF TnTestHdCommandEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "This table maintains commands for the testHd test"
+    ::= { tnTestHdProfObjects 6 }
+
+tnTestHdCommandEntry OBJECT-TYPE
+    SYNTAX       TnTestHdCommandEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Information to start a test head
+         Entries are read-only for the user."
+    INDEX { tnSysSwitchId,
+            tnTestHdName }
+    ::= { tnTestHdCommandTable 1 }
+
+TnTestHdCommandEntry ::= SEQUENCE
+    {
+       tnTestHdName          SnmpAdminString,
+--       tnTestHdOwner         SnmpAdminString,
+       tnTestHdStartTime     DateAndTime,
+       tnTestHdElapsedTime   Integer32,
+       tnTestHdFc            TFCName,
+       tnTestHdAvgLatency    Integer32,
+       tnTestHdFrLossRatio   Integer32,
+       tnTestHdJitter        Integer32,
+       tnTestHdDsiredThrpt   Integer32,
+       tnTestHdAchvdThrpt    Integer32,
+       tnTestHdCompleted     TruthValue,
+       tnTestHdStopped       TruthValue,
+       tnTestHdTestStatus    INTEGER,
+       tnTestHdCompletedTime DateAndTime,
+       tnTestHdSapPortId     TmnxPortID,
+       tnTestHdSapEncapValue TmnxEncapVal,
+       tnTestHdAdminStatus   INTEGER,
+       tnTestHdProfId        Integer32,
+       tnTestHdAccCritId     Integer32,
+       tnTestHdPayLdId       Integer32,
+       tnTestHdColorAware    TruthValue
+}
+
+tnTestHdName OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(1..32))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "tnTestHdName is a mandatory parameter that needs to be
+        set along with tnTestHdAdminStatus to start a test head
+        test.
+        "
+    ::= { tnTestHdCommandEntry 1 }
+
+--tnTestHdOwner OBJECT-TYPE
+--    SYNTAX      SnmpAdminString (SIZE(1..32))
+--    MAX-ACCESS  read-write
+--    STATUS      current
+--    DESCRIPTION
+--        "tnTestHdOwner is a mandatory parameter that needs to be
+--        set along with tnTestHdAdminStatus to start a test head
+--        test."
+--    ::= { tnTestHdCommandEntry 2 }
+
+tnTestHdStartTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "tnTestHdStartTime test head start time sent in the trap
+        message"
+    ::= { tnTestHdCommandEntry 3 }
+
+tnTestHdElapsedTime OBJECT-TYPE
+    SYNTAX      Integer32 (100000)
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "tnTestHdElapsedTime is the elapsed time since test head test
+        has started"
+    ::= { tnTestHdCommandEntry 4 }
+
+tnTestHdFc OBJECT-TYPE
+    SYNTAX       TFCName
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "tnTestHdFc is an  optional parameter that needs to be
+        set along with tnTestHdAdminStatus to start a test head
+        test.If tnTestHdFc is not given along with
+        tnTestHdAdminStatus default forwarding class 'be' would be
+        used"
+    DEFVAL { "be" }
+    ::= { tnTestHdCommandEntry 5 }
+
+tnTestHdAvgLatency OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483000)
+    UNITS       "microseconds"
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "tnTestHdAvgLatency is the measured average latency in the
+        test head run. tnTestHdAvgLatency is sent in the trap upon
+        test completion"
+    ::= { tnTestHdCommandEntry 6 }
+
+
+tnTestHdFrLossRatio OBJECT-TYPE
+    SYNTAX      Integer32 (0..10000000)
+    UNITS       "10000th of a percent"
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "tnTestHdFrLossRatio is the measured frame loss ratio
+        in the test head run. tnTestHdFrLossRatio is sent in the
+        trap upon test completion"
+    ::= { tnTestHdCommandEntry 7 }
+
+tnTestHdJitter OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483000)
+    UNITS       "microseconds"
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "tnTestHdJitter is the measured jitter  in the test head run.
+        tnTestHdJitter is sent in the trap upon test completion"
+    ::= { tnTestHdCommandEntry 8 }
+
+tnTestHdDsiredThrpt OBJECT-TYPE
+    SYNTAX      Integer32 (100000)
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "tnTestHdDsiredThrpt is the desired through put in the test head
+        run. tnTestHdDsiredThrpt is sent in the trap upon test completion"
+    ::= { tnTestHdCommandEntry 9 }
+
+
+tnTestHdAchvdThrpt OBJECT-TYPE
+    SYNTAX      Integer32 (100000)
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "tnTestHdAchvdThrpt is the acheived through put in the test head
+        run. tnTestHdAchvdThrpt is sent in the trap upon test completion"
+    ::= { tnTestHdCommandEntry 10 }
+
+tnTestHdCompleted OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "tnTestHdCompleted is true if the test is completed else it is
+        false. tnTestHdCompleted is sent in the trap upon test completion"
+    ::= { tnTestHdCommandEntry 11 }
+
+tnTestHdStopped OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "tnTestHdStopped is true if the test is stopped midway else it is
+        false. tnTestHdStopped is sent in the trap upon test completion"
+    ::= { tnTestHdCommandEntry 12 }
+
+tnTestHdTestStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    pass (1),
+                    fail (2),
+                    not-available(3)
+                }
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "tnTestHdTestStatus is sent in the trap upon test completion.
+        tnTestHdTestStatus is pass if the desired test results are
+        acheived."
+    ::= { tnTestHdCommandEntry 13 }
+
+tnTestHdCompletedTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "tnTestHdCompletedTime is the time at which test head run
+        has completed. tnTestHdCompletedTime is sent in the trap upon
+        test completion."
+    ::= { tnTestHdCommandEntry 14 }
+
+tnTestHdSapPortId OBJECT-TYPE
+    SYNTAX          TmnxPortID
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+         "The Sap Port ID to be used for the test run, it has to be supplied
+         along with tnTestHdSapEncapValue when the test is started.
+         "
+    ::= { tnTestHdCommandEntry 15 }
+
+tnTestHdSapEncapValue OBJECT-TYPE
+    SYNTAX          TmnxEncapVal
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+         "The Sap Encap value to be used for the test run, it has to be supplied
+         along with tnTestHdSapPortId when the test is started.
+         "
+    ::= { tnTestHdCommandEntry 16 }
+
+tnTestHdAdminStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                          enabled(1), -- test should be started
+                          disabled(2) -- test should be stopped
+                        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Reflects the desired state that a Test Head should be
+         in:
+
+           enabled(1)  - Attempt to activate the test as defined by
+            tnTestHdName, tnTestHdOwner, tnTestHdProfId,
+            tnTestHdPayLdId, tnTestHdAccCritId, tnTestHdSapPortId,
+            tnTestHdSapEncapValue, tnTestHdFc
+                         .
+           disabled(2) - Deactivate the test as defined by this
+                         tmnxOamPingCtlEntry.
+
+         An attempt to set tmnxOamPingCtlAdminStatus to 'enabled' will fail
+         if the parameters required by a particular TestHead test have
+         not been set along with tnTestHdAdminStatus  Upon completion of
+         a Test head test, he agent will reset the value of this object to
+         'disabled'. When this object has the value 'enabled' an attempt to modify
+         any of the test parameters will fail with an inconsistentValue
+         error."
+    DEFVAL { disabled }
+    ::= { tnTestHdCommandEntry 17 }
+
+tnTestHdProfId OBJECT-TYPE
+    SYNTAX       Integer32 (0..10)
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+         "tnTestHdProfId is the test head profile to be used for
+         the test run, it has to be supplied along with tnTestHdAdminStatus
+         when the test is started. tnTestHdProfEntry corresponding to
+         tnTestHdProfId should be creted before starting the test.
+         "
+    ::= { tnTestHdCommandEntry 18 }
+
+tnTestHdAccCritId OBJECT-TYPE
+    SYNTAX       Integer32 (1..4)
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+         "tnTestHdAccCritId is the acceptance criteria to be used for
+         the test run, it is an optional parameter to be supplied along
+         with tnTestHdAdminStatus when the test is started.
+         tnTestHdAccCritEntry corresponding to tnTestHdAccCritId
+         should be creted before starting the test.
+         "
+    ::= { tnTestHdCommandEntry 19 }
+
+tnTestHdPayLdId OBJECT-TYPE
+    SYNTAX       Integer32 (1..4)
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+         "tnTestHdPayLd is the frame payload to be used for
+         the test run, it is an optional parameter to be supplied along
+         with tnTestHdAdminStatus when the test is started.
+         tnTestHdPayLdEntry corresponding to tnTestHdPayLdIndex
+         should be creted before starting the test.
+         "
+    ::= { tnTestHdCommandEntry 20 }
+
+tnTestHdColorAware OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+         "tnTestHdColorAware can be set to true to run when the test
+         is started to run color-aware tests.
+         "
+    ::= { tnTestHdCommandEntry 21 }
+
+-- tmnxOamTestHeadTestCompleted NOTIFICATION-TYPE
+--    OBJECTS {
+--        tnTestHdName,
+--        tnTestHdOwner,
+--        tnTestHdStartTime,
+--        tnTestHdCompletedTime,
+--        tnTestHdElapsedTime,
+--        tnTestHdProfIndex,
+--        tnTestHdAccCritIndex,
+--        tnTestHdPayLdIndex,
+--        svcId,
+--        tnTestHdSapPortId,
+--        tnTestHdSapEncapValue,
+--        tnTestHdFc,
+--        tnTestHdDsiredThrpt,
+--        tnTestHdCompleted,
+--        tnTestHdStopped,
+--        tnTestHdTestStatus,
+--        tnTestHdAvgLatency,
+--        tnTestHdFrLossRatio,
+--        tnTestHdJitter,
+--        tnTestHdAchvdThrpt
+--    }
+--    STATUS  current
+--    DESCRIPTION
+--        "Generated at the completion of Test Head completion."
+--    ::= { tmnxSASOamNotifications 1 }
+
+-- tnTestHdFullResultsTable OBJECT-TYPE
+--    SYNTAX       SEQUENCE OF TnTestHdFullResultsEntry
+--    MAX-ACCESS   not-accessible
+--    STATUS       current
+--    DESCRIPTION
+--        "This table maintains the mapping of a particular
+--         forwarding class traffic into the specified queue."
+--    ::= { tnTestHdProfObjects 7 }
+
+-- tnTestHdFullResultsEntry OBJECT-TYPE
+--    SYNTAX       TnTestHdFullResultsEntry
+--    MAX-ACCESS   not-accessible
+--    STATUS       current
+--    DESCRIPTION
+--        "Information about a particular test head result.
+
+--         Entries are read-only for the user."
+--    INDEX { tnSysSwitchId, tnTestHdResultsName, tnTestHdResultsOwner  }
+--    ::= { tnTestHdFullResultsTable 1 }
+
+-- TnTestHdFullResultsEntry ::= SEQUENCE
+--  {
+--        tnTestHdResultsName                     SnmpAdminString,
+--        tnTestHdResultsOwner                    SnmpAdminString,
+--        tnTestHdResultsStartTime                DateAndTime,
+--        tnTestHdResultsElapsedTime              INTEGER,
+--        tnTestHdResultsFc                       TFCName,
+--        tnTestHdResultsAvgLatency               INTEGER,
+--        tnTestHdResultsFrLossRatio              INTEGER,
+--        tnTestHdResultsJitter                   INTEGER,
+--        tnTestHdResultsDsiredThrpt              INTEGER,
+--        tnTestHdResultsAchvdThrpt               INTEGER,
+--        tnTestHdResultsCompleted                TruthValue,
+--        tnTestHdResultsStopped                  TruthValue,
+--        tnTestHdResultsTestStatus               INTEGER,
+--        tnTestHdResultsCompletedTime            DateAndTime,
+--        tnTestHdResultsSapPortId                TmnxPortID,
+--        tnTestHdResultsSapEncapValue            TmnxEncapVal,
+--        tnTestHdResultsAdminStatus              INTEGER,
+--        tnTestHdResultsProfId                   INTEGER,
+--        tnTestHdResultsAccCritId                INTEGER,
+--        tnTestHdResultsPayLdId                  INTEGER,
+--        tnTestHdResultsColorAware               TruthValue,
+
+--        tnTestHdResultsProfIndex                INTEGER,
+--        tnTestHdResultsProfRowStatus            RowStatus,
+--        tnTestHdResultsProfDescription          TItemDescription,
+--        tnTestHdResultsProfCIRAdaptation        TAdaptationRule,
+--        tnTestHdResultsProfOperCIR              TTestHdCIRRate,
+--        tnTestHdResultsProfDurHr                Integer32,
+--        tnTestHdResultsProfDurMin               Integer32,
+--        tnTestHdResultsProfDurSec               Integer32,
+--        tnTestHdResultsProfFrameSize            INTEGER,
+--        tnTestHdResultsProfTrapEnable           TruthValue,
+--        tnTestHdResultsLastChanged              TimeStamp,
+--        tnTestHdResultsProfAdminCIR             TTestHdCIRRate,
+--        tnTestHdResultsProfAdminPIR             TTestHdPIRRate,
+--        tnTestHdResultsProfOperPIR              TTestHdPIRRate,
+--        tnTestHdResultsProfDot1pIn              Dot1PPriority,
+--        tnTestHdResultsProfDot1pOut             Dot1PPriority,
+--        tnTestHdResultsProfActiveTests          OCTET STRING,
+--        tnTestHdResultsProfCompletedTests       OCTET STRING,
+
+--        tnTestHdResultsPayLdIndex               INTEGER,
+--        tnTestHdResultsPayLdRowStatus           RowStatus,
+--        tnTestHdResultsPayLdDesc                TItemDescription,
+--        tnTestHdResultsPayLddataPattrn          OCTET STRING,
+--        tnTestHdResultsPayLdSrcIpv4Addr         IpAddress,
+--        tnTestHdResultsPayLdDstIpv4Addr         IpAddress,
+--        tnTestHdResultsPayLdDSCP                TDSCPNameOrEmpty,
+--        tnTestHdResultsPayLdIpProto             INTEGER,
+--        tnTestHdResultsPayLdIpTos               INTEGER,
+--        tnTestHdResultsPayLdIpTTL               INTEGER,
+--        tnTestHdResultsPayLdSrcMac              MacAddress,
+--        tnTestHdResultsPayLdDstMac              MacAddress,
+--        tnTestHdResultsPayLdSrcPort             INTEGER,
+--        tnTestHdResultsPayLdDstPort             INTEGER,
+--        tnTestHdResultsPayLdLastChanged         TimeStamp,
+--        tnTestHdResultsPayLdType                INTEGER,
+--        tnTestHdResultsPayLdVTagOne             Integer32,
+--        tnTestHdResultsPayLdVTagOneTpid         Unsigned32,
+--        tnTestHdResultsPayLdVTagOneDot1p        Dot1PPriority,
+--        tnTestHdResultsPayLdVTagTwo             Integer32,
+--        tnTestHdResultsPayLdVTagTwoTpid         Unsigned32,
+--        tnTestHdResultsPayLdVTagTwoDot1p        Dot1PPriority,
+--        tnTestHdResultsPayLdEthertype           Unsigned32,
+--        tnTestHdResultsPayLdVTagOneDei          Unsigned32,
+--        tnTestHdResultsPayLdVTagTwoDei          Unsigned32,
+
+--        tnTestHdResultsAccCritIndex             INTEGER,
+--        tnTestHdResultsAccCritRowStatus         RowStatus,
+--        tnTestHdResultsAccCritJittrRiseThres    INTEGER,
+--        tnTestHdResultsAccCritLatRiseThres      INTEGER,
+--        tnTestHdResultsAccCritLossRiseThres     INTEGER,
+--        tnTestHdResultsAccCritLastChanged       TimeStamp,
+--        tnTestHdResultsAccCritLossRiseThresIn   INTEGER,
+--        tnTestHdResultsAccCritLossRiseThresOut  INTEGER,
+--        tnTestHdResultsAccCritCirThres          INTEGER,
+--        tnTestHdResultsAccCritPirThres          INTEGER,
+--        tnTestHdResultsAccCritLatRiseThresIn    INTEGER,
+--        tnTestHdResultsAccCritLatRiseThresOut   INTEGER,
+--        tnTestHdResultsAccCritJittrRiseThresIn  INTEGER,
+--        tnTestHdResultsAccCritJittrRiseThresOut INTEGER,
+
+--        tnTestHdResultsResProfId                   INTEGER,
+--        tnTestHdResultsResProfPayLdId              INTEGER,
+--        tnTestHdResultsResProfAccCritId            INTEGER,
+--        tnTestHdResultsResTransCount               Counter64,
+--        tnTestHdResultsResRecvCount                Counter64,
+--        tnTestHdResultsResMeasuredThruput          INTEGER,
+--        tnTestHdResultsResMeasuredFLR              INTEGER,
+--        tnTestHdResultsResMeasuredLatency          Counter64,
+--        tnTestHdResultsResLatencyAccptanceResult   INTEGER,
+--        tnTestHdResultsResMeasuredJitter           INTEGER,
+--        tnTestHdResultsResJitterAccptanceResult    INTEGER,
+--        tnTestHdResultsResSapPortId                TmnxPortID,
+--        tnTestHdResultsResSapEncapValue            TmnxEncapVal,
+--        tnTestHdResultsResFLRAccptanceResult       INTEGER,
+--        tnTestHdResultsResMinLatency               Counter64,
+--        tnTestHdResultsResMaxLatency               Counter64,
+
+--        tnTestHdResultsSessStartTime               DateAndTime,
+--        tnTestHdResultsSessCompletedTime           DateAndTime,
+--        tnTestHdResultsSessTotalTime               INTEGER,
+--        tnTestHdResultsSessFc                      TFCName,
+--        tnTestHdResultsSessCompleted               TruthValue,
+--        tnTestHdResultsSessStopped                 TruthValue,
+--        tnTestHdResultsSessProfId                  INTEGER,
+--        tnTestHdResultsSessPayLdId                 INTEGER,
+--        tnTestHdResultsSessAccCritId               INTEGER,
+--        tnTestHdResultsSessSapPortId               TmnxPortID,
+
+--        tnTestHdResultsSessSapEncapValue           TmnxEncapVal
+--    }
+
+-- tnTestHdResultsName OBJECT-TYPE
+--    SYNTAX      SnmpAdminString (SIZE(1..32))
+--    MAX-ACCESS  read-only
+--    STATUS      current
+--    DESCRIPTION
+--        "tnTestHdName is a mandatory parameter that needs to be
+--        set along with tnTestHdAdminStatus to start a test head
+--        test.
+--        "
+--    ::= { tnTestHdFullResultsEntry 1 }
+
+-- tnTestHdResultsOwner OBJECT-TYPE
+--    SYNTAX      SnmpAdminString (SIZE(1..32))
+--    MAX-ACCESS  read-only
+--    STATUS      current
+--    DESCRIPTION
+--        "tnTestHdOwner is a mandatory parameter that needs to be
+--        set along with tnTestHdAdminStatus to start a test head
+--        test."
+--    ::= { tnTestHdFullResultsEntry 2 }
+
+-- tnTestHdResultsStartTime OBJECT-TYPE
+--    SYNTAX      DateAndTime
+--    MAX-ACCESS  read-only
+--    STATUS      current
+--    DESCRIPTION
+--        "tnTestHdStartTime test head start time sent in the trap
+--        message"
+--    ::= { tnTestHdFullResultsEntry 3 }
+
+-- tnTestHdResultsElapsedTime OBJECT-TYPE
+--    SYNTAX      INTEGER  (100000)
+--    UNITS       "seconds"
+--    MAX-ACCESS  read-only
+--    STATUS      current
+--    DESCRIPTION
+--        "tnTestHdElapsedTime is the elapsed time since test head test
+--        has started"
+--    ::= { tnTestHdFullResultsEntry 4 }
+
+-- tnTestHdResultsFc OBJECT-TYPE
+--    SYNTAX       TFCName
+--    MAX-ACCESS   read-only
+--    STATUS       current
+--    DESCRIPTION
+--        "tnTestHdFc is an  optional parameter that needs to be
+--        set along with tnTestHdAdminStatus to start a test head
+--        test.If tnTestHdFc is not given along with
+--        tnTestHdAdminStatus default forwarding class 'be' would be
+--        used"
+--    DEFVAL { "be" }
+--    ::= { tnTestHdFullResultsEntry 5 }
+
+-- tnTestHdResultsAvgLatency OBJECT-TYPE
+--    SYNTAX      INTEGER (0..2147483000)
+--    UNITS       "microseconds"
+--    MAX-ACCESS   read-only
+--    STATUS       current
+--    DESCRIPTION
+--        "tnTestHdAvgLatency is the measured average latency in the
+--        test head run. tnTestHdAvgLatency is sent in the trap upon
+--        test completion"
+--    ::= { tnTestHdFullResultsEntry 6 }
+
+
+-- tnTestHdResultsFrLossRatio OBJECT-TYPE
+--    SYNTAX      INTEGER (0..10000000)
+--    UNITS       "10000th of a percent"
+--    MAX-ACCESS   read-only
+--    STATUS       current
+--    DESCRIPTION
+--        "tnTestHdFrLossRatio is the measured frame loss ratio
+--        in the test head run. tnTestHdFrLossRatio is sent in the
+--        trap upon test completion"
+--    ::= { tnTestHdFullResultsEntry 7 }
+
+-- tnTestHdResultsJitter OBJECT-TYPE
+--    SYNTAX      INTEGER (0..2147483000)
+--    UNITS       "microseconds"
+--    MAX-ACCESS   read-only
+--    STATUS       current
+--    DESCRIPTION
+--        "tnTestHdJitter is the measured jitter  in the test head run.
+--        tnTestHdJitter is sent in the trap upon test completion"
+--    ::= { tnTestHdFullResultsEntry 8 }
+
+-- tnTestHdResultsDsiredThrpt OBJECT-TYPE
+--    SYNTAX      INTEGER  (100000)
+--    MAX-ACCESS   read-only
+--    STATUS       current
+--    DESCRIPTION
+--        "tnTestHdDsiredThrpt is the desired through put in the test head
+--        run. tnTestHdDsiredThrpt is sent in the trap upon test completion"
+--    ::= { tnTestHdFullResultsEntry 9 }
+
+
+-- tnTestHdResultsAchvdThrpt OBJECT-TYPE
+--    SYNTAX      INTEGER  (100000)
+--    MAX-ACCESS   read-only
+--    STATUS       current
+--    DESCRIPTION
+--        "tnTestHdAchvdThrpt is the acheived through put in the test head
+--        run. tnTestHdAchvdThrpt is sent in the trap upon test completion"
+--    ::= { tnTestHdFullResultsEntry 10 }
+
+-- tnTestHdResultsCompleted OBJECT-TYPE
+--    SYNTAX      TruthValue
+--    MAX-ACCESS   read-only
+--    STATUS       current
+--    DESCRIPTION
+--        "tnTestHdCompleted is true if the test is completed else it is
+--        false. tnTestHdCompleted is sent in the trap upon test completion"
+--    ::= { tnTestHdFullResultsEntry 11 }
+
+-- tnTestHdResultsStopped OBJECT-TYPE
+--    SYNTAX      TruthValue
+--    MAX-ACCESS   read-only
+--    STATUS       current
+--    DESCRIPTION
+--        "tnTestHdStopped is true if the test is stopped midway else it is
+--        false. tnTestHdStopped is sent in the trap upon test completion"
+--    ::= { tnTestHdFullResultsEntry 12 }
+
+-- tnTestHdResultsTestStatus OBJECT-TYPE
+--    SYNTAX      INTEGER {
+--                    pass (1),
+--                    fail (2),
+--                    not-available(3)
+--                }
+--    MAX-ACCESS   read-only
+--    STATUS       current
+--    DESCRIPTION
+--        "tnTestHdTestStatus is sent in the trap upon test completion.
+--        tnTestHdTestStatus is pass if the desired test results are
+--        acheived."
+--    ::= { tnTestHdFullResultsEntry 13 }
+
+-- tnTestHdResultsCompletedTime OBJECT-TYPE
+--    SYNTAX      DateAndTime
+--    MAX-ACCESS  read-only
+--    STATUS      current
+--    DESCRIPTION
+--        "tnTestHdCompletedTime is the time at which test head run
+--        has completed. tnTestHdCompletedTime is sent in the trap upon
+--        test completion."
+--    ::= { tnTestHdFullResultsEntry 14 }
+
+-- tnTestHdResultsSapPortId OBJECT-TYPE
+--    SYNTAX          TmnxPortID
+--    MAX-ACCESS      read-only
+--    STATUS          current
+--    DESCRIPTION
+--         "The Sap Port ID to be used for the test run, it has to be supplied
+--         along with tnTestHdSapEncapValue when the test is started.
+--         "
+--    ::= { tnTestHdFullResultsEntry 15 }
+
+-- tnTestHdResultsSapEncapValue OBJECT-TYPE
+--    SYNTAX          TmnxEncapVal
+--    MAX-ACCESS      read-only
+--    STATUS          current
+--    DESCRIPTION
+--         "The Sap Encap value to be used for the test run, it has to be supplied
+--         along with tnTestHdSapPortId when the test is started.
+--         "
+--    ::= { tnTestHdFullResultsEntry 16 }
+
+-- tnTestHdResultsAdminStatus OBJECT-TYPE
+--    SYNTAX      INTEGER {
+--                          enabled(1),  test should be started
+--                          disabled(2)  test should be stopped
+--                        }
+--    MAX-ACCESS  read-only
+--    STATUS      current
+--    DESCRIPTION
+--        "Reflects the desired state that a Test Head should be
+--         in:
+
+--           enabled(1)  - Attempt to activate the test as defined by
+--            tnTestHdName, tnTestHdOwner, tnTestHdResultsProfId,
+--            tnTestHdResultsPayLdId, tnTestHdResultsAccCritId, tnTestHdSapPortId,
+--            tnTestHdSapEncapValue, tnTestHdFc
+--                         .
+--           disabled(2) - Deactivate the test as defined by this
+--                         tmnxOamPingCtlEntry.
+
+--         An attempt to set tmnxOamPingCtlAdminStatus to 'enabled' will fail
+--         if the parameters required by a particular TestHead test have
+--         not been set along with tnTestHdAdminStatus  Upon completion of
+--         a Test head test, he agent will reset the value of this object to
+--         'disabled'. When this object has the value 'enabled' an attempt to modify
+--         any of the test parameters will fail with an inconsistentValue
+--         error."
+--    DEFVAL { disabled }
+--    ::= { tnTestHdFullResultsEntry 17 }
+
+-- tnTestHdResultsProfId OBJECT-TYPE
+--    SYNTAX       INTEGER (0..10)
+--    MAX-ACCESS   read-only
+--    STATUS       current
+--    DESCRIPTION
+--         "tnTestHdResultsProfId is the test head profile to be used for
+--         the test run, it has to be supplied along with tnTestHdAdminStatus
+--         when the test is started. tnTestHdResultsProfEntry corresponding to
+--         tnTestHdResultsProfId should be creted before starting the test.
+--         "
+--    ::= { tnTestHdFullResultsEntry 18 }
+
+-- tnTestHdResultsAccCritId OBJECT-TYPE
+--    SYNTAX       INTEGER (1..4)
+--    MAX-ACCESS   read-only
+--    STATUS       current
+--    DESCRIPTION
+--         "tnTestHdResultsAccCritId is the acceptance criteria to be used for
+--         the test run, it is an optional parameter to be supplied along
+--         with tnTestHdAdminStatus when the test is started.
+--         tnTestHdResultsAccCritEntry corresponding to tnTestHdResultsAccCritId
+--         should be creted before starting the test.
+--         "
+--    ::= { tnTestHdFullResultsEntry 19 }
+
+-- tnTestHdResultsPayLdId OBJECT-TYPE
+--    SYNTAX       INTEGER (1..4)
+--    MAX-ACCESS   read-only
+--    STATUS       current
+--    DESCRIPTION
+--         "tnTestHdResultsPayLd is the frame payload to be used for
+--         the test run, it is an optional parameter to be supplied along
+--         with tnTestHdAdminStatus when the test is started.
+--         tnTestHdResultsPayLdEntry corresponding to tnTestHdResultsPayLdIndex
+--         should be creted before starting the test.
+--         "
+--    ::= { tnTestHdFullResultsEntry 20 }
+
+-- tnTestHdResultsColorAware OBJECT-TYPE
+--    SYNTAX       TruthValue
+--    MAX-ACCESS   read-only
+--    STATUS       current
+--    DESCRIPTION
+--         "tnTestHdResultsColorAware can be set to true to run when the test
+--         is started to run color-aware tests.
+--         "
+--    ::= { tnTestHdFullResultsEntry 21 }
+
+-- tnTestHdResultsProfIndex OBJECT-TYPE
+--    SYNTAX       INTEGER (0..10)
+--    MAX-ACCESS   read-only
+--    STATUS       current
+--    DESCRIPTION
+--        "tnTestHdResultsProfIndex profile index for this entry"
+--    ::= { tnTestHdFullResultsEntry 22 }
+
+-- tnTestHdResultsProfRowStatus OBJECT-TYPE
+--    SYNTAX       RowStatus
+--    MAX-ACCESS   read-only
+--    STATUS       current
+--    DESCRIPTION
+--        "RowStatus for this entry"
+--    ::= { tnTestHdFullResultsEntry 23 }
+
+-- tnTestHdResultsProfDescription OBJECT-TYPE
+--    SYNTAX       TItemDescription
+--    MAX-ACCESS   read-only
+--    STATUS       current
+--    DESCRIPTION
+--        "user description for this profile"
+--    DEFVAL { ''H }
+--    ::= { tnTestHdFullResultsEntry 24 }
+
+
+-- tnTestHdResultsProfCIRAdaptation OBJECT-TYPE
+--    SYNTAX       TAdaptationRule
+--    MAX-ACCESS   read-only
+--    STATUS       current
+--    DESCRIPTION
+--        "cir rule to be used in the test head test"
+--    DEFVAL { closest }
+--    ::= { tnTestHdFullResultsEntry 25 }
+
+-- tnTestHdResultsProfOperCIR OBJECT-TYPE
+--    SYNTAX       TTestHdCIRRate
+--    MAX-ACCESS   read-only
+--    STATUS       current
+--    DESCRIPTION
+--        "oper cir used in the payload"
+--    ::= { tnTestHdFullResultsEntry 26 }
+
+-- tnTestHdResultsProfDurHr  OBJECT-TYPE
+--    SYNTAX      Integer32 (0..24)
+--    UNITS       "hours"
+--    MAX-ACCESS  read-only
+--    STATUS      current
+--    DESCRIPTION
+--        "tnTestHdResultsProfDurHr is the number of hours the test head
+--        test to be run"
+--    DEFVAL { 0 }
+--    ::= { tnTestHdFullResultsEntry 27 }
+
+-- tnTestHdResultsProfDurMin  OBJECT-TYPE
+--    SYNTAX      Integer32 (0..60)
+--    UNITS       "minutes"
+--    MAX-ACCESS  read-only
+--    STATUS      current
+--    DESCRIPTION
+--        "tnTestHdResultsProfDurMin is the number of minutes the test head
+--        test to be run"
+--    DEFVAL { 3 }
+--    ::= { tnTestHdFullResultsEntry 28 }
+
+
+-- tnTestHdResultsProfDurSec  OBJECT-TYPE
+--    SYNTAX      Integer32 (0..60)
+--    UNITS       "seconds"
+--    MAX-ACCESS  read-only
+--    STATUS      current
+--    DESCRIPTION
+--        "tnTestHdResultsProfDurSec is the number of seconds the test head
+--        test to be run"
+--    DEFVAL { 0 }
+--    ::= { tnTestHdFullResultsEntry 29 }
+
+
+-- tnTestHdResultsProfFrameSize  OBJECT-TYPE
+--    SYNTAX      INTEGER (64..9212)
+--    MAX-ACCESS  read-only
+--    STATUS      current
+--    DESCRIPTION
+--        "tnTestHdResultsProfFrameSize is the frame size to be used in frame
+--        payload"
+--    DEFVAL { 1514 }
+--    ::= { tnTestHdFullResultsEntry 30 }
+
+
+-- tnTestHdResultsProfTrapEnable OBJECT-TYPE
+--    SYNTAX       TruthValue
+--    MAX-ACCESS   read-only
+--    STATUS       current
+--    DESCRIPTION
+--        "tnTestHdResultsProfTrapEnable when set to true tmnxOamTestHeadTestCompleted
+--        trap will be sent when the test run completes."
+--    DEFVAL { false }
+--    ::= { tnTestHdFullResultsEntry 31 }
+
+-- tnTestHdResultsLastChanged OBJECT-TYPE
+--    SYNTAX       TimeStamp
+--    MAX-ACCESS   read-only
+--    STATUS       current
+--    DESCRIPTION
+--        "The value tnTestHdLastChanged indicates the system uptime when
+--        an entry in tnTestHdResultsProfTable was last changed."
+--    ::= { tnTestHdFullResultsEntry 32 }
+
+-- tnTestHdResultsProfAdminCIR OBJECT-TYPE
+--    SYNTAX       TTestHdCIRRate
+--    MAX-ACCESS   read-only
+--    STATUS       current
+--    DESCRIPTION
+--        "admin cir to be used in the payload"
+--    DEFVAL { 1000 }
+--    ::= { tnTestHdFullResultsEntry 33 }
+
+
+-- tnTestHdResultsProfAdminPIR OBJECT-TYPE
+--    SYNTAX       TTestHdPIRRate
+--    MAX-ACCESS   read-only
+--    STATUS       current
+--    DESCRIPTION
+--        "admin pir to be used in the payload"
+--    DEFVAL { -1 }
+--    ::= { tnTestHdFullResultsEntry 34 }
+
+-- tnTestHdResultsProfOperPIR OBJECT-TYPE
+--    SYNTAX       TTestHdPIRRate
+--    MAX-ACCESS   read-only
+--    STATUS       current
+--    DESCRIPTION
+--        "oper pir used in the payload"
+--    ::= { tnTestHdFullResultsEntry 35 }
+
+-- tnTestHdResultsProfDot1pIn OBJECT-TYPE
+--    SYNTAX       Dot1PPriority
+--    MAX-ACCESS   read-only
+--    STATUS       current
+--    DESCRIPTION
+--        "dot1p-in value to for this profile.
+--        "
+--    DEFVAL { -1 }
+--    ::= { tnTestHdFullResultsEntry 36 }
+
+-- tnTestHdResultsProfDot1pOut OBJECT-TYPE
+--    SYNTAX       Dot1PPriority
+--    MAX-ACCESS   read-only
+--    STATUS       current
+--    DESCRIPTION
+--        "dot1p-out value to for this profile.
+--        "
+--    DEFVAL { -1 }
+--    ::= { tnTestHdFullResultsEntry 37 }
+
+-- tnTestHdResultsProfActiveTests OBJECT-TYPE
+--    SYNTAX       OCTET STRING (SIZE(0..514))
+--    MAX-ACCESS   read-only
+--    STATUS       current
+--    DESCRIPTION
+--        "Active tests that are using this profile
+--        "
+--    ::= { tnTestHdFullResultsEntry 38 }
+
+-- tnTestHdResultsProfCompletedTests OBJECT-TYPE
+--    SYNTAX       OCTET STRING (SIZE(0..514))
+--    MAX-ACCESS   read-only
+--    STATUS       current
+--    DESCRIPTION
+--        "Completed tests that have used this profile
+--        "
+--    ::= { tnTestHdFullResultsEntry 39 }
+
+-- tnTestHdResultsPayLdIndex OBJECT-TYPE
+--    SYNTAX       INTEGER (1..4)
+--    MAX-ACCESS   read-only
+--    STATUS       current
+--    DESCRIPTION
+--        "tnTestHdFullResultsIndex is the payload index"
+--    ::= { tnTestHdFullResultsEntry 40 }
+
+-- tnTestHdResultsPayLdRowStatus OBJECT-TYPE
+--    SYNTAX       RowStatus
+--    MAX-ACCESS   read-only
+--    STATUS       current
+--    DESCRIPTION
+--        "Row Status for this entry."
+--    ::= { tnTestHdFullResultsEntry 41 }
+
+-- tnTestHdResultsPayLdDesc OBJECT-TYPE
+--    SYNTAX       TItemDescription
+--    MAX-ACCESS   read-only
+--    STATUS       current
+--    DESCRIPTION "tnTestHdFullResultsDesc is the textual description
+--                entered by user for this payload"
+--    DEFVAL { ''H }
+--    ::= { tnTestHdFullResultsEntry 42 }
+
+-- tnTestHdResultsPayLddataPattrn OBJECT-TYPE
+--    SYNTAX       OCTET STRING (SIZE (0..64))
+--    MAX-ACCESS   read-only
+--    STATUS       current
+--    DESCRIPTION
+--        "tnTestHdFullResultsdataPattrn is string of characters 0-9,a-f
+--        It is used to fill up the data field of the payload of the frame,
+--        repeating it in the payload field as many time as need to fill
+--        up the entire length of the payload"
+--    DEFVAL { "a1b2c3d4e5f6" }
+--    ::= { tnTestHdFullResultsEntry 43 }
+
+-- tnTestHdResultsPayLdSrcIpv4Addr  OBJECT-TYPE
+--    SYNTAX      IpAddress
+--    MAX-ACCESS  read-only
+--    STATUS      current
+--    DESCRIPTION
+--        "tnTestHdResultsPayLdSrcIpv4Addr is the source ip address to be used
+--        in frame payload"
+--    DEFVAL { 0 }
+--    ::= { tnTestHdFullResultsEntry 44 }
+
+
+-- tnTestHdResultsPayLdDstIpv4Addr  OBJECT-TYPE
+--    SYNTAX      IpAddress
+--    MAX-ACCESS  read-only
+--    STATUS      current
+--    DESCRIPTION
+--        "tnTestHdResultsPayLdDstIpv4Addr is the destination ip address to be used
+--        in frame payload"
+--    DEFVAL { 0 }
+--    ::= { tnTestHdFullResultsEntry 45 }
+
+
+-- tnTestHdResultsPayLdDSCP OBJECT-TYPE
+--    SYNTAX       TDSCPNameOrEmpty
+--    MAX-ACCESS   read-only
+--    STATUS       current
+--    DESCRIPTION
+--        "tnTestHdResultsPayLdDSCP is the dscp value  to be used in frame payload"
+--    DEFVAL { "be" }
+--    ::= { tnTestHdFullResultsEntry 46 }
+
+-- tnTestHdResultsPayLdIpProto OBJECT-TYPE
+--    SYNTAX       INTEGER (0..255)
+--    MAX-ACCESS   read-only
+--    STATUS       current
+--    DESCRIPTION
+--        "tnTestHdResultsPayLdIpProto is the ip protocal value  to be used in frame
+--        payload"
+--    DEFVAL { 0 }
+--    ::= { tnTestHdFullResultsEntry 47 }
+
+-- tnTestHdResultsPayLdIpTos OBJECT-TYPE
+--    SYNTAX       INTEGER (0..8)
+--    MAX-ACCESS   read-only
+--    STATUS       current
+--    DESCRIPTION
+--        "tnTestHdResultsPayLdIpTos is the ip type of service value  to be used in frame
+--        payload"
+--    DEFVAL { 0 }
+--    ::= { tnTestHdFullResultsEntry 48 }
+
+-- tnTestHdResultsPayLdIpTTL OBJECT-TYPE
+--    SYNTAX       INTEGER (1..255)
+--    MAX-ACCESS   read-only
+--    STATUS       current
+--    DESCRIPTION
+--        "tnTestHdResultsPayLdIpTTL is the ip time to live value  to be used in frame
+--        payload"
+--    DEFVAL { 255 }
+--    ::= { tnTestHdFullResultsEntry 49 }
+
+-- tnTestHdResultsPayLdSrcMac OBJECT-TYPE
+--    SYNTAX          MacAddress
+--    MAX-ACCESS      read-only
+--    STATUS          current
+--    DESCRIPTION
+--        "Source MAC to be used in the frame payload."
+--    DEFVAL { '000000000000'H }
+--    ::= { tnTestHdFullResultsEntry 50 }
+
+-- tnTestHdResultsPayLdDstMac OBJECT-TYPE
+--    SYNTAX          MacAddress
+--    MAX-ACCESS      read-only
+--    STATUS          current
+--    DESCRIPTION
+--        "Destination MAC to be used in the frame payload."
+--    DEFVAL { '000000000000'H }
+--    ::= { tnTestHdFullResultsEntry 51 }
+
+-- tnTestHdResultsPayLdSrcPort OBJECT-TYPE
+--    SYNTAX          INTEGER(0..65535)
+--    MAX-ACCESS      read-only
+--    STATUS          current
+--    DESCRIPTION
+--        "Source Port to be used in the frame payload."
+--    DEFVAL { 0 }
+--    ::= { tnTestHdFullResultsEntry 52 }
+
+
+-- tnTestHdResultsPayLdDstPort OBJECT-TYPE
+--    SYNTAX          INTEGER(0..65535)
+--    MAX-ACCESS      read-only
+--    STATUS          current
+--    DESCRIPTION
+--        "Destination Port to be used in the frame payload."
+--    DEFVAL { 0 }
+--    ::= { tnTestHdFullResultsEntry 53 }
+
+-- tnTestHdResultsPayLdLastChanged OBJECT-TYPE
+--    SYNTAX       TimeStamp
+--    MAX-ACCESS   read-only
+--    STATUS       current
+--    DESCRIPTION
+--        "The value tnTestHdResultsPayLdLastChanged indicates the system
+--        uptime when an entry in tnTestHdResultsPayLdTable was last changed."
+--    ::= { tnTestHdFullResultsEntry 54 }
+
+-- tnTestHdResultsPayLdType OBJECT-TYPE
+--    SYNTAX       INTEGER {
+--                          tcp-ipv4 (1),
+--                          l2 (2),
+--                          udp-ipv4 (3),
+--                          ipv4 (4)
+--                        }
+--    MAX-ACCESS   read-only
+--    STATUS       current
+--    DESCRIPTION
+--        "tnTestHdResultsPayLdType indicates the payload type for
+--        this frame payload."
+--    DEFVAL { tcp-ipv4 }
+--    ::= { tnTestHdFullResultsEntry 55 }
+
+-- tnTestHdResultsPayLdVTagOne  OBJECT-TYPE
+--    SYNTAX      Integer32 (-1..4094)
+--    MAX-ACCESS  read-only
+--    STATUS      current
+--    DESCRIPTION
+--        "Vlan tag one to be used in payload , if set to -1 packets are sent out without
+--         vlan tag"
+--    DEFVAL { -1 }
+--   ::= { tnTestHdFullResultsEntry 56 }
+
+-- tnTestHdResultsPayLdVTagOneTpid         OBJECT-TYPE
+--  SYNTAX      Unsigned32 ('600'H..'ffff'H)
+--  MAX-ACCESS  read-only
+--  STATUS      current
+--  DESCRIPTION
+--      "The  tnTestHdResultsPayLdVTagOneTpid variable indicates the ethertype to be set
+--      in the payload."
+--  DEFVAL { '8100'H }
+--    ::= { tnTestHdFullResultsEntry 57 }
+
+-- tnTestHdResultsPayLdVTagOneDot1p OBJECT-TYPE
+--  SYNTAX          Dot1PPriority
+--  MAX-ACCESS      read-only
+--  STATUS          current
+--  DESCRIPTION
+--       "IEEE 802.1p priority value for this frame payload.
+--       "
+--  DEFVAL { 0 }
+--  ::= { tnTestHdFullResultsEntry 58 }
+
+-- tnTestHdResultsPayLdVTagTwo  OBJECT-TYPE
+--  SYNTAX      Integer32 (-1..4094)
+--  MAX-ACCESS  read-only
+--  STATUS      current
+--  DESCRIPTION
+--      "Vlan tag two to be used in payload , if set to -1 packets are sent out without
+--       vlan tag"
+--  DEFVAL { -1 }
+--  ::= { tnTestHdFullResultsEntry 59 }
+
+-- tnTestHdResultsPayLdVTagTwoTpid         OBJECT-TYPE
+--  SYNTAX      Unsigned32 ('600'H..'ffff'H)
+--  MAX-ACCESS  read-only
+--  STATUS      current
+--  DESCRIPTION
+--      "The  tnTestHdResultsPayLdVTagTwoTpid variable indicates the ethertype to be set
+--      in the payload."
+--  DEFVAL { '8100'H }
+--  ::= { tnTestHdFullResultsEntry 60 }
+
+-- tnTestHdResultsPayLdVTagTwoDot1p OBJECT-TYPE
+--  SYNTAX          Dot1PPriority
+--  MAX-ACCESS      read-only
+--  STATUS          current
+--  DESCRIPTION
+--       "IEEE 802.1p priority value for this frame payload.
+--       "
+--  DEFVAL { 0 }
+--  ::= { tnTestHdFullResultsEntry 61 }
+
+-- tnTestHdResultsPayLdEthertype         OBJECT-TYPE
+--  SYNTAX      Unsigned32 ('600'H..'ffff'H)
+--  MAX-ACCESS  read-only
+--  STATUS      current
+--  DESCRIPTION
+--      "The  tnTestHdResultsPayLdEthertype variable indicates the ethertype to be set
+--      in the payload."
+--  DEFVAL { '800'H }
+--  ::= { tnTestHdFullResultsEntry 62 }
+
+-- tnTestHdResultsPayLdVTagOneDei OBJECT-TYPE
+--  SYNTAX     Unsigned32(0|1)
+--  MAX-ACCESS  read-only
+--  STATUS      current
+--  DESCRIPTION
+--      " tnTestHdResultsPayLdVTagOneDei can have value one or zero."
+--  DEFVAL { 0 }
+--  ::= { tnTestHdFullResultsEntry 63 }
+
+
+-- tnTestHdResultsPayLdVTagTwoDei OBJECT-TYPE
+--  SYNTAX      Unsigned32 (0|1)
+--  MAX-ACCESS  read-only
+--  STATUS      current
+--  DESCRIPTION
+--      " tnTestHdResultsPayLdVTagTwoDei can have value one or zero."
+--  DEFVAL { 0 }
+--  ::= { tnTestHdFullResultsEntry 64 }
+
+-- tnTestHdResultsAccCritIndex OBJECT-TYPE
+--  SYNTAX       INTEGER (1..4)
+--  MAX-ACCESS   read-only
+--  STATUS       current
+--  DESCRIPTION
+--      "."
+--  ::= { tnTestHdFullResultsEntry 65 }
+
+-- tnTestHdResultsAccCritRowStatus OBJECT-TYPE
+--  SYNTAX       RowStatus
+--  MAX-ACCESS   read-only
+--  STATUS       current
+--  DESCRIPTION
+--      "Row Status for this entry."
+--  ::= { tnTestHdFullResultsEntry 66 }
+
+-- tnTestHdResultsAccCritJittrRiseThres OBJECT-TYPE
+--  SYNTAX      INTEGER (-1 | 0..2147483000)
+--  UNITS       "microseconds"
+--  MAX-ACCESS   read-only
+--  STATUS       current
+--  DESCRIPTION
+--      " tnTestHdResultsAccCritJittrRiseThres is the acceptance criteria
+--      jitter rising threshold to be used for test run"
+--  DEFVAL { -1 }
+--    ::= { tnTestHdFullResultsEntry 67 }
+
+-- tnTestHdResultsAccCritLatRiseThres OBJECT-TYPE
+--  SYNTAX      INTEGER (-1 | 0..2147483000)
+--  UNITS       "microseconds"
+--  MAX-ACCESS   read-only
+--  STATUS       current
+--  DESCRIPTION
+--      " tnTestHdResultsAccCritLatRiseThres is the acceptance criteria
+--      latency rising threshold to be used for test run"
+--  DEFVAL { -1 }
+--  ::= { tnTestHdFullResultsEntry 68 }
+
+-- tnTestHdResultsAccCritLossRiseThres OBJECT-TYPE
+--  SYNTAX      INTEGER (-1 | 0..1000000)
+--  UNITS       "10000th of a percent"
+--  MAX-ACCESS   read-only
+--  STATUS       current
+--  DESCRIPTION
+--      " tnTestHdResultsAccCritLossRiseThres is the acceptance criteria
+--      loss rising threshold to be used for test run"
+--  DEFVAL { -1 }
+--  ::= { tnTestHdFullResultsEntry 69 }
+
+-- tnTestHdResultsAccCritLastChanged OBJECT-TYPE
+--  SYNTAX       TimeStamp
+--  MAX-ACCESS   read-only
+--  STATUS       current
+--  DESCRIPTION
+--      "The value  tnTestHdResultsAccCritLastChanged indicates the system
+--      uptime when an entry in  tnTestHdResultsAccCritTable was last changed."
+--    ::= { tnTestHdFullResultsEntry 70 }
+
+-- tnTestHdResultsAccCritLossRiseThresIn OBJECT-TYPE
+--  SYNTAX      INTEGER (-1 | 0..1000000)
+--  UNITS       "10000th of a percent"
+--  MAX-ACCESS   read-only
+--  STATUS       current
+--  DESCRIPTION
+--      " tnTestHdResultsAccCritLossRiseThresIn is the acceptance criteria
+--      loss rising threshold in to be used for test run"
+--  DEFVAL { -1 }
+--  ::= { tnTestHdFullResultsEntry 71 }
+
+-- tnTestHdResultsAccCritLossRiseThresOut OBJECT-TYPE
+--  SYNTAX      INTEGER (-1 | 0..1000000)
+--  UNITS       "10000th of a percent"
+--  MAX-ACCESS   read-only
+--  STATUS       current
+--  DESCRIPTION
+--      " tnTestHdResultsAccCritLossRiseThresOut is the acceptance criteria
+--      out loss rising threshold to be used for test run"
+--  DEFVAL { -1 }
+--  ::= { tnTestHdFullResultsEntry 72 }
+
+-- tnTestHdResultsAccCritCirThres OBJECT-TYPE
+--  SYNTAX      INTEGER (-1 | 0..1000000)
+--  MAX-ACCESS   read-only
+--  STATUS       current
+--  DESCRIPTION
+--      " tnTestHdResultsAccCritCirThres is the acceptance criteria
+--      cir threshold to be used for test run"
+--  DEFVAL { -1 }
+--    ::= { tnTestHdFullResultsEntry 73 }
+
+-- tnTestHdResultsAccCritPirThres OBJECT-TYPE
+--  SYNTAX      INTEGER (-1 | 0..1000000)
+--  MAX-ACCESS   read-only
+--  STATUS       current
+--  DESCRIPTION
+--      " tnTestHdResultsAccCritPirThres is the acceptance criteria
+--       pir threshold to be used for test run"
+--  DEFVAL { -1 }
+--  ::= { tnTestHdFullResultsEntry 74 }
+
+-- tnTestHdResultsAccCritLatRiseThresIn OBJECT-TYPE
+--  SYNTAX      INTEGER (-1 | 0..2147483000)
+--  UNITS       "microseconds"
+--  MAX-ACCESS   read-only
+--  STATUS       current
+--  DESCRIPTION
+--      " tnTestHdResultsAccCritLatRiseThresIn is the acceptance criteria
+--      latency rising threshold-in to be used for test run"
+--  DEFVAL { -1 }
+--  ::= { tnTestHdFullResultsEntry 75 }
+
+-- tnTestHdResultsAccCritLatRiseThresOut OBJECT-TYPE
+--  SYNTAX      INTEGER (-1 | 0..2147483000)
+--  UNITS       "microseconds"
+--  MAX-ACCESS   read-only
+--  STATUS       current
+--  DESCRIPTION
+--      " tnTestHdResultsAccCritLatRiseThresOut is the acceptance criteria
+--      latency rising threshold out to be used for test run"
+--  DEFVAL { -1 }
+--  ::= { tnTestHdFullResultsEntry 76 }
+
+-- tnTestHdResultsAccCritJittrRiseThresIn OBJECT-TYPE
+--  SYNTAX      INTEGER (-1 | 0..2147483000)
+--  UNITS       "microseconds"
+--  MAX-ACCESS   read-only
+--  STATUS       current
+--  DESCRIPTION
+--      " tnTestHdResultsAccCritJittrRiseThresIn is the acceptance criteria
+--      jitter rising threshold-in to be used for test run"
+--  DEFVAL { -1 }
+--  ::= { tnTestHdFullResultsEntry 77 }
+
+-- tnTestHdResultsAccCritJittrRiseThresOut OBJECT-TYPE
+--  SYNTAX      INTEGER (-1 | 0..2147483000)
+--  UNITS       "microseconds"
+--  MAX-ACCESS   read-only
+--  STATUS       current
+--  DESCRIPTION
+--      " tnTestHdResultsAccCritJittrRiseThresOut is the acceptance criteria
+--        jitter rising threshold-out to be used for test run"
+--  DEFVAL { -1 }
+--   ::= { tnTestHdFullResultsEntry 78 }
+
+-- tnTestHdResultsResProfId OBJECT-TYPE
+--  SYNTAX          INTEGER (0..10)
+--  MAX-ACCESS      read-only
+--  STATUS          current
+--  DESCRIPTION     "The Testhead profile Id used for this test"
+--   ::= { tnTestHdFullResultsEntry 79 }
+
+-- tnTestHdResultsResProfPayLdId OBJECT-TYPE
+--  SYNTAX          INTEGER (0..4)
+--  MAX-ACCESS      read-only
+--  STATUS          current
+--  DESCRIPTION     "The Testhead profile Pay Load Id used for this
+--                   test"
+--   ::= { tnTestHdFullResultsEntry 80 }
+
+-- tnTestHdResultsResProfAccCritId OBJECT-TYPE
+--  SYNTAX          INTEGER (0..4)
+--  MAX-ACCESS      read-only
+--  STATUS          current
+--  DESCRIPTION     "The Testhead profile Acceptance Criteria Id used
+--                   for this test"
+--  ::= { tnTestHdFullResultsEntry 81 }
+
+-- tnTestHdResultsResTransCount OBJECT-TYPE
+--  SYNTAX          Counter64
+--  MAX-ACCESS      read-only
+--  STATUS          current
+--  DESCRIPTION     "The total number of packets injected"
+--  ::= { tnTestHdFullResultsEntry 82 }
+
+
+-- tnTestHdResultsResRecvCount OBJECT-TYPE
+--  SYNTAX          Counter64
+--  MAX-ACCESS      read-only
+--  STATUS          current
+--  DESCRIPTION     "The total number of packets received"
+--   ::= { tnTestHdFullResultsEntry 83 }
+
+-- tnTestHdResultsResMeasuredThruput OBJECT-TYPE
+--  SYNTAX          INTEGER (1000000)
+--  UNITS           "kbps"
+--  MAX-ACCESS      read-only
+--  STATUS          current
+--  DESCRIPTION     "The throughput measured for this test"
+--   ::= { tnTestHdFullResultsEntry 84 }
+
+-- tnTestHdResultsResMeasuredFLR OBJECT-TYPE
+--  SYNTAX          INTEGER  (-1 | 0..1000000)
+--  UNITS           "10000th of a percent"
+--  MAX-ACCESS      read-only
+--  STATUS          current
+--  DESCRIPTION     "The frame loss ratio measured for this test, if
+--                   set to -1  tnTestHdResultsResMeasuredFLR is not applicable
+--                   for this test"
+--    ::= { tnTestHdFullResultsEntry 85 }
+
+-- tnTestHdResultsResMeasuredLatency OBJECT-TYPE
+--  SYNTAX          Counter64
+--  UNITS           "microseconds"
+--  MAX-ACCESS      read-only
+--  STATUS          current
+--  DESCRIPTION     "The Latency measured for this test"
+--    ::= { tnTestHdFullResultsEntry 86 }
+
+-- tnTestHdResultsResLatencyAccptanceResult OBJECT-TYPE
+--  SYNTAX          INTEGER {
+--                      pass (1),
+--                      fail (2),
+--                      not-applicable(3)
+--                  }
+--  MAX-ACCESS      read-only
+--  STATUS          current
+--  DESCRIPTION     "The Latency Acceptance for this test"
+--  ::= { tnTestHdFullResultsEntry 87 }
+
+-- tnTestHdResultsResMeasuredJitter OBJECT-TYPE
+--  SYNTAX          INTEGER  (0..2147483647)
+--  UNITS           "microseconds"
+--  MAX-ACCESS      read-only
+--  STATUS          current
+--  DESCRIPTION     "The Jitter measured for this test"
+--  ::= { tnTestHdFullResultsEntry 88 }
+
+-- tnTestHdResultsResJitterAccptanceResult OBJECT-TYPE
+--  SYNTAX          INTEGER {
+--                      pass (1),
+--                      fail (2),
+--                      not-applicable(3)
+--                  }
+--  MAX-ACCESS      read-only
+--  STATUS          current
+--  DESCRIPTION     "The Jitter Acceptance for this test"
+--  ::= { tnTestHdFullResultsEntry 89 }
+
+-- tnTestHdResultsResSapPortId OBJECT-TYPE
+--  SYNTAX          TmnxPortID
+--  MAX-ACCESS      read-only
+--  STATUS          current
+--  DESCRIPTION     "The sap port id ID used in for this test run."
+--  ::= { tnTestHdFullResultsEntry 90 }
+-- tnTestHdResultsResSapEncapValue OBJECT-TYPE
+--  SYNTAX          TmnxEncapVal
+--  MAX-ACCESS      read-only
+--  STATUS          current
+--  DESCRIPTION     "The sap encap value used in this test run."
+--  ::= { tnTestHdFullResultsEntry 91 }
+
+-- tnTestHdResultsResFLRAccptanceResult OBJECT-TYPE
+--  SYNTAX          INTEGER {
+--                      pass (1),
+--                      fail (2),
+--                      not-applicable(3)
+--                  }
+--  MAX-ACCESS      read-only
+--  STATUS          current
+--  DESCRIPTION     "The FLR Acceptance for this test"
+--  ::= { tnTestHdFullResultsEntry 92 }
+
+-- tnTestHdResultsResMinLatency OBJECT-TYPE
+--  SYNTAX          Counter64
+--  UNITS           "microseconds"
+--  MAX-ACCESS      read-only
+--  STATUS          current
+--  DESCRIPTION     "The Latency measured minimum for this test"
+--  ::= { tnTestHdFullResultsEntry 93 }
+
+-- tnTestHdResultsResMaxLatency OBJECT-TYPE
+--  SYNTAX          Counter64
+--  UNITS           "microseconds"
+--  MAX-ACCESS      read-only
+--  STATUS          current
+--  DESCRIPTION     "The Latency measured maximum for this test"
+--  ::= { tnTestHdFullResultsEntry 94 }
+
+-- tnTestHdResultsSessStartTime OBJECT-TYPE
+--  SYNTAX      DateAndTime
+--  MAX-ACCESS  read-only
+--  STATUS      current
+--  DESCRIPTION
+--      " tnTestHdResultsSessStartTime test head start time for this session"
+--  ::= { tnTestHdFullResultsEntry 95 }
+
+
+-- tnTestHdResultsSessCompletedTime OBJECT-TYPE
+--  SYNTAX      DateAndTime
+--  MAX-ACCESS  read-only
+--  STATUS      current
+--  DESCRIPTION
+--      " tnTestHdResultsSessCompletedTime is the time stamp at which this
+--      test head run session has completed."
+--  ::= { tnTestHdFullResultsEntry 96 }
+
+-- tnTestHdResultsSessTotalTime OBJECT-TYPE
+--  SYNTAX      INTEGER (0..1000000)
+--  UNITS       "seconds"
+--  MAX-ACCESS  read-only
+--  STATUS      current
+--  DESCRIPTION
+--      " tnTestHdResultsSessTotalTime is the total time since test head test
+--      has started"
+--  ::= { tnTestHdFullResultsEntry 97 }
+
+-- tnTestHdResultsSessFc OBJECT-TYPE
+--  SYNTAX       TFCName
+--  MAX-ACCESS   read-only
+--  STATUS       current
+--  DESCRIPTION
+--      "tnTestHdFc is the fc used in this test head session"
+--  ::= { tnTestHdFullResultsEntry 98 }
+
+-- tnTestHdResultsSessCompleted OBJECT-TYPE
+--  SYNTAX       TruthValue
+--  MAX-ACCESS   read-only
+--  STATUS       current
+--  DESCRIPTION
+--      " tnTestHdResultsSessCompleted is true if the test is completed else it is
+--      false. "
+--  ::= { tnTestHdFullResultsEntry 99 }
+
+-- tnTestHdResultsSessStopped OBJECT-TYPE
+--  SYNTAX       TruthValue
+--  MAX-ACCESS   read-only
+--  STATUS       current
+--  DESCRIPTION
+--      "tnTestHdStopped is true if the test is stopped midway else it is
+--      false. "
+--   ::= { tnTestHdFullResultsEntry 100 }
+
+-- tnTestHdResultsSessProfId OBJECT-TYPE
+--  SYNTAX       INTEGER (0..10)
+--  MAX-ACCESS   read-only
+--  STATUS       current
+--  DESCRIPTION
+--      " tnTestHdResultsSessProfId is the profile index for this session"
+--  ::= { tnTestHdFullResultsEntry 101 }
+
+
+-- tnTestHdResultsSessPayLdId OBJECT-TYPE
+--  SYNTAX       INTEGER (1..4)
+--  MAX-ACCESS   read-only
+--  STATUS       current
+--  DESCRIPTION
+--      " tnTestHdResultsSessPayLdId is the payload index used for this session"
+--  ::= { tnTestHdFullResultsEntry 102 }
+
+-- tnTestHdResultsSessAccCritId OBJECT-TYPE
+--  SYNTAX       INTEGER (1..4)
+--  MAX-ACCESS   read-only
+--  STATUS       current
+--  DESCRIPTION
+--      " tnTestHdResultsSessAccCritId is the acceptance criteria id used for
+--      this test run"
+--  ::= { tnTestHdFullResultsEntry 103 }
+
+-- tnTestHdResultsSessSapPortId OBJECT-TYPE
+--  SYNTAX          TmnxPortID
+--  MAX-ACCESS      read-only
+--  STATUS          current
+--  DESCRIPTION     "The sap port id ID used in for this test run."
+--  ::= { tnTestHdFullResultsEntry 104 }
+
+-- tnTestHdResultsSessSapEncapValue OBJECT-TYPE
+--  SYNTAX          TmnxEncapVal
+--  MAX-ACCESS      read-only
+--  STATUS          current
+--  DESCRIPTION     "The sap encap value used in this test run."
+--    ::= { tnTestHdFullResultsEntry 105 }
+
+-- tnTestHdNotifyV5v0Group NOTIFICATION-GROUP
+--    NOTIFICATIONS {
+--        tmnxOamTestHeadTestCompleted
+--   }
+--    STATUS    current
+--    DESCRIPTION
+--        "The group of notifications supported in 7210 5.0 release"
+--    ::= { tnTestHdObjsGroups 2 }
+
+END

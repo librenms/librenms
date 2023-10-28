@@ -1,0 +1,1535 @@
+TN-SAS-PORT-MIB DEFINITIONS ::= BEGIN
+
+-- (c) Copyright 2023 Nokia Networks.  All rights reserved.
+-- This software is the confidential and proprietary property of
+-- Nokia and may only be used in accordance with the terms of the
+-- license agreement provided with this software.
+
+IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE,
+        Unsigned32,
+        Counter64,
+        Integer32                               FROM SNMPv2-SMI
+
+        RowStatus, TimeStamp,
+        TruthValue, MacAddress                  FROM SNMPv2-TC
+
+        tnSASObjs, tnSASModules                 FROM TROPIC-GLOBAL-REG
+
+        TmnxPortID, ServObjDesc,
+        TNamedItemOrEmpty, TNetworkIngressMeterId,
+        TNamedItem, TQueueId, TmnxServId,
+        TmnxEncapVal                            FROM TN-TC-MIB
+
+        tnPortEntry, tnPortPortID,
+        tnPortEtherEntry                        FROM TN-PORT-MIB
+
+        tnSysSwitchId                           FROM TROPIC-SYSTEM-MIB
+
+        InterfaceIndexOrZero,
+        ifEntry                                 FROM IF-MIB
+        ;
+
+tnSASPortMIBModule MODULE-IDENTITY
+        LAST-UPDATED    "202008280000Z"
+        ORGANIZATION    "Nokia"
+        CONTACT-INFO
+            "Nokia 7x50 Support
+             Web: http://www.nokia.com/comps/pages/carrier_support.jhtml"
+        DESCRIPTION
+        "This document is the SNMP MIB module to manage and provision the
+        hardware components of the Nokia 7x50 device.
+
+        This SNMP MIB module (Specification) embodies Nokia's
+        proprietary intellectual property.  Nokia retains
+        all title and ownership in the Specification, including any
+        revisions.
+
+        Nokia grants all interested parties a non-exclusive
+        license to use and distribute an unmodified copy of this
+        Specification in connection with management of Nokia
+        products, and without fee, provided this copyright notice and
+        license appear on all copies.
+
+        This Specification is supplied 'as is', and Nokia
+        makes no warranty, either express or implied, as to the use,
+        operation, condition, or performance of the Specification."
+
+--
+--  Revision History
+--
+
+        REVISION        "202008280000Z"
+        DESCRIPTION     "1) Changed SYNTAX of the following from ServiceAdminStatus
+                            to INTEGER:
+                            tnPortSapEtherLLFAdminStatus.
+                         2) Updated SYNTAX of the following:
+                            tnPortSapEtherLLFOperStatus."
+
+        REVISION        "201902150000Z"
+        DESCRIPTION     "Added the following to tnPortNetEgressQueueStatsTable:
+                         tnPortNetEgressQueueOperPIR
+                         tnPortNetEgressQueueOperCIR."
+
+        REVISION        "201811020000Z"
+        DESCRIPTION     "Added the following to tnSASPortEtherExtnTable:
+                         tnPortSapEtherLLFAdminStatus
+                         tnPortSapEtherLLFOperStatus
+                         tnPortSapEtherLLFId."
+
+        REVISION        "201712220000Z"
+        DESCRIPTION     "Updated range for the following:
+                         tnPortEtherEgressMaxBurst."
+
+        REVISION        "201711100000Z"
+        DESCRIPTION     "Updated range for the following:
+                         tnPortEtherEgressMaxBurst."
+
+        REVISION        "201702280000Z"
+        DESCRIPTION     "Added the following table:
+                         tnVirtualPortTable."
+
+        REVISION        "201603300000Z"
+        DESCRIPTION     "Added the following table:
+                         tnSASPortNetIngressStatsTable."
+
+        REVISION        "201511120000Z"
+        DESCRIPTION     "Added the following table:
+                         tnSASPssIfTable."
+
+        REVISION        "201509090000Z"
+        DESCRIPTION     "Added the following to tnSASPortEtherExtnTable:
+                         tnPortPtpEnable."
+
+        REVISION        "201501260000Z"
+        DESCRIPTION     "Added the following to tnSASPortEtherExtnTable:
+                         tnPortLldpTnlNrstBrdgeDstMac."
+
+        REVISION        "201209010000Z"
+        DESCRIPTION     "Changed the following index from read-only to
+                         not-accessible:
+                         tnIntervalNumber."
+
+        REVISION        "200801090000Z"
+        DESCRIPTION     "Rev 1.0                09 Jan 2008 00:00
+                         This is the 1.0 release of the TIMETRA-SAS-GLOBAL-MIB."
+
+        ::= { tnSASModules 6 }
+
+tnSASPortObjs                    OBJECT IDENTIFIER ::= { tnSASObjs 2 }
+-- tnSASPortNotificationObjects     OBJECT IDENTIFIER ::= { tnSASObjs 3 }
+-- tnSASPortStatsObjs               OBJECT IDENTIFIER ::= { tnSASObjs 4 }
+-- tnSASPortConformance             OBJECT IDENTIFIER ::= { tnSASConfs 2 }
+
+tnPortShgInfoTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF TnPortShgInfoEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "A table that contains port split-horizon group
+                     information. "
+    ::= { tnSASPortObjs 6 }
+
+tnPortShgInfoEntry OBJECT-TYPE
+    SYNTAX          TnPortShgInfoEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "Split-horizon group information about a TLS service."
+    INDEX           {  tnSysSwitchId, IMPLIED tnPortShgName }
+    ::= { tnPortShgInfoTable 1 }
+
+TnPortShgInfoEntry ::=
+    SEQUENCE {
+        tnPortShgName                  TNamedItem,
+        tnPortShgRowStatus             RowStatus,
+        tnPortShgInstanceId            Unsigned32,
+        tnPortShgDescription           ServObjDesc,
+        tnPortShgLastMgmtChange        TimeStamp
+    }
+
+tnPortShgName OBJECT-TYPE
+    SYNTAX          TNamedItem
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "The value of the object tnPortShgName specifies the name of
+                     the split-horizon group. "
+    ::= { tnPortShgInfoEntry 1 }
+
+tnPortShgRowStatus OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "The value of the object  tnPortShgRowStatus specifies the
+                     status of this row.
+                     The only values supported during a set operation are
+                     createAndGo(4) and destroy(6). To delete an entry
+                     from this table, there should be no port Bindings
+                     refering to it."
+    ::= { tnPortShgInfoEntry 2 }
+
+
+tnPortShgInstanceId OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The value of the object tnPortShgInstanceId indicates the
+                     instance identifier for the split horizon group."
+    ::= { tnPortShgInfoEntry 3 }
+
+tnPortShgDescription OBJECT-TYPE
+    SYNTAX          ServObjDesc
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "The value of the object tnPortShgDescription specifies
+                     generic information about this split-horizon group."
+    DEFVAL { "" }
+    ::= { tnPortShgInfoEntry 4 }
+
+tnPortShgLastMgmtChange OBJECT-TYPE
+    SYNTAX          TimeStamp
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The value of the object tnPortShgLastMgmtChange indicates the
+                     value of sysUpTime at the time of the most recent
+                     management-initiated change to this split-horizon group."
+    ::= { tnPortShgInfoEntry 5 }
+
+tnSASPortExtnTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TnSASPortExtnEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table has additional information about the 7210 platforms"
+    ::= { tnSASPortObjs 2 }
+
+tnSASPortExtnEntry       OBJECT-TYPE
+    SYNTAX      TnSASPortExtnEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents a port on a IOM card in a chassis in the
+         system.  Entries cannot be created and deleted via SNMP SET
+         operations.  Before an IOM tmnxMDAEntry can be deleted from the
+         tmnxMDATable, its supported tnPortEntries must be in the proper
+         state for removal."
+    AUGMENTS    { tnPortEntry }
+    ::= { tnSASPortExtnTable 1 }
+
+TnSASPortExtnEntry ::=
+    SEQUENCE {
+        tnPortUplinkMode                TruthValue,
+        tnPortAccessEgressQoSPolicyId   Unsigned32,
+        tnPortNetworkQoSPolicyId        Unsigned32,
+        tnPortShgGroupName              TNamedItemOrEmpty
+    }
+
+
+tnPortUplinkMode  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If the tnPortUplinkMode is set to true when the tnPortMode
+         is set to 'access(1)' and the port acts as an uplink.
+         tnPortEncaptype must also be configured 'qinqEncap'
+         when using access port as uplink port."
+    ::= { tnSASPortExtnEntry 1 }
+
+tnPortAccessEgressQoSPolicyId  OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Qos Policy ID for Access Egress Port"
+    DEFVAL { 1 }
+    ::= { tnSASPortExtnEntry 2 }
+
+tnPortNetworkQoSPolicyId  OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Port Network Policy ID "
+    DEFVAL { 1 }
+    ::= { tnSASPortExtnEntry 3 }
+
+tnPortShgGroupName  OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Split horizon group to be attached to this port"
+    ::= { tnSASPortExtnEntry 4 }
+
+--
+--  Network Port Ingress Stats Table
+--
+tnSASPortNetIngressStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TnSASPortNetIngressStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Defines the Nokia SAS series network port ingress
+         statistics table for providing, via SNMP, the capability of
+         retrieving the traffic statistics for the physical Meters
+         being used for the ports to forward the network ingress
+         traffic."
+    ::= { tnSASPortObjs 3 }
+
+tnSASPortNetIngressStatsEntry    OBJECT-TYPE
+    SYNTAX      TnSASPortNetIngressStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Defines an entry in tnSASPortNetIngressStatsTable. Entries are
+         created and deleted by the system depending on the meter policy
+         being used at the specific port."
+    INDEX   {  tnPortPortID, tnSASPortNetIngressMeterIndex }
+    ::= { tnSASPortNetIngressStatsTable 1 }
+
+TnSASPortNetIngressStatsEntry ::=
+    SEQUENCE {
+        tnSASPortNetIngressMeterIndex      TNetworkIngressMeterId,
+        tnSASPortNetIngressFwdInProfPkts   Counter64,
+        tnSASPortNetIngressFwdOutProfPkts  Counter64,
+        tnSASPortNetIngressFwdInProfOcts   Counter64,
+        tnSASPortNetIngressFwdOutProfOcts  Counter64
+    }
+
+tnSASPortNetIngressMeterIndex OBJECT-TYPE
+    SYNTAX      TNetworkIngressMeterId
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "tnSASPortNetIngressQueueIndex serves as the tertiary index. When used
+         in conjunction with tnSysSwitchId and tnPortPortID, it uniquely
+         identifies a network ingress meter for the specified port in the
+         managed system."
+    ::= { tnSASPortNetIngressStatsEntry 1 }
+
+tnSASPortNetIngressFwdInProfPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "tnSASPortNetIngressFwdInProfPkts indicates the number of conforming
+         network ingress packets forwarded on this port using this meter."
+    ::= { tnSASPortNetIngressStatsEntry 2 }
+
+tnSASPortNetIngressFwdOutProfPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "tnSASPortNetIngressFwdOutProfPkts indicates the number of exceeding
+         network ingress packets forwarded on this port using this meter."
+    ::= { tnSASPortNetIngressStatsEntry 3 }
+
+tnSASPortNetIngressFwdInProfOcts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "tnSASPortNetIngressFwdInProfOcts indicates the number of conforming
+         network ingress octets forwarded on this port using this meter."
+    ::= { tnSASPortNetIngressStatsEntry 4 }
+
+tnSASPortNetIngressFwdOutProfOcts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "tnSASPortNetIngressFwdOutProfOcts indicates the number of exceeding
+         network ingress octets forwarded on this port using this meter."
+    ::= { tnSASPortNetIngressStatsEntry 5 }
+
+
+--
+--  Port Ethernet Extenstion Table
+--
+tnSASPortEtherExtnTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SasTmnxPortEtherExtnEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table has additional information about the 7210 platforms"
+    ::= { tnSASPortObjs 4 }
+
+tnSASPortEtherExtnEntry       OBJECT-TYPE
+    SYNTAX      SasTmnxPortEtherExtnEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents an Ethernet port on a IOM card in a
+         chassis in the system.  Entries cannot be created and
+         deleted via SNMP SET operations.  Before an IOM cardEntry
+         can be deleted from the tmnxMDATable, its supported
+         tnPortEntries and tnPortEtherEntries must be in the proper
+         state for removal.  The tnPortEtherEntry contains attributes
+         that are unique to the Ethernet TmnxPortType."
+    AUGMENTS    { tnPortEtherEntry }
+    ::= { tnSASPortEtherExtnTable 1 }
+
+SasTmnxPortEtherExtnEntry ::=
+    SEQUENCE {
+        tnPortEtherEgressMaxBurst       Integer32,
+        tnPortStatsQueue1PktsFwd        TruthValue,
+        tnPortStatsQueue2PktsFwd        TruthValue,
+        tnPortStatsQueue3PktsFwd        TruthValue,
+        tnPortStatsQueue4PktsFwd        TruthValue,
+        tnPortStatsQueue5PktsFwd        TruthValue,
+        tnPortStatsQueue6PktsFwd        TruthValue,
+        tnPortStatsQueue7PktsFwd        TruthValue,
+        tnPortStatsQueue8PktsFwd        TruthValue,
+        tnPortEtherEgrSchedMode         INTEGER,
+        tnPortEtherLoopback             INTEGER,
+        tnPortEtherIpMTU                Unsigned32,
+        tnPortEtherClockConfig          INTEGER,
+        tnPortLoopbckServId             TmnxServId,
+        tnPortLoopbckSapPortId          InterfaceIndexOrZero,
+        tnPortLoopbckSapEncapVal        TmnxEncapVal,
+        tnPortLoopbckSrcMacAddr         MacAddress,
+        tnPortLoopbckDstMacAddr         MacAddress,
+        tnPortAccEgrSapQosMarking       INTEGER,
+        tnPortLldpTnlNrstBrdgeDstMac    TruthValue,
+        tnPortPtpEnable                 TruthValue,
+        tnPortSapEtherLLFAdminStatus    INTEGER,
+        tnPortSapEtherLLFOperStatus     INTEGER,
+        tnPortSapEtherLLFId             Unsigned32
+    }
+
+tnPortEtherEgressMaxBurst  OBJECT-TYPE
+    SYNTAX      Integer32 (-1 | 32..32767)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Controls the amount of burst the egress port can generate.
+        Its configured in terms of Kilo bits.Its an optional parameter.
+        And cannot be used without egress-rate being set."
+    DEFVAL { -1 }
+    ::= { tnSASPortEtherExtnEntry 1 }
+
+tnPortStatsQueue1PktsFwd  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If tnPortStatsQueue1PktsFwd is set to 'true', count the egress
+        packets with forwarding class value '0'."
+    ::= { tnSASPortEtherExtnEntry 2 }
+
+
+tnPortStatsQueue2PktsFwd  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If tnPortStatsQueue2PktsFwd is set to 'true', count the egress
+        packets with forwarding class value '1'."
+    ::= { tnSASPortEtherExtnEntry 3 }
+
+tnPortStatsQueue3PktsFwd  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If tnPortStatsQueue3PktsFwd is set to 'true', count the egress
+        packets with forwarding class value '2'."
+    ::= { tnSASPortEtherExtnEntry 4 }
+
+tnPortStatsQueue4PktsFwd  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If tnPortStatsQueue4PktsFwd is set to 'true', count the egress
+        packets with forwarding class value '3'."
+    ::= { tnSASPortEtherExtnEntry 5 }
+
+tnPortStatsQueue5PktsFwd  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If tnPortStatsQueue5PktsFwd is set to 'true', count the egress
+        packets with forwarding class value '5'."
+    ::= { tnSASPortEtherExtnEntry 6 }
+
+tnPortStatsQueue6PktsFwd  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If tnPortStatsQueue6PktsFwd is set to 'true', count the egress
+        packets with forwarding class value '6'."
+    ::= { tnSASPortEtherExtnEntry 7 }
+
+tnPortStatsQueue7PktsFwd  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If tnPortStatsQueue7PktsFwd is set to 'true', count the egress
+        packets with forwarding class value '7'."
+    ::= { tnSASPortEtherExtnEntry 8 }
+
+tnPortStatsQueue8PktsFwd  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If tnPortStatsQueue8PktsFwd is set to 'true', count the egress
+        packets with forwarding class value '8'."
+    ::= { tnSASPortEtherExtnEntry 9 }
+
+tnPortEtherEgrSchedMode    OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    fc-based     (1),
+                    sap-based    (2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "tnPortEtherEgrSchedMode sets the SAP egress scheduler mode. In
+        'fc-based' mode the prority of all the egress queues across all the
+        SAPs are considered to determine the next queue to schedule. In
+        'sap-based' mode the scheduler uses the priority of all the egress
+        queues in a SAP to determine the next queue to schedule and uses
+        round-robin scheduling mechanism to schedule each of the SAP"
+    DEFVAL      { fc-based }
+    ::= { tnSASPortEtherExtnEntry 10 }
+
+tnPortEtherLoopback  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    none     (0),
+                    internal (2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If tnPortEtherLoopback is set to internal, the ethernet port
+         is set to loopback mode. none will clear the loopback"
+    DEFVAL      { none }
+    ::= { tnSASPortEtherExtnEntry 11 }
+
+tnPortEtherIpMTU  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0|512..9000)
+    UNITS       "bytes"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "tnPortEtherIpMTU is the IP MTU for interfaces using this
+        port"
+    ::= { tnSASPortEtherExtnEntry 12 }
+
+tnPortEtherClockConfig   OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    notApplicable (0),
+                    automatic (1),
+                    manual-master (2),
+                    manual-slave (3)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "When the value of tnPortEtherClockConfig is 'automatic' the
+         Ethernet interface will automatically negotiate clock mastership
+         along with other link parameters with the far end. Depending
+         upon the capabilities of the two ends, one will be master the
+         other will be slave for clocking.
+         When the value of tnPortEtherClockConfig is 'manual-master', the
+         Ethernet interface will negotiate other link parameters with the
+         far end except clock mastership. It assumes clock mastership and want
+         the other end to be slave.
+         When the value is 'manual-slave' this ethernet interface chooses to
+         be slave and wants the far end to assume clock mastership.
+         For 10 baseT and 100 baseT ethernet interfaces, value of this
+         variable should be 'none', as this will not be applicable
+         for those interfaces."
+
+    DEFVAL { notApplicable }
+    ::= { tnSASPortEtherExtnEntry 13 }
+
+tnPortLoopbckServId OBJECT-TYPE
+    SYNTAX      TmnxServId
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Loopback Service Id"
+    ::= { tnSASPortEtherExtnEntry 14 }
+
+tnPortLoopbckSapPortId  OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Loopback Sap Port Id
+        0 indicates the port is undefined."
+    DEFVAL      {0}
+    ::= { tnSASPortEtherExtnEntry 15 }
+
+tnPortLoopbckSapEncapVal  OBJECT-TYPE
+    SYNTAX      TmnxEncapVal
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Loopback Sap Encapsulation"
+    ::= { tnSASPortEtherExtnEntry 16 }
+
+tnPortLoopbckSrcMacAddr  OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Loopback Source Mac Address"
+    ::= { tnSASPortEtherExtnEntry 17 }
+
+tnPortLoopbckDstMacAddr  OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Loopback Destination Mac Address"
+    ::= { tnSASPortEtherExtnEntry 18 }
+
+
+tnPortAccEgrSapQosMarking  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    enable     (1),
+                    disable    (2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Port Ethernet Access Egress Sap Qos Marking"
+    DEFVAL { enable }
+    ::= { tnSASPortEtherExtnEntry 19 }
+
+tnPortLldpTnlNrstBrdgeDstMac OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "If tnPortLldpTnlNrstBrdgeDstMac is set to 'true'
+         and admin status is disabled lldp pkts will be
+         tunnelled."
+    DEFVAL       { false }
+    ::= { tnSASPortEtherExtnEntry 20 }
+
+tnPortPtpEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "1588v2 PTP enabled on port"
+    DEFVAL  { false }
+    ::= { tnSASPortEtherExtnEntry 21 }
+
+tnPortSapEtherLLFAdminStatus OBJECT-TYPE
+    SYNTAX      INTEGER{
+      notApplicable(0),
+      up(1),
+      down(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "tnPortSapEtherLLFAdminStatus specifies whether or not Link-Loss
+         Forwarding has been enabled 'up' or disabled 'down' on a SAP
+         that is associated to this port.  If a SAP has not been associated
+         to this port, 'notApplicable' is specified.
+
+         See tnSapEthernetInfoTable for provisioning details."
+    ::= { tnSASPortEtherExtnEntry 22 }
+
+tnPortSapEtherLLFOperStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+      notApplicable(0), -- LLF not applicable
+      fault (1),        -- service is down or fault detected.
+      clear (2)         -- service is up and no fault detected.
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "tnPortSapEtherLLFOperStatus indicates whether or not a SAP that is
+         associated to the port is operationally 'down'.  If a SAP has not been
+         associated to the port, 'notApplicable' is specified.
+
+         See tnSapEthernetInfoTable for details."
+    ::= { tnSASPortEtherExtnEntry 23 }
+
+tnPortSapEtherLLFId OBJECT-TYPE
+    SYNTAX Unsigned32 (0..5)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "tnPortSapEtherLLFId specifies the identifier between sending
+         and receiving objects that are LLF enabled on a SAP that is
+         associated to this port.
+
+         See tnSapEthernetInfoTable for provisioning details."
+    ::= { tnSASPortEtherExtnEntry 24 }
+
+--
+--  Network Port Egress Stats Table
+--
+-- tnPortAccessEgressQueueStatsTable OBJECT-TYPE
+--     SYNTAX      SEQUENCE OF TmnxPortAccessEgressQueueStatsEntry
+--     MAX-ACCESS  not-accessible
+--     STATUS      current
+--     DESCRIPTION
+--         "Defines the Nokia SAS series access port egress
+--          statistics table for providing, via SNMP, the capability of
+--          retrieving the traffic statistics for the physical queues
+--          being used for the ports to forward the access egress
+--          traffic."
+--     ::= { tnSASPortObjs 7 }
+--
+-- tnPortAccessEgressQueueStatsEntry    OBJECT-TYPE
+--     SYNTAX      TmnxPortAccessEgressQueueStatsEntry
+--     MAX-ACCESS  not-accessible
+--     STATUS      current
+--     DESCRIPTION
+--         "Defines an entry in tnPortAccessEgressQueueStatsTable. Entries are
+--          created and deleted by the system depending on the queue policy
+--          being used at the specific port."
+--     INDEX   {  tnPortPortID, tnPortAccessEgressQueueStatsIndex }
+--     ::= { tnPortAccessEgressQueueStatsTable 1 }
+--
+-- TmnxPortAccessEgressQueueStatsEntry ::=
+--     SEQUENCE {
+--         tnPortAccessEgressQueueStatsIndex     TQueueId,
+--         tnPortAccessEgressQueueStatsFwdPkts   Counter64,
+--         tnPortAccessEgressQueueStatsFwdOcts   Counter64,
+--         tnPortAccessEgressQueueStatsDroPkts   Counter64,
+--         tnPortAccessEgressQueueStatsDroOcts   Counter64
+--     }
+--
+-- tnPortAccessEgressQueueStatsIndex OBJECT-TYPE
+--     SYNTAX      TQueueId (1..8)
+--     MAX-ACCESS  not-accessible
+--     STATUS      current
+--     DESCRIPTION
+--         "tnPortAccessEgressQueueIndex serves as the tertiary index. When used
+--          in conjunction with tnSysSwitchId and tnPortPortID, it uniquely
+--          identifies a access egress queue for the specified port in the
+--          managed system."
+--     ::= { tnPortAccessEgressQueueStatsEntry 1 }
+--
+-- tnPortAccessEgressQueueStatsFwdPkts OBJECT-TYPE
+--     SYNTAX      Counter64
+--     MAX-ACCESS  read-only
+--     STATUS      current
+--     DESCRIPTION
+--         "tnPortAccessEgressQueueStatsFwdPkts indicates the number of forwarded
+--          access egress packets forwarded on this port using this queue."
+--     ::= { tnPortAccessEgressQueueStatsEntry 2 }
+--
+-- tnPortAccessEgressQueueStatsFwdOcts OBJECT-TYPE
+--     SYNTAX      Counter64
+--     MAX-ACCESS  read-only
+--     STATUS      current
+--     DESCRIPTION
+--         "tnPortAccessEgressQueueStatsFwdOcts indicates the number of forward
+--          access egress octets forwarded on this port using this queue."
+--     ::= { tnPortAccessEgressQueueStatsEntry 3 }
+--
+-- tnPortAccessEgressQueueStatsDroPkts OBJECT-TYPE
+--     SYNTAX      Counter64
+--     MAX-ACCESS  read-only
+--     STATUS      current
+--     DESCRIPTION
+--         "tnPortAccessEgressQueueStatsDroPkts indicates the number of dropped
+--          access egress packets on this port using this queue."
+--     ::= { tnPortAccessEgressQueueStatsEntry 4 }
+--
+-- tnPortAccessEgressQueueStatsDroOcts OBJECT-TYPE
+--     SYNTAX      Counter64
+--     MAX-ACCESS  read-only
+--     STATUS      current
+--     DESCRIPTION
+--         "tnPortAccessEgressQueueStatsDroOcts indicates the number of dropped
+--          network egress octets on this port using this queue."
+--     ::= { tnPortAccessEgressQueueStatsEntry 5 }
+
+
+tnPortNetEgressQueueStatsTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxPortNetEgressQueueStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Defines the Nokia SAS series network port egress
+         statistics table for providing, via SNMP, the capability of
+         retrieving the traffic statistics for the physical queues
+         being used for the ports to forward the network egress
+         traffic."
+    ::= { tnSASPortObjs 8 }
+
+tnPortNetEgressQueueStatsEntry    OBJECT-TYPE
+    SYNTAX      TmnxPortNetEgressQueueStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Defines an entry in tnPortNetEgressQueueStatsTable. Entries are
+         created and deleted by the system depending on the queue policy
+         being used at the specific port."
+    INDEX   {  tnPortPortID, tnPortNetEgressQueueStatsIndex }
+    ::= { tnPortNetEgressQueueStatsTable 1 }
+
+TmnxPortNetEgressQueueStatsEntry ::=
+    SEQUENCE {
+        tnPortNetEgressQueueStatsIndex           TQueueId,
+        tnPortNetEgressQueueStatsFwdPkts         Counter64,
+        tnPortNetEgressQueueStatsFwdOcts         Counter64,
+        tnPortNetEgressQueueStatsDroPkts         Counter64,
+        tnPortNetEgressQueueStatsDroOcts         Counter64,
+        tnPortNetEgressQueueStatsInProfDroPkts   Counter64,
+        tnPortNetEgressQueueStatsInProfDroOcts   Counter64,
+        tnPortNetEgressQueueStatsOutProfDroPkts  Counter64,
+        tnPortNetEgressQueueStatsOutProfDroOcts  Counter64,
+        tnPortNetEgressQueueOperPIR              TPIRRate,
+        tnPortNetEgressQueueOperCIR              TCIRRate
+    }
+
+tnPortNetEgressQueueStatsIndex OBJECT-TYPE
+    SYNTAX      TQueueId (1..8)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "tnPortNetEgressQueueStatsIndex serves as the tertiary index. When used
+         in conjunction with tnSysSwitchId and tnPortPortID, it uniquely
+         identifies a network egress queue for the specified port in the
+         managed system."
+    ::= { tnPortNetEgressQueueStatsEntry 1 }
+
+tnPortNetEgressQueueStatsFwdPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "tnPortNetEgressQueueStatsFwdPkts indicates the number of forwarded
+         network egress packets on this port using this queue."
+    ::= { tnPortNetEgressQueueStatsEntry 2 }
+
+tnPortNetEgressQueueStatsFwdOcts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "tnPortNetEgressQueueStatsFwdOcts indicates the number of forwarded
+         network egress octets on this port using this queue."
+    ::= { tnPortNetEgressQueueStatsEntry 3 }
+
+tnPortNetEgressQueueStatsDroPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "tnPortNetEgressQueueStatsDroPkts indicates the number of dropped
+         network egress packets on this port using this queue."
+    ::= { tnPortNetEgressQueueStatsEntry 4 }
+
+tnPortNetEgressQueueStatsDroOcts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "tnPortNetEgressQueueStatsDroOcts indicates the number of dropped
+         network egress octets on this port using this queue."
+    ::= { tnPortNetEgressQueueStatsEntry 5 }
+
+tnPortNetEgressQueueStatsInProfDroPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "tnPortNetEgressQueueStatsInProfDroPkts indicates the number of dropped
+         network egress octets on this port using this in-profile queue."
+    ::= { tnPortNetEgressQueueStatsEntry 6 }
+
+tnPortNetEgressQueueStatsInProfDroOcts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "tnPortNetEgressQueueStatsInProfDroOcts indicates the number of dropped
+         network egress octets on this port using this in-profile queue."
+    ::= { tnPortNetEgressQueueStatsEntry 7 }
+
+tnPortNetEgressQueueStatsOutProfDroPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "tnPortNetEgressQueueStatsOutProfDroPkts indicates the number of dropped
+         network egress octets on this port using this out-profile queue."
+    ::= { tnPortNetEgressQueueStatsEntry 8 }
+
+tnPortNetEgressQueueStatsOutProfDroOcts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "tnPortNetEgressQueueStatsOutProfDroOcts indicates the number of dropped
+         network egress octets on this port using this out-profile queue."
+    ::= { tnPortNetEgressQueueStatsEntry 9 }
+
+tnPortNetEgressQueueOperPIR OBJECT-TYPE
+    SYNTAX       TPIRRate
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The operational PIR rate."
+    ::= { tnPortNetEgressQueueStatsEntry 10 }
+
+tnPortNetEgressQueueOperCIR OBJECT-TYPE
+    SYNTAX       TCIRRate
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The operational CIR rate."
+    ::= { tnPortNetEgressQueueStatsEntry 11 }
+
+--
+-- Extensions of Tmnx DS1 Port table
+--
+-- aluExtTmnxDS1PortTable OBJECT-TYPE
+--    SYNTAX      SEQUENCE OF AluExtTmnxDS1PortEntry
+--    MAX-ACCESS  not-accessible
+--    STATUS      current
+--    DESCRIPTION
+--        "The aluExtTmnxDS1PortTable has an entry for a DS1 physical port."
+--    ::= { tnSASPortObjs 9 }
+
+-- aluExtTmnxDS1PortEntry       OBJECT-TYPE
+--    SYNTAX      AluExtTmnxDS1PortEntry
+--    MAX-ACCESS  not-accessible
+--    STATUS      current
+--    DESCRIPTION
+--        "Each row entry represents extended functionality of a physical
+--         DS1 port on Nokia 7210 SAS devices.  Entries cannot be
+--         created or deleted via SNMP SET operations.  Entries in this table
+--         will be created or deleted automatically when entries in the
+--         tmnxDS1PortTable are created or deleted."
+--    AUGMENTS  { tnTmnxDS1PortEntry }
+--    ::= { aluExtTmnxDS1PortTable 1 }
+
+-- AluExtTmnxDS1PortEntry ::=
+--    SEQUENCE {
+--        aluExtDS1PortLineImpedance        INTEGER
+--    }
+
+-- aluExtDS1PortLineImpedance    OBJECT-TYPE
+--    SYNTAX      INTEGER {
+--                    notApplicable     (0),
+--                    impedance75Ohms   (1),
+--                    impedance100Ohms  (2),
+--                    impedance120Ohms  (3)
+--                }
+--    MAX-ACCESS  read-write
+--    STATUS      current
+--    DESCRIPTION
+--        "The value of aluExtDS1PortLineImpedance indicates the current line
+--         impedance set on the physical T1/E1 port.
+--
+--         T1 Ports may only be configured to have an impedance of 100 Ohms.
+--
+--         E1 Ports may be configured to have an impledance of either 75 or
+--         120 Ohms where the default impedance is 120 Ohms."
+--    DEFVAL      { impedance100Ohms }
+--    ::= { aluExtTmnxDS1PortEntry 1 }
+
+--
+--  Port ACR Clock Stats Table
+--
+-- tnPortAcrClkStatsTable OBJECT-TYPE
+--     SYNTAX      SEQUENCE OF TnPortAcrClkStatsEntry
+--     MAX-ACCESS  not-accessible
+--     STATUS      current
+--     DESCRIPTION
+--         "Defines the Nokia SAR series port adaptive clock
+--          recovery (ACR) statistics table for providing, via SNMP, the
+--          capability of retrieving statistical information relating
+--          to clock that is derived from the ACR CPIPE PW."
+--     ::= { tnSASPortObjs 10 }
+--
+-- tnPortAcrClkStatsEntry    OBJECT-TYPE
+--     SYNTAX      TnPortAcrClkStatsEntry
+--     MAX-ACCESS  not-accessible
+--     STATUS      current
+--     DESCRIPTION
+--         "Defines an entry in tnPortAcrClkStatsTable. Entries are
+--          created and deleted by the system depending port
+--          configuration."
+--     INDEX   {  tnPortPortID }
+--     ::= { tnPortAcrClkStatsTable 1 }
+--
+-- TnPortAcrClkStatsEntry ::=
+--     SEQUENCE {
+--         tnLastUpdateTime                   TimeStamp,
+--         tnTotalMinutesIn24Hour             Unsigned32,
+--         tnCurrent24HourFreqOffsetMeanPpb   Integer32,
+--         tnCurrent24HourFreqOffsetStdDevPpb Unsigned32,
+--         tnMaxShortIntervalMinutes          Unsigned32,
+--         tnTotalShortIntervalMinutes        Unsigned32,
+--         tnCurrent1MinValidData              TruthValue,
+--         tnCurrent1MinPhaseErrorMeanPpb      Integer32,
+--         tnCurrent1MinPhaseErrorStdDevNs     Unsigned32,
+--         tnCurrent1MinPhaseErrorMeanNs       Integer32,
+--         tnCurrent1MinFreqOffsetMeanPpb      Integer32,
+--         tnCurrent1MinFreqOffsetStdDevPpb    Unsigned32
+--     }
+--
+-- tnLastUpdateTime OBJECT-TYPE
+--     SYNTAX      TimeStamp
+--     MAX-ACCESS  read-only
+--     STATUS      current
+--     DESCRIPTION
+--         "The last time the ACR statistics were updated"
+--     ::= { tnPortAcrClkStatsEntry 1 }
+--
+-- tnTotalMinutesIn24Hour OBJECT-TYPE
+--     SYNTAX      Unsigned32
+--     MAX-ACCESS  read-only
+--     STATUS      current
+--     DESCRIPTION
+--         "The number of minutes in tn24HourFreqOffsetMeanPpb
+--         and tn24HourFreqOffsetStdDevPpb"
+--     ::= { tnPortAcrClkStatsEntry 2 }
+--
+-- tnCurrent24HourFreqOffsetMeanPpb OBJECT-TYPE
+--     SYNTAX      Integer32
+--     MAX-ACCESS  read-only
+--     STATUS      current
+--     DESCRIPTION
+--         "tnCurrent24HourFreqOffsetMeanPpb indicates the mean frequency offset
+--          from the local oscillator clock in parts per billion for up to the
+--          last 24 hour."
+--     ::= { tnPortAcrClkStatsEntry 3 }
+--
+-- tnCurrent24HourFreqOffsetStdDevPpb OBJECT-TYPE
+--     SYNTAX      Unsigned32
+--     MAX-ACCESS  read-only
+--     STATUS      current
+--     DESCRIPTION
+--         "tnCurrent24HourFreqOffsetStdDevPpb indicates the standard deviation of the
+--          frequency offset from the local oscillator clock in parts per billion
+--          for up to the last 24 hour."
+--     ::= { tnPortAcrClkStatsEntry 4 }
+--
+-- tnMaxShortIntervalMinutes OBJECT-TYPE
+--     SYNTAX      Unsigned32
+--     MAX-ACCESS  read-only
+--     STATUS      current
+--     DESCRIPTION
+--         "tnMaxShortIntervalMinutes the maximum number of tnStatsShortIntervalIndexes."
+--     ::= { tnPortAcrClkStatsEntry 5 }
+--
+-- tnTotalShortIntervalMinutes OBJECT-TYPE
+--     SYNTAX      Unsigned32
+--     MAX-ACCESS  read-only
+--     STATUS      current
+--     DESCRIPTION
+--         "tnTotalShortIntervalMinutes is the number of tnStatsShortIntervalIndexes
+--         that have valid statistics"
+--     ::= { tnPortAcrClkStatsEntry 6 }
+--
+-- tnCurrent1MinValidData OBJECT-TYPE
+--      SYNTAX TruthValue
+--      MAX-ACCESS read-only
+--      STATUS current
+--      DESCRIPTION
+--             "This variable indicates if the data for the first
+--             interval is valid."
+--      ::= { tnPortAcrClkStatsEntry 7 }
+--
+-- tnCurrent1MinPhaseErrorMeanPpb OBJECT-TYPE
+--      SYNTAX  Integer32
+--      MAX-ACCESS  read-only
+--      STATUS  current
+--      DESCRIPTION
+--             "The mean phase error from the local oscillator clock
+--             in parts per billion during the first interval."
+--      ::= { tnPortAcrClkStatsEntry 8 }
+--
+-- tnCurrent1MinPhaseErrorStdDevNs OBJECT-TYPE
+--      SYNTAX  Unsigned32
+--      MAX-ACCESS  read-only
+--      STATUS  current
+--      DESCRIPTION
+--             "The standard deviation of the phase error from the local
+--             oscillator clock in nano seconds during the first interval."
+--      ::= { tnPortAcrClkStatsEntry 9 }
+--
+-- tnCurrent1MinPhaseErrorMeanNs OBJECT-TYPE
+--      SYNTAX  Integer32
+--      MAX-ACCESS  read-only
+--      STATUS  current
+--      DESCRIPTION
+--             "The mean of the phase error from the local
+--             oscillator clock in nano seconds during the first interval."
+--      ::= { tnPortAcrClkStatsEntry 10 }
+--
+-- tnCurrent1MinFreqOffsetMeanPpb OBJECT-TYPE
+--      SYNTAX  Integer32
+--      MAX-ACCESS  read-only
+--      STATUS  current
+--      DESCRIPTION
+--             "The mean frequency offset from the local oscillator clock
+--             in parts per billion during the first interval."
+--      ::= { tnPortAcrClkStatsEntry 11 }
+--
+-- tnCurrent1MinFreqOffsetStdDevPpb OBJECT-TYPE
+--      SYNTAX  Unsigned32
+--      MAX-ACCESS  read-only
+--      STATUS  current
+--      DESCRIPTION
+--             "The standard deviation of the frequency offset from the
+--             local oscillator clock in nano seconds during the first interval."
+--      ::= { tnPortAcrClkStatsEntry 12 }
+
+--
+--  Port ACR Clock Stats Short Interval Table
+--
+-- tnPortAcrClkStatsShortIntervalTable OBJECT-TYPE
+--      SYNTAX  SEQUENCE OF TnPortAcrClkStatsShortIntervalEntry
+--      MAX-ACCESS  not-accessible
+--      STATUS  current
+--      DESCRIPTION
+--             "The Port ACR Clock Interval Table contains various
+--             statistics collected by each adaptively timed port
+--             over the previous 15 minutes. The past 15 minutes are
+--             broken into 15 1 minute intervals.  Each
+--             row in this table represents one such interval
+--             (identified by tnAcrClkIntervalNumber)."
+--      ::= { tnSASPortObjs 11 }
+--
+-- tnPortAcrClkStatsShortIntervalEntry OBJECT-TYPE
+--      SYNTAX  TnPortAcrClkStatsShortIntervalEntry
+--      MAX-ACCESS  not-accessible
+--      STATUS  current
+--      DESCRIPTION
+--             "An entry in the Port ACR Clock Interval table."
+--     INDEX   {  tnPortPortID, tnIntervalNumber}
+--      ::= { tnPortAcrClkStatsShortIntervalTable 1 }
+--
+-- TnPortAcrClkStatsShortIntervalEntry ::=
+--      SEQUENCE {
+--          tnIntervalNumber              INTEGER,
+--          tnIntervalValidData           TruthValue,
+--          tnIntervalUpdateTime          TimeStamp,
+--          tnIntervalPhaseErrorMeanPpb   Integer32,
+--          tnIntervalPhaseErrorStdDevNs  Unsigned32,
+--          tnIntervalPhaseErrorMeanNs    Integer32,
+--          tnIntervalFreqOffsetMeanPpb   Integer32,
+--          tnIntervalFreqOffsetStdDevPpb Unsigned32
+-- }
+--
+-- tnIntervalNumber OBJECT-TYPE
+--      SYNTAX  INTEGER (1..15)
+--      MAX-ACCESS  not-accessible
+--      STATUS  current
+--      DESCRIPTION
+--             "A number between 1 and 15, where 1 is the most
+--             recently completed 1 minute interval and 15 is
+--             the 1 minutes interval completed 14 minutes prior
+--             to interval 1."
+--      ::= { tnPortAcrClkStatsShortIntervalEntry 1 }
+--
+-- tnIntervalValidData OBJECT-TYPE
+--      SYNTAX TruthValue
+--      MAX-ACCESS read-only
+--      STATUS current
+--      DESCRIPTION
+--             "This variable indicates if the data for this
+--             interval is valid."
+--      ::= { tnPortAcrClkStatsShortIntervalEntry 2 }
+--
+-- tnIntervalUpdateTime OBJECT-TYPE
+--     SYNTAX      TimeStamp
+--     MAX-ACCESS  read-only
+--     STATUS      current
+--     DESCRIPTION
+--         "The update time of the ACR interval statistics"
+--     ::= { tnPortAcrClkStatsShortIntervalEntry 3 }
+--
+-- tnIntervalPhaseErrorMeanPpb OBJECT-TYPE
+--      SYNTAX  Integer32
+--      MAX-ACCESS  read-only
+--      STATUS  current
+--      DESCRIPTION
+--             "The mean phase error from the local oscillator clock
+--             in parts per billion during the interval."
+--      ::= { tnPortAcrClkStatsShortIntervalEntry 4 }
+--
+-- tnIntervalPhaseErrorStdDevNs OBJECT-TYPE
+--      SYNTAX  Unsigned32
+--      MAX-ACCESS  read-only
+--      STATUS  current
+--      DESCRIPTION
+--             "The standard deviation of the phase error from the local
+--             oscillator clock in nano seconds during the interval."
+--      ::= { tnPortAcrClkStatsShortIntervalEntry 5 }
+--
+-- tnIntervalPhaseErrorMeanNs OBJECT-TYPE
+--      SYNTAX  Integer32
+--      MAX-ACCESS  read-only
+--      STATUS  current
+--      DESCRIPTION
+--             "The mean of the phase error from the local
+--             oscillator clock in nano seconds during the interval."
+--      ::= { tnPortAcrClkStatsShortIntervalEntry 6 }
+--
+-- tnIntervalFreqOffsetMeanPpb OBJECT-TYPE
+--      SYNTAX  Integer32
+--      MAX-ACCESS  read-only
+--      STATUS  current
+--      DESCRIPTION
+--             "The mean frequency offset from the local oscillator clock
+--             in parts per billion during the interval."
+--      ::= { tnPortAcrClkStatsShortIntervalEntry 7 }
+--
+-- tnIntervalFreqOffsetStdDevPpb OBJECT-TYPE
+--      SYNTAX  Unsigned32
+--      MAX-ACCESS  read-only
+--      STATUS  current
+--      DESCRIPTION
+--             "The standard deviation of the frequency offset from the
+--             local oscillator clock in nano seconds during the interval."
+--      ::= { tnPortAcrClkStatsShortIntervalEntry 8 }
+
+--
+-- ALU Extensions of Tmnx DS1 table
+--
+-- aluExtTmnxDS1Table OBJECT-TYPE
+--     SYNTAX      SEQUENCE OF AluExtTmnxDS1Entry
+--     MAX-ACCESS  not-accessible
+--     STATUS      current
+--     DESCRIPTION
+--         "The aluExtTmnxDS1Table has an entry for a DS1 physical port or channel."
+--     ::= { tnSASPortObjs 12 }
+
+-- aluExtTmnxDS1Entry       OBJECT-TYPE
+--     SYNTAX      AluExtTmnxDS1Entry
+--     MAX-ACCESS  not-accessible
+--     STATUS      current
+--     DESCRIPTION
+--         "Each row entry represents extended functionality of a DS1 physical
+--          port or channel on Nokia 7210 SAS devices.  Entries cannot be
+--          created or deleted via SNMP SET operations.  Entries in this table
+--          will be created or deleted automatically when entries in the
+--          tmnxDS1Table are created or deleted."
+--     AUGMENTS  { tmnxDS1Entry }
+--     ::= { aluExtTmnxDS1Table 1 }
+
+-- AluExtTmnxDS1Entry ::=
+--     SEQUENCE {
+--                 aluExtDS1SignalBitsState     OCTET STRING
+--     }
+
+-- aluExtDS1SignalBitsState OBJECT-TYPE
+--     SYNTAX      OCTET STRING (SIZE(64))
+--     MAX-ACCESS  read-only
+--     STATUS      current
+--     DESCRIPTION
+--         "aluExtDS1SignalBitsState is an array of bytes used to indicate the
+--          current state of the ABCD signalling bits for all timeslots of a
+--          DS1/E1.
+
+--          The first half of the array or the 32 most significant bytes describe
+--          the RX ABCD bits. The other half describes the TX ABCD bits.
+
+--          In each half of the array, every byte represents a particular timeslot.
+--          The most significant byte represents timeslot 1. The least significant
+--          byte represents timeslot 32.
+
+--          The byte arrangement is as follows:
+
+--          array index: |  0  1 ... 30 31 | 32 33 ... 62 63 |
+--          timeslot:    |  1  2 ... 31 32 |  1  2 ... 31 32 |
+--                       | <---- RX -----> | <---- TX -----> |
+
+--          Each byte carries ABCD bits in the least significant nibble. The
+--          byte's most significant bit indicates the validity of the ABCD bits.
+
+--          The bit arrangement is as follows:
+
+--          bit pos:    | 7 6 5 4 3 2 1 0 |
+--                      | V x x x A B C D |
+
+--          'V' - validity (0 = invalid, 1 = valid)
+--          'x' - don't care
+
+--          ABCD bits are marked invalid for a variety of situations (eg.
+--          tmnxDS1SignalMode not configured for CAS, timeslot(s) not configured
+--          as part of a channel-group, DS1/E1 status not up, etc.).
+
+--          For CAS DS1 SF, only the AB signalling bits are supported. The remaining
+--          2 least significant bits in the nibble are undefined.
+--          "
+--     ::= { aluExtTmnxDS1Entry 3 }
+
+
+--
+-- PSS specific extension table of ifEntry
+--
+
+tnSASPssIfTable OBJECT-TYPE
+   SYNTAX       SEQUENCE OF TnSASPssIfEntry
+   MAX-ACCESS   not-accessible
+   STATUS       current
+   DESCRIPTION
+           "This table contains additional objects for the interface
+            table (ifTable) required for the management of packet cards
+            in PSS."
+   ::= { tnSASPortObjs 50 }
+
+tnSASPssIfEntry OBJECT-TYPE
+   SYNTAX       TnSASPssIfEntry
+   MAX-ACCESS   not-accessible
+   STATUS       current
+   DESCRIPTION
+           "An entry containing additional management information
+            applicable to PSS packet cards."
+   AUGMENTS     { ifEntry }
+   ::= { tnSASPssIfTable 1}
+
+TnSASPssIfEntry ::=
+   SEQUENCE {
+       ifStatsUpdateTimeStamp    Counter64
+   }
+
+ifStatsUpdateTimeStamp OBJECT-TYPE
+   SYNTAX       Counter64
+   UNITS        "milliseconds"
+   MAX-ACCESS   read-only
+   STATUS       current
+   DESCRIPTION
+           "A timestamp value to indicate the last update to the statistics
+            in the interface table.  This can be used for accurate delta
+            calculations of periodic readings of the statistics.  The
+            timestamp is in millisecond units"
+   ::= { tnSASPssIfEntry 1 }
+
+
+--
+-- Virtual port table for loopback
+--
+
+tnVirtualPortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TnVirtualPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The port table has an entry for each virtual port"
+    ::= { tnSASPortObjs 15 }
+
+
+tnVirtualPortEntry       OBJECT-TYPE
+    SYNTAX      TnVirtualPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents a virtual port"
+    INDEX   { tnSysSwitchId, tnVirtualPortPortID }
+    ::= { tnVirtualPortTable 1 }
+
+TnVirtualPortEntry ::=
+    SEQUENCE {
+        tnVirtualPortPortID                    TmnxPortID,
+        tnVirtualPortInUse                     INTEGER,
+        tnVirtualPortSpeed                     INTEGER
+ }
+
+tnVirtualPortPortID   OBJECT-TYPE
+    SYNTAX      TmnxPortID
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "tnVirtualPortPortID is an index into this table"
+    ::= { tnVirtualPortEntry 1 }
+
+tnVirtualPortInUse    OBJECT-TYPE
+    SYNTAX        INTEGER {
+                        not-in-use (1),
+                        mirror  (2),
+                        macswap (3),
+                        testhead (4)
+                        }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "tnVirtualPortInUse describes whether the virtual port is used by an application or not."
+    ::= { tnVirtualPortEntry 2 }
+
+tnVirtualPortSpeed    OBJECT-TYPE
+    SYNTAX        INTEGER {
+                         one-gig  (1),
+                         ten-gig  (2)
+                        }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "tnVirtualPortSpeed describes the speed of the virtual ports."
+    ::= { tnVirtualPortEntry 3 }
+
+--
+-- Dummy Scalars
+--
+tnSASPortScalar1 OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A dummy scalar that satisfies a SNMP get request quickly when
+         there is no 11QPE24 card provisioned.  Otherwise, it has to
+         traverse the remaining 11QPE24 MIB to get to the next applicable
+         item."
+    ::= { tnSASPortObjs 101 }
+
+tnSASPortScalar2 OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "."
+    ::= { tnSASPortObjs 102 }
+
+--
+-- Conformance Information
+--
+
+-- tnSASPortCompliances OBJECT IDENTIFIER ::= { tnSASPortConformance 1 }
+-- tnSASPortGroups      OBJECT IDENTIFIER ::= { tnSASPortConformance 2 }
+
+-- tnSASPortV1v0Group OBJECT-GROUP
+--    OBJECTS    {
+--        tnPortUplinkMode,
+--        tnPortAccessEgressQoSPolicyId,
+--        tnPortNetworkQoSPolicyId,
+--        tnPortShgGroupName,
+--        tnPortShgRowStatus,
+--        tnPortShgInstanceId,
+--        tnPortShgDescription,
+--        tnPortShgLastMgmtChange,
+--        tnSASPortNetIngressFwdInProfPkts,
+--        tnSASPortNetIngressFwdOutProfPkts,
+--        tnSASPortNetIngressFwdInProfOcts,
+--        tnSASPortNetIngressFwdOutProfOcts,
+--        tnPortEtherEgressMaxBurst,
+--        tnPortStatsQueue1PktsFwd,
+--        tnPortStatsQueue2PktsFwd,
+--        tnPortStatsQueue3PktsFwd,
+--        tnPortStatsQueue4PktsFwd,
+--        tnPortStatsQueue5PktsFwd,
+--        tnPortStatsQueue6PktsFwd,
+--        tnPortStatsQueue7PktsFwd,
+--        tnPortStatsQueue8PktsFwd,
+--        tnPortEtherLoopback
+--   }
+--       STATUS current
+--       DESCRIPTION
+--           " sas group object definition "
+--       ::= { tnSASPortGroups 1 }
+
+-- tnSASPortV1v1Group OBJECT-GROUP
+--    OBJECTS    {
+--        tnPortAccessEgressQueueStatsFwdPkts,
+--        tnPortAccessEgressQueueStatsFwdOcts,
+--        tnPortAccessEgressQueueStatsDroPkts,
+--        tnPortAccessEgressQueueStatsDroOcts,
+--        tnPortNetEgressQueueStatsFwdPkts,
+--        tnPortNetEgressQueueStatsFwdOcts,
+--        tnPortNetEgressQueueStatsDroPkts,
+--        tnPortNetEgressQueueStatsDroOcts,
+--        tnPortNetEgressQueueStatsInProfDroPkts,
+--        tnPortNetEgressQueueStatsInProfDroOcts,
+--        tnPortNetEgressQueueStatsOutProfDroPkts,
+--        tnPortNetEgressQueueStatsOutProfDroOcts
+--   }
+--       STATUS current
+--       DESCRIPTION
+--           " sas group object definition "
+--       ::= { tnSASPortGroups 2 }
+
+-- tnSASPortV2v0Group OBJECT-GROUP
+--    OBJECTS    {
+--        aluExtDS1PortLineImpedance,
+--        tnPortEtherEgrSchedMode
+--   }
+--       STATUS current
+--       DESCRIPTION
+--           " SAS group object definitions for 2.0 release"
+--       ::= { tnSASPortGroups 3 }
+
+-- tnSASPortV3v0Group OBJECT-GROUP
+--    OBJECTS    {
+--        tnPortEtherClockConfig
+--   }
+--       STATUS current
+--       DESCRIPTION
+--           " SAS group object definitions for 3.0 release"
+--       ::= { tnSASPortGroups 6 }
+
+-- aluPortAcrClkStatsGroup     OBJECT-GROUP
+--    OBJECTS {
+--                aluLastUpdateTime,
+--                aluTotalMinutesIn24Hour,
+--                aluCurrent24HourFreqOffsetMeanPpb,
+--                aluCurrent24HourFreqOffsetStdDevPpb,
+--                aluMaxShortIntervalMinutes,
+--                aluTotalShortIntervalMinutes,
+--                aluCurrent1MinValidData,
+--                aluCurrent1MinPhaseErrorMeanPpb,
+--                aluCurrent1MinPhaseErrorStdDevNs,
+--                aluCurrent1MinPhaseErrorMeanNs,
+--                aluCurrent1MinFreqOffsetMeanPpb,
+--                aluCurrent1MinFreqOffsetStdDevPpb,
+--                aluIntervalNumber,
+--                aluIntervalValidData,
+--                aluIntervalUpdateTime,
+--                aluIntervalPhaseErrorMeanPpb,
+--                aluIntervalPhaseErrorStdDevNs,
+--                aluIntervalPhaseErrorMeanNs,
+--                aluIntervalFreqOffsetMeanPpb,
+--                aluIntervalFreqOffsetStdDevPpb
+--            }
+--    STATUS      current
+--    DESCRIPTION
+--        "The group of objects supporting retrieval of the ACR clock statistic
+--        on Nokia SAR series systems"
+--    ::= { tnSASPortGroups 4 }
+
+--tnSASPortV4v0Group OBJECT-GROUP
+--    OBJECTS    {
+--        tnPortAccessEgressQueueStatsFwdPkts,
+--        tnPortAccessEgressQueueStatsFwdOcts,
+--        tnPortAccessEgressQueueStatsDroPkts,
+--        tnPortAccessEgressQueueStatsDroOcts,
+--        tnPortNetEgressQueueStatsFwdPkts,
+--        tnPortNetEgressQueueStatsFwdOcts,
+--        tnPortNetEgressQueueStatsDroPkts,
+--        tnPortNetEgressQueueStatsDroOcts,
+--        tnPortNetEgressQueueStatsInProfDroPkts,
+--        tnPortNetEgressQueueStatsInProfDroOcts,
+--        tnPortNetEgressQueueStatsOutProfDroPkts,
+--        tnPortNetEgressQueueStatsOutProfDroOcts,
+--        tnPortEtherIpMTU,
+--        tnPortEtherClockConfig,
+--        tnPortLoopbckServId,
+--        tnPortLoopbckSapPortId,
+--        tnPortLoopbckSapEncapVal,
+--        tnPortLoopbckSrcMacAddr,
+--        tnPortLoopbckDstMacAddr,
+--        tnPortAccEgrSapQosMarking,
+--        tnPortLldpTnlNrstBrdgeDstMac,
+--        tnPortPtpEnable,
+--        tnPortSapEtherLLFAdminStatus,
+--        tnPortSapEtherLLFOperStatus,
+--        tnPortSapEtherLLFId
+--   }
+--       STATUS current
+--       DESCRIPTION
+--           " sas group object definition "
+--       ::= { tnSASPortGroups 5 }
+
+END

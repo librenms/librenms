@@ -1,0 +1,430 @@
+TN-DOT3-OAM-MIB DEFINITIONS ::= BEGIN
+
+-- (c) Copyright 2023 Nokia Networks.  All rights reserved.
+-- This software is the confidential and proprietary property of
+-- Nokia and may only be used in accordance with the terms of the
+-- license agreement provided with this software.
+
+IMPORTS
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        Unsigned32, NOTIFICATION-TYPE                 FROM SNMPv2-SMI
+
+        TimeStamp,
+        TruthValue                                    FROM SNMPv2-TC
+
+        dot3OamEntry, dot3OamLoopbackEntry,
+        dot3OamPeerMacAddress                         FROM DOT3-OAM-MIB
+
+        tnSRMIBModules, tnSRObjs,
+        tnSRNotifyPrefix                              FROM TROPIC-GLOBAL-REG
+
+        ifIndex                                       FROM IF-MIB;
+
+
+tnDOT3OAMMIBModule MODULE-IDENTITY
+        LAST-UPDATED    "200807010000Z"
+        ORGANIZATION    "Nokia"
+        CONTACT-INFO
+            "Nokia 7xxx Support
+             Web: http://www.nokia.com/comps/pages/carrier_support.jhtml"
+        DESCRIPTION
+        "This document is the SNMP MIB module to manage and provision Ethernet
+        OAM (802.3ah) functionality for the Nokia 7xxx device. This includes
+        extensions to the DOT3-OAM-MIB defined in IEEE 802.3ah to allow transmit
+        interval configuration and other locally configured modifications.
+
+        This SNMP MIB module (Specification) embodies Nokia's
+        proprietary intellectual property.  Nokia retains
+        all title and ownership in the Specification, including any
+        revisions.
+
+        Nokia grants all interested parties a non-exclusive
+        license to use and distribute an unmodified copy of this
+        Specification in connection with management of Nokia
+        products, and without fee, provided this copyright notice and
+        license appear on all copies.
+
+        This Specification is supplied 'as is', and Nokia
+        makes no warranty, either express or implied, as to the use,
+        operation, condition, or performance of the Specification."
+--
+--  Revision History
+--
+        REVISION        "200807010000Z"
+        DESCRIPTION     "Rev 6.1                01 Jul 2008 00:00
+                         6.1 release of the TIMETRA-DOT3-OAM-MIB."
+
+        REVISION        "200801010000Z"
+        DESCRIPTION     "Rev 6.0                01 Jan 2008 00:00
+                         6.0 release of the TIMETRA-DOT3-OAM-MIB."
+
+        REVISION        "200608010000Z"
+        DESCRIPTION     "Rev 0.1                01 Aug 2006 00:00
+                         Initial version of the TIMETRA-DOT3-OAM-MIB."
+
+        ::= { tnSRMIBModules 42 }
+
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+--
+--  Nokia 7750 SR series Ethernet OAM extensions
+--
+
+tnDot3OamObjs           OBJECT IDENTIFIER ::= { tnSRObjs 42 }
+-- tnDot3OamMIBConformance OBJECT IDENTIFIER ::= { tnSRConfs 42 }
+tnDot3OamEntryObjs      OBJECT IDENTIFIER ::= { tnDot3OamObjs 1 }
+tnDot3OamLoopbackObjs    OBJECT IDENTIFIER ::= { tnDot3OamObjs 2 }
+
+tnDot3OamNotifyPrefix    OBJECT IDENTIFIER ::= { tnSRNotifyPrefix 42 }
+tnDot3OamNotificationsPrefix      OBJECT IDENTIFIER ::= { tnDot3OamNotifyPrefix 42 }
+    tnDot3OamNotifications      OBJECT IDENTIFIER ::= { tnDot3OamNotificationsPrefix 0 }
+
+
+--
+--  Nokia 7750 SR series Ethernet OAM (802.3ah) Table
+--
+--  Augmententation of dot3OamTable in DOT3-OAM-MIB
+--
+--  The tnDot3OamTable is an augmentation of the dot3OamTable.
+--  Use of AUGMENTS clause implies a one-to-one dependent relationship between
+--  the base table, dot3OamTable, and the augmenting table, tnDot3OamTable.
+--  This in effect extends the dot3OamTable with additional columns.
+--  Creation (or deletion) of a row in the dot3OamTable results in the same
+--  fate for the row in the tnDot3OamTable
+
+tnDot3OamTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF TDot3OamEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "The tnDot3OamTable is used to store proprietary configuration
+         information on a particular Ethernet like interface (OAM entity)
+         in the system that supports the OAM functions defined in [802.3ah]."
+    ::= { tnDot3OamEntryObjs 1 }
+
+    tnDot3OamEntry OBJECT-TYPE
+        SYNTAX        TDot3OamEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "An entry in the tnDot3OamTable containing configuration
+             information applicable to an OAM entity."
+        AUGMENTS { dot3OamEntry }
+        ::= { tnDot3OamTable 1 }
+
+    TDot3OamEntry ::=
+        SEQUENCE {
+           tnDot3OamLastChanged  TimeStamp,
+           tnDot3OamInterval     Unsigned32,
+           tnDot3OamMultiplier   Unsigned32,
+           tnDot3OamTunneling    TruthValue,
+           tnDot3OamLooped       TruthValue,
+           tnDot3OamHoldTime     Unsigned32
+        }
+
+     tnDot3OamLastChanged OBJECT-TYPE
+        SYNTAX     TimeStamp
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "The value of tnDot3OamLastChanged indicates
+                 the sysUpTime value when this row was last modified."
+        ::= { tnDot3OamEntry 1 }
+
+    tnDot3OamInterval OBJECT-TYPE
+        SYNTAX       Unsigned32 (1..600)
+        UNITS        "100s of milliseconds"
+        MAX-ACCESS   read-write
+        STATUS       current
+        DESCRIPTION
+           "The value of tnDot3OamInterval specifies the number of 100ms
+            time intervals between each periodic OAMPDU transmit and receive.
+            A lower value implies that OAMPDUs will be transmitted more
+            frequently to the peer, and OAMPDUs must be received more frequently
+            from the peer.  The default is set to 10, meaning 1 second between
+            transmits and receives."
+        DEFVAL { 10 }
+        ::= { tnDot3OamEntry 2 }
+
+    tnDot3OamMultiplier OBJECT-TYPE
+        SYNTAX       Unsigned32 (2..5)
+        MAX-ACCESS   read-write
+        STATUS       current
+        DESCRIPTION
+           "The value of tnDot3OamMultiplier specifies how many receive
+            intervals may expire with no OAMPDU receive.  After the configured
+            number of intervals with OAMPDU receive have passed, the OAM
+            negotiation process will restart."
+        DEFVAL { 5 }
+        ::= { tnDot3OamEntry 3 }
+
+    tnDot3OamTunneling OBJECT-TYPE
+        SYNTAX       TruthValue
+        MAX-ACCESS   read-write
+        STATUS       current
+        DESCRIPTION
+           "The value of tnDot3OamTunneling specifies if OAMPDUs should
+            be passed transparently through the OAM entity for processing
+            by another OAM entity across the network, or if OAMPDUs should be
+            terminated and processed at the local OAM entity.  This object
+            can only be set to 'true' if dot3OamAdminState is set to 'disabled'.
+            Likewise, dot3OamAdminState can only be set to 'enabled' if this
+            object is set to 'false'.  It is not valid to try and enable both
+            OAMPDU processing and OAMPDU tunneling on the same OAM entity."
+        DEFVAL { false }
+        ::= { tnDot3OamEntry 4 }
+
+    tnDot3OamLooped OBJECT-TYPE
+        SYNTAX       TruthValue
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+           "The value of tnDot3OamLooped indicates if the OAM entity
+            is receiving OAMPDUs that it transmitted.  A value of 'true'
+            indicates that the OAM entity is receiving it's own OAMPDUs while
+            a value of 'false' indicates it is not."
+        DEFVAL { false }
+        ::= { tnDot3OamEntry 5 }
+
+    tnDot3OamHoldTime OBJECT-TYPE
+        SYNTAX       Unsigned32 (0..50)
+        UNITS        "seconds"
+        MAX-ACCESS   read-write
+        STATUS       current
+        DESCRIPTION
+           "The value of tnDot3OamHoldTime specifies the number of seconds
+            the efm-oam protocol should wait after dot3OamOperStatus transitions
+            from 'operational (9)' to a non-operational state before going back to
+            the 'operational (9)' state again.  Note that a transition to the
+            'linkFault (2)' state does not cause tnDot3OamHoldTime to be used if
+            dot3OamOperStatus was previously in the 'operational (9)' state."
+        DEFVAL { 0 }
+        ::= { tnDot3OamEntry 6 }
+--
+--  Nokia 7750 SR series Ethernet OAM (802.3ah) Loopback Table
+--
+--  Augmententation of dot3OamLoopbackTable in DOT3-OAM-MIB
+--
+--  The tnDot3OamLoopbackTable is an augmentation of the
+--  dot3OamLoopbackTable. Use of AUGMENTS clause implies a one-to-one dependent
+--  relationship between the base table, dot3OamLoopbackTable, and the
+--  augmenting table, tnDot3OamLoopbackTable.  This in effect extends the
+--  dot3OamLoopbackTable with additional columns.  Creation (or deletion) of
+--  a row in the dot3OamLoopbackTable results in the same fate for the row in
+--  the tnDot3OamLoopbackTable.
+
+tnDot3OamLoopbackTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF TDot3OamLoopbackEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "The tnDot3OamLoopbackTable is used to store proprietary
+         loopback configuration information on a particular
+         Ethernet like interface (OAM entity) in the system that supports
+         the OAM functions defined in [802.3ah]."
+    ::= { tnDot3OamLoopbackObjs 1 }
+
+    tnDot3OamLoopbackEntry OBJECT-TYPE
+        SYNTAX        TDot3OamLoopbackEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "An entry in the tnDot3OamLoopbackTable containing
+             configuration information applicable to an OAM entity."
+        AUGMENTS { dot3OamLoopbackEntry }
+        ::= { tnDot3OamLoopbackTable 1 }
+
+    TDot3OamLoopbackEntry ::=
+        SEQUENCE {
+           tnDot3OamLoopbackLastChanged     TimeStamp,
+           tnDot3OamLoopbackLocalStatus     INTEGER
+        }
+
+    tnDot3OamLoopbackLastChanged OBJECT-TYPE
+        SYNTAX     TimeStamp
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "The value of tnDot3OamLoopbackLastChanged indicates
+                 the sysUpTime value when this row was last modified."
+        ::= { tnDot3OamLoopbackEntry 1 }
+
+    tnDot3OamLoopbackLocalStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+                      noLoopback (1),
+                      localLoopback (2)
+                    }
+        MAX-ACCESS   read-write
+        STATUS       current
+        DESCRIPTION
+           "The value of tnDot3OamLoopbackLocalStatus indicates the local
+            loopback status of the OAM entity.  This attribute allows the user
+            to manually set the local OAM entity loopback mode overriding the
+            802.3ah protocol for loopback.  Setting the value to 'localLoopback'
+            can only be done if dot3OamLoopbackStatus is set to 'noLoopback'.
+            If dot3OamLoopbackStatus is any value other than 'noLoopback', the
+            changes to tnDot3OamLoopbackLocalStatus will have no effect.  If
+            dot3OamLoopbackStatus is set to 'localLoopback', the OAM entity will
+            act as if its peer put the OAM entity into local loopback.  This
+            entry allows the user to put an OAM entity into local loopback mode,
+            even if dot3OamLoopbackIgnoreRx is set to 'ignore'."
+        DEFVAL { noLoopback }
+        ::= { tnDot3OamLoopbackEntry 2 }
+
+
+--
+--  Nokia 7750 SR series Ethernet OAM (802.3ah) Notifications
+--
+
+tnDot3OamPeerChanged NOTIFICATION-TYPE
+    OBJECTS {
+        dot3OamPeerMacAddress
+    }
+    STATUS  current
+    DESCRIPTION
+        "The tnDot3OamPeerChanged notification is generated
+         when the peer information (specifically the Peer MAC address)
+         changes.  Note that this notification will only be sent out
+         if the peer information was previously available and the
+         information changed, and not when the peer information
+         is first learned or becomes unavailable."
+    ::= { tnDot3OamNotifications 1 }
+
+tnDot3OamLoopDetected NOTIFICATION-TYPE
+    OBJECTS {
+        ifIndex
+    }
+    STATUS  current
+    DESCRIPTION
+        "The tnDot3OamLoopDetected notification is generated
+         when a port receives an 802.3ah PDU with a source MAC
+         address that matches the MAC address of that port."
+    ::= { tnDot3OamNotifications 2 }
+
+tnDot3OamLoopCleared NOTIFICATION-TYPE
+    OBJECTS {
+        ifIndex
+    }
+    STATUS  current
+    DESCRIPTION
+        "The tnDot3OamLoopCleared notification is generated
+         when a port is no longer receiving 802.3ah PDUs with
+         a source MAC address that matches the MAC address of
+         that port."
+    ::= { tnDot3OamNotifications 3 }
+
+--
+-- Conformance Information
+--
+-- tnDot3OamMIBCompliances OBJECT IDENTIFIER ::= { tnDot3OamMIBConformance 1 }
+-- tnDot3OamMIBGroups      OBJECT IDENTIFIER ::= { tnDot3OamMIBConformance 2 }
+
+-- tnDot3OamMIBCompliance  MODULE-COMPLIANCE
+--    STATUS  obsolete
+--    DESCRIPTION
+--            "The compliance statement for revision 5.0 of TIMETRA-DOT3-OAM-MIB."
+--    MODULE  this module
+--        MANDATORY-GROUPS {
+--            tnDot3OamGroup,
+--            tnDot3OamLoopbackGroup,
+--            tnDot3OamNotificationGroup
+--        }
+--    ::= { tnDot3OamMIBCompliances 1 }
+
+-- tnDot3OamMIBV6v0Compliance  MODULE-COMPLIANCE
+--    STATUS  obsolete
+--    DESCRIPTION
+--            "The compliance statement for revision 6.0 of TIMETRA-DOT3-OAM-MIB."
+--    MODULE  this module
+--        MANDATORY-GROUPS {
+--            tnDot3OamV6v0Group,
+--            tnDot3OamLoopbackGroup,
+--            tnDot3OamNotificationV6v0Group
+--        }
+--    ::= { tnDot3OamMIBCompliances 2 }
+
+-- tnDot3OamMIBV6v1Compliance  MODULE-COMPLIANCE
+--    STATUS  current
+--    DESCRIPTION
+--            "The compliance statement for revision 6.0 of TIMETRA-DOT3-OAM-MIB."
+--    MODULE  this module
+--        MANDATORY-GROUPS {
+--            tnDot3OamV6v0Group,
+--            tnDot3OamV6v1Group,
+--            tnDot3OamLoopbackGroup,
+--            tnDot3OamNotificationV6v0Group
+--        }
+--    ::= { tnDot3OamMIBCompliances 3 }
+-- units of conformance
+
+-- tnDot3OamGroup           OBJECT-GROUP
+--    OBJECTS  {
+--          tnDot3OamLastChanged,
+--          tnDot3OamInterval,
+--          tnDot3OamMultiplier,
+--          tnDot3OamTunneling
+--        }
+--    STATUS   obsolete
+--    DESCRIPTION
+--        "The group of objects providing for management an Ethernet OAM
+--         entity on Nokia 7750 SR series systems."
+--    ::= { tnDot3OamMIBGroups 1 }
+
+-- tnDot3OamLoopbackGroup           OBJECT-GROUP
+--    OBJECTS  {
+--          tnDot3OamLoopbackLastChanged,
+--          tnDot3OamLoopbackLocalStatus
+--        }
+--    STATUS   current
+--    DESCRIPTION
+--        "The group of objects providing for loopback management an
+--         Ethernet OAM entity on Nokia 7750 SR series systems."
+--    ::= { tnDot3OamMIBGroups 2 }
+
+-- tnDot3OamNotificationGroup  NOTIFICATION-GROUP
+--    NOTIFICATIONS {
+--        tnDot3OamPeerChanged
+--    }
+--    STATUS    obsolete
+--    DESCRIPTION
+--        "The group of notifications supporting Ethernet OAM in on Nokia 7x50
+--         SR series systems."
+--    ::= { tnDot3OamMIBGroups 3 }
+
+-- tnDot3OamNotificationV6v0Group  NOTIFICATION-GROUP
+--    NOTIFICATIONS {
+--        tnDot3OamPeerChanged,
+--        tnDot3OamLoopDetected,
+--        tnDot3OamLoopCleared
+--    }
+--    STATUS    current
+--    DESCRIPTION
+--        "The group of notifications supporting Ethernet OAM in on Nokia 7x50
+--         SR series systems release 6.0."
+--    ::= { tnDot3OamMIBGroups 4 }
+
+-- tnDot3OamV6v0Group           OBJECT-GROUP
+--    OBJECTS  {
+--          tnDot3OamLastChanged,
+--          tnDot3OamInterval,
+--          tnDot3OamMultiplier,
+--          tnDot3OamTunneling,
+--          tnDot3OamLooped
+--        }
+--    STATUS   current
+--    DESCRIPTION
+--        "The group of objects providing management for an Ethernet OAM
+--         entity on Nokia 7750 SR series systems release 6.0."
+--    ::= { tnDot3OamMIBGroups 5 }
+
+-- tnDot3OamV6v1Group           OBJECT-GROUP
+--    OBJECTS  {
+--          tnDot3OamHoldTime
+--        }
+--    STATUS   current
+--    DESCRIPTION
+--        "The group of objects providing management for an Ethernet OAM
+--         entity on Nokia 7750 SR series systems release 6.1."
+--    ::= { tnDot3OamMIBGroups 6 }
+END
+

@@ -1,0 +1,1806 @@
+TN-MPLS-TP-MIB DEFINITIONS ::= BEGIN
+
+-- (c) Copyright 2023 Nokia Networks.  All rights reserved.
+-- This software is the confidential and proprietary property of
+-- Nokia and may only be used in accordance with the terms of the
+-- license agreement provided with this software.
+
+IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE,
+        Unsigned32, Counter32, Integer32      FROM SNMPv2-SMI
+
+        TEXTUAL-CONVENTION, RowStatus,
+        TimeStamp, TruthValue,
+        TimeInterval                          FROM SNMPv2-TC
+
+        InterfaceIndexOrZero                  FROM IF-MIB
+
+        InetAddressType, InetAddress          FROM INET-ADDRESS-MIB
+
+        tnSRMIBModules, tnSRObjs              FROM TROPIC-GLOBAL-REG
+
+--        tmnxChassisNotifyChassisId,
+--        tmnxChassisNotifyHwIndex,
+--        tmnxCpmCardEntry,
+--        tmnxCpmCardOscillatorType             FROM TIMETRA-CHASSIS-MIB
+
+        TmnxAdminState, TmnxOperState,
+--      TItemDescription, TmnxEnabledDisabled,
+        TNamedItem, TNamedItemOrEmpty,
+        TmnxTunnelID, TmnxMplsTpTunnelType,
+        TmnxMplsTpGlobalID, TmnxMplsTpNodeID  FROM TN-TC-MIB
+
+        vRtrMplsLspIndex                      FROM TN-MPLS-MIB
+
+        vRtrID                                FROM TN-VRTR-MIB
+
+        tnSysSwitchId                         FROM TROPIC-SYSTEM-MIB
+        ;
+
+tnMplsTpMIBModule          MODULE-IDENTITY
+        LAST-UPDATED "201509300000Z"
+        ORGANIZATION "Nokia"
+        CONTACT-INFO
+            "Nokia SROS Support
+             Web: http://support.nokia.com"
+        DESCRIPTION
+        "This document is the SNMP MIB module to manage and provision the
+        MPLS Transport Profile (TP) components of the Nokia SROS.
+
+        This SNMP MIB module (Specification) embodies Nokia's
+        proprietary intellectual property.  Nokia retains
+        all title and ownership in the Specification, including any
+        revisions.
+
+        Nokia grants all interested parties a non-exclusive
+        license to use and distribute an unmodified copy of this
+        Specification in connection with management of Nokia
+        products, and without fee, provided this copyright notice and
+        license appear on all copies.
+
+        This Specification is supplied 'as is', and Nokia
+        makes no warranty, either express or implied, as to the use,
+        operation, condition, or performance of the Specification."
+
+--
+-- Revision History
+--
+        REVISION                 "201509300000Z"
+        DESCRIPTION              "Changed the DEFVAL for vRtrMplsTpPtcTmplRapidPscTimer:
+                                  From 10 to 3."
+
+        REVISION                 "201504300000Z"
+        DESCRIPTION              "Added support for MIBs in TN-MPLS-TP-MIB"
+
+        REVISION                 "201206010000Z"
+        DESCRIPTION              "Rev 1.0                1 Jun 2012 00:00
+                                  Initial release of the TIMETRA-MPLS-TP-MIB."
+
+        ::= { tnSRMIBModules 83 }
+
+vRtrMplsTpObjs             OBJECT IDENTIFIER ::= { tnSRObjs              83 }
+-- vRtrMplsTpNotifyPrefix     OBJECT IDENTIFIER ::= { tmnxSRNotifyPrefix      83 }
+-- vRtrMplsTpConformance      OBJECT IDENTIFIER ::= { tmnxSRConfs             83 }
+
+-- Object Groups in the Nokia MPLS-TP MIB Module
+vRtrMplsTpConfigTimeStamps OBJECT IDENTIFIER ::= { vRtrMplsTpObjs         1 }
+vRtrMplsTpConfigurations   OBJECT IDENTIFIER ::= { vRtrMplsTpObjs         2 }
+vRtrMplsTpStatus           OBJECT IDENTIFIER ::= { vRtrMplsTpObjs         3 }
+vRtrMplsTpStatistics       OBJECT IDENTIFIER ::= { vRtrMplsTpObjs         5 }
+vRtrMplsTpActions          OBJECT IDENTIFIER ::= { vRtrMplsTpObjs         6 }
+vRtrMplsTpNotifyObjects    OBJECT IDENTIFIER ::= { vRtrMplsTpObjs        10 }
+
+-- Notification Groups in the Nokia MPLS-TP MIB Module
+-- vRtrMplsTpNotifications    OBJECT IDENTIFIER ::= { vRtrMplsTpNotifyPrefix 0 }
+
+-- Compliance Groups in the Nokia MPLS-TP MIB Module
+-- vRtrMplsTpCompliances      OBJECT IDENTIFIER ::= { vRtrMplsTpConformance  1 }
+-- vRtrMplsTpGroups           OBJECT IDENTIFIER ::= { vRtrMplsTpConformance  2 }
+
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+--
+--  TIMETRA-MPLS-TP-MIB Textual Conventions
+--
+
+VRtrMplsTpLspPathMepPduType      ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The VRtrMplsTpLspPathMepPduType specifies the 4 byte APS-specific
+         information within each MPLS-TP APS PDU.
+
+         The information is encoded as shown below.
+            0                   1                   2                   3
+            0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+           +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+           |Ver|Request|PT |R|  Reserved1  |     FPath     |     Path      |
+           +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+"
+     SYNTAX     OCTET STRING( SIZE(4) )
+
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+--
+--  TIMETRA-MPLS-TP-MIB Global Configuration Objects
+--
+
+vRtrMplsTpSystemIdentifiers OBJECT IDENTIFIER ::= { vRtrMplsTpConfigurations 1 }
+
+vRtrMplsTpSystemTableLastChanged OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsTpSystemTableLastChanged indicates the time, since
+         system startup, when the vRtrMplsTpSystemTable last changed state."
+    ::= { vRtrMplsTpConfigTimeStamps 1 }
+
+vRtrMplsTpSystemTable            OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrMplsTpSystemEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrMplsTpSystemTable consists of the globally unique configuration
+         objects for MPLS-TP. These objects are typically required to be set
+         prior to configuring MPLS-TP LSP objects."
+    ::= { vRtrMplsTpSystemIdentifiers 1 }
+
+vRtrMplsTpSystemEntry            OBJECT-TYPE
+    SYNTAX      VRtrMplsTpSystemEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrMplsTpSystemEntry contains the globally unique configuration
+         objects for MPLS-TP."
+    INDEX       {
+                    tnSysSwitchId, vRtrID
+                }
+    ::= { vRtrMplsTpSystemTable 1 }
+
+VRtrMplsTpSystemEntry            ::= SEQUENCE {
+    vRtrMplsTpRowStatus              RowStatus,
+    vRtrMplsTpGlobalId               TmnxMplsTpGlobalID,
+    vRtrMplsTpNodeId                 TmnxMplsTpNodeID,
+    vRtrMplsTpTunnelIdMin            Unsigned32,
+    vRtrMplsTpTunnelIdMax            Unsigned32,
+    vRtrMplsTpAdminState             TmnxAdminState,
+    vRtrMplsTpInheritance            BITS
+}
+
+vRtrMplsTpRowStatus              OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsTpRowStatus specifies the row status of the
+         MPLS-TP system entry. A row must exist in this table for a specified
+         virtual router ID for MPLS-TP LSP configuration to be allowed."
+    ::= { vRtrMplsTpSystemEntry 1 }
+
+vRtrMplsTpGlobalId               OBJECT-TYPE
+    SYNTAX      TmnxMplsTpGlobalID
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsTpGlobalId specifies the AS number of the node."
+    DEFVAL { 0 }
+    ::= { vRtrMplsTpSystemEntry 2 }
+
+vRtrMplsTpNodeId                 OBJECT-TYPE
+    SYNTAX      TmnxMplsTpNodeID
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsTpNodeId specifies the unique node identifier for
+         the given global ID. If not specified, the MPLS Router ID of the node
+         is used."
+    DEFVAL { 0 }
+    ::= { vRtrMplsTpSystemEntry 3 }
+
+vRtrMplsTpTunnelIdMin            OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 | 1..61440)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsTpTunnelIdMin specifies the start
+         range of tunnel ids reserved for MPLS-TP LSPs.
+
+         This variable must be set along with vRtrMplsTpTunnelIdMax
+         to indicate the range of tunnel ids reserved for MPLS-TP LSPs.
+
+         A value of 0 indicates that tunnel ids are not reserved for
+         MPLS-TP LSPs."
+    DEFVAL { 0 }
+    ::= { vRtrMplsTpSystemEntry 4 }
+
+vRtrMplsTpTunnelIdMax            OBJECT-TYPE
+    SYNTAX      Unsigned32 ( 0 | 1..61440)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsTpTunnelIdMax specifies the end
+         range of tunnel ids reserved for MPLS-TP LSPs.
+
+         This variable must be set along with vRtrMplsTpTunnelIdMin
+         to indicate the range of tunnel ids reserved for MPLS-TP LSPs.
+
+         A value of 0 indicates that tunnel ids are not reserved for
+         MPLS-TP LSPs."
+    DEFVAL { 0 }
+    ::= { vRtrMplsTpSystemEntry 5 }
+
+vRtrMplsTpAdminState   OBJECT-TYPE
+    SYNTAX      TmnxAdminState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsTpAdminState specifies the desired
+         administrative state of MPLS-TP on this router."
+    DEFVAL { outOfService }
+    ::= { vRtrMplsTpSystemEntry 6 }
+
+vRtrMplsTpInheritance   OBJECT-TYPE
+    SYNTAX      BITS {
+                    vRtrMplsTpNodeId    (0)
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "For each writable object in this row that can be configured to
+         inherit its value from the corresponding object in the
+         vRtrIpAddrTable, there is bit within vRtrMplsTpInheritance
+         that controls whether to inherit the operational value of the
+         object or use the administratively set value.
+
+         Non mask bits will always have value of zero.
+
+         This object is a bit-mask, with the following objects:
+         vRtrMplsTpNodeId   0x1
+
+         When the bit for an object is set to one, then the object's
+         administrative and operational value are inherited from the
+         corresponding object in vRtrIpAddrTable.
+
+         When the bit for an object is set to zero, then the object's
+         administrative and operational value are whatever the DEFVAL
+         or most recently SET value is."
+    DEFVAL { {} }
+    ::= { vRtrMplsTpSystemEntry 7 }
+
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+--
+--  TIMETRA-MPLS-TP-MIB Template Configuration Objects
+--
+vRtrMplsTpTemplateObjects   OBJECT IDENTIFIER ::= { vRtrMplsTpConfigurations 2 }
+
+--
+--  TIMETRA-MPLS-TP-MIB OAM Template Configuration Objects
+--
+vRtrMplsTpOamTemplTblLastChanged OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsTpOamTemplTblLastChanged indicates the last
+         time, since system startup, when the vRtrMplsTpOamTemplateCfgTable
+         last changed state."
+    ::= { vRtrMplsTpConfigTimeStamps 2 }
+
+vRtrMplsTpOamTemplateCfgTable    OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrMplsTpOamTemplateCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrMplsTpOamTemplateCfgTable maintains the MPLS-TP Templates used
+         by MPLS-TP OAM.
+
+         The template is specific to the OAM protocol and can be used to
+         configure MPLS-TP-OAM parameters such as BFD Tx/Rx timer intervals,
+         multiplier and any other relevant session/fault management parameters.
+         The OAM template is referenced in the MPLS-TP path configuration, so
+         different values are possible for the working and protect paths of a
+         tunnel."
+    ::= { vRtrMplsTpTemplateObjects 1 }
+
+vRtrMplsTpOamTemplateCfgEntry    OBJECT-TYPE
+    SYNTAX      VRtrMplsTpOamTemplateCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrMplsTpOamTemplateCfgEntry contains the configuration items
+         maintained by the vRtrMplsTpOamTemplateCfgTable."
+    INDEX       {
+                    tnSysSwitchId,
+                    vRtrID,
+            IMPLIED vRtrMplsTpOamTmplName
+                }
+    ::= { vRtrMplsTpOamTemplateCfgTable 1 }
+
+VRtrMplsTpOamTemplateCfgEntry       ::= SEQUENCE {
+    vRtrMplsTpOamTmplName               TNamedItem,
+    vRtrMplsTpOamTmplRowStatus          RowStatus,
+    vRtrMplsTpOamTmplLastChangedTime    TimeStamp,
+    vRtrMplsTpOamTmplBfdTemplateName    TNamedItemOrEmpty,
+    vRtrMplsTpOamTmplHoldTimeDown       Unsigned32,
+    vRtrMplsTpOamTmplHoldTimeUp         Unsigned32
+}
+
+vRtrMplsTpOamTmplName            OBJECT-TYPE
+    SYNTAX      TNamedItem
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value vRtrMplsTpOamTmplName specifies the unique name of the
+         MPLS-TP OAM Template."
+    ::= { vRtrMplsTpOamTemplateCfgEntry 1 }
+
+vRtrMplsTpOamTmplRowStatus          OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsTpOamTmplRowStatus specifies the row status of the
+         MPLS-TP OAM Template entry.
+
+         Rows are created by setting this object to the value 'createAndGo (4)'
+         and are destroyed using the value 'destroy (6)'."
+    ::= {  vRtrMplsTpOamTemplateCfgEntry 2 }
+
+vRtrMplsTpOamTmplLastChangedTime    OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value vRtrMplsTpOamTmplLastChangedTime indicates the time, since
+         system startup, that an columnar object in this row changed state."
+    ::= { vRtrMplsTpOamTemplateCfgEntry 3 }
+
+vRtrMplsTpOamTmplBfdTemplateName    OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsTpOamTmplBfdTemplateName specifies the
+         TIMETRA-BFD-MIB::tmnxBfdAdminTemplateName used by the OAM template."
+    ::= { vRtrMplsTpOamTemplateCfgEntry 4 }
+
+vRtrMplsTpOamTmplHoldTimeDown       OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..5000)
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsTpOamTmplHoldTimeDown specifies the time, in
+         centiseconds, used for the hold-timer for the BFD Continuity Check (CC)
+         session down event dampening. This guards against reporting excessive
+         operational state transitions.
+
+         This is implemented by not advertising subsequent transitions of the
+         BFD CC state until the configured timer has expired.
+
+         A value of zero (0) specifies that a down transition is reported
+         immediately."
+    DEFVAL { 0 }
+    ::= { vRtrMplsTpOamTemplateCfgEntry 5 }
+
+vRtrMplsTpOamTmplHoldTimeUp         OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..500)
+    UNITS       "deciseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsTpOamTmplHoldTimeUp specifies the time, in
+         deciseconds, used for the hold-timer for the BFD Continuity Check (CC)
+         session up event dampening. This guards against reporting excessive
+         operational state transitions.
+
+         This is implemented by not advertising subsequent transitions of the
+         BFD CC state until the configured timer has expired.
+
+         A value of zero (0) specifies that an up transition is reported
+         immediately."
+    DEFVAL { 20 }
+    ::= { vRtrMplsTpOamTemplateCfgEntry 6 }
+
+--
+--  TIMETRA-MPLS-TP-MIB Protect Template Configuration Objects
+--
+vRtrMplsTpPtcTemplTblLastChanged OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsTpPtcTemplTblLastChanged indicates the last time,
+         since system startup, when the vRtrMplsTpPtcTemplateCfgTable changed
+         state."
+    ::= { vRtrMplsTpConfigTimeStamps 3 }
+
+vRtrMplsTpPtcTemplateCfgTable    OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrMplsTpPtcTemplateCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrMplsTpPtcTemplateCfgTable maintains the MPLS-TP Templates used
+         for MPLS LSP Protection. Entries in this table maintain the common
+         configuration elements used by the protected LSPs."
+    REFERENCE "RFC6378"
+    ::= { vRtrMplsTpTemplateObjects 2 }
+
+vRtrMplsTpPtcTemplateCfgEntry    OBJECT-TYPE
+    SYNTAX      VRtrMplsTpPtcTemplateCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrMplsTpPtcTemplateCfgEntry contains the configuration items
+         maintained by the vRtrMplsTpPtcTemplateCfgTable."
+    INDEX       {
+                    tnSysSwitchId,
+                    vRtrID,
+            IMPLIED vRtrMplsTpPtcTmplName }
+    ::= { vRtrMplsTpPtcTemplateCfgTable 1 }
+
+VRtrMplsTpPtcTemplateCfgEntry    ::= SEQUENCE {
+    vRtrMplsTpPtcTmplName            TNamedItem,
+    vRtrMplsTpPtcTmplRowStatus       RowStatus,
+    vRtrMplsTpPtcTmplLastChangedTime TimeStamp,
+    vRtrMplsTpPtcTmplProtectionMode  INTEGER,
+    vRtrMplsTpPtcTmplProtectionDir   INTEGER,
+    vRtrMplsTpPtcTmplRevertive       INTEGER,
+    vRtrMplsTpPtcTmplWaitToRestore   Unsigned32,
+    vRtrMplsTpPtcTmplRapidPscTimer   Unsigned32,
+    vRtrMplsTpPtcTmplSlowPscTimer    Unsigned32
+}
+
+vRtrMplsTpPtcTmplName               OBJECT-TYPE
+    SYNTAX      TNamedItem
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsTpPtcTmplName specifies the unique name of the
+         MPLS-TP Protection Template."
+    ::= { vRtrMplsTpPtcTemplateCfgEntry 1 }
+
+vRtrMplsTpPtcTmplRowStatus          OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsTpPtcTmplRowStatus specifies the row status of the
+         MPLS-TP Protection Template.
+
+         Rows are created by setting this object to the value 'createAndGo (4)'
+         and are destroyed by using the value 'destroy (6)'."
+    ::= { vRtrMplsTpPtcTemplateCfgEntry 2 }
+
+vRtrMplsTpPtcTmplLastChangedTime    OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsTpPtcTmplLastChangedTime indicates the time, since
+         system startup, that a columnar object in the MPLS-TP Protection
+         Template entry last changed state."
+    ::= { vRtrMplsTpPtcTemplateCfgEntry 3 }
+
+vRtrMplsTpPtcTmplProtectionMode  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    one2one (1)
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsTpPtcTmplProtectionMode specifies the mode used
+         for determining which members are actively receiving and transmitting
+         data.
+
+         In the 'one2one (1)' (1:1) architecture, a protection transport path is
+         dedicated to the working transport path of a single service, and the
+         traffic is only transmitted on either the working or the protection
+         path, by using a selector at the source of the protection domain.
+         A selector at the sink of the protection domain then selects the path
+         that carries the normal traffic.
+
+         When the value is set to 'one2one (1)', only two members are allowed,
+         and only one of them can be active at one point in time."
+    REFERENCE "RFC 6378"
+    DEFVAL { one2one }
+    ::= { vRtrMplsTpPtcTemplateCfgEntry 4 }
+
+vRtrMplsTpPtcTmplProtectionDir   OBJECT-TYPE
+    SYNTAX      INTEGER {
+                   bidirectional (2)
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsTpPtcTmplProtectionDir specifies the directional
+         mode of the Protection Template.
+             bidirectional - provides protection in both directions."
+    REFERENCE "RFC 6378"
+    DEFVAL { bidirectional }
+    ::= { vRtrMplsTpPtcTemplateCfgEntry 5 }
+
+vRtrMplsTpPtcTmplRevertive          OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    nonRevertive (1),
+                    revertive    (2)
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsTpPtcTmplRevertive specifies whether or not an
+         instance of this Template will operate in a 'revertive (2)' or
+         'nonRevertive (1)' mode."
+    REFERENCE "RFC 6378"
+    DEFVAL { revertive }
+    ::= { vRtrMplsTpPtcTemplateCfgEntry 6 }
+
+vRtrMplsTpPtcTmplWaitToRestore      OBJECT-TYPE
+    SYNTAX      Unsigned32  (0..720)
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsTpPtcTmplWaitToRestore specifies the
+         Wait-To-Restore (WTR) timer, in seconds, after a cleared failure the
+         working path must wait before reverting.
+
+         The WTR timer is used to prevent frequent operation of the protection
+         switching due to intermittent signal failure defects."
+    REFERENCE "RFC 6378 Section 4.3.3.5"
+    DEFVAL { 300 }
+    ::= { vRtrMplsTpPtcTemplateCfgEntry 7 }
+
+vRtrMplsTpPtcTmplRapidPscTimer      OBJECT-TYPE
+    SYNTAX      Unsigned32 (3|10|100|1000)
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsTpPtcTmplRapidPscTimer specifies the time, in
+         milliseconds, for the Rapid Protection Switch Coordination (PSC) timer.
+         A value of 3 denotes 3.33 ms.
+
+         When the protection domain state is changed, three PSC messages are
+         transmitted as quickly as possible, to allow for rapid protection
+         switching."
+
+    REFERENCE "RFC 6378 Section 4.1"
+    DEFVAL { 3 }
+    ::= { vRtrMplsTpPtcTemplateCfgEntry 8 }
+
+vRtrMplsTpPtcTmplSlowPscTimer       OBJECT-TYPE
+    SYNTAX      Unsigned32 (5..60)
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsTpPtcTmplSlowPscTimer specifies the time, in
+         seconds, for the Slow Protection Switch Coordination (PSC) timer used
+         to continually transmit the PSC message."
+    DEFVAL { 5 }
+    ::= { vRtrMplsTpPtcTemplateCfgEntry 9 }
+
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+--
+--  TIMETRA-MPLS-TP-MIB LSP/Path Configuration Objects
+--
+vRtrMplsTpLspObjects        OBJECT IDENTIFIER ::= { vRtrMplsTpConfigurations 3 }
+
+--
+--  TIMETRA-MPLS-TP-MIB LSP Path Configuration Objects
+--
+
+vRtrMplsTpLspPathTblLastChanged  OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsTpLspPathTblLastChanged indicates the last time,
+         since system startup, that the vRtrMplsTpLspPathTable changed state."
+    ::= { vRtrMplsTpConfigTimeStamps 5 }
+
+vRtrMplsTpLspPathTable           OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrMplsTpLspPathEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrMplsTpLspPathTable maintains the MPLS-TP configuration objects
+         associated with an MPLS LSP path."
+    ::= { vRtrMplsTpLspObjects  2 }
+
+vRtrMplsTpLspPathEntry               OBJECT-TYPE
+    SYNTAX      VRtrMplsTpLspPathEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrMplsTpLspPathEntry contains the configuration objects for the
+         MPLS-TP path table."
+    INDEX       {
+                    tnSysSwitchId,
+                    vRtrID,
+                    vRtrMplsLspIndex,
+                    vRtrMplsTpLspPathIndex
+                }
+    ::= { vRtrMplsTpLspPathTable 1 }
+
+VRtrMplsTpLspPathEntry           ::= SEQUENCE {
+    vRtrMplsTpLspPathIndex           INTEGER,
+    vRtrMplsTpLspPathRowStatus       RowStatus,
+    vRtrMplsTpLspPathLastChangedTime TimeStamp,
+    vRtrMplsTpLspPathAdminState      TmnxAdminState,
+    vRtrMplsTpLspPathOperState       TmnxOperState,
+    vRtrMplsTpLspPathReasonDownFlags BITS,
+    vRtrMplsTpLspPathLspNumber       Unsigned32,
+    vRtrMplsTpLspPathInLabel         Unsigned32,
+    vRtrMplsTpLspPathOutLabel        Unsigned32,
+    vRtrMplsTpLspPathOutLink         InterfaceIndexOrZero,
+    vRtrMplsTpLspPathNextHopAddrType InetAddressType,
+    vRtrMplsTpLspPathNextHopAddress  InetAddress,
+    vRtrMplsTpLspPathState           INTEGER,
+    vRtrMplsTpLspPathTimeUp          TimeInterval,
+    vRtrMplsTpLspPathTimeDown        TimeInterval,
+    vRtrMplsTpLspPathActiveTimeUp    TimeInterval
+}
+
+vRtrMplsTpLspPathIndex           OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    working    (1),
+                    protecting (2)
+                }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsTpLspPathIndex specifies the path index for the
+         MPLS-TP LSP path.
+            working (1)    - A working path is the primary path for the LSP.
+            protecting (2) - A protection path is the secondary path for the
+                             LSP."
+    ::= { vRtrMplsTpLspPathEntry 1 }
+
+vRtrMplsTpLspPathRowStatus       OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsTpLspPathRowStatus specifies the row status of the
+         MPLS-TP LSP Path."
+    ::= { vRtrMplsTpLspPathEntry 2 }
+
+vRtrMplsTpLspPathLastChangedTime OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsTpLspPathLastChangedTime indicates the last time,
+         since system startup, that a writable object in this table was
+         modified."
+    ::= { vRtrMplsTpLspPathEntry 3 }
+
+vRtrMplsTpLspPathAdminState      OBJECT-TYPE
+    SYNTAX      TmnxAdminState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsTpLspPathAdminState specifies the administrative
+         state of the MPLS-TP LSP Path."
+    DEFVAL { outOfService }
+    ::= { vRtrMplsTpLspPathEntry 4 }
+
+vRtrMplsTpLspPathOperState       OBJECT-TYPE
+    SYNTAX      TmnxOperState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsTpLspPathOperState indicates the operational state
+         of the MPLS-TP LSP Path."
+    ::= { vRtrMplsTpLspPathEntry 5 }
+
+vRtrMplsTpLspPathReasonDownFlags OBJECT-TYPE
+    SYNTAX      BITS {
+                   unknown              (0),
+                   ccFault              (1),
+                   cvFault              (2),
+                   ifDn                 (3),
+                   portDn               (4),
+                   parentAdminDn        (5),
+                   mepAdminDn           (6),
+                   unsupportedPort      (7),
+                   ifNhAddrInconsistent (8),
+                   ptcTmplMsng          (9),
+                   ccDnHold            (10),
+                   ccUpHold            (11),
+                   bfdNoRsrc           (12)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsTpLspPathReasonDownFlags specifies the reason why
+        the MPLS-TP LSP Path is operationally down when the administrative state
+        is 'inService (2)'.
+
+        The recognized BIT values are:
+            unknown              (0) - Unspecified (or unknown)
+            ccFault              (1) - BFD Continuity Check (CC) failed
+            cvFault              (2) - BFD Connectivity Verification (CV) failed
+            ifDn                 (3) - The path out-link interface is
+                                       operationally down
+            portDn               (4) - The port associated with the out-link
+                                       interface is operationally down
+            parentAdminDn        (5) - The associated mpls-tp Lsp or mpls-tp
+                                       instance or mpls instance is admin down
+            mepAdminDn           (6) - The path MEP is admin down
+            unsupportedPort      (7) - MPLS-TP functionality is not supported
+                                       over the out-link port.
+            ifNhAddrInconsistent (8) - The configured next-hop address is not
+                                       bound to the configured out-link
+                                       interface.
+            ptcTmplMsng          (9) - The protect-tp-path is missing a
+                                       protection-template name.
+            ccDnHold            (10) - ccFault effect on path-state is on hold
+                                       due to 'hold-time-down' config in the
+                                       oam-template
+            ccUpHold            (11) - ccFault clear effect on path-state is on
+                                       hold due to 'hold-time-up' config in the
+                                       oam-template
+            bfdNoRsrc           (12) - bfd-enable failed since maximum number of supported
+                                       bfd-sessions was reached."
+    ::= { vRtrMplsTpLspPathEntry 6 }
+
+vRtrMplsTpLspPathLspNumber       OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsTpLspPathLspNumber specifies the MPLS-TP LSP Path
+         number.
+
+         The default value of this object is dependent on the value of
+         vRtrMplsTpLspPathIndex. If this object refers to a 'working (1)' path,
+         then the default value is one (1). If this object refers to a
+         'protecting (2)' path, then the default value is two (2)."
+    REFERENCE "RFC 6370 Section 5.2"
+    ::= { vRtrMplsTpLspPathEntry 7 }
+
+vRtrMplsTpLspPathInLabel         OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsTpLspPathInLabel specifies the LSP ingress Label
+         used by the MPLS-TP LSP Path.
+
+         Once this object is set, to remove the in-label, one must destroy and
+         recreate the vRtrMplsTpLspPathEntry."
+    DEFVAL { 0 }
+    ::= { vRtrMplsTpLspPathEntry 8 }
+
+vRtrMplsTpLspPathOutLabel        OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 | 16..1048575)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsTpLspPathOutLabel specifies the LSP egress Label
+         used by the MPLS-TP LSP Path.
+
+         Once this object is set, to remove the out-label, one must destroy and
+         recreate the vRtrMplsTpLspPathEntry."
+    DEFVAL { 0 }
+    ::= { vRtrMplsTpLspPathEntry 9 }
+
+vRtrMplsTpLspPathOutLink         OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsTpLspPathOutLink specifies the LSP out-link
+         interface used by the MPLS-TP LSP Path.
+
+         Once this object is set, to remove the out-link, one must destroy and
+         recreate the vRtrMplsTpLspPathEntry."
+    DEFVAL { 0 }
+    ::= { vRtrMplsTpLspPathEntry 10 }
+
+vRtrMplsTpLspPathNextHopAddrType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsTpLspPathNextHopAddrType, along with
+         vRtrMplsTpLspPathNextHopAddress, specifies the IP address used as the
+         next hop for the MPLS-TP LSP Path.
+
+         Once this object is set, to remove the next hop, one must destroy and
+         recreate the vRtrMplsTpLspPathEntry.
+
+         This object is only applicable if the vRtrMplsTpLspPathOutLink
+         references a numbered interface."
+    DEFVAL { unknown }
+    ::= { vRtrMplsTpLspPathEntry 11 }
+
+vRtrMplsTpLspPathNextHopAddress  OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsTpLspPathNextHopAddress, along with
+         vRtrMplsTpLspPathNextHopAddrType, specifies the IP address used as the
+         next hop for the MPLS-TP LSP Path.
+
+         Once this object is set, to remove the next hop, one must destroy and
+         recreate the vRtrMplsTpLspPathEntry.
+
+         This object is only applicable if the vRtrMplsTpLspPathOutLink
+         references a numbered interface."
+    DEFVAL { "" }
+    ::= { vRtrMplsTpLspPathEntry 12 }
+
+vRtrMplsTpLspPathState    OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    unknown  (1),
+                    active   (2),
+                    inactive (3)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsTpLspPathState indicates the current working state
+         of the MPLS-TP LSP Path."
+    DEFVAL { unknown }
+    ::= { vRtrMplsTpLspPathEntry 13 }
+
+vRtrMplsTpLspPathTimeUp   OBJECT-TYPE
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsTpLspPathTimeUp indicates the time that
+         this MPLS-TP LSP path has been operational."
+    ::= { vRtrMplsTpLspPathEntry 14 }
+
+vRtrMplsTpLspPathTimeDown OBJECT-TYPE
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsTpLspPathTimeDown indicates the time that
+         this MPLS-TP LSP Path has not been operational."
+    ::= { vRtrMplsTpLspPathEntry 15 }
+
+vRtrMplsTpLspPathActiveTimeUp OBJECT-TYPE
+    SYNTAX      TimeInterval
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsTpLspPathActiveTimeUp indicates the time that
+         this MPLS-TP LSP Path has been active."
+    ::= { vRtrMplsTpLspPathEntry 16 }
+--
+--  TIMETRA-MPLS-TP-MIB LSP Path Configuration Objects
+--
+vRtrMplsTpLspPathMepTblLastChg   OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsTpLspPathMepTblLastChg indicates the last time,
+         since system startup, that the vRtrMplsTpLspPathMepTable changed
+         state."
+    ::= { vRtrMplsTpConfigTimeStamps 6 }
+
+vRtrMplsTpLspPathMepTable        OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrMplsTpLspPathMepEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrMplsTpLspPathMepTable maintains the Maintenance End Points
+         (MEPs) for the MPLS-TP LSP path."
+    ::= { vRtrMplsTpLspObjects  3 }
+
+vRtrMplsTpLspPathMepEntry        OBJECT-TYPE
+    SYNTAX      VRtrMplsTpLspPathMepEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrMplsTpLspPathMepEntry represents a Maintenance Endpoint for a
+         MPLS-TP LSP Path."
+    INDEX       {
+                    tnSysSwitchId,
+                    vRtrID,
+                    vRtrMplsLspIndex,
+                    vRtrMplsTpLspPathIndex
+                }
+    ::= { vRtrMplsTpLspPathMepTable 1 }
+
+VRtrMplsTpLspPathMepEntry        ::= SEQUENCE {
+    vRtrMplsTpLspPathMepLastChgTime  TimeStamp,
+    vRtrMplsTpLspPathMepRowStatus    RowStatus,
+    vRtrMplsTpLspPathMepAdminState   TmnxAdminState,
+    vRtrMplsTpLspPathMepProtectTmpl  TNamedItemOrEmpty,
+    vRtrMplsTpLspPathMepOamTmpl      TNamedItemOrEmpty,
+    vRtrMplsTpLspPathMepBfdEnabled   INTEGER,
+    vRtrMplsTpLspPathMepBfdOperState TmnxOperState
+}
+
+vRtrMplsTpLspPathMepLastChgTime  OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsTpLspPathMepLastChgTime indicates the time, since
+         system startup, when a columnar object for the specified row last
+         changed state."
+    ::= { vRtrMplsTpLspPathMepEntry 1 }
+
+vRtrMplsTpLspPathMepRowStatus    OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsTpLspPathMepRowStatus specifies the row status of
+         the vRtrMplsTpLspPathMepEntry."
+     ::= { vRtrMplsTpLspPathMepEntry 2 }
+
+vRtrMplsTpLspPathMepAdminState   OBJECT-TYPE
+    SYNTAX      TmnxAdminState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsTpLspPathMepAdminState specifies the
+        administrative state of the MPLS-TP LSP path."
+    DEFVAL { outOfService }
+    ::= { vRtrMplsTpLspPathMepEntry 3 }
+
+vRtrMplsTpLspPathMepProtectTmpl  OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsTpLspPathMepProtectTmpl specifies the associated
+         vRtrMplsTpPtcTemplateCfgEntry to this MPLS-TP LSP Path MEP.
+
+         This object is only meaningful to the row indexed with the
+         vRtrMplsTpLspPathIndex value of 'protecting'. Attempts to configure
+         this object, otherwise, will result in an 'inconsistentValue' error."
+    DEFVAL { "" }
+    ::= { vRtrMplsTpLspPathMepEntry 4 }
+
+vRtrMplsTpLspPathMepOamTmpl      OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsTpLspPathMepOamTmpl specifies the associated
+         vRtrMplsTpOamTemplateCfgEntry to this MPLS-TP LSP Path MEP."
+    DEFVAL { "" }
+    ::= { vRtrMplsTpLspPathMepEntry 5 }
+
+vRtrMplsTpLspPathMepBfdEnabled   OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    disabled (0),
+                    cc       (1),
+                    ccCv     (2)
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsTpLspPathMepBfdEnabled specifies whether BFD is
+         enabled or not.
+
+         If set to 'disabled (0)', BFD is not enabled.
+         If set to 'cc       (1)', BFD is enabled with Continuity Check (CC)
+                                   functionality.
+         If set to 'ccCv     (2)', BFD is enabled with both CC and Connectivity
+                                   Verification (CV) functionality.  In this
+                                   mode, BFD will detect mis-connectivity as
+                                   described in RFC 6428 Section 3.7.2.
+
+         Once enabled, a modification to this object will effect the BFD
+         session."
+    REFERENCE "RFC 6428"
+    DEFVAL { disabled }
+    ::= { vRtrMplsTpLspPathMepEntry 6 }
+
+vRtrMplsTpLspPathMepBfdOperState OBJECT-TYPE
+    SYNTAX      TmnxOperState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsTpLspPathMepBfdOperState indicates the operational
+         state of the BFD session.
+
+         The operational state of 'unknown (1)' indicates that the BFD session
+         is not enabled."
+    ::= { vRtrMplsTpLspPathMepEntry 7 }
+
+
+vRtrMplsTpLspPtPathMepStatTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrMplsTpLspPtPathMepStatEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrMplsTpLspPtPathMepStatTable maintains the Maintenance End
+         Points (MEPs) statistics for MPLS-TP LSP protection paths."
+    ::= { vRtrMplsTpLspObjects  4 }
+
+vRtrMplsTpLspPtPathMepStatEntry  OBJECT-TYPE
+    SYNTAX      VRtrMplsTpLspPtPathMepStatEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrMplsTpLspPathMepEntry represents a Maintenance Endpoint for a
+         MPLS-TP LSP protection Path.
+
+         Rows are created and destroyed by the system based on the configuration
+         of the MEP protection-type."
+    INDEX       {
+                    tnSysSwitchId,
+                    vRtrID,
+                    vRtrMplsLspIndex,
+                    vRtrMplsTpLspPathIndex
+                }
+    ::= { vRtrMplsTpLspPtPathMepStatTable 1 }
+
+VRtrMplsTpLspPtPathMepStatEntry  ::= SEQUENCE {
+    vRtrMplsTpLspPtPathMepRxPdu      VRtrMplsTpLspPathMepPduType,
+    vRtrMplsTpLspPtPathMepTxPdu      VRtrMplsTpLspPathMepPduType,
+    vRtrMplsTpLspPtPathMepDefects    BITS,
+    vRtrMplsTpLspPtPathMepWTRTimer   Counter32
+}
+
+vRtrMplsTpLspPtPathMepRxPdu      OBJECT-TYPE
+    SYNTAX      VRtrMplsTpLspPathMepPduType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsTpLspPtPathMepRxPdu indicates the last received
+         PSC PDU APS format. The value of this object compared to that of
+         vRtrMplsTpLspPtPathMepTxPdu will indicate a configuration mismatch
+         between the local and far-end node."
+    ::= { vRtrMplsTpLspPtPathMepStatEntry 1 }
+
+vRtrMplsTpLspPtPathMepTxPdu      OBJECT-TYPE
+    SYNTAX      VRtrMplsTpLspPathMepPduType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsTpLspPtPathMepTxPdu indicates the last transmitted
+         PSC PDU APS format. The value of this object compared to that of
+         vRtrMplsTpLspPtPathMepRxPdu will indicate a configuration mismatch
+         between the local and far-end node."
+    ::= { vRtrMplsTpLspPtPathMepStatEntry 2 }
+
+vRtrMplsTpLspPtPathMepDefects    OBJECT-TYPE
+    SYNTAX      BITS {
+                    protectionTypeMismatch (0),
+                    revertModeMismatch     (1)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsTpLspPtPathMepDefects indicates the defect state
+         of the protection path MEP. The defects monitored by this object are as
+         follows:
+
+             - protectionTypeMismatch (0) - A protection-type mismatch is
+                                            detected.
+             - revertModeMismatch     (1) - A revertive mode mismatch is
+                                            detected."
+    ::= { vRtrMplsTpLspPtPathMepStatEntry 3 }
+
+vRtrMplsTpLspPtPathMepWTRTimer   OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsTpLspPtPathMepWTRTimer indicates the remaining
+         Wait-To-Restore time, in seconds, before the protection path can
+         switch back to the working path.
+
+         A value of zero (0) indicates that there is no WTR timer in effect."
+    ::= { vRtrMplsTpLspPtPathMepStatEntry 4 }
+
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+--
+--  TIMETRA-MPLS-TP-MIB Command Configuration Objects
+--
+vRtrMplsTpCmdObjects        OBJECT IDENTIFIER ::= { vRtrMplsTpConfigurations 4 }
+
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+--
+--  TIMETRA-MPLS-TP-MIB Action Objects
+--
+
+--
+-- MPLS TP Tunnel Command Table
+--
+vRtrMplsTpTunnelCommandTable     OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrMplsTpTunnelCommandEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrMplsTpTunnelCommandTable maintains the one-shot action
+         commands that effect the state of the MPLS-TP operation."
+    REFERENCE "RFC 6378"
+    ::= { vRtrMplsTpCmdObjects 1 }
+
+vRtrMplsTpTunnelCommandEntry     OBJECT-TYPE
+    SYNTAX      VRtrMplsTpTunnelCommandEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrMplsTpTunnelCommandEntry contains the command available to
+         execute on an existing MPLS-TP Tunnel.
+
+         Rows in this table are created and destroyed by the system."
+    INDEX       {
+                    tnSysSwitchId,
+                    vRtrID,
+                    vRtrMplsLspIndex
+                }
+    ::= { vRtrMplsTpTunnelCommandTable 1 }
+
+VRtrMplsTpTunnelCommandEntry     ::= SEQUENCE {
+    vRtrMplsTpTunnelCommandSwitch    INTEGER
+}
+
+vRtrMplsTpTunnelCommandSwitch    OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    noCmd        (0),
+                    clear        (1),
+                    forceSwitch  (2),
+                    manualSwitch (3),
+                    lockout      (4)
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value vRtrMplsTpTunnelCommandSwitch specifies the switch command to
+         initiate on a MPLS-TP LSP Tunnel.
+
+         When read, this object returns the last command written or 'noCmd (0)'
+         if no command has been written to this MPLS-TP LSP Tunnel since
+         initialization. The return of the last command written does not imply
+         that this command is currently in effect. This request may be preempted
+         by a higher priority local or remote request.
+
+         The value 'noCmd (0)' may not be used in a write command.
+
+         The value 'clear (1)' clears all the switch commands listed below for
+         the specified LSP.
+
+         The value of 'forceSwitch (2)' switches the active path to the
+         protection path.
+
+         The value of 'manualSwitch (3)' switches the active path to the
+         protection path.
+
+         The value of 'lockout (4)' prevents the working path from switching to
+         the protection path."
+    DEFVAL { noCmd }
+    ::= { vRtrMplsTpTunnelCommandEntry 1 }
+
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+--
+--  TIMETRA-MPLS-TP-MIB LSR Configuration Objects
+--
+vRtrMplsTpLsrObjects        OBJECT IDENTIFIER ::= { vRtrMplsTpConfigurations 5 }
+
+--
+-- MPLS TP LSR Configuration Table
+--
+vRtrMplsTpLsrTblLastChanged      OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsTpLsrTblLastChanged indicates the last time,
+         since system startup, when the vRtrMplsTpLsrCfgTable changed state."
+    ::= { vRtrMplsTpConfigTimeStamps 7 }
+
+vRtrMplsTpLsrCfgTable            OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrMplsTpLsrCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrMplsTpLsrCfgTable maintains the MPLS-TP LSR
+         configuration information."
+    ::= { vRtrMplsTpLsrObjects 1 }
+
+vRtrMplsTpLsrCfgEntry            OBJECT-TYPE
+    SYNTAX      VRtrMplsTpLsrCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrMplsTpLsrCfgEntry contains the configuration items
+         maintained by the vRtrMplsTpLsrCfgTable."
+    INDEX       {
+                    tnSysSwitchId,
+                    vRtrID,
+            IMPLIED vRtrMplsTpLsrPathName
+                }
+    ::= { vRtrMplsTpLsrCfgTable 1 }
+
+VRtrMplsTpLsrCfgEntry            ::= SEQUENCE {
+    vRtrMplsTpLsrPathName            TNamedItem,
+    vRtrMplsTpLsrRowStatus           RowStatus,
+    vRtrMplsTpLsrLastChangedTime     TimeStamp,
+    vRtrMplsTpLsrAdminState          TmnxAdminState,
+    vRtrMplsTpLsrOperState           TmnxOperState,
+    vRtrMplsTpLsrFPInLabel           Unsigned32,
+    vRtrMplsTpLsrFPOutLabel          Unsigned32,
+    vRtrMplsTpLsrFPOutLink           InterfaceIndexOrZero,
+    vRtrMplsTpLsrFPNextHopAddrType   InetAddressType,
+    vRtrMplsTpLsrFPNextHopAddress    InetAddress,
+    vRtrMplsTpLsrRPInLabel           Unsigned32,
+    vRtrMplsTpLsrRPOutLabel          Unsigned32,
+    vRtrMplsTpLsrRPOutLink           InterfaceIndexOrZero,
+    vRtrMplsTpLsrRPNextHopAddrType   InetAddressType,
+    vRtrMplsTpLsrRPNextHopAddress    InetAddress,
+    vRtrMplsTpLsrFPEnabled           TruthValue,
+    vRtrMplsTpLsrRPEnabled           TruthValue
+    }
+
+
+vRtrMplsTpLsrPathName            OBJECT-TYPE
+    SYNTAX      TNamedItem
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsTpLsrPathName specifies the unique name of the
+         MPLS-TP LSR Path."
+    ::= { vRtrMplsTpLsrCfgEntry 1 }
+
+vRtrMplsTpLsrRowStatus           OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsTpLsrRowStatus specifies the row status of the
+         MPLS-TP LSR configuration entry.
+
+         Rows are created by setting this object to the value 'createAndGo (4)'
+         and are destroyed by using the value 'destroy (6)'."
+    ::= { vRtrMplsTpLsrCfgEntry 2 }
+
+vRtrMplsTpLsrLastChangedTime     OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsTpLsrLastChangedTime indicates the time, since
+         system startup, that a columnar object in the MPLS-TP LSR entry last
+         changed state."
+    ::= { vRtrMplsTpLsrCfgEntry 3 }
+
+vRtrMplsTpLsrAdminState          OBJECT-TYPE
+    SYNTAX      TmnxAdminState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsTpLsrAdminState specifies the administrative state
+         of the MPLS-TP LSR."
+    DEFVAL { outOfService }
+    ::= { vRtrMplsTpLsrCfgEntry 4 }
+
+vRtrMplsTpLsrOperState           OBJECT-TYPE
+    SYNTAX      TmnxOperState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsTpLsrOperState indicates the operational state of
+         the MPLS-TP LSR."
+    ::= { vRtrMplsTpLsrCfgEntry 5 }
+
+vRtrMplsTpLsrFPInLabel           OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsTpLsrFPInLabel specifies the forward path (FP)
+         ingress label used by the MPLS-TP LSR Path.
+
+         This object can be set only after vRtrMplsTpLsrFPEnabled is set to
+         'true'.
+
+         Once this object is set, the value may not be unset. To remove the
+         ingress label one must set vRtrMplsTpLsrFPEnabled to 'false'."
+    DEFVAL { 0 }
+    ::= { vRtrMplsTpLsrCfgEntry 6 }
+
+vRtrMplsTpLsrFPOutLabel          OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 | 16..1048575)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsTpLsrFPOutLabel specifies the forward path (FP)
+         egress label used by the MPLS-TP LSR Path.
+
+         This object can be set only after vRtrMplsTpLsrFPEnabled is set to
+         'true'.
+
+         Once this object is set, the value may not be unset. To remove the
+         egress label one must set vRtrMplsTpLsrFPEnabled to 'false'."
+    DEFVAL { 0 }
+    ::= { vRtrMplsTpLsrCfgEntry 7 }
+
+vRtrMplsTpLsrFPOutLink           OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsTpLsrFPOutLink specifies the forward path (FP)
+         out-link interface used by the MPLS-TP LSR Path.
+
+         This object can be set only after vRtrMplsTpLsrFPEnabled is set to
+         'true'.
+
+         Once this object is set, the value may not be unset. To remove the
+         out-link, one must set vRtrMplsTpLsrFPEnabled to 'false'."
+    DEFVAL { 0 }
+    ::= { vRtrMplsTpLsrCfgEntry 8 }
+
+vRtrMplsTpLsrFPNextHopAddrType   OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsTpLsrFPNextHopAddrType, along with
+         vRtrMplsTpLsrFPNextHopAddress, specifies the forward path (FP)
+         IP address used as the next hop for the MPLS-TP LSP Path.
+
+         This object can be set only after vRtrMplsTpLsrFPEnabled is set to
+         'true'.
+
+         Once this object is set, the value may not be unset. To remove the
+         next hop, one must set vRtrMplsTpLsrFPEnabled to 'false'.
+
+         This object is only applicable if the vRtrMplsTpLsrFPOutLink
+         references a numbered interface."
+    DEFVAL { unknown }
+    ::= { vRtrMplsTpLsrCfgEntry 9 }
+
+vRtrMplsTpLsrFPNextHopAddress    OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsTpLsrFPNextHopAddress, along with
+         vRtrMplsTpLsrFPNextHopAddrType, specifies the forward path (FP)
+         IP address used as the next hop for the MPLS-TP LSR Path.
+
+         This object can be set only after vRtrMplsTpLsrFPEnabled is set to
+         'true'.
+
+         Once this object is set, the value may not be unset. To remove the next
+         hop, one must set vRtrMplsTpLsrFPEnabled to 'false'.
+
+         This object is only applicable if the vRtrMplsTpLsrFPOutLink references
+         a numbered interface."
+    DEFVAL { "" }
+    ::= { vRtrMplsTpLsrCfgEntry 10 }
+
+vRtrMplsTpLsrRPInLabel           OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsTpLsrRPInLabel specifies the reverse path (RP)
+         LSP ingress label used by the MPLS-TP LSR Path.
+
+         This object can be set only after vRtrMplsTpLsrRPEnabled is set to
+         'true'.
+
+         Once this object is set, the value may not be unset. To remove the
+         ingress label, one must set vRtrMplsTpLsrRPEnabled to 'false'."
+    DEFVAL { 0 }
+    ::= { vRtrMplsTpLsrCfgEntry 11 }
+
+vRtrMplsTpLsrRPOutLabel          OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 | 16..1048575)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsTpLsrRPOutLabel specifies the reverse path (RP)
+         LSP egress label used by the MPLS-TP LSR Path.
+
+         This object can be set only after vRtrMplsTpLsrRPEnabled is set to
+         'true'.
+
+         Once this object is set, this value may not be unset. To remove the
+         egress label, one must set vRtrMplsTpLsrFPEnabled to 'false'."
+    DEFVAL { 0 }
+    ::= { vRtrMplsTpLsrCfgEntry 12 }
+
+vRtrMplsTpLsrRPOutLink           OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsTpLsrRPOutLink specifies the reverse path (RP)
+         LSP out-link interface used by the MPLS-TP LSP Path.
+
+         This object can be set only after vRtrMplsTpLsrRPEnabled is set to
+         'true'.
+
+         Once this object is set, this value may not be unset. To remove the
+         out-link, one must set vRtrMplsTpLsrRPEnabled to 'false'."
+    DEFVAL { 0 }
+    ::= { vRtrMplsTpLsrCfgEntry 13 }
+
+vRtrMplsTpLsrRPNextHopAddrType   OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsTpLsrRPNextHopAddrType, along with
+         vRtrMplsTpLsrRPNextHopAddress, specifies the reverse path (RP)
+         IP address used as the next hop for the MPLS-TP LSP Path.
+
+         This object can be set only after vRtrMplsTpLsrRPEnabled is set to
+         'true'.
+
+         Once this object is set, this value may not be unset. To remove the
+         next hop, one must set vRtrMplsTpLsrRPEnabled to 'false'.
+
+         This object is only applicable if the vRtrMplsTpLsrRPOutLink
+         references a numbered interface."
+    DEFVAL { unknown }
+    ::= { vRtrMplsTpLsrCfgEntry 14 }
+
+vRtrMplsTpLsrRPNextHopAddress    OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsTpLsrRPNextHopAddress, along with
+         vRtrMplsTpLsrRPNextHopAddrType, specifies the reverse path (RP)
+         IP address used as the next hop for the MPLS-TP LSR Path.
+
+         This object can be set only after vRtrMplsTpLsrRPEnabled is set to
+         'true'.
+
+         Once this object is set, this value may not be unset. To remove the
+         next hop, one must set vRtrMplsTpLsrRPEnabled to 'false'.
+
+         This object is only applicable if the vRtrMplsTpLsrRPOutLink references
+         a numbered interface."
+    DEFVAL { "" }
+    ::= { vRtrMplsTpLsrCfgEntry 15 }
+
+vRtrMplsTpLsrFPEnabled  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of  vRtrMplsTpLsrFPEnabled specifies whether the forward
+         path is configured for the LSR path."
+    DEFVAL { false }
+    ::= { vRtrMplsTpLsrCfgEntry 16 }
+
+
+vRtrMplsTpLsrRPEnabled  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of  vRtrMplsTpLsrRPEnabled specifies whether the reverse
+         path is configured for the LSR path."
+    DEFVAL { false }
+    ::= { vRtrMplsTpLsrCfgEntry 17 }
+
+
+vRtrMplsTpLsrPathIdTblLastChg    OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsTpLsrPathIdTblLastChg indicates the last time,
+         since system startup, when the vRtrMplsTpLsrPathIdTable changed state."
+    ::= { vRtrMplsTpConfigTimeStamps 8 }
+
+vRtrMplsTpLsrPathIdTable         OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrMplsTpLsrPathIdEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrMplsTpLsrPathIdTable maintains the MPLS-TP LSR Path
+         configuration information."
+    ::= { vRtrMplsTpLsrObjects 3 }
+
+vRtrMplsTpLsrPathIdEntry         OBJECT-TYPE
+    SYNTAX      VRtrMplsTpLsrPathIdEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrMplsTpLsrPathIdEntry contains the configuration items
+         maintained by the vRtrMplsTpLsrPathIdTable."
+    INDEX       {
+                    tnSysSwitchId,
+                    vRtrID,
+                    vRtrMplsTpLsrPathIdSrcGlobalId,
+                    vRtrMplsTpLsrPathIdSrcNodeId,
+                    vRtrMplsTpLsrPathIdSrcTunNum,
+                    vRtrMplsTpLsrPathIdDestGlobalId,
+                    vRtrMplsTpLsrPathIdDestNodeId,
+                    vRtrMplsTpLsrPathIdDestTunNum,
+                    vRtrMplsTpLsrPathIdLspNumber
+                }
+    ::= { vRtrMplsTpLsrPathIdTable 1 }
+
+VRtrMplsTpLsrPathIdEntry         ::= SEQUENCE {
+    vRtrMplsTpLsrPathIdSrcGlobalId   TmnxMplsTpGlobalID,
+    vRtrMplsTpLsrPathIdSrcNodeId     TmnxMplsTpNodeID,
+    vRtrMplsTpLsrPathIdSrcTunNum     Unsigned32,
+    vRtrMplsTpLsrPathIdDestGlobalId  TmnxMplsTpGlobalID,
+    vRtrMplsTpLsrPathIdDestNodeId    TmnxMplsTpNodeID,
+    vRtrMplsTpLsrPathIdDestTunNum    Unsigned32,
+    vRtrMplsTpLsrPathIdLspNumber     Unsigned32,
+    vRtrMplsTpLsrPathIdRowStatus     RowStatus,
+    vRtrMplsTpLsrPathIdPathName      TNamedItem
+    }
+
+vRtrMplsTpLsrPathIdSrcGlobalId   OBJECT-TYPE
+    SYNTAX      TmnxMplsTpGlobalID
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsTpLsrPathIdSrcGlobalId specifies the unique node
+         identifier for the given source global ID."
+    ::= { vRtrMplsTpLsrPathIdEntry 1 }
+
+vRtrMplsTpLsrPathIdSrcNodeId     OBJECT-TYPE
+    SYNTAX      TmnxMplsTpNodeID
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsTpLsrPathIdSrcNodeId specifies the unique node
+         identifier for the given source node ID."
+    ::= { vRtrMplsTpLsrPathIdEntry 2 }
+
+vRtrMplsTpLsrPathIdSrcTunNum     OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 | 1..61440)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsTpLsrPathIdSrcTunNum specifies the source tunnel
+         number of an MPLS-TP Static LSP."
+    ::= { vRtrMplsTpLsrPathIdEntry 3 }
+
+vRtrMplsTpLsrPathIdDestGlobalId  OBJECT-TYPE
+    SYNTAX      TmnxMplsTpGlobalID
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsTpLsrPathIdDestGlobalId specifies the unique node
+         identifier for the given remote global ID."
+    ::= { vRtrMplsTpLsrPathIdEntry 4 }
+
+vRtrMplsTpLsrPathIdDestNodeId    OBJECT-TYPE
+    SYNTAX      TmnxMplsTpNodeID
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsTpLsrPathIdDestNodeId specifies the unique node
+         identifier for the given remote node ID."
+    ::= { vRtrMplsTpLsrPathIdEntry 5 }
+
+vRtrMplsTpLsrPathIdDestTunNum    OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 | 1..61440)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsTpLsrPathIdDestTunNum specifies the destination
+         tunnel number of an MPLS-TP Static LSP."
+    ::= { vRtrMplsTpLsrPathIdEntry 6 }
+
+vRtrMplsTpLsrPathIdLspNumber     OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..65535)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsTpLsrPathIdLspNumber specifies the MPLS-TP LSP
+         Path number."
+    REFERENCE "RFC 6370 Section 5.2"
+    ::= { vRtrMplsTpLsrPathIdEntry 7 }
+
+vRtrMplsTpLsrPathIdRowStatus     OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsTpLsrPathIdRowStatus specifies the row status of
+         the MPLS-TP LSR Path.
+
+         Rows are created by setting this object to the value 'createAndGo (4)'
+         and are destroyed by using the value 'destroy (6)'."
+    ::= { vRtrMplsTpLsrPathIdEntry 8 }
+
+vRtrMplsTpLsrPathIdPathName      OBJECT-TYPE
+    SYNTAX      TNamedItem
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsTpLsrPathIdPathName specifies the unique name of
+         the MPLS-TP LSR Path.
+
+         This object MUST be specified on row-creation, and must reference an
+         existing vRtrMplsTpLsrPathName."
+    ::= { vRtrMplsTpLsrPathIdEntry 9 }
+
+
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+--
+--  TIMETRA-MPLS-TP-MIB Status Objects
+--
+vRtrMplsTpStatusObjects        OBJECT IDENTIFIER ::= { vRtrMplsTpStatus 1 }
+
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+--
+--
+--  Mpls-Tp Tunnel Table
+--
+
+vRtrMplsTpTunnelTable            OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrMplsTpTunnelEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "vRtrMplsTpTunnelTable maintains a list of MPLS-TP tunnels for the
+        specific router instance."
+    ::= { vRtrMplsTpStatusObjects 1}
+
+vRtrMplsTpTunnelEntry            OBJECT-TYPE
+    SYNTAX      VRtrMplsTpTunnelEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "vRtrMplsTpTunnelEntry defines a tunnel to a particular destination in a
+        specific router context. A tunnel to a specific destination is an
+        MPLS-TP Static LSP."
+    INDEX       {
+                    tnSysSwitchId,
+                    vRtrID,
+                    vRtrMplsTpTunnelNodeId,
+                    vRtrMplsTpTunnelGlobalId,
+                    vRtrMplsTpTunnelPreference,
+                    vRtrMplsTpTunnelType,
+                    vRtrMplsTpTunnelID,
+                    vRtrMplsTpTunnelNextHopAddrType,
+                    vRtrMplsTpTunnelNextHopAddress
+                }
+    ::= { vRtrMplsTpTunnelTable 1 }
+
+VRtrMplsTpTunnelEntry            ::= SEQUENCE {
+    vRtrMplsTpTunnelNodeId           TmnxMplsTpNodeID,
+    vRtrMplsTpTunnelGlobalId         TmnxMplsTpGlobalID,
+    vRtrMplsTpTunnelPreference       Unsigned32,
+    vRtrMplsTpTunnelType             TmnxMplsTpTunnelType,
+    vRtrMplsTpTunnelID               TmnxTunnelID,
+    vRtrMplsTpTunnelNextHopAddrType  InetAddressType,
+    vRtrMplsTpTunnelNextHopAddress   InetAddress,
+    vRtrMplsTpTunnelMetric           Unsigned32,
+    vRtrMplsTpTunnelAge              Integer32
+}
+
+vRtrMplsTpTunnelNodeId           OBJECT-TYPE
+    SYNTAX      TmnxMplsTpNodeID
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "vRtrMplsTpTunnelNodeId indicates the destination node id of this
+        tunnel."
+    ::= { vRtrMplsTpTunnelEntry 1 }
+
+vRtrMplsTpTunnelGlobalId         OBJECT-TYPE
+    SYNTAX      TmnxMplsTpGlobalID
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "vRtrMplsTpTunnelGlobalId indicates the global id of the system."
+    ::= { vRtrMplsTpTunnelEntry 2 }
+
+vRtrMplsTpTunnelPreference       OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..255)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "The value of vRtrMplsTpTunnelPreference determines the priority of this
+        tunnel versus the other tunnels from different sources.
+        This is an absolute number used internally by the system to specify
+        preferences for the tunnel.
+
+        The lowest number signifies the most preferred entry in the table."
+    ::= { vRtrMplsTpTunnelEntry 3 }
+
+vRtrMplsTpTunnelType             OBJECT-TYPE
+    SYNTAX      TmnxMplsTpTunnelType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "The value of vRtrMplsTpTunnelType indicates the type of this tunnel
+        entity."
+    ::= { vRtrMplsTpTunnelEntry 4 }
+
+vRtrMplsTpTunnelID               OBJECT-TYPE
+    SYNTAX      TmnxTunnelID
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "The value of vRtrMplsTpTunnelID provides an additional index to
+        distinguish between multiple tunnels to same destination having
+        same characteristics.
+
+        There could be multiple tunnels for the type 'mplsTpStatic'.
+        In such cases the vRtrMplsTpTunnelID will hold the specific
+        MPLS-TP Static LSP Id."
+    ::= { vRtrMplsTpTunnelEntry 5 }
+
+vRtrMplsTpTunnelNextHopAddrType  OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "The value of vRtrMplsTpTunnelNextHopAddrType specifies the address type
+        of vRtrMplsTpTunnelNextHopAddress."
+    ::= { vRtrMplsTpTunnelEntry 6 }
+
+vRtrMplsTpTunnelNextHopAddress   OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16|20))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "The value of vRtrMplsTpTunnelNextHopAddress specifies the ip address
+        of the next hop for the MPLS-TP tunnel and it depends on the value
+        of vRtrMplsTpTunnelNextHopAddrType."
+    ::= { vRtrMplsTpTunnelEntry 7 }
+
+vRtrMplsTpTunnelMetric           OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The value of vRtrMplsTpTunnelMetric indicates the metric of the tunnel.
+        This is used in addition to the preference for this tunnel."
+    ::= { vRtrMplsTpTunnelEntry 8 }
+
+vRtrMplsTpTunnelAge              OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The value of vRtrMplsTpTunnelAge indicates the number of seconds since
+        this tunnel entry was last updated or otherwise determined to be
+        correct. No semantics of 'too old' can be implied except through
+        knowledge of owner of the tunnel."
+    ::= { vRtrMplsTpTunnelEntry 9 }
+
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+--
+--  TIMETRA-MPLS-TP-MIB Notification Objects and Conformance Objects
+--  deleted from original file.
+--
+
+--
+-- Dummy Scalars
+--
+
+ vRtrMplsTpScalar1 OBJECT-TYPE
+     SYNTAX      Unsigned32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+         "A dummy scalar that satisfies a SNMP get request quickly.Otherwise,
+     it has to traverse the remaining MIB to get to the next applicable
+          item."
+     ::= { vRtrMplsTpConfigTimeStamps 101 }
+
+ vRtrMplsTpScalar2 OBJECT-TYPE
+     SYNTAX      Unsigned32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+         "."
+     ::= { vRtrMplsTpConfigTimeStamps 102 }
+
+END

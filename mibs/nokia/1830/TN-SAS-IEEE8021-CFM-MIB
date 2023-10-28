@@ -1,0 +1,153 @@
+TN-SAS-IEEE8021-CFM-MIB DEFINITIONS ::= BEGIN
+
+-- (c) Copyright 2023 Nokia Networks.  All rights reserved.
+-- This software is the confidential and proprietary property of
+-- Nokia and may only be used in accordance with the terms of the
+-- license agreement provided with this software.
+
+IMPORTS
+        MODULE-IDENTITY, Unsigned32, OBJECT-TYPE      FROM SNMPv2-SMI
+
+--      MODULE-COMPLIANCE, OBJECT-GROUP               FROM SNMPv2-CONF
+
+        TruthValue                                    FROM SNMPv2-TC
+
+        dot1agCfmMepEntry                             FROM IEEE8021-CFM-MIB
+
+        tnSASObjs, tnSASModules                       FROM TROPIC-GLOBAL-REG
+        ;
+
+tnSASIEEE8021CfmMIBModule MODULE-IDENTITY
+        LAST-UPDATED    "201001010000Z"
+        ORGANIZATION    "Nokia"
+        CONTACT-INFO
+            "Nokia 7x50 Support
+             Web: http://www.nokia.com/comps/pages/carrier_support.jhtml"
+        DESCRIPTION
+        "This document is the SNMP MIB module to manage and provision dot1ag
+        Connectivity Fault Management module functionality for the Nokia 7210
+        products. This includes extensions to the IEEE8021-CFM MIB.
+
+        This SNMP MIB module (Specification) embodies Nokia's
+        proprietary intellectual property. Nokia retains
+        all title and ownership in the Specification, including any
+        revisions.
+
+        Nokia grants all interested parties a non-exclusive
+        license to use and distribute an unmodified copy of this
+        Specification in connection with management of Nokia
+        products, and without fee, provided this copyright notice and
+        license appear on all copies.
+
+        This Specification is supplied 'as is', and Nokia
+        makes no warranty, either express or implied, as to the use,
+        operation, condition, or performance of the Specification."
+--
+--  Revision History
+--
+
+        REVISION        "201001010000Z"
+        DESCRIPTION     "Rev 1.0                01 Jan 2010 00:00
+                         Initial version of the TIMETRA-IEEE8021-CFM-MIB."
+
+        ::= { tnSASModules 11 }
+
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+--
+--  Nokia 7210 product series IEEE8021-CFM extensions
+--
+
+tnSASDot1agMIBObjs               OBJECT IDENTIFIER ::= { tnSASObjs 11 }
+-- tnSASDot1agMIBConformance         OBJECT IDENTIFIER ::= { tnSASConfs 7 }
+
+-- Groups in the Nokia CFM MIB Module
+tnSASDot1agCfmMep                 OBJECT IDENTIFIER ::= { tnSASDot1agMIBObjs 1 }
+--tnSASDot1agNotificationsPrefix    OBJECT IDENTIFIER ::= { tnSASDot1agMIBObjs 2 }
+-- tnxSASDot1agNotifications OBJECT IDENTIFIER ::= { tnSASDot1agNotificationsPrefix  1 }
+
+
+tnDot1agCfmMepExtnTable            OBJECT-TYPE
+    SYNTAX     SEQUENCE OF TnDot1agCfmMepExtnEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+       "This table augments the Maintenance Association End Point (MEP) table
+        of the IEEE8021-CFM-MIB."
+    ::= { tnSASDot1agCfmMep 1 }
+
+tnDot1agCfmMepExtnEntry            OBJECT-TYPE
+    SYNTAX     TnDot1agCfmMepExtnEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+       "A conceptual row in the tnDot1agCfmMepExtnTable. This row exists only
+        if the association dot1agCfmMepEntry is active."
+    AUGMENTS { dot1agCfmMepEntry }
+    ::= { tnDot1agCfmMepExtnTable 1 }
+
+TnDot1agCfmMepExtnEntry ::= SEQUENCE {
+    tnDot1agCfmMepSendAisOnPortDown            TruthValue,
+    tnDot1agCfmMepControlSapTag                Unsigned32
+}
+
+tnDot1agCfmMepSendAisOnPortDown    OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        " The value of tnDot1agCfmMepSendAisOnPortDown specifies that ETH-AIS
+         should be generated for client MEP-s immediately when port down is detected
+         on a SAP where server MEP resides"
+    DEFVAL { false }
+    ::= { tnDot1agCfmMepExtnEntry 1 }
+
+tnDot1agCfmMepControlSapTag    OBJECT-TYPE
+    SYNTAX     Unsigned32  (0 | 512..768)
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        " tnDot1agCfmMepControlSapTag specifies the control sap tag."
+    DEFVAL { 0 }
+    ::= { tnDot1agCfmMepExtnEntry 2 }
+
+--
+-- Conformance Information
+--
+
+-- tnSASDot1agCfmCompliances OBJECT IDENTIFIER ::= { tnSASDot1agMIBConformance 1 }
+-- tnSASDot1agCfmGroups      OBJECT IDENTIFIER ::= { tnSASDot1agMIBConformance 2 }
+
+-- Compliance statements
+
+-- tnSASDot1agCfmComplianceV2v0 MODULE-COMPLIANCE
+--    STATUS     current
+--    DESCRIPTION
+--       "The compliance statement for revision 2.0 of the 7210 system"
+--    MODULE this module
+--       MANDATORY-GROUPS {
+--           tnSASDot1agCfmMepGroupV2v0
+--       }
+--    ::= { tnSASDot1agCfmCompliances 2 }
+
+-- tnSASDot1agCfmMepGroupV2v0       OBJECT-GROUP
+--    OBJECTS {
+--        tnDot1agCfmMepSendAisOnPortDown
+--    }
+--    STATUS     current
+--    DESCRIPTION
+--       "The group of objects for management of dot1ag MEP Table applicable
+--        to implementing SDP-Bindings."
+--    ::= { tnSASDot1agCfmGroups 1 }
+
+--tnSASDot1agCfmMepGroupV4v0       OBJECT-GROUP
+--    OBJECTS {
+--        tnDot1agCfmMepSendAisOnPortDown,
+--        tnDot1agCfmMepControlSapTag
+--    }
+--    STATUS     current
+--    DESCRIPTION
+--       "The group of objects for management of dot1ag MEP Table applicable
+--        to implementing SDP-Bindings."
+--    ::= { tnSASDot1agCfmGroups 2 }
+
+END

@@ -1,0 +1,3036 @@
+TN-IEEE8021-CFM-MIB DEFINITIONS ::= BEGIN
+
+-- (c) Copyright 2023 Nokia Networks.  All rights reserved.
+-- This software is the confidential and proprietary property of
+-- Nokia and may only be used in accordance with the terms of the
+-- license agreement provided with this software.
+
+IMPORTS
+        MODULE-IDENTITY, Unsigned32, OBJECT-TYPE,
+        NOTIFICATION-TYPE, Integer32, Counter32,
+        Gauge32                                       FROM SNMPv2-SMI
+
+        TEXTUAL-CONVENTION,
+        MacAddress, TruthValue                        FROM SNMPv2-TC
+
+        InterfaceIndex                                FROM IF-MIB
+
+        dot1agCfmMdIndex, dot1agCfmMaIndex,
+        dot1agCfmMepIdentifier,
+        Dot1agCfmMDLevel, Dot1agCfmMpDirection,
+        Dot1agCfmMepIdOrZero, dot1agCfmMepEntry,
+        Dot1agCfmMepId,
+        dot1agCfmMepTransmitLbmDestMacAddress,
+        dot1agCfmMepTransmitLtmSeqNumber,
+        Dot1agCfmCcmInterval,
+        dot1agCfmMaNetEntry,
+        dot1agCfmMaMepListEntry                       FROM IEEE8021-CFM-MIB
+
+        tnSRMIBModules, tnSRObjs,
+        tnSRNotifyPrefix                              FROM TROPIC-GLOBAL-REG
+
+        SdpId                                         FROM TN-SERV-MIB
+
+        tnSysSwitchId                                 FROM TROPIC-SYSTEM-MIB
+
+        TmnxServId, TmnxEnabledDisabled, TNamedItem   FROM TN-TC-MIB;
+
+tnIEEE8021CfmMIBModule MODULE-IDENTITY
+        LAST-UPDATED    "202111121200Z"
+        ORGANIZATION    "Nokia"
+        CONTACT-INFO
+            "Nokia 7x50 Support
+             Web: http://www.nokia.com/comps/pages/carrier_support.jhtml"
+        DESCRIPTION
+        "This document is the SNMP MIB module to manage and provision dot1ag
+        Connectivity Fault Management module functionality for the Nokia 7x50
+        products. This includes extensions to the IEEE8021-CFM MIB.
+
+        This SNMP MIB module (Specification) embodies Nokia's
+        proprietary intellectual property.  Nokia retains
+        all title and ownership in the Specification, including any
+        revisions.
+
+        Nokia grants all interested parties a non-exclusive
+        license to use and distribute an unmodified copy of this
+        Specification in connection with management of Nokia
+        products, and without fee, provided this copyright notice and
+        license appear on all copies.
+
+        This Specification is supplied 'as is', and Nokia
+        makes no warranty, either express or implied, as to the use,
+        operation, condition, or performance of the Specification."
+
+--
+--  Revision History
+--
+
+        REVISION        "202111121200Z"
+        DESCRIPTION     "Added the following to tnDot1agCfmMepOndemandLmTestTable:
+                         tnDot1agCfmMepOndemandLmSessionStatus."
+
+        REVISION        "202109171200Z"
+        DESCRIPTION     "Added the following to tnDot1agCfmMepOndemandLmTestRsltTable:
+                         tnDot1agCfmMepOndemandLmRemoteMacAddr."
+
+        REVISION        "202106041200Z"
+        DESCRIPTION     "Added the following to tnDot1agCfmMepOndemandLmTestTable:
+                         tnDot1agCfmMepOndemandLmTimeout."
+
+        REVISION        "202005221200Z"
+        DESCRIPTION     "Added the following to tnDot1agCfmStackMPType:
+                         ethRing(3)
+                         to
+                         facInterface(5)."
+
+        REVISION        "201911221200Z"
+        DESCRIPTION     "1) Changed SYNTAX of the following from Unsigned32(1..90) to
+                            Unsigned32(1..5000):
+                            tnDot1agCfmMepSlmTWInterval.
+                         2) Added the following to tnDot1agCfmMepSlmTWIntrvlUnits:
+                            decimilliseconds(3)."
+
+        REVISION        "201908031200Z"
+        DESCRIPTION     "Added the following to tnDot1agCfmMepTable:
+                         tnDot1agCfmMepAlmProfName."
+
+        REVISION        "201905031200Z"
+        DESCRIPTION     "Added the following to tnDot1agCfmMepDelayRsltTable:
+                         tnDot1agCfmMepDelayNearEndTestDelay
+                         tnDot1agCfmMepDelayNearEndVariation
+                         tnDot1agCfmMepDelayFarEndTestDelay
+                         tnDot1agCfmMepDelayFarEndVariation."
+
+        REVISION        "201903291200Z"
+        DESCRIPTION     "Added the following to tnDot1agCfmMepTable:
+                         tnDot1agCfmMepOWDTDataSize."
+
+        REVISION        "201710061200Z"
+        DESCRIPTION     "1) Added the following to tnDot1agCfmMaMepListTable:
+                            tnDot1agCfmMaMepListSapSubType.
+                         2) Fixed MIB compile issues."
+
+        REVISION        "201505081200Z"
+        DESCRIPTION     "1) Added the following to tnDot1agCfmMepTable:
+                            tnDot1agCfmMepType
+                         2) Added the following to tnDot1agCfmMepTable:
+                            tnDot1agCfmMepFaultPropagation"
+
+        REVISION        "201409181200Z"
+        DESCRIPTION     "Added the following to tnDot1agCfmMepTable:
+                         tnDot1agCfmMepTransmitLbmDataTlvSize."
+
+        REVISION        "201407241200Z"
+        DESCRIPTION     "Changed range for tnDot1agCfmMepSlmTWDataSize to 9558 from 1500."
+
+        REVISION        "201402100000Z"
+        DESCRIPTION     "Added the following to tnDot1agCfmMepTable:
+                         tnDot1agCfmMepTWDTDataSize."
+
+        REVISION        "201308220000Z"
+        DESCRIPTION     "1) Added the following tables:
+                            tnDot1agCfmMaNetTable
+                            tnDot1agCfmMaMepListTable
+                            tnDot1agCfmComponentLimitTable.
+                         2) Added the following to tnDot1agCfmMepSlmTWTestTable:
+                            tnDot1agCfmMepSlmTWIntrvlUnits.
+                         3) Updated upper range of tnDot1agCfmMepSlmTWInterval
+                            from 10 to 90.
+                         4) Updated upper range of tnDot1agCfmMepSlmTWSendCount
+                            from 100 to 1000."
+
+        REVISION        "201212130000Z"
+        DESCRIPTION     "1) Added the following to tnDot1agCfmMepTable:
+                            tnDot1agCfmMepMcLagInactive.
+                         2) Added the following table:
+                            tnDot1agCfmMcLagConfigTable."
+
+        REVISION        "201212050000Z"
+        DESCRIPTION     "Commented out unsupported MIB tables and
+                         attributes for 1830."
+
+        REVISION        "201209091200Z"
+        DESCRIPTION     "1) Added the following to tnDot1agCfmMepSlmTWTestTable:
+                            tnDot1agCfmMepSlmTWIntervalRedef.
+                         2) Added the following tables:
+                            tnDot1agCfmMepOndemandLmTestTable
+                            tnDot1agCfmMepOndemandLmTestRsltTable
+                            tnDot1agCfmMepOWDelayRsltExtTable.
+                         3) Added the following notification:
+                            tnDot1agCfmMepOndemandLmTestComplete."
+
+        REVISION        "201203291200Z"
+        DESCRIPTION     "Added tnDot1agCfmMepCsfTable."
+
+        REVISION        "200902280000Z"
+        DESCRIPTION     "Rev 7.0                28 Feb 2009 00:00
+                         7.0 release of the TIMETRA-IEEE8021-CFM-MIB."
+
+        REVISION        "200801010000Z"
+        DESCRIPTION     "Rev 1.0                01 Jan 2008 00:00
+                         Initial version of the TIMETRA-IEEE8021-CFM-MIB."
+
+        ::= { tnSRMIBModules 52 }
+
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+--
+--  Nokia 7x50 product series IEEE8021-CFM extensions
+--
+
+tnDot1agMIBObjs                OBJECT IDENTIFIER ::= { tnSRObjs 52 }
+tnDot1agNotificationsPrefix    OBJECT IDENTIFIER ::= { tnSRNotifyPrefix 52 }
+    tnDot1agNotifications OBJECT IDENTIFIER ::= { tnDot1agNotificationsPrefix 0 }
+-- tnDot1agMIBConformance         OBJECT IDENTIFIER ::= { tnSRConfs 52 }
+
+-- Groups in the Nokia CFM MIB Module
+tnDot1agCfmStack               OBJECT IDENTIFIER ::= { tnDot1agMIBObjs 1 }
+tnDot1agCfmGlobalObjs          OBJECT IDENTIFIER ::= { tnDot1agMIBObjs 2 }
+tnDot1agCfmMa                  OBJECT IDENTIFIER ::= { tnDot1agMIBObjs 6 }
+tnDot1agCfmMep                 OBJECT IDENTIFIER ::= { tnDot1agMIBObjs 7 }
+-- tnDot1agCfmMip                 OBJECT IDENTIFIER ::= { tnDot1agMIBObjs 8 }
+-- tnDot1agCfmNotificationObjs    OBJECT IDENTIFIER ::= { tnDot1agMIBObjs 9 }
+
+NokiaPmonUnitType ::= TEXTUAL-CONVENTION
+        STATUS      current
+        DESCRIPTION "Statistics unit type for proactive and on-demand OAM PM."
+        SYNTAX      INTEGER {
+                      microseconds(1),
+                      hundred-nano-seconds(2),
+                      nano-seconds(3)
+                    }
+
+--
+--
+-- Nokia 7x50 product series dot1ag CFM SDP-Bind Stack Table
+--
+-- This table is a mirror of the dot1agCfmStackTable in IEEE8021-CFM-MIB.
+--
+-- The indexes of this table differ from that of the dot1agCfmStackTable
+-- by the replacement of the dot1agCfmStackIfIndex and
+-- dot1agCfmStackVlanIdOrNone indexes with that of the
+-- tnDot1agCfmSdpBindStackSdpid and tnDot1agCfmSdpBindStackVcId indexes.
+
+-- The CFM Sdp-Bind Stack Table
+
+-- tnDot1agCfmSdpBindStackTable OBJECT-TYPE
+--     SYNTAX     SEQUENCE OF TnDot1agCfmSdpBindStackEntry
+--     MAX-ACCESS not-accessible
+--     STATUS     current
+--     DESCRIPTION
+--        "There is one CFM Sdp-Bind Stack table per bridge. It permits
+--         the retrieval of information about the Maintenance Points
+--         configured on any given Sdp bindings."
+--     REFERENCE
+--        "802.1ag clauses 12.14.2"
+--     ::= { tnDot1agCfmStack 1 }
+--
+-- tnDot1agCfmSdpBindStackEntry OBJECT-TYPE
+--     SYNTAX     TnDot1agCfmSdpBindStackEntry
+--     MAX-ACCESS not-accessible
+--     STATUS     current
+--     DESCRIPTION
+--        "A conceptual row in the tnDot1agCfmSdpBindStackTable. This row behaves
+--         exactly like the dot1agCfmStackEntry row."
+--     INDEX { tnDot1agCfmSdpBindStackSdpId,
+--             tnDot1agCfmSdpBindStackVcId,
+--             tnDot1agCfmSdpBindStackMdLevel,
+--             tnDot1agCfmSdpBindStackDirection
+--           }
+--     ::= { tnDot1agCfmSdpBindStackTable 1 }
+--
+-- TnDot1agCfmSdpBindStackEntry ::= SEQUENCE {
+--       tnDot1agCfmSdpBindStackSdpId         SdpId,
+--       tnDot1agCfmSdpBindStackVcId          Unsigned32,
+--       tnDot1agCfmSdpBindStackMdLevel       Dot1agCfmMDLevel,
+--       tnDot1agCfmSdpBindStackDirection     Dot1agCfmMpDirection,
+--       tnDot1agCfmSdpBindStackMdIndex       Unsigned32,
+--       tnDot1agCfmSdpBindStackMaIndex       Unsigned32,
+--       tnDot1agCfmSdpBindStackMepId         Dot1agCfmMepIdOrZero,
+--       tnDot1agCfmSdpBindStackMacAddress    MacAddress
+--     }
+--
+-- tnDot1agCfmSdpBindStackSdpId OBJECT-TYPE
+--     SYNTAX     SdpId
+--     MAX-ACCESS not-accessible
+--     STATUS     current
+--     DESCRIPTION
+--        "The value of tnDot1agCfmSdpBindStackSdpId specifies the
+--         Bridge Port or aggregated port on which MEPs or MHFs
+--         might be configured."
+--     REFERENCE
+--        "802.1ag clause 12.14.2.1.2:a"
+--     ::= { tnDot1agCfmSdpBindStackEntry 1 }
+--
+-- tnDot1agCfmSdpBindStackVcId OBJECT-TYPE
+--     SYNTAX     Unsigned32
+--     MAX-ACCESS not-accessible
+--     STATUS     current
+--     DESCRIPTION
+--        "The value of tnDot1agCfmSdpBindStackVcId specifies, along with
+--         tnDot1agCfmSdpBindStackSdpId, the SDP Binding for the bridge."
+--     REFERENCE
+--        "802.1ag clause 12.14.2.1.2:d"
+--     ::= { tnDot1agCfmSdpBindStackEntry 2 }
+--
+-- tnDot1agCfmSdpBindStackMdLevel OBJECT-TYPE
+--     SYNTAX     Dot1agCfmMDLevel
+--     MAX-ACCESS not-accessible
+--     STATUS     current
+--     DESCRIPTION
+--        "The value of tnDot1agCfmSdpBindStackMdLevel specifies the MD Level of
+--         the Maintenance Point."
+--     REFERENCE
+--        "802.1ag clause 12.14.2.1.2:b"
+--     ::= { tnDot1agCfmSdpBindStackEntry 3 }
+--
+-- tnDot1agCfmSdpBindStackDirection OBJECT-TYPE
+--     SYNTAX     Dot1agCfmMpDirection
+--     MAX-ACCESS not-accessible
+--     STATUS     current
+--     DESCRIPTION
+--        "The value of tnDot1agCfmSdpBindStackDirection specifies the
+--         Direction in which the MP faces on the Bridge Port"
+--     REFERENCE
+--        "802.1ag clause 12.14.2.1.2:c"
+--     ::= { tnDot1agCfmSdpBindStackEntry 4 }
+--
+-- tnDot1agCfmSdpBindStackMdIndex OBJECT-TYPE
+--     SYNTAX     Unsigned32
+--     MAX-ACCESS read-only
+--     STATUS     current
+--     DESCRIPTION
+--        "The value of tnDot1agCfmSdpBindStackMdIndex indicates the index
+--         of the Maintenance Domain in the dot1agCfmMdTable to which the
+--         MP is associated, or 0, if none."
+--     REFERENCE
+--        "802.1ag clause 12.14.2.1.3:b"
+--     ::= { tnDot1agCfmSdpBindStackEntry 5 }
+--
+-- tnDot1agCfmSdpBindStackMaIndex OBJECT-TYPE
+--     SYNTAX     Unsigned32
+--     MAX-ACCESS read-only
+--     STATUS     current
+--     DESCRIPTION
+--        "The value of tnDot1agCfmSdpBindStackMaIndex indicates the index
+--         of the MA in the dot1agCfmMaNetTable and dot1agCfmMaCompTable
+--         to which the MP is associated, or 0, if none."
+--     REFERENCE
+--        "802.1ag clause 12.14.2.1.3:c"
+--     ::= { tnDot1agCfmSdpBindStackEntry 6 }
+--
+-- tnDot1agCfmSdpBindStackMepId OBJECT-TYPE
+--     SYNTAX     Dot1agCfmMepIdOrZero
+--     MAX-ACCESS read-only
+--     STATUS     current
+--     DESCRIPTION
+--        "The value of tnDot1agCfmSdpBindStackMepId indicates if an MEP
+--         is configured, the MEPID, else 0"
+--     REFERENCE
+--        "802.1ag clause 12.14.2.1.3:d"
+--     ::= { tnDot1agCfmSdpBindStackEntry 7 }
+--
+-- tnDot1agCfmSdpBindStackMacAddress OBJECT-TYPE
+--     SYNTAX     MacAddress
+--     MAX-ACCESS read-only
+--     STATUS     current
+--     DESCRIPTION
+--        "The value of tnDot1agCfmSdpBindStackMacAddress indicates
+--         the MAC address of the MP."
+--     REFERENCE
+--       "802.1ag clause 12.14.2.1.3:e"
+--     ::= { tnDot1agCfmSdpBindStackEntry 8 }
+
+-- Nokia 7x50 product series CFM MepEntry table
+--
+-- This table is an augmentation of the dot1agCfmMepTable in IEEE8021-CFM-MIB.
+--
+-- Use of AUGMENTS clause implies a one-to-one dependent relationship between
+-- the base table, dot1agCfmMepTable, and the augmenting table,
+-- tnDot1agCfmMepTable, with additional columns. Creation (or deletion) of a row
+-- in the dot1agCfmMepTable results in the same fate for the row in the
+-- tnDot1agCfmMepTable.
+
+
+-- ******************************************************************
+-- The MEP Table
+-- ******************************************************************
+
+tnDot1agCfmMepTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF TnDot1agCfmMepEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+       "This table augments the Maintenance Association End Point (MEP) table
+        of the IEEE8021-CFM-MIB."
+    ::= { tnDot1agCfmMep 1 }
+
+tnDot1agCfmMepEntry OBJECT-TYPE
+    SYNTAX     TnDot1agCfmMepEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+       "A conceptual row in the tnDot1agCfmMepTable. This row exists only
+        if the association dot1agCfmMepEntry is active."
+    AUGMENTS { dot1agCfmMepEntry }
+    ::= { tnDot1agCfmMepTable 1 }
+
+TnDot1agCfmMepEntry ::= SEQUENCE {
+    tnDot1agCfmMepSdpId                  SdpId,
+    tnDot1agCfmMepVcId                   Unsigned32,
+    tnDot1agCfmMepMacAddress             MacAddress,
+    tnDot1agCfmMepAisEnable              TruthValue,
+    tnDot1agCfmMepAisMegLevel            BITS,
+    tnDot1agCfmMepAisPriority            Unsigned32,
+    tnDot1agCfmMepAisInterval            Unsigned32,
+    tnDot1agCfmMepEthRxAisInterval       Unsigned32,
+    tnDot1agCfmMepEthRxAis               TruthValue,
+    tnDot1agCfmMepEthAisTxCount          Counter32,
+    tnDot1agCfmMepEthTestEnable          TruthValue,
+    tnDot1agCfmMepEthTestPattern         INTEGER,
+    tnDot1agCfmMepEthTestMacAddr         MacAddress,
+    tnDot1agCfmMepEthTestDataLen         Unsigned32,
+    tnDot1agCfmMepEthTestPriority        Unsigned32,
+    tnDot1agCfmMepOWDTMacAddress         MacAddress,
+    tnDot1agCfmMepOWDTPriority           Unsigned32,
+    tnDot1agCfmMepTWDTMacAddress         MacAddress,
+    tnDot1agCfmMepTWDTPriority           Unsigned32,
+    tnDot1agCfmMepSvcId                  TmnxServId,
+    tnDot1agCfmMepControlMep             TruthValue,
+    tnDot1agCfmMepEthTestThreshold       Unsigned32,
+    tnDot1agCfmMepOWDTThreshold          Unsigned32,
+    tnDot1agCfmMepMcLagInactive          INTEGER,
+    tnDot1agCfmMepTWDTDataSize           Unsigned32,
+    tnDot1agCfmMepTransmitLbmDataTlvSize Unsigned32,
+    tnDot1agCfmMepType                   INTEGER,
+    tnDot1agCfmMepFaultPropagation       INTEGER,
+    tnDot1agCfmMepOWDTDataSize           Unsigned32,
+    tnDot1agCfmMepAlmProfName            OCTET STRING
+}
+
+tnDot1agCfmMepSdpId OBJECT-TYPE
+    SYNTAX     SdpId
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+       "The value of tnDot1agCfmMepSdpId specifies, along with the
+        tnDot1agCfmMepVcId, the SDP-Binding within a bridge port,
+        to which the MEP is attached.
+
+        This object is applicable to SDP-Bindings only, and MUST be set
+        to the null ID (0) when dot1agCfmMepIfIndex or
+        dot1agCfmMepPrimaryVid, is non-zero. When this object is
+        applicable (non-zero), the dot1agCfmMepIfIndex and
+        dot1agCfmMepPrimaryVid MUST be set to zero (0)."
+    REFERENCE
+       "802.1ag clause 12.14.2.1.2:a"
+    ::= { tnDot1agCfmMepEntry 1 }
+
+tnDot1agCfmMepVcId OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+       "The value of tnDot1agCfmMepVcId specifies, along with
+        tnDot1agCfmMepSdpId, the SDP Binding for the bridge.
+
+        tnDot1agCfmMepVcId is applicable to SDP-Bindings only, and MUST
+        be set to zero (0) when dot1agCfmMepIfIndex or
+        dot1agCfmMepPrimaryVid is non-zero. When this object is
+        applicable (non-zero), the dot1agCfmMepIfIndex and
+        dot1agCfmMepPrimaryVid MUST be set to zero (0)."
+    REFERENCE
+       "802.1ag clause 12.14.2.1.2:d"
+    ::= { tnDot1agCfmMepEntry 2 }
+
+tnDot1agCfmMepMacAddress OBJECT-TYPE
+    SYNTAX     MacAddress
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+       "The value of tnDot1agCfmMepMacAddress specifies the mac-address
+        that is assigned to dot1agCfmMepMacAddress."
+    REFERENCE
+      "802.1ag clause 12.14.7.1.3:i and 19.4"
+    ::= { tnDot1agCfmMepEntry 3 }
+
+tnDot1agCfmMepAisEnable OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The value of tnDot1agCfmMepAisEnable specifies whether AIS
+         frames are generated from the Maintenance Entity Group (MEG)."
+    DEFVAL { false }
+    ::= { tnDot1agCfmMepEntry 4 }
+
+tnDot1agCfmMepAisMegLevel OBJECT-TYPE
+    SYNTAX     BITS {
+                   level1 (0),
+                   level2 (1),
+                   level3 (2),
+                   level4 (3),
+                   level5 (4),
+                   level6 (5),
+                   level7 (6)
+               }
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The value of tnDot1agCfmMepAisMegLevel specifies the levels
+         that should be notified to suppress alarms resulting from defect
+         conditions detected by the MEP."
+    DEFVAL { { } }
+    ::= { tnDot1agCfmMepEntry 5 }
+
+tnDot1agCfmMepAisPriority OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..7)
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The value of tnDot1agCfmMepAisPriority specifies at what priority
+         the AIS frames should be transmitted."
+    DEFVAL { 7 }
+    ::= { tnDot1agCfmMepEntry 6 }
+
+tnDot1agCfmMepAisInterval OBJECT-TYPE
+    SYNTAX     Unsigned32 (1 | 60)
+    UNITS      "seconds"
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The value of tnDot1agCfmMepAisInterval specifies at what intervals
+         to transmit AIS frames."
+    DEFVAL { 1 }
+    ::= { tnDot1agCfmMepEntry 7 }
+
+tnDot1agCfmMepEthRxAisInterval OBJECT-TYPE
+    SYNTAX     Unsigned32 (1 | 60)
+    UNITS      "seconds"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The value of tnDot1agCfmMepEthRxAisInterval indicates the AIS Interval
+        received in the last AIS Frame."
+    DEFVAL { 1 }
+    ::= { tnDot1agCfmMepEntry 8 }
+
+tnDot1agCfmMepEthRxAis OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The value of tnDot1agCfmMepEthRxAis indicates the MEP is receiving
+         AIS test frames from one or more of its sub-layer MEPs."
+    DEFVAL { false }
+    ::= { tnDot1agCfmMepEntry 9 }
+
+tnDot1agCfmMepEthAisTxCount OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The value of tnDot1agCfmMepEthAisTxCount indicates number of
+         AIS frames transmitted on the MEP."
+    ::= { tnDot1agCfmMepEntry 10 }
+
+tnDot1agCfmMepEthTestEnable OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The value of tnDot1agCfmMepEthTestEnable specifies whether
+         ethernet test frames are to be generated on transmission or
+         processed on reception. If this object is set to 'false',
+         then tnDot1agCfmMepEthTestPattern is undefined.
+
+         When this object is set to 'true', tnDot1agCfmMepEthTestPattern
+         is reset to its default value, unless tnDot1agCfmMepEthTestPattern
+         is set to a specific value in the same SNMP PDU."
+    DEFVAL { false }
+    ::= { tnDot1agCfmMepEntry 11 }
+
+tnDot1agCfmMepEthTestPattern OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   allZerosNoCrc  (0),
+                   allZerosCrc    (1),
+                   prbsNoCrc      (2),
+                   prbsCrc        (3),
+                   allOnesNoCrc   (4),
+                   allOnesCrc     (5)
+               }
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The value of tnDot1agCfmMepEthTestPattern specifies the data-content
+         of the AIS test frames. 'allZerosNoCrc (0)' and 'allZerosCrc (1)'
+         specifies the data content as all zero values (without and with CRC
+         calculations respectively). 'prbsNoCrc (3) and 'prbsCrc (4) specifies
+         the data content as pseudo random bit sequence (without and with CRC
+         calculations respectively). 'allOnesNoCrc (4)' and 'allOnesCrc (5)',
+         specifies the data content as all ones (without and with CRC
+         calculations respectively).
+
+         This object is only applicable if tnDot1agCfmMepEthTestEnable is set
+         to 'true'."
+    DEFVAL { allZerosNoCrc }
+    ::= { tnDot1agCfmMepEntry 12 }
+
+tnDot1agCfmMepEthTestMacAddr OBJECT-TYPE
+    SYNTAX     MacAddress
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The value of tnDot1agCfmMepEthTestMacAddr specifies the MAC address
+         of the target to whom the Eth-test frames are sent.
+
+         Setting this object will trigger the test frame to be sent. Once the test
+         is complete, the object will revert to the default value, indicating that
+         another test is possible."
+    DEFVAL { '000000000000'H }
+    ::= { tnDot1agCfmMepEntry 13 }
+
+tnDot1agCfmMepEthTestDataLen OBJECT-TYPE
+    SYNTAX     Unsigned32 (64..1500)
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The value of tnDot1agCfmMepEthTestDataLen specifies the length of the data
+         sent in an Eth-test frame. The contents of the data is specified by the
+         tnDot1agCfmMepEthTestPattern object."
+    DEFVAL { 64 }
+    ::= { tnDot1agCfmMepEntry 14 }
+
+tnDot1agCfmMepEthTestPriority OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..7)
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The value of tnDot1agCfmMepEthTestPriority specifies the priority used
+         in generating Eth-Test frames."
+    DEFVAL { 7 }
+    ::= { tnDot1agCfmMepEntry 15 }
+
+tnDot1agCfmMepOWDTMacAddress OBJECT-TYPE
+    SYNTAX     MacAddress
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The value of tnDot1agCfmMepOWDTMacAddress specifies the MAC address used
+         as a target for the One-Way-Delay Test (OWDT).
+
+         Setting this object will trigger a One-Way-Delay test to the specified
+         MAC address.
+
+         Upon completion of the test, the MacAddress will revert to it's
+         default value, indicating that another test is possible."
+    DEFVAL { '000000000000'H }
+    ::= { tnDot1agCfmMepEntry 16 }
+
+tnDot1agCfmMepOWDTPriority OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..7)
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The value of tnDot1agCfmMepOWDTPriority specifies the priority used in
+         the generated test frame for the One-Way-Delay test."
+    DEFVAL { 7 }
+    ::= { tnDot1agCfmMepEntry 17 }
+
+tnDot1agCfmMepTWDTMacAddress OBJECT-TYPE
+    SYNTAX     MacAddress
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The value of tnDot1agCfmMepTWDTMacAddress specifies the MAC address used
+         as a target for the Two-Way-Delay Test (TWDT).
+
+         Setting this object will trigger a Two-Way-Delay test to the specified
+         MAC address.
+
+         Upon completion of the test, the MacAddress will revert to it's
+         default value, indicating that another test is possible."
+    DEFVAL { '000000000000'H }
+    ::= { tnDot1agCfmMepEntry 18 }
+
+tnDot1agCfmMepTWDTPriority OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..7)
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The value of tnDot1agCfmMepTWDTPriority specifies the priority used in
+         the generated test frame for the Two-Way-Delay test."
+    DEFVAL { 7 }
+    ::= { tnDot1agCfmMepEntry 19 }
+
+tnDot1agCfmMepSvcId OBJECT-TYPE
+    SYNTAX     TmnxServId
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+       "The value of tnDot1agCfmMepSvcId specifies the service that the virtual
+        MEP is being created in.
+
+        tnDot1agCfmMepSvcId is applicable to virtual MEPs only, and MUST
+        be set to zero (0) when dot1agCfmMepIfIndex, dot1agCfmMepPrimaryVid,
+        tnDot1agCfmMepSdpId, or tnDot1agCfmMepVcId is non-zero.  When this
+        object is applicable (non-zero), the above objects MUST be set to zero (0)."
+    ::= { tnDot1agCfmMepEntry 20 }
+
+tnDot1agCfmMepControlMep OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tnDot1agCfmMepControlMep specifies whether or not the
+         operational state of the MEP is used by the management entity over which
+         this MEP is configured."
+    DEFVAL { false }
+    ::= { tnDot1agCfmMepEntry 21 }
+
+tnDot1agCfmMepEthTestThreshold OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..11840)
+    UNITS       "bit-errors"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tnDot1agCfmMepEthTestThreshold specifies when a
+         tnDot1agCfmMepEthTestComplete notification is sent. If
+         tnDot1agCfmMepEthTestThreshold is set to zero (0), a notification is
+         sent on the completion of any test for this MEP. Otherwise the
+         threshold must be exceeded and/or CRC failures must be detected to
+         send the notification."
+    DEFVAL { 1 }
+    ::= { tnDot1agCfmMepEntry 22 }
+
+tnDot1agCfmMepOWDTThreshold OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..600)
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "The value of tnDot1agCfmMepOWDTThreshold specifies when a
+        tnDot1agCfmMepDMTestComplete notification is sent for a one-way-delay
+        test. If tnDot1agCfmMepOWDTThreshold is set to zero (0), a
+        notification is sent on the completion of any one-way-delay-test for
+        this MEP. Otherwise the threshold must be exceeded to send the
+        notification."
+    DEFVAL { 3 }
+    ::= { tnDot1agCfmMepEntry 23 }
+
+tnDot1agCfmMepMcLagInactive OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    notApplicable (0),
+                    standby       (1),
+                    active        (2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDot1agCfmMepMcLagInactive indicates whether or not the
+         MEP is inactive, 'standby (2)', due to the MC-LAG standby state.  The
+         value of tmnxDot1agCfmMcLagStdbyInactive must be set to 'true (1)' for
+         this object to have meaning and return anything other than
+         'notApplicable (0)'."
+    ::= { tnDot1agCfmMepEntry 24 }
+
+tnDot1agCfmMepTWDTDataSize OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..9542)
+    UNITS       "bytes"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tnDot1agCfmMepTWDTDataSize specifies the data size,
+         in bytes, contained in the padding TLV for the Two-Way delay test.
+         A value of zero (0) specifies that no padding
+         TLV is inserted in the packet. Any non-zero value will increase
+         the packet size by the specified data size plus 3 bytes for the TLV
+         header."
+    DEFVAL { 0 }
+    ::= { tnDot1agCfmMepEntry 25 }
+
+tnDot1agCfmMepTransmitLbmDataTlvSize OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..9570)
+    UNITS       "bytes"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tnDot1agCfmMepTransmitLbmDataTlvSize specifies
+         the data size, in bytes, contained in the padding TLV
+         for the LBM test.  A value of zero (0) specifies that
+         no padding TLV is inserted in the packet.  Any non-zero value
+         will increase the packet size by the specified data size."
+    DEFVAL { 0 }
+    ::= { tnDot1agCfmMepEntry 26 }
+
+tnDot1agCfmMepType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    default           (0),
+                    facilityPort      (1),
+                    facilityInterface (2),
+                    sapPrimaryVlan    (3)
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDot1agCfmMepType specifies the endpoint type that
+         this MEP facilitates.
+             default           (0) -- implements a traditional MEP.
+             facilityPort      (1) -- implements a facility port/LAG level MEP.
+             facilityInterface (2) -- implements a router interface level MEP.
+             sapPrimaryVlan    (3) -- implements a SAP MEP using primary VLAN-ID
+                                      from the MA Comp Table. This is only
+                                      applicable if the MA primary VLAN ID is
+                                      set to a value other than zero (0).
+
+         This object must be specified during row creation."
+     DEFVAL { default }
+     ::= { tnDot1agCfmMepEntry 27 }
+
+tnDot1agCfmMepFaultPropagation OBJECT-TYPE
+    SYNTAX      INTEGER {
+                  disabled       (0),
+                  useIfStatusTLV (1),
+                  suspendCCM     (2)
+                }
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "The value of tnDot1agCfmMepFaultPropagation specifies what action
+          should be taken by the MEP if a fault is detected in the service
+          containing the MEP.  It also specifies if the MEP should propagate
+          a fault that it has detected into the service.
+
+          When this object is set to 'disabled (0)', no additional fault
+          propagation will occur.  When this object is set to 'useIfStatusTLV
+          (1)', the MEP will send an interface status TLV in the next CCM
+          indicating fault when fault is detected, even if the MEP itself has
+          not detected a fault.  When this object is set to 'suspendCCM (2)',
+          faults will be propagated by stopping the regular CCM transmissions
+          entirely.  Once the fault is cleared, the regular CCM transmissions
+          will resume.  Additionally, when the value of
+          tnDot1agCfmMepFaultPropagation is different than 'disabled (0)', a
+          defect detected by the MEP will be propagated into the service."
+    DEFVAL { disabled }
+    ::= { tnDot1agCfmMepEntry 28 }
+
+tnDot1agCfmMepOWDTDataSize OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..9542)
+    UNITS       "bytes"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tnDot1agCfmMepOWDTDataSize specifies the data size,
+         in bytes, contained in the padding TLV for the one-Way delay test.
+         A value of zero (0) specifies that no padding TLV is inserted in
+         the packet. Any non-zero value will increase the packet size by
+         the specified data size plus 3 bytes for the TLV header."
+    DEFVAL { 0 }
+    ::= { tnDot1agCfmMepEntry 29 }
+
+tnDot1agCfmMepAlmProfName OBJECT-TYPE
+    SYNTAX         OCTET STRING (SIZE(1..40))
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION    "."
+    ::= { tnDot1agCfmMepEntry 30 }
+
+--
+-- This table AUGMENTS the dot1agCfmMaNetTable in IEEE8021-CFM-MIB.
+--
+-- ******************************************************************
+-- The CFM Maintenance Association Table
+-- ******************************************************************
+tnDot1agCfmMaNetTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TDot1agCfmMaNetEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tnDot1agCfmMaNetTable AUGMENTS the standard MIB table,
+         dot1agCfmMaNetTable. This table is used to enhance Maintenance
+         Association functionality for Ethernet Connectivity Fault Management
+         (ETH-CFM)."
+    ::= { tnDot1agCfmMa 1 }
+
+tnDot1agCfmMaNetEntry OBJECT-TYPE
+    SYNTAX      TDot1agCfmMaNetEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tnDot1agCfmMaNetEntry consists of the configuration objects
+         used to enhance the Maintenance Association functionality."
+    AUGMENTS { dot1agCfmMaNetEntry }
+    ::= { tnDot1agCfmMaNetTable 1 }
+
+TDot1agCfmMaNetEntry          ::= SEQUENCE {
+    tnDot1agCfmMaNetTotalMEPCount  Counter32
+}
+
+tnDot1agCfmMaNetTotalMEPCount OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tnDot1agCfmMaNetTotalMEPCount indicates the number of
+        unique MEPs configured (both local and remote) that are associated with
+        this MA.
+
+        When the number of MEPs exceed the normal MA limits, the MA is
+        considered to be an extended MA and will use a resource from the
+        'Extended MA' resource entry in tnDot1agCfmComponentLimitTable."
+    ::= { tnDot1agCfmMaNetEntry 1 }
+
+--
+-- The MEP list table augments the standard dot1agCfmMaMepListTable
+--
+-- ******************************************************************
+--  The MEP List Table
+-- ******************************************************************
+tnDot1agCfmMaMepListTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TDot1agCfmMaMepListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tnDot1agCfmMaMepListTable extends the functionality of the
+         dot1agCfmMaMepListTable."
+    ::= { tnDot1agCfmMa 3 }
+
+tnDot1agCfmMaMepListEntry OBJECT-TYPE
+    SYNTAX      TDot1agCfmMaMepListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tnDot1agCfmMaMepListEntry augments the standard MIB entry
+         for the purpose of extending functionality for Dot1ag CFM MEP Lists.
+         Rows are created and destroyed by the system through the row status
+         field in dot1agCfmMaMepListEntry."
+    AUGMENTS    { dot1agCfmMaMepListEntry }
+    ::= { tnDot1agCfmMaMepListTable 1 }
+
+TDot1agCfmMaMepListEntry      ::= SEQUENCE {
+    tnDot1agCfmMaMepListMacAddress MacAddress,
+    tnDot1agCfmMaMepListSapSubType INTEGER
+}
+
+tnDot1agCfmMaMepListMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tnDot1agCfmMaMepListMacAddress specifies the target
+         unicast MAC address used for transmitting CFM packets to the remote
+         MEPs for the specified MEPID.
+
+         Setting a unicast MAC address restricts the number of MEPIDs that can
+         be configured for an individual MA to a maximum of one (1). Setting the
+         address back to the default value will remove this restriction and will
+         result in the regular CCM multicast address being used. This value
+         cannot be set to any multicast or broadcast address."
+    DEFVAL      { '000000000000'H }
+    ::= { tnDot1agCfmMaMepListEntry 1 }
+
+tnDot1agCfmMaMepListSapSubType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                  regular    (0),
+                  etree-root (1),
+                  etree-leaf (2)
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tnDot1agCfmMaMepListSapSubType specifies the SAP
+         sub type of the remote MEP for the specified MEPID.
+
+         This is used to ensure that LLF shutdown is based only on remote
+         etree-root SAP faults and to suppress unwanted CCM alarms
+         on etree-leaf SAPs."
+
+    DEFVAL      { regular }
+    ::= { tnDot1agCfmMaMepListEntry 2 }
+
+-- ******************************************************************
+-- The Stack Object. This group will contain all the MIBs objects
+-- needed to access the Stack managed object. This group supersedes
+-- the dot1agCfmStackTable due to the inclusion of Q-in-Q
+-- encapsulation. the VlanIdOrNone object has been expanded to
+-- support the full-range of Vlan/Q-in-Q encapsulation. Otherwise
+-- this group behaves identically to that of the standard
+-- dot1agCfmStackTable.
+-- ******************************************************************
+
+-- ******************************************************************
+-- The CFM Stack Table
+-- ******************************************************************
+tnDot1agCfmStackTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF TnDot1agCfmStackEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+       "There is one CFM Stack table per bridge. It permits
+        the retrieval of information about the Maintenance Points
+        configured on any given interface.
+       "
+    REFERENCE
+       "802.1ag clauses 12.14.2"
+    ::= { tnDot1agCfmStack 2 }
+
+tnDot1agCfmStackEntry OBJECT-TYPE
+    SYNTAX     TnDot1agCfmStackEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+       "The Stack table entry"
+    INDEX { tnDot1agCfmStackifIndex, tnDot1agCfmStackVlanIdOrNone,
+            tnDot1agCfmStackMdLevel, tnDot1agCfmStackDirection
+          }
+    ::= { tnDot1agCfmStackTable 1 }
+
+TnDot1agCfmStackEntry ::= SEQUENCE {
+      tnDot1agCfmStackifIndex       InterfaceIndex,
+      tnDot1agCfmStackVlanIdOrNone  Unsigned32,
+      tnDot1agCfmStackMdLevel       Dot1agCfmMDLevel,
+      tnDot1agCfmStackDirection     Dot1agCfmMpDirection,
+      tnDot1agCfmStackMdIndex       Unsigned32,
+      tnDot1agCfmStackMaIndex       Unsigned32,
+      tnDot1agCfmStackMepId         Dot1agCfmMepIdOrZero,
+      tnDot1agCfmStackMacAddress    MacAddress,
+      tnDot1agCfmStackMPType        INTEGER
+    }
+
+tnDot1agCfmStackifIndex OBJECT-TYPE
+    SYNTAX     InterfaceIndex
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+       "This object represents the  Bridge Port or aggregated port
+        on which MEPs or MHFs might be configured.
+
+        Upon a restart of the system, the system SHALL, if necessary,
+        change the value of this variable, and  rearrange the
+        dot1agCfmStackTable, so that it indexes the entry in the
+        interface table with the same value of ifAlias that it
+        indexed before the system restart.  If no such entry exists,
+        then the system SHALL delete all entries in the
+        dot1agCfmStackTable with the interface index.
+       "
+    REFERENCE
+       "802.1ag clause 12.14.2.1.2:a"
+    ::= { tnDot1agCfmStackEntry 1 }
+
+tnDot1agCfmStackVlanIdOrNone OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+       "VLAN ID to which the MP is attached, or 0, if none."
+    REFERENCE
+       "802.1ag clauses 12.14.2.1.2:d, 22.1.7"
+    ::= { tnDot1agCfmStackEntry 2 }
+
+tnDot1agCfmStackMdLevel OBJECT-TYPE
+    SYNTAX     Dot1agCfmMDLevel
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+       "MD Level of the Maintenance Point."
+    REFERENCE
+       "802.1ag clause 12.14.2.1.2:b"
+    ::= { tnDot1agCfmStackEntry 3 }
+
+tnDot1agCfmStackDirection OBJECT-TYPE
+    SYNTAX     Dot1agCfmMpDirection
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+       "Direction in which the MP faces on the Bridge Port"
+    REFERENCE
+       "802.1ag clause 12.14.2.1.2:c"
+    ::= { tnDot1agCfmStackEntry 4 }
+
+tnDot1agCfmStackMdIndex OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+       "The index of the Maintenance Domain in the dot1agCfmMdTable
+        to which the MP is associated, or 0, if none."
+    REFERENCE
+       "802.1ag clause 12.14.2.1.3:b"
+    ::= { tnDot1agCfmStackEntry 5 }
+
+tnDot1agCfmStackMaIndex OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+       "The index of the MA in the dot1agCfmMaNetTable and
+        dot1agCfmMaCompTable to which the MP is associated, or 0, if
+        none."
+    REFERENCE
+       "802.1ag clause 12.14.2.1.3:c"
+    ::= { tnDot1agCfmStackEntry 6 }
+
+tnDot1agCfmStackMepId OBJECT-TYPE
+    SYNTAX     Dot1agCfmMepIdOrZero
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+       "If an MEP is configured, the MEPID, else 0"
+    REFERENCE
+       "802.1ag clause 12.14.2.1.3:d"
+    ::= { tnDot1agCfmStackEntry 7 }
+
+tnDot1agCfmStackMacAddress OBJECT-TYPE
+    SYNTAX     MacAddress
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+       "MAC address of the MP."
+    REFERENCE
+      "802.1ag clause 12.14.2.1.3:e"
+    ::= { tnDot1agCfmStackEntry 8 }
+
+tnDot1agCfmStackMPType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                     sap    (1),
+                     ethTun (2),
+                     ethRing(3),
+                     facPort(4),
+                     facInterface(5)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tnDot1agCfmStackMPType indicates the entity that the
+         MP is configured on:
+              sap(1)      MP is configured on a SAP
+              ethTun(2)   MP is configured on an ethernet-tunnel"
+    ::= { tnDot1agCfmStackEntry 9 }
+
+--
+-- Nokia 7x50 product series dot1ag CFM Virtual MEP Stack Table
+--
+-- This table is a mirror of the dot1agCfmStackTable in IEEE8021-CFM-MIB.
+--
+-- The indexes of this table differ from that of the dot1agCfmStackTable
+-- by the replacement of the dot1agCfmStackIfIndex and
+-- dot1agCfmStackVlanIdOrNone indexes with that of the
+-- tnDot1agCfmVStackSvcId index.
+
+-- The CFM Virtual Stack Table
+
+-- tnDot1agCfmVStackTable OBJECT-TYPE
+--     SYNTAX     SEQUENCE OF TnDot1agCfmVStackEntry
+--     MAX-ACCESS not-accessible
+--     STATUS     current
+--     DESCRIPTION
+--        "There is one CFM Virtual Stack entry per service. It permits
+--         the retrieval of information about the Maintenance Points
+--         configured on any given virtual Maintenance Association End
+--         Point (MEP)."
+--     REFERENCE
+--        "802.1ag clauses 12.14.2"
+--     ::= { tnDot1agCfmStack 3 }
+--
+-- tnDot1agCfmVStackEntry OBJECT-TYPE
+--     SYNTAX     TnDot1agCfmVStackEntry
+--     MAX-ACCESS not-accessible
+--     STATUS     current
+--     DESCRIPTION
+--        "A conceptual row in the tnDot1agCfmVStackTable.
+--
+--         There exists one row for each configured virtual MEP in the system.
+--         Rows are created and destroyed based on the existence of a virtual MEP."
+--     INDEX { tnDot1agCfmVStackSvcId,
+--             tnDot1agCfmVStackMdLevel,
+--             tnDot1agCfmVStackDirection
+--           }
+--     ::= { tnDot1agCfmVStackTable 1 }
+--
+-- TnDot1agCfmVStackEntry ::= SEQUENCE {
+--       tnDot1agCfmVStackSvcId         TmnxServId,
+--       tnDot1agCfmVStackMdLevel       Dot1agCfmMDLevel,
+--       tnDot1agCfmVStackDirection     Dot1agCfmMpDirection,
+--       tnDot1agCfmVStackMdIndex       Unsigned32,
+--       tnDot1agCfmVStackMaIndex       Unsigned32,
+--       tnDot1agCfmVStackMepId         Dot1agCfmMepIdOrZero,
+--       tnDot1agCfmVStackMacAddress    MacAddress
+--     }
+--
+-- tnDot1agCfmVStackSvcId OBJECT-TYPE
+--     SYNTAX     TmnxServId
+--     MAX-ACCESS not-accessible
+--     STATUS     current
+--     DESCRIPTION
+--        "The value of tnDot1agCfmVStackSvcId specifies the
+--         service on which MEPs might be configured."
+--     REFERENCE
+--        "802.1ag clause 12.14.2.1.2:a"
+--     ::= { tnDot1agCfmVStackEntry 1 }
+--
+-- tnDot1agCfmVStackMdLevel OBJECT-TYPE
+--     SYNTAX     Dot1agCfmMDLevel
+--     MAX-ACCESS not-accessible
+--     STATUS     current
+--     DESCRIPTION
+--        "The value of tnDot1agCfmVStackMdLevel specifies the Maintenance
+--        Domain (MD) Level of the Maintenance Point."
+--     REFERENCE
+--        "802.1ag clause 12.14.2.1.2:b"
+--     ::= { tnDot1agCfmVStackEntry 2 }
+--
+-- tnDot1agCfmVStackDirection OBJECT-TYPE
+--     SYNTAX     Dot1agCfmMpDirection
+--     MAX-ACCESS not-accessible
+--     STATUS     current
+--     DESCRIPTION
+--        "The value of tnDot1agCfmVStackDirection specifies the
+--         direction in which the Maintenance Point (MP) faces on the service."
+--     REFERENCE
+--        "802.1ag clause 12.14.2.1.2:c"
+--     ::= { tnDot1agCfmVStackEntry 3 }
+--
+-- tnDot1agCfmVStackMdIndex OBJECT-TYPE
+--     SYNTAX     Unsigned32
+--     MAX-ACCESS read-only
+--     STATUS     current
+--     DESCRIPTION
+--        "The value of tnDot1agCfmVStackMdIndex indicates the index
+--         of the Maintenance Domain in the dot1agCfmMdTable to which the
+--         Maintenance Point (MP) is associated, or 0, if none."
+--     REFERENCE
+--        "802.1ag clause 12.14.2.1.3:b"
+--     ::= { tnDot1agCfmVStackEntry 4 }
+--
+-- tnDot1agCfmVStackMaIndex OBJECT-TYPE
+--     SYNTAX     Unsigned32
+--     MAX-ACCESS read-only
+--     STATUS     current
+--     DESCRIPTION
+--        "The value of tnDot1agCfmVStackMaIndex indicates the index
+--         of the Maintenance Association (MA) in the dot1agCfmMaNetTable
+--         and dot1agCfmMaCompTable to which the Maintenance Point (MP) is
+--         associated, or 0, if none."
+--     REFERENCE
+--        "802.1ag clause 12.14.2.1.3:c"
+--     ::= { tnDot1agCfmVStackEntry 5 }
+--
+-- tnDot1agCfmVStackMepId OBJECT-TYPE
+--     SYNTAX     Dot1agCfmMepIdOrZero
+--     MAX-ACCESS read-only
+--     STATUS     current
+--     DESCRIPTION
+--        "The value of tnDot1agCfmVStackMepId indicates if an MEP
+--         is configured, the MEPID, else 0."
+--     REFERENCE
+--        "802.1ag clause 12.14.2.1.3:d"
+--     ::= { tnDot1agCfmVStackEntry 6 }
+--
+-- tnDot1agCfmVStackMacAddress OBJECT-TYPE
+--     SYNTAX     MacAddress
+--     MAX-ACCESS read-only
+--     STATUS     current
+--     DESCRIPTION
+--        "The value of tnDot1agCfmVStackMacAddress indicates
+--         the MAC address of the MP."
+--     REFERENCE
+--       "802.1ag clause 12.14.2.1.3:e"
+--     ::= { tnDot1agCfmVStackEntry 7 }
+
+-- Nokia 7x50 product series CFM MIP table
+--
+-- The MIP tables (Sap and SDP) represent all the service endpoints
+-- where Maintenance Domain Intermediate Point (MIP) creation can
+-- occur.  If a SAP or SDP-Binding does not have a correlating row
+-- in these tables, then no MIP will be created for that endpoint.
+
+-- tnDot1agCfmMcLagConfigGroup  OBJECT IDENTIFIER ::= {tnDot1agCfmGlobalObjs 1}
+
+-- ******************************************************************
+-- The Multi-Chassis LAG Configuration Objects
+-- ******************************************************************
+tnDot1agCfmMcLagConfigTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF TnDot1agCfmMcLagConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+       "A row in the tnDot1agCfmMcLagConfigTable indicates whether a Mc Lag
+        is in Active Standby or not and what the Hold Time will be."
+    ::= { tnDot1agCfmGlobalObjs 1 }
+
+tnDot1agCfmMcLagConfigEntry OBJECT-TYPE
+    SYNTAX     TnDot1agCfmMcLagConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+       "The Cfm entry for MC LAG"
+    INDEX { tnSysSwitchId }
+    ::= { tnDot1agCfmMcLagConfigTable 1 }
+
+TnDot1agCfmMcLagConfigEntry ::= SEQUENCE {
+        tnDot1agCfmMcLagConfigStdbyInactive     TruthValue,
+        tnDot1agCfmMcLagConfigPropHoldTime      Unsigned32
+     }
+
+tnDot1agCfmMcLagConfigStdbyInactive OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "The value of tnDot1agCfmMcLagConfigStdbyInactive specifies whether or not
+          ETH-CFM MEPs configured on Multi-Chassis LAG ports are aware of MC-LAG
+          port active/standby states.
+
+          When this object is 'true (1)', MEPs configured on a Multi-Chassis
+          LAG port will act as if they are administratively shutdown if running
+          on a standby port, and will only be operational on an active MC-LAG
+          port.
+
+          When this object is 'false (2)', MEPs configured on a Multi-Chassis
+          LAG port will operate regardless of the MC-LAG port active and standby
+          states."
+    DEFVAL { false }
+    ::= { tnDot1agCfmMcLagConfigEntry 1 }
+
+tnDot1agCfmMcLagConfigPropHoldTime OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..60)
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tnDot1agCfmMcLagConfigPropHoldTime specifies the duration, in
+         seconds, of a timer that is activated when an MC-LAG port or protocol
+         changes state. While the timer is active, no fault set or clear is
+         propagated to the MC-LAG SAP's CFM MEP.
+
+         The outstanding hold time can be monitored by polling the value of
+         sapEthCfmMcLagPropHoldTimeRemain for a particular SAP.  When set to
+         the value zero (0), no delay in response to a port or protocol change
+         will be observed.
+
+         This object is meaningful only when tnDot1agCfmMcLagConfigStdbyInactive is
+         set to the value 'enabled (1)', otherwise an SNMP Set operation will
+         result in an inconsistentValue error and the result of an SNMP Get
+         operation will be undefined."
+    DEFVAL { 1 }
+    ::= { tnDot1agCfmMcLagConfigEntry 2 }
+
+--
+-- ******************************************************************
+-- The MIP (SAP) Table
+-- ******************************************************************
+--
+-- tnDot1agCfmSapMipTable
+-- OBJECT-TYPE
+--     SYNTAX     SEQUENCE OF TnDot1agCfmSapMipEntry
+--     MAX-ACCESS not-accessible
+--     STATUS     current
+--     DESCRIPTION
+--        "A row in the tnDot1agCfmSapMipTable indicates that the
+--         specified SAP may have a MIP created on the endpoint."
+--     ::= { tnDot1agCfmMip 1 }
+--
+-- tnDot1agCfmSapMipEntry OBJECT-TYPE
+--     SYNTAX     TnDot1agCfmSapMipEntry
+--     MAX-ACCESS not-accessible
+--     STATUS     current
+--     DESCRIPTION
+--        "The MIP (SAP) entry"
+--     INDEX { tnDot1agCfmSapMipIfIndex, tnDot1agCfmSapMipVlanIdOrNone }
+--     ::= { tnDot1agCfmSapMipTable 1 }
+--
+-- TnDot1agCfmSapMipEntry ::= SEQUENCE {
+--       tnDot1agCfmSapMipIfIndex         InterfaceIndex,
+--       tnDot1agCfmSapMipVlanIdOrNone    Unsigned32,
+--       tnDot1agCfmSapMipRowStatus       RowStatus
+--     }
+--
+-- tnDot1agCfmSapMipIfIndex OBJECT-TYPE
+--     SYNTAX     InterfaceIndex
+--     MAX-ACCESS not-accessible
+--     STATUS     current
+--     DESCRIPTION
+--        "This object represents the  Bridge Port or aggregated port
+--         on which MEPs or MHFs might be configured."
+--     ::= { tnDot1agCfmSapMipEntry 1 }
+--
+-- tnDot1agCfmSapMipVlanIdOrNone OBJECT-TYPE
+--     SYNTAX     Unsigned32
+--     MAX-ACCESS not-accessible
+--     STATUS     current
+--     DESCRIPTION
+--        "VLAN ID to which the MIP is attached, or 0, if none."
+--     ::= { tnDot1agCfmSapMipEntry 2 }
+--
+-- tnDot1agCfmSapMipRowStatus OBJECT-TYPE
+--     SYNTAX     RowStatus
+--     MAX-ACCESS read-create
+--     STATUS     current
+--     DESCRIPTION
+--        "The tnDot1agCfmSapMipRowStatus specifies the ability to enable MIP
+--         creation under a SAP. Existing MIPs associated with the SAP may be
+--         viewed via the tnDot1agCfmStackTable"
+--     ::= { tnDot1agCfmSapMipEntry 3 }
+
+--
+-- ******************************************************************
+-- The MIP (SDP) Table
+-- ******************************************************************
+-- tnDot1agCfmSdpMipTable
+-- OBJECT-TYPE
+--     SYNTAX     SEQUENCE OF TnDot1agCfmSdpMipEntry
+--     MAX-ACCESS not-accessible
+--     STATUS     current
+--     DESCRIPTION
+--        "A row in the tnDot1agCfmSapMipTable indicates that the
+--         specified SDP-Binding may have a MIP created on the endpoint."
+--     ::= { tnDot1agCfmMip 2 }
+--
+-- tnDot1agCfmSdpMipEntry OBJECT-TYPE
+--     SYNTAX     TnDot1agCfmSdpMipEntry
+--     MAX-ACCESS not-accessible
+--     STATUS     current
+--     DESCRIPTION
+--        "The MIP (SDP-Binding) entry"
+--     INDEX { tnDot1agCfmSdpMipSvcId,
+--             tnDot1agCfmSdpMipSdpId,
+--             tnDot1agCfmSdpMipVcId
+--           }
+--     ::= { tnDot1agCfmSdpMipTable 1 }
+--
+-- TnDot1agCfmSdpMipEntry ::= SEQUENCE {
+--       tnDot1agCfmSdpMipSvcId           TmnxServId,
+--       tnDot1agCfmSdpMipSdpId           SdpId,
+--       tnDot1agCfmSdpMipVcId            Unsigned32,
+--       tnDot1agCfmSdpMipRowStatus       RowStatus
+--     }
+--
+-- tnDot1agCfmSdpMipSvcId OBJECT-TYPE
+--     SYNTAX     TmnxServId
+--     MAX-ACCESS not-accessible
+--     STATUS     current
+--     DESCRIPTION
+--        "The value of tnDot1agCfmSdpMipSvcId specifies the
+--         service on which the Sdp-Binding MIP is configured."
+--     ::= { tnDot1agCfmSdpMipEntry 1 }
+--
+-- tnDot1agCfmSdpMipSdpId OBJECT-TYPE
+--     SYNTAX     SdpId
+--     MAX-ACCESS not-accessible
+--     STATUS     current
+--     DESCRIPTION
+--        "The value of tnDot1agCfmSdpMipSdpId specifies the
+--         Bridge Port or aggregated port on which MEPs or MHFs
+--         might be configured."
+--     ::= { tnDot1agCfmSdpMipEntry 2 }
+--
+-- tnDot1agCfmSdpMipVcId OBJECT-TYPE
+--     SYNTAX     Unsigned32
+--     MAX-ACCESS not-accessible
+--     STATUS     current
+--     DESCRIPTION
+--        "The value of tnDot1agCfmSdpMipVcId specifies, along with
+--         tnDot1agCfmSdpMipSdpId, the SDP Binding for the bridge."
+--     ::= { tnDot1agCfmSdpMipEntry 3 }
+--
+-- tnDot1agCfmSdpMipRowStatus OBJECT-TYPE
+--     SYNTAX     RowStatus
+--     MAX-ACCESS read-create
+--     STATUS     current
+--     DESCRIPTION
+--        "The tnDot1agCfmSapMipRowStatus specifies the ability to enable MIP
+--         creation under a SAP. Existing MIPs associated with the SAP may be
+--         viewed via the tnDot1agCfmSdpBindStackTable"
+--     ::= { tnDot1agCfmSdpMipEntry 4 }
+
+--
+-- MEP Eth-Test Result Table
+--
+
+-- tnDot1agCfmMepEthTestRsltTable OBJECT-TYPE
+--     SYNTAX     SEQUENCE OF TnDot1agCfmMepEthTestRsltEntry
+--     MAX-ACCESS not-accessible
+--     STATUS     current
+--     DESCRIPTION
+--        "The tnDot1agCfmMepEthTestRsltTable indicates the results of
+--         all eth-tests indexed by the originating MAC addresses.
+--
+--         This table is not persistent over reboots of the chassis."
+--     ::= { tnDot1agCfmMep 2 }
+--
+-- tnDot1agCfmMepEthTestRsltEntry OBJECT-TYPE
+--     SYNTAX     TnDot1agCfmMepEthTestRsltEntry
+--     MAX-ACCESS not-accessible
+--     STATUS     current
+--     DESCRIPTION
+--        "The MEG result table."
+--     INDEX {
+--               dot1agCfmMdIndex,
+--               dot1agCfmMaIndex,
+--               dot1agCfmMepIdentifier,
+--               tnDot1agCfmMepSrcMacAddress
+--           }
+--     ::= { tnDot1agCfmMepEthTestRsltTable 1 }
+--
+-- TnDot1agCfmMepEthTestRsltEntry ::= SEQUENCE {
+--     tnDot1agCfmMepSrcMacAddress    MacAddress,
+--     tnDot1agCfmMepFrameCount       Counter32,
+--     tnDot1agCfmMepByteCount        Counter32,
+--     tnDot1agCfmMepFailedBits       Counter32,
+--     tnDot1agCfmMepCrcFailures      Counter32,
+--     tnDot1agCfmMepCurrByteCount    Gauge32,
+--     tnDot1agCfmMepCurrFailedBits   Gauge32,
+--     tnDot1agCfmMepCurrCrcFailures  TruthValue
+-- }
+--
+-- tnDot1agCfmMepSrcMacAddress OBJECT-TYPE
+--     SYNTAX     MacAddress
+--     MAX-ACCESS not-accessible
+--     STATUS     current
+--     DESCRIPTION
+--         "The value of tnDot1agCfmMepSrcMacAddress indicates the MAC address
+--          of the issuer of the eth-test."
+--     ::= { tnDot1agCfmMepEthTestRsltEntry 1 }
+--
+-- tnDot1agCfmMepFrameCount OBJECT-TYPE
+--     SYNTAX     Counter32
+--     MAX-ACCESS read-only
+--     STATUS     current
+--     DESCRIPTION
+--         "The value of tnDot1agCfmMepFrameCount indicates the number of frames
+--          received from the issuer of the eth-test."
+--     ::= { tnDot1agCfmMepEthTestRsltEntry 2 }
+--
+-- tnDot1agCfmMepByteCount OBJECT-TYPE
+--     SYNTAX     Counter32
+--     MAX-ACCESS read-only
+--     STATUS     current
+--     DESCRIPTION
+--         "The value of tnDot1agCfmMepByteCount indicates the number of bytes
+--          received from the issuer of the eth-test."
+--     ::= { tnDot1agCfmMepEthTestRsltEntry 3 }
+--
+-- tnDot1agCfmMepFailedBits OBJECT-TYPE
+--     SYNTAX     Counter32
+--     MAX-ACCESS read-only
+--     STATUS     current
+--     DESCRIPTION
+--         "The value of tnDot1agCfmMepFailedBits indicates the accumulated
+--          number of bits that did not match the test-pattern in all received
+--          Eth-Tst frames since tnDot1agCfmMepEthTestEnable is configured
+--          from 'false' to 'true'."
+--     ::= { tnDot1agCfmMepEthTestRsltEntry 4 }
+--
+-- tnDot1agCfmMepCrcFailures OBJECT-TYPE
+--     SYNTAX     Counter32
+--     MAX-ACCESS read-only
+--     STATUS     current
+--     DESCRIPTION
+--         "The value of tnDot1agCfmMepCrcFailures indicates the accumulated number
+--          of CRC checksum failures."
+--     ::= { tnDot1agCfmMepEthTestRsltEntry 5 }
+--
+-- tnDot1agCfmMepCurrByteCount OBJECT-TYPE
+--     SYNTAX     Gauge32
+--     MAX-ACCESS read-only
+--     STATUS     current
+--     DESCRIPTION
+--         "The value of tnDot1agCfmMepCurrByteCount indicates the number of bytes
+--          contained in the most recently received Eth-Tst frame Test TLV."
+--     ::= { tnDot1agCfmMepEthTestRsltEntry 6 }
+--
+-- tnDot1agCfmMepCurrFailedBits OBJECT-TYPE
+--     SYNTAX     Gauge32
+--     MAX-ACCESS read-only
+--     STATUS     current
+--     DESCRIPTION
+--         "The value of tnDot1agCfmMepCurrFailedBits indicates the number of bits
+--          that did not match the test-pattern in the most recently received
+--          Eth-Tst frame."
+--     ::= { tnDot1agCfmMepEthTestRsltEntry 7 }
+--
+-- tnDot1agCfmMepCurrCrcFailures OBJECT-TYPE
+--     SYNTAX     TruthValue
+--     MAX-ACCESS read-only
+--     STATUS     current
+--     DESCRIPTION
+--         "The value of tnDot1agCfmMepCurrCrcFailures indicates that CRC errors
+--          were detected in the most recently received Eth-Tst frame."
+--     ::= { tnDot1agCfmMepEthTestRsltEntry 8 }
+
+--
+-- MEP Delay Result Table
+--
+tnDot1agCfmMepDelayRsltTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF TnDot1agCfmMepDelayRsltEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+       "The tnDot1agCfmMepDelayRsltTable indicates the results of
+        all the One-Way/Two-Way Delay Tests from the originating MAC
+        addresses.
+
+        This table is not persistent over reboots of the chassis."
+    ::= { tnDot1agCfmMep 3 }
+
+tnDot1agCfmMepDelayRsltEntry OBJECT-TYPE
+    SYNTAX     TnDot1agCfmMepDelayRsltEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+       "The MEG result table."
+    INDEX {
+              dot1agCfmMdIndex,
+              dot1agCfmMaIndex,
+              dot1agCfmMepIdentifier,
+              tnDot1agCfmMepDelaySrcMacAddr,
+              tnDot1agCfmMepDelayTestType
+          }
+    ::= { tnDot1agCfmMepDelayRsltTable 1 }
+
+TnDot1agCfmMepDelayRsltEntry   ::= SEQUENCE {
+    tnDot1agCfmMepDelaySrcMacAddr         MacAddress,
+    tnDot1agCfmMepDelayTestType           INTEGER,
+    tnDot1agCfmMepDelayTestDelay          Integer32,
+    tnDot1agCfmMepDelayVariation          Unsigned32,
+    tnDot1agCfmMepDelayNearEndTestDelay   Integer32,
+    tnDot1agCfmMepDelayNearEndVariation   Unsigned32,
+    tnDot1agCfmMepDelayFarEndTestDelay    Integer32,
+    tnDot1agCfmMepDelayFarEndVariation    Unsigned32
+}
+
+tnDot1agCfmMepDelaySrcMacAddr OBJECT-TYPE
+    SYNTAX     MacAddress
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The value of tnDot1agCfmMepDelaySrcMacAddr indicates the source
+         MAC address of the issuer of the test."
+    ::= { tnDot1agCfmMepDelayRsltEntry 1 }
+
+tnDot1agCfmMepDelayTestType OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   oneWayTest (1),
+                   twoWayTest (2)
+               }
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The value of tnDot1agCfmMepDelayTestType indicates the type
+         of test this row details."
+    ::= { tnDot1agCfmMepDelayRsltEntry 2 }
+
+tnDot1agCfmMepDelayTestDelay OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "microseconds"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The value of tnDot1agCfmMepDelayTestDelay indicates the amount
+         of time, measured in microseconds, from when the test-frame was
+         transmitted to the time it was received minus the local processing time
+         taken by the remote system.
+
+         Bi-direction test delay for twoWayTest or oneWayTest"
+    ::= { tnDot1agCfmMepDelayRsltEntry 3 }
+
+tnDot1agCfmMepDelayVariation OBJECT-TYPE
+    SYNTAX     Unsigned32
+    UNITS      "microseconds"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The value of tnDot1agCfmMepDelayVariation indicates the amount
+         of time delay variation, measured in microseconds, from the two
+         most recent time delay measurements.
+
+         Bi-direction test delay variation for twoWayTest or oneWayTest"
+    ::= { tnDot1agCfmMepDelayRsltEntry 4 }
+
+tnDot1agCfmMepDelayNearEndTestDelay OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "microseconds"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Near end test delay for oneWayTest."
+    ::= { tnDot1agCfmMepDelayRsltEntry 5 }
+
+tnDot1agCfmMepDelayNearEndVariation OBJECT-TYPE
+    SYNTAX     Unsigned32
+    UNITS      "microseconds"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Near end test delay variation for oneWayTest."
+    ::= { tnDot1agCfmMepDelayRsltEntry 6 }
+
+tnDot1agCfmMepDelayFarEndTestDelay OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "microseconds"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Far end test delay for oneWayTest"
+    ::= { tnDot1agCfmMepDelayRsltEntry 7 }
+
+tnDot1agCfmMepDelayFarEndVariation OBJECT-TYPE
+    SYNTAX     Unsigned32
+    UNITS      "microseconds"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Far end test delay variation for oneWayTest."
+    ::= { tnDot1agCfmMepDelayRsltEntry 8 }
+
+--************************************************************
+--add for the MEP-CSF function
+--************************************************************
+tnDot1agCfmMepCsfTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF TnDot1agCfmMepCsfEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+       "This table augments the Maintenance Association End Point (MEP) table
+        of the IEEE8021-CFM-MIB."
+    ::= { tnDot1agCfmMep 4 }
+
+tnDot1agCfmMepCsfEntry OBJECT-TYPE
+    SYNTAX     TnDot1agCfmMepCsfEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+       "A conceptual row in the tnDot1agCfmMepCsfTable. This row exists only
+        if the association dot1agCfmMepEntry is active."
+    AUGMENTS { dot1agCfmMepEntry }
+    ::= { tnDot1agCfmMepCsfTable 1 }
+
+TnDot1agCfmMepCsfEntry ::= SEQUENCE {
+    tnDot1agCfmMepCsfInterval   Dot1agCfmCcmInterval,
+    tnDot1agCfmMepCsfDirection  INTEGER,
+    tnDot1agCfmMepCsfPriority   Integer32
+   }
+
+tnDot1agCfmMepCsfInterval OBJECT-TYPE
+    SYNTAX      Dot1agCfmCcmInterval
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "Interval between CSF transmissions to be used in the MEP.
+       "
+    DEFVAL { interval1min }
+    ::= { tnDot1agCfmMepCsfEntry 1 }
+
+tnDot1agCfmMepCsfDirection OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    disable (1),
+                    unidirection (2),
+                    bi-dirction (3)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "CSF transmissions direction in the MEP
+        "
+    DEFVAL { disable }
+    ::= { tnDot1agCfmMepCsfEntry 2 }
+
+tnDot1agCfmMepCsfPriority OBJECT-TYPE
+    SYNTAX         Integer32 (0..7)
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION
+       "The priority value for CSFs transmitted by the MEP.
+        Default Value is the highest priority value allowed to pass
+        through the bridge port for any of this MEPs VIDs.
+        The management entity can obtain the default value for this
+        variable from the priority regeneration table by extracting the
+        highest priority value in this table on this MEPs bridge port.
+       "
+    DEFVAL { 7 }
+
+    ::= { tnDot1agCfmMepCsfEntry 3 }
+
+--
+-- MEP Synthetic Loss Measurement two-way Test Config Table
+--
+tnDot1agCfmMepSlmTWTestTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TnDot1agCfmMepSlmTWTestEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "tnDot1agCfmMepSlmTWTestTable consists of the MEP configuration for
+         issuing individual Synthetic Loss Measurement tests."
+    REFERENCE "ITU-T Y.1731 Ethernet Synthetic Frame Loss Measurement (ETH-SLM)"
+    ::= { tnDot1agCfmMep 5 }
+
+tnDot1agCfmMepSlmTWTestEntry OBJECT-TYPE
+    SYNTAX      TnDot1agCfmMepSlmTWTestEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "tnDot1agCfmMepSlmTWTestEntry contains the configuration for
+         generating Synthetic Loss Measurement (SLM) Tests for a particular MEP.
+         A row exists for each row in the dot1agCfmMepTable, and is destroyed
+         automatically with the removal of a row in the dot1agCfmMepTable.
+
+         Results from a two-way SLM test are reported in
+         tnDot1agCfmMepSlmTestRsltTable with the tnDot1agCfmMepSlmTestType
+         set to 'twoWayTest (2)'."
+    AUGMENTS { dot1agCfmMepEntry }
+    ::= { tnDot1agCfmMepSlmTWTestTable 1 }
+
+TnDot1agCfmMepSlmTWTestEntry   ::= SEQUENCE {
+    tnDot1agCfmMepSlmTWTestStatus  TmnxEnabledDisabled,
+    tnDot1agCfmMepSlmTWTestId      Unsigned32,
+    tnDot1agCfmMepSlmTWMacAddress  MacAddress,
+    tnDot1agCfmMepSlmTWPriority    Unsigned32,
+    tnDot1agCfmMepSlmTWInterval    Unsigned32,
+    tnDot1agCfmMepSlmTWTimeout     Unsigned32,
+    tnDot1agCfmMepSlmTWDataSize    Unsigned32,
+    tnDot1agCfmMepSlmTWSendCount   Unsigned32,
+    tnDot1agCfmMepSlmTWIntervalRedef    Unsigned32,
+    tnDot1agCfmMepSlmTWIntrvlUnits INTEGER
+}
+
+tnDot1agCfmMepSlmTWTestStatus OBJECT-TYPE
+    SYNTAX      TmnxEnabledDisabled
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tnDot1agCfmMepSlmTWTestStatus specifies the operational
+         state of the two-way Synthetic Loss Measurement (SLM) test.
+
+         To issue a two-way SLM test the user must issue an SNMP SET on this
+         object with a value 'enabled (1)'. To abort the two-way SLM test issue
+         an SNMP SET on this object with the value 'disabled (2)'.
+
+         A read on this object represents the current state of the two-way SLM
+         test:
+             enabled  (1)  - The test is actively running, and attempts at
+                             modifying any two-way SLM object will be rejected
+             disabled (2)  - The test is not running.
+
+         Once the test is complete this object will revert to the default value
+         'disabled (2)'."
+     DEFVAL { disabled }
+     ::= { tnDot1agCfmMepSlmTWTestEntry 1 }
+
+tnDot1agCfmMepSlmTWTestId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tnDot1agCfmMepSlmTWTestId indicates the test identifier
+         used to initiate the two-way Synthetic Loss Measurement (SLM) test."
+    ::= { tnDot1agCfmMepSlmTWTestEntry 2 }
+
+tnDot1agCfmMepSlmTWMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tnDot1agCfmMepSlmTWMacAddress specifies the MAC address
+         used as a target for the two-way Synthetic Loss Measurement (SLM) test.
+
+         This object MUST be set to a valid MAC Address for proper execution of
+         the two-way SLM test."
+    DEFVAL { '000000000000'H }
+    ::= { tnDot1agCfmMepSlmTWTestEntry 3 }
+
+tnDot1agCfmMepSlmTWPriority OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..7)
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The value of tnDot1agCfmMepSlmTWPriority specifies the priority used
+         in the generated test frame for the two-way Synthetic Loss Measurement
+         (SLM) test."
+    DEFVAL { 7 }
+    ::= { tnDot1agCfmMepSlmTWTestEntry 4 }
+
+tnDot1agCfmMepSlmTWInterval OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..5000)
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tnDot1agCfmMepSlmTWInterval specifies the delay, in
+        seconds, between Synthetic Loss Measurement (SLM) messages for the
+        two-way SLM test.
+
+		Following are the allowed value for 1830 TPS:
+		{33, 100, 1000} - all values in decimilliseconds
+		{1, 10, 60, 600} - all values in seconds"
+    DEFVAL { 5 }
+    ::= { tnDot1agCfmMepSlmTWTestEntry 5 }
+
+tnDot1agCfmMepSlmTWTimeout OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..10)
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tnDot1agCfmMepSlmTWTimeout specifies the time-out value,
+         in seconds, to wait for a Synthetic Loss Measurement (SLM) message to
+         reply for the two-way SLM test. Upon expiration of the timeout period,
+         the agent assumes that the message response will not be received. Any
+         response received after the timeout period has expired is silently
+         discarded."
+    DEFVAL { 5 }
+    ::= { tnDot1agCfmMepSlmTWTestEntry 6 }
+
+tnDot1agCfmMepSlmTWDataSize OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..9558)
+    UNITS       "bytes"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tnDot1agCfmMepSlmTWDataSize specifies the data size,
+         in bytes, contained in the padding TLV for the two-way Synthetic Loss
+         Measurement (SLM) test. A value of zero (0) specifies that no padding
+         TLV is inserted in the SLM packet. Any non-zero value will increase
+         the packet size by the specified data size plus 3 bytes for the TLV
+         header."
+    DEFVAL { 0 }
+    ::= { tnDot1agCfmMepSlmTWTestEntry 7 }
+
+tnDot1agCfmMepSlmTWSendCount OBJECT-TYPE
+    SYNTAX      Unsigned32(1..1000)
+    UNITS       "packets"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tnDot1agCfmMepSlmTWSendCount specifies the number of
+         Synthetic Loss Measurement (SLM) packets to send during the two-way
+         SLM test."
+    DEFVAL { 1 }
+    ::= { tnDot1agCfmMepSlmTWTestEntry 8 }
+
+tnDot1agCfmMepSlmTWIntervalRedef OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tnDot1agCfmMepSlmTWIntervalRedef specifies the interval
+         of SLM frames transmitted.
+         The permitted values are 100ms(0),1s (1),10s(2),1m(3),10(4)."
+    DEFVAL { 1 }
+    ::= { tnDot1agCfmMepSlmTWTestEntry 9 }
+
+tnDot1agCfmMepSlmTWIntrvlUnits OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    seconds(1),
+                    centiseconds(2),
+                    decimilliseconds(3)
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tnDot1agCfmMepSlmTWIntrvlUnits, in conjuction with
+         tnDot1agCfmMepSlmTWInterval, specifies the interval between Synthetic
+         Loss Measurement (SLM) messages sent by the two-way SLM test.  For
+         example, if tnDot1agCfmMepSlmTWInterval has the value 90, and
+         tnDot1agCfmMepSlmTWIntrvlUnits has the value 'centiseconds(2)', the
+         interval between SLM messages is 0.9 seconds.
+
+		 For  example, if tnDot1agCfmMepSlmTWInterval has the value 33, and
+		 tnDot1agCfmMepSlmTWIntrvlUnits has the value 'decimilliseconds (3)',
+		 the interval between SLM messages is 3.3 milliseconds.
+
+         The intervals supported are shown in the tnDot1agCfmMepSlmTWInterval
+         DESCRIPTION clause.
+		 "
+    DEFVAL { seconds }
+    ::= { tnDot1agCfmMepSlmTWTestEntry 10 }
+
+
+tnDot1agCfmStatisticsGroup  OBJECT IDENTIFIER ::= {tnDot1agCfmGlobalObjs 3}
+
+tnDot1agCfmComponentLimitTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TnDot1agCfmComponentLimitEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tnDot1agCfmComponentLimitTable stores the current resource counts
+         as well as their resource limits for Ethernet Connectivity Fault
+         Management (ETH-CFM) components in the SROS series system."
+    ::= { tnDot1agCfmStatisticsGroup 1 }
+
+tnDot1agCfmComponentLimitEntry OBJECT-TYPE
+    SYNTAX      TnDot1agCfmComponentLimitEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tnDot1agCfmComponentLimitEntry consists of the resource limits
+        for a particular component of ETH-CFM.
+
+        Rows are managed by the system and can not be created or destroyed using
+        SNMP set requests."
+    INDEX { tnSysSwitchId,
+            tnDot1agCfmCompMajorIndex,
+            tnDot1agCfmCompMinorIndex
+          }
+    ::= { tnDot1agCfmComponentLimitTable 1 }
+
+TnDot1agCfmComponentLimitEntry ::= SEQUENCE {
+    tnDot1agCfmCompMajorIndex      Unsigned32,
+    tnDot1agCfmCompMinorIndex      Unsigned32,
+    tnDot1agCfmCompName            TNamedItem,
+    tnDot1agCfmCompResourceUsage   Unsigned32,
+    tnDot1agCfmCompResourceLimit   Unsigned32
+}
+
+tnDot1agCfmCompMajorIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "The value of tnDot1agCfmCompMajorIndex specifies the major identifier
+         of the ETH-CFM component."
+    ::= { tnDot1agCfmComponentLimitEntry 1 }
+
+tnDot1agCfmCompMinorIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tnDot1agCfmCompMinorIndex specifies the minor identifier
+         of the ETH-CFM component."
+    ::= { tnDot1agCfmComponentLimitEntry 2 }
+
+tnDot1agCfmCompName OBJECT-TYPE
+    SYNTAX      TNamedItem
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tnDot1agCfmCompName indicates the name of the ETH-CFM
+         component."
+    ::= { tnDot1agCfmComponentLimitEntry 3 }
+
+tnDot1agCfmCompResourceUsage OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tnDot1agCfmCompResourceUsage indicates the current
+         resource usage for the ETH-CFM component."
+    ::= { tnDot1agCfmComponentLimitEntry 4 }
+
+tnDot1agCfmCompResourceLimit OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tnDot1agCfmCompResourceLimit indicates the maximum
+         resource usage limit for the ETH-CFM component for the
+         SROS series system."
+    ::= { tnDot1agCfmComponentLimitEntry 5 }
+
+
+--
+-- MEP Synthetic Loss Measurement one-way Test Config Table
+--
+tnDot1agCfmMepSlmOWTestTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TnDot1agCfmMepSlmOWTestEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "tnDot1agCfmMepSlmOWTestTable consists of the MEP configuration for
+         issuing individual Synthetic Loss Measurement one-way tests."
+    REFERENCE "ITU-T Y.1731 Ethernet Synthetic Frame Loss Measurement (ETH-SLM)"
+    ::= { tnDot1agCfmMep 6 }
+
+tnDot1agCfmMepSlmOWTestEntry OBJECT-TYPE
+    SYNTAX      TnDot1agCfmMepSlmOWTestEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "tnDot1agCfmMepSlmOWTestEntry contains the configuration for
+         generating Synthetic Loss Measurement (SLM) Tests for a particular MEP.
+         A row exists for each row in the dot1agCfmMepTable, and is destroyed
+         automatically with the removal of a row in the dot1agCfmMepTable.
+
+         Results from a one-way SLM test are reported in
+         tnDot1agCfmMepSlmTestRsltTable with tnDot1agCfmMepSlmTestType set
+         to 'oneWayTest (1)'."
+    AUGMENTS { dot1agCfmMepEntry }
+    ::= { tnDot1agCfmMepSlmOWTestTable 1 }
+
+TnDot1agCfmMepSlmOWTestEntry   ::= SEQUENCE {
+    tnDot1agCfmMepSlmOWTestStatus  TmnxEnabledDisabled,
+    tnDot1agCfmMepSlmOWTestId      Unsigned32,
+    tnDot1agCfmMepSlmOWMacAddress  MacAddress,
+    tnDot1agCfmMepSlmOWPriority    Unsigned32,
+    tnDot1agCfmMepSlmOWInterval    Unsigned32,
+    tnDot1agCfmMepSlmOWDataSize    Unsigned32,
+    tnDot1agCfmMepSlmOWSendCount   Unsigned32
+}
+
+tnDot1agCfmMepSlmOWTestStatus OBJECT-TYPE
+    SYNTAX      TmnxEnabledDisabled
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tnDot1agCfmMepSlmOWTestStatus specifies the operational
+         state of the one-way Synthetic Loss Measurement (SLM) test.
+
+         To issue a one-way SLM test the user must issue an SNMP SET on this
+         object with a value 'enabled (1)'. To abort the one-way SLM test issue
+         an SNMP SET on this object with the value 'disabled (2)'.
+
+         A read on this object represents the current state of the one-way SLM
+         test:
+             enabled  (1)  - The test is actively running, and attempts at
+                             modifying any one-way SLM object will be rejected
+             disabled (2)  - The test is not running.
+
+         Once the test is complete this object will revert to the default value
+         'disabled (2)'."
+     DEFVAL { disabled }
+     ::= { tnDot1agCfmMepSlmOWTestEntry 1 }
+
+tnDot1agCfmMepSlmOWTestId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tnDot1agCfmMepSlmOWTestId indicates the test identifier
+         used to initiate the one-way Synthetic Loss Measurement (SLM) test."
+    ::= { tnDot1agCfmMepSlmOWTestEntry 2 }
+
+tnDot1agCfmMepSlmOWMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tnDot1agCfmMepSlmOWMacAddress specifies the MAC address
+         used as a target for the one-way Synthetic Loss Measurement (SLM) Test.
+
+         This object MUST be set to a valid MAC Address for proper execution of
+         the one-way SLM test."
+    DEFVAL { '000000000000'H }
+    ::= { tnDot1agCfmMepSlmOWTestEntry 3 }
+
+tnDot1agCfmMepSlmOWPriority OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..7)
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The value of tnDot1agCfmMepSlmOWPriority specifies the priority used
+         in the generated test frame for the one-way Synthetic Loss Measurement
+         (SLM) test."
+    DEFVAL { 7 }
+    ::= { tnDot1agCfmMepSlmOWTestEntry 4 }
+
+tnDot1agCfmMepSlmOWInterval OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..10)
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tnDot1agCfmMepSlmOWInterval specifies the delay, in
+        seconds, between Synthetic Loss Measurement (SLM) messages for the
+        one-way SLM test."
+    DEFVAL { 5 }
+    ::= { tnDot1agCfmMepSlmOWTestEntry 5 }
+
+tnDot1agCfmMepSlmOWDataSize OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..1500)
+    UNITS       "bytes"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tnDot1agCfmMepSlmOWDataSize specifies the data size,
+         in bytes, contained in the padding TLV for the one-way Synthetic Loss
+         Measurement (SLM) test. A value of zero (0) specifies that no padding
+         TLV is inserted in the SLM packet. Any non-zero value will increase
+         the packet size by the specified data size plus 3 bytes for the TLV
+         header."
+    DEFVAL { 0 }
+    ::= { tnDot1agCfmMepSlmOWTestEntry 6 }
+
+tnDot1agCfmMepSlmOWSendCount OBJECT-TYPE
+    SYNTAX      Unsigned32(1..100)
+    UNITS       "packets"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tnDot1agCfmMepSlmOWSendCount specifies the number of
+         Synthetic Loss Measurement (SLM) packets to send consecutively during
+         the one-way SLM test."
+    DEFVAL { 1 }
+    ::= { tnDot1agCfmMepSlmOWTestEntry 7 }
+
+--
+-- MEP Synthetic Loss Measurement Test Results Table
+--
+tnDot1agCfmMepSlmTestRsltTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TnDot1agCfmMepSlmTestRsltEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "tnDot1agCfmMepSlmTestRsltTable consists of the results of manually
+         triggered Synthetic Loss Measurement tests."
+    ::= { tnDot1agCfmMep 7 }
+
+tnDot1agCfmMepSlmTestRsltEntry OBJECT-TYPE
+    SYNTAX      TnDot1agCfmMepSlmTestRsltEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "tnDot1agCfmMepSlmTestRsltEntry contains the results of a
+         manually triggered Synthetic Loss Measurement (SLM) test for a
+         particular MEP. Rows are auto-generated by the system based on the
+         issuing of a SLM test."
+    INDEX {
+              dot1agCfmMdIndex,
+              dot1agCfmMaIndex,
+              dot1agCfmMepIdentifier,
+              tnDot1agCfmMepSlmTestType,
+              tnDot1agCfmMepSlmRemoteMacAddr
+          }
+    ::= { tnDot1agCfmMepSlmTestRsltTable 1 }
+
+TnDot1agCfmMepSlmTestRsltEntry ::= SEQUENCE {
+    tnDot1agCfmMepSlmTestType      INTEGER,
+    tnDot1agCfmMepSlmRemoteMacAddr MacAddress,
+    tnDot1agCfmMepSlmTestId        Unsigned32,
+    tnDot1agCfmMepSlmRemoteMepId   Dot1agCfmMepId,
+    tnDot1agCfmMepSlmLastTxSeqF    Unsigned32,
+    tnDot1agCfmMepSlmPacketIn      Counter32,
+    tnDot1agCfmMepSlmPacketLossIn  Integer32,
+    tnDot1agCfmMepSlmPacketLossOut Integer32,
+    tnDot1agCfmMepSlmPacketUnack   Gauge32
+}
+
+tnDot1agCfmMepSlmTestType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                  oneWayTest (1),
+                  twoWayTest (2)
+                }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tnDot1agCfmMepSlmTestType specifies whether the
+         row for this Synthetic Loss Measurement (SLM) test refers to a two-way
+         SLM test."
+    ::= { tnDot1agCfmMepSlmTestRsltEntry 1 }
+
+tnDot1agCfmMepSlmRemoteMacAddr OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tnDot1agCfmMepSlmRemoteMacAddr specifies the source MAC
+         address of the remote node involved in the test."
+    ::= { tnDot1agCfmMepSlmTestRsltEntry 2 }
+
+tnDot1agCfmMepSlmTestId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tnDot1agCfmMepSlmTestId indicates the test identifier
+         that was used to initiate the Synthetic Loss Measurement (SLM) test."
+    ::= { tnDot1agCfmMepSlmTestRsltEntry 3 }
+
+tnDot1agCfmMepSlmRemoteMepId OBJECT-TYPE
+    SYNTAX      Dot1agCfmMepId
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tnDot1agCfmMepSlmRemoteMepId indicates the MEP
+         Identifier of the remote node involved in the test."
+    ::= { tnDot1agCfmMepSlmTestRsltEntry 4 }
+
+tnDot1agCfmMepSlmLastTxSeqF OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tnDot1agCfmMepSlmLastTxSeqF indicates the last
+         received sequence number on the local node, transmitted by the
+         remote node."
+    REFERENCE "ITU-T Y.1731 Ethernet Synthetic Frame Loss Measurement (ETH-SLM)"
+    ::= { tnDot1agCfmMepSlmTestRsltEntry 5 }
+
+tnDot1agCfmMepSlmPacketIn OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tnDot1agCfmMepSlmPacketIn indicates the number of
+         packets received during the execution of the test."
+    REFERENCE "ITU-T Y.1731 Ethernet Synthetic Frame Loss Measurement (ETH-SLM)"
+    ::= { tnDot1agCfmMepSlmTestRsltEntry 6 }
+
+tnDot1agCfmMepSlmPacketLossIn OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tnDot1agCfmMepSlmPacketLossIn indicates the number of
+         packets transmitted from the remote node but not received on the local
+         node during the execution of the test."
+    REFERENCE "ITU-T Y.1731 Ethernet Synthetic Frame Loss Measurement (ETH-SLM)"
+    ::= { tnDot1agCfmMepSlmTestRsltEntry 7 }
+
+tnDot1agCfmMepSlmPacketLossOut OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tnDot1agCfmMepSlmPacketLossOut indicates the number of
+         packets transmitted from the local node but not received on the remote
+         node during the execution of the test."
+    REFERENCE "ITU-T Y.1731 Ethernet Synthetic Frame Loss Measurement (ETH-SLM)"
+    ::= { tnDot1agCfmMepSlmTestRsltEntry 8 }
+
+tnDot1agCfmMepSlmPacketUnack OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tnDot1agCfmMepSlmPacketUnack indicates the number of
+         unacknowledged lost packets during the execution of the test."
+    REFERENCE "ITU-T Y.1731 Ethernet Synthetic Frame Loss Measurement (ETH-SLM)"
+    ::= { tnDot1agCfmMepSlmTestRsltEntry 9 }
+
+--************************************************************
+-- MEP regular LM function
+--************************************************************
+tnDot1agCfmMepOndemandLmTestTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TnDot1agCfmMepOndemandLmTestEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "tnDot1agCfmMepOndemandLmTestTable consists of the MEP configuration for
+         issuing individual on-demand Regular Loss Measurement tests."
+    REFERENCE "ITU-T Y.1731 Ethernet Frame Loss Measurement (ETH-LM)"
+    ::= { tnDot1agCfmMep 8 }
+
+tnDot1agCfmMepOndemandLmTestEntry OBJECT-TYPE
+    SYNTAX      TnDot1agCfmMepOndemandLmTestEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "tnDot1agCfmMepOndemandLmTestEntry contains the configuration for
+         generating regular Loss Measurement (LM) Tests for a particular MEP.
+         A row exists for each row in the dot1agCfmMepTable, and is destroyed
+         automatically with the removal of a row in the dot1agCfmMepTable.
+
+         Results from a on-demand regualar LM test are reported in
+         tnDot1agCfmMepOndemandLmTestRsltTable."
+    AUGMENTS { dot1agCfmMepEntry }
+    ::= { tnDot1agCfmMepOndemandLmTestTable 1 }
+
+TnDot1agCfmMepOndemandLmTestEntry   ::= SEQUENCE {
+    tnDot1agCfmMepOndemandLmTestStatus      TmnxEnabledDisabled,
+    tnDot1agCfmMepOndemandLmDestMacAddress  MacAddress,
+    tnDot1agCfmMepOndemandLmPriority        Unsigned32,
+    tnDot1agCfmMepOndemandLmInterval        Dot1agCfmCcmInterval,
+    tnDot1agCfmMepOndemandLmSendCount       Unsigned32,
+    tnDot1agCfmMepOndemandLmTimeout         Unsigned32,
+    tnDot1agCfmMepOndemandLmSessionStatus   INTEGER
+}
+
+tnDot1agCfmMepOndemandLmTestStatus OBJECT-TYPE
+    SYNTAX      TmnxEnabledDisabled
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tnDot1agCfmMepOndemandLmTestStatus specifies the operational
+         state of the on-demand regular Loss Measurement (LM) test.
+
+         To issue a on-demand regular LM test the user must issue an SNMP SET on this
+         object with a value 'enabled (1)'. To abort the on-demand regular LM test issue
+         an SNMP SET on this object with the value 'disabled (2)'.
+
+         A read on this object represents the current state of the two-way SLM
+         test:
+             enabled  (1)  - The test is actively running, and attempts at
+                             modifying any on-demand regular LM object will be rejected
+             disabled (2)  - The test is not running.
+
+         Once the test is complete this object will revert to the default value
+         'disabled (2)'."
+     DEFVAL { disabled }
+     ::= { tnDot1agCfmMepOndemandLmTestEntry 1 }
+
+tnDot1agCfmMepOndemandLmDestMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tnDot1agCfmMepOndemandLmMacAddress specifies the MAC address
+         used as a target for the on-demand regular Loss Measurement (LM) test.
+
+         This object MUST be set to a valid MAC Address for proper execution of
+         the on-demand regular LM test."
+    DEFVAL { '000000000000'H }
+    ::= { tnDot1agCfmMepOndemandLmTestEntry 2 }
+
+tnDot1agCfmMepOndemandLmPriority OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..7)
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The value of tnDot1agCfmMepOndemandLmPriority specifies the priority used
+         in the generated test frame for the on-demand regular Loss Measurement
+         (LM) test."
+    DEFVAL { 7 }
+    ::= { tnDot1agCfmMepOndemandLmTestEntry 3 }
+
+tnDot1agCfmMepOndemandLmInterval OBJECT-TYPE
+    SYNTAX      Dot1agCfmCcmInterval
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tnDot1agCfmMepOndemandLmInterval specifies the delay, in
+        seconds, between on-demand regular Loss Measurement (LM) messages for the
+        on-demand regular LM test.
+        allowed values: 100ms, 1s(default), 10s, 1m, 10m."
+    DEFVAL { interval1s }
+    ::= { tnDot1agCfmMepOndemandLmTestEntry 4 }
+
+tnDot1agCfmMepOndemandLmSendCount OBJECT-TYPE
+    SYNTAX      Unsigned32(2..101)
+    UNITS       "packets"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tnDot1agCfmMepOndemandLmSendCount specifies the number of
+         LMM packets to send during the on-demand regular
+         LM test."
+    DEFVAL { 2 }
+    ::= { tnDot1agCfmMepOndemandLmTestEntry 5 }
+
+tnDot1agCfmMepOndemandLmTimeout OBJECT-TYPE
+    SYNTAX      Unsigned32 (1000..10000)
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tnDot1agCfmMepOndemandLmTimeout specifies the time-out value,
+         in milliseconds, to wait for a response message for the two-way LM test.
+         Upon expiration of the timeout period, the agent assumes that the response
+         message will not be received. Any response received after the timeout period
+         has expired is silently discarded."
+    DEFVAL { 1000 }
+    ::= { tnDot1agCfmMepOndemandLmTestEntry 6 }
+
+tnDot1agCfmMepOndemandLmSessionStatus OBJECT-TYPE
+    SYNTAX         INTEGER{
+                     create(1),
+                     run(2),
+                     delete(3)
+                   }
+    MAX-ACCESS     read-write
+    STATUS         current
+    DESCRIPTION    "It specifies On Demand LM test session status.
+
+                    To execute an On Demand LM test, the user must first create the
+                    LM test session for the mep. Multiple On Demand LM tests can then
+                    be run until the user deletes the session.
+
+                    create:   create On Demand LM test session for the MEP.
+                    run:      execute On Demand LM test for the MEP.
+                    delete:   delete On Demand LM test session for the MEP."
+    DEFVAL         { delete }
+    ::= { tnDot1agCfmMepOndemandLmTestEntry 7 }
+
+--
+-- MEP On-demand regular Loss Measurement Test Results Table
+--
+tnDot1agCfmMepOndemandLmTestRsltTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TnDot1agCfmMepOndemandLmTestRsltEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "tnDot1agCfmMepOndemandLmTestRsltTable consists of the results of manually
+         triggered on-demand regular Loss Measurement tests."
+    ::= { tnDot1agCfmMep 9 }
+
+tnDot1agCfmMepOndemandLmTestRsltEntry OBJECT-TYPE
+    SYNTAX      TnDot1agCfmMepOndemandLmTestRsltEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "tnDot1agCfmMepOndemandLmTestRsltEntry contains the results of a
+         manually triggered on-demand regular Loss Measurement (LM) test.
+         Rows are auto-generated by the system based on the
+         issuing of a on-demand regular LM test."
+    INDEX {
+              dot1agCfmMdIndex,
+              dot1agCfmMaIndex,
+              dot1agCfmMepIdentifier
+          }
+    ::= { tnDot1agCfmMepOndemandLmTestRsltTable 1 }
+
+TnDot1agCfmMepOndemandLmTestRsltEntry ::= SEQUENCE {
+    tnDot1agCfmMepOndemandLmTnTF           Counter32,
+    tnDot1agCfmMepOndemandLmTnLF           Counter32,
+    tnDot1agCfmMepOndemandLmTfTF           Counter32,
+    tnDot1agCfmMepOndemandLmTfLF           Counter32,
+    tnDot1agCfmMepOndemandLmUnack          Gauge32,
+    tnDot1agCfmMepOndemandLmRemoteMacAddr  MacAddress
+}
+
+tnDot1agCfmMepOndemandLmTnTF OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tnDot1agCfmMepOndemandLmTnTF indicates the total number of
+         near-end transmitted service frames from the remote node during the
+         execution of the test."
+    REFERENCE "ITU-T Y.1731 Ethernet Frame Single-ended Loss Measurement (ETH-LM)"
+    ::= { tnDot1agCfmMepOndemandLmTestRsltEntry 1 }
+
+tnDot1agCfmMepOndemandLmTnLF OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tnDot1agCfmMepOndemandLmTnLF indicates the total number of
+         near-end lost service frames on the local node during the execution of
+         the test."
+    REFERENCE "ITU-T Y.1731 Ethernet Frame Single-ended Loss Measurement (ETH-LM)"
+    ::= { tnDot1agCfmMepOndemandLmTestRsltEntry 2 }
+
+tnDot1agCfmMepOndemandLmTfTF OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tnDot1agCfmMepOndemandLmTfTF indicates the total number of
+         far-end transmitted service frames from the local node during the
+         execution of the test."
+    REFERENCE "ITU-T Y.1731 Ethernet Frame Single-ended Loss Measurement (ETH-LM)"
+    ::= { tnDot1agCfmMepOndemandLmTestRsltEntry 3 }
+
+tnDot1agCfmMepOndemandLmTfLF OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tnDot1agCfmMepOndemandLmTfLF indicates the total number of
+         far-end lost service frames on the remote node during the execution of
+         the test."
+    REFERENCE "ITU-T Y.1731 Ethernet Frame Single-ended Loss Measurement (ETH-LM)"
+    ::= { tnDot1agCfmMepOndemandLmTestRsltEntry 4 }
+
+tnDot1agCfmMepOndemandLmUnack OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tnDot1agCfmMepOndemandLmUnack indicates the number of
+         unacknowledged lost LM packets during the execution of the test."
+    REFERENCE "ITU-T Y.1731 Ethernet Frame Single-ended Loss Measurement (ETH-LM)"
+    ::= { tnDot1agCfmMepOndemandLmTestRsltEntry 5 }
+
+tnDot1agCfmMepOndemandLmRemoteMacAddr OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The MAC address of the remote node involved in the test."
+    ::= { tnDot1agCfmMepOndemandLmTestRsltEntry 6 }
+
+--
+-- MEP one-way Delay Result extension Table
+--
+tnDot1agCfmMepOWDelayRsltExtTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF TnDot1agCfmMepOWDelayRsltExtEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+       "The tnDot1agCfmMepOWDelayRsltExtTable indicates the near-end One-way
+        Delay result.
+        This table is not persistent over reboots of the chassis."
+    ::= { tnDot1agCfmMep 10 }
+
+tnDot1agCfmMepOWDelayRsltExtEntry OBJECT-TYPE
+    SYNTAX     TnDot1agCfmMepOWDelayRsltExtEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+       "The near-end one-way delay test result table."
+    INDEX {
+              dot1agCfmMdIndex,
+              dot1agCfmMaIndex,
+              dot1agCfmMepIdentifier
+          }
+    ::= { tnDot1agCfmMepOWDelayRsltExtTable 1 }
+
+TnDot1agCfmMepOWDelayRsltExtEntry   ::= SEQUENCE {
+    tnDot1agCfmMepOWDelayRsltExtTnFD   Integer32,
+    tnDot1agCfmMepOWDelayRsltExtTnFDV  Integer32
+}
+
+tnDot1agCfmMepOWDelayRsltExtTnFD OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "microseconds"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The value of tnDot1agCfmMepOWDelayRsltExtTnFD indicates one-way
+         near-end frame delay from remote MEP to local MEP. It is the amount
+         of time, measured in microseconds, from when the test-frame was
+         transmitted by the remote MEP to the time it was received local MEP."
+    ::= { tnDot1agCfmMepOWDelayRsltExtEntry 1 }
+
+tnDot1agCfmMepOWDelayRsltExtTnFDV OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "microseconds"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The value of tnDot1agCfmMepDelayVariation indicates the amount of
+         near-end one-way time delay variation, measured in microseconds,
+         from the two most recent near-end one-way time delay measurements"
+    ::= { tnDot1agCfmMepOWDelayRsltExtEntry 2 }
+
+--
+-- Dummy Scalars
+--
+tnDot1agCfmMepScalar1 OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A dummy scalar that satisfies a SNMP get request quickly when
+         there is no 11QPE24 card provisioned.  Otherwise, it has to
+         traverse the remaining 11QPE24 MIB to get to the next applicable
+         item."
+    ::= { tnDot1agCfmMep 101 }
+
+tnDot1agCfmMepScalar2 OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "."
+    ::= { tnDot1agCfmMep 102 }
+
+
+
+--
+-- Notification Objects
+--
+
+-- tnDot1agCfmNotifySvcId OBJECT-TYPE
+--     SYNTAX      TmnxServId
+--     MAX-ACCESS  accessible-for-notify
+--     STATUS      current
+--     DESCRIPTION
+--         "The tnDot1agCfmNotifySvcId is used in notifications when a row
+--          consisting of the service identifier may not exist when the trap
+--          is issued."
+--     ::= { tnDot1agCfmNotificationObjs 1 }
+
+-- ******************************************************************
+-- The Synthetic Loss Measurement Configuration Objects
+-- ******************************************************************
+-- tnDot1agCfmSLMConfigGroup  OBJECT IDENTIFIER ::= {tnDot1agCfmGlobalObjs 2}
+
+--
+-- Dummy Scalars
+--
+tnDot1agCfmGlobalScalar1 OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A dummy scalar that satisfies a SNMP get request quickly when
+         there is no 11QPE24 card provisioned.  Otherwise, it has to
+         traverse the remaining 11QPE24 MIB to get to the next applicable
+         item."
+    ::= { tnDot1agCfmGlobalObjs 101 }
+
+tnDot1agCfmGlobalScalar2 OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "."
+    ::= { tnDot1agCfmGlobalObjs 102 }
+
+-- tnDot1agCfmSLMInactivityTimer OBJECT-TYPE
+--     SYNTAX      Unsigned32 (10..100)
+--     UNITS       "seconds"
+--     MAX-ACCESS  read-write
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnDot1agCfmSLMInactivityTimer specifies the duration,
+--          in seconds, that the system will maintain Synthetic Loss Measurement
+--          (SLM) reply (SLR) data for individual two-way tests in the absence of
+--          receiving SLM frames.
+--
+--          The system may be blocked in responding to new two-way SLM tests due to
+--          an excessive inactive timer duration. In this case, reducing this
+--          object's value, thus reducing the retention time for existing latent
+--          SLR test data, will help free test resources allowing the system to
+--          respond to new two-way SLM tests."
+--     REFERENCE "ITU-T Y.1731 Ethernet Synthetic Frame Loss Measurement (ETH-SLM)
+--                Section 8.2 Note 2."
+--     DEFVAL {  100 }
+--     ::= { tnDot1agCfmSLMConfigGroup 1 }
+
+--
+-- Notifications
+--
+
+tnDot1agCfmMepLbmTestComplete NOTIFICATION-TYPE
+    OBJECTS {
+              dot1agCfmMepTransmitLbmDestMacAddress
+            }
+    STATUS     current
+    DESCRIPTION
+       "The tnDot1agCfmMepLbmTestComplete notification indicates that
+        a loopback test has been issued and results are ready."
+    ::= { tnDot1agNotifications 1 }
+
+tnDot1agCfmMepLtmTestComplete NOTIFICATION-TYPE
+    OBJECTS {
+              dot1agCfmMepTransmitLtmSeqNumber
+            }
+    STATUS     current
+    DESCRIPTION
+       "The tnDot1agCfmMepLtmTestComplete notification indicates that
+        a linktrace test has been issued and results are ready. The
+        dot1agCfmMepTransmitLtmSeqNumber indicates the Transaction
+        Identifier to use to retrieve the Link-trace results."
+    ::= { tnDot1agNotifications 2 }
+
+-- tnDot1agCfmMepEthTestComplete NOTIFICATION-TYPE
+--     OBJECTS {
+--               tnDot1agCfmMepCurrByteCount,
+--               tnDot1agCfmMepCurrFailedBits,
+--               tnDot1agCfmMepCurrCrcFailures
+--             }
+--     STATUS     current
+--     DESCRIPTION
+--         "The tnDot1agCfmMepEthTestComplete notification indicates that
+--         an eth-test has been issued and results are ready. The
+--         tnDot1agCfmMepCurrByteCount indicates the number of bytes contained in
+--         the frame's Test TLV, and the tnDot1agCfmMepCurrFailedBits and
+--         tnDot1agCfmMepCurrCrcFailures indicate the failure state of the
+--         test. A value of Zero (0) for tnDot1agCfmMepCurrFailedBits and a
+--         value of 'false (2)' for tnDot1agCfmMepCurrCrcFailures indicates
+--         a successful test."
+--     ::= { tnDot1agNotifications 3 }
+
+tnDot1agCfmMepDMTestComplete NOTIFICATION-TYPE
+    OBJECTS {
+              tnDot1agCfmMepDelayTestDelay
+            }
+    STATUS     current
+    DESCRIPTION
+        "The tnDot1agCfmMepDMTestComplete notification indicates that a
+        One-Way-Delay-Test (OWDT) frame, or a Two-Way-Delay-Test (TWDT) response
+        was received. For an OWDT frame, traps are raised only when a delay
+        threshold of three (3) seconds is exceeded."
+    ::= { tnDot1agNotifications 4 }
+
+tnDot1agCfmMepAisStateChanged NOTIFICATION-TYPE
+    OBJECTS {
+               tnDot1agCfmMepEthRxAis
+            }
+    STATUS     current
+    DESCRIPTION
+        "The tnDot1agCfmMepAisStateChanged notification is generated when
+         a MEP enters or exits an AIS state."
+    ::= { tnDot1agNotifications 5 }
+
+-- tnDot1agCfmMipEvaluation       NOTIFICATION-TYPE
+--     OBJECTS {
+--                tnDot1agCfmNotifySvcId
+--             }
+--     STATUS  current
+--     DESCRIPTION
+--         "The tnDot1agCfmMipEvaluation notification is generated when a
+--          virtual MEP is created or deleted causing MIP reevaluation on the
+--          service. On virtual MEP creation, any MIPs in the service will be
+--           removed.  On virtual MEP deletion, the MIPs are reevaluated."
+--     ::= { tnDot1agNotifications 6 }
+
+tnDot1agCfmMepSLMTestComplete  NOTIFICATION-TYPE
+    OBJECTS {
+               tnDot1agCfmMepSlmTestId,
+               tnDot1agCfmMepSlmRemoteMepId,
+               tnDot1agCfmMepSlmLastTxSeqF,
+               tnDot1agCfmMepSlmPacketIn,
+               tnDot1agCfmMepSlmPacketLossIn,
+               tnDot1agCfmMepSlmPacketLossOut,
+               tnDot1agCfmMepSlmPacketUnack
+            }
+    STATUS      current
+    DESCRIPTION
+        "The tnDot1agCfmMepSLMTestComplete notification is generated when
+         a two-way Synthetic Loss Measurement (SLM) test is completed."
+   ::= { tnDot1agNotifications 7 }
+
+tnDot1agCfmMepOndemandLmTestComplete  NOTIFICATION-TYPE
+    OBJECTS {
+                tnDot1agCfmMepOndemandLmTnTF,
+                tnDot1agCfmMepOndemandLmTnLF,
+                tnDot1agCfmMepOndemandLmTfTF,
+                tnDot1agCfmMepOndemandLmTfLF,
+                tnDot1agCfmMepOndemandLmUnack
+            }
+    STATUS      current
+    DESCRIPTION
+        "The tnDot1agCfmMepOndemandLmTestComplete notification is generated when
+         a on-demand regular Loss Measurement (LM) test is completed."
+   ::= { tnDot1agNotifications 8 }
+
+--
+-- Conformance Information
+--
+
+-- tnDot1agCfmCompliances OBJECT IDENTIFIER ::= { tnDot1agMIBConformance 1 }
+-- tnDot1agCfmGroups      OBJECT IDENTIFIER ::= { tnDot1agMIBConformance 2 }
+
+-- Compliance statements
+
+-- tnDot1agCfmCompliance     MODULE-COMPLIANCE
+--    STATUS     obsolete
+--    DESCRIPTION
+--       "The compliance statement for revision 1.0 of TIMETRA-IEEE8021-CFM-MIB."
+--    MODULE this module
+--       MANDATORY-GROUPS {
+--           tnDot1agCfmSdpBindStackGroup,
+--           tnDot1agCfmMepGroup,
+--           tnDot1agCfmSapStackGroup
+--       }
+--    ::= { tnDot1agCfmCompliances 1 }
+
+-- tnDot1agCfmComplianceV7v0 MODULE-COMPLIANCE
+--    STATUS     current
+--    DESCRIPTION
+--       "The compliance statement for revision 7.0 of the 7x50 system"
+--    MODULE this module
+--       MANDATORY-GROUPS {
+--           tnDot1agCfmSdpBindStackGroup,
+--           tnDot1agCfmSapStackGroup,
+--           tnDot1agCfmNotificationGroup,
+--           tmnxY1731CfmNotificationGroup,
+--           tnDot1agCfmMipGroup,
+--           tnDot1agCfmMipNotifyGroup,
+--           tnDot1agCfmMepGroupV7v0
+--       }
+--    ::= { tnDot1agCfmCompliances 2 }
+
+-- tnDot1agCfmSdpBindStackGroup     OBJECT-GROUP
+--    OBJECTS  {
+--        tnDot1agCfmSdpBindStackMdIndex,
+--        tnDot1agCfmSdpBindStackMaIndex,
+--        tnDot1agCfmSdpBindStackMepId,
+--        tnDot1agCfmSdpBindStackMacAddress
+--    }
+--    STATUS     current
+--    DESCRIPTION
+--       "The group of objects for management of dot1ag Stack Table applicable
+--        to implementing SDP-Bindings."
+--    ::= { tnDot1agCfmGroups 1 }
+
+-- tnDot1agCfmMepGroup       OBJECT-GROUP
+--    OBJECTS {
+--        tnDot1agCfmMepSdpId,
+--        tnDot1agCfmMepVcId,
+--        tnDot1agCfmMepMacAddress
+--    }
+--    STATUS     obsolete
+--    DESCRIPTION
+--       "The group of objects for management of dot1ag MEP Table applicable
+--        to implementing SDP-Bindings."
+--    ::= { tnDot1agCfmGroups 2 }
+
+-- tnDot1agCfmSapStackGroup  OBJECT-GROUP
+--    OBJECTS {
+--        tnDot1agCfmStackMdIndex,
+--        tnDot1agCfmStackMaIndex,
+--        tnDot1agCfmStackMepId,
+--        tnDot1agCfmStackMacAddress
+--    }
+--    STATUS     current
+--    DESCRIPTION
+--       "The group of objects for management of dot1ag Stack Table applicable
+--        to implementing SAP on the 7x50."
+--    ::= { tnDot1agCfmGroups 3 }
+
+-- tnDot1agCfmNotificationGroup NOTIFICATION-GROUP
+--    NOTIFICATIONS {
+--        tnDot1agCfmMepLbmTestComplete,
+--        tnDot1agCfmMepLtmTestComplete
+--    }
+--    STATUS     current
+--    DESCRIPTION
+--       "The group of objects for management of dot1ag Notifications applicable
+--        to implementing CFM on the 7x50."
+--    ::= {tnDot1agCfmGroups 4 }
+
+-- tnDot1agCfmMipGroup       OBJECT-GROUP
+--    OBJECTS {
+--        tnDot1agCfmSapMipRowStatus,
+--        tnDot1agCfmSdpMipRowStatus
+--    }
+--    STATUS     current
+--    DESCRIPTION
+--       "The group of objects for management of dot1ag MIP Tables applicable
+--        to implementing MIPs."
+--    ::= { tnDot1agCfmGroups 5 }
+
+-- tnDot1agCfmMepGroupV7v0       OBJECT-GROUP
+--    OBJECTS {
+--        tnDot1agCfmMaNetTotalMEPCount,
+--        tnDot1agCfmMaMepListMacAddress,
+--        tnDot1agCfmMepSdpId,
+--        tnDot1agCfmMepVcId,
+--        tnDot1agCfmMepMacAddress,
+--        tnDot1agCfmMepAisEnable,
+--        tnDot1agCfmMepAisMegLevel,
+--        tnDot1agCfmMepAisPriority,
+--        tnDot1agCfmMepAisInterval,
+--        tnDot1agCfmMepEthTestEnable,
+--        tnDot1agCfmMepEthTestPattern,
+--        tnDot1agCfmMepEthRxAisInterval,
+--        tnDot1agCfmMepEthRxAis,
+--        tnDot1agCfmMepEthAisTxCount,
+--        tnDot1agCfmMepEthTestMacAddr,
+--        tnDot1agCfmMepEthTestDataLen,
+--        tnDot1agCfmMepEthTestPriority,
+--        tnDot1agCfmMepOWDTMacAddress,
+--        tnDot1agCfmMepOWDTPriority,
+--        tnDot1agCfmMepTWDTMacAddress,
+--        tnDot1agCfmMepTWDTPriority,
+--        tnDot1agCfmMepFrameCount,
+--        tnDot1agCfmMepByteCount,
+--        tnDot1agCfmMepFailedBits,
+--        tnDot1agCfmMepCrcFailures,
+--        tnDot1agCfmMepCurrByteCount,
+--        tnDot1agCfmMepCurrFailedBits,
+--        tnDot1agCfmMepCurrCrcFailures,
+--        tnDot1agCfmMepDelayTestDelay,
+--        tnDot1agCfmMepDelayVariation,
+--        tnDot1agCfmMepDelayNearEndTestDelay,
+--        tnDot1agCfmMepDelayNearEndVariation,
+--        tnDot1agCfmMepDelayFarEndTestDelay,
+--        tnDot1agCfmMepDelayFarEndVariation,
+--        tnDot1agCfmMepCsfInterval
+--        tnDot1agCfmMepCsfDirection
+--        tnDot1agCfmMepCsfPriority
+--        tnDot1agCfmMepSvcId,
+--        tnDot1agCfmMepControlMep,
+--        tnDot1agCfmMepEthTestThreshold,
+--        tnDot1agCfmMepOWDTThreshold,
+--        tnDot1agCfmVStackMdIndex,
+--        tnDot1agCfmVStackMaIndex,
+--        tnDot1agCfmVStackMepId,
+--        tnDot1agCfmVStackMacAddress,
+--        tnDot1agCfmStackMPType,
+--        tnDot1agCfmMepType,
+--        tnDot1agCfmMepFaultPropagation,
+--        tnDot1agCfmMepOWDTDataSize
+--    }
+--    STATUS     current
+--    DESCRIPTION
+--        "The group of objects for management dot1ag and Y.1731 tables applicable
+--         to implementing Virtual MEPs and MEGs on the 7x50, and enabling APS
+--         support."
+--    ::= { tnDot1agCfmGroups 6 }
+
+-- tmnxY1731CfmNotificationGroup NOTIFICATION-GROUP
+--    NOTIFICATIONS {
+--        tnDot1agCfmMepEthTestComplete,
+--        tnDot1agCfmMepDMTestComplete,
+--        tnDot1agCfmMepAisStateChanged
+--    }
+--    STATUS     current
+--    DESCRIPTION
+--       "The group of objects for management of Y.1731 Notifications applicable
+--        to implementing CFM on the 7x50."
+--    ::= {tnDot1agCfmGroups 7 }
+
+-- tnDot1agCfmNotifyObjsGroup    OBJECT-GROUP
+--    OBJECTS {
+--        tnDot1agCfmNotifySvcId
+--    }
+--    STATUS      current
+--    DESCRIPTION
+--        "The group of objects supporting notifications for revision 7.0 on
+--         Nokia 7x50 SR series systems."
+--    ::= { tnDot1agCfmGroups 8 }
+
+-- tnDot1agCfmMipNotifyGroup     NOTIFICATION-GROUP
+--    NOTIFICATIONS {
+--        tnDot1agCfmMipEvaluation
+--    }
+--    STATUS     current
+--    DESCRIPTION
+--        "The group of notification objects for management of dot1ag MIPs."
+--    ::= { tnDot1agCfmGroups 9 }
+
+--tnDot1agCfmV9v0Groups OBJECT IDENTIFIER ::= { tnDot1agCfmGroups 13 }
+
+--tnDot1agCfmMepSlmGroupV9v0     OBJECT-GROUP
+--    OBJECTS {
+--        tnDot1agCfmSLMInactivityTimer,
+--        tnDot1agCfmMepSlmTWTestStatus,
+--        tnDot1agCfmMepSlmTWTestId,
+--        tnDot1agCfmMepSlmTWMacAddress,
+--        tnDot1agCfmMepSlmTWPriority,
+--        tnDot1agCfmMepSlmTWInterval,
+--        tnDot1agCfmMepSlmTWTimeout,
+--        tnDot1agCfmMepSlmTWDataSize,
+--        tnDot1agCfmMepSlmTWSendCount,
+--        tnDot1agCfmMepSlmTWIntervalRedef,
+--        tnDot1agCfmMepSlmTWIntrvlUnits,
+--        tnDot1agCfmMepSlmOWTestStatus,
+--        tnDot1agCfmCompName,
+--        tnDot1agCfmCompResourceUsage,
+--        tnDot1agCfmCompResourceLimit,
+--        tnDot1agCfmMepSlmOWTestId,
+--        tnDot1agCfmMepSlmOWMacAddress,
+--        tnDot1agCfmMepSlmOWPriority,
+--        tnDot1agCfmMepSlmOWInterval,
+--        tnDot1agCfmMepSlmOWDataSize,
+--        tnDot1agCfmMepSlmOWSendCount,
+--        tnDot1agCfmMepSlmTestId,
+--        tnDot1agCfmMepSlmRemoteMepId,
+--        tnDot1agCfmMepSlmLastTxSeqF,
+--        tnDot1agCfmMepSlmPacketIn,
+--        tnDot1agCfmMepSlmPacketLossIn,
+--        tnDot1agCfmMepSlmPacketLossOut,
+--        tnDot1agCfmMepSlmPacketUnack,
+--        tnDot1agCfmMepOndemandLmTestStatus,
+--        tnDot1agCfmMepOndemandLmDestMacAddress,
+--        tnDot1agCfmMepOndemandLmPriority,
+--        tnDot1agCfmMepOndemandLmInterval,
+--        tnDot1agCfmMepOndemandLmSendCount,
+--        tnDot1agCfmMepOndemandLmTnTF,
+--        tnDot1agCfmMepOndemandLmTnLF,
+--        tnDot1agCfmMepOndemandLmTfTF,
+--        tnDot1agCfmMepOndemandLmTfLF,
+--        tnDot1agCfmMepOndemandLmUnack,
+--        tnDot1agCfmMepOWDelayRsltExtTnFD,
+--        tnDot1agCfmMepOWDelayRsltExtTnFDV
+--    }
+--    STATUS      current
+--    DESCRIPTION
+--        "The group of objects for management of Synthetic Loss Measurement Tests
+--         for the SROS release 9.0."
+--    ::= { tnDot1agCfmV9v0Groups 4 }
+
+END

@@ -1,0 +1,103 @@
+TN-RMD-TC-MIB DEFINITIONS ::= BEGIN
+
+-- (c) Copyright 2023 Nokia Networks.  All rights reserved.
+-- This software is the confidential and proprietary property of
+-- Nokia and may only be used in accordance with the terms of the
+-- license agreement provided with this software.
+
+IMPORTS
+    MODULE-IDENTITY, Unsigned32
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, DisplayString
+        FROM SNMPv2-TC
+    tnRmdMIBModules
+        FROM TROPIC-GLOBAL-REG
+    ;
+
+
+tnRmdTcModule MODULE-IDENTITY
+    LAST-UPDATED    "201802231200Z"
+    ORGANIZATION    "Nokia"
+    CONTACT-INFO    "Nokia
+                     Attn: Jeff Donnelly
+                     600 Mountain Avenue
+                     New Providence, NJ 07974
+
+                     Phone: +1 732 221 6408
+                     Email: jeff.donnelly@nokia.com"
+
+    DESCRIPTION
+        "Textual Conventions MIB for Remote Managed Devices (RMDs).
+         This MIB contains definitions which are commonly used throughout for
+         RMD MIBs."
+
+    REVISION    "201802231200Z"
+    DESCRIPTION "Updated the contact info."
+
+    REVISION    "201611160000Z"
+    DESCRIPTION "Updated the contact info."
+
+    REVISION    "201308090000Z"
+    DESCRIPTION "Added the following textual convention:
+                 TnRmdUserLabel."
+
+    REVISION    "201211280000Z"
+    DESCRIPTION "Initial revision."
+
+    ::= { tnRmdMIBModules 5 }
+
+
+-- =============================================================
+-- Textual Conventions
+-- =============================================================
+
+TnRmdAccessIfIndex ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "A unique value, greater than zero, identifying the access interface
+         to the remote managed device."
+    SYNTAX      Unsigned32 (1..32)
+
+TnRmdInventory ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+       "Represents inventory on an RMD."
+    SYNTAX OCTET STRING (SIZE(256))
+
+TnRmdPcp ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "A 3-bit PCP value."
+    SYNTAX Unsigned32 (0..7)
+
+TnRmdTpid ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "A 16-bit TPID."
+    SYNTAX Unsigned32 (0..'FFFF'h)
+
+TnRmdVersion ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+       "Represents a version number."
+    SYNTAX DisplayString
+
+TnRmdItemCode ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+       "Contains an item code."
+    SYNTAX DisplayString (SIZE(0..7))
+
+TnRmdOui ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+       "Represents an Organizational Unique Identifier."
+    SYNTAX OCTET STRING (SIZE(3))
+
+TnRmdUserLabel ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+       "User Label string, used for identification purposes."
+    SYNTAX DisplayString
+
+END

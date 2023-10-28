@@ -1,0 +1,2995 @@
+TROPIC-AMPLIFIER-MIB DEFINITIONS ::= BEGIN
+
+-- (c) Copyright 2023 Nokia Networks.  All rights reserved.
+-- This software is the confidential and proprietary property of
+-- Nokia and may only be used in accordance with the terms of the
+-- license agreement provided with this software.
+
+IMPORTS
+      SnmpAdminString                         FROM SNMP-FRAMEWORK-MIB
+      OBJECT-TYPE, MODULE-IDENTITY,
+      Unsigned32, Integer32                   FROM SNMPv2-SMI
+      MODULE-COMPLIANCE, OBJECT-GROUP         FROM SNMPv2-CONF
+      TruthValue                              FROM SNMPv2-TC
+      ifIndex, InterfaceIndexOrZero           FROM IF-MIB
+      tnShelfIndex                            FROM TROPIC-SHELF-MIB
+      tnSlotIndex                             FROM TROPIC-SLOT-MIB
+      TnCommand,
+      NokiaAmpPortTargetPowerWidth            FROM TROPIC-TC
+      tnCardModules, tnAmplifierMIB           FROM TROPIC-GLOBAL-REG;
+
+  tnAmplifierMibModule MODULE-IDENTITY
+      LAST-UPDATED    "202302101200Z"
+      ORGANIZATION    "Nokia"
+      CONTACT-INFO    "Nokia
+                       Attn: Jeff Donnelly
+                       600 Mountain Avenue
+                       New Providence, NJ 07974
+
+                       Phone: +1 732 221 6408
+                       Email: jeff.donnelly@nokia.com"
+
+      DESCRIPTION "Amplifier MIB types."
+
+      REVISION    "202302101200Z"
+      DESCRIPTION "Added the following to tnAmplifierCardInfoTable:
+                   tnAmplifierCardOAM1LPumpTemperatures
+                   tnAmplifierCardOAM2LPumpTemperatures
+                   tnAmplifierCardOAM3LPumpTemperatures
+                   tnAmplifierCardOAM1LPumpBiases
+                   tnAmplifierCardOAM2LPumpBiases
+                   tnAmplifierCardOAM3LPumpBiases."
+
+      REVISION    "202212091200Z"
+      DESCRIPTION "Added the following to tnAmplifierCardConfigTable:
+                   tnAmplifierCardOptIntAson."
+
+      REVISION    "202209021200Z"
+      DESCRIPTION "Added the following to tnAmplifierCardConfigTable:
+                   tnAmplifierCardAsonAddDropPlannedForOpsLBand."
+
+      REVISION    "202205131200Z"
+      DESCRIPTION "Added the following to tnAmplifierCardConfigTable:
+                   tnAmplifierCardUsage."
+
+      REVISION    "202107231200Z"
+      DESCRIPTION "Added the following to tnAmplifierPortInfoTable:
+                   tnAmplifierPortAprEDFApulsePower."
+
+      REVISION    "202106041200Z"
+      DESCRIPTION "Added the following to tnAmplifierPortConfigTable:
+                   tnAmplifierPortAsellLinkL."
+
+      REVISION    "202012181200Z"
+      DESCRIPTION "Added the following to tnAmplifierPortConfigTable:
+                   tnAmplifierPortTargetPowerWidth
+                   tnAmplifierPortTargetPowerWidthL."
+
+      REVISION    "202011061200Z"
+      DESCRIPTION "Added the following to tnAmplifierPortConfigTable:
+                   tnAmplifierPortAsellLink."
+
+      REVISION    "202010301200Z"
+      DESCRIPTION "1) Added the following to tnAmplifierPortConfigTable:
+                      tnAmplifierPortSpanLossTh.
+                   2) Added the following to tnAmplifierPortInfoTable:
+                      tnAmplifierPortSpanLoss."
+
+      REVISION    "202003061200Z"
+      DESCRIPTION "Added the following to tnAmplifierPortConfigTable:
+                   tnAmplifierPortAPREDFAPulseAttempt."
+
+      REVISION    "202002141200Z"
+      DESCRIPTION "Added the following to tnAmplifierPortOperatingMode:
+                   maxPower(3)."
+
+      REVISION    "202001311200Z"
+      DESCRIPTION "Added the following to tnAmplifierPortOperatingModeL:
+                   maxPower(3)."
+
+      REVISION    "202001171200Z"
+      DESCRIPTION "Added the following to tnAmplifierPortConfigTable:
+                   tnAmplifierPortLineDcmConnAddress."
+
+      REVISION    "201810101200Z"
+      DESCRIPTION "Added the following to tnAmplifierPortConfigTable:
+                   tnAmplifierPortAprEDFApulse."
+
+      REVISION    "201805181200Z"
+      DESCRIPTION "Added the following to tnAmplifierPortInfoTable:
+                   tnAmplifierPortPowerOutL."
+
+      REVISION    "201803301200Z"
+      DESCRIPTION "1) Added the following to tnAmplifierPortConfigTable:
+                      tnAmplifierPortBoosterTargetPowerIn.
+                   2) Added the following to tnAmplifierPortInfoTable:
+                      tnAmplifierPortInfoOSCRxPowerIn
+                      tnAmplifierPortInfoOSCSfpTxPowerOut
+                      tnAmplifierPortInfoOSCSfpRxPowerIn
+                      tnAmplifierPortBoosterTargetPowerOut.
+                   3) Added the following to tnAmplifierCardInfoTable:
+                      tnAmplifierCardOAM3PumpTemperatures
+                      tnAmplifierCardOAM3PumpBiases."
+
+      REVISION    "201802231200Z"
+      DESCRIPTION "Updated the contact info."
+
+      REVISION    "201802091200Z"
+      DESCRIPTION "Added the following to tnAmplifierPortConfigTable:
+                   tnAmplifierPortLosModeL."
+
+      REVISION    "201709291200Z"
+      DESCRIPTION "1) Added the following to tnAmplifierPortConfigTable:
+                      tnAmplifierPortBandMode.
+                   2) Added the following to tnAmplifierPortInfoTable:
+                      tnAmplifierPortPowerInL."
+
+      REVISION    "201709221200Z"
+      DESCRIPTION "Removed the range of the following in tnAmplifierPortInfoTable:
+                   tnAmplifierActOutAtten
+                   tnAmplifierActOutAttenL."
+
+      REVISION    "201707071200Z"
+      DESCRIPTION "Fixed MIB compile issues."
+
+      REVISION    "201706231200Z"
+      DESCRIPTION "Added the following to tnAmplifierCardInfoTable:
+                   tnAmplifierCardOAM1PumpTemperatures
+                   tnAmplifierCardOAM2PumpTemperatures
+                   tnAmplifierCardOAM1PumpBiases
+                   tnAmplifierCardOAM2PumpBiases."
+
+      REVISION    "201705311200Z"
+      DESCRIPTION "Added the following to tnAmplifierPortConfigTable:
+                   tnAmplifierPortOperatingModeL
+                   tnAmplifierPortSignalPowerTargetL
+                   tnAmplifierPortUserSelectedExteriorDcmPresentIn
+                   tnAmplifierPortUserSelectedExteriorDcmPresentOut."
+
+      REVISION    "201702241200Z"
+      DESCRIPTION "1) Added the following to tnAmplifierPortConfigTable:
+                      tnAmplifierPortGainTiltL
+                      tnAmplifierPortPowerGainBackoffL
+                      tnAmplifierPortPowerSpanRepairMarginL.
+                   2) Added the following to tnAmplifierPortInfoTable:
+                      tnAmplifierPortActualTiltL
+                      tnAmplifierPortSignalPowerOutL
+                      tnAmplifierPortInputToOutputGainL
+                      tnAmplifierPortOSCTxPowerOutL."
+
+      REVISION    "201611161200Z"
+      DESCRIPTION "Updated the contact info."
+
+      REVISION    "201611111200Z"
+      DESCRIPTION "Added the following to tnAmplifierPortInfoTable:
+                   tnAmplifierCommonEgressOutputPowerL,
+                   tnAmplifierActOutAttenL."
+
+      REVISION    "201610131200Z"
+      DESCRIPTION "Added the following to tnAmplifierPortConfigTable:
+                   tnAmplifierPortPowerGainL
+                   tnAmplifierPortPowerGainMinL
+                   tnAmplifierPortPowerGainMaxL
+                   tnAmplifierPortPowerDeltaMaxL
+                   tnAmplifierPortGainRangeL
+                   tnAmplifierPortTargetTiltL
+                   tnAmplifierPortVoaSetL."
+
+      REVISION    "201605311200Z"
+      DESCRIPTION "Added the following to tnAmplifierCardInfoTable:
+                   tnAmplifierCardOAMLPump[1-4]Temperature,
+                   tnAmplifierCardOAMLPump[1-4]Bias."
+
+      REVISION    "201605211200Z"
+      DESCRIPTION "Added the following to tnAmplifierPortInfoTable:
+                   tnAmplifierCommonEgressOutputPower,
+                   tnAmplifierActOutAtten."
+
+      REVISION    "201407311200Z"
+      DESCRIPTION "Changed the syntax of tnAmplifierPortSignalPowerTarget
+                   to Integer32 from Unsigned32."
+
+      REVISION    "201406121200Z"
+      DESCRIPTION "1) Added the following to tnAmplifierPortConfigTable:
+                      tnAmplifierPortOperatingMode
+                      tnAmplifierPortSignalPowerTarget.
+                   2) Added the following to tnAmplifierPortInfoTable:
+                      tnAmplifierPortTestingActive."
+
+      REVISION    "201403181200Z"
+      DESCRIPTION "Added the following to tnAmplifierHybridCardInfoTable:
+                   tnAmplifierHybridCardOAMPump[3-4]Temperature
+                   tnAmplifierHybridCardOAMPump[3-4]Bias."
+
+      REVISION    "201403111200Z"
+      DESCRIPTION "Added the following to tnAmplifierPortConfigTable:
+                   tnAmplifierPortGainRange
+                   tnAmplifierPortAprMode."
+
+      REVISION    "201402261200Z"
+      DESCRIPTION "Added ranges and DEFVAL to attributes."
+
+      REVISION    "201309051200Z"
+      DESCRIPTION "Added the following to tnAmplifierCardConfigTable:
+                   tnAmplifierCardAsonAddDropPlannedForOps."
+
+      REVISION    "201305231200Z"
+      DESCRIPTION "1) Updated ranges and defaults for the following:
+                      tnAmplifierPortPowerSpanRepairMargin.
+                   2) Updated defaults for the following:
+                      tnAmplifierPortGainTilt
+                      tnAmplifierPortPowerOut."
+
+      REVISION    "201305131200Z"
+      DESCRIPTION "1) Added the following to tnAmplifierPortInfoTable:
+                      tnAmplifierPortOSCTxPowerIn
+                      tnAmplifierPortOSCTxPowerOut.
+                   2) Marked the following as obsolete:
+                      tnAmplifierObjs
+                      tnAmplifierEvents."
+
+      REVISION    "201303161200Z"
+      DESCRIPTION "Added the following to tnAmplifierCardInfoTable:
+                   tnAmplifierCardOAMPump[4-6]Temperature
+                   tnAmplifierCardOAMPump[4-6]Bias."
+
+      REVISION    "201211261200Z"
+      DESCRIPTION "Added the following to tnAmplifierPortInfoTable:
+                   tnAmplifierPortWtOcmMonitorPortOut."
+
+      REVISION    "201209271200Z"
+      DESCRIPTION "Added the following DEFVAL for tnAmplifierPortAprHoldOffTime:
+                   time0ms."
+
+      REVISION    "201207161200Z"
+      DESCRIPTION "Added the following tables:
+                   tnAmplifierHybridPortConfigTable
+                   tnAmplifierHybridPortInfoTable
+                   tnAmplifierHybridCardInfoTable."
+
+      REVISION    "201106151200Z"
+      DESCRIPTION "1) Changed range for tnAmplifierMeshCardCommonEgressPower
+                      from (-3000, 1100) to (-1000, 1000), and the default
+                      from 0 to 100.
+                   2) Added DEFVAL for the following attributes:
+                      tnAmplifierMeshPortPowerOut, -9900
+                      tnAmplifierMeshPortSignalPowerOut, -9900."
+
+      REVISION    "201105231200Z"
+      DESCRIPTION "Added DEFVAL for the following attributes:
+                   tnAmplifierPortPowerDeltaMax, 0
+                   tnAmplifierPortDCMInPower, -9900
+                   tnAmplifierPortDCMOutPower, -9900."
+
+      REVISION    "201104281200Z"
+      DESCRIPTION "Added the following tables:
+                   tnAmplifierMeshPortInfoTable
+                   tnAmplifierMeshCardConfigTable
+                   tnAmplifierMeshCardInfoTable."
+
+      REVISION    "201103071200Z"
+      DESCRIPTION "Updated range to (0,9900) and added default of
+                   9900 for tnAmplifierCardOptIntSpanLoss."
+
+      REVISION    "201011161200Z"
+      DESCRIPTION "1) Added the following to tnAmplifierCardInfoTable:
+                      tnAmplifierCardOptIntSpanLoss
+                   2) Added the following to a new MIB table,
+                      tnAmplifierCardConfigTable:
+                      tnAmplifierCardOptIntDetection
+                      tnAmplifierCardOptIntBaseline
+                      tnAmplifierCardOptIntLossThreshold
+                      tnAmplifierCardOptIntPollPeriod
+                      tnAmplifierCardOptIntClearAlarm."
+
+      REVISION    "201010311200Z"
+      DESCRIPTION "Added ranges for AM2125A and AM2318A to the following:
+                   tnAmplifierPortPowerGain
+                   tnAmplifierPortPowerGainMin
+                   tnAmplifierPortPowerGainMax."
+
+      REVISION    "201010241200Z"
+      DESCRIPTION "1) Added the following to tnAmplifierPortConfigTable:
+                      tnAmplifierPortVoaSet.
+                   2) Added the following to tnAmplifierPortInfoTable:
+                      tnAmplifierPortInputToOutputGain
+                      tnAmplifierPortDCMInPower
+                      tnAmplifierPortDCMOutPower
+                      tnAmplifierPortActualTilt."
+
+      REVISION    "201010181200Z"
+      DESCRIPTION "Marked the following as obsolete:
+                   tnAmplifierPortAutoReEnableBackoffTime."
+
+      REVISION    "201010141200Z"
+      DESCRIPTION "Added the following to tnAmplifierPortConfigTable:
+                   tnAmplifierPortSignalFailThreshold
+                   tnAmplifierPortSignalDegradeThreshold."
+
+      REVISION    "201009101200Z"
+      DESCRIPTION "1) Marked the following in tnAmplifierPortAprHoldOffTime
+                      as obsolete:
+                      time50ms(2)
+                      time100ms(3).
+                   2) Added the following to tnAmplifierPortAprHoldOffTime:
+                      time250ms(4)."
+
+      REVISION    "201008151200Z"
+      DESCRIPTION "Changed losa(1) to auto(1) for tnAmplifierPortLosMode."
+
+      REVISION    "201007291200Z"
+      DESCRIPTION "Added the following to tnAmplifierPortConfigTable:
+                   tnAmplifierPortAprHoldOffTime
+                   tnAmplifierPortLosMode."
+
+      REVISION    "201007051200Z"
+      DESCRIPTION "Added the following to tnAmplifierPortConfigTable:
+                   tnAmplifierPortGainTilt."
+
+      REVISION    "201006161200Z"
+      DESCRIPTION "Added the following to tnAmplifierPortConfigTable:
+                   tnAmplifierPortSRSTiltACoeffDCM
+                   tnAmplifierPortMaxFlatGainOffset."
+
+      REVISION    "201006041200Z"
+      DESCRIPTION "Added ranges for AM2017B and AM2325B to the following:
+                   tnAmplifierPortPowerGain
+                   tnAmplifierPortPowerGainMin
+                   tnAmplifierPortPowerGainMax."
+
+      REVISION    "201002251200Z"
+      DESCRIPTION "Updated range for tnAmplifierPortPowerDeltaMax from
+                   (0, 9999) to (0, 500)."
+
+      REVISION    "201002171200Z"
+      DESCRIPTION "Added range for ALPFGT to the following:
+                   tnAmplifierPortPowerGain,
+                   tnAmplifierPortPowerGainMin
+                   tnAmplifierPortPowerGainMax."
+
+      REVISION    "201002091200Z"
+      DESCRIPTION "Updated range for A2325A to the following:
+                   tnAmplifierPortPowerGain,
+                   tnAmplifierPortPowerGainMin
+                   tnAmplifierPortPowerGainMax."
+
+      REVISION    "201001241200Z"
+      DESCRIPTION "1) Added the following MIB table:
+                      tnAmplifierCardInfo.
+                   2) Added the following to tnAmplifierCardInfoTable:
+                      tnAmplifierCardOAMPump[1-3]Temperature
+                      tnAmplifierCardOAMPump[1-3]Bias.
+                   3) Added range for A2325A to the following:
+                      tnAmplifierPortPowerGain
+                      tnAmplifierPortPowerGainMin
+                      tnAmplifierPortPowerGainMax."
+
+      REVISION    "200912111200Z"
+      DESCRIPTION "Added tnAmplifierPortAprDisable."
+
+      REVISION    "200912031200Z"
+      DESCRIPTION "Added range for ALPFGK to the following:
+                   tnAmplifierPortPowerGain
+                   tnAmplifierPortPowerGainMin
+                   tnAmplifierPortPowerGainMax."
+
+      REVISION    "200903181200Z"
+      DESCRIPTION "Added range for AHPLG to the following:
+                   tnAmplifierPortPowerGain,
+                   tnAmplifierPortPowerGainMin
+                   tnAmplifierPortPowerGainMax."
+
+      REVISION    "200811171200Z"
+      DESCRIPTION "Changed range of tnAmplifierPortTargetTilt to (-300, 0)."
+
+      REVISION    "200810161200Z"
+      DESCRIPTION "Marked the following as deprecated:
+                   tnAmplifierPortAutoReEnableBackoffTime."
+
+      REVISION    "200805221200Z"
+      DESCRIPTION "tnAmplifierPortPowerGainBackoff will not be obsoleted."
+
+      REVISION    "200804111200Z"
+      DESCRIPTION "1) Updated the amplifier gain attribute ranges to
+                      AHPHG: 1300 to 3300 and ALPHG: 1000 to 3000.
+                   2) Removed:
+                      tnAmplifierPortDeviationIn
+                      tnAmplifierPortDeviationOut."
+
+      REVISION    "200803281200Z"
+      DESCRIPTION "Updated the amplifier gain attribute ranges."
+
+      REVISION    "200802161200Z"
+      DESCRIPTION "1) Changed the attribute descriptions to include
+                      1830 card types.
+                   2) Added comments to attributes that will be obsoleted.
+                   3) Added the following MIB attributes:
+                      tnAmplifierPortPowerDeltaMax
+                      tnAmplifierPortDeviationIn
+                      tnAmplifierPortDeviationOut
+                      tnAmplifierPortTargetTilt
+                      tnAmplifierPortFunction."
+
+      ::= { tnCardModules 4 }
+
+  tnAmplifierConf                      OBJECT IDENTIFIER ::= { tnAmplifierMIB 1 }
+  tnAmplifierGroups                    OBJECT IDENTIFIER ::= { tnAmplifierConf 1 }
+  tnAmplifierPortConfigGroups          OBJECT IDENTIFIER ::= { tnAmplifierGroups 1 }
+  tnAmplifierPortInfoGroups            OBJECT IDENTIFIER ::= { tnAmplifierGroups 2 }
+  tnAmplifierCardInfoGroups            OBJECT IDENTIFIER ::= { tnAmplifierGroups 3 }
+  tnAmplifierCardConfigGroups          OBJECT IDENTIFIER ::= { tnAmplifierGroups 4 }
+  tnAmplifierCompliances               OBJECT IDENTIFIER ::= { tnAmplifierConf 2 }
+  tnAmplifierPortConfigCompliances     OBJECT IDENTIFIER ::= { tnAmplifierCompliances 1 }
+  tnAmplifierPortInfoCompliances       OBJECT IDENTIFIER ::= { tnAmplifierCompliances 2 }
+  tnAmplifierCardInfoCompliances       OBJECT IDENTIFIER ::= { tnAmplifierCompliances 3 }
+  tnAmplifierCardConfigCompliances     OBJECT IDENTIFIER ::= { tnAmplifierCompliances 4 }
+--  obsolete
+--  tnAmplifierObjs                      OBJECT IDENTIFIER ::= { tnAmplifierMIB 2 }
+--  tnAmplifierEvents                    OBJECT IDENTIFIER ::= { tnAmplifierMIB 3 }
+  tnAmplifierPortConfig                OBJECT IDENTIFIER ::= { tnAmplifierMIB 4 }
+  tnAmplifierPortInfo                  OBJECT IDENTIFIER ::= { tnAmplifierMIB 5 }
+  tnAmplifierCardInfo                  OBJECT IDENTIFIER ::= { tnAmplifierMIB 6 }
+  tnAmplifierCardConfig                OBJECT IDENTIFIER ::= { tnAmplifierMIB 7 }
+
+--------------------------------------------------------------------------------
+-- Type Definitions
+--------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------
+-- Amplifier Port Config Scalars
+--------------------------------------------------------------------------------
+    tnAmplifierPortConfigAttributeTotal OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Total number of attributes in
+                        tnAmplifierPortConfigTable."
+        ::= { tnAmplifierPortConfig 1 }
+
+--------------------------------------------------------------------------------
+-- Amplifier Port Config Table
+--------------------------------------------------------------------------------
+    tnAmplifierPortConfigTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnAmplifierPortConfigEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The provisioned ports on an amplifier card."
+        ::= { tnAmplifierPortConfig 2 }
+
+    tnAmplifierPortConfigEntry OBJECT-TYPE
+        SYNTAX         TnAmplifierPortConfigEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { ifIndex }
+        ::= { tnAmplifierPortConfigTable 1 }
+
+    TnAmplifierPortConfigEntry ::= SEQUENCE {
+        tnAmplifierPortPowerGain                          Unsigned32,
+        tnAmplifierPortPowerGainMin                       Unsigned32,
+        tnAmplifierPortPowerGainMax                       Unsigned32,
+        tnAmplifierPortPowerGainBackoff                   Unsigned32,
+        tnAmplifierPortEnable                             TruthValue,
+        tnAmplifierPortAutoReEnableMode                   TruthValue,
+--        obsolete
+--        tnAmplifierPortAutoReEnableBackoffTime            Unsigned32,
+        tnAmplifierPortPowerSpanRepairMargin              Unsigned32,
+        tnAmplifierPortPowerDeltaMax                      Unsigned32,
+        tnAmplifierPortTargetTilt                         Integer32,
+        tnAmplifierPortFunction                           INTEGER,
+        tnAmplifierPortAprDisable                         TruthValue,
+        tnAmplifierPortSRSTiltACoeffDCM                   Integer32,
+        tnAmplifierPortMaxFlatGainOffset                  Integer32,
+        tnAmplifierPortGainTilt                           Integer32,
+        tnAmplifierPortAprHoldOffTime                     INTEGER,
+        tnAmplifierPortLosMode                            INTEGER,
+        tnAmplifierPortSignalFailThreshold                Unsigned32,
+        tnAmplifierPortSignalDegradeThreshold             Unsigned32,
+        tnAmplifierPortVoaSet                             Unsigned32,
+        tnAmplifierPortGainRange                          INTEGER,
+        tnAmplifierPortAprMode                            INTEGER,
+        tnAmplifierPortOperatingMode                      INTEGER,
+        tnAmplifierPortSignalPowerTarget                  Integer32,
+        tnAmplifierPortPowerGainL                         Unsigned32,
+        tnAmplifierPortPowerGainMinL                      Unsigned32,
+        tnAmplifierPortPowerGainMaxL                      Unsigned32,
+        tnAmplifierPortPowerDeltaMaxL                     Unsigned32,
+        tnAmplifierPortGainRangeL                         INTEGER,
+        tnAmplifierPortTargetTiltL                        Integer32,
+        tnAmplifierPortVoaSetL                            Unsigned32,
+        tnAmplifierPortGainTiltL                          Integer32,
+        tnAmplifierPortPowerGainBackoffL                  Unsigned32,
+        tnAmplifierPortPowerSpanRepairMarginL             Unsigned32,
+        tnAmplifierPortOperatingModeL                     INTEGER,
+        tnAmplifierPortSignalPowerTargetL                 Integer32,
+        tnAmplifierPortUserSelectedExteriorDcmPresentIn   TruthValue,
+        tnAmplifierPortUserSelectedExteriorDcmPresentOut  TruthValue,
+        tnAmplifierPortBandMode                           INTEGER,
+        tnAmplifierPortLosModeL                           INTEGER,
+        tnAmplifierPortBoosterTargetPowerIn               Integer32,
+        tnAmplifierPortAprEDFApulse                       INTEGER,
+        tnAmplifierPortLineDcmConnAddress                 InterfaceIndexOrZero,
+        tnAmplifierPortAPREDFAPulseAttempt                TnCommand,
+        tnAmplifierPortSpanLossTh                         Integer32,
+        tnAmplifierPortAsellLink                          TruthValue,
+        tnAmplifierPortTargetPowerWidth                   NokiaAmpPortTargetPowerWidth,
+        tnAmplifierPortTargetPowerWidthL                  NokiaAmpPortTargetPowerWidth,
+        tnAmplifierPortAsellLinkL                         TruthValue
+    }
+
+    tnAmplifierPortPowerGain OBJECT-TYPE
+        SYNTAX         Unsigned32
+        UNITS          "mB"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The following description applies to the signal
+                        port of the amplifier card:
+
+                        Current configurable ranges and defaults:
+
+                        A2325A:           (1600..3200), 1600
+                        A2P2125 (port 1): ( 200..2000), 1000
+                        A2P2125 (port 4): (1500..3100), 1500
+                        A4PSWG (port 1):  ( 700..2900),  700
+                        A4PSWG (port 4):  ( 200..2000), 1000
+
+                        AA2DONW:          (1300..2300), 1300
+                        AAR_8A:           (1000..2000), 1500
+                        AHPHG:            (1300..3300), 1300
+                        AHPLG:            ( 600..2400),  600
+                        ALPFGK:           (1300..2300), 1800
+
+                        ALPFGT:           (1300..2300), 1800
+                        ALPHG:            (1000..3000), 1000
+                        AM2017B:          ( 600..2400),  600
+                        AM2032A:          (2600..4000), 2600
+                        AM2125A:          (1500..3100), 1500
+
+                        AM2125B:          (1500..3100), 1500
+                        AM2318A:          ( 700..2400),  700
+                        AM2325B:          (1600..3200), 1600
+                        AM2625A:          (1600..3000), 1600
+                        ASWG:             ( 700..2900),  700
+
+                        MESH4:            ( 700..2400),  700
+                        RA2P:             ( 200..2000), 1000."
+        ::= { tnAmplifierPortConfigEntry 1 }
+
+    tnAmplifierPortPowerGainMin OBJECT-TYPE
+        SYNTAX         Unsigned32
+        UNITS          "mB"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The following description applies to the signal
+                        port of the amplifier card:
+
+                        This value is used by power management.
+
+                        Current configurable ranges and defaults:
+
+                        A2325A:           (1600..3200), 1600
+                        A2P2125 (port 1): (   0..2500),  700
+                        A2P2125 (port 4): (1500..3100), 1500
+                        A4PSWG (port 1):  (   0..2500),  700
+                        A4PSWG (port 4):  ( 700..2900),  700
+
+                        AA2DONW:          (1300..2300), 1300
+                        AHPHG:            (1300..3300), 1300
+                        AHPLG:            ( 600..2400),  600
+                        ALPFGK:           (1300..2300), 1300
+                        ALPFGT:           (1300..2300), 1300
+
+                        ALPHG:            (1000..3000), 1000
+                        AM2017B:          ( 600..2400),  600
+                        AM2032A:          (2600..4000), 2600
+                        AM2125A:          (1500..3100), 1500
+                        AM2125B:          (1500..3100), 1500
+
+                        AM2318A:          ( 700..2400),  700
+                        AM2325B:          (1600..3200), 1600
+                        AM2625A:          (1600..3000), 1600
+                        ASWG:             ( 700..2900),  700
+                        MESH4:            ( 700..2400),  700
+
+                        RA2P:             (   0..2500),  700."
+        ::= { tnAmplifierPortConfigEntry 2 }
+
+    tnAmplifierPortPowerGainMax OBJECT-TYPE
+        SYNTAX         Unsigned32
+        UNITS          "mB"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The following description applies to the signal
+                        port of the amplifier card:
+
+                        This value is used by power management.
+
+                        Current configurable ranges and defaults:
+
+                        A2325A:           (1600..3200), 3200
+                        A2P2125 (port 1): (   0..2500), 2500
+                        A2P2125 (port 4): (1500..3100), 3100
+                        A4PSWG (port 1):  (   0..2500), 2500
+                        A4PSWG (port 4):  ( 700..2900), 2200
+
+                        AA2DONW:          (1300..2300), 2300
+                        AHPHG:            (1300..3300), 3300
+                        AHPLG:            ( 600..2400), 2400
+                        ALPFGK:           (1300..2300), 2300
+                        ALPFGT:           (1300..2300), 2300
+
+                        ALPHG:            (1000..3000), 3000
+                        AM2017B:          ( 600..2400), 2400
+                        AM2032A:          (2600..4000), 4000
+                        AM2125A:          (1500..3100), 3100
+                        AM2125B:          (1500..3100), 3100
+
+                        AM2318A:          ( 700..2400), 2400
+                        AM2325B:          (1600..3200), 3200
+                        AM2625A:          (1600..3000), 3000
+                        ASWG:             ( 700..2900), 2200
+                        MESH4:            ( 700..2400), 2400
+
+                        RA2P:             (   0..2500), 2500."
+        ::= { tnAmplifierPortConfigEntry 3 }
+
+    tnAmplifierPortPowerGainBackoff OBJECT-TYPE
+        SYNTAX         Unsigned32
+        UNITS          "mB"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The following description applies to the signal
+                        port of the amplifier card:
+
+                        The adjustment made to min/max gain by power
+                        management when commissioning.
+
+                        Current configurable range: 0 to 1000."
+        DEFVAL         { 0 }
+        ::= { tnAmplifierPortConfigEntry 4 }
+
+    tnAmplifierPortEnable OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The following description applies to the signal
+                        port of the amplifier card:
+
+                        This attribute allows a network operator to kick
+                        start the laser.  Setting a value of false is
+                        restricted."
+        DEFVAL         { true }
+        ::= { tnAmplifierPortConfigEntry 5 }
+
+    tnAmplifierPortAutoReEnableMode OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The following description applies to the
+                        ampOutThruIn port of the amplifier card:
+
+                        Auto re-enable mode."
+        DEFVAL         { true }
+        ::= { tnAmplifierPortConfigEntry 6 }
+
+--    obsolete
+--    tnAmplifierPortAutoReEnableBackoffTime OBJECT-TYPE ::= { tnAmplifierPortConfigEntry 7 }
+
+    tnAmplifierPortPowerSpanRepairMargin OBJECT-TYPE
+        SYNTAX         Unsigned32
+        UNITS          "mB"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The following description applies to the signal
+                        port of the amplifier card:
+
+                        EPT - splice margin.
+
+                        This is calculated as the absolute value of the
+                        difference between tnAmplifierPortPowerGainMax
+                        and tnAmplifierPortPowerGainBackoff.
+
+                        Current ranges and defaults:
+
+                        ASWG:   (700..2900), 2200
+                        A4PSWG: (700..2900), 2200."
+        ::= { tnAmplifierPortConfigEntry 8 }
+
+    tnAmplifierPortPowerDeltaMax OBJECT-TYPE
+        SYNTAX         Unsigned32
+        UNITS          "mB"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The following description applies to the signal
+                        port of the amplifier card:
+
+                        EPT - delta max.
+
+                        Current configurable range: 0 to 500."
+        DEFVAL         { 0 }
+        ::= { tnAmplifierPortConfigEntry 9 }
+
+    tnAmplifierPortTargetTilt OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mB"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The following description applies to the signal
+                        port of the amplifier card:
+
+                        EPT - Tilt.
+
+                        Configurable ranges and defaults:
+
+                        A2325A:  (-300..   0),    0
+                        A2P2125: (-300.. 300),    0
+                        A2P2125: (-400.. 400),    0
+                        AHPHG:   (-300..   0),    0
+                        AHPLG:   (-300..   0),    0
+                        ALPHG:   (-300..   0),    0
+                        AM2017B: (-300..   0),    0
+                        AM2032A: (-300..   0),    0
+                        AM2125A: (-400.. 400),    0
+                        AM2125B: (-400.. 400),    0
+                        AM2318A: (-400.. 400),    0
+                        AM2325B: (-300..   0),    0
+                        AM2625A: (-600..-100), -100
+                        MESH4:   (-400.. 400),    0
+                        RA2P:    (-300.. 300),    0
+                        ASWG:    (-400.. 400),    0
+                        A4PSWG:  (-400.. 400),    0."
+        ::= { tnAmplifierPortConfigEntry 10 }
+
+    tnAmplifierPortFunction OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         ingress(1),
+                         egress(2),
+                         other(3)
+                       }
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Indicates the functional type of the amplifier
+                        card."
+        ::= { tnAmplifierPortConfigEntry 11 }
+
+    tnAmplifierPortAprDisable OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The Auto Power Recovery Disable."
+        DEFVAL         { false }
+        ::= { tnAmplifierPortConfigEntry 12 }
+
+    tnAmplifierPortSRSTiltACoeffDCM OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Modeling coefficient for the
+                        SRSTilt = A*Pout(mW) equation, for DCM.
+
+                        Current configurable range: 0 to 10000."
+        DEFVAL         { 0 }
+        ::= { tnAmplifierPortConfigEntry 13 }
+
+    tnAmplifierPortMaxFlatGainOffset OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mB"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Provides a correction to the assumed max flat
+                        gain value.
+
+                        Current configurable range: -500 to 500."
+        DEFVAL         { 0 }
+        ::= { tnAmplifierPortConfigEntry 14 }
+
+    tnAmplifierPortGainTilt OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mB"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Current OA tilt setting for the signal port of
+                        the amplifier card.
+
+                        Current ranges:
+
+                        AM2625A: -600 to -100
+                        AM2032A: -300 to 0
+                        ASWG:    -400 to 400
+                        A4PSWG:  -400 to 400."
+        DEFVAL         { 0 }
+        ::= { tnAmplifierPortConfigEntry 15 }
+
+    tnAmplifierPortAprHoldOffTime OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         time0ms(1),
+--                         obsolete
+--                         time50ms(2),
+--                         time100ms(3),
+                         time250ms(4)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The auto power recovery hold off time."
+        DEFVAL         { time0ms }
+        ::= { tnAmplifierPortConfigEntry 16 }
+
+    tnAmplifierPortLosMode OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         auto(1),
+                         losn(2)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The Amplifier Port LOS Mode."
+        DEFVAL         { auto }
+        ::= { tnAmplifierPortConfigEntry 17 }
+
+    tnAmplifierPortSignalFailThreshold OBJECT-TYPE
+        SYNTAX         Unsigned32 (0..12)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Integer range 4 to 5, representing 10**4 to 10**5.
+
+                        Current configurable range: 4 to 5."
+        DEFVAL         { 4 }
+        ::= { tnAmplifierPortConfigEntry 18 }
+
+    tnAmplifierPortSignalDegradeThreshold OBJECT-TYPE
+        SYNTAX         Unsigned32 (0..12)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Integer range 5 to 9, representing 10**5 to 10**9.
+
+                        Current configurable range: 5 to 9."
+        DEFVAL         { 6 }
+        ::= { tnAmplifierPortConfigEntry 19 }
+
+    tnAmplifierPortVoaSet OBJECT-TYPE
+        SYNTAX         Unsigned32
+        UNITS          "mBm"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The following description applies to the
+                        LINEOUT port of the uni-directionalamplifier
+                        card:
+
+                        Current configurable range: 0 to 1800."
+        DEFVAL         { 0 }
+        ::= { tnAmplifierPortConfigEntry 20 }
+
+    tnAmplifierPortGainRange OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         low(1),
+                         high(2)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Gain range for ASWG/A4PSWG cards."
+        DEFVAL         { low }
+        ::= { tnAmplifierPortConfigEntry 21 }
+
+    tnAmplifierPortAprMode OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         auto(1),
+                         force(2)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "APR Mode for ASWG/A4PSWG cards."
+        DEFVAL         { auto }
+        ::= { tnAmplifierPortConfigEntry 22 }
+
+    tnAmplifierPortOperatingMode OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         gain(1),
+                         power(2),
+                         maxPower(3)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "ASE Mode for ASWG/A4PSWG cards.
+
+                         Set to power (node sets LD to LOSN as well)
+                         Set to gain (node sets LD to LOSA as well)."
+        DEFVAL         { gain }
+        ::= { tnAmplifierPortConfigEntry 23 }
+
+    tnAmplifierPortSignalPowerTarget OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mBm"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Value used when tnAmplifierPortOperatingMode
+                        is in power mode.
+
+                        Current configurable range: -400 to 1000."
+        DEFVAL         { 300 }
+        ::= { tnAmplifierPortConfigEntry 24 }
+
+    tnAmplifierPortPowerGainL OBJECT-TYPE
+        SYNTAX         Unsigned32
+        UNITS          "mB"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Specifies the amplifier gain."
+
+        ::= { tnAmplifierPortConfigEntry 25 }
+
+    tnAmplifierPortPowerGainMinL OBJECT-TYPE
+        SYNTAX         Unsigned32
+        UNITS          "mB"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Specifies the minimum EDFA gain."
+
+        ::= { tnAmplifierPortConfigEntry 26 }
+
+    tnAmplifierPortPowerGainMaxL OBJECT-TYPE
+        SYNTAX         Unsigned32
+        UNITS          "mB"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Specifies the maximum EDFA gain."
+
+        ::= { tnAmplifierPortConfigEntry  27}
+
+    tnAmplifierPortPowerDeltaMaxL OBJECT-TYPE
+        SYNTAX         Unsigned32
+        UNITS          "mB"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Specifies the maximum allowed difference between the
+                        provisioned gain and the measured gain before an
+                        alarm is raised."
+
+        DEFVAL         { 0 }
+        ::= { tnAmplifierPortConfigEntry 28 }
+
+    tnAmplifierPortGainRangeL OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         low(1),
+                         high(2)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Specifies the EDFA gain range.."
+        DEFVAL         { low }
+        ::= { tnAmplifierPortConfigEntry 29 }
+
+    tnAmplifierPortTargetTiltL OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mB"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Specifies the amplifier tilt value used by the system."
+
+        ::= { tnAmplifierPortConfigEntry 30 }
+
+    tnAmplifierPortVoaSetL OBJECT-TYPE
+        SYNTAX         Unsigned32
+        UNITS          "mBm"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Specifies the output VOA setting."
+        DEFVAL         { 0 }
+        ::= { tnAmplifierPortConfigEntry 31 }
+
+    tnAmplifierPortGainTiltL OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mB"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Current OA tilt setting for the signal port of
+                        the amplifier card for L band."
+        DEFVAL         { 0 }
+        ::= { tnAmplifierPortConfigEntry 32 }
+
+    tnAmplifierPortPowerGainBackoffL OBJECT-TYPE
+        SYNTAX         Unsigned32
+        UNITS          "mB"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The following description applies to the signal
+                        port of the amplifier card for L band:
+
+                        The adjustment made to min/max gain by power
+                        management when commissioning.
+
+                        Current configurable range: 0 to 1000."
+        DEFVAL         { 0 }
+        ::= { tnAmplifierPortConfigEntry 33 }
+
+    tnAmplifierPortPowerSpanRepairMarginL OBJECT-TYPE
+        SYNTAX         Unsigned32
+        UNITS          "mB"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The following description applies to the signal
+                        port of the amplifier card for L Band:
+
+                        EPT - splice margin.
+
+                        This is calculated as the absolute value of the
+                        difference between tnAmplifierPortPowerGainMaxL
+                        and tnAmplifierPortPowerGainBackoffL."
+        ::= { tnAmplifierPortConfigEntry 34 }
+
+    tnAmplifierPortOperatingModeL OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         gain(1),
+                         power(2),
+                         maxPower(3)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "ASE Mode for ASWG/A4PSWG cards for L-Band.
+
+                         Set to power (node sets LD to LOSN as well)
+                         Set to gain (node sets LD to LOSA as well)."
+        DEFVAL         { gain }
+        ::= { tnAmplifierPortConfigEntry 35 }
+
+    tnAmplifierPortSignalPowerTargetL OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mBm"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Value used when tnAmplifierPortOperatingModeL
+                        is in power mode for L-Band.
+
+                        Current configurable range: -400 to 1000."
+        DEFVAL         { 300 }
+        ::= { tnAmplifierPortConfigEntry 36 }
+
+    tnAmplifierPortUserSelectedExteriorDcmPresentIn OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Manage external DCM."
+        DEFVAL         { false }
+        ::= { tnAmplifierPortConfigEntry 37 }
+
+    tnAmplifierPortUserSelectedExteriorDcmPresentOut OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Manage external DCM."
+        DEFVAL         { false }
+        ::= { tnAmplifierPortConfigEntry 38 }
+
+    tnAmplifierPortBandMode OBJECT-TYPE
+        SYNTAX         INTEGER {
+                          cBand(1),
+                          lBand(2),
+                          clBand(3)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "This attribute determines if the LD is operating
+                        in a single or dual band. If in a single  band mode,
+                        only the  provisioned band attributes are made availabe
+                        to provision and retrieve."
+        DEFVAL         { clBand }
+        ::= { tnAmplifierPortConfigEntry 39 }
+
+    tnAmplifierPortLosModeL OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         auto(1),
+                         losn(2)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The Amplifier Port LOS Mode in L band."
+        DEFVAL         { auto }
+        ::= { tnAmplifierPortConfigEntry 40 }
+
+    tnAmplifierPortBoosterTargetPowerIn OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mBm"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Target Power Per Channel.
+
+                        Current configurable range: -500 to 600."
+        DEFVAL         { -100 }
+        ::= { tnAmplifierPortConfigEntry 41 }
+
+    tnAmplifierPortAprEDFApulse OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         on(1),
+                         off(2)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "APR EDFA Pulsing."
+        DEFVAL         { on }
+        ::= { tnAmplifierPortConfigEntry 42 }
+
+    tnAmplifierPortLineDcmConnAddress OBJECT-TYPE
+        SYNTAX         InterfaceIndexOrZero
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnAmplifierPortConfigEntry 43 }
+
+    tnAmplifierPortAPREDFAPulseAttempt OBJECT-TYPE
+        SYNTAX         TnCommand
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "APR pulse attempt."
+        DEFVAL         { noCmd }
+        ::= { tnAmplifierPortConfigEntry 44 }
+
+    tnAmplifierPortSpanLossTh OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mB"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Span loss threshold ."
+        DEFVAL         { -9900 }
+        ::= { tnAmplifierPortConfigEntry 45 }
+
+    tnAmplifierPortAsellLink OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { false }
+        ::= { tnAmplifierPortConfigEntry 46 }
+
+    tnAmplifierPortTargetPowerWidth OBJECT-TYPE
+        SYNTAX         NokiaAmpPortTargetPowerWidth
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { channelWidth50GHz }
+        ::= { tnAmplifierPortConfigEntry 47 }
+
+    tnAmplifierPortTargetPowerWidthL OBJECT-TYPE
+        SYNTAX         NokiaAmpPortTargetPowerWidth
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { channelWidth50GHz }
+        ::= { tnAmplifierPortConfigEntry 48 }
+
+    tnAmplifierPortAsellLinkL OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { false }
+        ::= { tnAmplifierPortConfigEntry 49 }
+
+--------------------------------------------------------------------------------
+-- Hybrid Amplifier Port Config Scalars
+--------------------------------------------------------------------------------
+    tnAmplifierHybridPortConfigAttributeTotal OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Total number of attributes in
+                        tnAmplifierHybridPortConfigTable."
+        ::= { tnAmplifierPortConfig 3 }
+
+--------------------------------------------------------------------------------
+-- Hybrid Amplifier Port Config Table
+--------------------------------------------------------------------------------
+    tnAmplifierHybridPortConfigTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnAmplifierHybridPortConfigEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The provisioned ports on an hybrid amplifier
+                        card."
+        ::= { tnAmplifierPortConfig 4 }
+
+    tnAmplifierHybridPortConfigEntry OBJECT-TYPE
+        SYNTAX         TnAmplifierHybridPortConfigEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { ifIndex }
+        ::= { tnAmplifierHybridPortConfigTable 1 }
+
+    TnAmplifierHybridPortConfigEntry ::= SEQUENCE {
+        tnAmplifierHybridPortVoaAttenuation           Unsigned32,
+        tnAmplifierHybridPortInitialMidLoss           Unsigned32,
+        tnAmplifierHybridPortInitialAgcTargetGain     Unsigned32,
+        tnAmplifierHybridPortVoaMinAttenuation        Unsigned32,
+        tnAmplifierHybridPortVoaMaxAttenuation        Unsigned32
+    }
+
+    tnAmplifierHybridPortVoaAttenuation OBJECT-TYPE
+        SYNTAX         Unsigned32
+        UNITS          "mB"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Hybrid amplifier port VOA attenuation.
+
+                        Current configurable range: 0 to 2000."
+        DEFVAL         { 0 }
+        ::= { tnAmplifierHybridPortConfigEntry 1 }
+
+    tnAmplifierHybridPortInitialMidLoss OBJECT-TYPE
+        SYNTAX         Unsigned32
+        UNITS          "mB"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Hybrid amplifier port initial VOA attenuation.
+
+                        Current configurable range: 0 to 2000."
+        DEFVAL         { 60 }
+        ::= { tnAmplifierHybridPortConfigEntry 2 }
+
+    tnAmplifierHybridPortInitialAgcTargetGain OBJECT-TYPE
+        SYNTAX         Unsigned32
+        UNITS          "mB"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Hybrid amplifier port initial AGC target gain.
+
+                        Current configurable range: 200 to 2000."
+        DEFVAL         { 1000 }
+        ::= { tnAmplifierHybridPortConfigEntry 3 }
+
+    tnAmplifierHybridPortVoaMinAttenuation OBJECT-TYPE
+        SYNTAX         Unsigned32
+        UNITS          "mB"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Hybrid amplifier port VOA minimum attenuation.
+
+                        Current configurable range: 0 to 2000."
+        DEFVAL         { 0 }
+        ::= { tnAmplifierHybridPortConfigEntry 4 }
+
+    tnAmplifierHybridPortVoaMaxAttenuation OBJECT-TYPE
+        SYNTAX         Unsigned32
+        UNITS          "mB"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Hybrid amplifier port VOA maximum attenuation.
+
+                        Current configurable range: 0 to 2000."
+        DEFVAL         { 2000 }
+        ::= { tnAmplifierHybridPortConfigEntry 5 }
+
+--------------------------------------------------------------------------------
+-- Amplifier Port Info Scalars
+--------------------------------------------------------------------------------
+    tnAmplifierPortInfoAttributeTotal OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Total number of attributes in
+                        tnAmplifierPortInfoTable."
+        ::= { tnAmplifierPortInfo 1 }
+
+--------------------------------------------------------------------------------
+-- Amplifier Port Info Table
+--------------------------------------------------------------------------------
+    tnAmplifierPortInfoTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnAmplifierPortInfoEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The equipped ports on an amplifier card."
+        ::= { tnAmplifierPortInfo 2 }
+
+    tnAmplifierPortInfoEntry OBJECT-TYPE
+        SYNTAX         TnAmplifierPortInfoEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { ifIndex }
+        ::= { tnAmplifierPortInfoTable 1 }
+
+    TnAmplifierPortInfoEntry ::= SEQUENCE {
+        tnAmplifierPortInternalAmpModuleTemperature  Integer32,
+        tnAmplifierPortPowerIn                       Integer32,
+        tnAmplifierPortPowerOut                      Integer32,
+        tnAmplifierPortSignalPowerOut                Integer32,
+        tnAmplifierPortInputToOutputGain             Integer32,
+        tnAmplifierPortDCMInPower                    Integer32,
+        tnAmplifierPortDCMOutPower                   Integer32,
+        tnAmplifierPortActualTilt                    Integer32,
+        tnAmplifierPortWtOcmMonitorPortOut           Unsigned32,
+        tnAmplifierPortOSCTxPowerIn                  Integer32,
+        tnAmplifierPortOSCTxPowerOut                 Integer32,
+        tnAmplifierPortTestingActive                 TruthValue,
+        tnAmplifierCommonEgressOutputPower           Integer32,
+        tnAmplifierActOutAtten                       Unsigned32,
+        tnAmplifierCommonEgressOutputPowerL          Integer32,
+        tnAmplifierActOutAttenL                      Unsigned32,
+        tnAmplifierPortActualTiltL                   Integer32,
+        tnAmplifierPortSignalPowerOutL               Integer32,
+        tnAmplifierPortInputToOutputGainL            Integer32,
+        tnAmplifierPortOSCTxPowerOutL                Integer32,
+        tnAmplifierPortPowerInL                      Integer32,
+        tnAmplifierPortInfoOSCRxPowerIn              Integer32,
+        tnAmplifierPortInfoOSCSfpTxPowerOut          Integer32,
+        tnAmplifierPortInfoOSCSfpRxPowerIn           Integer32,
+        tnAmplifierPortBoosterTargetPowerOut         Integer32,
+        tnAmplifierPortPowerOutL                     Integer32,
+        tnAmplifierPortSpanLoss                      Integer32,
+        tnAmplifierPortAprEDFApulsePower             Unsigned32
+    }
+
+    tnAmplifierPortInternalAmpModuleTemperature OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "Celsius"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The following description applies to the
+                        signal port of the amplifier card:
+
+                        The temperature of the laser.
+
+                        Current range:  -5 to 35."
+        DEFVAL         { 30 }
+        ::= { tnAmplifierPortInfoEntry 1 }
+
+    tnAmplifierPortPowerIn OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mBm"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The following description applies to the
+                        fromDcm and line ports of the amplifier card:
+
+                        The total input power
+                        Current ranges:
+                        ASWG:   -9900, -3600 to 1700
+                        A4PSWG: -9900, -3600 to 1700."
+        ::= { tnAmplifierPortInfoEntry 2 }
+
+    tnAmplifierPortPowerOut OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mBm"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The following description applies to the
+                        signal and toDcm ports of the amplifier card:
+
+                        The total output power.
+
+                        Current ranges:
+
+                        AM2625A: -9900, -900 to 2900
+                        AM2032A: -9900, -300 to 2300
+                        ASWG:    -9900, -1100 to 2550
+                        A4PSWG:  -9900, -1100 to 2550."
+        ::= { tnAmplifierPortInfoEntry 3 }
+
+    tnAmplifierPortSignalPowerOut OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mBm"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The following description applies to the
+                        signal port of the amplifier card:
+
+                        The total input power plus the programmed gain.
+
+                        Current Ranges:
+                        ASWG:    -9900, -1100 to 2550
+                        A4PSWG:  -9900, -1100 to 2550."
+        ::= { tnAmplifierPortInfoEntry 4 }
+
+    tnAmplifierPortInputToOutputGain OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mB"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The following description applies to the
+                        LINEOUT port of the uni-directional amplifier
+                        card.
+                        Current Ranges:
+                        ASWG:    -9900, -300 to 2900
+                        A4PSWG:  -9900, -300 to 2900."
+        ::= { tnAmplifierPortInfoEntry 5 }
+
+    tnAmplifierPortDCMInPower OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mBm"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The following description applies to the DCM
+                        In port of the amplifier card.  -9900 indicates
+                        no measured power.
+
+                        Current range: -9900, -3000 to 2000."
+        DEFVAL         { -9900 }
+        ::= { tnAmplifierPortInfoEntry 6 }
+
+    tnAmplifierPortDCMOutPower OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mBm"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The following description applies to the DCM
+                        Out port of the amplifier card.  -9900 indicates
+                        no measured power.
+
+                        Current range: -9900, -3000 to 2000."
+        DEFVAL         { -9900 }
+        ::= { tnAmplifierPortInfoEntry 7 }
+
+    tnAmplifierPortActualTilt OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mB"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The following description applies to the
+                        signal port of the amplifier card:
+
+                        Current range: -1000 to 500."
+        ::= { tnAmplifierPortInfoEntry 8 }
+
+    tnAmplifierPortWtOcmMonitorPortOut OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The associated WTOCM In port associated to the LD.
+
+                        Current range: 0 to 0xFFFFFFFF."
+        DEFVAL         { 0 }
+        ::= { tnAmplifierPortInfoEntry 9 }
+
+    tnAmplifierPortOSCTxPowerIn OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mBm"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The EDFA module OSC transmitted input power of
+                        the amplifier card.  -9900 indicates no measured
+                        power.
+
+                        Current ranges:
+
+                        A2P2125:  -1500 to 1100
+                        AM2032A:  -1500 to 1100
+                        AM2125A:  -1500 to 1100
+                        AM2125B:  -1500 to 1100
+                        AM2318A:  -1500 to 1100
+                        AM2625A:  -2000 to 1100
+                        ASWG:     -1500 to 1100
+                        A4PSWG:   -1500 to 1100."
+        DEFVAL         { -9900 }
+        ::= { tnAmplifierPortInfoEntry 10 }
+
+    tnAmplifierPortOSCTxPowerOut OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mBm"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The EDFA module OSC transmitted output power of
+                        the amplifier card.  -9900 indicates no measured
+                        power.
+
+                        Current ranges:
+
+                        A2P2125:  -1500 to 1100
+                        AA2DONW:  -1500 to 1500
+                        AM2032A:  -1500 to 1100
+                        AM2125A:  -1500 to 1100
+                        AM2125B:  -1500 to 1100
+                        AM2318A:  -1500 to 1100
+                        AM2625A:      0 to 1500
+                        ASWG:     -1500 to 1100
+                        A4PSWG:   -1500 to 1100."
+        DEFVAL         { -9900 }
+        ::= { tnAmplifierPortInfoEntry 11 }
+
+    tnAmplifierPortTestingActive OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Node sets to true when testing in progress
+                        on port (logic)."
+        DEFVAL         { false }
+        ::= { tnAmplifierPortInfoEntry 12 }
+
+    tnAmplifierCommonEgressOutputPower OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mBm"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Calculated in scot when tiltadj is triggered.Referes to the
+                        Target output power per channel,adjusted for the C+L Interaction."
+        ::= { tnAmplifierPortInfoEntry 13 }
+
+    tnAmplifierActOutAtten OBJECT-TYPE
+        SYNTAX         Unsigned32
+        UNITS          "mB"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Actual amplifier attenuation available on the AWBxx packs only."
+        DEFVAL         { 0 }
+        ::= { tnAmplifierPortInfoEntry 14 }
+
+    tnAmplifierCommonEgressOutputPowerL OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mBm"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Calculated in scot when tiltadj is triggered.Referes to the
+                        Target output power per channel,adjusted for the C+L Interaction."
+        ::= { tnAmplifierPortInfoEntry 15 }
+
+    tnAmplifierActOutAttenL OBJECT-TYPE
+        SYNTAX         Unsigned32
+        UNITS          "mB"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Actual amplifier attenuation available on the AWBxx packs only
+                        for L Band."
+        DEFVAL         { 0 }
+        ::= { tnAmplifierPortInfoEntry 16 }
+
+    tnAmplifierPortActualTiltL OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mB"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The following description applies to the
+                        signal port of the amplifier card for L band:
+
+                        Current range: -1000 to 500."
+        ::= { tnAmplifierPortInfoEntry 17 }
+
+    tnAmplifierPortSignalPowerOutL OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mBm"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The following description applies to the
+                        signal port of the amplifier card for L band:
+
+                        The total input power plus the programmed gain."
+        ::= { tnAmplifierPortInfoEntry 18 }
+
+    tnAmplifierPortInputToOutputGainL OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mB"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The following description applies to the
+                        LINEOUT port of the uni-directional amplifier
+                        card for L band."
+        ::= { tnAmplifierPortInfoEntry 19 }
+
+    tnAmplifierPortOSCTxPowerOutL OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mBm"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The EDFA module OSC transmitted output power of
+                        the amplifier card.  -9900 indicates no measured
+                        power."
+        DEFVAL         { -9900 }
+        ::= { tnAmplifierPortInfoEntry 20 }
+
+    tnAmplifierPortPowerInL OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mBm"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "EDFA module total input power L band."
+        ::= { tnAmplifierPortInfoEntry 21 }
+
+    tnAmplifierPortInfoOSCRxPowerIn OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mBm"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The EDFA module OSC received input power to the card.
+                        -9900 indicates no measured power."
+        ::= { tnAmplifierPortInfoEntry 22 }
+
+    tnAmplifierPortInfoOSCSfpTxPowerOut OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mBm"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The OSCSFP transceiver output power -9900 indicates
+                        no measured power."
+        ::= { tnAmplifierPortInfoEntry 23 }
+
+    tnAmplifierPortInfoOSCSfpRxPowerIn OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mBm"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The OSCSFP transceiver input power -9900 indicates no
+                        measured power."
+        ::= { tnAmplifierPortInfoEntry 24 }
+
+    tnAmplifierPortBoosterTargetPowerOut OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mBm"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Target Power Per Channel."
+        ::= { tnAmplifierPortInfoEntry 25 }
+
+    tnAmplifierPortPowerOutL OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mBm"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Total output power for L Band."
+        ::= { tnAmplifierPortInfoEntry 26 }
+
+    tnAmplifierPortSpanLoss OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mB"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Span loss."
+        DEFVAL         { 9900 }
+        ::= { tnAmplifierPortInfoEntry 27 }
+
+    tnAmplifierPortAprEDFApulsePower OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Apr EDFA pulse Power."
+        ::= { tnAmplifierPortInfoEntry 28 }
+
+--------------------------------------------------------------------------------
+-- Amplifier MESH Port Info Scalars
+--------------------------------------------------------------------------------
+    tnAmplifierMeshPortInfoAttributeTotal OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Total number of attributes in
+                        tnAmplifierMeshPortInfoTable."
+        ::= { tnAmplifierPortInfo 3 }
+
+--------------------------------------------------------------------------------
+-- Amplifier Mesh Port Info Table
+--------------------------------------------------------------------------------
+    tnAmplifierMeshPortInfoTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnAmplifierMeshPortInfoEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The equipped ports on a mesh card."
+        ::= { tnAmplifierPortInfo 4 }
+
+    tnAmplifierMeshPortInfoEntry OBJECT-TYPE
+        SYNTAX         TnAmplifierMeshPortInfoEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { ifIndex }
+        ::= { tnAmplifierMeshPortInfoTable 1 }
+
+    TnAmplifierMeshPortInfoEntry ::=
+        SEQUENCE {
+            tnAmplifierMeshPortPowerOut            Integer32,
+            tnAmplifierMeshPortSignalPowerOut      Integer32,
+            tnAmplifierMeshPortInputToOutputGain   Integer32
+        }
+
+    tnAmplifierMeshPortPowerOut OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mBm"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The following description applies to the output
+                        port of the mesh card:
+
+                        The total output power.
+
+                        -9900 indicates no measured power."
+        DEFVAL         { -9900 }
+        ::= { tnAmplifierMeshPortInfoEntry 1 }
+
+    tnAmplifierMeshPortSignalPowerOut OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mBm"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The following description applies to the
+                        output port of the mesh card:
+
+                        The total input power plus the programmed gain.
+
+                        -9900 indicates no measured power."
+        DEFVAL         { -9900 }
+        ::= { tnAmplifierMeshPortInfoEntry 2 }
+
+    tnAmplifierMeshPortInputToOutputGain OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mB"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The following description reports the gain from
+                        sigIn to sigOut ports of the MESH4 card:
+
+                        OA module gain - EVOA loss - SEEPROM loss of
+                        splitter.
+
+                        Current range:
+
+                        MESH4: -1100 to 2400."
+        DEFVAL         { 700 }
+        ::= { tnAmplifierMeshPortInfoEntry 3 }
+
+--------------------------------------------------------------------------------
+-- Hybrid Amplifier Port Info Scalars
+--------------------------------------------------------------------------------
+    tnAmplifierHybridPortInfoAttributeTotal OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Total number of attributes in
+                        tnAmplifierHybridPortInfoTable."
+        ::= { tnAmplifierPortInfo 5 }
+
+--------------------------------------------------------------------------------
+-- Hybrid Amplifier Port Info Table
+--------------------------------------------------------------------------------
+    tnAmplifierHybridPortInfoTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnAmplifierHybridPortInfoEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The equipped ports on an hybrid amplifier card."
+        ::= { tnAmplifierPortInfo 6 }
+
+    tnAmplifierHybridPortInfoEntry OBJECT-TYPE
+        SYNTAX         TnAmplifierHybridPortInfoEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { ifIndex }
+        ::= { tnAmplifierHybridPortInfoTable 1 }
+
+    TnAmplifierHybridPortInfoEntry ::= SEQUENCE {
+        tnAmplifierHybridPortInternalAmpModuleTemperature     Unsigned32
+    }
+
+    tnAmplifierHybridPortInternalAmpModuleTemperature OBJECT-TYPE
+        SYNTAX         Unsigned32
+        UNITS          "Celsius"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Hybrid Amplifier Port Internal Module Temperature."
+        ::= { tnAmplifierHybridPortInfoEntry 1 }
+
+--------------------------------------------------------------------------------
+-- Amplifier Card Info Scalars
+--------------------------------------------------------------------------------
+    tnAmplifierCardInfoAttributeTotal OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Total number of attributes in
+                        tnAmplifierCardInfoTable."
+        ::= { tnAmplifierCardInfo 1 }
+
+--------------------------------------------------------------------------------
+-- Amplifier Card Info Table
+--------------------------------------------------------------------------------
+    tnAmplifierCardInfoTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnAmplifierCardInfoEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The equipped pumps and other values on an
+                        amplifier card."
+        ::= { tnAmplifierCardInfo 2 }
+
+    tnAmplifierCardInfoEntry OBJECT-TYPE
+        SYNTAX         TnAmplifierCardInfoEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { tnShelfIndex,
+                tnSlotIndex }
+        ::= { tnAmplifierCardInfoTable 1 }
+
+    TnAmplifierCardInfoEntry ::= SEQUENCE {
+        tnAmplifierCardOAMPump1Temperature      Integer32,
+        tnAmplifierCardOAMPump2Temperature      Integer32,
+        tnAmplifierCardOAMPump3Temperature      Integer32,
+        tnAmplifierCardOAMPump1Bias             Integer32,
+        tnAmplifierCardOAMPump2Bias             Integer32,
+        tnAmplifierCardOAMPump3Bias             Integer32,
+        tnAmplifierCardOptIntSpanLoss           Integer32,
+        tnAmplifierCardOAMPump4Temperature      Integer32,
+        tnAmplifierCardOAMPump5Temperature      Integer32,
+        tnAmplifierCardOAMPump6Temperature      Integer32,
+        tnAmplifierCardOAMPump4Bias             Integer32,
+        tnAmplifierCardOAMPump5Bias             Integer32,
+        tnAmplifierCardOAMPump6Bias             Integer32,
+        tnAmplifierCardOAMLPump1Temperature     Integer32,
+        tnAmplifierCardOAMLPump2Temperature     Integer32,
+        tnAmplifierCardOAMLPump3Temperature     Integer32,
+        tnAmplifierCardOAMLPump4Temperature     Integer32,
+        tnAmplifierCardOAMLPump1Bias            Integer32,
+        tnAmplifierCardOAMLPump2Bias            Integer32,
+        tnAmplifierCardOAMLPump3Bias            Integer32,
+        tnAmplifierCardOAMLPump4Bias            Integer32,
+        tnAmplifierCardOAM1PumpTemperatures     SnmpAdminString,
+        tnAmplifierCardOAM2PumpTemperatures     SnmpAdminString,
+        tnAmplifierCardOAM1PumpBiases           SnmpAdminString,
+        tnAmplifierCardOAM2PumpBiases           SnmpAdminString,
+        tnAmplifierCardOAM3PumpTemperatures     SnmpAdminString,
+        tnAmplifierCardOAM3PumpBiases           SnmpAdminString,
+        tnAmplifierCardOAM1LPumpTemperatures    SnmpAdminString,
+        tnAmplifierCardOAM2LPumpTemperatures    SnmpAdminString,
+        tnAmplifierCardOAM3LPumpTemperatures    SnmpAdminString,
+        tnAmplifierCardOAM1LPumpBiases          SnmpAdminString,
+        tnAmplifierCardOAM2LPumpBiases          SnmpAdminString,
+        tnAmplifierCardOAM3LPumpBiases          SnmpAdminString
+     }
+
+    tnAmplifierCardOAMPump1Temperature OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "Celsius"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The current temperature of the OA Laser Pump 1."
+        ::= { tnAmplifierCardInfoEntry 1 }
+
+    tnAmplifierCardOAMPump2Temperature OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "Celsius"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The current temperature of the OA Laser Pump 2."
+        ::= { tnAmplifierCardInfoEntry 2 }
+
+    tnAmplifierCardOAMPump3Temperature OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "Celsius"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The current temperature of the OA Laser Pump 3."
+        ::= { tnAmplifierCardInfoEntry 3 }
+
+    tnAmplifierCardOAMPump1Bias OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mA"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The current bias of the OA Laser Pump 1."
+        ::= { tnAmplifierCardInfoEntry 4 }
+
+    tnAmplifierCardOAMPump2Bias OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mA"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The current bias of the OA Laser Pump 2."
+        ::= { tnAmplifierCardInfoEntry 5 }
+
+    tnAmplifierCardOAMPump3Bias OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mA"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The current bias of the OA Laser Pump 3."
+        ::= { tnAmplifierCardInfoEntry 6 }
+
+    tnAmplifierCardOptIntSpanLoss OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mB"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The span loss value.
+
+                        Current range: 0 to 9900."
+        DEFVAL         { 9900 }
+        ::= { tnAmplifierCardInfoEntry 7 }
+
+    tnAmplifierCardOAMPump4Temperature OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "Celsius"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The current temperature of the OA Laser Pump 4."
+        ::= { tnAmplifierCardInfoEntry 8 }
+
+    tnAmplifierCardOAMPump5Temperature OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "Celsius"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The current temperature of the OA Laser Pump 5."
+        ::= { tnAmplifierCardInfoEntry 9 }
+
+    tnAmplifierCardOAMPump6Temperature OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "Celsius"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The current temperature of the OA Laser Pump 6."
+        ::= { tnAmplifierCardInfoEntry 10 }
+
+    tnAmplifierCardOAMPump4Bias OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mA"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The current bias of the OA Laser Pump 4."
+        ::= { tnAmplifierCardInfoEntry 11 }
+
+    tnAmplifierCardOAMPump5Bias OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mA"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The current bias of the OA Laser Pump 5."
+        ::= { tnAmplifierCardInfoEntry 12 }
+
+    tnAmplifierCardOAMPump6Bias OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mA"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The current bias of the OA Laser Pump 6."
+        ::= { tnAmplifierCardInfoEntry 13 }
+
+    tnAmplifierCardOAMLPump1Temperature OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "Celsius"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The current temperature of the OA Laser Pump 1 for L Band."
+        ::= { tnAmplifierCardInfoEntry 14 }
+
+    tnAmplifierCardOAMLPump2Temperature OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "Celsius"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The current temperature of the OA Laser Pump 2 for L Band."
+        ::= { tnAmplifierCardInfoEntry 15 }
+
+    tnAmplifierCardOAMLPump3Temperature OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "Celsius"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The current temperature of the OA Laser Pump 3 for L Band."
+        ::= { tnAmplifierCardInfoEntry 16 }
+
+    tnAmplifierCardOAMLPump4Temperature OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "Celsius"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The current temperature of the OA Laser Pump 4 for L Band."
+        ::= { tnAmplifierCardInfoEntry 17 }
+
+    tnAmplifierCardOAMLPump1Bias OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mA"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The current bias of the OA Laser Pump 1 for L Band."
+        ::= { tnAmplifierCardInfoEntry 18 }
+
+    tnAmplifierCardOAMLPump2Bias OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mA"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The current bias of the OA Laser Pump 2 for L Band."
+        ::= { tnAmplifierCardInfoEntry 19 }
+
+    tnAmplifierCardOAMLPump3Bias OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mA"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The current bias of the OA Laser Pump 3 for L Band."
+        ::= { tnAmplifierCardInfoEntry 20 }
+
+    tnAmplifierCardOAMLPump4Bias OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mA"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The current bias of the OA Laser Pump 4 for L Band."
+        ::= { tnAmplifierCardInfoEntry 21 }
+
+    tnAmplifierCardOAM1PumpTemperatures OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..512))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "String containing number of pumps for the 1st optical
+                        amplifier on the card, followed by the pump temperature
+                        for each pump.  For IROADM9R OAM1 is the ingress OA module."
+        ::= { tnAmplifierCardInfoEntry 22 }
+
+        tnAmplifierCardOAM2PumpTemperatures OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..512))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "String containing number of pumps for the 2nd OA module
+                        on the card, followed by the pump temperature for each
+                        pump.  For IROADM9R OAM2 is the egress OA module."
+        ::= { tnAmplifierCardInfoEntry 23 }
+
+    tnAmplifierCardOAM1PumpBiases OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..512))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "String containing number of pumps for the 1st optical
+                        amplifier on the card, followed by the pump bias current
+                        for each pump.  For IROADM9R OAM1 is the ingress OA module."
+        ::= { tnAmplifierCardInfoEntry 24 }
+
+    tnAmplifierCardOAM2PumpBiases OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..512))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "String containing number of pumps for the 2nd optical
+                        amplifier on the card, followed by the pump bias current
+                        for each pump.  For IROADM9R OAM2 is the egress OA module."
+        ::= { tnAmplifierCardInfoEntry 25 }
+
+    tnAmplifierCardOAM3PumpTemperatures OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..512))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "String containing number of pumps for the 3rd OA module
+                        on the card, followed by the pump temperature for each
+                        pump."
+        ::= { tnAmplifierCardInfoEntry 26 }
+
+    tnAmplifierCardOAM3PumpBiases OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..512))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "String containing number of pumps for the 3rd optical
+                        amplifier on the card, followed by the pump bias current
+                        for each pump."
+        ::= { tnAmplifierCardInfoEntry 27 }
+
+    tnAmplifierCardOAM1LPumpTemperatures OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..512))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnAmplifierCardInfoEntry 28 }
+
+    tnAmplifierCardOAM2LPumpTemperatures OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..512))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnAmplifierCardInfoEntry 29 }
+
+    tnAmplifierCardOAM3LPumpTemperatures OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..512))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnAmplifierCardInfoEntry 30 }
+
+    tnAmplifierCardOAM1LPumpBiases OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..512))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnAmplifierCardInfoEntry 31 }
+
+    tnAmplifierCardOAM2LPumpBiases OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..512))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnAmplifierCardInfoEntry 32 }
+
+    tnAmplifierCardOAM3LPumpBiases OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..512))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnAmplifierCardInfoEntry 33 }
+
+--------------------------------------------------------------------------------
+-- Mesh Amplifier Card Info Scalars
+--------------------------------------------------------------------------------
+    tnAmplifierMeshCardInfoAttributeTotal OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Total number of attributes in
+                        tnAmplifierMeshCardInfoTable."
+        ::= { tnAmplifierCardInfo 3 }
+
+--------------------------------------------------------------------------------
+-- Mesh Amplifier Card Info Table
+--------------------------------------------------------------------------------
+    tnAmplifierMeshCardInfoTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnAmplifierMeshCardInfoEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The measured values on an amplifier module in
+                        a mesh card."
+        ::= { tnAmplifierCardInfo 4 }
+
+    tnAmplifierMeshCardInfoEntry OBJECT-TYPE
+        SYNTAX         TnAmplifierMeshCardInfoEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { tnShelfIndex,
+                tnSlotIndex }
+        ::= { tnAmplifierMeshCardInfoTable 1 }
+
+    TnAmplifierMeshCardInfoEntry ::= SEQUENCE {
+        tnAmplifierMeshCardInternalTemperature   Integer32,
+        tnAmplifierMeshCardPowerIn               Integer32,
+        tnAmplifierMeshCardPowerOut              Integer32,
+        tnAmplifierMeshCardSignalPowerOut        Integer32,
+        tnAmplifierMeshCardInputToOutputGain     Integer32,
+        tnAmplifierMeshCardGainTilt              Integer32,
+        tnAmplifierMeshCardActualTilt            Integer32
+    }
+
+    tnAmplifierMeshCardInternalTemperature OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "Celsius"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The following description applies to the
+                        amplifier module in the mesh card:
+
+                        The temperature of the laser.
+
+                        Current range:
+
+                        MESH4:  -5 to 35."
+        DEFVAL         { 30 }
+        ::= { tnAmplifierMeshCardInfoEntry 1 }
+
+    tnAmplifierMeshCardPowerIn OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mBm"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The following description applies to the input
+                        port of the amplifier module in the mesh card:
+
+                        The total input power.
+
+                        -9900 indicates no measured power."
+        ::= { tnAmplifierMeshCardInfoEntry 2 }
+
+    tnAmplifierMeshCardPowerOut OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mBm"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The following description applies to the output
+                        port of the amplifier module in the mesh card:
+
+                        The total output power.
+
+                        -9900 indicates no measured power."
+        ::= { tnAmplifierMeshCardInfoEntry 3 }
+
+    tnAmplifierMeshCardSignalPowerOut OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mBm"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The following description applies to the output
+                        port of the amplifier module in the mesh card:
+
+                        The total input power plus the programmed gain.
+
+                        -9900 indicates no measured power."
+        ::= { tnAmplifierMeshCardInfoEntry 4 }
+
+    tnAmplifierMeshCardInputToOutputGain OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mB"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The following description applies to the output
+                        port of the amplifier module in the mesh card:
+
+                        Current range:
+
+                        MESH4: -1100 to 2400."
+        DEFVAL         { 700 }
+        ::= { tnAmplifierMeshCardInfoEntry 5 }
+
+    tnAmplifierMeshCardGainTilt OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mB"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Current OA tilt setting for the output port of
+                        the amplifier module in the mesh card."
+        ::= { tnAmplifierMeshCardInfoEntry 6 }
+
+    tnAmplifierMeshCardActualTilt OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mB"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The following description applies to the output
+                        port of the amplifier module in the mesh card:
+
+                        Current range:
+
+                        MESH4: -1000 to 500."
+        ::= { tnAmplifierMeshCardInfoEntry 7 }
+
+--------------------------------------------------------------------------------
+-- Hybrid Amplifier Card Info Scalars
+--------------------------------------------------------------------------------
+    tnAmplifierHybridCardInfoAttributeTotal OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Total number of attributes in
+                        tnAmplifierHybridCardInfoTable."
+        ::= { tnAmplifierCardInfo 5 }
+
+--------------------------------------------------------------------------------
+-- Hybrid Amplifier Card Info Table
+--------------------------------------------------------------------------------
+    tnAmplifierHybridCardInfoTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnAmplifierHybridCardInfoEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The measured values on an amplifier module in
+                        a mesh card."
+        ::= { tnAmplifierCardInfo 6 }
+
+    tnAmplifierHybridCardInfoEntry OBJECT-TYPE
+        SYNTAX         TnAmplifierHybridCardInfoEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { tnShelfIndex,
+                tnSlotIndex }
+        ::= { tnAmplifierHybridCardInfoTable 1 }
+
+    TnAmplifierHybridCardInfoEntry ::= SEQUENCE {
+        tnAmplifierHybridCardOAMPump1Temperature     Integer32,
+        tnAmplifierHybridCardOAMPump2Temperature     Integer32,
+        tnAmplifierHybridCardOAMPump1Bias            Integer32,
+        tnAmplifierHybridCardOAMPump2Bias            Integer32,
+        tnAmplifierHybridCardOAMPump3Temperature     Integer32,
+        tnAmplifierHybridCardOAMPump4Temperature     Integer32,
+        tnAmplifierHybridCardOAMPump3Bias            Integer32,
+        tnAmplifierHybridCardOAMPump4Bias            Integer32
+    }
+
+    tnAmplifierHybridCardOAMPump1Temperature OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "Celsius"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The current temperature of the OA Laser Pump 1."
+        ::= { tnAmplifierHybridCardInfoEntry 1 }
+
+    tnAmplifierHybridCardOAMPump2Temperature OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "Celsius"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The current temperature of the OA Laser Pump 2."
+        ::= { tnAmplifierHybridCardInfoEntry 2 }
+
+    tnAmplifierHybridCardOAMPump1Bias OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mA"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The current bias of the OA Laser Pump 1."
+        DEFVAL         { 0 }
+        ::= { tnAmplifierHybridCardInfoEntry 3 }
+
+    tnAmplifierHybridCardOAMPump2Bias OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mA"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The current bias of the OA Laser Pump 2."
+        DEFVAL         { 0 }
+        ::= { tnAmplifierHybridCardInfoEntry 4 }
+
+    tnAmplifierHybridCardOAMPump3Temperature OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "Celsius"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The current temperature of the OA Laser Pump 3."
+        ::= { tnAmplifierHybridCardInfoEntry 5 }
+
+    tnAmplifierHybridCardOAMPump4Temperature OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "Celsius"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The current temperature of the OA Laser Pump 4."
+        ::= { tnAmplifierHybridCardInfoEntry 6 }
+
+    tnAmplifierHybridCardOAMPump3Bias OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mA"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The current bias of the OA Laser Pump 3."
+        DEFVAL         { 0 }
+        ::= { tnAmplifierHybridCardInfoEntry 7 }
+
+    tnAmplifierHybridCardOAMPump4Bias OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mA"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The current bias of the OA Laser Pump 4."
+        DEFVAL         { 0 }
+        ::= { tnAmplifierHybridCardInfoEntry 8 }
+
+--------------------------------------------------------------------------------
+-- Amplifier Card Config Scalars
+--------------------------------------------------------------------------------
+    tnAmplifierCardConfigAttributeTotal OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Total number of attributes in
+                        tnAmplifierCardConfigTable."
+        ::= { tnAmplifierCardConfig 1 }
+
+--------------------------------------------------------------------------------
+-- Amplifier Card Config Table
+--------------------------------------------------------------------------------
+    tnAmplifierCardConfigTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnAmplifierCardConfigEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The configurable values on an amplifier card."
+        ::= { tnAmplifierCardConfig 2 }
+
+    tnAmplifierCardConfigEntry OBJECT-TYPE
+        SYNTAX         TnAmplifierCardConfigEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { tnShelfIndex,
+                tnSlotIndex }
+        ::= { tnAmplifierCardConfigTable 1 }
+
+    TnAmplifierCardConfigEntry ::= SEQUENCE {
+        tnAmplifierCardOptIntDetection                INTEGER,
+        tnAmplifierCardOptIntBaseline                 Integer32,
+        tnAmplifierCardOptIntLossThreshold            Integer32,
+        tnAmplifierCardOptIntPollPeriod               Integer32,
+        tnAmplifierCardOptIntClearAlarm               TnCommand,
+        tnAmplifierCardAsonAddDropPlannedForOps       TruthValue,
+        tnAmplifierCardUsage                          INTEGER,
+        tnAmplifierCardAsonAddDropPlannedForOpsLBand  TruthValue,
+        tnAmplifierCardOptIntAson                     INTEGER
+     }
+
+    tnAmplifierCardOptIntDetection OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         on(1),
+                         off(2)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The status of the Optical Intrusion detection
+                        feature."
+        DEFVAL         { off }
+        ::= { tnAmplifierCardConfigEntry 1 }
+
+    tnAmplifierCardOptIntBaseline OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mBm"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The optical intrusion baseline value, with -100
+                        means no value has been set.
+
+                        Current configurable range: -100, 100 to 5000."
+        DEFVAL         { -100 }
+        ::= { tnAmplifierCardConfigEntry 2 }
+
+    tnAmplifierCardOptIntLossThreshold OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mBm"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The optical intrusion loss threshold value.
+
+                        Current configurable range: 100 to 500."
+        DEFVAL         { 150 }
+        ::= { tnAmplifierCardConfigEntry 3 }
+
+    tnAmplifierCardOptIntPollPeriod OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "seconds"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The optical intrusion poll period.
+
+                        Current configurable range: 20 to 120."
+        DEFVAL         { 30 }
+        ::= { tnAmplifierCardConfigEntry 4 }
+
+    tnAmplifierCardOptIntClearAlarm OBJECT-TYPE
+        SYNTAX         TnCommand
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Clears optical intrusion alarm."
+        DEFVAL         { noCmd }
+        ::= { tnAmplifierCardConfigEntry 5 }
+
+    tnAmplifierCardAsonAddDropPlannedForOps OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Used for ASON nodes running GMRE.  The value
+                        indicates if an LD defining the add/drop block
+                        has been planned to accept OPSA OCH protected
+                        services."
+        DEFVAL         { false }
+        ::= { tnAmplifierCardConfigEntry 6 }
+
+    tnAmplifierCardUsage OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         line(1),
+                         standAlone(2),
+                         addDrop(3)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { line }
+        ::= { tnAmplifierCardConfigEntry 7 }
+
+    tnAmplifierCardAsonAddDropPlannedForOpsLBand OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "L Band. Used for ASON nodes running GMRE.  The value
+                        indicates if an LD defining the add/drop block has
+                        been planned to accept OPSA OCH protected services."
+        DEFVAL         { false }
+        ::= { tnAmplifierCardConfigEntry 8 }
+
+    tnAmplifierCardOptIntAson OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         on(1),
+                         off(2)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Enables or disables ason monitoring of the optical
+                        instrusion monitoring.
+                        on  - enables ASON monitoring
+                        off - disables ASON monitoring."
+        DEFVAL         { on }
+        ::= { tnAmplifierCardConfigEntry 9 }
+
+--------------------------------------------------------------------------------
+-- Mesh Amplifier Card Config Scalars
+--------------------------------------------------------------------------------
+    tnAmplifierMeshCardConfigAttributeTotal OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Total number of attributes in
+                        tnAmplifierMeshCardConfigTable."
+        ::= { tnAmplifierCardConfig 3 }
+
+--------------------------------------------------------------------------------
+-- Mesh Amplifier Card Config Table
+--------------------------------------------------------------------------------
+    tnAmplifierMeshCardConfigTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnAmplifierMeshCardConfigEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The provisioned parameters on an amplifier
+                        module in a mesh card."
+        ::= { tnAmplifierCardConfig 4 }
+
+    tnAmplifierMeshCardConfigEntry OBJECT-TYPE
+        SYNTAX         TnAmplifierMeshCardConfigEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { tnShelfIndex,
+                tnSlotIndex }
+        ::= { tnAmplifierMeshCardConfigTable 1 }
+
+    TnAmplifierMeshCardConfigEntry ::= SEQUENCE {
+        tnAmplifierMeshCardPowerGain           Unsigned32,
+        tnAmplifierMeshCardPowerGainMin        Unsigned32,
+        tnAmplifierMeshCardPowerGainMax        Unsigned32,
+        tnAmplifierMeshCardTargetTilt          Integer32,
+        tnAmplifierMeshCardVoaSet              Unsigned32,
+        tnAmplifierMeshCardCommonEgressPower   Integer32
+    }
+
+    tnAmplifierMeshCardPowerGain OBJECT-TYPE
+        SYNTAX         Unsigned32 (700..2400)
+        UNITS          "mB"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The following description applies to the output
+                        port of the amplifier module in the mesh card:
+
+                        Current configurable range:
+
+                        MESH4:  700 to 2400."
+        DEFVAL         { 700 }
+        ::= { tnAmplifierMeshCardConfigEntry 1 }
+
+    tnAmplifierMeshCardPowerGainMin OBJECT-TYPE
+        SYNTAX         Unsigned32 (700..2400)
+        UNITS          "mB"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The following description applies to the output
+                        port of the amplifier module in the mesh card:
+
+                        This value is used by power management.
+
+                        Current configurable range:
+
+                        MESH4:  700 to 2400."
+        DEFVAL         { 700 }
+        ::= { tnAmplifierMeshCardConfigEntry 2 }
+
+    tnAmplifierMeshCardPowerGainMax OBJECT-TYPE
+        SYNTAX         Unsigned32 (700..2400)
+        UNITS          "mB"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The following description applies to the output
+                        port of the amplifier module in the mesh card:
+
+                        This value is used by power management.
+
+                        Current configurable range:
+
+                        MESH4:  700 to 2400."
+        DEFVAL         { 2400 }
+        ::= { tnAmplifierMeshCardConfigEntry 3 }
+
+    tnAmplifierMeshCardTargetTilt OBJECT-TYPE
+        SYNTAX         Integer32 (-400..400)
+        UNITS          "mB"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The following description applies to the output
+                        port of the amplifier module in the mesh card:
+
+                        EPT - Tilt.
+
+                        Current configurable range:
+
+                        MESH4:  -400 to 400."
+        DEFVAL         { 0 }
+        ::= { tnAmplifierMeshCardConfigEntry 4 }
+
+    tnAmplifierMeshCardVoaSet OBJECT-TYPE
+        SYNTAX         Unsigned32 (0..1800)
+        UNITS          "mBm"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The following description applies to the output
+                        port of the amplifier module in the mesh card:
+
+                        Current configurable range:
+
+                        MESH4:  0 to 1800."
+        DEFVAL         { 0 }
+        ::= { tnAmplifierMeshCardConfigEntry 5 }
+
+    tnAmplifierMeshCardCommonEgressPower OBJECT-TYPE
+        SYNTAX         Integer32 (-1000..1000)
+        UNITS          "mBm"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Common Egress Power.  This is the per channel
+                        default egress power
+
+                        Current configurable range:
+
+                        MESH4: -1000 to 1000."
+        DEFVAL         { 100 }
+        ::= { tnAmplifierMeshCardConfigEntry 6 }
+
+--------------------------------------------------------------------------------
+-- Conformance Group Definitions
+--------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------
+-- Conformance Amplifier Port Config Group Definitions
+--------------------------------------------------------------------------------
+    tnAmplifierPortConfigScalarsGroup OBJECT-GROUP
+        OBJECTS {
+            tnAmplifierPortConfigAttributeTotal
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnAmplifierPortConfigGroups 1 }
+
+    tnAmplifierPortConfigGroup OBJECT-GROUP
+        OBJECTS {
+            tnAmplifierPortPowerGain,
+            tnAmplifierPortPowerGainMin,
+            tnAmplifierPortPowerGainMax,
+            tnAmplifierPortPowerGainBackoff,
+            tnAmplifierPortEnable,
+            tnAmplifierPortAutoReEnableMode,
+--            obsolete
+--            tnAmplifierPortAutoReEnableBackoffTime,
+            tnAmplifierPortPowerSpanRepairMargin,
+            tnAmplifierPortPowerDeltaMax,
+            tnAmplifierPortTargetTilt,
+            tnAmplifierPortFunction,
+            tnAmplifierPortAprDisable,
+            tnAmplifierPortSRSTiltACoeffDCM,
+            tnAmplifierPortMaxFlatGainOffset,
+            tnAmplifierPortGainTilt,
+            tnAmplifierPortAprHoldOffTime,
+            tnAmplifierPortLosMode,
+            tnAmplifierPortSignalFailThreshold,
+            tnAmplifierPortSignalDegradeThreshold,
+            tnAmplifierPortVoaSet,
+            tnAmplifierPortGainRange,
+            tnAmplifierPortAprMode,
+            tnAmplifierPortOperatingMode,
+            tnAmplifierPortSignalPowerTarget,
+            tnAmplifierPortPowerGainL,
+            tnAmplifierPortPowerGainMinL,
+            tnAmplifierPortPowerGainMaxL,
+            tnAmplifierPortPowerDeltaMaxL,
+            tnAmplifierPortGainRangeL,
+            tnAmplifierPortTargetTiltL,
+            tnAmplifierPortVoaSetL,
+            tnAmplifierPortGainTiltL,
+            tnAmplifierPortPowerGainBackoffL,
+            tnAmplifierPortPowerSpanRepairMarginL,
+            tnAmplifierPortOperatingModeL,
+            tnAmplifierPortSignalPowerTargetL,
+            tnAmplifierPortUserSelectedExteriorDcmPresentIn,
+            tnAmplifierPortUserSelectedExteriorDcmPresentOut,
+            tnAmplifierPortBandMode,
+            tnAmplifierPortLosModeL,
+            tnAmplifierPortBoosterTargetPowerIn,
+            tnAmplifierPortAprEDFApulse,
+            tnAmplifierPortLineDcmConnAddress,
+            tnAmplifierPortAPREDFAPulseAttempt,
+            tnAmplifierPortSpanLossTh,
+            tnAmplifierPortAsellLink,
+            tnAmplifierPortTargetPowerWidth,
+            tnAmplifierPortTargetPowerWidthL,
+            tnAmplifierPortAsellLinkL
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnAmplifierPortConfigGroups 2 }
+
+    tnAmplifierHybridPortConfigScalarsGroup OBJECT-GROUP
+        OBJECTS {
+            tnAmplifierHybridPortConfigAttributeTotal
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnAmplifierPortConfigGroups 3 }
+
+    tnAmplifierHybridPortConfigGroup OBJECT-GROUP
+        OBJECTS {
+            tnAmplifierHybridPortVoaAttenuation,
+            tnAmplifierHybridPortInitialMidLoss,
+            tnAmplifierHybridPortInitialAgcTargetGain,
+            tnAmplifierHybridPortVoaMinAttenuation,
+            tnAmplifierHybridPortVoaMaxAttenuation
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnAmplifierPortConfigGroups 4 }
+
+--------------------------------------------------------------------------------
+-- Conformance Amplifier Port Info Group Definitions
+--------------------------------------------------------------------------------
+    tnAmplifierPortInfoScalarsGroup OBJECT-GROUP
+        OBJECTS {
+            tnAmplifierPortInfoAttributeTotal
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnAmplifierPortInfoGroups 1 }
+
+    tnAmplifierPortInfoGroup OBJECT-GROUP
+        OBJECTS {
+            tnAmplifierPortInternalAmpModuleTemperature,
+            tnAmplifierPortPowerIn,
+            tnAmplifierPortPowerOut,
+            tnAmplifierPortSignalPowerOut,
+            tnAmplifierPortInputToOutputGain,
+            tnAmplifierPortDCMInPower,
+            tnAmplifierPortDCMOutPower,
+            tnAmplifierPortActualTilt,
+            tnAmplifierPortWtOcmMonitorPortOut,
+            tnAmplifierPortOSCTxPowerIn,
+            tnAmplifierPortOSCTxPowerOut,
+            tnAmplifierPortTestingActive,
+            tnAmplifierCommonEgressOutputPower,
+            tnAmplifierActOutAtten,
+            tnAmplifierCommonEgressOutputPowerL,
+            tnAmplifierActOutAttenL,
+            tnAmplifierPortActualTiltL,
+            tnAmplifierPortSignalPowerOutL,
+            tnAmplifierPortInputToOutputGainL,
+            tnAmplifierPortOSCTxPowerOutL,
+            tnAmplifierPortPowerInL,
+            tnAmplifierPortInfoOSCRxPowerIn,
+            tnAmplifierPortInfoOSCSfpTxPowerOut,
+            tnAmplifierPortInfoOSCSfpRxPowerIn,
+            tnAmplifierPortBoosterTargetPowerOut,
+            tnAmplifierPortPowerOutL,
+            tnAmplifierPortSpanLoss,
+            tnAmplifierPortAprEDFApulsePower
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnAmplifierPortInfoGroups 2 }
+
+    tnAmplifierMeshPortInfoScalarsGroup OBJECT-GROUP
+        OBJECTS {
+            tnAmplifierMeshPortInfoAttributeTotal
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnAmplifierPortInfoGroups 3 }
+
+    tnAmplifierMeshPortInfoGroup OBJECT-GROUP
+        OBJECTS {
+            tnAmplifierMeshPortPowerOut,
+            tnAmplifierMeshPortSignalPowerOut,
+            tnAmplifierMeshPortInputToOutputGain
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnAmplifierPortInfoGroups 4 }
+
+    tnAmplifierHybridPortInfoScalarsGroup OBJECT-GROUP
+        OBJECTS {
+            tnAmplifierHybridPortInfoAttributeTotal
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnAmplifierPortInfoGroups 5 }
+
+    tnAmplifierHybridPortInfoGroup OBJECT-GROUP
+        OBJECTS {
+            tnAmplifierHybridPortInternalAmpModuleTemperature
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnAmplifierPortInfoGroups 6 }
+
+--------------------------------------------------------------------------------
+-- Conformance Amplifier Card Info Group Definitions
+--------------------------------------------------------------------------------
+    tnAmplifierCardInfoScalarsGroup OBJECT-GROUP
+        OBJECTS {
+            tnAmplifierCardInfoAttributeTotal
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnAmplifierCardInfoGroups 1 }
+
+    tnAmplifierCardInfoGroup OBJECT-GROUP
+        OBJECTS {
+            tnAmplifierCardOAMPump1Temperature,
+            tnAmplifierCardOAMPump2Temperature,
+            tnAmplifierCardOAMPump3Temperature,
+            tnAmplifierCardOAMPump1Bias,
+            tnAmplifierCardOAMPump2Bias,
+            tnAmplifierCardOAMPump3Bias,
+            tnAmplifierCardOptIntSpanLoss,
+            tnAmplifierCardOAMPump4Temperature,
+            tnAmplifierCardOAMPump5Temperature,
+            tnAmplifierCardOAMPump6Temperature,
+            tnAmplifierCardOAMPump4Bias,
+            tnAmplifierCardOAMPump5Bias,
+            tnAmplifierCardOAMPump6Bias,
+            tnAmplifierCardOAMLPump1Temperature,
+            tnAmplifierCardOAMLPump2Temperature,
+            tnAmplifierCardOAMLPump3Temperature,
+            tnAmplifierCardOAMLPump4Temperature,
+            tnAmplifierCardOAMLPump1Bias,
+            tnAmplifierCardOAMLPump2Bias,
+            tnAmplifierCardOAMLPump3Bias,
+            tnAmplifierCardOAMLPump4Bias,
+            tnAmplifierCardOAM1PumpTemperatures,
+            tnAmplifierCardOAM2PumpTemperatures,
+            tnAmplifierCardOAM1PumpBiases,
+            tnAmplifierCardOAM2PumpBiases,
+            tnAmplifierCardOAM3PumpTemperatures,
+            tnAmplifierCardOAM3PumpBiases,
+            tnAmplifierCardOAM1LPumpTemperatures,
+            tnAmplifierCardOAM2LPumpTemperatures,
+            tnAmplifierCardOAM3LPumpTemperatures,
+            tnAmplifierCardOAM1LPumpBiases,
+            tnAmplifierCardOAM2LPumpBiases,
+            tnAmplifierCardOAM3LPumpBiases
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnAmplifierCardInfoGroups 2 }
+
+    tnAmplifierMeshCardInfoScalarsGroup OBJECT-GROUP
+        OBJECTS {
+            tnAmplifierMeshCardInfoAttributeTotal
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnAmplifierCardInfoGroups 3 }
+
+    tnAmplifierMeshCardInfoGroup OBJECT-GROUP
+        OBJECTS {
+            tnAmplifierMeshCardInternalTemperature,
+            tnAmplifierMeshCardPowerIn,
+            tnAmplifierMeshCardPowerOut,
+            tnAmplifierMeshCardSignalPowerOut,
+            tnAmplifierMeshCardInputToOutputGain,
+            tnAmplifierMeshCardGainTilt,
+            tnAmplifierMeshCardActualTilt
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnAmplifierCardInfoGroups 4 }
+
+    tnAmplifierHybridCardInfoScalarsGroup OBJECT-GROUP
+        OBJECTS {
+            tnAmplifierHybridCardInfoAttributeTotal
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnAmplifierCardInfoGroups 5 }
+
+    tnAmplifierHybridCardInfoGroup OBJECT-GROUP
+        OBJECTS {
+            tnAmplifierHybridCardOAMPump1Temperature,
+            tnAmplifierHybridCardOAMPump2Temperature,
+            tnAmplifierHybridCardOAMPump1Bias,
+            tnAmplifierHybridCardOAMPump2Bias,
+            tnAmplifierHybridCardOAMPump3Temperature,
+            tnAmplifierHybridCardOAMPump4Temperature,
+            tnAmplifierHybridCardOAMPump3Bias,
+            tnAmplifierHybridCardOAMPump4Bias
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnAmplifierCardInfoGroups 6 }
+
+--------------------------------------------------------------------------------
+-- Conformance Amplifier Card Config Group Definitions
+--------------------------------------------------------------------------------
+    tnAmplifierCardConfigScalarsGroup OBJECT-GROUP
+        OBJECTS {
+            tnAmplifierCardConfigAttributeTotal
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnAmplifierCardConfigGroups 1 }
+
+    tnAmplifierCardConfigGroup OBJECT-GROUP
+        OBJECTS {
+            tnAmplifierCardOptIntDetection,
+            tnAmplifierCardOptIntBaseline,
+            tnAmplifierCardOptIntLossThreshold,
+            tnAmplifierCardOptIntPollPeriod,
+            tnAmplifierCardOptIntClearAlarm,
+            tnAmplifierCardAsonAddDropPlannedForOps,
+            tnAmplifierCardUsage,
+            tnAmplifierCardAsonAddDropPlannedForOpsLBand,
+            tnAmplifierCardOptIntAson
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnAmplifierCardConfigGroups 2 }
+
+    tnAmplifierMeshCardConfigScalarsGroup OBJECT-GROUP
+        OBJECTS {
+            tnAmplifierMeshCardConfigAttributeTotal
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnAmplifierCardConfigGroups 3 }
+
+    tnAmplifierMeshCardConfigGroup OBJECT-GROUP
+        OBJECTS {
+            tnAmplifierMeshCardPowerGain,
+            tnAmplifierMeshCardPowerGainMin,
+            tnAmplifierMeshCardPowerGainMax,
+            tnAmplifierMeshCardTargetTilt,
+            tnAmplifierMeshCardVoaSet,
+            tnAmplifierMeshCardCommonEgressPower
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnAmplifierCardConfigGroups 4 }
+
+--------------------------------------------------------------------------------
+-- Compliance Statements (mandatory)
+--------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------
+-- Compliance Port Config Statements (mandatory)
+--------------------------------------------------------------------------------
+    tnAmplifierPortConfigCompliance MODULE-COMPLIANCE
+        STATUS         current
+        DESCRIPTION    "."
+        MODULE
+        MANDATORY-GROUPS  {
+            tnAmplifierPortConfigScalarsGroup,
+            tnAmplifierPortConfigGroup,
+            tnAmplifierHybridPortConfigScalarsGroup,
+            tnAmplifierHybridPortConfigGroup
+        }
+        ::= { tnAmplifierPortConfigCompliances 1 }
+
+--------------------------------------------------------------------------------
+-- Compliance Port Info Statements (mandatory)
+--------------------------------------------------------------------------------
+    tnAmplifierPortInfoCompliance MODULE-COMPLIANCE
+        STATUS         current
+        DESCRIPTION    "."
+        MODULE
+        MANDATORY-GROUPS  {
+            tnAmplifierPortInfoScalarsGroup,
+            tnAmplifierPortInfoGroup,
+            tnAmplifierMeshPortInfoScalarsGroup,
+            tnAmplifierMeshPortInfoGroup,
+            tnAmplifierHybridPortInfoScalarsGroup,
+            tnAmplifierHybridPortInfoGroup
+        }
+        ::= { tnAmplifierPortInfoCompliances 1 }
+
+--------------------------------------------------------------------------------
+-- Compliance Card Info Statements (mandatory)
+--------------------------------------------------------------------------------
+    tnAmplifierCardInfoCompliance MODULE-COMPLIANCE
+        STATUS         current
+        DESCRIPTION    "."
+        MODULE
+        MANDATORY-GROUPS  {
+            tnAmplifierCardInfoScalarsGroup,
+            tnAmplifierCardInfoGroup,
+            tnAmplifierMeshCardInfoScalarsGroup,
+            tnAmplifierMeshCardInfoGroup,
+            tnAmplifierHybridCardInfoScalarsGroup,
+            tnAmplifierHybridCardInfoGroup
+        }
+        ::= { tnAmplifierCardInfoCompliances 1 }
+
+--------------------------------------------------------------------------------
+-- Compliance Card Config Statements (mandatory)
+--------------------------------------------------------------------------------
+    tnAmplifierCardConfigCompliance MODULE-COMPLIANCE
+        STATUS         current
+        DESCRIPTION    "."
+        MODULE
+        MANDATORY-GROUPS  {
+            tnAmplifierCardConfigScalarsGroup,
+            tnAmplifierCardConfigGroup,
+            tnAmplifierMeshCardConfigScalarsGroup,
+            tnAmplifierMeshCardConfigGroup
+        }
+        ::= { tnAmplifierCardConfigCompliances 1 }
+
+END -- DEFINITION OF TROPIC-AMPLIFIER-MIB

@@ -1,0 +1,674 @@
+TROPIC-USERMGMT-MIB DEFINITIONS ::= BEGIN
+
+-- (c) Copyright 2023 Nokia Networks.  All rights reserved.
+-- This software is the confidential and proprietary property of
+-- Nokia and may only be used in accordance with the terms of the
+-- license agreement provided with this software.
+
+IMPORTS
+      SnmpAdminString                         FROM SNMP-FRAMEWORK-MIB
+      OBJECT-TYPE, MODULE-IDENTITY,
+      Unsigned32                              FROM SNMPv2-SMI
+      MODULE-COMPLIANCE, OBJECT-GROUP         FROM SNMPv2-CONF
+      RowStatus, TruthValue                   FROM SNMPv2-TC
+      tnSystemModules, tnUserMgmtMIB          FROM TROPIC-GLOBAL-REG
+      AluWdmEnabledDisabled                   FROM TROPIC-TC;
+
+  tnUserMgmtMibModule MODULE-IDENTITY
+      LAST-UPDATED    "202209231200Z"
+      ORGANIZATION    "Nokia"
+      CONTACT-INFO    "Nokia
+                       Attn: Jeff Donnelly
+                       600 Mountain Avenue
+                       New Providence, NJ 07974
+
+                       Phone: +1 732 221 6408
+                       Email: jeff.donnelly@nokia.com"
+
+      DESCRIPTION "The user management MIB."
+
+      REVISION    "202209231200Z"
+      DESCRIPTION "Added the following to tnUserTable:
+                   tnUserPasswordForce."
+
+      REVISION    "202207081200Z"
+      DESCRIPTION "Added the following to tnUserTable:
+                   tnUserMaxSession."
+
+      REVISION    "202206101200Z"
+      DESCRIPTION "Added the following scalar to tnUserMgmtGlobal:
+                   tnUserMgmtSysHistorySize."
+
+      REVISION    "202205201200Z"
+      DESCRIPTION "Added the following scalar to tnUserMgmtGlobal:
+                   tnUserMgmtSysChangePasswordOnFirstLogin."
+
+      REVISION    "202203041200Z"
+      DESCRIPTION "Added the following to tnUserTable:
+                   tnUserToolsLinux."
+
+      REVISION    "202012041200Z"
+      DESCRIPTION "Changed SYNTAX of the following from SIZE(1..32) to SIZE(1..64):
+                   tnUserName."
+
+      REVISION    "201802231200Z"
+      DESCRIPTION "Updated the contact info."
+
+      REVISION    "201801121200Z"
+      DESCRIPTION "Changed default value of the following from 1 to 0:
+                   tnUserMgmtSysMaxSession."
+
+      REVISION    "201712151200Z"
+      DESCRIPTION "Added the following scalar to tnUserMgmtGlobal:
+                   tnUserMgmtSysMaxSession."
+
+      REVISION    "201611161200Z"
+      DESCRIPTION "Updated the contact info."
+
+      REVISION    "201606011200Z"
+      DESCRIPTION "1) Added the following to tnUserTable:
+                      tnUserPasswordAging.
+                   2) Updated the description of tnUserPasswordAge."
+
+      REVISION    "201505261200Z"
+      DESCRIPTION "Updated the description of tnUserSessionTimeout and
+                   tnUserMgmtSysSessionTimeOut"
+
+      REVISION    "201305211200Z"
+      DESCRIPTION "Marked the following as obsolete:
+                   tnUserMgmtEvents."
+
+      REVISION    "201304191200Z"
+      DESCRIPTION "Added the following to tnUserAccessLevel:
+                   crypto(6)."
+
+      REVISION    "201108121200Z"
+      DESCRIPTION "Updated description of tnUserPassword."
+
+      REVISION    "201106151200Z"
+      DESCRIPTION "Added DEFVAL for the following attribute:
+                   tnUserSessionTimeout, 15."
+
+      REVISION    "201010281200Z"
+      DESCRIPTION "1) Updated the range of tnUserMgmtSysMinPasswordLength
+                      from (6, 24) to (8, 32) and the default value from
+                      6 to 8.
+                   2) Added default value of 32 for
+                      tnUserMgmtSysMaxPasswordLength."
+
+      REVISION    "200907071200Z"
+      DESCRIPTION "Removed tnUserSessionOwner."
+
+      REVISION    "200907031200Z"
+      DESCRIPTION "1) Changed MAX-ACCESS of tnUserSessionId to not-accessible.
+                   2) Removed tnUserSessionId from tnUserSessionGroup."
+
+      REVISION    "200906121200Z"
+      DESCRIPTION "Renamed tnUserGlobalGroup to tnUserMgmtGlobalGroup."
+
+      REVISION    "200906111200Z"
+      DESCRIPTION "Added tnUserMgmtSysPasswordObsolescenceInterval
+                   to tnUserGlobalGroup definition."
+
+      REVISION    "200906091200Z"
+      DESCRIPTION "Changed MIB scalars from read-create to read-write."
+
+      REVISION    "200906071200Z"
+      DESCRIPTION "Added tnUserMgmtSysPasswordObsolescenceInterval."
+
+      REVISION    "200906041200Z"
+      DESCRIPTION "1) Updated description of security MIB attributes
+                      with range to include 0 and its meaning, if
+                      applicable.
+                   2) Added DEFVAL to the attribute definitions, if
+                      applicable."
+
+      REVISION    "200905301200Z"
+      DESCRIPTION "Updated description of tnUserNumberOfFailedLogins
+                   to be dependent on tnUserMgmtSysSessionFailedMaxLogins."
+
+      REVISION    "200905271200Z"
+      DESCRIPTION "Changed description of tnUserMgmtSysMaxPasswordLength
+                   to be non-configurable for 1830."
+
+      REVISION    "200905061200Z"
+      DESCRIPTION "Updated MIB descriptions."
+
+      REVISION    "200905051200Z"
+      DESCRIPTION "Added more information in MIB descriptions."
+
+      REVISION    "200904301200Z"
+      DESCRIPTION "1) Moved security related MIB attributes from
+                      tnSysBasics (TROPIC-SYSTEM-MIB) to
+                      tnUserMgmtGlobal.
+                   2) Added MIB attributes for password aging for
+                      system and user levels."
+
+      REVISION    "200904071200Z"
+      DESCRIPTION "Added tnUserSessionTable."
+
+      REVISION    "200804111200Z"
+      DESCRIPTION "1) Updated the MIB description.
+                   2) Added the session timeout to tnUserTable."
+
+      ::= { tnSystemModules 8 }
+
+  tnUserMgmtConf        OBJECT IDENTIFIER ::= { tnUserMgmtMIB 1 }
+  tnUserMgmtGroups      OBJECT IDENTIFIER ::= { tnUserMgmtConf 1 }
+  tnUserMgmtCompliances OBJECT IDENTIFIER ::= { tnUserMgmtConf 2 }
+  tnUserMgmtObjs        OBJECT IDENTIFIER ::= { tnUserMgmtMIB 2 }
+  tnUserMgmtBasics      OBJECT IDENTIFIER ::= { tnUserMgmtObjs 1 }
+  tnUserMgmtGlobal      OBJECT IDENTIFIER ::= { tnUserMgmtObjs 2 }
+--  obsolete
+--  tnUserMgmtEvents      OBJECT IDENTIFIER ::= { tnUserMgmtMIB 3 }
+
+--------------------------------------------------------------------------------
+-- User Table
+--------------------------------------------------------------------------------
+    tnUserTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnUserEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnUserMgmtBasics 1 }
+
+    tnUserEntry OBJECT-TYPE
+        SYNTAX         TnUserEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { tnUserName }
+        ::= { tnUserTable 1 }
+
+    TnUserEntry ::=
+        SEQUENCE {
+            tnUserName                           SnmpAdminString,
+            tnUserRowStatus                      RowStatus,
+            tnUserAccessLevel                    INTEGER,
+            tnUserPassword                       SnmpAdminString,
+            tnUserLastLoginDateAndTime           Unsigned32,
+            tnUserLastLoginTerminalIP            SnmpAdminString,
+            tnUserNumberOfFailedLogins           Unsigned32,
+            tnUserSessionTimeout                 Unsigned32,
+            tnUserLastPasswordChangeDateAndTime  Unsigned32,
+            tnUserPasswordAge                    Unsigned32,
+            tnUserPasswordGraceInterval          Unsigned32,
+            tnUserPasswordGraceLogins            Unsigned32,
+            tnUserPasswordAging                  Unsigned32,
+            tnUserToolsLinux                     AluWdmEnabledDisabled,
+            tnUserMaxSession                     Unsigned32,
+            tnUserPasswordForce                  TruthValue
+        }
+
+    tnUserName OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(1..64))
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The user name."
+        ::= { tnUserEntry 1 }
+
+    tnUserRowStatus OBJECT-TYPE
+        SYNTAX         RowStatus
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Supported values:
+
+                        Gets:
+                          notInService  - the user is disabled.
+                          active        - the user is active.
+
+                        Sets:
+                          createAndGo   - the user is created and active (row status
+                                          becomes active), the access level and
+                                          password must be included in the set PDU.
+                          createAndWait - the user is created and disabled (goes to
+                                          notInService), the access level and
+                                          password must be included in the set PDU.
+                          notInService  - the user is disabled.
+                          active        - the user is active.
+                          destroy       - the user is deleted."
+        ::= { tnUserEntry 2 }
+
+    tnUserAccessLevel OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         unknown(1),
+                         administrator(2),
+                         provisioner(3),
+                         observer(4),
+                         service(5),
+                         crypto(6)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The access level may be set to admin, provisioner,
+                        crypto, or observer.  Sets with a value of service
+                        are restricted.  This attribute may be set with
+                        any of the supported row status values, except
+                        destroy."
+        ::= { tnUserEntry 3 }
+
+    tnUserPassword OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(1..40))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "When read, this attribute will return an empty
+                        string.  This attribute may be set with any of the
+                        supported row status values, except destroy.
+                        The value to be set must be hashed, not clear
+                        text.  When read, this attribute will return
+                        '********'."
+        ::= { tnUserEntry 4 }
+
+    tnUserLastLoginDateAndTime OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The last user login time measured in total time
+                        ticks (seconds) from the year 1970."
+        ::= { tnUserEntry 5 }
+
+    tnUserLastLoginTerminalIP OBJECT-TYPE
+        SYNTAX         SnmpAdminString
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The last user login terminal IP address."
+        ::= { tnUserEntry 6 }
+
+    tnUserNumberOfFailedLogins OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The number of failed logins for the user.
+                        This number is reset by a successful login.
+                        tnUserMgmtSysSessionFailedMaxLogins failed
+                        logins will put this user entry in the
+                        notInService row state."
+        ::= { tnUserEntry 7 }
+
+    tnUserSessionTimeout OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The session timeout in minutes for the user.
+                        0 means use the system-level setting,
+                        defined in tnUserMgmtSysSessionTimeOut.
+
+                        Current configurable range: 0 to 999"
+        DEFVAL         { 0 }
+        ::= { tnUserEntry 8 }
+
+    tnUserLastPasswordChangeDateAndTime OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Date and time of the last password change."
+        ::= { tnUserEntry 9 }
+
+    tnUserPasswordAge OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The password age from last time the user session login in
+                        days.  0 means that password be changed next time.."
+        ::= { tnUserEntry 10 }
+
+    tnUserPasswordGraceInterval OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Password aging grace threshold for the
+                        user session in days.  0 mean no limit in
+                        grace period.
+
+                        Range: 0 to 999."
+        ::= { tnUserEntry 11 }
+
+    tnUserPasswordGraceLogins OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Password aging grace logins threshold for
+                        the user session, in number of times allowed.
+                        0 means no limit on the number of logins after
+                        password has expired.
+
+                        Range: 0 to 999."
+        ::= { tnUserEntry 12 }
+
+    tnUserPasswordAging OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Password Aging in days.  0 means that password
+                        will never expire.
+
+                        Current configurable range: 0 to 999."
+        ::= { tnUserEntry 13 }
+
+    tnUserToolsLinux OBJECT-TYPE
+        SYNTAX         AluWdmEnabledDisabled
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Tools Linux command.
+                        enabled  - allow this user to execute the tools Linux
+                                   command
+                        disabled - prevent this user from executing the tools
+                                   Linux command."
+        ::= { tnUserEntry 14 }
+
+    tnUserMaxSession OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The maximum number of sessions configurable for the user.
+                        0 - No maximum number of sessions for the user."
+        ::= { tnUserEntry 15 }
+
+    tnUserPasswordForce OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnUserEntry 16 }
+
+--------------------------------------------------------------------------------
+-- User Session Table
+--------------------------------------------------------------------------------
+    tnUserSessionTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnUserSessionEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnUserMgmtBasics 2 }
+
+    tnUserSessionEntry OBJECT-TYPE
+        SYNTAX         TnUserSessionEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { tnUserSessionId }
+        ::= { tnUserSessionTable 1 }
+
+    TnUserSessionEntry ::=
+        SEQUENCE {
+            tnUserSessionId               Unsigned32,
+            tnUserSessionUserType         INTEGER,
+            tnUserSessionUserName         SnmpAdminString,
+            tnUserSessionTerminal         SnmpAdminString,
+            tnUserSessionLoginTime        Unsigned32
+        }
+
+    tnUserSessionId OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "Session ID."
+        ::= { tnUserSessionEntry 1 }
+
+    tnUserSessionUserType OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         unknown(1),
+                         cliTelnet(2),
+                         cliSsh(3),
+                         cliConsloe(4),
+                         webui(5),
+                         webuiSecure(6),
+                         tl1Raw(7),
+                         tl1Telnet(8),
+                         tl1Ssh(9),
+                         snmp(10)
+                       }
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Session user type."
+        ::= { tnUserSessionEntry 2 }
+
+    tnUserSessionUserName OBJECT-TYPE
+        SYNTAX         SnmpAdminString
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Session user name."
+        ::= { tnUserSessionEntry 3 }
+
+    tnUserSessionTerminal OBJECT-TYPE
+        SYNTAX         SnmpAdminString
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Session terminal."
+        ::= { tnUserSessionEntry 4 }
+
+    tnUserSessionLoginTime OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Session login time."
+        ::= { tnUserSessionEntry 5 }
+
+--------------------------------------------------------------------------------
+-- User Management Globals
+--------------------------------------------------------------------------------
+    tnUserMgmtSysMinPasswordLength OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-write
+        STATUS         current
+        DESCRIPTION    "Minimum password length.
+
+                        Current configurable range: 8 to 32."
+        DEFVAL         { 8 }
+        ::= { tnUserMgmtGlobal 1 }
+
+    tnUserMgmtSysMaxPasswordLength OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-write
+        STATUS         current
+        DESCRIPTION    "Maximum password length.  This attribute is
+                        not configurable in 1830."
+        DEFVAL         { 32 }
+        ::= { tnUserMgmtGlobal 2 }
+
+    tnUserMgmtSysSessionTimeOut OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-write
+        STATUS         current
+        DESCRIPTION    "System session timeout in minutes.
+                        0 means use the account type default, as follows:
+
+                        Observer: 60 minutes
+                        Provisioner: 45 minutes
+                        Admin: 30 minutes
+                        Crypto: 45 minutes
+                        Service: 15 minutes
+
+                        Current configurable range: 0 to 999."
+        DEFVAL         { 60 }
+        ::= { tnUserMgmtGlobal 3 }
+
+    tnUserMgmtSysSessionFailedMaxLogins OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-write
+        STATUS         current
+        DESCRIPTION    "Maximum failed logins allowed.  0 means
+                        disabled.
+
+                        Current configurable range: 0 to 15."
+        DEFVAL         { 3 }
+        ::= { tnUserMgmtGlobal 4 }
+
+    tnUserMgmtSysLoginInactivityTimeOut OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-write
+        STATUS         current
+        DESCRIPTION    "Maximum interval that the User is inactive,
+                        without login to the NE, before that user is
+                        disabled in days.  That is, the number of
+                        days left before UID expiration.  0 indicates
+                        that the user account is disabled.
+
+                        Current configurable range: 0 to 999."
+        DEFVAL         { 60 }
+        ::= { tnUserMgmtGlobal 5 }
+
+    tnUserMgmtSysMinIntervalInvalidLogin OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-write
+        STATUS         current
+        DESCRIPTION    "Minimum interval between invalid login attempts,
+                        in seconds.  0 indicates that user account is
+                        disabled.
+
+                        Current configurable range: 0 to 60."
+        DEFVAL         { 4 }
+        ::= { tnUserMgmtGlobal 6 }
+
+    tnUserMgmtSysSessionLogoff OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-write
+        STATUS         current
+        DESCRIPTION    "Session ID to be logged off.  After user session
+                        is logged off, this is reset to 0."
+        ::= { tnUserMgmtGlobal 7 }
+
+    tnUserMgmtSysPasswordAging OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-write
+        STATUS         current
+        DESCRIPTION    "Password Aging in days.  0 means that password
+                        will never expire.
+
+                        Current configurable range: 0 to 999."
+        DEFVAL         { 30 }
+        ::= { tnUserMgmtGlobal 8 }
+
+    tnUserMgmtSysPasswordAgingGraceInterval OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-write
+        STATUS         current
+        DESCRIPTION    "Password aging grace threshold in days.  0 means
+                        no limit in grace period.
+
+                        Current configurable range: 0 to 999."
+        DEFVAL         { 7 }
+        ::= { tnUserMgmtGlobal 9 }
+
+    tnUserMgmtSysPasswordAgingGraceLogins OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-write
+        STATUS         current
+        DESCRIPTION    "Password aging grace logins threshold in number
+                        of times allowed.  0 means no limit on the number
+                        of logins after password has expired.
+
+                        Current configurable range: 0 to 999."
+        DEFVAL         { 3 }
+        ::= { tnUserMgmtGlobal 10 }
+
+    tnUserMgmtSysPasswordObsolescenceInterval OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-write
+        STATUS         current
+        DESCRIPTION    "Minimum time interval, in days, that is required
+                        if the user wishes to use a password that was
+                        already used.  0 means this capability is
+                        disabled.
+
+                        Current configurable range: 0 to 999."
+        DEFVAL         { 180 }
+        ::= { tnUserMgmtGlobal 11 }
+
+    tnUserMgmtSysMaxSession OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-write
+        STATUS         current
+        DESCRIPTION    "The maximum session number configurable from range: 0 to 10.
+                        0 - Disable the maximum session configuration."
+        DEFVAL         { 0 }
+        ::= { tnUserMgmtGlobal 12 }
+
+    tnUserMgmtSysChangePasswordOnFirstLogin OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-write
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnUserMgmtGlobal 13 }
+
+    tnUserMgmtSysHistorySize OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-write
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { 10 }
+        ::= { tnUserMgmtGlobal 14 }
+
+--------------------------------------------------------------------------------
+-- Conformance Group Definitions
+--------------------------------------------------------------------------------
+    tnUserGroup OBJECT-GROUP
+        OBJECTS {
+            tnUserRowStatus,
+            tnUserAccessLevel,
+            tnUserPassword,
+            tnUserLastLoginDateAndTime,
+            tnUserLastLoginTerminalIP,
+            tnUserNumberOfFailedLogins,
+            tnUserSessionTimeout,
+            tnUserLastPasswordChangeDateAndTime,
+            tnUserPasswordAge,
+            tnUserPasswordGraceInterval,
+            tnUserPasswordGraceLogins,
+            tnUserPasswordAging,
+            tnUserToolsLinux,
+            tnUserMaxSession,
+            tnUserPasswordForce
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnUserMgmtGroups 1 }
+
+    tnUserSessionGroup OBJECT-GROUP
+        OBJECTS {
+            tnUserSessionUserType,
+            tnUserSessionUserName,
+            tnUserSessionTerminal,
+            tnUserSessionLoginTime
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnUserMgmtGroups 2 }
+
+    tnUserMgmtGlobalGroup  OBJECT-GROUP
+        OBJECTS {
+            tnUserMgmtSysMinPasswordLength,
+            tnUserMgmtSysMaxPasswordLength,
+            tnUserMgmtSysSessionTimeOut,
+            tnUserMgmtSysSessionFailedMaxLogins,
+            tnUserMgmtSysLoginInactivityTimeOut,
+            tnUserMgmtSysMinIntervalInvalidLogin,
+            tnUserMgmtSysSessionLogoff,
+            tnUserMgmtSysPasswordAging,
+            tnUserMgmtSysPasswordAgingGraceInterval,
+            tnUserMgmtSysPasswordAgingGraceLogins,
+            tnUserMgmtSysPasswordObsolescenceInterval,
+            tnUserMgmtSysMaxSession,
+            tnUserMgmtSysChangePasswordOnFirstLogin,
+            tnUserMgmtSysHistorySize
+        }
+        STATUS         current
+        DESCRIPTION    "A collection of objects providing user global
+                        variables."
+        ::= { tnUserMgmtGroups 3 }
+
+--------------------------------------------------------------------------------
+-- Compliance Statements (mandatory)
+--------------------------------------------------------------------------------
+    tnUserMgmtCompliance MODULE-COMPLIANCE
+        STATUS         current
+        DESCRIPTION    "."
+        MODULE
+        MANDATORY-GROUPS {
+            tnUserGroup,
+            tnUserSessionGroup,
+            tnUserMgmtGlobalGroup
+        }
+        ::= { tnUserMgmtCompliances 1 }
+
+END -- DEFINITION OF TROPIC-USERMGMT-MIB

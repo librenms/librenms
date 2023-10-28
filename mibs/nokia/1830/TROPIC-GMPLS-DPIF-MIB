@@ -1,0 +1,614 @@
+TROPIC-GMPLS-DPIF-MIB DEFINITIONS ::= BEGIN
+
+-- (c) Copyright 2023 Nokia Networks.  All rights reserved.
+-- This software is the confidential and proprietary property of
+-- Nokia and may only be used in accordance with the terms of the
+-- license agreement provided with this software.
+
+IMPORTS
+      MODULE-IDENTITY, OBJECT-TYPE,
+      Unsigned32, Integer32                   FROM SNMPv2-SMI
+      MODULE-COMPLIANCE, OBJECT-GROUP         FROM SNMPv2-CONF
+      TruthValue,
+      RowStatus,
+      DisplayString                           FROM SNMPv2-TC
+      InetAddressIPv4                         FROM INET-ADDRESS-MIB
+      tnGmplsMIBModules, tnGmplsObjs          FROM TROPIC-GLOBAL-REG;
+
+  tnGmplsDpifMibModule MODULE-IDENTITY
+      LAST-UPDATED    "201802231200Z"
+      ORGANIZATION    "Nokia"
+      CONTACT-INFO    "Nokia
+                       Attn: Jeff Donnelly
+                       600 Mountain Avenue
+                       New Providence, NJ 07974
+
+                       Phone: +1 732 221 6408
+                       Email: jeff.donnelly@nokia.com"
+
+      DESCRIPTION     "GMPLS Data Plane Interface MIB types."
+
+      REVISION        "201802231200Z"
+      DESCRIPTION     "Updated the contact info."
+
+      REVISION        "201707071200Z"
+      DESCRIPTION     "Fixed MIB compile issues."
+
+      REVISION        "201611161200Z"
+      DESCRIPTION     "Updated the contact info."
+
+      REVISION        "201306271200Z"
+      DESCRIPTION     "Initial version."
+
+      ::= { tnGmplsMIBModules 2 }
+
+---------------------------------------------------------------------------
+-- Top level components of this MIB
+---------------------------------------------------------------------------
+  tnGmplsDpifMIB            OBJECT IDENTIFIER ::= { tnGmplsObjs 2 }
+
+-- tables, scalars
+  tnGmplsDpifObjs           OBJECT IDENTIFIER ::= { tnGmplsDpifMIB 1 }
+
+-- traps
+--  tnGmplsDpifNotifications  OBJECT IDENTIFIER ::= { tnGmplsDpifMIB 2 }
+--  tnGmplsDpifNotifyPrefix   OBJECT IDENTIFIER ::= { tnGmplsDpifNotifications 0 }
+
+  tnGmplsDpifConf           OBJECT IDENTIFIER ::= { tnGmplsDpifMIB 3 }
+  tnGmplsDpifGroups         OBJECT IDENTIFIER ::= { tnGmplsDpifConf 1 }
+  tnGmplsDpifCompliances    OBJECT IDENTIFIER ::= { tnGmplsDpifConf 2 }
+
+--------------------------------------------------------------------------------
+-- GMPLS DPIF Scalar
+--------------------------------------------------------------------------------
+    tnGmplsDpifAttributeTotal OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Total number of attributes in this MIB file."
+        ::= { tnGmplsDpifObjs 1 }
+
+---------------------------------------------------------------------------
+-- GMPLS DataBearer Link Table
+---------------------------------------------------------------------------
+    tnGmplsDBLinkTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnGmplsDBLinkEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The GMPLS DataBearer Link Table."
+        ::= { tnGmplsDpifObjs 2 }
+
+    tnGmplsDBLinkEntry OBJECT-TYPE
+        SYNTAX         TnGmplsDBLinkEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "An entry in this table represents an GMPLS Label
+                        Switched Path (LSP)."
+        REFERENCE      "?"
+        INDEX          { tnGmplsDBLinkIfId }
+        ::= { tnGmplsDBLinkTable 1 }
+
+    TnGmplsDBLinkEntry ::= SEQUENCE {
+        tnGmplsDBLinkIfId                 Unsigned32,
+        tnGmplsDBLinkRemoteIfId           Unsigned32,
+        tnGmplsDBLinkName                 DisplayString,
+        tnGmplsDBLinkType                 INTEGER,
+        tnGmplsDBLinkTEId                 Unsigned32,
+        tnGmplsDBLinkACD                  INTEGER,
+        tnGmplsDBLinkUseInFiber           TruthValue,
+        tnGmplsDBLinkWTR                  Unsigned32,
+        tnGmplsDBLinkAdminStatus          INTEGER,
+        tnGmplsDBLinkOperationalState     INTEGER,
+        tnGmplsDBLinkMaintState           INTEGER,
+        tnGmplsDBLinkAlarmState           INTEGER,
+        tnGmplsDBLink3RIndex              Unsigned32,
+        tnGmplsDBLinkRowStatus            RowStatus
+    }
+
+    tnGmplsDBLinkIfId OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "Interface Id of the databearer.  Refers to the
+                        supporting facility of the NE.
+
+                        The format is rrsbbppcc with the following meaning:
+                          rr = 2 digits rack
+                           s = 1 digit subrack
+                          bb = 2 digits board/slot
+                          pp = 2 digits port
+                          cc = 2 digits channel, default 01."
+        ::= { tnGmplsDBLinkEntry 1 }
+
+    tnGmplsDBLinkRemoteIfId OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Interface Id of the databearer of the remote side."
+        ::= { tnGmplsDBLinkEntry 2 }
+
+    tnGmplsDBLinkName OBJECT-TYPE
+        SYNTAX         DisplayString
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "User friendly name"
+        ::= { tnGmplsDBLinkEntry 3 }
+
+    tnGmplsDBLinkType OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         drop(1),
+                         nni(2),
+                         enni(3),
+                         ennig(4),
+                         uni(5),
+                         unistar(6),
+                         regen3R(7)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Link type."
+        ::= { tnGmplsDBLinkEntry 4 }
+
+    tnGmplsDBLinkTEId OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Reference to the TE link in the TE Link table."
+        ::= { tnGmplsDBLinkEntry 5 }
+
+    tnGmplsDBLinkACD OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         empty(1),
+                         cp(2),
+                         cpmp(3),
+                         mp(4)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Access Control Domain for resource assignment to
+                        control plane or management plane."
+        ::= { tnGmplsDBLinkEntry 6 }
+
+    tnGmplsDBLinkUseInFiber OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Allow configuration of InBand communication channels."
+        ::= { tnGmplsDBLinkEntry 7 }
+
+    tnGmplsDBLinkWTR OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Wait to revert time in seconds."
+        ::= { tnGmplsDBLinkEntry 8 }
+
+    tnGmplsDBLinkAdminStatus OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         down(1),
+                         up(2),
+                         shuttingdown(3)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Administrative state."
+        ::= { tnGmplsDBLinkEntry 9 }
+
+    tnGmplsDBLinkOperationalState OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         down(1),
+                         up(2)
+                       }
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Administrative state."
+        ::= { tnGmplsDBLinkEntry 10 }
+
+    tnGmplsDBLinkMaintState OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         down(1),
+                         up(2),
+--                         migrationPrep(3),
+--                         migrationCancel(4),
+--                         migrationTakeover(5),
+                         linkMaintenance(6)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Maintenance state."
+        ::= { tnGmplsDBLinkEntry 11 }
+
+    tnGmplsDBLinkAlarmState OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         localAlarm(1),
+                         remoteAlarm(2),
+                         itcAlarm(3),
+                         hardwareUnavailable(4),
+                         neUnavailable(5),
+                         disabled(6),
+                         dbDown(7),
+                         allDBDown(8),
+                         cpDown(9),
+                         linkSummaryMismatch(10),
+                         remoteDBDown(11),
+                         hardwareClash(12),
+                         otherMgrConnection(13),
+                         localWTR(14),
+                         remoteWTR(15),
+                         localSDAlarm(16),
+                         remoteSDAlarm(17),
+                         dbAlarm(18),
+                         hardwareDegraded(19),
+                         localOTUAlarm(20),
+                         hardwareUnavailableOTU(21),
+                         ltcer(22),
+                         ue(23),
+                         tca(24),
+                         noAlarm(25)
+                       }
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Current active alarm state.  If multiple alarms
+                        are active the first alarm is shown."
+        ::= { tnGmplsDBLinkEntry 12 }
+
+    tnGmplsDBLink3RIndex OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Index, reference to the 3R link."
+        ::= { tnGmplsDBLinkEntry 13 }
+
+    tnGmplsDBLinkRowStatus OBJECT-TYPE
+        SYNTAX         RowStatus
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "This variable is used to create, modify, and/or
+                        delete a row in this table.  Supported values
+                        for this table are:
+                          active       => to activate new data link config
+                          notInService => configuration not active
+                          notReady     => mandatory parameters missing
+                          destroy      => delete data link
+                          createAndGo  => create and activate new datalink entry.
+
+                        CreateAndWait of row entries is not allowed."
+        ::= { tnGmplsDBLinkEntry 14 }
+
+------------------------------------------------------------------------------------------
+-- Traffic Engineering Link Table
+------------------------------------------------------------------------------------------
+    tnGmplsTELinkTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnGmplsTELinkEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The GMPLS Traffic Engineering Link Table."
+        ::= { tnGmplsDpifObjs 3 }
+
+    tnGmplsTELinkEntry OBJECT-TYPE
+        SYNTAX         TnGmplsTELinkEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "An entry in this table represents an GMPLS Label
+                        Switched Path (LSP)."
+        REFERENCE      "?"
+        INDEX          { tnGmplsTELinkIfId }
+        ::= { tnGmplsTELinkTable 1 }
+
+    TnGmplsTELinkEntry ::= SEQUENCE {
+        tnGmplsTELinkIfId                  Unsigned32,
+        tnGmplsTELinkRemoteIfId            Unsigned32,
+        tnGmplsTELinkRemoteSubnodeId       Unsigned32,
+        tnGmplsTELinkRemoteCPNodeId        InetAddressIPv4,
+        tnGmplsTELinkTNA                   InetAddressIPv4,
+        tnGmplsTELinkName                  DisplayString,
+        tnGmplsTELinkMetric                Unsigned32,
+        tnGmplsTELinkColor                 Unsigned32,
+        tnGmplsTELinkSRLG                  DisplayString,
+        tnGmplsTELinkLatency               Unsigned32,
+        tnGmplsTELinkAdminStatus           INTEGER,
+        tnGmplsTELinkOperationalState      INTEGER,
+        tnGmplsTELinkMaintState            INTEGER,
+        tnGmplsTELinkAlarmState            INTEGER,
+        tnGmplsTELinkRowStatus             RowStatus
+    }
+
+    tnGmplsTELinkIfId OBJECT-TYPE
+        SYNTAX         Unsigned32 (100000..999999)
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "Interface Id of the TElink.  Refers to the
+                        supporting facility of the NE."
+        ::= { tnGmplsTELinkEntry 1 }
+
+    tnGmplsTELinkRemoteIfId OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Interface Id of the telink on the remote side."
+        ::= { tnGmplsTELinkEntry 2 }
+
+    tnGmplsTELinkRemoteSubnodeId OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Remote Data plane node Id"
+        ::= { tnGmplsTELinkEntry 3 }
+
+    tnGmplsTELinkRemoteCPNodeId OBJECT-TYPE
+        SYNTAX         InetAddressIPv4
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Node Id of the remote side."
+        ::= { tnGmplsTELinkEntry 4 }
+
+    tnGmplsTELinkTNA OBJECT-TYPE
+        SYNTAX         InetAddressIPv4
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "TNA address in IPv4."
+        ::= { tnGmplsTELinkEntry 5 }
+
+    tnGmplsTELinkName OBJECT-TYPE
+        SYNTAX         DisplayString
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "User friendly name"
+        ::= { tnGmplsTELinkEntry 6 }
+
+    tnGmplsTELinkMetric OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "TE Metric."
+        DEFVAL         { 20 }
+        ::= { tnGmplsTELinkEntry 7 }
+
+    tnGmplsTELinkColor OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Resource color attribute. The bits 29..32
+                        are reserved for GMPLS internal use."
+        DEFVAL         { 0 }
+        ::= { tnGmplsTELinkEntry 8 }
+
+    tnGmplsTELinkSRLG OBJECT-TYPE
+        SYNTAX         DisplayString
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "List of SRLG values separated by ','."
+        ::= { tnGmplsTELinkEntry 9 }
+
+    tnGmplsTELinkLatency OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Latency attribute."
+        DEFVAL         { 0 }
+        ::= { tnGmplsTELinkEntry 10 }
+
+    tnGmplsTELinkAdminStatus OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         down(1),
+                         up(2),
+                         shuttingdown(3)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Administrative state."
+        ::= { tnGmplsTELinkEntry 11 }
+
+    tnGmplsTELinkOperationalState OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         down(1),
+                         up(2)
+                       }
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Administrative state."
+        ::= { tnGmplsTELinkEntry 12 }
+
+    tnGmplsTELinkMaintState OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         down(1),
+                         up(2),
+--                         migrationPrep(3),
+--                         migrationCancel(4),
+--                         migrationTakeover(5),
+                         linkMaintenance(6)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Maintenance state."
+        ::= { tnGmplsTELinkEntry 13 }
+
+    tnGmplsTELinkAlarmState OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         localAlarm(1),
+                         remoteAlarm(2),
+                         itcAlarm(3),
+                         hardwareUnavailable(4),
+                         neUnavailable(5),
+                         disabled(6),
+                         dbDown(7),
+                         allDBDown(8),
+                         cpDown(9),
+                         linkSummaryMismatch(10),
+                         remoteDBDown(11),
+                         hardwareClash(12),
+                         otherMgrConnection(13),
+                         localWTR(14),
+                         remoteWTR(15),
+                         localSDAlarm(16),
+                         remoteSDAlarm(17),
+                         dbAlarm(18),
+                         hardwareDegraded(19),
+                         localOTUAlarm(20),
+                         hardwareUnavailableOTU(21),
+                         ltcer(22),
+                         ue(23),
+                         tca(24),
+                         noAlarm(25)
+                       }
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Current active alarm state.  If multiple alarms
+                        are active the first one is displayed."
+        ::= { tnGmplsTELinkEntry 14 }
+
+    tnGmplsTELinkRowStatus OBJECT-TYPE
+        SYNTAX         RowStatus
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "This variable is used to create, modify, and/or
+                        delete a row in this table.  Supported values
+                        for this table are:
+                          active       => activate new TE link config
+                          notInService => configuration not active
+                          notReady     => mandatory parameters missing
+                          destroy      => delete TE link
+                          createAndGo  => create and activate new TE link entry
+
+                        CreateAndWait of row entries is not allowed."
+        ::= { tnGmplsTELinkEntry 15 }
+
+---------------------------------------------------------------------------
+-- Notifications.
+---------------------------------------------------------------------------
+--    tnGmplsDBLinkAdminStatusChange NOTIFICATION-TYPE
+--        OBJECTS {
+--            tnGmplsDBLinkIfId,
+--            tnGmplsDBLinkAdminStatus
+--        }
+--        STATUS         current
+--        DESCRIPTION    "This notification is generated when a status
+--                        object is changed."
+--        ::= { tnGmplsDpifNotifyPrefix 1 }
+--
+--    tnGmplsDBLinkOpStateChange NOTIFICATION-TYPE
+--        OBJECTS {
+--            tnGmplsDBLinkIfId,
+--            tnGmplsDBLinkOperationalState
+--        }
+--        STATUS         current
+--        DESCRIPTION    "This notification is generated when a operational
+--                       status object is changed."
+--        ::= { tnGmplsDpifNotifyPrefix 2 }
+--
+--    tnGmplsTELinkAdminStatusChange NOTIFICATION-TYPE
+--        OBJECTS {
+--            tnGmplsTELinkIfId,
+--               tnGmplsTELinkAdminStatus
+--               }
+--        STATUS         current
+--        DESCRIPTION    "This notification is generated when a status
+--                        object is changed."
+--        ::= { tnGmplsDpifNotifyPrefix 3 }
+--
+--    tnGmplsTELinkOpStateChange NOTIFICATION-TYPE
+--        OBJECTS {
+--            tnGmplsTELinkIfId,
+--            tnGmplsTELinkOperationalState
+--        }
+--        STATUS         current
+--        DESCRIPTION    "This notification is generated when a operational
+--                        status object is changed."
+--   ::= { tnGmplsDpifNotifyPrefix 4 }
+--
+-- End of notifications.
+
+---------------------------------------------------------------------------
+-- Conformance Group Definitions
+---------------------------------------------------------------------------
+    tnGmplsDpifObjsGroup OBJECT-GROUP
+        OBJECTS {
+            tnGmplsDpifAttributeTotal
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnGmplsDpifGroups 1 }
+
+    tnGmplsDBLinkGroup OBJECT-GROUP
+        OBJECTS {
+            tnGmplsDBLinkRemoteIfId,
+            tnGmplsDBLinkName,
+            tnGmplsDBLinkType,
+            tnGmplsDBLinkTEId,
+            tnGmplsDBLinkACD,
+            tnGmplsDBLinkUseInFiber,
+            tnGmplsDBLinkWTR,
+            tnGmplsDBLinkAdminStatus,
+            tnGmplsDBLinkOperationalState,
+            tnGmplsDBLinkMaintState,
+            tnGmplsDBLinkAlarmState,
+            tnGmplsDBLink3RIndex,
+            tnGmplsDBLinkRowStatus
+        }
+        STATUS         current
+        DESCRIPTION    "The GMPLS datalink group of objects providing for
+                        management of GMPLS NE entities."
+        ::= { tnGmplsDpifGroups 2 }
+
+    tnGmplsTELinkGroup OBJECT-GROUP
+        OBJECTS {
+            tnGmplsTELinkRemoteIfId,
+            tnGmplsTELinkRemoteSubnodeId,
+            tnGmplsTELinkRemoteCPNodeId,
+            tnGmplsTELinkTNA,
+            tnGmplsTELinkName,
+            tnGmplsTELinkMetric,
+            tnGmplsTELinkColor,
+            tnGmplsTELinkSRLG,
+            tnGmplsTELinkLatency,
+            tnGmplsTELinkAdminStatus,
+            tnGmplsTELinkOperationalState,
+            tnGmplsTELinkMaintState,
+            tnGmplsTELinkAlarmState,
+            tnGmplsTELinkRowStatus
+        }
+        STATUS         current
+        DESCRIPTION    "The GMPLS dataplane TE link interface group of
+                        objects providing for management of GMPLS TE
+                        entities."
+        ::= { tnGmplsDpifGroups 3 }
+
+--    tnGmplsDBLinkNotificationGroup NOTIFICATION-GROUP
+--        NOTIFICATIONS {
+--            tnGmplsDBLinkAdminStatusChange,
+--            tnGmplsDBLinkOpStateChange
+--        }
+--        STATUS  current
+--        DESCRIPTION    "Set of notifications implemented in this module.
+--                        None is mandatory."
+--        ::= { tnGmplsDpifGroups 4 }
+--
+--    tnGmplsTELinkNotificationGroup NOTIFICATION-GROUP
+--        NOTIFICATIONS {
+--            tnGmplsTELinkAdminStatusChange,
+--            tnGmplsTELinkOpStateChange
+--        }
+--        STATUS  current
+--        DESCRIPTION    "Set of notifications implemented in this module.
+--                        None is mandatory."
+--        ::= { tnGmplsDpifGroups 5 }
+--
+
+---------------------------------------------------------------------------
+-- Compliance Statements (mandatory)
+---------------------------------------------------------------------------
+    tnGmplsDpifCompliance MODULE-COMPLIANCE
+        STATUS         current
+        DESCRIPTION    "The compliance statement for SNMPv2 entities
+                        which implement GMPLS NE."
+        MODULE
+        MANDATORY-GROUPS {
+            tnGmplsDpifObjsGroup,
+            tnGmplsTELinkGroup,
+            tnGmplsDBLinkGroup
+--            tnGmplsDBLinkNotificationGroup,
+--            tnGmplsTELinkNotificationGroup
+        }
+        ::= { tnGmplsDpifCompliances 1 }
+
+END -- DEFINITION OF TROPIC-GMPLS-DPIF-MIB

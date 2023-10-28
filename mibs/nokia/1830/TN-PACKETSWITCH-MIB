@@ -1,0 +1,648 @@
+TN-PACKETSWITCH-MIB DEFINITIONS ::= BEGIN
+
+-- (c) Copyright 2023 Nokia Networks.  All rights reserved.
+-- This software is the confidential and proprietary property of
+-- Nokia and may only be used in accordance with the terms of the
+-- license agreement provided with this software.
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Integer32, Unsigned32                       FROM SNMPv2-SMI
+
+    TEXTUAL-CONVENTION, RowStatus,
+    MacAddress                                  FROM SNMPv2-TC
+
+    InterfaceIndexOrZero                        FROM IF-MIB
+
+    TItemDescription, TFdbTableSizeProfileID    FROM TN-TC-MIB
+
+    tnSRObjs                                    FROM TROPIC-GLOBAL-REG
+
+    TropicShelfSlotIndexType,
+    TropicShelfIndexType,
+    AluWdmTnIfType,
+    TropicResetType                             FROM TROPIC-TC
+
+    tnSysSwitchId                               FROM TROPIC-SYSTEM-MIB
+    ;
+
+tnPacketSwitchMIBModule       MODULE-IDENTITY
+        LAST-UPDATED "202302170000Z"
+        ORGANIZATION "Nokia"
+        CONTACT-INFO
+            "Nokia SROS Support
+             Web: http://support.nokia.com"
+        DESCRIPTION
+        "This document is the SNMP MIB module to manage and provision a
+        packetswitch in the PSS product.
+
+        This SNMP MIB module (Specification) embodies Nokia's
+        proprietary intellectual property.  Nokia retains
+        all title and ownership in the Specification, including any
+        revisions.
+
+        Nokia grants all interested parties a non-exclusive
+        license to use and distribute an unmodified copy of this
+        Specification in connection with management of Nokia
+        products, and without fee, provided this copyright notice and
+        license appear on all copies.
+
+        This Specification is supplied 'as is', and Nokia
+        makes no warranty, either express or implied, as to the use,
+        operation, condition, or performance of the Specification."
+
+--
+-- Revision History
+--
+
+        REVISION    "202302170000Z"
+        DESCRIPTION "Updated DESCRIPTION of the following:
+                     tnPacketSwitchCounterMode."
+
+        REVISION    "202207220000Z"
+        DESCRIPTION "Added the following to TPacketSwitchType:
+                     pss32-16-4(3)."
+
+        REVISION    "202108060000Z"
+        DESCRIPTION "Added the following to tnPacketSwitchConfigTable:
+                     tnPacketSwitchCounterLmmStatsCollectionMode."
+
+        REVISION    "202107230000Z"
+        DESCRIPTION "Added the following to tnPacketSwitchConfigTable:
+                     tnPacketSwitchCounterMode."
+
+        REVISION    "202011130000Z"
+        DESCRIPTION "Added the following to tnPacketSwitchSystemConfigTable:
+                     tnPacketSwitchSapLoopbackMacAddr."
+
+        REVISION    "202008210000Z"
+        DESCRIPTION "Marked the following as deprecated:
+                     tnPacketSwitchFdbTableSize."
+
+        REVISION    "202008140000Z"
+        DESCRIPTION "Marked the following as deprecated:
+                     tnPacketSwitchFaultMode
+                     tnPacketSwitchFdbLocalAgeTime."
+
+        REVISION    "202005150000Z"
+        DESCRIPTION "Added the following to TPacketSwitchOperMode:
+                      mixed(3)"
+
+        REVISION    "201908160000Z"
+        DESCRIPTION "1) Added the following to tnPacketSwitchSystemConfigTable:
+                        tnPacketSwitchFdbLocalAgeTime.
+                     2) Added the following table:
+                        tnPacketSwitchFdbTblSizProfTable."
+
+        REVISION    "201807200000Z"
+        DESCRIPTION "1) Added the following to TPacketSwitchType:
+                        centralizedSwitchedFabric(2).
+                     2) Updated DESCRIPTION of the following:
+                        tnPacketSwitchRowStatus
+                        tnPacketCard1bp1n2
+                        tnPacketCard1bp2n1
+                        tnPacketCard2ShelfSlot
+                        tnPacketCard2bp1n2
+                        tnPacketCard2bp2n1
+                        tnUplinkCard1ShelfSlot
+                        tnUplinkCard2ShelfSlot
+                        tnPacketSwitchOperMode
+                        tnPacketSwitchDescription
+                        tnPacketSwitchProtectionState
+                        tnPacketCard1SwitchControllerStatus
+                        tnPacketCard2SwitchControllerStatus
+                        tnPacketSwitchEthOamCcmFaultMgntMode
+                     3) Added the following to tnPacketSwitchConfigTable:
+                        tnPacketSwitchShelf
+                        tnPacketSwitchFaultMode."
+
+        REVISION    "201806150000Z"
+        DESCRIPTION "Added the following to tnPacketSwitchSystemConfigTable:
+                     tnPacketSwitchTestHdNoServPort."
+
+        REVISION    "201711030000Z"
+        DESCRIPTION "1) Added the following textual convention:
+                        TSwitchContollerStatusType.
+                     2) Added the following to tnPacketSwitchConfigTable:
+                        tnPacketSwitchDescription
+                        tnPacketSwitchProtectionState
+                        tnPacketCard1SwitchControllerStatus
+                        tnPacketCard2SwitchControllerStatus.
+                     3) Added the following table:
+                        tnPacketSwitchResetTable."
+
+        REVISION    "201704070000Z"
+        DESCRIPTION "Added tnPacketSwitchSystemConfigTable"
+
+        REVISION    "201607180000Z"
+        DESCRIPTION "Rev 1.0                6 Jul 2016 00:00
+                     Initial release of the TN-PACKETSWITCH-MIB"
+        ::= { tnSRMIBModules 100 }
+
+-- Object Groups in the Nokia PACKET-SWITCH MIB Module
+tnPacketSwitchObjs       OBJECT IDENTIFIER ::= { tnSRObjs   100 }
+
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+--
+--      TN-PACKETSWITCH-MIB textual conventions
+--
+
+TPacketSwitchType ::= TEXTUAL-CONVENTION
+    STATUS         current
+    DESCRIPTION    "TPacketSwitchType indicates the type
+                    of packetswitch being configured.  Different
+                    shelf types/products may have different packetswitch
+                    attributes"
+    SYNTAX          INTEGER {
+                       unassigned                       (0),
+                       pss8Family                       (1),
+                       centralizedSwitchedFabric        (2),
+                       pss32-16-4                       (3)
+                    }
+
+TPacketSwitchOperMode ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION     "TPacketSwitchOperMode describes the operational mode
+                     of the packetswitch.  In network mode the system uses
+                     MPLS-TP to provide service transport, and in
+                     access-uplink mode the system uses Ethernet
+                     QinQ (802.1ad) switching.
+
+                     Note that this is an analogous to the MIB attribute
+                     tnCardUplinkAdminMode in TROPIC-CARD-MIB for non
+                     packetswitch packet cards."
+    SYNTAX           INTEGER {
+                        unassigned    (0),
+                        network       (1),
+                        accessUplink  (2),
+                        mixed         (3)
+                     }
+
+TSwitchContollerStatusType ::= TEXTUAL-CONVENTION
+    STATUS         current
+    DESCRIPTION    "TSwitchContollerStatusType indicates the status
+                    of the switch controller."
+    SYNTAX          INTEGER {
+                      active    (1),
+                      stand-by  (2)
+                    }
+
+--------------------------------------------------------------------------------
+-- PacketSwitch configuration Table
+--------------------------------------------------------------------------------
+tnPacketSwitchConfigTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF TnPacketSwitchConfigEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "A table that contains configuration information
+                     relevant to a packetswitch."
+    ::= { tnPacketSwitchObjs 1 }
+
+tnPacketSwitchConfigEntry OBJECT-TYPE
+    SYNTAX          TnPacketSwitchConfigEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "Information about a specific packetswitch"
+    INDEX           { tnSysSwitchId }
+    ::= { tnPacketSwitchConfigTable 1 }
+
+TnPacketSwitchConfigEntry ::=
+    SEQUENCE {
+        tnPacketSwitchRowStatus                        RowStatus,
+        tnPacketSwitchType                             TPacketSwitchType,
+        tnPacketCard1ShelfSlot                         TropicShelfSlotIndexType,
+        tnPacketCard1bp1n2                             AluWdmTnIfType,
+        tnPacketCard1bp2n1                             AluWdmTnIfType,
+        tnPacketCard2ShelfSlot                         TropicShelfSlotIndexType,
+        tnPacketCard2bp1n2                             AluWdmTnIfType,
+        tnPacketCard2bp2n1                             AluWdmTnIfType,
+        tnUplinkCard1ShelfSlot                         TropicShelfSlotIndexType,
+        tnUplinkCard2ShelfSlot                         TropicShelfSlotIndexType,
+        tnPacketSwitchOperMode                         TPacketSwitchOperMode,
+        tnPacketSwitchDescription                      TItemDescription,
+        tnPacketSwitchProtectionState                  INTEGER,
+        tnPacketCard1SwitchControllerStatus            TSwitchContollerStatusType,
+        tnPacketCard2SwitchControllerStatus            TSwitchContollerStatusType,
+        tnPacketSwitchShelf                            TropicShelfIndexType,
+        tnPacketSwitchFaultMode                        INTEGER, -- deprecated
+        tnPacketSwitchCounterMode                      INTEGER,
+        tnPacketSwitchCounterLmmStatsCollectionMode    INTEGER
+    }
+
+tnPacketSwitchRowStatus  OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "The value of the object tnPacketSwitchRowStatus specifies
+                    the status of this row."
+    ::= { tnPacketSwitchConfigEntry 1 }
+
+tnPacketSwitchType  OBJECT-TYPE
+    SYNTAX          TPacketSwitchType
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "The value of the object tnPacketSwitchType specifies
+                    the type of packetswitch being created.  Some of the
+                    fields in the tnPacketSwitchConfigTable may only be
+                    applicable to certain switch types."
+    ::= { tnPacketSwitchConfigEntry 2 }
+
+tnPacketCard1ShelfSlot  OBJECT-TYPE
+    SYNTAX          TropicShelfSlotIndexType
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "The value of the object tnPacketCard1ShelfSlot specifies
+                    the shelf/slot location of the first packetcard.
+
+                    Note: this object is NOT applicable to centralized switched fabric
+                          packet switches"
+    ::= { tnPacketSwitchConfigEntry 3 }
+
+tnPacketCard1bp1n2  OBJECT-TYPE
+    SYNTAX          AluWdmTnIfType
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "The value of the object tnPacketCard1bp1n2 specifies
+                    the backplane mode (ex. XFI, CAUI) of the BP1 N+2 interface
+                    on a pss8Family shelf of Packetcard1.
+
+                    Note: this object is NOT applicable to centralized switched fabric
+                          packet switches"
+    ::= { tnPacketSwitchConfigEntry 4 }
+
+tnPacketCard1bp2n1  OBJECT-TYPE
+    SYNTAX          AluWdmTnIfType
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "The value of the object tnPacketCard1bp2n1 specifies
+                    the backplane mode (ex. XFI, CAUI) of the BP2 N+1 interface
+                    on a pss8Family shelf of Packetcard1.
+
+                    Note: this object is NOT applicable to centralized switched fabric
+                          packet switches"
+    ::= { tnPacketSwitchConfigEntry 5 }
+
+tnPacketCard2ShelfSlot  OBJECT-TYPE
+    SYNTAX          TropicShelfSlotIndexType
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "The value of the object tnPacketCard2ShelfSlot specifies
+                    the shelf/slot location of the second packetcard.
+
+                    Note: this object is NOT applicable to centralized switched fabric
+                          packet switches"
+    ::= { tnPacketSwitchConfigEntry 6 }
+
+tnPacketCard2bp1n2  OBJECT-TYPE
+    SYNTAX          AluWdmTnIfType
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "The value of the object tnPacketCard2bp1n2 specifies
+                    the backplane mode (ex. XFI, CAUI) of the BP1 N+2 interface
+                    on a pss8Family shelf of Packetcard2.
+
+                    Note: this object is NOT applicable to centralized switched fabric
+                          packet switches"
+    ::= { tnPacketSwitchConfigEntry 7 }
+
+tnPacketCard2bp2n1  OBJECT-TYPE
+    SYNTAX          AluWdmTnIfType
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "The value of the object tnPacketCard2bp2n1 specifies
+                    the backplane mode (ex. XFI, CAUI) of the BP2 N+1 interface
+                    on a pss8Family shelf of Packetcard2.
+
+                    Note: this object is NOT applicable to centralized switched fabric
+                          packet switches"
+    ::= { tnPacketSwitchConfigEntry 8 }
+
+tnUplinkCard1ShelfSlot  OBJECT-TYPE
+    SYNTAX          TropicShelfSlotIndexType
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "The value of the object tnUplinkCard1ShelfSlot specifies
+                    the shelf/slot location of the first uplink card.
+
+                    Note: this object is NOT applicable to centralized switched fabric
+                          packet switches"
+    ::= { tnPacketSwitchConfigEntry 9 }
+
+tnUplinkCard2ShelfSlot  OBJECT-TYPE
+    SYNTAX          TropicShelfSlotIndexType
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "The value of the object tnUplinkCard2ShelfSlot specifies
+                    the shelf/slot location of the second uplink card.
+
+                    Note: this object is NOT applicable to centralized switched fabric
+                          packet switches"
+    ::= { tnPacketSwitchConfigEntry 10 }
+
+tnPacketSwitchOperMode  OBJECT-TYPE
+    SYNTAX          TPacketSwitchOperMode
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "The value of the object tnPacketSwitchOperMode specifies
+                    the operational mode of the switch.
+
+                    Note: this object is NOT applicable to centralized switched fabric
+                          packet switches"
+    ::= { tnPacketSwitchConfigEntry 11 }
+
+tnPacketSwitchDescription  OBJECT-TYPE
+    SYNTAX          TItemDescription
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "User-provided description for this packet switch."
+    DEFVAL { ''H }
+    ::= { tnPacketSwitchConfigEntry 12 }
+
+tnPacketSwitchProtectionState OBJECT-TYPE
+    SYNTAX          INTEGER {
+                         notApplicable(0),
+                         protected(1),
+                         unprotected(2)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "State of switch controller: protected (standby card ready to protect),
+                     unprotected (standby card may require reboot for protection),
+                     not applicable (protection is not applicable to packet switch).
+
+                     Note: this object is NOT applicable to centralized switched fabric
+                           packet switches"
+    ::= { tnPacketSwitchConfigEntry 13 }
+
+tnPacketCard1SwitchControllerStatus OBJECT-TYPE
+    SYNTAX          TSwitchContollerStatusType
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "Indicates the switch controller status for packet card 1: active/standby
+
+                     Note: this object is NOT applicable to centralized switched fabric
+                           packet switches"
+    ::= { tnPacketSwitchConfigEntry 14 }
+
+tnPacketCard2SwitchControllerStatus OBJECT-TYPE
+    SYNTAX          TSwitchContollerStatusType
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Indicates the switch controller status for packet card 2: active/standby
+
+                    Note: this object is NOT applicable to centralized switched fabric
+                          packet switches"
+    ::= { tnPacketSwitchConfigEntry 15 }
+
+tnPacketSwitchShelf OBJECT-TYPE
+    SYNTAX          TropicShelfIndexType
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "Specifies which shelf this packet switch belongs to.
+
+                     Note: this object is only applicable to centralized switched fabric
+                           packet switches"
+    ::= { tnPacketSwitchConfigEntry 16 }
+
+tnPacketSwitchFaultMode OBJECT-TYPE
+    SYNTAX         INTEGER{
+                     ieee(1),
+                     itu(2)
+                   }
+    MAX-ACCESS     read-create
+    STATUS         deprecated
+    DESCRIPTION    "Fault reporting mode for the packet switch
+
+                    Current configurable modes:
+                      ieee:  IEEE 802.1ag compliant
+                      itu:   ITU-T G.8021 compliant.
+                    Equivalent to tnPacketSwitchEthOamCcmFaultMgntMode"
+    ::= { tnPacketSwitchConfigEntry 17 }
+
+tnPacketSwitchCounterMode OBJECT-TYPE
+    SYNTAX         INTEGER{
+                     all(1),
+                     sapsdp(2),
+                     lm(3)
+                   }
+    MAX-ACCESS     read-write
+    STATUS         current
+    DESCRIPTION    "Counter mode for the packet switch:
+
+                    all:    support all counters. This applies to all packet switch
+                            except Falcon packet switch with 12CE120, 12CE121 or 1CE100 card.
+                    sapsdp: support SAP/SDP but not LM counters. This applies only to
+                            Falcon packet switch with 12CE120, 12CE121 or 1CE100 card.It will be the
+                            default value for Falcon packet switch with 12CE120, 12CE121 or 1CE100 card.
+                    lm:     support LM but not SAP/SDP counters. This applies only to
+                            Falcon packet switch with 12CE120, 12CE121 or 1CE100 card.
+
+                    sapsdp and lm are introduced due to hardware counter resource
+                    limitations for Falcon packet switch."
+    DEFVAL         { all }
+    ::= { tnPacketSwitchConfigEntry 18 }
+
+tnPacketSwitchCounterLmmStatsCollectionMode OBJECT-TYPE
+    SYNTAX         INTEGER{
+                     notApplicable(1),
+                     single(2),
+                     fc(3)
+                   }
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "Counter LMM stats collection mode for the packet switch.
+
+                    notApplicable: This only applies to Falcon packet switch when
+                                   its counter mode is sapsdp.
+                    single:        This only applies to Falcon packet switch when
+                                   its counter mode is lm.  It means only one pair
+                                   of LM counters (TxFCl and RxFCl) is allocated
+                                   to count frames, per SAP.
+                    fc:            This only applies to Sidewinder packet switch.
+                                   It means multiple pairs of LM counters (TxFCl
+                                   and RxFCl) are allocated to count frames on per
+                                   FC basis, each for one FC per SAP."
+    ::= { tnPacketSwitchConfigEntry 19 }
+
+--------------------------------------------------------------------------------
+-- PacketSwitch System configuration Table
+--------------------------------------------------------------------------------
+tnPacketSwitchSystemConfigTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF TnPacketSwitchSystemConfigEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "A table that contains system configuration information
+                     relevant to a packetswitch."
+    ::= { tnPacketSwitchObjs 2 }
+
+tnPacketSwitchSystemConfigEntry OBJECT-TYPE
+    SYNTAX          TnPacketSwitchSystemConfigEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "System Information about a specific packetswitch"
+    INDEX           { tnSysSwitchId }
+    ::= { tnPacketSwitchSystemConfigTable 1 }
+
+TnPacketSwitchSystemConfigEntry ::=
+    SEQUENCE {
+        tnPacketSwitchLACPSystemPriority              Unsigned32,
+        tnPacketSwitchEthOamCcmFaultMgntMode          INTEGER,
+        tnPacketSwitchLoopbackNoServPort              InterfaceIndexOrZero,
+        tnPacketSwitchMirrorLoopbackNoServPort        InterfaceIndexOrZero,
+        tnPacketSwitchTestHdNoServPort                InterfaceIndexOrZero,
+        tnPacketSwitchFdbLocalAgeTime                 Integer32,  -- deprecated
+        tnPacketSwitchSapLoopbackMacAddr              MacAddress
+    }
+
+tnPacketSwitchLACPSystemPriority OBJECT-TYPE
+        SYNTAX         Unsigned32 (1..65535)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "tnPacketSwitchLACPSystemPriority is the Link Aggregation
+                        Control Protocol (LACP) system priority which is
+                        combined with the system MAC address to make up
+                        a unique system ID that is used by LACP in
+                        communications with LACP peer systems on Link
+                        Aggregation (LAG) ports.
+                        Equivalent to tnCardLACPSystemPriority in card mode"
+        DEFVAL         { 32768 }
+        ::= { tnPacketSwitchSystemConfigEntry 1 }
+
+tnPacketSwitchEthOamCcmFaultMgntMode OBJECT-TYPE
+        SYNTAX         INTEGER{
+                         ieee(1),
+                         itu(2)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The Ethernet OAM fault management compliancy of the
+                        packet switch.
+
+                        Current configurable modes:
+                        ieee:  IEEE 802.1ag compliant
+                        itu:   ITU-T G.8021 compliant.
+                        Equivalent to tnCardEthOamCcmFaultMgntMode in card mode"
+        DEFVAL         { ieee }
+        ::= { tnPacketSwitchSystemConfigEntry 2 }
+
+tnPacketSwitchLoopbackNoServPort OBJECT-TYPE
+        SYNTAX          InterfaceIndexOrZero
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION     "Second loopback port used for internal sap creation,
+                         which is needed for Mac address swapping.
+                         0 indicates the port is undefined.
+                         Equivalent to tnCardLoopbackNoServPort in card mode"
+        DEFVAL          { 0 }
+        ::= { tnPacketSwitchSystemConfigEntry 3 }
+
+tnPacketSwitchMirrorLoopbackNoServPort OBJECT-TYPE
+        SYNTAX          InterfaceIndexOrZero
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION     "Second loopback port used for internal sap creation
+                         Equivalent to tnCardMirrorLoopbackNoServPort in card mode"
+        DEFVAL          { 0 }
+        ::= { tnPacketSwitchSystemConfigEntry 4 }
+
+tnPacketSwitchTestHdNoServPort OBJECT-TYPE
+        SYNTAX          InterfaceIndexOrZero
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION     "Second loopback port used for internal sap creation
+                         Equivalent to tnCardTestHdNoServPort in card mode"
+        DEFVAL          { 0 }
+        ::= { tnPacketSwitchSystemConfigEntry 5 }
+
+tnPacketSwitchFdbLocalAgeTime OBJECT-TYPE
+    SYNTAX          Integer32 (60..512)
+    MAX-ACCESS      read-write
+    STATUS          deprecated
+    DESCRIPTION     "The value of the object tnPacketSwitchFdbLocalAgeTime specifies
+                     the aging time for locally learned MAC addresses in the FDB for
+                     all VPLS instances in a packetsswitch."
+    DEFVAL          { 300 }
+    ::= { tnPacketSwitchSystemConfigEntry 6 }
+
+tnPacketSwitchSapLoopbackMacAddr OBJECT-TYPE
+    SYNTAX          MacAddress
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "This specifies the unicast source MAC address used with a
+                     MAC Swap SAP terminal loopback."
+    DEFVAL          { '000000000000'H }  -- 00:00:00:00:00:00
+    ::= { tnPacketSwitchSystemConfigEntry 7 }
+
+--------------------------------------------------------------------------------
+-- PacketSwitch Reset Table
+--------------------------------------------------------------------------------
+    tnPacketSwitchResetTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnPacketSwitchResetEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "Request a packet switch reset"
+        ::= { tnPacketSwitchObjs 3 }
+
+    tnPacketSwitchResetEntry  OBJECT-TYPE
+        SYNTAX         TnPacketSwitchResetEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { tnSysSwitchId }
+        ::= { tnPacketSwitchResetTable 1 }
+
+    TnPacketSwitchResetEntry ::= SEQUENCE {
+        tnPacketSwitchReset       TropicResetType
+    }
+
+    tnPacketSwitchReset OBJECT-TYPE
+        SYNTAX         TropicResetType
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Request to reset all packet cards in a packet switch"
+        DEFVAL         { noCmd }
+        ::= { tnPacketSwitchResetEntry 1 }
+
+--------------------------------------------------------------------------------
+-- PacketSwitch FDB table size configuration Table
+--------------------------------------------------------------------------------
+    tnPacketSwitchFdbTblSizProfTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnPacketSwitchFdbTblSizProfEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "A table that contains Fdb Table Size profiles
+                        relevant to a packetswitch."
+        ::= { tnPacketSwitchObjs 4 }
+
+    tnPacketSwitchFdbTblSizProfEntry OBJECT-TYPE
+        SYNTAX         TnPacketSwitchFdbTblSizProfEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "One instance of Fdb Table Size profile."
+        INDEX { tnSysSwitchId, tnPacketSwitchFdbTblSizProfIndex }
+        ::= { tnPacketSwitchFdbTblSizProfTable 1 }
+
+    TnPacketSwitchFdbTblSizProfEntry ::= SEQUENCE {
+        tnPacketSwitchFdbTblSizProfIndex                  TFdbTableSizeProfileID,
+        tnPacketSwitchFdbTableSize                        Integer32  -- deprecated
+    }
+
+    tnPacketSwitchFdbTblSizProfIndex OBJECT-TYPE
+        SYNTAX         TFdbTableSizeProfileID
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The tnPacketSwitchFdbTblSizProfIndex is used as index for the table."
+        ::= { tnPacketSwitchFdbTblSizProfEntry 1 }
+
+    tnPacketSwitchFdbTableSize OBJECT-TYPE
+       SYNTAX          Integer32 (1..240000)
+       MAX-ACCESS      read-write
+       STATUS          deprecated
+       DESCRIPTION     "The value of the object tnPacketSwitchFdbTableSize specifies the
+                        maximum number of learned and static entries allowed in
+                        the FDB of this profile."
+       DEFVAL          { 256 }
+       ::= { tnPacketSwitchFdbTblSizProfEntry 2 }
+
+END -- DEFINITION OF TN-PACKETSWITCH-MIB

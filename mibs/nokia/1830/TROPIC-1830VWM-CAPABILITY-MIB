@@ -1,0 +1,3016 @@
+TROPIC-1830VWM-CAPABILITY-MIB DEFINITIONS ::= BEGIN
+
+-- (c) Copyright 2023 Nokia Networks.  All rights reserved.
+-- This software is the confidential and proprietary property of
+-- Nokia and may only be used in accordance with the terms of the
+-- license agreement provided with this software.
+
+IMPORTS
+    MODULE-IDENTITY, Integer32, Unsigned32  FROM SNMPv2-SMI
+    AGENT-CAPABILITIES                      FROM SNMPv2-CONF
+    tnVwmMsAgentCapability                  FROM TROPIC-VWMMS-MIB;
+
+tn1830VwmCapability MODULE-IDENTITY
+
+    LAST-UPDATED    "201905090000Z"
+    ORGANIZATION    "Nokia"
+    CONTACT-INFO    "Nokia
+                     Attn: Jeff Donnelly
+                     600 Mountain Avenue
+                     New Providence, NJ 07974
+
+                     Phone: +1 732 221 6408
+                     Email: jeff.donnelly@nokia.com"
+
+    DESCRIPTION "The Agent Capabilities for the 1830 VWM."
+
+    REVISION    "201905090000Z"
+    DESCRIPTION "Removed support for tnVwmMsCard2Group and tnVwmMsSfp4Group.
+                 Removed support for tnVwmMsSfpProfilesPnGroup, added support
+                 for tnVwmMsSfpProfileGroup and tnVwmMsSfpProfilesGroup.
+                 Removed VARIATION for tnVwmMsSfpProfilePnRate and
+                 tnVwmMsSfpProfilePnCreateRate, added VARIATION for
+                 tnVwmMsSfpProfileRate.
+                 Removed VARIATION for tnVwmMsIfPcsHistoryStatsIfCv,
+                 tnVwmMsIfPcsHistoryStatsIfEs and tnVwmMsIfPcsHistoryStatsIfSes.
+                 Added not-implemented VARIATION for tnSysDebug and
+                 tnSysClusterV3SecurityUser.
+                 Added not-implemented VARIATION for tnVwmMsIfOtdrOpticalReturnLoss.
+                 Updated AGENT-CAPABILITIES release indication to R9.0.1."
+
+    REVISION    "201904300000Z"
+    DESCRIPTION "Added VARIATION for tnVwmMsIfOtdrBaselineMeasurementReflections
+                 and tnVwmMsIfOtdrCurrentMeasurementReflections.
+                 Updated VARIATION of tnVwmMsSlotProgrammedType."
+
+    REVISION    "201904110000Z"
+    DESCRIPTION "Renamed tnVwmMsDmSmLmCardGroup into tnVwmMsDcmLmCardGroup.
+                 Added VARIATION for tnAccessPortAINSDebounceTimeRemaining."
+
+    REVISION    "201903110000Z"
+    DESCRIPTION "Added 'not-implemented' VARIATION clauses for objects
+                 tnAccessPortCpriMappingType and tnAccessPortFecType."
+
+    REVISION    "201903080000Z"
+    DESCRIPTION "Updated AGENT-CAPABILITIES release indication to R9.1.0.
+                 Updated VARIATION for tnVwmMsIfLoopbackStatus and
+                 tnVwmMsIfTerminalLoopback.
+                 Updated VARIATION for tnVwmMsNtpState.
+                 Updated VARIATION for tnVwmMsSfpProfileRate.
+                 Added VARIATION for not-implemented tnSysTL1Enable,
+                 tnSysLMEnabled, tnSysAlienChannelLicensingEnabled and
+                 tnPortEtherOperEgressRate.
+                 Added support for tnVwmMsDmSmLmCardGroup.
+                 Added support for tnVwmMsSfp4Group.
+                 Added support for tnVwmMsCard2Group.
+                 Removed support for tnVwmMsSfpProfilesGroup, added
+                 support for tnVwmMsSfpProfilesPnGroup.
+                 Removed VARIATION for tnVwmMsSfpProfileRate, added
+                 VARIATION for tnVwmMsSfpProfilePnRate and
+                 tnVwmMsSfpProfilePnCreateRate."
+
+    REVISION    "201901310000Z"
+    DESCRIPTION "Updated VARIATION for tnVwmMsSfpTxFrequency."
+
+    REVISION    "201812070000Z"
+    DESCRIPTION "Added VARIATION clauses for the character sets of
+                 tnVwmMsIfDescr, tnVwmMsIfTopologyString1,
+                 tnVwmMsIfTopologyString2 and tnVwmMsRflmIfLabel."
+
+    REVISION    "201811300000Z"
+    DESCRIPTION "Added DEFVAL variation for tnSysDiscoveryBinnedStatsBin."
+
+    REVISION    "201811150000Z"
+    DESCRIPTION "Added limited value range variation for
+                 tnVwmMsSfpInfoLinkType."
+
+    REVISION    "201811050000Z"
+    DESCRIPTION "Added not-implemented variations for
+                 tnAmplifierPortAprEDFApulse."
+
+    REVISION    "201810030000Z"
+    DESCRIPTION "Added range variations for tnVwmMsShelfSfpProfileIndex."
+
+    REVISION    "201809120000Z"
+    DESCRIPTION "Added range variation for tnVwmMsTransferLogShelfNr.
+                 Removed support for TnCondition value rateMismatch(1489)."
+
+    REVISION    "201809050000Z"
+    DESCRIPTION "Changed description of ifAdminStatus.
+                 Added support and variations for the tnSysTransferLogGroup and
+                 tnVwmMsTransferLogGroup.
+                 Added support for tnVwmMsSfpProfilesGroup. Added VARIATION
+                 for tnVwmMsSfpProfileName and tnVwmMsSfpProfileRate."
+
+    REVISION    "201808200000Z"
+    DESCRIPTION "Added support and variations for the tnUserMgmtGlobalGroup.
+                 Added variation for tnVwmMsUserDataPir,
+                 tnVwmMsAmplifierPortRxPowerLosThreshold,
+                 tnVwmMsAmplifierPortTxPowerLosThreshold, tnVwmMsTlu9mIfPmMode,
+                 tnVwmMsOpsOsmPselSwitchCountResetTimer,
+                 tnVwmMsOpsOsmPserSwitchCountResetTimer
+                 Added support for tnVwmMsPrbsGroup, tnVwmMsIfLoopbackGroup
+                 tnVwmMsAmplifierPortGroup, tnVwmMsAmplifierCardGroup.
+                 Enhanced VARIATION clauses of tnVwmMsPmudLossRefBand1InOmdOut,
+                 tnVwmMsPmudLossRefBand2InOmdOut, tnAccessPortAINSDebounceTime,
+                 tnAmplifierPortPowerGain, tnSysAINSDebounceTime,
+                 tnVwmMsUserDataTpid, tnVwmMsOpsOsmBounceTimer,
+                 tnVwmMsOpsOsmHoldOffTimer, tnVwmMsOpsOsmPselMaxSwitchCount,
+                 tnVwmMsOpsOsmPserMaxSwitchCount and of tnPortEtherTable.
+                 Enhanced descriptions of tnSysDiscoveryServerIp.
+                 Marked tnSysDiscoveryServerInetAddressType,
+                 tnSysDiscoveryServerInetAddressType and tnSwNodeControlStatus
+                 as not-implemented."
+
+    REVISION    "201807090000Z"
+    DESCRIPTION "Enhanced the VARIATION clauses of tnVwmMsCdrChannelIf1 and
+                 tnVwmMsCdrChannelIf2 with restriction on shelf and slot values.
+                 Added range variations for tnVwmMsShelfAIndex,
+                 tnVwmMsShelfZIndex, tnVwmMsSlotAIndex and tnVwmMsSlotZIndex.
+                 Enhanced descriptions of tnVwmMsOpsOsmPserPmudGroupName and
+                 tnVwmMsSnmpTrapDestServerId."
+
+    REVISION    "201806220000Z"
+    DESCRIPTION "Enhanced supported set of values for tnGenericTrapCondition,
+                 tnGenericActiveAlarmCondition, tnVwmMsAsapFaultProfileCondition.
+                 Added clauses indicating that tnAmplifierPortPowerGainMin and
+                 tnAmplifierPortPowerGainMax are supported in read-only mode.
+                 Replaced tnVwmMsSfd10InsertionLossGroup by
+                 tnVwmMsSfd10InventoryGroup."
+
+    REVISION    "201806060000Z"
+    DESCRIPTION "Added VARIATION clauses for TROPIC-AMPLIFIER-MIB
+                 tnAmplifierPortConfigGroup and tnAmplifierPortInfoGroup
+                 objects.
+                 Removed 'not-implemented' VARIATION of ifConnectorPresent.
+                 Added support for tnVwmMsIfCapabilityGroup,
+                 tnVwmMsOpticalPortGroup, tnVwmMsPmonIfEthFecStatsGroup
+                 and tnVwmMsSfd10InsertionLossGroup.
+                 Enhanced list of supported detectable and non-detectable
+                 passive shelves.
+                 Removed value range limitation for tnVwmMsUserDataVlanId.
+                 Enhanced descriptions for ifAdminStatus,
+                 tnVwmMsSlotProgrammedType, tnVwmMsIfRole, tnVwmMsSfpType,
+                 tnVwmMsSfpTxFrequency, tnVwmMsPrbsTestIfIndex,
+                 tnVwmMsIfLoopbackStatus, tnVwmMsIfTerminalLoopback and
+                 tnVwmMsIfMonitorTargetIf."
+
+    REVISION    "201806010000Z"
+    DESCRIPTION "Added VARIATION clauses for tnVwmMsCdrChannelIf1 and
+                 tnVwmMsCdrChannelIf2.
+                 Added support for tnVwmMsCdrChannel2Group."
+
+    REVISION    "201805150000Z"
+    DESCRIPTION "Updated value range of tnVwmMsPmudEVoaBandInLine1Out
+                 and tnVwmMsPmudEVoaBandInLine2Out.
+                 Added VARIATION clauses for tnVwmMsUserDataIfTable and
+                 tnVwmMsUserDataTpidTable objects.
+                 Added VARIATION clauses for tnPortEtherAutoNegotiate,
+                 tnPortEtherDuplex and tnPortEtherSpeed from the newly
+                 supported TN-PORT-MIB."
+
+    REVISION    "201803160000Z"
+    DESCRIPTION "Updated AGENT-CAPABILITIES release indication to R9.0.0.
+                 Included tnSystemBasicsGroup, added VARIATION for all
+                 objects except tnSysAINSDebounceTime.
+                 Removed VARIATION for tnAccessPortAINSDebounceTime and
+                 tnAccessPortAINSDebounceTimeRemaining.
+                 Added support and DESCRIPTION for tnAccessPortAINS."
+
+    REVISION    "201803080000Z"
+    DESCRIPTION "Updated VARIATION of tnVwmMsOpsOsmPserPmudGroupName and
+                 tnVwmMsSnmpTrapDestServerId, removed VARIATION of
+                 tnVwmMsOpsOsmPserPmudGroup."
+
+    REVISION    "201802270000Z"
+    DESCRIPTION "Updated VARIATION of tnVwmMsOpsOsmPserPmudGroupName and
+                 tnVwmMsSnmpTrapDestServerId, added VARIATION of
+                 tnVwmMsOpsOsmPserPmudGroup."
+
+    REVISION    "201802231200Z"
+    DESCRIPTION "Updated the contact info."
+
+    REVISION    "201802080000Z"
+    DESCRIPTION "Updated VARIATION of tnVwmMsCardInvStatus."
+
+    REVISION    "201801120000Z"
+    DESCRIPTION "Update range of tnVwmMsOpsOsmPselHoldOffTimer and
+                 tnVwmMsOpsOsmPserHoldOffTimer.
+                 Fixed value for ifAdminStatus of PMU and ITP ports."
+
+    REVISION    "201712130000Z"
+    DESCRIPTION "Added VARIATION for tnVwmMsOpsOsmPserPmudGroupName.
+                 Added VARIATION for tnVwmMsOpsOsmPserPmudGroupRowStatus.
+                 Added VARIATION for TropicVwmMsSignalAttenuation objects
+                  - tnVwmMsOpsOsmDsvEVoaSigInAOut
+                  - tnVwmMsOpsOsmDsvEVoaSigInBOut
+                  - tnVwmMsOpsOsmDsvEVoaSigOutAIn
+                  - tnVwmMsOpsOsmDsvEVoaSigOutBIn
+                  - tnVwmMsPmudEVoaBandInLine1Out
+                  - tnVwmMsPmudEVoaBandInLine2Out
+                  - tnVwmMsPmudEVoaBandOutLine1In
+                  - tnVwmMsPmudEVoaBandOutLine2In.
+                 Added support for tnVwmMsInsertionLossGroup.
+                 Added lpbkTerm(47) and oprUnachieve(61) to the VARIATION
+                 clauses of objects with syntax TROPIC-TC::TnCondition.
+                 Added specification that the value of tnVwmMsShelfTime
+                 must be a UTC time.
+                 Added VARIATION for tnVwmMsPmudLossRefBand1InOmdOut and
+                 tnVwmMsPmudLossRefBand2InOmdOut."
+
+    REVISION    "201711210000Z"
+    DESCRIPTION "Enhances VARIATION clause of tnVwmMsSlotProgrammedType,
+                 adding configuration possibilities for OPS slots.
+                 Removed VARIATION clause of tnAccessPortDirection.
+                 Added VARIATION clauses for passive shelves.
+                 Modified VARIATION for tnVwmMsIfLoopbackStatus.
+                 Added VARIATION for tnVwmMsIfTerminalLoopback.
+                 Added support for tnVwmMsPmonTlu9mGroup.
+                 Added support for tnVwmMsPmonIfThresholdsGroup.
+                 Added VARIATION for tnVwmMsIfPmCvSesThreshold10B.
+                 Added VARIATION for tnVwmMsIfPmCvSesThreshold66B.
+                 Added support for tnVwmMsIfOpticalPowerThresholdsGroup.
+                 Added VARIATION for tnVwmMsIfRxOptPwrThreshold.
+                 Added VARIATION for tnVwmMsIfTxOptPwrThreshold.
+                 Added VARIATION for tnVwmMsOpsOsmPselWMonIfIndex.
+                 Added VARIATION for tnVwmMsOpsOsmPselPMonIfIndex.
+                 Updated VARIATION for tnVwmMsSfpTxFrequency.
+                 Added VARIATION for tnVwmMsSfpInfoFrequency,
+                 tnVwmMsSfpInfoStartFrequency, tnVwmMsSfpInfoStopFrequency
+                 and tnVwmMsSfpInfoFrequencyGrid.
+                 Added support for tnVwmMsSfpTunableGroup."
+
+    REVISION    "201711010000Z"
+    DESCRIPTION "Added values txSquelch(1474), apsSuspended(1475) and
+                 monitorExc(1477) to the VARIATION clauses of all objects
+                 with syntax TROPIC-TC::TnCondition.
+                 Added value none(0) to the VARIATION clause of object
+                 tnGenericTrapCondition.
+                 The VARIATION clauses of objects tnVwmMsSnmpReqRspPort
+                 and tnVwmMsSnmpTrapDestPort indicate that value 0 can not
+                 be configured.
+                 Added VARIATION for tnVwmMsOpsOsmDsvThresholdSigOut."
+
+    REVISION    "201710130000Z"
+    DESCRIPTION "Added VARIATION for
+                 tnSysBackupAndRestoreRemoteHostInetAddressType and
+                 tnSysBackupAndRestoreRemoteHostInetAddress.
+                 Added VARIATION for
+                 tnSwNodeSwdlServerInetAddressType and
+                 tnSwNodeSwdlServerInetAddress.
+                 Added VARIATION for tnAccessPortFarEndIfIndex.
+                 Updated VARIATION for tnAccessPortFarEndIfIndexConnFrom.
+                 Removed VARIATION for tnAccessPortFarEndAddressConnFrom
+                 and tnAccessPortFarEndTypeConnFrom.
+                 Updated VARIATION for tnVwmMsPrbsTestIfIndex.
+                 Added support for the following TROPIC-TC::TnCondition
+                 values : frcdWkSwBk(31), frcdWkSwPr(32), manWkSwBk(49),
+                 manWkSwPr(50), mismatch(51), wkSwPr(84), wkSwBk(109),
+                 wtr(617)"
+
+    REVISION    "201709290000Z"
+    DESCRIPTION "Updated AGENT-CAPABILITIES release indication to R8.5.0.
+                 Added VARIATION indicating that tnGenericTrapEntityType
+                 and tnGenericActiveAlarmEntityType are not implemented.
+                 Modified VARIATION for tnVwmMsSfpTxFrequency, removing the
+                 value range limitation, adding support for OSU OSC ports.
+                 Added VARIATION clauses for tnVwmMsOpsOsmSwitchCommand,
+                 tnVwmMsOpsOsmPselRowStatus and tnVwmMsOpsOsmPserRowStatus.
+                 Added support for tnVwmMsOsmDsvGroup, tnVwmMsPmudGroup,
+                 tnVwmMsOpsOsmPselGroup and tnVwmMsOpsOsmPserGroup.
+                 Added VARIATION clauses for tnVwmMsOpsOsmPselTable and
+                 tnVwmMsOpsOsmPserTable objects."
+
+    REVISION    "201707140000Z"
+    DESCRIPTION "Removed support for snmpWarmStartNotificationGroup"
+
+    REVISION    "201707050000Z"
+    DESCRIPTION "Removed support for TROPIC-NOTIFICATION-MIB, added support
+                 for TROPIC-GENERIC-NOTIFICATION-MIB.
+                 Removed support for TROPIC-LOG-MIB, added support for
+                 TROPIC-GENERIC-LOG-MIB.
+                 Added VARIATION for tnGenericTrapNumberResetToBeHandled
+                 being not-implemented.
+                 Enhanced value set of tnGenericTrapCategory.
+                 Added support for tnVwmMsSfp3Group.
+                 Add VARIATION for tnVwmMsShelfRestart."
+
+    REVISION    "201706160000Z"
+    DESCRIPTION "Added tnVwmMsPmonIfPcsStatsGroup, and VARIATION clauses for
+                 the not-supported objects of this group."
+
+    REVISION    "201704240000Z"
+    DESCRIPTION "Removed VARIATION of 'not-implemented' sysServices.
+                 Modified VARIATION for objects tnSysBackupAndRestoreProtocol,
+                 tnSysDiscoveryServerProtocol and tnSwNodeSwdlServerProtocol,
+                 allowing write access only with value sftp(2)."
+
+    REVISION    "201704060000Z"
+    DESCRIPTION "Updated AGENT-CAPABILITIES release indication to R8.4.0.
+                 Modified VARIATION of RowStatus objects, indicating that such
+                 an object must be the only object in a SET PDU.
+                 Changed the set of supported TrapCondition values for objects
+                 tnTrapCondition, tnActiveAlarmCondition and
+                 tnVwmMsAsapFaultProfileCondition, aligning with other products
+                 supported by NFM-T.
+                 Removed text specifying that changes to objects from the
+                 tnVwmMsSnmpTrapDestGroup lead to a cold restart of the SNMP
+                 Agent. VARIATION clauses have been updated or removed for this."
+
+    REVISION    "201702060000Z"
+    DESCRIPTION "Modified VARIATION for tnVwmMsNtpServerAddr, correcting the
+                 description to functionally disable an instance."
+
+    REVISION    "201701130000Z"
+    DESCRIPTION "Replaced tn1830VwmCapabilityR820 by tn1830VwmCapabilityR830.
+                 Modified VARIATION for ifOperStatus, removed value testing(4).
+                 Modified VARIATION for tnVwmMsShelfManagementMode and
+                 tnVwmMsShelfDbSyncDirection.
+                 Added VARIATION for tnVwmMsCdrChannelRate.
+                 Added VARIATION for tnVwmMsIfMonitorMode.
+                 Added VARIATION for tnVwmMsShelfAIndex, tnVwmMsShelfZIndex,
+                 tnVwmMsSlotAIndex, tnVwmMsSlotZIndex, tnVwmMsOpsPaeWtrTimer
+                 and tnVwmMsOpsPaeRowStatus.
+                 Updated VARIATION of tnTrapCondition, tnActiveAlarmCondition,
+                 tnVwmMsAsapFaultProfileCondition, tnVwmMsIfMonitorTargetIf
+                 and tnVwmMsSnmpTrapDestRowStatus.
+                 Added VARIATION for tnVwmMsIfLosPropExtensionTimer and
+                 tnVwmMsIfLosPropDefectPersistenceTimer.
+                 Added support of tnAccessPortGroup.
+                 Added support of tnVwmMsShelfTopologyGroup.
+                 Added VARIATION for tnVwmMsShelfAltitude."
+
+    REVISION    "201612160000Z"
+    DESCRIPTION "Modified VARIATION for tnVwmMsSnmpTrapDestServerId,
+                 correcting the supported character set.
+                 Modified VARIATION for tnVwmMsSfpTxFrequency, adding client
+                 ports, and a value range limitation.
+                 Added VARIATION for tnVwmMsIfMonitorTargetIf.
+                 Added VARIATION for tnVwmMsSlotAssignedStatus.
+                 Added VARIATION clauses for tnVwmMsOpsOsmTable objects.
+                 Removed VARIATION clauses for actions now supported by
+                 OPS units.
+                 Added VARIATION for tnVwmMsCraftIpV4AddrType.
+                 Added support of tnVwmMsOpsCardGroup.
+                 Added VARIATION clauses for tnVwmMsCraftIpV4Addr and
+                 tnVwmMsCraftIpV4Gateway.
+                 Added VARIATION for tnVwmMsNtpState."
+
+    REVISION    "201611040000Z"
+    DESCRIPTION "Added VARIATION for tnVwmMsMtSoftwareShelfLoadIndex.
+                 Added VARIATION for tnVwmMsMtSoftwareShelfLoadPath.
+                 Added VARIATION for tnVwmMsMtSoftwareShelfActivate.
+                 Added VARIATION for tnVwmMsMtSoftwareShelfAbort."
+
+    REVISION    "201610280000Z"
+    DESCRIPTION "Replaced obsolete tnVwmMsPowerIfGroup by tnVwmMsPwrIfGroup.
+                 Added VARIATION for tnVwmMsSfpTxFrequency.
+                 Added VARIATION for tnVwmMsPrbsTestStartAutoStop.
+                 Added VARIATION for tnVwmMsIfLoopbackStatus.
+                 Added VARIATION clauses for actions unsupported by OPS units."
+
+    REVISION    "201609260000Z"
+    DESCRIPTION "Added VARIATION for tnVwmMsShelfManagementMode.
+                 Added VARIATION for tnVwmMsShelfDbSyncDirection.
+                 Added support for tnVwmMsDdmDataGroup.
+                 Added VARIATION for tnVwmMsPrbsTestIfIndex.
+                 Added VARIATION for tnVwmMsIfRole."
+
+    REVISION    "201608170000Z"
+    DESCRIPTION "Added the administrative and operation status (testing) for a
+                 Line or Client interface (TLU and ITP)."
+
+    REVISION    "201608110000Z"
+    DESCRIPTION "Removed access read-only limitation from tnVwmMsSfpType."
+
+    REVISION    "201606160000Z"
+    DESCRIPTION "Added tnSystemDiscoveryGroup with VARIATION clauses.
+                 Added tnVwmMsSysDiscoveryGroup, tnVwmMsPmonNotificationsGroup,
+                 tnVwmMsPmonIfEthStatsGroup, tnVwmMsPmonIfOptStatsGroup and
+                 tnVwmMsSecurityNotificationsGroup."
+
+    REVISION    "201605310000Z"
+    DESCRIPTION "Extended VARIATION for tnVwmMsNtpServerAddr.
+                 Added support tnVwmMsExtAnalogIfGroup, tnVwmMsExtCtrlIfGroup.
+                 Removed variation tnVwmMsExtAlmIfAdminStatus, tnVwmMsExtAlmIfActivePos.
+                 Updated tnVwmMsExtAlmIfDescr.
+                 Added limitation of supported character set for
+                 tnVwmMsExtAnalogIfDescr, tnVwmMsExtCtrlIfDescr.
+                 Removed VARIATION of tnSysBackupAndRestoreCommand (full support)."
+
+    REVISION    "201605130000Z"
+    DESCRIPTION "Added limited value ranges for tnVwmMsFaultAlarmRaiseTime
+                 and tnVwmMsFaultAlarmClearTime.
+                 Updated VARIATION of tnVwmMsShelfProgrammedType.
+                 Added value range limitation for tnVwmMsShelfIndex.
+                 Added value range limitation for tnVwmMsSlotIndex.
+                 Modified encoding for tnTrapObjectID and tnActiveAlarmObjectID.
+                 Added encoding description for ifIndex."
+
+    REVISION    "201604150000Z"
+    DESCRIPTION "Initial version of this MIB module."
+
+    ::= { tnVwmMsAgentCapability 1 }
+
+tn1830VwmCapabilityR901 AGENT-CAPABILITIES
+    PRODUCT-RELEASE "Release 9.0.1."
+    STATUS          current
+    DESCRIPTION     "Agent Capabilities for the 1830 VWM product.
+
+                     Several VARIATION clauses refer to passive shelves, which
+                     are units for which object tnVwmMsShelfProgrammedType has
+                     one of the following values :
+                      - aluWdmSfd44Shelf    (*)
+                      - aluWdmSfd44bShelf   (*)
+                      - aluWdmSfd96Shelf    (*)
+                      - aluWdmBmuPShelf     (*)
+                      - nokiaSfd10ALmShelf  (*)
+                      - nokiaSfd10BLmShelf  (*)
+                      - nokiaSfd10CLmShelf  (*)
+                      - nokiaSfd10DLmShelf  (*)
+                      - aluWdmSplit2Shelf
+                      - aluWdmOscCplrShelf
+                      - aluWdmOAUnidirShelf
+                      - nokiaSfd2AShelf, nokiaSfd2BShelf, nokiaSfd2CShelf, nokiaSfd2DShelf,
+                        nokiaSfd2EShelf, nokiaSfd2FShelf, nokiaSfd2GShelf, nokiaSfd2HShelf,
+                        nokiaSfd2IShelf, nokiaSfd2LShelf, nokiaSfd2MShelf, nokiaSfd2NShelf,
+                        nokiaSfd2OShelf, nokiaSfd2PShelf, nokiaSfd2QShelf, nokiaSfd2RShelf
+                      - nokiaSfd4AShelf, nokiaSfd4BShelf, nokiaSfd4CShelf, nokiaSfd4DShelf,
+                        nokiaSfd4EShelf, nokiaSfd4FShelf, nokiaSfd4GShelf, nokiaSfd4HShelf
+                      - nokiaSfd8AShelf, nokiaSfd8BShelf, nokiaSfd8CShelf, nokiaSfd8DShelf
+                      - nokiaSfc1AShelf, nokiaSfc1BShelf, nokiaSfc1CShelf, nokiaSfc1DShelf,
+                        nokiaSfc1EShelf, nokiaSfc1FShelf, nokiaSfc1GShelf, nokiaSfc1HShelf
+                      - nokiaSfc2ABShelf, nokiaSfc2CDShelf, nokiaSfc2EFShelf, nokiaSfc2GHShelf
+                      - nokiaSfc4ADShelf, nokiaSfc4EHShelf
+                      - nokiaSfc8UShelf, nokiaSfc8LShelf
+                      - nokiaSARO2AShelf, nokiaSARO2BShelf, nokiaSARO2CShelf, nokiaSARO2DShelf,
+                        nokiaSARO2EShelf, nokiaSARO2FShelf, nokiaSARO2GShelf, nokiaSARO2HShelf
+                      - nokiaSARO4AShelf, nokiaSARO4BShelf, nokiaSARO4CShelf, nokiaSARO4DShelf
+                      - nokiaSARO8AShelf, nokiaSARO8BShelf
+                      - nokiaLR4BOCShelf
+
+                     The shelf types marked with (*) can dynamically be detected
+                     by the OSU, and are therefore referred to as 'detectable
+                     passive shelves'. The other shelves are 'not-detectable
+                     passive shelves'."
+
+--
+-- Capabilities for SNMPv2-MIB
+--
+
+    SUPPORTS            SNMPv2-MIB
+        INCLUDES        { systemGroup,
+                          snmpBasicNotificationsGroup }
+
+--
+-- Capabilities for IF-MIB
+--
+
+    SUPPORTS            IF-MIB
+        INCLUDES        { ifGeneralInformationGroup,
+                          ifVHCPacketGroup }
+
+        VARIATION       ifIndex
+            DESCRIPTION "In the value of this object, the shelf, slot and port
+                         values are encoded as follows :
+
+                          shelf = (value & 0x7FF00000) >> 20;
+                          slot  = (value & 0x000FF000) >> 12;
+                          port  = (value & 0x00000FF0) >> 4;"
+
+        VARIATION       ifDescr
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       ifType
+            SYNTAX      INTEGER { ethernetCsmacd(6), opticalChannel(195) }
+            DESCRIPTION "Limited set of values."
+
+        VARIATION       ifPhysAddress
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       ifAdminStatus
+            DESCRIPTION "Setting of the value to testing(3) is only supported
+                         for client and line ports of TLU-9(M) and ITP units, for
+                         ports 1-28 of TLU-200 units, and for the LINE and SIG
+                         ports of ADVGI units.
+
+                         This object has fixed value up(1), and is read-only,
+                         for the following interfaces :
+                          - Interfaces with port number (see ifIndex VARIATION)
+                            16 or 17 related to shelves with one of the following
+                            values of tnVwmMsShelfProgrammedType :
+                             - nokiaVwmMsPmu9UcShelf
+                             - nokiaVwmMsPmu9LcShelf
+                             - nokiaVwmMsPmu9UcmShelf
+                             - nokiaVwmMsPmu9LcmShelf
+                          - Interfaces with port number (see ifIndex VARIATION)
+                            26 or 27 related to shelves with one of the following
+                            values of tnVwmMsShelfProgrammedType :
+                             - nokiaVwmMsPmuD21AShelf
+                             - nokiaVwmMsPmuD21BShelf
+                             - nokiaVwmMsPmuD21CShelf
+                             - nokiaVwmMsPmuD21DShelf
+                          - Interfaces with port number (see ifIndex VARIATION)
+                            17 or 18 related to shelves with one of the following
+                            values of tnVwmMsShelfProgrammedType :
+                             - nokiaVwmMsItp4UcaShelf
+                             - nokiaVwmMsItp4UcbShelf
+                             - nokiaVwmMsItp4LcaShelf
+                             - nokiaVwmMsItp4LcbShelf
+
+                         This object can not be set for passive shelves."
+
+        VARIATION       ifOperStatus
+            SYNTAX      INTEGER { up(1), down(2), unknown(4) }
+            DESCRIPTION "Limited set of values.
+                         For an interface of a passive shelf this object
+                         always has value up(1)."
+
+        VARIATION       ifLinkUpDownTrapEnable
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       ifName
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       ifAlias
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       ifHCInUcastPkts
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       ifHCInMulticastPkts
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       ifHCInBroadcastPkts
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       ifHCOutUcastPkts
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       ifHCOutMulticastPkts
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       ifHCOutBroadcastPkts
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       ifHCInOctets
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       ifHCOutOctets
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       ifInOctets
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       ifOutOctets
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       ifInUnknownProtos
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       ifInErrors
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       ifOutErrors
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       ifInUcastPkts
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       ifInMulticastPkts
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       ifInBroadcastPkts
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       ifInDiscards
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       ifOutUcastPkts
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       ifOutMulticastPkts
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       ifOutBroadcastPkts
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       ifOutDiscards
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       ifPromiscuousMode
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+--
+-- Capabilities for TROPIC-SYSTEM-MIB
+--
+
+    SUPPORTS            TROPIC-SYSTEM-MIB
+        INCLUDES        { tnSystemBasicsGroup,
+                          tnSystemBackupAndRestoreGroup,
+                          tnSysTransferLogGroup,
+                          tnSystemDiscoveryGroup }
+
+        VARIATION       tnSysDescr
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnSysTelnetPort
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnSysHttpPort
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnSysDateAndTime
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnSysReset
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnSysMIBVersion
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnSysRingID
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnSysNetworkElementID
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnSysAINSDebounceTime
+            SYNTAX      Unsigned32 (0..345600)
+            DESCRIPTION "Limited range of values.
+                         On SET, positive (non-zero) values are rounded up to
+                         the next full minute on input. Only the rounded value
+                         is stored and the rounded value is returned for GET
+                         operations"
+
+        VARIATION       tnSysSonetSdhMode
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnSysAlarmReportingControl
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnSysWavelengthTrackerWaveKeySpace
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnSysSecureMode
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnSysExtendedTemperatureRange
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnSysTemperatureInCelsius
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnSysName
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnSysEquipmentControllerCapacity
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnSysFirstLevelControllerCapacity
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnSysMatrix0CompactCapacity
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnSysUniversalMatrixFirstLevelControllerCapacity
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnSysTimeOffsetTimeZone
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnSysFipsSquelchMode
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnSysOtdrListOfFileNames
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnSysOtdrFileCounts
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnSysAltitude
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnSysThermalShutdownAutotimer
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnSysDisplayShelfLabel
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnSysPMFineGranularityControl
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnSysFmRead
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnSysPMStreamingServerControl
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnSysSlotMigrationControl
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnSysFlexGridClusterOcsAddDropEnabled
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnSysFilterCheckTime
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnSysCNLinkPhysicalIfIndex
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnSysUserlabel
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnSysOpenAgentControl
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnSysUnkeyedDanglingOchAddDropEnabled
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnSysNetWorkTraceV3SecurityUser
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnSysScotV3SecurityUser
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnSysTL1Enable
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnSysLMEnabled
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnSysAlienChannelLicensingEnabled
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnSysDebug
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnSysClusterV3SecurityUser
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnSysBackupAndRestoreRemoteHostIp
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported. It is superseded by
+                         objects tnSysBackupAndRestoreRemoteHostAddrType
+                         and tnSysBackupAndRestoreRemoteHostAddr."
+
+        VARIATION       tnSysBackupAndRestoreProtocol
+            SYNTAX      INTEGER { sftp(2) }
+            DESCRIPTION "Limited set of values."
+
+        VARIATION       tnSysBackupAndRestoreLastBackupFileCrc
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnSysBackupAndRestoreRemoteHostInetAddressType
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnSysBackupAndRestoreRemoteHostInetAddress
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnSysTransferLogCommand
+            DESCRIPTION "In order to initiate a file transfer for a specific
+                         shelf (OSU: shelf 1, RMU: shelf > 1) object
+                         tnVwmMsTransferLogShelfNr must be set to the
+                         value of the desired shelf number from which the log
+                         must be retrieved.
+                         Access is restricted to SNMPv3 users with admin
+                         rights.
+                         The tnGenericSecurityFileNameNotif trap is sent when
+                         the log file is ready on the OSU.
+                         The following state change traps are issued for the
+                         regarding the result of the issued command:
+                         - tnSysTransferLogStatus
+                         - tnVwmMsTransferLogOperResult
+                         Object tnVwmMsTransferLogAbort can be used to abort
+                         a log file transfer."
+
+        VARIATION       tnSysTransferLogRemoteHostIp
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported , it is superseded by
+                         tnVwmMsTransferLogRemoteHostAddrType and
+                         tnVwmMsTransferLogRemoteHostAddr."
+
+        VARIATION       tnSysTransferLogType
+            SYNTAX      INTEGER { ual(3), secu(6) }
+            DEFVAL      { ual }
+            DESCRIPTION "Limited set of values.
+                         Depending on the selected value the following logs
+                         can be retrieved:
+                         - ual(3) : raw format of the user action log
+                         - secu(6): raw format of the security log"
+
+        VARIATION       tnSysTransferLogStatus
+            DESCRIPTION "Object tnVwmMsTransferLogOperResult provides
+                        additional result information in ASCII format."
+
+        VARIATION       tnSysTransferLogLastLogFilename
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnSysTransferLogLastLogFilename
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnSysTransferLogLastCommand
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnSysTransferLogLastFileTimeStamp
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnSysTransferLogProtocol
+            SYNTAX      INTEGER { sftp(2) }
+                        DEFVAL      { sftp }
+            DESCRIPTION "Limited set of values."
+
+        VARIATION       tnSysTransferLogWindowStart
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnSysTransferLogWindowStop
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnSysTransferLogRemoteHostInetAddressType
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported, it is superseded by
+                         tnVwmMsTransferLogRemoteHostAddrType."
+
+        VARIATION       tnSysTransferLogRemoteHostInetAddress
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported, it is superseded by
+                         tnVwmMsTransferLogRemoteHostAddr."
+
+        VARIATION       tnSysDiscoveryMask
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnSysDiscoveryErrorCode
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnSysDiscoveryBinnedStatsInterval
+            SYNTAX      Unsigned32 (0..1)
+            DESCRIPTION "Limited value range. Value 0 corresponds
+                         with a 15 minute interval.
+                         Value 1 corresponds with a 24 hour interval."
+
+        VARIATION       tnSysDiscoveryBinnedStatsBin
+            SYNTAX      Unsigned32 (1..96)
+            DEFVAL      { 1 }
+            DESCRIPTION "Limited value range.
+                         Value 1 indicates the most recent history bin
+                         for all PM points. Value 2 indicates the second
+                         most recent history bin etc.
+                         When tnSysDiscoveryBinnedStatsInterval is set to
+                         value 0 (which corresponds to a 15 minute interval)
+                         bin numbers in the range of 1..96 can be requested.
+                         When tnSysDiscoveryBinnedStatsInterval is set to
+                         value 1 (which corresponds to a 24 hour interval)
+                         only bin number 1 can be requested."
+
+        VARIATION       tnSysDiscoveryServerProtocol
+            SYNTAX      INTEGER { sftp(2) }
+            DESCRIPTION "Limited set of values."
+
+        VARIATION       tnSysDiscoveryServerIp
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported. It is superseded by
+                         objects tnVwmMsSysDiscoveryServerAddrType and
+                         tnVwmMsSysDiscoveryServerAddr."
+
+        VARIATION       tnSysDiscoveryServerInetAddressType
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnSysDiscoveryServerInetAddress
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+--
+-- Capabilities for TROPIC-SOFTWARE-MIB
+--
+
+    SUPPORTS            TROPIC-SOFTWARE-MIB
+        INCLUDES        { tnSwNodeGroup }
+
+        VARIATION       tnSwNodeControl
+            SYNTAX      INTEGER { noCmd(1),
+                                  audit(3),
+                                  activate(4),
+                                  commit(6),
+                                  backout(7),
+                                  load(8) }
+            DESCRIPTION "Limited set of values."
+
+        VARIATION       tnSwNodeForce
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnSwNodeNoBackup
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnSwNodeLastControlOperation
+            SYNTAX      INTEGER { noCmd(1),
+                                  audit(3),
+                                  activate(4),
+                                  commit(6),
+                                  backout(7),
+                                  load(8) }
+            DESCRIPTION "Limited set of values."
+
+        VARIATION       tnSwNodeLastControlOperationIntegerResult
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnSwNodeLastAuditTimeStamp
+            ACCESS      read-only
+            DESCRIPTION "The value can only be set by the agent."
+
+        VARIATION       tnSwNodeSwdlServerProtocol
+            SYNTAX      INTEGER { sftp(2) }
+            DESCRIPTION "Limited set of values."
+
+        VARIATION       tnSwNodeSwdlServerIp
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported. It is superseded
+                         by objects tnSwNodeSwdlServerAddrType and
+                         tnSwNodeSwdlServerAddr."
+
+        VARIATION       tnSwNodePartialLoadCommand
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnSwNodePartialLoadSupportedCardTypes
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnSwNodePartialLoadImgInstalledCardTypes
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnSwNodePartialLoadImgToBeInstalledCardTypes
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnSwNodePartialLoadActionResult
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnSwNodePartialLoadActionPercentCompleted
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnSwNodeSwdlServerInetAddressType
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnSwNodeSwdlServerInetAddress
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnSwNodeControlStatus
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+--
+-- Capabilities for TROPIC-USERMGMT-MIB
+--
+
+    SUPPORTS            TROPIC-USERMGMT-MIB
+        INCLUDES        { tnUserGroup,
+                          tnUserMgmtGlobalGroup }
+
+        VARIATION       tnUserName
+            DESCRIPTION "This table is read-only and lists the CLI users.
+                         SNMPv3 users are omitted from this table."
+
+        VARIATION       tnUserRowStatus
+            SYNTAX      INTEGER { active(1) }
+            ACCESS      read-only
+            DESCRIPTION "Limited set of values. This object is read-only."
+
+        VARIATION       tnUserAccessLevel
+            SYNTAX      INTEGER { administrator(2),
+                                  provisioner(3),
+                                  observer(4),
+                                  service(5) }
+            ACCESS      read-only
+            DESCRIPTION "Limited set of values. This object is read-only.
+                         The access levels correspond with the following
+                         CLI access levels:
+                         - administrator(2) : Admin
+                         - provisioner(3)   : Config
+                         - observer(4)      : View
+                         - service(5)       : Debug"
+
+        VARIATION       tnUserPassword
+            ACCESS      read-only
+            DESCRIPTION "This object is read-only.
+                         The minimum password length is 8 characters and the
+                         maximum length is 32 characters. However always the
+                         value '********' is returned."
+
+        VARIATION       tnUserLastLoginTerminalIP
+            ACCESS      not-implemented
+            DESCRIPTION "This object is superseeded by:
+                         - tnVwmMsUserLastLoginTerminalIpType
+                         - tnVwmMsUserLastLoginTerminalIp"
+
+        VARIATION       tnUserSessionTimeout
+            ACCESS      read-only
+            DESCRIPTION "This object is read-only.
+                         The value is equal to that of scalar
+                         tnUserMgmtSysSessionTimeOut."
+
+        VARIATION       tnUserPasswordGraceInterval
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnUserPasswordGraceLogins
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnUserPasswordAging
+            ACCESS      read-only
+            DESCRIPTION "This object is read-only.
+                         The value is equal to that of scalar
+                         tnUserMgmtSysPasswordAging."
+
+        VARIATION       tnUserMgmtSysMinPasswordLength
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnUserMgmtSysMaxPasswordLength
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnUserMgmtSysSessionTimeOut
+            SYNTAX      Unsigned32 (1..999)
+            DESCRIPTION "Limited set of values, range 1 - 999."
+
+        VARIATION       tnUserMgmtSysSessionFailedMaxLogins
+            SYNTAX      Unsigned32 (0..15)
+            DESCRIPTION "Limited set of values, range 0 - 15."
+
+        VARIATION       tnUserMgmtSysLoginInactivityTimeOut
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnUserMgmtSysMinIntervalInvalidLogin
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnUserMgmtSysSessionLogoff
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnUserMgmtSysPasswordAging
+            SYNTAX      Unsigned32 (0..999)
+            DESCRIPTION "Limited set of values, range 0 - 999."
+
+        VARIATION       tnUserMgmtSysPasswordAgingGraceInterval
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnUserMgmtSysPasswordAgingGraceLogins
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnUserMgmtSysPasswordObsolescenceInterval
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnUserMgmtSysMaxSession
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+--
+-- Capabilities for TROPIC-GENERIC-NOTIFICATION-MIB
+--
+
+    SUPPORTS            TROPIC-GENERIC-NOTIFICATION-MIB
+        INCLUDES        { tnGenericTrapBufferGroup }
+
+        VARIATION       tnGenericTrapCategory
+            SYNTAX      INTEGER { criticalAlarms(1),
+                                  majorAlarms(2),
+                                  minorAlarms(3),
+                                  uiActions(5),
+                                  generalEvents(6),
+                                  warningAlarms(12) }
+            DESCRIPTION "Limited set of values."
+
+        VARIATION       tnGenericTrapCondition
+            SYNTAX      INTEGER { none(0),
+                                  contCom(15),
+                                  eqpt(24),
+                                  frcdWkSwBk(31),
+                                  frcdWkSwPr(32),
+                                  lof(41),
+                                  los(43),
+                                  lpbkLine(46),
+                                  lpbkTerm(47),
+                                  manWkSwBk(49),
+                                  manWkSwPr(50),
+                                  mismatch(51),
+                                  opr(60),
+                                  oprUnachieve(61),
+                                  pwr(64),
+                                  replUnitMiss(65),
+                                  trmt(82),
+                                  unknown(83),
+                                  wkSwPr(84),
+                                  swUpgFail(108),
+                                  wkSwBk(109),
+                                  man(112),
+                                  eqptDgr(195),
+                                  lss(208),
+                                  hiBer(225),
+                                  lanLfi(230),
+                                  lanRfi(231),
+                                  unknownSfpXfp(270),
+                                  mismatchSfpXfp(271),
+                                  oaPumpBiasCurrHigh(348),
+                                  oaPumpTempHigh(349),
+                                  sfpTempOOR(355),
+                                  tCvPcs15Min(368),
+                                  tEsPcs15Min(375),
+                                  tSefsPcs15Min(387),
+                                  tSesPcs15Min(393),
+                                  tCvPcs1Day(412),
+                                  tEsPcs1Day(419),
+                                  tSefsPcs1Day(431),
+                                  tSesPcs1Day(437),
+                                  intTempHigh(458),
+                                  intTempLow(459),
+                                  replUnitMissMOD(467),
+                                  wtr(617),
+                                  cardBoot(718),
+                                  inventoryErrMod(1315),
+                                  hiSer(1399),
+                                  cabAlm1(1421),
+                                  cabAlm2(1422),
+                                  cabAlm3(1423),
+                                  cabAlm4(1424),
+                                  frmAlm1(1425),
+                                  frmAlm2(1426),
+                                  frmAlm3(1427),
+                                  frmAlm4(1428),
+                                  frmAlm5(1429),
+                                  frmAlm6(1430),
+                                  frmAlm7(1431),
+                                  frmAlm8(1432),
+                                  frmAlm9(1433),
+                                  frmAlm10(1434),
+                                  frmAlm11(1435),
+                                  frmAlm12(1436),
+                                  usrAlm1(1437),
+                                  usrAlm2(1438),
+                                  usrAlm3(1439),
+                                  usrAlm4(1440),
+                                  usrAlm5(1441),
+                                  usrAlm6(1442),
+                                  usrAlm7(1443),
+                                  usrAlm8(1444),
+                                  usrAlm9(1445),
+                                  usrAlm10(1446),
+                                  usrAlm11(1447),
+                                  usrAlm12(1448),
+                                  usrAlm13(1449),
+                                  usrAlm14(1450),
+                                  usrAlm15(1451),
+                                  usrAlm16(1452),
+                                  usrAlm17(1453),
+                                  usrAlm18(1454),
+                                  usrAlm19(1455),
+                                  usrAlm20(1456),
+                                  usrAlm21(1457),
+                                  usrAlm22(1458),
+                                  usrAlm23(1459),
+                                  usrAlm24(1460),
+                                  usrAlm25(1461),
+                                  usrAlm26(1462),
+                                  usrAlm27(1463),
+                                  usrAlm28(1464),
+                                  usrAlm29(1465),
+                                  usrAlm30(1466),
+                                  usrAlm31(1467),
+                                  usrAlm32(1468),
+                                  swCompFail(1469),
+                                  apsBlock(1470),
+                                  apsLOSrv(1471),
+                                  apsLOSync(1472),
+                                  auditBlock(1473),
+                                  txSquelch(1474),
+                                  apsSuspended(1475),
+                                  monitorExc(1477),
+                                  cpriLossOfSignal(1485),
+                                  cpriLossOfFrame(1486),
+                                  cpriLocalFault(1487),
+                                  cpriRemoteAlarmIndication(1488) }
+            DESCRIPTION "Limited set of values."
+
+        VARIATION       tnGenericTrapEntityType
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnGenericTrapNumberResetToBeHandled
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+--
+-- Capabilities for TROPIC-GENERIC-LOG-MIB
+--
+
+    SUPPORTS            TROPIC-GENERIC-LOG-MIB
+        INCLUDES        { tnGenericActiveAlarmGroup }
+
+        VARIATION       tnGenericActiveAlarmCategory
+            SYNTAX      INTEGER { criticalAlarms(1),
+                                  majorAlarms(2),
+                                  minorAlarms(3),
+                                  warningAlarms(12) }
+            DESCRIPTION "Limited set of values."
+
+        VARIATION       tnGenericActiveAlarmCondition
+            SYNTAX      INTEGER { none(0),
+                                  contCom(15),
+                                  eqpt(24),
+                                  frcdWkSwBk(31),
+                                  frcdWkSwPr(32),
+                                  lof(41),
+                                  los(43),
+                                  lpbkLine(46),
+                                  lpbkTerm(47),
+                                  manWkSwBk(49),
+                                  manWkSwPr(50),
+                                  mismatch(51),
+                                  opr(60),
+                                  oprUnachieve(61),
+                                  pwr(64),
+                                  replUnitMiss(65),
+                                  trmt(82),
+                                  unknown(83),
+                                  wkSwPr(84),
+                                  swUpgFail(108),
+                                  wkSwBk(109),
+                                  man(112),
+                                  eqptDgr(195),
+                                  lss(208),
+                                  hiBer(225),
+                                  lanLfi(230),
+                                  lanRfi(231),
+                                  unknownSfpXfp(270),
+                                  mismatchSfpXfp(271),
+                                  oaPumpBiasCurrHigh(348),
+                                  oaPumpTempHigh(349),
+                                  sfpTempOOR(355),
+                                  tCvPcs15Min(368),
+                                  tEsPcs15Min(375),
+                                  tSefsPcs15Min(387),
+                                  tSesPcs15Min(393),
+                                  tCvPcs1Day(412),
+                                  tEsPcs1Day(419),
+                                  tSefsPcs1Day(431),
+                                  tSesPcs1Day(437),
+                                  intTempHigh(458),
+                                  intTempLow(459),
+                                  replUnitMissMOD(467),
+                                  wtr(617),
+                                  cardBoot(718),
+                                  inventoryErrMod(1315),
+                                  hiSer(1399),
+                                  cabAlm1(1421),
+                                  cabAlm2(1422),
+                                  cabAlm3(1423),
+                                  cabAlm4(1424),
+                                  frmAlm1(1425),
+                                  frmAlm2(1426),
+                                  frmAlm3(1427),
+                                  frmAlm4(1428),
+                                  frmAlm5(1429),
+                                  frmAlm6(1430),
+                                  frmAlm7(1431),
+                                  frmAlm8(1432),
+                                  frmAlm9(1433),
+                                  frmAlm10(1434),
+                                  frmAlm11(1435),
+                                  frmAlm12(1436),
+                                  usrAlm1(1437),
+                                  usrAlm2(1438),
+                                  usrAlm3(1439),
+                                  usrAlm4(1440),
+                                  usrAlm5(1441),
+                                  usrAlm6(1442),
+                                  usrAlm7(1443),
+                                  usrAlm8(1444),
+                                  usrAlm9(1445),
+                                  usrAlm10(1446),
+                                  usrAlm11(1447),
+                                  usrAlm12(1448),
+                                  usrAlm13(1449),
+                                  usrAlm14(1450),
+                                  usrAlm15(1451),
+                                  usrAlm16(1452),
+                                  usrAlm17(1453),
+                                  usrAlm18(1454),
+                                  usrAlm19(1455),
+                                  usrAlm20(1456),
+                                  usrAlm21(1457),
+                                  usrAlm22(1458),
+                                  usrAlm23(1459),
+                                  usrAlm24(1460),
+                                  usrAlm25(1461),
+                                  usrAlm26(1462),
+                                  usrAlm27(1463),
+                                  usrAlm28(1464),
+                                  usrAlm29(1465),
+                                  usrAlm30(1466),
+                                  usrAlm31(1467),
+                                  usrAlm32(1468),
+                                  swCompFail(1469),
+                                  apsBlock(1470),
+                                  apsLOSrv(1471),
+                                  apsLOSync(1472),
+                                  auditBlock(1473),
+                                  txSquelch(1474),
+                                  apsSuspended(1475),
+                                  monitorExc(1477),
+                                  cpriLossOfSignal(1485),
+                                  cpriLossOfFrame(1486),
+                                  cpriLocalFault(1487),
+                                  cpriRemoteAlarmIndication(1488) }
+            DESCRIPTION "Limited set of values."
+
+        VARIATION       tnGenericActiveAlarmEntityType
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+--
+-- Capabilities for TROPIC-ACCESSPORT-MIB
+--
+
+    SUPPORTS            TROPIC-ACCESSPORT-MIB
+        INCLUDES        { tnAccessPortGroup }
+
+        VARIATION       tnAccessPortDescr
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnAccessPortStatusLEDColor
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnAccessPortStatusLEDState
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnAccessPortOperationalCapability
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnAccessPortStateQualifier
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnAccessPortFarEndIfIndex
+            DESCRIPTION "In the value of this object, the shelf, slot and port
+                         values are encoded as follows :
+
+                          shelf = (value & 0x7FF00000) >> 20;
+                          slot  = (value & 0x000FF000) >> 12;
+                          port  = (value & 0x00000FF0) >> 4;"
+
+        VARIATION       tnAccessPortAINS
+            DESCRIPTION "When this object is present in a SET request where an
+                         ifAdminStatus object is present with value Down(2) or
+                         or Testing(3) this object is considered as having the
+                         value false(2)."
+
+        VARIATION       tnAccessPortAINSDebounceTime
+            SYNTAX      Integer32 (-1..345600)
+            DESCRIPTION "Limited range of values.
+                         Value -1 means to use system AINS debounce time
+                         (default value), 0 means infinite debounce time.
+                         On SET positive (non-zero) values are rounded up to
+                         the next full minute on input. Only the rounded value
+                         is stored and the rounded value is returned for GET
+                         operations."
+
+        VARIATION       tnAccessPortUsingSysAINSDebounceTime
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnAccessPortAINSDebounceTimeRemaining
+            DESCRIPTION "Value 0 is returned when the get is not issued for a
+                         specific interface, i.e. the value is requested via
+                         getnext or getbulk."
+
+        VARIATION       tnAccessPortIsDomainEdgePort
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnAccessPortFarEndIfIndexConnFrom
+            DESCRIPTION "In the value of this object, the shelf, slot and port
+                         values are encoded as follows :
+
+                          shelf = (value & 0x7FF00000) >> 20;
+                          slot  = (value & 0x000FF000) >> 12;
+                          port  = (value & 0x00000FF0) >> 4;"
+
+        VARIATION       tnAccessPortExtAmpIpAddressIn
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnAccessPortExtAmpIpAddressOut
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnAccessPortWtocmConnLoss
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnAccessPortWtocmConnAddress
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnAccessPortOppDirectionPortAddress
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnAccessPortIsValidInternalOTSXcEndpoint
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnAccessPortWtDomainNumber
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnAccessPortHasMpoConnector
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnAccessPortMpoConnectorPortOutIfIndex
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnAccessPortMpoConnectorPortInIfIndex
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnAccessPortIsMpo
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnAccessPortMonOcmConnAddress
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnAccessPortAlmProfName
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnAccessPortmfcTemperature
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnAccessPortmfcNominalPressure
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnAccessPortmfcDifferentialPressure
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnAccessFilterAmbientTemperature
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnAccessFilterPressure
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnAccessFilterRecorded
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnAccessFilterCalibrated
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnAccessFilterAltitude
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnAccessFilterRecordTime
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnAccessFilterCalibrateTime
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnAccessFilterScheduledTime
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnAccessPortCpriMappingType
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnAccessPortFecType
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+--
+-- Capabilities for TROPIC-AMPLIFIER-MIB
+--
+
+    SUPPORTS            TROPIC-AMPLIFIER-MIB
+        INCLUDES        { tnAmplifierPortConfigGroup,
+                          tnAmplifierPortInfoGroup }
+
+        VARIATION       tnAmplifierPortPowerGain
+            SYNTAX      Unsigned32 (700.. 1800)
+            DESCRIPTION "For LINE interfaces of ADVGI units the value range
+                         is 700-1400 mB.
+                         For SIG interfaces of ADVGI units the value range
+                         is 1200-1800 mB."
+
+        VARIATION       tnAmplifierPortPowerGainMin
+            ACCESS      read-only
+            DESCRIPTION "This object is supported in read-only mode."
+
+        VARIATION       tnAmplifierPortPowerGainMax
+            ACCESS      read-only
+            DESCRIPTION "This object is supported in read-only mode."
+
+        VARIATION       tnAmplifierPortPowerGainBackoff
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnAmplifierPortEnable
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnAmplifierPortAutoReEnableMode
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnAmplifierPortPowerSpanRepairMargin
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnAmplifierPortPowerDeltaMax
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnAmplifierPortTargetTilt
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnAmplifierPortFunction
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnAmplifierPortAprDisable
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnAmplifierPortSRSTiltACoeffDCM
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnAmplifierPortMaxFlatGainOffset
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnAmplifierPortGainTilt
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnAmplifierPortAprHoldOffTime
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnAmplifierPortSignalFailThreshold
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnAmplifierPortSignalDegradeThreshold
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnAmplifierPortVoaSet
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnAmplifierPortGainRange
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnAmplifierPortAprMode
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnAmplifierPortOperatingMode
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnAmplifierPortSignalPowerTarget
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnAmplifierPortPowerGainL
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnAmplifierPortPowerGainMinL
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnAmplifierPortPowerGainMaxL
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnAmplifierPortPowerDeltaMaxL
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnAmplifierPortGainRangeL
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnAmplifierPortTargetTiltL
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnAmplifierPortVoaSetL
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnAmplifierPortGainTiltL
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnAmplifierPortPowerGainBackoffL
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnAmplifierPortPowerSpanRepairMarginL
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnAmplifierPortOperatingModeL
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnAmplifierPortSignalPowerTargetL
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnAmplifierPortUserSelectedExteriorDcmPresentIn
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnAmplifierPortUserSelectedExteriorDcmPresentOut
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnAmplifierPortBandMode
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnAmplifierPortLosModeL
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnAmplifierPortBoosterTargetPowerIn
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnAmplifierPortAprEDFApulse
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnAmplifierPortInternalAmpModuleTemperature
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnAmplifierPortDCMInPower
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnAmplifierPortDCMOutPower
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnAmplifierPortActualTilt
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnAmplifierPortWtOcmMonitorPortOut
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnAmplifierPortOSCTxPowerIn
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnAmplifierPortOSCTxPowerOut
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnAmplifierPortTestingActive
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnAmplifierCommonEgressOutputPower
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnAmplifierActOutAtten
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnAmplifierCommonEgressOutputPowerL
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnAmplifierActOutAttenL
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnAmplifierPortActualTiltL
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnAmplifierPortSignalPowerOutL
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnAmplifierPortInputToOutputGainL
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnAmplifierPortOSCTxPowerOutL
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnAmplifierPortPowerInL
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnAmplifierPortInfoOSCRxPowerIn
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnAmplifierPortInfoOSCSfpTxPowerOut
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnAmplifierPortInfoOSCSfpRxPowerIn
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnAmplifierPortBoosterTargetPowerOut
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+        VARIATION       tnAmplifierPortPowerOutL
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+--
+-- Capabilities for TN-PORT-MIB
+--
+-- There are no conformance groups defined in TN-PORT-MIB.
+-- Due to this omission this section is listed in comment style and
+-- the partly supported table is included instead of groups.
+--
+--  SUPPORTS            TN-PORT-MIB
+--      INCLUDES        { tnPortEtherTable }
+--
+-- From the tnPortEtherTable, only tnPortEtherDuplex, tnPortEtherSpeed
+-- and tnPortEtherAutoNegotiate are implemented.
+--
+--      VARIATION       tnPortEtherMTU
+--          ACCESS      not-implemented
+--          DESCRIPTION "This object is not supported."
+--
+--      VARIATION       tnPortEtherDuplex
+--          SYNTAX      INTEGER { fullDuplex(1), halfDuplex(2) }
+--          DESCRIPTION "Limited set of values."
+--
+--      VARIATION       tnPortEtherSpeed
+--          SYNTAX      INTEGER { speed10(1), speed100(2) }
+--          DESCRIPTION "Limited set of values."
+--
+--      VARIATION       tnPortEtherAutoNegotiate
+--          SYNTAX      INTEGER { true(1), false(2) }
+--          DESCRIPTION "Limited set of values."
+--
+--      VARIATION       tnPortEtherOperDuplex
+--          ACCESS      not-implemented
+--          DESCRIPTION "This object is not supported."
+--
+--      VARIATION       tnPortEtherOperSpeed
+--          ACCESS      not-implemented
+--          DESCRIPTION "This object is not supported."
+--
+--      VARIATION       tnPortEtherAcctPolicyId
+--          ACCESS      not-implemented
+--          DESCRIPTION "This object is not supported."
+--
+--      VARIATION       tnPortEtherCollectStats
+--          ACCESS      not-implemented
+--          DESCRIPTION "This object is not supported."
+--      VARIATION       tnPortEtherMDIMDIX
+--          ACCESS      not-implemented
+--          DESCRIPTION "This object is not supported."
+--
+--      VARIATION       tnPortEtherXGigMode
+--          ACCESS      not-implemented
+--          DESCRIPTION "This object is not supported."
+--
+--      VARIATION       tnPortEtherEgressRate
+--          ACCESS      not-implemented
+--          DESCRIPTION "This object is not supported."
+--
+--      VARIATION       tnPortEtherDot1qEtype
+--          ACCESS      not-implemented
+--          DESCRIPTION "This object is not supported."
+--
+--      VARIATION       tnPortEtherQinqEtype
+--          ACCESS      not-implemented
+--          DESCRIPTION "This object is not supported."
+--
+--      VARIATION       tnPortEtherIngressRate
+--          ACCESS      not-implemented
+--          DESCRIPTION "This object is not supported."
+--
+--      VARIATION       tnPortEtherReportAlarm
+--          ACCESS      not-implemented
+--          DESCRIPTION "This object is not supported."
+--
+--      VARIATION       tnPortEtherReportAlarmStatus
+--          ACCESS      not-implemented
+--          DESCRIPTION "This object is not supported."
+--
+--      VARIATION       tnPortEtherPkts1519toMax
+--          ACCESS      not-implemented
+--          DESCRIPTION "This object is not supported."
+--
+--      VARIATION       tnPortEtherHCOverPkts1519toMax
+--          ACCESS      not-implemented
+--          DESCRIPTION "This object is not supported."
+--
+--      VARIATION       tnPortEtherHCPkts1519toMax
+--          ACCESS      not-implemented
+--          DESCRIPTION "This object is not supported."
+--
+--      VARIATION       tnPortEtherLacpTunnel
+--          ACCESS      not-implemented
+--          DESCRIPTION "This object is not supported."
+--
+--      VARIATION       tnPortEtherDownWhenLoopedEnabled
+--          ACCESS      not-implemented
+--          DESCRIPTION "This object is not supported."
+--
+--      VARIATION       tnPortEtherDownWhenLoopedKeepAlive
+--          ACCESS      not-implemented
+--          DESCRIPTION "This object is not supported."
+--
+--      VARIATION       tnPortEtherDownWhenLoopedRetry
+--          ACCESS      not-implemented
+--          DESCRIPTION "This object is not supported."
+--
+--      VARIATION       tnPortEtherDownWhenLoopedState
+--          ACCESS      not-implemented
+--          DESCRIPTION "This object is not supported."
+--
+--      VARIATION       tnPortEtherPBBEtype
+--          ACCESS      not-implemented
+--          DESCRIPTION "This object is not supported."
+--
+--      VARIATION       tnPortEtherSingleFiber
+--          ACCESS      not-implemented
+--          DESCRIPTION "This object is not supported."
+--
+--      VARIATION       tnPortEtherSSM
+--          ACCESS      not-implemented
+--          DESCRIPTION "This object is not supported."
+--
+--      VARIATION       tnPortEtherDWLUseBroadcastAddr
+--          ACCESS      not-implemented
+--          DESCRIPTION "This object is not supported."
+--
+--      VARIATION       tnPortEtherSSMCodeType
+--          ACCESS      not-implemented
+--          DESCRIPTION "This object is not supported."
+--
+--      VARIATION       tnPortEtherSSMTxDus
+--          ACCESS      not-implemented
+--          DESCRIPTION "This object is not supported."
+--
+--      VARIATION       tnPortEtherSSMRxEsmc
+--          ACCESS      not-implemented
+--          DESCRIPTION "This object is not supported."
+--
+--      VARIATION       tnPortEtherSSMTxQualityLevel
+--          ACCESS      not-implemented
+--          DESCRIPTION "This object is not supported."
+--
+--      VARIATION       tnPortEtherQinqEtypelink
+--          ACCESS      not-implemented
+--          DESCRIPTION "This object is not supported."
+--
+--      VARIATION       tnPortEtherOperEgressRate
+--          ACCESS      not-implemented
+--          DESCRIPTION "This object is not supported."
+
+--
+-- Capabilities for TROPIC-VWMMS-MIB
+--
+
+    SUPPORTS            TROPIC-VWMMS-MIB
+        INCLUDES        { tnVwmMsShelfGroup,
+                          tnVwmMsShelfTypeStringGroup,
+                          tnVwmMsShelfOldObjectsGroup,
+                          tnVwmMsShelfTopologyGroup,
+                          tnVwmMsSlotGroup,
+                          tnVwmMsCardGroup,
+                          tnVwmMsOpsCardGroup,
+                          tnVwmMsIfGroup,
+                          tnVwmMsSfpGroup,
+                          tnVwmMsSfp2Group,
+                          tnVwmMsSfp3Group,
+                          tnVwmMsSfpTunableGroup,
+                          tnVwmMsCdrChannelGroup,
+                          tnVwmMsCdrChannel2Group,
+                          tnVwmMsPwrIfGroup,
+                          tnVwmMsExtAlmIfGroup,
+                          tnVwmMsExtAnalogIfGroup,
+                          tnVwmMsExtCtrlIfGroup,
+                          tnVwmMsPrbsTestGroup,
+                          tnVwmMsPrbsGroup,
+                          tnVwmMsIfLoopbackGroup,
+                          tnVwmMsDdmDataGroup,
+                          tnVwmMsIfMonitorGroup,
+                          tnVwmMsIfLosPropagationGroup,
+                          tnVwmMsUserDataGroup,
+                          tnVwmMsAmplifierPortGroup,
+                          tnVwmMsIfCapabilityGroup,
+                          tnVwmMsOpticalPortGroup,
+                          tnVwmMsSnmpGroup,
+                          tnVwmMsSnmpTrapDestGroup,
+                          tnVwmMsFaultGroup,
+                          tnVwmMsDatabaseGroup,
+                          tnVwmMsSoftwareGroup,
+                          tnVwmMsMtSoftwareGroup,
+                          tnVwmMsTimeGroup,
+                          tnVwmMsSystemIpGroup,
+                          tnVwmMsCraftIpGroup,
+                          tnVwmMsSysDiscoveryGroup,
+                          tnVwmMsPmonNotificationsGroup,
+                          tnVwmMsPmonIfEthStatsGroup,
+                          tnVwmMsPmonIfOptStatsGroup,
+                          tnVwmMsPmonIfPcsStatsGroup,
+                          tnVwmMsPmonIfEthFecStatsGroup,
+                          tnVwmMsPmonTlu9mGroup,
+                          tnVwmMsPmonIfThresholdsGroup,
+                          tnVwmMsIfOpticalPowerThresholdsGroup,
+                          tnVwmMsSecurityNotificationsGroup,
+                          tnVwmMsOpsOsmGroup,
+                          tnVwmMsOpsPaeGroup,
+                          tnVwmMsOsmDsvGroup,
+                          tnVwmMsPmudGroup,
+                          tnVwmMsInsertionLossGroup,
+                          tnVwmMsSfd10InventoryGroup,
+                          tnVwmMsAmplifierCardGroup,
+                          tnVwmMsOpsOsmPselGroup,
+                          tnVwmMsOpsOsmPserGroup,
+                          tnVwmMsUserGroup,
+                          tnVwmMsTransferLogGroup,
+                          tnVwmMsSfpProfileGroup,
+                          tnVwmMsSfpProfilesGroup,
+                          tnVwmMsDcmLmCardGroup,
+                          tnVwmMsIfOtdrGroup }
+
+        VARIATION       tnVwmMsShelfIndex
+            SYNTAX      Unsigned32 (1..2047)
+            DESCRIPTION "Limited value range."
+
+        VARIATION       tnVwmMsShelfName
+            DESCRIPTION "The following ASCII characters from ITU Recommendation
+                         T.50 are supported :
+                          - Space character  - value 0x20
+                          - G0 character set - values 0x21 - 0x7E"
+
+        VARIATION       tnVwmMsShelfDescr
+            DESCRIPTION "The following ASCII characters from ITU Recommendation
+                         T.50 are supported :
+                          - Space character  - value 0x20
+                          - G0 character set - values 0x21 - 0x7E"
+
+        VARIATION       tnVwmMsShelfProgrammedType
+            DESCRIPTION "Only transitions between values tropicEmptyShelf
+                         and non-tropicEmptyShelf are allowed, i.e.
+                         re-configuration from a non-empty shelf type to
+                         a different non-empty shelf type is not allowed."
+
+        VARIATION       tnVwmMsShelfLampTest
+            DESCRIPTION "This object can not be set for passive shelves.
+                         Reading of this object for passive shelves always
+                         returns value inactive(1)."
+
+        VARIATION       tnVwmMsShelfLocation
+            DESCRIPTION "The following ASCII characters from ITU Recommendation
+                         T.50 are supported :
+                          - Space character  - value 0x20
+                          - G0 character set - values 0x21 - 0x7E"
+
+        VARIATION       tnVwmMsShelfLocationCode
+            DESCRIPTION "The following ASCII characters from ITU Recommendation
+                         T.50 are supported :
+                          - Space character  - value 0x20
+                          - G0 character set - values 0x21 - 0x7E"
+
+        VARIATION       tnVwmMsShelfManagementMode
+            DESCRIPTION "The value of this object can not be changed for the
+                         managing OSU (tnVwmMsShelfIndex 1), and for
+                         non-detectable passive shelves. For these shelves it
+                         has fixed value standalone(1)."
+
+        VARIATION       tnVwmMsShelfDbSyncDirection
+            DESCRIPTION "The value of this object can not be changed for the
+                         managing OSU (tnVwmMsShelfIndex 1), nor for passive
+                         shelves. For these shelves it has fixed value
+                         osuToRmu(1)."
+
+        VARIATION       tnVwmMsShelfConnectionState
+            DESCRIPTION "The value of this object is fixed connStateNotAppl(0)
+                         for non-detectable passive shelves."
+
+        VARIATION       tnVwmMsShelfSynchState
+            DESCRIPTION "The value of this object is fixed synchNotApplicable(0)
+                         for passive shelves."
+
+        VARIATION       tnVwmMsShelfAltitude
+            SYNTAX      Integer32 (-1000..10000)
+            DESCRIPTION "Limited value range."
+
+        VARIATION       tnVwmMsShelfRestart
+            DESCRIPTION "Reading of this object always returns value noCmd(1).
+                         This object can not be set for passive shelves."
+
+        VARIATION       tnVwmMsShelfRestartCapability
+            DESCRIPTION "This object has value 0 for passive shelves."
+
+        VARIATION       tnVwmMsSlotIndex
+            SYNTAX      Unsigned32 (1..255)
+            DESCRIPTION "Limited value range."
+
+        VARIATION       tnVwmMsSlotProgrammedType
+            DESCRIPTION "Setting of the value is only possible for a slot
+                         instance with tnVwmMsSlotIndex value 2, and for
+                         which object tnVwmMsShelfProgrammedType of the
+                         related shelf has one of the following values :
+                            - nokiaVwmMsOsu20Shelf
+                            - nokiaVwmMsTlu9Shelf
+                            - nokiaVwmMsTlu9mShelf
+                            - nokiaVwmMsTlu200Shelf
+                            - nokiaVwmMsPmuD21AShelf
+                            - nokiaVwmMsPmuD21BShelf
+                            - nokiaVwmMsPmuD21CShelf
+                            - nokiaVwmMsPmuD21DShelf
+                            - nokiaVwmMsAdvgiShelf
+
+                         For these slots, if not related to a nokiaVwmMsTlu200Shelf,
+                         only transitions between values tropicEmptyCard and
+                         nokiaVwmMsFanTOCard are allowed.
+
+                         For these slots, if related to a nokiaVwmMsTlu200Shelf,
+                         only transitions between values tropicEmptyCard and
+                         nokiaVwmMsFanIICard are allowed.
+
+                         In addition, setting is also possible for slot
+                         instances with tnVwmMsSlotIndex values 2-7, and
+                         for which object tnVwmMsShelfProgrammedType of the
+                         related shelf has the following value :
+                            - nokiaVwmMsOpsShelf
+
+                         For slots with tnVwmMsSlotIndex values 2-5, only
+                         transitions between values tropicEmptyCard and
+                         nokiaVwmMsOpsOsmCard or nokiaVwmMsOpsOsmDsvCard
+                         are allowed. Transitions between nokiaVwmMsOpsOsmCard
+                         and nokiaVwmMsOpsOsmDsvCard are not allowed.
+                         For slots with tnVwmMsSlotIndex values 6-7, only
+                         transitions between values tropicEmptyCard and
+                         nokiaVwmMsOpsPsuCard are allowed."
+
+        VARIATION       tnVwmMsSlotAssignedStatus
+            DESCRIPTION "Setting of the value is only possible for a slot
+                         instance with tnVwmMsSlotIndex value > 1, and for
+                         which object tnVwmMsShelfProgrammedType of the
+                         related shelf has the value nokiaVwmMsOpsShelf."
+
+        VARIATION       tnVwmMsCardInvStatus
+            DESCRIPTION "No entries exist in the tnVwmMsCardTable for
+                         not-detectable passive shelves."
+
+        VARIATION       tnVwmMsIfDescr
+            DESCRIPTION "The following ASCII characters from ITU Recommendation
+                         T.50 are supported :
+                          - Space character  - value 0x20
+                          - G0 character set - values 0x21 - 0x7E"
+
+        VARIATION       tnVwmMsIfTopologyString1
+            DESCRIPTION "The following ASCII characters from ITU Recommendation
+                         T.50 are supported :
+                          - Space character  - value 0x20
+                          - G0 character set - values 0x21 - 0x7E"
+
+        VARIATION       tnVwmMsIfTopologyString2
+            DESCRIPTION "The following ASCII characters from ITU Recommendation
+                         T.50 are supported :
+                          - Space character  - value 0x20
+                          - G0 character set - values 0x21 - 0x7E"
+
+        VARIATION       tnVwmMsRflmIfLabel
+            DESCRIPTION "The following ASCII characters from ITU Recommendation
+                         T.50 are supported :
+                          - Space character  - value 0x20
+                          - G0 character set - values 0x21 - 0x7E"
+
+        VARIATION       tnVwmMsIfRole
+            DESCRIPTION "Setting of the value is only supported for the OSC ports
+                         and the LAN1 port of the OSU, and only when object
+                         ifAdminStatus of the port has value down(2)."
+
+        VARIATION       tnVwmMsSfpType
+            DESCRIPTION "Setting of the value is only supported for client ports
+                         of TLU-9(M) and ITP units, for the SFP, QSFP and OSC ports
+                         of TLU-200 units, and for the OSC ports of ADVGI units."
+
+        VARIATION       tnVwmMsSfpTxFrequency
+            DESCRIPTION "Setting of the value is only supported for line, client
+                         and MON ports of TLU-9(M) units, for SFP and OSC ports of
+                         TLU-200 units, and for OSC ports of OSU, PMU-D and ADVGI
+                         units."
+
+        VARIATION       tnVwmMsCdrChannelIf1
+            DESCRIPTION "Setting of the value is only supported for CDR channels
+                         of TLU-200 units.
+                         The value can only be one of the first 28 interfaces of
+                         the TLU-200 unit on which this channel resides.
+                         Within the same SET PDU the values of tnVwmMsCdrChannelIf1
+                         and tnVwmMsCdrChannelIf2 must differ.
+                         The bits in the tnVwmMsCdrChannelIf1 value representing the
+                         shelf and slot must equal the values of tnVwmMsShelfIndex
+                         and tnVwmMsSlotIndex."
+
+        VARIATION       tnVwmMsCdrChannelIf2
+            DESCRIPTION "Setting of the value is only supported for CDR channels
+                         of TLU-200 units.
+                         The value can only be one of the first 28 interfaces of
+                         the TLU-200 unit on which this channel resides.
+                         Within the same SET PDU the values of tnVwmMsCdrChannelIf2
+                         and tnVwmMsCdrChannelIf2 must differ.
+                         The bits in the tnVwmMsCdrChannelIf2 value representing the
+                         shelf and slot must equal the values of tnVwmMsShelfIndex
+                         and tnVwmMsSlotIndex."
+
+        VARIATION       tnVwmMsCdrChannelRate
+            DESCRIPTION "Setting of the value is not supported for CDR channels
+                         10-12 of TLU-9M units."
+
+        VARIATION       tnVwmMsSfpInfoLinkType
+            SYNTAX      INTEGER { linkTypeNotApplicable(0),
+                                  link9umCoreFibre(1),
+                                  linkCopperCable(4),
+                                  link62um5CoreFibreOM1(5),
+                                  link50umCoreFibreOM2(6),
+                                  link50umCoreFibreOM3(7),
+                                  link50umCoreFibreOM4(8) }
+            DESCRIPTION "Limited set of values."
+
+        VARIATION       tnVwmMsSfpInfoFrequency
+            DESCRIPTION "This object only exists for tunable and fixed DWDM SFPs."
+
+        VARIATION       tnVwmMsSfpInfoStartFrequency
+            DESCRIPTION "This object only exists for tunable SFPs."
+
+        VARIATION       tnVwmMsSfpInfoStopFrequency
+            DESCRIPTION "This object only exists for tunable SFPs."
+
+        VARIATION       tnVwmMsSfpInfoFrequencyGrid
+            DESCRIPTION "This object only exists for tunable SFPs."
+
+        VARIATION       tnVwmMsExtAlmIfDescr
+            DESCRIPTION "The following ASCII characters from ITU Recommendation
+                         T.50 are supported :
+                          - Space character  - value 0x20
+                          - G0 character set - values 0x21 - 0x7E"
+
+        VARIATION       tnVwmMsExtAnalogIfDescr
+            DESCRIPTION "The following ASCII characters from ITU Recommendation
+                         T.50 are supported :
+                          - Space character  - value 0x20
+                          - G0 character set - values 0x21 - 0x7E"
+
+        VARIATION       tnVwmMsExtCtrlIfDescr
+            DESCRIPTION "The following ASCII characters from ITU Recommendation
+                         T.50 are supported :
+                          - Space character  - value 0x20
+                          - G0 character set - values 0x21 - 0x7E"
+
+        VARIATION       tnVwmMsPrbsTestIfIndex
+            DESCRIPTION "In the value of this object, the shelf, slot and port
+                         values are encoded as follows :
+
+                          shelf = (value & 0x7FF00000) >> 20;
+                          slot  = (value & 0x000FF000) >> 12;
+                          port  = (value & 0x00000FF0) >> 4;
+
+                         PRBS Testing is only supported for line and client ports
+                         of TLU-9(M) and ITP units, and for ports 1-28 of TLU-200
+                         units."
+
+        VARIATION       tnVwmMsPrbsTestStartAutoStop
+            DESCRIPTION "Setting the value of this object is only allowed when
+                         ifAdminStatus of the port of which the ifIndex value
+                         equals that of object tnVwmMsPrbsTestIfIndex, has value
+                         testing(3)."
+
+        VARIATION       tnVwmMsDdmDataType
+            DESCRIPTION "No entries exist in the tnVwmMsDdmDataTable for passive
+                         shelves."
+
+        VARIATION       tnVwmMsIfLoopbackStatus
+            DESCRIPTION "Setting the value of this object is only allowed :
+                          1) for line and client ports of TLU-9(M) and ITP units
+                             and ports 1-28 of TLU-200 units
+                          2) when ifAdminStatus of the port has value testing(3).
+
+                         The value of this object can not be set to true(1) when :
+                          1) the value of tnVwmMsIfTerminalLoopback for this port is true(1)
+                          2) the value of tnVwmMsIfLoopbackStatus for the port related
+                             to this port via the CDR channel is true(1)
+                          3) the value of tnVwmMsIfTerminalLoopback for the port related
+                             to this port via the CDR channel is true(1)
+                          4) a PRBS test is running for this port
+                          5) a PRBS test is running for the port related to this port
+                             via the CDR channel
+                          6) on a TLU-200 unit the value of tnVwmMsCdrChannelRate of
+                             the associated CDR channel is set to auto(0)"
+
+        VARIATION       tnVwmMsIfTerminalLoopback
+            DESCRIPTION "Setting the value of this object is only allowed :
+                          1) for line and client ports of TLU-9(M) and ITP units
+                             and ports 1-28 of TLU-200 units
+                          2) when ifAdminStatus of the port has value testing(3).
+
+                         The value of this object can not be set to true(1) when :
+                          1) the value of tnVwmMsIfLoopbackStatus for this port is true(1)
+                          2) the value of tnVwmMsIfTerminalLoopback for the port related
+                             to this port via the CDR channel is true(1)
+                          3) the value of tnVwmMsIfLoopbackStatus for the port related
+                             to this port via the CDR channel is true(1)
+                          4) a PRBS test is running for this port
+                          5) a PRBS test is running for the port related to this port
+                             via the CDR channel
+                          6) on a TLU-200 unit the value of tnVwmMsCdrChannelRate of
+                             the associated CDR channel is set to auto(0)
+                          7) on a TLU-200 unit the value of tnVwmMsOpticalPortConfigFec
+                             is set to auto(1)"
+
+        VARIATION       tnVwmMsIfMonitorMode
+            DESCRIPTION "The value of this object can not be set to monOsc(3)."
+
+        VARIATION       tnVwmMsIfMonitorTargetIf
+            DESCRIPTION "Setting the value of this object is only allowed :
+                          1) for line and client ports of TLU9m units, and for
+                             ports 1-28 of TLU-200 units
+                          2) when ifAdminStatus of both this port as well as its
+                             via the CDR channel related port have value testing(3),
+                             except when object tnVwmMsIfMonitorMode has value
+                             monIdle(0) or monListen(1)
+                          3) when the interface represents the same shelf and slot
+                             instance as ifIndex."
+
+        VARIATION       tnVwmMsIfLosPropExtensionTimer
+            SYNTAX      Unsigned32 (0..300000)
+            DEFVAL      { 0 }
+            DESCRIPTION "Limited value range."
+
+        VARIATION       tnVwmMsIfLosPropDefectPersistenceTimer
+            SYNTAX      Unsigned32 (0..1000000)
+            DEFVAL      { 15 }
+            DESCRIPTION "Limited value range."
+
+        VARIATION       tnVwmMsIfRxOptPwrThreshold
+            SYNTAX      Integer32 (-400..100)
+            DESCRIPTION "Limited value range."
+
+        VARIATION       tnVwmMsIfTxOptPwrThreshold
+            SYNTAX      Integer32 (-400..100)
+            DESCRIPTION "Limited value range."
+
+        VARIATION       tnVwmMsUserDataPvid
+            SYNTAX      Integer32 (0..4079)
+            DESCRIPTION "Limited value range."
+
+        VARIATION       tnVwmMsUserDataVlanId
+            DESCRIPTION "Value 0 can not be set, it can only be read."
+
+        VARIATION       tnVwmMsUserDataPir
+            SYNTAX      Unsigned32 (1..100)
+            DEFVAL      { 10 }
+            DESCRIPTION "Limited value range : 1..100Mbit/s."
+
+        VARIATION       tnVwmMsUserDataTpid
+            SYNTAX      Unsigned32 (1536..65535)
+            DESCRIPTION "Limited value range : 0x0600..0xFFFF."
+
+        VARIATION       tnVwmMsAmplifierPortRxPowerLosThreshold
+            SYNTAX      Integer32 (-3500..3000)
+            DESCRIPTION "Limited value range."
+
+        VARIATION       tnVwmMsAmplifierPortTxPowerLosThreshold
+            SYNTAX      Integer32 (-3500..3000)
+            DESCRIPTION "Limited value range."
+
+        VARIATION       tnVwmMsOpticalPortFlsTimer
+            DEFVAL      { 1000000 }
+            DESCRIPTION "Default value, suppresses FLS."
+
+        VARIATION       tnVwmMsOpticalPortLfiInsertionTimer
+            DEFVAL      { 1000000 }
+            DESCRIPTION "Default value, suppresses LFI insertion."
+
+        VARIATION       tnVwmMsOpticalPortIdleInsertionTimer
+            DEFVAL      { 1000000 }
+            DESCRIPTION "Default value, suppresses IDLE insertion."
+
+        VARIATION       tnVwmMsOpticalPortLosExtensionTimer
+            DEFVAL      { 0 }
+            DESCRIPTION "Default value, disables LOS extension."
+
+        VARIATION       tnVwmMsSfpProfileName
+            DESCRIPTION "The following ASCII characters from ITU Recommendation
+                         T.50 are supported :
+                          - Space character  - value 0x20
+                          - G0 character set - values 0x21 - 0x7E"
+
+        VARIATION       tnVwmMsSfpProfileRate
+            SYNTAX      INTEGER { cpriRate1(1),
+                                  cpriRate2(2),
+                                  cpriRate3(3),
+                                  cpriRate4(4),
+                                  cpriRate5(5),
+                                  cpriRate6(6),
+                                  cpriRate7(7),
+                                  cpriRate8(8),
+                                  obsaiRate1(11),
+                                  obsaiRate2(12),
+                                  obsaiRate4(13),
+                                  obsaiRate8(14),
+                                  gbe1(21),
+                                  gbe10(22) }
+            DESCRIPTION "Limited set of values.
+                         The configurable set of values is specific per SFP
+                         mnemonic."
+
+        VARIATION       tnVwmMsShelfSfpProfileIndex
+            SYNTAX      Unsigned32 (1..32)
+            DESCRIPTION "Limited value range."
+
+        VARIATION       tnVwmMsSnmpReqRspPort
+            DESCRIPTION "Value 0 can not be configured for this object.
+                         A change to the value of this object leads to a cold
+                         restart of the SNMP Agent."
+
+        VARIATION       tnVwmMsSnmpTrapDestServerId
+            DESCRIPTION "The following ASCII characters from ITU Recommendation
+                         T.50 are supported : [A-Z][a-z][0-9] plus the dot (.)
+                         and underscore (_) characters.
+                         Value 'all' is not allowed."
+
+        VARIATION       tnVwmMsSnmpTrapDestAddrType
+            SYNTAX      INTEGER { unknown(0), ipv4(1), ipv6(2) }
+            DESCRIPTION "Limited set of values.
+                         Value unknown(0) is merely the read-only initial
+                         value of this object, and can not be configured."
+
+        VARIATION       tnVwmMsSnmpTrapDestPort
+            DESCRIPTION "Value 0 can not be configured for this object."
+
+        VARIATION       tnVwmMsSnmpTrapDestCommunity
+            DESCRIPTION "The following ASCII characters from ITU Recommendation
+                         T.50 are supported : [A-Z][a-z][0-9]_.-"
+
+        VARIATION       tnVwmMsSnmpTrapDestRowStatus
+            SYNTAX      INTEGER { active(1),
+                                  notInService(2),
+                                  createAndWait(5),
+                                  destroy(6) }
+            DESCRIPTION "Limited set of values.
+                         The row status must be set to notInService(2) before
+                         being set to destroy(6) to remove this conceptual row.
+
+                         When used in a SET request, this object must be the
+                         only object in the PDU."
+
+        VARIATION       tnVwmMsFaultAlarmRaiseTime
+            SYNTAX      Unsigned32 (0..600)
+            DESCRIPTION "Limited value range."
+
+        VARIATION       tnVwmMsFaultAlarmClearTime
+            SYNTAX      Unsigned32 (0..600)
+            DESCRIPTION "Limited value range."
+
+        VARIATION       tnVwmMsAsapName
+            ACCESS      read-only
+            DESCRIPTION "Setting of the value is not yet supported.
+                         The value is fixed an empty string."
+
+        VARIATION       tnVwmMsAsapFaultProfileCondition
+            SYNTAX      INTEGER { none(0),
+                                  contCom(15),
+                                  eqpt(24),
+                                  frcdWkSwBk(31),
+                                  frcdWkSwPr(32),
+                                  lof(41),
+                                  los(43),
+                                  lpbkLine(46),
+                                  lpbkTerm(47),
+                                  manWkSwBk(49),
+                                  manWkSwPr(50),
+                                  mismatch(51),
+                                  opr(60),
+                                  oprUnachieve(61),
+                                  pwr(64),
+                                  replUnitMiss(65),
+                                  trmt(82),
+                                  unknown(83),
+                                  wkSwPr(84),
+                                  swUpgFail(108),
+                                  wkSwBk(109),
+                                  man(112),
+                                  eqptDgr(195),
+                                  lss(208),
+                                  hiBer(225),
+                                  lanLfi(230),
+                                  lanRfi(231),
+                                  unknownSfpXfp(270),
+                                  mismatchSfpXfp(271),
+                                  oaPumpBiasCurrHigh(348),
+                                  oaPumpTempHigh(349),
+                                  sfpTempOOR(355),
+                                  tCvPcs15Min(368),
+                                  tEsPcs15Min(375),
+                                  tSefsPcs15Min(387),
+                                  tSesPcs15Min(393),
+                                  tCvPcs1Day(412),
+                                  tEsPcs1Day(419),
+                                  tSefsPcs1Day(431),
+                                  tSesPcs1Day(437),
+                                  intTempHigh(458),
+                                  intTempLow(459),
+                                  replUnitMissMOD(467),
+                                  wtr(617),
+                                  cardBoot(718),
+                                  inventoryErrMod(1315),
+                                  hiSer(1399),
+                                  cabAlm1(1421),
+                                  cabAlm2(1422),
+                                  cabAlm3(1423),
+                                  cabAlm4(1424),
+                                  frmAlm1(1425),
+                                  frmAlm2(1426),
+                                  frmAlm3(1427),
+                                  frmAlm4(1428),
+                                  frmAlm5(1429),
+                                  frmAlm6(1430),
+                                  frmAlm7(1431),
+                                  frmAlm8(1432),
+                                  frmAlm9(1433),
+                                  frmAlm10(1434),
+                                  frmAlm11(1435),
+                                  frmAlm12(1436),
+                                  usrAlm1(1437),
+                                  usrAlm2(1438),
+                                  usrAlm3(1439),
+                                  usrAlm4(1440),
+                                  usrAlm5(1441),
+                                  usrAlm6(1442),
+                                  usrAlm7(1443),
+                                  usrAlm8(1444),
+                                  usrAlm9(1445),
+                                  usrAlm10(1446),
+                                  usrAlm11(1447),
+                                  usrAlm12(1448),
+                                  usrAlm13(1449),
+                                  usrAlm14(1450),
+                                  usrAlm15(1451),
+                                  usrAlm16(1452),
+                                  usrAlm17(1453),
+                                  usrAlm18(1454),
+                                  usrAlm19(1455),
+                                  usrAlm20(1456),
+                                  usrAlm21(1457),
+                                  usrAlm22(1458),
+                                  usrAlm23(1459),
+                                  usrAlm24(1460),
+                                  usrAlm25(1461),
+                                  usrAlm26(1462),
+                                  usrAlm27(1463),
+                                  usrAlm28(1464),
+                                  usrAlm29(1465),
+                                  usrAlm30(1466),
+                                  usrAlm31(1467),
+                                  usrAlm32(1468),
+                                  swCompFail(1469),
+                                  apsBlock(1470),
+                                  apsLOSrv(1471),
+                                  apsLOSync(1472),
+                                  auditBlock(1473),
+                                  txSquelch(1474),
+                                  apsSuspended(1475),
+                                  monitorExc(1477),
+                                  cpriLossOfSignal(1485),
+                                  cpriLossOfFrame(1486),
+                                  cpriLocalFault(1487),
+                                  cpriRemoteAlarmIndication(1488) }
+            DESCRIPTION "Limited set of values."
+
+        VARIATION       tnVwmMsAsapFaultProfileSeverity
+            SYNTAX      INTEGER { critical(3),
+                                  major(4),
+                                  minor(5),
+                                  warning(6) }
+            DESCRIPTION "Limited set of values."
+
+        VARIATION       tnVwmMsDatabaseBackupAndRestoreRemoteHostAddrType
+            SYNTAX      INTEGER { unknown(0), ipv4(1), ipv6(2) }
+            DESCRIPTION "Limited set of values.
+                         Value unknown(0) is merely the read-only initial
+                         value of this object, and can not be configured."
+
+        VARIATION       tnVwmMsSoftwareRemoteHostAddrType
+            SYNTAX      INTEGER { unknown(0), ipv4(1), ipv6(2) }
+            DESCRIPTION "Limited set of values.
+                         Value unknown(0) is merely the read-only initial
+                         value of this object, and can not be configured."
+
+        VARIATION       tnVwmMsMtSoftwareShelfLoadIndex
+            SYNTAX      Unsigned32 (1..2047)
+            DESCRIPTION "Limited value range.
+                         This object can not be set for an OPS."
+
+        VARIATION       tnVwmMsMtSoftwareShelfLoadPath
+            DESCRIPTION "This object can not be set for an OPS."
+
+        VARIATION       tnVwmMsMtSoftwareShelfActivate
+            DESCRIPTION "This object can not be set for an OPS."
+
+        VARIATION       tnVwmMsMtSoftwareShelfAbort
+            DESCRIPTION "This object can not be set for an OPS."
+
+        VARIATION       tnVwmMsShelfTime
+            DESCRIPTION "This object can not be set for an OPS.
+                         This object can neither be read nor set for passive
+                         shelves.
+                         The value to which this object is set must be a UTC
+                         time, i.e. with zero UTC offset. The last 3 of the
+                         11 octets of the DateAndTime must contain values
+                         0x2B ('+'), 0x00 and 0x00."
+
+        VARIATION       tnVwmMsNtpState
+            DESCRIPTION "This object can not be set for an OPS.
+                         The value of this object cannot be set to disabled(2)
+                         for managed RMUs.
+                         Upon changing the tnVwmMsShelfManagementMode from
+                         standalone(1) to managed(2) the value of this object
+                         is enabled(1) regardless the value of
+                         tnVwmMsShelfDbSyncDirection.
+                         In case of a DB upgrade, a previous value disabled(2)
+                         will be changed to enabled(1) for a managed RMU."
+
+        VARIATION       tnVwmMsNtpServerAddrType
+            DESCRIPTION "The value of this object can only be changed for
+                         the NTP server instances of the OSU."
+
+        VARIATION       tnVwmMsNtpServerAddr
+            DESCRIPTION "The value of this object can only be changed for
+                         the NTP server instances of the OSU.
+
+                         The NTP server instance can be functionally disabled
+                         by setting the IP address to the null address."
+
+        VARIATION       tnVwmMsSystemIpV4AddrType
+            SYNTAX      INTEGER { ipv4(1) }
+            DESCRIPTION "This object is defined merely for SMIv2-compliance,
+                         and has no functional meaning. It has fixed value."
+
+        VARIATION       tnVwmMsSystemIpV6AddrType
+            SYNTAX      INTEGER { ipv6(2) }
+            DESCRIPTION "This object is defined merely for SMIv2-compliance,
+                         and has no functional meaning. It has fixed value."
+
+        VARIATION       tnVwmMsCraftIpV4AddrType
+            SYNTAX      INTEGER { ipv4(1) }
+            DESCRIPTION "This object is defined merely for SMIv2-compliance,
+                         and has no functional meaning. It has fixed value."
+
+        VARIATION       tnVwmMsCraftIpV4Addr
+            DESCRIPTION "IP addresses from the ranges 192.168.0.xx and
+                         10.0.xx.xx are not allowed."
+
+        VARIATION       tnVwmMsCraftIpV4Gateway
+            DESCRIPTION "IP addresses from the ranges 192.168.0.xx and
+                         10.0.xx.xx are not allowed."
+
+        VARIATION       tnVwmMsTlu9mIfPmMode
+            DESCRIPTION "The object can only be changed for TLU-9M interfaces."
+
+        VARIATION       tnVwmMsIfPmCvSesThreshold10B
+            SYNTAX      Unsigned32 (0..65535)
+            DESCRIPTION "Limited value range."
+
+        VARIATION       tnVwmMsIfPmCvSesThreshold66B
+            SYNTAX      Unsigned32 (0..65535)
+            DESCRIPTION "Limited value range."
+
+        VARIATION       tnVwmMsOpsOsmDescr
+            DESCRIPTION "The following ASCII characters from ITU Recommendation
+                         T.50 are supported :
+                          - Space character  - value 0x20
+                          - G0 character set - values 0x21 - 0x7E"
+
+        VARIATION       tnVwmMsOpsOsmThresholdA
+            SYNTAX      Integer32 (-300..350)
+            DESCRIPTION "Limited value range."
+
+        VARIATION       tnVwmMsOpsOsmThresholdB
+            SYNTAX      Integer32 (-300..350)
+            DESCRIPTION "Limited value range."
+
+        VARIATION       tnVwmMsOpsOsmThresholdSIG
+            SYNTAX      Integer32 (-300..350)
+            DESCRIPTION "Limited value range."
+
+        VARIATION       tnVwmMsOpsOsmThresholdHysteresis
+            SYNTAX      Integer32 (10..30)
+            DESCRIPTION "Limited value range."
+
+        VARIATION       tnVwmMsOpsOsmBounceTimer
+            SYNTAX      Unsigned32 (0..65535)
+            DESCRIPTION "Limited value range.
+                         The value of the tnVwmMsOpsOsmHoldOffTimer must be
+                         greater then the value of tnVwmMsOpsOsmBounceTimer,
+                         otherwise an error is returned."
+
+        VARIATION       tnVwmMsOpsOsmEvaluationTimer
+            SYNTAX      Unsigned32 (0..65535)
+            DESCRIPTION "Limited value range."
+
+        VARIATION       tnVwmMsOpsOsmHoldOffTimer
+            SYNTAX      Unsigned32 (0..65535)
+            DESCRIPTION "Limited value range.
+                         The value of the tnVwmMsOpsOsmHoldOffTimer must be
+                         greater then the value of tnVwmMsOpsOsmBounceTimer,
+                         otherwise an error is returned."
+
+        VARIATION       tnVwmMsOpsOsmMaxSwitchCount
+            SYNTAX      Unsigned32 (0..65535)
+            DESCRIPTION "Limited value range."
+
+        VARIATION       tnVwmMsOpsOsmSwitchCommand
+            SYNTAX      INTEGER { clear(0),
+                                  forcedSwitchToWorker(1),
+                                  forcedSwitchToProtection(2) }
+            DESCRIPTION "Limited set of values."
+
+        VARIATION       tnVwmMsShelfAIndex
+            SYNTAX      Unsigned32 (1..2047)
+            DESCRIPTION "Limited value range. This index can only indicate a
+                         shelf object with tnVwmMsShelfProgrammedType value
+                         nokiaVwmMsOpsShelf."
+
+        VARIATION       tnVwmMsShelfZIndex
+            SYNTAX      Unsigned32 (1..2047)
+            DESCRIPTION "Limited value range. This index can only indicate a
+                         shelf object with tnVwmMsShelfProgrammedType value
+                         nokiaVwmMsOpsShelf."
+
+        VARIATION       tnVwmMsSlotAIndex
+            SYNTAX      Unsigned32 (1..255)
+            DESCRIPTION "Limited value range. This index can only indicate a
+                         slot object with tnVwmMsSlotProgrammedType value
+                         nokiaVwmMsOpsOsmCard."
+
+        VARIATION       tnVwmMsSlotZIndex
+            SYNTAX      Unsigned32 (1..255)
+            DESCRIPTION "Limited value range. This index can only indicate a
+                         slot object with tnVwmMsSlotProgrammedType value
+                         nokiaVwmMsOpsOsmCard."
+
+        VARIATION       tnVwmMsOpsPaeWtrTimer
+            SYNTAX      Unsigned32 (0..60)
+            DESCRIPTION "Limited value range. Stepsize is 10."
+
+        VARIATION       tnVwmMsOpsPaeRowStatus
+            SYNTAX      INTEGER { active(1),
+                                  notInService(2),
+                                  createAndWait(5),
+                                  destroy(6) }
+            DESCRIPTION "Limited set of values.
+                         The row status must be set to notInService(2) before
+                         being set to destroy(6) to remove this conceptual row.
+
+                         When used in a SET request, this object must be the
+                         only object in the PDU."
+
+        VARIATION       tnVwmMsOpsOsmDsvThresholdA
+            SYNTAX      Integer32 (-300..350)
+            DESCRIPTION "Limited value range."
+
+        VARIATION       tnVwmMsOpsOsmDsvThresholdB
+            SYNTAX      Integer32 (-300..350)
+            DESCRIPTION "Limited value range."
+
+        VARIATION       tnVwmMsOpsOsmDsvThresholdSigIn
+            SYNTAX      Integer32 (-300..350)
+            DESCRIPTION "Limited value range."
+
+        VARIATION       tnVwmMsOpsOsmDsvThresholdSigOut
+            SYNTAX      Integer32 (-300..350)
+            DESCRIPTION "Limited value range."
+
+        VARIATION       tnVwmMsOpsOsmDsvThresholdHysteresis
+            SYNTAX      Integer32 (10..30)
+            DESCRIPTION "Limited value range."
+
+        VARIATION       tnVwmMsOpsOsmDsvEVoaSigInAOut
+            SYNTAX      Unsigned32 (0..1500)
+            DESCRIPTION "Limited value range."
+
+        VARIATION       tnVwmMsOpsOsmDsvEVoaSigInBOut
+            SYNTAX      Unsigned32 (0..1500)
+            DESCRIPTION "Limited value range."
+
+        VARIATION       tnVwmMsOpsOsmDsvEVoaSigOutAIn
+            SYNTAX      Unsigned32 (0..1500)
+            DESCRIPTION "Limited value range."
+
+        VARIATION       tnVwmMsOpsOsmDsvEVoaSigOutBIn
+            SYNTAX      Unsigned32 (0..1500)
+            DESCRIPTION "Limited value range."
+
+        VARIATION       tnVwmMsPmudEVoaBandInLine1Out
+            SYNTAX      Unsigned32 (0..2000)
+            DESCRIPTION "Limited value range."
+
+        VARIATION       tnVwmMsPmudEVoaBandInLine2Out
+            SYNTAX      Unsigned32 (0..2000)
+            DESCRIPTION "Limited value range."
+
+        VARIATION       tnVwmMsPmudEVoaBandOutLine1In
+            SYNTAX      Unsigned32 (0..2000)
+            DESCRIPTION "Limited value range."
+
+        VARIATION       tnVwmMsPmudEVoaBandOutLine2In
+            SYNTAX      Unsigned32 (0..2000)
+            DESCRIPTION "Limited value range."
+
+        VARIATION       tnVwmMsPmudLossRefBand1InOmdOut
+            SYNTAX      Integer32 (-3000..3000|100000)
+            DESCRIPTION "Valid values are in the range -3000 ... 3000.
+                         Also value 100000 is valid, and implies 'none'."
+
+        VARIATION       tnVwmMsPmudLossRefBand2InOmdOut
+            SYNTAX      Integer32 (-3000..3000|100000)
+            DESCRIPTION "Valid values are in the range -3000 ... 3000.
+                         Also value 100000 is valid, and implies 'none'."
+
+        VARIATION       tnVwmMsOpsOsmPselDescr
+            DESCRIPTION "The following ASCII characters from ITU Recommendation
+                         T.50 are supported :
+                          - Space character  - value 0x20
+                          - G0 character set - values 0x21 - 0x7E"
+
+        VARIATION       tnVwmMsOpsOsmPselWMonIfIndex
+            DESCRIPTION "In the value of this object, the shelf, slot and port
+                         values are encoded as follows :
+
+                          shelf = (value & 0x7FF00000) >> 20;
+                          slot  = (value & 0x000FF000) >> 12;
+                          port  = (value & 0x00000FF0) >> 4;
+
+                         Value 0 is a read-only value."
+
+        VARIATION       tnVwmMsOpsOsmPselPMonIfIndex
+            DESCRIPTION "In the value of this object, the shelf, slot and port
+                         values are encoded as follows :
+
+                          shelf = (value & 0x7FF00000) >> 20;
+                          slot  = (value & 0x000FF000) >> 12;
+                          port  = (value & 0x00000FF0) >> 4;
+
+                         Value 0 is a read-only value."
+
+        VARIATION       tnVwmMsOpsOsmPselWtrTimer
+            SYNTAX      Unsigned32 (0..60)
+            DESCRIPTION "Limited value range."
+
+        VARIATION       tnVwmMsOpsOsmPselBounceTimer
+            SYNTAX      Unsigned32 (0..65535)
+            DESCRIPTION "Limited value range."
+
+        VARIATION       tnVwmMsOpsOsmPselHoldOffTimer
+            SYNTAX      Unsigned32 (0..65535)
+            DESCRIPTION "Limited value range."
+
+        VARIATION       tnVwmMsOpsOsmPselSwitchCountResetTimer
+            SYNTAX      Unsigned32 (1..4294967295)
+            DEFVAL      { 900000 }
+            DESCRIPTION "Limited value range."
+
+        VARIATION       tnVwmMsOpsOsmPselMaxSwitchCount
+            SYNTAX      Unsigned32 (1..65535)
+            DEFVAL      { 30 }
+            DESCRIPTION "Limited value range."
+
+        VARIATION       tnVwmMsOpsOsmPselRowStatus
+            SYNTAX      INTEGER { active(1),
+                                  notInService(2),
+                                  createAndWait(5),
+                                  destroy(6) }
+            DESCRIPTION "Limited set of values.
+                         The row status must be set to notInService(2) before
+                         being set to destroy(6) to remove this conceptual row.
+
+                         When used in a SET request, this object must be the
+                         only object in the PDU."
+
+        VARIATION       tnVwmMsOpsOsmPserDescr
+            DESCRIPTION "The following ASCII characters from ITU Recommendation
+                         T.50 are supported :
+                          - Space character  - value 0x20
+                          - G0 character set - values 0x21 - 0x7E"
+
+        VARIATION       tnVwmMsOpsOsmPserWtrTimer
+            SYNTAX      Unsigned32 (0..60)
+            DESCRIPTION "Limited value range."
+
+        VARIATION       tnVwmMsOpsOsmPserBounceTimer
+            SYNTAX      Unsigned32 (0..65535)
+            DESCRIPTION "Limited value range."
+
+        VARIATION       tnVwmMsOpsOsmPserHoldOffTimer
+            SYNTAX      Unsigned32 (0..65535)
+            DESCRIPTION "Limited value range."
+
+        VARIATION       tnVwmMsOpsOsmPserSwitchCountResetTimer
+            SYNTAX      Unsigned32 (1..4294967295)
+            DEFVAL      { 900000 }
+            DESCRIPTION "Limited value range."
+
+        VARIATION       tnVwmMsOpsOsmPserMaxSwitchCount
+            SYNTAX      Unsigned32 (1..65535)
+            DEFVAL      { 30 }
+            DESCRIPTION "Limited value range."
+
+        VARIATION       tnVwmMsOpsOsmPserRowStatus
+            SYNTAX      INTEGER { active(1),
+                                  notInService(2),
+                                  createAndWait(5),
+                                  destroy(6) }
+            DESCRIPTION "Limited set of values.
+                         The row status must be set to notInService(2) before
+                         being set to destroy(6) to remove this conceptual row.
+
+                         When used in a SET request, this object must be the
+                         only object in the PDU."
+
+        VARIATION       tnVwmMsOpsOsmPserPmudGroupName
+            DESCRIPTION "The following ASCII characters from ITU Recommendation
+                         T.50 are supported : [A-Z][a-z][0-9] plus the dot (.)
+                         and underscore (_) characters.
+                         Value 'all' is not allowed."
+
+        VARIATION       tnVwmMsOpsOsmPserPmudGroupRowStatus
+            SYNTAX      INTEGER { active(1),
+                                  createAndGo(4),
+                                  destroy(6) }
+            DESCRIPTION "Limited set of values.
+                         The row status can only be set to createAnGo(4) for
+                         row creation, or to destroy(6) for row deletion.
+                         When reading, always value active(1) is read.
+
+                         When used in a SET request, this object must be the
+                         only object in the PDU."
+
+        VARIATION       tnVwmMsTransferLogShelfNr
+            SYNTAX      Unsigned32 (1..2047)
+            DESCRIPTION "Limited value range."
+
+        VARIATION       tnVwmMsTransferLogRemoteHostAddrType
+            SYNTAX      INTEGER { unknown(0), ipv4(1), ipv6(2) }
+            DESCRIPTION "Limited set of values.
+                         Value unknown(0) is merely the read-only initial
+                         value of this object, and can not be configured."
+
+        VARIATION       tnVwmMsIfOtdrBaselineMeasurementReflections
+            SYNTAX      Unsigned32 (0..15)
+            DESCRIPTION "Limited value range."
+
+        VARIATION       tnVwmMsIfOtdrCurrentMeasurementReflections
+            SYNTAX      Unsigned32 (0..15)
+            DESCRIPTION "Limited value range."
+
+        VARIATION       tnVwmMsIfOtdrOpticalReturnLoss
+            ACCESS      not-implemented
+            DESCRIPTION "This object is not supported."
+
+    ::= { tn1830VwmCapability 2 }
+
+END

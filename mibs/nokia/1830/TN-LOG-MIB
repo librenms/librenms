@@ -1,0 +1,3877 @@
+TN-LOG-MIB DEFINITIONS ::= BEGIN
+
+-- (c) Copyright 2023 Nokia Networks.  All rights reserved.
+-- This software is the confidential and proprietary property of
+-- Nokia and may only be used in accordance with the terms of the
+-- license agreement provided with this software.
+
+IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE,
+        Unsigned32
+            FROM SNMPv2-SMI
+
+        tnSRMIBModules, tnSRObjs
+            FROM TROPIC-GLOBAL-REG
+
+--      TFilterActionOrDefault
+--          FROM TN-FILTER-MIB
+
+        TNamedItem
+            FROM TN-TC-MIB
+
+        tnSysSwitchId
+            FROM TROPIC-SYSTEM-MIB
+        ;
+
+tnSRLogMIBModule MODULE-IDENTITY
+        LAST-UPDATED    "201212050000Z"
+        ORGANIZATION    "Nokia"
+        CONTACT-INFO
+            "Nokia 7x50 Support
+             Web: http://www.nokia.com/comps/pages/carrier_support.jhtml"
+        DESCRIPTION
+        "This document is the SNMP MIB module to manage and provision the
+        Nokia 7x50 Logging utility.
+
+        This SNMP MIB module (Specification) embodies Nokia's
+        proprietary intellectual property.  Nokia retains
+        all title and ownership in the Specification, including any
+        revisions.
+
+        Nokia grants all interested parties a non-exclusive
+        license to use and distribute an unmodified copy of this
+        Specification in connection with management of Nokia
+        products, and without fee, provided this copyright notice and
+        license appear on all copies.
+
+        This Specification is supplied 'as is', and Nokia
+        makes no warranty, either express or implied, as to the use,
+        operation, condition, or performance of the Specification."
+--
+--  Revision History
+--
+        REVISION        "201212050000Z"
+        DESCRIPTION     "Commented out unsupported MIB tables and
+                         attributes for 1830."
+
+        REVISION        "200902280000Z"
+        DESCRIPTION     "Rev 7.0                28 Feb 2009 00:00
+                         7.0 release of the TIMETRA-LOG-MIB."
+
+        REVISION        "200801010000Z"
+        DESCRIPTION     "Rev 6.0                01 Jan 2008 00:00
+                         6.0 release of the TIMETRA-LOG-MIB."
+
+        REVISION        "200701010000Z"
+        DESCRIPTION     "Rev 5.0                01 Jan 2007 00:00
+                         5.0 release of the TIMETRA-LOG-MIB."
+
+        REVISION        "200603150000Z"
+        DESCRIPTION     "Rev 4.0                15 Mar 2006 00:00
+                         4.0 release of the TIMETRA-LOG-MIB."
+
+        REVISION        "200501240000Z"
+        DESCRIPTION     "Rev 2.1                24 Jan 2005 00:00
+                         2.1 release of the TIMETRA-LOG-MIB."
+
+        REVISION        "200405270000Z"
+        DESCRIPTION     "Rev 2.1                27 May 2004 00:00
+                         2.1 release of the TIMETRA-LOG-MIB."
+
+        REVISION        "200401150000Z"
+        DESCRIPTION     "Rev 2.0                15 Jan 2004 00:00
+                         2.0 release of the TIMETRA-LOG-MIB."
+
+        REVISION        "200308150000Z"
+        DESCRIPTION     "Rev 1.2                15 Aug 2003 00:00
+                         1.2 release of the TIMETRA-LOG-MIB."
+
+        REVISION        "200301200000Z"
+        DESCRIPTION     "Rev 1.0                20 Jan 2003 00:00
+                         1.0 Release of the TIMETRA-LOG-MIB."
+
+        REVISION        "200111100000Z"
+        DESCRIPTION     "Rev 0.1                10 Nov 2001 00:00
+                         Initial version of the TIMETRA-LOG-MIB."
+
+        ::= { tnSRMIBModules 12 }
+
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+--
+--
+
+tnSRLogObjs                 OBJECT IDENTIFIER ::= { tnSRObjs 12 }
+-- tnLogNotificationObjects      OBJECT IDENTIFIER ::= { tnSRLogObjs 1 }
+
+-- tnLogNotifyPrefix      OBJECT IDENTIFIER ::= { tnSRNotifyPrefix 12 }
+-- tnLogNotifications               OBJECT IDENTIFIER ::= { tnLogNotifyPrefix 0 }
+
+-- tnLogConformance          OBJECT IDENTIFIER ::= { tnSRConfs 12 }
+
+ --
+ -- Textual Conventions
+ --
+
+    -- NOTE: The ItuPerceivedSeverity is temporarily copied from the
+    -- ITU-ALARM-MIB draft from the IETF Disman working group
+--    ItuPerceivedSeverity ::= TEXTUAL-CONVENTION
+--        STATUS current
+--        DESCRIPTION
+--                "ITU perceived severity values as per M.3100
+--                and X.733"
+--        SYNTAX   INTEGER {
+--                     none (0),
+--                     cleared (1),
+--                     indeterminate (2),
+--                     critical (3),
+--                     major (4),
+--                     minor (5),
+--                     warning (6)
+--                 }
+
+    -- Nokia 7x50 SR series Textual Conventions
+
+
+    -- Nokia 7x50 SR series Syslog Textual Conventions
+
+--  TmnxSyslogId ::= TEXTUAL-CONVENTION
+--     STATUS      current
+--     DESCRIPTION
+--        "The value of TmnxSyslogId uniquely identifies an entry in the
+--         tnSyslogTargetTable to be used for the syslog collector target
+--         information when creating a log file where tnLogIdDestination
+--         has a value of 'syslog (2)'."
+--     SYNTAX  Integer32 (1..10)
+
+--  TmnxSyslogIdOrEmpty ::= TEXTUAL-CONVENTION
+--     STATUS      current
+--     DESCRIPTION
+--        "The value of TmnxSyslogIdOrEmpty uniquely identifies an entry in the
+--         tnSyslogTargetTable to be used for the syslog collector target
+--         information when creating a log file where tnLogIdDestination
+--         has a value of 'syslog (2)'.  The value of 0 is used when no
+--         entry exists in the tnSyslogTargetTable."
+--     SYNTAX  Integer32 (0 | 1..10)
+
+-- From SYSLOG-DEVICE-MIB
+-- SyslogFacility  ::=  TEXTUAL-CONVENTION
+--    STATUS  current
+--    DESCRIPTION
+--        "This textual convention maps out to the facilities
+--         available for syslog messages."
+--    SYNTAX  INTEGER {
+--                      local0(16),
+--                      local1(17),
+--                      local2(18),
+--                      local3(19),
+--                      local4(20),
+--                      local5(21),
+--                      local6(22),
+--                      local7(23)
+--                    }
+
+--  TmnxSyslogFacility ::= TEXTUAL-CONVENTION
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of TmnxSyslogFacility is an enumerated integer that
+--          specifies which syslog facility is the intended destination for the
+--          log event stream."
+--     SYNTAX      INTEGER {
+--                     kernel (0),
+--                     user (1),
+--                     mail (2),
+--                     systemd (3),
+--                     auth (4),
+--                     syslogd (5),
+--                     printer (6),
+--                     netnews (7),
+--                     uucp (8),
+--                     cron (9),
+--                     authpriv (10),
+--                     ftp (11),
+--                     ntp (12),
+--                     logaudit (13),
+--                     logalert (14),
+--                     cron2 (15),
+--                     local0 (16),
+--                     local1 (17),
+--                     local2 (18),
+--                     local3 (19),
+--                     local4 (20),
+--                     local5 (21),
+--                     local6 (22),
+--                     local7 (23)
+--                 }
+
+--  TmnxUdpPort ::= TEXTUAL-CONVENTION
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of TmnxUdpPort is the port used to send messages
+--          to an event collector target.  514 is the IANA assigned port number
+--          for syslog.  162 is the IANA assigned port number for SNMP
+--          notifications."
+--     SYNTAX      Integer32 (0..65535)
+
+--  TmnxSyslogSeverity ::= TEXTUAL-CONVENTION
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of TmnxSyslogSeverity is an enumerated integer that
+--          specifies the severity levels of syslog messages."
+--     SYNTAX      INTEGER {
+--                     emergency (0),
+--                     alert (1),
+--                     critical (2),
+--                     error (3),
+--                     warning (4),
+--                     notice (5),
+--                     info (6),
+--                     debug (7)
+--                 }
+
+    -- Nokia 7x50 SR series Log Textual Conventions
+
+--  TmnxLogFileId ::= TEXTUAL-CONVENTION
+--     STATUS      current
+--     DESCRIPTION
+--        "The value of TmnxLogFileId uniquely identifies a file-id to be
+--         used when creating a log or billing file.  A value of zero (0)
+--         indicates none specified and is invalid when used as an index
+--         for the tnLogFileIdTable."
+--     SYNTAX  Integer32 (0..99)
+
+--  TmnxLogFileType ::= TEXTUAL-CONVENTION
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of TmnxLogFileType indicates the type of information
+--          that will be written to this file."
+--     SYNTAX      INTEGER {
+--                     none (0),
+--                     eventLog (1),
+--                     accountingPolicy (2)
+--                 }
+
+--  TmnxLogIdIndex ::= TEXTUAL-CONVENTION
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tmnxLogIdIndex uniquely identifies an event stream log.
+--          Note that 2 default TmnxLogIdEntry rows are created by the agent using
+--          TmnxLogIdIndex values 99 and 100."
+--     SYNTAX  Integer32 (1..100)
+
+--  TmnxCFlash ::= TEXTUAL-CONVENTION
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of TmnxCFlash uniquely identifies a compact flash
+--          module on the active CPM card.  A value of zero (0) indicates
+--          none specified."
+--     SYNTAX  Unsigned32
+
+--  TmnxLogFilterId ::= TEXTUAL-CONVENTION
+--     STATUS       current
+--     DESCRIPTION
+--         "The value of TmnxLogFilterId is the identification number of an
+--         event log filter.  The value of zero indicates none specified.
+--         The value of zero (0) is invalid when used as an index for the
+--         tnLogFilterTable. Filter entry 1001 is created by the agent."
+--     SYNTAX Unsigned32  (0..1001)
+
+--  TmnxLogFilterEntryId ::= TEXTUAL-CONVENTION
+--     STATUS       current
+--     DESCRIPTION
+--         "The value of TmnxLogFilterEntryId is the identification number of an
+--         event log filter entry."
+--     SYNTAX Unsigned32  (1..999)
+
+--  TmnxLogFilterOperator ::= TEXTUAL-CONVENTION
+--     STATUS      current
+--     DESCRIPTION
+--         "When TmnxLogFilterOperator has a value of 'off', the item is not
+--          matched.  Otherwise the value of TmnxLogFilterOperator determines
+--          the comparison operator to be used as the parameter match criterion."
+--     SYNTAX      INTEGER {
+--                     off (1),
+--                     equal (2),
+--                     notEqual (3),
+--                     lessThan (4),
+--                     lessThanOrEqual (5),
+--                     greaterThan (6),
+--                     greaterThanOrEqual (7)
+--                 }
+
+--  TmnxEventNumber ::= TEXTUAL-CONVENTION
+--     STATUS      current
+--     DESCRIPTION
+--         "Each log event type has a unique identifying number.  This number is
+--          unique within a particular software application, such as IP, MPLS,
+--          OSPF, etc.; but it is not necessarily unique across different software
+--          applications.  That is MPLS event #1001 may be different from OSPF
+--          event #1001."
+--     SYNTAX      Unsigned32
+
+--
+--  Nokia 7x50 SR series Log General Objects
+--
+-- tnLogMaxLogs   OBJECT-TYPE
+--     SYNTAX      Unsigned32
+--     UNITS       "logs"
+--     MAX-ACCESS  read-write
+--     STATUS      current
+--     DESCRIPTION
+--         "The maximum number of concurrent active Logs that are allowed.
+--          A value of zero (0) for this object implies that there is no
+--          limit for the number of concurrent active logs in effect."
+--     DEFVAL { 15 }
+--     ::= { tnSRLogObjs 2 }
+
+--
+--  Nokia 7x50 SR series Log File-ID Table
+--
+-- tnLogFileIdTable     OBJECT-TYPE
+--     SYNTAX      SEQUENCE OF TnLogFileIdEntry
+--     MAX-ACCESS  not-accessible
+--     STATUS      current
+--     DESCRIPTION
+--         "Defines the Nokia 7x50 SR series Log File ID Table for providing,
+--          via SNMP, the capability of defining the characteristics for
+--          log and billing files and associating them with a file-id.
+--          The actual file is not created until the file-id is used in
+--          a log or billing file configuration."
+--    ::= { tnSRLogObjs 3 }
+--
+-- tnLogFileIdEntry OBJECT-TYPE
+--     SYNTAX      TnLogFileIdEntry
+--     MAX-ACCESS  not-accessible
+--     STATUS      current
+--     DESCRIPTION
+--         "Defines an entry in the tnLogFileIdTable.  Entries are created
+--          and deleted in this table by SNMP sets to tnLogFileIdRowStatus."
+--     INDEX { tnLogFileId }
+--     ::= { tnLogFileIdTable 1 }
+--
+-- TnLogFileIdEntry ::=
+--     SEQUENCE {
+--         tnLogFileId                       TmnxLogFileId,
+--         tnLogFileIdRowStatus              RowStatus,
+--         tnLogFileIdStorageType            StorageType,
+--         tnLogFileIdRolloverTime           Integer32,
+--         tnLogFileIdRetainTime             Integer32,
+--         tnLogFileIdAdminLocation          TmnxCFlash,
+--         tnLogFileIdOperLocation           TmnxCFlash,
+--         tnLogFileIdDescription            TItemDescription,
+--         tnLogFileIdLogType                TmnxLogFileType,
+--         tnLogFileIdLogId                  Integer32,
+--         tnLogFileIdPathName               DisplayString,
+--         tnLogFileIdCreateTime             DateAndTime,
+--         tnLogFileIdBackupLoc              TmnxCFlash
+--     }
+--
+-- tnLogFileId       OBJECT-TYPE
+--     SYNTAX      TmnxLogFileId
+--     MAX-ACCESS  not-accessible
+--     STATUS      current
+--     DESCRIPTION
+--        "The index value tnLogFileId uniquely identifies a file-id to be
+--         used when creating a log or billing file."
+--     ::= { tnLogFileIdEntry 1 }
+--
+-- tnLogFileIdRowStatus OBJECT-TYPE
+--     SYNTAX      RowStatus
+--     MAX-ACCESS  read-create
+--     STATUS      current
+--     DESCRIPTION
+--         "This object allows entries to be created and deleted
+--         in the tnLogFileIdTable.  Deletion of an entry in this
+--         table will not succeed if it is currently used by any log
+--         or billing file."
+--     REFERENCE
+--         "See definition of RowStatus in RFC 2579, 'Textual
+--         Conventions for SMIv2.'"
+--     ::= { tnLogFileIdEntry 2 }
+--
+-- tnLogFileIdStorageType OBJECT-TYPE
+--     SYNTAX      StorageType
+--     MAX-ACCESS  read-create
+--     STATUS      current
+--     DESCRIPTION
+--         "The storage type for this conceptual row.
+--         Conceptual rows having the value 'permanent' need not
+--         allow write-access to any columnar objects in the row."
+--     DEFVAL { nonVolatile }
+--     ::= { tnLogFileIdEntry 3 }
+--
+-- tnLogFileIdRolloverTime       OBJECT-TYPE
+--     SYNTAX      Integer32 (5..10080)
+--     UNITS       "minutes"
+--     MAX-ACCESS  read-create
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnLogFileIdRolloverTime specifies how often, in
+--          minutes, a new log or billing file will be created.  If the value
+--          of tnLogFileIdLogType is not 'rollover', then the value of this
+--          object is irrelevant."
+--     DEFVAL { 1440 }
+--     ::= { tnLogFileIdEntry 4 }
+--
+-- tnLogFileIdRetainTime        OBJECT-TYPE
+--     SYNTAX      Integer32 (1..500)
+--     UNITS       "hours"
+--     MAX-ACCESS  read-create
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnLogFileIdRetainTime specifies the minimum time,
+--          in hours, that a file is retained on the media.  Once this time
+--          period has expired the file is deleted."
+--     DEFVAL { 12 }
+--     ::= { tnLogFileIdEntry 5 }
+--
+-- tnLogFileIdAdminLocation      OBJECT-TYPE
+--     SYNTAX      TmnxCFlash
+--     MAX-ACCESS  read-create
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnLogFileIdAdminLocation specifies where the log
+--          or billing file should be created.  The file location should be a
+--          compact flash on the primary CPM.  When the secondary CPM becomes
+--          the primary CPM after a failure, the same log file policies will
+--          be activated.  Thus it is recommended that the same media is
+--          available to both secondary and primary CPMs.
+--
+--          If no location is specified, 0, the compact flash cf1: is used to
+--          store the log files or cf2: is used to store billing files."
+--     DEFVAL { 0 }
+--     ::= { tnLogFileIdEntry 6 }
+--
+-- tnLogFileIdOperLocation      OBJECT-TYPE
+--     SYNTAX      TmnxCFlash
+--     MAX-ACCESS  read-only
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnLogFileIdOperLocation specifies where the log
+--          or billing file has been created.  The file location should be a
+--          compact flash on the primary CPM.  When the secondary CPM becomes
+--          the primary CPM after a failure, the same log file policies will
+--          be activated.  Thus it is recommended that the same media is
+--          available to both secondary and primary CPMs."
+--     ::= { tnLogFileIdEntry 7 }
+--
+-- tnLogFileIdDescription   OBJECT-TYPE
+--     SYNTAX      TItemDescription
+--     MAX-ACCESS  read-create
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnLogFileIdDescription is a user provided description
+--          string for this log file-id entry.  It can consist of any printable,
+--          seven-bit ASCII characters up to 80 characters in length."
+--     DEFVAL { ''h }     ## the empty string
+--     ::= { tnLogFileIdEntry 8 }
+--
+-- tnLogFileIdLogType       OBJECT-TYPE
+--     SYNTAX      TmnxLogFileType
+--     MAX-ACCESS  read-only
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnLogFileIdLogType indicates the type of information
+--          that will be written to this file."
+--     ::= { tnLogFileIdEntry 9 }
+--
+-- tnLogFileIdLogId     OBJECT-TYPE
+--     SYNTAX      Integer32 (0..99)
+--     MAX-ACCESS  read-only
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnLogFileIdLogId indicates the ID index of the log or
+--          accounting policy this file is attached to.  A value of zero (0)
+--          indicates that this file definition is not currently used by any
+--          log or accounting policy."
+--     ::= { tnLogFileIdEntry 10 }
+--
+-- tnLogFileIdPathName  OBJECT-TYPE
+--     SYNTAX      DisplayString
+--     MAX-ACCESS  read-only
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnLogFileIdPathName is the pathname of the currently
+--          opened file used by this file-id entry."
+--     ::= { tnLogFileIdEntry 11 }
+--
+-- tnLogFileIdCreateTime    OBJECT-TYPE
+--     SYNTAX      DateAndTime
+--     MAX-ACCESS  read-only
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnLogFileIdCreateTime is the time the currently opened
+--          file version used by this file-id entry was created."
+--     ::= { tnLogFileIdEntry 12 }
+--
+-- tnLogFileIdBackupLoc     OBJECT-TYPE
+--     SYNTAX      TmnxCFlash
+--     MAX-ACCESS  read-create
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnLogFileIdBackupLoc specifies where the log
+--          or billing file should be created if it cannot be created in
+--          the location specified by tnLogFileIdAdminLocation.  The file
+--          location should be a compact flash on the primary CPM.  When the
+--          secondary CPM becomes the primary CPM after a failure, the same
+--          log file policies will be activated.  Thus it is recommended that
+--          the same media is available to both secondary and primary CPMs.
+--
+--          If no backup location is specified, 0, and the log or billing
+--          file could not be created in the location specified by
+--          tnLogFileIdAdminLocation or the file creation at the specified
+--          backup location fails, a file create failure trap is issued
+--          and the associated log or accounting policy is marked as
+--          operationally 'outOfService'."
+--     DEFVAL { 0 }
+--     ::= { tnLogFileIdEntry 13 }
+
+--
+-- Nokia 7x50 SR series Log Accounting Policy  Table
+--
+-- tnLogApTable OBJECT-TYPE
+--    SYNTAX      SEQUENCE OF TnLogApEntry
+--    MAX-ACCESS  not-accessible
+--    STATUS      current
+--    DESCRIPTION
+--        "The Nokia 7x50 SR series Log Accounting Policy Table contains
+--         an entry for each accounting policy that specifies the
+--         characteristics of the accounting records associated with an
+--         accounting policy."
+--   ::= { tnSRLogObjs 4 }
+--
+-- tnLogApEntry OBJECT-TYPE
+--    SYNTAX      TnLogApEntry
+--    MAX-ACCESS  not-accessible
+--    STATUS      current
+--    DESCRIPTION
+--        "Defines an entry in the tnLogApTable.  Entries in the
+--         tnLogApTable are created and destroyed via SNMP Set
+--         requests to tnLogApRowStatus."
+--    INDEX { tnLogApPolicyId }
+--    ::= { tnLogApTable 1 }
+--
+-- TnLogApEntry ::=
+--    SEQUENCE {
+--        tnLogApPolicyId                   Integer32,
+--        tnLogApRowStatus                  RowStatus,
+--        tnLogApStorageType                StorageType,
+--        tnLogApAdminStatus                TmnxAdminState,
+--        tnLogApOperStatus                 TmnxOperState,
+--        tnLogApInterval                   Integer32,
+--        tnLogApDescription                TItemDescription,
+--        tnLogApDefault                    TruthValue,
+--        tnLogApRecord                     INTEGER,
+--        tnLogApToFileId                   TmnxLogFileId,
+--        tnLogApPortType                   INTEGER,
+--        tnLogApDefaultInterval            TruthValue
+--     }
+--
+-- tnLogApPolicyId  OBJECT-TYPE
+--    SYNTAX      Integer32 (1..99)
+--    MAX-ACCESS  not-accessible
+--    STATUS      current
+--    DESCRIPTION
+--        "The value of tnLogApPolicyId uniquely identifies an accounting
+--         policy to be used for creating accounting records.  A specific
+--         accounting policy can be applied to one or more service access
+--         points (SAPs).  Any changes made to an existing policy is applied
+--         immediately to all SAPs where this policy is applied."
+--    ::= { tnLogApEntry 1 }
+--
+-- tnLogApRowStatus OBJECT-TYPE
+--    SYNTAX      RowStatus
+--    MAX-ACCESS  read-create
+--    STATUS      current
+--    DESCRIPTION
+--        "This object allows entries to be created and deleted
+--        in the tnLogApTable.  Deletion of an entry in this
+--        table will not succeed if it is currently applied to any
+--        service access point (SAP)."
+--    REFERENCE
+--        "See definition of RowStatus in RFC 2579, 'Textual
+--        Conventions for SMIv2.'"
+--    ::= { tnLogApEntry 2 }
+--
+-- tnLogApStorageType OBJECT-TYPE
+--    SYNTAX      StorageType
+--    MAX-ACCESS  read-create
+--    STATUS      current
+--    DESCRIPTION
+--        "The storage type for this conceptual row.
+--        Conceptual rows having the value 'permanent' need not
+--        allow write-access to any columnar objects in the row."
+--    DEFVAL { nonVolatile }
+--    ::= { tnLogApEntry 3 }
+--
+-- tnLogApAdminStatus       OBJECT-TYPE
+--    SYNTAX      TmnxAdminState
+--    MAX-ACCESS  read-create
+--    STATUS      current
+--    DESCRIPTION
+--        "The value of tnLogApAdminStatus indicates the desired
+--         administrative state for this accounting policy."
+--    DEFVAL { inService }
+--    ::= { tnLogApEntry 4 }
+--
+-- tnLogApOperStatus        OBJECT-TYPE
+--    SYNTAX      TmnxOperState
+--    MAX-ACCESS  read-only
+--    STATUS      current
+--    DESCRIPTION
+--        "The value of tnLogApOperStatus indicates the current
+--         operational status of this accounting policy."
+--    ::= { tnLogApEntry 5 }
+--
+-- tnLogApInterval      OBJECT-TYPE
+--    SYNTAX      Integer32 (5..120)
+--    MAX-ACCESS  read-create
+--    STATUS      current
+--    DESCRIPTION
+--        "The value of tnLogApInterval determines how frequently
+--         the statistics are collected and written to their destination.
+--
+--         tnLogApInterval will have a default value if the value of
+--         tnLogApDefaultInterval is set to 'true'. Value of
+--         tnLogApInterval can be set manually if tnLogApDefaultInterval
+--         is set to 'false'. An attempt to set this object to a non-default
+--         value will fail with an inconsistentValue error if
+--         tnLogApDefaultInterval has the value 'true' set.
+--
+--         If no record is specified, default value for tnLogApInterval is 5.
+--         For service and network types of record, default values are 5 and 15
+--         respectively."
+--    DEFVAL { 5 }
+--    ::= { tnLogApEntry 6 }
+--
+-- tnLogApDescription   OBJECT-TYPE
+--    SYNTAX      TItemDescription
+--    MAX-ACCESS  read-create
+--    STATUS      current
+--    DESCRIPTION
+--        "The value of tnLogApDescription is a user provided description
+--         string for this accounting policy.  It can consist of any printable,
+--         seven-bit ASCII characters up to 80 characters in length."
+--    DEFVAL { ''h }     ## the empty string
+--    ::= { tnLogApEntry 7 }
+--
+-- tnLogApDefault       OBJECT-TYPE
+--    SYNTAX      TruthValue
+--    MAX-ACCESS  read-create
+--    STATUS      current
+--    DESCRIPTION
+--        "When tnLogApDefault has a value of 'true', it indicates that
+--         this accounting policy is applied to all service access points (SAPs)
+--         that do not have an explicit accounting policy applied.  If no
+--         accounting policy is associated with a SAP accounting records are
+--         produced in accordance with the default policy.
+--
+--         Only one accounting policy entry in the tnLogApTable can have
+--         tnLogApDefault set to 'true'.  If there is no entry in the
+--         tnLogApTable with tnLogApDefault set to 'true', then the
+--         only accounting records collected are those explicitly configured
+--         accounting policies."
+--    DEFVAL { false }
+--    ::= { tnLogApEntry 8 }
+--
+-- tnLogApRecord    OBJECT-TYPE
+--    SYNTAX      INTEGER {
+--                    none (0),
+--                    svcIngressOctet (1),
+--                    svcEgressOctet (2),
+--                    svcIngressPkt (3),
+--                    svcEgressPkt (4),
+--                    netIngressOctet (5),
+--                    netEgressOctet (6),
+--                    netIngressPkt (7),
+--                    netEgressPkt (8),
+--                    compactSvcInOctet (9),
+--                    combinedSvcIngress (10),
+--                    combinedNetInEgOctet (11),
+--                    combinedSvcInEgOctet (12),
+--                    completeSvcInEg (13),
+--                    combinedSvcSdpInEg (14),
+--                    completeSvcSdpInEg (15),
+--                    completeSubscrIngrEgr (16),
+--                    bsxProtocol (17),
+--                    bsxApplication (18),
+--                    bsxAppGroup (19),
+--                    bsxSubscriberProtocol (20),
+--                    bsxSubscriberApplication (21),
+--                    bsxSubscriberAppGroup (22),
+--                    custom-record-subscriber (23),
+--                    custom-record-service (24),
+--                    custom-record-aa (25),
+--                    queueGroupOctets (26),
+--                    queueGroupPackets (27),
+--                    combinedQueueGroup (28),
+--                    combined-mpls-lsp-ingress (29),
+--                    combined-mpls-lsp-egress (30),
+--                    combined-ldp-lsp-egress (31),
+--                    saa (32),
+--                    netInfIngressOct(33),
+--                    netInfIngressPkt(34),
+--                    combinedNetInfIngress(35),
+--                    accessEgressPkt(36),
+--                    accessEgressOct(37),
+--                    combinedAccessEgress(38),
+--                    combinedNetEgress(39),
+--                    combinedSvcEgress(40),
+--                    combinedSvcInEgPkt(41),
+--                    combinedNetInEgPkt(42)
+--                }
+--    MAX-ACCESS  read-create
+--    STATUS      current
+--    DESCRIPTION
+--        "The value of tnLogApRecord indicates the type of predefined
+--         accounting record type to be written to the accounting file.
+--
+--         When tnLogApDefaultInterval has a value of 'false', statistics
+--         collection interval of the record type will be ignored.
+--
+--         The value 'bsxSubscriberAppGroup (22)' was made obsolete in
+--         release 7.0 and replaced by 'custom-record-aa (25).'"
+--    DEFVAL { none }
+--    ::= { tnLogApEntry  9 }
+--
+-- tnLogApToFileId      OBJECT-TYPE
+--    SYNTAX      TmnxLogFileId
+--    MAX-ACCESS  read-create
+--    STATUS      current
+--    DESCRIPTION
+--        "The value of tnLogApToFileId is the index to the entry in the
+--         tnLogFileIdTable that specifies the file characteristics to be
+--         used for the destination of the accounting policy records collected
+--         by this accounting policy.  The file itself is created the first
+--         time this accounting policy is applied to a service access point
+--         (SAP).
+--
+--         tnLogApOperStatus will not transition to 'inService' until a value
+--         has been set for tnLogApToFileId."
+--    ::= { tnLogApEntry 10 }
+--
+-- tnLogApPortType      OBJECT-TYPE
+--    SYNTAX      INTEGER {
+--                    none       (0),
+--                    access     (1),
+--                    network    (2),
+--                    sdp        (3),
+--                    subscriber (4),
+--                    appAssure  (5),
+--                    qgrp       (6),
+--                    saa        (7),
+--                    mplsLspIngr (8),
+--                    mplsLspEgr  (9),
+--                    ldpLspEgr   (10),
+--                    networkIf   (11),
+--                    accessport  (12)
+--                }
+--    MAX-ACCESS  read-only
+--    STATUS      current
+--    DESCRIPTION
+--        "The tnLogApPortType variable indicates if this accounting policy's
+--         record type is to be associated with a service access port, a
+--         network access port, a service destination point, a subscriber or
+--         the application-assurance feature."
+--    ::= { tnLogApEntry 11 }
+--
+-- tnLogApDefaultInterval       OBJECT-TYPE
+--    SYNTAX      TruthValue
+--    MAX-ACCESS  read-create
+--    STATUS      current
+--    DESCRIPTION
+--        "When tnLogApDefaultInterval has a value of 'true', it indicates
+--         that tnLogApInterval will have a default value.
+--
+--         When tnLogApDefaultInterval has a value of 'false', user can set
+--         the value of tnLogApInterval manually."
+--    DEFVAL { true }
+--    ::= { tnLogApEntry 12 }
+
+--
+-- Nokia 7x50 SR series Log Identification Table
+--
+--  tnLogIdTable OBJECT-TYPE
+--     SYNTAX      SEQUENCE OF TnLogIdEntry
+--     MAX-ACCESS  not-accessible
+--     STATUS      current
+--     DESCRIPTION
+--         "The Nokia 7x50 SR series Log Identification Table contains an
+--          entry for each log that specifies the characteristics of that
+--          log associated with a log-id number."
+--    ::= { tnSRLogObjs 5 }
+--
+--  tnLogIdEntry OBJECT-TYPE
+--     SYNTAX      TnLogIdEntry
+--     MAX-ACCESS  not-accessible
+--     STATUS      current
+--     DESCRIPTION
+--         "Defines an entry in the tnLogIdTable.  Entries in the
+--          tnLogIdTable are created and destroyed via SNMP Set
+--          requests to tnLogIdRowStatus.  Default log entries 99
+--          and 100 are created by the agent."
+--     INDEX { tnLogIdIndex }
+--     ::= { tnLogIdTable 1 }
+--
+--  TnLogIdEntry ::=
+--     SEQUENCE {
+--         tnLogIdIndex                      TmnxLogIdIndex,
+--         tnLogIdRowStatus                  RowStatus,
+--         tnLogIdStorageType                StorageType,
+--         tnLogIdAdminStatus                TmnxAdminState,
+--         tnLogIdOperStatus                 TmnxOperState,
+--         tnLogIdDescription                TItemDescription,
+--         tnLogIdFilterId                   TmnxLogFilterId,
+--         tnLogIdSource                     BITS,
+--         tnLogIdDestination                INTEGER,
+--         tnLogIdFileId                     TmnxLogFileId,
+--         tnLogIdSyslogId                   TmnxSyslogIdOrEmpty,
+--         tnLogIdMaxMemorySize              Unsigned32,
+--         tnLogIdConsoleSession             TruthValue,
+--         tnLogIdForwarded                  Counter64,
+--         tnLogIdDropped                    Counter64,
+--         tnLogIdTimeFormat                 INTEGER
+--      }
+--
+--  tnLogIdIndex  OBJECT-TYPE
+--     SYNTAX      TmnxLogIdIndex
+--     MAX-ACCESS  not-accessible
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnLogIdIndex uniquely identifies an event stream log."
+--     ::= { tnLogIdEntry 1 }
+--
+--  tnLogIdRowStatus OBJECT-TYPE
+--     SYNTAX      RowStatus
+--     MAX-ACCESS  read-create
+--     STATUS      current
+--     DESCRIPTION
+--         "This object allows entries to be created and deleted
+--         in the tnLogIdTable.  Deletion of an entry in this
+--         table will not succeed if tnLogIdOperStatus is not
+--         'outOfService'.  tnLogIdOperStatus will not transition
+--         to 'inService' if tnLogIdSource and tnLogIdDestination
+--         and their associated objects have not been set to valid values."
+--     REFERENCE
+--         "See definition of RowStatus in RFC 2579, 'Textual
+--         Conventions for SMIv2.'"
+--     ::= { tnLogIdEntry 2 }
+--
+--  tnLogIdStorageType OBJECT-TYPE
+--     SYNTAX      StorageType
+--     MAX-ACCESS  read-create
+--     STATUS      current
+--     DESCRIPTION
+--         "The storage type for this conceptual row.
+--         Conceptual rows having the value 'permanent' need not
+--         allow write-access to any columnar objects in the row."
+--     DEFVAL { nonVolatile }
+--     ::= { tnLogIdEntry 3 }
+--
+--  tnLogIdAdminStatus       OBJECT-TYPE
+--     SYNTAX      TmnxAdminState
+--     MAX-ACCESS  read-create
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnLogIdAdminStatus indicates the desired
+--          administrative state for this log."
+--     DEFVAL { inService }
+--     ::= { tnLogIdEntry 4 }
+--
+--  tnLogIdOperStatus        OBJECT-TYPE
+--     SYNTAX      TmnxOperState
+--     MAX-ACCESS  read-only
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnLogIdOperStatus indicates the current
+--          operational status of this log."
+--     ::= { tnLogIdEntry 5 }
+--
+--  tnLogIdDescription   OBJECT-TYPE
+--     SYNTAX      TItemDescription
+--     MAX-ACCESS  read-create
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnLogIdDescription is a user provided description
+--          string for this log.  It can consist of any printable,
+--          seven-bit ASCII characters up to 80 characters in length."
+--     DEFVAL { ''h }     ## the empty string
+--     ::= { tnLogIdEntry 6 }
+--
+--  tnLogIdFilterId      OBJECT-TYPE
+--     SYNTAX      TmnxLogFilterId
+--     MAX-ACCESS  read-create
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnLogIdFilterId is the index into the
+--          tnLogFilterTable to the entry the defines a filter to be
+--          applied to this log's source event stream to limit the events
+--          output to this log's destination.  If tnLogIdFilterId has a
+--          value of 0, then all events in the source log are forwarded
+--          to the destination."
+--     DEFVAL { 0 }
+--     ::= { tnLogIdEntry 7 }
+--
+--  tnLogIdSource        OBJECT-TYPE
+--     SYNTAX      BITS {
+--                     main (0),
+--                     security (1),
+--                     change (2),
+--                     debugTrace (3),
+--                     li (4)
+--                 }
+--     MAX-ACCESS  read-create
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnLogIdSource is a bit mask that specifies the
+--          log event source stream(s) to be forwarded to the destination
+--          specified in tnLogIdDestination.  Events from more than one
+--          source may be forwarded to the log destination.
+--
+--          The 'main' event stream consists of all events that are not
+--          explicitly directed to any other event stream.
+--
+--          The 'security' event stream contains all events that affect
+--          attempts to breach system security such as failed login attempts,
+--          attempts to access SNMP MIB tables to which the user has not
+--          been granted access, or attempts to enter a branch of the CLI
+--          for which the user is not authorized.
+--
+--          The 'user' activity event stream contains all events that directly
+--          affect the configuration or operation of the system.
+--
+--          The 'debugTrace' event stream contains all events configured for
+--          application or protocol tracing.
+--
+--          The 'li' event stream contains all events configured for Lawful
+--          Intercept activities.  An attempt to set the 'li' event stream
+--          will fail with an inconsistentValue error if the requestor does
+--          not have access to the 'li' context.  An attempt to set the 'li'
+--          event stream will fail with an inconsistentValue error if
+--          tnLogIdDestination has the value 'syslog' or 'file'."
+--     DEFVAL { {} }
+--     ::= { tnLogIdEntry 8 }
+--
+--  tnLogIdDestination       OBJECT-TYPE
+--     SYNTAX      INTEGER {
+--                     none (0),
+--                     console (1),
+--                     syslog (2),
+--                     snmpTraps (3),
+--                     file (4),
+--                     memory (5)
+--                 }
+--     MAX-ACCESS  read-create
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnLogIdDestination specifies the event log stream
+--          destination.  Once this object has been set to a value other than
+--          the default 'none' it cannot be modified and attempts to reset
+--          it to another value will fail with an INCONSISTENT VALUE error.
+--
+--          The 'console' destination causes all selected log events to be
+--          directed to the system console.  If the console is not connected
+--          then all entries are dropped.
+--
+--          The 'syslog' destination sends all selected log events to the
+--          syslog address configured in tnSyslogTargetAddress and
+--          tnSyslogTargetUdpPort in the tnSyslogTargetTable row entry
+--          pointed to by the value of tnLogIdSyslogId.  An attempt to
+--          set this object ot 'syslog' will fail with an inconsistentValue
+--          error if tnLogIdSource has the value 'li' set.
+--
+--          The 'snmpTraps' destination causes events defined as SNMP traps
+--          to be sent to the configured SNMP trap destinations and also to
+--          be logged in the NOTIFICATION-LOG-MIB tables.  The allocated memory
+--          size for the log of transmitted traps is specified in
+--          tnLogIdMaxMemorySize.  The events are logged to memory in a circular
+--          fashion.  Once the space is full, the oldest entry is replaced with
+--          a new entry.
+--
+--          The 'file' destination causes all selected log events to be
+--          directed to a file on one of the CPM's compact flash discs.
+--          Details of the file's configuration are in the tnLogFileIdTable
+--          entry pointed to by the value of tnLogIdFileId.  An attempt to
+--          set this object ot 'file' will fail with an inconsistentValue
+--          error if tnLogIdSource has the value 'li' set.
+--
+--          The 'memory' destination causes all selected log events to be
+--          directed to an in memory storage area.  The allocated memory size
+--          for the log is specified in tnLogIdMaxMemorySize.  The events are
+--          logged to memory in a circular fashion.  Once the space is full,
+--          the oldest entry is replaced with a new entry."
+--     DEFVAL { none }
+--     ::= { tnLogIdEntry 9 }
+--
+--  tnLogIdFileId      OBJECT-TYPE
+--     SYNTAX      TmnxLogFileId
+--     MAX-ACCESS  read-create
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnLogIdFileId is the index to the entry in the
+--          tnLogFileIdTable that specifies the file characteristics to be
+--          used for the destination of the log events written to this log.
+--
+--          tnLogIdOperStatus will not transition to 'inService' until a
+--          valid value has been set for tnLogIdFileId.  This object is
+--          valid only if tnLogIdDestination is set to 'file'."
+--     ::= { tnLogIdEntry 10 }
+--
+--  tnLogIdSyslogId     OBJECT-TYPE
+--     SYNTAX      TmnxSyslogIdOrEmpty
+--     MAX-ACCESS  read-create
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnLogIdSyslogId is the index into the
+--          tnSyslogTargetTable for the row entry with the information to
+--          format event messages to be sent to a specific syslog collector target.
+--
+--          This object is valid only when tnLogIdDestination has a value of
+--          'syslog'.  If this object has a value of zero (0), then no collector
+--          is specified and no messages are sent."
+--     DEFVAL { 0 }
+--     ::= { tnLogIdEntry 11 }
+--
+--  tnLogIdMaxMemorySize     OBJECT-TYPE
+--     SYNTAX      Unsigned32 (0|50..1024)
+--     UNITS       "kilobytes"
+--     MAX-ACCESS  read-create
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnLogIdMaxMemorySize specifies the amount of memory to
+--          allocate for this log.  This object is valid only when
+--          tnLogIdDestination has a value of 'memory' or 'snmpTraps'.
+--          If the value tnLogIdDestination is neither 'memory' nor
+--          'snmpTraps' a read of this object will return zero (0).
+--
+--          Once a memory size has been specified and the log created, any
+--          attempt to modify this object will fail with an INCONSISTENT
+--          VALUE error."
+--     DEFVAL { 100 }
+--     ::= { tnLogIdEntry 12 }
+--
+--  tnLogIdConsoleSession    OBJECT-TYPE
+--     SYNTAX      TruthValue
+--     MAX-ACCESS  read-create
+--     STATUS      current
+--     DESCRIPTION
+--         "This object exists for the convenience of the Nokia 7x50 SR CLI.
+--          When set to 'true' it indicates that the 'CONSOLE' log output
+--          should be printed to the Telnet session instead of the CONSOLE
+--          device.  When a tnLogIdEntry is created directly via SNMP,
+--          setting this object has no meaning and the 'CONSOLE' log output
+--          will always be sent to the CONSOLE device."
+--     DEFVAL { false }
+--     ::= { tnLogIdEntry 13 }
+--
+--  tnLogIdForwarded     OBJECT-TYPE
+--     SYNTAX      Counter64
+--     MAX-ACCESS  read-only
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnLogIdForwarded is the count of the number of events
+--          that have been forwarded to this log's destination.  This counter is
+--          incremented after an event has been selected by the log filter defined
+--          in tnLogIdFilterId."
+--     ::= { tnLogIdEntry 14 }
+--
+--  tnLogIdDropped   OBJECT-TYPE
+--     SYNTAX      Counter64
+--     MAX-ACCESS  read-only
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnLogIdDropped is the count of the number of events
+--          that have been sent to this logs source(s) and that have not been
+--          forwarded to the log destination because they were filtered out
+--          by the log filter defined in tnLogIdFilterId."
+--     ::= { tnLogIdEntry 15 }
+--
+--  tnLogIdTimeFormat     OBJECT-TYPE
+--     SYNTAX      INTEGER {
+--                     utc (1),
+--                     local (2)
+--                 }
+--     MAX-ACCESS  read-create
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnLogIdTimeFormat specifies the type of timestamp
+--          format for events sent to logs where tnLogIdDestination
+--          has a value of either 'syslog (2)' or 'file (4)'.
+--
+--          When tnLogIdTimeFormat has a value of 'utc (1)' timestamps are
+--          written using the Coordinated Universal Time value.  When
+--          tnLogIdTimeFormat has a value of 'local (2)' timestamps are
+--          written in the system's local time."
+--     DEFVAL { utc }
+--     ::= { tnLogIdEntry 16 }
+
+--
+--  Nokia 7x50 SR series Log Filter Table
+--
+-- tnLogFilterTable OBJECT-TYPE
+--     SYNTAX       SEQUENCE OF TnLogFilterEntry
+--     MAX-ACCESS   not-accessible
+--     STATUS       current
+--     DESCRIPTION  "  "
+--     ::= { tnSRLogObjs 6 }
+--
+-- tnLogFilterEntry OBJECT-TYPE
+--     SYNTAX       TnLogFilterEntry
+--     MAX-ACCESS   not-accessible
+--     STATUS       current
+--     DESCRIPTION
+--         "Information about a particular Log Filter entry.
+--
+--         Entries are created by user.
+--         Entries are deleted by user.
+--         Entry 1001 is created by the agent for default TmnxLogIdIndex 100.
+--
+--         There is no StorageType object.  Entries have a presumed
+--         StorageType of nonVolatile.
+--         "
+--     INDEX { tnLogFilterId }
+--     ::= { tnLogFilterTable 1 }
+--
+-- TnLogFilterEntry ::= SEQUENCE
+--     {
+--         tnLogFilterId            TmnxLogFilterId,
+--         tnLogFilterRowStatus     RowStatus,
+--         tnLogFilterDescription   TItemDescription,
+--         tnLogFilterDefaultAction TFilterAction,
+--         tnLogFilterInUse         TruthValue
+--     }
+--
+-- tnLogFilterId  OBJECT-TYPE
+--     SYNTAX       TmnxLogFilterId (1..1001)
+--     MAX-ACCESS   not-accessible
+--     STATUS       current
+--     DESCRIPTION
+--         "The value of tnLogFilterId is a unique index that identifies a
+--          particular entry in the tnLogFilterTable."
+--     ::= { tnLogFilterEntry 1 }
+--
+-- tnLogFilterRowStatus  OBJECT-TYPE
+--     SYNTAX       RowStatus
+--     MAX-ACCESS   read-create
+--     STATUS       current
+--     DESCRIPTION
+--         "Row entries in this table are created and destroyed via SNMP set
+--          requests."
+--     ::= { tnLogFilterEntry 2 }
+--
+-- tnLogFilterDescription  OBJECT-TYPE
+--     SYNTAX       TItemDescription
+--     MAX-ACCESS   read-create
+--     STATUS       current
+--     DESCRIPTION
+--         "The value of tnLogFilterDescription is a user provided description
+--          string for this log filter.  It can consist of any printable,
+--          seven-bit ASCII characters up to 80 characters in length."
+--     DEFVAL { ''H }
+--     ::= { tnLogFilterEntry 3 }
+--
+-- tnLogFilterDefaultAction  OBJECT-TYPE
+--     SYNTAX       TFilterAction
+--     MAX-ACCESS   read-create
+--     STATUS       current
+--     DESCRIPTION
+--         "The action to take for packets that do not match any filter entries.
+--         the value default(3) is not allowed."
+--     DEFVAL { forward }
+--     ::= { tnLogFilterEntry 4 }
+--
+-- tnLogFilterInUse      OBJECT-TYPE
+--     SYNTAX      TruthValue
+--     MAX-ACCESS  read-only
+--     STATUS      current
+--     DESCRIPTION
+--         "When tnLogFilterInUse has a value of 'true', this filter is
+--          attached to a log file configuration.  The same tnLogFilterEntry
+--          can be attached to more than one log file."
+--     ::= { tnLogFilterEntry 5 }
+
+--
+-- Nokia 7x50 SR series Log Filter Entry parameters
+--
+-- tnLogFilterParamsTable OBJECT-TYPE
+--     SYNTAX       SEQUENCE OF TnLogFilterParamsEntry
+--     MAX-ACCESS   not-accessible
+--     STATUS       current
+--     DESCRIPTION  "A table of all log filter match entries for all log filters."
+--     ::= { tnSRLogObjs 7 }
+--
+-- tnLogFilterParamsEntry OBJECT-TYPE
+--     SYNTAX       TnLogFilterParamsEntry
+--     MAX-ACCESS   not-accessible
+--     STATUS       current
+--     DESCRIPTION
+--         "Information about a particular Log Filter Parameter entry.
+--         Every Log Filter can have zero or more Log Filter Parameter match
+--         entries.
+--
+--         The Log Filter parameter entries are checked in ascending order by
+--         their index value, tnLogFilterParamsIndex.  Upon the first successful
+--         match, the specified actions are applied as indicated by the value of
+--         tnLogFilterParamsAction.  No further checking against
+--         remaining tnLogFilterParamsEntry rows is done.  Therefore, entries
+--         in this table should be sequenced from most to least explicit match
+--         criterion.  It is recommended that multiple parameter entries for a log
+--         filter should be created with gaps between their index values.  This
+--         allows a new entry to be inserted into an existing filter policy
+--         without needing to renumber the already existing filter parameters
+--         entries.
+--
+--         A log filter entry in the tnLogFilterTable with no entry in the
+--         tnLogFilterParamsTable to define its match criteria set will match
+--         every log event, and the default action specified by
+--         tnLogFilterDefaultAction will be taken.
+--
+--         Entries are created by user.
+--         Entries are deleted by user.
+--
+--         There is no StorageType object, entries have a presumed
+--         StorageType of nonVolatile.
+--         "
+--     INDEX { tnLogFilterId, tnLogFilterParamsIndex }
+--     ::= { tnLogFilterParamsTable 1 }
+--
+-- TnLogFilterParamsEntry ::= SEQUENCE
+--     {
+--         tnLogFilterParamsIndex            TmnxLogFilterEntryId,
+--         tnLogFilterParamsRowStatus        RowStatus,
+--         tnLogFilterParamsDescription      TItemDescription,
+--         tnLogFilterParamsAction           TFilterActionOrDefault,
+--         tnLogFilterParamsApplication      TNamedItemOrEmpty,
+--         tnLogFilterParamsApplOperator     TmnxLogFilterOperator,
+--         tnLogFilterParamsNumber           TmnxEventNumber,
+--         tnLogFilterParamsNumberOperator   TmnxLogFilterOperator,
+--         tnLogFilterParamsSeverity         ItuPerceivedSeverity,
+--         tnLogFilterParamsSeverityOperator TmnxLogFilterOperator,
+--         tnLogFilterParamsSubject          TNamedItemOrEmpty,
+--         tnLogFilterParamsSubjectOperator  TmnxLogFilterOperator,
+--         tnLogFilterParamsSubjectRegexp    TruthValue,
+--         tnLogFilterParamsRouter           TNamedItemOrEmpty,
+--         tnLogFilterParamsRouterOperator   TmnxLogFilterOperator,
+--         tnLogFilterParamsRouterRegexp     TruthValue
+--     }
+--
+-- tnLogFilterParamsIndex  OBJECT-TYPE
+--     SYNTAX       TmnxLogFilterEntryId
+--     MAX-ACCESS   not-accessible
+--     STATUS       current
+--     DESCRIPTION
+--         ""
+--     ::= { tnLogFilterParamsEntry 1 }
+--
+-- tnLogFilterParamsRowStatus  OBJECT-TYPE
+--     SYNTAX       RowStatus
+--     MAX-ACCESS   read-create
+--     STATUS       current
+--     DESCRIPTION
+--         "Row Status for this Log filter's parameter entry."
+--     ::= { tnLogFilterParamsEntry 2 }
+--
+-- tnLogFilterParamsDescription  OBJECT-TYPE
+--     SYNTAX       TItemDescription
+--     MAX-ACCESS   read-create
+--     STATUS       current
+--     DESCRIPTION
+--         "The value of tnLogFilterParamsDescription is a user provided
+--          description string for this log filter match entry.  It can consist
+--          of any printable, seven-bit ASCII characters up to 80 characters in
+--          length."
+--     DEFVAL { ''H }
+--     ::= { tnLogFilterParamsEntry 3 }
+--
+-- tnLogFilterParamsAction  OBJECT-TYPE
+--     SYNTAX       TFilterActionOrDefault
+--     MAX-ACCESS   read-create
+--     STATUS       current
+--     DESCRIPTION
+--         "the action to take for log events that match this filter entry.
+--         the value default(3) is allowed.  If tnLogFilterParamsAction
+--         has the value 'default', the action specified by the value
+--         of tnLogFilterDefaultAction is applied to events that match
+--         this filter entry."
+--     DEFVAL { default }
+--     ::= { tnLogFilterParamsEntry 4 }
+--
+-- tnLogFilterParamsApplication  OBJECT-TYPE
+--     SYNTAX      TNamedItemOrEmpty
+--     MAX-ACCESS  read-create
+--     STATUS      current
+--     DESCRIPTION
+--         "Matches log events with the specified application name.  An
+--          application is the software entity the reports the log event and
+--          includes IP, MPLS, OSPF, CLI, SERVICES, etc."
+--     DEFVAL { ''H }  ## empty string
+--     ::= { tnLogFilterParamsEntry 5 }
+--
+-- tnLogFilterParamsApplOperator OBJECT-TYPE
+--     SYNTAX      TmnxLogFilterOperator
+--     MAX-ACCESS  read-create
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnLogFilterParamsApplOperator is the comparison
+--          operator to use to determine if the log event matches the value
+--          of tnLogFilterParamsApplication.  The only valid values from
+--          TmnxLogFilterOperator are 'off', 'equal', and 'notEqual'."
+--     DEFVAL { off }
+--     ::= { tnLogFilterParamsEntry 6 }
+--
+-- tnLogFilterParamsNumber       OBJECT-TYPE
+--     SYNTAX      TmnxEventNumber
+--     MAX-ACCESS  read-create
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnLogFilterParamsNumber is the log event number to
+--          be matched.  Event numbers uniquely identify a certain event within
+--          an application but not across applications."
+--     DEFVAL { 0 }
+--     ::= { tnLogFilterParamsEntry 7 }
+--
+-- tnLogFilterParamsNumberOperator   OBJECT-TYPE
+--     SYNTAX      TmnxLogFilterOperator
+--     MAX-ACCESS  read-create
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnLogFilterParamsNumberOperator is the comparison
+--          operator to use to determine if the log event matches the value
+--          of tnLogFilterParamsNumber."
+--     DEFVAL { off }
+--     ::= { tnLogFilterParamsEntry 8 }
+--
+-- tnLogFilterParamsSeverity     OBJECT-TYPE
+--     SYNTAX      ItuPerceivedSeverity
+--     MAX-ACCESS  read-create
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnLogFilterParamsSeverity is the log event severity
+--          level to be matched."
+--     DEFVAL { none }
+--     ::= { tnLogFilterParamsEntry 9 }
+--
+-- tnLogFilterParamsSeverityOperator        OBJECT-TYPE
+--     SYNTAX      TmnxLogFilterOperator
+--     MAX-ACCESS  read-create
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnLogFilterParamsSeverityOperator is the comparison
+--          operator to use to determine if the log event matches the value
+--          of tnLogFilterParamsSeverity."
+--     DEFVAL { off }
+--     ::= { tnLogFilterParamsEntry 10 }
+--
+-- tnLogFilterParamsSubject     OBJECT-TYPE
+--     SYNTAX      TNamedItemOrEmpty
+--     MAX-ACCESS  read-create
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnLogFilterParamsSubject is the log event subject
+--          string to be matched.  The subject is the entity that the event is
+--          reported for, such as a port ID."
+--     DEFVAL { ''H }
+--     ::= { tnLogFilterParamsEntry 11 }
+--
+-- tnLogFilterParamsSubjectOperator     OBJECT-TYPE
+--     SYNTAX      TmnxLogFilterOperator
+--     MAX-ACCESS  read-create
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnLogFilterParamsSubjectOperator is the comparison
+--          operator to use to determine if the log event matches the value
+--          of tnLogFilterParamsSubject.  The only valid values of
+--          TmnxLogFilterOperator to use for the subject string comparison are
+--          'off', 'equal', and 'notEqual'."
+--     DEFVAL { off }
+--     ::= { tnLogFilterParamsEntry 12 }
+--
+-- tnLogFilterParamsSubjectRegexp     OBJECT-TYPE
+--     SYNTAX      TruthValue
+--     MAX-ACCESS  read-create
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnLogFilterParamsSubjectRegexp specifies the type
+--          of string comparison to use to determine if the log event matches
+--          the value of tnLogFilterParamsSubject.  When the value of
+--          tnLogFilterParamsSubjectRegexp is 'true', the string in
+--          tnLogFilterParamsSubject is a regular expression string to be
+--          matched against the subject string in the log event being filtered.
+--          When it has a value of 'false', the string in
+--          tnLogFilterParamsSubject is matched exactly by the event
+--          filter."
+--     DEFVAL { false }
+--     ::= { tnLogFilterParamsEntry 13 }
+--
+-- tnLogFilterParamsRouter      OBJECT-TYPE
+--     SYNTAX      TNamedItemOrEmpty
+--     MAX-ACCESS  read-create
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnLogFilterParamsRouter is the log event router
+--          context name string to be matched."
+--     DEFVAL { ''H }
+--     ::= { tnLogFilterParamsEntry 14 }
+--
+-- tnLogFilterParamsRouterOperator      OBJECT-TYPE
+--     SYNTAX      TmnxLogFilterOperator
+--     MAX-ACCESS  read-create
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnLogFilterParamsRouterOperator is the comparison
+--          operator to use to determine if the log event matches the value
+--          of tnLogFilterParamsRouter.  The only valid values of
+--          TmnxLogFilterOperator to use for the router name string comparison
+--          are 'off', 'equal', and 'notEqual'."
+--     DEFVAL { off }
+--     ::= { tnLogFilterParamsEntry 15 }
+--
+-- tnLogFilterParamsRouterRegexp      OBJECT-TYPE
+--     SYNTAX      TruthValue
+--     MAX-ACCESS  read-create
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnLogFilterParamsRouterRegexp specifies the type
+--          of string comparison to use to determine if the log event matches
+--          the value of tnLogFilterParamsRouter.  When the value of
+--          tnLogFilterParamsRouterRegexp is 'true', the string in
+--          tnLogFilterParamsRouter is a regular expression string to be
+--          matched against the router name string in the log event being
+--          filtered.  When it has a value of 'false', the string in
+--          tnLogFilterParamsRouter is matched exactly by the event
+--          filter."
+--     DEFVAL { false }
+--     ::= { tnLogFilterParamsEntry 16 }
+
+--
+-- Nokia 7x50 SR series Syslog Target Entry parameters
+--
+-- tnSyslogTargetTable OBJECT-TYPE
+--     SYNTAX       SEQUENCE OF TnSyslogTargetEntry
+--     MAX-ACCESS   not-accessible
+--     STATUS       current
+--     DESCRIPTION
+--         "A table of all remote syslog collectors that this agent is
+--          configured to send syslog messages to."
+--     ::= { tnSRLogObjs 8 }
+--
+-- tnSyslogTargetEntry OBJECT-TYPE
+--     SYNTAX       TnSyslogTargetEntry
+--     MAX-ACCESS   not-accessible
+--     STATUS       current
+--     DESCRIPTION
+--         "Information about a particular Syslog Target entry.
+--
+--          Entries are created by user.
+--          Entries are deleted by user.
+--
+--          There is no StorageType object, entries have a presumed
+--          StorageType of nonVolatile. "
+--     INDEX { tnSyslogTargetIndex }
+--     ::= { tnSyslogTargetTable 1 }
+--
+-- TnSyslogTargetEntry ::= SEQUENCE
+--     {
+--         tnSyslogTargetIndex               TmnxSyslogId,
+--         tnSyslogTargetRowStatus           RowStatus,
+--         tnSyslogTargetDescription         TItemDescription,
+-- ##        tnSyslogTargetAddress             IpAddress,
+--         tnSyslogTargetUdpPort             TmnxUdpPort,
+--         tnSyslogTargetFacility            TmnxSyslogFacility,
+--         tnSyslogTargetSeverity            TmnxSyslogSeverity,
+--         tnSyslogTargetMessagePrefix       TNamedItemOrEmpty,
+--         tnSyslogTargetMessagesDropped     Counter32,
+--         tnSyslogTargetAddrType            InetAddressType,
+--         tnSyslogTargetAddr                InetAddress
+--     }
+--
+-- tnSyslogTargetIndex     OBJECT-TYPE
+--     SYNTAX       TmnxSyslogId
+--     MAX-ACCESS   not-accessible
+--     STATUS       current
+--     DESCRIPTION
+--         "The value of tnSyslogTargetIndex is a unique arbitrary identifier
+--          for this syslog collector target."
+--     ::= { tnSyslogTargetEntry 1 }
+--
+-- tnSyslogTargetRowStatus   OBJECT-TYPE
+--     SYNTAX      RowStatus
+--     MAX-ACCESS  read-create
+--     STATUS      current
+--     DESCRIPTION
+--         "The tnSyslogTargetRowStatus object allows for dynamic creation and
+--          deletion of row entries in the tnSyslogTargetTable as well as the
+--          activation and deactivation of these entries.
+--
+--          When this object's value is set to 'notInService (2)', no messages
+--          will be sent to this target collector and none of its counters will
+--          be incremented.
+--
+--          Refer to the RowStatus convention for further details on the behavior
+--          of this object."
+--     REFERENCE
+--         "RFC2579 (Textual Conventions for SMIv2)"
+--     ::= { tnSyslogTargetEntry 2 }
+--
+-- tnSyslogTargetDescription     OBJECT-TYPE
+--     SYNTAX      TItemDescription
+--     MAX-ACCESS  read-create
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnSyslogTargetDescription is an administratively
+--          assigned textual description of this syslog collector target."
+--     DEFVAL { ''H }  ## the empty string
+--     ::= { tnSyslogTargetEntry 3 }
+--
+-- ##  A future mib version should use InetAddressType and InetAddress instead
+-- ##  of IpAddress and support DNS names.
+-- ## tnSyslogTargetAddress     OBJECT-TYPE
+-- ##    SYNTAX      IpAddress
+-- ##    MAX-ACCESS  read-create
+-- ##    STATUS      obsolete
+-- ##    DESCRIPTION
+-- ##        "The value of tnSyslogTargetAddress is the IPv4 address for
+-- ##         this syslog message collector target.  If the value of this
+-- ##         object is '0.0.0.0', then no messages will be sent, nor will
+-- ##         any counters be incremented.
+--
+-- ##         This object was made obsolete in release 5.0.  It is replaced
+-- ##         by the InetAddress pair tnSyslogTargetAddrType and
+-- ##         tnSyslogTargetAddr."
+-- ##    DEFVAL { '00000000'h }       0.0.0.0
+-- ##    ::= { tnSyslogTargetEntry 4 }
+--
+-- tnSyslogTargetUdpPort     OBJECT-TYPE
+--     SYNTAX      TmnxUdpPort
+--     MAX-ACCESS  read-create
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnSyslogTargetUdpPort is the UDP port number that
+--          is used to send messages to this syslog collector target."
+--     DEFVAL { 514 }  ## The IANA assigned port number for syslog
+--     ::= { tnSyslogTargetEntry 5 }
+--
+-- tnSyslogTargetFacility    OBJECT-TYPE
+--     SYNTAX      TmnxSyslogFacility
+--     MAX-ACCESS  read-create
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnSyslogTargetFacility is the syslog facility number
+--          that will be encoded in messages sent to this syslog collector target."
+--     DEFVAL { local7 }
+--     ::= { tnSyslogTargetEntry 6 }
+--
+-- tnSyslogTargetSeverity    OBJECT-TYPE
+--     SYNTAX      TmnxSyslogSeverity
+--     MAX-ACCESS  read-create
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnSyslogTargetSeverity is the maximum severity level
+--          of the messages that SHOULD be forwarded to this syslog collector
+--          target.  The higher the level, the lower the severity."
+--     DEFVAL { info }
+--     ::= { tnSyslogTargetEntry 7 }
+--
+-- tnSyslogTargetMessagePrefix   OBJECT-TYPE
+--     SYNTAX      TNamedItemOrEmpty
+--     MAX-ACCESS  read-create
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnSyslogTargetMessagePrefix is a string of ABNF
+--          alphanumeric characters to be prepended as the MSG TAG to the
+--          syslog MSG CONTENT string and separated from it with a colon
+--          and space, ': '."
+--     DEFVAL { ''H } ## the empty string
+--     ::= { tnSyslogTargetEntry 8 }
+--
+-- tnSyslogTargetMessagesDropped     OBJECT-TYPE
+--     SYNTAX      Counter32
+--     MAX-ACCESS  read-only
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnSyslogTargetMessagesDropped is a count of messages
+--          not sent to this syslog collector target because the severity level
+--          of the message was above tnSyslogTargetSeverity; the higher the
+--          level, the lower the severity."
+--     ::= { tnSyslogTargetEntry 9 }
+--
+-- tnSyslogTargetAddrType   OBJECT-TYPE
+--     SYNTAX      InetAddressType
+--     MAX-ACCESS  read-create
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnSyslogTargetAddrType specifies the type of
+--          host address to be used for the syslog message collector target.
+--          This object indicates the type of address stored in the
+--          corresponding tnSyslogTargetAddr object.
+--
+--          Only 'ipv4', 'ipv6', and 'ipv6z' address types are supported."
+--     DEFVAL { unknown }
+--     ::= { tnSyslogTargetEntry 10 }
+--
+-- tnSyslogTargetAddr OBJECT-TYPE
+--     SYNTAX      InetAddress  (SIZE(0|4|16|20))
+--     MAX-ACCESS  read-create
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnSyslogTargetAddr specifies the IP host address
+--          to be used for the syslog message collector target.  If no address
+--          is specified, ''H, then no messages will be sent nor will
+--          any counters be incremented.
+--
+--          The syslog target address type is determined by the value of the
+--          corresponding tnSyslogTargetAddrType object."
+--     DEFVAL { ''H }
+--     ::= { tnSyslogTargetEntry 11 }
+
+--
+-- Nokia 7x50 SR series Event Application Entry parameters
+--
+tnEventAppTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF TnEventAppEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "A table of all applications that generate TiMOS logger events."
+    ::= { tnSRLogObjs 9 }
+
+tnEventAppEntry OBJECT-TYPE
+    SYNTAX       TnEventAppEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Information about a particular application entry.
+
+         Entries are created by the agent when the system initializes.
+
+         There is no StorageType object, entries have a presumed
+         StorageType of permanent. "
+    INDEX { tnSysSwitchId, tnEventAppIndex }
+    ::= { tnEventAppTable 1 }
+
+TnEventAppEntry ::= SEQUENCE
+    {
+        tnEventAppIndex          Unsigned32,
+        tnEventAppName           TNamedItem
+    }
+
+tnEventAppIndex     OBJECT-TYPE
+    SYNTAX       Unsigned32
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "The value of tnEventAppIndex is a unique arbitrary identifier
+         for this application event generator."
+    ::= { tnEventAppEntry 1 }
+
+tnEventAppName    OBJECT-TYPE
+    SYNTAX      TNamedItem
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tnEventAppName is the name string that is
+     used in TiMOS log messages as the application that generated the
+         logged event."
+    ::= { tnEventAppEntry 2 }
+
+--
+-- Nokia 7x50 SR series Event Entry parameters
+--
+-- tnEventTable OBJECT-TYPE
+--     SYNTAX       SEQUENCE OF TnEventEntry
+--     MAX-ACCESS   not-accessible
+--     STATUS       current
+--     DESCRIPTION
+--         "A table of all TiMOS events that can be generated."
+--     ::= { tnSRLogObjs 10 }
+--
+-- tnEventEntry OBJECT-TYPE
+--     SYNTAX       TnEventEntry
+--     MAX-ACCESS   not-accessible
+--     STATUS       current
+--     DESCRIPTION
+--         "Information about a particular TiMOS event type entry.
+--          Entries are created by the agent when the system initializes.
+--          There is no StorageType object, entries have a presumed
+--          StorageType of permanent. "
+--     INDEX { tnEventAppIndex, tnEventID }
+--     ::= { tnEventTable 1 }
+--
+-- TnEventEntry ::= SEQUENCE
+--     {
+--         tnEventID         Unsigned32,
+--         tnEventName       TNamedItem,
+--         tnEventSeverity   ItuPerceivedSeverity,
+--         tnEventControl    TruthValue,
+--         tnEventCounter    Counter32,
+--         tnEventDropCount  Counter32,
+--         tnEventReset      TmnxActionType,
+--         tnEventThrottle   TruthValue
+--     }
+--
+-- tnEventID     OBJECT-TYPE
+--     SYNTAX       Unsigned32
+--     MAX-ACCESS   not-accessible
+--     STATUS       current
+--     DESCRIPTION
+--         "The value of tnEventID is a unique arbitrary identifier
+--          for indexing event type entries within an event generator application
+--          as identified by the value of tnEventAppIndex."
+--     ::= { tnEventEntry 1 }
+--
+-- tnEventName   OBJECT-TYPE
+--     SYNTAX      TNamedItem
+--     MAX-ACCESS  read-only
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnEventName is a short name string used to describe
+--          this event type."
+--     ::= { tnEventEntry 2 }
+--
+-- tnEventSeverity   OBJECT-TYPE
+--     SYNTAX      ItuPerceivedSeverity
+--     MAX-ACCESS  read-write
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnEventSeverity indicates the severity level that
+--          will be associated with this type of event when it is generated."
+--     ::= { tnEventEntry 3 }
+--
+-- tnEventControl    OBJECT-TYPE
+--     SYNTAX      TruthValue
+--     MAX-ACCESS  read-write
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnEventControl determines whether or not events
+--          of this type will be generated or suppressed.  When it has a value
+--          of 'true', the event is generated and tnEventCounter is incremented.
+--          When it has a value of 'false', the event is suppressed and
+--          tnEventDropCount is incremented."
+--     ::= { tnEventEntry 4 }
+--
+-- tnEventCounter    OBJECT-TYPE
+--     SYNTAX      Counter32
+--     MAX-ACCESS  read-only
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnEventCounter is the number of times an event of this
+--          type has been generated."
+--     ::= { tnEventEntry 5 }
+--
+-- tnEventDropCount      OBJECT-TYPE
+--     SYNTAX      Counter32
+--     MAX-ACCESS  read-only
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnEventDropCount is the number of times and event
+--         of this type has been suppressed because tnEventControl is set to
+--         'false'."
+--     ::= { tnEventEntry 6 }
+--
+-- tnEventReset      OBJECT-TYPE
+--     SYNTAX      TmnxActionType
+--     MAX-ACCESS  read-write
+--     STATUS      current
+--     DESCRIPTION
+--         "Setting tnEventReset to 'doAction (1)' causes the agent to
+--          reset the values of tnEventSeverity and tnEventControl
+--          to the default values for this event type."
+--     DEFVAL { notApplicable }
+--     ::= { tnEventEntry 7 }
+--
+-- tnEventThrottle   OBJECT-TYPE
+--     SYNTAX      TruthValue
+--     MAX-ACCESS  read-write
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnEventThrottle determines whether or not events
+--          of this type will be throttled.  When it has a value
+--          of 'true', the event is throttled at the rate indicated by the
+--          value of tnEventThrottleLimit and tnEventThrottleInterval.
+--          When it has a value of 'false', no event throttling is applied."
+--     DEFVAL { false }
+--     ::= { tnEventEntry 8 }
+
+--
+-- Nokia 7x50 SR series SNMP Trap Group Entry parameters
+--
+-- tnSnmpTrapGroupTable OBJECT-TYPE
+--     SYNTAX       SEQUENCE OF TnSnmpTrapGroupEntry
+--     MAX-ACCESS   not-accessible
+--     STATUS       obsolete
+--     DESCRIPTION
+--         "A table of all remote SNMP trap collectors to which this agent is
+--          configured to send SNMP notifications messages.
+--
+--          This table was made obsolete in the 5.0 release and is replace
+--          with tnSnmpTrapDestTable."
+--     ::= { tnSRLogObjs 11 }
+--
+-- tnSnmpTrapGroupEntry OBJECT-TYPE
+--     SYNTAX       TnSnmpTrapGroupEntry
+--     MAX-ACCESS   not-accessible
+--     STATUS       obsolete
+--     DESCRIPTION
+--         "Information about a particular SNMP trap destination entry.
+--          The first index instance creates and snmp trap group to be
+--          associated with the event log with the same value for
+--          tnLogIdIndex. The second and third indexes specify a
+--          remote SNMP trap destination that will be sent SNMP notification
+--          messages from the associated event log.
+--
+--          Entries are created by user.
+--          Entries are deleted by user.
+--
+--          There is no StorageType object, entries have a presumed
+--          StorageType of nonVolatile.
+--
+--          This table was made obsolete in the 5.0 release and is
+--          replaced with the tnSnmpTrapDestTable."
+--     INDEX { tnStgIndex, tnStgDestAddress, tnStgDestPort }
+--     ::= { tnSnmpTrapGroupTable 1 }
+--
+-- TnSnmpTrapGroupEntry ::= SEQUENCE
+--     {
+--         tnStgIndex            TmnxLogIdIndex,
+--         tnStgDestAddress      IpAddress,
+--         tnStgDestPort         TmnxUdpPort,
+--         tnStgRowStatus        RowStatus,
+--         tnStgDescription      TItemDescription,
+--         tnStgVersion          SnmpMessageProcessingModel,
+--         tnStgNotifyCommunity  OCTET STRING,
+--         tnStgSecurityLevel    SnmpSecurityLevel
+--     }
+--
+-- tnStgIndex     OBJECT-TYPE
+--     SYNTAX       TmnxLogIdIndex
+--     MAX-ACCESS   not-accessible
+--     STATUS       obsolete
+--     DESCRIPTION
+--         "The value of tnStgIndex specifies an snmp trap group to
+--          be associated with the event log with the same value for
+--          tnLogIdIndex.
+--
+--          This object was made obsolete in the 5.0 release.  It is
+--          replaced by tnStdIndex."
+--     ::= { tnSnmpTrapGroupEntry 1 }
+--
+-- ##     A future enhancement may use InetAddressType and InetAddress to allow
+-- ##     ipv6 addressed notification receivers.
+-- ##     A future enhancement may support DNS names for notification receivers.
+-- tnStgDestAddress     OBJECT-TYPE
+--     SYNTAX      IpAddress
+--     MAX-ACCESS  not-accessible
+--     STATUS      obsolete
+--     DESCRIPTION
+--         "The value of tnStgDestAddress is the IPv4 address for
+--          this remote snmp notification destination.  If the value of this
+--          object is '0.0.0.0', then no messages will be sent, nor will
+--          any counters be incremented.
+--
+--          This object was made obsolete in the 5.0 release.  It is
+--          replaced by the InetAddressType/InetAddress objects
+--          tnStdDestAddrType and tnStdDestAddr."
+--     DEFVAL { '00000000'h }      ## 0.0.0.0
+--     ::= { tnSnmpTrapGroupEntry 2 }
+--
+-- tnStgDestPort     OBJECT-TYPE
+--     SYNTAX      TmnxUdpPort
+--     MAX-ACCESS  not-accessible
+--     STATUS      obsolete
+--     DESCRIPTION
+--         "The value of tnStgDestPort is the UDP port number that
+--          is used to send messages to this remote SNMP notification
+--          destination.
+--
+--          This object was made obsolete in the 5.0 release.  It is
+--          replaced by tnStdDestPort."
+--     DEFVAL { 162 }  ## The IANA assigned port number for SNMP notifications
+--     ::= { tnSnmpTrapGroupEntry 3 }
+--
+-- tnStgRowStatus   OBJECT-TYPE
+--     SYNTAX      RowStatus
+--     MAX-ACCESS  read-create
+--     STATUS      obsolete
+--     DESCRIPTION
+--         "The tnStgRowStatus object allows for dynamic creation and
+--          deletion of row entries in the tnSnmpTrapGroupTable as well
+--          as the activation and deactivation of these entries.
+--
+--          When this object's value is set to 'notInService (2)', no messages
+--          will be sent to this snmp trap group and none of its counters will
+--          be incremented.
+--
+--          Refer to the RowStatus convention for further details on the behavior
+--          of this object.
+--
+--          This object was made obsolete in the 5.0 release.  It is
+--          replaced by tnStdRowStatus."
+--     REFERENCE
+--         "RFC2579 (Textual Conventions for SMIv2)"
+--     ::= { tnSnmpTrapGroupEntry 4 }
+--
+-- tnStgDescription     OBJECT-TYPE
+--     SYNTAX      TItemDescription
+--     MAX-ACCESS  read-create
+--     STATUS      obsolete
+--     DESCRIPTION
+--         "The value of tnStgDescription is an administratively
+--          assigned textual description of this snmp trap destination.
+--
+--          This object was made obsolete in the 5.0 release.  It is
+--          replaced by tnStdDescription."
+--     DEFVAL { ''H }  ## the empty string
+--     ::= { tnSnmpTrapGroupEntry 5 }
+--
+-- tnStgVersion          OBJECT-TYPE
+--     SYNTAX      SnmpMessageProcessingModel
+--     MAX-ACCESS  read-create
+--     STATUS      obsolete
+--     DESCRIPTION
+--         "The value of tnStgVersion specifies the SNMP version that
+--          will be used to format notification messages sent to this
+--          snmp trap destination.
+--
+--          The values supported by the Nokia 7x50 SR series SNMP agent are:
+--                         0  for SNMPv1
+--                         1  for SNMPv2c
+--                         3  for SNMPv3
+--
+--          This object was made obsolete in the 5.0 release.  It is
+--          replaced by tnStdVersion."
+--     DEFVAL { 3 }  ## SNMPv3
+--     ::= { tnSnmpTrapGroupEntry 6 }
+--
+-- tnStgNotifyCommunity  OBJECT-TYPE
+--     SYNTAX      OCTET STRING (SIZE(0..32))
+--     MAX-ACCESS  read-create
+--     STATUS      obsolete
+--     DESCRIPTION
+--         "The value of tnStgNotifyCommunity specifies the SNMPv1 or
+--          SNMPv2c community name string or the SNMPv3 security name
+--          used when an SNMP notification message is sent to this
+--          trap destination.  If the value of this object is the empty
+--          string, then no messages will be sent nor will any counters be
+--          incremented.
+--
+--          This object was made obsolete in the 5.0 release.  It is
+--          replaced by tnStdVersion."
+--     DEFVAL { ''H }  ## the empty string
+--     ::= { tnSnmpTrapGroupEntry 7 }
+--
+-- tnStgSecurityLevel    OBJECT-TYPE
+--     SYNTAX      SnmpSecurityLevel
+--     MAX-ACCESS  read-create
+--     STATUS      obsolete
+--     DESCRIPTION
+--         "The value of tnStgSecurityLevel specifies the level of security
+--          at which SNMP notification messages will be sent to the SNMP
+--          trap destination when tnStgVersion has a value of '3' for
+--          SNMPv3.
+--
+--          This object was made obsolete in the 5.0 release.  It is
+--          replaced by tnStdSecurityLevel."
+--     DEFVAL { noAuthNoPriv }
+--     ::= { tnSnmpTrapGroupEntry 8 }
+
+--
+-- Nokia 7x50 SR series Event parameters
+--
+-- tnEventTest    OBJECT-TYPE
+--     SYNTAX      TmnxActionType
+--     MAX-ACCESS  read-write
+--     STATUS      current
+--     DESCRIPTION
+--         "Setting tnEventTest to 'doAction' causes the tnTestEvent
+--          notification to be generated."
+--     DEFVAL { notApplicable }
+--     ::= { tnSRLogObjs 12 }
+--
+-- tnEventThrottleLimit   OBJECT-TYPE
+--     SYNTAX      Unsigned32  (1..20000)
+--     UNITS       "events"
+--     MAX-ACCESS  read-write
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnEventThrottleLimit specifies the number of
+--          log events that can be logged within the tnEventThrottleInterval
+--          for a specific entry in the tnEventTable.  Once the limit has
+--          been reached, any additional events of that type will be dropped,
+--          i.e. tnEventDropCount will be incremented.  At the end of the
+--          throttle interval if any events have been dropped a
+--          TIMETRA-SYSTEM-MIB::tnTrapDropped notification will be sent."
+--     DEFVAL { 500 }
+--     ::= { tnSRLogObjs 13 }
+--
+-- tnEventThrottleInterval   OBJECT-TYPE
+--     SYNTAX      Unsigned32  (1..1200)
+--     UNITS       "seconds"
+--     MAX-ACCESS  read-write
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnEventThrottleInterval specifies the number of
+--          seconds that an event throttling interval lasts."
+--     DEFVAL { 1 }
+--     ::= { tnSRLogObjs 14 }
+
+--
+-- Nokia 7xxxx series SNMP SET error messages
+--
+-- tnSnmpSetErrsMax  OBJECT-TYPE
+--     SYNTAX      Unsigned32
+--     MAX-ACCESS  read-only
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnSnmpSetErrsMax indicates the maximum number of
+--          entries the agent will create in the tnSnmpSetErrsTable.
+--          Once the table is full the agent will delete the oldest entry in
+--          the table in order to add new entries."
+--     ::= { tnSRLogObjs 15 }
+--
+-- tnSnmpSetErrsTable OBJECT-TYPE
+--     SYNTAX       SEQUENCE OF TnSnmpSetErrsEntry
+--     MAX-ACCESS   not-accessible
+--     STATUS       current
+--     DESCRIPTION
+--         "A table of recent SNMP SET failures.  Only the SET errs from
+--          remote SNMP manager requests are saved in this table.  Only
+--          SET errs detected by the SNMP engine in the test phase
+--          consistency check method functions are saved.  SET errors that
+--          are caught by the preliminary access and ASN.1 decoding phase
+--          are not saved.  These are errs such as noAccess, notWritable,
+--          wrongType, wrongLength and wrongEncoding.  Note that notWritable,
+--          wrongType, and wrongLength errs may sometimes be generated by
+--          the consistency check; in this case they will be saved in this
+--          table.
+--
+--          SET errs caused by local CLI sessions are not saved.
+--
+--          The tnSnmpSetErrsTable is intended to provide an aide to
+--          Network Management Systems (NMS) developers.  When an SNMP SET
+--          fails during the consistency checking test phase, this table may
+--          provide more detailed failure reason information than the simple
+--          SNMP error code value in the SNMP response PDU."
+--     ::= { tnSRLogObjs 16 }
+--
+-- tnSnmpSetErrsEntry OBJECT-TYPE
+--     SYNTAX       TnSnmpSetErrsEntry
+--     MAX-ACCESS   not-accessible
+--     STATUS       current
+--     DESCRIPTION
+--         "Information about a particular SNMP SET error.  The first two
+--          index instances identify the SNMP manager who sent the SNMP SET
+--          request that failed.  The third index specifies the SNMP request-id
+--          (sequence number) of the SNMP SET request that failed.
+--
+--          Entries are created by the agent.
+--          Entries are deleted by the agent.
+--
+--          There is no StorageType object, entries have a presumed
+--          StorageType of volatile."
+--     INDEX   {   tnSseAddressType,
+--                 tnSseAddress,
+--                 tnSseSnmpPort,
+--                 tnSseRequestId
+--             }
+--     ::= { tnSnmpSetErrsTable 1 }
+--
+-- TnSnmpSetErrsEntry ::= SEQUENCE
+--     {
+--         tnSseAddressType      InetAddressType,
+--         tnSseAddress          InetAddress,
+--         tnSseSnmpPort         TmnxUdpPort,
+--         tnSseRequestId        Unsigned32,
+--         tnSseVersion          SnmpMessageProcessingModel,
+--         tnSseSeverityLevel    ItuPerceivedSeverity,
+--         tnSseModuleId         Unsigned32,
+--         tnSseModuleName       TNamedItem,
+--         tnSseErrorCode        Unsigned32,
+--         tnSseErrorName        DisplayString,
+--         tnSseErrorMsg         DisplayString,
+--         tnSseExtraText        OCTET STRING,
+--         tnSseTimestamp        TimeStamp
+--     }
+--
+-- tnSseAddressType  OBJECT-TYPE
+--     SYNTAX       InetAddressType
+--     MAX-ACCESS   not-accessible
+--     STATUS       current
+--     DESCRIPTION
+--         "The value of tnSseAddressType indicates the IP address
+--          type of address specified in tnSseAddress.  'ipv4' and
+--          'ipv6' are the only address type values supported."
+--     ::= { tnSnmpSetErrsEntry 1 }
+--
+-- tnSseAddress      OBJECT-TYPE
+--     SYNTAX      InetAddress  (SIZE(4|16))
+--     MAX-ACCESS  not-accessible
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnSseAddress is the IP address of the SNMP
+--          manager that sent the SNMP SET request that failed for this
+--          error reason."
+--     ::= { tnSnmpSetErrsEntry 2 }
+--
+-- tnSseSnmpPort     OBJECT-TYPE
+--     SYNTAX      TmnxUdpPort
+--     MAX-ACCESS  not-accessible
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnSseSnmpPort is the UDP port number of the SNMP
+--          manager that sent the SNMP SET request that failed for this
+--          error reason."
+--     ::= { tnSnmpSetErrsEntry 3 }
+--
+-- tnSseRequestId    OBJECT-TYPE
+--     SYNTAX      Unsigned32
+--     MAX-ACCESS  not-accessible
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnSseRequestId indicates the request-id of the SNMP
+--          SNMP SET request that failed for this error reason."
+--     ::= { tnSnmpSetErrsEntry 4 }
+--
+-- tnSseVersion      OBJECT-TYPE
+--     SYNTAX      SnmpMessageProcessingModel
+--     MAX-ACCESS  read-only
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnSseVersion indicates the SNMP version of
+--          the SNMP SET request that failed.
+--
+--          The values supported by the Nokia 7xxx series SNMP agent are:
+--                         0  for SNMPv1
+--                         1  for SNMPv2c
+--                         3  for SNMPv3
+--         "
+--     ::= { tnSnmpSetErrsEntry 5 }
+--
+-- tnSseSeverityLevel    OBJECT-TYPE
+--     SYNTAX      ItuPerceivedSeverity
+--     MAX-ACCESS  read-only
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnSseSeverityLevel indicates severity level that
+--          is associated with this type SNMP SET error."
+--     ::= { tnSnmpSetErrsEntry 6 }
+--
+-- tnSseModuleId    OBJECT-TYPE
+--     SYNTAX      Unsigned32
+--     MAX-ACCESS  read-only
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnSseModuleId indicates a unique arbitrary
+--          identified for the TiMOS application module that generated
+--          this SNMP SET error.  NOTE: This is NOT the same value used
+--          for tnEventAppIndex."
+--     ::= { tnSnmpSetErrsEntry 7 }
+--
+-- tnSseModuleName    OBJECT-TYPE
+--     SYNTAX      TNamedItem
+--     MAX-ACCESS  read-only
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnSseModuleName indicates the name string of the
+--          TiMOS application module that generated this SNMP SET error.
+--          NOTE: This is NOT the same value used for tnEventAppName."
+--     ::= { tnSnmpSetErrsEntry 8 }
+--
+-- tnSseErrorCode    OBJECT-TYPE
+--     SYNTAX      Unsigned32
+--     MAX-ACCESS  read-only
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnSseErrorCode indicates the error number associated
+--          with this SNMP SET error.  The error numbers are unique within
+--          a tnSseModuleId.  They are not unique across all modules so
+--          both the module name and error number are required to identify
+--          a particular error message."
+--     ::= { tnSnmpSetErrsEntry 9 }
+--
+-- tnSseErrorName    OBJECT-TYPE
+--     SYNTAX      DisplayString  (SIZE(1..64))
+--     MAX-ACCESS  read-only
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnSseErrorName indicates the error name associated
+--          with this SNMP SET error.  The error names are unique within
+--          a tnSseModuleId.  They are not unique across all modules so
+--          both the module name and error name are required to identify
+--          a particular error message."
+--     ::= { tnSnmpSetErrsEntry 10 }
+--
+-- tnSseErrorMsg    OBJECT-TYPE
+--     SYNTAX      DisplayString  (SIZE(1..255))
+--     MAX-ACCESS  read-only
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnSseErrorMsg indicates the fixed error message
+--          text associated with this SNMP SET error identified by the values
+--          of tnSseModuleId and tnSseErrorCode."
+--     ::= { tnSnmpSetErrsEntry 11 }
+--
+-- tnSseExtraText    OBJECT-TYPE
+--     SYNTAX      OCTET STRING  (SIZE(0..320))
+--     MAX-ACCESS  read-only
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnSseExtraText indicates the fixed run-time variable
+--          message text associated with this SNMP SET error identified by the
+--          values of tnSseModuleId and tnSseErrorCode.  If the extra text
+--          was truncated to fit into buffer size allowed, the last character
+--          will be an asterix (*)."
+--     ::= { tnSnmpSetErrsEntry 12 }
+--
+-- tnSseTimestamp    OBJECT-TYPE
+--     SYNTAX      TimeStamp
+--     MAX-ACCESS  read-only
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnSseTimestamp indicates the sysUpTime value when
+--          this tnSnmpSetErrsEntry was created by the agent."
+--     ::= { tnSnmpSetErrsEntry 13 }
+
+--
+-- Nokia 7x50 SR series SNMP Trap Log Entry parameters
+--
+--  Augmentation of the SNMP-TARGET-MIB::snmpNotifyTable
+--  Use of AUGMENTS clause implies a one-to-one dependent relationship
+--  between the base table, snmpNotifyTable, and the augmenting table,
+--  tnSnmpTrapLogTable. This in effect extends the snmpNotifyTable with
+--  additional columns. Creation (or deletion) of a row in the snmpNotifyTable
+--  results in the same fate for the row in the tnSnmpTrapLogTable.
+--
+-- tnSnmpTrapLogTable OBJECT-TYPE
+--     SYNTAX       SEQUENCE OF TmnxSnmpTrapLogEntry
+--     MAX-ACCESS   not-accessible
+--     STATUS       current
+--     DESCRIPTION
+--         "A table of all remote SNMP trap logs to which this agent is
+--          configured to send SNMP notifications messages."
+--     ::= { tnSRLogObjs 17 }
+--
+-- tnSnmpTrapLogEntry OBJECT-TYPE
+--     SYNTAX       TmnxSnmpTrapLogEntry
+--     MAX-ACCESS   not-accessible
+--     STATUS       current
+--     DESCRIPTION
+--         "Each row entry in the tnSnmpTrapLogTable represents additional
+--          columns for attributes specific to the Nokia 7x50 SR series
+--          implementation of SNMP-TARGET-MIB::snmpNotifyTable."
+--     AUGMENTS { snmpNotifyEntry }
+--     ::= { tnSnmpTrapLogTable 1 }
+--
+-- TmnxSnmpTrapLogEntry ::= SEQUENCE
+--     {
+--         tnSnmpTrapLogDescription      TItemDescription
+--     }
+--
+-- tnSnmpTrapLogDescription     OBJECT-TYPE
+--     SYNTAX      TItemDescription
+--     MAX-ACCESS  read-create
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnSnmpTrapLogDescription is an administratively
+--          assigned textual description of this snmp trap log."
+--     DEFVAL { ''H }  ## the empty string
+--     ::= { tnSnmpTrapLogEntry 1 }
+
+--
+-- Nokia 7x50 SR series SNMP Trap Group Entry parameters
+--
+-- tnSnmpTrapDestTable OBJECT-TYPE
+--     SYNTAX       SEQUENCE OF TnSnmpTrapDestEntry
+--     MAX-ACCESS   not-accessible
+--     STATUS       current
+--     DESCRIPTION
+--         "A table of all remote SNMP IPv4/v6 trap collectors to which this
+--          agent is configured to send SNMP notification messages."
+--     ::= { tnSRLogObjs 18 }
+--
+-- tnSnmpTrapDestEntry OBJECT-TYPE
+--     SYNTAX       TnSnmpTrapDestEntry
+--     MAX-ACCESS   not-accessible
+--     STATUS       current
+--     DESCRIPTION
+--         "Information about a particular SNMP notification destination entry.
+--          The first index instance creates an snmp notification group to be
+--          associated with the event log with the same value for
+--          tnLogIdIndex. The second index specifies an administrative
+--          name to identify a specific SNMP notification target.
+--
+--          Entries are created by user.
+--          Entries are deleted by user.
+--
+--          There is no StorageType object, entries have a presumed
+--          StorageType of nonVolatile."
+--     INDEX   { tnStdIndex,
+--               IMPLIED tnStdName
+--             }
+--     ::= { tnSnmpTrapDestTable 1 }
+--
+-- TnSnmpTrapDestEntry ::= SEQUENCE
+--     {
+--         tnStdIndex            TmnxLogIdIndex,
+--         tnStdName             SnmpAdminString,
+--         tnStdRowStatus        RowStatus,
+--         tnStdRowLastChanged   TimeStamp,
+--         tnStdDestAddrType     InetAddressType,
+--         tnStdDestAddr         InetAddress,
+--         tnStdDestPort         TmnxUdpPort,
+--         tnStdDescription      TItemDescription,
+--         tnStdVersion          SnmpMessageProcessingModel,
+--         tnStdNotifyCommunity  OCTET STRING,
+--         tnStdSecurityLevel    SnmpSecurityLevel,
+--         tnStdReplay           TruthValue,
+--         tnStdReplayStart      Unsigned32,
+--         tnStdReplayLastTime   TimeStamp
+--     }
+--
+-- tnStdIndex     OBJECT-TYPE
+--     SYNTAX       TmnxLogIdIndex
+--     MAX-ACCESS   not-accessible
+--     STATUS       current
+--     DESCRIPTION
+--         "The value of tnStdIndex specifies an snmp notification group to
+--          be associated with the event log with the same value for
+--          tnLogIdIndex."
+--     ::= { tnSnmpTrapDestEntry 1 }
+--
+-- tnStdName     OBJECT-TYPE
+--     SYNTAX      SnmpAdminString (SIZE(1..28))
+--     MAX-ACCESS  not-accessible
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnStdName specifies the name of an snmp
+--          notification destination within the snmp notification group
+--          specified by tnLogIdIndex."
+--     ::= { tnSnmpTrapDestEntry 2 }
+--
+-- tnStdRowStatus   OBJECT-TYPE
+--     SYNTAX      RowStatus
+--     MAX-ACCESS  read-create
+--     STATUS      current
+--     DESCRIPTION
+--         "The tnStdRowStatus object allows for dynamic creation and
+--          deletion of row entries in the tnSnmpTrapDestTable as well
+--          as the activation and deactivation of these entries.
+--
+--          In order for 'createAndGo' row creation to succeed or status
+--          to transition to 'active' a value must be set for
+--          tnStdNotifyCommunity.
+--
+--          In order for 'createAndGo' row creation to succeed or status
+--          to transition to 'active' an entry must exist in the
+--          SNMP-TARGET-MIB::snmpNotifyTable with an snmpNotifyName index
+--          that is the ASCII string representation of the value of tnStdIndex.
+--
+--          When this object's value is set to 'notInService (2)', no messages
+--          will be sent to this snmp notification collector and none of its
+--          counters will be incremented.
+--
+--          Refer to the RowStatus convention for further details on the behavior
+--          of this object."
+--     REFERENCE
+--         "RFC2579 (Textual Conventions for SMIv2)"
+--     ::= { tnSnmpTrapDestEntry 3 }
+--
+-- tnStdRowLastChanged   OBJECT-TYPE
+--     SYNTAX      TimeStamp
+--     MAX-ACCESS  read-only
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnStdRowLastChanged indicates the sysUpTime when
+--          the value of a writable object in this row entry was modified."
+--     ::= { tnSnmpTrapDestEntry 4 }
+--
+-- tnStdDestAddrType   OBJECT-TYPE
+--     SYNTAX      InetAddressType
+--     MAX-ACCESS  read-create
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnStdDestAddrType specifies the type of
+--          host address to be used for the remote SNMP notification
+--          collector.  This object indicates the type of address stored
+--          in the corresponding tnStdDestAddr object.
+--
+--          If the value of this object is 'unknown', then no messages
+--          will be sent nor will any counters be incremented.
+--
+--          If tnStdDestAddrType is not set in the same PDU with
+--          tnStdDestAddr, the set request will fail with an
+--          inconsistentValue error."
+--     DEFVAL { unknown }
+--     ::= { tnSnmpTrapDestEntry 5 }
+--
+-- tnStdDestAddr OBJECT-TYPE
+--     SYNTAX      InetAddress (SIZE(0|4|16|20))
+--     MAX-ACCESS  read-create
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnStdDestAddr specifies the IP host address
+--          to be used for the remote SNMP notification collector.
+--
+--          The SNMP notification collector IP address type is determined by
+--          the value of the corresponding tnStdDestAddrType object.
+--
+--          If the value of this object is empty or all NULLs, then no
+--          messages will be sent nor will any counters be incremented.
+--
+--          If tnStdDestAddrType is not set in the same PDU with
+--          tnStdDestAddr, the set request will fail with an
+--          inconsistentValue error."
+--     DEFVAL { ''H }
+--     ::= { tnSnmpTrapDestEntry 6 }
+--
+-- tnStdDestPort     OBJECT-TYPE
+--     SYNTAX      TmnxUdpPort
+--     MAX-ACCESS  read-create
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnStdDestPort is the UDP port number that
+--          is used to send messages to this remote SNMP notification
+--          collector."
+--     DEFVAL { 162 }  ## The IANA assigned port number for SNMP notifications
+--     ::= { tnSnmpTrapDestEntry 7 }
+--
+-- tnStdDescription     OBJECT-TYPE
+--     SYNTAX      TItemDescription
+--     MAX-ACCESS  read-create
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnStdDescription is an administratively
+--          assigned textual description of this SNMP notification collector."
+--     DEFVAL { ''H }  ## the empty string
+--     ::= { tnSnmpTrapDestEntry 8 }
+--
+-- tnStdVersion          OBJECT-TYPE
+--     SYNTAX      SnmpMessageProcessingModel
+--     MAX-ACCESS  read-create
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnStdVersion specifies the SNMP version that
+--          will be used to format notification messages sent to this
+--          SNMP notification collector.
+--
+--          The values supported by the Nokia 7x50 SR series SNMP agent are:
+--                         0  for SNMPv1
+--                         1  for SNMPv2c
+--                         3  for SNMPv3
+--         "
+--     DEFVAL { 3 }  ## SNMPv3
+--     ::= { tnSnmpTrapDestEntry 9 }
+--
+-- tnStdNotifyCommunity  OBJECT-TYPE
+--     SYNTAX      OCTET STRING (SIZE(0..31))
+--     MAX-ACCESS  read-create
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnStdNotifyCommunity specifies the SNMPv1 or
+--          SNMPv2c community name string or the SNMPv3 security name
+--          used when an SNMP notification message is sent to this
+--          SNMP notification collector.  If the value of this object is
+--          the empty string, then no messages will be sent nor will any
+--          counters be incremented."
+--     DEFVAL { ''H }  ## the empty string
+--     ::= { tnSnmpTrapDestEntry 10 }
+--
+-- tnStdSecurityLevel    OBJECT-TYPE
+--     SYNTAX      SnmpSecurityLevel
+--     MAX-ACCESS  read-create
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnStdSecurityLevel specifies the level of security
+--          at which SNMP notification messages will be sent to the SNMP
+--          notification collector when tnStdVersion has a value of '3' for
+--          SNMPv3."
+--     DEFVAL { noAuthNoPriv }
+--     ::= { tnSnmpTrapDestEntry 11 }
+--
+-- tnStdReplay   OBJECT-TYPE
+--     SYNTAX      TruthValue
+--     MAX-ACCESS  read-create
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnStdReplay specifies whether or not to resend
+--          notifications that were generated while this notification
+--          destination did not have a route installed for it in the route
+--          tables."
+--     DEFVAL { false }
+--     ::= { tnSnmpTrapDestEntry 12 }
+--
+-- tnStdReplayStart  OBJECT-TYPE
+--     SYNTAX      Unsigned32
+--     MAX-ACCESS  read-only
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnStdReplayStart indicates the SNMP notification
+--          request ID of the first event that cound not be generated because
+--          there is no route to this notification target address.
+--
+--          Events will be resent when this notification target address is
+--          readded to the route tables, on either an in-band or out-of-band
+--          interface.  The agent searches backwards in the event log and
+--          begins resending events from the oldest event that has a timestamp
+--          <= 5 hundredths of a second less than the timestamp of the
+--          event with this request ID.  Note that if the outage is long
+--          and a large number of events are generated in the meantime,
+--          it is possible that the log memory storage has wrapped and the
+--          event data for this request ID is no longer available.  In that case,
+--          the oldest event saved in the log will be the first event resent.
+--
+--          A value of 0 indicates that there are no missed events waiting
+--          to be resent."
+--     ::= { tnSnmpTrapDestEntry 13 }
+--
+-- tnStdReplayLastTime   OBJECT-TYPE
+--     SYNTAX      TimeStamp
+--     MAX-ACCESS  read-only
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnStdReplayLastTime indicates the sysUpTime when
+--          missed events were last replayed to this SNMP notification target
+--          address.  A value of 0 indicates that no missed events have been
+--          replayed to this SNMP notification target address."
+--     ::= { tnSnmpTrapDestEntry 14 }
+
+--
+--
+--
+-- tnStdMaxTargets   OBJECT-TYPE
+--     SYNTAX      Unsigned32 (10..100)
+--     UNITS       "trap-targets"
+--     MAX-ACCESS  read-write
+--     STATUS      current
+--     DESCRIPTION
+--         "The maximum number of tnSnmpTrapDestTable row entries that can
+--          be created for a specific tnStdIndex that represents an snmp
+--          notification group."
+--     DEFVAL { 25 }
+--     ::= { tnSRLogObjs 19 }
+
+--
+-- tnLogApCustRecordTable
+-- Log Accounting Policy Table extensions to create a custom record
+--
+-- tnLogApCustRecordTable OBJECT-TYPE
+--    SYNTAX      SEQUENCE OF TmnxLogApCustRecordEntry
+--    MAX-ACCESS  not-accessible
+--    STATUS      current
+--    DESCRIPTION
+--        "The Nokia 7x50 SR series tnLogApCustRecordTable augments
+--         tnLogApTable.
+--         The table allows to configure the layout and setting for
+--         a custom accounting record associated with this accounting policy."
+--   ::= { tnSRLogObjs 20 }
+--
+-- tnLogApCustRecordEntry OBJECT-TYPE
+--     SYNTAX      TmnxLogApCustRecordEntry
+--     MAX-ACCESS  not-accessible
+--     STATUS      current
+--     DESCRIPTION
+--         "Defines an entry in the tnLogApCustRecordTable. Entries in this
+--          table are created and destroyed via SNMP Set requests to the
+--          tnLogApRowStatus object of the tnLogApTable."
+--     AUGMENTS { tnLogApEntry }
+--     ::= { tnLogApCustRecordTable 1 }
+--
+-- TmnxLogApCustRecordEntry ::=
+--     SEQUENCE {
+--         tnLogApCrLastChanged           TimeStamp,
+--         tnLogApCrSignChangeDelta       Unsigned32,
+--         tnLogApCrSignChangeQueue       TQueueIdOrAll,
+--         tnLogApCrSignChangeOCntr       THsmdaCounterIdOrZeroOrAll,
+--         tnLogApCrSignChangeQICounters  TmnxAccPlcyQICounters,
+--         tnLogApCrSignChangeQECounters  TmnxAccPlcyQECounters,
+--         tnLogApCrSignChangeOICounters  TmnxAccPlcyOICounters,
+--         tnLogApCrSignChangeOECounters  TmnxAccPlcyOECounters,
+--         tnLogApCrSignChangeAACounters  TmnxAccPlcyAACounters,
+--         tnLogApCrAACounters            TmnxAccPlcyAACounters
+--     }
+--
+-- tnLogApCrLastChanged OBJECT-TYPE
+--     SYNTAX      TimeStamp
+--     MAX-ACCESS  read-only
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnLogApCrLastChanged indicates the sysUpTime when
+--          an object in this table was last modified. A Value 0 means that
+--          no change was made to this row since the box was last initialized."
+--     ::= { tnLogApCustRecordEntry 1 }
+--
+-- tnLogApCrSignChangeDelta OBJECT-TYPE
+--     SYNTAX      Unsigned32
+--     MAX-ACCESS  read-write
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnLogApCrSignChangeDelta specifies the delta
+--          change  (significant change) that is required for the custom record
+--          to be written to the xml file."
+--     DEFVAL { 0 }
+--     ::= { tnLogApCustRecordEntry 2 }
+--
+-- tnLogApCrSignChangeQueue OBJECT-TYPE
+--     SYNTAX      TQueueIdOrAll
+--     MAX-ACCESS  read-write
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnLogApCrSignChangeQueue specifies the reference
+--         queue to which the significant change defined in
+--         tnLogApCrSignChangeDelta applies."
+--     DEFVAL { 0 }
+--     ::= { tnLogApCustRecordEntry 3 }
+--
+-- tnLogApCrSignChangeOCntr OBJECT-TYPE
+--     SYNTAX      THsmdaCounterIdOrZeroOrAll
+--     MAX-ACCESS  read-write
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnLogApCrSignChangeOCntr specifies the counter-id
+--          that will be taken as reference to which the significant
+--          change defined in tnLogApCrSignChangeDelta applies."
+--     DEFVAL { 0 }
+--     ::= { tnLogApCustRecordEntry 4 }
+--
+-- tnLogApCrSignChangeQICounters OBJECT-TYPE
+--     SYNTAX      TmnxAccPlcyQICounters
+--     MAX-ACCESS  read-write
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnLogApCrSignChangeQICounters specifies the ingress
+--          counter Ids in the queue defined by tnLogApCrSignChangeQueue to be
+--          taken as reference to which the significant change defined in
+--          tnLogApCrSignChangeDelta applies.
+--
+--          A non-zero value of this object is only allowed if the object
+--          tnLogApCrSignChangeQueue has a non-zero value."
+--     DEFVAL { '0'H }
+--     ::= { tnLogApCustRecordEntry 5 }
+--
+-- tnLogApCrSignChangeQECounters OBJECT-TYPE
+--     SYNTAX      TmnxAccPlcyQECounters
+--     MAX-ACCESS  read-write
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnLogApCrSignChangeQECounters specifies the egress
+--          counter Ids in the queue defined by tnLogApCrSignChangeQueue to be
+--          taken as reference to which the significant change defined in
+--          tnLogApCrSignChangeDelta applies.
+--
+--          A non-zero value of this object is only allowed if the object
+--          tnLogApCrSignChangeQueue has a non-zero value."
+--     DEFVAL { '0'H }
+--     ::= { tnLogApCustRecordEntry 6 }
+--
+-- tnLogApCrSignChangeOICounters OBJECT-TYPE
+--     SYNTAX      TmnxAccPlcyOICounters
+--     MAX-ACCESS  read-write
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnLogApCrSignChangeOICounters specifies the ingress
+--          counter Ids in the counter-group defined by tnLogApCrSignChangeOCntr
+--          to be taken as reference to which the significant change defined in
+--          tnLogApCrSignChangeDelta applies.
+--
+--          A non-zero value of this object is only allowed if the object
+--          tnLogApCrSignChangeOCntr has a non-zero value."
+--     DEFVAL { '0'H }
+--     ::= { tnLogApCustRecordEntry 7 }
+--
+-- tnLogApCrSignChangeOECounters OBJECT-TYPE
+--     SYNTAX      TmnxAccPlcyOECounters
+--     MAX-ACCESS  read-write
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnLogApCrSignChangeOECounters specifies the egress
+--          counter Ids in the counter-group defined by tnLogApCrSignChangeOCntr
+--          to be taken as reference to which the significant change defined in
+--          tnLogApCrSignChangeDelta applies.
+--
+--          A non-zero value of this object is only allowed if the object
+--          tnLogApCrSignChangeOCntr has a non-zero value."
+--     DEFVAL { '0'H }
+--     ::= { tnLogApCustRecordEntry 8 }
+--
+-- tnLogApCrSignChangeAACounters OBJECT-TYPE
+--     SYNTAX      TmnxAccPlcyAACounters
+--     MAX-ACCESS  read-write
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnLogApCrSignChangeAACounters specifies the
+--          AA (Application assurance) counter Ids  to be taken as reference to
+--          which the significant change defined in tnLogApCrSignChangeDelta
+--          applies.
+--
+--          A non-zero value of this object is only allowed if both the objects
+--          tnLogApCrSignChangeOCntr and tnLogApCrSignChangeQueue are zero.
+--
+--          Also, a non-zero value for this object is only allowed if the object
+--          tnLogApCrSignChangeDelta is either 0 or 1."
+--     DEFVAL { '0'H }
+--     ::= { tnLogApCustRecordEntry 9 }
+--
+-- tnLogApCrAACounters OBJECT-TYPE
+--     SYNTAX      TmnxAccPlcyAACounters
+--     MAX-ACCESS  read-write
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnLogApCrQueueECounters indicates the list of
+--          AA  (application Assurance) counters that need to be collected
+--          in this custom record."
+--     DEFVAL { '0'H }
+--     ::= { tnLogApCustRecordEntry 10 }
+
+--
+-- tnLogApCustRecordQueueTable
+-- Log Accounting Policy Table extensions to create a custom record
+--
+-- tnLogApCustRecordQueueTable OBJECT-TYPE
+--    SYNTAX      SEQUENCE OF TnLogApCustRecordQueueEntry
+--    MAX-ACCESS  not-accessible
+--    STATUS      current
+--    DESCRIPTION
+--        "The Nokia 7x50 SR series tnLogApCustRecordQueueTable
+--         allows to create custom record queue information for a given
+--         accounting policy.
+--         Rows can only be created for existing accounting policies
+--         (as defined in tnLogApTable)."
+--   ::= { tnSRLogObjs 21 }
+--
+-- tnLogApCustRecordQueueEntry OBJECT-TYPE
+--     SYNTAX      TnLogApCustRecordQueueEntry
+--     MAX-ACCESS  not-accessible
+--     STATUS      current
+--     DESCRIPTION
+--         "Defines an entry in the tnLogApCustRecordQueueTable. Entries in this
+--          table are created and destroyed via SNMP Set requests."
+--     INDEX { tnLogApPolicyId,
+--             tnLogApCrQueueId }
+--     ::= { tnLogApCustRecordQueueTable 1 }
+--
+-- TnLogApCustRecordQueueEntry ::=
+--     SEQUENCE {
+--         tnLogApCrQueueId               TQueueId,
+--         tnLogApCrQueueRowStatus        RowStatus,
+--         tnLogApCrQueueLastChanged      TimeStamp,
+--         tnLogApCrQueueICounters        TmnxAccPlcyQICounters,
+--         tnLogApCrQueueECounters        TmnxAccPlcyQECounters
+--     }
+--
+-- tnLogApCrQueueId OBJECT-TYPE
+--     SYNTAX      TQueueId (1..32)
+--     MAX-ACCESS  not-accessible
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnLogApCrQueueId specifies the queue-id for which
+--          counters will be collected in this custom record. The counters that
+--          will be collected are defined in tnLogApCrQueueICounters and
+--          tnLogApCrQueueECounters."
+--     ::= { tnLogApCustRecordQueueEntry 1 }
+--
+-- tnLogApCrQueueRowStatus OBJECT-TYPE
+--     SYNTAX      RowStatus
+--     MAX-ACCESS  read-create
+--     STATUS      current
+--     DESCRIPTION
+--         "Row Status of the entry. This allows creation/deletion of rows in this
+--          table."
+--     ::= { tnLogApCustRecordQueueEntry 2 }
+--
+-- tnLogApCrQueueLastChanged OBJECT-TYPE
+--     SYNTAX      TimeStamp
+--     MAX-ACCESS  read-only
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnLogApCrQueueLastChanged indicates the sysUpTime when
+--          an object in this table was last modified. A Value 0 means that
+--          no change was made to this row since it was created."
+--     ::= { tnLogApCustRecordQueueEntry 3 }
+--
+-- tnLogApCrQueueICounters OBJECT-TYPE
+--     SYNTAX      TmnxAccPlcyQICounters
+--     MAX-ACCESS  read-create
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnLogApCrQueueICounters indicates the list of
+--          ingress counters that need to be collected in this custom record.
+--
+--          At least one of the objects tnLogApCrQueueICounters or
+--          tnLogApCrQueueECounters must have a non-zero value."
+--     DEFVAL { '0'H }
+--     ::= { tnLogApCustRecordQueueEntry 4 }
+--
+-- tnLogApCrQueueECounters OBJECT-TYPE
+--     SYNTAX      TmnxAccPlcyQECounters
+--     MAX-ACCESS  read-create
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnLogApCrQueueECounters indicates the list of
+--          egress counters that need to be collected in this custom record.
+--
+--          At least one of the objects tnLogApCrQueueICounters or
+--          tnLogApCrQueueECounters must have a non-zero value."
+--     DEFVAL { '0'H }
+--     ::= { tnLogApCustRecordQueueEntry 5 }
+
+--
+-- tnLogApCrOverrideCntrTable
+-- Log Accounting Policy Table extensions to create a custom record
+--
+-- tnLogApCrOverrideCntrTable OBJECT-TYPE
+--    SYNTAX      SEQUENCE OF TnLogApCrOverrideCntrEntry
+--    MAX-ACCESS  not-accessible
+--    STATUS      current
+--    DESCRIPTION
+--        "The Nokia 7x50 SR series tnLogApCrOverrideCntrTable
+--         allows to create custom record counter override information for a given
+--         accounting policy.
+--         Rows can only be created for existing accounting policies
+--         (as defined in tnLogApTable)."
+--   ::= { tnSRLogObjs 22 }
+--
+-- tnLogApCrOverrideCntrEntry OBJECT-TYPE
+--     SYNTAX      TnLogApCrOverrideCntrEntry
+--     MAX-ACCESS  not-accessible
+--     STATUS      current
+--     DESCRIPTION
+--         "Defines an entry in the tnLogApCrOverrideCntrTable. Entries in this
+--          table are created and destroyed via SNMP Set requests."
+--     INDEX { tnLogApPolicyId,
+--             tnLogApCrOverrideCntrId }
+--     ::= { tnLogApCrOverrideCntrTable 1 }
+--
+-- TnLogApCrOverrideCntrEntry ::=
+--     SEQUENCE {
+--         tnLogApCrOverrideCntrId        THsmdaCounterIdOrZero,
+--         tnLogApCrOverrideCntrRowStatus RowStatus,
+--         tnLogApCrOverrideCntrLastChngd TimeStamp,
+--         tnLogApCrOverrideCntrICounters TmnxAccPlcyOICounters,
+--         tnLogApCrOverrideCntrECounters TmnxAccPlcyOECounters
+--     }
+--
+-- tnLogApCrOverrideCntrId OBJECT-TYPE
+--     SYNTAX      THsmdaCounterIdOrZero (1..8)
+--     MAX-ACCESS  not-accessible
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnLogApCrOverrideCntrId specifies the counter group
+--          for which counters will be collected in this custom record.
+--          The counters that will be collected are defined in
+--          tnLogApCrOverrideCntrICounters and tnLogApCrOverrideCntrECounters."
+--     ::= { tnLogApCrOverrideCntrEntry 1 }
+--
+-- tnLogApCrOverrideCntrRowStatus OBJECT-TYPE
+--     SYNTAX      RowStatus
+--     MAX-ACCESS  read-create
+--     STATUS      current
+--     DESCRIPTION
+--         "Row Status of the entry. This allows creation/deletion of rows in this
+--          table."
+--     ::= { tnLogApCrOverrideCntrEntry 2 }
+--
+-- tnLogApCrOverrideCntrLastChngd OBJECT-TYPE
+--     SYNTAX      TimeStamp
+--     MAX-ACCESS  read-only
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnLogApCrOverrideCntrLastChngd indicates the sysUpTime
+--          when an object in this table was last modified. A Value 0 means that
+--          no change was made to this row since it was created."
+--     ::= { tnLogApCrOverrideCntrEntry 3 }
+--
+-- tnLogApCrOverrideCntrICounters OBJECT-TYPE
+--     SYNTAX      TmnxAccPlcyOICounters
+--     MAX-ACCESS  read-create
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnLogApCrOverrideCntrICounters indicates the list of
+--          ingress counters that need to be collected in this custom record.
+--
+--          At least one of the objects tnLogApCrOverrideCntrICounters or
+--          tnLogApCrOverrideCntrECounters must have a non-zero value."
+--     DEFVAL { '0'H }
+--     ::= { tnLogApCrOverrideCntrEntry 4 }
+--
+-- tnLogApCrOverrideCntrECounters OBJECT-TYPE
+--     SYNTAX      TmnxAccPlcyOECounters
+--     MAX-ACCESS  read-create
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnLogApCrOverrideCntrECounters indicates the list of
+--          egress counters that need to be collected in this custom record.
+--
+--          At least one of the objects tnLogApCrOverrideCntrICounters or
+--          tnLogApCrOverrideCntrECounters must have a non-zero value."
+--     DEFVAL { '0'H }
+--     ::= { tnLogApCrOverrideCntrEntry 5 }
+
+-- tnEventPrimaryRoutePref   OBJECT-TYPE
+--     SYNTAX      INTEGER {
+--                     inband  (1),
+--                     outband (2)
+--                 }
+--     MAX-ACCESS  read-write
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnEventPrimaryRoutePref specifies the
+--          primary routing preference for traffic generated for
+--          SNMP notifications and syslog messages.
+--
+--          A value of 'inband' specifies that the Logging utility will
+--          attempt to use the Base routing context to send SNMP
+--          notifications and syslog messages to remote destinations.
+--
+--          A value of 'outband' specifies that the Logging utility will
+--          attempt to use the management routing context to send SNMP
+--          notifications and syslog messages to remote destinations.
+--
+--          If the remote destination, as specified by tnStdDestAddr
+--          or tnSyslogTargetAddr, is not reachable via the routing
+--          context specified by tnEventPrimaryRoutePref, the secondary
+--          routing preference as specified by tnEventSecondaryRoutePref
+--          will be attempted."
+--     DEFVAL { outband }
+--     ::= { tnSRLogObjs 23 }
+--
+-- tnEventSecondaryRoutePref   OBJECT-TYPE
+--     SYNTAX      INTEGER {
+--                     inband  (1),
+--                     outband (2),
+--                     none    (3)
+--                 }
+--     MAX-ACCESS  read-write
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnEventSecondaryRoutePref specifies the
+--          secondary routing preference for traffic generated for
+--          SNMP notifications and syslog messages. The routing
+--          context specified by the tnEventSecondaryRoutePref
+--          will be attempted if the remote destination was not
+--          reachable by the primary routing preference,
+--          specified by tnEventPrimaryRoutePref. The value
+--          specified for tnEventSecondaryRoutePref must be
+--          distinct from the value for tnEventPrimaryRoutePref.
+--
+--          A value of 'inband' specifies that the Logging utility will
+--          attempt to use the Base routing context to send SNMP
+--          notifications and syslog messages to remote destinations.
+--
+--          A value of 'outband' specifies that the Logging utility will
+--          attempt to use the management routing context to send SNMP
+--          notifications and syslog messages to remote destinations.
+--
+--          A value of 'none' specifies that no attempt will be made
+--          to send SNMP notifications and syslog messages to
+--          remote destinations.
+--
+--          If the remote destination, as specified by tnStdDestAddr
+--          or tnSyslogTargetAddr, is not reachable via the routing
+--          contexts specified by tnEventPrimaryRoutePref and
+--          tnEventSecondaryRoutePref, the Log utility will fail to
+--          send SNMP notifications and syslog messages to the remote
+--          destination."
+--     DEFVAL { inband }
+--     ::= { tnSRLogObjs 24 }
+
+--
+-- Notification Definition section
+--
+-- tnLogFileDeletedLogId     OBJECT-TYPE
+--     SYNTAX      TmnxLogIdIndex
+--     MAX-ACCESS  accessible-for-notify
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnLogFileDeletedLogId indicates with which event
+--          log-id or accounting-policy-id the deleted file was associated.
+--          Note the corresponding entry in the tnLogIdTable or tnLogApTable
+--          may no longer exist."
+--     ::= { tnLogNotificationObjects 1 }
+--
+-- tnLogFileDeletedFileId    OBJECT-TYPE
+--     SYNTAX      TmnxLogFileId
+--     MAX-ACCESS  accessible-for-notify
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnLogFileDeletedFileId indicates with which event
+--          log-id or accounting-policy-id the deleted file was associated.
+--          Note that the corresponding entry in the tnLogFileIdTable may
+--          no longer exist."
+--     ::= { tnLogNotificationObjects 2 }
+--
+-- tnLogFileDeletedLogType   OBJECT-TYPE
+--     SYNTAX      TmnxLogFileType
+--     MAX-ACCESS  accessible-for-notify
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnLogFileDeletedLogType indicates whether the
+--          deleted file was an 'eventLog' or 'accountingPolicy'."
+--     ::= { tnLogNotificationObjects 3 }
+--
+-- tnLogFileDeletedLocation  OBJECT-TYPE
+--     SYNTAX      TmnxCFlash
+--     MAX-ACCESS  accessible-for-notify
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnLogFileDeletedLocation indicates on which compact
+--          flash device the event log or accounting policy file that has
+--          been deleted was located. "
+--     ::= { tnLogNotificationObjects 4 }
+--
+-- tnLogFileDeletedName      OBJECT-TYPE
+--     SYNTAX      DisplayString
+--     MAX-ACCESS  accessible-for-notify
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnLogFileDeletedName indicates the pathname of an
+--          event log or accounting policy file that has been deleted because
+--          of space contention on a compact flash device."
+--     ::= { tnLogNotificationObjects 5 }
+--
+-- tnLogFileDeletedCreateTime    OBJECT-TYPE
+--     SYNTAX      DateAndTime
+--     MAX-ACCESS  accessible-for-notify
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnLogFileDeletedCreateTime indicates the date and
+--          time when the deleted file had been created."
+--     ::= { tnLogNotificationObjects 6 }
+--
+-- tnLogTraceErrorTitle      OBJECT-TYPE
+--     SYNTAX      DisplayString (SIZE(0..50))
+--     MAX-ACCESS  accessible-for-notify
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnLogTraceErrorTitle indicates the title string of the
+--          trace error event that generated the tnLogTraceError notification."
+--     ::= { tnLogNotificationObjects 7 }
+--
+-- tnLogTraceErrorMessage      OBJECT-TYPE
+--     SYNTAX      DisplayString
+--     MAX-ACCESS  accessible-for-notify
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnLogTraceErrorMessage indicates the message text
+--          string of the trace error event that generated the tnLogTraceError
+--          notification."
+--     ::= { tnLogNotificationObjects 9 }
+--
+-- tnLogThrottledEventID    OBJECT-TYPE
+--     SYNTAX       OBJECT IDENTIFIER
+--     MAX-ACCESS   accessible-for-notify
+--     STATUS       current
+--     DESCRIPTION
+--         "tnLogThrottledEventID is used by the tnLogEventThrottled
+--          notification to indicate the NOTIFICATION-TYPE object identifier
+--          of the throttled event."
+--     ::= { tnLogNotificationObjects 10 }
+--
+-- tnLogThrottledEvents    OBJECT-TYPE
+--     SYNTAX       Unsigned32
+--     MAX-ACCESS   accessible-for-notify
+--     STATUS       current
+--     DESCRIPTION
+--         "tnLogThrottledEvents is used by the tnLogEventThrottled
+--          notification to indicate the number of events dropped because
+--          of event throttling during the last throttle interval."
+--     ::= { tnLogNotificationObjects 11 }
+--
+-- tnSysLogTargetId  OBJECT-TYPE
+--     SYNTAX      TmnxSyslogId
+--     MAX-ACCESS  accessible-for-notify
+--     STATUS      current
+--     DESCRIPTION
+--         "tnSysLogTargetId is used by the tnSysLogTargetProblem
+--          notification to indicate the involved TmnxSyslogId."
+--     ::= { tnLogNotificationObjects 12 }
+--
+-- tnSysLogTargetProblemDescr  OBJECT-TYPE
+--     SYNTAX      DisplayString
+--     MAX-ACCESS  accessible-for-notify
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnSysLogTargetProblemDescr indicates the type of
+--          error encountered when trying to deliver events to the
+--          destination specified in the TmnxSyslogId."
+--     ::= { tnLogNotificationObjects 13 }
+--
+-- tnLogNotifyApInterval    OBJECT-TYPE
+--     SYNTAX      Integer32 (5..120)
+--     MAX-ACCESS  accessible-for-notify
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnLogNotifyApInterval indicates how frequently
+--          the statistics are collected and written to their destination."
+--     ::= { tnLogNotificationObjects 14 }
+--
+-- tnStdReplayStartEvent     OBJECT-TYPE
+--     SYNTAX      Unsigned32
+--     MAX-ACCESS  accessible-for-notify
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnStdReplayStartEvent indicates the SNMP
+--          notification request ID of the first missed event that was
+--          replayed when an SNMP notification target address was readded to
+--          the RTM following a period when the target address had been removed.
+--          It is used by the tnStdEventsReplayed notification."
+--     ::= { tnLogNotificationObjects 15 }
+--
+-- tnStdReplayEndEvent     OBJECT-TYPE
+--     SYNTAX      Unsigned32
+--     MAX-ACCESS  accessible-for-notify
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnStdReplayEndEvent indicates the SNMP
+--          notification request ID of the last missed event that was
+--          replayed when an SNMP notification target address was readded to
+--          the RTM following a period when the target address had been removed.
+--          It is used by the tnStdEventsReplayed notification."
+--     ::= { tnLogNotificationObjects 16 }
+
+--
+-- Notifications
+--
+-- tnLogSpaceContention NOTIFICATION-TYPE
+--      OBJECTS {
+--        tnLogFileIdRolloverTime,
+--        tnLogFileIdRetainTime,
+--        tnLogFileIdAdminLocation,
+--        tnLogFileIdBackupLoc,
+--        tnLogFileIdOperLocation,
+--        tnLogFileIdLogId,
+--        tnLogFileIdLogType
+--      }
+--      STATUS  current
+--      DESCRIPTION
+--          "Generated when space contention occurs on the compact flash where
+--           a log or billing file creation is being attempted.  Space contention
+--           exists if:
+--                Insufficient space is available on the compact flash to create
+--                a file of the same size as the file being rolled over.
+--
+--                The first file of this type is being created and less than
+--                10% of the total compact flash space is available.
+--
+--                A write operation on a log or billing file is denied due to
+--                lack of space."
+--      ::= { tnLogNotifications 1 }
+--
+-- tnLogAdminLocFailed NOTIFICATION-TYPE
+--      OBJECTS {
+--        tnLogFileIdAdminLocation,
+--        tnLogFileIdBackupLoc,
+--        tnLogFileIdOperLocation,
+--        tnLogFileIdLogId,
+--        tnLogFileIdLogType
+--      }
+--      STATUS  current
+--      DESCRIPTION
+--          "Generated when an attempt to create a log or billing file at the
+--           location specified by tnLogFileIdAdminLocation has failed.
+--           Indicates that the backup location, if specified, will be used."
+--      ::= { tnLogNotifications 2 }
+--
+-- tnLogBackupLocFailed NOTIFICATION-TYPE
+--      OBJECTS {
+--        tnLogFileIdAdminLocation,
+--        tnLogFileIdBackupLoc,
+--        tnLogFileIdOperLocation,
+--        tnLogFileIdLogId,
+--        tnLogFileIdLogType
+--      }
+--      STATUS  current
+--      DESCRIPTION
+--          "Generated when an attempt to create a log or billing file at the
+--           location specified by tnLogFileIdBackupLoc has failed."
+--      ::= { tnLogNotifications 3 }
+--
+-- tnLogFileRollover NOTIFICATION-TYPE
+--      OBJECTS {
+--        tnLogFileIdRolloverTime,
+--        tnLogFileIdRetainTime,
+--        tnLogFileIdAdminLocation,
+--        tnLogFileIdBackupLoc,
+--        tnLogFileIdOperLocation,
+--        tnLogFileIdLogId,
+--        tnLogFileIdLogType,
+--        tnLogFileIdPathName,
+--        tnLogFileIdCreateTime
+--      }
+--      STATUS  current
+--      DESCRIPTION
+--          "Generated when an event log or accounting policy file's
+--           rollover time has expired.  The file located as indicated
+--           by the value of tnLogFileIdOperLocation is closed and a new
+--           file is created as specified by tnLogFileIdAdminLocation
+--           and tnLogFileIdBackupLoc."
+--      ::= { tnLogNotifications 4 }
+--
+-- tnLogFileDeleted NOTIFICATION-TYPE
+--     OBJECTS {
+--         tnLogFileDeletedLogId,
+--         tnLogFileDeletedFileId,
+--         tnLogFileDeletedLogType,
+--         tnLogFileDeletedLocation,
+--         tnLogFileDeletedName,
+--         tnLogFileDeletedCreateTime
+--     }
+--     STATUS  current
+--     DESCRIPTION
+--         "Generated when a closed event log or accounting policy file
+--          has been deleted as part of the space contention cleanup."
+--     ::= { tnLogNotifications 5 }
+--
+-- tnTestEvent    NOTIFICATION-TYPE
+--     OBJECTS {
+--         sysDescr,
+--         sysObjectID
+--     }
+--     STATUS  current
+--     DESCRIPTION
+--         "The tnTestEvent notification is generated when the object
+--          tnEventTest is set to a value of 'doAction'.  This event can
+--          be used to test that remote log destinations such as syslog and
+--          snmp trap destinations are configured correctly."
+--     ::= { tnLogNotifications 6 }
+--
+-- tnLogTraceError    NOTIFICATION-TYPE
+--     OBJECTS {
+--         tnLogTraceErrorTitle,
+--         tnLogTraceErrorMessage
+--     }
+--     STATUS  current
+--     DESCRIPTION
+--         "The tnLogTraceError notification is generated when a trace
+--          error event is detected."
+--     ::= { tnLogNotifications 7 }
+--
+-- tnLogEventThrottled NOTIFICATION-TYPE
+--     OBJECTS {
+--         tnLogThrottledEventID,
+--         tnLogThrottledEvents
+--     }
+--     STATUS  current
+--     DESCRIPTION
+--         "A tnLogEventThrottled notification is generated
+--          at the end of the throttling interval when one or more
+--          event are dropped because the throttling limit was
+--          reached for that interval."
+--     ::= { tnLogNotifications 8 }
+--
+-- tnSysLogTargetProblem NOTIFICATION-TYPE
+--     OBJECTS {
+--         tnSysLogTargetId,
+--         tnSysLogTargetProblemDescr
+--     }
+--     STATUS  current
+--     DESCRIPTION
+--         "A tnSysLogTargetProblem notification is generated
+--          when a problem is encountered when trying to deliver data
+--          to the syslog destination identfied by the tnSysLogTargetId."
+--     ::= { tnLogNotifications 9 }
+--
+-- tnLogAccountingDataLoss NOTIFICATION-TYPE
+--     OBJECTS {
+--         tnLogFileIdRolloverTime,
+--         tnLogFileIdRetainTime,
+--         tnLogFileIdAdminLocation,
+--         tnLogFileIdBackupLoc,
+--         tnLogFileIdOperLocation,
+--         tnLogFileIdLogId,
+--         tnLogNotifyApInterval
+--     }
+--     STATUS  current
+--     DESCRIPTION
+--         "A tnLogAccountingDataLoss notification is generated
+--          when an accounting file is still being written to
+--          when the next interval ends.  The collection of
+--          statistics for the past interval is immediately
+--          stopped and collection is started for the next
+--          interval.  There are missing records in the file
+--          for this past interval."
+--     ::= { tnLogNotifications 10 }
+--
+-- tnStdEventsReplayed   NOTIFICATION-TYPE
+--     OBJECTS {
+--         tnStdDestAddrType,
+--         tnStdDestAddr,
+--         tnStdReplayStartEvent,
+--         tnStdReplayEndEvent,
+--         tnStdReplayStart
+--     }
+--     STATUS  current
+--     DESCRIPTION
+--         "A tnStdEventsReplayed notification is generated when
+--          an SNMP trap target address is added to the RTM (tnVRtrID)
+--          following a period when the address had been removed.
+--          The value of tnStdReplayStartEvent is the SNMP notification
+--          request ID of the first event that was replayed.  The value
+--          of tnStdReplayEndEvent is the SNMP notification request ID of the
+--          last missed event that was replayed.  The value of
+--          tnStdReplayStart is the request ID of the first event for
+--          which there was no route to the trap target address."
+--     ::= { tnLogNotifications 11 }
+
+--
+-- Conformance Information
+--
+-- tnLogCompliances OBJECT IDENTIFIER ::= { tnLogConformance 1 }
+-- tnLogGroups      OBJECT IDENTIFIER ::= { tnLogConformance 2 }
+
+-- compliance statements
+
+-- tnLogCompliance  MODULE-COMPLIANCE
+--    ::= { tnLogCompliances 1 }
+
+-- tnLogR2r1Compliance  MODULE-COMPLIANCE
+--    ::= { tnLogCompliances 2 }
+
+-- tnLogR3r0Compliance  MODULE-COMPLIANCE
+--    ::= { tnLogCompliances 3 }
+
+-- tnLogV4v0Compliance  MODULE-COMPLIANCE
+--     STATUS  obsolete
+--     DESCRIPTION
+--             "The compliance statement for revision 4.0 of TIMETRA-LOG-MIB."
+--     MODULE  this module
+--         MANDATORY-GROUPS {
+--             tnLogGlobalGroup,
+--             tnLogV4v0Group,
+--             tnLogAccountingPolicyGroup,
+--             tnLogFileIdGroup,
+--             tnLogSyslogGroup,
+--             tnSnmpTrapGroup,
+--             tnLogEventsR2r1Group,
+--             tnLogNotificationR3r0Group
+--         }
+--     ::= { tnLogCompliances 4 }
+
+-- tnLogV5v0Compliance  MODULE-COMPLIANCE
+--     STATUS  obsolete
+--     DESCRIPTION
+--             "The compliance statement for revision 5.0 of TIMETRA-LOG-MIB."
+--     MODULE  this module
+--         MANDATORY-GROUPS {
+--             tnLogGlobalGroup,
+--             tnLogV5v0Group,
+--             tnLogAccountingPolicyGroup,
+--             tnLogFileIdGroup,
+--             tnLogSyslogV5v0Group,
+--             tnSnmpTrapV5v0Group,
+--             tnSnmpSetErrsGroup,
+--             tnLogEventsV5v0Group,
+--             tnLogNotificationV5v0Group
+--         }
+--     ::= { tnLogCompliances 5 }
+
+-- tnLogV6v0Compliance  MODULE-COMPLIANCE
+--     STATUS  obsolete
+--     DESCRIPTION
+--             "The compliance statement for revision 6.0 of TIMETRA-LOG-MIB."
+--     MODULE  this module
+--         MANDATORY-GROUPS {
+--             tnLogGlobalGroup,
+--             tnLogV5v0Group,
+--             tnLogAccountingPolicyGroup,
+--             tnLogFileIdGroup,
+--             tnLogSyslogV5v0Group,
+--             tnSnmpTrapV5v0Group,
+--             tnSnmpTrapDestV6v0Group,
+--             tnSnmpSetErrsGroup,
+--             tnLogEventsV5v0Group,
+--             tnLogNotificationV6v0Group
+--         }
+--     ::= { tnLogCompliances 6 }
+
+-- tnLogV6v1Compliance  MODULE-COMPLIANCE
+--     STATUS  current
+--     DESCRIPTION
+--             "The compliance statement for revision 6.1 of TIMETRA-LOG-MIB."
+--     MODULE  this module
+--         MANDATORY-GROUPS {
+--             tnLogGlobalGroup,
+--             tnLogV5v0Group,
+--             tnLogAccountingPolicyGroup,
+--             tnLogFileIdGroup,
+--             tnLogSyslogV5v0Group,
+--             tnSnmpTrapV5v0Group,
+--             tnSnmpTrapDestV6v0Group,
+--             tnSnmpSetErrsGroup,
+--             tnLogEventsV5v0Group,
+--             tnLogNotificationV6v0Group,
+--             tnLogAccountingPolicyV6v1Group
+--         }
+--     ::= { tnLogCompliances 7 }
+
+
+-- tnLogV7v0Compliance  MODULE-COMPLIANCE
+--     STATUS  current
+--     DESCRIPTION
+--             "The compliance statement for revision 7.0 of TIMETRA-LOG-MIB."
+--     MODULE  this module
+--         MANDATORY-GROUPS {
+--             tnLogGlobalGroup,
+--             tnLogV5v0Group,
+--             tnLogAccountingPolicyGroup,
+--             tnLogFileIdGroup,
+--             tnLogSyslogV5v0Group,
+--             tnSnmpTrapV5v0Group,
+--             tnSnmpTrapDestV6v0Group,
+--             tnSnmpSetErrsGroup,
+--             tnLogEventsV5v0Group,
+--             tnLogNotificationV6v0Group,
+--             tnLogAccountingPolicyV6v1Group,
+--             tnLogAccountingPolicyCRV7v0Group,
+--             tnLogRoutePreferenceV7v0Group
+--         }
+--     ::= { tnLogCompliances 8 }
+
+-- units of conformance
+
+-- tnLogGlobalGroup   OBJECT-GROUP
+--     OBJECTS {   tnLogMaxLogs
+--            }
+--     STATUS      current
+--     DESCRIPTION
+--         "The group of objects supporting management of event logging
+--          capabilities on Nokia 7x50 SR series systems."
+--     ::= { tnLogGroups 1 }
+
+-- tnLogGroup   OBJECT-GROUP
+--    ::= { tnLogGroups 2 }
+
+-- tnLogAccountingPolicyGroup    OBJECT-GROUP
+--     OBJECTS {   tnLogApRowStatus,
+--                 tnLogApStorageType,
+--                 tnLogApAdminStatus,
+--                 tnLogApOperStatus,
+--                 tnLogApInterval,
+--                 tnLogApDescription,
+--                 tnLogApDefault,
+--                 tnLogApRecord,
+--                 tnLogApToFileId,
+--                 tnLogApPortType
+--             }
+--     STATUS      current
+--     DESCRIPTION
+--         "The group of objects supporting management of accounting policies
+--          capabilities on Nokia 7x50 SR series systems."
+--     ::= { tnLogGroups 3 }
+
+
+-- tnLogFileIdGroup     OBJECT-GROUP
+--     OBJECTS {   tnLogFileIdRowStatus,
+--                 tnLogFileIdStorageType,
+--                 tnLogFileIdRolloverTime,
+--                 tnLogFileIdRetainTime,
+--                 tnLogFileIdAdminLocation,
+--                 tnLogFileIdOperLocation,
+--                 tnLogFileIdDescription,
+--                 tnLogFileIdLogType,
+--                 tnLogFileIdLogId,
+--                 tnLogFileIdPathName,
+--                 tnLogFileIdCreateTime,
+--                 tnLogFileIdBackupLoc
+--             }
+--     STATUS      current
+--     DESCRIPTION
+--         "The group of objects supporting management of Log File destinations
+--          on Nokia 7x50 SR series systems."
+--     ::= { tnLogGroups 4 }
+
+-- tnLogSyslogGroup     OBJECT-GROUP
+--     OBJECTS {   tnSyslogTargetRowStatus,
+--                 tnSyslogTargetDescription,
+--                 tnSyslogTargetAddress,
+--                 tnSyslogTargetUdpPort,
+--                 tnSyslogTargetFacility,
+--                 tnSyslogTargetSeverity,
+--                 tnSyslogTargetMessagePrefix,
+--                 tnSyslogTargetMessagesDropped
+--             }
+--     STATUS      obsolete
+--     DESCRIPTION
+--         "The group of objects supporting management of Log Syslog destinations
+--          on Nokia 7x50 SR series systems."
+--     ::= { tnLogGroups 5 }
+
+-- tnSnmpTrapGroup     OBJECT-GROUP
+--     OBJECTS {   tnStgRowStatus,
+--                 tnStgDescription,
+--                 tnStgVersion,
+--                 tnStgNotifyCommunity,
+--                 tnStgSecurityLevel
+--             }
+--     STATUS      obsolete
+--     DESCRIPTION
+--         "The group of objects supporting management of Log SNMP notification
+--          destinations on Nokia 7x50 SR series systems."
+--     ::= { tnLogGroups 6 }
+
+-- tnLogEventsGroup     OBJECT-GROUP
+--    ::= { tnLogGroups 7 }
+
+-- tnLogNotifyObjsGroup   OBJECT-GROUP
+--    ::= { tnLogGroups 8 }
+
+-- tnLogNotificationGroup NOTIFICATION-GROUP
+--    ::= { tnLogGroups 9 }
+
+-- tnLogEventsR2r1Group     OBJECT-GROUP
+--     OBJECTS {   tnEventAppName,
+--                 tnEventName,
+--                 tnEventSeverity,
+--                 tnEventControl,
+--                 tnEventCounter,
+--                 tnEventDropCount,
+--                 tnEventReset,
+--                 tnEventTest
+--             }
+--     STATUS      obsolete
+--     DESCRIPTION
+--         "The group of objects supporting management of Log Events
+--          on Nokia 7x50 SR series systems release 2.1."
+--     ::= { tnLogGroups 10 }
+
+-- tnLogNotificationR2r1Group NOTIFICATION-GROUP
+--    ::= { tnLogGroups 11 }
+
+-- tnLogR2r1Group   OBJECT-GROUP
+--    ::= { tnLogGroups 12 }
+
+-- tnLogNotifyObjsR3r0Group   OBJECT-GROUP
+--     OBJECTS {   tnLogFileDeletedLogId,
+--                 tnLogFileDeletedFileId,
+--                 tnLogFileDeletedLogType,
+--                 tnLogFileDeletedLocation,
+--                 tnLogFileDeletedName,
+--                 tnLogFileDeletedCreateTime,
+--                 tnLogTraceErrorTitle,
+--                 tnLogTraceErrorMessage
+--             }
+--     STATUS      obsolete
+--     DESCRIPTION
+--         "The group of objects supporting management of Log notifications
+--          on Nokia 7x50 SR series systems."
+--     ::= { tnLogGroups 13 }
+
+-- tnLogNotificationR3r0Group NOTIFICATION-GROUP
+--     NOTIFICATIONS   {   tnLogSpaceContention,
+--                         tnLogAdminLocFailed,
+--                         tnLogBackupLocFailed,
+--                         tnLogFileRollover,
+--                         tnLogFileDeleted,
+--                         tnTestEvent,
+--                         tnLogTraceError
+--                     }
+--     STATUS        obsolete
+--     DESCRIPTION
+--         "The group of notifications supporting the Log feature
+--          on Nokia 7x50 SR series systems release 3.0."
+--     ::= { tnLogGroups 14 }
+
+-- tnLogV4v0Group   OBJECT-GROUP
+--     OBJECTS {   tnLogIdRowStatus,
+--                 tnLogIdStorageType,
+--                 tnLogIdAdminStatus,
+--                 tnLogIdOperStatus,
+--                 tnLogIdDescription,
+--                 tnLogIdFilterId,
+--                 tnLogIdSource,
+--                 tnLogIdDestination,
+--                 tnLogIdFileId,
+--                 tnLogIdSyslogId,
+--                 tnLogIdMaxMemorySize,
+--                 tnLogIdConsoleSession,
+--                 tnLogIdForwarded,
+--                 tnLogIdDropped,
+--                 tnLogIdTimeFormat,
+--                 tnLogFilterRowStatus,
+--                 tnLogFilterDescription,
+--                 tnLogFilterDefaultAction,
+--                 tnLogFilterInUse,
+--                 tnLogFilterParamsRowStatus,
+--                 tnLogFilterParamsDescription,
+--                 tnLogFilterParamsAction,
+--                 tnLogFilterParamsApplication,
+--                 tnLogFilterParamsApplOperator,
+--                 tnLogFilterParamsNumber,
+--                 tnLogFilterParamsNumberOperator,
+--                 tnLogFilterParamsSeverity,
+--                 tnLogFilterParamsSeverityOperator,
+--                 tnLogFilterParamsSubject,
+--                 tnLogFilterParamsSubjectOperator,
+--                 tnLogFilterParamsSubjectRegexp
+--             }
+--     STATUS      obsolete
+--     DESCRIPTION
+--         "The group of objects supporting management of event logs
+--          on Nokia 7x50 SR series systems."
+--     ::= { tnLogGroups 15 }
+
+-- tnSnmpSetErrsGroup   OBJECT-GROUP
+--     OBJECTS {   tnSnmpSetErrsMax,
+--                 tnSseVersion,
+--                 tnSseSeverityLevel,
+--                 tnSseModuleId,
+--                 tnSseModuleName,
+--                 tnSseErrorCode,
+--                 tnSseErrorName,
+--                 tnSseErrorMsg,
+--                 tnSseExtraText,
+--                 tnSseTimestamp
+--             }
+--     STATUS      current
+--     DESCRIPTION
+--         "The group of objects supporting management of SNMP SET failure
+--          error messages."
+--     ::= { tnLogGroups 16 }
+
+-- tnLogEventsV5v0Group     OBJECT-GROUP
+--     OBJECTS {   tnEventAppName,
+--                 tnEventName,
+--                 tnEventSeverity,
+--                 tnEventControl,
+--                 tnEventCounter,
+--                 tnEventDropCount,
+--                 tnEventReset,
+--                 tnEventThrottle,
+--                 tnEventTest,
+--                 tnEventThrottleLimit,
+--                 tnEventThrottleInterval
+--             }
+--     STATUS      current
+--     DESCRIPTION
+--         "The group of objects supporting management of Log Events
+--          on Nokia 7xxx SR series systems release 5.0."
+--     ::= { tnLogGroups 17 }
+--
+-- tnLogNotifyObjsV5v0Group   OBJECT-GROUP
+--     OBJECTS {   tnLogFileDeletedLogId,
+--                 tnLogFileDeletedFileId,
+--                 tnLogFileDeletedLogType,
+--                 tnLogFileDeletedLocation,
+--                 tnLogFileDeletedName,
+--                 tnLogFileDeletedCreateTime,
+--                 tnLogTraceErrorTitle,
+--                 tnLogTraceErrorMessage,
+--                 tnLogThrottledEventID,
+--                 tnLogThrottledEvents,
+--                 tnSysLogTargetId,
+--                 tnSysLogTargetProblemDescr
+--             }
+--     STATUS      obsolete
+--     DESCRIPTION
+--         "The group of objects supporting management of Log notifications
+--          on Nokia 7xxx SR series systems release 5.0."
+--     ::= { tnLogGroups 18 }
+--
+-- tnLogNotificationV5v0Group NOTIFICATION-GROUP
+--     NOTIFICATIONS   {   tnLogSpaceContention,
+--                         tnLogAdminLocFailed,
+--                         tnLogBackupLocFailed,
+--                         tnLogFileRollover,
+--                         tnLogFileDeleted,
+--                         tnTestEvent,
+--                         tnLogTraceError,
+--                         tnLogEventThrottled,
+--                         tnSysLogTargetProblem
+--                     }
+--     STATUS        obsolete
+--     DESCRIPTION
+--         "The group of notifications supporting the Log feature
+--          on Nokia 7xxx SR series systems release 5.0."
+--     ::= { tnLogGroups 19 }
+--
+-- tnLogSyslogV5v0Group     OBJECT-GROUP
+--     OBJECTS {   tnSyslogTargetRowStatus,
+--                 tnSyslogTargetDescription,
+--                 tnSyslogTargetUdpPort,
+--                 tnSyslogTargetFacility,
+--                 tnSyslogTargetSeverity,
+--                 tnSyslogTargetMessagePrefix,
+--                 tnSyslogTargetMessagesDropped,
+--                 tnSyslogTargetAddrType,
+--                 tnSyslogTargetAddr
+--             }
+--     STATUS      current
+--     DESCRIPTION
+--         "The group of objects supporting management of Log Syslog destinations
+--          on Nokia 7xxx series systems release 5.0."
+--     ::= { tnLogGroups 20 }
+--
+-- tnSnmpTrapV5v0Group     OBJECT-GROUP
+--     OBJECTS {   tnSnmpTrapLogDescription,
+--                 tnStdRowStatus,
+--                 tnStdRowLastChanged,
+--                 tnStdDestAddrType,
+--                 tnStdDestAddr,
+--                 tnStdDestPort,
+--                 tnStdDescription,
+--                 tnStdVersion,
+--                 tnStdNotifyCommunity,
+--                 tnStdSecurityLevel,
+--                 tnStdMaxTargets
+--             }
+--     STATUS      current
+--     DESCRIPTION
+--         "The group of objects supporting management of Log SNMP notification
+--          destinations on Nokia 7xxx series systems for release 5.0."
+--     ::= { tnLogGroups 21 }
+--
+-- tnLogV5v0Group   OBJECT-GROUP
+--     OBJECTS {   tnLogIdRowStatus,
+--                 tnLogIdStorageType,
+--                 tnLogIdAdminStatus,
+--                 tnLogIdOperStatus,
+--                 tnLogIdDescription,
+--                 tnLogIdFilterId,
+--                 tnLogIdSource,
+--                 tnLogIdDestination,
+--                 tnLogIdFileId,
+--                 tnLogIdSyslogId,
+--                 tnLogIdMaxMemorySize,
+--                 tnLogIdConsoleSession,
+--                 tnLogIdForwarded,
+--                 tnLogIdDropped,
+--                 tnLogIdTimeFormat,
+--                 tnLogFilterRowStatus,
+--                 tnLogFilterDescription,
+--                 tnLogFilterDefaultAction,
+--                 tnLogFilterInUse,
+--                 tnLogFilterParamsRowStatus,
+--                 tnLogFilterParamsDescription,
+--                 tnLogFilterParamsAction,
+--                 tnLogFilterParamsApplication,
+--                 tnLogFilterParamsApplOperator,
+--                 tnLogFilterParamsNumber,
+--                 tnLogFilterParamsNumberOperator,
+--                 tnLogFilterParamsSeverity,
+--                 tnLogFilterParamsSeverityOperator,
+--                 tnLogFilterParamsSubject,
+--                 tnLogFilterParamsSubjectOperator,
+--                 tnLogFilterParamsSubjectRegexp,
+--                 tnLogFilterParamsRouter,
+--                 tnLogFilterParamsRouterOperator,
+--                 tnLogFilterParamsRouterRegexp
+--             }
+--     STATUS      current
+--     DESCRIPTION
+--         "The group of objects supporting management of event logs
+--          on Nokia 7xxx SR series systems in release 5.0."
+--     ::= { tnLogGroups 22 }
+--
+-- tnLogObsoleteObjsV5v0Group    OBJECT-GROUP
+--     OBJECTS {   tnSyslogTargetAddress,
+--                 tnStgRowStatus,
+--                 tnStgDescription,
+--                 tnStgVersion,
+--                 tnStgNotifyCommunity,
+--                 tnStgSecurityLevel
+--             }
+--     STATUS      current
+--     DESCRIPTION
+--         "The group of objects supporting management of TiMOS logs
+--          obsoleted on Nokia 7xxx series systems in release 5.0."
+--     ::= { tnLogGroups 23 }
+--
+-- tnLogNotifyObjsV6v0Group   OBJECT-GROUP
+--     OBJECTS {   tnLogFileDeletedLogId,
+--                 tnLogFileDeletedFileId,
+--                 tnLogFileDeletedLogType,
+--                 tnLogFileDeletedLocation,
+--                 tnLogFileDeletedName,
+--                 tnLogFileDeletedCreateTime,
+--                 tnLogTraceErrorTitle,
+--                 tnLogTraceErrorMessage,
+--                 tnLogThrottledEventID,
+--                 tnLogThrottledEvents,
+--                 tnSysLogTargetId,
+--                 tnSysLogTargetProblemDescr,
+--                 tnLogNotifyApInterval,
+--                 tnStdReplayStartEvent,
+--                 tnStdReplayEndEvent
+--             }
+--     STATUS      current
+--     DESCRIPTION
+--         "The group of objects supporting management of Log notifications
+--          on Nokia 7xxx SR series systems release 6.0."
+--     ::= { tnLogGroups 24 }
+--
+-- tnLogNotificationV6v0Group NOTIFICATION-GROUP
+--     NOTIFICATIONS   {   tnLogSpaceContention,
+--                         tnLogAdminLocFailed,
+--                         tnLogBackupLocFailed,
+--                         tnLogFileRollover,
+--                         tnLogFileDeleted,
+--                         tnTestEvent,
+--                         tnLogTraceError,
+--                         tnLogEventThrottled,
+--                         tnSysLogTargetProblem,
+--                         tnLogAccountingDataLoss,
+--                         tnStdEventsReplayed
+--                     }
+--     STATUS        current
+--     DESCRIPTION
+--         "The group of notifications supporting the Log feature
+--          on Nokia 7xxx SR series systems release 6.0."
+--     ::= { tnLogGroups 25 }
+--
+-- tnSnmpTrapDestV6v0Group   OBJECT-GROUP
+--     OBJECTS {   tnStdReplay,
+--                 tnStdReplayStart,
+--                 tnStdReplayLastTime
+--             }
+--     STATUS      current
+--     DESCRIPTION
+--         "The group of objects added to support SNMP trap destinations
+--          in the Nokia 7xxx SR series systems release 6.0."
+--     ::= { tnLogGroups 26 }
+--
+-- tnLogAccountingPolicyV6v1Group    OBJECT-GROUP
+--     OBJECTS {
+--                 tnLogApDefaultInterval
+--             }
+--     STATUS      current
+--     DESCRIPTION
+--         "The group of objects supporting management of accounting policies
+--          capabilities on Nokia 7x50 SR series systems release 6.1."
+--     ::= { tnLogGroups 27 }
+--
+--
+-- tnLogAccountingPolicyCRV7v0Group    OBJECT-GROUP
+--     OBJECTS {   tnLogApCrLastChanged,
+--                 tnLogApCrSignChangeDelta,
+--                 tnLogApCrSignChangeQueue,
+--                 tnLogApCrSignChangeOCntr,
+--                 tnLogApCrSignChangeQICounters,
+--                 tnLogApCrSignChangeQECounters,
+--                 tnLogApCrSignChangeOICounters,
+--                 tnLogApCrSignChangeOECounters,
+--                 tnLogApCrSignChangeAACounters,
+--                 tnLogApCrAACounters,
+--                 tnLogApCrQueueRowStatus,
+--                 tnLogApCrQueueLastChanged,
+--                 tnLogApCrQueueICounters,
+--                 tnLogApCrQueueECounters,
+--                 tnLogApCrOverrideCntrRowStatus,
+--                 tnLogApCrOverrideCntrLastChngd,
+--                 tnLogApCrOverrideCntrICounters,
+--                 tnLogApCrOverrideCntrECounters
+--             }
+--     STATUS      current
+--     DESCRIPTION
+--         "The group of objects supporting the creation of a custom record
+--          inside a accounting policy
+--          on Nokia 7x50 SR series systems."
+--     ::= { tnLogGroups 28 }
+--
+-- tnLogRoutePreferenceV7v0Group     OBJECT-GROUP
+--     OBJECTS {   tnEventPrimaryRoutePref,
+--                 tnEventSecondaryRoutePref
+--             }
+--     STATUS      current
+--     DESCRIPTION
+--         "The group of objects supporting routing preferences of Log Events
+--          on Nokia 7xxx SR series systems release 7.0."
+--     ::= { tnLogGroups 29 }
+
+END

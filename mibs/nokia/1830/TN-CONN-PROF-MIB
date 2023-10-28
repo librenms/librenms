@@ -1,0 +1,334 @@
+TN-CONN-PROF-MIB DEFINITIONS ::= BEGIN
+
+-- (c) Copyright 2023 Nokia Networks.  All rights reserved.
+-- This software is the confidential and proprietary property of
+-- Nokia and may only be used in accordance with the terms of the
+-- license agreement provided with this software.
+
+IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE,
+--      NOTIFICATION-TYPE,
+        Unsigned32                            FROM SNMPv2-SMI
+
+--      MODULE-COMPLIANCE, OBJECT-GROUP,
+--      NOTIFICATION-GROUP                    FROM SNMPv2-CONF
+
+        TEXTUAL-CONVENTION, RowStatus,
+        TimeStamp, DisplayString              FROM SNMPv2-TC
+
+        TmnxEncapVal, TItemDescription        FROM TN-TC-MIB
+
+--      tnSRNotifyPrefix, tnSRConfs,
+        tnSRMIBModules, tnSRObjs              FROM TROPIC-GLOBAL-REG
+
+        tnSysSwitchId                         FROM TROPIC-SYSTEM-MIB
+        ;
+
+tnConnProfMIBModule   MODULE-IDENTITY
+        LAST-UPDATED "201910180000Z"
+        ORGANIZATION "Nokia"
+        CONTACT-INFO
+            "Nokia SROS Support
+             Web: http://support.nokia.com"
+        DESCRIPTION
+        "This document is the SNMP MIB module to manage connection profiles
+        associated with VLL services of the Nokia SROS system.
+
+        This SNMP MIB module (Specification) embodies Nokia's
+        proprietary intellectual property. Nokia retains all title
+        and ownership in the Specification, including any revisions.
+
+        Nokia grants all interested parties a non-exclusive license
+        to use and distribute an unmodified copy of this Specification
+        in connection with management of Nokia products, and without
+        fee, provided this copyright notice and license appear on all
+        copies.
+
+        This Specification is supplied `as is', and Nokia makes no
+        warranty, either express or implied, as to the use, operation,
+        condition, or performance of the Specification."
+
+--
+--  Revision History
+--
+        REVISION        "201910180000Z"
+        DESCRIPTION     "Modified the range from (SIZE(0..200)) to (SIZE(0..512))
+                         for the following:
+                         TnConnProfVlanRanges."
+
+        REVISION        "201504060000Z"
+        DESCRIPTION     "Imported MIBS into PSS for Packet Card support"
+
+        REVISION                 "201102010000Z"
+        DESCRIPTION              "Rev 1.0                1 Feb 2011 00:00
+                                  Initial Release of the TN-CONN-PROF-MIB
+                                  in SROS 9.0."
+
+        ::= { tnSRMIBModules 75 }
+
+tnConnProfObjs             OBJECT IDENTIFIER ::= { tnSRObjs             75 }
+-- tnConnProfNtfyPrefix       OBJECT IDENTIFIER ::= { tnSRNotifyPrefix     75 }
+-- tnConnProfConformance      OBJECT IDENTIFIER ::= { tnSRConfs            75 }
+
+-- Object Groups in the Nokia Connection Profile MIB Module
+-- tnConnProfConfigTimeStamps OBJECT IDENTIFIER ::= { tnConnProfObjs        1 }
+tnConnProfConfigObjs       OBJECT IDENTIFIER ::= { tnConnProfObjs        2 }
+
+-- Notification Groups in the Nokia Connection Profile MIB Module
+-- tnConnProfNotifications    OBJECT IDENTIFIER ::= { tnConnProfNtfyPrefix  0 }
+
+-- Compliance Groups in the Nokia Connection Profile MIB Module
+-- tnConnProfCompliances      OBJECT IDENTIFIER ::= { tnConnProfConformance 1 }
+-- tnConnProfGroups           OBJECT IDENTIFIER ::= { tnConnProfConformance 2 }
+
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+--
+--  TN-CONN-PROF-MIB Textual Conventions
+--
+TnConnProfId                   ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "A number used to identify a connection profile. The value 0 is used as
+         the null ID."
+    SYNTAX      Unsigned32 (0|1..1000)
+
+TnConnProfVlanRanges                   ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "String which represents vlan range of a connection profile."
+    SYNTAX      DisplayString (SIZE(0..512))
+
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+--
+--  TN-CONN-PROF-MIB Configuration Objects
+--
+
+--
+--  Connection Profile objects
+--
+
+-- tnConnProfTblLastChanged       OBJECT-TYPE
+--     SYNTAX      TimeStamp
+--     MAX-ACCESS  read-only
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnConnProfTblLastChanged indicates the time, since
+--          system startup, when the tnConnProfTable last changed state."
+--     ::= { tnConnProfConfigTimeStamps 1 }
+
+tnConnProfTable                OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TnConnProfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tnConnProfTable contains an entry for each connection
+         profile."
+    ::= { tnConnProfConfigObjs 1 }
+
+tnConnProfEntry                OBJECT-TYPE
+    SYNTAX      TnConnProfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each tnConnProfEntry contains connection profile specific
+         configuration."
+    INDEX { tnSysSwitchId,
+            tnConnProfId
+          }
+    ::= { tnConnProfTable 1 }
+
+TnConnProfEntry                ::= SEQUENCE {
+    tnConnProfId                   TnConnProfId,
+    tnConnProfRowStatus            RowStatus,
+    tnConnProfLastChanged          TimeStamp,
+    tnConnProfDescription          TItemDescription,
+    tnConnProfVlanRange            TnConnProfVlanRanges
+}
+
+tnConnProfId                   OBJECT-TYPE
+    SYNTAX      TnConnProfId
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tnConnProfId specifies the index to a specific
+         connection profile. tnConnProfId is system unique."
+    ::= { tnConnProfEntry 1 }
+
+tnConnProfRowStatus            OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tnConnProfRowStatus specifies the row status. It allows
+         entries to be created and deleted in the tnConnProfTable.
+
+         Rows are created by specifying the value of 'createAndGo(4)' and
+         deleted by specifying the value of 'destroy(6)'.
+
+         To delete an entry, all references to the connection profile in
+         existing SAPs and in tnConnProfAtmMemberTable must be deleted."
+    ::= { tnConnProfEntry 2 }
+
+tnConnProfLastChanged          OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tnConnProfLastChanged indicates the time, since system
+         startup, that the connection profile was created or modified."
+    ::= { tnConnProfEntry 3 }
+
+tnConnProfDescription          OBJECT-TYPE
+    SYNTAX      TItemDescription
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tnConnProfDescription specifies the description of this
+         connection profile."
+    DEFVAL { "" }
+    ::= { tnConnProfEntry 4 }
+
+tnConnProfVlanRange          OBJECT-TYPE
+    SYNTAX      TnConnProfVlanRanges
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tnConnProfVlanRange specifies the vlan ranges of this
+         connection profile."
+    DEFVAL { "" }
+    ::= { tnConnProfEntry 5 }
+END
+
+--  Connection Profile ATM Member objects
+--
+--
+-- tnConnProfAtmMemberTblLastChgd OBJECT-TYPE
+--     SYNTAX      TimeStamp
+--     MAX-ACCESS  read-only
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnConnProfAtmMemberTblLastChgd indicates the time,
+--          since system startup, when the tnConnProfAtmMemberTable last changed
+--          state."
+--     ::= { tnConnProfConfigTimeStamps 2 }
+--
+-- tnConnProfAtmMemberTable       OBJECT-TYPE
+--     SYNTAX      SEQUENCE OF TnConnProfAtmMemberEntry
+--     MAX-ACCESS  not-accessible
+--     STATUS      current
+--     DESCRIPTION
+--         "The tnConnProfAtmMemberTable contains an entry for each ATM
+--          connection profile member.
+--
+--          Each ATM connection profile member is a VPI/VCI value to be assigned
+--          to an ATM SAP of an APIPE VLL service with
+--          TN-SERV-MIB:svcVllType set to a value of 'atmCell(7)'.
+--
+--          Up to a maximum of 16 ATM connection profile members can be added to
+--          a connection profile."
+--     ::= { tnConnProfConfigObjs 2 }
+--
+-- tnConnProfAtmMemberEntry       OBJECT-TYPE
+--     SYNTAX      TnConnProfAtmMemberEntry
+--     MAX-ACCESS  not-accessible
+--     STATUS      current
+--     DESCRIPTION
+--         "Each tnConnProfAtmMemberEntry contains ATM connection profile member
+--          specific configuration."
+--     INDEX  {    tnSysSwitchId,
+--                 tnConnProfId,
+--                 tnConnProfAtmMemberEncapValue
+--            }
+--     ::= { tnConnProfAtmMemberTable 1 }
+--
+-- TnConnProfAtmMemberEntry       ::= SEQUENCE {
+--     tnConnProfAtmMemberEncapValue  TmnxEncapVal,
+--     tnConnProfAtmMemberRowStatus   RowStatus
+-- }
+--
+-- tnConnProfAtmMemberEncapValue  OBJECT-TYPE
+--     SYNTAX      TmnxEncapVal
+--     MAX-ACCESS  not-accessible
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnConnProfAtmMemberEncapValue specifies, along with
+--          tnConnProfId, the index to a specific ATM connection profile member.
+--          The TmnxEncapVal supported is ATM VC, for which the top 3 bits are
+--          000."
+--     ::= { tnConnProfAtmMemberEntry 1 }
+--
+-- tnConnProfAtmMemberRowStatus   OBJECT-TYPE
+--     SYNTAX      RowStatus
+--     MAX-ACCESS  read-create
+--     STATUS      current
+--     DESCRIPTION
+--         "The value of tnConnProfAtmMemberRowStatus specifies the row status.
+--          It allows entries to be created and deleted in the
+--          tnConnProfAtmMemberTable.
+--
+--          Rows are created by specifying the value of 'createAndGo(4)' and
+--          deleted by specifying the value of 'destroy(6)'."
+--     ::= { tnConnProfAtmMemberEntry 2 }
+--
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+--
+--  TN-CONN-PROF-MIB Notification Objects
+--
+--
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+--
+--  TN-CONN-PROF-MIB Compliance Statements
+--
+-- tnConnProfV9v0Compliance       MODULE-COMPLIANCE
+--     STATUS      current
+--     DESCRIPTION
+--         "The compliance statement for management of connection profiles
+--          on Nokia SROS series systems for release 9.0."
+--     MODULE # this module
+--         MANDATORY-GROUPS {
+--          tnConnProfTimeStampGroup,
+--             tnConnProfGroup,
+--             tnConnProfAtmMemberGroup
+--         }
+--     ::= { tnConnProfCompliances 1 }
+--
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+--
+--  TN-CONN-PROF-MIB Group Statements
+--
+-- tnConnV9v0Groups OBJECT IDENTIFIER ::= { tnConnProfGroups 1 }
+--
+-- tnConnProfTimeStampGroup       OBJECT-GROUP
+--     OBJECTS {
+--         tnConnProfTblLastChanged,
+--         tnConnProfAtmMemberTblLastChgd
+--     }
+--     STATUS      current
+--     DESCRIPTION
+--         "The group of objects maintaining table/row statistics for connection
+--          profile tables on Nokia SROS series systems."
+--     ::= { tnConnV9v0Groups 1 }
+--
+-- tnConnProfGroup                OBJECT-GROUP
+--     OBJECTS {
+--         tnConnProfRowStatus,
+--         tnConnProfLastChanged,
+--         tnConnProfDescription,
+--         tnConnProfVlanRange
+--     }
+--     STATUS      current
+--     DESCRIPTION
+--         "The group of objects supporting management of connection
+--          profiles on Nokia SROS series systems."
+--     ::= { tnConnV9v0Groups 2 }
+--
+-- tnConnProfAtmMemberGroup       OBJECT-GROUP
+--     OBJECTS {
+--         tnConnProfAtmMemberRowStatus
+--     }
+--     STATUS      current
+--     DESCRIPTION
+--         "The group of objects supporting management of ATM connection
+--          profile members on Nokia SROS series systems."
+--     ::= { tnConnV9v0Groups 3 }
+-- END
