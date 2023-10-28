@@ -1,6 +1,6 @@
 <?php
 /*
- * InsufficientDataException.php
+ * YamlDeviceDiscovery.php
  *
  * -Description-
  *
@@ -23,8 +23,27 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace LibreNMS\Exceptions;
+namespace LibreNMS\OS\Traits;
 
-class InsufficientDataException extends \Exception
+use Illuminate\Support\Collection;
+
+class YamlStorageDiscovery
 {
+    private array $storagePrefetch = [];
+
+    public function discoverYamlStorage()
+    {
+        $storages = new Collection();
+        $storages_yaml = $this->getDiscovery('storage');
+
+        foreach ($storages_yaml['pre-cache']['oids'] ?? [] as $oid) {
+            \SnmpQuery::enumStrings()->numericIndex()
+                ->options($storages_yaml['pre-cache']['snmp_flags'] ?? null)
+                ->walk($oid)->valuesByIndex($this->storagePrefetch);
+        }
+
+        // TODO
+
+        return $storages;
+    }
 }

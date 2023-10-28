@@ -53,7 +53,7 @@ class Storage extends DeviceRelatedModel implements Keyable
         // filter by mounts ignores
         foreach (\LibreNMS\Config::getCombined($os, 'ignore_mount') as $im) {
             if ($im == $this->storage_descr) {
-                Log::debug("ignored $this->storage_descr (matched: $im)\n");
+                Log::debug("ignored $this->storage_descr\n");
 
                 return false;
             }
@@ -76,19 +76,12 @@ class Storage extends DeviceRelatedModel implements Keyable
         }
 
         // filter by type
-        if (\LibreNMS\Config::get('ignore_mount_removable', false) && $this->storage_type == 'hrStorageRemovableDisk') {
-            Log::debug("skip(removable)\n");
-            return false;
-        }
+        foreach (\LibreNMS\Config::getCombined($os, 'ignore_mount_type') as $imt) {
+            if ($imt == $this->storage_type) {
+                Log::debug("ignored type $this->storage_type\n");
 
-        if (\LibreNMS\Config::get('ignore_mount_network', false) && $this->storage_type == 'hrStorageNetworkDisk') {
-            Log::debug("skip(network)\n");
-            return false;
-        }
-
-        if (\LibreNMS\Config::get('ignore_mount_optical', false) && $this->storage_type == 'hrStorageCompactDisc') {
-            Log::debug("skip(cd)\n");
-            return false;
+                return false;
+            }
         }
 
         return true;

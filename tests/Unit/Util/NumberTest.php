@@ -97,21 +97,25 @@ class NumberTest extends TestCase
         try {
             Number::fillMissingRatio();
             $this->fail('No exception thrown');
-        } catch (InsufficientDataException) {}
+        } catch (InsufficientDataException) {
+        }
 
         try {
             Number::fillMissingRatio(total: 1);
             $this->fail('No exception thrown');
-        } catch (InsufficientDataException) {}
+        } catch (InsufficientDataException) {
+        }
 
         try {
             Number::fillMissingRatio(used: 1);
             $this->fail('No exception thrown');
-        } catch (InsufficientDataException) {}
+        } catch (InsufficientDataException) {
+        }
 
         try {
             Number::fillMissingRatio(available: 1);
             $this->fail('No exception thrown');
-        } catch (InsufficientDataException) {}
+        } catch (InsufficientDataException) {
+        }
     }
 }

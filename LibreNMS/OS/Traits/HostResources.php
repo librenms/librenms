@@ -211,15 +211,13 @@ trait HostResources
 
             return ! in_array($storage['hrStorageType'], $this->storageIgnoreTypes);
         })->map(function ($storage) {
-            $units = $storage['hrStorageAllocationUnits'];
-            $index = $storage['hrStorageIndex'];
             return (new Storage([
                 'type' => 'hrstorage',
-                'storage_index' => $index,
+                'storage_index' => $storage['hrStorageIndex'],
                 'storage_type' => $storage['hrStorageType'],
                 'storage_descr' => $storage['hrStorageDescr'],
-                'storage_used_oid' => ".1.3.6.1.2.1.25.2.3.1.6.$index",
-                'storage_units' => $units,
+                'storage_used_oid' => '.1.3.6.1.2.1.25.2.3.1.6.' . $storage['hrStorageIndex'],
+                'storage_units' => $storage['hrStorageAllocationUnits'],
             ]))->fillUsage(
                 Number::correctIntegerOverflow($storage['hrStorageUsed'] ?? null),
                 Number::correctIntegerOverflow($storage['hrStorageSize'] ?? null),

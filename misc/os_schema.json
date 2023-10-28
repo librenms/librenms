@@ -468,6 +468,12 @@
                 "type": "regex"
             }
         },
+        "ignore_mount_type": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
         "bad_hrSystemUptime": {
             "type": "boolean"
         },
