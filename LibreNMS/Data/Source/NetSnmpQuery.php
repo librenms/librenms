@@ -387,49 +387,49 @@ class NetSnmpQuery implements SnmpQueryInterface
 
     private function execMultiple(string $command, array $oids): SnmpResponse
     {
+        $response = new SnmpResponse('');
+
+        foreach ($oids as $oid) {
+            $response = $response->append($this->exec($command, Arr::wrap($oid)));
+
+            // if abort on failure is set, return after first failure
+            if ($this->abort && ! $response->isValid()) {
+                $oid_list = implode(',', array_map(fn($group) => implode(',', $group), $oids));
+                Log::debug("SNMP failed walking $oid of $oid_list aborting.");
+
+                return $response;
+            }
+        }
+
+        return $response;
+    }
+
+    private function exec(string $command, array $oids): SnmpResponse
+    {
         // use runtime(array) cache if requested. The 'null' driver will simply return the value without caching
         $driver = $this->cache ? 'array' : 'null';
         $key = $this->cache ? $this->getCacheKey($command, $oids) : '';
 
         return Cache::driver($driver)->rememberForever($key, function () use ($command, $oids) {
-            $response = new SnmpResponse('');
+            $measure = Measurement::start($command);
+            $proc = new Process($this->buildCli($command, $oids));
+            $proc->setTimeout(Config::get('snmp.exec_timeout', 1200));
 
-            foreach ($oids as $oid) {
-                $response = $response->append($this->exec($command, Arr::wrap($oid)));
+            $this->logCommand($proc->getCommandLine());
 
-                // if abort on failure is set, return after first failure
-                if ($this->abort && ! $response->isValid()) {
-                    Log::debug("SNMP failed walking $oid of " . implode(',', $oids) . ' aborting.');
+            $proc->run();
+            $exitCode = $proc->getExitCode();
+            $output = $proc->getOutput();
+            $stderr = $proc->getErrorOutput();
 
-                    return $response;
-                }
-            }
+            // check exit code and log possible bad auth
+            $this->checkExitCode($exitCode, $stderr);
+            $this->logOutput($output, $stderr);
 
-            return $response;
+            $measure->manager()->recordSnmp($measure->end());
+
+            return new SnmpResponse($output, $stderr, $exitCode);
         });
-    }
-
-    private function exec(string $command, array $oids): SnmpResponse
-    {
-        $measure = Measurement::start($command);
-
-        $proc = new Process($this->buildCli($command, $oids));
-        $proc->setTimeout(Config::get('snmp.exec_timeout', 1200));
-
-        $this->logCommand($proc->getCommandLine());
-
-        $proc->run();
-        $exitCode = $proc->getExitCode();
-        $output = $proc->getOutput();
-        $stderr = $proc->getErrorOutput();
-
-        // check exit code and log possible bad auth
-        $this->checkExitCode($exitCode, $stderr);
-        $this->logOutput($output, $stderr);
-
-        $measure->manager()->recordSnmp($measure->end());
-
-        return new SnmpResponse($output, $stderr, $exitCode);
     }
 
     private function initCommand(string $binary, array $oids): array
@@ -543,7 +543,7 @@ class NetSnmpQuery implements SnmpQueryInterface
 
     private function getCacheKey(string $type, array $oids): string
     {
-        $oids = implode(',', array_map(fn ($group) => implode(',', $group), $oids));
+        $oids = implode(',', $oids);
         $options = implode(',', $this->options);
 
         return "$type|{$this->device->hostname}|$this->context|$oids|$options";
