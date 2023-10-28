@@ -540,7 +540,7 @@ class NetSnmpQuery implements SnmpQueryInterface
 
     private function getCacheKey(array $oids): string
     {
-        $oids = implode(',', array_map(fn($group) => implode(',', $group), $oids));
+        $oids = implode(',', array_map(fn ($group) => implode(',', $group), $oids));
         $options = implode(',', $this->options);
 
         return "{$this->device->hostname}|$this->context|$oids|$options";
