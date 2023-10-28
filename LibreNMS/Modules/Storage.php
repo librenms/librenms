@@ -25,15 +25,32 @@
 
 namespace LibreNMS\Modules;
 
+use App\Models\Device;
 use App\Observers\ModuleModelObserver;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 use LibreNMS\DB\SyncsModels;
+use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Discovery\StorageDiscovery;
+use LibreNMS\Interfaces\Module;
+use LibreNMS\Interfaces\Polling\StoragePolling;
 use LibreNMS\OS;
+use LibreNMS\Polling\ModuleStatus;
 use LibreNMS\RRD\RrdDefinition;
 
-class Storage implements \LibreNMS\Interfaces\Module
+class Storage implements Module
 {
     use SyncsModels;
+
+    public function dependencies(): array
+    {
+        return [];
+    }
+
+    public function shouldDiscover(OS $os, ModuleStatus $status): bool
+    {
+        return $status->isEnabledAndDeviceUp($os->getDevice());
+    }
 
     /**
      * @inheritDoc
@@ -43,66 +60,82 @@ class Storage implements \LibreNMS\Interfaces\Module
         if ($os instanceof StorageDiscovery) {
             $data = $os->discoverStorage()->filter->isValid($os->getName());
 
-            dd($data->toArray());
-
             ModuleModelObserver::observe(\App\Models\Storage::class);
             $this->syncModels($os->getDevice(), 'storage', $data);
         }
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function poll(OS $os)
+    public function shouldPoll(OS $os, ModuleStatus $status): bool
     {
-        foreach (dbFetchRows('SELECT * FROM storage WHERE device_id = ?', [$device['device_id']]) as $storage) {
-            $descr = $storage['storage_descr'];
-            $mib = $storage['storage_mib'];
-
-            echo 'Storage ' . $descr . ': ' . $mib . "\n\n\n\n";
-
-            $rrd_name = ['storage', $mib, $descr];
-            $rrd_def = RrdDefinition::make()
-                ->addDataset('used', 'GAUGE', 0)
-                ->addDataset('free', 'GAUGE', 0);
-
-            $file = \LibreNMS\Config::get('install_dir') . '/includes/polling/storage/' . $mib . '.inc.php';
-            if (is_file($file)) {
-                include $file;
-            }
-
-            d_echo($storage);
-
-            if ($storage['size']) {
-                $percent = round(($storage['used'] / $storage['size'] * 100));
-            } else {
-                $percent = 0;
-            }
-
-            echo $percent . '% ';
-
-            $fields = [
-                'used'   => $storage['used'],
-                'free'   => $storage['free'],
-            ];
-
-            $tags = compact('mib', 'descr', 'rrd_name', 'rrd_def');
-            data_update($device, 'storage', $tags, $fields);
-
-            // NOTE: casting to string for mysqli bug (fixed by mysqlnd)
-            $update = dbUpdate(['storage_used' => (string) $storage['used'], 'storage_free' => (string) $storage['free'], 'storage_size' => (string) $storage['size'], 'storage_units' => $storage['units'], 'storage_perc' => $percent], 'storage', '`storage_id` = ?', [$storage['storage_id']]);
-
-            echo "\n";
-        }//end foreach
-
-        unset($storage);
+        return $status->isEnabledAndDeviceUp($os->getDevice());
     }
 
     /**
      * @inheritDoc
      */
-    public function cleanup(OS $os)
+    public function poll(OS $os, DataStorageInterface $datastore): void
     {
-        // TODO: Implement cleanup() method.
+        $storages = $os->getDevice()->storage;
+
+        if ($storages->isEmpty()) {
+            return; // nothing to do
+        }
+
+        // poll storage
+        if ($os instanceof StoragePolling) {
+            $os->pollStorage($storages);
+        } else {
+            $this->defaultPolling($storages);
+        }
+
+        foreach ($storages as $storage) {
+            Log::info("$storage->storage_descr: $storage->storage_perc%");
+
+            $datastore->put($os->getDeviceArray(), 'storage', [
+                'type' => $storage->type,
+                'descr' => $storage->storage_descr,
+                'rrd_name' => ['storage', $storage->type, $storage->storage_descr],
+                'rrd_def' => RrdDefinition::make()
+                    ->addDataset('used', 'GAUGE', 0)
+                    ->addDataset('free', 'GAUGE', 0),
+            ], [
+                'used'   => $storage->storage_used,
+                'free'   => $storage->storage_free,
+            ]);
+        }
+    }
+
+    private function defaultPolling(Collection $storages): void
+    {
+        // fetch all data
+        $oids = $storages->map->only(['storage_used_oid', 'storage_size_oid', 'storage_free_oid', 'storage_perc_oid'])
+            ->flatten()->filter()->unique()->values()->all();
+        $data = \SnmpQuery::get($oids)->values();
+
+        $storages->each(function (\App\Models\Storage $storage) use ($data) {
+            $storage->fillUsage(
+                $data[$storage->storage_used_oid] ?? null,
+                $data[$storage->storage_size_oid] ?? null,
+                $data[$storage->storage_free_oid] ?? null,
+                $data[$storage->storage_perc_oid] ?? null
+            );
+        });
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function cleanup(Device $device): void
+    {
+        $device->storage()->delete();
+    }
+
+    public function dump(Device $device)
+    {
+        return [
+            'storage' => $device->storage()
+                ->orderBy('storage_index')->orderBy('storage_type')
+                ->get()->map->makeHidden(['device_id', 'storage_id']),
+        ];
     }
 }

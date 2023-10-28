@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use LibreNMS\Exceptions\InsufficientDataException;
 use LibreNMS\Interfaces\Models\Keyable;
 use LibreNMS\Util\Number;
 
@@ -48,46 +50,15 @@ class Mempool extends DeviceRelatedModel implements Keyable
         return $this->mempool_total > 0;
     }
 
-    public function fillUsage($used = null, $total = null, $free = null, $percent = null)
+    public function fillUsage($used = null, $total = null, $free = null, $percent = null): self
     {
         try {
-            $total = Number::correctIntegerOverflow($total);
-            $used = Number::correctIntegerOverflow($used, $total);
-            $free = Number::correctIntegerOverflow($free, $total);
-        } catch (\Exception $e) {
-            d_echo($e->getMessage());
+            [$this->mempol_total, $this->mempool_used, $this->mempool_free, $this->mempool_perc]
+                = Number::fillMissingRatio($total, $used, $free, $percent, 0, $this->mempool_precision);
+        } catch (InsufficientDataException $e) {
+            Log::debug($e->getMessage());
 
-            return $this; // unhandled negative
-        }
-
-        $this->mempool_total = $this->calculateTotal($total, $used, $free);
-        $this->mempool_used = $used * $this->mempool_precision;
-        $this->mempool_free = $free * $this->mempool_precision;
-        $percent = $this->normalizePercent($percent); // don't assign to model or it loses precision
-        $this->mempool_perc = $percent;
-
-        if (! $this->mempool_total) {
-            if (! $percent && $percent !== 0.0) {
-                // could not calculate total, can't calculate other values
-                return $this;
-            }
-            $this->mempool_total = 100; // only have percent, mark total as 100
-        }
-
-        if ($used === null) {
-            $this->mempool_used = $free !== null
-                ? $this->mempool_total - $this->mempool_free
-                : round($this->mempool_total * ($percent ? ($percent / 100) : 0));
-        }
-
-        if ($free === null) {
-            $this->mempool_free = $used !== null
-                ? $this->mempool_total - $this->mempool_used
-                : round($this->mempool_total * ($percent ? (1 - ($percent / 100)) : 1));
-        }
-
-        if ($percent == null) {
-            $this->mempool_perc = (int) Number::calculatePercent($this->mempool_used, $this->mempool_total, 0);
+            return $this; //
         }
 
         return $this;
@@ -146,33 +117,5 @@ class Mempool extends DeviceRelatedModel implements Keyable
     public function getCompositeKey()
     {
         return "$this->mempool_type-$this->mempool_index";
-    }
-
-    private function calculateTotal($total, $used, $free)
-    {
-        if ($total !== null) {
-            return (int) $total * $this->mempool_precision;
-        }
-
-        if ($used !== null && $free !== null) {
-            return ($used + $free) * $this->mempool_precision;
-        }
-
-        return $this->mempool_total; // don't change the value it may have been set in discovery
-    }
-
-    private function normalizePercent($percent)
-    {
-        if ($percent === null) {
-            return null;
-        }
-
-        $percent = floatval($percent);
-
-        while ($percent > 100) {
-            $percent = $percent / 10;
-        }
-
-        return $percent;
     }
 }

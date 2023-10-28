@@ -328,7 +328,7 @@ function discover_storage(&$valid, $device, $index, $type, $mib, $descr, $size, 
     Log::debug("Discover Storage: $index, $type, $mib, $descr, $size, $units, $used\n");
 
     if ($descr && $size > '0') {
-        $storage = dbFetchRow('SELECT * FROM `storage` WHERE `storage_index` = ? AND `device_id` = ? AND `storage_mib` = ?', [$index, $device['device_id'], $mib]);
+        $storage = dbFetchRow('SELECT * FROM `storage` WHERE `storage_index` = ? AND `device_id` = ? AND `type` = ?', [$index, $device['device_id'], $mib]);
         if (empty($storage)) {
             if (Config::getOsSetting($device['os'], 'storage_perc_warn')) {
                 $perc_warn = Config::getOsSetting($device['os'], 'storage_perc_warn');
@@ -341,7 +341,7 @@ function discover_storage(&$valid, $device, $index, $type, $mib, $descr, $size, 
                     'device_id' => $device['device_id'],
                     'storage_descr' => $descr,
                     'storage_index' => $index,
-                    'storage_mib' => $mib,
+                    'type' => $mib,
                     'storage_type' => $type,
                     'storage_units' => $units,
                     'storage_size' => $size,
@@ -353,7 +353,7 @@ function discover_storage(&$valid, $device, $index, $type, $mib, $descr, $size, 
 
             echo '+';
         } else {
-            $updated = dbUpdate(['storage_descr' => $descr, 'storage_type' => $type, 'storage_units' => $units, 'storage_size' => $size], 'storage', '`device_id` = ? AND `storage_index` = ? AND `storage_mib` = ?', [$device['device_id'], $index, $mib]);
+            $updated = dbUpdate(['storage_descr' => $descr, 'storage_type' => $type, 'storage_units' => $units, 'storage_size' => $size], 'storage', '`device_id` = ? AND `storage_index` = ? AND `type` = ?', [$device['device_id'], $index, $mib]);
             if ($updated) {
                 echo 'U';
             } else {

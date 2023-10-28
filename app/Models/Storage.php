@@ -2,15 +2,18 @@
 
 namespace App\Models;
 
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Log;
+use LibreNMS\Exceptions\InsufficientDataException;
 use LibreNMS\Interfaces\Models\Keyable;
+use LibreNMS\Util\Number;
 
 class Storage extends DeviceRelatedModel implements Keyable
 {
     protected $table = 'storage';
     protected $primaryKey = 'storage_id';
+    public $timestamps = false;
     protected $fillable = [
-        'storage_mib',
+        'type',
         'storage_index',
         'storage_type',
         'storage_descr',
@@ -24,36 +27,49 @@ class Storage extends DeviceRelatedModel implements Keyable
         'storage_perc',
         'storage_perc_oid',
         'storage_perc_warn',
-        'storage_deleted',
     ];
 
     public function getCompositeKey()
     {
-        return "$this->storage_mib-$this->storage_index";
+        return "$this->type-$this->storage_index";
     }
 
-    public function isValid(string $os)
+    public function fillUsage($used = null, $total = null, $free = null, $percent = null): self
+    {
+        try {
+            [$this->storage_size, $this->storage_used, $this->storage_free, $this->storage_perc]
+                = Number::fillMissingRatio($total, $used, $free, $percent, 0, $this->storage_units);
+        } catch (InsufficientDataException $e) {
+            Log::debug($e->getMessage());
+
+            return $this; //
+        }
+
+        return $this;
+    }
+
+    public function isValid(string $os): bool
     {
         // filter by mounts ignores
-        foreach (\LibreNMS\Config::getCombined($os, 'ignore_mount', []) as $im) {
+        foreach (\LibreNMS\Config::getCombined($os, 'ignore_mount') as $im) {
             if ($im == $this->storage_descr) {
-                d_echo("ignored $this->storage_descr (matched: $im)\n");
+                Log::debug("ignored $this->storage_descr (matched: $im)\n");
 
                 return false;
             }
         }
 
-        foreach (\LibreNMS\Config::getCombined($os, 'ignore_mount_string', []) as $ims) {
-            if (Str::contains($this->storage_descr, $ims)) {
-                d_echo("ignored $this->storage_descr (matched: $ims)\n");
+        foreach (\LibreNMS\Config::getCombined($os, 'ignore_mount_string') as $ims) {
+            if (str_contains($this->storage_descr, $ims)) {
+                Log::debug("ignored $this->storage_descr (matched: $ims)\n");
 
                 return false;
             }
         }
 
-        foreach (\LibreNMS\Config::getCombined($os, 'ignore_mount_regexp', []) as $imr) {
+        foreach (\LibreNMS\Config::getCombined($os, 'ignore_mount_regexp') as $imr) {
             if (preg_match($imr, $this->storage_descr)) {
-                d_echo("ignored $this->storage_descr (matched: $imr)\n");
+                Log::debug("ignored $this->storage_descr (matched: $imr)\n");
 
                 return false;
             }
@@ -61,17 +77,17 @@ class Storage extends DeviceRelatedModel implements Keyable
 
         // filter by type
         if (\LibreNMS\Config::get('ignore_mount_removable', false) && $this->storage_type == 'hrStorageRemovableDisk') {
-            d_echo("skip(removable)\n");
+            Log::debug("skip(removable)\n");
             return false;
         }
 
         if (\LibreNMS\Config::get('ignore_mount_network', false) && $this->storage_type == 'hrStorageNetworkDisk') {
-            d_echo("skip(network)\n");
+            Log::debug("skip(network)\n");
             return false;
         }
 
         if (\LibreNMS\Config::get('ignore_mount_optical', false) && $this->storage_type == 'hrStorageCompactDisc') {
-            d_echo("skip(cd)\n");
+            Log::debug("skip(cd)\n");
             return false;
         }
 

@@ -213,15 +213,17 @@ trait HostResources
         })->map(function ($storage) {
             $units = $storage['hrStorageAllocationUnits'];
             $index = $storage['hrStorageIndex'];
-            return new Storage([
-                'storage_mib' => 'hrstorage',
+            return (new Storage([
+                'type' => 'hrstorage',
                 'storage_index' => $index,
                 'storage_type' => $storage['hrStorageType'],
                 'storage_descr' => $storage['hrStorageDescr'],
-                'storage_size' => Number::correctIntegerOverflow($storage['hrStorageSize']) * $units,
-                'storage_used' => Number::correctIntegerOverflow($storage['hrStorageUsed']) * $units,
+                'storage_used_oid' => ".1.3.6.1.2.1.25.2.3.1.6.$index",
                 'storage_units' => $units,
-            ]);
+            ]))->fillUsage(
+                Number::correctIntegerOverflow($storage['hrStorageUsed'] ?? null),
+                Number::correctIntegerOverflow($storage['hrStorageSize'] ?? null),
+            );
         });
     }
 
