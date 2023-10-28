@@ -30,6 +30,7 @@ use App\Models\Eventlog;
 use App\Polling\Measure\Measurement;
 use DeviceCache;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Enum\Severity;
@@ -82,6 +83,7 @@ class NetSnmpQuery implements SnmpQueryInterface
     private array|string $options = [self::DEFAULT_FLAGS];
     private Device $device;
     private bool $abort = false;
+    private bool $cache = false;
     // defaults for net-snmp https://net-snmp.sourceforge.io/docs/man/snmpcmd.html
     private array $mibs = ['SNMPv2-TC', 'SNMPv2-MIB', 'IF-MIB', 'IP-MIB', 'TCP-MIB', 'UDP-MIB', 'NET-SNMP-VACM-MIB'];
 
@@ -122,6 +124,13 @@ class NetSnmpQuery implements SnmpQueryInterface
         }
 
         $this->device = new Device($device);
+
+        return $this;
+    }
+
+    public function cache(): SnmpQueryInterface
+    {
+        $this->cache = true;
 
         return $this;
     }
@@ -197,6 +206,18 @@ class NetSnmpQuery implements SnmpQueryInterface
         $this->options = $numeric
             ? array_merge($this->options, ['-On'])
             : array_diff($this->options, ['-On']);
+
+        return $this;
+    }
+
+    /**
+     * Output all OIDs numerically
+     */
+    public function numericIndex(bool $numericIndex = true): SnmpQueryInterface
+    {
+        $this->options = $numericIndex
+            ? array_merge($this->options, ['-Ob'])
+            : array_diff($this->options, ['-Ob']);
 
         return $this;
     }
@@ -366,20 +387,23 @@ class NetSnmpQuery implements SnmpQueryInterface
 
     private function execMultiple(string $command, array $oids): SnmpResponse
     {
-        $response = new SnmpResponse('');
+        // use runtime(array) cache if requested. The 'null' driver will simple return the value without caching
+        return Cache::driver($this->cache ? 'array' : 'null')->rememberForever($this->getCacheKey($oids), function () use ($command, $oids) {
+            $response = new SnmpResponse('');
 
-        foreach ($oids as $oid) {
-            $response = $response->append($this->exec($command, Arr::wrap($oid)));
+            foreach ($oids as $oid) {
+                $response = $response->append($this->exec($command, Arr::wrap($oid)));
 
-            // if abort on failure is set, return after first failure
-            if ($this->abort && ! $response->isValid()) {
-                Log::debug("SNMP failed walking $oid of " . implode(',', $oids) . ' aborting.');
+                // if abort on failure is set, return after first failure
+                if ($this->abort && ! $response->isValid()) {
+                    Log::debug("SNMP failed walking $oid of " . implode(',', $oids) . ' aborting.');
 
-                return $response;
+                    return $response;
+                }
             }
-        }
 
-        return $response;
+            return $response;
+        });
     }
 
     private function exec(string $command, array $oids): SnmpResponse
@@ -512,5 +536,13 @@ class NetSnmpQuery implements SnmpQueryInterface
     private function parseOid(array|string $oid): array
     {
         return is_string($oid) ? explode(' ', $oid) : $oid;
+    }
+
+    private function getCacheKey(array $oids): string
+    {
+        $oids = implode(',', array_map(fn($group) => implode(',', $group), $oids));
+        $options = implode(',', $this->options);
+
+        return "{$this->device->hostname}|$this->context|$oids|$options";
     }
 }
