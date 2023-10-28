@@ -387,8 +387,11 @@ class NetSnmpQuery implements SnmpQueryInterface
 
     private function execMultiple(string $command, array $oids): SnmpResponse
     {
-        // use runtime(array) cache if requested. The 'null' driver will simple return the value without caching
-        return Cache::driver($this->cache ? 'array' : 'null')->rememberForever($this->getCacheKey($oids), function () use ($command, $oids) {
+        // use runtime(array) cache if requested. The 'null' driver will simply return the value without caching
+        $driver = $this->cache ? 'array' : 'null';
+        $key = $this->cache ? $this->getCacheKey($command, $oids) : '';
+
+        return Cache::driver($driver)->rememberForever($key, function () use ($command, $oids) {
             $response = new SnmpResponse('');
 
             foreach ($oids as $oid) {
@@ -538,11 +541,11 @@ class NetSnmpQuery implements SnmpQueryInterface
         return is_string($oid) ? explode(' ', $oid) : $oid;
     }
 
-    private function getCacheKey(array $oids): string
+    private function getCacheKey(string $type, array $oids): string
     {
         $oids = implode(',', array_map(fn ($group) => implode(',', $group), $oids));
         $options = implode(',', $this->options);
 
-        return "{$this->device->hostname}|$this->context|$oids|$options";
+        return "$type|{$this->device->hostname}|$this->context|$oids|$options";
     }
 }
