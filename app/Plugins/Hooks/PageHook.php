@@ -26,12 +26,12 @@
 namespace App\Plugins\Hooks;
 
 use App\Models\User;
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\Str;
 
 abstract class PageHook
 {
-    /** @var string */
-    public $view = 'resources.views.page';
+    public string $view = 'resources.views.page';
 
     public function authorize(User $user): bool
     {
@@ -40,14 +40,15 @@ abstract class PageHook
 
     public function data(): array
     {
-        return [
-        ];
+        return [];
     }
 
-    final public function handle(string $pluginName): array
+    final public function handle(string $pluginName, array $settings, Application $app): array
     {
         return array_merge([
             'settings_view' => Str::start($this->view, "$pluginName::"),
-        ], $this->data());
+        ], $app->call([$this, 'data'], [
+            'settings' => $settings,
+        ]));
     }
 }
