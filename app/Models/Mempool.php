@@ -53,7 +53,7 @@ class Mempool extends DeviceRelatedModel implements Keyable
     public function fillUsage($used = null, $total = null, $free = null, $percent = null): self
     {
         try {
-            [$this->mempol_total, $this->mempool_used, $this->mempool_free, $this->mempool_perc]
+            [$this->mempool_total, $this->mempool_used, $this->mempool_free, $this->mempool_perc]
                 = Number::fillMissingRatio($total, $used, $free, $percent, 0, $this->mempool_precision);
         } catch (InsufficientDataException $e) {
             Log::debug($e->getMessage());

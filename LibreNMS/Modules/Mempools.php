@@ -62,7 +62,7 @@ class Mempools implements Module
             if ($mempool->isValid()) {
                 return true;
             }
-            Log::debug("Rejecting Mempool $mempool->mempool_index $mempool->mempool_descr: Invalid total value");
+            Log::debug("Rejecting Mempool $mempool->mempool_index $mempool->mempool_descr: Invalid total value $mempool->mempool_total");
 
             return false;
         });
@@ -71,9 +71,8 @@ class Mempools implements Module
         MempoolObserver::observe(\App\Models\Mempool::class);
         $this->syncModels($os->getDevice(), 'mempools', $mempools);
 
-        $mempools->each(function ($mempool) {
-            $this->printMempool($mempool);
-        });
+        Log::info('');
+        $mempools->each($this->printMempool(...));
     }
 
     public function shouldPoll(OS $os, ModuleStatus $status): bool
@@ -225,7 +224,7 @@ class Mempools implements Module
         if ($mempool->mempool_total != 100) {
             $used = Number::formatBi($mempool->mempool_used);
             $total = Number::formatBi($mempool->mempool_total);
-            $status .= "  {$used} / {$total}";
+            $status .= "  $used / $total";
         }
         Log::info($status);
     }

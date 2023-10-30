@@ -162,13 +162,13 @@ trait HostResources
 
     public function discoverMempools()
     {
-        $hr_storage = $this->getCacheTable('hrStorageTable', 'HOST-RESOURCES-MIB:HOST-RESOURCES-TYPES');
+        $hr_storage = \SnmpQuery::cache()->hideMib()->mibs(['HOST-RESOURCES-TYPES'])->walk('HOST-RESOURCES-MIB::hrStorageTable')->table(1);
 
         if (! is_array($hr_storage)) {
             return new Collection;
         }
 
-        $ram_bytes = snmp_get($this->getDeviceArray(), 'hrMemorySize.0', '-OQUv', 'HOST-RESOURCES-MIB') * 1024
+        $ram_bytes = \SnmpQuery::get('HOST-RESOURCES-MIB::hrMemorySize.0')->value() * 1024
             ?: (isset($hr_storage[1]['hrStorageSize']) ? $hr_storage[1]['hrStorageSize'] * $hr_storage[1]['hrStorageAllocationUnits'] : 0);
 
         return collect($hr_storage)->filter(Closure::fromCallable([$this, 'memValid']))
@@ -197,7 +197,7 @@ trait HostResources
 
     public function discoverStorage(): Collection
     {
-        $hr_storage = $this->getCacheTable('hrStorageTable', 'HOST-RESOURCES-MIB:HOST-RESOURCES-TYPES');
+        $hr_storage = \SnmpQuery::cache()->hideMib()->mibs(['HOST-RESOURCES-TYPES'])->walk('HOST-RESOURCES-MIB::hrStorageTable')->table(1);
 
         if (! is_array($hr_storage)) {
             return new Collection;

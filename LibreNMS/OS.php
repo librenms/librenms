@@ -55,6 +55,7 @@ use LibreNMS\OS\Traits\NetstatsPolling;
 use LibreNMS\OS\Traits\UcdResources;
 use LibreNMS\OS\Traits\YamlMempoolsDiscovery;
 use LibreNMS\OS\Traits\YamlOSDiscovery;
+use LibreNMS\OS\Traits\YamlStorageDiscovery;
 use LibreNMS\Util\StringHelpers;
 
 class OS implements
@@ -354,10 +355,10 @@ class OS implements
     public function discoverStorage(): Collection
     {
         if ($this->hasYamlDiscovery('storage')) {
-            return $this->discoverYamlMempools();
+            return $this->discoverYamlStorage();
         }
 
-        return $this->discoverHrMempools();
+        return $this->discoverHrStorage();
     }
 
     public function getDiscovery($module = null)

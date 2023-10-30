@@ -37,6 +37,7 @@ use LibreNMS\Interfaces\Polling\StoragePolling;
 use LibreNMS\OS;
 use LibreNMS\Polling\ModuleStatus;
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Util\Number;
 
 class Storage implements Module
 {
@@ -62,6 +63,9 @@ class Storage implements Module
 
             ModuleModelObserver::observe(\App\Models\Storage::class);
             $this->syncModels($os->getDevice(), 'storage', $data);
+
+            Log::info('');
+            $data->each($this->printStorage(...));
         }
     }
 
@@ -89,7 +93,7 @@ class Storage implements Module
         }
 
         foreach ($storages as $storage) {
-            Log::info("$storage->storage_descr: $storage->storage_perc%");
+            $this->printStorage($storage);
 
             $datastore->put($os->getDeviceArray(), 'storage', [
                 'type' => $storage->type,
@@ -137,5 +141,16 @@ class Storage implements Module
                 ->orderBy('storage_index')->orderBy('storage_type')
                 ->get()->map->makeHidden(['device_id', 'storage_id']),
         ];
+    }
+
+    private function printStorage(\App\Models\Storage $storage): void
+    {
+        $message = "$storage->storage_descr: $storage->storage_perc%";
+        if ($storage->storage_size != 100) {
+            $used = Number::formatBi($storage->storage_used);
+            $total = Number::formatBi($storage->storage_size);
+            $message .= "  $used / $total";
+        }
+        Log::info($message);
     }
 }
