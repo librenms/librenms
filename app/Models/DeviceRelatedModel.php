@@ -42,11 +42,10 @@ class DeviceRelatedModel extends BaseModel
         // Build the comma-separated list of device IDs in SQL
         $deviceIdsSubquery = \DB::table('device_group_device')
         ->where('device_group_id', $deviceGroup)
-        ->pluck('device_id')
-        ->implode(',');
+        ->pluck('device_id');
 
         // Use the result in the whereIn clause
-        return $query->whereIn($query->qualifyColumn('device_id'), explode(',', $deviceIdsSubquery));
+        return $query->whereIn($query->qualifyColumn('device_id'), $deviceIdsSubquery);
     }
 
     // ---- Define Relationships ----
