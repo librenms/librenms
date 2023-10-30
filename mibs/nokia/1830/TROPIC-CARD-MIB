@@ -1,0 +1,1458 @@
+TROPIC-CARD-MIB DEFINITIONS ::= BEGIN
+
+-- (c) Copyright 2023 Nokia Networks.  All rights reserved.
+-- This software is the confidential and proprietary property of
+-- Nokia and may only be used in accordance with the terms of the
+-- license agreement provided with this software.
+
+IMPORTS
+      SnmpAdminString                         FROM SNMP-FRAMEWORK-MIB
+      OBJECT-TYPE, MODULE-IDENTITY,
+      Unsigned32, Integer32                   FROM SNMPv2-SMI
+      MODULE-COMPLIANCE, OBJECT-GROUP         FROM SNMPv2-CONF
+      TEXTUAL-CONVENTION,
+      TruthValue, MacAddress                  FROM SNMPv2-TC
+      TropicCardCLEI,
+      TropicCardHFD,
+      TropicCardSerialNumber,
+      TropicCardManufacturingPartNumber,
+      TropicCardMarketingPartNumber,
+      TropicCardSWGenericLoadName,
+      TropicLEDColorType,
+      TropicLEDStateType,
+      AluWdmCardCapacity,
+      AluWdmWtClkValues                       FROM TROPIC-TC
+      tnShelfIndex                            FROM TROPIC-SHELF-MIB
+      tnSlotIndex                             FROM TROPIC-SLOT-MIB
+      tnCardModules, tnCardMIB                FROM TROPIC-GLOBAL-REG
+      InterfaceIndexOrZero                    FROM IF-MIB;
+
+  tnCardMibModule MODULE-IDENTITY
+      LAST-UPDATED    "202208121200Z"
+      ORGANIZATION    "Nokia"
+      CONTACT-INFO    "Nokia
+                       Attn: Jeff Donnelly
+                       600 Mountain Avenue
+                       New Providence, NJ 07974
+
+                       Phone: +1 732 221 6408
+                       Email: jeff.donnelly@nokia.com"
+
+      DESCRIPTION "The card MIB."
+
+      REVISION    "202208121200Z"
+      DESCRIPTION "Added the following to tnCardTable:
+                   tnCardUDCChanType
+                   tnCardUDCStatus."
+
+      REVISION    "202205061200Z"
+      DESCRIPTION "Added the following to tnCardTable:
+                   tnCardPassThroughBandwidthUsage."
+
+      REVISION    "202106181200Z"
+      DESCRIPTION "Added the following to tnCardTable:
+                   tnCardTargetAddPortInputPower."
+
+      REVISION    "202103191200Z"
+      DESCRIPTION "Added the following table:
+                   tnCardPrbsTestIdTable."
+
+      REVISION    "202012181200Z"
+      DESCRIPTION "Added the following to tnCardModuleCfg:
+                   twelvePlugs(6)
+                   ninePlugs(7)."
+
+      REVISION    "202012041200Z"
+      DESCRIPTION "Added the following to tnCardTable:
+                   tnCardMgracd."
+
+      REVISION    "202011131200Z"
+      DESCRIPTION "Added the following to tnCardTable:
+                   tnCardSapLoopbackMacAddr."
+
+      REVISION    "202009111200Z"
+      DESCRIPTION "Added the following to tnCardTable:
+                   tnCardLOLCKDetectionEnable."
+
+      REVISION    "202006191200Z"
+      DESCRIPTION "Added the following to tnCardModuleCfg:
+                   thirtyPlugs(5)."
+
+      REVISION    "202006121200Z"
+      DESCRIPTION "Added the following to tnCardModuleCfg:
+                   elplugs(4)."
+
+      REVISION    "202003201200Z"
+      DESCRIPTION "Added the following to tnCardTable:
+                   tnCardAseMode
+                   tnCardAddPowerMode."
+
+      REVISION    "202002211200Z"
+      DESCRIPTION "Added the following to tnCardTable:
+                   tnCardShutdownCmd
+                   tnCardCpuTemperature
+                   tnCardMainDeviceTemperature."
+
+      REVISION    "202002141200Z"
+      DESCRIPTION "Added the following to tnCardTable:
+                   tnCardClkSelectedValue."
+
+      REVISION    "201912131200Z"
+      DESCRIPTION "Added the following to tnCardTable:
+                   tnCardSlotClkStatus."
+
+      REVISION    "201910251200Z"
+      DESCRIPTION "Changed SYNTAX of the following from Unsigned32 to Integer32:
+                   tnCardPower."
+
+      REVISION    "201910181200Z"
+      DESCRIPTION "1) Added the following textual convention:
+                      NokiaOAMTestUnitType.
+                   2) Added the following to tnCardTable:
+                      tnCardOAMTestUnit."
+
+      REVISION    "201908301200Z"
+      DESCRIPTION "Added the following to tnCardTable:
+                   tnCardVirtual."
+
+      REVISION    "201907121200Z"
+      DESCRIPTION "Added the following to tnCardTable:
+                   tnCardInitConfProfile."
+
+      REVISION    "201906071200Z"
+      DESCRIPTION "Added the following to tnCardTable:
+                   tnCardLineMode."
+
+      REVISION    "201903221200Z"
+      DESCRIPTION "Added the following to tnCardTable:
+                   tnCardLicenseRestricted."
+
+      REVISION    "201902221200Z"
+      DESCRIPTION "Added the following to tnCardTable:
+                   tnCardModuleCfg."
+
+      REVISION    "201901251200Z"
+      DESCRIPTION "Added the following to tnCardTable:
+                   tnCardTransportModeOSC."
+
+      REVISION    "201805181200Z"
+      DESCRIPTION "Added the following to tnCardTable:
+                   tnCardTotalRam."
+
+      REVISION    "201803091200Z"
+      DESCRIPTION "Added the following to tnCardHeight:
+                   extendedHeight(4)."
+
+      REVISION    "201802231200Z"
+      DESCRIPTION "Updated the contact info."
+
+      REVISION    "201712261200Z"
+      DESCRIPTION "Added the following table:
+                   tnCardDbSyncTable."
+
+      REVISION    "201709151200Z"
+      DESCRIPTION "Added the following to tnCardTable:
+                   tnCardIntWrkMode."
+
+      REVISION    "201705261200Z"
+      DESCRIPTION "Added the following to tnCardTable:
+                   tnCardL1andL2Decoupled."
+
+      REVISION    "201704281200Z"
+      DESCRIPTION "Added the following to tnCardTable:
+                   tnCardAmbientTemp
+                   tnCardRpmRead."
+
+      REVISION    "201703311200Z"
+      DESCRIPTION "Added the following to tnCardTable:
+                   tnCardTestHdNoServPort."
+
+      REVISION    "201702241200Z"
+      DESCRIPTION "Added the following to tnCardTable:
+                   tnCardDNRLEDColor."
+
+      REVISION    "201702101200Z"
+      DESCRIPTION "Added the following to tnCardTable:
+                   tnCardMirrorLoopbackNoServPort."
+
+      REVISION    "201611161200Z"
+      DESCRIPTION "Updated the contact info."
+
+      REVISION    "201609091200Z"
+      DESCRIPTION "Added the following to tnCardTable:
+                   tnCardLicenseCap1Val
+                   tnCardLicenseCap2Val
+                   tnCardLicenseTimeStamp
+                   tnCardLicenseRmaKey."
+
+      REVISION    "201608081200Z"
+      DESCRIPTION "Added the following to tnCardTable:
+                   tnCardLicenseAction."
+
+      REVISION    "201607291200Z"
+      DESCRIPTION "Added the following to tnCardTable:
+                   tnCardLicenseData."
+
+      REVISION    "201510051200Z"
+      DESCRIPTION "Added the following to tnCardTable:
+                   tnCardAlmProfEnvName."
+
+      REVISION    "201509301200Z"
+      DESCRIPTION "Added the following to tnCardTable:
+                   tnCardAlmProfName."
+
+      REVISION    "201507301200Z"
+      DESCRIPTION "Added the following to tnCardTable:
+                   tnCardLoopbackNoServPort."
+
+      REVISION    "201505291200Z"
+      DESCRIPTION "Added unassigned(0) mode to tnCardUplinkAdminMode MIB.
+                   and updated the DEFVAL to unassigned"
+
+      REVISION    "201503111200Z"
+      DESCRIPTION "Added the following to tnCardTable:
+                   tnCardUplinkAdminMode."
+
+      REVISION    "201502061200Z"
+      DESCRIPTION "Added the following to tnCardTable:
+                   tnCardPower
+                   tnCardCurrent."
+
+      REVISION    "201402261200Z"
+      DESCRIPTION "Added DEFVAL to attributes."
+
+      REVISION    "201312261200Z"
+      DESCRIPTION "Added the following to tnCardTable:
+                   tnCardWtClkMeasureValues."
+
+      REVISION    "201312151200Z"
+      DESCRIPTION "Added the following to tnCardTable:
+                   tnCardClkSwitch
+                   tnCardRtrvClkSwitch."
+
+      REVISION    "201311181200Z"
+      DESCRIPTION "Marked the following as obsolete:
+                   tnCardOverride."
+
+      REVISION    "201308161200Z"
+      DESCRIPTION "Added the following to tnCardTable:
+                   tnCardEthOamCcmFaultMgntMode."
+
+      REVISION    "201305211200Z"
+      DESCRIPTION "Marked the following as obsolete:
+                   tnCardEvents."
+
+      REVISION    "201209061200Z"
+      DESCRIPTION "Marked the following as obsolete:
+                   tnCardFPGATable."
+
+      REVISION    "201207171200Z"
+      DESCRIPTION "Added the following to tnCardTable:
+                   tnCardMaxPower."
+
+      REVISION    "201207101200Z"
+      DESCRIPTION "Added the following to tnCardTable:
+                   tnCardLACPSystemPriority."
+
+      REVISION    "201105231200Z"
+      DESCRIPTION "Added DEFVAL for the following attribute:
+                   tnCardTemperatureTolerance, 0."
+
+      REVISION    "201105191200Z"
+      DESCRIPTION "Added the following to tnCardTable:
+                   tnCardCapacity."
+
+      REVISION    "200903311200Z"
+      DESCRIPTION "Added the following to tnCardWidth:
+                   tripleWidth(4)."
+
+      REVISION    "200902101200Z"
+      DESCRIPTION "Removed tnCardFunction."
+
+      REVISION    "200902011200Z"
+      DESCRIPTION "Added tnCardFunction."
+
+      REVISION    "200809261200Z"
+      DESCRIPTION "Updated high temperature from 85 to 90."
+
+      REVISION    "200809241200Z"
+      DESCRIPTION "Added tnCardFactoryID."
+
+      REVISION    "200809191200Z"
+      DESCRIPTION "Corrected the temperature threshold configurable range."
+
+      REVISION    "200806051200Z"
+      DESCRIPTION "Added the FPGA content."
+
+      REVISION    "200805291200Z"
+      DESCRIPTION "Updated the LED attribute applicability for the 1830
+                   PSS-32."
+
+      REVISION    "200804111200Z"
+      DESCRIPTION "1) Updated the MIB file description.
+                   2) Added remote inventory attributes to tnCardTable
+                      (they exist in the slot table as well)."
+
+      ::= { tnCardModules 1 }
+
+  tnCardConf             OBJECT IDENTIFIER ::= { tnCardMIB 1 }
+  tnCardGroups           OBJECT IDENTIFIER ::= { tnCardConf 1 }
+  tnCardCompliances      OBJECT IDENTIFIER ::= { tnCardConf 2 }
+  tnCardObjs             OBJECT IDENTIFIER ::= { tnCardMIB 2 }
+  tnCardBasics           OBJECT IDENTIFIER ::= { tnCardObjs 1 }
+--  obsolete
+--  tnCardEvents           OBJECT IDENTIFIER ::= { tnCardMIB 3 }
+
+--------------------------------------------------------------------------------
+-- Type Definitions
+--------------------------------------------------------------------------------
+    NokiaOAMTestUnitType ::= TEXTUAL-CONVENTION
+        STATUS         current
+        DESCRIPTION    "OAM Test unit type."
+        SYNTAX         INTEGER {
+                         microseconds(1),
+                         hundred-nano-seconds(2),
+                         nano-seconds(3)
+                       }
+
+--------------------------------------------------------------------------------
+-- Object Definitions
+--------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------
+-- Generic Card Scalars
+--------------------------------------------------------------------------------
+    tnCardTotal OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The total number of card records allocated on
+                        a 1696R/1830 NE."
+        ::= { tnCardBasics 1 }
+
+--------------------------------------------------------------------------------
+-- Generic Card Table
+--------------------------------------------------------------------------------
+    tnCardTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnCardEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnCardBasics 2 }
+
+    tnCardEntry OBJECT-TYPE
+        SYNTAX         TnCardEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { tnShelfIndex,
+                tnSlotIndex }
+        ::= { tnCardTable 1 }
+
+    TnCardEntry ::= SEQUENCE {
+        tnCardName                         SnmpAdminString,
+        tnCardDescr                        SnmpAdminString,
+        tnCardCLEI                         TropicCardCLEI,
+        tnCardHFD                          TropicCardHFD,
+        tnCardSerialNumber                 TropicCardSerialNumber,
+        tnCardManufacturingPartNumber      TropicCardManufacturingPartNumber,
+        tnCardMarketingPartNumber          TropicCardMarketingPartNumber,
+        tnCardSWGenericLoadName            TropicCardSWGenericLoadName,
+--        obsolete
+--        tnCardReset                        TropicResetType,
+        tnCardHeight                       INTEGER,
+        tnCardWidth                        INTEGER,
+--        obsolete
+--        tnCardResetReason                  INTEGER,
+        tnCardTemperature                  Integer32,
+        tnCardHighTemperatureThresh        Integer32,
+        tnCardLowTemperatureThresh         Integer32,
+        tnCardTemperatureTolerance         Unsigned32,
+        tnCardStatusLEDColor               TropicLEDColorType,
+        tnCardStatusLEDState               TropicLEDStateType,
+        tnCardActivityLEDColor             TropicLEDColorType,
+        tnCardActivityLEDState             TropicLEDStateType,
+        tnCardCompanyID                    SnmpAdminString,
+        tnCardMnemonic                     SnmpAdminString,
+        tnCardSWPartNum                    SnmpAdminString,
+        tnCardDate                         SnmpAdminString,
+        tnCardExtraData                    SnmpAdminString,
+--        obsolete
+--        tnCardOverride                     TruthValue,
+        tnCardAnyPortsInService            TruthValue,
+        tnCardLastBootedFwBundleVer        SnmpAdminString,
+        tnCardNextFwBundleVer              SnmpAdminString,
+        tnCardFactoryID                    SnmpAdminString,
+        tnCardCapacity                     AluWdmCardCapacity,
+        tnCardLACPSystemPriority           Unsigned32,
+        tnCardMaxPower                     Unsigned32,
+        tnCardEthOamCcmFaultMgntMode       INTEGER,
+        tnCardClkSwitch                    AluWdmWtClkValues,
+        tnCardRtrvClkSwitch                AluWdmWtClkValues,
+        tnCardWtClkMeasureValues           OCTET STRING,
+        tnCardPower                        Integer32,
+        tnCardCurrent                      Unsigned32,
+        tnCardUplinkAdminMode              INTEGER,
+        tnCardLoopbackNoServPort           InterfaceIndexOrZero,
+        tnCardAlmProfName                  OCTET STRING,
+        tnCardAlmProfEnvName               OCTET STRING,
+        tnCardLicenseData                  SnmpAdminString,
+        tnCardLicenseAction                INTEGER,
+        tnCardLicenseCap1Val               Unsigned32,
+        tnCardLicenseCap2Val               Unsigned32,
+        tnCardLicenseTimeStamp             Unsigned32,
+        tnCardLicenseRmaKey                SnmpAdminString,
+        tnCardMirrorLoopbackNoServPort     InterfaceIndexOrZero,
+        tnCardDNRLEDColor                  INTEGER,
+        tnCardTestHdNoServPort             InterfaceIndexOrZero,
+        tnCardAmbientTemp                  Integer32,
+        tnCardRpmRead                      Integer32,
+        tnCardL1andL2Decoupled             TruthValue,
+        tnCardIntWrkMode                   INTEGER,
+        tnCardTotalRam                     Unsigned32,
+        tnCardTransportModeOSC             INTEGER,
+        tnCardModuleCfg                    INTEGER,
+        tnCardLicenseRestricted            TruthValue,
+        tnCardLineMode                     INTEGER,
+        tnCardInitConfProfile              Unsigned32,
+        tnCardVirtual                      TruthValue,
+        tnCardOAMTestUnit                  NokiaOAMTestUnitType,
+        tnCardSlotClkStatus                INTEGER,
+        tnCardClkSelectedValue             INTEGER,
+        tnCardShutdownCmd                  INTEGER,
+        tnCardCpuTemperature               Integer32,
+        tnCardMainDeviceTemperature        Integer32,
+        tnCardAseMode                      INTEGER,
+        tnCardAddPowerMode                 INTEGER,
+        tnCardLOLCKDetectionEnable         TruthValue,
+        tnCardSapLoopbackMacAddr           MacAddress,
+        tnCardMgracd                       INTEGER,
+        tnCardTargetAddPortInputPower      Integer32,
+        tnCardPassThroughBandwidthUsage    Integer32,
+        tnCardUDCChanType                  INTEGER,
+        tnCardUDCStatus                    INTEGER
+    }
+
+    tnCardName OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..31))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { "" }
+        ::= { tnCardEntry 1 }
+
+    tnCardDescr OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..255))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { "" }
+        ::= { tnCardEntry 2 }
+
+    tnCardCLEI OBJECT-TYPE
+        SYNTAX         TropicCardCLEI
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { "" }
+        ::= { tnCardEntry 3 }
+
+    tnCardHFD OBJECT-TYPE
+        SYNTAX         TropicCardHFD
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { "" }
+        ::= { tnCardEntry 4 }
+
+    tnCardSerialNumber OBJECT-TYPE
+        SYNTAX         TropicCardSerialNumber
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { "" }
+        ::= { tnCardEntry 5 }
+
+    tnCardManufacturingPartNumber OBJECT-TYPE
+        SYNTAX         TropicCardManufacturingPartNumber
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { "" }
+        ::= { tnCardEntry 6 }
+
+    tnCardMarketingPartNumber OBJECT-TYPE
+        SYNTAX         TropicCardMarketingPartNumber
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { "" }
+        ::= { tnCardEntry 7 }
+
+    tnCardSWGenericLoadName OBJECT-TYPE
+        SYNTAX         TropicCardSWGenericLoadName
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The SW generic load currently active."
+        DEFVAL         { "" }
+        ::= { tnCardEntry 8 }
+
+--    obsolete
+--    tnCardReset OBJECT-TYPE ::= { tnCardEntry 9 }
+
+    tnCardHeight OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         unknown(1),
+                         halfHeight(2),
+                         fullHeight(3),
+                         extendedHeight(4)
+                       }
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnCardEntry 10 }
+
+    tnCardWidth OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         unknown(1),
+                         singleWidth(2),
+                         doubleWidth(3),
+                         tripleWidth(4)
+                       }
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnCardEntry 11 }
+
+--    obsolete
+--    tnCardResetReason OBJECT-TYPE ::= { tnCardEntry 12 }
+
+    tnCardTemperature OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "Celsius"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The current temperature of the card."
+        ::= { tnCardEntry 13 }
+
+    tnCardHighTemperatureThresh OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "Celsius"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The high temperature threshold of the card.
+
+                        Current configurable range:
+                        1696R:  -5 to 60
+                        1830:   -5 to 90."
+        DEFVAL         { 90 }
+        ::= { tnCardEntry 14 }
+
+    tnCardLowTemperatureThresh OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "Celsius"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The low temperature threshold of the card.
+
+                        Current configurable range:
+                        1696R:   -5 to 60
+                        1830:   -45 to 90."
+        DEFVAL         { -5 }
+        ::= { tnCardEntry 15 }
+
+    tnCardTemperatureTolerance OBJECT-TYPE
+        SYNTAX         Unsigned32
+        UNITS          "Celsius"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The temperature tolerance of the card, applied
+                        to the card's high and low temperature thresholds.
+
+                        Current configurable range: 0 to 10."
+        DEFVAL         { 3 }
+        ::= { tnCardEntry 16 }
+
+    tnCardStatusLEDColor OBJECT-TYPE
+        SYNTAX         TropicLEDColorType
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The color of the status LED.
+                        For the 1830 PSS-32, not applicable to the DCM
+                        and SFD cards."
+        ::= { tnCardEntry 17 }
+
+    tnCardStatusLEDState OBJECT-TYPE
+        SYNTAX         TropicLEDStateType
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The state of the status LED.
+                        For the 1830 PSS-32, not applicable to the DCM
+                        and SFD cards."
+        ::= { tnCardEntry 18 }
+
+    tnCardActivityLEDColor OBJECT-TYPE
+        SYNTAX         TropicLEDColorType
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The color of the activity LED.
+                        For the 1830 PSS-32, only applicable to the EC
+                        card."
+        ::= { tnCardEntry 19 }
+
+    tnCardActivityLEDState OBJECT-TYPE
+        SYNTAX         TropicLEDStateType
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The state of the activity LED.
+                        For the 1830 PSS-32, only applicable to the EC
+                        card."
+        ::= { tnCardEntry 20 }
+
+    tnCardCompanyID OBJECT-TYPE
+        SYNTAX         SnmpAdminString
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { "" }
+        ::= { tnCardEntry 21 }
+
+    tnCardMnemonic OBJECT-TYPE
+        SYNTAX         SnmpAdminString
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { "" }
+        ::= { tnCardEntry 22 }
+
+    tnCardSWPartNum OBJECT-TYPE
+        SYNTAX         SnmpAdminString
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { "" }
+        ::= { tnCardEntry 23 }
+
+    tnCardDate OBJECT-TYPE
+        SYNTAX         SnmpAdminString
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { "" }
+        ::= { tnCardEntry 24 }
+
+    tnCardExtraData OBJECT-TYPE
+        SYNTAX         SnmpAdminString
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { "" }
+        ::= { tnCardEntry 25 }
+
+--    obsolete
+--    tnCardOverride OBJECT-TYPE ::= { tnCardEntry 26 }
+
+    tnCardAnyPortsInService OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnCardEntry 27 }
+
+    tnCardLastBootedFwBundleVer OBJECT-TYPE
+        SYNTAX         SnmpAdminString
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { "" }
+        ::= { tnCardEntry 28 }
+
+    tnCardNextFwBundleVer OBJECT-TYPE
+        SYNTAX         SnmpAdminString
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { "" }
+        ::= { tnCardEntry 29 }
+
+    tnCardFactoryID OBJECT-TYPE
+        SYNTAX         SnmpAdminString
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { "" }
+        ::= { tnCardEntry 30 }
+
+    tnCardCapacity OBJECT-TYPE
+        SYNTAX         AluWdmCardCapacity
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The capacity of the storage medium in the slot."
+        DEFVAL         { unknownCapacity }
+        ::= { tnCardEntry 31 }
+
+    tnCardLACPSystemPriority OBJECT-TYPE
+        SYNTAX         Unsigned32 (1..65535)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "tnCardLACPSystemPriority is the Link Aggregation
+                        Control Protocol (LACP) system priority which is
+                        combined with the system MAC address to make up
+                        a unique system ID that is used by LACP in
+                        communications with LACP peer systems on Link
+                        Aggregation (LAG) ports."
+        DEFVAL         { 32768 }
+        ::= { tnCardEntry 32 }
+
+    tnCardMaxPower OBJECT-TYPE
+        SYNTAX         Unsigned32
+        UNITS          "milli-Watts"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "P sub 0, P sub 50 and P sub 100 (percent
+                        utilization of transmission function) provided
+                        for ATIS TEER calculation.  These measurements
+                        are to be made under the conditions provided in
+                        ATIS-0600015-2009:
+
+                        Temperature:  25 deg C +/- 3 deg C (77 deg F +/- 5 deg F)
+                        Humidity:  Relative humidity between 30% and 75%
+                        Barometric Pressure:  Between 1020 and 812 mbar.
+
+                        Current range: 0 to 1,000,000."
+        ::= { tnCardEntry 33 }
+
+    tnCardEthOamCcmFaultMgntMode OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         ieee(1),
+                         itu(2)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The Ethernet OAM fault management compliancy of the card.
+
+                        Current configurable modes:
+                        ieee:  IEEE 802.1ag compliant
+                        itu:   ITU-T G.8021 compliant."
+        DEFVAL         { ieee }
+        ::= { tnCardEntry 34 }
+
+    tnCardClkSwitch OBJECT-TYPE
+        SYNTAX         AluWdmWtClkValues
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Clock Switch on pack level."
+        DEFVAL         { wtClkAuto }
+        ::= { tnCardEntry 35 }
+
+    tnCardRtrvClkSwitch OBJECT-TYPE
+        SYNTAX         AluWdmWtClkValues
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Retrieve Clock Selection on pack level."
+        ::= { tnCardEntry 36 }
+
+    tnCardWtClkMeasureValues OBJECT-TYPE
+        SYNTAX         OCTET STRING (SIZE(0..100))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Retrieve PF Wt clock measurements."
+        DEFVAL         { "" }
+        ::= { tnCardEntry 37 }
+
+    tnCardPower OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "milli-Watts"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The monitored card power consumption value"
+        ::= { tnCardEntry 38 }
+
+    tnCardCurrent OBJECT-TYPE
+        SYNTAX         Unsigned32
+        UNITS          "milli-Amperes"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The monitored card current value"
+        ::= { tnCardEntry 39 }
+
+    tnCardUplinkAdminMode OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         unassigned(0),
+                         network(1),
+                         accessUplink(2)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Each card can be configured in one of two administrative
+                        modes. In network mode the system uses MPLS-TP to
+                        provide service transport, and in access-uplink mode the
+                        system uses Ethernet QinQ (802.1ad) switching.
+
+                        NOTE: to change the administrative mode, the mode must
+                        be unassigned. To set the mode to unassigned, the slot
+                        must first be set to empty then back to the previously
+                        configure pack type. "
+
+        DEFVAL         { unassigned }
+        ::= { tnCardEntry 40 }
+
+    tnCardLoopbackNoServPort OBJECT-TYPE
+        SYNTAX         InterfaceIndexOrZero
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Second loopback port used for internal sap creation,
+                        which is needed for Mac address swapping.
+                        0 indicates the port is undefined."
+        DEFVAL         { 0 }
+        ::= { tnCardEntry 41 }
+
+    tnCardAlmProfName OBJECT-TYPE
+        SYNTAX         OCTET STRING (SIZE(1..40))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnCardEntry 42 }
+
+    tnCardAlmProfEnvName OBJECT-TYPE
+        SYNTAX         OCTET STRING (SIZE(1..40))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnCardEntry 43 }
+
+    tnCardLicenseData OBJECT-TYPE
+        SYNTAX         SnmpAdminString
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "License key applied to card"
+        DEFVAL         { "" }
+        ::= { tnCardEntry 44 }
+
+    tnCardLicenseAction OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         unknown(1),
+                         apply(2),
+                         delete(3)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "License Action mode"
+        DEFVAL         { unknown }
+        ::= { tnCardEntry 45 }
+
+    tnCardLicenseCap1Val OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "License key Cap1 Value"
+        DEFVAL         { 0 }
+        ::= { tnCardEntry 46 }
+
+    tnCardLicenseCap2Val OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "License key Cap2 Value"
+        DEFVAL         { 0 }
+        ::= { tnCardEntry 47 }
+
+    tnCardLicenseTimeStamp OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "License key Timestamp"
+        DEFVAL         { 0 }
+        ::= { tnCardEntry 48 }
+
+    tnCardLicenseRmaKey OBJECT-TYPE
+        SYNTAX         SnmpAdminString
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "License key RMA Key"
+        DEFVAL         { "" }
+        ::= { tnCardEntry 49 }
+
+    tnCardMirrorLoopbackNoServPort OBJECT-TYPE
+        SYNTAX         InterfaceIndexOrZero
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Second loopback port used for internal sap creation"
+        DEFVAL         { 0 }
+        ::= { tnCardEntry 50 }
+
+    tnCardDNRLEDColor OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         off(1),
+                         orange(2)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "DNR LED Color"
+        ::= { tnCardEntry 51 }
+
+    tnCardTestHdNoServPort OBJECT-TYPE
+        SYNTAX         InterfaceIndexOrZero
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Loopback port for testhead"
+        DEFVAL         { 0 }
+        ::= { tnCardEntry 52 }
+
+    tnCardAmbientTemp OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "Celsius"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Ambient temperature on PSI."
+        ::= { tnCardEntry 53 }
+
+    tnCardRpmRead OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Card Rpm on PSI."
+        ::= { tnCardEntry 54 }
+
+    tnCardL1andL2Decoupled OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Indicates whether the port types on L1 and L2 are decoupled."
+        DEFVAL         { true }
+        ::= { tnCardEntry 55 }
+
+    tnCardIntWrkMode OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         legacy(1),
+                         standard(2)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "legacy sets the interworking mode of the card to support
+                        legacy applications, while standard sets the interworking
+                        mode of the card to support standard OTN applications."
+        DEFVAL         { standard }
+        ::= { tnCardEntry 56 }
+
+    tnCardTotalRam OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Display the RAM capacity."
+        ::= { tnCardEntry 57 }
+
+    tnCardTransportModeOSC OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         layer2(1),
+                         layer3(2)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Transport Mode OSC to layer 2 and 3."
+        ::= { tnCardEntry 58 }
+
+    tnCardModuleCfg OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         plugLimit40(1),
+                         plugLimit32(2),
+                         plugLimit20(3),
+                         elplugs(4),
+                         thirtyPlugs(5),
+                         twelvePlugs(6),
+                         ninePlugs(7)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Pluggable module card configuration."
+        ::= { tnCardEntry 59 }
+
+    tnCardLicenseRestricted OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "License Restricted Card:
+                          true  - If the card is restricted and has the value
+                                  of lower nibble  of the byte set to 0x2
+                          false - If the card is unrestricted and has the value
+                                  of lower nibble of the byte set to 0x0 or 0x1."
+        ::= { tnCardEntry 60 }
+
+    tnCardLineMode OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         notApplicable(1),
+                         fixed(2),
+                         dynamic(3)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Card Line mode:
+                          fixed   - sets the line mode to support fixed provisioning
+                                    for changing the line port type/en-coding
+                          dynamic - sets the line mode to allow dynamic modification
+                                    of the line port type/encoding."
+        DEFVAL         { fixed }
+        ::= { tnCardEntry 61 }
+
+    tnCardInitConfProfile OBJECT-TYPE
+        SYNTAX         Unsigned32 (1..1000)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Triggers an initial service setup which includes
+                        interface, OTSIG and DXC auto provision by given
+                        the corresponding configuration profile ID."
+        ::= { tnCardEntry 62 }
+
+    tnCardVirtual OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Indicate if the card is virtual card or not."
+        ::= { tnCardEntry 63 }
+
+    tnCardOAMTestUnit OBJECT-TYPE
+        SYNTAX         NokiaOAMTestUnitType
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The value of tnCardOAMTestUnit defines the unit of
+                        OAM (SLM/DM) test results."
+        ::= { tnCardEntry 64 }
+
+    tnCardSlotClkStatus OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         unknown(1),
+                         onFreq(2),
+                         fail(3)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnCardEntry 65 }
+
+    tnCardClkSelectedValue OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         unknown(1),
+                         yes(2),
+                         no(3)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnCardEntry 66 }
+
+    tnCardShutdownCmd OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         normal(1),
+                         shutdownForce(2)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "normal        - user shall set the card state to admin
+                                        down before.
+                        shutdownForce - force allows an user with administrator
+                                        rights to perform a reset cold without
+                                        setting the ports and the card to admin
+                                        down before."
+        ::= { tnCardEntry 67 }
+
+    tnCardCpuTemperature OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "Celsius"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The current temperature of the control card, for
+                        example, the 1830 TPS EC."
+        ::= { tnCardEntry 68 }
+
+    tnCardMainDeviceTemperature OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "Celsius"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The current temperature of the main device, for
+                        example, the 1830 TPS FPGA."
+        ::= { tnCardEntry 69 }
+
+    tnCardAseMode OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         unconfigured(1),
+                         noNoise(2),
+                         low(3),
+                         standard(4)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { unconfigured }
+        ::= { tnCardEntry 70 }
+
+    tnCardAddPowerMode OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         low(1),
+                         high(2)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { low }
+        ::= { tnCardEntry 71 }
+
+    tnCardLOLCKDetectionEnable OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "PTPIOC card uses this attribute to enable/disable
+                        Loss of Lock(LOLCK) detection on OTC line ports:
+                          true  - Enable
+                          false - Disable."
+        DEFVAL         { false }
+        ::= { tnCardEntry 72 }
+
+    tnCardSapLoopbackMacAddr OBJECT-TYPE
+        SYNTAX         MacAddress
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "tnCardSapLoopbackMacAddr specifies the unicast source
+                        MAC address used with a MAC Swap SAP terminal loopback"
+        DEFVAL         { '000000000000'H }  -- 00:00:00:00:00:00
+        ::= { tnCardEntry 73 }
+
+    tnCardMgracd OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         none(1),
+                         cp(2),
+                         mgnpln(3),
+                         cpmgnpln(4)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Indicates if managed by CP, MGNPLN, shared by both or free."
+        DEFVAL         { none }
+        ::= { tnCardEntry 74 }
+
+    tnCardTargetAddPortInputPower OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mBm"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnCardEntry 75 }
+
+    tnCardPassThroughBandwidthUsage OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Passthrough Bandwidth Usage.
+                        For 20p200, range is 0 to 120000."
+        ::= { tnCardEntry 76 }
+
+    tnCardUDCChanType OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         gcc0(1),
+                         gcc0Tcm(2)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnCardEntry 77 }
+
+    tnCardUDCStatus OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         on(1),
+                         off(2)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnCardEntry 78 }
+
+--------------------------------------------------------------------------------
+-- Generic Card Assembly Table
+--------------------------------------------------------------------------------
+    tnCardAssemblyTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnCardAssemblyEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnCardBasics 3 }
+
+    tnCardAssemblyEntry OBJECT-TYPE
+        SYNTAX         TnCardAssemblyEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { tnShelfIndex,
+                tnSlotIndex,
+                tnCardAssemblyIndex }
+        ::= { tnCardAssemblyTable 1 }
+
+    TnCardAssemblyEntry ::= SEQUENCE {
+        tnCardAssemblyIndex                   Integer32,
+        tnCardAssemblyName                    SnmpAdminString,
+        tnCardAssemblyCLEI                    TropicCardCLEI,
+        tnCardAssemblyHFD                     TropicCardHFD,
+        tnCardAssemblySerialNumber            TropicCardSerialNumber,
+        tnCardAssemblyManufacturingPartNumber TropicCardManufacturingPartNumber,
+        tnCardAssemblyMarketingPartNumber     TropicCardMarketingPartNumber
+    }
+
+    tnCardAssemblyIndex OBJECT-TYPE
+        SYNTAX         Integer32 (1..256)
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnCardAssemblyEntry 1 }
+
+    tnCardAssemblyName OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..31))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnCardAssemblyEntry 2 }
+
+    tnCardAssemblyCLEI OBJECT-TYPE
+        SYNTAX         TropicCardCLEI
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnCardAssemblyEntry 3 }
+
+    tnCardAssemblyHFD OBJECT-TYPE
+        SYNTAX         TropicCardHFD
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnCardAssemblyEntry 4 }
+
+    tnCardAssemblySerialNumber OBJECT-TYPE
+        SYNTAX         TropicCardSerialNumber
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnCardAssemblyEntry 5 }
+
+    tnCardAssemblyManufacturingPartNumber OBJECT-TYPE
+        SYNTAX         TropicCardManufacturingPartNumber
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnCardAssemblyEntry 6 }
+
+    tnCardAssemblyMarketingPartNumber OBJECT-TYPE
+        SYNTAX         TropicCardMarketingPartNumber
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnCardAssemblyEntry 7 }
+
+--------------------------------------------------------------------------------
+-- Card FPGA Table
+--------------------------------------------------------------------------------
+--    obsolete
+--    tnCardFPGATable OBJECT-TYPE ::= { tnCardBasics 4 }
+
+--------------------------------------------------------------------------------
+-- Card Db Sync Table
+--------------------------------------------------------------------------------
+    tnCardDbSyncTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnCardDbSyncEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnCardBasics 5 }
+
+    tnCardDbSyncEntry OBJECT-TYPE
+        SYNTAX         TnCardDbSyncEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The entry for tnCardDbSyncTable"
+        INDEX { tnShelfIndex,
+                tnSlotIndex }
+        ::= { tnCardDbSyncTable 1 }
+
+    TnCardDbSyncEntry ::= SEQUENCE {
+        tnCardDBSyncEnabledByUser     TruthValue
+    }
+
+    tnCardDBSyncEnabledByUser OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Indicates whether or not the user has enabled DB sync
+                        between the LC and the EC.  If it is enabled,
+                        tnCardDBSyncEnabledByUser shall be true.  After the
+                        sync, tnCardDBSyncEnabledByUser shall change to false."
+        DEFVAL         { false }
+        ::= { tnCardDbSyncEntry 1 }
+
+--------------------------------------------------------------------------------
+-- Card PRBS Test ID Table
+--------------------------------------------------------------------------------
+    tnCardPrbsTestIdTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnCardPrbsTestIdEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnCardBasics 6 }
+
+    tnCardPrbsTestIdEntry OBJECT-TYPE
+        SYNTAX         TnCardPrbsTestIdEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { tnShelfIndex,
+                tnSlotIndex }
+        ::= { tnCardPrbsTestIdTable 1 }
+
+    TnCardPrbsTestIdEntry ::= SEQUENCE {
+        tnCardPrbsTestIdOidList       SnmpAdminString
+    }
+
+    tnCardPrbsTestIdOidList OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..2048))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnCardPrbsTestIdEntry 1 }
+
+--------------------------------------------------------------------------------
+-- Conformance Group Definitions
+--------------------------------------------------------------------------------
+    tnCardScalarsGroup OBJECT-GROUP
+        OBJECTS {
+            tnCardTotal
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnCardGroups 1 }
+
+    tnCardTableGroup OBJECT-GROUP
+        OBJECTS {
+            tnCardName,
+            tnCardDescr,
+            tnCardCLEI,
+            tnCardHFD,
+            tnCardSerialNumber,
+            tnCardManufacturingPartNumber,
+            tnCardMarketingPartNumber,
+            tnCardSWGenericLoadName,
+--            obsolete
+--            tnCardReset,
+            tnCardHeight,
+            tnCardWidth,
+--            obsolete
+--            tnCardResetReason,
+            tnCardTemperature,
+            tnCardHighTemperatureThresh,
+            tnCardLowTemperatureThresh,
+            tnCardTemperatureTolerance,
+            tnCardStatusLEDColor,
+            tnCardStatusLEDState,
+            tnCardActivityLEDColor,
+            tnCardActivityLEDState,
+            tnCardCompanyID,
+            tnCardMnemonic,
+            tnCardSWPartNum,
+            tnCardDate,
+            tnCardExtraData,
+--            obsolete
+--            tnCardOverride,
+            tnCardAnyPortsInService,
+            tnCardLastBootedFwBundleVer,
+            tnCardNextFwBundleVer,
+            tnCardFactoryID,
+            tnCardCapacity,
+            tnCardLACPSystemPriority,
+            tnCardMaxPower,
+            tnCardEthOamCcmFaultMgntMode,
+            tnCardClkSwitch,
+            tnCardRtrvClkSwitch,
+            tnCardWtClkMeasureValues,
+            tnCardPower,
+            tnCardCurrent,
+            tnCardUplinkAdminMode,
+            tnCardLoopbackNoServPort,
+            tnCardAlmProfName,
+            tnCardAlmProfEnvName,
+            tnCardLicenseData,
+            tnCardLicenseAction,
+            tnCardLicenseCap1Val,
+            tnCardLicenseCap2Val,
+            tnCardLicenseTimeStamp,
+            tnCardLicenseRmaKey,
+            tnCardMirrorLoopbackNoServPort,
+            tnCardDNRLEDColor,
+            tnCardTestHdNoServPort,
+            tnCardAmbientTemp,
+            tnCardRpmRead,
+            tnCardL1andL2Decoupled,
+            tnCardIntWrkMode,
+            tnCardTotalRam,
+            tnCardTransportModeOSC,
+            tnCardModuleCfg,
+            tnCardLicenseRestricted,
+            tnCardLineMode,
+            tnCardInitConfProfile,
+            tnCardVirtual,
+            tnCardOAMTestUnit,
+            tnCardSlotClkStatus,
+            tnCardClkSelectedValue,
+            tnCardShutdownCmd,
+            tnCardCpuTemperature,
+            tnCardMainDeviceTemperature,
+            tnCardAseMode,
+            tnCardAddPowerMode,
+            tnCardLOLCKDetectionEnable,
+            tnCardSapLoopbackMacAddr,
+            tnCardMgracd,
+            tnCardTargetAddPortInputPower,
+            tnCardPassThroughBandwidthUsage,
+            tnCardUDCChanType,
+            tnCardUDCStatus
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnCardGroups 2 }
+
+    tnCardAssemblyTableGroup OBJECT-GROUP
+        OBJECTS {
+            tnCardAssemblyName,
+            tnCardAssemblyCLEI,
+            tnCardAssemblyHFD,
+            tnCardAssemblySerialNumber,
+            tnCardAssemblyManufacturingPartNumber,
+            tnCardAssemblyMarketingPartNumber
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnCardGroups 3 }
+
+--    obsolete
+--    tnCardFPGATableGroup OBJECT-GROUP ::= { tnCardGroups 4 }
+
+    tnCardPrbsTestIdTableGroup OBJECT-GROUP
+        OBJECTS {
+            tnCardPrbsTestIdOidList
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnCardGroups 5 }
+
+--------------------------------------------------------------------------------
+-- Compliance Statements (mandatory)
+--------------------------------------------------------------------------------
+    tnCardCompliance MODULE-COMPLIANCE
+        STATUS         current
+        DESCRIPTION    "."
+        MODULE
+        MANDATORY-GROUPS {
+            tnCardScalarsGroup,
+            tnCardTableGroup,
+            tnCardAssemblyTableGroup,
+--            obsolete
+--            tnCardFPGATableGroup,
+            tnCardPrbsTestIdTableGroup
+        }
+        ::= { tnCardCompliances 1 }
+
+END -- DEFINITION OF TROPIC-CARD-MIB
