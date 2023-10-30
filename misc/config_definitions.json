@@ -4712,6 +4712,10 @@
         "plugin_dir": {
             "type": "directory"
         },
+        "plugins.show_errors": {
+            "type": "boolean",
+            "default": false
+        },
         "poller_modules.unix-agent": {
             "order": 420,
             "group": "poller",
