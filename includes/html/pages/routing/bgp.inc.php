@@ -279,20 +279,6 @@ if (! Auth::user()->hasGlobalRead()) {
 
         // Peer Address
         $peer_device = \App\Models\Device::whereHas('bgppeers', fn ($q) => $q->where('bgpLocalAddr', $peer['bgpPeerIdentifier']))->first();
-        // $graph_array['id'] = $peer['bgpPeer_id'];
-        // $graph_array['afi'] = 'ipv4';
-        // $graph_array['safi'] = 'unicast';
-        // $graph_array_zoom = $graph_array;
-        // $graph_array_zoom['height'] = '150';
-        // $graph_array_zoom['width'] = '500';
-        // $graph_array_zoom['afi'] = 'ipv4';
-        // $graph_array_zoom['safi'] = 'unicast';
-        // $overlib_link = 'device/device=' . $peer_device['device_id'] . '/tab=routing/proto=bgp/';
-        // if (! empty($peer_device)) {
-        //     $peeraddresslink = '<span class=list-large>' . \LibreNMS\Util\Url::deviceLink($peer_device, $peer_addr, vars: ['tab' => 'routing', 'proto' => 'bgp']) . '</span>';
-        // } else {
-        //     $peeraddresslink = '<span class=list-large>' . $peer_addr . '</span>';
-        // }
         $peeraddresslink = '<span class=list-large>' . $peer_addr . '</span>';
 
         // Local Address
