@@ -17,6 +17,5 @@ class Popup extends Component
         return Config::get('web_mouseover', true)
             ? view('components.popup')
             : view('components.nopopup');
-
     }
 }
