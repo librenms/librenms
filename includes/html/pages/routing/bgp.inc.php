@@ -289,7 +289,7 @@ if (! Auth::user()->hasGlobalRead()) {
         $graph_array_zoom['safi'] = 'unicast';
         $overlib_link = 'device/device=' . $peer_device['device_id'] . '/tab=routing/proto=bgp/';
         if (! empty($peer_device)) {
-            $peeraddresslink = '<span class=list-large>' . \LibreNMS\Util\Url::overlibLink($overlib_link, $peer_addr, \LibreNMS\Util\Url::graphTag($graph_array_zoom)). '</span>';
+            $peeraddresslink = '<span class=list-large>' . \LibreNMS\Util\Url::overlibLink($overlib_link, $peer_addr, \LibreNMS\Util\Url::graphTag($graph_array_zoom)) . '</span>';
         } else {
             $peeraddresslink = '<span class=list-large>' . $peer_addr . '</span>';
         }
