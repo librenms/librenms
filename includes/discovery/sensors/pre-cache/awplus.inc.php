@@ -17,4 +17,3 @@ $pre_cache['awplus-sfpddm'] = snmpwalk_cache_oid($device, 'atPluggableDiagRxPowe
 
 echo 'atPluggableDiagRxLosTable ';
 $pre_cache['awplus-sfpddm'] = snmpwalk_cache_oid($device, 'atPluggableDiagRxLosTable', $pre_cache['awplus-sfpddm'], 'AT-PLUGGABLE-DIAGNOSTICS-MIB');
-

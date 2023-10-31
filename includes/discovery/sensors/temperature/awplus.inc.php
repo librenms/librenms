@@ -5,7 +5,7 @@ echo "Temperature###############################################################
 
 if ($pre_cache['awplus-sfpddm']) {
     foreach ($pre_cache['awplus-sfpddm'] as $index => $data) {
-        if (isset($data["atPluggableDiagTempStatusReading"])) {
+        if (isset($data['atPluggableDiagTempStatusReading'])) {
             $ifIndex = explode(".", $index, 2)[0];
             $high_limit = isset($data['atPluggableDiagTempAlarmMax']) ? $data['atPluggableDiagTempAlarmMax'] / $divisor : null;
             $high_warn_limit = isset($data['atPluggableDiagTempWarningMax']) ? $data['atPluggableDiagTempWarningMax'] / $divisor : null;

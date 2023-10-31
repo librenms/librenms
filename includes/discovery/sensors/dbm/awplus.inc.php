@@ -3,7 +3,7 @@ $divisor = 10000;
 
 if ($pre_cache['awplus-sfpddm']) {
     foreach ($pre_cache['awplus-sfpddm'] as $index => $data) {
-        if (isset($data["atPluggableDiagTxPowerStatusReading"])) {
+        if (isset($data['atPluggableDiagTxPowerStatusReading'])) {
             $ifIndex = explode(".", $index, 2)[0];
             $high_limit = isset($data['atPluggableDiagTxPowerAlarmMax']) ? mw_to_dbm($data['atPluggableDiagTxPowerAlarmMax'] / $divisor) : null;
             $high_warn_limit = isset($data['atPluggableDiagTxPowerWarningMax']) ? mw_to_dbm($data['atPluggableDiagTxPowerWarningMax'] / $divisor) : null;
@@ -39,7 +39,7 @@ if ($pre_cache['awplus-sfpddm']) {
 }
 if ($pre_cache['awplus-sfpddm']) {
     foreach ($pre_cache['awplus-sfpddm'] as $index => $data) {
-        if (isset($data["atPluggableDiagRxPowerStatusReading"])) {
+        if (isset($data['atPluggableDiagRxPowerStatusReading'])) {
             $ifIndex = explode(".", $index, 2)[0];
             $high_limit = isset($data['atPluggableDiagRxPowerAlarmMax']) ? mw_to_dbm($data['atPluggableDiagRxPowerAlarmMax'] / $divisor) : null;
             $high_warn_limit = isset($data['atPluggableDiagRxPowerWarningMax']) ? mw_to_dbm($data['atPluggableDiagRxPowerWarningMax'] / $divisor) : null;
@@ -73,4 +73,3 @@ if ($pre_cache['awplus-sfpddm']) {
         }
     }
 }
-
