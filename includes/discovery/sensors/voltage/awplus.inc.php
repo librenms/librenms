@@ -4,7 +4,7 @@ $divisor = 10000;
 if ($pre_cache['awplus-sfpddm']) {
     foreach ($pre_cache['awplus-sfpddm'] as $index => $data) {
         if (isset($data['atPluggableDiagVccStatusReading'])) {
-            $ifIndex = explode(".", $index, 2)[0];
+            $ifIndex = explode('.', $index, 2)[0];
             $high_limit = isset($data['atPluggableDiagVccAlarmMax']) ? ($data['atPluggableDiagVccAlarmMax'] / $divisor) : null;
             $high_warn_limit = isset($data['atPluggableDiagVccWarningMax']) ? ($data['atPluggableDiagVccWarningMax'] / $divisor) : null;
             $low_warn_limit = isset($data['atPluggableDiagVccWarningMin']) ? ($data['atPluggableDiagVccWarningMin'] / $divisor) : null;

@@ -4,7 +4,7 @@ $divisor = 1000000;
 if ($pre_cache['awplus-sfpddm']) {
     foreach ($pre_cache['awplus-sfpddm'] as $index => $data) {
         if (isset($data['atPluggableDiagTxBiasStatusReading'])) {
-            $ifIndex = explode(".", $index, 2)[0];
+            $ifIndex = explode('.', $index, 2)[0];
             $high_limit = isset($data['atPluggableDiagTxBiasAlarmMax']) ? ($data['atPluggableDiagTxBiasAlarmMax'] / $divisor) : null;
             $high_warn_limit = isset($data['atPluggableDiagTxBiasWarningMax']) ? ($data['atPluggableDiagTxBiasWarningMax'] / $divisor) : null;
             $low_warn_limit = isset($data['atPluggableDiagTxBiasWarningMin']) ? ($data['atPluggableDiagTxBiasWarningMin'] / $divisor) : null;
