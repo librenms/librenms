@@ -39,43 +39,55 @@ class SmokepingCliTest extends DBTestCase
         'Le23HKVMvN' => [
             'Cl09bZU4sn' => [
                 'transport' => 'udp',
+                'displayname' => 'Cl09bZU4sn',
             ],
             'c559TvthzY' => [
                 'transport' => 'udp6',
+                'displayname' => 'c559TvthzY',
             ],
             'sNtzSdxdw8' => [
                 'transport' => 'udp6',
+                'displayname' => 'sNtzSdxdw8',
             ],
             '10.0.0.3' => [
                 'transport' => 'udp',
+                'displayname' => '10.0.0.3',
             ],
             '2600::' => [
                 'transport' => 'udp',
+                'displayname' => '2600::',
             ],
         ],
         'Psv9oZcxdC' => [
             'oHiPfLzrmU' => [
                 'transport' => 'udp',
+                'displayname' => 'oHiPfLzrmU',
             ],
             'kEn7hZ7N37' => [
                 'transport' => 'udp6',
+                'displayname' => 'kEn7hZ7N37',
             ],
             'PcbZ5FKtS3' => [
                 'transport' => 'udp6',
+                'displayname' => 'PcbZ5FKtS3',
             ],
             '192.168.1.1' => [
                 'transport' => 'udp',
+                'displayname' => '192.168.1.1',
             ],
             'fe80::' => [
                 'transport' => 'udp',
+                'displayname' => 'fe80::',
             ],
         ],
         '4diY0pWFik' => [
             'example.org' => [
                 'transport' => 'udp',
+                'displayname' => 'example.org',
             ],
             'host_with_under_score.example.org' => [
                 'transport' => 'udp6',
+                'displayname' => 'host_with_under_score.example.org',
             ],
         ],
     ];
