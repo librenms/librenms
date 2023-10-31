@@ -313,12 +313,27 @@ if (! Auth::user()->hasGlobalRead()) {
         }
 
         unset($sep);
+<<<<<<< HEAD
         $peer_device = \App\Models\Device::whereHas('bgppeers', fn ($q) => $q->where('bgpLocalAddr', $peer['bgpPeerIdentifier']))->first();
+=======
+<<<<<<< HEAD
+=======
+        $peer_device = \App\Models\Device::whereHas('bgppeers', fn ($q) => $q->where('bgpLocalAddr', $peer['bgpPeerIdentifier']))->first();
+>>>>>>> f521c1398 (Removed extra space)
+>>>>>>> 52cb46d58 (Removed extra space)
 
         echo '  <td></td>
             <td width=150>' . $localaddresslink . '<br />' . generate_device_link($peer, null, ['tab' => 'routing', 'proto' => 'bgp']) . '</td>
             <td width=30><b>&#187;</b></td>
+<<<<<<< HEAD
             <td width=150>' . $peeraddresslink . '<br />' . \LibreNMS\Util\Url::deviceLink($peer_device, vars: ['tab' => 'routing', 'proto' => 'bgp']) . "</td>
+=======
+<<<<<<< HEAD
+            <td width=150>' . $peeraddresslink . "</td>
+=======
+            <td width=150>' . $peeraddresslink . '<br />' . \LibreNMS\Util\Url::deviceLink($peer_device, vars: ['tab' => 'routing', 'proto' => 'bgp']) . "</td>
+>>>>>>> f521c1398 (Removed extra space)
+>>>>>>> 52cb46d58 (Removed extra space)
             <td width=50><b>$peer_type</b></td>
             <td width=50>" . $peer['afi'] . '</td>
             <td><strong>AS' . $peer['bgpPeerRemoteAs'] . '</strong><br />' . $peer['astext'] . '</td>
