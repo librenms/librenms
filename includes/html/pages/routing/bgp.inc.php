@@ -281,7 +281,7 @@ if (! Auth::user()->hasGlobalRead()) {
         // Peer Address
         $peer_device = \App\Models\Device::whereHas('bgppeers', fn ($q) => $q->where('bgpLocalAddr', $peer['bgpPeerIdentifier']))->first();
         $peerdevicelink = \LibreNMS\Util\Url::deviceLink($peer_device, $peer_addr, vars: ['tab' => 'routing', 'proto' => 'bgp']);
-        if (!empty($peerdevicelink)) {
+        if (! empty($peerdevicelink)) {
             $peeraddresslink = '<span class=list-large>' . $peerdevicelink . '</span>';
         } else {
             $peeraddresslink = '<span class=list-large>' . $peer_addr . '</span>';
