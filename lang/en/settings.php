@@ -364,11 +364,11 @@ return [
         ],
         'auth_ldap_cacertfile' => [
             'description' => 'Override system TLS CA Cert',
-            'help' => 'Use supplied CA Cert for LDAPS.'
+            'help' => 'Use supplied CA Cert for LDAPS.',
         ],
         'auth_ldap_ignorecert' => [
             'description' => 'Do not require valid Cert',
-            'help' => 'Do not require a valid TLS Cert for LDAPS.'
+            'help' => 'Do not require a valid TLS Cert for LDAPS.',
         ],
         'auth_ldap_emailattr' => [
             'description' => 'Mail attribute',
