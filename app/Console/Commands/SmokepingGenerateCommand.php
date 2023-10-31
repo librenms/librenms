@@ -127,7 +127,10 @@ class SmokepingGenerateCommand extends LnmsCommand
         // Take the devices array and build it into a hierarchical list
         $smokelist = [];
         foreach ($devices as $device) {
-            $smokelist[$device->type][$device->hostname] = ['transport' => $device->transport];
+            $smokelist[$device->type][$device->hostname] = [
+                'transport' => $device->transport,
+                'displayname' => $device->displayName(),
+            ];
         }
 
         $targets = $this->buildTargets($smokelist, Config::get('smokeping.probes'), $this->option('single-process'));
@@ -315,8 +318,8 @@ class SmokepingGenerateCommand extends LnmsCommand
         foreach ($devices as $hostname => $config) {
             if (! $this->dnsLookup || $this->deviceIsResolvable($hostname)) {
                 $lines[] = sprintf('++ %s', $this->buildMenuEntry($hostname));
-                $lines[] = sprintf('   menu = %s', $hostname);
-                $lines[] = sprintf('   title = %s', $hostname);
+                $lines[] = sprintf('   menu = %s', $config['displayname']);
+                $lines[] = sprintf('   title = %s', $config['displayname']);
 
                 if (! $singleProcess) {
                     $lines[] = sprintf('   probe = %s', $this->balanceProbes($config['transport'], $probeCount));
