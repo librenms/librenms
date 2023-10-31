@@ -313,11 +313,12 @@ if (! Auth::user()->hasGlobalRead()) {
         }
 
         unset($sep);
+        $peer_device = \App\Models\Device::whereHas('bgppeers', fn ($q) => $q->where('bgpLocalAddr', $peer['bgpPeerIdentifier']))->first();
 
         echo '  <td></td>
             <td width=150>' . $localaddresslink . '<br />' . generate_device_link($peer, null, ['tab' => 'routing', 'proto' => 'bgp']) . '</td>
             <td width=30><b>&#187;</b></td>
-            <td width=150>' . $peeraddresslink . "</td>
+            <td width=150>' . $peeraddresslink . '<br />' . \LibreNMS\Util\Url::deviceLink($peer_device, vars: ['tab' => 'routing', 'proto' => 'bgp']) . "</td>
             <td width=50><b>$peer_type</b></td>
             <td width=50>" . $peer['afi'] . '</td>
             <td><strong>AS' . $peer['bgpPeerRemoteAs'] . '</strong><br />' . $peer['astext'] . '</td>
