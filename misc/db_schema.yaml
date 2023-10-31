@@ -1251,10 +1251,10 @@ ospf_areas:
     - { Field: ospfAreaId, Type: varchar(32), 'Null': false, Extra: '' }
     - { Field: ospfAuthType, Type: varchar(64), 'Null': true, Extra: '' }
     - { Field: ospfImportAsExtern, Type: varchar(128), 'Null': false, Extra: '' }
-    - { Field: ospfSpfRuns, Type: int, 'Null': false, Extra: '' }
-    - { Field: ospfAreaBdrRtrCount, Type: int, 'Null': false, Extra: '' }
-    - { Field: ospfAsBdrRtrCount, Type: int, 'Null': false, Extra: '' }
-    - { Field: ospfAreaLsaCount, Type: int, 'Null': false, Extra: '' }
+    - { Field: ospfSpfRuns, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: ospfAreaBdrRtrCount, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: ospfAsBdrRtrCount, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: ospfAreaLsaCount, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: ospfAreaLsaCksumSum, Type: int, 'Null': false, Extra: '' }
     - { Field: ospfAreaSummary, Type: varchar(64), 'Null': false, Extra: '' }
     - { Field: ospfAreaStatus, Type: varchar(64), 'Null': false, Extra: '' }
@@ -1272,11 +1272,11 @@ ospf_instances:
     - { Field: ospfVersionNumber, Type: varchar(32), 'Null': false, Extra: '' }
     - { Field: ospfAreaBdrRtrStatus, Type: varchar(32), 'Null': false, Extra: '' }
     - { Field: ospfASBdrRtrStatus, Type: varchar(32), 'Null': false, Extra: '' }
-    - { Field: ospfExternLsaCount, Type: int, 'Null': false, Extra: '' }
+    - { Field: ospfExternLsaCount, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: ospfExternLsaCksumSum, Type: int, 'Null': false, Extra: '' }
     - { Field: ospfTOSSupport, Type: varchar(32), 'Null': false, Extra: '' }
-    - { Field: ospfOriginateNewLsas, Type: int, 'Null': false, Extra: '' }
-    - { Field: ospfRxNewLsas, Type: int, 'Null': false, Extra: '' }
+    - { Field: ospfOriginateNewLsas, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: ospfRxNewLsas, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: ospfExtLsdbLimit, Type: int, 'Null': true, Extra: '' }
     - { Field: ospfMulticastExtensions, Type: int, 'Null': true, Extra: '' }
     - { Field: ospfExitOverflowInterval, Type: int, 'Null': true, Extra: '' }
@@ -1297,8 +1297,8 @@ ospf_nbrs:
     - { Field: ospfNbrOptions, Type: int, 'Null': false, Extra: '' }
     - { Field: ospfNbrPriority, Type: int, 'Null': false, Extra: '' }
     - { Field: ospfNbrState, Type: varchar(32), 'Null': false, Extra: '' }
-    - { Field: ospfNbrEvents, Type: int, 'Null': false, Extra: '' }
-    - { Field: ospfNbrLsRetransQLen, Type: int, 'Null': false, Extra: '' }
+    - { Field: ospfNbrEvents, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: ospfNbrLsRetransQLen, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: ospfNbmaNbrStatus, Type: varchar(32), 'Null': false, Extra: '' }
     - { Field: ospfNbmaNbrPermanence, Type: varchar(32), 'Null': false, Extra: '' }
     - { Field: ospfNbrHelloSuppressed, Type: varchar(32), 'Null': false, Extra: '' }
@@ -1326,7 +1326,7 @@ ospf_ports:
     - { Field: ospfIfState, Type: varchar(32), 'Null': true, Extra: '' }
     - { Field: ospfIfDesignatedRouter, Type: varchar(32), 'Null': true, Extra: '' }
     - { Field: ospfIfBackupDesignatedRouter, Type: varchar(32), 'Null': true, Extra: '' }
-    - { Field: ospfIfEvents, Type: int, 'Null': true, Extra: '' }
+    - { Field: ospfIfEvents, Type: 'int unsigned', 'Null': true, Extra: '' }
     - { Field: ospfIfAuthKey, Type: varchar(128), 'Null': true, Extra: '' }
     - { Field: ospfIfStatus, Type: varchar(32), 'Null': true, Extra: '' }
     - { Field: ospfIfMulticastForwarding, Type: varchar(32), 'Null': true, Extra: '' }
