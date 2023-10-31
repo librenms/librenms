@@ -562,6 +562,20 @@
             "order": 21,
             "type": "boolean"
         },
+        "auth_ldap_cacertfile": {
+            "group": "auth",
+            "section": "ldap",
+            "order": 22,
+            "type": "text"
+        },
+        "auth_ldap_ignorecert": {
+            "default": false,
+            "group": "auth",
+            "section": "ldap",
+            "order": 23,
+            "type": "boolean"
+        },
+
         "auth_ldap_emailattr": {
             "default": "mail",
             "group": "auth",
