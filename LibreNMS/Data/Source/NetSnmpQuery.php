@@ -394,7 +394,7 @@ class NetSnmpQuery implements SnmpQueryInterface
 
             // if abort on failure is set, return after first failure
             if ($this->abort && ! $response->isValid()) {
-                $oid_list = implode(',', array_map(fn ($group) => implode(',', $group), $oids));
+                $oid_list = implode(',', array_map(fn ($group) => is_array($group) ? implode(',', $group) : $group, $oids));
                 Log::debug("SNMP failed walking $oid of $oid_list aborting.");
 
                 return $response;

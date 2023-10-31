@@ -52,7 +52,7 @@ class Ciscowlc extends Cisco implements
 
         foreach ($radios as $radio) {
             foreach ($radio as $slot) {
-                $numClients += $slot['AIRESPACE-WIRELESS-MIB::bsnApIfNoOfUsers'];
+                $numClients += $slot['AIRESPACE-WIRELESS-MIB::bsnApIfNoOfUsers'] ?? 0;
             }
         }
 
