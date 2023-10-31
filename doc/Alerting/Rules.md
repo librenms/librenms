@@ -72,9 +72,10 @@ On the Advanced tab, you can specify some additional options for the alert rule:
 - An example of this would be an average rule for all CPUs over 10%
 
 ```sql
-SELECT devices.*, (SELECT AVG(processors.processor_usage) as sub_avg FROM processors WHERE processors.device_id = devices.device_id
- HAVING AVG(processors.processor_usage) >= 10) as cpu_avg
-FROM devices WHERE devices.device_id = ? AND (devices.status = 1 && (devices.disabled = 0 && devices.ignore = 0)) = 1;
+SELECT devices.*, (SELECT AVG(processors.processor_usage) as sub_avg FROM processors
+WHERE processors.device_id = devices.device_id HAVING AVG(processors.processor_usage) >= 10) as cpu_avg
+FROM devices WHERE devices.device_id = ? AND
+(devices.status = 1 && (devices.disabled = 0 && devices.ignore = 0)) = 1;
 ```
 
 > The 10 would then contain the average CPU usage value, you can
