@@ -1,4 +1,5 @@
 <?php
+
 $divisor = 10000;
 
 if ($pre_cache['awplus-sfpddm']) {
