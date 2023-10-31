@@ -279,17 +279,28 @@ if (! Auth::user()->hasGlobalRead()) {
         $graph_array['width'] = $width;
 
         // Peer Address
+        $graph_array_zoom = $graph_array;
+        $graph_array_zoom['height'] = '150';
+        $graph_array_zoom['width'] = '500';
         $peer_device = \App\Models\Device::whereHas('bgppeers', fn ($q) => $q->where('bgpLocalAddr', $peer['bgpPeerIdentifier']))->first();
-        $peerdevicelink = \LibreNMS\Util\Url::deviceLink($peer_device, $peer_addr, vars: ['tab' => 'routing', 'proto' => 'bgp']);
-        if (! empty($peerdevicelink)) {
-            $peeraddresslink = '<span class=list-large>' . $peerdevicelink . '</span>';
+        $graph_array['afi'] = 'ipv4';
+        $graph_array['safi'] = 'unicast';
+        $graph_array_zoom['afi'] = 'ipv4';
+        $graph_array_zoom['safi'] = 'unicast';
+        $overlib_link = 'device/device=' . $peer_device['device_id'] . '/tab=routing/proto=bgp/';
+        if (! empty($peer_device)) {
+            $peeraddresslink = '<span class=list-large>' . \LibreNMS\Util\Url::overlibLink($overlib_link, $peer_addr, \LibreNMS\Util\Url::graphTag($graph_array_zoom)). '</span>';
         } else {
             $peeraddresslink = '<span class=list-large>' . $peer_addr . '</span>';
         }
 
         // Local Address
-        $local_device = \App\Models\Device::where('device_id', $peer['device_id'])->first();
-        $localaddresslink = '<span class=list-large>' . \LibreNMS\Util\Url::deviceLink($local_device, $local_addr, vars: ['tab' => 'routing', 'proto' => 'bgp']) . '</span>';
+        $graph_array['afi'] = 'ipv4';
+        $graph_array['safi'] = 'unicast';
+        $graph_array_zoom['afi'] = 'ipv4';
+        $graph_array_zoom['safi'] = 'unicast';
+        $overlib_link = 'device/device=' . $peer['device_id'] . '/tab=routing/proto=bgp/';
+        $localaddresslink = '<span class=list-large>' . \LibreNMS\Util\Url::overlibLink($overlib_link, $local_addr, \LibreNMS\Util\Url::graphTag($graph_array_zoom)) . '</span>';
 
         if ($peer['bgpPeerLastErrorCode'] == 0 && $peer['bgpPeerLastErrorSubCode'] == 0) {
             $last_error = $peer['bgpPeerLastErrorText'];
