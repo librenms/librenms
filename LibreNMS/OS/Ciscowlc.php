@@ -149,7 +149,7 @@ class Ciscowlc extends Cisco implements
         }
 
         $ssids = $this->getCacheByIndex('bsnDot11EssSsid', 'AIRESPACE-WIRELESS-MIB');
-        if (empty ($ssids)) {
+        if (empty($ssids)) {
             //  Try to check the LWAPP mib
             $ssids = $this->getCacheByIndex('cLWlanSsid', 'CISCO-LWAPP-WLAN-MIB');
         }
