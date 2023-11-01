@@ -22,7 +22,7 @@ class ReportDevices extends LnmsCommand
         $this->addOption('fields', 'f', InputOption::VALUE_REQUIRED, default: 'hostname,ip');
         $this->addOption('output', 'o', InputOption::VALUE_REQUIRED, __('commands.report:devices.options.output', ['types' => '[table, csv, none]']), 'table');
         $this->addOption('list-fields');
-   }
+    }
 
     /**
      * Execute the console command.
@@ -36,7 +36,7 @@ class ReportDevices extends LnmsCommand
         }
 
         try {
-            $fields = collect(explode(',', $this->option('fields')))->map(fn($field) => $this->getField($field));
+            $fields = collect(explode(',', $this->option('fields')))->map(fn ($field) => $this->getField($field));
         } catch (\Exception $e) {
             $this->error($e->getMessage());
 
@@ -72,7 +72,6 @@ class ReportDevices extends LnmsCommand
         });
     }
 
-
     protected function getField(string $field): SyntheticDeviceField
     {
         // relationship counts
@@ -84,7 +83,7 @@ class ReportDevices extends LnmsCommand
 
             return new SyntheticDeviceField(
                 $field,
-                modifyQuery: fn(Builder $query) => $query->withCount($relationship),
+                modifyQuery: fn (Builder $query) => $query->withCount($relationship),
                 headerName: "$relationship count");
         }
 
@@ -99,14 +98,14 @@ class ReportDevices extends LnmsCommand
             throw new \Exception("Invalid field: $field");
         }
 
-       return new SyntheticDeviceField($field, [$field]);
+        return new SyntheticDeviceField($field, [$field]);
     }
 
     protected function getSyntheticFields(): array
     {
         return [
-            'displayName' => new SyntheticDeviceField('displayName', ['hostname', 'sysName', 'ip', 'display'], fn(Device $device) => $device->displayName(), headerName: 'display name'),
-            'location' => new SyntheticDeviceField('location', ['location_id'], fn(Device $device) => $device->location->location, fn(Builder $q) => $q->with('location')),
+            'displayName' => new SyntheticDeviceField('displayName', ['hostname', 'sysName', 'ip', 'display'], fn (Device $device) => $device->displayName(), headerName: 'display name'),
+            'location' => new SyntheticDeviceField('location', ['location_id'], fn (Device $device) => $device->location->location, fn (Builder $q) => $q->with('location')),
         ];
     }
 
@@ -132,7 +131,6 @@ class ReportDevices extends LnmsCommand
 
             return;
         }
-
 
         // print table
         $this->table($headers, $rows);

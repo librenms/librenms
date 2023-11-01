@@ -206,7 +206,7 @@ return [
             'list-fields' => 'Print out a list of valid fields',
             'fields' => 'A comma seperated list of fields to display. Valid options: device column names from the database, relationship counts (ports_count), and/or displayName',
             'output' => 'Output format to display the data :types',
-        ]
+        ],
     ],
     'smokeping:generate' => [
         'args-nonsense' => 'Use one of --probes and --targets',

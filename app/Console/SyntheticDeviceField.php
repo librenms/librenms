@@ -31,13 +31,14 @@ use Illuminate\Database\Eloquent\Builder;
 
 class SyntheticDeviceField
 {
-public function __construct(
+    public function __construct(
     public readonly string $name,
     public readonly array $columns = [],
     public readonly ?Closure $displayFunction = null,
     public readonly ?Closure $modifyQuery = null,
     public readonly ?string $headerName = null,
-){}
+) {
+    }
 
     public function headerName(): string
     {
