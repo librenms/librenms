@@ -628,6 +628,25 @@ class Device extends BaseModel
         );
     }
 
+    public function scopeWhereDeviceSpec(Builder $query, ?string $deviceSpec): Builder
+    {
+        if (empty($deviceSpec)) {
+            return $query;
+        } elseif ($deviceSpec == 'all') {
+            return $query;
+        } elseif ($deviceSpec == 'even') {
+            return $query->whereRaw('device_id % 2 = 0');
+        } elseif ($deviceSpec == 'odd') {
+            return $query->whereRaw('device_id % 2 = 1');
+        } elseif (is_numeric($deviceSpec)) {
+            return $query->where('device_id', $deviceSpec);
+        } elseif (str_contains($deviceSpec, '*')) {
+            return $query->where('hostname', 'like', str_replace('*', '%', $deviceSpec));
+        }
+
+        return $query->where('hostname', $deviceSpec);
+    }
+
     // ---- Define Relationships ----
 
     public function accessPoints(): HasMany
