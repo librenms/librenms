@@ -66,7 +66,7 @@ trait UcdResources
             'memSysAvail.0',
         ], '-OQUs', 'UCD-SNMP-MIB');
 
-        if ($this->oidValid($data, 'memTotalReal') && ($this->oidValid($data, 'memAvailReal'))) {
+        if ($this->oidValid($data, 'memTotalReal') && $this->oidValid($data, 'memAvailReal')) {
             $mempools->push((new Mempool([
                 'mempool_index' => 1,
                 'mempool_type' => 'ucd',
