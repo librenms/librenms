@@ -43,8 +43,8 @@
                 rowCount: [25, 50, 100, -1],
                 url: "{{ route('table.port-nac') }}",
                 post: function () {
-                        device_id: '{{ $device->device_id }}',
                     return {
+                        device_id: '{{ $device->device_id }}',
                     };
                 },
                 formatters: {
