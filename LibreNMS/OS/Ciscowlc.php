@@ -143,8 +143,16 @@ class Ciscowlc extends Cisco implements
      */
     public function discoverWirelessClients()
     {
-        $ssids = $this->getCacheByIndex('bsnDot11EssSsid', 'AIRESPACE-WIRELESS-MIB');
         $counts = $this->getCacheByIndex('bsnDot11EssNumberOfMobileStations', 'AIRESPACE-WIRELESS-MIB');
+        if (empty($counts)) {
+            return []; // no counts to be had
+        }
+
+        $ssids = $this->getCacheByIndex('bsnDot11EssSsid', 'AIRESPACE-WIRELESS-MIB');
+        if (empty($ssids)) {
+            //  Try to check the LWAPP mib
+            $ssids = $this->getCacheByIndex('cLWlanSsid', 'CISCO-LWAPP-WLAN-MIB');
+        }
 
         $sensors = [];
         $total_oids = [];
@@ -165,17 +173,15 @@ class Ciscowlc extends Cisco implements
             );
         }
 
-        if (! empty($counts)) {
-            $sensors[] = new WirelessSensor(
-                'clients',
-                $this->getDeviceId(),
-                $total_oids,
-                'ciscowlc',
-                0,
-                'Clients: Total',
-                $total
-            );
-        }
+        $sensors[] = new WirelessSensor(
+            'clients',
+            $this->getDeviceId(),
+            $total_oids,
+            'ciscowlc',
+            0,
+            'Clients: Total',
+            $total
+        );
 
         return $sensors;
     }
