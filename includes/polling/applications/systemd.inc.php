@@ -17,14 +17,14 @@ if (! function_exists('systemd_data_update_helper')) {
     /**
      * Performs a data update and returns the updated metrics.
      *
-     * @param  class    $device
-     * @param  string   $app_id
-     * @param  array    $fields
-     * @param  array    $metrics
-     * @param  string   $name
-     * @param  string   $polling_type
-     * @param  class    $rrd_def
-     * @param  string   $state_type
+     * @param  class  $device
+     * @param  string  $app_id
+     * @param  array  $fields
+     * @param  array  $metrics
+     * @param  string  $name
+     * @param  string  $polling_type
+     * @param  class  $rrd_def
+     * @param  string  $state_type
      * @return $metrics
      */
     function systemd_data_update_helper($device, $app_id, $fields, $metrics, $name, $polling_type, $rrd_def, $state_type)
