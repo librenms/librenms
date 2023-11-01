@@ -96,7 +96,7 @@ trait UcdResources
                 'mempool_precision' => 1024,
                 'mempool_descr' => 'Memory buffers',
                 'mempool_used_oid' => '.1.3.6.1.4.1.2021.4.14.0',
-            ]))->fillUsage(null, $data[0]['memTotalReal'], $data[0]['memBuffer']));
+            ]))->fillUsage($data[0]['memBuffer'], $data[0]['memTotalReal']));
         }
 
         if ($this->oidValid($data, 'memCached')) {
@@ -107,7 +107,7 @@ trait UcdResources
                 'mempool_precision' => 1024,
                 'mempool_descr' => 'Cached memory',
                 'mempool_used_oid' => '.1.3.6.1.4.1.2021.4.15.0',
-            ]))->fillUsage(null, $data[0]['memTotalReal'], $data[0]['memCached']));
+            ]))->fillUsage($data[0]['memCached'], $data[0]['memTotalReal']));
         }
 
         if ($this->oidValid($data, 'memSysAvail')) {
