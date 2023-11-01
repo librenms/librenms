@@ -28,6 +28,7 @@ namespace LibreNMS\OS\Traits;
 use App\Models\Mempool;
 use Illuminate\Support\Collection;
 use LibreNMS\Device\YamlDiscovery;
+use LibreNMS\Device\YamlDiscoveryField;
 use LibreNMS\Util\Oid;
 
 trait YamlMempoolsDiscovery
@@ -44,8 +45,30 @@ trait YamlMempoolsDiscovery
 
     public function discoverYamlMempools()
     {
-        $mempools = new Collection();
         $mempools_yaml = $this->getDiscovery('mempools');
+
+        return YamlDiscovery::from($mempools_yaml, \App\Models\Mempool::class, [
+            'index' => new YamlDiscoveryField('index', 'mempool_index', '{{ $index }}'),
+            'type' => new YamlDiscoveryField('type', 'mempool_type', $this->getName()),
+            'class' => new YamlDiscoveryField('class', 'mempool_class', 'system'),
+            'precision' => new YamlDiscoveryField('precision', 'mempool_precision', 1),
+            'descr' => new YamlDiscoveryField('descr', 'mempool_descr', 'Memory', callback: fn($value) => ucwords($value)),
+            'used' => new YamlDiscoveryField('used', 'mempool_used', poll: true),
+            'free' => new YamlDiscoveryField('free', 'mempool_free', poll: true),
+            'total' => new YamlDiscoveryField('total', 'mempool_total', poll: true),
+            'percent_used' => new YamlDiscoveryField('percent_used', 'mempool_prec', poll: true),
+            'warn_percent' => new YamlDiscoveryField('warn_percent', 'mempool_perc_warn', 90),
+        ], callback: function (\App\Models\Mempool $mempool, $fields) {
+            // only use "free" if we have both used and total ????
+
+            $mempool->fillUsage(
+                $fields['used']->value,
+                $fields['total']->value,
+                $fields['free']->value,
+                $fields['percent_used']->value,
+            );
+        });
+        $mempools = new Collection();
 
         foreach ($mempools_yaml['pre-cache']['oids'] ?? [] as $oid) {
             $options = $mempools_yaml['pre-cache']['snmp_flags'] ?? '-OQUb';

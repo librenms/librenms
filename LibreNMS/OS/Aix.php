@@ -26,8 +26,6 @@
 namespace LibreNMS\OS;
 
 use App\Models\Device;
-use App\Models\Storage;
-use Illuminate\Support\Collection;
 use LibreNMS\OS\Shared\Unix;
 
 class Aix extends Unix
@@ -38,20 +36,20 @@ class Aix extends Unix
         $this->discoverYamlOS($device);
     }
 
-    public function discoverStorage(): Collection
-    {
-        return \SnmpQuery::enumStrings()->walk('IBM-AIX-MIB::aixFsTable')->mapTable(function ($data, $index) {
-            return (new Storage([
-                'type' => 'aix',
-                'storage_index' => $index,
-                'storage_type' => $data['IBM-AIX-MIB::aixFsType'],
-                'storage_descr' => $data['IBM-AIX-MIB::aixFsMountPoint'],
-                'storage_used_oid' => ".1.3.6.1.4.1.2.6.191.6.2.1.6.$index",
-                'storage_units' => 1024 * 1024,
-            ]))->fillUsage(
-                total: $data['IBM-AIX-MIB::aixFsSize'] ?? null,
-                free: $data['IBM-AIX-MIB::aixFsFree'] ?? null,
-            );
-        });
-    }
+//    public function discoverStorage(): Collection
+//    {
+//        return \SnmpQuery::enumStrings()->walk('IBM-AIX-MIB::aixFsTable')->mapTable(function ($data, $index) {
+//            return (new Storage([
+//                'type' => 'aix',
+//                'storage_index' => $index,
+//                'storage_type' => $data['IBM-AIX-MIB::aixFsType'],
+//                'storage_descr' => $data['IBM-AIX-MIB::aixFsMountPoint'],
+//                'storage_used_oid' => ".1.3.6.1.4.1.2.6.191.6.2.1.6.$index",
+//                'storage_units' => 1024 * 1024,
+//            ]))->fillUsage(
+//                total: $data['IBM-AIX-MIB::aixFsSize'] ?? null,
+//                free: $data['IBM-AIX-MIB::aixFsFree'] ?? null,
+//            );
+//        });
+//    }
 }

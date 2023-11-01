@@ -25,24 +25,38 @@
 
 namespace LibreNMS\OS\Traits;
 
+use App\Models\Storage;
 use Illuminate\Support\Collection;
+use LibreNMS\Device\YamlDiscovery;
+use LibreNMS\Device\YamlDiscoveryField;
 
-class YamlStorageDiscovery
+trait YamlStorageDiscovery
 {
     private array $storagePrefetch = [];
 
-    public function discoverYamlStorage()
+    public function discoverYamlStorage(): Collection
     {
-        $storages = new Collection();
-        $storages_yaml = $this->getDiscovery('storage');
-
-        foreach ($storages_yaml['pre-cache']['oids'] ?? [] as $oid) {
-            \SnmpQuery::enumStrings()->numericIndex()
-                ->options($storages_yaml['pre-cache']['snmp_flags'] ?? null)
-                ->walk($oid)->valuesByIndex($this->storagePrefetch);
-        }
-
-        // TODO
+        $storages = YamlDiscovery::from($this->getDiscovery('storage'),
+            \App\Models\Storage::class,
+            [
+                'type' => new YamlDiscoveryField('type', 'storage_type', 'Storage'),
+                'descr' => new YamlDiscoveryField('descr', 'storage_descr', 'Disk {{ $index }}'),
+                'units' => new YamlDiscoveryField('units', 'storage_units', 1048576), // TODO good default?
+                'size' => new YamlDiscoveryField('size', 'storage_size', poll: true),
+                'used' => new YamlDiscoveryField('used', 'storage_used', poll: true),
+                'free' => new YamlDiscoveryField('free', 'storage_free', poll: true),
+                'percent_used' => new YamlDiscoveryField('percent_used', 'storage_perc', poll: true),
+                'index' => new YamlDiscoveryField('index', 'storage_index', '{{ $index }}'),
+            ], [
+                'type' => $this->getName(),
+            ], function (Storage $storage, $fields) {
+                $storage->fillUsage(
+                    $fields['used']->value,
+                    $fields['size']->value,
+                    $fields['free']->value,
+                    $fields['percent_used']->value,
+                );
+            });
 
         return $storages;
     }

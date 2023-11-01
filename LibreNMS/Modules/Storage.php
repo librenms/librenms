@@ -59,13 +59,13 @@ class Storage implements Module
     public function discover(OS $os): void
     {
         if ($os instanceof StorageDiscovery) {
-            $data = $os->discoverStorage()->filter->isValid($os->getName());
+            $storages = $os->discoverStorage()->filter->isValid($os->getName());
 
             ModuleModelObserver::observe(\App\Models\Storage::class);
-            $this->syncModels($os->getDevice(), 'storage', $data);
+            $this->syncModels($os->getDevice(), 'storage', $storages);
 
             Log::info('');
-            $data->each($this->printStorage(...));
+            $storages->each($this->printStorage(...));
         }
     }
 

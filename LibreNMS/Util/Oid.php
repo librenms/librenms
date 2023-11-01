@@ -59,6 +59,12 @@ class Oid
         return (bool) preg_match('/^[.\d]+$/', $this->oid);
     }
 
+    public function isFullTextualOid(): bool
+    {
+        return (bool) preg_match('/[-_A-Za-z0-9]+::[-_A-Za-z0-9]+', $this->oid);
+    }
+
+
     public function hasMib(): bool
     {
         return str_contains($this->oid, '::');
@@ -79,6 +85,11 @@ class Oid
     public function hasNumericRoot(): bool
     {
         return (bool) preg_match('/^\.?1/', $this->oid);
+    }
+
+    public function isValid(string $oid): bool
+    {
+        return $this->isNumeric() || $this->isFullTextualOid();
     }
 
     public static function hasNumeric(array $oids): bool

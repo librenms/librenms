@@ -86,9 +86,4 @@ class Storage extends DeviceRelatedModel implements Keyable
 
         return true;
     }
-
-    public function fromYaml()
-    {
-        dd(func_get_args());
-    }
 }
