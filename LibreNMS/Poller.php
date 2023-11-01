@@ -87,7 +87,7 @@ class Poller
 
         $this->logger->info("Starting polling run:\n");
 
-        foreach ($this->whereDeviceSpec($this->device_spec)->pluck('device_id') as $device_id) {
+        foreach (Device::whereDeviceSpec($this->device_spec)->pluck('device_id') as $device_id) {
             $results->markAttempted();
             $this->initDevice($device_id);
             PollingDevice::dispatch($this->device);
