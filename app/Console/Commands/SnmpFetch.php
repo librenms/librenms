@@ -149,7 +149,7 @@ abstract class SnmpFetch extends LnmsCommand
     protected function getDevices(): \Illuminate\Support\Collection
     {
         return Device::whereDeviceSpec($this->deviceSpec)->pluck('device_id')
-            ->map(fn($device_id) => DeviceCache::get($device_id));
+            ->map(fn ($device_id) => DeviceCache::get($device_id));
     }
 
     protected function fetchData(): SnmpResponse
