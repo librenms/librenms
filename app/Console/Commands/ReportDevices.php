@@ -14,6 +14,7 @@ use Symfony\Component\Console\Input\InputOption;
 class ReportDevices extends LnmsCommand
 {
     protected $name = 'report:devices';
+    const NONE_SEPERATOR = "\t";
 
     public function __construct()
     {
@@ -126,7 +127,7 @@ class ReportDevices extends LnmsCommand
 
         if ($output == 'none') {
             foreach ($rows as $row) {
-                $this->line(implode(' ', $row));
+                $this->line(implode(self::NONE_SEPERATOR, $row));
             }
 
             return;

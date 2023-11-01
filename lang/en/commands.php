@@ -230,7 +230,7 @@ return [
     'snmp:fetch' => [
         'description' => 'Run snmp query against a device',
         'arguments' => [
-            'device spec' => 'Device to query: device_id, hostname/ip, hostname regex, or all',
+            'device spec' => 'Device spec to poll: device_id, hostname, wildcard (*), odd, even, all',
             'oid(s)' => 'One or more SNMP OID to fetch.  Should be either MIB::oid or a numeric oid',
         ],
         'failed' => 'SNMP command failed!',
