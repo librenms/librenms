@@ -173,17 +173,15 @@ class Ciscowlc extends Cisco implements
             );
         }
 
-        if (! empty($counts)) {
-            $sensors[] = new WirelessSensor(
-                'clients',
-                $this->getDeviceId(),
-                $total_oids,
-                'ciscowlc',
-                0,
-                'Clients: Total',
-                $total
-            );
-        }
+        $sensors[] = new WirelessSensor(
+            'clients',
+            $this->getDeviceId(),
+            $total_oids,
+            'ciscowlc',
+            0,
+            'Clients: Total',
+            $total
+        );
 
         return $sensors;
     }
