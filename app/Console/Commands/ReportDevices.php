@@ -2,34 +2,39 @@
 
 namespace App\Console\Commands;
 
+use App\Console\LnmsCommand;
 use App\Console\SyntheticDeviceField;
 use App\Models\Device;
-use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Schema;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputOption;
 
-class ReportDevices extends Command
+class ReportDevices extends LnmsCommand
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
-    protected $signature = 'report:devices {-f|--fields=hostname,ip,sysName} {-o|--output=table}';
+    protected $name = 'report:devices';
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
-    protected $description = 'Print out data from all devices';
+    public function __construct()
+    {
+        parent::__construct();
+        $this->addArgument('device spec', InputArgument::OPTIONAL);
+        $this->addOption('fields', 'f', InputOption::VALUE_REQUIRED, default: 'hostname,ip');
+        $this->addOption('output', 'o', InputOption::VALUE_REQUIRED, __('commands.report:devices.options.output', ['types' => '[table, csv, none]']), 'table');
+        $this->addOption('list-fields');
+   }
 
     /**
      * Execute the console command.
      */
     public function handle(): int
     {
+        if ($this->option('list-fields')) {
+            $this->printFields();
+
+            return 0;
+        }
+
         try {
             $fields = collect(explode(',', $this->option('fields')))->map(fn($field) => $this->getField($field));
         } catch (\Exception $e) {
@@ -37,24 +42,11 @@ class ReportDevices extends Command
 
             return 1;
         }
-        $output = $this->option('output');
 
         $headers = $fields->map->headerName()->all();
         $devices = $this->fetchDeviceData($fields);
 
-        $out = fopen('php://output', 'w');
-        if ($output == 'csv') {
-            fputcsv($out, $headers);
-            foreach ($devices as $device) {
-                fputcsv($out, $device);
-            }
-            fclose($out);
-
-            return 0;
-        }
-
-        // print table
-        $this->table($headers, $devices);
+        $this->printReport($headers, $devices);
 
         return 0;
     }
@@ -62,7 +54,7 @@ class ReportDevices extends Command
     protected function fetchDeviceData($fields): Collection
     {
         $columns = $fields->pluck('columns')->flatten()->all();
-        $query = Device::select($columns);
+        $query = Device::whereDeviceSpec($this->argument('device spec'))->select($columns);
 
         // apply any field query modifications
         foreach ($fields as $field) {
@@ -97,13 +89,9 @@ class ReportDevices extends Command
         }
 
         // misc synthetic fields
-        $custom = match($field) {
-            'displayName' => new SyntheticDeviceField($field, ['hostname', 'sysName', 'ip', 'display'], fn(Device $device) => $device->displayName(), headerName: 'display name'),
-            default => null,
-        };
-
-        if ($custom) {
-            return $custom;
+        $syntheticFields = $this->getSyntheticFields();
+        if (isset($syntheticFields[$field])) {
+            return $syntheticFields[$field];
         }
 
         // just a regular column, check that it exists
@@ -112,5 +100,62 @@ class ReportDevices extends Command
         }
 
        return new SyntheticDeviceField($field, [$field]);
+    }
+
+    protected function getSyntheticFields(): array
+    {
+        return [
+            'displayName' => new SyntheticDeviceField('displayName', ['hostname', 'sysName', 'ip', 'display'], fn(Device $device) => $device->displayName(), headerName: 'display name'),
+            'location' => new SyntheticDeviceField('location', ['location_id'], fn(Device $device) => $device->location->location, fn(Builder $q) => $q->with('location')),
+        ];
+    }
+
+    protected function printReport(array $headers, array|Collection $rows): void
+    {
+        $output = $this->option('output');
+
+        if ($output == 'csv') {
+            $out = fopen('php://output', 'w');
+            fputcsv($out, $headers);
+            foreach ($rows as $row) {
+                fputcsv($out, $row);
+            }
+            fclose($out);
+
+            return;
+        }
+
+        if ($output == 'none') {
+            foreach ($rows as $row) {
+                $this->line(implode("\t", $row));
+            }
+
+            return;
+        }
+
+
+        // print table
+        $this->table($headers, $rows);
+    }
+
+    protected function printFields(): void
+    {
+        $this->info(__('commands.report:devices.columns'));
+        $columns = Schema::getColumnListing('devices');
+        foreach ($columns as $column) {
+            $this->line($column);
+        }
+
+        $this->info(__('commands.report:devices.synthetic'));
+        $synthetic = array_keys($this->getSyntheticFields());
+        foreach ($synthetic as $field) {
+            $this->line($field);
+        }
+
+        $this->info(__('commands.report:devices.counts'));
+        $relationships = Device::definedRelations();
+        foreach ($relationships as $relationship) {
+            $this->line($relationship . '_count');
+        }
     }
 }
