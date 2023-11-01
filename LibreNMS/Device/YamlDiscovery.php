@@ -457,7 +457,7 @@ class YamlDiscovery
         $fetchedData = [];  // TODO preCache?
 
         foreach ($yaml['data'] ?? [] as $yamlItem) {
-            $oids = $yamlItem['oid'] ?? Arr::only($yamlItem, collect($fields)->where('poll')->keys()->all());
+            $oids = $yamlItem['oid'] ?? Arr::only($yamlItem, collect($fields)->where('fetch')->keys()->all());
             $response = SnmpQuery::enumStrings()->walk($oids);
             $fetchedData = array_replace_recursive($fetchedData, $response->table(100)); // merge into cached data
             $count = 0;
@@ -474,12 +474,14 @@ class YamlDiscovery
                 /** @var \LibreNMS\Device\YamlDiscoveryField $field */
                 foreach ($fields as $key => $field) {
                     if (! array_key_exists($key, $yamlItem)) {
+                        // field not filled from yaml, use the default (if the default is empty, just pass through)
                         $field->value = $field->default ? self::replaceValues('default', $index, $count, ['default' => $field->default], $fetchedData) : $field->default;
                     } else {
                         $field->value = self::replaceValues($key, $index, $count, $yamlItem, $fetchedData);
+
                         // record numeric oid for polling
-                        if ($field->poll) {
-                            $modelAttributes[$field->model_column . '_oid'] = Oid::toNumeric($yamlItem[$key]) . '.' . $index;
+                        if ($field->oid_column) {
+                            $modelAttributes[$field->oid_column] = Oid::toNumeric($yamlItem[$key]) . '.' . $index;
                         }
                     }
 
@@ -489,7 +491,7 @@ class YamlDiscovery
                 $newModel = new $model($modelAttributes);
 
                 if ($callback) {
-                    $callback($newModel, $fields);
+                    $callback($newModel, $fields, $yamlItem, $index);
                 }
 
                 $models->push($newModel);

@@ -27,7 +27,6 @@ namespace LibreNMS\OS\Traits;
 
 use App\Models\Mempool;
 use App\Models\Storage;
-use Closure;
 use Exception;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
@@ -168,12 +167,14 @@ trait HostResources
             return new Collection;
         }
 
-        $ram_bytes = \SnmpQuery::get('HOST-RESOURCES-MIB::hrMemorySize.0')->value() * 1024
-            ?: (isset($hr_storage[1]['hrStorageSize']) ? $hr_storage[1]['hrStorageSize'] * $hr_storage[1]['hrStorageAllocationUnits'] : 0);
+        $hrMemorySize = \SnmpQuery::get('HOST-RESOURCES-MIB::hrMemorySize.0')->value();
+        $ram_bytes = $hrMemorySize
+            ? $hrMemorySize * 1024
+            : (isset($hr_storage[1]['hrStorageSize']) ? $hr_storage[1]['hrStorageSize'] * $hr_storage[1]['hrStorageAllocationUnits'] : 0);
 
-        return collect($hr_storage)->filter(Closure::fromCallable([$this, 'memValid']))
+        return collect($hr_storage)->filter($this->memValid(...))
             ->map(function ($storage, $index) use ($ram_bytes) {
-                $total = $storage['hrStorageSize'];
+                $total = $storage['hrStorageSize'] ?? null;
                 if (Str::contains($storage['hrStorageDescr'], 'Real Memory Metrics') || ($storage['hrStorageType'] == 'hrStorageOther' && $total != 0)) {
                     // use total RAM for buffers, cached, and shared
                     // bsnmp does not report the same as net-snmp, total RAM is stored in hrMemorySize
@@ -227,6 +228,8 @@ trait HostResources
 
     protected function memValid($storage)
     {
+        dd($storage);
+
         if (empty($storage['hrStorageType']) || empty($storage['hrStorageDescr'])) {
             return false;
         }

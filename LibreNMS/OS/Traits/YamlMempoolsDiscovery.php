@@ -47,19 +47,22 @@ trait YamlMempoolsDiscovery
     {
         $mempools_yaml = $this->getDiscovery('mempools');
 
-        return YamlDiscovery::from($mempools_yaml, \App\Models\Mempool::class, [
+        return YamlDiscovery::from($mempools_yaml, Mempool::class, [
             'index' => new YamlDiscoveryField('index', 'mempool_index', '{{ $index }}'),
             'type' => new YamlDiscoveryField('type', 'mempool_type', $this->getName()),
             'class' => new YamlDiscoveryField('class', 'mempool_class', 'system'),
             'precision' => new YamlDiscoveryField('precision', 'mempool_precision', 1),
             'descr' => new YamlDiscoveryField('descr', 'mempool_descr', 'Memory', callback: fn($value) => ucwords($value)),
-            'used' => new YamlDiscoveryField('used', 'mempool_used', poll: true),
-            'free' => new YamlDiscoveryField('free', 'mempool_free', poll: true),
-            'total' => new YamlDiscoveryField('total', 'mempool_total', poll: true),
-            'percent_used' => new YamlDiscoveryField('percent_used', 'mempool_prec', poll: true),
+            'used' => new YamlDiscoveryField('used', 'mempool_used', fetch: true, oid_column: 'mempool_used_oid'),
+            'free' => new YamlDiscoveryField('free', 'mempool_free', fetch: true), // oid filled below if appropriate
+            'total' => new YamlDiscoveryField('total', 'mempool_total', fetch: true),
+            'percent_used' => new YamlDiscoveryField('percent_used', 'mempool_prec', fetch: true),
             'warn_percent' => new YamlDiscoveryField('warn_percent', 'mempool_perc_warn', 90),
-        ], callback: function (\App\Models\Mempool $mempool, $fields) {
-            // only use "free" if we have both used and total ????
+        ], callback: function (Mempool $mempool, $fields, $yaml, $index) {
+            // only use "free" if we have both used and total FIXME comment does not match code?
+            if ($fields['used']->value === null || $fields['total']->value === null) {
+                $mempool->mempool_free_oid =  Oid::toNumeric($yaml['free']) . '.' . $index;
+            }
 
             $mempool->fillUsage(
                 $fields['used']->value,

@@ -174,7 +174,7 @@ class Mempools implements Module
      * @param  \Illuminate\Support\Collection  $mempools
      * @return \Illuminate\Support\Collection
      */
-    private function calculateAvailable(Collection $mempools)
+    private function calculateAvailable(Collection $mempools): Collection
     {
         if ($mempools->count() > 2) { // optimization
             $system = null;
@@ -209,7 +209,7 @@ class Mempools implements Module
 
             if ($system !== null) {
                 $old = Number::formatBi($system->mempool_free);
-                $system->fillUsage(($system->mempool_used - $buffers - $cached) / $system->mempool_precision, $system->mempool_total / $system->mempool_precision);
+                $system->fillUsage(($system->mempool_used - $buffers - $cached), $system->mempool_total, multiplier: 1);
                 $new = Number::formatBi($system->mempool_free);
                 Log::debug("Free memory adjusted by availability calculation: {$old} -> {$new}\n");
             }

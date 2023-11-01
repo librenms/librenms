@@ -42,10 +42,10 @@ trait YamlStorageDiscovery
                 'type' => new YamlDiscoveryField('type', 'storage_type', 'Storage'),
                 'descr' => new YamlDiscoveryField('descr', 'storage_descr', 'Disk {{ $index }}'),
                 'units' => new YamlDiscoveryField('units', 'storage_units', 1048576), // TODO good default?
-                'size' => new YamlDiscoveryField('size', 'storage_size', poll: true),
-                'used' => new YamlDiscoveryField('used', 'storage_used', poll: true),
-                'free' => new YamlDiscoveryField('free', 'storage_free', poll: true),
-                'percent_used' => new YamlDiscoveryField('percent_used', 'storage_perc', poll: true),
+                'size' => new YamlDiscoveryField('size', 'storage_size', fetch: true),
+                'used' => new YamlDiscoveryField('used', 'storage_used', fetch: true),
+                'free' => new YamlDiscoveryField('free', 'storage_free', fetch: true),
+                'percent_used' => new YamlDiscoveryField('percent_used', 'storage_perc', fetch: true),
                 'index' => new YamlDiscoveryField('index', 'storage_index', '{{ $index }}'),
             ], [
                 'type' => $this->getName(),

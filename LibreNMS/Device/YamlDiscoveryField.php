@@ -30,11 +30,11 @@ class YamlDiscoveryField
     public mixed $value = null;
 
     public function __construct(
-        public readonly string     $key,
-        public readonly ?string    $model_column = null,
-        public readonly ?string    $default = null,
-        public readonly bool       $poll = false,
-        public ?\Closure $callback = null,
-    ) {
-    }
+        public readonly string    $key,
+        public readonly ?string   $model_column = null,
+        public readonly ?string   $default = null,
+        public readonly bool      $fetch = false,
+        public readonly ?string   $oid_column = null,
+        public readonly ?\Closure $callback = null,
+    ) {}
 }
