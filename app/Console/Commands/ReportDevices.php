@@ -126,7 +126,7 @@ class ReportDevices extends LnmsCommand
 
         if ($output == 'none') {
             foreach ($rows as $row) {
-                $this->line(implode("\t", $row));
+                $this->line(implode(' ', $row));
             }
 
             return;
