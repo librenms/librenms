@@ -39,8 +39,8 @@ use Symfony\Component\HttpFoundation\ParameterBag;
 class Url
 {
     /**
-     * @param  Device  $device
-     * @param  string  $text
+     * @param  Device|null  $device
+     * @param  string|null  $text
      * @param  array  $vars
      * @param  int  $start
      * @param  int  $end
@@ -51,7 +51,7 @@ class Url
     public static function deviceLink($device, $text = '', $vars = [], $start = 0, $end = 0, $escape_text = 1, $overlib = 1)
     {
         if (! $device instanceof Device || ! $device->hostname) {
-            return $text;
+            return (string) $text;
         }
 
         if (! $device->canAccess(Auth::user())) {
