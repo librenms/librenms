@@ -827,6 +827,12 @@ return [
                 'description' => 'Version',
                 'help' => 'This is used to automatically create the base_uri for the Graylog API. If you have modified the API uri from the default, set this to other and specify your base_uri.',
             ],
+            'query' => [
+                'field' => [
+                    'description' => 'Query api field',
+                    'help' => 'Changes the default field to query graylog API.',
+                ],
+            ],
         ],
         'html' => [
             'device' => [
