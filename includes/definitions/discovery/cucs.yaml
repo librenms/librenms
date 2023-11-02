@@ -2,7 +2,7 @@ mib: CISCO-UNIFIED-COMPUTING-EQUIPMENT-MIB
 modules:
     os:
         version: ENTITY-MIB::entPhysicalSoftwareRev.22
-        hardware: ENTITY-MIB::entPhysicalModelName.149
+        hardware: ENTITY-MIB::entPhysicalModelName.10
         serial: ENTITY-MIB::entPhysicalSerialNum.10
     sensors:
         pre-cache:
