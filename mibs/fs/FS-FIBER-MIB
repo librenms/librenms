@@ -1,0 +1,2927 @@
+-- *****************************************************************
+-- FS-FIBER-MIB.mib:  FS FIBER MIB file
+--
+-- January 2012
+--
+-- Copyright (c) 2012 by FS.COM Inc
+-- All rights reserved.
+-- 
+-- *****************************************************************
+--
+
+FS-FIBER-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        Gauge32
+                FROM SNMPv2-SMI
+        TruthValue,
+        DisplayString
+                FROM SNMPv2-TC
+        MODULE-COMPLIANCE,
+        OBJECT-GROUP
+                FROM SNMPv2-CONF
+        IfIndex
+                FROM FS-TC
+        fsMgmt
+                FROM FS-SMI
+        ifIndex,
+        ifDescr
+                FROM IF-MIB;
+
+fsFiberMIB MODULE-IDENTITY
+        LAST-UPDATED "201111280000Z"
+        ORGANIZATION "FS.COM Inc"
+        CONTACT-INFO
+                " 
+                Tel: 400-865-2852 
+
+                E-mail: https://www.fs.com/live_chat_service_mail.html"
+        DESCRIPTION
+                "This module defines fs fiber module information mibs."
+        REVISION      "201111280000Z"
+        DESCRIPTION
+                "Initial version of this MIB module."
+        ::= { fsMgmt 105}
+
+fsFiberMIBObjects OBJECT IDENTIFIER ::= { fsFiberMIB 1 }
+
+
+-- ---------------------------------------------------------- --
+-- A table for getting Fiber port information.
+-- ---------------------------------------------------------- -- 
+fsFiberTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF FSFiberEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table for getting Fiber Module information"
+        ::= { fsFiberMIBObjects 1 }
+    
+fsFiberEntry OBJECT-TYPE
+        SYNTAX FSFiberEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Entry of a Fiber Module information."
+        INDEX { fsFiberPortIndex }
+        ::= { fsFiberTable 1 }
+    
+FSFiberEntry ::=
+        SEQUENCE {
+                fsFiberPortIndex IfIndex,
+                fsFiberPortDescr DisplayString,
+                fsFiberTransceiverType INTEGER,
+                fsFiberConnectorType INTEGER,
+                fsFiberWavelength INTEGER,
+                fsFiberTransferDistanceSMF INTEGER,
+                fsFiberTransferDistance62point5umOM1 INTEGER,
+                fsFiberTransferDistance62point5um INTEGER,
+                fsFiberTransferDistance50umOM2 INTEGER,
+                fsFiberTransferDistance50um INTEGER,
+                fsFiberTransferDistance50umOM3 INTEGER,
+                fsFiberTransferDistanceEBW50um INTEGER,
+                fsFiberTransferDistanceCopper INTEGER,
+                fsFiberTransferDistanceCableAssembly INTEGER,
+                fsFiberDDMSupportStatus TruthValue,
+                fsFiberSerialNumber DisplayString,
+                fsFiberTemp INTEGER,
+                fsFiberTempStatus INTEGER,
+                fsFiberVoltage INTEGER,
+                fsFiberVoltageStatus INTEGER,
+                fsFiberBias INTEGER,
+                fsFiberBiasStatus INTEGER,
+                fsFiberChannel1Bias INTEGER,
+                fsFiberChannel1BiasStatus INTEGER,
+                fsFiberChannel2Bias INTEGER,
+                fsFiberChannel2BiasStatus INTEGER,
+                fsFiberChannel3Bias INTEGER,
+                fsFiberChannel3BiasStatus INTEGER,
+                fsFiberChannel4Bias INTEGER,
+                fsFiberChannel4BiasStatus INTEGER,
+                fsFiberRXpowerIntegerpart INTEGER,
+                fsFiberRXpowerDecimalpart INTEGER,
+                fsFiberRXpowertype INTEGER,
+                fsFiberRXpowerStatus INTEGER,
+                fsFiberChannel1RXpowerIntegerpart INTEGER,
+                fsFiberChannel1RXpowerDecimalpart INTEGER,
+                fsFiberChannel1RXpowertype INTEGER,
+                fsFiberChannel1RXpowerStatus INTEGER,
+                fsFiberChannel2RXpowerIntegerpart INTEGER,
+                fsFiberChannel2RXpowerDecimalpart INTEGER,
+                fsFiberChannel2RXpowertype INTEGER,
+                fsFiberChannel2RXpowerStatus INTEGER,
+                fsFiberChannel3RXpowerIntegerpart INTEGER,
+                fsFiberChannel3RXpowerDecimalpart INTEGER,
+                fsFiberChannel3RXpowertype INTEGER,
+                fsFiberChannel3RXpowerStatus INTEGER,
+                fsFiberChannel4RXpowerIntegerpart INTEGER,
+                fsFiberChannel4RXpowerDecimalpart INTEGER,
+                fsFiberChannel4RXpowertype INTEGER,
+                fsFiberChannel4RXpowerStatus INTEGER,
+                fsFiberTXpowerIntegerpart INTEGER,
+                fsFiberTXpowerDecimalpart INTEGER,
+                fsFiberTXpowerStatus INTEGER,
+                fsFiberChannel1TXpowerIntegerpart INTEGER,
+                fsFiberChannel1TXpowerDecimalpart INTEGER,
+                fsFiberChannel1TXpowerStatus INTEGER,
+                fsFiberChannel2TXpowerIntegerpart INTEGER,
+                fsFiberChannel2TXpowerDecimalpart INTEGER,
+                fsFiberChannel2TXpowerStatus INTEGER,
+                fsFiberChannel3TXpowerIntegerpart INTEGER,
+                fsFiberChannel3TXpowerDecimalpart INTEGER,
+                fsFiberChannel3TXpowerStatus INTEGER,
+                fsFiberChannel4TXpowerIntegerpart INTEGER,
+                fsFiberChannel4TXpowerDecimalpart INTEGER,
+                fsFiberChannel4TXpowerStatus INTEGER,
+                fsFiberRXpowerSign INTEGER,
+                fsFiberChannel1RXpowerSign INTEGER,
+                fsFiberChannel2RXpowerSign INTEGER,
+                fsFiberChannel3RXpowerSign INTEGER,
+                fsFiberChannel4RXpowerSign INTEGER,
+                fsFiberTXpowerSign INTEGER,
+                fsFiberChannel1TXpowerSign INTEGER,
+                fsFiberChannel2TXpowerSign INTEGER,
+                fsFiberChannel3TXpowerSign INTEGER,
+                fsFiberChannel4TXpowerSign INTEGER,
+                fsFiberRXpower INTEGER,
+                fsFiberChannel1RXpower INTEGER,
+                fsFiberChannel2RXpower INTEGER,
+                fsFiberChannel3RXpower INTEGER,
+                fsFiberChannel4RXpower INTEGER,
+                fsFiberTXpower INTEGER,
+                fsFiberChannel1TXpower INTEGER,
+                fsFiberChannel2TXpower INTEGER,
+                fsFiberChannel3TXpower INTEGER,
+                fsFiberChannel4TXpower INTEGER,
+                fsFiberWavelengthExact DisplayString,
+                fsFiberTransferDistance50umOM4 INTEGER,
+                fsFiberTransferDistanceSMFExt INTEGER,
+                fsFiberBandWidth INTEGER,
+                fsFiberFormFactor INTEGER,
+                fsFiberRXpowerLowWarnThreshold INTEGER,
+                fsFiberRXpowerHighWarnThreshold INTEGER,
+                fsFiberRXpowerLowAlarmThreshold INTEGER,
+                fsFiberRXpowerHighAlarmThreshold INTEGER,
+                fsFiberTXpowerLowWarnThreshold INTEGER,
+                fsFiberTXpowerHighWarnThreshold INTEGER,
+                fsFiberTXpowerLowAlarmThreshold INTEGER,
+                fsFiberTXpowerHighAlarmThreshold INTEGER,
+                fsFiberChannel5Bias INTEGER,
+                fsFiberChannel5BiasStatus INTEGER,
+                fsFiberChannel6Bias INTEGER,
+                fsFiberChannel6BiasStatus INTEGER,
+                fsFiberChannel7Bias INTEGER,
+                fsFiberChannel7BiasStatus INTEGER,
+                fsFiberChannel8Bias INTEGER,
+                fsFiberChannel8BiasStatus INTEGER,
+                fsFiberChannel5RXpowerIntegerpart INTEGER,
+                fsFiberChannel5RXpowerDecimalpart INTEGER,
+                fsFiberChannel5RXpowertype INTEGER,
+                fsFiberChannel5RXpowerStatus INTEGER,
+                fsFiberChannel6RXpowerIntegerpart INTEGER,
+                fsFiberChannel6RXpowerDecimalpart INTEGER,
+                fsFiberChannel6RXpowertype INTEGER,
+                fsFiberChannel6RXpowerStatus INTEGER,
+                fsFiberChannel7RXpowerIntegerpart INTEGER,
+                fsFiberChannel7RXpowerDecimalpart INTEGER,
+                fsFiberChannel7RXpowertype INTEGER,
+                fsFiberChannel7RXpowerStatus INTEGER,
+                fsFiberChannel8RXpowerIntegerpart INTEGER,
+                fsFiberChannel8RXpowerDecimalpart INTEGER,
+                fsFiberChannel8RXpowertype INTEGER,
+                fsFiberChannel8RXpowerStatus INTEGER,
+                fsFiberChannel5TXpowerIntegerpart INTEGER,
+                fsFiberChannel5TXpowerDecimalpart INTEGER,
+                fsFiberChannel5TXpowerStatus INTEGER,
+                fsFiberChannel6TXpowerIntegerpart INTEGER,
+                fsFiberChannel6TXpowerDecimalpart INTEGER,
+                fsFiberChannel6TXpowerStatus INTEGER,
+                fsFiberChannel7TXpowerIntegerpart INTEGER,
+                fsFiberChannel7TXpowerDecimalpart INTEGER,
+                fsFiberChannel7TXpowerStatus INTEGER,
+                fsFiberChannel8TXpowerIntegerpart INTEGER,
+                fsFiberChannel8TXpowerDecimalpart INTEGER,
+                fsFiberChannel8TXpowerStatus INTEGER,
+                fsFiberChannel5RXpowerSign INTEGER,
+                fsFiberChannel6RXpowerSign INTEGER,
+                fsFiberChannel7RXpowerSign INTEGER,
+                fsFiberChannel8RXpowerSign INTEGER,
+                fsFiberChannel5TXpowerSign INTEGER,
+                fsFiberChannel6TXpowerSign INTEGER,
+                fsFiberChannel7TXpowerSign INTEGER,
+                fsFiberChannel8TXpowerSign INTEGER,
+                fsFiberChannel5RXpower INTEGER,
+                fsFiberChannel6RXpower INTEGER,
+                fsFiberChannel7RXpower INTEGER,
+                fsFiberChannel8RXpower INTEGER,
+                fsFiberChannel5TXpower INTEGER,
+                fsFiberChannel6TXpower INTEGER,
+                fsFiberChannel7TXpower INTEGER,
+                fsFiberChannel8TXpower INTEGER,
+                fsFiberTransferDistance50umOM5 INTEGER,
+                fsFiberMode INTEGER,
+                fsFiberTempLowWarnThreshold INTEGER,
+                fsFiberTempHighWarnThreshold INTEGER,
+                fsFiberTempLowAlarmThreshold INTEGER,
+                fsFiberTempHighAlarmThreshold INTEGER,
+                fsFiberVoltageLowWarnThreshold INTEGER,
+                fsFiberVoltageHighWarnThreshold INTEGER,
+                fsFiberVoltageLowAlarmThreshold INTEGER,
+                fsFiberVoltageHighAlarmThreshold INTEGER,
+                fsFiberBiasLowWarnThreshold INTEGER,
+                fsFiberBiasHighWarnThreshold INTEGER,
+                fsFiberBiasLowAlarmThreshold INTEGER,
+                fsFiberBiasHighAlarmThreshold INTEGER
+        }
+        
+fsFiberPortIndex OBJECT-TYPE
+        SYNTAX IfIndex
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Port index of the port."
+        ::= { fsFiberEntry 1 }
+
+fsFiberPortDescr OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(1..32))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Discription of the port."
+        ::= { fsFiberEntry 2 }
+
+fsFiberTransceiverType OBJECT-TYPE
+        SYNTAX INTEGER {
+            unknown(1),
+            fiber100BASEGTSFP(2),
+            fiber100BASESXSFP(3),
+            fiber100BASELXSFP(4),
+            fiber100BASELHSFP(5),
+            fiber100BASEZXSFP(6),
+            fiber100CopperSFP(7),
+            fiber1000BASEGTSFP(8),
+            fiber1000BASESXSFP(9),
+            fiber1000BASELXSFP(10),
+            fiber1000BASELHSFP(11),
+            fiber1000BASEZXSFP(12),
+            fiber1000CopperSFP(13),
+            fiber10GCopperSFPPlus(14),
+            fiber10GBASESRSFPPlus(15),
+            fiber10GBASELRSFPPlus(16),
+            fiber10GBASEERSFPPlus(17),
+            fiber10GBASEZRSFPPlus(18),
+            fiber10GCopperXFP(19),
+            fiber10GBASESRXFP(20),
+            fiber10GBASELRXFP(21),
+            fiber10GBASEERXFP(22),
+            fiber10GBASEZRXFP(23),
+            fiber40GActiveCableQSFPPlus(24),
+            fiber40GLR4QSFPPlus(25),
+            fiber40GCopperQSFPPlus(26),
+            fiber40GSR4QSFPPlus(27),
+            fiber2500CopperSFP(28),
+            fiberFC16G(29),
+            fiberFC8G(30),
+            fiberFC4G(31),
+            fiberFC2G(32),
+            fiber10GActiveCableSFPPlus(33),
+            fiber40GER4QSFPPlus(34),
+            fiber40GZR4QSFPPlus(35),
+            fiber100GCABLEQSFP28(36),
+            fiber100GLR4QSFP28(37),
+            fiber100GSR4QSFP28(38),
+            fiber100GER4QSFP28(39),
+            fiber100GZR4QSFP28(40),
+            fiber100GCR4QSFP28(41),
+            fiber100GPSM4QSFP28(42),
+            fiber25GSRSFP28    (43),
+            fiber25GLRSFP28    (44),
+            fiber25GERSFP28    (45),
+            fiber25GZRSFP28    (46),
+            fiber25GCOPPERSFP28 (47),
+            fiber25GACTIVECABLESFP28 (48),
+            fiber100GiLR4QSFP28(49),
+            fiber10GBASELRMSFPPlus(50),
+            fiber40GLSR4QSFPPlus(51),
+            fiber40GSWDM4QSFPPlus(52),
+            fiber40GiLR4QSFPPlus(53),
+            fiber40GPSM4QSFPPlus(54),
+            fiber40GSR4BiDiQSFPPlus(55),
+            fiber100GSWDM4QSFP28(56),
+            fiber100GPAM4BiDiQSFP28(57),
+            fiber100GER4LiteQSFP28(58),
+            fiber100G4WDM40QSFP28(59),
+            fiber100GDWDM2QSFP28(60),
+            fiber40GZRQSFPPlus(61),
+            fiber100GZRQSFP28(62),
+            fiber100GCWDM4QSFP28(63),
+            fiber10GPASSIVECOPPERSFPPlus(64),
+            fiber10GACTIVECOPPERSFPPlus(65),
+            fiber10GLOOPBACKSFPPlus(66),
+            fiber40GPASSIVECOPPERQSFPPlus(67),
+            fiber40GACTIVECOPPERQSFPPlus(68),
+            fiber40GLOOPBACKQSFPPlus(69),
+            fiber100GPASSIVECOPPERQSFP28(70),
+            fiber100GACTIVECOPPERQSFP28(71),
+            fiber100GLOOPBACKQSFP28(72),
+            fiber25GPASSIVECOPPERSFP28(73),
+            fiber25GACTIVECOPPERSFP28(74),
+            fiber25GLOOPBACKSFP28(75),
+            fiber200GSR4QSFP56(76),
+            fiber200GFR4QSFP56(77),
+            fiber200GPASSIVECOPPERQSFP56(78),
+            fiber200GACTIVECOPPERQSFP56(79),
+            fiber400GSR8QSFPDD(80),
+            fiber400GDR4QSFPDD(81),
+            fiber400GFR4QSFPDD(82),
+            fiber400GPASSIVECOPPERQSFPDD(83),
+            fiber400GACTIVECABLEQSFPDD(84),
+            fiber400GLR8QSFPDD(85),
+            fiber200GLOOPBACKQSFP56(86),
+            fiber400GACTIVECOPPERQSFPDD(87),
+            fiber400GLOOPBACKQSFPDD(88),
+            fiber100GPASSIVECOPPERDSFP(89),
+            fiber100GACTIVECOPPERDSFP(90),
+            fiber100GACTIVECABLEDSFP(91),
+            fiber100GLOOPBACKDSFP(92),
+            fiber100GDR1QSFP28(93),
+            fiber100GFR1QSFP28(94),
+            fiber400GZRQSFPDD(95),
+            fiber2500BASESXSFP(96),
+            fiber2500BASELXSFP(97),
+            fiber200GACTIVECABLEQSFP56(98),
+            fiber40GLX4QSFPPlus(99),
+            fiber10GBASELR8SFX(100),
+            fiber1000BASELX8SFG(101),
+            fiber10GCOPPER8SFX(102),
+            fiber10GBASETXFP(103),
+            fiber400GZRPlusQSFPDD(104),
+            fiber400GLR4QSFPDD(105)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Transceiver type of the Fiber module insered into the port."
+        ::= { fsFiberEntry 3 }
+
+fsFiberConnectorType OBJECT-TYPE
+        SYNTAX INTEGER {
+        meaningless(0),
+            unknownorunspecified(1),
+            vendorspecific(2),
+            sc(3),
+            fiberChannelStyle1CopperConnector(4),
+            fiberChannelStyle2CopperConnector(5),
+            bncortnc(6),
+            fiberChannelCoaxialHeaders(7),
+            fiberJack(8),
+            lc(9),
+            mtrj(10),
+            mu(11),
+            sg(12),
+            opticalPigtail(13),
+            hssdcII(14),
+            copperPigtail(15),
+            mpo(16),
+            rj45(17),
+            noSeparableConnector(18),
+            mxc(19)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Connector type of the Fiber module insered into the port.
+	     If the transceiver type of Fiber module is unknown(1), then this
+             object contains a zero value."
+        ::= { fsFiberEntry 4 }
+
+fsFiberWavelength OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The value of wavelength of the Fiber module insered into the port.
+	     If the transceiver type of Fiber module is either fiber100CopperSFP(7)  
+	     or fiber1000CopperSFP(13) (or fiber10GCopperSFPPlus(14), 
+	     or fiber10GCopperXFP(19), or fiber40GCopperQSFPPlus(26), or fiber2500CopperSFP(28), or unknown(1)), then this
+             object contains a zero value."
+        ::= { fsFiberEntry 5 }
+
+fsFiberTransferDistanceSMF OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The value of transfer distance of the Fiber module insered into the port.
+	     This value specifies the link length that is supported by the 
+	     transceiver while operating in compliance with the applicable 
+	     standards using single mode fiber for. The value is in units of kilometers.
+	     A value of zero means that the transceiver does not support single mode fiber."
+        ::= { fsFiberEntry 6 }
+
+fsFiberTransferDistance62point5umOM1 OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The value of transfer distance of the Fiber module insered into the port.
+	     This value specifies the link length that is supported by the 
+	     transceiver while operating in compliance with the applicable 
+	     standards using 62.5 micron multimode (200 MHz*Km at 850 nm, 500 MHz*Km 
+	     at 1310 nm) fiber. The value is in units of meters.
+	     A value of zero means that the transceiver does not 
+	     support 62.5 micron multimode fiber or the Fiber module type 
+	     is neither SFP/SFP+ nor QSFP+."
+        ::= { fsFiberEntry 7 }
+
+fsFiberTransferDistance62point5um OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The value of transfer distance of the Fiber module insered into the port.
+	     This value specifies the link length that is supported by the 
+	     transceiver while operating in compliance with the applicable 
+	     standards using 62.5 micron core multimode (200 MHz*Km at 850 nm, 500 MHz*Km 
+	     at 1310 nm) fiber. The value is in units of meters.
+	     A value of zero means that the transceiver does not 
+	     support 62.5 micron multimode fiber or the Fiber module type is not XFP."
+        ::= { fsFiberEntry 8 }
+
+fsFiberTransferDistance50umOM2 OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The value of transfer distance of the Fiber module insered into the port.
+	     This value specifies the link length that is supported by the 
+	     transceiver while operating in compliance with the applicable 
+	     standards using 50 micron multimode (500 MHz*Km at 850 nm for SFP module 
+	     or at 850 nm and 1310 nm for QSFP+ module) fiber. The value is in units of meters.
+	     A value of zero means that the transceiver does not 
+	     support 50 micron multimode fiber or the Fiber module type 
+	     is neither SFP/SFP+ nor QSFP+."
+        ::= { fsFiberEntry 9 }
+
+fsFiberTransferDistance50um OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The value of transfer distance of the Fiber module insered into the port.
+	     This value specifies the link length that is supported by the 
+	     transceiver while operating in compliance with the applicable 
+	     standards using 50 micron core multimode (500 MHz*Km at 850 nm and 1310 nm) fiber. 
+	     The value is in units of meters.
+	     A value of zero means that the transceiver does not 
+	     support 50 micron core multimode fiber or the Fiber module type 
+	     is not XFP."
+        ::= { fsFiberEntry 10 }
+
+fsFiberTransferDistance50umOM3 OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The value of transfer distance of the Fiber module insered into the port.
+	     This value specifies the link length that is supported by the 
+	     transceiver while operating in compliance with the applicable 
+	     standards using 50 micron multimode OM3(2000 MHz*Km) fiber. 
+	     The value is in units of meters.
+	     A value of zero means that the transceiver does not 
+	     support 50 micron multimode fiber or the Fiber module type 
+	     is neither SFP/SFP+ nor QSFP+."
+        ::= { fsFiberEntry 11 }
+
+fsFiberTransferDistanceEBW50um OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The value of transfer distance of the Fiber module insered into the port.
+	     This value specifies the link length that is supported by the 
+	     transceiver while operating in compliance with the applicable 
+	     standards using 2000 MHz*Km (850nm) extended bandwidth 50 
+	     micron core multimode fiber. The value is in units of meters.  
+	     A value of zero means that the transceiver does not support 
+	     extended bandwidth 50 micron multimode fiber or the Fiber module type is not XFP."
+        ::= { fsFiberEntry 12 }
+
+fsFiberTransferDistanceCopper OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The value of transfer distance of the Fiber module insered into the port.
+	     This value specifies the link length that is supported by the 
+	     transceiver while operating in compliance with the applicable 
+	     standards using copper cables. The value is in units of meters.
+	     A value of zero means that the transceiver does not support copper cables
+	     or the Fiber module type is neither SFP/SFP+ nor XFP."
+        ::= { fsFiberEntry 13 }
+
+fsFiberTransferDistanceCableAssembly OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The value of transfer distance of the Fiber module insered into the port.
+	     This value specifies the link length of the Cable assembly passive. 
+	     The value is in units of meters.
+	     A value of zero means that the transceiver is not a cable assemblyor
+	     or the Fiber module type is not QSFP+."
+        ::= { fsFiberEntry 14 }
+
+fsFiberDDMSupportStatus OBJECT-TYPE
+        SYNTAX        TruthValue
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+        "This object indicates that whether the Digital Diagnostic Monitors is implemeted."
+    ::= { fsFiberEntry 15 }
+
+fsFiberSerialNumber OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(1..32))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The serial number of the Fiber module insered into the port."
+        ::= { fsFiberEntry 16 }
+
+fsFiberTemp OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The temperature of the Fiber module insered into the port.
+	    The value is in units of degrees Celsius.
+	    If the fsFiberDDMSupportStatus is false, the temperature value is 0."
+        ::= { fsFiberEntry 17 }
+
+fsFiberTempStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+            unknown(1),
+            ok(2),
+            warning(3),
+            alarm(4)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The status ok(2) indicates that the temperature of the Fiber module is in
+	    the normal level. The status warning(3) indicates that the temperature of 
+	    the Fiber module exceeds high warning level or is below low warning level. 
+            The status alarm(4) indicates that the temperature of 
+	    the Fiber module exceeds high alarm level or is below low alarm level. 
+	    If the fsFiberDDMSupportStatus is false or the Fiber module type is 
+	    neither SFP/SFP+ nor XFP(or not QSFP+), the status is unknown(1)."
+        ::= { fsFiberEntry 18 }
+
+fsFiberVoltage OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The voltage of the Fiber module insered into the port.
+	    The value is in units of mVolts.
+	    If the fsFiberDDMSupportStatus is false, the voltage value is 0."
+        ::= { fsFiberEntry 19 }
+
+fsFiberVoltageStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+            unknown(1),
+            ok(2),
+            warning(3),
+            alarm(4)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The status ok(2) indicates that the voltage of the Fiber module is in
+	    the normal level. The status warning(3) indicates that the voltage of 
+	    the Fiber module exceeds high warning level or is below low warning level. 
+            The status alarm(4) indicates that the voltage of 
+	    the Fiber module exceeds high alarm level or is below low alarm level. 
+	    If the fsFiberDDMSupportStatus is false or the Fiber module type is 
+	    neither SFP/SFP+ nor XFP(or not QSFP+), the status is unknown(1)."
+        ::= { fsFiberEntry 20 }
+
+fsFiberBias OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The bias of the Fiber module insered into the port.
+	    The value is in units of uA.
+	    If the fsFiberDDMSupportStatus is false or the Fiber module type is 
+	    neither SFP/SFP+ nor XFP, the bias value is 0."
+        ::= { fsFiberEntry 21 }
+
+fsFiberBiasStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+            unknown(1),
+            ok(2),
+            warning(3),
+            alarm(4)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The status ok(2) indicates that the bias of the Fiber module is in
+	    the normal level. The status warning(3) indicates that the bias of 
+	    the Fiber module exceeds high warning level or is below low warning level. 
+            The status alarm(4) indicates that the bias of 
+	    the Fiber module exceeds high alarm level or is below low alarm level. 
+	    If the fsFiberDDMSupportStatus is false or the Fiber module type is 
+	    neither SFP/SFP+ nor XFP, the status is unknown(1)."
+        ::= { fsFiberEntry 22 }
+
+fsFiberChannel1Bias OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The bias in Channel 1 of the QSFP+ Fiber module insered into the port.
+	    The value is in units of uA.
+	    If the fsFiberDDMSupportStatus is false or the Fiber module type is 
+	    not QSFP+, the bias value in Channel 1 is 0."
+        ::= { fsFiberEntry 23 }
+
+fsFiberChannel1BiasStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+            unknown(1),
+            ok(2),
+            warning(3),
+            alarm(4)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The status ok(2) indicates that the bias in the Channel 1 of QSFP+ is in
+	    the normal level. The status warning(3) indicates 
+	    that the bias in the Channel 1 exceeds high warning level or is 
+	    below low warning level. The status alarm(4) indicates that the bias in 
+	    the Channel 1 exceeds high alarm level or is below low alarm level. 
+	    If the fsFiberDDMSupportStatus is false or the Fiber module type is 
+	    not QSFP+, the status is unknown(1)."
+        ::= { fsFiberEntry 24 }
+
+fsFiberChannel2Bias OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The bias in Channel 2 of the QSFP+ Fiber module insered into the port.
+	    The value is in units of uA.
+	    If the fsFiberDDMSupportStatus is false or the Fiber module type is 
+	    not QSFP+, the bias value in Channel 2 is 0."
+        ::= { fsFiberEntry 25 }
+
+fsFiberChannel2BiasStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+            unknown(1),
+            ok(2),
+            warning(3),
+            alarm(4)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The status ok(2) indicates that the bias in the Channel 2 of QSFP+ is in
+	    the normal level. The status warning(3) indicates 
+	    that the bias in the Channel 2 exceeds high warning level or is 
+	    below low warning level. The status alarm(4) indicates that the bias in 
+	    the Channel 2 exceeds high alarm level or is below low alarm level. 
+	    If the fsFiberDDMSupportStatus is false or the Fiber module type is 
+	    not QSFP+, the status is unknown(1)."
+        ::= { fsFiberEntry 26 }
+
+fsFiberChannel3Bias OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The bias in Channel 3 of the QSFP+ Fiber module insered into the port.
+	    The value is in units of uA.
+	    If the fsFiberDDMSupportStatus is false or the Fiber module type is 
+	    not QSFP+, the bias value in Channel 3 is 0."
+        ::= { fsFiberEntry 27 }
+
+fsFiberChannel3BiasStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+            unknown(1),
+            ok(2),
+            warning(3),
+            alarm(4)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The status ok(2) indicates that the bias in the Channel 3 of QSFP+ is in
+	    the normal level. The status warning(3) indicates 
+	    that the bias in the Channel 3 exceeds high warning level or is 
+	    below low warning level. The status alarm(4) indicates that the bias in 
+	    the Channel 3 exceeds high alarm level or is below low alarm level. 
+	    If the fsFiberDDMSupportStatus is false or the Fiber module type is 
+	    not QSFP+, the status is unknown(1)."
+        ::= { fsFiberEntry 28 }
+
+fsFiberChannel4Bias OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The bias in Channel 4 of the QSFP+ Fiber module insered into the port.
+	    The value is in units of uA.
+	    If the fsFiberDDMSupportStatus is false or the Fiber module type is 
+	    not QSFP+, the bias value in Channel 4 is 0."
+        ::= { fsFiberEntry 29 }
+
+fsFiberChannel4BiasStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+            unknown(1),
+            ok(2),
+            warning(3),
+            alarm(4)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The status ok(2) indicates that the bias in the Channel 4 of QSFP+ is in
+	    the normal level. The status warning(3) indicates 
+	    that the bias in the Channel 4 exceeds high warning level or is 
+	    below low warning level. The status alarm(4) indicates that the bias in 
+	    the Channel 4 exceeds high alarm level or is below low alarm level. 
+	    If the fsFiberDDMSupportStatus is false or the Fiber module type is 
+	    not QSFP+, the status is unknown(1)."
+        ::= { fsFiberEntry 30 }
+
+fsFiberRXpowerIntegerpart OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The integer part of Rx power of the Fiber module insered into the port.
+	    The value is in units of dbm.
+	    If the fsFiberDDMSupportStatus is false or the Fiber module type is 
+	    neither SFP/SFP+ nor XFP, the integer part of Rx power value 
+	    is -100(means that the value is invalid)."
+        ::= { fsFiberEntry 31 }
+
+fsFiberRXpowerDecimalpart OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The decimal part of Rx power of the Fiber module insered into the port.
+	    The value is in units of dbm.
+	    If the fsFiberDDMSupportStatus is false or the Fiber module type is 
+	    neither SFP/SFP+ nor XFP, the decimal part of Rx power value 
+	    is -100(means that the value is invalid)."
+        ::= { fsFiberEntry 32 }
+
+fsFiberRXpowertype OBJECT-TYPE
+        SYNTAX INTEGER {
+            unknown(1),
+            average(2),
+            oma(3)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The value indicates whether the received power measurement 
+	     represents average input optical power(2) or oma(3). 
+	     If the fsFiberDDMSupportStatus is false or the Fiber module type is 
+	     neither SFP/SFP+ nor XFP (or not QSFP+), the value is unknown(1)."
+        ::= { fsFiberEntry 33 }
+
+fsFiberRXpowerStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+            unknown(1),
+            ok(2),
+            warning(3),
+            alarm(4)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The status ok(2) indicates that the Rx power of the Fiber module is in
+	    the normal level. The status warning(3) indicates that the Rx power of 
+	    the Fiber module exceeds high warning level or is below low warning level. 
+            The status alarm(4) indicates that the Rx power of 
+	    the Fiber module exceeds high alarm level or is below low alarm level. 
+	    If the fsFiberDDMSupportStatus is false or the Fiber module type is 
+	    neither SFP/SFP+ nor XFP, the status is unknown(1)."
+        ::= { fsFiberEntry 34 }
+
+fsFiberChannel1RXpowerIntegerpart OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The integer part of Rx power in Channel 1 of the QSFP+ 
+	    Fiber module insered into the port. The value is in units of dbm.
+	    If the fsFiberDDMSupportStatus is false or the Fiber module type is 
+	    not QSFP+, the integer part of Rx power value in Channel 1 
+	    is -100(means the value is invalid)."
+        ::= { fsFiberEntry 35 }
+
+fsFiberChannel1RXpowerDecimalpart OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The decimal part of Rx power in Channel 1 of the QSFP+ 
+	    Fiber module insered into the port. The value is in units of dbm.
+	    If the fsFiberDDMSupportStatus is false or the Fiber module type is 
+	    not QSFP+, the decimal part of Rx power value in Channel 1 
+	    is -100(means the value is invalid)."
+        ::= { fsFiberEntry 36 }
+
+fsFiberChannel1RXpowertype OBJECT-TYPE
+        SYNTAX INTEGER {
+            unknown(1),
+            average(2),
+            oma(3)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The value indicates whether the received power measurement 
+	     represents average input optical power(2) or oma(3) in Channel 1 of QSFP+. 
+	     If the fsFiberDDMSupportStatus is false or the Fiber module type is 
+	     not QSFP+, the value is unknown(1)."
+        ::= { fsFiberEntry 37 }
+
+fsFiberChannel1RXpowerStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+            unknown(1),
+            ok(2),
+            warning(3),
+            alarm(4)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The status ok(2) indicates that the Rx power in the Channel 1 of QSFP+ is in
+	    the normal level. The status warning(3) indicates that 
+	    the Rx power in the Channel 1 exceeds high warning level or is below 
+	    low warning level. The status alarm(4) indicates that the Rx power in the
+	    Channel 1 exceeds high alarm level or is below low alarm level. 
+	    If the fsFiberDDMSupportStatus is false or the Fiber module type is 
+	    not QSFP+, the status is unknown(1)."
+        ::= { fsFiberEntry 38 }
+
+fsFiberChannel2RXpowerIntegerpart OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The integer part of Rx power in Channel 1 of the QSFP+ 
+	    Fiber module insered into the port. The value is in units of dbm.
+	    If the fsFiberDDMSupportStatus is false or the Fiber module type is 
+	    not QSFP+, the integer part of Rx power value in Channel 1 
+	    is -100(means the value is invalid)."
+        ::= { fsFiberEntry 39 }
+
+fsFiberChannel2RXpowerDecimalpart OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The decimal part of Rx power in Channel 1 of the QSFP+ 
+	    Fiber module insered into the port. The value is in units of dbm.
+	    If the fsFiberDDMSupportStatus is false or the Fiber module type is 
+	    not QSFP+, the decimal part of Rx power value in Channel 2 
+	    is -100(means the value is invalid)."
+        ::= { fsFiberEntry 40 }
+
+fsFiberChannel2RXpowertype OBJECT-TYPE
+        SYNTAX INTEGER {
+            unknown(1),
+            average(2),
+            oma(3)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The value indicates whether the received power measurement 
+	     represents average input optical power(2) or oma(3) in Channel 2 of QSFP+. 
+	     If the fsFiberDDMSupportStatus is false or the Fiber module type is 
+	     not QSFP+, the value is unknown(1)."
+        ::= { fsFiberEntry 41 }
+
+fsFiberChannel2RXpowerStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+            unknown(1),
+            ok(2),
+            warning(3),
+            alarm(4)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The status ok(2) indicates that the Rx power in the Channel 2 of QSFP+ is in
+	    the normal level. The status warning(3) indicates that 
+	    the Rx power in the Channel 2 exceeds high warning level or is below 
+	    low warning level. The status alarm(4) indicates that the Rx power in the
+	    Channel 2 exceeds high alarm level or is below low alarm level. 
+	    If the fsFiberDDMSupportStatus is false or the Fiber module type is 
+	    not QSFP+, the status is unknown(1)."
+        ::= { fsFiberEntry 42 }
+
+fsFiberChannel3RXpowerIntegerpart OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The integer part of Rx power in Channel 3 of the QSFP+ 
+	    Fiber module insered into the port. The value is in units of dbm.
+	    If the fsFiberDDMSupportStatus is false or the Fiber module type is 
+	    not QSFP+, the integer part of Rx power value in Channel 3 
+	    is -100(means the value is invalid)."
+        ::= { fsFiberEntry 43 }
+
+fsFiberChannel3RXpowerDecimalpart OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The decimal part of Rx power in Channel 3 of the QSFP+ 
+	    Fiber module insered into the port. The value is in units of dbm.
+	    If the fsFiberDDMSupportStatus is false or the Fiber module type is 
+	    not QSFP+, the decimal part of Rx power value in Channel 3 
+	    is -100(means the value is invalid)."
+        ::= { fsFiberEntry 44 }
+
+fsFiberChannel3RXpowertype OBJECT-TYPE
+        SYNTAX INTEGER {
+            unknown(1),
+            average(2),
+            oma(3)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The value indicates whether the received power measurement 
+	     represents average input optical power(2) or oma(3) in Channel 3 of QSFP+. 
+	     If the fsFiberDDMSupportStatus is false or the Fiber module type is 
+	     not QSFP+, the value is unknown(1)."
+        ::= { fsFiberEntry 45 }
+
+fsFiberChannel3RXpowerStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+            unknown(1),
+            ok(2),
+            warning(3),
+            alarm(4)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The status ok(2) indicates that the Rx power in the Channel 3 of QSFP+ is in
+	    the normal level. The status warning(3) indicates that 
+	    the Rx power in the Channel 3 exceeds high warning level or is below 
+	    low warning level. The status alarm(4) indicates that the Rx power in the
+	    Channel 3 exceeds high alarm level or is below low alarm level. 
+	    If the fsFiberDDMSupportStatus is false or the Fiber module type is 
+	    not QSFP+, the status is unknown(1)."
+        ::= { fsFiberEntry 46 }
+
+fsFiberChannel4RXpowerIntegerpart OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The integer part of Rx power in Channel 4 of the QSFP+ 
+	    Fiber module insered into the port. The value is in units of dbm.
+	    If the fsFiberDDMSupportStatus is false or the Fiber module type is 
+	    not QSFP+, the integer part of Rx power value in Channel 4 
+	    is -100(means the value is invalid)."
+        ::= { fsFiberEntry 47 }
+
+fsFiberChannel4RXpowerDecimalpart OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The decimal part of Rx power in Channel 4 of the QSFP+ 
+	    Fiber module insered into the port. The value is in units of dbm.
+	    If the fsFiberDDMSupportStatus is false or the Fiber module type is 
+	    not QSFP+, the decimal part of Rx power value in Channel 4 
+	    is -100(means the value is invalid)."
+        ::= { fsFiberEntry 48 }
+
+fsFiberChannel4RXpowertype OBJECT-TYPE
+        SYNTAX INTEGER {
+            unknown(1),
+            average(2),
+            oma(3)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The value indicates whether the received power measurement 
+	     represents average input optical power(2) or oma(3) in Channel 4 of QSFP+. 
+	     If the fsFiberDDMSupportStatus is false or the Fiber module type is 
+	     not QSFP+, the value is unknown(1)."
+        ::= { fsFiberEntry 49 }
+
+fsFiberChannel4RXpowerStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+            unknown(1),
+            ok(2),
+            warning(3),
+            alarm(4)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The status ok(2) indicates that the Rx power in the Channel 4 of QSFP+ is in
+	    the normal level. The status warning(3) indicates that 
+	    the Rx power in the Channel 4 exceeds high warning level or is below 
+	    low warning level. The status alarm(4) indicates that the Rx power in the
+	    Channel 4 exceeds high alarm level or is below low alarm level. 
+	    If the fsFiberDDMSupportStatus is false or the Fiber module type is 
+	    not QSFP+, the status is unknown(1)."
+        ::= { fsFiberEntry 50 }
+
+fsFiberTXpowerIntegerpart OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The integer part of Tx power of the Fiber module insered into the port.
+	    The value is in units of dbm.
+	    If the fsFiberDDMSupportStatus is false or the Fiber module type is 
+	    neither SFP/SFP+ nor XFP, the integer part of Tx power value 
+	    is -100(means that the value is invalid)."
+        ::= { fsFiberEntry 51 }
+
+fsFiberTXpowerDecimalpart OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The decimal part of Tx power of the Fiber module insered into the port.
+	    The value is in units of dbm.
+	    If the fsFiberDDMSupportStatus is false or the Fiber module type is 
+	    neither SFP/SFP+ nor XFP, the decimal part of Tx power value 
+	    is -100(means that the value is invalid)."
+        ::= { fsFiberEntry 52 }
+
+fsFiberTXpowerStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+            unknown(1),
+            ok(2),
+            warning(3),
+            alarm(4)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The status ok(2) indicates that the Tx power of the Fiber module is in
+	    the normal level. The status warning(3) indicates that the Tx power of 
+	    the Fiber module exceeds high warning level or is below low warning level. 
+            The status alarm(4) indicates that the Tx power of 
+	    the Fiber module exceeds high alarm level or is below low alarm level. 
+	    If the fsFiberDDMSupportStatus is false or the Fiber module type is 
+	    neither SFP/SFP+ nor XFP, the status is unknown(1)."
+        ::= { fsFiberEntry 53 }
+
+fsFiberChannel1TXpowerIntegerpart OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The integer part of Tx power in Channel 1 of the QSFP+ 
+	    Fiber module insered into the port. The value is in units of dbm.
+	    If the fsFiberDDMSupportStatus is false or the Fiber module type is 
+	    not QSFP+, the integer part of Tx power value in Channel 1 
+	    is -100(means the value is invalid)."
+        ::= { fsFiberEntry 54 }
+
+fsFiberChannel1TXpowerDecimalpart OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The decimal part of Tx power in Channel 1 of the QSFP+ 
+	    Fiber module insered into the port. The value is in units of dbm.
+	    If the fsFiberDDMSupportStatus is false or the Fiber module type is 
+	    not QSFP+, the decimal part of Tx power value in Channel 1 
+	    is -100(means the value is invalid)."
+        ::= { fsFiberEntry 55 }
+
+fsFiberChannel1TXpowerStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+            unknown(1),
+            ok(2),
+            warning(3),
+            alarm(4)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The status ok(2) indicates that the Tx power in the Channel 1 of QSFP+ is in
+	    the normal level. The status warning(3) indicates that 
+	    the Tx power in the Channel 1 exceeds high warning level or is below 
+	    low warning level. The status alarm(4) indicates that the Tx power in the
+	    Channel 1 exceeds high alarm level or is below low alarm level. 
+	    If the fsFiberDDMSupportStatus is false or the Fiber module type is 
+	    not QSFP+, the status is unknown(1)."
+        ::= { fsFiberEntry 56 }
+
+fsFiberChannel2TXpowerIntegerpart OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The integer part of Tx power in Channel 1 of the QSFP+ 
+	    Fiber module insered into the port. The value is in units of dbm.
+	    If the fsFiberDDMSupportStatus is false or the Fiber module type is 
+	    not QSFP+, the integer part of Tx power value in Channel 1 
+	    is -100(means the value is invalid)."
+        ::= { fsFiberEntry 57 }
+
+fsFiberChannel2TXpowerDecimalpart OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The decimal part of Tx power in Channel 1 of the QSFP+ 
+	    Fiber module insered into the port. The value is in units of dbm.
+	    If the fsFiberDDMSupportStatus is false or the Fiber module type is 
+	    not QSFP+, the decimal part of Tx power value in Channel 2 
+	    is -100(means the value is invalid)."
+        ::= { fsFiberEntry 58 }
+
+fsFiberChannel2TXpowerStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+            unknown(1),
+            ok(2),
+            warning(3),
+            alarm(4)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The status ok(2) indicates that the Tx power in the Channel 2 of QSFP+ is in
+	    the normal level. The status warning(3) indicates that 
+	    the Tx power in the Channel 2 exceeds high warning level or is below 
+	    low warning level. The status alarm(4) indicates that the Tx power in the
+	    Channel 2 exceeds high alarm level or is below low alarm level. 
+	    If the fsFiberDDMSupportStatus is false or the Fiber module type is 
+	    not QSFP+, the status is unknown(1)."
+        ::= { fsFiberEntry 59 }
+
+fsFiberChannel3TXpowerIntegerpart OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The integer part of Tx power in Channel 3 of the QSFP+ 
+	    Fiber module insered into the port. The value is in units of dbm.
+	    If the fsFiberDDMSupportStatus is false or the Fiber module type is 
+	    not QSFP+, the integer part of Tx power value in Channel 3 
+	    is -100(means the value is invalid)."
+        ::= { fsFiberEntry 60 }
+
+fsFiberChannel3TXpowerDecimalpart OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The decimal part of Tx power in Channel 3 of the QSFP+ 
+	    Fiber module insered into the port. The value is in units of dbm.
+	    If the fsFiberDDMSupportStatus is false or the Fiber module type is 
+	    not QSFP+, the decimal part of Tx power value in Channel 3 
+	    is -100(means the value is invalid)."
+        ::= { fsFiberEntry 61 }
+
+fsFiberChannel3TXpowerStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+            unknown(1),
+            ok(2),
+            warning(3),
+            alarm(4)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The status ok(2) indicates that the Tx power in the Channel 3 of QSFP+ is in
+	    the normal level. The status warning(3) indicates that 
+	    the Tx power in the Channel 3 exceeds high warning level or is below 
+	    low warning level. The status alarm(4) indicates that the Tx power in the
+	    Channel 3 exceeds high alarm level or is below low alarm level. 
+	    If the fsFiberDDMSupportStatus is false or the Fiber module type is 
+	    not QSFP+, the status is unknown(1)."
+        ::= { fsFiberEntry 62 }
+
+fsFiberChannel4TXpowerIntegerpart OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The integer part of Tx power in Channel 4 of the QSFP+ 
+	    Fiber module insered into the port. The value is in units of dbm.
+	    If the fsFiberDDMSupportStatus is false or the Fiber module type is 
+	    not QSFP+, the integer part of Tx power value in Channel 4 
+	    is -100(means the value is invalid)."
+        ::= { fsFiberEntry 63 }
+
+fsFiberChannel4TXpowerDecimalpart OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The decimal part of Tx power in Channel 4 of the QSFP+ 
+	    Fiber module insered into the port. The value is in units of dbm.
+	    If the fsFiberDDMSupportStatus is false or the Fiber module type is 
+	    not QSFP+, the decimal part of Tx power value in Channel 4 
+	    is -100(means the value is invalid)."
+        ::= { fsFiberEntry 64 }
+
+fsFiberChannel4TXpowerStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+            unknown(1),
+            ok(2),
+            warning(3),
+            alarm(4)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The status ok(2) indicates that the Tx power in the Channel 4 of QSFP+ is in
+	    the normal level. The status warning(3) indicates that 
+	    the Tx power in the Channel 4 exceeds high warning level or is below 
+	    low warning level. The status alarm(4) indicates that the Tx power in the
+	    Channel 4 exceeds high alarm level or is below low alarm level. 
+	    If the fsFiberDDMSupportStatus is false or the Fiber module type is 
+	    not QSFP+, the status is unknown(1)."
+        ::= { fsFiberEntry 65 }
+
+fsFiberRXpowerSign OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The sign (-1) indicates that the Rx power value is lower than 0, while sign (1) is higher than 0."
+        ::= { fsFiberEntry 66 }
+
+fsFiberChannel1RXpowerSign OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The sign (-1) indicates that the Rx power value is lower than 0, while sign (1) is higher than 0."
+        ::= { fsFiberEntry 67 }
+
+fsFiberChannel2RXpowerSign OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The sign (-1) indicates that the Rx power value is lower than 0, while sign (1) is higher than 0."
+        ::= { fsFiberEntry 68 }
+
+fsFiberChannel3RXpowerSign OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The sign (-1) indicates that the Rx power value is lower than 0, while sign (1) is higher than 0."
+        ::= { fsFiberEntry 69 }
+
+fsFiberChannel4RXpowerSign OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The sign (-1) indicates that the Rx power value is lower than 0, while sign (1) is higher than 0."
+        ::= { fsFiberEntry 70 }
+
+fsFiberTXpowerSign OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The sign (-1) indicates that the Tx power value is lower than 0, while sign (1) is higher than 0."
+        ::= { fsFiberEntry 71 }
+
+fsFiberChannel1TXpowerSign OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The sign (-1) indicates that the Tx power value is lower than 0, while sign (1) is higher than 0."
+        ::= { fsFiberEntry 72 }
+
+fsFiberChannel2TXpowerSign OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The sign (-1) indicates that the Tx power value is lower than 0, while sign (1) is higher than 0."
+        ::= { fsFiberEntry 73 }
+
+fsFiberChannel3TXpowerSign OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The sign (-1) indicates that the Tx power value is lower than 0, while sign (1) is higher than 0."
+        ::= { fsFiberEntry 74 }
+
+fsFiberChannel4TXpowerSign OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The sign (-1) indicates that the Tx power value is lower than 0, while sign (1) is higher than 0."
+        ::= { fsFiberEntry 75 }
+
+fsFiberRXpower OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The Rx power of the Fiber module insered into the port.
+        The value is in units of dbm, which needs to be divided by 100.
+        The value of -10000 means the value is invalid."
+        ::= { fsFiberEntry 76 }
+
+fsFiberChannel1RXpower OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The Rx power in Channel 1 of the QSFP+ Fiber module insered into the port.
+        The value is in units of dbm, which needs to be divided by 100.
+        The value of -10000 means the value is invalid."
+        ::= { fsFiberEntry 77 }
+
+fsFiberChannel2RXpower OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The Rx power in Channel 2 of the QSFP+ Fiber module insered into the port.
+        The value is in units of dbm, which needs to be divided by 100.
+        The value of -10000 means the value is invalid."
+        ::= { fsFiberEntry 78 }
+
+fsFiberChannel3RXpower OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The Rx power in Channel 3 of the QSFP+ Fiber module insered into the port.
+        The value is in units of dbm, which needs to be divided by 100.
+        The value of -10000 means the value is invalid."
+        ::= { fsFiberEntry 79 }
+
+
+fsFiberChannel4RXpower OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The Rx power in Channel 4 of the QSFP+ Fiber module insered into the port.
+        The value is in units of dbm, which needs to be divided by 100.
+        The value of -10000 means the value is invalid."
+        ::= { fsFiberEntry 80 }
+
+fsFiberTXpower OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The Tx power of the Fiber module insered into the port.
+        The value is in units of dbm, which needs to be divided by 100.
+        The value of -10000 means the value is invalid."
+        ::= { fsFiberEntry 81 }
+
+fsFiberChannel1TXpower OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The Tx power in Channel 1 of the QSFP+ Fiber module insered into the port.
+        The value is in units of dbm, which needs to be divided by 100.
+        The value of -10000 means the value is invalid."
+        ::= { fsFiberEntry 82 }
+
+fsFiberChannel2TXpower OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The Tx power in Channel 2 of the QSFP+ Fiber module insered into the port.
+        The value is in units of dbm, which needs to be divided by 100.
+        The value of -10000 means the value is invalid."
+        ::= { fsFiberEntry 83 }
+
+fsFiberChannel3TXpower OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The Tx power in Channel 3 of the QSFP+ Fiber module insered into the port.
+        The value is in units of dbm, which needs to be divided by 100.
+        The value of -10000 means the value is invalid."
+        ::= { fsFiberEntry 84 }
+
+fsFiberChannel4TXpower OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The Tx power in Channel 4 of the QSFP+ Fiber module insered into the port.
+        The value is in units of dbm, which needs to be divided by 100.
+        The value of -10000 means the value is invalid."
+        ::= { fsFiberEntry 85 }
+
+fsFiberWavelengthExact OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(1..32))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The value of wavelength of the Fiber module insered into the port.
+        If the transceiver type of Fiber module is either fiber100CopperSFP(7)
+        or fiber1000CopperSFP(13) (or fiber10GCopperSFPPlus(14), 
+        or fiber10GCopperXFP(19), or fiber40GCopperQSFPPlus(26), or fiber2500CopperSFP(28), or unknown(1)), then this
+             object contains a NA value."
+        ::= { fsFiberEntry 86 }
+
+fsFiberTransferDistance50umOM4 OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The value of transfer distance of the Fiber module insered into the port.
+	     This value specifies the link length that is supported by the 
+	     transceiver while operating in compliance with the applicable 
+	     standards using 50 micron multimode OM4(4700 MHz*Km) fiber. 
+	     The value is in units of meters.
+	     A value of zero means that the transceiver does not 
+	     support 50 micron multimode fiber or the Fiber module type 
+	     is neither SFP/SFP+ nor QSFP+."
+        ::= { fsFiberEntry 87 }
+
+
+fsFiberTransferDistanceSMFExt OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The value of transfer distance of the Fiber module insered into the port.
+	     This value specifies the link length that is supported by the 
+	     transceiver while operating in compliance with the applicable 
+	     standards using single mode fiber for. The value is in units of meters.
+	     A value of zero means that the transceiver does not support single mode fiber."
+        ::= { fsFiberEntry 88 }
+
+fsFiberBandWidth OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The value of transfer maximum available bandwidth of the Fiber module insered into the port.
+        The value is in units of Mbit/s.
+        A value of zero means that the transceiver does not insert or unknown type."
+        ::= { fsFiberEntry 89 }
+
+fsFiberFormFactor OBJECT-TYPE
+        SYNTAX INTEGER {
+            unknown(0),
+            xfp(1),
+            sfp(2),
+            sfpPlus(3),
+            sfp28(4),
+            qsfpPlus(5),
+            qsfp28(6)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Indicates the form factor of the Fiber module insered into the port."
+        ::= { fsFiberEntry 90 }
+
+fsFiberRXpowerLowWarnThreshold OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The Rx power low warning threshold of the Fiber module insered into the port.
+        The value is in units of dbm, which needs to be divided by 100.
+        The value of -10000 means the value is invalid."
+        ::= { fsFiberEntry 91 }
+
+fsFiberRXpowerHighWarnThreshold OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The Rx power high warning threshold of the Fiber module insered into the port.
+        The value is in units of dbm, which needs to be divided by 100.
+        The value of -10000 means the value is invalid."
+        ::= { fsFiberEntry 92 }
+
+fsFiberRXpowerLowAlarmThreshold OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The Rx power low alarm threshold of the Fiber module insered into the port.
+        The value is in units of dbm, which needs to be divided by 100.
+        The value of -10000 means the value is invalid."
+        ::= { fsFiberEntry 93 }
+
+fsFiberRXpowerHighAlarmThreshold OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The Rx power high alarm threshold of the Fiber module insered into the port.
+        The value is in units of dbm, which needs to be divided by 100.
+        The value of -10000 means the value is invalid."
+        ::= { fsFiberEntry 94 }
+
+fsFiberTXpowerLowWarnThreshold OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The Tx power low warning threshold of the Fiber module insered into the port.
+        The value is in units of dbm, which needs to be divided by 100.
+        The value of -10000 means the value is invalid."
+        ::= { fsFiberEntry 95 }
+
+fsFiberTXpowerHighWarnThreshold OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The Tx power high warning threshold of the Fiber module insered into the port.
+        The value is in units of dbm, which needs to be divided by 100.
+        The value of -10000 means the value is invalid."
+        ::= { fsFiberEntry 96 }
+
+fsFiberTXpowerLowAlarmThreshold OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The Tx power low alarm threshold of the Fiber module insered into the port.
+        The value is in units of dbm, which needs to be divided by 100.
+        The value of -10000 means the value is invalid."
+        ::= { fsFiberEntry 97 }
+
+fsFiberTXpowerHighAlarmThreshold OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The Tx power high alarm threshold of the Fiber module insered into the port.
+        The value is in units of dbm, which needs to be divided by 100.
+        The value of -10000 means the value is invalid."
+        ::= { fsFiberEntry 98 }
+
+fsFiberChannel5Bias OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The bias in Channel 5 of the QSFP CMIS Fiber module insered into the port.
+        The value is in units of uA.
+        If the fsFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP CMIS, the bias value in Channel 5 is 0."
+        ::= { fsFiberEntry 99 }
+
+fsFiberChannel5BiasStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+            unknown(1),
+            ok(2),
+            warning(3),
+            alarm(4)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The status ok(2) indicates that the bias in the Channel 5 of QSFP CMIS is in
+        the normal level. The status warning(3) indicates 
+        that the bias in the Channel 5 exceeds high warning level or is 
+        below low warning level. The status alarm(4) indicates that the bias in 
+        the Channel 5 exceeds high alarm level or is below low alarm level. 
+        If the fsFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP CMIS, the status is unknown(1)."
+        ::= { fsFiberEntry 100 }
+
+fsFiberChannel6Bias OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The bias in Channel 6 of the QSFP CMIS Fiber module insered into the port.
+        The value is in units of uA.
+        If the fsFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP CMIS, the bias value in Channel 6 is 0."
+        ::= { fsFiberEntry 101 }
+
+fsFiberChannel6BiasStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+            unknown(1),
+            ok(2),
+            warning(3),
+            alarm(4)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The status ok(2) indicates that the bias in the Channel 6 of QSFP CMIS is in
+        the normal level. The status warning(3) indicates 
+        that the bias in the Channel 6 exceeds high warning level or is 
+        below low warning level. The status alarm(4) indicates that the bias in 
+        the Channel 6 exceeds high alarm level or is below low alarm level. 
+        If the fsFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP CMIS, the status is unknown(1)."
+        ::= { fsFiberEntry 102 }
+
+fsFiberChannel7Bias OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The bias in Channel 7 of the QSFP CMIS Fiber module insered into the port.
+        The value is in units of uA.
+        If the fsFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP CMIS, the bias value in Channel 7 is 0."
+        ::= { fsFiberEntry 103 }
+
+fsFiberChannel7BiasStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+            unknown(1),
+            ok(2),
+            warning(3),
+            alarm(4)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The status ok(2) indicates that the bias in the Channel 7 of QSFP CMIS is in
+        the normal level. The status warning(3) indicates 
+        that the bias in the Channel 7 exceeds high warning level or is 
+        below low warning level. The status alarm(4) indicates that the bias in 
+        the Channel 7 exceeds high alarm level or is below low alarm level. 
+        If the fsFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP CMIS, the status is unknown(1)."
+        ::= { fsFiberEntry 104 }
+
+fsFiberChannel8Bias OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The bias in Channel 8 of the QSFP CMIS Fiber module insered into the port.
+        The value is in units of uA.
+        If the fsFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP CMIS, the bias value in Channel 8 is 0."
+        ::= { fsFiberEntry 105 }
+
+fsFiberChannel8BiasStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+            unknown(1),
+            ok(2),
+            warning(3),
+            alarm(4)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The status ok(2) indicates that the bias in the Channel 8 of QSFP CMIS is in
+        the normal level. The status warning(3) indicates 
+        that the bias in the Channel 8 exceeds high warning level or is 
+        below low warning level. The status alarm(4) indicates that the bias in 
+        the Channel 8 exceeds high alarm level or is below low alarm level. 
+        If the fsFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP CMIS, the status is unknown(1)."
+        ::= { fsFiberEntry 106 }
+
+fsFiberChannel5RXpowerIntegerpart OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The integer part of Rx power in Channel 5 of the QSFP CMIS 
+        Fiber module insered into the port. The value is in units of dbm.
+        If the fsFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP CMIS, the integer part of Rx power value in Channel 5 
+        is -100(means the value is invalid)."
+        ::= { fsFiberEntry 107 }
+
+fsFiberChannel5RXpowerDecimalpart OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The decimal part of Rx power in Channel 5 of the QSFP CMIS 
+        Fiber module insered into the port. The value is in units of dbm.
+        If the fsFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP CMIS, the decimal part of Rx power value in Channel 5 
+        is -100(means the value is invalid)."
+        ::= { fsFiberEntry 108 }
+
+fsFiberChannel5RXpowertype OBJECT-TYPE
+        SYNTAX INTEGER {
+            unknown(1),
+            average(2),
+            oma(3)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The value indicates whether the received power measurement 
+        represents average input optical power(2) or oma(3) in Channel 5 of QSFP CMIS. 
+        If the fsFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP CMIS, the value is unknown(1)."
+        ::= { fsFiberEntry 109 }
+
+fsFiberChannel5RXpowerStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+            unknown(1),
+            ok(2),
+            warning(3),
+            alarm(4)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The status ok(2) indicates that the Rx power in the Channel 5 of QSFP CMIS is in
+        the normal level. The status warning(3) indicates that 
+        the Rx power in the Channel 5 exceeds high warning level or is below 
+        low warning level. The status alarm(4) indicates that the Rx power in the
+        Channel 5 exceeds high alarm level or is below low alarm level. 
+        If the fsFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP CMIS, the status is unknown(1)."
+        ::= { fsFiberEntry 110 }
+        
+fsFiberChannel6RXpowerIntegerpart OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The integer part of Rx power in Channel 6 of the QSFP CMIS 
+        Fiber module insered into the port. The value is in units of dbm.
+        If the fsFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP CMIS, the integer part of Rx power value in Channel 6 
+        is -100(means the value is invalid)."
+        ::= { fsFiberEntry 111 }
+
+fsFiberChannel6RXpowerDecimalpart OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The decimal part of Rx power in Channel 6 of the QSFP CMIS 
+        Fiber module insered into the port. The value is in units of dbm.
+        If the fsFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP CMIS, the decimal part of Rx power value in Channel 6 
+        is -100(means the value is invalid)."
+        ::= { fsFiberEntry 112 }
+
+fsFiberChannel6RXpowertype OBJECT-TYPE
+        SYNTAX INTEGER {
+            unknown(1),
+            average(2),
+            oma(3)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The value indicates whether the received power measurement 
+        represents average input optical power(2) or oma(3) in Channel 6 of QSFP CMIS. 
+        If the fsFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP CMIS, the value is unknown(1)."
+        ::= { fsFiberEntry 113 }
+
+fsFiberChannel6RXpowerStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+            unknown(1),
+            ok(2),
+            warning(3),
+            alarm(4)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The status ok(2) indicates that the Rx power in the Channel 6 of QSFP CMIS is in
+        the normal level. The status warning(3) indicates that 
+        the Rx power in the Channel 6 exceeds high warning level or is below 
+        low warning level. The status alarm(4) indicates that the Rx power in the
+        Channel 6 exceeds high alarm level or is below low alarm level. 
+        If the fsFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP CMIS, the status is unknown(1)."
+        ::= { fsFiberEntry 114 }
+        
+fsFiberChannel7RXpowerIntegerpart OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The integer part of Rx power in Channel 7 of the QSFP CMIS 
+        Fiber module insered into the port. The value is in units of dbm.
+        If the fsFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP CMIS, the integer part of Rx power value in Channel 7 
+        is -100(means the value is invalid)."
+        ::= { fsFiberEntry 115 }
+
+fsFiberChannel7RXpowerDecimalpart OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The decimal part of Rx power in Channel 7 of the QSFP CMIS 
+        Fiber module insered into the port. The value is in units of dbm.
+        If the fsFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP CMIS, the decimal part of Rx power value in Channel 7 
+        is -100(means the value is invalid)."
+        ::= { fsFiberEntry 116 }
+
+fsFiberChannel7RXpowertype OBJECT-TYPE
+        SYNTAX INTEGER {
+            unknown(1),
+            average(2),
+            oma(3)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The value indicates whether the received power measurement 
+        represents average input optical power(2) or oma(3) in Channel 7 of QSFP CMIS. 
+        If the fsFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP CMIS, the value is unknown(1)."
+        ::= { fsFiberEntry 117 }
+
+fsFiberChannel7RXpowerStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+            unknown(1),
+            ok(2),
+            warning(3),
+            alarm(4)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The status ok(2) indicates that the Rx power in the Channel 7 of QSFP CMIS is in
+        the normal level. The status warning(3) indicates that 
+        the Rx power in the Channel 7 exceeds high warning level or is below 
+        low warning level. The status alarm(4) indicates that the Rx power in the
+        Channel 7 exceeds high alarm level or is below low alarm level. 
+        If the fsFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP CMIS, the status is unknown(1)."
+        ::= { fsFiberEntry 118 }
+        
+fsFiberChannel8RXpowerIntegerpart OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The integer part of Rx power in Channel 8 of the QSFP CMIS 
+        Fiber module insered into the port. The value is in units of dbm.
+        If the fsFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP CMIS, the integer part of Rx power value in Channel 8 
+        is -100(means the value is invalid)."
+        ::= { fsFiberEntry 119 }
+
+fsFiberChannel8RXpowerDecimalpart OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The decimal part of Rx power in Channel 8 of the QSFP CMIS 
+        Fiber module insered into the port. The value is in units of dbm.
+        If the fsFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP CMIS, the decimal part of Rx power value in Channel 8 
+        is -100(means the value is invalid)."
+        ::= { fsFiberEntry 120 }
+
+fsFiberChannel8RXpowertype OBJECT-TYPE
+        SYNTAX INTEGER {
+            unknown(1),
+            average(2),
+            oma(3)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The value indicates whether the received power measurement 
+        represents average input optical power(2) or oma(3) in Channel 8 of QSFP CMIS. 
+        If the fsFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP CMIS, the value is unknown(1)."
+        ::= { fsFiberEntry 121 }
+
+fsFiberChannel8RXpowerStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+            unknown(1),
+            ok(2),
+            warning(3),
+            alarm(4)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The status ok(2) indicates that the Rx power in the Channel 8 of QSFP CMIS is in
+        the normal level. The status warning(3) indicates that 
+        the Rx power in the Channel 8 exceeds high warning level or is below 
+        low warning level. The status alarm(4) indicates that the Rx power in the
+        Channel 8 exceeds high alarm level or is below low alarm level. 
+        If the fsFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP CMIS, the status is unknown(1)."
+        ::= { fsFiberEntry 122 }
+
+fsFiberChannel5TXpowerIntegerpart OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The integer part of Tx power in Channel 5 of the QSFP CMIS 
+        Fiber module insered into the port. The value is in units of dbm.
+        If the fsFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP CMIS, the integer part of Tx power value in Channel 5 
+        is -100(means the value is invalid)."
+        ::= { fsFiberEntry 123 }
+
+fsFiberChannel5TXpowerDecimalpart OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The decimal part of Tx power in Channel 5 of the QSFP CMIS 
+        Fiber module insered into the port. The value is in units of dbm.
+        If the fsFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP CMIS, the decimal part of Tx power value in Channel 5 
+        is -100(means the value is invalid)."
+        ::= { fsFiberEntry 124 }
+
+fsFiberChannel5TXpowerStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+            unknown(1),
+            ok(2),
+            warning(3),
+            alarm(4)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The status ok(2) indicates that the Tx power in the Channel 5 of QSFP CMIS is in
+        the normal level. The status warning(3) indicates that 
+        the Tx power in the Channel 5 exceeds high warning level or is below 
+        low warning level. The status alarm(4) indicates that the Tx power in the
+        Channel 5 exceeds high alarm level or is below low alarm level. 
+        If the fsFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP CMIS, the status is unknown(1)."
+        ::= { fsFiberEntry 125 }
+
+fsFiberChannel6TXpowerIntegerpart OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The integer part of Tx power in Channel 6 of the QSFP CMIS 
+        Fiber module insered into the port. The value is in units of dbm.
+        If the fsFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP CMIS, the integer part of Tx power value in Channel 6 
+        is -100(means the value is invalid)."
+        ::= { fsFiberEntry 126 }
+
+fsFiberChannel6TXpowerDecimalpart OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The decimal part of Tx power in Channel 6 of the QSFP CMIS 
+        Fiber module insered into the port. The value is in units of dbm.
+        If the fsFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP CMIS, the decimal part of Tx power value in Channel 6 
+        is -100(means the value is invalid)."
+        ::= { fsFiberEntry 127 }
+
+fsFiberChannel6TXpowerStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+            unknown(1),
+            ok(2),
+            warning(3),
+            alarm(4)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The status ok(2) indicates that the Tx power in the Channel 6 of QSFP CMIS is in
+        the normal level. The status warning(3) indicates that 
+        the Tx power in the Channel 6 exceeds high warning level or is below 
+        low warning level. The status alarm(4) indicates that the Tx power in the
+        Channel 6 exceeds high alarm level or is below low alarm level. 
+        If the fsFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP CMIS, the status is unknown(1)."
+        ::= { fsFiberEntry 128 }
+
+fsFiberChannel7TXpowerIntegerpart OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The integer part of Tx power in Channel 7 of the QSFP CMIS 
+        Fiber module insered into the port. The value is in units of dbm.
+        If the fsFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP CMIS, the integer part of Tx power value in Channel 7 
+        is -100(means the value is invalid)."
+        ::= { fsFiberEntry 129 }
+
+fsFiberChannel7TXpowerDecimalpart OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The decimal part of Tx power in Channel 7 of the QSFP CMIS 
+        Fiber module insered into the port. The value is in units of dbm.
+        If the fsFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP CMIS, the decimal part of Tx power value in Channel 7 
+        is -100(means the value is invalid)."
+        ::= { fsFiberEntry 130 }
+
+fsFiberChannel7TXpowerStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+            unknown(1),
+            ok(2),
+            warning(3),
+            alarm(4)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The status ok(2) indicates that the Tx power in the Channel 7 of QSFP CMIS is in
+        the normal level. The status warning(3) indicates that 
+        the Tx power in the Channel 7 exceeds high warning level or is below 
+        low warning level. The status alarm(4) indicates that the Tx power in the
+        Channel 7 exceeds high alarm level or is below low alarm level. 
+        If the fsFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP CMIS, the status is unknown(1)."
+        ::= { fsFiberEntry 131 }
+
+fsFiberChannel8TXpowerIntegerpart OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The integer part of Tx power in Channel 8 of the QSFP CMIS 
+        Fiber module insered into the port. The value is in units of dbm.
+        If the fsFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP CMIS, the integer part of Tx power value in Channel 8 
+        is -100(means the value is invalid)."
+        ::= { fsFiberEntry 132 }
+
+fsFiberChannel8TXpowerDecimalpart OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The decimal part of Tx power in Channel 8 of the QSFP CMIS 
+        Fiber module insered into the port. The value is in units of dbm.
+        If the fsFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP CMIS, the decimal part of Tx power value in Channel 8 
+        is -100(means the value is invalid)."
+        ::= { fsFiberEntry 133 }
+
+fsFiberChannel8TXpowerStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+            unknown(1),
+            ok(2),
+            warning(3),
+            alarm(4)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The status ok(2) indicates that the Tx power in the Channel 8 of QSFP CMIS is in
+        the normal level. The status warning(3) indicates that 
+        the Tx power in the Channel 8 exceeds high warning level or is below 
+        low warning level. The status alarm(4) indicates that the Tx power in the
+        Channel 8 exceeds high alarm level or is below low alarm level. 
+        If the fsFiberDDMSupportStatus is false or the Fiber module type is 
+        not QSFP CMIS, the status is unknown(1)."
+        ::= { fsFiberEntry 134 }
+
+fsFiberChannel5RXpowerSign OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The sign (-1) indicates that the Rx power value is lower than 0, while sign (1) is higher than 0."
+        ::= { fsFiberEntry 135 }
+
+fsFiberChannel6RXpowerSign OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The sign (-1) indicates that the Rx power value is lower than 0, while sign (1) is higher than 0."
+        ::= { fsFiberEntry 136 }
+
+fsFiberChannel7RXpowerSign OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The sign (-1) indicates that the Rx power value is lower than 0, while sign (1) is higher than 0."
+        ::= { fsFiberEntry 137 }
+
+fsFiberChannel8RXpowerSign OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The sign (-1) indicates that the Rx power value is lower than 0, while sign (1) is higher than 0."
+        ::= { fsFiberEntry 138 }
+
+fsFiberChannel5TXpowerSign OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The sign (-1) indicates that the Tx power value is lower than 0, while sign (1) is higher than 0."
+        ::= { fsFiberEntry 139 }
+
+fsFiberChannel6TXpowerSign OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The sign (-1) indicates that the Tx power value is lower than 0, while sign (1) is higher than 0."
+        ::= { fsFiberEntry 140 }
+
+fsFiberChannel7TXpowerSign OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The sign (-1) indicates that the Tx power value is lower than 0, while sign (1) is higher than 0."
+        ::= { fsFiberEntry 141 }
+
+fsFiberChannel8TXpowerSign OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The sign (-1) indicates that the Tx power value is lower than 0, while sign (1) is higher than 0."
+        ::= { fsFiberEntry 142 }
+
+fsFiberChannel5RXpower OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The Rx power in Channel 5 of the QSFP CMIS Fiber module insered into the port.
+        The value is in units of dbm, which needs to be divided by 100.
+        The value of -10000 means the value is invalid."
+        ::= { fsFiberEntry 143 }
+
+fsFiberChannel6RXpower OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The Rx power in Channel 6 of the QSFP CMIS Fiber module insered into the port.
+        The value is in units of dbm, which needs to be divided by 100.
+        The value of -10000 means the value is invalid."
+        ::= { fsFiberEntry 144 }
+
+fsFiberChannel7RXpower OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The Rx power in Channel 7 of the QSFP CMIS Fiber module insered into the port.
+        The value is in units of dbm, which needs to be divided by 100.
+        The value of -10000 means the value is invalid."
+        ::= { fsFiberEntry 145 }
+
+fsFiberChannel8RXpower OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The Rx power in Channel 8 of the QSFP CMIS Fiber module insered into the port.
+        The value is in units of dbm, which needs to be divided by 100.
+        The value of -10000 means the value is invalid."
+        ::= { fsFiberEntry 146 }
+
+fsFiberChannel5TXpower OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The Tx power in Channel 5 of the QSFP CMIS Fiber module insered into the port.
+        The value is in units of dbm, which needs to be divided by 100.
+        The value of -10000 means the value is invalid."
+        ::= { fsFiberEntry 147 }
+
+fsFiberChannel6TXpower OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The Tx power in Channel 6 of the QSFP CMIS Fiber module insered into the port.
+        The value is in units of dbm, which needs to be divided by 100.
+        The value of -10000 means the value is invalid."
+        ::= { fsFiberEntry 148 }
+
+fsFiberChannel7TXpower OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The Tx power in Channel 7 of the QSFP CMIS Fiber module insered into the port.
+        The value is in units of dbm, which needs to be divided by 100.
+        The value of -10000 means the value is invalid."
+        ::= { fsFiberEntry 149 }
+
+fsFiberChannel8TXpower OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The Tx power in Channel 8 of the QSFP CMIS Fiber module insered into the port.
+        The value is in units of dbm, which needs to be divided by 100.
+        The value of -10000 means the value is invalid."
+        ::= { fsFiberEntry 150 }
+
+fsFiberTransferDistance50umOM5 OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The value of transfer distance of the Fiber module insered into the port.
+         This value specifies the link length that is supported by the 
+         transceiver while operating in compliance with the applicable 
+         standards using 50 micron multimode OM5(4700 MHz*Km at 850nm, 2470 MHz*km at 953nm) fiber. 
+         The value is in units of meters.
+         A value of zero means that the transceiver does not 
+         support 50 micron multimode fiber or the Fiber module type 
+         is neither SFP/SFP+ nor QSFP+."
+        ::= { fsFiberEntry 151 }
+
+fsFiberMode OBJECT-TYPE
+        SYNTAX INTEGER {
+            unknown(0),
+            copper(1),
+            singleMode(2),
+            multiMode(3)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This object indicates the fiber type."
+        ::= { fsFiberEntry 152 }
+
+fsFiberTempLowWarnThreshold OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The temperature low warning threshold of the Fiber module insered into the port.
+        The value is in units of degrees Celsius.
+        The value of -10000 means the value is invalid."
+        ::= { fsFiberEntry 153 }
+
+fsFiberTempHighWarnThreshold OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The temperature high warning threshold of the Fiber module insered into the port.
+        The value is in units of degrees Celsius.
+        The value of -10000 means the value is invalid."
+        ::= { fsFiberEntry 154 }
+
+fsFiberTempLowAlarmThreshold OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The temperature low alarm threshold of the Fiber module insered into the port.
+        The value is in units of degrees Celsius.
+        The value of -10000 means the value is invalid."
+        ::= { fsFiberEntry 155 }
+
+fsFiberTempHighAlarmThreshold OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The temperature high alarm threshold of the Fiber module insered into the port.
+        The value is in units of degrees Celsius.
+        The value of -10000 means the value is invalid."
+        ::= { fsFiberEntry 156 }
+
+fsFiberVoltageLowWarnThreshold OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The voltage low warning threshold of the Fiber module insered into the port.
+        The value is in units of mVolts.
+        The value of -10000 means the value is invalid."
+        ::= { fsFiberEntry 157 }
+
+fsFiberVoltageHighWarnThreshold OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The voltage high warning threshold of the Fiber module insered into the port.
+        The value is in units of mVolts.
+        The value of -10000 means the value is invalid."
+        ::= { fsFiberEntry 158 }
+
+fsFiberVoltageLowAlarmThreshold OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The voltage low alarm threshold of the Fiber module insered into the port.
+        The value is in units of mVolts.
+        The value of -10000 means the value is invalid."
+        ::= { fsFiberEntry 159 }
+
+fsFiberVoltageHighAlarmThreshold OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The voltage high alarm threshold of the Fiber module insered into the port.
+        The value is in units of mVolts.
+        The value of -10000 means the value is invalid."
+        ::= { fsFiberEntry 160 }
+
+fsFiberBiasLowWarnThreshold OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The bias low warning threshold of the Fiber module insered into the port.
+        The value is in units of uA.
+        The value of -10000 means the value is invalid."
+        ::= { fsFiberEntry 161 }
+
+fsFiberBiasHighWarnThreshold OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The bias high warning threshold of the Fiber module insered into the port.
+        The value is in units of uA.
+        The value of -10000 means the value is invalid."
+        ::= { fsFiberEntry 162 }
+
+fsFiberBiasLowAlarmThreshold OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The bias low alarm threshold of the Fiber module insered into the port.
+        The value is in units of uA.
+        The value of -10000 means the value is invalid."
+        ::= { fsFiberEntry 163 }
+
+fsFiberBiasHighAlarmThreshold OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The bias high alarm threshold of the Fiber module insered into the port.
+        The value is in units of uA.
+        The value of -10000 means the value is invalid."
+        ::= { fsFiberEntry 164 }
+
+fsFiberVendorTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF FSFiberVendorEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+               "A table of Vendor info entries."
+        ::= { fsFiberMIBObjects 2 }
+
+fsFiberVendorEntry OBJECT-TYPE
+        SYNTAX     FSFiberVendorEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "Entry contains Vendor info."  
+        INDEX { fsFiberVendorPortIndex }
+        ::= { fsFiberVendorTable 1 }
+
+       FSFiberVendorEntry ::=
+       SEQUENCE {
+           fsFiberVendorPortIndex      IfIndex,
+           fsFiberVendorName           DisplayString,
+           fsFiberVendorOUI            DisplayString,
+           fsFiberVendorPartNumber     DisplayString,
+           fsFiberVendorRev            DisplayString,
+           fsFiberManufacturingDate    DisplayString,
+           fsFiberEncoding             DisplayString
+       }
+
+       fsFiberVendorPortIndex OBJECT-TYPE
+       SYNTAX        IfIndex 
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+           "The port index of Vendor info ."
+       ::= { fsFiberVendorEntry 1 }
+
+       fsFiberVendorName OBJECT-TYPE
+       SYNTAX        DisplayString
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+           "The description of vendor name." 
+       ::= { fsFiberVendorEntry 2 }
+
+       fsFiberVendorOUI OBJECT-TYPE
+       SYNTAX        DisplayString
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+           "The description of vendor oui." 
+       ::= { fsFiberVendorEntry 3 }
+
+       fsFiberVendorPartNumber OBJECT-TYPE
+       SYNTAX        DisplayString
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+           "The description of vendor part number." 
+       ::= { fsFiberVendorEntry 4 }
+
+       fsFiberVendorRev OBJECT-TYPE
+       SYNTAX        DisplayString
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+           "The description of vendor revision." 
+       ::= { fsFiberVendorEntry 5 }
+
+       fsFiberManufacturingDate OBJECT-TYPE
+       SYNTAX        DisplayString
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+           "The description of vendor's manufacturing date." 
+       ::= { fsFiberVendorEntry 6 }
+
+       fsFiberEncoding OBJECT-TYPE
+       SYNTAX        DisplayString
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+           "The description of vendor's encoding type." 
+       ::= { fsFiberVendorEntry 7 }
+       
+fsFiberOMCTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF FSFiberOMCEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table of OMC fiber info entries."
+        ::= { fsFiberMIBObjects 3 }
+                
+fsFiberOMCEntry OBJECT-TYPE
+        SYNTAX FSFiberOMCEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Entry contains OMC fiber info."
+        INDEX { fsFiberOMCPortIndex }
+        ::= { fsFiberOMCTable 1 }
+                
+        FSFiberOMCEntry ::=
+        SEQUENCE { 
+            fsFiberOMCPortIndex        IfIndex,
+            fsFiberOMCRxpower          DisplayString,
+            fsFiberOMCTxpower          DisplayString,
+            fsFiberOMCWavelength       DisplayString,
+            fsFiberOMCTranslength      DisplayString,
+            fsFiberOMCPortType         DisplayString
+         }
+
+        fsFiberOMCPortIndex OBJECT-TYPE
+        SYNTAX IfIndex
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Port index of the port."
+        ::= { fsFiberOMCEntry 1 }
+               
+        fsFiberOMCRxpower OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (0..255))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The Rx power of the Fiber module insered into the port.
+        Use a comma to separate multiple optical power values for multiple channels,
+        fill in key-value pairs, connect the key and value with an equal sign,
+        the key is the channel name, and the value is the optical power.
+        The unit of the optical power value is dbw."
+        ::= { fsFiberOMCEntry 2 }
+   
+        fsFiberOMCTxpower OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The Tx power of the Fiber module insered into the port.
+        Use a comma to separate multiple optical power values for multiple channels,
+        fill in key-value pairs, connect the key and value with an equal sign,
+        the key is the channel name, and the value is the optical power.
+        The unit of the optical power value is dbw."
+        ::= { fsFiberOMCEntry 3 }
+        fsFiberOMCWavelength OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (0..255))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The value of wavelength of the Fiber module insered into the port.
+        The unit is nm.
+        If it is a single wavelength, report a single value, for example: 1310.
+        If it is a wavelength range, report the wavelength range, for example: 1310-1312.
+        The reported string does not include the unit."
+        ::= { fsFiberOMCEntry 4 }
+            
+        fsFiberOMCTranslength OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The value of transfer distance of the Fiber module insered into the port.
+        The unit is km.
+        If it is a single distance, report a single value, for example: 20
+        If there are multiple distances in fiber mode, report multiple sets of data separated by commas. 
+        The format of each group of data is a key-value pair, the key and value are connected with =, 
+        the key is the fiber grade, and the value is the corresponding distance, such as 'OM1=20, OM2=30'"
+        ::= { fsFiberOMCEntry 5 }
+         
+        fsFiberOMCPortType OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (0..255))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Port type of the Fiber module insered into the port."
+        ::= { fsFiberOMCEntry 6 }
+fsFiberAntifakeMIBTraps OBJECT IDENTIFIER ::= { fsFiberMIB 2 }
+
+fsFiberAntifakeIntfNameDesc OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..255))
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+          "The description of the interface."
+        ::= { fsFiberAntifakeMIBTraps 1 }
+
+fsFiberAntifakeSerialNumberDesc OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..255))
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+          "The description of the serial number of the fiber module." 
+        ::= { fsFiberAntifakeMIBTraps 2 }
+        
+fsFiberAntifakeTrap NOTIFICATION-TYPE
+        OBJECTS   {fsFiberAntifakeIntfNameDesc, fsFiberAntifakeSerialNumberDesc}
+        STATUS     current
+        DESCRIPTION
+          "When detect the fiber module is not original fs fiber module, then this trap will be sent."
+        ::= { fsFiberAntifakeMIBTraps 3 }                    
+
+fsFiberMIBConformance OBJECT IDENTIFIER ::= { fsFiberMIB 3 }
+fsFiberMIBCompliances OBJECT IDENTIFIER ::= { fsFiberMIBConformance 1 }
+fsFiberMIBGroups      OBJECT IDENTIFIER ::= { fsFiberMIBConformance 2 }
+
+fsFiberEventMIBTraps OBJECT IDENTIFIER ::= { fsFiberMIB 4 }
+fsFiberEventReason OBJECT-TYPE
+        SYNTAX INTEGER {
+            unknown(1),
+            fiberInvalidTxHigh(2),
+            fiberInvalidTxLow(3),
+            fiberInvalidRxHigh(4),
+            fiberInvalidRxLow(5),
+            fiberInvalidI2CFail(6),
+            fiberInvalidNotSupp(7),
+            fiberInvalidTemperatureLow(8),
+            fiberInvalidTemperatureHigh(9),
+            fiberInvalidVoltageLow(10),
+            fiberInvalidVoltageHigh(11),
+            fiberInvalidTXBiasLow(12),
+            fiberInvalidTXBiasHigh(13),
+            fiberInvalidRXLossSignal(14),
+            fiberInvalidRXCDRLossLock(15),
+            fiberInvalidTXLossSignal(16),
+            fiberInvalidTXCDRLossLock(17),
+            fiberInvalidTXFault(18),
+            fiberInvalidCheckSumError(19),
+            fiberInvalidModuleNotReady(20),
+            fiberInvalidRXNotReady(21),
+            fiberInvalidTxHighWarn(22),
+            fiberInvalidTxLowWarn(23),
+            fiberInvalidRxHighWarn(24),
+            fiberInvalidRxLowWarn(25),
+            fiberInvalidTemperatureLowWarn(26),
+            fiberInvalidTemperatureHighWarn(27),
+            fiberInvalidVoltageLowWarn(28),
+            fiberInvalidVoltageHighWarn(29),
+            fiberInvalidTXBiasLowWarn(30),
+            fiberInvalidTXBiasHighWarn(31),
+            fiberInvalidRXTotalPowerLowAlarm(32),
+            fiberInvalidRXMediaPreFECBERHighAlarm(33),
+            fiberInvalidColorGrayFiberAlarm(34),
+            fiberInvalidRXTotalPowerLowWarn(35),
+            fiberInvalidRXMediaPreFECBERHighWarn(36)
+        }
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "The reason of the fiber invalid event." 
+        ::= { fsFiberEventMIBTraps 1 }
+
+fsFiberEventDesc OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..255))
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+          "The description of the fiber invalid event." 
+        ::= { fsFiberEventMIBTraps 2 }
+
+fsFiberRemoveEventTrap NOTIFICATION-TYPE
+        OBJECTS   {ifIndex, ifDescr}
+        STATUS     current
+        DESCRIPTION
+          "When detect the fiber has been removed, then this trap will be sent."
+        ::= { fsFiberEventMIBTraps 3 }
+
+fsFiberInsertEventTrap NOTIFICATION-TYPE
+        OBJECTS   {ifIndex, ifDescr}
+        STATUS     current
+        DESCRIPTION
+          "When detect the fiber has been inserted, then this trap will be sent."
+        ::= { fsFiberEventMIBTraps 4 }
+
+fsFiberInvalidTrap NOTIFICATION-TYPE
+        OBJECTS   {ifIndex, ifDescr, fsFiberEventReason, fsFiberEventDesc, fsFiberAlarmValue, fsFiberAlarmThresholdValue}
+        STATUS     current
+        DESCRIPTION
+          "Detect the fiber invalid event."
+        ::= { fsFiberEventMIBTraps 5 }
+
+fsFiberInvalidResumeTrap NOTIFICATION-TYPE
+        OBJECTS   {ifIndex, ifDescr, fsFiberEventReason, fsFiberEventDesc, fsFiberAlarmValue, fsFiberAlarmThresholdValue}
+        STATUS     current
+        DESCRIPTION
+          "The fiber resume from invalid event."
+        ::= { fsFiberEventMIBTraps 6 }
+
+fsFiberAlarmValue OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "The realtime value of the fiber invalid event. The value of power is in units of dbm, which needs to be divided by 100.
+        The value of -10000 means the value is invalid." 
+        ::= { fsFiberEventMIBTraps 7 }
+
+fsFiberAlarmThresholdValue OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "The threshold value of the fiber invalid event. The value of power is in units of dbm, which needs to be divided by 100.
+        The value of -10000 means the value is invalid." 
+        ::= { fsFiberEventMIBTraps 8 }
+
+fsFiberSpeedMismatch NOTIFICATION-TYPE
+        OBJECTS { ifIndex, ifDescr }
+        STATUS current
+        DESCRIPTION 
+                "When detect the fiber has been inserted and the speed of the optical module does not match
+        the speed supported by the interface, then this trap will be sent."
+        ::= { fsFiberEventMIBTraps 9 }
+
+-- ---------------------------------------------------------- --
+-- compliance statements
+-- ---------------------------------------------------------- --
+fsFiberMIBConpliance MODULE-COMPLIANCE
+        STATUS  current
+        DESCRIPTION
+                "The compliance statement for entities which implement
+                the FS Fiber MIB"
+        MODULE  -- this module
+                MANDATORY-GROUPS { 
+                        fsFiberMIBGroup  
+                }
+
+                GROUP      fsFiberAntifakeIntfNameDescGroup
+                DESCRIPTION
+                     "This group is mandatory only for those system which support fiber antifake notification." 
+
+                GROUP      fsFiberAntifakeSerialNumberDescGroup
+                DESCRIPTION
+                     "This group is mandatory only for those system which support fiber antifake notification." 
+
+         ::= { fsFiberMIBCompliances 1 }
+         
+fsFiberMIBGroup OBJECT-GROUP
+        OBJECTS {
+                fsFiberPortDescr,
+                fsFiberTransceiverType,
+                fsFiberConnectorType,
+                fsFiberWavelength,
+                fsFiberTransferDistanceSMF,
+                fsFiberTransferDistance62point5umOM1,
+                fsFiberTransferDistance62point5um,
+                fsFiberTransferDistance50umOM2,
+                fsFiberTransferDistance50um,
+                fsFiberTransferDistance50umOM3,
+                fsFiberTransferDistanceEBW50um,
+                fsFiberTransferDistanceCopper,
+                fsFiberTransferDistanceCableAssembly,
+                fsFiberDDMSupportStatus,
+                fsFiberSerialNumber,
+                fsFiberTemp,
+                fsFiberTempStatus,
+                fsFiberVoltage,
+                fsFiberVoltageStatus,
+                fsFiberBias,
+                fsFiberBiasStatus,
+                fsFiberChannel1Bias,
+                fsFiberChannel1BiasStatus,
+                fsFiberChannel2Bias,
+                fsFiberChannel2BiasStatus,
+                fsFiberChannel3Bias,
+                fsFiberChannel3BiasStatus,
+                fsFiberChannel4Bias,
+                fsFiberChannel4BiasStatus,
+                fsFiberRXpowerIntegerpart,
+                fsFiberRXpowerDecimalpart,
+                fsFiberRXpowertype,
+                fsFiberRXpowerStatus,
+                fsFiberChannel1RXpowerIntegerpart,
+                fsFiberChannel1RXpowerDecimalpart,
+                fsFiberChannel1RXpowertype,
+                fsFiberChannel1RXpowerStatus,
+                fsFiberChannel2RXpowerIntegerpart,
+                fsFiberChannel2RXpowerDecimalpart,
+                fsFiberChannel2RXpowertype,
+                fsFiberChannel2RXpowerStatus,
+                fsFiberChannel3RXpowerIntegerpart,
+                fsFiberChannel3RXpowerDecimalpart,
+                fsFiberChannel3RXpowertype,
+                fsFiberChannel3RXpowerStatus,
+                fsFiberChannel4RXpowerIntegerpart,
+                fsFiberChannel4RXpowerDecimalpart,
+                fsFiberChannel4RXpowertype,
+                fsFiberChannel4RXpowerStatus,
+                fsFiberTXpowerIntegerpart,
+                fsFiberTXpowerDecimalpart,
+                fsFiberTXpowerStatus,
+                fsFiberChannel1TXpowerIntegerpart,
+                fsFiberChannel1TXpowerDecimalpart,
+                fsFiberChannel1TXpowerStatus,
+                fsFiberChannel2TXpowerIntegerpart,
+                fsFiberChannel2TXpowerDecimalpart,
+                fsFiberChannel2TXpowerStatus,
+                fsFiberChannel3TXpowerIntegerpart,
+                fsFiberChannel3TXpowerDecimalpart,
+                fsFiberChannel3TXpowerStatus,
+                fsFiberChannel4TXpowerIntegerpart,
+                fsFiberChannel4TXpowerDecimalpart,
+                fsFiberChannel4TXpowerStatus,
+                fsFiberRXpowerSign,
+                fsFiberChannel1RXpowerSign,
+                fsFiberChannel2RXpowerSign,
+                fsFiberChannel3RXpowerSign,
+                fsFiberChannel4RXpowerSign,
+                fsFiberTXpowerSign,
+                fsFiberChannel1TXpowerSign,
+                fsFiberChannel2TXpowerSign,
+                fsFiberChannel3TXpowerSign,
+                fsFiberChannel4TXpowerSign,
+                fsFiberRXpower,
+                fsFiberChannel1RXpower,
+                fsFiberChannel2RXpower,
+                fsFiberChannel3RXpower,
+                fsFiberChannel4RXpower,
+                fsFiberTXpower,
+                fsFiberChannel1TXpower,
+                fsFiberChannel2TXpower,
+                fsFiberChannel3TXpower,
+                fsFiberChannel4TXpower,
+                fsFiberWavelengthExact,
+                fsFiberTransferDistance50umOM4,
+                fsFiberTransferDistanceSMFExt,
+                fsFiberBandWidth,
+                fsFiberFormFactor,
+                fsFiberRXpowerLowWarnThreshold,
+                fsFiberRXpowerHighWarnThreshold,
+                fsFiberRXpowerLowAlarmThreshold,
+                fsFiberRXpowerHighAlarmThreshold,
+                fsFiberTXpowerLowWarnThreshold,
+                fsFiberTXpowerHighWarnThreshold,
+                fsFiberTXpowerLowAlarmThreshold,
+                fsFiberTXpowerHighAlarmThreshold,
+                fsFiberChannel5Bias,
+                fsFiberChannel5BiasStatus,
+                fsFiberChannel6Bias,
+                fsFiberChannel6BiasStatus,
+                fsFiberChannel7Bias,
+                fsFiberChannel7BiasStatus,
+                fsFiberChannel8Bias,
+                fsFiberChannel8BiasStatus,
+                fsFiberChannel5RXpowerIntegerpart,
+                fsFiberChannel5RXpowerDecimalpart,
+                fsFiberChannel5RXpowertype,
+                fsFiberChannel5RXpowerStatus,
+                fsFiberChannel6RXpowerIntegerpart,
+                fsFiberChannel6RXpowerDecimalpart,
+                fsFiberChannel6RXpowertype,
+                fsFiberChannel6RXpowerStatus,
+                fsFiberChannel7RXpowerIntegerpart,
+                fsFiberChannel7RXpowerDecimalpart,
+                fsFiberChannel7RXpowertype,
+                fsFiberChannel7RXpowerStatus,
+                fsFiberChannel8RXpowerIntegerpart,
+                fsFiberChannel8RXpowerDecimalpart,
+                fsFiberChannel8RXpowertype,
+                fsFiberChannel8RXpowerStatus,
+                fsFiberChannel5TXpowerIntegerpart,
+                fsFiberChannel5TXpowerDecimalpart,
+                fsFiberChannel5TXpowerStatus,
+                fsFiberChannel6TXpowerIntegerpart,
+                fsFiberChannel6TXpowerDecimalpart,
+                fsFiberChannel6TXpowerStatus,
+                fsFiberChannel7TXpowerIntegerpart,
+                fsFiberChannel7TXpowerDecimalpart,
+                fsFiberChannel7TXpowerStatus,
+                fsFiberChannel8TXpowerIntegerpart,
+                fsFiberChannel8TXpowerDecimalpart,
+                fsFiberChannel8TXpowerStatus,
+                fsFiberChannel5RXpowerSign,
+                fsFiberChannel6RXpowerSign,
+                fsFiberChannel7RXpowerSign,
+                fsFiberChannel8RXpowerSign,
+                fsFiberChannel5TXpowerSign,
+                fsFiberChannel6TXpowerSign,
+                fsFiberChannel7TXpowerSign,
+                fsFiberChannel8TXpowerSign,
+                fsFiberChannel5RXpower,
+                fsFiberChannel6RXpower,
+                fsFiberChannel7RXpower,
+                fsFiberChannel8RXpower,
+                fsFiberChannel5TXpower,
+                fsFiberChannel6TXpower,
+                fsFiberChannel7TXpower,
+                fsFiberChannel8TXpower,
+                fsFiberTransferDistance50umOM5,
+                fsFiberMode,
+                fsFiberTempLowWarnThreshold,
+                fsFiberTempHighWarnThreshold,
+                fsFiberTempLowAlarmThreshold,
+                fsFiberTempHighAlarmThreshold,
+                fsFiberVoltageLowWarnThreshold,
+                fsFiberVoltageHighWarnThreshold,
+                fsFiberVoltageLowAlarmThreshold,
+                fsFiberVoltageHighAlarmThreshold,
+                fsFiberBiasLowWarnThreshold,
+                fsFiberBiasHighWarnThreshold,
+                fsFiberBiasLowAlarmThreshold,
+                fsFiberBiasHighAlarmThreshold
+        }
+        STATUS  current
+        DESCRIPTION
+                "A collection of objects providing Fiber managment."
+        ::= { fsFiberMIBGroups 1 }
+
+fsFiberAntifakeIntfNameDescGroup OBJECT-GROUP
+        OBJECTS {fsFiberAntifakeIntfNameDesc}
+        STATUS  current
+        DESCRIPTION
+                "Objects that providing a literal description of the interface."
+        ::= { fsFiberMIBGroups 2 } 
+	
+fsFiberAntifakeSerialNumberDescGroup OBJECT-GROUP
+        OBJECTS {fsFiberAntifakeSerialNumberDesc}
+        STATUS  current
+        DESCRIPTION
+                "Objects that providing a literal description of the fiber module serial number."
+        ::= { fsFiberMIBGroups 3 }
+END
