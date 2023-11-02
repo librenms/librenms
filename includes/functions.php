@@ -108,8 +108,15 @@ function getImageName($device, $use_database = true, $dir = 'images/os/')
 function renamehost($id, $new, $source = 'console')
 {
     $host = gethostbyid($id);
+    $new_rrd_dir = Rrd::dirFromHost($new);
 
-    if (! is_dir(Rrd::dirFromHost($new)) && rename(Rrd::dirFromHost($host), Rrd::dirFromHost($new)) === true) {
+    if (is_dir($new_rrd_dir)) {
+        log_event("Renaming of $host failed due to existing RRD folder for $new", $id, 'system', 5);
+
+        return "Renaming of $host failed due to existing RRD folder for $new\n";
+    }
+
+    if (! is_dir($new_rrd_dir) && rename(Rrd::dirFromHost($host), $new_rrd_dir) === true) {
         dbUpdate(['hostname' => $new, 'ip' => null], 'devices', 'device_id=?', [$id]);
         log_event("Hostname changed -> $new ($source)", $id, 'system', 3);
 
