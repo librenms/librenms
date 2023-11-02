@@ -6507,6 +6507,81 @@
                     "user_func": null,
                     "rrd_type": "GAUGE",
                     "state_name": "fgVpnSslState"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "voltage",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.12356.101.4.3.2.1.3.10",
+                    "sensor_index": "fgHwSensorEntIndex.10",
+                    "sensor_type": "fortigate",
+                    "sensor_descr": "VCC 2V5",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 2.464,
+                    "sensor_limit": 2.8336,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": 2.0944,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "voltage",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.12356.101.4.3.2.1.3.12",
+                    "sensor_index": "fgHwSensorEntIndex.12",
+                    "sensor_type": "fortigate",
+                    "sensor_descr": "VCC 1V15",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 1.136,
+                    "sensor_limit": 1.3064,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": 0.9656,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "voltage",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.12356.101.4.3.2.1.3.4",
+                    "sensor_index": "fgHwSensorEntIndex.4",
+                    "sensor_type": "fortigate",
+                    "sensor_descr": "CPU VCCP",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 0.9609,
+                    "sensor_limit": 1.105035,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": 0.816765,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": null
                 }
             ],
             "state_indexes": [
@@ -6572,7 +6647,7 @@
                     "ospfIfMetricTOS": 0,
                     "ospfIfMetricValue": 0,
                     "ospfIfMetricStatus": "notInService",
-                    "context_name": null,
+                    "context_name": "",
                     "ifIndex": null
                 }
             ],
@@ -6593,7 +6668,7 @@
                     "ospfMulticastExtensions": 0,
                     "ospfExitOverflowInterval": 0,
                     "ospfDemandExtensions": "false",
-                    "context_name": null
+                    "context_name": ""
                 }
             ],
             "ospf_areas": [
@@ -6608,7 +6683,7 @@
                     "ospfAreaLsaCksumSum": 6228397,
                     "ospfAreaSummary": "sendAreaSummary",
                     "ospfAreaStatus": "active",
-                    "context_name": null
+                    "context_name": ""
                 }
             ],
             "ospf_nbrs": [
@@ -6626,7 +6701,7 @@
                     "ospfNbmaNbrStatus": "0",
                     "ospfNbmaNbrPermanence": "dynamic",
                     "ospfNbrHelloSuppressed": "false",
-                    "context_name": null
+                    "context_name": ""
                 },
                 {
                     "port_id": null,
@@ -6642,7 +6717,7 @@
                     "ospfNbmaNbrStatus": "0",
                     "ospfNbmaNbrPermanence": "dynamic",
                     "ospfNbrHelloSuppressed": "false",
-                    "context_name": null
+                    "context_name": ""
                 }
             ]
         }

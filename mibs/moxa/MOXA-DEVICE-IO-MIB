@@ -1,0 +1,267 @@
+-- *****************************************************************
+-- Moxa General (Device Diagnostics) - Device IO PRIVATE MIB
+--
+-- Copyright (c) 2019 by Moxa Inc.
+-- All rights reserved.
+-- *****************************************************************
+
+MOXA-DEVICE-IO-MIB DEFINITIONS ::= BEGIN
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, Integer32, NOTIFICATION-TYPE
+            FROM SNMPv2-SMI
+        TEXTUAL-CONVENTION, DisplayString
+            FROM SNMPv2-TC
+        deviceDiagnostics
+            FROM MOXA-GENERAL-MIB;
+
+    mxDeviceIo MODULE-IDENTITY
+        LAST-UPDATED "202202170000Z"
+        ORGANIZATION "Moxa Inc."
+        CONTACT-INFO
+            "
+            Postal: Moxa Inc.
+            13F., No. 3, Sec. 4, New Taipei Blvd.
+            Xinzhuang Dist., New Taipei City 242032, Taiwan, R.O.C.
+
+            Tel: +866-2-89191230
+            Web: http://www.moxa.com/
+            "
+        DESCRIPTION
+            "This MIB module defines device IO"
+
+        REVISION    "202202170000Z"
+        DESCRIPTION "update CONTACT-INFO"
+
+        REVISION    "201906300000Z"
+        DESCRIPTION "Initial Revision"
+
+        ::= { deviceDiagnostics 6 }
+
+    moxa                 OBJECT IDENTIFIER ::= { enterprises 8691 }
+    general              OBJECT IDENTIFIER ::= { moxa 602 }
+    deviceDiagnostics    OBJECT IDENTIFIER ::= { general 8 }
+
+-- -------------------------------------------------------------
+-- groups in the MOXA-DEVICE-IO-MIB MIB
+-- -------------------------------------------------------------
+
+    deviceioNotification OBJECT IDENTIFIER ::= { mxDeviceIo 0 }
+    -- deviceioConfiguration OBJECT IDENTIFIER ::= { mxDeviceIo 1 }
+    deviceioStatus OBJECT IDENTIFIER ::= { mxDeviceIo 2 }
+    -- deviceioExtensions OBJECT IDENTIFIER ::= { mxDeviceIo 3 }
+
+-- -------------------------------------------------------------
+-- Notification group
+-- -------------------------------------------------------------
+
+    deviceioNotifySystemPowerOn NOTIFICATION-TYPE
+        OBJECTS {
+            deviceioStatSystemPowerIndex
+        }
+        STATUS current
+        DESCRIPTION
+            "Notification for device system power becomes on"
+        ::= { deviceioNotification 1 }
+
+    deviceioNotifySystemPowerOff NOTIFICATION-TYPE
+        OBJECTS {
+            deviceioStatSystemPowerIndex
+        }
+        STATUS current
+        DESCRIPTION
+            "Notification for device system power becomes off"
+        ::= { deviceioNotification 2 }
+
+    deviceioNotifyDiOpen NOTIFICATION-TYPE
+        OBJECTS {
+            deviceioStatDiIndex
+        }
+        STATUS current
+        DESCRIPTION
+            "Notification for device DI becomes open"
+        ::= { deviceioNotification 3 }
+
+    deviceioNotifyDiShort NOTIFICATION-TYPE
+        OBJECTS {
+            deviceioStatDiIndex
+        }
+        STATUS current
+        DESCRIPTION
+            "Notification for device DI becomes short"
+        ::= { deviceioNotification 4 }
+
+-- -------------------------------------------------------------
+-- Status group
+-- -------------------------------------------------------------
+
+    deviceioStatSystemPowerTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF DeviceioStatSystemPowerEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Device system power status table."
+        ::= { deviceioStatus 1 }
+
+    deviceioStatSystemPowerEntry OBJECT-TYPE
+        SYNTAX DeviceioStatSystemPowerEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Table entry representing system power status"
+        INDEX { deviceioStatSystemPowerIndex }
+            ::= { deviceioStatSystemPowerTable 1 }
+
+    DeviceioStatSystemPowerEntry ::=
+        SEQUENCE {
+            deviceioStatSystemPowerIndex Integer32,
+            deviceioStatSystemPowerStatus INTEGER
+        }
+
+    deviceioStatSystemPowerIndex OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "Index of system power."
+        ::= { deviceioStatSystemPowerEntry  1 }
+
+    deviceioStatSystemPowerStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+                   off(0),
+                   on(1)
+            }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "status of system power."
+        ::= { deviceioStatSystemPowerEntry  2 }
+
+    deviceioStatPoePowerTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF DeviceioStatPoePowerEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Device system poe status table."
+        ::= { deviceioStatus 2 }
+
+    deviceioStatPoePowerEntry OBJECT-TYPE
+        SYNTAX DeviceioStatPoePowerEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Table entry representing poe power status"
+        INDEX { deviceioStatPoePowerIndex }
+            ::= { deviceioStatPoePowerTable 1 }
+
+    DeviceioStatPoePowerEntry ::=
+        SEQUENCE {
+            deviceioStatPoePowerIndex Integer32,
+            deviceioStatPoePowerStatus INTEGER
+        }
+
+    deviceioStatPoePowerIndex OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Index of poe power."
+        ::= { deviceioStatPoePowerEntry  1 }
+
+    deviceioStatPoePowerStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+                   off(0),
+                   on(1)
+               }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "status of poe power."
+        ::= { deviceioStatPoePowerEntry  2 }
+
+    deviceioStatDiTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF DeviceioStatDiEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Device DI status table."
+        ::= { deviceioStatus 3 }
+
+    deviceioStatDiEntry OBJECT-TYPE
+        SYNTAX DeviceioStatDiEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Table entry representing DI status."
+        INDEX { deviceioStatDiIndex }
+            ::= { deviceioStatDiTable 1 }
+
+    DeviceioStatDiEntry ::=
+        SEQUENCE {
+            deviceioStatDiIndex Integer32,
+            deviceioStatDiStatus INTEGER
+        }
+
+    deviceioStatDiIndex OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "Index of DI."
+        ::= { deviceioStatDiEntry 1 }
+
+    deviceioStatDiStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+                   open(0),
+                   short(1)
+               }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "status of di."
+        ::= { deviceioStatDiEntry  2 }
+
+    deviceioStatRelayTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF DeviceioStatRelayEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Device Relay Status table."
+        ::= { deviceioStatus 4 }
+
+    deviceioStatRelayEntry OBJECT-TYPE
+        SYNTAX DeviceioStatRelayEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Table entry representing Relay status."
+        INDEX { deviceioStatRelayIndex }
+            ::= { deviceioStatRelayTable 1 }
+
+    DeviceioStatRelayEntry ::=
+        SEQUENCE {
+            deviceioStatRelayIndex Integer32,
+            deviceioStatRelayStatus INTEGER
+        }
+
+    deviceioStatRelayIndex OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Index of relay."
+        ::= { deviceioStatRelayEntry 1 }
+
+    deviceioStatRelayStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+                   open(0),
+                   short(1)
+               }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "status of relay."
+        ::= { deviceioStatRelayEntry  2 }
+
+
+
+END

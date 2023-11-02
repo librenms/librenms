@@ -158,10 +158,12 @@ if ($phasecount > 1) {
     if ($oids) {
         echo ' Voltage In ';
         [$oid,$current] = explode(' ', $oids);
-        $divisor = 1;
-        $type = 'apc';
-        $index = '1';
-        $descr = 'Input';
-        discover_sensor($valid['sensor'], 'voltage', $device, $oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
+        if ($current >= 0) { // Some units using rPDU2 can return rPDU2PhaseStatusVoltage.1; Value (Integer): -1 hence this check. Example : AP7900B
+            $divisor = 1;
+            $type = 'apc';
+            $index = '1';
+            $descr = 'Input';
+            discover_sensor($valid['sensor'], 'voltage', $device, $oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
+        }
     }
 }
