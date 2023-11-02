@@ -83,7 +83,9 @@ class Device extends BaseModel
 
     protected $casts = [
         'inserted' => 'datetime',
+        'last_discovered' => 'datetime',
         'last_polled' => 'datetime',
+        'last_ping' => 'datetime',
         'status' => 'boolean',
     ];
 
@@ -297,9 +299,9 @@ class Device extends BaseModel
         return Permissions::canAccessDevice($this->device_id, $user->user_id);
     }
 
-    public function formatDownUptime($short = false)
+    public function formatDownUptime($short = false): string
     {
-        $time = ($this->status == 1) ? $this->uptime : time() - strtotime($this->last_polled);
+        $time = ($this->status == 1) ? $this->uptime : $this->last_polled->diffInSeconds();
 
         return Time::formatInterval($time, $short);
     }
