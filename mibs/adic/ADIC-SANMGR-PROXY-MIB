@@ -1,0 +1,5502 @@
+-- Name:                       ADIC SANMGR PROXY MIB 
+--
+--                       SANMGR_PROXY_MIB.mib version 1.15
+--
+--             **********************************************************
+--             *                                                        *
+--             *                   SMI v1 version                       *
+--             *                                                        *
+--             **********************************************************
+--
+-- Purpose:    Proxy Agent MIB for ADIC I/O Blades
+-- File:       SANMGR_PROXY_MIB.mib
+-- Enterprise: 1.3.6.1.4.1.2935
+-- Created:    17 April 2002 by Dean Hawthorne
+-- Revision:   SANMGR_PROXY_MIB.mib 1.14
+-- Author:     ADIC
+--
+-- Copyright (c) 2002 - 2013 Quantum Corporation
+-- 
+-- Revision History:
+--      $Log: SANMGR_PROXY_MIB.mib  $
+--      Revision 1.15 2013/12/07 10:26:49MST Bob Ackerman (backerman) 
+--      Add module identify so that we can support dynamically loadable modules.
+--      Revision 1.14 2013/09/16 10:26:49MST Carsten Prigge (cprigge) 
+--      Clean up MIB files to reduce errors from various MIB browsers
+--      Revision 1.13 2006/11/01 11:00:23MST Darrel Somer (dsomer) 
+--      Sync up with master from mib project.
+--      Revision 1.26 2006/11/01 10:46:47MST Darrel Somer (dsomer) 
+--      Sync up w blades.
+--      Revision 1.12 2006/06/28 10:58:22MDT dsomer 
+--      Add 7404 product type.
+--      Revision 1.11 2004/10/07 12:49:56MDT backerman 
+--      32890: updates for the SOIP/SOIP2 rescan and autolevel traps
+--      Revision 1.24 2004/10/07 10:46:35EDT dhawthorne 
+--      Added paSoip2iRescan, paSoipiRescan, paFLBStatus, and paSoip2iScanPeriod to AgentScalarsTable
+--      Removed PanelLED group
+--      Revision 1.23 2004/10/06 18:12:57EDT dhawthorne 
+--      Move pnTrapBroadcastMode to trapDestTable
+--      Revision 1.22 2004/10/06 17:58:20EDT dhawthorne 
+--      Merged SANMgr MIB (attached) and SANMgr Proxy MIBs:
+--      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+--      Added values to PathlightProduct Typedef.
+--      Added sfpSWTwoGB(21) to FibreMedia Typedef
+--      Added ultra320(5) to SCSI Speed Typedef
+--      Added SCSI Role and SCSI Termination Typedefs
+--      Added pdAltVendor and pdAltProduct to device table
+--      Added scsiTargetEnabled to scsiCtlrTable
+--      Added pnTrapBroadcastMode
+--      Added dmPath and dmSerialNum to DevMapTable
+--      Added deviceMapMultipathMode, deviceMapRemoveDevice 
+--      and LoadBalancingMode to deviceMapCommandTable
+--      Added Pathlight Utility Module table
+--      Added trap definitions 81 through 90
+--      Removed unused typedefs
+--      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+--      Revision 1.21 2004/03/29 18:09:04EST dhawthorne 
+--      Added fcPortID
+--      Revision 1.20 2003/10/30 14:33:10EST dhawthorne 
+--      Document possible values for hostCommand set operation
+--      Revision 1.19 2003/10/28 13:38:39EST dhawthorne 
+--      Correct duplicate trap name issue
+--      Revision 1.18 2003/10/28 13:25:39EST dhawthorne 
+--      Added trap #118
+--      Revision 1.17 2003/10/24 17:25:57EDT dhawthorne 
+--      Added health check traps 112 thru 116
+--      Revision 1.16 2003/09/12 11:24:06EDT dhawthorne 
+--      Added vLib(9), soip(10), and soip2(11) to Interface enumeration.
+--      Revision 1.15 2003/09/10 11:00:16EDT dhawthorne 
+--      Merged paEnableAllScsiTargets and paHPFStatus from SANMgr.mib
+--      Revision 1.14 2003/09/09 18:14:10EDT dhawthorne 
+--      Added HPF tables from SANMgr MIB
+--      Revision 1.13 2003/06/04 17:40:45EDT dhawthorne 
+--      Interchange trap # 70 and trap # 71
+--      Revision 1.12 2003/05/19 16:56:33EDT dhawthorne 
+--      Added Controller Status Change Trap (# 80)
+--      Revision 1.11 2003/05/02 12:05:12EDT dhawthorne 
+--      Added trap definitions for traps 73 thru 78
+--      Revision 1.10 2003/04/28 14:48:06EDT dhawthorne 
+--      Added controller reset complete trap.
+--      Revision 1.9 2003/04/17 11:47:30EDT dhawthorne 
+--      Pasted proxy MIB into agent group, OID agent.500
+--      Revision 1.8 2003/01/04 15:30:54EST dhawthorne 
+--      Use FibreLoopIDMode enum for fcLoopIdMode
+--      Revision 1.7 2002/12/10 11:47:32EST dhawthorne 
+--      Declared hostConnectionType as Interface, not INTEGER
+--      Revision 1.5.1.1 2002/12/09 20:30:36MST dhawthorne 
+--      Changed declaration of hostConnectionType
+--      Revision 1.5 2002/10/08 07:34:13MDT dhawthorne 
+--      Added eVPS data to paHost table
+--      Revision 1.4 2002/10/04 18:35:02EDT dhawthorne 
+--      Removed all enum or SIZE definitions from SEQUENCE clauses to satisfy jMIBc compiler
+--      Revision 1.3 2002/09/16 13:50:03EDT dhawthorne 
+--      Closing CR405
+--      Revision 1.2 2002/08/26 17:23:07EDT dhawthorne 
+--      Add paGhostIoTimeToLive through paAMPStatus
+--      Revision 1.1 2002/08/12 09:53:03EDT jbruegger 
+--      Initial revision
+--      Member imported to project e:/mks/projects/mib/mib.pj
+--
+
+ADIC-SANMGR-PROXY-MIB
+
+DEFINITIONS ::= BEGIN
+
+IMPORTS                                                 
+    TimeTicks, IpAddress, Gauge, enterprises, experimental
+                FROM RFC1155-SMI
+    OBJECT-TYPE                 
+                FROM RFC-1212
+    DisplayString               
+                FROM RFC1213-MIB 
+    TRAP-TYPE                 
+                FROM RFC-1215  
+-- **********************************************************
+-- *                                                        *
+-- * Imports from ADIC-INTELLIGENT-STORAGE-MIB              *
+-- *                                                        *
+-- **********************************************************    
+-- OID Hierarchy
+  		network,
+-- "Extra" Index for Proxy
+		componentId,
+--Type assignments  
+ 
+    	RowStatus,
+    	Boolean
+    			FROM ADIC-INTELLIGENT-STORAGE-MIB;     
+
+-- **********************************************************
+-- *                                                        *
+-- *    ADIC SNC MIB Definitions from old SANMgr-MIB        *
+-- *                                                        *
+-- **********************************************************     
+    -- the sanmgr-proxy node can be located anywhere in the hierarchy
+    sanmgrProxy MODULE-IDENTITY
+    LAST-UPDATED "201509240000Z"
+    ORGANIZATION "Quantum Corporation"
+    CONTACT-INFO
+           " Quantum Corporation
+             224 Airport Parkway, Suite 300
+             San Jose, CA 95110
+             Tel: +1 800 284-5101
+
+             E-mail: support@quantum.com"
+    DESCRIPTION
+        "This MIB provides Tape Library product information."
+    REVISION    "201509240000Z"
+    DESCRIPTION
+        "MIB update as of September 2015"
+    ::= { network 10 }
+    pathlight               OBJECT IDENTIFIER    ::= { sanmgrProxy 10 } 
+-- Categories
+--    products                OBJECT IDENTIFIER ::= { pathlight 1 }
+    agent                   OBJECT IDENTIFIER ::= { pathlight 2 }
+    devices                 OBJECT IDENTIFIER ::= { pathlight 3 }
+    controllers             OBJECT IDENTIFIER ::= { pathlight 4 }
+    notification            OBJECT IDENTIFIER ::= { pathlight 5 }
+    panelLED                OBJECT IDENTIFIER ::= { pathlight 6 }
+    paHost                  OBJECT IDENTIFIER ::= { pathlight 7 }
+    scsiMap                 OBJECT IDENTIFIER ::= { pathlight 8 }
+    deviceMap               OBJECT IDENTIFIER ::= { pathlight 9 }
+    replication             OBJECT IDENTIFIER ::= { pathlight 10 }    
+    envData                 OBJECT IDENTIFIER ::= { pathlight 11 }
+    portFailover            OBJECT IDENTIFIER ::= { pathlight 12 }      
+    utilityModule           OBJECT IDENTIFIER ::= { pathlight 13 } 
+    trapDefinition          OBJECT IDENTIFIER ::= { pathlight 1000 }
+    
+-- textual conventions
+
+-- SAN product type
+    PathlightProduct ::= INTEGER { sanGateway(1), sanRouter(2), sanBridge(3), 
+                         adicFCR2(4), dellFCR2(5), siemensFCR2(6), sanHoneoye(7),
+                         adicHoneoye(8), dellHoneoye(9), siemensHoneoye(10),
+                         ibmGatewayModule(11), ibmHoneoye(12),
+                         adicPlt5000(13), dellPlt5000(14), ibmPlt5000(15),
+                         adicSNC4000(16), dellSNC4000(17), adicSNC6101(18),
+                         dellSNC6101(19), adicSNC6404(20), adicSNC6104(21),
+                         adicSNC7404(22) }
+
+-- Status values
+    PltStatus ::=  INTEGER { failed(1), down(2), testing(3), up(4) }
+    FcStatus ::= INTEGER { configWait(0), loopInit(1), login(2), ready(3),
+        lostSync(4), error(5), reinit(6), nonPart(7), failed(8) }
+
+-- Designation of type of storage interface
+    Interface ::= INTEGER { none(0), sanGateway(1), ssa(2), fibreChannel(3), scsi(4), ethernet(5), 
+                            unknown(6), any(7), sanReplication(8), vLib(9), soip(10), soip2(11) }
+
+-- Reboot Image Agent and Reset Controllers 
+    Reset ::= INTEGER { run(0), reset(1), reboot(2) }
+
+-- Device types
+    DeviceType ::= INTEGER { directAccess(0), sequentialAccess(1), 
+        printer(2), 
+        processor(3), worm(4), cd(5), scanner(6), opticalMemory(7),
+        mediumChanger(8), communications(9), ascIt81(10), ascIt82(11),
+        storageArrayController(12), enclosure(13), simplifiedDirectAccess(14),
+        opticalCardReader(15), unknown(31) }
+
+-- Vendor IDs
+      VendorIDInt ::= INTEGER { unknown(0), symbios(4096), amd(4130), qlogic(4215), 
+          pathlight(4537)  }
+
+-- Fibre Channel Media Type
+    FibreMedia ::= INTEGER { unknown(0), copper(1), shortWaveOptical(2),
+        longWaveOptical(3), shortWaveOpticalDual(4), longWaveOpticalDual(5),
+        shortWaveOpticalLongDistance(6), longWaveOpticalLongDistance(7),
+        gbicSWOneGB(8), gbicLW1300OneGB(9), gbicLW1300HPOneGB(10),
+        gbicLW1550HPOneGB(11), gbicCopperHSSDCOneGB(12), gbicCopperDB9OneGB(13),
+        gbicSWTwoGB(14), gbicLW1300TwoGB(15), gbicLW1300HPTwoGB(16),
+        gbicLW1550HPTwoGB(17), gbicCopperHSSDCTwoGB(18), gbicCopperDB9TwoGB(19),
+        noGBIC(20), sfpSWTwoGB(21), sfpSWFourGB(22) }
+
+-- Fibre Channel Port Type
+    FibrePort ::= INTEGER { nodeLoop(0), node(1), fabricLoop(3), fabric(4), none( 255 ) }
+
+-- Fibre Channel Loop ID mode
+    FibreLoopIDMode ::= INTEGER { soft(0), hard(1) }
+
+-- Fibre Port Mode
+    FibrePortMode   ::= INTEGER { privateTargetOnly(1),
+                                 privateInitiatorOnly(2),
+                                 privateTargetAndInitiator(3),
+                                 publicTargetOnly(17),
+                                 publicInitiatorOnly(18),
+                                 publicTargetAndInitiator(19) }
+
+-- Fibre Channel Connection options
+    FibreConnOptions ::= INTEGER { loopOnly(0),
+                                  pointToPointOnly(1),
+                                  loopPreferred(2),
+                                  pointToPointPreferred(3) }
+-- SCSI Speed 
+    ScsiSpeed ::= INTEGER { async(0), fast(1), ultra(2), ultra2(3), ultra160(4), ultra320(5) }
+
+-- SCSI Card Type
+    ScsiCardType ::= INTEGER { none(0), differentialNoTermination(1),
+         differentialTerminated(2), singleEndedNoTermination(3), 
+         singleEndedTerminated(4), unknown(5), lowVoltageSingleEnded(6),
+         lowVoltageDifferential(7), lowVoltageMultiFunction(8) } 
+
+-- SCSI Ansi Level
+    ScsiAnsiLevel ::= INTEGER { notScsi(0), scsi-1(1), scsi-2(2), scsi-3(3) }
+
+--aht 1/28/02 added enumeration for EVPS host Lun Type.
+    HostLUNType ::= INTEGER { bit8(0), bit16(1), vsa(2) }
+
+-- *** FC Host Port Failover ***
+    FcHPFRecoveryType ::= INTEGER {returnToActive(0), returnToStandby(1), requiresIntervention(2)}
+    FcHPFPortState    ::= INTEGER {onLine(0), offLine(1)}
+    FcHPFPortFailType ::= INTEGER {none(0), linkDown(1), linkError(2)}
+
+-- ***************************************************************** 
+-- 
+-- Pathlight Agent Group 
+-- 
+-- ***************************************************************** 
+       agentScalarTable OBJECT-TYPE 
+        SYNTAX SEQUENCE OF AgentScalarEntry 
+        ACCESS not-accessible 
+        STATUS mandatory 
+        DESCRIPTION 
+            ""
+        ::= { agent 1 }
+
+    agentScalarEntry OBJECT-TYPE 
+        SYNTAX AgentScalarEntry 
+        ACCESS not-accessible 
+        STATUS mandatory 
+        DESCRIPTION 
+            "A component entry containing objects for a 
+             particular component." 
+        INDEX { componentId } 
+        ::= { agentScalarTable 1 } 
+
+        AgentScalarEntry ::= 
+            SEQUENCE {  
+                paIdentify              INTEGER,
+                paReboot                Reset, 
+                paHealthCheckValue      Gauge,
+                paHealthCheckLevel      INTEGER,
+                paHealthCheckInterval   Gauge,
+                paEvRptLevel            INTEGER,
+                paEventLogLevels        OCTET STRING,
+                paTrapThresholds        OCTET STRING,
+                paBaudRate              INTEGER,
+                paFiller                INTEGER,
+                paLogSize               Gauge,
+                paCommand               INTEGER,      
+                paLogBoot               Gauge,
+                paLogNCurrent           Gauge,
+                paLogChronFirst         Gauge,
+                paLogChronLast          Gauge,
+                paLogScroll             INTEGER,
+                paLogFilename           DisplayString,
+                paEnvironmentState      INTEGER,
+                paGatewayFWRev          DisplayString,
+                paGatewayHWRev          DisplayString,
+                paSnmpFWRev             DisplayString,
+                paRidTag                DisplayString,
+                paSerialNumber          DisplayString,
+                paServerVersion         INTEGER,
+                paProductType           PathlightProduct,
+                paVPSEnabled            Boolean,
+                paLicenseKey            DisplayString, 
+                paThirdPartyCopyEnabled Boolean,
+                paVPSStatus             INTEGER,
+                paThirdPartyCopyStatus  INTEGER,
+                paCommandControlLUN     INTEGER,
+                paSanDirectorEnabled    Boolean,
+                paNodeName              OCTET STRING,
+                paVPMStatus             INTEGER,
+                paSRSStatus             INTEGER,
+                paEthernetType          DisplayString,
+                paTrapSequenceNumber    INTEGER,
+                paSysNodeNameMode       INTEGER,
+                paGhostIOTimeToLive 	INTEGER,
+                paMaxLun 				INTEGER,  
+                paEVPSEnabled			INTEGER,  
+                paMaxHostLun			INTEGER,
+                paAMPStatus             INTEGER,
+                paEnableAllScsiTargets  INTEGER,
+                paHPFStatus             INTEGER,
+                paSoip2iRescan          Boolean,
+                paSoipiRescan           Boolean, 
+                paFLBStatus             INTEGER,
+                paSoip2iScanPeriod      INTEGER,
+                paCommandFlowLogEnabled Boolean
+            }
+--
+-- Begin definitions
+--
+    paIdentify  OBJECT-TYPE
+       SYNTAX INTEGER
+       ACCESS read-write
+       STATUS mandatory
+       DESCRIPTION
+            "Flash the READY light on the
+            SAN Data Gateway front panel.
+            A non-zero value turns the 
+            LED on for the specified 
+            number of seconds.  Zero
+            turns LED off."
+       ::= { agentScalarEntry 1 }
+ 
+    paReboot    OBJECT-TYPE 
+       SYNTAX Reset 
+       ACCESS read-write 
+       STATUS mandatory 
+       DESCRIPTION 
+           "Writing a reboot(2) value here 
+           causes immediate reboot." 
+       ::= { agentScalarEntry 2 } 
+ 
+    paHealthCheckValue OBJECT-TYPE 
+       SYNTAX Gauge 
+       ACCESS read-only 
+       STATUS mandatory 
+       DESCRIPTION 
+           "Value in percent of health check 
+           tests passed." 
+       ::= { agentScalarEntry 3 } 
+ 
+    paHealthCheckLevel OBJECT-TYPE
+       SYNTAX INTEGER { none(0), system(1), interface(2), simpleDevice(3), deviceReady(4) }
+       ACCESS read-write
+       STATUS mandatory
+       DESCRIPTION 
+           "Scrutiny level of health check function."
+       ::= { agentScalarEntry 4 }
+
+    paHealthCheckInterval OBJECT-TYPE 
+       SYNTAX Gauge 
+       ACCESS read-write 
+       STATUS mandatory 
+       DESCRIPTION "Health Check interval in minutes." 
+       ::= { agentScalarEntry 5 } 
+ 
+    paEvRptLevel OBJECT-TYPE
+       SYNTAX INTEGER { private(0), notice(1), warning(2), information(3) }
+       ACCESS read-write
+       STATUS mandatory
+       DESCRIPTION 
+           "Used when retrieving Event Log. Events with 
+           log level greater than paEvRptLevel are not
+           retrieved."
+       ::= { agentScalarEntry 6 }
+ 
+    paEventLogLevels OBJECT-TYPE 
+       SYNTAX OCTET STRING (SIZE(256)) 
+       ACCESS read-write 
+       STATUS mandatory 
+       DESCRIPTION
+           "Each of 255 event types has an 8-bit level
+           used when reading log.  Currently valid LogLevel
+           range is 0-3." 
+       ::= { agentScalarEntry 7 } 
+ 
+    paTrapThresholds OBJECT-TYPE 
+       SYNTAX OCTET STRING (SIZE(256)) 
+       ACCESS read-write 
+       STATUS mandatory 
+       DESCRIPTION 
+           "Each of 255 event types has an 8-bit threshold.
+           When the number of events exceeds the Trap Threshold,
+           a trap is generated and sent to all parties listed 
+           in the trap destination table (also under SNMP
+           control) .
+           Threshold       0  means  Never
+           Threshold       1  means  Always
+           Threshold 2 - 255  means  Number of events per
+                                     10 minute period" 
+       ::= { agentScalarEntry 8 } 
+ 
+    paBaudRate OBJECT-TYPE 
+       SYNTAX INTEGER { baud9600(0), baud19200(1), baud38400(2) }
+       ACCESS read-write 
+       STATUS mandatory 
+       DESCRIPTION 
+           "Serial baud rate for SAN Gateway Service Port.
+           Currently, the Agent does not support baud rate 
+           change: the rate is hard-coded to 19200 baud." 
+       ::= { agentScalarEntry 9 } 
+
+    paFiller OBJECT-TYPE
+       SYNTAX INTEGER
+       ACCESS read-write
+       STATUS mandatory
+       DESCRIPTION 
+           "Filler field to the sanmanger MIB"
+       ::= { agentScalarEntry 10 }
+    
+    paLogSize OBJECT-TYPE
+       SYNTAX Gauge
+       ACCESS read-write
+       STATUS mandatory
+       DESCRIPTION 
+           "Number of records in entire event log.
+           (Not just current records since boot.)"
+       ::= { agentScalarEntry 11 }
+    
+    paCommand OBJECT-TYPE 
+       SYNTAX  INTEGER { idle(0), snapshot(1), scroll(2), save(3), clear(4), removeFile(5),
+                             logModeCurrent(6), logModeAbsolute(7), doHealthCheck(8) }
+       ACCESS read-write 
+       STATUS mandatory 
+       DESCRIPTION 
+           "Used for issuing command to SNMP agent." 
+       ::= { agentScalarEntry 12 } 
+
+    paLogBoot OBJECT-TYPE 
+       SYNTAX Gauge 
+       ACCESS read-only 
+       STATUS mandatory 
+       DESCRIPTION "Absolute index of first log entry at boot." 
+       ::= { agentScalarEntry 13 } 
+ 
+    paLogNCurrent OBJECT-TYPE 
+       SYNTAX Gauge 
+       ACCESS read-write 
+       STATUS mandatory 
+       DESCRIPTION 
+           "SNMP Get (read) returns number of records 
+           since boot subject to viewing level filtering.
+           SNMP Set (write) copies this number of records
+           since boot (subject to level filtering) into a
+           buffer from which records are read.  This mode
+           of use is deprecated.  The preferred way to get
+           the event log since boot is to read paLogBoot,
+           set paEvRptLevel and do a series of SNMP GetNext
+           calls starting at instance paLogBoot until end
+           of event log MIB table is reached." 
+       ::= { agentScalarEntry 14 } 
+ 
+    paLogChronFirst OBJECT-TYPE 
+       SYNTAX Gauge 
+       ACCESS read-write 
+       STATUS obsolete 
+       DESCRIPTION 
+           "Used to request range of records from 
+           paLogChronFirst to paLogChronLast" 
+       ::= { agentScalarEntry 15 } 
+ 
+    paLogChronLast OBJECT-TYPE 
+       SYNTAX Gauge 
+       ACCESS read-write 
+       STATUS obsolete 
+       DESCRIPTION 
+           "Used to request range of records from 
+           paLogChronFirst to paLogChronLast" 
+       ::= { agentScalarEntry 16 } 
+
+    paLogScroll OBJECT-TYPE 
+       SYNTAX INTEGER
+       ACCESS read-write 
+       STATUS obsolete 
+       DESCRIPTION 
+           "Used to request previous/next range of records  
+           event log" 
+       ::= { agentScalarEntry 17 } 
+ 
+    paLogFilename OBJECT-TYPE
+        SYNTAX  DisplayString ( SIZE(0..128))
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "Used to save event log to a file."
+    ::= { agentScalarEntry 18 }
+
+    paEnvironmentState OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION 
+            "Temperature and Voltage Status of 
+            SAN Data Gateway:
+            **********************************
+            (LSB) bit 0  Auxiliary Power 
+                  bit 1  Main Power 
+                  bit 2  Temperature Warning
+                  bit 3  Temperature Alarm"
+        ::= { agentScalarEntry 19 } 
+
+    paGatewayFWRev OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (0..64))
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "SAN Data Gateway Firmware Revision information."
+        ::= { agentScalarEntry 20 } 
+
+    paGatewayHWRev OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (0..64))
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "SAN Data Gateway Hardware Revision information."
+        ::= { agentScalarEntry 21 } 
+
+    paSnmpFWRev OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (0..64))
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "SNMP Agent Firmware Revision information."
+        ::= { agentScalarEntry 22 } 
+
+    paRidTag OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (0..128))
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "SAN Data Gateway RIDTag."
+        ::= { agentScalarEntry 23 } 
+
+    paSerialNumber OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (0..64))
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "SAN Data Gateway Serial Number."
+        ::= { agentScalarEntry 24 } 
+
+    paServerVersion OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION 
+            "Remote Management software writes Server
+            version information here to customize SNMP
+            Agent behavior."
+        ::= { agentScalarEntry 25 } 
+
+    paProductType OBJECT-TYPE
+        SYNTAX PathlightProduct
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION 
+            "Type of SAN device"
+        ::= { agentScalarEntry 26 } 
+
+    paVPSEnabled OBJECT-TYPE
+        SYNTAX Boolean
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION 
+            "State of VPS Access Control enable."
+        ::= { agentScalarEntry 27 } 
+
+    paLicenseKey OBJECT-TYPE
+        SYNTAX DisplayString ( SIZE(0..64))
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION 
+            "Used to pass feature enabling license keys."
+        ::= { agentScalarEntry 28 } 
+
+    paThirdPartyCopyEnabled OBJECT-TYPE
+        SYNTAX Boolean
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION 
+            "State of Extended 3rd Party Copy enable.
+            Enabled means that a valid license key
+            has been entered for this feature."
+        ::= { agentScalarEntry 29 } 
+
+    paVPSStatus OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION 
+            "State of Virtual Private SAN feature.
+            bit 0 :   active or inactive.
+            bit 1 : licensed or not licensed.
+            Bit 1 is redundant with MIB var paVPSEnabled.
+            Writing 1 to bit 0 makes VPS active if licensed.
+            Writing 0 to bit 0 makes VPS inactive if licensed."
+        ::= { agentScalarEntry 30 } 
+
+    paThirdPartyCopyStatus OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION 
+            "State of Extended 3rd Party Copy feature.
+            bit 0 :   active or inactive.
+            bit 1 : licensed or not licensed.
+            Bit 1 is redundant with MIB var paThirdPartyCopyEnabled.
+            Writing 1 to bit 0 makes Third Party Copy active if licensed.
+            Writing 0 to bit 0 makes Third Party Copy inactive if licensed."
+        ::= { agentScalarEntry 31 } 
+
+    paCommandControlLUN OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION 
+            "Gateway/Router Command and Control LUN"
+        ::= { agentScalarEntry 32 } 
+
+    paSanDirectorEnabled OBJECT-TYPE
+        SYNTAX Boolean
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION 
+            "State of SAN Director Support for this device.
+            To enable, user must write a valid license key
+            to OID paLicenseKey or enter the license key
+            from the service port."
+        ::= { agentScalarEntry 33 } 
+
+    paNodeName OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (8))
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "SAN Gateway Node Name."
+        ::= { agentScalarEntry 34 } 
+
+    paVPMStatus OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION 
+            "State of Virtual Private Map feature.
+            bit 0 :   active or inactive.
+            bit 1 : licensed or not licensed."
+        ::= { agentScalarEntry 35 } 
+
+    paSRSStatus OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION 
+            "State of SAN Replication Services feature.
+            bit 0 :   active or inactive.
+            bit 1 : licensed or not licensed."
+        ::= { agentScalarEntry 36 } 
+    
+     paEthernetType OBJECT-TYPE
+        SYNTAX DisplayString
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION 
+             "Current Ethernet Speed."
+        ::= { agentScalarEntry 37 }
+
+     paTrapSequenceNumber OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION 
+            "Sequence number of last trap sent by this
+            SNMP Agent."
+        ::= { agentScalarEntry 38 } 
+
+     paSysNodeNameMode OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            sameForEachPort(0),
+            differentForEachPort(1)
+        }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION 
+            "Algorithm used when computing Fibre Channel
+            World Wide Node Name for each port.  If the 
+            value is sameForEachPort(0), then the World
+            Wide Node Name is the same for each port and
+            computed based on the World Wide Node Name of 
+            the gateway.  If the value is differentForEachPort(1),
+            then the World Wide Node Name is different for  
+            each port, computed based on the World Wide 
+            Port Name for that port."
+        ::= { agentScalarEntry 39 } 
+
+    paGhostIOTimeToLive OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION 
+            "The amount of time that commands can remain
+            queued in the SNC before being considered stale
+            and discarded.
+            0      : Never discard (ghost I/O disabled) 
+            1 - 30 : TTL in ticks (60th of a second)"
+        ::= { agentScalarEntry 40 }
+
+     paMaxLun OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION 
+            "The maximum LUN value possible."
+        ::= { agentScalarEntry 41 }
+
+     paEVPSEnabled	OBJECT-TYPE
+		SYNTAX	INTEGER
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION  "Bit 0:  EVPS active if 1, inactive if 0
+		              Bit 1:  EVPS licensed if 1, unlicensed if 0"
+		::= { agentScalarEntry 42 }    
+	    
+	 paMaxHostLun	OBJECT-TYPE  -- C.R. 2370
+		SYNTAX	INTEGER
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION  "The number of devices one host can see"
+		::= { agentScalarEntry 43 }
+	
+	 paAMPStatus OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION 
+            "Status of Automatic Multipath feature.
+            bit 0 : active or inactive.
+            bit 1 : licensed or not licensed."
+        ::= { agentScalarEntry 44 }
+
+	paEnableAllScsiTargets OBJECT-TYPE
+        SYNTAX  INTEGER { disable(0), enable(1)	}
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "Used to Enable/Disable all-scsi-targets."
+        ::= { agentScalarEntry 45 }
+
+   paHPFStatus OBJECT-TYPE
+      SYNTAX   INTEGER
+      ACCESS   read-write
+      STATUS   mandatory
+      DESCRIPTION  "Bit 0:  HPF active if 1, inactive if 0
+                   Bit 1:  HPF licensed if 1, unlicensed if 0"
+	::= { agentScalarEntry 46 }
+
+    paSoip2iRescan OBJECT-TYPE 
+        SYNTAX  Boolean 
+        ACCESS read-write 
+        STATUS mandatory 
+        DESCRIPTION 
+            "Writing true(1) here causes SOIP2 initiator to 
+            rescan its bus."    
+        ::= { agentScalarEntry 47 }
+        
+    paSoipiRescan OBJECT-TYPE 
+        SYNTAX  Boolean 
+        ACCESS read-write 
+        STATUS mandatory 
+        DESCRIPTION 
+            "Writing true(1) here causes SOIP initiator to 
+            rescan its bus."    
+        ::= { agentScalarEntry 48 }
+        
+    paFLBStatus OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION 
+            "Status of Load Balancing feature.
+            bit 0 : active or inactive.
+            bit 1 : licensed or not licensed."
+        ::= { agentScalarEntry 49 }
+        
+    paSoip2iScanPeriod OBJECT-TYPE 
+        SYNTAX INTEGER 
+        ACCESS read-write 
+        STATUS mandatory 
+        DESCRIPTION 
+            "SOIP2 Initiator Scan period in seconds. 
+             0 will disable scan."    
+        ::= { agentScalarEntry 50 }    
+
+    paCommandFlowLogEnabled OBJECT-TYPE 
+        SYNTAX Boolean 
+        ACCESS read-only 
+        STATUS mandatory 
+        DESCRIPTION 
+            "Returns TRUE iff Command Flow Logging is availabe. 
+             Returns FALSE otherwise."    
+        ::= { agentScalarEntry 51 }    
+
+-- ***************************************************************** 
+--
+-- Pathlight Event Log Table 
+-- 
+-- ***************************************************************** 
+    paEventLog OBJECT-TYPE
+       SYNTAX SEQUENCE OF LogEntry
+       ACCESS not-accessible
+       STATUS mandatory
+       DESCRIPTION "Entry point for the Agent Event Log Table."
+       ::= { agent 500 }
+
+    paEventLogEntry OBJECT-TYPE
+       SYNTAX LogEntry
+       ACCESS not-accessible
+       STATUS mandatory
+       DESCRIPTION "Agent Event Log table entry."
+        INDEX { paIndex }
+       ::= { paEventLog 1 }
+
+    LogEntry ::= SEQUENCE {
+        paIndex         INTEGER,
+        paTime          TimeTicks,
+        paProducer      INTEGER,
+        paEventClass    INTEGER,
+        paEventCode     INTEGER,
+        paSeq           INTEGER,
+        paEventVars     DisplayString
+    }
+
+    paIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "MIB EventLogEntry Table index."
+    ::= { paEventLogEntry 1 }
+
+    paTime   OBJECT-TYPE
+        SYNTAX TimeTicks
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Time stamp (since boot)."
+    ::= { paEventLogEntry 2 }
+
+    paProducer   OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Numeric identifier for this event's producer."
+    ::= { paEventLogEntry 3 }
+
+    paEventClass    OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Numeric identifier for this event's class."
+    ::= { paEventLogEntry 4 }
+
+    paEventCode     OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Numeric code for this event."
+    ::= { paEventLogEntry 5 }
+
+    paSeq OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION 
+            "Sequence number (relative record number)
+            since boot."
+    ::= { paEventLogEntry 6 }
+
+    paEventVars     OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..256))
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Text description of event."
+    ::= { paEventLogEntry 7 }
+    
+-- ***************************************************************** 
+--
+-- Pathlight Devices Group 
+-- 
+-- ***************************************************************** 
+    pdDevices OBJECT-TYPE
+       SYNTAX SEQUENCE OF DevEntry
+       ACCESS not-accessible
+       STATUS mandatory
+       DESCRIPTION 
+           "Pathlight Physical Device Group
+           ***********************************
+           Each device attached to the Gateway
+           has an entry here."
+       ::= { devices 1 }
+
+    pdDevEntry OBJECT-TYPE
+       SYNTAX DevEntry
+       ACCESS not-accessible
+       STATUS mandatory
+       DESCRIPTION "Physical Device Group table entry."
+       INDEX { componentId, pdIndex  }
+       ::= { pdDevices 1 }
+
+    DevEntry ::= SEQUENCE {
+        pdIndex         INTEGER,
+        pdUID           DisplayString,
+        pdType          DeviceType,
+        pdVendor        DisplayString,
+        pdProduct       DisplayString,
+        pdBlockSize     INTEGER,
+        pdCapacity      Gauge,
+        pdAccess        INTEGER,
+        pdRemovable     Boolean,
+        pdStatus        PltStatus,
+        pdSpeed         INTEGER,
+        pdWidth         INTEGER,
+        pdSerial        DisplayString,
+        pdIdentify      INTEGER,        --R/W
+        pdInterfaceType Interface,
+        pdBus           INTEGER,
+        pdId            INTEGER,
+        pdLun           INTEGER, 
+        pdCtlrIndex     INTEGER,
+        pdHWRev         DisplayString,
+        pdFWRev         DisplayString,
+        pdReset         Reset,
+        pdStatusBits    INTEGER,
+        pdScsiAnsiLevel ScsiAnsiLevel,
+        pdTargetLun     INTEGER,
+        pdIpAddress     IpAddress,
+        pdAltVendor     DisplayString,  
+        pdAltProduct    DisplayString
+        }
+
+    pdIndex  OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "MIB table index"
+    ::= { pdDevEntry 1 }  
+    
+    pdUID  OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(16))       
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Universal Identifier"
+    ::= { pdDevEntry 2 }  
+    
+    pdType OBJECT-TYPE
+        SYNTAX DeviceType
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Device Type i.e. disk/tape/cd etc."
+    ::= { pdDevEntry 3 }   
+    
+    pdVendor OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(8))
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Device Vendor"
+    ::= { pdDevEntry 4 }  
+    
+    pdProduct OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(16))
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Device Product Identifier"
+    ::= { pdDevEntry 5 }  
+    
+    pdBlockSize OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Block size in Bytes"
+    ::= { pdDevEntry 6 }     
+    
+    pdCapacity OBJECT-TYPE
+        SYNTAX Gauge
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Capacity in BLOCKS (see pdBlockSize)"
+    ::= { pdDevEntry 7 }    
+    
+    pdAccess    OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Is device accessible ?"
+    ::= { pdDevEntry 8 }  
+    
+    pdRemovable OBJECT-TYPE
+        SYNTAX Boolean
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Is device removable ?"
+    ::= { pdDevEntry 9 }   
+    
+    pdStatus    OBJECT-TYPE
+        SYNTAX PltStatus
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Device Status"
+    ::= { pdDevEntry 10 }   
+    
+    pdSpeed     OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Device Speed in MBytes/second"
+    ::= { pdDevEntry 11 }   
+    
+    pdWidth     OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Data path width in bits"
+    ::= { pdDevEntry 12 }   
+    
+    pdSerial    OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..32))    
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Device Serial Number"
+    ::= { pdDevEntry 13 }     
+    
+    pdIdentify  OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION 
+            "Number of seconds to flash identifying LED.
+            Write here to flash LED on device if
+            supported by Gateway and device.  Zero
+            turns LED off."
+    ::= { pdDevEntry 14 }   
+    
+    pdInterfaceType OBJECT-TYPE
+        SYNTAX Interface
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "This device's type of communication interface."
+    ::= { pdDevEntry 15 }    
+    
+ -- Following are only valid for SCSI devices
+    pdBus  OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "SCSI bus number"
+    ::= { pdDevEntry 16 }   
+    
+    pdId  OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "SCSI Address ID"
+    ::= { pdDevEntry 17 }    
+    
+    pdLun OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "SCSI Logical Unit Number."
+    ::= { pdDevEntry 18 }    
+    
+    pdCtlrIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "Index of this device's controller in the
+            Controllers MIB table and type-specific 
+            controller tables"
+    ::= { pdDevEntry 19 } 
+    
+    pdHWRev OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(0..32))
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Device hardware revision number/identifier"
+    ::= { pdDevEntry 20 }   
+    
+    pdFWRev OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(0..32))
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Device firmware revision number/identifier"
+    ::= { pdDevEntry 21 }  
+    
+    pdReset OBJECT-TYPE 
+        SYNTAX  Reset 
+        ACCESS read-write 
+        STATUS mandatory 
+        DESCRIPTION 
+            "Generic device reset if supported.
+            Write reset(1) here to reset device
+            if supported by Gateway firmware
+            and device." 
+    ::= { pdDevEntry 22 }  
+    
+    pdStatusBits OBJECT-TYPE 
+        SYNTAX  INTEGER 
+        ACCESS read-only 
+        STATUS mandatory 
+        DESCRIPTION 
+            "Device status bits as per SCSI spec."
+    ::= { pdDevEntry 23 }  
+    
+    pdScsiAnsiLevel OBJECT-TYPE 
+        SYNTAX  ScsiAnsiLevel 
+        ACCESS read-only 
+        STATUS mandatory 
+        DESCRIPTION 
+            "Device SCSI level."
+    ::= { pdDevEntry 24 }    
+    
+    pdTargetLun  OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "This target device's Logical Unit Number as 
+                    seen from attached host."
+    ::= { pdDevEntry 25 }    
+    
+    pdIpAddress  OBJECT-TYPE
+        SYNTAX IpAddress
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "This target device's IP Address if applicable.
+                    In case of SAN Gateway or Router, this information
+                    is used to allow arbitrary drill-down capability."
+    ::= { pdDevEntry 26 }  
+    
+        pdAltVendor OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(8))
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Device alternate Vendor"
+    ::= { pdDevEntry 27 }   
+    
+    pdAltProduct OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(16))
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Device alternate Product Identifier"
+    ::= { pdDevEntry 28 }
+
+-- ***************************************************************** 
+-- 
+-- Pathlight Controllers Group 
+-- 
+-- *****************************************************************
+    pcControllers OBJECT-TYPE
+       SYNTAX SEQUENCE OF CtlrEntry
+       ACCESS not-accessible
+       STATUS mandatory
+       DESCRIPTION 
+           "Pathlight Controller Group
+           *******************************
+           All controllers installed in
+           the SAN Data Gateway have an
+           entry here AND a parallel entry
+           in the controller-type specific
+           table (Fibre Channnel, SSA, or 
+           SCSI)."
+       ::= { controllers 1 }
+
+    pcCtlrEntry OBJECT-TYPE
+       SYNTAX CtlrEntry
+       ACCESS not-accessible
+       STATUS mandatory
+       DESCRIPTION "Controller Group table entry."
+       INDEX { componentId, pcIndex }
+       ::= { pcControllers 1 }
+
+     CtlrEntry ::= SEQUENCE {
+        pcIndex         INTEGER,
+        pcType          Interface,
+        pcVendorId      VendorIDInt,
+        pcProductId     INTEGER,
+        pcRevision      DisplayString,
+        pcSubVendor     INTEGER,
+        pcSubProduct    INTEGER,
+        pcMaxBurst      INTEGER,    --R/W
+        pcLatency       INTEGER,    --R/W
+        pcIdentify      INTEGER,    --R/W
+        pcPCIBus        INTEGER,
+        pcPCIDev        INTEGER,
+        pcPCIFunc       INTEGER, 
+        pcReset         Reset,      --R/W 
+        pcRescan        Boolean,     --R/W 
+        pcLED           OCTET STRING,
+        pcHWRev         DisplayString,
+        pcFWRev         DisplayString,
+        pcPCISlot       INTEGER,
+        pcPMCSlot       INTEGER,
+        pcPCIClass      OCTET STRING,
+        pcSplitMode     Boolean,
+        pcChannelMask   Gauge,
+        pcPortHostType  DisplayString
+    }
+
+    pcIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "MIB Table index."
+    ::= { pcCtlrEntry 1 }
+    
+    pcType  OBJECT-TYPE
+        SYNTAX  Interface
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Communication Interface type."
+    ::= { pcCtlrEntry 2 }
+    
+    pcVendorId OBJECT-TYPE
+        SYNTAX  VendorIDInt
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Integer vendor ID for this controller."
+    ::= { pcCtlrEntry 3 }
+  
+    pcProductId OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Vendor's integer ID for this controller."
+    ::= { pcCtlrEntry 4 }
+   
+    pcRevision OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(0..32))
+        ACCESS read-only
+        STATUS deprecated
+        DESCRIPTION 
+            "Revision information for this controller.
+            See also pcHWRev and pcFWRev."
+    ::= { pcCtlrEntry 5 }
+   
+    pcSubVendor OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Integer sub-vendor ID for this controller."
+    ::= { pcCtlrEntry 6 }
+   
+    pcSubProduct OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION 
+            "Vendor's integer sub-product ID for this
+            controller."
+    ::= { pcCtlrEntry 7 }
+    pcMaxBurst OBJECT-TYPE
+  
+        SYNTAX  INTEGER --R/W
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "Maximum burst transfer rate in MBytes/second"
+    ::= { pcCtlrEntry 8 }
+   
+    pcLatency OBJECT-TYPE
+        SYNTAX  INTEGER (0..255) --R/W
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "Latency Timer in Clock Ticks."
+    ::= { pcCtlrEntry 9 }
+   
+    pcIdentify OBJECT-TYPE
+        SYNTAX  INTEGER  --R/W
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION 
+            "Reserved for flashing identifying LED
+            on device."
+    ::= { pcCtlrEntry 10 }
+  
+    pcPCIBus OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION 
+            "PCI Bus number in SAN Data Gateway for
+            this controller."
+    ::= { pcCtlrEntry 11 }
+   
+    pcPCIDev OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION 
+            "PCI device number in SAN Data Gateway for
+            this controller."
+    ::= { pcCtlrEntry 12 }
+  
+    pcPCIFunc OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION 
+            "PCI Function number in SAN Data Gateway for
+            this contoller."
+    ::= { pcCtlrEntry 13 }
+  
+    pcReset OBJECT-TYPE 
+        SYNTAX  Reset 
+        ACCESS read-write 
+        STATUS mandatory 
+        DESCRIPTION 
+            "Generic controller reset variable.  Not
+            supported for all controller types." 
+    ::= { pcCtlrEntry 14 } 
+ 
+    pcRescan OBJECT-TYPE 
+        SYNTAX  Boolean 
+        ACCESS read-write 
+        STATUS mandatory 
+        DESCRIPTION 
+            "Writing true(1) here causes controller to 
+            rescan its bus if rescan is supported for 
+            this controller type." 
+    ::= { pcCtlrEntry 15 } 
+ 
+    pcLED OBJECT-TYPE 
+        SYNTAX  OCTET STRING (SIZE(2)) 
+        ACCESS read-only 
+        STATUS mandatory 
+        DESCRIPTION "Is LED on?" 
+    ::= { pcCtlrEntry 16 } 
+  
+    pcHWRev OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(0..32))
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Hardware revision for this controller."
+    ::= { pcCtlrEntry 17 }
+    pcFWRev OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(0..32))
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Firmware revision for this controller"
+    ::= { pcCtlrEntry 18 }
+  
+    pcPCISlot OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Location of Channel Card on PCI bus"
+    ::= { pcCtlrEntry 19 }
+  
+    pcPMCSlot OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION 
+            "Location of Card: PMC 1, 2 or 3.
+                                   0=> Not a PMC card"
+    ::= { pcCtlrEntry 20 }
+  
+    pcPCIClass OBJECT-TYPE
+        SYNTAX  OCTET STRING (SIZE(3) )
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION 
+            "Device class code as per PCI specification."
+    ::= { pcCtlrEntry 21 }
+  
+    pcSplitMode OBJECT-TYPE
+        SYNTAX  Boolean
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION 
+            "Enable/Disable Split Mode for this
+            controller."
+    ::= { pcCtlrEntry 22 }
+ 
+    pcChannelMask OBJECT-TYPE
+        SYNTAX  Gauge
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION 
+            "Specifies access permissions for this initiator 
+            in bits 0 through 18
+            *************************************************
+                        -* SCSI Channels *-
+            Bit 0 => Is access DISALLOWED to SCSI channel 1 ? 
+            Bit 1 => Is access DISALLOWED to SCSI channel 2 ? 
+            Bit 2 => Is access DISALLOWED to SCSI channel 3 ? 
+            Bit 3 => Is access DISALLOWED to SCSI channel 4 ?
+                       -* Ultra SCSI Channels *-
+            Bit 4 => Is access DISALLOWED to Ultra SCSI channel 1 ?
+            Bit 5 => Is access DISALLOWED to Ultra SCSI channel 2 ?
+            Bit 6 => Is access DISALLOWED to Ultra SCSI channel 3 ?
+            Bit 7 => Is access DISALLOWED to Ultra SCSI channel 4 ?
+            Bit 8 => Is access DISALLOWED to Ultra SCSI channel 5 ?
+            Bit 9 => Is access DISALLOWED to Ultra SCSI channel 6 ?
+                         -* Fibre Channel *-
+            Bit 10 => Is access DISALLOWED to Fibre Channel 1 ?
+            Bit 11 => Is access DISALLOWED to Fibre Channel 2 ?
+            Bit 12 => Is access DISALLOWED to Fibre Channel 3 ?
+            Bit 13 => Is access DISALLOWED to Fibre Channel 4 ?
+            Bit 14 => Is access DISALLOWED to Fibre Channel 5 ?
+            Bit 15 => Is access DISALLOWED to Fibre Channel 6 ?
+                         -* SSA Channels *-
+            Bit 16 => Is access DISALLOWED to SSA channel 1 ?
+            Bit 17 => Is access DISALLOWED to SSA Channel 2 ?
+            Bit 18 => Is access DISALLOWED to SSA Channel 3 ?"
+    ::= { pcCtlrEntry 23 }
+
+    pcPortHostType OBJECT-TYPE 
+        SYNTAX  DisplayString (SIZE(0..32) )
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "Host type for this port.  Used if VPS
+                    is not enabled."
+    ::= { pcCtlrEntry 24 }
+ 
+-- ***************************************************************** 
+-- 
+-- Pathlight Fibre Channel Group 
+-- 
+-- ***************************************************************** 
+    pcFCCtlrs OBJECT-TYPE
+       SYNTAX SEQUENCE OF FcCtlrEntry
+       ACCESS not-accessible
+       STATUS mandatory
+       DESCRIPTION 
+           "Entry point for Fibre Channel Controller Device Group
+           ******************************************************
+           This table parallels the Controller Table:  a Fibre
+           Channel controller with pcIndex N in the controller
+           table appears here as index N as well, and in general
+           there are rows in this table which are empty."
+       ::= { controllers 2 }
+
+    fcCtlrEntry OBJECT-TYPE
+       SYNTAX FcCtlrEntry
+       ACCESS not-accessible
+       STATUS mandatory
+       DESCRIPTION "Fibre Channel Controller Device table entry."
+       INDEX { componentId, pcIndex }
+       ::= { pcFCCtlrs 1 }
+
+    FcCtlrEntry ::= SEQUENCE {
+        fcStatus               FcStatus,
+        fcMaxSpeed             Gauge,
+        fcWWID                 DisplayString,
+        fcFWRev                DisplayString,
+        fcHWRev                DisplayString,
+        fcLoopID               INTEGER,
+        fcFrameSize            INTEGER,
+        fcPortType             FibrePort,
+        fcMedia                FibreMedia,
+        fcSerialNumber         DisplayString,
+        fcLoopIDMode           FibreLoopIDMode,
+        fcALPhysicalAddress    INTEGER,
+        fcPortMode             FibrePortMode,
+        fcConnectionOptions    FibreConnOptions,
+        fcCtlrChipType         INTEGER,
+        fcTapeFeature          Boolean,
+        fcHardID               INTEGER,
+        fcCurrentSpeedSetting  INTEGER,
+        fcCurrentSpeed         INTEGER,
+        fcFrameBufferSize      INTEGER,
+        fcLinkFailureCount     INTEGER,
+        fcLossSyncCount        INTEGER,
+        fcLossSignalCount      INTEGER,
+        fcProtocolErrorCount   INTEGER,
+        fcInvalidTxWordCount   INTEGER,
+        fcInvalidCRCCount      INTEGER,
+        fcWWNodeName           DisplayString,
+        fcPortID               INTEGER
+    }
+
+    fcStatus    OBJECT-TYPE
+        SYNTAX  FcStatus
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION 
+            "Status of the Fibre Channel Controller"
+    ::= { fcCtlrEntry 1 }
+  
+    fcMaxSpeed  OBJECT-TYPE
+        SYNTAX  Gauge
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Maximum Transfer Speed in MBytes per second."
+    ::= { fcCtlrEntry 2 }
+  
+    fcWWID  OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(17))
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION 
+            "World Wide Identifier for this Fibre Channel
+            Controller."
+    ::= { fcCtlrEntry 3 }
+  
+    fcFWRev OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(0..32))
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION 
+            "Firmware revision number/identifier for this
+            Fibre Channel Controller."
+    ::= { fcCtlrEntry 4 }
+   
+    fcHWRev OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(0..32))
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION 
+            "Hardware revision number/identifier for this
+            Fibre Channel Controller."
+    ::= { fcCtlrEntry 5 }
+   
+    fcLoopID    OBJECT-TYPE
+        SYNTAX  INTEGER (-1..127)
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION 
+            "Fibre Channel Loop ID.
+            soft = -1"
+    ::= { fcCtlrEntry 6 }
+  
+    fcFrameSize OBJECT-TYPE
+--        SYNTAX  INTEGER (512|1024|2048) 
+        SYNTAX  INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "Fibre Channel frame size."
+    ::= { fcCtlrEntry 7 }
+ 
+    fcPortType  OBJECT-TYPE
+        SYNTAX  FibrePort
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION 
+            "Fibre Channel Port Type"
+    ::= { fcCtlrEntry 8 }
+ 
+    fcMedia     OBJECT-TYPE
+        SYNTAX  FibreMedia
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION 
+            "Media type for this Fibre Channel Controller"
+    ::= { fcCtlrEntry 9 }
+  
+    fcSerialNumber  OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(0..32) )
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION 
+            "Serial Number for this Fibre Channel
+            Controller."
+    ::= { fcCtlrEntry 10 }
+ 
+    fcLoopIDMode   OBJECT-TYPE
+        SYNTAX FibreLoopIDMode
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION 
+            "Fibre Channel Loop ID mode (soft or hard)"
+    ::= { fcCtlrEntry 11 }
+ 
+    fcALPhysicalAddress   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION 
+            "Arbitrated Loop Physical Address (ALPA)"
+    ::= { fcCtlrEntry 12 }
+
+    fcPortMode OBJECT-TYPE
+        SYNTAX  FibrePortMode
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION 
+            "Fibre Channel Port Mode."
+    ::= { fcCtlrEntry 13 }
+
+    fcConnectionOptions OBJECT-TYPE
+        SYNTAX  FibreConnOptions
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION 
+            "Connection options for ISP2200 FC chip.
+            Values 4 - 8 are reserved."
+    ::= { fcCtlrEntry 14 }
+
+    fcCtlrChipType OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION 
+            "Type of Fibre Channel controller chip.
+            Valid types are 2100, 2200 for QLogic
+            ISP2100 and ISP2200 chips."
+    ::= { fcCtlrEntry 15 }
+ 
+    fcTapeFeature OBJECT-TYPE
+        SYNTAX  Boolean
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION 
+            "Status of Fibre Channel Tape Specification support.  
+            true  means this controller supports FC Tape
+            false means this controller does not support FC Tape"
+    ::= { fcCtlrEntry 16 }
+
+    fcHardID    OBJECT-TYPE
+        SYNTAX  INTEGER (-1..256)
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION 
+            "Fibre Channel Hard ID, the preferred loop ID
+            for this controller.  Even if the controller is 
+            in Hard Loop ID mode, the actual loop ID
+            is not guaranteed to be fcHardID."
+    ::= { fcCtlrEntry 17 }
+
+    fcCurrentSpeedSetting  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "Speed in Gb/sec. 0: Auto, 1: 1Gb, 2: 2Gb"
+    ::= { fcCtlrEntry 18 }
+    
+    fcCurrentSpeed  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Current Speed Indicator Gb/sec."
+    ::= { fcCtlrEntry 19 }
+    
+    fcFrameBufferSize  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Fibre Channel Frame Buffer Size"
+    ::= { fcCtlrEntry 20 }
+
+    fcLinkFailureCount  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Fibre Channel Link Failure Count "
+    ::= { fcCtlrEntry 21 }
+
+    fcLossSyncCount  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Fibre Channel Loss of Sync Count "
+    ::= { fcCtlrEntry 22 }
+
+    fcLossSignalCount  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Fibre Channel Loss of Signal Count "
+    ::= { fcCtlrEntry 23 }
+
+    fcProtocolErrorCount  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Fibre Channel Primitive Sequence Protocol Error Count "
+    ::= { fcCtlrEntry 24 }
+
+    fcInvalidTxWordCount  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Fibre Channel Invalid Transmission Word Count "
+    ::= { fcCtlrEntry 25 }
+
+    fcInvalidCRCCount  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Fibre Channel Invalid CRC Count "
+    ::= { fcCtlrEntry 26 }
+
+    fcWWNodeName  OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(17))
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION 
+            "The World Wide Node Name for this Fibre Channel
+            Controller. The Node Name for this port may
+            computer strictly on the World Wide Node Name
+            for the gateway, or on a per port basis which
+            uses the World Wide Port Name (fcWWID), thus 
+            giving each port a different Node Name.  See 
+            paSysNodeNameMode to get or set which algorithm
+            is in use."
+    ::= { fcCtlrEntry 27 }       
+
+    fcPortID  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Fibre Channel Port Identifier
+                    24 bit quantity which uniquely
+                    identifies the port within the
+                    loop or fabric."
+    ::= { fcCtlrEntry 28 }    
+    
+-- ***************************************************************** 
+-- 
+-- Pathlight SSA Group 
+-- 
+-- ***************************************************************** 
+    pcSSACtlrs OBJECT-TYPE
+       SYNTAX SEQUENCE OF SSACtlrEntry
+       ACCESS not-accessible
+       STATUS obsolete
+       DESCRIPTION 
+           "Entry point for SSA Controller Device Group
+           ****************************************************
+           This table parallels the Controller Table:  an SSA
+           controller with pcIndex N in the controller
+           table appears here as row index N as well, and in 
+           general there are rows in this table which are empty."
+       ::= { controllers 3 }
+
+    ssaCtlrEntry OBJECT-TYPE
+       SYNTAX SSACtlrEntry
+       ACCESS not-accessible
+       STATUS obsolete
+       DESCRIPTION "SSA Controller Device table entry."
+        INDEX { pcIndex }
+       ::= { pcSSACtlrs 1 }
+
+    SSACtlrEntry ::= SEQUENCE {
+        ssaStatus1         PltStatus,
+        ssaStatus2         PltStatus,
+        ssaSpeed           INTEGER,
+        ssaUID             DisplayString,
+        ssaFWRev           DisplayString,
+        ssaMaxTarg         Gauge,
+        ssaMaxInit         Gauge,
+        ssaPathAlg         INTEGER,
+        ssaHWRev           DisplayString,
+        ssaMasterPriority  INTEGER,
+        ssaSATAQuota       INTEGER,
+        ssaSATBQuota       INTEGER,
+        ssaSATIQuota       INTEGER 
+    }
+
+    ssaStatus1  OBJECT-TYPE
+        SYNTAX  PltStatus
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Status on port 1 of dual port SSA card"
+    ::= { ssaCtlrEntry 1 }
+  
+    ssaStatus2  OBJECT-TYPE
+        SYNTAX  PltStatus
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Status on port 2 of dual port SSA card"
+    ::= { ssaCtlrEntry 2 }
+  
+    ssaSpeed    OBJECT-TYPE
+        SYNTAX  INTEGER { ssa80(1), ssa160(2) }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION 
+            "SSA transfer speed 
+            80 Mbytes/second or 160 MBytes/second "
+    ::= { ssaCtlrEntry 3 }
+  
+    ssaUID  OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(16))
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Universal Identifier for this SSA Controller."
+    ::= { ssaCtlrEntry 4 }
+  
+    ssaFWRev    OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(0..32))
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION 
+            "Firmware revision number/identifier for this
+            SSA controller."
+    ::= { ssaCtlrEntry 5 }
+   
+    ssaMaxTarg  OBJECT-TYPE
+        SYNTAX  Gauge
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "Maximum number of targets supported."
+    ::= { ssaCtlrEntry 6 }
+  
+    ssaMaxInit  OBJECT-TYPE
+        SYNTAX  Gauge
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "Maximum number of initiators supported."
+    ::= { ssaCtlrEntry 7 }
+  
+    ssaPathAlg  OBJECT-TYPE
+        SYNTAX  INTEGER { default(0), skipInitiators(1), unknown(2) }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "SSA pathing algorithm."
+    ::= { ssaCtlrEntry 8 }
+   
+    ssaHWRev    OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(0..32))
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION 
+            "Hardware revision number/identifier for this
+            SSA controller."
+    ::= { ssaCtlrEntry 9 }
+ 
+    ssaMasterPriority  OBJECT-TYPE
+        SYNTAX  INTEGER ( 0..7 )
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION 
+            "The SSA Master Priority of an SSA node
+            is a number from 0 to 7.  SSA initiators 
+            elect a master based on this priority.  
+            If more than one SSA node has the same 
+            priority then the node with the highest 
+            UID is elected.  Pathlight SSA host adapters 
+            default to a Master Priority of 4.  
+            SAN Gateway SSA Target adapters default to a
+            priority of 5 to ensure that the Gateway
+            node will be master in a multi-initiator loop.
+            This value should never be set to 7 because 
+            this is the priority used to guarantee 
+            mastership to a node that is entering 
+            Service Mode."
+    ::= { ssaCtlrEntry 10 }
+  
+    ssaSATAQuota  OBJECT-TYPE
+        SYNTAX  INTEGER ( 0..255 )
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION 
+            "The SSA SAT Quota A parameter is an 8 bit 
+            number that determines 'the maximum number 
+            of frames which can be originated from this 
+            port before the port is SATisfied and forwards 
+            the SAT character.  A value of zero means that
+            no SATs are forwarded or issued from this port.'"
+    ::= { ssaCtlrEntry 11 }
+ 
+    ssaSATBQuota  OBJECT-TYPE
+        SYNTAX  INTEGER ( 0..255 )
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION 
+            "The SSA SAT Quota B parameter is an 8 bit 
+            number that determines 'the maximum number
+            of frames which this port can originate 
+            without forwarding a SAT character. A value
+            of zero means that an infinite number of 
+            frames can be sent without being subject to
+            SAT pacing.'"
+    ::= { ssaCtlrEntry 12 }
+
+    ssaSATIQuota  OBJECT-TYPE
+        SYNTAX  INTEGER ( 0..255 )
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION ""
+    ::= { ssaCtlrEntry 13 }
+ 
+-- ***************************************************************** 
+-- 
+-- Pathlight SCSI Group 
+-- 
+-- ***************************************************************** 
+    pcSCSICtlrs OBJECT-TYPE
+       SYNTAX SEQUENCE OF SCSICtlrEntry
+       ACCESS not-accessible
+       STATUS mandatory
+       DESCRIPTION 
+           "Entry point for SCSI Controller Device Group
+           ****************************************************
+           This table parallels the Controller Table:  a SCSI
+           controller with pcIndex N in the controller
+           table appears here as row index N as well, and in 
+           general there are rows in this table which are empty."
+       ::= { controllers 4 }
+
+    scsiCtlrEntry OBJECT-TYPE
+       SYNTAX SCSICtlrEntry
+       ACCESS not-accessible
+       STATUS mandatory
+       DESCRIPTION "SCSI Controller Device table entry."
+        INDEX { componentId, pcIndex }
+       ::= { pcSCSICtlrs 1 }
+
+    SCSICtlrEntry ::= SEQUENCE {
+        scsiStatus            PltStatus,
+        scsiSpeed             ScsiSpeed,
+        scsiRole              INTEGER,
+        scsiHostId            INTEGER,
+        scsiMaxSpeed          ScsiSpeed,
+        scsiTerm              INTEGER,
+        scsiIoCard            ScsiCardType,
+        scsiMaxIds            INTEGER,
+        scsiMaxLuns           INTEGER,
+        scsiMaxWidth          INTEGER,
+        scsiHWRev             DisplayString,
+        scsiFWRev             DisplayString,
+        scsiResetOnPowerUp    Boolean,
+        scsiMultiInitEnabled  Boolean,
+        scsiAlternateHostId   INTEGER,
+                scsiTargetEnabled     Boolean
+    }
+
+    scsiStatus  OBJECT-TYPE
+        SYNTAX  PltStatus
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Status for this SCSI controller."
+    ::= { scsiCtlrEntry 1 }
+
+    scsiSpeed   OBJECT-TYPE
+        SYNTAX  ScsiSpeed
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION 
+            "SCSI Transaction speed."
+    ::= { scsiCtlrEntry 2 }
+
+    scsiRole    OBJECT-TYPE
+        SYNTAX INTEGER { target(0), initiator(1) }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "Is this a Target or an Initiator ?"
+    ::= { scsiCtlrEntry 3 }
+
+    scsiHostId  OBJECT-TYPE
+        SYNTAX  INTEGER (0..15)
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "Host ID defaults to 7."
+    ::= { scsiCtlrEntry 4 }
+
+    scsiMaxSpeed    OBJECT-TYPE
+        SYNTAX  ScsiSpeed
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "Maximum Speed of this SCSI Channel."
+    ::= { scsiCtlrEntry 5 }
+
+    scsiTerm    OBJECT-TYPE
+        SYNTAX INTEGER { disabled(0), enabled(1), notPresent(2) }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION 
+            "State of internal SCSI bus 
+            terminations, if any."
+    ::= { scsiCtlrEntry 6 }
+
+    scsiIoCard  OBJECT-TYPE
+        SYNTAX  ScsiCardType
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION 
+            "Type of SCSI controller hardware." 
+    ::= { scsiCtlrEntry 7 }
+
+    scsiMaxIds  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION 
+            "Maximum Number of IDs for this
+            SCSI controller."
+    ::= { scsiCtlrEntry 8 }
+
+    scsiMaxLuns OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION 
+            "Maximum Number of LUNs for this
+            SCSI controller."
+    ::= { scsiCtlrEntry 9 }
+
+    scsiMaxWidth OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Maximum transfer width in bits."
+    ::= { scsiCtlrEntry 10 }
+
+    scsiHWRev OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(0..32))
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION 
+            "Hardware revision for this
+            SCSI controller."
+    ::= { scsiCtlrEntry 11 }
+
+    scsiFWRev OBJECT-TYPE
+        SYNTAX  DisplayString ( SIZE(0..32))
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION 
+            "Firmware revision for this
+            SCSI controller."
+    ::= { scsiCtlrEntry 12 }
+
+    scsiResetOnPowerUp OBJECT-TYPE
+        SYNTAX  Boolean
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION 
+            "Enables/Disables SCSI bus reset
+            upon Gateway power-up for this 
+            SCSI controller."
+    ::= { scsiCtlrEntry 13 }
+
+    scsiMultiInitEnabled OBJECT-TYPE
+        SYNTAX  Boolean
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION 
+            "Enables/Disables multi-initiator
+            support on for this SCSI controller."
+    ::= { scsiCtlrEntry 14 }
+
+    scsiAlternateHostId  OBJECT-TYPE
+        SYNTAX  INTEGER (-1..15)
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION 
+            "Alternate Host ID for this 
+            SCSI controller.  -1 means
+            use automatic."
+    ::= { scsiCtlrEntry 15 }
+
+    scsiTargetEnabled OBJECT-TYPE
+        SYNTAX  Boolean
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION 
+            "Indicates target ScsiRole support
+            for this SCSI controller."
+    ::= { scsiCtlrEntry 16 }
+
+-- ***************************************************************** 
+-- 
+-- Pathlight Notification Group 
+--
+-- Trap Destination Table
+-- 
+-- ***************************************************************** 
+
+-- ***************************************************************** 
+-- Indexing of the Trap Destination Table
+--
+--     This table is multi-indexed by and IP Address, UDP Port pair.
+--     An instance identifier of an object in this table looks like
+--     ipAddress1.ipAddress2.ipAddress3.ipAddress4.udpPort .  So, 
+--     a management application at IP Address "120.134.0.12" listening 
+--     for traps on UDP Port 162 would have an instance identifier
+--     120.134.0.12.162
+--
+-- Registering to receive traps
+--
+--     In order to receive traps from the Pathlight unit, a
+--     management application must create an entry in the
+--     Trap Destination Table.  This is a row-atomic operation.
+--     In the same SNMP PDU varbind list, the management application
+--     must send an SNMP SET request with the following varbinds in 
+--     the PDU:
+--
+--     OID                      Type      Value
+--     pnTrapStyle.[instance]   INTEGER   1 means Proprietary
+--                                        2 means rfc1215 Style
+--                                        Defaults to proprietary(1)
+--                                        if this varbind is missing
+--     pnUdpPort.[instance]     INTEGER   UDP Port on which
+--                                        management application
+--                                        is listening
+--                                        Defaults to 162
+--     pnIPAddr.[instance]      IpAddress IP Address of management
+--                                        Application
+--
+--    Where [instance] is the instance identifier as described above.
+--
+--    The order of the varbinds in the PDU is important.  The pnIPAddr
+--    varbind must be last in the list.
+--
+-- Proprietary Style vs. RFC 1215 Style
+--
+--    An entry in the Trap Destination Table with pnTrapStyle set to 1
+--    will cause the SNMP Agent firmware to send traps to the
+--    management application at that entry's IP address and UDP port
+--    with a proprietary variable binding scheme.  The data
+--    payloads (varbinds) constructed in this proprietary fashion
+--    cannot be described using the RFC 1215 TRAP-TYPE construct
+--    and thus cannot be enumerated in the MIB.
+--
+--    An entry in the Trap Destination Table with pnTrapStyle set to 2
+--    will cause the SNMP Agent firmware to send traps to the
+--    management application at that entry's IP address and UDP port
+--    with a variable binding scheme consistent with the RFC 1215
+--    TRAP-TYPE construct.  The data payloads (varbinds) are described
+--    in this MIB using the RFC 1215 construct.
+--
+--    It is very strongly recommended that management applications
+--    choose the RFC 1215 trap style when registering to receive traps. 
+--
+-- ***************************************************************** 
+
+    pnTrapDest OBJECT-TYPE
+       SYNTAX SEQUENCE OF TrapDestEntry
+       ACCESS not-accessible
+       STATUS obsolete
+       DESCRIPTION 
+           "Trap destination Group Table
+           ******************************************
+           A list of IP addresses to which SNMP Traps
+           are sent in parallel using UDP Port 162."
+       ::= { notification 1 }
+
+    pnTrapDestEntry OBJECT-TYPE
+       SYNTAX TrapDestEntry
+       ACCESS not-accessible
+       STATUS obsolete
+       DESCRIPTION "Trap destination table entry."
+        INDEX { componentId, pnIPAddr, pnUdpPort }
+       ::= { pnTrapDest 1 }
+
+    TrapDestEntry ::= SEQUENCE {
+        pnIndex         INTEGER,
+        pnIPAddr        IpAddress,
+        pnUdpPort       INTEGER,
+        pnTrapStyle     INTEGER,
+        pnTrapBroadcastMode INTEGER 
+    }
+
+    pnIndex  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS read-write
+        STATUS obsolete
+        DESCRIPTION "Index into TrapDest table "
+    ::= { pnTrapDestEntry 1 }
+
+    pnIPAddr OBJECT-TYPE
+        SYNTAX  IpAddress
+        ACCESS read-write
+        STATUS obsolete
+        DESCRIPTION 
+            "IP Address of destination entity 
+            to which traps are sent."
+    ::= { pnTrapDestEntry 2 }
+
+    pnUdpPort  OBJECT-TYPE
+        SYNTAX  INTEGER ( 0..65535 )
+        ACCESS read-write
+        STATUS obsolete
+        DESCRIPTION "UDP Port on which traps are sent
+                    to this entity."
+    ::= { pnTrapDestEntry 3 }
+
+    pnTrapStyle  OBJECT-TYPE
+        SYNTAX  INTEGER { proprietary(1), rfc1215(2) }
+        ACCESS read-write
+        STATUS obsolete
+        DESCRIPTION "Style to be used when building a trap PDU
+                    to be sent to this entity.  A value of 
+                    proprietary(1) selects the proprietary 
+                    format used by the Pathlight SAN Director
+                    management application.  A value of rfc1215(2)
+                    selects the format as described in the RFC 1215
+                    TRAP-TYPE objects included in this MIB document.
+                    The default is proprietary(1)."
+    ::= { pnTrapDestEntry 4 }
+
+        pnTrapBroadcastMode  OBJECT-TYPE
+        SYNTAX  INTEGER 
+        {
+            disable(0),
+            enable(1)
+        }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "Used to Enable/Disable the broadcasting of traps."
+    ::= { pnTrapDestEntry 5 }
+
+-- ***************************************************************** 
+-- *
+-- * PanelLED Group has been removed; it does not have meaning
+-- * for IOB's
+-- *
+-- ***************************************************************** 
+
+-- **********************************************************
+-- *                                                        *
+-- *    Host Initiator Group                                *
+-- *                                                        * 
+-- **********************************************************
+-- *                                                        *
+-- *    Host Command Table                                  *
+-- *    This Table is for issuing Host (VPS) related        *
+-- *    commands to the SNC.                                *
+-- *                                                        *
+-- ********************************************************** 
+    hostCommandTable OBJECT-TYPE 
+        SYNTAX SEQUENCE OF HostCommandEntry 
+        ACCESS not-accessible 
+        STATUS mandatory 
+        DESCRIPTION 
+            ""
+        ::= { paHost 1 }
+
+    hostCommandEntry OBJECT-TYPE 
+        SYNTAX HostCommandEntry 
+        ACCESS not-accessible 
+        STATUS mandatory 
+        DESCRIPTION 
+            "An object for issuing host-related commands 
+            to the SNC." 
+        INDEX { componentId } 
+        ::= { hostCommandTable 1 } 
+
+        HostCommandEntry ::= 
+            SEQUENCE {  
+                hostCommand             INTEGER
+            }
+
+    hostCommand  OBJECT-TYPE
+        SYNTAX  INTEGER { commitChanges(1) }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "Used to issue commands to VPS control
+                    software. Possible commands are:
+                    commitChanges: commits any pending
+                        LUN Mapping changes to persistent
+                        memory."
+    ::= { hostCommandEntry 1 }
+
+-- **********************************************************
+-- *                                                        *
+-- *    Host Initiator Table                                *
+-- *                                                        *
+-- ********************************************************** 
+    hostInitiator OBJECT-TYPE
+       SYNTAX SEQUENCE OF InitiatorEntry
+       ACCESS not-accessible
+       STATUS mandatory
+       DESCRIPTION 
+           "Attached Host Group Table
+           ***************************
+           List of attached hosts and
+           pertinent information."
+       ::= { paHost 2 }
+
+    hostInitiatorEntry OBJECT-TYPE
+       SYNTAX InitiatorEntry
+       ACCESS not-accessible
+       STATUS mandatory
+       DESCRIPTION "Attached Host Group table entry."
+        INDEX { componentId, hostIndex }
+       ::= { hostInitiator 1 }
+
+    InitiatorEntry ::= SEQUENCE {
+        hostIndex          INTEGER,
+        hostRowStatus      INTEGER,
+        hostWWName         DisplayString,
+        hostName           DisplayString,
+        hostType           DisplayString,
+        hostPortID         DisplayString,
+        hostSANConnection  INTEGER,
+        hostConnectionType Interface,
+        hostITLData        OCTET STRING,
+        hostIPAddr         IpAddress,
+        hostLunType        HostLUNType,--aht 1/28/02  evps
+        hostLunMap         OCTET STRING, --aht 2/6/02 evps 
+        hostInbandAccess   INTEGER         
+    }
+
+    hostIndex  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "Index into Host Initiator table."
+    ::= { hostInitiatorEntry 1 }
+
+    hostRowStatus  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "Row Status for this row. "
+    ::= { hostInitiatorEntry 2 }
+
+    hostWWName  OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE( 0..32 ) )
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "World Wide name of this Initiator. "
+    ::= { hostInitiatorEntry 3 }
+
+    hostName  OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE( 0..32 ) )
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "Name for this Initiator. "
+    ::= { hostInitiatorEntry 4 }
+
+    hostType  OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE( 0..32 ) )
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "Operating System and other
+                    host environment information. "
+    ::= { hostInitiatorEntry 5 }
+
+    hostPortID  OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE( 0..32 ) )
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "Host port identifcation."
+    ::= { hostInitiatorEntry 6 }
+
+    hostSANConnection OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "SAN Connection (1-6) to which
+                    this host is connected. "
+    ::= { hostInitiatorEntry 7 }
+
+    hostConnectionType  OBJECT-TYPE
+        SYNTAX Interface
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Type of data connection (FCAL, etc.) "
+    ::= { hostInitiatorEntry 8 }
+
+    hostITLData  OBJECT-TYPE
+        SYNTAX  OCTET STRING ( SIZE( 256 ) )
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "ITL Access Control data for
+                    this host.  256 possible LUNs
+                    with one Byte of data per LUN. "
+    ::= { hostInitiatorEntry 9 }
+
+    hostIPAddr OBJECT-TYPE
+        SYNTAX  IpAddress
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION 
+            "IP Address of this host.  Host is
+            not required to have an IP address."
+    ::= { hostInitiatorEntry 10 }
+
+    hostLunType OBJECT-TYPE
+        SYNTAX  HostLUNType
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "The type of this host for EVPS.  8-bit, 16-bit, or volume set"
+   ::=  { hostInitiatorEntry 11}
+
+    hostLunMap  OBJECT-TYPE
+        SYNTAX  OCTET STRING ( SIZE( 512  ) )
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "EVPS Map data.
+                    256 possible LUNs
+                    with two Bytes of
+                    data for each lun"
+    ::= { hostInitiatorEntry 12 }
+
+   hostInbandAccess	OBJECT-TYPE
+       SYNTAX   INTEGER
+       ACCESS   read-write
+       STATUS   mandatory
+       DESCRIPTION
+           "The in-band access level of the host"
+   ::= { hostInitiatorEntry 13}
+
+
+-- ***************************************************************** 
+-- 
+-- Pathlight SCSI Channel Map Table (Virtual Private Map)
+--
+-- Maps a series of SCSI addresses (Port Number, Target ID, LUN )
+-- to devices.  Devices are identified by Pathlight assigned LUNs 
+-- 
+-- ***************************************************************** 
+
+-- **********************************************************
+-- *                                                        *
+-- *    SCSI Map Command Table                              *
+-- *    This Table is for issuing VPM related commands to   *
+-- *    SNC.                                                *
+-- *                                                        *
+-- ********************************************************** 
+    scsiMapCommandTable OBJECT-TYPE 
+        SYNTAX SEQUENCE OF ScsiMapCommandEntry 
+        ACCESS not-accessible 
+        STATUS mandatory 
+        DESCRIPTION 
+            "SCSI Map Command Table"
+        ::= { scsiMap 1 }
+
+    scsiMapCommandEntry OBJECT-TYPE 
+        SYNTAX ScsiMapCommandEntry 
+        ACCESS not-accessible 
+        STATUS mandatory 
+        DESCRIPTION 
+            "An object for issuing VPM-related commands 
+            to the SNC." 
+        INDEX { componentId } 
+        ::= { scsiMapCommandTable 1 } 
+
+        ScsiMapCommandEntry ::= 
+            SEQUENCE {  
+                scsiMapCommand             INTEGER
+            }
+
+    scsiMapCommand  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "Used to issue commands to SCSI Channel map
+                    (VPM) routines. "
+    ::= { scsiMapCommandEntry 1 }
+
+-- **********************************************************
+-- *                                                        *
+-- *    SCSI Map Table                                      *
+-- *    This Table is the actual VPM data.                  *
+-- *                                                        *
+-- ********************************************************** 
+    scsiChannelMap OBJECT-TYPE
+       SYNTAX SEQUENCE OF ScsiMapEntry
+       ACCESS not-accessible
+       STATUS mandatory
+       DESCRIPTION 
+           "SCSI Channel Device Map Table
+           ******************************
+           List of devices presented to
+           SCSI attached initiator.  The
+           initiator sees a series of 
+           (Target ID, LUN ) SCSI targets
+           which are mapped to a logical
+           device identified by a Pathlight
+           assigned LUN."
+       ::= { scsiMap 2 }
+
+    scsiMapEntry OBJECT-TYPE
+       SYNTAX ScsiMapEntry
+       ACCESS not-accessible
+       STATUS mandatory
+       DESCRIPTION "SCSI Channel Device Map Table entry."
+        INDEX { componentId,
+                scsiMapPort,
+                scsiMapTid,
+                scsiMapLun    }
+       ::= { scsiChannelMap 1 }
+
+    ScsiMapEntry ::= SEQUENCE {
+        scsiMapRowStatus     RowStatus, -- Row control object
+        scsiMapPort          INTEGER, -- SCSI Port Number 1 thru 10
+        scsiMapTid           INTEGER, -- SCSI Target ID
+        scsiMapLun           INTEGER, -- SCSI LUN
+        scsiMapAssignedLun   INTEGER, -- Pathlight assigned LUN 
+                                      -- for this device
+        scsiMapComments      DisplayString,
+        scsiMapPdIndex       INTEGER  -- index into the Pathlight Device
+                                      -- ( pd ) table
+    }
+
+    scsiMapRowStatus  OBJECT-TYPE
+        SYNTAX RowStatus
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "Specifies the state of the row."
+    ::= { scsiMapEntry 1 }
+
+    scsiMapPort OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "SCSI port (bus) number for this entry (1 thru 10). "
+    ::= { scsiMapEntry 2 }
+
+    scsiMapTid OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "SCSI Target ID for this entry. "
+    ::= { scsiMapEntry 3 }
+
+    scsiMapLun OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "SCSI LUN for this entry. "
+    ::= { scsiMapEntry 4 }
+
+    scsiMapAssignedLun OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "Pathlight LUN assigned to this entry. 
+                    This assigned LUN maps to some device
+                    connected to the Gateway/Router by some
+                    other means (FC, SSA, SCSI, ...)."
+    ::= { scsiMapEntry 5 }
+
+    scsiMapComments OBJECT-TYPE  
+        SYNTAX  DisplayString (SIZE( 0..80 ) )
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "User's comments for this entry."
+    ::= { scsiMapEntry 6 }
+
+    scsiMapPdIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Index into Pathlight SANMgr MIB
+                    Device Table ( pd group ).  The Device
+                    Table has more detailed information about 
+                    attached devices."
+    ::= { scsiMapEntry 7 }
+
+-- ***************************************************************** 
+-- 
+-- Pathlight Device Map
+--
+-- Maps a physical device addresses ( Port Number, Target ID, LUN )
+-- to Pathlight assigned LUNs
+--
+-- Can potentially contain information about devices which are not
+-- presently attached and therefore do not appear in Pathlight Devices 
+-- Group 
+-- 
+-- ***************************************************************** 
+
+-- **********************************************************
+-- *                                                        *
+-- *    Device Map Command Table                            *
+-- *    This Table is for issuing Device Map related        *
+-- *    commands to the SNC.                                *
+-- *                                                        *
+-- ********************************************************** 
+    deviceMapCommandTable OBJECT-TYPE 
+        SYNTAX SEQUENCE OF DeviceMapCommandEntry 
+        ACCESS not-accessible 
+        STATUS mandatory 
+        DESCRIPTION 
+            ""
+        ::= { deviceMap 1 }
+
+    deviceMapCommandEntry OBJECT-TYPE 
+        SYNTAX DeviceMapCommandEntry 
+        ACCESS not-accessible 
+        STATUS mandatory 
+        DESCRIPTION 
+            "An object for issuing VPM-related commands 
+            to the SNC." 
+        INDEX { componentId } 
+        ::= { deviceMapCommandTable 1 } 
+
+        DeviceMapCommandEntry ::= 
+            SEQUENCE {  
+                deviceMapCommand             INTEGER,
+                deviceMapMultipathMode		 INTEGER, 
+                deviceMapRemoveDevice        INTEGER,
+                deviceLoadBalancingMode      INTEGER
+            }
+            
+    deviceMapCommand  OBJECT-TYPE
+        SYNTAX  INTEGER {
+            clearCopy(1),
+            commit(2),
+            winnow(3),
+            mapClearDatabase(4)
+        }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "Used to issue commands to device map
+                    map routines. "
+    ::= { deviceMapCommandEntry 1 }   
+
+    deviceMapMultipathMode  OBJECT-TYPE
+        SYNTAX  INTEGER {
+             single(0),
+             manual(1),
+                 auto(2)
+        }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "Used to set the Multipath mode."
+    ::= { deviceMapCommandEntry 2 }
+
+    deviceMapRemoveDevice  OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS write-only
+        STATUS mandatory
+        DESCRIPTION "Used to remove a device from the Device Map given its Device-Id. 
+                              Warning: This command stops the IO for this device before removing"
+    ::= { deviceMapCommandEntry 3 }
+
+    deviceLoadBalancingMode  OBJECT-TYPE
+        SYNTAX  INTEGER {
+             disable(0),
+             enable(1)
+        }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "Used to set the Load Balancing Mode."
+    ::= { deviceMapCommandEntry 4 }    
+
+    dmDeviceMap OBJECT-TYPE
+       SYNTAX SEQUENCE OF DevMapEntry
+       ACCESS not-accessible
+       STATUS mandatory
+       DESCRIPTION 
+           "Device Map Group
+           ***********************************
+           Each device attached to the Gateway
+           has an entry here.  Historical data
+           of devices not presently connected 
+           may also appear here."
+       ::= { deviceMap 2 }
+
+    dmDevMapEntry OBJECT-TYPE
+       SYNTAX DevMapEntry
+       ACCESS not-accessible
+       STATUS mandatory
+       DESCRIPTION "Device Map Group entry."
+       INDEX { componentId,
+               dmAssignedLun }
+       ::= { dmDeviceMap 1 }
+
+    DevMapEntry ::= SEQUENCE {
+        dmRowStatus     RowStatus,   -- row control object
+        dmAssignedLun   INTEGER,         
+        dmType          Interface, -- FCAL, SCSI, SSA, SNA
+        dmPort          INTEGER, -- Port (or channel) number 
+        dmTargetId      INTEGER, -- Actual TID of device
+        dmTargetLun     INTEGER, -- Actual LUN of device
+        dmUid           OCTET STRING, -- 64 bit UID
+        dmPath          INTEGER, -- Multipath mode of device
+        dmSerialNum     DisplayString -- Serial Number of the device
+    }
+
+    dmRowStatus  OBJECT-TYPE
+        SYNTAX RowStatus
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "Row Control Object for this row"
+    ::= { dmDevMapEntry 1 }
+
+    dmAssignedLun  OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Logical Unit Number assigned to this
+                    attached device.  Range is 0 thru 255."
+    ::= { dmDevMapEntry 2 }
+
+    dmType  OBJECT-TYPE
+        SYNTAX Interface
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "Type of device (FC, SCSI, SNA, SSA)."
+    ::= { dmDevMapEntry 3 }
+
+    dmPort  OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "SAN Gateway Port to which this device is 
+                    connected.  May be 1 thru 10 for SCSI,
+                    1 thru 6 for Fibre Channel, 1 thru 3 for
+                    SSA."
+    ::= { dmDevMapEntry 4 }
+
+    dmTargetId  OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "The Target ID of the attached target
+                    device.  This is the actual target ID
+                    of the device, not fabricated by the
+                    Gateway or Router."
+    ::= { dmDevMapEntry 5 }
+
+    dmTargetLun  OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "The Logical Unit Number of the attached
+                    target device.  This is the actual LUN
+                    of the device, not fabricated by the
+                    Gateway or Router."
+    ::= { dmDevMapEntry 6 }
+
+    dmUid  OBJECT-TYPE
+        SYNTAX OCTET STRING( SIZE( 8 ) )
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "A universally unique identifier for this 
+                    target device."
+    ::= { dmDevMapEntry 7 }
+
+        dmPath  OBJECT-TYPE
+        SYNTAX INTEGER {
+             single(0),
+             manual(1),
+                 auto(2)
+        }
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "The Multipath Mode of the device. The 
+                    mode can only be single(0), manual(1), 
+                                        or auto(1)."
+    ::= { dmDevMapEntry 8 }
+    
+        dmSerialNum  OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (0..64))
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "The Serial Number of the device."
+    ::= { dmDevMapEntry 9 }
+
+
+
+-- ***************************************************************** 
+-- 
+-- Pathlight SAN Replication Services Device Group 
+-- 
+-- ***************************************************************** 
+
+    srsDevTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF SRSDevEntry
+       ACCESS not-accessible
+       STATUS mandatory
+       DESCRIPTION 
+           "Entry point for SAN Replication Service Device Group
+           *****************************************************
+           Each SAN Replication Service Device has an entry in 
+           this table"
+       ::= { replication 1 }
+
+    srsDevEntry OBJECT-TYPE
+       SYNTAX SRSDevEntry
+       ACCESS not-accessible
+       STATUS mandatory
+       DESCRIPTION "SAN Replication Service Device Group entry."
+        INDEX { componentId,
+                srsDevId }
+       ::= { srsDevTable 1 }
+
+    SRSDevEntry ::= SEQUENCE {
+        srsDevId              INTEGER, -- SRS Device ID 
+        srsDevState           INTEGER, -- SRS Device State
+        srsDevCommand         INTEGER, -- Write to srsDevCommand to invoke commands 
+        srsDevAssignedLun     INTEGER, -- SRS Device Assigned LUN
+        srsDevMemberCount     INTEGER, -- Number of members of this SRS Device
+        srsDevMembersOnline   INTEGER, -- Number of members online 
+        srsDevFlags           INTEGER, -- SCSI Flags
+        srsDevSizeInBlocks    Gauge, -- Number of blocks in this SRS Device
+        srsDevBlockSize       INTEGER, -- Block size 
+        srsDevPrimary         INTEGER  -- Assigned LUN of this SRS Device's Primary
+    }
+
+    srsDevId  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Device ID for this SRS Device."
+    ::= { srsDevEntry 1 }
+
+    srsDevState   OBJECT-TYPE
+        SYNTAX  INTEGER {
+            unknown(0),
+            initialized(1),
+            online(2),
+            error(3),
+            deleted(4)
+        }
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION 
+            "State of this LUN Replicated Device."
+    ::= { srsDevEntry 2 }
+
+    srsDevCommand OBJECT-TYPE
+        SYNTAX  INTEGER {
+            create(1),
+            remove(2)
+        }
+        ACCESS read-write
+        STATUS mandatory 
+        DESCRIPTION "Used to invoke SAN Replication Services API 
+                    commands.  Parameters may be passed in the 
+                    same SNMP Set varbind list with the srsDevCommand
+                    as the last varbind.
+                    *********************************************
+                    create(1)         - Creates a new SRS Device
+                    delete(2)         - Deletes an existing SRS Device" 
+    ::= { srsDevEntry 3 }
+
+    srsDevAssignedLun  OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "Assigned LUN of the SAN Replication Service Device's
+                    Primary."
+    ::= { srsDevEntry 4 }
+
+    srsDevMemberCount  OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Number of members of this LUN Replicated Device."
+    ::= { srsDevEntry 5 }
+
+    srsDevMembersOnline  OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Number of members online."
+    ::= { srsDevEntry 6 }
+
+    srsDevFlags  OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "SCSI device flags for this SAN Replication Service Device."
+    ::= { srsDevEntry 7 }
+
+    srsDevSizeInBlocks  OBJECT-TYPE
+        SYNTAX  Gauge 
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "Size in blocks of this SAN Replication Services Device."
+    ::= { srsDevEntry 8 }
+
+    srsDevBlockSize  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "Block size in octets."
+    ::= { srsDevEntry 9 }
+
+    srsDevPrimary  OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "The Assigned LUN of this SRS Device's Primary."
+    ::= { srsDevEntry 10 }
+
+-- ***************************************************************** 
+-- 
+-- Pathlight LUN Replication Member Table
+--
+-- ***************************************************************** 
+
+    srsMemTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF SRSMemEntry
+       ACCESS not-accessible
+       STATUS mandatory
+       DESCRIPTION 
+           "Entry point for SAN Replication Services Member Group
+           *****************************************************
+           This table lists the Members of each SRS Device."
+       ::= { replication 2 }
+
+    srsMemEntry OBJECT-TYPE
+       SYNTAX SRSMemEntry
+       ACCESS not-accessible
+       STATUS mandatory
+       DESCRIPTION "SAN Replication Services Member Group entry."
+        INDEX { componentId,
+                srsMemDeviceId, 
+                srsMemId }
+       ::= { srsMemTable 1 }
+
+    SRSMemEntry ::= SEQUENCE {
+        srsMemDeviceId           INTEGER, -- The SRS Device ID to which this member belongs 
+        srsMemId                 INTEGER, -- This Member's ID 
+        srsMemState              INTEGER, -- State of SRS member 
+        srsMemCommand            INTEGER, -- Write to lrmCommand to invoke commands 
+        srsMemType               INTEGER, -- i.e., is this a primary ?
+        srsMemSyncPoint          INTEGER, -- indicator of synchronization progress
+        srsMemAssignedLun        INTEGER,
+        srsMemReadOptions        INTEGER,
+        srsMemWriteOptions       INTEGER
+    }
+
+    srsMemDeviceId  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Device ID of the SAN Replication Services Device 
+                    to which this member belongs."
+    ::= { srsMemEntry 1 }
+
+    srsMemId  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Member ID (index) of this member device."
+    ::= { srsMemEntry 2 }
+
+    srsMemState   OBJECT-TYPE
+        SYNTAX  INTEGER {
+            unknown(0),
+            online(1),
+            synchronized(2),
+            synchronizing(3),
+            suspended(4),
+            readError(5),
+            writeError(6),
+            offline(7)
+        }
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION 
+            "State of this SAN Replication Services Device Member."
+    ::= { srsMemEntry 3 }
+
+    srsMemCommand OBJECT-TYPE
+        SYNTAX  INTEGER {
+            memberAdd(1),
+            suspend(2),
+            resume(3),
+            remove(4),
+            primarySet(5),
+            fullSynchronize(6),
+            quickSynchronize(7),
+            memberChange(8)
+        }
+        ACCESS read-write
+        STATUS mandatory 
+        DESCRIPTION "Used to invoke SAN Replication Services API 
+                    methods.  Parameters may be passed in the same 
+                    SNMP Set varbind list with the lrmCommand as 
+                    the last varbind."
+    ::= { srsMemEntry 4 }
+
+    srsMemType  OBJECT-TYPE
+        SYNTAX  INTEGER {
+            primary(1),
+            secondary(2)
+        } 
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Is this device a primary or secondary member."
+    ::= { srsMemEntry 5 }
+
+    srsMemSyncPoint  OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Number of blocks synchronized so far.
+                    Used for monitoring synchronization."
+    ::= { srsMemEntry 6 }
+
+    srsMemAssignedLun  OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "Assigned LUN for this SRS Member."
+    ::= { srsMemEntry 7 }
+
+    srsMemReadOptions OBJECT-TYPE
+        SYNTAX  INTEGER {
+            enabled(0),
+            disabled(1) 
+        }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "SRS Member read options."
+    ::= { srsMemEntry 8 }
+
+    srsMemWriteOptions OBJECT-TYPE
+        SYNTAX  INTEGER {
+            synchronous(0),
+            asynchronous(1) 
+        }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "SRS Member write options."
+    ::= { srsMemEntry 9 }
+
+
+-- ***************************************************************** 
+-- 
+-- Pathlight Environmental Data Table
+--
+-- ***************************************************************** 
+    envDataTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF EnvDataEntry
+       ACCESS not-accessible
+       STATUS mandatory
+       DESCRIPTION            
+		   "Entry point for Environmental Data Group
+           *****************************************************
+           This table lists the attributes of each environmental data."		   
+       ::= { envData 1 }
+
+    envDataEntry OBJECT-TYPE
+       SYNTAX EnvDataEntry
+       ACCESS not-accessible
+       STATUS mandatory
+       DESCRIPTION "Environmental Data Group table entry."
+       INDEX { componentId,
+               envDataId }
+       ::= { envDataTable 1 }
+
+    EnvDataEntry ::= SEQUENCE {
+       envDataId      INTEGER,   
+	   envDataName    DisplayString,             
+       envNominalLo   DisplayString,
+	   envNominalHi   DisplayString,
+	   envWarningLo   DisplayString,
+	   envWarningHi   DisplayString,
+	   envCurValue    DisplayString,
+	   envCurStatus   DisplayString,
+	   envUnit        DisplayString       
+    }
+    
+	envDataId  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Event identifier."
+    ::= { envDataEntry 1 }
+
+    envDataName OBJECT-TYPE  
+        SYNTAX  DisplayString (SIZE( 0..64 ) )
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Name of this environmental data"
+    ::= { envDataEntry 2 }
+
+    envNominalLo OBJECT-TYPE  
+        SYNTAX  DisplayString (SIZE( 0..32 ) )
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Minimum value for Nominal status
+		             Warning state occurs if the current value is less than this"
+    ::= { envDataEntry 3 }
+
+    envNominalHi OBJECT-TYPE  
+        SYNTAX  DisplayString (SIZE( 0..32 ) )
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Maximum Value for Nominal status
+		             Warning state occurs if the current value is greater than this."
+    ::= { envDataEntry 4 }
+
+	envWarningLo OBJECT-TYPE  
+        SYNTAX  DisplayString (SIZE( 0..32 ) )
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Minimum value for Warning status
+		             Alarm state occurs if the current value is less than this"
+    ::= { envDataEntry 5 }
+
+    envWarningHi OBJECT-TYPE  
+        SYNTAX  DisplayString (SIZE( 0..32 ) )
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Maximum Value for Warning status
+		             Alarm state occurs if the current value is greater than this."
+    ::= { envDataEntry 6 }
+
+    envCurValue OBJECT-TYPE  
+        SYNTAX  DisplayString (SIZE( 0..32 ) )
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Current Value."
+    ::= { envDataEntry 7 }
+
+	envCurStatus OBJECT-TYPE  
+        SYNTAX  DisplayString (SIZE( 0..32 ) )
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Current Status: Nominal, Warning, or Alarm."
+    ::= { envDataEntry 8 }
+
+    envUnit OBJECT-TYPE  
+        SYNTAX  DisplayString (SIZE( 0..32 ) )
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Unit"
+    ::= { envDataEntry 9 }
+
+-- ***************************************************************** 
+-- 
+-- Pathlight Port Failover
+--
+-- ***************************************************************** 
+
+    fcHostPortFailover      OBJECT IDENTIFIER ::= { portFailover 1 }
+
+-- ***************************************************************** 
+-- 
+-- Pathlight FC Host Port Failover
+--
+-- ***************************************************************** 
+
+    fcHPFPortMappings OBJECT-TYPE
+       SYNTAX SEQUENCE OF FcHPFMapTableEntry
+       ACCESS not-accessible
+       STATUS mandatory
+       DESCRIPTION            
+           "  FC Host Port Failover Mapping
+           ***********************************
+           This table consists of port mappings 
+           for the FC Host Port Failover"
+       ::= { fcHostPortFailover 1 }
+    
+    fcHPFMapEntry OBJECT-TYPE
+       SYNTAX FcHPFMapTableEntry
+       ACCESS not-accessible
+       STATUS mandatory
+       DESCRIPTION 
+            " SNMP table for FC Host Port Failover 
+              Mappings "
+       INDEX {  componentId,
+                fcHPFMapVirtualPort }
+       ::= { fcHPFPortMappings 1 }
+
+    FcHPFMapTableEntry ::= SEQUENCE {
+        fcHPFMapRowStatus     RowStatus,   -- row control object
+        
+        fcHPFMapVirtualPort   INTEGER,     -- The Virtual Port Index,
+        
+        fcHPFMapPrimaryPort   INTEGER,     -- The port index of the active port                
+
+        fcHPFMapStandbyList   OCTET STRING, 
+                                        -- Comma seperated list of standby Ports
+                                        
+        fcHPFMapActivePort    INTEGER   -- The port index of the active port
+    }
+    
+    fcHPFMapRowStatus  OBJECT-TYPE
+        SYNTAX RowStatus
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "Row Control Object for this row"
+    ::= { fcHPFMapEntry 1 }
+
+    fcHPFMapVirtualPort  OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "The virtual port index. Depends on the 
+                     configuration. Usaually same as phys port 
+                     index, but 0 if not configured"
+    ::= { fcHPFMapEntry 2 }
+    
+    fcHPFMapPrimaryPort  OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "The physical port index that acts as the
+                     default standby"
+    ::= { fcHPFMapEntry 3 }
+    
+    fcHPFMapStandbyList OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(256)) 
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "The comma seperated list of ports that are 
+                     configured as standbys for the virtual port,
+                     excluding the primary port."
+    ::= { fcHPFMapEntry 4 }
+    
+    fcHPFMapActivePort OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "The physical port thats active on this virtual port"
+    ::= { fcHPFMapEntry 5 }
+    
+    fcHPFPhysicalPorts OBJECT-TYPE
+       SYNTAX SEQUENCE OF FcHPFPhysicalPortTableEntry
+       ACCESS not-accessible
+       STATUS mandatory
+       DESCRIPTION            
+           "  FC Host Port Failover Physical Ports
+           ***************************************
+           This table consists of physical port
+           settings for the FC Host Port Failover"
+       ::= { fcHostPortFailover 2 }
+    
+    fcHPFPhysicalPortEntry OBJECT-TYPE
+       SYNTAX FcHPFPhysicalPortTableEntry
+       ACCESS not-accessible
+       STATUS mandatory
+       DESCRIPTION 
+            " SNMP table for FC Host Port Failover 
+              Port Settings "
+       INDEX {  componentId, 
+                fcHPFPhysicalPort }
+       ::= { fcHPFPhysicalPorts 1 }
+
+    FcHPFPhysicalPortTableEntry ::= SEQUENCE {
+        fcHPFPhysicalPortRowStatus     RowStatus,   -- row control object
+        
+        fcHPFPhysicalPort INTEGER,                  -- The physical FC port index         
+        
+        fcHPFPhysicalPortFailureType   FcHPFPortFailType,
+                                               -- If failed, then the type of failure
+                                               -- Link-Error/Link-Down/None
+        
+        fcHPFPhysicalPortCurrentState  FcHPFPortState, 
+                                               -- The state of this physical port
+                                               -- online/offline
+        
+        fcHPFPhysicalPortIntervention  Boolean -- If the port requires intervention?
+    }
+    
+    fcHPFPhysicalPortRowStatus  OBJECT-TYPE
+        SYNTAX RowStatus
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "Row Control Object for this row"
+    ::= { fcHPFPhysicalPortEntry 1 }
+
+    fcHPFPhysicalPort  OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "The physical FC port Index.  The range 
+                     depends on the pathlight model."
+    ::= { fcHPFPhysicalPortEntry 2 }
+
+    fcHPFPhysicalPortFailureType  OBJECT-TYPE
+        SYNTAX FcHPFPortFailType
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "If this phys port failed, this field gives the
+                     type of failure.Values 0 = None, 1 = Link Down
+                     2 = Link Error"
+    ::= { fcHPFPhysicalPortEntry 3 }
+    
+    fcHPFPhysicalPortCurrentState OBJECT-TYPE
+        SYNTAX FcHPFPortState
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "The current state of this physical port. The values
+                     0 = Online, 1 = Offline"
+    ::= { fcHPFPhysicalPortEntry 4 }
+    
+    fcHPFPhysicalPortIntervention OBJECT-TYPE
+        SYNTAX Boolean
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "Does this physical port require intervention? Values
+                     1 = true, 2 = false"
+    ::= { fcHPFPhysicalPortEntry 5 }
+
+    fcHPFGlobalTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF FcHPFGlobalEntry
+       ACCESS not-accessible
+       STATUS mandatory
+       DESCRIPTION            
+           "  FC Host Port Failover Global Settings
+           ****************************************
+           This table consists of settings global
+           to the HPF function."
+       ::= { fcHostPortFailover 3 }
+    
+    fcHPFGlobalEntry OBJECT-TYPE
+       SYNTAX FcHPFGlobalEntry
+       ACCESS not-accessible
+       STATUS mandatory
+       DESCRIPTION 
+            " SNMP table for FC Host Port Failover 
+              Global Settings "
+       INDEX { componentId }
+       ::= { fcHPFGlobalTable 1 }
+
+    FcHPFGlobalEntry ::= SEQUENCE {
+       fcHPFLinkDownThreshold               INTEGER,
+       fcHPFErrorRecoveryMode               FcHPFRecoveryType, 
+       fcHPFLinkDownRecoveryMode            FcHPFRecoveryType 
+    }
+
+    fcHPFLinkDownThreshold  OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "Used to set the Link Down threshold in seconds.
+                     Only after this delay the failover triggers"
+    ::= { fcHPFGlobalEntry 1 }
+    
+    fcHPFErrorRecoveryMode  OBJECT-TYPE
+        SYNTAX FcHPFRecoveryType
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "Used to set the global recovery mode for 
+                     failures that happen due to FC cable errors 
+                     Values: returnToActive(0), returnToStandby(1),
+                     requiresIntervention(2)"
+    ::= { fcHPFGlobalEntry 2 }
+                     
+    fcHPFLinkDownRecoveryMode  OBJECT-TYPE
+        SYNTAX FcHPFRecoveryType
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "Used to set the global recovery mode for 
+                     failures that happen due to Link Down Errors 
+                     Values: returnToActive(0), returnToStandby(1), 
+                     requiresIntervention(2)"
+    ::= { fcHPFGlobalEntry 3 }
+
+
+-- ***************************************************************** 
+-- 
+-- Pathlight Utility Module Table
+--
+-- ***************************************************************** 
+    utilityModuleTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF UtilityModuleEntry
+       ACCESS not-accessible
+       STATUS mandatory
+       DESCRIPTION            
+                   "Entry point for Utility Module Group
+           *****************************************************"
+       ::= { utilityModule 1 }
+
+    utilityModuleEntry OBJECT-TYPE
+       SYNTAX UtilityModuleEntry
+       ACCESS not-accessible
+       STATUS mandatory
+       DESCRIPTION "Utility Module Group table entry."
+       INDEX { utilityModuleId }
+       ::= { utilityModuleTable 1 }
+
+    UtilityModuleEntry ::= 
+       SEQUENCE {
+          utilityModuleId           INTEGER,   
+          utilityModuleVersion      DisplayString
+       }
+
+    -- 
+    -- Begin utility module definitions
+    --     
+        utilityModuleId  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Utility module index."
+    ::= { utilityModuleEntry 1 }
+
+    utilityModuleVersion OBJECT-TYPE  
+        SYNTAX  DisplayString (SIZE( 0..32 ) )
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Utility module version identifier."
+    ::= { utilityModuleEntry 2 }
+             
+             
+             
+-- ***************************************************************** 
+-- 
+-- Pathlight Trap Types  ==> Not used by Scalar Tape Libraries
+--
+-- ***************************************************************** 
+
+-- ***************************************************************** 
+-- 
+-- CS Events  
+--
+-- Central Scrutinizer (CS) events have a Specific Trap Type value
+-- in the range 1 through 99.  Not all of which all of these trap
+-- types are in use.  With the exception of the paTrapSequenceNumber,
+-- the varbinds listed in the VARIABLES clause for each CS event map 
+-- to an entry in the Event Log Table.  The Display String paEventVars
+-- contains a textual description of the event.
+--
+-- ***************************************************************** 
+  
+-- internal TRAP only, not reported to external application
+   ssaPortUpEvent  TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {   
+        	componentId,
+            paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            "An SSA Port Up Event has occurred."
+        ::= 1
+
+-- internal TRAP only, not reported to external application
+    ssaPortDownEvent  TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+        	componentId,
+        	paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            "An SSA Port Down Event has occurred."
+        ::= 2
+
+-- internal TRAP only, not reported to external application
+    ssaUidAddedEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+        	componentId,
+        	paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            "An SSA UID Added Event has occurred."
+        ::= 3
+
+-- internal TRAP only, not reported to external application
+    ssaUidRemovedEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+        	componentId,
+        	paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            "An SSA UID Removed Event has occurred."
+        ::= 4
+
+-- internal TRAP only, not reported to external application
+    ssaWebReconfiguredEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+        	componentId,
+        	paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            "An SSA Web Reconfigured Event has occurred."
+        ::= 5
+
+-- internal TRAP only, not reported to external application
+    ssaAsyncErrorEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+        	componentId,
+        	paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            "An SSA Async Error Event has occurred."
+        ::= 6
+
+-- internal TRAP only, not reported to external application
+    ssaAdapterEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+        	componentId,
+        	paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            "An SSA Adapter Event has occurred."
+        ::= 7
+
+-- internal TRAP only, not reported to external application
+    senseDataEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+        	componentId,
+        	paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            "Sense Data recorded following a check condition.
+            Normally, the host system will request and process
+            sense data, and then perform error recovery."
+        ::= 8
+
+-- internal TRAP only, not reported to external application
+    unitAttentionEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+        	componentId,
+        	paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            "A LUN reports a unit attention condition on
+            a non-removable media device."
+        ::= 9
+
+-- internal TRAP only, not reported to external application
+    ibfEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+        	componentId,
+        	paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            "An Internal Bus Fault event has occurred."
+        ::= 10
+
+-- internal TRAP only, not reported to external application
+    temperatureChangeEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+        	componentId,
+        	paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            "A temperature sensor has reported a change from
+            one of three possible states to a another.  The
+            possible states are  OK, High, Very High.  The 
+            display string contained in the varbind paEventVars
+            indicates the initial and final temperature state."
+        ::= 11
+
+-- internal TRAP only, not reported to external application
+    timeReferenceEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+        	componentId,
+        	paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            ""
+        ::= 12
+
+-- internal TRAP only, not reported to external application
+    shutdownEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+        	componentId,
+        	paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            "This unit is shutting down as a result of
+            a restart request."
+        ::= 13
+
+-- internal TRAP only, not reported to external application
+    diagnosticEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+        	componentId,
+        	paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            "This event is used for diagnostic purposes."
+        ::= 14
+
+-- internal TRAP only, not reported to external application
+    configurationEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+        	componentId,
+        	paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            ""
+        ::= 15
+
+-- internal TRAP only, not reported to external application
+    unexpectedScsiInterruptEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+        	componentId,
+        	paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            "A SCSI bus reports an unexpected interrupt."
+        ::= 16
+
+-- internal TRAP only, not reported to external application
+    lipResetEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+        	componentId,
+        	paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            "A Fibre Channel interface reports a LIP reset
+            was received from a host."
+        ::= 17
+
+-- internal TRAP only, not reported to external application
+    fcSystemErrorEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+            componentId,
+            paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            "A Fibre Channel interace reports a system error."
+        ::= 18
+
+-- internal TRAP only, not reported to external application
+    fcRequestTransferErrorEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+            componentId,
+            paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            "A Fibre Channel interface reports an error
+            processing a request."
+        ::= 19
+
+-- internal TRAP only, not reported to external application
+    fcResponseTransferErrorEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+            componentId,
+            paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            "A Fibre Channel interface reports an error
+            processing a response."
+        ::= 20
+
+-- internal TRAP only, not reported to external application
+    memoryFaultEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+            componentId,
+            paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            "Processor memory fault detected."
+        ::= 21
+
+-- internal TRAP only, not reported to external application
+    fcLipEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+            componentId,
+            paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            "A Fibre Channel interface detected a LIP."
+        ::= 22
+
+-- internal TRAP only, not reported to external application
+    fcLoopUpEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+            componentId,
+            paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            "A Fibre Channel interface reports loop up."
+        ::= 23
+
+-- internal TRAP only, not reported to external application
+    fcLoopDownEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+            componentId,
+            paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            "A Fibre Channel interface reports loop down."
+        ::= 24
+
+-- internal TRAP only, not reported to external application
+    pciBusParityErrorEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+            componentId,
+            paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            "Parity error detected on unit internal PCI bus."
+        ::= 25
+
+-- internal TRAP only, not reported to external application
+    pciInterfaceErrorEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+            componentId,
+            paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            "Interface error detected on unit internal PCI bus."
+        ::= 26
+
+-- internal TRAP only, not reported to external application
+    scsiDeviceAddedEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+            componentId,
+            paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            "A device has been added to a SCSI bus."
+        ::= 27
+
+-- internal TRAP only, not reported to external application
+    scsiBusResetEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+            componentId,
+            paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            "A SCSI interface reports a bus reset was detected."
+        ::= 28
+
+-- internal TRAP only, not reported to external application
+    deviceAddedEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+            componentId,
+            paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            "This unit has added a device to its configuration
+            table.  Note: This trap is held off until the unit 
+            has been up for 60 seconds."
+        ::= 29
+
+-- internal TRAP only, not reported to external application
+    deviceRemovedEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+            componentId,
+            paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            "This unit has removed a device from its configuration
+            table."
+        ::= 30
+
+-- internal TRAP only, not reported to external application
+    loggingStartedEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+            componentId,
+            paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            "Event logging service has started."
+        ::= 31
+
+ -- internal TRAP only, not reported to external application
+   loggingStoppedEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+            componentId,
+            paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            "Event logging service has stopped."
+        ::= 32
+
+-- internal TRAP only, not reported to external application
+    interfaceBusFaultEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+            componentId,
+            paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            "An interface has detected a bus fault.  The
+            display string contained in varbind paEventVars
+            contains the details of which interface detected
+            the fault."
+        ::= 33
+
+-- internal TRAP only, not reported to external application
+    interfaceDeviceFaultEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+            componentId,
+            paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            "An interface has detected a device fault.  The
+            display string contained in varbind paEventVars
+            contains the details of which interface detected
+            the fault."
+        ::= 34
+
+-- internal TRAP only, not reported to external application
+    scsiUnexpectedDisconnectEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+            componentId,
+            paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            "A SCSI interface has reported an unexpected 
+            disconnect by a device."
+        ::= 35
+
+-- internal TRAP only, not reported to external application
+    scsiParityErrorEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+            componentId,
+            paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            "A SCSI interface has detected a parity error on 
+            the bus."
+        ::= 36
+
+-- internal TRAP only, not reported to external application
+    fcPortDatabaseChangeEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+            componentId,
+            paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            "Fibre Channel port databse change detected."
+        ::= 37
+
+-- internal TRAP only, not reported to external application
+    ddfMemoryErrorEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+            componentId,
+            paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            "An error was detected on the Direct Data Flow memory board."
+        ::= 38
+
+-- internal TRAP only, not reported to external application
+    fcDirectoryServerChangeEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+            componentId,
+            paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            "The Directory Server on the Fibre Channel fabric
+            has changed."
+        ::= 39
+
+-- internal TRAP only, not reported to external application
+    lunLimitExcededEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+            componentId,
+            paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            "The maximum LUN limit has been exceded, too many 
+            devices connected."
+        ::= 40
+
+-- internal TRAP only, not reported to external application
+    fcTransferFailureEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+            componentId,
+            paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            "Fibre Channel transfer error."
+        ::= 41
+
+-- internal TRAP only, not reported to external application
+    deviceLimitExcededEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+            componentId,
+            paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            "The maximum device limit has been exceded, the persistent
+            device map database is full."
+        ::= 42
+
+-- internal TRAP only, not reported to external application
+    fcDebugDumpEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+            componentId,
+            paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            "A Fibre Channel interface driver has reported a
+            a debug dump."
+        ::= 43
+
+-- internal TRAP only, not reported to external application
+    excessiveScsiBusErrorsEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+            componentId,
+            paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            ""
+        ::= 44
+
+-- internal TRAP only, not reported to external application
+    memoryScrubberErrorEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+            componentId,
+            paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            ""
+        ::= 45
+
+-- internal TRAP only, not reported to external application
+    srsDeviceCreatedEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+            componentId,
+            paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            "A new SAN Replication Services device has 
+            been created"
+        ::= 46
+
+-- internal TRAP only, not reported to external application
+    srsDeviceOnlineEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+            componentId,
+            paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            "A SAN Replication Services device has entered 
+            the online state."
+        ::= 47
+
+-- internal TRAP only, not reported to external application
+    srsDeviceRemovedEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+            componentId,
+            paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            "A SAN Replication Services device has 
+            been removed (deleted)."
+        ::= 48
+
+-- internal TRAP only, not reported to external application
+    srsDeviceFailedEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+            componentId,
+            paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            "A SAN Replication Services device has failed."
+        ::= 49
+
+-- internal TRAP only, not reported to external application
+    srsMemberAddedEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+            componentId,
+            paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            "A new member LUN has been added to a SAN 
+            Replication Services device."
+        ::= 50
+
+-- internal TRAP only, not reported to external application
+    srsMemberSuspendedEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+            componentId,
+            paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            "A SAN Replication Services member has been 
+            suspended."
+        ::= 51
+
+-- internal TRAP only, not reported to external application
+   srsMemberRemovedEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+            componentId,
+            paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            "A SAN Replication Services member has been 
+            removed."
+        ::= 52
+
+-- internal TRAP only, not reported to external application
+    srsMemberSyncStartedEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+            componentId,
+            paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            "A SAN Replication Service member has begun 
+            synchronization to the primary member."
+        ::= 53
+
+-- internal TRAP only, not reported to external application
+    srsMemberSyncDoneEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+            componentId,
+            paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            "A SAN Replication Service member has completed 
+            synchronization to the primary member."
+        ::= 54
+
+-- internal TRAP only, not reported to external application
+    srsMemberSyncErrorEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+            componentId,
+            paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            "An error was detect during synchronization
+            of a SAN Replication Service member to the 
+            primary member."
+        ::= 55
+
+-- internal TRAP only, not reported to external application
+    srsMemberRetryEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+            componentId,
+            paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            "A command issued to a SAN Replication Services
+            member has failed and is being retried."
+        ::= 56
+
+-- internal TRAP only, not reported to external application
+    srsMemberErrorEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+            componentId,
+            paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            "A command issued to a SAN Replication Services
+            member has resulted in an error."
+        ::= 57
+
+-- internal TRAP only, not reported to external application
+    envPowerNominalEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+            componentId,
+            paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            "Power has returned to nominal state from
+            a warning or alarm state."
+        ::= 58
+
+-- internal TRAP only, not reported to external application
+    envPowerWarningEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+            componentId,
+            paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            "Power has entered a warning state from
+            a nominal state (power degrading) or 
+            alarm state (power improving)."
+        ::= 59
+
+-- internal TRAP only, not reported to external application
+    envPowerAlarmEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+            componentId,
+            paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            "Power has entered an alarm state."
+        ::= 60
+
+
+-- internal TRAP only, not reported to external application
+    envTemperatureNominalEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+            componentId,
+            paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            "Inlet air, outlet air, or I/O processor
+            temperature has returned to nominal state from
+            a warning or alarm state."
+        ::= 61
+
+-- internal TRAP only, not reported to external application
+    envInletTemperatureWarningEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+            componentId,
+            paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            "Inlet air temperature has entered a warning 
+            state from a nominal state (temperature increasing) 
+            or an alarm state (temperature decreasing)."
+        ::= 62
+
+-- internal TRAP only, not reported to external application
+    envInletTemperatureAlarmEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+            componentId,
+            paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            "Inlet air temperature has entered an alarm state."
+        ::= 63
+
+-- internal TRAP only, not reported to external application
+    envOutletTemperatureWarningEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+            componentId,
+            paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            "Outlet air temperature has entered a warning 
+            state from a nominal state (temperature increasing) 
+            or an alarm state (temperature decreasing)."
+        ::= 64
+
+-- internal TRAP only, not reported to external application
+    envOutletTemperatureAlarmEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+            componentId,
+            paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            "Outlet air temperature has entered an alarm state."
+        ::= 65
+
+
+
+
+-- internal TRAP only, not reported to external application
+    envFanNominalEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+            componentId,
+            paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            "Fan has entered a nominal state from a fault state."
+        ::= 66
+
+-- internal TRAP only, not reported to external application
+    envFanWarningEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+            componentId,
+            paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            "Fan has entered a warning range (tachometer 
+            fans only)."
+        ::= 67
+
+-- internal TRAP only, not reported to external application
+    envFanAlarmEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+            componentId,
+            paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            "Fan has entered an alarm range (tachometer 
+            fans) or is stalled (rotor stall fans)."
+        ::= 68
+
+-- internal TRAP only, not reported to external application
+    eccMemoryErrorEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+            componentId,
+            paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            "Error correcting code memory has detected
+            an error."
+        ::= 69
+
+-- internal TRAP only, not reported to external application
+    restartCompleteEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+            componentId,
+            paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            "Restart process has completed."
+        ::= 70
+        
+-- internal TRAP only, not reported to external application
+    firmwareUploadCompleteEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+            componentId,
+            paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            "Firmware upload process has completed."
+        ::= 71
+
+-- internal TRAP only, not reported to external application
+    maxInitiatorsExceededEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+            componentId,
+            paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            "Maximum number of initiators has been exceeded."
+        ::= 72
+
+-- internal TRAP only, not reported to external application
+     dataPathFailoverEvent   TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+            componentId,
+            paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars -- "Data path failover has occured at %s."
+        }
+        DESCRIPTION
+            ""
+        ::= 73
+
+-- internal TRAP only, not reported to external application
+    amemWarningEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+            componentId,
+            paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars -- "WARNING: Amem memory not installed properly"
+        }
+        DESCRIPTION
+            "Amem memory not properly installed."
+        ::= 74
+
+-- internal TRAP only, not reported to external application
+    hostOfflineEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+            componentId,
+            paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars -- "NOTICE: Host Connectivity Lost"
+        }
+        DESCRIPTION
+            "An attached host has been moved to
+            the offline state."
+        ::= 75
+        
+-- internal TRAP only, not reported to external application
+    hostOnlineEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+            componentId,
+            paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars -- "NOTICE: Host Connectivity Established"
+        }
+        DESCRIPTION
+            "An attached host has been moved to
+            the online state."
+        ::= 76
+
+-- internal TRAP only, not reported to external application
+    hostPortFailoverEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+            componentId,
+            paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars -- "FC Host Port Failover on virtual port %d: failed %d active %d."
+        }
+        DESCRIPTION
+            ""
+        ::= 77
+
+-- internal TRAP only, not reported to external application
+    hpfRequiresInterventionEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+            componentId,
+            paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars -- "FC Host Port %d requires user intervention."
+        }
+        DESCRIPTION
+            "Host port failover requires invention."
+        ::= 78      
+
+-- internal TRAP only, not reported to external application
+   controllerResetCompletedEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+            componentId,
+            paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars -- "NOTICE: FC Controller %d Restart Complete"
+        }
+        DESCRIPTION
+            "The controller indicated in paEventVars has 
+            completed its reset sequence. The text format
+            for paEventVars is:
+            NOTICE: FC Controller %d Restart Complete"
+        ::= 79
+                  
+-- internal TRAP only, not reported to external application
+    controllerStatusChangeEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+            componentId,
+            paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars -- "NOTICE: Controller %d status is %d"
+        }
+        DESCRIPTION
+            "The status of the controller indicated in 
+            paEventVars has changed.  The controller 
+            index (pcIndex) and the new status (fcStatus
+            for Fibre Channel, scsiStatus for SCSI) are 
+            encoding in paEventVars according to the 
+            following format:
+            NOTICE: Controller %d status is %d"
+        ::= 80  
+
+-- internal TRAP only, not reported to external application
+     ethFailoverEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+            componentId,
+            paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            "Ethernet Port Filover has occured." 
+        ::= 81
+
+-- internal TRAP only, not reported to external application
+     memUsageWarningEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+            componentId,
+            paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            "Memory usage reached warning level." 
+        ::= 82
+
+-- internal TRAP only, not reported to external application
+     taskSuspendedWarningEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+            componentId,
+            paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            "Task suspended warning." 
+        ::= 83
+
+-- internal TRAP only, not reported to external application
+     umTaskWatchdogWarningEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+            componentId,
+            paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            "Utility module task watchdog warning." 
+        ::= 84
+        
+-- internal TRAP only, not reported to external application
+     dataPathTrespassEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+            componentId,
+            paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            "Data path trespass has occurred." 
+        ::= 85
+        
+-- internal TRAP only, not reported to external application
+     deviceListChangedEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+            componentId,
+            paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            "Target device list changed on an interface." 
+        ::= 86
+
+-- internal TRAP only, not reported to external application
+   autoLevelStart    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+            componentId,
+            paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            "Auto Level has begun."
+        ::= 87
+
+ -- internal TRAP only, not reported to external application
+   autoLevelEnd    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+            componentId,
+            paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            "Auto Level is done."
+        ::= 88
+
+ -- internal TRAP only, not reported to external application
+   autoLevelError    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+            componentId,
+            paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            "Auto Level has got error."
+        ::= 89
+
+-- internal TRAP only, not reported to external application
+    corruptNVRAMError    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+            componentId,
+            paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            "NVRAM corruption detected."
+        ::= 90
+                        
+-- ***************************************************************** 
+-- 
+-- Specific Trap Types 81 - 99 are not in use at this time
+--
+-- ***************************************************************** 
+-- ***************************************************************** 
+-- 
+-- Health Check Events
+--
+-- Health Check events have an Enterprise Specific Trap Type value
+-- in the range 100 through 149.  Not all of which all of these trap
+-- types are in use.  With the exception of the paTrapSequenceNumber,
+-- the varbinds listed in the VARIABLES clause for each CS event map 
+-- to an entry in the Event Log Table.  The Display String paEventVars
+-- contains a textual description of the event.
+--
+-- ***************************************************************** 
+
+-- internal TRAP only, not reported to external application
+    powerSupplyOutOfSpecEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+            componentId,
+            paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            "The main power supply voltage is out
+            of specified operating range."
+        ::= 100
+
+ -- internal TRAP only, not reported to external application
+   auxPowerOutOfSpecEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+            componentId,
+            paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            "The auxillary power supply voltage is out
+            of specified operating range."
+        ::= 101
+
+ -- internal TRAP only, not reported to external application
+   newTemperatureChangeEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+            componentId,
+            paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            "Temperature change detected since last report.
+            The possible temperature states are  OK, High, 
+            and Very High."
+        ::= 102
+
+-- internal TRAP only, not reported to external application
+    newPciErrorsEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+            componentId,
+            paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            ""
+        ::= 103
+
+ -- internal TRAP only, not reported to external application
+   newMemoryParityErrorsEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+            componentId,
+            paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            ""
+        ::= 104
+
+ -- internal TRAP only, not reported to external application
+   pciBusInterfaceErrorEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+            componentId,
+            paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            ""
+        ::= 105
+
+ -- internal TRAP only, not reported to external application
+   fcInterfaceFailureEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+            componentId,
+            paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            "Fibre Channel interface failed Health Check."
+        ::= 106
+
+-- internal TRAP only, not reported to external application
+    scsiInterfaceFailureEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+            componentId,
+            paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            "SCSI interface failed Health Check."
+        ::= 107
+
+ -- internal TRAP only, not reported to external application
+   ssaInterfaceFailureEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+            componentId,
+            paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            "SSA interface failed Health Check."
+        ::= 108
+
+ -- internal TRAP only, not reported to external application
+   deviceFailureEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+            componentId,
+            paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            "Target device failed Health Check."
+        ::= 109
+
+ -- internal TRAP only, not reported to external application
+   fcLinkStatusChangeEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+            componentId,
+            paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            "Fibre Channel link status has changed."
+        ::= 110
+
+ -- internal TRAP only, not reported to external application
+   newFcTranferErrorsEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+            componentId,
+            paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            "New Fibre Channel transfer errors were detected
+            since last report."
+        ::= 111
+
+ -- internal TRAP only, not reported to external application
+   envFanEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+            componentId,
+            paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            "The health check task has detected a fan
+            running in warning or alarm range."
+        ::= 112
+
+ -- internal TRAP only, not reported to external application
+   envPowerEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+            componentId,
+            paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            "The health check task has detected a power
+            supply running in warning or alarm range."
+        ::= 113
+        
+-- internal TRAP only, not reported to external application
+    envTemperatureEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+            componentId,
+            paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            "The health check task has detected a temperature
+            sensor reporting in warning or alarm range."
+        ::= 114
+
+-- internal TRAP only, not reported to external application
+    eccMemoryHealthCheckEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+            componentId,
+            paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            "The health check task has detected an ECC
+            memory error."
+        ::= 115
+
+-- internal TRAP only, not reported to external application
+    eccMemoryScrubberEvent   TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+            componentId,
+            paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            "The health check task has detected an ECC
+            memory scrubber event."
+        ::= 116
+
+-- internal TRAP only, not reported to external application
+    deviceRecoverEvent   TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES
+        {
+            componentId,
+            paTrapSequenceNumber,
+            paTime,
+            paProducer,
+            paEventClass,
+            paEventCode,
+            paSeq,
+            paEventVars
+        }
+        DESCRIPTION
+            ""
+        ::= 118
+
+-- ***************************************************************** 
+-- 
+-- Specific Trap Types 117 - 149 are not in use at this time
+--
+-- ***************************************************************** 
+
+-- ***************************************************************** 
+-- 
+-- Miscellaneous Events
+--
+-- ***************************************************************** 
+-- internal TRAP only, not reported to external application
+    logWillOverwriteEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES 
+        {
+        	componentId 
+       	}
+        DESCRIPTION
+            "The event log circular buffer is about to 
+            wrap, overwriting the oldest entries."
+        ::= 150
+
+-- ***************************************************************** 
+-- 
+-- Other Special Events
+--
+-- ***************************************************************** 
+
+-- internal TRAP only, not reported to external application
+    bootCompletedEvent    TRAP-TYPE
+        ENTERPRISE  trapDefinition
+        VARIABLES 
+        {
+        	componentId 
+       	}
+        DESCRIPTION
+            "This unit has completed its boot sequence and
+            is ready for SNMP communication with management
+            applications.  During the time period between
+            the initiation of the boot (or reboot) sequence
+            and the issuing of the bootCompletedEvent trap, 
+            certain data objects may not be completely
+            initialized.  As such, management applications 
+            should not attempt to retrieve data via SNMP
+            until the bootCompletedEvent is issued."
+        ::= 4444
+
+    END
