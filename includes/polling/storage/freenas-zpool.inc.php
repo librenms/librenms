@@ -8,6 +8,10 @@ if (! isset($storage_cache['zpool'])) {
 if (isset($storage_cache['zpool'][$storage['storage_index']]['zpoolUsed'])) {
     $used = $storage_cache['zpool'][$storage['storage_index']]['zpoolUsed'];
 
-    $storage['used'] = $used * $storage['units'];
-    $storage['free'] = $storage['size'] - $storage['used'];
+    $storage['used'] = $used * $storage['storage_units'];
+    $storage['free'] = $storage['storage_size'] - $storage['used'];
+
+    // leave these the same
+    $storage['size'] = $storage['storage_size'];
+    $storage['units'] = $storage['storage_units'];
 }
