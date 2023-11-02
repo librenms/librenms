@@ -110,27 +110,16 @@ if ($vars['view'] == 'macaccounting_pkts') {
 
 print_optionbar_end();
 
-echo '<table border="0" cellspacing="0" cellpadding="5" width="100%">';
+echo '<table border="0" cellspacing="0" cellpadding="5" width="100%" class="table sortable">';
 echo '<tr style="height: 30px"><th>Peer address</th><th>Type</th><th>Family</th><th>Remote AS</th><th>Peer description</th><th>State</th><th>Last error</th><th>Uptime</th></tr>';
 
 $i = '1';
 
 foreach (dbFetchRows("SELECT * FROM `bgpPeers` WHERE `device_id` = ? $extra_sql ORDER BY `bgpPeerRemoteAs`, `bgpPeerIdentifier`", [$device['device_id']]) as $peer) {
     $has_macaccounting = dbFetchCell('SELECT COUNT(*) FROM `ipv4_mac` AS I, mac_accounting AS M WHERE I.ipv4_address = ? AND M.mac = I.mac_address', [$peer['bgpPeerIdentifier']]);
-    if (! is_integer($i / 2)) {
-        $bg_colour = \LibreNMS\Config::get('list_colour.even');
-    } else {
-        $bg_colour = \LibreNMS\Config::get('list_colour.odd');
-    }
 
     unset($alert);
     unset($peerhost, $peername);
-
-    if (! is_integer($i / 2)) {
-        $bg_colour = \LibreNMS\Config::get('list_colour.odd');
-    } else {
-        $bg_colour = \LibreNMS\Config::get('list_colour.even');
-    }
 
     if ($peer['bgpPeerState'] == 'established') {
         $col = 'green';
@@ -241,7 +230,7 @@ foreach (dbFetchRows("SELECT * FROM `bgpPeers` WHERE `device_id` = ? $extra_sql 
         $last_error = describe_bgp_error_code($peer['bgpPeerLastErrorCode'], $peer['bgpPeerLastErrorSubCode']) . '<br/>' . $peer['bgpPeerLastErrorText'];
     }
 
-    echo '<tr bgcolor="' . $bg_colour . '"' . (empty($peer['alert']) ? '' : ' bordercolor="#cc0000"') . (empty($peer['disabled']) ? '' : ' bordercolor="#cccccc"') . '>
+    echo '<tr class="bgp"' . (empty($peer['alert']) ? '' : ' bordercolor="#cc0000"') . (empty($peer['disabled']) ? '' : ' bordercolor="#cccccc"') . '>
         ';
 
     echo '
@@ -255,8 +244,7 @@ foreach (dbFetchRows("SELECT * FROM `bgpPeers` WHERE `device_id` = ? $extra_sql 
         <td>' . \LibreNMS\Util\Time::formatInterval($peer['bgpPeerFsmEstablishedTime']) . "<br />
         Updates <i class='fa fa-arrow-down icon-theme' aria-hidden='true'></i> " . $peer['bgpPeerInUpdates'] . "
         <i class='fa fa-arrow-up icon-theme' aria-hidden='true'></i> " . $peer['bgpPeerOutUpdates'] . '</td>
-        </tr>
-        <tr height=5></tr>';
+        </tr>';
 
     unset($invalid);
 
@@ -297,7 +285,7 @@ foreach (dbFetchRows("SELECT * FROM `bgpPeers` WHERE `device_id` = ? $extra_sql 
         $graph_array['height'] = '100';
         $graph_array['width'] = '216';
         $graph_array['to'] = \LibreNMS\Config::get('time.now');
-        echo '<tr bgcolor="' . $bg_colour . '"><td colspan="7">';
+        echo '<tr class="bgp"><td colspan="7">';
 
         include 'includes/html/print-graphrow.inc.php';
 
