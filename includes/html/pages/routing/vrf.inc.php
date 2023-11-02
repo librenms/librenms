@@ -104,8 +104,9 @@ if (! Auth::user()->hasGlobalRead()) {
         }
 
         $i = '1';
+        echo '<tbody>';
         foreach (dbFetchRows('SELECT `vrf_name`, `mplsVpnVrfRouteDistinguisher`, `mplsVpnVrfDescription` FROM `vrfs` GROUP BY `mplsVpnVrfRouteDistinguisher`, `mplsVpnVrfDescription`,`vrf_name`') as $vrf) {
-            echo '<tbody><td></td>';
+            echo '<td></td>';
             echo '<td width=240>';
             echo '<a class=list-large href=' . \LibreNMS\Util\Url::generate($vars, ['view' => 'detail', 'vrf' => $vrf['vrf_name']]) . '>';
             echo $vrf['vrf_name'] . '</a><br />';
@@ -169,11 +170,11 @@ if (! Auth::user()->hasGlobalRead()) {
                     }//end switch
                 }//end foreach
 
-                echo '</td></tbody>';
+                echo '</td>';
                 $x++;
             } //end foreach
 
-            echo '</table></td>';
+            echo '</tbody></table></td>';
             $i++;
         }//end foreach
         echo '</table></div>';
