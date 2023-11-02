@@ -4814,7 +4814,7 @@
                     "bgpPeerLastErrorCode": 4,
                     "bgpPeerLastErrorSubCode": 0,
                     "bgpPeerLastErrorText": null,
-                    "bgpPeerIface": null,
+                    "bgpPeerIface": 18,
                     "bgpLocalAddr": "192.168.1.22",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "",
