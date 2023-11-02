@@ -1704,7 +1704,7 @@ ports:
     - { Field: ifTrunk, Type: varchar(16), 'Null': true, Extra: '' }
     - { Field: ifVrf, Type: int, 'Null': false, Extra: '', Default: '0' }
     - { Field: cpsIfMaxSecureMacAddr, Type: 'int', 'Null': true, Extra: ''}
-    - { Field: cpsIfStickyEnable, Type: 'varchar(1)', 'Null': true, Extra: ''}
+    - { Field: cpsIfStickyEnable, Type: 'varchar(5)', 'Null': true, Extra: ''}
     - { Field: ignore, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
     - { Field: disabled, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
     - { Field: deleted, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
