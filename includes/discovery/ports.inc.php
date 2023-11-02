@@ -22,11 +22,6 @@ $port_stats = snmpwalk_cache_oid($device, 'ifAlias', $port_stats, 'IF-MIB');
 $port_stats = snmpwalk_cache_oid($device, 'ifType', $port_stats, 'IF-MIB', null, $typeSnmpFlags);
 $port_stats = snmpwalk_cache_oid($device, 'ifOperStatus', $port_stats, 'IF-MIB', null, $operStatusSnmpFlags);
 
-if ($device['os'] == 'ios' || $device['os'] == 'iosxe') {
-    $port_stats = snmpwalk_cache_oid($device, 'cpsIfStickyEnable', $port_stats, 'CISCO-PORT-SECURITY-MIB');
-    $port_stats = snmpwalk_cache_oid($device, 'cpsIfMaxSecureMacAddr', $port_stats, 'CISCO-PORT-SECURITY-MIB');
-}
-
 // Get Trellix NSP ports
 if ($device['os'] == 'mlos-nsp') {
     require base_path('includes/discovery/ports/mlos-nsp.inc.php');
