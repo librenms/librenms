@@ -48,10 +48,10 @@ class Url
      * @param  int  $overlib
      * @return string
      */
-    public static function deviceLink($device, $text = null, $vars = [], $start = 0, $end = 0, $escape_text = 1, $overlib = 1)
+    public static function deviceLink($device, $text = '', $vars = [], $start = 0, $end = 0, $escape_text = 1, $overlib = 1)
     {
         if (! $device instanceof Device || ! $device->hostname) {
-            return '';
+            return $text;
         }
 
         if (! $device->canAccess(Auth::user())) {
