@@ -32,7 +32,7 @@
                     "processor_usage": 36,
                     "processor_descr": "Slot 0: N5860-48SC, Cpu 0",
                     "processor_precision": 1,
-                    "processor_perc_warn": 75
+                    "processor_perc_warn": 85
                 }
             ]
         },
