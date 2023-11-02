@@ -37,8 +37,7 @@ class Device extends BaseModel
 {
     use PivotEventTrait, HasFactory;
 
-    const UPDATED_AT = null;
-    const CREATED_AT = 'inserted';
+    public $timestamps = false;
     protected $primaryKey = 'device_id';
     protected $fillable = [
         'authalgo',
