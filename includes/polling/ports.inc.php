@@ -440,7 +440,6 @@ if ($device['os'] == 'ios' || $device['os'] == 'iosxe') {
     foreach ($cisco_if_extension_oids as $oid) {
         $port_stats = snmpwalk_cache_oid($device, $oid, $port_stats, 'CISCO-IF-EXTENSION-MIB');
     }
-    
     // Adding polling for $port_security_oids (Cisco only)
     foreach ($port_security_oids as $oid) {
         // echo 'CISCO-PORT-SECURITY-MIB';
@@ -927,7 +926,6 @@ foreach ($ports as $port) {
                 }
             }
             // End Update Port-Security
-            
             // Do EtherLike-MIB
             if (Config::get('enable_ports_etherlike')) {
                 include 'ports/port-etherlike.inc.php';
