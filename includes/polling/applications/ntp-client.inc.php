@@ -24,7 +24,6 @@ try {
     return;
 }
 
-$rrd_name = ['app', $name, $app->app_id];
 $rrd_def = RrdDefinition::make()
     ->addDataset('offset', 'GAUGE', -1000, 1000)
     ->addDataset('frequency', 'GAUGE', -1000, 1000)
@@ -40,6 +39,11 @@ $fields = [
     'stability' => $ntp['data']['clk_wander'],
 ];
 
-$tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
+$tags = [
+    'name' => $name,
+    'app_id' => $app->app_id,
+    'rrd_name' => ['app', $name, $app->app_id],
+    'rrd_def' => $rrd_def,
+];
 data_update($device, 'app', $tags, $fields);
 update_application($app, 'OK', $fields);

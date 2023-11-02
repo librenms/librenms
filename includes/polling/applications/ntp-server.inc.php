@@ -27,7 +27,6 @@ try {
     return;
 }
 
-$rrd_name = ['app', $name, $app->app_id];
 $rrd_def = RrdDefinition::make()
     ->addDataset('stratum', 'GAUGE', 0, 1000)
     ->addDataset('offset', 'GAUGE', -1000, 1000)
@@ -61,6 +60,11 @@ $fields = [
     'packets_sent'   => $ntp['data']['packets_sent'],
 ];
 
-$tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
+$tags = [
+    'name' => $name,
+    'app_id' => $app->app_id,
+    'rrd_name' => ['app', $name, $app->app_id],
+    'rrd_def' => $rrd_def,
+];
 data_update($device, 'app', $tags, $fields);
 update_application($app, 'OK', $fields);

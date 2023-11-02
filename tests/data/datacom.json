@@ -32,7 +32,7 @@
                     "os": "datacom",
                     "type": "network",
                     "serial": null,
-                    "icon": "datacom.png"
+                    "icon": "datacom.svg"
                 }
             ]
         },

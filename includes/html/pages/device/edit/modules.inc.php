@@ -28,6 +28,7 @@ $poller_module_names = $settings['poller_modules'];
 $discovery_module_names = $settings['discovery_modules'];
 
 $poller_modules = Config::get('poller_modules');
+unset($poller_modules['core']); // core cannot be toggled
 ksort($poller_modules);
 foreach ($poller_modules as $module => $module_status) {
     $module_name = $poller_module_names[$module]['description'] ?: $module;
@@ -112,6 +113,7 @@ foreach ($poller_modules as $module => $module_status) {
 <?php
 
 $discovery_modules = Config::get('discovery_modules');
+unset($discovery_modules['core']); // core cannot be toggled
 ksort($discovery_modules);
 foreach ($discovery_modules as $module => $module_status) {
     $module_name = $discovery_module_names[$module]['description'] ?: $module;

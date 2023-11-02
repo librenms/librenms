@@ -160,6 +160,10 @@ return [
                 'description' => 'Disable alerting',
                 'help' => 'Stop alerts being generated',
             ],
+            'acknowledged' => [
+                'description' => 'Send Acknowledged Alerts',
+                'help' => 'Notify if Alert has been acknowledged',
+            ],
             'fixed-contacts' => [
                 'description' => 'Updates to contact email addresses not honored',
                 'help' => 'If TRUE any changes to sysContact or users emails will not be honoured whilst alert is active',
@@ -283,6 +287,14 @@ return [
             'description' => 'Check certificate',
             'help' => 'Check certificates for validity. Some servers use self signed certificates, disabling this allows those.',
         ],
+        'auth_ad_debug' => [
+            'description' => 'Debug',
+            'help' => 'Show detailed error messages, do not leave this enabled as it can leak data.',
+        ],
+        'auth_ad_domain' => [
+            'description' => 'Active Directory Domain',
+            'help' => 'Active Directory Domain Example: example.com',
+        ],
         'auth_ad_group_filter' => [
             'description' => 'Group LDAP filter',
             'help' => 'Active Directory LDAP filter for selecting groups',
@@ -291,6 +303,10 @@ return [
             'description' => 'Group access',
             'help' => 'Define groups that have access and level',
         ],
+        'auth_ad_require_groupmembership' => [
+            'description' => 'Require group membership',
+            'help' => 'Only allow users to log in if they are part of a defined group',
+        ],
         'auth_ad_user_filter' => [
             'description' => 'User LDAP filter',
             'help' => 'Active Directory LDAP filter for selecting users',
@@ -298,10 +314,6 @@ return [
         'auth_ad_url' => [
             'description' => 'Active Directory Server(s)',
             'help' => 'Set server(s), space separated. Prefix with ldaps:// for ssl. Example: ldaps://dc1.example.com ldaps://dc2.example.com',
-        ],
-        'auth_ad_domain' => [
-            'description' => 'Active Directory Domain',
-            'help' => 'Active Directory Domain Example: example.com',
         ],
         'auth_ldap_attr' => [
             'uid' => [
@@ -349,6 +361,14 @@ return [
         'auth_ldap_debug' => [
             'description' => 'Show debug',
             'help' => 'Shows debug information.  May expose private information, do not leave enabled.',
+        ],
+        'auth_ldap_cacertfile' => [
+            'description' => 'Override system TLS CA Cert',
+            'help' => 'Use supplied CA Cert for LDAPS.',
+        ],
+        'auth_ldap_ignorecert' => [
+            'description' => 'Do not require valid Cert',
+            'help' => 'Do not require a valid TLS Cert for LDAPS.',
         ],
         'auth_ldap_emailattr' => [
             'description' => 'Mail attribute',
@@ -539,9 +559,6 @@ return [
             'junose-atm-vp' => [
                 'description' => 'Junose ATM VP',
             ],
-            'libvirt-vminfo' => [
-                'description' => 'Libvirt VMInfo',
-            ],
             'loadbalancers' => [
                 'description' => 'Loadbalancers',
             ],
@@ -594,8 +611,8 @@ return [
             'vlans' => [
                 'description' => 'VLans',
             ],
-            'vmware-vminfo' => [
-                'description' => 'VMWare VMInfo',
+            'vminfo' => [
+                'description' => 'Hypervisor VM Info',
             ],
             'vrf' => [
                 'description' => 'VRF',
@@ -809,6 +826,12 @@ return [
             'version' => [
                 'description' => 'Version',
                 'help' => 'This is used to automatically create the base_uri for the Graylog API. If you have modified the API uri from the default, set this to other and specify your base_uri.',
+            ],
+            'query' => [
+                'field' => [
+                    'description' => 'Query api field',
+                    'help' => 'Changes the default field to query graylog API.',
+                ],
             ],
         ],
         'html' => [
@@ -1189,6 +1212,9 @@ return [
             'stp' => [
                 'description' => 'STP',
             ],
+            'vminfo' => [
+                'description' => 'Hypervisor VM Info',
+            ],
             'ntp' => [
                 'description' => 'NTP',
             ],
@@ -1282,6 +1308,10 @@ return [
             'dump_errors' => [
                 'description' => 'Dump debug errors (Will break your install)',
                 'help' => 'Dump out errors that are normally hidden so you as a developer can find and fix the possible issues.',
+            ],
+            'throttle' => [
+                'description' => 'Throttle Error Reports',
+                'help' => 'Reports will only be sent every specified amount of seconds. Without this if you have an error in common code reporting can get out of hand. Set to 0 to disable throttling.',
             ],
         ],
         'route_purge' => [

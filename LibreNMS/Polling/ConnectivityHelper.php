@@ -182,7 +182,7 @@ class ConnectivityHelper
         }
 
         // check for open outage
-        $open_outage = $this->device->outages()->whereNull('up_again')->orderBy('going_down', 'desc')->first();
+        $open_outage = $this->device->getCurrentOutage();
 
         if ($status) {
             if ($open_outage) {

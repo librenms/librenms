@@ -22051,7 +22051,7 @@
                     "processor_index": "2.1.300",
                     "processor_type": "ironware",
                     "processor_usage": 1,
-                    "processor_descr": "Slot 2 4x10G [2]",
+                    "processor_descr": "Slot 2 4x10G [1]",
                     "processor_precision": 100,
                     "processor_perc_warn": 75
                 },
@@ -22062,7 +22062,7 @@
                     "processor_index": "3.1.300",
                     "processor_type": "ironware",
                     "processor_usage": 1,
-                    "processor_descr": "Slot 3  [3]",
+                    "processor_descr": "Slot 3  [1]",
                     "processor_precision": 100,
                     "processor_perc_warn": 75
                 }

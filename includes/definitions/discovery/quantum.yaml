@@ -1,0 +1,138 @@
+mib: ADIC-INTELLIGENT-STORAGE-MIB:ADIC-MANAGEMENT-MIB:ADIC-SANMGR-PROXY-MIB
+modules:
+    os:
+        hardware: ADIC-INTELLIGENT-STORAGE-MIB::productName.0
+        serial: ADIC-INTELLIGENT-STORAGE-MIB::productSerialNumber.0
+        version: ADIC-INTELLIGENT-STORAGE-MIB::productVersion.0
+    sensors:
+        temperature:
+            data:
+                -
+                    oid: temperatureSensorTable
+                    value: temperatureSensorDegreesCelsius
+                    snmp_flags: ['-ObsaQ']
+                    num_oid: '.1.3.6.1.4.1.3764.1.1.200.200.30.1.4.{{ $index }}'
+                    index: 'temp.{{ $index }}'
+                    descr: '{{ temperatureSensorName }} [{{ temperatureSensorLocation }}]'
+                    low_warn_limit: temperatureSensorWarningLo
+                    warn_limit: temperatureSensorWarningHi
+        fanspeed:
+            data:
+                -
+                    oid: coolingFanTable
+                    value: coolingFanRPM
+                    snmp_flags: ['-ObsaQ']
+                    num_oid: '.1.3.6.1.4.1.3764.1.1.200.200.40.1.4.{{ $index }}'
+                    index: 'coolingFanRPM.{{ $index }}'
+                    descr: '{{ coolingFanName }} [{{ coolingFanLocation }}]'
+                    low_warn_limit: coolingFanWarningLo
+                    warn_limit: coolingFanWarningHi
+        count:
+            data:
+                -
+                    oid: phDriveTable
+                    value: phDriveReadErrors
+                    snmp_flags: ['-ObsaQ']
+                    num_oid: '.1.3.6.1.4.1.3764.1.1.200.20.80.110.1.23.{{ $index }}'
+                    index: 'phDriveReadErrors.{{ $index }}'
+                    group: 'drives'
+                    descr: '{{ phDriveSerialNumber }} read errors'
+                -
+                    oid: phDriveTable
+                    value: phDriveWriteErrors
+                    snmp_flags: ['-ObsaQ']
+                    num_oid: '.1.3.6.1.4.1.3764.1.1.200.20.80.110.1.24.{{ $index }}'
+                    index: 'phDriveWriteErrors.{{ $index }}'
+                    group: 'drives'
+                    descr: '{{ phDriveSerialNumber }} write errors'
+                -
+                    oid: phDriveTable
+                    value: phDriveMbytesRead
+                    snmp_flags: ['-ObsaQ']
+                    num_oid: '.1.3.6.1.4.1.3764.1.1.200.20.80.110.1.25.{{ $index }}'
+                    index: 'phDriveBytesRead.{{ $index }}'
+                    multiplier: 1000000
+                    group: 'drives'
+                    descr: '{{ phDriveSerialNumber }} read'
+                -
+                    oid: phDriveTable
+                    value: phDriveMbytesWritten
+                    snmp_flags: ['-ObsaQ']
+                    num_oid: '.1.3.6.1.4.1.3764.1.1.200.20.80.110.1.26.{{ $index }}'
+                    index: 'phDriveBytesWrite.{{ $index }}'
+                    multiplier: 1000000
+                    group: 'drives'
+                    descr: '{{ phDriveSerialNumber }} written'
+        state:
+            data:
+                -
+                    oid: phDriveTable
+                    value: phDriveRasStatus
+                    snmp_flags: ['-ObsaQ']
+                    num_oid: '.1.3.6.1.4.1.3764.1.1.200.20.80.110.1.31.{{ $index }}'
+                    index: 'phDriveRasStatus.{{ $index }}'
+                    group: 'drives'
+                    descr: 'Service: {{ phDriveSerialNumber }}'
+                    states:
+                        - { value: 1, generic: 0, graph: 0, descr: good }
+                        - { value: 2, generic: 2, graph: 0, descr: failed }
+                        - { value: 3, generic: 2, graph: 0, descr: degraded }
+                        - { value: 4, generic: 1, graph: 0, descr: warning }
+                        - { value: 5, generic: 0, graph: 0, descr: informational }
+                        - { value: 6, generic: 3, graph: 0, descr: unknown }
+                        - { value: 7, generic: 3, graph: 0, descr: invalid }
+                -
+                    oid: phIeStationTable
+                    value: phIeStationDoorStatus
+                    snmp_flags: ['-ObsaQ']
+                    num_oid: '.1.3.6.1.4.1.3764.1.1.200.20.80.110.1.31.{{ $index }}'
+                    index: 'phIeStationDoorStatus.{{ $index }}'
+                    descr: 'Import/Export Door: {{ phIeStationNumber }}'
+                    states:
+                        - { value: 1, generic: 1, graph: 0, descr: open }
+                        - { value: 2, generic: 0, graph: 0, descr: closed }
+                        - { value: 3, generic: 0, graph: 0, descr: closed and locked }
+                        - { value: 4, generic: 0, graph: 0, descr: closed and unlocked }
+                        - { value: 5, generic: 2, graph: 0, descr: controller failed }
+                        - { value: 6, generic: 4, graph: 0, descr: not installed }
+                        - { value: 7, generic: 3, graph: 0, descr: no data }
+                    skip_values:
+                        -
+                            oid: phIeStationDoorStatus
+                            op: '=='
+                            value: '6'
+                -
+                    oid: rasSystemStatusTable
+                    value: rasStatusGroupStatus
+                    snmp_flags: ['-ObsaQ']
+                    num_oid: '.1.3.6.1.4.1.3764.1.1.200.20.100.10.1.2.{{ $index }}'
+                    index: 'rasStatusGroupStatus.{{ $index }}'
+                    group: '{{ rasStatusGroupIndex }}'
+                    descr: 'summary'
+                    states:
+                        - { value: 1, generic: 0, graph: 0, descr: good }
+                        - { value: 2, generic: 2, graph: 0, descr: failed }
+                        - { value: 3, generic: 2, graph: 0, descr: degraded }
+                        - { value: 4, generic: 1, graph: 0, descr: warning }
+                        - { value: 5, generic: 0, graph: 0, descr: informational }
+                        - { value: 6, generic: 3, graph: 0, descr: unknown }
+                        - { value: 7, generic: 3, graph: 0, descr: invalid }
+                -
+                    oid: powerSupplyTable
+                    value: powerSupplyStatus
+                    snmp_flags: ['-ObsaQ']
+                    num_oid: '.1.3.6.1.4.1.3764.1.1.200.200.10.1.8.{{ $index }}'
+                    index: 'powerSupplyStatus.{{ $index }}'
+                    group: 'powerAndCooling'
+                    descr: '{{ powerSupplyLocation }}'
+                    states:
+                        - { value: 1, generic: 3, graph: 0, descr: unknown }
+                        - { value: 2, generic: 4, graph: 0, descr: not installed }
+                        - { value: 3, generic: 0, graph: 0, descr: ok }
+                        - { value: 4, generic: 1, graph: 0, descr: powered off }
+                        - { value: 5, generic: 2, graph: 0, descr: failed}
+                    skip_values:
+                        -
+                            oid: powerSupplyStatus
+                            op: '=='
+                            value: '2'

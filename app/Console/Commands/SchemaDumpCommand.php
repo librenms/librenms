@@ -36,6 +36,7 @@ class SchemaDumpCommand extends DumpCommand
             foreach ($databases as $database) {
                 $this->line("Database: $database");
                 $this->input->setOption('database', $database);
+                $this->input->setOption('verbose', 3);
                 parent::handle($connections, $dispatcher);
             }
 

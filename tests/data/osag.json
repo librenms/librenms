@@ -35098,90 +35098,6 @@
                     "mempool_class": "buffers",
                     "mempool_precision": 1024,
                     "mempool_descr": "Memory buffers",
-                    "mempool_perc": 99,
-                    "mempool_perc_oid": null,
-                    "mempool_used": 133047623680,
-                    "mempool_used_oid": ".1.3.6.1.4.1.2021.4.14.0",
-                    "mempool_free": 1763430400,
-                    "mempool_free_oid": null,
-                    "mempool_total": 134811054080,
-                    "mempool_total_oid": null,
-                    "mempool_largestfree": null,
-                    "mempool_lowestfree": null,
-                    "mempool_deleted": 0,
-                    "mempool_perc_warn": null
-                },
-                {
-                    "mempool_index": "4",
-                    "entPhysicalIndex": null,
-                    "mempool_type": "ucd",
-                    "mempool_class": "cached",
-                    "mempool_precision": 1024,
-                    "mempool_descr": "Cached memory",
-                    "mempool_perc": 85,
-                    "mempool_perc_oid": null,
-                    "mempool_used": 114511949824,
-                    "mempool_used_oid": ".1.3.6.1.4.1.2021.4.15.0",
-                    "mempool_free": 20299104256,
-                    "mempool_free_oid": null,
-                    "mempool_total": 134811054080,
-                    "mempool_total_oid": null,
-                    "mempool_largestfree": null,
-                    "mempool_lowestfree": null,
-                    "mempool_deleted": 0,
-                    "mempool_perc_warn": null
-                }
-            ]
-        },
-        "poller": {
-            "mempools": [
-                {
-                    "mempool_index": "1",
-                    "entPhysicalIndex": null,
-                    "mempool_type": "ucd",
-                    "mempool_class": "system",
-                    "mempool_precision": 1024,
-                    "mempool_descr": "Physical memory",
-                    "mempool_perc": 6,
-                    "mempool_perc_oid": null,
-                    "mempool_used": 8464232448,
-                    "mempool_used_oid": null,
-                    "mempool_free": 126346821632,
-                    "mempool_free_oid": ".1.3.6.1.4.1.2021.4.6.0",
-                    "mempool_total": 134811054080,
-                    "mempool_total_oid": null,
-                    "mempool_largestfree": null,
-                    "mempool_lowestfree": null,
-                    "mempool_deleted": 0,
-                    "mempool_perc_warn": null
-                },
-                {
-                    "mempool_index": "2",
-                    "entPhysicalIndex": null,
-                    "mempool_type": "ucd",
-                    "mempool_class": "swap",
-                    "mempool_precision": 1024,
-                    "mempool_descr": "Swap space",
-                    "mempool_perc": 0,
-                    "mempool_perc_oid": null,
-                    "mempool_used": 0,
-                    "mempool_used_oid": null,
-                    "mempool_free": 17179865088,
-                    "mempool_free_oid": ".1.3.6.1.4.1.2021.4.4.0",
-                    "mempool_total": 17179865088,
-                    "mempool_total_oid": null,
-                    "mempool_largestfree": null,
-                    "mempool_lowestfree": null,
-                    "mempool_deleted": 0,
-                    "mempool_perc_warn": null
-                },
-                {
-                    "mempool_index": "3",
-                    "entPhysicalIndex": null,
-                    "mempool_type": "ucd",
-                    "mempool_class": "buffers",
-                    "mempool_precision": 1024,
-                    "mempool_descr": "Memory buffers",
                     "mempool_perc": 1,
                     "mempool_perc_oid": null,
                     "mempool_used": 1763430400,
@@ -35216,6 +35132,7 @@
                     "mempool_perc_warn": null
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     }
 }

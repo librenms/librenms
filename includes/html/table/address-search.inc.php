@@ -1,6 +1,7 @@
 <?php
 
 use LibreNMS\Util\IP;
+use LibreNMS\Util\Mac;
 
 $param = [];
 
@@ -37,7 +38,8 @@ if ($vars['search_type'] == 'ipv4') {
     }
 } elseif ($vars['search_type'] == 'mac') {
     $sql = ' FROM `ports` AS I, `devices` AS D';
-    $sql .= " WHERE I.device_id = D.device_id AND `ifPhysAddress` LIKE '%" . trim(str_replace([':', ' ', '-', '.', '0x'], '', $vars['address'])) . "%' $where ";
+    $sql .= " WHERE I.device_id = D.device_id AND `ifPhysAddress` LIKE ? $where ";
+    $param[] = '%' . trim(str_replace([':', ' ', '-', '.', '0x'], '', $vars['address'])) . '%';
 }//end if
 if (is_numeric($vars['device_id'])) {
     $sql .= ' AND I.device_id = ?';
@@ -86,8 +88,9 @@ foreach (dbFetchRows($sql, $param) as $interface) {
     if ($vars['search_type'] == 'ipv6') {
         $address = (string) IP::parse($interface['ipv6_address'], true) . '/' . $interface['ipv6_prefixlen'];
     } elseif ($vars['search_type'] == 'mac') {
-        $address = \LibreNMS\Util\Rewrite::readableMac($interface['ifPhysAddress']);
-        $mac_oui = \LibreNMS\Util\Rewrite::readableOUI($interface['ifPhysAddress']);
+        $mac = Mac::parse($interface['ifPhysAddress']);
+        $address = $mac->readable();
+        $mac_oui = $mac->vendor();
     } else {
         $address = (string) IP::parse($interface['ipv4_address'], true) . '/' . $interface['ipv4_prefixlen'];
     }

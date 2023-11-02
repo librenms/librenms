@@ -261,7 +261,7 @@ if (Config::get('enable_vrfs')) {
         if ($row['ifVrf']) {
             if (! $valid_vrf_if[$vrf_id][$if]) {
                 echo '-';
-                dbUpdate(['ifVrf' => 'NULL'], 'ports', 'port_id=?', [$if]);
+                dbUpdate(['ifVrf' => 0], 'ports', 'port_id=?', [$if]);
             } else {
                 echo '.';
             }

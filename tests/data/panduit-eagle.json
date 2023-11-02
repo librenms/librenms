@@ -248,7 +248,7 @@
                     "ifMtu": 1500,
                     "ifType": "other",
                     "ifAlias": "lo",
-                    "ifPhysAddress": "0",
+                    "ifPhysAddress": null,
                     "ifLastChange": 0,
                     "ifVlan": null,
                     "ifTrunk": null,

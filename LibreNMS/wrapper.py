@@ -55,7 +55,6 @@ import LibreNMS
 from LibreNMS.command_runner import command_runner
 from LibreNMS.config import DBConfig
 
-
 logger = logging.getLogger(__name__)
 
 # Timeout in seconds for any poller / service / discovery action per device
@@ -86,6 +85,7 @@ All time related variables are in seconds
 wrappers = {
     "service": {
         "executable": "check-services.php",
+        "option": "-h",
         "table_name": "services",
         "memc_touch_time": 10,
         "stepping": 300,
@@ -94,6 +94,7 @@ wrappers = {
     },
     "discovery": {
         "executable": "discovery.php",
+        "option": "-h",
         "table_name": "devices",
         "memc_touch_time": 30,
         "stepping": 300,
@@ -101,7 +102,8 @@ wrappers = {
         "total_exec_time": 21600,
     },
     "poller": {
-        "executable": "poller.php",
+        "executable": "lnms",
+        "option": "device:poll -q",
         "table_name": "devices",
         "memc_touch_time": 10,
         "stepping": 300,
@@ -280,7 +282,9 @@ def poll_worker(
                     os.path.dirname(os.path.dirname(os.path.realpath(__file__))),
                     wrappers[wrapper_type]["executable"],
                 )
-                command = "/usr/bin/env php {} -h {}".format(executable, device_id)
+                command = "/usr/bin/env php {} {} {}".format(
+                    executable, wrappers[wrapper_type]["option"], device_id
+                )
                 if modules is not None and len(str(modules).strip()):
                     module_str = re.sub("\s", "", str(modules).strip())
                     command = command + " -m {}".format(module_str)

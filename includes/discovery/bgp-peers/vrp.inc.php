@@ -83,7 +83,7 @@ if (count($bgpPeersCache) > 0 || count($bgpPeersCache_ietf) == 0) {
         $vrfId = $map_vrf['byName'][$vrfName]['vrf_id'];
 
         foreach ($vrf as $address => $value) {
-            $astext = get_astext($value['hwBgpPeerRemoteAs']);
+            $astext = \LibreNMS\Util\AutonomousSystem::get($value['hwBgpPeerRemoteAs'])->name();
             if (! DeviceCache::getPrimary()->bgppeers()->where('bgpPeerIdentifier', $address)->where('vrf_id', $vrfId)->exists()) {
                 $peers = [
                     'device_id' => $device['device_id'],

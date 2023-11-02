@@ -227,6 +227,8 @@ same version as PHP.
     lnms config:set auth_ldap_userdn true
     lnms config:set auth_ldap_userlist_filter service=informatique
     lnms config:set auth_ldap_wildcard_ou false
+    lnms config:set auth_ldap_cacertfile /opt/librenms/ldap-ca-cert
+    lnms config:set auth_ldap_ignorecert false
     ```
 
 ### LDAP bind user (optional)
@@ -304,10 +306,14 @@ The attribute `Filter-ID` is a standard Radius-Reply-Attribute (string) that
 can be assigned a specially formatted string to assign a single role to the user. 
 
 The string to send in `Filter-ID` reply attribute must start with `librenms_role_` followed by the role name.
-For example to set the admin role send `librenms_role_admin`
+For example to set the admin role send `librenms_role_admin`.
 
-LibreNMS will ignore any other strings sent in `Filter-ID` and revert to default
-role that is set in your config.
+The following strings correspond to the built-in roles, but any defined role can be used:
+- `librenms_role_normal` - Sets the normal user level.
+- `librenms_role_admin` - Sets the administrator level.
+- `librenms_role_global-read` - Sets the global read level
+
+LibreNMS will ignore any other strings sent in `Filter-ID` and revert to default role that is set in your config.
 
 ```php
 $config['radius']['hostname']      = 'localhost';

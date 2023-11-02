@@ -1,7 +1,6 @@
 <?php
 
 use App\Models\BgpPeer;
-use App\Models\Device;
 use Carbon\Carbon;
 
 $name = 'bird2';
@@ -12,7 +11,7 @@ if (! \LibreNMS\Config::get('enable_bgp')) {
     return;
 }
 
-$birdOutput = snmp_get($device, 'nsExtendOutputFull.' . string_to_oid($name), '-Oqv', 'NET-SNMP-EXTEND-MIB');
+$birdOutput = snmp_get($device, 'nsExtendOutputFull.' . \LibreNMS\Util\Oid::ofString($name), '-Oqv', 'NET-SNMP-EXTEND-MIB');
 
 // make sure we actually get something back
 if (empty($birdOutput)) {
@@ -124,7 +123,7 @@ $deviceObj = DeviceCache::getPrimary();
 
 if (empty($protocolsData)) {
     echo PHP_EOL . $name . ': No BGP Peers found' . PHP_EOL;
-    $deviceObj->bgpLocalAs = 'NULL';
+    $deviceObj->bgpLocalAs = null;
     $deviceObj->save();
 
     return;
@@ -151,7 +150,7 @@ foreach ($protocolsData as $protocol) {
     ]);
 
     $bgpPeer->device_id = $device['device_id'];
-    $bgpPeer->astext = get_astext($protocol['neighbor_as']);
+    $bgpPeer->astext = \LibreNMS\Util\AutonomousSystem::get($protocol['neighbor_as'])->name();
     $bgpPeer->bgpPeerIdentifier = $protocol['neighbor_id'] ?: '0.0.0.0';
     $bgpPeer->bgpPeerRemoteAs = $protocol['neighbor_as'];
     $bgpPeer->bgpPeerState = strtolower($protocol['bgp_state']);

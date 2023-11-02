@@ -521,6 +521,9 @@ $graphs['privoxy'] = [
     'resp_xxx',
     'ver',
 ];
+$graphs['ss'] = [
+    'sockets',
+];
 
 echo '<div class="panel panel-default">';
 echo '<div class="panel-heading">';

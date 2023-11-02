@@ -22,7 +22,6 @@ foreach ($lines as $line) {
 }
 
 //FreeRADIUS-Total-Access
-$rrd_name = ['app', $name, 'access', $app->app_id];
 $rrd_def = RrdDefinition::make()
     ->addDataset('requests', 'DERIVE', 0, 125000000000)
     ->addDataset('accepts', 'DERIVE', 0, 125000000000)
@@ -35,11 +34,16 @@ $fields = [
     'challenges' => $freeradius['FreeRADIUS-Total-Access-Challenges'],
 ];
 $metrics['access'] = $fields;
-$tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
+$tags = [
+    'name' => $name,
+    'app_id' => $app->app_id,
+    'type' => 'access',
+    'rrd_name' => ['app', $name, 'access', $app->app_id],
+    'rrd_def' => $rrd_def,
+];
 data_update($device, 'app', $tags, $fields);
 
 //FreeRADIUS-Total-Auth
-$rrd_name = ['app', $name, 'auth', $app->app_id];
 $rrd_def = RrdDefinition::make()
     ->addDataset('responses', 'DERIVE', 0, 125000000000)
     ->addDataset('duplicate_requests', 'DERIVE', 0, 125000000000)
@@ -56,11 +60,16 @@ $fields = [
     'unknown_types' => $freeradius['FreeRADIUS-Total-Auth-Unknown-Types'],
 ];
 $metrics['auth'] = $fields;
-$tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
+$tags = [
+    'name' => $name,
+    'app_id' => $app->app_id,
+    'type' => 'auth',
+    'rrd_name' => ['app', $name, 'auth', $app->app_id],
+    'rrd_def' => $rrd_def,
+];
 data_update($device, 'app', $tags, $fields);
 
 //FreeRADIUS-Total-Acct
-$rrd_name = ['app', $name, 'acct', $app->app_id];
 $rrd_def = RrdDefinition::make()
     ->addDataset('requests', 'DERIVE', 0, 125000000000)
     ->addDataset('responses', 'DERIVE', 0, 125000000000)
@@ -79,11 +88,16 @@ $fields = [
     'unknown_types' => $freeradius['FreeRADIUS-Total-Acct-Unknown-Types'],
 ];
 $metrics['acct'] = $fields;
-$tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
+$tags = [
+    'name' => $name,
+    'app_id' => $app->app_id,
+    'type' => 'acct',
+    'rrd_name' => ['app', $name, 'acct', $app->app_id],
+    'rrd_def' => $rrd_def,
+];
 data_update($device, 'app', $tags, $fields);
 
 //FreeRADIUS-Total-Proxy-Access
-$rrd_name = ['app', $name, 'proxy_access', $app->app_id];
 $rrd_def = RrdDefinition::make()
     ->addDataset('requests', 'DERIVE', 0, 125000000000)
     ->addDataset('accepts', 'DERIVE', 0, 125000000000)
@@ -96,11 +110,16 @@ $fields = [
     'challenges' => $freeradius['FreeRADIUS-Total-Proxy-Access-Challenges'],
 ];
 $metrics['proxy_access'] = $fields;
-$tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
+$tags = [
+    'name' => $name,
+    'app_id' => $app->app_id,
+    'type' => 'proxy_access',
+    'rrd_name' => ['app', $name, 'proxy_access', $app->app_id],
+    'rrd_def' => $rrd_def,
+];
 data_update($device, 'app', $tags, $fields);
 
 //FreeRADIUS-Total-Proxy-Auth
-$rrd_name = ['app', $name, 'proxy_auth', $app->app_id];
 $rrd_def = RrdDefinition::make()
     ->addDataset('responses', 'DERIVE', 0, 125000000000)
     ->addDataset('duplicate_requests', 'DERIVE', 0, 125000000000)
@@ -117,11 +136,16 @@ $fields = [
     'unknown_types' => $freeradius['FreeRADIUS-Total-Proxy-Auth-Unknown-Types'],
 ];
 $metrics['proxy_auth'] = $fields;
-$tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
+$tags = [
+    'name' => $name,
+    'app_id' => $app->app_id,
+    'type' => 'proxy_auth',
+    'rrd_name' => ['app', $name, 'proxy_auth', $app->app_id],
+    'rrd_def' => $rrd_def,
+];
 data_update($device, 'app', $tags, $fields);
 
 //FreeRADIUS-Total-Proxy-Acct
-$rrd_name = ['app', $name, 'proxy_acct', $app->app_id];
 $rrd_def = RrdDefinition::make()
     ->addDataset('requests', 'DERIVE', 0, 125000000000)
     ->addDataset('responses', 'DERIVE', 0, 125000000000)
@@ -140,7 +164,13 @@ $fields = [
     'unknown_types' => $freeradius['FreeRADIUS-Total-Proxy-Acct-Unknown-Types'],
 ];
 $metrics['proxy_acct'] = $fields;
-$tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
+$tags = [
+    'name' => $name,
+    'app_id' => $app->app_id,
+    'type' => 'proxy_acct',
+    'rrd_name' => ['app', $name, 'proxy_acct', $app->app_id],
+    'rrd_def' => $rrd_def,
+];
 data_update($device, 'app', $tags, $fields);
 
 //FreeRADIUS-Queue
@@ -163,7 +193,13 @@ $fields = [
     'pps_out' => $freeradius['FreeRADIUS-Queue-PPS-Out'],
 ];
 $metrics['queue'] = $fields;
-$tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
+$tags = [
+    'name' => $name,
+    'app_id' => $app->app_id,
+    'type' => 'queue',
+    'rrd_name' => ['app', $name, 'queue', $app->app_id],
+    'rrd_def' => $rrd_def,
+];
 data_update($device, 'app', $tags, $fields);
 update_application($app, $rawdata, $metrics);
 

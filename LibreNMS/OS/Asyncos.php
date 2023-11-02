@@ -25,20 +25,21 @@
 
 namespace LibreNMS\OS;
 
+use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\OS;
 use LibreNMS\RRD\RrdDefinition;
 
 class Asyncos extends OS implements OSPolling
 {
-    public function pollOS(): void
+    public function pollOS(DataStorageInterface $datastore): void
     {
         // Get stats only if device is web proxy
         if ($this->getDevice()->sysObjectID == '.1.3.6.1.4.1.15497.1.2') {
             $connections = \SnmpQuery::get('TCP-MIB::tcpCurrEstab.0')->value();
 
             if (is_numeric($connections)) {
-                data_update($this->getDeviceArray(), 'asyncos_conns', [
+                $datastore->put($this->getDeviceArray(), 'asyncos_conns', [
                     'rrd_def' => RrdDefinition::make()->addDataset('connections', 'GAUGE', 0, 50000),
                 ], [
                     'connections' => $connections,

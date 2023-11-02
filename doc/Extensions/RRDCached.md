@@ -322,7 +322,7 @@ service rrdcached start
 Check to see if the graphs are being drawn in LibreNMS. This might take a few minutes.
 After at least one poll cycle (5 mins), check the LibreNMS disk I/O performance delta.
 Disk I/O can be found under the menu Devices>All Devices>[localhost
-hostname](../Installation/Installation-CentOS-7-Apache.md)>Health>Disk I/O.
+hostname]>Health>Disk I/O.
 
 Depending on many factors, you should see the Ops/sec drop by ~30-40%.
 
