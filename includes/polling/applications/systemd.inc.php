@@ -17,8 +17,8 @@ if (! function_exists('systemd_data_update_helper')) {
     /**
      * Performs a data update and returns the updated metrics.
      *
-     * @param  string  $app_id
      * @param  class  $device
+     * @param  string  $app_id
      * @param  array  $fields
      * @param  array  $metrics
      * @param  string  $name
@@ -27,10 +27,8 @@ if (! function_exists('systemd_data_update_helper')) {
      * @param  string  $state_type
      * @return $metrics
      */
-    function systemd_data_update_helper($app_id, $fields, $metrics, $name, $polling_type, $rrd_def, $state_type)
+    function systemd_data_update_helper($device, $app_id, $fields, $metrics, $name, $polling_type, $rrd_def, $state_type)
     {
-        global $device;
-
         $rrd_name = [$polling_type, $name, $app_id, $state_type];
         $metrics[$state_type] = $fields;
         $tags = [
@@ -85,7 +83,7 @@ foreach ($systemd_mapper as $state_type => $state_statuses) {
             }
             $rrd_def->addDataset($field_name, 'GAUGE', 0);
         }
-        $metrics = systemd_data_update_helper($app->app_id, $fields, $metrics, $name, $polling_type, $rrd_def, $state_type);
+        $metrics = systemd_data_update_helper($device, $app->app_id, $fields, $metrics, $name, $polling_type, $rrd_def, $state_type);
     } else {
         // Process systemd states that have three
         // levels of depth (sub)
@@ -114,7 +112,7 @@ foreach ($systemd_mapper as $state_type => $state_statuses) {
                 $rrd_def->addDataset($field_name, 'GAUGE', 0);
             }
             $flat_type = $state_type . '_' . $sub_state_type;
-            $metrics = systemd_data_update_helper($app->app_id, $fields, $metrics, $name, $polling_type, $rrd_def, $flat_type);
+            $metrics = systemd_data_update_helper($device, $app->app_id, $fields, $metrics, $name, $polling_type, $rrd_def, $flat_type);
         }
     }
 }
