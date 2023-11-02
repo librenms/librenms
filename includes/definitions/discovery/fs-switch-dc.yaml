@@ -19,8 +19,7 @@ modules:
                 oid: fsNodeCPUTotalTable
                 value: fsNodeCPUTotal5min
                 descr: '{{ $fsNodeCPUTotalName }}'
-                warn_limit: fsNodeCPUTotalWarning
-                high_limit: fsNodeCPUTotalCritical
+                warn_percent: fsNodeCPUTotalCritical
     sensors:
         dbm:
             data:
