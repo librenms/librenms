@@ -200,7 +200,7 @@ trait HostResources
     {
         $hr_storage = \SnmpQuery::cache()->hideMib()->mibs(['HOST-RESOURCES-TYPES'])->walk('HOST-RESOURCES-MIB::hrStorageTable')->table(1);
 
-        if (! is_array($hr_storage)) {
+        if (empty($hr_storage)) {
             return new Collection;
         }
         echo 'Host Resources: ';
@@ -228,8 +228,6 @@ trait HostResources
 
     protected function memValid($storage)
     {
-        dd($storage);
-
         if (empty($storage['hrStorageType']) || empty($storage['hrStorageDescr'])) {
             return false;
         }
