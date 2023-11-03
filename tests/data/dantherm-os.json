@@ -3,7 +3,7 @@
         "discovery": {
             "devices": [
                 {
-                    "sysName": "<private>",
+                    "sysName": "custom hostname",
                     "sysObjectID": ".1.3.6.1.4.1.0",
                     "sysDescr": "FreeCooling Controller, SNMP V1.0",
                     "sysContact": "<private>",

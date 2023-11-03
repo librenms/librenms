@@ -21,27 +21,14 @@
 namespace LibreNMS\OS;
 
 use App\Models\Device;
-use LibreNMS\Interfaces\Polling\OSPolling;
+use LibreNMS\Interfaces\Discovery\OSDiscovery;
 
-class DanthermOs extends \LibreNMS\OS implements OSPolling
+class DanthermOs extends \LibreNMS\OS implements OSDiscovery
 {
     public function discoverOS(Device $device): void
     {
         parent::discoverOS($device); // yaml
 
-        $this->customSysName($device);
-    }
-
-    public function pollOs(): void
-    {
-        $this->customSysName($this->getDevice());
-    }
-
-    /**
-     * @param  \App\Models\Device  $device
-     */
-    private function customSysName(Device $device): void
-    {
-        $device->sysName = snmp_get($this->getDeviceArray(), 'hostName.0', '-Osqnv', 'DANTHERM-COOLING-MIB') ?: $device->sysName;
+        $device->sysName = \SnmpQuery::get('DANTHERM-COOLING-MIB::hostName.0')->value() ?: $device->sysName;
     }
 }
