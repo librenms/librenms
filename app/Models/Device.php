@@ -301,7 +301,7 @@ class Device extends BaseModel
 
     public function formatDownUptime($short = false): string
     {
-        $time = ($this->status == 1) ? $this->uptime : $this->last_polled->diffInSeconds();
+        $time = ($this->status == 1) ? $this->uptime : $this->last_polled?->diffInSeconds();
 
         return Time::formatInterval($time, $short);
     }
