@@ -64,7 +64,7 @@ class Zyxelnwa extends Zyxel implements OSDiscovery, WirelessClientsDiscovery, W
 
     private function getRadioName($value): string
     {
-        return match($value) {
+        return match ($value) {
             '1' => '2.4GHz',
             '2' => '5GHz',
             default => 'Unknown',
