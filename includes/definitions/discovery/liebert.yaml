@@ -48,6 +48,12 @@ modules:
                     descr: 'AC RMS {{ $lgpPduPsLineEntryLine }}'
                     index: 'lgpPduPsLineEntryEpLNTenths.{{ $index }}'
                     divisor: 10
+                -
+                    oid: lgpPduRcpTable
+                    value: lgpPduRcpEntryEp
+                    num_oid: '.1.3.6.1.4.1.476.1.42.3.8.50.20.1.55.{{ $index }}'
+                    descr: 'Voltage {{ $lgpPduRcpEntryUsrLabel }}'
+                    index: 'lgpPduRcpEntryEp.{{ $index }}'
         power:
             data:
                 -
@@ -60,8 +66,22 @@ modules:
                     oid: lgpPduPsTable
                     value: lgpPduPsEntryApTotal
                     num_oid: '.1.3.6.1.4.1.476.1.42.3.8.30.20.1.90.{{ $index }}'
-                    descr: 'Apparent Power for {{ $lgpPduPsEntryModel }}'
+                    descr: 'Apparent Power {{ $lgpPduPsEntryModel }}'
                     index: 'lgpPduPsEntryApTotal.{{ $index }}'
+                    group: ApparentPower
+                -
+                    oid: lgpPduRcpTable
+                    value: lgpPduRcpEntryPwrOut
+                    num_oid: '.1.3.6.1.4.1.476.1.42.3.8.50.20.1.65.{{ $index }}'
+                    descr: 'Power {{ $lgpPduRcpEntryUsrLabel }}'
+                    index: 'lgpPduRcpEntryPwrOut.{{ $index }}'
+                -
+                    oid: lgpPduRcpTable
+                    value: lgpPduRcpEntryApOut
+                    num_oid: '.1.3.6.1.4.1.476.1.42.3.8.50.20.1.70.{{ $index }}'
+                    descr: 'Apparent Power {{ $lgpPduRcpEntryUsrLabel }}'
+                    index: 'lgpPduRcpEntryApOut.{{ $index }}'
+                    group: ApparentPower
         current:
             data:
                 -
@@ -72,6 +92,13 @@ modules:
                     index: 'lgpPduRbEntryEcAvailBeforeAlarmHundredths.{{ $index }}'
                     divisor: 100
                     group: Available
+                -
+                    oid: lgpPduRcpTable
+                    value: lgpPduRcpEntryEc
+                    num_oid: '.1.3.6.1.4.1.476.1.42.3.8.50.20.1.60.{{ $index }}'
+                    descr: 'Current {{ $lgpPduRcpEntryUsrLabel }}'
+                    divisor: 10
+                    index: 'lgpPduRcpEntryEc.{{ $index }}'
         count:
             data:
                 -
@@ -234,6 +261,17 @@ modules:
                     states:
                         - { value: 1, graph: 0, descr: 'on', generic: 0 }
                         - { value: 2, graph: 1, descr: 'off', generic: 0 }
+                -
+                    oid: lgpPduRcpTable
+                    num_oid: '.1.3.6.1.4.1.476.1.42.3.8.50.20.1.95.{{ $index }}'
+                    descr: 'State {{ $lgpPduRcpEntryUsrLabel }}'
+                    index: 'lgpPduRcpEntryPwrState.{{ $index }}'
+                    value: lgpPduRcpEntryPwrState
+                    state_name: lgpPduRcpEntryPwrState
+                    states:
+                        - { value: 2, graph: 0, descr: 'on', generic: 1 }
+                        - { value: 1, graph: 0, descr: 'off', generic: 0 }
+                        - { value: 0, graph: 0, descr: 'unknown', generic: 2 }
         percent:
             data:
                 -
@@ -280,3 +318,17 @@ modules:
                     num_oid: '.1.3.6.1.4.1.476.1.42.3.5.2.3.1.14.{{ $index }}'
                     descr: '{{ $lgpPwrMeasurementPoint }}.{{ $index }}'
                     index: 'lgpPwrLineMeasurementPowerFactor.{{ $index }}'
+                -
+                    oid: lgpPduRcpTable
+                    value: lgpPduRcpEntryPf
+                    divisor: 100
+                    num_oid: '.1.3.6.1.4.1.476.1.42.3.8.50.20.1.75.{{ $index }}'
+                    descr: 'Power Factor {{ $lgpPduRcpEntryUsrLabel }}'
+                    index: 'lgpPduRcpEntryPf.{{ $index }}'
+                -
+                    oid: lgpPduPsTable
+                    value: lgpPduPsEntryPfTotal
+                    divisor: 100
+                    num_oid: '.1.3.6.1.4.1.476.1.42.3.8.30.20.1.95.{{ $index }}'
+                    descr: 'Power Factor Total {{ $lgpPduPsEntryModel }}'
+                    index: 'lgpPduPsEntryPfTotal.{{ $index }}'
