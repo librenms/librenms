@@ -92,27 +92,27 @@ if (isset($ss[0])) {
     }
 
     // Set various graphs if we've seen the right OIDs.
-    if (is_numeric($ss['ssRawSwapIn'])) {
+    if (isset($ss['ssRawSwapIn']) && is_numeric($ss['ssRawSwapIn'])) {
         $os->enableGraph('ucd_swap_io');
     }
 
-    if (is_numeric($ss['ssIORawSent'])) {
+    if (isset($ss['ssIORawSent']) && is_numeric($ss['ssIORawSent'])) {
         $os->enableGraph('ucd_io');
     }
 
-    if (is_numeric($ss['ssRawContexts'])) {
+    if (isset($ss['ssRawContexts']) && is_numeric($ss['ssRawContexts'])) {
         $os->enableGraph('ucd_contexts');
     }
 
-    if (is_numeric($ss['ssRawInterrupts'])) {
+    if (isset($ss['ssRawInterrupts']) && is_numeric($ss['ssRawInterrupts'])) {
         $os->enableGraph('ucd_interrupts');
     }
 
-    if (is_numeric($ss['ssCpuRawWait'])) {
+    if (isset($ss['ssCpuRawWait']) && is_numeric($ss['ssCpuRawWait'])) {
         $os->enableGraph('ucd_io_wait');
     }
 
-    if (is_numeric($ss['ssCpuRawSteal'] ?? null)) {
+    if (isset($ss['ssCpuRawSteal']) && is_numeric($ss['ssCpuRawSteal'])) {
         $os->enableGraph('ucd_cpu_steal');
     }
 }
