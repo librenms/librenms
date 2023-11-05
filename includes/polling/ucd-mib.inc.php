@@ -35,7 +35,10 @@ $ss = snmpwalk_cache_oid($device, 'systemStats', [], 'UCD-SNMP-MIB');
 if (isset($ss[0])) {
     $ss = $ss[0];
 
-    if (is_numeric($ss['ssCpuRawUser']) && is_numeric($ss['ssCpuRawNice']) && is_numeric($ss['ssCpuRawSystem']) && is_numeric($ss['ssCpuRawIdle'])) {
+    if (isset($ss['ssCpuRawUser']) && is_numeric($ss['ssCpuRawUser'])
+        && isset($ss['ssCpuRawNice']) && is_numeric($ss['ssCpuRawNice'])
+        && isset($ss['ssCpuRawSystem']) && is_numeric($ss['ssCpuRawSystem'])
+        && isset($ss['ssCpuRawIdle']) && is_numeric($ss['ssCpuRawIdle'])) {
         $rrd_def = RrdDefinition::make()
             ->addDataset('user', 'COUNTER', 0)
             ->addDataset('system', 'COUNTER', 0)
