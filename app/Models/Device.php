@@ -83,7 +83,9 @@ class Device extends BaseModel
 
     protected $casts = [
         'inserted' => 'datetime',
+        'last_discovered' => 'datetime',
         'last_polled' => 'datetime',
+        'last_ping' => 'datetime',
         'status' => 'boolean',
     ];
 
@@ -297,9 +299,9 @@ class Device extends BaseModel
         return Permissions::canAccessDevice($this->device_id, $user->user_id);
     }
 
-    public function formatDownUptime($short = false)
+    public function formatDownUptime($short = false): string
     {
-        $time = ($this->status == 1) ? $this->uptime : time() - strtotime($this->last_polled);
+        $time = ($this->status == 1) ? $this->uptime : $this->last_polled?->diffInSeconds();
 
         return Time::formatInterval($time, $short);
     }
@@ -626,6 +628,25 @@ class Device extends BaseModel
                 ->where('service_template_id', $serviceTemplate);
             }
         );
+    }
+
+    public function scopeWhereDeviceSpec(Builder $query, ?string $deviceSpec): Builder
+    {
+        if (empty($deviceSpec)) {
+            return $query;
+        } elseif ($deviceSpec == 'all') {
+            return $query;
+        } elseif ($deviceSpec == 'even') {
+            return $query->whereRaw('device_id % 2 = 0');
+        } elseif ($deviceSpec == 'odd') {
+            return $query->whereRaw('device_id % 2 = 1');
+        } elseif (is_numeric($deviceSpec)) {
+            return $query->where('device_id', $deviceSpec);
+        } elseif (str_contains($deviceSpec, '*')) {
+            return $query->where('hostname', 'like', str_replace('*', '%', $deviceSpec));
+        }
+
+        return $query->where('hostname', $deviceSpec);
     }
 
     // ---- Define Relationships ----

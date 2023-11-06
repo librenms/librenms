@@ -21,6 +21,7 @@ use App\Models\Location;
 use App\Models\MplsSap;
 use App\Models\MplsService;
 use App\Models\OspfPort;
+use App\Models\PollerGroup;
 use App\Models\Port;
 use App\Models\PortGroup;
 use App\Models\PortsFdb;
@@ -2947,6 +2948,21 @@ function del_location(Illuminate\Http\Request $request)
     }
 
     return api_error(500, "Failed to delete the location $location");
+}
+
+function get_poller_group(Illuminate\Http\Request $request)
+{
+    $poller_group = $request->route('poller_group_id_or_name');
+    if (empty($poller_group)) {
+        return api_success(PollerGroup::get(), 'get_poller_group');
+    }
+
+    $data = ctype_digit($poller_group) ? PollerGroup::find($poller_group) : PollerGroup::where('group_name', $poller_group)->first();
+    if (empty($data)) {
+        return api_error(404, 'Poller Group does not exist');
+    }
+
+    return api_success($data, 'get_poller_group');
 }
 
 function del_service_from_host(Illuminate\Http\Request $request)

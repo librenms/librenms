@@ -30,6 +30,7 @@ use App\Models\Eventlog;
 use App\Polling\Measure\Measurement;
 use DeviceCache;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Enum\Severity;
@@ -82,6 +83,7 @@ class NetSnmpQuery implements SnmpQueryInterface
     private array|string $options = [self::DEFAULT_FLAGS];
     private Device $device;
     private bool $abort = false;
+    private bool $cache = false;
     // defaults for net-snmp https://net-snmp.sourceforge.io/docs/man/snmpcmd.html
     private array $mibs = ['SNMPv2-TC', 'SNMPv2-MIB', 'IF-MIB', 'IP-MIB', 'TCP-MIB', 'UDP-MIB', 'NET-SNMP-VACM-MIB'];
 
@@ -122,6 +124,13 @@ class NetSnmpQuery implements SnmpQueryInterface
         }
 
         $this->device = new Device($device);
+
+        return $this;
+    }
+
+    public function cache(): SnmpQueryInterface
+    {
+        $this->cache = true;
 
         return $this;
     }
@@ -197,6 +206,18 @@ class NetSnmpQuery implements SnmpQueryInterface
         $this->options = $numeric
             ? array_merge($this->options, ['-On'])
             : array_diff($this->options, ['-On']);
+
+        return $this;
+    }
+
+    /**
+     * Output all OIDs numerically
+     */
+    public function numericIndex(bool $numericIndex = true): SnmpQueryInterface
+    {
+        $this->options = $numericIndex
+            ? array_merge($this->options, ['-Ob'])
+            : array_diff($this->options, ['-Ob']);
 
         return $this;
     }
@@ -373,7 +394,8 @@ class NetSnmpQuery implements SnmpQueryInterface
 
             // if abort on failure is set, return after first failure
             if ($this->abort && ! $response->isValid()) {
-                Log::debug("SNMP failed walking $oid of " . implode(',', $oids) . ' aborting.');
+                $oid_list = implode(',', array_map(fn ($group) => is_array($group) ? implode(',', $group) : $group, $oids));
+                Log::debug("SNMP failed walking $oid of $oid_list aborting.");
 
                 return $response;
             }
@@ -384,25 +406,30 @@ class NetSnmpQuery implements SnmpQueryInterface
 
     private function exec(string $command, array $oids): SnmpResponse
     {
-        $measure = Measurement::start($command);
+        // use runtime(array) cache if requested. The 'null' driver will simply return the value without caching
+        $driver = $this->cache ? 'array' : 'null';
+        $key = $this->cache ? $this->getCacheKey($command, $oids) : '';
 
-        $proc = new Process($this->buildCli($command, $oids));
-        $proc->setTimeout(Config::get('snmp.exec_timeout', 1200));
+        return Cache::driver($driver)->rememberForever($key, function () use ($command, $oids) {
+            $measure = Measurement::start($command);
+            $proc = new Process($this->buildCli($command, $oids));
+            $proc->setTimeout(Config::get('snmp.exec_timeout', 1200));
 
-        $this->logCommand($proc->getCommandLine());
+            $this->logCommand($proc->getCommandLine());
 
-        $proc->run();
-        $exitCode = $proc->getExitCode();
-        $output = $proc->getOutput();
-        $stderr = $proc->getErrorOutput();
+            $proc->run();
+            $exitCode = $proc->getExitCode();
+            $output = $proc->getOutput();
+            $stderr = $proc->getErrorOutput();
 
-        // check exit code and log possible bad auth
-        $this->checkExitCode($exitCode, $stderr);
-        $this->logOutput($output, $stderr);
+            // check exit code and log possible bad auth
+            $this->checkExitCode($exitCode, $stderr);
+            $this->logOutput($output, $stderr);
 
-        $measure->manager()->recordSnmp($measure->end());
+            $measure->manager()->recordSnmp($measure->end());
 
-        return new SnmpResponse($output, $stderr, $exitCode);
+            return new SnmpResponse($output, $stderr, $exitCode);
+        });
     }
 
     private function initCommand(string $binary, array $oids): array
@@ -512,5 +539,13 @@ class NetSnmpQuery implements SnmpQueryInterface
     private function parseOid(array|string $oid): array
     {
         return is_string($oid) ? explode(' ', $oid) : $oid;
+    }
+
+    private function getCacheKey(string $type, array $oids): string
+    {
+        $oids = implode(',', $oids);
+        $options = implode(',', $this->options);
+
+        return "$type|{$this->device->hostname}|$this->context|$oids|$options";
     }
 }

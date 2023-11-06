@@ -17,8 +17,8 @@ if (! function_exists('ss_data_update_helper')) {
     /**
      * Performs a data update and returns the updated metrics.
      *
-     * @param  string  $app_id
      * @param  class  $device
+     * @param  string  $app_id
      * @param  array  $fields
      * @param  array  $metrics
      * @param  string  $name
@@ -27,10 +27,8 @@ if (! function_exists('ss_data_update_helper')) {
      * @param  string  $gen_type
      * @return $metrics
      */
-    function ss_data_update_helper($app_id, $fields, $metrics, $name, $polling_type, $rrd_def, $gen_type)
+    function ss_data_update_helper($device, $app_id, $fields, $metrics, $name, $polling_type, $rrd_def, $gen_type)
     {
-        global $device;
-
         $rrd_name = [$polling_type, $name, $app_id, $gen_type];
         $metrics[$gen_type] = $fields;
         $tags = [
@@ -120,7 +118,7 @@ foreach ($ss_section_list as $gen_type) {
             }
             $rrd_def->addDataset($field_name, 'GAUGE', 0);
         }
-        $metrics = ss_data_update_helper($app->app_id, $fields, $metrics, $name, $polling_type, $rrd_def, $gen_type);
+        $metrics = ss_data_update_helper($device, $app->app_id, $fields, $metrics, $name, $polling_type, $rrd_def, $gen_type);
     } else {
         // Process sockets that have netids.  These are all address families.
 
@@ -171,7 +169,7 @@ foreach ($ss_section_list as $gen_type) {
                 $rrd_def->addDataset($field_name, 'GAUGE', 0);
             }
             $flat_type = $gen_type . '_' . $netid;
-            $metrics = ss_data_update_helper($app->app_id, $fields, $metrics, $name, $polling_type, $rrd_def, $flat_type);
+            $metrics = ss_data_update_helper($device, $app->app_id, $fields, $metrics, $name, $polling_type, $rrd_def, $flat_type);
         }
     }
 }

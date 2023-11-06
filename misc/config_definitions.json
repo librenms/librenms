@@ -562,6 +562,20 @@
             "order": 21,
             "type": "boolean"
         },
+        "auth_ldap_cacertfile": {
+            "group": "auth",
+            "section": "ldap",
+            "order": 22,
+            "type": "text"
+        },
+        "auth_ldap_ignorecert": {
+            "default": false,
+            "group": "auth",
+            "section": "ldap",
+            "order": 23,
+            "type": "boolean"
+        },
+
         "auth_ldap_emailattr": {
             "default": "mail",
             "group": "auth",
@@ -3749,6 +3763,13 @@
                 "other": "Other"
             }
         },
+        "graylog.query.field": {
+            "default": "source",
+            "type": "text",
+            "group": "external",
+            "section": "graylog",
+            "order": 10
+        },
         "group": {
             "type": "text",
             "default": "librenms"
@@ -4711,6 +4732,10 @@
         },
         "plugin_dir": {
             "type": "directory"
+        },
+        "plugins.show_errors": {
+            "type": "boolean",
+            "default": false
         },
         "poller_modules.unix-agent": {
             "order": 420,

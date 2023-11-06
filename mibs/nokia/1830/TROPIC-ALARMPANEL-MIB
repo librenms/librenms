@@ -1,0 +1,514 @@
+TROPIC-ALARMPANEL-MIB DEFINITIONS ::= BEGIN
+
+-- (c) Copyright 2023 Nokia Networks.  All rights reserved.
+-- This software is the confidential and proprietary property of
+-- Nokia and may only be used in accordance with the terms of the
+-- license agreement provided with this software.
+
+IMPORTS
+      SnmpAdminString                         FROM SNMP-FRAMEWORK-MIB
+      OBJECT-TYPE, MODULE-IDENTITY,
+      Unsigned32                              FROM SNMPv2-SMI
+      MODULE-COMPLIANCE, OBJECT-GROUP         FROM SNMPv2-CONF
+      InterfaceIndexOrZero                    FROM IF-MIB
+      TropicCardCLEI,
+      TropicCardHFD,
+      TropicCardSerialNumber,
+      TropicCardManufacturingPartNumber,
+      TropicCardMarketingPartNumber,
+      TropicLEDColorType,
+      TropicLEDStateType,
+      TnCommand, TnTrapCategory               FROM TROPIC-TC
+      tnShelfIndex                            FROM TROPIC-SHELF-MIB
+      tnSlotIndex                             FROM TROPIC-SLOT-MIB
+      tnMiscModules, tnAlarmPanelMIB          FROM TROPIC-GLOBAL-REG;
+
+  tnAlarmPanelMibModule MODULE-IDENTITY
+      LAST-UPDATED    "201802231200Z"
+      ORGANIZATION    "Nokia"
+      CONTACT-INFO    "Nokia
+                       Attn: Jeff Donnelly
+                       600 Mountain Avenue
+                       New Providence, NJ 07974
+
+                       Phone: +1 732 221 6408
+                       Email: jeff.donnelly@nokia.com"
+
+      DESCRIPTION "The shelf panel MIB."
+
+      REVISION    "201802231200Z"
+      DESCRIPTION "Updated the contact info."
+
+      REVISION    "201611161200Z"
+      DESCRIPTION "Updated the contact info."
+
+      REVISION    "201401131200Z"
+      DESCRIPTION "1) Changed SYNTAX of the following from InterfaceIndex
+                      to InterfaceIndexOrZero:
+                      tnUserInterfacePanelCpoConnTo.
+                   2) Marked the following as obsolete:
+                      tnUserInterfacePanelCpiAlarmType
+                      tnUserInterfacePanelCpoPolarity."
+
+      REVISION    "201305201200Z"
+      DESCRIPTION "Marked the following as obsolete:
+                   tnAlarmPanelEvents."
+
+      REVISION    "201303141200Z"
+      DESCRIPTION "Marked the following as obsolete:
+                   tnAlarmPanelTable."
+
+      REVISION    "201203291200Z"
+      DESCRIPTION "Added the following to tnUserInterfacePanelCpoConState:
+                   racklamp(4)."
+
+      REVISION    "201004161200Z"
+      DESCRIPTION "Added the following MIB attributes for warningAlarms:
+                   tnAlarmPanelNodeWarningLEDColor
+                   tnAlarmPanelNodeWarningLEDState
+                   tnAlarmPanelAudibleWarningRelay
+                   tnAlarmPanelVisualWarningRelay
+                   tnUserInterfacePanelNodeWarningLEDColor
+                   tnUserInterfacePanelNodeWarningLEDState."
+
+      REVISION    "201001061200Z"
+      DESCRIPTION "1) Added auto(3) to tnUserInterfacePanelCpoConState.
+                   2) Added tnUserInterfacePanelCpoConnTo to
+                      tnUserInterfacePanelCpoTable."
+
+      REVISION    "200909011200Z"
+      DESCRIPTION "Changed array size of tnUserInterfacePanelCpiAlarmType
+                   from 10 to 56."
+
+      REVISION    "200908241200Z"
+      DESCRIPTION "Restored the following obsolete attributes:
+                   tnUserInterfacePanelCpiAlarmType and
+                   tnUserInterfacePanelCpoPolarity."
+
+      REVISION    "200905211200Z"
+      DESCRIPTION "1) Marked the following as obsolete:
+                      tnUserInterfacePanelCpiAlarmType
+                      tnUserInterfacePanelCpoPolarity.
+                   2) Changed sizes of strings of the following to 56:
+                      tnUserInterfacePanelCpiAlarmMsg(30)
+                      tnUserInterfacePanelCpoContType(10)."
+
+      REVISION    "200903031200Z"
+      DESCRIPTION "Used AluWdmEnabledDisabled common enum in TROPIC-TC."
+
+      REVISION    "200902271200Z"
+      DESCRIPTION "Used AluWdmEnabledDisabled common enum in SNMPv2-TC."
+
+      REVISION    "200805291200Z"
+      DESCRIPTION "1) Updated the description for the MIB.
+                   2) Added the environmental alarms and external
+                      controls for the user interface panel and removed
+                      unsupported user interface panel attributes."
+
+      ::= { tnMiscModules 3 }
+
+  tnAlarmPanelConf        OBJECT IDENTIFIER ::= { tnAlarmPanelMIB 1 }
+  tnAlarmPanelGroups      OBJECT IDENTIFIER ::= { tnAlarmPanelConf 1 }
+  tnAlarmPanelCompliances OBJECT IDENTIFIER ::= { tnAlarmPanelConf 2 }
+  tnAlarmPanelObjs        OBJECT IDENTIFIER ::= { tnAlarmPanelMIB 2 }
+  tnAlarmPanelBasics      OBJECT IDENTIFIER ::= { tnAlarmPanelObjs 1 }
+--  obsolete
+--  tnAlarmPanelEvents      OBJECT IDENTIFIER ::= { tnAlarmPanelMIB 3 }
+
+--------------------------------------------------------------------------------
+-- Obsoleted OIDs
+--------------------------------------------------------------------------------
+--    tnAlarmPanelTable OBJECT-TYPE ::= { tnAlarmPanelBasics 1 }
+--    tnAlarmPanelExtPortsCapabilityTable OBJECT-TYPE ::= { tnAlarmPanelBasics 2 }
+
+--------------------------------------------------------------------------------
+-- User Interface Panel Table
+--------------------------------------------------------------------------------
+    tnUserInterfacePanelTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnUserInterfacePanelEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnAlarmPanelBasics 3 }
+
+    tnUserInterfacePanelEntry OBJECT-TYPE
+        SYNTAX         TnUserInterfacePanelEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { tnShelfIndex,
+                tnSlotIndex }
+        ::= { tnUserInterfacePanelTable 1 }
+
+    TnUserInterfacePanelEntry ::= SEQUENCE {
+        tnUserInterfacePanelName                    SnmpAdminString,
+        tnUserInterfacePanelDescr                   SnmpAdminString,
+        tnUserInterfacePanelCLEI                    TropicCardCLEI,
+        tnUserInterfacePanelHFD                     TropicCardHFD,
+        tnUserInterfacePanelSerialNumber            TropicCardSerialNumber,
+        tnUserInterfacePanelManufacturingPartNumber TropicCardManufacturingPartNumber,
+        tnUserInterfacePanelMarketingPartNumber     TropicCardMarketingPartNumber,
+        tnUserInterfacePanelACOLEDColor             TropicLEDColorType,
+        tnUserInterfacePanelACOLEDState             TropicLEDStateType,
+        tnUserInterfacePanelNodeCriticalLEDColor    TropicLEDColorType,
+        tnUserInterfacePanelNodeCriticalLEDState    TropicLEDStateType,
+        tnUserInterfacePanelNodeMajorLEDColor       TropicLEDColorType,
+        tnUserInterfacePanelNodeMajorLEDState       TropicLEDStateType,
+        tnUserInterfacePanelNodeMinorLEDColor       TropicLEDColorType,
+        tnUserInterfacePanelNodeMinorLEDState       TropicLEDStateType,
+        tnUserInterfacePanelShelfLEDColor           TropicLEDColorType,
+        tnUserInterfacePanelShelfLEDState           TropicLEDStateType,
+        tnUserInterfacePanelACO                     TnCommand,
+        tnUserInterfacePanelNodeWarningLEDColor     TropicLEDColorType,
+        tnUserInterfacePanelNodeWarningLEDState     TropicLEDStateType
+    }
+
+    tnUserInterfacePanelName OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..31))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnUserInterfacePanelEntry 1 }
+
+    tnUserInterfacePanelDescr OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..255))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnUserInterfacePanelEntry 2 }
+
+    tnUserInterfacePanelCLEI OBJECT-TYPE
+        SYNTAX         TropicCardCLEI
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnUserInterfacePanelEntry 3 }
+
+    tnUserInterfacePanelHFD OBJECT-TYPE
+        SYNTAX         TropicCardHFD
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnUserInterfacePanelEntry 4 }
+
+    tnUserInterfacePanelSerialNumber OBJECT-TYPE
+        SYNTAX         TropicCardSerialNumber
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnUserInterfacePanelEntry 5 }
+
+    tnUserInterfacePanelManufacturingPartNumber OBJECT-TYPE
+        SYNTAX         TropicCardManufacturingPartNumber
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnUserInterfacePanelEntry 6 }
+
+    tnUserInterfacePanelMarketingPartNumber OBJECT-TYPE
+        SYNTAX         TropicCardMarketingPartNumber
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnUserInterfacePanelEntry 7 }
+
+    tnUserInterfacePanelACOLEDColor OBJECT-TYPE
+        SYNTAX         TropicLEDColorType
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The color of the alarm cut off LED."
+        ::= { tnUserInterfacePanelEntry 8 }
+
+    tnUserInterfacePanelACOLEDState OBJECT-TYPE
+        SYNTAX         TropicLEDStateType
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The state of the alarm cut off LED."
+        ::= { tnUserInterfacePanelEntry 9 }
+
+    tnUserInterfacePanelNodeCriticalLEDColor OBJECT-TYPE
+        SYNTAX         TropicLEDColorType
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The color of the node critical alarm indication
+                        LED."
+        ::= { tnUserInterfacePanelEntry 10 }
+
+    tnUserInterfacePanelNodeCriticalLEDState OBJECT-TYPE
+        SYNTAX         TropicLEDStateType
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The state of the node critical alarm indication
+                        LED."
+        ::= { tnUserInterfacePanelEntry 11 }
+
+    tnUserInterfacePanelNodeMajorLEDColor OBJECT-TYPE
+        SYNTAX         TropicLEDColorType
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The color of the node major alarm indication LED."
+        ::= { tnUserInterfacePanelEntry 12 }
+
+    tnUserInterfacePanelNodeMajorLEDState OBJECT-TYPE
+        SYNTAX         TropicLEDStateType
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The state of the node major alarm indication LED."
+        ::= { tnUserInterfacePanelEntry 13 }
+
+    tnUserInterfacePanelNodeMinorLEDColor OBJECT-TYPE
+        SYNTAX         TropicLEDColorType
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The color of the node minor alarm indication LED."
+        ::= { tnUserInterfacePanelEntry 14 }
+
+    tnUserInterfacePanelNodeMinorLEDState OBJECT-TYPE
+        SYNTAX         TropicLEDStateType
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The state of the node minor alarm indication LED."
+        ::= { tnUserInterfacePanelEntry 15 }
+
+    tnUserInterfacePanelShelfLEDColor OBJECT-TYPE
+        SYNTAX         TropicLEDColorType
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The color of the shelf status LED."
+        ::= { tnUserInterfacePanelEntry 16 }
+
+    tnUserInterfacePanelShelfLEDState OBJECT-TYPE
+        SYNTAX         TropicLEDStateType
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The state of the shelf status LED."
+        ::= { tnUserInterfacePanelEntry 17 }
+
+    tnUserInterfacePanelACO OBJECT-TYPE
+        SYNTAX         TnCommand
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Audible alarm cut-off."
+        ::= { tnUserInterfacePanelEntry 18 }
+
+    tnUserInterfacePanelNodeWarningLEDColor OBJECT-TYPE
+        SYNTAX         TropicLEDColorType
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The color of the node warning alarm indication
+                        LED."
+        ::= { tnUserInterfacePanelEntry 19 }
+
+    tnUserInterfacePanelNodeWarningLEDState OBJECT-TYPE
+        SYNTAX         TropicLEDStateType
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The state of the node warning alarm indication
+                        LED."
+        ::= { tnUserInterfacePanelEntry 20 }
+
+--------------------------------------------------------------------------------
+-- User Interface Panel Control Point Input Table
+--------------------------------------------------------------------------------
+    tnUserInterfacePanelCpiTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnUserInterfacePanelCpiEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnAlarmPanelBasics 4 }
+
+    tnUserInterfacePanelCpiEntry OBJECT-TYPE
+        SYNTAX         TnUserInterfacePanelCpiEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { tnShelfIndex,
+                tnSlotIndex,
+                tnUserInterfacePanelCpiIndex }
+        ::= { tnUserInterfacePanelCpiTable 1 }
+
+    TnUserInterfacePanelCpiEntry ::= SEQUENCE {
+        tnUserInterfacePanelCpiIndex     Unsigned32,
+--        obsolete
+--        tnUserInterfacePanelCpiAlarmType SnmpAdminString,
+        tnUserInterfacePanelCpiAlarmMsg  SnmpAdminString,
+        tnUserInterfacePanelCpiPolarity  INTEGER,
+        tnUserInterfacePanelCpiCategory  TnTrapCategory
+    }
+
+    tnUserInterfacePanelCpiIndex OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnUserInterfacePanelCpiEntry 1 }
+
+--    obsolete
+--    tnUserInterfacePanelCpiAlarmType OBJECT-TYPE ::= { tnUserInterfacePanelCpiEntry 2 }
+
+    tnUserInterfacePanelCpiAlarmMsg OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..56))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnUserInterfacePanelCpiEntry 3 }
+
+    tnUserInterfacePanelCpiPolarity OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         alow(1),
+                         ahigh(2)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnUserInterfacePanelCpiEntry 4 }
+
+    tnUserInterfacePanelCpiCategory OBJECT-TYPE
+        SYNTAX         TnTrapCategory
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnUserInterfacePanelCpiEntry 5 }
+
+--------------------------------------------------------------------------------
+-- User Interface Panel Control Point Output Table
+--------------------------------------------------------------------------------
+    tnUserInterfacePanelCpoTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnUserInterfacePanelCpoEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnAlarmPanelBasics 5 }
+
+    tnUserInterfacePanelCpoEntry OBJECT-TYPE
+        SYNTAX         TnUserInterfacePanelCpoEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { tnShelfIndex,
+                tnSlotIndex,
+                tnUserInterfacePanelCpoIndex }
+        ::= { tnUserInterfacePanelCpoTable 1 }
+
+    TnUserInterfacePanelCpoEntry ::= SEQUENCE {
+        tnUserInterfacePanelCpoIndex     Unsigned32,
+        tnUserInterfacePanelCpoConState  INTEGER,
+        tnUserInterfacePanelCpoContType  SnmpAdminString,
+--        obsolete
+--        tnUserInterfacePanelCpoPolarity  INTEGER,
+        tnUserInterfacePanelCpoConnTo    InterfaceIndexOrZero
+    }
+
+    tnUserInterfacePanelCpoIndex OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnUserInterfacePanelCpoEntry 1 }
+
+    tnUserInterfacePanelCpoConState OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         rls(1),
+                         opr(2),
+                         auto(3),
+                         racklamp(4)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnUserInterfacePanelCpoEntry 2 }
+
+    tnUserInterfacePanelCpoContType OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..56))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnUserInterfacePanelCpoEntry 3 }
+
+--    obsolete
+--    tnUserInterfacePanelCpoPolarity OBJECT-TYPE ::= { tnUserInterfacePanelCpoEntry 4 }
+
+    tnUserInterfacePanelCpoConnTo OBJECT-TYPE
+        SYNTAX         InterfaceIndexOrZero
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "AID (shelf/slot) of the Amp that the output is
+                        connected to."
+        ::= { tnUserInterfacePanelCpoEntry 5 }
+
+--------------------------------------------------------------------------------
+-- Conformance Group Definitions
+--------------------------------------------------------------------------------
+--    obsolete
+--    tnAlarmPanelGroup  OBJECT-GROUP ::= { tnAlarmPanelGroups 1 }
+--    tnAlarmPanelExtPortsCapabilityGroup  OBJECT-GROUP ::= { tnAlarmPanelGroups 2 }
+
+    tnUserInterfacePanelGroup  OBJECT-GROUP
+        OBJECTS {
+            tnUserInterfacePanelName,
+            tnUserInterfacePanelDescr,
+            tnUserInterfacePanelCLEI,
+            tnUserInterfacePanelHFD,
+            tnUserInterfacePanelSerialNumber,
+            tnUserInterfacePanelManufacturingPartNumber,
+            tnUserInterfacePanelMarketingPartNumber,
+            tnUserInterfacePanelACOLEDColor,
+            tnUserInterfacePanelACOLEDState,
+            tnUserInterfacePanelNodeCriticalLEDColor,
+            tnUserInterfacePanelNodeCriticalLEDState,
+            tnUserInterfacePanelNodeMajorLEDColor,
+            tnUserInterfacePanelNodeMajorLEDState,
+            tnUserInterfacePanelNodeMinorLEDColor,
+            tnUserInterfacePanelNodeMinorLEDState,
+            tnUserInterfacePanelShelfLEDColor,
+            tnUserInterfacePanelShelfLEDState,
+            tnUserInterfacePanelACO,
+            tnUserInterfacePanelNodeWarningLEDColor,
+            tnUserInterfacePanelNodeWarningLEDState
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnAlarmPanelGroups 3 }
+
+    tnUserInterfacePanelCpiGroup  OBJECT-GROUP
+        OBJECTS {
+--            obsolete
+--            tnUserInterfacePanelCpiAlarmType,
+            tnUserInterfacePanelCpiAlarmMsg,
+            tnUserInterfacePanelCpiPolarity,
+            tnUserInterfacePanelCpiCategory
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnAlarmPanelGroups 4 }
+
+    tnUserInterfacePanelCpoGroup  OBJECT-GROUP
+        OBJECTS {
+            tnUserInterfacePanelCpoConState,
+            tnUserInterfacePanelCpoContType,
+--            obsolete
+--            tnUserInterfacePanelCpoPolarity,
+            tnUserInterfacePanelCpoConnTo
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnAlarmPanelGroups 5 }
+
+--------------------------------------------------------------------------------
+-- Compliance Statements (mandatory)
+--------------------------------------------------------------------------------
+    tnAlarmPanelCompliance MODULE-COMPLIANCE
+        STATUS         current
+        DESCRIPTION    "."
+        MODULE
+        MANDATORY-GROUPS {
+--            obsolete
+--            tnAlarmPanelGroup,
+--            tnAlarmPanelExtPortsCapabilityGroup
+            tnUserInterfacePanelGroup,
+            tnUserInterfacePanelCpiGroup,
+            tnUserInterfacePanelCpoGroup
+        }
+        ::= { tnAlarmPanelCompliances 1 }
+
+END -- DEFINITION OF TROPIC-ALARMPANEL-MIB

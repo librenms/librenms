@@ -66,7 +66,21 @@ foreach ($graph_types as $type => $descr) {
 
 print_optionbar_end();
 
-echo "<div style='margin: 5px;'><table border=0 cellspacing=0 cellpadding=5 width=100%>";
+echo '
+<div>
+  <div class="panel panel-default">
+    <div class="panel-body">
+      <table class="table table-condensed table-hover" style="border-collapse:collapse;">
+        <thead>
+          <tr>
+            <th>&nbsp;</th>
+            <th>VRF</th>
+            <th>Description</th>
+            <th>RD</th>
+            <th>Interfaces</th>
+          </tr>
+        </thead>';
+
 $i = '0';
 foreach (dbFetchRows('SELECT * FROM `vrfs` WHERE `device_id` = ? ORDER BY `vrf_name`', [$device['device_id']]) as $vrf) {
     include 'includes/html/print-vrf.inc.php';

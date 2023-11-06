@@ -362,6 +362,14 @@ return [
             'description' => 'Show debug',
             'help' => 'Shows debug information.  May expose private information, do not leave enabled.',
         ],
+        'auth_ldap_cacertfile' => [
+            'description' => 'Override system TLS CA Cert',
+            'help' => 'Use supplied CA Cert for LDAPS.',
+        ],
+        'auth_ldap_ignorecert' => [
+            'description' => 'Do not require valid Cert',
+            'help' => 'Do not require a valid TLS Cert for LDAPS.',
+        ],
         'auth_ldap_emailattr' => [
             'description' => 'Mail attribute',
         ],
@@ -819,6 +827,12 @@ return [
                 'description' => 'Version',
                 'help' => 'This is used to automatically create the base_uri for the Graylog API. If you have modified the API uri from the default, set this to other and specify your base_uri.',
             ],
+            'query' => [
+                'field' => [
+                    'description' => 'Query api field',
+                    'help' => 'Changes the default field to query graylog API.',
+                ],
+            ],
         ],
         'html' => [
             'device' => [
@@ -1119,9 +1133,6 @@ return [
             ],
             'ucd-diskio' => [
                 'description' => 'UCD DiskIO',
-            ],
-            'wifi' => [
-                'description' => 'Wifi',
             ],
             'wireless' => [
                 'description' => 'Wireless',
