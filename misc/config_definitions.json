@@ -742,31 +742,31 @@
             "group": "auth",
             "section": "pamnss",
             "order": 0,
-            "type": "text",
+            "type": "text"
         },
         "auth_pamnss_admin_group": {
             "group": "auth",
             "section": "pamnss",
             "order": 1,
-            "type": "text",
+            "type": "text"
         },
         "auth_pamnss_user_group": {
             "group": "auth",
             "section": "pamnss",
             "order": 2,
-            "type": "text",
+            "type": "text"
         },
         "auth_pamnss_global_read_group": {
             "group": "auth",
             "section": "pamnss",
             "order": 3,
-            "type": "text",
+            "type": "text"
         },
         "auth_pamnss_demo_group": {
             "group": "auth",
             "section": "pamnss",
             "order": 4,
-            "type": "text",
+            "type": "text"
         },
         "auth_remember": {
             "default": 30,
