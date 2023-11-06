@@ -39,7 +39,7 @@ class PamNssAuthorizer extends AuthorizerBase
 
     public function getRoles($username)
     {
-        $roles=[];
+        $roles = [];
 
         if (Config::has('auth_pamnss_admin_group')) {
             $group = Config::get('auth_pamnss_admin_group');
