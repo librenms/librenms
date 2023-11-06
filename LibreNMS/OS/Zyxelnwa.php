@@ -35,9 +35,9 @@ class Zyxelnwa extends Zyxel implements OSDiscovery, WirelessClientsDiscovery, W
             $sensors[] = new WirelessSensor('clients', $this->getDeviceId(), $base_oid . $index, 'zyxelnwa', $index, $radio, $row['ZYXEL-ES-WIRELESS::wlanStationCount']);
         }
 
-        $total = (int) \SnmpQuery::options(['-OQXUte', '-Pu'])->get('ZYXEL-ES-WIRELESS::wlanTotalStationCount.0')->value();
+        $total = \SnmpQuery::options(['-OQXUte', '-Pu'])->get('ZYXEL-ES-WIRELESS::wlanTotalStationCount.0')->value();
         if ($total !== '') {
-            $sensors[] = new WirelessSensor('clients', $this->getDeviceId(), '.1.3.6.1.4.1.890.1.15.3.5.15.0', 'zyxelnwa', 'total', 'Total', $total);
+            $sensors[] = new WirelessSensor('clients', $this->getDeviceId(), '.1.3.6.1.4.1.890.1.15.3.5.15.0', 'zyxelnwa', 'total', 'Total', (int) $total);
         }
 
         return $sensors;
