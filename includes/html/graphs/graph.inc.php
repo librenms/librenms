@@ -9,10 +9,9 @@ try {
         $device = is_numeric($vars['device'])
             ? device_by_id_cache($vars['device'])
             : device_by_name($vars['device']);
-        if (empty($device['device_id'])) {
-            throw new \LibreNMS\Exceptions\RrdGraphException('Device not found');
+        if (isset($device['device_id'])) {
+            DeviceCache::setPrimary($device['device_id']);
         }
-        DeviceCache::setPrimary($device['device_id']);
     }
 
     // variables for included graphs
@@ -57,6 +56,11 @@ try {
         graph_error('No Authorization', 'No Auth');
 
         return;
+    }
+
+    // check after auth
+    if (isset($vars['device']) && empty($device['device_id'])) {
+        throw new \LibreNMS\Exceptions\RrdGraphException('Device not found');
     }
 
     $rrd_options = $graph_params . ' ' . $rrd_options;
