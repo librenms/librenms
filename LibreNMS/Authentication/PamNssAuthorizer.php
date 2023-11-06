@@ -22,8 +22,13 @@ class PamNssAuthorizer extends AuthorizerBase
 
         $service = Config::get('auth_pamnss_service');
 
+        $error='';
         if (pam_auth($username, $password, $error, true, $service)) {
             return true;
+        }
+
+        if ($error) {
+            AuthenticationException('Failed to auth "'.$credentials['username'].'" using service "'.$service.'"');
         }
 
         throw new AuthenticationException();
@@ -90,7 +95,11 @@ class PamNssAuthorizer extends AuthorizerBase
             }
         }
 
-        return $roles;
+        if (isset($roles[0]) {
+            return $roles;
+        }
+
+        return false;
     }
 
     public function getUserid($username)
