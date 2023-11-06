@@ -39,8 +39,7 @@ class PamNssAuthorizer extends AuthorizerBase
 
     public function getRoles($username)
     {
-        // start with most perms and work lower, given users are likely to be a member of more
-        // than one group.
+        $roles=[];
 
         if (Config::has('auth_pamnss_admin_group')) {
             $group = Config::get('auth_pamnss_admin_group');
@@ -48,7 +47,7 @@ class PamNssAuthorizer extends AuthorizerBase
             if ($groupinfo) {
                 foreach ($groupinfo['members'] as $member) {
                     if ($member == $username) {
-                        return 'admin';
+                        $roles[] = 'admin';
                     }
                 }
             }
@@ -60,7 +59,7 @@ class PamNssAuthorizer extends AuthorizerBase
             if ($groupinfo) {
                 foreach ($groupinfo['members'] as $member) {
                     if ($member == $username) {
-                        return 'user';
+                        $roles[] = 'user';
                     }
                 }
             }
@@ -72,7 +71,7 @@ class PamNssAuthorizer extends AuthorizerBase
             if ($groupinfo) {
                 foreach ($groupinfo['members'] as $member) {
                     if ($member == $username) {
-                        return 'global-read';
+                        $roles[] = 'global-read';
                     }
                 }
             }
@@ -84,13 +83,13 @@ class PamNssAuthorizer extends AuthorizerBase
             if ($groupinfo) {
                 foreach ($groupinfo['members'] as $member) {
                     if ($member == $username) {
-                        return 'demo';
+                        $roles[] = 'demo';
                     }
                 }
             }
         }
 
-        return false;
+        return $roles;
     }
 
     public function getUserid($username)
