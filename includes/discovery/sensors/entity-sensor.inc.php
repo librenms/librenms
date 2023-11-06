@@ -70,7 +70,6 @@ if (! empty($entity_oids)) {
             $entitysensor['other'] = 'dbm';
         }
         if (isset($entitysensor[$entry['entPhySensorType']]) && is_numeric($entry['entPhySensorValue']) && is_numeric($index)) {
-
             $entPhysicalIndex = $index;
             $oid = '.1.3.6.1.2.1.99.1.1.1.4.' . $index;
             $current = $entry['entPhySensorValue'];
