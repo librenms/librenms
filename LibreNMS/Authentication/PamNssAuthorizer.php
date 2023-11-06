@@ -43,7 +43,7 @@ class PamNssAuthorizer extends AuthorizerBase
         return false;
     }
 
-    public function getRoles($username)
+    public function getRoles($username): array|false
     {
         $roles = [];
 
