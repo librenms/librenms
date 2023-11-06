@@ -95,7 +95,7 @@ class PamNssAuthorizer extends AuthorizerBase
             }
         }
 
-        if (isset($roles[0]) {
+        if (isset($roles[0])) {
             return $roles;
         }
 
