@@ -28,7 +28,7 @@ class PamNssAuthorizer extends AuthorizerBase
         }
 
         if ($error) {
-            AuthenticationException('Failed to auth "' . $credentials['username'] . '" using service "' . $service . '"');
+            throw new AuthenticationException('Failed to auth "' . $credentials['username'] . '" using service "' . $service . '"');
         }
 
         throw new AuthenticationException();
