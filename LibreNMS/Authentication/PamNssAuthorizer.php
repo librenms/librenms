@@ -2,6 +2,7 @@
 
 namespace LibreNMS\Authentication;
 
+use LibreNMS\Config;
 use LibreNMS\Exceptions\AuthenticationException;
 
 class PamNssAuthorizer extends AuthorizerBase
