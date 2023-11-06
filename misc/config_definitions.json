@@ -733,8 +733,16 @@
                 "http-auth": "HTTP Authentication",
                 "ad-authorization": "Externally authenticated AD",
                 "ldap-authorization": "Externally authenticated LDAP",
-                "sso": "Single Sign On"
+                "sso": "Single Sign On",
+                "pamnss": "PAM + NSS"
             }
+        },
+        "auth_pamnss_service": {
+            "default": "librenms",
+            "group": "auth",
+            "section": "pamnss",
+            "order": 0,
+            "type": "text",
         },
         "auth_remember": {
             "default": 30,
