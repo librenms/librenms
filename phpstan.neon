@@ -37,6 +37,10 @@ parameters:
 
     ignoreErrors:
         - '#Unsafe usage of new static#'
+        # $error is handled as a reference via pam_auth, but phpstan does not pick up on that
+        -
+            message: '#If condition is always false#'
+            path: LibreNMS/Authentication/PamNssAuthorizer.php
 
     parallel:
         processTimeout: 300.0
