@@ -21,7 +21,7 @@ class LegacyExternalAuth
     {
         if (! Auth::guard($guard)->check()) {
             // check for get variables
-            if(Config::get('auth.allow_get_login')) {
+            if (Config::get('auth.allow_get_login')) {
                 if ($request->isMethod('get') && $request->has(['username', 'password'])) {
                     Auth::attempt($request->only(['username', 'password']));
                 }
