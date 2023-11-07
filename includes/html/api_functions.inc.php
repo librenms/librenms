@@ -1494,7 +1494,7 @@ function list_oxidized(Illuminate\Http\Request $request)
              ->whereNotIn('type', Config::get('oxidized.ignore_types', []))
              ->whereNotIn('os', Config::get('oxidized.ignore_os', []))
              ->whereAttributeDisabled('override_Oxidized_disable')
-             ->select(['device_id', 'hostname', 'sysName', 'sysDescr', 'sysObjectID', 'hardware', 'os', 'ip', 'location_id', 'purpose', 'notes'])
+             ->select(['devices.device_id', 'hostname', 'sysName', 'sysDescr', 'sysObjectID', 'hardware', 'os', 'ip', 'location_id', 'purpose', 'notes'])
              ->get();
 
     /** @var Device $device */
