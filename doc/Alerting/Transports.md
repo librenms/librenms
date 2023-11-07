@@ -350,7 +350,7 @@ Jira password, Project key, and issue type.
 
 ### Webhooks
 The config fields that need to set for webhooks are: Jira Open URL, Jira Close URL,
- Jira username, Jira password and webhook ID. Webhook ID is used
+ Jira username, Jira password and webhook ID.
 
 > Note: Webhooks allow more control over how alerts are handled in Jira. With webhooks, 
 > recovery messages can be sent to a different URL than alerts. Additionally, a custom 
