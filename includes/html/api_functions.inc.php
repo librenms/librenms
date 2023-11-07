@@ -1486,6 +1486,7 @@ function list_oxidized(Illuminate\Http\Request $request)
 {
     $return = [];
     $devices = Device::query()
+            ->with('attribs')
              ->where('disabled', 0)
              ->when($request->route('hostname'), function ($query, $hostname) {
                  return $query->where('hostname', $hostname);
@@ -1493,22 +1494,21 @@ function list_oxidized(Illuminate\Http\Request $request)
              ->whereNotIn('type', Config::get('oxidized.ignore_types', []))
              ->whereNotIn('os', Config::get('oxidized.ignore_os', []))
              ->whereAttributeDisabled('override_Oxidized_disable')
-             ->select(['hostname', 'sysName', 'sysDescr', 'sysObjectID', 'hardware', 'os', 'ip', 'location_id', 'purpose', 'notes'])
+             ->select(['devices.device_id', 'hostname', 'sysName', 'sysDescr', 'sysObjectID', 'hardware', 'os', 'ip', 'location_id', 'purpose', 'notes'])
              ->get();
 
     /** @var Device $device */
     foreach ($devices as $device) {
-        $device['device_id'] = DeviceCache::getByHostname($device->hostname)->device_id;
         $output = [
             'hostname' => $device->hostname,
             'os' => $device->os,
             'ip' => $device->ip,
         ];
-        $custom_ssh_port = get_dev_attrib($device, 'override_device_ssh_port');
+        $custom_ssh_port = $device->getAttrib('override_device_ssh_port');
         if (! empty($custom_ssh_port)) {
             $output['ssh_port'] = $custom_ssh_port;
         }
-        $custom_telnet_port = get_dev_attrib($device, 'override_device_telnet_port');
+        $custom_telnet_port = $device->getAttrib('override_device_telnet_port');
         if (! empty($custom_telnet_port)) {
             $output['telnet_port'] = $custom_telnet_port;
         }
