@@ -22,7 +22,7 @@ class PamNssAuthorizer extends AuthorizerBase
 
         $service = Config::get('auth_pamnss_service');
 
-        $error = 0;
+        $error = '';
         if (pam_auth($username, $password, $error, true, $service)) {
             return true;
         }
