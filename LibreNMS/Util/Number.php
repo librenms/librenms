@@ -248,7 +248,7 @@ class Number
         $int_max = 4294967296;
         if ($value < 0) {
             // assume unsigned/signed issue
-            $value = $int_max + $value;
+            $value = $int_max + self::cast($value);
             if (($max !== null && $value > $max) || $value > $int_max) {
                 throw new UncorrectableNegativeException;
             }

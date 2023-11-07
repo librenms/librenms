@@ -471,16 +471,17 @@ class YamlDiscovery
                 $count++;
                 $modelAttributes = $attributes;
 
-                /** @var \LibreNMS\Device\YamlDiscoveryField $field */
+                /** @var \LibreNMS\Discovery\Yaml\YamlDiscoveryField $field */
                 foreach ($fields as $key => $field) {
                     if (! array_key_exists($key, $yamlItem)) {
                         // field not filled from yaml, use the default (if the default is empty, just pass through)
                         $field->value = $field->default ? self::replaceValues('default', $index, $count, ['default' => $field->default], $fetchedData) : $field->default;
                     } else {
                         $field->value = self::replaceValues($key, $index, $count, $yamlItem, $fetchedData);
+                        dump($field->value);
 
                         // record numeric oid for polling
-                        if ($field->oid_column) {
+                        if ( $field->oid_column && $field->value !== null) {
                             $modelAttributes[$field->oid_column] = Oid::toNumeric($yamlItem[$key]) . '.' . $index;
                         }
                     }

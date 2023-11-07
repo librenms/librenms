@@ -26,67 +26,61 @@
 namespace LibreNMS\OS\Traits;
 
 use App\Models\Mempool;
-use Illuminate\Support\Collection;
-use LibreNMS\Device\YamlDiscovery;
-use LibreNMS\Device\YamlDiscoveryField;
+use App\View\SimpleTemplate;
+use Illuminate\Support\Facades\Log;
+use LibreNMS\Discovery\Yaml\IndexField;
+use LibreNMS\Discovery\Yaml\OidField;
+use LibreNMS\Discovery\Yaml\YamlDiscoveryField;
+use LibreNMS\Discovery\YamlDiscoveryDefinition;
 use LibreNMS\Util\Oid;
 
 trait YamlMempoolsDiscovery
 {
-    private $mempoolsData = [];
-    private $mempoolsOids = [];
-    private $mempoolsFields = [
-        'total',
-        'free',
-        'used',
-        'percent_used',
-    ];
-    private $mempoolsPrefetch = [];
 
     public function discoverYamlMempools()
     {
         $mempools_yaml = $this->getDiscovery('mempools');
 
-        return YamlDiscovery::from($mempools_yaml, Mempool::class, [
-            'index' => new YamlDiscoveryField('index', 'mempool_index', '{{ $index }}'),
-            'type' => new YamlDiscoveryField('type', 'mempool_type', $this->getName()),
-            'class' => new YamlDiscoveryField('class', 'mempool_class', 'system'),
-            'precision' => new YamlDiscoveryField('precision', 'mempool_precision', 1),
-            'descr' => new YamlDiscoveryField('descr', 'mempool_descr', 'Memory', callback: fn($value) => ucwords($value)),
-            'used' => new YamlDiscoveryField('used', 'mempool_used', fetch: true, oid_column: 'mempool_used_oid'),
-            'free' => new YamlDiscoveryField('free', 'mempool_free', fetch: true), // oid filled below if appropriate
-            'total' => new YamlDiscoveryField('total', 'mempool_total', fetch: true),
-            'percent_used' => new YamlDiscoveryField('percent_used', 'mempool_prec', fetch: true),
-            'warn_percent' => new YamlDiscoveryField('warn_percent', 'mempool_perc_warn', 90),
-        ], callback: function (Mempool $mempool, $fields, $yaml, $index) {
-            // only use "free" if we have both used and total FIXME comment does not match code?
-            if ($fields['used']->value === null || $fields['total']->value === null) {
-                $mempool->mempool_free_oid =  Oid::toNumeric($yaml['free']) . '.' . $index;
-            }
-
-            $mempool->fillUsage(
-                $fields['used']->value,
-                $fields['total']->value,
-                $fields['free']->value,
-                $fields['percent_used']->value,
-            );
-        });
-        $mempools = new Collection();
-
-        foreach ($mempools_yaml['pre-cache']['oids'] ?? [] as $oid) {
-            $options = $mempools_yaml['pre-cache']['snmp_flags'] ?? '-OQUb';
-            $this->mempoolsPrefetch = snmpwalk_cache_oid($this->getDeviceArray(), $oid, $this->mempoolsPrefetch, null, null, $options);
-        }
-
-        foreach ($mempools_yaml['data'] as $yaml) {
-            $this->fetchData($yaml, $this->getDiscovery()['mib'] ?? 'ALL');
-            $snmp_data = array_replace_recursive($this->mempoolsPrefetch, $this->mempoolsData);
-
-            $count = 1;
-            foreach ($this->mempoolsData as $index => $data) {
-                if (YamlDiscovery::canSkipItem(null, $index, $yaml, [], $data)) {
-                    echo 's';
-                    continue;
+        $def = YamlDiscoveryDefinition::make(Mempool::class)
+            ->addField(new IndexField('index', 'mempool_index'))
+            ->addField(new YamlDiscoveryField('type', 'mempool_type', $this->getName()))
+            ->addField(new YamlDiscoveryField('class', 'mempool_class', 'system'))
+            ->addField(new YamlDiscoveryField('precision', 'mempool_precision', 1))
+            ->addField(new YamlDiscoveryField('descr', 'mempool_descr', 'Memory', callback: fn($value) => ucwords($value)))
+            ->addField(new OidField('used','mempool_used'))
+            ->addField(new OidField('free','mempool_free'))
+            ->addField(new OidField('total','mempool_total'))
+            ->addField(new OidField('percent_used','mempool_prec'))
+            ->addField(new YamlDiscoveryField('warn_percent', 'mempool_perc_warn', 90))
+            ->afterEach(function (Mempool $mempool, YamlDiscoveryDefinition $def, $yaml, $index) {
+                // fill numeric oid that should be polled
+                if (isset($yaml['used']) && $def->getFieldCurrentValue('used') !== null) {
+                    if (isset($yaml['used_num_oid'])) {
+                        $mempool->mempool_used_oid = SimpleTemplate::parse($yaml['used_num_oid'], ['index' => $index]);
+                    } else {
+                        Log::critical('used_num_oid should be added to the discovery yaml to increase performance');
+                        $mempool->mempool_used_oid = Oid::toNumeric($yaml['used'] . '.' . $index);
+                    }
+                    $mempool->mempool_free_oid = null;
+                    $mempool->mempool_perc_oid = null;
+                } elseif (isset($yaml['free']) && $def->getFieldCurrentValue('free') !== null) {
+                    if (isset($yaml['free_num_oid'])) {
+                        $mempool->mempool_free_oid = SimpleTemplate::parse($yaml['free_num_oid'], ['index' => $index]);
+                    } else {
+                        Log::critical('free_num_oid should be added to the discovery yaml to increase performance');
+                        $mempool->mempool_free_oid = Oid::toNumeric($yaml['free'] . '.' . $index);
+                    }
+                    $mempool->mempool_used_oid = null;
+                    $mempool->mempool_perc_oid = null;
+                } elseif (isset($yaml['percent_used']) && $def->getFieldCurrentValue('percent_used') !== null) {
+                    if (isset($yaml['percent_used_num_oid'])) {
+                        $mempool->mempool_perc_oid = SimpleTemplate::parse($yaml['percent_used_num_oid'], ['index' => $index]);
+                    } else {
+                        Log::critical('percent_used_num_oid should be added to the discovery yaml to increase performance');
+                        $mempool->mempool_perc_oid = Oid::toNumeric($yaml['percent_used'] . '.' . $index);
+                    }
+                    $mempool->mempool_used_oid = null;
+                    $mempool->mempool_free_oid = null;
                 }
 
                 $used = $this->getData('used', $index, $yaml);
@@ -106,16 +100,17 @@ trait YamlMempoolsDiscovery
                     $total,
                     $this->getData('free', $index, $yaml),
                     $this->getData('percent_used', $index, $yaml)
+
+                $fields = $def->getFields();
+                $mempool->fillUsage(
+                    $fields['used']->value,
+                    $fields['total']->value,
+                    $fields['free']->value,
+                    $fields['percent_used']->value,
                 );
+            });
 
-                if ($mempool->mempool_total) {
-                    $mempools->push($mempool);
-                    $count++;
-                }
-            }
-        }
-
-        return $mempools;
+        return $def->discover($mempools_yaml);
     }
 
     private function getData($field, $index, $yaml)
@@ -143,37 +138,5 @@ trait YamlMempoolsDiscovery
         }
 
         return null;
-    }
-
-    /**
-     * @param  array  $yaml  item yaml definition
-     * @param  string  $mib
-     *
-     * @throws \LibreNMS\Exceptions\InvalidOidException
-     */
-    private function fetchData($yaml, $mib)
-    {
-        $this->mempoolsOids = [];
-        $this->mempoolsData = []; // clear data from previous mempools
-        $options = $yaml['snmp_flags'] ?? '-OQUb';
-
-        if (isset($yaml['oid'])) {
-            $this->mempoolsData = snmpwalk_cache_oid($this->getDeviceArray(), $yaml['oid'], $this->mempoolsData, null, null, $options);
-        }
-
-        foreach ($this->mempoolsFields as $field) {
-            if (isset($yaml[$field]) && ! is_numeric($yaml[$field])) { // allow for hard-coded values
-                $oid = $yaml[$field];
-                if (Oid::of($oid)->isNumeric()) { // if numeric oid, it is not a table, just fetch it
-                    $this->mempoolsData[0][$oid] = snmp_get($this->getDeviceArray(), $oid, '-Oqv');
-                    continue;
-                }
-
-                if (empty($yaml['oid'])) { // if table given, skip individual oids
-                    $this->mempoolsData = snmpwalk_cache_oid($this->getDeviceArray(), $oid, $this->mempoolsData, null, null, $options);
-                }
-                $this->mempoolsOids[$field] = Oid::of($oid)->toNumeric($mib);
-            }
-        }
     }
 }

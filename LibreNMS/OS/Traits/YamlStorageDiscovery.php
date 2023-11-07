@@ -28,7 +28,7 @@ namespace LibreNMS\OS\Traits;
 use App\Models\Storage;
 use Illuminate\Support\Collection;
 use LibreNMS\Device\YamlDiscovery;
-use LibreNMS\Device\YamlDiscoveryField;
+use LibreNMS\Discovery\Yaml\YamlDiscoveryField;
 
 trait YamlStorageDiscovery
 {

@@ -1,6 +1,6 @@
 <?php
 /*
- * DiscoveryItem.php
+ * OidField.php
  *
  * -Description-
  *
@@ -23,18 +23,32 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace LibreNMS\Device;
+namespace LibreNMS\Discovery\Yaml;
 
-class YamlDiscoveryField
+class NumericOidField extends YamlDiscoveryField
 {
-    public mixed $value = null;
+    private $required;
 
-    public function __construct(
-        public readonly string    $key,
-        public readonly ?string   $model_column = null,
-        public readonly ?string   $default = null,
-        public readonly bool      $fetch = false,
-        public readonly ?string   $oid_column = null,
-        public readonly ?\Closure $callback = null,
-    ) {}
+    /**
+     * @param string $key
+     * @param string|null $model_column
+     * @param string|null $default
+     * @param callable|null $callback
+     * @param callable|bool $required
+     */
+    public function __construct(string $key, ?string $model_column = null, ?string $default = null, $callback = null, callable|bool $required = false)
+    {
+        parent::__construct($key, $model_column, $default, $callback);
+
+        $this->required = $required;
+    }
+
+    public function isRequired()
+    {
+        if (is_callable($this->required)) {
+            return call_user_func($this->required);
+        }
+
+        return $this->required;
+    }
 }
