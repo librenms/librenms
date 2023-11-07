@@ -391,6 +391,13 @@
             },
             "type": "array"
         },
+        "auth.allow_get_login": {
+            "group": "auth",
+            "section": "general",
+            "order": 24,
+            "type": "boolean",
+            "default": false
+        },
         "auth.socialite.redirect": {
             "group": "auth",
             "section": "socialite",
