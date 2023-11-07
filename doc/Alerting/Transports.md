@@ -367,8 +367,8 @@ The config fields that need to set for webhooks are: Jira Open URL, Jira Close U
 | ------ | ------- |
 | Project Key | JIRAPROJECTKEY |
 | Issue Type | Myissuetype |
-| Open URL | <https://myjira.mysite.com> |
-| Close URL | *<https://myjira.mysite.com>* |
+| Open URL | <https://myjira.mysite.com> /  <https://webhook-open-url> |
+| Close URL | <https://webhook-close-url>  |
 | Jira Username | myjirauser |
 | Jira Password | myjirapass |
 | Enable webhook | ON/OFF |
