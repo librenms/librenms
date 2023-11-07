@@ -22,13 +22,8 @@ class PamNssAuthorizer extends AuthorizerBase
 
         $service = Config::get('auth_pamnss_service');
 
-        $error = '';
-        if (pam_auth($username, $password, $error, true, $service)) {
+        if (pam_auth($username, $password, null, true, $service)) {
             return true;
-        }
-
-        if ($error) {
-            throw new AuthenticationException('Failed to auth "' . $credentials['username'] . '" using service "' . $service . '"');
         }
 
         throw new AuthenticationException();
