@@ -23,7 +23,7 @@ use LibreNMS\Util\Http;
 class Jira extends Transport
 {
     protected string $name = 'Jira';
-    
+
     public function deliverAlert(array $alert_data): bool
     {
         $webhook_on = $this->config['enable-webhook'];
@@ -32,12 +32,12 @@ class Jira extends Transport
         if ($alert_data['state'] != 0) {
             $url = $this->config['jira-ticket-open'];
             // If webhooks are not enabled, append the API endpoint
-            if (!$webhook_on) {
+            if (! $webhook_on) {
                 $url .= '/rest/api/latest/issue';
             }
-        // Messsage is a recovery
+            // Messsage is a recovery
         } else {
-            if (!$webhook_on) {
+            if (! $webhook_on) {
                 return false; // Webhooks not enabled, do nothing.
             } else {
                 $url = $this->config['jira-ticket-close'];
@@ -49,7 +49,7 @@ class Jira extends Transport
         $title = empty($alert_data['title']) ? 'Librenms alert for: ' . $alert_data['hostname'] : $alert_data['title'];
         $description = $alert_data['msg'];
 
-         // Construct the payload
+        // Construct the payload
         $data = [
             'fields' => [
                 'summary' => $title,
