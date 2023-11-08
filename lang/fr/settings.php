@@ -184,10 +184,6 @@ return [
             'description' => 'Autoriser l\'accès aux graphes pour les réseaux suivants sans login',
             'help' => '(ne s\'applique pas si l\'accès sans login est déjà permis)',
         ],
-        'api_demo' => [
-            'description' => 'Ceci est la démo',
-            'help' => 'Démo',
-        ],
         'apps' => [
             'powerdns-recursor' => [
                 'api-key' => [
