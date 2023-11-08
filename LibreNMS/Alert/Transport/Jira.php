@@ -30,8 +30,8 @@ class Jira extends Transport
 
         // Check if messsage is an alert or not
         if ($alert_data['state'] != 0) {
-            $url = $this->config['jira-ticket-open'];
-            // If webhooks are not enabled, append the API endpoint
+            $url = $this->config['jira-url'];
+            // If webhooks are not enabled, append the API info
             if (! $webhook_on) {
                 $url .= '/rest/api/latest/issue';
             }
@@ -40,7 +40,7 @@ class Jira extends Transport
             if (! $webhook_on) {
                 return false; // Webhooks not enabled, do nothing.
             } else {
-                $url = $this->config['jira-ticket-close'];
+                $url = $this->config['jira-close-url'];
             }
         }
 
@@ -107,13 +107,13 @@ class Jira extends Transport
                 ],
                 [
                     'title' => 'Open Ticket URL',
-                    'name' => 'jira-ticket-open',
+                    'name' => 'jira-url',
                     'descr' => 'Create Jira Ticket',
                     'type' => 'text',
                 ],
                 [
                     'title' => 'Close Ticket URL',
-                    'name' => 'jira-ticket-close',
+                    'name' => 'jira-close-url',
                     'descr' => 'Close Jira Ticket | Webhook Only"',
                     'type' => 'text',
                 ],
@@ -151,8 +151,8 @@ class Jira extends Transport
             ],
             'validation' => [
                 'jira-key' => 'required|string',
-                'jira-ticket-open' => 'required|url',
-                'jira-ticket-close' => 'nullable|url',
+                'jira-url' => 'required|url',
+                'jira-close-url' => 'nullable|url',
                 'webhook-id' => 'nullable|string',
                 'jira-type' => 'required|string',
                 'jira-username' => 'required|string',
