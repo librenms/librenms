@@ -237,9 +237,6 @@ return [
                 ],
             ],
         ],
-        'api_demo' => [
-            'description' => 'Це демо',
-        ],
         'apps' => [
             'powerdns-recursor' => [
                 'api-key' => [
