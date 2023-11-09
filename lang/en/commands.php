@@ -120,6 +120,7 @@ return [
             'db_connect' => 'Failed to connect to database. Verify database service is running and connection settings.',
             'db_auth' => 'Failed to connect to database. Verify credentials: :error',
             'no_devices' => 'No devices found matching your given device specification.',
+            'none_up' => 'Device was down, unable to poll.|All devices were down, unable to poll.',
             'none_polled' => 'No devices were polled.',
         ],
         'polled' => 'Polled :count devices in :time',
@@ -193,6 +194,20 @@ return [
         'enabled' => ':count plugin enabled|:count plugins enabled',
         'failed' => 'Failed to enable plugin(s)',
     ],
+    'report:devices' => [
+        'description' => 'Print out data from devices',
+        'columns' => 'Database columns:',
+        'synthetic' => 'Additional fields:',
+        'counts' => 'Relationship counts:',
+        'arguments' => [
+            'device spec' => 'Device spec to poll: device_id, hostname, wildcard (*), odd, even, all',
+        ],
+        'options' => [
+            'list-fields' => 'Print out a list of valid fields',
+            'fields' => 'A comma seperated list of fields to display. Valid options: device column names from the database, relationship counts (ports_count), and/or displayName',
+            'output' => 'Output format to display the data :types',
+        ],
+    ],
     'smokeping:generate' => [
         'args-nonsense' => 'Use one of --probes and --targets',
         'config-insufficient' => 'In order to generate a smokeping configuration, you must have set "smokeping.probes", "fping", and "fping6" set in your configuration',
@@ -215,7 +230,7 @@ return [
     'snmp:fetch' => [
         'description' => 'Run snmp query against a device',
         'arguments' => [
-            'device spec' => 'Device to query: device_id, hostname/ip, hostname regex, or all',
+            'device spec' => 'Device spec to poll: device_id, hostname, wildcard (*), odd, even, all',
             'oid(s)' => 'One or more SNMP OID to fetch.  Should be either MIB::oid or a numeric oid',
         ],
         'failed' => 'SNMP command failed!',

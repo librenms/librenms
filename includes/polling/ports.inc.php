@@ -4,6 +4,7 @@ use LibreNMS\Config;
 use LibreNMS\Enum\PortAssociationMode;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Debug;
+use LibreNMS\Util\Mac;
 use LibreNMS\Util\Number;
 
 // Build SNMP Cache Array
@@ -578,7 +579,7 @@ foreach ($ports as $port) {
             $this_port['ifName'] = $matches[1];
         }
 
-        $polled_period = ($polled - $port['poll_time']);
+        $polled_period = max($polled - $port['poll_time'], 1);
 
         $port['update'] = [];
         $port['update_extended'] = [];
@@ -589,9 +590,8 @@ foreach ($ports as $port) {
         }
 
         // rewrite the ifPhysAddress
-        if (strpos($this_port['ifPhysAddress'] ?? '', ':')) {
-            $mac_split = explode(':', $this_port['ifPhysAddress']);
-            $this_port['ifPhysAddress'] = zeropad($mac_split[0]) . zeropad($mac_split[1]) . zeropad($mac_split[2]) . zeropad($mac_split[3]) . zeropad($mac_split[4] ?? '') . zeropad($mac_split[5] ?? '');
+        if (isset($this_port['ifPhysAddress'])) {
+            $this_port['ifPhysAddress'] = Mac::parse($this_port['ifPhysAddress'])->hex();
         }
 
         // use HC values if they are available
@@ -613,7 +613,8 @@ foreach ($ports as $port) {
 
         if (isset($this_port['ifHighSpeed']) && is_numeric($this_port['ifHighSpeed'])) {
             d_echo("ifHighSpeed ({$this_port['ifHighSpeed']}) ");
-            $this_port['ifSpeed'] = $this_port['ifHighSpeed'] . '000000'; // * 1000000, but handle in sql
+            $this_port['ifSpeed'] = $this_port['ifHighSpeed'] == '0' ? 0
+                : $this_port['ifHighSpeed'] . '000000'; // * 1000000, but handle in sql
         } elseif (isset($this_port['ifSpeed']) && is_numeric($this_port['ifSpeed'])) {
             d_echo("ifSpeed ({$this_port['ifSpeed']}) ");
         } else {
@@ -917,12 +918,6 @@ foreach ($ports as $port) {
 
             if ($device['os'] == 'ios' || $device['os'] == 'iosxe') {
                 include 'ports/cisco-if-extension.inc.php';
-            }
-        }
-
-        foreach ($port['update'] as $key => $val_check) {
-            if (! isset($val_check)) {
-                unset($port['update'][$key]);
             }
         }
 

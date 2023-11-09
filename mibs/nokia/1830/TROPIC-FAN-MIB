@@ -1,0 +1,245 @@
+TROPIC-FAN-MIB DEFINITIONS ::= BEGIN
+
+-- (c) Copyright 2023 Nokia Networks.  All rights reserved.
+-- This software is the confidential and proprietary property of
+-- Nokia and may only be used in accordance with the terms of the
+-- license agreement provided with this software.
+
+IMPORTS
+      SnmpAdminString                         FROM SNMP-FRAMEWORK-MIB
+      OBJECT-TYPE, MODULE-IDENTITY,
+      Integer32                               FROM SNMPv2-SMI
+      MODULE-COMPLIANCE, OBJECT-GROUP         FROM SNMPv2-CONF
+      TropicCardCLEI,
+      TropicCardHFD,
+      TropicCardSerialNumber,
+      TropicCardManufacturingPartNumber,
+      TropicCardMarketingPartNumber,
+      TropicCardSWGenericLoadName,
+      TropicLEDColorType,
+      TropicLEDStateType                      FROM TROPIC-TC
+      tnShelfIndex                            FROM TROPIC-SHELF-MIB
+      tnSlotIndex                             FROM TROPIC-SLOT-MIB
+      tnMiscModules, tnFanMIB                 FROM TROPIC-GLOBAL-REG;
+
+  tnFanMibModule MODULE-IDENTITY
+      LAST-UPDATED    "201802231200Z"
+      ORGANIZATION    "Nokia"
+      CONTACT-INFO    "Nokia
+                       Attn: Jeff Donnelly
+                       600 Mountain Avenue
+                       New Providence, NJ 07974
+
+                       Phone: +1 732 221 6408
+                       Email: jeff.donnelly@nokia.com"
+
+      DESCRIPTION "The fan MIB."
+
+      REVISION    "201802231200Z"
+      DESCRIPTION "Updated the contact info."
+
+      REVISION    "201611161200Z"
+      DESCRIPTION "Updated the contact info."
+
+      REVISION    "201305211200Z"
+      DESCRIPTION "Marked the following as obsolete:
+                   tnFanEvents
+                   tnFanTable."
+
+      REVISION    "201002161200Z"
+      DESCRIPTION "Added tnFanUnitSpeedControl to tnFanUnitTable."
+
+      REVISION    "200803201200Z"
+      DESCRIPTION "1) Updated the MIB file description.
+                   2) Renamed the Fan Unit 1 table to the Fan Unit table."
+
+      ::= { tnMiscModules 1 }
+
+  tnFanConf        OBJECT IDENTIFIER ::= { tnFanMIB 1 }
+  tnFanGroups      OBJECT IDENTIFIER ::= { tnFanConf 1 }
+  tnFanCompliances OBJECT IDENTIFIER ::= { tnFanConf 2 }
+  tnFanObjs        OBJECT IDENTIFIER ::= { tnFanMIB 2 }
+  tnFanBasics      OBJECT IDENTIFIER ::= { tnFanObjs 1 }
+--  obsolete
+--  tnFanEvents      OBJECT IDENTIFIER ::= { tnFanMIB 3 }
+
+--------------------------------------------------------------------------------
+-- Fan Table
+--------------------------------------------------------------------------------
+--    obsolete
+--    tnFanTable OBJECT-TYPE ::= { tnFanBasics 1 }
+
+--------------------------------------------------------------------------------
+-- Fan Unit Table
+--------------------------------------------------------------------------------
+    tnFanUnitTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnFanUnitEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnFanBasics 2 }
+
+    tnFanUnitEntry OBJECT-TYPE
+        SYNTAX         TnFanUnitEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { tnShelfIndex,
+                tnSlotIndex }
+        ::= { tnFanUnitTable 1 }
+
+    TnFanUnitEntry ::= SEQUENCE {
+        tnFanUnitName                    SnmpAdminString,
+        tnFanUnitDescr                   SnmpAdminString,
+        tnFanUnitCLEI                    TropicCardCLEI,
+        tnFanUnitHFD                     TropicCardHFD,
+        tnFanUnitSerialNumber            TropicCardSerialNumber,
+        tnFanUnitManufacturingPartNumber TropicCardManufacturingPartNumber,
+        tnFanUnitMarketingPartNumber     TropicCardMarketingPartNumber,
+        tnFanUnitSWGenericLoadName       TropicCardSWGenericLoadName,
+        tnFanUnitPower                   Integer32,
+        tnFanUnitSpeed                   Integer32,
+        tnFanUnitStatusLEDColor          TropicLEDColorType,
+        tnFanUnitStatusLEDState          TropicLEDStateType,
+        tnFanUnitSpeedControl            INTEGER
+    }
+
+    tnFanUnitName OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..31))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnFanUnitEntry 1 }
+
+    tnFanUnitDescr OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..255))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnFanUnitEntry 2 }
+
+    tnFanUnitCLEI OBJECT-TYPE
+        SYNTAX         TropicCardCLEI
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnFanUnitEntry 3 }
+
+    tnFanUnitHFD OBJECT-TYPE
+        SYNTAX         TropicCardHFD
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnFanUnitEntry 4 }
+
+    tnFanUnitSerialNumber OBJECT-TYPE
+        SYNTAX         TropicCardSerialNumber
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnFanUnitEntry 5 }
+
+    tnFanUnitManufacturingPartNumber OBJECT-TYPE
+        SYNTAX         TropicCardManufacturingPartNumber
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnFanUnitEntry 6 }
+
+    tnFanUnitMarketingPartNumber OBJECT-TYPE
+        SYNTAX         TropicCardMarketingPartNumber
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnFanUnitEntry 7 }
+
+    tnFanUnitSWGenericLoadName OBJECT-TYPE
+        SYNTAX         TropicCardSWGenericLoadName
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The SW generic load currently active."
+        ::= { tnFanUnitEntry 8 }
+
+    tnFanUnitPower OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The power level being fed into the fan units.
+                        The range is 1 to 10, with 10 being the maximum
+                        power."
+        ::= { tnFanUnitEntry 9 }
+
+    tnFanUnitSpeed OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "RPM"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Fan speed."
+        ::= { tnFanUnitEntry 10 }
+
+    tnFanUnitStatusLEDColor OBJECT-TYPE
+        SYNTAX         TropicLEDColorType
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The color of the status LED."
+        ::= { tnFanUnitEntry 11 }
+
+    tnFanUnitStatusLEDState OBJECT-TYPE
+        SYNTAX         TropicLEDStateType
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The state of the status LED."
+        ::= { tnFanUnitEntry 12 }
+
+    tnFanUnitSpeedControl OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         normal(1),
+                         maximum(2)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Fan speed control."
+        DEFVAL         { normal }
+        ::= { tnFanUnitEntry 13 }
+
+--------------------------------------------------------------------------------
+-- Conformance Group Definitions
+--------------------------------------------------------------------------------
+--    obsolete
+--    tnFanGroup  OBJECT-GROUP ::= { tnFanGroups 1 }
+
+    tnFanUnitGroup  OBJECT-GROUP
+        OBJECTS {
+            tnFanUnitName,
+            tnFanUnitDescr,
+            tnFanUnitCLEI,
+            tnFanUnitHFD,
+            tnFanUnitSerialNumber,
+            tnFanUnitManufacturingPartNumber,
+            tnFanUnitMarketingPartNumber,
+            tnFanUnitSWGenericLoadName,
+            tnFanUnitPower,
+            tnFanUnitSpeed,
+            tnFanUnitStatusLEDColor,
+            tnFanUnitStatusLEDState,
+            tnFanUnitSpeedControl
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnFanGroups 2 }
+
+--------------------------------------------------------------------------------
+-- Compliance Statements (mandatory)
+--------------------------------------------------------------------------------
+    tnFanCompliance MODULE-COMPLIANCE
+        STATUS         current
+        DESCRIPTION    "."
+        MODULE
+        MANDATORY-GROUPS {
+--            obsolete
+--            tnFanGroup,
+            tnFanUnitGroup
+        }
+        ::= { tnFanCompliances 1 }
+
+END -- DEFINITION OF TROPIC-FAN-MIB

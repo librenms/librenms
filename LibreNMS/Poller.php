@@ -32,11 +32,10 @@ use App\Models\Eventlog;
 use App\Polling\Measure\Measurement;
 use App\Polling\Measure\MeasurementManager;
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
 use LibreNMS\Enum\Severity;
-use LibreNMS\Exceptions\PollerException;
 use LibreNMS\Polling\ConnectivityHelper;
+use LibreNMS\Polling\Result;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Dns;
@@ -77,9 +76,9 @@ class Poller
         $this->parseModules();
     }
 
-    public function poll(): int
+    public function poll(): Result
     {
-        $polled = 0;
+        $results = new Result;
         $this->printHeader();
 
         if (Debug::isEnabled() && ! defined('PHPUNIT_RUNNING')) {
@@ -88,7 +87,8 @@ class Poller
 
         $this->logger->info("Starting polling run:\n");
 
-        foreach ($this->buildDeviceQuery()->pluck('device_id') as $device_id) {
+        foreach (Device::whereDeviceSpec($this->device_spec)->pluck('device_id') as $device_id) {
+            $results->markAttempted();
             $this->initDevice($device_id);
             PollingDevice::dispatch($this->device);
             $this->os = OS::make($this->deviceArray);
@@ -104,33 +104,26 @@ class Poller
 
             $measurement->end();
 
+            // if modules are not overridden, record performance
             if (empty($this->module_override)) {
-                // record performance
-                $measurement->manager()->record('device', $measurement);
-                $this->device->last_polled = Carbon::now();
-                $this->device->last_polled_timetaken = $measurement->getDuration();
-                app('Datastore')->put($this->deviceArray, 'poller-perf', [
-                    'rrd_def' => RrdDefinition::make()->addDataset('poller', 'GAUGE', 0),
-                    'module' => 'ALL',
-                ], [
-                    'poller' => $measurement->getDuration(),
-                ]);
-                $this->os->enableGraph('poller_perf');
+                if ($this->device->status) {
+                    $this->recordPerformance($measurement);
+                }
 
                 if ($helper->canPing()) {
                     $this->os->enableGraph('ping_perf');
                 }
 
-                $this->os->persistGraphs();
+                $this->os->persistGraphs($this->device->status); // save graphs but don't delete any if device is down
                 $this->logger->info(sprintf("Enabled graphs (%s): %s\n\n",
                     $this->device->graphs->count(),
                     $this->device->graphs->pluck('graph')->implode(' ')
                 ));
             }
 
+            // finalize the device poll
             $this->device->save();
-            $polled++;
-
+            $results->markCompleted($this->device->status);
             DevicePolled::dispatch($this->device);
 
             $this->logger->info(sprintf("\n>>> Polled %s (%s) in %0.3f seconds <<<",
@@ -144,20 +137,12 @@ class Poller
 
             // check if the poll took too long and log an event
             if ($measurement->getDuration() > Config::get('rrd.step')) {
-                \App\Models\Eventlog::log('Polling took longer than ' . round(Config::get('rrd.step') / 60, 2) .
+                Eventlog::log('Polling took longer than ' . round(Config::get('rrd.step') / 60, 2) .
                     ' minutes!  This will cause gaps in graphs.', $this->device, 'system', Severity::Error);
             }
         }
 
-        return $polled;
-    }
-
-    /**
-     * Get the total number of devices to poll.
-     */
-    public function totalDevices(): int
-    {
-        return $this->buildDeviceQuery()->count();
+        return $results;
     }
 
     private function pollModules(): void
@@ -175,7 +160,7 @@ class Poller
         $datastore = app('Datastore');
 
         foreach (array_keys(Config::get('poller_modules')) as $module) {
-            $module_status = Module::status($module, $this->device, $this->isModuleManuallyEnabled($module));
+            $module_status = Module::pollingStatus($module, $this->device, $this->isModuleManuallyEnabled($module));
             $should_poll = false;
             $start_memory = memory_get_usage();
             $module_start = microtime(true);
@@ -193,7 +178,7 @@ class Poller
             } catch (Throwable $e) {
                 // isolate module exceptions so they don't disrupt the polling process
                 $this->logger->error("%rError polling $module module for {$this->device->hostname}.%n $e", ['color' => true]);
-                \App\Models\Eventlog::log("Error polling $module module. Check log file for more details.", $this->device, 'poller', Severity::Error);
+                Eventlog::log("Error polling $module module. Check log file for more details.", $this->device, 'poller', Severity::Error);
                 report($e);
             }
 
@@ -239,32 +224,11 @@ class Poller
         return false;
     }
 
-    private function buildDeviceQuery(): Builder
-    {
-        $query = Device::query();
-
-        if (empty($this->device_spec)) {
-            throw new PollerException('Invalid device spec');
-        } elseif ($this->device_spec == 'all') {
-            return $query;
-        } elseif ($this->device_spec == 'even') {
-            return $query->whereRaw('device_id % 2 = 0');
-        } elseif ($this->device_spec == 'odd') {
-            return $query->whereRaw('device_id % 2 = 1');
-        } elseif (is_numeric($this->device_spec)) {
-            return $query->where('device_id', $this->device_spec);
-        } elseif (Str::contains($this->device_spec, '*')) {
-            return $query->where('hostname', 'like', str_replace('*', '%', $this->device_spec));
-        }
-
-        return $query->where('hostname', $this->device_spec);
-    }
-
     private function initDevice(int $device_id): void
     {
         \DeviceCache::setPrimary($device_id);
         $this->device = \DeviceCache::getPrimary();
-        $this->device->ip = $this->device->overwrite_ip ?: Dns::lookupIp($this->device);
+        $this->device->ip = $this->device->overwrite_ip ?: Dns::lookupIp($this->device) ?: $this->device->ip;
 
         $this->deviceArray = $this->device->toArray();
         if ($os_group = Config::get("os.{$this->device->os}.group")) {
@@ -278,7 +242,7 @@ class Poller
     private function initRrdDirectory(): void
     {
         $host_rrd = \Rrd::name($this->device->hostname, '', '');
-        if (Config::get('rrd.enable', true) && ! Config::get('rrdcached') && ! is_dir($host_rrd)) {
+        if (Config::get('rrd.enable', true) && ! is_dir($host_rrd)) {
             try {
                 mkdir($host_rrd);
                 $this->logger->info("Created directory : $host_rrd");
@@ -300,7 +264,7 @@ class Poller
                 Config::set("poller_submodules.$module", $existing_submodules);
             }
 
-            if (! Module::exists($module)) {
+            if (! Module::exists($module) && ! Module::legacyPollingExists($module)) {
                 unset($this->module_override[$index]);
                 continue;
             }
@@ -338,5 +302,21 @@ EOH, $this->device->hostname, $group ? " ($group)" : '', $this->device->device_i
         if (Debug::isEnabled() || Debug::isVerbose()) {
             $this->logger->info(Version::get()->header());
         }
+    }
+
+    private function recordPerformance(Measurement $measurement): void
+    {
+        $measurement->manager()->record('device', $measurement);
+        $this->device->last_polled = Carbon::now();
+        $this->device->last_polled_timetaken = $measurement->getDuration();
+
+        app('Datastore')->put($this->deviceArray, 'poller-perf', [
+            'rrd_def' => RrdDefinition::make()->addDataset('poller', 'GAUGE', 0),
+            'module' => 'ALL',
+        ], [
+            'poller' => $this->device->last_polled_timetaken,
+        ]);
+
+        $this->os->enableGraph('poller_perf');
     }
 }

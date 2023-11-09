@@ -391,6 +391,13 @@
             },
             "type": "array"
         },
+        "auth.allow_get_login": {
+            "group": "auth",
+            "section": "general",
+            "order": 24,
+            "type": "boolean",
+            "default": false
+        },
         "auth.socialite.redirect": {
             "group": "auth",
             "section": "socialite",
@@ -500,7 +507,7 @@
             "order": 1,
             "type": "text",
             "validate": {
-                "value": "regex:#(ldaps?://[\\w.]+\\s+)+#"
+                "value": ["regex:#^ldaps?://([-0-9a-zA-Z_.]+|\\[[a-fA-F0-9:]{3,39}\\])(\\s+ldaps?://([-0-9a-zA-Z_.]+|\\[[a-fA-F0-9:]{3,39}\\]))*$#"]
             }
         },
         "auth_ad_require_groupmembership": {
@@ -562,6 +569,20 @@
             "order": 21,
             "type": "boolean"
         },
+        "auth_ldap_cacertfile": {
+            "group": "auth",
+            "section": "ldap",
+            "order": 22,
+            "type": "text"
+        },
+        "auth_ldap_ignorecert": {
+            "default": false,
+            "group": "auth",
+            "section": "ldap",
+            "order": 23,
+            "type": "boolean"
+        },
+
         "auth_ldap_emailattr": {
             "default": "mail",
             "group": "auth",
@@ -4719,12 +4740,9 @@
         "plugin_dir": {
             "type": "directory"
         },
-        "poller_modules.core": {
-            "default": true,
+        "plugins.show_errors": {
             "type": "boolean",
-            "validate": {
-                "value": "boolean|accepted"
-            }
+            "default": false
         },
         "poller_modules.unix-agent": {
             "order": 420,
@@ -4732,6 +4750,13 @@
             "section": "poller_modules",
             "default": false,
             "type": "boolean"
+        },
+        "poller_modules.core": {
+            "default": true,
+            "type": "boolean",
+            "validate": {
+                "value": "boolean|accepted"
+            }
         },
         "poller_modules.os": {
             "order": 320,

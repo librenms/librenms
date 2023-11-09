@@ -73,6 +73,11 @@ class SnmpQueryMock implements SnmpQueryInterface
         return $this;
     }
 
+    public function cache(): SnmpQueryInterface
+    {
+        return $this; // ignore, always cached
+    }
+
     public function context(string $context): SnmpQueryInterface
     {
         $this->context = $context;
@@ -113,6 +118,14 @@ class SnmpQueryMock implements SnmpQueryInterface
     public function numeric(bool $numeric = true): SnmpQueryInterface
     {
         $this->numeric = $numeric;
+
+        return $this;
+    }
+
+    public function numericIndex(bool $numericIndex = true): SnmpQueryInterface
+    {
+        // TODO: Implement numericIndex() method
+        Log::error('numericIndex not implemented in SnmpQueryMock');
 
         return $this;
     }

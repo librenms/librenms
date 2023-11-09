@@ -266,6 +266,10 @@ return [
             'description' => 'Key to hold cache of autonomous systems descriptions',
         ],
         'auth' => [
+            'allow_get_login' => [
+                'description' => 'Allow get login (Insecure)',
+                'help' => 'Allow login by putting username and password variables in the url get request, useful for display systems where you cannot interactively log in. This is considered insecure because the password will be shown in logs and logins are not rate limited so it could open you up to brute force attacks.',
+            ],
             'socialite' => [
                 'redirect' => [
                     'description' => 'Redirect Login page',
@@ -361,6 +365,14 @@ return [
         'auth_ldap_debug' => [
             'description' => 'Show debug',
             'help' => 'Shows debug information.  May expose private information, do not leave enabled.',
+        ],
+        'auth_ldap_cacertfile' => [
+            'description' => 'Override system TLS CA Cert',
+            'help' => 'Use supplied CA Cert for LDAPS.',
+        ],
+        'auth_ldap_ignorecert' => [
+            'description' => 'Do not require valid Cert',
+            'help' => 'Do not require a valid TLS Cert for LDAPS.',
         ],
         'auth_ldap_emailattr' => [
             'description' => 'Mail attribute',
@@ -1125,9 +1137,6 @@ return [
             ],
             'ucd-diskio' => [
                 'description' => 'UCD DiskIO',
-            ],
-            'wifi' => [
-                'description' => 'Wifi',
             ],
             'wireless' => [
                 'description' => 'Wireless',

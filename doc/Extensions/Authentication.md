@@ -227,6 +227,8 @@ same version as PHP.
     lnms config:set auth_ldap_userdn true
     lnms config:set auth_ldap_userlist_filter service=informatique
     lnms config:set auth_ldap_wildcard_ou false
+    lnms config:set auth_ldap_cacertfile /opt/librenms/ldap-ca-cert
+    lnms config:set auth_ldap_ignorecert false
     ```
 
 ### LDAP bind user (optional)

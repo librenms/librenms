@@ -1098,90 +1098,6 @@
                     "mempool_class": "buffers",
                     "mempool_precision": 1024,
                     "mempool_descr": "Memory buffers",
-                    "mempool_perc": 99,
-                    "mempool_perc_oid": null,
-                    "mempool_used": 4096655360,
-                    "mempool_used_oid": ".1.3.6.1.4.1.2021.4.14.0",
-                    "mempool_free": 21790720,
-                    "mempool_free_oid": null,
-                    "mempool_total": 4118446080,
-                    "mempool_total_oid": null,
-                    "mempool_largestfree": null,
-                    "mempool_lowestfree": null,
-                    "mempool_deleted": 0,
-                    "mempool_perc_warn": null
-                },
-                {
-                    "mempool_index": "4",
-                    "entPhysicalIndex": null,
-                    "mempool_type": "ucd",
-                    "mempool_class": "cached",
-                    "mempool_precision": 1024,
-                    "mempool_descr": "Cached memory",
-                    "mempool_perc": 67,
-                    "mempool_perc_oid": null,
-                    "mempool_used": 2741809152,
-                    "mempool_used_oid": ".1.3.6.1.4.1.2021.4.15.0",
-                    "mempool_free": 1376636928,
-                    "mempool_free_oid": null,
-                    "mempool_total": 4118446080,
-                    "mempool_total_oid": null,
-                    "mempool_largestfree": null,
-                    "mempool_lowestfree": null,
-                    "mempool_deleted": 0,
-                    "mempool_perc_warn": null
-                }
-            ]
-        },
-        "poller": {
-            "mempools": [
-                {
-                    "mempool_index": "1",
-                    "entPhysicalIndex": null,
-                    "mempool_type": "ucd",
-                    "mempool_class": "system",
-                    "mempool_precision": 1024,
-                    "mempool_descr": "Physical memory",
-                    "mempool_perc": 46,
-                    "mempool_perc_oid": null,
-                    "mempool_used": 1885573120,
-                    "mempool_used_oid": null,
-                    "mempool_free": 2232872960,
-                    "mempool_free_oid": ".1.3.6.1.4.1.2021.4.6.0",
-                    "mempool_total": 4118446080,
-                    "mempool_total_oid": null,
-                    "mempool_largestfree": null,
-                    "mempool_lowestfree": null,
-                    "mempool_deleted": 0,
-                    "mempool_perc_warn": null
-                },
-                {
-                    "mempool_index": "2",
-                    "entPhysicalIndex": null,
-                    "mempool_type": "ucd",
-                    "mempool_class": "swap",
-                    "mempool_precision": 1024,
-                    "mempool_descr": "Swap space",
-                    "mempool_perc": 25,
-                    "mempool_perc_oid": null,
-                    "mempool_used": 1087750144,
-                    "mempool_used_oid": null,
-                    "mempool_free": 3205771264,
-                    "mempool_free_oid": ".1.3.6.1.4.1.2021.4.4.0",
-                    "mempool_total": 4293521408,
-                    "mempool_total_oid": null,
-                    "mempool_largestfree": null,
-                    "mempool_lowestfree": null,
-                    "mempool_deleted": 0,
-                    "mempool_perc_warn": null
-                },
-                {
-                    "mempool_index": "3",
-                    "entPhysicalIndex": null,
-                    "mempool_type": "ucd",
-                    "mempool_class": "buffers",
-                    "mempool_precision": 1024,
-                    "mempool_descr": "Memory buffers",
                     "mempool_perc": 1,
                     "mempool_perc_oid": null,
                     "mempool_used": 21790720,
@@ -1216,6 +1132,7 @@
                     "mempool_perc_warn": null
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     }
 }

@@ -26,14 +26,14 @@
 namespace App\Plugins\Hooks;
 
 use App\Models\User;
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\Str;
 
 abstract class MenuEntryHook
 {
-    /** @var string */
-    public $view = 'resources.views.menu';
+    public string $view = 'resources.views.menu';
 
-    public function authorize(User $user, array $settings): bool
+    public function authorize(User $user): bool
     {
         return true;
     }
@@ -43,8 +43,10 @@ abstract class MenuEntryHook
         return [];
     }
 
-    final public function handle(string $pluginName): array
+    final public function handle(string $pluginName, array $settings, Application $app): array
     {
-        return [Str::start($this->view, "$pluginName::"), $this->data()];
+        return [Str::start($this->view, "$pluginName::"), $app->call([$this, 'data'], [
+            'settings' => $settings,
+        ])];
     }
 }

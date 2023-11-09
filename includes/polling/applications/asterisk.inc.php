@@ -3,7 +3,6 @@
 use LibreNMS\RRD\RrdDefinition;
 
 $name = 'asterisk';
-$app_id = $app->app_id;
 
 if (! empty($agent_data[$name])) {
     $rawdata = $agent_data[$name];
@@ -46,13 +45,17 @@ $sip_fields = [
 ];
 
 $asterisk_metrics['stats'] = $sip_fields;
-$sip_tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
+$sip_tags = [
+    'name' => $name,
+    'app_id' => $app->app_id,
+    'rrd_name' => $rrd_name,
+    'rrd_def' => $rrd_def,
+];
 data_update($device, 'app', $sip_tags, $sip_fields);
 
 unset($rrd_name, $rrd_def, $sip_fields, $sip_tags);
 
 // Additional iax2 stats
-$rrd_name = ['app', $name, 'iax2', $app->app_id];
 $rrd_def = RrdDefinition::make()
     ->addDataset('iax2peers', 'GAUGE', 0, 10000)
     ->addDataset('iax2online', 'GAUGE', 0, 10000)
@@ -67,11 +70,17 @@ $iax2_fields = [
 ];
 
 $asterisk_metrics['iax2'] = $iax2_fields;
-$iax2_tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
+$iax2_tags = [
+    'name' => $name,
+    'app_id' => $app->app_id,
+    'type' => 'iax2',
+    'rrd_name' => ['app', $name, 'iax2', $app->app_id],
+    'rrd_def' => $rrd_def,
+];
 data_update($device, 'app', $iax2_tags, $iax2_fields);
 
 update_application($app, $rawdata, $asterisk_metrics);
 
-unset($rrd_name, $rrd_def, $iax2_fields, $iax2_tags);
+unset($rrd_def, $iax2_fields, $iax2_tags);
 
-unset($asterisk, $asterisk_metrics, $rawdata, $app_id); // these are used for all rrds
+unset($asterisk, $asterisk_metrics, $rawdata); // these are used for all rrds

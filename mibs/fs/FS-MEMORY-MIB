@@ -1,0 +1,481 @@
+-- *****************************************************************
+-- FS-MEMORY-MIB.mib:  FS Memory MIB file
+--
+-- October 2003, Wuzg
+--
+-- Copyright (c) 2003 by FS.COM Inc..
+-- All rights reserved.
+-- 
+-- *****************************************************************
+--
+
+FS-MEMORY-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        Integer32,
+        Gauge32
+                FROM SNMPv2-SMI
+        DisplayString,
+        MacAddress,
+        TEXTUAL-CONVENTION
+                FROM SNMPv2-TC
+        MODULE-COMPLIANCE,
+        OBJECT-GROUP
+                FROM SNMPv2-CONF
+        fsMgmt
+                FROM FS-SMI;
+
+fsMemoryMIB MODULE-IDENTITY
+        LAST-UPDATED "200310140000Z"
+        ORGANIZATION "FS.COM Inc.."
+        CONTACT-INFO
+                " 
+                Tel: 400-865-2852 
+
+                E-mail: https://www.fs.com/live_chat_service_mail.html"
+        DESCRIPTION
+                "This module defines fs system mibs."
+        REVISION      "200310140000Z"
+        DESCRIPTION
+                "Initial version of this MIB module."
+        ::= { fsMgmt 35}
+
+-- Percentage for statistic, etc.
+--
+Percent ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "An integer that is in the range of a percent value."
+    SYNTAX INTEGER (0..100)
+    
+fsMemoryPoolMIBObjects OBJECT IDENTIFIER ::= { fsMemoryMIB 1 }
+
+    
+fsMemoryPoolUtilizationTable OBJECT-TYPE
+  SYNTAX      SEQUENCE OF FSMemoryPoolUtilizationEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+    "A table of memory pool utilization entries. Each of the
+     objects provides a general idea of how much of the memory
+     pool has been used over a given period of time."
+  ::= { fsMemoryPoolMIBObjects 1 }
+
+fsMemoryPoolUtilizationEntry OBJECT-TYPE
+  SYNTAX      FSMemoryPoolUtilizationEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+    "An entry in the memory pool utilization table."
+  INDEX { fsMemoryPoolIndex }
+  ::= { fsMemoryPoolUtilizationTable 1 }
+
+FSMemoryPoolUtilizationEntry ::=
+  SEQUENCE {
+    fsMemoryPoolIndex  Integer32,
+    fsMemoryPoolName   DisplayString,
+    fsMemoryPoolCurrentUtilization  Percent,
+    fsMemoryPoolLowestUtilization  Percent,
+    fsMemoryPoolLargestUtilization Percent,
+    fsMemoryPoolSize   Integer32,
+    fsMemoryPoolUsed   Integer32,
+    fsMemoryPoolFree   Integer32,
+    fsMemoryPoolWarning  Percent,
+    fsMemoryPoolCritical Percent,
+    fsMemoryPoolAverageUtilization Percent,
+    fsMemoryPoolTotalSize   Gauge32,
+    fsMemoryPoolUsedSize    Gauge32,
+    fsMemoryPoolFreeSize    Gauge32
+
+  }
+    
+fsMemoryPoolIndex OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "An index that uniquely represents a Memory Pool."
+    ::= { fsMemoryPoolUtilizationEntry 1 }
+
+fsMemoryPoolName OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "A textual name assigned to the memory pool.  This
+        object is suitable for output to a human operator"
+    ::= { fsMemoryPoolUtilizationEntry 2 }
+    
+fsMemoryPoolCurrentUtilization OBJECT-TYPE
+    SYNTAX        Percent
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This is the memory pool utilization currently."
+    ::= { fsMemoryPoolUtilizationEntry 3 }
+
+fsMemoryPoolLowestUtilization OBJECT-TYPE
+    SYNTAX        Percent
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This is the memory pool utilization when memory used least."
+    ::= { fsMemoryPoolUtilizationEntry 4 }
+
+fsMemoryPoolLargestUtilization OBJECT-TYPE
+    SYNTAX        Percent
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This is the memory pool utilization when memory used most."
+    ::= { fsMemoryPoolUtilizationEntry 5 }
+        
+fsMemoryPoolSize OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This is the size of physical memory ."
+    ::= { fsMemoryPoolUtilizationEntry 6 }
+
+fsMemoryPoolUsed OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This is the memory size that has been used."
+    ::= { fsMemoryPoolUtilizationEntry 7 }
+
+fsMemoryPoolFree OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This is the memory size that is free."
+    ::= { fsMemoryPoolUtilizationEntry 8 }
+
+fsMemoryPoolWarning OBJECT-TYPE
+    SYNTAX        Percent
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The first warning of memory pool."
+    ::= { fsMemoryPoolUtilizationEntry 9 }
+
+fsMemoryPoolCritical OBJECT-TYPE
+    SYNTAX        Percent
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The second warning of memory pool."
+    ::= { fsMemoryPoolUtilizationEntry 10 }
+
+fsMemoryPoolAverageUtilization OBJECT-TYPE
+    SYNTAX        Percent
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This is the average memory pool utilization currently."
+    ::= { fsMemoryPoolUtilizationEntry 11 }
+
+fsMemoryPoolTotalSize OBJECT-TYPE
+    SYNTAX        Gauge32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The total size of physical memory, the unit is Mbytes ."
+    ::= { fsMemoryPoolUtilizationEntry 12 }
+
+fsMemoryPoolUsedSize OBJECT-TYPE
+    SYNTAX        Gauge32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Have used physical memory size, the unit is Mbytes ."
+    ::= { fsMemoryPoolUtilizationEntry 13 }
+
+fsMemoryPoolFreeSize OBJECT-TYPE
+    SYNTAX        Gauge32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The remaining physical memory size, the unit is Mbytes ."
+    ::= { fsMemoryPoolUtilizationEntry 14 }
+
+fsNodeMemoryPoolTable OBJECT-TYPE
+  SYNTAX      SEQUENCE OF FSNodeMemoryPoolEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+    "A table of node's memory pool utilization entries. Each of the
+     objects provides a general idea of how much of the memory
+     pool has been used over a given period of time."
+  ::= { fsMemoryPoolMIBObjects 2 }
+
+fsNodeMemoryPoolEntry OBJECT-TYPE
+  SYNTAX      FSNodeMemoryPoolEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+    "An entry in the node's memory pool utilization table."
+  INDEX { fsNodeMemoryPoolIndex }
+  ::= { fsNodeMemoryPoolTable 1 }
+
+FSNodeMemoryPoolEntry ::=
+  SEQUENCE {
+    fsNodeMemoryPoolIndex  Integer32,
+    fsNodeMemoryPoolName   DisplayString,
+    fsNodeMemoryPoolCurrentUtilization  Percent,
+    fsNodeMemoryPoolLowestUtilization  Percent,
+    fsNodeMemoryPoolLargestUtilization Percent,
+    fsNodeMemoryPoolSize   Integer32,
+    fsNodeMemoryPoolUsed   Integer32,
+    fsNodeMemoryPoolFree   Integer32,
+    fsNodeMemoryPoolWarning  Percent,
+    fsNodeMemoryPoolCritical Percent,
+    fsNodeMemoryPoolTotalSize  Gauge32,
+    fsNodeMemoryPoolUsedSize  Gauge32,
+    fsNodeMemoryPoolFreeSize  Gauge32
+  }
+    
+fsNodeMemoryPoolIndex OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "An index that uniquely represents a node's Memory Pool."
+    ::= { fsNodeMemoryPoolEntry 1 }
+
+fsNodeMemoryPoolName OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "A textual name assigned to the node's memory pool.  This
+        object is suitable for output to a human operator"
+    ::= { fsNodeMemoryPoolEntry 2 }
+    
+fsNodeMemoryPoolCurrentUtilization OBJECT-TYPE
+    SYNTAX        Percent
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This is the node's memory pool utilization currently."
+    ::= { fsNodeMemoryPoolEntry 3 }
+
+fsNodeMemoryPoolLowestUtilization OBJECT-TYPE
+    SYNTAX        Percent
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This is the node's memory pool utilization when memory used least."
+    ::= { fsNodeMemoryPoolEntry 4 }
+
+fsNodeMemoryPoolLargestUtilization OBJECT-TYPE
+    SYNTAX        Percent
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This is the node's memory pool utilization when memory used most."
+    ::= { fsNodeMemoryPoolEntry 5 }
+        
+fsNodeMemoryPoolSize OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This is the size of the node's physical memory ."
+    ::= { fsNodeMemoryPoolEntry 6 }
+
+fsNodeMemoryPoolUsed OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This is the node's memory size that has been used."
+    ::= { fsNodeMemoryPoolEntry 7 }
+
+fsNodeMemoryPoolFree OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This is the node's memory size that is free."
+    ::= { fsNodeMemoryPoolEntry 8 }
+    
+fsNodeMemoryPoolWarning OBJECT-TYPE
+    SYNTAX        Percent
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "This is the first warning of the node's memory."
+    ::= { fsNodeMemoryPoolEntry 9 }
+    
+fsNodeMemoryPoolCritical OBJECT-TYPE
+    SYNTAX        Percent
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "This is the second warning of the node's memory."
+    ::= { fsNodeMemoryPoolEntry 10 }  
+
+fsNodeMemoryPoolTotalSize OBJECT-TYPE
+    SYNTAX        Gauge32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The total size of node's physical memory, the unit is Mbytes ."
+    ::= { fsNodeMemoryPoolEntry 11 }
+
+fsNodeMemoryPoolUsedSize OBJECT-TYPE
+    SYNTAX        Gauge32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Have used node's physical memory size, the unit is Mbytes ."
+    ::= { fsNodeMemoryPoolEntry 12 }
+
+fsNodeMemoryPoolFreeSize OBJECT-TYPE
+    SYNTAX        Gauge32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The remaining node's physical memory size, the unit is Mbytes ."
+    ::= { fsNodeMemoryPoolEntry 13 }
+
+
+--lank ap 2010-7   
+fsLankApMemoryPoolTable OBJECT-TYPE
+  SYNTAX      SEQUENCE OF FSLankApMemoryPoolEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+    "A table of lank ap memory pool utilization entries. Each of the
+     objects provides a general idea of how much of the memory
+     pool has been used over a given period of time."
+  ::= { fsMemoryPoolMIBObjects 3 }
+
+fsLankApMemoryPoolEntry OBJECT-TYPE
+  SYNTAX      FSLankApMemoryPoolEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+    "An entry in the lank ap memory pool utilization table."
+  INDEX { fsLankApMemoryPoolMacAddr }
+  ::= { fsLankApMemoryPoolTable 1 }
+
+FSLankApMemoryPoolEntry ::=
+  SEQUENCE {
+    fsLankApMemoryPoolMacAddr             MacAddress,
+    fsLankApMemoryPoolWarning             Percent,  
+    fsLankApMemoryPoolCritical            Percent,
+    fsLankApMemoryPoolCurrentUtilization  Percent,
+    fsLankApMemoryPoolAverageUtilization  Percent
+  }
+ 
+fsLankApMemoryPoolMacAddr OBJECT-TYPE
+    SYNTAX        MacAddress
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "An index that uniquely represents lank ap Memory Pool."
+    ::= { fsLankApMemoryPoolEntry 1 }   
+    
+fsLankApMemoryPoolWarning OBJECT-TYPE
+    SYNTAX        Percent
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The first warning of lank ap memory pool."
+    ::= { fsLankApMemoryPoolEntry 2 }
+
+fsLankApMemoryPoolCritical OBJECT-TYPE
+    SYNTAX        Percent
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The second warning of lank ap memory pool."
+    ::= { fsLankApMemoryPoolEntry 3 }
+
+fsLankApMemoryPoolCurrentUtilization OBJECT-TYPE
+    SYNTAX        Percent
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This is the lank ap memory pool utilization currently."
+    ::= { fsLankApMemoryPoolEntry 4 }
+  
+fsLankApMemoryPoolAverageUtilization OBJECT-TYPE
+    SYNTAX        Percent
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This is the lank ap average memory pool utilization currently."
+    ::= { fsLankApMemoryPoolEntry 5 }
+
+
+fsMemoryMIBConformance OBJECT IDENTIFIER ::= { fsMemoryMIB 2 }
+fsMemoryMIBCompliances OBJECT IDENTIFIER ::= { fsMemoryMIBConformance 1 }
+fsMemoryMIBGroups      OBJECT IDENTIFIER ::= { fsMemoryMIBConformance 2 }
+
+
+-- compliance statements
+
+fsMemoryMIBCompliance MODULE-COMPLIANCE
+        STATUS  current
+        DESCRIPTION
+                "The compliance statement for entities which implement
+                the FS Memory MIB"
+        MODULE  -- this module
+                MANDATORY-GROUPS { fsMemoryPoolUtilizationMIBGroup
+                 }
+        ::= { fsMemoryMIBCompliances 1 }
+                
+-- units of conformance
+
+fsMemoryPoolUtilizationMIBGroup OBJECT-GROUP
+        OBJECTS {
+          fsMemoryPoolIndex,
+          fsMemoryPoolName,
+          fsMemoryPoolCurrentUtilization,
+          fsMemoryPoolLowestUtilization,
+          fsMemoryPoolLargestUtilization,
+	  fsMemoryPoolSize,
+	  fsMemoryPoolUsed,
+	  fsMemoryPoolFree,
+	  fsMemoryPoolWarning,
+	  fsMemoryPoolCritical,
+          fsMemoryPoolAverageUtilization,
+          fsMemoryPoolTotalSize,
+          fsMemoryPoolUsedSize,
+          fsMemoryPoolFreeSize
+        }
+        STATUS  current
+        DESCRIPTION
+                "A collection of objects providing memory pool utilization to a FS agent."
+        ::= { fsMemoryMIBGroups 1 } 
+  
+fsNodeMemoryPoolMIBGroup OBJECT-GROUP
+        OBJECTS {
+          fsNodeMemoryPoolIndex,
+          fsNodeMemoryPoolName,
+          fsNodeMemoryPoolCurrentUtilization,
+          fsNodeMemoryPoolLowestUtilization,
+          fsNodeMemoryPoolLargestUtilization,
+	  fsNodeMemoryPoolSize,
+	  fsNodeMemoryPoolUsed,
+	  fsNodeMemoryPoolFree,
+	  fsNodeMemoryPoolWarning,
+	  fsNodeMemoryPoolCritical,
+          fsNodeMemoryPoolTotalSize,
+          fsNodeMemoryPoolUsedSize,
+          fsNodeMemoryPoolFreeSize
+        }
+        STATUS  current
+        DESCRIPTION
+                "A collection of objects providing node's memory pool utilization to a FS agent."
+        ::= { fsMemoryMIBGroups 2 } 
+  
+END

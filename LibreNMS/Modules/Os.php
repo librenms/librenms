@@ -47,7 +47,7 @@ class Os implements Module
 
     public function shouldDiscover(\LibreNMS\OS $os, ModuleStatus $status): bool
     {
-        return $status->isEnabled() && ! $os->getDevice()->snmp_disable && $os->getDevice()->status;
+        return $status->isEnabledAndDeviceUp($os->getDevice());
     }
 
     public function discover(\LibreNMS\OS $os): void
@@ -70,7 +70,7 @@ class Os implements Module
 
     public function shouldPoll(\LibreNMS\OS $os, ModuleStatus $status): bool
     {
-        return $status->isEnabled() && ! $os->getDevice()->snmp_disable && $os->getDevice()->status;
+        return $status->isEnabledAndDeviceUp($os->getDevice());
     }
 
     public function poll(\LibreNMS\OS $os, DataStorageInterface $datastore): void
