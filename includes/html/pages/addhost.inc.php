@@ -39,6 +39,18 @@ if (! empty($_POST['hostname'])) {
         if ($_POST['transport']) {
             $new_device->transport = strip_tags($_POST['transport']);
         }
+        $attribs = [];
+        if ($_POST['ssh_port']) {
+            $attribs['override_device_ssh_port'] = strip_tags($_POST['ssh_port']);
+        }
+
+        if ($_POST['telnet_port']) {
+            $attribs['override_device_telnet_port'] = strip_tags($_POST['telnet_port']);
+        }
+
+        if ($_POST['http_port']) {
+            $attribs['override_device_http_port'] = strip_tags($_POST['http_port']);
+        }
 
         $additional = [];
         if (! $snmp_enabled) {
@@ -76,6 +88,11 @@ if (! empty($_POST['hostname'])) {
             $result = (new ValidateDeviceAndCreate($new_device, $force_add))->execute();
 
             if ($result) {
+                if (! empty($attribs)) {
+                    foreach ($attribs as $attrib_type => $attrib_value) {
+                        set_dev_attrib($new_device, $attrib_type, $attrib_value);
+                    }
+                }
                 $link = \LibreNMS\Util\Url::deviceUrl($new_device->device_id);
                 print_message("Device added <a href='$link'>$hostname ($new_device->device_id)</a>");
             }
@@ -233,7 +250,7 @@ foreach (PortAssociationMode::getModes() as $mode) {
                   foreach (\LibreNMS\SNMPCapabilities::authAlgorithms() as $algo => $enabled) {
                       echo "<option value=\"$algo\"" . ($enabled ?: ' disabled') . ">$algo</option>";
                   }
-                  ?>
+?>
               </select>
               <?php if (! \LibreNMS\SNMPCapabilities::supportsSHA2()) {?>
               <label class="text-left"><small>Some options are disabled. <a href="https://docs.librenms.org/Support/FAQ/#optional-requirements-for-snmpv3-sha2-auth">Read more here</a></small></label>
@@ -251,10 +268,10 @@ foreach (PortAssociationMode::getModes() as $mode) {
             <div class="col-sm-9">
               <select name="cryptoalgo" id="cryptoalgo" class="form-control input-sm">
                   <?php
-                  foreach (\LibreNMS\SNMPCapabilities::cryptoAlgoritms() as $algo => $enabled) {
-                      echo "<option value=\"$algo\"" . ($enabled ?: ' disabled') . ">$algo</option>";
-                  }
-                  ?>
+foreach (\LibreNMS\SNMPCapabilities::cryptoAlgoritms() as $algo => $enabled) {
+    echo "<option value=\"$algo\"" . ($enabled ?: ' disabled') . ">$algo</option>";
+}
+?>
               </select>
               <?php if (! \LibreNMS\SNMPCapabilities::supportsAES256()) {?>
               <label class="text-left"><small>Some options are disabled. <a href="https://docs.librenms.org/Support/FAQ/#optional-requirements-for-snmpv3-sha2-auth">Read more here</a></small></label>
@@ -265,7 +282,7 @@ foreach (PortAssociationMode::getModes() as $mode) {
       </div>
 <?php
 if (Config::get('distributed_poller') === true) {
-                      echo '
+    echo '
           <div class="form-group">
               <label for="poller_group" class="col-sm-3 control-label">Poller Group</label>
               <div class="col-sm-9">
@@ -273,23 +290,50 @@ if (Config::get('distributed_poller') === true) {
                       <option value="0"> Default poller group</option>
     ';
 
-                      foreach (dbFetchRows('SELECT `id`,`group_name` FROM `poller_groups` ORDER BY `group_name`') as $group) {
-                          echo '<option value="' . $group['id'] . '">' . $group['group_name'] . '</option>';
-                      }
+    foreach (dbFetchRows('SELECT `id`,`group_name` FROM `poller_groups` ORDER BY `group_name`') as $group) {
+        echo '<option value="' . $group['id'] . '">' . $group['group_name'] . '</option>';
+    }
 
-                      echo '
+    echo '
                   </select>
               </div>
           </div>
     ';
-                  }//endif
+}//endif
 ?>
       <div class="form-group">
-          <label for="force_add" class="col-sm-3 control-label">Force add<br><small>(No ICMP or SNMP checks performed)</small></label>
-          <div class="col-sm-9">
-                  <input type="checkbox" name="force_add" id="force_add" data-size="small">
-          </div>
+        <label for="force_add" class="col-sm-3 control-label">Force add<br><small>(No ICMP or SNMP checks performed)</small></label>
+        <div class="col-sm-9">
+          <input type="checkbox" name="force_add" id="force_add" data-size="small">
+        </div>
       </div>
+<?php
+if (Config::get('device_add_overrides') === true) {
+    echo '<div class="form-group">
+          <div class="col-sm-12 alert alert-info">
+            <label class="control-label text-left input-sm">Custom ports misc attributes (optional) </label>
+          </div>
+        </div>
+      <div class="form-group">
+        <label for="custom_ssh_port" class="col-sm-3 control-label">Custom SSH port</label>
+        <div class="col-sm-3">
+          <input type="text" name="ssh_port" placeholder="SSH port" class="form-control input-sm">
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="custom_telnet_port" class="col-sm-3 control-label">Custom Telnet port</label>
+        <div class="col-sm-3">
+          <input type="text" name="telnet_port" placeholder="Telnet port" class="form-control input-sm">
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="custom_http_port" class="col-sm-3 control-label">Custom HTTP port</label>
+        <div class="col-sm-3">
+          <input type="text" name="http_port" placeholder="HTTP port" class="form-control input-sm">
+        </div>
+      </div>';
+}
+?>
     <hr>
     <center><button type="submit" class="btn btn-default" name="Submit">Add Device</button></center>
   </div>

@@ -1661,6 +1661,10 @@ return [
             'description' => 'Location Map open',
             'help' => 'Location Map is shown by default',
         ],
+        'device_add_overrides' => [
+            'description' => 'Port overrides on device add page',
+            'help' => 'Show / Hide port override options on device add page',
+        ],
         'whois' => [
             'description' => 'Path to whois',
         ],
