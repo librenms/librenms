@@ -300,6 +300,8 @@ function get_device(Illuminate\Http\Request $request)
             $device = array_merge($device, ['parent_id' => $host_id]);
         }
 
+        $attribs = get_dev_attribs($device['device_id']);
+        $device = array_merge($device, $attribs);
         return api_success([$device], 'devices');
     });
 }
@@ -449,7 +451,15 @@ function add_device(Illuminate\Http\Request $request)
     } catch (Exception $e) {
         return api_error(500, $e->getMessage());
     }
-
+    if (! empty($data['override_device_ssh_port'])) {
+        set_dev_attrib($device, 'override_device_ssh_port', $data['override_device_ssh_port']);
+    }
+    if (! empty($data['override_device_telnet_port'])) {
+        set_dev_attrib($device, 'override_device_telnet_port', $data['override_device_telnet_port']);
+    }
+    if (! empty($data['override_device_http_port'])) {
+        set_dev_attrib($device, 'override_device_http_port', $data['override_device_http_port']);
+    }
     $message = "Device $device->hostname ($device->device_id) has been added successfully";
 
     return api_success([$device->attributesToArray()], 'devices', $message);
