@@ -68,6 +68,10 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('nac', 'NacController@index');
 
+    Route::prefix("device")->name('device.')->group(function () {
+        Route::get("add", "DeviceController@addDevice")->name('add');
+        Route::post("add", "DeviceController@createDevice");
+    });
     // Device Tabs
     Route::prefix('device/{device}')->namespace('Device\Tabs')->name('device.')->group(function () {
         Route::put('notes', 'NotesController@update')->name('notes.update');
@@ -124,7 +128,7 @@ Route::middleware(['auth'])->group(function () {
 
     // old route redirects
     Route::permanentRedirect('poll-log', 'poller/log');
-
+    Route::permanentRedirect('addhost', 'device/add');
     // Two Factor Auth
     Route::prefix('2fa')->namespace('Auth')->group(function () {
         Route::get('', 'TwoFactorController@showTwoFactorForm')->name('2fa.form');

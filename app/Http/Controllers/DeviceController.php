@@ -2,19 +2,26 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\Device\ValidateDeviceAndCreate;
 use App\Facades\DeviceCache;
 use App\Models\Device;
+use App\Models\PollerGroup;
 use App\Models\Vminfo;
 use Carbon\Carbon;
+use Exception;
 use Gate;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Blade;
 use LibreNMS\Config;
+use LibreNMS\Enum\PortAssociationMode;
+use LibreNMS\Exceptions\HostUnreachableException;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Graph;
+use LibreNMS\Util\IP;
 use LibreNMS\Util\Url;
+use LibreNMS\Util\Validate;
 
 class DeviceController extends Controller
 {
@@ -59,10 +66,10 @@ class DeviceController extends Controller
     public function index(Request $request, $device, $current_tab = 'overview', $vars = '')
     {
         $device = str_replace('device=', '', $device);
-        $device = is_numeric($device) ? DeviceCache::get((int) $device) : DeviceCache::getByHostname($device);
+        $device = is_numeric($device) ? DeviceCache::get((int)$device) : DeviceCache::getByHostname($device);
         $device_id = $device->device_id;
 
-        if (! $device->exists) {
+        if (!$device->exists) {
             abort(404);
         }
 
@@ -92,7 +99,7 @@ class DeviceController extends Controller
         // Device Link Menu, select the primary link
         $device_links = $this->deviceLinkMenu($device, $current_tab);
         $primary_device_link_name = Config::get('html.device.primary_link', 'edit');
-        if (! isset($device_links[$primary_device_link_name])) {
+        if (!isset($device_links[$primary_device_link_name])) {
             $primary_device_link_name = array_key_first($device_links);
         }
         $primary_device_link = $device_links[$primary_device_link_name];
@@ -248,5 +255,84 @@ class DeviceController extends Controller
     private function editTabExists(string $tab): bool
     {
         return is_file(base_path("includes/html/pages/device/edit/$tab.inc.php"));
+    }
+
+    public function addDevice()
+    {
+        $this->authorize("create", Device::class);
+
+        $transports = Config::get('snmp.transports');
+        $modes = PortAssociationMode::getModes();
+        $defaultMode = Config::get('default_port_association_mode');
+        $distributedPoller = Config::get('distributed_poller');
+        $pollerGroup = PollerGroup::select('id', 'group_name')->orderBy('group_name')->get();
+        return view('device.add', [
+            'transports' => $transports,
+            'modes' => $modes,
+            'defaultMode' => $defaultMode,
+            'distributedPoller' => $distributedPoller,
+            'pollerGroup' => $pollerGroup,
+        ]);
+    }
+
+    public function createDevice(Request $request)
+    {
+
+        $this->authorize("create", Device::class);
+        if (!Validate::hostname($request->hostname) && !IP::isValid($request->hostname)) {
+            return redirect()->back()->with(['error_message' => 'Invalid hostname or IP address: ' . $request->hostname]);
+        }
+        $device = new Device(['hostname' => $request->hostname]);
+        if ($request->port) {
+            $device->port = strip_tags($request->port);
+        }
+        if ($request->transport) {
+            $device->transport = strip_tags($request->transport);
+        }
+        $snmp_enabled = !isset($_POST['hostname']) || isset($_POST['snmp']);
+        if (!$snmp_enabled) {
+            $device->snmp_disable = 1;
+            $device->os = $request->os ? strip_tags($request->os_id) : 'ping';
+            $device->hardware = strip_tags($request->hardware);
+            $device->sysName = strip_tags($request->sysName);
+        } elseif ($request->snmpver === 'v2c' || $request->snmpver === 'v1') {
+            $device->snmpver = strip_tags($request->snmpver);
+            $communities = Config::get('snmp.community');
+            if ($request->community) {
+                $device->community = $request->community;
+                $communities = [$request->community];
+            }
+        } elseif ($request->snmpver === 'v3') {
+            $device->snmpver = 'v3';
+            $device->authlevel = strip_tags($request->authlevel);
+            $device->authname = $request->authname;
+            $device->authpass = $request->authpass;
+            $device->authalgo = strip_tags($request->authalgo);
+            $device->cryptopass = $request->cryptopass;
+            $device->cryptoalgo = $request->cryptoalgo;
+
+        } else {
+            return redirect()->back()->with(['error_message' => 'Unsupported SNMP Version. There was a dropdown menu, how did you reach this error ?']);
+        }//end if
+
+        try {
+            $device->poller_group = strip_tags($request->poller_group ?? '');
+            $device->port_association_mode = PortAssociationMode::getId($request->port_assoc_mode);
+
+            $force_add = ($request->has('force_add') && $request->force_add == 'on');
+            $result = (new ValidateDeviceAndCreate($device, $force_add))->execute();
+
+            if ($result) {
+                return redirect()->back()->with(['success_message' => 'Device added: <a href="' . route("device", $device) . '">' . $device->hostname . '(' . $device->id . ')' . '</a>']);
+            }
+        } catch (HostUnreachableException $e) {
+
+            return redirect()->back()->withErrors(['error_message' => $e->getMessage(), 'reasons' => $e->getReasons()]);
+
+        } catch (Exception $e) {
+            return redirect()->back()->withErrors(['error_message' => $e->getMessage()]);
+
+        }
+        return $request;
     }
 }
