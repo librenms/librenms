@@ -302,6 +302,7 @@ function get_device(Illuminate\Http\Request $request)
 
         $attribs = get_dev_attribs($device['device_id']);
         $device = array_merge($device, $attribs);
+
         return api_success([$device], 'devices');
     });
 }
