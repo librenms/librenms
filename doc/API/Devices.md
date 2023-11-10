@@ -36,7 +36,7 @@ Output:
 
 ### `get_device`
 
-Get details of a given device.
+Get details of a given device + attribs if they exist.
 
 Route: `/api/v0/devices/:hostname`
 
@@ -1178,40 +1178,43 @@ Route: `/api/v0/devices`
 
 Input (JSON):
 
-- hostname (required): device hostname or IP
-- display: A string to display as the name of this device, defaults to 
+- `hostname` (required): device hostname or IP
+- `display`: A string to display as the name of this device, defaults to
   hostname (or device_display_default setting). May be a simple
   template using replacements: {{ $hostname }}, {{ $sysName }},
   {{ $sysName_fallback }}, {{ $ip }}
-- port: SNMP port (defaults to port defined in config).
-- transport: SNMP protocol (defaults to transport defined in config).
-- snmpver: SNMP version to use, v1, v2c or v3. Defaults to v2c.
-- port_association_mode: method to identify ports: ifIndex (default), ifName, ifDescr, ifAlias
-- poller_group: This is the poller_group id used for distributed
+- `port`: SNMP port (defaults to port defined in config).
+- `transport`: SNMP protocol (defaults to transport defined in config).
+- `snmpver`: SNMP version to use, v1, v2c or v3. Defaults to v2c.
+- `port_association_mode`: method to identify ports: ifIndex (default), ifName, ifDescr, ifAlias
+- `poller_group`: This is the poller_group id used for distributed
   poller setup. Defaults to 0.
-- location or location_id: set the location by text or location id
-- force_add: Set to true to force the device to be added regardless of it being able
+- `location` or location_id: set the location by text or location id
+- `force_add`: Set to true to force the device to be added regardless of it being able
   to respond to snmp or icmp.
+- `override_device_ssh_port`: Device misc option ssh port.
+- `override_device_telnet_port`: Device misc option telnet port.
+- `override_device_http_port`: Device misc option http port.
 
 For SNMP v1 or v2c
 
-- community: Required for SNMP v1 or v2c.
+- `community`: Required for SNMP v1 or v2c.
 
 For SNMP v3
 
-- authlevel: SNMP authlevel (noAuthNoPriv, authNoPriv, authPriv).
-- authname: SNMP Auth username
-- authpass: SNMP Auth password
-- authalgo: SNMP Auth algorithm (MD5, SHA) (SHA-224, SHA-256, SHA-384, SHA-512 if supported by your server)
-- cryptopass: SNMP Crypto Password
-- cryptoalgo: SNMP Crypto algorithm (AES, DES)
+- `authlevel`: SNMP authlevel (noAuthNoPriv, authNoPriv, authPriv).
+- `authname`: SNMP Auth username
+- `authpass`: SNMP Auth password
+- `authalgo`: SNMP Auth algorithm (MD5, SHA) (SHA-224, SHA-256, SHA-384, SHA-512 if supported by your server)
+- `cryptopass`: SNMP Crypto Password
+- `cryptoalgo`: SNMP Crypto algorithm (AES, DES)
 
 For ICMP only
 
-- snmp_disable: Boolean, set to true for ICMP only.
-- os: OS short name for the device (defaults to ping).
-- sysName: sysName for the device.
-- hardware: Device hardware.
+- `snmp_disable`: Boolean, set to true for ICMP only.
+- `os`: OS short name for the device (defaults to ping).
+- `sysName`: sysName for the device.
+- `hardware`: Device hardware.
 
 Example:
 
