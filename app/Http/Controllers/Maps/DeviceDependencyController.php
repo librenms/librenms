@@ -41,15 +41,55 @@ class DeviceDependencyController extends MapController
     protected static function deviceList($request)
     {
         $group_id = $request->get('group');
+        $valid_loc = $request->get('location_valid');
+        $disabled = $request->get('disabled');
+        $ignore = $request->get('ignore');
+        $disabled_alerts = $request->get('disabled_alerts');
 
-        if (! $group_id) {
-            return Device::hasAccess($request->user())->with('parents', 'location')->get();
+        $deviceQuery = Device::hasAccess($request->user())->with('location');
+
+        if ($group_id) {
+            $deviceQuery->inDeviceGroup($group_id);
         }
 
-        $devices = Device::inDeviceGroup($group_id)
-            ->hasAccess($request->user())
-            ->with([
-                'location',
+        if (! is_null($disabled)) {
+            if ($disabled) {
+                $deviceQuery->where('disabled','<>','0');
+            } else {
+                $deviceQuery->where('disabled','=','0');
+            }
+        }
+
+        if (! is_null($ignore)) {
+            if ($ignore) {
+                $deviceQuery->where('ignore','<>','0');
+            } else {
+                $deviceQuery->where('ignore','=','0');
+            }
+        }
+
+        if (! is_null($disabled_alerts)) {
+            if ($disabled_alerts) {
+                $deviceQuery->where('disable_notify','<>','0');
+            } else {
+                $deviceQuery->where('disable_notify','=','0');
+            }
+        }
+
+        if ($valid_loc) {
+            $deviceQuery->whereHas('location', function ($query) {
+                    $query->whereNotNull('lng')
+                        ->whereNotNull('lat')
+                        ->where('lng','<>','')
+                        ->where('lat','<>','');
+                });
+        }
+
+        if (! $group_id) {
+            return $deviceQuery->with('parents')->get();
+        }
+
+        $devices = $deviceQuery->with([
                 'parents' => function ($query) use ($request) {
                     $query->hasAccess($request->user());
                 },
@@ -177,5 +217,26 @@ class DeviceDependencyController extends MapController
         ];
 
         return view('map.device-dependency', $data);
+    }
+
+    // Device Dependency JSON
+    public function dependencyJSON(Request $request)
+    {
+        // List all devices
+        $device_list = [];
+        foreach (self::deviceList($request) as $device) {
+            $device_list[$device->device_id] = [
+                    'id'      => $device->device_id,
+                    'icon'    => $device->icon,
+                    'sname'   => $device->shortDisplayName(),
+                    'status'  => $device->status,
+                    'url'     => Url::deviceUrl($device->device_id),
+                    'lat'     => $device->location->lat,
+                    'lng'     => $device->location->lng,
+                    'parents' => $device->parents->map->only('device_id')->flatten(),
+                ];
+        }
+
+        return response()->json($device_list);
     }
 }
