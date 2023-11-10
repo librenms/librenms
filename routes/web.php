@@ -91,6 +91,8 @@ Route::middleware(['auth'])->group(function () {
         Route::post('custom/{map}/background', [CustomMapBackgroundController::class, 'save'])->name('maps.custom.background.save');
         Route::get('custom/{map}/data', [CustomMapDataController::class, 'get'])->name('maps.custom.data');
         Route::post('custom/{map}/data', [CustomMapDataController::class, 'save'])->name('maps.custom.data.save');
+        Route::get('devicedependency', 'DeviceDependencyController@dependencyMap');
+        Route::get('devicedependencyjson', 'DeviceDependencyController@dependencyJSON');
     });
     Route::get('maps/devicedependency', [DeviceDependencyController::class, 'dependencyMap']);
 

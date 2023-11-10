@@ -22,6 +22,8 @@ echo '</div><div class="panel-body">';
 
 echo '<script src="js/leaflet.js"></script>';
 echo '<script src="js/L.Control.Locate.min.js"></script>';
+echo '<script src="js/leaflet.markercluster.js"></script>';
+echo '<script src="js/leaflet.awesome-markers.min.js"></script>';
 
 if ($device['os'] == 'ios' || $device['os'] == 'iosxe') {
     \LibreNMS\Util\Rewrite::ciscoHardware($device, false);
@@ -154,10 +156,10 @@ if ($device['location_id'] && $location = Location::find($device['location_id'])
     </div>
     <div id="toggle-map" class="row collapse"><div id="location-map"></div></div>
     <script>
-        var device_marker, device_location, device_map;
+        var device_map, device_marker_cluster;
         $("#toggle-map").on("shown.bs.collapse", function () {
-             if (device_marker == null) {
-
+             var device_marker, device_location;
+             if (device_map == null) {
                 device_location = new L.LatLng(' . (float) $location->lat . ', ' . (float) $location->lng . ');
                 config = {"tile_url": "' . Config::get('leaflet.tile_url', '{s}.tile.openstreetmap.org') . '"};
                 device_map = init_map("location-map", "' . $maps_engine . '", "' . $maps_api . '", config);
@@ -165,9 +167,74 @@ if ($device['location_id'] && $location = Location::find($device['location_id'])
                 let zoom = (device_location.lat === 0 && device_location.lng === 0) ? 2 : 17;
                 device_map.setView(device_location, zoom);
                 device_marker.dragging.enable();
-
-
                 ';
+
+    # If we are configured to show all devices on map
+    if (Config::get('device_location_map_show_devices')) {
+        // Get a list of devices we have access to and add them to the map
+        echo'
+                device_marker_cluster = L.markerClusterGroup({
+                    maxClusterRadius: 80,
+                    iconCreateFunction: function (cluster) {
+                        var markers = cluster.getAllChildMarkers();
+                        var n = 0;
+                        color = "green"
+                        newClass = "Cluster marker-cluster marker-cluster-small leaflet-zoom-animated leaflet-clickable";
+                        for (var i = 0; i < markers.length; i++) {
+                            if (markers[i].options.icon.options.markerColor == "red") {
+                                color = "red";
+                            }
+                        }
+                        return L.divIcon({ html: cluster.getChildCount(), className: color+newClass, iconSize: L.point(40, 40) });
+                    },
+                  });
+                var redMarker = L.AwesomeMarkers.icon({
+                    icon: \'server\',
+                    markerColor: \'red\', prefix: \'fa\', iconColor: \'white\'
+                  });
+                var greenMarker = L.AwesomeMarkers.icon({
+                    icon: \'server\',
+                    markerColor: \'green\', prefix: \'fa\', iconColor: \'white\'
+                  });
+
+                $.get( "' . url('/maps/devicedependencyjson') . '", {disabled_alerts: 0, disabled: 0, location_valid: 1})
+                  .done(function( data ) {
+                      $.each( data, function( device_id, device ) {
+                        var icon = greenMarker;
+                        var z_offset = 5000;
+                        if (device["status"] == 0) {
+                            icon = redMarker;
+                            z_offset = 10000;
+                        }
+                        var marker = L.marker(new L.LatLng(device["lat"],device["lng"]), {title: device["sname"], icon: icon, zIndexOffset: z_offset});
+                        marker.bindPopup("<a href=\"" + device["url"] + "\"><img src=\"" + device["icon"] + "\" width=\"32\" height=\"32\" alt=\"\"> " + device["sname"] + "</a>");
+                        device_marker_cluster.addLayer(marker);
+        ';
+        # If we are configured to show dependencies
+        if (Config::get('device_location_map_show_device_dependencies')) {
+            echo'
+                        $.each( device["parents"], function( parent_idx, parent_id ) {
+                            if (parent_id in data && (data[parent_id]["lat"] != device["lat"] || data[parent_id]["lng"] != device["lng"])) {
+                                var line = new L.Polyline([new L.LatLng(device["lat"],device["lng"]), new L.LatLng(data[parent_id]["lat"],data[parent_id]["lng"])], {
+                                    color: "blue",
+                                    weight: 2,
+                                    opacity: 0.8,
+                                    smoothFactor: 1
+                                });
+                                device_marker_cluster.addLayer(line);
+                            }
+                        });
+            ';
+        }
+        echo'
+                      })
+                  })
+                  .fail(function() {
+                      alert( "error fetching devices" );
+                  });
+                device_map.addLayer(device_marker_cluster);
+        ';
+    }
 
     if (Auth::user()->isAdmin()) {
         echo '  device_marker.on("dragend", function () {
@@ -182,7 +249,7 @@ if ($device['location_id'] && $location = Location::find($device['location_id'])
                     }
                 });';
     } else {
-        echo 'device_map.dragging.disable();';
+        echo 'device_marker.dragging.disable();';
     }
     echo '
         }

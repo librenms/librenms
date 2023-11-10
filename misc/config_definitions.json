@@ -1234,6 +1234,25 @@
             "default": false,
             "type": "boolean"
         },
+        "device_location_map_show_devices": {
+            "order": 3,
+            "group": "webui",
+            "section": "device",
+            "default": false,
+            "type": "boolean"
+        },
+        "device_location_map_show_device_dependencies": {
+            "order": 4,
+            "group": "webui",
+            "section": "device",
+            "default": false,
+            "type": "boolean",
+            "when": {
+                "setting": "device_location_map_show_devices",
+                "operator": "equals",
+                "value": true
+            }
+        },
         "default_port_association_mode": {
             "default": "ifIndex",
             "type": "select",
@@ -2056,7 +2075,7 @@
             }
         },
         "geoloc.dns": {
-            "order": 3,
+            "order": 5,
             "group": "webui",
             "section": "device",
             "default": true,
@@ -4081,7 +4100,7 @@
         "html.device.primary_link": {
             "group": "webui",
             "section": "device",
-            "order": 3,
+            "order": 6,
             "type": "select",
             "default": "edit",
             "options": {
