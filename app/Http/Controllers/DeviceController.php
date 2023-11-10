@@ -66,10 +66,10 @@ class DeviceController extends Controller
     public function index(Request $request, $device, $current_tab = 'overview', $vars = '')
     {
         $device = str_replace('device=', '', $device);
-        $device = is_numeric($device) ? DeviceCache::get((int)$device) : DeviceCache::getByHostname($device);
+        $device = is_numeric($device) ? DeviceCache::get((int) $device) : DeviceCache::getByHostname($device);
         $device_id = $device->device_id;
 
-        if (!$device->exists) {
+        if (! $device->exists) {
             abort(404);
         }
 
@@ -257,16 +257,16 @@ class DeviceController extends Controller
         return is_file(base_path("includes/html/pages/device/edit/$tab.inc.php"));
     }
 
-    public function addDevice()
+    public function create()
     {
-        $this->authorize("create", Device::class);
+        $this->authorize('create', Device::class);
 
         $transports = Config::get('snmp.transports');
         $modes = PortAssociationMode::getModes();
         $defaultMode = Config::get('default_port_association_mode');
         $distributedPoller = Config::get('distributed_poller');
         $pollerGroup = PollerGroup::select('id', 'group_name')->orderBy('group_name')->get();
-        return view('device.add', [
+        return view('device.create', [
             'transports' => $transports,
             'modes' => $modes,
             'defaultMode' => $defaultMode,
@@ -275,23 +275,26 @@ class DeviceController extends Controller
         ]);
     }
 
-    public function createDevice(Request $request)
+    public function store(Request $request)
     {
-
-        $this->authorize("create", Device::class);
-        if (!Validate::hostname($request->hostname) && !IP::isValid($request->hostname)) {
+        $this->authorize('create', Device::class);
+        $validated = $this->validate($request,
+        [
+''
+        ]);
+        if (! Validate::hostname($request->hostname) && ! IP::isValid($request->hostname)) {
             return redirect()->back()->with(['error_message' => 'Invalid hostname or IP address: ' . $request->hostname]);
         }
         $device = new Device(['hostname' => $request->hostname]);
         if ($request->port) {
-            $device->port = strip_tags($request->port);
+            $device->port = strip_tags(is_numeric($request->port));
         }
         if ($request->transport) {
             $device->transport = strip_tags($request->transport);
         }
-        $snmp_enabled = !isset($_POST['hostname']) || isset($_POST['snmp']);
-        if (!$snmp_enabled) {
-            $device->snmp_disable = 1;
+        $snmp_enabled = ! isset($_POST['hostname']) || isset($_POST['snmp']);
+        if (! $snmp_enabled) {
+            $device->snmp_disable = true;
             $device->os = $request->os ? strip_tags($request->os_id) : 'ping';
             $device->hardware = strip_tags($request->hardware);
             $device->sysName = strip_tags($request->sysName);
@@ -323,7 +326,7 @@ class DeviceController extends Controller
             $result = (new ValidateDeviceAndCreate($device, $force_add))->execute();
 
             if ($result) {
-                return redirect()->back()->with(['success_message' => 'Device added: <a href="' . route("device", $device) . '">' . $device->hostname . '(' . $device->id . ')' . '</a>']);
+                return redirect()->back()->with(['success_message' => 'Device added: <a href="' . route("device", $device) . '">' . $device->hostname . '(' . $device->device_id . ')' . '</a>']);
             }
         } catch (HostUnreachableException $e) {
 

@@ -59,7 +59,7 @@ if (! empty($_POST['hostname'])) {
             $new_device->authlevel = strip_tags($_POST['authlevel']);
             $new_device->authname = $_POST['authname'];
             $new_device->authpass = $_POST['authpass'];
-            $new_device->authalgo = strip_tags($_POST['authalgo']);
+            $new_device->auMENUthalgo = strip_tags($_POST['authalgo']);
             $new_device->cryptopass = $_POST['cryptopass'];
             $new_device->cryptoalgo = $_POST['cryptoalgo'];
 
