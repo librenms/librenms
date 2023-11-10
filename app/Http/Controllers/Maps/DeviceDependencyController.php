@@ -80,8 +80,8 @@ class DeviceDependencyController extends MapController
             $deviceQuery->whereHas('location', function ($query) {
                 $query->whereNotNull('lng')
                     ->whereNotNull('lat')
-                    ->where('lng','<>','')
-                    ->where('lat','<>','');
+                    ->where('lng', '<>', '')
+                    ->where('lat', '<>', '');
             });
         }
 
