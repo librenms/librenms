@@ -30,8 +30,8 @@ print_optionbar_end();
 $graphs = [
     'mdadm_level'          => 'RAID level',
     'mdadm_size'           => 'RAID Size',
-    'mdadm_disc_count'     => 'RAID Disc count',
-    'mdadm_hotspare_count' => 'RAID Hotspare Disc count',
+    'mdadm_disc_count'     => 'RAID Disk count',
+    'mdadm_hotspare_count' => 'RAID Hotspare Disk count',
     'mdadm_degraded'       => 'RAID degraded',
     'mdadm_sync_speed'     => 'RAID Sync speed',
     'mdadm_sync_completed' => 'RAID Sync completed',
