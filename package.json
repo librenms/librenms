@@ -13,7 +13,7 @@
     },
     "devDependencies": {
         "autoprefixer": "^10.4.2",
-        "axios": "^0.25.0",
+        "axios": "^1.6.0",
         "bootstrap": "^4.5.3",
         "jquery": "^3.5.1",
         "laravel-mix": "^6.0.41",
