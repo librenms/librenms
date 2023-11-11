@@ -138,9 +138,6 @@ return [
             'description' => 'Erlaube diesem Netzwerk Zugriff auf Graphen',
             'help' => 'Erlaube den angegebenen Netzwerken Zugrif auf Graphen ohne eingeloggt zu sein (funktioniert nicht wenn authentifizierte Graphen aktiviert sind)',
         ],
-        'api_demo' => [
-            'description' => 'Dies ist eine Demo',
-        ],
         'apps' => [
             'powerdns-recursor' => [
                 'api-key' => [

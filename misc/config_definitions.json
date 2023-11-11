@@ -365,10 +365,6 @@
             "order": 3,
             "type": "array"
         },
-        "api_demo": {
-            "default": false,
-            "type": "boolean"
-        },
         "apps.powerdns-recursor.api-key": {
             "type": "text"
         },
