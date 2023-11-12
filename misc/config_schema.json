@@ -51,7 +51,7 @@
                                 ]
                             },
                             "value": {
-                                "type": ["string", "array"]
+                                "type": ["string", "array", "bool"]
                             }
                         }
                     },
