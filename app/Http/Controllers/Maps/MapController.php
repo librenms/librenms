@@ -37,7 +37,7 @@ class MapController extends Controller
     protected static function deviceLinks($request)
     {
         // Return a blank array for unknown link types
-        if ($request->get('link_type') != "xdp") {
+        if ($request->get('link_type') != 'xdp') {
             return [];
         }
 
