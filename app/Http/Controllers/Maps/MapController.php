@@ -37,7 +37,7 @@ class MapController extends Controller
     protected static function deviceLinks($request)
     {
         // Return a blank array for unknown link types
-        if($request->get('link_type') != "xdp") {
+        if ($request->get('link_type') != "xdp") {
             return [];
         }
 
@@ -74,13 +74,13 @@ class MapController extends Controller
             ->whereIn('rd.status', [0, 1])
             ->groupByRaw('left_id, right_id, left_lat, left_lng, right_lat, right_lng');
 
-        if(! \Auth::user()->hasGlobalRead()) {
-            $linkQuery->whereIntegerInRaw("l.local_device_id", \Permissions::devicesForUser($request->user()))
-                ->whereIntegerInRaw("l.remote_device_id", \Permissions::devicesForUser($request->user()));
+        if (! \Auth::user()->hasGlobalRead()) {
+            $linkQuery->whereIntegerInRaw('l.local_device_id', \Permissions::devicesForUser($request->user()))
+                ->whereIntegerInRaw('l.remote_device_id', \Permissions::devicesForUser($request->user()));
         }
 
         $group_id = $request->get('group');
-        if($group_id) {
+        if ($group_id) {
             $linkQuery->join('device_group_device AS ldg', 'ld.device_id', '=', 'ldg.device_id')
                 ->join('device_group_device AS rdg', 'rd.device_id', '=', 'rdg.device_id')
                 ->where('rd.device_group_id', '=', $group_id)
@@ -139,14 +139,14 @@ class MapController extends Controller
         }
 
         if (! $group_id) {
-            if($linkType == "depends") {
+            if ($linkType == 'depends') {
                 return $deviceQuery->with('parents')->get();
             } else {
                 return $deviceQuery->get();
             }
         }
 
-        if($linkType == "depends") {
+        if ($linkType == 'depends') {
             $devices = $deviceQuery->with([
                 'parents' => function ($query) use ($request) {
                     $query->hasAccess($request->user());
@@ -270,7 +270,7 @@ class MapController extends Controller
             }
             $link_color = Config::get("network_map_legend.$link_used");
 
-            $link_list[$link->left_id . "." . $link->right_id] = [
+            $link_list[$link->left_id . '.' . $link->right_id] = [
                 'local_lat'  => $link->left_lat,
                 'local_lng'  => $link->left_lng,
                 'remote_lat' => $link->right_lat,
@@ -279,14 +279,15 @@ class MapController extends Controller
                 'width'      => $width,
             ];
         }
+
         return response()->json($link_list);
     }
 
     // Full Screen Map
     public function fullscreenMap(Request $request)
     {
-        $group_name = NULL;
-        if($request->get('group')) {
+        $group_name = null;
+        if ($request->get('group')) {
             $group_name = DeviceGroup::where('id', '=', $request->get('group'))->first('name');
             if (! empty($group_name)) {
                 $group_name = $group_name->name;
@@ -299,7 +300,7 @@ class MapController extends Controller
             'map_api_key' => Config::get('geoloc.api_key', ''),
             'show_netmap' => Config::get('network_map_show_on_worldmap', false),
             'netmap_source' => Config::get('network_map_worldmap_link_type', 'xdp'),
-            'netmap_include_disabled_alerts' => Config::get('network_map_worldmap_show_disabled_alerts', true)?1:0,
+            'netmap_include_disabled_alerts' => Config::get('network_map_worldmap_show_disabled_alerts', true) ? 1 : 0,
             'page_refresh' => Config::get('page_refresh', 300),
             'init_lat' => Config::get('leaflet.default_lat', 51.48),
             'init_lng' => Config::get('leaflet.default_lng', 0),
