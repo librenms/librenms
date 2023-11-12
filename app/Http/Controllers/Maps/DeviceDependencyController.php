@@ -28,6 +28,7 @@ namespace App\Http\Controllers\Maps;
 use App\Models\Device;
 use App\Models\DeviceGroup;
 use Illuminate\Http\Request;
+use LibreNMS\Config;
 use LibreNMS\Util\Url;
 
 class DeviceDependencyController extends MapController
@@ -37,69 +38,6 @@ class DeviceDependencyController extends MapController
     protected $deviceIdAll = [];
 
     private $parentDeviceIds = [];
-
-    protected static function deviceList($request)
-    {
-        $group_id = $request->get('group');
-        $valid_loc = $request->get('location_valid');
-        $disabled = $request->get('disabled');
-        $ignore = $request->get('ignore');
-        $disabled_alerts = $request->get('disabled_alerts');
-
-        $deviceQuery = Device::hasAccess($request->user())->with('location');
-
-        if ($group_id) {
-            $deviceQuery->inDeviceGroup($group_id);
-        }
-
-        if (! is_null($disabled)) {
-            if ($disabled) {
-                $deviceQuery->where('disabled', '<>', '0');
-            } else {
-                $deviceQuery->where('disabled', '=', '0');
-            }
-        }
-
-        if (! is_null($ignore)) {
-            if ($ignore) {
-                $deviceQuery->where('ignore', '<>', '0');
-            } else {
-                $deviceQuery->where('ignore', '=', '0');
-            }
-        }
-
-        if (! is_null($disabled_alerts)) {
-            if ($disabled_alerts) {
-                $deviceQuery->where('disable_notify', '<>', '0');
-            } else {
-                $deviceQuery->where('disable_notify', '=', '0');
-            }
-        }
-
-        if ($valid_loc) {
-            $deviceQuery->whereHas('location', function ($query) {
-                $query->whereNotNull('lng')
-                    ->whereNotNull('lat')
-                    ->where('lng', '<>', '')
-                    ->where('lat', '<>', '');
-            });
-        }
-
-        if (! $group_id) {
-            return $deviceQuery->with('parents')->get();
-        }
-
-        $devices = $deviceQuery->with([
-            'parents' => function ($query) use ($request) {
-                $query->hasAccess($request->user());
-            },
-            'children' => function ($query) use ($request) {
-                $query->hasAccess($request->user());
-            }, ])
-        ->get();
-
-        return $devices->merge($devices->map->only('children', 'parents')->flatten())->loadMissing('parents', 'location');
-    }
 
     protected function highlightDevices($devices_by_id, $device_id_list)
     {
@@ -139,11 +77,16 @@ class DeviceDependencyController extends MapController
         $show_device_path = $request->get('showparentdevicepath');
 
         $dependencies = [];
-        $devices_by_id = [];
+        $devices_by_id = array();
         $device_list = [];
 
         // collect Device IDs and Parents/Children to find isolated Devices
         $device_associations = [];
+
+        // For manual level we need to track some items
+        $next_level_devices = array();
+        $device_child_map = array();
+        $processed_devices = array();
 
         // List all devices
         foreach (self::deviceList($request) as $device) {
@@ -151,7 +94,7 @@ class DeviceDependencyController extends MapController
             $this->deviceIdAll[] = $device->device_id;
 
             // List all Device
-            $devices_by_id[] = array_merge(
+            $devices_by_id[$device->device_id] = array_merge(
                 [
                     'id' => $device->device_id,
                     'label' => $device->shortDisplayName(),
@@ -175,8 +118,43 @@ class DeviceDependencyController extends MapController
                     'to' => $parent->device_id,
                     'width' => 2,
                 ];
+                // Keep track of the parent->child relationship
+                if(! array_key_exists($parent->device_id, $device_child_map)) {
+                    $device_child_map[$parent->device_id] = array();
+                }
+                $device_child_map[$parent->device_id][$device->device_id] = True;
+            }
+            if(! count($parents)) {
+                // This is a top level device
+                $next_level_devices[$device->device_id] = True;
             }
         }
+
+        $this_level=0;
+        while (count($next_level_devices)) {
+            $this_level_devices = $next_level_devices;
+            $next_level_devices = array();
+
+            foreach (array_keys($this_level_devices) as $device_id) {
+                // Ignore if the device has already been processed
+                if (array_key_exists($device_id, $processed_devices)) {
+                    continue;
+                }
+
+                // Set device level and mark as processed
+                $devices_by_id[$device_id]['level'] = $this_level;
+                $processed_devices[$device_id] = True;
+
+                // Add any child devices to be processed next
+                if (array_key_exists($device_id, $device_child_map)) {
+                    $next_level_devices = $next_level_devices + $device_child_map[$device_id];
+                }
+            }
+            $this_level++;
+        }
+
+        // We can collapse devices_by_id to be just values
+        $devices_by_id = array_values($devices_by_id);
 
         // highlight isolated Devices
         if ($highlight_node == $this->isolatedDeviceId) {
@@ -217,26 +195,5 @@ class DeviceDependencyController extends MapController
         ];
 
         return view('map.device-dependency', $data);
-    }
-
-    // Device Dependency JSON
-    public function dependencyJSON(Request $request)
-    {
-        // List all devices
-        $device_list = [];
-        foreach (self::deviceList($request) as $device) {
-            $device_list[$device->device_id] = [
-                'id'      => $device->device_id,
-                'icon'    => $device->icon,
-                'sname'   => $device->shortDisplayName(),
-                'status'  => $device->status,
-                'url'     => Url::deviceUrl($device->device_id),
-                'lat'     => $device->location->lat,
-                'lng'     => $device->location->lng,
-                'parents' => $device->parents->map->only('device_id')->flatten(),
-            ];
-        }
-
-        return response()->json($device_list);
     }
 }
