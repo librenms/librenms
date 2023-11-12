@@ -84,6 +84,7 @@ Route::middleware(['auth'])->group(function () {
         ->name('device')->where('vars', '.*');
 
     // Maps
+    Route::get('fullscreenmap', 'Maps\MapController@fullscreenMap');
     Route::prefix('maps')->group(function () {
         Route::resource('custom', CustomMapController::class, ['as' => 'maps'])
             ->parameters(['custom' => 'map'])->except('create');
@@ -92,7 +93,8 @@ Route::middleware(['auth'])->group(function () {
         Route::get('custom/{map}/data', [CustomMapDataController::class, 'get'])->name('maps.custom.data');
         Route::post('custom/{map}/data', [CustomMapDataController::class, 'save'])->name('maps.custom.data.save');
         Route::get('devicedependency', 'DeviceDependencyController@dependencyMap');
-        Route::get('devicedependencyjson', 'DeviceDependencyController@dependencyJSON');
+        Route::get('getdevices', 'MapController@getDevices')->name('maps.getdevices');
+        Route::get('getlinks', 'MapController@getLinks')->name('maps.getlinks');
     });
     Route::get('maps/devicedependency', [DeviceDependencyController::class, 'dependencyMap']);
 

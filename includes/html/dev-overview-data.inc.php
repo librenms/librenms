@@ -174,7 +174,7 @@ if ($device['location_id'] && $location = Location::find($device['location_id'])
         // Get a list of devices we have access to and add them to the map
         echo'
                 device_marker_cluster = L.markerClusterGroup({
-                    maxClusterRadius: 80,
+                    maxClusterRadius: ' . Config::get('leaflet.group_radius', 80) . ',
                     iconCreateFunction: function (cluster) {
                         var markers = cluster.getAllChildMarkers();
                         var n = 0;
@@ -197,7 +197,7 @@ if ($device['location_id'] && $location = Location::find($device['location_id'])
                     markerColor: \'green\', prefix: \'fa\', iconColor: \'white\'
                   });
 
-                $.get( "' . url('/maps/devicedependencyjson') . '", {disabled_alerts: 0, disabled: 0, location_valid: 1})
+                $.get( "' . url('/maps/getdevices') . '", {disabled_alerts: 0, disabled: 0, location_valid: 1, link_type: "depends"})
                   .done(function( data ) {
                       $.each( data, function( device_id, device ) {
                         var icon = greenMarker;
