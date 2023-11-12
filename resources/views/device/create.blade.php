@@ -156,12 +156,12 @@
                                 <label for="authalgo" class="col-sm-3 control-label">Auth Algorithm</label>
                                 <div class="col-sm-9">
                                     <select name="authalgo" id="authalgo" class="form-control input-sm">
-                                        @foreach(\LibreNMS\SNMPCapabilities::authAlgorithms() as $algo => $enabled)
+                                        @foreach($authAlgorithms as $algo => $enabled)
                                             <option value="{{$algo}}"
                                                     @if(!$enabled)  disabled @endif >{{$algo}}</option>
                                         @endforeach
                                     </select>
-                                    @if (!\LibreNMS\SNMPCapabilities::supportsSHA2())
+                                    @if (!$supportSHA2)
                                         <label class="text-left"><small>Some options are disabled. <a
                                                     href="https://docs.librenms.org/Support/FAQ/#optional-requirements-for-snmpv3-sha2-auth">Read
                                                     more here</a></small></label>
@@ -179,13 +179,13 @@
                                 <label for="cryptoalgo" class="col-sm-3 control-label">Crypto Algorithm</label>
                                 <div class="col-sm-9">
                                     <select name="cryptoalgo" id="cryptoalgo" class="form-control input-sm">
-                                        @foreach (\LibreNMS\SNMPCapabilities::cryptoAlgoritms() as $algo => $enabled)
+                                        @foreach ($cryptoAlgorithmsas as  $algo => $enabled)
 
                                             <option value="{{$algo}}"
                                                     @if(!$enabled)  disabled @endif >{{$algo}}</option>
 
                                         @endforeach                                    </select>
-                                    @if(!\LibreNMS\SNMPCapabilities::supportsAES256())
+                                    @if(!$supportAES256)
                                         <label class="text-left"><small>Some options are disabled. <a
                                                     href="https://docs.librenms.org/Support/FAQ/#optional-requirements-for-snmpv3-sha2-auth">Read
                                                     more here</a></small></label>

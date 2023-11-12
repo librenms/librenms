@@ -68,9 +68,9 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('nac', 'NacController@index');
 
-    Route::prefix("device")->name('device.')->group(function () {
-        Route::get("create", "DeviceController@create")->name('create');
-        Route::post("store", "DeviceController@store");
+    Route::prefix('device')->name('device.')->group(function () {
+        Route::get('create', 'DeviceController@create')->name('create');
+        Route::post('store', 'DeviceController@store');
     });
     // Device Tabs
     Route::prefix('device/{device}')->namespace('Device\Tabs')->name('device.')->group(function () {

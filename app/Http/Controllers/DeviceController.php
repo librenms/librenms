@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Actions\Device\ValidateDeviceAndCreate;
 use App\Facades\DeviceCache;
+use App\Http\Requests\StoreDeviceRequest;
 use App\Models\Device;
 use App\Models\PollerGroup;
 use App\Models\Vminfo;
@@ -17,6 +18,7 @@ use Illuminate\Support\Facades\Blade;
 use LibreNMS\Config;
 use LibreNMS\Enum\PortAssociationMode;
 use LibreNMS\Exceptions\HostUnreachableException;
+use LibreNMS\SNMPCapabilities;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Graph;
 use LibreNMS\Util\IP;
@@ -66,10 +68,10 @@ class DeviceController extends Controller
     public function index(Request $request, $device, $current_tab = 'overview', $vars = '')
     {
         $device = str_replace('device=', '', $device);
-        $device = is_numeric($device) ? DeviceCache::get((int) $device) : DeviceCache::getByHostname($device);
+        $device = is_numeric($device) ? DeviceCache::get((int)$device) : DeviceCache::getByHostname($device);
         $device_id = $device->device_id;
 
-        if (! $device->exists) {
+        if (!$device->exists) {
             abort(404);
         }
 
@@ -266,34 +268,39 @@ class DeviceController extends Controller
         $defaultMode = Config::get('default_port_association_mode');
         $distributedPoller = Config::get('distributed_poller');
         $pollerGroup = PollerGroup::select('id', 'group_name')->orderBy('group_name')->get();
+        $authAlgorithms = SNMPCapabilities::authAlgorithms();
+        $supportSHA2 = SNMPCapabilities::supportsSHA2();
+        $supportAES256 = SNMPCapabilities::supportsAES256();
+        $cryptoAlgorithms = SNMPCapabilities::cryptoAlgoritms();
         return view('device.create', [
             'transports' => $transports,
             'modes' => $modes,
             'defaultMode' => $defaultMode,
             'distributedPoller' => $distributedPoller,
             'pollerGroup' => $pollerGroup,
+            'authAlgorithms' => $authAlgorithms,
+            'supportSHA2' => $supportSHA2,
+            'supportAES256' => $supportAES256,
+            'cryptoAlgorithms' => $cryptoAlgorithms,
         ]);
     }
 
-    public function store(Request $request)
+    public function store(StoreDeviceRequest $request)
     {
         $this->authorize('create', Device::class);
-        $validated = $this->validate($request,
-        [
-''
-        ]);
-        if (! Validate::hostname($request->hostname) && ! IP::isValid($request->hostname)) {
+
+        if (!Validate::hostname($request->hostname) && !IP::isValid($request->hostname)) {
             return redirect()->back()->with(['error_message' => 'Invalid hostname or IP address: ' . $request->hostname]);
         }
         $device = new Device(['hostname' => $request->hostname]);
         if ($request->port) {
-            $device->port = strip_tags(is_numeric($request->port));
+            $device->port = $request->port;
         }
         if ($request->transport) {
             $device->transport = strip_tags($request->transport);
         }
-        $snmp_enabled = ! isset($_POST['hostname']) || isset($_POST['snmp']);
-        if (! $snmp_enabled) {
+        $snmp_enabled = !isset($_POST['hostname']) || isset($_POST['snmp']);
+        if (!$snmp_enabled) {
             $device->snmp_disable = true;
             $device->os = $request->os ? strip_tags($request->os_id) : 'ping';
             $device->hardware = strip_tags($request->hardware);
@@ -315,7 +322,7 @@ class DeviceController extends Controller
             $device->cryptoalgo = $request->cryptoalgo;
 
         } else {
-            return redirect()->back()->with(['error_message' => 'Unsupported SNMP Version. There was a dropdown menu, how did you reach this error ?']);
+            return redirect()->back()->with(['error_message' => __('exceptions.snmp_version_unsupported.message', ['snmpver' => $request->snmpver])]);
         }//end if
 
         try {
