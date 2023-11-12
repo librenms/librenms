@@ -254,8 +254,7 @@ html, body, #fullscreen-map {
                     cur.sec -= 1;
                     if (cur.sec <= 0) {
                         refreshMap();
-                        //cur.sec = {{$page_refresh}};
-                        cur.sec = 30;
+                        cur.sec = {{$page_refresh}};
                     }
                     $("#countdown_timer").html("<i class=\"fa fa-clock-o fa-fw fa-lg\"></i> Refresh in " + cur.sec);
                 }, 1000);
