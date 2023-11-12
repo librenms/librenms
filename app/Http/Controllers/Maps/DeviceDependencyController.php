@@ -28,7 +28,6 @@ namespace App\Http\Controllers\Maps;
 use App\Models\Device;
 use App\Models\DeviceGroup;
 use Illuminate\Http\Request;
-use LibreNMS\Config;
 use LibreNMS\Util\Url;
 
 class DeviceDependencyController extends MapController
@@ -77,16 +76,16 @@ class DeviceDependencyController extends MapController
         $show_device_path = $request->get('showparentdevicepath');
 
         $dependencies = [];
-        $devices_by_id = array();
+        $devices_by_id = [];
         $device_list = [];
 
         // collect Device IDs and Parents/Children to find isolated Devices
         $device_associations = [];
 
         // For manual level we need to track some items
-        $next_level_devices = array();
-        $device_child_map = array();
-        $processed_devices = array();
+        $next_level_devices = [];
+        $device_child_map = [];
+        $processed_devices = [];
 
         // List all devices
         foreach (self::deviceList($request) as $device) {
@@ -119,21 +118,21 @@ class DeviceDependencyController extends MapController
                     'width' => 2,
                 ];
                 // Keep track of the parent->child relationship
-                if(! array_key_exists($parent->device_id, $device_child_map)) {
-                    $device_child_map[$parent->device_id] = array();
+                if (! array_key_exists($parent->device_id, $device_child_map)) {
+                    $device_child_map[$parent->device_id] = [];
                 }
-                $device_child_map[$parent->device_id][$device->device_id] = True;
+                $device_child_map[$parent->device_id][$device->device_id] = true;
             }
-            if(! count($parents)) {
+            if (! count($parents)) {
                 // This is a top level device
-                $next_level_devices[$device->device_id] = True;
+                $next_level_devices[$device->device_id] = true;
             }
         }
 
-        $this_level=0;
+        $this_level = 0;
         while (count($next_level_devices)) {
             $this_level_devices = $next_level_devices;
-            $next_level_devices = array();
+            $next_level_devices = [];
 
             foreach (array_keys($this_level_devices) as $device_id) {
                 // Ignore if the device has already been processed
@@ -143,7 +142,7 @@ class DeviceDependencyController extends MapController
 
                 // Set device level and mark as processed
                 $devices_by_id[$device_id]['level'] = $this_level;
-                $processed_devices[$device_id] = True;
+                $processed_devices[$device_id] = true;
 
                 // Add any child devices to be processed next
                 if (array_key_exists($device_id, $device_child_map)) {
