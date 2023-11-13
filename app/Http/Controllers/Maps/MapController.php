@@ -29,6 +29,7 @@ use App\Http\Controllers\Controller;
 use App\Models\AlertSchedule;
 use App\Models\Device;
 use App\Models\DeviceGroup;
+use App\Models\Service;
 use Illuminate\Http\Request;
 use LibreNMS\Config;
 use LibreNMS\Util\Url;
@@ -253,15 +254,29 @@ class MapController extends Controller
         // List all devices
         $device_list = [];
         foreach (self::deviceList($request) as $device) {
+            if ($device->status) {
+                $updowntime = \LibreNMS\Util\Time::formatInterval($device->uptime);
+            } elseif ($device->last_polled) {
+                $updowntime = \LibreNMS\Util\Time::formatInterval(time() - strtotime($device->last_polled));
+            } else {
+                $updowntime = '';
+            }
+
             $device_list[$device->device_id] = [
                 'id'          => $device->device_id,
                 'icon'        => $device->icon,
+                'icontitle'   => $device->icon ? str_replace(['.svg', '.png'], '', basename($device->icon)) : $device->os,
                 'sname'       => $device->shortDisplayName(),
                 'status'      => $device->status,
+                'uptime'      => $device->uptime,
+                'updowntime'  => $updowntime,
+                'last_polled' => $device->last_polled,
+                'disabled'    => $device->disabled,
+                'no_alerts'   => $device->disable_notify,
                 'url'         => Url::deviceUrl($device->device_id),
-                'lat'         => $device->location->lat,
-                'lng'         => $device->location->lng,
-                'parents'     => $device->parents->map->only('device_id')->flatten(),
+                'lat'         => $device->location ? $device->location->lat : null,
+                'lng'         => $device->location ? $device->location->lng : null,
+                'parents'     => ($request->get('link_type') == 'depends') ? $device->parents->map->only('device_id')->flatten() : [],
                 'maintenance' => array_key_exists($device->device_id, $maintdevicesmap) ? 1 : 0,
             ];
         }
@@ -303,6 +318,61 @@ class MapController extends Controller
         }
 
         return response()->json($link_list);
+    }
+
+    // GET Device services
+    public function getServices(Request $request)
+    {
+        $group_id = $request->get('device_group');
+        $services = Service::hasAccess($request->user())->with('device');
+
+        if ($group_id) {
+            $services->inDeviceGroup($group_id);
+        }
+
+        $service_list = [];
+        foreach ($services->get() as $service) {
+            if ($service->device->status) {
+                $updowntime = \LibreNMS\Util\Time::formatInterval($service->device->uptime);
+            } elseif ($service->device->last_polled) {
+                $updowntime = \LibreNMS\Util\Time::formatInterval(time() - strtotime($service->device->last_polled));
+            } else {
+                $updowntime = '';
+            }
+
+            $service_list[] = [
+                'id'          => $service->service_id,
+                'name'        => $service->service_name,
+                'type'        => $service->service_type,
+                'status'      => $service->service_status,
+                'icon'        => $service->device->icon,
+                'icontitle'   => $service->device->icon ? str_replace(['.svg', '.png'], '', basename($service->device->icon)) : $service->device->os,
+                'device_name' => $service->device->shortDisplayName(),
+                'url'         => Url::deviceUrl($service->device_id),
+                'updowntime'  => $updowntime,
+                'compact'     => Config::get('webui.availability_map_compact'),
+                'box_size'    => Config::get('webui.availability_map_box_size'),
+            ];
+        }
+
+        return response()->json($service_list);
+    }
+
+    // Availability Map
+    public function availabilityMap(Request $request)
+    {
+        $data = [
+            'page_refresh' => Config::get('page_refresh', 300),
+            'compact'      => Config::get('webui.availability_map_compact'),
+            'box_size'     => Config::get('webui.availability_map_box_size'),
+            'sort'         => Config::get('webui.availability_map_sort_status') ? 'status' : 'hostname',
+            'use_groups'   => Config::get('webui.availability_map_use_device_groups'),
+            'services'     => Config::get('show_services'),
+            'uptime_warn'  => Config::get('uptime_warning'),
+            'devicegroups' => Config::get('webui.availability_map_use_device_groups') ? DeviceGroup::hasAccess($request->user())->orderBy('name')->get(['id', 'name']) : [],
+        ];
+
+        return view('map.availability', $data);
     }
 
     // Full Screen Map

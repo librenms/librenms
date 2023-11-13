@@ -82,6 +82,7 @@ Route::middleware(['auth'])->group(function () {
 
     // Maps
     Route::get('fullscreenmap', 'Maps\MapController@fullscreenMap');
+    Route::get('availability-map', 'Maps\MapController@availabilityMap');
     Route::prefix('maps')->group(function () {
         Route::resource('custom', CustomMapController::class, ['as' => 'maps'])
             ->parameters(['custom' => 'map'])->except('create');
@@ -92,6 +93,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('devicedependency', 'DeviceDependencyController@dependencyMap');
         Route::get('getdevices', 'MapController@getDevices')->name('maps.getdevices');
         Route::get('getlinks', 'MapController@getLinks')->name('maps.getlinks');
+        Route::get('getservices', 'MapController@getServices')->name('maps.getservices');
     });
     Route::get('maps/devicedependency', [DeviceDependencyController::class, 'dependencyMap']);
 

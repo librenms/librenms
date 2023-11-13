@@ -30,7 +30,7 @@ Only leaflet map engine is currently supported
 </div>
 
 </div>
-</Div>
+</div>
 </div>
 
 <div class="container" id="fullscreen-map"></div>
