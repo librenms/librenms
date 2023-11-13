@@ -49,8 +49,11 @@ class Api extends Transport
         ->withHeaders($request_headers); //get each line of key-values and process the variables for Headers
 
         if ($method !== 'get') {
+            // Set default value for Content-Type but use whatever is already in request_headers
+            $request_headers = array_merge(['Content-Type' => 'text/plain'], $request_headers);
             $request_body = SimpleTemplate::parse($this->config['api-body'], $alert_data);
-            $client->withBody($request_body, 'text/plain'); // Content-Type can be overriden by user headers
+            $client->withBody($request_body); // always overrides Content-Type
+            $client->replaceHeaders($request_headers); // replace with our computed headers
         }
 
         if ($username) {
