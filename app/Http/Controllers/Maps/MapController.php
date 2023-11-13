@@ -26,6 +26,7 @@
 namespace App\Http\Controllers\Maps;
 
 use App\Http\Controllers\Controller;
+use App\Models\AlertSchedule;
 use App\Models\Device;
 use App\Models\DeviceGroup;
 use Illuminate\Http\Request;
@@ -98,11 +99,16 @@ class MapController extends Controller
         $ignore = $request->get('ignore');
         $disabled_alerts = $request->get('disabled_alerts');
         $linkType = $request->get('link_type');
+        $statuses = $request->get('statuses');
 
         $deviceQuery = Device::hasAccess($request->user())->with('location');
 
         if ($group_id) {
             $deviceQuery->inDeviceGroup($group_id);
+        }
+
+        if ($statuses && count($statuses) > 0) {
+            $deviceQuery->whereIn('status', $statuses);
         }
 
         if (! is_null($disabled)) {
@@ -229,18 +235,34 @@ class MapController extends Controller
     // GET Device
     public function getDevices(Request $request)
     {
+        // Get all devices under maintenance
+        $maintdevices = AlertSchedule::isActive()
+            ->with('devices', 'locations.devices', 'deviceGroups.devices')
+            ->get()
+            ->map->only('devices', 'locations.devices', 'deviceGroups.devices')
+            ->flatten();
+
+        // Create a hash of device IDs covered by maintenance to avoid a DB call per device below
+        $maintdevicesmap = [];
+        foreach ($maintdevices as $device) {
+            if ($device) {
+                $maintdevicesmap[$device->device_id] = true;
+            }
+        }
+
         // List all devices
         $device_list = [];
         foreach (self::deviceList($request) as $device) {
             $device_list[$device->device_id] = [
-                'id'      => $device->device_id,
-                'icon'    => $device->icon,
-                'sname'   => $device->shortDisplayName(),
-                'status'  => $device->status,
-                'url'     => Url::deviceUrl($device->device_id),
-                'lat'     => $device->location->lat,
-                'lng'     => $device->location->lng,
-                'parents' => $device->parents->map->only('device_id')->flatten(),
+                'id'          => $device->device_id,
+                'icon'        => $device->icon,
+                'sname'       => $device->shortDisplayName(),
+                'status'      => $device->status,
+                'url'         => Url::deviceUrl($device->device_id),
+                'lat'         => $device->location->lat,
+                'lng'         => $device->location->lng,
+                'parents'     => $device->parents->map->only('device_id')->flatten(),
+                'maintenance' => array_key_exists($device->device_id, $maintdevicesmap) ? 1 : 0,
             ];
         }
 

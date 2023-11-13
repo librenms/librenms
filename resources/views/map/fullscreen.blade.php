@@ -101,6 +101,9 @@ html, body, #fullscreen-map {
             color = "green"
             newClass = "Cluster marker-cluster marker-cluster-small leaflet-zoom-animated leaflet-clickable";
             for (var i = 0; i < markers.length; i++) {
+                if (markers[i].options.icon.options.markerColor == "blue" && color != "red") {
+                    color = "blue";
+                }
                 if (markers[i].options.icon.options.markerColor == "red") {
                     color = "red";
                 }
@@ -113,6 +116,10 @@ html, body, #fullscreen-map {
     var redMarker = L.AwesomeMarkers.icon({
         icon: 'server',
         markerColor: 'red', prefix: 'fa', iconColor: 'white'
+    });
+    var blueMarker = L.AwesomeMarkers.icon({
+        icon: 'server',
+        markerColor: 'blue', prefix: 'fa', iconColor: 'white'
     });
     var greenMarker = L.AwesomeMarkers.icon({
         icon: 'server',
@@ -150,10 +157,15 @@ html, body, #fullscreen-map {
             .done(function( data ) {
                 $.each( data, function( device_id, device ) {
                     var icon = greenMarker;
-                    var z_offset = 5000;
+                    var z_offset = 0;
                     if (device["status"] == 0) {
-                        icon = redMarker;
-                        z_offset = 10000;
+                        if (device["maintenance"] != 0) {
+                            icon = blueMarker;
+                            z_offset = 5000;
+                        } else {
+                            icon = redMarker;
+                            z_offset = 10000;
+                        }
                     }
                     if(device_id in device_markers) {
                         device_markers[device_id].setLatLng(new L.LatLng(device["lat"], device["lng"]));
