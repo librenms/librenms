@@ -181,6 +181,9 @@ if ($device['location_id'] && $location = Location::find($device['location_id'])
                         color = "green"
                         newClass = "Cluster marker-cluster marker-cluster-small leaflet-zoom-animated leaflet-clickable";
                         for (var i = 0; i < markers.length; i++) {
+                            if (markers[i].options.icon.options.markerColor == "blue" && color != "red") {
+                                color = "blue";
+                            }
                             if (markers[i].options.icon.options.markerColor == "red") {
                                 color = "red";
                             }
@@ -192,6 +195,10 @@ if ($device['location_id'] && $location = Location::find($device['location_id'])
                     icon: \'server\',
                     markerColor: \'red\', prefix: \'fa\', iconColor: \'white\'
                   });
+                var blueMarker = L.AwesomeMarkers.icon({
+                    icon: \'server\',
+                    markerColor: \'blue\', prefix: \'fa\', iconColor: \'white\'
+                  });
                 var greenMarker = L.AwesomeMarkers.icon({
                     icon: \'server\',
                     markerColor: \'green\', prefix: \'fa\', iconColor: \'white\'
@@ -201,10 +208,15 @@ if ($device['location_id'] && $location = Location::find($device['location_id'])
                   .done(function( data ) {
                       $.each( data, function( device_id, device ) {
                         var icon = greenMarker;
-                        var z_offset = 5000;
+                        var z_offset = 0;
                         if (device["status"] == 0) {
-                            icon = redMarker;
-                            z_offset = 10000;
+                            if (device["maintenance"] != 0) {
+                                icon = blueMarker;
+                                z_offset = 5000;
+                            } else {
+                                icon = redMarker;
+                                z_offset = 10000;
+                            }
                         }
                         var marker = L.marker(new L.LatLng(device["lat"],device["lng"]), {title: device["sname"], icon: icon, zIndexOffset: z_offset});
                         marker.bindPopup("<a href=\"" + device["url"] + "\"><img src=\"" + device["icon"] + "\" width=\"32\" height=\"32\" alt=\"\"> " + device["sname"] + "</a>");
