@@ -271,8 +271,17 @@ class RunAlerts
     public function runAcks()
     {
         foreach ($this->loadAlerts('alerts.state = ' . AlertState::ACKNOWLEDGED . ' && alerts.open = ' . AlertState::ACTIVE) as $alert) {
-            $this->issueAlert($alert);
-            dbUpdate(['open' => AlertState::CLEAR], 'alerts', 'rule_id = ? && device_id = ?', [$alert['rule_id'], $alert['device_id']]);
+            $rextra = json_decode($alert['extra'], true);
+            if (! isset($rextra['acknowledgement'])) {
+                // backwards compatibility check
+                $rextra['acknowledgement'] = true;
+            }
+
+            if ($rextra['acknowledgement']) {
+                // Rule is set to send an acknowledgement alert
+                $this->issueAlert($alert);
+                dbUpdate(['open' => AlertState::CLEAR], 'alerts', 'rule_id = ? && device_id = ?', [$alert['rule_id'], $alert['device_id']]);
+            }
         }
     }
 
