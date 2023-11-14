@@ -648,5 +648,19 @@
         $('#dashboard_name').val('Default');
         dashboard_add($('#add_form'));
     @endif
+
+     function checkFullScreen() {
+         if (window.innerHeight > (screen.height - 10)) {
+            $(".navbar-fixed-top").hide();
+            $("#dashboard-editor").hide();
+            $("body").css("padding-top", 0).css("padding-bottom", 0);
+         } else {
+            $(".navbar-fixed-top").show();
+            $("#dashboard-editor").show();
+            $("body").css("padding-top", "50px").css("padding-bottom", "50px");
+         };
+     }
+     window.addEventListener('resize', checkFullScreen(), false);
+     checkFullScreen();
 </script>
 @endpush
