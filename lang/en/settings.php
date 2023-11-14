@@ -126,6 +126,10 @@ return [
                 'description' => 'Recovery Alerts',
                 'help' => 'Notify if Alert recovers',
             ],
+            'acknowledgement_alerts' => [
+                'description' => 'Acknowledgement Alerts',
+                'help' => 'Notify if Alert is acknowledged',
+            ],
             'invert_map' => [
                 'description' => 'All devices except in list',
                 'help' => 'Alert only for Devices which are not listed',

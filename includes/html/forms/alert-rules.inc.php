@@ -59,6 +59,7 @@ $invert = isset($_POST['invert']) ? $_POST['invert'] : null;
 $name = strip_tags($_POST['name']);
 $proc = $_POST['proc'];
 $recovery = $vars['recovery'];
+$acknowledgement = $vars['acknowledgement'];
 $invert_map = isset($_POST['invert_map']) ? $_POST['invert_map'] : null;
 $severity = $_POST['severity'];
 
@@ -82,6 +83,7 @@ if ($invert == 'on') {
 }
 
 $recovery = empty($recovery) ? $recovery = false : true;
+$acknowledgement = empty($acknowledgement) ? $acknowledgement = false : true;
 
 if ($invert_map == 'on') {
     $invert_map = true;
@@ -90,13 +92,14 @@ if ($invert_map == 'on') {
 }
 
 $extra = [
-    'mute'     => $mute,
-    'count'    => $count,
-    'delay'    => $delay_sec,
-    'invert'   => $invert,
-    'interval' => $interval_sec,
-    'recovery' => $recovery,
-    'options'  => $options,
+    'mute'            => $mute,
+    'count'           => $count,
+    'delay'           => $delay_sec,
+    'invert'          => $invert,
+    'interval'        => $interval_sec,
+    'recovery'        => $recovery,
+    'acknowledgement' => $acknowledgement,
+    'options'         => $options,
 ];
 
 $extra_json = json_encode($extra);
