@@ -1084,6 +1084,45 @@ function get_port_info(Illuminate\Http\Request $request)
     });
 }
 
+function update_port_description(Illuminate\Http\Request $request)
+{
+    $port_id = $request->route('portid');
+    $port = Port::hasAccess(Auth::user())
+        ->where([
+            'port_id' => $port_id,
+        ])->first();
+    if (empty($port)) {
+        return api_error(400, 'Invalid port ID.');
+    }
+
+    $data = json_decode($request->getContent(), true);
+    $field = 'description';
+    $content = $data[$field];
+
+    if (empty($content)) {
+        return api_error(400, 'New port description has not been supplied.');
+    }
+
+    $port->ifAlias = $content;
+    $port->save();
+
+    return api_success_noresult(200, 'Port description updated.');
+}
+
+function get_port_description(Illuminate\Http\Request $request)
+{
+    $port_id = $request->route('portid');
+    $port = Port::hasAccess(Auth::user())
+        ->where([
+            'port_id' => $port_id,
+        ])->first();
+    if (empty($port)) {
+        return api_error(400, 'Invalid port ID.');
+    } else {
+        return api_success($port->ifAlias, 'port_description');
+    }
+}
+
 /**
  * @throws \LibreNMS\Exceptions\ApiException
  */
