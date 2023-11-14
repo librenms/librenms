@@ -649,7 +649,7 @@
         dashboard_add($('#add_form'));
     @endif
 
-     function checkFullScreen() {
+     function checkFullScreen(event) {
          if (window.innerHeight > (screen.height - 10)) {
             $(".navbar-fixed-top").hide();
             $("#dashboard-editor").hide();
@@ -660,7 +660,7 @@
             $("body").css("padding-top", "50px").css("padding-bottom", "50px");
          };
      }
-     window.addEventListener('resize', checkFullScreen(), false);
+     addEvent(window, 'resize', checkFullScreen);
      checkFullScreen();
 </script>
 @endpush
