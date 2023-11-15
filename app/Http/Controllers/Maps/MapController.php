@@ -176,44 +176,54 @@ class MapController extends Controller
 
     protected function nodeDisabledStyle()
     {
-        return ['color' => [
-            'highlight' => [
+        return [
+            'color' => [
+                'highlight' => [
+                    'background' => Config::get('network_map_legend.di.node'),
+                ],
+                'border' => Config::get('network_map_legend.di.border'),
                 'background' => Config::get('network_map_legend.di.node'),
             ],
-            'border' => Config::get('network_map_legend.di.border'),
-            'background' => Config::get('network_map_legend.di.node'),
-        ],
+            'borderWidth' => null,
         ];
     }
 
     protected function nodeHighlightStyle()
     {
-        return ['color' => [
-            'highlight' => [
+        return [
+            'color' => [
+                'highlight' => [
+                    'border' => Config::get('network_map_legend.highlight.border'),
+                ],
                 'border' => Config::get('network_map_legend.highlight.border'),
             ],
-            'border' => Config::get('network_map_legend.highlight.border'),
-        ],
             'borderWidth' => Config::get('network_map_legend.highlight.borderWidth'),
         ];
     }
 
     protected function nodeDownStyle()
     {
-        return ['color' => [
-            'highlight' => [
-                'background' => Config::get('network_map_legend.dn.node'),
+        return [
+            'color' => [
+                'highlight' => [
+                    'background' => Config::get('network_map_legend.dn.node'),
+                    'border' => Config::get('network_map_legend.dn.border'),
+                ],
                 'border' => Config::get('network_map_legend.dn.border'),
+                'background' => Config::get('network_map_legend.dn.node'),
             ],
-            'border' => Config::get('network_map_legend.dn.border'),
-            'background' => Config::get('network_map_legend.dn.node'),
-        ],
+            'borderWidth' => null,
         ];
     }
 
     protected function nodeUpStyle()
     {
-        return [];
+        return [
+            'color' => null,
+            'border' => null,
+            'background' => null,
+            'borderWidth' => null,
+        ];
     }
 
     protected function deviceStyle($device, $highlight_node = 0)
@@ -251,6 +261,11 @@ class MapController extends Controller
             }
         }
 
+        // For manual level we need to track some items
+        $next_level_devices = [];
+        $device_child_map = [];
+        $processed_devices = [];
+
         // List all devices
         $device_list = [];
         foreach (self::deviceList($request) as $device) {
@@ -260,6 +275,18 @@ class MapController extends Controller
                 $updowntime = \LibreNMS\Util\Time::formatInterval(time() - strtotime($device->last_polled));
             } else {
                 $updowntime = '';
+            }
+
+            foreach ($device->parents as $parent) {
+                // Keep track of all children for a given device ID
+                if (! array_key_exists($parent->device_id, $device_child_map)) {
+                    $device_child_map[$parent->device_id] = [];
+                }
+                $device_child_map[$parent->device_id][$device->device_id] = true;
+            }
+            if (! count($device->parents)) {
+                // This is a top level device
+                $next_level_devices[$device->device_id] = true;
             }
 
             $device_list[$device->device_id] = [
@@ -273,12 +300,69 @@ class MapController extends Controller
                 'last_polled' => $device->last_polled,
                 'disabled'    => $device->disabled,
                 'no_alerts'   => $device->disable_notify,
-                'url'         => Url::deviceUrl($device->device_id),
+                'url'         => $request->get('url_type') == 'links' ? Url::deviceLink($device, null, [], 0, 0, 0, 0) : Url::deviceUrl($device->device_id),
+                'style'       => self::deviceStyle($device, $request->get('highlight_node')),
                 'lat'         => $device->location ? $device->location->lat : null,
                 'lng'         => $device->location ? $device->location->lng : null,
                 'parents'     => ($request->get('link_type') == 'depends') ? $device->parents->map->only('device_id')->flatten() : [],
                 'maintenance' => array_key_exists($device->device_id, $maintdevicesmap) ? 1 : 0,
             ];
+        }
+
+        // Add levels to each device
+        $this_level = 0;
+        while (count($next_level_devices)) {
+            $this_level_devices = $next_level_devices;
+            $next_level_devices = [];
+
+            foreach (array_keys($this_level_devices) as $device_id) {
+                // Highlight isolated devices if needed
+                if ($request->get('highlight_node') == -1 && ! array_key_exists($device_id, $device_child_map) && count($device_list[$device_id]['parents']) == 0) {
+                    $device_list[$device_id]['style'] = array_merge($device_list[$device_id]['style'], $this->nodeHighlightStyle());
+                }
+
+                // Ignore if the device has already been processed
+                if (array_key_exists($device_id, $processed_devices)) {
+                    continue;
+                }
+
+                // Set device level and mark as processed
+                $device_list[$device_id]['level'] = $this_level;
+                $processed_devices[$device_id] = true;
+
+                // Add any child devices to be processed next
+                if (array_key_exists($device_id, $device_child_map)) {
+                    $next_level_devices = $next_level_devices + $device_child_map[$device_id];
+                }
+            }
+            $this_level++;
+        }
+
+        // If any device does not have a level it is linked to missing parents, so set to level 0
+        foreach (array_keys($device_list) as $device_id) {
+            if (! array_key_exists('level', $device_list[$device_id])) {
+                $device_list[$device_id]['level'] = 0;
+            }
+        }
+
+        // Highlight all parents if required
+        if ($request->get('showpath') && $request->get('highlight_node') > 0) {
+            $processed_parents = [];
+            $this_parents = $device_list[$request->get('highlight_node')]['parents'];
+
+            while (count($this_parents) > 0) {
+                $next_parents = [];
+                foreach ($this_parents as $parent_id) {
+                    if (array_key_exists($parent_id, $processed_parents)) {
+                        continue;
+                    }
+                    $processed_parents[$parent_id] = true;
+
+                    $device_list[$parent_id]['style'] = array_merge($device_list[$parent_id]['style'], $this->nodeHighlightStyle());
+                    $next_parents = array_merge($next_parents, $device_list[$parent_id]['parents']->toArray());
+                }
+                $this_parents = $next_parents;
+            }
         }
 
         return response()->json($device_list);
