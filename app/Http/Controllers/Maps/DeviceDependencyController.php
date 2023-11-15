@@ -29,7 +29,6 @@ use App\Http\Controllers\Controller;
 use App\Models\DeviceGroup;
 use Illuminate\Http\Request;
 use LibreNMS\Config;
-use LibreNMS\Util\Url;
 
 class DeviceDependencyController extends Controller
 {
