@@ -371,7 +371,13 @@ if ($options['f'] === 'recalculate_device_dependencies') {
         // update all root nodes and recurse, chunk so we don't blow up
         Device::doesntHave('parents')->with('children')->chunkById(100, function (Collection $devices) {
             // anonymous recursive function
-            $recurse = function (Device $device) use (&$recurse) {
+            $processed = [];
+            $recurse = function (Device $device) use (&$recurse, &$processed) {
+                // Do not process the same device 2 times
+                if (array_key_exists($device->device_id, $processed)) {
+                    return;
+                }
+                $processed[$device->device_id] = true;
                 $device->updateMaxDepth();
 
                 $device->children->each($recurse);
