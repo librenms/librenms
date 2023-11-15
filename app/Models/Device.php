@@ -370,7 +370,7 @@ class Device extends BaseModel
                     $found_parents[$parent->device_id] = true;
 
                     foreach ($parent->parents as $next_parent) {
-                        if (!array_key_exists($next_parent->device_id, $found_parents)) {
+                        if (! array_key_exists($next_parent->device_id, $found_parents)) {
                             $next_parents[] = $next_parent;
                         }
                     }
