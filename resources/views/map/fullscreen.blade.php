@@ -17,7 +17,7 @@ Only leaflet map engine is currently supported
 @else
 
 <div class="container-fluid">
-<div class="row">
+<div class="row" id="controls-row">
 <div class="col-md-12">
 
 &nbsp;
@@ -61,33 +61,31 @@ html, body, #fullscreen-map {
 
 @section('scripts')
 <script type="text/javascript">
-     var isFullscreen = (window.innerHeight > (screen.height - 10));
-     window.addEventListener('resize', function () {
-         if (window.innerHeight > (screen.height - 10)) {
-             isFullscreen = true;
-             setStyle();
-         } else {
-             isFullscreen = false;
-             setStyle();
-         };
-    }, false);
-
-    function setStyle() {
+    function checkMapSize() {
         var mapheight = $(window).height() - $("#fullscreen-map").offset().top;
         if(mapheight < 200) {
             mapheight = 200;
         }
         $("#fullscreen-map").height(mapheight);
-        if(isFullscreen) {
+    };
+
+    function checkFullScreen() {
+        if (window.matchMedia('(display-mode: fullscreen)').matches) {
             document.getElementsByClassName('navbar-fixed-top')[0].style.display = "none";
             document.getElementsByTagName('body')[0].style.paddingTop = 0;
+            $("#controls-row").hide();
         } else {
             document.getElementsByClassName('navbar-fixed-top')[0].style.removeProperty("display");
             document.getElementsByTagName('body')[0].style.paddingTop = "50px";
+            $("#controls-row").show();
         };
     };
 
-    window.dispatchEvent(new Event('resize'));
+    window.matchMedia('(display-mode: fullscreen)').addEventListener('change', checkFullScreen);
+    checkFullScreen();
+
+    window.addEventListener('resize', checkMapSize);
+    checkMapSize();
 
     var device_map = init_map("fullscreen-map", "{{$map_provider}}", "{{$map_api_key}}", {"tile_url": "{{$tile_url}}"});
     device_map.setView(new L.LatLng({{$init_lat}}, {{$init_lng}}));
