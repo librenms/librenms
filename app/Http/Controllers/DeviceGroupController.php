@@ -67,7 +67,7 @@ class DeviceGroupController extends Controller
             $deviceGroup->devices()->sync($request->devices);
         }
 
-        $flasher->addSuccess(__('Device Group :name created', ['name' => $deviceGroup->name]));
+        $flasher->addSuccess(__('Device Group :name created', ['name' => htmlentities($deviceGroup->name)]));
 
         return redirect()->route('device-groups.index');
     }
@@ -143,7 +143,7 @@ class DeviceGroupController extends Controller
         if ($deviceGroup->isDirty() || $devices_updated) {
             try {
                 if ($deviceGroup->save() || $devices_updated) {
-                    $flasher->addSuccess(__('Device Group :name updated', ['name' => $deviceGroup->name]));
+                    $flasher->addSuccess(__('Device Group :name updated', ['name' => htmlentities($deviceGroup->name)]));
                 } else {
                     $flasher->addError(__('Failed to save'));
 
@@ -170,7 +170,7 @@ class DeviceGroupController extends Controller
     public function destroy(DeviceGroup $deviceGroup)
     {
         if ($deviceGroup->serviceTemplates()->exists()) {
-            $msg = __('Device Group :name still has Service Templates associated with it. Please remove or update the Service Template accordingly', ['name' => $deviceGroup->name]);
+            $msg = __('Device Group :name still has Service Templates associated with it. Please remove or update the Service Template accordingly', ['name' => htmlentities($deviceGroup->name)]);
 
             return response($msg, 200);
         }
