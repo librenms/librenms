@@ -650,7 +650,7 @@
     @endif
 
      function checkFullScreen(event) {
-         if (window.innerHeight > (screen.height - 10)) {
+         if (window.matchMedia('(display-mode: fullscreen)').matches) {
             $(".navbar-fixed-top").hide();
             $("#dashboard-editor").hide();
             $("body").css("padding-top", 0).css("padding-bottom", 0);
@@ -660,7 +660,7 @@
             $("body").css("padding-top", "50px").css("padding-bottom", "50px");
          };
      }
-     addEvent(window, 'resize', checkFullScreen);
+     window.matchMedia('(display-mode: fullscreen)').addEventListener('change', checkFullScreen);
      checkFullScreen();
 </script>
 @endpush
