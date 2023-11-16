@@ -70,7 +70,7 @@ html, body, #fullscreen-map {
     };
 
     function checkFullScreen() {
-        if (window.matchMedia('(display-mode: fullscreen)').matches) {
+        if (window.innerHeight > (screen.height - 10) || window.matchMedia('(display-mode: fullscreen)').matches) {
             document.getElementsByClassName('navbar-fixed-top')[0].style.display = "none";
             document.getElementsByTagName('body')[0].style.paddingTop = 0;
             $("#controls-row").hide();
