@@ -1567,6 +1567,7 @@ tr.search:nth-child(odd) {
 }
 
 .minigraph-image {
+  display: inline;
   margin: 2px;
 }
 
