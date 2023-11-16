@@ -678,6 +678,7 @@ foreach ($ports as $port) {
                 } else {
                     $current_oid = \LibreNMS\Util\StringHelpers::inferEncoding($this_port['ifAlias']);
                 }
+                $current_oid = utf8_encode($current_oid); // prevent invalid non-utf8 characters
             }
             if ($oid == 'ifSpeed') {
                 $ifSpeed_override = DeviceCache::getPrimary()->getAttrib('ifSpeed:' . $port['ifName']);
