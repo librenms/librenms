@@ -77,7 +77,7 @@ class Template
         try {
             return Blade::render($data['template']->template, $alert);
         } catch (\Exception $e) {
-            return Blade::render($this->getDefaultTemplate($data['template']?->name, $e->getMessage()), $alert);
+            return Blade::render($this->getDefaultTemplate($data['template']->name ?? '', $e->getMessage()), $alert);
         }
     }
 
@@ -97,7 +97,7 @@ class Template
         }
     }
 
-    public function getDefaultTemplate(?string $template_name, string $error): string
+    public function getDefaultTemplate(string $template_name, string $error): string
     {
         return '{{ $alert->title }}' . PHP_EOL .
             'Severity: {{ $alert->severity }}' . PHP_EOL .
