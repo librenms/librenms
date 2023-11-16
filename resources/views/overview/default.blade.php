@@ -650,7 +650,7 @@
     @endif
 
      function checkFullScreen(event) {
-         if (window.matchMedia('(display-mode: fullscreen)').matches) {
+         if (window.innerHeight > (screen.height - 10) || window.matchMedia('(display-mode: fullscreen)').matches) {
             $(".navbar-fixed-top").hide();
             $("#dashboard-editor").hide();
             $("body").css("padding-top", 0).css("padding-bottom", 0);
