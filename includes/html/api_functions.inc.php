@@ -1097,16 +1097,31 @@ function update_port_description(Illuminate\Http\Request $request)
 
     $data = json_decode($request->getContent(), true);
     $field = 'description';
-    $content = $data[$field];
+    $description = $data[$field];
 
-    if (empty($content)) {
-        return api_error(400, 'New port description has not been supplied.');
+    if (empty($description)) {
+        // from update-ifalias.inc.php:
+        // "Set to repoll so we avoid using ifDescr on port poll"
+        $description = 'repoll';
     }
 
-    $port->ifAlias = $content;
+    $port->ifAlias = $description;
     $port->save();
 
-    return api_success_noresult(200, 'Port description updated.');
+    $ifName = $port->ifName;
+    $device = $port->device_id;
+
+    if ($description == 'repoll') {
+        // No description provided, clear description
+        del_dev_attrib($port, 'ifName:' . $ifName); // "port" object has required device_id
+        log_event("$ifName Port ifAlias cleared via API", $device, 'interface', 3, $port_id);
+        return api_success_noresult(200, 'Port description cleared.');
+    } else {
+        // Prevent poller from overwriting new description
+        set_dev_attrib($port, 'ifName:' . $ifName, 1); // see above
+        log_event("$ifName Port ifAlias set via API: $description", $device, 'interface', 3, $port_id);
+        return api_success_noresult(200, 'Port description updated.');
+    }
 }
 
 function get_port_description(Illuminate\Http\Request $request)

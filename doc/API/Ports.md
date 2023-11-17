@@ -410,6 +410,7 @@ Route: `/api/v0/ports/:portid/description`
 Input (JSON):
 
 - description: The string data to use as the new port description.
+Sending an empty string will reset the description to default.
 
 Example:
 
