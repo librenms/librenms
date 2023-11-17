@@ -126,6 +126,9 @@ try {
         if (method_exists($authorizer, 'getGroupList')) {
             echo 'Groups: ' . implode('; ', $authorizer->getGroupList()) . PHP_EOL;
         }
+        if (method_exists($authorizer, 'getRoles')) {
+            echo 'Roles: ' . implode('; ', $authorizer->getRoles($test_username)) . PHP_EOL;
+        }
     }
 } catch (Exception $e) {
     echo 'Error: ' . get_class($e) . " thrown!\n";
