@@ -1,5 +1,4 @@
 mib: ZHONE-CARD-RESOURCES-MIB
-mib_dir: juniper
 modules:
     processors:
         data:
