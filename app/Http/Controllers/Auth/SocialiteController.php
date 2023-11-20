@@ -149,7 +149,7 @@ class SocialiteController extends Controller
         $user->save();
     }
 
-    private function setRolesFromClaim( string $provider, $user): bool
+    private function setRolesFromClaim(string $provider, $user): bool
     {
         $scopes = LibreNMSConfig::get('auth.socialite.scopes');
         $claims = LibreNMSConfig::get('auth.socialite.claims');
@@ -158,8 +158,7 @@ class SocialiteController extends Controller
         if (is_array($scopes) &&
             $this->socialite_user instanceof \Laravel\Socialite\AbstractUser &&
             ! empty($claims)
-        )
-        {
+        ) {
             $roles = [];
             $attributes = $this->socialite_user->getRaw();
 
@@ -168,14 +167,16 @@ class SocialiteController extends Controller
                     $roles = array_merge($roles, $claims[$scope_data]['roles'] ?? []);
                 }
             }
-            if( is_array($roles) && count($roles) > 0 ){
-                $user->setRoles(array_unique($roles),true);
+            if (is_array($roles) && count($roles) > 0) {
+                $user->setRoles(array_unique($roles), true);
+
                 return true;
             }
         }
 
-        if( $default_role !== null && $default_role != "none" ){
-            $user->setRoles([$default_role],false);
+        if ($default_role !== null && $default_role != 'none') {
+            $user->setRoles([$default_role], false);
+
             return true;
         }
 

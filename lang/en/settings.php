@@ -284,7 +284,7 @@ return [
                 ],
                 'scopes' => [
                     'description' => 'Scopes that should be included with in the authentication request',
-                    'help' => 'See https://laravel.com/docs/10.x/socialite#access-scopes'
+                    'help' => 'See https://laravel.com/docs/10.x/socialite#access-scopes',
                 ],
             ],
         ],
