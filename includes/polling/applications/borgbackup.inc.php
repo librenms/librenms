@@ -20,13 +20,14 @@ $metrics = [];
 $data = $returned['data'];
 
 // a basic sanity check
-if (!isset($data['mode']) && ( strcmp($data['mode'], 'single') == 0 || strcmp($data['mode'], 'multi') == 0 )) {
+if (! isset($data['mode']) && (strcmp($data['mode'], 'single') == 0 || strcmp($data['mode'], 'multi') == 0)) {
     d_echo('.data.mode is undef or not set to single or multi');
     update_application($app, 'Error', $metrics);
+
     return;
 }
 
-$app_data=[
+$app_data = [
     'mode' => $data['mode'],
     'errored' => [],
     'repos' => [],
@@ -46,9 +47,9 @@ if (strcmp($data['mode'], 'single') == 0
     d_echo('Single mode and error set.');
     if (isset($data['repos']['single']['error'])
         && strcmp($data['repos']['single']['error'], '') !== 0) {
-        $app_data['errored']['single']=$data['repos']['single']['error'];
+        $app_data['errored']['single'] = $data['repos']['single']['error'];
     } else {
-        $app_data['errored']['single']='Unknown error. .totals.errored > 0, but .repos.single.error is empty.';
+        $app_data['errored']['single'] = 'Unknown error. .totals.errored > 0, but .repos.single.error is empty.';
     }
 }
 
@@ -58,7 +59,7 @@ if (strcmp($data['mode'], 'single') == 0
 //
 //
 d_echo('Processing totals...');
-$total_vars=[
+$total_vars = [
     'errored',
     'locked',
     'locked_for',
@@ -91,13 +92,13 @@ if (strcmp($data['mode'], 'multi') == 0) {
 
     if (isset($data['repos'][$repo]['error'])
         && strcmp($data['repos'][$repo]['error'], '') !== 0) {
-        $app_data['errored'][$repo]=$data['repos'][$repo]['error'];
+        $app_data['errored'][$repo] = $data['repos'][$repo]['error'];
     } elseif (isset($data['repos'][$repo]['error'])
               && strcmp($data['repos'][$repo]['error'], '') == 0) {
-        $app_data['errored'][$repo]='';
+        $app_data['errored'][$repo] = '';
     }
 
-    $repo_vars=[
+    $repo_vars = [
         'locked',
         'locked_for',
         'time_since_last_modified',
@@ -114,15 +115,15 @@ if (strcmp($data['mode'], 'multi') == 0) {
         d_echo('Processing repo "' . $repo . '"');
 
         // record error info for this repo if we have it
-        $errored=0;
+        $errored = 0;
         if (isset($data['repos'][$repo]['error'])
             && strcmp($data['repos'][$repo]['error'], '') !== 0) {
-            $app_data['errored'][$repo]=$data['repos'][$repo]['error'];
-            $errored=1;
+            $app_data['errored'][$repo] = $data['repos'][$repo]['error'];
+            $errored = 1;
         } elseif (isset($data['repos'][$repo]['error'])
                   && strcmp($data['repos'][$repo]['error'], '') == 0) {
-            $app_data['errored'][$repo]='.repos.' . $repo . '.error is set but blank';
-            $errored=1;
+            $app_data['errored'][$repo] = '.repos.' . $repo . '.error is set but blank';
+            $errored = 1;
         }
         $rrd_name = ['app', $name, $app->app_id, 'repos___' . $repo . '___errored'];
         $fields = [
