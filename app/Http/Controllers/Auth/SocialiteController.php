@@ -167,7 +167,7 @@ class SocialiteController extends Controller
                     $roles = array_merge($roles, $claims[$scope_data]['roles'] ?? []);
                 }
             }
-            if (is_array($roles) && count($roles) > 0) {
+            if (count($roles) > 0) {
                 $user->setRoles(array_unique($roles), true);
 
                 return true;
