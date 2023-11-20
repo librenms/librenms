@@ -2,7 +2,6 @@
 
 $name = 'borgbackup';
 $unit_text = 'Seconds';
-$colours = 'psychedelic';
 $descr = 'Since Mtime';
 $ds = 'data';
 

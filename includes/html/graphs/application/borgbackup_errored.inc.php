@@ -2,7 +2,6 @@
 
 $name = 'borgbackup';
 $unit_text = 'Repos';
-$colours = 'psychedelic';
 $descr = 'Errored';
 $ds = 'data';
 

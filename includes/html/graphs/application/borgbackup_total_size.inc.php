@@ -2,7 +2,6 @@
 
 $name = 'borgbackup';
 $unit_text = 'Bytes';
-$colours = 'psychedelic';
 $descr = 'Orig Size';
 $ds = 'data';
 
