@@ -1121,7 +1121,7 @@ function update_port_description(Illuminate\Http\Request $request)
         // Prevent poller from overwriting new description
         set_dev_attrib($port, 'ifName:' . $ifName, 1); // see above
         log_event("$ifName Port ifAlias set via API: $description", $device, 'interface', 3, $port_id);
-        
+
         return api_success_noresult(200, 'Port description updated.');
     }
 }
