@@ -3,10 +3,10 @@
 $name = 'borgbackup';
 $unit_text = 'Seconds';
 $colours = 'psychedelic';
-$descr = 'Seconds';
+$descr = 'Since Mtime';
 $ds = 'data';
 
-$name_part = 'errored';
+$name_part = 'time_since_last_modified';
 
 if (isset($vars['borgrepo'])) {
     $name_part = 'repos___' . $vars['borgrepo'] . '___' . $name_part;

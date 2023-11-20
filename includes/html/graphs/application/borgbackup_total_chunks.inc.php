@@ -3,7 +3,7 @@
 $name = 'borgbackup';
 $unit_text = 'Chunks';
 $colours = 'psychedelic';
-$descr = 'Chunks';
+$descr = 'Total Chunks';
 $ds = 'data';
 
 $name_part = 'total_chunks';

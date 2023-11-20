@@ -3,7 +3,7 @@
 $name = 'borgbackup';
 $unit_text = 'Bytes';
 $colours = 'psychedelic';
-$descr = 'Bytes';
+$descr = 'Dedup Size';
 $ds = 'data';
 
 $name_part = 'unique_csize';

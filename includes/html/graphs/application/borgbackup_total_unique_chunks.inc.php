@@ -1,9 +1,9 @@
 <?php
 
 $name = 'borgbackup';
-$unit_text = 'Bytes';
+$unit_text = 'Chunks';
 $colours = 'psychedelic';
-$descr = 'Bytes';
+$descr = 'Unique';
 $ds = 'data';
 
 $name_part = 'total_unique_chunks';

@@ -3,7 +3,7 @@
 $name = 'borgbackup';
 $unit_text = 'Seconds';
 $colours = 'psychedelic';
-$descr = 'Seconds';
+$descr = 'Locked For';
 $ds = 'data';
 
 $name_part = 'locked_for';

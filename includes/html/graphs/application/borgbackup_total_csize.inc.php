@@ -3,7 +3,7 @@
 $name = 'borgbackup';
 $unit_text = 'Bytes';
 $colours = 'psychedelic';
-$descr = 'Bytes';
+$descr = 'Cmprssd Size';
 $ds = 'data';
 
 $name_part = 'total_csize';
