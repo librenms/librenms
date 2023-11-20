@@ -524,6 +524,18 @@ $graphs['privoxy'] = [
 $graphs['ss'] = [
     'sockets',
 ];
+$graphs['borgbackup'] = [
+    'unique_csize',
+    'total_csize',
+    'total_size',
+    'total_chunks',
+    'total_unique_chunks',
+    'unique_size',
+    'time_since_last_modified',
+    'errored',
+    'locked',
+    'locked_for',
+];
 
 echo '<div class="panel panel-default">';
 echo '<div class="panel-heading">';
