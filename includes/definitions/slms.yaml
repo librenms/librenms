@@ -2,6 +2,7 @@ os: slms
 text: 'Zhone MXK'
 type: network
 icon: zhone
+mib_dir: zhone
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }
