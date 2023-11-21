@@ -1,0 +1,51 @@
+-- **********************************************************
+-- Copyright 2018 VMware, Inc.  All rights reserved.
+-- **********************************************************
+
+VMWARE-VROPS-AGENTCAP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY
+       FROM SNMPv2-SMI
+    vmwareAgentCapabilities
+       FROM VMWARE-ROOT-MIB
+    AGENT-CAPABILITIES
+       FROM  SNMPv2-CONF;
+vmwVropsAgentCapabilityMIB MODULE-IDENTITY
+   LAST-UPDATED "201806270000Z"
+   ORGANIZATION "VMware, Inc"
+   CONTACT-INFO
+      "VMware, Inc
+      3401 Hillview Ave
+      Palo Alto, CA 94304
+      Tel: 1-877-486-9273 or 650-427-5000
+      Fax: 650-427-5001
+      Web: http://kb.vmware.com/kb/1013445
+      "
+   DESCRIPTION
+     "This module defines agent capabilities for deployed VMware vRealize Operations Manager agents by release."
+   REVISION     "201806270000Z"
+   DESCRIPTION
+         "Capabilities for vRealize Operations Manager 7.0 releases."
+
+        ::= { vmwareAgentCapabilities 27 }
+
+vmwVropsCapability OBJECT IDENTIFIER ::= { vmwVropsAgentCapabilityMIB 1 }
+
+vmwVrops2018-70 AGENT-CAPABILITIES
+  PRODUCT-RELEASE
+     "7.0.0"
+  STATUS  current
+  DESCRIPTION
+     "Release 7.0.0 for VMware vRealize Operations Manager supporting only SNMPv2c/SNMPv3 trap PDUs.
+     It describes all the notifications sent from the vRealize Operations Manager.
+     "
+  REFERENCE
+     "http://www.vmware.com/products"
+     -- REVISION 201806270000Z
+     SUPPORTS VMWARE-VROPS-MIB
+     INCLUDES {
+         vmwVROPSNotificationGroup
+     }
+   ::= { vmwVropsCapability 1 }
+END

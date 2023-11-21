@@ -1,0 +1,88 @@
+{
+    "applications": {
+        "discovery": {
+            "applications": [
+                {
+                    "app_type": "linux_softnet_stat",
+                    "app_state": "UNKNOWN",
+                    "discovered": "1",
+                    "app_state_prev": null,
+                    "app_status": "",
+                    "app_instance": "",
+                    "data": null,
+                    "deleted_at": null
+                }
+            ]
+        },
+        "poller": {
+            "applications": {
+                "0": {
+                    "app_type": "linux_softnet_stat",
+                    "app_state": "OK",
+                    "discovered": "1",
+                    "app_state_prev": "UNKNOWN",
+                    "app_status": "",
+                    "app_instance": "",
+                    "data": "{\"budget\":\"300\",\"budget_usecs\":\"8000\"}",
+                    "deleted_at": null
+                }
+            },
+            "application_metrics": [
+                {
+                    "metric": "backlog_length",
+                    "value": "0",
+                    "value_prev": null,
+                    "app_type": "linux_softnet_stat"
+                },
+                {
+                    "metric": "budget",
+                    "value": "300",
+                    "value_prev": null,
+                    "app_type": "linux_softnet_stat"
+                },
+                {
+                    "metric": "budget_usecs",
+                    "value": "8000",
+                    "value_prev": null,
+                    "app_type": "linux_softnet_stat"
+                },
+                {
+                    "metric": "cpu_collision",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_softnet_stat"
+                },
+                {
+                    "metric": "flow_limit",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_softnet_stat"
+                },
+                {
+                    "metric": "packet_dropped",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_softnet_stat"
+                },
+                {
+                    "metric": "packets",
+                    "value": 395382025,
+                    "value_prev": null,
+                    "app_type": "linux_softnet_stat"
+                },
+                {
+                    "metric": "received_rps",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_softnet_stat"
+                },
+                {
+                    "metric": "time_squeeze",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_softnet_stat"
+                }
+            ]
+        }
+    }
+}

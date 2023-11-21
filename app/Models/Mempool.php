@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Support\Str;
 use LibreNMS\Interfaces\Models\Keyable;
+use LibreNMS\Util\Number;
 
 class Mempool extends DeviceRelatedModel implements Keyable
 {
@@ -86,7 +87,7 @@ class Mempool extends DeviceRelatedModel implements Keyable
         }
 
         if ($percent == null) {
-            $this->mempool_perc = $this->mempool_used / $this->mempool_total * 100;
+            $this->mempool_perc = (int) Number::calculatePercent($this->mempool_used, $this->mempool_total, 0);
         }
 
         return $this;

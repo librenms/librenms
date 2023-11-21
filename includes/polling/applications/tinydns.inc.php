@@ -30,7 +30,6 @@ $name = 'tinydns';
 
 if (! empty($agent_data['app'][$name]) && $app->app_id > 0) {
     echo ' tinydns';
-    $rrd_name = ['app', $name, $app->app_id];
     $rrd_def = RrdDefinition::make()
         ->addDataset('a', 'COUNTER', 0, 125000000000)
         ->addDataset('ns', 'COUNTER', 0, 125000000000)
@@ -81,7 +80,12 @@ if (! empty($agent_data['app'][$name]) && $app->app_id > 0) {
         'noquery'  => $noquery,
     ];
 
-    $tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
+    $tags = [
+        'name' => $name,
+        'app_id' => $app->app_id,
+        'rrd_name' => ['app', $name, $app->app_id],
+        'rrd_def' => $rrd_def,
+    ];
     data_update($device, 'app', $tags, $fields);
     update_application($app, $name, $fields);
 }//end if

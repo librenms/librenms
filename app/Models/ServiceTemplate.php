@@ -162,7 +162,7 @@ class ServiceTemplate extends BaseModel
         }
 
         $template_ids = static::query()
-            ->with(['device_groups' => function ($query) {
+            ->with(['groups' => function ($query) {
                 $query->select('device_groups.id');
             }])
             ->get()

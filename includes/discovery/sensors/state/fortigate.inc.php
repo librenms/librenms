@@ -44,7 +44,7 @@ if ($systemMode == 'activePassive' || $systemMode == 'activeActive') {
         // Setup a sensor for the cluster sync state
         $fgHaStatsSyncStatus_num = '.1.3.6.1.4.1.12356.101.13.2.1.1.12';
         $fgHaStatsSyncStatus_txt = 'fgHaStatsSyncStatus';
-        $stateName = 'haSyncStatus ' . $index;
+        $stateName = 'haSyncStatus';
         $descr = 'HA sync status ' . $cluster_member_name;
 
         $states = [

@@ -72,6 +72,22 @@ function submitCustomRange(frmdata) {
     return true;
 }
 
+function updateTimezone(tz, static)
+{
+    $.post(ajax_url + '/set_timezone',
+        {
+            timezone: tz,
+            static: static
+        },
+        function(data) {
+            if(data === tz) {
+                location.reload();
+            }
+        },
+        'text'
+    );
+}
+
 function updateResolution(refresh)
 {
     $.post(ajax_url + '/set_resolution',
@@ -195,6 +211,15 @@ $(document).ready(function() {
         }
     });
 });
+
+// Fix select2 search focus bug
+$(document).on('select2:open', (e) => {
+    const selectId = e.target.id
+
+    $(".select2-search__field[aria-controls='select2-" + selectId + "-results']").each(function (key, value){
+        value.focus();
+    })
+})
 
 function refresh_oxidized_node(device_hostname){
     $.ajax({

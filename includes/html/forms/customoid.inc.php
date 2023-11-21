@@ -18,24 +18,16 @@ $action = $_POST['action'];
 $name = strip_tags($_POST['name']);
 $oid = strip_tags($_POST['oid']);
 $datatype = strip_tags($_POST['datatype']);
-if (! empty($_POST['unit'])) {
-    $unit = $_POST['unit'];
-} else {
-    $unit = ['NULL'];
-}
-$limit = set_numeric($_POST['limit'], ['NULL']);
-$limit_warn = set_numeric($_POST['limit_warn'], ['NULL']);
-$limit_low = set_numeric($_POST['limit_low'], ['NULL']);
-$limit_low_warn = set_numeric($_POST['limit_low_warn'], ['NULL']);
+$unit = $_POST['unit'];
+$limit = $_POST['limit'];
+$limit_warn = $_POST['limit_warn'];
+$limit_low = $_POST['limit_low'];
+$limit_low_warn = $_POST['limit_low_warn'];
 $alerts = ($_POST['alerts'] == 'on' ? 1 : 0);
 $passed = ($_POST['passed'] == 'on' ? 1 : 0);
 $divisor = set_numeric($_POST['divisor'], 1);
 $multiplier = set_numeric($_POST['multiplier'], 1);
-if (! empty($_POST['user_func'])) {
-    $user_func = $_POST['user_func'];
-} else {
-    $user_func = ['NULL'];
-}
+$user_func = $_POST['user_func'];
 
 if ($action == 'test') {
     $query = 'SELECT * FROM `devices` WHERE `device_id` = ? LIMIT 1';

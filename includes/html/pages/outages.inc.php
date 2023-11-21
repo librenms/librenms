@@ -55,10 +55,10 @@ $pagetitle[] = 'Outages';
         ?>
         '</div>' +
         '&nbsp;&nbsp;<div class="form-group">' +
-        '<input name="from" type="text" class="form-control" id="dtpickerfrom" maxlength="16" value="<?php echo $vars['from']; ?>" placeholder="From" data-date-format="YYYY-MM-DD HH:mm">' +
+        '<input name="from" type="text" class="form-control" id="dtpickerfrom" maxlength="16" value="<?php echo htmlspecialchars($vars['from']); ?>" placeholder="From" data-date-format="YYYY-MM-DD HH:mm">' +
         '</div>' +
         '<div class="form-group">' +
-        '&nbsp;&nbsp;<input name="to" type="text" class="form-control" id="dtpickerto" maxlength="16" value="<?php echo $vars['to']; ?>" placeholder="To" data-date-format="YYYY-MM-DD HH:mm">' +
+        '&nbsp;&nbsp;<input name="to" type="text" class="form-control" id="dtpickerto" maxlength="16" value="<?php echo htmlspecialchars($vars['to']); ?>" placeholder="To" data-date-format="YYYY-MM-DD HH:mm">' +
         '</div>' +
         '&nbsp;&nbsp;<button type="submit" class="btn btn-default">Filter</button>' +
         '</form>' +
@@ -78,7 +78,7 @@ $pagetitle[] = 'Outages';
                 clear: 'fa fa-trash-o',
                 close: 'fa fa-close'
             },
-            defaultDate: '<?php echo Carbon::now()->subMonth()->format(Config::get('dateformat.byminute', 'Y-m-d H:i')); ?>'
+            defaultDate: '<?php echo Carbon::now(session('preferences.timezone'))->subMonth()->format(Config::get('dateformat.byminute', 'Y-m-d H:i')); ?>'
         });
         $("#dtpickerfrom").on("dp.change", function (e) {
             $("#dtpickerto").data("DateTimePicker").minDate(e.date);
@@ -95,7 +95,7 @@ $pagetitle[] = 'Outages';
                 clear: 'fa fa-trash-o',
                 close: 'fa fa-close'
             },
-            defaultDate: '<?php echo Carbon::now()->format(Config::get('dateformat.byminute', 'Y-m-d H:i')); ?>'
+            defaultDate: '<?php echo Carbon::now(session('preferences.timezone'))->format(Config::get('dateformat.byminute', 'Y-m-d H:i')); ?>'
         });
         $("#dtpickerto").on("dp.change", function (e) {
             $("#dtpickerfrom").data("DateTimePicker").maxDate(e.date);
@@ -106,7 +106,7 @@ $pagetitle[] = 'Outages';
         if ($("#dtpickerto").val() != "") {
             $("#dtpickerfrom").data("DateTimePicker").maxDate($("#dtpickerto").val());
         } else {
-            $("#dtpickerto").data("DateTimePicker").maxDate('<?php echo Carbon::now()->format(Config::get('dateformat.byminute', 'Y-m-d H:i')); ?>');
+            $("#dtpickerto").data("DateTimePicker").maxDate('<?php echo Carbon::now(session('preferences.timezone'))->format(Config::get('dateformat.byminute', 'Y-m-d H:i')); ?>');
         }
     });
 

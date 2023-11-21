@@ -4,14 +4,14 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class MempoolsAddOids extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::table('mempools', function (Blueprint $table) {
             $table->dropColumn('hrDeviceIndex');
@@ -34,7 +34,7 @@ class MempoolsAddOids extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::table('mempools', function (Blueprint $table) {
             $table->string('mempool_descr', 64)->change();
@@ -42,4 +42,4 @@ class MempoolsAddOids extends Migration
             $table->dropColumn(['mempool_class', 'mempool_perc_oid', 'mempool_used_oid', 'mempool_free_oid', 'mempool_total_oid']);
         });
     }
-}
+};

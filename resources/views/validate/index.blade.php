@@ -40,7 +40,7 @@
                         <div x-bind:id="'body-' + group.group" class="panel-collapse collapse" x-bind:class="{'in': group.status !== 2}">
                             <div class="panel-body">
                                 <template x-for="result in group.results">
-                                    <div class="panel" x-bind:class="{'panel-success': result.status === 2, 'panel-warning': result.status === 1, 'panel-danger': result.status === 0}">
+                                    <div class="panel" x-bind:class="{'panel-info': result.status === 3, 'panel-success': result.status === 2, 'panel-warning': result.status === 1, 'panel-danger': result.status === 0}">
                                         <div class="panel-heading"
                                              x-text="result.statusText + ': ' + result.message"
                                         ></div>

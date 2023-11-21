@@ -31,14 +31,15 @@ use App\Logging\Reporting\Middleware\SetGroups;
 use App\Logging\Reporting\Middleware\SetInstanceId;
 use App\Models\Callback;
 use ErrorException;
-use Facade\FlareClient\Report;
-use Facade\Ignition\Facades\Flare;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Util\Git;
+use Spatie\FlareClient\Report;
+use Spatie\LaravelIgnition\Facades\Flare;
 
-class ErrorReportingProvider extends \Facade\Ignition\IgnitionServiceProvider
+class ErrorReportingProvider extends \Spatie\LaravelIgnition\IgnitionServiceProvider
 {
     /** @var int */
     protected $errorReportingLevel = E_ALL & ~E_NOTICE;
@@ -49,10 +50,14 @@ class ErrorReportingProvider extends \Facade\Ignition\IgnitionServiceProvider
     /** @var string|null */
     private static $instanceId;
 
+    private $throttle = 300;
+
     public function boot(): void
     {
+        $this->throttle = Config::get('reporting.throttle', 300);
+
         /* @phpstan-ignore-next-line */
-        if (! method_exists(\Facade\FlareClient\Flare::class, 'filterReportsUsing')) {
+        if (! method_exists(\Spatie\FlareClient\Flare::class, 'filterReportsUsing')) {
             Log::debug("Flare client too old, disabling Ignition to avoid bug.\n");
 
             return;
@@ -60,10 +65,11 @@ class ErrorReportingProvider extends \Facade\Ignition\IgnitionServiceProvider
 
         Flare::filterExceptionsUsing(function (\Exception $e) {
             if (Config::get('reporting.dump_errors')) {
-                dump('Exception: ' . $e->getMessage(), $e->getFile() . ':' . $e->getLine());
+                \Log::critical('%RException: ' . get_class($e) . ' ' . $e->getMessage() . '%n @ %G' . $e->getFile() . ':' . $e->getLine() . '%n' . PHP_EOL . $e->getTraceAsString(), ['color' => true]);
             }
 
-            return $this->isReportingEnabled();
+            // check if reporting is enabled and not throttled
+            return $this->isReportingEnabled() && ! $this->isThrottled();
         });
 
         Flare::filterReportsUsing(function (Report $report) {
@@ -147,6 +153,26 @@ class ErrorReportingProvider extends \Facade\Ignition\IgnitionServiceProvider
         $this->reportingEnabled = true;
 
         return true;
+    }
+
+    private function isThrottled(): bool
+    {
+        if ($this->throttle) {
+            $this->reportingEnabled = false; // disable future reporting (to avoid this cache check)
+
+            try {
+                if (Cache::get('recently_reported_error')) {
+                    return true; // reporting is currently throttled
+                }
+
+                // let this report go and disable reporting for the next error
+                Cache::put('recently_reported_error', true, $this->throttle);
+            } catch (\Exception $e) {
+                // ignore throttling exception (Such as database or redis not running for cache)
+            }
+        }
+
+        return false;
     }
 
     /**

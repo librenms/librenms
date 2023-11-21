@@ -10,14 +10,14 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 
-class AddPrimaryKeyIpv4Mac extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         if (! Schema::hasColumn('ipv4_mac', 'id')) {
             Schema::table('ipv4_mac', function (Blueprint $table) {
@@ -31,7 +31,7 @@ class AddPrimaryKeyIpv4Mac extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
     }
-}
+};

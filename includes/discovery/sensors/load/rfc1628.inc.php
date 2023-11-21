@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Util\Number;
+
 echo 'RFC1628 ';
 
 $load_data = snmpwalk_group($device, 'upsOutputPercentLoad', 'UPS-MIB');
@@ -19,6 +21,7 @@ foreach ($load_data as $index => $data) {
     if (count($load_data) > 1) {
         $descr .= " $index";
     }
+    $value = Number::cast($value);
 
     discover_sensor(
         $valid['sensor'],

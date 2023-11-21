@@ -62,6 +62,10 @@ class WebServer extends BaseValidation
                     $validator->fail('base_url is not set correctly', "lnms config:set base_url $correct_base");
                 }
             }
+
+            if (request()->secure() && ! \config('session.secure')) {
+                $validator->fail('Secure session cookies are not enabled', 'Set SESSION_SECURE_COOKIE=true and run lnms config:cache');
+            }
         }
     }
 

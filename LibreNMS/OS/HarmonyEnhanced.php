@@ -23,9 +23,7 @@ class HarmonyEnhanced extends OS implements WirelessRssiDiscovery, WirelessSnrDi
                 'harmony_enhanced',
                 $index,
                 'RSL Radio ' . $index,
-                null,
-                null,
-                10
+                divisor: 10
             );
         }
 
@@ -44,9 +42,7 @@ class HarmonyEnhanced extends OS implements WirelessRssiDiscovery, WirelessSnrDi
                 'harmony_enhanced',
                 $index,
                 'SNR Radio ' . $index,
-                null,
-                null,
-                10
+                divisor: 10
             );
         }
 
@@ -65,9 +61,7 @@ class HarmonyEnhanced extends OS implements WirelessRssiDiscovery, WirelessSnrDi
                 'harmony_enhanced',
                 $index,
                 'TX Power Radio ' . $index,
-                null,
-                null,
-                10
+                divisor: 10
             );
         }
 

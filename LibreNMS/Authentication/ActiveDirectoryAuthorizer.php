@@ -7,6 +7,7 @@
 namespace LibreNMS\Authentication;
 
 use LibreNMS\Config;
+use LibreNMS\Enum\LegacyAuthLevel;
 use LibreNMS\Exceptions\AuthenticationException;
 use LibreNMS\Exceptions\LdapMissingException;
 
@@ -124,26 +125,33 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
         return false;
     }
 
-    public function getUserlevel($username)
+    public function getRoles(string $username): array|false
     {
-        $userlevel = 0;
+        $roles = [];
         if (! Config::get('auth_ad_require_groupmembership', true)) {
             if (Config::get('auth_ad_global_read', false)) {
-                $userlevel = 5;
+                $roles[] = 'global-read';
             }
         }
 
         // cycle through defined groups, test for memberOf-ship
-        foreach (Config::get('auth_ad_groups', []) as $group => $level) {
+        foreach (Config::get('auth_ad_groups', []) as $group => $data) {
             try {
                 if ($this->userInGroup($username, $group)) {
-                    $userlevel = max($userlevel, $level['level']);
+                    if (isset($data['roles']) && is_array($data['roles'])) {
+                        $roles = array_merge($roles, $data['roles']);
+                    } elseif (isset($data['level'])) {
+                        $role = LegacyAuthLevel::tryFrom($data['level'])?->getName();
+                        if ($role) {
+                            $roles[] = $role;
+                        }
+                    }
                 }
             } catch (AuthenticationException $e) {
             }
         }
 
-        return $userlevel;
+        return array_unique($roles);
     }
 
     public function getUserid($username)

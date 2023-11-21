@@ -20,8 +20,14 @@ if (! Auth::check()) {
 Debug::set($_REQUEST['debug']);
 
 if (is_numeric($_GET['device_id'])) {
-    foreach (dbFetch('SELECT * FROM ports WHERE device_id = ? ORDER BY portName,ifAlias', [$_GET['device_id']]) as $interface) {
+    // use php to sort since we need call cleanPort
+    $interface_map = [];
+    foreach (dbFetchRows('SELECT * FROM ports WHERE device_id = ?', [$_GET['device_id']]) as $interface) {
         $interface = cleanPort($interface);
+        $interface_map[$interface['label']] = $interface;
+    }
+    ksort($interface_map);
+    foreach ($interface_map as $interface) {
         $string = addslashes(html_entity_decode($interface['label'] . ' - ' . $interface['ifAlias']));
         echo "obj.options[obj.options.length] = new Option('" . $string . "','" . $interface['port_id'] . "');\n";
     }

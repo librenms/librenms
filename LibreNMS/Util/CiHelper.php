@@ -241,7 +241,7 @@ class CiHelper
         if ($this->canCheck('web')) {
             echo "Preparing for web checks\n";
             $this->execute('config:clear', ['php', 'artisan', 'config:clear'], true);
-            $this->execute('dusk:update', ['php', 'artisan', 'dusk:update', '--detect'], true);
+            $this->execute('dusk:chrome-driver', ['php', 'artisan', 'dusk:chrome-driver', '--detect'], true);
 
             // check if web server is running
             $server = new Process(['php', '-S', '127.0.0.1:8000', base_path('server.php')], public_path(), ['APP_ENV' => 'dusk.testing']);
@@ -391,10 +391,18 @@ class CiHelper
         $proc->setTimeout(7200)->setIdleTimeout(3600);
         if (! ($silence || $quiet)) {
             echo PHP_EOL;
-            $proc->setTty(Process::isTtySupported());
-        }
 
-        $proc->run();
+            if (Process::isTtySupported()) {
+                $proc->setTty(true);
+                $proc->run();
+            } else {
+                $proc->run(function ($type, $buffer) {
+                    echo $buffer;
+                });
+            }
+        } else {
+            $proc->run();
+        }
 
         $duration = sprintf('%.2fs', microtime(true) - $start);
         if ($proc->getExitCode() > 0) {

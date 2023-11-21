@@ -29,7 +29,9 @@ use App\Models\BgpPeer;
 use App\Models\Device;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Config;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Tests\Traits\RequiresDatabase;
+use LibreNMS\Util\AutonomousSystem;
 
 class BgpTrapTest extends SnmpTrapTestCase
 {
@@ -52,9 +54,9 @@ DISMAN-EVENT-MIB::sysUpTimeInstance 302:12:56:24.81
 SNMPv2-MIB::snmpTrapOID.0 BGP4-MIB::bgpEstablished
 BGP4-MIB::bgpPeerLastError.$bgppeer->bgpPeerIdentifier \"04 00 \"
 BGP4-MIB::bgpPeerState.$bgppeer->bgpPeerIdentifier established\n",
-            "SNMP Trap: BGP Up $bgppeer->bgpPeerIdentifier " . get_astext($bgppeer->bgpPeerRemoteAs) . ' is now established',
+            "SNMP Trap: BGP Up $bgppeer->bgpPeerIdentifier " . AutonomousSystem::get($bgppeer->bgpPeerRemoteAs)->name() . ' is now established',
             'Could not handle bgpEstablished',
-            [1, 'bgpPeer', $bgppeer->bgpPeerIdentifier],
+            [Severity::Ok, 'bgpPeer', $bgppeer->bgpPeerIdentifier],
             $device,
         );
 
@@ -78,9 +80,9 @@ DISMAN-EVENT-MIB::sysUpTimeInstance 302:12:55:33.47
 SNMPv2-MIB::snmpTrapOID.0 BGP4-MIB::bgpBackwardTransition
 BGP4-MIB::bgpPeerLastError.$bgppeer->bgpPeerIdentifier \"04 00 \"
 BGP4-MIB::bgpPeerState.$bgppeer->bgpPeerIdentifier idle\n",
-            "SNMP Trap: BGP Down $bgppeer->bgpPeerIdentifier " . get_astext($bgppeer->bgpPeerRemoteAs) . ' is now idle',
+            "SNMP Trap: BGP Down $bgppeer->bgpPeerIdentifier " . AutonomousSystem::get($bgppeer->bgpPeerRemoteAs)->name() . ' is now idle',
             'Could not handle bgpBackwardTransition',
-            [5, 'bgpPeer', $bgppeer->bgpPeerIdentifier],
+            [Severity::Error, 'bgpPeer', $bgppeer->bgpPeerIdentifier],
             $device,
         );
 

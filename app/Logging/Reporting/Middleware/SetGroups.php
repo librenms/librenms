@@ -25,19 +25,17 @@
 
 namespace App\Logging\Reporting\Middleware;
 
-use Facade\FlareClient\Report;
 use LibreNMS\Util\Version;
+use Spatie\FlareClient\Report;
 
-class SetGroups
+class SetGroups implements \Spatie\FlareClient\FlareMiddleware\FlareMiddleware
 {
     /**
      * Middleware to set LibreNMS and Tools grouping data
      *
-     * @param  \Facade\FlareClient\Report  $report
-     * @param  callable  $next
      * @return mixed
      */
-    public function handle(Report $report, $next)
+    public function handle(Report $report, \Closure $next)
     {
         try {
             $version = Version::get();

@@ -1,0 +1,56 @@
+mib:  ALPHA-RECTIFIER-SYS-MIB:ALPHA-RESOURCE-MIB
+modules:
+    os:
+        serial: ALPHA-RESOURCE-MIB:componentListSerialNumber.1.1
+        version: ALPHA-RESOURCE-MIB:controllerInfoSoftwareVersion.0
+    sensors:
+        voltage:
+            data:
+                -
+                    oid: rectifierSystem
+                    num_oid: '.1.3.6.1.4.1.7309.5.3.1.10.{{ $index }}'
+                    value: rectSysSystemVoltage
+                    divisor: 1000
+                    descr: 'System Voltage'
+                    index: rectSysSystemVoltage.{{ $index }}
+                -
+                    oid: rectifierSystem
+                    num_oid: '.1.3.6.1.4.1.7309.5.3.1.12.{{ $index }}'
+                    value: rectSysBatteryVoltage
+                    divisor: 1000
+                    descr: 'Battery Voltage'
+                    index: rectSysBatteryVoltage.{{ $index }}
+                -
+                    oid: rectifierSystem
+                    value: rectSysAverageRectifierACInputVoltage
+                    num_oid: '.1.3.6.1.4.1.7309.5.3.1.6.{{ $index }}'
+                    divisor: 1000
+                    descr: 'AC Input Voltage'
+                    index: rectSysAverageRectifierACInputVoltage.{{ $index }}
+
+        current:
+            data:
+                -
+                    oid: rectifierSystem
+                    num_oid: '.1.3.6.1.4.1.7309.5.3.1.1.{{ $index }}'
+                    value: rectSysTotalOutputCurrent
+                    divisor: 1000
+                    descr: 'Total Output Current'
+                -
+                    oid: rectifierSystem
+                    num_oid: '.1.3.6.1.4.1.7309.5.3.1.13.{{ $index }}'
+                    value: rectSysBatteryCurrent
+                    index: rectSysBatteryCurrent.{{ $index }}
+                    descr: 'Total Battery Current'
+                    divisor: 1000
+                    skip_value_lt: 0
+
+        temperature:
+            data:
+                -
+                    oid: rectifierSystem
+                    num_oid: '.1.3.6.1.4.1.7309.5.3.1.14.{{ $index }}'
+                    value: rectSysBatteryTemperature
+                    index: rectSysBatteryTemperature.{{ $index }}
+                    divisor: 1000
+                    descr: 'Battery Temperature'

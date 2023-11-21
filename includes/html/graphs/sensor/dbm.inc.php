@@ -1,6 +1,7 @@
 <?php
 
 $scale_min = '0';
+$current_id = $current_id ?? '';
 
 require 'includes/html/graphs/common.inc.php';
 

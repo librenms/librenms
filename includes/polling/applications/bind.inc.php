@@ -13,7 +13,14 @@ if (! empty($agent_data['app'][$name])) {
     $bind = snmp_get($device, $oid, $options, $mib);
 }
 
-[$incoming, $outgoing, $server, $resolver, $cache, $rrsets, $adb, $sockets] = explode("\n", $bind);
+$bind_data = explode("\n", $bind);
+if (count($bind_data) !== 8) {
+    echo " Incorrect number of datapoints returned from device, skipping\n";
+
+    return;
+}
+
+[$incoming, $outgoing, $server, $resolver, $cache, $rrsets, $adb, $sockets] = $bind_data;
 
 //
 // INCOMING PROCESSING
@@ -359,7 +366,6 @@ data_update($device, 'app', $tags, $fields);
 [$ch, $cm, $chfq, $cmfq, $crddtme, $crddtte, $cdn, $cdhb, $ctmt, $ctmiu, $cthmiu,
     $chmt, $chmiu, $chhmiu] = explode(',', $cache);
 
-$rrd_name = ['app', $name, $app->app_id, 'cache'];
 $rrd_def = RrdDefinition::make()
     ->addDataset('ch', 'DERIVE', 0)
     ->addDataset('cm', 'DERIVE', 0)
@@ -394,7 +400,12 @@ $fields = [
 ];
 $metrics['cache'] = $fields;
 
-$tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
+$tags = [
+    'name' => $name,
+    'app_id' => $app->app_id,
+    'rrd_name' => ['app', $name, $app->app_id, 'cache'],
+    'rrd_def' => $rrd_def,
+];
 data_update($device, 'app', $tags, $fields);
 
 //

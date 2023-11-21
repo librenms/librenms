@@ -34,21 +34,6 @@ class HttpAuthAuthorizer extends MysqlAuthorizer
         return false;
     }
 
-    public function getUserlevel($username)
-    {
-        $user_level = parent::getUserlevel($username);
-
-        if ($user_level) {
-            return $user_level;
-        }
-
-        if (Config::has('http_auth_guest')) {
-            return parent::getUserlevel(Config::get('http_auth_guest'));
-        }
-
-        return 0;
-    }
-
     public function getUserid($username)
     {
         $user_id = parent::getUserid($username);

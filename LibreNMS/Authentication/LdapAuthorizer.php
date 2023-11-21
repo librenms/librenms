@@ -4,6 +4,7 @@ namespace LibreNMS\Authentication;
 
 use ErrorException;
 use LibreNMS\Config;
+use LibreNMS\Enum\LegacyAuthLevel;
 use LibreNMS\Exceptions\AuthenticationException;
 use LibreNMS\Exceptions\LdapMissingException;
 
@@ -101,10 +102,8 @@ class LdapAuthorizer extends AuthorizerBase
         return false;
     }
 
-    public function getUserlevel($username)
+    public function getRoles(string $username): array|false
     {
-        $userlevel = 0;
-
         try {
             $connection = $this->getLdapConnection();
             $groups = Config::get('auth_ldap_groups');
@@ -126,18 +125,29 @@ class LdapAuthorizer extends AuthorizerBase
             $search = ldap_search($connection, Config::get('auth_ldap_groupbase'), $filter);
             $entries = ldap_get_entries($connection, $search);
 
-            // Loop the list and find the highest level
+            $roles = [];
+            // Collect all assigned roles
             foreach ($entries as $entry) {
-                $groupname = $entry['cn'][0];
-                if ($groups[$groupname]['level'] > $userlevel) {
-                    $userlevel = $groups[$groupname]['level'];
+                if (isset($entry['cn'][0])) {
+                    $groupname = $entry['cn'][0];
+
+                    if (isset($groups[$groupname]['roles']) && is_array($groups[$groupname]['roles'])) {
+                        $roles = array_merge($roles, $groups[$groupname]['roles']);
+                    } elseif (isset($groups[$groupname]['level'])) {
+                        $role = LegacyAuthLevel::tryFrom($groups[$groupname]['level'])?->getName();
+                        if ($role) {
+                            $roles[] = $role;
+                        }
+                    }
                 }
             }
+
+            return array_unique($roles);
         } catch (AuthenticationException $e) {
             echo $e->getMessage() . PHP_EOL;
         }
 
-        return $userlevel;
+        return false;
     }
 
     public function getUserid($username)
@@ -161,65 +171,6 @@ class LdapAuthorizer extends AuthorizerBase
         return -1;
     }
 
-    public function getUserlist()
-    {
-        $userlist = [];
-
-        try {
-            $connection = $this->getLdapConnection();
-
-            $ldap_groups = $this->getGroupList();
-            if (empty($ldap_groups)) {
-                d_echo('No groups defined.  Cannot search for users.');
-
-                return [];
-            }
-
-            $filter = '(' . Config::get('auth_ldap_prefix') . '*)';
-            if (Config::get('auth_ldap_userlist_filter') != null) {
-                $filter = '(' . Config::get('auth_ldap_userlist_filter') . ')';
-            }
-
-            // build group filter
-            $group_filter = '';
-            foreach ($ldap_groups as $group) {
-                $group_filter .= '(memberOf=' . trim($group) . ')';
-            }
-            if (count($ldap_groups) > 1) {
-                $group_filter = "(|$group_filter)";
-            }
-
-            // search using memberOf
-            $search = ldap_search($connection, trim(Config::get('auth_ldap_suffix'), ','), "(&$filter$group_filter)");
-            if (ldap_count_entries($connection, $search)) {
-                foreach (ldap_get_entries($connection, $search) as $entry) {
-                    $user = $this->ldapToUser($entry);
-                    $userlist[$user['username']] = $user;
-                }
-            } else {
-                // probably doesn't support memberOf, go through all users, this could be slow
-                $search = ldap_search($connection, trim(Config::get('auth_ldap_suffix'), ','), $filter);
-                foreach (ldap_get_entries($connection, $search) as $entry) {
-                    foreach ($ldap_groups as $ldap_group) {
-                        if (ldap_compare(
-                            $connection,
-                            $ldap_group,
-                            Config::get('auth_ldap_groupmemberattr', 'memberUid'),
-                            $this->getMembername($entry['uid'][0])
-                        )) {
-                            $user = $this->ldapToUser($entry);
-                            $userlist[$user['username']] = $user;
-                        }
-                    }
-                }
-            }
-        } catch (AuthenticationException $e) {
-            echo $e->getMessage() . PHP_EOL;
-        }
-
-        return $userlist;
-    }
-
     public function getUser($user_id)
     {
         $connection = $this->getLdapConnection();
@@ -233,7 +184,7 @@ class LdapAuthorizer extends AuthorizerBase
         $entries = ldap_get_entries($connection, $search);
         foreach ($entries as $entry) {
             $user = $this->ldapToUser($entry);
-            if ((int) $user['user_id'] !== (int) $user_id) {
+            if ($user['user_id'] != $user_id) {
                 continue;
             }
 
@@ -360,9 +311,8 @@ class LdapAuthorizer extends AuthorizerBase
         return [
             'username' => $entry['uid'][0],
             'realname' => $entry['cn'][0],
-            'user_id' => (int) $entry[$uid_attr][0],
+            'user_id' => $entry[$uid_attr][0],
             'email' => $entry[Config::get('auth_ldap_emailattr', 'mail')][0],
-            'level' => $this->getUserlevel($entry['uid'][0]),
         ];
     }
 
@@ -398,6 +348,16 @@ class LdapAuthorizer extends AuthorizerBase
     {
         if (Config::get('auth_ldap_debug')) {
             ldap_set_option(null, LDAP_OPT_DEBUG_LEVEL, 7);
+        }
+        /*
+         * Due to https://bugs.php.net/bug.php?id=78029 these set options are done at this stage otherwise they
+         * will not take effect after the first bind is performed.
+         */
+        if (Config::get('auth_ldap_cacertfile')) {
+            ldap_set_option($this->ldap_connection, LDAP_OPT_X_TLS_CACERTFILE, Config::get('auth_ldap_cacertfile'));
+        }
+        if (Config::get('auth_ldap_ignorecert')) {
+            ldap_set_option($this->ldap_connection, LDAP_OPT_X_TLS_REQUIRE_CERT, 0);
         }
 
         $this->connect();

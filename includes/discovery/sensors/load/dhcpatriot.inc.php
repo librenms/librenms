@@ -71,7 +71,7 @@ if (! empty($dhcp_networks[$dhcp_networks_base_oid])) {
         $type = $value['type'];
         $divisor = $pool_data[$value['size_oid']];
         $descr = $value['description'] . ' (' . $pool_data[$value['oid']] . '/' . $divisor . ')';
-        $current = (($pool_data[$value['oid']] / $divisor) * 100);
+        $current = \LibreNMS\Util\Number::calculatePercent($pool_data[$value['oid']], $divisor);
         $group = $value['group'];
 
         discover_sensor(

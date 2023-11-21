@@ -5,7 +5,6 @@ namespace App\Console\Commands;
 use App\Console\LnmsCommand;
 use App\Models\Device;
 use DeviceCache;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Arr;
 use Illuminate\Validation\Rule;
 use LibreNMS\Data\Source\SnmpResponse;
@@ -149,12 +148,8 @@ abstract class SnmpFetch extends LnmsCommand
 
     protected function getDevices(): \Illuminate\Support\Collection
     {
-        return Device::query()->when($this->deviceSpec !== 'all', function (Builder $query) {
-            return $query->where('device_id', $this->deviceSpec)
-                ->orWhere('hostname', 'regexp', "^$this->deviceSpec$");
-        })->pluck('device_id')->map(function ($device_id) {
-            return DeviceCache::get($device_id);
-        });
+        return Device::whereDeviceSpec($this->deviceSpec)->pluck('device_id')
+            ->map(fn ($device_id) => DeviceCache::get($device_id));
     }
 
     protected function fetchData(): SnmpResponse

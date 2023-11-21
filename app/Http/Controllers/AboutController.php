@@ -54,6 +54,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use LibreNMS\Config;
 use LibreNMS\Data\Store\Rrd;
+use LibreNMS\Util\Http;
 use LibreNMS\Util\Version;
 
 class AboutController extends Controller
@@ -113,7 +114,7 @@ class AboutController extends Controller
 
         // try to clear usage data if we have a uuid
         if ($usage_uuid) {
-            if (! \Http::post(Config::get('callback_clear'), ['uuid' => $usage_uuid])->successful()) {
+            if (! Http::client()->post(Config::get('callback_clear'), ['uuid' => $usage_uuid])->successful()) {
                 return response()->json([], 500); // don't clear if this fails to delete upstream data
             }
         }

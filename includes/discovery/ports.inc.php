@@ -22,6 +22,11 @@ $port_stats = snmpwalk_cache_oid($device, 'ifAlias', $port_stats, 'IF-MIB');
 $port_stats = snmpwalk_cache_oid($device, 'ifType', $port_stats, 'IF-MIB', null, $typeSnmpFlags);
 $port_stats = snmpwalk_cache_oid($device, 'ifOperStatus', $port_stats, 'IF-MIB', null, $operStatusSnmpFlags);
 
+// Get Trellix NSP ports
+if ($device['os'] == 'mlos-nsp') {
+    require base_path('includes/discovery/ports/mlos-nsp.inc.php');
+}
+
 //Get UFiber OLT ports
 if ($device['os'] == 'edgeosolt') {
     require base_path('includes/discovery/ports/edgeosolt.inc.php');
@@ -50,6 +55,11 @@ if ($device['os'] == 'luminato') {
 //Moxa Etherdevice portName mapping
 if ($device['os'] == 'moxa-etherdevice') {
     require base_path('includes/discovery/ports/moxa-etherdevice.inc.php');
+}
+
+//Cambium cnMatrix port description mapping
+if ($device['os'] == 'cnmatrix') {
+    require base_path('includes/discovery/ports/cnmatrix.inc.php');
 }
 
 // End Building SNMP Cache Array
@@ -103,6 +113,10 @@ foreach ($port_stats as $ifIndex => $snmp_data) {
 
     if (is_port_valid($snmp_data, $device)) {
         port_fill_missing_and_trim($snmp_data, $device);
+
+        if ($device['os'] == 'vmware-vcsa' && preg_match('/Device ([a-z0-9]+) at .*/', $snmp_data['ifDescr'], $matches)) {
+            $snmp_data['ifName'] = $matches[1];
+        }
 
         // Port newly discovered?
         if (! isset($ports_db[$port_id]) || ! is_array($ports_db[$port_id])) {

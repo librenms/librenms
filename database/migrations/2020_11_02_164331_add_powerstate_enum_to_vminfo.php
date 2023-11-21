@@ -6,14 +6,14 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use LibreNMS\Enum\PowerState;
 
-class AddPowerstateEnumToVminfo extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         Vminfo::select('id', 'vmwVmState')->chunk(100, function ($vms) {
             foreach ($vms as $vm) {
@@ -36,10 +36,10 @@ class AddPowerstateEnumToVminfo extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::table('vminfo', function (Blueprint $table) {
             $table->string('vmwVmState', 128)->change();
         });
     }
-}
+};

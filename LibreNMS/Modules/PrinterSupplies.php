@@ -27,12 +27,13 @@ use App\Observers\ModuleModelObserver;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use LibreNMS\DB\SyncsModels;
-use LibreNMS\Enum\Alert;
+use LibreNMS\Enum\Severity;
+use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
+use LibreNMS\Polling\ModuleStatus;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Number;
-use Log;
 
 class PrinterSupplies implements Module
 {
@@ -44,6 +45,11 @@ class PrinterSupplies implements Module
     public function dependencies(): array
     {
         return [];
+    }
+
+    public function shouldDiscover(OS $os, ModuleStatus $status): bool
+    {
+        return $status->isEnabledAndDeviceUp($os->getDevice());
     }
 
     /**
@@ -64,6 +70,11 @@ class PrinterSupplies implements Module
         $this->syncModels($os->getDevice(), 'printerSupplies', $data);
     }
 
+    public function shouldPoll(OS $os, ModuleStatus $status): bool
+    {
+        return $status->isEnabledAndDeviceUp($os->getDevice());
+    }
+
     /**
      * Poll data for this module and update the DB / RRD.
      * Try to keep this efficient and only run if discovery has indicated there is a reason to run.
@@ -71,10 +82,14 @@ class PrinterSupplies implements Module
      *
      * @param  \LibreNMS\OS  $os
      */
-    public function poll(OS $os): void
+    public function poll(OS $os, DataStorageInterface $datastore): void
     {
         $device = $os->getDeviceArray();
         $toner_data = $os->getDevice()->printerSupplies;
+
+        if (empty($toner_data)) {
+            return; // no data to poll
+        }
 
         $toner_snmp = snmp_get_multi_oid($device, $toner_data->pluck('supply_oid')->toArray());
 
@@ -91,7 +106,7 @@ class PrinterSupplies implements Module
                 'rrd_oldname' => ['toner', $toner['supply_descr']],
                 'index'       => $toner['supply_index'],
             ];
-            data_update($device, 'toner', $tags, $tonerperc);
+            $datastore->put($device, 'toner', $tags, $tonerperc);
 
             // Log empty supplies (but only once)
             if ($tonerperc == 0 && $toner['supply_current'] > 0) {
@@ -99,7 +114,7 @@ class PrinterSupplies implements Module
                     'Toner ' . $toner['supply_descr'] . ' is empty',
                     $os->getDevice(),
                     'toner',
-                    Alert::ERROR,
+                    Severity::Error,
                     $toner['supply_id']
                 );
             }
@@ -110,7 +125,7 @@ class PrinterSupplies implements Module
                     'Toner ' . $toner['supply_descr'] . ' was replaced (new level: ' . $tonerperc . '%)',
                     $os->getDevice(),
                     'toner',
-                    Alert::NOTICE,
+                    Severity::Notice,
                     $toner['supply_id']
                 );
             }
@@ -235,7 +250,7 @@ class PrinterSupplies implements Module
                 // at least one piece of paper in tray
                 $current = 50;
             } else {
-                $current = $current / $capacity * 100;
+                $current = Number::calculatePercent($current, $capacity);
             }
 
             $papers->push(new PrinterSupply([

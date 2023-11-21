@@ -2,14 +2,14 @@
 
 use Illuminate\Database\Migrations\Migration;
 
-class FixTemplateLinefeeds extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         DB::table('alert_templates')->update(['template' => DB::raw('REPLACE(`template`, \'\\\\r\\\\n\', char(10))')]);
         DB::table('alert_templates')->update(['template' => DB::raw('REPLACE(`template`, \'\\\\n\', \'\')')]);
@@ -20,7 +20,7 @@ class FixTemplateLinefeeds extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
     }
-}
+};

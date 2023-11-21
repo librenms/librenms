@@ -70,7 +70,13 @@ class Oid
         $key = 'Oid:toNumeric:' . $oid . '/' . $mib;
 
         $numeric_oid = Cache::remember($key, $cache, function () use ($oid, $mib) {
-            return \SnmpQuery::numeric()->translate($oid, $mib);
+            $snmpQuery = \SnmpQuery::numeric();
+
+            if ($mib) {
+                $snmpQuery->mibs([$mib], append: $mib !== 'ALL'); // append to base mibs unless using ALL
+            }
+
+            return $snmpQuery->translate($oid);
         });
 
         if (empty($numeric_oid)) {
@@ -78,5 +84,18 @@ class Oid
         }
 
         return $numeric_oid;
+    }
+
+    /**
+     * Convert a string to an oid encoded string
+     */
+    public static function ofString(string $string): string
+    {
+        $oid = strlen($string);
+        for ($i = 0; $i != strlen($string); $i++) {
+            $oid .= '.' . ord($string[$i]);
+        }
+
+        return $oid;
     }
 }

@@ -13,7 +13,7 @@ class SnmpTranslate extends SnmpFetch
     protected $name = 'snmp:translate';
     protected array $oids;
 
-    protected function getDevices(): \Illuminate\Support\Collection
+    protected function getDevices(): Collection
     {
         if (empty($this->oids)) {
             $this->oids = [$this->deviceSpec];

@@ -27,7 +27,7 @@ if ($device['os'] == 'boss') {
                 'vlan_domain' => $vtpdomain_id,
                 'vlan_vlan' => $vlan_id,
                 'vlan_name' => $vlan['rcVlanName'],
-                'vlan_type' => ['NULL'],
+                'vlan_type' => null,
             ], 'vlans');
             echo '+';
         }

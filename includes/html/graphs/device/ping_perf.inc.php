@@ -16,5 +16,6 @@ $filename = Rrd::name($device['hostname'], 'ping-perf');
 
 $descr = 'Milliseconds';
 $ds = 'ping';
+$scale_min = 0;
 
 require 'includes/html/graphs/generic_stats.inc.php';

@@ -99,9 +99,6 @@
                 "entity-state": {
                     "type": "boolean"
                 },
-                "wifi": {
-                    "type": "boolean"
-                },
                 "ipmi": {
                     "type": "boolean"
                 },
@@ -180,10 +177,7 @@
                 "cisco-vpdn": {
                     "type": "boolean"
                 },
-                "libvirt-vminfo": {
-                    "type": "boolean"
-                },
-                "vmware-vminfo": {
+                "vminfo": {
                     "type": "boolean"
                 },
                 "vlans": {
@@ -345,10 +339,7 @@
                 "junose-atm-vp": {
                     "type": "boolean"
                 },
-                "vmware-vminfo": {
-                    "type": "boolean"
-                },
-                "libvirt-vminfo": {
+                "vminfo": {
                     "type": "boolean"
                 },
                 "mpls": {

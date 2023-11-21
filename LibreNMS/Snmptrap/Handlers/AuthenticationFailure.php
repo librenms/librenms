@@ -26,6 +26,7 @@
 namespace LibreNMS\Snmptrap\Handlers;
 
 use App\Models\Device;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
 
@@ -41,6 +42,6 @@ class AuthenticationFailure implements SnmptrapHandler
      */
     public function handle(Device $device, Trap $trap)
     {
-        $trap->log('SNMP Trap: Authentication Failure: ' . $device->displayName(), 3, 'auth');
+        $trap->log('SNMP Trap: Authentication Failure: ' . $device->displayName(), Severity::Notice, 'auth');
     }
 }

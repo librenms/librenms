@@ -1,0 +1,68 @@
+
+-- *****************************************************************
+-- MCAFEE-SMI.mib:  
+-- McAfee Enterprise Structure of Management Information
+--
+-- May 2001, Rohit Kaushal
+--
+-- Copyright (c) 2001 - 2005 by McAfee, Inc.
+-- All rights reserved.
+-- 
+-- *****************************************************************
+
+MCAFEE-INTRUVERT-SMI DEFINITIONS ::= BEGIN
+
+IMPORTS
+    OBJECT-IDENTITY, MODULE-IDENTITY, enterprises
+        FROM SNMPv2-SMI;
+
+mcafee-intruvert MODULE-IDENTITY
+LAST-UPDATED "200707090000Z"
+ORGANIZATION 
+"McAfee, Inc."
+CONTACT-INFO 
+"McAfee Customer Service Department
+
+Postal: 5000 Headquarters Drive
+        Plano, TX  75024
+        USA
+
+Tel: +1 800 338 8754
+
+E-mail: support@mcafee.com"
+DESCRIPTION 
+"The Structure of Management Information for the McAfee-Intruvert enterprise.
+Initial version of this MIB module."
+::= { enterprises 8962 }
+
+
+ivConventions  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION 
+        ""
+    ::= { mcafee-intruvert 1 }
+
+-- assigned by IANA
+
+ivProducts  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION 
+        " "
+    ::= { mcafee-intruvert 2 }
+
+ivInventory  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION 
+        ""
+    ::= { mcafee-intruvert 3 }
+
+matdProducts OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+        ""
+    ::= { mcafee-intruvert 4 }
+
+END
+
+
+

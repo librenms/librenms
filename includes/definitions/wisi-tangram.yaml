@@ -3,7 +3,9 @@ text: 'WISI Tangram'
 type: network
 icon: wisi
 mib_dir: wisi
-over: []
+over:
+    - { graph: device_temperature, text: Temperature }
+    - { graph: device_fanspeed, text: Fans }
 discovery:
     -
         sysObjectID:
