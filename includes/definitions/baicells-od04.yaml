@@ -1,7 +1,8 @@
 os: baicells-od04
 text: 'Baicells CPE'
 type: wireless
-icon: rts
+icon: baicells
+mib_dir: baicells/cpe
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }

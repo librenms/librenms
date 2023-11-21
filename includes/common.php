@@ -902,3 +902,15 @@ function array_by_column($array, $column)
 {
     return array_combine(array_column($array, $column), $array);
 }
+
+/**
+ * Convert a duration string in HH:MM:SS format to minutes
+ *
+ * @param  string  $duration  The duration to convert
+ * @return float   minutes
+ */
+function hhmmss_to_minutes($duration)
+{
+    list($h, $m, $s) = explode(':', $duration);
+    return $h * 60 + $m + $s / 60;
+}
