@@ -463,7 +463,6 @@ c. (Optional): You may define a certificate location for self-signed certificate
 1. Copy the shell script to the desired host.
 ```
 wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/certificate.py -O /etc/snmp/certificate.py
-
 ```
 
 2. Make the script executable
