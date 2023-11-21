@@ -23,7 +23,7 @@
                     "app_state_prev": "UNKNOWN",
                     "app_status": "",
                     "app_instance": "",
-                    "data": null,
+                    "data": "{\"mode\":\"single\",\"errored\":[],\"repos\":[]}",
                     "deleted_at": null
                 }
             ],
@@ -42,7 +42,7 @@
                 },
                 {
                     "metric": "locked_for",
-                    "value": null,
+                    "value": 0,
                     "value_prev": null,
                     "app_type": "borgbackup"
                 },
