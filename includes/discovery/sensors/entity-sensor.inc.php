@@ -26,6 +26,14 @@ if (! empty($entity_array)) {
     if ($device['os'] === 'arista_eos') {
         $entity_oids = snmpwalk_cache_oid($device, 'aristaEntSensorThresholdTable', $entity_oids, 'ARISTA-ENTITY-SENSOR-MIB');
     }
+    if ($device['os'] === 'xos') {
+        echo ' XOS:entPhysicalContainedIn';
+        $entity_oids = snmpwalk_cache_oid($device, 'entPhysicalContainedIn', $entity_oids, 'ENTITY-MIB');
+        echo ' XOS:entAliasMappingIdentifier';
+        $entity_oids = snmpwalk_cache_oid($device, 'entAliasMappingIdentifier', $entity_oids, 'ENTITY-MIB');
+        echo ' XOS:ifName';
+        $xos_ifname = snmpwalk_cache_oid($device, 'ifName', [], 'IF-MIB');
+    }
     echo ' entPhySensorOperStatus';
     $entity_oids = snmpwalk_cache_multi_oid($device, 'entPhySensorOperStatus', $entity_oids, 'ENTITY-SENSOR-MIB');
 }
@@ -73,6 +81,10 @@ if (! empty($entity_oids)) {
                     $card = $card[0] . $card[1] . '00';
                 }
                 $descr = ucwords($entity_array[$card]['entPhysicalName'] ?? '') . ' ' . ucwords($entity_array[$index]['entPhysicalDescr'] ?? '');
+            } elseif ($device['os'] === 'xos' && str_starts_with($entity_oids[$entity_oids[$index]['entPhysicalContainedIn'] . '.0']['entAliasMappingIdentifier'], 'mib-2.2.2.1.1.')) {
+                $xos_ifindex = end(explode('.', $entity_oids[$entity_oids[$index]['entPhysicalContainedIn'] . '.0']['entAliasMappingIdentifier']));
+                $xos_portname = $xos_ifname[$xos_ifindex]['ifName'];
+                $descr = ucwords($xos_portname . ' ' . str_replace(' Sensor', '', $entity_array[$index]['entPhysicalDescr']));
             } else {
                 $descr = ucwords($entity_array[$index]['entPhysicalName']);
             }
@@ -162,7 +174,7 @@ if (! empty($entity_oids)) {
                 $valid_sensor = false;
             }
             // Check for valid sensors
-            if (isset($entry['entPhySensorOperStatus']) && $entry['entPhySensorOperStatus'] === 'unavailable') {
+            if (isset($entry['entPhySensorOperStatus']) && ($entry['entPhySensorOperStatus'] === 'unavailable' || $entry['entPhySensorOperStatus'] === 'nonoperational')) {
                 $valid_sensor = false;
             }
             if ($valid_sensor && dbFetchCell("SELECT COUNT(*) FROM `sensors` WHERE device_id = ? AND `sensor_class` = ? AND `sensor_type` = 'cisco-entity-sensor' AND `sensor_index` = ?", [$device['device_id'], $type, $index]) == '0') {
