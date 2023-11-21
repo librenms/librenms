@@ -78,7 +78,7 @@ foreach ($total_vars as $to_total) {
     ];
     $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
     data_update($device, 'app', $tags, $fields);
-    $metrics[$total_vars] = $data['totals'][$to_total];
+    $metrics[$to_total] = $data['totals'][$to_total];
 }
 
 //
