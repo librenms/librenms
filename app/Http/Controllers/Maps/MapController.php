@@ -591,7 +591,7 @@ class MapController extends Controller
                     'ldev'       => $port->device_id,
                     'rdev'       => $row->remote_device_id,
                     'ifnames'    => $port->ifName . ' <> ' . $row->remote_port_name,
-                    'url'        => Url::portLink($port, null, null, false, 1),
+                    'url'        => Url::portLink($port, null, null, false, true),
                     'width'      => $width,
                 ],
                 $link_style,
