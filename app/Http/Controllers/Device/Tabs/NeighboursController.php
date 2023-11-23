@@ -98,7 +98,7 @@ class NeighboursController implements DeviceTab
 
                 $rport = null;
                 if ($row->remote_port_id) {
-                    $rport = Port::where('port_id', '=', $port->remote_port_id)->with('device')->first();
+                    $rport = Port::where('port_id', '=', $row->remote_port_id)->with('device')->first();
 
                     if (! in_array($rport->device->device_id, $devices)) {
                         $devices[$rport->device->device_id] = [
@@ -116,7 +116,7 @@ class NeighboursController implements DeviceTab
                     'remote_url'      => $rport ? Url::portLink($rport, null, null, true, false) : '',
                     'rdev_id'         => $rport ? $rport->device->device_id : null,
                     'rdev_name'       => $row->remote_hostname,
-                    'rdev_platform'   => $port->remote_platform,
+                    'rdev_platform'   => $row->remote_platform,
                     'remote_portname' => $rport ? $rport->ifAlias : $row->remote_port,
                     'protocol'        => strtoupper($row->protocol),
                 ];
