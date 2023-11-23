@@ -26,6 +26,7 @@
 namespace App\Http\Controllers\Device\Tabs;
 
 use App\Models\Device;
+use App\Models\Port;
 use App\Models\Link;
 use LibreNMS\Config;
 use LibreNMS\Interfaces\UI\DeviceTab;
