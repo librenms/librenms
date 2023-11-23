@@ -118,10 +118,10 @@ class MapController extends Controller
             // We use the orderBy caluse below to make these entries appear at the
             // top of the list, causing them to be used first
             ->leftJoin('ipv4_addresses as rip', function ($j) {
-                 $j->on('rp.port_id', '=', 'rip.port_id')
-                     ->on('rip.ipv4_address', '=', 'm.ipv4_address');
+                $j->on('rp.port_id', '=', 'rip.port_id')
+                    ->on('rip.ipv4_address', '=', 'm.ipv4_address');
             })
-            ->whereNotIn('m.mac_address',['000000000000','ffffffffffff'])
+            ->whereNotIn('m.mac_address', ['000000000000', 'ffffffffffff'])
             ->whereColumn('ld.device_id', '<>', 'rd.device_id')
             ->orderBy('ipv4_address_id', 'DESC')
             ->orderBy('ifName')
@@ -521,8 +521,8 @@ class MapController extends Controller
     protected function addDeviceLinks($query, &$link_list, &$device_assoc_seen)
     {
         foreach ($query as $port) {
-            $device_ids_1 = $port->device_id . "." . $port->remote_device_id;
-            $device_ids_2 = $port->remote_device_id . "." . $port->device_id;
+            $device_ids_1 = $port->device_id . '.' . $port->remote_device_id;
+            $device_ids_2 = $port->remote_device_id . '.' . $port->device_id;
 
             // Ignore any associations that have already been processed
             if (array_key_exists($device_ids_1, $device_assoc_seen)
@@ -557,7 +557,7 @@ class MapController extends Controller
                     'border' => Config::get("network_map_legend.$link_used"),
                     'highlight' => Config::get("network_map_legend.$link_used"),
                     'color' => Config::get("network_map_legend.$link_used"),
-                ]
+                ],
             ];
             if ($port->local_device_status == 0 && $port->remote_device_status == 0) {
                 // If both devices are offline, mark the link as being down

@@ -48,7 +48,7 @@ class NetMapController extends MapController
             'group_id' => $group_id,
             'options' => $this->visOptions(),
             'group_name' => $group_name,
-            'link_types' => Config::get('network_map_items', ['xdp','mac']),
+            'link_types' => Config::get('network_map_items', ['xdp', 'mac']),
         ];
 
         return view('map.netmap', $data);

@@ -29,8 +29,9 @@ use App\Models\Device;
 use App\Models\Port;
 use App\Models\Link;
 use Illuminate\Http\Request;
-use LibreNMS\Interfaces\UI\DeviceTab;
 use LibreNMS\Config;
+use LibreNMS\Interfaces\UI\DeviceTab;
+use LibreNMS\Interfaces\UI\DeviceTab;
 use LibreNMS\Util\Url;
 
 class NeighboursController implements DeviceTab
@@ -66,13 +67,13 @@ class NeighboursController implements DeviceTab
 
         if ($selection == 'list') {
             $linkQuery = Port::select(
-                    \DB::raw('ports.*'),
-                    \DB::raw('l.remote_port_id'),
-                    \DB::raw('l.remote_hostname'),
-                    \DB::raw('l.remote_port'),
-                    \DB::raw('l.remote_platform'),
-                    \DB::raw('l.protocol'),
-                )
+                \DB::raw('ports.*'),
+                \DB::raw('l.remote_port_id'),
+                \DB::raw('l.remote_hostname'),
+                \DB::raw('l.remote_port'),
+                \DB::raw('l.remote_platform'),
+                \DB::raw('l.protocol'),
+            )
                 ->with('device')
                 ->join('links as l', 'l.local_port_id', '=', 'ports.port_id')
                 ->where('l.local_device_id', '=', $device->device_id)
@@ -85,7 +86,7 @@ class NeighboursController implements DeviceTab
             }
 
             foreach ($linkQuery->get() as $port) {
-                if (!in_array($port->device->device_id, $devices)) {
+                if (! in_array($port->device->device_id, $devices)) {
                     $devices[$port->device->device_id] = [
                         'url'  => Url::deviceLink($port->device, null, [], 0, 0, 0, 1),
                         'hw'   => $port->device->hardware,
@@ -97,7 +98,7 @@ class NeighboursController implements DeviceTab
                 if ($port->remote_port_id) {
                     $rport = Port::where('port_id', '=', $port->remote_port_id)->with('device')->first();
 
-                    if (!in_array($rport->device->device_id, $devices)) {
+                    if (! in_array($rport->device->device_id, $devices)) {
                         $devices[$rport->device->device_id] = [
                             'url'  => Url::deviceLink($rport->device, null, [], 0, 0, 0, 1),
                             'hw'   => $rport->device->hardware,
@@ -110,7 +111,7 @@ class NeighboursController implements DeviceTab
                     'local_url'       => Url::portLink($port, null, null, 1, 0),
                     'ldev_id'         => $port->device->device_id,
                     'local_portname'  => $port->ifAlias,
-                    'remote_url'      => $rport ? Url::portLink($rport, null, null, 1, 0) : "",
+                    'remote_url'      => $rport ? Url::portLink($rport, null, null, 1, 0) : '',
                     'rdev_id'         => $rport ? $rport->device->device_id : null,
                     'rdev_name'       => $port->remote_hostname,
                     'rdev_platform'   => $port->remote_platform,
@@ -135,7 +136,7 @@ class NeighboursController implements DeviceTab
             'device_id'  => $device->device_id,
             'devices'    => $devices,
             'links'      => $links,
-            'link_types' => Config::get('network_map_items', ['xdp','mac']),
+            'link_types' => Config::get('network_map_items', ['xdp', 'mac']),
             'visoptions' => Config::get('network_map_vis_options'),
         ];
     }
