@@ -86,6 +86,8 @@ class NeighboursController implements DeviceTab
             }
 
             foreach ($linkQuery->get() as $port) {
+                $row = json_decode(json_encode($port));
+
                 if (! in_array($port->device->device_id, $devices)) {
                     $devices[$port->device->device_id] = [
                         'url'  => Url::deviceLink($port->device, null, [], 0, 0, 0, 1),
@@ -95,7 +97,7 @@ class NeighboursController implements DeviceTab
                 }
 
                 $rport = null;
-                if ($port->remote_port_id) {
+                if ($row->remote_port_id) {
                     $rport = Port::where('port_id', '=', $port->remote_port_id)->with('device')->first();
 
                     if (! in_array($rport->device->device_id, $devices)) {
@@ -108,15 +110,15 @@ class NeighboursController implements DeviceTab
                 }
 
                 $links[] = [
-                    'local_url'       => Url::portLink($port, null, null, true, 0),
+                    'local_url'       => Url::portLink($port, null, null, true, false),
                     'ldev_id'         => $port->device->device_id,
                     'local_portname'  => $port->ifAlias,
-                    'remote_url'      => $rport ? Url::portLink($rport, null, null, true, 0) : '',
+                    'remote_url'      => $rport ? Url::portLink($rport, null, null, true, false) : '',
                     'rdev_id'         => $rport ? $rport->device->device_id : null,
-                    'rdev_name'       => $port->remote_hostname,
+                    'rdev_name'       => $row->remote_hostname,
                     'rdev_platform'   => $port->remote_platform,
-                    'remote_portname' => $rport ? $rport->ifAlias : $port->remote_port,
-                    'protocol'        => strtoupper($port->protocol),
+                    'remote_portname' => $rport ? $rport->ifAlias : $row->remote_port,
+                    'protocol'        => strtoupper($row->protocol),
                 ];
             }
         }
