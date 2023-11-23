@@ -1,8 +1,8 @@
 <?php
 /**
- * DependencyController.php
+ * NetMapController.php
  *
- * Controller for graphing Relationships
+ * Controller for dynamic network map base page
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,8 +19,8 @@
  *
  * @link       https://www.librenms.org
  *
- * @copyright  2019 Thomas Berberich
- * @author     Thomas Berberich <sourcehhdoctor@gmail.com>
+ * @copyright  2023 Steven Wilton
+ * @author     Steven Wilton <swilton@fluentit.com.au>
  */
 
 namespace App\Http\Controllers\Maps;
