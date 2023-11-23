@@ -16,6 +16,7 @@
 @endif
                     </select>
                 </div>
+@if($use_groups)
                 <div class="page-availability-title-right">
                     <span class="page-availability-title">Device group</span>
                     <select id="show_group" class="page-availability-report-select" name="show_group" onchange="refreshMap()">
@@ -25,6 +26,7 @@
 @endforeach
                     </select>
                 </div>
+@endif
             </div>
         </div>
         <div class="row">
