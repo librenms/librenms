@@ -168,6 +168,7 @@ class MapController extends Controller
             });
         }
 
+        // Return as a cursor to avoid excessive memory use
         return $linkQuery->cursor();
     }
 
@@ -234,6 +235,7 @@ class MapController extends Controller
                 ->where('ldg.device_group_id', '=', $group_id);
         }
 
+        // Return as a cursor to avoid excessive memory use
         return $linkQuery->cursor();
     }
 
@@ -521,8 +523,11 @@ class MapController extends Controller
     protected function addDeviceLinks($query, &$link_list, &$device_assoc_seen)
     {
         foreach ($query as $port) {
-            $device_ids_1 = $port->device_id . '.' . $port->remote_device_id;
-            $device_ids_2 = $port->remote_device_id . '.' . $port->device_id;
+            // We have additional attributes, so we needs a copy to avoid PHPStan errors
+            $row = json_decode(json_encode($port));
+
+            $device_ids_1 = $port->device_id . '.' . $row->remote_device_id;
+            $device_ids_2 = $row->remote_device_id . '.' . $port->device_id;
 
             // Ignore any associations that have already been processed
             if (array_key_exists($device_ids_1, $device_assoc_seen)
@@ -559,7 +564,7 @@ class MapController extends Controller
                     'color' => Config::get("network_map_legend.$link_used"),
                 ],
             ];
-            if ($port->local_device_status == 0 && $port->remote_device_status == 0) {
+            if ($row->local_device_status == 0 && $row->remote_device_status == 0) {
                 // If both devices are offline, mark the link as being down
                 $link_style = [
                     'dashes' => [8, 12],
@@ -569,7 +574,7 @@ class MapController extends Controller
                         'color' => Config::get('network_map_legend.dn.edge'),
                     ],
                 ];
-            } elseif ($port->ifOperStatus == 'down' || $port->remote_ifOperStatus == 'down') {
+            } elseif ($port->ifOperStatus == 'down' || $row->remote_ifOperStatus == 'down') {
                 // If either port is offline, mark the link as being down
                 $link_style = [
                     'dashes' => [8, 12],
@@ -581,12 +586,12 @@ class MapController extends Controller
                 ];
             }
 
-            $link_list[$port->port_id . '.' . $port->remote_port_id] = array_merge(
+            $link_list[$port->port_id . '.' . $row->remote_port_id] = array_merge(
                 [
                     'ldev'       => $port->device_id,
-                    'rdev'       => $port->remote_device_id,
-                    'ifnames'    => $port->ifName . ' <> ' . $port->remote_port_name,
-                    'url'        => Url::portLink($port, null, null, 0, 1),
+                    'rdev'       => $row->remote_device_id,
+                    'ifnames'    => $port->ifName . ' <> ' . $row->remote_port_name,
+                    'url'        => Url::portLink($port, null, null, false, 1),
                     'width'      => $width,
                 ],
                 $link_style,

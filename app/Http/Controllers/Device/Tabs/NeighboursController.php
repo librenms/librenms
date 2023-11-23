@@ -81,8 +81,8 @@ class NeighboursController implements DeviceTab
 
             // Only show where user has access to both devices
             if (! \Auth::user()->hasGlobalRead()) {
-                $linkQuery->whereIntegerInRaw('l.local_device_id', \Permissions::devicesForUser(\Auth::user()))
-                    ->whereIntegerInRaw('l.remote_device_id', \Permissions::devicesForUser(\Auth::user()));
+                $linkQuery->whereIntegerInRaw('l.local_device_id', \Permissions::devicesForUser())
+                    ->whereIntegerInRaw('l.remote_device_id', \Permissions::devicesForUser());
             }
 
             foreach ($linkQuery->get() as $port) {
@@ -108,10 +108,10 @@ class NeighboursController implements DeviceTab
                 }
 
                 $links[] = [
-                    'local_url'       => Url::portLink($port, null, null, 1, 0),
+                    'local_url'       => Url::portLink($port, null, null, true, 0),
                     'ldev_id'         => $port->device->device_id,
                     'local_portname'  => $port->ifAlias,
-                    'remote_url'      => $rport ? Url::portLink($rport, null, null, 1, 0) : '',
+                    'remote_url'      => $rport ? Url::portLink($rport, null, null, true, 0) : '',
                     'rdev_id'         => $rport ? $rport->device->device_id : null,
                     'rdev_name'       => $port->remote_hostname,
                     'rdev_platform'   => $port->remote_platform,
