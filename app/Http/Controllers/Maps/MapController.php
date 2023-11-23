@@ -720,6 +720,21 @@ class MapController extends Controller
             }
         }
 
+        $init_lat = $request->get('lat');
+        if (!$init_lat) {
+            $init_lat = Config::get('leaflet.default_lat', 51.48);
+        }
+
+        $init_lng = $request->get('lng');
+        if (!$init_lng) {
+            $init_lng = Config::get('leaflet.default_lng', 0);
+        }
+
+        $init_zoom = $request->get('zoom');
+        if (!$init_zoom) {
+            $init_zoom = Config::get('leaflet.default_zoom', 5);
+        }
+
         $data = [
             'map_engine' => Config::get('map.engine', 'leaflet'),
             'map_provider' => Config::get('geoloc.engine', 'openstreetmap'),
@@ -728,9 +743,9 @@ class MapController extends Controller
             'netmap_source' => Config::get('network_map_worldmap_link_type', 'xdp'),
             'netmap_include_disabled_alerts' => Config::get('network_map_worldmap_show_disabled_alerts', true) ? 1 : 0,
             'page_refresh' => Config::get('page_refresh', 300),
-            'init_lat' => Config::get('leaflet.default_lat', 51.48),
-            'init_lng' => Config::get('leaflet.default_lng', 0),
-            'init_zoom' => Config::get('leaflet.default_zoom', 5),
+            'init_lat' => $init_lat,
+            'init_lng' => $init_lng,
+            'init_zoom' => $init_zoom,
             'group_radius' => Config::get('leaflet.group_radius', 80),
             'tile_url' => Config::get('leaflet.tile_url', '{s}.tile.openstreetmap.org'),
             'group_id' => $request->get('group'),

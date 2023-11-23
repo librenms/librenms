@@ -157,6 +157,30 @@ if ($device['location_id'] && $location = Location::find($device['location_id'])
     <div id="toggle-map" class="row collapse"><div id="location-map"></div></div>
     <script>
         var device_map, device_marker_cluster;
+
+        L.Control.Fullscreen = L.Control.extend({
+            onAdd: function(map) {
+                var fsdiv = L.DomUtil.create("div");
+                var a = document.createElement("a");
+                a.title = "Go to fullscreen map";
+                a.href = "#";
+                a.style.textDecoration = "none";
+                a.classList.add("fa-solid","fa-expand","fa-2xl");
+                a.onclick = function() {
+                    var zoom = device_map.getZoom();
+                    var coords = device_map.getCenter();
+                    window.location.href = "fullscreenmap?lat=" + coords.lat + "&lng=" + coords.lng + "&zoom=" + zoom;
+                    return false
+                };
+                fsdiv.appendChild(a);
+                return fsdiv;
+            }
+        });
+
+        L.control.fullscreen = function(opts) {
+            return new L.Control.Fullscreen(opts);
+        }
+
         $("#toggle-map").on("shown.bs.collapse", function () {
              var device_marker, device_location;
              if (device_map == null) {
