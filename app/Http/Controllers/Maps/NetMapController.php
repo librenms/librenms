@@ -1,14 +1,8 @@
 <?php
 /**
-<<<<<<< HEAD
  * NetMapController.php
  *
  * Controller for dynamic network map base page
-=======
- * DependencyController.php
- *
- * Controller for graphing Relationships
->>>>>>> 9766e386e (Converted all device map pages to Laravel)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,13 +19,8 @@
  *
  * @link       https://www.librenms.org
  *
-<<<<<<< HEAD
  * @copyright  2023 Steven Wilton
  * @author     Steven Wilton <swilton@fluentit.com.au>
-=======
- * @copyright  2019 Thomas Berberich
- * @author     Thomas Berberich <sourcehhdoctor@gmail.com>
->>>>>>> 9766e386e (Converted all device map pages to Laravel)
  */
 
 namespace App\Http\Controllers\Maps;
