@@ -53,7 +53,12 @@ $.get( '{{ route('maps.getdevicelinks') }}', {device: {{$data['device_id']}}, li
         $.get( '{{ route('maps.getdevices') }}', {devices: Object.keys(devices), url_type: 'links'})
             .done(function( data ) {
                 $.each(data, function( dev_id, dev ) {
-                    network_nodes.add({id: dev_id, label: dev["sname"], title: dev["url"], shape: "box"});
+                    var this_dev = {id: dev_id, label: dev["sname"], title: dev["url"], shape: "box"};
+                    if (dev["style"]) {
+                        // Merge the style if it has been defined
+                        this_dev = Object.assign(dev["style"], this_dev);
+                    }
+                    network_nodes.add(this_dev);
                 });
 
                 network_nodes.flush();
