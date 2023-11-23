@@ -26,9 +26,12 @@
 namespace App\Http\Controllers\Device\Tabs;
 
 use App\Models\Device;
+use App\Models\Port;
 use App\Models\Link;
 use Illuminate\Http\Request;
 use LibreNMS\Interfaces\UI\DeviceTab;
+use LibreNMS\Config;
+use LibreNMS\Util\Url;
 
 class NeighboursController implements DeviceTab
 {
@@ -56,6 +59,84 @@ class NeighboursController implements DeviceTab
 
     public function data(Device $device, Request $request): array
     {
-        return [];
+        $selection = Url::parseOptions('selection', 'list');
+
+        $links = [];
+        $devices = [];
+
+        if ($selection == 'list') {
+            $linkQuery = Port::select(
+                    \DB::raw('ports.*'),
+                    \DB::raw('l.remote_port_id'),
+                    \DB::raw('l.remote_hostname'),
+                    \DB::raw('l.remote_port'),
+                    \DB::raw('l.remote_platform'),
+                    \DB::raw('l.protocol'),
+                )
+                ->with('device')
+                ->join('links as l', 'l.local_port_id', '=', 'ports.port_id')
+                ->where('l.local_device_id', '=', $device->device_id)
+                ->orderBy('ports.ifName');
+
+            // Only show where user has access to both devices
+            if (! \Auth::user()->hasGlobalRead()) {
+                $linkQuery->whereIntegerInRaw('l.local_device_id', \Permissions::devicesForUser(\Auth::user()))
+                    ->whereIntegerInRaw('l.remote_device_id', \Permissions::devicesForUser(\Auth::user()));
+            }
+
+            foreach ($linkQuery->get() as $port) {
+                if (!in_array($port->device->device_id, $devices)) {
+                    $devices[$port->device->device_id] = [
+                        'url'  => Url::deviceLink($port->device, null, [], 0, 0, 0, 1),
+                        'hw'   => $port->device->hardware,
+                        'name' => $port->device->shortDisplayName(),
+                    ];
+                }
+
+                $rport = null;
+                if ($port->remote_port_id) {
+                    $rport = Port::where('port_id', '=', $port->remote_port_id)->with('device')->first();
+
+                    if (!in_array($rport->device->device_id, $devices)) {
+                        $devices[$rport->device->device_id] = [
+                            'url'  => Url::deviceLink($rport->device, null, [], 0, 0, 0, 1),
+                            'hw'   => $rport->device->hardware,
+                            'name' => $rport->device->shortDisplayName(),
+                        ];
+                    }
+                }
+
+                $links[] = [
+                    'local_url'       => Url::portLink($port, null, null, 1, 0),
+                    'ldev_id'         => $port->device->device_id,
+                    'local_portname'  => $port->ifAlias,
+                    'remote_url'      => $rport ? Url::portLink($rport, null, null, 1, 0) : "",
+                    'rdev_id'         => $rport ? $rport->device->device_id : null,
+                    'rdev_name'       => $port->remote_hostname,
+                    'rdev_platform'   => $port->remote_platform,
+                    'remote_portname' => $rport ? $rport->ifAlias : $port->remote_port,
+                    'protocol'        => strtoupper($port->protocol),
+                ];
+            }
+        }
+
+        return [
+            'selections' => [
+                'list' => [
+                    'text' => 'List',
+                    'link' => Url::deviceUrl($device, ['tab' => 'neighbours', 'selection' => 'list']),
+                ],
+                'map' => [
+                    'text' => 'Map',
+                    'link' => Url::deviceUrl($device, ['tab' => 'neighbours', 'selection' => 'map']),
+                ],
+            ],
+            'selection'  => $selection,
+            'device_id'  => $device->device_id,
+            'devices'    => $devices,
+            'links'      => $links,
+            'link_types' => Config::get('network_map_items', ['xdp','mac']),
+            'visoptions' => Config::get('network_map_vis_options'),
+        ];
     }
 }

@@ -214,7 +214,7 @@ html, body, #fullscreen-map {
                 $("#countdown").css("border", "1px solid red");
             });
 @if($show_netmap && $netmap_source == 'xdp')
-        $.get( '{{ route('maps.getlinks') }}', {link_type: '{{$netmap_source}}'})
+        $.get( '{{ route('maps.getgeolinks') }}', {link_type: '{{$netmap_source}}'})
             .done(function( data ) {
                 $.each( data, function( link_id, link) {
                     if(link_id in link_markers) {

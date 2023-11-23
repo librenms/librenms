@@ -29,14 +29,16 @@ use App\Http\Controllers\Controller;
 use App\Models\AlertSchedule;
 use App\Models\Device;
 use App\Models\DeviceGroup;
+use App\Models\Port;
 use App\Models\Service;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use LibreNMS\Config;
 use LibreNMS\Util\Url;
 
 class MapController extends Controller
 {
-    protected static function deviceLinks($request)
+    protected static function geoLinks($request)
     {
         // Return a blank array for unknown link types
         if ($request->get('link_type') != 'xdp') {
@@ -85,16 +87,160 @@ class MapController extends Controller
         if ($group_id) {
             $linkQuery->join('device_group_device AS ldg', 'ld.device_id', '=', 'ldg.device_id')
                 ->join('device_group_device AS rdg', 'rd.device_id', '=', 'rdg.device_id')
-                ->where('rd.device_group_id', '=', $group_id)
-                ->where('ld.device_group_id', '=', $group_id);
+                ->where('rdg.device_group_id', '=', $group_id)
+                ->where('ldg.device_group_id', '=', $group_id);
         }
 
         return $linkQuery->get();
     }
 
+    protected static function deviceMacLinks($request)
+    {
+        $disabled = $request->get('disabled');
+        $disabled_alerts = $request->get('disabled_alerts');
+
+        $linkQuery = Port::hasAccess($request->user())
+            ->select(\DB::raw('ports.*'),
+                \DB::raw('rd.device_id AS remote_device_id'),
+                \DB::raw('rp.port_id AS remote_port_id'),
+                \DB::raw('rp.ifName AS remote_port_name'),
+                \DB::raw('ld.status AS local_device_status'),
+                \DB::raw('rd.status AS remote_device_status'),
+                \DB::raw('rp.ifOperStatus AS remote_ifOperStatus'),
+                \DB::raw('rip.ipv4_address_id'),
+            )
+            ->join('ipv4_mac as m', 'ports.port_id', '=', 'm.port_id')
+            ->join('ports as rp', 'm.mac_address', '=', 'rp.ifPhysAddress')
+            ->join('devices as ld', 'ports.device_id', '=', 'ld.device_id')
+            ->join('devices as rd', 'rp.device_id', '=', 'rd.device_id')
+            // Outer join to the IPv4 address table on the remote device
+            // to see if we can find an IP matching the ARP entry on the local device
+            // We use the orderBy caluse below to make these entries appear at the
+            // top of the list, causing them to be used first
+            ->leftJoin('ipv4_addresses as rip', function ($j) {
+                 $j->on('rp.port_id', '=', 'rip.port_id')
+                     ->on('rip.ipv4_address', '=', 'm.ipv4_address');
+            })
+            ->whereNotIn('m.mac_address',['000000000000','ffffffffffff'])
+            ->whereColumn('ld.device_id', '<>', 'rd.device_id')
+            ->orderBy('ipv4_address_id', 'DESC')
+            ->orderBy('ifName')
+            ->orderBy('remote_port_name');
+
+        if (! \Auth::user()->hasGlobalRead()) {
+            $linkQuery->whereIntegerInRaw('ld.device_id', \Permissions::devicesForUser($request->user()))
+                ->whereIntegerInRaw('rd.device_id', \Permissions::devicesForUser($request->user()));
+        }
+
+        if (! is_null($disabled)) {
+            if ($disabled) {
+                $linkQuery->where('rd.disabled', '<>', '0')
+                    ->where('ld.disabled', '<>', '0');
+            } else {
+                $linkQuery->where('rd.disabled', '=', '0')
+                    ->where('ld.disabled', '=', '0');
+            }
+        }
+
+        if (! is_null($disabled_alerts)) {
+            if ($disabled_alerts) {
+                $linkQuery->where('rd.disable_notify', '<>', '0')
+                    ->where('ld.disable_notify', '<>', '0');
+            } else {
+                $linkQuery->where('rd.disable_notify', '=', '0')
+                    ->where('ld.disable_notify', '=', '0');
+            }
+        }
+
+        $group_id = $request->get('group');
+        if ($group_id) {
+            $linkQuery->join('device_group_device AS ldg', 'ld.device_id', '=', 'ldg.device_id')
+                ->join('device_group_device AS rdg', 'rd.device_id', '=', 'rdg.device_id')
+                ->where('rdg.device_group_id', '=', $group_id)
+                ->where('ldg.device_group_id', '=', $group_id);
+        }
+
+        $device_id = $request->get('device');
+        if ($device_id) {
+            $linkQuery->where(function (Builder $q) use ($device_id) {
+                $q->where('ld.device_id', '=', $device_id)
+                      ->orWhere('rd.device_id', '=', $device_id);
+            });
+        }
+
+        return $linkQuery->cursor();
+    }
+
+    protected static function deviceXdpLinks($request)
+    {
+        $disabled = $request->get('disabled');
+        $disabled_alerts = $request->get('disabled_alerts');
+
+        $linkQuery = Port::hasAccess($request->user())
+            ->select(\DB::raw('ports.*'),
+                \DB::raw('rd.device_id AS remote_device_id'),
+                \DB::raw('rp.port_id AS remote_port_id'),
+                \DB::raw('rp.ifName AS remote_port_name'),
+                \DB::raw('ld.status AS local_device_status'),
+                \DB::raw('rd.status AS remote_device_status'),
+                \DB::raw('rp.ifOperStatus AS remote_ifOperStatus'),
+            )
+            ->join('links as l', 'ports.port_id', '=', 'l.local_port_id')
+            ->join('devices as rd', 'l.remote_device_id', '=', 'rd.device_id')
+            ->join('devices as ld', 'ports.device_id', '=', 'ld.device_id')
+            ->join('ports as rp', 'l.remote_port_id', '=', 'rp.port_id')
+            ->where('l.active', '<>', 0)
+            ->orderBy('ports.ifName')
+            ->orderBy('rp.ifName');
+
+        if (! \Auth::user()->hasGlobalRead()) {
+            $linkQuery->whereIntegerInRaw('l.local_device_id', \Permissions::devicesForUser($request->user()))
+                ->whereIntegerInRaw('l.remote_device_id', \Permissions::devicesForUser($request->user()));
+        }
+
+        if (! is_null($disabled)) {
+            if ($disabled) {
+                $linkQuery->where('rd.disabled', '<>', '0')
+                    ->where('ld.disabled', '<>', '0');
+            } else {
+                $linkQuery->where('rd.disabled', '=', '0')
+                    ->where('ld.disabled', '=', '0');
+            }
+        }
+
+        if (! is_null($disabled_alerts)) {
+            if ($disabled_alerts) {
+                $linkQuery->where('rd.disable_notify', '<>', '0')
+                    ->where('ld.disable_notify', '<>', '0');
+            } else {
+                $linkQuery->where('rd.disable_notify', '=', '0')
+                    ->where('ld.disable_notify', '=', '0');
+            }
+        }
+
+        $device_id = $request->get('device');
+        if ($device_id) {
+            $linkQuery->where(function (Builder $q) use ($device_id) {
+                $q->where('ld.device_id', '=', $device_id)
+                      ->orWhere('rd.device_id', '=', $device_id);
+            });
+        }
+
+        $group_id = $request->get('group');
+        if ($group_id) {
+            $linkQuery->join('device_group_device AS ldg', 'l.local_device_id', '=', 'ldg.device_id')
+                ->join('device_group_device AS rdg', 'l.remote_device_id', '=', 'rdg.device_id')
+                ->where('rdg.device_group_id', '=', $group_id)
+                ->where('ldg.device_group_id', '=', $group_id);
+        }
+
+        return $linkQuery->cursor();
+    }
+
     protected static function deviceList($request)
     {
         $group_id = $request->get('group');
+        $devices = $request->get('devices');
         $valid_loc = $request->get('location_valid');
         $disabled = $request->get('disabled');
         $ignore = $request->get('ignore');
@@ -106,6 +252,10 @@ class MapController extends Controller
 
         if ($group_id) {
             $deviceQuery->inDeviceGroup($group_id);
+        }
+
+        if ($devices) {
+            $deviceQuery->whereIntegerInRaw('device_id', $devices);
         }
 
         if ($statuses && count($statuses) > 0) {
@@ -368,12 +518,107 @@ class MapController extends Controller
         return response()->json($device_list);
     }
 
-    // GET Device Links
-    public function getLinks(Request $request)
+    protected function addDeviceLinks($query, &$link_list, &$device_assoc_seen)
+    {
+        foreach ($query as $port) {
+            $device_ids_1 = $port->device_id . "." . $port->remote_device_id;
+            $device_ids_2 = $port->remote_device_id . "." . $port->device_id;
+
+            // Ignore any associations that have already been processed
+            if (array_key_exists($device_ids_1, $device_assoc_seen)
+                || array_key_exists($device_ids_2, $device_assoc_seen)) {
+                continue;
+            }
+            $device_assoc_seen[$device_ids_1] = true;
+            $device_assoc_seen[$device_ids_2] = true;
+
+            $speed = $port->ifSpeed / 1000000000;
+            if ($speed > 500000) {
+                $width = 20;
+            } else {
+                $width = round(0.77 * pow($speed, 0.25));
+            }
+            if ($port->ifSpeed > 0) {
+                $link_in_usage_pct = $port->ifInOctets_rate * 8 / $port->ifSpeed * 100;
+                $link_out_usage_pct = $port->ifOutOctets_rate * 8 / $port->ifSpeed * 100;
+                $link_used = max($link_out_usage_pct, $link_in_usage_pct);
+            } else {
+                $link_used = 0;
+            }
+            $link_used = round(2 * $link_used, -1) / 2;
+            if ($link_used > 100) {
+                $link_used = 100;
+            }
+            if (is_nan($link_used)) {
+                $link_used = 0;
+            }
+            $link_style = [
+                'color' => [
+                    'border' => Config::get("network_map_legend.$link_used"),
+                    'highlight' => Config::get("network_map_legend.$link_used"),
+                    'color' => Config::get("network_map_legend.$link_used"),
+                ]
+            ];
+            if ($port->local_device_status == 0 && $port->remote_device_status == 0) {
+                // If both devices are offline, mark the link as being down
+                $link_style = [
+                    'dashes' => [8, 12],
+                    'color' => [
+                        'border' => Config::get('network_map_legend.dn.border'),
+                        'highlight' => Config::get('network_map_legend.dn.edge'),
+                        'color' => Config::get('network_map_legend.dn.edge'),
+                    ],
+                ];
+            } elseif ($port->ifOperStatus == 'down' || $port->remote_ifOperStatus == 'down') {
+                // If either port is offline, mark the link as being down
+                $link_style = [
+                    'dashes' => [8, 12],
+                    'color' => [
+                        'border' => Config::get('network_map_legend.dn.border'),
+                        'highlight' => Config::get('network_map_legend.dn.edge'),
+                        'color' => Config::get('network_map_legend.dn.edge'),
+                    ],
+                ];
+            }
+
+            $link_list[$port->port_id . '.' . $port->remote_port_id] = array_merge(
+                [
+                    'ldev'       => $port->device_id,
+                    'rdev'       => $port->remote_device_id,
+                    'ifnames'    => $port->ifName . ' <> ' . $port->remote_port_name,
+                    'url'        => Url::portLink($port, null, null, 0, 1),
+                    'width'      => $width,
+                ],
+                $link_style,
+            );
+        }
+    }
+
+    // GET Device Links by device
+    public function getDeviceLinks(Request $request)
     {
         // List all links
         $link_list = [];
-        foreach (self::deviceLinks($request) as $link) {
+        $device_assoc_seen = [];
+        $link_types = $request->get('link_types');
+
+        foreach ($link_types as $link_type) {
+            if ($link_type == 'mac') {
+                self::addDeviceLinks(self::deviceMacLinks($request), $link_list, $device_assoc_seen);
+            } elseif ($link_type == 'xdp') {
+                self::addDeviceLinks(self::deviceXdpLinks($request), $link_list, $device_assoc_seen);
+            }
+        }
+
+        return response()->json($link_list);
+    }
+
+    // GET Device Links grouped by geographic locations
+    public function getGeographicLinks(Request $request)
+    {
+        // List all links
+        $link_list = [];
+        foreach (self::geoLinks($request) as $link) {
             $speed = $link->link_capacity / 1000000000;
             if ($speed > 500000) {
                 $width = 20;
