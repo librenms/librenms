@@ -246,10 +246,11 @@ if ($device['location_id'] && $location = Location::find($device['location_id'])
                   });
                 device_map.addLayer(device_marker_cluster);
         ';
-    }
-
-    if (Auth::user()->isAdmin()) {
-        echo '  device_marker.on("dragend", function () {
+    } elseif (Auth::user()->isAdmin()) {
+        echo '
+                device_marker = L.marker(device_location).addTo(device_map);
+                device_marker.dragging.enable();
+                device_marker.on("dragend", function () {
                     var new_location = device_marker.getLatLng();
                     if (confirm("Update location to " + new_location + "? This will update this location for all devices!")) {
                         update_location(' . $location->id . ', new_location, function(success) {
@@ -260,8 +261,6 @@ if ($device['location_id'] && $location = Location::find($device['location_id'])
                         });
                     }
                 });';
-    } else {
-        echo 'device_marker.dragging.disable();';
     }
     echo '
         }
