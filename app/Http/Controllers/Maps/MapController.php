@@ -721,17 +721,17 @@ class MapController extends Controller
         }
 
         $init_lat = $request->get('lat');
-        if (!$init_lat) {
+        if (! $init_lat) {
             $init_lat = Config::get('leaflet.default_lat', 51.48);
         }
 
         $init_lng = $request->get('lng');
-        if (!$init_lng) {
+        if (! $init_lng) {
             $init_lng = Config::get('leaflet.default_lng', 0);
         }
 
         $init_zoom = $request->get('zoom');
-        if (!$init_zoom) {
+        if (! $init_zoom) {
             $init_zoom = Config::get('leaflet.default_zoom', 5);
         }
 
