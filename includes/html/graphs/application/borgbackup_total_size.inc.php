@@ -4,6 +4,7 @@ $name = 'borgbackup';
 $unit_text = 'Bytes';
 $descr = 'Orig Size';
 $ds = 'data';
+$no_hourly = true;
 
 $name_part = 'total_size';
 

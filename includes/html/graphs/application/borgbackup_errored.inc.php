@@ -4,6 +4,7 @@ $name = 'borgbackup';
 $unit_text = 'Repos';
 $descr = 'Errored';
 $ds = 'data';
+$no_hourly = true;
 
 $name_part = 'errored';
 

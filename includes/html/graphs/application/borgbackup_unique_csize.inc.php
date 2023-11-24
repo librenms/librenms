@@ -4,6 +4,7 @@ $name = 'borgbackup';
 $unit_text = 'Bytes';
 $descr = 'Dedup Size';
 $ds = 'data';
+$no_hourly = true;
 
 $name_part = 'unique_csize';
 

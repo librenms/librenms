@@ -4,6 +4,10 @@ $name = 'borgbackup';
 $unit_text = 'Repos';
 $descr = 'Locked';
 $ds = 'data';
+$no_hourly = true;
+$no_daily = true;
+$no_weekly = true;
+$no_percentile = true;
 
 $name_part = 'locked';
 

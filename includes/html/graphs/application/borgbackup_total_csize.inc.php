@@ -4,6 +4,7 @@ $name = 'borgbackup';
 $unit_text = 'Bytes';
 $descr = 'Cmprssd Size';
 $ds = 'data';
+$no_hourly = true;
 
 $name_part = 'total_csize';
 

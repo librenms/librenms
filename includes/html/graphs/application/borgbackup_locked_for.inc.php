@@ -4,6 +4,7 @@ $name = 'borgbackup';
 $unit_text = 'Seconds';
 $descr = 'Locked For';
 $ds = 'data';
+$no_hourly = true;
 
 $name_part = 'locked_for';
 

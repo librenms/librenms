@@ -4,6 +4,7 @@ $name = 'borgbackup';
 $unit_text = 'Chunks';
 $descr = 'Unique';
 $ds = 'data';
+$no_hourly = true;
 
 $name_part = 'total_unique_chunks';
 
