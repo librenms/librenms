@@ -61,7 +61,7 @@ class SyslogController extends TableController
 
     public function sortFields($request)
     {
-        return ['label', 'timestamp', 'level', 'device_id', 'tag','program', 'msg', 'priority'];
+        return ['label', 'timestamp', 'level', 'device_id', 'tag', 'program', 'msg', 'priority'];
     }
 
     /**
