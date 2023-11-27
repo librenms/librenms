@@ -35,7 +35,7 @@ class SyslogController extends SelectController
     protected function rules()
     {
         return [
-            'field' => 'required|in:program,priority',
+            'field' => 'required|in:program,priority,tag',
             'device' => 'nullable|int',
         ];
     }

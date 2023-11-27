@@ -36,6 +36,7 @@ class SyslogController extends TableController
             'device' => 'nullable|int',
             'device_group' => 'nullable|int',
             'program' => 'nullable|string',
+            'tag' => 'nullable|string',
             'priority' => 'nullable|string',
             'to' => 'nullable|date',
             'from' => 'nullable|date',
@@ -54,12 +55,13 @@ class SyslogController extends TableController
             'device_id' => 'device',
             'program' => 'program',
             'priority' => 'priority',
+            'tag' => 'tag',
         ];
     }
 
     public function sortFields($request)
     {
-        return ['label', 'timestamp', 'level', 'device_id', 'program', 'msg', 'priority'];
+        return ['label', 'timestamp', 'level', 'device_id', 'tag','program', 'msg', 'priority'];
     }
 
     /**
@@ -103,6 +105,7 @@ class SyslogController extends TableController
             'timestamp' => $syslog->timestamp,
             'level' => htmlentities($syslog->level),
             'device_id' => $device ? \LibreNMS\Util\Url::deviceLink($device, $device->shortDisplayName()) : '',
+            'tag' => htmlentities($syslog->tag),
             'program' => htmlentities($syslog->program),
             'msg' => htmlentities($syslog->msg),
             'priority' => htmlentities($syslog->priority),

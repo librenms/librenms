@@ -22,6 +22,7 @@ $common_output[] = '
                 <th data-column-id="timestamp" data-order="desc">Timestamp</th>
                 <th data-column-id="level">Level</th>
                 <th data-column-id="device_id">Hostname</th>
+                <th data-column-id="tag">Tag</th>
                 <th data-column-id="program">Program</th>
                 <th data-column-id="msg">Message</th>
                 <th data-column-id="priority">Priority</th>
@@ -40,6 +41,7 @@ var syslog_grid = $("#syslog").bootgrid({
             device: "' . htmlspecialchars($vars['device'] ?? '') . '",
             program: "' . htmlspecialchars($vars['program'] ?? '') . '",
             priority: "' . htmlspecialchars($vars['priority'] ?? '') . '",
+            tag: "' . htmlspecialchars($vars['tag'] ?? '') . '",
             to: "' . htmlspecialchars($vars['to'] ?? '') . '",
             from: "' . htmlspecialchars($vars['from'] ?? '') . '",
         };
