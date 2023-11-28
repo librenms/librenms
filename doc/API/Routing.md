@@ -8,9 +8,12 @@ Input:
 
 - hostname = Either the devices hostname or id.
 - asn = The local ASN you would like to filter by
-- remote_asn = Filter by remote peer ASN
-- remote_address = Filter by remote peer address
-- local_address = Filter by local address
+- remote_asn = Filter by remote peer ASN (bgpPeerRemoteAs)
+- remote_address = Filter by remote peer address (bgpPeerRemoteAddr)
+- local_address = Filter by local address (bgpLocalAddr)
+- bgp_descr = Filter by BGP neighbor description (bgpPeerDescr)
+- bgp_state = Filter by BGP session state (like established,idle...)  (bgpPeerState)
+- bgp_state = Filter by BGP admin state (start,stop...)  (bgpPeerAdminStatus)
 
 
 
@@ -22,6 +25,9 @@ curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bgp?hostnam
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bgp?asn=1234
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bgp?remote_asn=1234
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bgp?local_address=1.1.1.1&remote_address=2.2.2.2
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bgp?bgp_descr=UPSTREAM
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bgp?bgp_state=idle
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bgp?bgp_adminstate=idle
 ```
 
 Output:
