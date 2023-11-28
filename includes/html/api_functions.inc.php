@@ -636,6 +636,7 @@ function list_bgp(Illuminate\Http\Request $request)
     $bgp_descr = $request->get('bgp_descr');
     $bgp_state = $request->get('bgp_state');
     $bgp_adminstate = $request->get('bgp_adminstate');
+    $bgp_family = $request->get('bgp_family');
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
     if (is_numeric($device_id)) {
         $sql .= ' AND `devices`.`device_id` = ?';
@@ -643,11 +644,11 @@ function list_bgp(Illuminate\Http\Request $request)
     }
     if (! empty($asn)) {
         $sql .= ' AND `devices`.`bgpLocalAs` = ?';
-        $sql_params[] = $asn;
+        $sql_params[] = preg_replace("/[^0-9]/", "", $asn);
     }
     if (! empty($remote_asn)) {
         $sql .= ' AND `bgpPeers`.`bgpPeerRemoteAs` = ?';
-        $sql_params[] = $remote_asn;
+        $sql_params[] = preg_replace("/[^0-9]/", "", $remote_asn);
     }
     if (! empty($local_address)) {
         $sql .= ' AND `bgpPeers`.`bgpLocalAddr` = ?';
@@ -677,6 +678,15 @@ function list_bgp(Illuminate\Http\Request $request)
         $sql .= ' AND `bgpPeers`.`bgpPeerAdminStatus` = ?';
         $sql_params[] = $bgp_adminstate;
     }
+    if (! empty($bgp_family)) {
+        if ($bgp_family == 4) {
+            $sql .= ' AND `bgpPeers`.`bgpLocalAddr` LIKE \'%.%\'';
+        }
+        else if ($bgp_family == 6) {
+            $sql .= ' AND `bgpPeers`.`bgpLocalAddr` LIKE \'%:%\'';
+        }
+    }
+
     $bgp_sessions = dbFetchRows("SELECT `bgpPeers`.* FROM `bgpPeers` LEFT JOIN `devices` ON `bgpPeers`.`device_id` = `devices`.`device_id` WHERE `bgpPeerState` IS NOT NULL AND `bgpPeerState` != '' $sql", $sql_params);
     $total_bgp_sessions = count($bgp_sessions);
     if (! is_numeric($total_bgp_sessions)) {
