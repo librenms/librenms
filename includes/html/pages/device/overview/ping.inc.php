@@ -21,6 +21,7 @@ if ($perf->isNotEmpty()) {
         'type' => 'device_ping_perf',
         'from' => \LibreNMS\Config::get('time.day'),
         'legend' => 'yes',
+        'height' => 180,
         'popup_title' => DeviceCache::getPrimary()->hostname . ' - Ping Response',
     ]);
 

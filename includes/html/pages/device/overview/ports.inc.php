@@ -39,10 +39,10 @@ if (ObjectCache::portCounts(['total'], $device['device_id'])['total'] > 0) {
     $ports = ObjectCache::portCounts(['total', 'up', 'down', 'disabled'], $device['device_id']);
     echo '
     <tr>
-      <td><i class="fa fa-link fa-lg" style="color:black" aria-hidden="true"></i> ' . $ports['total'] . '</td>
-      <td><i class="fa fa-link fa-lg interface-upup" aria-hidden="true"></i> ' . $ports['up'] . '</td>
-      <td><i class="fa fa-link fa-lg interface-updown" aria-hidden="true"></i> ' . $ports['down'] . '</td>
-      <td><i class="fa fa-link fa-lg interface-admindown" aria-hidden="true"></i> ' . $ports['disabled'] . '</td>
+      <td><i class="fa fa-link fa-lg" style="color:black" aria-hidden="true" title="Total"></i> ' . $ports['total'] . '</td>
+      <td><i class="fa fa-link fa-lg interface-upup" aria-hidden="true" title="Up"></i> ' . $ports['up'] . '</td>
+      <td><i class="fa fa-link fa-lg interface-updown" aria-hidden="true" title="Down"></i> ' . $ports['down'] . '</td>
+      <td><i class="fa fa-link fa-lg interface-admindown" aria-hidden="true" title="Disabled"></i> ' . $ports['disabled'] . '</td>
     </tr>';
 
     echo '<tr>
@@ -50,15 +50,14 @@ if (ObjectCache::portCounts(['total'], $device['device_id'])['total'] > 0) {
 
     $ifsep = '';
 
-    if ($device['type'] == 'network') {
-        //a semicolon list for >10 Ports does not makes sense, so we save queries/rendering and make a link for network devices
+    if ($ports['total'] >= 10 ) {
         echo '<a href="' . url('device') . '/' . DeviceCache::getPrimary()->device_id . '/ports/' . '">Go to Port list</a>';
     } else {
         foreach (dbFetchRows("SELECT * FROM `ports` WHERE device_id = ? AND `deleted` != '1' AND `disabled` = 0 ORDER BY ifName", [$device['device_id']]) as $data) {
-          $data = cleanPort($data);
-          $data = array_merge($data, $device);
-          echo "$ifsep" . generate_port_link($data, makeshortif(strtolower($data['label'])));
-          $ifsep = ', ';
+            $data = cleanPort($data);
+            $data = array_merge($data, $device);
+            echo "$ifsep" . generate_port_link($data, makeshortif(strtolower($data['label'])));
+            $ifsep = ', ';
         }
     }
 

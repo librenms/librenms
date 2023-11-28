@@ -19,8 +19,7 @@ if ($perf->isNotEmpty()) {
     $graph = \App\Http\Controllers\Device\Tabs\OverviewController::setGraphWidth([
         'device' => DeviceCache::getPrimary()->device_id,
         'type' => 'device_availability',
-        'from' => \LibreNMS\Config::get('time.day'),
-        'duration' => 86400,
+        'from' => \LibreNMS\Config::get('time.month'),
         'legend' => 'yes',
         'popup_title' => DeviceCache::getPrimary()->hostname . ' - Availability',
     ]);
