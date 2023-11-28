@@ -644,11 +644,11 @@ function list_bgp(Illuminate\Http\Request $request)
     }
     if (! empty($asn)) {
         $sql .= ' AND `devices`.`bgpLocalAs` = ?';
-        $sql_params[] = preg_replace("/[^0-9]/", "", $asn);
+        $sql_params[] = preg_replace('/[^0-9]/', '', $asn);
     }
     if (! empty($remote_asn)) {
         $sql .= ' AND `bgpPeers`.`bgpPeerRemoteAs` = ?';
-        $sql_params[] = preg_replace("/[^0-9]/", "", $remote_asn);
+        $sql_params[] = preg_replace('/[^0-9]/', '', $remote_asn);
     }
     if (! empty($local_address)) {
         $sql .= ' AND `bgpPeers`.`bgpLocalAddr` = ?';
@@ -681,8 +681,7 @@ function list_bgp(Illuminate\Http\Request $request)
     if (! empty($bgp_family)) {
         if ($bgp_family == 4) {
             $sql .= ' AND `bgpPeers`.`bgpLocalAddr` LIKE \'%.%\'';
-        }
-        else if ($bgp_family == 6) {
+        } elseif ($bgp_family == 6) {
             $sql .= ' AND `bgpPeers`.`bgpLocalAddr` LIKE \'%:%\'';
         }
     }

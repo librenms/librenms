@@ -13,7 +13,7 @@ Input:
 - local_address = Filter by local address
 - bgp_descr = Filter by BGP neighbor description
 - bgp_state = Filter by BGP session state (like established,idle...)
-- bgp_state = Filter by BGP admin state (start,stop...)
+- bgp_state = Filter by BGP admin state (start,stop,running...)
 - bgp_family = Filter by BGP address Family (4,6)
 
 
