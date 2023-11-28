@@ -22,6 +22,7 @@ $default_interval = Config::get('alert_rule.interval') . 'm';
 $default_mute_alerts = Config::get('alert_rule.mute_alerts');
 $default_invert_rule_match = Config::get('alert_rule.invert_rule_match');
 $default_recovery_alerts = Config::get('alert_rule.recovery_alerts');
+$default_acknowledgement_alerts = Config::get('alert_rule.acknowledgement_alerts');
 $default_invert_map = Config::get('alert_rule.invert_map');
 
 if (Auth::user()->hasGlobalAdmin()) {
@@ -112,10 +113,14 @@ if (Auth::user()->hasGlobalAdmin()) {
                                         <input type='checkbox' name='invert' id='invert'>
                                     </div>
                                 </div>
-                                <div class="form-group" title="Issue recovery notifications.">
-                                    <label for='recovery' class='col-sm-3 col-md-2 control-label'>Recovery alerts </label>
-                                    <div class='col-sm-2'>
+                                <div class="form-group form-inline">
+                                    <label for='recovery' class='col-sm-3 col-md-2 control-label' title="Issue recovery alerts.">Recovery alerts </label>
+                                    <div class='col-sm-2' title="Issue recovery alerts.">
                                         <input type='checkbox' name='recovery' id='recovery'>
+                                    </div>
+                                    <label for='acknowledgement' class='col-sm-3 col-md-3 control-label' title="Issue acknowledgement alerts." style="vertical-align: top;">Acknowledgement alerts </label>
+                                    <div class='col-sm-2' title="Issue acknowledgement alerts.">
+                                        <input type='checkbox' name='acknowledgement' id='acknowledgement'>
                                     </div>
                                 </div>
                                 <div class="form-group form-inline">
@@ -308,6 +313,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                 $("#mute").bootstrapSwitch('state', <?=$default_mute_alerts?>);
                 $("#invert").bootstrapSwitch('state', <?=$default_invert_rule_match?>);
                 $("#recovery").bootstrapSwitch('state', <?=$default_recovery_alerts?>);
+                $("#acknowledgement").bootstrapSwitch('state', <?=$default_acknowledgement_alerts?>);
                 $("#override_query").bootstrapSwitch('state', false);
                 $("#invert_map").bootstrapSwitch('state', <?=$default_invert_map?>);
                 $(this).find("input[type=text]").val("");
@@ -389,6 +395,9 @@ if (Auth::user()->hasGlobalAdmin()) {
                 if (typeof extra.recovery == 'undefined') {
                     extra.recovery = '<?=$default_recovery_alerts?>';
                 }
+                if (typeof extra.acknowledgement == 'undefined') {
+                    extra.acknowledgement = '<?=$default_acknowledgement_alerts?>';
+                }
 
                 if (typeof extra.options == 'undefined') {
                     extra.options = new Array();
@@ -397,6 +406,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                     extra.options.override_query = false;
                 }
                 $("[name='recovery']").bootstrapSwitch('state', extra.recovery);
+                $("[name='acknowledgement']").bootstrapSwitch('state', extra.acknowledgement);
 
                 if (rule.invert_map == 1) {
                     $("[name='invert_map']").bootstrapSwitch('state', true);

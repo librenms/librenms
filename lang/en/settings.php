@@ -126,6 +126,10 @@ return [
                 'description' => 'Recovery Alerts',
                 'help' => 'Notify if Alert recovers',
             ],
+            'acknowledgement_alerts' => [
+                'description' => 'Acknowledgement Alerts',
+                'help' => 'Notify if Alert is acknowledged',
+            ],
             'invert_map' => [
                 'description' => 'All devices except in list',
                 'help' => 'Alert only for Devices which are not listed',
@@ -243,9 +247,6 @@ return [
                 ],
             ],
         ],
-        'api_demo' => [
-            'description' => 'This is the demo',
-        ],
         'apps' => [
             'powerdns-recursor' => [
                 'api-key' => [
@@ -266,6 +267,10 @@ return [
             'description' => 'Key to hold cache of autonomous systems descriptions',
         ],
         'auth' => [
+            'allow_get_login' => [
+                'description' => 'Allow get login (Insecure)',
+                'help' => 'Allow login by putting username and password variables in the url get request, useful for display systems where you cannot interactively log in. This is considered insecure because the password will be shown in logs and logins are not rate limited so it could open you up to brute force attacks.',
+            ],
             'socialite' => [
                 'redirect' => [
                     'description' => 'Redirect Login page',
@@ -276,6 +281,10 @@ return [
                 ],
                 'configs' => [
                     'description' => 'Provider configs',
+                ],
+                'scopes' => [
+                    'description' => 'Scopes that should be included with in the authentication request',
+                    'help' => 'See https://laravel.com/docs/10.x/socialite#access-scopes',
                 ],
             ],
         ],
