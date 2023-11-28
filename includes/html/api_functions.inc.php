@@ -664,19 +664,19 @@ function list_bgp(Illuminate\Http\Request $request)
         } catch (InvalidIpException $e) {
             return api_error(400, 'Invalid remote address');
         }
-    } 
+    }
     if (! empty($bgp_descr)) {
         $sql .= ' AND `bgpPeers`.`bgpPeerDescr` LIKE ?';
         $sql_params[] = "%$bgp_descr%";
-    }    
+    }
     if (! empty($bgp_state)) {
         $sql .= ' AND `bgpPeers`.`bgpPeerState` = ?';
         $sql_params[] = $bgp_state;
-    }    
+    }
     if (! empty($bgp_adminstate)) {
         $sql .= ' AND `bgpPeers`.`bgpPeerAdminStatus` = ?';
         $sql_params[] = $bgp_adminstate;
-    }           
+    }
     $bgp_sessions = dbFetchRows("SELECT `bgpPeers`.* FROM `bgpPeers` LEFT JOIN `devices` ON `bgpPeers`.`device_id` = `devices`.`device_id` WHERE `bgpPeerState` IS NOT NULL AND `bgpPeerState` != '' $sql", $sql_params);
     $total_bgp_sessions = count($bgp_sessions);
     if (! is_numeric($total_bgp_sessions)) {
