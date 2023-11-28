@@ -50,7 +50,7 @@ if (ObjectCache::portCounts(['total'], $device['device_id'])['total'] > 0) {
 
     $ifsep = '';
 
-    if ($ports['total'] >= 10 ) {
+    if ($ports['total'] >= 10) {
         echo '<a href="' . url('device') . '/' . DeviceCache::getPrimary()->device_id . '/ports/' . '">Go to Port list</a>';
     } else {
         foreach (dbFetchRows("SELECT * FROM `ports` WHERE device_id = ? AND `deleted` != '1' AND `disabled` = 0 ORDER BY ifName", [$device['device_id']]) as $data) {
