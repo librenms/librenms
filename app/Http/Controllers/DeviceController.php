@@ -68,10 +68,10 @@ class DeviceController extends Controller
     public function index(Request $request, $device, $current_tab = 'overview', $vars = '')
     {
         $device = str_replace('device=', '', $device);
-        $device = is_numeric($device) ? DeviceCache::get((int)$device) : DeviceCache::getByHostname($device);
+        $device = is_numeric($device) ? DeviceCache::get((int) $device) : DeviceCache::getByHostname($device);
         $device_id = $device->device_id;
 
-        if (!$device->exists) {
+        if (! $device->exists) {
             abort(404);
         }
 
@@ -101,7 +101,7 @@ class DeviceController extends Controller
         // Device Link Menu, select the primary link
         $device_links = $this->deviceLinkMenu($device, $current_tab);
         $primary_device_link_name = Config::get('html.device.primary_link', 'edit');
-        if (!isset($device_links[$primary_device_link_name])) {
+        if (! isset($device_links[$primary_device_link_name])) {
             $primary_device_link_name = array_key_first($device_links);
         }
         $primary_device_link = $device_links[$primary_device_link_name];
@@ -272,6 +272,7 @@ class DeviceController extends Controller
         $supportSHA2 = SNMPCapabilities::supportsSHA2();
         $supportAES256 = SNMPCapabilities::supportsAES256();
         $cryptoAlgorithms = SNMPCapabilities::cryptoAlgoritms();
+
         return view('device.create', [
             'transports' => $transports,
             'modes' => $modes,
@@ -289,8 +290,8 @@ class DeviceController extends Controller
     {
         $this->authorize('create', Device::class);
 
-        if (!Validate::hostname($request->hostname) && !IP::isValid($request->hostname)) {
-            return redirect()->back()->with(['error_message' => 'Invalid hostname or IP address: ' . $request->hostname]);
+        if (! Validate::hostname($request->hostname) && ! IP::isValid($request->hostname)) {
+            return redirect()->back()->with(['error_message' => __('Invalid hostname or IP address:'), [$request->hostname]]);
         }
         $device = new Device(['hostname' => $request->hostname]);
         if ($request->port) {
@@ -299,8 +300,8 @@ class DeviceController extends Controller
         if ($request->transport) {
             $device->transport = strip_tags($request->transport);
         }
-        $snmp_enabled = !isset($_POST['hostname']) || isset($_POST['snmp']);
-        if (!$snmp_enabled) {
+        $snmp_enabled = ! isset($_POST['hostname']) || isset($_POST['snmp']);
+        if (! $snmp_enabled) {
             $device->snmp_disable = true;
             $device->os = $request->os ? strip_tags($request->os_id) : 'ping';
             $device->hardware = strip_tags($request->hardware);
@@ -320,29 +321,26 @@ class DeviceController extends Controller
             $device->authalgo = strip_tags($request->authalgo);
             $device->cryptopass = $request->cryptopass;
             $device->cryptoalgo = $request->cryptoalgo;
-
         } else {
             return redirect()->back()->with(['error_message' => __('exceptions.snmp_version_unsupported.message', ['snmpver' => $request->snmpver])]);
         }//end if
 
         try {
-            $device->poller_group = strip_tags($request->poller_group ?? '');
+            $device->poller_group = (int) $request->poller_group;
             $device->port_association_mode = PortAssociationMode::getId($request->port_assoc_mode);
 
             $force_add = ($request->has('force_add') && $request->force_add == 'on');
             $result = (new ValidateDeviceAndCreate($device, $force_add))->execute();
 
             if ($result) {
-                return redirect()->back()->with(['success_message' => 'Device added: <a href="' . route("device", $device) . '">' . $device->hostname . '(' . $device->device_id . ')' . '</a>']);
+                return redirect()->back()->with(['success_message' => 'Device added: <a href="' . route('device', $device) . '">' . $device->hostname . '(' . $device->device_id . ')' . '</a>']);
             }
         } catch (HostUnreachableException $e) {
-
             return redirect()->back()->withErrors(['error_message' => $e->getMessage(), 'reasons' => $e->getReasons()]);
-
         } catch (Exception $e) {
             return redirect()->back()->withErrors(['error_message' => $e->getMessage()]);
-
         }
+
         return $request;
     }
 }

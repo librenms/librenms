@@ -179,7 +179,7 @@
                                 <label for="cryptoalgo" class="col-sm-3 control-label">Crypto Algorithm</label>
                                 <div class="col-sm-9">
                                     <select name="cryptoalgo" id="cryptoalgo" class="form-control input-sm">
-                                        @foreach ($cryptoAlgorithmsas as  $algo => $enabled)
+                                        @foreach ($cryptoAlgorithms as  $algo => $enabled)
 
                                             <option value="{{$algo}}"
                                                     @if(!$enabled)  disabled @endif >{{$algo}}</option>
