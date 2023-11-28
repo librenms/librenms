@@ -5970,7 +5970,7 @@
             "type": "boolean"
         },
         "webui.graph_type": {
-            "default": "png",
+            "default": "svg",
             "group": "webui",
             "section": "graph",
             "order": 1,
