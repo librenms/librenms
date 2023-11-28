@@ -430,6 +430,41 @@
                 "value.saml.entityid": "url"
             }
         },
+        "auth.socialite.scopes": {
+            "group": "auth",
+            "section": "socialite",
+            "order": 4,
+            "type": "array"
+        },
+        "auth.socialite.default_role": {
+            "group": "auth",
+            "section": "socialite",
+            "order": 5,
+            "type": "select",
+            "default": "none",
+            "options" : {
+                "none" : "No Access",
+                "normal" : "Normal Access",
+                "global-read" : "Global Viewing Access",
+                "admin" : "Global Administrative Access"
+            }
+        },
+        "auth.socialite.claims": {
+            "default": {},
+            "group": "auth",
+            "section": "socialite",
+            "order": 6,
+            "type": "group-role-map",
+            "options": {
+                "groupPlaceholder": "Claim Group"
+            },
+            "validate": {
+                "value": "array",
+                "value.*": "array",
+                "value.*.roles": "array|required",
+                "value.*.roles.*": "string"
+            }
+        },
         "auth_ad_base_dn": {
             "group": "auth",
             "section": "ad",

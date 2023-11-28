@@ -271,6 +271,47 @@ If it doesn't work, please double check your configuration values by using the `
     lnms config:get auth.socialite
     ```
 
+### Default Role
+
+    Since most Socialite Providers don't provide Authorization only Authentication it is possible to set
+    the default User Role for Authorized users.   Appropriate care should be taken.
+
+- none: **No Access**: User has no access
+
+- normal: **Normal User**: You will need to assign device / port
+      permissions for users at this level.
+
+- global-read: **Global Read**: Read only Administrator.
+
+- admin: **Administrator**: This is a global read/write admin account.
+
+    !!! setting "settings/auth/socialite"
+        ```bash
+        lnms config:set auth.socialite.default_role global-read
+        ```
+
+###  Claims / Access Scopes
+
+    Socialite can specifiy scopes that should be included with in the authentication request.
+    (see https://laravel.com/docs/10.x/socialite#access-scopes )
+
+    For example, if Okta is configured to expose group information it is possible to use these group
+    names to configure User Roles.
+
+    First enable sending the 'groups' claim (along with the normal openid, profile, and email claims )
+    !!! setting "settings/auth/socialite"
+        ```bash
+        lnms config:set auth.socialite.scopes.+ groups
+        ```
+
+    Then setup mappings from the returned claim arrays to the User levels you want
+    !!! setting "settings/auth/socialite"
+        ```bash
+        lnms config:set auth.socialite.claims.RETURN_FROM_CLAIM.roles '["admin"]'
+        lnms config:set auth.socialite.claims.OTHER_RETURN_FROM_CLAIM.roles '["global-read","cleaner"]'
+        ```
+
+
 ## SAML2 Example
 
 ### Install plugin
