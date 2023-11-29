@@ -99,9 +99,6 @@
                 "entity-state": {
                     "type": "boolean"
                 },
-                "wifi": {
-                    "type": "boolean"
-                },
                 "ipmi": {
                     "type": "boolean"
                 },

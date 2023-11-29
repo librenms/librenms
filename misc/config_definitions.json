@@ -226,6 +226,13 @@
             "section": "rules",
             "order": 7
         },
+        "alert_rule.acknowledgement_alerts": {
+            "default": true,
+            "type": "boolean",
+            "group": "alerting",
+            "section": "rules",
+            "order": 7
+        },
         "alert_rule.invert_map": {
             "default": false,
             "type": "boolean",
@@ -365,10 +372,6 @@
             "order": 3,
             "type": "array"
         },
-        "api_demo": {
-            "default": false,
-            "type": "boolean"
-        },
         "apps.powerdns-recursor.api-key": {
             "type": "text"
         },
@@ -390,6 +393,13 @@
                 "65333": "Cymru Bogon Feed"
             },
             "type": "array"
+        },
+        "auth.allow_get_login": {
+            "group": "auth",
+            "section": "general",
+            "order": 24,
+            "type": "boolean",
+            "default": false
         },
         "auth.socialite.redirect": {
             "group": "auth",
@@ -418,6 +428,41 @@
                 "value.saml.metadata": "url_or_xml",
                 "value.saml.acs": "url",
                 "value.saml.entityid": "url"
+            }
+        },
+        "auth.socialite.scopes": {
+            "group": "auth",
+            "section": "socialite",
+            "order": 4,
+            "type": "array"
+        },
+        "auth.socialite.default_role": {
+            "group": "auth",
+            "section": "socialite",
+            "order": 5,
+            "type": "select",
+            "default": "none",
+            "options" : {
+                "none" : "No Access",
+                "normal" : "Normal Access",
+                "global-read" : "Global Viewing Access",
+                "admin" : "Global Administrative Access"
+            }
+        },
+        "auth.socialite.claims": {
+            "default": {},
+            "group": "auth",
+            "section": "socialite",
+            "order": 6,
+            "type": "group-role-map",
+            "options": {
+                "groupPlaceholder": "Claim Group"
+            },
+            "validate": {
+                "value": "array",
+                "value.*": "array",
+                "value.*.roles": "array|required",
+                "value.*.roles.*": "string"
             }
         },
         "auth_ad_base_dn": {
@@ -5960,7 +6005,7 @@
             "type": "boolean"
         },
         "webui.graph_type": {
-            "default": "png",
+            "default": "svg",
             "group": "webui",
             "section": "graph",
             "order": 1,

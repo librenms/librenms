@@ -27,6 +27,7 @@
 namespace LibreNMS\Data\Store;
 
 use App\Polling\Measure\Measurement;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Util\Http;
@@ -104,12 +105,17 @@ class Prometheus extends BaseDatastore
             'vals' => $vals,
         ]);
 
-        $result = $this->client->withBody($vals, 'text/plain')->post($promurl);
+        try {
+            $result = $this->client->withBody($vals, 'text/plain')->post($promurl);
 
-        $this->recordStatistic($stat->end());
+            $this->recordStatistic($stat->end());
 
-        if (! $result->successful()) {
-            Log::error('Prometheus Error: ' . $result->body());
+            if (! $result->successful()) {
+                Log::error('Prometheus Error: ' . $result->body());
+            }
+        } catch (ConnectionException $e) {
+            \Illuminate\Support\Facades\Log::error("%RFailed to connect to Prometheus server $this->base_uri, temporarily disabling.%n", ['color' => true]);
+            $this->enabled = false;
         }
     }
 

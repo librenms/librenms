@@ -193,9 +193,6 @@ return [
             'description' => '允許指定網路存取圖表',
             'help' => '允許指定網路可以在未登入授權查看圖表 (若未啟用 允許未登入存取圖表 則忽略此設定)',
         ],
-        'api_demo' => [
-            'description' => '這是展示',
-        ],
         'apps' => [
             'powerdns-recursor' => [
                 'api-key' => [

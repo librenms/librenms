@@ -1,3 +1,129 @@
+mib: ISM-HUAWEI-MIB:ISM-STORAGE-SVC-MIB::HUAWEI-STORAGE-HARDWARE-MIB:HUAWEI-STORAGE-SPACE-MIB
 modules:
-  os:
-    version_regex: ISM-STORAGE-SVC-MIB::version.0
+    os:
+        version: ISM-STORAGE-SVC-MIB::version.0
+        serial: ISM-STORAGE-SVC-MIB::deviceId.0
+    sensors:
+        temperature:
+            data:
+                -
+                    oid: hwInfoDiskTable
+                    value: hwInfoDiskTemperature
+                    num_oid: '.1.3.6.1.4.1.34774.4.1.23.5.1.1.11.{{ $index }}'
+                    descr: '{{ $hwInfoDiskLocation }} {{ $hwInfoDiskManufacturer }} {{ $hwInfoDiskModel }}'
+                    index: '{{ $index }}'
+                    snmp_flags: '-OteQUsb'
+                    group: 'Disks'
+        state:
+            data:
+                -
+                    oid: hwInfoControllerTable
+                    value: hwInfoControllerHealthStatus
+                    num_oid: '.1.3.6.1.4.1.34774.4.1.23.5.2.1.2.{{ $index }}'
+                    descr: '{{ $hwInfoControllerLocation }}'
+                    snmp_flags: '-OteQUsb'
+                    group: 'Controllers'
+                    state_name: hwInfoControllerHealthStatus
+                    states:
+                        - { value:  1, generic: 0, graph: 0, descr: 'Normal' }
+                        - { value:  2, generic: 2, graph: 0, descr: 'Fault' }
+                        - { value:  3, generic: 1, graph: 0, descr: 'Pre-fail' }
+                        - { value:  4, generic: 1, graph: 0, descr: 'Partially broken' }
+                        - { value:  5, generic: 2, graph: 0, descr: 'Degraded' }
+                        - { value:  6, generic: 2, graph: 0, descr: 'Bad sectors found' }
+                        - { value:  7, generic: 1, graph: 0, descr: 'Bit sectors found' }
+                        - { value:  8, generic: 1, graph: 0, descr: 'Consistent' }
+                        - { value:  9, generic: 1, graph: 0, descr: 'Inconsistent' }
+                        - { value: 10, generic: 1, graph: 0, descr: 'Busy' }
+                        - { value: 11, generic: 1, graph: 0, descr: 'No input' }
+                        - { value: 12, generic: 1, graph: 0, descr: 'Low battery' }
+                        - { value: 13, generic: 1, graph: 0, descr: 'Single link fault' }
+                        - { value: 14, generic: 1, graph: 0, descr: 'Invalid' }
+                        - { value: 15, generic: 1, graph: 0, descr: 'Write protect' }
+                -
+                    oid: hwInfoStoragePoolTable
+                    value: hwInfoStoragePoolHealthStatus
+                    num_oid: '.1.3.6.1.4.1.34774.4.1.23.4.2.1.5.{{ $index }}'
+                    descr: '{{ $hwInfoStoragePoolName }}'
+                    snmp_flags: '-OteQUsb'
+                    group: 'Storage Pools'
+                    state_name: hwInfoStoragePoolHealthStatus
+                    states:
+                        - { value:  1, generic: 0, graph: 0, descr: 'Normal' }
+                        - { value:  2, generic: 2, graph: 0, descr: 'Fault' }
+                        - { value:  3, generic: 1, graph: 0, descr: 'Pre-fail' }
+                        - { value:  4, generic: 1, graph: 0, descr: 'Partially broken' }
+                        - { value:  5, generic: 2, graph: 0, descr: 'Degraded' }
+                        - { value:  6, generic: 2, graph: 0, descr: 'Bad sectors found' }
+                        - { value:  7, generic: 1, graph: 0, descr: 'Bit sectors found' }
+                        - { value:  8, generic: 1, graph: 0, descr: 'Consistent' }
+                        - { value:  9, generic: 1, graph: 0, descr: 'Inconsistent' }
+                        - { value: 10, generic: 1, graph: 0, descr: 'Busy' }
+                        - { value: 11, generic: 1, graph: 0, descr: 'No input' }
+                        - { value: 12, generic: 1, graph: 0, descr: 'Low battery' }
+                        - { value: 13, generic: 1, graph: 0, descr: 'Single link fault' }
+                        - { value: 14, generic: 1, graph: 0, descr: 'Invalid' }
+                        - { value: 15, generic: 1, graph: 0, descr: 'Write protect' }
+                -
+                    oid: hwInfoLunTable
+                    value: hwInfoLunHealthStatus
+                    num_oid: '.1.3.6.1.4.1.34774.4.1.23.4.8.1.9.{{ $index }}'
+                    descr: '{{ $hwInfoLunName }}'
+                    snmp_flags: '-OteQUsb'
+                    group: 'LUNs'
+                    state_name: hwInfoLunHealthStatus
+                    states:
+                        - { value:  1, generic: 0, graph: 0, descr: 'Normal' }
+                        - { value:  2, generic: 2, graph: 0, descr: 'Fault' }
+                        - { value:  3, generic: 1, graph: 0, descr: 'Pre-fail' }
+                        - { value:  4, generic: 1, graph: 0, descr: 'Partially broken' }
+                        - { value:  5, generic: 2, graph: 0, descr: 'Degraded' }
+                        - { value:  6, generic: 2, graph: 0, descr: 'Bad sectors found' }
+                        - { value:  7, generic: 1, graph: 0, descr: 'Bit sectors found' }
+                        - { value:  8, generic: 1, graph: 0, descr: 'Consistent' }
+                        - { value:  9, generic: 1, graph: 0, descr: 'Inconsistent' }
+                        - { value: 10, generic: 1, graph: 0, descr: 'Busy' }
+                        - { value: 11, generic: 1, graph: 0, descr: 'No input' }
+                        - { value: 12, generic: 1, graph: 0, descr: 'Low battery' }
+                        - { value: 13, generic: 1, graph: 0, descr: 'Single link fault' }
+                        - { value: 14, generic: 1, graph: 0, descr: 'Invalid' }
+                        - { value: 15, generic: 1, graph: 0, descr: 'Write protect' }
+                -
+                    oid: hwInfoDiskTable
+                    value: hwInfoDiskHealthStatus
+                    num_oid: '.1.3.6.1.4.1.34774.4.1.23.5.1.1.2.{{ $index }}'
+                    descr: '{{ $hwInfoDiskLocation }} {{ $hwInfoDiskManufacturer }} {{ $hwInfoDiskModel }}'
+                    index: '{{ $index }}'
+                    group: 'Disks'
+                    state_name: hwInfoDiskHealthStatus
+                    states:
+                        - { value:  1, generic: 0, graph: 0, descr: 'Normal' }
+                        - { value:  2, generic: 2, graph: 0, descr: 'Fault' }
+                        - { value:  3, generic: 1, graph: 0, descr: 'Pre-fail' }
+                        - { value:  4, generic: 1, graph: 0, descr: 'Partially broken' }
+                        - { value:  5, generic: 2, graph: 0, descr: 'Degraded' }
+                        - { value:  6, generic: 2, graph: 0, descr: 'Bad sectors found' }
+                        - { value:  7, generic: 1, graph: 0, descr: 'Bit sectors found' }
+                        - { value:  8, generic: 1, graph: 0, descr: 'Consistent' }
+                        - { value:  9, generic: 1, graph: 0, descr: 'Inconsistent' }
+                        - { value: 10, generic: 1, graph: 0, descr: 'Busy' }
+                        - { value: 11, generic: 1, graph: 0, descr: 'No input' }
+                        - { value: 12, generic: 1, graph: 0, descr: 'Low battery' }
+                        - { value: 13, generic: 1, graph: 0, descr: 'Single link fault' }
+                        - { value: 14, generic: 1, graph: 0, descr: 'Invalid' }
+                        - { value: 15, generic: 1, graph: 0, descr: 'Write protect' }
+        percent:
+            data:
+                -
+                    oid: hwInfoDiskTable
+                    value:  hwInfoDiskHealthMark
+                    num_oid: '.1.3.6.1.4.1.34774.4.1.23.5.1.1.25.{{ $index }}'
+                    descr: '{{ $hwInfoDiskLocation }} {{ $hwInfoDiskManufacturer }} {{ $hwInfoDiskModel }}'
+                    index: '{{ $index }}'
+                    snmp_flags: '-OteQUsb'
+                    group: 'Disk Life Cycle'
+                    skip_values:
+                        -
+                                oid: hwInfoDiskHealthMark
+                                op: '='
+                                value: 255

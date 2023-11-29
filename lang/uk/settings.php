@@ -237,9 +237,6 @@ return [
                 ],
             ],
         ],
-        'api_demo' => [
-            'description' => 'Це демо',
-        ],
         'apps' => [
             'powerdns-recursor' => [
                 'api-key' => [
@@ -1076,9 +1073,6 @@ return [
             ],
             'ucd-diskio' => [
                 'description' => 'UCD DiskIO',
-            ],
-            'wifi' => [
-                'description' => 'Wifi',
             ],
             'wireless' => [
                 'description' => 'Бездротові',

@@ -139,9 +139,6 @@ return [
             'description' => '允许指定网络存取图表',
             'help' => '允许指定网络可以在未登入授权查看图表 (若未启用 允许未登入存取图表 则忽略此设定)',
         ],
-        'api_demo' => [
-            'description' => '这是展示',
-        ],
         'apps' => [
             'powerdns-recursor' => [
                 'api-key' => [
