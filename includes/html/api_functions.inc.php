@@ -633,6 +633,10 @@ function list_bgp(Illuminate\Http\Request $request)
     $remote_asn = $request->get('remote_asn');
     $local_address = $request->get('local_address');
     $remote_address = $request->get('remote_address');
+    $bgp_descr = $request->get('bgp_descr');
+    $bgp_state = $request->get('bgp_state');
+    $bgp_adminstate = $request->get('bgp_adminstate');
+    $bgp_family = $request->get('bgp_family');
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
     if (is_numeric($device_id)) {
         $sql .= ' AND `devices`.`device_id` = ?';
@@ -640,11 +644,11 @@ function list_bgp(Illuminate\Http\Request $request)
     }
     if (! empty($asn)) {
         $sql .= ' AND `devices`.`bgpLocalAs` = ?';
-        $sql_params[] = $asn;
+        $sql_params[] = preg_replace('/[^0-9]/', '', $asn);
     }
     if (! empty($remote_asn)) {
         $sql .= ' AND `bgpPeers`.`bgpPeerRemoteAs` = ?';
-        $sql_params[] = $remote_asn;
+        $sql_params[] = preg_replace('/[^0-9]/', '', $remote_asn);
     }
     if (! empty($local_address)) {
         $sql .= ' AND `bgpPeers`.`bgpLocalAddr` = ?';
@@ -660,6 +664,25 @@ function list_bgp(Illuminate\Http\Request $request)
             $sql_params[] = IP::parse($remote_address)->uncompressed();
         } catch (InvalidIpException $e) {
             return api_error(400, 'Invalid remote address');
+        }
+    }
+    if (! empty($bgp_descr)) {
+        $sql .= ' AND `bgpPeers`.`bgpPeerDescr` LIKE ?';
+        $sql_params[] = "%$bgp_descr%";
+    }
+    if (! empty($bgp_state)) {
+        $sql .= ' AND `bgpPeers`.`bgpPeerState` = ?';
+        $sql_params[] = $bgp_state;
+    }
+    if (! empty($bgp_adminstate)) {
+        $sql .= ' AND `bgpPeers`.`bgpPeerAdminStatus` = ?';
+        $sql_params[] = $bgp_adminstate;
+    }
+    if (! empty($bgp_family)) {
+        if ($bgp_family == 4) {
+            $sql .= ' AND `bgpPeers`.`bgpLocalAddr` LIKE \'%.%\'';
+        } elseif ($bgp_family == 6) {
+            $sql .= ' AND `bgpPeers`.`bgpLocalAddr` LIKE \'%:%\'';
         }
     }
 
