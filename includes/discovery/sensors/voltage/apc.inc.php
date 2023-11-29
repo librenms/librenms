@@ -31,7 +31,7 @@ $phasecount = $pre_cache['apcups_phase_count'];
 d_echo($phasecount);
 d_echo($pre_cache['apcups_phase_count']);
 // Check for three phase UPS devices - else skip to normal discovery
-if ($phasecount > 1) {
+if ($phasecount > 2) {
     $oids = snmpwalk_cache_oid($device, 'upsPhaseOutputVoltage', $oids, 'PowerNet-MIB');
     $in_oids = snmpwalk_cache_oid($device, 'upsPhaseInputVoltage', $in_oids, 'PowerNet-MIB');
     foreach ($oids as $index => $data) {
