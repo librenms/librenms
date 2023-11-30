@@ -650,7 +650,12 @@
     @endif
 
      function checkFullScreen(event) {
-         if (window.innerHeight > (screen.height - 10) || window.matchMedia('(display-mode: fullscreen)').matches) {
+         var isFullscreen = window.matchMedia('(display-mode: fullscreen)').matches;
+         if (isFullscreen != null && isFullscreen) {
+            $(".navbar-fixed-top").hide();
+            $("#dashboard-editor").hide();
+            $("body").css("padding-top", 0).css("padding-bottom", 0);
+         } else if (isFullscreen == null && window.innerHeight > (screen.height - 10)) {
             $(".navbar-fixed-top").hide();
             $("#dashboard-editor").hide();
             $("body").css("padding-top", 0).css("padding-bottom", 0);
