@@ -26,7 +26,7 @@ class Jira extends Transport
 
     public function deliverAlert(array $alert_data): bool
     {
-        $webhook_on = $this->config['enable-webhook'];
+        $webhook_on = $this->config['enable-webhook'] ?? false;
 
         // Check if messsage is an alert or not
         if ($alert_data['state'] != 0) {
@@ -67,6 +67,8 @@ class Jira extends Transport
         if ($webhook_on) {
             if (! empty($this->config['webhook-id'])) {
                 $data['fields'][$this->config['webhook-id']] = $alert_data['id'];
+            } else {
+                $data['fields']['alert_id'] = $alert_data['id'];
             }
         }
 
