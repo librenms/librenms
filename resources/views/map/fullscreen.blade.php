@@ -70,7 +70,12 @@ html, body, #fullscreen-map {
     };
 
     function checkFullScreen() {
-        if (window.innerHeight > (screen.height - 10) || window.matchMedia('(display-mode: fullscreen)').matches) {
+        var isFullscreen = window.matchMedia('(display-mode: fullscreen)').matches;
+        if (isFullscreen != null && isFullscreen) {
+            document.getElementsByClassName('navbar-fixed-top')[0].style.display = "none";
+            document.getElementsByTagName('body')[0].style.paddingTop = 0;
+            $("#controls-row").hide();
+        } else if (isFullscreen == null && window.innerHeight > (screen.height - 10)) {
             document.getElementsByClassName('navbar-fixed-top')[0].style.display = "none";
             document.getElementsByTagName('body')[0].style.paddingTop = 0;
             $("#controls-row").hide();
