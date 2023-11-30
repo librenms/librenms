@@ -167,7 +167,7 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
     echo ' TIMETRA-LLDP-MIB: ';
     $lldp_array = SnmpQuery::hideMib()->walk('TIMETRA-LLDP-MIB::tmnxLldpRemoteSystemsData')->table();
     foreach ($lldp_array as $key => $lldp) {
-        if (! key_exists('tmnxLldpRemPortId', $lldp) {
+        if (! key_exists('tmnxLldpRemPortId', $lldp)) {
             // we cannot go any further
             continue;
         }
