@@ -69,6 +69,26 @@ html, body, #fullscreen-map {
         $("#fullscreen-map").height(mapheight);
     };
 
+    function checkFullScreen() {
+        var isFullscreen = window.matchMedia('(display-mode: fullscreen)').matches;
+        if (isFullscreen != null && isFullscreen) {
+            document.getElementsByClassName('navbar-fixed-top')[0].style.display = "none";
+            document.getElementsByTagName('body')[0].style.paddingTop = 0;
+            $("#controls-row").hide();
+        } else if (isFullscreen == null && window.innerHeight > (screen.height - 10)) {
+            document.getElementsByClassName('navbar-fixed-top')[0].style.display = "none";
+            document.getElementsByTagName('body')[0].style.paddingTop = 0;
+            $("#controls-row").hide();
+        } else {
+            document.getElementsByClassName('navbar-fixed-top')[0].style.removeProperty("display");
+            document.getElementsByTagName('body')[0].style.paddingTop = "50px";
+            $("#controls-row").show();
+        };
+    };
+
+    window.matchMedia('(display-mode: fullscreen)').addEventListener('change', checkFullScreen);
+    checkFullScreen();
+
     window.addEventListener('resize', checkMapSize);
     checkMapSize();
 
