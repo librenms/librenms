@@ -310,6 +310,21 @@ class Port extends DeviceRelatedModel
         return $this->hasMany(\App\Models\Ipv6Address::class, 'port_id');
     }
 
+    public function links(): HasMany
+    {
+        return $this->hasMany(\App\Models\Link::class, 'local_port_id');
+    }
+
+    public function remoteLinks(): HasMany
+    {
+        return $this->hasMany(\App\Models\Link::class, 'remote_port_id');
+    }
+
+    public function allLinks(): \Illuminate\Support\Collection
+    {
+        return $this->links->merge($this->remoteLinks);
+    }
+
     public function macAccounting(): HasMany
     {
         return $this->hasMany(MacAccounting::class, 'port_id');
