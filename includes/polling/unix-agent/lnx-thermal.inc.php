@@ -10,6 +10,7 @@ if (isset($thermal_data) && $thermal_data != '') {
     foreach ($thermal_zones as $thermal_zone) {
         $index++;
         [ $name, $enabled, $type, $temperature ] = explode(" ", $thermal_zone);
+        $temperature /= 1000;
 
         discover_sensor(
             $valid['sensor'],
@@ -18,7 +19,7 @@ if (isset($thermal_data) && $thermal_data != '') {
             '',
             $index,
             'temp',
-            "$type: $type",
+            "$name ($type)",
             '1',
             '1',
             null,
@@ -27,5 +28,11 @@ if (isset($thermal_data) && $thermal_data != '') {
             null,
             $temperature,
             'agent');
+
+        dbUpdate(
+            ['sensor_current' => $temperature],
+            'sensors',
+            '`sensor_index` = ? AND `sensor_class` = ? AND `poller_type` = ? AND `device_id` = ?',
+            [$index, 'temperature', 'agent', $device['device_id']]);
     }
 }
