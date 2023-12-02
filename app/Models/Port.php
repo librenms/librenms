@@ -42,11 +42,12 @@ class Port extends DeviceRelatedModel
             $port->statistics()->delete();
             $port->stp()->delete();
             $port->vlans()->delete();
+            $port->links()->delete();
+            $port->remoteLinks()->delete();
 
             // dont have relationships yet
             DB::table('juniAtmVp')->where('port_id', $port->port_id)->delete();
             DB::table('ports_perms')->where('port_id', $port->port_id)->delete();
-            DB::table('links')->where('local_port_id', $port->port_id)->orWhere('remote_port_id', $port->port_id)->delete();
             DB::table('ports_stack')->where('port_id_low', $port->port_id)->orWhere('port_id_high', $port->port_id)->delete();
 
             \Rrd::purge($port->device?->hostname, \Rrd::portName($port->port_id)); // purge all port rrd files
