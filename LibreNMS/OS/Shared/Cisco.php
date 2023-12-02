@@ -537,7 +537,7 @@ class Cisco extends OS implements
 
     protected function getMainSerial()
     {
-        $serial_output = snmp_get_multi($this->getDeviceArray(), ['entPhysicalSerialNum.1', 'entPhysicalSerialNum.1001'], '-OQUs', 'ENTITY-MIB:OLD-CISCO-CHASSIS-MIB');
+        $serial_output = snmp_get_multi($this->getDeviceArray(), ['entPhysicalSerialNum.1', 'entPhysicalSerialNum.1000', 'entPhysicalSerialNum.1001', 'entPhysicalSerialNum.24555730'], '-OQUs', 'ENTITY-MIB:OLD-CISCO-CHASSIS-MIB');
 //        $serial_output = snmp_getnext($this->getDevice(), 'entPhysicalSerialNum', '-OQUs', 'ENTITY-MIB:OLD-CISCO-CHASSIS-MIB');
 
         if (! empty($serial_output[1]['entPhysicalSerialNum'])) {
@@ -546,6 +546,8 @@ class Cisco extends OS implements
             return $serial_output[1000]['entPhysicalSerialNum'];
         } elseif (! empty($serial_output[1001]['entPhysicalSerialNum'])) {
             return $serial_output[1001]['entPhysicalSerialNum'];
+        } elseif (! empty($serial_output[24555730]['entPhysicalSerialNum'])) {
+            return $serial_output[24555730]['entPhysicalSerialNum'];
         }
 
         return null;
