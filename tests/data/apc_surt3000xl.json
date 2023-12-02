@@ -460,6 +460,56 @@
                 },
                 {
                     "sensor_deleted": 0,
+                    "sensor_class": "count",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.318.1.1.1.2.2.6.0",
+                    "sensor_index": "upsAdvBatteryNumOfBadBattPacks.0",
+                    "sensor_type": "apc",
+                    "sensor_descr": "Bad batteries",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": -1,
+                    "sensor_limit": 1,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "count",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.318.1.1.1.2.2.5.0",
+                    "sensor_index": "upsAdvBatteryNumOfBattPacks.0",
+                    "sensor_type": "apc",
+                    "sensor_descr": "Installed batteries",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 3,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": 0,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
                     "sensor_class": "current",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.318.1.1.1.4.3.4.0",
@@ -582,6 +632,31 @@
                     "user_func": null,
                     "rrd_type": "GAUGE",
                     "state_name": "upsAdvBatteryReplaceIndicator"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.318.1.1.1.3.2.5.0",
+                    "sensor_index": "upsAdvInputLineFailCause.0",
+                    "sensor_type": "upsAdvInputLineFailCause",
+                    "sensor_descr": "Last failure cause",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 9,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": "upsAdvInputLineFailCause"
                 },
                 {
                     "sensor_deleted": 0,
@@ -723,6 +798,76 @@
                     "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 2
+                },
+                {
+                    "state_name": "upsAdvInputLineFailCause",
+                    "state_descr": "noTransfer",
+                    "state_draw_graph": 0,
+                    "state_value": 1,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "upsAdvInputLineFailCause",
+                    "state_descr": "highLineVoltage",
+                    "state_draw_graph": 0,
+                    "state_value": 2,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "upsAdvInputLineFailCause",
+                    "state_descr": "brownout",
+                    "state_draw_graph": 0,
+                    "state_value": 3,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "upsAdvInputLineFailCause",
+                    "state_descr": "blackout",
+                    "state_draw_graph": 0,
+                    "state_value": 4,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "upsAdvInputLineFailCause",
+                    "state_descr": "smallMomentarySag",
+                    "state_draw_graph": 0,
+                    "state_value": 5,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "upsAdvInputLineFailCause",
+                    "state_descr": "deepMomentarySag",
+                    "state_draw_graph": 0,
+                    "state_value": 6,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "upsAdvInputLineFailCause",
+                    "state_descr": "smallMomentarySag",
+                    "state_draw_graph": 0,
+                    "state_value": 7,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "upsAdvInputLineFailCause",
+                    "state_descr": "largeMomentarySpike",
+                    "state_draw_graph": 0,
+                    "state_value": 8,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "upsAdvInputLineFailCause",
+                    "state_descr": "selfTest",
+                    "state_draw_graph": 0,
+                    "state_value": 9,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "upsAdvInputLineFailCause",
+                    "state_descr": "rateOfVoltageChange",
+                    "state_draw_graph": 0,
+                    "state_value": 10,
+                    "state_generic_value": 0
                 },
                 {
                     "state_name": "upsBasicOutputStatus",
@@ -909,6 +1054,56 @@
                 },
                 {
                     "sensor_deleted": 0,
+                    "sensor_class": "count",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.318.1.1.1.2.2.6.0",
+                    "sensor_index": "upsAdvBatteryNumOfBadBattPacks.0",
+                    "sensor_type": "apc",
+                    "sensor_descr": "Bad batteries",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": -1,
+                    "sensor_limit": 1,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "count",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.318.1.1.1.2.2.5.0",
+                    "sensor_index": "upsAdvBatteryNumOfBattPacks.0",
+                    "sensor_type": "apc",
+                    "sensor_descr": "Installed batteries",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 3,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": 0,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
                     "sensor_class": "current",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.318.1.1.1.4.3.4.0",
@@ -1031,6 +1226,31 @@
                     "user_func": null,
                     "rrd_type": "GAUGE",
                     "state_name": "upsAdvBatteryReplaceIndicator"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.318.1.1.1.3.2.5.0",
+                    "sensor_index": "upsAdvInputLineFailCause.0",
+                    "sensor_type": "upsAdvInputLineFailCause",
+                    "sensor_descr": "Last failure cause",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 9,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": "upsAdvInputLineFailCause"
                 },
                 {
                     "sensor_deleted": 0,
@@ -1172,6 +1392,76 @@
                     "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 2
+                },
+                {
+                    "state_name": "upsAdvInputLineFailCause",
+                    "state_descr": "noTransfer",
+                    "state_draw_graph": 0,
+                    "state_value": 1,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "upsAdvInputLineFailCause",
+                    "state_descr": "highLineVoltage",
+                    "state_draw_graph": 0,
+                    "state_value": 2,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "upsAdvInputLineFailCause",
+                    "state_descr": "brownout",
+                    "state_draw_graph": 0,
+                    "state_value": 3,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "upsAdvInputLineFailCause",
+                    "state_descr": "blackout",
+                    "state_draw_graph": 0,
+                    "state_value": 4,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "upsAdvInputLineFailCause",
+                    "state_descr": "smallMomentarySag",
+                    "state_draw_graph": 0,
+                    "state_value": 5,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "upsAdvInputLineFailCause",
+                    "state_descr": "deepMomentarySag",
+                    "state_draw_graph": 0,
+                    "state_value": 6,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "upsAdvInputLineFailCause",
+                    "state_descr": "smallMomentarySag",
+                    "state_draw_graph": 0,
+                    "state_value": 7,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "upsAdvInputLineFailCause",
+                    "state_descr": "largeMomentarySpike",
+                    "state_draw_graph": 0,
+                    "state_value": 8,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "upsAdvInputLineFailCause",
+                    "state_descr": "selfTest",
+                    "state_draw_graph": 0,
+                    "state_value": 9,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "upsAdvInputLineFailCause",
+                    "state_descr": "rateOfVoltageChange",
+                    "state_draw_graph": 0,
+                    "state_value": 10,
+                    "state_generic_value": 0
                 },
                 {
                     "state_name": "upsBasicOutputStatus",
