@@ -170,8 +170,6 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
         foreach ($sub_lldp_1 as $ifIndex => $sub_lldp_2) {
             foreach ($sub_lldp_2 as $macIndex => $sub_lldp_3) {
                 foreach ($sub_lldp_3 as $remIndex => $lldp) {
-                    echo " TS $timeMark : $ifIndex -- $macIndex -- $remIndex \n ";
-                    d_echo ($lldp);
 
                     $interface = get_port_by_ifIndex($device['device_id'], $ifIndex);
                     $remote_device_id = find_device_id($lldp['tmnxLldpRemSysName']);
@@ -198,7 +196,9 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
                                 $remote_device_id
                                 );
                     }
-                }}}
+                }
+            }
+        }
     }//end foreach
     echo PHP_EOL;
 } elseif ($device['os'] == 'jetstream') {
