@@ -9,7 +9,7 @@ if (isset($thermal_data) && $thermal_data != '') {
 
     foreach ($thermal_zones as $thermal_zone) {
         $index++;
-        [ $name, $enabled, $type, $temperature ] = explode(" ", $thermal_zone);
+        [ $name, $enabled, $type, $temperature ] = explode(' ', $thermal_zone);
         $temperature /= 1000;
 
         // Add the sensor to database (does not update value if already exists).
