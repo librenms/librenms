@@ -1,0 +1,137 @@
+mib: MEINBERG-OS-MIB
+modules:
+    sensors:
+        count:
+            data:
+                -
+                    oid: mbgOsReceiverGoodSv
+                    value: mbgOsReceiverGoodSv
+                    num_oid: '.1.3.6.1.4.1.5597.7.2.3.1.1.6.{{ $index }}'
+                    descr: 'Current number of good/usable satellites'
+                    low_warn_limit: 10
+                    low_limit: 5
+                    group: GNSS
+                    index: 'mbgOsReceiverGoodSv.{{ $index }}'
+                -
+                    oid: mbgOsReceiverSv
+                    value: mbgOsReceiverSv
+                    num_oid: '.1.3.6.1.4.1.5597.7.2.3.1.1.7.{{ $index }}'
+                    descr: 'Current number of satellites visible'
+                    low_warn_limit: 15
+                    low_limit: 10
+                    group: GNSS
+                    index: 'mbgOsReceiverSv.{{ $index }}'
+                -
+                    oid: mbgOsSysrefGlbStateMasterRefVariance
+                    value: mbgOsSysrefGlbStateMasterRefVariance
+                    num_oid: '.1.3.6.1.4.1.5597.7.2.4.2.1.4.{{ $index }}'
+                    group: PRECISION
+                    descr: 'Master reference variance'
+                    index: 'mbgOsSysrefGlbStateMasterRefVariance.{{ $index }}'
+                -
+                    oid: mbgOsSysrefGlbStateMasterRefAccuracy
+                    value: mbgOsSysrefGlbStateMasterRefAccuracy
+                    num_oid: '.1.3.6.1.4.1.5597.7.2.4.2.1.3.{{ $index }}'
+                    group: PRECISION
+                    descr: 'Master reference accuracy (ns)'
+                    index: 'mbgOsSysrefGlbStateMasterRefAccuracy.{{ $index }}'
+                -
+                    oid: mbgOsPtpMiscTableEntry
+                    value: mbgOsPtpMiscUnicastSlaves
+                    num_oid: '.1.3.6.1.4.1.5597.7.2.5.2.1.1.4.{{ $index }}'
+                    descr: "Unicast Slave: {{ $mbgOsPtpMiscNetworkIntfLabel }}"
+                    group: PTP
+                    index: 'ptp_{{ $index }}_unicast_slave}'
+                -
+                    oid: mbgOsPtpParentDsTableEntry
+                    value: mbgOsPtpParentDsGmClockVariance
+                    num_oid: '.1.3.6.1.4.1.5597.7.2.5.2.3.1.8.{{ $index }}'
+                    group: PTP
+                    descr: '{{ $mbgOsPtpParentDsGmClockId }} master variance'
+                    index: 'mbgOsPtpParentDsGmClockVariance.{{ $index }}'
+                    skip_values:
+                        -
+                          oid: mbgOsPtpParentDsGmClockAccuracy
+                          op: '='
+                          value: 0
+                -
+                    oid: mbgOsPtpParentDsTableEntry
+                    value: mbgOsPtpParentDsGmPrio1
+                    num_oid: '.1.3.6.1.4.1.5597.7.2.5.2.3.1.4.{{ $index }}'
+                    group: PTP
+                    descr: '{{ $mbgOsPtpParentDsGmClockId }} master Priority'
+                    index: 'mbgOsPtpParentDsGmPrio1.{{ $index }}'
+                    skip_values:
+                        -
+                          oid: mbgOsPtpParentDsGmClockAccuracy
+                          op: '='
+                          value: 0
+                -
+                    oid: mbgOsSysrefSrcStateTableEntry
+                    value: mbgOsSysrefSrcStateOffset
+                    num_oid: '.1.3.6.1.4.1.5597.7.2.4.2.2.1.1.5.{{ $index }}'
+                    descr: "Priority {{ $mbgOsSysrefSrcStatePriority }}: {{ $mbgOsSysrefSrcStateId }} - offset (ns)"
+                    group: REFERENCES
+                    index: 'ptp_references_{{ $index }}}'
+        state:
+            data:
+                -
+                    oid: mbgOsSysrefGlbStateSysSync
+                    value: mbgOsSysrefGlbStateSysSync
+                    num_oid: '.1.3.6.1.4.1.5597.7.2.4.2.1.5.{{ $index }}'
+                    descr: 'System global sync state'
+                    index: 'mbgOsSysrefGlbStateSysSync.{{ $index }}'
+                    states:
+                        - { value: 0, descr: notSynchronized, graph: 0, generic: 2 }
+                        - { value: 1, descr: synchronized, graph: 1, generic: 0 }
+                -
+                    oid: mbgOsReceiverState
+                    value: mbgOsReceiverState
+                    num_oid: '.1.3.6.1.4.1.5597.7.2.3.1.1.3.{{ $index }}'
+                    descr: 'Receiver status'
+                    index: 'mbgOsReceiverState.{{ $index }}'
+                    states:
+                        - { value: 0, descr: noData, graph: 0, generic: 3 }
+                        - { value: 1, descr: waitingForData, graph: 1, generic: 1 }
+                        - { value: 2, descr: antennaShortCircuit, graph: 2, generic: 2 }
+                        - { value: 3, descr: antennaDisconnected, graph: 3, generic: 2 }
+                        - { value: 4, descr: coldBoot, graph: 4, generic: 1 }
+                        - { value: 5, descr: warmBoot, graph: 5, generic: 1 }
+                        - { value: 6, descr: synchronized, graph: 6, generic: 0 }
+                -
+                    oid: mbgOsPtpMiscTableEntry
+                    value: mbgOsPtpMiscRunning
+                    num_oid: '.1.3.6.1.4.1.5597.7.2.5.2.1.1.2.{{ $index }}'
+                    descr: "Interface: {{ $mbgOsPtpMiscNetworkIntfLabel }}"
+                    index: 'ptp_{{ $index }}}_state'
+                    group: PTP
+                    states:
+                        - { value: 0, descr: NOT RUN, graph: 1, generic: 3 }
+                        - { value: 1, descr: RUNNING, graph: 1, generic: 0 }
+                -
+                    oid: mbgOsPtpParentDsTableEntry
+                    value: mbgOsPtpParentDsGmClockAccuracy
+                    num_oid: '.1.3.6.1.4.1.5597.7.2.5.2.3.1.7.{{ $index }}'
+                    group: PTP
+                    descr: '{{ $mbgOsPtpParentDsGmClockId }} master accuracy'
+                    index: 'mbgOsPtpParentDsGmClockAccuracy.{{ $index }}'
+                    skip_values:
+                        -
+                          oid: mbgOsPtpParentDsGmClockAccuracy
+                          op: '='
+                          value: 0
+                    states:
+                        - { value: -2, descr: ok, graph: 1, generic: 3 }
+                        - { value: 32, descr: <25ns, graph: 1, generic: 0 }
+                        - { value: 33, descr: <100ns, graph: 1, generic: 0 }
+                        - { value: 34, descr: <250ns, graph: 1, generic: 0 }        
+                        - { value: 35, descr: <1μs, graph: 1, generic: 0 }
+                        - { value: 36, descr: <2.5μs, graph: 1, generic: 0 }
+                        - { value: 37, descr: <10μs, graph: 1, generic: 0 }    
+                        - { value: 38, descr: <25μs, graph: 1, generic: 0 }
+                        - { value: 39, descr: <100μs, graph: 1, generic: 0 }
+                        - { value: 40, descr: <250μs, graph: 1, generic: 0 }        
+                        - { value: 41, descr: <1ms, graph: 1, generic: 0 }
+                        - { value: 42, descr: <2-5ms, graph: 1, generic: 0 }
+                        - { value: 43, descr: <10ms, graph: 1, generic: 0 }   
+                        - { value: 44, descr: <25ms, graph: 1, generic: 0 }     
