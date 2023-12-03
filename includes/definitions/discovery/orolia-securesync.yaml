@@ -1,0 +1,280 @@
+mib: SPECTRACOM-XSYNC-MIB:SPECTRACOM-NTP-V4-MIB:SPECTRACOM-PTPBASE-MIB
+modules:
+    os:
+        serial: SNMPv2-SMI::enterprises.18837.3.2.2.1.16.0
+        version: SNMPv2-SMI::enterprises.18837.3.2.2.1.11.0
+    sensors:
+        pre-cache:
+            data:
+                -
+                    oid:
+                        - ntpSysStaCurrentPeerName
+                        - ntpAssocEntry
+                        - ptpbaseClockParentDSEntry
+                    snmp_flags: '-OQUsbe'
+        count:
+            data:
+                -
+                    oid: ssSysStaEstPhaseError
+                    value: ssSysStaEstPhaseError
+                    num_oid: '.1.3.6.1.4.1.18837.3.2.2.1.8.{{ $index }}'
+                    descr: 'Phase error (ns)'
+                    group: PRECISION
+                    snmp_flags: '-OQUsbe'
+                    index: 'ssSysStaEstPhaseError.{{ $index }}'
+                -
+                    oid: ssSysStaEstFreqError
+                    value: ssSysStaEstFreqError
+                    num_oid: '.1.3.6.1.4.1.18837.3.2.2.1.9.{{ $index }}'
+                    descr: 'Frequence error (Hz)'
+                    group: PRECISION
+                    snmp_flags: '-OQUsbe'
+                    index: 'ssSysStaEstFreqError.{{ $index }}'
+                -
+                    oid: ssGpsRefNumSats
+                    value: ssGpsRefNumSats
+                    num_oid: '.1.3.6.1.4.1.18837.3.2.2.2.1.1.8.{{ $index }}'
+                    descr: 'Current number of good/usable satellites'
+                    snmp_flags: '-OQUsbe'
+                    group: GNSS
+                    index: 'ssGpsRefNumSats.{{ $index }}'
+                -
+                    oid: ntpSysStaStratum
+                    value: ntpSysStaStratum
+                    num_oid: '.1.3.6.1.4.1.18837.3.3.2.2.{{ $index }}'
+                    descr: 'Current stratum'
+                    snmp_flags: '-OQUsbe'
+                    group: NTP
+                    index: 'ntpSysStaStratum.{{ $index }}'
+                -
+                    oid: ntpSysStaPeerJitter
+                    value: ntpSysStaPeerJitter
+                    num_oid: '.1.3.6.1.4.1.18837.3.3.2.7.{{ $index }}'
+                    descr: 'Jitter Selected peer (ms): {{ $ntpSysStaCurrentPeerName }}'
+                    snmp_flags: '-OQUsbe'
+                    group: REFERENCE
+                    index: 'ntpSysStaPeerJitter.{{ $index }}'
+                -
+                    oid: ntpSysStaPeerOffset
+                    value: ntpSysStaPeerOffset
+                    num_oid: '.1.3.6.1.4.1.18837.3.3.2.6.{{ $index }}'
+                    descr: 'Offset Selected peer (µs): {{ $ntpSysStaCurrentPeerName }}'
+                    multiplier: 1000
+                    snmp_flags: '-OQUsbe'
+                    group: REFERENCE
+                    index: 'ntpSysStaPeerOffset.{{ $index }}'
+                -
+                    oid: ntpSysStaPeerDelay
+                    value: ntpSysStaPeerDelay
+                    num_oid: '.1.3.6.1.4.1.18837.3.3.2.5.{{ $index }}'
+                    descr: 'Delay Selected peer (ms): {{ $ntpSysStaCurrentPeerName }}'
+                    snmp_flags: '-OQUsbe'
+                    group: REFERENCE
+                    index: 'ntpSysStaPeerDelay.{{ $index }}'
+                -
+                    oid: ntpAssocEntry
+                    value: assocEntryJitter
+                    num_oid: '.1.3.6.1.4.1.18837.3.3.3.2.1.14.{{ $index }}'
+                    descr: 'Jitter (ms): {{ $assocEntryIdentity }}'
+                    snmp_flags: '-OQUsbe'
+                    group: NTP
+                    index: 'assocEntryJitter.{{ $index }}'
+                -
+                    oid: ntpAssocEntry
+                    value: assocEntryOffset
+                    num_oid: '.1.3.6.1.4.1.18837.3.3.3.2.1.13.{{ $index }}'
+                    multiplier: 1000
+                    descr: 'Offset (µs): {{ $assocEntryIdentity }} {{ $assocEntryRefId }}'
+                    snmp_flags: '-OQUsbe'
+                    group: NTP
+                    index: 'assocEntryOffset.{{ $index }}'
+                -
+                    oid: ntpAssocEntry
+                    value: assocEntryDelay
+                    num_oid: '.1.3.6.1.4.1.18837.3.3.3.2.1.12.{{ $index }}'
+                    descr: 'Delay (ms): {{ $assocEntryIdentity }}'
+                    snmp_flags: '-OQUsbe'
+                    group: NTP
+                    index: 'assocEntryDelay.{{ $index }}'
+                -
+                    oid: ptpbaseClockParentDSEntry
+                    value: ptpbaseClockParentDSGMClockPriority1
+                    descr: '{{ $ptpbaseClockParentDSGMClockIdentity }} master Priority'
+                    snmp_flags: '-OQUsbe'
+                    group: PTP
+                    index: 'ptpbaseClockParentDSGMClockPriority1.{{ $index }}'
+                -
+                    oid: ptpbaseClockParentDSEntry
+                    value: ptpbaseClockParentDSGMClockQualityOffset
+                    descr: '{{ $ptpbaseClockParentDSGMClockIdentity }} master Variance'
+                    snmp_flags: '-OQUsbe'
+                    group: PTP
+                    index: 'ptpbaseClockParentDSGMClockQualityOffset.{{ $index }}'
+
+        temperature:
+            data:
+
+                -
+                    oid: ssSysStaOscTemp
+                    value: ssSysStaOscTemp
+                    num_oid: '.1.3.6.1.4.1.18837.3.2.2.1.17.{{ $index }}'
+                    descr: 'Oscillator Temp'
+                    snmp_flags: '-OQUsbe'
+                    index: 'ssSysStaOscTemp.{{ $index }}'
+                -
+                    oid: ssSysStaBrdTemp
+                    value: ssSysStaBrdTemp
+                    num_oid: '.1.3.6.1.4.1.18837.3.2.2.1.18.{{ $index }}'
+                    descr: 'Board Temp'
+                    snmp_flags: '-OQUsbe'
+                    index: 'ssSysStaBrdTemp.{{ $index }}'
+                -
+                    oid: ssSysStaCpuTemp
+                    value: ssSysStaCpuTemp
+                    num_oid: '.1.3.6.1.4.1.18837.3.2.2.1.19.{{ $index }}'
+                    descr: 'CPU Temp'
+                    snmp_flags: '-OQUsbe'
+                    index: 'ssSysStaCpuTemp.{{ $index }}'
+        state:
+            data:
+                -
+                    oid: ssSysStaPowerDC
+                    value: ssSysStaPowerDC
+                    num_oid: '.1.3.6.1.4.1.18837.3.2.2.1.2.{{ $index }}'
+                    descr: 'DC power'
+                    snmp_flags: '-OQUsbe'
+                    index: 'dcpower.{{ $index }}'
+                    states:
+                        - { value: 1, descr: ok, graph: 1, generic: 0 }
+                        - { value: 2, descr: nok, graph: 2, generic: 2 }
+                        - { value: 3, descr: none, graph: 3, generic: 3 }
+                -
+                    oid: ssSysStaSyncState
+                    value: ssSysStaSyncState
+                    num_oid: '.1.3.6.1.4.1.18837.3.2.2.1.5.{{ $index }}'
+                    descr: 'Sync status'
+                    snmp_flags: '-OQUsbe'
+                    group: TIME
+                    index: 'ssSysStaSyncState.{{ $index }}'
+                    states:
+                        - { value: 1, descr: sync, graph: 1, generic: 0 }
+                        - { value: 2, descr: nosync, graph: 1, generic: 2 }
+                -
+                    oid: ssSysStaHoldoverState
+                    value: ssSysStaHoldoverState
+                    num_oid: '.1.3.6.1.4.1.18837.3.2.2.1.6.{{ $index }}'
+                    descr: 'Holdover status'
+                    snmp_flags: '-OQUsbe'
+                    group: TIME
+                    index: 'ssSysStaHoldoverState.{{ $index }}'
+                    states:
+                        - { value: 1, descr: inHoldover, graph: 1, generic: 2 }
+                        - { value: 2, descr: notInHoldover, graph: 1, generic: 0 }
+                -
+                    oid: ssSysStaTimeScale
+                    value: ssSysStaTimeScale
+                    num_oid: '.1.3.6.1.4.1.18837.3.2.2.1.10.{{ $index }}'
+                    descr: 'Time scale'
+                    snmp_flags: '-OQUsbe'
+                    group: TIME
+                    index: 'ssSysStaTimeScale.{{ $index }}'
+                    states:
+                        - { value: 1, descr: utc, graph: 1, generic: 0 }
+                        - { value: 2, descr: tai, graph: 1, generic: 0 }
+                        - { value: 3, descr: gps, graph: 1, generic: 0 }
+                -
+                    oid: ssSysStaBshJammingState
+                    value: ssSysStaBshJammingState
+                    num_oid: '.1.3.6.1.4.1.18837.3.2.2.1.22.{{ $index }}'
+                    descr: 'Jamming status'
+                    snmp_flags: '-OQUsbe'
+                    index: 'ssSysStaBshJammingState.{{ $index }}'
+                    states:
+                        - { value: 1, descr: active, graph: 1, generic: 2 }
+                        - { value: 2, descr: inactive, graph: 1, generic: 0 }
+                -
+                    oid: ssSysStaBshSpoofingState
+                    value: ssSysStaBshSpoofingState
+                    num_oid: '.1.3.6.1.4.1.18837.3.2.2.1.23.{{ $index }}'
+                    descr: 'Spoofing status'
+                    snmp_flags: '-OQUsbe'
+                    index: 'ssSysStaBshSpoofingState.{{ $index }}'
+                    states:
+                        - { value: 1, descr: active, graph: 1, generic: 2 }
+                        - { value: 2, descr: inactive, graph: 1, generic: 0 }
+                -
+                    oid: ssSysStaDisciplining
+                    value: ssSysStaDisciplining
+                    num_oid: '.1.3.6.1.4.1.18837.3.2.2.1.24.{{ $index }}'
+                    descr: 'Oscillator disciplined'
+                    snmp_flags: '-OQUsbe'
+                    group: TIME
+                    index: 'ssSysStaDisciplining.{{ $index }}'
+                    states:
+                        - { value: 0, descr: none, graph: 1, generic: 3 }
+                        - { value: 1, descr: warmup, graph: 1, generic: 0 }
+                        - { value: 2, descr: calibration, graph: 1, generic: 1 }                        
+                        - { value: 3, descr: trackSetup, graph: 1, generic: 1 }                       
+                        - { value: 4, descr: trackLock, graph: 1, generic: 0 }  
+                        - { value: 5, descr: freerun, graph: 1, generic: 2 }  
+                        - { value: 6, descr: fault, graph: 1, generic: 2 }  
+                -
+                    oid: ssGpsRefTimeValid
+                    value: ssGpsRefTimeValid
+                    num_oid: '.1.3.6.1.4.1.18837.3.2.2.2.1.1.4.{{ $index }}'
+                    descr: 'GNSS valid time'
+                    snmp_flags: '-OQUsbe'
+                    group: GNSS
+                    index: 'ssGpsRefTimeValid.{{ $index }}'
+                    states:
+                        - { value: 1, descr: ok, graph: 1, generic: 0 }
+                        - { value: 2, descr: nok, graph: 1, generic: 2 }
+                -
+                    oid: ssGpsRefAntennaState
+                    value: ssGpsRefAntennaState
+                    num_oid: '.1.3.6.1.4.1.18837.3.2.2.2.1.1.17.{{ $index }}'
+                    descr: 'Antenna state'
+                    snmp_flags: '-OQUsbe'
+                    group: GNSS
+                    index: 'ssGpsRefAntennaState.{{ $index }}'
+                    states:
+                        - { value: 1, descr: ok, graph: 1, generic: 0 }
+                        - { value: 2, descr: short, graph: 1, generic: 2 }
+                        - { value: 3, descr: open, graph: 1, generic: 2 }
+                        - { value: 4, descr: unknown, graph: 1, generic: 3 }
+                -
+                    oid: ntpSysStaCurrentMode
+                    value: ntpSysStaCurrentMode
+                    num_oid: '.1.3.6.1.4.1.18837.3.3.2.1.{{ $index }}'
+                    descr: 'NTP service'
+                    snmp_flags: '-OQUsbe'
+                    group: NTP
+                    index: 'ntpSysStaCurrentMode.{{ $index }}'
+                    states:
+                        - { value: 1, descr: unknown, graph: 1, generic: 3 }
+                        - { value: 2, descr: notRunning, graph: 1, generic: 2 }
+                        - { value: 3, descr: notSynchonized, graph: 1, generic: 2 }
+                        - { value: 4, descr: synchronized, graph: 1, generic: 0 } 
+                -
+                    oid: ptpbaseClockParentDSEntry
+                    value: ptpbaseClockParentDSGMClockQualityAccuracy
+                    num_oid: '.1.3.6.1.4.1.18837.3.5.1.2.2.1.12.{{ $index }}'
+                    descr: '{{ $ptpbaseClockParentDSGMClockIdentity }} Master accuracy'
+                    snmp_flags: '-OQUsbe'                    
+                    group: PTP
+                    index: 'ptpbaseQualityAccuracy.{{ $index }}'        
+                    states:
+                        - { value: 254, descr: ok, graph: 1, generic: 3 }
+                        - { value: 32, descr: <25ns, graph: 1, generic: 0 }
+                        - { value: 33, descr: <100ns, graph: 1, generic: 0 }
+                        - { value: 34, descr: <250ns, graph: 1, generic: 0 }
+                        - { value: 35, descr: <1μs, graph: 1, generic: 0 }
+                        - { value: 36, descr: <2.5μs, graph: 1, generic: 0 }
+                        - { value: 37, descr: <10μs, graph: 1, generic: 0 }
+                        - { value: 38, descr: <25μs, graph: 1, generic: 0 }
+                        - { value: 39, descr: <100μs, graph: 1, generic: 0 }
+                        - { value: 40, descr: <250μs, graph: 1, generic: 0 }
+                        - { value: 41, descr: <1ms, graph: 1, generic: 0 }
+                        - { value: 42, descr: <2-5ms, graph: 1, generic: 0 }
+                        - { value: 43, descr: <10ms, graph: 1, generic: 0 }
+                        - { value: 44, descr: <25ms, graph: 1, generic: 0 }
