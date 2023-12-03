@@ -137,6 +137,10 @@ class Xdsl implements Module
             // Values are 1/10
             foreach ($this->adslTenthValues as $oid) {
                 if (isset($data[$oid])) {
+                    if ($oid == 'adslAtucCurrOutputPwr' && $data[$oid] > 0x7FFFFFFF) {
+                        // workaround Cisco Bug CSCvj53634
+                        $data[$oid] -= 0x100000000;
+                    }
                     $data[$oid] = $data[$oid] / 10;
                 }
             }
@@ -206,12 +210,12 @@ class Xdsl implements Module
         $rrd_def = RrdDefinition::make()
             ->addDataset('AtucCurrSnrMgn', 'GAUGE', 0, 635)
             ->addDataset('AtucCurrAtn', 'GAUGE', 0, 635)
-            ->addDataset('AtucCurrOutputPwr', 'GAUGE', 0, 635)
+            ->addDataset('AtucCurrOutputPwr', 'GAUGE', -100, 635)
             ->addDataset('AtucCurrAttainableR', 'GAUGE', 0)
             ->addDataset('AtucChanCurrTxRate', 'GAUGE', 0)
             ->addDataset('AturCurrSnrMgn', 'GAUGE', 0, 635)
             ->addDataset('AturCurrAtn', 'GAUGE', 0, 635)
-            ->addDataset('AturCurrOutputPwr', 'GAUGE', 0, 635)
+            ->addDataset('AturCurrOutputPwr', 'GAUGE', -100, 635)
             ->addDataset('AturCurrAttainableR', 'GAUGE', 0)
             ->addDataset('AturChanCurrTxRate', 'GAUGE', 0)
             ->addDataset('AtucPerfLofs', 'COUNTER', null, 100000000000)
