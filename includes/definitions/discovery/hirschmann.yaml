@@ -20,7 +20,6 @@ modules:
             -
                 oid: hmCpuUtilization
                 num_oid: '.1.3.6.1.4.1.248.14.2.15.2.1.{{ $index }}'
-
     sensors:
         temperature:
             data:
@@ -46,7 +45,6 @@ modules:
                     group: 'SFP {{ $subindex0 }}/{{ $subindex1 }}'
                     descr: 'Power RX {{ $hmSfpInfoPartId }} {{ $subindex0 }}/{{ $subindex1 }}'
                     num_oid: '.1.3.6.1.4.1.248.14.1.1.13.1.35.{{ $index }}'
- 
         state:
             data:
                 -
@@ -60,3 +58,4 @@ modules:
                         - { descr: standby-inactive, graph: 1, value: 3, generic: 3 }
                         - { descr: redundancy-manager-active, graph: 1, value: 4, generic: 0 }
                         - { descr: redundancy-manager-inactive, graph: 1, value: 5, generic: 3 }
+                        
