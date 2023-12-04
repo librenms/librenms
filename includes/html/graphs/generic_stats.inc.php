@@ -21,19 +21,19 @@ if (! isset($munge)) {
     $munge = false;
 }
 
-if (!isset($no_hourly)) {
+if (! isset($no_hourly)) {
     $no_hourly = false;
 }
 
-if (!isset($no_daily)) {
+if (! isset($no_daily)) {
     $no_daily = false;
 }
 
-if (!isset($no_weekly)) {
+if (! isset($no_weekly)) {
     $no_weekly = false;
 }
 
-if (!isset($no_percentile)) {
+if (! isset($no_percentile)) {
     $no_percentile = false;
 }
 
@@ -123,13 +123,13 @@ $graph_stat_percentile_disable = \LibreNMS\Config::get('graph_stat_percentile_di
 $descr = \LibreNMS\Data\Store\Rrd::fixedSafeDescr($descr, $descr_len);
 
 if ($height > 25) {
-    if (!$no_hourly) {
+    if (! $no_hourly) {
         $descr_1h = \LibreNMS\Data\Store\Rrd::fixedSafeDescr('1 hour avg', $descr_len);
     }
-    if (!$no_daily) {
+    if (! $no_daily) {
         $descr_1d = \LibreNMS\Data\Store\Rrd::fixedSafeDescr('1 day avg', $descr_len);
     }
-    if (!$no_weekly) {
+    if (! $no_weekly) {
         $descr_1w = \LibreNMS\Data\Store\Rrd::fixedSafeDescr('1 week avg', $descr_len);
     }
 }
@@ -154,7 +154,7 @@ $rrd_optionsb .= ' AREA:' . $id . '#' . $colourA . $colourAalpha;
 $rrd_optionsb .= ' LINE1.25:' . $id . '#' . $colour . ":'$descr'";
 
 if ($height > 25) {
-    if (!$no_hourly) {
+    if (! $no_hourly) {
         $rrd_options .= ' DEF:' . $id . "1h$munge_helper=$filename:$ds:AVERAGE:step=3600";
     }
     if ($munge) {
@@ -172,7 +172,7 @@ if ($height > 25) {
         $time_diff = 1;
     }
     // displays nan if less than 17 hours
-    if (!$no_daily) {
+    if (! $no_daily) {
         if ($time_diff >= 61200) {
             $rrd_options .= ' DEF:' . $id . "1d$munge_helper=$filename:$ds:AVERAGE:step=86400";
             if ($munge) {
@@ -182,7 +182,7 @@ if ($height > 25) {
     }
 
     // weekly breaks and causes issues if it is less than 8 days
-    if (!$no_weekly) {
+    if (! $no_weekly) {
         if ($time_diff >= 691200) {
             $rrd_options .= ' DEF:' . $id . "1w$munge_helper=$filename:$ds:AVERAGE:step=604800";
             if ($munge) {
@@ -194,13 +194,13 @@ if ($height > 25) {
     $rrd_optionsb .= ' GPRINT:' . $id . ':LAST:%5.' . $float_precision . 'lf%s' . $units . ' GPRINT:' . $id . ':MIN:%5.' . $float_precision . 'lf%s' . $units;
     $rrd_optionsb .= ' GPRINT:' . $id . ':MAX:%5.' . $float_precision . 'lf%s' . $units . ' GPRINT:' . $id . ":AVERAGE:'%5." . $float_precision . "lf%s$units\\n'";
 
-    if (!$no_hourly) {
+    if (! $no_hourly) {
         $rrd_optionsb .= ' LINE1.25:' . $id . '1h#' . $colour1h . ":'$descr_1h'";
         $rrd_optionsb .= ' GPRINT:' . $id . '1h:LAST:%5.' . $float_precision . 'lf%s' . $units . ' GPRINT:' . $id . '1h:MIN:%5.' . $float_precision . 'lf%s' . $units;
         $rrd_optionsb .= ' GPRINT:' . $id . '1h:MAX:%5.' . $float_precision . 'lf%s' . $units . ' GPRINT:' . $id . "1h:AVERAGE:'%5." . $float_precision . "lf%s$units\\n'";
     }
 
-    if (!$no_daily) {
+    if (! $no_daily) {
         if ($time_diff >= 61200) {
             $rrd_optionsb .= ' LINE1.25:' . $id . '1d#' . $colour1d . ":'$descr_1d'";
             $rrd_optionsb .= ' GPRINT:' . $id . '1d:LAST:%5.' . $float_precision . 'lf%s' . $units . ' GPRINT:' . $id . '1d:MIN:%5.' . $float_precision . 'lf%s' . $units;
@@ -208,7 +208,7 @@ if ($height > 25) {
         }
     }
 
-    if (!$no_weekly) {
+    if (! $no_weekly) {
         if ($time_diff >= 691200) {
             $rrd_optionsb .= ' LINE1.25:' . $id . '1w#' . $colour1w . ":'$descr_1w'";
             $rrd_optionsb .= ' GPRINT:' . $id . '1w:LAST:%5.' . $float_precision . 'lf%s' . $units . ' GPRINT:' . $id . '1w:MIN:%5.' . $float_precision . 'lf%s' . $units;
@@ -216,8 +216,8 @@ if ($height > 25) {
         }
     }
 
-    if (!$no_percentile) {
-        if (!$graph_stat_percentile_disable) {
+    if (! $no_percentile) {
+        if (! $graph_stat_percentile_disable) {
             $rrd_optionsb .= ' HRULE:' . $id . '25th#' . $colour25th . ':25th_Percentile';
             $rrd_optionsb .= ' GPRINT:' . $id . '25th:%' . $float_precision . 'lf%s\n';
 

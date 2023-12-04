@@ -4,7 +4,7 @@ $name = 'borgbackup';
 $unit_text = 'Seconds';
 $descr = 'Since Mtime';
 $ds = 'data';
-$no_hourly =  true;
+$no_hourly = true;
 
 $name_part = 'time_since_last_modified';
 
