@@ -150,6 +150,11 @@ class Xdsl implements Module
 
             $portAdsl->port_id = $os->ifIndexToId($ifIndex);
 
+            if ($portAdsl->port_id == 0) {
+                // failure of ifIndexToId(), port_id is invalid, and syncModels will crash
+                continue;
+            }
+
             if ($datastore) {
                 $this->storeAdsl($portAdsl, $data, (int) $ifIndex, $os, $datastore);
                 echo ' ADSL(' . $portAdsl->adslLineCoding . '/' . Number::formatSi($portAdsl->adslAtucChanCurrTxRate, 2, 3, 'bps') . '/' . Number::formatSi($portAdsl->adslAturChanCurrTxRate, 2, 3, 'bps') . ') ';
