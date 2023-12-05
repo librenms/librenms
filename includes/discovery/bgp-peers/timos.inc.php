@@ -40,7 +40,6 @@ if ($device['os'] == 'timos') {
     }
     unset($bgpPeersCache);
 
-
     $vrfs = DeviceCache::getPrimary()->vrfs()->select('vrf_id', 'vrf_oid')->get();
     foreach ($vrfs as $vrf) {
         $map_vrf['byId'][$vrf['vrf_id']]['vrf_oid'] = $vrf['vrf_oid'];
