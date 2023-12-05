@@ -40,9 +40,18 @@ if ($device['os'] == 'timos') {
     }
     unset($bgpPeersCache);
 
+
+    $vrfs = DeviceCache::getPrimary()->vrfs()->select('vrf_id', 'vrf_oid')->get();
+    foreach ($vrfs as $vrf) {
+        $map_vrf['byId'][$vrf['vrf_id']]['vrf_oid'] = $vrf['vrf_oid'];
+        $map_vrf['byOid'][$vrf['vrf_oid']]['vrf_id'] = $vrf['vrf_id'];
+    }
+
     foreach ($bgpPeers as $vrfOid => $vrf) {
-        $vrfId = DeviceCache::getPrimary()->vrfs()->select('vrf_id', 'vrf_name')->where('vrf_oid', '=', $vrfOid)->get();
+        $vrfId = $map_vrf['byOid'][$vrfOid]['vrf_id'] ?? null;
+
         d_echo($vrfId);
+
         foreach ($vrf as $address => $value) {
             $astext = \LibreNMS\Util\AutonomousSystem::get($value['tBgpPeerNgPeerAS4Byte'])->name();
             if (! DeviceCache::getPrimary()->bgppeers()->where('bgpPeerIdentifier', $address)->where('vrf_id', $vrfId)->exists()) {
@@ -74,7 +83,6 @@ if ($device['os'] == 'timos') {
                     discover_new_device($name, $device, 'BGP');
                 }
                 echo '+';
-                $timos_bgp_peer_count ++;
             } else {
                 $peers = [
                     'bgpPeerRemoteAs' => $value['tBgpPeerNgPeerAS4Byte'],
@@ -83,16 +91,16 @@ if ($device['os'] == 'timos') {
                 $affected = DeviceCache::getPrimary()->bgppeers()->where('bgpPeerIdentifier', $address)->where('vrf_id', $vrfId)->update($peers);
                 $seenPeerID[] = DeviceCache::getPrimary()->bgppeers()->where('bgpPeerIdentifier', $address)->where('vrf_id', $vrfId)->select('bgpPeer_id')->orderBy('bgpPeer_id', 'ASC')->first()->bgpPeer_id;
                 echo str_repeat('.', $affected);
-                $timos_bgp_peer_count += $affected;
             }
         }
     }
-    // clean up peers
 
+    // clean up peers
     if (! is_null($seenPeerID)) {
         $deleted = DeviceCache::getPrimary()->bgppeers()->whereNotIn('bgpPeer_id', $seenPeerID)->delete();
         echo str_repeat('-', $deleted);
     }
+
     unset($bgpPeers);
     // No return statement here, so standard BGP mib will still be polled after this file is executed.
 }
