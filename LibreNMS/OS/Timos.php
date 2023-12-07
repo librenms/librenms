@@ -581,7 +581,10 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
                 $ip = long2ip(hexdec(str_replace(' ', '', $value['sdpFarEndInetAddress'])));
             } else {
                 //Fixme implement ipv6 conversion
-                $ip = $value['sdpFarEndInetAddress'] ?? 'unknown';
+                //$value['sdpFarEndInetAddress'] might still be any of these:
+                //  -> unknown(0), ipv4(1), ipv6(2), ipv4z(3), ipv6z(4), dns(16)
+
+                $ip = $value['sdpFarEndInetAddress'] ?? null;
             }
             $sdps->push(new MplsSdp([
                 'sdp_oid' => $value['sdpId'],
