@@ -296,8 +296,8 @@ class Xdsl implements Module
             'ifName' => $os->ifIndexToName($ifIndex),
             'rrd_name' => Rrd::portName($port->port_id, 'xdsl2LineStatusActAtp'),
             'rrd_def' => RrdDefinition::make()
-                ->addDataset('ds', 'GAUGE', 0)
-                ->addDataset('us', 'GAUGE', 0),
+                ->addDataset('ds', 'GAUGE', -100)
+                ->addDataset('us', 'GAUGE', -100),
         ], [
             'ds' => $data['xdsl2LineStatusActAtpDs'] ?? null,
             'us' => $data['xdsl2LineStatusActAtpUs'] ?? null,
