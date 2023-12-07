@@ -33,6 +33,7 @@ class Number
         if ($value > ((0x100 ** $numberBytes) / 2) - 1) {
             return $value - (0x100 ** $numberBytes);
         }
+
         return $value;
     }
 
