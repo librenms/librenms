@@ -137,9 +137,9 @@ class Xdsl implements Module
             // Values are 1/10
             foreach ($this->adslTenthValues as $oid) {
                 if (isset($data[$oid])) {
-                    if ($oid == 'adslAtucCurrOutputPwr' && $data[$oid] > 0x7FFFFFFF) {
+                    if ($oid == 'adslAtucCurrOutputPwr') {
                         // workaround Cisco Bug CSCvj53634
-                        $data[$oid] -= 0x100000000;
+                        $data[$oid] = Number::unsignedAsSigned($data[$oid]);
                     }
                     $data[$oid] = $data[$oid] / 10;
                 }
