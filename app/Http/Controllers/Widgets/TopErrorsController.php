@@ -52,7 +52,7 @@ class TopErrorsController extends WidgetController
         $data = $this->getSettings();
 
         $query = Port::hasAccess($request->user())->with(['device' => function ($query) {
-            $query->select('device_id', 'hostname', 'sysName', 'status', 'os');
+            $query->select('device_id', 'hostname', 'sysName', 'display', 'status', 'os');
         }])
             ->isValid()
             ->select(['port_id', 'device_id', 'ifName', 'ifDescr', 'ifAlias'])
