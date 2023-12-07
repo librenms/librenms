@@ -30,8 +30,8 @@ class Number
     public static function unsignedAsSigned($value, $numberBytes = 4)
     {
         // defaults to 4 bytes, or 32 bits
-        if ($value > ((0x100**($numberBytes)) / 2) - 1) {
-            return ($value - (0x100**($numberBytes)));
+        if ($value > ((0x100 ** $numberBytes) / 2) - 1) {
+            return $value - (0x100 ** $numberBytes);
         }
         return $value;
     }
