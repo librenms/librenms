@@ -27,6 +27,15 @@ namespace LibreNMS\Util;
 
 class Number
 {
+    public static function unsignedAsSigned($value, $numberBytes = 4)
+    {
+        // defaults to 4 bytes, or 32 bits
+        if ($value > ((0x100**($numberBytes)) / 2) - 1) {
+            return ($value - (0x100**($numberBytes)));
+        }
+        return $value;
+    }
+
     public static function formatBase($value, $base = 1000, $round = 2, $sf = 3, $suffix = 'B')
     {
         return $base == 1000
