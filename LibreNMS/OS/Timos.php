@@ -788,7 +788,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
         foreach ($mplsTunnelArHopCache as $key => $value) {
             [$mplsTunnelARHopListIndex, $mplsTunnelARHopIndex] = explode('.', $key);
             $firstPath = $paths->firstWhere('mplsLspPathTunnelARHopListIndex', $mplsTunnelARHopListIndex);
-            if (!isset($firstPath)) {
+            if (! isset($firstPath)) {
                 continue;
             }
             $lsp_path_id = $firstPath->lsp_path_id;
