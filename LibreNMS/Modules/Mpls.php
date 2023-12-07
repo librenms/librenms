@@ -146,7 +146,7 @@ class Mpls implements Module
                 $this->syncModels($device, 'mplsSaps', $os->pollMplsSaps($svcs));
             }
 
-            if ($device->mplsSdpBinds()->exists()) {
+            if ($device->mplsSdpBinds()->exists() && isset($sdps, $svcs)) {
                 echo "\nMPLS SDP Bindings: ";
                 ModuleModelObserver::observe(\App\Models\MplsSdpBind::class);
                 $this->syncModels($device, 'mplsSdpBinds', $os->pollMplsSdpBinds($sdps, $svcs));
