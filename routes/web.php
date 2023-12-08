@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AboutController;
+use App\Http\Controllers\Ajax\OsSearchController;
 use App\Http\Controllers\AlertController;
 use App\Http\Controllers\AlertTransportController;
 use App\Http\Controllers\Auth\SocialiteController;
@@ -65,7 +66,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('overview', 'OverviewController@index')->name('overview');
     Route::get('/', 'OverviewController@index')->name('home');
     Route::view('vminfo', 'vminfo');
-
     Route::get('nac', 'NacController@index');
 
     Route::prefix('devices')->name('device.')->group(function () {
@@ -151,6 +151,7 @@ Route::middleware(['auth'])->group(function () {
             Route::get('search/bgp', BgpSearchController::class);
             Route::get('search/device', DeviceSearchController::class);
             Route::get('search/port', PortSearchController::class);
+            Route::get('search/os', [OsSearchController::class,'handleRequest']);
             Route::post('set_map_group', 'AvailabilityMapController@setGroup');
             Route::post('set_map_view', 'AvailabilityMapController@setView');
             Route::post('set_resolution', 'ResolutionController@set');

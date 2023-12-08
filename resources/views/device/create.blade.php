@@ -257,7 +257,7 @@
             datumTokenizer: Bloodhound.tokenizers.obj.whitespace('text'),
             queryTokenizer: Bloodhound.tokenizers.whitespace,
             remote: {
-                url: "ajax_ossuggest.php?term=%QUERY",
+                url: "ajax/search/os?term=%QUERY",
                 filter: function (output) {
                     return $.map(output, function (item) {
                         return {
