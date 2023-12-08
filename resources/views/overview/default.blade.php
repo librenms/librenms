@@ -660,7 +660,7 @@
             $("body").css("padding-top", "50px").css("padding-bottom", "50px");
          };
      }
-     window.addEventListener('resize', checkFullScreen(), false);
+     window.addEventListener('resize', checkFullScreen, false);
      checkFullScreen();
 </script>
 @endpush
