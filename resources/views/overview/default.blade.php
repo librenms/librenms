@@ -649,13 +649,8 @@
         dashboard_add($('#add_form'));
     @endif
 
-     function checkFullScreen(event) {
-         var isFullscreen = window.matchMedia('(display-mode: fullscreen)').matches;
-         if (isFullscreen != null && isFullscreen) {
-            $(".navbar-fixed-top").hide();
-            $("#dashboard-editor").hide();
-            $("body").css("padding-top", 0).css("padding-bottom", 0);
-         } else if (isFullscreen == null && window.innerHeight > (screen.height - 10)) {
+     function checkFullScreen() {
+         if (window.innerHeight > (screen.height - 10)) {
             $(".navbar-fixed-top").hide();
             $("#dashboard-editor").hide();
             $("body").css("padding-top", 0).css("padding-bottom", 0);
@@ -665,7 +660,7 @@
             $("body").css("padding-top", "50px").css("padding-bottom", "50px");
          };
      }
-     window.matchMedia('(display-mode: fullscreen)').addEventListener('change', checkFullScreen);
+     window.addEventListener('resize', checkFullScreen(), false);
      checkFullScreen();
 </script>
 @endpush
