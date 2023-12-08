@@ -651,5 +651,5 @@ class CustomMapController extends Controller
         }
 
         return response()->json(['id' => $map_id, 'bgimage' => $background, 'errors' => $errors]);
-    }
+   }
 }
