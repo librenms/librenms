@@ -40,7 +40,7 @@ class StoreDeviceRequest extends FormRequest
             'sysName' => 'nullable|string|max:255',
             'poller_group' => 'nullable|integer|max:255',
             'port_assoc_mode' => 'nullable|string|max:255',
-            'force_add' => 'nullable|./|max:255',
+            'force_add' => 'nullable|max:255',
         ];
     }
 }
