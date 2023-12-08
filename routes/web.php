@@ -78,6 +78,11 @@ Route::middleware(['auth'])->group(function () {
 
     // Maps
     Route::prefix('maps')->namespace('Maps')->group(function () {
+        Route::get('custom/edit/{map_id?}', 'CustomMapController@edit')->name('maps.custom.edit');
+        Route::post('custom/{map_id}/save', 'CustomMapController@save')->name('maps.custom.save');
+        Route::post('custom/{map_id}/background', 'CustomMapController@background')->name('maps.custom.background');
+        Route::post('custom/{map_id}/delete', 'CustomMapController@delete')->name('maps.custom.delete');
+        Route::get('custom/{map_id}', 'CustomMapController@view')->name('maps.custom.view');
         Route::get('devicedependency', 'DeviceDependencyController@dependencyMap');
     });
 
@@ -146,6 +151,7 @@ Route::middleware(['auth'])->group(function () {
         Route::namespace('Ajax')->group(function () {
             Route::get('search/bgp', BgpSearchController::class);
             Route::get('search/device', DeviceSearchController::class);
+            Route::get('search/device/{device_id}/port', DevicePortSearchController::class);
             Route::get('search/port', PortSearchController::class);
             Route::post('set_map_group', 'AvailabilityMapController@setGroup');
             Route::post('set_map_view', 'AvailabilityMapController@setView');

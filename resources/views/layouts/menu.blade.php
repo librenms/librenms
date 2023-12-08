@@ -76,6 +76,11 @@
                                         @endforeach
                                     </ul></li>
                                 @endif
+                                @admin
+                                <li><a href="{{ route('maps.custom.edit') }}"><i class="fa fa-map fa-fw fa-lg"
+                                                                            aria-hidden="true"></i> {{ __('Custom Map Editor') }}
+                                    </a></li>
+                                @endadmin
                                 <li><a href="{{ url('fullscreenmap') }}"><i class="fa fa-expand fa-fw fa-lg"
                                                                             aria-hidden="true"></i> {{ __('Geographical') }}
                                     </a></li>
