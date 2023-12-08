@@ -28,10 +28,10 @@ class StoreDeviceRequest extends FormRequest
             'port' => 'nullable|integer|min:1|max:65535',
             'transport' => 'nullable|string|max:255',
             'snmpver' => ['nullable|string|max:255|', Rule::in(['v1', 'v2c', 'v3'])],
-            'community' => 'nullable|string|max:255',
-            'authlevel' => 'nullable|string|max:255',
-            'authname' => 'nullable|string|max:255',
-            'authpass' => 'nullable|string|max:255',
+            'community' => 'required_if:snmpver,v2c|string|max:255',
+            'authlevel' => 'required_if:snmpver:v3|string|max:255',
+            'authname' => 'required_if:snmpver:v3|nullable|string|max:255',
+            'authpass' => 'required_if:snmpver:v3|nullable|string|max:255',
             'authalgo' => 'nullable|string|max:255',
             'cryptopass' => 'nullable|string|max:255',
             'cryptoalgo' => 'nullable|string|max:255',
@@ -40,7 +40,7 @@ class StoreDeviceRequest extends FormRequest
             'sysName' => 'nullable|string|max:255',
             'poller_group' => 'nullable|integer|max:255',
             'port_assoc_mode' => 'nullable|string|max:255',
-            'force_add' => 'nullable|string|max:255',
+            'force_add' => 'nullable|./|max:255',
         ];
     }
 }
