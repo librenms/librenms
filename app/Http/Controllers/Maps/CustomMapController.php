@@ -581,6 +581,9 @@ class CustomMapController extends Controller
         $height = $request->post('height');
         $bgclear = $request->post('bgclear') == 'true' ? true : false;
         $bgnewimage = $request->post('bgimage');
+        $newnodeconf = json_decode($request->post('newnodeconf'));
+        $newedgeconf = json_decode($request->post('newedgeconf'));
+
 
         if (! preg_match('/^(\d+)(px|%)$/', $width, $matches)) {
             array_push($errors, 'Width must be a number followed by px or %');
