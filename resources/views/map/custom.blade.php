@@ -288,7 +288,6 @@
                     <input type="text" id="mapheight" name="mapheight" class="form-control input-sm" value="{{$map_conf['height']}}">
                 </div>
               </div>
-@if($map_id)
               <div class="form-group row" id="mapBackgroundRow">
                 <label for="selectbackground" class="col-sm-3 control-label">Background</label>
                 <div class="col-sm-9">
@@ -303,7 +302,6 @@
                   <button id="mapBackgroundClear" type="button" name="clearbackground" class="btn btn-primary" onclick="mapClearBackground();">Clear Background</button>
                 </div>
               </div>
-@endif
               <hr>
               <div class="row">
                 <div class="col-sm-12" id="savemap-alert">
@@ -423,6 +421,7 @@
 @if(!is_null($map_id))
 @if(!$map_id)
     $("#mapModalPopup").click();
+    $("#mapBackgroundClearRow").hide();
 
     function editMapCancel() {
         window.location.href = "{{ route("maps.custom.edit") }}/";
@@ -496,6 +495,8 @@
         fd.append('height', height);
         fd.append('bgclear', clearbackground);
         fd.append('bgimage', newbackground);
+        fd.append('newnodeconf', JSON.stringify(newnodeconf));
+        fd.append('newedgeconf', JSON.stringify(newedgeconf));
 
         $.ajax({
             url: '{{ route('maps.custom.save', ['map_id' => $map_id]) }}',
@@ -517,8 +518,10 @@
                     canvas = $("#custom-map").children()[0].canvas;
                     if(data['bgimage']) {
                         $(canvas).css('background-image','url(images/custommap/' + data['bgimage'] + ')').css('background-size', 'cover');
+                        bgimage = data['bgimage'];
                     } else {
                         $(canvas).css('background-image','');
+                        bgimage = '';
                     }
 
                     editMapCancel();
@@ -541,6 +544,9 @@
         // TODO: Read in all nodes and edges, convert to JSON and post.  On success hide save button.
         $("#map-saveDataButton").hide();
     }
+
+    var newedgeconf = {!! json_encode($newedge_conf) !!};
+    var newnodeconf = {!! json_encode($newnode_conf) !!};
 @endif
 
     var network_nodes = new vis.DataSet({queue: {delay: 100}});
@@ -548,14 +554,13 @@
     var network;
     var network_height;
     var network_width;
+    var bgimage = '{!! $background !!}';
 
     var Countdown;
 
 @if($map_id)
 @if($edit)
     var newcount = 1;
-    var newedgeconf = {!! json_encode($newedge_conf) !!};
-    var newnodeconf = {!! json_encode($newnode_conf) !!};
     var port_search_device_id_1 = 0;
     var port_search_device_id_2 = 0;
 
@@ -1085,6 +1090,11 @@
 
         network.moveTo({position: {x: centreX, y: centreY}, scale: 1});
 
+        if(bgimage) {
+            canvas = $("#custom-map").children()[0].canvas;
+            $(canvas).css('background-image','url(images/custommap/' + bgimage + ')').css('background-size', 'cover');
+        }
+
         // Workaround for top-left close icon because the vis.js images have not been copied
         $(".vis-close").addClass("fa fa-xmark");
 
@@ -1134,7 +1144,7 @@
 //        var highlight = $("#highlight_node").val();
 //        var showpath = $("#showparentdevicepath")[0].checked ? 1 : 0;
 //
-//        $.get( '{{ route('maps.getdevices') }}', {disabled: 0, disabled_alerts: 0, link_type: "depends", url_type: "links", highlight_node: highlight, showpath: showpath})
+//        $.get( '{ route('maps.getdevices') }', {disabled: 0, disabled_alerts: 0, link_type: "depends", url_type: "links", highlight_node: highlight, showpath: showpath})
 //            .done(function( data ) {
 //                function deviceSort(a,b) {
 //                    return (data[a]["sname"] > data[b]["sname"]) ? 1 : -1;

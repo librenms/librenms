@@ -26,75 +26,125 @@
 namespace App\Http\Controllers\Maps;
 
 use App\Http\Controllers\Controller;
+use App\Models\CustomMap;
+use App\Models\CustomMapBackground;
+use App\Models\CustomMapEdge;
+use App\Models\CustomMapNode;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use LibreNMS\Config;
 use LibreNMS\Util\Url;
 
 class CustomMapController extends Controller
 {
+    private $default_edge_conf = [
+        'arrows' => [
+            'to' => [
+                'enabled' => true,
+            ],
+        ],
+        'smooth' => [
+            'type' => "dynamic",
+        ],
+        'font' => [
+            'color' => '#343434',
+            'size' => 14,
+            'face' => 'arial',
+        ],
+        'label' => true,
+    ];
+
+    private $default_node_conf = [
+        'borderWidth' => 1,
+        'color' => [
+            'border' => '#2B7CE9',
+            'background' => '#D2E5FF',
+        ],
+        'font' => [
+            'color' => '#343434',
+            'size' => 14,
+            'face' => 'arial',
+        ],
+        'icon' => [],
+        'label' => true,
+        'shape' => 'box',
+        'size' => 25,
+    ];
+
+    private $default_map_options = [
+        'interaction' => [
+            'dragNodes' => false,
+            'dragView' => false,
+            'zoomView' => false,
+        ],
+        'manipulation' => [
+            'enabled' => false,
+        ],
+        'physics' => [
+            'enabled' => false,
+        ],
+    ];
+
+    private function checkImageCache(CustomMap $map)
+    {
+        if(! $map->custom_map_id) {
+           return null;
+        }
+        if(! $map->background_suffix) {
+           return null;
+        }
+
+        $imageName = $map->custom_map_id . '_' . $map->background_version . '.' . $map->background_suffix;
+        if(Storage::disk('base')->missing('html/images/custommap/' . $imageName)) {
+            Storage::disk('base')->put('html/images/custommap/' . $imageName, $map->background->background_image);
+        }
+        return $imageName;
+    }
+
     public function edit(Request $request)
     {
         // TODO: Check if admin
 
         // TODO: Read config if ID > 0
-        $map_conf = [
-            'height' => "800px",
-            'width' => "1800px",
-            'interaction' => [
-                'dragNodes' => true,
-                'dragView' => false,
-                'zoomView' => false,
-            ],
-            'manipulation' => [
-                'enabled' => true,
-                'initiallyActive' => true,
-            ],
-            'physics' => [
-                'enabled' => false,
-            ],
-        ];
-
-        // TODO: Allow settings to come from DB
-        $newedge_conf = [
-            'arrows' => [
-                'to' => [
-                    'enabled' => true,
+        if($request->map_id == 0) {
+            $newedge_conf = $this->default_edge_conf;
+            $newnode_conf = $this->default_node_conf;
+            $name = 'New Map';
+            $map_conf = [
+                'height' => "800px",
+                'width' => "1800px",
+                'interaction' => [
+                    'dragNodes' => true,
+                    'dragView' => false,
+                    'zoomView' => false,
                 ],
-            ],
-            'smooth' => [
-                'type' => "dynamic",
-            ],
-            'font' => [
-                'color' => '#343434',
-                'size' => 14,
-                'face' => 'arial',
-            ],
-            'label' => true,
-        ];
-
-        $newnode_conf = [
-            'borderWidth' => 1,
-            'color' => [
-                'border' => '#2B7CE9',
-                'background' => '#D2E5FF',
-            ],
-            'font' => [
-                'color' => '#343434',
-                'size' => 14,
-                'face' => 'arial',
-            ],
-            'icon' => [],
-            'label' => true,
-            'shape' => 'box',
-            'size' => 25,
-        ];
+                'manipulation' => [
+                    'enabled' => true,
+                    'initiallyActive' => true,
+                ],
+                'physics' => [
+                    'enabled' => false,
+                ],
+            ];
+            $background = null;
+        } else {
+            $map = CustomMap::find($request->map_id);
+            $name = $map->name;
+            $newedge_conf = $map->newedgeconfig;
+            $newnode_conf = $map->newnodeconfig;
+            $map_conf = $map->options;
+            $map_conf['width'] = $map->width;
+            $map_conf['height'] = $map->height;
+            $background = $this->checkImageCache($map);
+        }
 
         $data = [
             'edit' => true,
             'map_id' => $request->map_id,
-            'name' => 'New Map',
-            'background' => null,
+            'name' => $name,
+            'background' => $background,
             'page_refresh' => Config::get('page_refresh', 300),
             'map_conf' => $map_conf,
             'newedge_conf' => $newedge_conf,
@@ -110,12 +160,15 @@ class CustomMapController extends Controller
     {
         $errors = [];
 
-        $map_id = Url::parseOptions('map_id');
+        $map_id = $request->map_id;
         $name = $request->post('name');
         $width = $request->post('width');
         $height = $request->post('height');
-        $bgclear = $request->post('bgclear');
+        $bgclear = $request->post('bgclear') == 'true' ? true : false;
         $bgnewimage = $request->post('bgimage');
+        $newnodeconf = json_decode($request->post('newnodeconf'));
+        $newedgeconf = json_decode($request->post('newedgeconf'));
+
 
         if (! preg_match('/^(\d+)(px|%)$/', $width, $matches)) {
             array_push($errors, "Width must be a number followed by px or %");
@@ -143,19 +196,45 @@ class CustomMapController extends Controller
 
         $imageName = null;
         if (! $errors) {
-            //TODO: Update or create
-            //TODO: Make sure background is left alone if bgclear is false and bgnewimage is null
             if (! $map_id) {
-                //TODO: Replace with new map ID
-                $map_id = 1;
+                $map = new CustomMap;
+                $map->options = $this->default_map_options;
+                $map->background_version = 0;
+            } else {
+                $map = CustomMap::find($map_id);
+            }
+
+            $map->name = $name;
+            $map->width = $width;
+            $map->height = $height;
+            $map->newnodeconfig = $newnodeconf;
+            $map->newedgeconfig = $newedgeconf;
+            $map->save();
+            if (! $map_id) {
+                $map_id = $map->custom_map_id;
             }
 
             if ($request->bgimage) {
-                $imageName = $map_id . '.' . $request->bgimage->extension();
-                $request->bgimage->move(public_path('images/custommap'), $imageName);
-                //TODO: Update database again with image name and image contents
+                $map->background_suffix = $request->bgimage->extension();
+                if(!$map->background) {
+                    $background = new CustomMapBackground;
+                    $background->background_image = $request->bgimage->getContent();
+                    $map->background->save($background);
+                    $map->refresh();
+                } else {
+                    $map->background->background_image = $request->bgimage->getContent();
+                    $map->background->save();
+                }
+                $map->background_version++;
+                $map->save();
+            } elseif ($bgclear) {
+                if($map->background) {
+                    $map->background->delete();
+                }
+                $map->background_suffix = null;
+                $map->save();
             }
-            //TODO: Set imageName if there is an existing image in the DB
+            $imageName = $this->checkImageCache($map);
         }
 
         return response()->json(['id' => $map_id, 'bgimage' => $imageName, 'errors' => $errors]);
