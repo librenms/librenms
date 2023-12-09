@@ -9,7 +9,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        DB::statement("ALTER TABLE mpls_sdps MODIFY COLUMN sdpFarEndInetAddressType ENUM('unknown', 'ipv4', 'ipv6', 'ipv4z', 'ipv6z', 'dns')");
+        Schema::table('mpls_sdps', function($table) {
+            // drop and recreate because of SQLite not accepting any changes.
+            // data is collected again next poll anyway.
+            $table->dropColumn(['sdpFarEndInetAddressType']);
+            $table->enum('sdpFarEndInetAddressType', ['unknown', 'ipv4', 'ipv6', 'ipv4z', 'ipv6z', 'dns'])->nullable();
+        });
     }
 
     /**
@@ -17,6 +22,9 @@ return new class extends Migration
      */
     public function down(): void
     {
-        DB::statement("ALTER TABLE mpls_sdps MODIFY COLUMN sdpFarEndInetAddressType ENUM('ipv4', 'ipv6')");
+        Schema::table('mpls_sdps', function($table) {
+            $table->dropColumn(['sdpFarEndInetAddressType']);
+            $table->enum('sdpFarEndInetAddressType', ['ipv4', 'ipv6'])->nullable();
+        });
     }
 };
