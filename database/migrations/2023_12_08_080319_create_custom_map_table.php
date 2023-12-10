@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('custom_maps', function (Blueprint $table) {
             $table->increments('custom_map_id');
             $table->string('name', 100);
-            $table->string('width', '10');
-            $table->string('height', '10');
+            $table->string('width', 10);
+            $table->string('height', 10);
             $table->string('background_suffix', 10)->nullable();
             $table->integer('background_version')->unsigned();
             $table->json('options')->nullable();

@@ -3,7 +3,7 @@
 @section('title', __('Custom Map'))
 
 @section('content')
-@if($edit)
+@if($edit && !is_null($map_id))
 <button type="button" id="nodeModalPopup" class="btn btn-primary" data-toggle="modal" data-target="#nodeModal" style="display:none">Hidden</button>
 <div class="modal fade" id="nodeModal" tabindex="-1" role="dialog" aria-labelledby="nodeModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
@@ -320,37 +320,38 @@
     </div>
   </div>
 </div>
+@endif
 
 <div class="container-fluid">
 
+@if($edit && is_null($map_id))
   <div class="row" id="control-row">
-@if(is_null($map_id))
     <div class="col-md-12">
       <select id="show_group" class="page-availability-report-select" name="show_group" onchange="selectMap(this)">
         <option value="-1" selected>Select map to edit</option>
         <option value="0">Create New Map</option>
-<!-- TODO: Fill in available maps -->
+@foreach($maps as $map)
+        <option value="{{$map->custom_map_id}}">{{$map->name}}</option>
+@endforeach
       </select>
     </div>
-@else
+  </div>
+@elseif($edit)
+  <div class="row" id="control-row">
     <div class="col-md-5">
       <button type=button value="mapedit" id="map-editButton" class="btn btn-primary" onclick="editMapSettings();">Edit Map Settings</button>
       <button type=button value="editnodedefaults" id="map-nodeDefaultsButton" class="btn btn-primary" onclick="editNodeDefaults();">Edit Node Defaults</button>
       <button type=button value="editedgedefaults" id="map-edgeDefaultsButton" class="btn btn-primary" onclick="editEdgeDefaults();">Edit Edge Defaults</button>
     </div>
     <div class="col-md-2">
-@if($map_id)
       <center>
         <h4 id="title">{{$name}}</h4>
       </center>
-@endif
     </div>
     <div class="col-md-5 text-right">
       <button type=button value="maprender" id="map-renderButton" class="btn btn-primary" style="display: none" onclick="CreateNetwork();">Re-Render Map</button>
       <button type=button value="mapsave" id="map-saveDataButton" class="btn btn-primary" style="display: none" onclick="saveMapData();">Save Map</button>
     </div>
-@endif
-  </div>
   </div>
 @else
   <div class="row" id="alert-row">
@@ -383,32 +384,166 @@
 
 @section('scripts')
 <script type="text/javascript">
-    function checkMapSize() {
-        var mapheight = $(window).height() - $("#custom-map").offset().top;
-        if(mapheight < 200) {
-            mapheight = 200;
-        }
-        $("#custom-map").height(mapheight);
-    };
+@if(! is_null($map_id))
+    var bgimage = '{!! $background !!}';
+    var network;
+    var network_height;
+    var network_width;
+    var network_nodes = new vis.DataSet({queue: {delay: 100}});
+    var network_edges = new vis.DataSet({queue: {delay: 100}});
 
-    function checkFullScreen() {
-        if (window.innerHeight > (screen.height - 10) || window.matchMedia('(display-mode: fullscreen)').matches) {
-            document.getElementsByClassName('navbar-fixed-top')[0].style.display = "none";
-            document.getElementsByTagName('body')[0].style.paddingTop = 0;
-        } else {
-            document.getElementsByClassName('navbar-fixed-top')[0].style.removeProperty("display");
-            document.getElementsByTagName('body')[0].style.paddingTop = "50px";
+    function CreateNetwork() {
+        // Flush the nodes and edges so they are rendered immediately
+        network_nodes.flush();
+        network_edges.flush();
+
+        var container = document.getElementById('custom-map');
+        var options = {!! json_encode($map_conf) !!};
+
+@if($edit)
+        // Set up the triggers for adding and editing map items
+        options['manipulation']['addNode'] = function (data, callback) {
+                callback(null);
+                $("#nodeModalLabel").text("Add Node");
+                var node = structuredClone(newnodeconf);
+                node.id = "new" + newcount++;
+                node.label = "New Node";
+                node.x = data.x;
+                node.y = data.y;
+                node.add = true;
+                $(".single-node").show();
+                editNode(node, editNodeSave);
+            }
+        options['manipulation']['editNode'] = function (data, callback) {
+                callback(null);
+                $("#nodeModalLabel").text("Edit Node");
+                $(".single-node").show();
+                editNode(data, editNodeSave);
+            }
+        options['manipulation']['deleteNode'] = function (data, callback) {
+                callback(null);
+                $.each( data.edges, function( edge_idx, edgeid ) {
+                    edgeid = edgeid.split("_")[0];
+                    deleteEdge(edgeid);
+                });
+                $.each( data.nodes, function( node_idx, nodeid ) {
+                    network_nodes.remove(nodeid);
+                    network_nodes.flush();
+                });
+            }
+        options['manipulation']['addEdge'] = function (data, callback) {
+                // Because we deal with multiple edges, do not use the default callback
+                callback(null);
+
+                // Do not allow linking to the same node
+                if(data.to == data.from) {
+                    return;
+                }
+                // Do not allow linking to the mid point nodes
+                if(isNaN(data.to) && data.to.endsWith("_mid")) {
+                    return;
+                }
+                if(isNaN(data.from) && data.from.endsWith("_mid")) {
+                    return;
+                }
+
+                var pos = network.getPositions([data.from, data.to]);
+                var mid_x = (pos[data.from].x + pos[data.to].x) >> 1;
+                var mid_y = (pos[data.from].y + pos[data.to].y) >> 1;
+
+                var edgeid = "new" + newcount++;
+
+                var mid = {id: edgeid + "_mid", shape: "dot", size: 3, x: mid_x, y: mid_y};
+
+                var edge1 = structuredClone(newedgeconf);
+                edge1.id = edgeid + "_from";
+                edge1.from = data.from;
+                edge1.to = edgeid + "_mid";
+
+                var edge2 = structuredClone(newedgeconf);
+                edge2.id = edgeid + "_to";
+                edge2.from = data.to;
+                edge2.to = edgeid + "_mid";
+
+                // TODO: Look up xdp relationships and pre-select port if relationship exists
+
+                var edgedata = {id: edgeid, mid: mid, edge1: edge1, edge2: edge2, add: true}
+
+                $("#edgeModalLabel").text("Add Edge");
+                editEdge(edgedata, editEdgeSave);
+            }
+        options['manipulation']['editEdge'] = { editWithoutDrag: editExistingEdge };
+        options['manipulation']['deleteEdge'] = function (data, callback) {
+            callback(null);
+            $.each( data.edges, function( edge_idx, edgeid ) {
+                edgeid = edgeid.split("_")[0];
+                deleteEdge(edgeid);
+            });
         };
-    };
+@endif
 
-    // Check if we are fullscreen and add listener for if it changes
-    window.matchMedia('(display-mode: fullscreen)').addEventListener('change', checkFullScreen);
-    checkFullScreen();
+        network = new vis.Network(container, {nodes: network_nodes, edges: network_edges, stabilize: true}, options);
+        network_height = $($(container).children(".vis-network")[0]).height();
+        network_width = $($(container).children(".vis-network")[0]).width();
+        var centreY = parseInt(network_height / 2);
+        var centreX = parseInt(network_width / 2);
 
-    // Set the map size as needed
-    window.addEventListener('resize', checkMapSize);
-    checkMapSize();
+        network.moveTo({position: {x: centreX, y: centreY}, scale: 1});
 
+        if(bgimage) {
+            canvas = $("#custom-map").children()[0].canvas;
+            $(canvas).css('background-image','url({{ route('maps.custom.background', ['map_id' => $map_id]) }})').css('background-size', 'cover');
+        }
+
+        // Workaround for top-left close icon because the vis.js images have not been copied
+        $(".vis-close").addClass("fa fa-xmark");
+@if($edit)
+        network.on('dragEnd', function (data) {
+            if(data.edges.length > 0 || data.nodes.length > 0) {
+                // Make sure a node is not dragged outside the canvas
+                nodepos = network.getPositions(data.nodes);
+                $.each( nodepos, function( nodeid, node ) {
+                    move = false;
+                    if ( node.x < {{ $hmargin }} ) {
+                        node.x = {{ $hmargin }};
+                        move = true;
+                    } else if ( node.x > network_width - {{ $hmargin }} ) {
+                        node.x = network_width - {{ $hmargin }};
+                        move = true;
+                    }
+                    if ( node.y < {{ $vmargin }} ) {
+                        node.y = {{ $vmargin }};
+                        move = true;
+                    } else if ( node.y > network_height - {{ $vmargin }} ) {
+                        node.y = network_height - {{ $vmargin }};
+                        move = true;
+                    }
+                    if ( move ) {
+                        network.moveNode(nodeid, node.x, node.y);
+                    }
+                    node.id = nodeid;
+                    network_nodes.update(node);
+                });
+                $("#map-saveDataButton").show();
+                $("#map-renderButton").show();
+            }
+        });
+        $("#map-renderButton").hide();
+@else
+        network.on('doubleClick', function (properties) {
+            if (properties.nodes > 0) {
+                window.location.href = "device/device="+properties.nodes+"/"
+            }
+        });
+@endif
+    }
+@endif
+@if(!$edit)
+    var Countdown;
+@endif
+
+@if($edit)
+@if(is_null($map_id))
     function selectMap(caller) {
         if($(caller).val() < 0) {
             return true;
@@ -417,24 +552,7 @@
         }
         window.location.href = "{{ route("maps.custom.edit") }}/" + $(caller).val();
     }
-
-@if(!is_null($map_id))
-@if(!$map_id)
-    $("#mapModalPopup").click();
-    $("#mapBackgroundClearRow").hide();
-
-    function editMapCancel() {
-        window.location.href = "{{ route("maps.custom.edit") }}/";
-    }
-@else
-    function editMapCancel() {
-        $('#mapBackgroundClear').text('Clear Background');
-        $('#mapBackgroundClearVal').val('');
-        $("#mapBackgroundCancel").hide();
-        $("#mapBackgroundSelect").val(null);
-        $('#mapModal').modal('hide');
-    }
-@endif
+@else {{-- edit mode with map id not null --}}
     function mapChangeBackground() {
         $("#mapBackgroundCancel").show();
     }
@@ -490,12 +608,9 @@
         fd.append('height', height);
         fd.append('bgclear', clearbackground);
         fd.append('bgimage', newbackground);
-        // TODO: Move these to the main save page
-        fd.append('newnodeconf', JSON.stringify(newnodeconf));
-        fd.append('newedgeconf', JSON.stringify(newedgeconf));
 
         $.ajax({
-            url: '{{ route('maps.custom.save', ['map_id' => $map_id]) }}',
+            url: '{{ route('maps.custom.savesettings', ['map_id' => $map_id]) }}',
             data: fd,
             processData: false,
             contentType: false,
@@ -535,27 +650,17 @@
             },
         });
     }
+@if(!$map_id)
+    // New map - pop up the modal to set initial settings
+    $("#mapModalPopup").click();
+    $("#mapBackgroundClearRow").hide();
 
-    function saveMapData() {
-        // TODO: Read in all nodes and edges, convert to JSON and post.  On success hide save button.
-        $("#map-saveDataButton").hide();
+    function editMapCancel() {
+        window.location.href = "{{ route("maps.custom.edit") }}/";
     }
-
+@else {{-- edit mode with map id > 0 --}}
     var newedgeconf = {!! json_encode($newedge_conf) !!};
     var newnodeconf = {!! json_encode($newnode_conf) !!};
-@endif
-
-    var network_nodes = new vis.DataSet({queue: {delay: 100}});
-    var network_edges = new vis.DataSet({queue: {delay: 100}});
-    var network;
-    var network_height;
-    var network_width;
-    var bgimage = '{!! $background !!}';
-
-    var Countdown;
-
-@if($map_id)
-@if($edit)
     var newcount = 1;
     var port_search_device_id_1 = 0;
     var port_search_device_id_2 = 0;
@@ -564,6 +669,23 @@
     var edge_port_map = {};
     // TODO: Add devices to the map on load
     var node_device_map = {};
+
+    function editMapCancel() {
+        $('#mapBackgroundClear').text('Clear Background');
+        $('#mapBackgroundClearVal').val('');
+        $("#mapBackgroundCancel").hide();
+        $("#mapBackgroundSelect").val(null);
+        $('#mapModal').modal('hide');
+    }
+
+    function saveMapData() {
+        // TODO: Read in all nodes and edges, convert to JSON and post.  On success hide save button.
+        // TODO: Move these to the main save page
+        var fd = new FormData();
+        fd.append('newnodeconf', JSON.stringify(newnodeconf));
+        fd.append('newedgeconf', JSON.stringify(newedgeconf));
+        $("#map-saveDataButton").hide();
+    }
 
     function nodeStyleChange() {
         var nodestyle = $("#nodestyle").val();
@@ -643,6 +765,7 @@
                 newnodeconf.color.border = newnodeconf.color.highlight.border = newnodeconf.color.hover.border = $("#nodecolourbdr").val();
             }
         }
+        $("#map-saveDataButton").show();
     }
 
     function checkColourReset(itemColour, defaultColour, resetControlId) {
@@ -731,10 +854,10 @@
         editNodeHide();
 
         if($("#device_id").val()) {
-            node.title = true;
+            node.title = $("#device_id").val();
             node.image = {unselected: $("#device_image").val()};
         } else {
-            node.title = false;
+            node.title = '';
             node.image = {};
         }
         // Update the node with the selected values on success and run the callback
@@ -865,6 +988,7 @@
         newedgeconf.font.size = $("#edgetextsize").val();
         newedgeconf.font.color = $("#edgetextcolour").val();
         newedgeconf.label = $("#edgetextshow").prop('checked');
+        $("#map-saveDataButton").show();
     }
 
     function editEdge(edgedata, callback) {
@@ -988,156 +1112,11 @@
         network_nodes.remove(edgeid + "_mid");
         network_nodes.flush();
     }
-@endif
+@endif {{-- map_id > 0 --}}
+@endif {{-- map_id is not null --}}
+@endif {{-- edit mode --}}
 
-    function CreateNetwork() {
-        // Flush the nodes and edges so they are rendered immediately
-        network_nodes.flush();
-        network_edges.flush();
-
-        var container = document.getElementById('custom-map');
-        var options = {!! json_encode($map_conf) !!};
-
-@if($edit)
-        // Disable dragging of the view
-        options['manipulation']['addNode'] = function (data, callback) {
-                callback(null);
-                $("#nodeModalLabel").text("Add Node");
-                var node = structuredClone(newnodeconf);
-                node.id = "new" + newcount++;
-                node.label = "New Node";
-                node.x = data.x;
-                node.y = data.y;
-                node.add = true;
-                $(".single-node").show();
-                editNode(node, editNodeSave);
-            }
-        options['manipulation']['editNode'] = function (data, callback) {
-                callback(null);
-                $("#nodeModalLabel").text("Edit Node");
-                $(".single-node").show();
-                editNode(data, editNodeSave);
-            }
-        options['manipulation']['deleteNode'] = function (data, callback) {
-                callback(null);
-                $.each( data.edges, function( edge_idx, edgeid ) {
-                    edgeid = edgeid.split("_")[0];
-                    deleteEdge(edgeid);
-                });
-                $.each( data.nodes, function( node_idx, nodeid ) {
-                    network_nodes.remove(nodeid);
-                    network_nodes.flush();
-                });
-            }
-        options['manipulation']['addEdge'] = function (data, callback) {
-                // Because we deal with multiple edges, do not use the default callback
-                callback(null);
-
-                // Do not allow linking to the same node
-                if(data.to == data.from) {
-                    return;
-                }
-                // Do not allow linking to the mid point nodes
-                if(isNaN(data.to) && data.to.endsWith("_mid")) {
-                    return;
-                }
-                if(isNaN(data.from) && data.from.endsWith("_mid")) {
-                    return;
-                }
-
-                var pos = network.getPositions([data.from, data.to]);
-                var mid_x = (pos[data.from].x + pos[data.to].x) >> 1;
-                var mid_y = (pos[data.from].y + pos[data.to].y) >> 1;
-
-                var edgeid = "new" + newcount++;
-
-                var mid = {id: edgeid + "_mid", shape: "dot", size: 3, x: mid_x, y: mid_y};
-
-                var edge1 = structuredClone(newedgeconf);
-                edge1.id = edgeid + "_from";
-                edge1.from = data.from;
-                edge1.to = edgeid + "_mid";
-
-                var edge2 = structuredClone(newedgeconf);
-                edge2.id = edgeid + "_to";
-                edge2.from = data.to;
-                edge2.to = edgeid + "_mid";
-
-                // TODO: Look up xdp relationships and pre-select port if relationship exists
-
-                var edgedata = {id: edgeid, mid: mid, edge1: edge1, edge2: edge2, add: true}
-
-                $("#edgeModalLabel").text("Add Edge");
-                editEdge(edgedata, editEdgeSave);
-            }
-        options['manipulation']['editEdge'] = { editWithoutDrag: editExistingEdge };
-        options['manipulation']['deleteEdge'] = function (data, callback) {
-            callback(null);
-            $.each( data.edges, function( edge_idx, edgeid ) {
-                edgeid = edgeid.split("_")[0];
-                deleteEdge(edgeid);
-            });
-        };
-@endif
-
-        network = new vis.Network(container, {nodes: network_nodes, edges: network_edges, stabilize: true}, options);
-        network_height = $($(container).children(".vis-network")[0]).height();
-        network_width = $($(container).children(".vis-network")[0]).width();
-        var centreY = parseInt(network_height / 2);
-        var centreX = parseInt(network_width / 2);
-
-        network.moveTo({position: {x: centreX, y: centreY}, scale: 1});
-
-        if(bgimage) {
-            canvas = $("#custom-map").children()[0].canvas;
-            $(canvas).css('background-image','url({{ route('maps.custom.background', ['map_id' => $map_id]) }})').css('background-size', 'cover');
-        }
-
-        // Workaround for top-left close icon because the vis.js images have not been copied
-        $(".vis-close").addClass("fa fa-xmark");
-
-
-@if(!$edit)
-        network.on('doubleClick', function (properties) {
-            if (properties.nodes > 0) {
-                window.location.href = "device/device="+properties.nodes+"/"
-            }
-        });
-@else
-        network.on('dragEnd', function (data) {
-            if(data.edges.length > 0 || data.nodes.length > 0) {
-                // Make sure a node is not dragged outside the canvas
-                nodepos = network.getPositions(data.nodes);
-                $.each( nodepos, function( nodeid, node ) {
-                    move = false;
-                    if ( node.x < {{ $hmargin }} ) {
-                        node.x = {{ $hmargin }};
-                        move = true;
-                    } else if ( node.x > network_width - {{ $hmargin }} ) {
-                        node.x = network_width - {{ $hmargin }};
-                        move = true;
-                    }
-                    if ( node.y < {{ $vmargin }} ) {
-                        node.y = {{ $vmargin }};
-                        move = true;
-                    } else if ( node.y > network_height - {{ $vmargin }} ) {
-                        node.y = network_height - {{ $vmargin }};
-                        move = true;
-                    }
-                    if ( move ) {
-                        network.moveNode(nodeid, node.x, node.y);
-                    }
-                    node.id = nodeid;
-                    network_nodes.update(node);
-                });
-                $("#map-saveDataButton").show();
-                $("#map-renderButton").show();
-            }
-        });
-        $("#map-renderButton").hide();
-@endif
-    }
-
+@if($map_id > 0)
     function refreshMap() {
 //TODO: Load map nodes and edges
 //        var highlight = $("#highlight_node").val();
@@ -1223,8 +1202,7 @@
         };
 
         Countdown.Start();
-@endif
-
+@else {{-- edit mode and map id > 0 --}}
         var devices = new Bloodhound({
             datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
             queryTokenizer: Bloodhound.tokenizers.whitespace,
@@ -1329,9 +1307,10 @@
                 }
             });
 
+@endif {{-- edit mode --}}
         refreshMap();
     });
-@endif
+@endif {{-- map_id > 0 --}}
 </script>
 @endsection
 

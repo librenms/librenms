@@ -161,11 +161,18 @@ class CustomMapController extends Controller
             return response('Insufficient privileges');
         }
 
-        if($request->map_id == 0) {
-            $newedge_conf = $this->default_edge_conf;
-            $newnode_conf = $this->default_node_conf;
-            $name = 'New Map';
-            $map_conf = [
+        $data = [
+            'map_id' => $request->map_id,
+            'edit' => true,
+            'vmargin' => 20,
+            'hmargin' => 20,
+        ];
+
+        if(is_null($request->map_id)) {
+            $data['maps'] = CustomMap::orderBy('name')->get(['custom_map_id','name']);
+        } elseif($request->map_id == 0) {
+            $data['name'] = 'New Map';
+            $data['map_conf'] = [
                 'height' => "800px",
                 'width' => "1800px",
                 'interaction' => [
@@ -181,35 +188,51 @@ class CustomMapController extends Controller
                     'enabled' => false,
                 ],
             ];
-            $background = null;
+            $data['background'] = null;
         } else {
             $map = CustomMap::find($request->map_id);
-            $name = $map->name;
-            $newedge_conf = $map->newedgeconfig;
-            $newnode_conf = $map->newnodeconfig;
-            $map_conf = $map->options;
-            $map_conf['width'] = $map->width;
-            $map_conf['height'] = $map->height;
-            $background = $this->checkImageCache($map);
+            if(! $map) {
+                abort(404);
+            }
+            $data['name'] = $map->name;
+            $data['newedge_conf'] = $map->newedgeconfig;
+            $data['newnode_conf'] = $map->newnodeconfig;
+            $data['map_conf'] = $map->options;
+            $data['map_conf']['width'] = $map->width;
+            $data['map_conf']['height'] = $map->height;
+            // Override some settings for the editor
+            $data['map_conf']['interaction'] = ['dragNodes' => true, 'dragView' => false, 'zoomView' => false];
+            $data['map_conf']['manipulation'] = ['enabled' => true, 'initiallyActive' => true];
+            $data['map_conf']['physics'] = ['enabled' => false];
+            $data['background'] = $this->checkImageCache($map);
         }
-
-        $data = [
-            'edit' => true,
-            'map_id' => $request->map_id,
-            'name' => $name,
-            'background' => $background,
-            'page_refresh' => Config::get('page_refresh', 300),
-            'map_conf' => $map_conf,
-            'newedge_conf' => $newedge_conf,
-            'newnode_conf' => $newnode_conf,
-            'vmargin' => 20,
-            'hmargin' => 20,
-        ];
 
         return view('map.custom', $data);
     }
 
     public function save(Request $request)
+    {
+        $errors = [];
+
+        $newnodeconf = json_decode($request->post('newnodeconf'));
+        $newedgeconf = json_decode($request->post('newedgeconf'));
+
+        $map = CustomMap::find($request->map_id);
+        if(!$map) {
+            abort(404);
+        }
+
+        if (! $errors) {
+            //TODO: set new node and edge configs
+            //TODO: add new nodes and update existing
+            //TODO: add new edges and update existing
+            //TODO: delete missing nodes
+            //TODO: delete missing edges
+        }
+        return response()->json(['id' => $map_id, 'errors' => $errors]);
+    }
+
+    public function saveSettings(Request $request)
     {
         $errors = [];
 
@@ -219,8 +242,6 @@ class CustomMapController extends Controller
         $height = $request->post('height');
         $bgclear = $request->post('bgclear') == 'true' ? true : false;
         $bgnewimage = $request->post('bgimage');
-        $newnodeconf = json_decode($request->post('newnodeconf'));
-        $newedgeconf = json_decode($request->post('newedgeconf'));
 
 
         if (! preg_match('/^(\d+)(px|%)$/', $width, $matches)) {
@@ -252,6 +273,8 @@ class CustomMapController extends Controller
             if (! $map_id) {
                 $map = new CustomMap;
                 $map->options = $this->default_map_options;
+                $map->newnodeconfig = $this->default_node_conf;
+                $map->newedgeconfig = $this->default_edge_conf;
                 $map->background_version = 0;
             } else {
                 $map = CustomMap::find($map_id);
@@ -260,8 +283,6 @@ class CustomMapController extends Controller
             $map->name = $name;
             $map->width = $width;
             $map->height = $height;
-            $map->newnodeconfig = $newnodeconf;
-            $map->newedgeconfig = $newedgeconf;
             $map->save();
             if (! $map_id) {
                 $map_id = $map->custom_map_id;

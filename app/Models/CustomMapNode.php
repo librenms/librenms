@@ -60,11 +60,6 @@ class CustomMapNode extends BaseModel
         return $this->hasOne(Device::class, 'device_id');
     }
 
-    public function edges(): \Illuminate\Support\Collection
-    {
-        return $this->edges1->merge($this->edges2);
-    }
-
     public function edges1(): HasMany
     {
         return $this->hasMany(CustomMapEdge::class, 'custom_map_node_id1');
