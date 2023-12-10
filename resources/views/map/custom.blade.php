@@ -329,7 +329,7 @@
       <select id="show_group" class="page-availability-report-select" name="show_group" onchange="selectMap(this)">
         <option value="-1" selected>Select map to edit</option>
         <option value="0">Create New Map</option>
-<!-- TODO: Fill in maps -->
+<!-- TODO: Fill in available maps -->
       </select>
     </div>
 @else
@@ -474,13 +474,8 @@
         var name = $("#mapname").val();
         var width = $("#mapwidth").val();
         var height = $("#mapheight").val();
-@if($map_id)
         var clearbackground = $('#mapBackgroundClearVal').val() ? true : false;
         var newbackground = $('#mapBackgroundSelect').prop('files').length ? $('#mapBackgroundSelect').prop('files')[0] : '';
-@else
-        var clearbackground = false;
-        var newbackground = '';
-@endif
 
         if(!isNaN(width)) {
             width = width + "px";
@@ -495,6 +490,7 @@
         fd.append('height', height);
         fd.append('bgclear', clearbackground);
         fd.append('bgimage', newbackground);
+        // TODO: Move these to the main save page
         fd.append('newnodeconf', JSON.stringify(newnodeconf));
         fd.append('newedgeconf', JSON.stringify(newedgeconf));
 
@@ -517,7 +513,7 @@
 
                     canvas = $("#custom-map").children()[0].canvas;
                     if(data['bgimage']) {
-                        $(canvas).css('background-image','url(images/custommap/' + data['bgimage'] + ')').css('background-size', 'cover');
+                        $(canvas).css('background-image','url({{ route('maps.custom.background', ['map_id' => $map_id]) }})').css('background-size', 'cover');
                         bgimage = data['bgimage'];
                     } else {
                         $(canvas).css('background-image','');
@@ -1067,6 +1063,8 @@
                 edge2.from = data.to;
                 edge2.to = edgeid + "_mid";
 
+                // TODO: Look up xdp relationships and pre-select port if relationship exists
+
                 var edgedata = {id: edgeid, mid: mid, edge1: edge1, edge2: edge2, add: true}
 
                 $("#edgeModalLabel").text("Add Edge");
@@ -1092,7 +1090,7 @@
 
         if(bgimage) {
             canvas = $("#custom-map").children()[0].canvas;
-            $(canvas).css('background-image','url(images/custommap/' + bgimage + ')').css('background-size', 'cover');
+            $(canvas).css('background-image','url({{ route('maps.custom.background', ['map_id' => $map_id]) }})').css('background-size', 'cover');
         }
 
         // Workaround for top-left close icon because the vis.js images have not been copied
@@ -1141,6 +1139,7 @@
     }
 
     function refreshMap() {
+//TODO: Load map nodes and edges
 //        var highlight = $("#highlight_node").val();
 //        var showpath = $("#showparentdevicepath")[0].checked ? 1 : 0;
 //
@@ -1195,13 +1194,14 @@
 //                }
 //            });
 
-        // Initialise map.
+        // Initialise map if it does not exist
         if (! network) {
             CreateNetwork();
         }
     }
 
     $(document).ready(function () {
+@if(! $edit)
         Countdown = {
             sec: {{$page_refresh}},
 
@@ -1223,6 +1223,7 @@
         };
 
         Countdown.Start();
+@endif
 
         var devices = new Bloodhound({
             datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
