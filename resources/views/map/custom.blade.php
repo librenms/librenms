@@ -320,7 +320,7 @@
     </div>
   </div>
 </div>
-@endif
+@endif {{-- Edit mode with map_id not null --}}
 
 <div class="container-fluid">
 
@@ -353,7 +353,8 @@
       <button type=button value="mapsave" id="map-saveDataButton" class="btn btn-primary" style="display: none" onclick="saveMapData();">Save Map</button>
     </div>
   </div>
-@else
+@endif {{-- edit mode with map_id not null --}}
+@if(! is_null($map_id))
   <div class="row" id="alert-row">
     <div class="col-md-12">
       <div class="alert alert-warning" role="alert" id="alert">Loading data</div>
@@ -585,7 +586,7 @@
     }
 
     function saveMapSettings() {
-        $("#savemap").attr('disabled','disabled');
+        $("#map-saveButton").attr('disabled','disabled');
         $("#savemap-alert").text('Saving...');
         $("#savemap-alert").attr("class", "col-sm-12 alert alert-info");
 
@@ -646,7 +647,7 @@
                 $("#savemap-alert").attr("class", "col-sm-12 alert alert-danger");
             },
             complete: function( resp, status, error ) {
-                $("#savemap").removeAttr('disabled');
+                $("#map-saveButton").removeAttr('disabled');
             },
         });
     }
@@ -679,12 +680,38 @@
     }
 
     function saveMapData() {
+        $("#map-saveDataButton").attr('disabled', 'disabled');
         // TODO: Read in all nodes and edges, convert to JSON and post.  On success hide save button.
         // TODO: Move these to the main save page
         var fd = new FormData();
         fd.append('newnodeconf', JSON.stringify(newnodeconf));
         fd.append('newedgeconf', JSON.stringify(newedgeconf));
-        $("#map-saveDataButton").hide();
+
+        $.ajax({
+            url: '{{ route('maps.custom.save', ['map_id' => $map_id]) }}',
+            data: fd,
+            processData: false,
+            contentType: false,
+            type: 'POST',
+            success: function( data, status, resp ) {
+                if(data['errors'].length) {
+                    $("#alert").html("Save failed due to the following errors:<br />" + data['errors'].join("<br />"));
+                    $("#alert").attr("class", "col-sm-12 alert alert-danger");
+                    $("#alert-row").show();
+                } else {
+                    $("#map-saveDataButton").hide();
+                    $("#alert-row").hide();
+                }
+            },
+            error: function( resp, status, error ) {
+                $("#alert").text("Save failed.  Server returned error response code: " + resp.status);
+                $("#alert").attr("class", "col-sm-12 alert alert-danger");
+                $("#alert-row").show();
+            },
+            complete: function( resp, status, error ) {
+                $("#map-saveDataButton").removeAttr('disabled');
+            },
+        });
     }
 
     function nodeStyleChange() {
@@ -926,7 +953,7 @@
         }
         if(edge_id in edge_port_map) {
             $("#port_id").val(edge_port_map[edge_id].port_id);
-            $("#port_name").val(edge_port_map[edge_id].port_name);
+            $("#port_name").text(edge_port_map[edge_id].port_name);
             $("#portreverse").bootstrapSwitch('state', edge_port_map[edge_id].reverse);
             $("#edgePortRow").show();
             $("#edgePortReverseRow").show();
@@ -1039,10 +1066,11 @@
         edgedata.edge1.font.size = edgedata.edge2.font.size = $("#edgetextsize").val();
         edgedata.edge1.font.color = edgedata.edge2.font.color = $("#edgetextcolour").val();
         edgedata.edge1.label = edgedata.edge2.label = $("#edgetextshow").prop('checked') ? "xx%" : null;
+        edgedata.edge1.title = edgedata.edge2.title = $("#port_id").val();
 
         if(edgedata.id) {
             if($("#port_id").val()) {
-                edge_port_map[edgedata.id] = {port_id: $("#port_id").val(), port_name: $("#port_name").val(), reverse: $("#portreverse")[0].checked}
+                edge_port_map[edgedata.id] = {port_id: $("#port_id").val(), port_name: $("#port_name").text(), reverse: $("#portreverse")[0].checked}
             } else {
                 delete edge_port_map[edgedata.id];
             }

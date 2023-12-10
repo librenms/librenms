@@ -32,11 +32,12 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 class CustomMapNode extends BaseModel
 {
     protected $primaryKey = 'custom_map_node_id';
-    protected $fillable = ['device_id','label','style','icon','size','textface','textsize','textcolour','colourbg','colourbdr'];
+    protected $fillable = ['device_id','label','style','icon','size','border_width','text_face','text_size','text_colour','colour_bg','colour_bdr'];
     protected $casts = [
-        'device_id' => 'int',
-        'size' => 'int',
-        'textsize' => 'int',
+        'device_id'    => 'int',
+        'border_width' => 'int',
+        'size'         => 'int',
+        'textsize'     => 'int',
     ];
     public $timestamps = false;
 

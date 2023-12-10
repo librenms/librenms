@@ -19,11 +19,12 @@ return new class extends Migration
             $table->string('style', 50);
             $table->string('icon', 8)->nullable();
             $table->integer('size');
-            $table->string('textface', 50);
-            $table->integer('textsize');
-            $table->string('textcolour', 10);
-            $table->string('colourbg', 10);
-            $table->string('colourbdr', 10);
+            $table->integer('border_width');
+            $table->string('text_face', 50);
+            $table->integer('text_size');
+            $table->string('text_colour', 10);
+            $table->string('colour_bg', 10)->nullable();
+            $table->string('colour_bdr', 10)->nullable();
             $table->foreign('device_id')->references('device_id')->on('devices')->onDelete('set null');
             $table->foreign('custom_map_id')->references('custom_map_id')->on('custom_maps')->onDelete('cascade');
         });
