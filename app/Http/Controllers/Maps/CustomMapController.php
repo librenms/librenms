@@ -575,14 +575,34 @@ class CustomMapController extends Controller
 
         $errors = [];
 
+        $newnodeconf = json_decode($request->post('newnodeconf'));
+        $newedgeconf = json_decode($request->post('newedgeconf'));
+
+        $map = CustomMap::find($request->map_id);
+        if(!$map) {
+            abort(404);
+        }
+
+        if (! $errors) {
+            //TODO: set new node and edge configs
+            //TODO: add new nodes and update existing
+            //TODO: add new edges and update existing
+            //TODO: delete missing nodes
+            //TODO: delete missing edges
+        }
+        return response()->json(['id' => $map_id, 'errors' => $errors]);
+    }
+
+    public function saveSettings(Request $request)
+    {
+        $errors = [];
+
         $map_id = $request->map_id;
         $name = $request->post('name');
         $width = $request->post('width');
         $height = $request->post('height');
         $bgclear = $request->post('bgclear') == 'true' ? true : false;
         $bgnewimage = $request->post('bgimage');
-        $newnodeconf = json_decode($request->post('newnodeconf'));
-        $newedgeconf = json_decode($request->post('newedgeconf'));
 
 
         if (! preg_match('/^(\d+)(px|%)$/', $width, $matches)) {
