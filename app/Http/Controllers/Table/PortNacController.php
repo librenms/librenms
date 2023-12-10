@@ -25,16 +25,22 @@
 
 namespace App\Http\Controllers\Table;
 
+use App\Models\Port;
 use App\Models\PortsNac;
 use LibreNMS\Util\Mac;
 use LibreNMS\Util\Url;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 
 class PortNacController extends TableController
 {
     public function rules()
     {
         return [
-            'device_id' => 'int',
+            'device_id' => 'nullable|integer',
+            'searchby' => 'in:mac,vlan,ip,port,description,first_seen,last_seen,vendor',
         ];
     }
 
@@ -81,6 +87,47 @@ class PortNacController extends TableController
     }
 
     /**
+     * @param  string  $search
+     * @param  Builder  $query
+     * @param  array  $fields
+     * @return Builder|\Illuminate\Database\Query\Builder
+     */
+    protected function search($search, $query, $fields = [])
+    {
+        if ($search = trim(\Request::get('searchPhrase') ?? '')) {
+            $mac_search = '%' . str_replace([':', ' ', '-', '.', '0x'], '', $search) . '%';
+
+            switch (\Request::get('searchby') ?? '') {
+                case 'mac':
+                    return $query->where('ports_nac.mac_address', 'like', $search);
+                case 'vlan':
+                    return $query->whereIntegerInRaw('ports_nac.vlan', $this->findVlans($search));
+                case 'ip':
+                    return $query->whereIn('ports_nac.ip_address', $search);
+                case 'description':
+                    return $query->whereIntegerInRaw('ports_nac.port_id', $this->findPorts($search));
+                case 'vendor':
+                    $vendor_ouis = $this->ouisFromVendor($search);
+
+                    return $this->findPortsByOui($vendor_ouis, $query);
+                default:
+                    return $query->where(function ($query) use ($search, $mac_search) {
+                        $vendor_ouis = $this->ouisFromVendor($search);
+                        
+                        $this->findPortsByOui($vendor_ouis, $query)
+                            ->orWhereIntegerInRaw('ports_nac.port_id', $this->findPorts($search))
+                            ->orWhere('ports_nac.vlan', 'like', '%' . $search . '%')
+                            ->orWhere('ports_nac.mac_address', 'like', $mac_search)
+                            ->orWhere('ports_nac.username', 'like', '%' . $search . '%')
+                            ;
+                    });
+            }
+        }
+
+        return $query;
+    }
+
+    /**
      * @param  PortsNac  $nac
      */
     public function formatItem($nac)
@@ -94,5 +141,52 @@ class PortNacController extends TableController
         $item['device_id'] = Url::deviceLink($nac->device);
 
         return $item;
+    }
+
+    /**
+     * @param  string  $ifAlias
+     * @return Collection
+     */
+    protected function findPorts($ifAlias): Collection
+    {
+        $port_id = \Request::get('port_id');
+        $device_id = \Request::get('device_id');
+
+        return Port::where('ifAlias', 'like', "%$ifAlias%")
+            ->when($device_id, function ($query) use ($device_id) {
+                return $query->where('device_id', $device_id);
+            })
+            ->when($port_id, function ($query) use ($port_id) {
+                return $query->where('port_id', $port_id);
+            })
+            ->pluck('port_id');
+    }
+
+    /**
+     * Get the OUI list for a specific vendor
+     *
+     * @param  string  $vendor
+     * @return array
+     */
+    protected function ouisFromVendor(string $vendor): array
+    {
+        return DB::table('vendor_ouis')
+            ->where('vendor', 'LIKE', '%' . $vendor . '%')
+            ->pluck('oui')
+            ->toArray();
+    }
+
+    /**
+     * Get all port ids from vendor OUIs
+     */
+    protected function findPortsByOui(array $vendor_ouis, Builder $query): Builder
+    {
+        $query->where(function (Builder $query) use ($vendor_ouis) {
+            foreach ($vendor_ouis as $oui) {
+                $query->orWhere('ports_nac.mac_address', 'LIKE', "$oui%");
+            }
+        });
+
+        return $query; // Return the query builder instance
     }
 }
