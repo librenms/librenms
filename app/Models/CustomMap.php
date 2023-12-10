@@ -25,6 +25,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
@@ -39,6 +40,25 @@ class CustomMap extends BaseModel
         'newedgeconfig'       => 'json',
     ];
     public $timestamps = false;
+
+    public function scopeHasAccess($query, User $user)
+    {
+        if ($user->hasGlobalRead()) {
+            return $query;
+        }
+
+        // Allow only if the user has access to all devices on the map
+        return $query->withCount([
+                'nodes as device_nodes_count' => function(Builder $q) use ($user) {
+                    $q->whereNotNull('device_id');
+                },
+                'nodes as device_nodes_allowed_count' => function(Builder $q) use ($user) {
+                    $this->hasDeviceAccess($q, $user, 'custom_map_nodes');
+                },
+            ])
+            ->having('device_nodes_count', '=', 'device_nodes_allowed_count')
+            ->having('device_nodes_count', '>', 0);
+    }
 
     public function nodes(): HasMany
     {

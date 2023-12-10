@@ -40,6 +40,16 @@ class CustomMapNode extends BaseModel
     ];
     public $timestamps = false;
 
+    public function scopeHasAccess($query, User $user)
+    {
+        if ($user->hasGlobalRead()) {
+            return $query;
+        }
+
+        // Allow only if the user has access to the node
+        return $this->hasDeviceAccess($query, $user);
+    }
+
     public function map(): BelongsTo
     {
         return $this->belongsTo(CustomMap::class, 'custom_map_id');

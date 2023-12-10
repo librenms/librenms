@@ -103,11 +103,64 @@ class CustomMapController extends Controller
         return $imageName;
     }
 
+    public function background(Request $request)
+    {
+        $map = CustomMap::where('custom_map_id', '=', $request->map_id)
+            ->hasAccess($request->user())
+            ->first();
+
+        $background = $this->checkImageCache($map);
+        if($background) {
+            $path = Storage::disk('base')->path('html/images/custommap/') . $background;
+            $mime = Storage::mimeType($background);
+            $headers = [
+                'Content-Type' => $mime,
+            ];
+            return response()->file($path, $headers);
+        }
+        abort(404);
+    }
+
+    public function view(Request $request)
+    {
+        $map = CustomMap::where('custom_map_id', '=', $request->map_id)
+            ->hasAccess($request->user())
+            ->first();
+
+        if(!$map) {
+            abort(404);
+        }
+
+        $name = $map->name;
+        $newedge_conf = $map->newedgeconfig;
+        $newnode_conf = $map->newnodeconfig;
+        $map_conf = $map->options;
+        $map_conf['width'] = $map->width;
+        $map_conf['height'] = $map->height;
+        $background = $this->checkImageCache($map);
+
+        $data = [
+            'edit' => false,
+            'map_id' => $request->map_id,
+            'name' => $name,
+            'background' => $background,
+            'page_refresh' => Config::get('page_refresh', 300),
+            'map_conf' => $map_conf,
+            'newedge_conf' => $newedge_conf,
+            'newnode_conf' => $newnode_conf,
+            'vmargin' => 20,
+            'hmargin' => 20,
+        ];
+
+        return view('map.custom', $data);
+    }
+
     public function edit(Request $request)
     {
-        // TODO: Check if admin
+        if (! $request->user()->isAdmin()) {
+            return response('Insufficient privileges');
+        }
 
-        // TODO: Read config if ID > 0
         if($request->map_id == 0) {
             $newedge_conf = $this->default_edge_conf;
             $newnode_conf = $this->default_node_conf;
@@ -219,20 +272,21 @@ class CustomMapController extends Controller
                 if(!$map->background) {
                     $background = new CustomMapBackground;
                     $background->background_image = $request->bgimage->getContent();
-                    $map->background->save($background);
-                    $map->refresh();
+                    $map->background()->save($background);
                 } else {
                     $map->background->background_image = $request->bgimage->getContent();
                     $map->background->save();
                 }
                 $map->background_version++;
                 $map->save();
+                $map->refresh();
             } elseif ($bgclear) {
                 if($map->background) {
                     $map->background->delete();
                 }
                 $map->background_suffix = null;
                 $map->save();
+                $map->refresh();
             }
             $imageName = $this->checkImageCache($map);
         }
