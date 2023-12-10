@@ -114,11 +114,12 @@ class PortNacController extends TableController
                     return $query->where(function ($query) use ($search, $mac_search) {
                         $vendor_ouis = $this->ouisFromVendor($search);
                         
-                        $this->findPortsByOui($vendor_ouis, $query)
+                        $this->queryByOui($vendor_ouis, $query)
                             ->orWhereIntegerInRaw('ports_nac.port_id', $this->findPorts($search))
                             ->orWhere('ports_nac.vlan', 'like', '%' . $search . '%')
                             ->orWhere('ports_nac.mac_address', 'like', $mac_search)
                             ->orWhere('ports_nac.username', 'like', '%' . $search . '%')
+                            ->orWhere('ports_nac.ip_address', 'like', '%' . $search . '%')
                             ;
                     });
             }
@@ -177,9 +178,9 @@ class PortNacController extends TableController
     }
 
     /**
-     * Get all port ids from vendor OUIs
+     * filter $query from vendor OUIs
      */
-    protected function findPortsByOui(array $vendor_ouis, Builder $query): Builder
+    protected function queryByOui(array $vendor_ouis, Builder $query): Builder
     {
         $query->where(function (Builder $query) use ($vendor_ouis) {
             foreach ($vendor_ouis as $oui) {
