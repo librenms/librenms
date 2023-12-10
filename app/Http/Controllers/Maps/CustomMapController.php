@@ -584,13 +584,16 @@ class CustomMapController extends Controller
         }
 
         if (! $errors) {
-            //TODO: set new node and edge configs
+            $map->newedgeconfig = $newedgeconf;
+            $map->newnodeconfig = $newnodeconf;
+
             //TODO: add new nodes and update existing
             //TODO: add new edges and update existing
-            //TODO: delete missing nodes
             //TODO: delete missing edges
+            //TODO: delete missing nodes
+            $map->save();
         }
-        return response()->json(['id' => $map_id, 'errors' => $errors]);
+        return response()->json(['id' => $map->map_id, 'errors' => $errors]);
     }
 
     public function saveSettings(Request $request)
