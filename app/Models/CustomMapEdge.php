@@ -31,11 +31,13 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class CustomMapEdge extends BaseModel
 {
     protected $primaryKey = 'custom_map_edge_id';
-    protected $fillable = ['custom_map_id','custom_map_node1_id','custom_map_node2_id','style','showpct','textface','textsize','textcolour','mid_x','mid_y'];
+    protected $fillable = ['custom_map_id','custom_map_node1_id','custom_map_node2_id','port_id','style','reverse','showpct','text_face','text_size','text_colour','mid_x','mid_y'];
     protected $casts = [
         'custom_map_id'       => 'int',
         'custom_map_node1_id' => 'int',
         'custom_map_node2_id' => 'int',
+        'port_id'             => 'int',
+        'reverse'             => 'bool',
         'showpct'             => 'bool',
         'textsize'            => 'int',
         'mid_x'               => 'int',
@@ -48,14 +50,14 @@ class CustomMapEdge extends BaseModel
         return $this->belongsTo(CustomMap::class, 'custom_map_id');
     }
 
+    public function port(): HasOne
+    {
+        return $this->hasOne(Port::class, 'port_id');
+    }
+
     public function edges(): HasMany
     {
         return $this->hasMany(CustomMapEdge::class, 'custom_map_edge_id');
-    }
-
-    public function nodes(): \Illuminate\Support\Collection
-    {
-        return $this->node1->merge($this->node2);
     }
 
     public function node1(): BelongsTo

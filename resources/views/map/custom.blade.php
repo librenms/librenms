@@ -681,11 +681,29 @@
 
     function saveMapData() {
         $("#map-saveDataButton").attr('disabled', 'disabled');
-        // TODO: Read in all nodes and edges, convert to JSON and post.  On success hide save button.
-        // TODO: Move these to the main save page
+        var nodes = {};
+        var edges = {};
+
+        $.each(network_nodes.get(), function (node_idx, node) {
+            if(node.id.endsWith("_mid")) {
+                edgeid = node.id.split("_")[0];
+                edge1 = network_edges.get(edgeid + "_from");
+                edge2 = network_edges.get(edgeid + "_to");
+                edges[edgeid] = {id: edgeid, text_colour: edge1.font.color, text_size: edge1.font.size, text_face: edge1.font.face, from: edge1.from, to: edge2.from, showpct: (edge1.label ? true : false), port_id: edge1.title, style: edge1.smooth.type, mid_x: node.x, mid_y: node.y, reverse: (edgeid in edge_port_map ? edge_port_map[edgeid].reverse : false)};
+            } else {
+                if(node.icon.code) {
+                    node.icon = node.icon.code.charCodeAt(0).toString(16);
+                } else {
+                    node.icon = null;
+                }
+                nodes[node.id] = node;
+            }
+        });
         var fd = new FormData();
         fd.append('newnodeconf', JSON.stringify(newnodeconf));
         fd.append('newedgeconf', JSON.stringify(newedgeconf));
+        fd.append('nodes', JSON.stringify(nodes));
+        fd.append('edges', JSON.stringify(edges));
 
         $.ajax({
             url: '{{ route('maps.custom.save', ['map_id' => $map_id]) }}',

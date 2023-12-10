@@ -25,6 +25,8 @@ return new class extends Migration
             $table->string('text_colour', 10);
             $table->string('colour_bg', 10)->nullable();
             $table->string('colour_bdr', 10)->nullable();
+            $table->integer('x_pos');
+            $table->integer('y_pos');
             $table->foreign('device_id')->references('device_id')->on('devices')->onDelete('set null');
             $table->foreign('custom_map_id')->references('custom_map_id')->on('custom_maps')->onDelete('cascade');
         });

@@ -32,7 +32,6 @@ use App\Models\CustomMapEdge;
 use App\Models\CustomMapNode;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use LibreNMS\Config;
 use LibreNMS\Util\Url;
@@ -89,9 +88,6 @@ class CustomMapController extends Controller
 
     private function checkImageCache(CustomMap $map)
     {
-        if(! $map->custom_map_id) {
-           return null;
-        }
         if(! $map->background_suffix) {
            return null;
         }
@@ -120,6 +116,8 @@ class CustomMapController extends Controller
         }
         abort(404);
     }
+
+    //TODO: Add fetch for map data
 
     public function view(Request $request)
     {
@@ -214,25 +212,87 @@ class CustomMapController extends Controller
     {
         $errors = [];
 
-        $newnodeconf = json_decode($request->post('newnodeconf'));
-        $newedgeconf = json_decode($request->post('newedgeconf'));
-
-        $map = CustomMap::find($request->map_id);
+        $map = CustomMap::where('custom_map_id', '=', $request->map_id)->with('nodes', 'edges')->first();
         if(!$map) {
             abort(404);
         }
 
         if (! $errors) {
-            $map->newedgeconfig = $newedgeconf;
-            $map->newnodeconfig = $newnodeconf;
+            DB::transaction(function() use ($map, $request) {
+                $nodesProcessed = [];
+                $edgesProcessed = [];
 
-            //TODO: add new nodes and update existing
-            //TODO: add new edges and update existing
-            //TODO: delete missing edges
-            //TODO: delete missing nodes
-            $map->save();
+                $newNodes = [];
+
+                $newnodeconf = json_decode($request->post('newnodeconf'));
+                $newedgeconf = json_decode($request->post('newedgeconf'));
+                $nodes = json_decode($request->nodes);
+                $edges = json_decode($request->edges);
+
+                $map->newedgeconfig = $newedgeconf;
+                $map->newnodeconfig = $newnodeconf;
+                $map->save();
+
+                foreach ($nodes as $nodeid => $node) {
+                    if (strpos($nodeid, 'new') == 0) {
+                        $dbnode = new CustomMapNode;
+                        $dbnode->map()->associate($map);
+                    } else {
+                        $dbnode = $map->nodes[$nodeid];
+                    }
+                    $dbnode->device_id = $node->title ? $node->title : null;
+                    $dbnode->label = $node->label;
+                    $dbnode->style = $node->shape;
+                    $dbnode->icon = $node->icon;
+                    $dbnode->size = $node->size;
+                    $dbnode->text_face = $node->font->face;
+                    $dbnode->text_size = $node->font->size;
+                    $dbnode->text_colour = $node->font->color;
+                    $dbnode->colour_bg = (array)$node->color ? $node->color->background : null;
+                    $dbnode->colour_bdr = (array)$node->color ? $node->color->border : null;
+                    $dbnode->border_width = $node->borderWidth;
+                    $dbnode->x_pos = intval($node->x);
+                    $dbnode->y_pos = intval($node->y);
+
+                    $dbnode->save();
+                    $nodesProcessed[$dbnode->custom_map_node_id] = true;
+                    $newNodes[$nodeid] = $dbnode;
+                }
+                foreach ($edges as $edgeid => $edge) {
+                    if (strpos($edgeid, 'new') == 0) {
+                        $dbedge = new CustomMapEdge;
+                        $dbedge->map()->associate($map);
+                    } else {
+                        $dbedge = $map->edges[$edgeid];
+                    }
+                    $dbedge->custom_map_node1_id = strpos($edge->from, "new") == 0 ? $newNodes[$edge->from]->custom_map_node_id : $edge->from;
+                    $dbedge->custom_map_node2_id = strpos($edge->to, "new") == 0 ? $newNodes[$edge->to]->custom_map_node_id : $edge->to;
+                    $dbedge->port_id = $edge->port_id ? $edge->port_id : null;
+                    $dbedge->reverse= $edge->reverse;
+                    $dbedge->showpct = $edge->showpct;
+                    $dbedge->style = $edge->style;
+                    $dbedge->text_face = $edge->text_face;
+                    $dbedge->text_size = $edge->text_size;
+                    $dbedge->text_colour = $edge->text_colour;
+                    $dbedge->mid_x = intval($edge->mid_x);
+                    $dbedge->mid_y = intval($edge->mid_y);
+
+                    $dbedge->save();
+                    $edgeProcessed[$dbedge->custom_map_edge_id] = true;
+                }
+                foreach ($map->edges as $edge) {
+                    if (! array_key_exists($edge->custom_map_edge_id, $edgesProcessed)) {
+                        $edge->delete();
+                    }
+                }
+                foreach ($map->nodes as $node) {
+                    if (! array_key_exists($node->custom_map_node_id, $nodesProcessed)) {
+                        $node->delete();
+                    }
+                }
+            });
         }
-        return response()->json(['id' => $map->map_id, 'errors' => $errors]);
+        return response()->json(['id' => $map->custom_map_id, 'errors' => $errors]);
     }
 
     public function saveSettings(Request $request)

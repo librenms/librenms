@@ -17,11 +17,12 @@ return new class extends Migration
             $table->integer('custom_map_node1_id')->unsigned()->index();
             $table->integer('custom_map_node2_id')->unsigned()->index();
             $table->integer('port_id')->unsigned()->nullable()->index();
+            $table->boolean('reverse');
             $table->string('style', 50);
             $table->boolean('showpct');
-            $table->string('textface', 50);
-            $table->integer('textsize');
-            $table->string('textcolour', 10);
+            $table->string('text_face', 50);
+            $table->integer('text_size');
+            $table->string('text_colour', 10);
             $table->integer('mid_x');
             $table->integer('mid_y');
             $table->foreign('custom_map_id')->references('custom_map_id')->on('custom_maps')->onDelete('cascade');
