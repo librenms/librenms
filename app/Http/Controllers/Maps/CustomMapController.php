@@ -32,6 +32,7 @@ use App\Models\CustomMapEdge;
 use App\Models\CustomMapNode;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use LibreNMS\Config;
 use LibreNMS\Util\Url;
@@ -575,12 +576,15 @@ class CustomMapController extends Controller
         $errors = [];
 
         $map = CustomMap::where('custom_map_id', '=', $request->map_id)->with('nodes', 'edges')->first();
-        if(!$map) {
+        if (!$map) {
             abort(404);
         }
 
         if (! $errors) {
             DB::transaction(function() use ($map, $request) {
+                $dbnodes = $map->nodes->keyBy('custom_map_node_id')->all();
+                $dbedges = $map->edges->keyBy('custom_map_edge_id')->all();
+
                 $nodesProcessed = [];
                 $edgesProcessed = [];
 
@@ -596,11 +600,15 @@ class CustomMapController extends Controller
                 $map->save();
 
                 foreach ($nodes as $nodeid => $node) {
-                    if (strpos($nodeid, 'new') == 0) {
+                    if (strpos($nodeid, 'new') === 0) {
                         $dbnode = new CustomMapNode;
                         $dbnode->map()->associate($map);
                     } else {
-                        $dbnode = $map->nodes[$nodeid];
+                        $dbnode = $dbnodes[$nodeid];
+                        if (!$dbnode) {
+                            Log::error("Could not find existing node for node id " . $nodeid);
+                            abort(404);
+                        }
                     }
                     $dbnode->device_id = $node->title ? $node->title : null;
                     $dbnode->label = $node->label;
@@ -621,11 +629,16 @@ class CustomMapController extends Controller
                     $newNodes[$nodeid] = $dbnode;
                 }
                 foreach ($edges as $edgeid => $edge) {
-                    if (strpos($edgeid, 'new') == 0) {
+                    Log::error("Processing " . $edgeid);
+                    if (strpos($edgeid, 'new') === 0) {
                         $dbedge = new CustomMapEdge;
                         $dbedge->map()->associate($map);
                     } else {
-                        $dbedge = $map->edges[$edgeid];
+                        $dbedge = $dbedges[$edgeid];
+                        if (!$dbedge) {
+                            Log::error("Could not find existing edge for edge id " . $edgeid);
+                            abort(404);
+                        }
                     }
                     $dbedge->custom_map_node1_id = strpos($edge->from, "new") == 0 ? $newNodes[$edge->from]->custom_map_node_id : $edge->from;
                     $dbedge->custom_map_node2_id = strpos($edge->to, "new") == 0 ? $newNodes[$edge->to]->custom_map_node_id : $edge->to;
@@ -640,7 +653,7 @@ class CustomMapController extends Controller
                     $dbedge->mid_y = intval($edge->mid_y);
 
                     $dbedge->save();
-                    $edgeProcessed[$dbedge->custom_map_edge_id] = true;
+                    $edgesProcessed[$dbedge->custom_map_edge_id] = true;
                 }
                 foreach ($map->edges as $edge) {
                     if (! array_key_exists($edge->custom_map_edge_id, $edgesProcessed)) {
@@ -659,6 +672,10 @@ class CustomMapController extends Controller
 
     public function saveSettings(Request $request)
     {
+        if (! $request->user()->isAdmin()) {
+            return response('Insufficient privileges');
+        }
+
         $errors = [];
 
         $map_id = $request->map_id;
@@ -667,7 +684,6 @@ class CustomMapController extends Controller
         $height = $request->post('height');
         $bgclear = $request->post('bgclear') == 'true' ? true : false;
         $bgnewimage = $request->post('bgimage');
-
 
         if (! preg_match('/^(\d+)(px|%)$/', $width, $matches)) {
             array_push($errors, 'Width must be a number followed by px or %');
@@ -738,5 +754,5 @@ class CustomMapController extends Controller
         }
 
         return response()->json(['id' => $map_id, 'bgimage' => $background, 'errors' => $errors]);
-   }
+    }
 }

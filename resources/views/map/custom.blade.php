@@ -258,7 +258,6 @@
   </div>
 </div>
 
-
 <button type="button" id="mapModalPopup" class="btn btn-primary" data-toggle="modal" data-target="#mapModal" style="display:none">Hidden</button>
 <div class="modal fade" id="mapModal" tabindex="-1" role="dialog" aria-labelledby="mapModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
@@ -320,6 +319,23 @@
     </div>
   </div>
 </div>
+
+<button type="button" id="mapDeleteModalPopup" class="btn btn-primary" data-toggle="modal" data-target="#mapDeleteModal" style="display:none">Hidden</button>
+<div class="modal fade" id="mapDeleteModal" tabindex="-1" role="dialog" aria-labelledby="mapDeleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="mapDeleteModalLabel">Delete Map</h5>
+      </div>
+      <div class="modal-footer">
+        <center>
+          <button type=button value="delete" id="map-deleteConfirmButton" class="btn btn-danger" onclick="deleteMap()">Delete</button>
+          <button type=button value="cancel" id="map-deleteCancelButton" class="btn btn-primary" onclick="$('#mapDeleteModal').modal('hide');">Cancel</button>
+        </center>
+      </div>
+    </div>
+  </div>
+</div>
 @endif {{-- Edit mode with map_id not null --}}
 
 <div class="container-fluid">
@@ -351,6 +367,7 @@
     <div class="col-md-5 text-right">
       <button type=button value="maprender" id="map-renderButton" class="btn btn-primary" style="display: none" onclick="CreateNetwork();">Re-Render Map</button>
       <button type=button value="mapsave" id="map-saveDataButton" class="btn btn-primary" style="display: none" onclick="saveMapData();">Save Map</button>
+      <button type=button value="mapdelete" id="map-deleteButton" class="btn btn-danger" onclick="$('#mapDeleteModal').modal('show');">Delete Map</button>
     </div>
   </div>
 @endif {{-- edit mode with map_id not null --}}
@@ -386,12 +403,13 @@
 @section('scripts')
 <script type="text/javascript">
 @if(! is_null($map_id))
-    var bgimage = '{!! $background !!}';
+    var bgimage = {{ $background ? "true" : "false" }};
     var network;
     var network_height;
     var network_width;
     var network_nodes = new vis.DataSet({queue: {delay: 100}});
     var network_edges = new vis.DataSet({queue: {delay: 100}});
+    var node_device_map = {};
 
     function CreateNetwork() {
         // Flush the nodes and edges so they are rendered immediately
@@ -466,8 +484,6 @@
                 edge2.from = data.to;
                 edge2.to = edgeid + "_mid";
 
-                // TODO: Look up xdp relationships and pre-select port if relationship exists
-
                 var edgedata = {id: edgeid, mid: mid, edge1: edge1, edge2: edge2, add: true}
 
                 $("#edgeModalLabel").text("Add Edge");
@@ -496,9 +512,10 @@
             $(canvas).css('background-image','url({{ route('maps.custom.background', ['map_id' => $map_id]) }})').css('background-size', 'cover');
         }
 
+@if($edit)
         // Workaround for top-left close icon because the vis.js images have not been copied
         $(".vis-close").addClass("fa fa-xmark");
-@if($edit)
+
         network.on('dragEnd', function (data) {
             if(data.edges.length > 0 || data.nodes.length > 0) {
                 // Make sure a node is not dragged outside the canvas
@@ -532,8 +549,8 @@
         $("#map-renderButton").hide();
 @else
         network.on('doubleClick', function (properties) {
-            if (properties.nodes > 0) {
-                window.location.href = "device/device="+properties.nodes+"/"
+            if (properties.nodes > 0 && properties.nodes[0] in node_device_map) {
+                window.location.href = "device/"+node_device_map[properties.nodes[0]].device_id;
             }
         });
 @endif
@@ -630,10 +647,10 @@
                     canvas = $("#custom-map").children()[0].canvas;
                     if(data['bgimage']) {
                         $(canvas).css('background-image','url({{ route('maps.custom.background', ['map_id' => $map_id]) }})').css('background-size', 'cover');
-                        bgimage = data['bgimage'];
+                        bgimage = true;
                     } else {
                         $(canvas).css('background-image','');
-                        bgimage = '';
+                        bgimage = false;
                     }
 
                     editMapCancel();
@@ -666,10 +683,14 @@
     var port_search_device_id_1 = 0;
     var port_search_device_id_2 = 0;
 
-    // TODO: Add ports to the map on load
     var edge_port_map = {};
-    // TODO: Add devices to the map on load
-    var node_device_map = {};
+
+    function deleteMap() {
+        $.post("{{ route('maps.custom.delete', ['map_id' => $map_id]) }}")
+            .done(function() {
+                window.location.href = "{{ route('maps.custom.edit') }}";
+            });
+    }
 
     function editMapCancel() {
         $('#mapBackgroundClear').text('Clear Background');
@@ -727,6 +748,8 @@
                 $("#alert-row").show();
             },
             complete: function( resp, status, error ) {
+                // Re-read the map from the DB in case any items were modified
+                refreshMap();
                 $("#map-saveDataButton").removeAttr('disabled');
             },
         });
@@ -757,7 +780,7 @@
     }
 
     function nodeDeviceClear() {
-        $("#devicesearch").val("");
+        $("#devicesearch").typeahead('val','');
         $("#device_id").val("");
         $("#device_name").text("");
         $("#device_image").val("");
@@ -791,24 +814,12 @@
         newnodeconf.font.face = $("#nodetextface").val();
         newnodeconf.font.size = $("#nodetextsize").val();
         newnodeconf.font.color = $("#nodetextcolour").val();
+        newnodeconf.color.background = newnodeconf.color.highlight.background = newnodeconf.color.hover.background = $("#nodecolourbg").val();
+        newnodeconf.color.border = newnodeconf.color.highlight.border = newnodeconf.color.hover.border = $("#nodecolourbdr").val();
         if(newnodeconf.shape == "icon") {
-            newnodeconf.icon = {face: 'FontAwesome', code: String.fromCharCode(parseInt($("#nodeicon").val(), 16))}; 
-            newnodeconf.icon.size = $("#nodesize").val();
-            if(newnodeconf.title) {
-                newnodeconf.color = {};
-            } else {
-                newnodeconf.icon.color = $("#nodecolourbdr").val();
-            }
+            newnodeconf.icon = {face: 'FontAwesome', code: String.fromCharCode(parseInt($("#nodeicon").val(), 16)), size: $("#nodesize").val(), color: newnodeconf.color.border};
         } else {
             newnodeconf.icon = {};
-            newnodeconf.size = $("#nodesize").val();
-            if(newnodeconf.title) {
-                newnodeconf.color = {};
-            } else {
-                newnodeconf.color = {highlight: {}, hover: {}};
-                newnodeconf.color.background = newnodeconf.color.highlight.background = newnodeconf.color.hover.background = $("#nodecolourbg").val();
-                newnodeconf.color.border = newnodeconf.color.highlight.border = newnodeconf.color.hover.border = $("#nodecolourbdr").val();
-            }
         }
         $("#map-saveDataButton").show();
     }
@@ -822,7 +833,7 @@
     }
 
     function editNode(data, callback) {
-        $("#devicesearch").val("");
+        $("#devicesearch").typeahead('val','');
         if(data.id && isNaN(data.id) && data.id.endsWith("_mid")) {
             edge = network_edges.get((data.id.split("_")[0]) + "_to");
             editExistingEdge(edge, null);
@@ -911,24 +922,14 @@
         node.font.face = $("#nodetextface").val();
         node.font.size = parseInt($("#nodetextsize").val());
         node.font.color = $("#nodetextcolour").val();
+        node.color = {highlight: {}, hover: {}};
+        node.color.background = node.color.highlight.background = node.color.hover.background = $("#nodecolourbg").val();
+        node.color.border = node.color.highlight.border = node.color.hover.border = $("#nodecolourbdr").val();
+        node.size = $("#nodesize").val();
         if(node.shape == "icon") {
-            node.icon = {face: 'FontAwesome', code: String.fromCharCode(parseInt($("#nodeicon").val(), 16))}; 
-            node.icon.size = $("#nodesize").val();
-            if(node.title) {
-                node.color = {};
-            } else {
-                node.icon.color = $("#nodecolourbdr").val();
-            }
+            node.icon = {face: 'FontAwesome', code: String.fromCharCode(parseInt($("#nodeicon").val(), 16)), size: $("#nodesize").val(), color: node.color.border}; 
         } else {
             node.icon = {};
-            node.size = $("#nodesize").val();
-            if(node.title) {
-                node.color = {};
-            } else {
-                node.color = {highlight: {}, hover: {}};
-                node.color.background = node.color.highlight.background = node.color.hover.background = $("#nodecolourbg").val();
-                node.color.border = node.color.highlight.border = node.color.hover.border = $("#nodecolourbdr").val();
-            }
         }
         if(node.add) {
             delete node.add;
@@ -998,7 +999,7 @@
     }
 
     function edgePortClear() {
-        $("#portsearch").val("");
+        $("#portsearch").typeahead('val','');
         $("#port_id").val("");
         $("#port_name").text("");
         $("#edgePortSearchRow").show();
@@ -1037,7 +1038,7 @@
     }
 
     function editEdge(edgedata, callback) {
-        $("#portsearch").val("");
+        $("#portsearch").typeahead('val','');
         var nodes = network_nodes.get({
           fields: ['id', 'label'],
           filter: function (item) {
@@ -1164,60 +1165,123 @@
 
 @if($map_id > 0)
     function refreshMap() {
-//TODO: Load map nodes and edges
-//        var highlight = $("#highlight_node").val();
-//        var showpath = $("#showparentdevicepath")[0].checked ? 1 : 0;
-//
-//        $.get( '{ route('maps.getdevices') }', {disabled: 0, disabled_alerts: 0, link_type: "depends", url_type: "links", highlight_node: highlight, showpath: showpath})
-//            .done(function( data ) {
-//                function deviceSort(a,b) {
-//                    return (data[a]["sname"] > data[b]["sname"]) ? 1 : -1;
-//                }
-//
-//                var keys = Object.keys(data).sort(deviceSort);
-//                $.each( keys, function( dev_idx, device_id ) {
-//                    var device = data[device_id];
-//                    var this_dev = {id: device_id, label: device["sname"], title: device["url"], shape: "box", level: device["level"]}
-//                    if (device["style"]) {
-//                        // Merge the style if it has been defined
-//                        this_dev = Object.assign(device["style"], this_dev);
-//                    }
-//                    if (network_nodes.get(device_id)) {
-//                        network_nodes.update(this_dev);
-//                    } else {
-//                        network_nodes.add([this_dev]);
-//                        $("#highlight_node").append("<option value='" + device_id + "' id='highlight-device-" + device_id + "'>" + device["sname"] + "</option>")
-//                    }
-//                    $.each( device["parents"], function( parent_idx, parent_id ) {
-//                        link_id = device_id + "." + parent_id;
-//                        if (!network_edges.get(link_id)) {
-//                            network_edges.add([{from: device_id, to: parent_id, width: 2}]);
-//                        }
-//                    })
-//                })
-//
-//                } else {
-//                    $.each( network_nodes.getIds(), function( dev_idx, device_id ) {
-//                        if (!(device_id in data)) {
-//                            network_nodes.remove(device_id);
-//                            var option_id = "#highlight-device-" + device_id;
-//                            $(option_id).remove();
-//                        }
-//                    });
-//                }
-//
-//                if (Object.keys(data).length == 0) {
-//                    $("#alert").html("No devices found");
-//                    $("#alert-row").show();
-//                } else if (Object.keys(data).length > 500) {
-//                    $("#alert").html("The initial render will be slow due to the number of devices.  Auto refresh has been paused.");
-//                    $("#alert-row").show();
-//                    Countdown.Pause();
-//                } else {
-//                    $("#alert").html("");
-//                    $("#alert-row").hide();
-//                }
-//            });
+        $.get( '{{ route('maps.custom.getdata', ['map_id' => $map_id]) }}')
+            .done(function( data ) {
+                // Add/update nodes
+                $.each( data.nodes, function( nodeid, node) {
+                    var node_cfg = {};
+                    node_cfg.id = nodeid;
+                    if(node.device_id) {
+                        node_device_map[nodeid] = {device_id: node.device_id, device_name: node.device_name};
+@if($edit)
+                        node_cfg.title = node.device_id;
+@else
+                        node_cfg.title = node.device_info;
+@endif
+                        node_cfg.image = {unselected: node.device_image};
+                    } else {
+                        node_cfg.title = null;
+                        node_cfg.image = {};
+                    }
+                    node_cfg.label = node.label;
+                    node_cfg.shape = node.style;
+                    node_cfg.borderWidth = node.border_width;
+                    node_cfg.x = node.x_pos;
+                    node_cfg.y = node.y_pos;
+                    node_cfg.font = {face: node.text_face, size: node.text_size, color: node.text_colour};
+                    node_cfg.size = node.size;
+                    node_cfg.color = {background: node.colour_bg, border: node.colour_bdr};
+                    if(node.style == "icon") {
+                        node_cfg.icon = {face: 'FontAwesome', code: String.fromCharCode(parseInt(node.icon, 16)), size: node.size, color: node.colour_bdr}; 
+                    } else {
+                        node_cfg.icon = {};
+                    }
+
+                    if (network_nodes.get(nodeid)) {
+                        network_nodes.update(node_cfg);
+                    } else {
+                        network_nodes.add([node_cfg]);
+                    }
+                });
+
+                $.each( data.edges, function( edgeid, edge) {
+                    var mid_x = edge.mid_x;
+                    var mid_y = edge.mid_y;
+
+                    var mid = {id: edgeid + "_mid", shape: "dot", size: 0, x: mid_x, y: mid_y};
+@if($edit)
+                    mid.size = 3;
+@endif
+
+                    var edge1 = {id: edgeid + "_from", from: edge.custom_map_node1_id, to: edgeid + "_mid", arrows: {to: {enabled: true}}, font: {face: edge.text_face, size: edge.text_size, color: edge.text_colour}, smooth: {type: edge.style}};
+                    var edge2 = {id: edgeid + "_to", from: edge.custom_map_node2_id, to: edgeid + "_mid", arrows: {to: {enabled: true}}, font: {face: edge.text_face, size: edge.text_size, color: edge.text_colour}, smooth: {type: edge.style}};
+@if($edit)
+                    if(edge.port_id) {
+                        edge_port_map[edgeid] = {port_id: edge.port_id, port_name: edge.port_name, reverse: edge.reverse};
+                        edge1.title = edge2.title = edge.port_id;
+                    } else {
+                        edge1.title = edge2.title = '';
+                    }
+                    if(edge.showpct) {
+                        edge1.label = edge2.label = 'xx%';
+                    } else {
+                        edge1.label = edge2.label = '';
+                    }
+@else
+                    if(edge.port_id) {
+                        edge1.title = edge2.title = edge.port_info;
+                        if(edge.showpct) {
+                            edge1.label = edge.port_topct + "%";
+                            edge2.label = edge.port_frompct + "%";
+                        }
+                        edge1.color = {color: edge.colour1};
+                        edge1.width = edge.width1;
+                        edge2.color = {color: edge.colour2};
+                        edge2.width = edge.width2;
+                    }
+@endif
+                    if (network_nodes.get(mid.id)) {
+                        network_nodes.update(mid);
+                        network_edges.update(edge1);
+                        network_edges.update(edge2);
+                    } else {
+                        network_nodes.add([mid]);
+                        network_edges.add([edge1, edge2]);
+                    }
+                });
+
+                // Remove any nodes that are not in the database, includes edges
+                $.each( network_nodes.getIds(), function( node_idx, nodeid ) {
+                    if(nodeid.endsWith('_mid')) {
+                        edgeid = edgeid.split("_")[0];
+                        if(! (edgeid in data.edges)) {
+                            network_nodes.remove(edgeid + "_mid");
+                            network_edges.remove(edgeid + "_to");
+                            network_edges.remove(edgeid + "_from");
+                        }
+                    } else {
+                        if(! (nodeid in data.nodes)) {
+                            network_nodes.remove(nodeid);
+                        }
+                    }
+                });
+
+                // Flush in order to make sure nodes exist for edges to connect to
+                network_nodes.flush();
+                network_edges.flush();
+@if($edit)
+                $("#alert").html("");
+                $("#alert-row").hide();
+@else
+                if (Object.keys(data).length == 0) {
+                    $("#alert").html("No devices found");
+                    $("#alert-row").show();
+                } else {
+                    $("#alert").html("");
+                    $("#alert-row").hide();
+                }
+@endif
+            });
 
         // Initialise map if it does not exist
         if (! network) {
@@ -1298,7 +1362,6 @@
         });
         node2ports.initialize();
 
-        // TODO: Clear the results on load
         $('#devicesearch').typeahead({
                 hint: true,
                 highlight: true,
@@ -1321,7 +1384,6 @@
                 }
             });
 
-        // TODO: Clear the results on load
         $('#portsearch').typeahead({
                 hint: true,
                 highlight: true,
