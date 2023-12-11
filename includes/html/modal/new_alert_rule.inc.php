@@ -155,7 +155,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                             <div role="tabpanel" class="tab-pane" id="advanced">
                                 <div class="form-group">
                                     <label for="override_query" class="col-sm-3 col-md-2 control-label">Override SQL</label>
-                                    <div class="col-sm-9 col-md-10">                                       
+                                    <div class="col-sm-9 col-md-10">
                                         <input type='checkbox' name='override_query' id='override_query'>
                                     </div>
                                 </div>
@@ -163,7 +163,6 @@ if (Auth::user()->hasGlobalAdmin()) {
                                     <label for="adv_query" class="col-sm-3 col-md-2 control-label">Query</label>
                                     <div class="col-sm-9 col-md-10">
                                         <textarea class="form-control code" rows="6" name="adv_query" id='adv_query' style="font-family: Menlo, Monaco, Consolas, 'Courier New', monospace;";></textarea>
-                                        <!-- <input type="text" id="adv_query" name="adv_query" class="form-control"> -->
                                     </div>
                                 </div>
                             </div>
