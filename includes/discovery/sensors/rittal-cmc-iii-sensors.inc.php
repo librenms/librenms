@@ -22,6 +22,9 @@
  * @copyright 2020 Denny Friebe
  * @author    Denny Friebe <denny.friebe@icera-network.de>
  */
+
+use LibreNMS\Util\StringHelpers;
+
 $cmc_iii_var_table = snmpwalk_cache_oid($device, 'cmcIIIVarTable', [], 'RITTAL-CMC-III-MIB', null);
 $cmc_iii_sensors = [];
 
@@ -77,7 +80,7 @@ foreach ($cmc_iii_var_table as $index => $entry) {
             }
 
             // encode string to ensure that degree sign may be used properly for unit comparison
-            $unit = utf8_encode($entry['cmcIIIVarUnit']);
+            $unit = StringHelpers::inferEncoding($entry['cmcIIIVarUnit']);
             $type = 'state';
             $temperature_units = ['degree C', 'degree F', '°C', '°F'];
             if ($unit == 'mA') {

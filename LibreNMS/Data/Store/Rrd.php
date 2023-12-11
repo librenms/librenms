@@ -580,7 +580,7 @@ class Rrd extends BaseDatastore
         }
 
         // if valid image is returned with error, extract image and feedback
-        $image_type = Config::get('webui.graph_type', 'png');
+        $image_type = Config::get('webui.graph_type', 'svg');
         $search = $this->getImageEnd($image_type);
         if (($position = strrpos($process->getOutput(), $search)) !== false) {
             $position += strlen($search);
