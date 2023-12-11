@@ -22,9 +22,7 @@ bgp-peers:
 nac:
     ports_nac:
         excluded_fields: [device_id, ports_nac_id, port_id, created_at, updated_at]
-        joins:
-            - { left: ports_nac.port_id, right: ports.port_id, select: [ifIndex] }
-        order_by: ports.ifIndex, ports_nac.mac_address
+        order_by: mac_address
 fdb-table:
     ports_fdb:
         excluded_fields: [device_id, ports_fdb_id, port_id, vlan_id, created_at, updated_at]
