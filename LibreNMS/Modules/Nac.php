@@ -80,7 +80,7 @@ class Nac implements Module
 
             $nac_entries = $os->pollNac()->keyBy('mac_address');
             //filter out historical entries
-            $existing_entries = $os->getDevice()->portsNac->keyBy('mac_address')->filter(function($value, $key) {
+            $existing_entries = $os->getDevice()->portsNac->keyBy('mac_address')->filter(function ($value, $key) {
                 if ($value['historical'] == 0) {
                     return $value;
                 }
