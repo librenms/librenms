@@ -39,7 +39,7 @@ class PortNacController extends TableController
     {
         return [
             'device_id' => 'nullable|integer',
-            'searchby' => 'in:mac,vlan,ip,description,vendor,',
+            'searchby' => 'in:mac,ip,description,vendor,',
         ];
     }
 
@@ -99,8 +99,6 @@ class PortNacController extends TableController
             switch (\Request::get('searchby') ?? '') {
                 case 'mac':
                     return $query->where('ports_nac.mac_address', 'like', $search);
-                case 'vlan':
-                    return $query->whereIntegerInRaw('ports_nac.vlan', $this->findVlans($search));
                 case 'ip':
                     return $query->whereIn('ports_nac.ip_address', $search);
                 case 'description':
