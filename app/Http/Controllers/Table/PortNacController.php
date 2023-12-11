@@ -106,7 +106,7 @@ class PortNacController extends TableController
                 case 'vendor':
                     $vendor_ouis = $this->ouisFromVendor($search);
 
-                    return $this->findPortsByOui($vendor_ouis, $query);
+                    return $this->queryByOui($vendor_ouis, $query);
                 default:
                     return $query->where(function ($query) use ($search, $mac_search) {
                         $vendor_ouis = $this->ouisFromVendor($search);
