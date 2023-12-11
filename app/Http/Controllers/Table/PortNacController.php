@@ -39,7 +39,7 @@ class PortNacController extends TableController
     {
         return [
             'device_id' => 'nullable|integer',
-            'searchby' => 'in:mac,vlan,ip,port,description,first_seen,last_seen,vendor',
+            'searchby' => 'in:mac,vlan,ip,description,vendor,',
         ];
     }
 
