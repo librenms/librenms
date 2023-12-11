@@ -2061,7 +2061,7 @@ syslog:
     - { Field: level, Type: varchar(10), 'Null': true, Extra: '' }
     - { Field: tag, Type: varchar(10), 'Null': true, Extra: '' }
     - { Field: timestamp, Type: timestamp, 'Null': false, Extra: '', Default: CURRENT_TIMESTAMP }
-    - { Field: program, Type: varchar(10), 'Null': true, Extra: '' }
+    - { Field: program, Type: varchar(32), 'Null': true, Extra: '' }
     - { Field: msg, Type: text, 'Null': true, Extra: '' }
     - { Field: seq, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
   Indexes:
