@@ -30,9 +30,10 @@ use App\Models\PortsNac;
 use LibreNMS\Util\Mac;
 use LibreNMS\Util\Url;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use LibreNMS\Util\Mac;
+use LibreNMS\Util\Url;
 
 class PortNacController extends TableController
 {
