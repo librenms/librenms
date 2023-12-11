@@ -2058,7 +2058,7 @@ syslog:
     - { Field: device_id, Type: 'int unsigned', 'Null': true, Extra: '' }
     - { Field: facility, Type: varchar(10), 'Null': true, Extra: '' }
     - { Field: priority, Type: varchar(10), 'Null': true, Extra: '' }
-    - { Field: level, Type: varchar(16), 'Null': true, Extra: '' }
+    - { Field: level, Type: varchar(10), 'Null': true, Extra: '' }
     - { Field: tag, Type: varchar(10), 'Null': true, Extra: '' }
     - { Field: timestamp, Type: timestamp, 'Null': false, Extra: '', Default: CURRENT_TIMESTAMP }
     - { Field: program, Type: varchar(10), 'Null': true, Extra: '' }
