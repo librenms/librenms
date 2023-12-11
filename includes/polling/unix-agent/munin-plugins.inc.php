@@ -47,12 +47,12 @@ if (! empty($agent_data['munin'])) {
             $insert = [
                 'device_id'      => $device['device_id'],
                 'mplug_type'     => $plugin_type,
-                'mplug_instance' => ($instance == null ? ['NULL'] : $instance),
+                'mplug_instance' => $instance,
                 'mplug_category' => ($plugin['graph']['category'] == null ? 'general' : strtolower($plugin['graph']['category'])),
-                'mplug_title'    => ($plugin['graph']['title'] == null ? ['NULL'] : $plugin['graph']['title']),
-                'mplug_vlabel'   => ($plugin['graph']['vlabel'] == null ? ['NULL'] : $plugin['graph']['vlabel']),
-                'mplug_args'     => ($plugin['graph']['args'] == null ? ['NULL'] : $plugin['graph']['args']),
-                'mplug_info'     => ($plugin['graph']['info'] == null ? ['NULL'] : $plugin['graph']['info']),
+                'mplug_title'    => $plugin['graph']['title'],
+                'mplug_vlabel'   => $plugin['graph']['vlabel'],
+                'mplug_args'     => $plugin['graph']['args'],
+                'mplug_info'     => $plugin['graph']['info'],
             ];
             $mplug_id = dbInsert($insert, 'munin_plugins');
         } else {

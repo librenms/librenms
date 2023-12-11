@@ -39,6 +39,8 @@ trait VminfoLibvirt
 
         if (! Config::get('enable_libvirt')) {
             echo 'not configured';
+
+            return new Collection;
         }
 
         $vms = new Collection;

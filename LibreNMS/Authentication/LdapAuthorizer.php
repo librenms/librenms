@@ -349,6 +349,16 @@ class LdapAuthorizer extends AuthorizerBase
         if (Config::get('auth_ldap_debug')) {
             ldap_set_option(null, LDAP_OPT_DEBUG_LEVEL, 7);
         }
+        /*
+         * Due to https://bugs.php.net/bug.php?id=78029 these set options are done at this stage otherwise they
+         * will not take effect after the first bind is performed.
+         */
+        if (Config::get('auth_ldap_cacertfile')) {
+            ldap_set_option($this->ldap_connection, LDAP_OPT_X_TLS_CACERTFILE, Config::get('auth_ldap_cacertfile'));
+        }
+        if (Config::get('auth_ldap_ignorecert')) {
+            ldap_set_option($this->ldap_connection, LDAP_OPT_X_TLS_REQUIRE_CERT, 0);
+        }
 
         $this->connect();
 

@@ -14,7 +14,6 @@ try {
     return;
 }
 
-$rrd_name = ['app', $name, $app->app_id];
 $rrd_def = RrdDefinition::make()
     ->addDataset('errors', 'GAUGE', 0)
     ->addDataset('ignored_host', 'GAUGE', 0)
@@ -52,6 +51,11 @@ if (isset($data['last_errors']) && isset($data['last_errors'][0])) {
     log_event('suricata_extract_submit errors found: ' . json_encode($data['last_errors']), $device, 'application', 5);
 }
 
-$tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
+$tags = [
+    'name' => $name,
+    'app_id' => $app->app_id,
+    'rrd_name' => ['app', $name, $app->app_id],
+    'rrd_def' => $rrd_def,
+];
 data_update($device, 'app', $tags, $fields);
 update_application($app, 'OK', $fields);

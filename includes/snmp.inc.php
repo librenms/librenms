@@ -293,6 +293,10 @@ function snmp_get($device, $oid, $options = null, $mib = null, $mibdir = null)
     $measure->manager()->recordSnmp($measure->end());
     if (preg_match('/(No Such Instance|No Such Object|No more variables left|Authentication failure)/i', $data)) {
         return false;
+    } elseif (preg_match('/Wrong Type(.*)should be/', $data)) {
+        $data = preg_replace('/Wrong Type \(should be .*\): /', '', $data);
+
+        return $data;
     } elseif ($data || $data === '0') {
         return $data;
     } else {
@@ -797,6 +801,7 @@ function snmpwalk_array_num($device, $oid, $indexes = 1)
  */
 function get_device_max_repeaters($device)
 {
-    return $device['attribs']['snmp_max_repeaters'] ??
-        Config::getOsSetting($device['os'], 'snmp.max_repeaters', Config::get('snmp.max_repeaters', false));
+    $attrib = DeviceCache::get($device['device_id'] ?? null)->getAttrib('snmp_max_repeaters');
+
+    return $attrib ?? Config::getOsSetting($device['os'], 'snmp.max_repeaters', Config::get('snmp.max_repeaters', false));
 }

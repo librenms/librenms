@@ -1,0 +1,3082 @@
+F3-NTP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP
+             FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE, IpAddress, Integer32, Unsigned32
+             FROM SNMPv2-SMI                                           
+    DisplayString, TruthValue, RowStatus, StorageType, VariablePointer,DateAndTime,
+    TEXTUAL-CONVENTION
+             FROM SNMPv2-TC
+    neIndex, shelfIndex, slotIndex
+             FROM  CM-ENTITY-MIB
+    fsp150cm
+             FROM  ADVA-MIB
+    AdminState, OperationalState, SecondaryState, F3DisplayString,
+    IpVersion, CmPmIntervalType, CmPmBinAction, PerfCounter64
+             FROM  CM-COMMON-MIB
+     CmNtpMode, CmNtpType 
+             FROM CM-SYSTEM-MIB
+    cmEthernetAccPortIndex, cmEthernetNetPortIndex
+             FROM  CM-FACILITY-MIB
+    Ipv6Address
+             FROM  IPV6-TC;
+
+f3NtpMIB MODULE-IDENTITY
+    LAST-UPDATED    "202212260000Z"
+    ORGANIZATION    "ADVA Optical Networking"
+    CONTACT-INFO
+        "Web URL: http://adva.com/
+        E-mail:  support@adva.com
+        Postal:  ADVA Optical Networking SE
+             Campus Martinsried
+             Fraunhoferstrasse 9a
+             82152 Martinsried/Munich
+             Germany
+        Phone: +49 089 89 06 65 0
+        Fax:  +49 089 89 06 65 199 "
+    DESCRIPTION    "This module defines the NTP definitions used by
+        the F3 (FSP150CM/CC) product lines.
+        SNMP Tables in this module: f3NtpClockTable,f3NCITable,f3NtpVirtualPort,
+               f3NtpRemoteClientTable,f3NtpAccPortFlowPointTable,
+               f3NtpNetPortFlowPointTable,f3NCIStatsTable,
+               f3NCIHistoryTable,f3NCIThresholdTable,
+               f3NtpAccPortFlowPointStatsTable,f3NtpAccPortFlowPointHistoryTable,
+               f3NtpAccPortFlowPointThresholdTable,
+               f3NtpNetPortFlowPointStatsTable,f3NtpNetPortFlowPointHistoryTable,
+               f3NtpNetPortFlowPointThresholdTable,
+	       	   f3NtpTrackedClientTable, f3NtpTrackedClientStatsTable,
+               f3NtpTrackedClientHistoryTable,f3NtpTrackedClientThresholdTable,
+	       f3NtpRemoteServerTable.
+        Copyright (C) ADVA."
+    REVISION    "202208250000Z"
+    DESCRIPTION
+        " 
+	Notes from release 202212260000Z
+          a) Changed f3NtpClockOffset units to PerfCounter64
+		
+          Notes from release 202208250000Z
+          a) Added new enum:
+	  	NtpPollingInterval
+	  	
+          Notes from release 202208080000Z
+          a) Added new table:
+	  	f3NtpRemoteServer
+	  
+	  Notes from release 202208030000Z
+          a) f3NtpClockEntry has new attributes:
+	  	f3NtpClockOffset
+		f3NtpClockSecondaryState
+
+        Notes from release 202205190000Z
+           a) added new tables to NCI:
+           		f3NtpTrackedClientStatsTable
+               f3NtpTrackedClientHistoryTable
+               f3NtpTrackedClientThresholdTable    
+          b) added new notification to NCI:
+           		f3NtpTrackedClientCrossingAlert
+          c) added new oid definition:
+           		f3NtpPerformanceNotifications
+           		
+         Notes from release 202205090000Z
+           a) added new table to NCI:
+           		f3NtpTrackedClientTable              
+        
+          Notes from release 202204220000Z
+           a) f3NCITable has new attributes:
+                f3NCINtpHardenedResponderControl
+         
+          Notes from release 202204210000Z
+           a) F3NCIStatsEntry has new attributes:
+                f3NCIStatsAuthFailures 
+                f3NCIStatsReqsDiscarded
+                f3NCIStatsAvgTPS       
+                f3NCIStatsMaxTPS   
+                
+
+           b) F3NCIHistoryEntry has new attributes:
+                f3NCIHistoryAuthFailures  
+                f3NCIHistoryReqsDiscarded 
+                f3NCIHistoryAvgTPS        
+                f3NCIHistoryMaxTPS          
+
+          Notes from release 202103220000Z
+          a)Added the literals local(3) and gps(4) to NtpTimeScale.
+          b) added f3NCITimeScale and f3NCICurrentTimeOfDay scalar variable
+          c) Change f3NtpClockTimeScale scalar variable to deprecated
+
+          Notes from release 201912300000Z
+           a) f3NCITable has new attributes:
+                f3NtpAutokeyCtrl,
+
+          Notes from release 201909260000Z
+           a) f3NCITable has new attributes:
+                f3NCIDaytimeServiceControl,
+                f3NCITimeServiceControl
+        
+          Notes from release 201908260000Z
+           a) New Textual Conventions : 
+                           NtpAssociationMode
+           b) f3NCITable has new attributes:
+                           f3NCIAssociationMode,
+                           f3NCIPeer1IpV4Address,
+                           f3NCIPeer2IpV4Address,
+                           f3NCIPeer3IpV4Address,
+                           f3NCIPeer1IpV6Address,
+                           f3NCIPeer2IpV6Address,
+                           f3NCIPeer3IpV6Address,
+                           f3NCIPeerMinInterval,
+                           f3NCIPeerMaxInterval,
+                           f3NCIPeerSymKeyIdList
+                           
+          Notes from release 201906270000Z
+           a) New Textual Conventions : 
+                           NtpBroadcastInterval and NtpVersion
+           b) f3NCITable has new attributes:
+                           f3NCIBroadcastState,
+                           f3NCIBroadcastIpV4Address,
+                           f3NCIBroadcastIpV6Address,
+                           f3NCIBroadcastInterval,
+                           f3NCIBroadcastMaxHops,
+                           f3NCIBroadcastSymKeyId,
+                           f3NCIBroadcastNtpVersion
+                           
+          Notes from release 201902040000Z
+           a) f3NCITable has new attributes:
+                           f3NCIDefaultGatewayControl
+
+          Notes from release 201804280000Z
+           a) f3NCITable has new attributes:
+                           f3NCIIpV6UdpChecksum,
+                           f3NCIIpV6Address,
+                           f3NCIIpV6AddrPrefixLength,
+                           f3NCIIpV4Gateway,
+                           f3NCIIpV6Gateway
+                           
+          Notes from release 201610260000Z
+           a) f3NtpRemoteClientTable has been changed:
+                Attributes with Unsigned32 syntax:
+                           f3NtpRemoteClientRxPacketsLo,
+                           f3NtpRemoteClientRxPacketsHi,
+                           f3NtpRemoteClientAvgPollIntervalLo,
+                           f3NtpRemoteClientAvgPollIntervalHi,
+                           f3NtpRemoteClientLastPollIntervalLo,
+                           f3NtpRemoteClientLastPollIntervalHi
+                 have been replaced by ones with PerfCounter64 syntax:
+                           f3NtpRemoteClientRxPackets,
+                           f3NtpRemoteClientAvgPollInterval,
+                           f3NtpRemoteClientLastPollInterval
+        
+          Notes from release 201607120000Z
+           First version."
+    ::= {fsp150cm 47}
+
+-- 
+-- OID definitions
+-- 
+f3NtpObjects                OBJECT IDENTIFIER ::= {f3NtpMIB 1}
+f3NtpConformance            OBJECT IDENTIFIER ::= {f3NtpMIB 2}
+f3NtpPerformanceObjects    OBJECT IDENTIFIER ::= {f3NtpMIB 3}
+f3NtpPerformanceNotifications  OBJECT IDENTIFIER ::= {f3NtpMIB 4}
+
+
+-- 
+-- Textual Conventions 
+-- 
+NtpFlowPointType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Enumerations for NTP Flow Point Type. Other enumeration values
+            will be defined in the future. Presently only case is:
+             server - represents a NTP Server Type."
+    SYNTAX       INTEGER {
+                   server(1)
+                  }
+
+NtpTimeScale ::= TEXTUAL-CONVENTION
+    STATUS         current
+    DESCRIPTION    "Enumerations for Time Scale,
+        utc, not-available, local, gps."
+    SYNTAX INTEGER    {
+        utc(1),
+        not-available(2),
+        local(3),
+        gps(4)        
+        }
+
+ToggleValue ::= TEXTUAL-CONVENTION
+    STATUS         current
+    DESCRIPTION    "Enumerations for functionality that can be enabled or disabled."
+    SYNTAX INTEGER    {
+        enabled(1),
+        disabled(2),
+        not-available(3)
+        }
+
+GnssSyncLossAction ::= TEXTUAL-CONVENTION
+    STATUS         current
+    DESCRIPTION    "Enumerations for specifying an action that a manager can execute."
+    SYNTAX INTEGER    {
+        strtm-16-li-nochg(1),
+        strtm-16-li-unkn(2),
+        strtm-1-li-unkn(3),
+        none(4),
+        not-available(5)
+        }
+
+NtpBroadcastInterval ::= TEXTUAL-CONVENTION
+    STATUS         current
+    DESCRIPTION    "Enumerations for NTP Broadcast Interval."
+    SYNTAX INTEGER    {
+        pkt1per8secs(1),
+        pkt1per16secs(2),
+        pkt1per32secs(3),
+        pkt1per64secs(4),
+        pkt1per128secs(5),
+        pkt1per256secs(6),
+        pkt1per512secs(7),
+        pkt1per1024secs(8),
+        pkt1per2048secs(9),
+        pkt1per4096secs(10),
+        pkt1per8192secs(11),
+        pkt1per16384secs(12),
+        pkt1per32768secs(13),
+        pkt1per65536secs(14)
+        }
+
+NtpVersion ::= TEXTUAL-CONVENTION
+    STATUS         current
+    DESCRIPTION    "Enumerations for NTP Version."
+    SYNTAX INTEGER    {
+        ntpv3(1),
+        ntpv4(2)
+        }
+
+NtpAssociationType ::= TEXTUAL-CONVENTION
+    STATUS         current
+    DESCRIPTION    "Enumerations for NTP Association Type."
+    SYNTAX INTEGER    {
+        not-available(1),
+        symmetric-active(2),
+        symmetric-passive(3),
+        server-only(4)
+        }
+        
+NtpPollingInterval ::= TEXTUAL-CONVENTION
+    STATUS         current
+    DESCRIPTION    "Enumerations for NTP Polling Interval."
+    SYNTAX INTEGER    {
+        sec16(1),
+        sec32(2),
+        sec64(3),
+        sec128(4),
+        sec256(5),
+        sec512(6),
+        sec1024(7)
+        }
+
+--
+-- NTP Clock Table 
+--
+f3NtpClockTable OBJECT-TYPE
+    SYNTAX         SEQUENCE OF F3NtpClockEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION    "A list of entries corresponding to the NTP Clock entities."
+    ::= { f3NtpObjects 1 }
+
+f3NtpClockEntry OBJECT-TYPE
+    SYNTAX         F3NtpClockEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION    "An entry containing information applicable to a particular
+        NTP Clock entity."
+    INDEX    { neIndex, f3NtpClockIndex }
+    ::= { f3NtpClockTable 1 }
+
+F3NtpClockEntry ::=
+    SEQUENCE {
+        f3NtpClockIndex Integer32,
+        f3NtpClockAlias DisplayString,
+        f3NtpClockAdminState AdminState,
+        f3NtpClockOperationalState OperationalState,
+        f3NtpClockTimeClock VariablePointer,
+        f3NtpClockStratumLevel Unsigned32,
+        f3NtpClockLeapIndicator Unsigned32,
+        f3NtpClockTimeScale DisplayString,
+        f3NtpClockPrecision Unsigned32,
+        f3NtpClockRootDelay Unsigned32,
+        f3NtpClockRootDispersion Unsigned32,
+        f3NtpClockNtpMode CmNtpMode,
+        f3NtpClockNtpType CmNtpType,
+        f3NtpClockNtpAuthentication ToggleValue,
+        f3NtpClockServerState ToggleValue,
+        f3NtpClockTimeReferenceLossHandling GnssSyncLossAction,
+        f3NtpClockRefClockId DisplayString,
+        f3NtpClockStorageType   StorageType,
+        f3NtpClockRowStatus     RowStatus,
+        f3NtpAuthenticationSecureMode ToggleValue,
+        f3NtpAutokeyCtrl              ToggleValue,
+        f3NtpClockOffset              PerfCounter64,
+	f3NtpClockSecondaryState      SecondaryState
+   }
+
+
+f3NtpClockIndex OBJECT-TYPE
+    SYNTAX         Integer32
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION    "Unique index value associated with the NTP Clock Entity."
+    ::= { f3NtpClockEntry 1 }
+
+f3NtpClockAlias OBJECT-TYPE
+    SYNTAX         DisplayString (SIZE(0..256))
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION    "This object allows SNMP management entities to provide an
+        alias to the NTP Clock entity."
+    ::= { f3NtpClockEntry 2 }
+
+f3NtpClockAdminState OBJECT-TYPE
+    SYNTAX         AdminState
+    MAX-ACCESS     read-write
+    STATUS         current
+    DESCRIPTION    "This object represents the Administrative State of the NTP Clock."
+    ::= { f3NtpClockEntry 3 }
+
+f3NtpClockOperationalState OBJECT-TYPE
+    SYNTAX         OperationalState
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "This object represents the Operational State of the NTP Clock."
+    ::= { f3NtpClockEntry 4 }
+
+f3NtpClockTimeClock OBJECT-TYPE
+    SYNTAX         VariablePointer
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION    "This object provides the entry from f3TimeClockTable, which is used as frequency and time of day source for the NTP Clock."
+    ::= { f3NtpClockEntry 5 }
+
+f3NtpClockStratumLevel OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "The Ntp Stratum Level of the NTP Clock."
+    ::= { f3NtpClockEntry 6 }
+
+f3NtpClockLeapIndicator OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "Leap Second indicator if a leap second will occur."
+    ::= { f3NtpClockEntry 7 }
+
+f3NtpClockTimeScale OBJECT-TYPE
+    SYNTAX         DisplayString (SIZE(0..16))
+    MAX-ACCESS     read-only
+    STATUS         deprecated
+    DESCRIPTION    "Indicates whether the time source is UTC time or not."
+    ::= { f3NtpClockEntry 8 }
+
+f3NtpClockPrecision OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "Todo."
+    ::= { f3NtpClockEntry 9 }
+
+f3NtpClockRootDelay OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "Todo."
+    ::= { f3NtpClockEntry 10 }
+
+f3NtpClockRootDispersion OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "Todo."
+    ::= { f3NtpClockEntry 11 }
+
+f3NtpClockNtpMode OBJECT-TYPE
+    SYNTAX         CmNtpMode
+    MAX-ACCESS     read-write
+    STATUS         current
+    DESCRIPTION    "Indicates the current NTP mode of the NTP clock."
+    ::= { f3NtpClockEntry 12 }
+
+f3NtpClockNtpType OBJECT-TYPE
+    SYNTAX         CmNtpType
+    MAX-ACCESS     read-write
+    STATUS         current
+    DESCRIPTION    "Todo."
+    ::= { f3NtpClockEntry 13 }
+
+f3NtpClockNtpAuthentication OBJECT-TYPE
+    SYNTAX         ToggleValue
+    MAX-ACCESS     read-write
+    STATUS         current
+    DESCRIPTION    "Permits to enable or disable NTP Authentication."
+    ::= { f3NtpClockEntry 14 }
+
+f3NtpClockServerState OBJECT-TYPE
+    SYNTAX         ToggleValue
+    MAX-ACCESS     read-write
+    STATUS         current
+    DESCRIPTION    "Permits to enable or disable the NTP Clock as Ntp Server."
+    ::= { f3NtpClockEntry 15 }
+
+f3NtpClockTimeReferenceLossHandling OBJECT-TYPE
+    SYNTAX         GnssSyncLossAction
+    MAX-ACCESS     read-write
+    STATUS         current
+    DESCRIPTION    "Todo."
+    ::= { f3NtpClockEntry 16 }
+
+f3NtpClockRefClockId OBJECT-TYPE
+    SYNTAX         DisplayString (SIZE(0..4))
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "This object identifies the NTP Clock by a string."
+    ::= { f3NtpClockEntry 17 }
+
+f3NtpClockStorageType OBJECT-TYPE
+    SYNTAX         StorageType
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION    "The type of storage configured for this entry."
+    ::= { f3NtpClockEntry 18 }
+
+f3NtpClockRowStatus OBJECT-TYPE
+    SYNTAX         RowStatus
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION    "The status of this row.  An entry MUST NOT exist in the
+        active state unless all objects in the entry have an
+        appropriate value, as described
+        in the description clause for each writable object.
+        
+        The values of f3NtpClockRowStatus supported are
+        createAndGo(4) and destroy(6).  All mandatory attributes
+        must be specified in a single SNMP SET request with
+        f3NtpClockRowStatus value as createAndGo(4).
+        Upon successful row creation, this object has a
+        value of active(1).
+        
+        The f3NtpClockRowStatus object may be modified if
+        the associated instance of this object is equal to active(1)."
+    ::= { f3NtpClockEntry 19 }
+
+f3NtpAuthenticationSecureMode OBJECT-TYPE
+    SYNTAX         ToggleValue
+    MAX-ACCESS     read-write
+    STATUS         current
+    DESCRIPTION    "Allows to enable or disable NTP Authentication Secure Mode."
+    ::= { f3NtpClockEntry 20 }
+
+f3NtpAutokeyCtrl OBJECT-TYPE
+    SYNTAX         ToggleValue
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION    "Allows to enable or disable NTP Clock Server Auto Key."
+    ::= { f3NtpClockEntry 21 }
+
+f3NtpClockOffset OBJECT-TYPE
+    SYNTAX         PerfCounter64
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "This attribute indicates estimated time offset to the reference clock in ns"
+    ::= { f3NtpClockEntry 22 }
+    
+f3NtpClockSecondaryState OBJECT-TYPE
+    SYNTAX         SecondaryState
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "This object represents the Secondary State of the NTP Clock."
+    ::= { f3NtpClockEntry 23 }    
+--
+-- NTP Clock Interface Table 
+--
+f3NCITable OBJECT-TYPE
+    SYNTAX         SEQUENCE OF F3NCIEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION    "A list of entries corresponding to NTP Clock Interface (NCI) entities."
+    ::= { f3NtpObjects 2 }
+
+f3NCIEntry OBJECT-TYPE
+    SYNTAX         F3NCIEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION    "An entry containing information applicable to a particular NTP Clock Interface."
+    INDEX    { neIndex, f3NtpClockIndex, f3NCIIndex }
+    ::= { f3NCITable 1 }
+
+F3NCIEntry ::=
+    SEQUENCE {
+        f3NCIIndex Integer32,
+        f3NCIAlias DisplayString,
+        f3NCIAdminState AdminState,
+        f3NCIOperationalState OperationalState,
+        f3NCIIfName DisplayString,
+        f3NCIIpProtocol IpVersion,
+        f3NCIIpV4Address IpAddress,
+        f3NCIIpV4SubnetMask IpAddress,
+        f3NCIDscp Unsigned32,
+        f3NCIStorageType StorageType,
+        f3NCIRowStatus RowStatus,
+        f3NCIIpV6UdpChecksum ToggleValue,
+        f3NCIIpV6Address Ipv6Address,
+        f3NCIIpV6AddrPrefixLength Integer32,
+        f3NCIIpV4Gateway IpAddress,
+        f3NCIIpV6Gateway Ipv6Address,
+        f3NCIDefaultGatewayControl  ToggleValue,
+        f3NCIDaytimeServiceControl ToggleValue,
+        f3NCITimeServiceControl ToggleValue,
+        f3NCIBroadcastState  ToggleValue,
+        f3NCIBroadcastIpV4Address  IpAddress,
+        f3NCIBroadcastIpV6Address  Ipv6Address,
+        f3NCIBroadcastInterval  NtpBroadcastInterval,
+        f3NCIBroadcastMaxHops  Integer32,
+        f3NCIBroadcastSymKeyId  Integer32,
+        f3NCIBroadcastNtpVersion  NtpVersion,
+        f3NCIAssociationMode NtpAssociationType,
+        f3NCIPeer1IpV4Address IpAddress,
+        f3NCIPeer2IpV4Address IpAddress,
+        f3NCIPeer3IpV4Address IpAddress,
+        f3NCIPeer1IpV6Address Ipv6Address,
+        f3NCIPeer2IpV6Address Ipv6Address,
+        f3NCIPeer3IpV6Address Ipv6Address,
+        f3NCIPeerMinInterval NtpBroadcastInterval,
+        f3NCIPeerMaxInterval NtpBroadcastInterval,
+        f3NCIPeerSymKeyIdList DisplayString,
+        f3NCITimeScale NtpTimeScale,
+        f3NCICurrentTimeOfDay DateAndTime,
+        f3NCINtpHardenedResponderControl ToggleValue
+    }
+
+
+f3NCIIndex OBJECT-TYPE
+    SYNTAX         Integer32
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION    "Unique index value associated with the NTP Clock Interface."
+    ::= { f3NCIEntry 1 }
+
+f3NCIAlias OBJECT-TYPE
+    SYNTAX         DisplayString (SIZE(0..256))
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION    "This object allows SNMP management entities to provide an
+        alias to the NTP Clock Interface entity."
+    ::= { f3NCIEntry 2 }
+
+f3NCIAdminState OBJECT-TYPE
+    SYNTAX         AdminState
+    MAX-ACCESS     read-write
+    STATUS         current
+    DESCRIPTION    "This object represents the Administrative State of the NTP Clock Interface."
+    ::= { f3NCIEntry 3 }
+
+f3NCIOperationalState OBJECT-TYPE
+    SYNTAX         OperationalState
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "This object represents the Operational State of the NTP Clock Interface."
+    ::= { f3NCIEntry 4 }
+
+f3NCIIfName OBJECT-TYPE
+    SYNTAX         DisplayString (SIZE(0..15))
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION    "This object allows SNMP management entities to provide a
+        name to the NTP Clock Interface.  This is used for creation of the 
+        underlying IP Interface associated with the NTP Clock Interface."
+    ::= { f3NCIEntry 5 }
+
+f3NCIIpProtocol OBJECT-TYPE
+    SYNTAX         IpVersion
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION    "This object allows specification of the IP Protocol to communicate with associated NTP Clock."
+    ::= { f3NCIEntry 6 }
+
+f3NCIIpV4Address OBJECT-TYPE
+    SYNTAX         IpAddress
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION    "This object allows specification of the IPv4 Address of the NTP Clock."
+    ::= { f3NCIEntry 7 }
+
+f3NCIIpV4SubnetMask OBJECT-TYPE
+    SYNTAX         IpAddress
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION    "This object allows specification of the IPv4 Subnet Mask of the NTP Clock."
+    ::= { f3NCIEntry 8 }
+
+f3NCIDscp OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION    "This object represents Differenciated Services Code Point, its value is set into DS field in the IP header of IP packets."
+    ::= { f3NCIEntry 9 }
+
+f3NCIStorageType OBJECT-TYPE
+    SYNTAX         StorageType
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION    "The type of storage configured for this entry."
+    ::= { f3NCIEntry 10 }
+
+f3NCIRowStatus OBJECT-TYPE
+    SYNTAX         RowStatus
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION    "The status of this row.  An entry MUST NOT exist in the
+        active state unless all objects in the entry have an
+        appropriate value, as described
+        in the description clause for each writable object.
+        
+        The values of f3NCIRowStatus supported are
+        createAndGo(4) and destroy(6).  All mandatory attributes
+        must be specified in a single SNMP SET request with
+        f3NCIRowStatus value as createAndGo(4).
+        Upon successful row creation, this object has a
+        value of active(1).
+        
+        The f3NCIRowStatus object may be modified if
+        the associated instance of this object is equal to active(1)."
+    ::= { f3NCIEntry 11 }
+
+f3NCIIpV6UdpChecksum OBJECT-TYPE
+    SYNTAX         ToggleValue 
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION
+        "This object allows to enable/disable insertion of checksum on 
+         transmit side of NTP packet and to ignore it on received side. 
+         This object has an impact only on NTP Clock Interface with
+         IPv6 address."
+    ::= { f3NCIEntry 12 }
+
+f3NCIIpV6Address OBJECT-TYPE
+    SYNTAX         Ipv6Address 
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION
+        "This object allows specification of the IPv6 Address of
+         the NTP Clock Interface."
+    ::= { f3NCIEntry 13 }
+
+f3NCIIpV6AddrPrefixLength OBJECT-TYPE
+    SYNTAX         Integer32 (0..128)
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION
+        "This object allows specification of the IPv6 address prefix length of
+         the NTP Clock Interface."
+    ::= { f3NCIEntry 14 }
+
+f3NCIIpV4Gateway OBJECT-TYPE
+    SYNTAX         IpAddress
+    MAX-ACCESS     read-write
+    STATUS         current
+    DESCRIPTION
+        "This object allows to specify IPv4 gateway."
+    ::= { f3NCIEntry 15 }
+
+f3NCIIpV6Gateway OBJECT-TYPE
+    SYNTAX         Ipv6Address
+    MAX-ACCESS     read-write
+    STATUS         current
+    DESCRIPTION
+        "This object allows to specify IPv6 gateway."
+   ::= { f3NCIEntry 16 }
+
+f3NCIDefaultGatewayControl OBJECT-TYPE
+    SYNTAX     ToggleValue
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This attribute controls Gateway address for NTP Clock Interface."
+     ::= { f3NCIEntry 17 }
+
+f3NCITimeServiceControl OBJECT-TYPE
+    SYNTAX     ToggleValue
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This attribute controls the Time service for NTP Clock Interface."
+     ::= { f3NCIEntry 18 }
+    
+f3NCIDaytimeServiceControl OBJECT-TYPE
+    SYNTAX     ToggleValue
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This attribute controls the Daytime service for NTP Clock Interface."
+     ::= { f3NCIEntry 19 }
+
+f3NCIBroadcastState OBJECT-TYPE
+    SYNTAX     ToggleValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object controls the use of NTP broadcasting."
+     ::= { f3NCIEntry 20 }
+
+f3NCIBroadcastIpV4Address OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object allows specification of the Broadcast IPv4 Address of
+         the NTP Clock Interface."
+    ::= { f3NCIEntry 21 }
+
+f3NCIBroadcastIpV6Address OBJECT-TYPE
+    SYNTAX     Ipv6Address
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object allows specification of the Broadcast IPv6 Address of
+         the NTP Clock Interface."
+    ::= { f3NCIEntry 22 }
+
+f3NCIBroadcastInterval OBJECT-TYPE
+    SYNTAX     NtpBroadcastInterval
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object allows specification of the Broadcast Interval time of
+          the NTP Clock Interface."
+    ::= { f3NCIEntry 23 }
+
+f3NCIBroadcastMaxHops OBJECT-TYPE
+    SYNTAX     Integer32 (1..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object allows specification of the Max of Hops for broadcasting
+          of the NTP Clock Interface."
+    ::= { f3NCIEntry 24 }
+
+f3NCIBroadcastSymKeyId OBJECT-TYPE
+    SYNTAX     Integer32 (1..65535)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object allows specification of the Symmetric key Id for
+          broadcasting of the NTP Clock Interface."
+    ::= { f3NCIEntry 25 }
+
+f3NCIBroadcastNtpVersion OBJECT-TYPE
+    SYNTAX     NtpVersion
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object allows specification of the Ntp Version that is used
+          for the NTP Clock Interface."
+    ::= { f3NCIEntry 26 }
+
+f3NCIAssociationMode OBJECT-TYPE
+    SYNTAX     NtpAssociationType
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object allows specification of the Ntp Association Mode that is used
+          for the NTP Clock Interface."
+     ::= { f3NCIEntry 27 }
+
+f3NCIPeer1IpV4Address OBJECT-TYPE
+    SYNTAX         IpAddress
+    MAX-ACCESS     read-write
+    STATUS         current
+    DESCRIPTION    
+         "IPv4 Address of the first peer of the NTP Clock Interface.
+          If NTP Association Mode is symmetric-active, then symmetric-passive peer addresses
+          can be specified.
+          But a maximum of three symmetric-passive peers can be specified per NTP Clock.
+          If NTP Association Mode is symmetric-passive, three symmetric-active peers can be
+          associated and read, but they are not specified."
+    ::= { f3NCIEntry 28 }
+
+f3NCIPeer2IpV4Address OBJECT-TYPE
+    SYNTAX         IpAddress
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION    
+         "IPv4 Address of the second peer of the NTP Clock Interface.
+          If NTP Association Mode is symmetric-active, then symmetric-passive peer addresses
+          can be specified.
+          But a maximum of three symmetric-passive peers can be specified per NTP Clock.
+          If NTP Association Mode is symmetric-passive, three symmetric-active peers can be
+          associated and read, but they are not specified."
+    ::= { f3NCIEntry 29 }
+
+f3NCIPeer3IpV4Address OBJECT-TYPE
+    SYNTAX         IpAddress
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION    
+         "IPv4 Address of the third peer of the NTP Clock Interface.
+          If NTP Association Mode is symmetric-active, then symmetric-passive peer addresses
+          can be specified.
+          But a maximum of three symmetric-passive peers can be specified per NTP Clock.
+          If NTP Association Mode is symmetric-passive, three symmetric-active peers can be
+          associated and read, but they are not specified."
+    ::= { f3NCIEntry 30 }
+
+f3NCIPeer1IpV6Address OBJECT-TYPE
+    SYNTAX         Ipv6Address
+    MAX-ACCESS     read-write
+    STATUS         current
+    DESCRIPTION    
+         "IPv6 Address of the first peer of the NTP Clock Interface.
+          If NTP Association Mode is symmetric-active, then symmetric-passive peer addresses
+          can be specified.
+          But a maximum of three symmetric-passive peers can be specified per NTP Clock.
+          If NTP Association Mode is symmetric-passive, three symmetric-active peers can be
+          associated and read, but they are not specified."
+    ::= { f3NCIEntry 31 }
+
+f3NCIPeer2IpV6Address OBJECT-TYPE
+    SYNTAX         Ipv6Address
+    MAX-ACCESS     read-write
+    STATUS         current
+    DESCRIPTION    
+         "IPv6 Address of the second peer of the NTP Clock Interface.
+          If NTP Association Mode is symmetric-active, then symmetric-passive peer addresses
+          can be specified.
+          But a maximum of three symmetric-passive peers can be specified per NTP Clock.
+          If NTP Association Mode is symmetric-passive, three symmetric-active peers can be
+          associated and read, but they are not specified."
+    ::= { f3NCIEntry 32 }
+
+f3NCIPeer3IpV6Address OBJECT-TYPE
+    SYNTAX         Ipv6Address
+    MAX-ACCESS     read-write
+    STATUS         current
+    DESCRIPTION    
+         "IPv6 Address of the third peer of the NTP Clock Interface.
+          If NTP Association Mode is symmetric-active, then symmetric-passive peer addresses
+          can be specified.
+          But a maximum of three symmetric-passive peers can be specified per NTP Clock.
+          If NTP Association Mode is symmetric-passive, three symmetric-active peers can be
+          associated and read, but they are not specified."
+    ::= { f3NCIEntry 33 }
+
+f3NCIPeerMinInterval OBJECT-TYPE
+    SYNTAX     NtpBroadcastInterval
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object allows specification of the minimum of the peering Interval time of
+          the NTP Clock Interface."
+    ::= { f3NCIEntry 34 }
+
+f3NCIPeerMaxInterval OBJECT-TYPE
+    SYNTAX     NtpBroadcastInterval
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object allows specification of the maximum of the peering Interval time of
+          the NTP Clock Interface."
+    ::= { f3NCIEntry 35 }
+
+f3NCIPeerSymKeyIdList OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "Symmetric key IDs for peering with the NTP Clock Interface.
+          If NTP Association Mode is symmetric-active, then one key must be defined.
+          If NTP Association Mode is symmetric-passive, up to 20 symmetric keys can be specified,
+          each of them potentially matching the symmetric keys of a remote symmetric-active NCI."
+    ::= { f3NCIEntry 36 }
+
+f3NCITimeScale OBJECT-TYPE
+    SYNTAX     NtpTimeScale
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This attribute specifies Server time format."
+    ::= { f3NCIEntry 37 }
+
+f3NCICurrentTimeOfDay OBJECT-TYPE
+    SYNTAX     DateAndTime
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This attribute indicate the Current time of day provided by the NC."
+    ::= { f3NCIEntry 38 }
+    
+f3NCINtpHardenedResponderControl OBJECT-TYPE
+    SYNTAX     ToggleValue
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This attribute controls the NTP Hardened Responder for NTP Clock Interface."
+    ::= { f3NCIEntry 39 }
+
+--
+-- NTP Virtual Port Table 
+--
+f3NtpVirtualPortTable OBJECT-TYPE
+    SYNTAX         SEQUENCE OF F3NtpVirtualPortEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION    "A list of entries corresponding to NtpVirtualPortEntry entities."
+    ::= { f3NtpObjects 3 }
+
+f3NtpVirtualPortEntry OBJECT-TYPE
+    SYNTAX         F3NtpVirtualPortEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION    "An entry containing information applicable to a particular
+        NTP Virtual Port Entity."
+    INDEX    { neIndex, shelfIndex, slotIndex, f3NtpVirtualPortIndex }
+    ::= { f3NtpVirtualPortTable 1 }
+
+F3NtpVirtualPortEntry ::=
+    SEQUENCE {
+        f3NtpVirtualPortIndex Integer32,
+        f3NtpVirtualPortAlias DisplayString,
+        f3NtpVirtualPortAdminState AdminState,
+        f3NtpVirtualPortOperationalState OperationalState,
+        f3NtpVirtualPortNtpFlowPoint VariablePointer,
+        f3NtpVirtualPortStorageType   StorageType,
+        f3NtpVirtualPortRowStatus     RowStatus
+    }
+
+
+f3NtpVirtualPortIndex OBJECT-TYPE
+    SYNTAX         Integer32
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION    "Unique index value associated with the NTP Virtual Port Entity."
+    ::= { f3NtpVirtualPortEntry 1 }
+
+f3NtpVirtualPortAlias OBJECT-TYPE
+    SYNTAX         DisplayString (SIZE(0..256))
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION    "This object allows SNMP management entities to provide an
+        alias to the NTP Virtual Port entity."
+    ::= { f3NtpVirtualPortEntry 2 }
+
+f3NtpVirtualPortAdminState OBJECT-TYPE
+    SYNTAX         AdminState
+    MAX-ACCESS     read-write
+    STATUS         current
+    DESCRIPTION    "This object represents the Administrative State of the NTP Virtual Port
+        Entity."
+    ::= { f3NtpVirtualPortEntry 3 }
+
+f3NtpVirtualPortOperationalState OBJECT-TYPE
+    SYNTAX         OperationalState
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "This object represents the Operational State of the NTP Virtual Port
+        Entity."
+    ::= { f3NtpVirtualPortEntry 4 }
+
+f3NtpVirtualPortNtpFlowPoint OBJECT-TYPE
+    SYNTAX         VariablePointer
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION    "This object associates the NTP Flow Point with the NTP Virtual Port."
+    ::= { f3NtpVirtualPortEntry 5 }
+
+f3NtpVirtualPortStorageType OBJECT-TYPE
+    SYNTAX         StorageType
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION    "The type of storage configured for this entry."
+    ::= { f3NtpVirtualPortEntry 6 }
+
+f3NtpVirtualPortRowStatus OBJECT-TYPE
+    SYNTAX         RowStatus
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION    "The status of this row.  An entry MUST NOT exist in the
+        active state unless all objects in the entry have an
+        appropriate value, as described
+        in the description clause for each writable object.
+        
+        The values of f3NtpVirtualPortRowStatus supported are
+        createAndGo(4) and destroy(6).  All mandatory attributes
+        must be specified in a single SNMP SET request with
+        f3NtpVirtualPortRowStatus value as createAndGo(4).
+        Upon successful row creation, this object has a
+        value of active(1).
+        
+        The f3NtpVirtualPortRowStatus object may be modified if
+        the associated instance of this object is equal to active(1)."
+    ::= { f3NtpVirtualPortEntry 7 }
+
+--
+-- NTP Remote Client Table 
+--
+f3NtpRemoteClientTable OBJECT-TYPE
+    SYNTAX         SEQUENCE OF F3NtpRemoteClientEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION    "A list of entries corresponding to NTP Remote Client entities."
+    ::= { f3NtpObjects 4 }
+
+f3NtpRemoteClientEntry OBJECT-TYPE
+    SYNTAX         F3NtpRemoteClientEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION    "An entry containing information applicable to a particular
+        NTP Remote Client Entity."
+    INDEX    { neIndex, shelfIndex, slotIndex, f3NtpRemoteClientIndex }
+    ::= { f3NtpRemoteClientTable 1 }
+
+F3NtpRemoteClientEntry ::=
+    SEQUENCE {
+        f3NtpRemoteClientIndex Integer32,
+        f3NtpRemoteClientIpV4Address IpAddress,
+        f3NtpRemoteClientRxPackets PerfCounter64,
+        f3NtpRemoteClientAvgPollInterval PerfCounter64,
+        f3NtpRemoteClientLastPollInterval PerfCounter64,
+        f3NtpRemoteClientNtpMode Integer32,
+        f3NtpRemoteClientNtpVersion Integer32,
+        f3NtpRemoteClientStorageType   StorageType,
+        f3NtpRemoteClientRowStatus     RowStatus
+    }
+
+
+f3NtpRemoteClientIndex OBJECT-TYPE
+    SYNTAX         Integer32
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION    "Unique index value associated with the NTP Remote Client Entity."
+    ::= { f3NtpRemoteClientEntry 1 }
+
+f3NtpRemoteClientIpV4Address OBJECT-TYPE
+    SYNTAX         IpAddress
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "This object indicates the IPv4 Address of the NTP Remote Client."
+    ::= { f3NtpRemoteClientEntry 2 }
+
+f3NtpRemoteClientRxPackets OBJECT-TYPE
+    SYNTAX         PerfCounter64
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "This object represents the number of NTP packets sent by the NTP Remote Client and received on the NTP Flow Point."
+    ::= { f3NtpRemoteClientEntry 3 }
+
+f3NtpRemoteClientAvgPollInterval OBJECT-TYPE
+    SYNTAX         PerfCounter64
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "This object represents the interval over which monitored value has been the most recently sampled on the NTP Flow Point."
+    ::= { f3NtpRemoteClientEntry 4 }
+
+f3NtpRemoteClientLastPollInterval OBJECT-TYPE
+    SYNTAX         PerfCounter64
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "This object represents the interval over which monitored value is sampled and averaged on the NTP Flow Point."
+    ::= { f3NtpRemoteClientEntry 5 }
+
+f3NtpRemoteClientNtpMode OBJECT-TYPE
+    SYNTAX         Integer32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "This object represents the NTP Mode of the NTP Remote Client."
+    ::= { f3NtpRemoteClientEntry 6 }
+
+f3NtpRemoteClientNtpVersion OBJECT-TYPE
+    SYNTAX         Integer32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "This object represents the NTP protocol Version used by the NTP Remote Client to communicate with the NTP Server."
+    ::= { f3NtpRemoteClientEntry 7 }
+
+f3NtpRemoteClientStorageType OBJECT-TYPE
+    SYNTAX         StorageType
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION    "The type of storage configured for this entry."
+    ::= { f3NtpRemoteClientEntry 8 }
+
+f3NtpRemoteClientRowStatus OBJECT-TYPE
+    SYNTAX         RowStatus
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION    "The status of this row.  An entry MUST NOT exist in the
+        active state unless all objects in the entry have an
+        appropriate value, as described
+        in the description clause for each writable object.
+        
+        The values of f3NtpRemoteClientRowStatus supported are
+        createAndGo(4) and destroy(6).  All mandatory attributes
+        must be specified in a single SNMP SET request with
+        f3NtpRemoteClientRowStatus value as createAndGo(4).
+        Upon successful row creation, this object has a
+        value of active(1).
+        
+        The f3NtpRemoteClientRowStatus object may be modified if
+        the associated instance of this object is equal to active(1)."
+    ::= { f3NtpRemoteClientEntry 9 }
+
+--
+-- Ethernet Access Port - NTP Flow Point Table 
+--
+f3NtpAccPortFlowPointTable OBJECT-TYPE
+    SYNTAX         SEQUENCE OF F3NtpAccPortFlowPointEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION    "A list of entries corresponding to the Access Port 
+        NTP Flow Point entities."
+    ::= { f3NtpObjects 5 }
+
+f3NtpAccPortFlowPointEntry OBJECT-TYPE
+    SYNTAX         F3NtpAccPortFlowPointEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION    "An entry containing information applicable to a particular
+        Access Port NTP Flow Point Entity."
+    INDEX    { neIndex, shelfIndex, slotIndex, cmEthernetAccPortIndex,
+        f3NtpAccPortFlowPointIndex }
+    ::= { f3NtpAccPortFlowPointTable 1 }
+
+F3NtpAccPortFlowPointEntry ::=
+    SEQUENCE {
+        f3NtpAccPortFlowPointIndex Integer32,
+        f3NtpAccPortFlowPointAlias DisplayString,
+        f3NtpAccPortFlowPointAdminState AdminState,
+        f3NtpAccPortFlowPointOperationalState OperationalState,
+        f3NtpAccPortFlowPointType NtpFlowPointType,
+        f3NtpAccPortFlowPointOuterVlanEtherType Integer32,
+        f3NtpAccPortFlowPointOuterVlanMemberList DisplayString,
+        f3NtpAccPortFlowPointOuterUntaggedEnabled TruthValue,
+        f3NtpAccPortFlowPointInner1VlanEtherType Integer32,
+        f3NtpAccPortFlowPointInner1VlanMemberList DisplayString,
+        f3NtpAccPortFlowPointInner1UntaggedEnabled TruthValue,
+        f3NtpAccPortFlowPointInner2VlanEtherType Integer32,
+        f3NtpAccPortFlowPointInner2VlanMemberList DisplayString,
+        f3NtpAccPortFlowPointInner2UntaggedEnabled TruthValue,
+        f3NtpAccPortFlowPointCOS Integer32,
+        f3NtpAccPortFlowPointCIRLo Unsigned32,
+        f3NtpAccPortFlowPointCIRHi Unsigned32,
+        f3NtpAccPortFlowPointEIRLo Unsigned32,
+        f3NtpAccPortFlowPointEIRHi Unsigned32,
+        f3NtpAccPortFlowPointBufferSize Unsigned32,
+        f3NtpAccPortFlowPointStorageType StorageType,
+        f3NtpAccPortFlowPointRowStatus RowStatus
+    }
+
+
+f3NtpAccPortFlowPointIndex OBJECT-TYPE
+    SYNTAX         Integer32
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION    "Unique index value associated with the Access Port NTP Flow Point."
+    ::= { f3NtpAccPortFlowPointEntry 1 }
+
+f3NtpAccPortFlowPointAlias OBJECT-TYPE
+    SYNTAX         DisplayString (SIZE(0..256))
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION    "This object allows SNMP management entities to provide an
+        alias to the Access Port NTP Flow Point."
+    ::= { f3NtpAccPortFlowPointEntry 2 }
+
+f3NtpAccPortFlowPointAdminState OBJECT-TYPE
+    SYNTAX         AdminState
+    MAX-ACCESS     read-write
+    STATUS         current
+    DESCRIPTION    "This object represents the Administrative State of the
+        NTP Flow Point."
+    ::= { f3NtpAccPortFlowPointEntry 3 }
+
+f3NtpAccPortFlowPointOperationalState OBJECT-TYPE
+    SYNTAX         OperationalState
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "This object represents the Operational State of the NTP Flow
+        Point."
+    ::= { f3NtpAccPortFlowPointEntry 4 }
+
+f3NtpAccPortFlowPointType OBJECT-TYPE
+    SYNTAX         NtpFlowPointType
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION    "This object represents the NTP Flow Point Type, i.e. whether
+        it is for a NTP Server or a NTP Client. Note that only Server Type is
+        available in this MIB Version."
+    ::= { f3NtpAccPortFlowPointEntry 5 }
+
+f3NtpAccPortFlowPointOuterVlanEtherType OBJECT-TYPE
+    SYNTAX         Integer32
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION    "This object allows specification of the Outer VLAN Ether Type
+        of the NTP Flow."
+    ::= { f3NtpAccPortFlowPointEntry 6 }
+
+f3NtpAccPortFlowPointOuterVlanMemberList OBJECT-TYPE
+    SYNTAX         DisplayString
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION    "This object allows specification of the Outer VLAN(s)
+        of the NTP Flow."
+    ::= { f3NtpAccPortFlowPointEntry 7 }
+
+f3NtpAccPortFlowPointOuterUntaggedEnabled OBJECT-TYPE
+    SYNTAX         TruthValue
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION    "This object allows specification of whether the Outer VLAN
+        exists or not."
+    ::= { f3NtpAccPortFlowPointEntry 8 }
+
+f3NtpAccPortFlowPointInner1VlanEtherType OBJECT-TYPE
+    SYNTAX         Integer32
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION    "This object allows specification of the Inner1 VLAN Ether Type
+        of the NTP Flow."
+    ::= { f3NtpAccPortFlowPointEntry 9 }
+
+f3NtpAccPortFlowPointInner1VlanMemberList OBJECT-TYPE
+    SYNTAX         DisplayString
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION    "This object allows specification of the Inner1 VLAN(s)
+        of the NTP Flow."
+    ::= { f3NtpAccPortFlowPointEntry 10 }
+
+f3NtpAccPortFlowPointInner1UntaggedEnabled OBJECT-TYPE
+    SYNTAX         TruthValue
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION    "This object allows specification of whether the Inner1 VLAN
+        exists or not."
+    ::= { f3NtpAccPortFlowPointEntry 11 }
+
+f3NtpAccPortFlowPointInner2VlanEtherType OBJECT-TYPE
+    SYNTAX         Integer32
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION    "This object allows specification of the Inner2 VLAN Ether Type
+        of the NTP Flow."
+    ::= { f3NtpAccPortFlowPointEntry 12 }
+
+f3NtpAccPortFlowPointInner2VlanMemberList OBJECT-TYPE
+    SYNTAX         DisplayString
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION    "This object allows specification of the Inner2 VLAN(s)
+        of the NTP Flow."
+    ::= { f3NtpAccPortFlowPointEntry 13 }
+
+f3NtpAccPortFlowPointInner2UntaggedEnabled OBJECT-TYPE
+    SYNTAX         TruthValue
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION    "This object allows specification of whether the Inner2 VLAN
+        exists or not."
+    ::= { f3NtpAccPortFlowPointEntry 14 }
+
+f3NtpAccPortFlowPointCOS OBJECT-TYPE
+    SYNTAX         Integer32 (0..7)
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION    "This object allows specification of Class of Service of the traffic
+        associated with this NTP Flow Point."
+    ::= { f3NtpAccPortFlowPointEntry 15 }
+
+f3NtpAccPortFlowPointCIRLo OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION    "This object allows specification of Committed Information Rate of the
+        traffic associated with this NTP Flow Point.
+        The CIR value is in bits-per-second units. The value of this object
+        represents the lower 32 bits of the total CIR value."
+    ::= { f3NtpAccPortFlowPointEntry 16 }
+
+f3NtpAccPortFlowPointCIRHi OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION    "This object allows specification of Committed Information Rate of the
+        traffic associated with this NTP Flow Point.
+        The CIR value is in bits-per-second units. The value of this object
+        represents the higher 32 bits of the total CIR value."
+    ::= { f3NtpAccPortFlowPointEntry 17 }
+
+f3NtpAccPortFlowPointEIRLo OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION    "This object allows specification of Excess Information Rate of the
+        traffic associated with this NTP Flow Point.
+        The EIR value is in bits-per-second units. The value of this object
+        represents the lower 32 bits of the total EIR value."
+    ::= { f3NtpAccPortFlowPointEntry 18 }
+
+f3NtpAccPortFlowPointEIRHi OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION    "This object allows specification of Excess Information Rate of the
+        traffic associated with this NTP Flow Point.
+        The EIR value is in bits-per-second units. The value of this object
+        represents the higher 32 bits of the total EIR value."
+    ::= { f3NtpAccPortFlowPointEntry 19 }
+
+f3NtpAccPortFlowPointBufferSize OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION    "This object allows specification of the Buffer Size of the queue associated
+        with this NTP Flow Point."
+    ::= { f3NtpAccPortFlowPointEntry 20 }
+
+f3NtpAccPortFlowPointStorageType OBJECT-TYPE
+    SYNTAX         StorageType
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION    "The type of storage configured for this entry."
+    ::= { f3NtpAccPortFlowPointEntry 21 }
+
+f3NtpAccPortFlowPointRowStatus OBJECT-TYPE
+    SYNTAX         RowStatus
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION    "The status of this row.  An entry MUST NOT exist in the
+        active state unless all objects in the entry have an
+        appropriate value, as described
+        in the description clause for each writable object.
+        
+        The values of f3NtpAccPortFlowPointRowStatus supported are
+        createAndGo(4) and destroy(6).  All mandatory attributes
+        must be specified in a single SNMP SET request with
+        f3NtpAccPortFlowPointRowStatus value as createAndGo(4).
+        Upon successful row creation, this object has a
+        value of active(1).
+        
+        The f3NtpAccPortFlowPointRowStatus object may be modified if
+        the associated instance of this object is equal to active(1)."
+    ::= { f3NtpAccPortFlowPointEntry 22 }
+
+--
+-- Ethernet Network Port - NTP Flow Point Table 
+--
+f3NtpNetPortFlowPointTable OBJECT-TYPE
+    SYNTAX         SEQUENCE OF F3NtpNetPortFlowPointEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION    "A list of entries corresponding to the Network Port 
+        NTP Flow Point entities."
+    ::= { f3NtpObjects 6 }
+
+f3NtpNetPortFlowPointEntry OBJECT-TYPE
+    SYNTAX         F3NtpNetPortFlowPointEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION    "An entry containing information applicable to a particular
+        Network Port NTP Flow Point Entity."
+    INDEX    { neIndex, shelfIndex, slotIndex, cmEthernetNetPortIndex,
+        f3NtpNetPortFlowPointIndex }
+    ::= { f3NtpNetPortFlowPointTable 1 }
+
+F3NtpNetPortFlowPointEntry ::=
+    SEQUENCE {
+        f3NtpNetPortFlowPointIndex Integer32,
+        f3NtpNetPortFlowPointAlias DisplayString,
+        f3NtpNetPortFlowPointAdminState AdminState,
+        f3NtpNetPortFlowPointOperationalState OperationalState,
+        f3NtpNetPortFlowPointType NtpFlowPointType,
+        f3NtpNetPortFlowPointOuterVlanEtherType Integer32,
+        f3NtpNetPortFlowPointOuterVlanMemberList DisplayString,
+        f3NtpNetPortFlowPointOuterUntaggedEnabled TruthValue,
+        f3NtpNetPortFlowPointInner1VlanEtherType Integer32,
+        f3NtpNetPortFlowPointInner1VlanMemberList DisplayString,
+        f3NtpNetPortFlowPointInner1UntaggedEnabled TruthValue,
+        f3NtpNetPortFlowPointInner2VlanEtherType Integer32,
+        f3NtpNetPortFlowPointInner2VlanMemberList DisplayString,
+        f3NtpNetPortFlowPointInner2UntaggedEnabled TruthValue,
+        f3NtpNetPortFlowPointCOS Integer32,
+        f3NtpNetPortFlowPointCIRLo Unsigned32,
+        f3NtpNetPortFlowPointCIRHi Unsigned32,
+        f3NtpNetPortFlowPointEIRLo Unsigned32,
+        f3NtpNetPortFlowPointEIRHi Unsigned32,
+        f3NtpNetPortFlowPointBufferSize Unsigned32,
+        f3NtpNetPortFlowPointStorageType StorageType,
+        f3NtpNetPortFlowPointRowStatus RowStatus
+    }
+
+
+f3NtpNetPortFlowPointIndex OBJECT-TYPE
+    SYNTAX         Integer32
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION    "Unique index value associated with the Network Port 
+        NTP Flow Point."
+    ::= { f3NtpNetPortFlowPointEntry 1 }
+
+f3NtpNetPortFlowPointAlias OBJECT-TYPE
+    SYNTAX         DisplayString (SIZE(0..256))
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION    "This object allows SNMP management entities to provide an
+        alias to the Network Port NTP Flow Point."
+    ::= { f3NtpNetPortFlowPointEntry 2 }
+
+f3NtpNetPortFlowPointAdminState OBJECT-TYPE
+    SYNTAX         AdminState
+    MAX-ACCESS     read-write
+    STATUS         current
+    DESCRIPTION    "This object represents the Administrative State of the
+        NTP Flow Point."
+    ::= { f3NtpNetPortFlowPointEntry 3 }
+
+f3NtpNetPortFlowPointOperationalState OBJECT-TYPE
+    SYNTAX         OperationalState
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "This object represents the Operational State of the NTP Flow
+        Point."
+    ::= { f3NtpNetPortFlowPointEntry 4 }
+
+f3NtpNetPortFlowPointType OBJECT-TYPE
+    SYNTAX         NtpFlowPointType
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION    "This object represents the NTP Flow Point Type, i.e. whether
+        it is for a NTP Server or a NTP Client. Note that only Server Type is
+        available in this MIB Version."
+    ::= { f3NtpNetPortFlowPointEntry 5 }
+
+f3NtpNetPortFlowPointOuterVlanEtherType OBJECT-TYPE
+    SYNTAX         Integer32
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION    "This object allows specification of the Outer VLAN Ether Type
+        of the NTP Flow."
+    ::= { f3NtpNetPortFlowPointEntry 6 }
+
+f3NtpNetPortFlowPointOuterVlanMemberList OBJECT-TYPE
+    SYNTAX         DisplayString
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION    "This object allows specification of the Outer VLAN(s)
+        of the NTP Flow."
+    ::= { f3NtpNetPortFlowPointEntry 7 }
+
+f3NtpNetPortFlowPointOuterUntaggedEnabled OBJECT-TYPE
+    SYNTAX         TruthValue
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION    "This object allows specification of whether the Outer VLAN
+        exists or not."
+    ::= { f3NtpNetPortFlowPointEntry 8 }
+
+f3NtpNetPortFlowPointInner1VlanEtherType OBJECT-TYPE
+    SYNTAX         Integer32
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION    "This object allows specification of the Inner1 VLAN Ether Type
+        of the NTP Flow."
+    ::= { f3NtpNetPortFlowPointEntry 9 }
+
+f3NtpNetPortFlowPointInner1VlanMemberList OBJECT-TYPE
+    SYNTAX         DisplayString
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION    "This object allows specification of the Inner1 VLAN(s)
+        of the NTP Flow."
+    ::= { f3NtpNetPortFlowPointEntry 10 }
+
+f3NtpNetPortFlowPointInner1UntaggedEnabled OBJECT-TYPE
+    SYNTAX         TruthValue
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION    "This object allows specification of whether the Inner1 VLAN
+        exists or not."
+    ::= { f3NtpNetPortFlowPointEntry 11 }
+
+f3NtpNetPortFlowPointInner2VlanEtherType OBJECT-TYPE
+    SYNTAX         Integer32
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION    "This object allows specification of the Inner2 VLAN Ether Type
+        of the NTP Flow."
+    ::= { f3NtpNetPortFlowPointEntry 12 }
+
+f3NtpNetPortFlowPointInner2VlanMemberList OBJECT-TYPE
+    SYNTAX         DisplayString
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION    "This object allows specification of the Inner2 VLAN(s)
+        of the NTP Flow."
+    ::= { f3NtpNetPortFlowPointEntry 13 }
+
+f3NtpNetPortFlowPointInner2UntaggedEnabled OBJECT-TYPE
+    SYNTAX         TruthValue
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION    "This object allows specification of whether the Inner2 VLAN
+        exists or not."
+    ::= { f3NtpNetPortFlowPointEntry 14 }
+
+f3NtpNetPortFlowPointCOS OBJECT-TYPE
+    SYNTAX         Integer32 (0..7)
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION    "This object allows specification of Class of Service of the traffic
+        associated with this NTP Flow Point."
+    ::= { f3NtpNetPortFlowPointEntry 15 }
+
+f3NtpNetPortFlowPointCIRLo OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION    "This object allows specification of Committed Information Rate of the
+        NTP traffic associated with this Flow Point.
+        The CIR value is in bits-per-second units. The value of this object
+        represents the lower 32 bits of the total CIR value."
+    ::= { f3NtpNetPortFlowPointEntry 16 }
+
+f3NtpNetPortFlowPointCIRHi OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION    "This object allows specification of Committed Information Rate of the
+        traffic associated with this NTP Flow Point.
+        The CIR value is in bits-per-second units. The value of this object
+        represents the higher 32 bits of the total CIR value."
+    ::= { f3NtpNetPortFlowPointEntry 17 }
+
+f3NtpNetPortFlowPointEIRLo OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION    "This object allows specification of Excess Information Rate of the
+        traffic associated with this NTP Flow Point.
+        The EIR value is in bits-per-second units. The value of this object
+        represents the lower 32 bits of the total EIR value."
+    ::= { f3NtpNetPortFlowPointEntry 18 }
+
+f3NtpNetPortFlowPointEIRHi OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION    "This object allows specification of Excess Information Rate of the
+        traffic associated with this NTP Flow Point.
+        The EIR value is in bits-per-second units. The value of this object
+        represents the higher 32 bits of the total EIR value."
+    ::= { f3NtpNetPortFlowPointEntry 19 }
+
+f3NtpNetPortFlowPointBufferSize OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION    "This object allows specification of the Buffer Size of the queue associated
+        with this NTP Flow Point."
+    ::= { f3NtpNetPortFlowPointEntry 20 }
+
+f3NtpNetPortFlowPointStorageType OBJECT-TYPE
+    SYNTAX         StorageType
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION    "The type of storage configured for this entry."
+    ::= { f3NtpNetPortFlowPointEntry 21 }
+
+f3NtpNetPortFlowPointRowStatus OBJECT-TYPE
+    SYNTAX         RowStatus
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION    "The status of this row.  An entry MUST NOT exist in the
+        active state unless all objects in the entry have an
+        appropriate value, as described
+        in the description clause for each writable object.
+        
+        The values of f3NtpNetPortFlowPointRowStatus supported are
+        createAndGo(4) and destroy(6).  All mandatory attributes
+        must be specified in a single SNMP SET request with
+        f3NtpNetPortFlowPointRowStatus value as createAndGo(4).
+        Upon successful row creation, this object has a
+        value of active(1).
+        
+        The f3NtpNetPortFlowPointRowStatus object may be modified if
+        the associated instance of this object is equal to active(1)."
+    ::= { f3NtpNetPortFlowPointEntry 22 }
+
+--
+-- NTP Tracked Client Table 
+--
+f3NtpTrackedClientTable OBJECT-TYPE
+    SYNTAX         SEQUENCE OF F3NtpTrackedClientEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION    "A list of entries corresponding to NTP Tracked Client entities."
+    ::= { f3NtpObjects 7 }
+
+f3NtpTrackedClientEntry OBJECT-TYPE
+    SYNTAX         F3NtpTrackedClientEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION    "An entry containing information applicable to a particular
+        NTP Tracked Client Entity."
+    INDEX    { neIndex, shelfIndex, slotIndex, f3NtpTrackedClientIndex }
+    ::= { f3NtpTrackedClientTable 1 }
+
+F3NtpTrackedClientEntry ::=
+    SEQUENCE {
+        f3NtpTrackedClientIndex 		Integer32,
+        f3NtpTrackedClientAlias       	DisplayString,
+        f3NtpTrackedClientIpV4Address 	IpAddress,
+        f3NtpTrackedClientIpV6Address   Ipv6Address,             
+        f3NtpTrackedClientStorageType   StorageType,
+        f3NtpTrackedClientRowStatus     RowStatus
+    }
+
+
+f3NtpTrackedClientIndex OBJECT-TYPE
+    SYNTAX         Integer32
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION    "Unique index value associated with the NTP Tracked Client Entity."
+    ::= { f3NtpTrackedClientEntry 1 }
+
+f3NtpTrackedClientAlias    OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..256))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+         "This object allows SNMP management entities to provide an 
+          alias to the Tracked Client."
+     ::= { f3NtpTrackedClientEntry 2 }
+     
+f3NtpTrackedClientIpV4Address OBJECT-TYPE
+    SYNTAX         IpAddress
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION    "This object indicates the IPv4 Address of the NTP Tracked Client."
+    ::= { f3NtpTrackedClientEntry 3 }
+
+f3NtpTrackedClientIpV6Address OBJECT-TYPE
+    SYNTAX     Ipv6Address 
+    MAX-ACCESS read-create
+    STATUS   current
+    DESCRIPTION
+         "This object allows specification of the unicast IPv6 Address of
+          the Tracked Client."
+    ::= { f3NtpTrackedClientEntry 4 }
+
+
+f3NtpTrackedClientStorageType OBJECT-TYPE
+    SYNTAX         StorageType
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION    "The type of storage configured for this entry."
+    ::= { f3NtpTrackedClientEntry 5 }
+
+f3NtpTrackedClientRowStatus OBJECT-TYPE
+    SYNTAX         RowStatus
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION    "The status of this row.  An entry MUST NOT exist in the
+        active state unless all objects in the entry have an
+        appropriate value, as described
+        in the description clause for each writable object.
+        
+        The values of f3NtpTrackedClientRowStatus supported are
+        createAndGo(4) and destroy(6).  All mandatory attributes
+        must be specified in a single SNMP SET request with
+        f3NtpRemoteClientRowStatus value as createAndGo(4).
+        Upon successful row creation, this object has a
+        value of active(1).
+        
+        The f3NtpTrackedClientRowStatus object may be modified if
+        the associated instance of this object is equal to active(1)."
+    ::= { f3NtpTrackedClientEntry 6 }
+
+
+--
+-- NTP Remote Server Table 
+--
+f3NtpRemoteServerTable OBJECT-TYPE
+    SYNTAX         SEQUENCE OF F3NtpRemoteServerEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION    "A list of entries corresponding to NTP Server entities."
+    ::= { f3NtpObjects 8 }
+
+f3NtpRemoteServerEntry OBJECT-TYPE
+    SYNTAX         F3NtpRemoteServerEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION    "An entry containing information applicable to a particular
+        NTP Remote Server Entity."
+    INDEX    { neIndex, f3NtpClockIndex, f3NtpRemoteServerIndex }
+    ::= { f3NtpRemoteServerTable 1 }
+
+F3NtpRemoteServerEntry ::=
+    SEQUENCE {
+
+       f3NtpRemoteServerIndex Integer32,
+       f3NtpRemoteServerAlias DisplayString,
+       f3NtpRemoteServerAdminState AdminState,
+       f3NtpRemoteServerOperationalState OperationalState,
+       f3NtpRemoteServerSecondaryState SecondaryState,
+       f3NtpRemoteServerServerAddress DisplayString,
+       f3NtpRemoteServerMinPollInterval NtpPollingInterval,
+       f3NtpRemoteServerMaxPollInterval NtpPollingInterval,
+       f3NtpRemoteServerPreferred ToggleValue,
+       f3NtpRemoteServerReach Unsigned32,                                      
+       f3NtpRemoteServerStorageType StorageType,
+       f3NtpRemoteServerRowStatus RowStatus
+
+    }
+
+f3NtpRemoteServerIndex OBJECT-TYPE
+    SYNTAX         Integer32
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION    "Unique index value associated with the NTP Remote Server Entity."
+    ::= { f3NtpRemoteServerEntry 1 }
+    
+f3NtpRemoteServerAlias OBJECT-TYPE
+    SYNTAX         DisplayString (SIZE(0..256))
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION    "This object allows SNMP management entities to provide an
+        alias to the NTP Remote Server."
+    ::= { f3NtpRemoteServerEntry 2 }
+
+f3NtpRemoteServerAdminState OBJECT-TYPE
+    SYNTAX         AdminState
+    MAX-ACCESS     read-write
+    STATUS         current
+    DESCRIPTION    "This object represents the Administrative State of the NTP Remote Server"
+    ::= { f3NtpRemoteServerEntry 3 }
+
+f3NtpRemoteServerOperationalState OBJECT-TYPE
+    SYNTAX         OperationalState
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "This object represents the Operational State of the NTP Remote Server."
+    ::= { f3NtpRemoteServerEntry 4 }
+    
+f3NtpRemoteServerSecondaryState OBJECT-TYPE
+    SYNTAX      SecondaryState 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This object represents the Secondary State of the NTP Remote Server."
+    ::= { f3NtpRemoteServerEntry 5 }
+    
+f3NtpRemoteServerServerAddress OBJECT-TYPE
+    SYNTAX         DisplayString
+    MAX-ACCESS     read-write
+    STATUS         current
+    DESCRIPTION    "This object specifies the NTP Remote Server Address in form of IPv4 or IPv6 address or hostname."
+    ::= { f3NtpRemoteServerEntry 6 }
+
+f3NtpRemoteServerMinPollInterval OBJECT-TYPE
+    SYNTAX         NtpPollingInterval
+    MAX-ACCESS     read-write
+    STATUS         current
+    DESCRIPTION    "This object represents the specifies minimum polling interval on NTP Remote Server."
+    ::= { f3NtpRemoteServerEntry 7 }
+
+f3NtpRemoteServerMaxPollInterval OBJECT-TYPE
+    SYNTAX         NtpPollingInterval
+    MAX-ACCESS     read-write
+    STATUS         current
+    DESCRIPTION    "This object represents the specifies maximum polling interval on NTP Remote Server."
+    ::= { f3NtpRemoteServerEntry 8 }
+
+f3NtpRemoteServerPreferred OBJECT-TYPE
+    SYNTAX         ToggleValue
+    MAX-ACCESS     read-write
+    STATUS         current
+    DESCRIPTION    "This object allows server configuration as preferred one on the NTP Remote Server."
+    ::= { f3NtpRemoteServerEntry 9 }
+
+f3NtpRemoteServerReach OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "This object returns information on packet loss."
+    ::= { f3NtpRemoteServerEntry 10 }
+
+f3NtpRemoteServerStorageType OBJECT-TYPE
+    SYNTAX         StorageType
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION    "The type of storage configured for this entry."
+    ::= { f3NtpRemoteServerEntry 11 }
+
+f3NtpRemoteServerRowStatus OBJECT-TYPE
+    SYNTAX         RowStatus
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION    "The status of this row.  An entry MUST NOT exist in the
+        active state unless all objects in the entry have an
+        appropriate value, as described
+        in the description clause for each writable object.
+        
+        The values of f3NtpRemoteServerRowStatus supported are
+        createAndGo(4) and destroy(6).  All mandatory attributes
+        must be specified in a single SNMP SET request with
+        f3NtpRemoteServerRowStatus value as createAndGo(4).
+        Upon successful row creation, this object has a
+        value of active(1).
+        
+        The f3NtpRemoteServerRowStatus object may be modified if
+        the associated instance of this object is equal to active(1)."
+    ::= { f3NtpRemoteServerEntry 12 }
+--
+-- PERFORMANCE 
+--
+--
+-- NTP Clock Interface Statistics Table 
+--
+f3NCIStatsTable OBJECT-TYPE
+    SYNTAX         SEQUENCE OF F3NCIStatsEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION    "A collection of NTP Clock Interface(NCI) related statistics.
+        These reflect the current data."
+    ::= { f3NtpPerformanceObjects 1 }
+
+f3NCIStatsEntry OBJECT-TYPE
+    SYNTAX         F3NCIStatsEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION    "A conceptual row in the f3NCIStatsTable. Entries exist
+        in this table for each NTP Clock Interface."
+    INDEX    { neIndex, f3NtpClockIndex, f3NCIIndex, f3NCIStatsIndex }
+    ::= { f3NCIStatsTable 1 }
+
+F3NCIStatsEntry ::=
+    SEQUENCE {
+        f3NCIStatsIndex Integer32,
+        f3NCIStatsIntervalType CmPmIntervalType,
+        f3NCIStatsValid TruthValue,
+        f3NCIStatsAction CmPmBinAction,
+        f3NCIStatsRequestsProcessed PerfCounter64,
+        f3NCIStatsResponsesError PerfCounter64,
+
+        f3NCIStatsAuthFailures  PerfCounter64,
+        f3NCIStatsReqsDiscarded PerfCounter64,
+        f3NCIStatsAvgTPS        PerfCounter64,
+        f3NCIStatsMaxTPS        PerfCounter64
+    }
+
+
+f3NCIStatsIndex OBJECT-TYPE
+    SYNTAX         Integer32 (1..4)
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION    "An arbitrary integer index value used to uniquely identify
+        this NTP Clock Interface statistics entry.
+        1 - 15min
+        2 - 1day
+        3 - rollover
+        4 - 5min"
+    ::= { f3NCIStatsEntry 1 }
+
+f3NCIStatsIntervalType OBJECT-TYPE
+    SYNTAX         CmPmIntervalType
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "Indicates the type of collection, i.e. whether it is
+        15 Min, 1 Day or rollover."
+    ::= { f3NCIStatsEntry 2 }
+
+f3NCIStatsValid OBJECT-TYPE
+    SYNTAX         TruthValue
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "Indicates the validity of the bin."
+    ::= { f3NCIStatsEntry 3 }
+
+f3NCIStatsAction OBJECT-TYPE
+    SYNTAX         CmPmBinAction
+    MAX-ACCESS     read-write
+    STATUS         current
+    DESCRIPTION    "Allows the Manager to clear the bin."
+    ::= { f3NCIStatsEntry 4 }
+
+f3NCIStatsRequestsProcessed OBJECT-TYPE
+    SYNTAX         PerfCounter64
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "Count of NTP messages that have been processed by the NCI."
+    ::= { f3NCIStatsEntry 5 }
+
+f3NCIStatsResponsesError OBJECT-TYPE
+    SYNTAX         PerfCounter64
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "Count of NTP Error messages that have been transmitted by 
+        the NCI when messages could not have been processed."
+    ::= { f3NCIStatsEntry 6 }
+
+f3NCIStatsAuthFailures OBJECT-TYPE
+    SYNTAX         PerfCounter64
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "Count of NTP Authentication Failures that have been processed by the NCI."
+    ::= { f3NCIStatsEntry 7 }
+
+f3NCIStatsReqsDiscarded OBJECT-TYPE
+    SYNTAX         PerfCounter64
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "Count of NTP Requests Discarded that have been processed by the NCI."
+    ::= { f3NCIStatsEntry 8 }
+
+f3NCIStatsAvgTPS OBJECT-TYPE
+    SYNTAX         PerfCounter64
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "Count of NTP Average number of PTS."
+    ::= { f3NCIStatsEntry 9 }
+
+f3NCIStatsMaxTPS OBJECT-TYPE
+    SYNTAX         PerfCounter64
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "Count of NTP Maximum number of PTS."
+    ::= { f3NCIStatsEntry 10 }
+
+--
+-- NTP Clock Interface History Table 
+--
+f3NCIHistoryTable OBJECT-TYPE
+    SYNTAX         SEQUENCE OF F3NCIHistoryEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION    "A collection history data for each NTP Clock Interface
+        and different time interval."
+    ::= { f3NtpPerformanceObjects 2 }
+
+f3NCIHistoryEntry OBJECT-TYPE
+    SYNTAX         F3NCIHistoryEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION    "A conceptual row in the f3NCIHistoryTable.
+        Entries exist in this table for each NTP Clock Interface
+        and different time interval."
+    INDEX    { neIndex, f3NtpClockIndex, f3NCIIndex, f3NCIStatsIndex,
+        f3NCIHistoryIndex }
+    ::= { f3NCIHistoryTable 1 }
+
+F3NCIHistoryEntry ::=
+    SEQUENCE {
+        f3NCIHistoryIndex Integer32,
+        f3NCIHistoryTime DateAndTime,
+        f3NCIHistoryValid TruthValue,
+        f3NCIHistoryAction CmPmBinAction,
+        f3NCIHistoryRequestsProcessed PerfCounter64,
+        f3NCIHistoryResponsesError PerfCounter64,
+
+        f3NCIHistoryAuthFailures  PerfCounter64,
+        f3NCIHistoryReqsDiscarded PerfCounter64,
+        f3NCIHistoryAvgTPS        PerfCounter64,
+        f3NCIHistoryMaxTPS        PerfCounter64
+    }
+
+
+f3NCIHistoryIndex OBJECT-TYPE
+    SYNTAX         Integer32 (1..32)
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION    "An arbitrary integer index value used to uniquely identify
+        this NTP Clock Interface and time interval entry."
+    ::= { f3NCIHistoryEntry 1 }
+
+f3NCIHistoryTime OBJECT-TYPE
+    SYNTAX         DateAndTime
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "Indicates the time of history bin creation."
+    ::= { f3NCIHistoryEntry 2 }
+
+f3NCIHistoryValid OBJECT-TYPE
+    SYNTAX         TruthValue
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "Indicates the validity of the bin."
+    ::= { f3NCIHistoryEntry 3 }
+
+f3NCIHistoryAction OBJECT-TYPE
+    SYNTAX         CmPmBinAction
+    MAX-ACCESS     read-write
+    STATUS         current
+    DESCRIPTION    "Allows the Manager to clear the bin."
+    ::= { f3NCIHistoryEntry 4 }
+
+f3NCIHistoryRequestsProcessed OBJECT-TYPE
+    SYNTAX         PerfCounter64
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "Count of NTP messages that have been processed by the NCI."
+    ::= { f3NCIHistoryEntry 5 }
+
+f3NCIHistoryResponsesError OBJECT-TYPE
+    SYNTAX         PerfCounter64
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "Count of NTP Error messages that have been transmitted by 
+        the NCI when messages could not have been processed."
+    ::= { f3NCIHistoryEntry 6 }
+
+f3NCIHistoryAuthFailures OBJECT-TYPE
+    SYNTAX         PerfCounter64
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "Count of NTP Authentication Failures that have been processed by the NCI."
+    ::= { f3NCIHistoryEntry 7 }
+
+f3NCIHistoryReqsDiscarded OBJECT-TYPE
+    SYNTAX         PerfCounter64
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "Count of NTP Requests Discarded that have been processed by the NCI."
+    ::= { f3NCIHistoryEntry 8 }
+
+f3NCIHistoryAvgTPS OBJECT-TYPE
+    SYNTAX         PerfCounter64
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "Count of NTP Average number of PTS."
+    ::= { f3NCIHistoryEntry 9 }
+
+f3NCIHistoryMaxTPS OBJECT-TYPE
+    SYNTAX         PerfCounter64
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "Count of NTP Maximum number of PTS."
+    ::= { f3NCIHistoryEntry 10 }
+
+--
+-- NTP Clock Interface Threshold Table 
+--
+f3NCIThresholdTable OBJECT-TYPE
+    SYNTAX         SEQUENCE OF F3NCIThresholdEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION    "A table of entries that allow manageability of
+        a list of Thresholds for NTP Clock Interface."
+    ::= { f3NtpPerformanceObjects 3 }
+
+f3NCIThresholdEntry OBJECT-TYPE
+    SYNTAX         F3NCIThresholdEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION    "A conceptual row in the f3NCIThresholdTable."
+    INDEX    { neIndex, f3NtpClockIndex, f3NCIIndex, f3NCIStatsIndex,
+        f3NCIThresholdIndex }
+    ::= { f3NCIThresholdTable 1 }
+
+F3NCIThresholdEntry ::=
+    SEQUENCE {
+        f3NCIThresholdIndex Integer32,
+        f3NCIThresholdInterval CmPmIntervalType,
+        f3NCIThresholdVariable VariablePointer,
+        f3NCIThresholdValueLo Unsigned32,
+        f3NCIThresholdValueHi Unsigned32,
+        f3NCIThresholdMonValue PerfCounter64
+    }
+
+
+f3NCIThresholdIndex OBJECT-TYPE
+    SYNTAX         Integer32 (1..65535)
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION    "An index that uniquely identifies an entry in the
+        f3NCIThresholdTable."
+    ::= { f3NCIThresholdEntry 1 }
+
+f3NCIThresholdInterval OBJECT-TYPE
+    SYNTAX         CmPmIntervalType
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "The time interval over which monitored value is
+        sampled and compared with the specified threshold."
+    ::= { f3NCIThresholdEntry 2 }
+
+f3NCIThresholdVariable OBJECT-TYPE
+    SYNTAX         VariablePointer
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "The object identifier of the particular variable to be sampled."
+    ::= { f3NCIThresholdEntry 3 }
+
+f3NCIThresholdValueLo OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-write
+    STATUS         current
+    DESCRIPTION    "Lower 32 bits of the threshold value."
+    ::= { f3NCIThresholdEntry 4 }
+
+f3NCIThresholdValueHi OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-write
+    STATUS         current
+    DESCRIPTION    "Higher 32 bits of the threshold value."
+    ::= { f3NCIThresholdEntry 5 }
+
+f3NCIThresholdMonValue OBJECT-TYPE
+    SYNTAX         PerfCounter64
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "Monitored value corresponding to f3NCIThresholdVariable value."
+    ::= { f3NCIThresholdEntry 6 }
+
+--
+-- Access Port NTP Flow Point Statistics Table 
+--
+f3NtpAccPortFlowPointStatsTable OBJECT-TYPE
+    SYNTAX         SEQUENCE OF F3NtpAccPortFlowPointStatsEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION    "A collection of Access Port NTP Flow Point statistics.
+        These reflect the current data."
+    ::= { f3NtpPerformanceObjects 4 }
+
+f3NtpAccPortFlowPointStatsEntry OBJECT-TYPE
+    SYNTAX         F3NtpAccPortFlowPointStatsEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION    "A conceptual row in the f3NtpAccPortFlowPointStatsTable.
+        Entries exist in this table for each Access Port NTP Flow Point."
+    INDEX    { neIndex, shelfIndex, slotIndex, cmEthernetAccPortIndex,
+        f3NtpAccPortFlowPointIndex, f3NtpAccPortFlowPointStatsIndex }
+    ::= { f3NtpAccPortFlowPointStatsTable 1 }
+
+F3NtpAccPortFlowPointStatsEntry ::=
+    SEQUENCE {
+        f3NtpAccPortFlowPointStatsIndex Integer32,
+        f3NtpAccPortFlowPointStatsIntervalType CmPmIntervalType,
+        f3NtpAccPortFlowPointStatsValid TruthValue,
+        f3NtpAccPortFlowPointStatsAction CmPmBinAction,
+        f3NtpAccPortFlowPointStatsRequestsDropped PerfCounter64,
+        f3NtpAccPortFlowPointStatsRequestsReceived PerfCounter64,
+        f3NtpAccPortFlowPointStatsResponsesTransmitted PerfCounter64
+    }
+
+
+f3NtpAccPortFlowPointStatsIndex OBJECT-TYPE
+    SYNTAX         Integer32 (1..4)
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION    "An arbitrary integer index value used to uniquely identify
+        this Access Port NTP Flow Point statistics entry.
+        1 - 15min
+        2 - 1day
+        3 - rollover
+        4 - 5min"
+    ::= { f3NtpAccPortFlowPointStatsEntry 1 }
+
+f3NtpAccPortFlowPointStatsIntervalType OBJECT-TYPE
+    SYNTAX         CmPmIntervalType
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "Indicates the type of collection, i.e. whether it is
+        5 Min, 15 Min, 1 Day or rollover."
+    ::= { f3NtpAccPortFlowPointStatsEntry 2 }
+
+f3NtpAccPortFlowPointStatsValid OBJECT-TYPE
+    SYNTAX         TruthValue
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "Indicates the validity of the bin."
+    ::= { f3NtpAccPortFlowPointStatsEntry 3 }
+
+f3NtpAccPortFlowPointStatsAction OBJECT-TYPE
+    SYNTAX         CmPmBinAction
+    MAX-ACCESS     read-write
+    STATUS         current
+    DESCRIPTION    "Allows the Manager to clear the bin."
+    ::= { f3NtpAccPortFlowPointStatsEntry 4 }
+
+f3NtpAccPortFlowPointStatsRequestsDropped OBJECT-TYPE
+    SYNTAX         PerfCounter64
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "Count of NTP messages that have been dropped from the NTP Flow Point."
+    ::= { f3NtpAccPortFlowPointStatsEntry 5 }
+
+f3NtpAccPortFlowPointStatsRequestsReceived OBJECT-TYPE
+    SYNTAX         PerfCounter64
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "Count of NTP messages that have been recieved on the NTP Flow Point."
+    ::= { f3NtpAccPortFlowPointStatsEntry 6 }
+
+f3NtpAccPortFlowPointStatsResponsesTransmitted OBJECT-TYPE
+    SYNTAX         PerfCounter64
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "Count of NTP messages that have been transmitted on the NTP Flow Point."
+    ::= { f3NtpAccPortFlowPointStatsEntry 7 }
+
+--
+-- Access Port NTP Flow Point History Table 
+--
+f3NtpAccPortFlowPointHistoryTable OBJECT-TYPE
+    SYNTAX         SEQUENCE OF F3NtpAccPortFlowPointHistoryEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION    "A collection of Access Port NTP Flow Point history statistics.
+        These reflect the history data."
+    ::= { f3NtpPerformanceObjects 5 }
+
+f3NtpAccPortFlowPointHistoryEntry OBJECT-TYPE
+    SYNTAX         F3NtpAccPortFlowPointHistoryEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION    "A conceptual row in the f3NtpAccPortFlowPointHistoryTable.
+        Entries exist in this table for each Access Port Flow Point."
+    INDEX    { neIndex, shelfIndex, slotIndex, cmEthernetAccPortIndex,
+        f3NtpAccPortFlowPointIndex, f3NtpAccPortFlowPointStatsIndex,
+        f3NtpAccPortFlowPointHistoryIndex }
+    ::= { f3NtpAccPortFlowPointHistoryTable 1 }
+
+F3NtpAccPortFlowPointHistoryEntry ::=
+    SEQUENCE {
+        f3NtpAccPortFlowPointHistoryIndex Integer32,
+        f3NtpAccPortFlowPointHistoryTime DateAndTime,
+        f3NtpAccPortFlowPointHistoryValid TruthValue,
+        f3NtpAccPortFlowPointHistoryAction CmPmBinAction,
+        f3NtpAccPortFlowPointHistoryRequestsDropped PerfCounter64,
+        f3NtpAccPortFlowPointHistoryRequestsReceived PerfCounter64,
+        f3NtpAccPortFlowPointHistoryResponsesTransmitted PerfCounter64
+    }
+
+
+f3NtpAccPortFlowPointHistoryIndex OBJECT-TYPE
+    SYNTAX         Integer32 (1..32)
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION    "An arbitrary integer index value used to uniquely identify
+        this Ethernet Access Port NTP Flow point history bin entry."
+    ::= { f3NtpAccPortFlowPointHistoryEntry 1 }
+
+f3NtpAccPortFlowPointHistoryTime OBJECT-TYPE
+    SYNTAX         DateAndTime
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "Indicates the time of history bin creation."
+    ::= { f3NtpAccPortFlowPointHistoryEntry 2 }
+
+f3NtpAccPortFlowPointHistoryValid OBJECT-TYPE
+    SYNTAX         TruthValue
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "Indicates the validity of the bin."
+    ::= { f3NtpAccPortFlowPointHistoryEntry 3 }
+
+f3NtpAccPortFlowPointHistoryAction OBJECT-TYPE
+    SYNTAX         CmPmBinAction
+    MAX-ACCESS     read-write
+    STATUS         current
+    DESCRIPTION    "Allows the Manager to clear the bin."
+    ::= { f3NtpAccPortFlowPointHistoryEntry 4 }
+
+f3NtpAccPortFlowPointHistoryRequestsDropped OBJECT-TYPE
+    SYNTAX         PerfCounter64
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "Count of NTP messages that have been dropped from the NTP Flow Point."
+    ::= { f3NtpAccPortFlowPointHistoryEntry 5 }
+
+f3NtpAccPortFlowPointHistoryRequestsReceived OBJECT-TYPE
+    SYNTAX         PerfCounter64
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "Count of NTP messages that have been recieved on the NTP Flow Point."
+    ::= { f3NtpAccPortFlowPointHistoryEntry 6 }
+
+f3NtpAccPortFlowPointHistoryResponsesTransmitted OBJECT-TYPE
+    SYNTAX         PerfCounter64
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "Count of NTP messages that have been transmitted on the NTP Flow Point."
+    ::= { f3NtpAccPortFlowPointHistoryEntry 7 }
+
+--
+-- Access Port NTP Flow Point Threshold Table 
+--
+f3NtpAccPortFlowPointThresholdTable OBJECT-TYPE
+    SYNTAX         SEQUENCE OF F3NtpAccPortFlowPointThresholdEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION    "A table of entries that allow manageability of Access Port NTP Flow Point
+        Thresholds."
+    ::= { f3NtpPerformanceObjects 6 }
+
+f3NtpAccPortFlowPointThresholdEntry OBJECT-TYPE
+    SYNTAX         F3NtpAccPortFlowPointThresholdEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION    "A conceptual row in the f3NtpAccPortFlowPointThresholdTable."
+    INDEX    { neIndex, shelfIndex, slotIndex, cmEthernetAccPortIndex,
+        f3NtpAccPortFlowPointIndex, f3NtpAccPortFlowPointStatsIndex,
+        f3NtpAccPortFlowPointThresholdIndex }
+    ::= { f3NtpAccPortFlowPointThresholdTable 1 }
+
+F3NtpAccPortFlowPointThresholdEntry ::=
+    SEQUENCE {
+        f3NtpAccPortFlowPointThresholdIndex Integer32,
+        f3NtpAccPortFlowPointThresholdInterval CmPmIntervalType,
+        f3NtpAccPortFlowPointThresholdVariable VariablePointer,
+        f3NtpAccPortFlowPointThresholdValueLo Unsigned32,
+        f3NtpAccPortFlowPointThresholdValueHi Unsigned32,
+        f3NtpAccPortFlowPointThresholdMonValue PerfCounter64
+    }
+
+
+f3NtpAccPortFlowPointThresholdIndex OBJECT-TYPE
+    SYNTAX         Integer32 (1..65535)
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION    "An index that uniquely identifies an entry in the
+        f3NtpAccPortFlowPointThresholdTable."
+    ::= { f3NtpAccPortFlowPointThresholdEntry 1 }
+
+f3NtpAccPortFlowPointThresholdInterval OBJECT-TYPE
+    SYNTAX         CmPmIntervalType
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "The interval over which monitored value is
+        sampled and compared with the specified threshold."
+    ::= { f3NtpAccPortFlowPointThresholdEntry 2 }
+
+f3NtpAccPortFlowPointThresholdVariable OBJECT-TYPE
+    SYNTAX         VariablePointer
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "The object identifier of the particular variable to be
+        sampled."
+    ::= { f3NtpAccPortFlowPointThresholdEntry 3 }
+
+f3NtpAccPortFlowPointThresholdValueLo OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-write
+    STATUS         current
+    DESCRIPTION    "Lower 32 bits of the threshold value."
+    ::= { f3NtpAccPortFlowPointThresholdEntry 4 }
+
+f3NtpAccPortFlowPointThresholdValueHi OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-write
+    STATUS         current
+    DESCRIPTION    "Higher 32 bits of the threshold value."
+    ::= { f3NtpAccPortFlowPointThresholdEntry 5 }
+
+f3NtpAccPortFlowPointThresholdMonValue OBJECT-TYPE
+    SYNTAX         PerfCounter64
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "Monitored value corresponding to f3NtpAccPortFlowPointThresholdVariable."
+    ::= { f3NtpAccPortFlowPointThresholdEntry 6 }
+
+--
+-- Network Port NTP Flow Point Statistics Table 
+--
+f3NtpNetPortFlowPointStatsTable OBJECT-TYPE
+    SYNTAX         SEQUENCE OF F3NtpNetPortFlowPointStatsEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION    "A collection of Network Port NTP Flow Point statistics.
+        These reflect the current data."
+    ::= { f3NtpPerformanceObjects 7 }
+
+f3NtpNetPortFlowPointStatsEntry OBJECT-TYPE
+    SYNTAX         F3NtpNetPortFlowPointStatsEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION    "A conceptual row in the f3NtpNetPortFlowPointStatsTable.
+        Entries exist in this table for each Network Port NTP Flow Point."
+    INDEX    { neIndex, shelfIndex, slotIndex, cmEthernetNetPortIndex,
+        f3NtpNetPortFlowPointIndex, f3NtpNetPortFlowPointStatsIndex }
+    ::= { f3NtpNetPortFlowPointStatsTable 1 }
+
+F3NtpNetPortFlowPointStatsEntry ::=
+    SEQUENCE {
+        f3NtpNetPortFlowPointStatsIndex Integer32,
+        f3NtpNetPortFlowPointStatsIntervalType CmPmIntervalType,
+        f3NtpNetPortFlowPointStatsValid TruthValue,
+        f3NtpNetPortFlowPointStatsAction CmPmBinAction,
+        f3NtpNetPortFlowPointStatsRequestsDropped PerfCounter64,
+        f3NtpNetPortFlowPointStatsRequestsReceived PerfCounter64,
+        f3NtpNetPortFlowPointStatsResponsesTransmitted PerfCounter64
+    }
+
+
+f3NtpNetPortFlowPointStatsIndex OBJECT-TYPE
+    SYNTAX         Integer32 (1..4)
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION    "An arbitrary integer index value used to uniquely identify
+        this Network Port NTP Flow Point statistics entry.
+        1 - 15min
+        2 - 1day
+        3 - rollover
+        4 - 5min"
+    ::= { f3NtpNetPortFlowPointStatsEntry 1 }
+
+f3NtpNetPortFlowPointStatsIntervalType OBJECT-TYPE
+    SYNTAX         CmPmIntervalType
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "Indicates the type of collection, i.e. whether it is
+        5 Min, 15 Min, 1 Day or rollover."
+    ::= { f3NtpNetPortFlowPointStatsEntry 2 }
+
+f3NtpNetPortFlowPointStatsValid OBJECT-TYPE
+    SYNTAX         TruthValue
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "Indicates the validity of the bin."
+    ::= { f3NtpNetPortFlowPointStatsEntry 3 }
+
+f3NtpNetPortFlowPointStatsAction OBJECT-TYPE
+    SYNTAX         CmPmBinAction
+    MAX-ACCESS     read-write
+    STATUS         current
+    DESCRIPTION    "Allows the Manager to clear the bin."
+    ::= { f3NtpNetPortFlowPointStatsEntry 4 }
+
+f3NtpNetPortFlowPointStatsRequestsDropped OBJECT-TYPE
+    SYNTAX         PerfCounter64
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "Count of NTP messages that have been dropped from the NTP Flow Point."
+    ::= { f3NtpNetPortFlowPointStatsEntry 5 }
+
+f3NtpNetPortFlowPointStatsRequestsReceived OBJECT-TYPE
+    SYNTAX         PerfCounter64
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "Count of NTP messages that have been recieved on the NTP Flow Point."
+    ::= { f3NtpNetPortFlowPointStatsEntry 6 }
+
+f3NtpNetPortFlowPointStatsResponsesTransmitted OBJECT-TYPE
+    SYNTAX         PerfCounter64
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "Count of NTP messages that have been transmitted on the NTP Flow Point."
+    ::= { f3NtpNetPortFlowPointStatsEntry 7 }
+
+--
+-- Network Port NTP Flow Point History Table 
+--
+f3NtpNetPortFlowPointHistoryTable OBJECT-TYPE
+    SYNTAX         SEQUENCE OF F3NtpNetPortFlowPointHistoryEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION    "A collection of Network Port NTP Flow Point history statistics.
+        These reflect the history data."
+    ::= { f3NtpPerformanceObjects 8 }
+
+f3NtpNetPortFlowPointHistoryEntry OBJECT-TYPE
+    SYNTAX         F3NtpNetPortFlowPointHistoryEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION    "A conceptual row in the f3NtpNetPortFlowPointHistoryTable.
+        Entries exist in this table for each Network Port NTP Flow Point."
+    INDEX    { neIndex, shelfIndex, slotIndex, cmEthernetNetPortIndex,
+        f3NtpNetPortFlowPointIndex, f3NtpNetPortFlowPointStatsIndex,
+        f3NtpNetPortFlowPointHistoryIndex }
+    ::= { f3NtpNetPortFlowPointHistoryTable 1 }
+
+F3NtpNetPortFlowPointHistoryEntry ::=
+    SEQUENCE {
+        f3NtpNetPortFlowPointHistoryIndex Integer32,
+        f3NtpNetPortFlowPointHistoryTime DateAndTime,
+        f3NtpNetPortFlowPointHistoryValid TruthValue,
+        f3NtpNetPortFlowPointHistoryAction CmPmBinAction,
+        f3NtpNetPortFlowPointHistoryRequestsDropped PerfCounter64,
+        f3NtpNetPortFlowPointHistoryRequestsReceived PerfCounter64,
+        f3NtpNetPortFlowPointHistoryResponsesTransmitted PerfCounter64
+    }
+
+
+f3NtpNetPortFlowPointHistoryIndex OBJECT-TYPE
+    SYNTAX         Integer32 (1..32)
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION    "An arbitrary integer index value used to uniquely identify
+        this Ethernet Traffic Port NTP Flow point history bin entry."
+    ::= { f3NtpNetPortFlowPointHistoryEntry 1 }
+
+f3NtpNetPortFlowPointHistoryTime OBJECT-TYPE
+    SYNTAX         DateAndTime
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "Indicates the time of history bin creation."
+    ::= { f3NtpNetPortFlowPointHistoryEntry 2 }
+
+f3NtpNetPortFlowPointHistoryValid OBJECT-TYPE
+    SYNTAX         TruthValue
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "Indicates the validity of the bin."
+    ::= { f3NtpNetPortFlowPointHistoryEntry 3 }
+
+f3NtpNetPortFlowPointHistoryAction OBJECT-TYPE
+    SYNTAX         CmPmBinAction
+    MAX-ACCESS     read-write
+    STATUS         current
+    DESCRIPTION    "Allows the Manager to clear the bin."
+    ::= { f3NtpNetPortFlowPointHistoryEntry 4 }
+
+f3NtpNetPortFlowPointHistoryRequestsDropped OBJECT-TYPE
+    SYNTAX         PerfCounter64
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "Count of NTP messages that have been dropped from the NTP Flow Point."
+    ::= { f3NtpNetPortFlowPointHistoryEntry 5 }
+
+f3NtpNetPortFlowPointHistoryRequestsReceived OBJECT-TYPE
+    SYNTAX         PerfCounter64
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "Count of NTP messages that have been recieved on the NTP Flow Point."
+    ::= { f3NtpNetPortFlowPointHistoryEntry 6 }
+
+f3NtpNetPortFlowPointHistoryResponsesTransmitted OBJECT-TYPE
+    SYNTAX         PerfCounter64
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "Count of NTP messages that have been transmitted on the NTP Flow Point."
+    ::= { f3NtpNetPortFlowPointHistoryEntry 7 }
+
+--
+-- Network Port NTP Flow Point Threshold Table 
+--
+f3NtpNetPortFlowPointThresholdTable OBJECT-TYPE
+    SYNTAX         SEQUENCE OF F3NtpNetPortFlowPointThresholdEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION    "A table of entries that allow manageability of Network Port NTP Flow Point
+        Thresholds."
+    ::= { f3NtpPerformanceObjects 9 }
+
+f3NtpNetPortFlowPointThresholdEntry OBJECT-TYPE
+    SYNTAX         F3NtpNetPortFlowPointThresholdEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION    "A conceptual row in the f3NtpNetPortFlowPointThresholdTable."
+    INDEX    { neIndex, shelfIndex, slotIndex, cmEthernetNetPortIndex,
+        f3NtpNetPortFlowPointIndex, f3NtpNetPortFlowPointStatsIndex,
+        f3NtpNetPortFlowPointThresholdIndex }
+    ::= { f3NtpNetPortFlowPointThresholdTable 1 }
+
+F3NtpNetPortFlowPointThresholdEntry ::=
+    SEQUENCE {
+        f3NtpNetPortFlowPointThresholdIndex Integer32,
+        f3NtpNetPortFlowPointThresholdInterval CmPmIntervalType,
+        f3NtpNetPortFlowPointThresholdVariable VariablePointer,
+        f3NtpNetPortFlowPointThresholdValueLo Unsigned32,
+        f3NtpNetPortFlowPointThresholdValueHi Unsigned32,
+        f3NtpNetPortFlowPointThresholdMonValue PerfCounter64
+    }
+
+
+f3NtpNetPortFlowPointThresholdIndex OBJECT-TYPE
+    SYNTAX         Integer32 (1..65535)
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION    "An index that uniquely identifies an entry in the
+        f3NtpNetPortFlowPointThresholdTable."
+    ::= { f3NtpNetPortFlowPointThresholdEntry 1 }
+
+f3NtpNetPortFlowPointThresholdInterval OBJECT-TYPE
+    SYNTAX         CmPmIntervalType
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "The interval over which monitored value is
+        sampled and compared with the specified threshold."
+    ::= { f3NtpNetPortFlowPointThresholdEntry 2 }
+
+f3NtpNetPortFlowPointThresholdVariable OBJECT-TYPE
+    SYNTAX         VariablePointer
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "The object identifier of the particular variable to be
+        sampled."
+    ::= { f3NtpNetPortFlowPointThresholdEntry 3 }
+
+f3NtpNetPortFlowPointThresholdValueLo OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-write
+    STATUS         current
+    DESCRIPTION    "Lower 32 bits of the threshold value."
+    ::= { f3NtpNetPortFlowPointThresholdEntry 4 }
+
+f3NtpNetPortFlowPointThresholdValueHi OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-write
+    STATUS         current
+    DESCRIPTION    "Higher 32 bits of the threshold value."
+    ::= { f3NtpNetPortFlowPointThresholdEntry 5 }
+
+f3NtpNetPortFlowPointThresholdMonValue OBJECT-TYPE
+    SYNTAX         PerfCounter64
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "Monitored value corresponding to f3NtpNetPortFlowPointThresholdVariable."
+    ::= { f3NtpNetPortFlowPointThresholdEntry 6 }
+    
+
+--
+-- PERFORMANCE 
+--
+--
+-- NTP Tracked Client Statistics Table 
+--
+f3NtpTrackedClientStatsTable OBJECT-TYPE
+    SYNTAX         SEQUENCE OF F3NtpTrackedClientStatsEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION    "A collection of NTP Tracked Client related statistics.
+        These reflect the current data."
+    ::= { f3NtpPerformanceObjects 10 }
+
+f3NtpTrackedClientStatsEntry OBJECT-TYPE
+    SYNTAX         F3NtpTrackedClientStatsEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION    "A conceptual row in the f3NtpTrackedClientStatsTable. Entries exist
+        in this table for each NTP Tracked Client."
+    INDEX    { neIndex, f3NtpClockIndex, f3NCIIndex, f3NtpTrackedClientStatsClientIndex, 
+    f3NtpTrackedClientStatsIndex }
+    ::= { f3NtpTrackedClientStatsTable 1 }
+
+F3NtpTrackedClientStatsEntry ::=
+    SEQUENCE {
+        f3NtpTrackedClientStatsIndex Integer32,
+        f3NtpTrackedClientStatsClientIndex Integer32,
+        f3NtpTrackedClientStatsIntervalType CmPmIntervalType,
+        f3NtpTrackedClientStatsValid TruthValue,
+        f3NtpTrackedClientStatsAction CmPmBinAction,
+        f3NtpTrackedClientStatsResponsesTransmitted PerfCounter64,
+        f3NtpTrackedClientStatsRequestsReceived PerfCounter64      
+    }
+
+
+f3NtpTrackedClientStatsIndex OBJECT-TYPE
+    SYNTAX         Integer32 (1..4)
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION    "An arbitrary integer index value used to uniquely identify
+        this NTP Tracked Client statistics entry.
+        1 - 15min
+        2 - 1day
+        3 - rollover
+        4 - 5min"
+    ::= { f3NtpTrackedClientStatsEntry 1 }
+    
+
+f3NtpTrackedClientStatsClientIndex OBJECT-TYPE
+    SYNTAX         Integer32 (1..4)
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION    "An arbitrary integer index value used to uniquely identify
+        this NTP Tracked Client ."
+    ::= { f3NtpTrackedClientStatsEntry 2 }
+
+f3NtpTrackedClientStatsIntervalType OBJECT-TYPE
+    SYNTAX         CmPmIntervalType
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "Indicates the type of collection, i.e. whether it is
+        15 Min, 1 Day or rollover."
+    ::= { f3NtpTrackedClientStatsEntry 3 }
+
+f3NtpTrackedClientStatsValid OBJECT-TYPE
+    SYNTAX         TruthValue
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "Indicates the validity of the bin."
+    ::= { f3NtpTrackedClientStatsEntry 4 }
+
+f3NtpTrackedClientStatsAction OBJECT-TYPE
+    SYNTAX         CmPmBinAction
+    MAX-ACCESS     read-write
+    STATUS         current
+    DESCRIPTION    "Allows the Manager to clear the bin."
+    ::= { f3NtpTrackedClientStatsEntry 5 }
+
+f3NtpTrackedClientStatsResponsesTransmitted OBJECT-TYPE
+    SYNTAX         PerfCounter64
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "Count of messages that have been transmitted by the Ntp Tracked Client."
+    ::= { f3NtpTrackedClientStatsEntry 6 }
+
+f3NtpTrackedClientStatsRequestsReceived OBJECT-TYPE
+    SYNTAX         PerfCounter64
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "Count of requests messages that have been received by the NtpTrackedClient."
+    ::= { f3NtpTrackedClientStatsEntry 7 }
+
+
+--
+-- NTP Tracked Client History Table 
+--
+f3NtpTrackedClientHistoryTable OBJECT-TYPE
+    SYNTAX         SEQUENCE OF F3NtpTrackedClientHistoryEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION    "A collection history data for each NTP Tracked Client
+        and different time interval."
+    ::= { f3NtpPerformanceObjects 11 }
+
+f3NtpTrackedClientHistoryEntry OBJECT-TYPE
+    SYNTAX         F3NtpTrackedClientHistoryEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION    "A conceptual row in the f3NtpTrackedClientHistoryTable.
+        Entries exist in this table for each NTP Tracked Client
+        and different time interval."
+    INDEX    { neIndex, f3NtpClockIndex, f3NCIIndex, f3NtpTrackedClientStatsClientIndex, 
+    		f3NtpTrackedClientStatsIndex, f3NtpTrackedClientHistoryIndex }
+    ::= { f3NtpTrackedClientHistoryTable 1 }
+
+F3NtpTrackedClientHistoryEntry ::=
+    SEQUENCE {
+        f3NtpTrackedClientHistoryIndex Integer32,
+        f3NtpTrackedClientHistoryTime DateAndTime,
+        f3NtpTrackedClientHistoryValid TruthValue,
+        f3NtpTrackedClientHistoryAction CmPmBinAction,       
+        f3NtpTrackedClientHistoryResponsesTransmitted PerfCounter64,
+        f3NtpTrackedClientHistoryRequestsReceived PerfCounter64
+
+    }
+
+
+f3NtpTrackedClientHistoryIndex OBJECT-TYPE
+    SYNTAX         Integer32 (1..32)
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION    "An arbitrary integer index value used to uniquely identify
+        this NTP Tracked Client and time interval entry."
+    ::= { f3NtpTrackedClientHistoryEntry 1 }
+
+f3NtpTrackedClientHistoryTime OBJECT-TYPE
+    SYNTAX         DateAndTime
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "Indicates the time of history bin creation."
+    ::= { f3NtpTrackedClientHistoryEntry 2 }
+
+f3NtpTrackedClientHistoryValid OBJECT-TYPE
+    SYNTAX         TruthValue
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "Indicates the validity of the bin."
+    ::= { f3NtpTrackedClientHistoryEntry 3 }
+
+f3NtpTrackedClientHistoryAction OBJECT-TYPE
+    SYNTAX         CmPmBinAction
+    MAX-ACCESS     read-write
+    STATUS         current
+    DESCRIPTION    "Allows the Manager to clear the bin."
+    ::= { f3NtpTrackedClientHistoryEntry 4 }
+
+f3NtpTrackedClientHistoryResponsesTransmitted OBJECT-TYPE
+    SYNTAX         PerfCounter64
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "Count of responses that have been transmitted."
+    ::= { f3NtpTrackedClientHistoryEntry 5 }
+
+f3NtpTrackedClientHistoryRequestsReceived OBJECT-TYPE
+    SYNTAX         PerfCounter64
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "Count of requests that have been received."
+    ::= { f3NtpTrackedClientHistoryEntry 6 }
+
+--
+-- NTP Tracked Client Threshold Table 
+--
+f3NtpTrackedClientThresholdTable OBJECT-TYPE
+    SYNTAX         SEQUENCE OF F3NtpTrackedClientThresholdEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION    "A table of entries that allow manageability of
+        a list of Thresholds for NTP Tracked Client."
+    ::= { f3NtpPerformanceObjects 12 }
+
+f3NtpTrackedClientThresholdEntry OBJECT-TYPE
+    SYNTAX         F3NtpTrackedClientThresholdEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION    "A conceptual row in the f3NtpTrackedClientThresholdTable."
+    INDEX    { neIndex, f3NtpClockIndex, f3NCIIndex, f3NtpTrackedClientStatsClientIndex,
+    		f3NtpTrackedClientStatsIndex, f3NtpTrackedClientThresholdIndex }
+    ::= { f3NtpTrackedClientThresholdTable 1 }
+
+F3NtpTrackedClientThresholdEntry ::=
+    SEQUENCE {
+        f3NtpTrackedClientThresholdIndex Integer32,
+        f3NtpTrackedClientThresholdInterval CmPmIntervalType,
+        f3NtpTrackedClientThresholdVariable VariablePointer,
+        f3NtpTrackedClientThresholdValueLo Unsigned32,
+        f3NtpTrackedClientThresholdValueHi Unsigned32,
+        f3NtpTrackedClientThresholdMonValue PerfCounter64
+    }
+
+
+f3NtpTrackedClientThresholdIndex OBJECT-TYPE
+    SYNTAX         Integer32 (1..65535)
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION    "An index that uniquely identifies an entry in the
+        f3NtpTrackedClientThresholdTable."
+    ::= { f3NtpTrackedClientThresholdEntry 1 }
+
+f3NtpTrackedClientThresholdInterval OBJECT-TYPE
+    SYNTAX         CmPmIntervalType
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "The time interval over which monitored value is
+        sampled and compared with the specified threshold."
+    ::= { f3NtpTrackedClientThresholdEntry 2 }
+
+f3NtpTrackedClientThresholdVariable OBJECT-TYPE
+    SYNTAX         VariablePointer
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "The object identifier of the particular variable to be sampled."
+    ::= { f3NtpTrackedClientThresholdEntry 3 }
+
+f3NtpTrackedClientThresholdValueLo OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-write
+    STATUS         current
+    DESCRIPTION    "Lower 32 bits of the threshold value."
+    ::= { f3NtpTrackedClientThresholdEntry 4 }
+
+f3NtpTrackedClientThresholdValueHi OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-write
+    STATUS         current
+    DESCRIPTION    "Higher 32 bits of the threshold value."
+    ::= { f3NtpTrackedClientThresholdEntry 5 }
+
+f3NtpTrackedClientThresholdMonValue OBJECT-TYPE
+    SYNTAX         PerfCounter64
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "Monitored value corresponding to f3NtpTrackedClientThresholdVariable value."
+    ::= { f3NtpTrackedClientThresholdEntry 6 }
+
+
+f3NtpTrackedClientCrossingAlert NOTIFICATION-TYPE
+    OBJECTS {
+        f3NtpTrackedClientThresholdIndex,
+        f3NtpTrackedClientThresholdInterval,
+        f3NtpTrackedClientThresholdVariable,
+        f3NtpTrackedClientThresholdValueLo,
+        f3NtpTrackedClientThresholdValueHi,
+        f3NtpTrackedClientThresholdMonValue
+    }
+    STATUS  current
+    DESCRIPTION
+            "This trap is sent each time a threshold on a PM condition
+             on an NtpTrackedClient is crossed."
+  ::= { f3NtpPerformanceNotifications 1 }
+
+
+--
+-- Conformance
+--
+f3NtpCompliances OBJECT IDENTIFIER ::= {f3NtpConformance 1}
+f3NtpGroups      OBJECT IDENTIFIER ::= {f3NtpConformance 2}
+
+f3NtpCompliance MODULE-COMPLIANCE
+    STATUS         current
+    DESCRIPTION    "Describes the requirements for conformance to the F3 NTP
+        group."
+    MODULE    -- this module
+        MANDATORY-GROUPS {
+              f3NtpObjectGroup, f3NtpPerfObjectGroup
+        }
+
+    ::= { f3NtpCompliances 1 }
+
+
+f3NtpObjectGroup OBJECT-GROUP
+    OBJECTS    {
+        f3NtpClockIndex, f3NtpClockAlias,
+        f3NtpClockAdminState, f3NtpClockOperationalState,
+        f3NtpClockTimeClock, f3NtpClockStratumLevel,
+        f3NtpClockLeapIndicator, f3NtpClockTimeScale,
+        f3NtpClockPrecision, f3NtpClockRootDelay,
+        f3NtpClockRootDispersion, f3NtpClockNtpMode,
+        f3NtpClockNtpType, f3NtpClockNtpAuthentication,
+        f3NtpClockServerState, f3NtpClockTimeReferenceLossHandling,
+        f3NtpClockRefClockId, f3NtpClockStorageType, f3NtpClockRowStatus,
+	f3NtpAuthenticationSecureMode,f3NtpAutokeyCtrl, f3NtpClockOffset, f3NtpClockSecondaryState,
+        
+        f3NCIIndex, f3NCIAlias,
+        f3NCIAdminState, f3NCIOperationalState,
+        f3NCIIfName, f3NCIIpProtocol,
+        f3NCIIpV4Address, f3NCIIpV4SubnetMask,
+        f3NCIDscp, f3NCIStorageType, f3NCIRowStatus,
+        f3NCIIpV6UdpChecksum, f3NCIIpV6Address,
+        f3NCIIpV6AddrPrefixLength, f3NCIIpV4Gateway,
+        f3NCIIpV6Gateway,f3NCIDefaultGatewayControl,
+        f3NCIDaytimeServiceControl, f3NCITimeServiceControl,
+        
+        f3NCIBroadcastState, f3NCIBroadcastIpV4Address,
+        f3NCIBroadcastIpV6Address, f3NCIBroadcastInterval,
+        f3NCIBroadcastMaxHops, f3NCIBroadcastSymKeyId,
+        f3NCIBroadcastNtpVersion,
+        f3NCIAssociationMode, f3NCIPeer1IpV4Address,
+        f3NCIPeer2IpV4Address, f3NCIPeer3IpV4Address,
+        f3NCIPeer1IpV6Address, f3NCIPeer2IpV6Address,
+        f3NCIPeer3IpV6Address, f3NCIPeerMinInterval,
+        f3NCIPeerMaxInterval, f3NCIPeerSymKeyIdList,
+        f3NCITimeScale, f3NCICurrentTimeOfDay,
+        f3NCINtpHardenedResponderControl,
+               
+        f3NtpVirtualPortIndex, f3NtpVirtualPortAlias,
+        f3NtpVirtualPortAdminState, f3NtpVirtualPortOperationalState,
+        f3NtpVirtualPortNtpFlowPoint,
+        f3NtpVirtualPortStorageType, f3NtpVirtualPortRowStatus,
+        
+        f3NtpRemoteClientIndex, f3NtpRemoteClientIpV4Address,
+        f3NtpRemoteClientRxPackets, f3NtpRemoteClientAvgPollInterval,
+        f3NtpRemoteClientLastPollInterval, f3NtpRemoteClientNtpMode,
+        f3NtpRemoteClientNtpVersion, f3NtpRemoteClientStorageType,
+        f3NtpRemoteClientRowStatus,
+        
+        f3NtpAccPortFlowPointIndex, f3NtpAccPortFlowPointAlias,
+        f3NtpAccPortFlowPointAdminState, f3NtpAccPortFlowPointOperationalState,
+        f3NtpAccPortFlowPointType,
+        f3NtpAccPortFlowPointOuterVlanEtherType, f3NtpAccPortFlowPointOuterVlanMemberList,
+        f3NtpAccPortFlowPointOuterUntaggedEnabled, f3NtpAccPortFlowPointInner1VlanEtherType,
+        f3NtpAccPortFlowPointInner1VlanMemberList, f3NtpAccPortFlowPointInner1UntaggedEnabled,
+        f3NtpAccPortFlowPointInner2VlanEtherType, f3NtpAccPortFlowPointInner2VlanMemberList,
+        f3NtpAccPortFlowPointInner2UntaggedEnabled, f3NtpAccPortFlowPointCOS,
+        f3NtpAccPortFlowPointCIRLo, f3NtpAccPortFlowPointCIRHi,
+        f3NtpAccPortFlowPointEIRLo, f3NtpAccPortFlowPointEIRHi,
+        f3NtpAccPortFlowPointBufferSize, f3NtpAccPortFlowPointStorageType, f3NtpAccPortFlowPointRowStatus,
+        
+        f3NtpNetPortFlowPointIndex, f3NtpNetPortFlowPointAlias,
+        f3NtpNetPortFlowPointAdminState, f3NtpNetPortFlowPointOperationalState,
+        f3NtpNetPortFlowPointType,
+        f3NtpNetPortFlowPointOuterVlanEtherType, f3NtpNetPortFlowPointOuterVlanMemberList,
+        f3NtpNetPortFlowPointOuterUntaggedEnabled, f3NtpNetPortFlowPointInner1VlanEtherType,
+        f3NtpNetPortFlowPointInner1VlanMemberList, f3NtpNetPortFlowPointInner1UntaggedEnabled,
+        f3NtpNetPortFlowPointInner2VlanEtherType, f3NtpNetPortFlowPointInner2VlanMemberList,
+        f3NtpNetPortFlowPointInner2UntaggedEnabled, f3NtpNetPortFlowPointCOS,
+        f3NtpNetPortFlowPointCIRLo, f3NtpNetPortFlowPointCIRHi,
+        f3NtpNetPortFlowPointEIRLo, f3NtpNetPortFlowPointEIRHi,
+        f3NtpNetPortFlowPointBufferSize, f3NtpNetPortFlowPointStorageType, f3NtpNetPortFlowPointRowStatus,
+        
+        f3NtpTrackedClientIndex, f3NtpTrackedClientAlias, 
+        f3NtpTrackedClientIpV4Address, f3NtpTrackedClientIpV6Address,
+        f3NtpTrackedClientStorageType, f3NtpTrackedClientRowStatus,
+        f3NtpRemoteServerIndex, f3NtpRemoteServerAlias, f3NtpRemoteServerAdminState,
+        f3NtpRemoteServerOperationalState, f3NtpRemoteServerServerAddress,       
+        f3NtpRemoteServerMinPollInterval, f3NtpRemoteServerMaxPollInterval,
+        f3NtpRemoteServerPreferred, f3NtpRemoteServerReach,                                      
+        f3NtpRemoteServerStorageType, f3NtpRemoteServerRowStatus
+               
+        }
+    STATUS         current
+    DESCRIPTION    "A collection of objects used to manage the F3 NTP Object group."
+    ::= { f3NtpGroups 1 }
+
+f3NtpPerfObjectGroup OBJECT-GROUP
+    OBJECTS {
+
+        f3NCIStatsIndex, f3NCIStatsIntervalType,
+        f3NCIStatsValid, f3NCIStatsAction,
+        f3NCIStatsRequestsProcessed, f3NCIStatsResponsesError,
+        f3NCIStatsAuthFailures, 
+        f3NCIStatsReqsDiscarded,
+        f3NCIStatsAvgTPS,       
+        f3NCIStatsMaxTPS,       
+
+        f3NCIHistoryIndex, f3NCIHistoryTime,
+        f3NCIHistoryValid, f3NCIHistoryAction,
+        f3NCIHistoryRequestsProcessed, f3NCIHistoryResponsesError,
+        f3NCIHistoryAuthFailures, 
+        f3NCIHistoryReqsDiscarded,
+        f3NCIHistoryAvgTPS,       
+        f3NCIHistoryMaxTPS,       
+
+        f3NCIThresholdIndex, f3NCIThresholdInterval,
+        f3NCIThresholdVariable, f3NCIThresholdValueLo,
+        f3NCIThresholdValueHi, f3NCIThresholdMonValue,
+
+        f3NtpAccPortFlowPointStatsIndex, f3NtpAccPortFlowPointStatsIntervalType,
+        f3NtpAccPortFlowPointStatsValid, f3NtpAccPortFlowPointStatsAction,
+        f3NtpAccPortFlowPointStatsRequestsDropped,
+        f3NtpAccPortFlowPointStatsRequestsReceived, f3NtpAccPortFlowPointStatsResponsesTransmitted,
+
+        f3NtpAccPortFlowPointHistoryIndex, f3NtpAccPortFlowPointHistoryTime,
+        f3NtpAccPortFlowPointHistoryValid, f3NtpAccPortFlowPointHistoryAction,
+        f3NtpAccPortFlowPointHistoryRequestsDropped,
+        f3NtpAccPortFlowPointHistoryRequestsReceived, f3NtpAccPortFlowPointHistoryResponsesTransmitted,
+
+        f3NtpAccPortFlowPointThresholdIndex, f3NtpAccPortFlowPointThresholdInterval,
+        f3NtpAccPortFlowPointThresholdVariable,
+        f3NtpAccPortFlowPointThresholdValueLo, f3NtpAccPortFlowPointThresholdValueHi,
+        f3NtpAccPortFlowPointThresholdMonValue,
+       
+        f3NtpNetPortFlowPointStatsIndex, f3NtpNetPortFlowPointStatsIntervalType,
+        f3NtpNetPortFlowPointStatsValid, f3NtpNetPortFlowPointStatsAction,
+        f3NtpNetPortFlowPointStatsRequestsDropped,
+        f3NtpNetPortFlowPointStatsRequestsReceived, f3NtpNetPortFlowPointStatsResponsesTransmitted,
+
+        f3NtpNetPortFlowPointHistoryIndex, f3NtpNetPortFlowPointHistoryTime,
+        f3NtpNetPortFlowPointHistoryValid, f3NtpNetPortFlowPointHistoryAction,
+        f3NtpNetPortFlowPointHistoryRequestsDropped,
+        f3NtpNetPortFlowPointHistoryRequestsReceived, f3NtpNetPortFlowPointHistoryResponsesTransmitted,
+
+        f3NtpNetPortFlowPointThresholdIndex, f3NtpNetPortFlowPointThresholdInterval,
+        f3NtpNetPortFlowPointThresholdVariable,
+        f3NtpNetPortFlowPointThresholdValueLo, f3NtpNetPortFlowPointThresholdValueHi,
+        f3NtpNetPortFlowPointThresholdMonValue,
+        
+        f3NtpTrackedClientStatsIndex, f3NtpTrackedClientStatsIntervalType,
+        f3NtpTrackedClientStatsValid, f3NtpTrackedClientStatsAction,
+        f3NtpTrackedClientStatsResponsesTransmitted, f3NtpTrackedClientStatsRequestsReceived,
+              
+
+        f3NtpTrackedClientHistoryIndex, f3NtpTrackedClientHistoryTime,
+        f3NtpTrackedClientHistoryValid, f3NtpTrackedClientHistoryAction,
+        f3NtpTrackedClientHistoryResponsesTransmitted, f3NtpTrackedClientHistoryRequestsReceived,
+            
+
+        f3NtpTrackedClientThresholdIndex, f3NtpTrackedClientThresholdInterval,
+        f3NtpTrackedClientThresholdVariable, f3NtpTrackedClientThresholdValueLo,
+        f3NtpTrackedClientThresholdValueHi, f3NtpTrackedClientThresholdMonValue     
+        
+
+
+    }
+    STATUS  current
+    DESCRIPTION
+        "A collection of objects used to manage the F3 NTP Performance data."
+    ::= { f3NtpGroups 2 }
+
+END

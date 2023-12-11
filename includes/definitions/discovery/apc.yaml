@@ -46,12 +46,23 @@ modules:
                     value: memInputNormalState
                     num_oid: '.1.3.6.1.4.1.318.1.1.10.4.3.4.1.7.{{ $index }}'
                     index: 'memInputNormalState.{{ $index }}'
-                    descr: memInputName
+                    descr: 'Normal state: {{ $memInputName }}'
                     states:
                         - { descr: Closed, graph: 1, value: 1, generic: 0 }
                         - { descr: Open, graph: 1, value: 2, generic: 0 }
                         - { descr: Disabled, graph: 1, value: 3, generic: 0 }
                         - { descr: No State, graph: 1, value: 4, generic: 0 }
+                -
+                    oid: memInputsStatusTable
+                    state_name: memInputsStatusAlarmStatus
+                    value: memInputsStatusAlarmStatus
+                    num_oid: '.1.3.6.1.4.1.318.1.1.10.4.3.2.1.7.{{ $index }}'
+                    index: 'memInputStatusAlarmState.{{ $index }}'
+                    descr: memInputsStatusInputName
+                    states:
+                        - { descr: Ok, graph: 1, value: 1, generic: 0 }
+                        - { descr: Alarm, graph: 1, value: 2, generic: 1 }
+                        - { descr: Critical, graph: 1, value: 3, generic: 2 }
                 -
                     oid: airIRRP100UnitStatusOperateMode
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.3.3.1.2.2.1.{{ $index }}'
@@ -831,6 +842,7 @@ modules:
                     descr: Air Flow
         voltage:
             data:
+                # rPDUIdentDeviceLinetoLineVoltage is done in includes/discovery/sensors/voltage/apc.inc.php:141
                 -
                     oid: airIRRP100UnitStatusCompressorDriveVoltage
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.3.3.1.2.2.37.{{ $index }}'
@@ -949,6 +961,7 @@ modules:
                     skip_values: -1
         current:
             data:
+                # rPDULoadStatusLoad and rPDU2PhaseStatusCurrent at OID .1.3.6.1.4.1.318.1.1.26.6.3.1.5 is done in the includes/discovery/sensors/current/apc.inc.php:19 file
                 -
                     oid: airIRRP100UnitStatusHumidifierCurrent
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.3.3.1.2.2.33.{{ $index }}'
@@ -1093,6 +1106,7 @@ modules:
                     multiplier: 10
                     index: 'rPDU2DeviceStatusPower.{{ $index }}'
                     descr: 'Power, Total'
+                    skip_value_lt: 0
                 -
                     oid: xPDUSystemOutput
                     value: xPDUSystemOutputTotalPower
@@ -1146,6 +1160,7 @@ modules:
                     divisor: 10
                     index: 'rPDU2DeviceStatusEnergy.{{ $index }}'
                     descr: 'Energy since {{ rPDU2DeviceStatusEnergyStartTime }}'
+                    skip_value_lt: 0
         pressure:
             data:
                 -

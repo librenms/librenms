@@ -1,7 +1,7 @@
 <?php
 
 // Set Entity state
-foreach (dbFetch('SELECT * FROM `entPhysical_state` WHERE `device_id` = ?', [$device['device_id']]) as $entity) {
+foreach (dbFetchRows('SELECT * FROM `entPhysical_state` WHERE `device_id` = ?', [$device['device_id']]) as $entity) {
     if (! isset($entPhysical_state[$entity['entPhysicalIndex']][$entity['subindex']][$entity['group']][$entity['key']])) {
         dbDelete(
             'entPhysical_state',

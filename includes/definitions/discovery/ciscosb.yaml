@@ -60,7 +60,7 @@ modules:
 #                    num_oid: '.1.3.6.1.4.1.9.6.1.101.108.1.1.5.{{ $index }}'
 #                    index: '{{ $index }}'
 #                    descr: 'POE Usage Port {{ $index }}'
-#                    divisor : 1000
+#                    divisor: 1000
 #                    high_limit:  rlPethPsePortOperPowerLimit
         temperature:
             data:
@@ -70,9 +70,34 @@ modules:
                     num_oid: '.1.3.6.1.4.1.9.6.1.101.83.5.1.1.2.{{ $index }}'
                     index: '{{ $index }}'
                     descr: 'FAN {{ $index }} Temperature'
-                    user_func: fahrenheit_to_celsius
+#                    user_func: fahrenheit_to_celsius
+                    warn_limit: 91
+                    high_limit: 95 
+# true for all switches, got data from cli output "show system sensors" on a SG350-8F8T, 
+# temperature seems to be the cpu/processing unit temperature, not the fan-in temperature. 
+# See CLI-output. All other temperatures are not accessable via SNMP (to my research). SG350X-24P and CBS250-4X have higher values
+                    low_limit: 0 # true for CBS250-8T-D and CBS250-8PP-D, all other tolerate -5
                     skip_values:
                         -
                             oid: rlEnvFanDataTemp
                             op: '=='
-                            value: 0                      
+                            value: 0               
+#                        -
+#                            oid: rlEnvFanDataTemp
+#                            op: '=='
+#                            value: -17.78 # Fahrenheit = 0     
+        fanspeed:
+            data:
+                -
+                    oid:  rlEnvFanDataSpeed
+                    value:  rlEnvFanDataSpeed
+                    num_oid: '.1.3.6.1.4.1.9.6.1.101.83.5.1.1.3.{{ $index }}'
+                    index: '{{ $index }}'
+                    descr: 'FAN {{ $index }} Speed'
+                    high_limit: 10000
+                    low_limit: 500
+                    skip_values:
+                        -
+                            oid: rlEnvFanDataSpeed
+                            op: '=='
+                            value: 0 

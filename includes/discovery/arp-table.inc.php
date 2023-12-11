@@ -55,7 +55,7 @@ foreach (DeviceCache::getPrimary()->getVrfContexts() as $context_name) {
                 continue;
             }
 
-            $mac = implode(array_map('zeropad', explode(':', $raw_mac)));
+            $mac = Mac::parse($raw_mac)->hex();
             $arp_table[$port_id][$ip] = $mac;
 
             $index = false;

@@ -286,4 +286,9 @@ class SnmpResponse
         // regular oid
         return explode('.', $key);
     }
+
+    public function __sleep()
+    {
+        return ['raw', 'exitCode', 'stderr'];
+    }
 }

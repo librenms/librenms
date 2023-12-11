@@ -148,7 +148,7 @@
                     "ifMtu": 1500,
                     "ifType": "ethernetCsmacd",
                     "ifAlias": "Internet Adapter",
-                    "ifPhysAddress": "38432d31462d",
+                    "ifPhysAddress": "8c1fb400f205",
                     "ifLastChange": 0,
                     "ifVlan": null,
                     "ifTrunk": null,

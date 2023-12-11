@@ -26,14 +26,14 @@
 namespace App\Plugins\Hooks;
 
 use App\Models\User;
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\Str;
 
 abstract class SettingsHook
 {
-    /** @var string */
-    public $view = 'resources.views.settings';
+    public string $view = 'resources.views.settings';
 
-    public function authorize(User $user, array $settings): bool
+    public function authorize(User $user): bool
     {
         return true;
     }
@@ -45,10 +45,12 @@ abstract class SettingsHook
         ];
     }
 
-    final public function handle(string $pluginName, array $settings): array
+    final public function handle(string $pluginName, array $settings, Application $app): array
     {
         return array_merge([
             'settings_view' => Str::start($this->view, "$pluginName::"),
-        ], $this->data($settings));
+        ], $this->data($app->call([$this, 'data'], [
+            'settings' => $settings,
+        ])));
     }
 }

@@ -126,6 +126,10 @@ return [
                 'description' => 'Recovery Alerts',
                 'help' => 'Notify if Alert recovers',
             ],
+            'acknowledgement_alerts' => [
+                'description' => 'Acknowledgement Alerts',
+                'help' => 'Notify if Alert is acknowledged',
+            ],
             'invert_map' => [
                 'description' => 'All devices except in list',
                 'help' => 'Alert only for Devices which are not listed',
@@ -159,6 +163,10 @@ return [
             'disable' => [
                 'description' => 'Disable alerting',
                 'help' => 'Stop alerts being generated',
+            ],
+            'acknowledged' => [
+                'description' => 'Send Acknowledged Alerts',
+                'help' => 'Notify if Alert has been acknowledged',
             ],
             'fixed-contacts' => [
                 'description' => 'Updates to contact email addresses not honored',
@@ -239,9 +247,6 @@ return [
                 ],
             ],
         ],
-        'api_demo' => [
-            'description' => 'This is the demo',
-        ],
         'apps' => [
             'powerdns-recursor' => [
                 'api-key' => [
@@ -262,6 +267,10 @@ return [
             'description' => 'Key to hold cache of autonomous systems descriptions',
         ],
         'auth' => [
+            'allow_get_login' => [
+                'description' => 'Allow get login (Insecure)',
+                'help' => 'Allow login by putting username and password variables in the url get request, useful for display systems where you cannot interactively log in. This is considered insecure because the password will be shown in logs and logins are not rate limited so it could open you up to brute force attacks.',
+            ],
             'socialite' => [
                 'redirect' => [
                     'description' => 'Redirect Login page',
@@ -272,6 +281,10 @@ return [
                 ],
                 'configs' => [
                     'description' => 'Provider configs',
+                ],
+                'scopes' => [
+                    'description' => 'Scopes that should be included with in the authentication request',
+                    'help' => 'See https://laravel.com/docs/10.x/socialite#access-scopes',
                 ],
             ],
         ],
@@ -357,6 +370,14 @@ return [
         'auth_ldap_debug' => [
             'description' => 'Show debug',
             'help' => 'Shows debug information.  May expose private information, do not leave enabled.',
+        ],
+        'auth_ldap_cacertfile' => [
+            'description' => 'Override system TLS CA Cert',
+            'help' => 'Use supplied CA Cert for LDAPS.',
+        ],
+        'auth_ldap_ignorecert' => [
+            'description' => 'Do not require valid Cert',
+            'help' => 'Do not require a valid TLS Cert for LDAPS.',
         ],
         'auth_ldap_emailattr' => [
             'description' => 'Mail attribute',
@@ -815,6 +836,12 @@ return [
                 'description' => 'Version',
                 'help' => 'This is used to automatically create the base_uri for the Graylog API. If you have modified the API uri from the default, set this to other and specify your base_uri.',
             ],
+            'query' => [
+                'field' => [
+                    'description' => 'Query api field',
+                    'help' => 'Changes the default field to query graylog API.',
+                ],
+            ],
         ],
         'html' => [
             'device' => [
@@ -1115,9 +1142,6 @@ return [
             ],
             'ucd-diskio' => [
                 'description' => 'UCD DiskIO',
-            ],
-            'wifi' => [
-                'description' => 'Wifi',
             ],
             'wireless' => [
                 'description' => 'Wireless',

@@ -296,11 +296,6 @@ parameters:
 			path: database/factories/UserFactory.php
 
 		-
-			message: "#^Property 'name' does not exist in Silber\\\\Bouncer\\\\Database\\\\Role model\\.$#"
-			count: 1
-			path: database/factories/UserFactory.php
-
-		-
 			message: "#^Static method Silber\\\\Bouncer\\\\BouncerFacade\\:\\:role\\(\\) invoked with 0 parameters, 1 required\\.$#"
 			count: 1
 			path: database/factories/UserFactory.php
@@ -313,11 +308,6 @@ parameters:
 		-
 			message: "#^Parameter \\#1 \\$abilities of method Silber\\\\Bouncer\\\\Conductors\\\\GivesAbilities\\:\\:to\\(\\) expects array\\|Illuminate\\\\Database\\\\Eloquent\\\\Model\\|int, string given\\.$#"
 			count: 1
-			path: database/seeders/RolesSeeder.php
-
-		-
-			message: "#^Property 'name' does not exist in Silber\\\\Bouncer\\\\Database\\\\Role model\\.$#"
-			count: 2
 			path: database/seeders/RolesSeeder.php
 
 		-

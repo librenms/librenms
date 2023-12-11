@@ -44,6 +44,7 @@
                 url: "{{ route('table.port-nac') }}",
                 post: function () {
                     return {
+                        device_id: '{{ $device->device_id }}',
                     };
                 },
                 formatters: {

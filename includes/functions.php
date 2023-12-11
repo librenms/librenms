@@ -8,7 +8,6 @@
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  */
 
-use App\Models\Device;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Enum\Severity;
@@ -109,8 +108,15 @@ function getImageName($device, $use_database = true, $dir = 'images/os/')
 function renamehost($id, $new, $source = 'console')
 {
     $host = gethostbyid($id);
+    $new_rrd_dir = Rrd::dirFromHost($new);
 
-    if (! is_dir(Rrd::dirFromHost($new)) && rename(Rrd::dirFromHost($host), Rrd::dirFromHost($new)) === true) {
+    if (is_dir($new_rrd_dir)) {
+        log_event("Renaming of $host failed due to existing RRD folder for $new", $id, 'system', 5);
+
+        return "Renaming of $host failed due to existing RRD folder for $new\n";
+    }
+
+    if (! is_dir($new_rrd_dir) && rename(Rrd::dirFromHost($host), $new_rrd_dir) === true) {
         dbUpdate(['hostname' => $new, 'ip' => null], 'devices', 'device_id=?', [$id]);
         log_event("Hostname changed -> $new ($source)", $id, 'system', 3);
 
@@ -129,7 +135,7 @@ function device_discovery_trigger($id)
         set_time_limit(0);
     }
 
-    $update = dbUpdate(['last_discovered' => ['NULL']], 'devices', '`device_id` = ?', [$id]);
+    $update = dbUpdate(['last_discovered' => null], 'devices', '`device_id` = ?', [$id]);
     if (! empty($update) || $update == '0') {
         $message = 'Device will be rediscovered';
     } else {
@@ -362,7 +368,8 @@ function port_fill_missing_and_trim(&$port, $device)
         $port['ifDescr'] = $port['ifName'];
         d_echo(' Using ifName as ifDescr');
     }
-    if (! empty($device['attribs']['ifName:' . $port['ifName']])) {
+    $attrib = DeviceCache::get($device['device_id'] ?? null)->getAttrib('ifName:' . $port['ifName']);
+    if (! empty($attrib)) {
         // ifAlias overridden by user, don't update it
         unset($port['ifAlias']);
         d_echo(' ifAlias overriden by user');
@@ -610,14 +617,7 @@ function report_this($message)
 function hytera_h2f($number, $nd)
 {
     if (strlen(str_replace(' ', '', $number)) == 4) {
-        $hex = '';
-        for ($i = 0; $i < strlen($number); $i++) {
-            $byte = strtoupper(dechex(ord($number[$i])));
-            $byte = str_repeat('0', 2 - strlen($byte)) . $byte;
-            $hex .= $byte . ' ';
-        }
-        $number = $hex;
-        unset($hex);
+        $number = \LibreNMS\Util\StringHelpers::asciiToHex($number, ' ');
     }
     $r = '';
     $y = explode(' ', $number);
@@ -885,8 +885,9 @@ function cache_peeringdb()
 function get_device_oid_limit($device)
 {
     // device takes priority
-    if (! empty($device['attribs']['snmp_max_oid'])) {
-        return $device['attribs']['snmp_max_oid'];
+    $attrib = DeviceCache::get($device['device_id'] ?? null)->getAttrib('snmp_max_oid');
+    if ($attrib !== null) {
+        return $attrib;
     }
 
     // then os

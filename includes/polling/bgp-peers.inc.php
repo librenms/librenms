@@ -458,10 +458,16 @@ if (! empty($peers)) {
                     $peer_data['bgpPeerIface'] = null;
                 }
             }
-            d_echo($peer_data);
         } catch (InvalidIpException $e) {
             // ignore
         }
+
+        if (empty($peer_data)) {
+            continue; // no data, try next peer
+        }
+
+        d_echo($peer_data);
+
         // --- Send event log notices ---
         if ($peer_data['bgpPeerFsmEstablishedTime']) {
             if (! (is_array(\LibreNMS\Config::get('alerts.bgp.whitelist'))

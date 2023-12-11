@@ -62,7 +62,7 @@ class Xdsl implements Module
 
     public function shouldDiscover(OS $os, ModuleStatus $status): bool
     {
-        return $status->isEnabled() && ! $os->getDevice()->snmp_disable && $os->getDevice()->status;
+        return $status->isEnabledAndDeviceUp($os->getDevice());
     }
 
     /**
@@ -77,7 +77,7 @@ class Xdsl implements Module
 
     public function shouldPoll(OS $os, ModuleStatus $status): bool
     {
-        return $status->isEnabled() && ! $os->getDevice()->snmp_disable && $os->getDevice()->status;
+        return $status->isEnabledAndDeviceUp($os->getDevice());
     }
 
     /**
@@ -149,6 +149,12 @@ class Xdsl implements Module
             }
 
             $portAdsl->port_id = $os->ifIndexToId($ifIndex);
+
+            if ($portAdsl->port_id == 0) {
+                // failure of ifIndexToId(), port_id is invalid, and syncModels will crash
+                echo ' ADSL( Failed to discover this port, ifIndex invalid : ' . $portAdsl->adslLineCoding . '/' . Number::formatSi($portAdsl->adslAtucChanCurrTxRate, 2, 3, 'bps') . '/' . Number::formatSi($portAdsl->adslAturChanCurrTxRate, 2, 3, 'bps') . ') ';
+                continue;
+            }
 
             if ($datastore) {
                 $this->storeAdsl($portAdsl, $data, (int) $ifIndex, $os, $datastore);
