@@ -58,6 +58,7 @@ $mute = isset($_POST['mute']) ? $_POST['mute'] : null;
 $invert = isset($_POST['invert']) ? $_POST['invert'] : null;
 $name = strip_tags($_POST['name']);
 $proc = $_POST['proc'];
+$notes = $_POST['notes'];
 $recovery = $vars['recovery'];
 $acknowledgement = $vars['acknowledgement'];
 $invert_map = isset($_POST['invert_map']) ? $_POST['invert_map'] : null;
@@ -118,6 +119,7 @@ if (is_numeric($rule_id) && $rule_id > 0) {
             'extra' => $extra_json,
             'name' => $name,
             'proc' => $proc,
+            'notes' => $notes,
             'query' => $query,
             'builder' => $builder_json,
             'invert_map' => $invert_map,
@@ -146,6 +148,7 @@ if (is_numeric($rule_id) && $rule_id > 0) {
             'disabled' => 0,
             'name' => $name,
             'proc' => $proc,
+            'notes' => $notes,
             'query' => $query,
             'builder' => $builder_json,
             'invert_map' => $invert_map,
