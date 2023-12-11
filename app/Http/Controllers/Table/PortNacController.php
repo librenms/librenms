@@ -112,14 +112,12 @@ class PortNacController extends TableController
                 default:
                     return $query->where(function ($query) use ($search, $mac_search) {
                         $vendor_ouis = $this->ouisFromVendor($search);
-                        
                         $this->queryByOui($vendor_ouis, $query)
                             ->orWhereIntegerInRaw('ports_nac.port_id', $this->findPorts($search))
                             ->orWhere('ports_nac.vlan', 'like', '%' . $search . '%')
                             ->orWhere('ports_nac.mac_address', 'like', $mac_search)
                             ->orWhere('ports_nac.username', 'like', '%' . $search . '%')
-                            ->orWhere('ports_nac.ip_address', 'like', '%' . $search . '%')
-                            ;
+                            ->orWhere('ports_nac.ip_address', 'like', '%' . $search . '%');
                     });
             }
         }
