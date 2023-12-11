@@ -45,7 +45,7 @@ class ApplicationController extends SelectController
     protected function baseQuery($request)
     {
         $query = Application::hasAccess($request->user())->with(['device' => function ($query) {
-            $query->select('device_id', 'hostname', 'sysName');
+            $query->select('device_id', 'hostname', 'sysName', 'display');
         }]);
 
         if ($type = $request->get('type')) {
