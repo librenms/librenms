@@ -12,9 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('syslog', function (Blueprint $table) {
-            $table->string('tag', 256)->change();
+            $table->string('tag', 32)->change()->index();
             $table->string('level', 16)->change();
-            $table->string('program', 256)->change();
+            $table->string('program', 32)->change();
         });
     }
 
@@ -27,6 +27,7 @@ return new class extends Migration
             $table->string('tag', 10)->change();
             $table->string('level', 10)->change();
             $table->string('program', 10)->change();
+            $table->dropIndex(['tag']);
         });
     }
 };

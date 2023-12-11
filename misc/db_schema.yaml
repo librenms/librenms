@@ -2058,9 +2058,9 @@ syslog:
     - { Field: facility, Type: varchar(10), 'Null': true, Extra: '' }
     - { Field: priority, Type: varchar(10), 'Null': true, Extra: '' }
     - { Field: level, Type: varchar(16), 'Null': true, Extra: '' }
-    - { Field: tag, Type: varchar(256), 'Null': true, Extra: '' }
+    - { Field: tag, Type: varchar(32), 'Null': true, Extra: '' }
     - { Field: timestamp, Type: timestamp, 'Null': false, Extra: '', Default: CURRENT_TIMESTAMP }
-    - { Field: program, Type: varchar(256), 'Null': true, Extra: '' }
+    - { Field: program, Type: varchar(32), 'Null': true, Extra: '' }
     - { Field: msg, Type: text, 'Null': true, Extra: '' }
     - { Field: seq, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
   Indexes:
@@ -2071,6 +2071,7 @@ syslog:
     syslog_device_id_timestamp_index: { Name: syslog_device_id_timestamp_index, Columns: [device_id, timestamp], Unique: false, Type: BTREE }
     syslog_priority_level_index: { Name: syslog_priority_level_index, Columns: [priority, level], Unique: false, Type: BTREE }
     syslog_program_index: { Name: syslog_program_index, Columns: [program], Unique: false, Type: BTREE }
+    syslog_tag_index: { Name: syslog_tag_index, Columns: [tag], Unique: false, Type: BTREE }
     syslog_timestamp_index: { Name: syslog_timestamp_index, Columns: [timestamp], Unique: false, Type: BTREE }
 tnmsneinfo:
   Columns:
