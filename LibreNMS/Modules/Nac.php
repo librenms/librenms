@@ -123,7 +123,7 @@ class Nac implements Module
             'ports_nac' => $device->portsNac()->orderBy('ports.ifIndex')->orderBy('mac_address')
                 ->leftJoin('ports', 'ports_nac.port_id', 'ports.port_id')
                 ->select(['ports_nac.*', 'ifIndex'])
-                ->get()->map->makeHidden(['ports_nac_id', 'device_id', 'port_id']),
+                ->get()->map->makeHidden(['ports_nac_id', 'device_id', 'port_id', 'updated_at', 'created_at']),
         ];
     }
 }

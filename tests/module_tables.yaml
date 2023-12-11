@@ -19,10 +19,6 @@ bgp-peers:
         - { left: bgpPeers.vrf_id, right: vrfs.vrf_id, select: [vrfs.bgpLocalAs as vrfLocalAs] }
     bgpPeers_cbgp:
         excluded_fields: [device_id]
-nac:
-    ports_nac:
-        excluded_fields: [device_id, ports_nac_id, port_id, created_at, updated_at]
-        order_by: mac_address
 fdb-table:
     ports_fdb:
         excluded_fields: [device_id, ports_fdb_id, port_id, vlan_id, created_at, updated_at]
