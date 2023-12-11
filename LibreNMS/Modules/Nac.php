@@ -28,6 +28,7 @@ namespace LibreNMS\Modules;
 use App\Models\Device;
 use App\Models\PortsNac;
 use App\Observers\ModuleModelObserver;
+use Illuminate\Support\Facades\DB;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\Interfaces\Polling\NacPolling;
