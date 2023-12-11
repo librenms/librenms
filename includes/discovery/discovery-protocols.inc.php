@@ -203,6 +203,10 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
     $lldp_array = SnmpQuery::hideMib()->walk('TPLINK-LLDPINFO-MIB::lldpNeighborInfoEntry')->table();
 
     foreach ($lldp_array as $key => $lldp) {
+        if (! is_array($lldp['lldpNeighborPortIndexId'])) {
+            // code below will fail so no need to finish this loop occurence.
+            continue;
+        }
         $IndexId = key($lldp['lldpNeighborPortIndexId']);
 
         $local_ifName = $lldp['lldpNeighborPortId'][$IndexId];
