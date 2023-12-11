@@ -32,6 +32,7 @@ use App\Models\CustomMapEdge;
 use App\Models\CustomMapNode;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use LibreNMS\Config;
 use LibreNMS\Util\Url;
@@ -86,17 +87,56 @@ class CustomMapController extends Controller
         ],
     ];
 
+    protected function nodeDisabledStyle()
+    {
+        return [
+            'border' => Config::get('network_map_legend.di.border'),
+            'background' => Config::get('network_map_legend.di.node'),
+        ];
+    }
+
+    protected function nodeDownStyle()
+    {
+        return [
+            'border' => Config::get('network_map_legend.dn.border'),
+            'background' => Config::get('network_map_legend.dn.node'),
+        ];
+    }
+
+    protected function nodeUpStyle()
+    {
+        return [
+            'border' => null,
+            'background' => null,
+        ];
+    }
+
     private function checkImageCache(CustomMap $map)
     {
-        if(! $map->background_suffix) {
+        if (! $map->background_suffix) {
            return null;
         }
 
         $imageName = $map->custom_map_id . '_' . $map->background_version . '.' . $map->background_suffix;
-        if(Storage::disk('base')->missing('html/images/custommap/' . $imageName)) {
+        if (Storage::disk('base')->missing('html/images/custommap/' . $imageName)) {
             Storage::disk('base')->put('html/images/custommap/' . $imageName, $map->background->background_image);
         }
         return $imageName;
+    }
+
+    public function delete(Request $request)
+    {
+        $map = CustomMap::where('custom_map_id', '=', $request->map_id)
+            ->hasAccess($request->user())
+            ->first();
+
+        if (!$map) {
+            abort(404);
+        }
+
+        $map->delete();
+        return response('Success', 200)
+                  ->header('Content-Type', 'text/plain');
     }
 
     public function background(Request $request)
@@ -106,7 +146,7 @@ class CustomMapController extends Controller
             ->first();
 
         $background = $this->checkImageCache($map);
-        if($background) {
+        if ($background) {
             $path = Storage::disk('base')->path('html/images/custommap/') . $background;
             $mime = Storage::mimeType($background);
             $headers = [
@@ -117,7 +157,153 @@ class CustomMapController extends Controller
         abort(404);
     }
 
-    //TODO: Add fetch for map data
+    private function speedWidth(int $speed)
+    {
+        if ($speed < 1000) {
+            return 1;
+        }
+        return strlen((string)$speed) - 3;
+    }
+
+    private function speedColour(float $pct)
+    {
+        if ($pct < 0) {
+            return '#000000';
+        } elseif ($pct < 50) {
+            return sprintf('#00%02X00', (int)(255.0 * (50.0 - $pct) / 50.0));
+        } elseif ($pct < 100) {
+            return sprintf('#%02X0000', (int)(255.0 * ($pct - 50.0) / 50.0));
+        } elseif ($pct < 150) {
+            return sprintf('#FF00%02X', (int)(255.0 * ($pct - 100.0) / 50.0));
+        }
+        return '#FF00FF';
+    }
+
+    private function snmpSpeed(String $speeds)
+    {
+        // Only succeed if the string startes with a number optionally followed by a unit
+        if (preg_match('/^(\d+)([kMGTP])?/', $speeds, $matches)) {
+            $speed = $matches[1];
+            if ($matches[2] == 'k') {
+                $speed *= 1000;
+            } elseif ($matches[2] == 'M') {
+                $speed *= 1000000;
+            } elseif ($matches[2] == 'G') {
+                $speed *= 1000000000;
+            } elseif ($matches[2] == 'T') {
+                $speed *= 1000000000000;
+            } elseif ($matches[2] == 'P') {
+                $speed *= 1000000000000000;
+            }
+            return $speed;
+        }
+        return 0;
+    }
+
+    public function getData(Request $request)
+    {
+        $map = CustomMap::where('custom_map_id', '=', $request->map_id)
+            ->hasAccess($request->user())
+            ->with('nodes', 'nodes.device', 'edges', 'edges.port', 'edges.port.device')
+            ->first();
+
+        if (!$map) {
+            abort(404);
+        }
+        $edges = [];
+        $nodes = [];
+
+        foreach ($map->edges as $edge) {
+            $edges[$edge->custom_map_edge_id] = $edge;
+            if ($edge->port) {
+                $edge->port_name = $edge->port->device->displayName() . " - " . $edge->port->getLabel();
+                $edge->port_info = Url::portLink($edge->port, null, null, false, true);
+
+                // Work out speed to and from
+                $speedto = 0;
+                $speedfrom = 0;
+                $rateto = 0;
+                $ratefrom = 0;
+
+                // Try to interpret the SNMP speeds
+                if ($edge->port->port_descr_speed) {
+                    $speed_parts = explode('/', $edge->port->port_descr_speed, 2);
+
+                    if (count($speed_parts == 1)) {
+                        $speedto = snmpSpeed($speed_parts[0]);
+                        $speedfrom = $speedto;
+                    } elseif ($edge->reverse) {
+                        $speedto = $this->snmpSpeed($speed_parts[1]);
+                        $speedfrom = $this->snmpSpeed($speed_parts[0]);
+                    } else {
+                        $speedto = $this->snmpSpeed($speed_parts[0]);
+                        $speedfrom = $this->snmpSpeed($speed_parts[1]);
+                    }
+                    if ($speedto == 0 || $speed_from == 0) {
+                        $speedto = 0;
+                        $speedfrom = 0;
+                    }
+                }
+
+                // If we did not get a speed from the snmp desc, use the deteced speed
+                if ($speedto == 0) {
+                    $speedto = $edge->port->ifSpeed;
+                    $speedfrom = $edge->port->ifSpeed;
+                }
+
+                // Get the to/from rates
+                if ($edge->reverse) {
+                    $ratefrom = $edge->port->ifInOctets_rate * 8;
+                    $rateto = $edge->port->ifOutOctets_rate * 8;
+                } else {
+                    $ratefrom = $edge->port->ifOutOctets_rate * 8;
+                    $rateto = $edge->port->ifInOctets_rate * 8;
+                }
+
+                if ($speedto == 0) {
+                    $edge->port_topct = -1.0;
+                    $edge->port_frompct = -1.0;
+                } else {
+                    $edge->port_topct = $rateto / $speedto * 100.0;
+                    $edge->port_frompct = $ratefrom / $speedfrom * 100.0;
+                }
+                $edge->colour1 = $this->speedColour($edge->port_topct);
+                $edge->colour2 = $this->speedColour($edge->port_frompct);
+                $edge->width1 = $this->speedWidth($speedto);
+                $edge->width2 = $this->speedWidth($speedfrom);
+            }
+            unset ($edge->port);
+        }
+
+        foreach ($map->nodes as $node) {
+            $nodes[$node->custom_map_node_id] = $node;
+            if ($node->device) {
+                $node->device_name = $node->device->hostname . "(" . $node->device->sysName . ")";
+                $node->device_image = $node->device->icon;
+                $node->device_info = Url::deviceLink($node->device, null, [], 0, 0, 0, 0);
+
+                if ($node->device->disabled) {
+                    $device_style = $this->nodeDisabledStyle();
+                } elseif (! $node->device->status) {
+                    $device_style = $this->nodeDownStyle();
+                } else {
+                    $device_style = $this->nodeUpStyle();
+                }
+
+                if ($device_style['background']) {
+                    $node->colour_bg = $device_style['background'];
+                }
+
+                if ($device_style['border']) {
+                    $node->colour_bdr = $device_style['border'];
+                }
+            }
+            unset ($node->device);
+        }
+
+        return response()->json(['nodes' => $nodes, 'edges' => $edges]);
+    }
+
 
     public function view(Request $request)
     {
@@ -125,7 +311,7 @@ class CustomMapController extends Controller
             ->hasAccess($request->user())
             ->first();
 
-        if(!$map) {
+        if (!$map) {
             abort(404);
         }
 
@@ -135,7 +321,7 @@ class CustomMapController extends Controller
         $map_conf = $map->options;
         $map_conf['width'] = $map->width;
         $map_conf['height'] = $map->height;
-        $background = $this->checkImageCache($map);
+        $background = $map->background_suffix ? true : false;
 
         $data = [
             'edit' => false,
@@ -166,9 +352,9 @@ class CustomMapController extends Controller
             'hmargin' => 20,
         ];
 
-        if(is_null($request->map_id)) {
+        if (is_null($request->map_id)) {
             $data['maps'] = CustomMap::orderBy('name')->get(['custom_map_id','name']);
-        } elseif($request->map_id == 0) {
+        } elseif ($request->map_id == 0) {
             $data['name'] = 'New Map';
             $data['map_conf'] = [
                 'height' => "800px",
@@ -189,7 +375,7 @@ class CustomMapController extends Controller
             $data['background'] = null;
         } else {
             $map = CustomMap::find($request->map_id);
-            if(! $map) {
+            if (! $map) {
                 abort(404);
             }
             $data['name'] = $map->name;
@@ -202,7 +388,7 @@ class CustomMapController extends Controller
             $data['map_conf']['interaction'] = ['dragNodes' => true, 'dragView' => false, 'zoomView' => false];
             $data['map_conf']['manipulation'] = ['enabled' => true, 'initiallyActive' => true];
             $data['map_conf']['physics'] = ['enabled' => false];
-            $data['background'] = $this->checkImageCache($map);
+            $data['background'] = $map->background_suffix ? true : false;
         }
 
         return view('map.custom', $data);
@@ -210,15 +396,22 @@ class CustomMapController extends Controller
 
     public function save(Request $request)
     {
+        if (! $request->user()->isAdmin()) {
+            return response('Insufficient privileges');
+        }
+
         $errors = [];
 
         $map = CustomMap::where('custom_map_id', '=', $request->map_id)->with('nodes', 'edges')->first();
-        if(!$map) {
+        if (!$map) {
             abort(404);
         }
 
         if (! $errors) {
             DB::transaction(function() use ($map, $request) {
+                $dbnodes = $map->nodes->keyBy('custom_map_node_id')->all();
+                $dbedges = $map->edges->keyBy('custom_map_edge_id')->all();
+
                 $nodesProcessed = [];
                 $edgesProcessed = [];
 
@@ -234,11 +427,15 @@ class CustomMapController extends Controller
                 $map->save();
 
                 foreach ($nodes as $nodeid => $node) {
-                    if (strpos($nodeid, 'new') == 0) {
+                    if (strpos($nodeid, 'new') === 0) {
                         $dbnode = new CustomMapNode;
                         $dbnode->map()->associate($map);
                     } else {
-                        $dbnode = $map->nodes[$nodeid];
+                        $dbnode = $dbnodes[$nodeid];
+                        if (!$dbnode) {
+                            Log::error("Could not find existing node for node id " . $nodeid);
+                            abort(404);
+                        }
                     }
                     $dbnode->device_id = $node->title ? $node->title : null;
                     $dbnode->label = $node->label;
@@ -259,11 +456,16 @@ class CustomMapController extends Controller
                     $newNodes[$nodeid] = $dbnode;
                 }
                 foreach ($edges as $edgeid => $edge) {
-                    if (strpos($edgeid, 'new') == 0) {
+                    Log::error("Processing " . $edgeid);
+                    if (strpos($edgeid, 'new') === 0) {
                         $dbedge = new CustomMapEdge;
                         $dbedge->map()->associate($map);
                     } else {
-                        $dbedge = $map->edges[$edgeid];
+                        $dbedge = $dbedges[$edgeid];
+                        if (!$dbedge) {
+                            Log::error("Could not find existing edge for edge id " . $edgeid);
+                            abort(404);
+                        }
                     }
                     $dbedge->custom_map_node1_id = strpos($edge->from, "new") == 0 ? $newNodes[$edge->from]->custom_map_node_id : $edge->from;
                     $dbedge->custom_map_node2_id = strpos($edge->to, "new") == 0 ? $newNodes[$edge->to]->custom_map_node_id : $edge->to;
@@ -278,7 +480,7 @@ class CustomMapController extends Controller
                     $dbedge->mid_y = intval($edge->mid_y);
 
                     $dbedge->save();
-                    $edgeProcessed[$dbedge->custom_map_edge_id] = true;
+                    $edgesProcessed[$dbedge->custom_map_edge_id] = true;
                 }
                 foreach ($map->edges as $edge) {
                     if (! array_key_exists($edge->custom_map_edge_id, $edgesProcessed)) {
@@ -297,6 +499,10 @@ class CustomMapController extends Controller
 
     public function saveSettings(Request $request)
     {
+        if (! $request->user()->isAdmin()) {
+            return response('Insufficient privileges');
+        }
+
         $errors = [];
 
         $map_id = $request->map_id;
@@ -305,7 +511,6 @@ class CustomMapController extends Controller
         $height = $request->post('height');
         $bgclear = $request->post('bgclear') == 'true' ? true : false;
         $bgnewimage = $request->post('bgimage');
-
 
         if (! preg_match('/^(\d+)(px|%)$/', $width, $matches)) {
             array_push($errors, "Width must be a number followed by px or %");
@@ -331,7 +536,7 @@ class CustomMapController extends Controller
             $request->validate(['bgimage' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048']);
         }
 
-        $imageName = null;
+        $background = $false;
         if (! $errors) {
             if (! $map_id) {
                 $map = new CustomMap;
@@ -353,7 +558,7 @@ class CustomMapController extends Controller
 
             if ($request->bgimage) {
                 $map->background_suffix = $request->bgimage->extension();
-                if(!$map->background) {
+                if (!$map->background) {
                     $background = new CustomMapBackground;
                     $background->background_image = $request->bgimage->getContent();
                     $map->background()->save($background);
@@ -365,16 +570,16 @@ class CustomMapController extends Controller
                 $map->save();
                 $map->refresh();
             } elseif ($bgclear) {
-                if($map->background) {
+                if ($map->background) {
                     $map->background->delete();
                 }
                 $map->background_suffix = null;
                 $map->save();
                 $map->refresh();
             }
-            $imageName = $this->checkImageCache($map);
+            $background = $map->background_suffix ? true : false;
         }
 
-        return response()->json(['id' => $map_id, 'bgimage' => $imageName, 'errors' => $errors]);
+        return response()->json(['id' => $map_id, 'bgimage' => $background, 'errors' => $errors]);
     }
 }

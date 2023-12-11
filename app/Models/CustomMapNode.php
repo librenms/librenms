@@ -27,7 +27,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class CustomMapNode extends BaseModel
 {
@@ -58,9 +57,9 @@ class CustomMapNode extends BaseModel
         return $this->belongsTo(CustomMap::class, 'custom_map_id');
     }
 
-    public function device(): HasOne
+    public function device(): BelongsTo
     {
-        return $this->hasOne(Device::class, 'device_id');
+        return $this->belongsTo(Device::class, 'device_id');
     }
 
     public function edges1(): HasMany

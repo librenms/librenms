@@ -81,6 +81,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('custom/edit/{map_id?}', 'CustomMapController@edit')->name('maps.custom.edit');
         Route::get('custom/{map_id}', 'CustomMapController@view')->name('maps.custom.view');
         Route::get('custom/{map_id}/background', 'CustomMapController@background')->name('maps.custom.background');
+        Route::get('custom/{map_id}/getdata', 'CustomMapController@getData')->name('maps.custom.getdata');
         Route::post('custom/{map_id}/save', 'CustomMapController@save')->name('maps.custom.save');
         Route::post('custom/{map_id}/savesettings', 'CustomMapController@saveSettings')->name('maps.custom.savesettings');
         Route::post('custom/{map_id}/delete', 'CustomMapController@delete')->name('maps.custom.delete');

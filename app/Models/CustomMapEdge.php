@@ -50,9 +50,9 @@ class CustomMapEdge extends BaseModel
         return $this->belongsTo(CustomMap::class, 'custom_map_id');
     }
 
-    public function port(): HasOne
+    public function port(): BelongsTo
     {
-        return $this->hasOne(Port::class, 'port_id');
+        return $this->belongsTo(Port::class, 'port_id');
     }
 
     public function edges(): HasMany
