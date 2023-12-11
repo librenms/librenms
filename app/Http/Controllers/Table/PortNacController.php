@@ -134,8 +134,9 @@ class PortNacController extends TableController
         $item['mac_oui'] = $mac->vendor();
         $item['mac_address'] = $mac->readable();
         $item['device_id'] = Url::deviceLink($nac->device);
-        unset ($item['device']); //avoid sending all device data in the JSON reply
-        unset ($item['port']); //free some unused data to be sent to the browser
+        unset($item['device']); //avoid sending all device data in the JSON reply
+        unset($item['port']); //free some unused data to be sent to the browser
+
         return $item;
     }
 

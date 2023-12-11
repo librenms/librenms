@@ -79,7 +79,12 @@ class Nac implements Module
             ModuleModelObserver::observe(PortsNac::class);
 
             $nac_entries = $os->pollNac()->keyBy('mac_address');
-            $existing_entries = $os->getDevice()->portsNac->keyBy('mac_address');
+            //filter out historical entries
+            $existing_entries = $os->getDevice()->portsNac->keyBy('mac_address')->filter(function($value, $key) {
+                if($value['historical'] == 0) {
+                    return $value;
+                }
+            });
 
             // update existing models
             foreach ($nac_entries as $nac_entry) {
@@ -91,10 +96,10 @@ class Nac implements Module
             // persist to DB
             $os->getDevice()->portsNac()->saveMany($nac_entries);
 
-            $delete = $existing_entries->diffKeys($nac_entries)->pluck('ports_nac_id');
-            if ($delete->isNotEmpty()) {
-                $count = PortsNac::query()->whereIntegerInRaw('ports_nac_id', $delete)->delete();
-                d_echo('Deleted ' . $count, str_repeat('-', $count));
+            $age = $existing_entries->diffKeys($nac_entries)->pluck('ports_nac_id');
+            if ($age->isNotEmpty()) {
+                $count = PortsNac::query()->whereIntegerInRaw('ports_nac_id', $age)->update(['historical' => true, 'updated_at' => DB::raw('updated_at')]);
+                d_echo('Aged ' . $count, str_repeat('-', $count));
             }
         }
     }
