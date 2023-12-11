@@ -78,7 +78,7 @@ class PortNacController extends TableController
      */
     public function baseQuery($request)
     {
-        return PortsNac::select('device_id', 'port_id', 'mac_address', 'ip_address', 'vlan', 'domain', 'host_mode', 'username', 'authz_by', 'timeout', 'time_elapsed', 'time_left', 'authc_status', 'authz_status', 'method')
+        return PortsNac::select('device_id', 'port_id', 'mac_address', 'ip_address', 'vlan', 'domain', 'host_mode', 'username', 'authz_by', 'timeout', 'time_elapsed', 'time_left', 'authc_status', 'authz_status', 'method', 'created_at', 'updated_at', 'historical')
             ->when($request->device_id, fn ($q, $id) => $q->where('device_id', $id))
             ->hasAccess($request->user())
             ->with('port')
@@ -133,9 +133,9 @@ class PortNacController extends TableController
         $item['port_id'] = Url::portLink($nac->port, $nac->port->getShortLabel());
         $item['mac_oui'] = $mac->vendor();
         $item['mac_address'] = $mac->readable();
-        $item['port'] = null; //free some unused data to be sent to the browser
         $item['device_id'] = Url::deviceLink($nac->device);
-
+        unset ($item['device']); //avoid sending all device data in the JSON reply
+        unset ($item['port']); //free some unused data to be sent to the browser
         return $item;
     }
 
