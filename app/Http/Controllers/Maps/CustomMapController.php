@@ -267,8 +267,14 @@ class CustomMapController extends Controller
                     $edge->port_topct = $rateto / $speedto * 100.0;
                     $edge->port_frompct = $ratefrom / $speedfrom * 100.0;
                 }
-                $edge->colour1 = $this->speedColour($edge->port_topct);
-                $edge->colour2 = $this->speedColour($edge->port_frompct);
+                if ($edge->port->ifOperStatus != "up") {
+                    // If the port is not online, show the same as speed unknown
+                    $edge->colour1 = $this->speedColour(-1.0);
+                    $edge->colour2 = $this->speedColour(-1.0);
+                } else {
+                    $edge->colour1 = $this->speedColour($edge->port_topct);
+                    $edge->colour2 = $this->speedColour($edge->port_frompct);
+                }
                 $edge->width1 = $this->speedWidth($speedto);
                 $edge->width2 = $this->speedWidth($speedfrom);
             }
@@ -536,7 +542,7 @@ class CustomMapController extends Controller
             $request->validate(['bgimage' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048']);
         }
 
-        $background = $false;
+        $background = false;
         if (! $errors) {
             if (! $map_id) {
                 $map = new CustomMap;
