@@ -27,8 +27,6 @@ namespace App\Http\Controllers\Table;
 
 use App\Models\Port;
 use App\Models\PortsNac;
-use LibreNMS\Util\Mac;
-use LibreNMS\Util\Url;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;

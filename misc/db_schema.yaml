@@ -610,9 +610,9 @@ devices_perms:
     devices_perms_user_id_index: { Name: devices_perms_user_id_index, Columns: [user_id], Unique: false, Type: BTREE }
 device_graphs:
   Columns:
-    - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
     - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: graph, Type: varchar(255), 'Null': true, Extra: '' }
+    - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     device_graphs_device_id_index: { Name: device_graphs_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
@@ -1597,6 +1597,8 @@ ports_nac:
     - { Field: time_left, Type: varchar(50), 'Null': true, Extra: '' }
     - { Field: vlan, Type: 'int unsigned', 'Null': true, Extra: '' }
     - { Field: time_elapsed, Type: varchar(50), 'Null': true, Extra: '' }
+    - { Field: created_at, Type: timestamp, 'Null': true, Extra: '' }
+    - { Field: updated_at, Type: timestamp, 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [ports_nac_id], Unique: true, Type: BTREE }
     ports_nac_device_id_index: { Name: ports_nac_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
