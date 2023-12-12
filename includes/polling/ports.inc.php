@@ -112,11 +112,6 @@ $pagp_extended_oids = [
     'pagpGroupIfIndex',
 ];
 
-$port_security_oids = [
-    'cpsIfStickyEnable',
-    'cpsIfMaxSecureMacAddr',
-];
-
 $ifmib_oids = [
     'ifDescr',
     'ifAdminStatus',
@@ -439,11 +434,6 @@ if ($device['os_group'] == 'cisco' && $device['os'] != 'asa') {
 if ($device['os'] == 'ios' || $device['os'] == 'iosxe') {
     foreach ($cisco_if_extension_oids as $oid) {
         $port_stats = snmpwalk_cache_oid($device, $oid, $port_stats, 'CISCO-IF-EXTENSION-MIB');
-    }
-    // Adding polling for $port_security_oids (Cisco only)
-    foreach ($port_security_oids as $oid) {
-        // echo 'CISCO-PORT-SECURITY-MIB';
-        $port_stats = snmpwalk_cache_oid($device, $oid, $port_stats, 'CISCO-PORT-SECURITY-MIB');
     }
 }//end if
 
@@ -912,20 +902,6 @@ foreach ($ports as $port) {
             }
             // End Update PAgP
 
-            // Update Port-Security
-            if ($device['os'] == 'ios' || $device['os'] == 'iosxe') {
-                foreach ($port_security_oids as $oid) {
-                    // Loop the OIDs
-                    $current_oid = $this_port[$oid] ?? null;
-                    if ($current_oid != $port[$oid]) {
-                        // If data has changed, build a query
-                        $port['update'][$oid] = $current_oid;
-                        echo 'Port-Security';
-                        log_event("$oid -> " . $current_oid, $device, 'interface', 3, $port['port_id']);
-                    }
-                }
-            }
-            // End Update Port-Security
             // Do EtherLike-MIB
             if (Config::get('enable_ports_etherlike')) {
                 include 'ports/port-etherlike.inc.php';
