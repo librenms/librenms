@@ -440,7 +440,7 @@ class CustomMapController extends Controller
             abort(404);
         }
 
-        if (! $errors) {
+        if (! count($errors)) {
             DB::transaction(function() use ($map, $request) {
                 $dbnodes = $map->nodes->keyBy('custom_map_node_id')->all();
                 $dbedges = $map->edges->keyBy('custom_map_edge_id')->all();
