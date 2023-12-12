@@ -183,7 +183,7 @@ class CustomMapController extends Controller
     {
         // Only succeed if the string startes with a number optionally followed by a unit
         if (preg_match('/^(\d+)([kMGTP])?/', $speeds, $matches)) {
-            $speed = $matches[1];
+            $speed = (int)$matches[1];
             if ($matches[2] == 'k') {
                 $speed *= 1000;
             } elseif ($matches[2] == 'M') {
@@ -214,10 +214,24 @@ class CustomMapController extends Controller
         $nodes = [];
 
         foreach ($map->edges as $edge) {
-            $edges[$edge->custom_map_edge_id] = $edge;
+            $edgeid = $edge->custom_map_edge_id;
+            $edges[$edgeid] = [
+                'custom_map_edge_id'  => $edge->custom_map_edge_id,
+                'custom_map_node1_id' => $edge->custom_map_node1_id,
+                'custom_map_node2_id' => $edge->custom_map_node2_id,
+                'port_id'             => $edge->port_id,
+                'reverse'             => $edge->reverse,
+                'style'               => $edge->style,
+                'showpct'             => $edge->showpct,
+                'text_face'           => $edge->text_face,
+                'text_size'           => $edge->text_size,
+                'text_colour'         => $edge->text_colour,
+                'mid_x'               => $edge->mid_x,
+                'mid_y'               => $edge->mid_y,
+            ];
             if ($edge->port) {
-                $edge->port_name = $edge->port->device->displayName() . " - " . $edge->port->getLabel();
-                $edge->port_info = Url::portLink($edge->port, null, null, false, true);
+                $edges[$edgeid]['port_name'] = $edge->port->device->displayName() . " - " . $edge->port->getLabel();
+                $edges[$edgeid]['port_info'] = Url::portLink($edge->port, null, null, false, true);
 
                 // Work out speed to and from
                 $speedto = 0;
@@ -261,32 +275,46 @@ class CustomMapController extends Controller
                 }
 
                 if ($speedto == 0) {
-                    $edge->port_topct = -1.0;
-                    $edge->port_frompct = -1.0;
+                    $edges[$edgeid]['port_topct'] = -1.0;
+                    $edges[$edgeid]['port_frompct'] = -1.0;
                 } else {
-                    $edge->port_topct = round($rateto / $speedto * 100.0, 2);
-                    $edge->port_frompct = round($ratefrom / $speedfrom * 100.0, 2);
+                    $edges[$edgeid]['port_topct'] = round($rateto / $speedto * 100.0, 2);
+                    $edges[$edgeid]['port_frompct'] = round($ratefrom / $speedfrom * 100.0, 2);
                 }
                 if ($edge->port->ifOperStatus != "up") {
                     // If the port is not online, show the same as speed unknown
-                    $edge->colour1 = $this->speedColour(-1.0);
-                    $edge->colour2 = $this->speedColour(-1.0);
+                    $edges[$edgeid]['colour1'] = $this->speedColour(-1.0);
+                    $edges[$edgeid]['colour2'] = $this->speedColour(-1.0);
                 } else {
-                    $edge->colour1 = $this->speedColour($edge->port_topct);
-                    $edge->colour2 = $this->speedColour($edge->port_frompct);
+                    $edges[$edgeid]['colour1'] = $this->speedColour($edges[$edgeid]['port_topct']);
+                    $edges[$edgeid]['colour2'] = $this->speedColour($edges[$edgeid]['port_frompct']);
                 }
-                $edge->width1 = $this->speedWidth($speedto);
-                $edge->width2 = $this->speedWidth($speedfrom);
+                $edges[$edgeid]['width1'] = $this->speedWidth($speedto);
+                $edges[$edgeid]['width2'] = $this->speedWidth($speedfrom);
             }
-            unset ($edge->port);
         }
 
         foreach ($map->nodes as $node) {
-            $nodes[$node->custom_map_node_id] = $node;
+            $nodeid = $node->custom_map_node_id;
+            $nodes[$nodeid] = [
+                'custom_map_node_id' => $node->custom_map_node_id,
+                'label'              => $node->label,
+                'style'              => $node->style,
+                'icon'               => $node->icon,
+                'size'               => $node->size,
+                'border_width'       => $node->border_width,
+                'text_face'          => $node->text_face,
+                'text_size'          => $node->text_size,
+                'text_colour'        => $node->text_colour,
+                'colour_bg'          => $node->colour_bg,
+                'colour_bdr'         => $node->colour_bdr,
+                'x_pos'              => $node->x_pos,
+                'y_pos'              => $node->y_pos,
+            ];
             if ($node->device) {
-                $node->device_name = $node->device->hostname . "(" . $node->device->sysName . ")";
-                $node->device_image = $node->device->icon;
-                $node->device_info = Url::deviceLink($node->device, null, [], 0, 0, 0, 0);
+                $nodes[$nodeid]['device_name'] = $node->device->hostname . "(" . $node->device->sysName . ")";
+                $nodes[$nodeid]['device_image'] = $node->device->icon;
+                $nodes[$nodeid]['device_info'] = Url::deviceLink($node->device, null, [], 0, 0, 0, 0);
 
                 if ($node->device->disabled) {
                     $device_style = $this->nodeDisabledStyle();
@@ -297,14 +325,13 @@ class CustomMapController extends Controller
                 }
 
                 if ($device_style['background']) {
-                    $node->colour_bg = $device_style['background'];
+                    $nodes[$nodeid]['colour_bg'] = $device_style['background'];
                 }
 
                 if ($device_style['border']) {
-                    $node->colour_bdr = $device_style['border'];
+                    $nodes[$nodeid]['colour_bdr'] = $device_style['border'];
                 }
             }
-            unset ($node->device);
         }
 
         return response()->json(['nodes' => $nodes, 'edges' => $edges]);
