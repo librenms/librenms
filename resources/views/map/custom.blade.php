@@ -449,6 +449,7 @@
                     network_nodes.remove(nodeid);
                     network_nodes.flush();
                 });
+                $("#map-saveDataButton").show();
             }
         options['manipulation']['addEdge'] = function (data, callback) {
                 // Because we deal with multiple edges, do not use the default callback
@@ -1158,6 +1159,7 @@
         network_edges.flush();
         network_nodes.remove(edgeid + "_mid");
         network_nodes.flush();
+        $("#map-saveDataButton").show();
     }
 @endif {{-- map_id > 0 --}}
 @endif {{-- map_id is not null --}}
