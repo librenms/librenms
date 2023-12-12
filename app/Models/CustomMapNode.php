@@ -31,7 +31,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class CustomMapNode extends BaseModel
 {
     protected $primaryKey = 'custom_map_node_id';
-    protected $fillable = ['device_id','label','style','icon','size','border_width','text_face','text_size','text_colour','colour_bg','colour_bdr', 'x_pos', 'y_pos'];
+    protected $fillable = ['device_id', 'label', 'style', 'icon', 'size', 'border_width', 'text_face', 'text_size', 'text_colour', 'colour_bg', 'colour_bdr', 'x_pos', 'y_pos'];
     protected $casts = [
         'device_id'    => 'int',
         'border_width' => 'int',

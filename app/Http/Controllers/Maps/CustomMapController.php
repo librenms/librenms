@@ -316,7 +316,7 @@ class CustomMapController extends Controller
                 'y_pos'              => $node->y_pos,
             ];
             if ($node->device) {
-                $nodes[$nodeid]['device_name'] = $node->device->hostname . '(' . $node->device->sysName . ")";
+                $nodes[$nodeid]['device_name'] = $node->device->hostname . '(' . $node->device->sysName . ')';
                 $nodes[$nodeid]['device_image'] = $node->device->icon;
                 $nodes[$nodeid]['device_info'] = Url::deviceLink($node->device, null, [], 0, 0, 0, 0);
 

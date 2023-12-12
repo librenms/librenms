@@ -16,7 +16,7 @@ return new class extends Migration
             $table->integer('custom_map_id')->unsigned()->index()->unique();
             $table->foreign('custom_map_id')->references('custom_map_id')->on('custom_maps')->onDelete('cascade');
         });
-        DB::statement("ALTER TABLE custom_map_backgrounds ADD background_image MEDIUMBLOB");
+        DB::statement('ALTER TABLE custom_map_backgrounds ADD background_image MEDIUMBLOB');
     }
 
     /**

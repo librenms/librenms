@@ -36,6 +36,7 @@ class DevicePortSearchController extends PortSearchController
             'device_id' => 'integer',
         ]);
         $q = parent::buildQuery($search, $request);
+
         return $q->where('device_id', $request->device_id);
     }
 
@@ -43,6 +44,7 @@ class DevicePortSearchController extends PortSearchController
     {
         $r = parent::formatItem($port);
         $r['device_id'] = $port->device_id;
+
         return $r;
     }
 }

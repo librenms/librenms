@@ -30,7 +30,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class CustomMapBackground extends BaseModel
 {
     protected $primaryKey = 'custom_map_background_id';
-    protected $fillable = ['custom_map_id','background_image'];
+    protected $fillable = ['custom_map_id', 'background_image'];
     protected $casts = [
         'custom_map_id' => 'int',
     ];
