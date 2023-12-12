@@ -159,10 +159,10 @@ class CustomMapController extends Controller
 
     private function speedWidth(int $speed)
     {
-        if ($speed < 1000) {
-            return 1;
+        if ($speed < 1000000) {
+            return 1.0;
         }
-        return strlen((string)$speed) - 3;
+        return (strlen((string)$speed) - 5) / 2.0;
     }
 
     private function speedColour(float $pct)
@@ -229,8 +229,8 @@ class CustomMapController extends Controller
                 if ($edge->port->port_descr_speed) {
                     $speed_parts = explode('/', $edge->port->port_descr_speed, 2);
 
-                    if (count($speed_parts == 1)) {
-                        $speedto = snmpSpeed($speed_parts[0]);
+                    if (count($speed_parts) == 1) {
+                        $speedto = $this->snmpSpeed($speed_parts[0]);
                         $speedfrom = $speedto;
                     } elseif ($edge->reverse) {
                         $speedto = $this->snmpSpeed($speed_parts[1]);
@@ -239,7 +239,7 @@ class CustomMapController extends Controller
                         $speedto = $this->snmpSpeed($speed_parts[0]);
                         $speedfrom = $this->snmpSpeed($speed_parts[1]);
                     }
-                    if ($speedto == 0 || $speed_from == 0) {
+                    if ($speedto == 0 || $speedfrom == 0) {
                         $speedto = 0;
                         $speedfrom = 0;
                     }
@@ -264,8 +264,8 @@ class CustomMapController extends Controller
                     $edge->port_topct = -1.0;
                     $edge->port_frompct = -1.0;
                 } else {
-                    $edge->port_topct = $rateto / $speedto * 100.0;
-                    $edge->port_frompct = $ratefrom / $speedfrom * 100.0;
+                    $edge->port_topct = round($rateto / $speedto * 100.0, 2);
+                    $edge->port_frompct = round($ratefrom / $speedfrom * 100.0, 2);
                 }
                 if ($edge->port->ifOperStatus != "up") {
                     // If the port is not online, show the same as speed unknown
