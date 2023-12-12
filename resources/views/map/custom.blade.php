@@ -15,6 +15,18 @@
         <div class="row">
           <div class="col-md-12">
             <div class="well well-lg">
+              <div class="form-group row single-node" id="nodeDeviceLabelRow">
+                <label for="nodelabel" class="col-sm-3 control-label">Label</label>
+                <div class="col-sm-9">
+                  <input type=text id="nodelabel" class="form-control input-sm" value="Node Name" />
+                </div>
+              </div>
+              <div class="form-group row single-node" id="nodeDeviceSearchRow">
+                <label for="devicesearch" class="col-sm-3 control-label">Select Device</label>
+                <div class="col-sm-9">
+                  <input class="form-control typeahead" type="search" id="devicesearch" name="devicesearch" placeholder="Select Device" autocomplete="off">
+                </div>
+              </div>
               <div class="form-group row single-node" id="nodeDeviceRow" style="display:none">
                 <label for="deviceclear" class="col-sm-3 control-label">Selected Device</label>
                 <div class="col-sm-7">
@@ -24,18 +36,6 @@
                 </div>
                 <div class="col-sm-2">
                   <button type=button class="btn btn-primary" value="save" id="deviceclear" onclick="nodeDeviceClear();">Clear</button>
-                </div>
-              </div>
-              <div class="form-group row single-node" id="nodeDeviceSearchRow">
-                <label for="devicesearch" class="col-sm-3 control-label">Select Device</label>
-                <div class="col-sm-9">
-                  <input class="form-control typeahead" type="search" id="devicesearch" name="devicesearch" placeholder="Select Device" autocomplete="off">
-                </div>
-              </div>
-              <div class="form-group row single-node" id="nodeDeviceLabelRow">
-                <label for="nodelabel" class="col-sm-3 control-label">Label</label>
-                <div class="col-sm-9">
-                  <input type=text id="nodelabel" class="form-control input-sm" value="Node Name" />
                 </div>
               </div>
               <div class="form-group row">
@@ -156,6 +156,26 @@
         <div class="row">
           <div class="col-md-12">
             <div class="well well-lg">
+              <div class="form-group row" id="divEdgeFrom">
+                <label for="edgefrom" class="col-sm-3 control-label">From</label>
+                <div class="col-sm-9">
+                  <select id="edgefrom" class="form-control input-sm">
+                  </select>
+                </div>
+              </div>
+              <div class="form-group row" id="divEdgeTo">
+                <label for="edgeto" class="col-sm-3 control-label">To</label>
+                <div class="col-sm-9">
+                  <select id="edgeto" class="form-control input-sm">
+                  </select>
+                </div>
+              </div>
+              <div class="form-group row single-node" id="edgePortSearchRow" style="display:none">
+                <label for="portsearch" class="col-sm-3 control-label">Select Port</label>
+                <div class="col-sm-9">
+                  <input class="form-control typeahead" type="search" id="portsearch" name="portsearch" placeholder="Select Port" autocomplete="off">
+                </div>
+              </div>
               <div class="form-group row" id="edgePortRow" style="display:none">
                 <label for="portclear" class="col-sm-3 control-label">Selected Port</label>
                 <div class="col-sm-7">
@@ -171,26 +191,6 @@
                 <label for="portreverse" class="col-sm-3 control-label">Reverse Port Direction</label>
                 <div class="col-sm-9">
                   <input class="form-check-input" type="checkbox" role="switch" id="portreverse">
-                </div>
-              </div>
-              <div class="form-group row single-node" id="edgePortSearchRow" style="display:none">
-                <label for="portsearch" class="col-sm-3 control-label">Select Port</label>
-                <div class="col-sm-9">
-                  <input class="form-control typeahead" type="search" id="portsearch" name="portsearch" placeholder="Select Port" autocomplete="off">
-                </div>
-              </div>
-              <div class="form-group row" id="divEdgeFrom">
-                <label for="edgefrom" class="col-sm-3 control-label">From</label>
-                <div class="col-sm-9">
-                  <select id="edgefrom" class="form-control input-sm">
-                  </select>
-                </div>
-              </div>
-              <div class="form-group row" id="divEdgeTo">
-                <label for="edgeto" class="col-sm-3 control-label">To</label>
-                <div class="col-sm-9">
-                  <select id="edgeto" class="form-control input-sm">
-                  </select>
                 </div>
               </div>
               <div class="form-group row">
@@ -370,6 +370,12 @@
       <button type=button value="mapdelete" id="map-deleteButton" class="btn btn-danger" onclick="$('#mapDeleteModal').modal('show');">Delete Map</button>
     </div>
   </div>
+
+  <div class="row" id="control-map-sep">
+    <div class="col-md-12">
+      <hr>
+    </div>
+  </div>
 @endif {{-- edit mode with map_id not null --}}
 @if(! is_null($map_id))
   <div class="row" id="alert-row">
@@ -378,12 +384,6 @@
     </div>
   </div>
 @endif
-
-  <div class="row" id="control-map-sep">
-    <div class="col-md-12">
-      <hr>
-    </div>
-  </div>
 
   <div class="row">
     <div class="col-md-12">
@@ -1215,6 +1215,13 @@
 
                     var edge1 = {id: edgeid + "_from", from: edge.custom_map_node1_id, to: edgeid + "_mid", arrows: {to: {enabled: true}}, font: {face: edge.text_face, size: edge.text_size, color: edge.text_colour}, smooth: {type: edge.style}};
                     var edge2 = {id: edgeid + "_to", from: edge.custom_map_node2_id, to: edgeid + "_mid", arrows: {to: {enabled: true}}, font: {face: edge.text_face, size: edge.text_size, color: edge.text_colour}, smooth: {type: edge.style}};
+
+                    // Special case for curved lines
+                    if(edge2.smooth.type == "curvedCW") {
+                        edge2.smooth.type = "curvedCCW";
+                    } else if (edge2.smooth.type == "curvedCCW") {
+                        edge2.smooth.type = "curvedCW";
+                    }
 @if($edit)
                     if(edge.port_id) {
                         edge_port_map[edgeid] = {port_id: edge.port_id, port_name: edge.port_name, reverse: edge.reverse};
@@ -1253,7 +1260,7 @@
                 // Remove any nodes that are not in the database, includes edges
                 $.each( network_nodes.getIds(), function( node_idx, nodeid ) {
                     if(nodeid.endsWith('_mid')) {
-                        edgeid = edgeid.split("_")[0];
+                        edgeid = nodeid.split("_")[0];
                         if(! (edgeid in data.edges)) {
                             network_nodes.remove(edgeid + "_mid");
                             network_edges.remove(edgeid + "_to");
