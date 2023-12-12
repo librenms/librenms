@@ -581,7 +581,7 @@ class CustomMapController extends Controller
         }
 
         if (! count($errors)) {
-            DB::transaction(function() use ($map, $request) {
+            DB::transaction(function () use ($map, $request) {
                 $dbnodes = $map->nodes->keyBy('custom_map_node_id')->all();
                 $dbedges = $map->edges->keyBy('custom_map_edge_id')->all();
 
@@ -605,8 +605,8 @@ class CustomMapController extends Controller
                         $dbnode->map()->associate($map);
                     } else {
                         $dbnode = $dbnodes[$nodeid];
-                        if (!$dbnode) {
-                            Log::error("Could not find existing node for node id " . $nodeid);
+                        if (! $dbnode) {
+                            Log::error('Could not find existing node for node id ' . $nodeid);
                             abort(404);
                         }
                     }
@@ -618,8 +618,8 @@ class CustomMapController extends Controller
                     $dbnode->text_face = $node->font->face;
                     $dbnode->text_size = $node->font->size;
                     $dbnode->text_colour = $node->font->color;
-                    $dbnode->colour_bg = (array)$node->color ? $node->color->background : null;
-                    $dbnode->colour_bdr = (array)$node->color ? $node->color->border : null;
+                    $dbnode->colour_bg = (array) $node->color ? $node->color->background : null;
+                    $dbnode->colour_bdr = (array) $node->color ? $node->color->border : null;
                     $dbnode->border_width = $node->borderWidth;
                     $dbnode->x_pos = intval($node->x);
                     $dbnode->y_pos = intval($node->y);
@@ -629,21 +629,20 @@ class CustomMapController extends Controller
                     $newNodes[$nodeid] = $dbnode;
                 }
                 foreach ($edges as $edgeid => $edge) {
-                    Log::error("Processing " . $edgeid);
                     if (strpos($edgeid, 'new') === 0) {
                         $dbedge = new CustomMapEdge;
                         $dbedge->map()->associate($map);
                     } else {
                         $dbedge = $dbedges[$edgeid];
-                        if (!$dbedge) {
-                            Log::error("Could not find existing edge for edge id " . $edgeid);
+                        if (! $dbedge) {
+                            Log::error('Could not find existing edge for edge id ' . $edgeid);
                             abort(404);
                         }
                     }
-                    $dbedge->custom_map_node1_id = strpos($edge->from, "new") == 0 ? $newNodes[$edge->from]->custom_map_node_id : $edge->from;
-                    $dbedge->custom_map_node2_id = strpos($edge->to, "new") == 0 ? $newNodes[$edge->to]->custom_map_node_id : $edge->to;
+                    $dbedge->custom_map_node1_id = strpos($edge->from, 'new') == 0 ? $newNodes[$edge->from]->custom_map_node_id : $edge->from;
+                    $dbedge->custom_map_node2_id = strpos($edge->to, 'new') == 0 ? $newNodes[$edge->to]->custom_map_node_id : $edge->to;
                     $dbedge->port_id = $edge->port_id ? $edge->port_id : null;
-                    $dbedge->reverse= $edge->reverse;
+                    $dbedge->reverse = $edge->reverse;
                     $dbedge->showpct = $edge->showpct;
                     $dbedge->style = $edge->style;
                     $dbedge->text_face = $edge->text_face;
@@ -667,6 +666,7 @@ class CustomMapController extends Controller
                 }
             });
         }
+
         return response()->json(['id' => $map->custom_map_id, 'errors' => $errors]);
     }
 
