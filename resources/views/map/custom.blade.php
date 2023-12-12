@@ -4,7 +4,6 @@
 
 @section('content')
 @if($edit && !is_null($map_id))
-<button type="button" id="nodeModalPopup" class="btn btn-primary" data-toggle="modal" data-target="#nodeModal" style="display:none">Hidden</button>
 <div class="modal fade" id="nodeModal" tabindex="-1" role="dialog" aria-labelledby="nodeModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
@@ -145,7 +144,6 @@
   </div>
 </div>
 
-<button type="button" id="edgeModalPopup" class="btn btn-primary" data-toggle="modal" data-target="#edgeModal" style="display:none">Hidden</button>
 <div class="modal fade" id="edgeModal" tabindex="-1" role="dialog" aria-labelledby="edgeModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
@@ -258,7 +256,6 @@
   </div>
 </div>
 
-<button type="button" id="mapModalPopup" class="btn btn-primary" data-toggle="modal" data-target="#mapModal" style="display:none">Hidden</button>
 <div class="modal fade" id="mapModal" tabindex="-1" role="dialog" aria-labelledby="mapModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
@@ -320,7 +317,6 @@
   </div>
 </div>
 
-<button type="button" id="mapDeleteModalPopup" class="btn btn-primary" data-toggle="modal" data-target="#mapDeleteModal" style="display:none">Hidden</button>
 <div class="modal fade" id="mapDeleteModal" tabindex="-1" role="dialog" aria-labelledby="mapDeleteModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
@@ -367,7 +363,7 @@
     <div class="col-md-5 text-right">
       <button type=button value="maprender" id="map-renderButton" class="btn btn-primary" style="display: none" onclick="CreateNetwork();">Re-Render Map</button>
       <button type=button value="mapsave" id="map-saveDataButton" class="btn btn-primary" style="display: none" onclick="saveMapData();">Save Map</button>
-      <button type=button value="mapdelete" id="map-deleteButton" class="btn btn-danger" onclick="$('#mapDeleteModal').modal('show');">Delete Map</button>
+      <button type=button value="mapdelete" id="map-deleteButton" class="btn btn-danger" onclick="$('#mapDeleteModal').modal({backdrop: 'static', keyboard: false}, 'show');">Delete Map</button>
     </div>
   </div>
 
@@ -600,7 +596,7 @@
         } else {
             $("#mapBackgroundClearRow").hide();
         }
-        $('#mapModal').modal('show');
+        $('#mapModal').modal({backdrop: 'static', keyboard: false}, 'show');
     }
 
     function saveMapSettings() {
@@ -671,7 +667,7 @@
     }
 @if(!$map_id)
     // New map - pop up the modal to set initial settings
-    $("#mapModalPopup").click();
+    $('#mapModal').modal({backdrop: 'static', keyboard: false}, 'show');
     $("#mapBackgroundClearRow").hide();
 
     function editMapCancel() {
@@ -902,7 +898,7 @@
             $("#node-saveButton").hide();
             $("#node-saveDefaultsButton").show();
         }
-        $("#nodeModalPopup").click();
+        $('#nodeModal').modal({backdrop: 'static', keyboard: false}, 'show');
     }
 
     function editNodeSave(event) {
@@ -1025,7 +1021,7 @@
 
         $("#edge-saveButton").hide();
         $("#edge-saveDefaultsButton").show();
-        $("#edgeModalPopup").click();
+        $('#edgeModal').modal({backdrop: 'static', keyboard: false}, 'show');
     }
 
     function editEdgeDefaultsSave() {
@@ -1071,7 +1067,7 @@
         $("#edge-saveDefaultsButton").hide();
         $("#edge-saveButton").on("click", {data: edgedata}, callback);
 
-        $("#edgeModalPopup").click();
+        $('#edgeModal').modal({backdrop: 'static', keyboard: false}, 'show');
     }
 
     function editEdgeSave(event) {
@@ -1378,7 +1374,7 @@
             },
             {
                 source: devices.ttAdapter(),
-                limit: '8',
+                limit: '25',
                 async: true,
                 display: 'name',
                 templates: {
@@ -1400,7 +1396,7 @@
             },
             {
                 source: node1ports.ttAdapter(),
-                limit: '8',
+                limit: '25',
                 async: true,
                 display: 'name',
                 templates: {
@@ -1409,7 +1405,7 @@
             },
             {
                 source: node2ports.ttAdapter(),
-                limit: '8',
+                limit: '25',
                 async: true,
                 display: 'name',
                 templates: {
