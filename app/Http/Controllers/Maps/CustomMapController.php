@@ -154,6 +154,7 @@ class CustomMapController extends Controller
             $headers = [
                 'Content-Type' => $mime,
             ];
+
             return response()->file($path, $headers);
         }
         abort(404);
@@ -164,6 +165,7 @@ class CustomMapController extends Controller
         if ($speed < 1000000) {
             return 1.0;
         }
+
         return (strlen((string) $speed) - 5) / 2.0;
     }
 
@@ -178,6 +180,7 @@ class CustomMapController extends Controller
         } elseif ($pct < 150) {
             return sprintf('#FF00%02X', (int) (255.0 * ($pct - 100.0) / 50.0));
         }
+
         return '#FF00FF';
     }
 
@@ -340,7 +343,6 @@ class CustomMapController extends Controller
 
         return response()->json(['nodes' => $nodes, 'edges' => $edges]);
     }
-
 
     public function view(Request $request)
     {
