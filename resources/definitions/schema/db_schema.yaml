@@ -1674,6 +1674,15 @@ poller_groups:
     - { Field: descr, Type: varchar(255), 'Null': false, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
+port_security:
+  Columns:
+    - { Field: port_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '', Default: '0' }
+    - { Field: cpsIfMaxSecureMacAddr, Type: int, 'Null': true, Extra: '' }
+    - { Field: cpsIfStickyEnable, Type: varchar(5), 'Null': true, Extra: '' }
+  Indexes:
+    port_security_port_id_unique: { Name: port_security_port_id_unique, Columns: [port_id], Unique: true, Type: BTREE }
+    ports_fdb_device_id_index: { Name: ports_fdb_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
 ports:
   Columns:
     - { Field: port_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -1703,8 +1712,6 @@ ports:
     - { Field: ifVlan, Type: varchar(8), 'Null': true, Extra: '' }
     - { Field: ifTrunk, Type: varchar(16), 'Null': true, Extra: '' }
     - { Field: ifVrf, Type: int, 'Null': false, Extra: '', Default: '0' }
-    - { Field: cpsIfMaxSecureMacAddr, Type: 'int', 'Null': true, Extra: ''}
-    - { Field: cpsIfStickyEnable, Type: 'varchar(5)', 'Null': true, Extra: ''}
     - { Field: ignore, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
     - { Field: disabled, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
     - { Field: deleted, Type: tinyint, 'Null': false, Extra: '', Default: '0' }

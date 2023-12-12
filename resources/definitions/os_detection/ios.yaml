@@ -49,7 +49,11 @@ poller_modules:
     cisco-vpdn: true
     ipmi: false
     xdsl: true
+<<<<<<< HEAD
     port-security: false
+=======
+    cisco-port-security: true
+>>>>>>> cfbc7f6b73 (Added cisco port security poller module and table)
 discovery_modules:
     cisco-cef: true
     slas: true

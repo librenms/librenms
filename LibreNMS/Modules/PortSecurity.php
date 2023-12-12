@@ -27,16 +27,13 @@ namespace LibreNMS\Modules;
 
 use App\Models\Device;
 use App\Observers\ModuleModelObserver;
-use Illuminate\Support\Facades\DB;
+use LibreNMS\Config;
 use LibreNMS\DB\SyncsModels;
-use LibreNMS\Interfaces\Data\DataStorageInterface;
-use LibreNMS\Interfaces\Discovery\PortSecurityDiscovery;
-use LibreNMS\Interfaces\Module;
 use LibreNMS\Interfaces\Polling\PortSecurityPolling;
 use LibreNMS\OS;
 use LibreNMS\Polling\ModuleStatus;
 
-class PortSecurity implements Module
+class PortSecurity implements \LibreNMS\Interfaces\Module
 {
     use SyncsModels;
 
@@ -50,7 +47,8 @@ class PortSecurity implements Module
 
     public function shouldDiscover(OS $os, ModuleStatus $status): bool
     {
-        return $status->isEnabledAndDeviceUp($os->getDevice()) && $os instanceof PortSecurityDiscovery;
+        // libvirt does not use snmp, only ssh tunnels
+        return $status->isEnabledAndDeviceUp($os->getDevice(), check_snmp: ! Config::get('enable_libvirt')) && $os instanceof PortSecurityDiscovery;
     }
 
     /**
@@ -67,23 +65,25 @@ class PortSecurity implements Module
     }
 
     /**
-     * Poll data for this module and update the DB
-     *
-     * @param  \LibreNMS\OS  $os
+     * @inheritDoc
      */
     public function poll(OS $os, DataStorageInterface $datastore): void
     {
-        if ($os instanceof PortSecurityPolling) {
-            $device = $os->getDevice();
-            $portsec = $os->pollPortSecurity($os, $device);
-            ModuleModelObserver::observe(\App\Models\PortSecurity::class);
-            $this->syncModels($device, 'portSecurity', $portsec);
+        if ($os->getDevice()->PortSecurity->isEmpty()) {
+            return;
         }
-    }
 
-    public function dataExists(Device $device): bool
-    {
-        return $device->portSecurity()->exists();
+        if ($os instanceof PortSecurityPolling) {
+            $cps = $os->pollPortSecurity($os->getDevice()->PortSecurity);
+
+            ModuleModelObserver::observe(\App\Models\PortSecurity::class);
+            $this->syncModels($os->getDevice(), 'PortSecurity', $cps);
+
+            return;
+        }
+
+        // just run discovery again
+        $this->discover($os);
     }
 
     /**
