@@ -56,7 +56,7 @@ class CustomMap extends BaseModel
                     $this->hasDeviceAccess($q, $user, 'custom_map_nodes');
                 },
             ])
-            ->having('device_nodes_count', '=', 'device_nodes_allowed_count')
+            ->havingRaw('device_nodes_count = device_nodes_allowed_count')
             ->having('device_nodes_count', '>', 0);
     }
 
