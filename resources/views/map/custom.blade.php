@@ -1400,7 +1400,7 @@
                 async: true,
                 display: 'name',
                 templates: {
-                    suggestion: Handlebars.compile('<p><small><i class="fa fa-link fa-sm icon-theme" aria-hidden="true"></i> <strong>@{{name}}</strong>@{{hostname}}<br /><i>@{{description}}</i></small></p>')
+                    suggestion: Handlebars.compile('<p><small><i class="fa fa-link fa-sm icon-theme" aria-hidden="true"></i> <strong>@{{name}}</strong> - @{{hostname}}<br /><i>@{{description}}</i></small></p>')
                 }
             },
             {
@@ -1409,7 +1409,7 @@
                 async: true,
                 display: 'name',
                 templates: {
-                    suggestion: Handlebars.compile('<p><small><i class="fa fa-link fa-sm icon-theme" aria-hidden="true"></i> <strong>@{{name}}</strong>@{{hostname}}<br /><i>@{{description}}</i></small></p>')
+                    suggestion: Handlebars.compile('<p><small><i class="fa fa-link fa-sm icon-theme" aria-hidden="true"></i> <strong>@{{name}}</strong> - @{{hostname}}<br /><i>@{{description}}</i></small></p>')
                 }
             }).on('typeahead:select', function (ev, suggestion) {
                 edgePortSelect(suggestion.port_id, suggestion.hostname, suggestion.name, (suggestion.device_id != port_search_device_id_1));
