@@ -305,6 +305,7 @@ class CustomMapController extends Controller
             $nodeid = $node->custom_map_node_id;
             $nodes[$nodeid] = [
                 'custom_map_node_id' => $node->custom_map_node_id,
+                'device_id'          => $node->device_id,
                 'label'              => $node->label,
                 'style'              => $node->style,
                 'icon'               => $node->icon,
