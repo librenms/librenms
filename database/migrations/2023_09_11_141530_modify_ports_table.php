@@ -15,9 +15,9 @@ return new class extends Migration
     {
         Schema::create('port_security', function (Blueprint $table) {
             $table->integer('port_id')->unsigned()->default(0);
-            $table->integer('device_id')->unsigned()->default(0)->after('port_id');
-            $table->integer('cpsIfMaxSecureMacAddr')->nullable()->after('device_id');
-            $table->string('cpsIfStickyEnable')->nullable()->after('cpsIfMaxSecureMacAddr');
+            $table->integer('device_id')->unsigned()->default(0);
+            $table->integer('cpsIfMaxSecureMacAddr')->nullable();
+            $table->string('cpsIfStickyEnable')->nullable();
         });
     }
 
