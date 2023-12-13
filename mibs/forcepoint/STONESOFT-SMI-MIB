@@ -1,0 +1,60 @@
+--
+-- Structure of Management Information (SMI) MIB for Forcepoint LLC.
+--
+-- This MIB contains the top level registrations for Forcepoint's MIBs
+--
+
+STONESOFT-SMI-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	enterprises, MODULE-IDENTITY
+	    FROM SNMPv2-SMI;
+
+stonesoftSmiMibModule MODULE-IDENTITY
+	LAST-UPDATED	"201808090000Z"
+	ORGANIZATION	"Forcepoint LLC"
+	CONTACT-INFO	"email: mib.stonesoft@forcepoint.com"
+	DESCRIPTION	"Top level enterprise MIB for Forcepoint NGFW"
+	REVISION	"201808090000Z"
+	DESCRIPTION	"Add registration for stonesoftLogForwarding"
+	REVISION	"201706190000Z"
+	DESCRIPTION	"Description update"
+	REVISION	"201605060000Z"
+	DESCRIPTION	"Company information update"
+	REVISION	"200406160000Z"
+	DESCRIPTION	"First public revision"
+	::= { stonesoftModules 2 }
+
+-- The enterprise identifier registered for Forcepoint LLC.
+stonesoft		OBJECT IDENTIFIER ::= { enterprises 1369 }
+
+-- Top level registrations for Forcepoint. The old SBFC-MIB reserves
+--   stonesoft 1 and 2.
+
+-- sub-tree for module registrations
+stonesoftModules 	OBJECT IDENTIFIER ::= { stonesoft 3 }
+
+-- sub-tree for experiments
+stonesoftExperimental	OBJECT IDENTIFIER ::= { stonesoft 4 }
+
+-- sub-tree for products
+stonesoftProducts	OBJECT IDENTIFIER ::= { stonesoft 5 }
+
+-- sub-tree for company-wide objects and events
+stonesoftGeneric	OBJECT IDENTIFIER ::= { stonesoft 6 }
+
+
+-- Product registrations
+stonesoftLoadBalancer	OBJECT IDENTIFIER ::= { stonesoftProducts 1 }
+stonesoftFirewall	OBJECT IDENTIFIER ::= { stonesoftProducts 2 }
+stonesoftVPN		OBJECT IDENTIFIER ::= { stonesoftProducts 3 }
+stonesoftIDS		OBJECT IDENTIFIER ::= { stonesoftProducts 4 }
+stonesoftIPS		OBJECT IDENTIFIER ::= { stonesoftProducts 5 }
+
+
+-- Generic (product independent) resource registrations
+stonesoftNetworkNode	OBJECT IDENTIFIER ::= { stonesoftGeneric 1 }
+stonesoftCluster	OBJECT IDENTIFIER ::= { stonesoftGeneric 2 }
+stonesoftLogForwarding	OBJECT IDENTIFIER ::= { stonesoftGeneric 3 }
+
+END

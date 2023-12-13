@@ -1,0 +1,20 @@
+mib: STONESOFT-SMI-MIB:STONESOFT-FIREWALL-MIB:STONESOFT-NETNODE-MIB
+modules:
+    mempools:
+        data:
+            -
+                total: STONESOFT-FIREWALL-MIB::fwMemBytesTotal
+                free: STONESOFT-FIREWALL-MIB::fwMemBytesUnused
+                used: STONESOFT-FIREWALL-MIB::fwMemBytesUsed
+                descr: 'Local Memory {{ $index }}'
+    processors:
+        data:
+            -
+                oid: STONESOFT-FIREWALL-MIB::fwCpuTotal
+                num_oid: '.1.3.6.1.4.1.1369.5.2.1.11.1.1.3.{{ $index }}'
+                descr: 'Processor {{ $index }}'
+    os:
+        serial: STONESOFT-NETNODE-MIB::nodePosCode.0
+        version: STONESOFT-SMI-MIB::stonesoftFirewall.1.1.0
+        version_regex: '/Forcepoint NGFW version (?<version>[0-9\.]+)/'
+        hardware: STONESOFT-NETNODE-MIB::nodeApplianceModel.0
