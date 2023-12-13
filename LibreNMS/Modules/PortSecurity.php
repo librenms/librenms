@@ -106,7 +106,7 @@ class PortSecurity implements \LibreNMS\Interfaces\Module
     public function dump(Device $device)
     {
         return [
-            'PortSecurity' => $device->PortSecurity()->orderBy('vmwVmVMID')
+            'PortSecurity' => $device->PortSecurity()->orderBy('ifIndex')
                 ->get()->map->makeHidden(['id', 'device_id']),
         ];
     }
