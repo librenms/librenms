@@ -1177,21 +1177,22 @@ for duplicate device and snmp reachability, but not duplicate hostname.
 Route: `/api/v0/devices`
 
 Input (JSON):
-
+Fields:
 - hostname (required): device hostname or IP
 - display: A string to display as the name of this device, defaults to 
   hostname (or device_display_default setting). May be a simple
   template using replacements: {{ $hostname }}, {{ $sysName }},
   {{ $sysName_fallback }}, {{ $ip }}
+- snmpver: SNMP version to use, v1, v2c or v3. During checks detection order is v2c,v3,v1
 - port: SNMP port (defaults to port defined in config).
-- transport: SNMP protocol (defaults to transport defined in config).
-- snmpver: SNMP version to use, v1, v2c or v3. Defaults to v2c.
+- transport: SNMP protocol (udp,tcp,udp6,tcp6) Defaults to transport defined in config.
 - port_association_mode: method to identify ports: ifIndex (default), ifName, ifDescr, ifAlias
-- poller_group: This is the poller_group id used for distributed
-  poller setup. Defaults to 0.
+- snmp_disable: Disables snmp checks and only checks icmp adding the device as ping only (defaults to false)
+- poller_group: This is the poller_group id used for distributed poller setup. Defaults to 0.
 - location or location_id: set the location by text or location id
-- force_add: Set to true to force the device to be added regardless of it being able
-  to respond to snmp or icmp.
+Options:
+- force_add: Skip all checks and attempts to detect credentials.  All required fields must be set in the API call.
+- ping_fallback: if snmp checks fail, add the device as ping only instead of failing
 
 For SNMP v1 or v2c
 
