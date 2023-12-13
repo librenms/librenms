@@ -1676,7 +1676,7 @@ poller_groups:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
 port_security:
   Columns:
-    - { Field: port_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: port_id, Type: 'int unsigned', 'Null': false, Extra: '', Default: '0' }
     - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '', Default: '0' }
     - { Field: cpsIfMaxSecureMacAddr, Type: int, 'Null': true, Extra: '' }
     - { Field: cpsIfStickyEnable, Type: varchar(5), 'Null': true, Extra: '' }
