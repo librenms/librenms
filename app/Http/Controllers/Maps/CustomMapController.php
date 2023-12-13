@@ -171,16 +171,23 @@ class CustomMapController extends Controller
 
     private function speedColour(float $pct)
     {
+        // For the maths below, the 5.1 is worked out as 255 / 50
+        // (255 being the max colour value and 50 is the max of the $pct calcluation)
         if ($pct < 0) {
+            // Black if we can't determine the percentage (link down or speed 0)
             return '#000000';
         } elseif ($pct < 50) {
-            return sprintf('#00%02X00', (int) (255.0 * (50.0 - $pct) / 50.0));
+            // 100% green and slowly increase the red until we get to yellow
+            return sprintf('#%02XFF00', (int) (5.1 * $pct));
         } elseif ($pct < 100) {
-            return sprintf('#%02X0000', (int) (255.0 * ($pct - 50.0) / 50.0));
+            // 100% red and slowly remove green to go from yellow to red
+            return sprintf('#FF%02X00', (int) (5.1 * (100.0 - $pct)));
         } elseif ($pct < 150) {
-            return sprintf('#FF00%02X', (int) (255.0 * ($pct - 100.0) / 50.0));
+            // 100% red and slowly increase blue to go purple
+            return sprintf('#FF00%02X', (int) (5.1 * ($pct - 100.0)));
         }
 
+        // Default to purple for links over 150%
         return '#FF00FF';
     }
 
