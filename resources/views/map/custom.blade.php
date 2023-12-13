@@ -756,10 +756,8 @@
         var nodestyle = $("#nodestyle").val();
         if(nodestyle == 'icon') {
             $("#nodeIconRow").show();
-            $("#nodeColourBgRow").hide();
         } else {
             $("#nodeIconRow").hide();
-            $("#nodeColourBgRow").show();
         }
     }
 
@@ -769,8 +767,6 @@
         $("#nodelabel").val(name.split(".")[0].split(" ")[0]);
         $("#device_image").val(image);
         $("#nodeDeviceSearchRow").hide();
-        $("#nodeColourBgRow").hide();
-        $("#nodeColourBdrRow").hide();
         $("#nodestyleimage").show();
         $("#nodestylecircularimage").show();
         $("#nodeDeviceRow").show();
@@ -785,8 +781,6 @@
         $("#nodestyleimage").hide();
         $("#nodestylecircularimage").hide();
         $("#nodeDeviceSearchRow").show();
-        $("#nodeColourBgRow").show();
-        $("#nodeColourBdrRow").show();
 
         // Reset device style if we were using the device image
         if($("#nodestyle").val() == "image" || $("#nodestyle").val() == "circularImage") {
@@ -842,16 +836,10 @@
             $("#device_name").text(node_device_map[data.id].device_name);
             // Hide device selection row
             $("#nodeDeviceSearchRow").hide();
-            // Hide background colour rows (this is set dynamically for devices)
-            $("#nodeColourBgRow").hide();
-            $("#nodeColourBdrRow").hide();
         } else {
             // Node is not linked to a device
             $("#device_id").val("");
             $("#device_name").text("");
-            // Always show background colour rows
-            $("#nodeColourBgRow").show();
-            $("#nodeColourBdrRow").show();
             // Hide the selected device row
             $("#nodeDeviceRow").hide();
         }
@@ -868,8 +856,6 @@
         if(data.shape == "icon") {
             $("#nodeicon").val(data.icon.code.charCodeAt(0).toString(16));
             $("#nodeIconRow").show();
-            // hide the background colour row for icons
-            $("#nodeColourBgRow").hide();
         } else {
             $("#nodeIconRow").hide();
         }
@@ -1188,7 +1174,11 @@
                     node_cfg.y = node.y_pos;
                     node_cfg.font = {face: node.text_face, size: node.text_size, color: node.text_colour};
                     node_cfg.size = node.size;
+@if($edit)
                     node_cfg.color = {background: node.colour_bg, border: node.colour_bdr};
+@else
+                    node_cfg.color = {background: node.colour_bg_view, border: node.colour_bdr_view};
+@endif
                     if(node.style == "icon") {
                         node_cfg.icon = {face: 'FontAwesome', code: String.fromCharCode(parseInt(node.icon, 16)), size: node.size, color: node.colour_bdr}; 
                     } else {
@@ -1236,13 +1226,13 @@
                     if(edge.port_id) {
                         edge1.title = edge2.title = edge.port_info;
                         if(edge.showpct) {
-                            edge1.label = edge.port_topct + "%";
-                            edge2.label = edge.port_frompct + "%";
+                            edge1.label = edge.port_frompct + "%";
+                            edge2.label = edge.port_topct + "%";
                         }
-                        edge1.color = {color: edge.colour1};
-                        edge1.width = edge.width1;
-                        edge2.color = {color: edge.colour2};
-                        edge2.width = edge.width2;
+                        edge1.color = {color: edge.colour_from};
+                        edge1.width = edge.width_from;
+                        edge2.color = {color: edge.colour_to};
+                        edge2.width = edge.width_to;
                     }
 @endif
                     if (network_nodes.get(mid.id)) {
