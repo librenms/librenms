@@ -13,9 +13,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('ports', function (Blueprint $table) {
-            $table->string('cpsIfStickyEnable', 5)->nullable()->after('ifVrf');
-            $table->integer('cpsIfMaxSecureMacAddr')->nullable()->after('ifVrf');
+        Schema::create('port_security', function (Blueprint $table) {
+            $table->integer('port_id')->unsigned()->default(0);
+            $table->integer('device_id')->unsigned()->default(0)->after('port_id');
+            $table->integer('cpsIfMaxSecureMacAddr')->nullable()->after('device_id');
+            $table->string('cpsIfStickyEnable')->nullable()->after('cpsIfMaxSecureMacAddr');
         });
     }
 
@@ -26,8 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('ports', function (Blueprint $table) {
-            $table->dropColumn(['cpsIfMaxSecureMacAddr', 'cpsIfStickyEnable']);
-        });
+        Schema::drop('port_security');
     }
 };
