@@ -213,7 +213,7 @@
                 "xdsl": {
                     "type": "boolean"
                 },
-                "port-security": {
+                "cisco-port-security": {
                     "type": "boolean"
                 }
             },
