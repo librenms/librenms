@@ -374,6 +374,7 @@ It is up the IdP to provide the relevant details that you will need for configur
 === "Azure"
 
     ![LibreNMS-SAML-Azure](https://user-images.githubusercontent.com/8980985/222431219-af2369dc-1abd-4943-8dfb-5a21d8b9976c.png)
+    ```bash
     echo "SESSION_SAME_SITE_COOKIE=none" >> .env
     lnms plugin:add socialiteproviders/saml2
     lnms config:set auth.socialite.redirect true
@@ -385,6 +386,7 @@ It is up the IdP to provide the relevant details that you will need for configur
     lnms config:set auth.socialite.configs.saml2.metadata https://nexus.microsoftonline-p.com/federationmetadata/saml20/federationmetadata.xml
     lnms config:set auth.socialite.configs.saml2.sp_default_binding_method urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST
     lnms config:clear
+    ```
 
 #### Using an Identity Provider metadata URL
 
