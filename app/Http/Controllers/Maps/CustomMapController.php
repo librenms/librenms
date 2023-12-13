@@ -189,7 +189,9 @@ class CustomMapController extends Controller
         // Only succeed if the string startes with a number optionally followed by a unit
         if (preg_match('/^(\d+)([kMGTP])?/', $speeds, $matches)) {
             $speed = (int) $matches[1];
-            if ($matches[2] == 'k') {
+            if (count($matches) < 3) {
+                return $speed;
+	    } elseif ($matches[2] == 'k') {
                 $speed *= 1000;
             } elseif ($matches[2] == 'M') {
                 $speed *= 1000000;
