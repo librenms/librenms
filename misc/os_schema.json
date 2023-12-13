@@ -215,6 +215,9 @@
                 },
                 "xdsl": {
                     "type": "boolean"
+                },
+                "cisco-port-security": {
+                    "type": "boolean"
                 }
             },
             "additionalProperties": false

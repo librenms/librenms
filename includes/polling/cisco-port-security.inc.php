@@ -55,7 +55,7 @@ if ($device['os'] == 'ios' || $device['os'] == 'iosxe') {
             $db_data['device_id'] = $port_info['device_id'];
             $db_data['cpsIfMaxSecureMacAddr'] = $snmp_data['cpsIfMaxSecureMacAddr'];
 	    $db_data['cpsIfStickyEnable'] = $snmp_data['cpsIfStickyEnable'];
-            echo '<pre>'; print_r($db_data); echo '</pre>';
+            //echo '<pre>'; print_r($db_data); echo '</pre>';
 	    if ($port_sec_info) {
 		echo 'Updating data';
 		dbUpdate($db_data, 'port_security', '`port_id` = ?', [$port_id]);
