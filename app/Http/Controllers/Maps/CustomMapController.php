@@ -290,14 +290,14 @@ class CustomMapController extends Controller
                 }
                 if ($edge->port->ifOperStatus != 'up') {
                     // If the port is not online, show the same as speed unknown
-                    $edges[$edgeid]['colour1'] = $this->speedColour(-1.0);
-                    $edges[$edgeid]['colour2'] = $this->speedColour(-1.0);
+                    $edges[$edgeid]['colour_to'] = $this->speedColour(-1.0);
+                    $edges[$edgeid]['colour_from'] = $this->speedColour(-1.0);
                 } else {
-                    $edges[$edgeid]['colour1'] = $this->speedColour($edges[$edgeid]['port_topct']);
-                    $edges[$edgeid]['colour2'] = $this->speedColour($edges[$edgeid]['port_frompct']);
+                    $edges[$edgeid]['colour_to'] = $this->speedColour($edges[$edgeid]['port_topct']);
+                    $edges[$edgeid]['colour_from'] = $this->speedColour($edges[$edgeid]['port_frompct']);
                 }
-                $edges[$edgeid]['width1'] = $this->speedWidth($speedto);
-                $edges[$edgeid]['width2'] = $this->speedWidth($speedfrom);
+                $edges[$edgeid]['width_to'] = $this->speedWidth($speedto);
+                $edges[$edgeid]['width_from'] = $this->speedWidth($speedfrom);
             }
         }
 
@@ -316,6 +316,8 @@ class CustomMapController extends Controller
                 'text_colour'        => $node->text_colour,
                 'colour_bg'          => $node->colour_bg,
                 'colour_bdr'         => $node->colour_bdr,
+                'colour_bg_view'     => $node->colour_bg,
+                'colour_bdr_view'    => $node->colour_bdr,
                 'x_pos'              => $node->x_pos,
                 'y_pos'              => $node->y_pos,
             ];
@@ -333,11 +335,11 @@ class CustomMapController extends Controller
                 }
 
                 if ($device_style['background']) {
-                    $nodes[$nodeid]['colour_bg'] = $device_style['background'];
+                    $nodes[$nodeid]['colour_bg_view'] = $device_style['background'];
                 }
 
                 if ($device_style['border']) {
-                    $nodes[$nodeid]['colour_bdr'] = $device_style['border'];
+                    $nodes[$nodeid]['colour_bdr_view'] = $device_style['border'];
                 }
             }
         }
