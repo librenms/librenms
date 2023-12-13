@@ -50,7 +50,7 @@ class CustomMapController extends Controller
         ],
         'font' => [
             'color' => '#343434',
-            'size' => 14,
+            'size' => 12,
             'face' => 'arial',
         ],
         'label' => true,
