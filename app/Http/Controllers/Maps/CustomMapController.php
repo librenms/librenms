@@ -198,7 +198,7 @@ class CustomMapController extends Controller
             $speed = (int) $matches[1];
             if (count($matches) < 3) {
                 return $speed;
-	    } elseif ($matches[2] == 'k') {
+            } elseif ($matches[2] == 'k') {
                 $speed *= 1000;
             } elseif ($matches[2] == 'M') {
                 $speed *= 1000000;
