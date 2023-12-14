@@ -22,6 +22,11 @@ $port_stats = snmpwalk_cache_oid($device, 'ifAlias', $port_stats, 'IF-MIB');
 $port_stats = snmpwalk_cache_oid($device, 'ifType', $port_stats, 'IF-MIB', null, $typeSnmpFlags);
 $port_stats = snmpwalk_cache_oid($device, 'ifOperStatus', $port_stats, 'IF-MIB', null, $operStatusSnmpFlags);
 
+//Get AOS7 ports with context
+if ($device['os'] == 'aos7') {
+    require base_path('includes/discovery/ports/aos7.inc.php');
+}
+
 // Get Trellix NSP ports
 if ($device['os'] == 'mlos-nsp') {
     require base_path('includes/discovery/ports/mlos-nsp.inc.php');
