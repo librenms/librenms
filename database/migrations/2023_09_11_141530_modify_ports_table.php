@@ -14,10 +14,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('port_security', function (Blueprint $table) {
-            $table->integer('port_id')->unsigned()->default(0);
-            $table->integer('device_id')->unsigned()->default(0);
+            $table->integer('port_id')->unsigned()->default(0)->unique();
+            $table->integer('device_id')->unsigned()->default(0)->index();
             $table->integer('cpsIfMaxSecureMacAddr')->nullable();
             $table->string('cpsIfStickyEnable', 5)->nullable();
+            $table->unique(['port_id']);
         });
     }
 
