@@ -44,7 +44,15 @@
                 rowCount: [25, 50, 100, -1],
                 url: "{{ route('table.port-nac') }}",
                 post: function () {
+                    var check_showHistorical = document.getElementById('check_showHistorical');
+                    if (check_showHistorical) {
+                        var showHistorical = check_showHistorical.checked;
+                    } else {
+                        var showHistorical = false;
+                    }
+
                     return {
+                        showHistorical: showHistorical,
                         device_id: '{{ $device->device_id }}',
                     };
                 },
@@ -118,7 +126,22 @@
                     }
                 }
             });
+            var add = $(".actionBar").append(
+                    '<div class="search form-group pull-left" style="width:auto">' +
+                    '<?php echo csrf_field() ?>' +
+                    '<input type="checkbox" name="check_showHistorical" data-size="small" id="check_showHistorical">' +
+                    '&nbsp;Include historical NAC entries' +
+                    '</div>');
 
+            $("#check_showHistorical").bootstrapSwitch({
+                'onSwitchChange': function(event, state){
+                     updateTable();
+                }
+            });
+
+            function updateTable() {
+                $('#nac-grid').bootgrid('reload');
+            };
         });
     </script>
 @endpush
