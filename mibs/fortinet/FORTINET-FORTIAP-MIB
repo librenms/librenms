@@ -1,0 +1,2066 @@
+--
+-- FORTINET-AP-MIB.mib: MIB for Fortinet AP OID tree
+-- MODULE-IDENTITY
+--  OrgName
+--     Fortinet Technologies, Inc.
+--  ContactInfo
+--     Technical Support
+--     e-mail: support@fortinet.com
+--     http://www.fortinet.com
+--
+
+FORTINET-FORTIAP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    fortinet
+        FROM FORTINET-CORE-MIB
+    MODULE-COMPLIANCE, NOTIFICATION-GROUP, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    Counter64, Integer32, IpAddress,
+    MODULE-IDENTITY, NOTIFICATION-TYPE, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    DisplayString, PhysAddress
+        FROM SNMPv2-TC;
+
+fnFortiAPMib MODULE-IDENTITY
+    LAST-UPDATED "201810030000Z"
+    ORGANIZATION
+        "Fortinet Technologies, Inc."
+    CONTACT-INFO
+        "
+         Technical Support
+         email: support@fortinet.com
+         http://www.fortinet.com"
+    DESCRIPTION
+        "MIB module for Fortinet FortiAP devices."
+    REVISION    "201810030000Z"
+    DESCRIPTION
+        "Initial version of FORTINET-FORTIAP-MIB."
+    ::= { fortinet 120}
+
+-- fortinet.fnFortiAPMib.fapCommon
+fapCommon OBJECT IDENTIFIER ::= { fnFortiAPMib 1 }
+
+fapVersion OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "FortiAP Software Version."
+    ::= { fapCommon 1 }
+
+fapSerialNum OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "FortiAP Serial Number."
+    ::= { fapCommon 2 }
+
+fapHostName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Hostname of the FortiAP."
+    ::= { fapCommon 3 }
+
+fapRegionCode OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Operating Region Code of the FortiAP."
+    ::= { fapCommon 4 }
+
+fapBaseMacAddr OBJECT-TYPE
+    SYNTAX      PhysAddress (SIZE(6|8))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "BaseMAC Address of the FortiAP."
+    ::= { fapCommon 5 }
+
+fapBiosVer OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "BIOS Version of the FortiAP."
+    ::= { fapCommon 6 }
+
+fapBiosDataVer OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "BIOS Data Version of the FortiAP."
+    ::= { fapCommon 7 }
+
+fapSysPartNum OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Hardware part number of the FortiAP."
+    ::= { fapCommon 8 }
+
+-- fortinet.fnFortiAPMib.fapWTPConfig
+fapWTPConfig OBJECT IDENTIFIER ::= { fnFortiAPMib 2 }
+
+fapWtpWanMode OBJECT-TYPE
+    SYNTAX      INTEGER { wanOnly(0),
+                          wanLan(1),
+                          aggregate(2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "WAN Mode Operation."
+    ::= { fapWTPConfig 1 }
+
+fapWtpApAddrMode OBJECT-TYPE
+    SYNTAX      INTEGER { dhcp(0),
+                          static(1) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "IP address Mode of the FortiAP Ethernet Interface."
+    ::= { fapWTPConfig 2 }
+
+fapWtpApIpAddr OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "IP address of the FortiAP Ethernet Interface"
+    ::= { fapWTPConfig 3 }
+
+fapWtpApIpNetmask OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Netmask of the FortiAP Ethernet Interface."
+    ::= { fapWTPConfig 4 }
+
+fapWtpApIpGateway OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Gateway of the FortiAP Ethernet Interface."
+    ::= { fapWTPConfig 5 }
+
+fapWtpApMode OBJECT-TYPE
+    SYNTAX      INTEGER { thinAp(0),
+                          fatAp(1),
+                          siteSurvey(2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Operating Mode of the FortiAP."
+    ::= { fapWTPConfig 6 }
+
+fapWtpApDnsAddr OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "DNS Server Address."
+    ::= { fapWTPConfig 7 }
+
+fapWtpApStpMode OBJECT-TYPE
+    SYNTAX      INTEGER { disable(0),
+                          enable(1),
+                          disabledWithWanBlock(2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "STP Operating Mode of the FortiAP."
+    ::= { fapWTPConfig 8 }
+
+fapWtpApMgmtVlanID OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Management VLAN ID of the FortiAP."
+    ::= { fapWTPConfig 9 }
+
+fapWtpApAcDiscoveryType OBJECT-TYPE
+    SYNTAX      INTEGER { auto(0),
+                          static(1),
+                          dhcp(2),
+                          dns(3),
+                          broadcast(5),
+                          multicast(6),
+                          fortiCloud(7) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "AC discovery type of the FortiAP."
+    ::= { fapWTPConfig 10 }
+
+fapWtpApAcAddr1 OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "IP address of the AC 1."
+    ::= { fapWTPConfig 11 }
+
+fapWtpApAcAddr2 OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "IP address of the AC 2."
+    ::= { fapWTPConfig 12 }
+
+fapWtpApAcAddr3 OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "IP address of the AC 3."
+    ::= { fapWTPConfig 13 }
+
+fapWtpApAcHostname1 OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Hostname of the AC 1."
+    ::= { fapWTPConfig 14 }
+
+fapWtpApAcHostname2 OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Hostname of the AC 2."
+    ::= { fapWTPConfig 15 }
+
+fapWtpApAcHostname3 OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Hostname of the AC 3."
+    ::= { fapWTPConfig 16 }
+
+fapWtpAcMulticastAddr OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Multicast Address of the AC."
+    ::= { fapWTPConfig 17 }
+
+fapWtpAcDhcpCode OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "DHCP option code from AC."
+    ::= { fapWTPConfig 18 }
+
+fapWtpAcFcldApCtrl OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Forticloud AP Control server."
+    ::= { fapWTPConfig 19 }
+
+fapWtpAcFcldId OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Forticloud User ID."
+    ::= { fapWTPConfig 20 }
+
+fapWtpAcFcldPassword OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Forticloud User Password."
+    ::= { fapWTPConfig 21 }
+
+fapWtpAcCtrlPort OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "CAPWAP AC Control Port."
+    ::= { fapWTPConfig 22 }
+
+fapWtpAcDataChannelSecurity OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "DataChannel Security used in CAPWAP."
+    ::= { fapWTPConfig 23 }
+
+fapWtpMeshApType OBJECT-TYPE
+    SYNTAX      INTEGER { ethernet(0),
+                          mesh(1),
+                          ethernetMeshBackup(2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Mesh AP Type."
+    ::= { fapWTPConfig 24 }
+
+fapWtpMeshSSID OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "MESH SSID to be Connected to."
+    ::= { fapWTPConfig 25 }
+
+fapWtpMeshPassword OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "MESH Password to be Connected."
+    ::= { fapWTPConfig 26 }
+
+fapWtpEthBridge OBJECT-TYPE
+    SYNTAX      INTEGER { disable(0),
+                          enable(1) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Disable/enable ethernet bridge on mesh leaf."
+    ::= { fapWTPConfig 27 }
+
+fapWtpEthBridgeVlans OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Ethernet vlan bridges on mesh leaf."
+    ::= { fapWTPConfig 28 }
+
+fapLedState OBJECT-TYPE
+    SYNTAX      INTEGER { disable(0),
+                          enable(1),
+                          controledByAC(2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Configured LED Mode of the FortiAP."
+    ::= { fapWTPConfig 29 }
+
+fapPoeMode OBJECT-TYPE
+    SYNTAX      INTEGER { autoDetect(0),
+                          ieee8023Af(1),
+                          ieee8023At(2),
+                          powerAdapter(3),
+                          acControlled(4) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Configured  POE Mode of the FortiAP."
+    ::= { fapWTPConfig 30 }
+
+-- fortinet.fnFortiAPMib.fapWTPStatus
+fapWTPStatus OBJECT IDENTIFIER ::= { fnFortiAPMib 3 }
+
+fapAcDiscoveryType OBJECT-TYPE
+        SYNTAX      INTEGER { unknown(0),
+                              static(1),
+                              dhcp(2),
+                              dns(3),
+                              acRefer(4),
+                              broadcast(5),
+                              multicast(6),
+                              fortiCloud(7) }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Current AC Discovery type."
+        ::= { fapWTPStatus 1 }
+
+fapCtlmsgOffload OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Display the control messages to be offloaded."
+    ::= { fapWTPStatus  2 }
+
+fapAcCertVersion OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Operating AC certificate."
+        ::= { fapWTPStatus 3 }
+
+fapPoeModeOper OBJECT-TYPE
+        SYNTAX      INTEGER { autoDetect(0),
+                              ieee8023Af(1),
+                              ieee8023At(2),
+                              powerAdapter(3),
+                              acControlled(4) }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Operating PoE Mode."
+        ::= { fapWTPStatus 4 }
+
+fapLedMode OBJECT-TYPE
+        SYNTAX      INTEGER { disable(0),
+                              normal(1),
+                              blinking(2) }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Operating LED State."
+        ::= { fapWTPStatus 5 }
+
+fapAllowAccess OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Control management access to the FortiAP."
+        ::= { fapWTPStatus 6 }
+
+fapLldpAccess OBJECT-TYPE
+        SYNTAX      INTEGER { disable(0),
+                              enable(1) }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Link Layer Discovery Protocol for the FortiAP."
+        ::= { fapWTPStatus 7 }
+
+fapRadioCount OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Total number of Radios on the FortiAP."
+        ::= { fapWTPStatus 8 }
+
+fapStationInfo OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Connected & Allowed  Stations on the FortiAP.
+             Format x/y, x is the current station count, and y is
+             the maximum number of stations allowed."
+        ::= { fapWTPStatus 9 }
+
+fapEchoInterval OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Time between Echo Requests sent by the FortiAP."
+        ::= { fapWTPStatus 10 }
+
+fapKeepAliveInterval OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Time between two Keep Alive Packets sent by the FortiAP."
+        ::= { fapWTPStatus 11 }
+
+fapRetransmitMax OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Maximum number of control packet retransmissions."
+        ::= { fapWTPStatus 12 }
+
+fapDcDeadInterval OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Data Channel Dead Interval."
+        ::= { fapWTPStatus 13 }
+
+fapDiscoveryInterval OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "AC Discovery Interval."
+        ::= { fapWTPStatus 14 }
+
+fapReportInterval OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Background Scan Report Interval."
+        ::= { fapWTPStatus 15 }
+
+fapStationStatsInterval OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Time between running station stats reports."
+        ::= { fapWTPStatus 16 }
+
+fapVapStatsInterval OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Time between running vap stats reports."
+        ::= { fapWTPStatus 17 }
+
+fapRadioStatsInterval OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Time between running radio stats reports."
+        ::= { fapWTPStatus 18 }
+
+fapStationCapInterval OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Time between running station capability reports."
+        ::= { fapWTPStatus 19 }
+
+fapIdleTimeout OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Time after which a client is considered idle and timed out."
+        ::= { fapWTPStatus 20 }
+
+fapStatisticsInterval OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Staticics collect interval."
+        ::= { fapWTPStatus 21 }
+
+fapFortiPresenceInterval OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Time between running FortiPresence reports."
+        ::= { fapWTPStatus 22 }
+
+fapFsmState OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Current CAPWAP state of the FortiAP."
+        ::= { fapWTPStatus 23 }
+
+fapWtpIpAddr OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "IP address of the FortiAP."
+        ::= { fapWTPStatus 24 }
+
+fapAcIpAddr OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "IP address of the AC control channel."
+        ::= { fapWTPStatus 25 }
+
+fapAcPort OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "UDP port number of the AC control channel."
+        ::= { fapWTPStatus 26 }
+
+fapIpFragmentPrevent OBJECT-TYPE
+        SYNTAX      INTEGER { disable(0),
+                              tcpMss(1),
+                              tunMtu(2),
+                              both(3) }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Prevent IP fragmentation for CAPWAP tunneled control and data packets."
+        ::= { fapWTPStatus 27 }
+
+fapAeroScout OBJECT-TYPE
+        SYNTAX      INTEGER { disable(0),
+                              enable(1) }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "AeroScout Real Time Location Service support."
+        ::= { fapWTPStatus 28 }
+
+fapLanMode OBJECT-TYPE
+        SYNTAX      INTEGER { disable(0),
+                              enable(1),
+                              wanLan(2) }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "LAN Port Mode."
+        ::= { fapWTPStatus 29 }
+
+fapLanPortCount OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Total number of LAN Ports on the FortiAP."
+        ::= { fapWTPStatus 30 }
+
+fapDataChannelStatus OBJECT-TYPE
+        SYNTAX      INTEGER { off(0),
+                              on(1) }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "FortiAP Data Channel Status."
+        ::= { fapWTPStatus 31 }
+
+fapDataChannelSecurityOper OBJECT-TYPE
+        SYNTAX      INTEGER { clear(0),
+                              dtls(1),
+                              ipsec(2) }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Data Channel Security."
+        ::= { fapWTPStatus 32 }
+
+fapFortiPresenceServer OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "IP address of the FortiPresence server."
+        ::= { fapWTPStatus 33 }
+
+fapFortiPresencePort OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "UDP port number of the Forti presence server."
+        ::= { fapWTPStatus 34 }
+
+fapFortiPresenceProject OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The project name of the Forti presence server."
+        ::= { fapWTPStatus 35 }
+
+fapWtpLocation OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Physical location of the FortiAP."
+    ::= { fapWTPStatus 36 }
+
+-- fortinet.fnFortiAPMib.fapRadioTables
+fapRadioTables OBJECT IDENTIFIER
+        ::= { fnFortiAPMib 4 }
+
+fapRadioTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF FapRadioEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A configuration table of device's radios"
+        ::= { fapRadioTables 1 }
+
+fapRadioEntry OBJECT-TYPE
+        SYNTAX      FapRadioEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An entry containing information applicable
+             to a particular virtual domain"
+        INDEX       { fapRadioIndex }
+        ::= { fapRadioTable 1 }
+
+FapRadioEntry ::= SEQUENCE {
+        fapRadioIndex               Integer32,
+        fapRadioMode                INTEGER,
+        fapRadioCountry             DisplayString,
+        fapRadioCountryId           Integer32,
+        fapRadioStationInfo         DisplayString,
+        fapRadioType                INTEGER,
+        fapRadioHT2040Coexist       INTEGER,
+        fapRadioBeaconInterval      Integer32,
+        fapRadioTxPowerConfig       Integer32,
+        fapRadioTxPowerOper         Integer32,
+        fapRadioTxPowerMax          Integer32,
+        fapRadioChannelWidth        INTEGER,
+        fapRadioSGI                 INTEGER,
+        fapRadioChannelOper         INTEGER,
+        fapRadioChannelUtil         INTEGER,
+        fapRadioSensorMode          INTEGER,
+        fapRadioApScan              INTEGER,
+        fapRadioApScanPeriod        Integer32,
+        fapRadioApScanInterval      Integer32,
+        fapRadioApScanDuration      Integer32,
+        fapRadioApScanIdleTime      Integer32,
+        fapRadioApScanReportTimer   Integer32,
+        fapRadioDARRP               INTEGER,
+        fapRadioSpectralAnalysis    INTEGER,
+        fapRadioWIDS                DisplayString,
+        fapRadioFortiPresence       INTEGER,
+        fapRadioAirFairness         INTEGER,
+        fapRadioConfigChannelList   DisplayString,
+        fapRadioHwChannelList       DisplayString,
+        fapRadioNolChannelList      DisplayString
+    }
+
+fapRadioIndex OBJECT-TYPE
+        SYNTAX      Integer32 (0..2)
+        MAX-ACCESS  not-accessible 
+        STATUS      current
+        DESCRIPTION
+            "Radio index number."
+        ::= { fapRadioEntry 1 }
+
+fapRadioMode OBJECT-TYPE
+    SYNTAX      INTEGER { ap(0),
+                          disabled(1),
+                          monitor(2),
+                          sniffer(3),
+                          failed(4) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Configured radio mode."
+    ::= { fapRadioEntry 2 }
+
+fapRadioCountry OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Radio Operating Country."
+        ::= { fapRadioEntry 3 }
+
+fapRadioCountryId OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Radio Operating Country ID."
+        ::= { fapRadioEntry 4 }
+
+fapRadioStationInfo OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Connected & Allowed  Stations on the Radio.
+             Format x/y, x is the current station count and y is
+             the maximum number of stations allowed."
+        ::= { fapRadioEntry 5 }
+
+fapRadioType OBJECT-TYPE
+        SYNTAX      INTEGER { ieee80211a(0),
+                              ieee80211b(1),
+                              ieee80211gonly(2),
+                              ieee80211ac2g(3),
+                              ieee80211ac(4),
+                              ieee80211n24G(5),
+                              ieee80211n5G(6),
+                              ieee80211n(7),
+                              ieee80211ax24G(8),
+                              ieee80211ax5G(9),
+                              ieee80211ax(10) }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "WiFi band Radio operates."
+        ::= { fapRadioEntry 6 }
+
+fapRadioHT2040Coexist OBJECT-TYPE
+        SYNTAX      INTEGER { disable(0),
+                              enable(1) }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Allowing both HT20 and HT40 on the same Radio."
+        ::= { fapRadioEntry 7 }
+
+fapRadioBeaconInterval OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Time between beacon frames in msec."
+        ::= { fapRadioEntry 8 }
+
+fapRadioTxPowerConfig OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Configured Tx Power of the Radio."
+        ::= { fapRadioEntry 9 }
+
+fapRadioTxPowerOper OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Operating Tx Power of the Radio."
+        ::= { fapRadioEntry 10 }
+
+fapRadioTxPowerMax OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Maximum Tx Power of the Radio."
+        ::= { fapRadioEntry 11 }
+
+fapRadioChannelWidth OBJECT-TYPE
+        SYNTAX      INTEGER { bw20Mhz(0),
+                              bw40Mhz(1),
+                              bw80Mhz(2),
+                              bw160Mhz(3) }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Channel bandwidth: 160, 80, 40, or 20MHz."
+        ::= { fapRadioEntry 12 }
+
+fapRadioSGI OBJECT-TYPE
+        SYNTAX      INTEGER { disable(0),
+                              enable(1) }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Short guard interval configuration."
+        ::= { fapRadioEntry 13 }
+
+fapRadioChannelOper OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Operating radio channel."
+    ::= { fapRadioEntry 14 }
+
+fapRadioChannelUtil OBJECT-TYPE
+    SYNTAX      INTEGER { disable(0),
+                          enable(1),
+                          enabled2(2) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Channel utilization measurement."
+    ::= { fapRadioEntry 15 }
+
+fapRadioSensorMode OBJECT-TYPE
+    SYNTAX      INTEGER { disable(0),
+                          both(1),
+                          foreignOnly(2),
+                          invalid(3) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Scan WiFi nearby stations."
+    ::= { fapRadioEntry 16 }
+
+fapRadioApScan OBJECT-TYPE
+    SYNTAX      INTEGER { disable(0),
+                          background(1),
+                          foreground(2),
+                          background2(3),
+                          foreground2(4) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Rogue AP Detection."
+    ::= { fapRadioEntry 17 }
+
+fapRadioApScanPeriod OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Period of time between background scans."
+    ::= { fapRadioEntry 18 }
+
+fapRadioApScanInterval OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Period of time between scanning two channels."
+    ::= { fapRadioEntry 19 }
+
+fapRadioApScanDuration OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Listening time on a scanning channel."
+    ::= { fapRadioEntry 20 }
+
+fapRadioApScanIdleTime OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Waiting time for channel inactivity before scanning a new channel."
+    ::= { fapRadioEntry 21 }
+
+fapRadioApScanReportTimer OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Period of time between background scan reports."
+    ::= { fapRadioEntry 22 }
+
+fapRadioDARRP OBJECT-TYPE
+    SYNTAX      INTEGER { disable(0),
+                          enable(1) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Distributed Automatic Radio Resource Provisioning."
+    ::= { fapRadioEntry 23 }
+
+fapRadioSpectralAnalysis OBJECT-TYPE
+    SYNTAX      INTEGER { disable(0),
+                          enable(1),
+                          scanOnly(2) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Spectrum analysis to find interference."
+    ::= { fapRadioEntry 24 }
+
+fapRadioWIDS OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Wireless Intrusion Detection System Profile."
+    ::= { fapRadioEntry 25 }
+
+fapRadioFortiPresence OBJECT-TYPE
+    SYNTAX      INTEGER { disable(0),
+                          foreign(1),
+                          both(2) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "FortiPresence to monitor the location and activity of WiFi clients."
+    ::= { fapRadioEntry 26 }
+
+fapRadioAirFairness OBJECT-TYPE
+    SYNTAX      INTEGER { disable(0),
+                          enable(1) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Disable/enable air time fairness."
+    ::= { fapRadioEntry 27 }
+
+fapRadioConfigChannelList OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Configured channel list."
+    ::= { fapRadioEntry 28 }
+
+fapRadioHwChannelList OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Hareware supported channel list."
+    ::= { fapRadioEntry 29 }
+
+fapRadioNolChannelList OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Non-occupancy channel list."
+    ::= { fapRadioEntry 30 }
+
+-- fortinet.fnFortiAPMib.fapTraps
+fapTraps OBJECT IDENTIFIER
+    ::= { fnFortiAPMib 0 }
+
+fapDevUp NOTIFICATION-TYPE
+    OBJECTS     { fapSerialNum }
+    STATUS      current
+    DESCRIPTION
+        "Indicates that the specified AP device is up."
+    ::= { fapTraps 1 }
+
+fapCpuOverload NOTIFICATION-TYPE
+    OBJECTS     { fapSerialNum }
+    STATUS      current
+    DESCRIPTION
+        "Indicates that the CPU usage of the specified AP has exceeded the configured threshold."
+    ::= { fapTraps 2 }
+
+fapMemOverload NOTIFICATION-TYPE
+    OBJECTS     { fapSerialNum }
+    STATUS      current
+    DESCRIPTION
+        "Indicates that the memory usage of the specified AP has exceeded the configured threshold."
+    ::= { fapTraps 3 }
+
+fapDevDown NOTIFICATION-TYPE
+    OBJECTS     { fapSerialNum }
+    STATUS      current
+    DESCRIPTION
+        "Indicates that the specified AP device is down."
+    ::= { fapTraps 4 }
+
+fapAcConnected NOTIFICATION-TYPE
+    OBJECTS     { fapAcIpAddr, fapSerialNum }
+    STATUS      current
+    DESCRIPTION
+        "Indicates that AP has connected to the specified AC."
+    ::= { fapTraps 5 }
+
+-- fortinet.fnFortiAPMib.fapVapTables
+fapVapTables OBJECT IDENTIFIER
+    ::= { fnFortiAPMib 7 }
+
+fapVapTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FapVapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of virtual access point configured on the device"
+    ::= { fapVapTables 1 }
+
+fapVapEntry OBJECT-TYPE
+    SYNTAX      FapVapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry containing information applicable \
+         to a particular virtual domain"
+    INDEX       { fapVapRadioId, fapVapWlanId }
+    ::= { fapVapTable 1 }
+
+FapVapEntry ::= SEQUENCE {
+        fapVapRadioId            Integer32,
+        fapVapWlanId             Integer32,
+        fapVapBSSID              PhysAddress,
+        fapVapSSID               DisplayString,
+        fapVapAdmin              INTEGER,
+        fapVapStatus             INTEGER,
+        fapVapMeshBackhaul       INTEGER,
+        fapVapLocalAuth          INTEGER,
+        fapVapLocalStandAlone    INTEGER,
+        fapVapNatMode            INTEGER,
+        fapVapLocalBridging      INTEGER,
+        fapVapSplitTunnel        INTEGER,
+        fapVapLanIsolation       INTEGER,
+        fapVapIntraSsidPriv      INTEGER,
+        fapVapMacAuth            INTEGER,
+        fapVapMacAuthFailThrough INTEGER,
+        fapVapTunnelType         INTEGER,
+        fapVapVlanId             Integer32,
+        fapVapAuth               DisplayString,
+        fapVapProbRespSuppress   INTEGER,
+        fapVapProbRespThresh     Integer32,
+        fapVapRxSop              INTEGER,
+        fapVapRx5GThresh         Integer32,
+        fapVapRx2GThresh         Integer32,
+        fapVapLdpcType           INTEGER,
+        fapVapDhcpOp82Insert     Integer32,
+        fapVapDhcpOp82CircId     Integer32,
+        fapVapDhcpOp82RemId      Integer32,
+        fapVapBcSuppression      DisplayString,
+        fapVapKeyId              Integer32,
+        fapVapKeyLength          Integer32,
+        fapVapPMF                INTEGER,
+        fapVapOKC                INTEGER,
+        fapVapDynamicVLAN        INTEGER,
+        fapVapExternRoaming      INTEGER,
+        fapVapVoiceEnterprise    INTEGER,
+        fapVapFastBssTrans       INTEGER,
+        fapVapCpAuth             INTEGER,
+        fapVapWebAuthServer      DisplayString,
+        fapVapAtfWeight          Integer32,
+        fapVapRadServer          DisplayString,
+        fapVapRadAcctServer      DisplayString,
+        fapVapRadAcctInterimIntv Integer32,
+        fapVapRadCoA             INTEGER,
+        fapVapStaInfoCount       Integer32,
+        fapVapStaInfoMax         Integer32,
+        fapVapRateLimitUL        Integer32,
+        fapVapRateLimitDL        Integer32,
+        fapVapRateLimitUlUser    Integer32,
+        fapVapRateLimitDLUser    Integer32,
+        fapVapRateLimitBurst     INTEGER,
+        fapVapPrimaryWag         DisplayString,
+        fapVapSecondaryWag       DisplayString,
+        fapVapCurrentWag         DisplayString,
+        fapVapTunEchoIntv        Integer32,
+        fapVapTunFallbackTimeout Integer32
+    }
+
+fapVapRadioId OBJECT-TYPE
+    SYNTAX      Integer32 (0..2)
+    MAX-ACCESS  not-accessible 
+    STATUS      current
+    DESCRIPTION
+        "Index number of the radio."
+    ::= { fapVapEntry 1 }
+
+fapVapWlanId OBJECT-TYPE
+    SYNTAX      Integer32 (0..15)
+    MAX-ACCESS  not-accessible 
+    STATUS      current
+    DESCRIPTION
+        "Index number of the WLAN."
+    ::= { fapVapEntry 2 }
+
+fapVapBSSID OBJECT-TYPE
+    SYNTAX      PhysAddress (SIZE(6|8))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "BSSID of the virtual AP."
+    ::= { fapVapEntry 3 }
+
+fapVapSSID OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "SSID used by the virtual AP."
+    ::= { fapVapEntry 4 }
+
+fapVapAdmin OBJECT-TYPE
+    SYNTAX      INTEGER { down(0),
+                          up(1) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Administration Status of VAP interface."
+    ::= { fapVapEntry 5 }
+
+fapVapStatus OBJECT-TYPE
+    SYNTAX      INTEGER { down(0),
+                          up(1) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Operating Status of VAP interface."
+    ::= { fapVapEntry 6 }
+
+fapVapMeshBackhaul OBJECT-TYPE
+    SYNTAX      INTEGER { disable(0),
+                          enable(1) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Enable/Disable mesh backhaul on the VAP."
+    ::= { fapVapEntry 7 }
+
+fapVapLocalAuth OBJECT-TYPE
+    SYNTAX      INTEGER { disable(0),
+                          enable(1) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Enable/disable local authorization on the VAP."
+    ::= { fapVapEntry 8 }
+
+fapVapLocalStandAlone OBJECT-TYPE
+    SYNTAX      INTEGER { disable(0),
+                          enable(1) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Enable/disable local Stand Alone on the VAP."
+    ::= { fapVapEntry 9 }
+
+fapVapNatMode OBJECT-TYPE
+    SYNTAX      INTEGER { disable(0),
+                          enable(1) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Enable/Disable NAT mode on the VAP."
+    ::= { fapVapEntry 10 }
+
+fapVapLocalBridging OBJECT-TYPE
+    SYNTAX      INTEGER { disable(0),
+                          enable(1) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Enable/Disable local briding on the VAP."
+    ::= { fapVapEntry 11 }
+
+fapVapSplitTunnel OBJECT-TYPE
+    SYNTAX      INTEGER { disable(0),
+                          enable(1) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Enable/Disable split tunnel on the VAP."
+    ::= { fapVapEntry 12 }
+
+fapVapLanIsolation OBJECT-TYPE
+    SYNTAX      INTEGER { disable(0),
+                          enable(1) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Enable/Disable LAN isolation on the VAP."
+    ::= { fapVapEntry 13 }
+
+fapVapIntraSsidPriv OBJECT-TYPE
+    SYNTAX      INTEGER { disable(0),
+                          enable(1) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Enable/Disable intra SSID privacy on the VAP."
+    ::= { fapVapEntry 14 }
+
+fapVapMacAuth OBJECT-TYPE
+    SYNTAX      INTEGER { disable(0),
+                          enable(1) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Enable/Disable MAC authorization on the VAP."
+    ::= { fapVapEntry 15 }
+
+fapVapMacAuthFailThrough OBJECT-TYPE
+    SYNTAX      INTEGER { disable(0),
+                          enable(1) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Enable/Disable MAC authorization fail through on the VAP."
+    ::= { fapVapEntry 16 }
+
+fapVapTunnelType OBJECT-TYPE
+    SYNTAX      INTEGER { local(0),
+                          ieee8023(1),
+                          ieee80211(2),
+                          invalid(3) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The tunnel type of the VAP."
+    ::= { fapVapEntry 17 }
+
+fapVapVlanId    OBJECT-TYPE
+    SYNTAX      Integer32 (1..4094)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Vlan ID of the VAP."
+    ::= { fapVapEntry 18 }
+
+fapVapAuth      OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Authentication information of the VAP."
+    ::= { fapVapEntry 19 }
+
+fapVapProbRespSuppress OBJECT-TYPE
+    SYNTAX      INTEGER { disable(0),
+                          enable(1) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Enable/Disable probe response suppress on the VAP."
+    ::= { fapVapEntry 20 }
+
+fapVapProbRespThresh OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Probe response threshold on the VAP in dBm."
+    ::= { fapVapEntry 21 }
+
+fapVapRxSop OBJECT-TYPE
+    SYNTAX      INTEGER { disable(0),
+                          enable(1) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Enable/Disable Rx SoP on the VAP."
+    ::= { fapVapEntry 22 }
+
+fapVapRx5GThresh OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Rx 5G threshold on the VAP in dBm."
+    ::= { fapVapEntry 23 }
+
+fapVapRx2GThresh OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Rx 2G threshold on the VAP in dBm."
+    ::= { fapVapEntry 24 }
+
+fapVapLdpcType OBJECT-TYPE
+    SYNTAX      INTEGER { none(0),
+                          ldpcRx(1),
+                          ldpcTx(2),
+                          ldpcRxTx(3) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "LDPC coding type of the VAP."
+    ::= { fapVapEntry 25 }
+
+fapVapDhcpOp82Insert OBJECT-TYPE
+    SYNTAX      INTEGER { disable(0),
+                          enable(1) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Enable/Disable DHCP option 82 insertion on the VAP."
+    ::= { fapVapEntry 26 }
+
+fapVapDhcpOp82CircId OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "DHCP option 82 circuit ID of the VAP."
+    ::= { fapVapEntry 27 }
+
+fapVapDhcpOp82RemId OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "DHCP option 82 remote ID of  the VAP."
+    ::= { fapVapEntry 28 }
+
+fapVapBcSuppression OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Broadcast and multicast suppression of the VAP."
+    ::= { fapVapEntry 29 }
+
+fapVapKeyId OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Key Id of the VAP."
+    ::= { fapVapEntry 30 }
+
+fapVapKeyLength OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Key length of the VAP."
+    ::= { fapVapEntry 31 }
+
+fapVapPMF OBJECT-TYPE
+    SYNTAX      INTEGER { disable(0),
+                          optional(1),
+                          required(2) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "PMF options of the VAP."
+    ::= { fapVapEntry 32 }
+
+fapVapOKC OBJECT-TYPE
+    SYNTAX      INTEGER { disable(0),
+                          enable(1) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Disable/enable the OKC of the VAP."
+    ::= { fapVapEntry 33 }
+
+fapVapDynamicVLAN OBJECT-TYPE
+    SYNTAX      INTEGER { disable(0),
+                          enable(1) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Enable/Disable dynamic VLAN on the VAP."
+    ::= { fapVapEntry 34 }
+
+fapVapExternRoaming OBJECT-TYPE
+    SYNTAX      INTEGER { disable(0),
+                          enable(1) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Enable/disable Extern roaming on the VAP."
+    ::= { fapVapEntry 35 }
+
+fapVapVoiceEnterprise OBJECT-TYPE
+    SYNTAX      INTEGER { disable(0),
+                          enable(1) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Enable/Disable voice enterprise on the VAP."
+    ::= { fapVapEntry 36 }
+
+fapVapFastBssTrans OBJECT-TYPE
+    SYNTAX      INTEGER { disable(0),
+                          enable(1) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Enable/Disable fast BSS transtion on the VAP."
+    ::= { fapVapEntry 37 }
+
+fapVapCpAuth OBJECT-TYPE
+    SYNTAX      INTEGER { disable(0),
+                          enable(1) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Enable/Disable captive portal authorization on the VAP."
+    ::= { fapVapEntry 38 }
+
+fapVapWebAuthServer OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "CP authorization web server of the VAP."
+    ::= { fapVapEntry 39 }
+
+fapVapAtfWeight OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Air time fairness weightage of the VAP in percentage."
+    ::= { fapVapEntry 40 }
+
+fapVapRadServer OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Radius server list. Format(IP address:port number)."
+    ::= { fapVapEntry 41 }
+
+fapVapRadAcctServer OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Radius account server list. Format(IP address:port number)."
+    ::= { fapVapEntry 42 }
+
+fapVapRadAcctInterimIntv OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Radius account interim interval."
+    ::= { fapVapEntry 43 }
+
+fapVapRadCoA OBJECT-TYPE
+    SYNTAX      INTEGER { disable(0),
+                          enable(1) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Enable/disable Radius CoA."
+    ::= { fapVapEntry 44 }
+
+fapVapStaInfoCount OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Station count of the VAP."
+    ::= { fapVapEntry 45 }
+
+fapVapStaInfoMax OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Station maximum count of the VAP."
+    ::= { fapVapEntry 46 }
+
+fapVapRateLimitUL OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Rate limit(Kbps) up link."
+    ::= { fapVapEntry 47 }
+
+fapVapRateLimitDL OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Rate limit(Kbps) down link."
+    ::= { fapVapEntry 48 }
+
+fapVapRateLimitUlUser OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Rate limit(Kbps) up link user."
+    ::= { fapVapEntry 49 }
+
+fapVapRateLimitDLUser OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Rate limit(Kbps) down link user."
+    ::= { fapVapEntry 50 }
+
+fapVapRateLimitBurst OBJECT-TYPE
+    SYNTAX      INTEGER  { disable(0),
+                           enable(1) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Enable/disable rate limit burst."
+    ::= { fapVapEntry 51 }
+
+fapVapPrimaryWag OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The name of the primary WAG of the VAP."
+    ::= { fapVapEntry 52 }
+
+fapVapSecondaryWag OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The name of the secondary WAG of the VAP."
+    ::= { fapVapEntry 53 }
+
+fapVapCurrentWag OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The name of the current live WAG of the VAP."
+    ::= { fapVapEntry 54 }
+
+fapVapTunEchoIntv OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time interval (seconds) to send out echo frame when the VAP is in the
+         tunnel dual ping mode."
+    ::= { fapVapEntry 55 }
+
+fapVapTunFallbackTimeout OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Timeout value (seconds) to check if the current tunnel falls back to
+         the configured primary tunnel."
+    ::= { fapVapEntry 56 }
+
+-- fortinet.fnFortiAPMib.fapStationTables
+fapStationTables OBJECT IDENTIFIER
+    ::= { fnFortiAPMib 8 }
+
+fapStationTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FapStationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of connected stations on the device"
+    ::= { fapStationTables 1 }
+
+fapStationEntry OBJECT-TYPE
+    SYNTAX      FapStationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry containing information applicable \
+         to connected stations"
+    INDEX       { fapStaRadioId, fapStaWlanId, fapStaMacAddr }
+    ::= { fapStationTable 1 }
+
+FapStationEntry ::= SEQUENCE {
+        fapStaRadioId          Integer32,
+        fapStaWlanId           Integer32,
+        fapStaMacAddr          PhysAddress,
+        fapStaBSSID            PhysAddress,
+        fapStaVlanId           Integer32,
+        fapStaIpAddr           IpAddress,
+        fapStaSSID             DisplayString
+    }
+
+fapStaRadioId OBJECT-TYPE
+    SYNTAX      Integer32 (0..2)
+    MAX-ACCESS  not-accessible 
+    STATUS      current
+    DESCRIPTION
+        "Index number of the radio."
+    ::= { fapStationEntry 1 }
+
+fapStaWlanId OBJECT-TYPE
+    SYNTAX      Integer32 (0..15)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Index number of the WLAN."
+    ::= { fapStationEntry 2 }
+
+fapStaMacAddr OBJECT-TYPE
+    SYNTAX      PhysAddress  (SIZE(6|8))
+    MAX-ACCESS  not-accessible 
+    STATUS      current
+    DESCRIPTION
+        "MAC address of the connected station."
+    ::= { fapStationEntry 3 }
+
+fapStaBSSID OBJECT-TYPE
+    SYNTAX      PhysAddress  (SIZE(6|8))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "BSSID of the connected station."
+    ::= { fapStationEntry 4 }
+
+fapStaVlanId OBJECT-TYPE
+    SYNTAX      Integer32 (1..4094)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Vlan Id of the connected station."
+    ::= { fapStationEntry 5 }
+
+fapStaIpAddr OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "IP address of the connected station."
+        ::= { fapStationEntry 6 }
+
+fapStaSSID OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "SSID of the connected station."
+    ::= { fapStationEntry 7 }
+
+--
+-- fortinet.fnFortiAPMib.fapWagTables
+
+fapWagTables OBJECT IDENTIFIER
+    ::= { fnFortiAPMib 9 }
+
+--
+-- fortinet.fnFortiAPMib.fapWagTablesTables.fapWagTable
+--
+fapWagTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FapWagEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of tunnel profiles configured on the device"
+    ::= { fapWagTables 1 }
+
+fapWagEntry OBJECT-TYPE
+    SYNTAX      FapWagEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An tunnel profile entry containing information applicable
+         to a particular virtual domain"
+    INDEX       { fapWagTunType, fapWagIpAddr, fapWagPort }
+    ::= { fapWagTable 1 }
+
+FapWagEntry ::= SEQUENCE {
+    fapWagTunType     INTEGER,
+    fapWagIpAddr      IpAddress,
+    fapWagPort        Integer32,
+    fapWagState       INTEGER,
+    fapWagRxPackets   Counter64,
+    fapWagRxBytes     Counter64,
+    fapWagRxErrors    Counter64,
+    fapWagTxPackets   Counter64,
+    fapWagTxBytes     Counter64,
+    fapWagTxErrors    Counter64,
+    fapWagAliveTime   Integer32,
+    fapWagPingInterv  Integer32,
+    fapWagPingNum     Integer32,
+    fapWagDhcpAddr    IpAddress
+}
+
+fapWagTunType OBJECT-TYPE
+    SYNTAX      INTEGER { l2tp(1), gre(2) }
+    MAX-ACCESS  not-accessible 
+    STATUS      current
+    DESCRIPTION
+        "The tunnel type of the WAG. It's one of indexes for the WAG entry."
+    ::= { fapWagEntry 1 }
+
+fapWagIpAddr OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The IP address of the WAG. It's one of indexes for the WAG entry."
+    ::= { fapWagEntry 2 }
+
+fapWagPort OBJECT-TYPE
+    SYNTAX      Integer32 (1024..65535)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The UDP port of the WAG. It's one of indexes for the WAG entry."
+    ::= { fapWagEntry 3 }
+
+fapWagState OBJECT-TYPE
+    SYNTAX  INTEGER { init(0), activemon(1), alive(2), dead(3) }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The FSM state of the current WAG."
+    ::= { fapWagEntry 4 }
+
+fapWagRxPackets OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS  current
+    DESCRIPTION
+        "The number of packets received on the current tunnel."
+    ::= { fapWagEntry 5 }
+
+fapWagRxBytes OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS  current
+    DESCRIPTION
+        "The number of bytes received on the current tunnel."
+    ::= { fapWagEntry 6 }
+
+fapWagRxErrors OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS  current
+    DESCRIPTION
+        "The number of received packet errors on the current tunnel."
+    ::= { fapWagEntry 7 }
+
+fapWagTxPackets OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS  current
+    DESCRIPTION
+        "The number of packets transmitted on the current tunnel."
+    ::= { fapWagEntry 8 }
+
+fapWagTxBytes OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS  current
+    DESCRIPTION
+        "The number of bytes transmitted on the current tunnel."
+    ::= { fapWagEntry 9 }
+
+fapWagTxErrors OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS  current
+    DESCRIPTION
+        "The number of transmitted packet errors on the current tunnel."
+    ::= { fapWagEntry 10 }
+
+fapWagAliveTime OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS  current
+    DESCRIPTION
+        "How long the tunnel is in active mode in seconds."
+    ::= { fapWagEntry 11 }
+
+fapWagPingInterv OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS  current
+    DESCRIPTION
+        "Interval of the ping echo request in seconds."
+    ::= { fapWagEntry 12 }
+
+fapWagPingNum OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS  current
+    DESCRIPTION
+        "The number of the ping echo requests."
+    ::= { fapWagEntry 13 }
+
+fapWagDhcpAddr OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-only
+    STATUS  current
+    DESCRIPTION
+        "The IP address used in the DHCP request."
+    ::= { fapWagEntry 14 }
+
+--
+-- fortinet.fnFortiAPMib.fapModel
+--
+-- Model_number(e.g. 221, 249 for 24J) + FAP_family(FAP=1, FAP-U=2, FAP-S=3, FAP-C=4) + 
+-- FAP_Generation (E=1, F=2, G=3, …)
+fapModel OBJECT IDENTIFIER ::= { fnFortiAPMib 10 }
+
+-- fapModel start
+
+fap231f          OBJECT IDENTIFIER ::= { fapModel 23112 }
+fap234f          OBJECT IDENTIFIER ::= { fapModel 23412 }
+fap23jf          OBJECT IDENTIFIER ::= { fapModel 23912 }
+fap431f          OBJECT IDENTIFIER ::= { fapModel 43112 }
+fap432f          OBJECT IDENTIFIER ::= { fapModel 43212 }
+fap433f          OBJECT IDENTIFIER ::= { fapModel 43312 }
+fap831f          OBJECT IDENTIFIER ::= { fapModel 83112 }
+
+fap221e          OBJECT IDENTIFIER ::= { fapModel 22111 }
+fap222e          OBJECT IDENTIFIER ::= { fapModel 22211 }
+fap223e          OBJECT IDENTIFIER ::= { fapModel 22311 }
+fap224e          OBJECT IDENTIFIER ::= { fapModel 22411 }
+fap231e          OBJECT IDENTIFIER ::= { fapModel 23111 }
+fap321e          OBJECT IDENTIFIER ::= { fapModel 32111 }
+fap421e          OBJECT IDENTIFIER ::= { fapModel 42111 }
+fap423e          OBJECT IDENTIFIER ::= { fapModel 42311 }
+faps221e         OBJECT IDENTIFIER ::= { fapModel 22131 }
+faps223e         OBJECT IDENTIFIER ::= { fapModel 22331 }
+faps421e         OBJECT IDENTIFIER ::= { fapModel 42131 }
+faps422e         OBJECT IDENTIFIER ::= { fapModel 42231 }
+faps423e         OBJECT IDENTIFIER ::= { fapModel 42331 }
+
+fapc24je         OBJECT IDENTIFIER ::= { fapModel 24941 }
+fapu221ev        OBJECT IDENTIFIER ::= { fapModel 22121 }
+fapu223ev        OBJECT IDENTIFIER ::= { fapModel 22321 }
+fapu24jev        OBJECT IDENTIFIER ::= { fapModel 24921 }
+fapu321ev        OBJECT IDENTIFIER ::= { fapModel 32121 }
+fapu323ev        OBJECT IDENTIFIER ::= { fapModel 32321 }
+fapu421ev        OBJECT IDENTIFIER ::= { fapModel 42121 }
+fapu422ev        OBJECT IDENTIFIER ::= { fapModel 42221 }
+fapu423ev        OBJECT IDENTIFIER ::= { fapModel 42321 }
+fapu231f         OBJECT IDENTIFIER ::= { fapModel 23122 }
+fapu234f         OBJECT IDENTIFIER ::= { fapModel 23422 }
+fapu431f         OBJECT IDENTIFIER ::= { fapModel 43122 }
+fapu432f         OBJECT IDENTIFIER ::= { fapModel 43222 }
+fapu433f         OBJECT IDENTIFIER ::= { fapModel 43322 }
+-- fapModel end
+--
+-- fortinet.fnFortiAPMib.fapMibConformance
+--
+
+fapMibConformance OBJECT IDENTIFIER
+    ::= { fnFortiAPMib 100 }
+
+fapTrapGroup NOTIFICATION-GROUP
+    NOTIFICATIONS { fapDevUp, fapDevDown, fapAcConnected,
+                    fapCpuOverload, fapMemOverload }
+    STATUS      current
+    DESCRIPTION
+        "Event notifications."
+    ::= { fapMibConformance 1 }
+
+fapTrapObjectGroup OBJECT-GROUP
+    OBJECTS { fapSerialNum, fapAcIpAddr }
+    STATUS      current
+    DESCRIPTION
+        "Object identifiers used in notifications."
+    ::= { fapMibConformance 2 }
+
+fapSysCommGroup OBJECT-GROUP
+    OBJECTS { fapVersion, fapSerialNum, fapHostName, 
+              fapRegionCode, fapBaseMacAddr, fapBiosVer, 
+              fapBiosDataVer, fapSysPartNum}
+    STATUS      current
+    DESCRIPTION
+        "Objects pertaining to the common system info of the AP."
+    ::= { fapMibConformance 3 }
+
+fapWtpConfGroup OBJECT-GROUP
+    OBJECTS { fapWtpWanMode, fapWtpApAddrMode, fapWtpApIpAddr, fapWtpApIpNetmask,
+              fapWtpApIpGateway, fapWtpApMode, fapWtpApDnsAddr, fapWtpApStpMode,
+              fapWtpApMgmtVlanID, fapWtpApAcDiscoveryType, fapWtpApAcAddr1, fapWtpApAcAddr2,
+              fapWtpApAcAddr3, fapWtpApAcHostname1, fapWtpApAcHostname2, fapWtpApAcHostname3,
+              fapWtpAcMulticastAddr, fapWtpAcDhcpCode, fapWtpAcFcldApCtrl, fapWtpAcFcldId,
+              fapWtpAcFcldPassword, fapWtpAcCtrlPort, fapWtpAcDataChannelSecurity, fapWtpMeshApType,
+              fapWtpMeshSSID, fapWtpMeshPassword, fapWtpEthBridge, fapWtpEthBridgeVlans,
+              fapLedState, fapPoeMode }
+    STATUS      current
+    DESCRIPTION
+        "Objects pertaining to the configuration of the AP."
+    ::= { fapMibConformance 4 }
+
+fapWtpStatusGroup OBJECT-GROUP
+    OBJECTS { fapAcDiscoveryType, fapCtlmsgOffload, fapAcCertVersion, fapPoeModeOper,
+              fapLedMode, fapAllowAccess, fapLldpAccess, fapRadioCount, fapStationInfo, 
+              fapEchoInterval, fapKeepAliveInterval, fapRetransmitMax, fapDcDeadInterval,
+              fapDiscoveryInterval, fapReportInterval, fapStationStatsInterval, fapVapStatsInterval,
+              fapRadioStatsInterval, fapStationCapInterval, fapIdleTimeout, fapStatisticsInterval, 
+              fapFortiPresenceInterval, fapFsmState, fapWtpIpAddr, fapAcIpAddr, fapAcPort,
+              fapIpFragmentPrevent, fapAeroScout, fapLanMode, fapLanPortCount, fapDataChannelStatus,
+              fapDataChannelSecurityOper, fapFortiPresenceServer, fapFortiPresencePort, fapFortiPresenceProject, 
+              fapWtpLocation }
+    STATUS      current
+    DESCRIPTION
+        "Object pertaining to the status of the AP."
+    ::= { fapMibConformance 5 }
+
+fapRadioGroup OBJECT-GROUP
+    OBJECTS { fapRadioMode, fapRadioCountry, fapRadioCountryId, fapRadioStationInfo,
+              fapRadioType, fapRadioHT2040Coexist, fapRadioBeaconInterval, fapRadioTxPowerConfig, 
+              fapRadioTxPowerOper, fapRadioTxPowerMax, fapRadioChannelWidth, fapRadioSGI, 
+              fapRadioChannelOper, fapRadioChannelUtil, fapRadioSensorMode, fapRadioApScan,
+              fapRadioApScanPeriod, fapRadioApScanInterval, fapRadioApScanDuration, fapRadioApScanIdleTime, 
+              fapRadioApScanReportTimer, fapRadioDARRP, fapRadioSpectralAnalysis, fapRadioWIDS,
+              fapRadioFortiPresence, fapRadioAirFairness, fapRadioConfigChannelList, fapRadioHwChannelList, 
+              fapRadioNolChannelList }
+    STATUS      current
+    DESCRIPTION
+        "Object pertaining to radio information of the AP."
+    ::= { fapMibConformance 6 }
+
+fapVapGroup OBJECT-GROUP
+    OBJECTS { fapVapBSSID, fapVapSSID, fapVapAdmin, fapVapStatus,
+              fapVapMeshBackhaul, fapVapLocalAuth, fapVapLocalStandAlone, fapVapNatMode,
+              fapVapLocalBridging, fapVapSplitTunnel, fapVapLanIsolation, fapVapIntraSsidPriv,              
+              fapVapMacAuth, fapVapMacAuthFailThrough, fapVapTunnelType, fapVapVlanId, 
+              fapVapAuth, fapVapProbRespSuppress, fapVapProbRespThresh, fapVapRxSop,
+              fapVapRx5GThresh, fapVapRx2GThresh, fapVapLdpcType, fapVapDhcpOp82Insert,
+              fapVapDhcpOp82CircId, fapVapDhcpOp82RemId, fapVapBcSuppression, fapVapKeyId,
+              fapVapKeyLength, fapVapPMF, fapVapOKC, fapVapDynamicVLAN, fapVapExternRoaming,
+              fapVapVoiceEnterprise, fapVapFastBssTrans, fapVapCpAuth, fapVapWebAuthServer,
+              fapVapAtfWeight, fapVapRadServer, fapVapRadAcctServer, fapVapRadAcctInterimIntv,              
+              fapVapRadCoA, fapVapStaInfoCount, fapVapStaInfoMax, fapVapRateLimitUL,
+              fapVapRateLimitDL, fapVapRateLimitUlUser, fapVapRateLimitDLUser, fapVapRateLimitBurst,
+              fapVapPrimaryWag, fapVapSecondaryWag, fapVapCurrentWag, fapVapTunEchoIntv, 
+              fapVapTunFallbackTimeout }
+    STATUS      current
+    DESCRIPTION
+        "Object pertaining to the VAP information of the AP."
+    ::= { fapMibConformance 7 }
+
+fapWagGroup OBJECT-GROUP
+    OBJECTS { fapWagPingInterv,
+              fapWagPingNum, fapWagDhcpAddr, fapWagState, fapWagAliveTime,
+              fapWagRxPackets, fapWagRxBytes, fapWagRxErrors, fapWagTxPackets,
+              fapWagTxBytes, fapWagTxErrors }
+    STATUS      current
+    DESCRIPTION
+        "Object pertaining to the WAG information of the AP."
+    ::= { fapMibConformance 8 }
+
+fapStationGroup OBJECT-GROUP
+    OBJECTS { fapStaBSSID, fapStaVlanId, fapStaIpAddr, fapStaSSID }
+    STATUS      current
+    DESCRIPTION
+        "Object pertaining to the station information of the AP."
+    ::= { fapMibConformance 9 }
+
+fapMibCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the FAP MIB."
+
+    MODULE      -- this module
+
+        GROUP   fapTrapObjectGroup
+        DESCRIPTION
+              "This group is mandatory for all Fortinet network appliances
+              supporting this MIB."
+        GROUP   fapTrapGroup
+        DESCRIPTION
+              "This group is mandatory for all Fortinet network appliances
+              supporting this MIB."
+        GROUP   fapSysCommGroup
+        DESCRIPTION
+              "This group is mandatory for all Fortinet network appliances
+              supporting this MIB."
+        GROUP   fapWtpConfGroup
+        DESCRIPTION
+              "This group is mandatory for all Fortinet network appliances
+              supporting this MIB."
+        GROUP  fapWtpStatusGroup 
+        DESCRIPTION
+              "This group is mandatory for all Fortinet network appliances
+              supporting this MIB."
+        GROUP  fapRadioGroup 
+        DESCRIPTION
+              "This group is mandatory for all Fortinet network appliances
+              supporting this MIB."
+        GROUP  fapVapGroup 
+        DESCRIPTION
+              "This group is mandatory for all Fortinet network appliances
+              supporting this MIB."
+        GROUP  fapWagGroup 
+        DESCRIPTION
+              "This group is mandatory for all Fortinet network appliances
+              supporting this MIB."
+        GROUP  fapStationGroup 
+        DESCRIPTION
+              "This group is mandatory for all Fortinet network appliances
+              supporting this MIB."
+    ::= { fapMibConformance 100 }
+END
