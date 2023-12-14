@@ -24,7 +24,8 @@
                     <th data-column-id="authc_status" data-formatter="nac_authc" data-formatter="tooltip">{{ __('NAC Authc') }}</th>
                     <th data-column-id="authz_status" data-formatter="nac_authz">{{ __('NAC Authz') }}</th>
                     <th data-column-id="method" data-formatter="nac_method">{{ __('NAC Method') }}</th>
-
+                    <th data-column-id="created_at" data-formatter="tooltip">{{ __('First seen') }}</th>
+                    <th data-column-id="updated_at" data-formatter="tooltip">{{ __('Last seen') }}</th>
                 </tr>
                 </thead>
             </table>

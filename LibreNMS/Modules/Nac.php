@@ -90,7 +90,17 @@ class Nac implements Module
             // update existing models
             foreach ($nac_entries as $nac_entry) {
                 if ($existing = $existing_entries->get($nac_entry->mac_address)) {
-                    $nac_entries->put($nac_entry->mac_address, $existing->fill($nac_entry->attributesToArray()));
+                    // we have the same mac_address once again. Let's decide if we should keep the existing as history or not.
+                    if (($nac_entry->port_id == $existing->port_id) ||
+                        ($nac_entry->method == $existing->method) ||
+                        ($nac_entry->vlan == $existing->vlan) ||
+                        ($nac_entry->authz_by == $existing->authz_by) ||
+                        ($nac_entry->authz_status == $existing->authz_status) ||
+                        ($nac_entry->ip_address == $existing->ip_address) ||
+                        ($nac_entry->username == $existing->username)) {
+                        // if everything is similar, we update current entry. If not, we duplicate+history
+                        $nac_entries->put($nac_entry->mac_address, $existing->fill($nac_entry->attributesToArray()));
+                    }
                 }
             }
 

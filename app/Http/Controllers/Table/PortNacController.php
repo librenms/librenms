@@ -67,6 +67,8 @@ class PortNacController extends TableController
             'authc_status',
             'authz_status',
             'method',
+            'created_at',
+            'updated_at',
         ];
     }
 
@@ -80,6 +82,7 @@ class PortNacController extends TableController
     {
         return PortsNac::select('device_id', 'port_id', 'mac_address', 'ip_address', 'vlan', 'domain', 'host_mode', 'username', 'authz_by', 'timeout', 'time_elapsed', 'time_left', 'authc_status', 'authz_status', 'method', 'created_at', 'updated_at', 'historical')
             ->when($request->device_id, fn ($q, $id) => $q->where('device_id', $id))
+            ->when($request->showHistorical != 'true', fn ($q, $h) => $q->where('historical', 0))
             ->hasAccess($request->user())
             ->with('port')
             ->with('device');
@@ -130,6 +133,8 @@ class PortNacController extends TableController
     {
         $item = $nac->toArray();
         $mac = Mac::parse($item['mac_address']);
+        $item['updated_at'] = $nac->updated_at ? ($item['historical'] == 0 ? $nac->updated_at->diffForHumans() : $nac->updated_at->toDateTimeString()) : '';
+        $item['created_at'] = $nac->created_at ? $nac->created_at->toDateTimeString() : '';
         $item['port_id'] = Url::portLink($nac->port, $nac->port->getShortLabel());
         $item['mac_oui'] = $mac->vendor();
         $item['mac_address'] = $mac->readable();
