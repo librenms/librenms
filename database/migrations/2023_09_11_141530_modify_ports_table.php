@@ -18,7 +18,6 @@ return new class extends Migration
             $table->integer('device_id')->unsigned()->default(0)->index();
             $table->integer('cpsIfMaxSecureMacAddr')->nullable();
             $table->string('cpsIfStickyEnable', 5)->nullable();
-            $table->unique(['port_id']);
         });
     }
 
