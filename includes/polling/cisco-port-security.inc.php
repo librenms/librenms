@@ -58,12 +58,12 @@ if ($device['os'] == 'ios' || $device['os'] == 'iosxe') {
 	        $db_data['cpsIfStickyEnable'] = $snmp_data['cpsIfStickyEnable'];
             //echo '<pre>'; print_r($db_data); echo '</pre>';
             if ($port_sec_info) {
-            echo 'Updating data';
-            dbUpdate($db_data, 'port_security', '`port_id` = ?', [$port_id]);
+                echo 'Updating data';
+                dbUpdate($db_data, 'port_security', '`port_id` = ?', [$port_id]);
             }
             else {
-            echo 'Inserting data';
-            $db_return = dbInsert($db_data, 'port_security');
+                echo 'Inserting data';
+                $db_return = dbInsert($db_data, 'port_security');
             }
 	    }
     }//end foreach
