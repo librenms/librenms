@@ -1682,7 +1682,7 @@ port_security:
     - { Field: cpsIfStickyEnable, Type: varchar(5), 'Null': true, Extra: '' }
   Indexes:
     port_security_port_id_unique: { Name: port_security_port_id_unique, Columns: [port_id], Unique: true, Type: BTREE }
-    ports_fdb_device_id_index: { Name: ports_fdb_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
+    port_security_device_id_index: { Name: ports_fdb_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
 ports:
   Columns:
     - { Field: port_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
