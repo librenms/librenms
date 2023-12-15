@@ -766,6 +766,21 @@ class Device extends BaseModel
         return $this->hasMany(\App\Models\IsisAdjacency::class, 'device_id', 'device_id');
     }
 
+    public function links(): HasMany
+    {
+        return $this->hasMany(\App\Models\Link::class, 'local_device_id');
+    }
+
+    public function remoteLinks(): HasMany
+    {
+        return $this->hasMany(\App\Models\Link::class, 'remote_device_id');
+    }
+
+    public function allLinks(): \Illuminate\Support\Collection
+    {
+        return $this->links->merge($this->remoteLinks);
+    }
+
     public function location(): BelongsTo
     {
         return $this->belongsTo(\App\Models\Location::class, 'location_id', 'id');
