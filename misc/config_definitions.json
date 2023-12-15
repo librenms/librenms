@@ -851,6 +851,9 @@
         },
         "bad_if": {
             "type": "array",
+            "group": "discovery",
+            "section": "ports",
+            "order": 0,
             "default": [
                 "voip-null",
                 "virtual-",
@@ -878,16 +881,22 @@
         },
         "bad_if_regexp": {
             "type": "array",
+            "group": "discovery",
+            "section": "ports",
+            "order": 1,
             "default": [
                 "/^ng[0-9]+$/",
                 "/^sl[0-9]/"
-            ]
+            ],
+            "validate": {
+                "value.*": "is_regex"
+            }
         },
         "bad_iftype": {
             "type": "array",
-            "group": "poller",
-            "section": "interface_types",
-            "order": 0,
+            "group": "discovery",
+            "section": "ports",
+            "order": 3,
             "default": [
                 "voiceEncap",
                 "voiceFXO",
@@ -907,6 +916,9 @@
         },
         "bad_ifoperstatus": {
             "type": "array",
+            "group": "discovery",
+            "section": "ports",
+            "order": 4,
             "default": [
                 "notPresent"
             ]

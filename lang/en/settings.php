@@ -40,6 +40,7 @@ return [
             'general' => ['name' => 'General Discovery Settings'],
             'route' => ['name' => 'Routes Discovery Module'],
             'discovery_modules' => ['name' => 'Discovery Modules'],
+            'ports' => ['name' => 'Ports Module'],
             'storage' => ['name' => 'Storage Module'],
             'networks' => ['name' => 'Networks'],
         ],
@@ -66,7 +67,6 @@ return [
             'rrdtool' => ['name' => 'Datastore: RRDTool'],
             'snmp' => ['name' => 'SNMP'],
             'poller_modules' => ['name' => 'Poller Modules'],
-            'interface_types' => ['name' => 'Interface Type by RFC 7224'],
         ],
         'system' => [
             'cleanup' => ['name' => 'Cleanup'],
@@ -1086,9 +1086,21 @@ return [
                 ],
             ],
         ],
+        'bad_if' => [
+            'description' => 'Bad Interface Names',
+            'help' => 'Network interface IF-MIB:!:ifName which should be ignored',
+        ],
+        'bad_if_regexp' => [
+            'description' => 'Bad Interface Name Regex',
+            'help' => 'Network interface IF-MIB:!:ifName which should be ignored using regular expressions',
+        ],
+        'bad_ifoperstatus' => [
+            'description' => 'Bad Interface Operating Status',
+            'help' => 'Network interface IF-MIB:!:ifOperStatus which should be ignored',
+        ],
         'bad_iftype' => [
-            'description' => 'Bad Interfaces',
-            'help' => 'Network Interface Types which should be ignored',
+            'description' => 'Bad Interface Types',
+            'help' => 'Network interface IF-MIB:!:ifType which should be ignored',
         ],
         'ping' => [
             'description' => 'Path to ping',
