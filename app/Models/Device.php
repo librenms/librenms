@@ -173,12 +173,12 @@ class Device extends BaseModel
      */
     public function getVrfContexts(): array
     {
-        if (!$this->vrfLites->isEmpty()) {
-          return $this->vrfLites->pluck('context_name')->all();
-        } elseif (!$this->vrfs->isEmpty()) {
-          return $this->vrfs->pluck('vrf_oid')->all();
+        if (! $this->vrfLites->isEmpty()) {
+            return $this->vrfLites->pluck('context_name')->all();
+        } elseif (! $this->vrfs->isEmpty()) {
+            return $this->vrfs->pluck('vrf_oid')->all();
         } else {
-         return [''];
+            return [''];
         }
     }
 
