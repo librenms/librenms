@@ -39,7 +39,7 @@
             markerColor: 'green', prefix: 'fa', iconColor: 'white'
         });
 
-        $.get( '{{ route('maps.getdevices') }}', {location_valid: 1, disabled: 0, disabled_alerts: 0, status: '{{$status}}'.split(","), group: {{$device_group}}})
+        $.get( '{{ route('maps.getdevices') }}', {location_valid: 1, disabled: 0, disabled_alerts: 0, status: '{{$status}}'.split(","), group: {{$device_group ? $device_group : 'null'}}})
             .done(function( data ) {
                 $.each( data, function( device_id, device ) {
                     var icon = greenMarker;
