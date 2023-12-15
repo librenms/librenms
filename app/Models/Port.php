@@ -42,11 +42,12 @@ class Port extends DeviceRelatedModel
             $port->statistics()->delete();
             $port->stp()->delete();
             $port->vlans()->delete();
+            $port->links()->delete();
+            $port->remoteLinks()->delete();
 
             // dont have relationships yet
             DB::table('juniAtmVp')->where('port_id', $port->port_id)->delete();
             DB::table('ports_perms')->where('port_id', $port->port_id)->delete();
-            DB::table('links')->where('local_port_id', $port->port_id)->orWhere('remote_port_id', $port->port_id)->delete();
             DB::table('ports_stack')->where('port_id_low', $port->port_id)->orWhere('port_id_high', $port->port_id)->delete();
 
             \Rrd::purge($port->device?->hostname, \Rrd::portName($port->port_id)); // purge all port rrd files
@@ -308,6 +309,21 @@ class Port extends DeviceRelatedModel
     public function ipv6(): HasMany
     {
         return $this->hasMany(\App\Models\Ipv6Address::class, 'port_id');
+    }
+
+    public function links(): HasMany
+    {
+        return $this->hasMany(\App\Models\Link::class, 'local_port_id');
+    }
+
+    public function remoteLinks(): HasMany
+    {
+        return $this->hasMany(\App\Models\Link::class, 'remote_port_id');
+    }
+
+    public function allLinks(): \Illuminate\Support\Collection
+    {
+        return $this->links->merge($this->remoteLinks);
     }
 
     public function macAccounting(): HasMany
