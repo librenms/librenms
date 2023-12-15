@@ -42,7 +42,7 @@ class PortSecurity implements \LibreNMS\Interfaces\Module
      */
     public function dependencies(): array
     {
-        return [];
+        return ['devices', 'ports'];
     }
 
     public function shouldDiscover(OS $os, ModuleStatus $status): bool
