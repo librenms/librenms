@@ -17,7 +17,7 @@
             "default": false,
             "group": "alerting",
             "section": "general",
-            "order": 11,
+            "order": 12,
             "type": "boolean"
         },
         "alert.admins": {
@@ -87,14 +87,14 @@
             "default": false,
             "group": "alerting",
             "section": "general",
-            "order": 1,
+            "order": 0,
             "type": "boolean"
         },
         "alert.acknowledged": {
             "default": true,
             "group": "alerting",
             "section": "general",
-            "order": 1,
+            "order": 11,
             "type": "boolean"
         },
         "alert.fixed-contacts": {
@@ -5910,9 +5910,9 @@
             }
         },
         "uptime_warning": {
-            "group": "alerting",
-            "section": "general",
-            "order": 0,
+            "group": "webui",
+            "section": "dashboard",
+            "order": 2,
             "default": 86400,
             "type": "integer",
             "validate": {
