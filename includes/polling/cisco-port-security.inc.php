@@ -3,14 +3,9 @@
 namespace LibreNMS\DB;
 
 // Build SNMP Cache Array
-use App\Models\PortGroup;
-use LibreNMS\DB\Schema;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Database\Eloquent\Builder;
 use LibreNMS\Config;
 use LibreNMS\Enum\PortAssociationMode;
-use LibreNMS\Util\StringHelpers;
 
 $table = 'port_security';
 $port_id_field = 'port_id';
