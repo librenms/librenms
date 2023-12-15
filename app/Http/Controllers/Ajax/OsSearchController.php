@@ -56,10 +56,10 @@ class OsSearchController extends Controller
 
     public function handleRequest(Request $request)
     {
-        if (!Auth::check()) {
+        if (! Auth::check()) {
             abort(403, 'Unauthorized');
         }
-        if ($request->has('term')) {
+        if (! $request->has('term')) {
             abort(400);
         }
         \LibreNMS\Util\OS::loadAllDefinitions(false, true);
@@ -72,7 +72,7 @@ class OsSearchController extends Controller
             $ret[$lev] = array_intersect_key($os, ['os' => true, 'text' => true]);
         }
 
-        if (!isset($ret)) {
+        if (! isset($ret)) {
             $ret = ['Error: No suggestions found.'];
         }
 
