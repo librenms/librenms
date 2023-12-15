@@ -1091,8 +1091,8 @@ return [
             'help' => 'Network interface IF-MIB:!:ifName which should be ignored',
         ],
         'bad_if_regexp' => [
-            'description' => 'Bad Interface Names',
-            'help' => 'Network interface IF-MIB:!:ifName which should be ignored',
+            'description' => 'Bad Interface Name Regex',
+            'help' => 'Network interface IF-MIB:!:ifName which should be ignored using regular expressions',
         ],
         'bad_ifoperstatus' => [
             'description' => 'Bad Interface Operating Status',
