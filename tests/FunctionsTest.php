@@ -129,7 +129,7 @@ class FunctionsTest extends TestCase
 
     public function testNumberAsUnsigned()
     {
-        $this->assertSame(42, Number::unsignedAsSigned('42'));
+        $this->assertSame(42, Number::unsignedAsSigned('42'));  /** @phpstan-ignore-line */
         $this->assertSame(2147483647, Number::unsignedAsSigned(2147483647));
         $this->assertSame(-2147483648, Number::unsignedAsSigned(2147483648));
         $this->assertSame(-2147483647, Number::unsignedAsSigned(2147483649));
