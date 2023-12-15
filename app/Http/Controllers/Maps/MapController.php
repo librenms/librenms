@@ -741,7 +741,7 @@ class MapController extends Controller
             'map_api_key' => Config::get('geoloc.api_key', ''),
             'show_netmap' => Config::get('network_map_show_on_worldmap', false),
             'netmap_source' => Config::get('network_map_worldmap_link_type', 'xdp'),
-            'netmap_include_disabled_alerts' => Config::get('network_map_worldmap_show_disabled_alerts', true) ? "null" : 0,
+            'netmap_include_disabled_alerts' => Config::get('network_map_worldmap_show_disabled_alerts', true) ? 'null' : 0,
             'page_refresh' => Config::get('page_refresh', 300),
             'init_lat' => $init_lat,
             'init_lng' => $init_lng,
