@@ -175,4 +175,22 @@ class Number
 
         return (int) ($number * (1024 ** $exponent));
     }
+
+    public static function unsignedAsSigned(int $unsignedValue, int $bitLength = 32): int
+    {
+        // Maximum representable value for signed integer
+        $maxSignedValue = pow(2, $bitLength - 1) - 1;
+
+        // Check if the unsigned value is greater than the maximum representable unsigned value
+        // If so, convert it to its two's complement representation
+        if ($unsignedValue > $maxSignedValue) {
+            if ($unsignedValue > 2 ** $bitLength - 1) {
+                throw new \InvalidArgumentException('Unsigned value exceeds the maximum representable value of the give bit length: ' . $bitLength);
+            }
+
+            return $unsignedValue - ($maxSignedValue + 1) * 2;
+        }
+
+        return $unsignedValue;
+    }
 }
