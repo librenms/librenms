@@ -152,7 +152,7 @@ class NetSnmpQuery implements SnmpQueryInterface
 
         $this->context = $context;
         if ($options) {
-          $this->options  = Arr::wrap($options);
+            $this->options = Arr::wrap($options);
         }
 
         return $this;

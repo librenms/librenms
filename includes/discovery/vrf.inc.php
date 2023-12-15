@@ -202,12 +202,11 @@ if (Config::get('enable_vrfs')) {
 
         $aos7VrfTable = snmpwalk_cache_oid($device, 'alaVirtualRouterNameTable', [], 'ALCATEL-IND1-VIRTUALROUTER-MIB');
 
-
         foreach ($aos7VrfTable as $vrf_name => $vrf_data) {
             $vrf_oid = $vrf_name;
 
-            if ( ! $vrf_rd = dbFetchCell('select mplsVpnVrfRouteDistinguisher from vrfs where vrf_name = ? and `mplsVpnVrfRouteDistinguisher` like ?', [$vrf_name, '%:%'])) {
-              $vrf_rd = $vrf_data['alaVirtualRouterNameIndex'];
+            if (! $vrf_rd = dbFetchCell('select mplsVpnVrfRouteDistinguisher from vrfs where vrf_name = ? and `mplsVpnVrfRouteDistinguisher` like ?', [$vrf_name, '%:%'])) {
+                $vrf_rd = $vrf_data['alaVirtualRouterNameIndex'];
             }
 
             echo "\n  [VRF $vrf_name] OID   - $vrf_oid";
@@ -224,8 +223,8 @@ if (Config::get('enable_vrfs')) {
 
             if (dbFetchCell('SELECT COUNT(*) FROM vrfs WHERE device_id = ? AND `vrf_oid`=?', [$device['device_id'], $vrf_oid])) {
                 dbUpdate(['vrf_name' => $vrf_name, 'bgpLocalAs' => $vrf_as, 'mplsVpnVrfRouteDistinguisher' => $vrf_rd, 'mplsVpnVrfDescription' => null], 'vrfs', 'device_id=? AND vrf_oid=?', [$device['device_id'], $vrf_oid]);
-            } elseif( ! dbFetchCell('SELECT * FROM vrfs WHERE device_id = ? AND `vrf_name`=?', [$device['device_id'], $vrf_name])) {
-              dbInsert($vrfs, 'vrfs');
+            } elseif (! dbFetchCell('SELECT * FROM vrfs WHERE device_id = ? AND `vrf_name`=?', [$device['device_id'], $vrf_name])) {
+                dbInsert($vrfs, 'vrfs');
             }
 
             $vrf_id = dbFetchCell('SELECT vrf_id FROM vrfs WHERE device_id = ? AND `vrf_oid`=?', [$device['device_id'], $vrf_oid]);
@@ -234,15 +233,13 @@ if (Config::get('enable_vrfs')) {
             $aos7IfName = SnmpQuery::context($vrf_name)->walk('ALCATEL-IND1-IP-MIB::alaIpInterfaceName')->table(1);
             echo "\n  [VRF $vrf_name] PORTS - ";
             foreach ($aos7IfName as $if_index => $if_descr) {
-              $interface = dbFetchRow('SELECT * FROM `ports` WHERE `device_id` = ? AND `ifIndex` = ?', [$device['device_id'], $if_index]);
-              echo makeshortif($interface['ifDescr']) . ' ';
-              dbUpdate(['ifVrf' => $vrf_id], 'ports', 'port_id=?', [$interface['port_id']]);
-              $if = $interface['port_id'];
-              $valid_vrf_if[$vrf_id][$if] = 1;
+                $interface = dbFetchRow('SELECT * FROM `ports` WHERE `device_id` = ? AND `ifIndex` = ?', [$device['device_id'], $if_index]);
+                echo makeshortif($interface['ifDescr']) . ' ';
+                dbUpdate(['ifVrf' => $vrf_id], 'ports', 'port_id=?', [$interface['port_id']]);
+                $if = $interface['port_id'];
+                $valid_vrf_if[$vrf_id][$if] = 1;
             }
-
         } //end foreach
-
     } elseif ($device['os_group'] == 'arista') {
         echo "Arista\n";
         unset($vrf_count);
