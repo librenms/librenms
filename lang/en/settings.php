@@ -98,6 +98,10 @@ return [
             'help' => 'If a host is added as an ip address it is checked to ensure the ip is not already present. If the ip is present the host is not added. If host is added by hostname this check is not performed. If the setting is true hostnames are resolved and the check is also performed. This helps prevents accidental duplicate hosts.',
         ],
         'alert_rule' => [
+            'acknowledged_alerts' => [
+                'description' => 'Acknowledged Alerts',
+                'help' => 'Send alerts when an alert is acknowledged',
+            ],
             'severity' => [
                 'description' => 'Severity',
                 'help' => 'Severity for an Alert',
@@ -141,44 +145,44 @@ return [
                 'help' => 'Default acknowledge until alert clears',
             ],
             'admins' => [
-                'description' => 'Issue alerts to admins',
-                'help' => 'Alert administrators',
+                'description' => 'Issue alerts to admins (deprecated)',
+                'help' => 'Deprecated, use the mail alert transport instead.',
             ],
             'default_copy' => [
-                'description' => 'Copy all email alerts to default contact',
-                'help' => 'Copy all email alerts to default contact',
+                'description' => 'Copy all email alerts to default contact (deprecated)',
+                'help' => 'Deprecated, use the mail alert transport instead.',
             ],
             'default_if_none' => [
-                'description' => 'cannot set in webui?',
-                'help' => 'Send mail to default contact if no other contacts are found',
+                'description' => 'cannot set in webui? (deprecated)',
+                'help' => 'Deprecated, use the mail alert transport instead.',
             ],
             'default_mail' => [
-                'description' => 'Default contact',
-                'help' => 'The default mail contact',
+                'description' => 'Default contact (deprecated)',
+                'help' => 'Deprecated, use the mail alert transport instead.',
             ],
             'default_only' => [
-                'description' => 'Send alerts to default contact only',
-                'help' => 'Only alert default mail contact',
+                'description' => 'Send alerts to default contact only (deprecated)',
+                'help' => 'Deprecated, use the mail alert transport instead.',
             ],
             'disable' => [
                 'description' => 'Disable alerting',
                 'help' => 'Stop alerts being generated',
             ],
             'acknowledged' => [
-                'description' => 'Send Acknowledged Alerts',
+                'description' => 'Send acknowledged alerts',
                 'help' => 'Notify if Alert has been acknowledged',
             ],
             'fixed-contacts' => [
-                'description' => 'Updates to contact email addresses not honored',
+                'description' => 'Disable contact changes for active alerts',
                 'help' => 'If TRUE any changes to sysContact or users emails will not be honoured whilst alert is active',
             ],
             'globals' => [
-                'description' => 'Issue alerts to read only users',
-                'help' => 'Alert read only administrators',
+                'description' => 'Issue alerts to read only users (deprecated)',
+                'help' => 'Deprecated, use the mail alert transport instead.',
             ],
             'syscontact' => [
-                'description' => 'Issue alerts to sysContact',
-                'help' => 'Send alert to email in SNMP sysContact',
+                'description' => 'Issue alerts to sysContact (deprecated)',
+                'help' => 'Deprecated, use the mail alert transport instead.',
             ],
             'transports' => [
                 'mail' => [
@@ -191,8 +195,8 @@ return [
                 'help' => 'Tolerance window in seconds',
             ],
             'users' => [
-                'description' => 'Issue alerts to normal users',
-                'help' => 'Alert normal users',
+                'description' => 'Issue alerts to normal users (deprecated)',
+                'help' => 'Deprecated, use the mail alert transport instead.',
             ],
         ],
         'alert_log_purge' => [
