@@ -26,8 +26,8 @@ class OsSearchController extends Controller
     /**
      * Levenshtein Sort
      *
-     * @param string $base Comparison basis
-     * @param array $obj Object to sort
+     * @param  string  $base  Comparison basis
+     * @param  array  $obj  Object to sort
      * @return array
      */
     protected function levsortos($base, $obj, $keys)
