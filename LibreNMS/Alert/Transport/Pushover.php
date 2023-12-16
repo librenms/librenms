@@ -52,7 +52,8 @@ class Pushover extends Transport
         $data = [];
         $data['token'] = $this->config['appkey'];
         $data['user'] = $this->config['userkey'];
-        $data['html'] = "1"; // Entities are html encoded so this will cause them to be displayed correctly in pushover alerts
+        // Entities are html encoded so this will cause them to be displayed correctly in pushover alerts
+        $data['html'] = "1";
         switch ($alert_data['severity']) {
             case 'critical':
                 $data['priority'] = 1;
