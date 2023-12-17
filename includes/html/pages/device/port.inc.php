@@ -3,8 +3,8 @@
 use App\Models\Ipv4Mac;
 use App\Models\Port;
 use App\Models\PortAdsl;
-use App\Models\PortVdsl;
 use App\Models\PortsFdb;
+use App\Models\PortVdsl;
 use App\Plugins\Hooks\PortTabHook;
 use LibreNMS\Util\Rewrite;
 use LibreNMS\Util\Url;
