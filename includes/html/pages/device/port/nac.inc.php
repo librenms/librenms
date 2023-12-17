@@ -50,7 +50,13 @@ var grid = $("#nac-grid").bootgrid({
         };
     },
     formatters: {
-        "tooltip": function (column, row) {
+       "time_interval": function (column, row) {
+                var value = row[column.id];
+                var res = humanize_duration(value);
+                var res_light = res.split(' ').slice(0, 2).join(' ');
+                return "<span title=\'" + res.trim() + "\' data-toggle=\'tooltip\'>" + res_light + "</span>";
+            },
+       "tooltip": function (column, row) {
                 var value = row[column.id];
                 var vendor = '';
                 if (column.id == 'mac_address' && ((vendor = row['mac_oui']) != '' )) {
@@ -58,6 +64,59 @@ var grid = $("#nac-grid").bootgrid({
                 }
                 return "<span title=\'" + value + "\' data-toggle=\'tooltip\'>" + value + "</span>";
             },
+       "nac_authz": function (column, row) {
+                var value = row[column.id];
+                if (value === 'authorizationSuccess' || value === 'sussess') {
+                    //typo in huawei MIB so we must keep sussess
+                    return "<i class=\"fa fa-check-circle fa-lg icon-theme\"  aria-hidden=\"true\" style=\"color:green;\"></i>";
+                } else if (value === 'authorizationFailed') {
+                    return "<i class=\"fa fa-times-circle fa-lg icon-theme\" aria-hidden=\"true\" style=\"color:red;\"></i>";
+                } else {
+                    return "<span class=\'label label-default\' title=\'" + value + "\' data-toggle=\'tooltip\'>" + value + "</span>";
+                }
+            },
+       "nac_domain": function (column, row) {
+                var value = row[column.id];
+                if (value === 'voice') {
+                    return "<i class=\"fa fa-phone fa-lg icon-theme\"  aria-hidden=\"true\"></i>";
+                } else if (value === 'data') {
+                    return "<i class=\"fa fa-desktop fa-lg icon-theme\"  aria-hidden=\"true\"></i>";
+                } else if (value === 'Disabled') {
+                    return "<i class=\"fa fa-desktop fa-lg icon-theme\"  aria-hidden=\"true\"></i>";
+                } else {
+                    return "<span class=\'label label-default\' title=\'" + value + "\' data-toggle=\'tooltip\'>" + value + "</span>";
+                }
+            },
+       "nac_authc": function (column, row) {
+                var value = row[column.id];
+                if (value === 'notRun') {
+                    return "<span class=\"label label-primary\">notRun</span>";
+                } else if (value === 'running') {
+                    return "<span class=\"label label-primary\">running</span>";
+                } else if (value === 'failedOver') {
+                    return "<i class=\"fa fa-times-circle fa-lg icon-theme\"  aria-hidden=\"true\" style=\"color:red;\"></i>";
+                } else if (value === 'authcSuccess') {
+                    return "<i class=\"fa fa-check-circle fa-lg icon-theme\"  aria-hidden=\"true\" style=\"color:green;\">";
+                } else if (value === 'authcFailed') {
+                    return "<i class=\"fa fa-times-circle fa-lg icon-theme\"  aria-hidden=\"true\" style=\"color:red;\"></i>";
+                } else if (value === '6') {
+                    return "<i class=\"fa fa-times-circle fa-lg icon-theme\"  aria-hidden=\"true\" style=\"color:red;\"></i>";
+                } else {
+                    return "<span class=\'label label-default\' title=\'" + value + "\' data-toggle=\'tooltip\'>" + value + "</span>";
+                }
+            },
+       "nac_method": function (column, row) {
+                var value = row[column.id];
+                if (value === 'dot1x') {
+                    return "<span class=\"label label-success\">802.1x</span>";
+                } else if (value === 'macAuthBypass') {
+                    return "<span class=\"label label-primary\">MAB</span>";
+                } else if (value === 'other') {
+                    return "<span class=\"label label-danger\">Disabled</span>";
+                } else {
+                    return "<span class=\'label label-default\' title=\'" + value + "\' data-toggle=\'tooltip\'>" + value + "</span>";
+                }
+            }
     }
 });
 
