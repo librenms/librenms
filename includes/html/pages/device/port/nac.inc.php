@@ -35,15 +35,17 @@ var grid = $("#nac-grid").bootgrid({
     url: "<?php echo url('/ajax/table/port-nac'); ?>",
     post: function () {
         var check_showHistorical = document.getElementById('check_showHistorical');
+        var showHistorical = true;
         if (check_showHistorical) {
-            var showHistorical = check_showHistorical.checked;
+            showHistorical = check_showHistorical.checked;
         } else {
-            var showHistorical = false;
+            // not yet loaded, means the bootgrid is beeing created now, and we want to
+            // display historical data by default
+            showHistorical = true;
         }
 
         return {
             showHistorical: showHistorical,
-            device_id: "<?php echo $port['device_id']; ?>",
             port_id: "<?php echo $port['port_id']; ?>",
         };
     },
@@ -62,7 +64,7 @@ var grid = $("#nac-grid").bootgrid({
 var add = $(".actionBar").append(
         '<div class="search form-group pull-left" style="width:auto">' +
         '<?php echo csrf_field() ?>' +
-        '<input type="checkbox" name="check_showHistorical" data-size="small" id="check_showHistorical">' +
+        '<input type="checkbox" name="check_showHistorical" data-size="small" id="check_showHistorical" checked>' +
         '&nbsp;Include historical NAC entries' +
         '</div>');
 
