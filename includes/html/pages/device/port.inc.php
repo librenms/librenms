@@ -1,8 +1,10 @@
 <?php
 
+use App\Models\Ipv4Mac;
 use App\Models\Port;
 use App\Models\PortAdsl;
 use App\Models\PortVdsl;
+use App\Models\PortsFdb;
 use App\Plugins\Hooks\PortTabHook;
 use LibreNMS\Util\Rewrite;
 use LibreNMS\Util\Url;
@@ -74,9 +76,14 @@ $link_array = [
 
 $menu_options['graphs'] = 'Graphs';
 $menu_options['realtime'] = 'Real time';
-// FIXME CONDITIONAL
-$menu_options['arp'] = 'ARP Table';
-$menu_options['fdb'] = 'FDB Table';
+
+if (ipv4Mac::where('port_id', $port->port_id)->exists()) {
+    $menu_options['arp'] = 'ARP Table';
+}
+
+if (PortsFdb::where('port_id', $port->port_id)->exists()) {
+    $menu_options['fdb'] = 'FDB Table';
+}
 $menu_options['events'] = 'Eventlog';
 $menu_options['notes'] = (get_dev_attrib($device, 'port_id_notes:' . $port->port_id) ?? '') == '' ? 'Notes' : 'Notes*';
 
