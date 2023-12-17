@@ -445,7 +445,7 @@ function add_device(Illuminate\Http\Request $request)
             $device->snmp_disable = 1;
         }
 
-        (new ValidateDeviceAndCreate($device, ! empty($data['force_add'])))->execute();
+        (new ValidateDeviceAndCreate($device, ! empty($data['force_add']), ! empty($data['ping_fallback'])))->execute();
     } catch (Exception $e) {
         return api_error(500, $e->getMessage());
     }
