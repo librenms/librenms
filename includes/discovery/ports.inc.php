@@ -57,6 +57,11 @@ if ($device['os'] == 'moxa-etherdevice') {
     require base_path('includes/discovery/ports/moxa-etherdevice.inc.php');
 }
 
+//Remove extra ports on Zhone slms devices
+if ($device['os'] == 'slms') {
+    require base_path('includes/discovery/ports/slms.inc.php');
+}
+
 //Cambium cnMatrix port description mapping
 if ($device['os'] == 'cnmatrix') {
     require base_path('includes/discovery/ports/cnmatrix.inc.php');
