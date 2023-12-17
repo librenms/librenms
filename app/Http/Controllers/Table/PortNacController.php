@@ -82,6 +82,7 @@ class PortNacController extends TableController
     {
         return PortsNac::select('device_id', 'port_id', 'mac_address', 'ip_address', 'vlan', 'domain', 'host_mode', 'username', 'authz_by', 'timeout', 'time_elapsed', 'time_left', 'authc_status', 'authz_status', 'method', 'created_at', 'updated_at', 'historical')
             ->when($request->device_id, fn ($q, $id) => $q->where('device_id', $id))
+            ->when($request->port_id, fn ($q, $id) => $q->where('port_id', $id))
             ->when($request->showHistorical != 'true', fn ($q, $h) => $q->where('historical', 0))
             ->hasAccess($request->user())
             ->with('port')
