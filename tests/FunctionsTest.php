@@ -126,4 +126,21 @@ class FunctionsTest extends TestCase
         $this->assertSame(1, Number::cast(1.0));
         $this->assertSame(2, Number::cast('2.000'));
     }
+
+    public function testNumberAsUnsigned()
+    {
+        $this->assertSame(42, Number::unsignedAsSigned('42'));  /** @phpstan-ignore-line */
+        $this->assertSame(2147483647, Number::unsignedAsSigned(2147483647));
+        $this->assertSame(-2147483648, Number::unsignedAsSigned(2147483648));
+        $this->assertSame(-2147483647, Number::unsignedAsSigned(2147483649));
+        $this->assertSame(-1, Number::unsignedAsSigned(4294967295));
+    }
+
+    public function testNumberAsUnsignedValueExceedsMaxUnsignedValue()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        // Exceeds the maximum representable value for a 32-bit unsigned integer
+        Number::unsignedAsSigned(4294967296, 32);
+    }
 }

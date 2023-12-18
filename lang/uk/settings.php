@@ -65,7 +65,6 @@ return [
             'rrdtool' => ['name' => 'Сховище даних: RRDTool'],
             'snmp' => ['name' => 'SNMP'],
             'poller_modules' => ['name' => 'Модулі опитувача'],
-            'interface_types' => ['name' => 'Типи інтерфейсів за RFC 7224'],
         ],
         'system' => [
             'cleanup' => ['name' => 'Очистка'],
