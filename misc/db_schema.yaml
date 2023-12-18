@@ -1078,8 +1078,8 @@ mpls_sdps:
     - { Field: sdpLastMgmtChange, Type: bigint, 'Null': true, Extra: '' }
     - { Field: sdpLastStatusChange, Type: bigint, 'Null': true, Extra: '' }
     - { Field: sdpActiveLspType, Type: "enum('not-applicable','rsvp','ldp','bgp','none','mplsTp','srIsis','srOspf','srTeLsp','fpe')", 'Null': true, Extra: '' }
-    - { Field: sdpFarEndInetAddressType, Type: "enum('ipv4','ipv6')", 'Null': true, Extra: '' }
     - { Field: sdpFarEndInetAddress, Type: varchar(46), 'Null': true, Extra: '' }
+    - { Field: sdpFarEndInetAddressType, Type: "enum('unknown','ipv4','ipv6','ipv4z','ipv6z','dns')", 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [sdp_id], Unique: true, Type: BTREE }
     mpls_sdps_device_id_index: { Name: mpls_sdps_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }

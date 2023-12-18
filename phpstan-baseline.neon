@@ -51,16 +51,6 @@ parameters:
 			path: LibreNMS/Modules/Mpls.php
 
 		-
-			message: "#^Variable \\$sdps might not be defined\\.$#"
-			count: 1
-			path: LibreNMS/Modules/Mpls.php
-
-		-
-			message: "#^Variable \\$svcs might not be defined\\.$#"
-			count: 2
-			path: LibreNMS/Modules/Mpls.php
-
-		-
 			message: "#^Variable \\$features on left side of \\?\\? is never defined\\.$#"
 			count: 1
 			path: LibreNMS/Modules/Os.php
