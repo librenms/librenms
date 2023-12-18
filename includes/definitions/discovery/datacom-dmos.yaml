@@ -20,4 +20,3 @@ modules:
                 precision: 1
                 descr: 'Memory'
                 class: system
-                index: 1
