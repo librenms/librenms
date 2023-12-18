@@ -598,8 +598,8 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
                 'sdpOperPathMtu' => $value['sdpOperPathMtu'],
                 'sdpLastMgmtChange' => round($value['sdpLastMgmtChange'] / 100),
                 'sdpLastStatusChange' => round($value['sdpLastStatusChange'] / 100),
-                'sdpActiveLspType' => $value['sdpActiveLspType'],
-                'sdpFarEndInetAddressType' => $value['sdpFarEndInetAddressType'],
+                'sdpActiveLspType' => $value['sdpActiveLspType'] ?? null,
+                'sdpFarEndInetAddressType' => $value['sdpFarEndInetAddressType'] ?? null,
                 'sdpFarEndInetAddress' => $ip,
             ]));
         }
