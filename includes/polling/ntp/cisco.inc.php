@@ -12,6 +12,7 @@
  */
 
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Util\Number;
 
 $tmp_module = 'ntp';
 
