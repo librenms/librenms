@@ -1,9 +1,7 @@
 <?php
 
-use App\Models\Ipv4Mac;
 use App\Models\Port;
 use App\Models\PortAdsl;
-use App\Models\PortsFdb;
 use App\Models\PortVdsl;
 use App\Plugins\Hooks\PortTabHook;
 use LibreNMS\Util\Rewrite;
@@ -77,11 +75,11 @@ $link_array = [
 $menu_options['graphs'] = 'Graphs';
 $menu_options['realtime'] = 'Real time';
 
-if (ipv4Mac::where('port_id', $port->port_id)->exists()) {
+if ($port->macs()->exists()) {
     $menu_options['arp'] = 'ARP Table';
 }
 
-if (PortsFdb::where('port_id', $port->port_id)->exists()) {
+if ($port->fdbEntries()->exists()) {
     $menu_options['fdb'] = 'FDB Table';
 }
 $menu_options['events'] = 'Eventlog';
