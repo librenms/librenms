@@ -14,19 +14,18 @@
         </thead>
         <tbody>
 @foreach($data['links'] as $link)
-@if($link['rdev_id'])
-@php($rdev = $data['devices'][$link['rdev_id']])
+@if($link['rdev_url'])
             <tr>
                 <td>{!! $link['local_url'] !!}<br />{{ $link['local_portname'] }}</td>
-                <td>{!! $rdev['url'] !!}<br />{{ $rdev['hw'] }}</td>
-                <td>{!! $link['remote_url'] !!}<br />{{ $link['remote_portname'] }}</td>
+                <td>{!! $link['rdev_url'] !!}<br />{{ $link['rdev_info'] }}</td>
+                <td>{!! $link['rport_url'] !!}<br />{{ $link['rport_name'] }}</td>
                 <td>{{ $link['protocol'] }}</td>
             </tr>
 @else
             <tr>
                 <td>{!! $link['local_url'] !!}<br />{{ $link['local_portname'] }}</td>
-                <td>{{ $link['rdev_name'] }}<br />{{ $link['rdev_platform'] }}</td>
-                <td>{{ $link['remote_portname'] }}</td>
+                <td>{{ $link['rdev_name'] }}<br />{{ $link['rdev_info'] }}</td>
+                <td>{{ $link['rport_name'] }}</td>
                 <td>{{ $link['protocol'] }}</td>
             </tr>
 @endif
