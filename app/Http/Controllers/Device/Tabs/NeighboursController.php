@@ -28,9 +28,7 @@ namespace App\Http\Controllers\Device\Tabs;
 use App\Models\Device;
 use App\Models\Port;
 use App\Models\Link;
-use Illuminate\Http\Request;
 use LibreNMS\Config;
-use LibreNMS\Interfaces\UI\DeviceTab;
 use LibreNMS\Interfaces\UI\DeviceTab;
 use LibreNMS\Util\Url;
 
@@ -38,9 +36,7 @@ class NeighboursController implements DeviceTab
 {
     public function visible(Device $device): bool
     {
-        return Link::where('local_device_id', $device->device_id)
-            ->orWhere('remote_device_id', $device->device_id)
-            ->exists();
+        return Link::where('local_device_id', $device->device_id)->exists();
     }
 
     public function slug(): string
@@ -63,62 +59,27 @@ class NeighboursController implements DeviceTab
         $selection = Url::parseOptions('selection', 'list');
 
         $links = [];
-        $devices = [];
+
+        $devices[$device->device_id] = [
+            'url'  => Url::deviceLink($device, null, [], 0, 0, 0, 1),
+            'hw'   => $device->hardware,
+            'name' => $device->shortDisplayName(),
+        ];
 
         if ($selection == 'list') {
-            $linkQuery = Port::select(
-                \DB::raw('ports.*'),
-                \DB::raw('l.remote_port_id'),
-                \DB::raw('l.remote_hostname'),
-                \DB::raw('l.remote_port'),
-                \DB::raw('l.remote_platform'),
-                \DB::raw('l.protocol'),
-            )
-                ->with('device')
-                ->join('links as l', 'l.local_port_id', '=', 'ports.port_id')
-                ->where('l.local_device_id', '=', $device->device_id)
-                ->orderBy('ports.ifName');
+            $linksQuery = $device->links()->with('port', 'remoteDevice', 'remotePort');
 
-            // Only show where user has access to both devices
-            if (! \Auth::user()->hasGlobalRead()) {
-                $linkQuery->whereIntegerInRaw('l.local_device_id', \Permissions::devicesForUser())
-                    ->whereIntegerInRaw('l.remote_device_id', \Permissions::devicesForUser());
-            }
-
-            foreach ($linkQuery->get() as $port) {
-                $row = json_decode(json_encode($port));
-
-                if (! in_array($port->device->device_id, $devices)) {
-                    $devices[$port->device->device_id] = [
-                        'url'  => Url::deviceLink($port->device, null, [], 0, 0, 0, 1),
-                        'hw'   => $port->device->hardware,
-                        'name' => $port->device->shortDisplayName(),
-                    ];
-                }
-
-                $rport = null;
-                if ($row->remote_port_id) {
-                    $rport = Port::where('port_id', '=', $row->remote_port_id)->with('device')->first();
-
-                    if (! in_array($rport->device->device_id, $devices)) {
-                        $devices[$rport->device->device_id] = [
-                            'url'  => Url::deviceLink($rport->device, null, [], 0, 0, 0, 1),
-                            'hw'   => $rport->device->hardware,
-                            'name' => $rport->device->shortDisplayName(),
-                        ];
-                    }
-                }
-
+            foreach ($linksQuery->get()->sortBy('port.ifName') as $link) {
                 $links[] = [
-                    'local_url'       => Url::portLink($port, null, null, true, false),
-                    'ldev_id'         => $port->device->device_id,
-                    'local_portname'  => $port->ifAlias,
-                    'remote_url'      => $rport ? Url::portLink($rport, null, null, true, false) : '',
-                    'rdev_id'         => $rport ? $rport->device->device_id : null,
-                    'rdev_name'       => $row->remote_hostname,
-                    'rdev_platform'   => $row->remote_platform,
-                    'remote_portname' => $rport ? $rport->ifAlias : $row->remote_port,
-                    'protocol'        => strtoupper($row->protocol),
+                    'local_url'       => Url::portLink($link->port, null, null, true, false),
+                    'ldev_id'         => $device->device_id,
+                    'local_portname'  => $link->port->ifAlias,
+                    'rport_url'       => $link->remotePort ? Url::portLink($link->remotePort, null, null, true, false) : '',
+                    'rdev_url'        => $link->remoteDevice ? Url::deviceLink($link->remoteDevice, null, [], 0, 0, 0, 1) : null,
+                    'rdev_name'       => $link->remoteDevice ? $link->remoteDevice->shortDisplayName() : $link->remote_hostname,
+                    'rdev_info'       => $link->remoteDevice ? $link->remoteDevice->hardware : $link->remote_platform,
+                    'rport_name'      => $link->remotePort ? $link->remotePort->ifAlias : $link->remote_port,
+                    'protocol'        => strtoupper($link->protocol),
                 ];
             }
         }
@@ -136,7 +97,6 @@ class NeighboursController implements DeviceTab
             ],
             'selection'  => $selection,
             'device_id'  => $device->device_id,
-            'devices'    => $devices,
             'links'      => $links,
             'link_types' => Config::get('network_map_items', ['xdp', 'mac']),
             'visoptions' => Config::get('network_map_vis_options'),
