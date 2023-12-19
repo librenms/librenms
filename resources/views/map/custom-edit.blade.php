@@ -22,7 +22,7 @@
               <div class="form-group row single-node" id="nodeDeviceSearchRow">
                 <label for="devicesearch" class="col-sm-3 control-label">Select Device</label>
                 <div class="col-sm-9">
-                  <input class="form-control typeahead" type="search" id="devicesearch" name="devicesearch" placeholder="Select Device" autocomplete="off">
+                  <select name="devicesearch" id="devicesearch" class="form-control"></select>
                 </div>
               </div>
               <div class="form-group row single-node" id="nodeDeviceRow" style="display:none">
@@ -170,7 +170,7 @@
               <div class="form-group row single-node" id="edgePortSearchRow" style="display:none">
                 <label for="portsearch" class="col-sm-3 control-label">Select Port</label>
                 <div class="col-sm-9">
-                  <input class="form-control typeahead" type="search" id="portsearch" name="portsearch" placeholder="Select Port" autocomplete="off">
+                  <select name="portsearch" id="portsearch" class="form-control"></select>
                 </div>
               </div>
               <div class="form-group row" id="edgePortRow" style="display:none">
@@ -697,11 +697,13 @@
         }
     }
 
-    function nodeDeviceSelect(id, name, image) {
+    function nodeDeviceSelect(e) {
+        var id = e.params.data.id;
+        var name = e.params.data.text;
         $("#device_id").val(id);
         $("#device_name").text(name);
         $("#nodelabel").val(name.split(".")[0].split(" ")[0]);
-        $("#device_image").val(image);
+        $("#device_image").val(e.params.data.icon);
         $("#nodeDeviceSearchRow").hide();
         $("#nodestyleimage").show();
         $("#nodestylecircularimage").show();
@@ -709,7 +711,8 @@
     }
 
     function nodeDeviceClear() {
-        $("#devicesearch").typeahead('val','');
+        $("#devicesearch").val('');
+        $("#devicesearch").trigger('change');
         $("#device_id").val("");
         $("#device_name").text("");
         $("#device_image").val("");
@@ -760,7 +763,8 @@
     }
 
     function editNode(data, callback) {
-        $("#devicesearch").typeahead('val','');
+        $("#devicesearch").val('');
+        $("#devicesearch").trigger('change');
         if(data.id && isNaN(data.id) && data.id.endsWith("_mid")) {
             edge = network_edges.get((data.id.split("_")[0]) + "_to");
             editExistingEdge(edge, null);
@@ -907,9 +911,12 @@
         port_search_device_id_2 = (node2.id in node_device_map) ? node_device_map[node2.id].device_id : 0;
     }
 
-    function edgePortSelect(id, hostname, portname, reverse) {
+    function edgePortSelect(e) {
+        var id = e.params.data.id;
+        var name = e.params.data.text;
+        var reverse = e.params.data.device_id != port_search_device_id_1;
         $("#port_id").val(id);
-        $("#port_name").text(hostname + " - " + portname);
+        $("#port_name").text(name);
         $("#portreverse").bootstrapSwitch('state', reverse);
 
         $("#edgePortSearchRow").hide();
@@ -918,7 +925,7 @@
     }
 
     function edgePortClear() {
-        $("#portsearch").typeahead('val','');
+        $("#portsearch").val('');
         $("#port_id").val("");
         $("#port_name").text("");
         $("#edgePortSearchRow").show();
@@ -957,7 +964,7 @@
     }
 
     function editEdge(edgedata, callback) {
-        $("#portsearch").typeahead('val','');
+        $("#portsearch").val('');
         var nodes = network_nodes.get({
           fields: ['id', 'label'],
           filter: function (item) {
@@ -1183,107 +1190,18 @@
     }
 
     $(document).ready(function () {
-        var devices = new Bloodhound({
-            datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
-            queryTokenizer: Bloodhound.tokenizers.whitespace,
-            remote: {
-                url: ajax_url + "/search/device?search=%QUERY",
-                filter: function (devices) {
-                    return $.map(devices, function (device) {
-                        return {
-                            device_id: device.device_id,
-                            device_image: device.device_image,
-                            url: device.url,
-                            name: device.name,
-                            device_os: device.device_os,
-                            version: device.version,
-                            device_hardware: device.device_hardware,
-                            device_ports: device.device_ports,
-                            location: device.location
-                        };
-                    });
-                },
-                wildcard: "%QUERY"
+        init_select2('#devicesearch', 'device', {limit: 100}, '', 'Select Device', {dropdownParent: $('#nodeModal')});
+        $("#devicesearch").on("select2:select", nodeDeviceSelect);
+
+        init_select2('#portsearch', 'port', function(params) {
+            return {
+                limit: 100,
+                devices: [port_search_device_id_1, port_search_device_id_2],
+                term: params.term,
+                page: params.page || 1
             }
-        });
-        devices.initialize();
-
-        var node1ports = new Bloodhound({
-            datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
-            queryTokenizer: Bloodhound.tokenizers.whitespace,
-            remote: {
-                url: ajax_url + "/search/device",
-                replace: function(url, uriEncodedQuery) {
-                    return url + '/' + port_search_device_id_1 + '/port?search=' + uriEncodedQuery;
-                },
-            }
-        });
-        node1ports.initialize();
-
-        var node2ports = new Bloodhound({
-            datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
-            queryTokenizer: Bloodhound.tokenizers.whitespace,
-            remote: {
-                url: ajax_url + "/search/device",
-                replace: function(url, uriEncodedQuery) {
-                    return url + '/' + port_search_device_id_2 + '/port?search=' + uriEncodedQuery;
-                },
-            }
-        });
-        node2ports.initialize();
-
-        $('#devicesearch').typeahead({
-                hint: true,
-                highlight: true,
-                minLength: 1
-            },
-            {
-                source: devices.ttAdapter(),
-                limit: '25',
-                async: true,
-                display: 'name',
-                templates: {
-                    suggestion: Handlebars.compile('<p><img src="@{{device_image}}" style="float: left; min-height: 32px; margin-right: 5px;"> <small><strong>@{{name}}</strong> | @{{device_os}} | @{{version}} <br /> @{{device_hardware}} with @{{device_ports}} port(s) | @{{location}}</small></p>')
-                }
-            }).on('typeahead:select', function (ev, suggestion) {
-                nodeDeviceSelect(suggestion.device_id, suggestion.name, suggestion.device_image);
-            }).on('keyup', function (e) {
-                // on enter go to the first selection
-                if (e.which === 13) {
-                    $('.tt-selectable').first().trigger( "click" );
-                }
-            });
-
-        $('#portsearch').typeahead({
-                hint: true,
-                highlight: true,
-                minLength: 1
-            },
-            {
-                source: node1ports.ttAdapter(),
-                limit: '25',
-                async: true,
-                display: 'name',
-                templates: {
-                    suggestion: Handlebars.compile('<p><small><i class="fa fa-link fa-sm icon-theme" aria-hidden="true"></i> <strong>@{{name}}</strong> - @{{hostname}}<br /><i>@{{description}}</i></small></p>')
-                }
-            },
-            {
-                source: node2ports.ttAdapter(),
-                limit: '25',
-                async: true,
-                display: 'name',
-                templates: {
-                    suggestion: Handlebars.compile('<p><small><i class="fa fa-link fa-sm icon-theme" aria-hidden="true"></i> <strong>@{{name}}</strong> - @{{hostname}}<br /><i>@{{description}}</i></small></p>')
-                }
-            }).on('typeahead:select', function (ev, suggestion) {
-                edgePortSelect(suggestion.port_id, suggestion.hostname, suggestion.name, (suggestion.device_id != port_search_device_id_1));
-            }).on('keyup', function (e) {
-                // on enter go to the first selection
-                if (e.which === 13) {
-                    $('.tt-selectable').first().trigger( "click" );
-                }
-            });
+        }, '', 'Select Port', {dropdownParent: $('#edgeModal')});
+        $("#portsearch").on("select2:select", edgePortSelect);
 
         refreshMap();
     });
