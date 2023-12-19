@@ -356,7 +356,7 @@ class Url
             $urlargs[] = $key . '=' . ($arg === null ? '' : urlencode($arg));
         }
 
-        return '<img src="' . url('graph.php') . '?' . implode('&amp;', $urlargs) . '" style="border:0;" />';
+        return '<img src="' . url('librenms/graph.php') . '?' . implode('&amp;', $urlargs) . '" style="border:0;" />';
     }
 
     public static function graphPopup($args, $content = null, $link = null)
@@ -396,7 +396,7 @@ class Url
             $urlargs[] = $key . '=' . ($arg === null ? '' : urlencode($arg));
         }
 
-        $tag = '<img class="img-responsive" src="' . url('graph.php') . '?' . implode('&amp;', $urlargs) . '" style="border:0;"';
+        $tag = '<img class="img-responsive" src="' . url('librenms/graph.php') . '?' . implode('&amp;', $urlargs) . '" style="border:0;"';
 
         if (Config::get('enable_lazy_load', true)) {
             return $tag . ' loading="lazy" />';
