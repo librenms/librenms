@@ -510,9 +510,6 @@
         }
 
 @if($edit)
-        // Workaround for top-left close icon because the vis.js images have not been copied
-        $(".vis-close").addClass("fa fa-xmark");
-
         network.on('dragEnd', function (data) {
             if(data.edges.length > 0 || data.nodes.length > 0) {
                 // Make sure a node is not dragged outside the canvas
