@@ -581,7 +581,7 @@ class CustomMapController extends Controller
         }
 
         if (! count($errors)) {
-            DB::transaction(function () use ($map, $request) {
+            DB::transaction(function () use ($map, $request, $nodes, $edges) {
                 $dbnodes = $map->nodes->keyBy('custom_map_node_id')->all();
                 $dbedges = $map->edges->keyBy('custom_map_edge_id')->all();
 
@@ -590,13 +590,8 @@ class CustomMapController extends Controller
 
                 $newNodes = [];
 
-                $newnodeconf = json_decode($request->post('newnodeconf'));
-                $newedgeconf = json_decode($request->post('newedgeconf'));
-                $nodes = json_decode($request->nodes);
-                $edges = json_decode($request->edges);
-
-                $map->newedgeconfig = $newedgeconf;
-                $map->newnodeconfig = $newnodeconf;
+                $map->newnodeconfig = $request->post('newnodeconf');
+                $map->newedgeconfig = $request->post('newedgeconf');
                 $map->save();
 
                 foreach ($nodes as $nodeid => $node) {
