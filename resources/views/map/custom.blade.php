@@ -135,7 +135,7 @@
       </div>
       <div class="modal-footer">
         <center>
-          <button type=button class="btn btn-primary" value="savedefaults" id="node-saveDefaultsButton" data-dismiss="modal" style="display:none" onclick="editNodeDefaultsSave();">Save Defaults</button>
+          <button type=button class="btn btn-primary" value="savedefaults" id="node-saveDefaultsButton" data-dismiss="modal" style="display:none" onclick="editNodeDefaultsSave();">Set Defaults</button>
           <button type=button class="btn btn-primary" value="save" id="node-saveButton" data-dismiss="modal">Save</button>
           <button type=button class="btn btn-primary" value="cancel" id="node-cancelButton" data-dismiss="modal" onclick="editNodeCancel();">Cancel</button>
         </center>
@@ -247,7 +247,7 @@
       </div>
       <div class="modal-footer">
         <center>
-          <button type=button class="btn btn-primary" value="savedefaults" id="edge-saveDefaultsButton" data-dismiss="modal" style="display:none" onclick="editEdgeDefaultsSave();">Save Defaults</button>
+          <button type=button class="btn btn-primary" value="savedefaults" id="edge-saveDefaultsButton" data-dismiss="modal" style="display:none" onclick="editEdgeDefaultsSave();">Set Defaults</button>
           <button type=button class="btn btn-primary" value="save" id="edge-saveButton" data-dismiss="modal">Save</button>
           <button type=button class="btn btn-primary" value="cancel" id="edge-cancelButton" data-dismiss="modal" onclick="editEdgeCancel();">Cancel</button>
         </center>
