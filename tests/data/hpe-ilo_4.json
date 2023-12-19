@@ -5340,7 +5340,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.232.1.2.2.1.1.6.0",
                     "sensor_index": "cpqSeCpuStatus.0",
                     "sensor_type": "cpqSeCpuStatus",
-                    "sensor_descr": "Processor #0",
+                    "sensor_descr": "Processor #1",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
