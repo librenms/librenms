@@ -405,6 +405,7 @@ class CustomMapController extends Controller
 
         if (is_null($request->map_id)) {
             $data['maps'] = CustomMap::orderBy('name')->get(['custom_map_id', 'name']);
+
             return view('map.custom-edit-select', $data);
         } elseif ($request->map_id == 0) {
             $data['name'] = 'New Map';
@@ -425,6 +426,7 @@ class CustomMapController extends Controller
                 ],
             ];
             $data['background'] = null;
+
             return view('map.custom-new', $data);
         } else {
             $map = CustomMap::find($request->map_id);
