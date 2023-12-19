@@ -18,9 +18,9 @@ return new class extends Migration
             $table->string('height', 10);
             $table->string('background_suffix', 10)->nullable();
             $table->integer('background_version')->unsigned();
-            $table->json('options')->nullable();
-            $table->json('newnodeconfig');
-            $table->json('newedgeconfig');
+            $table->longText('options')->nullable();
+            $table->longText('newnodeconfig');
+            $table->longText('newedgeconfig');
         });
     }
 
