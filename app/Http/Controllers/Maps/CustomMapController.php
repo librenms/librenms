@@ -276,7 +276,7 @@ class CustomMapController extends Controller
                 }
 
                 // If we did not get a speed from the snmp desc, use the deteced speed
-                if ($speedto == 0) {
+                if ($speedto == 0 && $edge->port->ifSpeed) {
                     $speedto = $edge->port->ifSpeed;
                     $speedfrom = $edge->port->ifSpeed;
                 }
