@@ -1,0 +1,13 @@
+os: forcepoint
+text: 'Forcepoint NGFW'
+type: firewall
+icon: forcepoint
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+
+discovery:
+    - sysObjectID:
+          - .1.3.6.1.4.1.1369.5.2
+
+mib_dir: forcepoint
