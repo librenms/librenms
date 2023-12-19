@@ -283,6 +283,12 @@
                     <input type="text" id="mapheight" name="mapheight" class="form-control input-sm" value="{{$map_conf['height']}}">
                 </div>
               </div>
+              <div class="form-group row">
+                <label for="mapnodealign" class="col-sm-3 control-label">Node Alignment</label>
+                <div class="col-sm-9">
+                    <input type="number" id="mapnodealign" name="mapnodealign" class="form-control input-sm" value="{{$node_align}}">
+                </div>
+              </div>
               <div class="form-group row" id="mapBackgroundRow">
                 <label for="selectbackground" class="col-sm-3 control-label">Background</label>
                 <div class="col-sm-9">
@@ -380,6 +386,7 @@
     var network;
     var network_height;
     var network_width;
+    var node_align = {{$node_align}};
     var network_nodes = new vis.DataSet({queue: {delay: 100}});
     var network_edges = new vis.DataSet({queue: {delay: 100}});
     var node_device_map = {};
@@ -399,8 +406,8 @@
                 var node = structuredClone(newnodeconf);
                 node.id = "new" + newcount++;
                 node.label = "New Node";
-                node.x = data.x;
-                node.y = data.y;
+                node.x = node_align ? Math.round(data.x / node_align) * node_align : data.x;
+                node.y = node_align ? Math.round(data.y / node_align) * node_align : data.y;
                 node.add = true;
                 $(".single-node").show();
                 editNode(node, editNodeSave);
@@ -490,6 +497,11 @@
                 nodepos = network.getPositions(data.nodes);
                 $.each( nodepos, function( nodeid, node ) {
                     move = false;
+                    if ( node_align && !nodeid.endsWith("_mid")) {
+                        node.x = Math.round(node.x / node_align) * node_align;
+                        node.y = Math.round(node.y / node_align) * node_align;
+                        move = true;
+                    }
                     if ( node.x < {{ $hmargin }} ) {
                         node.x = {{ $hmargin }};
                         move = true;
@@ -556,6 +568,7 @@
         var name = $("#mapname").val();
         var width = $("#mapwidth").val();
         var height = $("#mapheight").val();
+        node_align = $("#mapnodealign").val();
         var clearbackground = $('#mapBackgroundClearVal').val() ? true : false;
         var newbackground = $('#mapBackgroundSelect').prop('files').length ? $('#mapBackgroundSelect').prop('files')[0] : '';
 
@@ -570,6 +583,7 @@
         fd.append('name', name);
         fd.append('width', width);
         fd.append('height', height);
+        fd.append('node_align', node_align);
         fd.append('bgclear', clearbackground);
         fd.append('bgimage', newbackground);
 

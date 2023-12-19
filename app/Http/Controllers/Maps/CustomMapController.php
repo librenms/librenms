@@ -409,6 +409,7 @@ class CustomMapController extends Controller
             return view('map.custom-edit-select', $data);
         } elseif ($request->map_id == 0) {
             $data['name'] = 'New Map';
+            $data['node_align'] = 10;
             $data['map_conf'] = [
                 'height' => '800px',
                 'width' => '1800px',
@@ -434,6 +435,7 @@ class CustomMapController extends Controller
                 abort(404);
             }
             $data['name'] = $map->name;
+            $data['node_align'] = $map->node_align;
             $data['newedge_conf'] = json_decode($map->newedgeconfig, true);
             $data['newnode_conf'] = json_decode($map->newnodeconfig, true);
             $data['map_conf'] = json_decode($map->options, true);
@@ -677,6 +679,7 @@ class CustomMapController extends Controller
         $name = $request->post('name');
         $width = $request->post('width');
         $height = $request->post('height');
+        $node_align = $request->post('node_align');
         $bgclear = $request->post('bgclear') == 'true' ? true : false;
         $bgnewimage = $request->post('bgimage');
 
@@ -719,6 +722,7 @@ class CustomMapController extends Controller
             $map->name = $name;
             $map->width = $width;
             $map->height = $height;
+            $map->node_align = $node_align;
             $map->save();
             if (! $map_id) {
                 $map_id = $map->custom_map_id;
