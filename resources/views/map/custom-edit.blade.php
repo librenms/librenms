@@ -926,6 +926,7 @@
 
     function edgePortClear() {
         $("#portsearch").val('');
+        $("#portsearch").trigger('change');
         $("#port_id").val("");
         $("#port_name").text("");
         $("#edgePortSearchRow").show();
@@ -965,6 +966,7 @@
 
     function editEdge(edgedata, callback) {
         $("#portsearch").val('');
+        $("#portsearch").trigger('change');
         var nodes = network_nodes.get({
           fields: ['id', 'label'],
           filter: function (item) {
