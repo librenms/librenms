@@ -738,6 +738,8 @@
                     $("#map-saveDataButton").hide();
                     $("#alert-row").hide();
                 }
+                // Re-read the map from the DB in case any items were modified
+                refreshMap();
             },
             error: function( resp, status, error ) {
                 $("#alert").text("Save failed.  Server returned error response code: " + resp.status);
@@ -745,8 +747,6 @@
                 $("#alert-row").show();
             },
             complete: function( resp, status, error ) {
-                // Re-read the map from the DB in case any items were modified
-                refreshMap();
                 $("#map-saveDataButton").removeAttr('disabled');
             },
         });
