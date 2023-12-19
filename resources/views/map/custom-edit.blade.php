@@ -1,9 +1,8 @@
 @extends('layouts.librenmsv1')
 
-@section('title', __('Custom Map'))
+@section('title', __('Edit Custom Map'))
 
 @section('content')
-@if($edit && !is_null($map_id))
 <div class="modal fade" id="nodeModal" tabindex="-1" role="dialog" aria-labelledby="nodeModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
@@ -332,23 +331,8 @@
     </div>
   </div>
 </div>
-@endif {{-- Edit mode with map_id not null --}}
 
 <div class="container-fluid">
-
-@if($edit && is_null($map_id))
-  <div class="row" id="control-row">
-    <div class="col-md-12">
-      <select id="show_group" class="page-availability-report-select" name="show_group" onchange="selectMap(this)">
-        <option value="-1" selected>Select map to edit</option>
-        <option value="0">Create New Map</option>
-@foreach($maps as $map)
-        <option value="{{$map->custom_map_id}}">{{$map->name}}</option>
-@endforeach
-      </select>
-    </div>
-  </div>
-@elseif($edit)
   <div class="row" id="control-row">
     <div class="col-md-5">
       <button type=button value="mapedit" id="map-editButton" class="btn btn-primary" onclick="editMapSettings();">Edit Map Settings</button>
@@ -366,21 +350,16 @@
       <button type=button value="mapdelete" id="map-deleteButton" class="btn btn-danger" onclick="$('#mapDeleteModal').modal({backdrop: 'static', keyboard: false}, 'show');">Delete Map</button>
     </div>
   </div>
-
   <div class="row" id="control-map-sep">
     <div class="col-md-12">
       <hr>
     </div>
   </div>
-@endif {{-- edit mode with map_id not null --}}
-@if(! is_null($map_id))
   <div class="row" id="alert-row">
     <div class="col-md-12">
       <div class="alert alert-warning" role="alert" id="alert">Loading data</div>
     </div>
   </div>
-@endif
-
   <div class="row">
     <div class="col-md-12">
       <center>
@@ -388,7 +367,6 @@
       </center>
     </div>
   </div>
-
 </div>
 @endsection
 
@@ -398,7 +376,6 @@
 
 @section('scripts')
 <script type="text/javascript">
-@if(! is_null($map_id))
     var bgimage = {{ $background ? "true" : "false" }};
     var network;
     var network_height;
@@ -415,7 +392,6 @@
         var container = document.getElementById('custom-map');
         var options = {!! json_encode($map_conf) !!};
 
-@if($edit)
         // Set up the triggers for adding and editing map items
         options['manipulation']['addNode'] = function (data, callback) {
                 callback(null);
@@ -494,7 +470,6 @@
                 deleteEdge(edgeid);
             });
         };
-@endif
 
         network = new vis.Network(container, {nodes: network_nodes, edges: network_edges, stabilize: true}, options);
         network_height = $($(container).children(".vis-network")[0]).height();
@@ -509,7 +484,6 @@
             $(canvas).css('background-image','url({{ route('maps.custom.background', ['map_id' => $map_id]) }})').css('background-size', 'cover');
         }
 
-@if($edit)
         network.on('dragEnd', function (data) {
             if(data.edges.length > 0 || data.nodes.length > 0) {
                 // Make sure a node is not dragged outside the canvas
@@ -541,30 +515,8 @@
             }
         });
         $("#map-renderButton").hide();
-@else
-        network.on('doubleClick', function (properties) {
-            if (properties.nodes > 0 && properties.nodes[0] in node_device_map) {
-                window.location.href = "device/"+node_device_map[properties.nodes[0]].device_id;
-            }
-        });
-@endif
     }
-@endif
-@if(!$edit)
-    var Countdown;
-@endif
 
-@if($edit)
-@if(is_null($map_id))
-    function selectMap(caller) {
-        if($(caller).val() < 0) {
-            return true;
-        } else if ($(caller).val() == 0) {
-            window.location.href = "{{ route("maps.custom.edit") }}/new";
-        }
-        window.location.href = "{{ route("maps.custom.edit") }}/" + $(caller).val();
-    }
-@else {{-- edit mode with map id not null --}}
     function mapChangeBackground() {
         $("#mapBackgroundCancel").show();
     }
@@ -632,7 +584,6 @@
                     $("#savemap-alert").html("Save failed due to the following errors:<br />" + data['errors'].join("<br />"));
                     $("#savemap-alert").attr("class", "col-sm-12 alert alert-danger");
                 } else {
-@if($map_id)
                     $("#title").text(name);
                     $("#savemap-alert").attr("class", "col-sm-12");
                     $("#savemap-alert").text("");
@@ -648,9 +599,6 @@
                     }
 
                     editMapCancel();
-@else
-                    window.location.href = "{{ @route('maps.custom.edit') }}/" + data['id'];
-@endif
                 }
             },
             error: function( resp, status, error ) {
@@ -662,15 +610,6 @@
             },
         });
     }
-@if(!$map_id)
-    // New map - pop up the modal to set initial settings
-    $('#mapModal').modal({backdrop: 'static', keyboard: false}, 'show');
-    $("#mapBackgroundClearRow").hide();
-
-    function editMapCancel() {
-        window.location.href = "{{ route("maps.custom.edit") }}/";
-    }
-@else {{-- edit mode with map id > 0 --}}
     var newedgeconf = {!! json_encode($newedge_conf) !!};
     var newnodeconf = {!! json_encode($newnode_conf) !!};
     var newcount = 1;
@@ -1140,11 +1079,7 @@
         network_nodes.flush();
         $("#map-saveDataButton").show();
     }
-@endif {{-- map_id > 0 --}}
-@endif {{-- map_id is not null --}}
-@endif {{-- edit mode --}}
 
-@if($map_id > 0)
     function refreshMap() {
         $.get( '{{ route('maps.custom.getdata', ['map_id' => $map_id]) }}')
             .done(function( data ) {
@@ -1154,11 +1089,7 @@
                     node_cfg.id = nodeid;
                     if(node.device_id) {
                         node_device_map[nodeid] = {device_id: node.device_id, device_name: node.device_name};
-@if($edit)
                         node_cfg.title = node.device_id;
-@else
-                        node_cfg.title = node.device_info;
-@endif
                         node_cfg.image = {unselected: node.device_image};
                     } else {
                         node_cfg.title = null;
@@ -1171,11 +1102,7 @@
                     node_cfg.y = node.y_pos;
                     node_cfg.font = {face: node.text_face, size: node.text_size, color: node.text_colour};
                     node_cfg.size = node.size;
-@if($edit)
                     node_cfg.color = {background: node.colour_bg, border: node.colour_bdr};
-@else
-                    node_cfg.color = {background: node.colour_bg_view, border: node.colour_bdr_view};
-@endif
                     if(node.style == "icon") {
                         node_cfg.icon = {face: 'FontAwesome', code: String.fromCharCode(parseInt(node.icon, 16)), size: node.size, color: node.colour_bdr}; 
                     } else {
@@ -1194,9 +1121,7 @@
                     var mid_y = edge.mid_y;
 
                     var mid = {id: edgeid + "_mid", shape: "dot", size: 0, x: mid_x, y: mid_y};
-@if($edit)
                     mid.size = 3;
-@endif
 
                     var edge1 = {id: edgeid + "_from", from: edge.custom_map_node1_id, to: edgeid + "_mid", arrows: {to: {enabled: true, scaleFactor: 0.6}}, font: {face: edge.text_face, size: edge.text_size, color: edge.text_colour}, smooth: {type: edge.style}};
                     var edge2 = {id: edgeid + "_to", from: edge.custom_map_node2_id, to: edgeid + "_mid", arrows: {to: {enabled: true, scaleFactor: 0.6}}, font: {face: edge.text_face, size: edge.text_size, color: edge.text_colour}, smooth: {type: edge.style}};
@@ -1207,7 +1132,6 @@
                     } else if (edge2.smooth.type == "curvedCCW") {
                         edge2.smooth.type = "curvedCW";
                     }
-@if($edit)
                     if(edge.port_id) {
                         edge_port_map[edgeid] = {port_id: edge.port_id, port_name: edge.port_name, reverse: edge.reverse};
                         edge1.title = edge2.title = edge.port_id;
@@ -1219,19 +1143,6 @@
                     } else {
                         edge1.label = edge2.label = '';
                     }
-@else
-                    if(edge.port_id) {
-                        edge1.title = edge2.title = edge.port_info;
-                        if(edge.showpct) {
-                            edge1.label = edge.port_frompct + "%";
-                            edge2.label = edge.port_topct + "%";
-                        }
-                        edge1.color = {color: edge.colour_from};
-                        edge1.width = edge.width_from;
-                        edge2.color = {color: edge.colour_to};
-                        edge2.width = edge.width_to;
-                    }
-@endif
                     if (network_nodes.get(mid.id)) {
                         network_nodes.update(mid);
                         network_edges.update(edge1);
@@ -1261,18 +1172,8 @@
                 // Flush in order to make sure nodes exist for edges to connect to
                 network_nodes.flush();
                 network_edges.flush();
-@if($edit)
                 $("#alert").html("");
                 $("#alert-row").hide();
-@else
-                if (Object.keys(data).length == 0) {
-                    $("#alert").html("No devices found");
-                    $("#alert-row").show();
-                } else {
-                    $("#alert").html("");
-                    $("#alert-row").hide();
-                }
-@endif
             });
 
         // Initialise map if it does not exist
@@ -1282,29 +1183,6 @@
     }
 
     $(document).ready(function () {
-@if(! $edit)
-        Countdown = {
-            sec: {{$page_refresh}},
-
-            Start: function () {
-                var cur = this;
-                this.interval = setInterval(function () {
-                    cur.sec -= 1;
-                    if (cur.sec <= 0) {
-                        refreshMap();
-                        cur.sec = {{$page_refresh}};
-                    }
-                }, 1000);
-            },
-
-            Pause: function () {
-                clearInterval(this.interval);
-                delete this.interval;
-            },
-        };
-
-        Countdown.Start();
-@else {{-- edit mode and map id > 0 --}}
         var devices = new Bloodhound({
             datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
             queryTokenizer: Bloodhound.tokenizers.whitespace,
@@ -1407,10 +1285,8 @@
                 }
             });
 
-@endif {{-- edit mode --}}
         refreshMap();
     });
-@endif {{-- map_id > 0 --}}
 </script>
 @endsection
 

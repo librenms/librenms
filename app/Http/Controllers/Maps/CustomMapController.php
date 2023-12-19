@@ -387,7 +387,7 @@ class CustomMapController extends Controller
             'hmargin' => 20,
         ];
 
-        return view('map.custom', $data);
+        return view('map.custom-view', $data);
     }
 
     public function edit(Request $request)
@@ -405,6 +405,7 @@ class CustomMapController extends Controller
 
         if (is_null($request->map_id)) {
             $data['maps'] = CustomMap::orderBy('name')->get(['custom_map_id', 'name']);
+            return view('map.custom-edit-select', $data);
         } elseif ($request->map_id == 0) {
             $data['name'] = 'New Map';
             $data['map_conf'] = [
@@ -424,6 +425,7 @@ class CustomMapController extends Controller
                 ],
             ];
             $data['background'] = null;
+            return view('map.custom-new', $data);
         } else {
             $map = CustomMap::find($request->map_id);
             if (! $map) {
@@ -442,7 +444,7 @@ class CustomMapController extends Controller
             $data['background'] = $map->background_suffix ? true : false;
         }
 
-        return view('map.custom', $data);
+        return view('map.custom-edit', $data);
     }
 
     public function save(Request $request)
@@ -606,9 +608,9 @@ class CustomMapController extends Controller
         if (! $errors) {
             if (! $map_id) {
                 $map = new CustomMap;
-                $map->options = $this->default_map_options;
-                $map->newnodeconfig = $this->default_node_conf;
-                $map->newedgeconfig = $this->default_edge_conf;
+                $map->options = json_encode($this->default_map_options);
+                $map->newnodeconfig = json_encode($this->default_node_conf);
+                $map->newedgeconfig = json_encode($this->default_edge_conf);
                 $map->background_version = 0;
             } else {
                 $map = CustomMap::find($map_id);
