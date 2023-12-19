@@ -518,6 +518,7 @@ custom_maps:
     - { Field: name, Type: varchar(100), 'Null': false, Extra: '' }
     - { Field: width, Type: varchar(10), 'Null': false, Extra: '' }
     - { Field: height, Type: varchar(10), 'Null': false, Extra: '' }
+    - { Field: node_align, Type: smallint, 'Null': false, Extra: '', Default: '0' }
     - { Field: background_suffix, Type: varchar(10), 'Null': true, Extra: '' }
     - { Field: background_version, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: options, Type: longtext, 'Null': true, Extra: '' }
