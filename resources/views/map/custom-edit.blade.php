@@ -236,6 +236,12 @@
                   <button type=button class="btn btn-primary" value="reset" id="edgecolourtextreset" onclick="$('#edgetextcolour').val(newedgeconf.font.color); $(this).attr('disabled','disabled');">Reset</button>
                 </div>
               </div>
+              <div class="form-group row" id="edgeRecenterRow">
+                <label for="edgerecenter" class="col-sm-3 control-label">Recenter Line</label>
+                <div class="col-sm-9">
+                  <input type=checkbox class="form-check-input" value="recenter" id="edgerecenter">
+                </div>
+              </div>
               <div class="row">
                 <div class="col-sm-12" id="saveedge-alert">
                 </div>
@@ -955,6 +961,7 @@
         $("#edgePortRow").hide();
         $("#edgePortReverseRow").hide();
         $("#edgePortSearchRow").hide();
+        $("#edgeRecenterRow").hide();
 
         $("#edgestyle").val(newedgeconf.smooth.type);
         $("#edgetextface").val(newedgeconf.font.face);
@@ -1006,6 +1013,7 @@
         $("#edgetextcolour").val(edgedata.edge1.font.color);
         $("#edgetextshow").bootstrapSwitch('state', Boolean(edgedata.edge1.label));
 
+        $("#edgeRecenterRow").show();
         $("#divEdgeFrom").show();
         $("#divEdgeTo").show();
         $("#edge-saveButton").show();
@@ -1052,6 +1060,17 @@
         } else {
             network_edges.update([edgedata.edge1, edgedata.edge2]);
 
+            if($("#edgerecenter").is(":checked")) {
+                var pos = network.getPositions([edgedata.edge1.from, edgedata.edge2.from]);
+                var mid_x = (pos[edgedata.edge1.from].x + pos[edgedata.edge2.from].x) >> 1;
+                var mid_y = (pos[edgedata.edge1.from].y + pos[edgedata.edge2.from].y) >> 1;
+ 
+                edgedata.mid.x = mid_x;
+                edgedata.mid.y = mid_y;
+                network_nodes.update([edgedata.mid]);
+                $("#map-renderButton").show();
+            }
+
             // Blank labels need to be selected to update.  Select both to ensure this happens
             if(! edgedata.edge1.label) {
                 network_edges.flush();
@@ -1062,6 +1081,7 @@
                 network.selectEdges([edgedata.edge1.id]);
             }
         }
+        $("#edgerecenter").prop( "checked", false );
         $("#map-saveDataButton").show();
     }
 
