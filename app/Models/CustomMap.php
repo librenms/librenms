@@ -26,20 +26,14 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class CustomMap extends BaseModel
 {
+    use HasFactory;
     protected $primaryKey = 'custom_map_id';
-    protected $fillable = ['name', 'width', 'height', 'background_suffix', 'background_version', 'options', 'newnodeconfig', 'newedgeconfig'];
-    protected $casts = [
-        'background_version'  => 'integer',
-        'options'             => 'json',
-        'newnodeconfig'       => 'json',
-        'newedgeconfig'       => 'json',
-    ];
-    public $timestamps = false;
 
     public function scopeHasAccess($query, User $user)
     {

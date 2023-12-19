@@ -25,16 +25,13 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class CustomMapBackground extends BaseModel
 {
+    use HasFactory;
     protected $primaryKey = 'custom_map_background_id';
-    protected $fillable = ['custom_map_id', 'background_image'];
-    protected $casts = [
-        'custom_map_id' => 'int',
-    ];
-    public $timestamps = false;
 
     public function map(): BelongsTo
     {

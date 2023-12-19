@@ -367,9 +367,9 @@ class CustomMapController extends Controller
         }
 
         $name = $map->name;
-        $newedge_conf = $map->newedgeconfig;
-        $newnode_conf = $map->newnodeconfig;
-        $map_conf = $map->options;
+        $newedge_conf = json_decode($map->newedgeconfig, true);
+        $newnode_conf = json_decode($map->newnodeconfig, true);
+        $map_conf = json_decode($map->options, true);
         $map_conf['width'] = $map->width;
         $map_conf['height'] = $map->height;
         $background = $map->background_suffix ? true : false;
@@ -430,9 +430,9 @@ class CustomMapController extends Controller
                 abort(404);
             }
             $data['name'] = $map->name;
-            $data['newedge_conf'] = $map->newedgeconfig;
-            $data['newnode_conf'] = $map->newnodeconfig;
-            $data['map_conf'] = $map->options;
+            $data['newedge_conf'] = json_decode($map->newedgeconfig, true);
+            $data['newnode_conf'] = json_decode($map->newnodeconfig, true);
+            $data['map_conf'] = json_decode($map->options, true);
             $data['map_conf']['width'] = $map->width;
             $data['map_conf']['height'] = $map->height;
             // Override some settings for the editor
@@ -458,8 +458,28 @@ class CustomMapController extends Controller
             abort(404);
         }
 
+        $newnodeconf = json_decode($request->post('newnodeconf'));
+        if (! $newnodeconf) {
+            array_push($errors, 'New node config is not valid JSON');
+        }
+
+        $newedgeconf = json_decode($request->post('newedgeconf'));
+        if (! $newedgeconf) {
+            array_push($errors, 'New edge config is not valid JSON');
+        }
+
+        $nodes = json_decode($request->nodes);
+        if (! $nodes) {
+            array_push($errors, 'Node list is not valid JSON');
+        }
+
+        $edges = json_decode($request->edges);
+        if (! $edges) {
+            array_push($errors, 'Edge list is not valid JSON');
+        }
+
         if (! count($errors)) {
-            DB::transaction(function () use ($map, $request) {
+            DB::transaction(function () use ($map, $request, $nodes, $edges) {
                 $dbnodes = $map->nodes->keyBy('custom_map_node_id')->all();
                 $dbedges = $map->edges->keyBy('custom_map_edge_id')->all();
 
@@ -468,13 +488,8 @@ class CustomMapController extends Controller
 
                 $newNodes = [];
 
-                $newnodeconf = json_decode($request->post('newnodeconf'));
-                $newedgeconf = json_decode($request->post('newedgeconf'));
-                $nodes = json_decode($request->nodes);
-                $edges = json_decode($request->edges);
-
-                $map->newedgeconfig = $newedgeconf;
-                $map->newnodeconfig = $newnodeconf;
+                $map->newnodeconfig = $request->post('newnodeconf');
+                $map->newedgeconfig = $request->post('newedgeconf');
                 $map->save();
 
                 foreach ($nodes as $nodeid => $node) {

@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('custom_map_backgrounds', function (Blueprint $table) {
             $table->increments('custom_map_background_id');
+            $table->timestamps();
             $table->integer('custom_map_id')->unsigned()->index()->unique();
             $table->foreign('custom_map_id')->references('custom_map_id')->on('custom_maps')->onDelete('cascade');
         });

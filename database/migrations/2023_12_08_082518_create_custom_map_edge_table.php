@@ -25,6 +25,7 @@ return new class extends Migration
             $table->string('text_colour', 10);
             $table->integer('mid_x');
             $table->integer('mid_y');
+            $table->timestamps();
             $table->foreign('custom_map_id')->references('custom_map_id')->on('custom_maps')->onDelete('cascade');
             $table->foreign('port_id')->references('port_id')->on('ports')->onDelete('set null');
             $table->foreign('custom_map_node1_id')->references('custom_map_node_id')->on('custom_map_nodes')->onDelete('cascade');

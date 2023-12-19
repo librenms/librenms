@@ -25,25 +25,14 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class CustomMapEdge extends BaseModel
 {
+    use HasFactory;
     protected $primaryKey = 'custom_map_edge_id';
-    protected $fillable = ['custom_map_id', 'custom_map_node1_id', 'custom_map_node2_id', 'port_id', 'style', 'reverse', 'showpct', 'text_face', 'text_size', 'text_colour', 'mid_x', 'mid_y'];
-    protected $casts = [
-        'custom_map_id'       => 'int',
-        'custom_map_node1_id' => 'int',
-        'custom_map_node2_id' => 'int',
-        'port_id'             => 'int',
-        'reverse'             => 'bool',
-        'showpct'             => 'bool',
-        'textsize'            => 'int',
-        'mid_x'               => 'int',
-        'mid_y'               => 'int',
-    ];
-    public $timestamps = false;
 
     public function map(): BelongsTo
     {

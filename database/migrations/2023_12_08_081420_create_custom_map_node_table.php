@@ -27,6 +27,7 @@ return new class extends Migration
             $table->string('colour_bdr', 10)->nullable();
             $table->integer('x_pos');
             $table->integer('y_pos');
+            $table->timestamps();
             $table->foreign('device_id')->references('device_id')->on('devices')->onDelete('set null');
             $table->foreign('custom_map_id')->references('custom_map_id')->on('custom_maps')->onDelete('cascade');
         });
