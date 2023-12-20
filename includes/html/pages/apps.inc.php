@@ -275,6 +275,8 @@ $graphs['smart'] = [
     'id187',
     'id188',
     'maxtemp',
+    'id190',
+    'id194',
     'id196',
     'id197',
     'id198',
@@ -518,6 +520,9 @@ $graphs['privoxy'] = [
     'req',
     'resp_xxx',
     'ver',
+];
+$graphs['ss'] = [
+    'sockets',
 ];
 
 echo '<div class="panel panel-default">';

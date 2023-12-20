@@ -22,7 +22,7 @@ Debug::set($_REQUEST['debug']);
 if (is_numeric($_GET['device_id'])) {
     // use php to sort since we need call cleanPort
     $interface_map = [];
-    foreach (dbFetch('SELECT * FROM ports WHERE device_id = ?', [$_GET['device_id']]) as $interface) {
+    foreach (dbFetchRows('SELECT * FROM ports WHERE device_id = ?', [$_GET['device_id']]) as $interface) {
         $interface = cleanPort($interface);
         $interface_map[$interface['label']] = $interface;
     }

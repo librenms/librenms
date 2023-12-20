@@ -1,0 +1,4870 @@
+-- *******************************************************************
+-- FS-AC-MGMT-MIB.mib : FS AC MGMT MIB file
+-- January 2009, huangyuanbo
+--
+-- Copyright (c) 2009 by FS.COM Inc..
+-- All rights reserved.
+-- *******************************************************************
+--
+FS-AC-MGMT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        IpAddress,
+        OBJECT-TYPE,
+        MODULE-IDENTITY,
+        NOTIFICATION-TYPE,
+        TimeTicks,
+        Counter32
+                FROM SNMPv2-SMI
+        MacAddress,
+        TruthValue,
+        DisplayString,
+        RowStatus
+                FROM SNMPv2-TC
+        MODULE-COMPLIANCE,
+        NOTIFICATION-GROUP,
+        OBJECT-GROUP
+                FROM SNMPv2-CONF
+        InetAddress,
+        InetAddressType
+                FROM INET-ADDRESS-MIB
+        capwapBaseNtfChannelType
+                FROM CAPWAP-BASE-MIB
+        capwapBaseNtfAuthenMethod
+                FROM CAPWAP-BASE-MIB
+        capwapBaseNtfChannelDownReason
+                FROM CAPWAP-BASE-MIB
+        fsMgmt
+                FROM FS-SMI; 
+                
+fsAcMgmtMIB MODULE-IDENTITY
+    LAST-UPDATED "200909180000Z"
+    ORGANIZATION "FS.COM Inc.."
+    CONTACT-INFO
+        " 
+    Tel: 400-865-2852
+
+    E-mail: https://www.fs.com/live_chat_service_mail.html"
+    DESCRIPTION
+        "This module defines ac management mibs."
+    REVISION      "200909180000Z"
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { fsMgmt 56}
+
+--***************** define the AC root nodes *****************
+fsAcMgmtAcMIBObjects OBJECT IDENTIFIER      ::= { fsAcMgmtMIB 1 }
+fsAcMgmtAc     OBJECT IDENTIFIER ::= { fsAcMgmtAcMIBObjects 1 }
+fsAcMgmtAcIf   OBJECT IDENTIFIER ::= { fsAcMgmtAcMIBObjects 2 }
+
+--***************** define the AP root nodes *****************
+fsAcMgmtApMIBObjects OBJECT IDENTIFIER      ::= { fsAcMgmtMIB 2 }
+fsAcMgmtAp     OBJECT IDENTIFIER ::= { fsAcMgmtApMIBObjects 1 }
+fsAcMgmtApIf   OBJECT IDENTIFIER ::= { fsAcMgmtApMIBObjects 2 }
+
+--******** define the AP group root nodes ************
+fsAcMgmtApgMIBObjects OBJECT IDENTIFIER      ::= { fsAcMgmtMIB 3 }
+fsAcMgmtApg     OBJECT IDENTIFIER ::= { fsAcMgmtApgMIBObjects 1 }
+fsAcMgmtApgIf   OBJECT IDENTIFIER ::= { fsAcMgmtApgMIBObjects 2 }
+
+--******** define the Wlan root nodes ************
+fsAcMgmtWlanMIBObjects OBJECT IDENTIFIER      ::= { fsAcMgmtMIB 4 }
+fsAcMgmtWlan     OBJECT IDENTIFIER ::= { fsAcMgmtWlanMIBObjects 1 }
+fsAcMgmtWlanIf   OBJECT IDENTIFIER ::= { fsAcMgmtWlanMIBObjects 2 }
+
+--******** define the Sta root nodes ************
+fsAcMgmtStaMIBObjects OBJECT IDENTIFIER      ::= { fsAcMgmtMIB 5 }
+fsAcMgmtSta     OBJECT IDENTIFIER ::= { fsAcMgmtStaMIBObjects 1 }
+fsAcMgmtStaIf   OBJECT IDENTIFIER ::= { fsAcMgmtStaMIBObjects 2 }
+
+-- ******** define the notify nodes *************
+fsAcMgmtNotificationsMIBObjects OBJECT IDENTIFIER      ::= { fsAcMgmtMIB 6 }
+fsAcMgmtNtfObjects     OBJECT IDENTIFIER ::= { fsAcMgmtNotificationsMIBObjects 1 }
+fsAcMgmtNotifications     OBJECT IDENTIFIER ::= { fsAcMgmtNotificationsMIBObjects 2 }   
+
+--********************************************************************
+--                                                                  **
+--                  AC nodes                                        **
+--                                                                  **
+--********************************************************************
+
+-- 1.sta_limit, the station num ac support
+fsAcStaLimit OBJECT-TYPE
+    SYNTAX  INTEGER (1..2147483647)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "The max station this AC supports."
+    ::= { fsAcMgmtAc 1 }
+
+-- 2.wtp_limit, the wtp num ac support
+fsAcWtpLimit OBJECT-TYPE
+    SYNTAX  INTEGER (1..2147483647)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "The max wtp this AC supports."
+    ::= { fsAcMgmtAc 2 }
+
+-- 3.[no] r_mac_field, 0-disable,1-enable
+fsAcRMacField OBJECT-TYPE
+    SYNTAX  INTEGER (0..1)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "Set AC's R-MAC Field."
+    ::= { fsAcMgmtAc 3 }
+
+-- 4.[no] data_dtls, 0-disable,1-enable
+fsAcDataDtls OBJECT-TYPE
+    SYNTAX  INTEGER (0..1)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "Set AC's DTLS Policy Field."
+    ::= { fsAcMgmtAc 4 }
+    
+-- 5.[no] ecn_support, 0-disable,1-enable
+fsAcEcnSupport OBJECT-TYPE
+    SYNTAX  INTEGER (0..1)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "Set AC's ECN Support Field."
+    ::= { fsAcMgmtAc 5 }
+
+-- 6.[no] backup_ac_ip ip_address
+fsAcAcIpTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF FSAcAcIpTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "Add or Del the AC's backup ip address."
+    ::= { fsAcMgmtAc 6 }
+
+fsAcAcIpTableEntry OBJECT-TYPE
+    SYNTAX  FSAcAcIpTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The entry of Ac's backup ip address."
+    INDEX   { fsAcAcIpIndex}
+    ::= { fsAcAcIpTable 1 }
+
+FSAcAcIpTableEntry ::=
+    SEQUENCE {
+        fsAcAcIpIndex      INTEGER,
+        fsAcBackAcIp       IpAddress,
+        fsAcAcIpRS         RowStatus
+    }
+
+-- The Ac name with priority index
+fsAcAcIpIndex OBJECT-TYPE
+    SYNTAX  INTEGER (1..512)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "AC's Ac name with priority index."
+    ::= { fsAcAcIpTableEntry 1 }
+
+fsAcBackAcIp OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "Set AC's ip list."
+    ::= { fsAcAcIpTableEntry 2 }
+    
+fsAcAcIpRS OBJECT-TYPE
+    SYNTAX     RowStatus 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "Used to add or del a backup ac ip address in the ac."
+    ::= { fsAcAcIpTableEntry 3 }
+
+-- 7.[no] ecn_support, set the mtu
+fsAcMtu OBJECT-TYPE
+    SYNTAX  INTEGER (0..1500)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "Set AC's MTU."
+    ::= { fsAcMgmtAc 7 }
+
+-- 8.ac_name, set the ac name
+fsAcAcName OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "Set AC's Name."
+    ::= { fsAcMgmtAc 8 }
+
+-- location location_string
+fsAcLocation  OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (1..255))
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "Ac's location information."
+    ::= { fsAcMgmtAc 9}
+
+-- reset ap_name
+fsAcResetAp  OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (1..255))
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "Delete the ap by assigning the ap name."
+    ::= { fsAcMgmtAc 10}
+
+-- The ap num attached to this ac.
+fsAcApNum OBJECT-TYPE
+    SYNTAX  INTEGER (1..800)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "Ap num attached to this ac."
+    ::= { fsAcMgmtAc 11 }
+
+-- The Ac's 802.11a rate set
+fsAc80211aRateTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF FSAc80211aRateEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "The Ap attributes."
+    ::= { fsAcMgmtAc 12 }
+
+fsAc80211aRateEntry OBJECT-TYPE
+    SYNTAX  FSAc80211aRateEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Get and set the Ap attribtues."
+    INDEX   { fsAc80211aRate }
+    ::= { fsAc80211aRateTable 1 }
+
+FSAc80211aRateEntry ::=
+    SEQUENCE {
+        fsAc80211aRate     INTEGER,
+        fsAc80211aRateType INTEGER
+    }
+
+fsAc80211aRate  OBJECT-TYPE
+    SYNTAX  INTEGER (1..8)
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "The global 802.11a rate set in this AC.
+            802.11a-6, 9, 12, 18, 24, 36, 48, and 54 Mbps.
+            set 1 for 6Mbps, set 2 for 9Mbps, set 3 for 12Mbps,etc..."
+    ::= { fsAc80211aRateEntry 1}
+    
+fsAc80211aRateType  OBJECT-TYPE
+    SYNTAX  INTEGER (1..3)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "The rate type:
+            1--disable
+            2--mandatory
+            3--support"
+    ::= { fsAc80211aRateEntry 2}
+
+-- The Ac's 802.11b rate set
+fsAc80211bRateTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF FSAc80211bRateEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "The 802.11b rate attributes."
+    ::= { fsAcMgmtAc 13 }
+
+fsAc80211bRateEntry OBJECT-TYPE
+    SYNTAX  FSAc80211bRateEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Get and set the Ap attribtues."
+    INDEX   { fsAc80211bRate }
+    ::= { fsAc80211bRateTable 1 }
+
+FSAc80211bRateEntry ::=
+    SEQUENCE {
+        fsAc80211bRate     INTEGER,
+        fsAc80211bRateType INTEGER
+    }
+
+fsAc80211bRate  OBJECT-TYPE
+    SYNTAX  INTEGER (1..3)
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "The global 802.11b rate set in this AC.
+            802.11b-1, 2, 5.5, 11Mbps.
+            set 1 for 1Mbps, set 2 for 2Mbps, set 3 for 5.5Mbps,etc..."
+    ::= { fsAc80211bRateEntry 1}
+    
+fsAc80211bRateType  OBJECT-TYPE
+    SYNTAX  INTEGER (1..3)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "The rate type:
+            1--disable
+            2--mandatory
+            3--support"
+    ::= { fsAc80211bRateEntry 2}
+
+fsAcFallback  OBJECT-TYPE
+    SYNTAX  INTEGER (1..2)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "The fallback state:
+            1--enable, 2--disable"
+    ::= { fsAcMgmtAc 14}
+    
+fsAcStaNum  OBJECT-TYPE
+    SYNTAX  INTEGER (1..24000)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The client num in this AC."
+    ::= { fsAcMgmtAc 15}
+    
+fsAcMacAddr  OBJECT-TYPE
+    SYNTAX  MacAddress
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The AC's mac address."
+    ::= { fsAcMgmtAc 16}
+
+fsAcDescriptor  OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (1..255))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The AC's descriptor."
+    ::= { fsAcMgmtAc 17}
+    
+fsAcPID  OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (1..255))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The AC's product id."
+    ::= { fsAcMgmtAc 18}
+    
+fsAcHwId  OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (1..255))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The AC's Hardware Id."
+    ::= { fsAcMgmtAc 19}
+    
+fsAcSN  OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (1..255))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The AC's serial number."
+    ::= { fsAcMgmtAc 20}
+ 
+fsAcTemp  OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The AC's temperature."
+    ::= { fsAcMgmtAc 21}
+
+fsAcAPUpDownCtrl  OBJECT-TYPE
+    SYNTAX  INTEGER (0..1)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "The AP Up/Down trap control
+                0 - off
+                1 - on."
+    ::= { fsAcMgmtAc 22}
+    
+fsAcAPJoinFailCtrl  OBJECT-TYPE
+    SYNTAX  INTEGER (0..1)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "The AP join fail control
+                0 - off
+                1 - on."
+    ::= { fsAcMgmtAc 23}
+    
+fsAcAPDecryEroReportCtrl  OBJECT-TYPE
+    SYNTAX  INTEGER (0..1)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "The AP Decry Error Report control
+                0 - off
+                1 - on."
+    ::= { fsAcMgmtAc 24}
+    
+fsAcApImageUpdtCtrl  OBJECT-TYPE
+    SYNTAX  INTEGER (0..1)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "The AP Image Update Control
+                0 - off
+                1 - on."
+    ::= { fsAcMgmtAc 25}
+    
+fsAcApConfigMsgEroCtrl  OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "The AP Config Message Error
+                0 - off
+                1 - on."
+    ::= { fsAcMgmtAc 26}
+    
+fsAcApRadioOperStatuCtrl  OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "The AP Radio Oper Status
+                0 - off
+                1 - on."
+    ::= { fsAcMgmtAc 27}
+    
+fsAcApAuthenFailCtrl  OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "The AP Authen Fail trap control
+                0 - off
+                1 - on."
+    ::= { fsAcMgmtAc 28}
+    
+fsAcApTimestampCtrl  OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "The AP timestamp trap control
+                0 - off
+                1 - on."
+    ::= { fsAcMgmtAc 29}
+    
+fsAcStaOperCtrl  OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "The Sta operation trap control
+                0 - off
+                1 - on."
+    ::= { fsAcMgmtAc 30}
+    
+fsAcType  OBJECT-TYPE
+    SYNTAX  INTEGER {
+        ws5302(1),
+        ws5708(2),
+        m8600ws(3),
+        ws3302(4),
+        m12000ws(5),
+        ws5504(6),
+        ws6108(7),
+        ws6816(8),
+        m18000-WS-ED(9),
+        m8600E-WS-ED(10),
+        eg2000(11),
+        ws6008(12),
+        ws6812(13),
+        aw608(14),
+        ws6024(15),
+        eg350(16)
+    }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The Ac type."
+    ::= { fsAcMgmtAc 31}
+    
+fsAcNeid  OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (1..255))
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "The Ac system net id."
+    ::= { fsAcMgmtAc 32}
+    
+fsAcManufacturer  OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (1..255))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The Ac's Manufacturer."
+    ::= { fsAcMgmtAc 33}
+
+fsAcSwVer  OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (1..255))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The Ac's software version."
+    ::= { fsAcMgmtAc 34}
+    
+fsAcSwManufacturer  OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (1..255))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The Ac's software Manufacturer."
+    ::= { fsAcMgmtAc 35}
+    
+fsAcStaResourceNotEnough  OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The sta number which can not attach to 
+             this system for not enough resource."
+    ::= { fsAcMgmtAc 36}
+    
+fsAcPppoeClientAct  OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The active client number in this AC."
+    ::= { fsAcMgmtAc 37}
+    
+fsAcPppoeClientMax  OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The client number which this AC support."
+    ::= { fsAcMgmtAc 38}
+
+fsAcStaActThredhold  OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "The thredhold which the client attach to this AC in one hour."
+    ::= { fsAcMgmtAc 39}
+    
+fsAcStaDisactThredhold  OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "The thredhold which the client leave this AC in one hour."
+    ::= { fsAcMgmtAc 40}
+    
+fsAcStaTotalRoamThredhold  OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The thredhold which the client's total roaming times."
+    ::= { fsAcMgmtAc 41}
+    
+fsAcStaPerRoamThredhold  OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The thredhold which the client's roaming times per minite."
+    ::= { fsAcMgmtAc 42}
+    
+-- [no] sta-off-line-remain-time number
+fsAcStaOffLineRemainTime  OBJECT-TYPE
+    SYNTAX  INTEGER(0..365)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "This object presents the time which the off line STA statistic remain in the AC."
+    ::= { fsAcMgmtAc 43}
+
+-- [no] sta-off-line-number number
+fsAcStaOffLineNumber  OBJECT-TYPE
+    SYNTAX  INTEGER(0..5000)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "This object presents the max number of the off line STA number statistic."
+    ::= { fsAcMgmtAc 44}
+
+-- sta-off-line-del mac-addr 
+fsAcStaOffLineDelSingle  OBJECT-TYPE
+    SYNTAX  MacAddress
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "This object presents the mac address which the off line STA to remove its statistic."
+    ::= { fsAcMgmtAc 45}
+
+-- sta-off-line-del all
+fsAcStaOffLineDelAll  OBJECT-TYPE
+    SYNTAX  INTEGER(1..1)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "This object is set to clear all of the off line STA's statistic."
+    ::= { fsAcMgmtAc 46}
+
+-- no ap-config ap-name
+fsAcRmOffLineApConfig  OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (1..65))
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "This object is set to delete the off line AP's configuration."
+    ::= { fsAcMgmtAc 47}
+    
+fsAcFlowBlGroupTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF FSAcFlowBlGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "The flow balance group table"
+    ::= { fsAcMgmtAc 48 }
+	
+fsAcFlowBlGroupEntry OBJECT-TYPE
+    SYNTAX  FSAcFlowBlGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Get and set the flow balance group attribute."
+    INDEX   { fsAcFlowBlGroupName }
+    ::= { fsAcFlowBlGroupTable 1 }
+
+FSAcFlowBlGroupEntry ::=
+    SEQUENCE {
+        fsAcFlowBlGroupName                DisplayString,
+        fsAcFlowBlApName1                  DisplayString,
+        fsAcFlowBlApName2                  DisplayString,
+        fsAcFlowBlApName3                  DisplayString,
+        fsAcFlowBlApName4                  DisplayString,
+        fsAcFlowBlApName5                  DisplayString,
+        fsAcFlowBlApName6                  DisplayString,
+        fsAcFlowBlApName7                  DisplayString,
+        fsAcFlowBlApName8                  DisplayString,
+        fsAcFlowBlApName9                  DisplayString,
+        fsAcFlowBlApName10                 DisplayString,
+        fsAcFlowBlNum                      INTEGER,
+        fsAcFlowBlRS                       RowStatus,
+        fsAcFlowBlEnable                   INTEGER,
+        fsAcFlowBlBase                     INTEGER,
+        fsAcFlowBlIsEnable                 TruthValue
+    }
+
+fsAcFlowBlGroupName  OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The flow balance group's name."
+    ::= { fsAcFlowBlGroupEntry 1}
+    
+fsAcFlowBlApName1  OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "The AP name belong to this flow balance group."
+    ::= { fsAcFlowBlGroupEntry 2}
+    
+fsAcFlowBlApName2  OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "The AP name belong to this flow balance group."
+    ::= { fsAcFlowBlGroupEntry 3}
+    
+fsAcFlowBlApName3  OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "The AP name belong to this flow balance group."
+    ::= { fsAcFlowBlGroupEntry 4}
+    
+fsAcFlowBlApName4  OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "The AP name belong to this flow balance group."
+    ::= { fsAcFlowBlGroupEntry 5}
+    
+fsAcFlowBlApName5  OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "The AP name belong to this flow balance group."
+    ::= { fsAcFlowBlGroupEntry 6}
+    
+fsAcFlowBlApName6  OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "The AP name belong to this flow balance group."
+    ::= { fsAcFlowBlGroupEntry 7}
+    
+fsAcFlowBlApName7  OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "The AP name belong to this flow balance group."
+    ::= { fsAcFlowBlGroupEntry 8}
+    
+fsAcFlowBlApName8  OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "The AP name belong to this flow balance group."
+    ::= { fsAcFlowBlGroupEntry 9}
+    
+fsAcFlowBlApName9  OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "The AP name belong to this flow balance group."
+    ::= { fsAcFlowBlGroupEntry 10}
+    
+fsAcFlowBlApName10  OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "The AP name belong to this flow balance group."
+    ::= { fsAcFlowBlGroupEntry 11}
+    
+fsAcFlowBlNum  OBJECT-TYPE
+    SYNTAX  INTEGER(0..1000)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "The flow balance group's flow throshold."
+    ::= { fsAcFlowBlGroupEntry 12}
+        
+fsAcFlowBlRS OBJECT-TYPE
+    SYNTAX     RowStatus 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "Used to add or del or modify the flow balance table."
+    ::= { fsAcFlowBlGroupEntry 13 }
+
+fsAcFlowBlEnable OBJECT-TYPE
+    SYNTAX     INTEGER 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "The flow balance group's flow enable throshold."
+    ::= { fsAcFlowBlGroupEntry 14 }
+
+fsAcFlowBlBase OBJECT-TYPE
+    SYNTAX     INTEGER 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "The flow balance group's flow base."
+    ::= { fsAcFlowBlGroupEntry 15 }
+
+fsAcFlowBlIsEnable  OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "The flow balance group's enable/disable."
+    ::= { fsAcFlowBlGroupEntry 16}
+
+fsAcNumBlGroupTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF FSAcNumBlGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "The number balance group table"
+    ::= { fsAcMgmtAc 49 }
+
+fsAcNumBlGroupEntry OBJECT-TYPE
+    SYNTAX  FSAcNumBlGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Get and set the number balance group attribute."
+    INDEX   { fsAcNumBlGroupName }
+    ::= { fsAcNumBlGroupTable 1 }
+
+FSAcNumBlGroupEntry ::=
+    SEQUENCE {
+        fsAcNumBlGroupName                DisplayString,
+        fsAcNumBlApName1                  DisplayString,
+        fsAcNumBlApName2                  DisplayString,
+        fsAcNumBlApName3                  DisplayString,
+        fsAcNumBlApName4                  DisplayString,
+        fsAcNumBlApName5                  DisplayString,
+        fsAcNumBlApName6                  DisplayString,
+        fsAcNumBlApName7                  DisplayString,
+        fsAcNumBlApName8                  DisplayString,
+        fsAcNumBlApName9                  DisplayString,
+        fsAcNumBlApName10                 DisplayString,
+        fsAcNumBlNum                      INTEGER,
+        fsAcNumBlRS                       RowStatus,
+        fsAcNumBlEnable                   INTEGER,
+        fsAcNumBlIsEnable                 TruthValue
+    }
+
+fsAcNumBlGroupName  OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The number balance group's name."
+    ::= { fsAcNumBlGroupEntry 1}
+    
+fsAcNumBlApName1  OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "The AP name belong to this number balance group."
+    ::= { fsAcNumBlGroupEntry 2}
+    
+fsAcNumBlApName2  OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "The AP name belong to this number balance group."
+    ::= { fsAcNumBlGroupEntry 3}
+    
+fsAcNumBlApName3  OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "The AP name belong to this number balance group."
+    ::= { fsAcNumBlGroupEntry 4}
+    
+fsAcNumBlApName4  OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "The AP name belong to this number balance group."
+    ::= { fsAcNumBlGroupEntry 5}
+    
+fsAcNumBlApName5  OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "The AP name belong to this number balance group."
+    ::= { fsAcNumBlGroupEntry 6}
+    
+fsAcNumBlApName6  OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "The AP name belong to this number balance group."
+    ::= { fsAcNumBlGroupEntry 7}
+    
+fsAcNumBlApName7  OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "The AP name belong to this number balance group."
+    ::= { fsAcNumBlGroupEntry 8}
+    
+fsAcNumBlApName8  OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "The AP name belong to this number balance group."
+    ::= { fsAcNumBlGroupEntry 9}
+    
+fsAcNumBlApName9  OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "The AP name belong to this number balance group."
+    ::= { fsAcNumBlGroupEntry 10}
+    
+fsAcNumBlApName10  OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "The AP name belong to this number balance group."
+    ::= { fsAcNumBlGroupEntry 11}
+    
+fsAcNumBlNum  OBJECT-TYPE
+    SYNTAX  INTEGER(0..1000)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "The number balance group's number throshold."
+    ::= { fsAcNumBlGroupEntry 12}
+        
+fsAcNumBlRS OBJECT-TYPE
+    SYNTAX     RowStatus 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "Used to add or del or modify the number balance table."
+    ::= { fsAcNumBlGroupEntry 13 }
+
+fsAcNumBlEnable  OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "The number balance group's number enable throshold."
+    ::= { fsAcNumBlGroupEntry 14}
+
+fsAcNumBlIsEnable  OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "The number balance group's enable/disable."
+    ::= { fsAcNumBlGroupEntry 15}
+
+fsAcInAcRoamNum  OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The Sta roaming in this AC."
+    ::= { fsAcMgmtAc 50}
+    
+fsAcBetweenAcRoamInNum  OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The Sta roaming in timers while roaming between ACs."
+    ::= { fsAcMgmtAc 51}
+    
+fsAcStaOnOverThrodOperCtrl  OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "The Sta on times over thredhold trap control
+                0 - off
+                1 - on."
+    ::= { fsAcMgmtAc 52}
+    
+fsAcStaOffOverThrodOperCtrl  OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "The Sta off times over thredhold trap control
+                0 - off
+                1 - on."
+    ::= { fsAcMgmtAc 53}
+    
+fsAcBetweenAcRoamOutNum OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The Sta roaming out timers while roaming between ACs."
+    ::= { fsAcMgmtAc 54}
+    
+fsAcCpusageSwitch  OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "This object presents the fsApCpuUsageTrapTimer node active or not.
+             1 -- on
+             2 -- off"
+    ::= { fsAcMgmtAc 55 }
+    
+fsAcCpuUsageTrapTimer OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "This object represents the AP's cpu usage info trap timer, 
+             second. Set to all APs."
+    ::= { fsAcMgmtAc 56 }
+    
+fsAcStatTrapTimer  OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "This object present the AP's radio statistic
+             trap timer, second. Set to all APs."
+    ::= { fsAcMgmtAc 57}
+    
+fsAcHeartBeat  OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "The heart beat between AC and AP£¬should not greater than 75s£¬second.
+             Set 0 to turn off this function."
+    ::= { fsAcMgmtAc 58}
+
+fsAcTotalApSupNum  OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "This object present the ACs' max num of supported APs."
+    ::= { fsAcMgmtAc 59}
+
+fsAcTotalStaSupNum  OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "This object present the ACs' max num of supported STAs."
+    ::= { fsAcMgmtAc 60}
+
+fsAcTotalPppoeSupNum  OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "This object present the ACs' maximum number of pppoe authentication."
+    ::= { fsAcMgmtAc 61}
+    
+fsAcCurTotalApSupNum  OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "This object present the current ACs' max num of supported STAs."
+    ::= { fsAcMgmtAc 62}
+
+fsAcCurTotalStaSupNum  OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "This object present the current ACs' max num of supported STAs."
+    ::= { fsAcMgmtAc 63}
+
+fsAcCurTotalPppoeSupNum  OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "This object present the current the ACs' maximum number of pppoe authentication."
+    ::= { fsAcMgmtAc 64}
+
+fsAcNasId  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The NAS ID about this AC."
+    ::= { fsAcMgmtAc 65}
+
+fsAcStaLimitLicense OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The max station this AC supports by license."
+    ::= { fsAcMgmtAc 66 }
+
+fsAcWtpLimitLicense OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The max wtp this AC supports by license."
+    ::= { fsAcMgmtAc 67 }
+
+fsAcStaIpv6Num  OBJECT-TYPE
+    SYNTAX  INTEGER (1..24000)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The ipv6 client num in this AC."
+    ::= { fsAcMgmtAc 68}
+
+fsAcIpv6  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "AC's ipv6 address."
+    ::= { fsAcMgmtAc 69}
+
+fsAcIpv6Prefix  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "AC's ipv6 address prefix."
+    ::= { fsAcMgmtAc 70}
+
+fsAcIpv6Type  OBJECT-TYPE
+    SYNTAX  INTEGER {
+        unknown(0),
+        unicase(1),
+        anycase(2),
+        multicase(3)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "AC's ipv6 address type."
+    ::= { fsAcMgmtAc 71}
+
+fsAcIpv6AddrType  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "AC's anycast address type."
+    ::= { fsAcMgmtAc 72}
+    
+fsAcKickClient  OBJECT-TYPE
+    SYNTAX  MacAddress
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "Set the mac and corresponding client will be kicked. Get this object will return last kicked client."
+    ::= { fsAcMgmtAc 73}
+    
+fsAcOpenStaNum  OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "Open client num in this AC."
+    ::= { fsAcMgmtAc 74}
+
+fsAcOpenStaAbnormalDownTimes  OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The times open client is abnormaly offline."
+    ::= { fsAcMgmtAc 75} 
+
+fsAcWepPskStaNum  OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "WEP/PSK client num in this AC."
+    ::= { fsAcMgmtAc 76}
+
+fsAcWepPskStaAbnormalDownTimes  OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The times WEP/PSK client is abnormaly offline."
+    ::= { fsAcMgmtAc 77} 
+    
+fsAcPriorStaTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF FSAcPriorStaEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "The prior sta table"
+    ::= { fsAcMgmtAc 78 }
+
+fsAcMicroAPUpDownCtrl  OBJECT-TYPE
+    SYNTAX  INTEGER (0..1)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "The Micro AP Up/Down trap control
+                0 - off
+                1 - on."
+    ::= { fsAcMgmtAc 79}
+fsAcPriorStaEntry OBJECT-TYPE
+    SYNTAX  FSAcPriorStaEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Get and set prior sta mac."
+    INDEX   { fsAcPriorStaMac }
+    ::= { fsAcPriorStaTable 1 }
+
+FSAcPriorStaEntry ::=
+    SEQUENCE {
+        fsAcPriorStaMac                MacAddress,
+        fsAcPriorStaRowStatus          RowStatus
+    }
+    
+fsAcPriorStaMac  OBJECT-TYPE
+    SYNTAX  MacAddress
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "The prior sta mac."
+    ::= { fsAcPriorStaEntry 1}
+    
+fsAcPriorStaRowStatus OBJECT-TYPE
+    SYNTAX     RowStatus 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "Used to add or del prior sta."
+    ::= { fsAcPriorStaEntry 2}
+
+fsAcOfflineApNum OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "Offline ap num in this ac."
+    ::= { fsAcMgmtAc 80 }
+
+fsAcTotalApNum OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "Total ap num in this ac."
+    ::= { fsAcMgmtAc 81 }
+
+fsAcTotalMicrolApNum OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "Total microl ap num in this ac."
+    ::= { fsAcMgmtAc 82 }
+
+fsAcOnlineMicrolApNum OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "Total online microl ap num in this ac."
+    ::= { fsAcMgmtAc 83 }
+
+fsAcOfflineMicrolApNum OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "Total offline microl ap num in this ac."
+    ::= { fsAcMgmtAc 84 }
+
+fsAcStaLinkTimes OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "Total sta link times in this ac of one day."
+    ::= { fsAcMgmtAc 85 }
+
+fsAcStaLinkSuccessTimes OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "Total sta link success times in this ac of one day."
+    ::= { fsAcMgmtAc 86 }
+	
+fsAcStaLinkFailTimes OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "Total sta link fail times in this ac of one day."
+    ::= { fsAcMgmtAc 87 }
+	
+fsAcStaAuthTimes OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "Total sta auth times in this ac of one day."
+    ::= { fsAcMgmtAc 88 }
+	
+fsAcStaAuthSuccessTimes OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "Total sta auth success times in this ac of one day."
+    ::= { fsAcMgmtAc 89 }
+	
+fsAcStaAuthFailTimes OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "Total sta auth fail times in this ac of one day."
+    ::= { fsAcMgmtAc 90 }
+	
+--********************************************************************
+--                                                                  **
+--                  AP nodes                                        **
+--                                                                  **
+--********************************************************************
+fsApCfgTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF FSApCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "The Ap attributes."
+    ::= { fsAcMgmtAp 1 }
+
+fsApCfgEntry OBJECT-TYPE
+    SYNTAX  FSApCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Get and set the Ap attribtues."
+    INDEX   { fsApMacAddr }
+    ::= { fsApCfgTable 1 }
+
+FSApCfgEntry ::=
+    SEQUENCE {
+        fsApMacAddr                 MacAddress,
+        fsApApName                  DisplayString,
+        fsApApgName                 DisplayString,
+        fsApDiscTimer               INTEGER,
+        fsApEchoReqTimer            INTEGER,
+        fsApEroReportTimer          INTEGER,
+        fsApStaTimeoutTimer         INTEGER,
+        fsApStatisticsTimer         INTEGER,
+        fsApFallback                INTEGER,
+        fsApImageId                 DisplayString,
+        fsApIpDhcp                  INTEGER,
+        fsApLocation                DisplayString,
+        fsApWpsMfp                  INTEGER,
+        fsApLastRebootReason        INTEGER,
+        fsApEthernetIfName          DisplayString,
+        fsApEthernetIfMacAddress    MacAddress,
+        fsApEthernetIfAdminStatus   INTEGER,
+        fsApEthernetIfOperStatus    INTEGER,
+        fsApEthernetIfRxUcastPkts   Counter32,
+        fsApEthernetIfRxNUcastPkts  Counter32,
+        fsApEthernetIfTxUcastPkts   Counter32,
+        fsApEthernetIfTxNUcastPkts  Counter32,
+        fsApEthernetIfDuplex        INTEGER,
+        fsApEthernetIfLinkSpeed     INTEGER,
+        fsApEthernetIfPOEPower      INTEGER,
+        fsApEthernetIfRxBoardPkts   Counter32,
+        fsApEthernetIfRxMultiPkts   Counter32,
+        fsApEthernetIfTxBoardPkts   Counter32,
+        fsApEthernetIfTxMultiPkts   Counter32,
+        fsApEthernetIfDropPkts      Counter32,
+        fsApAdminStatus             INTEGER,
+        fsApSn                      DisplayString,
+        fsApIp                      IpAddress,
+        fsApStaNum                  INTEGER,
+        fsApToFat                   INTEGER,
+        fsApId                      INTEGER,
+        fsApSwVer                   DisplayString,
+        fsApBootVer                 DisplayString,
+        fsApPID                     DisplayString,
+        fsApHwVer                   DisplayString,
+        fsApStaLimit                INTEGER,
+        fsApFactoryDefault          INTEGER,
+        fsApCpuUsageTrapTimer       INTEGER,
+        fsApStatTrapTimer           INTEGER,
+        fsApLinkOnTimeInterval      INTEGER,
+        fsApNetId                   DisplayString,
+        fsApUptime                  DisplayString,
+        fsApState                   INTEGER,
+        fsApNasId                   DisplayString,
+        fsApCoverArea               INTEGER,
+        fsApLinkOnTimeIntervalMs    TimeTicks,
+        fsApUptimeMs                TimeTicks,
+        fsApHbUptimeMs              TimeTicks,
+        fsApIpv6                    InetAddress,
+        fsApIpv6Prefix              DisplayString,
+        fsApIpv6PrefixLen           INTEGER,
+        fsApIpv6Type                INTEGER,
+        fsApIpv6Gateway             DisplayString,
+        fsApIpv6StaNum              INTEGER,
+        fsApMacAddrColon            DisplayString,
+        fsApMacAddrLine             DisplayString,
+        fsApMacAddrDot              DisplayString,
+		fsApEchoRequestCnt          Counter32,
+        fsApEchoResponseDropCnt     Counter32,
+        fsApEchoDelayTimeMS         INTEGER,
+		fsApIsIsharePlus            INTEGER,
+		fsApTotalMicrolApNum        INTEGER,
+		fsApOnlineMicrolApNum       INTEGER,
+		fsApOfflineMicrolApNum      INTEGER
+    }
+
+fsApMacAddr  OBJECT-TYPE
+    SYNTAX  MacAddress
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The AP's ethernet mac address."
+    ::= { fsApCfgEntry 1}
+
+-- The AP Name
+fsApApName  OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (1..64))
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "Ap's Name."
+    ::= { fsApCfgEntry 2}
+
+-- The Ap group name
+fsApApgName  OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (1..255))
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "Ap group Name."
+    ::= { fsApCfgEntry 3 }
+
+-- The Discovery timer
+fsApDiscTimer  OBJECT-TYPE
+    SYNTAX  INTEGER (2..180)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "Discovery timer."
+    ::= { fsApCfgEntry 4 }
+
+-- The Echo Request timer
+fsApEchoReqTimer  OBJECT-TYPE
+    SYNTAX  INTEGER (5..255)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "Echo Request timer."
+    ::= { fsApCfgEntry 5 }
+
+-- The Error Report timer
+fsApEroReportTimer  OBJECT-TYPE
+    SYNTAX  INTEGER (1..1080)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "Error Report timer."
+    ::= { fsApCfgEntry 6 }
+
+-- The Sta timeout timer
+fsApStaTimeoutTimer  OBJECT-TYPE
+    SYNTAX  INTEGER (1..2700)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "station idle timeout timer."
+    ::= { fsApCfgEntry 7 }
+
+-- The Statistics timeout timer
+fsApStatisticsTimer  OBJECT-TYPE
+    SYNTAX  INTEGER (1..65535)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "station idle timeout timer."
+    ::= { fsApCfgEntry 8 }
+
+-- The fallback value, 1-enable, 2-disable
+fsApFallback  OBJECT-TYPE
+    SYNTAX  INTEGER (1..2)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "The fallback value, 1--enable, 2--disable."
+    ::= { fsApCfgEntry 9 }
+
+-- The Image id
+fsApImageId  OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (1..128))
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "The Image version."
+    ::= { fsApCfgEntry 10 }
+
+-- The ip dhcp option value, 0-standard, 1-private
+fsApIpDhcp  OBJECT-TYPE
+    SYNTAX  INTEGER (0..1)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "The ip dhcp option value, 0--standard, 1--private."
+    ::= { fsApCfgEntry 11 }
+
+-- The ap location
+fsApLocation  OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(1..255))
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "Ap Location."
+    ::= { fsApCfgEntry 12}
+
+-- 0-disable, 1-enable
+fsApWpsMfp  OBJECT-TYPE
+    SYNTAX  INTEGER (0..1)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "0-disable, 1-enable."
+    ::= { fsApCfgEntry 13}
+
+fsApLastRebootReason  OBJECT-TYPE
+    SYNTAX  INTEGER {
+                notSupport(0),
+                acInit(1),
+                linkFail(2),
+                sWFail(3),
+                hWFail(4),
+                otherFail(5),
+                unknown(255)
+            }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The AP's last reboot reason."
+    ::= { fsApCfgEntry 14}
+
+fsApEthernetIfName OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(1..32))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+            "This object represents the name of the Ethernet interface."
+    ::= { fsApCfgEntry 15 }
+
+fsApEthernetIfMacAddress OBJECT-TYPE
+    SYNTAX     MacAddress
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "This object represents MAC address of the Ethernet interface
+             in the slot represented by fsApEthernetIfSlotId."
+    ::= { fsApCfgEntry 16 }
+
+fsApEthernetIfAdminStatus OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "This object represents the admin state of the physical
+             Ethernet interface on the AP."
+    ::= { fsApCfgEntry 17 }
+
+fsApEthernetIfOperStatus OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "This object represents the operational state of the physical
+             Ethernet interface on the AP."
+    ::= { fsApCfgEntry 18 }
+
+fsApEthernetIfRxUcastPkts OBJECT-TYPE
+    SYNTAX     Counter32
+    UNITS      "packets"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "This object represents total number of unicast packets 
+            received on the interface."
+    ::= { fsApCfgEntry 19 }
+
+fsApEthernetIfRxNUcastPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object represents total number of non-unicast or
+            mulitcast packets received on the interface"
+    ::= { fsApCfgEntry 20 }
+
+fsApEthernetIfTxUcastPkts OBJECT-TYPE
+    SYNTAX     Counter32
+    UNITS      "packets"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "This object represents total number of unicast packets 
+            transmitted on the interface."
+    ::= { fsApCfgEntry 21 }
+
+fsApEthernetIfTxNUcastPkts OBJECT-TYPE
+    SYNTAX     Counter32
+    UNITS      "packets"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "This object represents total number of non-unicast or
+            mulitcast packets transmitted on the interface"
+    ::= { fsApCfgEntry 22 }
+
+fsApEthernetIfDuplex OBJECT-TYPE
+    SYNTAX     INTEGER {
+        unknown(1),
+        halfduplex(2),
+        fullduplex(3),
+        auto(4)
+    }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "This object represents interface's duplex mode"
+    ::= { fsApCfgEntry 23 }
+
+fsApEthernetIfLinkSpeed OBJECT-TYPE
+    SYNTAX     INTEGER
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Speed of the interface in units of 1,000,000 bits per second"
+    ::= { fsApCfgEntry 24 }
+
+fsApEthernetIfPOEPower OBJECT-TYPE
+    SYNTAX     INTEGER {
+        none(1),
+        drawn(2),
+        notdrawn(3)
+    }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+      "This object represents whether this interface supports
+      Power Over Ethernet (POE)
+      none     - POE is not supported
+      drawn    - This interface supports POE, and power is
+                 being drawn
+      notdrawn - POE power is not drawn"
+    ::= { fsApCfgEntry 25 }
+
+
+fsApAdminStatus OBJECT-TYPE
+    SYNTAX     INTEGER {
+        enable(1),
+        disable(2)
+    }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+      "This object represents whether this interface supports
+      Power Over Ethernet (POE)
+      enable     - enable to admin
+      disable    - disable to admin"
+    ::= { fsApCfgEntry 26 }
+
+fsApEthernetIfRxBoardPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object represents total number of boardcast packets received on the interface"
+    ::= { fsApCfgEntry 27 }
+
+fsApEthernetIfRxMultiPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object represents total number of mulitcast packets received on the interface"
+    ::= { fsApCfgEntry 28 }
+
+fsApEthernetIfTxBoardPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object represents total number of boardcast packets transmitted on the interface"
+    ::= { fsApCfgEntry 29 }
+
+fsApEthernetIfTxMultiPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object represents total number of multicast packets transmitted on the interface"
+    ::= { fsApCfgEntry 30 }
+
+fsApEthernetIfDropPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object represents total number of packets dropped on the interface"
+    ::= { fsApCfgEntry 31 }
+
+fsApSn OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object represents SN string of the AP."
+    ::= { fsApCfgEntry 32 }
+
+fsApIp OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object represents ip address of the AP."
+    ::= { fsApCfgEntry 33 }
+
+fsApStaNum OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object represents Sta Num attach to the AP."
+    ::= { fsApCfgEntry 34 }
+
+fsApToFat OBJECT-TYPE
+    SYNTAX      INTEGER(0..1)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "This object represents the ap mode, 0 - fit, 1 - fat."
+    ::= { fsApCfgEntry 35 }
+    
+fsApId OBJECT-TYPE
+    SYNTAX      INTEGER(1..800)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The AP Id"
+    ::= { fsApCfgEntry 36 }
+    
+fsApSwVer OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object represents SN string of the AP."
+    ::= { fsApCfgEntry 37 }
+
+fsApBootVer OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object represents boot version string of the AP."
+    ::= { fsApCfgEntry 38 }
+    
+fsApPID OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object represents product id string of the AP."
+    ::= { fsApCfgEntry 39 }
+
+fsApHwVer OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object represents hardware string of the AP."
+    ::= { fsApCfgEntry 40 }
+
+fsApStaLimit OBJECT-TYPE
+    SYNTAX      INTEGER(1..30)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "This object represents client num limit of the AP."
+    ::= { fsApCfgEntry 41 }
+
+fsApFactoryDefault OBJECT-TYPE
+    SYNTAX      INTEGER {
+        normal(0),
+        reset(1)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "1 -- Set the ap to reboot with the factory default configuration."
+    ::= { fsApCfgEntry 42 }
+
+fsApCpuUsageTrapTimer OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "This object represents the AP's cpu usage info trap timer, 
+             second."
+    ::= { fsApCfgEntry 43 }
+    
+    
+fsApStatTrapTimer  OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "This object present the AP's radio statistic
+             trap timer, second."
+    ::= { fsApCfgEntry 44}
+    
+fsApLinkOnTimeInterval OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object represents the AP's Link on time interval, seconds."
+    ::= { fsApCfgEntry 45 }
+    
+fsApNetId OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "This object represents the AP's net unit code."
+    ::= { fsApCfgEntry 46 }
+    
+fsApUptime OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object represents the AP's capwap uptime."
+    ::= { fsApCfgEntry 47 }
+
+fsApState OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object represents the AP's state.
+                1 -- on line;
+                2 -- off line"
+    ::= { fsApCfgEntry 48 }
+
+fsApNasId  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The NAS ID about this AP."
+    ::= { fsApCfgEntry 49 }
+    
+fsApCoverArea OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "This object represents the AP's cover type.
+                1 -- Type A: School;
+                2 -- Type B: Airfield, Station;
+                3 -- Type C: Hospital, Hotel, Marketplace;
+                4 -- Type D: Group customers with specific WLAN requirements"
+    ::= { fsApCfgEntry 50 }
+
+fsApLinkOnTimeIntervalMs OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object represents the AP's Link on time interval, 0.01seconds."
+    ::= { fsApCfgEntry 51 }
+
+fsApUptimeMs OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object represents the AP's capwap uptime, 0.01seconds."
+    ::= { fsApCfgEntry 52 }
+
+fsApHbUptimeMs OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object represents the AP's capwap hotback uptime, 0.01seconds."
+    ::= { fsApCfgEntry 53 }
+
+fsApIpv6 OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object represents ipv6 address of the AP."
+    ::= { fsApCfgEntry 54 }
+
+fsApIpv6Prefix OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object represents ipv6 address prefix of the AP."
+    ::= { fsApCfgEntry 55 }
+
+fsApIpv6PrefixLen OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object represents ipv6 address prefix length of the AP."
+    ::= { fsApCfgEntry 56 }
+
+fsApIpv6Type OBJECT-TYPE
+    SYNTAX  INTEGER {
+        unknown(0),
+        unicase(1),
+        anycase(2),
+        multicase(3)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object represents ipv6 address type of the AP."
+    ::= { fsApCfgEntry 57 }
+
+fsApIpv6Gateway OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object represents ipv6 gateway address of the AP."
+    ::= { fsApCfgEntry 58 }
+
+fsApIpv6StaNum OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object represents ipv6 Sta Num attach to the AP."
+    ::= { fsApCfgEntry 59 }
+
+fsApMacAddrColon OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (17..17))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The AP's ethernet mac address separated by the colon character, format: XX:XX:XX:XX:XX:XX"
+    ::= { fsApCfgEntry 60 }
+
+fsApMacAddrLine OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (17..17))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The AP's ethernet mac address separated by the line character, format: XX-XX-XX-XX-XX-XX"
+    ::= { fsApCfgEntry 61 }
+
+fsApMacAddrDot OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (14..14))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The AP's ethernet mac address separated by the dot character, format: xxxx.xxxx.xxxx"
+    ::= { fsApCfgEntry 62 }
+	
+fsApEchoRequestCnt OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object represents echo request Num from the AP."
+    ::= { fsApCfgEntry 63 }
+ 
+fsApEchoResponseDropCnt OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object represents echo response drop Num from the AP."
+    ::= { fsApCfgEntry 64 }
+    
+fsApEchoDelayTimeMS OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object represents echo delay time from the AP."
+    ::= { fsApCfgEntry 65 }
+    
+fsApIsIsharePlus OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The AP is or not IsharePlus."
+    ::= { fsApCfgEntry 66 }
+    
+fsApTotalMicrolApNum OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The total microl Ap number."
+    ::= { fsApCfgEntry 67 }
+    
+fsApOnlineMicrolApNum OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The online microl Ap number."
+    ::= { fsApCfgEntry 68 }
+    
+fsApOfflineMicrolApNum OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The offline microl Ap number."
+    ::= { fsApCfgEntry 69 }
+    
+-- ***********************************
+-- ap configuration per radio
+-- ***********************************
+fsApCfgRadioTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF FSApCfgRadioEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "Set the ap attribute per radio."
+    ::= { fsAcMgmtAp 2 }
+
+fsApCfgRadioEntry OBJECT-TYPE
+    SYNTAX  FSApCfgRadioEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The entry of image id table."
+    INDEX   { fsApMacAddr, fsApCfgRadioId }
+    ::= { fsApCfgRadioTable 1 }
+
+FSApCfgRadioEntry ::=
+    SEQUENCE {
+        fsApCfgRadioId      INTEGER,
+        fsApRadioEn         INTEGER,
+        fsApTxPower         INTEGER,
+        fsApDtimPeriod      INTEGER,
+        fsApBeaconPeriod    INTEGER,
+        fsApCountry         DisplayString,
+        fsApPreaShort       INTEGER,
+        fsApRadioBssid      MacAddress,
+        fsApTxPowerLevel    INTEGER,
+        fsApTxPowerGlobal   INTEGER,
+        fsApCurChan         INTEGER,
+        fsApRfGlobal        INTEGER,
+        fsApRadioType       INTEGER,
+        fsApRadio11bSup     INTEGER,
+        fsApMaxTxPower      INTEGER,
+        fsApMinTxPower      INTEGER,
+        fsApCurTxPower      INTEGER,
+        fsApMaxTxPowerPer   INTEGER,
+        fsApMinTxPowerPer   INTEGER
+    }
+
+-- The radio id
+fsApCfgRadioId  OBJECT-TYPE
+    SYNTAX  INTEGER (1..31)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The radio id, 1~31."
+    ::= { fsApCfgRadioEntry 1 }
+
+-- 0-disable, 1-enable
+fsApRadioEn  OBJECT-TYPE
+    SYNTAX  INTEGER (0..1)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "0--disable, 1--enable."
+    ::= { fsApCfgRadioEntry 2 }
+
+-- The AP Tx Power
+fsApTxPower  OBJECT-TYPE
+    SYNTAX  INTEGER (1..100)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "Tx power, 1%."
+    ::= { fsApCfgRadioEntry 3}
+    
+-- The AP beacon dtim period
+fsApDtimPeriod  OBJECT-TYPE
+    SYNTAX  INTEGER (1..255)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "beacon dtim period, second."
+    ::= { fsApCfgRadioEntry 4}
+
+-- The beacon period
+fsApBeaconPeriod  OBJECT-TYPE
+    SYNTAX  INTEGER (20..1000)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "beacon period, millisecond."
+    ::= { fsApCfgRadioEntry 5}
+
+-- The ap country code
+fsApCountry  OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..255))
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "Ap country code."
+    ::= { fsApCfgRadioEntry 6}
+
+-- 0-not support short preamble,1-support short preamble
+fsApPreaShort  OBJECT-TYPE
+    SYNTAX  INTEGER (0..1)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "Short preamble support."
+    ::= { fsApCfgRadioEntry 7}
+
+fsApRadioBssid  OBJECT-TYPE
+    SYNTAX  MacAddress
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The AP's radio mac address(BSSID)."
+    ::= { fsApCfgRadioEntry 8}
+
+fsApTxPowerLevel  OBJECT-TYPE
+    SYNTAX  INTEGER (1..600)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The ap's tx power level in the radio."
+    ::= { fsApCfgRadioEntry 9}
+
+fsApTxPowerGlobal  OBJECT-TYPE
+    SYNTAX  INTEGER (0..1)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "The ap's tx power config as the Global or not.
+             0--customer, 1-global."
+    ::= { fsApCfgRadioEntry 10}
+    
+fsApCurChan  OBJECT-TYPE
+    SYNTAX  INTEGER (1..165)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "The ap's current channel in the radio."
+    ::= { fsApCfgRadioEntry 11}
+    
+fsApRfGlobal  OBJECT-TYPE
+    SYNTAX  INTEGER (0..1)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "The ap's channel config as the Global or not.
+             0--customer, 1-global."
+    ::= { fsApCfgRadioEntry 12}
+
+fsApRadioType  OBJECT-TYPE
+    SYNTAX  INTEGER (1..2)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "1--802.11b
+             2--802.11a"
+    ::= { fsApCfgRadioEntry 13}
+    
+fsApRadio11bSup  OBJECT-TYPE
+    SYNTAX  INTEGER (1..2)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "1--support 802.11b
+             2--not support 802.11b"
+    ::= { fsApCfgRadioEntry 14}
+    
+-- The AP Max Tx Power
+fsApMaxTxPower  OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "Max tx power, mw."
+    ::= { fsApCfgRadioEntry 15}
+    
+-- The AP Min Tx Power
+fsApMinTxPower  OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "Min tx power, mw."
+    ::= { fsApCfgRadioEntry 16}
+    
+-- The AP Current Tx Power
+fsApCurTxPower  OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "Current tx power, mw."
+    ::= { fsApCfgRadioEntry 17}
+    
+-- The AP Max Tx Power Percent
+fsApMaxTxPowerPer  OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "Max tx power percent, %."
+    ::= { fsApCfgRadioEntry 18}
+    
+-- The AP Min Tx Power Percent
+fsApMinTxPowerPer  OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "Min tx power percent, %."
+    ::= { fsApCfgRadioEntry 19}
+    
+fsApRadioRateCfgTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF FSApRadioRateCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "The rate set of the ap's radio."
+    ::= { fsAcMgmtAp 3 }
+
+fsApRadioRateCfgEntry OBJECT-TYPE
+    SYNTAX  FSApRadioRateCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The attribute of the ap radio rate type."
+    INDEX   { fsApMacAddr, fsApCfgRadioId, fsApRadioRate }
+    ::= { fsApRadioRateCfgTable 1 }
+
+FSApRadioRateCfgEntry ::=
+        SEQUENCE {
+            fsApRadioRate             INTEGER,
+            fsApRadioRateType         INTEGER
+        }
+        
+fsApRadioRate  OBJECT-TYPE
+    SYNTAX  INTEGER (1..8)
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "The ap's rate set in the radio.
+            802.11a-6, 9, 12, 18, 24, 36, 48, and 54 Mbps.
+            set 1 for 6Mbps, set 2 for 9Mbps, set 3 for 12Mbps,etc...
+            802.11b-1, 2, 5.5, 11Mbps.
+            set 1 for 1Mbps, set 2 for 2Mbps, set 3 for 5.5Mbps,etc..."
+    ::= { fsApRadioRateCfgEntry 1}
+    
+fsApRadioRateType  OBJECT-TYPE
+    SYNTAX  INTEGER (1..3)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "The rate type:
+            1--disable
+            2--mandatory
+            3--support"
+    ::= { fsApRadioRateCfgEntry 2}
+    
+    
+-- static ip config
+fsApStaticIpCfgTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF FSApStaticIpCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "The rate set of the ap's radio."
+    ::= { fsAcMgmtAp 4 }
+
+fsApStaticIpCfgEntry OBJECT-TYPE
+    SYNTAX  FSApStaticIpCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Config the static ip address of the ap."
+    INDEX   { fsApMacAddr }
+    ::= { fsApStaticIpCfgTable 1 }
+
+FSApStaticIpCfgEntry ::=
+        SEQUENCE {
+            fsApIpAddr             IpAddress,
+            fsApIpMask             IpAddress,
+            fsApIpGetway           IpAddress,
+            fsApStaticIpRS         RowStatus
+        }
+        
+fsApIpAddr  OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "The AP's Static Ip Address"
+    ::= { fsApStaticIpCfgEntry 1}
+    
+fsApIpMask  OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "The AP's Static Ip Address Mask"
+    ::= { fsApStaticIpCfgEntry 2}
+    
+fsApIpGetway  OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "The AP's Static Ip Address Getway"
+    ::= { fsApStaticIpCfgEntry 3}
+    
+fsApStaticIpRS  OBJECT-TYPE
+    SYNTAX  RowStatus
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "The AP's Static Ip Address Row status"
+    ::= { fsApStaticIpCfgEntry 4}
+
+
+fsApOfflineTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF FSApOfflineEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "The Ap offline time attributes."
+    ::= { fsAcMgmtAp 5 }
+
+fsApOfflineEntry OBJECT-TYPE
+    SYNTAX  FSApOfflineEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Get and set the Ap attribtues."
+    INDEX   { fsApOffMacAddr }
+    ::= { fsApOfflineTable 1 }
+
+FSApOfflineEntry ::=
+    SEQUENCE {
+        fsApOfftime                    INTEGER,
+        fsApOffApName                  DisplayString,
+        fsApOffMacAddr                 MacAddress,
+        fsApOffIp                      IpAddress,
+        fsApOffMacAddrColon            DisplayString,
+        fsApOffMacAddrLine             DisplayString,
+        fsApOffMacAddrDot              DisplayString
+    }
+
+fsApOfftime  OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The AP's ethernet mac address."
+    ::= { fsApOfflineEntry 1}
+
+-- The AP Name
+fsApOffApName  OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (1..32))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "Offline Ap's Name."
+    ::= { fsApOfflineEntry 2}
+
+fsApOffMacAddr  OBJECT-TYPE
+    SYNTAX  MacAddress
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The offline AP's ethernet mac address."
+    ::= { fsApOfflineEntry 3}
+
+fsApOffIp OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The IP address for the last use of the offline AP."
+    ::= { fsApOfflineEntry 4 }
+
+fsApOffMacAddrColon OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (17..17))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The offline AP's ethernet mac address separated by the colon character, format: XX:XX:XX:XX:XX:XX"
+    ::= { fsApOfflineEntry 5 }
+
+fsApOffMacAddrLine OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (17..17))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The offline AP's ethernet mac address separated by the line character, format: XX-XX-XX-XX-XX-XX"
+    ::= { fsApOfflineEntry 6 }
+
+fsApOffMacAddrDot OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (14..14))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The offline AP's ethernet mac address separated by the dot character, format: xxxx.xxxx.xxxx"
+    ::= { fsApOfflineEntry 7 }
+
+--********************************************************************
+--    fsApBackupState                                           **
+--********************************************************************
+fsApBackupStateTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF FSApBackupStateEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "The Ap backup state."
+    ::= { fsAcMgmtAp 6 }
+
+fsApBackupStateEntry OBJECT-TYPE
+    SYNTAX  FSApBackupStateEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Get the Ap backup state."
+    INDEX   { fsApMacAddr }
+    ::= { fsApBackupStateTable 1 }
+
+FSApBackupStateEntry ::=
+    SEQUENCE {
+        fsApBackupState             INTEGER
+    }
+
+fsApBackupState  OBJECT-TYPE
+    SYNTAX  INTEGER {
+                    unknown(0),
+                    master(1),
+                    slave(2)
+                }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The AP's backup state."
+    ::= { fsApBackupStateEntry 1 }
+
+--********************************************************************
+--    fsApMicroAp                                               **
+--********************************************************************
+fsApMicroApTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF FSApMicroApEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "The Micro AP configure."
+    ::= { fsAcMgmtAp 7 }
+
+fsApMicroApEntry OBJECT-TYPE
+    SYNTAX  FSApMicroApEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Config Micro AP."
+    INDEX   { fsApMacAddr, fsApMicroApSlot }
+    ::= { fsApMicroApTable 1 }
+
+FSApMicroApEntry ::=
+    SEQUENCE {
+        fsApMicroApSlot             INTEGER,
+		fsApMicroApName				DisplayString,
+		fsApMicroApReset            INTEGER,
+		fsApMicroApUninstall		INTEGER,
+		fsApMicroApMac            	MacAddress,
+		fsApMicroApBoard			DisplayString,
+		fsApMicroApState			INTEGER,
+		fsApMicroApRole             DisplayString,
+		fsApMicroApMasterSlot       INTEGER
+    }
+
+fsApMicroApSlot  OBJECT-TYPE
+    SYNTAX  INTEGER (1..48)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The Micro Ap's Slot Id."
+    ::= { fsApMicroApEntry 1 }
+
+fsApMicroApName  OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (1..32))
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "Micro Ap's Name."
+    ::= { fsApMicroApEntry 2}
+
+fsApMicroApReset  OBJECT-TYPE
+    SYNTAX  INTEGER (0..1)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "Reset Micro AP:
+            1--Reset"
+    ::= { fsApMicroApEntry 3}
+
+fsApMicroApUninstall  OBJECT-TYPE
+    SYNTAX  INTEGER (0..1)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "Uninstall Micro AP:
+            1--Uninstall"
+    ::= { fsApMicroApEntry 4}
+
+fsApMicroApMac  OBJECT-TYPE
+    SYNTAX  MacAddress
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "Micro AP Mac address"
+    ::= { fsApMicroApEntry 5}
+
+fsApMicroApBoard  OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (1..32))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "Micro AP Board ID"
+    ::= { fsApMicroApEntry 6}
+
+fsApMicroApState  OBJECT-TYPE
+    SYNTAX  INTEGER (0..2)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "Micro AP State:
+            0--Not Exist
+			1--Offline
+			2--Online"
+    ::= { fsApMicroApEntry 7}
+	
+fsApMicroApRole  OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (1..64))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "Micro AP Role"
+    ::= { fsApMicroApEntry 8}
+	
+fsApMicroApMasterSlot  OBJECT-TYPE
+    SYNTAX  INTEGER (1..24)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The Micro Ap's Intf Id."
+    ::= { fsApMicroApEntry 9 }
+
+--********************************************************************
+--    fsApGeneralCfgTable                                       **
+--********************************************************************
+
+fsApGeneralCfgTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF FSApGeneralCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "The general Ap attribtues, include online and offline Aps."
+    ::= { fsAcMgmtAp 8 }
+
+fsApGeneralCfgEntry OBJECT-TYPE
+    SYNTAX  FSApGeneralCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Get and set the general Ap attribtues."
+    INDEX   { fsApGeneralMacAddr }
+    ::= { fsApGeneralCfgTable 1 }
+
+FSApGeneralCfgEntry ::=
+    SEQUENCE {
+        fsApGeneralMacAddr             MacAddress,
+        fsApGeneralApName              DisplayString,
+        fsApGeneralState               INTEGER,
+        fsApGeneralTime                DisplayString,
+        fsApGeneralTimeMs              TimeTicks,
+        fsApGeneralIp                  IpAddress,
+        fsApGeneralMacAddrColon        DisplayString,
+        fsApGeneralMacAddrLine         DisplayString,
+        fsApGeneralMacAddrDot          DisplayString,
+		fsApGeneralLocation            DisplayString,
+		fsApGeneralCPUCurrentUsage     INTEGER,
+		fsApGeneralCPUAverageUsage     INTEGER,
+		fsApGeneralMemoryCurrentUsage  INTEGER,
+		fsApGeneralMemoryAverageUsage  INTEGER,
+		fsApGeneralApStaNum            Counter32, 
+		fsApGeneralApUpRate            Counter64,
+		fsApGeneralApDownRate          Counter64,
+		fsApGeneralAp24GChannel        Counter32,
+		fsApGeneralAp5GChannel         Counter32,
+		fsApGeneralStatus              RowStatus
+    } 
+
+fsApGeneralMacAddr  OBJECT-TYPE
+    SYNTAX  MacAddress
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The AP's ethernet mac address."
+    ::= { fsApGeneralCfgEntry 1}
+
+-- The AP Name
+fsApGeneralApName  OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (1..64))
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "The Ap's Name."
+    ::= { fsApGeneralCfgEntry 2}
+
+fsApGeneralState  OBJECT-TYPE
+    SYNTAX  INTEGER {
+        online(1),
+        offline(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+			"The AP's state.
+			1 -- online;
+			2 -- offline"
+    ::= { fsApGeneralCfgEntry 3}
+
+fsApGeneralTime OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The AP's capwap change time or add time, format: d:hh:mm:ss"
+    ::= { fsApGeneralCfgEntry 4 }
+
+fsApGeneralTimeMs OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The AP's capwap change time or add time, 0.01seconds."
+    ::= { fsApGeneralCfgEntry 5 }
+
+fsApGeneralIp OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The AP's ip address."
+    ::= { fsApGeneralCfgEntry 6 }
+
+fsApGeneralMacAddrColon OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (17..17))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The AP's ethernet mac address separated by the colon character, format: XX:XX:XX:XX:XX:XX"
+    ::= { fsApGeneralCfgEntry 7 }
+
+fsApGeneralMacAddrLine OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (17..17))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The AP's ethernet mac address separated by the line character, format: XX-XX-XX-XX-XX-XX"
+    ::= { fsApGeneralCfgEntry 8 }
+
+fsApGeneralMacAddrDot OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (14..14))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The AP's ethernet mac address separated by the dot character, format: xxxx.xxxx.xxxx"
+    ::= { fsApGeneralCfgEntry 9 }
+	
+fsApGeneralApLocation OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..256))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The AP's location"
+    ::= { fsApGeneralCfgEntry 10 }	
+	
+fsApGeneralCPUCurrentUsage  OBJECT-TYPE
+    SYNTAX  INTEGER 
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+			"The CPU current usage"
+    ::= { fsApGeneralCfgEntry 11}
+
+fsApGeneralCPUAverageUsage  OBJECT-TYPE
+    SYNTAX  INTEGER 
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+			"The CPU average usage"
+    ::= { fsApGeneralCfgEntry 12}	
+
+fsApGeneralMemoryCurrentUsage  OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+			"The CPU current usage"
+    ::= { fsApGeneralCfgEntry 13}	
+
+fsApGeneralMemoryAverageUsage  OBJECT-TYPE
+    SYNTAX  INTEGER 
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+			"The CPU average usage"
+    ::= { fsApGeneralCfgEntry 14}
+	
+fsApGeneralApStaNum  OBJECT-TYPE
+    SYNTAX  Counter32 
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+			"The Ap sta num"
+    ::= { fsApGeneralCfgEntry 15}
+
+fsApGeneralApUpRate  OBJECT-TYPE
+    SYNTAX  Counter64 
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+			"The Ap up rate"
+    ::= { fsApGeneralCfgEntry 16}
+
+fsApGeneralApDownRate  OBJECT-TYPE
+    SYNTAX  Counter64 
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+			"The Ap down rate"
+    ::= { fsApGeneralCfgEntry 17}
+	
+fsApGeneralAp24GChannel  OBJECT-TYPE
+    SYNTAX  Counter32 
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+			"The Ap 2.4g channel"
+    ::= { fsApGeneralCfgEntry 18}
+
+fsApGeneralAp5GChannel  OBJECT-TYPE
+    SYNTAX  Counter32 
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+			"The Ap 5g channel"
+    ::= { fsApGeneralCfgEntry 19}
+	
+fsApGeneralStatus  OBJECT-TYPE
+    SYNTAX  RowStatus 
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+			"The Ap Item Status"
+    ::= { fsApGeneralCfgEntry 20}
+	
+--********************************************************************
+--    fsApOnlineJsonTable                                       **
+--********************************************************************
+
+fsApOnlineJsonTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF FSApOnlineJsonEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "The online AP attributes."
+    ::= { fsAcMgmtAp 9 }
+
+fsApOnlineJsonEntry OBJECT-TYPE
+    SYNTAX  FSApOnlineJsonEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Get the online AP attribtues."
+    INDEX   { fsApOnlineJsonMacAddr}
+    ::= { fsApOnlineJsonTable 1 }
+
+FSApOnlineJsonEntry ::=
+    SEQUENCE {
+        fsApOnlineJsonMacAddr            MacAddress,
+        fsApOnlineJsonContent            OCTET STRING
+     }
+         
+fsApOnlineJsonMacAddr  OBJECT-TYPE
+    SYNTAX  MacAddress
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The AP's mac address."
+    ::= { fsApOnlineJsonEntry 1}
+    
+fsApOnlineJsonContent OBJECT-TYPE
+	SYNTAX  OCTET STRING (SIZE (1..1023))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "This object represents the ap content with json format."
+    ::= { fsApOnlineJsonEntry 2}
+
+--********************************************************************
+--    fsApMicroApJsonTable                                      **
+--********************************************************************
+
+fsApMicroApJsonTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF FSApMicroApJsonEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "The Micro AP attributes."
+    ::= { fsAcMgmtAp 10 }
+
+fsApMicroApJsonEntry OBJECT-TYPE
+    SYNTAX  FSApMicroApJsonEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Get the Micro AP attributes."
+	INDEX   { fsApMicroApJsonMacAddr, fsApMicroApJsonSlot }
+    ::= { fsApMicroApJsonTable 1 }
+
+FSApMicroApJsonEntry ::=
+    SEQUENCE {
+        fsApMicroApJsonMacAddr            MacAddress,
+        fsApMicroApJsonSlot               INTEGER,
+        fsApMicroApJsonContent            OCTET STRING
+     }
+         
+fsApMicroApJsonMacAddr  OBJECT-TYPE
+    SYNTAX  MacAddress
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The AP's mac address."
+    ::= { fsApMicroApJsonEntry 1}
+    
+fsApMicroApJsonSlot  OBJECT-TYPE
+    SYNTAX  INTEGER (1..48)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The Micro Ap's Slot Id."
+    ::= { fsApMicroApJsonEntry 2}
+
+fsApMicroApJsonContent OBJECT-TYPE
+	SYNTAX  OCTET STRING (SIZE (1..1023))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "This object represents the ap content with json format."
+    ::= { fsApMicroApJsonEntry 3}
+
+--********************************************************************
+--    fsApRadioWlanJsonTable                                    **
+--********************************************************************
+
+fsApRadioWlanJsonTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF FSApRadioWlanJsonEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "The AP WLAN attributes."
+    ::= { fsAcMgmtAp 11 }
+
+fsApRadioWlanJsonEntry OBJECT-TYPE
+    SYNTAX  FSApRadioWlanJsonEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Get the AP WLAN attributes."
+	INDEX   { fsApRadioWlanJsonMacAddr, fsApRadioWlanJsonRadioId, fsApRadioWlanJsonWlanId }
+    ::= { fsApRadioWlanJsonTable 1 }
+
+FSApRadioWlanJsonEntry ::=
+    SEQUENCE {
+        fsApRadioWlanJsonMacAddr            MacAddress,
+        fsApRadioWlanJsonRadioId            INTEGER,
+		fsApRadioWlanJsonWlanId             INTEGER,
+        fsApRadioWlanJsonContent            OCTET STRING
+     }
+         
+fsApRadioWlanJsonMacAddr  OBJECT-TYPE
+    SYNTAX  MacAddress
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The AP's mac address."
+    ::= { fsApRadioWlanJsonEntry 1}
+    
+fsApRadioWlanJsonRadioId  OBJECT-TYPE
+    SYNTAX  INTEGER (1..48)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The Ap's Radio Id."
+    ::= { fsApRadioWlanJsonEntry 2}
+
+fsApRadioWlanJsonWlanId  OBJECT-TYPE
+    SYNTAX  INTEGER (1..4094)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The Ap's Wlan Id."
+    ::= { fsApRadioWlanJsonEntry 3}
+
+fsApRadioWlanJsonContent OBJECT-TYPE
+	SYNTAX  OCTET STRING (SIZE (1..1023))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "This object represents the ap wlan content with json format."
+    ::= { fsApRadioWlanJsonEntry 4}
+
+--********************************************************************
+--    fsApDMJsonTable                                           **
+--********************************************************************
+
+fsApDMJsonTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF FSApDMJsonEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "The AP device management attributes."
+    ::= { fsAcMgmtAp 12 }
+
+fsApDMJsonEntry OBJECT-TYPE
+    SYNTAX  FSApDMJsonEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Get the AP device management attributes."
+	INDEX   { fsApDMJsonMacAddr }
+    ::= { fsApDMJsonTable 1 }
+
+FSApDMJsonEntry ::=
+    SEQUENCE {
+        fsApDMJsonMacAddr            MacAddress,
+        fsApDMJsonContent            OCTET STRING
+     }
+         
+fsApDMJsonMacAddr  OBJECT-TYPE
+    SYNTAX  MacAddress
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The AP's mac address."
+    ::= { fsApDMJsonEntry 1}
+
+fsApDMJsonContent OBJECT-TYPE
+	SYNTAX  OCTET STRING (SIZE (1..1023))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "This object represents the ap device management content with json format."
+    ::= { fsApDMJsonEntry 2}
+
+--********************************************************************
+--    fsApDeviceGpsTable                                        **
+--********************************************************************
+fsApDeviceGpsTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF FSApDeviceGpsEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "The Ap device GPS attribtues."
+    ::= { fsAcMgmtAp 13 }
+
+fsApDeviceGpsEntry OBJECT-TYPE
+    SYNTAX  FSApDeviceGpsEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Get the Ap device GPS attribtues"
+    INDEX   { fsApGpsMacAddr }
+    ::= { fsApDeviceGpsTable 1 }
+
+FSApDeviceGpsEntry ::=
+    SEQUENCE {
+        fsApGpsMacAddr           MacAddress,
+        fsApGpsLongitude         DisplayString,
+        fsApGpsLatitude          DisplayString
+    }
+
+fsApGpsMacAddr  OBJECT-TYPE
+    SYNTAX  MacAddress
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The AP's ethernet mac address."
+    ::= { fsApDeviceGpsEntry 1}
+
+fsApGpsLongitude  OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (1..64))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The Ap's Gps longitude."
+    ::= { fsApDeviceGpsEntry 2}
+
+fsApGpsLatitude  OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (1..64))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The Ap's Gps latitude."
+    ::= { fsApDeviceGpsEntry 3}
+
+--********************************************************************
+--    fsApWiredTable                                           **
+--********************************************************************
+
+fsApWiredTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF fsApWiredEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "Get/Set the AP wired vlan."
+    ::= { fsAcMgmtAp 14 }
+
+fsApWiredEntry OBJECT-TYPE
+    SYNTAX  fsApWiredEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Get/Set the AP wired vlan."
+	INDEX   { fsApWiredMacAddr, fsApWiredPort}
+    ::= { fsApWiredTable 1 }
+
+fsApWiredEntry ::=
+    SEQUENCE {
+        fsApWiredMacAddr         MacAddress,
+		fsApWiredPort            INTEGER,
+        fsApWiredVlanId          INTEGER
+     }
+         
+fsApWiredMacAddr  OBJECT-TYPE
+    SYNTAX  MacAddress
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The AP's mac address."
+    ::= { fsApWiredEntry 1}
+
+fsApWiredPort  OBJECT-TYPE
+	SYNTAX  INTEGER
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+			"The AP's wired port."
+	::= { fsApWiredEntry 2}
+	
+fsApWiredVlanId OBJECT-TYPE
+	SYNTAX  INTEGER (SIZE (0..4094))
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "The AP's wired vlan."
+    ::= { fsApWiredEntry 3}
+	
+--********************************************************************
+--                                                                  **
+--                  AP Group nodes                                  **
+--                                                                  **
+--********************************************************************
+fsApgCfgTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF FSApgCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "The attribute of the ap group."
+    ::= { fsAcMgmtApg 1 }
+
+fsApgCfgEntry OBJECT-TYPE
+    SYNTAX  FSApgCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The attribute of the ap group."
+    INDEX   { fsApgApgName }
+    ::= { fsApgCfgTable 1 }
+
+FSApgCfgEntry ::=
+        SEQUENCE {
+            fsApgApgName             DisplayString,
+            fsApgDiscTimer           INTEGER,
+            fsApgEchoReqTimer        INTEGER,
+            fsApgEroReportTimer      INTEGER,
+            fsApgStaTimeoutTimer     INTEGER,
+            fsApgStatisticsTimer     INTEGER,
+            fsApgFallback            INTEGER,
+            fsApgImageId             DisplayString,
+            fsApgCreatEn             INTEGER
+        }
+
+-- The AP Group Name
+fsApgApgName  OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (1..64))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "Ap group's Name."
+    ::= { fsApgCfgEntry 1}
+
+-- The Discovery timer
+fsApgDiscTimer  OBJECT-TYPE
+    SYNTAX  INTEGER (2..180)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "Discovery timer."
+    ::= { fsApgCfgEntry 2 }
+    
+-- The Echo Request timer
+fsApgEchoReqTimer  OBJECT-TYPE
+    SYNTAX  INTEGER (5..255)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "Echo Request timer."
+    ::= { fsApgCfgEntry 3 }
+
+
+-- The Error Report timer
+fsApgEroReportTimer  OBJECT-TYPE
+    SYNTAX  INTEGER (1..1080)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "Error Report timer."
+    ::= { fsApgCfgEntry 4 }
+
+-- The Sta timeout timer
+fsApgStaTimeoutTimer  OBJECT-TYPE
+    SYNTAX  INTEGER (60..86400)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "station idle timeout timer."
+    ::= { fsApgCfgEntry 5 }
+
+-- The Statistics timeout timer
+fsApgStatisticsTimer  OBJECT-TYPE
+    SYNTAX  INTEGER (1..65535)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "station idle timeout timer."
+    ::= { fsApgCfgEntry 6 }
+
+-- The fallback value, 1-enable, 2-disable
+fsApgFallback  OBJECT-TYPE
+    SYNTAX  INTEGER (1..2)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "The fallback value, 1--enable, 2--disable."
+    ::= { fsApgCfgEntry 7 }
+
+-- The Image id, should be 8 bytes
+fsApgImageId  OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (1..128))
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "The Ap image version string."
+    ::= { fsApgCfgEntry 8 }
+
+
+-- 0-del, 1-creat
+fsApgCreatEn  OBJECT-TYPE
+    SYNTAX  INTEGER (0..1)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "0-del, 1-creat."
+    ::= { fsApgCfgEntry 9 }
+    
+-- ***************************************
+-- ap group attribute per radio
+-- ***************************************
+fsApgCfgRadioTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF FSApgCfgRadioEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "The ap group attribute per radio."
+    ::= { fsAcMgmtApg 2 }
+
+fsApgCfgRadioEntry OBJECT-TYPE
+    SYNTAX  FSApgCfgRadioEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The ap group attribute per radio."
+    INDEX   { fsApgApgName, fsApgEnableRadioId}
+    ::= { fsApgCfgRadioTable 1 }
+
+FSApgCfgRadioEntry ::=
+    SEQUENCE {
+        fsApgEnableRadioId    INTEGER,
+        fsApgEnableRadioEn    INTEGER
+    }
+
+-- The radio id
+fsApgEnableRadioId  OBJECT-TYPE
+    SYNTAX  INTEGER (1..31)
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "The radio id, 1~31."
+    ::= { fsApgCfgRadioEntry 1 }
+
+-- 0-disable, 1-enable
+fsApgEnableRadioEn  OBJECT-TYPE
+    SYNTAX  INTEGER (0..1)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "0--disable, 1--enable."
+    ::= { fsApgCfgRadioEntry 2 }
+
+-- ************************************
+-- wlan-cvi mapping configure
+-- ************************************
+fsApgIntfMapTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF FSApgIntfMapEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "Set the wlan-interface map table type."
+    ::= { fsAcMgmtApg 3 }
+
+fsApgIntfMapEntry OBJECT-TYPE
+    SYNTAX  FSApgIntfMapEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "The entry of the wlan-interface map table."
+    INDEX   { fsApgApgName, fsApgWlanIndex }
+    ::= { fsApgIntfMapTable 1 }
+
+FSApgIntfMapEntry ::=
+    SEQUENCE {
+        fsApgWlanIndex        INTEGER,
+        fsApgWlanId           INTEGER,
+        fsApgVlanId           INTEGER,
+        fsApgRadioId          INTEGER,
+        fsApgWlanIntfMapRS    RowStatus
+    }
+
+-- The wlan-intf map index
+fsApgWlanIndex  OBJECT-TYPE
+    SYNTAX  INTEGER (1..64)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "Wlan Id."
+    ::= { fsApgIntfMapEntry 1 }
+    
+-- The Wlan Id
+fsApgWlanId  OBJECT-TYPE
+    SYNTAX  INTEGER (1..4094)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "Wlan Id."
+    ::= { fsApgIntfMapEntry 2 }
+    
+-- The Intf Id
+fsApgVlanId OBJECT-TYPE
+    SYNTAX  INTEGER (1..4094)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "Vlan Id."
+    ::= { fsApgIntfMapEntry 3 }
+
+-- The Radio Id
+fsApgRadioId  OBJECT-TYPE
+    SYNTAX  INTEGER (1..16)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "Radio Id."
+    ::= { fsApgIntfMapEntry 4 }
+
+fsApgWlanIntfMapRS OBJECT-TYPE
+    SYNTAX     RowStatus 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "Used to add or del a wlan-intf map in the ap group."
+    ::= { fsApgIntfMapEntry 5 }
+
+
+--********************************************************************
+--                                                                  **
+--                  WLAN nodes                                      **
+--                                                                  **
+--********************************************************************
+fsWlanCfgTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF FSWlanCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "The wlan attribute."
+    ::= { fsAcMgmtWlan 1 }
+
+fsWlanCfgEntry OBJECT-TYPE
+    SYNTAX  FSWlanCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The wlan attribute."
+    INDEX   { fsWlanId}
+    ::= { fsWlanCfgTable 1 }
+
+FSWlanCfgEntry ::=
+    SEQUENCE {
+        fsWlanId                INTEGER,
+        fsWlanShort             INTEGER,
+        fsWlanSpctMgmt          INTEGER,
+        fsWlanEnQos             INTEGER,
+        fsWlanShortSlotTime     INTEGER,
+        fsWlanEnableApsd        INTEGER,
+        fsWlanAckType           INTEGER,
+        fsWlanTunnelType        INTEGER,
+        fsWlanBroadSsid         INTEGER,
+        fsWlanRts               INTEGER,
+        fsWlanShortTry          INTEGER,
+        fsWlanLongTry           INTEGER,
+        fsWlanStaNum            INTEGER,
+        fsWlanNasId             DisplayString
+    }
+
+-- The Wlan id
+fsWlanId  OBJECT-TYPE
+    SYNTAX  INTEGER (1..512)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "Wlan Id."
+    ::= { fsWlanCfgEntry 1}
+
+-- The short preamble value, 0-disable, 1-enable
+fsWlanShort  OBJECT-TYPE
+    SYNTAX  INTEGER (0..2)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "Short Preamble."
+    ::= { fsWlanCfgEntry 2 }
+
+
+-- The Spectrum_Management value, 0-disable, 1-enable
+fsWlanSpctMgmt  OBJECT-TYPE
+    SYNTAX  INTEGER (0..1)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "Spectrum_Management."
+    ::= { fsWlanCfgEntry 3 }
+
+
+-- The Spectrum_Management value, 0-disable, 1-enable
+fsWlanEnQos  OBJECT-TYPE
+    SYNTAX  INTEGER (0..1)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "enbale qos value."
+    ::= { fsWlanCfgEntry 4 }
+
+-- The Spectrum_Management value, 0-disable, 1-enable
+fsWlanShortSlotTime  OBJECT-TYPE
+    SYNTAX  INTEGER (0..1)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "short slot time value."
+    ::= { fsWlanCfgEntry 5 }
+
+-- The IEEE 802.11 Add WLAN.APSD value, 0-disable, 1-enable
+fsWlanEnableApsd  OBJECT-TYPE
+    SYNTAX  INTEGER (0..1)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "IEEE 802.11 Add WLAN.APSD value."
+    ::= { fsWlanCfgEntry 6 }
+
+-- 0-delayed, 1-immediate
+fsWlanAckType  OBJECT-TYPE
+    SYNTAX  INTEGER (0..1)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "Ack delayed or immediate value."
+    ::= { fsWlanCfgEntry 7 }
+
+-- 0-local, 1-80211, 2-8023
+fsWlanTunnelType  OBJECT-TYPE
+    SYNTAX  INTEGER (0..2)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "Tunnel type value."
+    ::= { fsWlanCfgEntry 8 }
+
+-- 0-disable, 1-enable
+fsWlanBroadSsid  OBJECT-TYPE
+    SYNTAX  INTEGER (0..1)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "Broad Ssid value, 0--disable, 1--enable."
+    ::= { fsWlanCfgEntry 9 }
+    
+-- rts threshold
+fsWlanRts  OBJECT-TYPE
+    SYNTAX  INTEGER (0..255)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "rts threshold."
+    ::= { fsWlanCfgEntry 10 }
+
+-- Short retries
+fsWlanShortTry  OBJECT-TYPE
+    SYNTAX  INTEGER (0..255)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "Short retries."
+    ::= { fsWlanCfgEntry 11 }
+
+-- Long retries
+fsWlanLongTry  OBJECT-TYPE
+    SYNTAX  INTEGER (0..255)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "Long retries."
+    ::= { fsWlanCfgEntry 12 }
+    
+-- WLAN sta number
+fsWlanStaNum  OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The wireless stationes attach to this wlan."
+    ::= { fsWlanCfgEntry 13 }
+    
+-- WLAN nas id
+fsWlanNasId  OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "The NAS ID about this wlan."
+    ::= { fsWlanCfgEntry 14 }
+    
+-- *******************************
+-- wlan creat table
+-- *******************************
+fsWlanWlanCreatTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF FSWlanWlanCreatEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "Wlan creat table."
+    ::= { fsAcMgmtWlan 2 }
+
+fsWlanWlanCreatEntry OBJECT-TYPE
+    SYNTAX  FSWlanWlanCreatEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The entry of Braod Ssid value table."
+    INDEX   { fsWlanId}
+    ::= { fsWlanWlanCreatTable 1 }
+
+FSWlanWlanCreatEntry ::=
+    SEQUENCE {
+        fsWlanWlanSsid          DisplayString,
+        fsWlanWlanProfile       DisplayString,
+        fsWlanCreateMapRS       RowStatus
+    }
+    
+-- ssid string
+fsWlanWlanSsid  OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(1..255))
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "Wlan Ssid."
+    ::= { fsWlanWlanCreatEntry 1 }
+
+-- profile string
+fsWlanWlanProfile  OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(1..255))
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "Wlan profile."
+    ::= { fsWlanWlanCreatEntry 2 }
+    
+fsWlanCreateMapRS OBJECT-TYPE
+    SYNTAX     RowStatus 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+             "Used to add a wlan."
+    ::= { fsWlanWlanCreatEntry 3 }
+    
+-- *************************************
+-- channel channel_num regulatory band {unii0-unii6} {enable|disable}
+-- *************************************
+fsWlanChanBandTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF FSWlanChanBandEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "Channel band table type."
+    ::= { fsAcMgmtWlan 3 }
+
+fsWlanChanBandEntry OBJECT-TYPE
+    SYNTAX  FSWlanChanBandEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The entry of channel band table."
+    INDEX   { fsWlanId, fsWlanBandV}
+    ::= { fsWlanChanBandTable 1 }
+
+FSWlanChanBandEntry ::=
+    SEQUENCE {
+        fsWlanChanV              INTEGER,
+        fsWlanBandV              INTEGER,
+        fsWlanChanBandEn         INTEGER,
+        fsWlanChanBandRS         RowStatus
+    }
+
+-- band 
+fsWlanBandV  OBJECT-TYPE
+    SYNTAX  INTEGER (1..7)
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "1 for unii0, 2 for unii1 .. 7 for unii6."
+    ::= { fsWlanChanBandEntry 1 }
+
+-- channel
+fsWlanChanV  OBJECT-TYPE
+    SYNTAX  INTEGER (0..255)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "fragment threshold."
+    ::= { fsWlanChanBandEntry 2 }
+
+-- 0-disable,1-enable 
+fsWlanChanBandEn  OBJECT-TYPE
+    SYNTAX  INTEGER (0..1)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "0-disable,1-enable ."
+    ::= { fsWlanChanBandEntry 3 }
+    
+fsWlanChanBandRS OBJECT-TYPE
+    SYNTAX     RowStatus 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+             "Used to config a wlan channel band."
+    ::= { fsWlanChanBandEntry 4 }
+
+-- 15.speed speed_type radio radio_id 55555
+
+-- ***************************************
+-- regulatory limit First_Channel Number_of_Channels Mx_Tx_Power_Level
+-- ***************************************
+fsWlanLimitChanTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF FSWlanLimitChanEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "Channel band table type."
+    ::= { fsAcMgmtWlan 4 }
+
+fsWlanLimitChanEntry OBJECT-TYPE
+    SYNTAX  FSWlanLimitChanEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "The entry of channel band table."
+    INDEX   { fsWlanId}
+    ::= { fsWlanLimitChanTable 1 }
+
+FSWlanLimitChanEntry ::=
+    SEQUENCE {
+        fsWlanLimitChanFirstV       INTEGER,
+        fsWlanLimitChanNumV         INTEGER,
+        fsWlanLimitChanMaxTxPowerLv INTEGER,
+        fsWlanLimitChanRS           RowStatus
+     }
+
+-- first channel
+fsWlanLimitChanFirstV  OBJECT-TYPE
+    SYNTAX  INTEGER (0..255)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "first channel."
+    ::= { fsWlanLimitChanEntry 1 }
+    
+-- Channel num
+fsWlanLimitChanNumV  OBJECT-TYPE
+    SYNTAX  INTEGER (0..6)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "Channel num."
+    ::= { fsWlanLimitChanEntry 2 }
+
+-- Max Tx Power Level
+fsWlanLimitChanMaxTxPowerLv  OBJECT-TYPE
+    SYNTAX  INTEGER (1..8)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "Max Tx Power Level ."
+    ::= { fsWlanLimitChanEntry 3 }
+
+fsWlanLimitChanRS OBJECT-TYPE
+    SYNTAX     RowStatus 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+             "Used to config a wlan limit chan."
+    ::= { fsWlanLimitChanEntry 4 }
+
+
+--********************************************************************
+--                                                                  **
+--                  STA nodes                                       **
+--                                                                  **
+--********************************************************************
+fsStaTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF FSStaEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "fs AC MGMT station table."
+    ::= { fsAcMgmtSta 1 }
+
+fsStaEntry OBJECT-TYPE
+    SYNTAX  FSStaEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "fs AC MGMT station entry."
+    INDEX   { fsStaMacAddr}
+    ::= { fsStaTable 1 }
+
+FSStaEntry ::=
+    SEQUENCE {
+        fsStaMacAddr                MacAddress,
+        fsStaApMacAddr              MacAddress,
+        fsStaVlan                   INTEGER,
+        fsStaWlanId                 INTEGER,
+        fsStaIp                     IpAddress,
+        fsStaApIp                   IpAddress,
+        fsStaApRadioId              INTEGER,
+        fsStaApRadioType            INTEGER,
+        fsStaAssoType               INTEGER,
+        fsStaAuthType               INTEGER,
+        fsStaRoamTimesPerMin        INTEGER,
+        fsStaOnTimesPerHour         INTEGER,
+        fsStaOffTimesPerHour        INTEGER,
+        fsStaIpv6                   InetAddress,
+        fsStaAssoAuthMode           INTEGER,
+        fsStaNetAuthMode            INTEGER,
+        fsStaSsid                   DisplayString,
+        fsStaLinkRate               INTEGER,
+        fsStaCurChan                INTEGER,
+        fsStaClientType             DisplayString,
+        fsStaRssi                   INTEGER,
+        fsStaUserName               DisplayString,
+        fsStaTerminalType           DisplayString,
+        fsStaOnlineTime             DisplayString,
+        fsStaUpTimeInterval         INTEGER,
+        fsStaUserAuthTime           DisplayString
+     }
+         
+fsStaMacAddr  OBJECT-TYPE
+    SYNTAX  MacAddress
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The STA's mac address."
+    ::= { fsStaEntry 1}
+
+fsStaApMacAddr  OBJECT-TYPE
+    SYNTAX  MacAddress
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The  mac address with the AP which the STA attached."
+    ::= { fsStaEntry 2}
+
+fsStaVlan  OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "Vlan id the STA belong to."
+    ::= { fsStaEntry 3 }
+
+fsStaWlanId  OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "Wlan id the STA belong to."
+    ::= { fsStaEntry 4 }
+
+fsStaIp OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object represents ip address of the client."
+    ::= { fsStaEntry 5 }
+    
+fsStaApIp OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object represents ip address of AP which the client attaches to."
+    ::= { fsStaEntry 6 }
+    
+fsStaApRadioId OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object represents radio id of AP which the client attaches to."
+    ::= { fsStaEntry 7 }
+    
+fsStaApRadioType OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object represents ip address of AP which the client attaches to."
+    ::= { fsStaEntry 8 }
+    
+fsStaAssoType OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object represents sta's associate type."
+    ::= { fsStaEntry 9 }
+    
+fsStaAuthType OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object represents sta's authentication type."
+    ::= { fsStaEntry 10 }
+    
+fsStaRoamTimesPerMin  OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The Sta roaming times in the last minite."
+    ::= { fsStaEntry 11}
+    
+fsStaOnTimesPerHour  OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The Sta turn on times in the last hour."
+    ::= { fsStaEntry 12}
+    
+fsStaOffTimesPerHour  OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The Sta turn off times in the last hour."
+    ::= { fsStaEntry 13}
+
+fsStaIpv6  OBJECT-TYPE
+    SYNTAX  InetAddress
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The Sta ipv6 address."
+    ::= { fsStaEntry 14}
+
+fsStaAssoAuthMode  OBJECT-TYPE
+    SYNTAX  INTEGER {
+        open(0),
+        wep(1),
+        dot1x-wep(2),
+        dot1x-wpa(3),
+        dot1x-wpa2(4),
+        mab(5),
+        psk-wpa(6),
+        psk-wpa2(7),
+        wapi(8)
+    }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The Sta associate authentication mode."
+    ::= { fsStaEntry 15}
+
+fsStaNetAuthMode  OBJECT-TYPE
+    SYNTAX  INTEGER {
+        open(0),
+        web(1)
+    }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The Sta's authentication mode after associated."
+    ::= { fsStaEntry 16}
+
+fsStaSsid  OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "This object represents wlan ssid with the sta associated."
+    ::= { fsStaEntry 17}
+
+fsStaLinkRate  OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "This object represents link rate with the sta associated, unit: kbps."
+    ::= { fsStaEntry 18}
+
+fsStaCurChan  OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The Sta's current channel."
+    ::= { fsStaEntry 19}
+
+fsStaClientType OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "The sta's type."
+    ::= { fsStaEntry 20 }
+
+fsStaRssi OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The Sta's current RSSI."
+    ::= { fsStaEntry 21}
+	
+fsStaUserName  OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "This object represents user name with the sta associated."
+    ::= { fsStaEntry 22}
+
+fsStaTerminalType  OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "This object represents terminal type with the sta associated."
+    ::= { fsStaEntry 23}
+    
+fsStaOnlineTime  OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "This object represents the time when sta is associated."
+    ::= { fsStaEntry 24}
+    
+fsStaUpTimeInterval OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "This object represents how long sta is online(in seconds)."
+    ::= { fsStaEntry 25}
+    
+fsStaUserAuthTime OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "This object represents the time when user is authed(dot1x or webauth)."
+    ::= { fsStaEntry 26}
+
+--*********2.Sta Json***************
+fsStaJsonTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF FSStaJsonEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "fs AC MGMT station json table."
+    ::= { fsAcMgmtSta 2 }
+
+fsStaJsonEntry OBJECT-TYPE
+    SYNTAX  FSStaJsonEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "fs AC MGMT station json entry."
+    INDEX   { fsStaJsonMacAddr}
+    ::= { fsStaJsonTable 1 }
+
+FSStaJsonEntry ::=
+    SEQUENCE {
+        fsStaJsonMacAddr            MacAddress,
+        fsStaJsonContent            OCTET STRING
+     }
+         
+fsStaJsonMacAddr  OBJECT-TYPE
+    SYNTAX  MacAddress
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The STA's mac address."
+    ::= { fsStaJsonEntry 1}
+    
+fsStaJsonContent OBJECT-TYPE
+	SYNTAX  OCTET STRING (SIZE (1..1023))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "This object represents the sta content with json format."
+    ::= { fsStaJsonEntry 2}
+
+-- ****************************************
+--
+--               Notify nodes
+--
+-- ****************************************
+fsNotifyApMac OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents the unique identifier of a WTP."
+    ::= { fsAcMgmtNtfObjects 1 }
+    
+fsNotifyStaMac OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents the unique identifier of a STA."
+    ::= { fsAcMgmtNtfObjects 2 }
+
+fsNotifyApIp OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents the Ip address of a WTP."
+    ::= { fsAcMgmtNtfObjects 3 }
+
+fsNotifyStaIp OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents the Ip of a STA."
+    ::= { fsAcMgmtNtfObjects 4 }
+    
+fsNotifyStaOperType OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents the STA operation, 1-del,2-add,3-roaming,4-ipupdate,5-ipv6update"
+    ::= { fsAcMgmtNtfObjects 5 }
+    
+fsNotifyStaApRadioId OBJECT-TYPE
+    SYNTAX      INTEGER(1..2)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents the radio id which STA attach."
+    ::= { fsAcMgmtNtfObjects 6 }
+    
+fsNotifyStaApRadioType OBJECT-TYPE
+    SYNTAX      INTEGER (1..2)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+              "1--802.11b
+               2--802.11a"
+    ::= { fsAcMgmtNtfObjects 7 }    
+    
+fsNotifyStaVlanId OBJECT-TYPE
+    SYNTAX      INTEGER (1..4094)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+              "Vlan Id the sta belongs to"
+    ::= { fsAcMgmtNtfObjects 8 }
+    
+fsNotifyStaWlanId OBJECT-TYPE
+    SYNTAX      INTEGER (1..4095)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+              "Wlan Id the sta belongs to"
+    ::= { fsAcMgmtNtfObjects 9 }
+    
+fsNotifyAcMBChangeV OBJECT-TYPE
+    SYNTAX      INTEGER (1..2)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+              "1 - Master to backup,
+               2 - Backup to master"
+    ::= { fsAcMgmtNtfObjects 10 }
+
+fsNotifyStaOperTimes OBJECT-TYPE
+    SYNTAX      INTEGER (1..65535)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+              "This object present the times when the 
+               STA is active, disactive, roaming."
+    ::= { fsAcMgmtNtfObjects 11 }
+
+fsNotifyAcPowerIndex OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+              "This object present the AC's power unit index."
+    ::= { fsAcMgmtNtfObjects 12 }
+    
+fsNotifyAcPowerStatu OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+              "This object present the AC's power statu, 0-off, 1-on."
+    ::= { fsAcMgmtNtfObjects 13 }
+    
+fsNotifyTime OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+              "This object present the sta operation current time."
+    ::= { fsAcMgmtNtfObjects 14 }
+    
+fsNotifyOldVer OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+              "This object present the AP's old version."
+    ::= { fsAcMgmtNtfObjects 15 }
+    
+fsNotifyNewVer OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+              "This object present the AP's new version."
+    ::= { fsAcMgmtNtfObjects 16 }
+
+fsNotifyVerUpdtReason OBJECT-TYPE
+    SYNTAX      INTEGER (1..6)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+              "This object present the AP's firmware updating fail reason.
+                1 -- Image is not ready.
+                2 -- AC send image fail.
+                3 -- Link down when update ap image.
+                4 -- Active image file error.
+                5 -- AP response error.
+                6 -- AP has image in flash."
+    ::= { fsAcMgmtNtfObjects 17 }
+
+fsNotifyStaIpv6 OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+              "Sta ipv6 address."
+    ::= { fsAcMgmtNtfObjects 18 }
+
+fsNotifyStaAssoAuthMode  OBJECT-TYPE
+    SYNTAX  INTEGER {
+        open(0),
+        wep(1),
+        dot1x-wep(2),
+        dot1x-wpa(3),
+        dot1x-wpa2(4),
+        mab(5),
+        psk-wpa(6),
+        psk-wpa2(7),
+        wapi(8)
+    }
+    MAX-ACCESS  accessible-for-notify
+    STATUS  current
+    DESCRIPTION
+            "The Sta associate authentication mode."
+    ::= { fsAcMgmtNtfObjects 19}
+
+fsNotifyStaNetAuthMode  OBJECT-TYPE
+    SYNTAX  INTEGER {
+        open(0),
+        web(1)
+    }
+    MAX-ACCESS  accessible-for-notify
+    STATUS  current
+    DESCRIPTION
+            "The Sta's authentication mode after associated."
+    ::= { fsAcMgmtNtfObjects 20}
+
+fsNotifyStaSsid  OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS  current
+    DESCRIPTION
+            "The wlan ssid with the sta associated."
+    ::= { fsAcMgmtNtfObjects 21}
+
+fsNotifyStaLinkRate  OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  accessible-for-notify
+    STATUS  current
+    DESCRIPTION
+            "The link rate with the sta associated, unit: 1kbps."
+    ::= { fsAcMgmtNtfObjects 22}
+
+fsNotifyStaCurChan  OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  accessible-for-notify
+    STATUS  current
+    DESCRIPTION
+            "The Sta current use channel after associated."
+    ::= { fsAcMgmtNtfObjects 23}
+
+fsNotifyStaClientType  OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS  current
+    DESCRIPTION
+            "The Sta's type."
+    ::= { fsAcMgmtNtfObjects 24}
+
+fsNotifyStaRssi OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  accessible-for-notify
+    STATUS  current
+    DESCRIPTION
+            "The Sta's RSSI."
+    ::= { fsAcMgmtNtfObjects 25}
+
+fsNotifyStaReason OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS  current
+    DESCRIPTION
+            "The Sta's down reason."
+    ::= { fsAcMgmtNtfObjects 26}
+    
+fsNotifyStaTimestamp OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  accessible-for-notify
+    STATUS  current
+    DESCRIPTION
+            "Seconds since device bootup when this trap is sent."
+    ::= { fsAcMgmtNtfObjects 27}
+    
+fsNotifyStaOnlineTimeval OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  accessible-for-notify
+    STATUS  current
+    DESCRIPTION
+            "Sta's total online time in seconds."
+    ::= { fsAcMgmtNtfObjects 28}
+    
+fsNotifyStaIpv4Upflow OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  accessible-for-notify
+    STATUS  current
+    DESCRIPTION
+            "Sta's total IPv4 upflow in kbps."
+    ::= { fsAcMgmtNtfObjects 29}
+    
+fsNotifyStaIpv4Downflow OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  accessible-for-notify
+    STATUS  current
+    DESCRIPTION
+            "Sta's total IPv4 downflow in kbps."
+    ::= { fsAcMgmtNtfObjects 30}
+
+fsNotifyMicroApSlot OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Micro Ap Slot Id"
+    ::= { fsAcMgmtNtfObjects 31 }
+
+fsNotifyMicroApEvent OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Micro Ap Event: 1---up 2---down"
+    ::= { fsAcMgmtNtfObjects 32 }
+
+fsNotifyApLastFailureType OBJECT-TYPE
+    SYNTAX      INTEGER (1..4)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "This object present the AP's Last Failure Type.
+		  1 -- Power off or other failure.
+		  2 -- AP hang up.
+		  3 -- AP link failure.
+		  4 -- External command."
+    ::= { fsAcMgmtNtfObjects 33 }
+	
+fsNotifyApTimeStampFail NOTIFICATION-TYPE
+    OBJECTS     {
+                  fsNotifyApMac
+                }
+    STATUS      current
+    DESCRIPTION
+        "This notification is sent by the AC when an AP sync the time failed."
+    ::= { fsAcMgmtNotifications 1 }
+
+fsNotifyStaOper NOTIFICATION-TYPE
+    OBJECTS     {
+                  fsNotifyApMac,
+                  fsNotifyStaMac,
+                  fsNotifyApIp,
+                  fsNotifyStaIp,
+                  fsNotifyStaOperType,
+                  fsNotifyStaApRadioId,
+                  fsNotifyStaApRadioType,
+                  fsNotifyStaVlanId,
+                  fsNotifyStaWlanId,
+                  fsNotifyTime,
+                  fsNotifyStaIpv6,
+                  fsNotifyStaAssoAuthMode,
+                  fsNotifyStaNetAuthMode,
+                  fsNotifyStaSsid,
+                  fsNotifyStaLinkRate,
+                  fsNotifyStaCurChan,
+                  fsNotifyStaClientType,
+                  fsNotifyStaRssi,
+                  fsNotifyStaReason
+                }
+    STATUS      current
+    DESCRIPTION
+        "This notification is sent by the AC when a sta enter or quit or ip update."
+    ::= { fsAcMgmtNotifications 2 }
+
+fsNotifyAcMBChange NOTIFICATION-TYPE
+    OBJECTS     {
+                  fsNotifyAcMBChangeV
+                }
+    STATUS      current
+    DESCRIPTION
+        "This notification is sent by the AC change from 
+         smaster to backup or backup to master."
+    ::= { fsAcMgmtNotifications 3 }
+
+fsNotifyApSwUpdtFail NOTIFICATION-TYPE
+    OBJECTS     {
+                  fsNotifyApMac,
+                  fsNotifyOldVer,
+                  fsNotifyNewVer,
+                  fsNotifyVerUpdtReason
+                }
+    STATUS      current
+    DESCRIPTION
+        "This notification is sent by the AC when update the AP software failed."
+    ::= { fsAcMgmtNotifications 4 }
+
+fsNotifyStaActOverThredhold NOTIFICATION-TYPE
+    OBJECTS     {
+                  fsNotifyApMac,
+                  fsNotifyStaMac,
+                  fsNotifyStaApRadioId,
+                  fsNotifyStaApRadioType,
+                  fsNotifyStaOperTimes
+                }
+    STATUS      current
+    DESCRIPTION
+        "This notification is sent by the AC when a sta active times over thredhold."
+    ::= { fsAcMgmtNotifications 5 }
+
+fsNotifyStaDisactOverThredhold NOTIFICATION-TYPE
+    OBJECTS     {
+                  fsNotifyApMac,
+                  fsNotifyStaMac,
+                  fsNotifyStaApRadioId,
+                  fsNotifyStaApRadioType,
+                  fsNotifyStaOperTimes
+                }
+    STATUS      current
+    DESCRIPTION
+        "This notification is sent by the AC when a sta's disactive times over thredhold."
+    ::= { fsAcMgmtNotifications 6 }
+
+fsNotifyStaRoamTotal NOTIFICATION-TYPE
+    OBJECTS     {
+                  fsNotifyApMac,
+                  fsNotifyStaMac,
+                  fsNotifyStaApRadioId,
+                  fsNotifyStaApRadioType,
+                  fsNotifyStaOperTimes
+                }
+    STATUS      current
+    DESCRIPTION
+        "This notification is sent by the AC when a sta's total 
+         roaming times over thredhold ."
+    ::= { fsAcMgmtNotifications 7 }
+
+fsNotifyStaRoamPerMin NOTIFICATION-TYPE
+    OBJECTS     {
+                  fsNotifyApMac,
+                  fsNotifyStaMac,
+                  fsNotifyStaApRadioId,
+                  fsNotifyStaApRadioType,
+                  fsNotifyStaOperTimes
+                }
+    STATUS      current
+    DESCRIPTION
+        "This notification is sent by the AC when a sta's 
+         roaming times per minite over thredhold ."
+    ::= { fsAcMgmtNotifications 8 }
+
+fsNotifyAcPowerStatus NOTIFICATION-TYPE
+    OBJECTS     {
+                  fsNotifyAcPowerIndex,
+                  fsNotifyAcPowerStatu
+                }
+    STATUS      current
+    DESCRIPTION
+        "This notification is sent by the AC when the 
+         AC's power unit status changed."
+    ::= { fsAcMgmtNotifications 9 }
+
+fsNotify86PowerOffAlarm NOTIFICATION-TYPE
+    OBJECTS     {
+                  fsNotifyAcPowerIndex
+                }
+    STATUS      current
+    DESCRIPTION
+        "This notification is sent by the 86 power off."
+    ::= { fsAcMgmtNotifications 10 }
+
+fsNotify86PowerOffAlarmClear NOTIFICATION-TYPE
+    OBJECTS     {
+                  fsNotifyAcPowerIndex
+                }
+    STATUS      current
+    DESCRIPTION
+        "This notification is sent by the 86 power on."
+    ::= { fsAcMgmtNotifications 11 }
+
+fsNotifyApSwUpdtSuccess NOTIFICATION-TYPE
+    OBJECTS     {
+                  fsNotifyApMac,
+                  fsNotifyOldVer,
+                  fsNotifyNewVer
+                }
+    STATUS      current
+    DESCRIPTION
+        "This notification is sent by the AC when update the AP software success."
+    ::= { fsAcMgmtNotifications 12 }
+
+fsNotifyApUp NOTIFICATION-TYPE
+    OBJECTS     {
+                  fsApMacAddr,
+                  capwapBaseNtfChannelType,
+                  capwapBaseNtfAuthenMethod,
+				  fsNotifyApLastFailureType
+                }
+    STATUS      current
+    DESCRIPTION
+        "This notification is sent by the AC when a CAPWAP channel
+         established."
+    ::= { fsAcMgmtNotifications 13 }
+
+fsNotifyApDown NOTIFICATION-TYPE
+    OBJECTS     {
+                  fsApMacAddr,
+                  capwapBaseNtfChannelType,
+                  capwapBaseNtfChannelDownReason
+                }
+    STATUS      current
+    DESCRIPTION
+        "This notification is sent by the AC when CAPWAP channel
+         becomes down."
+    ::= { fsAcMgmtNotifications 14 }
+
+fsNotifyApSwUpdtFailApMac NOTIFICATION-TYPE
+    OBJECTS     {
+                  fsApMacAddr,
+                  fsNotifyOldVer,
+                  fsNotifyNewVer,
+                  fsNotifyVerUpdtReason
+                }
+    STATUS      current
+    DESCRIPTION
+        "This notification is sent by the AC when update the AP software failed."
+    ::= { fsAcMgmtNotifications 15 }
+
+fsNotifyApTimeStampFailApMac NOTIFICATION-TYPE
+    OBJECTS     {
+                  fsApMacAddr
+                }
+    STATUS      current
+    DESCRIPTION
+        "This notification is sent by the AC when an AP sync the time failed."
+    ::= { fsAcMgmtNotifications 16 }
+    
+fsNotifyStaOperAlternate NOTIFICATION-TYPE
+    OBJECTS     {
+                  fsNotifyStaOperType,
+                  fsNotifyStaMac,
+                  fsNotifyStaIp,
+                  fsNotifyApMac,
+                  fsNotifyApIp,
+                  fsNotifyStaApRadioId,
+                  fsNotifyStaApRadioType,
+                  fsNotifyStaWlanId,
+                  fsNotifyStaSsid,
+                  fsNotifyStaVlanId,
+                  fsNotifyStaLinkRate,
+                  fsNotifyStaCurChan,
+                  fsNotifyStaRssi,
+                  fsNotifyStaTimestamp,
+                  fsNotifyStaOnlineTimeval,
+                  fsNotifyStaIpv4Upflow,
+                  fsNotifyStaIpv4Downflow
+                }
+    STATUS      current
+    DESCRIPTION
+        "This notification is sent by the AC when a sta is up, down or roaming."
+    ::= { fsAcMgmtNotifications 17 }
+
+fsNotifyNonrootOper NOTIFICATION-TYPE
+    OBJECTS     {
+                  fsNotifyStaOperType,
+                  fsNotifyStaMac,
+                  fsNotifyApMac,
+                  fsNotifyStaApRadioId,
+                  fsNotifyStaTimestamp
+                }
+    STATUS      current
+    DESCRIPTION
+        "This notification is sent by the AC when a Nonroot is attach or leave."
+    ::= { fsAcMgmtNotifications 18 }
+
+fsNotifyMicroApAction NOTIFICATION-TYPE
+    OBJECTS     {
+                  fsNotifyApMac,
+                  fsNotifyMicroApSlot,
+                  fsNotifyMicroApEvent
+                }
+    STATUS      current
+    DESCRIPTION
+        "This notification when Micro Ap up or down."
+    ::= { fsAcMgmtNotifications 19 }
+	
+--********************************************************************
+--                                                                  **
+--           conformance information                                **
+--                                                                  **
+--********************************************************************
+fsAcMgmtAcMIBConformance OBJECT IDENTIFIER ::= { fsAcMgmtMIB 7 }
+fsAcMgmtAcMIBCompliances OBJECT IDENTIFIER ::= { fsAcMgmtAcMIBConformance 1 }
+fsAcMgmtAcMIBGroups      OBJECT IDENTIFIER ::= { fsAcMgmtAcMIBConformance 2 }
+
+
+--********************************************************************
+--                                                                  **
+--           compliance statements                                  **
+--                                                                  **
+--********************************************************************
+fsAcMgmtAcMIBCompliance MODULE-COMPLIANCE
+        STATUS  current
+        DESCRIPTION
+                "The compliance statement for entities which implement
+                the FS Ac Manager Ac"
+        MODULE  -- this module
+                MANDATORY-GROUPS { fsAcMgmtAcMIBGroup, fsAcMgmtAcTrapGroup }
+        ::= { fsAcMgmtAcMIBCompliances 1 }
+        
+
+--********************************************************************
+--                                                                  **
+--           units of conformance                                   **
+--                                                                  **
+--********************************************************************
+fsAcMgmtAcMIBGroup OBJECT-GROUP
+        OBJECTS {
+            fsAcStaLimit,
+            fsAcWtpLimit,
+            fsAcRMacField,
+            fsAcDataDtls,
+            fsAcEcnSupport,
+            fsAcBackAcIp,
+            fsAcMtu,
+            fsAcAcName,
+            fsAcLocation,
+            fsAcResetAp,
+            fsAcApNum,
+            fsAc80211aRateType,
+            fsAc80211bRateType,
+            fsAcFallback,
+            fsAcStaNum,
+            fsAcMacAddr,
+            fsAcDescriptor,
+            fsAcPID,
+            fsAcHwId,
+            fsAcSN,
+            fsAcTemp,
+            fsAcAPUpDownCtrl,
+            fsAcAPJoinFailCtrl,
+            fsAcAPDecryEroReportCtrl,
+            fsAcApImageUpdtCtrl,
+            fsAcApConfigMsgEroCtrl,
+            fsAcApRadioOperStatuCtrl,
+            fsAcApAuthenFailCtrl,
+            fsAcApTimestampCtrl,
+            fsAcStaOperCtrl,
+            fsAcType,
+            fsAcNeid,
+            fsAcManufacturer,
+            fsAcSwVer,
+            fsAcSwManufacturer,
+            fsAcStaResourceNotEnough,
+            fsAcPppoeClientAct,
+            fsAcPppoeClientMax,
+            fsAcStaActThredhold,
+            fsAcStaDisactThredhold,
+            fsAcStaTotalRoamThredhold,
+            fsAcStaPerRoamThredhold,
+            fsAcStaOffLineRemainTime,
+            fsAcStaOffLineNumber,
+            fsAcStaOffLineDelSingle,
+            fsAcStaOffLineDelAll,
+            fsAcRmOffLineApConfig,
+            fsAcFlowBlApName1,
+            fsAcFlowBlApName2,
+            fsAcFlowBlApName3,
+            fsAcFlowBlApName4,
+            fsAcFlowBlApName5,
+            fsAcFlowBlApName6,
+            fsAcFlowBlApName7,
+            fsAcFlowBlApName8,
+            fsAcFlowBlApName9,
+            fsAcFlowBlApName10,
+            fsAcFlowBlNum,
+            fsAcFlowBlRS,
+            fsAcNumBlApName1,
+            fsAcNumBlApName2,
+            fsAcNumBlApName3,
+            fsAcNumBlApName4,
+            fsAcNumBlApName5,
+            fsAcNumBlApName6,
+            fsAcNumBlApName7,
+            fsAcNumBlApName8,
+            fsAcNumBlApName9,
+            fsAcNumBlApName10,
+            fsAcNumBlNum,
+            fsAcNumBlRS,
+            fsAcInAcRoamNum,
+            fsAcBetweenAcRoamInNum,
+            fsAcStaOnOverThrodOperCtrl,
+            fsAcStaOffOverThrodOperCtrl,
+            fsAcBetweenAcRoamOutNum,
+            fsAcCpusageSwitch,
+            fsAcCpuUsageTrapTimer,
+            fsAcStatTrapTimer,
+            fsAcHeartBeat,
+            fsAcTotalApSupNum,
+            fsAcTotalStaSupNum,
+            fsAcTotalPppoeSupNum,
+            fsAcCurTotalApSupNum,
+            fsAcCurTotalStaSupNum,
+            fsAcCurTotalPppoeSupNum,
+            fsAcNasId,
+            fsAcStaLimitLicense,
+            fsAcWtpLimitLicense,
+            fsAcStaIpv6Num,
+            fsAcIpv6,
+            fsAcIpv6Prefix,
+            fsAcIpv6Type,
+            fsAcIpv6AddrType,
+            fsApApName,
+            fsApApgName,
+            fsApDiscTimer,
+            fsApEchoReqTimer,
+            fsApEroReportTimer,
+            fsApStaTimeoutTimer,
+            fsApStatisticsTimer,
+            fsApFallback,
+            fsApImageId,
+            fsApIpDhcp,
+            fsApLocation,
+            fsApWpsMfp,
+            fsApLastRebootReason,
+            fsApEthernetIfName,
+            fsApEthernetIfMacAddress,
+            fsApEthernetIfAdminStatus,
+            fsApEthernetIfOperStatus,
+            fsApEthernetIfRxUcastPkts,
+            fsApEthernetIfRxNUcastPkts,
+            fsApEthernetIfTxUcastPkts,
+            fsApEthernetIfTxNUcastPkts,
+            fsApEthernetIfDuplex,
+            fsApEthernetIfLinkSpeed,
+            fsApEthernetIfPOEPower,
+            fsApAdminStatus,
+            fsApEthernetIfRxBoardPkts,
+            fsApEthernetIfRxMultiPkts,
+            fsApEthernetIfTxBoardPkts,
+            fsApEthernetIfTxMultiPkts,
+            fsApEthernetIfDropPkts,
+            fsApSn,
+            fsApIp,
+            fsApStaNum,
+            fsApToFat,
+            fsApId,
+            fsApSwVer,
+            fsApBootVer,
+            fsApPID,
+            fsApHwVer,
+            fsApStaLimit,
+            fsApFactoryDefault,
+            fsApCpuUsageTrapTimer,
+            fsApStatTrapTimer,
+            fsApLinkOnTimeInterval,
+            fsApNetId,
+            fsApUptime,
+            fsApOfftime,
+            fsApState,
+            fsApNasId,
+            fsApCoverArea,
+            fsApLinkOnTimeIntervalMs,
+            fsApUptimeMs,
+            fsApHbUptimeMs,
+            fsApIpv6,
+            fsApIpv6Prefix,
+            fsApIpv6PrefixLen,
+            fsApIpv6Type,
+            fsApIpv6Gateway,
+            fsApIpv6StaNum,
+            fsApMacAddrColon,
+            fsApMacAddrLine,
+            fsApMacAddrDot,
+			fsApEchoRequestCnt,     
+            fsApEchoResponseDropCnt,
+			fsApIsIsharePlus,
+			fsApTotalMicrolApNum,
+			fsApOnlineMicrolApNum,
+			fsApOfflineMicrolApNum,
+            fsApEchoDelayTimeMS,
+            fsApRadioEn,
+            fsApTxPower,
+            fsApDtimPeriod,
+            fsApBeaconPeriod,
+            fsApCountry,
+            fsApPreaShort,
+            fsApRadioBssid,
+            fsApTxPowerLevel,
+            fsApTxPowerGlobal,
+            fsApCurChan,
+            fsApRfGlobal,
+            fsApRadioRateType,
+            fsApRadioType,
+            fsApRadio11bSup,
+            fsApMaxTxPower,
+            fsApMinTxPower,
+            fsApCurTxPower,
+            fsApMaxTxPowerPer,
+            fsApMinTxPowerPer,
+            fsApIpAddr,
+            fsApIpMask,
+            fsApIpGetway,
+            fsApStaticIpRS,
+            fsApgDiscTimer,
+            fsApgEchoReqTimer,
+            fsApgEroReportTimer,
+            fsApgStaTimeoutTimer,
+            fsApgStatisticsTimer,
+            fsApgFallback,
+            fsApgImageId,
+            fsApgCreatEn,
+            fsApgEnableRadioEn,
+            fsApgWlanId,
+            fsApgVlanId,
+            fsApgWlanIntfMapRS,
+            fsWlanShort,
+            fsWlanSpctMgmt,
+            fsWlanEnQos,
+            fsWlanShortSlotTime,
+            fsWlanEnableApsd,
+            fsWlanAckType,
+            fsWlanTunnelType,
+            fsWlanBroadSsid,
+            fsWlanWlanSsid,
+            fsWlanWlanProfile,
+            fsWlanCreateMapRS,
+            fsWlanRts,
+            fsWlanShortTry,
+            fsWlanLongTry,
+            fsWlanStaNum,
+            fsWlanNasId,
+            fsWlanChanV,
+            fsWlanChanBandEn,
+            fsWlanLimitChanRS,
+            fsWlanChanBandRS,
+            fsStaApMacAddr,
+            fsStaVlan,
+            fsStaWlanId,
+            fsStaIp,
+            fsStaApIp,
+            fsStaApRadioId,
+            fsStaApRadioType,
+            fsStaAssoType,
+            fsStaAuthType,
+            fsStaRoamTimesPerMin,
+            fsStaOnTimesPerHour,
+            fsStaOffTimesPerHour,
+            fsNotifyApMac,
+            fsNotifyStaMac,
+            fsNotifyApIp,
+            fsNotifyStaIp,
+            fsNotifyStaOperType,
+            fsNotifyStaApRadioId,
+            fsNotifyStaApRadioType,
+            fsNotifyStaVlanId,
+            fsNotifyStaWlanId,
+            fsNotifyTime,
+            fsNotifyOldVer,
+            fsNotifyNewVer,
+            fsNotifyVerUpdtReason,
+            fsNotifyAcMBChangeV,
+            fsNotifyStaOperTimes,
+            fsNotifyAcPowerIndex,
+            fsNotifyAcPowerStatu,
+            fsAcKickClient,
+            fsAcOpenStaNum,
+            fsAcOpenStaAbnormalDownTimes,
+            fsAcWepPskStaNum,
+            fsAcWepPskStaAbnormalDownTimes
+        }
+        STATUS  current
+        DESCRIPTION
+                "A collection of objects providing ac manager (echo) ability to a
+                FS agent."
+        ::= { fsAcMgmtAcMIBGroups 1 }
+
+fsAcMgmtAcTrapGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        fsNotifyApTimeStampFail,
+        fsNotifyStaOper,
+        fsNotifyAcMBChange,
+        fsNotifyApSwUpdtFail,
+        fsNotifyStaActOverThredhold,
+        fsNotifyStaDisactOverThredhold,
+        fsNotifyStaRoamTotal,
+        fsNotifyStaRoamPerMin,
+        fsNotifyAcPowerStatus,
+        fsNotify86PowerOffAlarm,
+        fsNotify86PowerOffAlarmClear,
+        fsNotifyApSwUpdtSuccess,
+        fsNotifyApUp,
+        fsNotifyApDown,
+        fsNotifyApSwUpdtFailApMac,
+        fsNotifyApTimeStampFailApMac
+        }
+    STATUS  current
+    DESCRIPTION
+        "A collection of traps providing ac manager (echo) ability to a
+         FS agent."
+    ::= { fsAcMgmtAcMIBGroups 2 }
+    
+END

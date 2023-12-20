@@ -14,7 +14,6 @@ try {
     return;
 }
 
-$rrd_name = ['app', $name, $app->app_id];
 $rrd_def = RrdDefinition::make()
     ->addDataset('backlog_length', 'GAUGE')
     ->addDataset('cpu_collision', 'COUNTER')
@@ -38,7 +37,12 @@ $fields = [
     'budget_usecs' => $data['budget_usecs'],
 ];
 
-$tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
+$tags = [
+    'name' => $name,
+    'app_id' => $app->app_id,
+    'rrd_name' => ['app', $name, $app->app_id],
+    'rrd_def' => $rrd_def,
+];
 data_update($device, 'app', $tags, $fields);
 $app->data = ['budget' => $data['budget'], 'budget_usecs' => $data['budget_usecs']];
 update_application($app, 'OK', $fields);

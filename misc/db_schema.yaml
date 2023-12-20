@@ -28,7 +28,7 @@ access_points:
     - { Field: numasoclients, Type: smallint, 'Null': false, Extra: '', Default: '0' }
     - { Field: nummonclients, Type: smallint, 'Null': false, Extra: '', Default: '0' }
     - { Field: numactbssid, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
-    - { Field: nummonbssid, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
+    - { Field: nummonbssid, Type: int, 'Null': false, Extra: '', Default: '0' }
     - { Field: interference, Type: 'tinyint unsigned', 'Null': false, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [accesspoint_id], Unique: true, Type: BTREE }
@@ -193,11 +193,13 @@ applications:
     applications_device_id_app_type_unique: { Name: applications_device_id_app_type_unique, Columns: [device_id, app_type], Unique: true, Type: BTREE }
 application_metrics:
   Columns:
+    - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
     - { Field: app_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: metric, Type: varchar(64), 'Null': false, Extra: '' }
     - { Field: value, Type: double, 'Null': true, Extra: '' }
     - { Field: value_prev, Type: double, 'Null': true, Extra: '' }
   Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     application_metrics_app_id_metric_unique: { Name: application_metrics_app_id_metric_unique, Columns: [app_id, metric], Unique: true, Type: BTREE }
 assigned_roles:
   Columns:
@@ -251,12 +253,12 @@ bgpPeers:
     - { Field: bgpLocalAddr, Type: text, 'Null': false, Extra: '' }
     - { Field: bgpPeerRemoteAddr, Type: text, 'Null': false, Extra: '' }
     - { Field: bgpPeerDescr, Type: varchar(255), 'Null': false, Extra: '', Default: '' }
-    - { Field: bgpPeerInUpdates, Type: int, 'Null': false, Extra: '' }
-    - { Field: bgpPeerOutUpdates, Type: int, 'Null': false, Extra: '' }
-    - { Field: bgpPeerInTotalMessages, Type: int, 'Null': false, Extra: '' }
-    - { Field: bgpPeerOutTotalMessages, Type: int, 'Null': false, Extra: '' }
-    - { Field: bgpPeerFsmEstablishedTime, Type: int, 'Null': false, Extra: '' }
-    - { Field: bgpPeerInUpdateElapsedTime, Type: int, 'Null': false, Extra: '' }
+    - { Field: bgpPeerInUpdates, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: bgpPeerOutUpdates, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: bgpPeerInTotalMessages, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: bgpPeerOutTotalMessages, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: bgpPeerFsmEstablishedTime, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: bgpPeerInUpdateElapsedTime, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: context_name, Type: varchar(128), 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [bgpPeer_id], Unique: true, Type: BTREE }
@@ -267,24 +269,24 @@ bgpPeers_cbgp:
     - { Field: bgpPeerIdentifier, Type: varchar(64), 'Null': false, Extra: '' }
     - { Field: afi, Type: varchar(16), 'Null': false, Extra: '' }
     - { Field: safi, Type: varchar(16), 'Null': false, Extra: '' }
-    - { Field: AcceptedPrefixes, Type: int, 'Null': false, Extra: '' }
-    - { Field: DeniedPrefixes, Type: int, 'Null': false, Extra: '' }
-    - { Field: PrefixAdminLimit, Type: int, 'Null': false, Extra: '' }
-    - { Field: PrefixThreshold, Type: int, 'Null': false, Extra: '' }
-    - { Field: PrefixClearThreshold, Type: int, 'Null': false, Extra: '' }
-    - { Field: AdvertisedPrefixes, Type: int, 'Null': false, Extra: '' }
-    - { Field: SuppressedPrefixes, Type: int, 'Null': false, Extra: '' }
-    - { Field: WithdrawnPrefixes, Type: int, 'Null': false, Extra: '' }
+    - { Field: AcceptedPrefixes, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: DeniedPrefixes, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: PrefixAdminLimit, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: PrefixThreshold, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: PrefixClearThreshold, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: AdvertisedPrefixes, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: SuppressedPrefixes, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: WithdrawnPrefixes, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: AcceptedPrefixes_delta, Type: int, 'Null': false, Extra: '' }
-    - { Field: AcceptedPrefixes_prev, Type: int, 'Null': false, Extra: '' }
+    - { Field: AcceptedPrefixes_prev, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: DeniedPrefixes_delta, Type: int, 'Null': false, Extra: '' }
-    - { Field: DeniedPrefixes_prev, Type: int, 'Null': false, Extra: '' }
+    - { Field: DeniedPrefixes_prev, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: AdvertisedPrefixes_delta, Type: int, 'Null': false, Extra: '' }
-    - { Field: AdvertisedPrefixes_prev, Type: int, 'Null': false, Extra: '' }
+    - { Field: AdvertisedPrefixes_prev, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: SuppressedPrefixes_delta, Type: int, 'Null': false, Extra: '' }
-    - { Field: SuppressedPrefixes_prev, Type: int, 'Null': false, Extra: '' }
+    - { Field: SuppressedPrefixes_prev, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: WithdrawnPrefixes_delta, Type: int, 'Null': false, Extra: '' }
-    - { Field: WithdrawnPrefixes_prev, Type: int, 'Null': false, Extra: '' }
+    - { Field: WithdrawnPrefixes_prev, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: context_name, Type: varchar(128), 'Null': true, Extra: '' }
   Indexes:
     bgppeers_cbgp_device_id_bgppeeridentifier_afi_safi_unique: { Name: bgppeers_cbgp_device_id_bgppeeridentifier_afi_safi_unique, Columns: [device_id, bgpPeerIdentifier, afi, safi], Unique: true, Type: BTREE }
@@ -426,8 +428,8 @@ ciscoASA:
     - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: oid, Type: varchar(255), 'Null': false, Extra: '' }
     - { Field: data, Type: bigint, 'Null': false, Extra: '' }
-    - { Field: high_alert, Type: bigint, 'Null': false, Extra: '' }
-    - { Field: low_alert, Type: bigint, 'Null': false, Extra: '' }
+    - { Field: high_alert, Type: bigint, 'Null': false, Extra: '', Default: '-1' }
+    - { Field: low_alert, Type: bigint, 'Null': false, Extra: '', Default: '0' }
     - { Field: disabled, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [ciscoASA_id], Unique: true, Type: BTREE }
@@ -1076,8 +1078,8 @@ mpls_sdps:
     - { Field: sdpLastMgmtChange, Type: bigint, 'Null': true, Extra: '' }
     - { Field: sdpLastStatusChange, Type: bigint, 'Null': true, Extra: '' }
     - { Field: sdpActiveLspType, Type: "enum('not-applicable','rsvp','ldp','bgp','none','mplsTp','srIsis','srOspf','srTeLsp','fpe')", 'Null': true, Extra: '' }
-    - { Field: sdpFarEndInetAddressType, Type: "enum('ipv4','ipv6')", 'Null': true, Extra: '' }
     - { Field: sdpFarEndInetAddress, Type: varchar(46), 'Null': true, Extra: '' }
+    - { Field: sdpFarEndInetAddressType, Type: "enum('unknown','ipv4','ipv6','ipv4z','ipv6z','dns')", 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [sdp_id], Unique: true, Type: BTREE }
     mpls_sdps_device_id_index: { Name: mpls_sdps_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
@@ -1249,10 +1251,10 @@ ospf_areas:
     - { Field: ospfAreaId, Type: varchar(32), 'Null': false, Extra: '' }
     - { Field: ospfAuthType, Type: varchar(64), 'Null': true, Extra: '' }
     - { Field: ospfImportAsExtern, Type: varchar(128), 'Null': false, Extra: '' }
-    - { Field: ospfSpfRuns, Type: int, 'Null': false, Extra: '' }
-    - { Field: ospfAreaBdrRtrCount, Type: int, 'Null': false, Extra: '' }
-    - { Field: ospfAsBdrRtrCount, Type: int, 'Null': false, Extra: '' }
-    - { Field: ospfAreaLsaCount, Type: int, 'Null': false, Extra: '' }
+    - { Field: ospfSpfRuns, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: ospfAreaBdrRtrCount, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: ospfAsBdrRtrCount, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: ospfAreaLsaCount, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: ospfAreaLsaCksumSum, Type: int, 'Null': false, Extra: '' }
     - { Field: ospfAreaSummary, Type: varchar(64), 'Null': false, Extra: '' }
     - { Field: ospfAreaStatus, Type: varchar(64), 'Null': false, Extra: '' }
@@ -1270,11 +1272,11 @@ ospf_instances:
     - { Field: ospfVersionNumber, Type: varchar(32), 'Null': false, Extra: '' }
     - { Field: ospfAreaBdrRtrStatus, Type: varchar(32), 'Null': false, Extra: '' }
     - { Field: ospfASBdrRtrStatus, Type: varchar(32), 'Null': false, Extra: '' }
-    - { Field: ospfExternLsaCount, Type: int, 'Null': false, Extra: '' }
+    - { Field: ospfExternLsaCount, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: ospfExternLsaCksumSum, Type: int, 'Null': false, Extra: '' }
     - { Field: ospfTOSSupport, Type: varchar(32), 'Null': false, Extra: '' }
-    - { Field: ospfOriginateNewLsas, Type: int, 'Null': false, Extra: '' }
-    - { Field: ospfRxNewLsas, Type: int, 'Null': false, Extra: '' }
+    - { Field: ospfOriginateNewLsas, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: ospfRxNewLsas, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: ospfExtLsdbLimit, Type: int, 'Null': true, Extra: '' }
     - { Field: ospfMulticastExtensions, Type: int, 'Null': true, Extra: '' }
     - { Field: ospfExitOverflowInterval, Type: int, 'Null': true, Extra: '' }
@@ -1295,8 +1297,8 @@ ospf_nbrs:
     - { Field: ospfNbrOptions, Type: int, 'Null': false, Extra: '' }
     - { Field: ospfNbrPriority, Type: int, 'Null': false, Extra: '' }
     - { Field: ospfNbrState, Type: varchar(32), 'Null': false, Extra: '' }
-    - { Field: ospfNbrEvents, Type: int, 'Null': false, Extra: '' }
-    - { Field: ospfNbrLsRetransQLen, Type: int, 'Null': false, Extra: '' }
+    - { Field: ospfNbrEvents, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: ospfNbrLsRetransQLen, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: ospfNbmaNbrStatus, Type: varchar(32), 'Null': false, Extra: '' }
     - { Field: ospfNbmaNbrPermanence, Type: varchar(32), 'Null': false, Extra: '' }
     - { Field: ospfNbrHelloSuppressed, Type: varchar(32), 'Null': false, Extra: '' }
@@ -1324,7 +1326,7 @@ ospf_ports:
     - { Field: ospfIfState, Type: varchar(32), 'Null': true, Extra: '' }
     - { Field: ospfIfDesignatedRouter, Type: varchar(32), 'Null': true, Extra: '' }
     - { Field: ospfIfBackupDesignatedRouter, Type: varchar(32), 'Null': true, Extra: '' }
-    - { Field: ospfIfEvents, Type: int, 'Null': true, Extra: '' }
+    - { Field: ospfIfEvents, Type: 'int unsigned', 'Null': true, Extra: '' }
     - { Field: ospfIfAuthKey, Type: varchar(128), 'Null': true, Extra: '' }
     - { Field: ospfIfStatus, Type: varchar(32), 'Null': true, Extra: '' }
     - { Field: ospfIfMulticastForwarding, Type: varchar(32), 'Null': true, Extra: '' }
@@ -1343,7 +1345,7 @@ packages:
   Columns:
     - { Field: pkg_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
     - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
-    - { Field: name, Type: varchar(64), 'Null': false, Extra: '' }
+    - { Field: name, Type: varchar(128), 'Null': false, Extra: '' }
     - { Field: manager, Type: varchar(16), 'Null': false, Extra: '', Default: '1' }
     - { Field: status, Type: tinyint, 'Null': false, Extra: '' }
     - { Field: version, Type: varchar(255), 'Null': false, Extra: '' }
@@ -1626,40 +1628,40 @@ ports_stack:
 ports_statistics:
   Columns:
     - { Field: port_id, Type: 'int unsigned', 'Null': false, Extra: '' }
-    - { Field: ifInNUcastPkts, Type: bigint, 'Null': true, Extra: '' }
-    - { Field: ifInNUcastPkts_prev, Type: bigint, 'Null': true, Extra: '' }
+    - { Field: ifInNUcastPkts, Type: 'bigint unsigned', 'Null': true, Extra: '' }
+    - { Field: ifInNUcastPkts_prev, Type: 'bigint unsigned', 'Null': true, Extra: '' }
     - { Field: ifInNUcastPkts_delta, Type: bigint, 'Null': true, Extra: '' }
     - { Field: ifInNUcastPkts_rate, Type: int, 'Null': true, Extra: '' }
-    - { Field: ifOutNUcastPkts, Type: bigint, 'Null': true, Extra: '' }
-    - { Field: ifOutNUcastPkts_prev, Type: bigint, 'Null': true, Extra: '' }
+    - { Field: ifOutNUcastPkts, Type: 'bigint unsigned', 'Null': true, Extra: '' }
+    - { Field: ifOutNUcastPkts_prev, Type: 'bigint unsigned', 'Null': true, Extra: '' }
     - { Field: ifOutNUcastPkts_delta, Type: bigint, 'Null': true, Extra: '' }
     - { Field: ifOutNUcastPkts_rate, Type: int, 'Null': true, Extra: '' }
-    - { Field: ifInDiscards, Type: bigint, 'Null': true, Extra: '' }
-    - { Field: ifInDiscards_prev, Type: bigint, 'Null': true, Extra: '' }
+    - { Field: ifInDiscards, Type: 'bigint unsigned', 'Null': true, Extra: '' }
+    - { Field: ifInDiscards_prev, Type: 'bigint unsigned', 'Null': true, Extra: '' }
     - { Field: ifInDiscards_delta, Type: bigint, 'Null': true, Extra: '' }
     - { Field: ifInDiscards_rate, Type: int, 'Null': true, Extra: '' }
-    - { Field: ifOutDiscards, Type: bigint, 'Null': true, Extra: '' }
-    - { Field: ifOutDiscards_prev, Type: bigint, 'Null': true, Extra: '' }
+    - { Field: ifOutDiscards, Type: 'bigint unsigned', 'Null': true, Extra: '' }
+    - { Field: ifOutDiscards_prev, Type: 'bigint unsigned', 'Null': true, Extra: '' }
     - { Field: ifOutDiscards_delta, Type: bigint, 'Null': true, Extra: '' }
     - { Field: ifOutDiscards_rate, Type: int, 'Null': true, Extra: '' }
-    - { Field: ifInUnknownProtos, Type: bigint, 'Null': true, Extra: '' }
-    - { Field: ifInUnknownProtos_prev, Type: bigint, 'Null': true, Extra: '' }
+    - { Field: ifInUnknownProtos, Type: 'bigint unsigned', 'Null': true, Extra: '' }
+    - { Field: ifInUnknownProtos_prev, Type: 'bigint unsigned', 'Null': true, Extra: '' }
     - { Field: ifInUnknownProtos_delta, Type: bigint, 'Null': true, Extra: '' }
     - { Field: ifInUnknownProtos_rate, Type: int, 'Null': true, Extra: '' }
-    - { Field: ifInBroadcastPkts, Type: bigint, 'Null': true, Extra: '' }
-    - { Field: ifInBroadcastPkts_prev, Type: bigint, 'Null': true, Extra: '' }
+    - { Field: ifInBroadcastPkts, Type: 'bigint unsigned', 'Null': true, Extra: '' }
+    - { Field: ifInBroadcastPkts_prev, Type: 'bigint unsigned', 'Null': true, Extra: '' }
     - { Field: ifInBroadcastPkts_delta, Type: bigint, 'Null': true, Extra: '' }
     - { Field: ifInBroadcastPkts_rate, Type: int, 'Null': true, Extra: '' }
-    - { Field: ifOutBroadcastPkts, Type: bigint, 'Null': true, Extra: '' }
-    - { Field: ifOutBroadcastPkts_prev, Type: bigint, 'Null': true, Extra: '' }
+    - { Field: ifOutBroadcastPkts, Type: 'bigint unsigned', 'Null': true, Extra: '' }
+    - { Field: ifOutBroadcastPkts_prev, Type: 'bigint unsigned', 'Null': true, Extra: '' }
     - { Field: ifOutBroadcastPkts_delta, Type: bigint, 'Null': true, Extra: '' }
     - { Field: ifOutBroadcastPkts_rate, Type: int, 'Null': true, Extra: '' }
-    - { Field: ifInMulticastPkts, Type: bigint, 'Null': true, Extra: '' }
-    - { Field: ifInMulticastPkts_prev, Type: bigint, 'Null': true, Extra: '' }
+    - { Field: ifInMulticastPkts, Type: 'bigint unsigned', 'Null': true, Extra: '' }
+    - { Field: ifInMulticastPkts_prev, Type: 'bigint unsigned', 'Null': true, Extra: '' }
     - { Field: ifInMulticastPkts_delta, Type: bigint, 'Null': true, Extra: '' }
     - { Field: ifInMulticastPkts_rate, Type: int, 'Null': true, Extra: '' }
-    - { Field: ifOutMulticastPkts, Type: bigint, 'Null': true, Extra: '' }
-    - { Field: ifOutMulticastPkts_prev, Type: bigint, 'Null': true, Extra: '' }
+    - { Field: ifOutMulticastPkts, Type: 'bigint unsigned', 'Null': true, Extra: '' }
+    - { Field: ifOutMulticastPkts_prev, Type: 'bigint unsigned', 'Null': true, Extra: '' }
     - { Field: ifOutMulticastPkts_delta, Type: bigint, 'Null': true, Extra: '' }
     - { Field: ifOutMulticastPkts_rate, Type: int, 'Null': true, Extra: '' }
   Indexes:
@@ -1749,7 +1751,7 @@ processes:
     - { Field: pid, Type: int, 'Null': false, Extra: '' }
     - { Field: vsz, Type: int, 'Null': false, Extra: '' }
     - { Field: rss, Type: int, 'Null': false, Extra: '' }
-    - { Field: cputime, Type: varchar(12), 'Null': false, Extra: '' }
+    - { Field: cputime, Type: varchar(14), 'Null': false, Extra: '' }
     - { Field: user, Type: varchar(50), 'Null': false, Extra: '' }
     - { Field: command, Type: text, 'Null': false, Extra: '' }
   Indexes:
@@ -2178,7 +2180,7 @@ vminfo:
     - { Field: vm_type, Type: varchar(16), 'Null': false, Extra: '', Default: vmware }
     - { Field: vmwVmVMID, Type: int, 'Null': false, Extra: '' }
     - { Field: vmwVmDisplayName, Type: varchar(128), 'Null': false, Extra: '' }
-    - { Field: vmwVmGuestOS, Type: varchar(128), 'Null': false, Extra: '' }
+    - { Field: vmwVmGuestOS, Type: varchar(256), 'Null': true, Extra: '' }
     - { Field: vmwVmMemSize, Type: int, 'Null': false, Extra: '' }
     - { Field: vmwVmCpus, Type: int, 'Null': false, Extra: '' }
     - { Field: vmwVmState, Type: 'smallint unsigned', 'Null': false, Extra: '' }

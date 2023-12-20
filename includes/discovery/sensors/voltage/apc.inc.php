@@ -31,7 +31,7 @@ $phasecount = $pre_cache['apcups_phase_count'];
 d_echo($phasecount);
 d_echo($pre_cache['apcups_phase_count']);
 // Check for three phase UPS devices - else skip to normal discovery
-if ($phasecount > 1) {
+if ($phasecount > 2) {
     $oids = snmpwalk_cache_oid($device, 'upsPhaseOutputVoltage', $oids, 'PowerNet-MIB');
     $in_oids = snmpwalk_cache_oid($device, 'upsPhaseInputVoltage', $in_oids, 'PowerNet-MIB');
     foreach ($oids as $index => $data) {
@@ -158,10 +158,12 @@ if ($phasecount > 1) {
     if ($oids) {
         echo ' Voltage In ';
         [$oid,$current] = explode(' ', $oids);
-        $divisor = 1;
-        $type = 'apc';
-        $index = '1';
-        $descr = 'Input';
-        discover_sensor($valid['sensor'], 'voltage', $device, $oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
+        if ($current >= 0) { // Some units using rPDU2 can return rPDU2PhaseStatusVoltage.1; Value (Integer): -1 hence this check. Example : AP7900B
+            $divisor = 1;
+            $type = 'apc';
+            $index = '1';
+            $descr = 'Input';
+            discover_sensor($valid['sensor'], 'voltage', $device, $oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
+        }
     }
 }

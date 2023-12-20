@@ -28,6 +28,7 @@ namespace LibreNMS\Polling;
 use App\Models\Device;
 use App\Models\DeviceOutage;
 use App\Models\Eventlog;
+use Carbon\Carbon;
 use LibreNMS\Config;
 use LibreNMS\Data\Source\Fping;
 use LibreNMS\Data\Source\FpingResponse;
@@ -182,7 +183,7 @@ class ConnectivityHelper
         }
 
         // check for open outage
-        $open_outage = $this->device->outages()->whereNull('up_again')->orderBy('going_down', 'desc')->first();
+        $open_outage = $this->device->getCurrentOutage();
 
         if ($status) {
             if ($open_outage) {
@@ -207,6 +208,7 @@ class ConnectivityHelper
             $perf->debug = array_merge($perf->debug, $this->traceroute());
         }
         $this->device->perf()->save($perf);
+        $this->device->last_ping = Carbon::now();
         $this->device->last_ping_timetaken = $ping_response->avg_latency ?: $this->device->last_ping_timetaken;
         $this->device->save();
 

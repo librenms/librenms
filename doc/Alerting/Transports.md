@@ -294,6 +294,17 @@ tokens to authenticate with GitLab and will store the token in cleartext.
 | Project ID | 1 |
 | Personal Access Token | AbCdEf12345 |
 
+
+## Grafana Oncall
+
+Send alerts to Grafana Oncall using a [Formatted Webhook](https://grafana.com/docs/oncall/latest/integrations/webhook/)
+
+**Example:**
+
+| Config | Example |
+| ------ | ------- |
+| Webhook URL | https://a-prod-us-central-0.grafana.net/integrations/v1/formatted_webhook/m12xmIjOcgwH74UF8CN4dk0Dh/ |
+
 ## HipChat
 
 See the HipChat API Documentation for [rooms/message](https://www.hipchat.com/docs/api/method/rooms/message)

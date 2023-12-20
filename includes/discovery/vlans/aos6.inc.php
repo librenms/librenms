@@ -25,7 +25,7 @@ foreach ($vlans as $vlan_id => $vlan) {
             'vlan_domain' => $vtpdomain_id,
             'vlan_vlan' => $vlan_id,
             'vlan_name' => $vlan['vlanDescription'],
-            'vlan_type' => ['NULL'],
+            'vlan_type' => null,
         ]);
         echo '+';
     }

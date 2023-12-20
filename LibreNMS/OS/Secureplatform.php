@@ -25,12 +25,13 @@
 
 namespace LibreNMS\OS;
 
+use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\RRD\RrdDefinition;
 
 class Secureplatform extends \LibreNMS\OS implements OSPolling
 {
-    public function pollOS(): void
+    public function pollOS(DataStorageInterface $datastore): void
     {
         $connections = snmp_get($this->getDeviceArray(), 'fwNumConn.0', '-OQv', 'CHECKPOINT-MIB');
 
@@ -42,7 +43,7 @@ class Secureplatform extends \LibreNMS\OS implements OSPolling
             ];
 
             $tags = compact('rrd_def');
-            data_update($this->getDeviceArray(), 'secureplatform_sessions', $tags, $fields);
+            $datastore->put($this->getDeviceArray(), 'secureplatform_sessions', $tags, $fields);
             $this->enableGraph('secureplatform_sessions');
         }
     }

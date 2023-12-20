@@ -29,4 +29,4 @@ use LibreNMS\OS;
 if (! $os instanceof OS) {
     $os = OS::make($device);
 }
-(new \LibreNMS\Modules\Nac())->poll($os);
+(new \LibreNMS\Modules\Nac())->poll($os, app('Datastore'));

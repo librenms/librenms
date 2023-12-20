@@ -7210,6 +7210,20 @@
                     "designatedPort": 14,
                     "forwardTransitions": 1,
                     "ifIndex": 10624
+                },
+                {
+                    "vlan": 98,
+                    "port_index": 80,
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 4,
+                    "designatedRoot": "0c85255ce500",
+                    "designatedCost": 0,
+                    "designatedBridge": "0c85255ce500",
+                    "designatedPort": 80,
+                    "forwardTransitions": 1,
+                    "ifIndex": 10624
                 }
             ]
         },

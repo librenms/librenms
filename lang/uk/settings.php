@@ -65,7 +65,6 @@ return [
             'rrdtool' => ['name' => 'Сховище даних: RRDTool'],
             'snmp' => ['name' => 'SNMP'],
             'poller_modules' => ['name' => 'Модулі опитувача'],
-            'interface_types' => ['name' => 'Типи інтерфейсів за RFC 7224'],
         ],
         'system' => [
             'cleanup' => ['name' => 'Очистка'],
@@ -236,9 +235,6 @@ return [
                     'help' => 'Співпадає з джерелом запиту. Можуть бути використані вільні символи, наприклад *.mydomain.com',
                 ],
             ],
-        ],
-        'api_demo' => [
-            'description' => 'Це демо',
         ],
         'apps' => [
             'powerdns-recursor' => [
@@ -524,9 +520,6 @@ return [
             'junose-atm-vp' => [
                 'description' => 'Junose ATM VP',
             ],
-            'libvirt-vminfo' => [
-                'description' => 'Libvirt VMInfo',
-            ],
             'loadbalancers' => [
                 'description' => 'Loadbalancers',
             ],
@@ -582,8 +575,8 @@ return [
             'vlans' => [
                 'description' => 'VLans',
             ],
-            'vmware-vminfo' => [
-                'description' => 'VMWare VMInfo',
+            'vminfo' => [
+                'description' => 'Hypervisor VM Info',
             ],
             'vrf' => [
                 'description' => 'VRF',
@@ -1080,9 +1073,6 @@ return [
             'ucd-diskio' => [
                 'description' => 'UCD DiskIO',
             ],
-            'wifi' => [
-                'description' => 'Wifi',
-            ],
             'wireless' => [
                 'description' => 'Бездротові',
             ],
@@ -1157,6 +1147,9 @@ return [
             ],
             'stp' => [
                 'description' => 'STP',
+            ],
+            'vminfo' => [
+                'description' => 'Hypervisor VM Info',
             ],
             'ntp' => [
                 'description' => 'NTP',

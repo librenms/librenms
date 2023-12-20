@@ -3,6 +3,7 @@
         <thead>
         <tr>
             <th data-column-id="severity" data-sortable="false"></th>
+            <th data-column-id="origin">{{ __('Origin') }}</th>
             <th data-column-id="timestamp" data-formatter="browserTime">{{ __('Timestamp') }}</th>
             <th data-column-id="level" data-sortable="false">{{ __('Level') }}</th>
             <th data-column-id="source">{{ __('Source') }}</th>

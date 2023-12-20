@@ -184,10 +184,6 @@ return [
             'description' => 'Autoriser l\'accès aux graphes pour les réseaux suivants sans login',
             'help' => '(ne s\'applique pas si l\'accès sans login est déjà permis)',
         ],
-        'api_demo' => [
-            'description' => 'Ceci est la démo',
-            'help' => 'Démo',
-        ],
         'apps' => [
             'powerdns-recursor' => [
                 'api-key' => [
@@ -432,9 +428,6 @@ return [
             'junose-atm-vp' => [
                 'description' => 'Junose ATM VP',
             ],
-            'libvirt-vminfo' => [
-                'description' => 'Libvirt VMInfo',
-            ],
             'loadbalancers' => [
                 'description' => 'Loadbalancers',
             ],
@@ -489,8 +482,8 @@ return [
             'vlans' => [
                 'description' => 'VLans',
             ],
-            'vmware-vminfo' => [
-                'description' => 'VMWare VMInfo',
+            'vminfo' => [
+                'description' => 'Hypervisor VM Info',
             ],
             'vrf' => [
                 'description' => 'VRF',
@@ -826,9 +819,6 @@ return [
             'ucd-diskio' => [
                 'description' => 'UCD DiskIO',
             ],
-            'wifi' => [
-                'description' => 'Wifi',
-            ],
             'wireless' => [
                 'description' => 'Wireless',
             ],
@@ -900,6 +890,9 @@ return [
             ],
             'stp' => [
                 'description' => 'STP',
+            ],
+            'vminfo' => [
+                'description' => 'Hypervisor VM Info',
             ],
             'ntp' => [
                 'description' => 'NTP',

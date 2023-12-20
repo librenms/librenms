@@ -46,18 +46,17 @@
                     <button type="submit" id="login" class="btn btn-primary btn-block" name="submit">
                         <i class="fa fa-btn fa-sign-in"></i> {{ __('Login') }}
                     </button>
-        </form>
-
-                    @foreach (\LibreNMS\Config::get('auth.socialite.configs', []) as $provider => $config)
-                    <br>
-                    <form role="form" action="{{ route('socialite.redirect', $provider) }}" method="post">
-                        {{ csrf_field() }}
-                        <button type="submit" id="login" class="btn btn-success btn-block">
-                            <i class="fab fa-btn fa-{{ $provider }}"></i> {{ __('Login with') }} {{ ucfirst($provider) }}
-                        </button>
-                    </form>
-                    @endforeach
                 </div>
             </div>
+        </form>
+
+        @foreach (\LibreNMS\Config::get('auth.socialite.configs', []) as $provider => $config)
+        <form role="form" action="{{ route('socialite.redirect', $provider) }}" method="post" class="tw-mt-5">
+            {{ csrf_field() }}
+            <button type="submit" id="login" class="btn btn-success btn-block">
+                <i class="fab fa-btn fa-{{ $provider }}"></i> {{ __('Login with') }} {{ ucfirst($provider) }}
+            </button>
+        </form>
+        @endforeach
     </div>
 </x-panel>

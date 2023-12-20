@@ -1,0 +1,418 @@
+--******************************************************************************
+--  Module  : SPECTRACOM-NTP-V4-MIB.mib
+--  Date    : 03/14/2006
+--  Author  : Mark Goodlein
+--  Purpose : This MIB defines the NTPv4 MIB for the private Spectracom MIB.
+--
+--  Copyright(C) 2006, 2009-2010 Spectracom Corporation.
+--  All Rights Reserved.
+--..............................................................................
+
+SPECTRACOM-NTP-V4-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    DisplayString
+        FROM SNMPv2-TC
+    specModules, specProducts
+        FROM SPECTRACOM-GLOBAL-REG-MIB;
+
+spectracomNtpV4MibModule MODULE-IDENTITY
+--               "YYYYMMDDHHMMZ"
+    LAST-UPDATED "202201070000Z"
+    ORGANIZATION "Spectracom"
+    CONTACT-INFO
+        "Postal: Orolia USA, Inc. dba Spectracom
+                 45 Becker Road, Suite A
+                 West Henrietta, NY 14586 USA
+         Tel:    +1 (585) 321-5800
+         Fax:    +1 (585) 321-5218
+         Email:  timingsupport@orolia.com"
+    DESCRIPTION
+        "Spectracom Corporation's NTP (V4) MIB."
+
+    REVISION    "202201070000Z"
+    DESCRIPTION
+        "Rev 1.3 - Updated address and email."
+
+    REVISION    "201306171453Z"
+    DESCRIPTION
+        "Rev 1.2 - Updated address."
+    REVISION    "201102211921Z"
+    DESCRIPTION
+        "Rev 1.1 - Changed enumeration for ntpSysStaCurrentMode object so that
+                   it no longer uses values of -1 and 0."
+
+    REVISION    "201006011540Z"
+    DESCRIPTION
+        "Rev 1.0 - Initial Revision. This module is a copy of the ntpV4Mib
+                   found in the SPECTRACOM-TIMEFREQ-MIB and defined in the
+                   SPECTRACOM-NTPv4-MIB.  It has been copied to the product
+                   level and is intended for use by all Spectracom products
+                   which feature NTPv4."
+    ::= { specModules 5 }
+
+--******************************************************************************
+-- Tree definition
+--..............................................................................
+
+--ntpSnmpObjs subtree
+ntpSnmpObjs           OBJECT IDENTIFIER ::= { specProducts 3 }
+
+--ntpV4Mib subtree
+ntpGeneralObjs        OBJECT IDENTIFIER ::= { ntpSnmpObjs 1 }
+ntpSystemStatusObjs   OBJECT IDENTIFIER ::= { ntpSnmpObjs 2 }
+ntpAssociationsObjs   OBJECT IDENTIFIER ::= { ntpSnmpObjs 3 }
+ntpAutoKeyObjs        OBJECT IDENTIFIER ::= { ntpSnmpObjs 4 }
+
+--******************************************************************************
+-- ntp General Objects [enterprises.18837.3.3.1.x]
+--..............................................................................
+
+ntpGenAppName           OBJECT-TYPE
+    SYNTAX               DisplayString
+    MAX-ACCESS           read-only
+    STATUS               current
+    DESCRIPTION
+        "Name of the NTP application implemented on this host."
+    ::= { ntpGeneralObjs 1 }
+
+ntpGenAppRevision       OBJECT-TYPE
+    SYNTAX               DisplayString
+    MAX-ACCESS           read-only
+    STATUS               current
+    DESCRIPTION
+        "Revision of the NTP application implemented on this host."
+    ::= { ntpGeneralObjs 2 }
+
+ntpGenAppVendor         OBJECT-TYPE
+    SYNTAX               DisplayString
+    MAX-ACCESS           read-only
+    STATUS               current
+    DESCRIPTION
+        "Vendor/author of the NTP application implemented on this host."
+    ::= { ntpGeneralObjs 3 }
+
+ntpGenSystemType        OBJECT-TYPE
+    SYNTAX               DisplayString
+    MAX-ACCESS           read-only
+    STATUS               current
+    DESCRIPTION
+        "System description of current host (OS / Hardware)."
+    ::= { ntpGeneralObjs 4 }
+
+--******************************************************************************
+-- ntp System Status Objects [enterprises.18837.3.3.2.x]
+--..............................................................................
+
+ntpSysStaCurrentMode     OBJECT-TYPE
+    SYNTAX               INTEGER { unknown(1),
+                                   notRunning(2),
+                                   notSynchonized(3),
+                                   synchronized(4) }
+    MAX-ACCESS           read-only
+    STATUS               current
+    DESCRIPTION
+        "Current Status of the NTP application."
+    ::= { ntpSystemStatusObjs 1 }
+
+ntpSysStaStratum         OBJECT-TYPE
+    SYNTAX               Unsigned32
+    MAX-ACCESS           read-only
+    STATUS               current
+    DESCRIPTION
+        "Current stratum of the NTP application."
+    ::= { ntpSystemStatusObjs 2 }
+
+ntpSysStaCurrentPeerAssc OBJECT-TYPE
+    SYNTAX               Unsigned32
+    MAX-ACCESS           read-only
+    STATUS               current
+    DESCRIPTION
+        "Association ID of the NTP application's selected peer."
+    ::= { ntpSystemStatusObjs 3 }
+
+ntpSysStaCurrentPeerName OBJECT-TYPE
+    SYNTAX               DisplayString
+    MAX-ACCESS           read-only
+    STATUS               current
+    DESCRIPTION
+        "Hostname/IP address of the NTP application's selected peer."
+    ::= { ntpSystemStatusObjs 4 }
+
+ntpSysStaPeerDelay       OBJECT-TYPE
+    SYNTAX               DisplayString
+    UNITS                "milliseconds"
+    MAX-ACCESS           read-only
+    STATUS               current
+    DESCRIPTION
+        "Delay of the NTP application's selected peer."
+    ::= { ntpSystemStatusObjs 5 }
+
+ntpSysStaPeerOffset      OBJECT-TYPE
+    SYNTAX               DisplayString
+    UNITS                "milliseconds"
+    MAX-ACCESS           read-only
+    STATUS               current
+    DESCRIPTION
+        "Offset with the NTP application's selected peer."
+    ::= { ntpSystemStatusObjs 6 }
+
+ntpSysStaPeerJitter      OBJECT-TYPE
+    SYNTAX               DisplayString
+    UNITS                "milliseconds"
+    MAX-ACCESS           read-only
+    STATUS               current
+    DESCRIPTION
+        "Jitter of the NTP application's selected peer."
+    ::= { ntpSystemStatusObjs 7 }
+
+--******************************************************************************
+-- ntp Associations Objects [enterprises.18837.3.3.3.x]
+--..............................................................................
+
+ntpAssocCount            OBJECT-TYPE
+    SYNTAX               Unsigned32
+    MAX-ACCESS           read-only
+    STATUS               current
+    DESCRIPTION
+        "Count of current associations."
+    ::= { ntpAssociationsObjs 1 }
+
+ntpAssocTable            OBJECT-TYPE
+    SYNTAX               SEQUENCE OF NtpAssocEntry
+    MAX-ACCESS           not-accessible
+    STATUS               current
+    DESCRIPTION
+        "Table of current associations."
+    ::= { ntpAssociationsObjs 2 }
+
+ntpAssocEntry            OBJECT-TYPE
+    SYNTAX               NtpAssocEntry
+    MAX-ACCESS           not-accessible
+    STATUS               current
+    DESCRIPTION
+        "A row in the association table."
+    INDEX                { assocEntryIndex }
+    ::= { ntpAssocTable 1 }
+
+NtpAssocEntry ::= SEQUENCE {
+        assocEntryIndex        Unsigned32,
+        assocEntryIdentity     DisplayString,
+        assocEntrySyncStatus   DisplayString,
+        assocEntryRefId        DisplayString,
+        assocEntryStratum      Unsigned32,
+        assocEntryMode         INTEGER,
+        assocEntryType         DisplayString,
+        assocEntryAuthStatus   DisplayString,
+        assocEntryLastPoll     Unsigned32,
+        assocEntryPollInterval Unsigned32,
+        assocEntryReach        Unsigned32,
+        assocEntryDelay        DisplayString,
+        assocEntryOffset       DisplayString,
+        assocEntryJitter       DisplayString }
+
+assocEntryIndex          OBJECT-TYPE
+    SYNTAX               Unsigned32(1..65535)
+    MAX-ACCESS           not-accessible
+    STATUS               current
+    DESCRIPTION
+        "The unique value which indentifies this row."
+    ::= { ntpAssocEntry 1 }
+
+assocEntryIdentity       OBJECT-TYPE
+    SYNTAX               DisplayString
+    MAX-ACCESS           read-only
+    STATUS               current
+    DESCRIPTION
+        "IPv4/IPv6 address or hostname of association."
+    ::= { ntpAssocEntry 2 }
+
+assocEntrySyncStatus     OBJECT-TYPE
+    SYNTAX               DisplayString
+    MAX-ACCESS           read-only
+    STATUS               current
+    DESCRIPTION
+        "Synchronization status of the association."
+    ::= { ntpAssocEntry 3 }
+
+assocEntryRefId          OBJECT-TYPE
+    SYNTAX               DisplayString
+    MAX-ACCESS           read-only
+    STATUS               current
+    DESCRIPTION
+        "Reference ID of the association."
+    ::= { ntpAssocEntry 4 }
+
+assocEntryStratum        OBJECT-TYPE
+    SYNTAX               Unsigned32
+    MAX-ACCESS           read-only
+    STATUS               current
+    DESCRIPTION
+        "Stratum level of the association."
+    ::= { ntpAssocEntry 5 }
+
+assocEntryMode           OBJECT-TYPE
+    SYNTAX               INTEGER { symmetricActive(1),
+                                   symmetricPassive(2),
+                                   client(3),
+                                   server(4),
+                                   broadcast(5) }
+    MAX-ACCESS           read-only
+    STATUS               current
+    DESCRIPTION
+        "The association's mode of operation"
+    ::= { ntpAssocEntry 6 }
+
+assocEntryType           OBJECT-TYPE
+    SYNTAX               DisplayString
+    MAX-ACCESS           read-only
+    STATUS               current
+    DESCRIPTION
+        "Type of association."
+    ::= { ntpAssocEntry 7 }
+
+assocEntryAuthStatus     OBJECT-TYPE
+    SYNTAX               DisplayString
+    MAX-ACCESS           read-only
+    STATUS               current
+    DESCRIPTION
+        "Authentication status of association."
+    ::= { ntpAssocEntry 8 }
+
+assocEntryLastPoll       OBJECT-TYPE
+    SYNTAX               Unsigned32
+    MAX-ACCESS           read-only
+    STATUS               current
+    DESCRIPTION
+        "Seconds since the association was last polled."
+    ::= { ntpAssocEntry 9 }
+
+assocEntryPollInterval   OBJECT-TYPE
+    SYNTAX               Unsigned32
+    MAX-ACCESS           read-only
+    STATUS               current
+    DESCRIPTION
+        "Current poll interval with association."
+    ::= { ntpAssocEntry 10 }
+
+assocEntryReach          OBJECT-TYPE
+    SYNTAX               Unsigned32
+    MAX-ACCESS           read-only
+    STATUS               current
+    DESCRIPTION
+        "Reach status with the current association."
+    ::= { ntpAssocEntry 11 }
+
+assocEntryDelay          OBJECT-TYPE
+    SYNTAX               DisplayString
+    UNITS                "milliseconds"
+    MAX-ACCESS           read-only
+    STATUS               current
+    DESCRIPTION
+        "Current delay between association."
+    ::= { ntpAssocEntry 12 }
+
+assocEntryOffset         OBJECT-TYPE
+    SYNTAX               DisplayString
+    UNITS                "milliseconds"
+    MAX-ACCESS           read-only
+    STATUS               current
+    DESCRIPTION
+        "Current offset of association."
+    ::= { ntpAssocEntry 13 }
+
+assocEntryJitter         OBJECT-TYPE
+    SYNTAX               DisplayString
+    UNITS                "milliseconds"
+    MAX-ACCESS           read-only
+    STATUS               current
+    DESCRIPTION
+        "Current jitter of association."
+    ::= { ntpAssocEntry 14 }
+
+--******************************************************************************
+-- ntp AutoKey Objects [enterprises.18837.3.3.4.x]
+--..............................................................................
+
+ntpAutoKeyTrustedRoot    OBJECT-TYPE
+    SYNTAX               Unsigned32
+    MAX-ACCESS           read-only
+    STATUS               current
+    DESCRIPTION
+        "1 - Currently trusted root, 0 - Currently not trusted root."
+    ::= { ntpAutoKeyObjs 1 }
+
+ntpAutoKeyNotBefore      OBJECT-TYPE
+    SYNTAX               DisplayString
+    MAX-ACCESS           read-only
+    STATUS               current
+    DESCRIPTION
+        "Not before date of current certificate."
+    ::= { ntpAutoKeyObjs 2 }
+
+ntpAutoKeyNotAfter       OBJECT-TYPE
+    SYNTAX               DisplayString
+    MAX-ACCESS           read-only
+    STATUS               current
+    DESCRIPTION
+        "Not after date of the current certificate."
+    ::= { ntpAutoKeyObjs 3 }
+
+--******************************************************************************
+-- Conformance Section [enterprises.18837.3.1.2.8.90.x]
+--..............................................................................
+
+-- OEM
+ntpConformance    OBJECT IDENTIFIER ::= { ntpSnmpObjs 90 }
+ntpCompliances    OBJECT IDENTIFIER ::= { ntpConformance 1 }
+ntpGroups         OBJECT IDENTIFIER ::= { ntpConformance 2 }
+
+ntpCompliance     MODULE-COMPLIANCE
+    STATUS        current
+    DESCRIPTION
+        "The compliance statement for SNMP entities which implement version 2
+         of the Spectracom NTP (V4) MIB."
+    MODULE -- this module
+        MANDATORY-GROUPS { ntpObjectsGroup }
+    ::= { ntpCompliances 1 }
+
+-- CONFORMANCE_OEM
+ntpObjectsGroup   OBJECT-GROUP
+    OBJECTS       { ntpGenAppName,
+                    ntpGenAppRevision,
+                    ntpGenAppVendor,
+                    ntpGenSystemType,
+                    ntpSysStaCurrentMode,
+                    ntpSysStaStratum,
+                    ntpSysStaCurrentPeerAssc,
+                    ntpSysStaCurrentPeerName,
+                    ntpSysStaPeerDelay,
+                    ntpSysStaPeerOffset,
+                    ntpSysStaPeerJitter,
+                    ntpAssocCount,
+                    assocEntryIdentity,
+                    assocEntrySyncStatus,
+                    assocEntryRefId,
+                    assocEntryStratum,
+                    assocEntryMode,
+                    assocEntryType,
+                    assocEntryAuthStatus,
+                    assocEntryLastPoll,
+                    assocEntryPollInterval,
+                    assocEntryReach,
+                    assocEntryDelay,
+                    assocEntryOffset,
+                    assocEntryJitter,
+                    ntpAutoKeyTrustedRoot,
+                    ntpAutoKeyNotBefore,
+                    ntpAutoKeyNotAfter }
+    STATUS        current
+    DESCRIPTION
+        "The collection of objects for the Spectracom NTP (V4) MIB"
+    ::= { ntpGroups 1 }
+
+END

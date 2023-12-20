@@ -1,0 +1,22 @@
+modules:
+    os:
+        hardware:
+         - ENTITY-MIB::entPhysicalModelName.1
+        sysDescr_regex: '/version(?<version>.*[0-9])/'
+
+    processors:
+        data:
+            -
+                oid: DMOS-SYSMON-MIB::cpuLoadOneMinuteActive
+                num_oid: 1.3.6.1.4.1.3709.3.6.4.1.2.1.4.1.1.49
+                descr: 'Processor'
+    mempools:
+        data:
+            -
+                total: .1.3.6.1.4.1.3709.3.6.4.2.2.1.58.1.1.49
+                free: .1.3.6.1.4.1.3709.3.6.4.2.2.1.60.1.1.49
+                used: .1.3.6.1.4.1.3709.3.6.4.2.2.1.59.1.1.49
+                precision: 1
+                descr: 'Memory'
+                class: system
+                index: 1

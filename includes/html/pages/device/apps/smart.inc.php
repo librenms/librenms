@@ -169,6 +169,7 @@ foreach ($graphs as $key => $text) {
     $graph_array['to'] = \LibreNMS\Config::get('time.now');
     $graph_array['id'] = $app['app_id'];
     $graph_array['type'] = 'application_' . $key;
+    $graph_array['scale_min'] = '0';
 
     if (isset($vars['disk'])) {
         $graph_array['disk'] = $vars['disk'];
