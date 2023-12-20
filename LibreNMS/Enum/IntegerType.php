@@ -47,7 +47,6 @@ enum IntegerType
             self::uint16 => 65535,
             self::uint32 => 4294967295,
             self::uint64 => 9223372036854775807,
-            default => throw new \InvalidArgumentException('Invalid integer type'),
         };
     }
 
@@ -56,7 +55,6 @@ enum IntegerType
         return match ($this) {
             self::int8,self::int16,self::int32,self::int64 => true,
             self::uint8,self::uint16,self::uint32,self::uint64 => false,
-            default => throw new \InvalidArgumentException('Invalid integer type'),
         };
     }
 }
