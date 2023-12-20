@@ -149,8 +149,7 @@ class FunctionsTest extends TestCase
     {
         $this->expectException(\InvalidArgumentException::class);
 
-
         // Exceeds the maximum representable value for a 16-bit unsigned integer
-        $value = Number::constrainInteger(4294967296, IntegerType::int16);
+        Number::constrainInteger(4294967296, IntegerType::int16);
     }
 }
