@@ -26,17 +26,14 @@
 namespace LibreNMS\Modules;
 
 use App\Models\Device;
-use App\Observers\ModuleModelObserver;
+use Illuminate\Support\Facades\DB;
 use LibreNMS\Config;
 use LibreNMS\DB\SyncsModels;
-use LibreNMS\Interfaces\Data\DataStorageInterface;
-use LibreNMS\Interfaces\Discovery\PortSecurityDiscovery;
+use LibreNMS\Enum\PortAssociationMode;
+use LibreNMS\Interfaces\Module;
 use LibreNMS\Interfaces\Polling\PortSecurityPolling;
 use LibreNMS\OS;
 use LibreNMS\Polling\ModuleStatus;
-use LibreNMS\Enum\PortAssociationMode;
-use Illuminate\Support\Facades\DB;
-use LibreNMS\Interfaces\Module;
 
 class PortSecurity implements Module
 {
@@ -129,7 +126,6 @@ class PortSecurity implements Module
             unset($port_stats);
             unset($ports_db);
 	    }
-
     }
 
     /**
