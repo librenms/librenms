@@ -31,6 +31,7 @@ use LibreNMS\Config;
 use LibreNMS\DB\SyncsModels;
 use LibreNMS\Enum\PortAssociationMode;
 use LibreNMS\Interfaces\Module;
+use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\OS;
 use LibreNMS\Polling\ModuleStatus;
 
@@ -56,7 +57,7 @@ class PortSecurity implements Module
      */
     public function discover(OS $os): void
     {
-        $this->poll($os);
+        $this->poll($os, app('Datastore'));
     }
 
     public function shouldPoll(OS $os, ModuleStatus $status): bool
