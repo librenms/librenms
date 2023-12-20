@@ -1,5 +1,6 @@
 <?php
 
+<<<<<<< HEAD
 // Build SNMP Cache Array
 // use App\Models\PortGroup;
 use Illuminate\Database\Eloquent\Model;
@@ -79,3 +80,10 @@ if ($device['os'] == 'ios' || $device['os'] == 'iosxe') {
     unset($port_stats);
     unset($ports_db);
 }
+=======
+use LibreNMS\OS;
+if (! $os instanceof OS) {
+    $os = OS::make($device);
+}
+(new \LibreNMS\Modules\PortSecurity())->poll($os);
+>>>>>>> 66c85ae25b (Moving polling to Modules/PortSecurity.php)
