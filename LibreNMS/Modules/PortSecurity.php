@@ -125,6 +125,7 @@ class PortSecurity implements Module
             // Clear Variables Here
             unset($port_stats);
             unset($ports_db);
+            
 	    }
     }
 
