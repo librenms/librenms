@@ -46,6 +46,11 @@ class PortSecurity implements Module
         return [];
     }
 
+    public function shouldDiscover(OS $os, ModuleStatus $status): bool
+    {
+        return $status->isEnabledAndDeviceUp($os->getDevice());
+    }
+
     /**
      * @inheritDoc
      */
@@ -61,10 +66,10 @@ class PortSecurity implements Module
 
     /**
      * Poll data for this module and update the DB
-     * 
+     *
      * @param  \LibreNMS\OS  $os
      */
-    public function poll(OS $os): void
+    public function poll(OS $os, DataStorageInterface $datastore): void
     {
         $table = 'port_security';
         $port_id_field = 'port_id';
