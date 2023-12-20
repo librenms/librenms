@@ -38,7 +38,7 @@ enum IntegerType
 
     public function maxValue(): int
     {
-        return match($this) {
+        return match ($this) {
             self::int8 => 127,
             self::int16 => 32767,
             self::int32 => 2147483647,
@@ -53,7 +53,7 @@ enum IntegerType
 
     public function isSigned(): bool
     {
-        return match($this) {
+        return match ($this) {
             self::int8,self::int16,self::int32,self::int64 => true,
             self::uint8,self::uint16,self::uint32,self::uint64 => false,
             default => throw new \InvalidArgumentException('Invalid integer type'),
