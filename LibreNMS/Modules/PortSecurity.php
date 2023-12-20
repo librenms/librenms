@@ -30,8 +30,8 @@ use Illuminate\Support\Facades\DB;
 use LibreNMS\Config;
 use LibreNMS\DB\SyncsModels;
 use LibreNMS\Enum\PortAssociationMode;
-use LibreNMS\Interfaces\Module;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
+use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
 use LibreNMS\Polling\ModuleStatus;
 
