@@ -32,6 +32,7 @@ use App\Models\PortVdsl;
 use App\Observers\ModuleModelObserver;
 use Illuminate\Support\Collection;
 use LibreNMS\DB\SyncsModels;
+use LibreNMS\Enum\IntegerType;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
@@ -139,7 +140,7 @@ class Xdsl implements Module
                 if (isset($data[$oid])) {
                     if ($oid == 'adslAtucCurrOutputPwr') {
                         // workaround Cisco Bug CSCvj53634
-                        $data[$oid] = Number::unsignedAsSigned($data[$oid]);
+                        $data[$oid] = Number::constrainInteger($data[$oid], IntegerType::int32);
                     }
                     $data[$oid] = $data[$oid] / 10;
                 }
