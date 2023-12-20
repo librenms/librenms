@@ -31,7 +31,6 @@ use LibreNMS\Config;
 use LibreNMS\DB\SyncsModels;
 use LibreNMS\Enum\PortAssociationMode;
 use LibreNMS\Interfaces\Module;
-use LibreNMS\Interfaces\Polling\PortSecurityPolling;
 use LibreNMS\OS;
 use LibreNMS\Polling\ModuleStatus;
 
@@ -55,14 +54,14 @@ class PortSecurity implements Module
         $this->poll($os);
     }
 
-
     public function shouldPoll(OS $os, ModuleStatus $status): bool
     {
         return $status->isEnabledAndDeviceUp($os->getDevice());
     }
 
     /**
-     * Poll data for this module and update the DB / RRD.
+     * Poll data for this module and update the DB
+     * 
      * @param  \LibreNMS\OS  $os
      */
     public function poll(OS $os): void
