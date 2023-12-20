@@ -47,13 +47,24 @@ class PortSecurity implements Module
         return [];
     }
 
+    /**
+     * @inheritDoc
+     */
+    public function discover(OS $os): void
+    {
+        $this->poll($os);
+    }
+	echo PHP_EOL;
+    }
+
     public function shouldPoll(OS $os, ModuleStatus $status): bool
     {
-        return $status->isEnabledAndDeviceUp($os->getDevice()) && $os instanceof PortSecurityPolling;
+        return $status->isEnabledAndDeviceUp($os->getDevice());
     }
 
     /**
-     * @inheritDoc
+     * Poll data for this module and update the DB / RRD.
+     * @param  \LibreNMS\OS  $os
      */
     public function poll(OS $os): void
     {
@@ -118,7 +129,6 @@ class PortSecurity implements Module
             // Clear Variables Here
             unset(
                 $ports_mapped,
-                $port,
                 $port_stats,
                 $ports_db
             );
@@ -132,7 +142,7 @@ class PortSecurity implements Module
      */
     public function cleanup(Device $device): void
     {
-        $device->PortSecurity()->delete();
+        $device->portSecurity()->delete();
     }
 
     /**
@@ -141,7 +151,7 @@ class PortSecurity implements Module
     public function dump(Device $device)
     {
         return [
-            'PortSecurity' => $device->PortSecurity()->orderBy('port_id')
+            'PortSecurity' => $device->portSecurity()->orderBy('port_id')
                 ->get()->map->makeHidden(['id', 'device_id']),
         ];
     }
