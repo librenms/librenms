@@ -115,16 +115,15 @@ class PortSecurity implements Module
                 }
             }//end foreach
 
+            // Clear Variables Here
             unset(
                 $ports_mapped,
-                $port
+                $port,
+                $port_stats,
+                $ports_db
             );
 
             echo "\n";
-
-            // Clear Variables Here
-            unset($port_stats);
-            unset($ports_db);  
         }
     }
 
