@@ -54,8 +54,7 @@ class PortSecurity implements Module
     {
         $this->poll($os);
     }
-	echo PHP_EOL;
-    }
+
 
     public function shouldPoll(OS $os, ModuleStatus $status): bool
     {
