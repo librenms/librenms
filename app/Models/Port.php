@@ -352,6 +352,11 @@ class Port extends DeviceRelatedModel
         return $this->links->merge($this->remoteLinks);
     }
 
+    public function macLinkedPorts(): BelongsToMany
+    {
+        return $this->belongsToMany(Port::class, 'view_port_mac_links', 'port_id', 'remote_port_id');
+    }
+
     public function macAccounting(): HasMany
     {
         return $this->hasMany(MacAccounting::class, 'port_id');
