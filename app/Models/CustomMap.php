@@ -54,25 +54,6 @@ class CustomMap extends BaseModel
             ->having('device_nodes_count', '>', 0);
     }
 
-    public function scopeHasAccess($query, User $user)
-    {
-        if ($user->hasGlobalRead()) {
-            return $query;
-        }
-
-        // Allow only if the user has access to all devices on the map
-        return $query->withCount([
-            'nodes as device_nodes_count' => function (Builder $q) {
-                $q->whereNotNull('device_id');
-            },
-            'nodes as device_nodes_allowed_count' => function (Builder $q) use ($user) {
-                $this->hasDeviceAccess($q, $user, 'custom_map_nodes');
-            },
-        ])
-            ->havingRaw('device_nodes_count = device_nodes_allowed_count')
-            ->having('device_nodes_count', '>', 0);
-    }
-
     public function nodes(): HasMany
     {
         return $this->hasMany(CustomMapNode::class, 'custom_map_id');
