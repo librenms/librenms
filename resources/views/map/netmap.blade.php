@@ -105,8 +105,14 @@
         $.post( '{{ route('maps.getdevicelinks') }}', {disabled: 0, disabled_alerts: 0, group: group, link_types: @json($link_types)})
             .done(function( data ) {
                 $.each( data, function( link_id, link ) {
+                    var this_edge = link['style'];
+                    this_edge['from'] = link['ldev'];
+                    this_edge['to'] = link['rdev'];
+                    this_edge['label'] = link['ifnames'];
+                    this_edge['title'] = link['url'];
+
                     if (!network_edges.get(link_id)) {
-                        network_edges.add([{from: link['ldev'], to: link['rdev'], label: link['ifnames'], title: link['url'], width: link['width']}]);
+                        network_edges.add([this_edge]);
                     }
                 })
 

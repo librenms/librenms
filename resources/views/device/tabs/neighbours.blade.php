@@ -44,7 +44,12 @@ $.post( '{{ route('maps.getdevicelinks') }}', {device: {{$data['device_id']}}, l
     .done(function( data ) {
         var devices = [];
         $.each(data, function( link_id, link ) {
-            network_edges.add({from: link['ldev'], to: link['rdev'], label: link['ifnames'], color: link['color'], borderWidth: link['borderWidth'], dashes: link['dashes']});
+            var this_edge = link['style'];
+            this_edge['from'] = link['ldev'];
+            this_edge['to'] = link['rdev'];
+            this_edge['label'] = link['ifnames'];
+
+            network_edges.add(this_edge);
             devices[link['ldev']] = true;
             devices[link['rdev']] = true;
         });
