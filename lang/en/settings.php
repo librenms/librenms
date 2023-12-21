@@ -1255,8 +1255,8 @@ return [
             'printer-supplies' => [
                 'description' => 'Printer Supplies',
             ],
-            'cisco-port-security' => [
-                'description' => 'Cisco Port Security',
+            'port-security' => [
+                'description' => 'Port Security',
             ],
         ],
         'ports_fdb_purge' => [

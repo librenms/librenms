@@ -5142,7 +5142,7 @@
             "default": true,
             "type": "boolean"
         },
-        "poller_modules.cisco-port-security": {
+        "poller_modules.port-security": {
             "order": 460,
                 "group": "poller",
                 "section": "poller_modules",
