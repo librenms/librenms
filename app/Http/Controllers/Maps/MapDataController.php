@@ -111,7 +111,8 @@ class MapDataController extends Controller
         }
 
         $linkQuery = Port::hasAccess($request->user())
-            ->with('macLinkedPorts', 'device', 'macLinkedPorts.device');
+            ->with('macLinkedPorts', 'device', 'macLinkedPorts.device')
+            ->whereHas('macLinkedPorts');
 
         if ($device_filter) {
             $linkQuery->whereHas('device', function (Builder $q) use ($user, $disabled, $disabled_alerts, $group_id) {
@@ -181,12 +182,14 @@ class MapDataController extends Controller
         }
 
         if ($device_id) {
-            $linkQuery->whereHas('macLinkedPorts', function ($q) use ($device_id) {
-                        $q->where('device_id', $device_id);
-                    })
-                ->orWhereHas('device', function ($q) use ($device_id) {
+            $linkQuery->where(function ($q) use ($device_id) {
+                $q->whereHas('macLinkedPorts', function ($q) use ($device_id) {
+                    $q->where('device_id', $device_id);
+                })
+                    ->orWhereHas('device', function ($q) use ($device_id) {
                         $q->where('device_id', $device_id);
                     });
+            });
         }
 
         //echo $linkQuery->toSql();
