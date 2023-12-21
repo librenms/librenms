@@ -154,7 +154,6 @@ Route::middleware(['auth'])->group(function () {
         Route::namespace('Ajax')->group(function () {
             Route::get('search/bgp', BgpSearchController::class);
             Route::get('search/device', DeviceSearchController::class);
-            Route::get('search/device/{device_id}/port', DevicePortSearchController::class);
             Route::get('search/port', PortSearchController::class);
             Route::post('set_map_group', 'AvailabilityMapController@setGroup');
             Route::post('set_map_view', 'AvailabilityMapController@setView');
