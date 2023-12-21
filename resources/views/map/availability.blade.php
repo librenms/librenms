@@ -76,7 +76,7 @@
         }
 
         if ($("#show_items").val() == 0 || $("#show_items").val() == 2) {
-            $.get( '{{ route('maps.getdevices') }}', {disabled: 0, disabled_alerts: 0, group: group})
+            $.post( '{{ route('maps.getdevices') }}', {disabled: 0, disabled_alerts: 0, group: group})
                 .done(function( data ) {
                     var host_warn_count = 0;
                     var host_up_count = 0;
@@ -145,7 +145,7 @@
             $("#devices-summary").hide();
         }
         if ($("#show_items").val() == 1 || $("#show_items").val() == 2) {
-            $.get( '{{ route('maps.getservices') }}', {disabled: 0, disabled_alerts: 0, device_group: group})
+            $.post( '{{ route('maps.getservices') }}', {disabled: 0, disabled_alerts: 0, device_group: group})
                 .done(function( data ) {
                     var service_warn_count = 0;
                     var service_up_count = 0;

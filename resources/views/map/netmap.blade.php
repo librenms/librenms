@@ -58,7 +58,7 @@
         var group = null;
 @endif
 
-        $.get( '{{ route('maps.getdevices') }}', {disabled: 0, disabled_alerts: 0, url_type: "links", group: group, highlight_node: highlight})
+        $.post( '{{ route('maps.getdevices') }}', {disabled: 0, disabled_alerts: 0, url_type: "links", group: group, highlight_node: highlight})
             .done(function( data ) {
                 function deviceSort(a,b) {
                     return (data[a]["sname"] > data[b]["sname"]) ? 1 : -1;
@@ -102,7 +102,7 @@
                 }
             });
 
-        $.get( '{{ route('maps.getdevicelinks') }}', {disabled: 0, disabled_alerts: 0, group: group, link_types: @json($link_types)})
+        $.post( '{{ route('maps.getdevicelinks') }}', {disabled: 0, disabled_alerts: 0, group: group, link_types: @json($link_types)})
             .done(function( data ) {
                 $.each( data, function( link_id, link ) {
                     if (!network_edges.get(link_id)) {

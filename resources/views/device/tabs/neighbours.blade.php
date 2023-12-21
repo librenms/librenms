@@ -40,7 +40,7 @@
 var network_nodes = new vis.DataSet({queue: {delay: 100}});
 var network_edges = new vis.DataSet({queue: {delay: 100}});
 
-$.get( '{{ route('maps.getdevicelinks') }}', {device: {{$data['device_id']}}, link_types: @json($data['link_types'])})
+$.post( '{{ route('maps.getdevicelinks') }}', {device: {{$data['device_id']}}, link_types: @json($data['link_types'])})
     .done(function( data ) {
         var devices = [];
         $.each(data, function( link_id, link ) {
@@ -49,7 +49,7 @@ $.get( '{{ route('maps.getdevicelinks') }}', {device: {{$data['device_id']}}, li
             devices[link['rdev']] = true;
         });
 
-        $.get( '{{ route('maps.getdevices') }}', {devices: Object.keys(devices), url_type: 'links'})
+        $.post( '{{ route('maps.getdevices') }}', {devices: Object.keys(devices), url_type: 'links'})
             .done(function( data ) {
                 $.each(data, function( dev_id, dev ) {
                     var this_dev = {id: dev_id, label: dev["sname"], title: dev["url"], shape: "box"};
