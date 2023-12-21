@@ -31,7 +31,7 @@ use Illuminate\Http\Request;
 use LibreNMS\Config;
 use LibreNMS\Util\Url;
 
-class NetMapController extends MapController
+class NetMapController extends Controller
 {
     // Device Dependency Map
     public function netMap(Request $request, $vars = '')
@@ -46,7 +46,7 @@ class NetMapController extends MapController
         $data = [
             'page_refresh' => Config::get('page_refresh', 300),
             'group_id' => $group_id,
-            'options' => $this->visOptions(),
+            'options' => Config::get('network_map_vis_options'),
             'group_name' => $group_name,
             'link_types' => Config::get('network_map_items', ['xdp', 'mac']),
         ];
