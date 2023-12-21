@@ -77,7 +77,6 @@ disable it for one device then you can do this within the WebUI Device
     lnms config:set poller_modules.cisco-cbqos false
     lnms config:set poller_modules.cisco-otv false
     lnms config:set poller_modules.cisco-vpdn false
-    lnms config:set poller_modules.cisco-port-security false
     lnms config:set poller_modules.netscaler-vsvr false
     lnms config:set poller_modules.aruba-controller false
     lnms config:set poller_modules.entity-physical true

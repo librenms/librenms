@@ -1767,8 +1767,8 @@ return [
             'printer-supplies' => [
                 'description' => 'Printer Supplies',
             ],
-            'cisco-port-security' => [
-                'description' => 'Cisco Port Security',
+            'port-security' => [
+                'description' => 'Port Security',
             ],
         ],
         'polling.selected_ports' => [
