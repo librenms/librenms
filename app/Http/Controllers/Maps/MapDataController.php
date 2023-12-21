@@ -50,7 +50,6 @@ class MapDataController extends Controller
             return [];
         }
 
-        // Device links are not in the schema yet, so we need to do a table query
         $linkQuery = Link::with('port', 'device', 'remoteDevice', 'device.location', 'remoteDevice.location')
             ->whereHas('device', function (Builder $q) use ($user) {
                 $q->whereIn('status', [0, 1])
@@ -111,10 +110,74 @@ class MapDataController extends Controller
         }
 
         $linkQuery = Port::hasAccess($request->user())
-            ->with('macLinkedPorts', 'device', 'macLinkedPorts.device')
+            ->with(['macLinkedPorts', 'device' => function ($q) use ($user, $disabled, $disabled_alerts, $group_id) {
+                    // Apply device filter to the list of local devices that we will load
+                    if (! $user->hasGlobalRead()) {
+                        $q->whereIntegerInRaw('device_id', \Permissions::devicesForUser($user));
+                    }
+
+                    if (! is_null($disabled)) {
+                        if ($disabled) {
+                            $q->where('disabled', '<>', '0');
+                        } else {
+                            $q->where('disabled', '=', '0');
+                        }
+                    }
+
+                    if (! is_null($disabled_alerts)) {
+                        if ($disabled_alerts) {
+                            $q->where('disable_notify', '<>', '0');
+                        } else {
+                            $q->where('disable_notify', '=', '0');
+                        }
+                    }
+
+                    if ($group_id) {
+                        $q->whereIn(
+                            $q->qualifyColumn('device_id'), function ($q) use ($group_id) {
+                                $q->select('device_id')
+                                ->from('device_group_device')
+                                ->where('device_group_id', $group_id);
+                            }
+                        );
+                    }
+                },
+                'macLinkedPorts.device' => function ($q) use ($user, $disabled, $disabled_alerts, $group_id) {
+                    // Apply device filter to the list of remote devices that we will load
+                    if (! $user->hasGlobalRead()) {
+                        $q->whereIntegerInRaw('device_id', \Permissions::devicesForUser($user));
+                    }
+
+                    if (! is_null($disabled)) {
+                        if ($disabled) {
+                            $q->where('disabled', '<>', '0');
+                        } else {
+                            $q->where('disabled', '=', '0');
+                        }
+                    }
+
+                    if (! is_null($disabled_alerts)) {
+                        if ($disabled_alerts) {
+                            $q->where('disable_notify', '<>', '0');
+                        } else {
+                            $q->where('disable_notify', '=', '0');
+                        }
+                    }
+
+                    if ($group_id) {
+                        $q->whereIn(
+                            $q->qualifyColumn('device_id'), function ($q) use ($group_id) {
+                                $q->select('device_id')
+                                ->from('device_group_device')
+                                ->where('device_group_id', $group_id);
+                            }
+                        );
+                    }
+                }])
             ->whereHas('macLinkedPorts');
 
         if ($device_filter) {
+            // Apply device level filter to the port list so we exclude ports that are not connected to devices we want to display
             $linkQuery->whereHas('device', function (Builder $q) use ($user, $disabled, $disabled_alerts, $group_id) {
                 if (! $user->hasGlobalRead()) {
                     $q->whereIntegerInRaw('device_id', \Permissions::devicesForUser($user));
@@ -147,7 +210,7 @@ class MapDataController extends Controller
                 }
             });
 
-            // Repeate the same filter on the remote device
+            // Apply the same device level filter to the port list so we exclude ports that have no remote devices we want to display
             $linkQuery->whereHas('macLinkedPorts.device', function (Builder $q) use ($user, $disabled, $disabled_alerts, $group_id) {
                 if (! $user->hasGlobalRead()) {
                     $q->whereIntegerInRaw('device_id', \Permissions::devicesForUser($user));
@@ -182,6 +245,7 @@ class MapDataController extends Controller
         }
 
         if ($device_id) {
+            // If we have a device ID, we want to show if we are the soure or target of a link
             $linkQuery->where(function ($q) use ($device_id) {
                 $q->whereHas('macLinkedPorts', function ($q) use ($device_id) {
                     $q->where('device_id', $device_id);
@@ -568,10 +632,20 @@ class MapDataController extends Controller
         return response()->json($device_list);
     }
 
-    protected function addDeviceLinks($query, &$link_list, &$device_assoc_seen)
+    protected function addDeviceLinks($query, &$link_list, &$device_assoc_seen, $remote_port_attr)
     {
         foreach ($query as $port) {
-            foreach ($port->macLinkedPorts as $remote_port) {
+            // Ignore any entries if the device has not been loaded (filtered out)
+            if (! $port->device) {
+                continue;
+            }
+
+            foreach ($port->{$remote_port_attr} as $remote_port) {
+                // Ignore any entries if the device has not been loaded (filtered out)
+                if (! $remote_port->device) {
+                    continue;
+                }
+
                 $device_ids_1 = $port->device_id . '.' . $remote_port->device_id;
                 $device_ids_2 = $remote_port->device_id . '.' . $port->device_id;
 
@@ -648,7 +722,7 @@ class MapDataController extends Controller
         DB::connection()->enableQueryLog();
         foreach ($link_types as $link_type) {
             if ($link_type == 'mac') {
-                self::addDeviceLinks(self::deviceMacLinks($request), $link_list, $device_assoc_seen);
+                self::addDeviceLinks(self::deviceMacLinks($request), $link_list, $device_assoc_seen, 'macLinkedPorts');
             } elseif ($link_type == 'xdp') {
                 //self::addDeviceLinks(self::deviceXdpLinks($request), $link_list, $device_assoc_seen);
             }
