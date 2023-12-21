@@ -1,25 +1,4 @@
 {
-    "os": {
-        "discovery": {
-            "devices": [
-                {
-                    "sysName": null,
-                    "sysObjectID": ".1.3.6.1.4.1.3709.1.2.137",
-                    "sysDescr": "DM4611 4GPON+2GT+2XS (DmOS version 9.0.0-345-1-g479ba56c8a)",
-                    "sysContact": "<private>",
-                    "version": "9.0.0-345-1-g479ba56c8",
-                    "hardware": "DM4611",
-                    "features": null,
-                    "location": "<private>",
-                    "os": "datacom-dmos",
-                    "type": "network",
-                    "serial": null,
-                    "icon": "datacom.svg"
-                }
-            ]
-        },
-        "poller": "matches discovery"
-    },
     "ports": {
         "discovery": {
             "ports": [
@@ -1630,6 +1609,27 @@
             ]
         }
     },
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": null,
+                    "sysObjectID": ".1.3.6.1.4.1.3709.1.2.137",
+                    "sysDescr": "DM4611 4GPON+2GT+2XS (DmOS version 9.0.0-345-1-g479ba56c8a)",
+                    "sysContact": "<private>",
+                    "version": "9.0.0-345-1-g479ba56c8",
+                    "hardware": "DM4611",
+                    "features": null,
+                    "location": "<private>",
+                    "os": "datacom-dmos",
+                    "type": "network",
+                    "serial": null,
+                    "icon": "datacom.svg"
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    },
     "processors": {
         "discovery": {
             "processors": [
@@ -1652,7 +1652,7 @@
         "discovery": {
             "mempools": [
                 {
-                    "mempool_index": "1",
+                    "mempool_index": "1.1.49",
                     "entPhysicalIndex": null,
                     "mempool_type": "datacom-dmos",
                     "mempool_class": "system",
@@ -1660,11 +1660,11 @@
                     "mempool_descr": "Memory",
                     "mempool_perc": 53,
                     "mempool_perc_oid": null,
-                    "mempool_used": 516265,
-                    "mempool_used_oid": ".1.3.6.1.4.1.3709.3.6.4.2.2.1.59.1.1.49",
-                    "mempool_free": 283939,
+                    "mempool_used": 529220949,
+                    "mempool_used_oid": ".1.3.6.1.4.1.3709.3.6.4.2.2.1.27.1.1.49",
+                    "mempool_free": 292476245,
                     "mempool_free_oid": null,
-                    "mempool_total": 973208,
+                    "mempool_total": 996564992,
                     "mempool_total_oid": null,
                     "mempool_largestfree": null,
                     "mempool_lowestfree": null,
@@ -1676,7 +1676,7 @@
         "poller": {
             "mempools": [
                 {
-                    "mempool_index": "1",
+                    "mempool_index": "1.1.49",
                     "entPhysicalIndex": null,
                     "mempool_type": "datacom-dmos",
                     "mempool_class": "system",
@@ -1684,11 +1684,11 @@
                     "mempool_descr": "Memory",
                     "mempool_perc": 53,
                     "mempool_perc_oid": null,
-                    "mempool_used": 516265,
-                    "mempool_used_oid": ".1.3.6.1.4.1.3709.3.6.4.2.2.1.59.1.1.49",
-                    "mempool_free": 456943,
+                    "mempool_used": 529220949,
+                    "mempool_used_oid": ".1.3.6.1.4.1.3709.3.6.4.2.2.1.27.1.1.49",
+                    "mempool_free": 467344043,
                     "mempool_free_oid": null,
-                    "mempool_total": 973208,
+                    "mempool_total": 996564992,
                     "mempool_total_oid": null,
                     "mempool_largestfree": null,
                     "mempool_lowestfree": null,
