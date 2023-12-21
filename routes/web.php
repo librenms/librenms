@@ -84,7 +84,7 @@ Route::middleware(['auth'])->group(function () {
         ->name('device')->where('vars', '.*');
 
     // Maps
-    Route::get('fullscreenmap', 'Maps\FullscreeenMapController@fullscreenMap');
+    Route::get('fullscreenmap', 'Maps\FullscreenMapController@fullscreenMap');
     Route::get('availability-map', 'Maps\AvailabilityMapController@availabilityMap');
     Route::get('map/{vars?}', 'Maps\NetMapController@netMap');
     Route::prefix('maps')->group(function () {

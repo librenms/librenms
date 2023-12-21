@@ -143,9 +143,9 @@ html, body, #fullscreen-map {
         var devices = {};
         var links = {};
 @if($show_netmap && $netmap_source == 'depends')
-        $.get( '{{ route('maps.getdevices') }}', {disabled: 0, location_valid: 1, disabled_alerts: {{$netmap_include_disabled_alerts}}, link_type: '{{$netmap_source}}'})
+        $.post( '{{ route('maps.getdevices') }}', {disabled: 0, location_valid: 1, disabled_alerts: {{$netmap_include_disabled_alerts}}, link_type: '{{$netmap_source}}'})
 @else
-        $.get( '{{ route('maps.getdevices') }}', {disabled: 0, location_valid: 1, disabled_alerts: {{$netmap_include_disabled_alerts}}})
+        $.post( '{{ route('maps.getdevices') }}', {disabled: 0, location_valid: 1, disabled_alerts: {{$netmap_include_disabled_alerts}}})
 @endif
             .done(function( data ) {
                 $.each( data, function( device_id, device ) {
@@ -209,7 +209,7 @@ html, body, #fullscreen-map {
                 $("#countdown").css("border", "1px solid red");
             });
 @if($show_netmap && $netmap_source == 'xdp')
-        $.get( '{{ route('maps.getgeolinks') }}', {link_type: '{{$netmap_source}}'})
+        $.post( '{{ route('maps.getgeolinks') }}', {link_type: '{{$netmap_source}}'})
             .done(function( data ) {
                 $.each( data, function( link_id, link) {
                     if(link_id in link_markers) {
