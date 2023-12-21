@@ -13,6 +13,7 @@
 
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Number;
+use LibreNMS\Enum\IntegerType;
 
 $tmp_module = 'ntp';
 
@@ -63,14 +64,14 @@ if (is_array($components) && count($components) > 0) {
         // the last 16 bits.
 
         $hexoffset = $cntpPeersVarEntry['1.3.6.1.4.1.9.9.168.1.2.1.1'][23][$array['UID']];
-        $rrd['offset'] = Number::unsignedAsSigned(hexdec(substr($hexoffset, 0, 5)), 16) + hexdec(substr($hexoffset, -5)) / 65536;
+        $rrd['offset'] = Number::constrainInteger(hexdec(substr($hexoffset, 0, 5)), IntegerType::int16) + hexdec(substr($hexoffset, -5)) / IntegerType::uint16;
 
         $hexdelay = $cntpPeersVarEntry['1.3.6.1.4.1.9.9.168.1.2.1.1'][24][$array['UID']];
-        $rrd['delay'] = Number::unsignedAsSigned(hexdec(substr($hexdelay, 0, 5)), 16) + hexdec(substr($hexdelay, -5)) / 65536;
+        $rrd['delay'] = Number::constrainInteger(hexdec(substr($hexdelay, 0, 5)), IntegerType::int16) + hexdec(substr($hexdelay, -5)) / IntegerType::uint16;
 
         // Cisco NTPUnsignedTimeValue - 16 bits of unsignedint, and 16 bits of unsignedint for fractional
         $hexdisp = $cntpPeersVarEntry['1.3.6.1.4.1.9.9.168.1.2.1.1'][25][$array['UID']];
-        $rrd['dispersion'] = hexdec(substr($hexdisp, 0, 5)) + hexdec(substr($hexdisp, -5)) / 65536;
+        $rrd['dispersion'] = hexdec(substr($hexdisp, 0, 5)) + hexdec(substr($hexdisp, -5)) / IntegerType::uint16;
 
         $tags = compact('ntp', 'rrd_name', 'rrd_def', 'peer');
         data_update($device, 'ntp', $tags, $rrd);
