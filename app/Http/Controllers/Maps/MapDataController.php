@@ -50,7 +50,7 @@ class MapDataController extends Controller
 
         // Device links are not in the schema yet, so we need to do a table query
         $linkQuery = Link::with('port', 'device', 'remoteDevice', 'device.location', 'remoteDevice.location')
-            ->whereHas('device', function(Builder $q) use ($user) {
+            ->whereHas('device', function (Builder $q) use ($user) {
                 $q->whereIn('status', [0, 1])
                     ->where('disabled', 0)
                     ->where('ignore', 0);
@@ -59,11 +59,11 @@ class MapDataController extends Controller
                     $q->whereIntegerInRaw('device_id', \Permissions::devicesForUser($user));
                 }
             })
-            ->whereHas('device.location', function(Builder $q) {
+            ->whereHas('device.location', function (Builder $q) {
                 $q->whereNotNull('lat')
                     ->whereNotNull('lng');
             })
-            ->whereHas('remoteDevice', function(Builder $q) use ($user) {
+            ->whereHas('remoteDevice', function (Builder $q) use ($user) {
                 $q->whereIn('status', [0, 1])
                     ->where('disabled', 0)
                     ->where('ignore', 0);
@@ -72,11 +72,11 @@ class MapDataController extends Controller
                     $q->whereIntegerInRaw('device_id', \Permissions::devicesForUser($user));
                 }
             })
-            ->whereHas('remoteDevice.location', function(Builder $q) {
+            ->whereHas('remoteDevice.location', function (Builder $q) {
                 $q->whereNotNull('lat')
                     ->whereNotNull('lng');
             })
-            ->whereHas('port', function(Builder $q) {
+            ->whereHas('port', function (Builder $q) {
                 $q->where('ifOperStatus', 'up');
             });
 
