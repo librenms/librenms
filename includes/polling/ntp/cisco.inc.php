@@ -11,8 +11,8 @@
  * the source code distribution for details.
  */
 
-use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Enum\IntegerType;
+use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Number;
 
 $tmp_module = 'ntp';
