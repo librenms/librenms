@@ -14,23 +14,24 @@ $role_data = snmpwalk_cache_oid($device, 'cswSwitchRole', [], 'CISCO-STACKWISE-M
 $redundant_data = snmp_get($device, 'cswRingRedundant.0', '-OQv', 'CISCO-STACKWISE-MIB');
 
 $tables = [
-    ['num_oid' => '.1.3.6.1.4.1.9.9.661.1.3.1.1.6.',    'oid' => 'c3gModemStatus',                       'state_name' => 'c3gModemStatus',               'mib' => 'CISCO-WAN-3G-MIB',                'descr' => 'Modem status'],
-    ['num_oid' => '.1.3.6.1.4.1.9.9.661.1.3.4.1.1.3.',  'oid' => 'c3gGsmCurrentBand',                    'state_name' => 'c3gGsmCurrentBand',            'mib' => 'CISCO-WAN-3G-MIB',                'descr' => 'Current band'],
-    ['num_oid' => '.1.3.6.1.4.1.9.9.661.1.3.2.1.5.',    'oid' => 'c3gGsmPacketService',                  'state_name' => 'c3gGsmPacketService',          'mib' => 'CISCO-WAN-3G-MIB',                'descr' => 'Packet service'],
-    ['num_oid' => '.1.3.6.1.4.1.9.9.661.1.3.2.1.6.',    'oid' => 'c3gGsmCurrentRoamingStatus',           'state_name' => 'c3gGsmCurrentRoamingStatus',   'mib' => 'CISCO-WAN-3G-MIB',                'descr' => 'Roaming status'],
-    ['num_oid' => '.1.3.6.1.4.1.9.9.661.1.3.5.1.1.2.',  'oid' => 'c3gGsmSimStatus',                      'state_name' => 'c3gGsmSimStatus',              'mib' => 'CISCO-WAN-3G-MIB',                'descr' => 'SIM status'],
-    ['num_oid' => '.1.3.6.1.4.1.9.9.13.1.2.1.7.',       'oid' => 'ciscoEnvMonVoltageStatusTable',        'state_name' => 'ciscoEnvMonVoltageState',      'mib' => 'CISCO-ENVMON-MIB',                'descr' => 'ciscoEnvMonVoltageStatusDescr'],
-    ['num_oid' => '.1.3.6.1.4.1.9.9.13.1.3.1.6.',       'oid' => 'ciscoEnvMonTemperatureStatusTable',    'state_name' => 'ciscoEnvMonTemperatureState',  'mib' => 'CISCO-ENVMON-MIB',                'descr' => 'ciscoEnvMonTemperatureStatusDescr'],
-    ['num_oid' => '.1.3.6.1.4.1.9.9.13.1.4.1.3.',       'oid' => 'ciscoEnvMonFanStatusTable',            'state_name' => 'ciscoEnvMonFanState',          'mib' => 'CISCO-ENVMON-MIB',                'descr' => 'ciscoEnvMonFanStatusDescr'],
-    ['num_oid' => '.1.3.6.1.4.1.9.9.13.1.5.1.3.',       'oid' => 'ciscoEnvMonSupplyStatusTable',         'state_name' => 'ciscoEnvMonSupplyState',       'mib' => 'CISCO-ENVMON-MIB',                'descr' => 'ciscoEnvMonSupplyStatusDescr'],
-    ['num_oid' => '.1.3.6.1.4.1.9.9.117.1.1.2.1.2.',    'oid' => 'cefcFRUPowerStatusTable',              'state_name' => 'cefcFRUPowerOperStatus',       'mib' => 'CISCO-ENTITY-FRU-CONTROL-MIB',    'descr' => 'Sensor Name'],
-    ['num_oid' => '.1.3.6.1.4.1.9.9.176.1.1.2.',        'oid' => 'cRFStatusUnitState',                   'state_name' => 'cRFStatusUnitState',           'mib' => 'CISCO-RF-MIB',                    'descr' => 'VSS Device State'],
-    ['num_oid' => '.1.3.6.1.4.1.9.9.176.1.1.4.',        'oid' => 'cRFStatusPeerUnitState',               'state_name' => 'cRFStatusPeerUnitState',       'mib' => 'CISCO-RF-MIB',                    'descr' => 'VSS Peer State'],
-    ['num_oid' => '.1.3.6.1.4.1.9.9.176.1.2.14.',       'oid' => 'cRFCfgRedundancyOperMode',             'state_name' => 'cRFCfgRedundancyOperMode',     'mib' => 'CISCO-RF-MIB',                    'descr' => 'VSS Mode'],
-    ['num_oid' => '.1.3.6.1.4.1.9.9.500.1.1.3.',        'oid' => 'cswGlobals',                           'state_name' => 'cswRingRedundant',             'mib' => 'CISCO-STACKWISE-MIB',             'descr' => 'Stack Ring - Redundant'],
-    ['num_oid' => '.1.3.6.1.4.1.9.9.500.1.2.1.1.3.',    'oid' => 'cswSwitchRole',                        'state_name' => 'cswSwitchRole',                'mib' => 'CISCO-STACKWISE-MIB',             'descr' => 'Stack Role - Switch#'],
-    ['num_oid' => '.1.3.6.1.4.1.9.9.500.1.2.1.1.6.',    'oid' => 'cswSwitchState',                       'state_name' => 'cswSwitchState',               'mib' => 'CISCO-STACKWISE-MIB',             'descr' => 'Stack State - Switch#'],
-    ['num_oid' => '.1.3.6.1.4.1.9.9.500.1.2.2.1.1.',    'oid' => 'cswStackPortOperStatus',               'state_name' => 'cswStackPortOperStatus',       'mib' => 'CISCO-STACKWISE-MIB',             'descr' => 'Stack Port Status - '],
+    ['num_oid' => '.1.3.6.1.4.1.9.9.661.1.3.1.1.6.',    'oid' => 'c3gModemStatus',                       'state_name' => 'c3gModemStatus',               'mib' => 'CISCO-WAN-3G-MIB',                                  'descr' => 'Modem status'],
+    ['num_oid' => '.1.3.6.1.4.1.9.9.661.1.3.4.1.1.3.',  'oid' => 'c3gGsmCurrentBand',                    'state_name' => 'c3gGsmCurrentBand',            'mib' => 'CISCO-WAN-3G-MIB',                                  'descr' => 'Current band'],
+    ['num_oid' => '.1.3.6.1.4.1.9.9.661.1.3.2.1.5.',    'oid' => 'c3gGsmPacketService',                  'state_name' => 'c3gGsmPacketService',          'mib' => 'CISCO-WAN-3G-MIB',                                  'descr' => 'Packet service'],
+    ['num_oid' => '.1.3.6.1.4.1.9.9.661.1.3.2.1.6.',    'oid' => 'c3gGsmCurrentRoamingStatus',           'state_name' => 'c3gGsmCurrentRoamingStatus',   'mib' => 'CISCO-WAN-3G-MIB',                                  'descr' => 'Roaming status'],
+    ['num_oid' => '.1.3.6.1.4.1.9.9.661.1.3.5.1.1.2.',  'oid' => 'c3gGsmSimStatus',                      'state_name' => 'c3gGsmSimStatus',              'mib' => 'CISCO-WAN-3G-MIB',                                  'descr' => 'SIM status'],
+    ['num_oid' => '.1.3.6.1.4.1.9.9.13.1.2.1.7.',       'oid' => 'ciscoEnvMonVoltageStatusTable',        'state_name' => 'ciscoEnvMonVoltageState',      'mib' => 'CISCO-ENVMON-MIB',                                  'descr' => 'ciscoEnvMonVoltageStatusDescr'],
+    ['num_oid' => '.1.3.6.1.4.1.9.9.13.1.3.1.6.',       'oid' => 'ciscoEnvMonTemperatureStatusTable',    'state_name' => 'ciscoEnvMonTemperatureState',  'mib' => 'CISCO-ENVMON-MIB',                                  'descr' => 'ciscoEnvMonTemperatureStatusDescr'],
+    ['num_oid' => '.1.3.6.1.4.1.9.9.13.1.4.1.3.',       'oid' => 'ciscoEnvMonFanStatusTable',            'state_name' => 'ciscoEnvMonFanState',          'mib' => 'CISCO-ENVMON-MIB',                                  'descr' => 'ciscoEnvMonFanStatusDescr'],
+    ['num_oid' => '.1.3.6.1.4.1.9.9.13.1.5.1.3.',       'oid' => 'ciscoEnvMonSupplyStatusTable',         'state_name' => 'ciscoEnvMonSupplyState',       'mib' => 'CISCO-ENVMON-MIB',                                  'descr' => 'ciscoEnvMonSupplyStatusDescr'],
+    ['num_oid' => '.1.3.6.1.4.1.9.9.117.1.1.2.1.2.',    'oid' => 'cefcFRUPowerStatusTable',              'state_name' => 'cefcFRUPowerOperStatus',       'mib' => 'CISCO-ENTITY-FRU-CONTROL-MIB',                      'descr' => 'Sensor Name'],
+    ['num_oid' => '.1.3.6.1.4.1.9.9.176.1.1.2.',        'oid' => 'cRFStatusUnitState',                   'state_name' => 'cRFStatusUnitState',           'mib' => 'CISCO-RF-MIB',                                      'descr' => 'VSS Device State'],
+    ['num_oid' => '.1.3.6.1.4.1.9.9.176.1.1.4.',        'oid' => 'cRFStatusPeerUnitState',               'state_name' => 'cRFStatusPeerUnitState',       'mib' => 'CISCO-RF-MIB',                                      'descr' => 'VSS Peer State'],
+    ['num_oid' => '.1.3.6.1.4.1.9.9.176.1.2.14.',       'oid' => 'cRFCfgRedundancyOperMode',             'state_name' => 'cRFCfgRedundancyOperMode',     'mib' => 'CISCO-RF-MIB',                                      'descr' => 'VSS Mode'],
+    ['num_oid' => '.1.3.6.1.4.1.9.9.500.1.1.3.',        'oid' => 'cswGlobals',                           'state_name' => 'cswRingRedundant',             'mib' => 'CISCO-STACKWISE-MIB',                               'descr' => 'Stack Ring - Redundant'],
+    ['num_oid' => '.1.3.6.1.4.1.9.9.500.1.2.1.1.3.',    'oid' => 'cswSwitchRole',                        'state_name' => 'cswSwitchRole',                'mib' => 'CISCO-STACKWISE-MIB',                               'descr' => 'Stack Role - Switch#'],
+    ['num_oid' => '.1.3.6.1.4.1.9.9.500.1.2.1.1.6.',    'oid' => 'cswSwitchState',                       'state_name' => 'cswSwitchState',               'mib' => 'CISCO-STACKWISE-MIB',                               'descr' => 'Stack State - Switch#'],
+    ['num_oid' => '.1.3.6.1.4.1.9.9.500.1.2.2.1.1.',    'oid' => 'cswStackPortOperStatus',               'state_name' => 'cswStackPortOperStatus',       'mib' => 'CISCO-STACKWISE-MIB',                               'descr' => 'Stack Port Status - '],
+    ['num_oid' => '.1.3.6.1.4.1.9.9.601.1.3.1.1.4.',    'oid' => 'crepSegmentComplete',                  'state_name' => 'crepSegmentComplete',          'mib' => 'CISCO-RESILIENT-ETHERNET-PROTOCOL-MIB',             'descr' => 'REP State - Segment '],
 ];
 
 foreach ($tables as $tablevalue) {
@@ -179,6 +180,12 @@ foreach ($tables as $tablevalue) {
                 ['value' => 12, 'generic' => 2, 'graph' => 0, 'descr' => 'mepLocked'],
                 ['value' => 13, 'generic' => 2, 'graph' => 0, 'descr' => 'networkRejected'],
             ];
+        } elseif ($state_name == 'crepSegmentComplete') {
+            $states = [
+                ['value' => 0, 'generic' => 3, 'graph' => 0, 'descr' => 'unknown'],
+                ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'complete'],
+                ['value' => 2, 'generic' => 2, 'graph' => 0, 'descr' => 'incomplete'],
+            ];
         } else {
             $states = [
                 ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'normal'],
@@ -214,6 +221,9 @@ foreach ($tables as $tablevalue) {
                 } elseif ($state_name == 'c3gModemStatus' || $state_name == 'c3gGsmCurrentBand' || $state_name == 'c3gGsmPacketService' || $state_name == 'c3gGsmCurrentRoamingStatus' || $state_name == 'c3gGsmSimStatus') {
                     $descr = $tablevalue['descr'];
                     $state_group = snmp_get($device, 'entPhysicalName.' . $index, '-Oqv', 'ENTITY-MIB');
+                } elseif ($state_name == 'crepSegmentComplete') {
+                    $repsegmentnumber++;
+                    $descr = $tablevalue['descr'] . $repsegmentnumber;
                 }
                 discover_sensor($valid['sensor'], 'state', $device, $cur_oid . $index, $index, $state_name, trim($descr), 1, 1, null, null, null, null, $temp[$index][$tablevalue['state_name']], 'snmp', $index, null, null, $state_group);
 

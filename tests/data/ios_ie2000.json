@@ -1,0 +1,975 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": null,
+                    "sysObjectID": ".1.3.6.1.4.1.9.1.1473",
+                    "sysDescr": "Cisco IOS Software, IE2000 Software (IE2000-UNIVERSALK9-M), Version 15.2(7)E2, RELEASE SOFTWARE (fc3)\nTechnical Support: http://www.cisco.com/techsupport\r\nCopyright (c) 1986-2020 by Cisco Systems, Inc.\r\nCompiled Sun 15-Mar-20 06:31 by prod_rel_team",
+                    "sysContact": null,
+                    "version": "15.2(7)E2",
+                    "hardware": "ciscoIE20008TCG",
+                    "features": "UNIVERSALK9",
+                    "location": null,
+                    "os": "ios",
+                    "type": "network",
+                    "serial": null,
+                    "icon": "cisco.svg"
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    },
+    "sensors": {
+        "discovery": {
+            "sensors": [
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "count",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.9.9.402.1.4.1.0",
+                    "sensor_index": "0",
+                    "sensor_type": "ios",
+                    "sensor_descr": "PoE Devices Connected",
+                    "group": "PoE",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 0,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.9.9.117.1.2.1.1.2.1007",
+                    "sensor_index": "cefcModuleOperStatus.1007",
+                    "sensor_type": "cefcModuleOperStatus",
+                    "sensor_descr": "Operating Status -",
+                    "group": "Module Operating Status",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 2,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": "1007",
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": "cefcModuleOperStatus"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.9.9.13.1.5.1.3.1004",
+                    "sensor_index": "1004",
+                    "sensor_type": "ciscoEnvMonSupplyState",
+                    "sensor_descr": "Sw1, PSA Normal",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 0,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": "1004",
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": "ciscoEnvMonSupplyState"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.9.9.13.1.5.1.3.1005",
+                    "sensor_index": "1005",
+                    "sensor_type": "ciscoEnvMonSupplyState",
+                    "sensor_descr": "Sw1, PSB Faulty",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 0,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": "1005",
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": "ciscoEnvMonSupplyState"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.9.9.13.1.3.1.6.1006",
+                    "sensor_index": "1006",
+                    "sensor_type": "ciscoEnvMonTemperatureState",
+                    "sensor_descr": "SW#1, Sensor#1, GREEN",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 0,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": "1006",
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": "ciscoEnvMonTemperatureState"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.9.9.601.1.3.1.1.4.1",
+                    "sensor_index": "1",
+                    "sensor_type": "crepSegmentComplete",
+                    "sensor_descr": "REP State - Segment 1",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 0,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": "1",
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": "crepSegmentComplete"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "temperature",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.9.9.13.1.3.1.3.1006",
+                    "sensor_index": "1006",
+                    "sensor_type": "cisco",
+                    "sensor_descr": "SW#1, Sensor#1, GREEN",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 46,
+                    "sensor_limit": 89,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": 36,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": "1006",
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": null
+                }
+            ],
+            "state_indexes": [
+                {
+                    "state_name": "cefcModuleOperStatus",
+                    "state_descr": "unknown",
+                    "state_draw_graph": 0,
+                    "state_value": 1,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "cefcModuleOperStatus",
+                    "state_descr": "ok",
+                    "state_draw_graph": 0,
+                    "state_value": 2,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "cefcModuleOperStatus",
+                    "state_descr": "disabled",
+                    "state_draw_graph": 0,
+                    "state_value": 3,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "cefcModuleOperStatus",
+                    "state_descr": "okButDiagFailed",
+                    "state_draw_graph": 0,
+                    "state_value": 4,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "cefcModuleOperStatus",
+                    "state_descr": "boot",
+                    "state_draw_graph": 0,
+                    "state_value": 5,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "cefcModuleOperStatus",
+                    "state_descr": "selfTest",
+                    "state_draw_graph": 0,
+                    "state_value": 6,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "cefcModuleOperStatus",
+                    "state_descr": "failed",
+                    "state_draw_graph": 0,
+                    "state_value": 7,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "cefcModuleOperStatus",
+                    "state_descr": "missing",
+                    "state_draw_graph": 0,
+                    "state_value": 8,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "cefcModuleOperStatus",
+                    "state_descr": "mismatchWithParent",
+                    "state_draw_graph": 0,
+                    "state_value": 9,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "cefcModuleOperStatus",
+                    "state_descr": "mismatchConfig",
+                    "state_draw_graph": 0,
+                    "state_value": 10,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "cefcModuleOperStatus",
+                    "state_descr": "diagFailed",
+                    "state_draw_graph": 0,
+                    "state_value": 11,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "cefcModuleOperStatus",
+                    "state_descr": "dormant",
+                    "state_draw_graph": 0,
+                    "state_value": 12,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "cefcModuleOperStatus",
+                    "state_descr": "outOfServiceAdmin",
+                    "state_draw_graph": 0,
+                    "state_value": 13,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "cefcModuleOperStatus",
+                    "state_descr": "outOfServiceEnvTemp",
+                    "state_draw_graph": 0,
+                    "state_value": 14,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "cefcModuleOperStatus",
+                    "state_descr": "poweredDown",
+                    "state_draw_graph": 0,
+                    "state_value": 15,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "cefcModuleOperStatus",
+                    "state_descr": "poweredUp",
+                    "state_draw_graph": 0,
+                    "state_value": 16,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "cefcModuleOperStatus",
+                    "state_descr": "powerDenied",
+                    "state_draw_graph": 0,
+                    "state_value": 17,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "cefcModuleOperStatus",
+                    "state_descr": "powerCycled",
+                    "state_draw_graph": 0,
+                    "state_value": 18,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "cefcModuleOperStatus",
+                    "state_descr": "okButPowerOverWarning",
+                    "state_draw_graph": 0,
+                    "state_value": 19,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "cefcModuleOperStatus",
+                    "state_descr": "okButPowerOverCritical",
+                    "state_draw_graph": 0,
+                    "state_value": 20,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "cefcModuleOperStatus",
+                    "state_descr": "syncInProgress",
+                    "state_draw_graph": 0,
+                    "state_value": 21,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "cefcModuleOperStatus",
+                    "state_descr": "upgrading",
+                    "state_draw_graph": 0,
+                    "state_value": 22,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "cefcModuleOperStatus",
+                    "state_descr": "okButAuthFailed",
+                    "state_draw_graph": 0,
+                    "state_value": 23,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "cefcModuleOperStatus",
+                    "state_descr": "mdr",
+                    "state_draw_graph": 0,
+                    "state_value": 24,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "cefcModuleOperStatus",
+                    "state_descr": "fwMismatchFound",
+                    "state_draw_graph": 0,
+                    "state_value": 25,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "cefcModuleOperStatus",
+                    "state_descr": "fwDownloadSuccess",
+                    "state_draw_graph": 0,
+                    "state_value": 26,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "cefcModuleOperStatus",
+                    "state_descr": "fwDownloadFailure",
+                    "state_draw_graph": 0,
+                    "state_value": 27,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "ciscoEnvMonSupplyState",
+                    "state_descr": "normal",
+                    "state_draw_graph": 0,
+                    "state_value": 1,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "ciscoEnvMonSupplyState",
+                    "state_descr": "warning",
+                    "state_draw_graph": 0,
+                    "state_value": 2,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "ciscoEnvMonSupplyState",
+                    "state_descr": "critical",
+                    "state_draw_graph": 0,
+                    "state_value": 3,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "ciscoEnvMonSupplyState",
+                    "state_descr": "shutdown",
+                    "state_draw_graph": 0,
+                    "state_value": 4,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "ciscoEnvMonSupplyState",
+                    "state_descr": "notPresent",
+                    "state_draw_graph": 0,
+                    "state_value": 5,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "ciscoEnvMonSupplyState",
+                    "state_descr": "notFunctioning",
+                    "state_draw_graph": 0,
+                    "state_value": 6,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "ciscoEnvMonTemperatureState",
+                    "state_descr": "normal",
+                    "state_draw_graph": 0,
+                    "state_value": 1,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "ciscoEnvMonTemperatureState",
+                    "state_descr": "warning",
+                    "state_draw_graph": 0,
+                    "state_value": 2,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "ciscoEnvMonTemperatureState",
+                    "state_descr": "critical",
+                    "state_draw_graph": 0,
+                    "state_value": 3,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "ciscoEnvMonTemperatureState",
+                    "state_descr": "shutdown",
+                    "state_draw_graph": 0,
+                    "state_value": 4,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "ciscoEnvMonTemperatureState",
+                    "state_descr": "notPresent",
+                    "state_draw_graph": 0,
+                    "state_value": 5,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "ciscoEnvMonTemperatureState",
+                    "state_descr": "notFunctioning",
+                    "state_draw_graph": 0,
+                    "state_value": 6,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "crepSegmentComplete",
+                    "state_descr": "unknown",
+                    "state_draw_graph": 0,
+                    "state_value": 0,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "crepSegmentComplete",
+                    "state_descr": "complete",
+                    "state_draw_graph": 0,
+                    "state_value": 1,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "crepSegmentComplete",
+                    "state_descr": "incomplete",
+                    "state_draw_graph": 0,
+                    "state_value": 2,
+                    "state_generic_value": 2
+                }
+            ]
+        },
+        "poller": {
+            "sensors": [
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "count",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.9.9.402.1.4.1.0",
+                    "sensor_index": "0",
+                    "sensor_type": "ios",
+                    "sensor_descr": "PoE Devices Connected",
+                    "group": "PoE",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 0,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.9.9.117.1.2.1.1.2.1007",
+                    "sensor_index": "cefcModuleOperStatus.1007",
+                    "sensor_type": "cefcModuleOperStatus",
+                    "sensor_descr": "Operating Status -",
+                    "group": "Module Operating Status",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 2,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": "1007",
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": "cefcModuleOperStatus"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.9.9.13.1.5.1.3.1004",
+                    "sensor_index": "1004",
+                    "sensor_type": "ciscoEnvMonSupplyState",
+                    "sensor_descr": "Sw1, PSA Normal",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 1,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": "1004",
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": 0,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": "ciscoEnvMonSupplyState"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.9.9.13.1.5.1.3.1005",
+                    "sensor_index": "1005",
+                    "sensor_type": "ciscoEnvMonSupplyState",
+                    "sensor_descr": "Sw1, PSB Faulty",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 6,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": "1005",
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": 0,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": "ciscoEnvMonSupplyState"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.9.9.13.1.3.1.6.1006",
+                    "sensor_index": "1006",
+                    "sensor_type": "ciscoEnvMonTemperatureState",
+                    "sensor_descr": "SW#1, Sensor#1, GREEN",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 1,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": "1006",
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": 0,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": "ciscoEnvMonTemperatureState"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.9.9.601.1.3.1.1.4.1",
+                    "sensor_index": "1",
+                    "sensor_type": "crepSegmentComplete",
+                    "sensor_descr": "REP State - Segment 1",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 1,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": "1",
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": 0,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": "crepSegmentComplete"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "temperature",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.9.9.13.1.3.1.3.1006",
+                    "sensor_index": "1006",
+                    "sensor_type": "cisco",
+                    "sensor_descr": "SW#1, Sensor#1, GREEN",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 46,
+                    "sensor_limit": 89,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": 36,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": "1006",
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": null
+                }
+            ],
+            "state_indexes": [
+                {
+                    "state_name": "cefcModuleOperStatus",
+                    "state_descr": "unknown",
+                    "state_draw_graph": 0,
+                    "state_value": 1,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "cefcModuleOperStatus",
+                    "state_descr": "ok",
+                    "state_draw_graph": 0,
+                    "state_value": 2,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "cefcModuleOperStatus",
+                    "state_descr": "disabled",
+                    "state_draw_graph": 0,
+                    "state_value": 3,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "cefcModuleOperStatus",
+                    "state_descr": "okButDiagFailed",
+                    "state_draw_graph": 0,
+                    "state_value": 4,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "cefcModuleOperStatus",
+                    "state_descr": "boot",
+                    "state_draw_graph": 0,
+                    "state_value": 5,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "cefcModuleOperStatus",
+                    "state_descr": "selfTest",
+                    "state_draw_graph": 0,
+                    "state_value": 6,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "cefcModuleOperStatus",
+                    "state_descr": "failed",
+                    "state_draw_graph": 0,
+                    "state_value": 7,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "cefcModuleOperStatus",
+                    "state_descr": "missing",
+                    "state_draw_graph": 0,
+                    "state_value": 8,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "cefcModuleOperStatus",
+                    "state_descr": "mismatchWithParent",
+                    "state_draw_graph": 0,
+                    "state_value": 9,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "cefcModuleOperStatus",
+                    "state_descr": "mismatchConfig",
+                    "state_draw_graph": 0,
+                    "state_value": 10,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "cefcModuleOperStatus",
+                    "state_descr": "diagFailed",
+                    "state_draw_graph": 0,
+                    "state_value": 11,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "cefcModuleOperStatus",
+                    "state_descr": "dormant",
+                    "state_draw_graph": 0,
+                    "state_value": 12,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "cefcModuleOperStatus",
+                    "state_descr": "outOfServiceAdmin",
+                    "state_draw_graph": 0,
+                    "state_value": 13,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "cefcModuleOperStatus",
+                    "state_descr": "outOfServiceEnvTemp",
+                    "state_draw_graph": 0,
+                    "state_value": 14,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "cefcModuleOperStatus",
+                    "state_descr": "poweredDown",
+                    "state_draw_graph": 0,
+                    "state_value": 15,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "cefcModuleOperStatus",
+                    "state_descr": "poweredUp",
+                    "state_draw_graph": 0,
+                    "state_value": 16,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "cefcModuleOperStatus",
+                    "state_descr": "powerDenied",
+                    "state_draw_graph": 0,
+                    "state_value": 17,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "cefcModuleOperStatus",
+                    "state_descr": "powerCycled",
+                    "state_draw_graph": 0,
+                    "state_value": 18,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "cefcModuleOperStatus",
+                    "state_descr": "okButPowerOverWarning",
+                    "state_draw_graph": 0,
+                    "state_value": 19,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "cefcModuleOperStatus",
+                    "state_descr": "okButPowerOverCritical",
+                    "state_draw_graph": 0,
+                    "state_value": 20,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "cefcModuleOperStatus",
+                    "state_descr": "syncInProgress",
+                    "state_draw_graph": 0,
+                    "state_value": 21,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "cefcModuleOperStatus",
+                    "state_descr": "upgrading",
+                    "state_draw_graph": 0,
+                    "state_value": 22,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "cefcModuleOperStatus",
+                    "state_descr": "okButAuthFailed",
+                    "state_draw_graph": 0,
+                    "state_value": 23,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "cefcModuleOperStatus",
+                    "state_descr": "mdr",
+                    "state_draw_graph": 0,
+                    "state_value": 24,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "cefcModuleOperStatus",
+                    "state_descr": "fwMismatchFound",
+                    "state_draw_graph": 0,
+                    "state_value": 25,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "cefcModuleOperStatus",
+                    "state_descr": "fwDownloadSuccess",
+                    "state_draw_graph": 0,
+                    "state_value": 26,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "cefcModuleOperStatus",
+                    "state_descr": "fwDownloadFailure",
+                    "state_draw_graph": 0,
+                    "state_value": 27,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "ciscoEnvMonSupplyState",
+                    "state_descr": "normal",
+                    "state_draw_graph": 0,
+                    "state_value": 1,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "ciscoEnvMonSupplyState",
+                    "state_descr": "warning",
+                    "state_draw_graph": 0,
+                    "state_value": 2,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "ciscoEnvMonSupplyState",
+                    "state_descr": "critical",
+                    "state_draw_graph": 0,
+                    "state_value": 3,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "ciscoEnvMonSupplyState",
+                    "state_descr": "shutdown",
+                    "state_draw_graph": 0,
+                    "state_value": 4,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "ciscoEnvMonSupplyState",
+                    "state_descr": "notPresent",
+                    "state_draw_graph": 0,
+                    "state_value": 5,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "ciscoEnvMonSupplyState",
+                    "state_descr": "notFunctioning",
+                    "state_draw_graph": 0,
+                    "state_value": 6,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "ciscoEnvMonTemperatureState",
+                    "state_descr": "normal",
+                    "state_draw_graph": 0,
+                    "state_value": 1,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "ciscoEnvMonTemperatureState",
+                    "state_descr": "warning",
+                    "state_draw_graph": 0,
+                    "state_value": 2,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "ciscoEnvMonTemperatureState",
+                    "state_descr": "critical",
+                    "state_draw_graph": 0,
+                    "state_value": 3,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "ciscoEnvMonTemperatureState",
+                    "state_descr": "shutdown",
+                    "state_draw_graph": 0,
+                    "state_value": 4,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "ciscoEnvMonTemperatureState",
+                    "state_descr": "notPresent",
+                    "state_draw_graph": 0,
+                    "state_value": 5,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "ciscoEnvMonTemperatureState",
+                    "state_descr": "notFunctioning",
+                    "state_draw_graph": 0,
+                    "state_value": 6,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "crepSegmentComplete",
+                    "state_descr": "unknown",
+                    "state_draw_graph": 0,
+                    "state_value": 0,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "crepSegmentComplete",
+                    "state_descr": "complete",
+                    "state_draw_graph": 0,
+                    "state_value": 1,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "crepSegmentComplete",
+                    "state_descr": "incomplete",
+                    "state_draw_graph": 0,
+                    "state_value": 2,
+                    "state_generic_value": 2
+                }
+            ]
+        }
+    }
+}
