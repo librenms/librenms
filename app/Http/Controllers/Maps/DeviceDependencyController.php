@@ -25,12 +25,11 @@
 
 namespace App\Http\Controllers\Maps;
 
-use App\Models\Device;
 use App\Models\DeviceGroup;
 use Illuminate\Http\Request;
 use LibreNMS\Config;
 
-class DeviceDependencyController extends MapController
+class DeviceDependencyController extends Controller
 {
     // Device Dependency Map
     public function dependencyMap(Request $request)
@@ -45,7 +44,7 @@ class DeviceDependencyController extends MapController
         $data = [
             'page_refresh' => Config::get('page_refresh', 300),
             'group_id' => $group_id,
-            'options' => $this->visOptions(),
+            'options' => Config::get('network_map_vis_options'),
             'group_name' => $group_name,
         ];
 
