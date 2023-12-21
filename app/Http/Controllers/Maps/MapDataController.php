@@ -29,6 +29,7 @@ namespace App\Http\Controllers\Maps;
 use App\Http\Controllers\Controller;
 use App\Models\AlertSchedule;
 use App\Models\Device;
+use App\Models\Link;
 use App\Models\Port;
 use App\Models\Service;
 use Illuminate\Database\Eloquent\Builder;
@@ -40,48 +41,44 @@ class MapDataController extends Controller
 {
     protected static function geoLinks($request)
     {
+        $user = $request->user();
+
         // Return a blank array for unknown link types
         if ($request->link_type != 'xdp') {
             return [];
         }
 
         // Device links are not in the schema yet, so we need to do a table query
-        $linkQuery = \DB::table('links as l')
-            ->select(\DB::raw('ll.id AS left_id'),
-                \DB::raw('ll.lat AS left_lat'),
-                \DB::raw('ll.lng AS left_lng'),
-                \DB::raw('rl.id AS right_id'),
-                \DB::raw('rl.lat AS right_lat'),
-                \DB::raw('rl.lng AS right_lng'),
-                \DB::raw('sum(lp.ifSpeed) AS link_capacity'),
-                \DB::raw('sum(lp.ifOutOctets_rate) * 8 / sum(lp.ifSpeed) * 100 as link_out_usage_pct'),
-                \DB::raw('sum(lp.ifInOctets_rate) * 8 / sum(lp.ifSpeed) * 100 as link_in_usage_pct'))
-            ->join('devices AS ld', 'l.local_device_id', '=', 'ld.device_id')
-            ->join('locations AS ll', 'ld.location_id', '=', 'll.id')
-            ->join('ports AS lp', 'l.local_port_id', '=', 'lp.port_id')
-            ->join('devices AS rd', 'l.remote_device_id', '=', 'rd.device_id')
-            ->join('locations AS rl', 'rd.location_id', '=', 'rl.id')
-            ->where('ld.location_id', '<>', 'rd.location_id')
-            ->where('ld.disabled', '=', 0)
-            ->where('ld.ignore', '=', 0)
-            ->where('rd.disabled', '=', 0)
-            ->where('rd.ignore', '=', 0)
-            ->where('lp.ifType', '=', 'ethernetCsmacd')
-            ->where('lp.ifOperStatus', '=', 'up')
-            ->where('lp.ifOutOctets_rate', '<>', 0)
-            ->where('lp.ifInOctets_rate', '<>', 0)
-            ->whereNotNull('ll.lat')
-            ->whereNotNull('ll.lng')
-            ->whereNotNull('rl.lat')
-            ->whereNotNull('rl.lng')
-            ->whereIn('ld.status', [0, 1])
-            ->whereIn('rd.status', [0, 1])
-            ->groupByRaw('left_id, right_id, left_lat, left_lng, right_lat, right_lng');
+        $linkQuery = Link::with('port', 'device', 'remoteDevice', 'device.location', 'remoteDevice.location')
+            ->whereHas('device', function(Builder $q) use ($user) {
+                $q->whereIn('status', [0, 1])
+                    ->where('disabled', 0)
+                    ->where('ignore', 0);
 
-        if (! \Auth::user()->hasGlobalRead()) {
-            $linkQuery->whereIntegerInRaw('l.local_device_id', \Permissions::devicesForUser($request->user()))
-                ->whereIntegerInRaw('l.remote_device_id', \Permissions::devicesForUser($request->user()));
-        }
+                if (! $user->hasGlobalRead()) {
+                    $q->whereIntegerInRaw('device_id', \Permissions::devicesForUser($user));
+                }
+            })
+            ->whereHas('device.location', function(Builder $q) {
+                $q->whereNotNull('lat')
+                    ->whereNotNull('lng');
+            })
+            ->whereHas('remoteDevice', function(Builder $q) use ($user) {
+                $q->whereIn('status', [0, 1])
+                    ->where('disabled', 0)
+                    ->where('ignore', 0);
+
+                if (! $user->hasGlobalRead()) {
+                    $q->whereIntegerInRaw('device_id', \Permissions::devicesForUser($user));
+                }
+            })
+            ->whereHas('remoteDevice.location', function(Builder $q) {
+                $q->whereNotNull('lat')
+                    ->whereNotNull('lng');
+            })
+            ->whereHas('port', function(Builder $q) {
+                $q->where('ifOperStatus', 'up');
+            });
 
         $group_id = $request->group;
         if ($group_id) {
@@ -91,7 +88,10 @@ class MapDataController extends Controller
                 ->where('ldg.device_group_id', '=', $group_id);
         }
 
-        return $linkQuery->get();
+        return $linkQuery->get()
+            ->groupBy(function (Link $i) {
+                return $i->device->location->lat . '.' . $i->device->location->lng . '.' . $i->remoteDevice->location->lat . '.' . $i->remoteDevice->location->lng;
+            });
     }
 
     protected static function deviceMacLinks($request)
@@ -321,6 +321,33 @@ class MapDataController extends Controller
         }
     }
 
+    protected function linkSpeedWidth($speed)
+    {
+        $speed /= 1000000000;
+        if ($speed > 500000) {
+            return 20;
+        }
+        if (is_nan($speed)) {
+            return 1;
+        }
+        if ($speed < 10) {
+            return 1;
+        }
+        return round(0.77 * pow($speed, 0.25));
+    }
+
+    protected function linkUseColour($link_pct)
+    {
+        $link_pct = round(2 * $link_pct, -1) / 2;
+        if ($link_pct > 100) {
+            $link_used = 100;
+        }
+        if (is_nan($link_pct)) {
+            $link_used = 0;
+        }
+        return Config::get("network_map_legend.$link_pct");
+    }
+
     protected function nodeDisabledStyle()
     {
         return [
@@ -532,37 +559,13 @@ class MapDataController extends Controller
             $device_assoc_seen[$device_ids_1] = true;
             $device_assoc_seen[$device_ids_2] = true;
 
-            $speed = $port->ifSpeed / 1000000000;
-            if ($speed > 500000) {
-                $width = 20;
-            } else {
-                $width = round(0.77 * pow($speed, 0.25));
-            }
-            if ($port->ifSpeed > 0) {
-                $link_in_usage_pct = $port->ifInOctets_rate * 8 / $port->ifSpeed * 100;
-                $link_out_usage_pct = $port->ifOutOctets_rate * 8 / $port->ifSpeed * 100;
-                $link_used = max($link_out_usage_pct, $link_in_usage_pct);
-            } else {
-                $link_used = 0;
-            }
-            $link_used = round(2 * $link_used, -1) / 2;
-            if ($link_used > 100) {
-                $link_used = 100;
-            }
-            if (is_nan($link_used)) {
-                $link_used = 0;
-            }
-            $link_style = [
-                'color' => [
-                    'border' => Config::get("network_map_legend.$link_used"),
-                    'highlight' => Config::get("network_map_legend.$link_used"),
-                    'color' => Config::get("network_map_legend.$link_used"),
-                ],
-            ];
+            $width = $this->linkSpeedWidth($port->ifSpeed);
+
             if ($row->local_device_status == 0 && $row->remote_device_status == 0) {
                 // If both devices are offline, mark the link as being down
                 $link_style = [
                     'dashes' => [8, 12],
+                    'width' => $width,
                     'color' => [
                         'border' => Config::get('network_map_legend.dn.border'),
                         'highlight' => Config::get('network_map_legend.dn.edge'),
@@ -573,24 +576,39 @@ class MapDataController extends Controller
                 // If either port is offline, mark the link as being down
                 $link_style = [
                     'dashes' => [8, 12],
+                    'width' => $width,
                     'color' => [
                         'border' => Config::get('network_map_legend.dn.border'),
                         'highlight' => Config::get('network_map_legend.dn.edge'),
                         'color' => Config::get('network_map_legend.dn.edge'),
                     ],
                 ];
+            } else {
+                if ($port->ifSpeed > 0) {
+                    $link_in_usage_pct = $port->ifInOctets_rate * 8 / $port->ifSpeed * 100;
+                    $link_out_usage_pct = $port->ifOutOctets_rate * 8 / $port->ifSpeed * 100;
+                    $link_used = max($link_out_usage_pct, $link_in_usage_pct);
+                } else {
+                    $link_used = 0;
+                }
+                $link_color = $this->linkUseColour($link_used);
+                $link_style = [
+                    'width' => $width,
+                    'color' => [
+                        'border' => $link_color,
+                        'highlight' => $link_color,
+                        'color' => $link_color,
+                    ],
+                ];
             }
 
-            $link_list[$port->port_id . '.' . $row->remote_port_id] = array_merge(
-                [
-                    'ldev'       => $port->device_id,
-                    'rdev'       => $row->remote_device_id,
-                    'ifnames'    => $port->ifName . ' <> ' . $row->remote_port_name,
-                    'url'        => Url::portLink($port, null, null, false, true),
-                    'width'      => $width,
-                ],
-                $link_style,
-            );
+            $link_list[$port->port_id . '.' . $row->remote_port_id] = [
+                'ldev'       => $port->device_id,
+                'rdev'       => $row->remote_device_id,
+                'ifnames'    => $port->ifName . ' <> ' . $row->remote_port_name,
+                'url'        => Url::portLink($port, null, null, false, true),
+                'style'      => $link_style,
+            ];
         }
     }
 
@@ -618,29 +636,33 @@ class MapDataController extends Controller
     {
         // List all links
         $link_list = [];
-        foreach (self::geoLinks($request) as $link) {
-            $speed = $link->link_capacity / 1000000000;
-            if ($speed > 500000) {
-                $width = 20;
-            } else {
-                $width = round(0.77 * pow($speed, 0.25));
-            }
-
-            $link_used = max($link->link_out_usage_pct, $link->link_in_usage_pct);
-            $link_used = round(2 * $link_used, -1) / 2;
-            if ($link_used > 100) {
+        foreach (self::geoLinks($request) as $location) {
+            $link = $location[0];
+            $capacity = $location->sum(function (Link $l) {
+                return $l->port->ifSpeed;
+            });
+            $inRate = $location->sum(function (Link $l) {
+                return $l->port->ifInOctets_rate * 8;
+            });
+            $outRate = $location->sum(function (Link $l) {
+                return $l->port->ifOutOctets_rate * 8;
+            });
+            if ($capacity > 0) {
+                $link_used = max($inRate / $capacity * 100, $outRate / $capacity * 100);
+            } elseif ($inRate > 0 || $outRate > 0) {
                 $link_used = 100;
-            }
-            if (is_nan($link_used)) {
+            } else {
                 $link_used = 0;
             }
-            $link_color = Config::get("network_map_legend.$link_used");
 
-            $link_list[$link->left_id . '.' . $link->right_id] = [
-                'local_lat'  => $link->left_lat,
-                'local_lng'  => $link->left_lng,
-                'remote_lat' => $link->right_lat,
-                'remote_lng' => $link->right_lng,
+            $width = $this->linkSpeedWidth($capacity);
+            $link_color = $this->linkUseColour($link_used);
+
+            $link_list[$link->device->location_id . '.' . $link->remoteDevice->location_id] = [
+                'local_lat'  => $link->device->location->lat,
+                'local_lng'  => $link->device->location->lng,
+                'remote_lat' => $link->remoteDevice->location->lat,
+                'remote_lng' => $link->remoteDevice->location->lng,
                 'color'      => $link_color,
                 'width'      => $width,
             ];
