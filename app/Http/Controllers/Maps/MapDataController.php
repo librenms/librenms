@@ -29,7 +29,6 @@ namespace App\Http\Controllers\Maps;
 use App\Http\Controllers\Controller;
 use App\Models\AlertSchedule;
 use App\Models\Device;
-use App\Models\DeviceGroup;
 use App\Models\Port;
 use App\Models\Service;
 use Illuminate\Database\Eloquent\Builder;
