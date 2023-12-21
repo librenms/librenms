@@ -333,6 +333,7 @@ class MapDataController extends Controller
         if ($speed < 10) {
             return 1;
         }
+
         return round(0.77 * pow($speed, 0.25));
     }
 
@@ -345,6 +346,7 @@ class MapDataController extends Controller
         if (is_nan($link_pct)) {
             $link_used = 0;
         }
+
         return Config::get("network_map_legend.$link_pct");
     }
 
