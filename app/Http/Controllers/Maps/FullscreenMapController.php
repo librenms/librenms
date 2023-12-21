@@ -27,7 +27,6 @@ namespace App\Http\Controllers\Maps;
 
 use App\Http\Controllers\Controller;
 use App\Models\DeviceGroup;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use LibreNMS\Config;
 
