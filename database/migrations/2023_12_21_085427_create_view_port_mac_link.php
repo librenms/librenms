@@ -11,7 +11,7 @@ return new class extends Migration
     public function up(): void
     {
         DB::statement("
-            CREATE OR REPLACE VIEW view_port_mac_links
+            CREATE VIEW IF NOT EXISTS view_port_mac_links
             AS
             -- Gets a list of port IDs for devices linked by MAC address
             SELECT
