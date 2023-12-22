@@ -10,11 +10,11 @@ $param = [];
 if (! isset($sort) || empty($sort)) {
     $sort = 'hostname ASC';
 }
-$sort_arr = explode(" ", trim($sort));
-if ($sort_arr[0] === "interface") {
-    $sort_arr[0] = "port_if_descr";
-} elseif ($sort_arr[0] === "hostname") {
-    $sort_arr[0] = "device_hostname";
+$sort_arr = explode(' ', trim($sort));
+if ($sort_arr[0] === 'interface') {
+    $sort_arr[0] = 'port_if_descr';
+} elseif ($sort_arr[0] === 'hostname') {
+    $sort_arr[0] = 'device_hostname';
 }
 
 if (isset($current)) {
