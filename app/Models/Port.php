@@ -352,6 +352,11 @@ class Port extends DeviceRelatedModel
         return $this->links->merge($this->remoteLinks);
     }
 
+    public function xdpLinkedPorts(): BelongsToMany
+    {
+        return $this->belongsToMany(Port::class, 'links', 'local_port_id', 'remote_port_id');
+    }
+
     public function macLinkedPorts(): BelongsToMany
     {
         return $this->belongsToMany(Port::class, 'view_port_mac_links', 'port_id', 'remote_port_id');
