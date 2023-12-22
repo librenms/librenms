@@ -12,7 +12,7 @@ return new class extends Migration
     {
         DB::statement('DROP VIEW IF EXISTS view_port_mac_links;');
         DB::statement("
-            CREATE OR REPLACE VIEW view_port_mac_links
+            CREATE VIEW IF NOT EXISTS view_port_mac_links
             AS
             -- Gets a list of port IDs for devices linked by MAC address
             SELECT
