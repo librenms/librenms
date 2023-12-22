@@ -574,7 +574,6 @@ class MapDataController extends Controller
         $device_assoc_seen = [];
         $link_types = $request->link_types;
 
-        DB::connection()->enableQueryLog();
         foreach ($link_types as $link_type) {
             if ($link_type == 'mac') {
                 $remote_port_attr = 'macLinkedPorts';
@@ -660,9 +659,6 @@ class MapDataController extends Controller
                     ];
                 }
             }
-        }
-        foreach (DB::getQueryLog() as $q) {
-            Log::error($q);
         }
 
         return response()->json($link_list);
