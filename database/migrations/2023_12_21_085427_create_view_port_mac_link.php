@@ -32,7 +32,7 @@ return new class extends Migration
                   AND arp.mac_address=rp.ifPhysAddress
               WHERE
                 arp.mac_address NOT IN ('000000000000', 'ffffffffffff');
-        ");       
+        ");
     }
 
     /**
@@ -40,6 +40,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        DB::statement("DROP VIEW IF EXISTS view_port_mac_links;");
+        DB::statement('DROP VIEW IF EXISTS view_port_mac_links;');
     }
 };

@@ -110,7 +110,9 @@ class MapDataController extends Controller
         }
 
         $linkQuery = Port::hasAccess($request->user())
-            ->with(['macLinkedPorts', 'device' => function ($q) use ($user, $disabled, $disabled_alerts, $group_id) {
+            ->with([
+                'macLinkedPorts',
+                'device' => function ($q) use ($user, $disabled, $disabled_alerts, $group_id) {
                     // Apply device filter to the list of local devices that we will load
                     if (! $user->hasGlobalRead()) {
                         $q->whereIntegerInRaw('device_id', \Permissions::devicesForUser($user));
