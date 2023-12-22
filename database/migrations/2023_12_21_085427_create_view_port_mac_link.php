@@ -16,6 +16,7 @@ return new class extends Migration
             -- Gets a list of port IDs for devices linked by MAC address
             SELECT
               p.port_id
+              ,arp.id as ipv4_mac_id
               ,rp.port_id as remote_port_id
             FROM
               ports p 
