@@ -270,6 +270,14 @@ class YamlDiscovery
                     return $pre_cache[$name][$index];
                 } elseif (count($pre_cache[$name]) === 1 && ! is_array(current($pre_cache[$name]))) {
                     return current($pre_cache[$name]);
+                } else {
+                    $index_countdown = explode('.', $index);
+                    foreach ($index_countdown as $sub_index) {
+                        array_pop($index_countdown);
+                        if (isset($pre_cache[$name][implode('.', $index_countdown)][$name])) {
+                            return $pre_cache[$name][implode('.', $index_countdown)][$name];
+                        }
+                    }
                 }
             } else {
                 return $pre_cache[$name];
