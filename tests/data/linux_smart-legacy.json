@@ -23,7 +23,7 @@
                     "app_state_prev": "UNKNOWN",
                     "app_status": "",
                     "app_instance": "",
-                    "data": "{\"disks\":{\"Z304VCFY\":{\"10\":\"0\",\"173\":\"null\",\"177\":\"null\",\"183\":\"0\",\"184\":\"0\",\"187\":\"0\",\"188\":\"0\",\"190\":\"35\",\"194\":\"35\",\"196\":\"null\",\"197\":\"0\",\"198\":\"0\",\"199\":\"0\",\"231\":\"null\",\"233\":\"null\",\"5\":\"0\",\"9\":null,\"completed\":\"5\",\"interrupted\":\"1\",\"read_failure\":\"0\",\"unknown_failure\":\"0\",\"extended\":\"6\",\"short\":\"0\",\"conveyance\":\"0\",\"selective\":\"selective\",\"is_ssd\":0}},\"legacy\":1,\"disks_with_failed_tests\":[],\"disks_with_failed_health\":[],\"has\":{\"id5\":1,\"id9\":0,\"id10\":1,\"id173\":0,\"id177\":0,\"id183\":1,\"id184\":1,\"id187\":1,\"id188\":1,\"id190\":1,\"id194\":1,\"id196\":0,\"id197\":1,\"id198\":1,\"id199\":1,\"id231\":0,\"id232\":0,\"id233\":0}}",
+                    "data": "{\"disks\":{\"Z304VCFY\":{\"10\":\"0\",\"173\":\"null\",\"177\":\"null\",\"183\":\"0\",\"184\":\"0\",\"187\":\"0\",\"188\":\"0\",\"190\":\"35\",\"194\":\"35\",\"196\":\"null\",\"197\":\"0\",\"198\":\"0\",\"199\":\"0\",\"231\":\"null\",\"233\":\"null\",\"5\":\"0\",\"9\":\"63438\",\"completed\":\"5\",\"interrupted\":\"1\",\"read_failure\":\"0\",\"unknown_failure\":\"0\",\"extended\":\"6\",\"short\":\"0\",\"conveyance\":\"0\",\"selective\":\"selective\",\"is_ssd\":0}},\"legacy\":1,\"disks_with_failed_tests\":[],\"disks_with_failed_health\":[],\"has\":{\"id5\":1,\"id9\":1,\"id10\":1,\"id173\":0,\"id177\":0,\"id183\":1,\"id184\":1,\"id187\":1,\"id188\":1,\"id190\":1,\"id194\":1,\"id196\":0,\"id197\":1,\"id198\":1,\"id199\":1,\"id231\":0,\"id232\":0,\"id233\":0}}",
                     "deleted_at": null
                 }
             ],
@@ -168,7 +168,7 @@
                 },
                 {
                     "metric": "disk_Z304VCFY_id9",
-                    "value": 0,
+                    "value": 63438,
                     "value_prev": null,
                     "app_type": "smart"
                 },
