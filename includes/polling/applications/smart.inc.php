@@ -13,7 +13,7 @@ try {
     $legacy = $e->getOutput();
     $lines = explode("\n", $legacy);
 
-    $data = ['disks'=>[], 'legacy'=>1];
+    $data = ['disks' => [], 'legacy' => 1];
 
     $int = 0;
     while (isset($lines[$int])) {
@@ -110,24 +110,24 @@ $new_disks_with_failed_health = [];
 $data['disks_with_failed_tests'] = [];
 $data['disks_with_failed_health'] = [];
 $data['has'] = [
-    'id5'=>0,
-    'id9'=>0,
-    'id10'=>0,
-    'id173'=>0,
-    'id177'=>0,
-    'id183'=>0,
-    'id184'=>0,
-    'id187'=>0,
-    'id188'=>0,
-    'id190'=>0,
-    'id194'=>0,
-    'id196'=>0,
-    'id197'=>0,
-    'id198'=>0,
-    'id199'=>0,
-    'id231'=>0,
-    'id232'=>0,
-    'id233'=>0,
+    'id5' => 0,
+    'id9' => 0,
+    'id10' => 0,
+    'id173' => 0,
+    'id177' => 0,
+    'id183' => 0,
+    'id184' => 0,
+    'id187' => 0,
+    'id188' => 0,
+    'id190' => 0,
+    'id194' => 0,
+    'id196' => 0,
+    'id197' => 0,
+    'id198' => 0,
+    'id199' => 0,
+    'id231' => 0,
+    'id232' => 0,
+    'id233' => 0,
 ];
 
 $metrics = [
