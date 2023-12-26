@@ -19,7 +19,7 @@ try {
     while (isset($lines[$int])) {
         [$disk, $id5, $id10, $id173, $id177, $id183, $id184, $id187, $id188, $id190, $id194,
             $id196, $id197, $id198, $id199, $id231, $id233, $completed, $interrupted, $read_failure,
-            $unknown_failure, $extended, $short, $conveyance, $selectiv, $id9] = explode(',', $lines[$int]);
+            $unknown_failure, $extended, $short, $conveyance, $selective, $id9] = explode(',', $lines[$int]);
         $int++;
 
         // could really be any of these, but make sure we have something defined,
