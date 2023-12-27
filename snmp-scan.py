@@ -320,7 +320,7 @@ Example: 192.168.0.1/32 will be treated as a single host address""",
 
     if args.legend and not VERBOSE_LEVEL:
         print(
-            "Legend:\n+  Added device\n*  Known device\n-  Failed to add device\n.  Ping failed\n~  Skipped due to no Reverse DNS\n"
+            "Legend:\n+  Added device\n*  Known device\n-  Failed to add device\n.  Ping failed\n~  Skipped due to no Reverse DNS\nE  Error when checking\n"
         )
 
     print("Scanning IPs:")
