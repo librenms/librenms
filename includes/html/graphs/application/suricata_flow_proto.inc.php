@@ -18,23 +18,23 @@ $rrd_list = [];
 if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'ICMPv4',
-        'ds'       => 'f_icmpv4',
+        'descr' => 'ICMPv4',
+        'ds' => 'f_icmpv4',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'ICMPv6',
-        'ds'       => 'f_icmpv6',
+        'descr' => 'ICMPv6',
+        'ds' => 'f_icmpv6',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'TCP',
-        'ds'       => 'f_tcp',
+        'descr' => 'TCP',
+        'ds' => 'f_tcp',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'UDP',
-        'ds'       => 'f_udp',
+        'descr' => 'UDP',
+        'ds' => 'f_udp',
     ];
 } else {
     d_echo('RRD "' . $rrd_filename . '" not found');

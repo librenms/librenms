@@ -14,18 +14,18 @@ $rrd_list = [];
 if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Allocated',
-        'ds'       => 'alloc',
+        'descr' => 'Allocated',
+        'ds' => 'alloc',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'In Use',
-        'ds'       => 'in_use',
+        'descr' => 'In Use',
+        'ds' => 'in_use',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'On Disk',
-        'ds'       => 'on_disk',
+        'descr' => 'On Disk',
+        'ds' => 'on_disk',
     ];
 } else {
     d_echo('RRD "' . $rrd_filename . '" not found');

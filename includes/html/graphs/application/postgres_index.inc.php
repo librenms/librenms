@@ -24,33 +24,33 @@ if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list = [
         [
             'filename' => $rrd_filename,
-            'descr'    => 'Scans',
-            'ds'       => 'idxscan',
-            'colour'   => '582A72',
+            'descr' => 'Scans',
+            'ds' => 'idxscan',
+            'colour' => '582A72',
         ],
         [
             'filename' => $rrd_filename,
-            'descr'    => 'Tuples Read',
-            'ds'       => 'idxtupread',
-            'colour'   => 'AA6C39',
+            'descr' => 'Tuples Read',
+            'ds' => 'idxtupread',
+            'colour' => 'AA6C39',
         ],
         [
             'filename' => $rrd_filename,
-            'descr'    => 'Tuples Fetched',
-            'ds'       => 'idxtupfetch',
-            'colour'   => 'FFD1AA',
+            'descr' => 'Tuples Fetched',
+            'ds' => 'idxtupfetch',
+            'colour' => 'FFD1AA',
         ],
         [
             'filename' => $rrd_filename,
-            'descr'    => 'Blocks Read',
-            'ds'       => 'idxblksread',
-            'colour'   => '88CC88',
+            'descr' => 'Blocks Read',
+            'ds' => 'idxblksread',
+            'colour' => '88CC88',
         ],
         [
             'filename' => $rrd_filename,
-            'descr'    => 'Buffer Hits',
-            'ds'       => 'idxblkshit',
-            'colour'   => '28536C',
+            'descr' => 'Buffer Hits',
+            'ds' => 'idxblkshit',
+            'colour' => '28536C',
         ],
     ];
 } else {

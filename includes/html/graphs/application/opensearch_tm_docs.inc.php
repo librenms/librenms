@@ -14,8 +14,8 @@ $rrd_list = [];
 if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Merged Docs',
-        'ds'       => 'tm_docs',
+        'descr' => 'Merged Docs',
+        'ds' => 'tm_docs',
     ];
 } else {
     d_echo('RRD "' . $rrd_filename . '" not found');

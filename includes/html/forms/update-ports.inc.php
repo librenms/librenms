@@ -4,7 +4,7 @@ header('Content-type: application/json');
 
 if (! Auth::user()->hasGlobalAdmin()) {
     $response = [
-        'status'  => 'error',
+        'status' => 'error',
         'message' => 'Need to be admin',
     ];
     echo json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
@@ -75,7 +75,7 @@ if ($rows_updated > 0) {
 }
 
 $response = [
-    'status'        => $status,
-    'message'       => $message,
+    'status' => $status,
+    'message' => $message,
 ];
 echo json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);

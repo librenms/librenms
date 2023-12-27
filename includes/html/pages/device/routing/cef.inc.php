@@ -3,10 +3,10 @@
 print_optionbar_start();
 
 $link_array = [
-    'page'   => 'device',
+    'page' => 'device',
     'device' => $device['device_id'],
-    'tab'    => 'routing',
-    'proto'  => 'cef',
+    'tab' => 'routing',
+    'proto' => 'cef',
 ];
 
 if (! isset($vars['view'])) {

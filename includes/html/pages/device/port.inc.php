@@ -66,10 +66,10 @@ echo "<div style='clear: both;'>";
 print_optionbar_start();
 
 $link_array = [
-    'page'   => 'device',
+    'page' => 'device',
     'device' => $device['device_id'],
-    'tab'    => 'port',
-    'port'   => $port->port_id,
+    'tab' => 'port',
+    'port' => $port->port_id,
 ];
 
 $menu_options['graphs'] = 'Graphs';

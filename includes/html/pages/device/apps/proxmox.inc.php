@@ -22,7 +22,7 @@ if (! \LibreNMS\Config::get('enable_proxmox')) {
     print_error('Proxmox agent was discovered on this host. Please enable Proxmox in your config.');
 } else {
     $graphs = [
-        'proxmox_traffic'       => 'Traffic',
+        'proxmox_traffic' => 'Traffic',
     ];
 
     foreach (proxmox_node_vms(var_get('device')) as $nvm) {

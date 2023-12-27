@@ -45,16 +45,16 @@ foreach ($timos_vrf_stats as $vrf) {
 unset($timos_vrf_stats);
 
 $translate = [
-    'ifName'            => 'vRtrIfName',
-    'ifAlias'           => 'vRtrIfAlias',
-    'ifDescr'           => 'vRtrIfDescription',
-    'ifSpeed'           => 'vRtrIfSpeed',
-    'ifType'            => 'vRtrIfType',
-    'ifMtu'             => 'vRtrIfMtu',
-    'ifHCInOctets'      => 'vRtrIfRxBytes',
-    'ifHCOutOctets'     => 'vRtrIfTxBytes',
-    'ifHCInUcastPkts'   => 'vRtrIfRxPkts',
-    'ifHCOutUcastPkts'  => 'vRtrIfTxPkts',
+    'ifName' => 'vRtrIfName',
+    'ifAlias' => 'vRtrIfAlias',
+    'ifDescr' => 'vRtrIfDescription',
+    'ifSpeed' => 'vRtrIfSpeed',
+    'ifType' => 'vRtrIfType',
+    'ifMtu' => 'vRtrIfMtu',
+    'ifHCInOctets' => 'vRtrIfRxBytes',
+    'ifHCOutOctets' => 'vRtrIfTxBytes',
+    'ifHCInUcastPkts' => 'vRtrIfRxPkts',
+    'ifHCOutUcastPkts' => 'vRtrIfTxPkts',
 ];
 
 $timos_ports = [];

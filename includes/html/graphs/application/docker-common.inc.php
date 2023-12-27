@@ -25,8 +25,8 @@ while (isset($containers[$int])) {
     if (Rrd::checkRrdExists($rrd_filename)) {
         $rrd_list[] = [
             'filename' => $rrd_filename,
-            'descr'    => $container_name,
-            'ds'       => $rrdVar,
+            'descr' => $container_name,
+            'ds' => $rrdVar,
         ];
     }
     $int++;

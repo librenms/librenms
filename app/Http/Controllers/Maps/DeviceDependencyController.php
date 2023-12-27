@@ -113,7 +113,7 @@ class DeviceDependencyController extends MapController
             // List all Device
             $devices_by_id[] = array_merge(
                 [
-                    'id'    => $device->device_id,
+                    'id' => $device->device_id,
                     'label' => $device->shortDisplayName(),
                     'title' => Url::deviceLink($device, null, [], 0, 0, 0, 0),
                     'shape' => 'box',
@@ -131,8 +131,8 @@ class DeviceDependencyController extends MapController
             foreach ($parents as $parent) {
                 $device_associations[] = $parent->device_id;
                 $dependencies[] = [
-                    'from'  => $device->device_id,
-                    'to'    => $parent->device_id,
+                    'from' => $device->device_id,
+                    'to' => $parent->device_id,
                     'width' => 2,
                 ];
             }

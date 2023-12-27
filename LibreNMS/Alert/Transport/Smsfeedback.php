@@ -81,10 +81,10 @@ class Smsfeedback extends Transport
                 ],
             ],
             'validation' => [
-                'smsfeedback-user'    => 'required|string',
-                'smsfeedback-pass'    => 'required|string',
+                'smsfeedback-user' => 'required|string',
+                'smsfeedback-pass' => 'required|string',
                 'smsfeedback-mobiles' => 'required',
-                'smsfeedback-sender'  => 'required|string',
+                'smsfeedback-sender' => 'required|string',
             ],
         ];
     }

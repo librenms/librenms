@@ -14,10 +14,10 @@ $rrd_filename = Rrd::name($device['hostname'], ['app', 'redis', $app->app_id, 'm
 
 $array = [
     'active' => 'Active',
-    'allocated'   => 'Allocated',
-    'resident'   => 'Resident',
-    'frag_bytes'   => 'Frag Bytes',
-    'rss_bytes'   => 'RSS Bytes',
+    'allocated' => 'Allocated',
+    'resident' => 'Resident',
+    'frag_bytes' => 'Frag Bytes',
+    'rss_bytes' => 'RSS Bytes',
 ];
 
 $rrd_list = [];

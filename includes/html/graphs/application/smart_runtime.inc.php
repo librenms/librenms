@@ -16,8 +16,8 @@ $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, $var
 if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Power On Hours',
-        'ds'       => 'id9',
+        'descr' => 'Power On Hours',
+        'ds' => 'id9',
     ];
 }
 

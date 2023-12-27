@@ -44,20 +44,20 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('packets_sent', 'DERIVE', 0, 125000000000);
 
 $fields = [
-    'stratum'        => $ntp['data']['stratum'],
-    'offset'         => $ntp['data']['offset'],
-    'frequency'      => $ntp['data']['frequency'],
-    'jitter'         => $ntp['data']['sys_jitter'],
-    'noise'          => $ntp['data']['clk_jitter'],
-    'stability'      => $ntp['data']['clk_wander'],
-    'uptime'         => $ntp['data']['time_since_reset'],
-    'buffer_recv'    => $ntp['data']['receive_buffers'],
-    'buffer_free'    => $ntp['data']['free_receive_buffers'],
-    'buffer_used'    => $ntp['data']['used_receive_buffers'],
-    'packets_drop'   => $ntp['data']['dropped_packets'],
+    'stratum' => $ntp['data']['stratum'],
+    'offset' => $ntp['data']['offset'],
+    'frequency' => $ntp['data']['frequency'],
+    'jitter' => $ntp['data']['sys_jitter'],
+    'noise' => $ntp['data']['clk_jitter'],
+    'stability' => $ntp['data']['clk_wander'],
+    'uptime' => $ntp['data']['time_since_reset'],
+    'buffer_recv' => $ntp['data']['receive_buffers'],
+    'buffer_free' => $ntp['data']['free_receive_buffers'],
+    'buffer_used' => $ntp['data']['used_receive_buffers'],
+    'packets_drop' => $ntp['data']['dropped_packets'],
     'packets_ignore' => $ntp['data']['ignored_packets'],
-    'packets_recv'   => $ntp['data']['received_packets'],
-    'packets_sent'   => $ntp['data']['packets_sent'],
+    'packets_recv' => $ntp['data']['received_packets'],
+    'packets_sent' => $ntp['data']['packets_sent'],
 ];
 
 $tags = [

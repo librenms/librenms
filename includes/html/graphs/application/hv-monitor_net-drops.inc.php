@@ -20,14 +20,14 @@ $rrd_list = [];
 if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'In',
-        'ds'       => 'idrop',
+        'descr' => 'In',
+        'ds' => 'idrop',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Out',
-        'ds'       => 'odrop',
-        'invert'   => true,
+        'descr' => 'Out',
+        'ds' => 'odrop',
+        'invert' => true,
     ];
 } else {
     d_echo('RRD "' . $rrd_filename . '" not found');

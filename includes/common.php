@@ -511,7 +511,7 @@ function get_ports_mapped($device_id, $with_statistics = false)
     $ports = [];
     $maps = [
         'ifIndex' => [],
-        'ifName'  => [],
+        'ifName' => [],
         'ifDescr' => [],
     ];
 
@@ -537,7 +537,7 @@ function get_ports_mapped($device_id, $with_statistics = false)
 
     return [
         'ports' => $ports,
-        'maps'  => $maps,
+        'maps' => $maps,
     ];
 }
 
@@ -648,6 +648,7 @@ function ResolveGlues($tables, $target, $x = 0, $hist = [], $last = [])
             }
         }
     }
+
     //You should never get here.
     return false;
 }

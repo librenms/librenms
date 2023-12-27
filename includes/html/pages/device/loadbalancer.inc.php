@@ -1,9 +1,9 @@
 <?php
 
 $link_array = [
-    'page'   => 'device',
+    'page' => 'device',
     'device' => $device['device_id'],
-    'tab'    => 'loadbalancer',
+    'tab' => 'loadbalancer',
 ];
 
 $type_text['loadbalancer_rservers'] = 'Rservers';       // Cisco ACE

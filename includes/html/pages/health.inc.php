@@ -77,7 +77,7 @@ foreach ($datas as $texttype) {
     if ($active_metric == $metric) {
         $navbar .= '<span class="pagemenu-selected">';
     }
-    $navbar .= generate_link($type_text[$metric], $link_array, ['metric'=> $metric, 'view' => $vars['view']]);
+    $navbar .= generate_link($type_text[$metric], $link_array, ['metric' => $metric, 'view' => $vars['view']]);
     if ($active_metric == $metric) {
         $navbar .= '</span>';
     }
@@ -90,7 +90,7 @@ if ($vars['view'] == 'graphs') {
     $displayoptions = '<span class="pagemenu-selected">';
 }
 
-$displayoptions .= generate_link('Graphs', $link_array, ['metric'=> $active_metric, 'view' => 'graphs']);
+$displayoptions .= generate_link('Graphs', $link_array, ['metric' => $active_metric, 'view' => 'graphs']);
 
 if ($vars['view'] == 'graphs') {
     $displayoptions .= '</span>';
@@ -102,7 +102,7 @@ if ($vars['view'] != 'graphs') {
     $displayoptions .= '<span class="pagemenu-selected">';
 }
 
-$displayoptions .= generate_link('No Graphs', $link_array, ['metric'=> $active_metric, 'view' => 'detail']);
+$displayoptions .= generate_link('No Graphs', $link_array, ['metric' => $active_metric, 'view' => 'detail']);
 
 if ($vars['view'] != 'graphs') {
     $displayoptions .= '</span>';

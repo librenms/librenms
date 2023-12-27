@@ -2,8 +2,8 @@
 
 $no_refresh = true;
 
-$link_array = ['page'    => 'device',
-    'device'  => $device['device_id'],
+$link_array = ['page' => 'device',
+    'device' => $device['device_id'],
     'tab' => 'edit', ];
 
 if (! Auth::user()->hasGlobalAdmin()) {
@@ -69,7 +69,7 @@ if (! Auth::user()->hasGlobalAdmin()) {
         } else {
         }
 
-        echo generate_link($text, $link_array, ['section'=>$type]);
+        echo generate_link($text, $link_array, ['section' => $type]);
 
         if ($vars['section'] == $type) {
             echo '</span>';

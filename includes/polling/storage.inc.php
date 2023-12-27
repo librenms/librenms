@@ -26,8 +26,8 @@ foreach (dbFetchRows('SELECT * FROM storage WHERE device_id = ?', [$device['devi
     echo $percent . '% ';
 
     $fields = [
-        'used'   => $storage['used'],
-        'free'   => $storage['free'],
+        'used' => $storage['used'],
+        'free' => $storage['free'],
     ];
 
     $tags = compact('mib', 'descr', 'rrd_name', 'rrd_def');

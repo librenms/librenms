@@ -13,9 +13,9 @@ $sensors = dbFetchColumn(
 $datas = array_intersect(array_keys($types), $sensors);
 
 $wireless_link_array = [
-    'page'   => 'device',
+    'page' => 'device',
     'device' => $device['device_id'],
-    'tab'    => 'wireless',
+    'tab' => 'wireless',
 ];
 
 print_optionbar_start();

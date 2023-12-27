@@ -19,8 +19,8 @@ foreach ($packages as $index => $package) {
     $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app['app_id'], $package]);
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => $label,
-        'ds'       => 'running_processes',
+        'descr' => $label,
+        'ds' => 'running_processes',
     ];
 
     $packages_int++;

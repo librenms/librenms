@@ -83,11 +83,11 @@ foreach (dbFetchRows($sql, $param) as $drive) {
     $bar_link = \LibreNMS\Util\Url::overlibLink($link, print_percentage_bar(400, 20, $perc, "$used / $total", 'ffffff', $background['left'], $free, 'ffffff', $background['right']), \LibreNMS\Util\Url::graphTag($graph_array_zoom));
 
     $response[] = [
-        'hostname'      => generate_device_link($drive),
+        'hostname' => generate_device_link($drive),
         'storage_descr' => $drive['storage_descr'],
-        'graph'         => $mini_graph,
-        'storage_used'  => $bar_link,
-        'storage_perc'  => $perc . '%',
+        'graph' => $mini_graph,
+        'storage_used' => $bar_link,
+        'storage_perc' => $perc . '%',
     ];
     if ($vars['view'] == 'graphs') {
         $graph_array['height'] = '100';
@@ -100,19 +100,19 @@ foreach (dbFetchRows($sql, $param) as $drive) {
         include 'includes/html/print-graphrow.inc.php';
         unset($return_data);
         $response[] = [
-            'hostname'      => $graph_data[0],
+            'hostname' => $graph_data[0],
             'storage_descr' => $graph_data[1],
-            'graph'         => $graph_data[2],
-            'storage_used'  => $graph_data[3],
-            'storage_perc'  => '',
+            'graph' => $graph_data[2],
+            'storage_used' => $graph_data[3],
+            'storage_perc' => '',
         ];
     } //end if
 }//end foreach
 
 $output = [
-    'current'  => $current,
+    'current' => $current,
     'rowCount' => $rowCount,
-    'rows'     => $response,
-    'total'    => $count,
+    'rows' => $response,
+    'total' => $count,
 ];
 echo json_encode($output, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);

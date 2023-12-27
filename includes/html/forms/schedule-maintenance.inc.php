@@ -180,7 +180,7 @@ if ($sub_type == 'new-maintenance') {
     }//end if
 
     $response = [
-        'status'  => $status,
+        'status' => $status,
         'message' => $message,
     ];
 } elseif ($sub_type == 'parse-maintenance') {
@@ -214,7 +214,7 @@ if ($sub_type == 'new-maintenance') {
     $status = 'ok';
     $message = 'Maintenance schedule has been removed';
     $response = [
-        'status'  => $status,
+        'status' => $status,
         'message' => $message,
     ];
 }//end if

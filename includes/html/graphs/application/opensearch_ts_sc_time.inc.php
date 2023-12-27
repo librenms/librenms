@@ -14,8 +14,8 @@ $rrd_list = [];
 if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Scroll Time',
-        'ds'       => 'ts_sc_time',
+        'descr' => 'Scroll Time',
+        'ds' => 'ts_sc_time',
     ];
 } else {
     d_echo('RRD "' . $rrd_filename . '" not found');

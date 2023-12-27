@@ -28,17 +28,17 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('update_interval', 'GAUGE', 0, 4096); // good for >1h
 
 $fields = [
-    'stratum'               => $chronyd['tracking']['stratum'],
-    'reference_time'        => $chronyd['tracking']['reference_time'],
-    'system_time'           => $chronyd['tracking']['system_time'],
-    'last_offset'           => $chronyd['tracking']['last_offset'],
-    'rms_offset'            => $chronyd['tracking']['rms_offset'],
-    'frequency'             => $chronyd['tracking']['frequency'],
-    'residual_frequency'    => $chronyd['tracking']['residual_frequency'],
-    'skew'                  => $chronyd['tracking']['skew'],
-    'root_delay'            => $chronyd['tracking']['root_delay'],
-    'root_dispersion'       => $chronyd['tracking']['root_dispersion'],
-    'update_interval'       => $chronyd['tracking']['update_interval'],
+    'stratum' => $chronyd['tracking']['stratum'],
+    'reference_time' => $chronyd['tracking']['reference_time'],
+    'system_time' => $chronyd['tracking']['system_time'],
+    'last_offset' => $chronyd['tracking']['last_offset'],
+    'rms_offset' => $chronyd['tracking']['rms_offset'],
+    'frequency' => $chronyd['tracking']['frequency'],
+    'residual_frequency' => $chronyd['tracking']['residual_frequency'],
+    'skew' => $chronyd['tracking']['skew'],
+    'root_delay' => $chronyd['tracking']['root_delay'],
+    'root_dispersion' => $chronyd['tracking']['root_dispersion'],
+    'update_interval' => $chronyd['tracking']['update_interval'],
 ];
 
 $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
@@ -69,19 +69,19 @@ foreach ($chronyd['sources'] as $source) {
     $sources[] = $source['source_name'];
     $rrd_name = ['app', $name, $app->app_id, $source['source_name']];
     $fields = [
-        'stratum'               => $source['stratum'],
-        'polling_rate'          => $source['polling_rate'],
-        'last_rx'               => $source['last_rx'],
-        'adjusted_offset'       => $source['adjusted_offset'],
-        'measured_offset'       => $source['measured_offset'],
-        'estimated_error'       => $source['estimated_error'],
-        'number_samplepoints'   => $source['number_samplepoints'],
-        'number_runs'           => $source['number_runs'],
-        'span'                  => $source['span'],
-        'frequency'             => $source['frequency'],
-        'frequency_skew'        => $source['frequency_skew'],
-        'offset'                => $source['offset'],
-        'stddev'                => $source['stddev'],
+        'stratum' => $source['stratum'],
+        'polling_rate' => $source['polling_rate'],
+        'last_rx' => $source['last_rx'],
+        'adjusted_offset' => $source['adjusted_offset'],
+        'measured_offset' => $source['measured_offset'],
+        'estimated_error' => $source['estimated_error'],
+        'number_samplepoints' => $source['number_samplepoints'],
+        'number_runs' => $source['number_runs'],
+        'span' => $source['span'],
+        'frequency' => $source['frequency'],
+        'frequency_skew' => $source['frequency_skew'],
+        'offset' => $source['offset'],
+        'stddev' => $source['stddev'],
     ];
 
     $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $source_rrd_def, 'rrd_name' => $rrd_name];

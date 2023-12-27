@@ -51,14 +51,14 @@ foreach ($pwrstatd_data as $data) {
     $rrd_name = ['app', $name, $app->app_id, $sn];
 
     $fields = [
-        'mruntime'  => $mruntime,
+        'mruntime' => $mruntime,
         'pcapacity' => $pcapacity,
-        'pload'     => $pload,
-        'voutput'   => $voutput,
-        'vrating'   => $vrating,
-        'vutility'  => $vutility,
-        'wload'     => $wload,
-        'wrating'   => $wrating,
+        'pload' => $pload,
+        'voutput' => $voutput,
+        'vrating' => $vrating,
+        'vutility' => $vutility,
+        'wload' => $wload,
+        'wrating' => $wrating,
     ];
 
     $metrics[$sn] = $fields;

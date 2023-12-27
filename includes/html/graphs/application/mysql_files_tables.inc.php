@@ -5,9 +5,9 @@ require 'includes/html/graphs/common.inc.php';
 $rrd_filename = Rrd::name($device['hostname'], ['app', 'mysql', $app->app_id]);
 
 $array = [
-    'TOC'  => ['descr' => 'Table Cache'],
-    'OFs'  => ['descr' => 'Open Files'],
-    'OTs'  => ['descr' => 'Open Tables'],
+    'TOC' => ['descr' => 'Table Cache'],
+    'OFs' => ['descr' => 'Open Files'],
+    'OTs' => ['descr' => 'Open Tables'],
     'OdTs' => ['descr' => 'Opened Tables'],
 ];
 

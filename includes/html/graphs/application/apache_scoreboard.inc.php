@@ -7,44 +7,44 @@ require 'includes/html/graphs/common.inc.php';
 $rrd_filename = Rrd::name($device['hostname'], ['app', 'apache', $app->app_id]);
 
 $array = [
-    'sb_reading'   => [
-        'descr'  => 'Reading',
+    'sb_reading' => [
+        'descr' => 'Reading',
         'colour' => '750F7DFF',
     ],
-    'sb_writing'   => [
-        'descr'  => 'Writing',
+    'sb_writing' => [
+        'descr' => 'Writing',
         'colour' => '00FF00FF',
     ],
-    'sb_wait'      => [
-        'descr'  => 'Waiting',
+    'sb_wait' => [
+        'descr' => 'Waiting',
         'colour' => '4444FFFF',
     ],
-    'sb_start'     => [
-        'descr'  => 'Starting',
+    'sb_start' => [
+        'descr' => 'Starting',
         'colour' => '157419FF',
     ],
     'sb_keepalive' => [
-        'descr'  => 'Keepalive',
+        'descr' => 'Keepalive',
         'colour' => 'FF0000FF',
     ],
-    'sb_dns'       => [
-        'descr'  => 'DNS',
+    'sb_dns' => [
+        'descr' => 'DNS',
         'colour' => '6DC8FEFF',
     ],
-    'sb_closing'   => [
-        'descr'  => 'Closing',
+    'sb_closing' => [
+        'descr' => 'Closing',
         'colour' => 'FFAB00FF',
     ],
-    'sb_logging'   => [
-        'descr'  => 'Logging',
+    'sb_logging' => [
+        'descr' => 'Logging',
         'colour' => 'FFFF00FF',
     ],
-    'sb_graceful'  => [
-        'descr'  => 'Graceful',
+    'sb_graceful' => [
+        'descr' => 'Graceful',
         'colour' => 'FF5576FF',
     ],
-    'sb_idle'      => [
-        'descr'  => 'Idle',
+    'sb_idle' => [
+        'descr' => 'Idle',
         'colour' => 'FF4105FF',
     ],
 ];

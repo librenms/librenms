@@ -1,10 +1,10 @@
 <?php
 
 $link_array = [
-    'page'   => 'device',
+    'page' => 'device',
     'device' => $device['device_id'],
-    'tab'    => 'apps',
-    'app'    => 'postgres',
+    'tab' => 'apps',
+    'app' => 'postgres',
 ];
 
 print_optionbar_start();

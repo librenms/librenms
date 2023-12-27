@@ -45,7 +45,7 @@ abstract class PortTabHook implements Hook
     {
         return [
             'title' => __CLASS__,
-            'port'  => $port,
+            'port' => $port,
         ];
     }
 

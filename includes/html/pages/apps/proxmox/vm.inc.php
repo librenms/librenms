@@ -3,7 +3,7 @@
 $vm = proxmox_vm_info(var_get('vmid'), var_get('instance'));
 
 $graphs = [
-    'proxmox_traffic'       => 'Traffic',
+    'proxmox_traffic' => 'Traffic',
 ];
 
 foreach ($vm['ports'] as $port) {

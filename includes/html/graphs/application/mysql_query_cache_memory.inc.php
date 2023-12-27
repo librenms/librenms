@@ -5,7 +5,7 @@ require 'includes/html/graphs/common.inc.php';
 $rrd_filename = Rrd::name($device['hostname'], ['app', 'mysql', $app->app_id]);
 
 $array = [
-    'QCs'   => 'Cache size',
+    'QCs' => 'Cache size',
     'QCeFy' => 'Free mem',
 ];
 

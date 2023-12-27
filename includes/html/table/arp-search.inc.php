@@ -99,12 +99,12 @@ foreach (dbFetchRows($sql, $param) as $entry) {
 
         $mac = Mac::parse($entry['mac_address']);
         $response[] = [
-            'mac_address'      => $mac->readable(),
-            'mac_oui'          => $mac->vendor(),
-            'ipv4_address'     => $entry['ipv4_address'],
-            'hostname'         => generate_device_link($entry),
-            'interface'        => generate_port_link($entry, makeshortif($entry['label'])) . ' ' . $error_img,
-            'remote_device'    => $arp_name,
+            'mac_address' => $mac->readable(),
+            'mac_oui' => $mac->vendor(),
+            'ipv4_address' => $entry['ipv4_address'],
+            'hostname' => generate_device_link($entry),
+            'interface' => generate_port_link($entry, makeshortif($entry['label'])) . ' ' . $error_img,
+            'remote_device' => $arp_name,
             'remote_interface' => $arp_if,
         ];
     }//end if
@@ -113,9 +113,9 @@ foreach (dbFetchRows($sql, $param) as $entry) {
 }//end foreach
 
 $output = [
-    'current'  => $current,
+    'current' => $current,
     'rowCount' => $rowCount,
-    'rows'     => $response,
-    'total'    => $total,
+    'rows' => $response,
+    'total' => $total,
 ];
 echo json_encode($output, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);

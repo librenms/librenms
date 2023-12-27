@@ -72,10 +72,10 @@ foreach ($components as $devid => $comp) {
                 }
 
                 $response[] = [
-                    'device'    => $device_link,
-                    'peer'      => $array['peer'],
-                    'stratum'   => $array['stratum'],
-                    'error'     => $array['error'],
+                    'device' => $device_link,
+                    'peer' => $array['peer'],
+                    'stratum' => $array['stratum'],
+                    'error' => $array['error'],
                 ];
 
                 // Do we want a graphrow.
@@ -84,10 +84,10 @@ foreach ($components as $devid => $comp) {
                     require 'includes/html/print-graphrow.inc.php';
                     unset($return_data);
                     $response[] = [
-                        'device'    => $graph_data[0],
-                        'peer'      => $graph_data[1],
-                        'stratum'   => $graph_data[2],
-                        'error'     => $graph_data[3],
+                        'device' => $graph_data[0],
+                        'peer' => $graph_data[1],
+                        'stratum' => $graph_data[2],
+                        'error' => $graph_data[3],
                     ];
                 }
             } // End if in range
@@ -101,9 +101,9 @@ if ($count == 0) {
 }
 
 $output = [
-    'current'  => $current,
+    'current' => $current,
     'rowCount' => $rowCount,
-    'rows'     => $response,
-    'total'    => $count,
+    'rows' => $response,
+    'total' => $count,
 ];
 echo json_encode($output, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);

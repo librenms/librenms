@@ -1,9 +1,9 @@
 <?php
 
 $graphs = [
-    'ceph_poolstats'    => 'Pool stats',
-    'ceph_osdperf'      => 'OSD Performance',
-    'ceph_df'           => 'Usage',
+    'ceph_poolstats' => 'Pool stats',
+    'ceph_osdperf' => 'OSD Performance',
+    'ceph_df' => 'Usage',
 ];
 
 foreach ($graphs as $key => $text) {

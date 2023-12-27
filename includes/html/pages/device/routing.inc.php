@@ -1,9 +1,9 @@
 <?php
 
 $link_array = [
-    'page'   => 'device',
+    'page' => 'device',
     'device' => $device['device_id'],
-    'tab'    => 'routing',
+    'tab' => 'routing',
 ];
 
 // $type_text['overview'] = "Overview";

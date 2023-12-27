@@ -31,7 +31,7 @@ if ($device['os_group'] == 'cisco') {
             ->addDataset('active', 'GAUGE', 0);
 
         $fields = [
-            'total'  => $total,
+            'total' => $total,
             'active' => $active,
         ];
 

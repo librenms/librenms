@@ -17,9 +17,9 @@ if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list = [
         [
             'filename' => $rrd_filename,
-            'descr'    => 'cpu time',
-            'ds'       => 'cputime',
-            'colour'   => '582a72',
+            'descr' => 'cpu time',
+            'ds' => 'cputime',
+            'colour' => '582a72',
         ],
     ];
 } else {

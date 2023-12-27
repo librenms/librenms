@@ -1,10 +1,10 @@
 <?php
 
 $link_array = [
-    'page'   => 'device',
+    'page' => 'device',
     'device' => $device['device_id'],
-    'tab'    => 'routing',
-    'proto'  => 'vrf',
+    'tab' => 'routing',
+    'proto' => 'vrf',
 ];
 
 // echo(generate_link("Basic", $link_array,array('view'=>'basic')));
@@ -43,10 +43,10 @@ unset($sep);
 echo ' Graphs: ';
 
 $graph_types = [
-    'bits'      => 'Bits',
-    'upkts'     => 'Unicast Packets',
-    'nupkts'    => 'Non-Unicast Packets',
-    'errors'    => 'Errors',
+    'bits' => 'Bits',
+    'upkts' => 'Unicast Packets',
+    'nupkts' => 'Non-Unicast Packets',
+    'errors' => 'Errors',
     'etherlike' => 'Etherlike',
 ];
 

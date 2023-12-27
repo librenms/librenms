@@ -40,15 +40,15 @@ if (! empty($entity_array)) {
 
 if (! empty($entity_oids)) {
     $entitysensor = [
-        'voltsDC'   => 'voltage',
-        'voltsAC'   => 'voltage',
-        'amperes'   => 'current',
-        'watts'     => 'power',
-        'hertz'     => 'freq',
+        'voltsDC' => 'voltage',
+        'voltsAC' => 'voltage',
+        'amperes' => 'current',
+        'watts' => 'power',
+        'hertz' => 'freq',
         'percentRH' => 'humidity',
-        'rpm'       => 'fanspeed',
-        'celsius'   => 'temperature',
-        'dBm'       => 'dbm',
+        'rpm' => 'fanspeed',
+        'celsius' => 'temperature',
+        'dBm' => 'dbm',
     ];
 
     foreach ($entity_oids as $index => $entry) {

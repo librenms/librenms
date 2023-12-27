@@ -96,10 +96,10 @@ class Smseagle extends Transport
                 ],
             ],
             'validation' => [
-                'smseagle-url'     => 'required|url',
-                'smseagle-token'    => 'required_without:smseagle-user,smseagle-pass|string',
-                'smseagle-user'    => 'required_without:smseagle-token|string',
-                'smseagle-pass'    => 'required_without:smseagle-token|string',
+                'smseagle-url' => 'required|url',
+                'smseagle-token' => 'required_without:smseagle-user,smseagle-pass|string',
+                'smseagle-user' => 'required_without:smseagle-token|string',
+                'smseagle-pass' => 'required_without:smseagle-token|string',
                 'smseagle-mobiles' => 'required',
             ],
         ];

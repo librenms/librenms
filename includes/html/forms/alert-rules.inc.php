@@ -92,14 +92,14 @@ if ($invert_map == 'on') {
 }
 
 $extra = [
-    'mute'            => $mute,
-    'count'           => $count,
-    'delay'           => $delay_sec,
-    'invert'          => $invert,
-    'interval'        => $interval_sec,
-    'recovery'        => $recovery,
+    'mute' => $mute,
+    'count' => $count,
+    'delay' => $delay_sec,
+    'invert' => $invert,
+    'interval' => $interval_sec,
+    'recovery' => $recovery,
     'acknowledgement' => $acknowledgement,
-    'options'         => $options,
+    'options' => $options,
 ];
 
 $extra_json = json_encode($extra);
@@ -237,6 +237,6 @@ if (is_numeric($rule_id) && $rule_id > 0) {
 }
 
 exit(json_encode([
-    'status'       => $status,
-    'message'      => $message,
+    'status' => $status,
+    'message' => $message,
 ]));

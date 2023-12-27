@@ -5,8 +5,8 @@ use LibreNMS\Util\Number;
 print_optionbar_start();
 
 $link_array = [
-    'page'    => 'routing',
-    'protocol'  => 'mpls',
+    'page' => 'routing',
+    'protocol' => 'mpls',
 ];
 
 if (! isset($vars['view'])) {

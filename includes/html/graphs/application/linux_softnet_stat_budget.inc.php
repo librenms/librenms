@@ -14,13 +14,13 @@ $rrd_list = [];
 if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Budget',
-        'ds'       => 'budget',
+        'descr' => 'Budget',
+        'ds' => 'budget',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Budget usecs',
-        'ds'       => 'budget_usecs',
+        'descr' => 'Budget usecs',
+        'ds' => 'budget_usecs',
     ];
 } else {
     d_echo('RRD "' . $rrd_filename . '" not found');

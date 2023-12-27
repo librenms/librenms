@@ -320,7 +320,7 @@ function check_service($command)
             }
             // We have a DS. Add an entry to the array.
             d_echo('Perf Data - DS: ' . $ds . ', Value: ' . $value . ', UOM: ' . $uom . "\n");
-            $metrics[$ds] = ['value'=>$value, 'uom'=>$uom];
+            $metrics[$ds] = ['value' => $value, 'uom' => $uom];
         } else {
             // No DS. Don't add an entry to the array.
             d_echo("Perf Data - None.\n");

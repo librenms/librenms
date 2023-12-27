@@ -17,15 +17,15 @@ if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list = [
         [
             'filename' => $rrd_filename,
-            'descr'    => 'requests',
-            'ds'       => 'serverrequests',
-            'colour'   => '582a72',
+            'descr' => 'requests',
+            'ds' => 'serverrequests',
+            'colour' => '582a72',
         ],
         [
             'filename' => $rrd_filename,
-            'descr'    => 'hits',
-            'ds'       => 'servererrors',
-            'colour'   => '28774f',
+            'descr' => 'hits',
+            'ds' => 'servererrors',
+            'colour' => '28774f',
         ],
     ];
 } else {

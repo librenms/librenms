@@ -7,9 +7,9 @@ $nototal = (($width < 224) ? 1 : 0);
 $unit_text = 'Seconds';
 $rrd_filename = Rrd::name($device['hostname'], ['app', 'chronyd', $app->app_id]);
 $array = [
-    'system_time'   => ['descr' => 'Clock lag'],
-    'last_offset'   => ['descr' => 'Last offset'],
-    'rms_offset'    => ['descr' => 'Avg offset'],
+    'system_time' => ['descr' => 'Clock lag'],
+    'last_offset' => ['descr' => 'Last offset'],
+    'rms_offset' => ['descr' => 'Avg offset'],
 ];
 
 $i = 0;

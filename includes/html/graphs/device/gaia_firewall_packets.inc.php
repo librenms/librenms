@@ -7,10 +7,10 @@ $rrd_options .= " --vertical-label='Packets per second'";
 $rrd_options .= " --lower-limit='0'";
 
 $stats = [
-    'accepted'  => '#74C366FF',
-    'rejected'  => '#007283FF',
-    'dropped'   => '#FFAB00FF',
-    'logged'    => '#B1441EFF',
+    'accepted' => '#74C366FF',
+    'rejected' => '#007283FF',
+    'dropped' => '#FFAB00FF',
+    'logged' => '#B1441EFF',
 ];
 
 $i = 0;

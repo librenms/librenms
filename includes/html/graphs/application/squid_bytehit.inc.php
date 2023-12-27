@@ -17,21 +17,21 @@ if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list = [
         [
             'filename' => $rrd_filename,
-            'descr'    => '1 minute',
-            'ds'       => 'reqbyteratio1',
-            'colour'   => '582a72',
+            'descr' => '1 minute',
+            'ds' => 'reqbyteratio1',
+            'colour' => '582a72',
         ],
         [
             'filename' => $rrd_filename,
-            'descr'    => '5 minute',
-            'ds'       => 'reqbyteratio5',
-            'colour'   => '28774f',
+            'descr' => '5 minute',
+            'ds' => 'reqbyteratio5',
+            'colour' => '28774f',
         ],
         [
             'filename' => $rrd_filename,
-            'descr'    => '60 minute',
-            'ds'       => 'reqbyteratio60',
-            'colour'   => '28536c',
+            'descr' => '60 minute',
+            'ds' => 'reqbyteratio60',
+            'colour' => '28536c',
         ],
     ];
 } else {

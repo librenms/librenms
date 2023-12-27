@@ -1,22 +1,22 @@
 <?php
 
 $link_array = [
-    'page'   => 'device',
+    'page' => 'device',
     'device' => $device['device_id'],
-    'tab'    => 'apps',
-    'app'    => 'sneck',
+    'tab' => 'apps',
+    'app' => 'sneck',
 ];
 
 $link_array = [
-    'page'   => 'device',
+    'page' => 'device',
     'device' => $device['device_id'],
-    'tab'    => 'apps',
-    'app'    => 'sneck',
+    'tab' => 'apps',
+    'app' => 'sneck',
 ];
 
 $graphs = [
-    'sneck_results'=>'Results',
-    'sneck_time'=>'Time Difference',
+    'sneck_results' => 'Results',
+    'sneck_time' => 'Time Difference',
 ];
 
 foreach ($graphs as $key => $text) {

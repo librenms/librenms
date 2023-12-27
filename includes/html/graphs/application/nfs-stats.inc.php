@@ -12,63 +12,63 @@ $printtotal = 0;
 $rrd_filename = Rrd::dirFromHost($device['hostname']) . '/app-nfsstats-' . $app->app_id . '.rrd';
 $array = [
     'total' => [
-        'descr'  => 'Total',
+        'descr' => 'Total',
         'colour' => '000000',
     ],
     'null' => [
-        'descr'  => 'NULL',
+        'descr' => 'NULL',
         'colour' => '630606',
     ],
     'getattr' => [
-        'descr'  => 'Get attributes',
+        'descr' => 'Get attributes',
         'colour' => '50C150',
     ],
     'setattr' => [
-        'descr'  => 'Set attributes',
+        'descr' => 'Set attributes',
         'colour' => '4D65A2',
     ],
     'lookup' => [
-        'descr'  => 'Lookup',
+        'descr' => 'Lookup',
         'colour' => '8B64A1',
     ],
     'access' => [
-        'descr'  => 'Access',
+        'descr' => 'Access',
         'colour' => 'AAAA39',
     ],
     'read' => [
-        'descr'  => 'Read',
+        'descr' => 'Read',
         'colour' => '',
     ],
     'write' => [
-        'descr'  => 'Write',
+        'descr' => 'Write',
         'colour' => '457A9A',
     ],
     'create' => [
-        'descr'  => 'Create',
+        'descr' => 'Create',
         'colour' => '690D87',
     ],
     'mkdir' => [
-        'descr'  => 'Make dir',
+        'descr' => 'Make dir',
         'colour' => '072A3F',
     ],
     'remove' => [
-        'descr'  => 'Remove',
+        'descr' => 'Remove',
         'colour' => 'F16464',
     ],
     'rmdir' => [
-        'descr'  => 'Remove dir',
+        'descr' => 'Remove dir',
         'colour' => '57162D',
     ],
     'rename' => [
-        'descr'  => 'Rename',
+        'descr' => 'Rename',
         'colour' => 'A40B62',
     ],
     'readdirplus' => [
-        'descr'  => 'Read dir plus',
+        'descr' => 'Read dir plus',
         'colour' => 'F1F164',
     ],
     'fsstat' => [
-        'descr'  => 'FS stat',
+        'descr' => 'FS stat',
         'colour' => 'F1F191',
     ],
 ];

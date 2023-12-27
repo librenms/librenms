@@ -14,8 +14,8 @@ $rrd_list = [];
 if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Get Missing Time',
-        'ds'       => 'tg_missing_time',
+        'descr' => 'Get Missing Time',
+        'ds' => 'tg_missing_time',
     ];
 } else {
     d_echo('RRD "' . $rrd_filename . '" not found');

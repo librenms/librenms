@@ -17,9 +17,9 @@ if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list = [
         [
             'filename' => $rrd_filename,
-            'descr'    => 'http io reads',
-            'ds'       => 'sysnumreads',
-            'colour'   => '582a72',
+            'descr' => 'http io reads',
+            'ds' => 'sysnumreads',
+            'colour' => '582a72',
         ],
     ];
 } else {

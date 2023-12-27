@@ -14,23 +14,23 @@ $rrd_list = [];
 if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Cache Hit',
-        'ds'       => 'cache_hits_per',
+        'descr' => 'Cache Hit',
+        'ds' => 'cache_hits_per',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Cache Miss',
-        'ds'       => 'cache_miss_per',
+        'descr' => 'Cache Miss',
+        'ds' => 'cache_miss_per',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Actual Hit',
-        'ds'       => 'actual_hit_per',
+        'descr' => 'Actual Hit',
+        'ds' => 'actual_hit_per',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Data Demand',
-        'ds'       => 'data_demand_per',
+        'descr' => 'Data Demand',
+        'ds' => 'data_demand_per',
     ];
 } else {
     d_echo('RRD "' . $rrd_filename . '" not found');

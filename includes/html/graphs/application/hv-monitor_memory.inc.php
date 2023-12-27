@@ -18,13 +18,13 @@ $rrd_list = [];
 if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Allocated',
-        'ds'       => 'mem_alloc',
+        'descr' => 'Allocated',
+        'ds' => 'mem_alloc',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'RSS',
-        'ds'       => 'rss',
+        'descr' => 'RSS',
+        'ds' => 'rss',
     ];
 } else {
     d_echo('RRD "' . $rrd_filename . '" not found');

@@ -14,8 +14,8 @@ $rrd_list = [];
 if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Periodic Flush',
-        'ds'       => 'tf_periodic',
+        'descr' => 'Periodic Flush',
+        'ds' => 'tf_periodic',
     ];
 } else {
     d_echo('RRD "' . $rrd_filename . '" not found');

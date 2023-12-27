@@ -68,11 +68,11 @@ class Riverbed extends OS implements OSPolling
                 ->addDataset('total', 'GAUGE', 0);
 
             $fields = [
-                'half_open'   => $conn_half_open,
+                'half_open' => $conn_half_open,
                 'half_closed' => $conn_half_closed,
                 'established' => $conn_established,
-                'active'      => $conn_active,
-                'total'       => $conn_total,
+                'active' => $conn_active,
+                'total' => $conn_total,
             ];
 
             $tags = compact('rrd_def');

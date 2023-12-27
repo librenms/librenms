@@ -1,7 +1,7 @@
 <?php
 
 $graphs = [
-    'backupninja_backupninja'       => 'backupninja backups',
+    'backupninja_backupninja' => 'backupninja backups',
 ];
 foreach ($graphs as $key => $text) {
     $graph_type = $key;

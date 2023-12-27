@@ -7,7 +7,7 @@ if (Auth::user()->hasGlobalRead()) {
     $perms_sql = '`printer_supplies`.`device_id` IN ' . dbGenPlaceholders(count($device_ids));
 
     $data['count'] = [
-        'query'  => "SELECT COUNT(`supply_id`) FROM printer_supplies WHERE $perms_sql",
+        'query' => "SELECT COUNT(`supply_id`) FROM printer_supplies WHERE $perms_sql",
         'params' => $device_ids,
     ];
 }

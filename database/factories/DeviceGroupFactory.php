@@ -18,7 +18,7 @@ class DeviceGroupFactory extends Factory
         return [
             'name' => $this->faker->domainWord(),
             'desc' => $this->faker->text(255),
-            'type' =>'static',
+            'type' => 'static',
         ];
     }
 }

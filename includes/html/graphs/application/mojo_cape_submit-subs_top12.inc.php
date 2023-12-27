@@ -19,8 +19,8 @@ foreach ($slugs as $index => $slug) {
     $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'slugs___-___' . $slug]);
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => $slug,
-        'ds'       => 'sub_count',
+        'descr' => $slug,
+        'ds' => 'sub_count',
     ];
 }
 

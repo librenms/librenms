@@ -1,7 +1,7 @@
 <?php
 
 $datas = [
-    'Flows'   => 'nfsen_flows',
+    'Flows' => 'nfsen_flows',
     'Packets' => 'nfsen_packets',
     'Traffic' => 'nfsen_traffic',
 ];

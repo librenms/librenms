@@ -14,63 +14,63 @@ $rrd_list = [];
 if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'CLOSED',
-        'ds'       => 'toCLOSED',
+        'descr' => 'CLOSED',
+        'ds' => 'toCLOSED',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'SYN_SENT',
-        'ds'       => 'toSYN_SENT',
+        'descr' => 'SYN_SENT',
+        'ds' => 'toSYN_SENT',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'SYN_RECEIVED',
-        'ds'       => 'toSYN_RECEIVED',
+        'descr' => 'SYN_RECEIVED',
+        'ds' => 'toSYN_RECEIVED',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'ESTABLISHED',
-        'ds'       => 'toESTABLISHED',
+        'descr' => 'ESTABLISHED',
+        'ds' => 'toESTABLISHED',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'CLOSE_WAIT',
-        'ds'       => 'toCLOSE_WAIT',
+        'descr' => 'CLOSE_WAIT',
+        'ds' => 'toCLOSE_WAIT',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'FIN_WAIT_1',
-        'ds'       => 'toFIN_WAIT_1',
+        'descr' => 'FIN_WAIT_1',
+        'ds' => 'toFIN_WAIT_1',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'CLOSING',
-        'ds'       => 'toCLOSING',
+        'descr' => 'CLOSING',
+        'ds' => 'toCLOSING',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'LAST_ACK',
-        'ds'       => 'toLAST_ACK',
+        'descr' => 'LAST_ACK',
+        'ds' => 'toLAST_ACK',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'FIN_WAIT_2',
-        'ds'       => 'toFIN_WAIT_2',
+        'descr' => 'FIN_WAIT_2',
+        'ds' => 'toFIN_WAIT_2',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'TIME_WAIT',
-        'ds'       => 'toTIME_WAIT',
+        'descr' => 'TIME_WAIT',
+        'ds' => 'toTIME_WAIT',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'UNKNOWN',
-        'ds'       => 'toUNKNOWN',
+        'descr' => 'UNKNOWN',
+        'ds' => 'toUNKNOWN',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'other',
-        'ds'       => 'toother',
+        'descr' => 'other',
+        'ds' => 'toother',
     ];
 } else {
     d_echo('RRD "' . $rrd_filename . '" not found');

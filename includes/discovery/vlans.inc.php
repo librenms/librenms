@@ -61,8 +61,8 @@ foreach ($device['vlans'] as $domain_id => $vlans) {
 
             $db_w = [
                 'device_id' => $device['device_id'],
-                'port_id'   => $port['port_id'] ?? null,
-                'vlan'      => $vlan_id,
+                'port_id' => $port['port_id'] ?? null,
+                'vlan' => $vlan_id,
             ];
 
             $db_a['baseport'] = $index_to_base[$ifIndex] ?? '';

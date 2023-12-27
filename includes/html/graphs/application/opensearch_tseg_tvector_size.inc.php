@@ -14,8 +14,8 @@ $rrd_list = [];
 if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Seg.Term.Vect.Size',
-        'ds'       => 'tseg_tvector_size',
+        'descr' => 'Seg.Term.Vect.Size',
+        'ds' => 'tseg_tvector_size',
     ];
 } else {
     d_echo('RRD "' . $rrd_filename . '" not found');

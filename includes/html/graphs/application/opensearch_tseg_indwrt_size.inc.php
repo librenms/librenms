@@ -14,8 +14,8 @@ $rrd_list = [];
 if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Seg.Ind.Wrt.Size',
-        'ds'       => 'tseg_indwrt_size',
+        'descr' => 'Seg.Ind.Wrt.Size',
+        'ds' => 'tseg_indwrt_size',
     ];
 } else {
     d_echo('RRD "' . $rrd_filename . '" not found');

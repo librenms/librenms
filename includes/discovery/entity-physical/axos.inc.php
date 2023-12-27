@@ -4,11 +4,11 @@ $physical_name = snmpwalk_cache_multi_oid($device, 'sysObjectID.0', $physical_na
 $serial_number = snmpwalk_cache_multi_oid($device, 'axosSystemChassisSerialNumber', $serial_number, 'Axos-System-MIB');
 $physical_index = 1;
 $entity_array[1] = [
-    'entPhysicalIndex'        => $physical_index,
+    'entPhysicalIndex' => $physical_index,
     'entPhysicalDescr' => $physical_name[0]['sysObjectID'],
     'entPhysicalVendorType' => 'Calix',
     'entPhysicalContainedIn' => '0',
-    'entPhysicalClass'        => 'chassis',
+    'entPhysicalClass' => 'chassis',
     'entPhysicalParentRelPos' => '-1',
     'entPhysicalName' => $physical_name[0]['sysObjectID'],
     'entPhysicalSerialNum' => $serial_number[0]['axosSystemChassisSerialNumber'],
@@ -21,15 +21,15 @@ foreach ($card_array as $card) {
     $physical_index++;
 //    Discover the card
     $entity_array[] = [
-        'entPhysicalIndex'        => $physical_index,
-        'entPhysicalDescr'        => "Calix {$card['axosCardActualType']}",
-        'entPhysicalClass'        => 'container',
-        'entPhysicalModelName'    => $card['axosCardPartNumber'],
-        'entPhysicalSerialNum'    => $card['axosCardSerialNumber'],
-        'entPhysicalContainedIn'  => 1,
-        'entPhysicalParentRelPos'  => $card['axosCardSlot'],
-        'entPhysicalSoftwareRev'  => $card['axosCardSoftwareVersion'],
-        'entPhysicalIsFRU'        => true,
+        'entPhysicalIndex' => $physical_index,
+        'entPhysicalDescr' => "Calix {$card['axosCardActualType']}",
+        'entPhysicalClass' => 'container',
+        'entPhysicalModelName' => $card['axosCardPartNumber'],
+        'entPhysicalSerialNum' => $card['axosCardSerialNumber'],
+        'entPhysicalContainedIn' => 1,
+        'entPhysicalParentRelPos' => $card['axosCardSlot'],
+        'entPhysicalSoftwareRev' => $card['axosCardSoftwareVersion'],
+        'entPhysicalIsFRU' => true,
     ];
 }
 

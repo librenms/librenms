@@ -9,29 +9,29 @@
 
 $oids = [
     0 => [
-        'type'  => 'dhcpatriotDatabaseThreads',
+        'type' => 'dhcpatriotDatabaseThreads',
         'descr' => 'Database Threads',
-        'oid'   => '.1.3.6.1.4.1.2021.50.45',
+        'oid' => '.1.3.6.1.4.1.2021.50.45',
     ],
     1 => [
-        'type'  => 'dhcpatriotDatabaseQueriesPerSecond',
+        'type' => 'dhcpatriotDatabaseQueriesPerSecond',
         'descr' => 'Database Queries Per Second',
-        'oid'   => '.1.3.6.1.4.1.2021.50.46',
+        'oid' => '.1.3.6.1.4.1.2021.50.46',
     ],
     2 => [
-        'type'  => 'dhcpatriotDHCPv4LeasesPerSecond',
+        'type' => 'dhcpatriotDHCPv4LeasesPerSecond',
         'descr' => 'DHCPv4 Leases Per Second',
-        'oid'   => '.1.3.6.1.4.1.2021.50.70',
+        'oid' => '.1.3.6.1.4.1.2021.50.70',
     ],
     3 => [
-        'type'  => 'dhcpatriotDHCPv6LeasesPerSecond',
+        'type' => 'dhcpatriotDHCPv6LeasesPerSecond',
         'descr' => 'DHCPv6 Leases Per Second',
-        'oid'   => '.1.3.6.1.5.1.2021.50.140',
+        'oid' => '.1.3.6.1.5.1.2021.50.140',
     ],
     4 => [
-        'type'  => 'dhcpatriotLicenseExpiration',
+        'type' => 'dhcpatriotLicenseExpiration',
         'descr' => 'License Expiration Days Remaining',
-        'oid'   => '.1.3.6.1.4.1.2021.51.12.4.1.2.7.76.73.67.69.78.83.69.1',
+        'oid' => '.1.3.6.1.4.1.2021.51.12.4.1.2.7.76.73.67.69.78.83.69.1',
     ],
 ];
 

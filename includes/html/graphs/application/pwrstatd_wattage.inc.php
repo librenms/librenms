@@ -6,8 +6,8 @@ $bigdescrlen = 25;
 $smalldescrlen = 25;
 
 $rrdArray = [
-    'wload'                   => ['descr' => 'PSU Load'],
-    'wrating'                 => ['descr' => 'PSU Rating'],
+    'wload' => ['descr' => 'PSU Load'],
+    'wrating' => ['descr' => 'PSU Rating'],
 ];
 
 require 'pwrstatd-common.inc.php';

@@ -17,28 +17,28 @@ $rrd_filename_232 = Rrd::name($device['hostname'], ['app', $name . '_id232', $ap
 if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Worst_Case_Erase_Count',
-        'ds'       => 'id173',
+        'descr' => 'Worst_Case_Erase_Count',
+        'ds' => 'id173',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Wear_Leveling_Count',
-        'ds'       => 'id177',
+        'descr' => 'Wear_Leveling_Count',
+        'ds' => 'id177',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'SSD_Life_Left',
-        'ds'       => 'id231',
+        'descr' => 'SSD_Life_Left',
+        'ds' => 'id231',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Media_Wearout_Indicator',
-        'ds'       => 'id233',
+        'descr' => 'Media_Wearout_Indicator',
+        'ds' => 'id233',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename_232,
-        'descr'    => 'Available_Reservd_Space',
-        'ds'       => 'id232',
+        'descr' => 'Available_Reservd_Space',
+        'ds' => 'id232',
     ];
 }
 

@@ -61,7 +61,7 @@ class Ciscowlc extends Cisco implements
             ->addDataset('NUMCLIENTS', 'GAUGE', 0, 12500000000);
 
         $fields = [
-            'NUMAPS'     => $numAccessPoints,
+            'NUMAPS' => $numAccessPoints,
             'NUMCLIENTS' => $numClients,
         ];
 

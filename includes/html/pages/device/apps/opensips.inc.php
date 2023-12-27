@@ -1,8 +1,8 @@
 <?php
 
 $graphs = [
-    'opensips_load'       => 'Load Average',
-    'opensips_memory'    => 'Memory',
+    'opensips_load' => 'Load Average',
+    'opensips_memory' => 'Memory',
     'opensips_openfiles' => 'Open files',
 ];
 

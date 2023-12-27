@@ -72,7 +72,7 @@ class Gitlab extends Transport
                     'title' => 'Project ID',
                     'name' => 'gitlab-id',
                     'descr' => 'GitLab Project ID',
-                    'type'=> 'text',
+                    'type' => 'text',
                 ],
                 [
                     'title' => 'Personal Access Token',

@@ -14,48 +14,48 @@ $rrd_list = [];
 if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'CONNECT',
-        'ds'       => 'req_connect',
+        'descr' => 'CONNECT',
+        'ds' => 'req_connect',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'DELETE',
-        'ds'       => 'req_delete',
+        'descr' => 'DELETE',
+        'ds' => 'req_delete',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'GET',
-        'ds'       => 'req_get',
+        'descr' => 'GET',
+        'ds' => 'req_get',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'HEAD',
-        'ds'       => 'req_head',
+        'descr' => 'HEAD',
+        'ds' => 'req_head',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'OPTIONS',
-        'ds'       => 'req_options',
+        'descr' => 'OPTIONS',
+        'ds' => 'req_options',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'PATCH',
-        'ds'       => 'req_patch',
+        'descr' => 'PATCH',
+        'ds' => 'req_patch',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'POST',
-        'ds'       => 'req_post',
+        'descr' => 'POST',
+        'ds' => 'req_post',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'PUT',
-        'ds'       => 'req_put',
+        'descr' => 'PUT',
+        'ds' => 'req_put',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'TRACE',
-        'ds'       => 'req_trace',
+        'descr' => 'TRACE',
+        'ds' => 'req_trace',
     ];
 } else {
     d_echo('RRD "' . $rrd_filename . '" not found');

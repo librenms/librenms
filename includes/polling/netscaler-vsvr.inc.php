@@ -101,13 +101,13 @@ if ($device['os'] == 'netscaler') {
             echo ' | ' . str_pad($vsvr['vsvrRequestRate'], 8) . ' | ' . str_pad($vsvr['vsvrRxBytesRate'] . 'B/s', 8) . ' | ' . str_pad($vsvr['vsvrTxBytesRate'] . 'B/s', 8);
 
             $db_update = [
-                'vsvr_ip'       => $vsvr['vsvrIpAddress'],
-                'vsvr_port'     => $vsvr['vsvrPort'],
-                'vsvr_state'    => $vsvr['vsvrState'],
-                'vsvr_type'     => $vsvr['vsvrType'],
+                'vsvr_ip' => $vsvr['vsvrIpAddress'],
+                'vsvr_port' => $vsvr['vsvrPort'],
+                'vsvr_state' => $vsvr['vsvrState'],
+                'vsvr_type' => $vsvr['vsvrType'],
                 'vsvr_req_rate' => $vsvr['RequestRate'],
-                'vsvr_bps_in'   => $vsvr['vsvrRxBytesRate'],
-                'vsvr_bps_out'  => $vsvr['vsvrTxBytesRate'],
+                'vsvr_bps_in' => $vsvr['vsvrRxBytesRate'],
+                'vsvr_bps_out' => $vsvr['vsvrTxBytesRate'],
             ];
 
             if (! is_array($vsvrs[$vsvr['vsvrFullName']])) {

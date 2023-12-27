@@ -1,14 +1,14 @@
 <?php
 
 $graphs = [
-    'seafile_connected'         => 'Connected Devices',
-    'seafile_enabled'           => 'activated Accounts',
-    'seafile_libraries'         => 'Libraries',
+    'seafile_connected' => 'Connected Devices',
+    'seafile_enabled' => 'activated Accounts',
+    'seafile_libraries' => 'Libraries',
     'seafile_trashed_libraries' => 'Trashed Libraries',
-    'seafile_size_consumption'  => 'Size Consumption',
-    'seafile_groups'            => 'Groups',
-    'seafile_version'           => 'Client Version',
-    'seafile_platform'          => 'Client Platform',
+    'seafile_size_consumption' => 'Size Consumption',
+    'seafile_groups' => 'Groups',
+    'seafile_version' => 'Client Version',
+    'seafile_platform' => 'Client Platform',
 ];
 
 foreach ($graphs as $key => $text) {

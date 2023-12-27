@@ -153,12 +153,12 @@ function process_syslog($entry, $update)
             dbInsert(
                 [
                     'device_id' => $entry['device_id'],
-                    'program'   => $entry['program'],
-                    'facility'  => $entry['facility'],
-                    'priority'  => $entry['priority'],
-                    'level'     => $entry['level'],
-                    'tag'       => $entry['tag'],
-                    'msg'       => $entry['msg'],
+                    'program' => $entry['program'],
+                    'facility' => $entry['facility'],
+                    'priority' => $entry['priority'],
+                    'level' => $entry['level'],
+                    'tag' => $entry['tag'],
+                    'msg' => $entry['msg'],
                     'timestamp' => $entry['timestamp'],
                 ],
                 'syslog'

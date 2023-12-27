@@ -1,10 +1,10 @@
 <?php
 
 $link_array = [
-    'page'   => 'device',
+    'page' => 'device',
     'device' => $device['device_id'],
-    'tab'    => 'apps',
-    'app'    => 'sagan',
+    'tab' => 'apps',
+    'app' => 'sagan',
 ];
 
 print_optionbar_start();
@@ -28,21 +28,21 @@ foreach ($sagan_instances as $index => $sinstance) {
 print_optionbar_end();
 
 $graphs = [
-    'sagan_bytes'=>'Bytes',
-    'sagan_eps'=>'Events Per Second',
-    'sagan_total'=>'Recieved Log Entries',
-    'sagan_drop'=>'Drop',
-    'sagan_drop_percent'=>'Drop Percent',
-    'sagan_f_total'=>'Flows Total',
-    'sagan_f_dropped'=>'Flows Dropped',
-    'sagan_f_drop_percent'=>'Flows Dropped Percent',
-    'sagan_ignore'=>'Ignore',
-    'sagan_bytes_ignored'=>'Bytes Ignored',
-    'sagan_match'=>'Match',
-    'sagan_max_bytes_log_line'=>'Max Bytes Log Line',
-    'sagan_threshold'=>'Threshold',
-    'sagan_uptime'=>'Uptime',
-    'sagan_alert'=>'Alert: 0=OK, 1=WARNING, 2=CRITICAL, 3+UNKNOWN',
+    'sagan_bytes' => 'Bytes',
+    'sagan_eps' => 'Events Per Second',
+    'sagan_total' => 'Recieved Log Entries',
+    'sagan_drop' => 'Drop',
+    'sagan_drop_percent' => 'Drop Percent',
+    'sagan_f_total' => 'Flows Total',
+    'sagan_f_dropped' => 'Flows Dropped',
+    'sagan_f_drop_percent' => 'Flows Dropped Percent',
+    'sagan_ignore' => 'Ignore',
+    'sagan_bytes_ignored' => 'Bytes Ignored',
+    'sagan_match' => 'Match',
+    'sagan_max_bytes_log_line' => 'Max Bytes Log Line',
+    'sagan_threshold' => 'Threshold',
+    'sagan_uptime' => 'Uptime',
+    'sagan_alert' => 'Alert: 0=OK, 1=WARNING, 2=CRITICAL, 3+UNKNOWN',
 ];
 
 foreach ($graphs as $key => $text) {

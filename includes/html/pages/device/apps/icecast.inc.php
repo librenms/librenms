@@ -1,8 +1,8 @@
 <?php
 
 $graphs = [
-    'icecast_cpuload'       => 'CPU Load',
-    'icecast_memoryusage'        => 'Used Memory',
+    'icecast_cpuload' => 'CPU Load',
+    'icecast_memoryusage' => 'Used Memory',
     'icecast_openfiles' => 'Open files',
 ];
 

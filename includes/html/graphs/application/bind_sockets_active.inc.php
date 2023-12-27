@@ -14,13 +14,13 @@ $rrd_list = [];
 if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'UDP/IPv4',
-        'ds'       => 'ui4sa',
+        'descr' => 'UDP/IPv4',
+        'ds' => 'ui4sa',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'UDP/IPv6',
-        'ds'       => 'ui6sa',
+        'descr' => 'UDP/IPv6',
+        'ds' => 'ui6sa',
     ];
     // This appears to be buggy on various versions of BIND named and acts as a counter instead.
 //    $rrd_list[]=array(
@@ -30,13 +30,13 @@ if (Rrd::checkRrdExists($rrd_filename)) {
 //    );
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'TCP/IPv6',
-        'ds'       => 'ti6sa',
+        'descr' => 'TCP/IPv6',
+        'ds' => 'ti6sa',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Raw',
-        'ds'       => 'rsa',
+        'descr' => 'Raw',
+        'ds' => 'rsa',
     ];
 } else {
     d_echo('RRD "' . $rrd_filename . '" not found');

@@ -39,5 +39,5 @@ if (! is_numeric($vars['group_id'])) {
 
 exit(json_encode([
     'status' => $status,
-    'message'=> $message,
+    'message' => $message,
 ]));

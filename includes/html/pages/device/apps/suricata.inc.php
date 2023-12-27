@@ -1,10 +1,10 @@
 <?php
 
 $link_array = [
-    'page'   => 'device',
+    'page' => 'device',
     'device' => $device['device_id'],
-    'tab'    => 'apps',
-    'app'    => 'suricata',
+    'tab' => 'apps',
+    'app' => 'suricata',
 ];
 
 print_optionbar_start();
@@ -28,17 +28,17 @@ foreach ($suricata_instances as $index => $sinstance) {
 print_optionbar_end();
 
 $graphs = [
-    'suricata_packets'=>'Packets',
-    'suricata_bytes'=>'Bytes',
-    'suricata_nasty_delta'=>'Drops or Errors Delta',
-    'suricata_nasty_percent'=>'Drops or Errors Percent',
-    'suricata_dec_proto'=>'Decoder Protocols',
-    'suricata_flow_proto'=>'Flow Protocols',
-    'suricata_app_flows'=>'App Layer Flows',
-    'suricata_app_tx'=>'App Layer TX',
-    'suricata_mem_use'=>'Memory Usage',
-    'suricata_uptime'=>'Uptime',
-    'suricata_alert'=>'Alert Status',
+    'suricata_packets' => 'Packets',
+    'suricata_bytes' => 'Bytes',
+    'suricata_nasty_delta' => 'Drops or Errors Delta',
+    'suricata_nasty_percent' => 'Drops or Errors Percent',
+    'suricata_dec_proto' => 'Decoder Protocols',
+    'suricata_flow_proto' => 'Flow Protocols',
+    'suricata_app_flows' => 'App Layer Flows',
+    'suricata_app_tx' => 'App Layer TX',
+    'suricata_mem_use' => 'Memory Usage',
+    'suricata_uptime' => 'Uptime',
+    'suricata_alert' => 'Alert Status',
 ];
 
 foreach ($graphs as $key => $text) {

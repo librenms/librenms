@@ -37,7 +37,7 @@ class InventoryController extends TableController
         return [
             'device' => 'nullable|int',
             'descr' => 'nullable|string',
-            'model'=> 'nullable|string',
+            'model' => 'nullable|string',
             'serial' => 'nullable|string',
         ];
     }

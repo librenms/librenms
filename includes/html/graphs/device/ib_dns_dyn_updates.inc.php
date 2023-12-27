@@ -7,10 +7,10 @@ $rrd_options .= " --vertical-label='Updates per minute'";
 $rrd_options .= " --lower-limit='0'";
 
 $stats = [
-    'success'        => '#74C366FF',
-    'failure'        => '#007283FF',
-    'reject'         => '#FFAB00FF',
-    'prereq_reject'  => '#B1441EFF',
+    'success' => '#74C366FF',
+    'failure' => '#007283FF',
+    'reject' => '#FFAB00FF',
+    'prereq_reject' => '#B1441EFF',
 ];
 
 $i = 0;

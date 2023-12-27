@@ -1,9 +1,9 @@
 <?php
 
 $graphs = [
-    'pureftpd_bitrate'     => 'PureFTPd - Bitrate',
+    'pureftpd_bitrate' => 'PureFTPd - Bitrate',
     'pureftpd_connections' => 'PureFTPd - Connections',
-    'pureftpd_users'       => 'PureFTPd - Users Connected',
+    'pureftpd_users' => 'PureFTPd - Users Connected',
 ];
 
 foreach ($graphs as $key => $text) {

@@ -38,16 +38,16 @@ foreach ($trans as $index => $data) {
     }
     if ($connectedto) {
         $entity_array[] = [
-            'entPhysicalIndex'        => $index,
-            'entPhysicalDescr'        => $data['eltPhdTransceiverInfoType'],
-            'entPhysicalClass'        => 'sfp-cage',
-            'entPhysicalName'         => strtoupper($data['eltPhdTransceiverInfoConnectorType']),
-            'entPhysicalModelName'    => \LibreNMS\OS\EltexMes23xx::normData($data['eltPhdTransceiverInfoPartNumber']),
-            'entPhysicalSerialNum'    => $data['eltPhdTransceiverInfoSerialNumber'],
-            'entPhysicalContainedIn'  => $connectedto,
-            'entPhysicalMfgName'      => $data['eltPhdTransceiverInfoVendorName'],
-            'entPhysicalHardwareRev'  => \LibreNMS\OS\EltexMes23xx::normData($data['eltPhdTransceiverInfoVendorRev']),
-            'entPhysicalIsFRU'        => 'true',
+            'entPhysicalIndex' => $index,
+            'entPhysicalDescr' => $data['eltPhdTransceiverInfoType'],
+            'entPhysicalClass' => 'sfp-cage',
+            'entPhysicalName' => strtoupper($data['eltPhdTransceiverInfoConnectorType']),
+            'entPhysicalModelName' => \LibreNMS\OS\EltexMes23xx::normData($data['eltPhdTransceiverInfoPartNumber']),
+            'entPhysicalSerialNum' => $data['eltPhdTransceiverInfoSerialNumber'],
+            'entPhysicalContainedIn' => $connectedto,
+            'entPhysicalMfgName' => $data['eltPhdTransceiverInfoVendorName'],
+            'entPhysicalHardwareRev' => \LibreNMS\OS\EltexMes23xx::normData($data['eltPhdTransceiverInfoVendorRev']),
+            'entPhysicalIsFRU' => 'true',
         ];
     }
 }

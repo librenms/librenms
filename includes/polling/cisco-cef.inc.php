@@ -78,9 +78,9 @@ if ($device['os_group'] == 'cisco') {
                     dbUpdate($cef_stat['update'], 'cef_switching', '`device_id` = ? AND `entPhysicalIndex` = ? AND `afi` = ? AND `cef_index` = ?', [$device['device_id'], $entity, $afi, $index]);
 
                     $fields = [
-                        'drop'      => $cef_stat['cefSwitchingDrop'],
-                        'punt'      => $cef_stat['cefSwitchingPunt'],
-                        'hostpunt'  => $cef_stat['cefSwitchingPunt2Host'],
+                        'drop' => $cef_stat['cefSwitchingDrop'],
+                        'punt' => $cef_stat['cefSwitchingPunt'],
+                        'hostpunt' => $cef_stat['cefSwitchingPunt2Host'],
                     ];
 
                     $tags = compact('entity', 'afi', 'index', 'rrd_name', 'rrd_def');

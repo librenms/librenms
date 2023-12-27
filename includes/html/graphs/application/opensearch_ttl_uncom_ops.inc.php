@@ -14,8 +14,8 @@ $rrd_list = [];
 if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Uncom Ops',
-        'ds'       => 'ttl_uncom_ops',
+        'descr' => 'Uncom Ops',
+        'ds' => 'ttl_uncom_ops',
     ];
 } else {
     d_echo('RRD "' . $rrd_filename . '" not found');

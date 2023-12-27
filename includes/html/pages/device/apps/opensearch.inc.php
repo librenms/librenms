@@ -1,10 +1,10 @@
 <?php
 
 $link_array = [
-    'page'   => 'device',
+    'page' => 'device',
     'device' => $device['device_id'],
-    'tab'    => 'apps',
-    'app'    => 'opensearch',
+    'tab' => 'apps',
+    'app' => 'opensearch',
 ];
 
 print_optionbar_start();
@@ -51,20 +51,20 @@ if (isset($vars['set'])) {
 
 if ($graph_set == 'cluster') {
     $graphs = [
-        'opensearch_c_nodes'=>'Nodes',
-        'opensearch_c_data_nodes'=>'Data Nodes',
-        'opensearch_c_all_shards'=>'Combined Shard Stats',
-        'opensearch_c_pending_tasks'=>'Pending Tasks',
-        'opensearch_c_in_fl_fetch'=>'In Flight Fetches',
-        'opensearch_status'=>'Status: 0=Green, 1=Yellow, 2=Red, 3=Unknown',
-        'opensearch_c_task_max_in_time'=>'Tasks Max Time In Milliseconds',
-        'opensearch_c_act_shards_perc'=>'Active Shards Percentage',
-        'opensearch_c_act_pri_shards'=>'Active Primary Shards',
-        'opensearch_c_act_shards'=>'Active Shards',
-        'opensearch_c_rel_shards'=>'Relocating Shards',
-        'opensearch_c_init_shards'=>'Initializing Shards',
-        'opensearch_c_delayed_shards'=>'Delayed Shards',
-        'opensearch_c_unass_shards'=>'Unassigned Shards',
+        'opensearch_c_nodes' => 'Nodes',
+        'opensearch_c_data_nodes' => 'Data Nodes',
+        'opensearch_c_all_shards' => 'Combined Shard Stats',
+        'opensearch_c_pending_tasks' => 'Pending Tasks',
+        'opensearch_c_in_fl_fetch' => 'In Flight Fetches',
+        'opensearch_status' => 'Status: 0=Green, 1=Yellow, 2=Red, 3=Unknown',
+        'opensearch_c_task_max_in_time' => 'Tasks Max Time In Milliseconds',
+        'opensearch_c_act_shards_perc' => 'Active Shards Percentage',
+        'opensearch_c_act_pri_shards' => 'Active Primary Shards',
+        'opensearch_c_act_shards' => 'Active Shards',
+        'opensearch_c_rel_shards' => 'Relocating Shards',
+        'opensearch_c_init_shards' => 'Initializing Shards',
+        'opensearch_c_delayed_shards' => 'Delayed Shards',
+        'opensearch_c_unass_shards' => 'Unassigned Shards',
     ];
 } elseif ($graph_set == 'translog') {
     $graphs = [
@@ -175,7 +175,7 @@ if ($graph_set == 'cluster') {
     ];
 } elseif ($graph_set == 'time') {
     $graphs = [
-        'opensearch_c_task_max_in_time'=>'Tasks Max Time',
+        'opensearch_c_task_max_in_time' => 'Tasks Max Time',
         'opensearch_time_all' => 'Combined',
         'opensearch_ti_time' => 'Index Time',
         'opensearch_ti_del_time' => 'Delete Time',
@@ -213,20 +213,20 @@ if ($graph_set == 'cluster') {
     ];
 } else {
     $graphs = [
-        'opensearch_c_nodes'=>'Nodes',
-        'opensearch_c_data_nodes'=>'Data Nodes',
-        'opensearch_c_all_shards'=>'Combined Shard Stats',
-        'opensearch_c_pending_tasks'=>'Pending Tasks',
-        'opensearch_c_in_fl_fetch'=>'In Flight Fetches',
-        'opensearch_status'=>'Status: 0=Green, 1=Yellow, 2=Red, 3=Unknown',
-        'opensearch_c_task_max_in_time'=>'Tasks Max Time In Milliseconds',
-        'opensearch_c_act_shards_perc'=>'Active Shards Percentage',
-        'opensearch_c_act_pri_shards'=>'Active Primary Shards',
-        'opensearch_c_act_shards'=>'Active Shards',
-        'opensearch_c_rel_shards'=>'Relocating Shards',
-        'opensearch_c_init_shards'=>'Initializing Shards',
-        'opensearch_c_delayed_shards'=>'Delayed Shards',
-        'opensearch_c_unass_shards'=>'Unassigned Shards',
+        'opensearch_c_nodes' => 'Nodes',
+        'opensearch_c_data_nodes' => 'Data Nodes',
+        'opensearch_c_all_shards' => 'Combined Shard Stats',
+        'opensearch_c_pending_tasks' => 'Pending Tasks',
+        'opensearch_c_in_fl_fetch' => 'In Flight Fetches',
+        'opensearch_status' => 'Status: 0=Green, 1=Yellow, 2=Red, 3=Unknown',
+        'opensearch_c_task_max_in_time' => 'Tasks Max Time In Milliseconds',
+        'opensearch_c_act_shards_perc' => 'Active Shards Percentage',
+        'opensearch_c_act_pri_shards' => 'Active Primary Shards',
+        'opensearch_c_act_shards' => 'Active Shards',
+        'opensearch_c_rel_shards' => 'Relocating Shards',
+        'opensearch_c_init_shards' => 'Initializing Shards',
+        'opensearch_c_delayed_shards' => 'Delayed Shards',
+        'opensearch_c_unass_shards' => 'Unassigned Shards',
     ];
 }
 

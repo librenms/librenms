@@ -36,7 +36,7 @@ $metrics = [];
 $category = 'clients';
 $fields = [
     'connected' => $client_data['connected_clients'],
-    'blocked'   => $client_data['blocked_clients'],
+    'blocked' => $client_data['blocked_clients'],
 ];
 $rrd_def = RrdDefinition::make()
     ->addDataset('connected', 'GAUGE', 0)
@@ -50,10 +50,10 @@ data_update($device, 'app', $tags, $fields);
 $category = 'memory';
 $fields = [
     'active' => $memory_data['allocator'],
-    'allocated'   => $memory_data['allocator_allocated'],
-    'resident'   => $memory_data['allocator_resident'],
-    'frag_bytes'   => $memory_data['allocator_frag_bytes'],
-    'rss_bytes'   => $memory_data['allocator_rss_bytes'],
+    'allocated' => $memory_data['allocator_allocated'],
+    'resident' => $memory_data['allocator_resident'],
+    'frag_bytes' => $memory_data['allocator_frag_bytes'],
+    'rss_bytes' => $memory_data['allocator_rss_bytes'],
 ];
 $rrd_def = RrdDefinition::make()
     ->addDataset('active', 'GAUGE', 0)
@@ -120,9 +120,9 @@ data_update($device, 'app', $tags, $fields);
 $category = 'defrag';
 $fields = [
     'hits' => $stats_data['active_defrag_hits'],
-    'misses'   => $stats_data['active_defrag_misses'],
-    'key_hits'   => $stats_data['active_defrag_key_hits'],
-    'key_misses'   => $stats_data['active_defrag_key_misses'],
+    'misses' => $stats_data['active_defrag_misses'],
+    'key_hits' => $stats_data['active_defrag_key_hits'],
+    'key_misses' => $stats_data['active_defrag_key_misses'],
 ];
 $rrd_def = RrdDefinition::make()
     ->addDataset('hits', 'GAUGE', 0)
@@ -138,7 +138,7 @@ data_update($device, 'app', $tags, $fields);
 $category = 'keyspace';
 $fields = [
     'hits' => $stats_data['keyspace_hits'],
-    'misses'   => $stats_data['keyspace_misses'],
+    'misses' => $stats_data['keyspace_misses'],
 ];
 $rrd_def = RrdDefinition::make()
     ->addDataset('hits', 'COUNTER', 0)

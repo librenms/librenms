@@ -16,8 +16,8 @@ $rrd_list = [];
 if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'banned',
-        'ds'       => 'banned',
+        'descr' => 'banned',
+        'ds' => 'banned',
     ];
 //    $rrd_list[] = [
 //        'filename' => $rrd_filename,
@@ -26,43 +26,43 @@ if (Rrd::checkRrdExists($rrd_filename)) {
 //    ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'running',
-        'ds'       => 'running',
+        'descr' => 'running',
+        'ds' => 'running',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'completed',
-        'ds'       => 'completed',
+        'descr' => 'completed',
+        'ds' => 'completed',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'distributed',
-        'ds'       => 'distributed',
+        'descr' => 'distributed',
+        'ds' => 'distributed',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'reported',
-        'ds'       => 'reported',
+        'descr' => 'reported',
+        'ds' => 'reported',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'recovered',
-        'ds'       => 'recovered',
+        'descr' => 'recovered',
+        'ds' => 'recovered',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'failed_analysis',
-        'ds'       => 'failed_analysis',
+        'descr' => 'failed_analysis',
+        'ds' => 'failed_analysis',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'failed_processing',
-        'ds'       => 'failed_processing',
+        'descr' => 'failed_processing',
+        'ds' => 'failed_processing',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'failed_reporting',
-        'ds'       => 'failed_reporting',
+        'descr' => 'failed_reporting',
+        'ds' => 'failed_reporting',
     ];
 } else {
     d_echo('RRD "' . $rrd_filename . '" not found');

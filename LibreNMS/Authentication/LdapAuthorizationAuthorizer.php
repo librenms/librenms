@@ -207,8 +207,8 @@ class LdapAuthorizationAuthorizer extends AuthorizerBase
                     return [
                         'username' => $username,
                         'realname' => $realname,
-                        'user_id'  => $user_id,
-                        'email'    => $email,
+                        'user_id' => $user_id,
+                        'email' => $email,
                     ];
                 }
             }

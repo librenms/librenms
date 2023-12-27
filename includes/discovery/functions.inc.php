@@ -597,23 +597,23 @@ function discover_entity_physical(&$valid, $device, $entPhysicalIndex, $entPhysi
     if ($entPhysicalDescr || $entPhysicalName) {
         if (dbFetchCell('SELECT COUNT(entPhysical_id) FROM `entPhysical` WHERE `device_id` = ? AND `entPhysicalIndex` = ?', [$device['device_id'], $entPhysicalIndex]) == '0') {
             $insert_data = [
-                'device_id'               => $device['device_id'],
-                'entPhysicalIndex'        => $entPhysicalIndex,
-                'entPhysicalDescr'        => $entPhysicalDescr,
-                'entPhysicalClass'        => $entPhysicalClass,
-                'entPhysicalName'         => $entPhysicalName,
-                'entPhysicalModelName'    => $entPhysicalModelName,
-                'entPhysicalSerialNum'    => $entPhysicalSerialNum,
-                'entPhysicalContainedIn'  => $entPhysicalContainedIn,
-                'entPhysicalMfgName'      => $entPhysicalMfgName,
+                'device_id' => $device['device_id'],
+                'entPhysicalIndex' => $entPhysicalIndex,
+                'entPhysicalDescr' => $entPhysicalDescr,
+                'entPhysicalClass' => $entPhysicalClass,
+                'entPhysicalName' => $entPhysicalName,
+                'entPhysicalModelName' => $entPhysicalModelName,
+                'entPhysicalSerialNum' => $entPhysicalSerialNum,
+                'entPhysicalContainedIn' => $entPhysicalContainedIn,
+                'entPhysicalMfgName' => $entPhysicalMfgName,
                 'entPhysicalParentRelPos' => $entPhysicalParentRelPos,
-                'entPhysicalVendorType'   => $entPhysicalVendorType,
-                'entPhysicalHardwareRev'  => $entPhysicalHardwareRev,
-                'entPhysicalFirmwareRev'  => $entPhysicalFirmwareRev,
-                'entPhysicalSoftwareRev'  => $entPhysicalSoftwareRev,
-                'entPhysicalIsFRU'        => $entPhysicalIsFRU,
-                'entPhysicalAlias'        => $entPhysicalAlias,
-                'entPhysicalAssetID'      => $entPhysicalAssetID,
+                'entPhysicalVendorType' => $entPhysicalVendorType,
+                'entPhysicalHardwareRev' => $entPhysicalHardwareRev,
+                'entPhysicalFirmwareRev' => $entPhysicalFirmwareRev,
+                'entPhysicalSoftwareRev' => $entPhysicalSoftwareRev,
+                'entPhysicalIsFRU' => $entPhysicalIsFRU,
+                'entPhysicalAlias' => $entPhysicalAlias,
+                'entPhysicalAssetID' => $entPhysicalAssetID,
             ];
             if (! empty($ifIndex)) {
                 $insert_data['ifIndex'] = $ifIndex;
@@ -625,23 +625,23 @@ function discover_entity_physical(&$valid, $device, $entPhysicalIndex, $entPhysi
         } else {
             echo '.';
             $update_data = [
-                'entPhysicalIndex'        => $entPhysicalIndex,
-                'entPhysicalDescr'        => $entPhysicalDescr,
-                'entPhysicalClass'        => $entPhysicalClass,
-                'entPhysicalName'         => $entPhysicalName,
-                'entPhysicalModelName'    => $entPhysicalModelName,
-                'entPhysicalSerialNum'    => $entPhysicalSerialNum,
-                'entPhysicalContainedIn'  => $entPhysicalContainedIn,
-                'entPhysicalMfgName'      => $entPhysicalMfgName,
+                'entPhysicalIndex' => $entPhysicalIndex,
+                'entPhysicalDescr' => $entPhysicalDescr,
+                'entPhysicalClass' => $entPhysicalClass,
+                'entPhysicalName' => $entPhysicalName,
+                'entPhysicalModelName' => $entPhysicalModelName,
+                'entPhysicalSerialNum' => $entPhysicalSerialNum,
+                'entPhysicalContainedIn' => $entPhysicalContainedIn,
+                'entPhysicalMfgName' => $entPhysicalMfgName,
                 'entPhysicalParentRelPos' => $entPhysicalParentRelPos,
-                'entPhysicalVendorType'   => $entPhysicalVendorType,
-                'entPhysicalHardwareRev'  => $entPhysicalHardwareRev,
-                'entPhysicalFirmwareRev'  => $entPhysicalFirmwareRev,
-                'entPhysicalSoftwareRev'  => $entPhysicalSoftwareRev,
-                'entPhysicalIsFRU'        => $entPhysicalIsFRU,
-                'entPhysicalAlias'        => $entPhysicalAlias,
-                'entPhysicalAssetID'      => $entPhysicalAssetID,
-                'ifIndex'                 => $ifIndex,
+                'entPhysicalVendorType' => $entPhysicalVendorType,
+                'entPhysicalHardwareRev' => $entPhysicalHardwareRev,
+                'entPhysicalFirmwareRev' => $entPhysicalFirmwareRev,
+                'entPhysicalSoftwareRev' => $entPhysicalSoftwareRev,
+                'entPhysicalIsFRU' => $entPhysicalIsFRU,
+                'entPhysicalAlias' => $entPhysicalAlias,
+                'entPhysicalAssetID' => $entPhysicalAssetID,
+                'ifIndex' => $ifIndex,
             ];
             dbUpdate($update_data, 'entPhysical', '`device_id`=? AND `entPhysicalIndex`=?', [$device['device_id'], $entPhysicalIndex]);
         }//end if
@@ -1075,10 +1075,10 @@ function build_bgp_peers($device, $data, $peer2)
             }
             d_echo("Found peer $peer_ip (AS$peer_as)\n");
             $peerlist[] = [
-                'ip'      => $peer_ip,
-                'as'      => $peer_as,
+                'ip' => $peer_ip,
+                'as' => $peer_as,
                 'localip' => $local_ip ?: '0.0.0.0',
-                'ver'     => $ver,
+                'ver' => $ver,
             ];
         }
     }

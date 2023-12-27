@@ -104,9 +104,9 @@ foreach (dbFetchRows($sql, $param) as $interface) {
     if (port_permitted($interface['port_id'])) {
         $interface = cleanPort($interface, $interface);
         $row = [
-            'hostname'    => generate_device_link($interface),
-            'interface'   => generate_port_link($interface) . ' ' . $error_img,
-            'address'     => $address,
+            'hostname' => generate_device_link($interface),
+            'interface' => generate_port_link($interface) . ' ' . $error_img,
+            'address' => $address,
             'description' => $interface['ifAlias'],
         ];
         if ($vars['search_type'] == 'mac') {
@@ -117,9 +117,9 @@ foreach (dbFetchRows($sql, $param) as $interface) {
 }//end foreach
 
 $output = [
-    'current'  => $current,
+    'current' => $current,
     'rowCount' => $rowCount,
-    'rows'     => $response,
-    'total'    => $total,
+    'rows' => $response,
+    'total' => $total,
 ];
 echo json_encode($output, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);

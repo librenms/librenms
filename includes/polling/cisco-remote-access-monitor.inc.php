@@ -53,12 +53,12 @@ if ($device['os_group'] == 'cisco') {
             ->addDataset('webvpn', 'GAUGE', 0);
 
         $fields = [
-            'email'   => $data['crasEmailNumSessions'],
-            'ipsec'   => $data['crasIPSecNumSessions'],
-            'l2l'     => $data['crasL2LNumSessions'],
-            'lb'      => $data['crasLBNumSessions'],
-            'svc'     => $data['crasSVCNumSessions'],
-            'webvpn'  => $data['crasWebvpnNumSessions'],
+            'email' => $data['crasEmailNumSessions'],
+            'ipsec' => $data['crasIPSecNumSessions'],
+            'l2l' => $data['crasL2LNumSessions'],
+            'lb' => $data['crasLBNumSessions'],
+            'svc' => $data['crasSVCNumSessions'],
+            'webvpn' => $data['crasWebvpnNumSessions'],
         ];
 
         $tags = compact('rrd_def');

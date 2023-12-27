@@ -24,15 +24,15 @@ if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list = [
         [
             'filename' => $rrd_filename,
-            'descr'    => 'Blocks Read',
-            'ds'       => 'read',
-            'colour'   => 'AA5439',
+            'descr' => 'Blocks Read',
+            'ds' => 'read',
+            'colour' => 'AA5439',
         ],
         [
             'filename' => $rrd_filename,
-            'descr'    => 'Buffer Hits',
-            'ds'       => 'hit',
-            'colour'   => '28774F',
+            'descr' => 'Buffer Hits',
+            'ds' => 'hit',
+            'colour' => '28774F',
         ],
     ];
 } else {

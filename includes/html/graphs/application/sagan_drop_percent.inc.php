@@ -18,8 +18,8 @@ $rrd_list = [];
 if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Drop%',
-        'ds'       => 'drop_percent',
+        'descr' => 'Drop%',
+        'ds' => 'drop_percent',
     ];
 } else {
     d_echo('RRD "' . $rrd_filename . '" not found');

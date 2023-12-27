@@ -7,8 +7,8 @@ $rrd_options .= " --vertical-label='Answer time in milliseconds'";
 $rrd_options .= " --lower-limit='0'";
 
 $stats = [
-    'PerfAA'        => '#74C366FF',
-    'PerfnonAA'     => '#007283FF',
+    'PerfAA' => '#74C366FF',
+    'PerfnonAA' => '#007283FF',
 ];
 
 $i = 0;

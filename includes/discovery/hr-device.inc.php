@@ -17,8 +17,8 @@ if (is_array($hrDevices)) {
         if (is_array($hrDevice) && isset($hrDevice['hrDeviceIndex']) && is_numeric($hrDevice['hrDeviceIndex'])) {
             if (dbFetchCell('SELECT COUNT(*) FROM `hrDevice` WHERE device_id = ? AND hrDeviceIndex = ?', [$device['device_id'], $hrDevice['hrDeviceIndex']])) {
                 $update_array = [
-                    'hrDeviceType'   => $hrDevice['hrDeviceType'],
-                    'hrDeviceDescr'  => $hrDevice['hrDeviceDescr'],
+                    'hrDeviceType' => $hrDevice['hrDeviceType'],
+                    'hrDeviceDescr' => $hrDevice['hrDeviceDescr'],
                     'hrDeviceStatus' => $hrDevice['hrDeviceStatus'] ?? 'unknown',
                     'hrDeviceErrors' => $hrDevice['hrDeviceErrors'] ?? 0,
                 ];

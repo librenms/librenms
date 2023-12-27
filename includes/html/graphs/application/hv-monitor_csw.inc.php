@@ -18,13 +18,13 @@ $rrd_list = [];
 if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Involuntary',
-        'ds'       => 'nivcsw',
+        'descr' => 'Involuntary',
+        'ds' => 'nivcsw',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Voluntary',
-        'ds'       => 'nvcsw',
+        'descr' => 'Voluntary',
+        'ds' => 'nvcsw',
     ];
 } else {
     d_echo('RRD "' . $rrd_filename . '" not found');

@@ -14,8 +14,8 @@ $rrd_list = [];
 if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'QC Size',
-        'ds'       => 'tqc_cache_size',
+        'descr' => 'QC Size',
+        'ds' => 'tqc_cache_size',
     ];
 } else {
     d_echo('RRD "' . $rrd_filename . '" not found');

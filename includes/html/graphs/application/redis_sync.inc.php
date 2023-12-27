@@ -14,8 +14,8 @@ $rrd_filename = Rrd::name($device['hostname'], ['app', 'redis', $app->app_id, 's
 
 $array = [
     'full' => 'Full',
-    'ok'   => 'OK',
-    'err'   => 'Error',
+    'ok' => 'OK',
+    'err' => 'Error',
 ];
 
 $rrd_list = [];

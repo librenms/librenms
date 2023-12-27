@@ -30,10 +30,10 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('last_warning', 'GAUGE', 0);
 
 $fields = [
-    'last_actions'   => $backupninja_data['last_actions'],
-    'last_fatal'     => $backupninja_data['last_fatal'],
-    'last_error'     => $backupninja_data['last_error'],
-    'last_warning'   => $backupninja_data['last_warning'],
+    'last_actions' => $backupninja_data['last_actions'],
+    'last_fatal' => $backupninja_data['last_fatal'],
+    'last_error' => $backupninja_data['last_error'],
+    'last_warning' => $backupninja_data['last_warning'],
 ];
 $metrics[$category] = $fields;
 

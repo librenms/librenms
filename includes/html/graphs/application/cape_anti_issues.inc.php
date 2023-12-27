@@ -28,39 +28,39 @@ $rrd_list = [];
 if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Min',
-        'ds'       => 's0anti_issues',
+        'descr' => 'Min',
+        'ds' => 's0anti_issues',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Max',
-        'ds'       => 's1anti_issues',
+        'descr' => 'Max',
+        'ds' => 's1anti_issues',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Mean',
-        'ds'       => 's3anti_issues',
+        'descr' => 'Mean',
+        'ds' => 's3anti_issues',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Median',
-        'ds'       => 's4anti_issues',
+        'descr' => 'Median',
+        'ds' => 's4anti_issues',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Mode',
-        'ds'       => 's5anti_issues',
+        'descr' => 'Mode',
+        'ds' => 's5anti_issues',
     ];
     if ($vars['stddev'] == 'on') {
         $rrd_list[] = [
             'filename' => $rrd_filename,
-            'descr'    => 'StdDev',
-            'ds'       => 's7anti_issues',
+            'descr' => 'StdDev',
+            'ds' => 's7anti_issues',
         ];
         $rrd_list[] = [
             'filename' => $rrd_filename,
-            'descr'    => 'StdDevP',
-            'ds'       => 's9anti_issues',
+            'descr' => 'StdDevP',
+            'ds' => 's9anti_issues',
         ];
     }
 } else {
