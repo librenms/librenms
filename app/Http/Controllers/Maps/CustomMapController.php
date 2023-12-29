@@ -232,18 +232,18 @@ class CustomMapController extends Controller
         foreach ($map->edges as $edge) {
             $edgeid = $edge->custom_map_edge_id;
             $edges[$edgeid] = [
-                'custom_map_edge_id'  => $edge->custom_map_edge_id,
+                'custom_map_edge_id' => $edge->custom_map_edge_id,
                 'custom_map_node1_id' => $edge->custom_map_node1_id,
                 'custom_map_node2_id' => $edge->custom_map_node2_id,
-                'port_id'             => $edge->port_id,
-                'reverse'             => $edge->reverse,
-                'style'               => $edge->style,
-                'showpct'             => $edge->showpct,
-                'text_face'           => $edge->text_face,
-                'text_size'           => $edge->text_size,
-                'text_colour'         => $edge->text_colour,
-                'mid_x'               => $edge->mid_x,
-                'mid_y'               => $edge->mid_y,
+                'port_id' => $edge->port_id,
+                'reverse' => $edge->reverse,
+                'style' => $edge->style,
+                'showpct' => $edge->showpct,
+                'text_face' => $edge->text_face,
+                'text_size' => $edge->text_size,
+                'text_colour' => $edge->text_colour,
+                'mid_x' => $edge->mid_x,
+                'mid_y' => $edge->mid_y,
             ];
             if ($edge->port) {
                 $edges[$edgeid]['port_name'] = $edge->port->device->displayName() . ' - ' . $edge->port->getLabel();
@@ -314,21 +314,21 @@ class CustomMapController extends Controller
             $nodeid = $node->custom_map_node_id;
             $nodes[$nodeid] = [
                 'custom_map_node_id' => $node->custom_map_node_id,
-                'device_id'          => $node->device_id,
-                'label'              => $node->label,
-                'style'              => $node->style,
-                'icon'               => $node->icon,
-                'size'               => $node->size,
-                'border_width'       => $node->border_width,
-                'text_face'          => $node->text_face,
-                'text_size'          => $node->text_size,
-                'text_colour'        => $node->text_colour,
-                'colour_bg'          => $node->colour_bg,
-                'colour_bdr'         => $node->colour_bdr,
-                'colour_bg_view'     => $node->colour_bg,
-                'colour_bdr_view'    => $node->colour_bdr,
-                'x_pos'              => $node->x_pos,
-                'y_pos'              => $node->y_pos,
+                'device_id' => $node->device_id,
+                'label' => $node->label,
+                'style' => $node->style,
+                'icon' => $node->icon,
+                'size' => $node->size,
+                'border_width' => $node->border_width,
+                'text_face' => $node->text_face,
+                'text_size' => $node->text_size,
+                'text_colour' => $node->text_colour,
+                'colour_bg' => $node->colour_bg,
+                'colour_bdr' => $node->colour_bdr,
+                'colour_bg_view' => $node->colour_bg,
+                'colour_bdr_view' => $node->colour_bdr,
+                'x_pos' => $node->x_pos,
+                'y_pos' => $node->y_pos,
             ];
             if ($node->device) {
                 $nodes[$nodeid]['device_name'] = $node->device->hostname . '(' . $node->device->sysName . ')';
