@@ -44,10 +44,10 @@ if (isset($vars['errors'])) {
                 <th data-column-id="ifSpeed" data-converter="human-bps">Speed</th>
                 <th data-column-id="ifMtu" data-visible="false">MTU</th>
                 <th data-column-id="ifInOctets_rate" data-searchable="false" data-css-class="green"
-                    data-converter="human-bps">Down
+                    data-converter="human-bps">In
                 </th>
                 <th data-column-id="ifOutOctets_rate" data-searchable="false" data-css-class="blue"
-                    data-converter="human-bps">Up
+                    data-converter="human-bps">Out
                 </th>
                 <th data-column-id="ifInUcastPkts_rate" data-searchable="false"
                     data-visible="<?php echo $details_visible ?>" data-css-class="green" data-converter="human-pps">
