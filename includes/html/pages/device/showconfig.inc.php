@@ -94,7 +94,15 @@ if (Auth::user()->hasGlobalAdmin()) {
                     fclose($errors);
                 }
             } else {
-                $fh = fopen($rancid_file, 'r') or exit("Can't open file");
+                $fh = fopen($rancid_file, 'r');
+                if ($fh === false) {
+                    echo '<div class="alert alert-warning">Error: Cannot open Rancid configuration file for this device.</div>';
+                    return;
+                }
+                if (filesize($rancid_file) == 0) {
+                    echo '<div class="alert alert-warning">Error: Rancid configuration file for this device is empty.</div>';
+                    return;
+                }
                 $text = fread($fh, filesize($rancid_file));
                 fclose($fh);
             }
@@ -110,7 +118,15 @@ if (Auth::user()->hasGlobalAdmin()) {
                     $previous_config = $vars['rev'] . '^';
                 }
             } else {
-                $fh = fopen($rancid_file, 'r') or exit("Can't open file");
+                $fh = fopen($rancid_file, 'r');
+                if ($fh === false) {
+                    echo '<div class="alert alert-warning">Error: Cannot open Rancid configuration file for this device.</div>';
+                    return;
+                }
+                if (filesize($rancid_file) == 0) {
+                    echo '<div class="alert alert-warning">Error: Rancid configuration file for this device is empty.</div>';
+                    return;
+                }
                 $text = fread($fh, filesize($rancid_file));
                 fclose($fh);
             }
