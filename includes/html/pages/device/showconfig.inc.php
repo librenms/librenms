@@ -97,10 +97,12 @@ if (Auth::user()->hasGlobalAdmin()) {
                 $fh = fopen($rancid_file, 'r');
                 if ($fh === false) {
                     echo '<div class="alert alert-warning">Error: Cannot open Rancid configuration file for this device.</div>';
+
                     return;
                 }
                 if (filesize($rancid_file) == 0) {
                     echo '<div class="alert alert-warning">Error: Rancid configuration file for this device is empty.</div>';
+
                     return;
                 }
                 $text = fread($fh, filesize($rancid_file));
@@ -121,10 +123,12 @@ if (Auth::user()->hasGlobalAdmin()) {
                 $fh = fopen($rancid_file, 'r');
                 if ($fh === false) {
                     echo '<div class="alert alert-warning">Error: Cannot open Rancid configuration file for this device.</div>';
+
                     return;
                 }
                 if (filesize($rancid_file) == 0) {
                     echo '<div class="alert alert-warning">Error: Rancid configuration file for this device is empty.</div>';
+
                     return;
                 }
                 $text = fread($fh, filesize($rancid_file));
@@ -182,7 +186,7 @@ if (Auth::user()->hasGlobalAdmin()) {
             // populate current_version
             if (isset($_POST['config'])) {
                 [$oid,$date,$version] = explode('|', htmlspecialchars($_POST['config']));
-                $current_config = ['oid'=>$oid, 'date'=>$date, 'version'=>$version];
+                $current_config = ['oid' => $oid, 'date' => $date, 'version' => $version];
             } else { // no version selected
                 $current_config = ['oid' => $config_versions[0]['oid'], 'date' => $config_versions[0]['date'], 'version' => $config_total];
             }
@@ -191,7 +195,7 @@ if (Auth::user()->hasGlobalAdmin()) {
             if (isset($_POST['diff'])) { // diff requested
                 [$oid,$date,$version] = explode('|', $_POST['prevconfig']);
                 if (isset($oid) && $oid != $current_config['oid']) {
-                    $previous_config = ['oid'=>$oid, 'date'=>$date, 'version'=>$version];
+                    $previous_config = ['oid' => $oid, 'date' => $date, 'version' => $version];
                 } elseif ($current_config['version'] != 1) {  // assume previous, unless current is first config
                     foreach ($config_versions as $key => $version) {
                         if ($version['oid'] == $current_config['oid']) {
