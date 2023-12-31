@@ -488,21 +488,21 @@ class MapDataController extends Controller
             }
 
             $device_list[$device->device_id] = [
-                'id'          => $device->device_id,
-                'icon'        => $device->icon,
-                'icontitle'   => $device->icon ? str_replace(['.svg', '.png'], '', basename($device->icon)) : $device->os,
-                'sname'       => $device->shortDisplayName(),
-                'status'      => $device->status,
-                'uptime'      => $device->uptime,
-                'updowntime'  => $updowntime,
+                'id' => $device->device_id,
+                'icon' => $device->icon,
+                'icontitle' => $device->icon ? str_replace(['.svg', '.png'], '', basename($device->icon)) : $device->os,
+                'sname' => $device->shortDisplayName(),
+                'status' => $device->status,
+                'uptime' => $device->uptime,
+                'updowntime' => $updowntime,
                 'last_polled' => $device->last_polled,
-                'disabled'    => $device->disabled,
-                'no_alerts'   => $device->disable_notify,
-                'url'         => $request->url_type == 'links' ? Url::deviceLink($device, null, [], 0, 0, 0, 0) : Url::deviceUrl($device->device_id),
-                'style'       => self::deviceStyle($device, $request->highlight_node),
-                'lat'         => $device->location ? $device->location->lat : null,
-                'lng'         => $device->location ? $device->location->lng : null,
-                'parents'     => ($request->link_type == 'depends') ? $device->parents->map->only('device_id')->flatten() : [],
+                'disabled' => $device->disabled,
+                'no_alerts' => $device->disable_notify,
+                'url' => $request->url_type == 'links' ? Url::deviceLink($device, null, [], 0, 0, 0, 0) : Url::deviceUrl($device->device_id),
+                'style' => self::deviceStyle($device, $request->highlight_node),
+                'lat' => $device->location ? $device->location->lat : null,
+                'lng' => $device->location ? $device->location->lng : null,
+                'parents' => ($request->link_type == 'depends') ? $device->parents->map->only('device_id')->flatten() : [],
                 'maintenance' => array_key_exists($device->device_id, $maintdevicesmap) ? 1 : 0,
             ];
         }
@@ -651,11 +651,11 @@ class MapDataController extends Controller
                     }
 
                     $link_list[$port->port_id . '.' . $remote_port->port_id] = [
-                        'ldev'       => $port->device_id,
-                        'rdev'       => $remote_port->device_id,
-                        'ifnames'    => $port->ifName . ' <> ' . $remote_port->ifName,
-                        'url'        => Url::portLink($port, null, null, false, true),
-                        'style'      => $link_style,
+                        'ldev' => $port->device_id,
+                        'rdev' => $remote_port->device_id,
+                        'ifnames' => $port->ifName . ' <> ' . $remote_port->ifName,
+                        'url' => Url::portLink($port, null, null, false, true),
+                        'style' => $link_style,
                     ];
                 }
             }
@@ -692,12 +692,12 @@ class MapDataController extends Controller
             $link_color = $this->linkUseColour($link_used);
 
             $link_list[$link->device->location_id . '.' . $link->remoteDevice->location_id] = [
-                'local_lat'  => $link->device->location->lat,
-                'local_lng'  => $link->device->location->lng,
+                'local_lat' => $link->device->location->lat,
+                'local_lng' => $link->device->location->lng,
                 'remote_lat' => $link->remoteDevice->location->lat,
                 'remote_lng' => $link->remoteDevice->location->lng,
-                'color'      => $link_color,
-                'width'      => $width,
+                'color' => $link_color,
+                'width' => $width,
             ];
         }
 
@@ -725,17 +725,17 @@ class MapDataController extends Controller
             }
 
             $service_list[] = [
-                'id'          => $service->service_id,
-                'name'        => $service->service_name,
-                'type'        => $service->service_type,
-                'status'      => $service->service_status,
-                'icon'        => $service->device->icon,
-                'icontitle'   => $service->device->icon ? str_replace(['.svg', '.png'], '', basename($service->device->icon)) : $service->device->os,
+                'id' => $service->service_id,
+                'name' => $service->service_name,
+                'type' => $service->service_type,
+                'status' => $service->service_status,
+                'icon' => $service->device->icon,
+                'icontitle' => $service->device->icon ? str_replace(['.svg', '.png'], '', basename($service->device->icon)) : $service->device->os,
                 'device_name' => $service->device->shortDisplayName(),
-                'url'         => Url::deviceUrl($service->device_id),
-                'updowntime'  => $updowntime,
-                'compact'     => Config::get('webui.availability_map_compact'),
-                'box_size'    => Config::get('webui.availability_map_box_size'),
+                'url' => Url::deviceUrl($service->device_id),
+                'updowntime' => $updowntime,
+                'compact' => Config::get('webui.availability_map_compact'),
+                'box_size' => Config::get('webui.availability_map_box_size'),
             ];
         }
 

@@ -37,12 +37,12 @@ class AvailabilityMapController extends Controller
     {
         $data = [
             'page_refresh' => Config::get('page_refresh', 300),
-            'compact'      => Config::get('webui.availability_map_compact'),
-            'box_size'     => Config::get('webui.availability_map_box_size'),
-            'sort'         => Config::get('webui.availability_map_sort_status') ? 'status' : 'hostname',
-            'use_groups'   => Config::get('webui.availability_map_use_device_groups'),
-            'services'     => Config::get('show_services'),
-            'uptime_warn'  => Config::get('uptime_warning'),
+            'compact' => Config::get('webui.availability_map_compact'),
+            'box_size' => Config::get('webui.availability_map_box_size'),
+            'sort' => Config::get('webui.availability_map_sort_status') ? 'status' : 'hostname',
+            'use_groups' => Config::get('webui.availability_map_use_device_groups'),
+            'services' => Config::get('show_services'),
+            'uptime_warn' => Config::get('uptime_warning'),
             'devicegroups' => Config::get('webui.availability_map_use_device_groups') ? DeviceGroup::hasAccess($request->user())->orderBy('name')->get(['id', 'name']) : [],
         ];
 
