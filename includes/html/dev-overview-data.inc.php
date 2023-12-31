@@ -228,7 +228,7 @@ if ($device['location_id'] && $location = Location::find($device['location_id'])
                     markerColor: \'green\', prefix: \'fa\', iconColor: \'white\'
                   });
 
-                $.get( "' . url('/maps/getdevices') . '", {disabled_alerts: 0, disabled: 0, location_valid: 1, link_type: "depends"})
+                $.post( "' . url('/maps/getdevices') . '", {disabled_alerts: 0, disabled: 0, location_valid: 1, link_type: "depends"})
                   .done(function( data ) {
                       $.each( data, function( device_id, device ) {
                         var icon = greenMarker;
