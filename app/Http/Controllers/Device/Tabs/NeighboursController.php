@@ -60,8 +60,8 @@ class NeighboursController implements DeviceTab
         $links = [];
 
         $devices[$device->device_id] = [
-            'url'  => Url::deviceLink($device, null, [], 0, 0, 0, 1),
-            'hw'   => $device->hardware,
+            'url' => Url::deviceLink($device, null, [], 0, 0, 0, 1),
+            'hw' => $device->hardware,
             'name' => $device->shortDisplayName(),
         ];
 
