@@ -1,0 +1,71 @@
+<?php
+/*
+ * LibreNMS
+ *
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or (at your
+ * option) any later version.  Please see LICENSE.txt at the top level of
+ * the source code distribution for details.
+ *
+ * @package    LibreNMS
+ * @link       https://www.librenms.org
+ * @copyright  2017 Thomas GAGNIERE
+ * @author     Thomas GAGNIERE <tgagniere@reseau-concept.com>
+ */
+
+namespace LibreNMS\OS;
+
+use App\Models\Device;
+use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Interfaces\Data\DataStorageInterface;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessApCountDiscovery;
+use LibreNMS\Interfaces\Polling\OSPolling;
+use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\OS\Shared\Zyxel;
+
+class Zyxelwlc extends Zyxel implements OSPolling,WirelessApCountDiscovery
+{
+    public function pollOS(DataStorageInterface $datastore): void
+    {
+        
+        $sessions = snmp_get($this->getDeviceArray(), '.1.3.6.1.4.1.890.1.15.3.1.19.0', '-Ovq'); #  ZYXEL-ES-COMMON::sysActiveSessionNum
+        if (is_numeric($sessions)) {
+            $rrd_def = RrdDefinition::make()->addDataset('sessions', 'GAUGE', 0, 3000000);
+            $fields = [
+                'sessions' => $sessions,
+            ];
+            $tags = compact('rrd_def');
+            $datastore->put($this->getDeviceArray(), 'zyxelwlc-sessions', $tags, $fields);
+            $this->enableGraph('zyxelwlc_sessions');
+        }
+    }
+
+    public function discoverWirelessApCount()
+    {
+        $oid = '.1.3.6.1.4.1.890.1.15.3.3.1.1.0'; #  ZYXEL-ES-CAPWAP::capwapOnlineAP
+        
+        if ( $this->getDeviceArray()['hardware'] == 'NXC2500') $max_ap = 64 ;
+            else if ( $this->getDeviceArray()['hardware'] == 'NXC5200') $max_ap = 240 ;
+                else if ( $this->getDeviceArray()['hardware'] == 'NXC5500') $max_ap = 1024 ;
+                    else $max_ap = 0 ;
+        
+        return [
+            new WirelessSensor(
+                'ap-count',
+                $this->getDeviceId(),
+                $oid,
+                'zyxelwlc',
+                0,
+                'Connected APs',
+                null,
+                1,
+                1,
+                'sum',
+                null,
+                $max_ap,
+                0
+            ),
+        ];
+    }
+}
