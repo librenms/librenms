@@ -32,8 +32,8 @@ while (isset($disks[$int])) {
     if (Rrd::checkRrdExists($rrd_filename)) {
         $rrd_list[] = [
             'filename' => $rrd_filename,
-            'descr'    => $disk,
-            'ds'       => $rrdVar,
+            'descr' => $disk,
+            'ds' => $rrdVar,
         ];
     }
     $int++;
