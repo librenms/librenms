@@ -12,9 +12,9 @@
 
 $oids = snmpwalk_cache_multi_oid($device, 'entPhysicalVendorType', [], 'ENTITY-MIB');
 
-if (!empty($oids)) {
-    $arubaPowerSensorOID           = "enterprises.47196.4.1.1.2.1.3"; // ARUBAWIRED-NETWORKING-OID::arubaWiredPowerSensor
-    $arubaPowerSensorOperStatusOID = ".1.3.6.1.2.1.99.1.1.1.5.";
+if (! empty($oids)) {
+    $arubaPowerSensorOID = 'enterprises.47196.4.1.1.2.1.3'; // ARUBAWIRED-NETWORKING-OID::arubaWiredPowerSensor
+    $arubaPowerSensorOperStatusOID = '.1.3.6.1.2.1.99.1.1.1.5.';
 
     // Create State Index - Values taken from ENTITY-SENSOR-MIB - EntitySensorStatus
     $state_name = 'arubaoscxEnvMonSupplyState';
@@ -28,13 +28,13 @@ if (!empty($oids)) {
     foreach ($oids as $index => $entry) {
         if ($entry['entPhysicalVendorType'] == $arubaPowerSensorOID) { // Is physical entity an arubaWiredPowerSensor?
             // Retrieve sensor name
-            $descr = snmp_get($device, 'ENTITY-MIB::entPhysicalName.'.$index, '-Ovqe', 'ENTITY-MIB');
+            $descr = snmp_get($device, 'ENTITY-MIB::entPhysicalName.' . $index, '-Ovqe', 'ENTITY-MIB');
 
             //Discover Sensors
-            discover_sensor($valid['sensor'], 'state', $device, $arubaPowerSensorOperStatusOID.$index, $index, $state_name, $descr, '1', '1', null, null, null, 3, null, 'snmp', $index);
+            discover_sensor($valid['sensor'], 'state', $device, $arubaPowerSensorOperStatusOID . $index, $index, $state_name, $descr, '1', '1', null, null, null, 3, null, 'snmp', $index);
 
             //Create Sensor To State Index
             create_sensor_to_state_index($device, $state_name, $index);
-        };
+        }
     }
 }
