@@ -20,11 +20,12 @@ use App\Models\Device;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessApCountDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\OS\Shared\Zyxel;
 
-class Zyxelwlc extends Zyxel implements OSPolling,WirelessApCountDiscovery
+class Zyxelwlc extends Zyxel implements OSPolling,WirelessApCountDiscovery,WirelessClientsDiscovery
 {
     public function pollOS(DataStorageInterface $datastore): void
     {
@@ -41,10 +42,29 @@ class Zyxelwlc extends Zyxel implements OSPolling,WirelessApCountDiscovery
         }
     }
 
+    public function discoverWirelessClients()
+    {
+        $oid = '.1.3.6.1.4.1.890.1.15.3.3.1.4.0' ; #    ZYXEL-ES-CAPWAP::capwapTotalStation
+        $total_station = snmp_get($this->getDeviceArray(), '.1.3.6.1.4.1.890.1.15.3.3.1.4.0', '-Ovq'); #    ZYXEL-ES-CAPWAP::capwapTotalStation
+
+        $sensors[] = new WirelessSensor(
+            'clients',
+            $this->getDeviceId(),
+            $oid,
+            'zyxelwlc',
+            0,
+            'Clients: Total',
+            $total_station
+        );
+
+        return $sensors;
+    }
+
     public function discoverWirelessApCount()
     {
         $oid = '.1.3.6.1.4.1.890.1.15.3.3.1.1.0'; #  ZYXEL-ES-CAPWAP::capwapOnlineAP
-        
+        $number_ap = snmp_get($this->getDeviceArray(), '.11.3.6.1.4.1.890.1.15.3.3.1.1.0', '-Ovq'); # ZYXEL-ES-CAPWAP::capwapOnlineAP
+
         if ( $this->getDeviceArray()['hardware'] == 'NXC2500') $max_ap = 64 ;
             else if ( $this->getDeviceArray()['hardware'] == 'NXC5200') $max_ap = 240 ;
                 else if ( $this->getDeviceArray()['hardware'] == 'NXC5500') $max_ap = 1024 ;
@@ -58,7 +78,7 @@ class Zyxelwlc extends Zyxel implements OSPolling,WirelessApCountDiscovery
                 'zyxelwlc',
                 0,
                 'Connected APs',
-                null,
+                $number_ap,
                 1,
                 1,
                 'sum',

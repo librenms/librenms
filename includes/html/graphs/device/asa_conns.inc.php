@@ -12,9 +12,9 @@
  * the source code distribution for details.
  */
 
-$scale_min = '0';
+ $scale_min = '0';
 
-require 'includes/html/graphs/common.inc.php';
+ require 'includes/html/graphs/common.inc.php';
 
 $rrd_filename = Rrd::name($device['hostname'], 'asa_conns');
 

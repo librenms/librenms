@@ -4,12 +4,9 @@ $rrd_filename = Rrd::name($device['hostname'], 'zyxelwlc-sessions');
 
 $ds = 'sessions';
 
-$colour_area = '9999cc';
-$colour_line = '0000cc';
-
-$colour_area_max = '9999cc';
-
-$graph_max = 1;
+$colour_area = '00000000';
+$colour_line = 'cc0000';
+$scale_min = '0';
 
 $unit_text = 'Sessions';
 
