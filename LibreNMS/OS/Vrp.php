@@ -133,7 +133,7 @@ class Vrp extends OS implements
                 'hwWlanRadioChUtilizationRate',
                 'hwWlanRadioChInterferenceRate',
                 'hwWlanRadioActualEIRP',
-                'hwWlanRadioFreqType',
+                'hwWlanRadioType',
                 'hwWlanRadioWorkingChannel',
             ];
 
@@ -182,16 +182,32 @@ class Vrp extends OS implements
                     $interference = $radio['hwWlanRadioChInterferenceRate'] ?? 0;
                     $radioutil = $radio['hwWlanRadioChUtilizationRate'] ?? 0;
                     $numasoclients = $clientPerRadio[$ap_id][$r_id] ?? 0;
+                    $radio['hwWlanRadioType'] = $radio['hwWlanRadioType'] ?? 0;
 
-                    switch ($radio['hwWlanRadioFreqType'] ?? null) {
-                        case 1:
-                            $type = '2.4Ghz';
-                            break;
-                        case 2:
-                            $type = '5Ghz';
-                            break;
-                        default:
-                            $type = 'unknown (huawei ' . ($radio['hwWlanRadioFreqType'] ?? null) . ')';
+                    $type = 'dot11';
+
+                    if ($radio['hwWlanRadioType'] & 2) {
+                        $type .= 'a';
+                    }
+
+                    if ($radio['hwWlanRadioType'] & 1) {
+                        $type .= 'b';
+                    }
+
+                    if ($radio['hwWlanRadioType'] & 4) {
+                        $type .= 'g';
+                    }
+
+                    if ($radio['hwWlanRadioType'] & 8) {
+                        $type .= 'n';
+                    }
+
+                    if ($radio['hwWlanRadioType'] & 16) {
+                        $type .= '_ac';
+                    }
+
+                    if ($radio['hwWlanRadioType'] & 32) {
+                        $type .= '_ax';
                     }
 
                     // TODO

@@ -37,6 +37,11 @@ modules:
                     index: 'fgHwSensorEntIndex.{{ $index }}'
                     descr: fgHwSensorEntName
                     value: fgHwSensorEntAlarmStatus
+                    skip_values:
+                        -
+                            oid: fgHwSensorEntName
+                            op: '='
+                            value: ''
                     states:
                         - { value: 0, descr: OK, graph: 1, generic: 0 }
                         - { value: 1, descr: ERROR, graph: 1, generic: 2 }
