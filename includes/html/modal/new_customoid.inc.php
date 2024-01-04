@@ -68,6 +68,8 @@ if (! (Auth::user()->hasGlobalAdmin())) {
                                 <option value="celsius_to_fahrenheit">C to F</option>
                                 <option value="fahrenheit_to_celsius">F to C</option>
                                 <option value="uw_to_dbm">uW to dBm</option>
+                                <option value="ieee754_to_float">IEEE754 to float</option>
+
                             </select>
                         </div>
                     </div>
