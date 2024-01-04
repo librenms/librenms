@@ -766,6 +766,21 @@ function mw_to_dbm($value)
  * @param  int  $min
  * @return null
  */
+
+/**
+ * Converts IEEE 754 to float
+ *
+ */
+function ieee754_to_float($value)
+{
+    $binary = str_pad(base_convert($value, 10, 2), 32, "0", STR_PAD_LEFT);
+    $sign = $binary[0];
+    $exponent = bindec(substr($binary, 1, 8)) - 127;
+    $mantissa = (2 << 22) + bindec(substr($binary, 9, 23));
+    $floatVal = $mantissa * pow(2, $exponent - 23) * ($sign ? -1 : 1);
+    return $floatVal;
+}
+
 function set_null($value, $default = null, $min = null)
 {
     if (! is_numeric($value)) {
