@@ -22,15 +22,14 @@ use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessApCountDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 use LibreNMS\Interfaces\Polling\OSPolling;
-use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\OS\Shared\Zyxel;
+use LibreNMS\RRD\RrdDefinition;
 
-class Zyxelwlc extends Zyxel implements OSPolling,WirelessApCountDiscovery,WirelessClientsDiscovery
+class Zyxelwlc extends Zyxel implements OSPolling, WirelessApCountDiscovery, WirelessClientsDiscovery
 {
     public function pollOS(DataStorageInterface $datastore): void
     {
-        
-        $sessions = snmp_get($this->getDeviceArray(), '.1.3.6.1.4.1.890.1.15.3.1.19.0', '-Ovq'); #  ZYXEL-ES-COMMON::sysActiveSessionNum
+        $sessions = snmp_get($this->getDeviceArray(), '.1.3.6.1.4.1.890.1.15.3.1.19.0', '-Ovq'); //  ZYXEL-ES-COMMON::sysActiveSessionNum
         if (is_numeric($sessions)) {
             $rrd_def = RrdDefinition::make()->addDataset('sessions', 'GAUGE', 0, 3000000);
             $fields = [
@@ -44,8 +43,8 @@ class Zyxelwlc extends Zyxel implements OSPolling,WirelessApCountDiscovery,Wirel
 
     public function discoverWirelessClients()
     {
-        $oid = '.1.3.6.1.4.1.890.1.15.3.3.1.4.0' ; #    ZYXEL-ES-CAPWAP::capwapTotalStation
-        $total_station = snmp_get($this->getDeviceArray(), '.1.3.6.1.4.1.890.1.15.3.3.1.4.0', '-Ovq'); #    ZYXEL-ES-CAPWAP::capwapTotalStation
+        $oid = '.1.3.6.1.4.1.890.1.15.3.3.1.4.0'; //    ZYXEL-ES-CAPWAP::capwapTotalStation
+        $total_station = (int) snmp_get($this->getDeviceArray(), '.1.3.6.1.4.1.890.1.15.3.3.1.4.0', '-Ovq'); //    ZYXEL-ES-CAPWAP::capwapTotalStation
 
         $sensors[] = new WirelessSensor(
             'clients',
@@ -62,14 +61,19 @@ class Zyxelwlc extends Zyxel implements OSPolling,WirelessApCountDiscovery,Wirel
 
     public function discoverWirelessApCount()
     {
-        $oid = '.1.3.6.1.4.1.890.1.15.3.3.1.1.0'; #  ZYXEL-ES-CAPWAP::capwapOnlineAP
-        $number_ap = snmp_get($this->getDeviceArray(), '.11.3.6.1.4.1.890.1.15.3.3.1.1.0', '-Ovq'); # ZYXEL-ES-CAPWAP::capwapOnlineAP
+        $oid = '.1.3.6.1.4.1.890.1.15.3.3.1.1.0'; //  ZYXEL-ES-CAPWAP::capwapOnlineAP
+        $number_ap = (int) snmp_get($this->getDeviceArray(), '.11.3.6.1.4.1.890.1.15.3.3.1.1.0', '-Ovq'); // ZYXEL-ES-CAPWAP::capwapOnlineAP
 
-        if ( $this->getDeviceArray()['hardware'] == 'NXC2500') $max_ap = 64 ;
-            else if ( $this->getDeviceArray()['hardware'] == 'NXC5200') $max_ap = 240 ;
-                else if ( $this->getDeviceArray()['hardware'] == 'NXC5500') $max_ap = 1024 ;
-                    else $max_ap = 0 ;
-        
+        if ($this->getDeviceArray()['hardware'] == 'NXC2500') {
+            $max_ap = 64;
+        } elseif ($this->getDeviceArray()['hardware'] == 'NXC5200') {
+            $max_ap = 240;
+        } elseif ($this->getDeviceArray()['hardware'] == 'NXC5500') {
+            $max_ap = 1024;
+        } else {
+            $max_ap = 0;
+        }
+
         return [
             new WirelessSensor(
                 'ap-count',
