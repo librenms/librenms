@@ -16,7 +16,6 @@
 
 namespace LibreNMS\OS;
 
-use App\Models\Device;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessApCountDiscovery;
