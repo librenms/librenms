@@ -32,6 +32,7 @@ if (! empty($_POST['editing'])) {
         $device_model->purpose = $_POST['descr'];
         $device_model->poller_group = $_POST['poller_group'];
         $device_model->ignore = (int) isset($_POST['ignore']);
+        $device_model->ignore_status = (int) isset($_POST['ignore_status']);
         $device_model->disabled = (int) isset($_POST['disabled']);
         $device_model->disable_notify = (int) isset($_POST['disable_notify']);
         $device_model->type = $_POST['type'];
@@ -309,6 +310,17 @@ If `devices.ignore = 0` or `macros.device = 1` condition is is set and ignore al
            <input name="ignore" type="checkbox" id="ignore" value="1" data-size="small"
                 <?php
                 if ($device_model->ignore) {
+                    echo 'checked=checked';
+                }
+                ?> />
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="ignore_status" class="col-sm-2 control-label" title="Tag device to ignore Status. It will always be shown as online.">Ignore Device Status</label>
+        <div class="col-sm-6">
+           <input name="ignore_status" type="checkbox" id="ignore_status" value="1" data-size="small"
+                <?php
+                if ($device_model->ignore_status) {
                     echo 'checked=checked';
                 }
                 ?> />
