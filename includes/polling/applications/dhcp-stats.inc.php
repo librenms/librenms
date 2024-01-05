@@ -65,15 +65,15 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('dhcp_free', 'GAUGE', 0);
 
 $fields = [
-    'dhcp_total'     => $dhcp_total,
-    'dhcp_active'    => $dhcp_active,
-    'dhcp_expired'   => $dhcp_expired,
-    'dhcp_released'  => $dhcp_released,
+    'dhcp_total' => $dhcp_total,
+    'dhcp_active' => $dhcp_active,
+    'dhcp_expired' => $dhcp_expired,
+    'dhcp_released' => $dhcp_released,
     'dhcp_abandoned' => $dhcp_abandoned,
-    'dhcp_reset'     => $dhcp_reset,
-    'dhcp_bootp'     => $dhcp_bootp,
-    'dhcp_backup'    => $dhcp_backup,
-    'dhcp_free'      => $dhcp_free,
+    'dhcp_reset' => $dhcp_reset,
+    'dhcp_bootp' => $dhcp_bootp,
+    'dhcp_backup' => $dhcp_backup,
+    'dhcp_free' => $dhcp_free,
 ];
 $metrics[$name . '_' . $category] = $fields;
 
@@ -99,7 +99,7 @@ if ($version == 2) {
 
         $fields = [
             'current' => $dhcp_current,
-            'max'     => $dhcp_max,
+            'max' => $dhcp_max,
             'percent' => $dhcp_percent,
         ];
 
@@ -126,7 +126,7 @@ if ($version == 2) {
 
         $fields = [
             'current' => $dhcp_current,
-            'max'     => $dhcp_max,
+            'max' => $dhcp_max,
             'percent' => $dhcp_percent,
         ];
 

@@ -20,12 +20,12 @@ $rrd_filename = Rrd::name($device['hostname'], [
 if (Rrd::checkRrdExists($rrd_filename)) {
     foreach ($rrdArray as $rrdVar => $rrdValues) {
         $rrd_list[] = [
-            'cdef_rpn'   => $rrdValues['cdef_rpn'] ?? null,
-            'colour'     => $rrdValues['colour'] ?? null,
-            'descr'      => $rrdValues['descr'],
-            'divider'    => $rrdValues['divider'] ?? null,
-            'ds'         => $rrdVar,
-            'filename'   => $rrd_filename,
+            'cdef_rpn' => $rrdValues['cdef_rpn'] ?? null,
+            'colour' => $rrdValues['colour'] ?? null,
+            'descr' => $rrdValues['descr'],
+            'divider' => $rrdValues['divider'] ?? null,
+            'ds' => $rrdVar,
+            'filename' => $rrd_filename,
             'multiplier' => $rrdValues['multiplier'] ?? null,
         ];
     }

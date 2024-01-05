@@ -7,12 +7,12 @@ $nototal = (($width < 550) ? 1 : 0);
 $unit_text = 'Messages/sec';
 $rrd_filename = Rrd::name($device['hostname'], ['app', 'mailscannerV2', $app->app_id]);
 $array = [
-    'spam'  => [
-        'descr'  => 'Spam',
+    'spam' => [
+        'descr' => 'Spam',
         'colour' => 'FF8800',
     ],
     'virus' => [
-        'descr'  => 'Virus',
+        'descr' => 'Virus',
         'colour' => 'FF0000',
     ],
 ];

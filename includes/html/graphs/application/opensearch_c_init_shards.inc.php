@@ -14,8 +14,8 @@ $rrd_list = [];
 if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Init Shards',
-        'ds'       => 'c_init_shards',
+        'descr' => 'Init Shards',
+        'ds' => 'c_init_shards',
     ];
 } else {
     d_echo('RRD "' . $rrd_filename . '" not found');

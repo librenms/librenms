@@ -15,9 +15,9 @@ foreach (dbFetchRows($sql, $param) as $port) {
     $rrd_filename = get_port_rrdfile_path($port['hostname'], $port['port_id']); // FIXME: Unification OK?
     if (Rrd::checkRrdExists($rrd_filename)) {
         $rrd_list[] = [
-            'filename'  => $rrd_filename,
-            'descr'     => $port['hostname'] . '-' . $port['ifDescr'],
-            'descr_in'  => shorthost($port['hostname']),
+            'filename' => $rrd_filename,
+            'descr' => $port['hostname'] . '-' . $port['ifDescr'],
+            'descr_in' => shorthost($port['hostname']),
             'descr_out' => makeshortif($port['ifDescr']),
         ];
     }

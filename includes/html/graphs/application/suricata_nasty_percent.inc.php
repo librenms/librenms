@@ -18,18 +18,18 @@ $rrd_list = [];
 if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Dropped',
-        'ds'       => 'drop_percent',
+        'descr' => 'Dropped',
+        'ds' => 'drop_percent',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'If Dropped',
-        'ds'       => 'ifdrop_percent',
+        'descr' => 'If Dropped',
+        'ds' => 'ifdrop_percent',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Error',
-        'ds'       => 'error_percent',
+        'descr' => 'Error',
+        'ds' => 'error_percent',
     ];
 } else {
     d_echo('RRD "' . $rrd_filename . '" not found');

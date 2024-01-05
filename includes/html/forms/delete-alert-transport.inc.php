@@ -38,5 +38,5 @@ if (! is_numeric($vars['transport_id'])) {
 
 exit(json_encode([
     'status' => $status,
-    'message'=> $message,
+    'message' => $message,
 ]));

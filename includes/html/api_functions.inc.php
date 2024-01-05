@@ -81,7 +81,7 @@ function api_success_noresult($code, $message = null): JsonResponse
 function api_error($statusCode, $message): JsonResponse
 {
     return response()->json([
-        'status'  => 'error',
+        'status' => 'error',
         'message' => $message,
     ], $statusCode, [], JSON_PRETTY_PRINT);
 } // end api_error()
@@ -114,7 +114,7 @@ function api_get_graph(Request $request, array $additional = [])
         ]);
 
         $graph = Graph::get([
-            'width'  => $request->get('width', 1075),
+            'width' => $request->get('width', 1075),
             'height' => $request->get('height', 300),
             ...$additional,
             ...$vars,
@@ -815,7 +815,7 @@ function get_graph_by_portgroup(Request $request)
     }
 
     return api_get_graph($request, [
-        'type'   => 'multiport_bits_separate',
+        'type' => 'multiport_bits_separate',
         'id' => $if_list,
     ]);
 }
@@ -1017,7 +1017,7 @@ function list_available_wireless_graphs(Illuminate\Http\Request $request)
                 foreach (dbFetchRows('SELECT `sensor_id`, `sensor_descr` FROM `wireless_sensors` WHERE `device_id` = ? AND `sensor_class` = ? AND `sensor_deleted` = 0', [$device_id, $type]) as $graph) {
                     $graphs[] = [
                         'sensor_id' => $graph['sensor_id'],
-                        'desc'      => $graph['sensor_descr'],
+                        'desc' => $graph['sensor_descr'],
                     ];
                 }
             }
@@ -1327,7 +1327,7 @@ function add_edit_rule(Illuminate\Http\Request $request)
     }
 
     $extra = [
-        'mute'  => $mute,
+        'mute' => $mute,
         'count' => $count,
         'delay' => $delay_sec,
         'interval' => $interval_sec,

@@ -30,8 +30,8 @@ unset($sep);
 echo ' Graphs: ';
 
 $graph_types = [
-    'bits'  => 'Bits',
-    'pkts'  => 'Packets',
+    'bits' => 'Bits',
+    'pkts' => 'Packets',
     'conns' => 'Connections',
 ];
 

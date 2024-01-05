@@ -43,7 +43,7 @@ abstract class DeviceOverviewHook
     {
         return [
             'title' => __CLASS__,
-            'device'  => $device,
+            'device' => $device,
         ];
     }
 

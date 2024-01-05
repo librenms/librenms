@@ -9,7 +9,7 @@ $rrd_filename = Rrd::name($device['hostname'], ['app', 'freeradius-proxy_access'
 $fr_proxy_access_array = [
     'requests' => 'Requests',
     'accepts' => 'Accepts',
-    'rejects'=> 'Rejects',
+    'rejects' => 'Rejects',
     'challenges' => 'Challenges',
 ];
 $colours = 'mixed';
