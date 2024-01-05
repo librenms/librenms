@@ -57,11 +57,11 @@ if (isset($vars['by']) && $vars['by'] == 'desc') {
 }
 
 $heads = [
-    'PID'     => '',
-    'VSZ'     => 'Virtual Memory',
-    'RSS'     => 'Resident Memory',
+    'PID' => '',
+    'VSZ' => 'Virtual Memory',
+    'RSS' => 'Resident Memory',
     'cputime' => '',
-    'user'    => '',
+    'user' => '',
     'command' => '',
 ];
 

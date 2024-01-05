@@ -58,7 +58,6 @@ return [
             'rrdtool' => ['name' => 'RRDTool 設定'],
             'snmp' => ['name' => 'SNMP'],
             'poller_modules' => ['name' => '輪詢器模組'],
-            'interface_types' => ['name' => 'RFC 7224 介面類型'],
         ],
         'system' => [
             'cleanup' => ['name' => '清理'],

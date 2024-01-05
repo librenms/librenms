@@ -26,16 +26,16 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('oos', 'GAUGE', 0, 125000000000);
 
 $fields = [
-    'ns'  => $drbd['ns'],
-    'nr'  => $drbd['nr'],
-    'dw'  => $drbd['dw'],
-    'dr'  => $drbd['dr'],
-    'al'  => $drbd['al'],
-    'bm'  => $drbd['bm'],
-    'lo'  => $drbd['lo'],
-    'pe'  => $drbd['pe'],
-    'ua'  => $drbd['ua'],
-    'ap'  => $drbd['ap'],
+    'ns' => $drbd['ns'],
+    'nr' => $drbd['nr'],
+    'dw' => $drbd['dw'],
+    'dr' => $drbd['dr'],
+    'al' => $drbd['al'],
+    'bm' => $drbd['bm'],
+    'lo' => $drbd['lo'],
+    'pe' => $drbd['pe'],
+    'ua' => $drbd['ua'],
+    'ap' => $drbd['ap'],
     'oos' => $drbd['oos'],
 ];
 

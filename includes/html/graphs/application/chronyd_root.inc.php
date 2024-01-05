@@ -7,8 +7,8 @@ $nototal = (($width < 224) ? 1 : 0);
 $unit_text = 'Seconds';
 $rrd_filename = Rrd::name($device['hostname'], ['app', 'chronyd', $app->app_id]);
 $array = [
-    'root_delay'        => ['descr' => 'Root clk delay'],
-    'root_dispersion'   => ['descr' => 'Root clk disp.'],
+    'root_delay' => ['descr' => 'Root clk delay'],
+    'root_dispersion' => ['descr' => 'Root clk disp.'],
 ];
 
 $i = 0;

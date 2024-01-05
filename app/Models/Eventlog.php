@@ -75,7 +75,7 @@ class Eventlog extends DeviceRelatedModel
             'datetime' => Carbon::now(),
             'severity' => $severity,
             'message' => $text,
-            'username'  => (class_exists('\Auth') && Auth::check()) ? Auth::user()->username : '',
+            'username' => (class_exists('\Auth') && Auth::check()) ? Auth::user()->username : '',
         ]);
 
         if (is_numeric($device)) {

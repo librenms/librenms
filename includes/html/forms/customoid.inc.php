@@ -4,7 +4,7 @@ header('Content-type: application/json');
 
 if (! Auth::user()->hasGlobalAdmin()) {
     exit(json_encode([
-        'status'  => 'error',
+        'status' => 'error',
         'message' => 'Need to be admin',
     ]));
 }
@@ -68,19 +68,19 @@ if ($action == 'test') {
     if (is_numeric($id) && $id > 0) {
         if (dbUpdate(
             [
-                'customoid_descr'          => $name,
-                'customoid_oid'            => $oid,
-                'customoid_datatype'       => $datatype,
-                'customoid_unit'           => $unit,
-                'customoid_divisor'        => $divisor,
-                'customoid_multiplier'     => $multiplier,
-                'customoid_limit'          => $limit,
-                'customoid_limit_warn'     => $limit_warn,
-                'customoid_limit_low'      => $limit_low,
+                'customoid_descr' => $name,
+                'customoid_oid' => $oid,
+                'customoid_datatype' => $datatype,
+                'customoid_unit' => $unit,
+                'customoid_divisor' => $divisor,
+                'customoid_multiplier' => $multiplier,
+                'customoid_limit' => $limit,
+                'customoid_limit_warn' => $limit_warn,
+                'customoid_limit_low' => $limit_low,
                 'customoid_limit_low_warn' => $limit_low_warn,
-                'customoid_alert'          => $alerts,
-                'customoid_passed'         => $passed,
-                'user_func'                => $user_func,
+                'customoid_alert' => $alerts,
+                'customoid_passed' => $passed,
+                'user_func' => $user_func,
             ],
             'customoids',
             '`customoid_id` = ?',
@@ -98,20 +98,20 @@ if ($action == 'test') {
     } else {
         $id = dbInsert(
             [
-                'device_id'                => $device_id,
-                'customoid_descr'          => $name,
-                'customoid_oid'            => $oid,
-                'customoid_datatype'       => $datatype,
-                'customoid_unit'           => $unit,
-                'customoid_divisor'        => $divisor,
-                'customoid_multiplier'     => $multiplier,
-                'customoid_limit'          => $limit,
-                'customoid_limit_warn'     => $limit_warn,
-                'customoid_limit_low'      => $limit_low,
+                'device_id' => $device_id,
+                'customoid_descr' => $name,
+                'customoid_oid' => $oid,
+                'customoid_datatype' => $datatype,
+                'customoid_unit' => $unit,
+                'customoid_divisor' => $divisor,
+                'customoid_multiplier' => $multiplier,
+                'customoid_limit' => $limit,
+                'customoid_limit_warn' => $limit_warn,
+                'customoid_limit_low' => $limit_low,
                 'customoid_limit_low_warn' => $limit_low_warn,
-                'customoid_alert'          => $alerts,
-                'customoid_passed'         => $passed,
-                'user_func'                => $user_func,
+                'customoid_alert' => $alerts,
+                'customoid_passed' => $passed,
+                'user_func' => $user_func,
             ],
             'customoids'
         );
@@ -125,6 +125,6 @@ if ($action == 'test') {
 }
 
 exit(json_encode([
-    'status'       => $status,
-    'message'      => $message,
+    'status' => $status,
+    'message' => $message,
 ]));

@@ -28,7 +28,7 @@ $set_rrd_def = RrdDefinition::make()
     ->addDataset('min_size', 'GAUGE')
     ->addDataset('size', 'GAUGE');
 
-$app_data = ['sets'=>[], 'no_minus_d'=>$data['no_minus_d']];
+$app_data = ['sets' => [], 'no_minus_d' => $data['no_minus_d']];
 
 $rrd_name = ['app', $name, $app->app_id];
 $fields = [

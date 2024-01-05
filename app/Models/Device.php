@@ -466,6 +466,7 @@ class Device extends BaseModel
         if (empty($ip)) {
             return null;
         }
+
         // @ suppresses warning, inet_ntop() returns false if it fails
         return @inet_ntop($ip) ?: null;
     }
@@ -764,6 +765,21 @@ class Device extends BaseModel
     public function isisAdjacencies(): HasMany
     {
         return $this->hasMany(\App\Models\IsisAdjacency::class, 'device_id', 'device_id');
+    }
+
+    public function links(): HasMany
+    {
+        return $this->hasMany(\App\Models\Link::class, 'local_device_id');
+    }
+
+    public function remoteLinks(): HasMany
+    {
+        return $this->hasMany(\App\Models\Link::class, 'remote_device_id');
+    }
+
+    public function allLinks(): \Illuminate\Support\Collection
+    {
+        return $this->links->merge($this->remoteLinks);
     }
 
     public function location(): BelongsTo

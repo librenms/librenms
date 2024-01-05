@@ -12,7 +12,7 @@ if (! Auth::user()->hasGlobalAdmin()) {
     $message = 'Wrong permissions';
     $details = 'You need to have admin permissions.';
     exit(json_encode([
-        'status'  => $status,
+        'status' => $status,
         'message' => $message,
         'details' => $details,
     ]));
@@ -34,7 +34,7 @@ if (is_numeric($alert_log_id)) {
 }
 
 exit(json_encode([
-    'status'  => $status,
+    'status' => $status,
     'message' => $message,
     'details' => $details,
 ]));
