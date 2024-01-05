@@ -1,4 +1,4 @@
-First we define our graphs in `includes/definitions.inc.php` to share
+First we define our graphs in `misc/config_definitions.inc.php` to share
 our work and contribute in the development of LibreNMS. :-) (or place
 in `config.php` if you don't plan to contribute)
 
