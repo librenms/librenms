@@ -14,18 +14,18 @@ $rrd_list = [];
 if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Total',
-        'ds'       => 'total_conns',
+        'descr' => 'Total',
+        'ds' => 'total_conns',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'From',
-        'ds'       => 'total_from',
+        'descr' => 'From',
+        'ds' => 'total_from',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'To',
-        'ds'       => 'total_to',
+        'descr' => 'To',
+        'ds' => 'total_to',
     ];
 } else {
     d_echo('RRD "' . $rrd_filename . '" not found');

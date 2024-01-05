@@ -44,13 +44,13 @@ if (count($vp_rows)) {
         $rrd_name = ['vp', $ifIndex, $vp_id];
 
         $fields = [
-            'incells'         => $t_vp['juniAtmVpStatsInCells'],
-            'outcells'        => $t_vp['juniAtmVpStatsOutCells'],
-            'inpackets'       => $t_vp['juniAtmVpStatsInPackets'],
-            'outpackets'      => $t_vp['juniAtmVpStatsOutPackets'],
-            'inpacketoctets'  => $t_vp['juniAtmVpStatsInPacketOctets'],
+            'incells' => $t_vp['juniAtmVpStatsInCells'],
+            'outcells' => $t_vp['juniAtmVpStatsOutCells'],
+            'inpackets' => $t_vp['juniAtmVpStatsInPackets'],
+            'outpackets' => $t_vp['juniAtmVpStatsOutPackets'],
+            'inpacketoctets' => $t_vp['juniAtmVpStatsInPacketOctets'],
             'outpacketoctets' => $t_vp['juniAtmVpStatsOutPacketOctets'],
-            'inpacketerrors'  => $t_vp['juniAtmVpStatsInPacketErrors'],
+            'inpacketerrors' => $t_vp['juniAtmVpStatsInPacketErrors'],
             'outpacketerrors' => $t_vp['juniAtmVpStatsOutPacketErrors'],
         ];
 

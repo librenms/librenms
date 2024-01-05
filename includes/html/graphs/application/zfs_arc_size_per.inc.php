@@ -14,18 +14,18 @@ $rrd_list = [];
 if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'ARC Size%',
-        'ds'       => 'arc_size_per',
+        'descr' => 'ARC Size%',
+        'ds' => 'arc_size_per',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Target Size%',
-        'ds'       => 'target_size_per',
+        'descr' => 'Target Size%',
+        'ds' => 'target_size_per',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Target Min%',
-        'ds'       => 'min_size_per',
+        'descr' => 'Target Min%',
+        'ds' => 'min_size_per',
     ];
 } else {
     d_echo('RRD "' . $rrd_filename . '" not found');

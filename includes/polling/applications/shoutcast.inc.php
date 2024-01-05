@@ -31,14 +31,14 @@ foreach ($servers as $item => $server) {
             ->addDataset('unique', 'GAUGE', 0, 125000000000);
 
         $fields = [
-            'bitrate'  => $data['1'],
-            'traf_in'  => $data['2'],
+            'bitrate' => $data['1'],
+            'traf_in' => $data['2'],
             'traf_out' => $data['3'],
-            'current'  => $data['4'],
-            'status'   => $data['5'],
-            'peak'     => $data['6'],
-            'max'      => $data['7'],
-            'unique'   => $data['8'],
+            'current' => $data['4'],
+            'status' => $data['5'],
+            'peak' => $data['6'],
+            'max' => $data['7'],
+            'unique' => $data['8'],
         ];
         $metrics[$server] = $fields;
 
