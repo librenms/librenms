@@ -121,7 +121,7 @@ class AlertRules
                     $details = gzcompress(json_encode($details), 9);
                     dbUpdate(['details' => $details], 'alert_log', 'id = ?', [$alert_log['id']]);
                 } else {
-                    $extra = gzcompress(json_encode(['contacts' => AlertUtil::getContacts($qry), 'rule'=>$qry]), 9);
+                    $extra = gzcompress(json_encode(['contacts' => AlertUtil::getContacts($qry), 'rule' => $qry]), 9);
                     if (dbInsert(['state' => AlertState::ACTIVE, 'device_id' => $device_id, 'rule_id' => $rule['id'], 'details' => $extra], 'alert_log')) {
                         if (is_null($current_state)) {
                             dbInsert(['state' => AlertState::ACTIVE, 'device_id' => $device_id, 'rule_id' => $rule['id'], 'open' => 1, 'alerted' => 0], 'alerts');

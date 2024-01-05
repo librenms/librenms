@@ -81,15 +81,15 @@ class Allied extends OS implements OSDiscovery
                 $hardware = $c;
                 $serial = snmp_get($this->getDeviceArray(), 'arBoardSerialNumber.1', '-OsvQU', 'AT-INTERFACES-MIB');
 
-                //  sysDescr.0 = STRING: "CentreCOM 9924Ts, version 3.2.1-04, built 08-Sep-2009"
+            //  sysDescr.0 = STRING: "CentreCOM 9924Ts, version 3.2.1-04, built 08-Sep-2009"
             } elseif ($a == 'CentreCOM' && $c == 'version') {
                 $version = $d;
                 $features = $f;
                 $hardware = snmp_get($this->getDeviceArray(), 'arBoardName.1', '-OsvQU', 'AT-INTERFACES-MIB');
                 $serial = snmp_get($this->getDeviceArray(), 'arBoardSerialNumber.1', '-OsvQU', 'AT-INTERFACES-MIB');
 
-                //AT-GS950/24 Gigabit Ethernet WebSmart Switch
-                //Also requires system description as no OIDs provide $hardware
+            //AT-GS950/24 Gigabit Ethernet WebSmart Switch
+            //Also requires system description as no OIDs provide $hardware
             } elseif ($d == 'WebSmart' && $e == 'Switch') {
                 $version = snmp_get($this->getDeviceArray(), 'swhub.167.81.1.3.0', '-OsvQU', 'AtiL2-MIB');
                 $version = $d . ' ' . $version;

@@ -13,7 +13,7 @@
 
 $comp_module = 'Cisco-CIMC';
 $component = new LibreNMS\Component();
-$components = $component->getComponents($device['device_id'], ['type'=>$comp_module]);
+$components = $component->getComponents($device['device_id'], ['type' => $comp_module]);
 
 // We only care about our device id.
 $components = $components[$device['device_id']];
@@ -72,10 +72,10 @@ if (is_null($tblUCSObjects)) {
 
             // Lets Set some defaults.
             $entPhysicalData = [
-                'entPhysicalHardwareRev'    => '',
-                'entPhysicalFirmwareRev'    => '',
-                'entPhysicalSoftwareRev'    => '',
-                'entPhysicalIsFRU'          => 'FALSE',
+                'entPhysicalHardwareRev' => '',
+                'entPhysicalFirmwareRev' => '',
+                'entPhysicalSoftwareRev' => '',
+                'entPhysicalIsFRU' => 'FALSE',
             ];
 
             switch ($tbl) {

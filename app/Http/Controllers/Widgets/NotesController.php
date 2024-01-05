@@ -44,8 +44,8 @@ class NotesController extends WidgetController
         }
 
         $purifier_config = [
-            'HTML.Allowed'    => 'b,iframe[frameborder|src|width|height],i,ul,ol,li,h1,h2,h3,h4,br,p,pre',
-            'HTML.Trusted'    => true,
+            'HTML.Allowed' => 'b,iframe[frameborder|src|width|height],i,ul,ol,li,h1,h2,h3,h4,br,p,pre',
+            'HTML.Trusted' => true,
             'HTML.SafeIframe' => true,
             'URI.SafeIframeRegexp' => '%^(https?:)?//%',
         ];

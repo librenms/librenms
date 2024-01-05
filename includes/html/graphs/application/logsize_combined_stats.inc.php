@@ -16,28 +16,28 @@ $rrd_list = [];
 if (Rrd::checkRrdExists($filename)) {
     $rrd_list[] = [
         'filename' => $filename,
-        'descr'    => 'Max Size',
-        'ds'       => 'max_size',
+        'descr' => 'Max Size',
+        'ds' => 'max_size',
     ];
     $rrd_list[] = [
         'filename' => $filename,
-        'descr'    => 'Mean Size',
-        'ds'       => 'mean_size',
+        'descr' => 'Mean Size',
+        'ds' => 'mean_size',
     ];
     $rrd_list[] = [
         'filename' => $filename,
-        'descr'    => 'Median Size',
-        'ds'       => 'median_size',
+        'descr' => 'Median Size',
+        'ds' => 'median_size',
     ];
     $rrd_list[] = [
         'filename' => $filename,
-        'descr'    => 'Mode Size',
-        'ds'       => 'mode_size',
+        'descr' => 'Mode Size',
+        'ds' => 'mode_size',
     ];
     $rrd_list[] = [
         'filename' => $filename,
-        'descr'    => 'Min Size',
-        'ds'       => 'min_size',
+        'descr' => 'Min Size',
+        'ds' => 'min_size',
     ];
 } else {
     d_echo('RRD "' . $filename . '" not found');
