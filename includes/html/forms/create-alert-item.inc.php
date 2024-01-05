@@ -57,10 +57,10 @@ if (empty($rule)) {
     }
 
     $extra = [
-        'mute'     => $mute,
-        'count'    => $count,
-        'delay'    => $delay_sec,
-        'invert'   => $invert,
+        'mute' => $mute,
+        'count' => $count,
+        'delay' => $delay_sec,
+        'invert' => $invert,
         'interval' => $interval_sec,
     ];
     $extra_json = json_encode($extra);

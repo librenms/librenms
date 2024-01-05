@@ -7,27 +7,27 @@ $rrd_filename = Rrd::name($device['hostname'], ['app', 'mysql', $app->app_id]);
 
 $array = [
     'MaCs' => [
-        'descr'  => 'Max Connections',
+        'descr' => 'Max Connections',
         'colour' => '22FF22',
     ],
     'MUCs' => [
-        'descr'  => 'Max Used Connections',
+        'descr' => 'Max Used Connections',
         'colour' => '0022FF',
     ],
-    'ACs'  => [
-        'descr'  => 'Aborted Clients',
+    'ACs' => [
+        'descr' => 'Aborted Clients',
         'colour' => 'FF0000',
     ],
     'AdCs' => [
-        'descr'  => 'Aborted Connects',
+        'descr' => 'Aborted Connects',
         'colour' => '0080C0',
     ],
-    'TCd'  => [
-        'descr'  => 'Threads Connected',
+    'TCd' => [
+        'descr' => 'Threads Connected',
         'colour' => 'FF0000',
     ],
-    'Cs'   => [
-        'descr'  => 'New Connections',
+    'Cs' => [
+        'descr' => 'New Connections',
         'colour' => '0080C0',
     ],
 ];

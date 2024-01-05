@@ -17,15 +17,15 @@ if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list = [
         [
             'filename' => $rrd_filename,
-            'descr'    => 'HTTP in',
-            'ds'       => 'httpinkb',
-            'colour'   => 'd46a6a',
+            'descr' => 'HTTP in',
+            'ds' => 'httpinkb',
+            'colour' => 'd46a6a',
         ],
         [
             'filename' => $rrd_filename,
-            'descr'    => 'HTTP out',
-            'ds'       => 'httpoutkb',
-            'colour'   => '28774f',
+            'descr' => 'HTTP out',
+            'ds' => 'httpoutkb',
+            'colour' => '28774f',
         ],
     ];
 } else {

@@ -16,28 +16,28 @@ $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, $var
 if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Reallocated_Sector_Ct',
-        'ds'       => 'id5',
+        'descr' => 'Reallocated_Sector_Ct',
+        'ds' => 'id5',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Reported_Uncorrect',
-        'ds'       => 'id187',
+        'descr' => 'Reported_Uncorrect',
+        'ds' => 'id187',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Command_Timeout',
-        'ds'       => 'id188',
+        'descr' => 'Command_Timeout',
+        'ds' => 'id188',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Current_Pending_Sector',
-        'ds'       => 'id197',
+        'descr' => 'Current_Pending_Sector',
+        'ds' => 'id197',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Offline_Uncorrectable',
-        'ds'       => 'id198',
+        'descr' => 'Offline_Uncorrectable',
+        'ds' => 'id198',
     ];
 }
 

@@ -18,13 +18,13 @@ $rrd_list = [];
 if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'User',
-        'ds'       => 'usertime',
+        'descr' => 'User',
+        'ds' => 'usertime',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Sys',
-        'ds'       => 'systime',
+        'descr' => 'Sys',
+        'ds' => 'systime',
     ];
 } else {
     d_echo('RRD "' . $rrd_filename . '" not found');

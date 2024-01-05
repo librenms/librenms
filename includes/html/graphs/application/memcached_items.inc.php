@@ -9,7 +9,7 @@ $nototal = 0;
 $unit_text = 'Items';
 $array = [
     'curr_items' => [
-        'descr'  => 'Items',
+        'descr' => 'Items',
         'colour' => '555555',
     ],
 ];

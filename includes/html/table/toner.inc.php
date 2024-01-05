@@ -92,20 +92,20 @@ foreach (dbFetchRows($sql, $param) as $toner) {
             include 'includes/html/print-graphrow.inc.php';
             unset($return_data);
             $response[] = [
-                'hostname'      => $graph_data[0],
+                'hostname' => $graph_data[0],
                 'mempool_descr' => $graph_data[1],
-                'graph'         => $graph_data[2],
-                'mempool_used'  => $graph_data[3],
-                'mempool_perc'  => '',
+                'graph' => $graph_data[2],
+                'mempool_used' => $graph_data[3],
+                'mempool_perc' => '',
             ];
         }
     }
 }
 
 $output = [
-    'current'  => $current,
+    'current' => $current,
     'rowCount' => $rowCount,
-    'rows'     => $response,
-    'total'    => $count,
+    'rows' => $response,
+    'total' => $count,
 ];
 echo json_encode($output, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);

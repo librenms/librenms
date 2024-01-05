@@ -72,8 +72,8 @@ class Twilio extends Transport
                 ],
             ],
             'validation' => [
-                'twilio-sid'    => 'required|string',
-                'twilio-token'    => 'required|string',
+                'twilio-sid' => 'required|string',
+                'twilio-token' => 'required|string',
                 'twilio-to' => 'required',
                 'twilio-sender' => 'required',
             ],

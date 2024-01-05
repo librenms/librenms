@@ -1,10 +1,10 @@
 <?php
 
 $link_array = [
-    'page'   => 'device',
+    'page' => 'device',
     'device' => $device['device_id'],
-    'tab'    => 'apps',
-    'app'    => 'mojo_cape_submit',
+    'tab' => 'apps',
+    'app' => 'mojo_cape_submit',
 ];
 
 print_optionbar_start();

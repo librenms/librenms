@@ -5,10 +5,10 @@ $domain_list = Rrd::getRrdApplicationArrays($device, $app['app_id'], 'certificat
 print_optionbar_start();
 
 $link_array = [
-    'page'   => 'device',
+    'page' => 'device',
     'device' => $device['device_id'],
-    'tab'    => 'apps',
-    'app'    => 'certificate',
+    'tab' => 'apps',
+    'app' => 'certificate',
 ];
 
 $cert_name_list = [];
@@ -28,7 +28,7 @@ printf('%s | certificates: %s', generate_link('All Certificates', $link_array), 
 print_optionbar_end();
 
 $graphs = [
-    'certificate_age'            => 'Age',
+    'certificate_age' => 'Age',
     'certificate_remaining_days' => 'Remaining days',
 ];
 

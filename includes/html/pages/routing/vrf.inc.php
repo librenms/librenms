@@ -7,7 +7,7 @@ if (! Auth::user()->hasGlobalRead()) {
     include 'includes/html/error-no-perm.inc.php';
 } else {
     $link_array = [
-        'page'     => 'routing',
+        'page' => 'routing',
         'protocol' => 'vrf',
     ];
 
@@ -41,10 +41,10 @@ if (! Auth::user()->hasGlobalRead()) {
     echo ' Graphs: ';
 
     $graph_types = [
-        'bits'      => 'Bits',
-        'upkts'     => 'Unicast Packets',
-        'nupkts'    => 'Non-Unicast Packets',
-        'errors'    => 'Errors',
+        'bits' => 'Bits',
+        'upkts' => 'Unicast Packets',
+        'nupkts' => 'Non-Unicast Packets',
+        'errors' => 'Errors',
         'etherlike' => 'Etherlike',
     ];
 
