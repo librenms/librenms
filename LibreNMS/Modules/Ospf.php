@@ -88,7 +88,7 @@ class Ospf implements Module
                     continue; // skip invalid data
                 }
 
-                if (!is_numeric($ospf_entry['ospfExternLsaCount'] ?? '')) {
+                if (! is_numeric($ospf_entry['ospfExternLsaCount'] ?? '')) {
                     continue;
                 }
 
