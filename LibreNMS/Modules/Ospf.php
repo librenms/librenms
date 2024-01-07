@@ -88,6 +88,10 @@ class Ospf implements Module
                     continue; // skip invalid data
                 }
 
+                if (!is_numeric($ospf_entry['ospfExternLsaCount'] ?? '')) {
+                    continue;
+                }
+
                 $instance = OspfInstance::updateOrCreate([
                     'device_id' => $os->getDeviceId(),
                     'ospf_instance_id' => $ospf_instance_id,
