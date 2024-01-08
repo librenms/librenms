@@ -87,9 +87,9 @@ class Ospf implements Module
                 if (empty($ospf_entry['ospfRouterId'])) {
                     continue; // skip invalid data
                 }
-                foreach (['ospfRxNewLsas', 'ospfOriginateNewLsas', 'ospfAreaBdrRtrStatus', 'ospfExternLsaCount'] as $column) {
-                    if (! array_key_exists($column, $ospf_entry)) {
-                        continue; // This column must exist
+                foreach (['ospfRxNewLsas', 'ospfOriginateNewLsas', 'ospfAreaBdrRtrStatus', 'ospfExternLsaCount', 'ospfTOSSupport', 'ospfExternLsaCksumSum', 'ospfExternLsaCount', 'ospfASBdrRtrStatus', 'ospfVersionNumber', 'ospfAdminStat'] as $column) {
+                    if (! array_key_exists($column, $ospf_entry) || is_null($ospf_entry[$column])) {
+                        continue; // This column must exist and not be null
                     }
                 }
 
