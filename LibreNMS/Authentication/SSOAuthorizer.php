@@ -138,7 +138,6 @@ class SSOAuthorizer extends MysqlAuthorizer
                         }
                     }
                 }
-
                 // No match, proxy is untrusted
                 return false;
             } catch (InvalidIpException $e) {
@@ -146,7 +145,6 @@ class SSOAuthorizer extends MysqlAuthorizer
                 return false;
             }
         }
-
         // Not enabled, trust everything
         return true;
     }
