@@ -102,6 +102,9 @@
                 "ipmi": {
                     "type": "boolean"
                 },
+                "isis": {
+                    "type": "boolean"
+                },
                 "entity-physical": {
                     "type": "boolean"
                 },
@@ -262,6 +265,9 @@
                     "type": "boolean"
                 },
                 "hr-device": {
+                    "type": "boolean"
+                },
+                "isis": {
                     "type": "boolean"
                 },
                 "discovery-protocols": {
