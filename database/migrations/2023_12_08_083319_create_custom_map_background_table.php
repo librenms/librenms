@@ -18,7 +18,12 @@ return new class extends Migration
             $table->binary('background_image');
             $table->foreign('custom_map_id')->references('custom_map_id')->on('custom_maps')->onDelete('cascade');
         });
-        DB::statement('ALTER TABLE custom_map_backgrounds MODIFY background_image MEDIUMBLOB');
+        try {
+            DB::statement('ALTER TABLE custom_map_backgrounds MODIFY background_image MEDIUMBLOB');
+        }
+        catch (Exception $e) {
+            // SQLite can store large values in a BLOB column
+        }
     }
 
     /**
