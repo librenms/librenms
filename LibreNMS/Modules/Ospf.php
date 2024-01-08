@@ -89,7 +89,7 @@ class Ospf implements Module
                 }
                 foreach (['ospfRxNewLsas', 'ospfOriginateNewLsas', 'ospfAreaBdrRtrStatus', 'ospfTOSSupport', 'ospfExternLsaCksumSum', 'ospfExternLsaCount', 'ospfASBdrRtrStatus', 'ospfVersionNumber', 'ospfAdminStat'] as $column) {
                     if (! array_key_exists($column, $ospf_entry) || is_null($ospf_entry[$column])) {
-                        continue; // This column must exist and not be null
+                        continue 2; // This column must exist and not be null
                     }
                 }
 
