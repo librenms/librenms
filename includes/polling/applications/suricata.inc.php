@@ -14,7 +14,7 @@ try {
 }
 
 // grab  the alert here as it is the global one
-$metrics = ['alert'=>$suricata['alert']];
+$metrics = ['alert' => $suricata['alert']];
 
 $rrd_def = RrdDefinition::make()
     ->addDataset('af_dcerpc_tcp', 'DERIVE', 0)

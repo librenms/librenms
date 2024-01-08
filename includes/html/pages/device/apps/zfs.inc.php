@@ -1,16 +1,16 @@
 <?php
 
 $link_array = [
-    'page'   => 'device',
+    'page' => 'device',
     'device' => $device['device_id'],
-    'tab'    => 'apps',
-    'app'    => 'zfs',
+    'tab' => 'apps',
+    'app' => 'zfs',
 ];
 
 print_optionbar_start();
 
 echo generate_link('ARC', $link_array);
-echo ' | ' . generate_link('L2', $link_array, ['zfs_page'=>'l2']);
+echo ' | ' . generate_link('L2', $link_array, ['zfs_page' => 'l2']);
 echo ' | Pools: ';
 
 $pools = $app->data['pools'] ?? [];
@@ -31,9 +31,9 @@ print_optionbar_end();
 
 if (isset($vars['pool'])) {
     $graphs = [
-        'zfs_pool_space'=>'Pool Space',
-        'zfs_pool_cap'=>'Pool Capacity',
-        'zfs_pool_frag'=>'Pool Fragmentation',
+        'zfs_pool_space' => 'Pool Space',
+        'zfs_pool_cap' => 'Pool Capacity',
+        'zfs_pool_frag' => 'Pool Fragmentation',
     ];
 } elseif (isset($vars['zfs_page']) && $vars['zfs_page'] == 'l2') {
     $graphs = [

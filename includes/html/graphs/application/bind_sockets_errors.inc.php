@@ -14,43 +14,43 @@ $rrd_list = [];
 if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'UDP/IPv4 send',
-        'ds'       => 'ui4se',
+        'descr' => 'UDP/IPv4 send',
+        'ds' => 'ui4se',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'UDP/IPv6 send',
-        'ds'       => 'ui6se',
+        'descr' => 'UDP/IPv6 send',
+        'ds' => 'ui6se',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'TCP/IPv4 send',
-        'ds'       => 'ti4se',
+        'descr' => 'TCP/IPv4 send',
+        'ds' => 'ti4se',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'TCP/IPv6 send',
-        'ds'       => 'ti6se',
+        'descr' => 'TCP/IPv6 send',
+        'ds' => 'ti6se',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'UDP/IPv4 recv',
-        'ds'       => 'ui4re',
+        'descr' => 'UDP/IPv4 recv',
+        'ds' => 'ui4re',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'UDP/IPv6 recv',
-        'ds'       => 'ui6re',
+        'descr' => 'UDP/IPv6 recv',
+        'ds' => 'ui6re',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'TCP/IPv4 recv',
-        'ds'       => 'ti4re',
+        'descr' => 'TCP/IPv4 recv',
+        'ds' => 'ti4re',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'TCP/IPv6 recv',
-        'ds'       => 'ti6re',
+        'descr' => 'TCP/IPv6 recv',
+        'ds' => 'ti6re',
     ];
 } else {
     d_echo('RRD "' . $rrd_filename . '" not found');

@@ -14,53 +14,53 @@ $rrd_list = [];
 if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'A Size',
-        'ds'       => 'l2_asize',
+        'descr' => 'A Size',
+        'ds' => 'l2_asize',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'BufC D Asize',
-        'ds'       =>  'l2_bufc_d_asize',
+        'descr' => 'BufC D Asize',
+        'ds' => 'l2_bufc_d_asize',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'BufC M Asize',
-        'ds'       =>  'l2_bufc_m_asize',
+        'descr' => 'BufC M Asize',
+        'ds' => 'l2_bufc_m_asize',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Log Blk Asize',
-        'ds'       =>  'l2_log_blk_asize',
+        'descr' => 'Log Blk Asize',
+        'ds' => 'l2_log_blk_asize',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'MFU Asize',
-        'ds'       =>  'l2_mfu_asize',
+        'descr' => 'MFU Asize',
+        'ds' => 'l2_mfu_asize',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'MRU Asize',
-        'ds'       =>  'l2_mru_asize',
+        'descr' => 'MRU Asize',
+        'ds' => 'l2_mru_asize',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Prefetch Asize',
-        'ds'       =>  'l2_prefetch_asize',
+        'descr' => 'Prefetch Asize',
+        'ds' => 'l2_prefetch_asize',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Rebuild Asize',
-        'ds'       =>  'l2_rb_asize',
+        'descr' => 'Rebuild Asize',
+        'ds' => 'l2_rb_asize',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Log Blk Avg Asize',
-        'ds'       =>  'l2_log_blk_avg_as',
+        'descr' => 'Log Blk Avg Asize',
+        'ds' => 'l2_log_blk_avg_as',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'HDR Size',
-        'ds'       =>  'l2_hdr_size',
+        'descr' => 'HDR Size',
+        'ds' => 'l2_hdr_size',
     ];
 } else {
     d_echo('RRD "' . $rrd_filename . '" not found');

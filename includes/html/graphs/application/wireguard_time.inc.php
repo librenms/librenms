@@ -30,8 +30,8 @@ if (Rrd::checkRrdExists($rrd_filename)) {
     foreach ($rrdArray as $rrdVar => $rrdValues) {
         $rrd_list[] = [
             'filename' => $rrd_filename,
-            'descr'    => $rrdValues['descr'],
-            'ds'       => $rrdVar,
+            'descr' => $rrdValues['descr'],
+            'ds' => $rrdVar,
         ];
     }
 } else {

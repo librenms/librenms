@@ -5,10 +5,10 @@ $psu_list = Rrd::getRrdApplicationArrays($device, $app['app_id'], 'pwrstatd');
 print_optionbar_start();
 
 $link_array = [
-    'page'   => 'device',
+    'page' => 'device',
     'device' => $device['device_id'],
-    'tab'    => 'apps',
-    'app'    => 'pwrstatd',
+    'tab' => 'apps',
+    'app' => 'pwrstatd',
 ];
 
 $sn_list = [];
@@ -28,10 +28,10 @@ printf('%s | PSUs: %s', generate_link('All PSUs', $link_array), implode(', ', $s
 print_optionbar_end();
 
 $graphs = [
-    'pwrstatd_minutes'    => 'Battery Runtime Remaining',
+    'pwrstatd_minutes' => 'Battery Runtime Remaining',
     'pwrstatd_percentage' => 'Percentage Readings',
-    'pwrstatd_voltage'    => 'Voltage Readings',
-    'pwrstatd_wattage'    => 'Power Readings',
+    'pwrstatd_voltage' => 'Voltage Readings',
+    'pwrstatd_wattage' => 'Power Readings',
 ];
 
 foreach ($graphs as $key => $text) {
