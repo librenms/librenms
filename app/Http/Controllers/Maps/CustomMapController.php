@@ -118,8 +118,8 @@ class CustomMapController extends Controller
         }
 
         $imageName = $map->custom_map_id . '_' . $map->background_version . '.' . $map->background_suffix;
-        if (Storage::disk('base')->missing('html/images/custommap/' . $imageName)) {
-            Storage::disk('base')->put('html/images/custommap/' . $imageName, $map->background->background_image);
+        if (Storage::disk('base')->missing('html/images/custommap/background/' . $imageName)) {
+            Storage::disk('base')->put('html/images/custommap/background/' . $imageName, $map->background->background_image);
         }
 
         return $imageName;
@@ -149,7 +149,7 @@ class CustomMapController extends Controller
 
         $background = $this->checkImageCache($map);
         if ($background) {
-            $path = Storage::disk('base')->path('html/images/custommap/') . $background;
+            $path = Storage::disk('base')->path('html/images/custommap/background/') . $background;
             $mime = Storage::mimeType($background);
             $headers = [
                 'Content-Type' => $mime,
