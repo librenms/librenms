@@ -31,6 +31,7 @@
     var network_nodes = new vis.DataSet({queue: {delay: 100}});
     var network_edges = new vis.DataSet({queue: {delay: 100}});
     var node_device_map = {};
+    var custom_image_base = "images/custommap/";
 
     function CreateNetwork() {
         // Flush the nodes and edges so they are rendered immediately
@@ -70,10 +71,8 @@
                     if(node.device_id) {
                         node_device_map[nodeid] = {device_id: node.device_id, device_name: node.device_name};
                         node_cfg.title = node.device_info;
-                        node_cfg.image = {unselected: node.device_image};
                     } else {
                         node_cfg.title = null;
-                        node_cfg.image = {};
                     }
                     node_cfg.label = node.label;
                     node_cfg.shape = node.style;
@@ -87,6 +86,20 @@
                         node_cfg.icon = {face: 'FontAwesome', code: String.fromCharCode(parseInt(node.icon, 16)), size: node.size, color: node.colour_bdr}; 
                     } else {
                         node_cfg.icon = {};
+                    }
+                    if(node.style == "image" || node.style == "circularImage") {
+                        if(node.image) {
+                            node_cfg.image = {unselected: custom_image_base + node.image};
+                        } else if (node.device_image) {
+                            node_cfg.image = {unselected: node.device_image};
+                        } else {
+                            // If we do not get a valid image from the database, use defaults
+                            node_cfg.shape = newnodeconf.shape;
+                            node_cfg.icon = newnodeconf.icon;
+                            node_cfg.image = newnodeconf.image;
+                        }
+                    } else {
+                        node_cfg.image = {};
                     }
 
                     if (network_nodes.get(nodeid)) {

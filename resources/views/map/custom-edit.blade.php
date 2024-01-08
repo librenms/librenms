@@ -1200,14 +1200,8 @@
                     if(node.device_id) {
                         node_device_map[nodeid] = {device_id: node.device_id, device_name: node.device_name, device_image: node.device_image};
                         node_cfg.title = node.device_id;
-                        if(node.image) {
-                            node_cfg.image = {unselected: custom_image_base + node.image};
-                        } else {
-                            node_cfg.image = {unselected: node.device_image};
-                        }
                     } else {
                         node_cfg.title = null;
-                        node_cfg.image = {};
                     }
                     node_cfg.label = node.label;
                     node_cfg.shape = node.style;
@@ -1222,11 +1216,19 @@
                     } else {
                         node_cfg.icon = {};
                     }
-                    // If we do not get a valid image from the database, use defaults
-                    if((node.style == "image" || node.style == "circularImage") && !node_cfg.image.unselected) {
-                        node_cfg.shape = newnodeconf.shape;
-                        node_cfg.icon = newnodeconf.icon;
-                        node_cfg.image = newnodeconf.image;
+                    if(node.style == "image" || node.style == "circularImage") {
+                        if(node.image) {
+                            node_cfg.image = {unselected: custom_image_base + node.image};
+                        } else if (node.device_image) {
+                            node_cfg.image = {unselected: node.device_image};
+                        } else {
+                            // If we do not get a valid image from the database, use defaults
+                            node_cfg.shape = newnodeconf.shape;
+                            node_cfg.icon = newnodeconf.icon;
+                            node_cfg.image = newnodeconf.image;
+                        }
+                    } else {
+                        node_cfg.image = {};
                     }
 
                     if (network_nodes.get(nodeid)) {
