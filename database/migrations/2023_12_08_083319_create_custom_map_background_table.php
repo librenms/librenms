@@ -20,8 +20,7 @@ return new class extends Migration
         });
         try {
             DB::statement('ALTER TABLE custom_map_backgrounds MODIFY background_image MEDIUMBLOB');
-        }
-        catch (Exception $e) {
+        } catch (Exception $e) {
             // SQLite can store large values in a BLOB column
         }
     }
