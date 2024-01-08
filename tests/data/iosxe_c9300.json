@@ -14229,5 +14229,22 @@
                 }
             ]
         }
+    },
+    "slas": {
+        "discovery": {
+            "slas": [
+                {
+                    "sla_nr": 200,
+                    "owner": "",
+                    "tag": "ICMP-JITTER",
+                    "rtt_type": "icmpjitter",
+                    "rtt": 15,
+                    "status": 1,
+                    "opstatus": 0,
+                    "deleted": 0
+                }
+            ]
+        },
+        "poller": "matches discovery"
     }
 }
