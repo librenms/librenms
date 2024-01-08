@@ -1,12 +1,12 @@
 @extends('layouts.librenmsv1')
 
-@section('title', __($name . ' | Custom Map'))
+@section('title', __('map.custom.title.view', ['name' => $name]))
 
 @section('content')
 <div class="container-fluid">
   <div class="row" id="alert-row">
     <div class="col-md-12">
-      <div class="alert alert-warning" role="alert" id="alert">Loading data</div>
+      <div class="alert alert-warning" role="alert" id="alert">{{ __('map.custom.view.loading') }}</div>
     </div>
   </div>
   <div class="row">
@@ -103,7 +103,7 @@
                     node_cfg.size = node.size;
                     node_cfg.color = {background: node.colour_bg_view, border: node.colour_bdr_view};
                     if(node.style == "icon") {
-                        node_cfg.icon = {face: 'FontAwesome', code: String.fromCharCode(parseInt(node.icon, 16)), size: node.size, color: node.colour_bdr}; 
+                        node_cfg.icon = {face: 'FontAwesome', code: String.fromCharCode(parseInt(node.icon, 16)), size: node.size, color: node.colour_bdr};
                     } else {
                         node_cfg.icon = {};
                     }
@@ -189,10 +189,10 @@
                 network_nodes.flush();
                 network_edges.flush();
                 if (Object.keys(data).length == 0) {
-                    $("#alert").html("No devices found");
+                    $("#alert").text('{{ __('map.custom.view.no_devices') }}');
                     $("#alert-row").show();
                 } else {
-                    $("#alert").html("");
+                    $("#alert").text("");
                     $("#alert-row").hide();
                 }
             });
