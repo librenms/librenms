@@ -318,6 +318,7 @@ class CustomMapController extends Controller
                 'label' => $node->label,
                 'style' => $node->style,
                 'icon' => $node->icon,
+                'image' => $node->image,
                 'size' => $node->size,
                 'border_width' => $node->border_width,
                 'text_face' => $node->text_face,
@@ -513,6 +514,7 @@ class CustomMapController extends Controller
                     $dbnode->label = $node->label;
                     $dbnode->style = $node->shape;
                     $dbnode->icon = $node->icon;
+                    $dbnode->image = property_exists($node->image, "unselected") ? $node->image->unselected : "";
                     $dbnode->size = $node->size;
                     $dbnode->text_face = $node->font->face;
                     $dbnode->text_size = $node->font->size;

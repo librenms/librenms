@@ -45,8 +45,8 @@
                     <option value="database">Database</option>
                     <option value="ellipse">Ellipse</option>
                     <option value="text">Text</option>
-                    <option value="image" id="nodestyleimage">Device Image</option>
-                    <option value="circularImage" id="nodestylecircularimage">Device Image (Circular)</option>
+                    <option value="image">Image</option>
+                    <option value="circularImage">Image (Circular)</option>
                     <option value="diamond">Diamond</option>
                     <option value="dot">Dot</option>
                     <option value="star">Star</option>
@@ -57,6 +57,23 @@
                     <option value="icon">Icon (select below)</option>
                   </select>
                   <input type="hidden" id="device_image">
+                </div>
+              </div>
+              <div class="form-group row" id="nodeImageRow">
+                <label for="nodeimage" class="col-sm-3 control-label">Image</label>
+                <div class="col-sm-6">
+                  <select id="nodeimage" class="form-control input-sm" onchange="setNodeImage();">
+                    <option value="" id="deviceiconimage">Device Image</option>
+                    <option value="icons/adc.svg">Application Delivery Controller</option>
+                    <option value="icons/firewall.svg">Firewall</option>
+                    <option value="icons/gtm.svg">Global Traffic Manager</option>
+                    <option value="icons/router.svg">Router</option>
+                    <option value="icons/switch-l2.svg">Switch - L2</option>
+                    <option value="icons/switch-l3.svg">Switch - L3</option>
+                  </select>
+                </div>
+                <div class="col-sm-3">
+                    <img id="nodeimagepreview" width=28 height=28>
                 </div>
               </div>
               <div class="form-group row" id="nodeIconRow">
@@ -396,6 +413,7 @@
     var network_nodes = new vis.DataSet({queue: {delay: 100}});
     var network_edges = new vis.DataSet({queue: {delay: 100}});
     var node_device_map = {};
+    var custom_image_base = "images/custommap/";
 
     function CreateNetwork() {
         // Flush the nodes and edges so they are rendered immediately
@@ -670,6 +688,13 @@
                 } else {
                     node.icon = null;
                 }
+                if("unselected" in node.image) {
+                    if(node.image.unselected.indexOf(custom_image_base) == 0) {
+                        node.image.unselected = node.image.unselected.replace(custom_image_base, "");
+                    } else {
+                        node.image = {};
+                    }
+                }
                 nodes[node.id] = node;
             }
         });
@@ -715,6 +740,11 @@
         } else {
             $("#nodeIconRow").hide();
         }
+        if(nodestyle == 'image' || nodestyle == 'circularImage') {
+            $("#nodeImageRow").show();
+        } else {
+            $("#nodeImageRow").hide();
+        }
     }
 
     function nodeDeviceSelect(e) {
@@ -725,8 +755,7 @@
         $("#nodelabel").val(name.split(".")[0].split(" ")[0]);
         $("#device_image").val(e.params.data.icon);
         $("#nodeDeviceSearchRow").hide();
-        $("#nodestyleimage").show();
-        $("#nodestylecircularimage").show();
+        $("#deviceiconimage").show();
         $("#nodeDeviceRow").show();
     }
 
@@ -737,13 +766,27 @@
         $("#device_name").text("");
         $("#device_image").val("");
         $("#nodeDeviceRow").hide();
-        $("#nodestyleimage").hide();
-        $("#nodestylecircularimage").hide();
+        $("#deviceiconimage").hide();
         $("#nodeDeviceSearchRow").show();
 
         // Reset device style if we were using the device image
-        if($("#nodestyle").val() == "image" || $("#nodestyle").val() == "circularImage") {
+        if(($("#nodestyle").val() == "image" || $("#nodestyle").val() == "circularImage") && !$("#nodeimage").val()){
             $("#nodestyle").val(newnodeconf.shape);
+            $("#nodeImageRow").hide();
+            setNodeImage();
+        }
+    }
+
+    function setNodeImage() {
+        // If the selected option is not visible, select the top option
+        if($("#nodeimage option:selected").css('display') == 'none') {
+            $("#nodeimage").val($("#nodeimage option:eq(1)").val());
+        }
+        // Set the image preview src
+        if($("#nodeimage").val()) {
+            $("#nodeimagepreview").attr("src", custom_image_base + $("#nodeimage").val());
+        } else {
+            $("#nodeimagepreview").attr("src", $("#device_image").val());
         }
     }
 
@@ -764,12 +807,17 @@
         newnodeconf.font.face = $("#nodetextface").val();
         newnodeconf.font.size = $("#nodetextsize").val();
         newnodeconf.font.color = $("#nodetextcolour").val();
-        newnodeconf.color.background = newnodeconf.color.highlight.background = newnodeconf.color.hover.background = $("#nodecolourbg").val();
-        newnodeconf.color.border = newnodeconf.color.highlight.border = newnodeconf.color.hover.border = $("#nodecolourbdr").val();
+        newnodeconf.color.background = $("#nodecolourbg").val();
+        newnodeconf.color.border = $("#nodecolourbdr").val();
         if(newnodeconf.shape == "icon") {
             newnodeconf.icon = {face: 'FontAwesome', code: String.fromCharCode(parseInt($("#nodeicon").val(), 16)), size: $("#nodesize").val(), color: newnodeconf.color.border};
         } else {
             newnodeconf.icon = {};
+        }
+        if(newnodeconf.shape == "image" || newnodeconf.shape == "circularImage") {
+            newnodeconf.image = {unselected: custom_image_base + $("#nodeimage").val()};
+        } else {
+            delete newnodeconf.image;
         }
         $("#map-saveDataButton").show();
     }
@@ -796,23 +844,35 @@
             $("#device_name").text(node_device_map[data.id].device_name);
             // Hide device selection row
             $("#nodeDeviceSearchRow").hide();
+            // Show device image as an option
+            $("#deviceiconimage").show();
+            $("#device_image").val(node_device_map[data.id].device_image);
         } else {
             // Node is not linked to a device
             $("#device_id").val("");
             $("#device_name").text("");
             // Hide the selected device row
             $("#nodeDeviceRow").hide();
-        }
-        // Show or hide the image option depending on whether the device has an image
-        if(data.image) {
-            $("#nodestyleimage").show();
-            $("#nodestylecircularimage").show();
-        } else {
-            $("#nodestyleimage").hide();
-            $("#nodestylecircularimage").hide();
+            // Hide device image as an option
+            $("#deviceiconimage").hide();
+            $("#device_image").val("");
         }
         $("#nodelabel").val(data.label);
         $("#nodestyle").val(data.shape);
+        // Show or hide the image selection if the shape is an image type
+        if(data.shape == "image" || data.shape == "circularImage") {
+            $("#nodeImageRow").show();
+            if(data.image.unselected.indexOf(custom_image_base) == 0) {
+                $("#nodeimage").val(data.image.unselected.replace(custom_image_base, ""));
+            } else {
+                $("#nodeimage").val("");
+            }
+        } else {
+            $("#nodeImageRow").hide();
+            $("#nodeimage").val("");
+        }
+        setNodeImage();
+        // Show or hide the icon selection if the shape is icon
         if(data.shape == "icon") {
             $("#nodeicon").val(data.icon.code.charCodeAt(0).toString(16));
             $("#nodeIconRow").show();
@@ -854,10 +914,8 @@
 
         if($("#device_id").val()) {
             node.title = $("#device_id").val();
-            node.image = {unselected: $("#device_image").val()};
         } else {
             node.title = '';
-            node.image = {};
         }
         // Update the node with the selected values on success and run the callback
         node.label = $("#nodelabel").val();
@@ -869,6 +927,15 @@
         node.color.background = node.color.highlight.background = node.color.hover.background = $("#nodecolourbg").val();
         node.color.border = node.color.highlight.border = node.color.hover.border = $("#nodecolourbdr").val();
         node.size = $("#nodesize").val();
+        if(node.shape == "image" || node.shape == "circularImage") {
+            if($("#nodeimage").val()) {
+                node.image = {unselected: custom_image_base + $("#nodeimage").val()};
+            } else {
+                node.image = {unselected: $("#device_image").val()};
+            }
+        } else {
+            node.image = {};
+        }
         if(node.shape == "icon") {
             node.icon = {face: 'FontAwesome', code: String.fromCharCode(parseInt($("#nodeicon").val(), 16)), size: $("#nodesize").val(), color: node.color.border}; 
         } else {
@@ -883,7 +950,7 @@
 
         if(node.id) {
             if($("#device_id").val()) {
-                node_device_map[node.id] = {device_id: $("#device_id").val(), device_name: $("#device_name").text()}
+                node_device_map[node.id] = {device_id: $("#device_id").val(), device_name: $("#device_name").text(), device_image: $("#device_image").val()}
             } else {
                 delete node_device_map[node.id];
             }
@@ -1131,9 +1198,13 @@
                     var node_cfg = {};
                     node_cfg.id = nodeid;
                     if(node.device_id) {
-                        node_device_map[nodeid] = {device_id: node.device_id, device_name: node.device_name};
+                        node_device_map[nodeid] = {device_id: node.device_id, device_name: node.device_name, device_image: node.device_image};
                         node_cfg.title = node.device_id;
-                        node_cfg.image = {unselected: node.device_image};
+                        if(node.image) {
+                            node_cfg.image = {unselected: custom_image_base + node.image};
+                        } else {
+                            node_cfg.image = {unselected: node.device_image};
+                        }
                     } else {
                         node_cfg.title = null;
                         node_cfg.image = {};
@@ -1150,6 +1221,12 @@
                         node_cfg.icon = {face: 'FontAwesome', code: String.fromCharCode(parseInt(node.icon, 16)), size: node.size, color: node.colour_bdr}; 
                     } else {
                         node_cfg.icon = {};
+                    }
+                    // If we do not get a valid image from the database, use defaults
+                    if((node.style == "image" || node.style == "circularImage") && !node_cfg.image.unselected) {
+                        node_cfg.shape = newnodeconf.shape;
+                        node_cfg.icon = newnodeconf.icon;
+                        node_cfg.image = newnodeconf.image;
                     }
 
                     if (network_nodes.get(nodeid)) {
