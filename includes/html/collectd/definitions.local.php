@@ -75,7 +75,7 @@ function meta_graph_local($host, $plugin, $plugin_instance, $type, $type_instanc
             continue;
         }
 
-        $sources[] = ['name'=>$inst, 'file'=>$file];
+        $sources[] = ['name' => $inst, 'file' => $file];
     }
 
     //  return collectd_draw_meta_stack($opts, $sources);

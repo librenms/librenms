@@ -8,12 +8,12 @@ $nototal = (($width < 224) ? 1 : 0);
 $unit_text = 'Inbound Calls/sec';
 $rrd_filename = Rrd::name($device['hostname'], ['app', 'freeswitch', 'stats', $app->app_id]);
 $array = [
-    'in_okay'  => [
-        'descr'  => 'Okay',
+    'in_okay' => [
+        'descr' => 'Okay',
         'colour' => '008800FF',
     ],
     'in_failed' => [
-        'descr'  => 'Failed',
+        'descr' => 'Failed',
         'colour' => '880000FF',
     ],
 ];

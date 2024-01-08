@@ -173,6 +173,7 @@ class Isis implements Module
 
         if (count($data) !== $adjacencies->where('isisISAdjState', 'up')->count()) {
             echo 'New Adjacencies, running discovery';
+
             // don't enable, might be a bad heuristic
             return $this->fillNew($adjacencies, $this->discoverIsIsMib($os));
         }

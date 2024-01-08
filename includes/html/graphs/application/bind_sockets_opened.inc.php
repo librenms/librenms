@@ -14,28 +14,28 @@ $rrd_list = [];
 if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'UDP/IPv4',
-        'ds'       => 'ui4so',
+        'descr' => 'UDP/IPv4',
+        'ds' => 'ui4so',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'UDP/IPv6',
-        'ds'       => 'ui6so',
+        'descr' => 'UDP/IPv6',
+        'ds' => 'ui6so',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'TCP/IPv4',
-        'ds'       => 'ti4so',
+        'descr' => 'TCP/IPv4',
+        'ds' => 'ti4so',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'TCP/IPv6',
-        'ds'       => 'ti6so',
+        'descr' => 'TCP/IPv6',
+        'ds' => 'ti6so',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Raw',
-        'ds'       => 'rso',
+        'descr' => 'Raw',
+        'ds' => 'rso',
     ];
 } else {
     d_echo('RRD "' . $rrd_filename . '" not found');
