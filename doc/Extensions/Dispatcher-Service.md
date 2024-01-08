@@ -266,8 +266,6 @@ Warning: Bullseye provide PHP 7.4 that is too old to run LibreNMS.
 
 ##### Debian 12 (Bookworm)
 
-Warning: Bookworm is not available as stable yet (as 2022 november).
-
 Install dependancies
 ```
 apt install python3 python3-mysqldb python3-dotenv
