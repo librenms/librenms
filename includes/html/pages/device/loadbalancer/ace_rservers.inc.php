@@ -33,9 +33,9 @@ echo ' Graphs: ';
 // "pkts"   => "Packets",
 // "errors" => "Errors");
 $graph_types = [
-    'curr'   => 'CurrentConns',
+    'curr' => 'CurrentConns',
     'failed' => 'FailedConns',
-    'total'  => 'TotalConns',
+    'total' => 'TotalConns',
 ];
 
 foreach ($graph_types as $type => $descr) {

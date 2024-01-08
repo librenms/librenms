@@ -14,43 +14,43 @@ $rrd_list = [];
 if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'IPv4 Req',
-        'ds'       => 'i4rr',
+        'descr' => 'IPv4 Req',
+        'ds' => 'i4rr',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'IPv6 Req',
-        'ds'       => 'i6rr',
+        'descr' => 'IPv6 Req',
+        'ds' => 'i6rr',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'TCP Req',
-        'ds'       => 'trr',
+        'descr' => 'TCP Req',
+        'ds' => 'trr',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'TCP Qry',
-        'ds'       => 'tqr',
+        'descr' => 'TCP Qry',
+        'ds' => 'tqr',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'UDP Qry',
-        'ds'       => 'uqr',
+        'descr' => 'UDP Qry',
+        'ds' => 'uqr',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'With EDNS(0)',
-        'ds'       => 'rwer',
+        'descr' => 'With EDNS(0)',
+        'ds' => 'rwer',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Other EDNS',
-        'ds'       => 'oeor',
+        'descr' => 'Other EDNS',
+        'ds' => 'oeor',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Dup. Qry',
-        'ds'       => 'dqr',
+        'descr' => 'Dup. Qry',
+        'ds' => 'dqr',
     ];
 } else {
     d_echo('RRD "' . $rrd_filename . '" not found');

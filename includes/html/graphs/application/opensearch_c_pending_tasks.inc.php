@@ -14,8 +14,8 @@ $rrd_list = [];
 if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Pending Tasks',
-        'ds'       => 'c_pending_tasks',
+        'descr' => 'Pending Tasks',
+        'ds' => 'c_pending_tasks',
     ];
 } else {
     d_echo('RRD "' . $rrd_filename . '" not found');

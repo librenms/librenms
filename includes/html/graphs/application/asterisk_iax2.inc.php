@@ -10,7 +10,7 @@ $rrd_filename = Rrd::name($device['hostname'], ['app', 'asterisk', 'iax2', $app-
 $astiax2_access_array = [
     'iax2peers' => 'Total Peers',
     'iax2online' => 'Online',
-    'iax2offline'=> 'Offline',
+    'iax2offline' => 'Offline',
     'iax2unmonitored' => 'Unmonitored',
 ];
 

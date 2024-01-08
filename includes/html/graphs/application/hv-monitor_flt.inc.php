@@ -18,13 +18,13 @@ $rrd_list = [];
 if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Major',
-        'ds'       => 'majflt',
+        'descr' => 'Major',
+        'ds' => 'majflt',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Minor',
-        'ds'       => 'minflt',
+        'descr' => 'Minor',
+        'ds' => 'minflt',
     ];
 } else {
     d_echo('RRD "' . $rrd_filename . '" not found');

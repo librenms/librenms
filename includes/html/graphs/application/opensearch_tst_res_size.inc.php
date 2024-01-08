@@ -14,8 +14,8 @@ $rrd_list = [];
 if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Store Reserved',
-        'ds'       => 'tst_res_size',
+        'descr' => 'Store Reserved',
+        'ds' => 'tst_res_size',
     ];
 } else {
     d_echo('RRD "' . $rrd_filename . '" not found');

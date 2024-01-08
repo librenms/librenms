@@ -4,7 +4,7 @@ $total = true;
 
 if (isset($total) && $total === true) {
     $graphs = [
-        'shoutcast_multi_bits'  => 'Traffic Statistics - Total of all Shoutcast servers',
+        'shoutcast_multi_bits' => 'Traffic Statistics - Total of all Shoutcast servers',
         'shoutcast_multi_stats' => 'Shoutcast Statistics - Total of all Shoutcast servers',
     ];
 
@@ -35,7 +35,7 @@ foreach ($files as $file) {
     $hostname = end($pieces);
     [$host, $port] = explode('_', $hostname, 2);
     $graphs = [
-        'shoutcast_bits'  => 'Traffic Statistics - ' . $host . ' (Port: ' . $port . ')',
+        'shoutcast_bits' => 'Traffic Statistics - ' . $host . ' (Port: ' . $port . ')',
         'shoutcast_stats' => 'Shoutcast Statistics - ' . $host . ' (Port: ' . $port . ')',
     ];
 
