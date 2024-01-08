@@ -72,7 +72,6 @@ if (count($bgpPeersCache) > 0 || count($bgpPeersCache_ietf) == 0) {
         $bgpPeers[$vrfInstance][$address]['afi'] = $oid[1];
         $bgpPeers[$vrfInstance][$address]['safi'] = $oid[2];
         $bgpPeers[$vrfInstance][$address]['typePeer'] = $oid[3];
-        $bgpPeers[$vrfInstance][$address]['bgpPeerDescr'] = '';
         if (array_key_exists('0.' . $oid[3] . '.' . $oid_address, $bgpPeersDesc)) {
             // We may have a description
             $bgpPeers[$vrfInstance][$address]['bgpPeerDescr'] = $bgpPeersDesc['0.' . $oid[3] . '.' . $oid_address]['hwBgpPeerSessionExtDescription'];
