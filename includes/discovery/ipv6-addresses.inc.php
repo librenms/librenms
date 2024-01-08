@@ -15,11 +15,6 @@ foreach (DeviceCache::getPrimary()->getVrfContexts() as $context_name) {
             ->table(4);
         foreach ($oids['ipv6'] ?? [] as $address => $data) {
             try {
-                // Some Juniper devices don't expose prefixlen through IP-MIB, and require IPV6-MIB handling below
-                if ($data['IP-MIB::ipAddressPrefix'] == 'SNMPv2-SMI::zeroDotZero') {
-                    $oids = [];
-                    break;
-                }
                 $ifIndex = $data['IP-MIB::ipAddressIfIndex'];
                 $ipv6_address = IPv6::fromHexString($address)->uncompressed();
                 $ipv6_origin = $data['IP-MIB::ipAddressOrigin'];
@@ -32,7 +27,7 @@ foreach (DeviceCache::getPrimary()->getVrfContexts() as $context_name) {
         }
     }
 
-    if (empty($oids)) {
+    if (empty($oids) || empty($valid)) {
         $oids = snmp_walk($device, 'ipv6AddrPfxLength', ['-OsqnU', '-Ln'], 'IPV6-MIB');
         $oids = str_replace('.1.3.6.1.2.1.55.1.8.1.2.', '', $oids);
         $oids = str_replace('"', '', $oids);
