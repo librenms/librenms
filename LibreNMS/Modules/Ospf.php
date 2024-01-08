@@ -84,8 +84,8 @@ class Ospf implements Module
 
             $ospf_instances = new Collection();
             foreach ($ospf_instances_poll as $ospf_instance_id => $ospf_entry) {
-                if (empty($ospf_entry['ospfRouterId'])) {
-                    continue; // skip invalid data
+                if (empty($ospf_entry['ospfRouterId']) || empty($ospf_entry['ospfAreaBdrRtrStatus']) || empty($ospf_entry['ospfExternLsaCount'])) {
+                    continue; // skip invalid or incomplete data
                 }
 
                 $instance = OspfInstance::updateOrCreate([
