@@ -576,6 +576,7 @@ custom_map_nodes:
     - { Field: label, Type: varchar(50), 'Null': false, Extra: '' }
     - { Field: style, Type: varchar(50), 'Null': false, Extra: '' }
     - { Field: icon, Type: varchar(8), 'Null': true, Extra: '' }
+    - { Field: image, Type: varchar(255), 'Null': false, Extra: '', Default: '' }
     - { Field: size, Type: int, 'Null': false, Extra: '' }
     - { Field: border_width, Type: int, 'Null': false, Extra: '' }
     - { Field: text_face, Type: varchar(50), 'Null': false, Extra: '' }
