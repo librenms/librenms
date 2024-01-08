@@ -163,9 +163,9 @@ return [
         ],
 
         'testing_memory' => [
-            'driver'   => 'sqlite',
+            'driver' => 'sqlite',
             'database' => ':memory:',
-            'prefix'   => '',
+            'prefix' => '',
             'foreign_key_constraints' => true,
         ],
 

@@ -4,10 +4,10 @@ $graphs = [
     'dhcp-stats_stats' => 'Stats',
     'dhcp-stats_pools_percent' => 'Pools Percent',
     'dhcp-stats_pools_current' => 'Pools Current',
-    'dhcp-stats_pools_max'     => 'Pools Max',
+    'dhcp-stats_pools_max' => 'Pools Max',
     'dhcp-stats_networks_percent' => 'Networks Percent',
     'dhcp-stats_networks_current' => 'Networks Current',
-    'dhcp-stats_networks_max'     => 'Networks Max',
+    'dhcp-stats_networks_max' => 'Networks Max',
 ];
 
 foreach ($graphs as $key => $text) {

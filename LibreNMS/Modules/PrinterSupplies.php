@@ -101,10 +101,10 @@ class PrinterSupplies implements Module
             echo $tonerperc . " %\n";
 
             $tags = [
-                'rrd_def'     => RrdDefinition::make()->addDataset('toner', 'GAUGE', 0, 20000),
-                'rrd_name'    => ['toner', $toner['supply_type'], $toner['supply_index']],
+                'rrd_def' => RrdDefinition::make()->addDataset('toner', 'GAUGE', 0, 20000),
+                'rrd_name' => ['toner', $toner['supply_type'], $toner['supply_index']],
                 'rrd_oldname' => ['toner', $toner['supply_descr']],
-                'index'       => $toner['supply_index'],
+                'index' => $toner['supply_index'],
             ];
             $datastore->put($device, 'toner', $tags, $tonerperc);
 

@@ -13,7 +13,7 @@ $colours = 'mixed';
 $rrd_filename = Rrd::name($device['hostname'], ['app', 'redis', $app->app_id, 'fragmentation']);
 
 $array = [
-    'bytes'   => 'Bytes',
+    'bytes' => 'Bytes',
 ];
 
 $rrd_list = [];

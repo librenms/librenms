@@ -18,28 +18,28 @@ $rrd_list = [];
 if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Dropped',
-        'ds'       => 'dropped',
+        'descr' => 'Dropped',
+        'ds' => 'dropped',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'If Dropped',
-        'ds'       => 'ifdropped',
+        'descr' => 'If Dropped',
+        'ds' => 'ifdropped',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Errors',
-        'ds'       => 'errors',
+        'descr' => 'Errors',
+        'ds' => 'errors',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Dec Inv.',
-        'ds'       => 'dec_invalid',
+        'descr' => 'Dec Inv.',
+        'ds' => 'dec_invalid',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Too Many Layers',
-        'ds'       => 'dec_too_many_layer',
+        'descr' => 'Too Many Layers',
+        'ds' => 'dec_too_many_layer',
     ];
 } else {
     d_echo('RRD "' . $rrd_filename . '" not found');

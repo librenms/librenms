@@ -28,39 +28,39 @@ $rrd_list = [];
 if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Min',
-        'ds'       => 's0regkeysmod',
+        'descr' => 'Min',
+        'ds' => 's0regkeysmod',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Max',
-        'ds'       => 's1regkeysmod',
+        'descr' => 'Max',
+        'ds' => 's1regkeysmod',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Mean',
-        'ds'       => 's3regkeysmod',
+        'descr' => 'Mean',
+        'ds' => 's3regkeysmod',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Median',
-        'ds'       => 's4regkeysmod',
+        'descr' => 'Median',
+        'ds' => 's4regkeysmod',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Mode',
-        'ds'       => 's5regkeysmod',
+        'descr' => 'Mode',
+        'ds' => 's5regkeysmod',
     ];
     if ($vars['stddev'] == 'on') {
         $rrd_list[] = [
             'filename' => $rrd_filename,
-            'descr'    => 'StdDev',
-            'ds'       => 's7regkeysmod',
+            'descr' => 'StdDev',
+            'ds' => 's7regkeysmod',
         ];
         $rrd_list[] = [
             'filename' => $rrd_filename,
-            'descr'    => 'StdDevP',
-            'ds'       => 's9regkeysmod',
+            'descr' => 'StdDevP',
+            'ds' => 's9regkeysmod',
         ];
     }
 } else {

@@ -61,7 +61,7 @@ class Mail extends Transport
                     'title' => 'Contact Type',
                     'name' => 'mail-contact',
                     'descr' => 'Method for selecting contacts',
-                    'type'  => 'select',
+                    'type' => 'select',
                     'options' => [
                         'Specified Email' => 'email',
                         'Device sysContact' => 'sysContact',
@@ -74,13 +74,13 @@ class Mail extends Transport
                     'title' => 'Email',
                     'name' => 'email',
                     'descr' => 'Email address of contact',
-                    'type'  => 'text',
+                    'type' => 'text',
                 ],
                 [
                     'title' => 'Role',
                     'name' => 'role',
                     'descr' => 'Role of users to mail',
-                    'type'  => 'select',
+                    'type' => 'select',
                     'options' => $roles,
                 ],
                 [

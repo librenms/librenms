@@ -27,8 +27,8 @@ while (isset($processes[$int])) {
     if (Rrd::checkRrdExists($rrd_filename)) {
         $rrd_list[] = [
             'filename' => $rrd_filename,
-            'descr'    => $process_name,
-            'ds'       => $rrdVar,
+            'descr' => $process_name,
+            'ds' => $rrdVar,
         ];
     }
     $int++;
