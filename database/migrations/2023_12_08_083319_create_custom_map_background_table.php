@@ -15,9 +15,10 @@ return new class extends Migration
             $table->increments('custom_map_background_id');
             $table->timestamps();
             $table->integer('custom_map_id')->unsigned()->index()->unique();
-            $table->mediumblob('background_image');
+            $table->binary('background_image');
             $table->foreign('custom_map_id')->references('custom_map_id')->on('custom_maps')->onDelete('cascade');
         });
+        DB::statement('ALTER TABLE custom_map_backgrounds MODIFY background_image MEDIUMBLOB');
     }
 
     /**
