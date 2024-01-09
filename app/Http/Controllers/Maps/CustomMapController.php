@@ -514,7 +514,7 @@ class CustomMapController extends Controller
                         }
                     }
                     $dbnode->device_id = is_numeric($node->title) ? $node->title : null;
-                    $dbnode->linked_custom_map_id = str_starts_with($node->title, 'map:') ? str_replace('map:', '', $node->title) : null;
+                    $dbnode->linked_custom_map_id = str_starts_with($node->title, 'map:') ? (int)str_replace('map:', '', $node->title) : null;
                     $dbnode->label = $node->label;
                     $dbnode->style = $node->shape;
                     $dbnode->icon = $node->icon;
