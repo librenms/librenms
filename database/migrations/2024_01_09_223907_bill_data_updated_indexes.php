@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('bill_data', function (Blueprint $table) {
-	    $table->dropPrimary(['bill_id', 'timestamp']);
+            $table->dropPrimary(['bill_id', 'timestamp']);
             $table->index(['bill_id', 'timestamp']);
         });
     }
