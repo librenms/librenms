@@ -159,4 +159,5 @@ T45-PoE    OBJECT IDENTIFIER ::= { xtmSeries 101 }
 T45-W-PoE  OBJECT IDENTIFIER ::= { xtmSeries 102 }
 T85-PoE    OBJECT IDENTIFIER ::= { xtmSeries 103 }
 T45-CW     OBJECT IDENTIFIER ::= { xtmSeries 104 }
+
 END
