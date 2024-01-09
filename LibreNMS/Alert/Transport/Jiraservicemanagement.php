@@ -6,7 +6,7 @@ use LibreNMS\Alert\Transport;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
 use LibreNMS\Util\Http;
 
-class JiraServiceManagement extends Transport
+class Jiraservicemanagement extends Transport
 {
     public function deliverAlert(array $alert_data): bool
     {
