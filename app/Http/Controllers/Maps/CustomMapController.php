@@ -393,6 +393,15 @@ class CustomMapController extends Controller
         return view('map.custom-view', $data);
     }
 
+    private function imageLabel(string $filename)
+    {
+        $ret = $filename;
+        $ret = str_replace('-', ' - ', $ret);
+        $ret = str_replace('_', ' ', $ret);
+
+        return ucwords($ret);
+    }
+
     public function edit(Request $request)
     {
         if (! $request->user()->isAdmin()) {
@@ -437,6 +446,15 @@ class CustomMapController extends Controller
             if (! $map) {
                 abort(404);
             }
+            $images = [];
+
+            foreach (Storage::disk('base')->files('html/images/custommap/icons') as $image) {
+                if (in_array(strtolower(pathinfo($image, PATHINFO_EXTENSION)), ['svg', 'png', 'jpg'])) {
+                    $images[pathinfo($image, PATHINFO_BASENAME)] = $this->imageLabel(pathinfo($image, PATHINFO_FILENAME));
+                }
+            }
+
+            $data['images'] = $images;
             $data['maps'] = CustomMap::orderBy('name')->where('custom_map_id', '<>', $request->map_id)->get(['custom_map_id', 'name']);
             $data['name'] = $map->name;
             $data['node_align'] = $map->node_align;

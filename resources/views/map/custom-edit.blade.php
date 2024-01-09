@@ -75,13 +75,9 @@
                 <div class="col-sm-6">
                   <select id="nodeimage" class="form-control input-sm" onchange="setNodeImage();">
                     <option value="" id="deviceiconimage">Device Image</option>
-{{-- TODO: Make the list below dynamic from the html/images/custommap/icons and html/images/custommap/icons-custom directories --}}
-                    <option value="icons/adc.svg">Application Delivery Controller</option>
-                    <option value="icons/firewall.svg">Firewall</option>
-                    <option value="icons/gtm.svg">Global Traffic Manager</option>
-                    <option value="icons/router.svg">Router</option>
-                    <option value="icons/switch-l2.svg">Switch - L2</option>
-                    <option value="icons/switch-l3.svg">Switch - L3</option>
+@foreach($images as $imgfile => $imglabel)
+                    <option value="{{$imgfile}}">{{$imglabel}}</option>
+@endforeach
                   </select>
                 </div>
                 <div class="col-sm-3">
@@ -429,7 +425,7 @@
     var network_nodes = new vis.DataSet({queue: {delay: 100}});
     var network_edges = new vis.DataSet({queue: {delay: 100}});
     var node_device_map = {};
-    var custom_image_base = "images/custommap/";
+    var custom_image_base = "images/custommap/icons/";
 
     function CreateNetwork() {
         // Flush the nodes and edges so they are rendered immediately
@@ -884,7 +880,7 @@
             $("#deviceiconimage").hide();
             $("#device_image").val("");
         }
-        if(data.title && data.title.startsWith("map:")) {
+        if(data.title && data.title.toString().startsWith("map:")) {
             // Hide device selection row
             $("#nodeDeviceSearchRow").hide();
             $("#maplink").val(data.title.replace("map:",""));

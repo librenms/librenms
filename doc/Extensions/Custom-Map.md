@@ -131,3 +131,9 @@ Once you are happy with a set of changes that you have made, you can click on th
 "Save Map" button in the top-right of the page to commit changes to the database.
 This will cause anyone viewing the map to see the new version the next time their
 page refreshes.
+
+## Adding Images
+
+You can add your own images to use on the custom map by copying files into the
+html/images/custommap/icons/ directory.  Any files with a .svg, .png or .jpg extension
+will be shown in the image selection drop-down in the custom map editor.
