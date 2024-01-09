@@ -13,10 +13,10 @@ modules:
     mempools:
         data:
             -
-                total: .1.3.6.1.4.1.3709.3.6.4.2.2.1.58.1.1.49
-                free: .1.3.6.1.4.1.3709.3.6.4.2.2.1.60.1.1.49
-                used: .1.3.6.1.4.1.3709.3.6.4.2.2.1.59.1.1.49
+                oid: DMOS-SYSMON-MIB::memory
+                total: DMOS-SYSMON-MIB::memoryOneMinuteTotal
+                free: DMOS-SYSMON-MIB::memoryOneMinuteFree
+                used: DMOS-SYSMON-MIB::memoryOneMinuteUsed
                 precision: 1
                 descr: 'Memory'
                 class: system
-                index: 1

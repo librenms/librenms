@@ -14,13 +14,13 @@ $rrd_filename = Rrd::name($device['hostname'], ['app', 'redis', $app->app_id, 'u
 
 $array = [
     'allocated' => 'Allocated',
-    'dataset'   => 'Dataset',
-    'lua'   => 'LUA',
-    'overhead'   => 'Overhead',
-    'peak'   => 'Peak',
-    'rss'   => 'RSS',
-    'scripts'   => 'Scripts',
-    'startup'   => 'Startup',
+    'dataset' => 'Dataset',
+    'lua' => 'LUA',
+    'overhead' => 'Overhead',
+    'peak' => 'Peak',
+    'rss' => 'RSS',
+    'scripts' => 'Scripts',
+    'startup' => 'Startup',
 ];
 
 $rrd_list = [];

@@ -7,7 +7,7 @@ $nototal = (($width < 224) ? 1 : 0);
 $unit_text = 'Level';
 $rrd_filename = Rrd::name($device['hostname'], ['app', 'chronyd', $app->app_id]);
 $array = [
-    'stratum'    => ['descr' => 'Stratum'],
+    'stratum' => ['descr' => 'Stratum'],
 ];
 
 $rrd_list = [];

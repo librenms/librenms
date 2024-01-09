@@ -816,6 +816,7 @@ function removeComments(&$output)
                 }
             }
         }
+
         /* transfer the new array back to the original array */
         return $new_array;
     }

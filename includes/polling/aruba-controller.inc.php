@@ -52,7 +52,7 @@ if ($device['type'] == 'wireless' && $device['os'] == 'arubaos') {
         ->addDataset('NUMCLIENTS', 'GAUGE', 0, 12500000000);
 
     $fields = [
-        'NUMAPS'     => $aruba_stats[0]['wlsxSwitchTotalNumAccessPoints'],
+        'NUMAPS' => $aruba_stats[0]['wlsxSwitchTotalNumAccessPoints'],
         'NUMCLIENTS' => $aruba_stats[0]['wlsxSwitchTotalNumStationsAssociated'],
     ];
 
@@ -104,13 +104,13 @@ if ($device['type'] == 'wireless' && $device['os'] == 'arubaos') {
                     ->addDataset('interference', 'GAUGE', 0, 2000);
 
                 $fields = [
-                    'channel'         => $channel,
-                    'txpow'           => $txpow,
-                    'radioutil'       => $radioutil,
-                    'nummonclients'   => $nummonclients,
-                    'nummonbssid'     => $nummonbssid,
-                    'numasoclients'   => $numasoclients,
-                    'interference'    => $interference,
+                    'channel' => $channel,
+                    'txpow' => $txpow,
+                    'radioutil' => $radioutil,
+                    'nummonclients' => $nummonclients,
+                    'nummonbssid' => $nummonbssid,
+                    'numasoclients' => $numasoclients,
+                    'interference' => $interference,
                 ];
 
                 $tags = [
@@ -145,39 +145,39 @@ if ($device['type'] == 'wireless' && $device['os'] == 'arubaos') {
             if ($foundid == 0) {
                 $ap_id = dbInsert(
                     [
-                        'channel'       => $channel,
-                        'deleted'       => 0,
-                        'device_id'     => $device['device_id'],
-                        'interference'  => $interference,
-                        'mac_addr'      => $mac,
-                        'name'          => $name,
-                        'numactbssid'   => $numactbssid,
+                        'channel' => $channel,
+                        'deleted' => 0,
+                        'device_id' => $device['device_id'],
+                        'interference' => $interference,
+                        'mac_addr' => $mac,
+                        'name' => $name,
+                        'numactbssid' => $numactbssid,
                         'numasoclients' => $numasoclients,
-                        'nummonbssid'   => $nummonbssid,
+                        'nummonbssid' => $nummonbssid,
                         'nummonclients' => $nummonclients,
-                        'radio_number'  => $radionum,
-                        'radioutil'     => $radioutil,
-                        'txpow'         => $txpow,
-                        'type'          => $type,
+                        'radio_number' => $radionum,
+                        'radioutil' => $radioutil,
+                        'txpow' => $txpow,
+                        'type' => $type,
                     ],
                     'access_points'
                 );
             } else {
                 dbUpdate(
                     [
-                        'channel'       => $channel,
-                        'deleted'       => 0,
-                        'interference'  => $interference,
-                        'mac_addr'      => $mac,
-                        'name'          => $name,
-                        'numactbssid'   => $numactbssid,
+                        'channel' => $channel,
+                        'deleted' => 0,
+                        'interference' => $interference,
+                        'mac_addr' => $mac,
+                        'name' => $name,
+                        'numactbssid' => $numactbssid,
                         'numasoclients' => $numasoclients,
-                        'nummonbssid'   => $nummonbssid,
+                        'nummonbssid' => $nummonbssid,
                         'nummonclients' => $nummonclients,
-                        'radio_number'  => $radionum,
-                        'radioutil'     => $radioutil,
-                        'txpow'         => $txpow,
-                        'type'          => $type,
+                        'radio_number' => $radionum,
+                        'radioutil' => $radioutil,
+                        'txpow' => $txpow,
+                        'type' => $type,
                     ],
                     'access_points',
                     '`accesspoint_id` = ?',

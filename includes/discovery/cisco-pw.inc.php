@@ -36,15 +36,15 @@ if (Config::get('enable_pseudowires') && $device['os_group'] == 'cisco') {
         } else {
             $pseudowire_id = dbInsert(
                 [
-                    'device_id'      => $device['device_id'],
-                    'port_id'        => $if_id,
+                    'device_id' => $device['device_id'],
+                    'port_id' => $if_id,
                     'peer_device_id' => $cpw_remote_device,
-                    'peer_ldp_id'    => $cpw_remote_id,
-                    'cpwVcID'        => $pw['cpwVcID'],
-                    'cpwOid'         => $pw_id,
-                    'pw_type'        => $pw['cpwVcType'],
-                    'pw_descr'       => $pw['cpwVcDescr'],
-                    'pw_psntype'     => $pw['cpwVcPsnType'],
+                    'peer_ldp_id' => $cpw_remote_id,
+                    'cpwVcID' => $pw['cpwVcID'],
+                    'cpwOid' => $pw_id,
+                    'pw_type' => $pw['cpwVcType'],
+                    'pw_descr' => $pw['cpwVcDescr'],
+                    'pw_psntype' => $pw['cpwVcPsnType'],
                 ],
                 'pseudowires'
             );
