@@ -554,7 +554,7 @@ class IRCBot
         }
 
         if ($this->ssl && $this->config['irc_disable_ssl_check']) {
-            $ssl_context_params = ['ssl'=>['allow_self_signed'=> true, 'verify_peer' => false, 'verify_peer_name' => false]];
+            $ssl_context_params = ['ssl' => ['allow_self_signed' => true, 'verify_peer' => false, 'verify_peer_name' => false]];
             $ssl_context = stream_context_create($ssl_context_params);
             $this->socket['irc'] = stream_socket_client($server . ':' . $this->port, $errno, $errstr, 30, STREAM_CLIENT_CONNECT, $ssl_context);
         } else {
@@ -1058,21 +1058,21 @@ class IRCBot
         $string = preg_replace('#</u>#i', chr(31), $string);
 
         $colors = [
-            'white'     => '00',
-            'black'     => '01',
-            'blue'      => '02',
-            'green'     => '03',
-            'red'       => '04',
-            'brown'     => '05',
-            'purple'    => '06',
-            'orange'    => '07',
-            'yellow'    => '08',
+            'white' => '00',
+            'black' => '01',
+            'blue' => '02',
+            'green' => '03',
+            'red' => '04',
+            'brown' => '05',
+            'purple' => '06',
+            'orange' => '07',
+            'yellow' => '08',
             'lightgreen' => '09',
-            'cyan'      => '10',
+            'cyan' => '10',
             'lightcyan' => '11',
             'lightblue' => '12',
-            'pink'      => '13',
-            'grey'      => '14',
+            'pink' => '13',
+            'grey' => '14',
             'lightgrey' => '15',
         ];
 

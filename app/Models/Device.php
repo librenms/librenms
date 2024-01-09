@@ -466,6 +466,7 @@ class Device extends BaseModel
         if (empty($ip)) {
             return null;
         }
+
         // @ suppresses warning, inet_ntop() returns false if it fails
         return @inet_ntop($ip) ?: null;
     }

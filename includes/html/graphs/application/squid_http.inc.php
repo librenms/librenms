@@ -17,21 +17,21 @@ if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list = [
         [
             'filename' => $rrd_filename,
-            'descr'    => 'requests',
-            'ds'       => 'protoclienthttpreq',
-            'colour'   => '582a72',
+            'descr' => 'requests',
+            'ds' => 'protoclienthttpreq',
+            'colour' => '582a72',
         ],
         [
             'filename' => $rrd_filename,
-            'descr'    => 'hits',
-            'ds'       => 'httphits',
-            'colour'   => '28774f',
+            'descr' => 'hits',
+            'ds' => 'httphits',
+            'colour' => '28774f',
         ],
         [
             'filename' => $rrd_filename,
-            'descr'    => 'errs to clnt',
-            'ds'       => 'httperrors',
-            'colour'   => '28536c',
+            'descr' => 'errs to clnt',
+            'ds' => 'httperrors',
+            'colour' => '28536c',
         ],
     ];
 } else {

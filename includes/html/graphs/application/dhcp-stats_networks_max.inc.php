@@ -27,8 +27,8 @@ while (isset($arrays[$int])) {
         [$net, $subnet] = explode('_', str_replace($category . '-', '', $array));
         $rrd_list[] = [
             'filename' => $rrd_filename,
-            'descr'    => $net . '/' . $subnet,
-            'ds'       => $rrdVar,
+            'descr' => $net . '/' . $subnet,
+            'ds' => $rrdVar,
         ];
     }
     $int++;
