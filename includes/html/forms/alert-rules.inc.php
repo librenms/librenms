@@ -58,7 +58,7 @@ $mute = isset($_POST['mute']) ? $_POST['mute'] : null;
 $invert = isset($_POST['invert']) ? $_POST['invert'] : null;
 $name = strip_tags($_POST['name']);
 $proc = $_POST['proc'];
-$notes = $_POST['notes'];
+$notes = strip_tags($_POST['notes']);
 $recovery = $vars['recovery'];
 $acknowledgement = $vars['acknowledgement'];
 $invert_map = isset($_POST['invert_map']) ? $_POST['invert_map'] : null;
@@ -71,26 +71,13 @@ if (! is_numeric($count)) {
 $delay_sec = convert_delay($delay);
 $interval_sec = convert_delay($interval);
 
-if ($mute == 'on') {
-    $mute = true;
-} else {
-    $mute = false;
-}
-
-if ($invert == 'on') {
-    $invert = true;
-} else {
-    $invert = false;
-}
+$mute = ($mute == 'on');
+$invert = ($invert == 'on');
 
 $recovery = empty($recovery) ? $recovery = false : true;
 $acknowledgement = empty($acknowledgement) ? $acknowledgement = false : true;
 
-if ($invert_map == 'on') {
-    $invert_map = true;
-} else {
-    $invert_map = false;
-}
+$invert_map = ($invert_map == 'on');
 
 $extra = [
     'mute'            => $mute,
