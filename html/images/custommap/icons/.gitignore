@@ -1,0 +1,11 @@
+# Ignore everything in this directory
+*
+# Except this file and all included images
+!.gitignore
+!adc.svg
+!firewall.svg
+!gtm.svg
+!router-square.svg
+!router.svg
+!switch-l2.svg
+!switch-l3.svg
