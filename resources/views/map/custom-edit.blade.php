@@ -36,6 +36,17 @@
                   <button type=button class="btn btn-primary" value="save" id="deviceclear" onclick="nodeDeviceClear();">Clear</button>
                 </div>
               </div>
+              <div class="form-group row single-node" id="nodeMapLinkRow">
+                <label for="maplink" class="col-sm-3 control-label">Link to Map</label>
+                <div class="col-sm-9">
+                  <select name="maplink" id="maplink" class="form-control" onchange="nodeMapLinkChange();">
+                    <option value="" style="color:#999;">Select Map...</option>
+@foreach($maps as $map)
+                    <option value="{{$map->custom_map_id}}">{{$map->name}}</option>
+@endforeach
+                  </select>
+                </div>
+              </div>
               <div class="form-group row">
                 <label for="nodestyle" class="col-sm-3 control-label">Style</label>
                 <div class="col-sm-9">
@@ -760,6 +771,7 @@
         $("#nodelabel").val(name.split(".")[0].split(" ")[0]);
         $("#device_image").val(e.params.data.icon);
         $("#nodeDeviceSearchRow").hide();
+        $("#nodeMapLinkRow").hide();
         $("#deviceiconimage").show();
         $("#nodeDeviceRow").show();
     }
@@ -773,12 +785,21 @@
         $("#nodeDeviceRow").hide();
         $("#deviceiconimage").hide();
         $("#nodeDeviceSearchRow").show();
+        $("#nodeMapLinkRow").show();
 
         // Reset device style if we were using the device image
         if(($("#nodestyle").val() == "image" || $("#nodestyle").val() == "circularImage") && !$("#nodeimage").val()){
             $("#nodestyle").val(newnodeconf.shape);
             $("#nodeImageRow").hide();
             setNodeImage();
+        }
+    }
+
+    function nodeMapLinkChange() {
+        if($("#maplink").val()) {
+            $("#nodeDeviceSearchRow").hide();
+        } else {
+            $("#nodeDeviceSearchRow").show();
         }
     }
 
@@ -849,6 +870,7 @@
             $("#device_name").text(node_device_map[data.id].device_name);
             // Hide device selection row
             $("#nodeDeviceSearchRow").hide();
+            $("#nodeMapLinkRow").hide();
             // Show device image as an option
             $("#deviceiconimage").show();
             $("#device_image").val(node_device_map[data.id].device_image);
@@ -861,6 +883,11 @@
             // Hide device image as an option
             $("#deviceiconimage").hide();
             $("#device_image").val("");
+        }
+        if(data.title && data.title.startsWith("map:")) {
+            // Hide device selection row
+            $("#nodeDeviceSearchRow").hide();
+            $("#maplink").val(data.title.replace("map:",""));
         }
         $("#nodelabel").val(data.label);
         $("#nodestyle").val(data.shape);
@@ -919,6 +946,8 @@
 
         if($("#device_id").val()) {
             node.title = $("#device_id").val();
+        } else if($("#maplink").val()) {
+            node.title = "map:" + $("#maplink").val();
         } else {
             node.title = '';
         }
@@ -977,7 +1006,7 @@
         node1 = network_nodes.get(node1_id);
         node2 = network_nodes.get(node2_id);
 
-        if(!node1.title && !node2.title) {
+        if(isNaN(node1.title) && isNaN(node2.title)) {
             // Neither node has a device - clear port config
             $("#port_id").val("");
             $("#edgePortRow").hide();
@@ -1205,6 +1234,8 @@
                     if(node.device_id) {
                         node_device_map[nodeid] = {device_id: node.device_id, device_name: node.device_name, device_image: node.device_image};
                         node_cfg.title = node.device_id;
+                    } else if(node.linked_map_id) {
+                        node_cfg.title = "map:" + node.linked_map_id;
                     } else {
                         node_cfg.title = null;
                     }

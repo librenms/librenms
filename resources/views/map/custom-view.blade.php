@@ -31,6 +31,7 @@
     var network_nodes = new vis.DataSet({queue: {delay: 100}});
     var network_edges = new vis.DataSet({queue: {delay: 100}});
     var node_device_map = {};
+    var node_link_map = {};
     var custom_image_base = "images/custommap/";
 
     function CreateNetwork() {
@@ -55,8 +56,12 @@
         }
 
         network.on('doubleClick', function (properties) {
-            if (properties.nodes > 0 && properties.nodes[0] in node_device_map) {
-                window.location.href = "device/"+node_device_map[properties.nodes[0]].device_id;
+            if (properties.nodes > 0) {
+                if(properties.nodes[0] in node_device_map) {
+                    window.location.href = "device/"+node_device_map[properties.nodes[0]].device_id;
+                } else if (properties.nodes[0] in node_link_map) {
+                    window.location.href = '{{ route('maps.custom.view', ['map_id' => -1]) }}'.replace("-1", node_link_map[properties.nodes[0]]);
+                }
             }
         });
     }
@@ -70,7 +75,12 @@
                     node_cfg.id = nodeid;
                     if(node.device_id) {
                         node_device_map[nodeid] = {device_id: node.device_id, device_name: node.device_name};
+                        delete node_link_map[nodeid];
                         node_cfg.title = node.device_info;
+                    } else if(node.linked_map_name) {
+                        delete node_device_map[nodeid];
+                        node_link_map[nodeid] = node.linked_map_id;
+                        node_cfg.title = "Go to " + node.linked_map_name;
                     } else {
                         node_cfg.title = null;
                     }

@@ -573,6 +573,7 @@ custom_map_nodes:
     - { Field: custom_map_node_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
     - { Field: custom_map_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: device_id, Type: 'int unsigned', 'Null': true, Extra: '' }
+    - { Field: custom_map_link_id, Type: 'int unsigned', 'Null': true, Extra: '' }
     - { Field: label, Type: varchar(50), 'Null': false, Extra: '' }
     - { Field: style, Type: varchar(50), 'Null': false, Extra: '' }
     - { Field: icon, Type: varchar(8), 'Null': true, Extra: '' }
@@ -591,9 +592,11 @@ custom_map_nodes:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [custom_map_node_id], Unique: true, Type: BTREE }
     custom_map_nodes_custom_map_id_index: { Name: custom_map_nodes_custom_map_id_index, Columns: [custom_map_id], Unique: false, Type: BTREE }
+    custom_map_nodes_custom_map_link_id_index: { Name: custom_map_nodes_custom_map_link_id_index, Columns: [custom_map_link_id], Unique: false, Type: BTREE }
     custom_map_nodes_device_id_index: { Name: custom_map_nodes_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
   Constraints:
     custom_map_nodes_custom_map_id_foreign: { name: custom_map_nodes_custom_map_id_foreign, foreign_key: custom_map_id, table: custom_maps, key: custom_map_id, extra: 'ON DELETE CASCADE' }
+    custom_map_nodes_custom_map_link_id_foreign: { name: custom_map_nodes_custom_map_link_id_foreign, foreign_key: custom_map_link_id, table: custom_maps, key: custom_map_id, extra: 'ON DELETE SET NULL' }
     custom_map_nodes_device_id_foreign: { name: custom_map_nodes_device_id_foreign, foreign_key: device_id, table: devices, key: device_id, extra: 'ON DELETE SET NULL' }
 dashboards:
   Columns:

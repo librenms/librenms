@@ -54,6 +54,11 @@ class CustomMapNode extends BaseModel
         return $this->belongsTo(Device::class, 'device_id');
     }
 
+    public function linked_map(): BelongsTo
+    {
+        return $this->belongsTo(CustomMap::class, 'linked_custom_map_id');
+    }
+
     public function edges1(): HasMany
     {
         return $this->hasMany(CustomMapEdge::class, 'custom_map_node_id1');

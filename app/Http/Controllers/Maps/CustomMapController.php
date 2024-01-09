@@ -220,7 +220,7 @@ class CustomMapController extends Controller
     {
         $map = CustomMap::where('custom_map_id', '=', $request->map_id)
             ->hasAccess($request->user())
-            ->with('nodes', 'nodes.device', 'edges', 'edges.port', 'edges.port.device')
+            ->with('nodes', 'nodes.device', 'nodes.linked_map', 'edges', 'edges.port', 'edges.port.device')
             ->first();
 
         if (! $map) {
@@ -315,6 +315,8 @@ class CustomMapController extends Controller
             $nodes[$nodeid] = [
                 'custom_map_node_id' => $node->custom_map_node_id,
                 'device_id' => $node->device_id,
+                'linked_map_id' => $node->linked_custom_map_id,
+                'linked_map_name' => $node->linked_map ? $node->linked_map->name : null,
                 'label' => $node->label,
                 'style' => $node->style,
                 'icon' => $node->icon,
@@ -435,6 +437,7 @@ class CustomMapController extends Controller
             if (! $map) {
                 abort(404);
             }
+            $data['maps'] = CustomMap::orderBy('name')->where('custom_map_id', '<>', $request->map_id)->get(['custom_map_id', 'name']);
             $data['name'] = $map->name;
             $data['node_align'] = $map->node_align;
             $data['newedge_conf'] = json_decode($map->newedgeconfig, true);
@@ -510,7 +513,8 @@ class CustomMapController extends Controller
                             abort(404);
                         }
                     }
-                    $dbnode->device_id = $node->title ? $node->title : null;
+                    $dbnode->device_id = is_numeric($node->title) ? $node->title : null;
+                    $dbnode->linked_custom_map_id = str_starts_with($node->title, "map:") ? str_replace("map:", "", $node->title) : null;
                     $dbnode->label = $node->label;
                     $dbnode->style = $node->shape;
                     $dbnode->icon = $node->icon;
