@@ -62,4 +62,12 @@ WATCHGUARD-INFO-SYSTEM-MIB DEFINITIONS ::= BEGIN
         DESCRIPTION
             "Version and update time of Intrusion Prevention Service"
         ::= {wgInfoSystem 4}
+
+    wgFeaureKeyExpirationInfo OBJECT-TYPE
+        SYNTAX      DateAndTime
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The feature keys expiration day." 
+        ::= {wgInfoSystem 5}
 END
