@@ -99,7 +99,7 @@ if (count($bgpPeersCache) > 0 || count($bgpPeersCache_ietf) == 0) {
                     'bgpPeerOutTotalMessages' => 0,
                     'bgpPeerFsmEstablishedTime' => $value['hwBgpPeerFsmEstablishedTime'],
                     'bgpPeerInUpdateElapsedTime' => 0,
-                    'bgpPeerDescr' => $value['bgpPeerDescr'] ?? '',
+                    'bgpPeerDescr' => $value['bgpPeerDescr'],
                     'astext' => $astext,
                 ];
                 if (empty($vrfId)) {
@@ -117,7 +117,7 @@ if (count($bgpPeersCache) > 0 || count($bgpPeersCache_ietf) == 0) {
                 $peers = [
                     'bgpPeerRemoteAs' => $value['hwBgpPeerRemoteAs'],
                     'astext' => $astext,
-                    'bgpPeerDescr' => $value['bgpPeerDescr'] ?? '',
+                    'bgpPeerDescr' => $value['bgpPeerDescr'],
                 ];
                 $affected = DeviceCache::getPrimary()->bgppeers()->where('bgpPeerIdentifier', $address)->where('vrf_id', $vrfId)->update($peers);
                 $seenPeerID[] = DeviceCache::getPrimary()->bgppeers()->where('bgpPeerIdentifier', $address)->where('vrf_id', $vrfId)->select('bgpPeer_id')->orderBy('bgpPeer_id', 'ASC')->first()->bgpPeer_id;
