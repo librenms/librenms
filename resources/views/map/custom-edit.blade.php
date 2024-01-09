@@ -64,6 +64,7 @@
                 <div class="col-sm-6">
                   <select id="nodeimage" class="form-control input-sm" onchange="setNodeImage();">
                     <option value="" id="deviceiconimage">Device Image</option>
+{{-- TODO: Make the list below dynamic from the html/images/custommap/icons and html/images/custommap/icons-custom directories --}}
                     <option value="icons/adc.svg">Application Delivery Controller</option>
                     <option value="icons/firewall.svg">Firewall</option>
                     <option value="icons/gtm.svg">Global Traffic Manager</option>
@@ -88,6 +89,10 @@
                     <option value="f0c2">Cloud</option>
                     <option value="f0ac">Globe</option>
                     <option value="f519">Tower</option>
+                    <option value="f061">Arrow - Right</option>
+                    <option value="f060">Arrow - Left</option>
+                    <option value="f062">Arrow - Up</option>
+                    <option value="f063">Arrow - Down</option>
                   </select>
                 </div>
                 <div class="col-sm-3">
