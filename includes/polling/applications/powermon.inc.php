@@ -40,9 +40,9 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('rate', 'GAUGE', 0);
 
 $fields = [
-    'watts-gauge'       => $result['data']['reading'],
-    'watts-abs'         => $result['data']['reading'],
-    'rate'              => $result['data']['supply']['rate'],
+    'watts-gauge' => $result['data']['reading'],
+    'watts-abs' => $result['data']['reading'],
+    'rate' => $result['data']['supply']['rate'],
 ];
 
 /*

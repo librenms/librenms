@@ -206,7 +206,7 @@ if ($device['os_group'] == 'cisco') {
                                 [, $tmp_ifindex] = explode('.', $entAliasMappingIdentifier);
                             }
                             break;
-                            //or sensor entity has a parent entity with module class and entPhysicalName set to an existing ifName.
+                        //or sensor entity has a parent entity with module class and entPhysicalName set to an existing ifName.
                         } elseif ($entPhysicalClass === 'module' && array_key_exists($entPhysicalName, $port_reverse_array)) {
                             $tmp_ifindex = $port_reverse_array[$entPhysicalName]['ifIndex'];
                             break;

@@ -77,9 +77,9 @@ foreach (DeviceCache::getPrimary()->getVrfContexts() as $context_name) {
             } elseif (isset($interface['port_id'])) {
                 d_echo("$raw_mac => $ip\n", '+');
                 $insert_data[] = [
-                    'port_id'      => $port_id,
-                    'device_id'    => $device['device_id'],
-                    'mac_address'  => $mac,
+                    'port_id' => $port_id,
+                    'device_id' => $device['device_id'],
+                    'mac_address' => $mac,
                     'ipv4_address' => $ip,
                     'context_name' => (string) $context_name,
                 ];

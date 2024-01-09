@@ -26,8 +26,8 @@ while (isset($arrays[$int])) {
     if (Rrd::checkRrdExists($rrd_filename)) {
         $rrd_list[] = [
             'filename' => $rrd_filename,
-            'descr'    => str_replace($category . '-', '', $array),
-            'ds'       => $rrdVar,
+            'descr' => str_replace($category . '-', '', $array),
+            'ds' => $rrdVar,
         ];
     }
 

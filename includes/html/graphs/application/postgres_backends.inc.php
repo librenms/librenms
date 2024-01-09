@@ -24,9 +24,9 @@ if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list = [
         [
             'filename' => $rrd_filename,
-            'descr'    => 'Backends',
-            'ds'       => 'backends',
-            'colour'   => '582A72',
+            'descr' => 'Backends',
+            'ds' => 'backends',
+            'colour' => '582A72',
         ],
     ];
 } else {

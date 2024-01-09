@@ -430,7 +430,7 @@ foreach ($rule_list as $rule) {
 <?php
 // Pagination
 
-if (($count % $results) > 0) {
+if ($count > $results) {
     echo '<div class="table-responsive">';
     echo '<div class="col pull-left">';
     echo generate_pagination($count, $results, $page_number);

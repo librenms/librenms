@@ -97,6 +97,22 @@ modules:
                     num_oid: '.1.3.6.1.4.1.20916.1.8.1.4.{{ $index }}'
                     value: value
                     descr: WiSH {{ $id }} Internal
+                
+                - # RoomAlert 32S internal temp
+                    oid: .1.3.6.1.4.1.20916.1.11.1.1.1.2.0
+                    num_oid: '.1.3.6.1.4.1.20916.1.11.1.1.1.2.{{ $index }}'
+                    index: 0
+                    descr: Internal Temperature
+                - # RoomAlert 32S internal heat
+                    oid: .1.3.6.1.4.1.20916.1.11.1.1.4.2.0
+                    num_oid: '.1.3.6.1.4.1.20916.1.11.1.1.4.2.{{ $index }}'
+                    index: 1
+                    descr: Internal Heat Index
+                - # RoomAlert 32S ext temp
+                    oid: ra32s-ext-temp
+                    num_oid: '.1.3.6.1.4.1.20916.1.11.1.2.{{ $index }}'
+                    value: value
+                    descr: Sensor {{ $id }}
 
                 - # TemPageR 3E internal
                     oid: .1.3.6.1.4.1.20916.1.7.1.1.1.1.0
@@ -151,6 +167,11 @@ modules:
                     num_oid: '.1.3.6.1.4.1.20916.1.8.1.1.2.1.{{ $index }}'
                     index: 0
                     descr: Internal Humidity
+                - # RoomAlert 32S
+                    oid: .1.3.6.1.4.1.20916.1.11.1.1.2.1.0
+                    num_oid: '.1.3.6.1.4.1.20916.1.11.1.1.2.1.{{ $index }}'
+                    index: 0
+                    descr: Internal Humidity
                 - # RoomAlert 12E sen1
                     oid: .1.3.6.1.4.1.20916.1.10.1.2.3.0
                     num_oid: '.1.3.6.1.4.1.20916.1.10.1.2.3.{{ $index }}'
@@ -171,6 +192,13 @@ modules:
                 - # RoomAlert 32E/W analog
                     oid: ra32-analog
                     num_oid: '.1.3.6.1.4.1.20916.1.8.1.1.5.{{ $index }}'
+                    value: value
+                    low_limit: 0
+                    high_limit: 5
+                    descr: Analog {{ $id }}
+                - # RoomAlert 32S analog
+                    oid: ra32s-analog
+                    num_oid: '.1.3.6.1.4.1.20916.1.11.1.1.5.{{ $index }}'
                     value: value
                     low_limit: 0
                     high_limit: 5
@@ -258,6 +286,34 @@ modules:
                     oid: ra32-switch
                     value: value
                     num_oid: '.1.3.6.1.4.1.20916.1.8.1.3.{{ $index }}'
+                    descr: Switch {{ $id }}
+                    state_name: switch
+                    states:
+                        - { value: 0, generic: -1, graph: 1, descr: Off }
+                        - { value: 1, generic: 0, graph: 1, descr: On }
+
+                - # RoomAlert 32S power
+                    oid: .1.3.6.1.4.1.20916.1.11.1.1.3.1.0
+                    num_oid: '.1.3.6.1.4.1.20916.1.11.1.1.3.1.{{ $index }}'
+                    index: 0
+                    descr: Power Source
+                    state_name: power
+                    states:
+                        - { value: 0, generic: 1, graph: 1, descr: Battery }
+                        - { value: 1, generic: 0, graph: 1, descr: AC }
+                - # RoomAlert 32S relays
+                    oid: ra32s-relay
+                    value: value
+                    num_oid: '.1.3.6.1.4.1.20916.1.11.1.1.6.{{ $index }}'
+                    descr: Relay {{ $id }}
+                    state_name: relay
+                    states:
+                        - { value: 0, generic: 0, graph: 1, descr: Open }
+                        - { value: 1, generic: 0, graph: 1, descr: Closed }
+                - # RoomAlert 32S switches
+                    oid: ra32s-switch
+                    value: value
+                    num_oid: '.1.3.6.1.4.1.20916.1.11.1.3.{{ $index }}'
                     descr: Switch {{ $id }}
                     state_name: switch
                     states:

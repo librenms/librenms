@@ -21,12 +21,12 @@ if ($phasecount > 1) {
     $oid_array = [
         [
             'HighPrecOid' => 'upsHighPrecOutputLoad',
-            'AdvOid'      => 'upsAdvOutputLoad',
-            'type'        => 'apc',
-            'index'       => 0,
-            'descr'       => 'Load(VA)',
-            'divisor'     => 10,
-            'mib'         => '+PowerNet-MIB',
+            'AdvOid' => 'upsAdvOutputLoad',
+            'type' => 'apc',
+            'index' => 0,
+            'descr' => 'Load(VA)',
+            'divisor' => 10,
+            'mib' => '+PowerNet-MIB',
         ],
     ];
     foreach ($oid_array as $item) {
