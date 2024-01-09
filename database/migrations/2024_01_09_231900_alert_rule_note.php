@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('alert_rules', function (Blueprint $table) {
-            $table->text('notes')->default('');
+            $table->text('notes')->default(null);
         });
     }
 
