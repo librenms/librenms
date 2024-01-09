@@ -8,6 +8,8 @@ use LibreNMS\Util\Http;
 
 class Jiraservicemanagement extends Transport
 {
+    protected string $name = 'Jira Service Management';
+
     public function deliverAlert(array $alert_data): bool
     {
         $url = $this->config['jsm-url'];
