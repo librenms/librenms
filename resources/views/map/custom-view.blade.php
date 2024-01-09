@@ -30,6 +30,7 @@
     var network_width;
     var network_nodes = new vis.DataSet({queue: {delay: 100}});
     var network_edges = new vis.DataSet({queue: {delay: 100}});
+    var edge_port_map = {};
     var node_device_map = {};
     var node_link_map = {};
     var custom_image_base = "images/custommap/";
@@ -56,12 +57,21 @@
         }
 
         network.on('doubleClick', function (properties) {
-            if (properties.nodes > 0) {
+            edge_id = null;
+            if (properties.nodes.length > 0) {
                 if(properties.nodes[0] in node_device_map) {
                     window.location.href = "device/"+node_device_map[properties.nodes[0]].device_id;
                 } else if (properties.nodes[0] in node_link_map) {
                     window.location.href = '{{ route('maps.custom.view', ['map_id' => -1]) }}'.replace("-1", node_link_map[properties.nodes[0]]);
+                } else if (properties.nodes[0].endsWith('_mid')) {
+                    edge_id = properties.nodes[0].split("_")[0];
                 }
+            } else if (properties.edges.length > 0) {
+                edge_id = properties.edges[0].split("_")[0];
+            }
+
+            if (edge_id && (edge_id in edge_port_map)) {
+               window.location.href = 'device/device=' + edge_port_map[edge_id].device_id + '/tab=port/port=' + edge_port_map[edge_id].port_id + '/';
             }
         });
     }
@@ -144,6 +154,10 @@
                         edge1.width = edge.width_from;
                         edge2.color = {color: edge.colour_to};
                         edge2.width = edge.width_to;
+
+                        edge_port_map[edgeid] = {device_id: edge.device_id, port_id: edge.port_id};
+                    } else {
+                        delete edge_port_map[edgeid];
                     }
                     if (network_nodes.get(mid.id)) {
                         network_nodes.update(mid);

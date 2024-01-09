@@ -246,6 +246,7 @@ class CustomMapController extends Controller
                 'mid_y' => $edge->mid_y,
             ];
             if ($edge->port) {
+                $edges[$edgeid]['device_id'] = $edge->port->device_id;
                 $edges[$edgeid]['port_name'] = $edge->port->device->displayName() . ' - ' . $edge->port->getLabel();
                 $edges[$edgeid]['port_info'] = Url::portLink($edge->port, null, null, false, true);
 
