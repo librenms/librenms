@@ -2607,6 +2607,8 @@ pkg install p5-JSON p5-MIME-Base64 smartmontools
 # Debian
 apt-get install cpanminus smartmontools
 cpanm MIME::Base64 JSON
+# CentOS
+dnf install smartmontools perl-JSON perl-MIME-Base64
 ```
 
 3. Make the script executable
