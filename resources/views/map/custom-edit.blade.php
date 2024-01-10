@@ -967,7 +967,7 @@
             node.image = {};
         }
         if(node.shape == "icon") {
-            node.icon = {face: 'FontAwesome', code: String.fromCharCode(parseInt($("#nodeicon").val(), 16)), size: $("#nodesize").val(), color: node.color.border}; 
+            node.icon = {face: 'FontAwesome', code: String.fromCharCode(parseInt($("#nodeicon").val(), 16)), size: $("#nodesize").val(), color: node.color.border};
         } else {
             node.icon = {};
         }
@@ -1161,7 +1161,7 @@
                 var pos = network.getPositions([edgedata.edge1.from, edgedata.edge2.from]);
                 var mid_x = (pos[edgedata.edge1.from].x + pos[edgedata.edge2.from].x) >> 1;
                 var mid_y = (pos[edgedata.edge1.from].y + pos[edgedata.edge2.from].y) >> 1;
- 
+
                 edgedata.mid.x = mid_x;
                 edgedata.mid.y = mid_y;
                 network_nodes.update([edgedata.mid]);
@@ -1244,7 +1244,7 @@
                     node_cfg.size = node.size;
                     node_cfg.color = {background: node.colour_bg, border: node.colour_bdr};
                     if(node.style == "icon") {
-                        node_cfg.icon = {face: 'FontAwesome', code: String.fromCharCode(parseInt(node.icon, 16)), size: node.size, color: node.colour_bdr}; 
+                        node_cfg.icon = {face: 'FontAwesome', code: String.fromCharCode(parseInt(node.icon, 16)), size: node.size, color: node.colour_bdr};
                     } else {
                         node_cfg.icon = {};
                     }
