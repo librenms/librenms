@@ -3,375 +3,11 @@
 @section('title', __('map.custom.title.edit'))
 
 @section('content')
-<div class="modal fade" id="nodeModal" tabindex="-1" role="dialog" aria-labelledby="nodeModalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="nodeModalLabel">{{ __('map.custom.edit.node.new') }}</h5>
-      </div>
-      <div class="modal-body">
-        <div class="row">
-          <div class="col-md-12">
-            <div class="well well-lg">
-              <div class="form-group row single-node" id="nodeDeviceLabelRow">
-                <label for="nodelabel" class="col-sm-3 control-label">{{ __('map.custom.edit.node.label') }}</label>
-                <div class="col-sm-9">
-                  <input type=text id="nodelabel" class="form-control input-sm" value="Node Name" />
-                </div>
-              </div>
-              <div class="form-group row single-node" id="nodeDeviceSearchRow">
-                <label for="devicesearch" class="col-sm-3 control-label">{{ __('map.custom.edit.node.device_select') }}</label>
-                <div class="col-sm-9">
-                  <select name="devicesearch" id="devicesearch" class="form-control"></select>
-                </div>
-              </div>
-              <div class="form-group row single-node" id="nodeDeviceRow" style="display:none">
-                <label for="deviceclear" class="col-sm-3 control-label">{{ __('Device') }}</label>
-                <div class="col-sm-7">
-                  <div id="device_name">
-                  </div>
-                  <input type="hidden" id="device_id">
-                </div>
-                <div class="col-sm-2">
-                  <button type=button class="btn btn-primary" value="save" id="deviceclear" onclick="nodeDeviceClear();">{{ __('Clear') }}</button>
-                </div>
-              </div>
-              <div class="form-group row single-node" id="nodeMapLinkRow">
-                <label for="maplink" class="col-sm-3 control-label">{{ __('map.custom.edit.node.map_link') }}</label>
-                <div class="col-sm-9">
-                  <select name="maplink" id="maplink" class="form-control" onchange="nodeMapLinkChange();">
-                    <option value="" style="color:#999;">{{ __('map.custom.edit.node.map_select') }}</option>
-@foreach($maps as $map)
-                    <option value="{{$map->custom_map_id}}">{{$map->name}}</option>
-@endforeach
-                  </select>
-                </div>
-              </div>
-              <div class="form-group row">
-                <label for="nodestyle" class="col-sm-3 control-label">{{ __('map.custom.edit.node.style') }}</label>
-                <div class="col-sm-9">
-                  <select id="nodestyle" class="form-control input-sm" onchange="nodeStyleChange();">
-                    <option value="box">{{ __('map.custom.edit.node.style_options.box') }}</option>
-                    <option value="circle">{{ __('map.custom.edit.node.style_options.circle') }}</option>
-                    <option value="database">{{ __('map.custom.edit.node.style_options.database') }}</option>
-                    <option value="ellipse">{{ __('map.custom.edit.node.style_options.ellipse') }}</option>
-                    <option value="text">{{ __('map.custom.edit.node.style_options.text') }}</option>
-                    <option value="image">{{ __('map.custom.edit.node.style_options.device_image') }}</option>
-                    <option value="circularImage">{{ __('map.custom.edit.node.style_options.device_image_circle') }}</option>
-                    <option value="diamond">{{ __('map.custom.edit.node.style_options.diamond') }}</option>
-                    <option value="dot">{{ __('map.custom.edit.node.style_options.dot') }}</option>
-                    <option value="star">{{ __('map.custom.edit.node.style_options.star') }}</option>
-                    <option value="triangle">{{ __('map.custom.edit.node.style_options.triangle') }}</option>
-                    <option value="triangleDown">{{ __('map.custom.edit.node.style_options.triangle_inverted') }}</option>
-                    <option value="hexagon">{{ __('map.custom.edit.node.style_options.hexagon') }}</option>
-                    <option value="square">{{ __('map.custom.edit.node.style_options.square') }}</option>
-                    <option value="icon">{{ __('map.custom.edit.node.style_options.icon') }}</option>
-                  </select>
-                  <input type="hidden" id="device_image">
-                </div>
-              </div>
-              <div class="form-group row" id="nodeImageRow">
-                <label for="nodeimage" class="col-sm-3 control-label">{{ __('map.custom.edit.node.image') }}</label>
-                <div class="col-sm-6">
-                  <select id="nodeimage" class="form-control input-sm" onchange="setNodeImage();">
-                    <option value="" id="deviceiconimage">{{ __('map.custom.edit.node.style_options.device_image') }}</option>
-@foreach($images as $imgfile => $imglabel)
-                    <option value="{{$imgfile}}">{{$imglabel}}</option>
-@endforeach
-                  </select>
-                </div>
-                <div class="col-sm-3">
-                    <img id="nodeimagepreview" width=28 height=28>
-                </div>
-              </div>
-              <div class="form-group row" id="nodeIconRow">
-                <label for="nodeicon" class="col-sm-3 control-label">{{ __('map.custom.edit.node.icon') }}</label>
-                <div class="col-sm-6">
-                  <select id="nodeicon" class="form-control input-sm" onchange="setNodeIcon();">
-                    <option value="f233">{{ __('map.custom.edit.node.icon_options.server')  }}</option>
-                    <option value="f390">{{ __('map.custom.edit.node.icon_options.desktop')  }}</option>
-                    <option value="f7c0">{{ __('map.custom.edit.node.icon_options.dish')  }}</option>
-                    <option value="f7bf">{{ __('map.custom.edit.node.icon_options.satellite')  }}</option>
-                    <option value="f1eb">{{ __('map.custom.edit.node.icon_options.wifi')  }}</option>
-                    <option value="f0c2">{{ __('map.custom.edit.node.icon_options.cloud')  }}</option>
-                    <option value="f0ac">{{ __('map.custom.edit.node.icon_options.globe')  }}</option>
-                    <option value="f519">{{ __('map.custom.edit.node.icon_options.tower')  }}</option>
-                    <option value="f061">{{ __('map.custom.edit.node.icon_options.arrow_right')  }}</option>
-                    <option value="f060">{{ __('map.custom.edit.node.icon_options.arrow_left')  }}</option>
-                    <option value="f062">{{ __('map.custom.edit.node.icon_options.arrow_up')  }}</option>
-                    <option value="f063">{{ __('map.custom.edit.node.icon_options.arrow_down')  }}</option>
-                  </select>
-                </div>
-                <div class="col-sm-3">
-                    <i class="fa" id="nodeiconpreview">&#xf233</i>
-                </div>
-              </div>
-              <div class="form-group row">
-                <label for="nodesize" class="col-sm-3 control-label">{{ __('map.custom.edit.node.size') }}</label>
-                <div class="col-sm-9">
-                  <input type=number id="nodesize" class="form-control input-sm" value=50 />
-                </div>
-              </div>
-              <div class="form-group row">
-                <label for="nodetextface" class="col-sm-3 control-label">{{ __('map.custom.edit.text_font') }}</label>
-                <div class="col-sm-9">
-                  <input type=text id="nodetextface" class="form-control input-sm" value="arial" />
-                </div>
-              </div>
-              <div class="form-group row">
-                <label for="nodetextsize" class="col-sm-3 control-label">{{ __('map.custom.edit.text_size') }}</label>
-                <div class="col-sm-9">
-                  <input type=number id="nodetextsize" class="form-control input-sm" value=14 />
-                </div>
-              </div>
-              <div class="form-group row">
-                <label for="nodetextcolour" class="col-sm-3 control-label">{{ __('map.custom.edit.text_color') }}</label>
-                <div class="col-sm-2">
-                  <input type=color id="nodetextcolour" class="form-control input-sm" value="#343434" onchange="$('#nodecolourtextreset').removeAttr('disabled');" />
-                </div>
-                <div class="col-sm-5">
-                </div>
-                <div class="col-sm-2">
-                  <button type=button class="btn btn-primary" value="reset" id="nodecolourtextreset" onclick="$('#nodetextcolour').val(newnodeconf.font.color); $(this).attr('disabled','disabled');">{{ __('Reset') }}</button>
-                </div>
-              </div>
-              <div class="form-group row" id="nodeColourBgRow">
-                <label for="nodecolourbg" class="col-sm-3 control-label">{{ __('map.custom.edit.node.bg_color') }}</label>
-                <div class="col-sm-2">
-                  <input type=color id="nodecolourbg" class="form-control input-sm" value="#343434" onchange="$('#nodecolourbgreset').removeAttr('disabled');" />
-                </div>
-                <div class="col-sm-5">
-                </div>
-                <div class="col-sm-2">
-                  <button type=button class="btn btn-primary" value="reset" id="nodecolourbgreset" onclick="$('#nodecolourbg').val(newnodeconf.color.background); $(this).attr('disabled','disabled');">{{ __('Reset') }}</button>
-                </div>
-              </div>
-              <div class="form-group row" id="nodeColourBdrRow">
-                <label for="nodecolourbdr" class="col-sm-3 control-label">{{ __('map.custom.edit.node.border_color') }}</label>
-                <div class="col-sm-2">
-                  <input type=color id="nodecolourbdr" class="form-control input-sm" value="#343434" onchange="$('#nodecolourbdrreset').removeAttr('disabled');" />
-                </div>
-                <div class="col-sm-5">
-                </div>
-                <div class="col-sm-2">
-                  <button type=button class="btn btn-primary" value="reset" id="nodecolourbdrreset" onclick="$('#nodecolourbdr').val(newnodeconf.color.border); $(this).attr('disabled','disabled');">{{ __('Reset') }}</button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <center>
-          <button type=button class="btn btn-primary" value="savedefaults" id="node-saveDefaultsButton" data-dismiss="modal" style="display:none" onclick="editNodeDefaultsSave();">{{ __('map.custom.edit.defaults') }}</button>
-          <button type=button class="btn btn-primary" value="save" id="node-saveButton" data-dismiss="modal">{{ __('Save') }}</button>
-          <button type=button class="btn btn-primary" value="cancel" id="node-cancelButton" data-dismiss="modal" onclick="editNodeCancel();">{{ __('Cancel') }}</button>
-        </center>
-      </div>
-    </div>
-  </div>
-</div>
 
-<div class="modal fade" id="edgeModal" tabindex="-1" role="dialog" aria-labelledby="edgeModalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="edgeModalLabel">{{ __('map.custom.edit.edge.new') }}</h5>
-      </div>
-      <div class="modal-body">
-        <div class="row">
-          <div class="col-md-12">
-            <div class="well well-lg">
-              <div class="form-group row" id="divEdgeFrom">
-                <label for="edgefrom" class="col-sm-3 control-label">{{ __('map.custom.edit.edge.from') }}</label>
-                <div class="col-sm-9">
-                  <select id="edgefrom" class="form-control input-sm">
-                  </select>
-                </div>
-              </div>
-              <div class="form-group row" id="divEdgeTo">
-                <label for="edgeto" class="col-sm-3 control-label">{{ __('map.custom.edit.edge.to') }}</label>
-                <div class="col-sm-9">
-                  <select id="edgeto" class="form-control input-sm">
-                  </select>
-                </div>
-              </div>
-              <div class="form-group row single-node" id="edgePortSearchRow" style="display:none">
-                <label for="portsearch" class="col-sm-3 control-label">{{ __('map.custom.edit.edge.port_select') }}</label>
-                <div class="col-sm-9">
-                  <select name="portsearch" id="portsearch" class="form-control"></select>
-                </div>
-              </div>
-              <div class="form-group row" id="edgePortRow" style="display:none">
-                <label for="portclear" class="col-sm-3 control-label">{{ __('Port') }}</label>
-                <div class="col-sm-7">
-                  <div id="port_name">
-                  </div>
-                  <input type="hidden" id="port_id">
-                </div>
-                <div class="col-sm-2">
-                  <button type=button class="btn btn-primary" value="save" id="portclear" onclick="edgePortClear();">{{ __('Clear') }}</button>
-                </div>
-              </div>
-              <div class="form-group row" id="edgePortReverseRow" style="display:none">
-                <label for="portreverse" class="col-sm-3 control-label">{{ __('map.custom.edit.edge.reverse') }}</label>
-                <div class="col-sm-9">
-                  <input class="form-check-input" type="checkbox" role="switch" id="portreverse">
-                </div>
-              </div>
-              <div class="form-group row">
-                <label for="edgestyle" class="col-sm-3 control-label">{{ __('map.custom.edit.edge.style') }}</label>
-                <div class="col-sm-9">
-                  <select id="edgestyle" class="form-control input-sm">
-                    <option value="dynamic">{{ __('map.custom.edit.edge.style_options.dynamic') }}</option>
-                    <option value="continuous">{{ __('map.custom.edit.edge.style_options.continuous') }}</option>
-                    <option value="discrete">{{ __('map.custom.edit.edge.style_options.discrete') }}</option>
-                    <option value="diagonalCross">{{ __('map.custom.edit.edge.style_options.diagonalCross') }}</option>
-                    <option value="straightCross">{{ __('map.custom.edit.edge.style_options.straightCross') }}</option>
-                    <option value="horizontal">{{ __('map.custom.edit.edge.style_options.horizontal') }}</option>
-                    <option value="vertical">{{ __('map.custom.edit.edge.style_options.vertical') }}</option>
-                    <option value="curvedCW">{{ __('map.custom.edit.edge.style_options.curvedCW') }}</option>
-                    <option value="curvedCCW">{{ __('map.custom.edit.edge.style_options.curvedCCW') }}</option>
-                    <option value="cubicBezier">{{ __('map.custom.edit.edge.style_options.cubicBezier') }}</option>
-                  </select>
-                </div>
-              </div>
-              <div class="form-group row">
-                <label for="edgetextshow" class="col-sm-3 control-label">{{ __('map.custom.edit.edge.show_usage_percent') }}</label>
-                <div class="col-sm-9">
-                  <input class="form-check-input" type="checkbox" role="switch" id="edgetextshow">
-                </div>
-              </div>
-              <div class="form-group row">
-                <label for="edgetextface" class="col-sm-3 control-label">{{ __('map.custom.edit.text_font') }}</label>
-                <div class="col-sm-9">
-                  <input type=text id="edgetextface" class="form-control input-sm" value="arial" />
-                </div>
-              </div>
-              <div class="form-group row">
-                <label for="edgetextsize" class="col-sm-3 control-label">{{ __('map.custom.edit.text_size') }}</label>
-                <div class="col-sm-9">
-                  <input type=number id="edgetextsize" class="form-control input-sm" value=14 />
-                </div>
-              </div>
-              <div class="form-group row">
-                <label for="edgetextcolour" class="col-sm-3 control-label">{{ __('map.custom.edit.text_color') }}</label>
-                <div class="col-sm-2">
-                  <input type=color id="edgetextcolour" class="form-control input-sm" value="#343434" onchange="$('#edgecolourtextreset').removeAttr('disabled');" />
-                </div>
-                <div class="col-sm-5">
-                </div>
-                <div class="col-sm-2">
-                  <button type=button class="btn btn-primary" value="reset" id="edgecolourtextreset" onclick="$('#edgetextcolour').val(newedgeconf.font.color); $(this).attr('disabled','disabled');">{{ __('Reset') }}</button>
-                </div>
-              </div>
-              <div class="form-group row" id="edgeRecenterRow">
-                <label for="edgerecenter" class="col-sm-3 control-label">{{ __('map.custom.edit.edge.recenter') }}</label>
-                <div class="col-sm-9">
-                  <input type=checkbox class="form-check-input" value="recenter" id="edgerecenter">
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-sm-12" id="saveedge-alert">
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <center>
-          <button type=button class="btn btn-primary" value="savedefaults" id="edge-saveDefaultsButton" data-dismiss="modal" style="display:none" onclick="editEdgeDefaultsSave();">{{ __('map.custom.edit.defaults') }}</button>
-          <button type=button class="btn btn-primary" value="save" id="edge-saveButton" data-dismiss="modal">{{ __('Save') }}</button>
-          <button type=button class="btn btn-primary" value="cancel" id="edge-cancelButton" data-dismiss="modal" onclick="editEdgeCancel();">{{ __('Cancel') }}</button>
-        </center>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="modal fade" id="mapModal" tabindex="-1" role="dialog" aria-labelledby="mapModalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="mapModalLabel">{{ __('map.custom.edit.map.settings_title') }}</h5>
-      </div>
-      <div class="modal-body">
-        <div class="row">
-          <div class="col-md-12">
-            <div class="well well-lg">
-              <div class="form-group row">
-                <label for="mapname" class="col-sm-3 control-label">{{ __('map.custom.edit.map.name') }}</label>
-                <div class="col-sm-9">
-                    <input type="text" id="mapname" name="mapname" class="form-control input-sm" value="{{$name}}">
-                </div>
-              </div>
-              <div class="form-group row">
-                <label for="mapwidth" class="col-sm-3 control-label">{{ __('map.custom.edit.map.width') }}</label>
-                <div class="col-sm-9">
-                    <input type="text" id="mapwidth" name="mapwidth" class="form-control input-sm" value="{{$map_conf['width']}}">
-                </div>
-              </div>
-              <div class="form-group row">
-                <label for="mapheight" class="col-sm-3 control-label">{{ __('map.custom.edit.map.height') }}</label>
-                <div class="col-sm-9">
-                    <input type="text" id="mapheight" name="mapheight" class="form-control input-sm" value="{{$map_conf['height']}}">
-                </div>
-              </div>
-              <div class="form-group row">
-                <label for="mapnodealign" class="col-sm-3 control-label">{{ __('map.custom.edit.map.alignment') }}</label>
-                <div class="col-sm-9">
-                    <input type="number" id="mapnodealign" name="mapnodealign" class="form-control input-sm" value="{{$node_align}}">
-                </div>
-              </div>
-              <div class="form-group row" id="mapBackgroundRow">
-                <label for="selectbackground" class="col-sm-3 control-label">{{ __('map.custom.edit.map.background') }}</label>
-                <div class="col-sm-9">
-                  <input id="mapBackgroundSelect" type="file" name="selectbackground" accept="image/png, image/jpeg" class="form-control" onchange="mapChangeBackground();">
-                  <button id="mapBackgroundCancel" type="button" name="cancelbackground" class="btn btn-primary" onclick="mapChangeBackgroundCancel();" style="display:none">{{ __('Cancel') }}</button>
-                </div>
-              </div>
-              <div class="form-group row" id="mapBackgroundClearRow">
-                <label for="clearbackground" class="col-sm-3 control-label">{{ __('map.custom.edit.map.clear_bg') }}</label>
-                <div class="col-sm-9">
-                  <input type="hidden" id="mapBackgroundClearVal">
-                  <button id="mapBackgroundClear" type="button" name="clearbackground" class="btn btn-primary" onclick="mapClearBackground();">{{ __('map.custom.edit.map.clear_background') }}</button>
-                </div>
-              </div>
-              <hr>
-              <div class="row">
-                <div class="col-sm-12" id="savemap-alert">
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <center>
-          <button type=button value="save" id="map-saveButton" class="btn btn-primary" onclick="saveMapSettings()">{{ __('Save') }}</button>
-          <button type=button value="cancel" id="map-cancelButton" class="btn btn-primary" onclick="editMapCancel()">{{ __('Cancel') }}</button>
-        </center>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="modal fade" id="mapDeleteModal" tabindex="-1" role="dialog" aria-labelledby="mapDeleteModalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="mapDeleteModalLabel">{{ __('map.custom.edit.map.delete') }}</h5>
-      </div>
-      <div class="modal-footer">
-        <center>
-          <button type=button value="delete" id="map-deleteConfirmButton" class="btn btn-danger" onclick="deleteMap()">{{ __('Delete') }}</button>
-          <button type=button value="cancel" id="map-deleteCancelButton" class="btn btn-primary" onclick="$('#mapDeleteModal').modal('hide');">{{ __('Cancel') }}</button>
-        </center>
-      </div>
-    </div>
-  </div>
-</div>
+@include('map.custom-node-modal')
+@include('map.custom-edge-modal')
+@include('map.custom-map-modal')
+@include('map.custom-map-delete-modal')
 
 <div class="container-fluid">
   <div class="row" id="control-row">
@@ -565,25 +201,6 @@
         $("#map-renderButton").hide();
     }
 
-    function mapChangeBackground() {
-        $("#mapBackgroundCancel").show();
-    }
-
-    function mapChangeBackgroundCancel() {
-        $("#mapBackgroundCancel").hide();
-        $("#mapBackgroundSelect").val(null);
-    }
-
-    function mapClearBackground() {
-        if($('#mapBackgroundClearVal').val()) {
-            $('#mapBackgroundClear').text('{{ __('map.custom.edit.map.clear_background') }}');
-            $('#mapBackgroundClearVal').val('');
-        } else {
-            $('#mapBackgroundClear').text('{{ __('map.custom.edit.map.keep_background') }}');
-            $('#mapBackgroundClearVal').val('clear');
-        }
-    }
-
     function editMapSettings() {
         $("#mapBackgroundCancel").hide();
         $("#mapBackgroundSelect").val(null);
@@ -596,74 +213,6 @@
         $('#mapModal').modal({backdrop: 'static', keyboard: false}, 'show');
     }
 
-    function saveMapSettings() {
-        $("#map-saveButton").attr('disabled','disabled');
-        $("#savemap-alert").text('Saving...');
-        $("#savemap-alert").attr("class", "col-sm-12 alert alert-info");
-
-        var name = $("#mapname").val();
-        var width = $("#mapwidth").val();
-        var height = $("#mapheight").val();
-        node_align = $("#mapnodealign").val();
-        var clearbackground = $('#mapBackgroundClearVal').val() ? true : false;
-        var newbackground = $('#mapBackgroundSelect').prop('files').length ? $('#mapBackgroundSelect').prop('files')[0] : '';
-
-        if(!isNaN(width)) {
-            width = width + "px";
-        }
-        if(!isNaN(height)) {
-            height = height + "px";
-        }
-
-        var fd = new FormData();
-        fd.append('name', name);
-        fd.append('width', width);
-        fd.append('height', height);
-        fd.append('node_align', node_align);
-        fd.append('bgclear', clearbackground);
-        fd.append('bgimage', newbackground);
-
-        $.ajax({
-            url: '{{ route('maps.custom.savesettings', ['map_id' => $map_id]) }}',
-            data: fd,
-            processData: false,
-            contentType: false,
-            type: 'POST',
-            success: function( data, status, resp ) {
-                if(data['errors'].length) {
-                    let alert_content = $("#savemap-alert");
-                    alert_content.empty();
-                    alert_content.append($('<div/>',{"text": "{{ __('map.custom.edit.map.save_errors') }}"}));
-                    alert_content.append(data['errors'].map((error) => $('<div/>', {"text": error})));
-                    alert_content.attr("class", "col-sm-12 alert alert-danger");
-                } else {
-                    $("#title").text(name);
-                    $("#savemap-alert").attr("class", "col-sm-12");
-                    $("#savemap-alert").text("");
-                    network.setSize(width, height);
-
-                    canvas = $("#custom-map").children()[0].canvas;
-                    if(data['bgimage']) {
-                        $(canvas).css('background-image','url({{ route('maps.custom.background', ['map_id' => $map_id]) }})').css('background-size', 'cover');
-                        bgimage = true;
-                    } else {
-                        $(canvas).css('background-image','');
-                        bgimage = false;
-                    }
-
-                    editMapCancel();
-                }
-            },
-            error: function( resp, status, error ) {
-                let alert_content = $("#savemap-alert");
-                alert_content.text('{{ __('map.custom.edit.map.save_error', ['code' => '?']) }}'.replace('?', resp.status));
-                alert_content.attr("class", "col-sm-12 alert alert-danger");
-            },
-            complete: function( resp, status, error ) {
-                $("#map-saveButton").removeAttr('disabled');
-            },
-        });
-    }
     var newedgeconf = @json($newedge_conf);
     var newnodeconf = @json($newnode_conf);
     var newcount = 1;
@@ -677,6 +226,24 @@
             .done(function() {
                 window.location.href = "{{ route('maps.custom.edit') }}";
             });
+    }
+
+    function editMapSuccess(data) {
+        $("#title").text(name);
+        $("#savemap-alert").attr("class", "col-sm-12");
+        $("#savemap-alert").text("");
+        network.setSize(data.width, data.height);
+
+        canvas = $("#custom-map").children()[0].canvas;
+        if(data['bgimage']) {
+            $(canvas).css('background-image','url({{ route('maps.custom.background', ['map_id' => $map_id]) }})').css('background-size', 'cover');
+            bgimage = true;
+        } else {
+            $(canvas).css('background-image','');
+            bgimage = false;
+        }
+
+        editMapCancel();
     }
 
     function editMapCancel() {

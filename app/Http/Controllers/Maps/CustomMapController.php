@@ -683,6 +683,12 @@ class CustomMapController extends Controller
             $background = $map->background_suffix ? true : false;
         }
 
-        return response()->json(['id' => $map_id, 'bgimage' => $background, 'errors' => $errors]);
+        return response()->json([
+            'id' => $map_id,
+            'width' => $map->width ?? '',
+            'height' => $map->height ?? '',
+            'bgimage' => $background,
+            'errors' => $errors
+        ]);
     }
 }
