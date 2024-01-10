@@ -15,6 +15,41 @@
  * @author     LibreNMS Contributors
  */
 
+// Sensors for license status
+$licenseOids = snmpwalk_cache_multi_oid($device, 'fgSystemInfoAdvanced', [], 'FORTINET-FORTIGATE-MIB');
+
+if (! empty($licenseOids)) {
+    foreach ($licenseOids as $index => $entry) {
+        if (isset($entry['fgLicContractExpiry'])) {
+            $descr = $entry['fgLicContractDesc'];
+            $expirationRaw = $entry['fgLicContractExpiry'];
+
+            discover_sensor(
+                $valid['sensor'],
+                'count',
+                $device,
+                '.1.3.6.1.4.1.12356.101.4.6.3.1.2.1.2.' . $index,
+                'fgLicContractExpiry.' . $index,
+                'fortigate',
+                'Days left for ' . $descr,
+                1,
+                1,
+                7,
+                14,
+                null,
+                null,
+                null,
+                'snmp',
+                null,
+                null,
+                null,
+                'License expiration',
+                'gauge'
+            );
+        }
+    }
+}
+
 $session_rate = [
     'Sessions/sec 1m avg' => ['.1.3.6.1.4.1.12356.101.4.1.11', 'fgSysSesRate1'],  //FORTINET-FORTIGATE-MIB::fgSysSesRate1.0
     'Sessions/sec 10m avg' => ['.1.3.6.1.4.1.12356.101.4.1.12', 'fgSysSesRate10'],  //FORTINET-FORTIGATE-MIB::fgSysSesRate10.0
