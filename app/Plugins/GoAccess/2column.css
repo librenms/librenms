@@ -1,0 +1,24 @@
+* {
+  margin:0;
+  padding:0;
+  box-sizing: border-box;
+}
+
+#container {
+  width: 1200px;
+  margin: 20px auto;
+}
+
+#header {
+  width: 100%;
+  height: 120px;
+  background-color: #acacac;
+}
+
+#contents {
+  width: 900px;
+  background-color: #f7f7f7;
+  height: 600px;
+  float: left;
+}
+

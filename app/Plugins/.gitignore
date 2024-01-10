@@ -7,3 +7,5 @@
 !/Hooks/**
 !/ExamplePlugin/
 !/ExamplePlugin/**
+!/GoAccess/
+!/GoAccess/**
