@@ -1,6 +1,6 @@
 <?php
 /*
- * LibreNMS Dantel Webmon generic sensor
+ * LibreNMS FortiGate count sensors
  *
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -22,7 +22,6 @@ if (! empty($licenseOids)) {
     foreach ($licenseOids as $index => $entry) {
         if (isset($entry['fgLicContractExpiry'])) {
             $descr = $entry['fgLicContractDesc'];
-            $expirationRaw = $entry['fgLicContractExpiry'];
 
             discover_sensor(
                 $valid['sensor'],
