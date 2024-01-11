@@ -87,6 +87,36 @@ class CustomMapController extends Controller
         ],
     ];
 
+    public function index(Request $request)
+    {
+        if (! $request->user()->isAdmin()) {
+            return response('Insufficient privileges');
+        }
+
+        return view('map.custom-manage', [
+            'maps' => CustomMap::orderBy('name')->get(['custom_map_id', 'name']),
+            'name' => 'New Map',
+            'node_align' => 10,
+            'background' => null,
+            'map_conf' => [
+                'height' => '800px',
+                'width' => '1800px',
+                'interaction' => [
+                    'dragNodes' => true,
+                    'dragView' => false,
+                    'zoomView' => false,
+                ],
+                'manipulation' => [
+                    'enabled' => true,
+                    'initiallyActive' => true,
+                ],
+                'physics' => [
+                    'enabled' => false,
+                ],
+            ]
+        ]);
+    }
+
     protected function nodeDisabledStyle()
     {
         return [
@@ -127,7 +157,7 @@ class CustomMapController extends Controller
 
     public function delete(Request $request)
     {
-        $map = CustomMap::where('custom_map_id', '=', $request->map_id)
+        $map = CustomMap::where('custom_map_id', '=', $request->map)
             ->hasAccess($request->user())
             ->first();
 
@@ -143,7 +173,7 @@ class CustomMapController extends Controller
 
     public function background(Request $request)
     {
-        $map = CustomMap::where('custom_map_id', '=', $request->map_id)
+        $map = CustomMap::where('custom_map_id', '=', $request->map)
             ->hasAccess($request->user())
             ->first();
 
@@ -218,7 +248,7 @@ class CustomMapController extends Controller
 
     public function getData(Request $request)
     {
-        $map = CustomMap::where('custom_map_id', '=', $request->map_id)
+        $map = CustomMap::where('custom_map_id', '=', $request->map)
             ->hasAccess($request->user())
             ->with('nodes', 'nodes.device', 'nodes.linked_map', 'edges', 'edges.port', 'edges.port.device')
             ->first();
@@ -362,7 +392,7 @@ class CustomMapController extends Controller
 
     public function view(Request $request)
     {
-        $map = CustomMap::where('custom_map_id', '=', $request->map_id)
+        $map = CustomMap::where('custom_map_id', '=', $request->map)
             ->hasAccess($request->user())
             ->first();
 
@@ -380,7 +410,7 @@ class CustomMapController extends Controller
 
         $data = [
             'edit' => false,
-            'map_id' => $request->map_id,
+            'map_id' => $request->map,
             'name' => $name,
             'background' => $background,
             'page_refresh' => Config::get('page_refresh', 300),
@@ -421,17 +451,17 @@ class CustomMapController extends Controller
         }
 
         $data = [
-            'map_id' => $request->map_id,
+            'map_id' => $request->map,
             'edit' => true,
             'vmargin' => 20,
             'hmargin' => 20,
         ];
 
-        if (is_null($request->map_id)) {
+        if (is_null($request->map)) {
             $data['maps'] = CustomMap::orderBy('name')->get(['custom_map_id', 'name']);
 
-            return view('map.custom-edit-select', $data);
-        } elseif ($request->map_id == 0) {
+            return view('map.custom-manage', $data);
+        } elseif ($request->map == 0) {
             $data['name'] = 'New Map';
             $data['node_align'] = 10;
             $data['map_conf'] = [
@@ -454,13 +484,13 @@ class CustomMapController extends Controller
 
             return view('map.custom-new', $data);
         } else {
-            $map = CustomMap::find($request->map_id);
+            $map = CustomMap::find($request->map);
             if (! $map) {
                 abort(404);
             }
 
             $data['images'] = $this->listNodeImages();
-            $data['maps'] = CustomMap::orderBy('name')->where('custom_map_id', '<>', $request->map_id)->get(['custom_map_id', 'name']);
+            $data['maps'] = CustomMap::orderBy('name')->where('custom_map_id', '<>', $request->map)->get(['custom_map_id', 'name']);
             $data['name'] = $map->name;
             $data['node_align'] = $map->node_align;
             $data['newedge_conf'] = json_decode($map->newedgeconfig, true);
@@ -486,7 +516,7 @@ class CustomMapController extends Controller
 
         $errors = [];
 
-        $map = CustomMap::where('custom_map_id', '=', $request->map_id)->with('nodes', 'edges')->first();
+        $map = CustomMap::where('custom_map_id', '=', $request->map)->with('nodes', 'edges')->first();
         if (! $map) {
             abort(404);
         }
@@ -606,7 +636,7 @@ class CustomMapController extends Controller
 
         $errors = [];
 
-        $map_id = $request->map_id;
+        $map_id = $request->map;
         $name = $request->post('name');
         $width = $request->post('width');
         $height = $request->post('height');

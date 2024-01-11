@@ -8,28 +8,29 @@
                 <div class="row">
                     <div class="col-md-12">
                         <div class="well well-lg">
+                            <input type="hidden" id="mapid" name="mapid" />
                             <div class="form-group row">
                                 <label for="mapname" class="col-sm-3 control-label">{{ __('map.custom.edit.map.name') }}</label>
                                 <div class="col-sm-9">
-                                    <input type="text" id="mapname" name="mapname" class="form-control input-sm" value="{{$name}}">
+                                    <input type="text" id="mapname" name="mapname" class="form-control input-sm" value="{{ $name ?? '' }}">
                                 </div>
                             </div>
                             <div class="form-group row">
                                 <label for="mapwidth" class="col-sm-3 control-label">{{ __('map.custom.edit.map.width') }}</label>
                                 <div class="col-sm-9">
-                                    <input type="text" id="mapwidth" name="mapwidth" class="form-control input-sm" value="{{$map_conf['width']}}">
+                                    <input type="text" id="mapwidth" name="mapwidth" class="form-control input-sm" value="{{ $map_conf['width'] ?? '1800px' }}">
                                 </div>
                             </div>
                             <div class="form-group row">
                                 <label for="mapheight" class="col-sm-3 control-label">{{ __('map.custom.edit.map.height') }}</label>
                                 <div class="col-sm-9">
-                                    <input type="text" id="mapheight" name="mapheight" class="form-control input-sm" value="{{$map_conf['height']}}">
+                                    <input type="text" id="mapheight" name="mapheight" class="form-control input-sm" value="{{ $map_conf['height'] ?? '800px' }}">
                                 </div>
                             </div>
                             <div class="form-group row">
                                 <label for="mapnodealign" class="col-sm-3 control-label">{{ __('map.custom.edit.map.alignment') }}</label>
                                 <div class="col-sm-9">
-                                    <input type="number" id="mapnodealign" name="mapnodealign" class="form-control input-sm" value="{{$node_align}}">
+                                    <input type="number" id="mapnodealign" name="mapnodealign" class="form-control input-sm" value="{{ $node_align ?? 10 }}">
                                 </div>
                             </div>
                             <div class="form-group row" id="mapBackgroundRow">
@@ -112,8 +113,14 @@
         fd.append('bgclear', clearbackground);
         fd.append('bgimage', newbackground);
 
+        @if(isset($map_id))
+            var url = '{{ route('maps.custom.savesettings', ['map' => $map_id ?? null]) }}';
+        @else
+            var url = '{{ route('maps.custom.create') }}';
+        @endif
+
         $.ajax({
-            url: '{{ route('maps.custom.savesettings', ['map_id' => $map_id]) }}',
+            url: url,
             data: fd,
             processData: false,
             contentType: false,
@@ -126,7 +133,7 @@
                     alert_content.append(data['errors'].map((error) => $('<div/>', {"text": error})));
                     alert_content.attr("class", "col-sm-12 alert alert-danger");
                 } else {
-                    editMapSuccess(data)
+                    editMapSuccess(data);
                 }
             },
             error: function( resp, status, error ) {

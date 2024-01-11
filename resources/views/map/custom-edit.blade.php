@@ -160,7 +160,7 @@
 
         if(bgimage) {
             canvas = $("#custom-map").children()[0].canvas;
-            $(canvas).css('background-image','url({{ route('maps.custom.background', ['map_id' => $map_id]) }})').css('background-size', 'cover');
+            $(canvas).css('background-image','url({{ route('maps.custom.background', ['map' => $map_id]) }})').css('background-size', 'cover');
         }
 
         network.on('dragEnd', function (data) {
@@ -222,9 +222,9 @@
     var edge_port_map = {};
 
     function deleteMap() {
-        $.post("{{ route('maps.custom.delete', ['map_id' => $map_id]) }}")
+        $.post("{{ route('maps.custom.delete', ['map' => $map_id]) }}")
             .done(function() {
-                window.location.href = "{{ route('maps.custom.edit') }}";
+                window.location.href = "{{ route('maps.custom.index') }}";
             });
     }
 
@@ -236,7 +236,7 @@
 
         canvas = $("#custom-map").children()[0].canvas;
         if(data['bgimage']) {
-            $(canvas).css('background-image','url({{ route('maps.custom.background', ['map_id' => $map_id]) }})').css('background-size', 'cover');
+            $(canvas).css('background-image','url({{ route('maps.custom.background', ['map' => $map_id]) }})').css('background-size', 'cover');
             bgimage = true;
         } else {
             $(canvas).css('background-image','');
@@ -288,7 +288,7 @@
         fd.append('edges', JSON.stringify(edges));
 
         $.ajax({
-            url: '{{ route('maps.custom.save', ['map_id' => $map_id]) }}',
+            url: '{{ route('maps.custom.save', ['map' => $map_id]) }}',
             data: fd,
             processData: false,
             contentType: false,
@@ -796,7 +796,7 @@
     }
 
     function refreshMap() {
-        $.get( '{{ route('maps.custom.getdata', ['map_id' => $map_id]) }}')
+        $.get( '{{ route('maps.custom.getdata', ['map' => $map_id]) }}')
             .done(function( data ) {
                 // Add/update nodes
                 $.each( data.nodes, function( nodeid, node) {

@@ -78,14 +78,16 @@ Route::middleware(['auth'])->group(function () {
 
     // Maps
     Route::prefix('maps')->namespace('Maps')->group(function () {
-        Route::get('custom/edit/{map_id?}', 'CustomMapController@edit')->name('maps.custom.edit');
-        Route::get('custom/{map_id}', 'CustomMapController@view')->name('maps.custom.view');
-        Route::get('custom/{map_id}/background', 'CustomMapController@background')->name('maps.custom.background');
-        Route::get('custom/{map_id}/getdata', 'CustomMapController@getData')->name('maps.custom.getdata');
-        Route::post('custom/{map_id}/save', 'CustomMapController@save')->name('maps.custom.save');
-        Route::post('custom/{map_id}/savesettings', 'CustomMapController@saveSettings')->name('maps.custom.savesettings');
-        Route::post('custom/{map_id}/delete', 'CustomMapController@delete')->name('maps.custom.delete');
-        Route::get('custom/{map_id}', 'CustomMapController@view')->name('maps.custom.view');
+        Route::get('custom', 'CustomMapController@index')->name('maps.custom.index');
+        Route::get('custom/edit/{map}', 'CustomMapController@edit')->name('maps.custom.edit');
+        Route::get('custom/{map}', 'CustomMapController@view')->name('maps.custom.view');
+        Route::get('custom/{map}/background', 'CustomMapController@background')->name('maps.custom.background');
+        Route::get('custom/{map}/getdata', 'CustomMapController@getData')->name('maps.custom.getdata');
+        Route::post('custom/{map}/save', 'CustomMapController@save')->name('maps.custom.save');
+        Route::post('custom/create', 'CustomMapController@saveSettings')->name('maps.custom.create');
+        Route::post('custom/{map}/savesettings', 'CustomMapController@saveSettings')->name('maps.custom.savesettings');
+        Route::post('custom/{map}/delete', 'CustomMapController@delete')->name('maps.custom.delete');
+        Route::get('custom/{map}', 'CustomMapController@view')->name('maps.custom.view');
         Route::get('devicedependency', 'DeviceDependencyController@dependencyMap');
     });
 

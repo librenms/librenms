@@ -7,9 +7,9 @@ return [
             'create' => 'Create New Custom Map',
             'view' => ':name | Custom Map',
             'edit' => 'Edit Custom Map',
+            'manage' => 'Manage Custom Maps',
         ],
-        'select_map' => 'Select map to edit',
-        'create_map' => 'Create New Map',
+        'create_map' => 'New Map',
         'view' => [
             'loading' => 'Loading data',
             'no_devices' => 'No devices found',
