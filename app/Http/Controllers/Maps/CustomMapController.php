@@ -688,7 +688,7 @@ class CustomMapController extends Controller
             'width' => $map->width ?? '',
             'height' => $map->height ?? '',
             'bgimage' => $background,
-            'errors' => $errors
+            'errors' => $errors,
         ]);
     }
 }

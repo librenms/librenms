@@ -20,7 +20,7 @@ return [
             'text_color' => 'Text Color',
             'defaults' => 'Set Defaults',
             'map' => [
-                'settings_title' =>  'Map Settings',
+                'settings_title' => 'Map Settings',
                 'name' => 'Name',
                 'width' => 'Width',
                 'height' => 'Height',
