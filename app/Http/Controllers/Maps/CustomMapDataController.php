@@ -23,7 +23,6 @@
  * @author     Steven Wilton <swilton@fluentit.com.au>
  */
 
-
 namespace App\Http\Controllers\Maps;
 
 use App\Http\Controllers\Controller;
@@ -190,7 +189,7 @@ class CustomMapDataController extends Controller
 
         $map->load(['nodes', 'edges']);
 
-        DB::transaction(function () use ($map, $request, $data) {
+        DB::transaction(function () use ($map, $data) {
             $dbnodes = $map->nodes->keyBy('custom_map_node_id')->all();
             $dbedges = $map->edges->keyBy('custom_map_edge_id')->all();
 
@@ -215,7 +214,7 @@ class CustomMapDataController extends Controller
                     }
                 }
                 $dbnode->device_id = is_numeric($node['title']) ? $node['title'] : null;
-                $dbnode->linked_custom_map_id = str_starts_with($node['title'], 'map:') ? (int)str_replace('map:', '', $node['title']) : null;
+                $dbnode->linked_custom_map_id = str_starts_with($node['title'], 'map:') ? (int) str_replace('map:', '', $node['title']) : null;
                 $dbnode->label = $node['label'];
                 $dbnode->style = $node['shape'];
                 $dbnode->icon = $node['icon'];
@@ -248,8 +247,8 @@ class CustomMapDataController extends Controller
                 $dbedge->custom_map_node1_id = strpos($edge['from'], 'new') == 0 ? $newNodes[$edge['from']]->custom_map_node_id : $edge['from'];
                 $dbedge->custom_map_node2_id = strpos($edge['to'], 'new') == 0 ? $newNodes[$edge['to']]->custom_map_node_id : $edge['to'];
                 $dbedge->port_id = $edge['port_id'] ? $edge['port_id'] : null;
-                $dbedge->reverse = (int)$edge['reverse'];
-                $dbedge->showpct = (int)$edge['showpct'];
+                $dbedge->reverse = filter_var($edge['reverse'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+                $dbedge->showpct = filter_var($edge['showpct'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
                 $dbedge->style = $edge['style'];
                 $dbedge->text_face = $edge['text_face'];
                 $dbedge->text_size = $edge['text_size'];
@@ -279,7 +278,7 @@ class CustomMapDataController extends Controller
     {
         // Only succeed if the string startes with a number optionally followed by a unit
         if (preg_match('/^(\d+)([kMGTP])?/', $speeds, $matches)) {
-            $speed = (int)$matches[1];
+            $speed = (int) $matches[1];
             if (count($matches) < 3) {
                 return $speed;
             } elseif ($matches[2] == 'k') {
@@ -309,13 +308,13 @@ class CustomMapDataController extends Controller
             return '#000000';
         } elseif ($pct < 50) {
             // 100% green and slowly increase the red until we get to yellow
-            return sprintf('#%02XFF00', (int)(5.1 * $pct));
+            return sprintf('#%02XFF00', (int) (5.1 * $pct));
         } elseif ($pct < 100) {
             // 100% red and slowly remove green to go from yellow to red
-            return sprintf('#FF%02X00', (int)(5.1 * (100.0 - $pct)));
+            return sprintf('#FF%02X00', (int) (5.1 * (100.0 - $pct)));
         } elseif ($pct < 150) {
             // 100% red and slowly increase blue to go purple
-            return sprintf('#FF00%02X', (int)(5.1 * ($pct - 100.0)));
+            return sprintf('#FF00%02X', (int) (5.1 * ($pct - 100.0)));
         }
 
         // Default to purple for links over 150%
@@ -328,7 +327,7 @@ class CustomMapDataController extends Controller
             return 1.0;
         }
 
-        return (strlen((string)$speed) - 5) / 2.0;
+        return (strlen((string) $speed) - 5) / 2.0;
     }
 
     protected function nodeDisabledStyle(): array
@@ -354,5 +353,4 @@ class CustomMapDataController extends Controller
             'background' => null,
         ];
     }
-
 }

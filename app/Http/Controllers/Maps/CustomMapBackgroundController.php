@@ -59,5 +59,4 @@ class CustomMapBackgroundController extends Controller
 
         return $imageName;
     }
-
 }

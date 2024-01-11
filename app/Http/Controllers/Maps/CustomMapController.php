@@ -85,7 +85,7 @@ class CustomMapController extends Controller
             'edit' => false,
             'map_id' => $map->custom_map_id,
             'name' => $map->name,
-            'background' => (bool)$map->background_suffix,
+            'background' => (bool) $map->background_suffix,
             'page_refresh' => Config::get('page_refresh', 300),
             'map_conf' => $map_conf,
             'newedge_conf' => $map->newedgeconfig,
@@ -106,12 +106,12 @@ class CustomMapController extends Controller
             'newedge_conf' => $map->newedgeconfig,
             'newnode_conf' => $map->newnodeconfig,
             'map_conf' => $map->options,
-            'background' => (bool)$map->background_suffix,
+            'background' => (bool) $map->background_suffix,
             'edit' => true,
             'vmargin' => 20,
             'hmargin' => 20,
             'images' => $this->listNodeImages(),
-            'maps' =>  CustomMap::orderBy('name')->where('custom_map_id', '<>', $map->custom_map_id)->get(['custom_map_id', 'name']),
+            'maps' => CustomMap::orderBy('name')->where('custom_map_id', '<>', $map->custom_map_id)->get(['custom_map_id', 'name']),
         ];
 
         $data['map_conf']['width'] = $map->width;

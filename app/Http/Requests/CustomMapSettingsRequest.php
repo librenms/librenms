@@ -55,7 +55,7 @@ class CustomMapSettingsRequest extends FormRequest
                 'image',
                 'mimes:jpeg,png,jpg,gif,svg',
                 'max:2048',
-            ]
+            ],
         ];
     }
 }
