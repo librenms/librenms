@@ -56,6 +56,11 @@ class CustomMap extends BaseModel
         'background_version' => 0,
     ];
 
+    public function hasAccess(): bool
+    {
+        return false; // TODO calculate based on device access
+    }
+
     public function scopeHasAccess($query, User $user)
     {
         if ($user->hasGlobalRead()) {

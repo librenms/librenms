@@ -8,12 +8,6 @@
                 <div class="row">
                     <div class="col-md-12">
                         <div class="well well-lg">
-                            <div class="form-group row single-node" id="nodeDeviceLabelRow">
-                                <label for="nodelabel" class="col-sm-3 control-label">{{ __('map.custom.edit.node.label') }}</label>
-                                <div class="col-sm-9">
-                                    <input type=text id="nodelabel" class="form-control input-sm" value="Node Name" />
-                                </div>
-                            </div>
                             <div class="form-group row single-node" id="nodeDeviceSearchRow">
                                 <label for="devicesearch" class="col-sm-3 control-label">{{ __('map.custom.edit.node.device_select') }}</label>
                                 <div class="col-sm-9">
@@ -29,6 +23,12 @@
                                 </div>
                                 <div class="col-sm-2">
                                     <button type=button class="btn btn-primary" value="save" id="deviceclear" onclick="nodeDeviceClear();">{{ __('Clear') }}</button>
+                                </div>
+                            </div>
+                            <div class="form-group row single-node" id="nodeDeviceLabelRow">
+                                <label for="nodelabel" class="col-sm-3 control-label">{{ __('map.custom.edit.node.label') }}</label>
+                                <div class="col-sm-9">
+                                    <input type=text id="nodelabel" class="form-control input-sm" value="Node Name" />
                                 </div>
                             </div>
                             <div class="form-group row single-node" id="nodeMapLinkRow">

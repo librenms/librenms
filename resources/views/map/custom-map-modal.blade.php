@@ -105,26 +105,26 @@
             height = height + "px";
         }
 
-        var fd = new FormData();
-        fd.append('name', name);
-        fd.append('width', width);
-        fd.append('height', height);
-        fd.append('node_align', node_align);
-        fd.append('bgclear', clearbackground);
-        fd.append('bgimage', newbackground);
-
         @if(isset($map_id))
-            var url = '{{ route('maps.custom.savesettings', ['map' => $map_id ?? null]) }}';
+            var url = '{{ route('maps.custom.update', ['map' => $map_id]) }}';
+            var method = 'PUT';
         @else
-            var url = '{{ route('maps.custom.create') }}';
+            var url = '{{ route('maps.custom.store') }}';
+            var method = 'POST';
         @endif
 
         $.ajax({
             url: url,
-            data: fd,
-            processData: false,
-            contentType: false,
-            type: 'POST'
+            data: {
+                name: name,
+                width: width,
+                height: height,
+                node_align: node_align,
+                bgclear: clearbackground,
+                bgimage: newbackground
+            },
+            dataType: 'json',
+            type: method
         }).done(function (data, status, resp) {
             editMapSuccess(data);
         }).fail(function (resp, status, error) {

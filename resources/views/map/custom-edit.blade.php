@@ -222,7 +222,10 @@
     var edge_port_map = {};
 
     function deleteMap() {
-        $.post("{{ route('maps.custom.delete', ['map' => $map_id]) }}")
+        $.ajax({
+            url: "{{ route('maps.custom.destroy', ['map' => $map_id]) }}",
+            type: 'DELETE'
+        })
             .done(function() {
                 window.location.href = "{{ route('maps.custom.index') }}";
             });
@@ -281,42 +284,36 @@
                 nodes[node.id] = node;
             }
         });
-        var fd = new FormData();
-        fd.append('newnodeconf', JSON.stringify(newnodeconf));
-        fd.append('newedgeconf', JSON.stringify(newedgeconf));
-        fd.append('nodes', JSON.stringify(nodes));
-        fd.append('edges', JSON.stringify(edges));
 
         $.ajax({
-            url: '{{ route('maps.custom.save', ['map' => $map_id]) }}',
-            data: fd,
-            processData: false,
-            contentType: false,
-            type: 'POST',
-            success: function( data, status, resp ) {
-                if(data['errors'].length) {
-                    let alert_content = $("#alert");
-                    alert_content.empty();
-                    alert_content.append($('<div/>',{"text": "{{ __('map.custom.edit.map.save_errors') }}"}));
-                    alert_content.append(data['errors'].map((error) => $('<div/>', {"text": error})));
-                    alert_content.attr("class", "col-sm-12 alert alert-danger");
-                    $("#alert-row").show();
-                } else {
-                    $("#map-saveDataButton").hide();
-                    $("#alert-row").hide();
-                }
-                // Re-read the map from the DB in case any items were modified
-                refreshMap();
+            url: '{{ route('maps.custom.data.save', ['map' => $map_id]) }}',
+            data: {
+                newnodeconf: newnodeconf,
+                newedgeconf: newedgeconf,
+                nodes: nodes,
+                edges: edges,
             },
-            error: function( resp, status, error ) {
+            dataType: 'json',
+            type: 'POST'
+        }).done(function (data, status, resp) {
+            $("#map-saveDataButton").hide();
+            $("#alert-row").hide();
+
+            // Re-read the map from the DB in case any items were modified
+            refreshMap();
+        }).fail(function (resp, status, error) {
+            var data = resp.responseJSON;
+            if (data['message']) {
+                let alert_content = $("#alert");
+                alert_content.text(data['message']);
+                alert_content.attr("class", "col-sm-12 alert alert-danger");
+            } else {
                 let alert_content = $("#alert");
                 alert_content.text('{{ __('map.custom.edit.map.save_error', ['code' => '?']) }}'.replace('?', resp.status));
                 alert_content.attr("class", "col-sm-12 alert alert-danger");
-                $("#alert-row").show();
-            },
-            complete: function( resp, status, error ) {
-                $("#map-saveDataButton").removeAttr('disabled');
-            },
+            }
+        }).always(function (resp, status, error) {
+            $("#map-saveDataButton").removeAttr('disabled');
         });
     }
 
@@ -796,7 +793,7 @@
     }
 
     function refreshMap() {
-        $.get( '{{ route('maps.custom.getdata', ['map' => $map_id]) }}')
+        $.get( '{{ route('maps.custom.data', ['map' => $map_id]) }}')
             .done(function( data ) {
                 // Add/update nodes
                 $.each( data.nodes, function( nodeid, node) {

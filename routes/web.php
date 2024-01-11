@@ -4,6 +4,10 @@ use App\Http\Controllers\AboutController;
 use App\Http\Controllers\AlertController;
 use App\Http\Controllers\AlertTransportController;
 use App\Http\Controllers\Auth\SocialiteController;
+use App\Http\Controllers\Maps\CustomMapBackgroundController;
+use App\Http\Controllers\Maps\CustomMapController;
+use App\Http\Controllers\Maps\CustomMapDataController;
+use App\Http\Controllers\Maps\DeviceDependencyController;
 use App\Http\Controllers\PushNotificationController;
 use App\Http\Controllers\ValidateController;
 use App\Http\Middleware\AuthenticateGraph;
@@ -77,19 +81,14 @@ Route::middleware(['auth'])->group(function () {
         ->name('device')->where('vars', '.*');
 
     // Maps
-    Route::prefix('maps')->namespace('Maps')->group(function () {
-        Route::get('custom', 'CustomMapController@index')->name('maps.custom.index');
-        Route::get('custom/edit/{map}', 'CustomMapController@edit')->name('maps.custom.edit');
-        Route::get('custom/{map}', 'CustomMapController@view')->name('maps.custom.view');
-        Route::get('custom/{map}/background', 'CustomMapController@background')->name('maps.custom.background');
-        Route::get('custom/{map}/getdata', 'CustomMapController@getData')->name('maps.custom.getdata');
-        Route::post('custom/{map}/save', 'CustomMapController@save')->name('maps.custom.save');
-        Route::post('custom/create', 'CustomMapController@create')->name('maps.custom.create');
-        Route::post('custom/{map}/savesettings', 'CustomMapController@saveSettings')->name('maps.custom.savesettings');
-        Route::post('custom/{map}/delete', 'CustomMapController@delete')->name('maps.custom.delete');
-        Route::get('custom/{map}', 'CustomMapController@view')->name('maps.custom.view');
-        Route::get('devicedependency', 'DeviceDependencyController@dependencyMap');
+    Route::prefix('maps')->group(function () {
+        Route::resource('custom', CustomMapController::class, ['as' => 'maps'])
+            ->parameters(['custom' => 'map'])->except('create');
+        Route::get('custom/{map}/background', CustomMapBackgroundController::class)->name('maps.custom.background');
+        Route::get('custom/{map}/data', [CustomMapDataController::class, 'get'])->name('maps.custom.data');
+        Route::post('custom/{map}/data', [CustomMapDataController::class, 'save'])->name('maps.custom.data.save');
     });
+    Route::get('maps/devicedependency', [DeviceDependencyController::class, 'dependencyMap']);
 
     // dashboard
     Route::resource('dashboard', 'DashboardController')->except(['create', 'edit']);

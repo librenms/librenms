@@ -87,7 +87,7 @@
                                         </a>
                                         <ul class="dropdown-menu scrollable-menu">
                                         @foreach($custommaps as $map)
-                                            <li><a href="{{ route('maps.custom.view', ['map' => $map->custom_map_id]) }}" title="{{ $map->name }}"><i class="fa fa-map-marked fa-fw fa-lg" aria-hidden="true"></i>
+                                            <li><a href="{{ route('maps.custom.show', ['map' => $map->custom_map_id]) }}" title="{{ $map->name }}"><i class="fa fa-map-marked fa-fw fa-lg" aria-hidden="true"></i>
                                                 {{ ucfirst($map->name) }}
                                             </a></li>
                                         @endforeach

@@ -23,7 +23,7 @@
             @foreach($maps as $map)
                 <tr id="map{{ $map->custom_map_id }}">
                     <td style="vertical-align: middle">
-                        <a href="{{ route('maps.custom.view', $map->custom_map_id) }}">{{ $map->name }}</a>
+                        <a href="{{ route('maps.custom.show', $map->custom_map_id) }}">{{ $map->name }}</a>
                     </td>
                     <td>
                         <a class="btn btn-primary" href="{{ route('maps.custom.edit', $map->custom_map_id) }}"><i class="fa fa-pencil"></i> {{ __('Edit') }}</a>
@@ -60,8 +60,10 @@
     }
 
     function deleteMap() {
-        $.post("{{ route('maps.custom.delete', ['map' => '?']) }}".replace('?', pendingDeleteId))
-            .done(() => {
+        $.ajax({
+            url: "{{ route('maps.custom.destroy', ['map' => '?']) }}".replace('?', pendingDeleteId),
+            type: 'DELETE'
+        }).done(() => {
                 $('#map' + pendingDeleteId).remove();
                 pendingDeleteId = null;
                 $('#mapDeleteModal').modal('hide');

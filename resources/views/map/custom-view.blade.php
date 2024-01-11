@@ -62,7 +62,7 @@
                 if(properties.nodes[0] in node_device_map) {
                     window.location.href = "device/"+node_device_map[properties.nodes[0]].device_id;
                 } else if (properties.nodes[0] in node_link_map) {
-                    window.location.href = '{{ route('maps.custom.view', ['map' => '?']) }}'.replace('?', node_link_map[properties.nodes[0]]);
+                    window.location.href = '{{ route('maps.custom.show', ['map' => '?']) }}'.replace('?', node_link_map[properties.nodes[0]]);
                 } else if (properties.nodes[0].endsWith('_mid')) {
                     edge_id = properties.nodes[0].split("_")[0];
                 }
@@ -77,7 +77,7 @@
     }
     var Countdown;
     function refreshMap() {
-        $.get( '{{ route('maps.custom.getdata', ['map' => $map_id]) }}')
+        $.get( '{{ route('maps.custom.data', ['map' => $map_id]) }}')
             .done(function( data ) {
                 // Add/update nodes
                 $.each( data.nodes, function( nodeid, node) {
