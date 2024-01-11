@@ -19,32 +19,32 @@ $fgDhcpTables = snmpwalk_cache_multi_oid($device, 'fgDhcpTables', [], 'FORTINET-
 if (! empty($fgDhcpTables)) {
     $vgEntNames = snmpwalk_cache_multi_oid($device, 'fgVdEntName', [], 'FORTINET-FORTIGATE-MIB');
 
-    foreach($fgDhcpTables as $index => $entry) {
-      $indexSplit = explode(".", $index);
-      $fgVdomID = $indexSplit[0];
-      $fgDhcpServerID = $indexSplit[1];
+    foreach ($fgDhcpTables as $index => $entry) {
+        $indexSplit = explode('.', $index);
+        $fgVdomID = $indexSplit[0];
+        $fgDhcpServerID = $indexSplit[1];
 
-      discover_sensor(
-          $valid['sensor'],
-          'percent',
-          $device,
-          '.1.3.6.1.4.1.12356.101.23.2.1.1.2.'.$index,
-          'fgDhcpLeaseUsage.' . $index,
-          'fortigate',
-          $vgEntNames[$fgVdomID]['fgVdEntName'].' Server ID '.$fgDhcpServerID.' Pool Usage',
-          1,
-          1,
-          null,
-          null,
-          90,
-          95,
-          $entry['fgDhcpLeaseUsage'],
-          'snmp',
-          null,
-          null,
-          null,
-          'DHCP Usage',
-          'gauge'
-       );
+        discover_sensor(
+            $valid['sensor'],
+            'percent',
+            $device,
+            '.1.3.6.1.4.1.12356.101.23.2.1.1.2.' . $index,
+            'fgDhcpLeaseUsage.' . $index,
+            'fortigate',
+            $vgEntNames[$fgVdomID]['fgVdEntName'] . ' Server ID ' . $fgDhcpServerID . ' Pool Usage',
+            1,
+            1,
+            null,
+            null,
+            90,
+            95,
+            $entry['fgDhcpLeaseUsage'],
+            'snmp',
+            null,
+            null,
+            null,
+            'DHCP Usage',
+            'gauge'
+        );
     }
 }
