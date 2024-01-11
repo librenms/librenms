@@ -22,7 +22,7 @@ if (! empty($licenseOids)) {
     foreach ($licenseOids as $index => $entry) {
         if (isset($entry['fgLicContractExpiry'])) {
             $descr = $entry['fgLicContractDesc'];
-            
+
             discover_sensor(
                 $valid['sensor'],
                 'count',
