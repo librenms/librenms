@@ -119,6 +119,14 @@ return [
                 'show_usage_percent' => 'Show percent usage',
                 'recenter' => 'Recenter Line',
             ],
+            'validate' => [
+                'width_format' => 'Width must be a number followed by px or %',
+                'width_percent' => 'Width percent must be between 10 and 100',
+                'width_pixels' => 'Width in pixels must be at least 200',
+                'height_format' => 'Height must be a number followed by px or %',
+                'height_percent' => 'Height percent must be between 10 and 100',
+                'height_pixels' => 'Height in pixels must be at least 200',
+            ],
         ],
     ],
 ];

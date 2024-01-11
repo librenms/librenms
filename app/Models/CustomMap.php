@@ -34,6 +34,27 @@ class CustomMap extends BaseModel
 {
     use HasFactory;
     protected $primaryKey = 'custom_map_id';
+    protected $casts = [
+        'options' => 'array',
+        'newnodeconfig' => 'array',
+        'newedgeconfig' => 'array',
+    ];
+    protected $fillable = [
+        'name',
+        'width',
+        'height',
+        'node_align',
+        'background_suffix',
+        'background_version',
+    ];
+
+    // default values for attributes
+    protected $attributes = [
+        'options' => '{"interaction":{"dragNodes":false,"dragView":false,"zoomView":false},"manipulation":{"enabled":false},"physics":{"enabled":false}}',
+        'newnodeconfig' => '{"borderWidth":1,"color":{"border":"#2B7CE9","background":"#D2E5FF"},"font":{"color":"#343434","size":14,"face":"arial"},"icon":[],"label":true,"shape":"box","size":25}',
+        'newedgeconfig' => '{"arrows":{"to":{"enabled":true}},"smooth":{"type":"dynamic"},"font":{"color":"#343434","size":12,"face":"arial"},"label":true}',
+        'background_version' => 0,
+    ];
 
     public function scopeHasAccess($query, User $user)
     {

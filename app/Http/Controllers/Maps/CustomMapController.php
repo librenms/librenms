@@ -26,10 +26,13 @@
 namespace App\Http\Controllers\Maps;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\CustomMapSettingsRequest;
 use App\Models\CustomMap;
 use App\Models\CustomMapBackground;
 use App\Models\CustomMapEdge;
 use App\Models\CustomMapNode;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -39,55 +42,7 @@ use LibreNMS\Util\Url;
 
 class CustomMapController extends Controller
 {
-    private $default_edge_conf = [
-        'arrows' => [
-            'to' => [
-                'enabled' => true,
-            ],
-        ],
-        'smooth' => [
-            'type' => 'dynamic',
-        ],
-        'font' => [
-            'color' => '#343434',
-            'size' => 12,
-            'face' => 'arial',
-        ],
-        'label' => true,
-    ];
-
-    private $default_node_conf = [
-        'borderWidth' => 1,
-        'color' => [
-            'border' => '#2B7CE9',
-            'background' => '#D2E5FF',
-        ],
-        'font' => [
-            'color' => '#343434',
-            'size' => 14,
-            'face' => 'arial',
-        ],
-        'icon' => [],
-        'label' => true,
-        'shape' => 'box',
-        'size' => 25,
-    ];
-
-    private $default_map_options = [
-        'interaction' => [
-            'dragNodes' => false,
-            'dragView' => false,
-            'zoomView' => false,
-        ],
-        'manipulation' => [
-            'enabled' => false,
-        ],
-        'physics' => [
-            'enabled' => false,
-        ],
-    ];
-
-    public function index(Request $request)
+    public function index(Request $request): View
     {
         if (! $request->user()->isAdmin()) {
             return response('Insufficient privileges');
@@ -113,7 +68,7 @@ class CustomMapController extends Controller
                 'physics' => [
                     'enabled' => false,
                 ],
-            ]
+            ],
         ]);
     }
 
@@ -401,9 +356,9 @@ class CustomMapController extends Controller
         }
 
         $name = $map->name;
-        $newedge_conf = json_decode($map->newedgeconfig, true);
-        $newnode_conf = json_decode($map->newnodeconfig, true);
-        $map_conf = json_decode($map->options, true);
+        $newedge_conf = $map->newedgeconfig;
+        $newnode_conf = $map->newnodeconfig;
+        $map_conf = $map->options;
         $map_conf['width'] = $map->width;
         $map_conf['height'] = $map->height;
         $background = $map->background_suffix ? true : false;
@@ -493,9 +448,9 @@ class CustomMapController extends Controller
             $data['maps'] = CustomMap::orderBy('name')->where('custom_map_id', '<>', $request->map)->get(['custom_map_id', 'name']);
             $data['name'] = $map->name;
             $data['node_align'] = $map->node_align;
-            $data['newedge_conf'] = json_decode($map->newedgeconfig, true);
-            $data['newnode_conf'] = json_decode($map->newnodeconfig, true);
-            $data['map_conf'] = json_decode($map->options, true);
+            $data['newedge_conf'] = $map->newedgeconfig;
+            $data['newnode_conf'] = $map->newnodeconfig;
+            $data['map_conf'] = $map->options;
             $data['map_conf']['width'] = $map->width;
             $data['map_conf']['height'] = $map->height;
             // Override some settings for the editor
@@ -628,97 +583,41 @@ class CustomMapController extends Controller
         return response()->json(['id' => $map->custom_map_id, 'errors' => $errors]);
     }
 
-    public function saveSettings(Request $request)
+    public function create(CustomMapSettingsRequest $request): JsonResponse
     {
-        if (! $request->user()->isAdmin()) {
-            return response('Insufficient privileges');
-        }
+        return $this->saveSettings($request, new CustomMap);
+    }
 
-        $errors = [];
+    public function saveSettings(CustomMapSettingsRequest $request, CustomMap $map): JsonResponse
+    {
+        $map->fill($request->validated());
+        $map->save(); // save to get ID
 
-        $map_id = $request->map;
-        $name = $request->post('name');
-        $width = $request->post('width');
-        $height = $request->post('height');
-        $node_align = $request->post('node_align');
-        $bgclear = $request->post('bgclear') == 'true' ? true : false;
-        $bgnewimage = $request->post('bgimage');
-
-        if (! preg_match('/^(\d+)(px|%)$/', $width, $matches)) {
-            array_push($errors, 'Width must be a number followed by px or %');
-        } elseif ($matches[2] == 'px' && $matches[1] < 200) {
-            array_push($errors, 'Width in pixels must be at least 200');
-        } elseif ($matches[2] == '%' && ($matches[1] < 10 || $matches[1] > 100)) {
-            array_push($errors, 'Width percent must be between 10 and 100');
-        }
-
-        if (! preg_match('/^(\d+)(px|%)$/', $height, $matches)) {
-            array_push($errors, 'Height must be a number followed by px or %');
-        } elseif ($matches[2] == 'px' && $matches[1] < 200) {
-            array_push($errors, 'Height in pixels must be at least 200');
-        } elseif ($matches[2] == '%' && ($matches[1] < 10 || $matches[1] > 100)) {
-            array_push($errors, 'Height percent must be between 10 and 100');
-        }
-
-        if (! $name) {
-            array_push($errors, 'Name must be supplied');
-        }
-
-        if ($bgnewimage) {
-            $request->validate(['bgimage' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048']);
-        }
-
-        $background = false;
-        if (! $errors) {
-            if (! $map_id) {
-                $map = new CustomMap;
-                $map->options = json_encode($this->default_map_options);
-                $map->newnodeconfig = json_encode($this->default_node_conf);
-                $map->newedgeconfig = json_encode($this->default_edge_conf);
-                $map->background_version = 0;
+        if ($request->bgimage) {
+            $map->background_suffix = $request->bgimage->extension();
+            if (! $map->background) {
+                $background = new CustomMapBackground;
+                $background->background_image = $request->bgimage->getContent();
+                $map->background()->save($background);
             } else {
-                $map = CustomMap::find($map_id);
+                $map->background->background_image = $request->bgimage->getContent();
+                $map->background->save();
             }
-
-            $map->name = $name;
-            $map->width = $width;
-            $map->height = $height;
-            $map->node_align = $node_align;
+            $map->background_version++;
             $map->save();
-            if (! $map_id) {
-                $map_id = $map->custom_map_id;
+        } elseif ($request->bgclear) {
+            if ($map->background) {
+                $map->background->delete();
             }
-
-            if ($request->bgimage) {
-                $map->background_suffix = $request->bgimage->extension();
-                if (! $map->background) {
-                    $background = new CustomMapBackground;
-                    $background->background_image = $request->bgimage->getContent();
-                    $map->background()->save($background);
-                } else {
-                    $map->background->background_image = $request->bgimage->getContent();
-                    $map->background->save();
-                }
-                $map->background_version++;
-                $map->save();
-                $map->refresh();
-            } elseif ($bgclear) {
-                if ($map->background) {
-                    $map->background->delete();
-                }
-                $map->background_suffix = null;
-                $map->save();
-                $map->refresh();
-            }
-            $background = $map->background_suffix ? true : false;
+            $map->background_suffix = null;
+            $map->save();
         }
 
         return response()->json([
-            'id' => $map_id,
-            'width' => $map->width ?? '',
-            'height' => $map->height ?? '',
-            'bgimage' => $background,
-            'errors' => $errors,
+            'id' => $map->custom_map_id,
+            'width' => $map->width,
+            'height' => $map->height,
+            'bgimage' => $map->background_suffix ? true : false,
         ]);
     }
 }

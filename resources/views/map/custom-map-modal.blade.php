@@ -36,7 +36,7 @@
                             <div class="form-group row" id="mapBackgroundRow">
                                 <label for="selectbackground" class="col-sm-3 control-label">{{ __('map.custom.edit.map.background') }}</label>
                                 <div class="col-sm-9">
-                                    <input id="mapBackgroundSelect" type="file" name="selectbackground" accept="image/png, image/jpeg" class="form-control" onchange="mapChangeBackground();">
+                                    <input id="mapBackgroundSelect" type="file" name="selectbackground" accept="image/png,image/jpeg,image/svg+xml" class="form-control" onchange="mapChangeBackground();">
                                     <button id="mapBackgroundCancel" type="button" name="cancelbackground" class="btn btn-primary" onclick="mapChangeBackgroundCancel();" style="display:none">{{ __('Cancel') }}</button>
                                 </div>
                             </div>
@@ -95,7 +95,7 @@
         var width = $("#mapwidth").val();
         var height = $("#mapheight").val();
         var node_align = $("#mapnodealign").val();
-        var clearbackground = $('#mapBackgroundClearVal').val() ? true : false;
+        var clearbackground = $('#mapBackgroundClearVal').val() ? 1 : 0;
         var newbackground = $('#mapBackgroundSelect').prop('files').length ? $('#mapBackgroundSelect').prop('files')[0] : '';
 
         if(!isNaN(width)) {
@@ -124,26 +124,22 @@
             data: fd,
             processData: false,
             contentType: false,
-            type: 'POST',
-            success: function( data, status, resp ) {
-                if(data['errors'].length) {
-                    let alert_content = $("#savemap-alert");
-                    alert_content.empty();
-                    alert_content.append($('<div/>',{"text": "{{ __('map.custom.edit.map.save_errors') }}"}));
-                    alert_content.append(data['errors'].map((error) => $('<div/>', {"text": error})));
-                    alert_content.attr("class", "col-sm-12 alert alert-danger");
-                } else {
-                    editMapSuccess(data);
-                }
-            },
-            error: function( resp, status, error ) {
+            type: 'POST'
+        }).done(function (data, status, resp) {
+            editMapSuccess(data);
+        }).fail(function (resp, status, error) {
+            var data = resp.responseJSON;
+            if (data['message']) {
+                let alert_content = $("#savemap-alert");
+                alert_content.text(data['message']);
+                alert_content.attr("class", "col-sm-12 alert alert-danger");
+            } else {
                 let alert_content = $("#savemap-alert");
                 alert_content.text('{{ __('map.custom.edit.map.save_error', ['code' => '?']) }}'.replace('?', resp.status));
                 alert_content.attr("class", "col-sm-12 alert alert-danger");
-            },
-            complete: function( resp, status, error ) {
-                $("#map-saveButton").removeAttr('disabled');
-            },
+            }
+        }).always(function (resp, status, error) {
+            $("#map-saveButton").removeAttr('disabled');
         });
     }
 </script>
