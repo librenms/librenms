@@ -27,6 +27,7 @@ namespace LibreNMS\Device;
 
 use LibreNMS\Config;
 use LibreNMS\OS;
+use LibreNMS\Util\StringHelpers;
 
 class WirelessSensor extends Sensor
 {
@@ -229,22 +230,22 @@ class WirelessSensor extends Sensor
 
     protected static function getDiscoveryInterface($type)
     {
-        return str_to_class($type, 'LibreNMS\\Interfaces\\Discovery\\Sensors\\Wireless') . 'Discovery';
+        return StringHelpers::toClass($type, 'LibreNMS\\Interfaces\\Discovery\\Sensors\\Wireless') . 'Discovery';
     }
 
     protected static function getDiscoveryMethod($type)
     {
-        return 'discoverWireless' . str_to_class($type);
+        return 'discoverWireless' . StringHelpers::toClass($type, null);
     }
 
     protected static function getPollingInterface($type)
     {
-        return str_to_class($type, 'LibreNMS\\Interfaces\\Polling\\Sensors\\Wireless') . 'Polling';
+        return StringHelpers::toClass($type, 'LibreNMS\\Interfaces\\Polling\\Sensors\\Wireless') . 'Polling';
     }
 
     protected static function getPollingMethod($type)
     {
-        return 'pollWireless' . str_to_class($type);
+        return 'pollWireless' . StringHelpers::toClass($type, null);
     }
 
     /**

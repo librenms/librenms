@@ -6,7 +6,5 @@ over:
     - { graph: device_bits, text: Traffic }
     - { graph: device_wireless_rssi, text: RSSI }
     - { graph: device_wireless_power, text: POWER }
-poller_modules:
-    wifi: true
 discovery:
     - { sysObjectID: .1.3.6.1.4.1.3373.1103, sysDescr: 'ALFOplus80HD - SIAE Microelettronica' }

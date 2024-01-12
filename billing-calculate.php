@@ -19,7 +19,7 @@ $options = getopt('r');
 
 if (isset($options['r'])) {
     echo "Clearing history table.\n";
-    dbQuery('TRUNCATE TABLE `bill_history`');
+    DB::table('bill_history')->truncate();
 }
 
 foreach (dbFetchRows('SELECT * FROM `bills` ORDER BY `bill_id`') as $bill) {
@@ -38,7 +38,7 @@ foreach (dbFetchRows('SELECT * FROM `bills` ORDER BY `bill_id`') as $bill) {
 
         $period = Billing::getPeriod($bill['bill_id'], $datefrom, $dateto);
 
-        $date_updated = str_replace('-', '', str_replace(':', '', str_replace(' ', '', $check['updated'])));
+        $date_updated = $check ? str_replace(['-', ':', ' '], '', $check['updated']) : 0;
 
         // Send the current dir_95th to the getRates function so it knows to aggregate or return the max in/out value and highest direction
         $dir_95th = $bill['dir_95th'];
@@ -70,69 +70,69 @@ foreach (dbFetchRows('SELECT * FROM `bills` ORDER BY `bill_id`') as $bill) {
                 $percent = Number::calculatePercent($rate_data['total_data'], $bill['bill_quota']);
             }
 
-            echo strftime('%x @ %X', strtotime($datefrom)) . ' to ' . strftime('%x @ %X', strtotime($dateto)) . ' ' . str_pad($type, 8) . ' ' . str_pad($allowed_text, 10) . ' ' . str_pad($used_text, 10) . ' ' . $percent . '%';
+            echo \Carbon\Carbon::parse($datefrom)->toDateTimeString() . ' to ' . \Carbon\Carbon::parse($dateto)->toDateTimeString() . ' ' . str_pad($type, 8) . ' ' . str_pad($allowed_text, 10) . ' ' . str_pad($used_text, 10) . ' ' . $percent . '%';
 
             if ($i == '0') {
                 $update = [
-                    'rate_95th'        => $rate_data['rate_95th'],
-                    'rate_95th_in'     => $rate_data['rate_95th_in'],
-                    'rate_95th_out'    => $rate_data['rate_95th_out'],
-                    'dir_95th'         => $rate_data['dir_95th'],
-                    'total_data'       => $rate_data['total_data'],
-                    'total_data_in'    => $rate_data['total_data_in'],
-                    'total_data_out'   => $rate_data['total_data_out'],
-                    'rate_average'     => $rate_data['rate_average'],
-                    'rate_average_in'  => $rate_data['rate_average_in'],
+                    'rate_95th' => $rate_data['rate_95th'],
+                    'rate_95th_in' => $rate_data['rate_95th_in'],
+                    'rate_95th_out' => $rate_data['rate_95th_out'],
+                    'dir_95th' => $rate_data['dir_95th'],
+                    'total_data' => $rate_data['total_data'],
+                    'total_data_in' => $rate_data['total_data_in'],
+                    'total_data_out' => $rate_data['total_data_out'],
+                    'rate_average' => $rate_data['rate_average'],
+                    'rate_average_in' => $rate_data['rate_average_in'],
                     'rate_average_out' => $rate_data['rate_average_out'],
-                    'bill_last_calc'   => ['NOW()'],
+                    'bill_last_calc' => ['NOW()'],
                 ];
 
                 dbUpdate($update, 'bills', '`bill_id` = ?', [$bill['bill_id']]);
                 echo ' Updated! ';
             }
 
-            if ($check['bill_id'] == $bill['bill_id']) {
+            if (isset($check['bill_id']) && $check['bill_id'] == $bill['bill_id']) {
                 $update = [
-                    'rate_95th'        => $rate_data['rate_95th'],
-                    'rate_95th_in'     => $rate_data['rate_95th_in'],
-                    'rate_95th_out'    => $rate_data['rate_95th_out'],
-                    'dir_95th'         => $rate_data['dir_95th'],
-                    'rate_average'     => $rate_data['rate_average'],
-                    'rate_average_in'  => $rate_data['rate_average_in'],
+                    'rate_95th' => $rate_data['rate_95th'],
+                    'rate_95th_in' => $rate_data['rate_95th_in'],
+                    'rate_95th_out' => $rate_data['rate_95th_out'],
+                    'dir_95th' => $rate_data['dir_95th'],
+                    'rate_average' => $rate_data['rate_average'],
+                    'rate_average_in' => $rate_data['rate_average_in'],
                     'rate_average_out' => $rate_data['rate_average_out'],
-                    'traf_total'       => $rate_data['total_data'],
-                    'traf_in'          => $rate_data['total_data_in'],
-                    'traf_out'         => $rate_data['total_data_out'],
-                    'bill_peak_out'     => $period['peak_out'],
-                    'bill_peak_in'      => $period['peak_in'],
-                    'bill_used'        => $used,
-                    'bill_overuse'     => $overuse,
-                    'bill_percent'     => $percent,
-                    'updated'          => ['NOW()'],
+                    'traf_total' => $rate_data['total_data'],
+                    'traf_in' => $rate_data['total_data_in'],
+                    'traf_out' => $rate_data['total_data_out'],
+                    'bill_peak_out' => $period['peak_out'],
+                    'bill_peak_in' => $period['peak_in'],
+                    'bill_used' => $used,
+                    'bill_overuse' => $overuse,
+                    'bill_percent' => $percent,
+                    'updated' => ['NOW()'],
                 ];
 
                 dbUpdate($update, 'bill_history', '`bill_hist_id` = ?', [$check['bill_hist_id']]);
                 echo ' Updated history! ';
             } else {
                 $update = [
-                    'rate_95th'        => $rate_data['rate_95th'],
-                    'rate_95th_in'     => $rate_data['rate_95th_in'],
-                    'rate_95th_out'    => $rate_data['rate_95th_out'],
-                    'dir_95th'         => $rate_data['dir_95th'],
-                    'rate_average'     => $rate_data['rate_average'],
-                    'rate_average_in'  => $rate_data['rate_average_in'],
+                    'rate_95th' => $rate_data['rate_95th'],
+                    'rate_95th_in' => $rate_data['rate_95th_in'],
+                    'rate_95th_out' => $rate_data['rate_95th_out'],
+                    'dir_95th' => $rate_data['dir_95th'],
+                    'rate_average' => $rate_data['rate_average'],
+                    'rate_average_in' => $rate_data['rate_average_in'],
                     'rate_average_out' => $rate_data['rate_average_out'],
-                    'traf_total'       => $rate_data['total_data'],
-                    'traf_in'          => $rate_data['total_data_in'],
-                    'traf_out'         => $rate_data['total_data_out'],
-                    'bill_datefrom'    => $datefrom,
-                    'bill_dateto'      => $dateto,
-                    'bill_type'        => $type,
-                    'bill_allowed'     => $allowed,
-                    'bill_used'        => $used,
-                    'bill_overuse'     => $overuse,
-                    'bill_percent'     => $percent,
-                    'bill_id'          => $bill['bill_id'],
+                    'traf_total' => $rate_data['total_data'],
+                    'traf_in' => $rate_data['total_data_in'],
+                    'traf_out' => $rate_data['total_data_out'],
+                    'bill_datefrom' => $datefrom,
+                    'bill_dateto' => $dateto,
+                    'bill_type' => $type,
+                    'bill_allowed' => $allowed,
+                    'bill_used' => $used,
+                    'bill_overuse' => $overuse,
+                    'bill_percent' => $percent,
+                    'bill_id' => $bill['bill_id'],
                 ];
                 dbInsert($update, 'bill_history');
                 echo ' Generated history! ';

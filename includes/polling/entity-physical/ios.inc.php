@@ -35,11 +35,11 @@ foreach ($chan_stats as $index => $entry) {
         ->addDataset('inerrors', 'DERIVE', 0, 125000000000);
 
     $fields = [
-        'inutil'      => $entry['cc6kxbarStatisticsInUtil'],
-        'oututil'     => $entry['cc6kxbarStatisticsOutUtil'],
-        'outdropped'  => $entry['cc6kxbarStatisticsOutDropped'],
-        'outerrors'   => $entry['cc6kxbarStatisticsOutErrors'],
-        'inerrors'    => $entry['cc6kxbarStatisticsInErrors'],
+        'inutil' => $entry['cc6kxbarStatisticsInUtil'],
+        'oututil' => $entry['cc6kxbarStatisticsOutUtil'],
+        'outdropped' => $entry['cc6kxbarStatisticsOutDropped'],
+        'outerrors' => $entry['cc6kxbarStatisticsOutErrors'],
+        'inerrors' => $entry['cc6kxbarStatisticsInErrors'],
     ];
 
     $tags = compact('index', 'subindex', 'rrd_name', 'rrd_def');

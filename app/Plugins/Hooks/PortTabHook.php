@@ -28,6 +28,7 @@ namespace App\Plugins\Hooks;
 use App\Models\Port;
 use App\Models\User;
 use App\Plugins\Hook;
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\Str;
 
 abstract class PortTabHook implements Hook
@@ -35,7 +36,7 @@ abstract class PortTabHook implements Hook
     /** @var string */
     public $view = 'resources.views.port-tab';
 
-    public function authorize(User $user, Port $port, array $settings): bool
+    public function authorize(User $user, Port $port): bool
     {
         return true;
     }
@@ -44,12 +45,15 @@ abstract class PortTabHook implements Hook
     {
         return [
             'title' => __CLASS__,
-            'port'  => $port,
+            'port' => $port,
         ];
     }
 
-    final public function handle(string $pluginName, Port $port): \Illuminate\Contracts\View\View
+    final public function handle(string $pluginName, Port $port, array $settings, Application $app): \Illuminate\Contracts\View\View
     {
-        return view(Str::start($this->view, "$pluginName::"), $this->data($port));
+        return view(Str::start($this->view, "$pluginName::"), $app->call([$this, 'data'], [
+            'port' => $port,
+            'settings' => $settings,
+        ]));
     }
 }

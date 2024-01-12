@@ -24,6 +24,7 @@
  */
 
 use LibreNMS\Config;
+use LibreNMS\Util\Mac;
 
 foreach (DeviceCache::getPrimary()->getVrfContexts() as $context_name) {
     if (file_exists(Config::get('install_dir') . "/includes/discovery/arp-table/{$device['os']}.inc.php")) {
@@ -54,7 +55,7 @@ foreach (DeviceCache::getPrimary()->getVrfContexts() as $context_name) {
                 continue;
             }
 
-            $mac = implode(array_map('zeropad', explode(':', $raw_mac)));
+            $mac = Mac::parse($raw_mac)->hex();
             $arp_table[$port_id][$ip] = $mac;
 
             $index = false;
@@ -69,16 +70,16 @@ foreach (DeviceCache::getPrimary()->getVrfContexts() as $context_name) {
                 $old_mac = $existing_data[$index]['mac_address'];
                 if ($mac != $old_mac && $mac != '') {
                     d_echo("Changed mac address for $ip from $old_mac to $mac\n");
-                    log_event("MAC change: $ip : " . \LibreNMS\Util\Rewrite::readableMac($old_mac) . ' -> ' . \LibreNMS\Util\Rewrite::readableMac($mac), $device, 'interface', 4, $port_id);
+                    log_event("MAC change: $ip : " . Mac::parse($old_mac)->readable() . ' -> ' . Mac::parse($mac)->readable(), $device, 'interface', 4, $port_id);
                     dbUpdate(['mac_address' => $mac], 'ipv4_mac', 'port_id=? AND ipv4_address=? AND context_name=?', [$port_id, $ip, $context_name]);
                 }
                 d_echo("$raw_mac => $ip\n", '.');
             } elseif (isset($interface['port_id'])) {
                 d_echo("$raw_mac => $ip\n", '+');
                 $insert_data[] = [
-                    'port_id'      => $port_id,
-                    'device_id'    => $device['device_id'],
-                    'mac_address'  => $mac,
+                    'port_id' => $port_id,
+                    'device_id' => $device['device_id'],
+                    'mac_address' => $mac,
                     'ipv4_address' => $ip,
                     'context_name' => (string) $context_name,
                 ];

@@ -85,7 +85,6 @@ if (isset($legacy)) {
 
 d_echo($powerdns);
 
-$rrd_name = ['app', $name, $app->app_id];
 $rrd_def = RrdDefinition::make();
 $fields = [];
 foreach ($powerdns_metrics as $ds => $metric) {
@@ -93,6 +92,11 @@ foreach ($powerdns_metrics as $ds => $metric) {
     $fields[$ds] = isset($powerdns[$metric]) ? $powerdns[$metric] : 'U';
 }
 
-$tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
+$tags = [
+    'name' => $name,
+    'app_id' => $app->app_id,
+    'rrd_name' => ['app', $name, $app->app_id],
+    'rrd_def' => $rrd_def,
+];
 data_update($device, 'app', $tags, $fields);
 update_application($app, json_encode($powerdns), $fields);

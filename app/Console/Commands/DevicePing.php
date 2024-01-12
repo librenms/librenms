@@ -4,7 +4,6 @@ namespace App\Console\Commands;
 
 use App\Console\LnmsCommand;
 use App\Models\Device;
-use Illuminate\Database\Eloquent\Builder;
 use LibreNMS\Config;
 use LibreNMS\Polling\ConnectivityHelper;
 use Symfony\Component\Console\Input\InputArgument;
@@ -32,12 +31,7 @@ class DevicePing extends LnmsCommand
     public function handle(): int
     {
         $spec = $this->argument('device spec');
-        $devices = Device::query()->when($spec !== 'all', function (Builder $query) use ($spec) {
-            /** @phpstan-var Builder<Device> $query */
-            return $query->where('device_id', $spec)
-                ->orWhere('hostname', $spec)
-                ->limit(1);
-        })->get();
+        $devices = Device::whereDeviceSpec($spec)->get();
 
         if ($devices->isEmpty()) {
             $devices = [new Device(['hostname' => $spec])];

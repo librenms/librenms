@@ -28230,7 +28230,7 @@
                 {
                     "port_descr_type": "cust",
                     "port_descr_descr": "ACME-building-1er",
-                    "port_descr_circuit": "",
+                    "port_descr_circuit": null,
                     "port_descr_speed": "Access;PortDot1X",
                     "port_descr_notes": null,
                     "ifDescr": "GigabitEthernet1/0/11",
@@ -28830,7 +28830,7 @@
                 {
                     "port_descr_type": "cust",
                     "port_descr_descr": "ACME-building-1er",
-                    "port_descr_circuit": "",
+                    "port_descr_circuit": null,
                     "port_descr_speed": "Access;PortDot1X",
                     "port_descr_notes": null,
                     "ifDescr": "GigabitEthernet1/0/17",
@@ -34530,9 +34530,9 @@
                 {
                     "port_descr_type": "cust",
                     "port_descr_descr": "ACME-building-1er",
-                    "port_descr_circuit": "",
+                    "port_descr_circuit": null,
                     "port_descr_speed": "Access;ADSL",
-                    "port_descr_notes": "",
+                    "port_descr_notes": null,
                     "ifDescr": "GigabitEthernet2/0/22",
                     "ifName": "GigabitEthernet2/0/22",
                     "portName": null,
@@ -41230,7 +41230,7 @@
                 {
                     "port_descr_type": "cust",
                     "port_descr_descr": "ACME-building-1er",
-                    "port_descr_circuit": "",
+                    "port_descr_circuit": null,
                     "port_descr_speed": "Access;PortDot1X",
                     "port_descr_notes": null,
                     "ifDescr": "GigabitEthernet3/0/36",
@@ -42130,7 +42130,7 @@
                 {
                     "port_descr_type": "cust",
                     "port_descr_descr": "ACME-building-1er",
-                    "port_descr_circuit": "",
+                    "port_descr_circuit": null,
                     "port_descr_speed": "Access;ADSL",
                     "port_descr_notes": null,
                     "ifDescr": "GigabitEthernet3/0/45",

@@ -40,6 +40,7 @@ return [
             'general' => ['name' => 'General Discovery Settings'],
             'route' => ['name' => 'Routes Discovery Module'],
             'discovery_modules' => ['name' => 'Discovery Modules'],
+            'ports' => ['name' => 'Ports Module'],
             'storage' => ['name' => 'Storage Module'],
             'networks' => ['name' => 'Networks'],
         ],
@@ -66,7 +67,6 @@ return [
             'rrdtool' => ['name' => 'Datastore: RRDTool'],
             'snmp' => ['name' => 'SNMP'],
             'poller_modules' => ['name' => 'Poller Modules'],
-            'interface_types' => ['name' => 'Interface Type by RFC 7224'],
         ],
         'system' => [
             'cleanup' => ['name' => 'Cleanup'],
@@ -98,6 +98,10 @@ return [
             'help' => 'If a host is added as an ip address it is checked to ensure the ip is not already present. If the ip is present the host is not added. If host is added by hostname this check is not performed. If the setting is true hostnames are resolved and the check is also performed. This helps prevents accidental duplicate hosts.',
         ],
         'alert_rule' => [
+            'acknowledged_alerts' => [
+                'description' => 'Acknowledged Alerts',
+                'help' => 'Send alerts when an alert is acknowledged',
+            ],
             'severity' => [
                 'description' => 'Severity',
                 'help' => 'Severity for an Alert',
@@ -126,6 +130,10 @@ return [
                 'description' => 'Recovery Alerts',
                 'help' => 'Notify if Alert recovers',
             ],
+            'acknowledgement_alerts' => [
+                'description' => 'Acknowledgement Alerts',
+                'help' => 'Notify if Alert is acknowledged',
+            ],
             'invert_map' => [
                 'description' => 'All devices except in list',
                 'help' => 'Alert only for Devices which are not listed',
@@ -137,40 +145,44 @@ return [
                 'help' => 'Default acknowledge until alert clears',
             ],
             'admins' => [
-                'description' => 'Issue alerts to admins',
-                'help' => 'Alert administrators',
+                'description' => 'Issue alerts to admins (deprecated)',
+                'help' => 'Deprecated, use the mail alert transport instead.',
             ],
             'default_copy' => [
-                'description' => 'Copy all email alerts to default contact',
-                'help' => 'Copy all email alerts to default contact',
+                'description' => 'Copy all email alerts to default contact (deprecated)',
+                'help' => 'Deprecated, use the mail alert transport instead.',
             ],
             'default_if_none' => [
-                'description' => 'cannot set in webui?',
-                'help' => 'Send mail to default contact if no other contacts are found',
+                'description' => 'cannot set in webui? (deprecated)',
+                'help' => 'Deprecated, use the mail alert transport instead.',
             ],
             'default_mail' => [
-                'description' => 'Default contact',
-                'help' => 'The default mail contact',
+                'description' => 'Default contact (deprecated)',
+                'help' => 'Deprecated, use the mail alert transport instead.',
             ],
             'default_only' => [
-                'description' => 'Send alerts to default contact only',
-                'help' => 'Only alert default mail contact',
+                'description' => 'Send alerts to default contact only (deprecated)',
+                'help' => 'Deprecated, use the mail alert transport instead.',
             ],
             'disable' => [
                 'description' => 'Disable alerting',
                 'help' => 'Stop alerts being generated',
             ],
+            'acknowledged' => [
+                'description' => 'Send acknowledged alerts',
+                'help' => 'Notify if Alert has been acknowledged',
+            ],
             'fixed-contacts' => [
-                'description' => 'Updates to contact email addresses not honored',
+                'description' => 'Disable contact changes for active alerts',
                 'help' => 'If TRUE any changes to sysContact or users emails will not be honoured whilst alert is active',
             ],
             'globals' => [
-                'description' => 'Issue alerts to read only users',
-                'help' => 'Alert read only administrators',
+                'description' => 'Issue alerts to read only users (deprecated)',
+                'help' => 'Deprecated, use the mail alert transport instead.',
             ],
             'syscontact' => [
-                'description' => 'Issue alerts to sysContact',
-                'help' => 'Send alert to email in SNMP sysContact',
+                'description' => 'Issue alerts to sysContact (deprecated)',
+                'help' => 'Deprecated, use the mail alert transport instead.',
             ],
             'transports' => [
                 'mail' => [
@@ -183,8 +195,8 @@ return [
                 'help' => 'Tolerance window in seconds',
             ],
             'users' => [
-                'description' => 'Issue alerts to normal users',
-                'help' => 'Alert normal users',
+                'description' => 'Issue alerts to normal users (deprecated)',
+                'help' => 'Deprecated, use the mail alert transport instead.',
             ],
         ],
         'alert_log_purge' => [
@@ -239,9 +251,6 @@ return [
                 ],
             ],
         ],
-        'api_demo' => [
-            'description' => 'This is the demo',
-        ],
         'apps' => [
             'powerdns-recursor' => [
                 'api-key' => [
@@ -262,6 +271,10 @@ return [
             'description' => 'Key to hold cache of autonomous systems descriptions',
         ],
         'auth' => [
+            'allow_get_login' => [
+                'description' => 'Allow get login (Insecure)',
+                'help' => 'Allow login by putting username and password variables in the url get request, useful for display systems where you cannot interactively log in. This is considered insecure because the password will be shown in logs and logins are not rate limited so it could open you up to brute force attacks.',
+            ],
             'socialite' => [
                 'redirect' => [
                     'description' => 'Redirect Login page',
@@ -273,6 +286,10 @@ return [
                 'configs' => [
                     'description' => 'Provider configs',
                 ],
+                'scopes' => [
+                    'description' => 'Scopes that should be included with in the authentication request',
+                    'help' => 'See https://laravel.com/docs/10.x/socialite#access-scopes',
+                ],
             ],
         ],
         'auth_ad_base_dn' => [
@@ -283,6 +300,14 @@ return [
             'description' => 'Check certificate',
             'help' => 'Check certificates for validity. Some servers use self signed certificates, disabling this allows those.',
         ],
+        'auth_ad_debug' => [
+            'description' => 'Debug',
+            'help' => 'Show detailed error messages, do not leave this enabled as it can leak data.',
+        ],
+        'auth_ad_domain' => [
+            'description' => 'Active Directory Domain',
+            'help' => 'Active Directory Domain Example: example.com',
+        ],
         'auth_ad_group_filter' => [
             'description' => 'Group LDAP filter',
             'help' => 'Active Directory LDAP filter for selecting groups',
@@ -291,6 +316,10 @@ return [
             'description' => 'Group access',
             'help' => 'Define groups that have access and level',
         ],
+        'auth_ad_require_groupmembership' => [
+            'description' => 'Require group membership',
+            'help' => 'Only allow users to log in if they are part of a defined group',
+        ],
         'auth_ad_user_filter' => [
             'description' => 'User LDAP filter',
             'help' => 'Active Directory LDAP filter for selecting users',
@@ -298,10 +327,6 @@ return [
         'auth_ad_url' => [
             'description' => 'Active Directory Server(s)',
             'help' => 'Set server(s), space separated. Prefix with ldaps:// for ssl. Example: ldaps://dc1.example.com ldaps://dc2.example.com',
-        ],
-        'auth_ad_domain' => [
-            'description' => 'Active Directory Domain',
-            'help' => 'Active Directory Domain Example: example.com',
         ],
         'auth_ldap_attr' => [
             'uid' => [
@@ -349,6 +374,14 @@ return [
         'auth_ldap_debug' => [
             'description' => 'Show debug',
             'help' => 'Shows debug information.  May expose private information, do not leave enabled.',
+        ],
+        'auth_ldap_cacertfile' => [
+            'description' => 'Override system TLS CA Cert',
+            'help' => 'Use supplied CA Cert for LDAPS.',
+        ],
+        'auth_ldap_ignorecert' => [
+            'description' => 'Do not require valid Cert',
+            'help' => 'Do not require a valid TLS Cert for LDAPS.',
         ],
         'auth_ldap_emailattr' => [
             'description' => 'Mail attribute',
@@ -539,9 +572,6 @@ return [
             'junose-atm-vp' => [
                 'description' => 'Junose ATM VP',
             ],
-            'libvirt-vminfo' => [
-                'description' => 'Libvirt VMInfo',
-            ],
             'loadbalancers' => [
                 'description' => 'Loadbalancers',
             ],
@@ -594,8 +624,8 @@ return [
             'vlans' => [
                 'description' => 'VLans',
             ],
-            'vmware-vminfo' => [
-                'description' => 'VMWare VMInfo',
+            'vminfo' => [
+                'description' => 'Hypervisor VM Info',
             ],
             'vrf' => [
                 'description' => 'VRF',
@@ -809,6 +839,12 @@ return [
             'version' => [
                 'description' => 'Version',
                 'help' => 'This is used to automatically create the base_uri for the Graylog API. If you have modified the API uri from the default, set this to other and specify your base_uri.',
+            ],
+            'query' => [
+                'field' => [
+                    'description' => 'Query api field',
+                    'help' => 'Changes the default field to query graylog API.',
+                ],
             ],
         ],
         'html' => [
@@ -1054,9 +1090,21 @@ return [
                 ],
             ],
         ],
+        'bad_if' => [
+            'description' => 'Bad Interface Names',
+            'help' => 'Network interface IF-MIB:!:ifName which should be ignored',
+        ],
+        'bad_if_regexp' => [
+            'description' => 'Bad Interface Name Regex',
+            'help' => 'Network interface IF-MIB:!:ifName which should be ignored using regular expressions',
+        ],
+        'bad_ifoperstatus' => [
+            'description' => 'Bad Interface Operating Status',
+            'help' => 'Network interface IF-MIB:!:ifOperStatus which should be ignored',
+        ],
         'bad_iftype' => [
-            'description' => 'Bad Interfaces',
-            'help' => 'Network Interface Types which should be ignored',
+            'description' => 'Bad Interface Types',
+            'help' => 'Network interface IF-MIB:!:ifType which should be ignored',
         ],
         'ping' => [
             'description' => 'Path to ping',
@@ -1110,9 +1158,6 @@ return [
             ],
             'ucd-diskio' => [
                 'description' => 'UCD DiskIO',
-            ],
-            'wifi' => [
-                'description' => 'Wifi',
             ],
             'wireless' => [
                 'description' => 'Wireless',
@@ -1188,6 +1233,9 @@ return [
             ],
             'stp' => [
                 'description' => 'STP',
+            ],
+            'vminfo' => [
+                'description' => 'Hypervisor VM Info',
             ],
             'ntp' => [
                 'description' => 'NTP',
@@ -1282,6 +1330,10 @@ return [
             'dump_errors' => [
                 'description' => 'Dump debug errors (Will break your install)',
                 'help' => 'Dump out errors that are normally hidden so you as a developer can find and fix the possible issues.',
+            ],
+            'throttle' => [
+                'description' => 'Throttle Error Reports',
+                'help' => 'Reports will only be sent every specified amount of seconds. Without this if you have an error in common code reporting can get out of hand. Set to 0 to disable throttling.',
             ],
         ],
         'route_purge' => [

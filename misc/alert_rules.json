@@ -699,12 +699,12 @@
     "severity": "critical"
   },
   {
-    "rule": "storage.storage_deleted = 0 AND storage.storage_descr = \"/\" AND storage.storage_perc >= 90 AND storage.storage_perc < 95",
+    "rule": "storage.storage_deleted = 0 && storage.storage_descr = \"/\" && storage.storage_perc >= 90 && storage.storage_perc < 95",
     "name": "Space on / is >= 90% and < 95% in use",
     "severity":"warning"
   },
   {
-    "rule": "storage.storage_deleted = 0 AND storage.storage_descr = \"/\" AND storage.storage_perc >= 95",
+    "rule": "storage.storage_deleted = 0 && storage.storage_descr = \"/\" && storage.storage_perc >= 95",
     "name": "Space on / is >= 95% in use",
     "severity":"critical"
   },
@@ -751,6 +751,16 @@
   {
     "rule": "applications.app_type = \"smart\" && application_metrics.metric = \"exit_nonzero\" && application_metrics.value > \"0\"",
     "name": "SMART: one or more disk could not be polled",
+    "severity": "critical"
+  },
+  {
+    "rule": "applications.app_type = \"ss\" && application_metrics.metric = \"tcp_time-wait\" && application_metrics.value > \"100\"",
+    "name": "SS TCP TIME-WAIT Sessions > 100",
+    "severity": "warning"
+  },
+  {
+    "rule": "applications.app_type = \"ss\" && application_metrics.metric = \"inet6_tcp_established\" && application_metrics.value < \"10\"",
+    "name": "SS IPv6 TCP ESTABLISHED Sessions < 10",
     "severity": "critical"
   },
   {

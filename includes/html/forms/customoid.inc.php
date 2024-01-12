@@ -4,7 +4,7 @@ header('Content-type: application/json');
 
 if (! Auth::user()->hasGlobalAdmin()) {
     exit(json_encode([
-        'status'  => 'error',
+        'status' => 'error',
         'message' => 'Need to be admin',
     ]));
 }
@@ -18,24 +18,16 @@ $action = $_POST['action'];
 $name = strip_tags($_POST['name']);
 $oid = strip_tags($_POST['oid']);
 $datatype = strip_tags($_POST['datatype']);
-if (! empty($_POST['unit'])) {
-    $unit = $_POST['unit'];
-} else {
-    $unit = ['NULL'];
-}
-$limit = set_numeric($_POST['limit'], ['NULL']);
-$limit_warn = set_numeric($_POST['limit_warn'], ['NULL']);
-$limit_low = set_numeric($_POST['limit_low'], ['NULL']);
-$limit_low_warn = set_numeric($_POST['limit_low_warn'], ['NULL']);
+$unit = $_POST['unit'];
+$limit = $_POST['limit'];
+$limit_warn = $_POST['limit_warn'];
+$limit_low = $_POST['limit_low'];
+$limit_low_warn = $_POST['limit_low_warn'];
 $alerts = ($_POST['alerts'] == 'on' ? 1 : 0);
 $passed = ($_POST['passed'] == 'on' ? 1 : 0);
 $divisor = set_numeric($_POST['divisor'], 1);
 $multiplier = set_numeric($_POST['multiplier'], 1);
-if (! empty($_POST['user_func'])) {
-    $user_func = $_POST['user_func'];
-} else {
-    $user_func = ['NULL'];
-}
+$user_func = $_POST['user_func'];
 
 if ($action == 'test') {
     $query = 'SELECT * FROM `devices` WHERE `device_id` = ? LIMIT 1';
@@ -76,19 +68,19 @@ if ($action == 'test') {
     if (is_numeric($id) && $id > 0) {
         if (dbUpdate(
             [
-                'customoid_descr'          => $name,
-                'customoid_oid'            => $oid,
-                'customoid_datatype'       => $datatype,
-                'customoid_unit'           => $unit,
-                'customoid_divisor'        => $divisor,
-                'customoid_multiplier'     => $multiplier,
-                'customoid_limit'          => $limit,
-                'customoid_limit_warn'     => $limit_warn,
-                'customoid_limit_low'      => $limit_low,
+                'customoid_descr' => $name,
+                'customoid_oid' => $oid,
+                'customoid_datatype' => $datatype,
+                'customoid_unit' => $unit,
+                'customoid_divisor' => $divisor,
+                'customoid_multiplier' => $multiplier,
+                'customoid_limit' => $limit,
+                'customoid_limit_warn' => $limit_warn,
+                'customoid_limit_low' => $limit_low,
                 'customoid_limit_low_warn' => $limit_low_warn,
-                'customoid_alert'          => $alerts,
-                'customoid_passed'         => $passed,
-                'user_func'                => $user_func,
+                'customoid_alert' => $alerts,
+                'customoid_passed' => $passed,
+                'user_func' => $user_func,
             ],
             'customoids',
             '`customoid_id` = ?',
@@ -106,20 +98,20 @@ if ($action == 'test') {
     } else {
         $id = dbInsert(
             [
-                'device_id'                => $device_id,
-                'customoid_descr'          => $name,
-                'customoid_oid'            => $oid,
-                'customoid_datatype'       => $datatype,
-                'customoid_unit'           => $unit,
-                'customoid_divisor'        => $divisor,
-                'customoid_multiplier'     => $multiplier,
-                'customoid_limit'          => $limit,
-                'customoid_limit_warn'     => $limit_warn,
-                'customoid_limit_low'      => $limit_low,
+                'device_id' => $device_id,
+                'customoid_descr' => $name,
+                'customoid_oid' => $oid,
+                'customoid_datatype' => $datatype,
+                'customoid_unit' => $unit,
+                'customoid_divisor' => $divisor,
+                'customoid_multiplier' => $multiplier,
+                'customoid_limit' => $limit,
+                'customoid_limit_warn' => $limit_warn,
+                'customoid_limit_low' => $limit_low,
                 'customoid_limit_low_warn' => $limit_low_warn,
-                'customoid_alert'          => $alerts,
-                'customoid_passed'         => $passed,
-                'user_func'                => $user_func,
+                'customoid_alert' => $alerts,
+                'customoid_passed' => $passed,
+                'user_func' => $user_func,
             ],
             'customoids'
         );
@@ -133,6 +125,6 @@ if ($action == 'test') {
 }
 
 exit(json_encode([
-    'status'       => $status,
-    'message'      => $message,
+    'status' => $status,
+    'message' => $message,
 ]));

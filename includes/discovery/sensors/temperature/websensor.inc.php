@@ -51,7 +51,7 @@ if ($oids) {
 }
 
 $temp_unit = snmp_get($device, 'tempUnit.0', '-OevTQUs', 'T3610-MIB');
-$user_func = '';
+$user_func = null;
 
 if (Str::contains($temp_unit, 'F')) {
     $user_func = 'fahrenheit_to_celsius';

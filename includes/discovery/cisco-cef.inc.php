@@ -1,7 +1,6 @@
 <?php
 
-$cefs = [];
-$cefs = snmpwalk_cache_threepart_oid($device, 'CISCO-CEF-MIB::cefSwitchingPath', $cefs);
+$cefs = SnmpQuery::hideMib()->walk('CISCO-CEF-MIB::cefSwitchingPath')->table(3);
 d_echo($cefs);
 
 if (is_array($cefs)) {

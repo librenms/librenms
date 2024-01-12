@@ -275,6 +275,8 @@ $graphs['smart'] = [
     'id187',
     'id188',
     'maxtemp',
+    'id190',
+    'id194',
     'id196',
     'id197',
     'id198',
@@ -519,15 +521,18 @@ $graphs['privoxy'] = [
     'resp_xxx',
     'ver',
 ];
+$graphs['ss'] = [
+    'sockets',
+];
 
 echo '<div class="panel panel-default">';
 echo '<div class="panel-heading">';
 echo "<span style='font-weight: bold;'>Apps</span> &#187; ";
 unset($sep);
 $link_array = [
-    'page'   => 'device',
+    'page' => 'device',
     'device' => $device['device_id'],
-    'tab'    => 'apps',
+    'tab' => 'apps',
 ];
 
 $apps = \LibreNMS\Util\ObjectCache::applications()->flatten();

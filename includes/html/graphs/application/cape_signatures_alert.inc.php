@@ -28,39 +28,39 @@ $rrd_list = [];
 if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Min',
-        'ds'       => 's0signatures_alert',
+        'descr' => 'Min',
+        'ds' => 's0signatures_alert',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Max',
-        'ds'       => 's1signatures_alert',
+        'descr' => 'Max',
+        'ds' => 's1signatures_alert',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Mean',
-        'ds'       => 's3signatures_alert',
+        'descr' => 'Mean',
+        'ds' => 's3signatures_alert',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Median',
-        'ds'       => 's4signatures_alert',
+        'descr' => 'Median',
+        'ds' => 's4signatures_alert',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Mode',
-        'ds'       => 's5signatures_alert',
+        'descr' => 'Mode',
+        'ds' => 's5signatures_alert',
     ];
     if ($vars['stddev'] == 'on') {
         $rrd_list[] = [
             'filename' => $rrd_filename,
-            'descr'    => 'StdDev',
-            'ds'       => 's7signatures_alert',
+            'descr' => 'StdDev',
+            'ds' => 's7signatures_alert',
         ];
         $rrd_list[] = [
             'filename' => $rrd_filename,
-            'descr'    => 'StdDevP',
-            'ds'       => 's9signatures_alert',
+            'descr' => 'StdDevP',
+            'ds' => 's9signatures_alert',
         ];
     }
 } else {

@@ -37,6 +37,11 @@ modules:
                     index: 'fgHwSensorEntIndex.{{ $index }}'
                     descr: fgHwSensorEntName
                     value: fgHwSensorEntAlarmStatus
+                    skip_values:
+                        -
+                            oid: fgHwSensorEntName
+                            op: '='
+                            value: ''
                     states:
                         - { value: 0, descr: OK, graph: 1, generic: 0 }
                         - { value: 1, descr: ERROR, graph: 1, generic: 2 }
@@ -308,4 +313,54 @@ modules:
                     low_warn_limit: -85
                     warn_limit: -30
                     high_limit: -20
-
+        temperature:
+            data:
+                -
+                    oid:  fgHwSensors
+                    num_oid: '.1.3.6.1.4.1.12356.101.4.3.2.1.3.{{ $index }}'
+                    index: 'fgHwSensorEntIndex.{{ $index }}'
+                    descr: fgHwSensorEntName
+                    value:  fgHwSensorEntValue
+                    skip_values:
+                        -   
+                            oid: fgHwSensorEntName
+                            op: 'regex'
+                            value: '/^((?!Temp).)*$/'
+                        -   
+                            oid: fgHwSensorEntValue
+                            op: '='
+                            value: -1
+        fanspeed:
+            data:
+                -
+                    oid:  fgHwSensors
+                    num_oid: '.1.3.6.1.4.1.12356.101.4.3.2.1.3.{{ $index }}'
+                    index: 'fgHwSensorEntIndex.{{ $index }}'
+                    descr: fgHwSensorEntName
+                    value:  fgHwSensorEntValue
+                    skip_values:
+                        -
+                            oid: fgHwSensorEntName
+                            op: 'regex'
+                            value: '/^((?!Fan).)*$/'
+                        -
+                            oid: fgHwSensorEntName
+                            op: 'regex'
+                            value: '/.*Temp.*/'
+                        -   
+                            oid: fgHwSensorEntValue
+                            op: '='
+                            value: -1
+        voltage:
+            data:
+                -
+                    oid:  fgHwSensors
+                    num_oid: '.1.3.6.1.4.1.12356.101.4.3.2.1.3.{{ $index }}'
+                    index: 'fgHwSensorEntIndex.{{ $index }}'
+                    descr: fgHwSensorEntName
+                    value:  fgHwSensorEntValue
+                    skip_values:
+                        -
+                            oid: fgHwSensorEntName
+                            op: 'regex'
+                            value: '/^((?!VCC).)*$/'

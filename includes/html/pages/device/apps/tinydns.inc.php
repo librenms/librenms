@@ -26,9 +26,9 @@
 
 $graphs = [
     'tinydns_queries' => 'Queries',
-    'tinydns_errors'  => 'Errors',
-    'tinydns_dnssec'  => 'DNSSec',
-    'tinydns_other'   => 'Other',
+    'tinydns_errors' => 'Errors',
+    'tinydns_dnssec' => 'DNSSec',
+    'tinydns_other' => 'Other',
 ];
 
 foreach ($graphs as $key => $text) {

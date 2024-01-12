@@ -25,6 +25,8 @@
 
 namespace LibreNMS\Util;
 
+use LibreNMS\Enum\IntegerType;
+
 class Number
 {
     public static function formatBase($value, $base = 1000, $round = 2, $sf = 3, $suffix = 'B')
@@ -84,6 +86,19 @@ class Number
         }
 
         return self::cast(number_format(round($value, $round), $sf, '.', '')) . " $ext$suffix";
+    }
+
+    /**
+     * Convert an Si or Bi formatted value to bytes (or bits)
+     */
+    public static function toBytes(string $formatted): int|float
+    {
+        preg_match('/^([\d.]+)([KMGTPEZY]?)(\w?)\w?$/', $formatted, $matches);
+        [, $number, $magnitude, $baseIndicator] = $matches;
+        $base = $baseIndicator == 'i' ? 1024 : 1000;
+        $exponent = ['K' => 1, 'M' => 2, 'G' => 3, 'T' => 4, 'P' => 5, 'E' => 6, 'Z' => 7, 'Y' => 8];
+
+        return self::cast($number) * pow($base, $exponent[$magnitude] ?? 0);
     }
 
     /**
@@ -161,5 +176,38 @@ class Number
         }
 
         return (int) ($number * (1024 ** $exponent));
+    }
+
+    public static function constrainInteger(int $value, IntegerType $integerSize): int
+    {
+        if ($integerSize->isSigned()) {
+            $maxSignedValue = $integerSize->maxValue();
+
+            if ($value > $maxSignedValue) {
+                $signedValue = $value - $maxSignedValue * 2 - 2;
+
+                // if conversion was successfull, the number will still be in the valid range
+                if ($signedValue > $maxSignedValue) {
+                    throw new \InvalidArgumentException('Unsigned value exceeds the maximum representable value of ' . $integerSize->name);
+                }
+
+                return $signedValue;
+            }
+
+            return $value;
+        }
+
+        // unsigned check if value is negative
+        if ($value < 0) {
+            $unsignedValue = $value + $integerSize->maxValue() - 1;
+
+            if ($unsignedValue < 0) {
+                throw new \InvalidArgumentException('Unsigned value exceeds the minimum representable value of ' . $integerSize->name);
+            }
+
+            return $unsignedValue;
+        }
+
+        return $value;
     }
 }

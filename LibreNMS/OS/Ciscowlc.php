@@ -27,6 +27,7 @@ namespace LibreNMS\OS;
 
 use App\Models\AccessPoint;
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessApCountDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 use LibreNMS\Interfaces\Polling\OSPolling;
@@ -38,7 +39,7 @@ class Ciscowlc extends Cisco implements
     WirelessClientsDiscovery,
     WirelessApCountDiscovery
 {
-    public function pollOS(): void
+    public function pollOS(DataStorageInterface $datastore): void
     {
         $device = $this->getDeviceArray();
         $apNames = \SnmpQuery::enumStrings()->walk('AIRESPACE-WIRELESS-MIB::bsnAPName')->table(1);
@@ -51,7 +52,7 @@ class Ciscowlc extends Cisco implements
 
         foreach ($radios as $radio) {
             foreach ($radio as $slot) {
-                $numClients += $slot['AIRESPACE-WIRELESS-MIB::bsnApIfNoOfUsers'];
+                $numClients += $slot['AIRESPACE-WIRELESS-MIB::bsnApIfNoOfUsers'] ?? 0;
             }
         }
 
@@ -60,12 +61,12 @@ class Ciscowlc extends Cisco implements
             ->addDataset('NUMCLIENTS', 'GAUGE', 0, 12500000000);
 
         $fields = [
-            'NUMAPS'     => $numAccessPoints,
+            'NUMAPS' => $numAccessPoints,
             'NUMCLIENTS' => $numClients,
         ];
 
         $tags = compact('rrd_def');
-        data_update($device, 'ciscowlc', $tags, $fields);
+        $datastore->put($device, 'ciscowlc', $tags, $fields);
 
         $db_aps = $this->getDevice()->accessPoints->keyBy->getCompositeKey();
         $valid_ap_ids = [];
@@ -105,7 +106,7 @@ class Ciscowlc extends Cisco implements
                     ->addDataset('numasoclients', 'GAUGE', 0, 500)
                     ->addDataset('interference', 'GAUGE', 0, 2000);
 
-                data_update($device, 'arubaap', [
+                $datastore->put($device, 'arubaap', [
                     'name' => $ap->name,
                     'radionum' => $ap->radio_number,
                     'rrd_name' => ['arubaap', $ap->name . $ap->radio_number],
@@ -142,8 +143,16 @@ class Ciscowlc extends Cisco implements
      */
     public function discoverWirelessClients()
     {
-        $ssids = $this->getCacheByIndex('bsnDot11EssSsid', 'AIRESPACE-WIRELESS-MIB');
         $counts = $this->getCacheByIndex('bsnDot11EssNumberOfMobileStations', 'AIRESPACE-WIRELESS-MIB');
+        if (empty($counts)) {
+            return []; // no counts to be had
+        }
+
+        $ssids = $this->getCacheByIndex('bsnDot11EssSsid', 'AIRESPACE-WIRELESS-MIB');
+        if (empty($ssids)) {
+            //  Try to check the LWAPP mib
+            $ssids = $this->getCacheByIndex('cLWlanSsid', 'CISCO-LWAPP-WLAN-MIB');
+        }
 
         $sensors = [];
         $total_oids = [];
@@ -164,17 +173,15 @@ class Ciscowlc extends Cisco implements
             );
         }
 
-        if (! empty($counts)) {
-            $sensors[] = new WirelessSensor(
-                'clients',
-                $this->getDeviceId(),
-                $total_oids,
-                'ciscowlc',
-                0,
-                'Clients: Total',
-                $total
-            );
-        }
+        $sensors[] = new WirelessSensor(
+            'clients',
+            $this->getDeviceId(),
+            $total_oids,
+            'ciscowlc',
+            0,
+            'Clients: Total',
+            $total
+        );
 
         return $sensors;
     }

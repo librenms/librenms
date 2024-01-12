@@ -58,7 +58,6 @@ return [
             'rrdtool' => ['name' => 'RRDTool 設定'],
             'snmp' => ['name' => 'SNMP'],
             'poller_modules' => ['name' => '輪詢器模組'],
-            'interface_types' => ['name' => 'RFC 7224 介面類型'],
         ],
         'system' => [
             'cleanup' => ['name' => '清理'],
@@ -192,9 +191,6 @@ return [
         'allow_unauth_graphs_cidr' => [
             'description' => '允許指定網路存取圖表',
             'help' => '允許指定網路可以在未登入授權查看圖表 (若未啟用 允許未登入存取圖表 則忽略此設定)',
-        ],
-        'api_demo' => [
-            'description' => '這是展示',
         ],
         'apps' => [
             'powerdns-recursor' => [

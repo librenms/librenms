@@ -24,9 +24,9 @@
  */
 $graphs = [
     'rrdcached_queue_length' => 'Queue Length',
-    'rrdcached_events'       => 'Events',
-    'rrdcached_tree'         => 'Tree',
-    'rrdcached_journal'      => 'Journal',
+    'rrdcached_events' => 'Events',
+    'rrdcached_tree' => 'Tree',
+    'rrdcached_journal' => 'Journal',
 ];
 
 foreach ($graphs as $key => $text) {

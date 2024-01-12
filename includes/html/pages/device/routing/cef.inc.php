@@ -3,10 +3,10 @@
 print_optionbar_start();
 
 $link_array = [
-    'page'   => 'device',
+    'page' => 'device',
     'device' => $device['device_id'],
-    'tab'    => 'routing',
-    'proto'  => 'cef',
+    'tab' => 'routing',
+    'proto' => 'cef',
 ];
 
 if (! isset($vars['view'])) {
@@ -37,16 +37,17 @@ if ($vars['view'] == 'graphs') {
 
 print_optionbar_end();
 
-echo '<div id="content">
-    <table  border="0" cellspacing="0" cellpadding="5" width="100%">';
-
-echo '<tr><th><a title="Physical hardware entity">Entity</a></th>
+echo '<div class="panel panel-default">
+    <div class="panel-body">
+    <table class="table table-condensed table-hover" style="border-collapse:collapse;">
+    <thead><tr>
+    <th><a title="Physical hardware entity">Entity</a></th>
     <th><a title="Address Family">AFI</a></th>
     <th><a title="CEF Switching Path">Path</a></th>
     <th><a title="Number of packets dropped.">Drop</a></th>
     <th><a title="Number of packets that could not be switched in the normal path and were punted to the next-fastest switching vector.">Punt</a></th>
     <th><a title="Number of packets that could not be switched in the normal path and were punted to the host.<br />For switch paths other than a centralized turbo switch path, punt and punt2host function the same way. With punt2host from a centralized turbo switch path (PAS and RSP), punt will punt the packet to LES, but punt2host will bypass LES and punt directly to process switching.">Punt2Host</a></th>
-    </tr>';
+    </tr></thead>';
 
 $i = 0;
 
@@ -68,7 +69,7 @@ foreach (dbFetchRows('SELECT * FROM `cef_switching` WHERE `device_id` = ?  ORDER
         $entity_descr = $entity['entPhysicalName'] . ' (' . $entity['entPhysicalModelName'] . ')';
     }
 
-    echo "<tr bgcolor=$bg_colour><td>" . $entity_descr . '</td>
+    echo '<tbody><tr><td>' . $entity_descr . '</td>
         <td>' . $cef['afi'] . '</td>
         <td>';
 
@@ -109,7 +110,7 @@ foreach (dbFetchRows('SELECT * FROM `cef_switching` WHERE `device_id` = ?  ORDER
 
     echo '</td>';
 
-    echo '</tr>
+    echo '</tr></tbody>
     ';
 
     if ($vars['view'] == 'graphs') {
@@ -129,4 +130,4 @@ foreach (dbFetchRows('SELECT * FROM `cef_switching` WHERE `device_id` = ?  ORDER
     $i++;
 }
 
-echo '</table></div>';
+echo '</table></div></div>';

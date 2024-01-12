@@ -21,6 +21,7 @@ use App\Models\Location;
 use App\Models\MplsSap;
 use App\Models\MplsService;
 use App\Models\OspfPort;
+use App\Models\PollerGroup;
 use App\Models\Port;
 use App\Models\PortGroup;
 use App\Models\PortsFdb;
@@ -42,8 +43,8 @@ use LibreNMS\Exceptions\InvalidTableColumnException;
 use LibreNMS\Util\Graph;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\IPv4;
+use LibreNMS\Util\Mac;
 use LibreNMS\Util\Number;
-use LibreNMS\Util\Rewrite;
 
 function api_success($result, $result_name, $message = null, $code = 200, $count = null, $extra = null): JsonResponse
 {
@@ -80,7 +81,7 @@ function api_success_noresult($code, $message = null): JsonResponse
 function api_error($statusCode, $message): JsonResponse
 {
     return response()->json([
-        'status'  => 'error',
+        'status' => 'error',
         'message' => $message,
     ], $statusCode, [], JSON_PRETTY_PRINT);
 } // end api_error()
@@ -113,7 +114,7 @@ function api_get_graph(Request $request, array $additional = [])
         ]);
 
         $graph = Graph::get([
-            'width'  => $request->get('width', 1075),
+            'width' => $request->get('width', 1075),
             'height' => $request->get('height', 300),
             ...$additional,
             ...$vars,
@@ -413,6 +414,7 @@ function add_device(Illuminate\Http\Request $request)
             'hostname',
             'display',
             'overwrite_ip',
+            'location_id',
             'port',
             'transport',
             'poller_group',
@@ -427,6 +429,10 @@ function add_device(Illuminate\Http\Request $request)
             'cryptoalgo',
         ]));
 
+        if (! empty($data['location'])) {
+            $device->location_id = \App\Models\Location::firstOrCreate(['location' => $data['location']])->id;
+        }
+
         // uses different name in legacy call
         if (! empty($data['version'])) {
             $device->snmpver = $data['version'];
@@ -439,7 +445,7 @@ function add_device(Illuminate\Http\Request $request)
             $device->snmp_disable = 1;
         }
 
-        (new ValidateDeviceAndCreate($device, ! empty($data['force_add'])))->execute();
+        (new ValidateDeviceAndCreate($device, ! empty($data['force_add']), ! empty($data['ping_fallback'])))->execute();
     } catch (Exception $e) {
         return api_error(500, $e->getMessage());
     }
@@ -627,6 +633,10 @@ function list_bgp(Illuminate\Http\Request $request)
     $remote_asn = $request->get('remote_asn');
     $local_address = $request->get('local_address');
     $remote_address = $request->get('remote_address');
+    $bgp_descr = $request->get('bgp_descr');
+    $bgp_state = $request->get('bgp_state');
+    $bgp_adminstate = $request->get('bgp_adminstate');
+    $bgp_family = $request->get('bgp_family');
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
     if (is_numeric($device_id)) {
         $sql .= ' AND `devices`.`device_id` = ?';
@@ -634,11 +644,11 @@ function list_bgp(Illuminate\Http\Request $request)
     }
     if (! empty($asn)) {
         $sql .= ' AND `devices`.`bgpLocalAs` = ?';
-        $sql_params[] = $asn;
+        $sql_params[] = preg_replace('/[^0-9]/', '', $asn);
     }
     if (! empty($remote_asn)) {
         $sql .= ' AND `bgpPeers`.`bgpPeerRemoteAs` = ?';
-        $sql_params[] = $remote_asn;
+        $sql_params[] = preg_replace('/[^0-9]/', '', $remote_asn);
     }
     if (! empty($local_address)) {
         $sql .= ' AND `bgpPeers`.`bgpLocalAddr` = ?';
@@ -654,6 +664,25 @@ function list_bgp(Illuminate\Http\Request $request)
             $sql_params[] = IP::parse($remote_address)->uncompressed();
         } catch (InvalidIpException $e) {
             return api_error(400, 'Invalid remote address');
+        }
+    }
+    if (! empty($bgp_descr)) {
+        $sql .= ' AND `bgpPeers`.`bgpPeerDescr` LIKE ?';
+        $sql_params[] = "%$bgp_descr%";
+    }
+    if (! empty($bgp_state)) {
+        $sql .= ' AND `bgpPeers`.`bgpPeerState` = ?';
+        $sql_params[] = $bgp_state;
+    }
+    if (! empty($bgp_adminstate)) {
+        $sql .= ' AND `bgpPeers`.`bgpPeerAdminStatus` = ?';
+        $sql_params[] = $bgp_adminstate;
+    }
+    if (! empty($bgp_family)) {
+        if ($bgp_family == 4) {
+            $sql .= ' AND `bgpPeers`.`bgpLocalAddr` LIKE \'%.%\'';
+        } elseif ($bgp_family == 6) {
+            $sql .= ' AND `bgpPeers`.`bgpLocalAddr` LIKE \'%:%\'';
         }
     }
 
@@ -786,7 +815,7 @@ function get_graph_by_portgroup(Request $request)
     }
 
     return api_get_graph($request, [
-        'type'   => 'multiport_bits_separate',
+        'type' => 'multiport_bits_separate',
         'id' => $if_list,
     ]);
 }
@@ -988,7 +1017,7 @@ function list_available_wireless_graphs(Illuminate\Http\Request $request)
                 foreach (dbFetchRows('SELECT `sensor_id`, `sensor_descr` FROM `wireless_sensors` WHERE `device_id` = ? AND `sensor_class` = ? AND `sensor_deleted` = 0', [$device_id, $type]) as $graph) {
                     $graphs[] = [
                         'sensor_id' => $graph['sensor_id'],
-                        'desc'      => $graph['sensor_descr'],
+                        'desc' => $graph['sensor_descr'],
                     ];
                 }
             }
@@ -1298,7 +1327,7 @@ function add_edit_rule(Illuminate\Http\Request $request)
     }
 
     $extra = [
-        'mute'  => $mute,
+        'mute' => $mute,
         'count' => $count,
         'delay' => $delay_sec,
         'interval' => $interval_sec,
@@ -1480,6 +1509,7 @@ function list_oxidized(Illuminate\Http\Request $request)
 {
     $return = [];
     $devices = Device::query()
+            ->with('attribs')
              ->where('disabled', 0)
              ->when($request->route('hostname'), function ($query, $hostname) {
                  return $query->where('hostname', $hostname);
@@ -1487,22 +1517,21 @@ function list_oxidized(Illuminate\Http\Request $request)
              ->whereNotIn('type', Config::get('oxidized.ignore_types', []))
              ->whereNotIn('os', Config::get('oxidized.ignore_os', []))
              ->whereAttributeDisabled('override_Oxidized_disable')
-             ->select(['hostname', 'sysName', 'sysDescr', 'sysObjectID', 'hardware', 'os', 'ip', 'location_id', 'purpose', 'notes'])
+             ->select(['devices.device_id', 'hostname', 'sysName', 'sysDescr', 'sysObjectID', 'hardware', 'os', 'ip', 'location_id', 'purpose', 'notes'])
              ->get();
 
     /** @var Device $device */
     foreach ($devices as $device) {
-        $device['device_id'] = DeviceCache::getByHostname($device->hostname)->device_id;
         $output = [
             'hostname' => $device->hostname,
             'os' => $device->os,
             'ip' => $device->ip,
         ];
-        $custom_ssh_port = get_dev_attrib($device, 'override_device_ssh_port');
+        $custom_ssh_port = $device->getAttrib('override_device_ssh_port');
         if (! empty($custom_ssh_port)) {
             $output['ssh_port'] = $custom_ssh_port;
         }
-        $custom_telnet_port = get_dev_attrib($device, 'override_device_telnet_port');
+        $custom_telnet_port = $device->getAttrib('override_device_telnet_port');
         if (! empty($custom_telnet_port)) {
             $output['telnet_port'] = $custom_telnet_port;
         }
@@ -2460,30 +2489,23 @@ function list_fdb(Illuminate\Http\Request $request)
 
 function list_fdb_detail(Illuminate\Http\Request $request)
 {
-    $macAddress = Rewrite::macToHex((string) $request->route('mac'));
+    $macAddress = Mac::parse($request->route('mac'));
 
-    $rules = [
-        'macAddress' => 'required|string|regex:/^[0-9a-fA-F]{12}$/',
-    ];
-
-    $validate = Validator::make(['macAddress' => $macAddress], $rules);
-    if ($validate->fails()) {
-        return api_error(422, $validate->messages());
+    if (! $macAddress->isValid()) {
+        return api_error(422, 'Invalid MAC address');
     }
 
-    $extras = ['mac' => Rewrite::readableMac($macAddress),  'mac_oui' => Rewrite::readableOUI($macAddress)];
+    $extras = ['mac' => $macAddress->readable(),  'mac_oui' => $macAddress->vendor()];
 
     $fdb = PortsFdb::hasAccess(Auth::user())
-           ->when(! empty($macAddress), function (Builder $query) use ($macAddress) {
-               return $query->leftJoin('ports', 'ports_fdb.port_id', 'ports.port_id')
-                      ->leftJoin('devices', 'ports_fdb.device_id', 'devices.device_id')
-                      ->where('mac_address', $macAddress)
-                      ->orderBy('ports_fdb.updated_at', 'desc')
-                      ->select('devices.hostname', 'ports.ifName', 'ports_fdb.updated_at');
-           })
-           ->limit(1000)->get();
+        ->leftJoin('ports', 'ports_fdb.port_id', 'ports.port_id')
+        ->leftJoin('devices', 'ports_fdb.device_id', 'devices.device_id')
+        ->where('mac_address', $macAddress->hex())
+        ->orderBy('ports_fdb.updated_at', 'desc')
+        ->select('devices.hostname', 'ports.ifName', 'ports_fdb.updated_at')
+        ->limit(1000)->get();
 
-    if (count($fdb) == 0) {
+    if ($fdb->isEmpty()) {
         return api_error(404, 'Fdb entry does not exist');
     }
 
@@ -2558,7 +2580,7 @@ function list_arp(Illuminate\Http\Request $request)
             return api_error(400, 'Invalid Network Address');
         }
     } elseif (filter_var($query, FILTER_VALIDATE_MAC)) {
-        $mac = \LibreNMS\Util\Rewrite::macToHex($query);
+        $mac = Mac::parse($query)->hex();
         $arp = dbFetchRows('SELECT * FROM `ipv4_mac` WHERE `mac_address`=?', [$mac]);
     } else {
         $arp = dbFetchRows('SELECT * FROM `ipv4_mac` WHERE `ipv4_address`=?', [$query]);
@@ -2916,7 +2938,7 @@ function get_location(Illuminate\Http\Request $request)
     if (empty($location)) {
         return api_error(400, 'No location has been provided to get');
     }
-    $data = ctype_digit($location) ? Location::find($location_id) : Location::where('location', $location)->first();
+    $data = ctype_digit($location) ? Location::find($location) : Location::where('location', $location)->first();
     if (empty($data)) {
         return api_error(404, 'Location does not exist');
     }
@@ -2951,6 +2973,21 @@ function del_location(Illuminate\Http\Request $request)
     return api_error(500, "Failed to delete the location $location");
 }
 
+function get_poller_group(Illuminate\Http\Request $request)
+{
+    $poller_group = $request->route('poller_group_id_or_name');
+    if (empty($poller_group)) {
+        return api_success(PollerGroup::get(), 'get_poller_group');
+    }
+
+    $data = ctype_digit($poller_group) ? PollerGroup::find($poller_group) : PollerGroup::where('group_name', $poller_group)->first();
+    if (empty($data)) {
+        return api_error(404, 'Poller Group does not exist');
+    }
+
+    return api_success($data, 'get_poller_group');
+}
+
 function del_service_from_host(Illuminate\Http\Request $request)
 {
     $service_id = $request->route('id');
@@ -2967,7 +3004,7 @@ function del_service_from_host(Illuminate\Http\Request $request)
 
 function search_by_mac(Illuminate\Http\Request $request)
 {
-    $macAddress = Rewrite::macToHex((string) $request->route('search'));
+    $macAddress = Mac::parse((string) $request->route('search'))->hex();
 
     $rules = [
         'macAddress' => 'required|string|regex:/^[0-9a-fA-F]{12}$/',

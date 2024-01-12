@@ -39,8 +39,8 @@ use Symfony\Component\HttpFoundation\ParameterBag;
 class Url
 {
     /**
-     * @param  Device  $device
-     * @param  string  $text
+     * @param  Device|null  $device
+     * @param  string|null  $text
      * @param  array  $vars
      * @param  int  $start
      * @param  int  $end
@@ -48,10 +48,10 @@ class Url
      * @param  int  $overlib
      * @return string
      */
-    public static function deviceLink($device, $text = null, $vars = [], $start = 0, $end = 0, $escape_text = 1, $overlib = 1)
+    public static function deviceLink($device, $text = '', $vars = [], $start = 0, $end = 0, $escape_text = 1, $overlib = 1)
     {
         if (! $device instanceof Device || ! $device->hostname) {
-            return '';
+            return (string) $text;
         }
 
         if (! $device->canAccess(Auth::user())) {
@@ -80,27 +80,32 @@ class Url
 
         // beginning of overlib box contains large hostname followed by hardware & OS details
         $contents = '<div><span class="list-large">' . $device->displayName() . '</span>';
+        $devinfo = '';
         if ($device->hardware) {
-            $contents .= ' - ' . htmlentities($device->hardware);
+            $devinfo .= htmlentities($device->hardware);
         }
 
         if ($device->os) {
-            $contents .= ' - ' . htmlentities(Config::getOsSetting($device->os, 'text'));
+            $devinfo .= ($devinfo ? ' - ' : '') . htmlentities(Config::getOsSetting($device->os, 'text'));
         }
 
         if ($device->version) {
-            $contents .= ' ' . htmlentities($device->version);
+            $devinfo .= ($devinfo ? ' - ' : '') . htmlentities($device->version);
         }
 
         if ($device->features) {
-            $contents .= ' (' . htmlentities($device->features) . ')';
+            $devinfo .= ' (' . htmlentities($device->features) . ')';
+        }
+
+        if ($devinfo) {
+            $contents .= '<br />' . $devinfo;
         }
 
         if ($device->location_id) {
-            $contents .= ' - ' . htmlentities($device->location ?? '');
+            $contents .= '<br />' . htmlentities($device->location ?? '');
         }
 
-        $contents .= '</div>';
+        $contents .= '</div><br />';
 
         foreach ((array) $graphs as $entry) {
             $graph = isset($entry['graph']) ? $entry['graph'] : 'unknown';

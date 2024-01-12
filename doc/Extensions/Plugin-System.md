@@ -14,6 +14,8 @@ LibreNMS. An example plugin is included in the LibreNMS distribution.
 
 Plugins in version 2 need to be installed into app/Plugins
 
+>Note: Plugins are disabled when the have an error, to show errors instead set plugins.show_errors
+
 The structure of a plugin is follows:
 
 ```
@@ -78,19 +80,62 @@ class in 'app/Plugins/PluginName' and overload the hook methods.
 - settings.blade.php :: If you need your own settings and variables, you can have a look in the ExamplePlugin.
 
 
+### PHP Hooks customization
 
-If you want to change the behavior, you can customize the hooks methods. Just as an example, you could imagine that the device-overview.blade.php should only be displayed when the device is in maintanence mode. Of course the method is more for a permission concept but it gives you the idea.
+PHP code should run inside your hooks method and not your blade view.
+The built in hooks support authorize and data methods.
 
-```
-abstract class DeviceOverviewHook
+These methods are called with [Dependency Injection](https://laravel.com/docs/container#method-invocation-and-injection)
+Hooks with relevant database models will include them in these calls.
+Additionally, the settings argument may be included to inject the plugin settings into the method.
+
+#### Data
+
+You can overrid the data method to supply data to your view.  You should also do any processing here.
+You can do things like access the database or configuration settings and more.
+
+In the data method we are injecting settings here to count how many we have for display in the menu entry blade view.
+Note that you must specify a default value (`= []` here) for any arguments that don't exist on the parent method.
+
+```php
+class Menu extends MenuEntryHook
 {
-    ...
-    public function authorize(User $user, Device $device, array $settings): bool
+    public function data(array $settings = []): array
     {
-        return $device->isUnderMaintenance();
+        return [
+            'count' => count($settings),
+        ];
     }
-    ...
+}
 ```
+
+#### Authorize 
+
+By default hooks are always shown, but you may control when the user is authorized to view the hook content.
+
+As an example, you could imagine that the device-overview.blade.php should only be displayed when the
+device is in maintanence mode and the current user has the admin role. 
+
+```php
+class DeviceOverview extends DeviceOverviewHook
+{
+    public function authorize(User $user, Device $device): bool
+    {
+        return $user->can('admin') && $device->isUnderMaintenance();
+    }
+}
+```
+
+
+### Full plugin
+
+You may create a full plugin that can publish multiple routes, views, database migrations and more.
+Create a package according to the Laravel documentation you may call any of the supported hooks to tie into LibreNMS.
+
+https://laravel.com/docs/packages
+
+> This is untested, please come to discord and share any expriences and update this documentation!
+
 
 ## Version 1 Plugin System structure (legacy verion)
 

@@ -47,6 +47,11 @@ interface SnmpQueryInterface
     public function deviceArray(array $device): SnmpQueryInterface;
 
     /**
+     * Cache the data for the rest of the runtime (or retrieve from cache if available)
+     */
+    public function cache(): SnmpQueryInterface;
+
+    /**
      * Set a context for the snmp query
      * This is most commonly used to fetch alternate sets of data, such as different VRFs
      */
@@ -80,6 +85,11 @@ interface SnmpQueryInterface
      * Output all OIDs numerically
      */
     public function numeric(bool $numeric = true): SnmpQueryInterface;
+
+    /**
+     * Output indexes only as numeric
+     */
+    public function numericIndex(bool $numericIndex = true): SnmpQueryInterface;
 
     /**
      * Hide MIB in output

@@ -17,7 +17,7 @@ version 3. See https://www.gnu.org/licenses/gpl-3.0.txt
 */
 
 $graphs = [
-    'powermon_consumption'    => 'PowerMon - Consumption',
+    'powermon_consumption' => 'PowerMon - Consumption',
 ];
 
 foreach ($graphs as $key => $text) {

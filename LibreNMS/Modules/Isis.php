@@ -31,10 +31,12 @@ use App\Observers\ModuleModelObserver;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use LibreNMS\DB\SyncsModels;
+use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Discovery\IsIsDiscovery;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\Interfaces\Polling\IsIsPolling;
 use LibreNMS\OS;
+use LibreNMS\Polling\ModuleStatus;
 use LibreNMS\Util\IP;
 
 class Isis implements Module
@@ -56,6 +58,11 @@ class Isis implements Module
         return ['ports'];
     }
 
+    public function shouldDiscover(OS $os, ModuleStatus $status): bool
+    {
+        return $status->isEnabledAndDeviceUp($os->getDevice());
+    }
+
     /**
      * Discover this module. Heavier processes can be run here
      * Run infrequently (default 4 times a day)
@@ -72,6 +79,11 @@ class Isis implements Module
         $this->syncModels($os->getDevice(), 'isisAdjacencies', $adjacencies);
     }
 
+    public function shouldPoll(OS $os, ModuleStatus $status): bool
+    {
+        return $status->isEnabledAndDeviceUp($os->getDevice());
+    }
+
     /**
      * Poll data for this module and update the DB / RRD.
      * Try to keep this efficient and only run if discovery has indicated there is a reason to run.
@@ -79,7 +91,7 @@ class Isis implements Module
      *
      * @param  \LibreNMS\OS  $os
      */
-    public function poll(OS $os): void
+    public function poll(OS $os, DataStorageInterface $datastore): void
     {
         $adjacencies = $os->getDevice()->isisAdjacencies;
 
@@ -161,6 +173,7 @@ class Isis implements Module
 
         if (count($data) !== $adjacencies->where('isisISAdjState', 'up')->count()) {
             echo 'New Adjacencies, running discovery';
+
             // don't enable, might be a bad heuristic
             return $this->fillNew($adjacencies, $this->discoverIsIsMib($os));
         }
@@ -168,7 +181,7 @@ class Isis implements Module
         $data = snmpwalk_cache_twopart_oid($os->getDeviceArray(), 'isisISAdjLastUpTime', $data, 'ISIS-MIB', null, '-OQUst');
 
         $adjacencies->each(function (IsisAdjacency $adjacency) use (&$data) {
-            $adjacency_data = Arr::last($data[$adjacency->ifIndex]);
+            $adjacency_data = Arr::last($data[$adjacency->ifIndex] ?? []);
             $adjacency->isisISAdjState = $adjacency_data['isisISAdjState'] ?? $adjacency->isisISAdjState;
             $adjacency->isisISAdjLastUpTime = $this->parseAdjacencyTime($adjacency_data);
             $adjacency->save();

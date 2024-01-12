@@ -1,0 +1,14 @@
+os: adva_fsp150cm
+text: 'ADVA OSA'
+type: timing
+icon: adva
+group: ADVA
+ifname: true
+over:
+    - { graph: device_bits, text: Traffic }
+    - { graph: device_temperature, text: Temperature }
+discovery:
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.5551.3.
+mib_dir: adva

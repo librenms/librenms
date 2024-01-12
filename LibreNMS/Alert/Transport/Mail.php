@@ -48,7 +48,7 @@ class Mail extends Transport
             $msg = preg_replace("/(?<!\r)\n/", "\r\n", $alert_data['msg']);
         }
 
-        return \LibreNMS\Util\Mail::send($emails, $alert_data['title'], $msg, $html, $this->config['attach-graph'] ?? null);
+        return \LibreNMS\Util\Mail::send($emails, $alert_data['title'], $msg, $html, $this->config['bcc'] ?? false, $this->config['attach-graph'] ?? null);
     }
 
     public static function configTemplate(): array
@@ -61,7 +61,7 @@ class Mail extends Transport
                     'title' => 'Contact Type',
                     'name' => 'mail-contact',
                     'descr' => 'Method for selecting contacts',
-                    'type'  => 'select',
+                    'type' => 'select',
                     'options' => [
                         'Specified Email' => 'email',
                         'Device sysContact' => 'sysContact',
@@ -74,14 +74,21 @@ class Mail extends Transport
                     'title' => 'Email',
                     'name' => 'email',
                     'descr' => 'Email address of contact',
-                    'type'  => 'text',
+                    'type' => 'text',
                 ],
                 [
                     'title' => 'Role',
                     'name' => 'role',
                     'descr' => 'Role of users to mail',
-                    'type'  => 'select',
+                    'type' => 'select',
                     'options' => $roles,
+                ],
+                [
+                    'title' => 'BCC',
+                    'name' => 'bcc',
+                    'descr' => 'Use BCC instead of TO',
+                    'type' => 'checkbox',
+                    'default' => false,
                 ],
                 [
                     'title' => 'Include Graphs',
