@@ -16,6 +16,7 @@ foreach (dbFetchRows('SELECT * FROM `customoids` WHERE `customoid_passed` = 1 AN
         'celsius_to_fahrenheit',
         'fahrenheit_to_celsius',
         'uw_to_dbm',
+        'ieee754_to_float',
     ];
 
     if (is_numeric($rawdata)) {
