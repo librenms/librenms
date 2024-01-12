@@ -81,10 +81,10 @@ class PortSecurity implements Module
         $max_macs_field = 'cpsIfMaxSecureMacAddr';
         $device = $os->getDeviceArray();
         if ($device['os'] == 'ios' || $device['os'] == 'iosxe') {
-            echo 'Port Stats';
             $port_stats = [];
             $port_stats = snmpwalk_cache_oid($device, 'cpsIfStickyEnable', $port_stats, 'CISCO-PORT-SECURITY-MIB');
             $port_stats = snmpwalk_cache_oid($device, 'cpsIfMaxSecureMacAddr', $port_stats, 'CISCO-PORT-SECURITY-MIB');
+
             // End Building SNMP Cache Array
 
             // By default libreNMS uses the ifIndex to associate ports on devices with ports discoverd/polled
@@ -94,7 +94,6 @@ class PortSecurity implements Module
             // or maybe other means in the future. The default port association mode still is ifIndex for
             // compatibility reasons.
             $port_association_mode = Config::get('default_port_association_mode');
-            print_r($port_association_mode);
             if ($device['port_association_mode']) {
                 $port_association_mode = PortAssociationMode::getName($device['port_association_mode']);
             }
@@ -106,12 +105,33 @@ class PortSecurity implements Module
             $default_port_group = Config::get('default_port_group');
 
             // Looping through all of the ports
-            echo 'Updating DB';
+            $device_id = $device['device_id'];
+            $where = [[$device_id_field, $device_id]];
+            $ports_output = DB::table('ports')->select($port_id_field, 'ifType')->where($where)->get();
+            $port_info = json_decode(json_encode($ports_output), true);
+            $port_sec_output = DB::table($table)->where($where)->get();
+            $port_sec_info = json_decode(json_encode($port_sec_output), true);
+
             foreach ($port_stats as $ifIndex => $snmp_data) {
+                $exists_port = false;
+                $exists_port_sec = false;
                 $snmp_data['ifIndex'] = $ifIndex; // Store ifIndex in port entry
                 // Get port_id according to port_association_mode used for this device
                 $port_id = get_port_id($ports_mapped, $snmp_data, $port_association_mode);
-                $device_id = $device['device_id'];
+                //Verifying if port is currently in ports table
+                foreach ($port_info as $port) {
+                    if ($port['port_id'] == $port_id) {
+                        $exists_port = true;
+                        break;
+                    }
+                }
+                //Verifying if port is currently in port_security table
+                foreach ($port_sec_info as $port_sec) {
+                    if ($port_sec['port_id'] == $port_id) {
+                        $exists_port_sec = true;
+                        break;
+                    }
+                }
                 // Needs to be an existing port. Checking if it's in the ports table
                 $where = [[$port_id_field, '=', $port_id], [$device_id_field, '=', $device_id]];
                 $output = DB::table('ports')->where($where)->get();
@@ -142,8 +162,7 @@ class PortSecurity implements Module
             // Clear Variables Here
             unset($port_stats);
             unset($ports_db);
-	    }
-
+        }
     }
 
     /**
@@ -160,11 +179,7 @@ class PortSecurity implements Module
     public function dump(Device $device, string $type): ?array
     {
         return [
-<<<<<<< HEAD
-            'PortSecurity' => $device->portSecurity()->orderBy('port_id')
-=======
             'PortSecurity' => $device->PortSecurity()->orderBy('port_id')
->>>>>>> 66c85ae25b (Moving polling to Modules/PortSecurity.php)
                 ->get()->map->makeHidden(['id', 'device_id']),
         ];
     }
