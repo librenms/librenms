@@ -30,6 +30,7 @@ modules:
                   #warn_limit: outletLoadHighThresh
                   #high_limit: outputCapacity
         voltage:
+            # note: this is configured, not measured
             options:
                 divisor: 10
                 skip_value_lt: 0
@@ -54,5 +55,5 @@ modules:
         power_factor:
             data:
                 - oid: systemPowerFactor
-                  descr: "System Power Factor"
+                  descr: "Configured System Power Factor"
 
