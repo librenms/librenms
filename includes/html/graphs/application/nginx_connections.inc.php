@@ -8,19 +8,19 @@ $rrd_filename = Rrd::name($device['hostname'], ['app', 'nginx', $app->app_id]);
 
 $array = [
     'Reading' => [
-        'descr'  => 'Reading',
+        'descr' => 'Reading',
         'colour' => '750F7DFF',
     ],
     'Writing' => [
-        'descr'  => 'Writing',
+        'descr' => 'Writing',
         'colour' => '00FF00FF',
     ],
     'Waiting' => [
-        'descr'  => 'Waiting',
+        'descr' => 'Waiting',
         'colour' => '4444FFFF',
     ],
-    'Active'  => [
-        'descr'  => 'Starting',
+    'Active' => [
+        'descr' => 'Starting',
         'colour' => '157419FF',
     ],
 ];

@@ -9,10 +9,10 @@ $unit_text = 'SIP Peers';
 $rrd_filename = Rrd::name($device['hostname'], ['app', 'asterisk', 'stats', $app->app_id]);
 
 $astsip_access_array = [
-    'sippeers'        => 'Total Peers',
-    'sipmononline'    => 'Online (Monitored)',
-    'sipmonoffline'   => 'Offline (Monitored)',
-    'sipunmononline'  => 'Online (Unmonitored)',
+    'sippeers' => 'Total Peers',
+    'sipmononline' => 'Online (Monitored)',
+    'sipmonoffline' => 'Offline (Monitored)',
+    'sipunmononline' => 'Online (Unmonitored)',
     'sipunmonoffline' => 'Offline (Unmonitored)',
 ];
 

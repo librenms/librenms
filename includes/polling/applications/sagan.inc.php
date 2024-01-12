@@ -19,7 +19,7 @@ try {
 }
 
 // grab  the alert here as it is the global one
-$metrics = ['alert'=>$sagan['alert']];
+$metrics = ['alert' => $sagan['alert']];
 
 $rrd_def = RrdDefinition::make()
     ->addDataset('after', 'GAUGE', 0)

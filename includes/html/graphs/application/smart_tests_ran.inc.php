@@ -16,23 +16,23 @@ $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, $var
 if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Extended',
-        'ds'       => 'extended',
+        'descr' => 'Extended',
+        'ds' => 'extended',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Short',
-        'ds'       => 'short',
+        'descr' => 'Short',
+        'ds' => 'short',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Selective',
-        'ds'       => 'selective',
+        'descr' => 'Selective',
+        'ds' => 'selective',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Conveyance',
-        'ds'       => 'conveyance',
+        'descr' => 'Conveyance',
+        'ds' => 'conveyance',
     ];
 }
 

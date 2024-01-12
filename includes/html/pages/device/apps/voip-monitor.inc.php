@@ -1,9 +1,9 @@
 <?php
 
 $graphs = [
-    'voip-monitor_cpuload'       => 'CPU Load',
-    'voip-monitor_memoryusage'        => 'Used Memory',
-    'voip-monitor_openfiles'        => 'Open files',
+    'voip-monitor_cpuload' => 'CPU Load',
+    'voip-monitor_memoryusage' => 'Used Memory',
+    'voip-monitor_openfiles' => 'Open files',
 ];
 
 foreach ($graphs as $key => $text) {

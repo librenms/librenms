@@ -5,15 +5,15 @@ $id = 1;
 foreach ($chassis_array as $chassis_contents) {
     // Discover the chassis
     $entity_array[] = [
-        'entPhysicalIndex'        => $id++,
-        'entPhysicalDescr'        => "Eurostore {$chassis_contents['siModel']}",
-        'entPhysicalClass'        => 'chassis',
-        'entPhysicalModelName'    => $chassis_contents['siModel'],
-        'entPhysicalSerialNum'    => $chassis_contents['siSerial'],
-        'entPhysicalContainedIn'  => '0',
-        'entPhysicalVendorType'   => $chassis_contents['siVendor'],
-        'entPhysicalHardwareRev'  => $chassis_contents['siBootVer'],
-        'entPhysicalFirmwareRev'  => $chassis_contents['siFirmVer'],
+        'entPhysicalIndex' => $id++,
+        'entPhysicalDescr' => "Eurostore {$chassis_contents['siModel']}",
+        'entPhysicalClass' => 'chassis',
+        'entPhysicalModelName' => $chassis_contents['siModel'],
+        'entPhysicalSerialNum' => $chassis_contents['siSerial'],
+        'entPhysicalContainedIn' => '0',
+        'entPhysicalVendorType' => $chassis_contents['siVendor'],
+        'entPhysicalHardwareRev' => $chassis_contents['siBootVer'],
+        'entPhysicalFirmwareRev' => $chassis_contents['siFirmVer'],
     ];
 }
 
@@ -27,10 +27,10 @@ for ($i = 1; $i <= 8; $i++) {
         $backplane_id = $id++;
         // Discover the chassis
         $entity_array[] = [
-            'entPhysicalIndex'        => $backplane_id,
-            'entPhysicalDescr'        => $backplane_contents['hwEnclosure0' . $i . 'Description'],
-            'entPhysicalClass'        => 'backplane',
-            'entPhysicalContainedIn'  => '1',
+            'entPhysicalIndex' => $backplane_id,
+            'entPhysicalDescr' => $backplane_contents['hwEnclosure0' . $i . 'Description'],
+            'entPhysicalClass' => 'backplane',
+            'entPhysicalContainedIn' => '1',
             'entPhysicalParentRelPos' => $i,
         ];
 
@@ -39,16 +39,16 @@ for ($i = 1; $i <= 8; $i++) {
         foreach ($hdd_array as $hdd_contents) {
             // Discover the chassis
             $entity_array[] = [
-                'entPhysicalContainedIn'  => $backplane_id,
-                'entPhysicalIndex'        => $id++,
-                'entPhysicalDescr'        => $hdd_contents['hddEnclosure0' . $i . 'Desc'],
-                'entPhysicalClass'        => 'container',
+                'entPhysicalContainedIn' => $backplane_id,
+                'entPhysicalIndex' => $id++,
+                'entPhysicalDescr' => $hdd_contents['hddEnclosure0' . $i . 'Desc'],
+                'entPhysicalClass' => 'container',
                 'entPhysicalParentRelPos' => $hdd_contents['hddEnclosure0' . $i . 'Slots'],
-                'entPhysicalName'         => $hdd_contents['hddEnclosure0' . $i . 'Name'],
-                'entPhysicalSerialNum'    => $hdd_contents['hddEnclosure0' . $i . 'Serial'],
-                'entPhysicalFirmwareRev'  => $hdd_contents['hddEnclosure0' . $i . 'FrimVer'],
-                'entPhysicalIsFRU'        => 'true',
-                'entPhysicalAlias'        => $hdd_contents['hddEnclosure0' . $i . 'State'],
+                'entPhysicalName' => $hdd_contents['hddEnclosure0' . $i . 'Name'],
+                'entPhysicalSerialNum' => $hdd_contents['hddEnclosure0' . $i . 'Serial'],
+                'entPhysicalFirmwareRev' => $hdd_contents['hddEnclosure0' . $i . 'FrimVer'],
+                'entPhysicalIsFRU' => 'true',
+                'entPhysicalAlias' => $hdd_contents['hddEnclosure0' . $i . 'State'],
             ];
         }
     }

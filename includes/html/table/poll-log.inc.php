@@ -62,18 +62,18 @@ foreach (dbFetchRows($sql, $param) as $device) {
         $device['group_name'] = 'General';
     }
     $response[] = [
-        'hostname'              => generate_device_link($device, null, ['tab' => 'graphs', 'group' => 'poller']),
-        'last_polled'           => $device['last_polled'],
-        'poller_group'          => $device['group_name'],
-        'location'              => $device['location'],
+        'hostname' => generate_device_link($device, null, ['tab' => 'graphs', 'group' => 'poller']),
+        'last_polled' => $device['last_polled'],
+        'poller_group' => $device['group_name'],
+        'location' => $device['location'],
         'last_polled_timetaken' => round($device['last_polled_timetaken'], 2),
     ];
 }
 
 $output = [
-    'current'  => $current,
+    'current' => $current,
     'rowCount' => $rowCount,
-    'rows'     => $response,
-    'total'    => $total,
+    'rows' => $response,
+    'total' => $total,
 ];
 echo json_encode($output);

@@ -10,9 +10,9 @@ echo "<span style='font-weight: bold;'>Apps</span> &#187; ";
 $sep = '';
 
 $link_array = [
-    'page'   => 'device',
+    'page' => 'device',
     'device' => $device['device_id'],
-    'tab'    => 'apps',
+    'tab' => 'apps',
 ];
 
 $apps = DeviceCache::getPrimary()->applications

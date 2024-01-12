@@ -1,17 +1,17 @@
 <?php
 
 $graphs = [
-    'redis_clients'       => 'Clients',
-    'redis_memory'        => 'Memory',
-    'redis_commands'      => 'Commands',
-    'redis_connections'   => 'Connections',
-    'redis_defrag'        => 'Defrag',
+    'redis_clients' => 'Clients',
+    'redis_memory' => 'Memory',
+    'redis_commands' => 'Commands',
+    'redis_connections' => 'Connections',
+    'redis_defrag' => 'Defrag',
     'redis_fragmentation' => 'Fragmentation',
-    'redis_keyspace'      => 'Keyspace',
-    'redis_net'           => 'Net',
-    'redis_objects'       => 'Objects',
-    'redis_sync'          => 'Sync',
-    'redis_usage'         => 'Usage',
+    'redis_keyspace' => 'Keyspace',
+    'redis_net' => 'Net',
+    'redis_objects' => 'Objects',
+    'redis_sync' => 'Sync',
+    'redis_usage' => 'Usage',
 ];
 
 foreach ($graphs as $key => $text) {
