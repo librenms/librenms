@@ -26,17 +26,14 @@
 namespace LibreNMS\Modules;
 
 use App\Models\Device;
-use App\Observers\ModuleModelObserver;
+use Illuminate\Support\Facades\DB;
 use LibreNMS\Config;
 use LibreNMS\DB\SyncsModels;
+use LibreNMS\Enum\PortAssociationMode;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
-use LibreNMS\Interfaces\Discovery\PortSecurityDiscovery;
-use LibreNMS\Interfaces\Polling\PortSecurityPolling;
+use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
 use LibreNMS\Polling\ModuleStatus;
-use LibreNMS\Enum\PortAssociationMode;
-use Illuminate\Support\Facades\DB;
-use LibreNMS\Interfaces\Module;
 
 class PortSecurity implements Module
 {
@@ -52,8 +49,7 @@ class PortSecurity implements Module
 
     public function shouldDiscover(OS $os, ModuleStatus $status): bool
     {
-        // libvirt does not use snmp, only ssh tunnels
-        return $status->isEnabledAndDeviceUp($os->getDevice(), check_snmp: ! Config::get('enable_libvirt')) && $os instanceof PortSecurityDiscovery;
+        return $status->isEnabledAndDeviceUp($os->getDevice());
     }
 
     /**
@@ -61,22 +57,18 @@ class PortSecurity implements Module
      */
     public function discover(OS $os): void
     {
-        if ($os instanceof PortSecurityDiscovery) {
-            $cps = $os->discoverPortSecurity();
-
-            ModuleModelObserver::observe(\App\Models\PortSecurity::class);
-            $this->syncModels($os->getDevice(), 'PortSecurity', $cps);
-        }
-        echo PHP_EOL;
+        $this->poll($os, app('Datastore'));
     }
 
     public function shouldPoll(OS $os, ModuleStatus $status): bool
     {
-        return $status->isEnabledAndDeviceUp($os->getDevice()) && $os instanceof PortSecurityPolling;
+        return $status->isEnabledAndDeviceUp($os->getDevice());
     }
 
     /**
-     * @inheritDoc
+     * Poll data for this module and update the DB
+     *
+     * @param  \LibreNMS\OS  $os
      */
     public function poll(OS $os, DataStorageInterface $datastore): void
     {
@@ -119,48 +111,50 @@ class PortSecurity implements Module
 			$port_sec_info = json_decode(json_encode($port_sec_output), true);
 
 			foreach ($port_stats as $ifIndex => $snmp_data) {
-			$exists_port = false;
-			$exists_port_sec = false;
-			$snmp_data['ifIndex'] = $ifIndex; // Store ifIndex in port entry
+                $exists_port = false;
+                $exists_port_sec = false;
+                $snmp_data['ifIndex'] = $ifIndex; // Store ifIndex in port entry
 				// Get port_id according to port_association_mode used for this device
 				$port_id = get_port_id($ports_mapped, $snmp_data, $port_association_mode);
-			foreach ($port_info as $port) {
-				if ($port['port_id'] == $port_id) {
-					$exists_port = true;
-					break;
-				}
-			}
-			foreach ($port_sec_info as $port_sec) {
-				if ($port_sec['port_id'] == $port_id) {
-					$exists_port_sec = true;
-					break;
-				}
-			}
-			// Needs to be an existing port. Checking if it's in the ports table
-			// Only concerned with physical ports
-			if ($exists_port) {
-				if ($port_info[0]['ifType'] == 'ethernetCsmacd') {
-					// Checking if port already exists in port_security table. Update if yes, insert if not.
-					//$port_sec_info = DB::table($table)->select($port_id_field, $device_id_field)->get();
-					$max_macs_value = $snmp_data['cpsIfMaxSecureMacAddr'];
-					$sticky_macs_value = $snmp_data['cpsIfStickyEnable'];
-					if ($exists_port_sec) {
-						if ($port_sec_info) {
-							echo 'Updating port '.$port_id.' ';
-							$update = [$sticky_macs_field => $sticky_macs_value, $max_macs_field => $max_macs_value];
-							$output = DB::table($table)->where($port_id_field, $port_id)->update($update);
-						}
-					} else {
-						if ($port_sec_info) {
-							echo 'Inserting port '.$port_id.' ';
-							$insert_info = [$port_id_field => $port_id, $device_id_field => $device_id, $sticky_macs_field => $sticky_macs_value, $max_macs_field => $max_macs_value];
-							$output = DB::table($table)->insert($insert_info);
-						}
-					}
-				}
-			} else {
-				echo 'port_id '.$port_id.' does not exist in ports table';
-			}
+                //Verifying if port is currently in ports table
+                foreach ($port_info as $port) {
+                    if ($port['port_id'] == $port_id) {
+                        $exists_port = true;
+                        break;
+                    }
+                }
+                //Verifying if port is currently in port_security table
+                foreach ($port_sec_info as $port_sec) {
+                    if ($port_sec['port_id'] == $port_id) {
+                        $exists_port_sec = true;
+                        break;
+                    }
+                }
+                // Needs to be an existing port. Checking if it's in the ports table
+                // Only concerned with physical ports
+                if ($exists_port) {
+                    if ($port_info[0]['ifType'] == 'ethernetCsmacd') {
+                        // Checking if port already exists in port_security table. Update if yes, insert if not.
+                        //$port_sec_info = DB::table($table)->select($port_id_field, $device_id_field)->get();
+                        $max_macs_value = $snmp_data['cpsIfMaxSecureMacAddr'];
+                        $sticky_macs_value = $snmp_data['cpsIfStickyEnable'];
+                        if ($exists_port_sec) {
+                            if ($port_sec_info) {
+                                echo 'Updating port '.$port_id.' ';
+                                $update = [$sticky_macs_field => $sticky_macs_value, $max_macs_field => $max_macs_value];
+                                $output = DB::table($table)->where($port_id_field, $port_id)->update($update);
+                            }
+                        } else {
+                            if ($port_sec_info) {
+                                echo 'Inserting port '.$port_id.' ';
+                                $insert_info = [$port_id_field => $port_id, $device_id_field => $device_id, $sticky_macs_field => $sticky_macs_value, $max_macs_field => $max_macs_value];
+                                $output = DB::table($table)->insert($insert_info);
+                            }
+                        }
+                    }
+                } else {
+                    echo 'port_id '.$port_id.' does not exist in ports table';
+                }
 			}//end foreach
 
 			unset(
@@ -173,23 +167,7 @@ class PortSecurity implements Module
 			// Clear Variables Here
 			unset($port_stats);
 			unset($ports_db);
-	}
-	/*if ($os->getDevice()->PortSecurity->exists()) {
-            return;
         }
-
-        if ($os instanceof PortSecurityPolling) {
-            $cps = $os->pollPortSecurity($os->getDevice()->PortSecurity);
-
-            ModuleModelObserver::observe(\App\Models\PortSecurity::class);
-            $this->syncModels($os->getDevice(), 'PortSecurity', $cps);
-
-            return;
-        }
-
-        // just run discovery again
-        $this->discover($os);
-*/
     }
 
     /**
@@ -197,7 +175,7 @@ class PortSecurity implements Module
      */
     public function cleanup(Device $device): void
     {
-        $device->PortSecurity()->delete();
+        $device->portSecurity()->delete();
     }
 
     /**
@@ -206,7 +184,7 @@ class PortSecurity implements Module
     public function dump(Device $device)
     {
         return [
-            'PortSecurity' => $device->PortSecurity()->orderBy('port_id')
+            'PortSecurity' => $device->portSecurity()->orderBy('port_id')
                 ->get()->map->makeHidden(['id', 'device_id']),
         ];
     }
