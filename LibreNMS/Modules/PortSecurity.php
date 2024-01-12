@@ -140,13 +140,13 @@ class PortSecurity implements Module
                         $sticky_macs_value = $snmp_data['cpsIfStickyEnable'];
                         if ($exists_port_sec) {
                             if ($port_sec_info) {
-                                echo 'Updating port '.$port_id . ' ';
+                                echo 'Updating port '. $port_id . ' ';
                                 $update = [$sticky_macs_field => $sticky_macs_value, $max_macs_field => $max_macs_value];
                                 $output = DB::table($table)->where($port_id_field, $port_id)->update($update);
                             }
                         } else {
                             if ($port_sec_info) {
-                                echo 'Inserting port '.$port_id . ' ';
+                                echo 'Inserting port '. $port_id . ' ';
                                 $insert_info = [$port_id_field => $port_id, $device_id_field => $device_id, $sticky_macs_field => $sticky_macs_value, $max_macs_field => $max_macs_value];
                                 $output = DB::table($table)->insert($insert_info);
                             }
