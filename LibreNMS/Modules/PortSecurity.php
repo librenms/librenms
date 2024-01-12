@@ -73,49 +73,49 @@ class PortSecurity implements Module
     public function poll(OS $os, DataStorageInterface $datastore): void
     {
         $table = 'port_security';
-		$port_id_field = 'port_id';
-		$device_id_field = 'device_id';
-		$sticky_macs_field = 'cpsIfStickyEnable';
-		$max_macs_field = 'cpsIfMaxSecureMacAddr';
-		$device = $os->getDeviceArray();
-		if ($device['os'] == 'ios' || $device['os'] == 'iosxe') {
-			$port_stats = [];
-			$port_stats = snmpwalk_cache_oid($device, 'cpsIfStickyEnable', $port_stats, 'CISCO-PORT-SECURITY-MIB');
-			$port_stats = snmpwalk_cache_oid($device, 'cpsIfMaxSecureMacAddr', $port_stats, 'CISCO-PORT-SECURITY-MIB');
+        $port_id_field = 'port_id';
+        $device_id_field = 'device_id';
+        $sticky_macs_field = 'cpsIfStickyEnable';
+        $max_macs_field = 'cpsIfMaxSecureMacAddr';
+        $device = $os->getDeviceArray();
+        if ($device['os'] == 'ios' || $device['os'] == 'iosxe') {
+            $port_stats = [];
+            $port_stats = snmpwalk_cache_oid($device, 'cpsIfStickyEnable', $port_stats, 'CISCO-PORT-SECURITY-MIB');
+            $port_stats = snmpwalk_cache_oid($device, 'cpsIfMaxSecureMacAddr', $port_stats, 'CISCO-PORT-SECURITY-MIB');
 
-			// End Building SNMP Cache Array
+            // End Building SNMP Cache Array
 
-			// By default libreNMS uses the ifIndex to associate ports on devices with ports discoverd/polled
-			// before and stored in the database. On Linux boxes this is a problem as ifIndexes may be
-			// unstable between reboots or (re)configuration of tunnel interfaces (think: GRE/OpenVPN/Tinc/...)
-			// The port association configuration allows to choose between association via ifIndex, ifName,
-			// or maybe other means in the future. The default port association mode still is ifIndex for
-			// compatibility reasons.
-			$port_association_mode = Config::get('default_port_association_mode');
-			if ($device['port_association_mode']) {
-				$port_association_mode = PortAssociationMode::getName($device['port_association_mode']);
-			}
+            // By default libreNMS uses the ifIndex to associate ports on devices with ports discoverd/polled
+            // before and stored in the database. On Linux boxes this is a problem as ifIndexes may be
+            // unstable between reboots or (re)configuration of tunnel interfaces (think: GRE/OpenVPN/Tinc/...)
+            // The port association configuration allows to choose between association via ifIndex, ifName,
+            // or maybe other means in the future. The default port association mode still is ifIndex for
+            // compatibility reasons.
+            $port_association_mode = Config::get('default_port_association_mode');
+            if ($device['port_association_mode']) {
+                $port_association_mode = PortAssociationMode::getName($device['port_association_mode']);
+            }
 
-			// Build array of ports in the database and an ifIndex/ifName -> port_id map
-			$ports_mapped = get_ports_mapped($device['device_id']);
-			$ports_db = $ports_mapped['ports'];
+            // Build array of ports in the database and an ifIndex/ifName -> port_id map
+            $ports_mapped = get_ports_mapped($device['device_id']);
+            $ports_db = $ports_mapped['ports'];
 
-			$default_port_group = Config::get('default_port_group');
+            $default_port_group = Config::get('default_port_group');
 
-			// Looping through all of the ports
-			$device_id = $device['device_id'];
-			$where = [[$device_id_field, $device_id]];
-			$ports_output = DB::table('ports')->select($port_id_field, 'ifType')->where($where)->get();
-			$port_info = json_decode(json_encode($ports_output), true);
-			$port_sec_output = DB::table($table)->where($where)->get();
-			$port_sec_info = json_decode(json_encode($port_sec_output), true);
+            // Looping through all of the ports
+            $device_id = $device['device_id'];
+            $where = [[$device_id_field, $device_id]];
+            $ports_output = DB::table('ports')->select($port_id_field, 'ifType')->where($where)->get();
+            $port_info = json_decode(json_encode($ports_output), true);
+            $port_sec_output = DB::table($table)->where($where)->get();
+            $port_sec_info = json_decode(json_encode($port_sec_output), true);
 
-			foreach ($port_stats as $ifIndex => $snmp_data) {
+            foreach ($port_stats as $ifIndex => $snmp_data) {
                 $exists_port = false;
                 $exists_port_sec = false;
                 $snmp_data['ifIndex'] = $ifIndex; // Store ifIndex in port entry
-				// Get port_id according to port_association_mode used for this device
-				$port_id = get_port_id($ports_mapped, $snmp_data, $port_association_mode);
+                // Get port_id according to port_association_mode used for this device
+                $port_id = get_port_id($ports_mapped, $snmp_data, $port_association_mode);
                 //Verifying if port is currently in ports table
                 foreach ($port_info as $port) {
                     if ($port['port_id'] == $port_id) {
@@ -155,18 +155,18 @@ class PortSecurity implements Module
                 } else {
                     echo 'port_id '.$port_id.' does not exist in ports table';
                 }
-			}//end foreach
+            }//end foreach
 
-			unset(
-				$ports_mapped,
-				$port
-			);
+            unset(
+                $ports_mapped,
+                $port
+            );
 
-			echo "\n";
+            echo "\n";
 
-			// Clear Variables Here
-			unset($port_stats);
-			unset($ports_db);
+            // Clear Variables Here
+            unset($port_stats);
+            unset($ports_db);
         }
     }
 
