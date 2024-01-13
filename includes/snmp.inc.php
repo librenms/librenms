@@ -399,13 +399,14 @@ function snmp_walk($device, $oid, $options = null, $mib = null, $mibdir = null)
     return $data;
 }//end snmp_walk()
 
-function is_array_index($snmpflags) {
-    if (!is_array($snmpflags)) {
-        $snmpflags=[$snmpflags];
+function is_array_index($snmpflags)
+{
+    if (! is_array($snmpflags)) {
+        $snmpflags = [$snmpflags];
     }
 
     foreach ($snmpflags as $flag) {
-        if (preg_match('/-O[a-zA-Z0-9]*X/',$flag) === 1) {
+        if (preg_match('/-O[a-zA-Z0-9]*X/', $flag) === 1) {
             return true;
         }
     }
@@ -435,12 +436,12 @@ function snmpwalk_cache_oid($device, $oid, $array = [], $mib = null, $mibdir = n
         $value = trim($value, "\" \\\n\r");
 
         if (is_array_index($snmpflags)) {
-            if (preg_match('/(.*)\[(.*)]/',$oid,$m) !== 1) {
+            if (preg_match('/(.*)\[(.*)]/', $oid, $m) !== 1) {
                 continue;
             }
 
-            $oid=$m[1];
-            $index=$m[2];
+            $oid = $m[1];
+            $index = $m[2];
         } else {
             [$oid, $index] = explode('.', $oid, 2);
         }
