@@ -17,12 +17,9 @@
 namespace LibreNMS\OS;
 
 use LibreNMS\Device\WirelessSensor;
-use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessApCountDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
-use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\OS\Shared\Zyxel;
-use LibreNMS\RRD\RrdDefinition;
 
 class Zyxelwlc extends Zyxel implements WirelessApCountDiscovery, WirelessClientsDiscovery
 {
