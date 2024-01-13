@@ -399,6 +399,20 @@ function snmp_walk($device, $oid, $options = null, $mib = null, $mibdir = null)
     return $data;
 }//end snmp_walk()
 
+function is_array_index($snmpflags) {
+    if (!is_array($snmpflags)) {
+        $snmpflags=[$snmpflags];
+    }
+
+    foreach ($snmpflags as $flag) {
+        if (preg_match('/-O[a-zA-Z0-9]*X/',$flag) === 1) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 function snmpwalk_cache_oid($device, $oid, $array = [], $mib = null, $mibdir = null, $snmpflags = '-OQUs')
 {
     $data = snmp_walk($device, $oid, $snmpflags, $mib, $mibdir);
@@ -419,7 +433,18 @@ function snmpwalk_cache_oid($device, $oid, $array = [], $mib = null, $mibdir = n
         [$oid,$value] = explode('=', $entry, 2);
         $oid = trim($oid);
         $value = trim($value, "\" \\\n\r");
-        [$oid, $index] = explode('.', $oid, 2);
+
+        if (is_array_index($snmpflags)) {
+            if (preg_match('/(.*)\[(.*)]/',$oid,$m) !== 1) {
+                continue;
+            }
+
+            $oid=$m[1];
+            $index=$m[2];
+        } else {
+            [$oid, $index] = explode('.', $oid, 2);
+        }
+
         if (! strstr($value, 'at this OID') && ! empty($oid)) {
             $array[$index][$oid] = $value;
         }
