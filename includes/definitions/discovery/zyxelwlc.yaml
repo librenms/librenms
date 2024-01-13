@@ -1,4 +1,4 @@
-mib: ZYXEL-ZYWALL-ZLD-COMMON-MIB
+mib: ZYXEL-ES-COMMON
 modules:
     os:
         hardware:
@@ -8,7 +8,7 @@ modules:
     mempools:
         data:
             -
-                percent_used: ZYXEL-ZYWALL-ZLD-COMMON-MIB::sysRAMUsage
+                percent_used: ZYXEL-ES-COMMON::sysMgmtMemUsage
                 index: 0
             -
                 percent_used: ZYXEL-ES-COMMON::sysMgmtFlashUsage
@@ -17,5 +17,15 @@ modules:
     processors:
         data:
             -
-                oid: sysCPUUsage
-                num_oid: '.1.3.6.1.4.1.890.1.6.22.1.1.{{ $index }}'
+                oid: sysMgmtCPUUsage
+                num_oid: '.1.3.6.1.4.1.890.1.15.3.2.4.{{ $index }}'
+    sensors:
+        count:
+            data:
+                -
+                    oid:  sysActiveSessionNum
+                    value: sysActiveSessionNum
+                    num_oid: '.1.3.6.1.4.1.890.1.15.3.1.19.0'
+                    descr: 'Active Sessions'
+                    state_name: active-sessions
+                    index: sessions

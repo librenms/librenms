@@ -3659,15 +3659,7 @@
             },
             "type": "graph"
         },
-        "graph_types.device.zyxelwlc_sessions": {
-            "default": {
-                "section": "firewall",
-                "order": 0,
-                "descr": "Sessions"
-            },
-            "type": "graph"
-        },
-        "graphite.enable": {
+         "graphite.enable": {
             "default": false,
             "type": "boolean",
             "group": "poller",

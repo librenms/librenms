@@ -24,21 +24,9 @@ use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\OS\Shared\Zyxel;
 use LibreNMS\RRD\RrdDefinition;
 
-class Zyxelwlc extends Zyxel implements OSPolling, WirelessApCountDiscovery, WirelessClientsDiscovery
+class Zyxelwlc extends Zyxel implements WirelessApCountDiscovery, WirelessClientsDiscovery
 {
-    public function pollOS(DataStorageInterface $datastore): void
-    {
-        $sessions = snmp_get($this->getDeviceArray(), '.1.3.6.1.4.1.890.1.15.3.1.19.0', '-Ovq'); //  ZYXEL-ES-COMMON::sysActiveSessionNum
-        if (is_numeric($sessions)) {
-            $rrd_def = RrdDefinition::make()->addDataset('sessions', 'GAUGE', 0, 3000000);
-            $fields = [
-                'sessions' => $sessions,
-            ];
-            $tags = compact('rrd_def');
-            $datastore->put($this->getDeviceArray(), 'zyxelwlc-sessions', $tags, $fields);
-            $this->enableGraph('zyxelwlc_sessions');
-        }
-    }
+
 
     public function discoverWirelessClients()
     {
