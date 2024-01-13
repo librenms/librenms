@@ -3659,7 +3659,7 @@
             },
             "type": "graph"
         },
-         "graphite.enable": {
+        "graphite.enable": {
             "default": false,
             "type": "boolean",
             "group": "poller",
