@@ -27,9 +27,9 @@ $delay = $_POST['delay'];
 $interval = $_POST['interval'];
 $mute = $_POST['mute'];
 $invert = $_POST['invert'];
-$name = strip_tages($_POST['name']);
-$notes = isset($_POST['$notes']) ? $_POST['$notes'] : '';
-$proc = isset($_POST['proc']) ? $_POST['proc'] : '';
+$name = strip_tags($_POST['name']);
+$notes = isset($_POST['$notes']) ? strip_tags($_POST['$notes']) : '';
+$proc = isset($_POST['proc']) ? strip_tags($_POST['proc']) : '';
 
 if (empty($rule)) {
     $update_message = 'ERROR: No rule was generated - did you forget to click and / or?';
