@@ -6,7 +6,7 @@ over:
     - { graph: device_bits, text: Traffic }
     - { graph: device_processor, text: 'CPU Usage' }
     - { graph: device_mempool, text: 'Memory Usage' }
-    - { graph: device_sensor-count-zyxelwlc-sessions, text: 'Active Sessions' }
+    - { graph: device_sensor-count-zyxelwlc-sessionNum, text: 'Active Sessions' }
     - { graph: device_wireless_clients, text: 'Number of Clients' }
     - { graph: device_wireless_ap-count, text: 'Connected APs' }
 mib_dir: zyxel
