@@ -27,7 +27,7 @@ foreach (DeviceCache::getPrimary()->getVrfContexts() as $context_name) {
         }
     }
 
-    if (empty($oids)) {
+    if (empty($oids) || empty($valid)) {
         $oids = snmp_walk($device, 'ipv6AddrPfxLength', ['-OsqnU', '-Ln'], 'IPV6-MIB');
         $oids = str_replace('.1.3.6.1.2.1.55.1.8.1.2.', '', $oids);
         $oids = str_replace('"', '', $oids);
