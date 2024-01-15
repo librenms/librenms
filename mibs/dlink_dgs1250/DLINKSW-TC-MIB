@@ -1,0 +1,64 @@
+-- *****************************************************************
+-- DLINKSW-TC-MIB.mib : D-Link MIB Textual Conventions
+--
+-- Copyright (c) 2012 D-Link Corporation, all rights reserved.
+--
+-- *****************************************************************
+
+DLINKSW-TC-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY
+            FROM SNMPv2-SMI
+        TEXTUAL-CONVENTION
+            FROM SNMPv2-TC
+       dlinkIndustrialCommon
+            FROM DLINK-ID-REC-MIB;
+
+    dlinkSwTextualConvention MODULE-IDENTITY
+        LAST-UPDATED "201211190000Z"
+        ORGANIZATION "D-Link Corp."
+        CONTACT-INFO
+            "        D-Link Corporation
+
+             Postal: No. 289, Sinhu 3rd Rd., Neihu District,
+                     Taipei City 114, Taiwan, R.O.C
+             Tel:     +886-2-66000123
+             E-mail: tsd@dlink.com.tw
+            "
+
+        DESCRIPTION
+            "The module defines textual conventions used for all proprietary
+             MIBs."
+        REVISION  "201211190000Z"
+        DESCRIPTION
+                "Initial version of this MIB."
+    ::= { dlinkIndustrialCommon  1 }
+
+-- -----------------------------------------------------------------------------
+    DlinkTrigger ::= TEXTUAL-CONVENTION
+        STATUS       current
+        DESCRIPTION
+            "The object defined by this textual convention can trigger an event.
+             It always returns 'none(1)' when read the object."
+        SYNTAX  INTEGER { none(1), action(2) }
+
+    Dlink2kVlanList ::= TEXTUAL-CONVENTION
+        STATUS      current
+        DESCRIPTION
+            "This textual convention can specify a VLAN range of 2k VLANs,
+            for example, 1 - 2048, 2049 - 4095, etc. Each octet within this value
+            specifies a set of eight VLANs. The first octet specifies first 8
+            VLANs of the range specified in the description, the second octet
+            specifies the next 8 VLANs, etc.
+            Within each octet, the most significant bit represents the lowest
+            numbered VLAN, and the least significant bit represents the highest
+            numbered VLAN.  Thus, each VLAN of the device is represented by a
+            single bit within the value of this object. If the corresponding bit
+            is '1' indicates that VLAN is included in the set of VLANs;
+            '0' means the VLAN is not included.
+            Note that if the length of this object is less than 256 octets,
+            any 'missing' octets are assumed to contain the value zero."
+        SYNTAX          OCTET STRING (SIZE (0..256))
+
+END

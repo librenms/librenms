@@ -32,7 +32,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                 <h2 class="modal-title" id="Create">Add / Edit Service</h2>
             </div>
-            <div class='alert alert-info'>Service will modified for the specified Device.</div>
+            <div class='alert alert-info'>Service will be modified for the specified Device.</div>
             <div class='well well-lg'>
                 <div class="modal-body">
                     <form method="post" role="form" id="service" class="form-horizontal service-form">
