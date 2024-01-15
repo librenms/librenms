@@ -1,0 +1,175 @@
+mib: DLINKSW-ENTITY-EXT-MIB:DLINKSW-DDM-MIB
+modules:
+    os:
+        hardware: SNMPv2-MIB::sysDescr.0
+        version:
+            - DLINKSW-ENTITY-EXT-MIB::dEntityExtVersionRuntime.1
+        serial:
+            - ENTITY-MIB::entPhysicalSerialNum.1
+    processors:
+        data:
+            -
+                oid: DLINKSW-ENTITY-EXT-MIB::dEntityExtCpuUtilTable
+                value: DLINKSW-ENTITY-EXT-MIB::dEntityExtCpuUtilFiveMinutes.1.1
+                num_oid: '.1.3.6.1.4.1.171.11.165.1000.5.1.7.1.5.1.1'
+    mempools:
+        data:
+            -
+                oid: DLINKSW-ENTITY-EXT-MIB::dEntityExtMemoryUtilTable
+                total: DLINKSW-ENTITY-EXT-MIB::dEntityExtMemUtilTotal
+                used: DLINKSW-ENTITY-EXT-MIB::dEntityExtMemUtilUsed
+                free: DLINKSW-ENTITY-EXT-MIB::dEntityExtMemUtilFree
+                descr: '{{ $subindex1 }} Memory'
+                precision: 1024
+    sensors:
+        temperature:
+            data:
+                -
+                    oid: dEntityExtEnvTempTable
+                    value: dEntityExtEnvTempCurrent
+                    num_oid: '.1.3.6.1.4.1.171.11.165.1000.5.1.1.1.1.4.{{ $index }}'
+                    descr: dEntityExtEnvTempDescr
+                    index: 'dEntityExtEnvTempCurrent.{{ $index }}'
+                    low_limit: dEntityExtEnvTempThresholdLow
+                    high_limit: dEntityExtEnvTempThresholdHigh
+                -
+                    oid: dDdmIfInfoTable
+                    value: dDdmIfInfoCurrentTemperature
+                    num_oid: '.1.3.6.1.4.1.171.11.165.1000.72.1.4.1.1.1.{{ $index }}'
+                    descr: 'SFP {{ $index }} Temp'
+                    index: 'dDdmIfInfoCurrentTemperature.{{ $index }}'
+                    low_limit: dDdmIfInfoLowAlarmTemperature
+                    high_limit: dDdmIfInfoHighAlarmTemperature
+                    divisor: 1000
+        voltage:
+            data:
+                -
+                    oid: dDdmIfInfoTable
+                    value: dDdmIfInfoCurrentVoltage
+                    num_oid: '.1.3.6.1.4.1.171.11.165.1000.72.1.4.1.1.7.{{ $index }}'
+                    descr: 'SFP {{ $index }} Volt'
+                    index: 'dDdmIfInfoCurrentVoltage.{{ $index }}'
+                    low_limit: dDdmIfInfoHighAlarmVoltage
+                    high_limit: dDdmIfInfoLowAlarmVoltage
+                    divisor: 100
+        current:
+            data:
+                -
+                    oid: dDdmIfInfoTable
+                    value: dDdmIfInfoCurrentBiasCurrent
+                    num_oid: '.1.3.6.1.4.1.171.11.165.1000.72.1.4.1.1.13.{{ $index }}'
+                    descr: 'SFP {{ $index }} Bias'
+                    index: 'dDdmIfInfoCurrentBiasCurrent.{{ $index }}'
+                    low_limit: dDdmIfInfoHighAlarmBiasCurrent
+                    high_limit: dDdmIfInfoLowAlarmBiasCurrent
+                    divisor: 1000
+        power:
+            data:
+                -
+                    oid: dDdmIfInfoTable
+                    value: dDdmIfInfoCurrentTxPower
+                    num_oid: '.1.3.6.1.4.1.171.11.165.1000.72.1.4.1.1.19.{{ $index }}'
+                    descr: 'SFP {{ $index }} TX Power'
+                    index: ' dDdmIfInfoCurrentTxPower.{{ $index }}'
+                    low_limit: dDdmIfInfoHighAlarmTxPower
+                    high_limit: dDdmIfInfoLowAlarmTxPower
+                    divisor: 1000000
+                -
+                    oid: dDdmIfInfoTable
+                    value: dDdmIfInfoCurrentRxPower
+                    num_oid: '.1.3.6.1.4.1.171.11.165.1000.72.1.4.1.1.25.{{ $index }}'
+                    descr: 'SFP {{ $index }} RX Power'
+                    index: ' dDdmIfInfoCurrentRxPower.{{ $index }}'
+                    low_limit: dDdmIfInfoHighAlarmRxPower
+                    high_limit: dDdmIfInfoLowAlarmRxPower
+                    divisor: 1000000
+        state:
+            data:
+                -
+                    oid: dEntityExtEnvFanTable
+                    value: dEntityExtEnvFanStatus
+                    num_oid: '.1.3.6.1.4.1.171.11.165.1000.5.1.1.2.1.4.{{ $index }}'
+                    descr: dEntityExtEnvFanDescr
+                    index: 'dEntityExtEnvFanStatus.{{ $index }}'
+                    states:
+                        - { descr: Ok, graph: 1, value: 1, generic: 0 }
+                        - { descr: Fault, graph: 1, value: 2, generic: 2 }
+                -
+                    oid: dEntityExtEnvPowerTable
+                    value: dEntityExtEnvPowerStatus
+                    num_oid: '.1.3.6.1.4.1.171.11.165.1000.5.1.1.3.1.6.{{ $index }}'
+                    descr: dEntityExtEnvPowerDescr
+                    index: 'dEntityExtEnvPowerStatus.{{ $index }}'
+                    states:
+                        - { descr: In Operation, graph: 1, value: 1, generic: 0 }
+                        - { descr: Failed, graph: 1, value: 2, generic: 2 }
+                        - { descr: Empty, graph: 1, value: 3, generic: 3 }
+                -
+                    oid: dEntityExtEnvTempTable
+                    value: dEntityExtEnvTempStatus
+                    num_oid: '.1.3.6.1.4.1.171.11.165.1000.5.1.1.1.1.7.{{ $index }}'
+                    descr: dEntityExtEnvTempDescr
+                    index: 'dEntityExtEnvTempStatus.{{ $index }}'
+                    states:
+                        - { descr: Ok, graph: 1, value: 1, generic: 0 }
+                        - { descr: Abnormal, graph: 1, value: 2, generic: 2 }
+                -
+                    oid: dDdmIfInfoTable
+                    value: dDdmIfInfoTemperatureState
+                    num_oid: '.1.3.6.1.4.1.171.11.165.1000.72.1.4.1.1.2.{{ $index }}'
+                    descr: 'SFP {{ $index }} Temp'
+                    index: 'dDdmIfInfoTemperatureState.{{ $index }}'
+                    states:
+                        - { descr: Normal, graph: 1, value: 0, generic: 0 }
+                        - { descr: HiAlarm, graph: 1, value: 1, generic: 2 }
+                        - { descr: HiWarning, graph: 1, value: 2, generic: 1 }
+                        - { descr: LoWarning, graph: 1, value: 3, generic: 1 }
+                        - { descr: LoAlarm, graph: 1, value: 4, generic: 2 }
+                -
+                    oid: dDdmIfInfoTable
+                    value: dDdmIfInfoVoltageState
+                    num_oid: '.1.3.6.1.4.1.171.11.165.1000.72.1.4.1.1.8.{{ $index }}'
+                    descr: 'SFP {{ $index }} Voltage'
+                    index: 'dDdmIfInfoVoltageState.{{ $index }}'
+                    states:
+                        - { descr: Normal, graph: 1, value: 0, generic: 0 }
+                        - { descr: HiAlarm, graph: 1, value: 1, generic: 2 }
+                        - { descr: HiWarning, graph: 1, value: 2, generic: 1 }
+                        - { descr: LoWarning, graph: 1, value: 3, generic: 1 }
+                        - { descr: LoAlarm, graph: 1, value: 4, generic: 2 }
+                -
+                    oid: dDdmIfInfoTable
+                    value: dDdmIfInfoBiasCurrentState
+                    num_oid: '.1.3.6.1.4.1.171.11.165.1000.72.1.4.1.1.14.{{ $index }}'
+                    descr: 'SFP {{ $index }} Bias'
+                    index: 'dDdmIfInfoBiasCurrentState.{{ $index }}'
+                    states:
+                        - { descr: Normal, graph: 1, value: 0, generic: 0 }
+                        - { descr: HiAlarm, graph: 1, value: 1, generic: 2 }
+                        - { descr: HiWarning, graph: 1, value: 2, generic: 1 }
+                        - { descr: LoWarning, graph: 1, value: 3, generic: 1 }
+                        - { descr: LoAlarm, graph: 1, value: 4, generic: 2 }
+                -
+                    oid: dDdmIfInfoTable
+                    value: dDdmIfInfoTxPowerState
+                    num_oid: '.1.3.6.1.4.1.171.11.165.1000.72.1.4.1.1.20.{{ $index }}'
+                    descr: 'SFP {{ $index }} TX Power'
+                    index: 'dDdmIfInfoTxPowerState.{{ $index }}'
+                    states:
+                        - { descr: Normal, graph: 1, value: 0, generic: 0 }
+                        - { descr: HiAlarm, graph: 1, value: 1, generic: 2 }
+                        - { descr: HiWarning, graph: 1, value: 2, generic: 1 }
+                        - { descr: LoWarning, graph: 1, value: 3, generic: 1 }
+                        - { descr: LoAlarm, graph: 1, value: 4, generic: 2 }
+                -
+                    oid: dDdmIfInfoTable
+                    value: dDdmIfInfoRxPowerState
+                    num_oid: '.1.3.6.1.4.1.171.11.165.1000.72.1.4.1.1.26.{{ $index }}'
+                    descr: 'SFP {{ $index }} RX Power'
+                    index: 'dDdmIfInfoRxPowerState.{{ $index }}'
+                    states:
+                        - { descr: Normal, graph: 1, value: 0, generic: 0 }
+                        - { descr: HiAlarm, graph: 1, value: 1, generic: 2 }
+                        - { descr: HiWarning, graph: 1, value: 2, generic: 1 }
+                        - { descr: LoWarning, graph: 1, value: 3, generic: 1 }
+                        - { descr: LoAlarm, graph: 1, value: 4, generic: 2 }
