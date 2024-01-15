@@ -1,10 +1,10 @@
 <?php
 
 $link_array = [
-    'page'   => 'device',
+    'page' => 'device',
     'device' => $device['device_id'],
-    'tab'    => 'apps',
-    'app'    => 'borgbackup',
+    'tab' => 'apps',
+    'app' => 'borgbackup',
 ];
 
 $mode = $app->data['mode'] ?? 'single';
