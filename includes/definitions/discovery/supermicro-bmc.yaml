@@ -8,11 +8,6 @@ modules:
         features: ATEN-IPMI-MIB::biosVesion.0
         features_template: "Bios {{ ATEN-IPMI-MIB::biosVesion.0 }}"
     sensors:
-        pre-cache:
-            data:
-                -
-                    oid:
-                        - sensorTable
         temperature:
             data:
                 -
