@@ -318,13 +318,13 @@ bills:
     PRIMARY: { Name: PRIMARY, Columns: [bill_id], Unique: true, Type: BTREE }
 bill_data:
   Columns:
+    - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
     - { Field: bill_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: timestamp, Type: datetime, 'Null': false, Extra: '' }
     - { Field: period, Type: int, 'Null': false, Extra: '' }
     - { Field: delta, Type: bigint, 'Null': false, Extra: '' }
     - { Field: in_delta, Type: bigint, 'Null': false, Extra: '' }
     - { Field: out_delta, Type: bigint, 'Null': false, Extra: '' }
-    - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     bill_data_bill_id_index: { Name: bill_data_bill_id_index, Columns: [bill_id], Unique: false, Type: BTREE }

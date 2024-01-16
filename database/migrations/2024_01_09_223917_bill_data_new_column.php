@@ -13,7 +13,7 @@ return new class extends Migration
     {
         if (! Schema::hasColumn('bill_data', 'id')) {
             Schema::table('bill_data', function (Blueprint $table) {
-                $table->id();
+                $table->id()->first();
             });
         }
     }
