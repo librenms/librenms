@@ -244,7 +244,7 @@ require {
         type httpd_t;
         type rrdcached_t;
         type httpd_sys_rw_content_t;
-        class dir { add_name getattr remove_name rmdir search write };
+        class dir { add_name getattr read remove_name rmdir search write };
         class file { create getattr open read rename setattr unlink write };
         class sock_file { create setattr unlink write };
         class capability { fsetid sys_resource };
