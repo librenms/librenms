@@ -50,17 +50,17 @@ foreach (['stype', 'device_id', 'service_id'] as $varname) {
 if (is_numeric($service_id) && $service_id > 0) {
     // Need to edit.
     if (is_numeric(edit_service($update, $service_id))) {
-        $status = ['status' =>0, 'message' => 'Modified Service: <i>' . $service_id . ': ' . $stype . '</i>'];
+        $status = ['status' => 0, 'message' => 'Modified Service: <i>' . $service_id . ': ' . $stype . '</i>'];
     } else {
-        $status = ['status' =>1, 'message' => 'ERROR: Failed to modify service: <i>' . $service_id . '</i>'];
+        $status = ['status' => 1, 'message' => 'ERROR: Failed to modify service: <i>' . $service_id . '</i>'];
     }
 } else {
     // Need to add.
     $service_id = add_service($device_id, $stype, $desc, $ip, $param, $ignore, $disabled, 0, $name);
     if ($service_id == false) {
-        $status = ['status' =>1, 'message' => 'ERROR: Failed to add Service: <i>' . $stype . '</i>'];
+        $status = ['status' => 1, 'message' => 'ERROR: Failed to add Service: <i>' . $stype . '</i>'];
     } else {
-        $status = ['status' =>0, 'message' => 'Added Service: <i>' . $service_id . ': ' . $stype . '</i>'];
+        $status = ['status' => 0, 'message' => 'Added Service: <i>' . $service_id . ': ' . $stype . '</i>'];
     }
 }
 header('Content-Type: application/json');

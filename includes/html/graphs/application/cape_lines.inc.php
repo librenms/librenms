@@ -16,28 +16,28 @@ $rrd_list = [];
 if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'debug',
-        'ds'       => 'debug',
+        'descr' => 'debug',
+        'ds' => 'debug',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'info',
-        'ds'       => 'info',
+        'descr' => 'info',
+        'ds' => 'info',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'warning',
-        'ds'       => 'warning',
+        'descr' => 'warning',
+        'ds' => 'warning',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'error',
-        'ds'       => 'error',
+        'descr' => 'error',
+        'ds' => 'error',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'critical',
-        'ds'       => 'critical',
+        'descr' => 'critical',
+        'ds' => 'critical',
     ];
 } else {
     d_echo('RRD "' . $rrd_filename . '" not found');

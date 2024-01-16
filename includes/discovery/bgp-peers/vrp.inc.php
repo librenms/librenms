@@ -72,7 +72,6 @@ if (count($bgpPeersCache) > 0 || count($bgpPeersCache_ietf) == 0) {
         $bgpPeers[$vrfInstance][$address]['afi'] = $oid[1];
         $bgpPeers[$vrfInstance][$address]['safi'] = $oid[2];
         $bgpPeers[$vrfInstance][$address]['typePeer'] = $oid[3];
-        $bgpPeers[$vrfInstance][$address]['bgpPeerDescr'] = '';
         if (array_key_exists('0.' . $oid[3] . '.' . $oid_address, $bgpPeersDesc)) {
             // We may have a description
             $bgpPeers[$vrfInstance][$address]['bgpPeerDescr'] = $bgpPeersDesc['0.' . $oid[3] . '.' . $oid_address]['hwBgpPeerSessionExtDescription'];
@@ -100,9 +99,11 @@ if (count($bgpPeersCache) > 0 || count($bgpPeersCache_ietf) == 0) {
                     'bgpPeerOutTotalMessages' => 0,
                     'bgpPeerFsmEstablishedTime' => $value['hwBgpPeerFsmEstablishedTime'],
                     'bgpPeerInUpdateElapsedTime' => 0,
-                    'bgpPeerDescr' => $value['bgpPeerDescr'] ?? '',
                     'astext' => $astext,
                 ];
+                if (array_key_exists('bgpPeerDescr', $value)) {
+                    $peers['bgpPeerDescr'] = $value['bgpPeerDescr'];
+                }
                 if (empty($vrfId)) {
                     unset($peers['vrf_id']);
                 }
@@ -118,8 +119,10 @@ if (count($bgpPeersCache) > 0 || count($bgpPeersCache_ietf) == 0) {
                 $peers = [
                     'bgpPeerRemoteAs' => $value['hwBgpPeerRemoteAs'],
                     'astext' => $astext,
-                    'bgpPeerDescr' => $value['bgpPeerDescr'] ?? '',
                 ];
+                if (array_key_exists('bgpPeerDescr', $value)) {
+                    $peers['bgpPeerDescr'] = $value['bgpPeerDescr'];
+                }
                 $affected = DeviceCache::getPrimary()->bgppeers()->where('bgpPeerIdentifier', $address)->where('vrf_id', $vrfId)->update($peers);
                 $seenPeerID[] = DeviceCache::getPrimary()->bgppeers()->where('bgpPeerIdentifier', $address)->where('vrf_id', $vrfId)->select('bgpPeer_id')->orderBy('bgpPeer_id', 'ASC')->first()->bgpPeer_id;
 

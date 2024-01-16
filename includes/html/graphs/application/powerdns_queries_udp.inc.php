@@ -9,19 +9,19 @@ $unit_text = 'Packets/sec';
 $rrd_filename = Rrd::name($device['hostname'], ['app', 'powerdns', $app->app_id]);
 $array = [
     'q_udp4Answers' => [
-        'descr'  => 'UDP4 Answers',
+        'descr' => 'UDP4 Answers',
         'colour' => '00008888',
     ],
     'q_udp4Queries' => [
-        'descr'  => 'UDP4 Queries',
+        'descr' => 'UDP4 Queries',
         'colour' => '000088FF',
     ],
     'q_udp6Answers' => [
-        'descr'  => 'UDP6 Answers',
+        'descr' => 'UDP6 Answers',
         'colour' => '88000088',
     ],
     'q_udp6Queries' => [
-        'descr'  => 'UDP6 Queries',
+        'descr' => 'UDP6 Queries',
         'colour' => '880000FF',
     ],
 ];

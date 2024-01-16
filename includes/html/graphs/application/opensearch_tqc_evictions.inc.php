@@ -14,8 +14,8 @@ $rrd_list = [];
 if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'QC Evictions',
-        'ds'       => 'tqc_evictions',
+        'descr' => 'QC Evictions',
+        'ds' => 'tqc_evictions',
     ];
 } else {
     d_echo('RRD "' . $rrd_filename . '" not found');

@@ -97,7 +97,7 @@ class Comware extends OS implements MempoolsDiscovery, ProcessorDiscovery
                 $mempools->push((new Mempool([
                     'mempool_index' => $index,
                     'mempool_type' => 'comware',
-                    'mempool_class' =>'system',
+                    'mempool_class' => 'system',
                     'mempool_descr' => $entity_name[$index],
                     'mempool_precision' => 1,
                     'mempool_perc_oid' => ".1.3.6.1.4.1.25506.2.6.1.1.1.1.8.$index",

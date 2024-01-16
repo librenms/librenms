@@ -18,23 +18,23 @@ $rrd_list = [];
 if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Packets',
-        'ds'       => 'packets',
+        'descr' => 'Packets',
+        'ds' => 'packets',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Dec. Packets',
-        'ds'       => 'dec_packets',
+        'descr' => 'Dec. Packets',
+        'ds' => 'dec_packets',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Dropped',
-        'ds'       => 'dropped',
+        'descr' => 'Dropped',
+        'ds' => 'dropped',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'If Dropped',
-        'ds'       => 'ifdropped',
+        'descr' => 'If Dropped',
+        'ds' => 'ifdropped',
     ];
 } else {
     d_echo('RRD "' . $rrd_filename . '" not found');

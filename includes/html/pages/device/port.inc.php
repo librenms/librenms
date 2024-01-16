@@ -66,17 +66,22 @@ echo "<div style='clear: both;'>";
 print_optionbar_start();
 
 $link_array = [
-    'page'   => 'device',
+    'page' => 'device',
     'device' => $device['device_id'],
-    'tab'    => 'port',
-    'port'   => $port->port_id,
+    'tab' => 'port',
+    'port' => $port->port_id,
 ];
 
 $menu_options['graphs'] = 'Graphs';
 $menu_options['realtime'] = 'Real time';
-// FIXME CONDITIONAL
-$menu_options['arp'] = 'ARP Table';
-$menu_options['fdb'] = 'FDB Table';
+
+if ($port->macs()->exists()) {
+    $menu_options['arp'] = 'ARP Table';
+}
+
+if ($port->fdbEntries()->exists()) {
+    $menu_options['fdb'] = 'FDB Table';
+}
 $menu_options['events'] = 'Eventlog';
 $menu_options['notes'] = (get_dev_attrib($device, 'port_id_notes:' . $port->port_id) ?? '') == '' ? 'Notes' : 'Notes*';
 

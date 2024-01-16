@@ -81,7 +81,7 @@ function api_success_noresult($code, $message = null): JsonResponse
 function api_error($statusCode, $message): JsonResponse
 {
     return response()->json([
-        'status'  => 'error',
+        'status' => 'error',
         'message' => $message,
     ], $statusCode, [], JSON_PRETTY_PRINT);
 } // end api_error()
@@ -114,7 +114,7 @@ function api_get_graph(Request $request, array $additional = [])
         ]);
 
         $graph = Graph::get([
-            'width'  => $request->get('width', 1075),
+            'width' => $request->get('width', 1075),
             'height' => $request->get('height', 300),
             ...$additional,
             ...$vars,
@@ -445,7 +445,7 @@ function add_device(Illuminate\Http\Request $request)
             $device->snmp_disable = 1;
         }
 
-        (new ValidateDeviceAndCreate($device, ! empty($data['force_add'])))->execute();
+        (new ValidateDeviceAndCreate($device, ! empty($data['force_add']), ! empty($data['ping_fallback'])))->execute();
     } catch (Exception $e) {
         return api_error(500, $e->getMessage());
     }
@@ -633,6 +633,10 @@ function list_bgp(Illuminate\Http\Request $request)
     $remote_asn = $request->get('remote_asn');
     $local_address = $request->get('local_address');
     $remote_address = $request->get('remote_address');
+    $bgp_descr = $request->get('bgp_descr');
+    $bgp_state = $request->get('bgp_state');
+    $bgp_adminstate = $request->get('bgp_adminstate');
+    $bgp_family = $request->get('bgp_family');
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
     if (is_numeric($device_id)) {
         $sql .= ' AND `devices`.`device_id` = ?';
@@ -640,11 +644,11 @@ function list_bgp(Illuminate\Http\Request $request)
     }
     if (! empty($asn)) {
         $sql .= ' AND `devices`.`bgpLocalAs` = ?';
-        $sql_params[] = $asn;
+        $sql_params[] = preg_replace('/[^0-9]/', '', $asn);
     }
     if (! empty($remote_asn)) {
         $sql .= ' AND `bgpPeers`.`bgpPeerRemoteAs` = ?';
-        $sql_params[] = $remote_asn;
+        $sql_params[] = preg_replace('/[^0-9]/', '', $remote_asn);
     }
     if (! empty($local_address)) {
         $sql .= ' AND `bgpPeers`.`bgpLocalAddr` = ?';
@@ -660,6 +664,25 @@ function list_bgp(Illuminate\Http\Request $request)
             $sql_params[] = IP::parse($remote_address)->uncompressed();
         } catch (InvalidIpException $e) {
             return api_error(400, 'Invalid remote address');
+        }
+    }
+    if (! empty($bgp_descr)) {
+        $sql .= ' AND `bgpPeers`.`bgpPeerDescr` LIKE ?';
+        $sql_params[] = "%$bgp_descr%";
+    }
+    if (! empty($bgp_state)) {
+        $sql .= ' AND `bgpPeers`.`bgpPeerState` = ?';
+        $sql_params[] = $bgp_state;
+    }
+    if (! empty($bgp_adminstate)) {
+        $sql .= ' AND `bgpPeers`.`bgpPeerAdminStatus` = ?';
+        $sql_params[] = $bgp_adminstate;
+    }
+    if (! empty($bgp_family)) {
+        if ($bgp_family == 4) {
+            $sql .= ' AND `bgpPeers`.`bgpLocalAddr` LIKE \'%.%\'';
+        } elseif ($bgp_family == 6) {
+            $sql .= ' AND `bgpPeers`.`bgpLocalAddr` LIKE \'%:%\'';
         }
     }
 
@@ -792,7 +815,7 @@ function get_graph_by_portgroup(Request $request)
     }
 
     return api_get_graph($request, [
-        'type'   => 'multiport_bits_separate',
+        'type' => 'multiport_bits_separate',
         'id' => $if_list,
     ]);
 }
@@ -994,7 +1017,7 @@ function list_available_wireless_graphs(Illuminate\Http\Request $request)
                 foreach (dbFetchRows('SELECT `sensor_id`, `sensor_descr` FROM `wireless_sensors` WHERE `device_id` = ? AND `sensor_class` = ? AND `sensor_deleted` = 0', [$device_id, $type]) as $graph) {
                     $graphs[] = [
                         'sensor_id' => $graph['sensor_id'],
-                        'desc'      => $graph['sensor_descr'],
+                        'desc' => $graph['sensor_descr'],
                     ];
                 }
             }
@@ -1304,7 +1327,7 @@ function add_edit_rule(Illuminate\Http\Request $request)
     }
 
     $extra = [
-        'mute'  => $mute,
+        'mute' => $mute,
         'count' => $count,
         'delay' => $delay_sec,
         'interval' => $interval_sec,
@@ -1494,7 +1517,7 @@ function list_oxidized(Illuminate\Http\Request $request)
              ->whereNotIn('type', Config::get('oxidized.ignore_types', []))
              ->whereNotIn('os', Config::get('oxidized.ignore_os', []))
              ->whereAttributeDisabled('override_Oxidized_disable')
-             ->select(['devices.device_id', 'hostname', 'sysName', 'sysDescr', 'sysObjectID', 'hardware', 'os', 'ip', 'location_id', 'purpose', 'notes'])
+             ->select(['devices.device_id', 'hostname', 'sysName', 'sysDescr', 'sysObjectID', 'hardware', 'os', 'ip', 'location_id', 'purpose', 'notes', 'poller_group'])
              ->get();
 
     /** @var Device $device */

@@ -8,11 +8,11 @@ TEXTUAL-CONVENTION, DisplayString, MacAddress, DateAndTime FROM SNMPv2-TC
 OBJECT-GROUP, NOTIFICATION-GROUP FROM SNMPv2-CONF;
 
 mikrotikExperimentalModule MODULE-IDENTITY
-  LAST-UPDATED "202305010000Z"
+  LAST-UPDATED "202309190000Z"
   ORGANIZATION "MikroTik"
   CONTACT-INFO "support@mikrotik.com"
   DESCRIPTION ""
-  REVISION "202305010000Z"
+  REVISION "202309190000Z"
   DESCRIPTION ""
   ::= { mikrotik 1 }
 
@@ -1442,7 +1442,7 @@ mtxrGaugeTableEntry OBJECT-TYPE
 MtxrGaugeTableEntry ::= SEQUENCE {
     mtxrGaugeIndex ObjectIndex,
     mtxrGaugeName DisplayString,
-    mtxrGaugeValue Gauge32,
+    mtxrGaugeValue Integer32,
     mtxrGaugeUnit INTEGER
 }
 
@@ -1461,7 +1461,7 @@ mtxrGaugeName OBJECT-TYPE
     ::= { mtxrGaugeTableEntry 2 }
 
 mtxrGaugeValue OBJECT-TYPE
-    SYNTAX Gauge32
+    SYNTAX Integer32
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION ""
@@ -3578,3 +3578,4 @@ mtxrTrapGroup NOTIFICATION-GROUP NOTIFICATIONS {
 -- ***************************************************************************
 
 END
+

@@ -44,10 +44,10 @@ foreach ($account_data as $data) {
     $rrd_name = ['app', $name, $app->app_id, $category, $owner_name];
 
     $fields = [
-        'enabled'           => $enabled,
-        'libraries'         => $libraries,
+        'enabled' => $enabled,
+        'libraries' => $libraries,
         'trashed_libraries' => $trashed_libraries,
-        'size_consumption'  => $size_consumption,
+        'size_consumption' => $size_consumption,
     ];
 
     $metrics[$owner_name . '_' . $category] = $fields;

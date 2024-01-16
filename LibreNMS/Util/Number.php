@@ -25,6 +25,8 @@
 
 namespace LibreNMS\Util;
 
+use LibreNMS\Enum\IntegerType;
+
 class Number
 {
     public static function formatBase($value, $base = 1000, $round = 2, $sf = 3, $suffix = 'B')
@@ -174,5 +176,38 @@ class Number
         }
 
         return (int) ($number * (1024 ** $exponent));
+    }
+
+    public static function constrainInteger(int $value, IntegerType $integerSize): int
+    {
+        if ($integerSize->isSigned()) {
+            $maxSignedValue = $integerSize->maxValue();
+
+            if ($value > $maxSignedValue) {
+                $signedValue = $value - $maxSignedValue * 2 - 2;
+
+                // if conversion was successfull, the number will still be in the valid range
+                if ($signedValue > $maxSignedValue) {
+                    throw new \InvalidArgumentException('Unsigned value exceeds the maximum representable value of ' . $integerSize->name);
+                }
+
+                return $signedValue;
+            }
+
+            return $value;
+        }
+
+        // unsigned check if value is negative
+        if ($value < 0) {
+            $unsignedValue = $value + $integerSize->maxValue() - 1;
+
+            if ($unsignedValue < 0) {
+                throw new \InvalidArgumentException('Unsigned value exceeds the minimum representable value of ' . $integerSize->name);
+            }
+
+            return $unsignedValue;
+        }
+
+        return $value;
     }
 }

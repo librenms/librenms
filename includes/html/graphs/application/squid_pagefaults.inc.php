@@ -17,9 +17,9 @@ if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list = [
         [
             'filename' => $rrd_filename,
-            'descr'    => 'page faults',
-            'ds'       => 'syspagefaults',
-            'colour'   => '582a72',
+            'descr' => 'page faults',
+            'ds' => 'syspagefaults',
+            'colour' => '582a72',
         ],
     ];
 } else {

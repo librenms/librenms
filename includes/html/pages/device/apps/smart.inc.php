@@ -3,15 +3,17 @@
 print_optionbar_start();
 
 $link_array = [
-    'page'   => 'device',
+    'page' => 'device',
     'device' => $device['device_id'],
-    'tab'    => 'apps',
-    'app'    => 'smart',
+    'tab' => 'apps',
+    'app' => 'smart',
 ];
 
 $drives = [];
 
 $app_data = $app->data;
+
+array_multisort(array_keys($app_data['disks']), SORT_ASC, $app_data['disks']);
 
 foreach ($app_data['disks'] as $label => $disk_data) {
     $disk = $label;
@@ -28,7 +30,7 @@ foreach ($app_data['disks'] as $label => $disk_data) {
         }
     }
 
-    array_push($drives, generate_link($label, $link_array, ['disk'=>$disk]) . $health_status);
+    array_push($drives, generate_link($label, $link_array, ['disk' => $disk]) . $health_status);
 }
 
 printf('%s | drives: %s', generate_link('All Drives', $link_array), implode(', ', $drives));
@@ -71,13 +73,13 @@ if (isset($vars['disk'])) {
     }
     print_optionbar_end();
     $graphs = [
-        'smart_big5'        => 'Reliability / Age',
-        'smart_temp'        => 'Temperature',
-        'smart_ssd'         => 'SSD-specific',
-        'smart_other'       => 'Other',
-        'smart_tests_status'=> 'S.M.A.R.T self-tests results',
-        'smart_tests_ran'   => 'S.M.A.R.T self-tests run count',
-        'smart_runtime'     => 'Power On Hours',
+        'smart_big5' => 'Reliability / Age',
+        'smart_temp' => 'Temperature',
+        'smart_ssd' => 'SSD-specific',
+        'smart_other' => 'Other',
+        'smart_tests_status' => 'S.M.A.R.T self-tests results',
+        'smart_tests_ran' => 'S.M.A.R.T self-tests run count',
+        'smart_runtime' => 'Power On Hours',
     ];
     if ($app_data['disks'][$vars['disk']]['is_ssd'] != 1) {
         unset($graphs['smart_ssd']);
