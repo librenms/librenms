@@ -186,11 +186,6 @@ parameters:
 			path: app/Http/Controllers/LegacyController.php
 
 		-
-			message: "#^Variable \\$vars on left side of \\?\\? is never defined\\.$#"
-			count: 1
-			path: app/Http/Controllers/LegacyController.php
-
-		-
 			message: "#^Called 'Model\\:\\:make\\(\\)' which performs unnecessary work, use 'new Model\\(\\)'\\.$#"
 			count: 1
 			path: app/Http/Controllers/PortGroupController.php
@@ -219,6 +214,11 @@ parameters:
 			message: "#^Called 'Model\\:\\:make\\(\\)' which performs unnecessary work, use 'new Model\\(\\)'\\.$#"
 			count: 1
 			path: app/Http/Controllers/ServiceTemplateController.php
+
+		-
+			message: "#^Offset 'image_title' does not exist on null\\.$#"
+			count: 1
+			path: app/Http/Controllers/Widgets/ImageController.php
 
 		-
 			message: "#^Offset 'image_title' on null in empty\\(\\) does not exist\\.$#"
