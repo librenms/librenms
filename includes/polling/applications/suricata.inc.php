@@ -13,9 +13,14 @@ try {
     return;
 }
 
+// grab the alert here as it is the global one
+$metrics = ['alert' => $suricata['alert']];
+
+// Used by both.
+$instances = [];
+
 if ($suricata['version'] == 1) {
-    // grab  the alert here as it is the global one
-    $metrics = ['alert' => $suricata['alert']];
+    $app->data['version'] = 1;
 
     $rrd_def = RrdDefinition::make()
         ->addDataset('af_dcerpc_tcp', 'DERIVE', 0)
@@ -150,7 +155,6 @@ if ($suricata['version'] == 1) {
     ];
 
     // process each instance
-    $instances = [];
     foreach ($suricata['data'] as $instance => $stats) {
         if ($instance == '.total') {
             $rrd_name = ['app', $name, $app->app_id];
@@ -172,35 +176,58 @@ if ($suricata['version'] == 1) {
         data_update($device, 'app', $tags, $fields);
     }
 } elseif ($suricata['version'] == 2) {
+    $app->data['version'] = 2;
+
+    // Nothing here is used by version 1.
+    include 'includes/suricata-shared.php';
+
     $counter_rrd_def = RrdDefinition::make()
         ->addDataset('data', 'DERIVE', 0);
 
     $gauge_rrd_def = RrdDefinition::make()
         ->addDataset('data', 'GAUGE', 0);
 
+    foreach ($suricata['data']['totals'] as $stat => $value) {
+        // If this is defined, it not something we understand.
+        if (isset($suricata_stat_keys[$stat])) {
+            $rrd_name = ['app', $name, $app->app_id, '_totals___', $stat];
+            $fields = ['data' => $value];
 
-    # anything not here is a counter
-    $gauges=[
-        'file_store__open_files'=>1,
-        'file_store__open_files_max_hit'=>1,
-        'flow__emerg_mode_entered'=>1,
-        'flow__emerg_mode_over'=>1,
-        'flow__memcap'=>1,
-        'flow__memuse'=>1,
-        'flow__mgr__rows_maxlen'=>1,
-        'flow__recycler__queue_avg'=>1,
-        'flow__recycler__queue_max'=>1,
-        'ftp__memcap'=>1,
-        'ftp__memuse'=>1,
-        'http__memcap'=>1,
-        'http__memuse'=>1,
-        'memcap_pressure'=>1,
-        'memcap_pressure_max'=>1,
-        'uptime'=>1,
-        'tcp__memuse'=>1,
-        'error_delta'=>1,
-        'drop_percent'=>1,
-    ];
+            $metrics['totals_'.$stat] = $value;
+
+            // Check if it is a gauge or counter
+            if (isset($suricata_stat_gauges[$stat])) {
+                $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $gauge_rrd_def, 'rrd_name' => $rrd_name];
+                data_update($device, 'app', $tags, $fields);
+            } else {
+                $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $counter_rrd_def, 'rrd_name' => $rrd_name];
+                data_update($device, 'app', $tags, $fields);
+            }
+        }
+    }
+
+    foreach ($suricata['data']['instances'] as $instance => $instance_stats) {
+        $instances[] = $instance;
+
+        foreach ($instance_stats as $stat => $value) {
+            // If this is defined, it not something we understand.
+            if (isset($suricata_stat_keys[$stat])) {
+                $rrd_name = ['app', $name, $app->app_id, '_instance_' . $instance . '___', $stat];
+                $fields = ['data' => $value];
+
+                $metrics['instance_' . $instance . '_' . $stat] = $value;
+
+                // Check if it is a gauge or counter
+                if (isset($suricata_stat_gauges[$stat])) {
+                    $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $gauge_rrd_def, 'rrd_name' => $rrd_name];
+                    data_update($device, 'app', $tags, $fields);
+                } else {
+                    $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $counter_rrd_def, 'rrd_name' => $rrd_name];
+                    data_update($device, 'app', $tags, $fields);
+                }
+            }
+        }
+    }
 } else {
     echo PHP_EOL . $name . ': ' .$suricata['version']. ' is not a supported extend version'  . PHP_EOL;
     return;
