@@ -35,10 +35,9 @@ foreach ($gpuArray as $index => $gpu) {
     $stats_count = count($stats);
     if ($stats_count == 22) {
         [$gpu, $pwr, $temp, $memtemp, $sm, $mem, $enc, $dec, $jpg, $ofa,
-        $mclk, $pclk, $pviol, $tviol, $fb, $bar1, $ccpm, $sbecc, $dbecc,
-        $pci, $rxpci, $txpci] = $stats;
-    }
-    elseif ($stats_count == 19 || $stats_count == 20) {
+            $mclk, $pclk, $pviol, $tviol, $fb, $bar1, $ccpm, $sbecc, $dbecc,
+            $pci, $rxpci, $txpci] = $stats;
+    } elseif ($stats_count == 19 || $stats_count == 20) {
         [$gpu, $pwr, $temp, $memtemp, $sm, $mem, $enc, $dec, $mclk, $pclk, $pviol, $tviol,
             $fb, $bar1, $sbecc, $dbecc, $pci, $rxpci, $txpci] = $stats;
     } else {
