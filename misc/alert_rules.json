@@ -10,8 +10,9 @@
   },
   {
     "rule": "macros.device_down = \"1\" && devices.status_reason = \"snmp\"",
-    "name": "SNMP not responding on Device - Check on SNMP Service - Device marked Down!",
-    "default": true
+    "name": "Device Down (SNMP unreachable)",
+    "default": true,
+    "notes": "Device may responds on ICMP but not on SNMP."
   },
   {
     "rule": "devices.uptime < \"300\" && macros.device = \"1\"",
