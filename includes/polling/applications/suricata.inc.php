@@ -171,6 +171,39 @@ if ($suricata['version'] == 1) {
         $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
         data_update($device, 'app', $tags, $fields);
     }
+} elseif ($suricata['version'] == 2) {
+    $counter_rrd_def = RrdDefinition::make()
+        ->addDataset('data', 'DERIVE', 0);
+
+    $gauge_rrd_def = RrdDefinition::make()
+        ->addDataset('data', 'GAUGE', 0);
+
+
+    # anything not here is a counter
+    $gauges=[
+        'file_store__open_files'=>1,
+        'file_store__open_files_max_hit'=>1,
+        'flow__emerg_mode_entered'=>1,
+        'flow__emerg_mode_over'=>1,
+        'flow__memcap'=>1,
+        'flow__memuse'=>1,
+        'flow__mgr__rows_maxlen'=>1,
+        'flow__recycler__queue_avg'=>1,
+        'flow__recycler__queue_max'=>1,
+        'ftp__memcap'=>1,
+        'ftp__memuse'=>1,
+        'http__memcap'=>1,
+        'http__memuse'=>1,
+        'memcap_pressure'=>1,
+        'memcap_pressure_max'=>1,
+        'uptime'=>1,
+        'tcp__memuse'=>1,
+        'error_delta'=>1,
+        'drop_percent'=>1,
+    ];
+} else {
+    echo PHP_EOL . $name . ': ' .$suricata['version']. ' is not a supported extend version'  . PHP_EOL;
+    return;
 }
 
 // check for added or removed instances
