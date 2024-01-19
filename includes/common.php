@@ -291,7 +291,7 @@ function zeropad($num, $length = 2)
 
 function set_dev_attrib($device, $attrib_type, $attrib_value)
 {
-    return DeviceCache::get((int) $device)->setAttrib($attrib_type, $attrib_value);
+    return DeviceCache::get((int) $device['device_id'])->setAttrib($attrib_type, $attrib_value);
 }
 
 function get_dev_attribs($device_id)
