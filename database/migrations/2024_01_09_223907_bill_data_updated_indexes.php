@@ -22,9 +22,5 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('bill_data', function (Blueprint $table) {
-            $table->dropIndex(['bill_id', 'timestamp']);
-            $table->primary(['bill_id', 'timestamp']);
-        });
     }
 };

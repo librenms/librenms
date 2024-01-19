@@ -20,7 +20,6 @@ return new class extends Migration
             $table->bigInteger('delta');
             $table->bigInteger('in_delta');
             $table->bigInteger('out_delta');
-            $table->primary(['bill_id', 'timestamp']);
         });
     }
 
