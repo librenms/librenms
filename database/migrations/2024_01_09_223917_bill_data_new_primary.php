@@ -13,6 +13,10 @@ return new class extends Migration
     {
         if (! Schema::hasColumn('bill_data', 'id')) {
             Schema::table('bill_data', function (Blueprint $table) {
+                $table->dropPrimary(['bill_id', 'timestamp']);
+            });
+
+            Schema::table('bill_data', function (Blueprint $table) {
                 $table->id()->first();
             });
         }
@@ -23,5 +27,12 @@ return new class extends Migration
      */
     public function down(): void
     {
+        Schema::table('bill_data', function (Blueprint $table) {
+            $table->dropColumn('id');
+        });
+
+        Schema::table('bill_data', function (Blueprint $table) {
+            $table->primary(['bill_id', 'timestamp']);
+        });
     }
 };
