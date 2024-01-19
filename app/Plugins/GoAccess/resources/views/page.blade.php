@@ -18,12 +18,12 @@
 
 
             <div class="tab-pane fade active in" id="nginx_access">
-                  <iframe style="width:100%; height:100%" frameborder="0" src="{{ url('/GoAccess/nginx-access.html') }}">
+                  <iframe style="width:100%; height:100vh" frameborder="0" src="{{ url('/GoAccess/nginx-access.html') }}">
                   </iframe>
             </div>
 
             <div class="tab-pane fade"          id="nginx_error">
-                  <iframe style="width:100%; height:100%" frameborder="0" src="{{ url('/GoAccess/nginx-error.html') }}">
+                  <iframe style="width:100%; height:100vh" frameborder="0" src="{{ url('/GoAccess/nginx-error.html') }}">
                   </iframe>
             </div>
 
