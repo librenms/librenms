@@ -3,6 +3,7 @@ text: WebPower-smart2
 group: ups
 icon: generic
 type: power
+mib_dir: webpower-smart2
 snmp_bulk: false
 over:
     - { graph: device_voltage, text: Voltage }
