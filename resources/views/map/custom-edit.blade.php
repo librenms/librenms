@@ -160,7 +160,7 @@
 
         if(bgimage) {
             canvas = $("#custom-map").children()[0].canvas;
-            $(canvas).css('background-image','url({{ route('maps.custom.background', ['map' => $map_id]) }})').css('background-size', 'cover');
+            $(canvas).css('background-image','url({{ route('maps.custom.background', ['map' => $map_id]) }}?ver={{$bgversion}})').css('background-size', 'cover');
         }
 
         network.on('dragEnd', function (data) {
@@ -239,7 +239,7 @@
 
         canvas = $("#custom-map").children()[0].canvas;
         if(data['bgimage']) {
-            $(canvas).css('background-image','url({{ route('maps.custom.background', ['map' => $map_id]) }})').css('background-size', 'cover');
+            $(canvas).css('background-image','url({{ route('maps.custom.background', ['map' => $map_id]) }}?ver=' + data['bgversion'] + ')').css('background-size', 'cover');
             bgimage = true;
         } else {
             $(canvas).css('background-image','');

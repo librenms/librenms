@@ -86,6 +86,7 @@ class CustomMapController extends Controller
             'map_id' => $map->custom_map_id,
             'name' => $map->name,
             'background' => (bool) $map->background_suffix,
+            'bgversion' => $map->background_version,
             'page_refresh' => Config::get('page_refresh', 300),
             'map_conf' => $map_conf,
             'newedge_conf' => $map->newedgeconfig,
@@ -107,6 +108,7 @@ class CustomMapController extends Controller
             'newnode_conf' => $map->newnodeconfig,
             'map_conf' => $map->options,
             'background' => (bool) $map->background_suffix,
+            'bgversion' => $map->background_version,
             'edit' => true,
             'vmargin' => 20,
             'hmargin' => 20,
@@ -159,6 +161,7 @@ class CustomMapController extends Controller
             'width' => $map->width,
             'height' => $map->height,
             'bgimage' => $map->background_suffix ? true : false,
+            'bgversion' => $map->background_version,
         ]);
     }
 

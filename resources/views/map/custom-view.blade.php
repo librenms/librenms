@@ -53,7 +53,7 @@
 
         if(bgimage) {
             canvas = $("#custom-map").children()[0].canvas;
-            $(canvas).css('background-image','url({{ route('maps.custom.background', ['map' => $map_id]) }})').css('background-size', 'cover');
+            $(canvas).css('background-image','url({{ route('maps.custom.background', ['map' => $map_id]) }}?ver={{$bgversion}})').css('background-size', 'cover');
         }
 
         network.on('doubleClick', function (properties) {
