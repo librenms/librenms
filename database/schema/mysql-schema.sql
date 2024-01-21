@@ -382,8 +382,7 @@ CREATE TABLE `bill_data` (
   `in_delta` bigint(20) NOT NULL, 
   `out_delta` bigint(20) NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `bill_data_bill_id_index` (`bill_id`),
-  KEY `bill_data_bill_id_timestamp_index` (`bill_id`,`timestamp`)
+  KEY `bill_data_bill_id_index` (`bill_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `bill_history`;
