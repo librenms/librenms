@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        dd(Schema::getColumnListing('bill_data'));
         if (! Schema::hasColumn('bill_data', 'id')) {
+            dd(Schema::getColumnListing('bill_data'));
             Schema::table('bill_data', function (Blueprint $table) {
                 $table->dropPrimary(['bill_id', 'timestamp']);
             });
