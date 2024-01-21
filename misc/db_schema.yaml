@@ -326,7 +326,7 @@ bill_data:
     - { Field: in_delta, Type: bigint, 'Null': false, Extra: '' }
     - { Field: out_delta, Type: bigint, 'Null': false, Extra: '' }
   Indexes:
-    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
+    PRIMARY: { Name: PRIMARY, Columns: [bill_data_id], Unique: true, Type: BTREE }
     bill_data_bill_id_index: { Name: bill_data_bill_id_index, Columns: [bill_id], Unique: false, Type: BTREE }
     bill_data_bill_id_timestamp_index: { Name: bill_data_bill_id_timestamp_index, Columns: [bill_id, timestamp], Unique: false, Type: BTREE }
 bill_history:
