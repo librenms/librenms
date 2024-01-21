@@ -21,6 +21,7 @@ return new class extends Migration
             $table->bigInteger('in_delta');
             $table->bigInteger('out_delta');
         });
+        dd(Schema::getColumnListing('bill_data'));
     }
 
     /**
