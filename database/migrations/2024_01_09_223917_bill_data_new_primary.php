@@ -16,9 +16,9 @@ return new class extends Migration
                 $table->dropPrimary(['bill_id', 'timestamp']);
             });
 
-            Schema::table('bill_data', function (Blueprint $table) {
-                $table->id()->first();
-            });
+//            Schema::table('bill_data', function (Blueprint $table) {
+//                $table->id()->first();
+//            });
         }
     }
 
