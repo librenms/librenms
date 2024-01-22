@@ -11,9 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        var_dump(Schema::getColumnListing('bill_data'));
         if (! Schema::hasColumn('bill_data', 'id')) {
-            var_dump(Schema::getColumnListing('bill_data'));
             Schema::table('bill_data', function (Blueprint $table) {
                 $table->dropPrimary(['bill_id', 'timestamp']);
             });
@@ -30,7 +28,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('bill_data', function (Blueprint $table) {
-            $table->dropColumn();
+            $table->dropColumn('id);
         });
 
         Schema::table('bill_data', function (Blueprint $table) {
