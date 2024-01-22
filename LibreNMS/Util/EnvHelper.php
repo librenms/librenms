@@ -126,7 +126,7 @@ class EnvHelper
                 } else {
                     if (Artisan::call('key:generate', [
                         '--show' => 'true',
-                        '--no-ansi' => 'true',                                      
+                        '--no-ansi' => 'true',
                     ]) == 0) {
                         $key = trim(Artisan::output());
                     }
