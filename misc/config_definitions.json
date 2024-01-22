@@ -5837,7 +5837,7 @@
             "order": 1
         },
         "twofactor": {
-            "default": "false",
+            "default": false,
             "type": "boolean",
             "group": "auth",
             "section": "general",
