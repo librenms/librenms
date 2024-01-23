@@ -4,9 +4,9 @@ echo '<h2>' . $app['app_instance'] . '</h2>';
 
 $graphs = [
     'drbd_network_bits' => 'Network Traffic',
-    'drbd_disk_bits'    => 'Disk Traffic',
-    'drbd_unsynced'     => 'Unsynced Data',
-    'drbd_queue'        => 'Queues',
+    'drbd_disk_bits' => 'Disk Traffic',
+    'drbd_unsynced' => 'Unsynced Data',
+    'drbd_queue' => 'Queues',
 ];
 
 foreach ($graphs as $key => $text) {

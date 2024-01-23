@@ -14,8 +14,8 @@ $rrd_list = [];
 if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Seg. Fixed Bit Set Size',
-        'ds'       => 'tseg_fbs_size',
+        'descr' => 'Seg. Fixed Bit Set Size',
+        'ds' => 'tseg_fbs_size',
     ];
 } else {
     d_echo('RRD "' . $rrd_filename . '" not found');

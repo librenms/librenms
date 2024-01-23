@@ -5,11 +5,11 @@ require 'includes/html/graphs/common.inc.php';
 $rrd_filename = Rrd::name($device['hostname'], ['app', 'mysql', $app->app_id]);
 
 $array = [
-    'SFJn'  => 'Full Join',
+    'SFJn' => 'Full Join',
     'SFRJn' => 'Full Range',
-    'SRe'   => 'Range',
-    'SRCk'  => 'Range Check',
-    'SSn'   => 'Scan',
+    'SRe' => 'Range',
+    'SRCk' => 'Range Check',
+    'SSn' => 'Scan',
 ];
 
 $i = 0;

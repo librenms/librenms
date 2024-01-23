@@ -56,24 +56,24 @@ Config::set('rrd_rows', 2400);
 // "-c", "MGRID#FFAAAA", "-c", "FRAME#3e3e3e", "-c", "ARROW#5e5e5e", "-R", "normal");
 // Predefined set of colors for use by collectd_draw_rrd()
 Config::set('rrd_colors', [
-    'h_1'  => 'F7B7B7',
-    'f_1'  => 'FF0000', // Red
-    'h_2'  => 'B7EFB7',
-    'f_2'  => '00E000', // Green
-    'h_3'  => 'B7B7F7',
-    'f_3'  => '0000FF', // Blue
-    'h_4'  => 'F3DFB7',
-    'f_4'  => 'F0A000', // Yellow
-    'h_5'  => 'B7DFF7',
-    'f_5'  => '00A0FF', // Cyan
-    'h_6'  => 'DFB7F7',
-    'f_6'  => 'A000FF', // Magenta
-    'h_7'  => 'FFC782',
-    'f_7'  => 'FF8C00', // Orange
-    'h_8'  => 'DCFF96',
-    'f_8'  => 'AAFF00', // Lime
-    'h_9'  => '83FFCD',
-    'f_9'  => '00FF99',
+    'h_1' => 'F7B7B7',
+    'f_1' => 'FF0000', // Red
+    'h_2' => 'B7EFB7',
+    'f_2' => '00E000', // Green
+    'h_3' => 'B7B7F7',
+    'f_3' => '0000FF', // Blue
+    'h_4' => 'F3DFB7',
+    'f_4' => 'F0A000', // Yellow
+    'h_5' => 'B7DFF7',
+    'f_5' => '00A0FF', // Cyan
+    'h_6' => 'DFB7F7',
+    'f_6' => 'A000FF', // Magenta
+    'h_7' => 'FFC782',
+    'f_7' => 'FF8C00', // Orange
+    'h_8' => 'DCFF96',
+    'f_8' => 'AAFF00', // Lime
+    'h_9' => '83FFCD',
+    'f_9' => '00FF99',
     'h_10' => '81D9FF',
     'f_10' => '00B2FF',
     'h_11' => 'FF89F5',

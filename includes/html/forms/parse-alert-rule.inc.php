@@ -73,14 +73,15 @@ if (is_array($rule)) {
 
     header('Content-type: application/json');
     echo json_encode([
-        'extra'      => isset($rule['extra']) ? json_decode($rule['extra']) : null,
-        'maps'       => $maps,
+        'extra' => isset($rule['extra']) ? json_decode($rule['extra']) : null,
+        'maps' => $maps,
         'transports' => $transports,
-        'name'       => $rule['name'],
-        'proc'       => $rule['proc'],
-        'builder'    => $builder,
-        'severity'   => $rule['severity'],
-        'adv_query'  => $rule['query'],
-        'invert_map'  => $rule['invert_map'],
+        'name' => $rule['name'],
+        'proc' => $rule['proc'],
+        'notes' => $rule['notes'],
+        'builder' => $builder,
+        'severity' => $rule['severity'],
+        'adv_query' => $rule['query'],
+        'invert_map' => $rule['invert_map'],
     ]);
 }

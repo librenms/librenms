@@ -524,15 +524,27 @@ $graphs['privoxy'] = [
 $graphs['ss'] = [
     'sockets',
 ];
+$graphs['borgbackup'] = [
+    'unique_csize',
+    'total_csize',
+    'total_size',
+    'total_chunks',
+    'total_unique_chunks',
+    'unique_size',
+    'time_since_last_modified',
+    'errored',
+    'locked',
+    'locked_for',
+];
 
 echo '<div class="panel panel-default">';
 echo '<div class="panel-heading">';
 echo "<span style='font-weight: bold;'>Apps</span> &#187; ";
 unset($sep);
 $link_array = [
-    'page'   => 'device',
+    'page' => 'device',
     'device' => $device['device_id'],
-    'tab'    => 'apps',
+    'tab' => 'apps',
 ];
 
 $apps = \LibreNMS\Util\ObjectCache::applications()->flatten();

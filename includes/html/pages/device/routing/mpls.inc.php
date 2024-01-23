@@ -5,10 +5,10 @@ use LibreNMS\Util\Number;
 print_optionbar_start();
 
 $link_array = [
-    'page'   => 'device',
+    'page' => 'device',
     'device' => $device['device_id'],
-    'tab'    => 'routing',
-    'proto'  => 'mpls',
+    'tab' => 'routing',
+    'proto' => 'mpls',
 ];
 
 if (! isset($vars['view'])) {

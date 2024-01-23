@@ -52,6 +52,7 @@ if (is_numeric($template_id)) {
     $output = [
         'status' => 'ok',
         'name' => $rule['name'],
+        'notes' => $rule['notes'],
         'builder' => $rule['builder'] ?: QueryBuilderParser::fromOld($rule['rule'])->toArray(),
         'extra' => array_replace($default_extra, (array) $rule['extra']),
         'severity' => $rule['severity'] ?: Config::get('alert_rule.severity'),

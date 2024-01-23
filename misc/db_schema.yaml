@@ -28,7 +28,7 @@ access_points:
     - { Field: numasoclients, Type: smallint, 'Null': false, Extra: '', Default: '0' }
     - { Field: nummonclients, Type: smallint, 'Null': false, Extra: '', Default: '0' }
     - { Field: numactbssid, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
-    - { Field: nummonbssid, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
+    - { Field: nummonbssid, Type: int, 'Null': false, Extra: '', Default: '0' }
     - { Field: interference, Type: 'tinyint unsigned', 'Null': false, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [accesspoint_id], Unique: true, Type: BTREE }
@@ -101,6 +101,7 @@ alert_rules:
     - { Field: builder, Type: text, 'Null': false, Extra: '' }
     - { Field: proc, Type: varchar(80), 'Null': true, Extra: '' }
     - { Field: invert_map, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
+    - { Field: notes, Type: text, 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     alert_rules_name_unique: { Name: alert_rules_name_unique, Columns: [name], Unique: true, Type: BTREE }
@@ -318,6 +319,7 @@ bills:
     PRIMARY: { Name: PRIMARY, Columns: [bill_id], Unique: true, Type: BTREE }
 bill_data:
   Columns:
+    - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
     - { Field: bill_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: timestamp, Type: datetime, 'Null': false, Extra: '' }
     - { Field: period, Type: int, 'Null': false, Extra: '' }
@@ -325,8 +327,9 @@ bill_data:
     - { Field: in_delta, Type: bigint, 'Null': false, Extra: '' }
     - { Field: out_delta, Type: bigint, 'Null': false, Extra: '' }
   Indexes:
-    PRIMARY: { Name: PRIMARY, Columns: [bill_id, timestamp], Unique: true, Type: BTREE }
+    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     bill_data_bill_id_index: { Name: bill_data_bill_id_index, Columns: [bill_id], Unique: false, Type: BTREE }
+    bill_data_bill_id_timestamp_index: { Name: bill_data_bill_id_timestamp_index, Columns: [bill_id, timestamp], Unique: false, Type: BTREE }
 bill_history:
   Columns:
     - { Field: bill_hist_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -1078,8 +1081,8 @@ mpls_sdps:
     - { Field: sdpLastMgmtChange, Type: bigint, 'Null': true, Extra: '' }
     - { Field: sdpLastStatusChange, Type: bigint, 'Null': true, Extra: '' }
     - { Field: sdpActiveLspType, Type: "enum('not-applicable','rsvp','ldp','bgp','none','mplsTp','srIsis','srOspf','srTeLsp','fpe')", 'Null': true, Extra: '' }
-    - { Field: sdpFarEndInetAddressType, Type: "enum('ipv4','ipv6')", 'Null': true, Extra: '' }
     - { Field: sdpFarEndInetAddress, Type: varchar(46), 'Null': true, Extra: '' }
+    - { Field: sdpFarEndInetAddressType, Type: "enum('unknown','ipv4','ipv6','ipv4z','ipv6z','dns')", 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [sdp_id], Unique: true, Type: BTREE }
     mpls_sdps_device_id_index: { Name: mpls_sdps_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }

@@ -1178,26 +1178,30 @@ Route: `/api/v0/devices`
 
 Input (JSON):
 
+Fields:
+
 - hostname (required): device hostname or IP
 - display: A string to display as the name of this device, defaults to 
   hostname (or device_display_default setting). May be a simple
   template using replacements: {{ $hostname }}, {{ $sysName }},
   {{ $sysName_fallback }}, {{ $ip }}
+- snmpver: SNMP version to use, v1, v2c or v3. During checks detection order is v2c,v3,v1
 - port: SNMP port (defaults to port defined in config).
-- transport: SNMP protocol (defaults to transport defined in config).
-- snmpver: SNMP version to use, v1, v2c or v3. Defaults to v2c.
+- transport: SNMP protocol (udp,tcp,udp6,tcp6) Defaults to transport defined in config.
 - port_association_mode: method to identify ports: ifIndex (default), ifName, ifDescr, ifAlias
-- poller_group: This is the poller_group id used for distributed
-  poller setup. Defaults to 0.
+- poller_group: This is the poller_group id used for distributed poller setup. Defaults to 0.
 - location or location_id: set the location by text or location id
-- force_add: Set to true to force the device to be added regardless of it being able
-  to respond to snmp or icmp.
 
-For SNMP v1 or v2c
+Options:
+
+- force_add: Skip all checks and attempts to detect credentials. Add the device as given directly to the database.
+- ping_fallback: if snmp checks fail, add the device as ping only instead of failing
+
+SNMP v1 or v2c credentials:
 
 - community: Required for SNMP v1 or v2c.
 
-For SNMP v3
+SNMP v3 credentials:
 
 - authlevel: SNMP authlevel (noAuthNoPriv, authNoPriv, authPriv).
 - authname: SNMP Auth username
@@ -1206,9 +1210,9 @@ For SNMP v3
 - cryptopass: SNMP Crypto Password
 - cryptoalgo: SNMP Crypto algorithm (AES, DES)
 
-For ICMP only
+For ICMP only:
 
-- snmp_disable: Boolean, set to true for ICMP only.
+- snmp_disable: set to true for ICMP only. Disables SNMP checks and polling.
 - os: OS short name for the device (defaults to ping).
 - sysName: sysName for the device.
 - hardware: Device hardware.

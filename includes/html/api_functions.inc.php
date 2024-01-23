@@ -81,7 +81,7 @@ function api_success_noresult($code, $message = null): JsonResponse
 function api_error($statusCode, $message): JsonResponse
 {
     return response()->json([
-        'status'  => 'error',
+        'status' => 'error',
         'message' => $message,
     ], $statusCode, [], JSON_PRETTY_PRINT);
 } // end api_error()
@@ -114,7 +114,7 @@ function api_get_graph(Request $request, array $additional = [])
         ]);
 
         $graph = Graph::get([
-            'width'  => $request->get('width', 1075),
+            'width' => $request->get('width', 1075),
             'height' => $request->get('height', 300),
             ...$additional,
             ...$vars,
@@ -445,7 +445,7 @@ function add_device(Illuminate\Http\Request $request)
             $device->snmp_disable = 1;
         }
 
-        (new ValidateDeviceAndCreate($device, ! empty($data['force_add'])))->execute();
+        (new ValidateDeviceAndCreate($device, ! empty($data['force_add']), ! empty($data['ping_fallback'])))->execute();
     } catch (Exception $e) {
         return api_error(500, $e->getMessage());
     }
@@ -815,7 +815,7 @@ function get_graph_by_portgroup(Request $request)
     }
 
     return api_get_graph($request, [
-        'type'   => 'multiport_bits_separate',
+        'type' => 'multiport_bits_separate',
         'id' => $if_list,
     ]);
 }
@@ -1017,7 +1017,7 @@ function list_available_wireless_graphs(Illuminate\Http\Request $request)
                 foreach (dbFetchRows('SELECT `sensor_id`, `sensor_descr` FROM `wireless_sensors` WHERE `device_id` = ? AND `sensor_class` = ? AND `sensor_deleted` = 0', [$device_id, $type]) as $graph) {
                     $graphs[] = [
                         'sensor_id' => $graph['sensor_id'],
-                        'desc'      => $graph['sensor_descr'],
+                        'desc' => $graph['sensor_descr'],
                     ];
                 }
             }
@@ -1105,6 +1105,62 @@ function get_port_info(Illuminate\Http\Request $request)
 
         return api_success($port, 'port');
     });
+}
+
+function update_port_description(Illuminate\Http\Request $request)
+{
+    $port_id = $request->route('portid');
+    $port = Port::hasAccess(Auth::user())
+        ->where([
+            'port_id' => $port_id,
+        ])->first();
+    if (empty($port)) {
+        return api_error(400, 'Invalid port ID.');
+    }
+
+    $data = json_decode($request->getContent(), true);
+    $field = 'description';
+    $description = $data[$field];
+
+    if (empty($description)) {
+        // from update-ifalias.inc.php:
+        // "Set to repoll so we avoid using ifDescr on port poll"
+        $description = 'repoll';
+    }
+
+    $port->ifAlias = $description;
+    $port->save();
+
+    $ifName = $port->ifName;
+    $device = $port->device_id;
+
+    if ($description == 'repoll') {
+        // No description provided, clear description
+        del_dev_attrib($port, 'ifName:' . $ifName); // "port" object has required device_id
+        log_event("$ifName Port ifAlias cleared via API", $device, 'interface', 3, $port_id);
+
+        return api_success_noresult(200, 'Port description cleared.');
+    } else {
+        // Prevent poller from overwriting new description
+        set_dev_attrib($port, 'ifName:' . $ifName, 1); // see above
+        log_event("$ifName Port ifAlias set via API: $description", $device, 'interface', 3, $port_id);
+
+        return api_success_noresult(200, 'Port description updated.');
+    }
+}
+
+function get_port_description(Illuminate\Http\Request $request)
+{
+    $port_id = $request->route('portid');
+    $port = Port::hasAccess(Auth::user())
+        ->where([
+            'port_id' => $port_id,
+        ])->first();
+    if (empty($port)) {
+        return api_error(400, 'Invalid port ID.');
+    } else {
+        return api_success($port->ifAlias, 'port_description');
+    }
 }
 
 /**
@@ -1318,6 +1374,7 @@ function add_edit_rule(Illuminate\Http\Request $request)
     $interval = $data['interval'];
     $override_query = $data['override_query'];
     $adv_query = $data['adv_query'];
+    $notes = $data['notes'];
     $delay_sec = convert_delay($delay);
     $interval_sec = convert_delay($interval);
     if ($mute == 1) {
@@ -1327,7 +1384,7 @@ function add_edit_rule(Illuminate\Http\Request $request)
     }
 
     $extra = [
-        'mute'  => $mute,
+        'mute' => $mute,
         'count' => $count,
         'delay' => $delay_sec,
         'interval' => $interval_sec,
@@ -1355,10 +1412,10 @@ function add_edit_rule(Illuminate\Http\Request $request)
     }
 
     if (is_numeric($rule_id)) {
-        if (! (dbUpdate(['name' => $name, 'builder' => $builder, 'query' => $query, 'severity' => $severity, 'disabled' => $disabled, 'extra' => $extra_json], 'alert_rules', 'id=?', [$rule_id]) >= 0)) {
+        if (! (dbUpdate(['name' => $name, 'builder' => $builder, 'query' => $query, 'severity' => $severity, 'disabled' => $disabled, 'extra' => $extra_json, 'notes' => $notes], 'alert_rules', 'id=?', [$rule_id]) >= 0)) {
             return api_error(500, 'Failed to update existing alert rule');
         }
-    } elseif (! $rule_id = dbInsert(['name' => $name, 'builder' => $builder, 'query' => $query, 'severity' => $severity, 'disabled' => $disabled, 'extra' => $extra_json], 'alert_rules')) {
+    } elseif (! $rule_id = dbInsert(['name' => $name, 'builder' => $builder, 'query' => $query, 'severity' => $severity, 'disabled' => $disabled, 'extra' => $extra_json, 'notes' => $notes], 'alert_rules')) {
         return api_error(500, 'Failed to create new alert rule');
     }
 
@@ -1517,7 +1574,7 @@ function list_oxidized(Illuminate\Http\Request $request)
              ->whereNotIn('type', Config::get('oxidized.ignore_types', []))
              ->whereNotIn('os', Config::get('oxidized.ignore_os', []))
              ->whereAttributeDisabled('override_Oxidized_disable')
-             ->select(['devices.device_id', 'hostname', 'sysName', 'sysDescr', 'sysObjectID', 'hardware', 'os', 'ip', 'location_id', 'purpose', 'notes'])
+             ->select(['devices.device_id', 'hostname', 'sysName', 'sysDescr', 'sysObjectID', 'hardware', 'os', 'ip', 'location_id', 'purpose', 'notes', 'poller_group'])
              ->get();
 
     /** @var Device $device */

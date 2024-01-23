@@ -9,11 +9,11 @@ $unit_text = 'Packets/sec';
 $rrd_filename = Rrd::name($device['hostname'], ['app', 'powerdns', $app->app_id]);
 $array = [
     'rec_questions' => [
-        'descr'  => 'Questions',
+        'descr' => 'Questions',
         'colour' => '6699CCFF',
     ],
-    'rec_answers'   => [
-        'descr'  => 'Answers',
+    'rec_answers' => [
+        'descr' => 'Answers',
         'colour' => '336699FF',
     ],
 ];

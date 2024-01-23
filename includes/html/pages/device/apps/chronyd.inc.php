@@ -1,10 +1,10 @@
 <?php
 
 $link_array = [
-    'page'   => 'device',
+    'page' => 'device',
     'device' => $device['device_id'],
-    'tab'    => 'apps',
-    'app'    => 'chronyd',
+    'tab' => 'apps',
+    'app' => 'chronyd',
 ];
 
 print_optionbar_start();
@@ -36,9 +36,9 @@ if (! isset($vars['source'])) {
     ];
 } else {
     $graphs = [
-        'chronyd_source_sampling'   => 'Clock sampling offsets',
-        'chronyd_source_frequency'  => 'Clock residual frequency',
-        'chronyd_source_polling'    => 'Polling',
+        'chronyd_source_sampling' => 'Clock sampling offsets',
+        'chronyd_source_frequency' => 'Clock residual frequency',
+        'chronyd_source_polling' => 'Polling',
     ];
 }
 

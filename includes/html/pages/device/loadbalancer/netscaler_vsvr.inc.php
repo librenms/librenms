@@ -6,10 +6,10 @@ if (is_numeric($vars['vsvr'])) {
     // echo('<a href="'.generate_url($vars, array('vsvr' => NULL)).'">All</a>');
     // print_optionbar_end();
     $graph_types = [
-        'bits'    => 'Bits',
-        'pkts'    => 'Packets',
-        'conns'   => 'Connections',
-        'reqs'    => 'Requests',
+        'bits' => 'Bits',
+        'pkts' => 'Packets',
+        'conns' => 'Connections',
+        'reqs' => 'Requests',
         'hitmiss' => 'Hit/Miss',
     ];
 
@@ -96,10 +96,10 @@ if (is_numeric($vars['vsvr'])) {
     unset($sep);
     echo ' Graphs: ';
     $graph_types = [
-        'bits'    => 'Bits',
-        'pkts'    => 'Packets',
-        'conns'   => 'Connections',
-        'reqs'    => 'Requests',
+        'bits' => 'Bits',
+        'pkts' => 'Packets',
+        'conns' => 'Connections',
+        'reqs' => 'Requests',
         'hitmiss' => 'Hit/Miss',
     ];
 

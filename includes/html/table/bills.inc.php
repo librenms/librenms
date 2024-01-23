@@ -159,19 +159,19 @@ foreach (dbFetchRows($sql, $param) as $bill) {
     }
 
     $response[] = [
-        'bill_name'     => $bill_name,
-        'notes'         => $notes,
-        'bill_type'     => $type,
-        'bill_allowed'    => $allowed,
+        'bill_name' => $bill_name,
+        'notes' => $notes,
+        'bill_type' => $type,
+        'bill_allowed' => $allowed,
         'total_data_in' => $in,
-        'total_data_out'=> $out,
-        'total_data'    => $total_data,
-        'rate_95th'     => $rate_95th,
-        'used'          => $used,
-        'overusage'     => $overuse_formatted,
-        'predicted'     => $predicted,
-        'graph'         => $bar,
-        'actions'       => $actions,
+        'total_data_out' => $out,
+        'total_data' => $total_data,
+        'rate_95th' => $rate_95th,
+        'used' => $used,
+        'overusage' => $overuse_formatted,
+        'predicted' => $predicted,
+        'graph' => $bar,
+        'actions' => $actions,
     ];
 }
 

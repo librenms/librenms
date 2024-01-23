@@ -135,7 +135,7 @@ class SocialiteController extends Controller
 
         $user = User::firstOrNew([
             'auth_type' => "socialite_$provider",
-            'auth_id'   => $this->socialite_user->getId(),
+            'auth_id' => $this->socialite_user->getId(),
         ]);
 
         if ($user->user_id) {
