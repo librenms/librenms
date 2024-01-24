@@ -5154,6 +5154,14 @@
             "order": 5,
             "type": "integer"
         },
+        "ports_nac_purge": {
+            "default": 10,
+            "units": "days",
+            "group": "system",
+            "section": "cleanup",
+            "order": 6,
+            "type": "integer"
+        },
         "ports_page_default": {
             "default": "details",
             "type": "select",
