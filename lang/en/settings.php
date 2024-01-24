@@ -1260,6 +1260,10 @@ return [
             'description' => 'Port FDB entries older than',
             'help' => 'Cleanup done by daily.sh',
         ],
+        'ports_nac_purge' => [
+            'description' => 'Port NAC entries older than',
+            'help' => 'Cleanup done by daily.sh',
+        ],
         'ports_purge' => [
             'description' => 'Purge ports deleted',
             'help' => 'Cleanup done by daily.sh',
