@@ -7,6 +7,8 @@ $link_array = [
     'app' => 'suricata',
 ];
 
+$app_data = $app->data;
+
 print_optionbar_start();
 
 echo generate_link('Totals', $link_array);
@@ -27,19 +29,24 @@ foreach ($suricata_instances as $index => $sinstance) {
 
 print_optionbar_end();
 
-$graphs = [
-    'suricata_packets' => 'Packets',
-    'suricata_bytes' => 'Bytes',
-    'suricata_nasty_delta' => 'Drops or Errors Delta',
-    'suricata_nasty_percent' => 'Drops or Errors Percent',
-    'suricata_dec_proto' => 'Decoder Protocols',
-    'suricata_flow_proto' => 'Flow Protocols',
-    'suricata_app_flows' => 'App Layer Flows',
-    'suricata_app_tx' => 'App Layer TX',
-    'suricata_mem_use' => 'Memory Usage',
-    'suricata_uptime' => 'Uptime',
-    'suricata_alert' => 'Alert Status',
-];
+if ($app_data['version'] == 1) {
+    $graphs = [
+        'suricata_packets' => 'Packets',
+        'suricata_bytes' => 'Bytes',
+        'suricata_nasty_delta' => 'Drops or Errors Delta',
+        'suricata_nasty_percent' => 'Drops or Errors Percent',
+        'suricata_dec_proto' => 'Decoder Protocols',
+        'suricata_flow_proto' => 'Flow Protocols',
+        'suricata_app_flows' => 'App Layer Flows',
+        'suricata_app_tx' => 'App Layer TX',
+        'suricata_mem_use' => 'Memory Usage',
+        'suricata_uptime' => 'Uptime',
+        'suricata_alert' => 'Alert Status',
+    ];
+} elseif ($app_data['version'] == 1) {
+    $graphs = [
+    ];
+}
 
 foreach ($graphs as $key => $text) {
     $graph_type = $key;
