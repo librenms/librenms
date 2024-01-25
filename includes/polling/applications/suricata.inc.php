@@ -190,7 +190,7 @@ if ($suricata['version'] == 1) {
     foreach ($suricata['data']['totals'] as $stat => $value) {
         // If this is defined, it not something we understand.
         if (isset($suricata_stat_keys[$stat])) {
-            $rrd_name = ['app', $name, $app->app_id, '_totals___', $stat];
+            $rrd_name = ['app', $name, $app->app_id, 'totals___' . $stat];
             $fields = ['data' => $value];
 
             $metrics['totals_'.$stat] = $value;
@@ -212,7 +212,7 @@ if ($suricata['version'] == 1) {
         foreach ($instance_stats as $stat => $value) {
             // If this is defined, it not something we understand.
             if (isset($suricata_stat_keys[$stat])) {
-                $rrd_name = ['app', $name, $app->app_id, '_instance_' . $instance . '___', $stat];
+                $rrd_name = ['app', $name, $app->app_id, 'instance_' . $instance . '___' . $stat];
                 $fields = ['data' => $value];
 
                 $metrics['instance_' . $instance . '_' . $stat] = $value;
