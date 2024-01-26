@@ -117,11 +117,12 @@ class Powerconnect extends OS implements ProcessorDiscovery, ProcessorPolling, N
         return $data;
     }
 
-    private static function decode_string(string $s):string {
-        $s=str_replace("\n",' ',$s);
-        $characters=explode(' ',$s);
+    private static function decode_string(string $s): string
+    {
+        $s = str_replace("\n",' ', $s);
+        $characters = explode(' ', $s);
 
-        $res='';
+        $res = '';
         foreach ($characters as $char) {
             if (trim($char) === '') {
                 continue;
@@ -130,18 +131,18 @@ class Powerconnect extends OS implements ProcessorDiscovery, ProcessorPolling, N
             if ($char === '00') {
                 break;
             }
-            $res.=chr(hexdec($char));
+            $res .= chr(hexdec($char));
         }
 
         return $res;
     }
 
-    private static function pivotTable(array $table):array {
-
-        $res=[];
+    private static function pivotTable(array $table):array
+    {
+        $res = [];
         foreach ($table as $column => $data) {
             foreach ($data as $index => $value) {
-                $res[$index][$column]=$value;
+                $res[$index][$column] = $value;
             }
         }
 
@@ -160,7 +161,7 @@ class Powerconnect extends OS implements ProcessorDiscovery, ProcessorPolling, N
 
         $table = SnmpQuery::mibs(['DNOS-AUTHENTICATION-MANAGER-MIB'])->mibDir('dell')->hideMib()->enumStrings()->walk('agentAuthMgrClientStatusTable')->table();
         if (count($table) === 0) {
-            d_echo ('Client status table is empty, not processing NAC entries.');
+            d_echo('Client status table is empty, not processing NAC entries.');
             return $nac;
         }
 
@@ -170,7 +171,7 @@ class Powerconnect extends OS implements ProcessorDiscovery, ProcessorPolling, N
         foreach ($table as &$row) {
             if ($row['agentAuthMgrClientAuthState'] === 'success') {
                 $row['agentAuthMgrClientAuthState'] = 'authcSuccess';
-            } else if ($row['agentAuthMgrClientAuthState'] === 'failed') {
+            } elseif ($row['agentAuthMgrClientAuthState'] === 'failed') {
                 $row['agentAuthMgrClientAuthState'] = 'authcFailed';
             }
 
