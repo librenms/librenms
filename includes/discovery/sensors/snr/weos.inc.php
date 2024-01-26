@@ -16,6 +16,7 @@
  * the source code distribution for details.
  */
 
+/*
 foreach ($pre_cache['weos_hdsl2ShdslEndpointCurrTable'] as $index => $data) {
     if (is_numeric($data['hdsl2ShdslEndpointCurrSnrMgn'])) {
         // $index is 4096.0.0.1 but ifName is only 4096. Use explode to break the string into an array.
@@ -29,3 +30,4 @@ foreach ($pre_cache['weos_hdsl2ShdslEndpointCurrTable'] as $index => $data) {
         var_dump($portExplode);
     }
 }
+*/

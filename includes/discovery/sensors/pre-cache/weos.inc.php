@@ -16,10 +16,10 @@
  * the source code distribution for details.
  */
 
-echo 'ifName ';
-$pre_cache['weos_ifName'] = snmpwalk_cache_oid($device, 'ifName', [], 'IF-MIB');
-var_dump($pre_cache['weos_ifName']);
+//echo 'ifName ';
+//$pre_cache['weos_ifName'] = snmpwalk_cache_oid($device, 'ifName', [], 'IF-MIB');
+//var_dump($pre_cache['weos_ifName']);
 
-echo 'hdsl2ShdslEndpointCurrTable ';
-$pre_cache['weos_hdsl2ShdslEndpointCurrTable'] = snmpwalk_cache_oid($device, 'hdsl2ShdslEndpointCurrTable', [], 'HDSL2-SHDSL-LINE-MIB', null, '-OQUbs');
-var_dump($pre_cache['weos_hdsl2ShdslEndpointCurrTable']);
+//echo 'hdsl2ShdslEndpointCurrTable ';
+//$pre_cache['weos_hdsl2ShdslEndpointCurrTable'] = snmpwalk_cache_oid($device, 'hdsl2ShdslEndpointCurrTable', [], 'HDSL2-SHDSL-LINE-MIB', null, '-OQUbs');
+//var_dump($pre_cache['weos_hdsl2ShdslEndpointCurrTable']);
