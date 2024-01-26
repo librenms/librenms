@@ -119,7 +119,7 @@ class Powerconnect extends OS implements ProcessorDiscovery, ProcessorPolling, N
 
     private static function decode_string(string $s): string
     {
-        $s = str_replace("\n",' ', $s);
+        $s = str_replace("\n", ' ', $s);
         $characters = explode(' ', $s);
 
         $res = '';
@@ -137,7 +137,7 @@ class Powerconnect extends OS implements ProcessorDiscovery, ProcessorPolling, N
         return $res;
     }
 
-    private static function pivotTable(array $table):array
+    private static function pivotTable(array $table): array
     {
         $res = [];
         foreach ($table as $column => $data) {
@@ -156,12 +156,14 @@ class Powerconnect extends OS implements ProcessorDiscovery, ProcessorPolling, N
         $authMgrEnabled = SnmpQuery::mibs(['DNOS-AUTHENTICATION-MANAGER-MIB'])->mibDir('dell')->hideMib()->enumStrings()->get('agentAuthMgrAdminMode.0')->value();
         if ($authMgrEnabled !== 'enable') {
             d_echo('AuthMgr not enabled.');
+
             return $nac;
         }
 
         $table = SnmpQuery::mibs(['DNOS-AUTHENTICATION-MANAGER-MIB'])->mibDir('dell')->hideMib()->enumStrings()->walk('agentAuthMgrClientStatusTable')->table();
         if (count($table) === 0) {
             d_echo('Client status table is empty, not processing NAC entries.');
+
             return $nac;
         }
 
