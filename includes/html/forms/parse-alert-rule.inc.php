@@ -78,6 +78,7 @@ if (is_array($rule)) {
         'transports' => $transports,
         'name' => $rule['name'],
         'proc' => $rule['proc'],
+        'notes' => $rule['notes'],
         'builder' => $builder,
         'severity' => $rule['severity'],
         'adv_query' => $rule['query'],

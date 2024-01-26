@@ -134,6 +134,8 @@ Route::prefix('v0')->namespace('\App\Api\Controllers')->group(function () {
         Route::get('search/{field}/{search?}', 'LegacyApiController@search_ports')->name('search_ports')->where('search', '.*');
         Route::get('mac/{search}', 'LegacyApiController@search_by_mac')->name('search_mac');
         Route::get('', 'LegacyApiController@get_all_ports')->name('get_all_ports');
+        Route::get('{portid}/description', 'LegacyApiController@get_port_description')->name('get_port_description');
+        Route::patch('{portid}/description', 'LegacyApiController@update_port_description')->name('update_port_description');
     });
 
     Route::prefix('bills')->group(function () {

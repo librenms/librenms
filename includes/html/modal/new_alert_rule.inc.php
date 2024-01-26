@@ -145,6 +145,12 @@ if (Auth::user()->hasGlobalAdmin()) {
                                         <input type='text' id='proc' name='proc' class='form-control validation' pattern='(http|https)://.*' maxlength='80'>
                                     </div>
                                 </div>
+                                <div class='form-group' title="A brief description for this alert rule">
+                                    <label for='notes' class='col-sm-3 col-md-2 control-label'>Notes</label>
+                                    <div class='col-sm-9 col-md-10'>
+                                        <textarea class="form-control" rows="6" name="notes" id='notes'></textarea>
+                                    </div>
+                                </div>                                
                             </div>
                             <div role="tabpanel" class="tab-pane" id="advanced">
                                 <div class="form-group">
@@ -156,7 +162,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                                 <div class="form-group">
                                     <label for="adv_query" class="col-sm-3 col-md-2 control-label">Query</label>
                                     <div class="col-sm-9 col-md-10">
-                                        <input type="text" id="adv_query" name="adv_query" class="form-control">
+                                        <textarea class="form-control code" rows="6" name="adv_query" id='adv_query' style="font-family: Menlo, Monaco, Consolas, 'Courier New', monospace;";></textarea>
                                     </div>
                                 </div>
                             </div>
@@ -321,6 +327,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                 $('#delay').val('<?=$default_delay?>');
                 $('#interval').val('<?=$default_interval?>');
                 $('#adv_query').val('');
+                $('#notes').val('');
                 $('#severity').val('<?=$default_severity?>');
 
                 var $maps = $('#maps');
@@ -341,6 +348,7 @@ if (Auth::user()->hasGlobalAdmin()) {
             $('#builder').queryBuilder("setRules", rule.builder);
             $('#severity').val(rule.severity).trigger('change');
             $('#adv_query').val(rule.adv_query);
+            $('#notes').val(rule.notes);
 
             var $maps = $('#maps');
             $maps.empty();

@@ -101,6 +101,7 @@ alert_rules:
     - { Field: builder, Type: text, 'Null': false, Extra: '' }
     - { Field: proc, Type: varchar(80), 'Null': true, Extra: '' }
     - { Field: invert_map, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
+    - { Field: notes, Type: text, 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     alert_rules_name_unique: { Name: alert_rules_name_unique, Columns: [name], Unique: true, Type: BTREE }
@@ -318,6 +319,7 @@ bills:
     PRIMARY: { Name: PRIMARY, Columns: [bill_id], Unique: true, Type: BTREE }
 bill_data:
   Columns:
+    - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
     - { Field: bill_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: timestamp, Type: datetime, 'Null': false, Extra: '' }
     - { Field: period, Type: int, 'Null': false, Extra: '' }
@@ -325,8 +327,9 @@ bill_data:
     - { Field: in_delta, Type: bigint, 'Null': false, Extra: '' }
     - { Field: out_delta, Type: bigint, 'Null': false, Extra: '' }
   Indexes:
-    PRIMARY: { Name: PRIMARY, Columns: [bill_id, timestamp], Unique: true, Type: BTREE }
+    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     bill_data_bill_id_index: { Name: bill_data_bill_id_index, Columns: [bill_id], Unique: false, Type: BTREE }
+    bill_data_bill_id_timestamp_index: { Name: bill_data_bill_id_timestamp_index, Columns: [bill_id, timestamp], Unique: false, Type: BTREE }
 bill_history:
   Columns:
     - { Field: bill_hist_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -1597,6 +1600,9 @@ ports_nac:
     - { Field: time_left, Type: varchar(50), 'Null': true, Extra: '' }
     - { Field: vlan, Type: 'int unsigned', 'Null': true, Extra: '' }
     - { Field: time_elapsed, Type: varchar(50), 'Null': true, Extra: '' }
+    - { Field: created_at, Type: timestamp, 'Null': true, Extra: '' }
+    - { Field: updated_at, Type: timestamp, 'Null': true, Extra: '' }
+    - { Field: historical, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [ports_nac_id], Unique: true, Type: BTREE }
     ports_nac_device_id_index: { Name: ports_nac_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }

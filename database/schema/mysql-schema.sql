@@ -374,13 +374,14 @@ DROP TABLE IF EXISTS `bill_data`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `bill_data` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `bill_id` int(10) unsigned NOT NULL,
   `timestamp` datetime NOT NULL,
   `period` int(11) NOT NULL,
   `delta` bigint(20) NOT NULL,
-  `in_delta` bigint(20) NOT NULL,
+  `in_delta` bigint(20) NOT NULL, 
   `out_delta` bigint(20) NOT NULL,
-  PRIMARY KEY (`bill_id`,`timestamp`),
+  PRIMARY KEY (`id`),
   KEY `bill_data_bill_id_index` (`bill_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
