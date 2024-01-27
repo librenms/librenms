@@ -165,6 +165,21 @@
             $(canvas).css('background-image','url({{ route('maps.custom.background', ['map' => $map_id]) }}?ver={{$bgversion}})').css('background-size', 'cover');
         }
 
+        network.on('doubleClick', function (properties) {
+            edge_id = null;
+            if (properties.nodes.length > 0) {
+                node_id = properties.nodes[0];
+                node = network_nodes.get(node_id);
+                $("#nodeModalLabel").text('{{ __('map.custom.edit.node.edit') }}');
+                $(".single-node").show();
+                editNode(node, editNodeSave);
+            } else if (properties.edges.length > 0) {
+                edge_id = properties.edges[0].split("_")[0];
+                edge = network_edges.get(edge_id + "_to");
+                editExistingEdge(edge, null);
+            }
+        });
+
         network.on('dragEnd', function (data) {
             if(data.edges.length > 0 || data.nodes.length > 0) {
                 // Make sure a node is not dragged outside the canvas
