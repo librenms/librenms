@@ -27,11 +27,13 @@ namespace App\Http\Controllers\Maps;
 
 use App\Http\Controllers\Controller;
 use App\Models\CustomMap;
+use App\Models\CustomMapBackground;
+use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Storage;
 
 class CustomMapBackgroundController extends Controller
 {
-    public function __invoke(CustomMap $map)
+    public function get(CustomMap $map)
     {
         $this->authorize('view', $map);
 
@@ -44,6 +46,36 @@ class CustomMapBackgroundController extends Controller
             ]);
         }
         abort(404);
+    }
+
+    public function save(FormRequest $request, CustomMap $map)
+    {
+        $this->authorize('update', $map);
+
+        if ($request->bgimage) {
+            $map->background_suffix = $request->bgimage->extension();
+            if (! $map->background) {
+                $background = new CustomMapBackground;
+                $background->background_image = $request->bgimage->getContent();
+                $map->background()->save($background);
+            } else {
+                $map->background->background_image = $request->bgimage->getContent();
+                $map->background->save();
+            }
+            $map->background_version++;
+            $map->save();
+        } elseif ($request->bgclear) {
+            if ($map->background) {
+                $map->background->delete();
+            }
+            $map->background_suffix = null;
+            $map->save();
+        }
+
+        return response()->json([
+            'bgimage' => $map->background_suffix ? true : false,
+            'bgversion' => $map->background_version,
+        ]);
     }
 
     private function checkImageCache(CustomMap $map): ?string

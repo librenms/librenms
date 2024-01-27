@@ -49,13 +49,6 @@ class CustomMapSettingsRequest extends FormRequest
                     }
                 },
             ],
-            'bgclear' => 'boolean',
-            'bgimage' => [
-                $this->post('bgimage') ? 'required' : 'nullable',
-                'image',
-                'mimes:jpeg,png,jpg,gif,svg',
-                'max:2048',
-            ],
         ];
     }
 }

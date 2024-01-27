@@ -33,20 +33,6 @@
                                     <input type="number" id="mapnodealign" name="mapnodealign" class="form-control input-sm" value="{{ $node_align ?? 10 }}">
                                 </div>
                             </div>
-                            <div class="form-group row" id="mapBackgroundRow">
-                                <label for="selectbackground" class="col-sm-3 control-label">{{ __('map.custom.edit.map.background') }}</label>
-                                <div class="col-sm-9">
-                                    <input id="mapBackgroundSelect" type="file" name="selectbackground" accept="image/png,image/jpeg,image/svg+xml" class="form-control" onchange="mapChangeBackground();">
-                                    <button id="mapBackgroundCancel" type="button" name="cancelbackground" class="btn btn-primary" onclick="mapChangeBackgroundCancel();" style="display:none">{{ __('Cancel') }}</button>
-                                </div>
-                            </div>
-                            <div class="form-group row" id="mapBackgroundClearRow">
-                                <label for="clearbackground" class="col-sm-3 control-label">{{ __('map.custom.edit.map.clear_bg') }}</label>
-                                <div class="col-sm-9">
-                                    <input type="hidden" id="mapBackgroundClearVal">
-                                    <button id="mapBackgroundClear" type="button" name="clearbackground" class="btn btn-primary" onclick="mapClearBackground();">{{ __('map.custom.edit.map.clear_background') }}</button>
-                                </div>
-                            </div>
                             <hr>
                             <div class="row">
                                 <div class="col-sm-12" id="savemap-alert">
@@ -67,25 +53,6 @@
 </div>
 
 <script>
-    function mapChangeBackground() {
-        $("#mapBackgroundCancel").show();
-    }
-
-    function mapChangeBackgroundCancel() {
-        $("#mapBackgroundCancel").hide();
-        $("#mapBackgroundSelect").val(null);
-    }
-
-    function mapClearBackground() {
-        if($('#mapBackgroundClearVal').val()) {
-            $('#mapBackgroundClear').text('{{ __('map.custom.edit.map.clear_background') }}');
-            $('#mapBackgroundClearVal').val('');
-        } else {
-            $('#mapBackgroundClear').text('{{ __('map.custom.edit.map.keep_background') }}');
-            $('#mapBackgroundClearVal').val('clear');
-        }
-    }
-
     function saveMapSettings() {
         $("#map-saveButton").attr('disabled','disabled');
         $("#savemap-alert").text('{{ __('map.custom.edit.map.saving') }}');
@@ -95,8 +62,6 @@
         var width = $("#mapwidth").val();
         var height = $("#mapheight").val();
         var node_align = $("#mapnodealign").val();
-        var clearbackground = $('#mapBackgroundClearVal').val() ? 1 : 0;
-        var newbackground = $('#mapBackgroundSelect').prop('files').length ? $('#mapBackgroundSelect').prop('files')[0] : '';
 
         if(!isNaN(width)) {
             width = width + "px";
@@ -119,9 +84,7 @@
                 name: name,
                 width: width,
                 height: height,
-                node_align: node_align,
-                bgclear: clearbackground,
-                bgimage: newbackground
+                node_align: node_align
             },
             dataType: 'json',
             type: method

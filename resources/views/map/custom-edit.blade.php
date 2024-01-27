@@ -4,15 +4,17 @@
 
 @section('content')
 
+@include('map.custom-background-modal')
 @include('map.custom-node-modal')
 @include('map.custom-edge-modal')
 @include('map.custom-map-modal')
-@include('map.custom-map-delete-modal')
+@include('map.custom-map-list-modal')
 
 <div class="container-fluid">
   <div class="row" id="control-row">
     <div class="col-md-5">
       <button type=button value="mapedit" id="map-editButton" class="btn btn-primary" onclick="editMapSettings();">{{ __('map.custom.edit.map.edit') }}</button>
+      <button type=button value="mapbg" id="map-bgButton" class="btn btn-primary" onclick="editMapBackground();">{{ __('map.custom.edit.bg.title') }}</button>
       <button type=button value="editnodedefaults" id="map-nodeDefaultsButton" class="btn btn-primary" onclick="editNodeDefaults();">{{ __('map.custom.edit.node.edit_defaults') }}</button>
       <button type=button value="editedgedefaults" id="map-edgeDefaultsButton" class="btn btn-primary" onclick="editEdgeDefaults();">{{ __('map.custom.edit.edge.edit_defaults') }}</button>
     </div>
@@ -24,7 +26,7 @@
     <div class="col-md-5 text-right">
       <button type=button value="maprender" id="map-renderButton" class="btn btn-primary" style="display: none" onclick="CreateNetwork();">{{ __('map.custom.edit.map.rerender') }}</button>
       <button type=button value="mapsave" id="map-saveDataButton" class="btn btn-primary" style="display: none" onclick="saveMapData();">{{ __('map.custom.edit.map.save') }}</button>
-      <button type=button value="mapdelete" id="map-deleteButton" class="btn btn-danger" onclick="$('#mapDeleteModal').modal({backdrop: 'static', keyboard: false}, 'show');">{{ __('map.custom.edit.map.delete') }}</button>
+      <button type=button value="maplist" id="map-listButton" class="btn btn-primary" onclick="mapList();">{{ __('map.custom.edit.map.list') }}</button>
     </div>
   </div>
   <div class="row" id="control-map-sep">
@@ -202,14 +204,6 @@
     }
 
     function editMapSettings() {
-        $("#mapBackgroundCancel").hide();
-        $("#mapBackgroundSelect").val(null);
-
-        if($("#custom-map").children()[0].canvas.style.backgroundImage) {
-            $("#mapBackgroundClearRow").show();
-        } else {
-            $("#mapBackgroundClearRow").hide();
-        }
         $('#mapModal').modal({backdrop: 'static', keyboard: false}, 'show');
     }
 
@@ -221,39 +215,28 @@
 
     var edge_port_map = {};
 
-    function deleteMap() {
-        $.ajax({
-            url: "{{ route('maps.custom.destroy', ['map' => $map_id]) }}",
-            type: 'DELETE'
-        })
-            .done(function() {
-                window.location.href = "{{ route('maps.custom.index') }}";
-            });
+    function mapList() {
+        if($("#map-saveDataButton").is(":visible")) {
+            $('#mapListModal').modal({backdrop: 'static', keyboard: false}, 'show');
+        } else {
+            viewList();
+        }
+    }
+
+    function viewList() {
+        window.location.href = "{{ route('maps.custom.index') }}";
     }
 
     function editMapSuccess(data) {
-        $("#title").text(name);
+        $("#title").text(data.name);
         $("#savemap-alert").attr("class", "col-sm-12");
         $("#savemap-alert").text("");
         network.setSize(data.width, data.height);
-
-        canvas = $("#custom-map").children()[0].canvas;
-        if(data['bgimage']) {
-            $(canvas).css('background-image','url({{ route('maps.custom.background', ['map' => $map_id]) }}?ver=' + data['bgversion'] + ')').css('background-size', 'cover');
-            bgimage = true;
-        } else {
-            $(canvas).css('background-image','');
-            bgimage = false;
-        }
 
         editMapCancel();
     }
 
     function editMapCancel() {
-        $('#mapBackgroundClear').text('{{ __('map.custom.edit.map.clear_background') }}');
-        $('#mapBackgroundClearVal').val('');
-        $("#mapBackgroundCancel").hide();
-        $("#mapBackgroundSelect").val(null);
         $('#mapModal').modal('hide');
     }
 
@@ -315,6 +298,18 @@
         }).always(function (resp, status, error) {
             $("#map-saveDataButton").removeAttr('disabled');
         });
+    }
+
+    function editMapBackground() {
+        $("#mapBackgroundCancel").hide();
+        $("#mapBackgroundSelect").val(null);
+
+        if($("#custom-map").children()[0].canvas.style.backgroundImage) {
+            $("#mapBackgroundClearRow").show();
+        } else {
+            $("#mapBackgroundClearRow").hide();
+        }
+        $('#bgModal').modal({backdrop: 'static', keyboard: false}, 'show');
     }
 
     function nodeStyleChange() {

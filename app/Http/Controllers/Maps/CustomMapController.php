@@ -136,32 +136,11 @@ class CustomMapController extends Controller
         $map->fill($request->validated());
         $map->save(); // save to get ID
 
-        if ($request->bgimage) {
-            $map->background_suffix = $request->bgimage->extension();
-            if (! $map->background) {
-                $background = new CustomMapBackground;
-                $background->background_image = $request->bgimage->getContent();
-                $map->background()->save($background);
-            } else {
-                $map->background->background_image = $request->bgimage->getContent();
-                $map->background->save();
-            }
-            $map->background_version++;
-            $map->save();
-        } elseif ($request->bgclear) {
-            if ($map->background) {
-                $map->background->delete();
-            }
-            $map->background_suffix = null;
-            $map->save();
-        }
-
         return response()->json([
             'id' => $map->custom_map_id,
+            'name' => $map->name,
             'width' => $map->width,
             'height' => $map->height,
-            'bgimage' => $map->background_suffix ? true : false,
-            'bgversion' => $map->background_version,
         ]);
     }
 
@@ -174,7 +153,7 @@ class CustomMapController extends Controller
         $image_translations = __('map.custom.edit.node.image_options');
 
         foreach (Storage::disk('base')->files('html/images/custommap/icons') as $image) {
-            if (in_array(strtolower(pathinfo($image, PATHINFO_EXTENSION)), ['svg', 'png', 'jpg'])) {
+            if (in_array(strtolower(pathinfo($image, PATHINFO_EXTENSION)), ['svg', 'png', 'jpg', 'gif'])) {
                 $file = pathinfo($image, PATHINFO_BASENAME);
                 $filename = pathinfo($image, PATHINFO_FILENAME);
 
