@@ -79,8 +79,8 @@ if (! isset($vars['app_page']) || ! isset($app->data['pools'])) {
         unset($pool['percent']);
         foreach ($pool as $pool_option => $option_value) {
             $pool_detail_table['rows'][$option_row_int] = [
-                ['data'=>$pool_option],
-                ['data'=>$option_value],
+                ['data' => $pool_option],
+                ['data' => $option_value],
             ];
             $option_row_int++;
         }
@@ -138,7 +138,7 @@ if (! isset($vars['app_page']) || ! isset($app->data['pools'])) {
             // safe to set given we know we got a valid MAC if a $port is set
             $mac_raw = true;
             $mac = $mac . ' (' .
-                generate_device_link(['device_id'=>$port->device_id]) . ', ' .
+                generate_device_link(['device_id' => $port->device_id]) . ', ' .
                 generate_port_link([
                     'label' => $port->label,
                     'port_id' => $port->port_id,
@@ -156,7 +156,7 @@ if (! isset($vars['app_page']) || ! isset($app->data['pools'])) {
         $table_info['rows'][$key] = [
             ['data' => $lease['ip']],
             ['data' => $lease['state']],
-            ['data' => $mac, 'raw'=>$mac_raw],
+            ['data' => $mac, 'raw' => $mac_raw],
             //  display the time as UTC as that keeps things most simple
             ['data' => date('Y-m-d\TH:i:s\Z', $lease['starts'])],
             ['data' => date('Y-m-d\TH:i:s\Z', $lease['ends'])],
