@@ -1,21 +1,20 @@
 <?php
 
-
 use App\Models\Port;
 
 $link_array = [
-    'page'   => 'device',
+    'page' => 'device',
     'device' => $device['device_id'],
-    'tab'    => 'apps',
-    'app'    => 'dhcp-stats',
+    'tab' => 'apps',
+    'app' => 'dhcp-stats',
 ];
 
 // app data is only going to exist for this for extend 3+, so don't both displaying it otherwise
 if (isset($app->data['pools'])) {
     print_optionbar_start();
     echo generate_link('General', $link_array);
-    echo ' | ' . generate_link('Pools', $link_array, ['app_page'=>'pools']);
-    echo ' | ' . generate_link('Leases', $link_array, ['app_page'=>'leases']);
+    echo ' | ' . generate_link('Pools', $link_array, ['app_page' => 'pools']);
+    echo ' | ' . generate_link('Leases', $link_array, ['app_page' => 'leases']);
     print_optionbar_end();
 }
 
@@ -24,10 +23,10 @@ if (! isset($vars['app_page']) || ! isset($app->data['pools'])) {
         'dhcp-stats_stats' => 'Stats',
         'dhcp-stats_pools_percent' => 'Pools Percent',
         'dhcp-stats_pools_current' => 'Pools Current',
-        'dhcp-stats_pools_max'     => 'Pools Max',
+        'dhcp-stats_pools_max' => 'Pools Max',
         'dhcp-stats_networks_percent' => 'Networks Percent',
         'dhcp-stats_networks_current' => 'Networks Current',
-        'dhcp-stats_networks_max'     => 'Networks Max',
+        'dhcp-stats_networks_max' => 'Networks Max',
     ];
 } elseif (isset($vars['app_page']) && $vars['app_page'] == 'pools') {
     $pools = $app->data['pools'] ?? [];
@@ -46,12 +45,12 @@ if (! isset($vars['app_page']) || ! isset($app->data['pools'])) {
     ];
     foreach ($pools as $key => $pool) {
         $pool_table['rows'][$key] = [
-            ['data'=>$pool['cidr']],
-            ['data'=>$pool['first_ip']],
-            ['data'=>$pool['last_ip']],
-            ['data'=>$pool['max']],
-            ['data'=>$pool['cur']],
-            ['data'=>$pool['percent']],
+            ['data' => $pool['cidr']],
+            ['data' => $pool['first_ip']],
+            ['data' => $pool['last_ip']],
+            ['data' => $pool['max']],
+            ['data' => $pool['cur']],
+            ['data' => $pool['percent']],
         ];
     }
     echo view('widgets/sortable_table', $pool_table);
@@ -61,7 +60,7 @@ if (! isset($vars['app_page']) || ! isset($app->data['pools'])) {
     echo '<center><b>Subnets Details</b></center>';
     print_optionbar_start();
     $pool_detail_table = [
-        'headers'=>[
+        'headers' => [
             'Key',
             'Value',
         ],
@@ -105,11 +104,11 @@ if (! isset($vars['app_page']) || ! isset($app->data['pools'])) {
     ];
     foreach ($subnets as $key => $subnet) {
         $subnets_table['rows'][$key] = [
-            ['data'=>$subnet['network']],
-            ['data'=>$subnet['max']],
-            ['data'=>$subnet['cur']],
-            ['data'=>$subnet['percent']],
-            ['data'=>json_encode($subnet['pools'])],
+            ['data' => $subnet['network']],
+            ['data' => $subnet['max']],
+            ['data' => $subnet['cur']],
+            ['data' => $subnet['percent']],
+            ['data' => json_encode($subnet['pools'])],
         ];
     }
     echo view('widgets/sortable_table', $subnets_table);
@@ -155,14 +154,14 @@ if (! isset($vars['app_page']) || ! isset($app->data['pools'])) {
             $lease['vendor_class_identifier'] = base64_decode($lease['vendor_class_identifier']);
         }
         $table_info['rows'][$key] = [
-            ['data'=>$lease['ip']],
-            ['data'=>$lease['state']],
-            ['data'=>$mac, 'raw'=>$mac_raw],
+            ['data' => $lease['ip']],
+            ['data' => $lease['state']],
+            ['data' => $mac, 'raw'=>$mac_raw],
             //  display the time as UTC as that keeps things most simple
-            ['data'=>date('Y-m-d\TH:i:s\Z', $lease['starts'])],
-            ['data'=>date('Y-m-d\TH:i:s\Z', $lease['ends'])],
-            ['data'=>$lease['client_hostname']],
-            ['data'=>$lease['vendor_class_identifier']],
+            ['data' => date('Y-m-d\TH:i:s\Z', $lease['starts'])],
+            ['data' => date('Y-m-d\TH:i:s\Z', $lease['ends'])],
+            ['data' => $lease['client_hostname']],
+            ['data' => $lease['vendor_class_identifier']],
         ];
     }
     echo view('widgets/sortable_table', $table_info);
