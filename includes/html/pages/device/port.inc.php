@@ -2,6 +2,7 @@
 
 use App\Models\Port;
 use App\Models\PortAdsl;
+use App\Models\PortsNac;
 use App\Models\PortVdsl;
 use App\Plugins\Hooks\PortTabHook;
 use LibreNMS\Util\Rewrite;
@@ -93,6 +94,10 @@ if (PortAdsl::where('port_id', $port->port_id)->exists()) {
     $menu_options['xdsl'] = 'xDSL';
 } elseif (PortVdsl::where('port_id', $port->port_id)->exists()) {
     $menu_options['xdsl'] = 'xDSL';
+}
+
+if (PortsNac::where('port_id', $port->port_id)->exists()) {
+    $menu_options['nac'] = 'NAC';
 }
 
 if (DeviceCache::getPrimary()->ports()->where('pagpGroupIfIndex', $port->ifIndex)->exists()) {
