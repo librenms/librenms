@@ -11,8 +11,23 @@ $app_data = $app->data;
 
 print_optionbar_start();
 
-echo generate_link('Totals', $link_array);
-echo '| Instances:';
+// set the default graph set page for v2
+if (!isset($vars['suricata_graph_set'])) {
+    $vars['suricata_graph_set']='general';
+}
+
+// print the link to the totals
+$total_label = isset($vars['sinstance'])
+    ? 'Totals'
+    : '<span class="pagemenu-selected">Totals</span>';
+if (isset($vars['suricata_graph_set'])) {
+    echo generate_link($total_label, $link_array, ['suricata_graph_set' => $vars['suricata_graph_set']]);
+} else {
+    echo generate_link($total_label, $link_array);
+}
+
+// print links to instances
+echo ' | Instances: ';
 $suricata_instances = $app->data['instances'] ?? [];
 sort($suricata_instances);
 foreach ($suricata_instances as $index => $sinstance) {
@@ -20,10 +35,35 @@ foreach ($suricata_instances as $index => $sinstance) {
         ? '<span class="pagemenu-selected">' . $sinstance . '</span>'
         : $sinstance;
 
-    echo generate_link($label, $link_array, ['sinstance' => $sinstance]);
+    echo generate_link($label, $link_array, ['sinstance' => $sinstance, 'suricata_graph_set' => $vars['suricata_graph_set']]);
 
     if ($index < (count($suricata_instances) - 1)) {
         echo ', ';
+    }
+}
+
+// print page information
+// only present for v2
+if ($app_data['version'] == 2) {
+    print "<br>\nPages: ";
+    $suricata_pages = ['general'=>'General', 'bypassed' => 'By Passed', 'errors' => 'Errors', 'memuse' => 'Memory Usage',
+                     'detect' => 'Detect', 'filestore' => 'File Store', 'tcp' => 'TCP'];
+    $page_count=0;
+    foreach ($suricata_pages as $page => $page_description) {
+        $label = $vars['suricata_graph_set'] == $page
+            ? '<span class="pagemenu-selected">' . $page_description . '</span>'
+            : $page_description;
+
+        if (isset($vars['sinstance'])) {
+            echo generate_link($label, $link_array, ['sinstance' => $vars['sinstance'], 'suricata_graph_set' => $page]);
+        } else {
+            echo generate_link($label, $link_array, ['suricata_graph_set' => $page]);
+        }
+
+        if ($page_count < (count($suricata_pages) - 1)) {
+            echo ', ';
+        }
+        $page_count++;
     }
 }
 
