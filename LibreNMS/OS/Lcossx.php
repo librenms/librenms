@@ -53,7 +53,7 @@ class Lcossx extends OS implements ProcessorDiscovery, ProcessorPolling
     {
         $data = snmpwalk_array_num($this->getDeviceArray(), $this->procOid);
         if ($data === false) {
-            return;
+            return [];
         }
 
         $processors = [];
