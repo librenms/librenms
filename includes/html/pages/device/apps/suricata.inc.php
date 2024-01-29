@@ -43,7 +43,11 @@ if ($app_data['version'] == 1) {
         'suricata_uptime' => 'Uptime',
         'suricata_alert' => 'Alert Status',
     ];
-} elseif ($app_data['version'] == 1) {
+} elseif ($app_data['version'] == 2) {
+    if (!isset($vars['suricata_graph_set'])) {
+        $vars['suricata_graph_set'] = 'general';
+    }
+
     if (strcmp($vars['suricata_graph_set'], 'general') == 0) {
         $graphs = [
             // capture__kernel_packets
