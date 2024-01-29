@@ -18,9 +18,11 @@ $metrics = ['alert' => $suricata['alert']];
 
 // Used by both.
 $instances = [];
+$old_data = $app->data;
+$new_data = [];
 
 if ($suricata['version'] == 1) {
-    $app->data['version'] = 1;
+    $new_data['version'] = 1;
 
     $rrd_def = RrdDefinition::make()
         ->addDataset('af_dcerpc_tcp', 'DERIVE', 0)
@@ -176,7 +178,7 @@ if ($suricata['version'] == 1) {
         data_update($device, 'app', $tags, $fields);
     }
 } elseif ($suricata['version'] == 2) {
-    $app->data['version'] = 2;
+    $new_data['version'] = 2;
 
     // Nothing here is used by version 1.
     include 'includes/suricata-shared.php';
@@ -234,9 +236,10 @@ if ($suricata['version'] == 1) {
 }
 
 // check for added or removed instances
-$old_instances = $app->data['instances'] ?? [];
+$old_instances = $old_data['instances'] ?? [];
 $added_instances = array_diff($instances, $old_instances);
 $removed_instances = array_diff($old_instances, $instances);
+$new_data['instances'] = $instances;
 
 // if we have any source instances, save and log
 if (count($added_instances) > 0 || count($removed_instances) > 0) {
@@ -246,6 +249,8 @@ if (count($added_instances) > 0 || count($removed_instances) > 0) {
     $log_message .= count($removed_instances) > 0 ? ' Removed ' . implode(',', $added_instances) : '';
     log_event($log_message, $device, 'application');
 }
+
+$app->data = $new_data;
 
 //
 // all done so update the app metrics
