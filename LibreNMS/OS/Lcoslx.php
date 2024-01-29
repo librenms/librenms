@@ -84,6 +84,7 @@ class Lcoslx extends OS implements
                 WirelessSensor::channelToFrequency($entry['lcosLXStatusWLANRadiosEntryRadioChannel'])
             );
         }
+
         return $sensors;
     }
 
@@ -120,6 +121,7 @@ class Lcoslx extends OS implements
                 $entry['lcosLXStatusWLANRadiosEntryModemLoad']
             );
         }
+
         return $sensors;
     }
 
@@ -229,7 +231,7 @@ class Lcoslx extends OS implements
             }
 
             if (isset($entry['lcosLXStatusWLANStationEntryEffTxRate'])) {
-                $sensors['tx-'.$bssid] = new WirelessSensor(
+                $sensors['tx-' . $bssid] = new WirelessSensor(
                     'rate',
                     $this->getDeviceId(),
                     '.1.3.6.1.4.1.2356.13.1.3.32.1.50.' . Mac::parse($bssid)->oid() . '.0',
@@ -237,11 +239,11 @@ class Lcoslx extends OS implements
                     $bssid,
                     'TX Rate ' . $entry['lcosLXStatusWLANStationEntryNetworkName'] . " $bssid",
                     $entry['lcosLXStatusWLANStationEntryEffTxRate'],
-                     1000000
+                    1000000
                 );
-            };
+            }
             if (isset($entry['lcosLXStatusWLANStationEntryEffRxRate'])) {
-                $sensors['rx-'.$bssid] = new WirelessSensor(
+                $sensors['rx-' . $bssid] = new WirelessSensor(
                     'rate',
                     $this->getDeviceId(),
                     '.1.3.6.1.4.1.2356.13.1.3.32.1.51.' . Mac::parse($bssid)->oid() . '.0',
@@ -249,10 +251,9 @@ class Lcoslx extends OS implements
                     $bssid,
                     'RX Rate ' . $entry['lcosLXStatusWLANStationEntryNetworkName'] . " $bssid",
                     $entry['lcosLXStatusWLANStationEntryEffTxRate'],
-                     1000000
+                    1000000
                 );
             }
-
         }
 
         return $sensors;

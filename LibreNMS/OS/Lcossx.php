@@ -38,55 +38,60 @@ class Lcossx extends OS implements ProcessorDiscovery, ProcessorPolling
     private function convertProcessorData(array $input)
     {
         $data = [];
-        $cpuList = explode(",", reset($input)[0]);
-        foreach($cpuList as $cpuPart) {
-            $cpuValues = explode(":", $cpuPart);
+        $cpuList = explode(',', reset($input)[0]);
+        foreach ($cpuList as $cpuPart) {
+            $cpuValues = explode(':', $cpuPart);
             $cpuName = trim($cpuValues[0]);
-            $cpuPerc = str_replace("%", "", $cpuValues[1]);
+            $cpuPerc = str_replace('%', '', $cpuValues[1]);
             $data[$cpuName] = $cpuPerc;
         }
+
         return $data;
     }
 
     public function discoverProcessors()
     {
         $data = snmpwalk_array_num($this->getDeviceArray(), $this->procOid);
-        if ($data === FALSE) { return; }
+        if ($data === false) {
+            return;
+        }
 
         $processors = [];
         $count = 0;
-        foreach($this->convertProcessorData($data) as $cpuName => $cpuPerc) {
+        foreach ($this->convertProcessorData($data) as $cpuName => $cpuPerc) {
             $processors[] = Processor::discover(
                 'lcossx',
                 $this->getDeviceId(),
                 $this->procOid,
                 $count,
-                "Processor ".$cpuName,
+                'Processor ' . $cpuName,
                 1,
                 $cpuPerc,
                 100
             );
             $count++;
         }
+
         return $processors;
     }
 
     public function pollProcessors(array $processors)
     {
         $data = snmpwalk_array_num($this->getDeviceArray(), $this->procOid);
-        if (get_debug_type($data) != "array") {
-            return array();
+        if (get_debug_type($data) != 'array') {
+            return [];
         }
 
         $cpuList = $this->convertProcessorData($data);
 
         $data = [];
-        foreach($processors as $processor) {
+        foreach ($processors as $processor) {
             $processor_id = $processor['processor_id'];
-            $key = explode(" ", $processor['processor_descr'])[1];
+            $key = explode(' ', $processor['processor_descr'])[1];
             $value = $cpuList[$key];
             $data[$processor_id] = $value;
         }
+
         return $data;
     }
 }
