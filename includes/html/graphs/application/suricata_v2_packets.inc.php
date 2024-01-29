@@ -15,7 +15,7 @@ if (isset($vars['sinstance'])) {
 }
 
 if (isset($vars['sinstance'])) {
-    $capture_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___capture__kernel_packets' ]);
+    $capture__kernel_packets_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___capture__kernel_packets' ]);
 } else {
     $capture__kernel_packets_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id], 'totals___capture__kernel_packets');
 }

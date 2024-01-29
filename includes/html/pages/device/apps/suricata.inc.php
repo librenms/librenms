@@ -51,7 +51,10 @@ if ($app_data['version'] == 1) {
             // decoder not events, decoder__bytes, decoder__avg_pkt_size
             // decoder__avg_pkt_size
             // decoder__bytes
+            // flow_bypassed__bytes
             'suricata_v2_bytes' => 'Bytes',
+            // decoder__avg_pkt_size
+            'suricata_v2_avg_pkg_size' => 'Decoder Average Packet Size',
             // drop_percent
             // capture__kernel_ifdrops, capture__kernel_drops
             // error_delta
