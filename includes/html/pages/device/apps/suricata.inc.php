@@ -143,20 +143,20 @@ if ($app_data['version'] == 1) {
         }
     } elseif (strcmp($vars['suricata_graph_set'], 'bypassed') == 0) {
         $graphs = [
-            // flow_bypassed__bytes
-            'suricata_v2_flow_bypassed__bytes' => 'Flow Bypassed Bytes',
             // flow_bypassed__closed
             'suricata_v2_flow_bypassed__closed' => 'Flow Bypassed Closed',
+            // flow_bypassed__bytes
+            'suricata_v2_flow_bypassed__bytes' => 'Flow Bypassed Bytes',
             // flow_bypassed__local_bytes
             'suricata_v2_flow_bypassed__local_bytes' => 'Flow Bypassed Local Bytes',
             // flow_bypassed__local_capture_pkts
-            'suricata_v2_flow_bypassed__local_capture_pkgs' => 'Flow Bypassed Local Capture Packets',
-            // flow_bypassed__local_pkts
-            'suricata_v2_flow_bypassed__local_pkgs' => 'Flow Bypassed Local Packets',
+            'suricata_v2_flow_bypassed__local_capture_pkts' => 'Flow Bypassed Local Capture Packets',
             // flow_bypassed__pkts
-            'suricata_v2_flow_bypassed__pkgs' => 'Flow Bypassed Packets',
+            'suricata_v2_flow_bypassed__pkts' => 'Flow Bypassed Packets',
+            // flow_bypassed__local_pkts
+            'suricata_v2_flow_bypassed__local_pkts' => 'Flow Bypassed Local Packets',
             // flow__end__state__local_bypassed
-            'suricata_v2_flow_bypassed__local_bypassed' => 'Flow Bypassed Local Bypassed',
+            'suricata_v2_flow__end__state__local_bypassed' => 'Flow End State Local Bypassed',
         ];
     } elseif (strcmp($vars['suricata_graph_set'], 'errors') == 0) {
         // drop_percent
