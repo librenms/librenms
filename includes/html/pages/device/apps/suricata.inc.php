@@ -89,24 +89,58 @@ if ($app_data['version'] == 1) {
     }
 
     if (strcmp($vars['suricata_graph_set'], 'general') == 0) {
-        $graphs = [
-            // capture__kernel_packets
-            'suricata_v2_packets' => 'Packets',
-            // decoder not events, decoder__bytes, decoder__avg_pkt_size
-            // decoder__avg_pkt_size
-            // decoder__bytes
-            // flow_bypassed__bytes
-            'suricata_v2_bytes' => 'Bytes',
-            // decoder__avg_pkt_size
-            'suricata_v2_avg_pkg_size' => 'Decoder Average Packet Size',
-            // drop_percent
-            // capture__kernel_ifdrops, capture__kernel_drops
-            // error_delta
-            // app_layer__flow__*
-            // app_layer__tx__*
-            // flow__emerg_mode_entered, flow__emerg_mode_over
-            // uptime
-        ];
+        if (!isset($vars['sinstance'])) {
+            // v2 computes drop_percent for total only currently
+            $graphs = [
+                // capture__kernel_packets
+                // decoder__ethernet
+                // capture__kernel_drops
+                //capture__kernel_ifdrops
+                'suricata_v2_packets' => 'Packets',
+                // decoder not events, decoder__bytes, decoder__avg_pkt_size
+                // decoder__bytes
+                // flow_bypassed__bytes
+                'suricata_v2_bytes' => 'Bytes',
+                // decoder__avg_pkt_size
+                'suricata_v2_avg_pkg_size' => 'Decoder Average Packet Size',
+                // drop_percent
+                'suricata_v2_drop_percent' => 'Drop Percentage',
+                // capture__kernel_ifdrops, capture__kernel_drops
+                'suricata_v2_pkt_drop' => 'Packet Drop',
+                // error_delta
+                'suricata_v2_error_delta' => 'Error Delta',
+                // app_layer__flow__*
+                'suricata_v2_app_layer__flows' => 'Application Layer Flows',
+                // app_layer__tx__*
+                'suricata_v2_app_layer__tx' => 'Application Layer Packets',
+                // flow__emerg_mode_entered, flow__emerg_mode_over
+                'suricata_v2_flow_emerg_mode' => 'Flow Emergency Mode',
+                // uptime
+                'suricata_v2_uptime' => 'Uptime',
+            ];
+        } else {
+            $graphs = [
+                // capture__kernel_packets
+                'suricata_v2_packets' => 'Packets',
+                // decoder not events, decoder__bytes, decoder__avg_pkt_size
+                // decoder__avg_pkt_size
+                // decoder__bytes
+                // flow_bypassed__bytes
+                'suricata_v2_bytes' => 'Bytes',
+                // decoder__avg_pkt_size
+                'suricata_v2_avg_pkg_size' => 'Decoder Average Packet Size',
+                // capture__kernel_ifdrops, capture__kernel_drops
+                'suricata_v2_pkt_drop' => 'Packet Drop',
+                // app_layer__flow__*
+                'suricata_v2_app_layer__flows' => 'Application Layer Flows',
+                // app_layer__tx__*
+                'suricata_v2_app_layer__tx' => 'Application Layer Packets',
+                // flow__emerg_mode_entered, flow__emerg_mode_over
+                'suricata_v2_flow_emerg_mode' => 'Flow Emergency Mode',
+                // uptime
+                'suricata_v2_uptime' => 'Uptime',
+            ];
+        }
     } elseif (strcmp($vars['suricata_graph_set'], 'bypassed') == 0) {
         // flow_bypassed__bytes
         // flow_bypassed__closed

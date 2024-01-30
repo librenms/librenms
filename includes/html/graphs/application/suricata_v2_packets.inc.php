@@ -15,9 +15,9 @@ if (isset($vars['sinstance'])) {
 }
 
 if (isset($vars['sinstance'])) {
-    $capture__kernel_packets_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___capture__kernel_packets' ]);
+    $decoder__ethernet_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___decoder__ethernet' ]);
 } else {
-    $capture__kernel_packets_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___capture__kernel_packets']);
+    $decoder__ethernet_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___decoder__ethernet']);
 }
 
 if (isset($vars['sinstance'])) {
@@ -44,7 +44,7 @@ if (Rrd::checkRrdExists($capture__kernel_packets_rrd_filename)) {
 }
 if (Rrd::checkRrdExists($capture__kernel_packets_rrd_filename)) {
     $rrd_list[] = [
-        'filename' => $capture__kernel_packets_rrd_filename,
+        'filename' => $decoder__ethernet_rrd_filename,
         'descr' => 'Eth Pkts',
         'ds' => 'data',
     ];
