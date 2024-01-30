@@ -23,7 +23,7 @@
  * @author     Nick Hilliard <nick@foobar.org>
  */
 
-// create state index
+// create state index for cardMode
 $state_name = 'cardMode';
 $states = [
     ['value' => 0, 'generic' => 3, 'graph' => 0, 'descr' => 'notapplicable'],
@@ -35,10 +35,31 @@ create_state_index($state_name, $states);
 $num_oid = '.1.3.6.1.4.1.42229.1.2.3.3.1.1.10.';
 
 foreach ($pre_cache['infineragroove_slotTable'] as $index => $data) {
-    if (is_array($data) && isset($data['cardMode'])) {
+    if (is_array($data) && isset($data['cardMode']) && $data['cardMode'] != "notApplicable") {
         // discover sensors
-        $descr = 'slot-' . str_replace('.', '/', $index) . ' (' . $data['slotActualCardType'] . ')';
+        $descr = 'slot-' . str_replace('.', '/', $index) . ' (' . $data['slotActualCardType'] . ') Mode';
         discover_sensor($valid['sensor'], 'state', $device, $num_oid . $index, $index, $state_name, $descr, '1', '1', null, null, null, null, $data['cardMode'], 'snmp', $index);
+
+        // create sensor to state index
+        create_sensor_to_state_index($device, $state_name, $index);
+    }
+}
+
+// create state index for cardOperStatus
+$state_name = 'cardOperStatus';
+$states = [
+    ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'up'],
+    ['value' => 2, 'generic' => 1, 'graph' => 0, 'descr' => 'down'],
+];
+create_state_index($state_name, $states);
+
+$num_oid = '.1.3.6.1.4.1.42229.1.2.3.3.1.1.4.';
+
+foreach ($pre_cache['infineragroove_slotTable'] as $index => $data) {
+    if (is_array($data) && isset($data['cardOperStatus' ])) {
+        // discover sensors
+        $descr = 'slot-' . str_replace('.', '/', $index) . ' (' . $data['slotActualCardType'] . ') Status';
+        discover_sensor($valid['sensor'], 'state', $device, $num_oid . $index, $index, $state_name, $descr, '1', '1', null, null, null, null, $data['cardOperStatus'], 'snmp', $index);
 
         // create sensor to state index
         create_sensor_to_state_index($device, $state_name, $index);
