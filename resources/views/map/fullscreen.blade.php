@@ -67,16 +67,6 @@ html, body, #fullscreen-map {
             mapheight = 200;
         }
         $("#fullscreen-map").height(mapheight);
-
-        if (window.innerHeight > (screen.height - 10)) {
-            document.getElementsByClassName('navbar-fixed-top')[0].style.display = "none";
-            document.getElementsByTagName('body')[0].style.paddingTop = 0;
-            $("#controls-row").hide();
-        } else {
-            document.getElementsByClassName('navbar-fixed-top')[0].style.removeProperty("display");
-            document.getElementsByTagName('body')[0].style.paddingTop = "50px";
-            $("#controls-row").show();
-        }
     };
 
     window.addEventListener('resize', checkMapSize);
