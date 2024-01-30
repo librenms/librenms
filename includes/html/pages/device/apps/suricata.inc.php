@@ -159,16 +159,23 @@ if ($app_data['version'] == 1) {
             'suricata_v2_flow__end__state__local_bypassed' => 'Flow End State Local Bypassed',
         ];
     } elseif (strcmp($vars['suricata_graph_set'], 'errors') == 0) {
-        // drop_percent
-        // capture__kernel_ifdrops, capture__kernel_drops
-        // error_delta
-        // app_layer__error__*__alloc
-        // app_layer__error__*__gap
-        // app_layer__error__*__internal
-        // app_layer__error__*__parser
-        // file_store__fs_errors
         $graphs = [
-
+            // drop_percent
+            'suricata_v2_drop_percent' => 'Drop Percent',
+            // capture__kernel_ifdrops, capture__kernel_drops
+            'suricata_v2_pkt_drop' => 'Packet Drop',
+            // error_delta
+            'suricata_v2_error_delta' => 'Error Delta',
+            // app_layer__error__*__alloc
+            'suricata_v2_app_layer_error_alloc' => 'App Layer Error Alloc',
+            // app_layer__error__*__gap
+            'suricata_v2_app_layer_error_gap' => 'App Layer Error Gap',
+            // app_layer__error__*__internal
+            'suricata_v2_app_layer_error_internal' => 'App Layer Error Internal',
+            // app_layer__error__*__parser
+            'suricata_v2_app_layer_error_parser' => 'App Layer Error Parser',
+            // file_store__fs_errors
+            'suricata_v2_file_store__fs_errors' => 'File Store FS Errors',
         ];
     } elseif (strcmp($vars['suricata_graph_set'], 'memuse') == 0) {
         // memcap
@@ -197,7 +204,7 @@ if ($app_data['version'] == 1) {
 
         ];
     } elseif (strcmp($vars['suricata_graph_set'], 'tcp') == 0) {
-        // tcp__ack_unseen_data": 2276,
+        // tcp__ack_unseen_data
         // tcp__active_sessions
         // tcp__insert_data_normal_fail
         // tcp__insert_data_overlap_fail
@@ -220,7 +227,7 @@ if ($app_data['version'] == 1) {
         // tcp__ssn_from_pool
         // tcp__ssn_memcap_drop
         // tcp__stream_depth_reached
-        //tcp__syn
+        // tcp__syn
         // tcp__synack
     }
 }
