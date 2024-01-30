@@ -1,7 +1,7 @@
 <?php
 
 $name = 'suricata';
-$unit_text = 'flows';
+$unit_text = 'flows/sec';
 $colours = 'psychedelic';
 $dostack = 0;
 $printtotal = 1;
