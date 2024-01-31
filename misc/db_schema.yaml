@@ -515,6 +515,92 @@ customoids:
     - { Field: user_func, Type: varchar(100), 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [customoid_id], Unique: true, Type: BTREE }
+custom_maps:
+  Columns:
+    - { Field: custom_map_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
+    - { Field: name, Type: varchar(100), 'Null': false, Extra: '' }
+    - { Field: width, Type: varchar(10), 'Null': false, Extra: '' }
+    - { Field: height, Type: varchar(10), 'Null': false, Extra: '' }
+    - { Field: node_align, Type: smallint, 'Null': false, Extra: '', Default: '0' }
+    - { Field: background_suffix, Type: varchar(10), 'Null': true, Extra: '' }
+    - { Field: background_version, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: options, Type: longtext, 'Null': true, Extra: '' }
+    - { Field: newnodeconfig, Type: longtext, 'Null': false, Extra: '' }
+    - { Field: newedgeconfig, Type: longtext, 'Null': false, Extra: '' }
+    - { Field: created_at, Type: timestamp, 'Null': true, Extra: '' }
+    - { Field: updated_at, Type: timestamp, 'Null': true, Extra: '' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [custom_map_id], Unique: true, Type: BTREE }
+custom_map_backgrounds:
+  Columns:
+    - { Field: custom_map_background_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
+    - { Field: created_at, Type: timestamp, 'Null': true, Extra: '' }
+    - { Field: updated_at, Type: timestamp, 'Null': true, Extra: '' }
+    - { Field: custom_map_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: background_image, Type: mediumblob, 'Null': true, Extra: '' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [custom_map_background_id], Unique: true, Type: BTREE }
+    custom_map_backgrounds_custom_map_id_unique: { Name: custom_map_backgrounds_custom_map_id_unique, Columns: [custom_map_id], Unique: true, Type: BTREE }
+  Constraints:
+    custom_map_backgrounds_custom_map_id_foreign: { name: custom_map_backgrounds_custom_map_id_foreign, foreign_key: custom_map_id, table: custom_maps, key: custom_map_id, extra: 'ON DELETE CASCADE' }
+custom_map_edges:
+  Columns:
+    - { Field: custom_map_edge_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
+    - { Field: custom_map_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: custom_map_node1_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: custom_map_node2_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: port_id, Type: 'int unsigned', 'Null': true, Extra: '' }
+    - { Field: reverse, Type: tinyint, 'Null': false, Extra: '' }
+    - { Field: style, Type: varchar(50), 'Null': false, Extra: '' }
+    - { Field: showpct, Type: tinyint, 'Null': false, Extra: '' }
+    - { Field: text_face, Type: varchar(50), 'Null': false, Extra: '' }
+    - { Field: text_size, Type: int, 'Null': false, Extra: '' }
+    - { Field: text_colour, Type: varchar(10), 'Null': false, Extra: '' }
+    - { Field: mid_x, Type: int, 'Null': false, Extra: '' }
+    - { Field: mid_y, Type: int, 'Null': false, Extra: '' }
+    - { Field: created_at, Type: timestamp, 'Null': true, Extra: '' }
+    - { Field: updated_at, Type: timestamp, 'Null': true, Extra: '' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [custom_map_edge_id], Unique: true, Type: BTREE }
+    custom_map_edges_custom_map_id_index: { Name: custom_map_edges_custom_map_id_index, Columns: [custom_map_id], Unique: false, Type: BTREE }
+    custom_map_edges_custom_map_node1_id_index: { Name: custom_map_edges_custom_map_node1_id_index, Columns: [custom_map_node1_id], Unique: false, Type: BTREE }
+    custom_map_edges_custom_map_node2_id_index: { Name: custom_map_edges_custom_map_node2_id_index, Columns: [custom_map_node2_id], Unique: false, Type: BTREE }
+    custom_map_edges_port_id_index: { Name: custom_map_edges_port_id_index, Columns: [port_id], Unique: false, Type: BTREE }
+  Constraints:
+    custom_map_edges_custom_map_id_foreign: { name: custom_map_edges_custom_map_id_foreign, foreign_key: custom_map_id, table: custom_maps, key: custom_map_id, extra: 'ON DELETE CASCADE' }
+    custom_map_edges_custom_map_node1_id_foreign: { name: custom_map_edges_custom_map_node1_id_foreign, foreign_key: custom_map_node1_id, table: custom_map_nodes, key: custom_map_node_id, extra: 'ON DELETE CASCADE' }
+    custom_map_edges_custom_map_node2_id_foreign: { name: custom_map_edges_custom_map_node2_id_foreign, foreign_key: custom_map_node2_id, table: custom_map_nodes, key: custom_map_node_id, extra: 'ON DELETE CASCADE' }
+    custom_map_edges_port_id_foreign: { name: custom_map_edges_port_id_foreign, foreign_key: port_id, table: ports, key: port_id, extra: 'ON DELETE SET NULL' }
+custom_map_nodes:
+  Columns:
+    - { Field: custom_map_node_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
+    - { Field: custom_map_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: device_id, Type: 'int unsigned', 'Null': true, Extra: '' }
+    - { Field: linked_custom_map_id, Type: 'int unsigned', 'Null': true, Extra: '' }
+    - { Field: label, Type: varchar(50), 'Null': false, Extra: '' }
+    - { Field: style, Type: varchar(50), 'Null': false, Extra: '' }
+    - { Field: icon, Type: varchar(8), 'Null': true, Extra: '' }
+    - { Field: image, Type: varchar(255), 'Null': false, Extra: '', Default: '' }
+    - { Field: size, Type: int, 'Null': false, Extra: '' }
+    - { Field: border_width, Type: int, 'Null': false, Extra: '' }
+    - { Field: text_face, Type: varchar(50), 'Null': false, Extra: '' }
+    - { Field: text_size, Type: int, 'Null': false, Extra: '' }
+    - { Field: text_colour, Type: varchar(10), 'Null': false, Extra: '' }
+    - { Field: colour_bg, Type: varchar(10), 'Null': true, Extra: '' }
+    - { Field: colour_bdr, Type: varchar(10), 'Null': true, Extra: '' }
+    - { Field: x_pos, Type: int, 'Null': false, Extra: '' }
+    - { Field: y_pos, Type: int, 'Null': false, Extra: '' }
+    - { Field: created_at, Type: timestamp, 'Null': true, Extra: '' }
+    - { Field: updated_at, Type: timestamp, 'Null': true, Extra: '' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [custom_map_node_id], Unique: true, Type: BTREE }
+    custom_map_nodes_custom_map_id_index: { Name: custom_map_nodes_custom_map_id_index, Columns: [custom_map_id], Unique: false, Type: BTREE }
+    custom_map_nodes_device_id_index: { Name: custom_map_nodes_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
+    custom_map_nodes_linked_custom_map_id_index: { Name: custom_map_nodes_linked_custom_map_id_index, Columns: [linked_custom_map_id], Unique: false, Type: BTREE }
+  Constraints:
+    custom_map_nodes_custom_map_id_foreign: { name: custom_map_nodes_custom_map_id_foreign, foreign_key: custom_map_id, table: custom_maps, key: custom_map_id, extra: 'ON DELETE CASCADE' }
+    custom_map_nodes_device_id_foreign: { name: custom_map_nodes_device_id_foreign, foreign_key: device_id, table: devices, key: device_id, extra: 'ON DELETE SET NULL' }
+    custom_map_nodes_linked_custom_map_id_foreign: { name: custom_map_nodes_linked_custom_map_id_foreign, foreign_key: linked_custom_map_id, table: custom_maps, key: custom_map_id, extra: 'ON DELETE SET NULL' }
 dashboards:
   Columns:
     - { Field: dashboard_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }

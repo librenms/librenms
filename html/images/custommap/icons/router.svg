@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+    xmlns:osb="http://www.openswatchbook.org/uri/2009/osb"
+    xmlns:dc="http://purl.org/dc/elements/1.1/"
+    xmlns:cc="http://creativecommons.org/ns#"
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns="http://www.w3.org/2000/svg"
+    xmlns:xlink="http://www.w3.org/1999/xlink"
+    version="1.1"
+    id="svg6315"
+    viewBox="0 0 146.47212 146.45606"
+    stroke="#2c2c2c">
+  <defs
+     id="defs6317">
+    <linearGradient
+       osb:paint="solid"
+       id="linearGradient819">
+      <stop
+         id="stop817"
+         offset="0"
+         style="stop-color:#dddddd;stop-opacity:1;" />
+    </linearGradient>
+    <linearGradient
+       gradientUnits="userSpaceOnUse"
+       y2="73.235916"
+       x2="146.47183"
+       y1="73.235916"
+       x1="3.5762787e-06"
+       id="linearGradient821"
+       xlink:href="#linearGradient819"
+       gradientTransform="matrix(0.99449835,0,0,0.99438474,0.4032344,0.40318833)" />
+  </defs>
+  <metadata
+     id="metadata6320">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     id="g857">
+    <ellipse
+       ry="70.420441"
+       rx="70.428482"
+       style="opacity:1;fill:#fdfdfd;fill-opacity:1;stroke-width:5.6151762;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:3.875;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
+       id="path815"
+       cx="73.236069"
+       cy="73.228027" />
+    <path
+       id="rect827-0-3"
+       d="M 33.088769,33.085566 V 66.301839 L 45.088962,54.303037 65.699451,73.22803 45.094734,92.158786 33.088769,80.154219 v 33.216291 h 33.220052 l -12.005955,-12.00464 18.9331,-20.602205 18.92699,20.607915 -12.000209,11.99889 33.218623,-0.002 0.002,-33.214769 L 101.37152,92.164122 80.772525,73.227966 101.37721,54.296922 113.38319,66.301496 V 33.085584 L 80.16311,33.085548 92.169056,45.090168 73.235974,65.69234 54.297455,45.095941 66.309184,33.085584 Z"
+       style="opacity:1;fill:#3a3a3a;fill-opacity:1;stroke-width:1.82743692;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal" />
+  </g>
+</svg>

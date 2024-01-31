@@ -76,6 +76,23 @@
                                         @endforeach
                                     </ul></li>
                                 @endif
+                                @admin
+                                <li><a href="{{ route('maps.custom.index') }}"><i class="fa fa-map-marked fa-fw fa-lg"
+                                                                            aria-hidden="true"></i> {{ __('Custom Map Editor') }}
+                                    </a></li>
+                                @endadmin
+                                @if($custommaps->isNotEmpty())
+                                    <li class="dropdown-submenu"><a><i class="fa fa-map-marked fa-fw fa-lg"
+                                                                                aria-hidden="true"></i> {{ __('Custom Maps') }}
+                                        </a>
+                                        <ul class="dropdown-menu scrollable-menu">
+                                        @foreach($custommaps as $map)
+                                            <li><a href="{{ route('maps.custom.show', ['map' => $map->custom_map_id]) }}" title="{{ $map->name }}"><i class="fa fa-map-marked fa-fw fa-lg" aria-hidden="true"></i>
+                                                {{ ucfirst($map->name) }}
+                                            </a></li>
+                                        @endforeach
+                                    </ul></li>
+                                @endif
                                 <li><a href="{{ url('fullscreenmap') }}"><i class="fa fa-expand fa-fw fa-lg"
                                                                             aria-hidden="true"></i> {{ __('Geographical') }}
                                     </a></li>
@@ -784,5 +801,5 @@
             })
         })
     @endif
-    
+
 </script>

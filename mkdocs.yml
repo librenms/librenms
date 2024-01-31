@@ -162,9 +162,14 @@ nav:
     - Check_MK Setup: Extensions/Agent-Setup.md
     - Dashboards: Extensions/Dashboards.md
     - Interface Description Parsing: Extensions/Interface-Description-Parsing.md
-    - Network Map: Extensions/Network-Map.md
+    - Network Maps:
+      - Availability Map: Extensions/Availability-Map.md
+      - Dependency Map: Extensions/Dependency-Map.md
+      - Network Map: Extensions/Network-Map.md
+      - Custom Map: Extensions/Custom-Map.md
+      - World Map: Extensions/World-Map.md
+      - VisJS Config: Extensions/VisJS-Config.md
     - Syslog: Extensions/Syslog.md
-    - World Map: Extensions/World-Map.md
     - Advanced Setup:
       - 1 Minute Polling: Support/1-Minute-Polling.md
       - Authentication Options: Extensions/Authentication.md
