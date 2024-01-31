@@ -1,7 +1,7 @@
 <?php
 
 $name = 'suricata';
-$unit_text = 'sessions';
+$unit_text = 'sessions/sec';
 $colours = 'psychedelic';
 $dostack = 0;
 $printtotal = 1;
