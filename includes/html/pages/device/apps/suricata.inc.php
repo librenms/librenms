@@ -178,30 +178,52 @@ if ($app_data['version'] == 1) {
             'suricata_v2_file_store__fs_errors' => 'File Store FS Errors',
         ];
     } elseif (strcmp($vars['suricata_graph_set'], 'memuse') == 0) {
-        // memcap
-        // memuse
-        // memcap_pressure
-        // memcap_pressure_max
-        // tcp__memuse
-        // tcp__reassembly_memuse
-        // tcp__segment_memcap_drop
-        // tcp__ssn_memcap_drop
         $graphs = [
-
+            // flow__memuse
+            // ftp__memuse
+            // http__memuse
+            // tcp__memuse
+            // tcp__reassembly_memuse
+            'suricata_v2_memuse' => 'Memory Usage',
+            // flow__memcap
+            // flow__memuse
+            'suricata_v2_memuse_flow' => 'Flow Memory Usage',
+            // ftp__memcap
+            // ftp__memuse
+            'suricata_v2_memuse_ftp' => 'FTP Memory Usage',
+            // http__memcap
+            // http__memuse
+            'suricata_v2_memuse_http' => 'HTTP Memory Usage',
+            // tcp__memuse
+            // tcp__reassembly_memuse
+            'suricata_v2_memuse_tcp' => 'TCP Memory Usage',
+            // tcp__segment_memcap_drop
+            // tcp__ssn_memcap_drop
+            'suricata_v2_memuse_tcp_drop' => 'TCP Memcap Drop',
+            // memcap_pressure
+            // memcap_pressure_max
+            'suricata_v2_memcap_pressure' => 'Memcap Pressure',
         ];
     } elseif (strcmp($vars['suricata_graph_set'], 'detect') == 0) {
-        // detect__alert
-        // detect__alert_queue_overflow
-        // detect__alerts_suppressed
         $graphs = [
-
+            // detect__alert
+            // detect__alerts_suppressed
+            'suricata_v2_detect_alert_suppressed' => 'Detect Alert + Suppressed',
+            // detect__alert
+            'suricata_v2_detect_alert' => 'Detect Alert',
+            // detect__alert_queue_overflow
+            'suricata_v2_detect__alert_queue_overflow' => 'Detect Alert Queue Overflow',
+            // detect__alerts_suppressed
+            'suricata_v2_detect__alerts_suppressed' => 'Detect Alerts Suppressed',
         ];
     } elseif (strcmp($vars['suricata_graph_set'], 'filestore') == 0) {
-        // file_store__fs_errors
-        // file_store__open_files
-        // file_store__open_files_max_hit
         $graphs = [
-
+            // file_store__fs_errors
+            'suricata_v2_file_store__fs_errors' => 'File Store FS Errors',
+            // file_store__open_files
+            'suricata_v2_file_store__open_files' => 'File Store Open Files',
+            // file_store__open_files_max_hit
+            'suricata_v2_file_store__open_files_max_hit' => 'File Store Open Files, Max Hit',
         ];
     } elseif (strcmp($vars['suricata_graph_set'], 'tcp') == 0) {
         // tcp__ack_unseen_data
