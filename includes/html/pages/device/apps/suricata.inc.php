@@ -226,31 +226,58 @@ if ($app_data['version'] == 1) {
             'suricata_v2_file_store__open_files_max_hit' => 'File Store Open Files, Max Hit',
         ];
     } elseif (strcmp($vars['suricata_graph_set'], 'tcp') == 0) {
-        // tcp__ack_unseen_data
-        // tcp__active_sessions
-        // tcp__insert_data_normal_fail
-        // tcp__insert_data_overlap_fail
-        // tcp__invalid_checksum
-        // tcp__memuse
-        // tcp__midstream_pickups
-        // tcp__overlap
-        // tcp__overlap_diff_data
-        // tcp__pkt_on_wrong_thread
-        // tcp__pseudo
-        // tcp__pseudo_failed
-        // tcp__reassembly_gap
-        // tcp__reassembly_memuse
-        // tcp__rst
-        // tcp__segment_from_cache
-        // tcp__segment_from_pool
-        // tcp__segment_memcap_drop
-        // tcp__sessions
-        // tcp__ssn_from_cache
-        // tcp__ssn_from_pool
-        // tcp__ssn_memcap_drop
-        // tcp__stream_depth_reached
-        // tcp__syn
-        // tcp__synack
+        $graphs = [
+            // tcp__ack_unseen_data
+            'suricata_v2_tcp__ack_unseen_data' => 'TCP Ack Unseen Data',
+            // tcp__active_sessions
+            'suricata_v2_tcp__active_sessions' => 'TCP Active Sessions',
+            // tcp__insert_data_normal_fail
+            'suricata_v2_tcp__insert_data_normal_fail' => 'TCP Insert Data Normal Fail',
+            // tcp__insert_data_overlap_fail
+            'suricata_v2_tcp__insert_data_overlap_fail' => 'TCP Insert Data Overlap Fail',
+            // tcp__invalid_checksum
+            'suricata_v2_tcp__invalid_checksum' => 'TCP Invalid Checksum',
+            // tcp__memuse
+            'suricata_v2_tcp__memuse' => 'TCP Memuse',
+            // tcp__midstream_pickups
+            'suricata_v2_tcp__midstream_pickups' => 'TCP Midstream Pickups',
+            // tcp__overlap
+            'suricata_v2_tcp__overlap' => 'TCP Overlap',
+            // tcp__overlap_diff_data
+            'suricata_v2_tcp__overlap_diff_data' => 'TCP Overlap Diff Data',
+            // tcp__pkt_on_wrong_thread
+            'suricata_v2_tcp__pkt_on_wrong_thread' => 'TCP Pkt on Wrong Thread',
+            // tcp__pseudo
+            'suricata_v2_tcp__pseudo' => 'TCP Pseudo',
+            // tcp__pseudo_failed
+            'suricata_v2_tcp__pseudo_failed' => 'TCP Pseudo Failed',
+            // tcp__reassembly_gap
+            'suricata_v2_tcp__reassembly_gap' => 'TCP Reassembly Gap',
+            // tcp__reassembly_memuse
+            'suricata_v2_tcp__reassembly_memuse' => 'TCP Reassembly Memuse',
+            // tcp__rst
+            'suricata_v2_tcp__rst' => 'TCP Rst',
+            // tcp__segment_from_cache
+            'suricata_v2_tcp__segment_from_cache' => 'TCP Segment From Cache',
+            // tcp__segment_from_pool
+            'suricata_v2_tcp__segment_from_pool' => 'TCP Segment From Pool',
+            // tcp__segment_memcap_drop
+            'suricata_v2_tcp__segment_memcap_drop' => 'TCP Segment Memcap Drop',
+            // tcp__sessions
+            'suricata_v2_tcp__sessions' => 'TCP Sessions',
+            // tcp__ssn_from_cache
+            'suricata_v2_tcp__ssn_from_cache' => 'TCP SSN From Cache',
+            // tcp__ssn_from_pool
+            'suricata_v2_tcp__ssn_from_pool' => 'TCP SSN From Pool',
+            // tcp__ssn_memcap_drop
+            'suricata_v2_tcp__ssn_memcap_drop' => 'TCP SSN Memcap Drop',
+            // tcp__stream_depth_reached
+            'suricata_v2_tcp__stream_depth_reached' => 'TCP Stream Depth Reached',
+            // tcp__syn
+            'suricata_v2_tcp__syn' => 'TCP Syn',
+            // tcp__synack
+            'suricata_v2_tcp__synack' => 'TCP Syn ACK',
+        ];
     }
 }
 

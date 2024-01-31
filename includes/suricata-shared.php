@@ -504,6 +504,9 @@ $suricata_stat_gauges=[
     'memcap_pressure_max' => 1,
     'uptime' => 1,
     'tcp__memuse' => 1,
+    'tcp__reassembly_memuse' => 1,
     'error_delta' => 1,
     'drop_percent' => 1,
+    'tcp__active_sessions' => 1,
+    'tcp__sessions' => 1,
 ];
