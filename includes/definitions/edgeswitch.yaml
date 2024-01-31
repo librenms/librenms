@@ -21,6 +21,7 @@ discovery:
             - '/^EdgePoint/'
             - '/^USW[ -]/'
             - '/^UBNT US/'
+            - '/^US[W]{0,1}-[\d]{1,2}/'
     -
         sysObjectID:
             - .1.3.6.1.4.1.8072.3.2.10
