@@ -2233,6 +2233,80 @@ function add_device_group(Illuminate\Http\Request $request)
     return api_success($deviceGroup->id, 'id', 'Device group ' . $deviceGroup->name . ' created', 201);
 }
 
+function update_device_group_add_devices(Illuminate\Http\Request $request)
+{
+    $data = json_decode($request->getContent(), true);
+    if (json_last_error() || ! is_array($data)) {
+        return api_error(400, "We couldn't parse the provided json. " . json_last_error_msg());
+    }
+
+    $name = $request->route('name');
+    if (! $name) {
+        return api_error(400, 'No device group name provided');
+    }
+
+    $deviceGroup = ctype_digit($name) ? DeviceGroup::find($name) : DeviceGroup::where('name', $name)->first();
+
+    if (! $deviceGroup) {
+        return api_error(404, "Device group $name not found");
+    }
+
+    if ('static' != $deviceGroup->type) {
+        return api_error(422, 'Only static device group can have devices added');
+    }
+
+    $rules = [
+        'devices' => 'array',
+        'devices.*' => 'integer',
+    ];
+
+    $v = Validator::make($data, $rules);
+    if ($v->fails()) {
+        return api_error(422, $v->messages());
+    }
+
+    $deviceGroup->devices()->syncWithoutDetaching($data['devices']);
+
+    return api_success_noresult(200, 'Devices added');
+}
+
+function update_device_group_remove_devices(Illuminate\Http\Request $request)
+{
+    $data = json_decode($request->getContent(), true);
+    if (json_last_error() || ! is_array($data)) {
+        return api_error(400, "We couldn't parse the provided json. " . json_last_error_msg());
+    }
+
+    $name = $request->route('name');
+    if (! $name) {
+        return api_error(400, 'No device group name provided');
+    }
+
+    $deviceGroup = ctype_digit($name) ? DeviceGroup::find($name) : DeviceGroup::where('name', $name)->first();
+
+    if (! $deviceGroup) {
+        return api_error(404, "Device group $name not found");
+    }
+
+    if ('static' != $deviceGroup->type) {
+        return api_error(422, 'Only static device group can have devices added');
+    }
+
+    $rules = [
+        'devices' => 'array',
+        'devices.*' => 'integer',
+    ];
+
+    $v = Validator::make($data, $rules);
+    if ($v->fails()) {
+        return api_error(422, $v->messages());
+    }
+
+    $deviceGroup->devices()->detach($data['devices']);
+
+    return api_success_noresult(200, 'Devices removed');
+}
+
 function get_device_groups(Illuminate\Http\Request $request)
 {
     $hostname = $request->route('hostname');
