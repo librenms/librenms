@@ -55,6 +55,7 @@ class Device extends BaseModel
         'display',
         'icon',
         'ignore',
+        'ignore_status',
         'ip',
         'location_id',
         'notes',
