@@ -31,11 +31,11 @@ class Ciscospark extends Transport
             'roomId' => $room_id,
         ];
 
-	if (strlen($alert_data['msg']) > Ciscospark::$MAX_MSG_SIZE) {
-	    $msg = substr($alert_data['msg'], 0, Ciscospark::$MAX_MSG_SIZE) . '...';
-	} else {
-	    $msg = $alert_data['msg'];
-	}
+        if (strlen($alert_data['msg']) > Ciscospark::$MAX_MSG_SIZE) {
+            $msg = substr($alert_data['msg'], 0, Ciscospark::$MAX_MSG_SIZE) . '...';
+        } else {
+            $msg = $alert_data['msg'];
+        }
 
         if ($this->config['use-markdown'] === 'on') {
             // Remove blank lines as they create weird markdown behaviors.
