@@ -55,7 +55,8 @@ if ($rowCount != -1) {
     $sql .= " LIMIT $limit_low,$limit_high";
 }
 
-$sql = "SELECT D.device_id, L.location as `location`, D.hostname AS `hostname`, D.sysName, D.last_polled AS `last_polled`, `group_name`, D.last_polled_timetaken AS `last_polled_timetaken` $sql";
+$sql = "SELECT D.device_id, L.location as `location`, D.hostname AS `hostname`, D.sysName, IFNULL(CONVERT_TZ(D.last_polled, @@global.time_zone, ?),D.last_polled) AS `last_polled`, `group_name`, D.last_polled_timetaken AS `last_polled_timetaken` $sql";
+$param[] = session('preferences.timezone');
 
 foreach (dbFetchRows($sql, $param) as $device) {
     if (empty($device['group_name'])) {
