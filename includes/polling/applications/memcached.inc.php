@@ -10,7 +10,6 @@ if (! empty($agent_data['app']['memcached'])) {
 } else {
     try {
         $data = json_app_get($device, $name, '1.1')['data'] ?? [];
-        $data = $data[$app->app_instance] ?? reset($data);
     } catch (JsonAppException $e) {
         $error_string = 'ERROR: ' . $e->getCode() . ':' . $e->getMessage();
         echo PHP_EOL . $name . ':' . $error_string . PHP_EOL;
@@ -19,8 +18,7 @@ if (! empty($agent_data['app']['memcached'])) {
         return;
     }
 }
-echo ' memcached(' . $app->app_instance . ')';
-$data = $data[$app->app_instance] ?? reset($data);  // specified instance or just the first one
+echo ' memcached ';
 
 $rrd_def = RrdDefinition::make()
     ->addDataset('uptime', 'GAUGE', 0, 125000000000)
