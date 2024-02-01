@@ -19,21 +19,29 @@ use LibreNMS\Util\Http;
 class Ciscospark extends Transport
 {
     protected string $name = 'Cisco Webex Teams';
+    // This is the total length minus 4 bytes for ellipses.
+    private static int $MAX_MSG_SIZE = 7435;
 
     public function deliverAlert(array $alert_data): bool
     {
         $room_id = $this->config['room-id'];
         $token = $this->config['api-token'];
-        $url = 'https://api.ciscospark.com/v1/messages';
+        $url = 'https://webexapis.com/v1/messages';
         $data = [
             'roomId' => $room_id,
         ];
 
+	if (strlen($alert_data['msg']) > Ciscospark::$MAX_MSG_SIZE) {
+	    $msg = substr($alert_data['msg'], 0, Ciscospark::$MAX_MSG_SIZE) . '...';
+	} else {
+	    $msg = $alert_data['msg'];
+	}
+
         if ($this->config['use-markdown'] === 'on') {
             // Remove blank lines as they create weird markdown behaviors.
-            $data['markdown'] = preg_replace('/^\s+/m', '', $alert_data['msg']);
+            $data['markdown'] = preg_replace('/^\s+/m', '', $msg);
         } else {
-            $data['text'] = strip_tags($alert_data['msg']);
+            $data['text'] = strip_tags($msg);
         }
 
         $res = Http::client()
