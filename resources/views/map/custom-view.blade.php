@@ -33,7 +33,7 @@
     var edge_port_map = {};
     var node_device_map = {};
     var node_link_map = {};
-    var custom_image_base = "images/custommap/";
+    var custom_image_base = "{{ $base_url }}images/custommap/icons/";
 
     function CreateNetwork() {
         // Flush the nodes and edges so they are rendered immediately

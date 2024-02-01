@@ -63,7 +63,7 @@
     var network_nodes = new vis.DataSet({queue: {delay: 100}});
     var network_edges = new vis.DataSet({queue: {delay: 100}});
     var node_device_map = {};
-    var custom_image_base = "images/custommap/icons/";
+    var custom_image_base = "{{ $base_url }}images/custommap/icons/";
 
     function CreateNetwork() {
         // Flush the nodes and edges so they are rendered immediately
