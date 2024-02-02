@@ -1,0 +1,807 @@
+--**MOD+************************************************************************
+--* Module:    ARUBAWIRED-POE-MIB :POE MIB file
+--*
+--* (c) Copyright 2019-2020 Hewlett Packard Enterprise Development LP
+--* All Rights Reserved.
+--*
+--* The contents of this software are proprietary and confidential
+--* to the Hewlett-Packard Development Company, L.P.  No part of this
+--* program may be photocopied, reproduced, or translated into another
+--* programming language without prior written consent of the
+--* Hewlett-Packard Development Company, L.P.
+--*
+--* Purpose: This file contains MIB definition of ARUBAWIRED-POE-MIB
+--*
+--**MOD-************************************************************************
+
+ARUBAWIRED-POE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, Counter32
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    wndFeatures
+        FROM ARUBAWIRED-NETWORKING-OID
+    pethPsePortEntry, pethMainPseEntry
+        FROM POWER-ETHERNET-MIB;
+
+arubaWiredPoeMIB MODULE-IDENTITY
+    LAST-UPDATED "201906240000Z" -- June 24, 2019
+    ORGANIZATION "HPE/Aruba Networking Division"
+    CONTACT-INFO "Hewlett Packard Company
+                  8000 Foothills Blvd.
+                  Roseville, CA 95747"
+    DESCRIPTION
+        "This MIB module describes management objects
+         that manage Power Source Equipment (PSE).
+         This is the MIB module related to HPE Aruba PoE "
+
+    REVISION     "201906240000Z" -- June 24, 2019
+    DESCRIPTION  "Initial revision."
+    ::= { wndFeatures 8 }
+
+-- **********************************************************************
+-- subtrees in the MIB
+-- **********************************************************************
+
+arubaWiredPoePethPsePort   OBJECT IDENTIFIER ::= { arubaWiredPoeMIB 1 }
+arubaWiredPoeConformance   OBJECT IDENTIFIER ::= { arubaWiredPoeMIB 2 }
+arubaWiredPoePethMainPse   OBJECT IDENTIFIER ::= { arubaWiredPoeMIB 3 }
+arubaWiredPoePethPseModule OBJECT IDENTIFIER ::= { arubaWiredPoeMIB 4 }
+
+-- **********************************************************************
+-- PSE Objects extension
+-- (AUGMENTS pethPsePortTable
+-- **********************************************************************
+
+arubaWiredPoePethPsePortTable OBJECT-TYPE
+      SYNTAX      SEQUENCE OF ArubaWiredPoePethPsePortEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION "A table of objects that display and control the power
+                   characteristics of power Ethernet ports on a Power Source
+                   Entity (PSE) device. This group will be implemented in
+                   managed power Ethernet switches and mid-span devices.
+                   Values of all read-write objects in this table are
+                   persistent at restart/reboot."
+      ::= { arubaWiredPoePethPsePort 1 }
+
+arubaWiredPoePethPsePortEntry OBJECT-TYPE
+      SYNTAX      ArubaWiredPoePethPsePortEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION "The fields in these entries will be used to supplement
+                   fields in 'pethPsePortEntry in ieee802af.mib."
+     AUGMENTS { pethPsePortEntry }
+    ::= { arubaWiredPoePethPsePortTable 1 }
+
+ArubaWiredPoePethPsePortEntry ::=
+    SEQUENCE {
+        arubaWiredPoePethPsePortPowerAllocateBy              INTEGER,
+        arubaWiredPoePethPsePortPreStdDetect                 INTEGER,
+        arubaWiredPoePethPsePortRpd                          INTEGER,
+        arubaWiredPoePethPsePortCurrent                      Integer32,
+        arubaWiredPoePethPsePortVoltage                      Integer32,
+        arubaWiredPoePethPsePortReservedPower                Integer32,
+        arubaWiredPoePethPsePortPowerDrawn                   Integer32,
+        arubaWiredPoePethPsePortAveragePower                 Integer32,
+        arubaWiredPoePethPsePortPeakPower                    Integer32,
+        arubaWiredPoePethPsePortOperStatus                   INTEGER,
+        arubaWiredPoePethPsePortPdSignature                  INTEGER,
+        arubaWiredPoePethPsePortPowerClassification          INTEGER,
+        arubaWiredPoePethPsePortPseAssignedClass             INTEGER,
+        arubaWiredPoePethPsePortPoECycle                     Integer32
+    }
+
+arubaWiredPoePethPsePortPowerAllocateBy OBJECT-TYPE
+      SYNTAX      INTEGER {
+                   usage(1),
+                   class(2)
+                  }
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION "Allows control over the power allocation strategy used for
+                   this port. Two power allocation strategies are class(2)
+                   and usage(1). When allocating by usage(1) power is delivered
+                   as requested by a PD. When allocating by class(2) the PSE
+                   uses the power ramp-up signature of the PD to identify the
+                   PD's power class and use the power level for the specified class."
+      DEFVAL      { 1 }
+      ::= { arubaWiredPoePethPsePortEntry 1 }
+
+arubaWiredPoePethPsePortPreStdDetect OBJECT-TYPE
+      SYNTAX      INTEGER {
+                   off(1),
+                   on(2)
+                  }
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "This field specifies the pre standard detect configuration for this port.
+                   A value of on - indicates that pre-802.3af-standard devices to power on.
+                   A value of off - indicates that only pre-802.3at/bt compliant
+                   devices are allowed. The default value is off."
+      DEFVAL      { 1 }
+      ::= { arubaWiredPoePethPsePortEntry 2 }
+
+arubaWiredPoePethPsePortRpd OBJECT-TYPE
+      SYNTAX      INTEGER {
+                   off(1),
+                   on(2)
+                  }
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "Rapid Power Down is executed by the hardware in the event of a power-supply
+                   failure. It quickly cuts power to a PD to prevent an over-current scenario
+                   in the PSE. This field indicates whether the interface will go down in the
+                   event of any PSU failure or not. A value of on(2) indicates that a power
+                   supply failure will cause the power delivery to be cut on supply failure.
+                   A value of off(1) indicates that the port is unaffected by the failure of
+                   any single PSU.The default value is off(1)."
+      DEFVAL      { 1 }
+      ::= { arubaWiredPoePethPsePortEntry 3 }
+
+arubaWiredPoePethPsePortCurrent OBJECT-TYPE
+      SYNTAX      Integer32
+      UNITS       "milliamperes"
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "This field specifies the current supplied at this port.
+                   This value is specified in milliamperes(mA)."
+      DEFVAL      { 0 }
+      ::= { arubaWiredPoePethPsePortEntry 4 }
+
+arubaWiredPoePethPsePortVoltage OBJECT-TYPE
+      SYNTAX      Integer32
+      UNITS       "deciVolts"
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "This field specifies the Voltage supplied at this port.
+                   This value is specified in 10's of Volts (dV)."
+      DEFVAL      { 0 }
+      ::= { arubaWiredPoePethPsePortEntry 5 }
+
+arubaWiredPoePethPsePortReservedPower OBJECT-TYPE
+      SYNTAX      Integer32
+      UNITS       "milliwatts"
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "This field specifies quantum of power which has been
+                   reserved for the PD at this port. This value is
+                   specified in milliwatts (mW)."
+      DEFVAL      { 0 }
+      ::= { arubaWiredPoePethPsePortEntry 6 }
+
+arubaWiredPoePethPsePortPowerDrawn OBJECT-TYPE
+      SYNTAX      Integer32
+      UNITS       "milliwatts"
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "This field specifies quantum of power which has indicating
+                   the actual power drawn by powered device(PD). This value
+                   is specified in milliwatts (mW)."
+      DEFVAL      { 0 }
+      ::= { arubaWiredPoePethPsePortEntry 7 }
+
+arubaWiredPoePethPsePortAveragePower OBJECT-TYPE
+      SYNTAX      Integer32
+      UNITS       "milliwatts"
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "This field specifies the average power in milliwatts drawn by
+                   the powered device (PD) on this port."
+      DEFVAL      { 0 }
+      ::= { arubaWiredPoePethPsePortEntry 8 }
+
+arubaWiredPoePethPsePortPeakPower OBJECT-TYPE
+      SYNTAX      Integer32
+      UNITS       "milliwatts"
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "This field specifies the peak power supplied in milliwatts to
+                   the powered device (PD) connected to this port."
+      DEFVAL      { 0 }
+      ::= { arubaWiredPoePethPsePortEntry 9 }
+
+arubaWiredPoePethPsePortOperStatus OBJECT-TYPE
+      SYNTAX      INTEGER {
+                   deny(1),
+                   off(2),
+                   on(3)
+                  }
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "This field specifies the operational status of the port."
+      DEFVAL      { 2 }
+      ::= { arubaWiredPoePethPsePortEntry 10 }
+
+arubaWiredPoePethPsePortPdSignature OBJECT-TYPE
+      SYNTAX      INTEGER {
+                   unknownSignature(0),
+                   singleSignature(1),
+                   dualSignature(2)
+                  }
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "This Signature value represents the PD signature. This variable is
+                   valid only while a PD is detected. In 802.3af and 802.3at standards
+                   the power controller on the PSE uses two of the four pairs of wires
+                   in the RJ45 connector to supply power to a power controller on the PD.
+                   With 802.3bt standard the controller on the PSE uses all four pairs.
+                   On the PD side there can either be single power controller, or two distinct
+                   power controllers connected to each of the two pairs and each of the two
+                   controllers would negotiate and draw power independently from the PSE.
+
+                   The Controller on the PSE is capable of detecting the PD signature, which will
+                   indicate whether the PD comprises a single controller or two independent
+                   controllers. Possible values:
+                   unknownSignature : 2-pair mode,
+                   singleSignature  : 4-pair mode and one controller on the PD side,
+                   dualSignature    : 4-pair mode and two controllers on the PD side."
+
+      DEFVAL      { 0 }
+      ::= { arubaWiredPoePethPsePortEntry 11 }
+
+arubaWiredPoePethPsePortPowerClassification OBJECT-TYPE
+      SYNTAX      INTEGER   {
+                   class0(1),
+                   class1(2),
+                   class2(3),
+                   class3(4),
+                   class4(5),
+                   class5(6),
+                   class6(7),
+                   class7(8),
+                   class8(9)
+                  }
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "A read-only value that indicates the PD Class of a detected PD.
+                   Classification is a way to tag different terminals on the
+                   Power over LAN network according to their power consumption.
+                   Devices such as IP telephones, WLAN access points and others,
+                   will be classified according to their power requirements.
+
+                   The meaning of the classification labels is defined in the
+                   IEEE specification.
+
+                   This variable is valid only while a PD is being powered,
+                   that is, while the attribute pethPsePortDetectionStatus
+                   is reporting the enumeration deliveringPower."
+      REFERENCE   "IEEE Std 802.3bt Section 30.9.1.1.6 aPSEPowerClassification."
+      ::= { arubaWiredPoePethPsePortEntry 12 }
+
+arubaWiredPoePethPsePortPseAssignedClass OBJECT-TYPE
+      SYNTAX      INTEGER   {
+                   class0(1),
+                   class1(2),
+                   class2(3),
+                   class3(4),
+                   class4(5),
+                   class5(6),
+                   class6(7)
+                  }
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "This field indicates the actual class assigned by PSE to the PD.
+                   Class demotion allows the PSE to allocate less than the PD requested
+                   power based on the PD requested power and PSE available power. This
+                   information is published to the PD via the LLDP protocol. This read-only
+                   value indicates the PSE assigned class on this port.
+
+                   This variable is valid only while a PD is being powered,
+                   that is, while the attribute pethPsePortDetectionStatus
+                   is reporting the enumeration deliveringPower."
+      ::= { arubaWiredPoePethPsePortEntry 13 }
+
+arubaWiredPoePethPsePortPoECycle OBJECT-TYPE
+      SYNTAX      Integer32
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION "This object is used for PoE port reset with timeout of 1-60s.
+                   PoE interface is disabled and then enabled with timeout as
+                   input."
+      DEFVAL      { 1 }
+      ::= { arubaWiredPoePethPsePortEntry 14 }
+
+-- **********************************************************************
+-- PSE Objects extension for Four pair related parameters on poe port
+-- (AUGMENTS pethPsePortTable)
+-- **********************************************************************
+arubaWiredPoePethPseFourPairPortTable OBJECT-TYPE
+      SYNTAX      SEQUENCE OF ArubaWiredPoePethPseFourPairPortEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION "A table of objects that display and control the power
+                   characteristics of power Ethernet ports on a Power Source
+                   Entity (PSE) device. This group will be implemented in
+                   managed power Ethernet switches and mid-span devices.
+                   Values of all read-write objects in this table are
+                   persistent at restart/reboot."
+      ::= { arubaWiredPoePethPsePort 2 }
+
+arubaWiredPoePethPseFourPairPortEntry OBJECT-TYPE
+      SYNTAX      ArubaWiredPoePethPseFourPairPortEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION "The fields in these entries will be used to supplement
+                   fields in 'pethPsePortEntry in ieee802af.mib."
+     AUGMENTS { pethPsePortEntry }
+    ::= { arubaWiredPoePethPseFourPairPortTable 1 }
+
+ArubaWiredPoePethPseFourPairPortEntry ::=
+    SEQUENCE {
+        arubaWiredPoePethPsePortDetectionStatusPairA         INTEGER,
+        arubaWiredPoePethPsePortDetectionStatusPairB         INTEGER,
+        arubaWiredPoePethPsePortPowerClassificationPairA     INTEGER,
+        arubaWiredPoePethPsePortPowerClassificationPairB     INTEGER,
+        arubaWiredPoePethPsePortPseAssignedClassA            INTEGER,
+        arubaWiredPoePethPsePortPseAssignedClassB            INTEGER,
+        arubaWiredPoePethPsePortInvalidSignatureCounterPairA Counter32,
+        arubaWiredPoePethPsePortInvalidSignatureCounterPairB Counter32,
+        arubaWiredPoePethPsePortPowerDeniedCounterPairA      Counter32,
+        arubaWiredPoePethPsePortPowerDeniedCounterPairB      Counter32,
+        arubaWiredPoePethPsePortOverLoadCounterPairA         Counter32,
+        arubaWiredPoePethPsePortOverLoadCounterPairB         Counter32,
+        arubaWiredPoePethPsePortMPSAbsentCounterPairA        Counter32,
+        arubaWiredPoePethPsePortMPSAbsentCounterPairB        Counter32
+    }
+
+arubaWiredPoePethPsePortDetectionStatusPairA OBJECT-TYPE
+      SYNTAX      INTEGER {
+                   searchingAltA(1),
+                   deliveringPowerAltA(2),
+                   faultAltA(3)
+                  }
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "Describes the operational status of the port PD detection.
+                   A value of deliveringPowerAltA - indicates that the PSE State
+                   diagram is in the state POWER_ON_PRI if alt_pri='a', or the
+                   state POWER_ON_SEC if alt_pri='b'.
+                   A value of faultAltA - indicates that the PSE State diagram
+                   is in the state IDLE_PRI if alt_pri='a', or the state IDLE_SEC
+                   if alt_pri='b' due to the variable error_condition_pri = TRUE
+                   (if alt_pri='a') or error_condition_sec = TRUE (if alt_pri='b').
+                   A value of searchingAltA - indicates the PSE State diagram is
+                   in a state other than those listed above."
+      REFERENCE   "IEEE Std 802.3bt Section 30.9.1.1.5a aPSEPowerDetectionStatusA."
+      DEFVAL      { 1 }
+      ::= { arubaWiredPoePethPseFourPairPortEntry 1 }
+
+arubaWiredPoePethPsePortDetectionStatusPairB  OBJECT-TYPE
+      SYNTAX      INTEGER {
+                   searchingAltB(1),
+                   deliveringPowerAltB(2),
+                   faultAltB(3)
+                  }
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "Describes the operational status of the port PD detection.
+                   A value of deliveringPowerAltB - indicates that the PSE State
+                   diagram is in the state POWER_ON_SEC if alt_pri='a', or the
+                   state POWER_ON_PRI if alt_pri='b'.
+                   A value of faultAltB - indicates that the PSE State diagram
+                   is in the state IDLE_SEC if alt_pri='a', or the state IDLE_PRI
+                   if alt_pri='b' due to the variable error_condition_sec = TRUE
+                   (if alt_pri='a') or error_condition_pri = TRUE (if alt_pri='b').
+                   A value of searchingAltB - indicates the PSE State diagram is
+                   in a state other than those listed above."
+      REFERENCE   "IEEE Std 802.3bt Section 30.9.1.1.5b aPSEPowerDetectionStatusB."
+      DEFVAL      { 1 }
+      ::= { arubaWiredPoePethPseFourPairPortEntry 2 }
+
+arubaWiredPoePethPsePortPowerClassificationPairA OBJECT-TYPE
+      SYNTAX     INTEGER {
+                  class1(1),
+                  class2(2),
+                  class3(3),
+                  class4(4),
+                  class5(5)
+                  }
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "A read-only value that indicates the PD Class of a detected
+                   dual-signature PD on paira.
+
+                   Classification is a way to tag different terminals on the
+                   Power over LAN network according to their power consumption.
+                   Devices such as IP telephones, WLAN access points and others,
+                   will be classified according to their power requirements.
+
+                   The meaning of the classification labels is defined in the
+                   IEEE specification.
+
+                   This variable is valid only while a PD is being powered that is,
+                   while the attribute arubaWiredPoePethPsePortDetectionStatusPairA
+                   is reporting the enumeration deliveringPowerAltA."
+
+      REFERENCE   "IEEE Std 802.3bt Section 30.9.1.1.6a aPSEPowerClassificationA."
+      ::= { arubaWiredPoePethPseFourPairPortEntry 3 }
+
+arubaWiredPoePethPsePortPowerClassificationPairB OBJECT-TYPE
+      SYNTAX     INTEGER {
+                  class1(1),
+                  class2(2),
+                  class3(3),
+                  class4(4),
+                  class5(5)
+                  }
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "A read-only value that indicates the PD Class of a detected
+                   dual-signature PD on paira.
+
+                   Classification is a way to tag different terminals on the
+                   Power over LAN network according to their power consumption.
+                   Devices such as IP telephones, WLAN access points and others,
+                   will be classified according to their power requirements.
+
+                   The meaning of the classification labels is defined in the
+                   IEEE specification.
+
+                   This variable is valid only while a PD is being powered,
+                   that is, while the attribute arubaWiredPoePethPsePortDetectionStatusPairB
+                   is reporting the enumeration deliveringPowerAltB."
+
+      REFERENCE   "IEEE Std 802.3bt Section 30.9.1.1.6b aPSEPowerClassificationB."
+      ::= { arubaWiredPoePethPseFourPairPortEntry 4 }
+
+arubaWiredPoePethPsePortPseAssignedClassA OBJECT-TYPE
+      SYNTAX      INTEGER   {
+                   class1(1),
+                   class2(2),
+                   class3(3),
+                   class4(4)
+                  }
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "This field indicates the actual class assigned by PSE to the PD.
+                   Class demotion allows the PSE to allocate less than the PD requested
+                   power based on the PD requested power and PSE available power. This
+                   information is published to the PD via the LLDP protocol. This read-only
+                   value indicates the PSE assigned class to PairA of this port."
+      ::= { arubaWiredPoePethPseFourPairPortEntry 5 }
+
+arubaWiredPoePethPsePortPseAssignedClassB OBJECT-TYPE
+      SYNTAX      INTEGER   {
+                   class1(1),
+                   class2(2),
+                   class3(3),
+                   class4(4)
+                  }
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "This field indicates the actual class assigned by PSE to the PD.
+                   Class demotion allows the PSE to allocate less than the PD requested
+                   power based on the PD requested power and PSE available power. This
+                   information is published to the PD via the LLDP protocol. This read-only
+                   value indicates the PSE assigned class to PairA of this port."
+      ::= { arubaWiredPoePethPseFourPairPortEntry 6 }
+
+arubaWiredPoePethPsePortInvalidSignatureCounterPairA OBJECT-TYPE
+      SYNTAX      Counter32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "This counter is incremented when the PSE state diagram
+                   enters the state SIGNATURE_INVALID, if alt_pri='a'."
+      REFERENCE   "IEEE Std 802.3bt Section 30.9.1.1.7a aPSEInvalidSignatureCounter."
+      DEFVAL      { 0 }
+      ::= { arubaWiredPoePethPseFourPairPortEntry 7 }
+
+arubaWiredPoePethPsePortInvalidSignatureCounterPairB OBJECT-TYPE
+      SYNTAX      Counter32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "This counter is incremented when the PSE state diagram
+                   enters the state SIGNATURE_INVALID, if alt_pri='b'"
+      REFERENCE   "IEEE Std 802.3bt Section 30.9.1.1.7b aPSEInvalidSignatureCounter."
+      DEFVAL      { 0 }
+      ::= { arubaWiredPoePethPseFourPairPortEntry 8 }
+
+arubaWiredPoePethPsePortPowerDeniedCounterPairA OBJECT-TYPE
+      SYNTAX     Counter32
+      MAX-ACCESS read-only
+      STATUS     current
+      DESCRIPTION "This counter is incremented when the PSE state diagram
+                   enters the state POWER_DENIED, if alt_pri='a'."
+      REFERENCE   "IEEE Std 802.3bt Section 30.9.1.1.8a aPSEPowerDeniedCounter."
+      DEFVAL      { 0 }
+      ::= { arubaWiredPoePethPseFourPairPortEntry 9 }
+
+arubaWiredPoePethPsePortPowerDeniedCounterPairB OBJECT-TYPE
+      SYNTAX      Counter32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "This counter is incremented when the PSE state diagram
+                   enters the state POWER_DENIED, if alt_pri='b'."
+      REFERENCE   "IEEE Std 802.3bt Section 30.9.1.1.8b aPSEPowerDeniedCounter."
+      DEFVAL      { 0 }
+      ::= { arubaWiredPoePethPseFourPairPortEntry 10 }
+
+arubaWiredPoePethPsePortOverLoadCounterPairA OBJECT-TYPE
+      SYNTAX      Counter32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "This counter is incremented when the PSE state diagram
+                   enters the state ERROR_DELAY_OVER, if alt_pri='a'."
+      REFERENCE   "IEEE Std 802.3bt Section 30.9.1.1.9a aPSEOverLoadCounter."
+      DEFVAL      { 0 }
+      ::= { arubaWiredPoePethPseFourPairPortEntry 11 }
+
+arubaWiredPoePethPsePortOverLoadCounterPairB OBJECT-TYPE
+      SYNTAX      Counter32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "This counter is incremented when the PSE state diagram
+                   enters the state ERROR_DELAY_OVER, if alt_pri='b'."
+      REFERENCE   "IEEE Std 802.3bt Section 30.9.1.1.10 aPSEOverLoadCounter."
+      DEFVAL      { 0 }
+      ::= { arubaWiredPoePethPseFourPairPortEntry 12 }
+
+arubaWiredPoePethPsePortMPSAbsentCounterPairA OBJECT-TYPE
+      SYNTAX      Counter32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "This counter is incremented when the PSE state diagram
+                   transitions directly from the state POWER_ON to the
+                   state IDLE due to tmpdo_timer_done being asserted,
+                   if alt_pri='a'."
+      REFERENCE   "IEEE Std 802.3bt Section 30.9.1.1.11a aPSEMPSAbsentCounter."
+      DEFVAL      { 0 }
+      ::= { arubaWiredPoePethPseFourPairPortEntry 13 }
+
+arubaWiredPoePethPsePortMPSAbsentCounterPairB OBJECT-TYPE
+      SYNTAX     Counter32
+      MAX-ACCESS read-only
+      STATUS     current
+      DESCRIPTION "This counter is incremented when the PSE state diagram
+                   transitions directly from the state POWER_ON to the
+                   state IDLE due to tmpdo_timer_done being asserted,
+                   if alt_pri='b'."
+      REFERENCE   "IEEE Std 802.3bt Section 30.9.1.1.11b aPSEMPSAbsentCounter."
+      DEFVAL      { 0 }
+      ::= { arubaWiredPoePethPseFourPairPortEntry 14 }
+
+-- **********************************************************************
+-- Power Over Ethernet (POE) per-PSE information - applies
+-- to each power-source equipment (PSE).
+-- **********************************************************************
+
+arubaWiredPoePethMainPseTable OBJECT-TYPE
+      SYNTAX      SEQUENCE OF ArubaWiredPoePethMainPseEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION "A table of objects that display and control attributes
+                   of the main power source in a PSE  device. Ethernet
+                   switches are one example of boxes that would support
+                   these objects. Values of all read-write objects in this
+                   table are persistent at restart/reboot."
+      ::= { arubaWiredPoePethMainPse 1 }
+
+arubaWiredPoePethMainPseEntry OBJECT-TYPE
+      SYNTAX      ArubaWiredPoePethMainPseEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION "The fields in these entries will be used to supplement
+                   fields in 'pethMainPseEntry in ieee802af.mib."
+      AUGMENTS { pethMainPseEntry }
+      ::= { arubaWiredPoePethMainPseTable 1 }
+
+ArubaWiredPoePethMainPseEntry ::=
+    SEQUENCE {
+        arubaWiredPoePethMainPseReservedPower       Integer32,
+        arubaWiredPoePethMainPseFailoverPower       Integer32,
+        arubaWiredPoePethMainPseRedundantPower      Integer32
+    }
+
+arubaWiredPoePethMainPseReservedPower OBJECT-TYPE
+      SYNTAX      Integer32
+      UNITS       "Watts"
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "This field specifies the power in Watts, in the switch
+                   available for PoE power delivery. This power is available
+                   only for subsystems of type chassis, as power supplies are
+                   associated with chassis subsystem."
+      DEFVAL      { 0 }
+      ::= { arubaWiredPoePethMainPseEntry 1 }
+
+arubaWiredPoePethMainPseFailoverPower OBJECT-TYPE
+      SYNTAX      Integer32
+      UNITS       "Watts"
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "This field specifies the power in Watts, in the switch
+                   available for PoE power delivery when a single power supply
+                   failure happens. This power is available only for subsystems
+                   of type chassis, as power supplies are associated with
+                   chassis subsystem."
+      DEFVAL      { 0 }
+      ::= { arubaWiredPoePethMainPseEntry 2 }
+
+arubaWiredPoePethMainPseRedundantPower OBJECT-TYPE
+      SYNTAX      Integer32
+      UNITS       "Watts"
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "This field specifies power in Watts reserved by power supply
+                   based on power redundancy configurations. This power is
+                   available only for subsystems of type chassis, as power
+                   supplies are associated with chassis subsystem."
+
+      DEFVAL      { 0 }
+      ::= { arubaWiredPoePethMainPseEntry 3 }
+
+-- **********************************************************************
+-- AlwaysOnPOE Information on module - applies
+-- to each module equipment of switch.
+-- **********************************************************************
+
+arubaWiredPoePethPseModuleTable OBJECT-TYPE
+      SYNTAX      SEQUENCE OF ArubaWiredPoePethPseModuleEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION "A table of objects contains the AlwaysOnPoe status
+                   information on module."
+      ::= { arubaWiredPoePethPseModule 1 }
+
+arubaWiredPoePethPseModuleEntry OBJECT-TYPE
+      SYNTAX      ArubaWiredPoePethPseModuleEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION "The fields in these entries will be used to display
+                   alwaysonpoe status information on specific module."
+      INDEX       {arubaWiredPoePethPseModuleGroupIndex,
+                   arubaWiredPoePethPseModuleSlotIndex}
+      ::= { arubaWiredPoePethPseModuleTable 1 }
+
+ArubaWiredPoePethPseModuleEntry ::=
+    SEQUENCE {
+    arubaWiredPoePethPseModuleGroupIndex    Integer32,
+    arubaWiredPoePethPseModuleSlotIndex     Integer32,
+    arubaWiredPoePethPseModuleAlwaysOnPoe   INTEGER
+    }
+
+arubaWiredPoePethPseModuleGroupIndex OBJECT-TYPE
+      SYNTAX      Integer32 (1..2147483647)
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION "This variable uniquely identifies the group containing the
+                   module to which a power Ethernet PSE is connected.
+                   Group means box in the stack and the value 1 MUST be used
+                   for non-modular devices."
+
+      ::= { arubaWiredPoePethPseModuleEntry 1 }
+
+arubaWiredPoePethPseModuleSlotIndex OBJECT-TYPE
+      SYNTAX      Integer32 (1..2147483647)
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION "This variable uniquely identifies the module in a switch
+                   and value 1 must be used for non-modular devices."
+
+      ::= { arubaWiredPoePethPseModuleEntry 2 }
+
+arubaWiredPoePethPseModuleAlwaysOnPoe OBJECT-TYPE
+      SYNTAX      INTEGER {
+                           off(1),
+                           on(2)
+                           }
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "Alwayson PoE is a feature that provides the ability for a
+                   switch to continue to provide power across a soft reboot.
+                   Value on(2) indicates Always-on PoE feature is enabled on
+                   the subsystem. Value off(1) indicates Alwayson PoE feature
+                   is disabled on the subsystem. This feature is applicable to
+                   subsystems of type chassis in non-modular switches, and to
+                   subsystems of type line-card in modular switches. This
+                   configuration is ignored on a non-PoE capable subsystems."
+      DEFVAL     { 2 }
+      ::= { arubaWiredPoePethPseModuleEntry 3 }
+
+-- **********************************************************************
+-- Conformance information
+-- **********************************************************************
+
+arubaWiredPoeCompliances OBJECT IDENTIFIER ::= { arubaWiredPoeConformance 1 }
+arubaWiredPoeGroups      OBJECT IDENTIFIER ::= { arubaWiredPoeConformance 2 }
+
+-- **********************************************************************
+-- compliance statements
+-- **********************************************************************
+
+arubaWiredPoeCompliance MODULE-COMPLIANCE
+      STATUS      current
+      DESCRIPTION "A compliance statement for HP Routing switches with PoE
+                   capability."
+      MODULE
+      MANDATORY-GROUPS {  arubaWiredPoePethPsePortTable,
+                          arubaWiredPoePethMainPseTable,
+                          arubaWiredPoePethPseModuleTable
+                       }
+
+      GROUP       arubaWiredPoePethPsePortTableGroup
+      DESCRIPTION "A Collection of Object(s) that display the current poe port
+                   parameters information."
+
+      GROUP       arubaWiredPoePethPseFourPairPortTableGroup
+      DESCRIPTION "A Collection of Object(s) that display the poe port
+                   four pair parameters information."
+
+      GROUP       arubaWiredPoePethMainPseTableGroup
+      DESCRIPTION "A Collection of Object(s) that provide poe information about
+                   each power source equipment instance."
+
+      GROUP       arubaWiredPoePethPseModuleTableGroup
+      DESCRIPTION "A Collection of Object(s) that provide AlwaysOnPoe
+                   information about each module on switch."
+
+      ::= { arubaWiredPoeCompliances 1 }
+
+arubaWiredPoePethPsePortTableGroup OBJECT-GROUP
+      OBJECTS     {
+                    arubaWiredPoePethPsePortPowerAllocateBy,
+                    arubaWiredPoePethPsePortPreStdDetect,
+                    arubaWiredPoePethPsePortRpd,
+                    arubaWiredPoePethPsePortCurrent,
+                    arubaWiredPoePethPsePortVoltage,
+                    arubaWiredPoePethPsePortReservedPower,
+                    arubaWiredPoePethPsePortPowerDrawn,
+                    arubaWiredPoePethPsePortAveragePower,
+                    arubaWiredPoePethPsePortPeakPower,
+                    arubaWiredPoePethPsePortOperStatus,
+                    arubaWiredPoePethPsePortPdSignature,
+                    arubaWiredPoePethPsePortPowerClassification,
+                    arubaWiredPoePethPsePortPseAssignedClass,
+                    arubaWiredPoePethPsePortPoECycle
+                  }
+      STATUS      current
+      DESCRIPTION "A collection of objects display configuration, status,
+                   PD information and mesurements of PoE PSE Port table."
+      ::= { arubaWiredPoeGroups 1 }
+
+arubaWiredPoePethPseFourPairPortTableGroup OBJECT-GROUP
+      OBJECTS     {
+                    arubaWiredPoePethPsePortDetectionStatusPairA,
+                    arubaWiredPoePethPsePortDetectionStatusPairB,
+                    arubaWiredPoePethPsePortPowerClassificationPairA,
+                    arubaWiredPoePethPsePortPowerClassificationPairB,
+                    arubaWiredPoePethPsePortPseAssignedClassA,
+                    arubaWiredPoePethPsePortPseAssignedClassB,
+                    arubaWiredPoePethPsePortInvalidSignatureCounterPairA,
+                    arubaWiredPoePethPsePortInvalidSignatureCounterPairB,
+                    arubaWiredPoePethPsePortPowerDeniedCounterPairA,
+                    arubaWiredPoePethPsePortPowerDeniedCounterPairB,
+                    arubaWiredPoePethPsePortOverLoadCounterPairA,
+                    arubaWiredPoePethPsePortOverLoadCounterPairB,
+                    arubaWiredPoePethPsePortMPSAbsentCounterPairA,
+                    arubaWiredPoePethPsePortMPSAbsentCounterPairB
+                  }
+      STATUS      current
+      DESCRIPTION "A collection of objects display four pair paramentets of
+                   each pair PD information, status, and counters of
+                   PoE PSE Port table."
+      ::= { arubaWiredPoeGroups 2 }
+
+arubaWiredPoePethMainPseTableGroup OBJECT-GROUP
+      OBJECTS     {
+                   arubaWiredPoePethMainPseReservedPower,
+                   arubaWiredPoePethMainPseFailoverPower,
+                   arubaWiredPoePethMainPseRedundantPower
+                  }
+      STATUS      current
+      DESCRIPTION "A Collection of Object(s) that provide information about
+                   each power source equipment instance."
+      ::= { arubaWiredPoeGroups 3 }
+
+arubaWiredPoePethPseModuleTableGroup OBJECT-GROUP
+      OBJECTS     {
+                   arubaWiredPoePethPseModuleAlwaysOnPoe
+                  }
+      STATUS      current
+      DESCRIPTION "A Collection of Object(s) that provide AlwaysOnPoe
+                   information about each module on switch."
+      ::= { arubaWiredPoeGroups 4 }
+END

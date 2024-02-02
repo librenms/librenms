@@ -1,0 +1,600 @@
+--**MOD+***********************************************************************
+--* Module:    ARUBAWIRED-MVRP-MIB.mib
+--*
+--* (c) Copyright 2017 Hewlett Packard Enterprise Development LP
+--* All Rights Reserved.
+--*
+--* The contents of this software are proprietary and confidential
+--* to the Hewlett-Packard Development Company, L.P.  No part of this
+--* program may be photocopied, reproduced, or translated into another
+--* programming language without prior written consent of the
+--* Hewlett-Packard Development Company, L.P.
+--*
+--* Purpose: This file contains MIB definition of ARUBAWIRED-MVRP-MIB
+--*
+--**MOD-***********************************************************************
+
+ARUBAWIRED-MVRP-MIB DEFINITIONS  ::= BEGIN
+
+IMPORTS
+  Integer32, Counter32, MODULE-IDENTITY, NOTIFICATION-TYPE, Gauge32,
+  OBJECT-TYPE
+               FROM SNMPv2-SMI
+  MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+               FROM SNMPv2-CONF
+  TimeInterval, TruthValue
+               FROM SNMPv2-TC
+  InterfaceIndex
+               FROM IF-MIB
+  EnabledStatus
+              FROM P-BRIDGE-MIB
+  VlanId
+              FROM Q-BRIDGE-MIB
+  wndFeatures
+              FROM ARUBAWIRED-NETWORKING-OID;
+
+arubaWiredMvrpMIB MODULE-IDENTITY
+    LAST-UPDATED "201711020000Z" -- November 02, 2017
+    ORGANIZATION "HPE/Aruba Networking Division"
+    CONTACT-INFO "Hewlett Packard Company
+                   8000 Foothills Blvd.
+                   Roseville, CA 95747"
+    DESCRIPTION  "This is the MIB module related to HPE Aruba VSX feature"
+
+    REVISION     "201711020000Z" -- November 02, 2017
+    DESCRIPTION  "Initial revision."
+
+    ::= { wndFeatures 6 }
+
+--**********************************************************************
+-- The MVRP MIB Objects
+-- **********************************************************************
+
+arubaWiredMvrpNotifications     OBJECT IDENTIFIER ::= { arubaWiredMvrpMIB 0 }
+arubaWiredMvrpObjects           OBJECT IDENTIFIER ::= { arubaWiredMvrpMIB 1 }
+arubaWiredMvrpConformance       OBJECT IDENTIFIER ::= { arubaWiredMvrpMIB 3 }
+
+--**********************************************************************
+--Start of MIB objects
+--**********************************************************************
+
+arubaWiredMvrpConfig           OBJECT IDENTIFIER ::= { arubaWiredMvrpObjects 1 }
+arubaWiredMvrpStats            OBJECT IDENTIFIER ::= { arubaWiredMvrpObjects 2 }
+
+
+arubaWiredMvrpGlobalClearStats OBJECT-TYPE
+  SYNTAX  TruthValue
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+              "Defines the global clear statistics control for MVRP.
+              True(1) indicates that MVRP should clear all
+              statistic counters related to all ports in the system.
+              A write operation of False(0) leads to a no operation and
+              a GET request for this object always returns FALSE."
+ ::= { arubaWiredMvrpConfig 1 }
+
+arubaWiredMvrpMaxVlanLimit OBJECT-TYPE
+  SYNTAX     Integer32
+  MAX-ACCESS read-write
+  STATUS     current
+  DESCRIPTION
+              "Defines the maximum number of dynamic VLANs that
+              can be created on the system by MVRP. If the number of VLANs
+              created by MVRP reaches this limit, the system will prevent
+              MVRP from creating additional VLANs. A write operation for
+              this object is not supported."
+
+ ::= { arubaWiredMvrpConfig 2 }
+
+---------------------------------------------------------------
+--MVRP Port Config Table
+---------------------------------------------------------------
+--joinTimer will be managed by ieee8021BridgePortMrpJoinTime
+--leaveTimer will be managed by ieee8021BridgePortMrpLeaveTime
+--leaveAllTimer will be managed by ieee8021BridgePortMrpLeaveAllTime
+--Global MVRP enable will be managed by ieee8021QBridgeMvrpEnabledStatus
+--Port MVRP enable will be managed by ieee8021QBridgePortMvrpEnabledStatus
+--Forbidden mode of Registrar state will be managed by
+--ieee8021QBridgeVlanForbiddenEgressPorts
+
+arubaWiredMvrpPortConfigTable OBJECT-TYPE
+  SYNTAX      SEQUENCE OF ArubaWiredMvrpPortConfigEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+              "A table containing MVRP port configuration information."
+ ::= { arubaWiredMvrpConfig 3 }
+
+arubaWiredMvrpPortConfigEntry OBJECT-TYPE
+  SYNTAX  ArubaWiredMvrpPortConfigEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+            "An MVRP port configuration entry."
+  INDEX { arubaWiredMvrpPortConfigifIndex }
+ ::= { arubaWiredMvrpPortConfigTable 1 }
+
+ArubaWiredMvrpPortConfigEntry ::= SEQUENCE {
+  arubaWiredMvrpPortConfigifIndex          InterfaceIndex,
+  arubaWiredMvrpPortConfigRegistrarMode    INTEGER,
+  arubaWiredMvrpPortConfigPeriodicTimer    Gauge32,
+  arubaWiredMvrpPortConfigPeriodicTransmissionStatus  EnabledStatus,
+  arubaWiredMvrpPortStatsClearStats        TruthValue
+  }
+
+arubaWiredMvrpPortConfigifIndex OBJECT-TYPE
+  SYNTAX  InterfaceIndex
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+         "The index value that uniquely identifies the interface to
+         which this entry is applicable.  The interface identified by
+         a particular value of this index is the same interface as
+         identified by the same value of the IF-MIB's ifIndex."
+ ::= { arubaWiredMvrpPortConfigEntry 1 }
+
+arubaWiredMvrpPortConfigRegistrarMode OBJECT-TYPE
+  SYNTAX  INTEGER
+   {
+   normal(1),
+   fixed(2)
+   }
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+            "Defines the mode of operation of all the registrar state
+            machines associated to the port.
+            normal - Registration as well as de-registration of VLANs are
+                     allowed.
+            fixed - The Registrar ignores all MRP messages and remains in
+                    IN state(Registered).
+            NOTE: Forbidden Registration Mode will be managed by
+                  ieee8021QBridgeVlanForbiddenEgressPorts."
+
+  DEFVAL  { normal }
+ ::= { arubaWiredMvrpPortConfigEntry 2 }
+
+arubaWiredMvrpPortConfigPeriodicTimer OBJECT-TYPE
+  SYNTAX  Gauge32 (100..1000000)
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+            "Interval at which the Periodic transmission state machine
+            of an MVRP instance generates transmission opportunities
+            for the MVRP instance."
+  DEFVAL  { 100 }
+ ::= { arubaWiredMvrpPortConfigEntry 3 }
+
+arubaWiredMvrpPortConfigPeriodicTransmissionStatus OBJECT-TYPE
+  SYNTAX    EnabledStatus
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+              "Used to enable or disable the Periodic transmission
+              state machine of an MVRP instance."
+  DEFVAL  { enabled }
+ ::= { arubaWiredMvrpPortConfigEntry 4 }
+
+arubaWiredMvrpPortStatsClearStats OBJECT-TYPE
+  SYNTAX TruthValue
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+             "Clear all statistics parameters corresponding to this port.
+              True(1) indicates that MVRP will clear all
+              statistic counters related to this port.
+              A write operation of False(0) leads to a no operation and
+              a GET request for this object always returns FALSE."
+
+::= { arubaWiredMvrpPortConfigEntry 5 }
+
+
+---------------------------------------------------------------
+--MVRP Port Statistics Table
+---------------------------------------------------------------
+--Last PDU Origin will be managed by ieee8021QBridgePortMvrpLastPduOrigin
+--Registration failed will be managed by
+--ieee8021QBridgePortMvrpFailedRegistrations
+
+arubaWiredMvrpPortStatsTable OBJECT-TYPE
+  SYNTAX  SEQUENCE OF ArubaWiredMvrpPortStatsEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+              "A table containing MVRP port statistics information."
+ ::= { arubaWiredMvrpStats 1 }
+
+arubaWiredMvrpPortStatsEntry OBJECT-TYPE
+  SYNTAX  ArubaWiredMvrpPortStatsEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+            "An MVRP port statistics entry."
+  INDEX { arubaWiredMvrpPortStatsifIndex }
+ ::= { arubaWiredMvrpPortStatsTable 1 }
+
+ArubaWiredMvrpPortStatsEntry ::= SEQUENCE {
+  arubaWiredMvrpPortStatsifIndex InterfaceIndex,
+  arubaWiredMvrpPortStatsNewReceived  Counter32,
+  arubaWiredMvrpPortStatsJoinInReceived  Counter32,
+  arubaWiredMvrpPortStatsJoinEmptyReceived  Counter32,
+  arubaWiredMvrpPortStatsLeaveReceived  Counter32,
+  arubaWiredMvrpPortStatsInReceived  Counter32,
+  arubaWiredMvrpPortStatsEmptyReceived  Counter32,
+  arubaWiredMvrpPortStatsLeaveAllReceived  Counter32,
+  arubaWiredMvrpPortStatsNewTransmitted  Counter32,
+  arubaWiredMvrpPortStatsJoinInTransmitted  Counter32,
+  arubaWiredMvrpPortStatsJoinEmptyTransmitted  Counter32,
+  arubaWiredMvrpPortStatsLeaveTransmitted  Counter32,
+  arubaWiredMvrpPortStatsInTransmitted  Counter32,
+  arubaWiredMvrpPortStatsEmptyTransmitted  Counter32,
+  arubaWiredMvrpPortStatsLeaveAllTransmitted  Counter32,
+  arubaWiredMvrpPortStatsTotalPDUReceived  Counter32,
+  arubaWiredMvrpPortStatsTotalPDUTransmitted  Counter32,
+  arubaWiredMvrpPortStatsFramesDiscarded  Counter32
+  }
+
+arubaWiredMvrpPortStatsifIndex OBJECT-TYPE
+  SYNTAX  InterfaceIndex
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+         "The index value that uniquely identifies the interface to
+         which this entry is applicable.  The interface identified by
+         a particular value of this index is the same interface as
+         identified by the same value of the IF-MIB's ifIndex."
+ ::= { arubaWiredMvrpPortStatsEntry 1 }
+
+arubaWiredMvrpPortStatsNewReceived OBJECT-TYPE
+  SYNTAX  Counter32
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+              "The number of New messages received."
+ ::= { arubaWiredMvrpPortStatsEntry 2 }
+
+arubaWiredMvrpPortStatsJoinInReceived OBJECT-TYPE
+  SYNTAX  Counter32
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+              "The number of Join In messages received."
+ ::= { arubaWiredMvrpPortStatsEntry 3 }
+
+arubaWiredMvrpPortStatsJoinEmptyReceived OBJECT-TYPE
+  SYNTAX  Counter32
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+            "The number of Join Empty messages received."
+ ::= { arubaWiredMvrpPortStatsEntry 4 }
+
+arubaWiredMvrpPortStatsLeaveReceived OBJECT-TYPE
+  SYNTAX  Counter32
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+              "The number of Leave messages received."
+ ::= { arubaWiredMvrpPortStatsEntry 5 }
+
+arubaWiredMvrpPortStatsInReceived OBJECT-TYPE
+  SYNTAX  Counter32
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+            "The number of In messages received."
+ ::= { arubaWiredMvrpPortStatsEntry 6 }
+
+arubaWiredMvrpPortStatsEmptyReceived OBJECT-TYPE
+  SYNTAX  Counter32
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+            "The number of Empty messages received."
+ ::= { arubaWiredMvrpPortStatsEntry 7 }
+
+arubaWiredMvrpPortStatsLeaveAllReceived OBJECT-TYPE
+  SYNTAX  Counter32
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+            "The number of Leave all messages received."
+ ::= { arubaWiredMvrpPortStatsEntry 8 }
+
+arubaWiredMvrpPortStatsNewTransmitted OBJECT-TYPE
+  SYNTAX  Counter32
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+            "The number of New messages transmitted."
+ ::= { arubaWiredMvrpPortStatsEntry 9 }
+
+arubaWiredMvrpPortStatsJoinInTransmitted OBJECT-TYPE
+  SYNTAX  Counter32
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+            "The number of Join In messages transmitted."
+ ::= { arubaWiredMvrpPortStatsEntry 10 }
+
+arubaWiredMvrpPortStatsJoinEmptyTransmitted OBJECT-TYPE
+  SYNTAX  Counter32
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+            "The number of Join Empty messages transmitted."
+ ::= { arubaWiredMvrpPortStatsEntry 11 }
+
+arubaWiredMvrpPortStatsLeaveTransmitted OBJECT-TYPE
+  SYNTAX  Counter32
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+            "The number of Leave messages transmitted."
+ ::= { arubaWiredMvrpPortStatsEntry 12 }
+
+arubaWiredMvrpPortStatsInTransmitted OBJECT-TYPE
+  SYNTAX  Counter32
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+            "The number of In messages transmitted."
+ ::= { arubaWiredMvrpPortStatsEntry 13 }
+
+arubaWiredMvrpPortStatsEmptyTransmitted OBJECT-TYPE
+  SYNTAX  Counter32
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+            "The number of Empty messages transmitted."
+ ::= { arubaWiredMvrpPortStatsEntry 14 }
+
+arubaWiredMvrpPortStatsLeaveAllTransmitted OBJECT-TYPE
+  SYNTAX  Counter32
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+            "The number of Leave all messages transmitted."
+ ::= { arubaWiredMvrpPortStatsEntry 15 }
+
+arubaWiredMvrpPortStatsTotalPDUReceived OBJECT-TYPE
+  SYNTAX  Counter32
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The total number of MVRP PDUs received."
+ ::= { arubaWiredMvrpPortStatsEntry 16 }
+
+arubaWiredMvrpPortStatsTotalPDUTransmitted  OBJECT-TYPE
+  SYNTAX  Counter32
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The total number of MVRP PDUs transmitted."
+ ::= { arubaWiredMvrpPortStatsEntry 17 }
+
+arubaWiredMvrpPortStatsFramesDiscarded OBJECT-TYPE
+  SYNTAX  Counter32
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The number of Invalid messages received."
+ ::= { arubaWiredMvrpPortStatsEntry 18 }
+
+
+arubaWiredMvrpStateTable OBJECT-TYPE
+  SYNTAX    SEQUENCE OF ArubaWiredMvrpStateEntry
+  MAX-ACCESS  not-accessible
+  STATUS    current
+  DESCRIPTION
+            "A table that contains information about the
+            MVRP state Machine(s) configuration."
+ ::= { arubaWiredMvrpStats 2 }
+
+arubaWiredMvrpStateEntry OBJECT-TYPE
+  SYNTAX    ArubaWiredMvrpStateEntry
+  MAX-ACCESS  not-accessible
+  STATUS    current
+  DESCRIPTION
+            "A row in a table that contains the VLAN ID and port list."
+  INDEX
+  {
+   arubaWiredMvrpVlanId,
+   arubaWiredMvrpStateifIndex
+  }
+ ::= { arubaWiredMvrpStateTable 1 }
+
+ArubaWiredMvrpStateEntry ::= SEQUENCE
+       {
+       arubaWiredMvrpVlanId               VlanId,
+       arubaWiredMvrpStateifIndex   InterfaceIndex,
+       arubaWiredMvrpApplicantState       INTEGER,
+       arubaWiredMvrpRegistrarState       INTEGER
+       }
+
+arubaWiredMvrpVlanId OBJECT-TYPE
+  SYNTAX    VlanId
+  MAX-ACCESS  not-accessible
+  STATUS    current
+  DESCRIPTION "The VLAN ID to which this entry belongs."
+ ::= { arubaWiredMvrpStateEntry 1 }
+
+arubaWiredMvrpStateifIndex OBJECT-TYPE
+  SYNTAX  InterfaceIndex
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+         "The index value that uniquely identifies the interface to
+         which this entry is applicable.  The interface identified by
+         a particular value of this index is the same interface as
+         identified by the same value of the IF-MIB's ifIndex."
+ ::= { arubaWiredMvrpStateEntry 2 }
+
+arubaWiredMvrpApplicantState OBJECT-TYPE
+  SYNTAX INTEGER {
+   aa(0),
+   qa(1),
+   la(2),
+   vp(3),
+   ap(4),
+   qp(5),
+   vo(6),
+   ao(7),
+   qo(8),
+   lo(9),
+   vn(10),
+   an(11)
+   }
+  MAX-ACCESS  read-only
+  STATUS    current
+  DESCRIPTION
+    " This MIB provides the Applicant State Machine values
+      of the MVRP enabled port as follows: 0 = aa, 1 = qa, 2 = la,
+      3 = vp, 4 = ap, 5 = qp, 6 = vo, 7 = ao, 8 = qo, 9 = lo, 10 = vn,
+      11 = an. The first letter indicates the state:
+      V for Very anxious, A for Anxious, Q for Quiet, and L for
+      Leaving. The second letter indicates the membership state:
+      A for Active member, P for Passive member, O for Observer and
+      N for New."
+ ::= { arubaWiredMvrpStateEntry 3 }
+
+arubaWiredMvrpRegistrarState OBJECT-TYPE
+  SYNTAX  INTEGER {
+          in(1),
+          lv(2),
+          mt(3)
+          }
+  MAX-ACCESS  read-only
+  STATUS    current
+  DESCRIPTION
+         "This MIB provides the Registrar state machine value for
+          the MVRP enabled port as follows: 1 = registered, 2 = leaving,
+          3 = empty."
+ ::= { arubaWiredMvrpStateEntry 4 }
+
+
+--**********************************************************************
+--  NOTIFICATIONS (TRAPS)
+--**********************************************************************
+
+arubaWiredMvrpVlanLimitReachedEvent NOTIFICATION-TYPE
+  OBJECTS
+    {
+     arubaWiredMvrpMaxVlanLimit
+    }
+  STATUS  current
+  DESCRIPTION
+             "The number of VLANs learned dynamically by MVRP has
+             reached a configured limit. Notify the management
+             entity with the number of VLANs learned dynamically by
+             MVRP and the configured MVRP VLAN limit."
+ ::= { arubaWiredMvrpNotifications 1 }
+
+--**********************************************************************
+--MVRP MIB  Groups and Compliances
+-- conformance information
+--**********************************************************************
+
+arubaWiredMvrpCompliances
+  OBJECT IDENTIFIER ::= { arubaWiredMvrpConformance 1 }
+
+arubaWiredMvrpGroups
+  OBJECT IDENTIFIER ::= { arubaWiredMvrpConformance 2 }
+
+--**********************************************************************
+--COMPLIANCE
+--**********************************************************************
+
+arubaWiredMvrpCompliance MODULE-COMPLIANCE
+  STATUS  current
+  DESCRIPTION
+            "Compliance statement for MVRP."
+  MODULE
+  MANDATORY-GROUPS
+    {
+      arubaWiredMvrpBaseGroup,
+      arubaWiredMvrpPortConfigGroup,
+      arubaWiredMvrpPortStatsGroup,
+      arubaWiredMvrpPortStateGroup,
+      arubaWiredMvrpNotifyGroup
+    }
+ ::= { arubaWiredMvrpCompliances 1 }
+
+--**********************************************************************
+--UNITS OF CONFORMANCE
+--**********************************************************************
+arubaWiredMvrpBaseGroup OBJECT-GROUP
+  OBJECTS
+    {
+      arubaWiredMvrpGlobalClearStats,
+      arubaWiredMvrpMaxVlanLimit
+    }
+  STATUS  current
+  DESCRIPTION
+             "Collection of objects for management of MVRP Base Group."
+ ::= { arubaWiredMvrpGroups 1 }
+
+arubaWiredMvrpPortConfigGroup OBJECT-GROUP
+  OBJECTS
+    {
+       arubaWiredMvrpPortConfigRegistrarMode,
+       arubaWiredMvrpPortConfigPeriodicTimer,
+       arubaWiredMvrpPortConfigPeriodicTransmissionStatus,
+       arubaWiredMvrpPortStatsClearStats
+    }
+  STATUS  current
+  DESCRIPTION
+            "Collection of objects for management of MVRP Port Configuration
+             Table."
+ ::= { arubaWiredMvrpGroups 2 }
+
+arubaWiredMvrpPortStatsGroup OBJECT-GROUP
+  OBJECTS
+    {
+      arubaWiredMvrpPortStatsNewReceived,
+      arubaWiredMvrpPortStatsJoinInReceived,
+      arubaWiredMvrpPortStatsJoinEmptyReceived,
+      arubaWiredMvrpPortStatsLeaveReceived,
+      arubaWiredMvrpPortStatsInReceived,
+      arubaWiredMvrpPortStatsEmptyReceived,
+      arubaWiredMvrpPortStatsLeaveAllReceived,
+      arubaWiredMvrpPortStatsNewTransmitted,
+      arubaWiredMvrpPortStatsJoinInTransmitted,
+      arubaWiredMvrpPortStatsJoinEmptyTransmitted,
+      arubaWiredMvrpPortStatsLeaveTransmitted,
+      arubaWiredMvrpPortStatsInTransmitted,
+      arubaWiredMvrpPortStatsEmptyTransmitted,
+      arubaWiredMvrpPortStatsLeaveAllTransmitted,
+      arubaWiredMvrpPortStatsTotalPDUReceived,
+      arubaWiredMvrpPortStatsTotalPDUTransmitted,
+      arubaWiredMvrpPortStatsFramesDiscarded
+     }
+  STATUS  current
+  DESCRIPTION
+            "Collection of objects for management of MVRP Statistics Table."
+ ::= { arubaWiredMvrpGroups 3 }
+
+arubaWiredMvrpPortStateGroup OBJECT-GROUP
+  OBJECTS
+    {
+        arubaWiredMvrpApplicantState,
+        arubaWiredMvrpRegistrarState
+    }
+  STATUS  current
+  DESCRIPTION
+             "Collection of objects to display Applicant and
+             Registrar state machine of the ports."
+ ::= { arubaWiredMvrpGroups 4 }
+
+arubaWiredMvrpNotifyGroup NOTIFICATION-GROUP
+  NOTIFICATIONS
+    {
+       arubaWiredMvrpVlanLimitReachedEvent
+    }
+  STATUS  current
+  DESCRIPTION
+            "MVRP notification group."
+ ::= { arubaWiredMvrpGroups 5 }
+
+END
