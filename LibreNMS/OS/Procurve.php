@@ -65,7 +65,6 @@ class Procurve extends \LibreNMS\OS implements OSPolling, NacPolling
         return $res;
     }
 
-
     public function pollNac()
     {
         $nac = new Collection();
@@ -75,7 +74,6 @@ class Procurve extends \LibreNMS\OS implements OSPolling, NacPolling
 
             return $nac;
         }
-
 
         $rowSet = [];
         $ifIndex_map = $this->getDevice()->ports()->pluck('port_id', 'ifIndex');
@@ -106,7 +104,6 @@ class Procurve extends \LibreNMS\OS implements OSPolling, NacPolling
             $rowSet[$ifIndex]['timeout'] = $nacEntry['hpicfDot1xSMAuthSessionTimeout'][$key];
         }
 
-
         $table = SnmpQuery::mibs(['IEEE8021-PAE-MIB'])->hideMib()->enumStrings()->walk('dot1xAuthConfigTable')->table();
         $table = self::pivotTable($table);
         foreach ($table as $ifIndex => $row) {
@@ -122,9 +119,7 @@ class Procurve extends \LibreNMS\OS implements OSPolling, NacPolling
             };
 
             $rowSet[$ifIndex]['port_id'] = $ifIndex_map->get($ifIndex, 0);
-
         }
-
 
         $table = SnmpQuery::mibs(['HP-DOT1X-EXTENSIONS-MIB'])->mibDir('hp')->hideMib()->enumStrings()->walk('hpicfDot1xAuthSessionStatsTable')->table();
 
@@ -141,7 +136,6 @@ class Procurve extends \LibreNMS\OS implements OSPolling, NacPolling
             $rowSet[$ifIndex]['time_elapsed'] = $nacEntry['hpicfDot1xAuthSessionTime'][$key] / 100;
         }
 
-
         $table = SnmpQuery::mibs(['HP-DOT1X-EXTENSIONS-MIB'])->hideMib()->enumStrings()->walk('hpicfDot1xPaePortTable')->table();
 
         $table = self::pivotTable($table);
@@ -152,7 +146,6 @@ class Procurve extends \LibreNMS\OS implements OSPolling, NacPolling
 
             $rowSet[$ifIndex]['method'] = ($nacEntry['hpicfDot1xPaePortAuth'] === 'true') ? 'dot1x' : '';
         }
-
 
         foreach ($rowSet as $row) {
             $nac->put($row['mac_address'], new PortsNac($row));
