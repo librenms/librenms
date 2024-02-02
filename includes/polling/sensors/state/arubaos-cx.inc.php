@@ -6,7 +6,7 @@ $stateLookupTable = [
     'fragment_active' => 1,
     'fragment_inactive' => 2,
 
-    //arubaWiredVsfv2MemberTable 
+    //arubaWiredVsfv2MemberTable
     'not_present' => 10,
     'booting' => 11,
     'ready' => 12,
@@ -16,5 +16,3 @@ $stateLookupTable = [
 ];
 
 $sensor_value = $stateLookupTable[$sensor_value];
-
-
