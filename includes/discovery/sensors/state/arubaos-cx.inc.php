@@ -29,7 +29,6 @@
  * @copyright  2024 CTNET BV
  * @author     Rudy Broersma <tozz@kijkt.tv>
  */
-
 $vsfOpStatusStates = [
     ['value' => 0, 'generic' => 0, 'graph' => 0, 'descr' => 'No Split'],
     ['value' => 1, 'generic' => 1, 'graph' => 0, 'descr' => 'Fragment Active'],
