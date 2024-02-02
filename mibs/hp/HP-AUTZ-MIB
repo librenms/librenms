@@ -1,181 +1,271 @@
+-- Copyright (C) 2006-2014, 2016-2018 Hewlett-Packard Enterprise Development LP
+-- All Rights Reserved.
+--
+-- The contents of this software are proprietary and confidential
+-- to the Hewlett Packard Enterprise Development LP.  No part of this
+-- program may be photocopied, reproduced, or translated into another
+-- programming language without prior written consent of the
+-- Hewlett Packard Enterprise Development LP.
+
 HP-AUTZ-MIB DEFINITIONS ::= BEGIN
 
-IMPORTS
-    hpSwitch            
-        FROM HP-ICF-OID            
-    InetAddressType, InetAddress            
-        FROM INET-ADDRESS-MIB            
-    OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP            
-        FROM SNMPv2-CONF            
-    OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE            
-        FROM SNMPv2-SMI;
+    IMPORTS
+        hpSwitch
+            FROM HP-ICF-OID
+    InetAddressType, InetAddress
+        FROM INET-ADDRESS-MIB
+    OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+    RowStatus, TruthValue, TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE,
+    Integer32, Unsigned32
+        FROM SNMPv2-SMI
+    VlanIndex
+        FROM Q-BRIDGE-MIB
+    VidList
+        FROM HP-ICF-TC
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB;
+
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.32
+    hpSwitchAuthorizationMIB MODULE-IDENTITY
+        LAST-UPDATED "201808200000Z"      -- Aug 20, 2018
+        ORGANIZATION "HP Networking"
+        CONTACT-INFO
+            "Hewlett Packard Enterprise Company
+            8000 Foothills Blvd.
+            Roseville, CA 95747"
+        DESCRIPTION
+            "This MIB module contains the definitions of objects
+            for managing the user authorization service on HP
+            networking devices."
+
+        REVISION     "201808200000Z"  -- Aug 20, 2018
+        DESCRIPTION  "Updated hpSwitchAutzUserRoleEntry to
+                      support new device specific attributes
+                      in user role"
+
+        REVISION     "201803190000Z"  -- Mar 19, 2018
+        DESCRIPTION  "Added hpSwitchAutzUserRoleLogOffPeriod
+                      to support log-off period in user role"
+
+        REVISION     "201707160000Z"  -- Jul 16, 2017
+        DESCRIPTION  "Added hpSwitchAutzUserRoleTunneledNodeServerDownloadableRole
+                      to support downloadable user role for controller."
+        REVISION     "201703160000Z"  -- Mar 16, 2017
+        DESCRIPTION  "Added hpSwitchAutzUserRoleDownloadedEnabled and
+                      changed hpSwitchAutzUserRoleType to support downloadable user role"
+        REVISION     "201610200000Z"  -- Oct 20, 2016
+        DESCRIPTION  "Added hpSwitchAutzUserRoleTaggedVlanId and
+                      hpSwitchAutzUserRoleTaggedVlanName to support tagged VLAN in user role"
+        REVISION     "201605090000Z"  -- May 09, 2016
+        DESCRIPTION  "Added hpSwitchAutzUserRoleTunneledNodeServerRedirect
+                      and hpSwitchAutzUserRoleTunneledNodeServerSecondaryRole to support
+                      redirect user traffic to user tunnel."
+        REVISION     "201601070000Z"  -- January 07, 2016
+        DESCRIPTION  "Added hpSwitchAutzUserRole."
+        REVISION     "201408040000Z"  -- August 04, 2014
+        DESCRIPTION  "Added hpSwitchAutzServicePrimaryMethod
+                      hpSwitchAutzServiceCommandsLevel to
+                      support 'auto' authorization and
+                      command access level."
+        REVISION     "201102070000Z"  -- February 07, 2011
+        DESCRIPTION  "Added
+                      hpSwitchLocalMgmtPrivGroupsTable,
+                      hpSwitchLocalMgmtPrivCommandsTable."
+        REVISION "200708290000Z"      -- August 29, 2007 at 00:00 GMT
+        DESCRIPTION
+            "Added hpicfSwitchAuthServerFail notification"
+        REVISION "200510050000Z"      -- October 05, 2005 at 00:00 GMT
+        DESCRIPTION
+            "Initial version."
+        ::= { hpSwitch 32 }
 
 
--- 1.3.6.1.4.1.11.2.14.11.5.1.32
-hpSwitchAuthorizationMIB MODULE-IDENTITY 
-    LAST-UPDATED "200708290000Z"      -- August 29, 2007 at 00:00 GMT
-    ORGANIZATION 
-        "Hewlett Packard Company,
-        Procurve Networking Business"
-    CONTACT-INFO 
-        "Hewlett Packard Company
-        8000 Foothills Blvd.
-        Roseville, CA 95747"
-    DESCRIPTION 
-        "This MIB module contains the definitions of objects
-        for managing the user authorization service on HP 
-        networking devices."
-    REVISION "200708290000Z"      -- August 29, 2007 at 00:00 GMT
-    DESCRIPTION 
-        "Added hpicfSwitchAuthServerFail notification"
-    REVISION "200510050000Z"      -- October 05, 2005 at 00:00 GMT
-    DESCRIPTION 
-        "Initial version."
-    ::= { hpSwitch 32 }
-
-
-
+    HpAutzUserRoleName ::= TEXTUAL-CONVENTION
+        DISPLAY-HINT "63a"
+        STATUS       current
+        DESCRIPTION  "User role name type.  All printable ASCII characters are
+                     allowed except '.', ' ', and '~'."
+        SYNTAX       OCTET STRING (SIZE(1..63))
 
 --
 -- Node definitions
 --
 
--- 1.3.6.1.4.1.11.2.14.11.5.1.32.0
-hpicfSwitchAuthorizationNotifications OBJECT IDENTIFIER ::= { hpSwitchAuthorizationMIB 0 }
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.32.0
+    hpicfSwitchAuthorizationNotifications OBJECT IDENTIFIER ::= { hpSwitchAuthorizationMIB 0 }
 
 
--- 1.3.6.1.4.1.11.2.14.11.5.1.32.0.1
-hpicfSwitchAuthServerFail NOTIFICATION-TYPE
-    OBJECTS { hpicfSwitchAuthServerType, hpicfSwitchAuthServerIPType, 
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.32.0.1
+    hpicfSwitchAuthServerFail NOTIFICATION-TYPE
+    OBJECTS { hpicfSwitchAuthServerType, hpicfSwitchAuthServerIPType,
     hpicfSwitchAuthServerIP }
-    STATUS current
-    DESCRIPTION 
-        "This notification indicates that the specified server is not reachable."
-    ::= { hpicfSwitchAuthorizationNotifications 1 }
+        STATUS current
+        DESCRIPTION
+            "This notification indicates that the specified server is not reachable."
+        ::= { hpicfSwitchAuthorizationNotifications 1 }
 
 
--- 1.3.6.1.4.1.11.2.14.11.5.1.32.1
-hpSwitchAuthorizationConfig OBJECT IDENTIFIER ::= { hpSwitchAuthorizationMIB 1 }
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.32.1
+    hpSwitchAuthorizationConfig OBJECT IDENTIFIER ::= { hpSwitchAuthorizationMIB 1 }
 
 
--- 1.3.6.1.4.1.11.2.14.11.5.1.32.1.1
-hpSwitchAutzServiceTable OBJECT-TYPE
-    SYNTAX SEQUENCE OF HpSwitchAutzServiceEntry
-    MAX-ACCESS not-accessible
-    STATUS current
-    DESCRIPTION
-        "The (conceptual) table listing the authorization
-        service types."
-    ::= { hpSwitchAuthorizationConfig 1 }
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.32.1.1
+    hpSwitchAutzServiceTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HpSwitchAutzServiceEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The (conceptual) table listing the authorization
+            service types."
+        ::= { hpSwitchAuthorizationConfig 1 }
 
 
--- 1.3.6.1.4.1.11.2.14.11.5.1.32.1.1.1
-hpSwitchAutzServiceEntry OBJECT-TYPE
-    SYNTAX HpSwitchAutzServiceEntry
-    MAX-ACCESS not-accessible
-    STATUS current
-    DESCRIPTION
-        "An entry (conceptual row) in the hpSwitchAutzServiceTable."
-    INDEX { hpSwitchAutzServiceType }
-    ::= { hpSwitchAutzServiceTable 1 }
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.32.1.1.1
+    hpSwitchAutzServiceEntry OBJECT-TYPE
+        SYNTAX HpSwitchAutzServiceEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An entry (conceptual row) in the hpSwitchAutzServiceTable."
+        INDEX { hpSwitchAutzServiceType }
+        ::= { hpSwitchAutzServiceTable 1 }
 
 
-HpSwitchAutzServiceEntry ::=
-    SEQUENCE { 
-        hpSwitchAutzServiceType
-            INTEGER,
-        hpSwitchAutzServicePrimaryMethod
-            INTEGER,
-        hpSwitchAutzServiceSecondaryMethod
-            INTEGER
-     }
+    HpSwitchAutzServiceEntry ::=
+        SEQUENCE {
+            hpSwitchAutzServiceType
+                INTEGER,
+            hpSwitchAutzServicePrimaryMethod
+                INTEGER,
+            hpSwitchAutzServiceSecondaryMethod
+                INTEGER,
+            hpSwitchAutzServiceCommandsLevel
+                INTEGER
+         }
 
--- 1.3.6.1.4.1.11.2.14.11.5.1.32.1.1.1.1
-hpSwitchAutzServiceType OBJECT-TYPE
-    SYNTAX INTEGER
-        {
-        commands(1),
-        exec(2),
-        network(3)
-        }
-    MAX-ACCESS not-accessible
-    STATUS current
-    DESCRIPTION
-        "Signifies the authorization service type for which
-        this entry contains configuration information."
-    ::= { hpSwitchAutzServiceEntry 1 }
-
-
--- 1.3.6.1.4.1.11.2.14.11.5.1.32.1.1.1.2
-hpSwitchAutzServicePrimaryMethod OBJECT-TYPE
-    SYNTAX INTEGER
-        {
-        local(1),
-        tacacs(2),
-        radius(3),
-        none(4)
-        }
-    MAX-ACCESS read-write
-    STATUS current
-    DESCRIPTION
-        "Specifies the primary method used for authorization."
-    ::= { hpSwitchAutzServiceEntry 2 }
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.32.1.1.1.1
+    hpSwitchAutzServiceType OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            commands(1),
+            exec(2),
+            network(3),
+            restUri(4)
+            }
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Signifies the authorization service type for which
+            this entry contains configuration information."
+        ::= { hpSwitchAutzServiceEntry 1 }
 
 
--- 1.3.6.1.4.1.11.2.14.11.5.1.32.1.1.1.3
-hpSwitchAutzServiceSecondaryMethod OBJECT-TYPE
-    SYNTAX INTEGER
-        {
-        local(1),
-        none(2)
-        }
-    MAX-ACCESS read-write
-    STATUS current
-    DESCRIPTION
-        "Specifies the secondary (backup) method used for 
-        authorization."
-    ::= { hpSwitchAutzServiceEntry 3 }
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.32.1.1.1.2
+    hpSwitchAutzServicePrimaryMethod OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            local(1),
+            tacacs(2),
+            radius(3),
+            none(4),
+            auto(5)
+            }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The primary method used for authorization. This object can be
+             set only when the authorization service type is command.
+
+             A value of local (1) indicates that authorization is performed
+             locally.
+             A value of tacacs (2) indicates that authorization is performed
+             using TACACS+.
+             A value of radius (3) indicates that authorization is performed
+             using RADIUS.
+             A value of none (4) indicates that authorization is not performed.
+             A value of auto (5) indicates that authorization is performed by the
+             same protocol that is configured for authentication."
+
+        ::= { hpSwitchAutzServiceEntry 2 }
 
 
--- 1.3.6.1.4.1.11.2.14.11.5.1.32.1.2
-hpicfSwitchAuthObjects OBJECT IDENTIFIER ::= { hpSwitchAuthorizationConfig 2 }
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.32.1.1.1.3
+    hpSwitchAutzServiceSecondaryMethod OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            local(1),
+            none(2)
+            }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Specifies the secondary (backup) method used for
+             authorization."
+        ::= { hpSwitchAutzServiceEntry 3 }
+
+    hpSwitchAutzServiceCommandsLevel OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            all(1),
+            managerlevelonly(2)
+            }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This object specifies the command level that requires authorization.
+
+             A value of all (1) indicates that authorization is required for all
+             commands.
+             A value of managerLevelOnly (2) indicates that the authorization is
+             required only for manager level commands.
+             This object is only valid when the value of hpSwitchAutzServiceType
+             is 'commands'. The default is 'all'."
+        DEFVAL {all}
+        ::= { hpSwitchAutzServiceEntry 4 }
 
 
--- 1.3.6.1.4.1.11.2.14.11.5.1.32.1.2.1
-hpicfSwitchAuthServerType OBJECT-TYPE
-    SYNTAX INTEGER
-        {
-        radius(1),
-        tacacs(2),
-        other(9)
-        }
-    MAX-ACCESS accessible-for-notify
-    STATUS current
-    DESCRIPTION
-        "Authorization server type reported in hpicfSwitchAuthorization 
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.32.1.2
+    hpicfSwitchAuthObjects OBJECT IDENTIFIER ::= { hpSwitchAuthorizationConfig 2 }
+
+
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.32.1.2.1
+    hpicfSwitchAuthServerType OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            radius(1),
+            tacacs(2),
+            other(9)
+            }
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+        "Authorization server type reported in hpicfSwitchAuthorization
         notifications."
-    ::= { hpicfSwitchAuthObjects 1 }
+        ::= { hpicfSwitchAuthObjects 1 }
 
 
--- 1.3.6.1.4.1.11.2.14.11.5.1.32.1.2.2
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.32.1.2.2
 hpicfSwitchAuthServerIPType OBJECT-TYPE
     SYNTAX InetAddressType
-    MAX-ACCESS accessible-for-notify
-    STATUS current
-    DESCRIPTION
-        "InetAddressType of the address reported in 
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+        "InetAddressType of the address reported in
         hpicfSwitchAuthServerIP."
-    ::= { hpicfSwitchAuthObjects 2 }
+        ::= { hpicfSwitchAuthObjects 2 }
 
 
 -- 1.3.6.1.4.1.11.2.14.11.5.1.32.1.2.3
 hpicfSwitchAuthServerIP OBJECT-TYPE
-    SYNTAX InetAddress 
+    SYNTAX InetAddress
     MAX-ACCESS accessible-for-notify
     STATUS current
     DESCRIPTION
-        "This object is used in an 
-        hpicfSwitchAuthorizationNotification to report the IP 
+        "This object is used in an
+        hpicfSwitchAuthorizationNotification to report the IP
         address of the affected server."
     ::= { hpicfSwitchAuthObjects 3 }
 
@@ -195,64 +285,946 @@ hpicfSwitchAuthServerNotifyEnable OBJECT-TYPE
     STATUS current
     DESCRIPTION
         "The operational status of hpicfSwitchAuthServerFail notifications.
-        The default value is ‘1’ (Enabled).  A value of ‘2’ represents 
-        Disabled.  Writing this object requires authentication, such 
-        as provided by SNMPv3."
+         The default value is 1 (Enabled). A value of 2 represents
+         Disabled. Writing this object requires authentication, such
+         as provided by SNMPv3."
     ::= { hpSwitchAuthConfigObjects 1 }
 
+-- ------------------------------------------------------------
+-- Local Management Privilege Groups Table
+-- ------------------------------------------------------------
 
--- 1.3.6.1.4.1.11.2.14.11.5.1.32.2
-hpSwitchAuthorizationConformance OBJECT IDENTIFIER ::= { hpSwitchAuthorizationMIB 2 }
+-- 1.3.6.1.4.1.11.2.14.11.5.1.32.1.4
+hpSwitchAuthLocalPrivConfigObjects OBJECT IDENTIFIER ::= { hpSwitchAuthorizationConfig 4 }
+
+   hpSwitchLocalMgmtPrivGroupsTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF HpSwitchLocalMgmtPrivGroupsEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "This table lists the local management
+                     privilege group names."
+        ::= { hpSwitchAuthLocalPrivConfigObjects 1 }
+
+   hpSwitchLocalMgmtPrivGroupsEntry OBJECT-TYPE
+        SYNTAX      HpSwitchLocalMgmtPrivGroupsEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Local Management Groups entry."
+          INDEX { hpSwitchLocalMgmtPrivGroupIndex }
+        ::= { hpSwitchLocalMgmtPrivGroupsTable 1 }
+
+   HpSwitchLocalMgmtPrivGroupsEntry ::=
+        SEQUENCE {
+            hpSwitchLocalMgmtPrivGroupIndex           Integer32,
+            hpSwitchLocalMgmtPrivGroupName            OCTET STRING,
+            hpSwitchLocalMgmtPrivGroupStatus          RowStatus
+        }
+
+   hpSwitchLocalMgmtPrivGroupIndex OBJECT-TYPE
+        SYNTAX      Integer32 (1..2147483647)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The index value which uniquely identifies a row
+                     in the group table.
+                     The values, One (1) is reserved for a predefined manager group,
+                     Two (2) is reserved for usernames that are not
+                     assigned to a group.  The privileges for usernames that
+                     do not have a group assignment is the same as
+                     operator'. "
+        ::= { hpSwitchLocalMgmtPrivGroupsEntry 1 }
+
+   hpSwitchLocalMgmtPrivGroupName OBJECT-TYPE
+        SYNTAX      OCTET STRING ( SIZE (1..255))
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "The name of a given Local Management server group."
+        ::= { hpSwitchLocalMgmtPrivGroupsEntry 2 }
+
+   hpSwitchLocalMgmtPrivGroupStatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "The status of the local management privilege
+                     group row."
+        ::= { hpSwitchLocalMgmtPrivGroupsEntry 3 }
+
+-- ------------------------------------------------------------
+-- Local Managment Privilege Commands Table
+-- ------------------------------------------------------------
+
+   hpSwitchLocalMgmtPrivCommandsTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF HpSwitchLocalMgmtPrivCommandsEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "This table lists the local management
+                     Privilege Command Match strings."
+        ::= { hpSwitchAuthLocalPrivConfigObjects 2 }
+
+   hpSwitchLocalMgmtPrivCommandsEntry OBJECT-TYPE
+        SYNTAX      HpSwitchLocalMgmtPrivCommandsEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Local Management Commands entry."
+          INDEX { hpSwitchLocalMgmtPrivGroupIndex,
+                  hpSwitchLocalMgmtPrivCmdSequenceIndex }
+
+        ::= { hpSwitchLocalMgmtPrivCommandsTable 1 }
+
+   HpSwitchLocalMgmtPrivCommandsEntry ::=
+        SEQUENCE {
+            hpSwitchLocalMgmtPrivCmdSequenceIndex        Integer32,
+            hpSwitchLocalMgmtPrivCmdMatchStr             OCTET STRING,
+            hpSwitchLocalMgmtPrivCmdPriv                 INTEGER,
+            hpSwitchLocalMgmtPrivCmdSendLog              INTEGER,
+            hpSwitchLocalMgmtPrivCmdStatus               RowStatus
+        }
+
+   hpSwitchLocalMgmtPrivCmdSequenceIndex OBJECT-TYPE
+        SYNTAX      Integer32 (1..2147483647)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The index value which uniquely identifies a row
+                     in the command table.  See the
+                     documentation for the number of sequences allowed."
+        ::= { hpSwitchLocalMgmtPrivCommandsEntry 1 }
+
+   hpSwitchLocalMgmtPrivCmdMatchStr OBJECT-TYPE
+        SYNTAX      OCTET STRING ( SIZE (0..65535))
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "The syntax of a command within a group.
+                     See the documentation for the maximum length
+                     of the command name."
+        ::= { hpSwitchLocalMgmtPrivCommandsEntry 2 }
+
+   hpSwitchLocalMgmtPrivCmdPriv OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        permit(1),
+                        deny(2)
+        }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "The privilege associated with commands that
+                     match the command string."
+        ::= { hpSwitchLocalMgmtPrivCommandsEntry 3 }
+
+   hpSwitchLocalMgmtPrivCmdSendLog OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        enable(1),
+                        disable(2)
+        }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "Determines if a log message is generated when
+                     commands matching this command string are
+                     attempted."
+        DEFVAL {disable}
+        ::= { hpSwitchLocalMgmtPrivCommandsEntry 4 }
 
 
--- 1.3.6.1.4.1.11.2.14.11.5.1.32.2.1
-hpSwitchAuthorizationMIBCompliances OBJECT IDENTIFIER ::= 
+   hpSwitchLocalMgmtPrivCmdStatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "The status of the local management privilege
+                     command row."
+        ::= { hpSwitchLocalMgmtPrivCommandsEntry 5 }
+
+-- ------------------------------------------------------------
+-- User Role Objects
+-- ------------------------------------------------------------
+
+   -- 1.3.6.1.4.1.11.2.14.11.5.1.32.1.5
+   hpSwitchAutzUserRole OBJECT IDENTIFIER ::= { hpSwitchAuthorizationConfig 5 }
+
+   -- 1.3.6.1.4.1.11.2.14.11.5.1.32.1.5.1
+   hpSwitchAutzUserRoleEnabled OBJECT-TYPE
+       SYNTAX      TruthValue
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION "Enable user role-based authorization.  When enabled,
+                    authenticated clients are assigned roles that determine
+                    authorization level.  When disabled, roles are not used."
+       DEFVAL { false }
+       ::= { hpSwitchAutzUserRole 1 }
+
+   -- 1.3.6.1.4.1.11.2.14.11.5.1.32.1.5.2
+   hpSwitchAutzUserRoleInitialRoleName OBJECT-TYPE
+       SYNTAX      HpAutzUserRoleName
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION "The value of this object must match the
+                    hpSwitchAutzUserRoleName of an entry in the
+                    hpSwithcAutzUserRoleTable."
+       ::= { hpSwitchAutzUserRole 2 }
+
+   -- 1.3.6.1.4.1.11.2.14.11.5.1.32.1.5.4
+   hpSwitchAutzUserRoleDownloadedEnabled OBJECT-TYPE
+       SYNTAX      TruthValue
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION "This object enables or disables the downlodable user role
+                    feature. The hpSwitchAutzUserRoleEnabled object should
+                    be enabled before configuring this object."
+       DEFVAL { false }
+       ::= { hpSwitchAutzUserRole 4 }
+
+-- ------------------------------------------------------------
+-- User Roles Table
+-- ------------------------------------------------------------
+
+   -- 1.3.6.1.4.1.11.2.14.11.5.1.32.1.5.3
+   hpSwitchAutzUserRoleTable OBJECT-TYPE
+       SYNTAX      SEQUENCE OF HpSwitchAutzUserRoleEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION "A table of configured user roles.  The maximum
+                    number of entries is implementation dependent."
+       ::= { hpSwitchAutzUserRole 3 }
+
+   -- 1.3.6.1.4.1.11.2.14.11.5.1.32.3.1.5.3.1
+   hpSwitchAutzUserRoleEntry OBJECT-TYPE
+       SYNTAX      HpSwitchAutzUserRoleEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION "A user role table entry."
+       INDEX       { hpSwitchAutzUserRoleName }
+       ::= { hpSwitchAutzUserRoleTable 1 }
+
+   HpSwitchAutzUserRoleEntry::=
+       SEQUENCE {
+           hpSwitchAutzUserRoleName                                HpAutzUserRoleName,
+           hpSwitchAutzUserRoleRowStatus                           RowStatus,
+           hpSwitchAutzUserRoleType                                INTEGER,
+           hpSwitchAutzUserRoleCaptivePortalProfileName            OCTET STRING,
+           hpSwitchAutzUserRoleIngressUserPolicyName               OCTET STRING,
+           hpSwitchAutzUserRoleReauthPeriod                        Integer32,
+           hpSwitchAutzUserRoleVlanId                              VlanIndex,
+           hpSwitchAutzUserRoleVlanName                            SnmpAdminString,
+           hpSwitchAutzUserRoleTunneledNodeServerRedirect          INTEGER,
+           hpSwitchAutzUserRoleTunneledNodeServerSecondaryRole     OCTET STRING,
+           hpSwitchAutzUserRoleTaggedVlanId                        VlanIndex,
+           hpSwitchAutzUserRoleTaggedVlanName                      SnmpAdminString,
+           hpSwitchAutzUserRoleTunneledNodeServerDownloadableRole  TruthValue,
+           hpSwitchAutzUserRoleLogOffPeriod                        Integer32,
+           hpSwitchAutzUserRoleCachedReauthPeriod                  Unsigned32,
+           hpSwitchAutzUserRoleTaggedVlanList                      VidList
+       }
+
+   -- 1.3.6.1.4.1.11.2.14.11.5.1.32.1.5.3.1.1
+   hpSwitchAutzUserRoleName OBJECT-TYPE
+        SYNTAX      HpAutzUserRoleName
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The name of this user role."
+        ::= { hpSwitchAutzUserRoleEntry 1 }
+
+   -- 1.3.6.1.4.1.11.2.14.11.5.1.32.1.5.3.1.2
+   hpSwitchAutzUserRoleRowStatus OBJECT-TYPE
+       SYNTAX      RowStatus
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION "The Row Status of this entry.
+
+                    To create a new entry, send an SNMP SET request with a
+                    RowStatus of 'createAndGo'.
+
+                    active - the entry is ready to use.
+
+                    notInService - not valid for this table.
+
+                    notReady - the entry is not fully configured.
+
+                    createAndGo - create a new entry. Entries of
+                                  hpSwitchAutzUserRoleType 'downloaded'
+                                  cannot be created or modified.
+
+                    createAndWait - not valid for this table.
+
+                    delete - delete the entry. Entries of
+                             hpSwitchAutzUserRoleType 'predefined' and
+                             the entry assigned to
+                             hpSwitchAutzUserRoleInitialRoleName cannot
+                             be deleted."
+       ::= { hpSwitchAutzUserRoleEntry 2 }
+
+   -- 1.3.6.1.4.1.11.2.14.11.5.1.32.1.5.3.1.3
+   hpSwitchAutzUserRoleType OBJECT-TYPE
+       SYNTAX      INTEGER {
+                       predefined(1),
+                       local(2),
+                       downloaded(3)
+                   }
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "This object defines different user role types supported.
+                    Predefined user roles cannot be modified or deleted.
+                    Downloaded user roles cannot be modified or created."
+       ::= { hpSwitchAutzUserRoleEntry 3 }
+
+   -- 1.3.6.1.4.1.11.2.14.11.5.1.32.1.5.3.1.4
+   hpSwitchAutzUserRoleCaptivePortalProfileName OBJECT-TYPE
+       SYNTAX      OCTET STRING (SIZE(0..63))
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION "The name of the captive portal profile
+                    (hpicfUsrAuthCaptivePortalProfileName) associated
+                    with this role. All printable ASCII characters
+                    are allowed except '.', ' ', and '~'."
+       ::= { hpSwitchAutzUserRoleEntry 4 }
+
+   -- 1.3.6.1.4.1.11.2.14.11.5.1.32.1.5.3.1.5
+   hpSwitchAutzUserRoleIngressUserPolicyName OBJECT-TYPE
+       SYNTAX      OCTET STRING (SIZE(0..64))
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION  "The name associated with hpicfGppcv2NpPolicyName
+                    of hpicfGppcv2NpSubType 'policyUser' assigned to
+                    this role."
+       ::= { hpSwitchAutzUserRoleEntry 5 }
+
+   -- 1.3.6.1.4.1.11.2.14.11.5.1.32.1.5.3.1.6
+   hpSwitchAutzUserRoleReauthPeriod OBJECT-TYPE
+       SYNTAX      Integer32 (0..999999999)
+       UNITS       "seconds"
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION "Specifies the period, in seconds, at which an
+                    authenticated client must re-authenticate. A value
+                    of 0 signifies that an authenticated client will
+                    never have to re-authenticate."
+       DEFVAL      { 0 }
+       ::= { hpSwitchAutzUserRoleEntry 6 }
+
+   -- 1.3.6.1.4.1.11.2.14.11.5.1.32.1.5.3.1.7
+   hpSwitchAutzUserRoleVlanId OBJECT-TYPE
+       SYNTAX      VlanIndex
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION "The untagged VLAN ID for this role. A value of 0 indicates
+                    unset. This column is mutually exclusive with
+                    hpSwitchAutzUserRoleVlanName."
+       ::= { hpSwitchAutzUserRoleEntry 7 }
+
+   -- 1.3.6.1.4.1.11.2.14.11.5.1.32.1.5.3.1.8
+   hpSwitchAutzUserRoleVlanName OBJECT-TYPE
+       SYNTAX      SnmpAdminString (SIZE(0..32))
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION "The untagged VLAN name for this role. This column is mutually
+                    exclusive with hpSwitchAutzUserRoleVlanId."
+       ::= { hpSwitchAutzUserRoleEntry 8 }
+
+   -- 1.3.6.1.4.1.11.2.14.11.5.1.32.1.5.3.1.9
+   hpSwitchAutzUserRoleTunneledNodeServerRedirect OBJECT-TYPE
+       SYNTAX      INTEGER
+                   {
+                       enable(1),
+                       disable(2)
+                   }
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION "Enables or disables the traffic redirection to the
+                    tunnel. If the MIB object 'hpSwitchAutzUserRoleCaptivePortalProfileName'
+                    is already enabled and an attempt is made to enable
+                    this object, it will result in an error.
+                    The MIB object can be enabled only if there is a tagged or
+                    untagged VLAN present in the user role."
+       DEFVAL       {disable}
+       ::= { hpSwitchAutzUserRoleEntry 9 }
+
+
+   -- 1.3.6.1.4.1.11.2.14.11.5.1.32.1.5.3.1.10
+   hpSwitchAutzUserRoleTunneledNodeServerSecondaryRole OBJECT-TYPE
+       SYNTAX      OCTET STRING (SIZE(0..63))
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION "The secondary role associated with this user role.
+                    This will be applied to user traffic at tunnel-node server end.
+                    All printable ASCII characters are allowed
+                    except '.', ' ' and '~'. This object returns an error if the
+                    secondary role name is greater than 63 characters."
+       ::= { hpSwitchAutzUserRoleEntry 10 }
+
+   -- 1.3.6.1.4.1.11.2.14.11.5.1.32.1.5.3.1.11
+   hpSwitchAutzUserRoleTaggedVlanId OBJECT-TYPE
+       SYNTAX      VlanIndex
+       MAX-ACCESS  read-create
+       STATUS      deprecated
+       DESCRIPTION "The tagged VLAN ID for this role. A value of 0 indicates
+                    unset. This column is mutually exclusive with
+                    hpSwitchAutzUserRoleTaggedVlanName,."
+       ::= { hpSwitchAutzUserRoleEntry 11 }
+
+   -- 1.3.6.1.4.1.11.2.14.11.5.1.32.1.5.3.1.12
+   hpSwitchAutzUserRoleTaggedVlanName OBJECT-TYPE
+       SYNTAX      SnmpAdminString (SIZE(0..32))
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION "The tagged VLAN name for this role. This column is mutually
+                    exclusive with hpSwitchAutzUserRoleTaggedVlanId."
+       ::= { hpSwitchAutzUserRoleEntry 12 }
+
+   -- 1.3.6.1.4.1.11.2.14.11.5.1.32.1.5.3.1.13
+   hpSwitchAutzUserRoleTunneledNodeServerDownloadableRole OBJECT-TYPE
+       SYNTAX      TruthValue
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION "This object indicates if the secondary roles is
+                    downloadable user role or not.The
+                    hpSwitchAutzUserRoleTunneledNodeServerRedirectobject
+                    should be enabled before configuring this object."
+       ::= { hpSwitchAutzUserRoleEntry 13 }
+
+   -- 1.3.6.1.4.1.11.2.14.11.5.1.32.1.5.3.1.14
+   hpSwitchAutzUserRoleLogOffPeriod OBJECT-TYPE
+       SYNTAX      Integer32 (0 | 60..9999999)
+       UNITS       "seconds"
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION "Specifies the period, in seconds, at which an authenticated
+                    client must automatically log-off. A value of 0 signifies
+                    that an authenticated client will never have to
+                    automatically log-off."
+       DEFVAL      { 300 }
+       ::= { hpSwitchAutzUserRoleEntry 14 }
+
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.32.1.5.3.1.15
+    hpSwitchAutzUserRoleCachedReauthPeriod OBJECT-TYPE
+        SYNTAX         Unsigned32 (0 | 60..2147483647)
+        UNITS          "seconds"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The value indicates the period in seconds, during which
+                        cached reauthentication is allowed on the port. A value
+			of 0 signifies cached reauthentication period is not set."
+        ::= { hpSwitchAutzUserRoleEntry 15 }
+
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.32.1.5.3.1.16
+    hpSwitchAutzUserRoleTaggedVlanList OBJECT-TYPE
+        SYNTAX          VidList
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION     "The set of tagged VLANs associated with this user-role."
+        ::= { hpSwitchAutzUserRoleEntry 16 }
+
+   hpSwitchAutzUserRoleSubTable OBJECT-TYPE
+       SYNTAX      SEQUENCE OF HpSwitchAutzUserRoleSubEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION "A table of configured sub user roles attributes. The maximum
+                    number of entries is implementation dependent."
+       ::= { hpSwitchAutzUserRole 5 }
+
+   -- 1.3.6.1.4.1.11.2.14.11.5.1.32.3.1.5.3.1
+   hpSwitchAutzUserRoleSubEntry OBJECT-TYPE
+       SYNTAX      HpSwitchAutzUserRoleSubEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION "A user role sub table entry."
+       INDEX       { hpSwitchAutzUserRoleName, hpSwitchAutzUserRoleSubType }
+       ::= { hpSwitchAutzUserRoleSubTable 1 }
+
+   HpSwitchAutzUserRoleSubEntry::=
+       SEQUENCE {
+           hpSwitchAutzUserRoleSubType                             INTEGER,
+           hpSwitchAutzUserRoleAdminEdgePort                       TruthValue,
+           hpSwitchAutzUserRolePoePriority                         INTEGER,
+           hpSwitchAutzUserRolePoeAllocBy                          INTEGER,
+           hpSwitchAutzUserRoleSubTypeRowStatus                    RowStatus,
+           hpSwitchAutzUserRolePortMode                            TruthValue
+       }
+
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.32.1.5.4.1.1
+    hpSwitchAutzUserRoleSubType OBJECT-TYPE
+        SYNTAX         INTEGER {
+                               device(1)
+                          }
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "This object specifies the sub type of user-role attributes.
+                        Device or other specific type."
+        ::= { hpSwitchAutzUserRoleSubEntry 1 }
+
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.32.1.5.4.1.2
+    hpSwitchAutzUserRoleAdminEdgePort OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION     "The administrative value of the Edge Port parameter.
+                         A value of true(1) indicates that the port associated
+                         with this user-role should be assumed as an edge-port,
+                         and a value of false(2) indicates that the port
+                         associated with this user-role should be assumed as a
+                         non-edge-port."
+        DEFVAL          {false}
+        ::= { hpSwitchAutzUserRoleSubEntry 2 }
+
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.32.1.5.4.1.3
+    hpSwitchAutzUserRolePoePriority OBJECT-TYPE
+        SYNTAX         INTEGER {
+			        default(0),
+                                critical(1),
+                                high(2),
+                                low(3)
+                            }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "This object controls the priority of the port from the point
+                        of view of a power management algorithm. The priority that
+                        is set by this variable could be used by a control mechanism
+                        that prevents over current situations by disconnecting first
+                        ports with lower power priority. Ports that connect devices
+                        critical to the operation of the network - like the E911
+                        telephones ports - should be set to higher priority."
+        ::= { hpSwitchAutzUserRoleSubEntry 3 }
+
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.32.1.5.4.1.4
+    hpSwitchAutzUserRolePoeAllocBy OBJECT-TYPE
+        SYNTAX         INTEGER {
+				usage(1),
+				class(2)
+			     }
+        MAX-ACCESS       read-create
+        STATUS           current
+        DESCRIPTION      "This object indicates the power allocation method for
+                          this port. The default value is usage."
+        ::= { hpSwitchAutzUserRoleSubEntry 4 }
+
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.32.1.5.4.1.5
+   hpSwitchAutzUserRoleSubTypeRowStatus OBJECT-TYPE
+       SYNTAX      RowStatus
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION "The Row Status of this entry.
+
+                    To create a new entry, send an SNMP SET request with a
+                    RowStatus of 'createAndGo'.
+
+                    active - the entry is ready to use.
+
+                    notInService - not valid for this table.
+
+                    notReady - the entry is not fully configured.
+
+                    createAndGo - create a new entry. Entries of
+                                  hpSwitchAutzUserRoleType 'downloaded'
+                                  cannot be created or modified.
+
+                    createAndWait - not valid for this table.
+
+                    delete - delete the entry. Entries of
+                             hpSwitchAutzUserRoleType 'predefined' and
+                             the entry assigned to
+                             hpSwitchAutzUserRoleInitialRoleName cannot
+                             be deleted."
+       ::= { hpSwitchAutzUserRoleSubEntry 5 }
+
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.32.1.5.4.1.7
+    hpSwitchAutzUserRolePortMode OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "This object indicates if the auth method on a port will be
+                        operating on a port mode or not."
+        DEFVAL          {false}
+        ::= { hpSwitchAutzUserRoleSubEntry 7 }
+
+-- ------------------------------------------------------------
+-- Local Managment Privilege URI Table
+-- ------------------------------------------------------------
+
+-- 1.3.6.1.4.1.11.2.14.11.5.1.32.1.6
+
+
+-- Compliance Statements
+
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.32.2
+    hpSwitchAuthorizationConformance OBJECT IDENTIFIER ::= { hpSwitchAuthorizationMIB 2 }
+
+
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.32.2.1
+hpSwitchAuthorizationMIBCompliances OBJECT IDENTIFIER ::=
     { hpSwitchAuthorizationConformance 1 }
 
 
--- 1.3.6.1.4.1.11.2.14.11.5.1.32.2.1.1
-hpSwitchAuthorizationMIBCompliance MODULE-COMPLIANCE
-    STATUS current
-    DESCRIPTION 
-        "The compliance statement for devices implementing the
-        HP-AUTZ-MIB."
-    MODULE -- this module
-        MANDATORY-GROUPS { hpSwitchAuthorizationConfigGroup }
-    ::= { hpSwitchAuthorizationMIBCompliances 1 }
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.32.2.1.1
+    hpSwitchAuthorizationMIBCompliance MODULE-COMPLIANCE
+        STATUS current
+        DESCRIPTION
+            "The compliance statement for devices implementing the
+            HP-AUTZ-MIB."
+        MODULE -- this module
+            MANDATORY-GROUPS { hpSwitchAuthorizationConfigGroup }
+        ::= { hpSwitchAuthorizationMIBCompliances 1 }
+
+   hpSwitchLocalMgmtPrivGrpMIBCompliance      MODULE-COMPLIANCE
+        STATUS      deprecated
+        DESCRIPTION "The compliance statement for listing the
+                     local management privilege methods to be
+                     tried for granting
+                     different access levels through
+                     various access tasks"
+        MODULE -- this module
+
+        MANDATORY-GROUPS { hpSwitchAutzLocalMgmtPrivGroup }
+
+        OBJECT  hpSwitchLocalMgmtPrivGroupName
+        MIN-ACCESS  read-only
+        DESCRIPTION
+            "Write access is not required.
+            "
+        OBJECT  hpSwitchLocalMgmtPrivCmdMatchStr
+        MIN-ACCESS  read-only
+        DESCRIPTION
+            "Write access is not required.
+            "
+        OBJECT  hpSwitchLocalMgmtPrivCmdPriv
+        MIN-ACCESS  read-only
+        DESCRIPTION
+            "Write access is not required.
+            "
+        OBJECT  hpSwitchLocalMgmtPrivCmdSendLog
+        MIN-ACCESS  read-only
+        DESCRIPTION
+            "Write access is not required.
+            "
+       ::= { hpSwitchAuthorizationMIBCompliances 2 }
+
+   hpSwitchLocalMgmtPrivGrpMIBCompliance1    MODULE-COMPLIANCE
+       STATUS        deprecated
+       DESCRIPTION   "The compliance statement for listing the
+                      local management privilege methods to be
+                      tried for granting different access levels
+                      through various access tasks"
+       MODULE  -- this module
+       MANDATORY-GROUPS { hpSwitchAutzLocalMgmtPrivGroup1 }
+       ::=  {  hpSwitchAuthorizationMIBCompliances 3  }
+
+   hpSwitchAuthorizationObjectsGrpMIBCompliance MODULE-COMPLIANCE
+      STATUS         current
+      DESCRIPTION    "The compliance statement for listing the
+                      local management privilege methods to be
+                      tried for granting different access levels
+                      through various access tasks"
+      MODULE -- this module
+      MANDATORY-GROUPS  { hpicfSwitchAuthorizationObjectsGroup }
+      ::=   { hpSwitchAuthorizationMIBCompliances 4 }
+
+   hpSwitchAuthorizationNotificationGrpMIBCompliance MODULE-COMPLIANCE
+      STATUS         current
+      DESCRIPTION    "The compliance statement for listing the
+                      local management privilege methods to be
+                      tried for granting different access levels
+                      through various access tasks"
+      MODULE -- this module
+      MANDATORY-GROUPS  { hpicfSwitchAuthorizationNotificationGroup }
+      ::=   { hpSwitchAuthorizationMIBCompliances 5 }
+
+    hpSwitchAutzRoleGrpCompliance MODULE-COMPLIANCE
+      STATUS        deprecated
+      DESCRIPTION   "The compliance statement for user roles."
+      MODULE -- this module
+      MANDATORY-GROUPS  { hpSwitchAutzUserRoleGroup }
+      ::=   { hpSwitchAuthorizationMIBCompliances 6 }
+
+    hpSwitchAutzRoleGrpCompliance1 MODULE-COMPLIANCE
+      STATUS        deprecated
+      DESCRIPTION   "The compliance statement for user roles."
+      MODULE -- this module
+      MANDATORY-GROUPS  { hpSwitchAutzUserRoleGroup1 }
+
+      ::=   { hpSwitchAuthorizationMIBCompliances 7 }
+
+    hpSwitchAutzRoleGrpCompliance2 MODULE-COMPLIANCE
+      STATUS        deprecated
+      DESCRIPTION   "The compliance statement for user roles."
+      MODULE -- this module
+      MANDATORY-GROUPS  { hpSwitchAutzUserRoleGroup2 }
+
+      ::=   { hpSwitchAuthorizationMIBCompliances 8 }
+    hpSwitchAutzRoleGrpCompliance3 MODULE-COMPLIANCE
+      STATUS        deprecated
+      DESCRIPTION   "The compliance statement for user roles."
+      MODULE -- this module
+      MANDATORY-GROUPS  { hpSwitchAutzUserRoleGroup3 }
+
+      ::=   { hpSwitchAuthorizationMIBCompliances 9 }
+
+    hpSwitchAutzRoleGrpCompliance4 MODULE-COMPLIANCE
+      STATUS        deprecated
+      DESCRIPTION   "The compliance statement for user roles."
+      MODULE -- this module
+      MANDATORY-GROUPS  { hpSwitchAutzUserRoleGroup4 }
+
+      ::=   { hpSwitchAuthorizationMIBCompliances 10 }
+
+   hpSwitchLocalMgmtPrivGrpMIBCompliance2      MODULE-COMPLIANCE
+        STATUS      current
+        DESCRIPTION "The compliance statement for listing the
+                     local management privilege methods to be
+                     tried for granting
+                     different access levels through
+                     various access tasks"
+        MODULE -- this module
+
+        MANDATORY-GROUPS { hpSwitchAutzLocalMgmtPrivGroup
+	                 }
+
+        OBJECT  hpSwitchLocalMgmtPrivGroupName
+        MIN-ACCESS  read-only
+        DESCRIPTION
+            "Write access is not required.
+            "
+        OBJECT  hpSwitchLocalMgmtPrivCmdMatchStr
+        MIN-ACCESS  read-only
+        DESCRIPTION
+            "Write access is not required.
+            "
+        OBJECT  hpSwitchLocalMgmtPrivCmdPriv
+        MIN-ACCESS  read-only
+        DESCRIPTION
+            "Write access is not required.
+            "
+        OBJECT  hpSwitchLocalMgmtPrivCmdSendLog
+        MIN-ACCESS  read-only
+        DESCRIPTION
+            "Write access is not required.
+            "
+       ::= { hpSwitchAuthorizationMIBCompliances 11 }
+
+   hpSwitchLocalMgmtPrivGrpMIBCompliance3    MODULE-COMPLIANCE
+       STATUS        current
+       DESCRIPTION   "The compliance statement for listing the
+                      local management privilege methods to be
+                      tried for granting different access levels
+                      through various access tasks"
+       MODULE -- this module
+       MANDATORY-GROUPS { hpSwitchAutzLocalMgmtPrivGroup1}
+       ::=  {  hpSwitchAuthorizationMIBCompliances 12  }
 
 
--- 1.3.6.1.4.1.11.2.14.11.5.1.32.2.2
-hpSwitchAuthorizationMIBGroups OBJECT IDENTIFIER ::= { hpSwitchAuthorizationConformance 2 }
+    hpSwitchAutzRoleGrpCompliance5 MODULE-COMPLIANCE
+      STATUS        deprecated
+      DESCRIPTION   "The compliance statement for user roles."
+      MODULE -- this module
+      MANDATORY-GROUPS  { hpSwitchAutzUserRoleGroup5 }
 
+      ::=   { hpSwitchAuthorizationMIBCompliances 13 }
 
--- 1.3.6.1.4.1.11.2.14.11.5.1.32.2.2.1
-hpSwitchAuthorizationConfigGroup OBJECT-GROUP
-    OBJECTS { hpSwitchAutzServicePrimaryMethod, 
-        hpSwitchAutzServiceSecondaryMethod, hpicfSwitchAuthServerNotifyEnable }
-    STATUS current
-    DESCRIPTION 
-        "A collection of objects to support authorization service."
-    ::= { hpSwitchAuthorizationMIBGroups 1 }
+    hpSwitchAutzRoleGrpCompliance6 MODULE-COMPLIANCE
+      STATUS        current
+      DESCRIPTION   "The compliance statement for user roles."
+      MODULE -- this module
+      MANDATORY-GROUPS  { hpSwitchAutzUserRoleGroup6 }
 
+      ::=   { hpSwitchAuthorizationMIBCompliances 14 }
 
--- 1.3.6.1.4.1.11.2.14.11.5.1.32.2.2.2
-hpicfSwitchAuthorizationNotificationGroup NOTIFICATION-GROUP
-    NOTIFICATIONS { hpicfSwitchAuthServerFail }
-    STATUS current
-    DESCRIPTION 
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.32.2.2
+    hpSwitchAuthorizationMIBGroups OBJECT IDENTIFIER ::= { hpSwitchAuthorizationConformance 2 }
+
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.32.2.2.1
+    hpSwitchAuthorizationConfigGroup OBJECT-GROUP
+    OBJECTS { hpSwitchAutzServicePrimaryMethod,
+        hpSwitchAutzServiceSecondaryMethod, hpSwitchAutzServiceCommandsLevel,
+        hpicfSwitchAuthServerNotifyEnable }
+        STATUS current
+        DESCRIPTION
+            "A collection of objects to support authorization service."
+        ::= { hpSwitchAuthorizationMIBGroups 1 }
+
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.32.2.2.2
+   hpicfSwitchAuthorizationNotificationGroup NOTIFICATION-GROUP
+        NOTIFICATIONS { hpicfSwitchAuthServerFail }
+        STATUS current
+        DESCRIPTION
         "A group of switch authorization notifications."
-    ::= { hpSwitchAuthorizationMIBGroups 2 }
+        ::= { hpSwitchAuthorizationMIBGroups 2 }
 
-
--- 1.3.6.1.4.1.11.2.14.11.5.1.32.2.2.3
-hpicfSwitchAuthorizationObjectsGroup OBJECT-GROUP
-    OBJECTS { hpicfSwitchAuthServerType, hpicfSwitchAuthServerIPType, 
+    -- 1.3.6.1.4.1.11.2.14.11.5.1.32.2.2.3
+    hpicfSwitchAuthorizationObjectsGroup OBJECT-GROUP
+    OBJECTS { hpicfSwitchAuthServerType, hpicfSwitchAuthServerIPType,
         hpicfSwitchAuthServerIP }
-    STATUS current
-    DESCRIPTION 
+        STATUS current
+        DESCRIPTION
         "A group of switch authorization objects."
-    ::= { hpSwitchAuthorizationMIBGroups 3 }
+        ::= { hpSwitchAuthorizationMIBGroups 3 }
 
+    hpSwitchAutzLocalMgmtPrivGroup OBJECT-GROUP
+        OBJECTS   {
+            hpSwitchLocalMgmtPrivGroupName,
+            hpSwitchLocalMgmtPrivCmdMatchStr,
+            hpSwitchLocalMgmtPrivCmdPriv,
+            hpSwitchLocalMgmtPrivCmdSendLog
+        }
+        STATUS    current
+        DESCRIPTION "A collection of objects for configuring
+                     Local Manangement Privilege Groups"
+       ::= { hpSwitchAuthorizationMIBGroups 4 }
 
+    hpSwitchAutzLocalMgmtPrivGroup1 OBJECT-GROUP
+      OBJECTS  {
+         hpSwitchLocalMgmtPrivCmdStatus,
+         hpSwitchLocalMgmtPrivGroupStatus
+      }
+      STATUS   current
+      DESCRIPTION "A collection of objects for configuring
+                   Local Mangement Privilege Groups"
+      ::= { hpSwitchAuthorizationMIBGroups 5 }
 
+    hpSwitchAutzUserRoleGroup OBJECT-GROUP
+      OBJECTS {
+         hpSwitchAutzUserRoleEnabled,
+         hpSwitchAutzUserRoleInitialRoleName,
+         hpSwitchAutzUserRoleRowStatus,
+         hpSwitchAutzUserRoleType,
+         hpSwitchAutzUserRoleCaptivePortalProfileName,
+         hpSwitchAutzUserRoleIngressUserPolicyName,
+         hpSwitchAutzUserRoleReauthPeriod,
+         hpSwitchAutzUserRoleVlanId,
+         hpSwitchAutzUserRoleVlanName
+      }
+      STATUS   deprecated
+      DESCRIPTION "A collection of objects for supporting
+                   local user roles."
+      ::= { hpSwitchAuthorizationMIBGroups 6 }
+
+    hpSwitchAutzUserRoleGroup1 OBJECT-GROUP
+      OBJECTS {
+         hpSwitchAutzUserRoleEnabled,
+         hpSwitchAutzUserRoleInitialRoleName,
+         hpSwitchAutzUserRoleRowStatus,
+         hpSwitchAutzUserRoleType,
+         hpSwitchAutzUserRoleCaptivePortalProfileName,
+         hpSwitchAutzUserRoleIngressUserPolicyName,
+         hpSwitchAutzUserRoleReauthPeriod,
+         hpSwitchAutzUserRoleVlanId,
+         hpSwitchAutzUserRoleVlanName,
+         hpSwitchAutzUserRoleTunneledNodeServerRedirect,
+         hpSwitchAutzUserRoleTunneledNodeServerSecondaryRole
+      }
+      STATUS   deprecated
+      DESCRIPTION "A collection of objects for supporting
+                   local user roles."
+      ::= { hpSwitchAuthorizationMIBGroups 7 }
+
+    hpSwitchAutzUserRoleGroup2 OBJECT-GROUP
+      OBJECTS {
+         hpSwitchAutzUserRoleEnabled,
+         hpSwitchAutzUserRoleInitialRoleName,
+         hpSwitchAutzUserRoleRowStatus,
+         hpSwitchAutzUserRoleType,
+         hpSwitchAutzUserRoleCaptivePortalProfileName,
+         hpSwitchAutzUserRoleIngressUserPolicyName,
+         hpSwitchAutzUserRoleReauthPeriod,
+         hpSwitchAutzUserRoleVlanId,
+         hpSwitchAutzUserRoleVlanName,
+         hpSwitchAutzUserRoleTunneledNodeServerRedirect,
+         hpSwitchAutzUserRoleTunneledNodeServerSecondaryRole,
+         hpSwitchAutzUserRoleTaggedVlanId,
+         hpSwitchAutzUserRoleTaggedVlanName
+      }
+      STATUS   deprecated
+      DESCRIPTION "A collection of objects for supporting
+                   local user roles."
+      ::= { hpSwitchAuthorizationMIBGroups 8 }
+
+    hpSwitchAutzUserRoleGroup3 OBJECT-GROUP
+      OBJECTS {
+         hpSwitchAutzUserRoleEnabled,
+         hpSwitchAutzUserRoleInitialRoleName,
+         hpSwitchAutzUserRoleRowStatus,
+         hpSwitchAutzUserRoleType,
+         hpSwitchAutzUserRoleCaptivePortalProfileName,
+         hpSwitchAutzUserRoleIngressUserPolicyName,
+         hpSwitchAutzUserRoleReauthPeriod,
+         hpSwitchAutzUserRoleVlanId,
+         hpSwitchAutzUserRoleVlanName,
+         hpSwitchAutzUserRoleTunneledNodeServerRedirect,
+         hpSwitchAutzUserRoleTunneledNodeServerSecondaryRole,
+         hpSwitchAutzUserRoleTaggedVlanId,
+         hpSwitchAutzUserRoleTaggedVlanName,
+         hpSwitchAutzUserRoleDownloadedEnabled
+      }
+      STATUS   deprecated
+      DESCRIPTION "A collection of objects for supporting
+                   local user roles."
+      ::= { hpSwitchAuthorizationMIBGroups 9 }
+
+    hpSwitchAutzUserRoleGroup4 OBJECT-GROUP
+      OBJECTS {
+         hpSwitchAutzUserRoleEnabled,
+         hpSwitchAutzUserRoleInitialRoleName,
+         hpSwitchAutzUserRoleRowStatus,
+         hpSwitchAutzUserRoleType,
+         hpSwitchAutzUserRoleCaptivePortalProfileName,
+         hpSwitchAutzUserRoleIngressUserPolicyName,
+         hpSwitchAutzUserRoleReauthPeriod,
+         hpSwitchAutzUserRoleVlanId,
+         hpSwitchAutzUserRoleVlanName,
+         hpSwitchAutzUserRoleTunneledNodeServerRedirect,
+         hpSwitchAutzUserRoleTunneledNodeServerSecondaryRole,
+         hpSwitchAutzUserRoleTaggedVlanId,
+         hpSwitchAutzUserRoleTaggedVlanName,
+         hpSwitchAutzUserRoleDownloadedEnabled,
+         hpSwitchAutzUserRoleTunneledNodeServerDownloadableRole
+      }
+      STATUS   deprecated
+      DESCRIPTION "A collection of objects for supporting
+                   local user roles."
+      ::= { hpSwitchAuthorizationMIBGroups 10 }
+
+    hpSwitchAutzUserRoleGroup5 OBJECT-GROUP
+      OBJECTS {
+         hpSwitchAutzUserRoleEnabled,
+         hpSwitchAutzUserRoleInitialRoleName,
+         hpSwitchAutzUserRoleRowStatus,
+         hpSwitchAutzUserRoleType,
+         hpSwitchAutzUserRoleCaptivePortalProfileName,
+         hpSwitchAutzUserRoleIngressUserPolicyName,
+         hpSwitchAutzUserRoleReauthPeriod,
+         hpSwitchAutzUserRoleVlanId,
+         hpSwitchAutzUserRoleVlanName,
+         hpSwitchAutzUserRoleTunneledNodeServerRedirect,
+         hpSwitchAutzUserRoleTunneledNodeServerSecondaryRole,
+         hpSwitchAutzUserRoleTaggedVlanId,
+         hpSwitchAutzUserRoleTaggedVlanName,
+         hpSwitchAutzUserRoleDownloadedEnabled,
+         hpSwitchAutzUserRoleTunneledNodeServerDownloadableRole,
+         hpSwitchAutzUserRoleLogOffPeriod
+      }
+      STATUS   deprecated
+      DESCRIPTION "A collection of objects for supporting
+                   local user roles."
+      ::= { hpSwitchAuthorizationMIBGroups 13 }
+
+    hpSwitchAutzUserRoleGroup6 OBJECT-GROUP
+      OBJECTS {
+         hpSwitchAutzUserRoleEnabled,
+         hpSwitchAutzUserRoleInitialRoleName,
+         hpSwitchAutzUserRoleRowStatus,
+         hpSwitchAutzUserRoleType,
+         hpSwitchAutzUserRoleCaptivePortalProfileName,
+         hpSwitchAutzUserRoleIngressUserPolicyName,
+         hpSwitchAutzUserRoleReauthPeriod,
+         hpSwitchAutzUserRoleVlanId,
+         hpSwitchAutzUserRoleVlanName,
+         hpSwitchAutzUserRoleTunneledNodeServerRedirect,
+         hpSwitchAutzUserRoleTunneledNodeServerSecondaryRole,
+         hpSwitchAutzUserRoleTaggedVlanName,
+         hpSwitchAutzUserRoleDownloadedEnabled,
+         hpSwitchAutzUserRoleTunneledNodeServerDownloadableRole,
+         hpSwitchAutzUserRoleLogOffPeriod,
+         hpSwitchAutzUserRoleSubTypeRowStatus,
+         hpSwitchAutzUserRoleAdminEdgePort,
+         hpSwitchAutzUserRolePoePriority,
+         hpSwitchAutzUserRoleCachedReauthPeriod,
+         hpSwitchAutzUserRolePoeAllocBy,
+         hpSwitchAutzUserRoleTaggedVlanList,
+         hpSwitchAutzUserRolePortMode
+      }
+      STATUS   current
+      DESCRIPTION "A collection of objects for supporting
+                   local user roles."
+      ::= { hpSwitchAuthorizationMIBGroups 14 }
 END
