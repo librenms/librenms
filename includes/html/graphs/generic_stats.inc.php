@@ -111,6 +111,14 @@ if (! isset($colour1h)) {
     $iter++;
 }
 
+if (! isset($colour1h_max) && ! $no_hourly_max) {
+    if (! \LibreNMS\Config::get("graph_colours.$colours.$iter")) {
+        $iter = 0;
+    }
+    $colour1h_max = \LibreNMS\Config::get("graph_colours.$colours.$iter");
+    $iter++;
+}
+
 if (! isset($colour1d)) {
     if (! \LibreNMS\Config::get("graph_colours.$colours.$iter")) {
         $iter = 0;
@@ -119,19 +127,19 @@ if (! isset($colour1d)) {
     $iter++;
 }
 
+if (! isset($colour1d_max) && ! $no_daily_max) {
+    if (! \LibreNMS\Config::get("graph_colours.$colours.$iter")) {
+        $iter = 0;
+    }
+    $colour1d_max = \LibreNMS\Config::get("graph_colours.$colours.$iter");
+    $iter++;
+}
+
 if (! isset($colour1w)) {
     if (! \LibreNMS\Config::get("graph_colours.$colours.$iter")) {
         $iter = 0;
     }
     $colour1w = \LibreNMS\Config::get("graph_colours.$colours.$iter");
-    $iter++;
-}
-
-if (! isset($colour1h_max) && $no_hourly_max) {
-    if (! \LibreNMS\Config::get("graph_colours.$colours.$iter")) {
-        $iter = 0;
-    }
-    $colour1h_max = \LibreNMS\Config::get("graph_colours.$colours.$iter");
     $iter++;
 }
 
@@ -224,12 +232,13 @@ if ($height > 25) {
     }
     if (! $no_daily_max) {
         if ($time_diff >= 61200) {
-            $rrd_options .= ' DEF:' . $id . "1dmax$munge_helper=$filename:$ds:MAXIMUM:step=86400";
+            $rrd_options .= ' DEF:' . $id . "1dmax$munge_helper=$filename:$ds:MAX:step=86400";
             if ($munge) {
                 $rrd_options .= ' CDEF:dsm01dmax=dsm01dmaxds,' . $munge_opts;
             }
         }
     }
+
 
     // weekly breaks and causes issues if it is less than 8 days
     if (! $no_weekly) {
@@ -237,14 +246,6 @@ if ($height > 25) {
             $rrd_options .= ' DEF:' . $id . "1w$munge_helper=$filename:$ds:AVERAGE:step=604800";
             if ($munge) {
                 $rrd_options .= ' CDEF:dsm01w=dsm01wds,' . $munge_opts;
-            }
-        }
-    }
-    if (! $no_weekly_max) {
-        if ($time_diff >= 691200) {
-            $rrd_options .= ' DEF:' . $id . "1wmax$munge_helper=$filename:$ds:MAXIMUM:step=604800";
-            if ($munge) {
-                $rrd_options .= ' CDEF:dsm01wmax=dsm01wmaxds,' . $munge_opts;
             }
         }
     }
@@ -273,7 +274,7 @@ if ($height > 25) {
     if (! $no_daily_max) {
         if ($time_diff >= 61200) {
             $rrd_optionsb .= ' LINE1.25:' . $id . '1dmax#' . $colour1d_max . ":'$descr_1d_max'";
-            $rrd_optionsb .= ' GPRINT:' . $id . '1dmax:LAST:%5.' . $float_precision . 'lf%s' . $units . ' GPRINT:' . $id . '1dmx:MIN:%5.' . $float_precision . 'lf%s' . $units;
+            $rrd_optionsb .= ' GPRINT:' . $id . '1dmax:LAST:%5.' . $float_precision . 'lf%s' . $units . ' GPRINT:' . $id . '1dmax:MIN:%5.' . $float_precision . 'lf%s' . $units;
             $rrd_optionsb .= ' GPRINT:' . $id . '1dmax:MAX:%5.' . $float_precision . 'lf%s' . $units . ' GPRINT:' . $id . "1dmax:AVERAGE:'%5." . $float_precision . "lf%s$units\\n'";
         }
     }
