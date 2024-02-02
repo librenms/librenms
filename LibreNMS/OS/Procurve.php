@@ -77,7 +77,7 @@ class Procurve extends \LibreNMS\OS implements OSPolling, NacPolling
         }
 
 
-        $rowSet=[];
+        $rowSet = [];
         $ifIndex_map = $this->getDevice()->ports()->pluck('port_id', 'ifIndex');
 
         $table = SnmpQuery::mibDir('hp')->mibs(['HP-DOT1X-EXTENSIONS-MIB'])->hideMib()->enumStrings()->walk('hpicfDot1xSMAuthConfigTable')->table();
@@ -86,7 +86,7 @@ class Procurve extends \LibreNMS\OS implements OSPolling, NacPolling
         foreach ($table as $ifIndex => $nacEntry) {
             $key = array_key_first($nacEntry['hpicfDot1xSMAuthMacAddr']);
 
-            $rowSet[$ifIndex]=[
+            $rowSet[$ifIndex] = [
                 'domain' => '',
                 'ip_address' => '',
                 'host_mode' => '',
@@ -121,7 +121,7 @@ class Procurve extends \LibreNMS\OS implements OSPolling, NacPolling
                 default => $row['dot1xAuthAuthControlledPortStatus']
             };
 
-            $rowSet[$ifIndex]['port_id']=$ifIndex_map->get($ifIndex, 0);
+            $rowSet[$ifIndex]['port_id'] = $ifIndex_map->get($ifIndex, 0);
 
         }
 
@@ -150,7 +150,7 @@ class Procurve extends \LibreNMS\OS implements OSPolling, NacPolling
                 continue;
             }
 
-            $rowSet[$ifIndex]['method'] = ($nacEntry['hpicfDot1xPaePortAuth'] === 'true') ? 'dot1x': '';
+            $rowSet[$ifIndex]['method'] = ($nacEntry['hpicfDot1xPaePortAuth'] === 'true') ? 'dot1x' : '';
         }
 
 
