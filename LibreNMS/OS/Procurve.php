@@ -71,7 +71,6 @@ class Procurve extends \LibreNMS\OS implements OSPolling, NacPolling
 
         $enabled = SnmpQuery::mibs(['IEEE8021-PAE-MIB'])->hideMib()->enumStrings()->get('dot1xPaeSystemAuthControl.0')->value();
         if ($enabled !== 'enabled') {
-
             return $nac;
         }
 
