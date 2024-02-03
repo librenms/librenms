@@ -1,0 +1,12 @@
+--
+-- ELN root SMI
+--
+ERICSSON-ELN-SMI DEFINITIONS ::= BEGIN
+
+     IMPORTS
+         ericsson
+               FROM ERICSSON-TOP-MIB;
+         
+     eln OBJECT IDENTIFIER ::= { ericsson 109 }
+                                             
+END

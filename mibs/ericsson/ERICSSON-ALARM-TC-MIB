@@ -1,0 +1,235 @@
+--
+-- The Ericsson Alarm Textual Conventions MIB
+--
+-- Copyright (c) 2017 by Ericsson AB.
+-- All rights reserved.
+--
+-- This MIB is part of the ERICSSON-ALARM-MIB Suite, and its use is documented
+-- further in TEA (The Ericsson Architecture), O&M System Architecture
+-- Principles, FAE 151 01.
+--
+
+ERICSSON-ALARM-TC-MIB DEFINITIONS ::= BEGIN
+
+-- Add imports as needed
+IMPORTS
+        MODULE-IDENTITY, Unsigned32
+                FROM SNMPv2-SMI
+        TEXTUAL-CONVENTION
+                FROM SNMPv2-TC
+        ericssonModules
+                FROM ERICSSON-TOP-MIB;
+
+ericssonAlarmTCMIB MODULE-IDENTITY
+        LAST-UPDATED "201708110000Z"
+        ORGANIZATION "Ericsson AB"
+        CONTACT-INFO
+                "EEIEMY"
+        DESCRIPTION
+                "This MIB defines textual conventions used by the
+                ERICSSON-ALARM-MIB.
+
+				Document number: 3/196 03-CXC 172 7549"
+
+        REVISION      "201708110000Z"
+        DESCRIPTION
+                "Updated as part of ERICSSON ALARM MIB 3.0 package.
+                Updated to remove author's name.
+				Document number: 3/196 03-CXC 172 7549, Rev E."
+		REVISION      "201705180000Z"
+        DESCRIPTION
+                "Updated to increase size of Additional Info.
+				Document number: 3/196 03-CXC 172 7549, Rev D."
+        REVISION      "201703310000Z"
+        DESCRIPTION
+                "Updated as part of ERICSSON ALARM MIB 2.1 package.
+				Updated with reference to TEA.
+				Document number: 3/196 03-CXC 172 7549, Rev C."
+        REVISION      "201606240000Z"
+        DESCRIPTION
+                "Updated as part of ERICSSON ALARM MIB 2.0 package.
+				Updated header.
+				Document number: 3/196 03-CXC 172 7549, Rev B."
+        REVISION      "200810170000Z"
+        DESCRIPTION
+                "Initial version of this MIB module."
+        ::= { ericssonModules 3 }
+
+--=======================
+--==Textual conventions==
+--=======================
+
+EriAlarmType ::= TEXTUAL-CONVENTION
+        DISPLAY-HINT "d"
+        STATUS current
+        DESCRIPTION
+                "A unique identification of the fault, not
+                including the managed object.  Alarm types are
+                used to identify if alarms indicate the same
+                problem or not, for lookup into external alarm
+                documentation, etc.  A unique alarm type is
+                identified using the combination of two instances
+                of EriAlarmType. Different managed object
+                types and instances can share alarm types.  But
+                if the same managed object reports the same alarm
+                type, it is to be considered to be the same alarm
+                state. The alarm type is a simplification of the
+                different X.733 and 3GPP alarm IRP alarm
+                correlation mechanisms based on EventType,
+                ProbableCause, SpecificProblem and
+                NotificationId."
+        SYNTAX Unsigned32
+
+EriAlarmIndex ::= TEXTUAL-CONVENTION
+        DISPLAY-HINT "d"
+        STATUS current
+        DESCRIPTION
+                "Index used in the active alarm table.  A row
+                shall never change its index during the lifetime
+                of the entry; for example renumbering entries is
+                not allowed when entries are deleted.
+                Renumbering after an agent restart is allowed.
+                Note that this index shall not be used to
+                identify alarms when performing
+                resynchronization, etc. The logical identity for
+                an alarm instance is the managed object and alarm
+                type."
+        SYNTAX Unsigned32
+
+EriAdditionalText ::= TEXTUAL-CONVENTION
+        DISPLAY-HINT "1a"
+        STATUS current
+        DESCRIPTION
+                "The string used in additional text
+                notifications. This MUST contain enough
+                information for an operator to be able to
+                understand the problem. If this string contains
+                structure, this format should be clearly
+                documented for programs to be able to parse that
+                information. This is a small size range in order
+                to guarantee delivery of notifications without
+                fragmentation. There is a corresponding textual
+                convention, EriLargeAdditionalText, to be used
+                for scalar and columnar objects.  The string
+                should adhere to the rules for SnmpAdminString of
+                SNMPv3 framework MIBs."
+        REFERENCE
+                "snmpFrameworkMIB in RFC 3411 defines
+                SnmpAdminString"
+        SYNTAX OCTET STRING(SIZE(4..256))
+
+EriLargeAdditionalText ::= TEXTUAL-CONVENTION
+        DISPLAY-HINT "1a"
+        STATUS current
+        DESCRIPTION
+                "The string used in additional text. This MUST
+                contain enough information for an operator to be
+                able to understand the problem. If this string
+                contains structure, this format should be clearly
+                documented for programs to be able to parse that
+                information. This is a large additional text to
+                be used in tables. There is a corresponding
+                textual convention to be used in alarm
+                notifications, EriAdditionalText.  The string
+                should adhere to the rules for SnmpAdminString of
+                SNMPv3 framework MIBs."
+        REFERENCE
+                "snmpFrameworkMIB in RFC 3411 defines
+                SnmpAdminString"
+        SYNTAX OCTET STRING(SIZE(4..512))
+
+EriAlarmSpecificProblem ::= TEXTUAL-CONVENTION
+        DISPLAY-HINT "1a"
+        STATUS current
+        DESCRIPTION
+                "Unique string for the Alarm Type. No different
+                alarm types may share specific problem. Specific
+                Problem and Alarm Type have a one-to-one
+                correspondance."
+        SYNTAX OCTET STRING(SIZE(4..64))
+
+EriAlarmSequenceNumber ::= TEXTUAL-CONVENTION
+        DISPLAY-HINT "d"
+        STATUS current
+        DESCRIPTION
+                "This is a monotonically increasing counter. It
+                is increased every time a notification is sent.
+                The value is NOT increased for heartbeat
+                notifications.  It is carried as a varbind in the
+                alarm notifications as well as in the heartbeat
+                notifications.  Management systems can use these
+                varbinds to detect lost notifications."
+        SYNTAX Unsigned32
+
+EriAdditionalInfo ::= TEXTUAL-CONVENTION
+        DISPLAY-HINT "1a"
+        STATUS current
+        DESCRIPTION
+                "Additional Information, structured in a way that is
+				suitable for machine-to-machine communication.
+				Comprises a number of name=value pairs, separated by a
+				semicolon in the following format:
+					name1=value1;name2=value2;..
+				Allowed strings for use as 'name' are defined in
+				The Ericsson Architecture and updated upon internal
+				requests from Ericsson organizations.
+				This is a small size range in order to guarantee delivery
+                of notifications without fragmentation. There is a
+                corresponding textual convention, EriLargeAdditionalInfo,
+                to be used for scalar and columnar objects.
+                The string should adhere to the rules for SnmpAdminString
+				of SNMPv3 framework MIBs."
+        REFERENCE
+                "snmpFrameworkMIB in RFC 3411 defines
+                SnmpAdminString;
+                TEA (The Ericsson Architecture),
+                Operation & Maintenance Architecture Principles, FAE 151 01."
+        SYNTAX OCTET STRING(SIZE(4..256))
+
+EriAppendedAdditionalInfo ::= TEXTUAL-CONVENTION
+        DISPLAY-HINT "1a"
+        STATUS current
+        DESCRIPTION
+                "Used for spillover of Additional Info in the append trap."
+        REFERENCE
+                "snmpFrameworkMIB in RFC 3411 defines
+                SnmpAdminString;
+                TEA (The Ericsson Architecture),
+                Operation & Maintenance Architecture Principles, FAE 151 01."
+        SYNTAX OCTET STRING(SIZE(4..512))
+
+EriLargeAdditionalInfo ::= TEXTUAL-CONVENTION
+        DISPLAY-HINT "1a"
+        STATUS current
+        DESCRIPTION
+                "Additional Information, structured in a way that is
+				suitable for machine-to-machine communication.
+				Comprises a number of name=value pairs, separated by a
+				semicolon in the following format:
+					name1=value1;name2=value2;..
+				Allowed strings for use as 'name' are defined in
+				The Ericsson Architecture and updated upon internal
+				requests from Ericsson organizations.
+				This is a large additional info to be used in tables.
+				There is a corresponding textual convention to be used
+				in alarm notifications, EriAdditionalInfo.
+				The string should adhere to the rules for SnmpAdminString
+				of SNMPv3 framework MIBs."
+        REFERENCE
+                "snmpFrameworkMIB in RFC 3411 defines
+                SnmpAdminString;
+                TEA (The Ericsson Architecture),
+                Operation & Maintenance Architecture Principles, FAE 151 01."
+        SYNTAX OCTET STRING(SIZE(4..768))
+
+EriAlarmRecordType ::= TEXTUAL-CONVENTION
+        STATUS current
+        DESCRIPTION
+                "This defines the alarm record type that is
+                being reported in an alarm notification."
+        SYNTAX INTEGER {
+                alarmNew(0),
+                alarmChange(1)
+        }
+
+END

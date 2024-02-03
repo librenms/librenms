@@ -1,0 +1,93 @@
+-- %DNP% $Id: ERICSSON-ROUTER-CIRCUIT-GROUP-CAP.my,v 1.1.6.2.4.4 2011/06/15 18:19:45 danielhe Exp $
+-- %DNP% $Source: /cvsroot/pkt/sw/se/xc/bsd/config/snmp/mibs/Attic/ERICSSON-ROUTER-CIRCUIT-GROUP-CAP.my,v $
+-- *****************************************************************
+-- ERICSSON-ROUTER-CIRCUIT-GROUP-CAP	 Circuit Group MIB Capabilities
+--
+-- Copyright (c) 2002-2003, 2005-2008, 2010-2011, 2015 Ericsson AB
+-- All rights reserved.
+-- 
+-- *****************************************************************
+
+ERICSSON-ROUTER-CIRCUIT-GROUP-CAP DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY
+		FROM SNMPv2-SMI
+	AGENT-CAPABILITIES
+		FROM SNMPv2-CONF
+	eriRouterCapabilities
+		FROM ERICSSON-ROUTER-SMI;
+
+eriRouterCctGroupCap MODULE-IDENTITY
+        LAST-UPDATED    "201501141800Z" -- Jan 14, 2015
+        ORGANIZATION    "Ericsson Inc."
+        CONTACT-INFO
+                "       Ericsson, Inc.
+
+                Postal: 100 Headquarters Dr.
+                        San Jose, CA  95134
+                        USA
+
+                 Phone: +1 408 750 5000
+                   Fax: +1 408 750 5599
+
+                "
+	DESCRIPTION
+		"The Agent Capabilities of the Quality of 
+                 Service counters MIB (ERICSSON-ROUTER-QOS-MIB).
+
+                If this MIB implementation is platform-dependent,
+                the PRODUCT-RELEASE clause contains Ericsson SEOS version and
+                at least one of the following Ericsson product families:
+                    [SE]  SmartEdge Multi-service Edge Router (MSER) family
+                    [SM]  SM family of Metro Ethernet Service Transport platforms
+                    [SSR] Smart Service Router (SSR) family"
+
+        REVISION        "201501141800Z" -- Jan 14, 2015
+        DESCRIPTION
+               "Updated RBN/rbn/Rbn as ERICSSON-ROUTER/eriRouter/EriRouter
+                to migrate RBN MIB to ERICSSON MIB."
+
+        REVISION        "201106150000Z" -- Jun 15, 2011
+        DESCRIPTION
+                "Update DESCRIPTION clause of MODULE-IDENTITY
+                 and PRODUCT-RELEASE clause of AGENT-CAPABILITIES."
+
+        REVISION    "201011010000Z" -- Nov 1, 2010
+        DESCRIPTION
+                "Modified PRODUCT-RELEASE clause for consistent naming.
+                 Updated CONTACT-INFO."
+
+	REVISION        "200807300000Z" -- Jul 30, 2008
+	DESCRIPTION
+		"Product release for eriRouterCctGroupCap1 has been renamed
+                 to SEOS 6.1.2"
+
+	REVISION        "200708140000Z" -- Aug 14, 2007
+	DESCRIPTION
+		"Initial version."
+	::= { eriRouterCapabilities 74 }
+
+eriRouterCctGroupCap1 AGENT-CAPABILITIES
+	PRODUCT-RELEASE	"SEOS 6.1.2 [SE]; SEOS 6.3.X [SM]; SEOS 11.1.X [SSR]"
+	STATUS		current
+	DESCRIPTION	"ERICSSON-ROUTER-CIRCUIT-GROUP-MIB capabilities"
+	SUPPORTS	ERICSSON-ROUTER-CIRCUIT-GROUP-MIB
+	INCLUDES {
+	    eriRouterCctGrpStatsGroup,
+            eriRouterCctGrpQStatsGroup,
+            eriRouterCctGrpPolicyStatsGroup
+        }
+
+	VARIATION eriRouterCctGrpRLPolicyType
+        SYNTAX INTEGER {
+                policing(1),
+                metering(2)
+        }
+        DESCRIPTION
+            "The value edrr(3), mdrr(4), pq(5), atmwfq(6), or pwfq(7) is not
+             supported."
+
+	::= { eriRouterCctGroupCap 1 }
+
+END

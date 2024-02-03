@@ -1,0 +1,149 @@
+-- *****************************************************************
+-- ERICSSON-ROUTER-ACL-MIB
+--
+-- Copyright (c) 2016 Ericsson AB.
+-- All rights reserved.
+--
+-- *****************************************************************
+
+
+
+ERICSSON-ROUTER-ACL-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+  MODULE-IDENTITY,
+  OBJECT-TYPE,
+  NOTIFICATION-TYPE,
+  Integer32
+    FROM SNMPv2-SMI
+  DisplayString
+    FROM SNMPv2-TC
+  MODULE-COMPLIANCE
+         FROM SNMPv2-CONF
+  SnmpAdminString
+      FROM SNMP-FRAMEWORK-MIB
+  eriRouterMgmt
+      FROM ERICSSON-ROUTER-SMI
+  OBJECT-GROUP, NOTIFICATION-GROUP
+      FROM SNMPv2-CONF;
+
+eriRouterACLMib MODULE-IDENTITY
+     LAST-UPDATED    "201610271800Z" -- Oct 27, 2016
+     ORGANIZATION    "Ericsson Inc."
+     CONTACT-INFO
+             "       Ericsson Inc."
+     DESCRIPTION
+             " ACL MIB"
+
+-- Revision history
+     REVISION        "201610271800Z" -- Oct 27, 2016
+     DESCRIPTION
+             "Initial version of ACL MIB defenition."
+
+    ::= { eriRouterMgmt 120 }
+
+eriRouterACLMibObjects OBJECT IDENTIFIER
+    ::= { eriRouterACLMib 1 }
+eriRouterACLNotifications OBJECT IDENTIFIER
+    ::= { eriRouterACLMib 2 }
+ eriRouterACLConformance OBJECT IDENTIFIER
+    ::= { eriRouterACLMib 3 }
+
+--
+-- Object definitions of eriRouterACLMibObjects
+--
+
+eriRouterACLContextName OBJECT-TYPE
+  SYNTAX  DisplayString (SIZE(1..255))
+  MAX-ACCESS accessible-for-notify
+  STATUS  current
+  DESCRIPTION
+      "Represents the name of the ACL access group context name."
+  ::= { eriRouterACLMibObjects 1 }
+
+eriRouterACLInterfaceName OBJECT-TYPE
+  SYNTAX  DisplayString (SIZE(1..255))
+  MAX-ACCESS accessible-for-notify
+  STATUS  current
+  DESCRIPTION
+      "Represents the name of the ACL access group interface name."
+  ::= { eriRouterACLMibObjects 2 }
+
+-- END OF Object definitions of eriRouterACLMibObjects
+--
+
+
+--
+-- Notification type definitions of eriRouterACLNotifications
+--
+
+eriRouterACLBuildFailed NOTIFICATION-TYPE
+  OBJECTS {
+      eriRouterACLContextName,
+      eriRouterACLInterfaceName
+       }
+  STATUS  current
+  DESCRIPTION
+      "Notification Type for an ACL Build Failed event."
+  ::= { eriRouterACLNotifications 1 }
+
+eriRouterACLBuildFailClear NOTIFICATION-TYPE
+  OBJECTS {
+      eriRouterACLContextName,
+      eriRouterACLInterfaceName
+       }
+  STATUS  current
+  DESCRIPTION
+      "Notification Type for an ACL Build Fail Clear event."
+  ::= { eriRouterACLNotifications 2 }
+
+--
+-- END OF Notification type definitions of eriRouterACLNotifications
+--
+
+--
+-- Conformance definitions of eriRouterACLConformance
+--
+
+eriRouterACLGroups OBJECT IDENTIFIER ::= { eriRouterACLConformance 1 }
+eriRouterACLCompliances OBJECT IDENTIFIER ::= { eriRouterACLConformance 2 }
+--
+-- END OF Conformance definitions of eriRouterACLConformance
+--
+
+eriRouterACLObjectsGroup OBJECT-GROUP
+    OBJECTS {
+      eriRouterACLContextName,
+      eriRouterACLInterfaceName
+    }
+    STATUS current
+    DESCRIPTION
+        "The collection of objects used in ACL access group
+         notifications"
+    ::= { eriRouterACLGroups 1 }
+
+
+eriRouterACLNotifyGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        eriRouterACLBuildFailed,
+        eriRouterACLBuildFailClear
+    }
+    STATUS current
+    DESCRIPTION
+        "Notifications for ACL access  groups."
+    ::= { eriRouterACLGroups 2 }
+
+eriRouterACLCompliance MODULE-COMPLIANCE
+    STATUS       current
+    DESCRIPTION
+        "The compliance statement for ACL access  group objects in this
+        ACL MIB."
+    MODULE      -- this module
+    MANDATORY-GROUPS {
+        eriRouterACLObjectsGroup,
+        eriRouterACLNotifyGroup
+    }
+    ::= { eriRouterACLCompliances 1 }
+
+
+END

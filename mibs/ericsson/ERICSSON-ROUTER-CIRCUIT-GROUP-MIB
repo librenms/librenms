@@ -1,0 +1,796 @@
+-- %DNP% $Id: ERICSSON-ROUTER-CIRCUIT-GROUP-MIB.my,v 1.1.6.2.4.2 2011/02/22 17:26:16 thatcher Exp $
+-- %DNP% $Source: /cvsroot/pkt/sw/se/xc/bsd/config/snmp/mibs/Attic/ERICSSON-ROUTER-CIRCUIT-GROUP-MIB.my,v $
+-- *****************************************************************
+-- ERICSSON-ROUTER-CIRCUIT-GROUP-MIB
+--
+-- Copyright (c) 2007-2008, 2011, 2015 Ericsson AB
+-- All rights reserved.
+--
+-- *****************************************************************
+
+ERICSSON-ROUTER-CIRCUIT-GROUP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+
+    Counter64,
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    Unsigned32, IpAddress
+            FROM SNMPv2-SMI
+
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP
+            FROM SNMPv2-CONF
+
+    SnmpAdminString
+            FROM SNMP-FRAMEWORK-MIB
+
+    EriRouterQosClassId, EriRouterQosPolicyType
+            FROM ERICSSON-ROUTER-QOS-MIB
+
+    eriRouterMgmt
+            FROM ERICSSON-ROUTER-SMI;
+
+
+eriRouterCircuitGroupMib MODULE-IDENTITY
+    LAST-UPDATED    "201501141800Z" -- Jan 14, 2015
+    ORGANIZATION    "Ericsson AB."
+    CONTACT-INFO
+            "       Ericsson AB.
+
+            Postal: 100 Headquarters Dr
+                    San Jose, CA  95134
+                    USA
+
+             Phone: +1 408 750 5000
+               Fax: +1 408 750 5599
+            "
+    DESCRIPTION
+        "Defines objects which may be used to monitor circuit groups
+        policies"
+
+    REVISION        "201501141800Z" -- Jan 14, 2015
+    DESCRIPTION
+        "Updated RBN/rbn/Rbn as ERICSSON-ROUTER/eriRouter/EriRouter
+         to migrate RBN MIB to ERICSSON MIB."
+
+    REVISION        "201101191800Z" -- Jan 19, 2011
+    DESCRIPTION
+        "Update CONTACT-INFO & ORGANIZATION. "
+
+    REVISION        "200807300000Z" -- July, 30, 2008
+    DESCRIPTION
+        "eriRouterCctGrpName object's maximum length has been increased from 39 to 80"
+    
+    REVISION        "200707250000Z" -- July 25, 2007
+    DESCRIPTION
+        "Initial version."
+    ::= { eriRouterMgmt 43 }
+
+eriRouterCircuitGroupObjects
+        OBJECT IDENTIFIER ::= { eriRouterCircuitGroupMib 1 }
+
+eriRouterCircuitGroupConformance
+        OBJECT IDENTIFIER ::= { eriRouterCircuitGroupMib 2 }
+
+--
+-- Circuit Groups
+--
+eriRouterCircuitGroupStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EriRouterCircuitGroupStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing various Tx, Rx, and drop counters
+        for each circuit group."
+    ::= { eriRouterCircuitGroupObjects 1 }
+    
+eriRouterCircuitGroupStatsEntry OBJECT-TYPE
+    SYNTAX      EriRouterCircuitGroupStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A conceptual row in the eriRouterCircuitGroupStatsTable. Each row
+        contains a set of packet and octet counters for a circuit group."
+    INDEX       { eriRouterCctGrpName }
+    ::= { eriRouterCircuitGroupStatsTable 1 }
+    
+EriRouterCircuitGroupStatsEntry    ::= SEQUENCE {
+    eriRouterCctGrpName                       SnmpAdminString,
+    eriRouterCctGrpTxOctets                   Counter64,
+    eriRouterCctGrpTxPackets                  Counter64,
+    eriRouterCctGrpTxMulticastOctets          Counter64,
+    eriRouterCctGrpTxMulticastPackets         Counter64,
+    eriRouterCctGrpRxOctets                   Counter64,
+    eriRouterCctGrpRxPackets                  Counter64,
+    eriRouterCctGrpRxMulticastOctets          Counter64,
+    eriRouterCctGrpRxMulticastPackets         Counter64,
+    eriRouterCctGrpAdjDroppedOctets           Counter64,
+    eriRouterCctGrpAdjDroppedPackets          Counter64,
+    eriRouterCctGrpDownDroppedOctets          Counter64,
+    eriRouterCctGrpDownDroppedPackets         Counter64,
+    eriRouterCctGrpUnreachDroppedOctets       Counter64,
+    eriRouterCctGrpUnreachDroppedPackets      Counter64,
+    eriRouterCctGrpUnknownEncapsOctets        Counter64,
+    eriRouterCctGrpUnknownEncapsPackets       Counter64
+}
+ 
+eriRouterCctGrpName   OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(1..113))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The name of the hierarchical group."
+    ::= { eriRouterCircuitGroupStatsEntry  1 }
+
+eriRouterCctGrpTxOctets   OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of octets transmitted by the group including
+         its children."
+    ::= { eriRouterCircuitGroupStatsEntry  2 }
+   
+eriRouterCctGrpTxPackets   OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets transmitted by the group including
+         its children."
+    ::= { eriRouterCircuitGroupStatsEntry  3 }
+   
+eriRouterCctGrpTxMulticastOctets   OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of multicast octets transmitted by the group including
+         its children."
+    ::= { eriRouterCircuitGroupStatsEntry  4 }
+   
+eriRouterCctGrpTxMulticastPackets   OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of multicast packets transmitted by the group including
+         its children."
+    ::= { eriRouterCircuitGroupStatsEntry  5 }
+   
+
+eriRouterCctGrpRxOctets   OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of octets received by the group including
+         its children."
+    ::= { eriRouterCircuitGroupStatsEntry  6 }
+   
+eriRouterCctGrpRxPackets   OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets received by the group including
+         its children."
+    ::= { eriRouterCircuitGroupStatsEntry  7 }
+   
+eriRouterCctGrpRxMulticastOctets   OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of multicast octets received by the group including
+         its children."
+    ::= { eriRouterCircuitGroupStatsEntry  8 }
+   
+eriRouterCctGrpRxMulticastPackets   OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of multicast packets received by the group including
+         its children."
+    ::= { eriRouterCircuitGroupStatsEntry  9 }
+
+eriRouterCctGrpAdjDroppedOctets   OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of adjacency octets dropped."
+    ::= { eriRouterCircuitGroupStatsEntry 10 }
+   
+eriRouterCctGrpAdjDroppedPackets   OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of adjacency packets dropped."
+    ::= { eriRouterCircuitGroupStatsEntry 11 }
+   
+eriRouterCctGrpDownDroppedOctets   OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of down octets dropped."
+    ::= { eriRouterCircuitGroupStatsEntry 12 }
+   
+eriRouterCctGrpDownDroppedPackets   OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of down packets dropped."
+    ::= { eriRouterCircuitGroupStatsEntry 13 }
+   
+eriRouterCctGrpUnreachDroppedOctets   OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of unreachable octets dropped."
+    ::= { eriRouterCircuitGroupStatsEntry 14 }
+   
+eriRouterCctGrpUnreachDroppedPackets   OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of unreachable packets dropped."
+    ::= { eriRouterCircuitGroupStatsEntry 15 }
+   
+eriRouterCctGrpUnknownEncapsOctets   OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number octets dropped due to unknown encapsulation."
+    ::= { eriRouterCircuitGroupStatsEntry 16 }
+   
+eriRouterCctGrpUnknownEncapsPackets   OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets dropped due to unknown encapsulation."
+    ::= { eriRouterCircuitGroupStatsEntry 17 }
+   
+--
+--
+--
+eriRouterCircuitGroupQTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EriRouterCircuitGroupQEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing various counters for each transmit queue
+        assigned to a circuit group."
+    ::= { eriRouterCircuitGroupObjects 2 }
+    
+eriRouterCircuitGroupQEntry OBJECT-TYPE
+    SYNTAX      EriRouterCircuitGroupQEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A conceptual row in the eriRouterCircuitGroupQueueTable. Each row
+        contains tx and drop counters for each transmit queue assigned
+        to a circuit group."
+    INDEX   { eriRouterCctGrpName, eriRouterCctGrpQueueId }
+    ::= { eriRouterCircuitGroupQTable 1 }
+    
+EriRouterCircuitGroupQEntry ::= SEQUENCE
+{
+    eriRouterCctGrpQueueId                Unsigned32,
+    eriRouterCctGrpQTxOctets              Counter64,
+    eriRouterCctGrpQTxPackets             Counter64,
+    eriRouterCctGrpQWredDroppedOctets     Counter64,
+    eriRouterCctGrpQWredDroppedPkts       Counter64,
+    eriRouterCctGrpQTailDroppedOctets     Counter64,
+    eriRouterCctGrpQTailDroppedPkts       Counter64
+}
+
+eriRouterCctGrpQueueId OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..7)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A unique identifier for a transmit queue used by the circuit."
+    ::= { eriRouterCircuitGroupQEntry 1 }
+
+eriRouterCctGrpQTxOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of octets transmitted out of this queue.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system."
+    ::= { eriRouterCircuitGroupQEntry 2 }
+
+eriRouterCctGrpQTxPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of packets transmitted out of this queue.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system."
+    ::= { eriRouterCircuitGroupQEntry 3 }
+
+eriRouterCctGrpQWredDroppedOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of octets dropped due to the application of a
+            weighted random early detection algorithm.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system."
+    ::= { eriRouterCircuitGroupQEntry 4 }
+
+eriRouterCctGrpQWredDroppedPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of packets dropped due to the application of a
+            weighted random early detection algorithm.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system."
+    ::= { eriRouterCircuitGroupQEntry 5 }
+
+eriRouterCctGrpQTailDroppedOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of octets dropped when the total number of packets
+            in this queue was greater than the maximum threshold.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system."
+    ::= { eriRouterCircuitGroupQEntry 6 }
+
+eriRouterCctGrpQTailDroppedPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of packets dropped when the total number of
+            packets in this queue was greater than the maximum threshold.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system."
+    ::= { eriRouterCircuitGroupQEntry 7 }
+
+--
+--
+--
+eriRouterCctGrpRLPolicyStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EriRouterCctGrpRLPolicyStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+           "A table of counters for rate limit policies applied to 
+           circuit groups."
+    ::= { eriRouterCircuitGroupObjects 3 }
+
+eriRouterCctGrpRLPolicyStatsEntry    OBJECT-TYPE
+    SYNTAX      EriRouterCctGrpRLPolicyStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+           "A conceptial row in the eriRouterCircuitGroupPolicyStatsTable. Each
+           row contains counters for a rate limit policy applied to the 
+           circuit group.  Note that each counter includes the sum of
+           all the child circuits. "
+    INDEX { eriRouterCctGrpName, eriRouterCctGrpRLPolicyType }
+    ::=  { eriRouterCctGrpRLPolicyStatsTable 1 }
+    
+EriRouterCctGrpRLPolicyStatsEntry ::= SEQUENCE {
+    eriRouterCctGrpRLPolicyType                   EriRouterQosPolicyType,
+    eriRouterCctGrpRLPolicyName                   SnmpAdminString,
+    eriRouterCctGrpRLPolicyConformOctets          Counter64,
+    eriRouterCctGrpRLPolicyConformPkts            Counter64,
+    eriRouterCctGrpRLPolicyExceedOctets           Counter64,
+    eriRouterCctGrpRLPolicyExceedPkts             Counter64,
+    eriRouterCctGrpRLPolicyExceedDroppedOctets    Counter64,
+    eriRouterCctGrpRLPolicyExceedDroppedPkts      Counter64,
+    eriRouterCctGrpRLPolicyViolateOctets          Counter64,
+    eriRouterCctGrpRLPolicyViolatePkts            Counter64,
+    eriRouterCctGrpRLPolicyViolateDroppedOctets   Counter64,
+    eriRouterCctGrpRLPolicyViolateDroppedPkts     Counter64
+}
+
+eriRouterCctGrpRLPolicyType OBJECT-TYPE
+    SYNTAX      EriRouterQosPolicyType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "The type of the rate-limit policy which is applied to the
+        circuit group."
+    ::= { eriRouterCctGrpRLPolicyStatsEntry 1 }
+
+eriRouterCctGrpRLPolicyName OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(1..39))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Name of the rate-limit policy."
+    ::= { eriRouterCctGrpRLPolicyStatsEntry 2 }
+
+
+eriRouterCctGrpRLPolicyConformOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of octets that conform to the rate limit set on
+            the circuit group for which counters are enabled."
+    ::= { eriRouterCctGrpRLPolicyStatsEntry 3 }
+
+eriRouterCctGrpRLPolicyConformPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of packets that conform to the rate limit set on
+            the circuit group for which counters are enabled."
+    ::= { eriRouterCctGrpRLPolicyStatsEntry 4 }
+
+eriRouterCctGrpRLPolicyExceedOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of octets that exceed the rate limit set on the
+            interface for which class counters are enabled."
+    ::= { eriRouterCctGrpRLPolicyStatsEntry 5 }
+
+eriRouterCctGrpRLPolicyExceedPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of packets that exceed the rate limit set on the
+            interface."
+    ::= { eriRouterCctGrpRLPolicyStatsEntry 6 }
+
+eriRouterCctGrpRLPolicyExceedDroppedOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of octets that were dropped due to the application
+            of an exceed action on packets that exceed the rate limit set
+            on the circuit group for which counters are enabled."
+    ::= { eriRouterCctGrpRLPolicyStatsEntry 7 }
+
+eriRouterCctGrpRLPolicyExceedDroppedPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of packets that were dropped due to the application
+            of an exceed action on packets that exceed the rate limit set
+            on the circuit group for which counters are enabled."
+    ::= { eriRouterCctGrpRLPolicyStatsEntry 8 }
+
+eriRouterCctGrpRLPolicyViolateOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of octets that violate the normal and maximum burst
+            sizes on the circuit group for which counters are enabled."
+    ::= { eriRouterCctGrpRLPolicyStatsEntry 9 }
+
+eriRouterCctGrpRLPolicyViolatePkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of packets that violate the normal and maximum burst
+            sizes on the circuit group for which counters are enabled."
+    ::= { eriRouterCctGrpRLPolicyStatsEntry 10 }
+
+eriRouterCctGrpRLPolicyViolateDroppedOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of octets that were dropped due to the application
+            of a violate action on packets that violate the normal and
+            maximum burst sizes on the circuit group for which counters
+            are enabled."
+    ::= { eriRouterCctGrpRLPolicyStatsEntry 11 }
+
+eriRouterCctGrpRLPolicyViolateDroppedPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of packets that were dropped due to the application
+            of a violate action on packets that violate the normal and
+            maximum burst sizes on the circuit group for which counters
+            are enabled."
+    ::= { eriRouterCctGrpRLPolicyStatsEntry 12 }
+
+--
+--
+--
+eriRouterCctGrpRLClassStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EriRouterCctGrpRLClassStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+           "A table of counters for rate limit policy classes applied to 
+           circuit groups."
+    ::= { eriRouterCircuitGroupObjects 4 }
+
+eriRouterCctGrpRLClassStatsEntry    OBJECT-TYPE
+    SYNTAX      EriRouterCctGrpRLClassStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+           "A conceptial row in the eriRouterCctGrpRLClassStatsTable. Each
+           row contains counters for a rate limit policy class applied 
+           to the circuit group."
+    INDEX { eriRouterCctGrpName, eriRouterCctGrpRLPolicyType, eriRouterCctGrpRLClassId }
+    ::=  { eriRouterCctGrpRLClassStatsTable 1 }
+    
+EriRouterCctGrpRLClassStatsEntry ::= SEQUENCE {
+    eriRouterCctGrpRLClassId                    EriRouterQosClassId,
+    eriRouterCctGrpRLClassName                  SnmpAdminString,
+    eriRouterCctGrpRLClassConformOctets         Counter64,
+    eriRouterCctGrpRLClassConformPkts           Counter64,
+    eriRouterCctGrpRLClassConformDroppedOctets  Counter64,
+    eriRouterCctGrpRLClassConformDroppedPkts    Counter64,
+    eriRouterCctGrpRLClassExceedOctets          Counter64,
+    eriRouterCctGrpRLClassExceedPkts            Counter64,
+    eriRouterCctGrpRLClassExceedDroppedOctets   Counter64,
+    eriRouterCctGrpRLClassExceedDroppedPkts     Counter64,
+    eriRouterCctGrpRLClassViolateOctets         Counter64,
+    eriRouterCctGrpRLClassViolatePkts           Counter64,
+    eriRouterCctGrpRLClassViolateDroppedOctets  Counter64,
+    eriRouterCctGrpRLClassViolateDroppedPkts    Counter64
+}
+
+eriRouterCctGrpRLClassId OBJECT-TYPE
+    SYNTAX      EriRouterQosClassId
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+           "A value that uniquely identifies a class defined in the
+            rate-limit policy access list."
+    ::= { eriRouterCctGrpRLClassStatsEntry 1 }
+
+eriRouterCctGrpRLClassName OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(1..39))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "Name of the class in the rate-limit policy access list."
+    ::= { eriRouterCctGrpRLClassStatsEntry 2 }
+
+eriRouterCctGrpRLClassConformOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of octets that conform to the policy class rate
+            limit set on the circuit group."
+    ::= { eriRouterCctGrpRLClassStatsEntry 3 }
+
+eriRouterCctGrpRLClassConformPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of packets that conform to the policy class rate
+            limit set on the circuit group."
+    ::= { eriRouterCctGrpRLClassStatsEntry 4 }
+
+eriRouterCctGrpRLClassConformDroppedOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of octets that were dropped due to the application
+            of a conform action on packets that conform to the policy class
+            rate limit set on the circuit group."
+    ::= { eriRouterCctGrpRLClassStatsEntry 5 }
+
+eriRouterCctGrpRLClassConformDroppedPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of packets that were dropped due to the application
+            of a conform action on packets that conform to the policy class
+            rate limit set on the circuit group."
+    ::= { eriRouterCctGrpRLClassStatsEntry 6 }
+
+eriRouterCctGrpRLClassExceedOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of octets that exceed the policy class rate limit
+            set on the circuit group."
+    ::= { eriRouterCctGrpRLClassStatsEntry 7 }
+
+eriRouterCctGrpRLClassExceedPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of packets that exceed the policy class rate
+            limit set on the circuit group."
+    ::= { eriRouterCctGrpRLClassStatsEntry 8 }
+
+eriRouterCctGrpRLClassExceedDroppedOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of octets that were dropped due to the application
+            of an exceed action on packets that exceed the policy class
+            rate limit set on the circuit group."
+    ::= { eriRouterCctGrpRLClassStatsEntry 9 }
+
+eriRouterCctGrpRLClassExceedDroppedPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of packets that were dropped due to the application
+            of an exceed action on packets that exceed the policy class
+            rate limit set on the circuit group."
+    ::= { eriRouterCctGrpRLClassStatsEntry 10 }
+
+eriRouterCctGrpRLClassViolateOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of octets that violate the normal and maximum burst
+            sizes on the circuit group."
+    ::= { eriRouterCctGrpRLClassStatsEntry 11 }
+
+eriRouterCctGrpRLClassViolatePkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of packets that violate the normal and maximum burst
+            sizes on the circuit group."
+    ::= { eriRouterCctGrpRLClassStatsEntry 12 }
+
+eriRouterCctGrpRLClassViolateDroppedOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of octets that were dropped due to the application
+            of a violate action on packets that violate the normal and
+            maximum burst sizes on the circuit group."
+    ::= { eriRouterCctGrpRLClassStatsEntry 13 }
+
+eriRouterCctGrpRLClassViolateDroppedPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of packets that were dropped due to the application
+            of a violate action on packets that violate the normal and
+            maximum burst sizes on the circuit group."
+    ::= { eriRouterCctGrpRLClassStatsEntry 14 }
+
+
+--
+-- Compliance statements
+--
+eriRouterCircuitGroupCompliances
+        OBJECT IDENTIFIER ::= { eriRouterCircuitGroupConformance 1 }
+eriRouterCircuitGroupConformGroups
+        OBJECT IDENTIFIER ::= { eriRouterCircuitGroupConformance 2 }
+
+eriRouterCCircuitGroupCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+        "The compliance statement for SNMP entities which implement
+         the CircuitGroup MIB."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+            eriRouterCctGrpStatsGroup,
+            eriRouterCctGrpQStatsGroup,
+            eriRouterCctGrpPolicyStatsGroup
+        }
+    ::= { eriRouterCircuitGroupCompliances 1 }
+    
+--
+-- Groups
+--
+eriRouterCctGrpStatsGroup OBJECT-GROUP
+    OBJECTS {
+        eriRouterCctGrpTxOctets,
+        eriRouterCctGrpTxPackets,
+        eriRouterCctGrpTxMulticastOctets,
+        eriRouterCctGrpTxMulticastPackets,
+        eriRouterCctGrpRxOctets,
+        eriRouterCctGrpRxPackets,
+        eriRouterCctGrpRxMulticastOctets,
+        eriRouterCctGrpRxMulticastPackets,
+        eriRouterCctGrpAdjDroppedOctets,
+        eriRouterCctGrpAdjDroppedPackets,
+        eriRouterCctGrpDownDroppedOctets,
+        eriRouterCctGrpDownDroppedPackets,
+        eriRouterCctGrpUnreachDroppedOctets,
+        eriRouterCctGrpUnreachDroppedPackets,
+        eriRouterCctGrpUnknownEncapsOctets,
+        eriRouterCctGrpUnknownEncapsPackets
+    }
+    STATUS    current
+    DESCRIPTION
+        "The collection of objects which allow monitoring of circuit groups."
+    ::= { eriRouterCircuitGroupConformGroups 1 }
+    
+eriRouterCctGrpQStatsGroup OBJECT-GROUP
+    OBJECTS {
+        eriRouterCctGrpQTxOctets,
+        eriRouterCctGrpQTxPackets,
+        eriRouterCctGrpQWredDroppedOctets,
+        eriRouterCctGrpQWredDroppedPkts,
+        eriRouterCctGrpQTailDroppedOctets,
+        eriRouterCctGrpQTailDroppedPkts
+    }
+    STATUS    current
+    DESCRIPTION
+        "The collection of objects which allow monitoring of circuit group
+        queues."
+    ::= { eriRouterCircuitGroupConformGroups 2 }
+
+eriRouterCctGrpPolicyStatsGroup OBJECT-GROUP
+    OBJECTS { 
+        eriRouterCctGrpRLPolicyName,
+        eriRouterCctGrpRLPolicyConformOctets,
+        eriRouterCctGrpRLPolicyConformPkts,
+        eriRouterCctGrpRLPolicyExceedOctets,
+        eriRouterCctGrpRLPolicyExceedPkts,
+        eriRouterCctGrpRLPolicyExceedDroppedOctets,
+        eriRouterCctGrpRLPolicyExceedDroppedPkts,
+        eriRouterCctGrpRLPolicyViolateOctets,
+        eriRouterCctGrpRLPolicyViolatePkts,
+        eriRouterCctGrpRLPolicyViolateDroppedOctets,
+        eriRouterCctGrpRLPolicyViolateDroppedPkts,
+        eriRouterCctGrpRLClassName,
+        eriRouterCctGrpRLClassConformOctets,
+        eriRouterCctGrpRLClassConformPkts,
+        eriRouterCctGrpRLClassConformDroppedOctets,
+        eriRouterCctGrpRLClassConformDroppedPkts,
+        eriRouterCctGrpRLClassExceedOctets,
+        eriRouterCctGrpRLClassExceedPkts,
+        eriRouterCctGrpRLClassExceedDroppedOctets,
+        eriRouterCctGrpRLClassExceedDroppedPkts,
+        eriRouterCctGrpRLClassViolateOctets,
+        eriRouterCctGrpRLClassViolatePkts,
+        eriRouterCctGrpRLClassViolateDroppedOctets,
+        eriRouterCctGrpRLClassViolateDroppedPkts
+     }
+    STATUS    current
+    DESCRIPTION
+        "The collection of objects which allow monitoring rate limit
+        policy and class counters for circuit groups."
+    ::= { eriRouterCircuitGroupConformGroups 3 }
+    
+END

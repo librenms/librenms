@@ -1,0 +1,458 @@
+PT-SFP-MIB DEFINITIONS::=BEGIN
+  IMPORTS 
+    MODULE-IDENTITY,OBJECT-TYPE,Integer32
+      FROM SNMPv2-SMI
+      pt FROM PT-MIB
+      MODULE-COMPLIANCE,
+      OBJECT-GROUP FROM SNMPv2-CONF
+    entPhysicalEntry FROM ENTITY-MIB
+  TEXTUAL-CONVENTION FROM SNMPv2-TC;
+  
+      ptSFP MODULE-IDENTITY
+        LAST-UPDATED "201605221030Z"
+        ORGANIZATION "Ericsson"
+        CONTACT-INFO
+            "Anders Ekvall
+             Postal: Ericsson AB,
+             E-Mail: anders.ekvall@ericsson.com"
+
+        DESCRIPTION
+            "This is the MIB of PT SFP specifics. Most entries are read from the SFP itself according to SFF-8472"
+            
+        REVISION      "201605221030Z"
+        DESCRIPTION
+            "The initial version of this MIB module."
+
+        ::= { pt 6 }
+        
+        ptSFPConformance OBJECT IDENTIFIER ::= { ptSFP 2 }
+  
+--
+-- The textual conventions we define and use in this MIB.
+--
+ 
+PortInterfaceTC ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+           "An integer which indicates the type of PORT_INTERFACE. "
+    SYNTAX     INTEGER {
+		eNONE                 (1),
+		eUNKNOWN              (2),
+		e100BASELX10          (5),
+		e100BASEFX            (7),
+		e1000BASET            (8),
+		e1000BASEZX           (10),
+		e1000BASELX10         (11),
+		eS11                  (12),
+		eS11E                 (13),
+		eL11                  (14),
+		eL12                  (15),
+		eS41                  (16),
+		eL41                  (17),
+		eL42                  (18),
+		eL42CWDM32DB          (19),
+		eS161                 (20),
+		eL161                 (21),
+		eL162                 (22),
+		eL162CWDM32DB         (23),
+		eL12CWDM28DB          (24),
+		e1000BASESX           (25),
+		e1000BASECWDM32DB     (26),
+		e1000BASECWDM28DB     (27),
+		eL12CWDM32DB          (29),
+		e10GBASELRLW          (30),
+		e10GBASEEREW          (31),
+		e10GBASEZpRZpW        (32),
+		eL42CWDM28DB          (33),
+		eL162CWDM28DB         (34),
+		eMULTIRATECWDM28DB    (35),
+		eMULTIRATECWDM32DB    (36),
+		eMULTIRATES11S41      (37),
+		e100BASEBX10U         (38),
+		e100BASEBX10D         (39),
+		e1000BASEBX10U        (40),
+		e1000BASEBX10D        (41),
+		e10GBASESX            (42),
+		e10GBASELH            (43),
+		eSTM1SFWD             (44),
+		eSTM1SFWU             (45),
+		eSTM4SFWD             (46),
+		eSTM4SFWU             (47),
+    e1000BASELX           (48),
+    e10GBASESRSW          (49),
+    e1000BASETFIXED       (50),
+    e1000BASEBX20U        (51),
+    e1000BASEBX20D        (52),
+    e10GBASEDWDM          (53),
+    eDWDMSFPHP            (54),
+    eUNRECOGNIZEDSFP      (55)
+    }
+ 
+   InstallStateTC ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+           "An integer which indicates the type of INSTALL_STATE."
+    SYNTAX     INTEGER {
+    
+		eEMPTY(1),
+		eNOTINSTALLED(2),
+		eINSTALLEDANDNOTPROVISIONED(3),
+		eINSTALLEDANDPROVISIONED(4),
+		eUNAVAILABLE(5),
+		eUNKNOWN (6)
+	}
+	
+  WaveLengthTC ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+           "An integer which indicates the type of WAVELENGTH. d is for the decimal."
+    SYNTAX     INTEGER {
+		eNA             (1),
+		eUNKNOWN        (2),
+		e1471           (3),
+		e1491           (4),
+		e1511           (5),
+		e1531           (6),
+		e1551           (7),
+		e1571           (8),
+		e1591           (9),
+		e1611           (10),
+		eNOTPROVISIONED (11),
+		e1311           (12),
+    e1560d6         (13),
+    e1559d8         (14),
+    e1559d0         (15),
+    e1558d2         (16),
+    e1557d4         (17),
+    e1556d6         (18),
+    e1555d8         (19),
+    e1554d9         (20),
+    e1554d1         (21),
+    e1553d3         (22),
+    e1552d5         (23),
+    e1551d7         (24),
+    e1550d9         (25),
+    e1550d1         (26),
+    e1549d3         (27),
+    e1548d5         (28),
+    e1547d7         (29),
+    e1546d9         (30),
+    e1546d1         (31),
+    e1545d3         (32),
+    e1544d5         (33),
+    e1543d7         (34),
+    e1542d9         (35),
+    e1542d1         (36),
+    e1541d4         (37),
+    e1540d6         (38),
+    e1539d8         (39),
+    e1539d0         (40),
+    e1538d2         (41),
+    e1537d4         (42),
+    e1536d6         (43),
+    e1535d8         (44),
+    e1535d0         (45),
+    e1534d3         (46),
+    e1533d5         (47),
+    e1532d7         (48),
+    e1531d9         (49),
+    e1531d1         (50),
+    e1530d3         (51),
+    e1529d6         (52),
+    e850            (53)
+}
+
+  ConnectorTypeTC ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+           "An integer which indicates the type of CONNECTOR_TYPE according SFF-8024."
+    SYNTAX     INTEGER {
+		eUNKNOWNORUNSPECIFIED         (1),
+		eSC                           (2),
+		eFIBERCHANNELSTYLE1COPPER     (3),
+		eFIBERCHANNELSTYLE2COPPER     (4),
+		eBNCTNC                       (5),
+		eFIBERCHANNELCOAXIALHEADERS   (6),
+		eFIBERJACK                    (7),
+		eLC                           (8),
+		eMTRT                         (9),
+		eMU                           (10),
+		eSG                           (11),
+		eOPTICALPIGTAIL               (12),
+		eRESERVED                     (13),
+		eHSSDCII                      (14),
+		eCOPPERPIGTAIL                (15),
+		eVENDORSPECIFIC               (16)
+	}
+	
+---
+---The SFP Group definition
+---
+---
+---The definition of sfpTable
+---   
+  ptSFPTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF PtSFPEntry
+    MAX-ACCESS  not-accessible
+    STATUS current
+    DESCRIPTION
+            "An table of SFP Table entries."
+        ::= { ptSFP 1 }
+        
+  ptSFPEntry OBJECT-TYPE
+        SYNTAX      PtSFPEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                  "An entry of PT SFP application."
+        AUGMENTS   { entPhysicalEntry }
+        ::= { ptSFPTable 1 }
+ 
+  PtSFPEntry ::=
+        SEQUENCE {
+              installedSFP                    PortInterfaceTC,
+              installState                    InstallStateTC, 
+              vendorName                      OCTET STRING,
+              vendorOui                       Integer32,
+              vendorPn                        OCTET STRING,
+              vendorRev                       OCTET STRING,
+              vendorSn                        OCTET STRING,
+              saleableEntityCode              OCTET STRING,
+              connectorType                   ConnectorTypeTC,
+              installedWavelength             WaveLengthTC,
+              levelRx                         Integer32,
+              rxPower                         OCTET STRING,
+              txPower                         OCTET STRING,
+              brNominal                       Integer32,
+              length9m1km                     Integer32,
+              length9m100m                    Integer32,
+              length50m10m                    Integer32,
+              length62m10m                    Integer32,
+              lengthCopper1m                  Integer32,
+              temperature                     OCTET STRING,
+              vcc                             OCTET STRING,
+              biasCurrent                     OCTET STRING
+                    }
+ 
+  installedSFP OBJECT-TYPE
+        SYNTAX      PortInterfaceTC
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Type of the inserted module, see textual convention"
+        ::= { ptSFPEntry 1 }
+
+  installState OBJECT-TYPE
+        SYNTAX      InstallStateTC
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Status of the inserted module, see textual convention"
+        ::= { ptSFPEntry 2 } 
+
+  vendorName OBJECT-TYPE
+         SYNTAX      OCTET STRING (SIZE (0..40))
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+            "SFP vendor name as reported by the SFP"
+           ::= { ptSFPEntry 3 }
+             
+  vendorOui OBJECT-TYPE
+         SYNTAX      Integer32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+            "SFP vendor IEEE company ID as reported by the SFP"
+           ::= { ptSFPEntry 4 }
+               
+  vendorPn OBJECT-TYPE
+         SYNTAX      OCTET STRING (SIZE (0..40))
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+            "Part number provided by SFP vendor (ASCII) as reported by the SFP"
+           ::= { ptSFPEntry 5 }
+             
+  vendorRev OBJECT-TYPE
+         SYNTAX      OCTET STRING (SIZE (0..40))
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+            "Revision level for part number provided by vendor (ASCII) as reported by the SFP"
+           ::= { ptSFPEntry 6 }
+           
+  vendorSn OBJECT-TYPE
+         SYNTAX      OCTET STRING (SIZE (0..8))
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+            "Serial number provided by vendor (ASCII) as reported by the SFP"
+           ::= { ptSFPEntry 7 }
+           
+  saleableEntityCode OBJECT-TYPE
+         SYNTAX      OCTET STRING (SIZE (0..8))
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+            "Propriety product name as reported by the SFP's Vendor Specific EEPROM"
+           ::= { ptSFPEntry 8 }  
+           
+  connectorType OBJECT-TYPE
+         SYNTAX      ConnectorTypeTC
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+            "An integer which indicates the type of CONNECTOR_TYPE according SFF-8024. See also textual convention"
+           ::= { ptSFPEntry 9 }  
+                   
+  installedWavelength OBJECT-TYPE
+         SYNTAX      WaveLengthTC
+         MAX-ACCESS  read-only
+         STATUS      current
+        DESCRIPTION
+            "An integer that in case of an optical SFP, is the laser wavelength in nm. See also textual convention."
+           ::= { ptSFPEntry 10 }  
+           
+  levelRx OBJECT-TYPE
+         SYNTAX      Integer32
+         MAX-ACCESS  read-only
+         STATUS      current
+        DESCRIPTION
+            "The input level in dBm (optical interfaces only). The value is an offset. The value 100 represents 0 dBm. The value 50 represents no signal."
+           ::= { ptSFPEntry 11 }
+           
+  rxPower OBJECT-TYPE
+         SYNTAX      OCTET STRING (SIZE (0..64))
+         MAX-ACCESS  read-only
+         STATUS      current
+             DESCRIPTION
+            "The received light power, in dBm."
+            ::= { ptSFPEntry 12 }       
+
+  txPower OBJECT-TYPE
+             SYNTAX      OCTET STRING (SIZE (0..64))
+         MAX-ACCESS  read-only
+         STATUS      current
+             DESCRIPTION
+            "The transmit light power, in dBm."
+            ::= { ptSFPEntry 13 }   
+           
+  brNominal OBJECT-TYPE
+         SYNTAX      Integer32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+            "The nominal bit rate, in units of 100 Mbps."
+           ::= { ptSFPEntry 14 }
+             
+  length9m1km OBJECT-TYPE
+         SYNTAX      Integer32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+            "Link length supported for 9/125 um single fiber, units of 1 km"
+           ::= { ptSFPEntry 15 }   
+  length9m100m OBJECT-TYPE
+         SYNTAX      Integer32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+            "Link length supported for 9/125 um single fiber, units of 100 m"
+           ::= { ptSFPEntry 16 }
+             
+  length50m10m OBJECT-TYPE
+         SYNTAX      Integer32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+            "Link length supported for 50/125 um OM2 fiber, units of 10 m"
+           ::= { ptSFPEntry 17 }  
+           
+  length62m10m OBJECT-TYPE
+         SYNTAX      Integer32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+            "Link length supported for 62.5/125 um OM1 fiber, units of 10 m "
+           ::= { ptSFPEntry 18 }
+             
+  lengthCopper1m OBJECT-TYPE
+         SYNTAX      Integer32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+            "Link length supported for copper or direct attach cable, units of m "
+           ::= { ptSFPEntry 19 }     
+   
+  temperature OBJECT-TYPE
+         SYNTAX      OCTET STRING (SIZE (0..64))
+         MAX-ACCESS  read-only
+         STATUS      current
+             DESCRIPTION
+            "The SFP module temperature, in degree Celsius"
+            ::= { ptSFPEntry 20 }
+
+  vcc OBJECT-TYPE
+         SYNTAX      OCTET STRING (SIZE (0..64))
+         MAX-ACCESS  read-only
+         STATUS      current
+             DESCRIPTION
+            "The supply voltage of the interface module, in V."
+            ::= { ptSFPEntry 21 }
+
+  biasCurrent OBJECT-TYPE
+         SYNTAX      OCTET STRING (SIZE (0..64))
+         MAX-ACCESS  read-only
+         STATUS      current
+             DESCRIPTION
+            "The bias current of the interface module, in mA."
+            ::= { ptSFPEntry 22 }
+
+--
+-- Conformance
+--
+
+    ptSFPCompliances OBJECT IDENTIFIER ::= { ptSFPConformance 1 }
+    ptSFPGroups      OBJECT IDENTIFIER ::= { ptSFPConformance 2 }
+
+    ptSFPFullCompliance MODULE-COMPLIANCE
+        STATUS current
+        DESCRIPTION
+            "The compliance statement for SNMP entities which implement everything."
+        MODULE -- This Module
+        MANDATORY-GROUPS { ptSFPCompleteGroup}
+        ::= { ptSFPCompliances 1 }
+
+    ptSFPCompleteGroup OBJECT-GROUP
+        OBJECTS
+        {
+              installedSFP,
+              installState,
+              installedWavelength,
+              levelRx,
+              vendorName,
+              vendorOui,
+              vendorPn,
+              vendorRev,
+              connectorType,
+              brNominal,
+              length9m1km,
+              length9m100m,
+              length50m10m,
+              length62m10m,
+              lengthCopper1m,
+              saleableEntityCode,
+              vendorSn, 
+              rxPower,
+              txPower,
+              temperature,
+              vcc,
+              biasCurrent
+        }
+        STATUS current
+        DESCRIPTION
+            "A collection of all current objects in this MIB module."
+        ::= { ptSFPGroups 1 }
+
+END

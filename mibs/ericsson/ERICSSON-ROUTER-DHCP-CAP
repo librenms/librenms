@@ -1,0 +1,210 @@
+-- %DNP% $Id: ERICSSON-ROUTER-DHCP-CAP.my,v 1.1.8.1.252.5 2011/06/15 18:19:45 danielhe Exp $
+-- %DNP% $Source: /cvsroot/pkt/sw/se/xc/bsd/config/snmp/mibs/Attic/ERICSSON-ROUTER-DHCP-CAP.my,v $
+-- *****************************************************************
+-- ERICSSON-ROUTER-DHCP-CAP		DHCP Mib Capabilities
+--
+-- Copyright (c) 2004-2009, 2010, 2015 Ericsson AB.
+-- All rights reserved.
+--
+-- *****************************************************************
+
+ERICSSON-ROUTER-DHCP-CAP DEFINITIONS ::= BEGIN
+
+IMPORTS
+
+	MODULE-IDENTITY
+			FROM SNMPv2-SMI
+	AGENT-CAPABILITIES
+			FROM SNMPv2-CONF
+	eriRouterCapabilities
+			FROM ERICSSON-ROUTER-SMI;
+
+eriRouterDhcpMibCap MODULE-IDENTITY
+	LAST-UPDATED    "201501141800Z" -- Jan 14, 2015
+	ORGANIZATION	"Ericsson AB"
+	CONTACT-INFO
+		"	Ericsson, AB.
+
+		Postal:	100 Headquarters Dr 
+			San Jose, CA  95134
+			USA
+
+		 Phone:	+1 408 750 5000
+		   Fax: +1 408 750 5599"
+	DESCRIPTION
+		"The Agent Capabilities of the DHCP MIB.
+
+                If this MIB implementation is platform-dependent,
+                the PRODUCT-RELEASE clause contains Ericsson SEOS version and
+                at least one of the following Ericsson product families:
+                    [SE]  SmartEdge Multi-service Edge Router (MSER) family
+                    [SM]  SM family of Metro Ethernet Service Transport platforms
+                    [SSR] Smart Service Router (SSR) family"
+
+        REVISION        "201501141800Z" -- Jan 14, 2015
+        DESCRIPTION
+                "Updated RBN/rbn/Rbn as ERICSSON-ROUTER/eriRouter/EriRouter
+                 to migrate RBN MIB to ERICSSON MIB."
+
+        REVISION        "201106150000Z" -- Jun 15, 2011
+        DESCRIPTION
+                "Update DESCRIPTION clause of MODULE-IDENTITY
+                 and PRODUCT-RELEASE clause of AGENT-CAPABILITIES."
+
+	REVISION	"201003101700Z" -- Mar 10, 2010
+	DESCRIPTION
+		"Added eriRouterDhcpMibCap3 AGENT-CAPABILITIES."
+
+	REVISION	"200510141700Z" -- Oct 14, 2005
+	DESCRIPTION
+		"Added eriRouterDhcpMibCap2 AGENT-CAPABILITIES."
+
+	REVISION	"200405031700Z" -- May 3, 2004
+	DESCRIPTION
+		"Initial version."
+
+	::= { eriRouterCapabilities 57 }
+
+eriRouterDhcpMibCap1 AGENT-CAPABILITIES
+	PRODUCT-RELEASE	"AOS 6.1.X.X"
+	STATUS		current
+	DESCRIPTION	"ERICSSON-ROUTER-DHCP-MIB capabilities"
+	SUPPORTS	ERICSSON-ROUTER-DHCP-MIB
+	INCLUDES {
+		eriRouterDhcpThresholdGroup,
+		eriRouterDhcpThresholdNotifyGroup
+	}
+
+	::= { eriRouterDhcpMibCap 1 }
+
+eriRouterDhcpMibCap2 AGENT-CAPABILITIES
+	PRODUCT-RELEASE	"SEOS 5.0.3"
+	STATUS		current
+	DESCRIPTION	"ERICSSON-ROUTER-DHCP-MIB capabilities"
+	SUPPORTS	ERICSSON-ROUTER-DHCP-MIB
+	INCLUDES {
+		eriRouterDhcpCtxThresholdGroup,
+		eriRouterDhcpRangeThresholdGroup,
+		eriRouterDhcpCtxThresholdNotifyGroup,
+		eriRouterDhcpRangeThresholdNotifyGroup
+	}
+
+        VARIATION      eriRouterDhcpIntfThresholdContextName
+        ACCESS         not-implemented
+        DESCRIPTION
+                "Object not supported."
+
+        VARIATION      eriRouterDhcpIntfThresholdSize
+        ACCESS         not-implemented
+        DESCRIPTION
+                "Object not supported."
+
+        VARIATION      eriRouterDhcpIntfThresholdAvailable
+        ACCESS         not-implemented
+        DESCRIPTION
+                "Object not supported."
+
+        VARIATION      eriRouterDhcpIntfThresholdInuse
+        ACCESS         not-implemented
+        DESCRIPTION
+                "Object not supported."
+
+        VARIATION      eriRouterDhcpIntfThresholdFallingThreshold
+        ACCESS         not-implemented
+        DESCRIPTION
+                "Object not supported."
+
+        VARIATION      eriRouterDhcpIntfThresholdFallingSendTrap
+        ACCESS         not-implemented
+        DESCRIPTION
+                "Object not supported."
+
+        VARIATION      eriRouterDhcpIntfThresholdFallingLogMessage
+        ACCESS         not-implemented
+        DESCRIPTION
+                "Object not supported."
+
+        VARIATION      eriRouterDhcpIntfThresholdRisingThreshold
+        ACCESS         not-implemented
+        DESCRIPTION
+                "Object not supported."
+
+        VARIATION      eriRouterDhcpIntfThresholdRisingSendTrap
+        ACCESS         not-implemented
+        DESCRIPTION
+                "Object not supported."
+
+        VARIATION      eriRouterDhcpIntfThresholdRisingLogMessage
+        ACCESS         not-implemented
+        DESCRIPTION
+                "Object not supported."
+
+	::= { eriRouterDhcpMibCap 2 }
+
+eriRouterDhcpMibCap3 AGENT-CAPABILITIES
+	PRODUCT-RELEASE	"SEOS 6.1.x [SE]; SEOS 6.3.X [SM]; SEOS 11.1.X [SSR]"
+	STATUS		current
+	DESCRIPTION	"ERICSSON-ROUTER-DHCP-MIB capabilities"
+	SUPPORTS	ERICSSON-ROUTER-DHCP-MIB
+	INCLUDES {
+                eriRouterDhcpCtxThresholdGroup,
+                eriRouterDhcpRangeThresholdGroup,
+                eriRouterDhcpCtxThresholdNotifyGroup,
+                eriRouterDhcpRangeThresholdNotifyGroup,
+                eriRouterDhcpLeaseFileFailureTrapGroup,
+                eriRouterDhcpLeaseFileFailureNotifyGroup
+	}
+
+        VARIATION      eriRouterDhcpIntfThresholdContextName
+        ACCESS         not-implemented
+        DESCRIPTION
+                "Object not supported."
+
+        VARIATION      eriRouterDhcpIntfThresholdSize
+        ACCESS         not-implemented
+        DESCRIPTION
+                "Object not supported."
+
+        VARIATION      eriRouterDhcpIntfThresholdAvailable
+        ACCESS         not-implemented
+        DESCRIPTION
+                "Object not supported."
+
+        VARIATION      eriRouterDhcpIntfThresholdInuse
+        ACCESS         not-implemented
+        DESCRIPTION
+                "Object not supported."
+
+        VARIATION      eriRouterDhcpIntfThresholdFallingThreshold
+        ACCESS         not-implemented
+        DESCRIPTION
+                "Object not supported."
+
+        VARIATION      eriRouterDhcpIntfThresholdFallingSendTrap
+        ACCESS         not-implemented
+        DESCRIPTION
+                "Object not supported."
+
+        VARIATION      eriRouterDhcpIntfThresholdFallingLogMessage
+        ACCESS         not-implemented
+        DESCRIPTION
+                "Object not supported."
+
+        VARIATION      eriRouterDhcpIntfThresholdRisingThreshold
+        ACCESS         not-implemented
+        DESCRIPTION
+                "Object not supported."
+
+        VARIATION      eriRouterDhcpIntfThresholdRisingSendTrap
+        ACCESS         not-implemented
+        DESCRIPTION
+                "Object not supported."
+
+        VARIATION      eriRouterDhcpIntfThresholdRisingLogMessage
+        ACCESS         not-implemented
+        DESCRIPTION
+                "Object not supported."
+
+	::= { eriRouterDhcpMibCap 3 }
+
+END

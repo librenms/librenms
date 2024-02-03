@@ -1,0 +1,754 @@
+-- %DNP%
+-- %DNP% $Source: /cvsroot/pkt/sw/se/xc/bsd/config/snmp/mibs/Attic/ERICSSON-ROUTER-BIND-MIB.my,v $
+-- *****************************************************************
+-- ERICSSON-ROUTER-BIND-MIB	
+--
+-- Copyright (c) 2002-2003, 2011, 2015 Ericsson AB.
+-- All rights reserved.
+--
+-- *****************************************************************
+
+ERICSSON-ROUTER-BIND-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY, OBJECT-TYPE,
+	Unsigned32
+		FROM SNMPv2-SMI
+
+	TEXTUAL-CONVENTION, TruthValue
+		FROM SNMPv2-TC
+
+	MODULE-COMPLIANCE, OBJECT-GROUP
+		FROM SNMPv2-CONF
+
+	SnmpAdminString
+		FROM SNMP-FRAMEWORK-MIB
+
+	EriRouterCircuitHandle, EriRouterSlot, EriRouterPort
+		FROM ERICSSON-ROUTER-TC
+
+	eriRouterMgmt
+		FROM ERICSSON-ROUTER-SMI;
+
+eriRouterBindMib MODULE-IDENTITY
+	LAST-UPDATED    "201501141800Z" -- Jan 14, 2015
+	ORGANIZATION	"Ericsson AB."
+	CONTACT-INFO
+                "       Ericsson AB.
+
+                Postal: 100 Headquarters Dr
+                        San Jose, CA  95134
+                        USA
+
+                 Phone: +1 408 750 5000
+                   Fax: +1 408 750 5599
+
+                "
+	DESCRIPTION
+		"Defines the objects necessary to support binding
+		circuits to interfaces."
+
+        REVISION        "201501141800Z" -- Jan 14, 2015
+        DESCRIPTION
+                "Updated RBN/rbn/Rbn as ERICSSON-ROUTER/eriRouter/EriRouter
+                 to migrate RBN MIB to ERICSSON MIB."
+
+        REVISION	"201101191800Z" -- Jan 19, 2011
+        DESCRIPTION
+		"Updated CONTACT-INFO & ORGANIZATION"
+
+	REVISION        "200310131700Z" -- October 13, 2003
+        DESCRIPTION
+		"Added new object eriRouterBindAuthDhcp.
+		Added new MODULE-COMPLIANCE statement eriRouterBindCompliance2.
+		Added new OBJECT-GROUP eriRouterBindConfigGroup2.
+
+		Clarified DESCRIPTION clause for eriRouterBindName by adding
+		multiIntfBind to the list of bind types where eriRouterBindName
+		is applicable.
+
+		Corrected misspelling of multiIntfBind in the
+		DESCRIPTION clause of eriRouterBindAuthContext."
+
+        REVISION	"200303071700Z" -- March 7, 2003
+        DESCRIPTION
+		"Added 'sessionBind' as one of the bind types that are
+		applicable to eriRouterBindMaxSessions object.  Removed
+		reference to non-existant platform in DESCRIPTION of
+		eriRouterBindMaxSessions object."
+
+        REVISION	"200211130000Z" -- November 13, 2002
+        DESCRIPTION
+		"Updated to import EriRouterSlot and EriRouterPort from ERICSSON-ROUTER-TC."
+
+        REVISION	"200207251700Z" -- Jul 25, 2002
+        DESCRIPTION
+		"Added support for the CLIPs bind type."
+
+        REVISION	"200201071700Z" -- Jan 7, 2002
+        DESCRIPTION
+                "Initial version."
+
+	::= { eriRouterMgmt 17 }
+
+eriRouterBindMIBObjects       OBJECT IDENTIFIER ::= { eriRouterBindMib 1 }
+
+eriRouterBindMIBConformance   OBJECT IDENTIFIER ::= { eriRouterBindMib 2 }
+
+eriRouterBindMIBNotifications OBJECT IDENTIFIER ::= { eriRouterBindMib 3 }
+
+--
+-- Textual Conventions
+--
+
+EriRouterBindType ::= TEXTUAL-CONVENTION
+	STATUS       current
+	DESCRIPTION
+		"The binding type.  The comment after the enumeration
+		label is the equivalent CLI command that would config
+		the corresponding bind type."
+	SYNTAX	INTEGER {
+		unbound(1),            -- state on initial creation
+		authBind(2),           -- "bind authentication"
+		bypassBind(3),         -- "bind bypass"
+		interfaceBind(4),      -- "bind interface"
+		subscriberBind(5),     -- "bind subscriber"
+		l2tptunnelBind(6),     -- "bind l2tp-tunnel"
+		sessionBind(7),        -- "bind session"
+		dot1qBind(8),          -- "bind 802.1 Q"
+		multiIntfBind(9),      -- "bind multi interface"
+		multiSubBind(10),      -- "bind multi subscriber"
+		multiClipsBind(11)     -- "bind multi clips"
+	}
+
+--
+-- BIND Circuit Table
+--
+
+eriRouterBindTable OBJECT-TYPE
+	SYNTAX       SEQUENCE OF EriRouterBindEntry
+	MAX-ACCESS   not-accessible
+	STATUS       current
+	DESCRIPTION
+		"This table contains the objects which identify and configure
+		circuit bindings.
+
+		With respect to creation and deletion of entries in this table,
+		rows are created or deleted when a circuit is created or
+		deleted - there is no explicit explicit creation or deletion
+		of rows allowed or required."
+	::= { eriRouterBindMIBObjects 1 }
+
+eriRouterBindEntry OBJECT-TYPE
+	SYNTAX       EriRouterBindEntry
+	MAX-ACCESS   not-accessible
+	STATUS       current
+	DESCRIPTION
+		"A conceptual row in the eriRouterBindTable."
+	INDEX        { eriRouterBindCircuit }
+	::= { eriRouterBindTable 1 }
+
+EriRouterBindEntry ::=
+	SEQUENCE {
+		eriRouterBindCircuit		EriRouterCircuitHandle,
+		eriRouterBindType		EriRouterBindType,
+		eriRouterBindName		SnmpAdminString,
+		eriRouterBindPassword		SnmpAdminString,
+		eriRouterBindContext		SnmpAdminString,
+		eriRouterBindAuthContext	SnmpAdminString,
+		eriRouterBindServiceGrp	SnmpAdminString,
+		eriRouterBindAcl		SnmpAdminString,
+		eriRouterBindAuthChap		TruthValue,
+		eriRouterBindAuthPap		TruthValue,
+		eriRouterBindAuthWait		TruthValue,
+		eriRouterBindAuthPapFirst	TruthValue,
+		eriRouterBindMaxSessions	Unsigned32,
+		eriRouterBindPvcSlot		EriRouterSlot,
+		eriRouterBindPvcPort		EriRouterPort,
+		eriRouterBindVpn		Unsigned32,
+		eriRouterBindAuthDhcp		TruthValue
+	}
+
+eriRouterBindCircuit OBJECT-TYPE
+	SYNTAX       EriRouterCircuitHandle
+	MAX-ACCESS   not-accessible
+	STATUS       current
+	DESCRIPTION
+		"A key identifying the circuit for which the binding applies.
+		Note the implication: this key identifies an existing circuit.
+		A basic tenent thus evolves: the circuit must exist before
+		it can be bound.  See the definition of the EriRouterCircuitHandle
+		TEXTUAL-CONVENTION for the definition of this key."
+
+	::= { eriRouterBindEntry 1 }
+
+eriRouterBindType OBJECT-TYPE
+	SYNTAX       EriRouterBindType
+	MAX-ACCESS   read-create
+	STATUS       current
+	DESCRIPTION
+		"The type of the binding.  See the definition of the
+		EriRouterBindType TEXTUAL-CONVENTION for the possible types.
+
+		The bind type must be appropriate to the type of circuit
+		that it is being applied to.  See the AOS Command Reference
+		Manual for a complete exposition of what circuit types may be
+		associated with which bindings.
+
+		Note that when a circuit is created, an initial binding is
+		established of type 'unbound'.  So there is always some
+		binding in effect for a circuit; there is no concept of
+		explicitly creating or deleting a binding, there is merely
+		setting it's type and supplying the applicable attributes
+		for the bind type.
+
+		In other words, with respect to entries in this table,
+		when a circuit is created, a row in this table is also
+		created. and when a circuit is deleted, the row in this
+		table is also deleted.
+
+		If you change the bind type to a new bind type for a
+		circuit, the previous binding is removed and any active
+		sessions are dropped.  If an existing binding on the circuit
+		is exactly the same as specified in the new binding, the
+		existing binding is not removed.  When changing the bind
+		type to a new bind type, all objects mandatory for the
+		new bind type must be included in the set operation.
+
+		Thus, the bind type will determine which group of objects
+		in a row of the eriRouterBindTable that will be applicable
+		for that instance of a circuit.
+
+		For example, if the bind type is 'subscriberBind', then
+		the columns in the row that are applicable will be:
+
+                eriRouterBindType
+                eriRouterBindName
+                eriRouterBindContext
+                eriRouterBindPassword
+
+		In a set operation, if additional columns are specified for
+		some given bind type, that is, columnar objects which are not
+		applicable to the given bind type, an INCONSISTENT VALUE
+		error will be returned.
+
+		The DESCRIPTION clause for each of the eriRouterBindTable objects
+		specifies the bind types that are applicable for that object.
+
+		For a complete specification of the various bind types
+		and the applicable columns of the eriRouterBindTable, please
+		see AOS Command Reference manual."
+
+	REFERENCE "Access Operating System (AOS) Command Reference Release 5.0"
+
+	::= { eriRouterBindEntry 2 }
+
+eriRouterBindName OBJECT-TYPE
+	SYNTAX       SnmpAdminString (SIZE (1..192))
+	MAX-ACCESS   read-create
+	STATUS       current
+	DESCRIPTION
+		"A name associated with the binding. This field is only
+		applicable when the value of eriRouterBindType is:
+
+		bypassBind
+		interfaceBind
+		subscriberBind
+		l2tptunnelBind
+		multiIntfBind
+		multiSubBind
+		sessionBind
+
+		If the value of eriRouterBindType is not one of these bind types,
+                then eriRouterBindName is not instantiated for this entry.
+
+		The value of eriRouterBindName is dependent on the value specified
+		in eriRouterBindType as described below:
+
+		Bind Type		Value of Name
+		---------		-------------
+		bypassBind		the name of an existing bypass to which
+					the circuit is to be bound
+		interfaceBind		the name of an existing interface
+		subscriberBind		the name of a subscriber
+		l2tptunnelBind		the tunnel to which the circuit is to
+					be bound
+		multiIntfBind		the name of an existing interface
+		multiSubBind		the name of a subscriber
+		sessionBind		the name of the peer or L2TP group
+					to which the circuit is to be bound
+
+		Don't think of eriRouterBindName as the name of the binding.  Rather,
+		it is the name of some other attribute associated with the
+		binding."
+
+	::= { eriRouterBindEntry 3 }
+
+eriRouterBindPassword OBJECT-TYPE
+	SYNTAX       SnmpAdminString (SIZE (1..64))
+	MAX-ACCESS   read-create
+	STATUS       current
+	DESCRIPTION
+		"The AAA password. This field is only applicable when
+		the value of eriRouterBindType is:
+
+		subscriberBind
+
+		If the value of eriRouterBindType is not this bind type,
+                then eriRouterBindPassword is not instantiated for this entry."
+
+	::= { eriRouterBindEntry 4 }
+
+eriRouterBindContext OBJECT-TYPE
+	SYNTAX       SnmpAdminString (SIZE (1..64))
+	MAX-ACCESS   read-create
+	STATUS       current
+	DESCRIPTION
+		"The name of the context associated with the binding.
+
+		This field is applicable only when one of the following
+		eriRouterBindType values is specified:
+
+		Bind Type	Value of Context
+		---------	----------------
+		bypassBind	The name of the context where the bypass exists.
+
+		interfaceBind	The name of the context in which the specified
+				interface exists.
+
+		subscriberBind	The name of the context used to locate the
+				subscriber information.
+
+		l2tptunnelBind	The name of the context in which the tunnel is
+				configured.
+
+		sessionBind	The name of the context for the peer.
+
+		multiIntfBind	The name of the context for the interface to
+				which the IP over Ethernet portion of the
+				circuit is to be bound.
+
+		multiSubBind	The name of the context for the interface to
+				which the IP over Ethernet portion of the
+				circuit is to be bound.
+
+		multiClipsBind	The name of the context for the interface to
+				which the IP over Ethernet portion of the
+				circuit is to be bound.
+
+		If the value of eriRouterBindType is not one of these bind types,
+                then eriRouterBindContext is not instantiated for this entry."
+
+	::= { eriRouterBindEntry 5 }
+
+eriRouterBindAuthContext OBJECT-TYPE
+	SYNTAX       SnmpAdminString (SIZE (1..64))
+	MAX-ACCESS   read-create
+	STATUS       current
+	DESCRIPTION
+		"The name of the authentication context associated with
+		the binding.  It is the name of the context to which PPP
+		sessions on the circuits being bound are restricted.
+
+		Specification of this column for a given entry is optional.
+
+		When using this optional context name, all attempts to bind
+		PPP sessions to contexts other than the one specified
+		will fail.
+
+		This object is applicable only when one of the following
+		eriRouterBindType values is specified:
+
+		authBind
+		multiIntfBind
+		multiSubBind
+
+		If the value of eriRouterBindType is not one of these bind types,
+                then eriRouterBindAuthContext is not instantiated for this entry."
+
+	::= { eriRouterBindEntry 6 }
+
+eriRouterBindServiceGrp OBJECT-TYPE
+	SYNTAX       SnmpAdminString (SIZE (1..64))
+	MAX-ACCESS   read-create
+	STATUS       current
+	DESCRIPTION
+		"The name of the service access list associated with
+		the binding.  It is the name of the service access list
+		that defines the services available to the PPP-encapsulated
+		circuit.
+
+		Specification of this column for a given entry is optional.
+
+		When using this optional service access list, all attempts
+		to authenticate to contexts or domains not permitted by
+		the named service access list fail.
+
+		This object is applicable only when one of the following
+		eriRouterBindType values is specified:
+
+		authBind
+		multiIntfBind
+		multiSubBind
+		multiClipsBind
+
+		If the value of eriRouterBindType is not one of these bind types,
+                then eriRouterBindServiceGrp is not instantiated for this entry."
+
+	::= { eriRouterBindEntry 7 }
+
+eriRouterBindAcl OBJECT-TYPE
+	SYNTAX       SnmpAdminString (SIZE (1..64))
+	MAX-ACCESS   read-create
+	STATUS       current
+	DESCRIPTION
+		"The name of the bridge access control list associated with
+		the binding.  It is the name of the Access control list to
+		be applied to the session.  The access control list must
+		already have been configured in the context of the session
+		peer.  This is typically used to filter packets so that
+		only PPPoE traffic is allowed through an Ethernet L2TP
+		tunnel.
+
+		Specification of this column for a given entry is optional.
+
+		This object is applicable only when one of the following
+		eriRouterBindType values is specified:
+
+		sessionBind
+
+		If the value of eriRouterBindType is not one of these bind types,
+                then eriRouterBindAcl is not instantiated for this entry."
+
+	::= { eriRouterBindEntry 8 }
+
+eriRouterBindAuthChap OBJECT-TYPE
+	SYNTAX       TruthValue
+	MAX-ACCESS   read-create
+	STATUS       current
+	DESCRIPTION
+		"If 'true', specifies that the PPP authentication protocol
+		to be used is Challenge Handshake Authentication Protocol.
+
+		This object is applicable only when one of the following
+		eriRouterBindType values is specified:
+
+		authBind
+		multiIntfBind
+		multiSubBind
+
+		If the value of eriRouterBindType is not one of these bind types,
+                then eriRouterBindAuthChap is not instantiated for this entry.
+
+		When performing a set operation on a row which involves one of
+		these bind types, either eriRouterBindAuthChap or eriRouterBindAuthPap or
+		both must be specified.
+
+		If both eriRouterBindAuthChap and eriRouterBindAuthPap are true,
+		then either authentication protocol may be used."
+
+	::= { eriRouterBindEntry 9 }
+
+eriRouterBindAuthPap OBJECT-TYPE
+	SYNTAX       TruthValue
+	MAX-ACCESS   read-create
+	STATUS       current
+	DESCRIPTION
+		"If 'true', specifies that the PPP authentication protocol
+		to be used is Password Authentication Protocol.
+
+		This object is applicable only when one of the following
+		eriRouterBindType values is specified:
+
+		authBind
+		multiIntfBind
+		multiSubBind
+
+		If the value of eriRouterBindType is not one of these bind types,
+                then eriRouterBindAuthPap is not instantiated for this entry.
+
+		When performing a set operation on a row which involves one of
+		these bind types, either eriRouterBindAuthChap or eriRouterBindAuthPap or
+		both must be specified.
+
+		If both eriRouterBindAuthChap and eriRouterBindAuthPap are true,
+		then either authentication protocol may be used."
+
+	::= { eriRouterBindEntry 10 }
+
+eriRouterBindAuthWait OBJECT-TYPE
+	SYNTAX       TruthValue
+	MAX-ACCESS   read-create
+	STATUS       current
+	DESCRIPTION
+		"If 'true', specifies that the inbound CHAP authentication
+		is completed first.  In other words, after the two sides
+		have decided to use CHAP, the SMS waits for the inbound
+		side to initiate athentication.
+
+		If 'true', eriRouterBindAuthChap must also be specified.
+
+		This object is applicable only when one of the following
+		eriRouterBindType values is specified:
+
+		authBind
+		multiIntfBind
+		multiSubBind
+
+		If the value of eriRouterBindType is not one of these bind types,
+                then eriRouterBindAuthWait is not instantiated for this entry.
+
+		When performing a set operation on a row which involves
+		this bind type, specification of this column is optional.
+		If not specified, this object will not be instantiated."
+
+	::= { eriRouterBindEntry 11 }
+
+eriRouterBindAuthPapFirst OBJECT-TYPE
+	SYNTAX       TruthValue
+	MAX-ACCESS   read-create
+	STATUS       current
+	DESCRIPTION
+		"If 'true', specifies that Password Authentication
+		Protocol (PAP) shall be negotiated before Challenge
+		Handshake Authentication Protocol (CHAP).  IF 'false',
+		then CHAP is negotiated before PAP.
+
+		With SNMP get operations, both eriRouterBindAuthChap and
+		eriRouterBindAuthPap must be true or this object is not
+		instantiated.
+
+		With SNMP set operations, if 'true', then both
+		eriRouterBindAuthChap and eriRouterBindAuthPap must also be specified
+		as 'true'.
+
+		This object is applicable only when one of the following
+		eriRouterBindType values is specified:
+
+		authBind
+		multiIntfBind
+		multiSubBind
+
+		If the value of eriRouterBindType is not one of these bind types,
+		then eriRouterBindAuthPapFirst is not instantiated for this entry.
+
+		When performing a set operation on a row which involves one of
+		these bind types, specification of this column is optional.
+		If not specified, this object will not be instantiated."
+
+	::= { eriRouterBindEntry 12 }
+
+eriRouterBindMaxSessions OBJECT-TYPE
+	SYNTAX       Unsigned32(1..65535)
+	MAX-ACCESS   read-create
+	STATUS       current
+	DESCRIPTION
+		"The maximum number of concurrent sessions allowed on the
+		circuit.  Applicable only to circuits which have an
+		encapsulation of type PPPoE.  If the circuit is not of
+		this type, then this entry is ignored.
+
+		Specification of this column for a given row is optional.
+		If not specified, this object will not be instantiated.
+
+		This object is applicable only when one of the following
+		eriRouterBindType values is specified:
+
+		authBind
+		sessionBind
+		multiIntfBind
+		multiSubBind
+		multiClipsBind
+
+		If the value of eriRouterBindType is not one of these bind types,
+                then eriRouterBindMaxSessions is not instantiated for this entry.
+
+		The maximum number of concurrent sessions allowed on the
+		circuit depends on the platform as specified in the
+		table below:
+
+		Platform	Sessions	MemSize
+		--------	--------	-------
+		SMS10000	65535
+		SMS1800/1000	10000		64MB FE
+		SMS1800/1000	8000		48MB FE
+		SMS1800/1000	4000		32MB FE
+		SMS1800/1000	4000		16MB FE
+		SMS1800/1000	4000		8MB FE
+		SMS500		2000"
+
+	::= { eriRouterBindEntry 13 }
+
+eriRouterBindPvcSlot OBJECT-TYPE
+	SYNTAX       EriRouterSlot
+	MAX-ACCESS   read-create
+	STATUS       current
+	DESCRIPTION
+		"The chassis slot number associated with this binding.
+
+		Use of the 'dot1qBind' type is for binding an ATM or
+		Frame Relay PVC to an Ethernet port using the specified
+		VLAN ID in eriRouterBindVpn.
+
+		This object is applicable only when one of the following
+		eriRouterBindType values is specified:
+
+		dot1qBind
+
+		If the value of eriRouterBindType is not one of these bind types,
+                then eriRouterBindPvcSlot is not instantiated for this entry."
+
+	::= { eriRouterBindEntry 14 }
+
+eriRouterBindPvcPort OBJECT-TYPE
+	SYNTAX       EriRouterPort
+	MAX-ACCESS   read-create
+	STATUS       current
+	DESCRIPTION
+		"The chassis port number associated with this binding.
+
+		Use of the 'dot1qBind' type is for binding an ATM or
+		Frame Relay PVC to an Ethernet port using the specified
+		VLAN ID in eriRouterBindVpn.
+
+		This object is applicable only when one of the following
+		eriRouterBindType values is specified:
+
+		dot1qBind
+
+		If the value of eriRouterBindType is not one of these bind types,
+                then eriRouterBindPvcPort is not instantiated for this entry."
+
+	::= { eriRouterBindEntry 15 }
+
+eriRouterBindVpn OBJECT-TYPE
+	SYNTAX       Unsigned32(2..4094)
+	MAX-ACCESS   read-create
+	STATUS       current
+	DESCRIPTION
+		"The specific tag to which the PVC is mapped on the
+		specified Ethernet port.
+
+		Use of the 'dot1qBind' type is for binding an ATM or
+		Frame Relay PVC to an Ethernet port using the specified
+		VLAN ID in eriRouterBindVpn.
+
+		This object is applicable only when one of the following
+		eriRouterBindType values is specified:
+
+		dot1qBind
+
+		If the value of eriRouterBindType is not one of these bind types,
+                then eriRouterBindVpn is not instantiated for this entry."
+
+	::= { eriRouterBindEntry 16 }
+
+eriRouterBindAuthDhcp OBJECT-TYPE
+	SYNTAX       TruthValue
+	MAX-ACCESS   read-create
+	STATUS       current
+	DESCRIPTION
+		"If 'true', specifies an authentication mechanism where
+		the DHCP server makes a request to the authentication
+		subsystem upon receipt of incoming DHCP discover packets.
+
+		This object is applicable only when one of the following
+		eriRouterBindType values is specified:
+
+		multiIntfBind
+		multiClipsBind
+
+		If the value of eriRouterBindType is not one of these bind types,
+		then eriRouterBindAuthDhcp is not instantiated for this entry.
+
+		When performing a set operation on a row which involves one of
+		these bind types, if either eriRouterBindAuthChap or eriRouterBindAuthPap
+		or both are specified, then eriRouterBindAuthDhcp may not be
+		specified."
+
+	::= { eriRouterBindEntry 17 }
+
+--
+-- compliance statements
+--
+
+eriRouterBindCompliances OBJECT IDENTIFIER ::= { eriRouterBindMIBConformance 1 }
+eriRouterBindGroups      OBJECT IDENTIFIER ::= { eriRouterBindMIBConformance 2 }
+
+eriRouterBindCompliance MODULE-COMPLIANCE
+	STATUS       deprecated
+	DESCRIPTION
+		"The compliance statement for SNMP entities which implement
+		 the ERICSSON-ROUTER-BIND-MIB."
+	MODULE      -- this module
+	MANDATORY-GROUPS {
+		eriRouterBindConfigGroup
+	}
+	::= { eriRouterBindCompliances 1}
+
+eriRouterBindCompliance2 MODULE-COMPLIANCE
+	STATUS       current
+	DESCRIPTION
+		"The compliance statement for SNMP entities which implement
+		 the ERICSSON-ROUTER-BIND-MIB."
+	MODULE      -- this module
+	MANDATORY-GROUPS {
+		eriRouterBindConfigGroup2
+	}
+	::= { eriRouterBindCompliances 2}
+
+--
+-- groupings
+--
+
+eriRouterBindConfigGroup	OBJECT-GROUP
+	OBJECTS {
+		eriRouterBindType,
+		eriRouterBindName,
+		eriRouterBindContext,
+		eriRouterBindPassword,
+		eriRouterBindAuthContext,
+		eriRouterBindServiceGrp,
+		eriRouterBindAcl,
+		eriRouterBindAuthChap,
+		eriRouterBindAuthPap,
+		eriRouterBindAuthWait,
+		eriRouterBindAuthPapFirst,
+		eriRouterBindMaxSessions,
+		eriRouterBindPvcSlot,
+		eriRouterBindPvcPort,
+		eriRouterBindVpn
+	}
+	STATUS       deprecated
+	DESCRIPTION
+		"The collection of all objects applicable for all values of
+		eriRouterBindType."
+	::= { eriRouterBindGroups 1}
+
+eriRouterBindConfigGroup2	OBJECT-GROUP
+	OBJECTS {
+		eriRouterBindType,
+		eriRouterBindName,
+		eriRouterBindContext,
+		eriRouterBindPassword,
+		eriRouterBindAuthContext,
+		eriRouterBindServiceGrp,
+		eriRouterBindAcl,
+		eriRouterBindAuthChap,
+		eriRouterBindAuthPap,
+		eriRouterBindAuthWait,
+		eriRouterBindAuthPapFirst,
+		eriRouterBindMaxSessions,
+		eriRouterBindPvcSlot,
+		eriRouterBindPvcPort,
+		eriRouterBindVpn,
+		eriRouterBindAuthDhcp
+	}
+	STATUS       current
+	DESCRIPTION
+		"The collection of all objects applicable for all values of
+		eriRouterBindType."
+	::= { eriRouterBindGroups 2}
+
+END
+

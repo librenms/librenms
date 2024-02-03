@@ -1,0 +1,176 @@
+-- %DNP% $Id: ERICSSON-ROUTER-MPLS-L3VPN-STD-EXT-MIB.my,v 1.1.4.2 2011/02/22 17:26:17 thatcher Exp $
+-- %DNP% $Source: /cvsroot/pkt/sw/se/xc/bsd/config/snmp/mibs/Attic/ERICSSON-ROUTER-MPLS-L3VPN-STD-EXT-MIB.my,v $
+-- *****************************************************************
+-- ERICSSON-ROUTER-MPLS-L3VPN-STD-EXT-MIB   Extension to RFC 4382
+--
+-- Copyright (c) 2009, 2011, 2015 Ericsson AB.
+-- All rights reserved.
+--
+-- *****************************************************************
+
+ERICSSON-ROUTER-MPLS-L3VPN-STD-EXT-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+   MODULE-IDENTITY, OBJECT-TYPE, Unsigned32
+      FROM SNMPv2-SMI                                     -- [RFC2578]
+   MODULE-COMPLIANCE, OBJECT-GROUP
+      FROM SNMPv2-CONF                                    -- [RFC2580]
+   SnmpAdminString
+      FROM SNMP-FRAMEWORK-MIB                             -- [RFC3411]
+   mplsL3VpnVrfName, MplsL3VpnRtType, 
+   MplsL3VpnRouteDistinguisher
+      FROM MPLS-L3VPN-STD-MIB                             -- [RFC4382]
+   AddressFamilyNumbers
+      FROM IANA-ADDRESS-FAMILY-NUMBERS-MIB                -- [IANAFamily]
+   eriRouterMgmt
+      FROM ERICSSON-ROUTER-SMI
+   ;
+
+eriRouterMplsL3VpnMIB MODULE-IDENTITY
+    LAST-UPDATED    "201501141800Z" -- Jan 14, 2015
+    ORGANIZATION    "Ericsson AB."
+    CONTACT-INFO
+            "       Ericsson AB.
+
+            Postal: 100 Headquarters Dr
+                    San Jose, CA  95134
+                    USA
+
+             Phone: +1 408 750 5000
+               Fax: +1 408 750 5599
+            "
+    DESCRIPTION
+        "This MIB contains managed object definitions for the
+         Layer-3 Multiprotocol Label Switching Virtual
+         Private Networks.
+
+         This version of this MIB module extends RFC4382."
+
+    -- Revision history.
+    REVISION        "201501141800Z" -- Jan 14, 2015
+    DESCRIPTION
+        "Updated RBN/rbn/Rbn as ERICSSON-ROUTER/eriRouter/EriRouter
+         to migrate RBN MIB to ERICSSON MIB."
+
+    REVISION        "201101191800Z" -- Jan 19, 2011
+    DESCRIPTION
+        "Update CONTACT-INFO & ORGANIZATION. "
+
+    REVISION
+        "200905300000Z"  -- May 30, 2009
+    DESCRIPTION
+        "Initial version."
+    ::= { eriRouterMgmt 51 }
+
+-- Top level components of this MIB.
+eriRouterMplsL3VpnObjects       OBJECT IDENTIFIER ::= { eriRouterMplsL3VpnMIB 1 }
+eriRouterMplsL3VpnConf          OBJECT IDENTIFIER ::= { eriRouterMplsL3VpnObjects 1 }
+eriRouterMplsL3VpnConformance   OBJECT IDENTIFIER ::= { eriRouterMplsL3VpnMIB 2 }
+
+-- eriRouterMplsL3VpnVrfRTTable
+eriRouterMplsL3VpnVrfRTTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF EriRouterMplsL3VpnVrfRTEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "This table specifies per-VRF route target association.
+         Each entry identifies a connectivity policy supported
+         as part of a VPN. eriRouterMplsL3VpnVrfRTTable is equivalent
+         to mplsL3VpnVrfRTTable except for lexicographical ordering."
+    ::= { eriRouterMplsL3VpnConf 1 }
+
+eriRouterMplsL3VpnVrfRTEntry OBJECT-TYPE
+    SYNTAX        EriRouterMplsL3VpnVrfRTEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+       "An entry in this table is created by an LSR for
+        each route target configured for a VRF supporting
+        a MPLS L3VPN instance.  The indexing provides an
+        ordering per-VRF instance.  See [RFC4364] for a
+        complete definition of a route target."
+    INDEX  { mplsL3VpnVrfName, 
+             eriRouterMplsL3VpnVrfRTAddrFamily,
+             eriRouterMplsL3VpnVrfRTType,
+             eriRouterMplsL3VpnVrfRTIndex }
+    ::= { eriRouterMplsL3VpnVrfRTTable 1 }
+
+EriRouterMplsL3VpnVrfRTEntry ::= SEQUENCE {
+     eriRouterMplsL3VpnVrfRTAddrFamily  AddressFamilyNumbers,
+     eriRouterMplsL3VpnVrfRTType        MplsL3VpnRtType,
+     eriRouterMplsL3VpnVrfRTIndex       Unsigned32,
+     eriRouterMplsL3VpnVrfRT            MplsL3VpnRouteDistinguisher,
+     eriRouterMplsL3VpnVrfRTDescr       SnmpAdminString
+   }
+
+eriRouterMplsL3VpnVrfRTAddrFamily OBJECT-TYPE
+   SYNTAX        AddressFamilyNumbers
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "The address family in which the route target is declared."
+   ::= { eriRouterMplsL3VpnVrfRTEntry 1 }
+
+eriRouterMplsL3VpnVrfRTType OBJECT-TYPE
+   SYNTAX        MplsL3VpnRtType
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "The route target distribution type."
+   ::= { eriRouterMplsL3VpnVrfRTEntry 2 }
+
+eriRouterMplsL3VpnVrfRTIndex OBJECT-TYPE
+   SYNTAX        Unsigned32 (1..4294967295)
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "Auxiliary index for route targets configured for a
+        particular VRF."
+   ::= { eriRouterMplsL3VpnVrfRTEntry 3 }
+
+eriRouterMplsL3VpnVrfRT OBJECT-TYPE
+   SYNTAX        MplsL3VpnRouteDistinguisher
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "The route target distribution policy."
+   DEFVAL { "" }
+   ::= { eriRouterMplsL3VpnVrfRTEntry 4 }
+
+eriRouterMplsL3VpnVrfRTDescr OBJECT-TYPE
+   SYNTAX        SnmpAdminString
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "Description of the route target."
+   DEFVAL { "" }
+   ::= { eriRouterMplsL3VpnVrfRTEntry 5 }
+
+-- Conformance Statement
+eriRouterMplsL3VpnGroups      
+    OBJECT IDENTIFIER ::= { eriRouterMplsL3VpnConformance 1 }
+eriRouterMplsL3VpnCompliances 
+    OBJECT IDENTIFIER ::= { eriRouterMplsL3VpnConformance 2 }
+
+-- Module Compliance
+eriRouterMplsL3VpnModuleCompliance MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION
+          "Compliance statement for agents that provide support
+           for the ERICSSON-ROUTER-MPLS-L3VPN-STD-EXT-MIB"
+    MODULE -- this module
+        MANDATORY-GROUPS {
+            eriRouterMplsL3VpnGroup
+        }
+    ::= { eriRouterMplsL3VpnCompliances 1 }
+
+-- Units of conformance.
+eriRouterMplsL3VpnGroup OBJECT-GROUP
+    OBJECTS { eriRouterMplsL3VpnVrfRT,
+              eriRouterMplsL3VpnVrfRTDescr }
+    STATUS  current
+    DESCRIPTION
+        "Collection of scalar objects required for MPLS VPN
+         management."
+    ::= { eriRouterMplsL3VpnGroups 1 }
+
+END

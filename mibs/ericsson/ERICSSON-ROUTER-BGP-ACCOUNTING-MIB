@@ -1,0 +1,229 @@
+-- %DNP% $Id: ERICSSON-ROUTER-BGP-ACCOUNTING-MIB.my,v 1.1.4.3.272.2 2011/02/22 17:26:16 thatcher Exp $
+-- %DNP% $Source: /cvsroot/pkt/sw/se/xc/bsd/config/snmp/mibs/Attic/ERICSSON-ROUTER-BGP-ACCOUNTING-MIB.my,v $
+-- *****************************************************************
+-- ERICSSON-ROUTER-BGP-ACCOUNTING-MIB
+--
+-- Copyright (c) 2002, 2004-2005, 2011, 2015 Ericsson AB.
+-- All rights reserved.
+--
+-- *****************************************************************
+
+ERICSSON-ROUTER-BGP-ACCOUNTING-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, Integer32,
+        Counter64
+                FROM SNMPv2-SMI
+        MODULE-COMPLIANCE, OBJECT-GROUP
+                FROM SNMPv2-CONF
+        eriRouterMgmt
+                FROM ERICSSON-ROUTER-SMI
+        ifIndex
+                FROM IF-MIB
+        SnmpAdminString
+                FROM SNMP-FRAMEWORK-MIB;
+
+        
+eriRouterBgpPolAcctMIB MODULE-IDENTITY
+        LAST-UPDATED    "201501141800Z" -- Jan 14, 2015
+        ORGANIZATION    "Ericsson AB."
+        CONTACT-INFO    
+                "       Ericsson AB.
+
+                Postal: 100 Headquarters Dr
+                        San Jose, CA  95134
+                        USA
+        
+                 Phone: +1 408 750 5000
+                   Fax: +1 408 750 5599
+                "
+        DESCRIPTION
+                "The BGP policy based accounting MIB defines necessary objects
+                 to account for IP traffic differentially via the BGP policies
+                 (e.g., community list, AS path).
+                 
+                 All mib objects defined in the module are viewed within the
+                 context identified in the SNMP protocol (i.e. the community
+                 string in v1/v2c or the contextName in v3)."
+       
+        REVISION        "201501141800Z" -- Jan 14, 2015
+        DESCRIPTION
+                "Updated RBN/rbn/Rbn as ERICSSON-ROUTER/eriRouter/EriRouter
+                 to migrate RBN MIB to ERICSSON MIB."
+
+        REVISION        "201101191800Z" -- Jan 19, 2011
+        DESCRIPTION
+                "Update CONTACT-INFO & ORGANIZATION."
+
+        REVISION        "200509200000Z"  -- Sep 20, 2005
+        DESCRIPTION
+                "Added a circuit descriptor object, interface name object,  
+                 context name object and updated conformation information"
+
+        REVISION        "200203150000Z"  --  Mar 15, 2002
+        DESCRIPTION
+                "Initial version of this MIB module."
+
+        ::= { eriRouterMgmt 20 }
+
+eriRouterBgpPolAcctMIBObjects OBJECT IDENTIFIER ::= { eriRouterBgpPolAcctMIB 1 }
+
+eriRouterBpaTable    OBJECT-TYPE
+      SYNTAX      SEQUENCE OF EriRouterBpaEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+        "A list of BGP Policy Accounting entries"
+      ::= { eriRouterBgpPolAcctMIBObjects 1 }
+
+eriRouterBpaEntry OBJECT-TYPE
+        SYNTAX     EriRouterBpaEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+        "An entry contains statistics applicable to a particular bgp based
+        routing policy set on a particular interface.
+        
+        The ifIndex instances referenced by this table represent a 
+        port, channel, sub-channel or circuit layer that supports
+        the IF-MIB ifPacketGroup, ifHCPacketGroup or ifVHCPacketGroup,
+        and is bound to an IP interface for which BGP policy based
+        accounting is enabled. Since the IF-MIB may provide support for
+        a subset of the physical interfaces available on the system,
+        it follows that support for BGP policy based accounting
+        information in this MIB is limited to the same subset of physical
+        interfaces supported in the IF-MIB."
+        INDEX {ifIndex, eriRouterBpaBucketIndex}
+        ::= { eriRouterBpaTable 1 }
+
+EriRouterBpaEntry ::= SEQUENCE {
+        eriRouterBpaBucketIndex       Integer32,
+        eriRouterBpaInPacketCount     Counter64,
+        eriRouterBpaInOctetCount      Counter64,
+        eriRouterBpaCircuitDescr      SnmpAdminString,
+        eriRouterBpaInterfaceName     SnmpAdminString,
+        eriRouterBpaContextName       SnmpAdminString 
+        }
+
+eriRouterBpaBucketIndex     OBJECT-TYPE
+      SYNTAX       Integer32 (1..2147483647)
+      MAX-ACCESS   read-only 
+      STATUS       current
+      DESCRIPTION
+        "An integer value greater than 0, that uniquely identifies
+        a bgp routing policy set on this interface. "
+      ::= { eriRouterBpaEntry 1}
+
+eriRouterBpaInPacketCount    OBJECT-TYPE
+      SYNTAX       Counter64
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION
+        "The total number of packets received for a particular
+        bgp routing policy on an interface."
+      ::= { eriRouterBpaEntry 2}
+
+eriRouterBpaInOctetCount     OBJECT-TYPE
+      SYNTAX       Counter64
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION
+        "The total number of octets received for a particular
+        bgp routing policy on an interface."
+      ::= { eriRouterBpaEntry 3}
+
+eriRouterBpaCircuitDescr     OBJECT-TYPE
+      SYNTAX       SnmpAdminString (SIZE (0..192))
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION
+        "A descriptive version of the interface that is consistent 
+        with information displayed in the CLI. This string is formatted as
+        slot/port:channel:subchannel authority/level/index,
+        with the exception that channel and subchannel are
+        only included when appropriate. For example,
+        4/1 1/2/7, 4/1:1 1/2/7 or 4/1:1:1 1/2/7.
+        
+        If a circuit description is not available then this object
+        contains a zero-length string"
+      ::= { eriRouterBpaEntry 4}
+
+eriRouterBpaInterfaceName    OBJECT-TYPE
+      SYNTAX       SnmpAdminString (SIZE (0..127))
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION
+        "The name of the ip interface bound to a circuit.
+        If ip interface name is not available then this object contains a
+        zero length string"
+      ::= { eriRouterBpaEntry 5}
+
+eriRouterBpaContextName     OBJECT-TYPE
+      SYNTAX       SnmpAdminString (SIZE (0..63))
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION
+        "The name of context in which this IP interface is defined.
+        If context information is not available then this object contains a
+        zero lenght string"
+      ::= { eriRouterBpaEntry 6}
+
+-- Conformance Information
+ 
+eriRouterBgpPolAcctMIBConformance OBJECT IDENTIFIER ::= { eriRouterBgpPolAcctMIB 3 }
+eriRouterBgpPolAcctMIBCompliances OBJECT IDENTIFIER ::= { eriRouterBgpPolAcctMIBConformance 1 }
+eriRouterBgpPolAcctMIBGroups      OBJECT IDENTIFIER ::= { eriRouterBgpPolAcctMIBConformance 2 }
+
+-- Compliance Statement 
+eriRouterBgpPolAcctMIBCompliance MODULE-COMPLIANCE
+        STATUS  deprecated 
+        DESCRIPTION
+                "The compliance statement for entities which implement
+                this BGP Policy Traffic Accounting MIB."
+        MODULE  -- this module
+                MANDATORY-GROUPS {
+                                eriRouterBpaTableGroup
+                }
+        ::= { eriRouterBgpPolAcctMIBCompliances 1 }
+
+        
+eriRouterBgpPolAcctMIBCompliance1 MODULE-COMPLIANCE
+        STATUS  current
+        DESCRIPTION
+                "The compliance statement for entities which implement
+                this BGP Policy Traffic Accounting MIB."
+        MODULE  -- this module
+                MANDATORY-GROUPS {
+                                eriRouterBpaTableGroup1
+                }
+        ::= { eriRouterBgpPolAcctMIBCompliances 2 }
+ 
+-- units of conformance
+ 
+eriRouterBpaTableGroup OBJECT-GROUP
+        OBJECTS {
+                eriRouterBpaBucketIndex,
+                eriRouterBpaInPacketCount,
+                eriRouterBpaInOctetCount
+        }
+        STATUS  deprecated
+        DESCRIPTION
+                "A collection of objects providing customer traffic 
+                related parameters."
+        ::= { eriRouterBgpPolAcctMIBGroups 1 }
+
+eriRouterBpaTableGroup1 OBJECT-GROUP
+        OBJECTS {
+                eriRouterBpaBucketIndex,
+                eriRouterBpaInPacketCount,
+                eriRouterBpaInOctetCount,
+                eriRouterBpaCircuitDescr,
+                eriRouterBpaInterfaceName,
+                eriRouterBpaContextName
+        }           
+        STATUS  current
+        DESCRIPTION
+                "Collection of objects providing more information 
+                about traffic-index"
+        ::= { eriRouterBgpPolAcctMIBGroups 2 }         
+END

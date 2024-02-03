@@ -1,0 +1,46 @@
+-- *****************************************************************
+-- ERICSSON-ROUTER-ACL-CAP        ACL Mib Capabilities
+--
+-- Copyright (c) 2016 Ericsson AB.
+-- All rights reserved.
+--
+-- *****************************************************************
+
+ERICSSON-ROUTER-ACL-CAP DEFINITIONS ::= BEGIN
+
+IMPORTS
+
+    MODULE-IDENTITY
+            FROM SNMPv2-SMI
+    AGENT-CAPABILITIES
+            FROM SNMPv2-CONF
+    eriRouterCapabilities
+            FROM ERICSSON-ROUTER-SMI;
+
+eriRouterACLMibCap MODULE-IDENTITY
+    LAST-UPDATED    "201610271800Z" -- Oct 27, 2016
+    ORGANIZATION    "Ericsson Inc."
+    CONTACT-INFO
+        "    Ericsson, Inc."
+    DESCRIPTION
+        "The Agent Capabilities of the ACL MIB."
+
+    REVISION    "201610271800Z" -- Oct 27, 2016
+    DESCRIPTION
+        "Initial version."
+
+    ::= { eriRouterCapabilities 120 }
+
+eriRouterACLMibCap1 AGENT-CAPABILITIES
+    PRODUCT-RELEASE    "IPOS 16.5"
+    STATUS        current
+    DESCRIPTION    "ERICSSON-ROUTER-ACL-MIB capabilities"
+    SUPPORTS    ERICSSON-ROUTER-ACL-MIB
+    INCLUDES {
+        eriRouterACLObjectsGroup,
+        eriRouterACLNotifyGroup
+    }
+
+    ::= { eriRouterACLMibCap 1 }
+
+END

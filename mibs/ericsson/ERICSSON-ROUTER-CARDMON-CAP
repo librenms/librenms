@@ -1,0 +1,439 @@
+-- %DNP%
+-- %DNP% $Source: /cvsroot/pkt/sw/se/xc/bsd/config/snmp/mibs/Attic/ERICSSON-ROUTER-CARDMON-CAP.my,v $
+-- *****************************************************************
+-- ERICSSON-ROUTER-CARDMON-CAP        Card Monitor MIB Capabilities
+--
+-- Copyright (c) 2004-2009, 2010-2011, 2015 Ericsson AB
+-- All rights reserved.
+-- 
+-- *****************************************************************
+
+ERICSSON-ROUTER-CARDMON-CAP DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY
+                FROM SNMPv2-SMI
+        AGENT-CAPABILITIES
+                FROM SNMPv2-CONF
+        eriRouterCapabilities
+                FROM ERICSSON-ROUTER-SMI;
+
+eriRouterCardMonCap MODULE-IDENTITY
+        LAST-UPDATED    "201501141800Z" -- Jan 14, 2015
+        ORGANIZATION    "Ericsson Inc."
+        CONTACT-INFO
+                "       Ericsson, Inc.
+
+                Postal: 100 Headquarters Dr.
+                        San Jose, CA  95134
+                        USA
+
+                 Phone: +1 408 750 5000
+                   Fax: +1 408 750 5599
+                "
+        DESCRIPTION
+                "The Agent Capabilities of the 
+                Card Monitor MIB (ERICSSON-ROUTER-CARDMON-MIB).
+
+                If this MIB implementation is platform-dependent,
+                the PRODUCT-RELEASE clause contains Ericsson SEOS version and
+                at least one of the following Ericsson product families:
+                    [SE]  SmartEdge Multi-service Edge Router (MSER) family
+                    [SM]  SM family of Metro Ethernet Service Transport platforms
+                    [SSR] Smart Service Router (SSR) family"
+
+        REVISION    "201501141800Z" -- Jan 14, 2015
+        DESCRIPTION
+                "Updated RBN/rbn/Rbn as ERICSSON-ROUTER/eriRouter/EriRouter
+                 to migrate RBN MIB to ERICSSON MIB."
+
+        REVISION    "201106150000Z" -- Jun 15, 2011
+        DESCRIPTION
+                "Update DESCRIPTION clause of MODULE-IDENTITY
+                 and PRODUCT-RELEASE clause of AGENT-CAPABILITIES."
+
+        REVISION    "201011010000Z" -- Nov 1, 2010
+        DESCRIPTION
+                "Modified PRODUCT-RELEASE clause for consistent naming.
+                 Updated CONTACT-INFO."
+
+        REVISION    "200903270000Z" -- March 27, 2009
+        DESCRIPTION
+	        "Added new OID: 
+                    eriRouterCardMonCap6 to include new 
+               syntax for eriRouterCardAlarmId."
+
+        REVISION    "200903160000Z" -- March 16, 2009
+        DESCRIPTION
+	        "Added new OID: 
+                    eriRouterCardMonCap5 to include new 
+               syntax for eriRouterCardAlarmId."
+
+        REVISION    "200705080000Z" -- May 8, 2007
+        DESCRIPTION
+	        "Updated eriRouterCardMonCap4 to include new 
+               syntax for eriRouterCardAlarmId."
+
+        REVISION    "200610020000Z" -- October 2, 2006
+        DESCRIPTION
+	        "Added new OID:
+	            eriRouterCardMonCap4."
+
+        REVISION    "200505180000Z" -- May 18, 2005
+        DESCRIPTION
+	        "Added new OID:
+	            eriRouterCardMonCap3."
+
+        REVISION    "200410190000Z" -- October 19, 2004
+        DESCRIPTION
+	        "Added new OID:
+	            eriRouterCardMonCap2."
+
+        REVISION        "200406290000Z" -- Jun 29, 2004
+        DESCRIPTION
+                "Initial version."
+        ::= { eriRouterCapabilities 58 }
+
+eriRouterCardMonCap1 AGENT-CAPABILITIES
+        PRODUCT-RELEASE "SEOS 2.6"
+        STATUS          current
+        DESCRIPTION     "ERICSSON-ROUTER-CARDMON-MIB capabilities"
+        SUPPORTS        ERICSSON-ROUTER-CARDMON-MIB
+        INCLUDES {
+                eriRouterCardMonMIBObjectGroup,
+                eriRouterCardMonMIBNotificationGroup
+                }
+
+        VARIATION eriRouterCardAlarmId
+        SYNTAX INTEGER {
+                unknown(1),
+                cpFail(2),                    -- circuit pack failure
+                cpBackplaneFail(3),           -- circuit pack backplane failure
+                voltageFail(5),               -- voltage failure
+                controllerSwitchFail(6),      -- controller switch failure
+                controllerTempCritical(7),    -- controller temp critical
+                controllerFail(8),            -- controller failure
+                cpPowerOnDiagFail(10),        -- circuit pack power-on 
+                                              -- diagnostic failure
+                controllerPowerOnDiagFail(11) -- controller power-on diagnostic
+                                              -- failure 
+                }
+        DESCRIPTION
+                "The value diagFail(4) or controllerDiagFail(9) is not 
+                supported."
+
+        ::= { eriRouterCardMonCap 1 }
+
+eriRouterCardMonCap2 AGENT-CAPABILITIES
+        PRODUCT-RELEASE "SEOS 4.0.3"
+        STATUS          current
+        DESCRIPTION     "ERICSSON-ROUTER-CARDMON-MIB capabilities"
+        SUPPORTS        ERICSSON-ROUTER-CARDMON-MIB
+        INCLUDES {
+                eriRouterCardMonMIBObjectGroup,
+                eriRouterCardMonMIBNotificationGroup,
+                eriRouterCardStatsMIBObjectGroup
+                }
+
+        VARIATION eriRouterCardAlarmId
+        SYNTAX INTEGER {
+                unknown(1),
+                cpFail(2),                    -- circuit pack failure
+                cpBackplaneFail(3),           -- circuit pack backplane failure
+                voltageFail(5),               -- voltage failure
+                controllerSwitchFail(6),      -- controller switch failure
+                controllerTempCritical(7),    -- controller temp critical
+                controllerFail(8),            -- controller failure
+                cpPowerOnDiagFail(10),        -- circuit pack power-on 
+                                              -- diagnostic failure
+                controllerPowerOnDiagFail(11) -- controller power-on diagnostic
+                                              -- failure 
+                }
+        DESCRIPTION
+                "The value diagFail(4) or controllerDiagFail(9) is not 
+                supported."
+
+        ::= { eriRouterCardMonCap 2 }
+
+eriRouterCardMonCap3 AGENT-CAPABILITIES
+        PRODUCT-RELEASE "SEOS 4.0.5"
+        STATUS          current
+        DESCRIPTION     "ERICSSON-ROUTER-CARDMON-MIB capabilities"
+        SUPPORTS        ERICSSON-ROUTER-CARDMON-MIB
+        INCLUDES {
+                eriRouterCardMonMIBObjectGroup2,
+                eriRouterCardMonMIBNotificationGroup,
+                eriRouterCardStatsMIBObjectGroup
+                }
+
+        VARIATION eriRouterCardAlarmId
+        SYNTAX INTEGER {
+                unknown(1),
+                cpFail(2),                    -- circuit pack failure
+                cpBackplaneFail(3),           -- circuit pack backplane failure
+                voltageFail(5),               -- voltage failure
+                controllerSwitchFail(6),      -- controller switch failure
+                controllerTempCritical(7),    -- controller temp critical
+                controllerFail(8),            -- controller failure
+                cpPowerOnDiagFail(10),        -- circuit pack power-on 
+                                              -- diagnostic failure
+                controllerPowerOnDiagFail(11) -- controller power-on diagnostic
+                                              -- failure 
+                }
+        DESCRIPTION
+                "The value diagFail(4) or controllerDiagFail(9) is not 
+                supported."
+
+        ::= { eriRouterCardMonCap 3 }
+
+eriRouterCardMonCap4 AGENT-CAPABILITIES
+        PRODUCT-RELEASE "SEOS 6.0.3"
+        STATUS          current
+        DESCRIPTION     "ERICSSON-ROUTER-CARDMON-MIB capabilities"
+        SUPPORTS        ERICSSON-ROUTER-CARDMON-MIB
+        INCLUDES {
+                eriRouterCardMonMIBObjectGroup2,
+                eriRouterCardMonMIBNotificationGroup,
+                eriRouterCardStatsMIBObjectGroup2
+                }
+
+        VARIATION eriRouterCardAlarmId
+        SYNTAX INTEGER {
+                unknown(1),
+                cpFail(2),                    -- circuit pack failure
+                cpBackplaneFail(3),           -- circuit pack backplane failure
+                voltageFail(5),               -- voltage failure
+                controllerSwitchFail(6),      -- controller switch failure
+                controllerTempCritical(7),    -- controller temp critical
+                controllerFail(8),            -- controller failure
+                cpPowerOnDiagFail(10),        -- circuit pack power-on 
+                                              -- diagnostic failure
+                controllerPowerOnDiagFail(11), -- controller power-on diagnostic
+                                              -- failure 
+                cpOverheat(12)                -- circuit pack overheat
+                }
+        DESCRIPTION
+                "The value diagFail(4) or controllerDiagFail(9) is not 
+                supported."
+
+        ::= { eriRouterCardMonCap 4 }
+
+eriRouterCardMonCap5 AGENT-CAPABILITIES
+        PRODUCT-RELEASE "SEOS 6.1.4"
+        STATUS          current
+        DESCRIPTION     "ERICSSON-ROUTER-CARDMON-MIB capabilities"
+        SUPPORTS        ERICSSON-ROUTER-CARDMON-MIB
+        INCLUDES {
+                eriRouterCardMonMIBObjectGroup2,
+                eriRouterCardMonMIBNotificationGroup,
+                eriRouterCardStatsMIBObjectGroup2
+                }
+
+        VARIATION eriRouterCardAlarmId
+        SYNTAX INTEGER {
+                unknown(1),
+                cpFail(2),                      -- circuit pack failure
+                cpBackplaneFail(3),             -- circuit pack backplane failure
+                diagFail(4),                    -- diagnostic failure
+                voltageFail(5),                 -- voltage failure
+                controllerSwitchFail(6),        -- controller switch failure
+                controllerTempCritical(7),      -- controller temp critical
+                controllerFail(8),              -- controller failure
+                controllerDiagFail(9),          -- controller diag test failure
+                cpPowerOnDiagFail(10),          -- circuit pack power-on 
+                                                -- diagnostic failure
+                controllerPowerOnDiagFail(11),  -- controller power-on 
+                                                -- diagnostic failure 
+                cpOverheat(12),                  -- circuit pack overheat 
+                controllerOverheat(13),          -- controller overheat
+                backplaneclkfail(14),
+                btciferror(15),
+                btcnotready(16),
+                cpbackplanedegrade(17),
+                cpcardcodemismatch(18),
+                cpmismatch(19),
+                cpmissing(20),
+                cpresetcomplete(21),
+                downloadcompleted(22),
+                downloadfailed(23),
+                syncfail(24),
+                backupfail(25),
+                controllercardcodemismatch(26),
+                controllercardtypemismatch(27),
+                controllermissing(28),
+                controlleroverheat(29),
+                controllerswitchauto(30),
+                controllerswitchcompleted(31),
+                controllerswitchexfailed(32),
+                controllerswitchforced(33),
+                controllerswitchmanual(34),
+                localfantrayinventfail(35),
+                localinventfail(36),
+                localbackplaneinventfail(37),
+                lostm2m(38),
+                nonvolatilememfail(39),
+                peerhwincompatible(40),
+                peerinventfail(41),
+                peermodeincompatible(42),
+                peersharedformatmismatch(43),
+                rtclockfail(44),
+                mic1missing(45),
+                mic2missing(46),
+                mic1mismatch(47),
+                mic2mismatch(48),
+                mic1voltagefailure(49),
+                mic2voltagefailure(50),
+                mic1overheat(51),
+                mic2overheat(52),
+                mic1failure(53),
+                mic2failure(54),
+                mic1podfail(55),
+                mic2podfail(56),
+                mic1diagnosticfail(57),
+                mic2diagnosticfail(58),
+                ethtransceiverrxpowerhi(59),
+                ethtransceiverrxpowerlo(60),
+                ethtransceivertemphi(61),
+                ethtransceivertemplo(62),
+                ethtranceivervoltagehi(63),
+                ethtranceivervoltagelo(64),
+                ethtransceiverbiashi(65),
+                ethtransceiverbiaslo(66),
+                ethtransceivertxpowerhi(67),
+                ethtransceivertxpowerlo(68),
+                ethtransceiveraux1hi(69),
+                ethtransceiveraux1lo(70),
+                ethtransceiveraux2hi(71),
+                ethtransceiveraux2lo(72),
+                ethtransceiverlvcc5hi(73),
+                ethtransceiverlvcc5lo(74),
+                ethtransceiverlvcc3hi(75),
+                ethtransceiverlvcc3lo(76),
+                ethtransceiverlvcc2hi(77),
+                ethtransceiverlvcc2lo(78)
+
+                }
+        DESCRIPTION
+                "The value diagFail(4) or controllerDiagFail(9) is not 
+                supported."
+
+        ::= { eriRouterCardMonCap 5 }
+
+
+eriRouterCardMonCap6 AGENT-CAPABILITIES
+        PRODUCT-RELEASE "SEOS 6.1.5"
+        STATUS          current
+        DESCRIPTION     "ERICSSON-ROUTER-CARDMON-MIB capabilities"
+        SUPPORTS        ERICSSON-ROUTER-CARDMON-MIB
+        INCLUDES {
+                eriRouterCardMonMIBObjectGroup2,
+                eriRouterCardMonMIBNotificationGroup,
+                eriRouterCardStatsMIBObjectGroup2
+                }
+
+        VARIATION eriRouterCardAlarmId
+        SYNTAX INTEGER {
+                unknown(1),
+                cpFail(2),                      -- circuit pack failure
+                cpBackplaneFail(3),             -- circuit pack backplane failure
+                diagFail(4),                    -- diagnostic failure
+                voltageFail(5),                 -- voltage failure
+                controllerSwitchFail(6),        -- controller switch failure
+                controllerTempCritical(7),      -- controller temp critical
+                controllerFail(8),              -- controller failure
+                controllerDiagFail(9),          -- controller diag test failure
+                cpPowerOnDiagFail(10),          -- circuit pack power-on 
+                                                -- diagnostic failure
+                controllerPowerOnDiagFail(11),  -- controller power-on 
+                                                -- diagnostic failure 
+                cpOverheat(12),                  -- circuit pack overheat 
+                controllerOverheat(13),          -- controller overheat
+                backplaneclkfail(14),
+                btciferror(15),
+                btcnotready(16),
+                cpbackplanedegrade(17),
+                cpcardcodemismatch(18),
+                cpmismatch(19),
+                cpmissing(20),
+                cpresetcomplete(21),
+                downloadcompleted(22),
+                downloadfailed(23),
+                syncfail(24),
+                backupfail(25),
+                controllercardcodemismatch(26),
+                controllercardtypemismatch(27),
+                controllermissing(28),
+                controlleroverheat(29),
+                controllerswitchauto(30),
+                controllerswitchcompleted(31),
+                controllerswitchexfailed(32),
+                controllerswitchforced(33),
+                controllerswitchmanual(34),
+                localfantrayinventfail(35),
+                localinventfail(36),
+                localbackplaneinventfail(37),
+                lostm2m(38),
+                nonvolatilememfail(39),
+                peerhwincompatible(40),
+                peerinventfail(41),
+                peermodeincompatible(42),
+                peersharedformatmismatch(43),
+                rtclockfail(44),
+                mic1missing(45),
+                mic2missing(46),
+                mic1mismatch(47),
+                mic2mismatch(48),
+                mic1voltagefailure(49),
+                mic2voltagefailure(50),
+                mic1overheat(51),
+                mic2overheat(52),
+                mic1failure(53),
+                mic2failure(54),
+                mic1podfail(55),
+                mic2podfail(56),
+                mic1diagnosticfail(57),
+                mic2diagnosticfail(58),
+                ethtransceiverrxpowerhi(59),
+                ethtransceiverrxpowerlo(60),
+                ethtransceivertemphi(61),
+                ethtransceivertemplo(62),
+                ethtranceivervoltagehi(63),
+                ethtranceivervoltagelo(64),
+                ethtransceiverbiashi(65),
+                ethtransceiverbiaslo(66),
+                ethtransceivertxpowerhi(67),
+                ethtransceivertxpowerlo(68),
+                ethtransceiveraux1hi(69),
+                ethtransceiveraux1lo(70),
+                ethtransceiveraux2hi(71),
+                ethtransceiveraux2lo(72),
+                ethtransceiverlvcc5hi(73),
+                ethtransceiverlvcc5lo(74),
+                ethtransceiverlvcc3hi(75),
+                ethtransceiverlvcc3lo(76),
+                ethtransceiverlvcc2hi(77),
+                ethtransceiverlvcc2lo(78),
+                controllerbsdl2cacheerror(79),  -- L2 cache error (PPC0)
+                controllervxwl2cacheerror(80)   -- L2 cache error (PPC1)
+
+                }
+        DESCRIPTION
+                "The value diagFail(4) or controllerDiagFail(9) is not 
+                supported."
+
+        ::= { eriRouterCardMonCap 6 }
+
+eriRouterCardMonCap7 AGENT-CAPABILITIES
+        PRODUCT-RELEASE "SEOS 11.1.X [SE, SM, SSR]"
+        STATUS          current
+        DESCRIPTION     "ERICSSON-ROUTER-CARDMON-MIB capabilities"
+        SUPPORTS        ERICSSON-ROUTER-CARDMON-MIB
+        INCLUDES {
+                eriRouterCardMonMIBObjectGroup2,
+                eriRouterCardMonMIBNotificationGroup,
+                eriRouterCardStatsMIBObjectGroup2
+                }
+        ::= { eriRouterCardMonCap 7 }
+
+END
+
