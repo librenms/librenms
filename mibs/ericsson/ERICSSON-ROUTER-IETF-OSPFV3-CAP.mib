@@ -1,0 +1,157 @@
+-- %DNP% $Id: ERICSSON-ROUTER-IETF-OSPFV3-TRAP-CAP.my,Exp $
+-- %DNP% $Source: pkt/sw/se/xc/bsd/config/snmp/mibs/ERICSSON-ROUTER-IETF-OSPFV3-TRAP-CAP.my,v $
+-- *****************************************************************
+-- ERICSSON-ROUTER-IETF-OSPFV3-TRAP-CAP.my: IETF OSPFV3-TRAP-MIB Agent Capabilities
+-- Copyright (c) 2013-2014 Ericsson AB.
+-- Copyright (c) 2001-2008 Redback Networks, Inc.
+-- All rights reserved.
+--
+-- *****************************************************************
+
+ERICSSON-ROUTER-IETF-OSPFV3-CAP DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY
+                FROM SNMPv2-SMI
+        AGENT-CAPABILITIES
+                FROM SNMPv2-CONF
+        eriRouterCapabilities
+                FROM ERICSSON-ROUTER-SMI;
+
+eriRouterIetfOspfv3Cap MODULE-IDENTITY
+        LAST-UPDATED    "201106150000Z" -- Jun 15, 2011
+	ORGANIZATION	"Ericsson Inc."
+	CONTACT-INFO
+		"	Ericsson, Inc.
+
+		Postal:	100 Headquarters Dr.
+			San Jose, CA  95134
+			USA
+
+		 Phone:	+1 408 750 5000
+		   Fax: +1 408 750 5599
+		"
+        DESCRIPTION
+            "The Agent Capabilities of the 
+             implementation of the IETF OSPF-TRAP-MIB.
+
+            If this MIB implementation is platform-dependent,
+            the PRODUCT-RELEASE clause contains Ericsson SEOS version and
+            at least one of the following Ericsson product families:
+                [SE]  SmartEdge Multi-service Edge Router (MSER) family
+                [SM]  SM family of Metro Ethernet Service Transport platforms
+                [SSR] Smart Service Router (SSR) family"
+
+        REVISION        "201503160000Z" -- November 10, 2006 00:00:00 EST 
+        DESCRIPTION
+            "Initial version"
+        ::= { eriRouterCapabilities 30 }
+
+eriRouterIetfOspfv3Cap1 AGENT-CAPABILITIES
+        PRODUCT-RELEASE     "SmartEdge 5.0.7.4"
+        STATUS              current
+        DESCRIPTION         "OSPFV3-MIB capabilities"
+        SUPPORTS            OSPFV3-MIB
+        INCLUDES {
+                ospfv3NotificationGroup
+                }
+
+        VARIATION       ospfv3NbrStateChange 
+        ACCESS          accessible-for-notify
+        DESCRIPTION
+           "This information is  available to SNMP." 
+
+        VARIATION       ospfv3RouterId 
+        ACCESS          accessible-for-notify
+        DESCRIPTION
+           "This information is  available to SNMP." 
+
+        VARIATION       ospfv3NbrState 
+        ACCESS          accessible-for-notify
+        DESCRIPTION
+           "This information is  available to SNMP." 
+        
+	VARIATION       ospfv3IfStateChange
+        ACCESS          accessible-for-notify
+        DESCRIPTION
+           "This information is  available to SNMP." 
+        
+	VARIATION       ospfv3IfState
+        ACCESS          accessible-for-notify
+        DESCRIPTION
+           "This information is  available to SNMP." 
+        
+        VARIATION      	ospfv3VirtIfStateChange 
+        ACCESS          not-implemented 
+        DESCRIPTION
+           "This information is not available to SNMP." 
+
+        VARIATION       ospfv3VirtNbrStateChange
+        ACCESS          not-implemented 
+        DESCRIPTION
+           "This information is not available to SNMP." 
+
+        VARIATION       ospfv3IfConfigError
+        ACCESS          not-implemented 
+        DESCRIPTION
+           "This information is not available to SNMP." 
+
+        VARIATION       ospfv3VirtIfConfigError
+        ACCESS          not-implemented 
+        DESCRIPTION
+           "This information is not available to SNMP." 
+
+        VARIATION       ospfv3IfRxBadPacket 
+        ACCESS          not-implemented 
+        DESCRIPTION
+           "This information is not available to SNMP." 
+
+        VARIATION       ospfv3VirtIfRxBadPacket
+        ACCESS          not-implemented 
+        DESCRIPTION
+           "This information is not available to SNMP." 
+
+        VARIATION       ospfv3VirtIfRxBadPacket
+        ACCESS          not-implemented 
+        DESCRIPTION
+           "This information is not available to SNMP." 
+
+        VARIATION       ospfv3LsdbOverflow
+        ACCESS          not-implemented 
+        DESCRIPTION
+           "This information is not available to SNMP." 
+
+        VARIATION       ospfv3LsdbApproachingOverflow
+        ACCESS          not-implemented 
+        DESCRIPTION
+           "This information is not available to SNMP." 
+
+        VARIATION       ospfv3IfStateChange 
+        ACCESS          not-implemented 
+        DESCRIPTION
+           "This information is not available to SNMP." 
+
+        VARIATION       ospfv3NssaTranslatorStatusChange
+        ACCESS          not-implemented 
+        DESCRIPTION
+           "This information is not available to SNMP." 
+
+        VARIATION       ospfv3RestartStatusChange
+        ACCESS          not-implemented 
+        DESCRIPTION
+           "This information is not available to SNMP." 
+
+        VARIATION       ospfv3NbrRestartHelperStatusChange
+        ACCESS          not-implemented 
+        DESCRIPTION
+           "This information is not available to SNMP." 
+
+        VARIATION       ospfv3VirtNbrRestartHelperStatusChange
+        ACCESS          not-implemented 
+        DESCRIPTION
+           "This information is not available to SNMP." 
+
+        ::= { eriRouterIetfOspfv3Cap 1 }
+
+
+END

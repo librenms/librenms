@@ -1,0 +1,289 @@
+-- *****************************************************************
+-- ERICSSON-ROUTER-STACKING-ALARM-MIB   STACKING ALARM MIB
+--
+-- Copyright (c) 2015-2017 Ericsson AB
+-- All rights reserved.
+--
+-- *****************************************************************
+
+ERICSSON-ROUTER-STACKING-ALARM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+
+    DateAndTime,
+    DisplayString
+        FROM SNMPv2-TC
+
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB
+
+    IANAItuProbableCause
+        FROM IANA-ITU-ALARM-TC-MIB
+
+    ItuPerceivedSeverity
+        FROM ITU-ALARM-TC-MIB
+
+    MODULE-COMPLIANCE,
+    NOTIFICATION-GROUP,
+    OBJECT-GROUP
+        FROM SNMPv2-CONF
+
+    eriRouterMgmt
+        FROM ERICSSON-ROUTER-SMI;
+
+--    EriAlarmType
+--        FROM ERICSSON-ALARM-TC-MIB;
+
+eriRouterStackingAlarmMib MODULE-IDENTITY
+    LAST-UPDATED    "201708300000Z" -- 30 Aug, 2017
+    ORGANIZATION    "Ericsson AB"
+    CONTACT-INFO
+            "       Ericsson AB
+
+            Postal: 100 Headquarters Dr.
+                    San Jose, CA  95134
+                    USA
+
+            Phone:  +1 408 750 5000
+            Fax:    +1 408 750 5599
+            "
+    DESCRIPTION
+            "This MIB provides the possibility to
+            report alarms according to the stacking
+            requirements for fault management."
+
+    REVISION        "201708300000Z" -- 30 Aug, 2017
+    DESCRIPTION
+            "Apply corrections to conform to MIB standards."
+
+    REVISION        "201509190000Z" -- Sep 19, 2015
+    DESCRIPTION
+            "Initial version."
+    ::= { eriRouterMgmt  117}
+
+eriRouterStackingAlarmNotifications OBJECT IDENTIFIER ::= { eriRouterStackingAlarmMib 1 }
+eriRouterStackingAlarmObjects       OBJECT IDENTIFIER ::= { eriRouterStackingAlarmMib 2 }
+eriRouterStackingAlarmConformance   OBJECT IDENTIFIER ::= { eriRouterStackingAlarmMib 3 }
+
+--
+-- some structure for the mib objects
+--
+
+eriRouterStackingAlarmNotify        OBJECT IDENTIFIER ::= { eriRouterStackingAlarmObjects 1 }
+
+--
+-- STACKING ALARM notification objects
+--
+
+eriRouterStackingAlarmEventStackId OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of this object contains the stack's identifier."
+    ::= { eriRouterStackingAlarmNotify 1 }
+
+eriRouterStackingAlarmEventChassisUID OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of this object contains a chassis' UID."
+    ::= { eriRouterStackingAlarmNotify 2 }
+
+eriRouterStackingAlarmEventDateAndTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The date and time when the event was raised."
+    ::= { eriRouterStackingAlarmNotify 3 }
+
+eriRouterStackingAlarmEventSeverity OBJECT-TYPE
+    SYNTAX      ItuPerceivedSeverity
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current severity of the event."
+    ::= { eriRouterStackingAlarmNotify 4 }
+
+eriRouterStackingAlarmEventProbableCause OBJECT-TYPE
+    SYNTAX      IANAItuProbableCause
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The probable cause for this event."
+    ::= { eriRouterStackingAlarmNotify 5 }
+
+eriRouterStackingAlarmEventAdditionalText OBJECT-TYPE
+    SYNTAX      SnmpAdminString  (SIZE(0..256))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The additional text of the event."
+    ::= { eriRouterStackingAlarmNotify 6 }
+
+eriRouterStackingAlarmEventMinorType OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The minor type of the event."
+    ::= { eriRouterStackingAlarmNotify 7 }
+
+--
+-- NOTIFICATIONS - node for hanging notification definitions
+--
+
+eriRouterStackingIdMismatchAlarm NOTIFICATION-TYPE
+    OBJECTS {
+            eriRouterStackingAlarmEventStackId,
+            eriRouterStackingAlarmEventChassisUID,
+            eriRouterStackingAlarmEventDateAndTime,
+            eriRouterStackingAlarmEventSeverity,
+            eriRouterStackingAlarmEventProbableCause,
+            eriRouterStackingAlarmEventAdditionalText,
+            eriRouterStackingAlarmEventMinorType
+        }
+    STATUS   current
+    DESCRIPTION
+        "This notification is triggered when a stacking Id mismatch is found
+        between connected chassis."
+    ::= { eriRouterStackingAlarmNotifications 1 }
+
+eriRouterStackingChassisNumberMismatchAlarm NOTIFICATION-TYPE
+    OBJECTS {
+            eriRouterStackingAlarmEventStackId,
+            eriRouterStackingAlarmEventChassisUID,
+            eriRouterStackingAlarmEventDateAndTime,
+            eriRouterStackingAlarmEventSeverity,
+            eriRouterStackingAlarmEventProbableCause,
+            eriRouterStackingAlarmEventAdditionalText,
+            eriRouterStackingAlarmEventMinorType
+        }
+    STATUS   current
+    DESCRIPTION
+        "This notification is triggered when a chassis number mismatch is found."
+    ::= { eriRouterStackingAlarmNotifications 2 }
+
+eriRouterStackingChassisNotFoundAlarm NOTIFICATION-TYPE
+    OBJECTS {
+            eriRouterStackingAlarmEventStackId,
+            eriRouterStackingAlarmEventChassisUID,
+            eriRouterStackingAlarmEventDateAndTime,
+            eriRouterStackingAlarmEventSeverity,
+            eriRouterStackingAlarmEventProbableCause,
+            eriRouterStackingAlarmEventAdditionalText,
+            eriRouterStackingAlarmEventMinorType
+        }
+    STATUS   current
+    DESCRIPTION
+        "This notification is triggered when a configured chassis is not found."
+    ::= { eriRouterStackingAlarmNotifications 3 }
+
+eriRouterStackingChassisTypeMismatchAlarm NOTIFICATION-TYPE
+    OBJECTS {
+            eriRouterStackingAlarmEventStackId,
+            eriRouterStackingAlarmEventChassisUID,
+            eriRouterStackingAlarmEventDateAndTime,
+            eriRouterStackingAlarmEventSeverity,
+            eriRouterStackingAlarmEventProbableCause,
+            eriRouterStackingAlarmEventAdditionalText,
+            eriRouterStackingAlarmEventMinorType
+        }
+    STATUS   current
+    DESCRIPTION
+        "This notification is triggered when a chassis physically connected
+        to the stack is not of a supported chassis type, or the chassis
+        connected is not same as the configured type."
+    ::= { eriRouterStackingAlarmNotifications 4 }
+
+eriRouterStackingChassisUIDFormatMismatchAlarm NOTIFICATION-TYPE
+    OBJECTS {
+            eriRouterStackingAlarmEventStackId,
+            eriRouterStackingAlarmEventChassisUID,
+            eriRouterStackingAlarmEventDateAndTime,
+            eriRouterStackingAlarmEventSeverity,
+            eriRouterStackingAlarmEventProbableCause,
+            eriRouterStackingAlarmEventAdditionalText,
+            eriRouterStackingAlarmEventMinorType
+        }
+    STATUS   current
+    DESCRIPTION
+        "This notification is triggered when a chassis physically connected to
+        the stack does not support the configured UID format."
+    ::= { eriRouterStackingAlarmNotifications 5 }
+
+eriRouterStackingLicenseNotAvailableAlarm NOTIFICATION-TYPE
+    OBJECTS {
+            eriRouterStackingAlarmEventStackId,
+            eriRouterStackingAlarmEventChassisUID,
+            eriRouterStackingAlarmEventDateAndTime,
+            eriRouterStackingAlarmEventSeverity,
+            eriRouterStackingAlarmEventProbableCause,
+            eriRouterStackingAlarmEventAdditionalText,
+            eriRouterStackingAlarmEventMinorType
+        }
+    STATUS   current
+    DESCRIPTION
+        "This notification is triggered when a stacking license is missing or
+        unavailable."
+    ::= { eriRouterStackingAlarmNotifications 6 }
+
+--
+-- compliance statements
+--
+eriRouterStackingAlarmCompliances OBJECT IDENTIFIER ::= { eriRouterStackingAlarmConformance 1 }
+eriRouterStackingAlarmGroups      OBJECT IDENTIFIER ::= { eriRouterStackingAlarmConformance 2 }
+
+eriRouterStackingAlarmCompliance MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION
+        "The compliance statement for SNMP entities which implement
+        the STACKING ALARM MIB."
+
+    MODULE -- this module
+        MANDATORY-GROUPS {
+            eriRouterStackingAlarmNotifyObjectGroup,
+            eriRouterStackingAlarmNotifyGroup
+        }
+    ::= { eriRouterStackingAlarmCompliances 1 }
+
+--
+-- groupings
+--
+
+eriRouterStackingAlarmNotifyObjectGroup OBJECT-GROUP
+    OBJECTS {
+        eriRouterStackingAlarmEventStackId,
+        eriRouterStackingAlarmEventChassisUID,
+        eriRouterStackingAlarmEventDateAndTime,
+        eriRouterStackingAlarmEventSeverity,
+        eriRouterStackingAlarmEventProbableCause,
+        eriRouterStackingAlarmEventAdditionalText,
+        eriRouterStackingAlarmEventMinorType
+    }
+    STATUS current
+    DESCRIPTION
+        "The collection of objects related to STACKING ALARM notifications."
+    ::= { eriRouterStackingAlarmGroups 1 }
+
+eriRouterStackingAlarmNotifyGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        eriRouterStackingIdMismatchAlarm,
+        eriRouterStackingChassisNumberMismatchAlarm,
+        eriRouterStackingChassisNotFoundAlarm,
+        eriRouterStackingChassisTypeMismatchAlarm,
+        eriRouterStackingChassisUIDFormatMismatchAlarm,
+        eriRouterStackingLicenseNotAvailableAlarm
+    }
+    STATUS current
+    DESCRIPTION
+        "Notification for tracking STACKING ALARM events."
+    ::= { eriRouterStackingAlarmGroups 2 }
+
+END

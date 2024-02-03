@@ -1,0 +1,1345 @@
+-- %DNP% $Id: ERICSSON-ROUTER-IPPOOL-MIB.my,v 1.1.4.5.272.4 2011/02/22 17:26:17 thatcher Exp $
+-- %DNP% $Source: /cvsroot/pkt/sw/se/xc/bsd/config/snmp/mibs/Attic/ERICSSON-ROUTER-IPPOOL-MIB.my,v $
+-- *****************************************************************
+-- ERICSSON-ROUTER-IPPOOL-MIB	IP Pool Mib
+--
+-- Copyright (c) 2001-2011, 2015 Ericsson AB.
+-- All rights reserved.
+-- 
+-- *****************************************************************
+
+ERICSSON-ROUTER-IPPOOL-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+    Unsigned32, IpAddress
+        FROM SNMPv2-SMI
+
+    TruthValue, TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP,
+    NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+         
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB
+
+    eriRouterMgmt
+        FROM ERICSSON-ROUTER-SMI
+
+    EriRouterPercentage
+        FROM ERICSSON-ROUTER-TC
+                
+    InetAddress, InetAddressType,
+    InetAddressPrefixLength
+        FROM INET-ADDRESS-MIB
+
+    InterfaceIndex
+        FROM IF-MIB;
+
+eriRouterIpPoolMib MODULE-IDENTITY
+    LAST-UPDATED    "201501141800Z" -- Jan 14, 2015
+    ORGANIZATION    "Ericsson AB"
+    CONTACT-INFO
+                "       Ericsson AB.
+
+                 Postal: 100 Headquarters Dr
+                         San Jose, CA  95134
+                         USA
+
+                 Phone: +1 408 750 5000
+                 Fax: +1 408 750 5599"
+
+    DESCRIPTION
+        "Defines the objects necessary to obtain information about
+        IP Pools for interfaces within a context."
+
+    REVISION    "201501141800Z" -- Jan 14, 2015
+    DESCRIPTION
+        "Updated RBN/rbn/Rbn as ERICSSON-ROUTER/eriRouter/EriRouter
+         to migrate RBN MIB to ERICSSON MIB."
+
+    REVISION    "201002100000Z" -- Feb 10, 2010
+    DESCRIPTION
+        "Defined textual conventions for representing IP Pool type and
+         threshold management: EriRouterInetPoolType, EriRouterInetIpPoolThresholdType,
+         EriRouterInetIpPoolThreshold, and EriRouterInetIpPoolThrshNotify.
+         
+         Added the following tables and notifications to support IPv6:
+         eriRouterInetIpPoolTable, eriRouterInetIpPoolCtxTable, 
+         eriRouterInetIpPoolHiFallingThrshMet, eriRouterInetIpPoolLoFallingThrshMet,
+         eriRouterInetIpPoolCtxHiFallingThrshMet, eriRouterInetIpPoolCtxLoFallingThrshMet,
+         
+         Updated CONTACT-INFO. 
+         "
+                 
+    REVISION    "200506170000Z" -- June 17, 2005
+    DESCRIPTION
+        "Added an IP Pool total size object, an IP Pool percentage
+        threshold table and a notification for monitoring per-context
+        IP Pool percentage thresholds."
+
+    REVISION    "200503140000Z" -- March 14, 2005
+    DESCRIPTION
+        "Added an ip pool type, an end ip address for range
+        ip pools, and updated conformance information."
+
+    REVISION    "200409280000Z" -- September 28, 2004
+    DESCRIPTION
+        "Added an ip pool name and updated conformance information."
+
+    REVISION    "200111071700Z" -- Nov 7, 2001
+    DESCRIPTION
+        "Initial version."
+
+    ::= { eriRouterMgmt 15 }
+	
+
+eriRouterIpPoolMIBNotifications OBJECT IDENTIFIER ::= { eriRouterIpPoolMib 0 }
+
+eriRouterIpPoolMIBObjects       OBJECT IDENTIFIER ::= { eriRouterIpPoolMib 1 }
+
+eriRouterIpPoolMIBConformance   OBJECT IDENTIFIER ::= { eriRouterIpPoolMib 2 }
+
+--
+-- Textual Conventions
+--            
+EriRouterInetPoolType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Denotes a generic IP Pool Type. "
+    SYNTAX  INTEGER {
+                ipv6(1),   -- Generic IPv6 Pool
+                dhcpv6(2)  -- IPv6 DHCPv6 pool
+            }
+            
+EriRouterInetIpPoolThresholdType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        " A value that represents a type of IP Pool threshold value.
+        
+          none(0)       No threshold setting. This value MUST
+                        be used if the value of all corresponding
+                        EriRouterInetIpPoolThreshold objects in the same logical row 
+                        are zeroes. 
+                  
+          absolute(1)   EriRouterInetIpPoolThreshold values in the same logical 
+                        row defined as absolute values with the range of 
+                        (1..IP Pool size)
+
+          percentage(2) EriRouterInetIpPoolThreshold values in the same logical 
+                        row defined as percentages with the range of (1..100).
+          
+          Implementations must ensure that EriRouterInetIpPoolThresholdType objects
+          and any dependent objects (e.g., EriRouterInetIpPoolThreshold objects) 
+          are consistent. 
+        
+          The relationship between absolute value and percentage is: 
+             absolute = IP Pool size * percentage 
+        "
+    SYNTAX  INTEGER {
+                none(0),      
+                absolute(1),   
+                percentage(2)
+            }
+
+EriRouterInetIpPoolThreshold ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS current
+    DESCRIPTION
+        "Denotes a generic IP Pool threshold.
+        
+         An EriRouterInetIpPoolThreshold value is always interpreted within 
+         the context of an EriRouterInetIpPoolThresholdType value.  The 
+         usages of the EriRouterInetIpPoolThreshold textual convention 
+         in the same logical row is required to specify the 
+         EriRouterInetIpPoolThresholdType object that provides the context. 
+
+         The value of an EriRouterInetIpPoolThreshold object must always be
+         consistent with the value of the associated EriRouterInetIpPoolThresholdType
+         object. "
+    SYNTAX  Unsigned32 
+            
+EriRouterInetIpPoolThrshNotify ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        " Denotes a logging method for monitoring falling thresholds "
+    SYNTAX  INTEGER {
+                none(0),  
+                log(1),  -- log file
+                trap(2), -- send snmp notification (trap)
+                both(3)  -- log(1) and trap(2)
+            }
+
+--
+-- IPv4 Pool Table
+--
+eriRouterIpPoolTable OBJECT-TYPE
+	SYNTAX       SEQUENCE OF EriRouterIpPoolEntry
+	MAX-ACCESS   not-accessible
+	STATUS       current
+	DESCRIPTION
+		"The purpose of this table is to allow customers to monitor
+		the status of IP Pools on their SMS systems through SNMP.
+
+		This table contains the objects which identify information
+		about IP Pools.  Each row in the table corresponds to one
+		IP Pool for a given interface within a particular
+		context.
+
+		Objects defined in this table are only accessible within the
+		context identified in the SNMP protocol (i.e. the community
+		string in v1/v2c or the contextName in v3)."
+	::= { eriRouterIpPoolMIBObjects 1 }
+
+eriRouterIpPoolEntry OBJECT-TYPE
+	SYNTAX       EriRouterIpPoolEntry
+	MAX-ACCESS   not-accessible
+	STATUS       current
+	DESCRIPTION
+		"A conceptual row in the eriRouterIpPoolTable."
+	INDEX        { eriRouterIpPoolInterfaceIdx, eriRouterIpPoolAddr }
+	::= { eriRouterIpPoolTable 1 }
+
+EriRouterIpPoolEntry ::=
+	SEQUENCE {
+		eriRouterIpPoolInterfaceIdx	Unsigned32,
+		eriRouterIpPoolAddr		IpAddress,
+		eriRouterIpPoolInterfaceName	SnmpAdminString,
+		eriRouterIpPoolMask		IpAddress,
+		eriRouterIpPoolSize		Unsigned32,
+		eriRouterIpPoolAvailable	Unsigned32,
+		eriRouterIpPoolUnusable	Unsigned32,
+		eriRouterIpPoolInuse		Unsigned32,
+		eriRouterIpPoolThreshold	Unsigned32,
+		eriRouterIpPoolSendTrap	TruthValue,
+		eriRouterIpPoolLogMessage	TruthValue,
+		eriRouterIpPoolName	        SnmpAdminString,
+		eriRouterIpPoolType		INTEGER,
+		eriRouterIpPoolEndAddr	IpAddress
+	}
+
+eriRouterIpPoolInterfaceIdx OBJECT-TYPE
+	SYNTAX       Unsigned32
+	MAX-ACCESS   not-accessible
+	STATUS       current
+	DESCRIPTION
+		"The index of the interface containing the IP Pool."
+	::= { eriRouterIpPoolEntry 1 }
+
+eriRouterIpPoolAddr OBJECT-TYPE
+	SYNTAX       IpAddress
+	MAX-ACCESS   not-accessible
+	STATUS       current
+	DESCRIPTION
+		"The start address of the IP Pool."
+	::= { eriRouterIpPoolEntry 2 }
+
+eriRouterIpPoolInterfaceName OBJECT-TYPE
+	SYNTAX       SnmpAdminString (SIZE (0..127))
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"The name of the interface containing the IP Pool."
+	::= { eriRouterIpPoolEntry 3 }
+
+eriRouterIpPoolMask OBJECT-TYPE
+	SYNTAX       IpAddress
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"The subnet mask of the IP Pool. This object will be
+                instantiated for IP Pools of type subnet only."
+	::= { eriRouterIpPoolEntry 4 }
+
+eriRouterIpPoolSize OBJECT-TYPE
+	SYNTAX       Unsigned32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"The size of the IP Pool is defined to be the sum of
+		 the available addresses plus the unusable addresses."
+	::= { eriRouterIpPoolEntry 5 }
+
+eriRouterIpPoolAvailable OBJECT-TYPE
+	SYNTAX       Unsigned32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"The number of addresses of an IP Pool that are available."
+	::= { eriRouterIpPoolEntry 6 }
+
+eriRouterIpPoolUnusable OBJECT-TYPE
+	SYNTAX       Unsigned32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"Unusable IP addresses in an IP Pool consist of the
+		 ip address of the interface, and those used by the
+		 network address and the broadcast address of the
+		 interface."
+	::= { eriRouterIpPoolEntry 7 }
+
+eriRouterIpPoolInuse OBJECT-TYPE
+	SYNTAX       Unsigned32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"The number of addresses of an IP Pool that are in use."
+	::= { eriRouterIpPoolEntry 8 }
+
+eriRouterIpPoolThreshold OBJECT-TYPE
+	SYNTAX       Unsigned32 (0..65535)
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"The threshold of an IP Pool is the value for currently
+		available addresses, as reported in eriRouterIpPoolAvailable,
+		which causes a trap and/or log message to be generated
+		when this value is reached.
+
+		This is a falling threshold, so a trap and/or log message
+		will only be sent on a transition of the value of available
+		addresss from (eriRouterIpPoolThreshold+1) addresses to
+		eriRouterIpPoolThreshold addresses.
+
+		Additionally, the action of sending the trap and/or log message
+		is subject to the values of eriRouterIpPoolSendTrap and
+		eriRouterIpPoolLogMessage.
+
+		A value of zero means there is no threshold."
+	::= { eriRouterIpPoolEntry 9 }
+
+eriRouterIpPoolSendTrap OBJECT-TYPE
+	SYNTAX       TruthValue
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"If true, upon detection of reaching a per-pool threshold
+		event, a trap will be sent.  See the definition of the
+		eriRouterIpPoolThresholdMet for the information included in the
+		trap.
+
+		Note, both eriRouterIpPoolSendTrap and eriRouterIpPoolLogMessage are
+		allowed to be TRUE at the same time."
+	::= { eriRouterIpPoolEntry 10 }
+
+eriRouterIpPoolLogMessage OBJECT-TYPE
+	SYNTAX       TruthValue
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"If true, upon detection of reaching a per-pool threshold
+		event, a message will be logged.  The information contained
+		in the message is the same as that included in the
+		eriRouterIpPoolThresholdMet trap.
+
+		Note, both eriRouterIpPoolSendTrap and eriRouterIpPoolLogMessage are
+		allowed to be TRUE at the same time."
+	::= { eriRouterIpPoolEntry 11 }
+
+eriRouterIpPoolName OBJECT-TYPE
+	SYNTAX       SnmpAdminString (SIZE (0..32))
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"The name of the IP Pool."
+	::= { eriRouterIpPoolEntry 12 }
+
+eriRouterIpPoolType OBJECT-TYPE
+	SYNTAX       INTEGER {
+			subnet(0),
+			range(1)
+		     }
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"The type of the IP Pool."
+	::= { eriRouterIpPoolEntry 13 }
+
+eriRouterIpPoolEndAddr OBJECT-TYPE
+	SYNTAX       IpAddress
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"The end address of the IP Pool. This object will be
+                instantiated for range IP Pools only."
+	::= { eriRouterIpPoolEntry 14 }
+
+--
+-- IP Pool per context objects
+--
+
+eriRouterIpPoolSummary          OBJECT IDENTIFIER ::= { eriRouterIpPoolMIBObjects 2 }
+
+eriRouterIpPoolContextName OBJECT-TYPE
+	SYNTAX       SnmpAdminString (SIZE (0..63))
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"The name of the context containing the IP Pool."
+	::= { eriRouterIpPoolSummary 1 }
+
+eriRouterIpPoolContextAvailable OBJECT-TYPE
+	SYNTAX       Unsigned32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"The total number of IP addresses available in all pools of
+		 all interfaces in the context valid in the current view."
+	::= { eriRouterIpPoolSummary 2 }
+
+eriRouterIpPoolContextThreshold OBJECT-TYPE
+	SYNTAX       Unsigned32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"The per-context threshold of an IP Pool is the value for
+		currently available per-context addresses, as reported in
+		eriRouterIpPoolContextAvailable, which causes a trap and/or
+		log message to be generated when this value is reached.
+
+		This is a falling threshold, so a trap and/or log message
+		will only be sent on a transition of the value of available
+		addresss from (eriRouterIpPoolContextThreshold+1) addresses to
+		eriRouterIpPoolContextThreshold addresses.
+
+		Additionally, the action of sending the trap and/or log message
+		is subject to the values of eriRouterIpPoolContextSendTrap and
+		eriRouterIpPoolContextLogMessage.
+
+		A value of zero means there is no per-context threshold."
+	::= { eriRouterIpPoolSummary 3 }
+
+eriRouterIpPoolContextSendTrap OBJECT-TYPE
+	SYNTAX       TruthValue
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"If true, upon detection of a per-context threshold crossing
+		event, a trap will be sent.  See the definition of the
+		eriRouterIpPoolContextThresholdMet for the information included
+		in the trap.
+
+		Note, both eriRouterIpPoolContextSendTrap and
+		eriRouterIpPoolContextLogMessage are allowed to be true at the
+		same time."
+	::= { eriRouterIpPoolSummary 4 }
+
+eriRouterIpPoolContextLogMessage OBJECT-TYPE
+	SYNTAX       TruthValue
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"If true, upon detection of a per-context threshold crossing
+		event, a message will be logged.  The information contained
+		in the message logged is the same as that included in the
+		eriRouterIpPoolContextThresholdMet trap.
+
+		Note, both eriRouterIpPoolContextSendTrap and
+		eriRouterIpPoolContextLogMessage are allowed to be true at the
+		same time."
+	::= { eriRouterIpPoolSummary 5 }
+
+eriRouterIpPoolContextTotalSize OBJECT-TYPE
+	SYNTAX       Unsigned32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"The total number of IP addresses configured in all pools of
+		all interfaces in the context valid in the current view.
+		It is the sum of the available addresses plus the unusable
+		addresses."
+	::= { eriRouterIpPoolSummary 6 }
+
+--
+-- Context IP Pool Percentage Threshold Table
+--
+
+eriRouterIpPoolContextThresholdPercentTable OBJECT-TYPE
+	SYNTAX       SEQUENCE OF EriRouterIpPoolContextThresholdPercentEntry
+	MAX-ACCESS   not-accessible
+	STATUS       current
+	DESCRIPTION
+		"The purpose of this table is to allow customers to monitor
+		the status of per-context IP Pool percentage thresholds through
+		SNMP.
+
+		This table contains the objects which identify information
+		about per-context IP Pool thresholds expressed in percentage.
+		Each row in the table corresponds to one IP Pool percentage
+		threshold configured within a particular context.
+
+		Objects defined in this table are only accessible within the
+		context identified in the SNMP protocol (i.e. the community
+		string in v1/v2c or the contextName in v3)."
+	::= { eriRouterIpPoolSummary 7 }
+
+eriRouterIpPoolContextThresholdPercentEntry OBJECT-TYPE
+	SYNTAX       EriRouterIpPoolContextThresholdPercentEntry
+	MAX-ACCESS   not-accessible
+	STATUS       current
+	DESCRIPTION
+		"A conceptual row in the eriRouterIpPoolContextThresholdPercentTable."
+	INDEX        { eriRouterIpPoolContextThresholdIndex }
+	::= { eriRouterIpPoolContextThresholdPercentTable 1 }
+
+EriRouterIpPoolContextThresholdPercentEntry ::=
+	SEQUENCE {
+		eriRouterIpPoolContextThresholdIndex		Unsigned32,
+		eriRouterIpPoolContextThresholdPercentage	EriRouterPercentage,
+		eriRouterIpPoolContextThresholdSendTrap	TruthValue,
+		eriRouterIpPoolContextThresholdLogMessage	TruthValue
+	}
+
+eriRouterIpPoolContextThresholdIndex OBJECT-TYPE
+	SYNTAX       Unsigned32
+	MAX-ACCESS   not-accessible
+	STATUS       current
+	DESCRIPTION
+		"The index of the IP Pool percentage threshold."
+	::= { eriRouterIpPoolContextThresholdPercentEntry 1 }
+
+eriRouterIpPoolContextThresholdPercentage OBJECT-TYPE
+	SYNTAX       EriRouterPercentage
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"A threshold for the percentage of the number of currently
+		available IP Pool addresses against the total number of IP
+		Pool addresses configured within the context.
+
+		This is a falling threshold, so an SNMP trap and/or log message
+		will only be sent when the current value, which is the % of 
+		eriRouterIpPoolContextAvailable/eriRouterIpPoolContextTotalSize truncated
+		to a whole number in percentage, is less than or equal to this
+		threshold, and the percentage value at the last check was
+		greater than this threshold.
+
+		Additionally, the action of sending the SNMP trap and/or
+		logging a message is subject to the values of
+		eriRouterIpPoolContextThresholdSendTrap and
+		eriRouterIpPoolContextThresholdLogMessage."
+	::= { eriRouterIpPoolContextThresholdPercentEntry 2 }
+
+eriRouterIpPoolContextThresholdSendTrap OBJECT-TYPE
+	SYNTAX       TruthValue
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"If true, upon detection of a per-context threshold crossing
+		event, an SNMP trap will be sent.  See the definition of the
+		eriRouterIpPoolContextThresholdPercentageMet for the information
+		included in the trap.
+
+		Note, both eriRouterIpPoolContextThresholdSendTrap and
+		eriRouterIpPoolContextThresholdLogMessage are allowed to be true
+		at the same time."
+	::= { eriRouterIpPoolContextThresholdPercentEntry 3 }
+
+eriRouterIpPoolContextThresholdLogMessage OBJECT-TYPE
+	SYNTAX       TruthValue
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"If true, upon detection of a per-context threshold crossing
+		event, a message will be logged.  The information contained
+		in the message logged is the same as that included in the
+		eriRouterIpPoolContextThresholdPercentageMet trap.
+
+		Note, both eriRouterIpPoolContextThresholdSendTrap and
+		eriRouterIpPoolContextThresholdLogMessage are allowed to be true
+		at the same time."
+	::= { eriRouterIpPoolContextThresholdPercentEntry 4 }
+
+
+-- definition of IP Pool related notifications.
+
+eriRouterIpPoolThresholdMet NOTIFICATION-TYPE
+	OBJECTS {
+		eriRouterIpPoolContextName,
+		eriRouterIpPoolInterfaceName,
+		eriRouterIpPoolMask,
+		eriRouterIpPoolAvailable,
+		eriRouterIpPoolThreshold }
+	STATUS	current
+	DESCRIPTION
+		"A notification indicating that the per pool falling
+		 threshold has been reached."
+	::= { eriRouterIpPoolMIBNotifications 1 }
+
+eriRouterIpPoolContextThresholdMet NOTIFICATION-TYPE
+	OBJECTS {
+	    eriRouterIpPoolContextName,
+	    eriRouterIpPoolContextAvailable,
+	    eriRouterIpPoolContextThreshold
+	}
+	STATUS	current
+	DESCRIPTION
+		"A notification indicating that the per-context falling
+		 threshold has been reached."
+	::= { eriRouterIpPoolMIBNotifications 2 }
+
+eriRouterIpPoolContextThresholdPercentageMet NOTIFICATION-TYPE
+	OBJECTS {
+	    eriRouterIpPoolContextName,
+	    eriRouterIpPoolContextTotalSize,
+	    eriRouterIpPoolContextAvailable,
+	    eriRouterIpPoolContextThresholdPercentage
+	}
+	STATUS	current
+	DESCRIPTION
+		"A notification indicating that the per-context percentage
+	 	 falling threshold has been reached."
+	::= { eriRouterIpPoolMIBNotifications 3 }
+
+--
+--  Generic IP-POOL MIB Table to support various IPv6 Pools
+--
+
+eriRouterInetIpPoolTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF EriRouterInetIpPoolEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "This table contains the objects which identify information
+         about IP Pools (such as ND IPv6 pool and DHCP-PD IPv6 Pool). 
+         Each row in the table corresponds to one IP Pool for either 
+         a given interface within a particular context or only within 
+         a particular context . If this pool is only configured per 
+         context basis, the interface index is set to zero.
+                  
+         The IPv6 pool range is from start prefix/length to the end 
+         prefix/length. The prefix length for start and end prefixes 
+         are the same, and refer to the prefix length to be advertised
+         or delegated.
+         
+         Objects defined in this table are only accessible within the
+         context identified in the SNMP protocol (i.e. the community
+         string in v1/v2c or the contextName in v3)."
+    REFERENCE "[RFC4861] Neighbor Discovery for IP version 6 (IPv6)"
+    ::= { eriRouterIpPoolMIBObjects 3 }
+
+eriRouterInetIpPoolEntry OBJECT-TYPE
+    SYNTAX       EriRouterInetIpPoolEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "A conceptual row in the eriRouterInetIpPoolTable."
+    INDEX { eriRouterInetIpPoolType,
+            eriRouterInetIpPoolIfIndex,             
+            eriRouterInetIpPoolStartPrefixType,
+            eriRouterInetIpPoolStartPrefix,
+            eriRouterInetIpPoolStartPrefixLen }
+    ::= { eriRouterInetIpPoolTable 1 }
+
+EriRouterInetIpPoolEntry ::=
+    SEQUENCE {
+        -- IP Pool configuration
+        eriRouterInetIpPoolType                EriRouterInetPoolType,
+        eriRouterInetIpPoolIfIndex             InterfaceIndex,
+        eriRouterInetIpPoolStartPrefixType     InetAddressType,
+        eriRouterInetIpPoolStartPrefix         InetAddress,   
+        eriRouterInetIpPoolStartPrefixLen      InetAddressPrefixLength, 
+        eriRouterInetIpPoolEndPrefixType       InetAddressType,
+        eriRouterInetIpPoolEndPrefix           InetAddress,
+        eriRouterInetIpPoolEndPrefixLen        InetAddressPrefixLength,
+        eriRouterInetIpPoolInterfaceName       SnmpAdminString,
+        eriRouterInetIpPoolName                SnmpAdminString,                
+        eriRouterInetIpPoolSize                Unsigned32,
+        -- IP Pool statistics
+        eriRouterInetIpPoolAvailable           Unsigned32,
+        eriRouterInetIpPoolUnusable            Unsigned32,
+        eriRouterInetIpPoolInuse               Unsigned32,
+        -- IP Pool falling thresolds
+        eriRouterInetIpPoolThrshType           EriRouterInetIpPoolThresholdType,
+        eriRouterInetIpPoolHiFallingThrsh      EriRouterInetIpPoolThreshold,
+        eriRouterInetIpPoolHiFallingNotify     EriRouterInetIpPoolThrshNotify,
+        eriRouterInetIpPoolLoFallingThrsh      EriRouterInetIpPoolThreshold,
+        eriRouterInetIpPoolLoFallingNotify     EriRouterInetIpPoolThrshNotify
+    }
+
+eriRouterInetIpPoolType  OBJECT-TYPE
+    SYNTAX       EriRouterInetPoolType
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "The type of IP Pool. "
+    ::= { eriRouterInetIpPoolEntry 1 }
+
+eriRouterInetIpPoolIfIndex OBJECT-TYPE
+    SYNTAX       InterfaceIndex
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "The index of the interface containing the IP Pool. 
+         The interface identified by a particular value of this 
+         index is the same interface as identified by the same value 
+         of the IF-MIB's ifIndex."
+    ::= { eriRouterInetIpPoolEntry 2 }
+
+eriRouterInetIpPoolStartPrefixType OBJECT-TYPE 
+    SYNTAX       InetAddressType
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "The address type of eriRouterInetIpPoolPrefix. "
+    ::= { eriRouterInetIpPoolEntry 3 }
+
+eriRouterInetIpPoolStartPrefix OBJECT-TYPE
+    SYNTAX       InetAddress
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "The start address prefix of this pool. The address type of 
+         this object is specified in eriRouterInetIpPoolPrefixType.  The 
+         length of this object is the standard length for objects 
+         of that type (always 16 bytes).  Any bits after 
+         eriRouterInetIpPoolStartPrefixLen must be zero.
+         "
+    ::= { eriRouterInetIpPoolEntry 4 }
+
+eriRouterInetIpPoolStartPrefixLen OBJECT-TYPE
+    SYNTAX       InetAddressPrefixLength(0..128)
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        " The prefix length associated with this prefix. It refers to
+          advertised or delegated prefix length. "
+    ::= { eriRouterInetIpPoolEntry 5 }
+    
+eriRouterInetIpPoolEndPrefixType OBJECT-TYPE 
+    SYNTAX       InetAddressType
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The address type of eriRouterInetIpPoolPrefix. The value of this object
+         is always ipv6 (2). "
+    ::= { eriRouterInetIpPoolEntry 6 }
+
+eriRouterInetIpPoolEndPrefix OBJECT-TYPE
+    SYNTAX       InetAddress
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The end IP address prefix of this pool. The address type of this 
+         object is specified in eriRouterInetIpPoolPrefixType.
+         
+         Any bits after eriRouterInetIpPoolPrefixLen must be zero."
+    ::= { eriRouterInetIpPoolEntry 7 }
+
+eriRouterInetIpPoolEndPrefixLen OBJECT-TYPE
+    SYNTAX       InetAddressPrefixLength(0..128)
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        " The IP prefix length associated with this prefix. It refers to
+          the advertised or delegated prefix length. 
+          See eriRouterInetIpPoolEndPrefixLen. "
+    ::= { eriRouterInetIpPoolEntry 8 }    
+
+eriRouterInetIpPoolInterfaceName OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The name of the interface containing the IP Pool."
+    ::= { eriRouterInetIpPoolEntry 9 }
+    
+eriRouterInetIpPoolName OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The name of the IP Pool."
+    ::= { eriRouterInetIpPoolEntry 10 }
+
+eriRouterInetIpPoolSize OBJECT-TYPE
+    SYNTAX       Unsigned32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The size of the IP Pool is defined to be the sum of
+         the available prefixes plus the unusable prefixes."
+    ::= { eriRouterInetIpPoolEntry 11 }
+
+eriRouterInetIpPoolAvailable OBJECT-TYPE
+    SYNTAX       Unsigned32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The number of IP address prefixes of an IP Pool that are available."
+    ::= { eriRouterInetIpPoolEntry 12 }
+
+eriRouterInetIpPoolUnusable OBJECT-TYPE
+    SYNTAX       Unsigned32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Unusable IP prefixes in an IP Pool. "
+    ::= { eriRouterInetIpPoolEntry 13 }
+
+eriRouterInetIpPoolInuse OBJECT-TYPE
+    SYNTAX       Unsigned32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The number of IP prefixes of an IP Pool that are in use."
+    ::= { eriRouterInetIpPoolEntry 14 }
+    
+eriRouterInetIpPoolThrshType OBJECT-TYPE
+    SYNTAX       EriRouterInetIpPoolThresholdType
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "This object indicates the value type of all threshold values in
+         this logical row, including eriRouterInetIpPoolHiFallingThrsh,
+         eriRouterInetIpPoolLoFallingThrsh. "
+    ::= { eriRouterInetIpPoolEntry 15 }
+    
+eriRouterInetIpPoolHiFallingThrsh OBJECT-TYPE
+    SYNTAX       EriRouterInetIpPoolThreshold
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The falling threshold of an IP Pool. When the value of eriRouterInetIpPoolAvailable 
+         crosses from (eriRouterInetIpPoolHiFallingThrsh + 1) to eriRouterInetIpPoolHiFallingThrsh
+         in either absolute value or percentage specified by eriRouterInetIpPoolThrshType,
+         a eriRouterInetIpPoolHiFallingThrshMet notification and/or log is generated.
+
+         The value of this object should never be smaller than the value
+         of eriRouterInetIpPoolLoFallingThrsh.
+        
+         A value of zero means that this falling threshold is not configured. "
+    ::= { eriRouterInetIpPoolEntry 16 }
+
+eriRouterInetIpPoolHiFallingNotify OBJECT-TYPE
+    SYNTAX       EriRouterInetIpPoolThrshNotify
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        " This object specifies if eriRouterInetIpPoolHiFallingThrshMet and/or log
+          is generated.
+        
+         See the description of eriRouterInetIpPoolHiFallingThrsh for conditions
+         which generate the notification. "
+    ::= { eriRouterInetIpPoolEntry 17 }
+
+eriRouterInetIpPoolLoFallingThrsh OBJECT-TYPE
+    SYNTAX       EriRouterInetIpPoolThreshold
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The falling threshold of an IP Pool. When the value of eriRouterInetIpPoolAvailable 
+         crosses from (eriRouterInetIpPoolLoFallingThrsh + 1) to eriRouterInetIpPoolLoFallingThrsh
+         (either absolute value or percentage) specified by eriRouterInetIpPoolThrshType,
+         a eriRouterInetIpPoolLoFallingThrshMet notification and/or log is generated.
+
+         The value of this object should never be greater than the value
+         of eriRouterInetIpPoolHiFallingThrsh.
+        
+         A value of zero means that this falling threshold is not configured. "
+    ::= { eriRouterInetIpPoolEntry 18 }
+
+eriRouterInetIpPoolLoFallingNotify OBJECT-TYPE
+    SYNTAX       EriRouterInetIpPoolThrshNotify
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "This object specifies if eriRouterInetIpPoolLoFallingThrshMet and/or log
+         is generated.
+        
+         See the description of eriRouterInetIpPoolLoFallingThrsh for conditions
+         which generate the notification. "
+    ::= { eriRouterInetIpPoolEntry 19 }
+
+
+--
+-- IP Pool context-level summary
+--
+eriRouterInetIpPoolSummary          OBJECT IDENTIFIER ::= { eriRouterIpPoolMIBObjects 4 }
+
+eriRouterInetIpPoolCtxName OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "The name of the context containing the IP Pool."
+    ::= { eriRouterInetIpPoolSummary 1 }
+    
+eriRouterInetIpPoolCtxTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF EriRouterInetIpPoolCtxEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "The purpose of this table is to allow customers to monitor
+         the status of IP Pool context summary and thresholds through
+         SNMP.
+
+         This table contains the objects which identify information
+         about per-context IP Pool thresholds expressed in absolute value 
+         or percentage. Each row in the table corresponds to one IP Pool 
+         threshold configured within a particular context.
+
+         Objects defined in this table are only accessible within the
+         context identified in the SNMP protocol (i.e. the community
+         string in v1/v2c or the contextName in v3)."
+    ::= { eriRouterInetIpPoolSummary 2 }
+
+eriRouterInetIpPoolCtxEntry OBJECT-TYPE
+    SYNTAX       EriRouterInetIpPoolCtxEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "A conceptual row in the eriRouterInetIpPoolCtxTable."
+    INDEX        {eriRouterInetIpPoolCtxPoolType}
+    ::= { eriRouterInetIpPoolCtxTable 1 }
+
+EriRouterInetIpPoolCtxEntry ::=
+    SEQUENCE {
+        eriRouterInetIpPoolCtxPoolType         EriRouterInetPoolType,
+        -- IP Pool statistics
+        eriRouterInetIpPoolCtxAvailable        Unsigned32,
+        eriRouterInetIpPoolCtxPoolSize         Unsigned32,
+        -- IP Pool falling thresholds
+        eriRouterInetIpPoolCtxThrshType        EriRouterInetIpPoolThresholdType,
+        eriRouterInetIpPoolCtxHiFallingThrsh   EriRouterInetIpPoolThreshold,
+        eriRouterInetIpPoolCtxHiFallingNotify  EriRouterInetIpPoolThrshNotify,
+        eriRouterInetIpPoolCtxLoFallingThrsh   EriRouterInetIpPoolThreshold,
+        eriRouterInetIpPoolCtxLoFallingNotify  EriRouterInetIpPoolThrshNotify
+    }
+
+eriRouterInetIpPoolCtxPoolType  OBJECT-TYPE
+    SYNTAX       EriRouterInetPoolType
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "The type of ip pool. "
+    ::= { eriRouterInetIpPoolCtxEntry 1 }
+    
+eriRouterInetIpPoolCtxAvailable OBJECT-TYPE
+    SYNTAX       Unsigned32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The number of IP address prefixes of an IP Pool that are available."
+    ::= { eriRouterInetIpPoolCtxEntry 2 }
+    
+eriRouterInetIpPoolCtxPoolSize OBJECT-TYPE
+    SYNTAX       Unsigned32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The total number of IP prefixes configured in all pools of
+         all interfaces in the context valid in the current view.
+         It is the sum of the available plus the unusable prefixes."
+    ::= { eriRouterInetIpPoolCtxEntry 3 }
+    
+eriRouterInetIpPoolCtxThrshType OBJECT-TYPE
+    SYNTAX       EriRouterInetIpPoolThresholdType
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "This object indicates the value type of all threshold values in
+         this logical row, including eriRouterInetIpPoolCtxHiFallingThrsh,
+         eriRouterInetIpPoolCtxLoFallingThrsh. "
+    ::= { eriRouterInetIpPoolCtxEntry 4 }
+    
+eriRouterInetIpPoolCtxHiFallingThrsh OBJECT-TYPE
+    SYNTAX       EriRouterInetIpPoolThreshold
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The falling threshold of an IP Pool. When the value of eriRouterInetIpPoolCtxAvailable 
+         crosses from (eriRouterInetIpPoolCtxHiFallingThrsh + 1) to eriRouterInetIpPoolCtxHiFallingThrsh
+         in either absolute value or percentage specified by eriRouterInetIpPoolCtxThrshType,
+         a eriRouterInetIpPoolCtxHiFallingThrshMet notification and/or log is generated.
+
+         The value of this object should never be smaller than the value
+         of eriRouterInetIpPoolCtxLoFallingThrsh.
+        
+         A value of zero means that this falling threshold is not configured. "
+    ::= { eriRouterInetIpPoolCtxEntry 5 }
+
+eriRouterInetIpPoolCtxHiFallingNotify OBJECT-TYPE
+    SYNTAX       EriRouterInetIpPoolThrshNotify
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "This object specifies if eriRouterInetIpPoolCtxHiFallingThrshMet and/or log
+         is generated.
+        
+         See the description of eriRouterInetIpPoolCtxHiFallingThrsh for conditions
+         which generate the notification. "
+    ::= { eriRouterInetIpPoolCtxEntry 6 }
+
+eriRouterInetIpPoolCtxLoFallingThrsh OBJECT-TYPE
+    SYNTAX       EriRouterInetIpPoolThreshold
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The falling threshold of an IP Pool. When the value of eriRouterInetIpPoolCtxAvailable 
+         crosses from (eriRouterInetIpPoolCtxLoFallingThrsh + 1) to eriRouterInetIpPoolCtxLoFallingThrsh
+         (either absolute value or percentage) specified by eriRouterInetIpPoolCtxThrshType,
+         a eriRouterInetIpPoolCtxLoFallingThrshMet notification and/or log is generated.
+
+         The value of this object should never be greater than the value
+         of eriRouterInetIpPoolCtxHiFallingThrsh.
+        
+         A value of zero means that this falling threshold is not configured. "
+    ::= { eriRouterInetIpPoolCtxEntry 7 }
+
+eriRouterInetIpPoolCtxLoFallingNotify OBJECT-TYPE
+    SYNTAX       EriRouterInetIpPoolThrshNotify
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        " This object specifies if eriRouterInetIpPoolCtxLoFallingThrshMet and/or log
+          is generated.
+        
+         See the description of eriRouterInetIpPoolCtxLoFallingThrsh for conditions
+         which generate the notification. "
+    ::= { eriRouterInetIpPoolCtxEntry 8 }
+
+    
+--
+-- IP POOL notifications
+--
+
+--  IP Pool notifications per pool
+eriRouterInetIpPoolHiFallingThrshMet NOTIFICATION-TYPE
+    OBJECTS {
+        eriRouterInetIpPoolEndPrefixType,
+        eriRouterInetIpPoolEndPrefix,
+        eriRouterInetIpPoolEndPrefixLen,
+        eriRouterInetIpPoolInterfaceName,
+        eriRouterInetIpPoolName,
+        eriRouterInetIpPoolSize,
+        eriRouterInetIpPoolAvailable,
+        eriRouterInetIpPoolThrshType,
+        eriRouterInetIpPoolHiFallingThrsh
+    }
+    STATUS    current
+    DESCRIPTION
+        "A notification indicating that the falling threshold with the high 
+        water mark(eriRouterInetIpPoolHiFallingThrsh) per IP Pool has been reached."
+    ::= { eriRouterIpPoolMIBNotifications 4 }
+
+eriRouterInetIpPoolLoFallingThrshMet NOTIFICATION-TYPE
+    OBJECTS {
+        eriRouterInetIpPoolEndPrefixType,
+        eriRouterInetIpPoolEndPrefix,
+        eriRouterInetIpPoolEndPrefixLen,
+        eriRouterInetIpPoolInterfaceName,
+        eriRouterInetIpPoolName,
+        eriRouterInetIpPoolSize,
+        eriRouterInetIpPoolAvailable,
+        eriRouterInetIpPoolThrshType,
+        eriRouterInetIpPoolLoFallingThrsh
+    }
+    STATUS    current
+    DESCRIPTION
+        "A notification indicating that the falling threshold with the low
+        water mark(eriRouterInetIpPoolLoFallingThrsh) per IP Pool has been reached."
+    ::= { eriRouterIpPoolMIBNotifications 5 }
+
+--  IP Pool notifications per context pool summary 
+eriRouterInetIpPoolCtxHiFallingThrshMet NOTIFICATION-TYPE
+    OBJECTS {
+        eriRouterInetIpPoolCtxName,
+        eriRouterInetIpPoolCtxPoolSize,
+        eriRouterInetIpPoolCtxAvailable,
+        eriRouterInetIpPoolCtxThrshType,
+        eriRouterInetIpPoolCtxHiFallingThrsh
+    }
+    STATUS    current
+    DESCRIPTION
+        "A notification indicating that the falling threshold with the high 
+        water mark(eriRouterInetIpPoolCtxHiFallingThrsh) per IP Pool has been reached."
+    ::= { eriRouterIpPoolMIBNotifications 6 }
+
+eriRouterInetIpPoolCtxLoFallingThrshMet NOTIFICATION-TYPE
+    OBJECTS {
+        eriRouterInetIpPoolCtxName,
+        eriRouterInetIpPoolCtxPoolSize,
+        eriRouterInetIpPoolCtxAvailable,
+        eriRouterInetIpPoolCtxThrshType,
+        eriRouterInetIpPoolCtxLoFallingThrsh
+    }
+    STATUS    current
+    DESCRIPTION
+        "A notification indicating that the falling threshold with the low
+        water mark(eriRouterInetIpPoolCtxLoFallingThrsh) per IP Pool has been reached."
+    ::= { eriRouterIpPoolMIBNotifications 7 }
+    
+--
+-- Compliance statements
+--
+
+eriRouterIpPoolCompliances  OBJECT IDENTIFIER ::= { eriRouterIpPoolMIBConformance 1 }
+eriRouterIpPoolGroups       OBJECT IDENTIFIER ::= { eriRouterIpPoolMIBConformance 2 }
+
+eriRouterIpPoolGroup    OBJECT-GROUP
+    OBJECTS {
+        eriRouterIpPoolInterfaceName,
+        eriRouterIpPoolMask,
+        eriRouterIpPoolSize,
+        eriRouterIpPoolAvailable,
+        eriRouterIpPoolUnusable,
+        eriRouterIpPoolInuse,
+        eriRouterIpPoolThreshold,
+        eriRouterIpPoolSendTrap,
+        eriRouterIpPoolLogMessage,
+        eriRouterIpPoolContextName,
+        eriRouterIpPoolContextAvailable,
+        eriRouterIpPoolContextThreshold,
+        eriRouterIpPoolContextSendTrap,
+        eriRouterIpPoolContextLogMessage
+    }
+    STATUS    current
+    DESCRIPTION
+        "The collection of objects providing interface IP Pool
+                 information."
+    ::= { eriRouterIpPoolGroups 1 }
+
+eriRouterIpPoolNotifyGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        eriRouterIpPoolThresholdMet,
+        eriRouterIpPoolContextThresholdMet
+    }
+    STATUS    current
+    DESCRIPTION
+            "The collection of notifications related to IP Pools."
+    ::= { eriRouterIpPoolGroups 2 }
+
+eriRouterIpPoolNameGroup    OBJECT-GROUP
+    OBJECTS {
+        eriRouterIpPoolName
+    }
+    STATUS    current
+    DESCRIPTION
+        "An object providing the IP pool name."
+    ::= { eriRouterIpPoolGroups 3 }
+
+eriRouterIpPoolGroupV2    OBJECT-GROUP
+    OBJECTS {
+        eriRouterIpPoolInterfaceName,
+        eriRouterIpPoolMask,
+        eriRouterIpPoolSize,
+        eriRouterIpPoolAvailable,
+        eriRouterIpPoolUnusable,
+        eriRouterIpPoolInuse,
+        eriRouterIpPoolThreshold,
+        eriRouterIpPoolSendTrap,
+        eriRouterIpPoolLogMessage,
+        eriRouterIpPoolType,
+        eriRouterIpPoolContextName,
+        eriRouterIpPoolContextAvailable,
+        eriRouterIpPoolContextThreshold,
+        eriRouterIpPoolContextSendTrap,
+        eriRouterIpPoolContextLogMessage
+    }
+    STATUS    current
+    DESCRIPTION
+        "The collection of objects providing interface IP Pool
+                 information."
+    ::= { eriRouterIpPoolGroups 4 }
+
+eriRouterIpPoolRangeGroup    OBJECT-GROUP
+    OBJECTS {
+        eriRouterIpPoolEndAddr
+    }
+    STATUS    current
+    DESCRIPTION
+        "An object providing an IP pool range information."
+    ::= { eriRouterIpPoolGroups 5 }
+
+eriRouterIpPoolInterfaceGroup    OBJECT-GROUP
+    OBJECTS {
+        eriRouterIpPoolInterfaceName,
+        eriRouterIpPoolMask,
+        eriRouterIpPoolSize,
+        eriRouterIpPoolAvailable,
+        eriRouterIpPoolUnusable,
+        eriRouterIpPoolInuse,
+        eriRouterIpPoolThreshold,
+        eriRouterIpPoolSendTrap,
+        eriRouterIpPoolLogMessage,
+        eriRouterIpPoolName,
+        eriRouterIpPoolType,
+        eriRouterIpPoolEndAddr
+    }
+    STATUS    current
+    DESCRIPTION
+        "The collection of objects providing interface IP Pool
+        information."
+    ::= { eriRouterIpPoolGroups 6 }
+
+eriRouterIpPoolContextGroup    OBJECT-GROUP
+    OBJECTS {
+        eriRouterIpPoolContextName,
+        eriRouterIpPoolContextAvailable,
+        eriRouterIpPoolContextThreshold,
+        eriRouterIpPoolContextSendTrap,
+        eriRouterIpPoolContextLogMessage,
+        eriRouterIpPoolContextTotalSize,
+        eriRouterIpPoolContextThresholdPercentage,
+        eriRouterIpPoolContextThresholdSendTrap,
+        eriRouterIpPoolContextThresholdLogMessage
+    }
+    STATUS    current
+    DESCRIPTION
+        "The collection of objects providing context IP Pool
+        information."
+    ::= { eriRouterIpPoolGroups 7 }
+
+eriRouterIpPoolNotifyGroupV2 NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        eriRouterIpPoolThresholdMet,
+        eriRouterIpPoolContextThresholdMet,
+        eriRouterIpPoolContextThresholdPercentageMet
+    }
+    STATUS    current
+    DESCRIPTION
+            "The collection of notifications related to IP Pools."
+    ::= { eriRouterIpPoolGroups 8 }
+	
+eriRouterInetIpPoolGroup OBJECT-GROUP
+    OBJECTS {
+        -- IP Pool configuration,
+        eriRouterInetIpPoolEndPrefixType, 
+        eriRouterInetIpPoolEndPrefix,
+        eriRouterInetIpPoolEndPrefixLen,
+        eriRouterInetIpPoolInterfaceName,
+        eriRouterInetIpPoolName,
+        eriRouterInetIpPoolSize,
+        -- IP Pool statistics,
+        eriRouterInetIpPoolAvailable,
+        eriRouterInetIpPoolUnusable,
+        eriRouterInetIpPoolInuse,
+        -- IP Pool falling thresolds
+        eriRouterInetIpPoolThrshType,
+        eriRouterInetIpPoolHiFallingThrsh,
+        eriRouterInetIpPoolHiFallingNotify,
+        eriRouterInetIpPoolLoFallingThrsh,
+        eriRouterInetIpPoolLoFallingNotify,
+        -- context summary
+        eriRouterInetIpPoolCtxName,
+        eriRouterInetIpPoolCtxAvailable,
+        eriRouterInetIpPoolCtxPoolSize, 
+        eriRouterInetIpPoolCtxThrshType,
+        eriRouterInetIpPoolCtxHiFallingThrsh,
+        eriRouterInetIpPoolCtxHiFallingNotify,
+        eriRouterInetIpPoolCtxLoFallingThrsh,
+        eriRouterInetIpPoolCtxLoFallingNotify
+    }
+    STATUS    current
+    DESCRIPTION
+        "The collection of objects providing context IP Pool
+        information."
+    ::= { eriRouterIpPoolGroups 9 }
+
+eriRouterInetIpPoolNotifyGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {        
+        eriRouterInetIpPoolHiFallingThrshMet,
+        eriRouterInetIpPoolLoFallingThrshMet,
+        eriRouterInetIpPoolCtxHiFallingThrshMet,
+        eriRouterInetIpPoolCtxLoFallingThrshMet
+   }
+    STATUS    current
+    DESCRIPTION
+        "The collection of notifications related to IP Pools."
+    ::= { eriRouterIpPoolGroups 10 }
+
+eriRouterIpPoolCompliance MODULE-COMPLIANCE
+    STATUS       current
+    DESCRIPTION
+        "The compliance statement for SNMP entities which implement
+         this IP Pool MIB."
+    MODULE      -- this module
+    MANDATORY-GROUPS {
+        eriRouterIpPoolGroup,
+        eriRouterIpPoolNotifyGroup
+    }
+    ::= { eriRouterIpPoolCompliances 1 }
+
+eriRouterIpPoolNameCompliance MODULE-COMPLIANCE
+    STATUS       current
+    DESCRIPTION
+        "The compliance statement for SNMP entities which implement
+         this IP Pool MIB, including support for named pools."
+    MODULE      -- this module
+    MANDATORY-GROUPS {
+        eriRouterIpPoolGroup,
+        eriRouterIpPoolNotifyGroup,
+        eriRouterIpPoolNameGroup
+    }
+    ::= { eriRouterIpPoolCompliances 2 }
+
+eriRouterIpPoolComplianceV2 MODULE-COMPLIANCE
+    STATUS       current
+    DESCRIPTION
+        "The compliance statement for SNMP entities which implement
+         this IP Pool MIB."
+    MODULE      -- this module
+    MANDATORY-GROUPS {
+        eriRouterIpPoolGroupV2,
+        eriRouterIpPoolNotifyGroup
+    }
+    ::= { eriRouterIpPoolCompliances 3 }
+
+eriRouterIpPoolNameComplianceV2 MODULE-COMPLIANCE
+    STATUS       current
+    DESCRIPTION
+        "The compliance statement for SNMP entities which implement
+         this IP Pool MIB, including support for named pools."
+    MODULE      -- this module
+    MANDATORY-GROUPS {
+        eriRouterIpPoolGroupV2,
+        eriRouterIpPoolNotifyGroup,
+        eriRouterIpPoolNameGroup
+    }
+    ::= { eriRouterIpPoolCompliances 4 }
+
+eriRouterIpPoolRangeCompliance MODULE-COMPLIANCE
+    STATUS       current
+    DESCRIPTION
+        "The compliance statement for SNMP entities which implement
+         thhis IP Pool MIB, including support for range ip pools."
+    MODULE      -- this module
+    MANDATORY-GROUPS {
+        eriRouterIpPoolGroupV2,
+        eriRouterIpPoolNotifyGroup,
+        eriRouterIpPoolRangeGroup
+    }
+    ::= { eriRouterIpPoolCompliances 5 }
+
+eriRouterIpPoolThresholdPercentCompliance MODULE-COMPLIANCE
+    STATUS       current
+    DESCRIPTION
+        "The compliance statement for SNMP entities which implement
+         this IP Pool MIB, including support for per-context
+         KIP Pool percentage thresholds."
+    MODULE      -- this module
+    MANDATORY-GROUPS {
+        eriRouterIpPoolInterfaceGroup,
+        eriRouterIpPoolContextGroup,
+        eriRouterIpPoolNotifyGroupV2
+    }
+    ::= { eriRouterIpPoolCompliances 6 }
+
+eriRouterInetIpPoolCompliance MODULE-COMPLIANCE
+    STATUS       current
+    DESCRIPTION
+        "The compliance statement for SNMP entities which implement
+         the IP Pool MIB, including support DHCP-PD & ND IPv6 Pool."
+    MODULE      -- this module
+    MANDATORY-GROUPS {
+        eriRouterInetIpPoolGroup,
+        eriRouterInetIpPoolNotifyGroup
+    }
+    ::= { eriRouterIpPoolCompliances 7 }    
+END
+ 

@@ -1,0 +1,144 @@
+-- %DNP%
+-- %DNP% $Source: /cvsroot/pkt/sw/se/xc/bsd/config/snmp/mibs//Attic/ERICSSON-ROUTER-TWAMP-MIB.my,v $
+-- *****************************************************************
+-- ERICSSON-ROUTER-TWAMP-MIB               TWAMP MIB
+--
+-- Copyright (c) 2016 Ericsson AB.
+-- All rights reserved.
+--
+-- *****************************************************************
+
+ ERICSSON-ROUTER-TWAMP-MIB DEFINITIONS ::= BEGIN
+
+     IMPORTS
+         MODULE-IDENTITY, OBJECT-TYPE, OBJECT-IDENTITY,
+         NOTIFICATION-TYPE, mib-2, Counter32,
+         Integer32, Unsigned32, TimeTicks       FROM SNMPv2-SMI
+
+         TEXTUAL-CONVENTION, DisplayString,
+         DateAndTime                            FROM SNMPv2-TC
+
+         MODULE-COMPLIANCE, OBJECT-GROUP,
+         NOTIFICATION-GROUP                     FROM SNMPv2-CONF
+
+         ItuPerceivedSeverity                   FROM ITU-ALARM-TC-MIB
+
+         eriRouterMgmt                          FROM ERICSSON-ROUTER-SMI
+
+         EriAlarmType                           FROM ERICSSON-ALARM-TC-MIB;
+
+
+ eriRouterTwampMib MODULE-IDENTITY
+     LAST-UPDATED "201606060000Z"  -- 6 June, 2016
+     ORGANIZATION "Ericsson AB"
+     CONTACT-INFO
+         "
+          Yan Wang J
+          Email: yan.j.wang@ericsson.com
+
+          Guangpeng Li
+          Email: guangpeng.li@ericsson.com
+
+          Chengxing Zhou
+          Email: chengxing.zhou@ericsson.com
+         "
+     DESCRIPTION
+         "Defines the objects necessary support Twamp."
+
+     REVISION "201606060000Z"
+     DESCRIPTION
+         "Initial revision."
+
+     ::= { eriRouterMgmt 113 }
+
+ eriRouterTwampMibNotifications OBJECT IDENTIFIER
+        ::= { eriRouterTwampMib 0 }
+
+ eriRouterTwampMibObjects OBJECT IDENTIFIER
+        ::= { eriRouterTwampMib 1 }
+
+--
+-- MIB table
+--
+
+ eriRouterTwampAlarmActiveTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF EriRouterTwampAlarmActiveEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+         "A list of Twamp active alarm entries."
+     ::= { eriRouterTwampMibObjects 1 }
+
+ eriRouterTwampAlarmActiveEntry OBJECT-TYPE
+     SYNTAX     EriRouterTwampAlarmActiveEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+         "A collection of Twamp active alarm info."
+     INDEX { eriRouterTwampAlarmActiveIndex }
+     ::= { eriRouterTwampAlarmActiveTable 1 }
+
+ EriRouterTwampAlarmActiveEntry ::= SEQUENCE {
+     eriRouterTwampAlarmActiveIndex            Unsigned32,
+     eriRouterTwampAlarmDateAndTime            DateAndTime,
+     eriRouterTwampEriAlarmType                EriAlarmType,
+     eriRouterTwampAlarmSeverity               ItuPerceivedSeverity,
+     eriRouterTwampAlarmDescription            DisplayString
+ }
+
+ eriRouterTwampAlarmActiveIndex OBJECT-TYPE
+     SYNTAX     Unsigned32 (1..65535)
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The unique identification of Twamp alarm."
+     ::= { eriRouterTwampAlarmActiveEntry 1 }
+
+ eriRouterTwampAlarmDateAndTime OBJECT-TYPE
+     SYNTAX     DateAndTime
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The date and time when the alarm was raised or cleared."
+     ::= { eriRouterTwampAlarmActiveEntry 2 }
+
+ eriRouterTwampEriAlarmType OBJECT-TYPE
+        SYNTAX              EriAlarmType
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION
+            "The Ericsson alarm type id of this alarm."
+    ::= { eriRouterTwampAlarmActiveEntry 3 }
+
+ eriRouterTwampAlarmSeverity OBJECT-TYPE
+     SYNTAX     ItuPerceivedSeverity
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The Severity of this alarm."
+     ::= { eriRouterTwampAlarmActiveEntry 4 }
+
+ eriRouterTwampAlarmDescription OBJECT-TYPE
+     SYNTAX     DisplayString
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The description of this alarm."
+     ::= { eriRouterTwampAlarmActiveEntry 5 }
+
+
+--
+-- Notifications
+--
+ eriRouterTwampAlarm NOTIFICATION-TYPE
+     OBJECTS  { eriRouterTwampAlarmActiveIndex,
+                eriRouterTwampAlarmDateAndTime,
+                eriRouterTwampEriAlarmType,
+                eriRouterTwampAlarmSeverity,
+                eriRouterTwampAlarmDescription}
+     STATUS   current
+     DESCRIPTION
+         "This notification signifies a Twamp alarm."
+     ::= { eriRouterTwampMibNotifications 1 }
+
+ END

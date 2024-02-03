@@ -1,0 +1,563 @@
+-- %DNP% $Id: ERICSSON-ROUTER-QOS-CAP.my,v 1.1.2.11.92.6 2011/06/15 18:19:46 danielhe Exp $
+-- %DNP% $Source: /cvsroot/pkt/sw/se/xc/bsd/config/snmp/mibs/Attic/ERICSSON-ROUTER-QOS-CAP.my,v $
+-- *****************************************************************
+-- ERICSSON-ROUTER-QOS-CAP	 QOS MIB Capabilities
+--
+-- Copyright (c) 2002-2003, 2005-2007, 2010-2011, 2015 Ericsson AB.
+-- All rights reserved.
+-- 
+-- *****************************************************************
+
+ERICSSON-ROUTER-QOS-CAP DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY
+		FROM SNMPv2-SMI
+	AGENT-CAPABILITIES
+		FROM SNMPv2-CONF
+	eriRouterCapabilities
+		FROM ERICSSON-ROUTER-SMI;
+
+eriRouterQosCap MODULE-IDENTITY
+        LAST-UPDATED    "201501141800Z" -- Jan 14, 2015
+        ORGANIZATION    "Ericsson AB."
+        CONTACT-INFO
+                "       Ericsson AB.
+
+            Postal:     100 Headquarters Dr.
+			San Jose, CA  95134
+			USA
+
+		 Phone:	+1 408 750 5000
+		   Fax: +1 408 750 5599
+		"
+	DESCRIPTION
+		"The Agent Capabilities of the Quality of Service
+                 counters MIB (ERICSSON-ROUTER-QOS-MIB).
+
+                If this MIB implementation is platform-dependent,
+                the PRODUCT-RELEASE clause contains Ericsson SEOS version and
+                at least one of the following Ericsson product families:
+                    [SE]  SmartEdge Multi-service Edge Router (MSER) family
+                    [SM]  SM family of Metro Ethernet Service Transport platforms
+                    [SSR] Smart Service Router (SSR) family"
+
+        REVISION        "201501141800Z" -- Jan 14, 2015
+        DESCRIPTION
+                "Updated RBN/rbn/Rbn as ERICSSON-ROUTER/eriRouter/EriRouter
+                 to migrate RBN MIB to ERICSSON MIB."
+
+        REVISION        "201106150000Z" -- Jun 15, 2011
+        DESCRIPTION
+                "Update DESCRIPTION clause of MODULE-IDENTITY
+                 and PRODUCT-RELEASE clause of AGENT-CAPABILITIES."
+
+        REVISION        "201011010000Z" -- Nov 1, 2010
+        DESCRIPTION
+                "Modified PRODUCT-RELEASE clause for consistent naming."
+
+        REVISION        "201003010000Z" -- March 1, 2010
+        DESCRIPTION
+                "Addes eriRouterQosCap7. Updated eriRouterQosSubscriberQueueStatsEntry
+                 DESCRIPTION clause in eriRouterQosCap7 to indicate WFQ support 
+                 for ATM subscribers. "
+
+	REVISION        "201001050000Z" -- Jan 5, 2010
+	DESCRIPTION
+                "Updated eriRouterQosSubscriberQueueStatsEntry DESCRIPTION clause in 
+                 eriRouterQosCap6 to indicate MDRR support. "
+
+	REVISION        "200708140000Z" -- Aug 14, 2007
+	DESCRIPTION
+		"Added a new OID: eriRouterQosCap6."
+
+	REVISION        "200609120000Z" -- Sept 12, 2006
+	DESCRIPTION
+		"Added a new OID: eriRouterQosCap5."
+
+	REVISION        "200509260000Z" -- Sept 26, 2005
+	DESCRIPTION
+		"Added a new OID: eriRouterQosCap4."
+
+	REVISION        "200503100000Z" -- Mar 10, 2005
+	DESCRIPTION
+		"Added a new OID: eriRouterQosCap3."
+
+	REVISION        "200308120000Z" -- Aug 12, 2003
+	DESCRIPTION
+		"Added a new OID: eriRouterQosCap2."
+
+	REVISION        "200207010000Z" -- July 1, 2002
+	DESCRIPTION
+		"Initial version."
+	::= { eriRouterCapabilities 45 }
+
+eriRouterQosCap1 AGENT-CAPABILITIES
+	PRODUCT-RELEASE	"SEOS 2.3.x"
+	STATUS		current
+	DESCRIPTION	"ERICSSON-ROUTER-QOS-MIB capabilities"
+	SUPPORTS	ERICSSON-ROUTER-QOS-MIB
+	INCLUDES {
+		eriRouterQosIfGroup
+		}
+
+	::= { eriRouterQosCap 1 }
+
+eriRouterQosCap2 AGENT-CAPABILITIES
+	PRODUCT-RELEASE	"SEOS 2.5.4"
+	STATUS		current
+	DESCRIPTION	"ERICSSON-ROUTER-QOS-MIB capabilities"
+	SUPPORTS	ERICSSON-ROUTER-QOS-MIB
+	INCLUDES {
+		eriRouterQosIfGroup,
+		eriRouterQosIfQueueGroup
+		}
+
+	VARIATION eriRouterQosIfInDroppedOctets
+	DESCRIPTION
+	"This object is not supported for atm-ds3-12-port and atm-oc3-4-port
+	cards."
+
+	VARIATION eriRouterQosIfHCInDroppedOctets
+	DESCRIPTION
+	"This object is not supported for atm-ds3-12-port and atm-oc3-4-port
+	cards."
+
+	VARIATION eriRouterQosIfOutDroppedOctets
+	DESCRIPTION
+	"This object is not supported for atm-ds3-12-port and atm-oc3-4-port
+	cards."
+
+	VARIATION eriRouterQosIfHCOutDroppedOctets
+	DESCRIPTION
+	"This object is not supported for atm-ds3-12-port and atm-oc3-4-port
+	cards."
+
+	VARIATION eriRouterQosIfQueueWredDroppedOctets
+	DESCRIPTION
+	"This object is not supported for atm-ds3-12-port and atm-oc3-4-port
+	cards."
+
+	VARIATION eriRouterQosIfQueueHCWredDroppedOctets
+	DESCRIPTION
+	"This object is not supported for atm-ds3-12-port and atm-oc3-4-port
+	cards."
+
+	VARIATION eriRouterQosIfQueueTailDroppedOctets
+	DESCRIPTION
+	"This object is not supported for atm-ds3-12-port and atm-oc3-4-port
+	cards."
+
+	VARIATION eriRouterQosIfQueueHCTailDroppedOctets
+	DESCRIPTION
+	"This object is not supported for atm-ds3-12-port and atm-oc3-4-port
+	cards."
+
+	::= { eriRouterQosCap 2 }
+
+eriRouterQosCap3 AGENT-CAPABILITIES
+	PRODUCT-RELEASE "SEOS 2.6.5"
+	STATUS          current
+	DESCRIPTION     "ERICSSON-ROUTER-QOS-MIB capabilities"
+	SUPPORTS        ERICSSON-ROUTER-QOS-MIB
+	INCLUDES {
+		eriRouterQosIfGroup,
+		eriRouterQosIfQueueGroup
+		}
+
+	VARIATION eriRouterQosIfInDroppedOctets
+	DESCRIPTION
+	"This object is not supported for ATM cards using PortMaker II
+	(PM2) SAR, e.g. atm-ds3-12-port, atm-oc3-4-port, atm-oc12e-1-port,
+	etc."
+
+	VARIATION eriRouterQosIfHCInDroppedOctets
+	DESCRIPTION
+	"This object is not supported for ATM cards using PortMaker II
+	(PM2) SAR, e.g. atm-ds3-12-port, atm-oc3-4-port, atm-oc12e-1-port,
+	etc."
+
+	VARIATION eriRouterQosIfOutDroppedOctets
+	DESCRIPTION
+	"This object is not supported for ATM cards using PortMaker II
+	(PM2) SAR, e.g. atm-ds3-12-port, atm-oc3-4-port, atm-oc12e-1-port,
+	etc."
+
+	VARIATION eriRouterQosIfHCOutDroppedOctets
+	DESCRIPTION
+	"This object is not supported for ATM cards using PortMaker II
+	(PM2) SAR, e.g. atm-ds3-12-port, atm-oc3-4-port, atm-oc12e-1-port,
+	etc."
+
+	VARIATION eriRouterQosIfQueueWredDroppedOctets
+	DESCRIPTION
+	"This object is not supported for ATM cards using PortMaker II
+	(PM2) SAR, e.g. atm-ds3-12-port, atm-oc3-4-port, atm-oc12e-1-port,
+	etc."
+
+	VARIATION eriRouterQosIfQueueHCWredDroppedOctets
+	DESCRIPTION
+	"This object is not supported for ATM cards using PortMaker II
+	(PM2) SAR, e.g. atm-ds3-12-port, atm-oc3-4-port, atm-oc12e-1-port,
+	etc."
+
+	VARIATION eriRouterQosIfQueueTailDroppedOctets
+	DESCRIPTION
+	"This object is not supported for ATM cards using PortMaker II
+	(PM2) SAR, e.g. atm-ds3-12-port, atm-oc3-4-port, atm-oc12e-1-port,
+	etc."
+
+	VARIATION eriRouterQosIfQueueHCTailDroppedOctets
+	DESCRIPTION
+	"This object is not supported for ATM cards using PortMaker II
+	(PM2) SAR, e.g. atm-ds3-12-port, atm-oc3-4-port, atm-oc12e-1-port,
+	etc."
+
+        ::= { eriRouterQosCap 3 }
+
+eriRouterQosCap4 AGENT-CAPABILITIES
+	PRODUCT-RELEASE "SEOS 5.0.3"
+	STATUS          current
+	DESCRIPTION     "ERICSSON-ROUTER-QOS-MIB capabilities"
+	SUPPORTS        ERICSSON-ROUTER-QOS-MIB
+	INCLUDES {
+		eriRouterQosIfGroup,
+		eriRouterQosIfQueueGroup,
+		eriRouterQosSubscriberQueueGroup
+		}
+
+	VARIATION eriRouterQosIfInDroppedOctets
+	DESCRIPTION
+	"This object is not supported for ATM cards using PortMaker II
+	(PM2) SAR, e.g. atm-ds3-12-port, atm-oc3-4-port, atm-oc12e-1-port,
+	etc."
+
+	VARIATION eriRouterQosIfHCInDroppedOctets
+	DESCRIPTION
+	"This object is not supported for ATM cards using PortMaker II
+	(PM2) SAR, e.g. atm-ds3-12-port, atm-oc3-4-port, atm-oc12e-1-port,
+	etc."
+
+	VARIATION eriRouterQosIfOutDroppedOctets
+	DESCRIPTION
+	"This object is not supported for ATM cards using PortMaker II
+	(PM2) SAR, e.g. atm-ds3-12-port, atm-oc3-4-port, atm-oc12e-1-port,
+	etc."
+
+	VARIATION eriRouterQosIfHCOutDroppedOctets
+	DESCRIPTION
+	"This object is not supported for ATM cards using PortMaker II
+	(PM2) SAR, e.g. atm-ds3-12-port, atm-oc3-4-port, atm-oc12e-1-port,
+	etc."
+
+	VARIATION eriRouterQosIfQueueWredDroppedOctets
+	DESCRIPTION
+	"This object is not supported for ATM cards using PortMaker II
+	(PM2) SAR, e.g. atm-ds3-12-port, atm-oc3-4-port, atm-oc12e-1-port,
+	etc."
+
+	VARIATION eriRouterQosIfQueueHCWredDroppedOctets
+	DESCRIPTION
+	"This object is not supported for ATM cards using PortMaker II
+	(PM2) SAR, e.g. atm-ds3-12-port, atm-oc3-4-port, atm-oc12e-1-port,
+	etc."
+
+	VARIATION eriRouterQosIfQueueTailDroppedOctets
+	DESCRIPTION
+	"This object is not supported for ATM cards using PortMaker II
+	(PM2) SAR, e.g. atm-ds3-12-port, atm-oc3-4-port, atm-oc12e-1-port,
+	etc."
+
+	VARIATION eriRouterQosIfQueueHCTailDroppedOctets
+	DESCRIPTION
+	"This object is not supported for ATM cards using PortMaker II
+	(PM2) SAR, e.g. atm-ds3-12-port, atm-oc3-4-port, atm-oc12e-1-port,
+	etc."
+
+	VARIATION eriRouterQosSubscriberQueueStatsEntry
+	DESCRIPTION
+	"This entry is only supported for the PPP and CLIPS subscriber
+	session with PWFQ policy applied."
+
+	::= { eriRouterQosCap 4 }
+
+eriRouterQosCap5 AGENT-CAPABILITIES
+	PRODUCT-RELEASE "SEOS 6.0.3"
+	STATUS          current
+	DESCRIPTION     "ERICSSON-ROUTER-QOS-MIB capabilities"
+	SUPPORTS        ERICSSON-ROUTER-QOS-MIB
+	INCLUDES {
+		eriRouterQosIfGroup,
+		eriRouterQosIfQueueGroup,
+		eriRouterQosSubscriberQueueGroup,
+		eriRouterQosIfRLClassStatsGroup,
+		eriRouterQosSubscriberRLClassStatsGroup
+		}
+
+	VARIATION eriRouterQosIfInDroppedOctets
+	DESCRIPTION
+	"This object is not supported for ATM cards using PortMaker II
+	(PM2) SAR, e.g. atm-ds3-12-port, atm-oc3-4-port, atm-oc12e-1-port,
+	etc."
+
+	VARIATION eriRouterQosIfHCInDroppedOctets
+	DESCRIPTION
+	"This object is not supported for ATM cards using PortMaker II
+	(PM2) SAR, e.g. atm-ds3-12-port, atm-oc3-4-port, atm-oc12e-1-port,
+	etc."
+
+	VARIATION eriRouterQosIfOutDroppedOctets
+	DESCRIPTION
+	"This object is not supported for ATM cards using PortMaker II
+	(PM2) SAR, e.g. atm-ds3-12-port, atm-oc3-4-port, atm-oc12e-1-port,
+	etc."
+
+	VARIATION eriRouterQosIfHCOutDroppedOctets
+	DESCRIPTION
+	"This object is not supported for ATM cards using PortMaker II
+	(PM2) SAR, e.g. atm-ds3-12-port, atm-oc3-4-port, atm-oc12e-1-port,
+	etc."
+
+	VARIATION eriRouterQosIfQueueWredDroppedOctets
+	DESCRIPTION
+	"This object is not supported for ATM cards using PortMaker II
+	(PM2) SAR, e.g. atm-ds3-12-port, atm-oc3-4-port, atm-oc12e-1-port,
+	etc."
+
+	VARIATION eriRouterQosIfQueueHCWredDroppedOctets
+	DESCRIPTION
+	"This object is not supported for ATM cards using PortMaker II
+	(PM2) SAR, e.g. atm-ds3-12-port, atm-oc3-4-port, atm-oc12e-1-port,
+	etc."
+
+	VARIATION eriRouterQosIfQueueTailDroppedOctets
+	DESCRIPTION
+	"This object is not supported for ATM cards using PortMaker II
+	(PM2) SAR, e.g. atm-ds3-12-port, atm-oc3-4-port, atm-oc12e-1-port,
+	etc."
+
+	VARIATION eriRouterQosIfQueueHCTailDroppedOctets
+	DESCRIPTION
+	"This object is not supported for ATM cards using PortMaker II
+	(PM2) SAR, e.g. atm-ds3-12-port, atm-oc3-4-port, atm-oc12e-1-port,
+	etc."
+
+	VARIATION eriRouterQosSubscriberQueueStatsEntry
+	DESCRIPTION
+	"This entry is only supported for the PPP and CLIPS subscriber
+	session with PWFQ policy applied."
+
+	VARIATION eriRouterQosIfRLPolicyType
+        SYNTAX INTEGER {
+                policing(1),
+                metering(2)
+        }
+        DESCRIPTION
+        "The value edrr(3), mdrr(4), pq(5), atmwfq(6), or pwfq(7) is not
+        supported."
+
+	VARIATION eriRouterQosSubsRLPolicyType
+        SYNTAX INTEGER {
+                policing(1),
+                metering(2)
+        }
+        DESCRIPTION
+        "The value edrr(3), mdrr(4), pq(5), atmwfq(6), or pwfq(7) is not
+        supported."
+
+	::= { eriRouterQosCap 5 }
+
+
+eriRouterQosCap6 AGENT-CAPABILITIES
+	PRODUCT-RELEASE "SEOS 6.2"
+	STATUS          current
+	DESCRIPTION     "ERICSSON-ROUTER-QOS-MIB capabilities"
+	SUPPORTS        ERICSSON-ROUTER-QOS-MIB
+	INCLUDES {
+		eriRouterQosIfGroup,
+		eriRouterQosIfQueueGroup,
+		eriRouterQosSubscriberQueueGroup,
+		eriRouterQosIfRLClassStatsGroup,
+		eriRouterQosSubscriberRLClassStatsGroup,
+                eriRouterQosHierarchicalPolicyStatsGroup
+		}
+
+	VARIATION eriRouterQosIfInDroppedOctets
+	DESCRIPTION
+	"This object is not supported for ATM cards using PortMaker II
+	(PM2) SAR, e.g. atm-ds3-12-port, atm-oc3-4-port, atm-oc12e-1-port,
+	etc."
+
+	VARIATION eriRouterQosIfHCInDroppedOctets
+	DESCRIPTION
+	"This object is not supported for ATM cards using PortMaker II
+	(PM2) SAR, e.g. atm-ds3-12-port, atm-oc3-4-port, atm-oc12e-1-port,
+	etc."
+
+	VARIATION eriRouterQosIfOutDroppedOctets
+	DESCRIPTION
+	"This object is not supported for ATM cards using PortMaker II
+	(PM2) SAR, e.g. atm-ds3-12-port, atm-oc3-4-port, atm-oc12e-1-port,
+	etc."
+
+	VARIATION eriRouterQosIfHCOutDroppedOctets
+	DESCRIPTION
+	"This object is not supported for ATM cards using PortMaker II
+	(PM2) SAR, e.g. atm-ds3-12-port, atm-oc3-4-port, atm-oc12e-1-port,
+	etc."
+
+	VARIATION eriRouterQosIfQueueWredDroppedOctets
+	DESCRIPTION
+	"This object is not supported for ATM cards using PortMaker II
+	(PM2) SAR, e.g. atm-ds3-12-port, atm-oc3-4-port, atm-oc12e-1-port,
+	etc."
+
+	VARIATION eriRouterQosIfQueueHCWredDroppedOctets
+	DESCRIPTION
+	"This object is not supported for ATM cards using PortMaker II
+	(PM2) SAR, e.g. atm-ds3-12-port, atm-oc3-4-port, atm-oc12e-1-port,
+	etc."
+
+	VARIATION eriRouterQosIfQueueTailDroppedOctets
+	DESCRIPTION
+	"This object is not supported for ATM cards using PortMaker II
+	(PM2) SAR, e.g. atm-ds3-12-port, atm-oc3-4-port, atm-oc12e-1-port,
+	etc."
+
+	VARIATION eriRouterQosIfQueueHCTailDroppedOctets
+	DESCRIPTION
+	"This object is not supported for ATM cards using PortMaker II
+	(PM2) SAR, e.g. atm-ds3-12-port, atm-oc3-4-port, atm-oc12e-1-port,
+	etc."
+
+	VARIATION eriRouterQosSubscriberQueueStatsEntry
+	DESCRIPTION
+	"This entry is only supported for the PPP and CLIPS subscriber
+	session with PWFQ / MDRR policy applied."
+
+	VARIATION eriRouterQosIfRLPolicyType
+        SYNTAX INTEGER {
+                policing(1),
+                metering(2)
+        }
+        DESCRIPTION
+        "The value edrr(3), mdrr(4), pq(5), atmwfq(6), or pwfq(7) is not
+        supported."
+
+	VARIATION eriRouterQosSubsRLPolicyType
+        SYNTAX INTEGER {
+                policing(1),
+                metering(2)
+        }
+        DESCRIPTION
+        "The value edrr(3), mdrr(4), pq(5), atmwfq(6), or pwfq(7) is not
+        supported."
+
+	VARIATION eriRouterQosHierarchicalPolicyType
+        SYNTAX INTEGER {
+                policing(1),
+                metering(2)
+        }
+        DESCRIPTION
+        "The value edrr(3), mdrr(4), pq(5), atmwfq(6), or pwfq(7) is not
+        supported."
+
+	::= { eriRouterQosCap 6 }
+
+eriRouterQosCap7 AGENT-CAPABILITIES
+        PRODUCT-RELEASE "SEOS 6.3.X [SE, SM]; SEOS 11.1.x [SSR]"
+        STATUS          current
+        DESCRIPTION     "ERICSSON-ROUTER-QOS-MIB capabilities"
+        SUPPORTS        ERICSSON-ROUTER-QOS-MIB
+        INCLUDES {
+                eriRouterQosIfGroup,
+                eriRouterQosIfQueueGroup,
+                eriRouterQosSubscriberQueueGroup,
+                eriRouterQosIfRLClassStatsGroup,
+                eriRouterQosSubscriberRLClassStatsGroup,
+                eriRouterQosHierarchicalPolicyStatsGroup
+                }
+
+        VARIATION eriRouterQosIfInDroppedOctets
+        DESCRIPTION
+        "This object is not supported for ATM cards using PortMaker II
+        (PM2) SAR, e.g. atm-ds3-12-port, atm-oc3-4-port, atm-oc12e-1-port,
+        etc."
+
+        VARIATION eriRouterQosIfHCInDroppedOctets
+        DESCRIPTION
+        "This object is not supported for ATM cards using PortMaker II
+        (PM2) SAR, e.g. atm-ds3-12-port, atm-oc3-4-port, atm-oc12e-1-port,
+        etc."
+
+        VARIATION eriRouterQosIfOutDroppedOctets
+        DESCRIPTION
+        "This object is not supported for ATM cards using PortMaker II
+        (PM2) SAR, e.g. atm-ds3-12-port, atm-oc3-4-port, atm-oc12e-1-port,
+        etc."
+
+        VARIATION eriRouterQosIfHCOutDroppedOctets
+        DESCRIPTION
+        "This object is not supported for ATM cards using PortMaker II
+        (PM2) SAR, e.g. atm-ds3-12-port, atm-oc3-4-port, atm-oc12e-1-port,
+        etc."
+
+        VARIATION eriRouterQosIfQueueWredDroppedOctets
+        DESCRIPTION
+        "This object is not supported for ATM cards using PortMaker II
+        (PM2) SAR, e.g. atm-ds3-12-port, atm-oc3-4-port, atm-oc12e-1-port,
+        etc."
+
+        VARIATION eriRouterQosIfQueueHCWredDroppedOctets
+        DESCRIPTION
+        "This object is not supported for ATM cards using PortMaker II
+        (PM2) SAR, e.g. atm-ds3-12-port, atm-oc3-4-port, atm-oc12e-1-port,
+        etc."
+
+        VARIATION eriRouterQosIfQueueTailDroppedOctets
+        DESCRIPTION
+        "This object is not supported for ATM cards using PortMaker II
+        (PM2) SAR, e.g. atm-ds3-12-port, atm-oc3-4-port, atm-oc12e-1-port,
+        etc."
+
+        VARIATION eriRouterQosIfQueueHCTailDroppedOctets
+        DESCRIPTION
+        "This object is not supported for ATM cards using PortMaker II
+        (PM2) SAR, e.g. atm-ds3-12-port, atm-oc3-4-port, atm-oc12e-1-port,
+        etc."
+
+        VARIATION eriRouterQosSubscriberQueueStatsEntry
+        DESCRIPTION
+        "This entry is only supported for the PPP and CLIPS subscriber
+        session with PWFQ / MDRR, and ATM subscribers with WFQ policy applied."
+
+        VARIATION eriRouterQosIfRLPolicyType
+        SYNTAX INTEGER {
+                policing(1),
+                metering(2)
+        }
+        DESCRIPTION
+        "The value edrr(3), mdrr(4), pq(5), atmwfq(6), or pwfq(7) is not
+        supported."
+
+        VARIATION eriRouterQosSubsRLPolicyType
+        SYNTAX INTEGER {
+                policing(1),
+                metering(2)
+        }
+        DESCRIPTION
+        "The value edrr(3), mdrr(4), pq(5), atmwfq(6), or pwfq(7) is not
+        supported."
+
+        VARIATION eriRouterQosHierarchicalPolicyType
+        SYNTAX INTEGER {
+                policing(1),
+                metering(2)
+        }
+        DESCRIPTION
+        "The value edrr(3), mdrr(4), pq(5), atmwfq(6), or pwfq(7) is not
+        supported."
+
+        ::= { eriRouterQosCap 7 }
+
+END

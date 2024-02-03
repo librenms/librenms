@@ -1,0 +1,90 @@
+-- $Id:$
+-- $Source:$
+-- ***************************************************************************
+-- ERICSSON-ROUTER-ISSU-CAP.my    Ericsson In State Service Upgrade(ISSU) MIB
+--
+-- Copyright (c) 2016 Ericsson AB.
+-- All rights reserved.
+--
+-- ***************************************************************************
+
+ERICSSON-ROUTER-ISSU-CAP DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY
+                FROM SNMPv2-SMI
+        AGENT-CAPABILITIES
+                FROM SNMPv2-CONF
+        eriRouterCapabilities
+                FROM ERICSSON-ROUTER-SMI;
+
+eriRouterIssuCap MODULE-IDENTITY
+    LAST-UPDATED    "201512100000Z" -- Dec 10, 2015
+    ORGANIZATION    "Ericsson AB."
+    CONTACT-INFO
+            "       Ericsson, Inc.
+
+            Postal: 100 Headquarters Drive
+                    San Jose, CA  95134-1370
+                    USA
+
+             Phone: +1 408 750 5000
+               Fax: +1 408 750 5599"
+
+    DESCRIPTION
+        "The Agent Capabilities of In State Service Upgrade(ISSU) MIB
+        implementation."
+
+    REVISION    "201512100000Z" -- Dec 10, 2015
+    DESCRIPTION
+           "Initial version"
+        ::= { eriRouterCapabilities 110 }
+
+eriRouterIssuCap1 AGENT-CAPABILITIES
+    PRODUCT-RELEASE "SEOS 16.1.x [SSR]"
+    STATUS          current
+    DESCRIPTION     "ERICSSON-ROUTER-ISSU-MIB capabilities"
+    SUPPORTS        ERICSSON-ROUTER-ISSU-MIB
+    INCLUDES {
+        eriRouterIssuStatusGroup,
+        eriRouterIssuMibNotifyGroup
+    }
+
+    VARIATION   eriIssuUpgradeTimeLeft
+    ACCESS      read-only
+    DESCRIPTION
+        "Write access is not supported."
+
+    VARIATION   eriIssuCurrentActionTimeLeft
+    ACCESS      read-only
+    DESCRIPTION
+        "Write access is not supported."
+
+    VARIATION   eriIssuCurrentAction
+    ACCESS      read-only
+    DESCRIPTION
+        "Write access is not supported."
+
+    VARIATION   eriIssuPrevAction
+    ACCESS      read-only
+    DESCRIPTION
+        "Write access is not supported."
+
+    VARIATION   eriIssuActionReason
+    ACCESS      read-only
+    DESCRIPTION
+        "Write access is not supported."
+
+    VARIATION   eriIssuCurrentStage
+    ACCESS      read-only
+    DESCRIPTION
+        "Write access is not supported."
+
+    VARIATION   eriIssuPrevStage
+    ACCESS      read-only
+    DESCRIPTION
+        "Write access is not supported."
+
+    ::= { eriRouterIssuCap 1 }
+
+END

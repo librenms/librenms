@@ -1,0 +1,256 @@
+-- *****************************************************************
+-- ERICSSON-ROUTER-IF-MIB       Extension of IF-MIB.my
+--
+-- %DNP% Copyright (c) 2011 - 2014, 2015 Ericsson AB.
+-- %DNP% All rights reserved.
+-- 
+-- *****************************************************************
+
+ERICSSON-ROUTER-IF-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Counter64
+                FROM SNMPv2-SMI
+
+    MODULE-COMPLIANCE, OBJECT-GROUP
+                FROM SNMPv2-CONF
+
+    eriRouterMgmt
+                FROM ERICSSON-ROUTER-SMI
+
+    ifEntry
+                FROM IF-MIB;
+
+eriRouterIfMib MODULE-IDENTITY
+    LAST-UPDATED "201501141800Z" -- Jan 14, 2015
+    ORGANIZATION "ERICSSON AB"
+    CONTACT-INFO
+            "       Ericsson AB.
+
+                Postal: 100 Headquarters Dr
+                        San Jose, CA  95134
+                        USA
+
+                 Phone: +1 408 750 5000
+                   Fax: +1 408 750 5599
+
+             "
+    DESCRIPTION
+            "This MIB defines eriRouterIfTable which extends IF-MIB's ifTable"
+
+    REVISION     "201501141800Z" -- Jan 14, 2015
+    DESCRIPTION
+        "Updated RBN/rbn/Rbn as ERICSSON-ROUTER/eriRouter/EriRouter
+         to migrate RBN MIB to ERICSSON MIB."
+
+    REVISION     "201410221800Z" -- October 22, 2014
+    DESCRIPTION
+       " Changed below entry name for better understandability
+               From                         To
+          eriRouterIfHCInIPv4MulticastPkts    eriRouterIfHCInIPv4Pkts
+          eriRouterIfHCOutIPv4MulticastPkts   eriRouterIfHCOutIPv4Pkts
+          eriRouterIfHCInIPv6MulticastPkts    eriRouterIfHCInIPv6Pkts
+          eriRouterIfHCOutIPv6MulticastPkts   eriRouterIfHCOutIPv6Pkts
+       "
+
+    REVISION     "201207181800Z" -- July 18, 2012
+    DESCRIPTION
+        "Initial version - defines eriRouterIfMIB"
+    ::= { eriRouterMgmt 57 }
+
+eriRouterIfMIBObjects     OBJECT IDENTIFIER ::= { eriRouterIfMib 0 }
+eriRouterIfMIBConformance OBJECT IDENTIFIER ::= { eriRouterIfMib 1 }
+
+--
+-- Textual Conventions
+--
+
+eriRouterIfTable OBJECT-TYPE
+        SYNTAX       SEQUENCE OF EriRouterIfEntry
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION
+            "A list of interface entries.  The number of entries is
+            given by the value of eriRouterIfNumber.  This table contains
+            extension objects for the ifTable interface table."
+        ::= { eriRouterIfMIBObjects 1 }
+
+eriRouterIfEntry      OBJECT-TYPE
+    SYNTAX      EriRouterIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry containing additional management information
+            applicable to a particular interface."
+    AUGMENTS    { ifEntry }
+    ::= { eriRouterIfTable 1 }
+
+EriRouterIfEntry ::=
+    SEQUENCE {
+        eriRouterIfHCInIPv4Octets           Counter64,
+        eriRouterIfHCOutIPv4Octets          Counter64,        
+        eriRouterIfHCInIPv4Pkts             Counter64,
+        eriRouterIfHCOutIPv4Pkts            Counter64,
+        eriRouterIfHCInIPv6Octets           Counter64,
+        eriRouterIfHCOutIPv6Octets          Counter64, 
+        eriRouterIfHCInIPv6Pkts             Counter64,
+        eriRouterIfHCOutIPv6Pkts            Counter64
+    }
+
+eriRouterIfHCInIPv4Octets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The total number of IPv4 octets received on the interface,
+            including framing characters.  
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times as indicated by the value of
+            ifCounterDiscontinuityTime in ifXTable in IF-MIB."
+    ::= { eriRouterIfEntry 1 }
+
+eriRouterIfHCOutIPv4Octets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The total number of IPv4 octets transmitted out of the
+            interface, including framing characters. 
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times as indicated by the value of
+            ifCounterDiscontinuityTime in ifXTable in IF-MIB."
+    ::= { eriRouterIfEntry 2 }
+
+eriRouterIfHCInIPv4Pkts  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The number of IPv4 packets, delivered by this sub-layer to a
+            higher (sub-)layer, which were addressed to a multicast
+            address at this sub-layer.  For a MAC layer protocol, this
+            includes both Group and Functional addresses.
+  
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times as indicated by the value of
+            ifCounterDiscontinuityTime in ifXTable in IF-MIB."
+    ::= { eriRouterIfEntry 3 }
+
+eriRouterIfHCOutIPv4Pkts OBJECT-TYPE
+SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The total number of IPv4 packets that higher-level protocols
+            requested be transmitted, and which were addressed to a
+            multicast address at this sub-layer, including those that
+            were discarded or not sent.  For a MAC layer protocol, this
+            includes both Group and Functional addresses. 
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times as indicated by the value of
+            ifCounterDiscontinuityTime in ifXTable in IF-MIB."
+    ::= { eriRouterIfEntry 4 }
+
+eriRouterIfHCInIPv6Octets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The total number of IPv6 octets received on the interface,
+            including framing characters.  
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times as indicated by the value of
+            ifCounterDiscontinuityTime in ifXTable in IF-MIB."
+    ::= { eriRouterIfEntry 5 }
+
+eriRouterIfHCOutIPv6Octets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The total number of IPv6 octets transmitted out of the
+            interface, including framing characters. 
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times as indicated by the value of
+            ifCounterDiscontinuityTime in ifXTable in IF-MIB."
+    ::= { eriRouterIfEntry 6 }
+
+eriRouterIfHCInIPv6Pkts  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The number of IPv6 packets, delivered by this sub-layer to a
+            higher (sub-)layer, which were addressed to a multicast
+            address at this sub-layer.  For a MAC layer protocol, this
+            includes both Group and Functional addresses.
+  
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times as indicated by the value of
+            ifCounterDiscontinuityTime in ifXTable in IF-MIB."
+    ::= { eriRouterIfEntry 7 }
+
+eriRouterIfHCOutIPv6Pkts OBJECT-TYPE
+SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The total number of IPv6 packets that higher-level protocols
+            requested be transmitted, and which were addressed to a
+            multicast address at this sub-layer, including those that
+            were discarded or not sent.  For a MAC layer protocol, this
+            includes both Group and Functional addresses. 
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times as indicated by the value of
+            ifCounterDiscontinuityTime in ifXTable in IF-MIB."
+    ::= { eriRouterIfEntry 8 }
+
+--
+-- compliance statements
+--
+
+eriRouterIfMIBCompliances OBJECT IDENTIFIER ::= { eriRouterIfMIBConformance 1 }
+eriRouterIfMIBGroups   OBJECT IDENTIFIER ::= { eriRouterIfMIBConformance 2 }
+
+eriRouterIfCompliance MODULE-COMPLIANCE
+        STATUS current      
+        DESCRIPTION
+                "The compliance statement for ERICSSON-ROUTER-IF-MIB"
+        MODULE      -- this module
+        MANDATORY-GROUPS {
+                eriRouterIfMIBGroup
+        }
+        ::= { eriRouterIfMIBCompliances 1 }
+
+eriRouterIfMIBGroup OBJECT-GROUP
+    OBJECTS  {
+        eriRouterIfHCInIPv4Octets,
+        eriRouterIfHCOutIPv4Octets,
+        eriRouterIfHCInIPv4Pkts,
+        eriRouterIfHCOutIPv4Pkts,
+        eriRouterIfHCInIPv6Octets,
+        eriRouterIfHCOutIPv6Octets,
+        eriRouterIfHCInIPv6Pkts,
+        eriRouterIfHCOutIPv6Pkts
+    }
+    STATUS current
+    DESCRIPTION
+       "Conformance group for ERICSSON-ROUTER-IF-MIB objects."
+    ::= { eriRouterIfMIBGroups 1 }
+
+END
+

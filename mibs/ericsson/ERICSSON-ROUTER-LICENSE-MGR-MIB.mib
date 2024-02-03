@@ -1,0 +1,433 @@
+-- *****************************************************************
+-- ERICSSON-ROUTER-LICENSE-MGR-MIB    LICENSE MANAGER MIB
+--
+-- Copyright (c) 2015-2016 Ericsson AB
+-- All rights reserved.
+--
+-- *****************************************************************
+
+ERICSSON-ROUTER-LICENSE-MGR-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE, Unsigned32,
+    NOTIFICATION-TYPE
+            FROM SNMPv2-SMI
+
+    DateAndTime
+            FROM SNMPv2-TC
+
+    SnmpAdminString
+            FROM SNMP-FRAMEWORK-MIB
+
+    ItuPerceivedSeverity
+            FROM ITU-ALARM-TC-MIB
+
+    EriRouterSlot,
+    EriRouterPort
+            FROM ERICSSON-ROUTER-TC
+
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP,
+    NOTIFICATION-GROUP
+            FROM SNMPv2-CONF
+    eriRouterMgmt
+            FROM ERICSSON-ROUTER-SMI;
+
+eriRouterLicenseMgrMib MODULE-IDENTITY
+    LAST-UPDATED   "201604180000Z" -- Apr 18, 2016
+    ORGANIZATION   "Ericsson AB"
+    CONTACT-INFO
+            "       Ericsson AB
+                    200 Headquarters Dr
+                    San Jose, CA 95134
+                    USA
+
+             Phone: +1 408 750 5000
+               Fax: +1 408 750 5599
+            "
+    DESCRIPTION
+        "Defines the objects necessary to support the management of
+        license server objects."
+
+    REVISION      "201604180000Z" -- Apr 18, 2016
+    DESCRIPTION
+        "Added:
+             eriRouterLicenseMgrEventCardSlot,
+             eriRouterLicenseMgrEventPort,
+             eriRouterLicenseMgrPortDisabledDueToCapacityExceededAlarm,
+             eriRouterLicenseMgrPortDisabledDueToCapacityExceededAlarmCleared,
+             eriRouterLicenseMgrBasePackageLicenseIsMissingCleared,
+             eriRouterLicenseMgrComplianceV2,
+             eriRouterLicenseMgrNotifyObjectGroupV2,
+             eriRouterLicenseMgrNotifyGroupV2
+        "
+
+    REVISION      "201510130000Z" -- Oct 13, 2015
+    DESCRIPTION
+        "Initial Version."
+
+    ::= { eriRouterMgmt 106}
+
+eriRouterLicenseMgrNotifications OBJECT IDENTIFIER ::= { eriRouterLicenseMgrMib 0 }
+
+eriRouterLicenseMgrObjects       OBJECT IDENTIFIER ::= { eriRouterLicenseMgrMib 1 }
+
+eriRouterLicenseMgrConformance   OBJECT IDENTIFIER ::= { eriRouterLicenseMgrMib 2 }
+--
+-- some structure for the mib objects
+--
+
+eriRouterLicenseMgrNotify        OBJECT IDENTIFIER ::= { eriRouterLicenseMgrObjects 1 }
+
+--
+-- License Manager notification objects
+--
+
+eriRouterLicenseMgrLicenseKey OBJECT-TYPE
+    SYNTAX      SnmpAdminString  (SIZE(0..256))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "License Key."
+    ::= { eriRouterLicenseMgrNotify 1 }
+
+eriRouterLicenseMgrEventDateAndTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The date and time when the event was raised."
+    ::= { eriRouterLicenseMgrNotify 2 }
+
+eriRouterLicenseMgrEventSeverity  OBJECT-TYPE
+    SYNTAX      ItuPerceivedSeverity
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The current severity of the event."
+    ::= { eriRouterLicenseMgrNotify 3 }
+
+eriRouterLicenseMgrEventAdditionalText OBJECT-TYPE
+    SYNTAX      SnmpAdminString  (SIZE(0..256))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The additional text of the event."
+    ::= { eriRouterLicenseMgrNotify 4 }
+
+eriRouterLicenseMgrEventCardSlot OBJECT-TYPE
+    SYNTAX      EriRouterSlot
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The slot ID of the port the event was raised against."
+    ::= { eriRouterLicenseMgrNotify 5 }
+
+eriRouterLicenseMgrEventPort OBJECT-TYPE
+    SYNTAX      EriRouterPort
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The port ID of the port the event was raised against."
+    ::= { eriRouterLicenseMgrNotify 6 }
+
+--
+-- NOTIFICATIONS - node for hanging notification definitions
+--
+eriRouterLicenseMgrAutonomousModeActivatedAlarm NOTIFICATION-TYPE
+OBJECTS {
+        eriRouterLicenseMgrEventDateAndTime,
+        eriRouterLicenseMgrEventSeverity,
+        eriRouterLicenseMgrEventAdditionalText
+    }
+    STATUS current
+    DESCRIPTION
+         "This notification signifies that License Manager operates
+         in Autonomous mode after losing its connection to a previously
+         installed License Key File."
+    ::= { eriRouterLicenseMgrNotifications 1 }
+
+eriRouterLicenseMgrAutonomousModeActivatedAlarmCleared NOTIFICATION-TYPE
+OBJECTS {
+        eriRouterLicenseMgrEventDateAndTime,
+        eriRouterLicenseMgrEventAdditionalText
+    }
+    STATUS current
+    DESCRIPTION
+         "This notification signifies either License Manager autonomous
+         mode expires or connection to installed key file gets restored.
+         If autonomous mode expires and connection to key file is still
+         not restored, eriRouterLicenseMgrKeyFileFaultAlarm shall be raised."
+    ::= { eriRouterLicenseMgrNotifications 2 }
+
+eriRouterLicenseMgrCapacityUsageThresholdReachedAlarm NOTIFICATION-TYPE
+OBJECTS {
+        eriRouterLicenseMgrLicenseKey,
+        eriRouterLicenseMgrEventDateAndTime,
+        eriRouterLicenseMgrEventSeverity,
+        eriRouterLicenseMgrEventAdditionalText
+    }
+    STATUS current
+    DESCRIPTION
+         "This notification signifies that usage of a given capacity
+         has reached the warning threshold or the licensed level.
+         eriRouterLicenseMgrEventSeverity has the value 'warning' when
+         the capacity usage has reached the warning threshold but
+         remained below the licensed level if warning threshold applies
+         on the capacity and the threshold is not set to 100%.
+         eriRouterLicenseMgrEventSeverity has the value 'major' when
+         the capacity usage has reached the licensed level."
+    ::= { eriRouterLicenseMgrNotifications 3 }
+
+eriRouterLicenseMgrCapacityUsageThresholdReachedAlarmCleared NOTIFICATION-TYPE
+OBJECTS {
+        eriRouterLicenseMgrLicenseKey,
+        eriRouterLicenseMgrEventDateAndTime,
+        eriRouterLicenseMgrEventAdditionalText
+    }
+    STATUS current
+    DESCRIPTION
+         "This notification signifies that capacity usage has gone
+         below the licensed level minus the hysteresis value and
+         warning threshold does not apply or is set to 100%. Or
+         capacity usage goes below the warning threshold."
+    ::= { eriRouterLicenseMgrNotifications 4 }
+
+eriRouterLicenseMgrEmergencyUnlockResetKeyRequiredAlarm NOTIFICATION-TYPE
+OBJECTS {
+        eriRouterLicenseMgrEventDateAndTime,
+        eriRouterLicenseMgrEventSeverity,
+        eriRouterLicenseMgrEventAdditionalText
+    }
+    STATUS current
+    DESCRIPTION
+         "This notification signifies that Emergency Unlock Reset key
+         needs to be installed in order to reset the Emergency Unlock counter.
+         eriRouterLicenseMgrEventSeverity has the value 'warning' when
+         Emergency Unlock is activated for the first time.
+         eriRouterLicenseMgrEventSeverity has the value 'major' when
+         Emergency Unlock is activated for the second time."
+    ::= { eriRouterLicenseMgrNotifications 5 }
+
+eriRouterLicenseMgrEmergencyUnlockResetKeyRequiredAlarmCleared NOTIFICATION-TYPE
+OBJECTS {
+        eriRouterLicenseMgrEventDateAndTime,
+        eriRouterLicenseMgrEventAdditionalText
+    }
+    STATUS current
+    DESCRIPTION
+         "This notification signifies that a key file containing
+         a valid Emergency Unlock Reset key is installed."
+    ::= { eriRouterLicenseMgrNotifications 6 }
+
+eriRouterLicenseMgrKeyFileFault NOTIFICATION-TYPE
+OBJECTS {
+        eriRouterLicenseMgrEventDateAndTime,
+        eriRouterLicenseMgrEventSeverity,
+        eriRouterLicenseMgrEventAdditionalText
+    }
+    STATUS current
+    DESCRIPTION
+         "This notification signifies that the license key file
+         used by License Manager remains unavailable after the
+         24 hour Autonomous mode period and the License Manager
+         has entered Locked mode"
+    ::= { eriRouterLicenseMgrNotifications 7 }
+
+eriRouterLicenseMgrKeyFileFaultCleared NOTIFICATION-TYPE
+OBJECTS {
+        eriRouterLicenseMgrEventDateAndTime,
+        eriRouterLicenseMgrEventAdditionalText
+    }
+    STATUS current
+    DESCRIPTION
+         "This notification signifies that a key file
+         is successfully installed or the last installed
+         key file becomes locatable by the License Manager."
+    ::= { eriRouterLicenseMgrNotifications 8 }
+
+eriRouterLicenseMgrLicenseKeyNotAvailableAlarm NOTIFICATION-TYPE
+OBJECTS {
+        eriRouterLicenseMgrLicenseKey,
+        eriRouterLicenseMgrEventDateAndTime,
+        eriRouterLicenseMgrEventSeverity,
+        eriRouterLicenseMgrEventAdditionalText
+    }
+    STATUS current
+    DESCRIPTION
+         "This notification signifies that licensed features and
+         capacities cannot be used because the corresponding license
+         key(s) is unavailable. eriRouterLicenseMgrEventSeverity
+         has the value 'minor' when license has entered the expiration
+         warning period. eriRouterLicenseMgrEventSeverity has the value
+         'major' when license has been expired or license cannot be found."
+    ::= { eriRouterLicenseMgrNotifications 9 }
+
+eriRouterLicenseMgrLicenseKeyNotAvailableAlarmCleared NOTIFICATION-TYPE
+OBJECTS {
+        eriRouterLicenseMgrLicenseKey,
+        eriRouterLicenseMgrEventDateAndTime,
+        eriRouterLicenseMgrEventAdditionalText
+    }
+    STATUS current
+    DESCRIPTION
+         "This notification signifies that the necessary
+         license key becomes available, or the key for which
+         the alarm was issued is not needed anymore."
+    ::= { eriRouterLicenseMgrNotifications 10 }
+
+eriRouterLicenseMgrPortDisabledDueToCapacityExceededAlarm NOTIFICATION-TYPE
+OBJECTS {
+        eriRouterLicenseMgrEventCardSlot,
+        eriRouterLicenseMgrEventPort,
+        eriRouterLicenseMgrEventDateAndTime,
+        eriRouterLicenseMgrEventSeverity
+    }
+    STATUS current
+    DESCRIPTION
+         "This notification signifies that a port has been disabled due to
+          insufficient port license capacity."
+    ::= { eriRouterLicenseMgrNotifications 11 }
+
+eriRouterLicenseMgrPortDisabledDueToCapacityExceededAlarmCleared NOTIFICATION-TYPE
+OBJECTS {
+        eriRouterLicenseMgrEventCardSlot,
+        eriRouterLicenseMgrEventPort,
+        eriRouterLicenseMgrEventDateAndTime
+    }
+    STATUS current
+    DESCRIPTION
+         "This notification signifies that the necessary license becomes
+          available, or the license for which the alarm was issued is not
+          needed anymore."
+    ::= { eriRouterLicenseMgrNotifications 12 }
+
+eriRouterLicenseMgrBasePackageLicenseIsMissing NOTIFICATION-TYPE
+OBJECTS {
+        eriRouterLicenseMgrEventDateAndTime,
+        eriRouterLicenseMgrEventSeverity,
+        eriRouterLicenseMgrEventAdditionalText
+    }
+    STATUS current
+    DESCRIPTION
+         "This notification indicates that the system is in grace period because
+          the Base package license is expired or invalid."
+    ::= { eriRouterLicenseMgrNotifications 13 }
+
+eriRouterLicenseMgrBasePackageLicenseIsMissingCleared NOTIFICATION-TYPE
+OBJECTS {
+        eriRouterLicenseMgrEventDateAndTime,
+        eriRouterLicenseMgrEventSeverity,
+        eriRouterLicenseMgrEventAdditionalText
+    }
+    STATUS current
+    DESCRIPTION
+         "This notification signifies that the necessary license becomes
+          available, or the license for which the alarm was issued is not
+          needed anymore."
+    ::= { eriRouterLicenseMgrNotifications 14 }
+
+--
+-- compliance statements
+--
+eriRouterLicenseMgrCompliances OBJECT IDENTIFIER ::= { eriRouterLicenseMgrConformance 1 }
+eriRouterLicenseMgrGroups      OBJECT IDENTIFIER ::= { eriRouterLicenseMgrConformance 2 }
+
+eriRouterLicenseMgrCompliance MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION
+        "The compliance statement for SNMP entities which implement
+         the LICENSE MGR MIB."
+
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+            eriRouterLicenseMgrNotifyObjectGroup,
+            eriRouterLicenseMgrNotifyGroup
+        }
+    ::= { eriRouterLicenseMgrCompliances 1 }
+
+eriRouterLicenseMgrComplianceV2 MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+        "The compliance statement for SNMP entities which implement
+         the LICENSE MGR MIB."
+
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+            eriRouterLicenseMgrNotifyObjectGroupV2,
+            eriRouterLicenseMgrNotifyGroupV2
+        }
+    ::= { eriRouterLicenseMgrCompliances 2 }
+
+--
+-- groupings
+--
+eriRouterLicenseMgrNotifyObjectGroup OBJECT-GROUP
+    OBJECTS {
+        eriRouterLicenseMgrLicenseKey,
+        eriRouterLicenseMgrEventDateAndTime,
+        eriRouterLicenseMgrEventSeverity,
+        eriRouterLicenseMgrEventAdditionalText
+    }
+    STATUS current
+    DESCRIPTION
+        "The collection of objects related to LICENSE MGR
+        notifications."
+    ::= { eriRouterLicenseMgrGroups 1 }
+
+eriRouterLicenseMgrNotifyGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        eriRouterLicenseMgrAutonomousModeActivatedAlarm,
+        eriRouterLicenseMgrAutonomousModeActivatedAlarmCleared,
+        eriRouterLicenseMgrCapacityUsageThresholdReachedAlarm,
+        eriRouterLicenseMgrCapacityUsageThresholdReachedAlarmCleared,
+        eriRouterLicenseMgrEmergencyUnlockResetKeyRequiredAlarm,
+        eriRouterLicenseMgrEmergencyUnlockResetKeyRequiredAlarmCleared,
+        eriRouterLicenseMgrKeyFileFault,
+        eriRouterLicenseMgrKeyFileFaultCleared,
+        eriRouterLicenseMgrLicenseKeyNotAvailableAlarm,
+        eriRouterLicenseMgrLicenseKeyNotAvailableAlarmCleared
+    }
+    STATUS current
+    DESCRIPTION
+        "Notification for tracking LICENSE MGR events."
+    ::= { eriRouterLicenseMgrGroups 2 }
+
+eriRouterLicenseMgrNotifyObjectGroupV2 OBJECT-GROUP
+    OBJECTS {
+        eriRouterLicenseMgrLicenseKey,
+        eriRouterLicenseMgrEventDateAndTime,
+        eriRouterLicenseMgrEventSeverity,
+        eriRouterLicenseMgrEventAdditionalText,
+        eriRouterLicenseMgrEventCardSlot,
+        eriRouterLicenseMgrEventPort
+    }
+    STATUS current
+    DESCRIPTION
+        "The collection of objects related to licensing notifications."
+    ::= { eriRouterLicenseMgrGroups 3 }
+
+eriRouterLicenseMgrNotifyGroupV2 NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        eriRouterLicenseMgrAutonomousModeActivatedAlarm,
+        eriRouterLicenseMgrAutonomousModeActivatedAlarmCleared,
+        eriRouterLicenseMgrCapacityUsageThresholdReachedAlarm,
+        eriRouterLicenseMgrCapacityUsageThresholdReachedAlarmCleared,
+        eriRouterLicenseMgrEmergencyUnlockResetKeyRequiredAlarm,
+        eriRouterLicenseMgrEmergencyUnlockResetKeyRequiredAlarmCleared,
+        eriRouterLicenseMgrKeyFileFault,
+        eriRouterLicenseMgrKeyFileFaultCleared,
+        eriRouterLicenseMgrLicenseKeyNotAvailableAlarm,
+        eriRouterLicenseMgrLicenseKeyNotAvailableAlarmCleared,
+        eriRouterLicenseMgrPortDisabledDueToCapacityExceededAlarm,
+        eriRouterLicenseMgrPortDisabledDueToCapacityExceededAlarmCleared,
+        eriRouterLicenseMgrBasePackageLicenseIsMissing,
+        eriRouterLicenseMgrBasePackageLicenseIsMissingCleared
+    }
+    STATUS current
+    DESCRIPTION
+        "Notification for tracking licensing events."
+    ::= { eriRouterLicenseMgrGroups 4 }
+
+END

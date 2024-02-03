@@ -1,0 +1,485 @@
+-- %DNP%
+-- %DNP% $Source: /cvsroot/pkt/sw/se/xc/bsd/config/snmp/mibs/Attic/ERICSSON-ROUTER-ICR-MIB.my,v $
+-- *****************************************************************
+-- ERICSSON-ROUTER-ICR-MIB    Ericsson Inter Chassis Resilience(ICR) MIB
+--
+-- Copyright (c) 2011, 2015 Ericsson AB.
+-- All rights reserved.
+--
+-- *****************************************************************
+
+ERICSSON-ROUTER-ICR-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, Integer32
+        FROM SNMPv2-SMI
+
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+
+    RowStatus
+        FROM SNMPv2-TC
+
+    InetAddressType, InetAddress, InetPortNumber
+        FROM INET-ADDRESS-MIB
+
+    eriRouterMgmt
+        FROM ERICSSON-ROUTER-SMI;
+
+eriRouterIcrMIB MODULE-IDENTITY
+    LAST-UPDATED    "201501141800Z" -- Jan 14, 2015
+    ORGANIZATION    "Ericsson AB."
+    CONTACT-INFO
+            "       Ericsson, Inc.
+
+            Postal: 100 Headquarters Drive
+                    San Jose, CA  95134-1370
+                    USA
+
+             Phone: +1 408 750 5000
+               Fax: +1 408 750 5599"
+    DESCRIPTION
+        "This MIB describes objects used for managing Inter Chassis
+        Resilience(ICR)."
+
+    REVISION        "201501141800Z" -- Jan 14, 2015
+    DESCRIPTION
+        "Updated RBN/rbn/Rbn as ERICSSON-ROUTER/eriRouter/EriRouter
+         to migrate RBN MIB to ERICSSON MIB."
+
+    REVISION        "201101100000Z" -- Jan 10, 2011
+    DESCRIPTION
+        "Initial Version."
+    ::= { eriRouterMgmt 101 }
+
+eriRouterIcrNotifications  OBJECT IDENTIFIER ::= { eriRouterIcrMIB 0 }
+eriRouterIcrMIBObjects     OBJECT IDENTIFIER ::= { eriRouterIcrMIB 1 }
+eriRouterIcrMIBConformance OBJECT IDENTIFIER ::= { eriRouterIcrMIB 2 }
+
+--
+-- Inter Chassis Resilience(ICR) Table
+--
+eriRouterIcrTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EriRouterIcrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table consists of ICR management objects."
+    ::= { eriRouterIcrMIBObjects 1 }
+
+eriRouterIcrEntry OBJECT-TYPE
+    SYNTAX      EriRouterIcrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry contains management objects of an ICR node."
+    INDEX { eriRouterIcrId }
+    ::= { eriRouterIcrTable 1 }
+
+EriRouterIcrEntry ::=
+    SEQUENCE {
+        eriRouterIcrId                Integer32,
+        eriRouterIcrLocalAddressType  InetAddressType,
+        eriRouterIcrLocalAddress      InetAddress,
+        eriRouterIcrLocalPort         InetPortNumber,
+        eriRouterIcrPeerAddressType   InetAddressType,
+        eriRouterIcrPeerAddress       InetAddress,
+        eriRouterIcrPeerPort          InetPortNumber,
+        eriRouterIcrPriority          INTEGER,
+        eriRouterIcrKeepAliveInterval Integer32,
+        eriRouterIcrHoldTime          Integer32,
+        eriRouterIcrState             INTEGER,
+        eriRouterIcrAdminStatus       INTEGER,
+        eriRouterIcrRowStatus         RowStatus
+    }
+
+eriRouterIcrId OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  not-accessible 
+    STATUS      current
+    DESCRIPTION
+        "The unique identifier of the ICR node."
+    ::= { eriRouterIcrEntry 1 }
+
+eriRouterIcrLocalAddressType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the type of 'eriRouterIcrLocalAddress'."
+    DEFVAL { unknown }
+    ::= { eriRouterIcrEntry 2 }
+
+eriRouterIcrLocalAddress OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the local address used to send/receive
+        ICR messages. The type of the address is determined by the
+        corresponding 'eriRouterIcrLocalAddressType'."
+    DEFVAL { ''H }
+    ::= { eriRouterIcrEntry 3 }
+
+eriRouterIcrLocalPort OBJECT-TYPE
+    SYNTAX      InetPortNumber 
+    MAX-ACCESS  read-create 
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the local port number used to send/receive ICR
+        messages."
+    DEFVAL { 0 }
+    ::= { eriRouterIcrEntry 4 }
+
+eriRouterIcrPeerAddressType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-create 
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the type of 'eriRouterIcrPeerAddress'." 
+    DEFVAL { unknown }
+    ::= { eriRouterIcrEntry 5 }
+
+eriRouterIcrPeerAddress OBJECT-TYPE
+    SYNTAX      InetAddress 
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the address used by the peer ICR node to
+        send/receive ICR messages. The type of the address is determined by
+        the corresponding 'eriRouterIcrPeerAddressType'."
+    DEFVAL { ''H }
+    ::= { eriRouterIcrEntry 6 }
+
+eriRouterIcrPeerPort OBJECT-TYPE
+    SYNTAX      InetPortNumber 
+    MAX-ACCESS  read-create 
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the port number used by the peer ICR node
+        to send/receive ICR messages."
+    DEFVAL { 0 }
+    ::= { eriRouterIcrEntry 7 }
+
+eriRouterIcrPriority OBJECT-TYPE
+    SYNTAX      INTEGER {
+        low(1),
+        high(2)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the ICR priority. The priority is used
+        for setting the initial preference level when the prefixes are
+        advertised and is used for tie-break in case both the local ICR
+        node and its peer node are booted up at the same time.
+        The local and the peer ICR nodes MUST configure different priorities"
+    DEFVAL { low }
+    ::= { eriRouterIcrEntry 8 }
+
+eriRouterIcrKeepAliveInterval OBJECT-TYPE
+    SYNTAX      Integer32 
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the interval that the node sends ICR
+        keep alive messages to its peer node."
+    DEFVAL { 1 }
+    ::= { eriRouterIcrEntry 9 }
+
+eriRouterIcrHoldTime OBJECT-TYPE
+    SYNTAX      Integer32 
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the time, after which, if the node
+        has not received a ICR keep alive message from its peer node, it
+        declares the peer loss."
+    DEFVAL { 10 }
+    ::= { eriRouterIcrEntry 10 }
+
+eriRouterIcrState OBJECT-TYPE
+    SYNTAX      INTEGER {
+        initialize(1),
+        active(2),
+        standby(3),
+        pendingStandby(4)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "The current ICR state:
+
+         - 'initialize', which indicates that the node is in
+            the process of deciding its role(active or standby).
+
+         - 'active', which indicates that the node operates as ICR active
+            node.
+
+         - 'standby', which indicates that the node operates as ICR
+            standby node.
+
+         - 'pendingStandby', which indicates that the node(previously in
+            'active' state) is waiting for operator intervention to transit
+            to 'standby' state after ICR switchover."
+     ::= { eriRouterIcrEntry 11 }
+
+eriRouterIcrAdminStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+        up(1),
+        down(2)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+         "This object controls ICR node. Setting this object to 'up' will
+         enable the ICR node. The node will transition from 'initialize' state
+         to 'active' or 'standby' state depending on the value of
+         'eriRouterIcrPriority'. Setting this object to 'down' will disable the
+         ICR node. The node will transition from its current state to
+         'initialize'.
+
+         To modify other 'read-create' objects in the conceptual row, the
+         'eriRouterIcrAdminStatus' object must be set to 'down'. The value of
+         the 'eriRouterIcrRowStatus' object must be 'active' in order for this
+         object to be set to 'up'."
+     DEFVAL { down }
+     ::= { eriRouterIcrEntry 12 }
+
+eriRouterIcrRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus 
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+         "The object is used to create and delete 'eriRouterIcrEntry' conceptual
+         rows.
+
+         Except 'eriRouterIcrAdminStatus', 'read-create' objects in the conceptual
+         row cannot be modified when eriRouterIcrRowStatus is set to active(1).
+
+         To change 'eriRouterIcrRowStatus' from 'active' to a different value,
+         the 'eriRouterIcrAdminStatus' object must be 'down'.
+
+         To create a row in this table, 'eriRouterIcrRowStatus' could be set to 
+         either 'createAndGo(4)' or 'createAndWait(5)'. Until all objects in
+         the conceptual row are appropriately configured, 'eriRouterIcrRowStatus' 
+         will transit to 'notReady(3)'."
+    ::= { eriRouterIcrEntry 13 }
+
+--
+-- ICR Notifications 
+--
+eriRouterIcrInconsistencyError OBJECT-TYPE
+    SYNTAX      INTEGER {
+        peerUp(0),
+        peerLoss(1)
+    }
+    MAX-ACCESS  accessible-for-notify 
+    STATUS      current
+    DESCRIPTION
+         "This object indicates the ICR inconsistency error code."
+    ::= { eriRouterIcrMIBObjects 2 }
+
+eriRouterIcrNewActive NOTIFICATION-TYPE
+    OBJECTS     {
+        eriRouterIcrLocalAddressType,
+        eriRouterIcrLocalAddress,
+        eriRouterIcrLocalPort,
+        eriRouterIcrState
+    }
+    STATUS      current
+    DESCRIPTION
+        "This notification is sent when the state of the ICR node has changed
+        to active."
+    ::= { eriRouterIcrNotifications 1 }
+
+eriRouterIcrNewStandby NOTIFICATION-TYPE
+    OBJECTS     {
+        eriRouterIcrLocalAddressType,
+        eriRouterIcrLocalAddress,
+        eriRouterIcrLocalPort,
+        eriRouterIcrPeerAddressType,
+        eriRouterIcrPeerAddress,
+        eriRouterIcrPeerPort,
+        eriRouterIcrState
+    }
+    STATUS      current
+    DESCRIPTION
+        "This notification is sent when the state of the ICR node has changed
+        to standby."
+    ::= { eriRouterIcrNotifications 2 }
+
+eriRouterIcrNewPendingStandby NOTIFICATION-TYPE
+    OBJECTS     {
+        eriRouterIcrLocalAddressType,
+        eriRouterIcrLocalAddress,
+        eriRouterIcrLocalPort,
+        eriRouterIcrPeerAddressType,
+        eriRouterIcrPeerAddress,
+        eriRouterIcrPeerPort,
+        eriRouterIcrState
+    }
+    STATUS      current
+    DESCRIPTION
+        "This notification is sent when the state of the ICR node has changed
+        to pendingStandby."
+    ::= { eriRouterIcrNotifications 3 }
+
+eriRouterIcrInconsistency NOTIFICATION-TYPE
+    OBJECTS     {
+        eriRouterIcrLocalAddressType,
+        eriRouterIcrLocalAddress,
+        eriRouterIcrLocalPort,
+        eriRouterIcrPeerAddressType,
+        eriRouterIcrPeerAddress,
+        eriRouterIcrPeerPort,
+        eriRouterIcrInconsistencyError
+    }
+    STATUS      current
+    DESCRIPTION
+        "This notification is sent when an ICR inconsistency error is
+        encountered."
+    ::= { eriRouterIcrNotifications 4 }
+
+eriRouterIcrVrrpInconsistency NOTIFICATION-TYPE
+    OBJECTS     {
+        eriRouterIcrLocalAddressType,
+        eriRouterIcrLocalAddress,
+        eriRouterIcrLocalPort,
+        eriRouterIcrPeerAddressType,
+        eriRouterIcrPeerAddress,
+        eriRouterIcrPeerPort,
+        eriRouterIcrInconsistencyError
+    }
+    STATUS      current
+    DESCRIPTION
+        "This notification is sent when VRRP master/master split scenario is
+        encountered."
+    ::= { eriRouterIcrNotifications 5 }
+
+--
+-- Conformance Information
+--
+eriRouterIcrMIBCompliances OBJECT IDENTIFIER ::= { eriRouterIcrMIBConformance 1 }
+eriRouterIcrMIBGroups      OBJECT IDENTIFIER ::= { eriRouterIcrMIBConformance 2 }
+
+eriRouterIcrMIBCompliance MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION
+        "The compliance statement for ICR MIB implementations."
+    MODULE -- this module
+    MANDATORY-GROUPS  {
+        eriRouterIcrGroup,
+        eriRouterIcrNotificationObjectGroup,
+        eriRouterIcrNotificationGroup
+    }
+
+    OBJECT eriRouterIcrLocalAddressType
+    SYNTAX      InetAddressType { unknown(0), ipv4(1), ipv6(2) }
+    MIN-ACCESS  read-only
+    DESCRIPTION
+        "Write access is not required. Only IPv4 and IPv6 addresses
+        require to support."
+
+    OBJECT eriRouterIcrLocalAddress
+    SYNTAX      InetAddress (SIZE(0|4|16))
+    MIN-ACCESS  read-only
+    DESCRIPTION
+        "Write access is not required. Only IPv4 and IPv6 addresses 
+        require to support."
+
+    OBJECT eriRouterIcrLocalPort
+    MIN-ACCESS  read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT eriRouterIcrPeerAddressType
+    SYNTAX      InetAddressType { unknown(0), ipv4(1), ipv6(2) }
+    MIN-ACCESS  read-only
+    DESCRIPTION
+        "Write access is not required. Only IPv4 and IPv6 addresses
+        require to support."
+
+    OBJECT eriRouterIcrPeerAddress
+    SYNTAX      InetAddress (SIZE(0|4|16))
+    MIN-ACCESS  read-only
+    DESCRIPTION
+        "Write access is not required. Only IPv4 and IPv6 addresses
+        require to support."
+
+    OBJECT eriRouterIcrPeerPort
+    MIN-ACCESS  read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT eriRouterIcrPriority 
+    MIN-ACCESS  read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT eriRouterIcrKeepAliveInterval 
+    MIN-ACCESS  read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT eriRouterIcrHoldTime 
+    MIN-ACCESS  read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT eriRouterIcrAdminStatus
+    MIN-ACCESS  read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT eriRouterIcrRowStatus
+    MIN-ACCESS  read-only
+    DESCRIPTION
+        "Write access is not required."
+    ::= { eriRouterIcrMIBCompliances 1 }
+
+eriRouterIcrGroup OBJECT-GROUP
+    OBJECTS  {
+        eriRouterIcrLocalAddressType,
+        eriRouterIcrLocalAddress,
+        eriRouterIcrLocalPort,
+        eriRouterIcrPeerAddressType,
+        eriRouterIcrPeerAddress,
+        eriRouterIcrPeerPort,
+        eriRouterIcrPriority,
+        eriRouterIcrKeepAliveInterval,
+        eriRouterIcrHoldTime,
+        eriRouterIcrState,
+        eriRouterIcrAdminStatus,
+        eriRouterIcrRowStatus
+    }
+    STATUS current
+    DESCRIPTION
+       "Conformance group for ICR objects."
+    ::= { eriRouterIcrMIBGroups 1 }
+
+eriRouterIcrNotificationObjectGroup OBJECT-GROUP
+    OBJECTS  {
+        eriRouterIcrInconsistencyError
+    }
+    STATUS current
+    DESCRIPTION
+       "Conformance group for objects contained in ICR notifications."
+    ::= { eriRouterIcrMIBGroups 2 }
+
+eriRouterIcrNotificationGroup NOTIFICATION-GROUP 
+    NOTIFICATIONS {
+        eriRouterIcrNewActive,
+        eriRouterIcrNewStandby,
+        eriRouterIcrNewPendingStandby,
+        eriRouterIcrInconsistency,
+        eriRouterIcrVrrpInconsistency
+    }
+    STATUS current
+    DESCRIPTION
+       "Conformance group for ICR notifications."
+    ::= { eriRouterIcrMIBGroups 3 }
+
+END

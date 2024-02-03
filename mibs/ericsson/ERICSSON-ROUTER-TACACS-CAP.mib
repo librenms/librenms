@@ -1,0 +1,84 @@
+-- %DNP% $Id: ERICSSON-ROUTER-TACACS-CAP.my,v 1.1.4.1.370.3 2011/06/15 18:19:46 danielhe Exp $
+-- %ERICSSON-ROUTER% $Source: /cvsroot/pkt/sw/se/xc/bsd/config/snmp/mibs/Attic/ERICSSON-ROUTER-TACACS-CAP.my,v $
+-- *****************************************************************
+-- ERICSSON-ROUTER-TACACS-CAP     ERICSSON-ROUTER-TACACS-MIB Capabilities
+--
+-- Copyright (c) 2004, 2011, 2015 Ericsson AB
+-- All rights reserved.
+-- 
+-- *****************************************************************
+
+ERICSSON-ROUTER-TACACS-CAP DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY     FROM SNMPv2-SMI
+    AGENT-CAPABILITIES  FROM SNMPv2-CONF
+    eriRouterCapabilities     FROM ERICSSON-ROUTER-SMI;
+
+eriRouterTacacsCap MODULE-IDENTITY
+    LAST-UPDATED    "201501141800Z" -- Jan 14, 2015
+    ORGANIZATION    "Ericsson AB."
+    CONTACT-INFO
+            "       Ericsson AB.
+
+            Postal: 100 Headquarters Dr
+                    San Jose, CA  95134
+                    USA
+
+             Phone: +1 408 750 5000
+               Fax: +1 408 750 5599
+            "
+    DESCRIPTION
+        "The Agent Capabilities of the TACACS MIB module (ERICSSON-ROUTER-TACACS-MIB).
+
+        If this MIB implementation is platform-dependent,
+        the PRODUCT-RELEASE clause contains Ericsson SEOS version and
+        at least one of the following Ericsson product families:
+            [SE]  SmartEdge Multi-service Edge Router (MSER) family
+            [SM]  SM family of Metro Ethernet Service Transport platforms
+            [SSR] Smart Service Router (SSR) family"
+
+    REVISION    "201501141800Z" -- Jan 14, 2015
+    DESCRIPTION
+        "Updated RBN/rbn/Rbn as ERICSSON-ROUTER/eriRouter/EriRouter
+         to migrate RBN MIB to ERICSSON MIB."
+
+    REVISION    "201106150000Z" -- Jun 15, 2011
+    DESCRIPTION
+        "Update DESCRIPTION clause of MODULE-IDENTITY
+         and PRODUCT-RELEASE clause of AGENT-CAPABILITIES."
+
+    REVISION        "201101191800Z" -- Jan 19, 2011
+    DESCRIPTION
+        "Update CONTACT-INFO & ORGANIZATION. "
+
+    REVISION	"200406291800Z" -- June 29, 2004
+    DESCRIPTION
+        "add eriRouterTacacsCap2."
+
+    REVISION	"200403021800Z" -- March 2, 2004
+    DESCRIPTION
+        "Initial version."
+    ::= { eriRouterCapabilities 61 }
+    
+eriRouterTacacsCap1 AGENT-CAPABILITIES
+    PRODUCT-RELEASE "AOS 6.0.10.x"
+    STATUS	    current
+    DESCRIPTION	    "ERICSSON-ROUTER-TACACS-MIB capabilities"
+    SUPPORTS	    ERICSSON-ROUTER-TACACS-MIB
+    INCLUDES {
+        eriRouterTacacsNotifyGroup
+    }
+    ::= { eriRouterTacacsCap 1 }
+
+eriRouterTacacsCap2 AGENT-CAPABILITIES
+    PRODUCT-RELEASE "SEOS 2.6.5 [SE]; SEOS 6.3.X [SM]; SEOS 11.1.x [SSR]"
+    STATUS	    current
+    DESCRIPTION	    "ERICSSON-ROUTER-TACACS-MIB capabilities"
+    SUPPORTS	    ERICSSON-ROUTER-TACACS-MIB
+    INCLUDES {
+        eriRouterTacacsNotifyGroup
+    }
+    ::= { eriRouterTacacsCap 2 }
+
+END

@@ -1,0 +1,426 @@
+-- %DNP% $Id: ERICSSON-ROUTER-IETF-BGP4-CAP.my,v 1.1.6.3.250.4 2011/06/15 18:19:45 danielhe Exp $
+-- %DNP% $Source: /cvsroot/pkt/sw/se/xc/bsd/config/snmp/mibs/Attic/ERICSSON-ROUTER-IETF-BGP4-CAP.my,v $
+-- *****************************************************************
+-- ERICSSON-ROUTER-IETF-BGP4-CAP
+--
+-- Copyright (c) 2000, 2003-2006, 2010-2011, 2015 Ericsson AB
+-- All rights reserved.
+--
+-- *****************************************************************
+
+ERICSSON-ROUTER-IETF-BGP4-CAP DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY
+                FROM SNMPv2-SMI
+        AGENT-CAPABILITIES
+                FROM SNMPv2-CONF
+        eriRouterCapabilities
+                FROM ERICSSON-ROUTER-SMI;
+
+eriRouterIetfBgp4Cap MODULE-IDENTITY
+        LAST-UPDATED    "201501141800Z" -- Jan 14, 2015
+	ORGANIZATION	"Ericsson Inc."
+	CONTACT-INFO
+		"	Ericsson, Inc.
+
+		Postal:	100 Headquarters Dr.
+			San Jose, CA  95134
+			USA
+
+		 Phone:	+1 408 750 5000
+		   Fax: +1 408 750 5599
+
+		"
+        DESCRIPTION
+                "The Agent Capabilities of the 
+                implementation of the BGP4-MIB.
+
+                If this MIB implementation is platform-dependent,
+                the PRODUCT-RELEASE clause contains Ericsson SEOS version and
+                at least one of the following Ericsson product families:
+                    [SE]  SmartEdge Multi-service Edge Router (MSER) family
+                    [SM]  SM family of Metro Ethernet Service Transport platforms
+                    [SSR] Smart Service Router (SSR) family"
+
+        REVISION        "201501141800Z" -- Jan 14, 2015
+        DESCRIPTION
+                "Updated RBN/rbn/Rbn as ERICSSON-ROUTER/eriRouter/EriRouter
+                 to migrate RBN MIB to ERICSSON MIB."
+
+        REVISION        "201106150000Z" -- Jun 15, 2011
+        DESCRIPTION
+                "Update DESCRIPTION clause of MODULE-IDENTITY
+                and PRODUCT-RELEASE clause of AGENT-CAPABILITIES."
+
+	REVISION	"201011010000Z" -- Nov 1, 2010
+	DESCRIPTION
+		"Modified PRODUCT-RELEASE clause for consistent naming.
+                 Updated CONTACT-INFO."
+                
+        REVISION        "200403050000Z" -- March 5, 2004
+        DESCRIPTION
+                "Added eriRouterIetfBgp4Cap3 for SMS support of BGP4 notifications."
+
+        REVISION        "200304030000Z" -- April 3, 2003
+        DESCRIPTION
+                "Added eriRouterIetfBgp4Cap2 for SmartEdge."
+
+        REVISION        "200303120000Z" -- March 12, 2003
+        DESCRIPTION
+                "The status of eriRouterIetfBgp4Cap1 was changed to obsolete,
+                 since the MIB is not supported on the SMS."
+
+        REVISION        "200003050000Z" -- March 5, 2000
+        DESCRIPTION
+                "Initial version ."
+
+        ::= { eriRouterCapabilities 25 }
+
+eriRouterIetfBgp4Cap1 AGENT-CAPABILITIES
+        PRODUCT-RELEASE "AOS 4.0.X.X"
+        STATUS          obsolete
+        DESCRIPTION     "BGP4-MIB capabilities for SMS"
+        SUPPORTS        BGP4-MIB
+        INCLUDES { bgp4MIBGlobalsGroup,  
+                   bgp4MIBPeerGroup,     
+                   bgp4MIBPathAttrGroup, 
+                   bgp4MIBNotificationGroup 
+                 }
+
+        VARIATION            bgp4PathAttrAtomicAggregate    
+        ACCESS               not-implemented
+        DESCRIPTION
+                "This information is not available."
+
+        VARIATION            bgp4PathAttrAggregatorAS       
+        ACCESS               not-implemented
+        DESCRIPTION
+                "This information is not available."
+
+        VARIATION            bgp4PathAttrAggregatorAddr     
+        ACCESS               not-implemented
+        DESCRIPTION
+                "This information is not available."
+
+        VARIATION            bgp4PathAttrCalcLocalPref      
+        ACCESS               not-implemented
+        DESCRIPTION
+                "This information is not available."
+
+        VARIATION            bgp4PathAttrBest               
+        ACCESS               not-implemented
+        DESCRIPTION
+                "This information is not available."
+
+        VARIATION            bgp4PathAttrUnknown            
+        ACCESS               not-implemented
+        DESCRIPTION
+                "This information is not available."
+
+        VARIATION        bgpPeerAdminStatus             
+        ACCESS           read-only
+        DESCRIPTION
+                "Write access is not allowed."
+
+        VARIATION        bgpPeerConnectRetryInterval     
+        ACCESS           read-only
+        DESCRIPTION
+                "Write access is not allowed."
+
+        VARIATION        bgpPeerHoldTimeConfigured       
+        ACCESS           read-only
+        DESCRIPTION
+                "Write access is not allowed."
+
+        VARIATION        bgpPeerKeepAliveConfigured       
+        ACCESS           read-only
+        DESCRIPTION
+                "Write access is not allowed."
+
+        VARIATION        bgpPeerMinASOriginationInterval  
+        ACCESS           read-only
+        DESCRIPTION
+                "Write access is not allowed."
+
+        VARIATION        bgpPeerMinRouteAdvertisementInterval 
+        ACCESS           read-only
+        DESCRIPTION
+                "Write access is not allowed."
+
+        ::= { eriRouterIetfBgp4Cap 1  }       
+
+eriRouterIetfBgp4Cap2 AGENT-CAPABILITIES
+        PRODUCT-RELEASE "SEOS 2.5.x.x [SE]; SEOS 6.3.X [SM]; SEOS 11.1.X [SSR]"
+        STATUS          current
+        DESCRIPTION     "BGP4-MIB capabilities for SmartEdge"
+        SUPPORTS        BGP4-MIB
+        INCLUDES { bgp4MIBGlobalsGroup,  
+                   bgp4MIBPeerGroup,     
+                   bgp4MIBPathAttrGroup, 
+                   bgp4MIBNotificationGroup
+                 }
+
+        VARIATION        bgpPeerAdminStatus             
+        ACCESS           read-only
+        DESCRIPTION
+                "Write access is not allowed."
+
+        VARIATION        bgpPeerConnectRetryInterval     
+        ACCESS           read-only
+        DESCRIPTION
+                "Write access is not allowed."
+
+        VARIATION        bgpPeerHoldTimeConfigured       
+        ACCESS           read-only
+        DESCRIPTION
+                "Write access is not allowed."
+
+        VARIATION        bgpPeerKeepAliveConfigured       
+        ACCESS           read-only
+        DESCRIPTION
+                "Write access is not allowed."
+
+        VARIATION        bgpPeerMinASOriginationInterval  
+        ACCESS           read-only
+        DESCRIPTION
+                "Write access is not allowed."
+
+        VARIATION        bgpPeerMinRouteAdvertisementInterval 
+        ACCESS           read-only
+        DESCRIPTION
+                "Write access is not allowed."
+
+        ::= { eriRouterIetfBgp4Cap 2  }       
+
+eriRouterIetfBgp4Cap3 AGENT-CAPABILITIES
+        PRODUCT-RELEASE "AOS 6.0.X.X"
+        STATUS          current
+        DESCRIPTION     "BGP4-MIB capabilities for SMS"
+        SUPPORTS        BGP4-MIB
+        INCLUDES { bgp4MIBGlobalsGroup,  
+                   bgp4MIBPeerGroup,
+                   bgp4MIBPathAttrGroup,
+                   bgp4MIBNotificationGroup
+                 }
+
+
+        VARIATION        bgpPeerIdentifier
+        ACCESS           not-implemented
+        DESCRIPTION
+		"This information is not available."
+
+        VARIATION        bgpPeerAdminStatus
+        ACCESS           not-implemented
+        DESCRIPTION
+		"This information is not available."
+
+        VARIATION        bgpPeerNegotiatedVersion
+        ACCESS           not-implemented
+        DESCRIPTION
+		"This information is not available."
+
+        VARIATION        bgpPeerLocalAddr
+        ACCESS           not-implemented
+        DESCRIPTION
+		"This information is not available."
+
+        VARIATION        bgpPeerLocalPort
+        ACCESS           not-implemented
+        DESCRIPTION
+		"This information is not available."
+
+        VARIATION        bgpPeerRemotePort
+        ACCESS           not-implemented
+        DESCRIPTION
+		"This information is not available."
+
+        VARIATION        bgpPeerRemoteAs
+        ACCESS           not-implemented
+        DESCRIPTION
+		"This information is not available."
+
+        VARIATION        bgpPeerInUpdates
+        ACCESS           not-implemented
+        DESCRIPTION
+		"This information is not available."
+
+        VARIATION        bgpPeerOutUpdates
+        ACCESS           not-implemented
+        DESCRIPTION
+		"This information is not available."
+
+        VARIATION        bgpPeerOutTotalMessages
+        ACCESS           not-implemented
+        DESCRIPTION
+		"This information is not available."
+
+        VARIATION        bgpPeerFsmEstablishedTransitions
+        ACCESS           not-implemented
+        DESCRIPTION
+		"This information is not available."
+
+        VARIATION        bgpPeerFsmEstablishedTime
+        ACCESS           not-implemented
+        DESCRIPTION
+		"This information is not available."
+
+        VARIATION        bgpPeerConnectRetryInterval
+        ACCESS           not-implemented
+        DESCRIPTION
+		"This information is not available."
+
+        VARIATION        bgpPeerHoldTime
+        ACCESS           not-implemented
+        DESCRIPTION
+		"This information is not available."
+
+        VARIATION        bgpPeerKeepAlive
+        ACCESS           not-implemented
+        DESCRIPTION
+		"This information is not available."
+
+        VARIATION        bgpPeerHoldTimeConfigured
+        ACCESS           not-implemented
+        DESCRIPTION
+		"This information is not available."
+
+        VARIATION        bgpPeerKeepAliveConfigured
+        ACCESS           not-implemented
+        DESCRIPTION
+		"This information is not available."
+
+        VARIATION        bgpPeerMinASOriginationInterval
+        ACCESS           not-implemented
+        DESCRIPTION
+		"This information is not available."
+
+        VARIATION        bgpPeerMinRouteAdvertisementInterval
+        ACCESS           not-implemented
+        DESCRIPTION
+		"This information is not available."
+
+        VARIATION        bgpPeerInUpdateElapsedTime
+        ACCESS           not-implemented
+        DESCRIPTION
+		"This information is not available."
+
+        VARIATION        bgpPeerRemoteAddr
+        ACCESS           accessible-for-notify 
+        DESCRIPTION
+                "This object is available only in notifications."
+
+        VARIATION        bgpPeerLastError
+        ACCESS           accessible-for-notify
+        DESCRIPTION
+                "This object is available only in notifications."
+
+        VARIATION        bgpPeerState
+        ACCESS           accessible-for-notify
+        DESCRIPTION
+                "This object is available only in notifications."
+
+        VARIATION        bgpPathAttrPeer
+        ACCESS           not-implemented
+        DESCRIPTION
+		"This information is not available."
+
+        VARIATION        bgpPathAttrDestNetwork
+        ACCESS           not-implemented
+        DESCRIPTION
+		"This information is not available."
+
+        VARIATION        bgpPathAttrOrigin
+        ACCESS           not-implemented
+        DESCRIPTION
+		"This information is not available."
+
+        VARIATION        bgpPathAttrASPath
+        ACCESS           not-implemented
+        DESCRIPTION
+		"This information is not available."
+
+        VARIATION        bgpPathAttrNextHop
+        ACCESS           not-implemented
+        DESCRIPTION
+		"This information is not available."
+
+        VARIATION        bgpPathAttrInterASMetric
+        ACCESS           not-implemented
+        DESCRIPTION
+		"This information is not available."
+
+        VARIATION        bgp4PathAttrPeer
+        ACCESS           not-implemented
+        DESCRIPTION
+		"This information is not available."
+
+        VARIATION        bgp4PathAttrIpAddrPrefixLen
+        ACCESS           not-implemented
+        DESCRIPTION
+		"This information is not available."
+
+        VARIATION        bgp4PathAttrIpAddrPrefix
+        ACCESS           not-implemented
+        DESCRIPTION
+		"This information is not available."
+
+        VARIATION        bgp4PathAttrOrigin
+        ACCESS           not-implemented
+        DESCRIPTION
+		"This information is not available."
+
+        VARIATION        bgp4PathAttrASPathSegment
+        ACCESS           not-implemented
+        DESCRIPTION
+		"This information is not available."
+
+        VARIATION        bgp4PathAttrNextHop
+        ACCESS           not-implemented
+        DESCRIPTION
+		"This information is not available."
+
+        VARIATION        bgp4PathAttrMultiExitDisc
+        ACCESS           not-implemented
+        DESCRIPTION
+		"This information is not available."
+
+        VARIATION        bgp4PathAttrLocalPref
+        ACCESS           not-implemented
+        DESCRIPTION
+		"This information is not available."
+
+        VARIATION        bgp4PathAttrAtomicAggregate
+        ACCESS           not-implemented
+        DESCRIPTION
+		"This information is not available."
+
+        VARIATION        bgp4PathAttrAggregatorAS
+        ACCESS           not-implemented
+        DESCRIPTION
+		"This information is not available."
+
+        VARIATION        bgp4PathAttrAggregatorAddr
+        ACCESS           not-implemented
+        DESCRIPTION
+		"This information is not available."
+
+        VARIATION        bgp4PathAttrCalcLocalPref
+        ACCESS           not-implemented
+        DESCRIPTION
+		"This information is not available."
+
+        VARIATION        bgp4PathAttrBest
+        ACCESS           not-implemented
+        DESCRIPTION
+		"This information is not available."
+
+        VARIATION        bgp4PathAttrUnknown
+        ACCESS           not-implemented
+        DESCRIPTION
+		"This information is not available."
+
+        ::= { eriRouterIetfBgp4Cap 3  }
+
+
+END

@@ -1,0 +1,46 @@
+--
+-- Copyright (c) 2001 by Ericsson AB.
+-- All rights reserved.
+--
+ERICSSON-SNF-TOP-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+	MODULE-IDENTITY,
+	OBJECT-IDENTITY
+		FROM SNMPv2-SMI
+		ericsson
+		FROM ERICSSON-TOP-MIB;
+
+snfTopMib MODULE-IDENTITY
+	LAST-UPDATED "200112200000Z"
+	ORGANIZATION "Put the right things here"
+	CONTACT-INFO
+		"E-mail: snf-contact@ericsson.com (or whatever)"
+	DESCRIPTION
+		"This provides the top level of the MIB
+		infrastructure for SNF.
+		Document number: 7/1551-FAY 320 0008 A"
+	::= { ericsson 110 }
+
+snfTC OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		"This branch is for defining TEXTUAL-CONVENTIONS
+		in all of the SNF-related MIBs."
+	::= { snfTopMib 1 }
+
+snfGeneric OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		"This branch is used for MIB objects
+		that are generic and apply across multiple
+		products."
+	::= { snfTopMib 2 }
+
+snfProductSpecific OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		"This branch is used for MIBs that are product
+		specific. Each product is given a specific
+		branch under snfProductSpecific."
+	::= { snfTopMib 3 }
+END

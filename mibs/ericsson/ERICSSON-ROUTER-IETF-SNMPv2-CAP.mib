@@ -1,0 +1,130 @@
+-- %DNP% $Id: ERICSSON-ROUTER-IETF-SNMPv2-CAP.my,v 1.1.6.3.452.4 2011/06/15 18:19:45 danielhe Exp $
+-- %DNP% $Source: /cvsroot/pkt/sw/se/xc/bsd/config/snmp/mibs/ERICSSON-ROUTER-IETF-SNMPv2-CAP.my,v $
+-- *****************************************************************
+-- ERICSSON-ROUTER-IETF-SNMPv2-CAP.my:	IETF SNMPv2-MIB Agent Capabilities
+--
+-- Copyright (c) 1998, 2001-2002, 2010-2011, 2015 Ericsson AB
+-- All rights reserved.
+-- 
+-- *****************************************************************
+
+ERICSSON-ROUTER-IETF-SNMPv2-CAP DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY
+		FROM SNMPv2-SMI
+	AGENT-CAPABILITIES
+		FROM SNMPv2-CONF
+	eriRouterCapabilities
+		FROM ERICSSON-ROUTER-SMI;
+
+eriRouterIetfSnmpv2Cap MODULE-IDENTITY
+        LAST-UPDATED    "201501141800Z" -- Jan 14, 2015
+	ORGANIZATION	"Ericsson Inc."
+	CONTACT-INFO
+		"	Ericsson, Inc.
+
+		Postal:	100 Headquarters Dr.
+			San Jose, CA  95134
+			USA
+
+		 Phone:	+1 408 750 5000
+		   Fax: +1 408 750 5599
+		"
+	DESCRIPTION
+		"The Agent Capabilities of the 
+		implementation of the IETF SNMPv2-MIB (RFC 1907).
+
+                If this MIB implementation is platform-dependent,
+                the PRODUCT-RELEASE clause contains Ericsson SEOS version and
+                at least one of the following Ericsson product families:
+                    [SE]  SmartEdge Multi-service Edge Router (MSER) family
+                    [SM]  SM family of Metro Ethernet Service Transport platforms
+                    [SSR] Smart Service Router (SSR) family"
+
+        REVISION        "201501141800Z" -- Jan 14, 2015
+        DESCRIPTION
+                "Updated RBN/rbn/Rbn as ERICSSON-ROUTER/eriRouter/EriRouter
+                to migrate RBN MIB to ERICSSON MIB."
+
+        REVISION        "201106150000Z" -- Jun 15, 2011
+        DESCRIPTION
+                "Update DESCRIPTION clause of MODULE-IDENTITY
+                and PRODUCT-RELEASE clause of AGENT-CAPABILITIES."
+
+        REVISION	"201011010000Z" -- Nov 1, 2010
+        DESCRIPTION
+	        "Modified PRODUCT-RELEASE clause for consistent naming.
+                Updated CONTACT-INFO."
+
+        REVISION        "200205290000Z" -- May 29, 2002
+        DESCRIPTION
+                "Put REVISIONs in correct order.
+                Update/correct CONTACT-INFO"
+
+        REVISION        "200202221138Z"  -- Feb. 22, 2002
+        DESCRIPTION
+                "Add eriRouterIetfSnmpv2Cap3; update contact-info"
+
+        REVISION        "200105172300Z"  -- May 17, 2001
+        DESCRIPTION
+                "Add eriRouterIetfSnmpv2Cap2; update contact-info"
+	::= { eriRouterCapabilities 1 }
+
+eriRouterIetfSnmpv2Cap1 AGENT-CAPABILITIES
+        PRODUCT-RELEASE "AOS 1.0.X.X"
+        STATUS          current
+        DESCRIPTION     "SNMPv2-MIB capabilities"
+        SUPPORTS        SNMPv2-MIB
+        INCLUDES {
+                systemGroup,
+                snmpGroup,
+                snmpSetGroup,
+                snmpBasicNotificationsGroup,
+                snmpCommunityGroup }
+        ::= { eriRouterIetfSnmpv2Cap 1 }
+
+eriRouterIetfSnmpv2Cap2 AGENT-CAPABILITIES
+	PRODUCT-RELEASE	"SEOS 2.0"
+	STATUS		current
+	DESCRIPTION	"SNMPv2-MIB capabilities"
+	SUPPORTS	SNMPv2-MIB
+	INCLUDES {
+                systemGroup,
+		snmpGroup,
+		snmpSetGroup,
+		snmpBasicNotificationsGroup,
+		snmpCommunityGroup }
+        
+        VARIATION   sysORLastChange
+            ACCESS  not-implemented
+            DESCRIPTION "Object not supported."
+            
+        VARIATION   sysORID
+            ACCESS  not-implemented
+            DESCRIPTION "Object not supported."
+            
+        VARIATION   sysORUpTime
+            ACCESS  not-implemented
+            DESCRIPTION "Object not supported."
+            
+        VARIATION   sysORDescr
+            ACCESS  not-implemented
+            DESCRIPTION "Object not supported."
+
+	::= { eriRouterIetfSnmpv2Cap 2 }
+
+eriRouterIetfSnmpv2Cap3 AGENT-CAPABILITIES
+	PRODUCT-RELEASE	"SEOS 2.1 [SE]; SEOS 6.3.X [SM]; SEOS 11.1.x [SSR]"
+	STATUS		current
+	DESCRIPTION	"SNMPv2-MIB capabilities"
+	SUPPORTS	SNMPv2-MIB
+	INCLUDES {
+                systemGroup,
+		snmpGroup,
+		snmpSetGroup,
+		snmpBasicNotificationsGroup,
+		snmpCommunityGroup }
+
+	::= { eriRouterIetfSnmpv2Cap 3 }
+END

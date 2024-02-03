@@ -1,0 +1,159 @@
+-- %DNP% $Id: ERICSSON-ROUTER-IETF-ENTITY-CAP.my,v 1.1.6.4.250.5 2011/06/15 18:19:45 danielhe Exp $
+-- %DNP% $Source: /cvsroot/pkt/sw/se/xc/bsd/config/snmp/mibs/ERICSSON-ROUTER-IETF-ENTITY-CAP.my,v $
+-- *****************************************************************
+-- ERICSSON-ROUTER-IETF-ENTITY-CAP.my      ENTITY MIB ERICSSON-ROUTER agent capabilities
+--
+-- Copyright (c) 2001-2006, 2010-2011, 2015 Ericsson AB
+-- All rights reserved.
+-- 
+-- *****************************************************************
+
+ERICSSON-ROUTER-IETF-ENTITY-CAP DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY
+                FROM SNMPv2-SMI
+        AGENT-CAPABILITIES
+                FROM SNMPv2-CONF
+        eriRouterCapabilities
+                FROM ERICSSON-ROUTER-SMI;
+
+eriRouterIetfEntityCap MODULE-IDENTITY
+        LAST-UPDATED    "201501141800Z" -- Jan 14, 2015
+	ORGANIZATION	"Ericsson AB."
+	CONTACT-INFO
+		"	Ericsson AB.
+
+		Postal:	100 Headquarters Dr.
+			San Jose, CA  95134
+			USA
+
+		 Phone:	+1 408 750 5000
+		   Fax: +1 408 750 5599
+		"
+        DESCRIPTION
+                "The Agent Capabilities of the 
+                implementation of the ENTITY-MIB.
+
+                If this MIB implementation is platform-dependent,
+                the PRODUCT-RELEASE clause contains Ericsson SEOS version and
+                at least one of the following Ericsson product families:
+                    [SE]  SmartEdge Multi-service Edge Router (MSER) family
+                    [SM]  SM family of Metro Ethernet Service Transport platforms
+                    [SSR] Smart Service Router (SSR) family"
+
+        REVISION        "201501141800Z" -- Jan 14, 2015
+        DESCRIPTION
+                "Updated RBN/rbn/Rbn as ERICSSON-ROUTER/eriRouter/EriRouter
+                 to migrate RBN MIB to ERICSSON MIB."
+
+        REVISION        "201106150000Z" -- Jun 15, 2011
+        DESCRIPTION
+                "Update DESCRIPTION clause of MODULE-IDENTITY
+                 and PRODUCT-RELEASE clause of AGENT-CAPABILITIES."
+
+	REVISION	"201011010000Z" -- Nov 1, 2010
+	DESCRIPTION
+		"Modified PRODUCT-RELEASE clause for consistent naming.
+                 Updated CONTACT-INFO."
+                
+        REVISION        "200905070000Z" -- May 07, 2009
+        DESCRIPTION
+                 "Added new OID:
+                        eriRouterIetfEntityCap5.
+                 "       
+        REVISION        "200503220000Z" -- Mar. 22, 2005
+        DESCRIPTION
+                "Modified eriRouterIetfEntityCap4 to include entityMappingGroup.
+                 Added new OID:
+                        eriRouterIetfEntityCap4.
+                 "
+
+        REVISION        "200310010000Z" -- Oct 1, 2003
+        DESCRIPTION
+                "Modified eriRouterIetfEntityCap1 to include entityGeneralGroup.
+                 Added new OID:
+                        eriRouterIetfEntityCap3.
+                 "
+
+	REVISION	"200105181100Z" -- May 18, 2001
+	DESCRIPTION
+		"Added new OID:
+			eriRouterIetfEntityCap2"
+
+        REVISION        "200102201000Z" -- February 20, 2001
+        DESCRIPTION
+                "Initial version."
+        ::= { eriRouterCapabilities 33 }
+
+eriRouterIetfEntityCap1 AGENT-CAPABILITIES
+        PRODUCT-RELEASE "AOS 5.0.X.X"
+        STATUS          current
+        DESCRIPTION     "ENTITY-MIB capabilities"
+        SUPPORTS        ENTITY-MIB  
+        INCLUDES { 
+                   entityPhysicalGroup,
+                   entityGeneralGroup,
+                   entityNotificationsGroup
+                 }      
+
+        ::= { eriRouterIetfEntityCap 1  }
+
+eriRouterIetfEntityCap2 AGENT-CAPABILITIES
+        PRODUCT-RELEASE "SEOS 2.0"
+        STATUS          current
+        DESCRIPTION     "ENTITY-MIB capabilities"
+        SUPPORTS        ENTITY-MIB  
+        INCLUDES { 
+                   entityPhysicalGroup,
+                   entityNotificationsGroup
+                 }      
+
+        ::= { eriRouterIetfEntityCap 2  }
+
+eriRouterIetfEntityCap3 AGENT-CAPABILITIES
+        PRODUCT-RELEASE "SEOS 2.5.7"
+        STATUS          current
+        DESCRIPTION     "ENTITY-MIB capabilities"
+        SUPPORTS        ENTITY-MIB
+        INCLUDES {
+                   entityPhysicalGroup,
+                   entityGeneralGroup,
+                   entityNotificationsGroup
+                 }
+        ::= { eriRouterIetfEntityCap 3  }
+
+eriRouterIetfEntityCap4 AGENT-CAPABILITIES
+        PRODUCT-RELEASE "AOS 6.0.5.X"
+        STATUS          current
+        DESCRIPTION     "ENTITY-MIB capabilities"
+        SUPPORTS        ENTITY-MIB
+        INCLUDES {
+                   entityPhysicalGroup,
+                   entityGeneralGroup,
+                   entityNotificationsGroup,
+                   entityMappingGroup
+                 }
+        ::= { eriRouterIetfEntityCap 4  }
+
+eriRouterIetfEntityCap5 AGENT-CAPABILITIES
+        PRODUCT-RELEASE "SEOS 6.2.X [SE]; SEOS 6.3.X [SM]; SEOS 11.1.x [SSR]"
+        STATUS          current
+        DESCRIPTION     "ENTITY-MIB capabilities"
+        SUPPORTS        ENTITY-MIB
+        INCLUDES {
+                   entityPhysicalGroup,
+                   entityGeneralGroup,
+                   entityNotificationsGroup,
+                   entityMappingGroup
+                 }
+
+        VARIATION      entLPPhysicalIndex
+        ACCESS          not-implemented
+        DESCRIPTION    "This object is not supported"
+
+        VARIATION      entPhysicalChildIndex
+        ACCESS          not-implemented
+        DESCRIPTION    "This object is not supported"
+        ::= { eriRouterIetfEntityCap 5  }
+END

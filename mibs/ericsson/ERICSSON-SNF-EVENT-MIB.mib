@@ -1,0 +1,96 @@
+--
+-- The Ericsson Alarm MIB
+--
+-- Copyright (c) 2013 by Ericsson AB.
+-- All rights reserved.
+--
+--
+
+ERICSSON-SNF-EVENT-MIB DEFINITIONS ::= BEGIN
+	IMPORTS
+		
+		MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE
+			FROM SNMPv2-SMI
+		alarmActiveResourceId, alarmModelDescription, alarmActiveDescription
+			FROM ALARM-MIB 
+	  	ituAlarmPerceivedSeverity, ituAlarmProbableCause, ituAlarmEventType, ituAlarmAdditionalText
+			FROM ITU-ALARM-MIB
+		snfGeneric
+			FROM ERICSSON-SNF-TOP-MIB;  
+      
+	snfEventModule	MODULE-IDENTITY
+		LAST-UPDATED	"200510260935Z"
+		ORGANIZATION	"Ericsson AB"
+		CONTACT-INFO	"Roger Andersson
+				 KA/EAB/LU/RA/L
+				 Ericsson AB
+				 Olandsgatan 1
+				 P.O. Box 518
+				 37123 Karlskrona
+				 Sweden
+			
+				 E-Mail: roger.j.andersson@ericsson.com
+				"
+		DESCRIPTION	"This MIB provides the possibility to report SNF events."
+		REVISION	"200510260000Z"
+		DESCRIPTION	""
+		::=  {  snfGeneric 15  }
+
+
+	snfEventObjects OBJECT IDENTIFIER 
+
+		::= { snfEventModule 1 }
+
+	
+	snfEventNotifications 	OBJECT IDENTIFIER 
+		::= {  snfEventModule 2  }
+   	snfEventNotificationsPrefix 	OBJECT IDENTIFIER
+		::= {  snfEventNotifications 0  }
+		
+
+	snfEventConformance OBJECT IDENTIFIER ::= { snfEventModule 3 }
+     	snfEventCompliances  OBJECT IDENTIFIER ::= { snfEventConformance 1 }
+     	snfEventGroups  OBJECT IDENTIFIER ::= { snfEventConformance 2 }
+     	
+	snfEvent	NOTIFICATION-TYPE
+		OBJECTS {  alarmModelDescription, 
+				alarmActiveResourceId, 
+				alarmActiveDescription, 
+				ituAlarmEventType, 
+				ituAlarmProbableCause  }
+		STATUS		current
+		DESCRIPTION	"This notification reports an SNF event. "
+		::=  {  snfEventNotificationsPrefix 1  }
+	
+	snfEventCompliance MODULE-COMPLIANCE
+      		STATUS  current
+      		DESCRIPTION
+	"The compliance statement for systems supporting
+ the ITU Alarm MIB."
+      		MODULE -- this module
+          		MANDATORY-GROUPS {
+              			snfEvents
+              		} 
+      		MODULE ALARM-MIB
+          		MANDATORY-GROUPS {
+              			alarmModelGroup,
+              			alarmActiveGroup,
+              			alarmActiveStatsGroup
+              		}
+      		MODULE ITU-ALARM-MIB
+          		MANDATORY-GROUPS {
+              			ituAlarmGroup,
+              			ituAlarmStatisticsGroup
+              		}
+     		::= { snfEventCompliances 1 }
+
+   	snfEvents NOTIFICATION-GROUP
+    		NOTIFICATIONS {
+      			snfEvent
+       	  	}
+    		STATUS		current
+    		DESCRIPTION
+	"This group contains the notifications that exists to support SNF events"
+    		::= { snfEventGroups 1}
+
+END

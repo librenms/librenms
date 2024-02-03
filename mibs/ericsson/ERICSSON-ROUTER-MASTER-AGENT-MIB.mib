@@ -1,0 +1,86 @@
+-- *****************************************************************
+-- ERICSSON-ROUTER-MASTER-MIB   MasterAgent Mib
+--
+-- %DNP% Copyright (c) 2013, 2015 Ericsson AB
+-- %DNP% All rights reserved.
+--
+-- *****************************************************************
+ERICSSON-ROUTER-MASTER-AGENT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, Integer32
+        FROM SNMPv2-SMI
+
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+
+    RowStatus
+        FROM SNMPv2-TC
+
+    agentxSessionDescr
+	FROM AGENTX-MIB
+
+    eriRouterMgmt
+        FROM ERICSSON-ROUTER-SMI;
+
+	eriRouterMasterAgentMIB MODULE-IDENTITY
+	    LAST-UPDATED "201501141800Z" -- Jan 14, 2015
+	    ORGANIZATION "Ericsson"
+	    CONTACT-INFO "postal:   Kovacs Zsolt
+		                    Budapest
+		                    1117 Irinyi ut
+
+			  email:    kovacs.zsolt@ericssson.com
+		         "
+	    DESCRIPTION  "An AgentX master mib for
+		         "
+
+            REVISION     "201501141800Z" -- Jan 14, 2015
+            DESCRIPTION
+                "Updated RBN/rbn/Rbn as ERICSSON-ROUTER/eriRouter/EriRouter
+                 to migrate RBN MIB to ERICSSON MIB."
+
+	    ::= { eriRouterMgmt 109 }
+eriRouterMasterAgent   OBJECT IDENTIFIER ::= {eriRouterMasterAgentMIB 1}
+
+eriRouterAgentxSessionCloseReason OBJECT-TYPE
+  SYNTAX    INTEGER {
+                reasonOther(1),
+                reasonParseError(2),
+                reasonProtocolError(3),
+                reasonTimeouts(4),
+                reasonShutdown(5),
+                reasonByManager(6) }
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+     "Contains the reason from AgentX-Close-PDU 'reason' field.
+            reasonOther(1)
+                 None of the following reasons
+            reasonParseError(2)
+                 Too many AgentX parse errors from peer
+            reasonProtocolError(3)
+                 Too many AgentX protocol errors from peer
+            reasonTimeouts(4)
+                 Too many timeouts waiting for peer
+            reasonShutdown(5)
+                 Sending entity is shutting down
+            reasonByManager(6)
+                 Due to Set operation; this reason code can be used only
+                 by the master agent, in response to an SNMP management
+                 request.
+     "
+  DEFVAL      { 1 }
+  ::= { eriRouterMasterAgentMIB 2 }
+
+eriRouterSubAgentLost NOTIFICATION-TYPE
+OBJECTS {
+	agentxSessionDescr,
+	eriRouterAgentxSessionCloseReason
+     }
+STATUS   current
+DESCRIPTION
+  "The notification is sent in case of AgentX sub-agent session is lost or closed."
+::= { eriRouterMasterAgent 2 }
+
+END

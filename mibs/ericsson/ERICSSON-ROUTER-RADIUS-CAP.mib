@@ -1,0 +1,214 @@
+-- %DNP% $Id: ERICSSON-ROUTER-RADIUS-CAP.my,v 1.1.2.4.154.4 2011/06/15 18:19:46 danielhe Exp $
+-- %DNP% $Source: /cvsroot/pkt/sw/se/xc/bsd/config/snmp/mibs/Attic/ERICSSON-ROUTER-RADIUS-CAP.my,v $
+-- *****************************************************************
+-- ERICSSON-ROUTER-RADIUS-CAP              RADIUS MIB Capabilities
+--
+-- Copyright (c) 2003-2006, 2010-2011, 2015 Ericsson AB.
+-- All rights reserved.
+--
+-- *****************************************************************
+
+ERICSSON-ROUTER-RADIUS-CAP DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY     FROM SNMPv2-SMI
+    AGENT-CAPABILITIES  FROM SNMPv2-CONF
+    eriRouterCapabilities     FROM ERICSSON-ROUTER-SMI;
+
+eriRouterRadiusCap MODULE-IDENTITY
+        LAST-UPDATED    "201501141800Z" -- Jan 14, 2015
+        ORGANIZATION    "Ericsson AB."
+        CONTACT-INFO
+                "       Ericsson AB.
+
+                Postal: 100 Headquarters Dr
+                        San Jose, CA  95134
+                        USA
+
+                 Phone: +1 408 750 5000
+                   Fax: +1 408 750 5599
+                "
+    DESCRIPTION
+        "The Agent Capabilities of the RADIUS MIB.
+
+        If this MIB implementation is platform-dependent,
+        the PRODUCT-RELEASE clause contains Ericsson SEOS version and
+        at least one of the following Ericsson product families:
+            [SE]  SmartEdge Multi-service Edge Router (MSER) family
+            [SM]  SM family of Metro Ethernet Service Transport platforms
+            [SSR] Smart Service Router (SSR) family"
+
+    REVISION    "201501141800Z" -- Jan 14, 2015
+    DESCRIPTION
+        "Updated RBN/rbn/Rbn as ERICSSON-ROUTER/eriRouter/EriRouter
+         to migrate RBN MIB to ERICSSON MIB."
+
+    REVISION    "201106150000Z" -- Jun 15, 2011
+    DESCRIPTION
+        "Update DESCRIPTION clause of MODULE-IDENTITY
+         and PRODUCT-RELEASE clause of AGENT-CAPABILITIES."
+
+    REVISION    "201011010000Z" -- Nov 1, 2010
+    DESCRIPTION
+        "Modified PRODUCT-RELEASE clause for consistent naming.
+         Updated CONTACT-INFO."
+
+    REVISION    "200503291700Z" -- March 29, 2005
+    DESCRIPTION
+        "add eriRouterRadiusCap3."
+
+    REVISION    "200403021800Z" -- March 2, 2004
+    DESCRIPTION
+        "add eriRouterRadiusCap2."
+
+    REVISION    "200312160000Z" -- Dec 16, 2003
+    DESCRIPTION
+        "Initial version."
+    ::= { eriRouterCapabilities 59 }
+
+eriRouterRadiusCap1 AGENT-CAPABILITIES
+    PRODUCT-RELEASE "SEOS 2.6.x"
+    STATUS          current
+    DESCRIPTION     "ERICSSON-ROUTER-RADIUS-MIB capabilities"
+    SUPPORTS        ERICSSON-ROUTER-RADIUS-MIB
+    INCLUDES {
+        eriRouterRadiusAuthGroup,
+        eriRouterRadiusAcctGroup,
+        eriRouterRadiusNotifyGroup,
+        eriRouterRadiusAuthNotifyGroup,
+        eriRouterRadiusAcctNotifyGroup
+    }
+
+    VARIATION eriRouterRadiusAuthPktTimeout
+    ACCESS    read-only
+    DESCRIPTION
+        "Write access is not allowed."
+
+    VARIATION eriRouterRadiusAuthSrvTimeout
+    ACCESS    read-only
+    DESCRIPTION
+        "Write access is not allowed."
+
+    VARIATION eriRouterRadiusAuthDeadtime
+    ACCESS    read-only
+    DESCRIPTION
+        "Write access is not allowed."
+
+    VARIATION eriRouterRadiusAuthTries
+    ACCESS    read-only
+    DESCRIPTION
+        "Write access is not allowed."
+
+    VARIATION eriRouterRadiusAcctPktTimeout
+    ACCESS    read-only
+    DESCRIPTION
+        "Write access is not allowed."
+
+    VARIATION eriRouterRadiusAcctSrvTimeout
+    ACCESS    read-only
+    DESCRIPTION
+        "Write access is not allowed."
+
+    VARIATION eriRouterRadiusAcctDeadtime
+    ACCESS    read-only
+    DESCRIPTION
+        "Write access is not allowed."
+
+    VARIATION eriRouterRadiusAcctTries
+    ACCESS    read-only
+    DESCRIPTION
+        "Write access is not allowed."
+
+    VARIATION eriRouterRadiusReason
+    SYNTAX    INTEGER { responding(1), serverTimeout(3) }
+    DESCRIPTION
+        "The only reason a server may change state is when it starts
+         responding and when a server-level timeout occurs."
+
+    ::= { eriRouterRadiusCap 1 }
+
+eriRouterRadiusCap2 AGENT-CAPABILITIES
+    PRODUCT-RELEASE "AOS 6.0.10.x"
+    STATUS          current
+    DESCRIPTION     "ERICSSON-ROUTER-RADIUS-MIB capabilities"
+    SUPPORTS        ERICSSON-ROUTER-RADIUS-MIB
+    INCLUDES {
+        eriRouterRadiusNotifyGroup,
+        eriRouterRadiusAuthNotifyGroup,
+        eriRouterRadiusAcctNotifyGroup
+    }
+
+    ::= { eriRouterRadiusCap 2 }
+
+eriRouterRadiusCap3 AGENT-CAPABILITIES
+    PRODUCT-RELEASE "SEOS 4.0.5.x [SE]"
+    STATUS          current
+    DESCRIPTION     "ERICSSON-ROUTER-RADIUS-MIB capabilities"
+    SUPPORTS        ERICSSON-ROUTER-RADIUS-MIB
+    INCLUDES {
+        eriRouterRadiusAuthGroup2,
+        eriRouterRadiusAcctGroup2,
+        eriRouterRadiusNotifyGroup,
+        eriRouterRadiusAuthNotifyGroup,
+        eriRouterRadiusAcctNotifyGroup
+    }
+
+    VARIATION eriRouterRadiusAuthPktTimeout
+    ACCESS    read-only
+    DESCRIPTION
+        "Write access is not allowed."
+
+    VARIATION eriRouterRadiusAuthSrvTimeout
+    ACCESS    read-only
+    DESCRIPTION
+        "Write access is not allowed."
+
+    VARIATION eriRouterRadiusAuthDeadtime
+    ACCESS    read-only
+    DESCRIPTION
+        "Write access is not allowed."
+
+    VARIATION eriRouterRadiusAuthTries
+    ACCESS    read-only
+    DESCRIPTION
+        "Write access is not allowed."
+
+    VARIATION eriRouterRadiusAuthStripDomain
+    ACCESS    read-only
+    DESCRIPTION
+        "Write access is not allowed."
+
+    VARIATION eriRouterRadiusAcctPktTimeout
+    ACCESS    read-only
+    DESCRIPTION
+        "Write access is not allowed."
+
+    VARIATION eriRouterRadiusAcctSrvTimeout
+    ACCESS    read-only
+    DESCRIPTION
+        "Write access is not allowed."
+
+    VARIATION eriRouterRadiusAcctDeadtime
+    ACCESS    read-only
+    DESCRIPTION
+        "Write access is not allowed."
+
+    VARIATION eriRouterRadiusAcctTries
+    ACCESS    read-only
+    DESCRIPTION
+        "Write access is not allowed."
+
+    VARIATION eriRouterRadiusAcctStripDomain
+    ACCESS    read-only
+    DESCRIPTION
+        "Write access is not allowed."
+
+    VARIATION eriRouterRadiusReason
+    SYNTAX    INTEGER { responding(1), serverTimeout(3) }
+    DESCRIPTION
+        "The only reason a server may change state is when it starts
+         responding and when a server-level timeout occurs."
+
+    ::= { eriRouterRadiusCap 3 }
+
+END

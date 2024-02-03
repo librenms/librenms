@@ -1,0 +1,279 @@
+-- $Id: ERICSSON-ROUTER-SYS-SECURITY-MIB.my,v 1.1.6.2 2011/02/22 17:26:18 thatcher Exp $
+-- $Source: /cvsroot/pkt/sw/se/xc/bsd/config/snmp/mibs/Attic/ERICSSON-ROUTER-SYS-SECURITY-MIB.my,v $
+-- *****************************************************************
+-- ERICSSON-ROUTER-SYS-SECURITY-MIB.my    
+--
+-- Copyright (c) 2009, 2011, 2015 Ericsson AB
+-- All rights reserved.
+--
+-- *****************************************************************
+ERICSSON-ROUTER-SYS-SECURITY-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+    Gauge32, Counter64
+        FROM SNMPv2-SMI     -- [RFC2578]
+
+    DateAndTime
+        FROM SNMPv2-TC      -- [RFC2579]
+
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF    -- [RFC2580]
+
+    CounterBasedGauge64
+        FROM HCNUM-TC
+        
+    EriRouterUnsigned64
+        FROM ERICSSON-ROUTER-TC
+        
+    eriRouterModules
+        FROM ERICSSON-ROUTER-SMI;
+
+ 
+eriRouterSysSecurityMib MODULE-IDENTITY
+    LAST-UPDATED "201501141800Z" -- Jan 14, 2015
+    ORGANIZATION "Ericsson AB"
+    CONTACT-INFO
+           "       Ericsson AB
+                   100 Headquarters Dr
+                   San Jose, CA  95134
+                   USA
+
+            Phone: +1 408 750 5000
+              Fax: +1 408 750 5599
+           "
+    DESCRIPTION
+        "This MIB module defines attributes and notifications
+         related to system and network level security issues.
+        
+         All mib objects defined in the module are viewed within
+         the context identified in the SNMP protocol (i.e. the
+         community string in v1/v2c or the contextName in v3).
+        "
+
+    REVISION     "201501141800Z" -- Jan 14, 2015
+    DESCRIPTION
+        "Updated RBN/rbn/Rbn as ERICSSON-ROUTER/eriRouter/EriRouter
+         to migrate RBN MIB to ERICSSON MIB."
+
+    REVISION     "200911091800Z" -- Nov 9, 2009
+    DESCRIPTION
+        "Initial version"
+    ::= {eriRouterModules 54}
+
+
+eriRouterSysSecNotifications  OBJECT IDENTIFIER ::= { eriRouterSysSecurityMib 0 }
+
+eriRouterSysSecObjects        OBJECT IDENTIFIER ::= { eriRouterSysSecurityMib 1 }
+
+eriRouterSysSecConformance    OBJECT IDENTIFIER ::= { eriRouterSysSecurityMib 2 }
+
+--
+-- Objects
+--
+eriRouterSysSecThresholdObjects OBJECT IDENTIFIER ::= { eriRouterSysSecObjects 1 }
+
+eriRouterSysSecNotifyEnable OBJECT-TYPE
+    SYNTAX  BITS {
+                maliciousPkt(0)
+            }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The bit mask to enable/disable notifications for crossing
+         specific threshold."
+    DEFVAL { { } }
+    ::= { eriRouterSysSecThresholdObjects 1 }
+
+eriRouterMeasurementInterval    OBJECT-TYPE
+    SYNTAX       Gauge32 (1..3600)
+    UNITS        "seconds"
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "Data is sampled at the start and end of a specified interval. The
+         difference between the start and end values |end - start| is called
+         the delta value.  When setting the interval, care should be taken
+         that the interval should be short enough that the sampled variable
+         is very unlikely to increase or decrease by more than range of the
+         variable. "
+    DEFVAL { 60 }
+    ::= { eriRouterSysSecThresholdObjects 2}
+    
+eriRouterMaliciousPktsThresholdHi OBJECT-TYPE
+    SYNTAX       EriRouterUnsigned64
+    UNITS        "Packets"
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "When the current sampling interval delta value of the malicious
+         packets counter is greater than or equal to this threshold, and
+         the delta value at the last sampling interval was less than this
+         threshold, a single high threshold exceeded event will be
+         generated.  A single high threshold exceeded event will also be
+         generated if the first sampling interval delta value of the
+         malicious IP packets counter is greater than or equal to this
+         threshold.
+
+         After a high threshold exceeded event is generated, another such
+         event will not be generated until the delta value falls below
+         this threshold and reaches the eriRouterMaliciousPktsThresholdLow,
+         generating a low threshold exceeded event.  In other words there
+         cannot be successive high threshold events without an intervening
+         low threshold event. "
+    ::= { eriRouterSysSecThresholdObjects 3}
+    
+eriRouterMaliciousPktsThresholdLow OBJECT-TYPE
+    SYNTAX       EriRouterUnsigned64
+    UNITS        "Packets"
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "When the current sampling interval delta value of the malicious
+         packets counter is less than or equal to this threshold, and the
+         delta value at the last sampling interval was greater than this
+         threshold, a single low threshold exceeded event will be
+         generated.  In addition, a high threshold exceeded event must
+         occur before a low threshold exceeded event can be generated. "
+    ::= { eriRouterSysSecThresholdObjects 4}
+    
+    
+--
+-- Counters to compare to above thresholds
+--
+eriRouterSysSecStatsObjects OBJECT IDENTIFIER ::= { eriRouterSysSecObjects 2 }
+
+eriRouterMaliciousPktsCounter OBJECT-TYPE
+    SYNTAX       Counter64
+    UNITS        "Packets"
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "A count of all malicious pkts.  This includes but is not limited
+         to malformed IP packets, malformed layer 4 IP, packets filtered by
+         ACLs for specific faults, IP packets identified as attempting to
+         spoof a system, and IP packets which failed reassembly."
+    ::= { eriRouterSysSecStatsObjects 1}
+
+eriRouterMaliciousPktsDelta OBJECT-TYPE
+    SYNTAX       CounterBasedGauge64
+    UNITS        "packets"
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "The delta value of eriRouterMaliciousPktsCounter at the most recently
+         completed measurement interval."
+    ::= { eriRouterSysSecStatsObjects 2 }
+
+--
+-- Objects only for notifications
+-- 
+eriRouterSysSecNotifyObjects  OBJECT IDENTIFIER ::= { eriRouterSysSecObjects 4 }
+
+eriRouterThresholdNotifyTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The DateAndTime of the notification."
+    ::= { eriRouterSysSecNotifyObjects 1 }
+
+--
+-- NOTIFICATIONS
+--
+eriRouterMaliciousPktThresholdHiExceeded NOTIFICATION-TYPE
+    STATUS current
+    DESCRIPTION
+        "This notification signifies that one of the delta values is equal
+         to or greater than the corresponding high threshold value.  The
+         specific delta value is the last object in the notification varbind
+         list. "
+    ::= { eriRouterSysSecNotifications 1 }
+
+eriRouterMaliciousPktThresholdLowExceeded NOTIFICATION-TYPE
+    OBJECTS {
+        eriRouterThresholdNotifyTime
+    }
+    STATUS current
+    DESCRIPTION
+        "This notification signifies that one of the delta values is less
+         than or equal to the corresponding low threshold value. The
+         specific delta value is the last object in the notification
+         varbind list. "
+    ::= { eriRouterSysSecNotifications 2 }
+
+--
+-- Conformance
+--
+eriRouterSysSecCompliances OBJECT IDENTIFIER ::= { eriRouterSysSecConformance 1 }
+eriRouterSysSecGroups      OBJECT IDENTIFIER ::= { eriRouterSysSecConformance 2 }
+
+eriRouterMaliciousPktGroup OBJECT-GROUP
+    OBJECTS {
+        eriRouterSysSecNotifyEnable,
+        eriRouterMeasurementInterval,
+        eriRouterMaliciousPktsThresholdHi,
+        eriRouterMaliciousPktsThresholdLow,
+        eriRouterMaliciousPktsCounter
+    }
+    STATUS current
+    DESCRIPTION
+        "Set of objects for the group."
+    ::= { eriRouterSysSecGroups 1 }
+   
+eriRouterSysSecNotifyObjectsGroup OBJECT-GROUP
+    OBJECTS {
+        eriRouterMaliciousPktsDelta,
+        eriRouterThresholdNotifyTime
+    }
+    STATUS current
+    DESCRIPTION
+        "Set of objects for the group."
+    ::= { eriRouterSysSecGroups 4 }
+
+eriRouterSysSecNotificationGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        eriRouterMaliciousPktThresholdHiExceeded,
+        eriRouterMaliciousPktThresholdLowExceeded
+    }
+    STATUS current
+    DESCRIPTION
+        "Set of notifications for the group."
+    ::= { eriRouterSysSecGroups 5 }
+    
+
+eriRouterSysSecCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+       "The compliance statement for support of this mib module."
+    MODULE -- this module
+        MANDATORY-GROUPS {
+            eriRouterMaliciousPktGroup,
+            eriRouterSysSecNotifyObjectsGroup,
+            eriRouterSysSecNotificationGroup
+        }
+        
+        OBJECT eriRouterMeasurementInterval
+        MIN-ACCESS   read-only
+        DESCRIPTION
+            "Write access is not required"
+
+        OBJECT eriRouterMaliciousPktsThresholdHi
+        MIN-ACCESS   read-only
+        DESCRIPTION
+            "Write access is not required"
+
+        OBJECT eriRouterMaliciousPktsThresholdLow
+        MIN-ACCESS   read-only
+        DESCRIPTION
+            "Write access is not required"
+
+        OBJECT eriRouterSysSecNotifyEnable
+        MIN-ACCESS   read-only
+        DESCRIPTION
+            "Write access is not required"
+
+        
+    ::= { eriRouterSysSecCompliances 1 }
+    
+END

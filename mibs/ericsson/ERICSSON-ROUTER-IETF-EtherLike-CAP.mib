@@ -1,0 +1,239 @@
+-- %DNP% $Id: ERICSSON-ROUTER-IETF-EtherLike-CAP.my,v 1.2.4.2.414.6 2011/06/15 18:19:45 danielhe Exp $
+-- %DNP% $Source: /cvsroot/pkt/sw/se/xc/bsd/config/snmp/mibs/ERICSSON-ROUTER-IETF-EtherLike-CAP.my,v $
+-- *****************************************************************
+-- ERICSSON-ROUTER-IETF-EtherLike-CAP.my:	IETF EtherLike-MIB Agent Capabilities
+--
+-- Copyright (c) 1998-2003, 2010-2011, 2015 Ericsson AB
+-- All rights reserved.
+-- 
+-- *****************************************************************
+
+ERICSSON-ROUTER-IETF-EtherLike-CAP DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY
+		FROM SNMPv2-SMI
+	AGENT-CAPABILITIES
+		FROM SNMPv2-CONF
+	eriRouterCapabilities
+		FROM ERICSSON-ROUTER-SMI;
+
+eriRouterIetfEtherLikeCap MODULE-IDENTITY
+        LAST-UPDATED    "201501141800Z" -- Jan 14, 2015
+	ORGANIZATION	"Ericsson Inc."
+	CONTACT-INFO
+		"	Ericsson, Inc.
+
+		Postal:	100 Headquarters Dr.
+			San Jose, CA  95134
+			USA
+
+		 Phone:	+1 408 750 5000
+		   Fax: +1 408 750 5599
+
+		"
+	DESCRIPTION
+		"The Agent Capabilities of the 
+		implementation of the IETF EtherLike-MIB (RFC 2665)
+
+                If this MIB implementation is platform-dependent,
+                the PRODUCT-RELEASE clause contains Ericsson SEOS version and
+                at least one of the following Ericsson product families:
+                    [SE]  SmartEdge Multi-service Edge Router (MSER) family
+                    [SM]  SM family of Metro Ethernet Service Transport platforms
+                    [SSR] Smart Service Router (SSR) family"
+
+        REVISION        "201501141800Z" -- Jan 14, 2015
+        DESCRIPTION
+                "Updated RBN/rbn/Rbn as ERICSSON-ROUTER/eriRouter/EriRouter
+                to migrate RBN MIB to ERICSSON MIB."
+
+        REVISION        "201106150000Z" -- Jun 15, 2011
+        DESCRIPTION
+                "Update DESCRIPTION clause of MODULE-IDENTITY
+                and PRODUCT-RELEASE clause of AGENT-CAPABILITIES."
+        
+	REVISION	"201011010000Z" -- Nov 1, 2010
+	DESCRIPTION
+		"Modified PRODUCT-RELEASE clause for consistent naming.
+                 Updated CONTACT-INFO."
+                
+        REVISION        "200812161700Z" -- December 16, 2008
+        DESCRIPTION
+                "Added new OID: eriRouterIetfEtherLikeCap5. 
+                 Added group etherStatsLowSpeedGroup and
+                 updated counters not supported."
+
+	REVISION	"200306191700Z" -- June 19, 2003
+	DESCRIPTION
+		"Added new OID:
+			eriRouterIetfEtherLikeCap4"
+
+	REVISION	"200106121200Z" -- June 12, 2001
+	DESCRIPTION
+		"Added new OID:
+			eriRouterIetfEtherLikeCap3"
+
+	REVISION	"199912152300Z"
+	DESCRIPTION
+		"Updated to reference RFC 2665"
+
+	REVISION	"9806232300Z"
+	DESCRIPTION
+		"Updated to reference RFC 2358"
+	::= { eriRouterCapabilities 7 }
+
+eriRouterIetfEtherLikeCap1 AGENT-CAPABILITIES
+	PRODUCT-RELEASE	"AOS 1.0.X.X"
+	STATUS		current
+	DESCRIPTION	"EtherLike-MIB capabilities"
+	SUPPORTS	EtherLike-MIB
+	INCLUDES {
+		etherStats100MbsGroup
+		}
+
+	::= { eriRouterIetfEtherLikeCap 1 }
+
+eriRouterIetfEtherLikeCap2 AGENT-CAPABILITIES
+	PRODUCT-RELEASE	"AOS 4.0.X.X"
+	STATUS		current
+	DESCRIPTION	"EtherLike-MIB capabilities"
+	SUPPORTS	EtherLike-MIB
+	INCLUDES {
+		etherStatsBaseGroup,
+                etherDuplexGroup,
+                etherStatsLowSpeedGroup,
+                etherStatsHighSpeedGroup
+		}
+
+	::= { eriRouterIetfEtherLikeCap 2 }
+
+eriRouterIetfEtherLikeCap3 AGENT-CAPABILITIES
+	PRODUCT-RELEASE	"SEOS 2.0.4"
+	STATUS		current
+	DESCRIPTION	"EtherLike-MIB capabilities"
+	SUPPORTS	EtherLike-MIB
+	INCLUDES {
+		etherStatsBaseGroup,
+                etherDuplexGroup,
+                etherStatsHighSpeedGroup
+		}
+
+        VARIATION   	dot3StatsInternalMacTransmitErrors
+            ACCESS  	not-implemented
+            DESCRIPTION "Object not supported."
+            
+        VARIATION   	dot3StatsCarrierSenseErrors
+            ACCESS  	not-implemented
+            DESCRIPTION "Object not supported."
+            
+        VARIATION   	dot3StatsInternalMacReceiveErrors
+            ACCESS  	not-implemented
+            DESCRIPTION "Object not supported."
+
+	::= { eriRouterIetfEtherLikeCap 3 }
+
+eriRouterIetfEtherLikeCap4 AGENT-CAPABILITIES
+	PRODUCT-RELEASE	"AOS 6.0.X.X"
+	STATUS		current
+	DESCRIPTION	"EtherLike-MIB capabilities"
+	SUPPORTS	EtherLike-MIB
+	INCLUDES {
+		etherStatsBaseGroup,
+                etherDuplexGroup,
+                etherStatsLowSpeedGroup,
+                etherStatsHighSpeedGroup
+		}
+
+        VARIATION   	dot3StatsSingleCollisionFrames
+	    DESCRIPTION "This counter is not supported for the
+			    GIGEX
+			ethernet ports; for ports of this type,
+			the value of this object will always be 0."
+
+        VARIATION   	dot3StatsMultipleCollisionFrames
+	    DESCRIPTION "This counter is not supported for the
+			    ENET, GIGEX, and XGE
+			ethernet ports; for ports of this type,
+			the value of this object will always be 0."
+
+        VARIATION   	dot3StatsSQETestErrors
+	    DESCRIPTION "This counter is not supported for the
+			    ENET, GIGEX, and XGE
+			ethernet ports; for ports of this type,
+			the value of this object will always be 0."
+
+        VARIATION   	dot3StatsDeferredTransmissions
+	    DESCRIPTION "This counter is not supported for the
+			    GIGEX and XGE
+			ethernet ports; for ports of this type,
+			the value of this object will always be 0."
+
+        VARIATION   	dot3StatsLateCollisions
+	    DESCRIPTION "This counter is not supported for the
+			    GIGEX
+			ethernet ports; for ports of this type,
+			the value of this object will always be 0."
+
+        VARIATION   	dot3StatsExcessiveCollisions
+	    DESCRIPTION "This counter is not supported for the
+			    GIGEX
+			ethernet ports; for ports of this type,
+			the value of this object will always be 0."
+
+        VARIATION   	dot3StatsCarrierSenseErrors
+	    DESCRIPTION "This counter is not supported for the
+			    GIGEX and XGE
+			ethernet ports; for ports of this type,
+			the value of this object will always be 0."
+
+        VARIATION   	dot3StatsInternalMacReceiveErrors
+	    DESCRIPTION "This counter is not supported for the
+			    XGE
+			ethernet ports; for ports of this type,
+			the value of this object will always be 0."
+
+        VARIATION   	dot3StatsSymbolErrors
+	    DESCRIPTION "This counter is not supported for the
+			    ENET and GBENET
+			ethernet ports; for ports of this type,
+			the value of this object will always be 0."
+
+        VARIATION   	dot3StatsDuplexStatus
+	    DESCRIPTION "The value of this object is always fullDuplex(3)
+			for the GBENET ethernet card, the GIGEX ethernet card,
+			and the fiber ports of the XGE ethernet ports on the
+			XFE card."
+
+	::= { eriRouterIetfEtherLikeCap 4 }
+
+eriRouterIetfEtherLikeCap5 AGENT-CAPABILITIES
+        PRODUCT-RELEASE "SEOS 6.1.4.3 [SE]; SEOS 6.3.X [SM]; SEOS 11.1.x [SSR]"
+        STATUS          current
+        DESCRIPTION     "EtherLike-MIB capabilities"
+        SUPPORTS        EtherLike-MIB
+        INCLUDES {
+                etherStatsBaseGroup,
+                etherDuplexGroup,
+                etherStatsLowSpeedGroup,
+                etherStatsHighSpeedGroup
+                }
+
+        VARIATION   dot3StatsInternalMacTransmitErrors
+            ACCESS      not-implemented
+            DESCRIPTION "Object not supported."
+
+        VARIATION   dot3StatsCarrierSenseErrors
+            ACCESS      not-implemented
+            DESCRIPTION "Object not supported."
+         
+        VARIATION   dot3StatsInternalMacReceiveErrors
+            ACCESS      not-implemented
+            DESCRIPTION "Object not supported."
+                
+        VARIATION   dot3StatsSQETestErrors
+            ACCESS      not-implemented
+            DESCRIPTION "Object not supported."
+         
+        ::= { eriRouterIetfEtherLikeCap 5 }
+END
