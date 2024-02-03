@@ -106,7 +106,6 @@ class Procurve extends \LibreNMS\OS implements OSPolling, NacPolling
             $rowSet[$ifIndex]['port_id'] = $ifIndex_map->get($ifIndex, 0);
         }
 
-
         $table = SnmpQuery::mibs(['HP-DOT1X-EXTENSIONS-MIB'])->mibDir('hp')->hideMib()->enumStrings()->walk('hpicfDot1xAuthSessionStatsTable')->table(2);
         foreach ($table as $ifIndex => $entry) {
             if (! isset($rowSet[$ifIndex])) {
