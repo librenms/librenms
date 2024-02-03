@@ -137,18 +137,6 @@ class Powerconnect extends OS implements ProcessorDiscovery, ProcessorPolling, N
         return $res;
     }
 
-    private static function pivotTable(array $table): array
-    {
-        $res = [];
-        foreach ($table as $column => $data) {
-            foreach ($data as $index => $value) {
-                $res[$index][$column] = $value;
-            }
-        }
-
-        return $res;
-    }
-
     public function pollNac()
     {
         $nac = new Collection();
@@ -160,14 +148,12 @@ class Powerconnect extends OS implements ProcessorDiscovery, ProcessorPolling, N
             return $nac;
         }
 
-        $table = SnmpQuery::mibs(['DNOS-AUTHENTICATION-MANAGER-MIB'])->mibDir('dell')->hideMib()->enumStrings()->walk('agentAuthMgrClientStatusTable')->table();
+        $table = SnmpQuery::mibs(['DNOS-AUTHENTICATION-MANAGER-MIB'])->mibDir('dell')->hideMib()->enumStrings()->walk('agentAuthMgrClientStatusTable')->table(2);
         if (count($table) === 0) {
             d_echo('Client status table is empty, not processing NAC entries.');
 
             return $nac;
         }
-
-        $table = self::pivotTable($table);
 
         $hostmode = SnmpQuery::mibs(['DNOS-AUTHENTICATION-MANAGER-MIB'])->mibDir('dell')->hideMib()->enumStrings()->walk('agentAuthMgrPortHostMode')->valuesByIndex();
         foreach ($table as &$row) {
