@@ -1,8 +1,7 @@
 mib: ERICSSON-ROUTER-ENVMON-MIB:ERICSSON-ROUTER-CPU-METER-MIB:ERICSSON-ROUTER-OPTICAL-TRANSCEIVER-MIB
 modules:
     os:
-        version:
-            - .1.3.6.1.2.1.1.1.0
+        version: SNMPv2-MIB::sysDescr.0
     processors:
         data:
             -
