@@ -7,6 +7,8 @@ $link_array = [
     'app' => 'logsize',
 ];
 
+require 'includes/html/graphs/generic_stats.inc.php';
+
 $no_minus_d = $app->data['no_minus_d'] ?? false;
 
 print_optionbar_start();
@@ -21,7 +23,20 @@ foreach ($sets_list as $index => $log_set) {
         ? '<span class="pagemenu-selected">' . $log_set . '</span>'
         : $log_set;
 
-    echo generate_link($label, $link_array, ['log_set' => $log_set]) . "\n";
+    echo generate_link($label, $link_array, [
+        'log_set' => $log_set,
+        'gstats_no_hourly' => $vars['gstats_no_hourly'],
+        'gstats_no_hourly_max' => $vars['gstats_no_hourly_max'],
+        'gstats_no_daily' => $vars['gstats_no_daily'],
+        'gstats_no_daily_max' => $vars['gstats_no_daily_max'],
+        'gstats_no_weekly' => $vars['gstats_no_weekly'],
+        'gstats_no_weekly_max' =>  $vars['gstats_no_weekly_max'],
+        'gstats_no_percentile' => $vars['gstats_no_percentile'],
+        'gstats_percentile_x0' => $vars['gstats_percentile_x0'],
+        'gstats_percentile_x0_val' => $vars['gstats_percentile_x0_val'],
+        'gstats_percentile_x1' => $vars['gstats_percentile_x1'],
+        'gstats_percentile_x1_val' => $vars['gstats_percentile_x1_val'],
+    ]) . "\n";
 
     if ($index < (count($sets_list) - 1)) {
         echo ', ';
@@ -39,7 +54,21 @@ if (isset($vars['log_set']) && isset($sets[$vars['log_set']])) {
             ? '<span class="pagemenu-selected">' . $log_file . '</span>'
             : $log_file;
 
-        echo generate_link($label, $link_array, ['log_set' => $vars['log_set'], 'log_file' => $log_file]) . "\n";
+        echo generate_link($label, $link_array, [
+            'log_set' => $vars['log_set'],
+            'log_file' => $log_file,
+            'gstats_no_hourly' => $vars['gstats_no_hourly'],
+            'gstats_no_hourly_max' => $vars['gstats_no_hourly_max'],
+            'gstats_no_daily' => $vars['gstats_no_daily'],
+            'gstats_no_daily_max' => $vars['gstats_no_daily_max'],
+            'gstats_no_weekly' => $vars['gstats_no_weekly'],
+            'gstats_no_weekly_max' =>  $vars['gstats_no_weekly_max'],
+            'gstats_no_percentile' => $vars['gstats_no_percentile'],
+            'gstats_percentile_x0' => $vars['gstats_percentile_x0'],
+            'gstats_percentile_x0_val' => $vars['gstats_percentile_x0_val'],
+            'gstats_percentile_x1' => $vars['gstats_percentile_x1'],
+            'gstats_percentile_x1_val' => $vars['gstats_percentile_x1_val'],
+        ]) . "\n";
 
         if ($index < (count($log_files) - 1)) {
             echo ', ';
@@ -92,6 +121,18 @@ foreach ($graphs as $key => $text) {
     if (isset($vars['log_file'])) {
         $graph_array['log_file'] = $vars['log_file'];
     }
+
+    $graph_array['gstats_no_hourly'] = $vars['gstats_no_hourly'];
+    $graph_array['gstats_no_hourly_max'] = $vars['gstats_no_hourly_max'];
+    $graph_array['gstats_no_daily'] = $vars['gstats_no_daily'];
+    $graph_array['gstats_no_daily_max'] = $vars['gstats_no_daily_max'];
+    $graph_array['gstats_no_weekly'] = $vars['gstats_no_weekly'];
+    $graph_array['gstats_no_weekly_max'] =  $vars['gstats_no_weekly_max'];
+    $graph_array['gstats_no_percentile'] = $vars['gstats_no_percentile'];
+    $graph_array['gstats_percentile_x0'] = $vars['gstats_percentile_x0'];
+    $graph_array['gstats_percentile_x0_val'] = $vars['gstats_percentile_x0_val'];
+    $graph_array['gstats_percentile_x1'] = $vars['gstats_percentile_x1'];
+    $graph_array['gstats_percentile_x1_val'] = $vars['gstats_percentile_x1_val'];
 
     echo '<div class="panel panel-default">
     <div class="panel-heading">
