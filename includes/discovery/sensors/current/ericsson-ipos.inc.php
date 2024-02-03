@@ -12,7 +12,7 @@
  */
 
 $eriRouterOpticalTransceiverParamTable = snmpwalk_group($device, 'eriRouterOpticalTransceiverParamTable', 'ERICSSON-ROUTER-OPTICAL-TRANSCEIVER-MIB', 0);
-$eriRouterOpticalTransceiverPortTable =  snmpwalk_group($device, 'eriRouterOpticalTransceiverPortTable', 'ERICSSON-ROUTER-OPTICAL-TRANSCEIVER-MIB', 0);
+$eriRouterOpticalTransceiverPortTable = snmpwalk_group($device, 'eriRouterOpticalTransceiverPortTable', 'ERICSSON-ROUTER-OPTICAL-TRANSCEIVER-MIB', 0);
 
 // Compute list of index that are available in both tables.
 $index_list_param = array_keys($eriRouterOpticalTransceiverParamTable['eriRouterOpticalTransceiverCurrentValue']);
@@ -31,11 +31,11 @@ foreach($index_list as $index) {
             'Slot ' . $eriRouterOpticalTransceiverPortTable['eriRouterOpticalTransceiverCardSlot'][$index] . ' / Port ' . $eriRouterOpticalTransceiverPortTable['eriRouterOpticalTransceiverPort'][$index],
             1000000,
             1,
-            ($eriRouterOpticalTransceiverParamTable['eriRouterOpticalTransceiverMinAlarmValue'][$index]['laserBiasCurrent'] / 1000),
-            ($eriRouterOpticalTransceiverParamTable['eriRouterOpticalTransceiverMinWarningValue'][$index]['laserBiasCurrent'] / 1000),
-            ($eriRouterOpticalTransceiverParamTable['eriRouterOpticalTransceiverMaxWarningValue'][$index]['laserBiasCurrent'] / 1000),
-            ($eriRouterOpticalTransceiverParamTable['eriRouterOpticalTransceiverMaxAlarmValue'][$index]['laserBiasCurrent'] / 1000),
-            ($eriRouterOpticalTransceiverParamTable['eriRouterOpticalTransceiverCurrentValue'][$index]['laserBiasCurrent'] / 1000),
+
+            $eriRouterOpticalTransceiverParamTable['eriRouterOpticalTransceiverMinWarningValue'][$index]['laserBiasCurrent'] / 1000,
+            $eriRouterOpticalTransceiverParamTable['eriRouterOpticalTransceiverMaxWarningValue'][$index]['laserBiasCurrent'] / 1000,
+            $eriRouterOpticalTransceiverParamTable['eriRouterOpticalTransceiverMaxAlarmValue'][$index]['laserBiasCurrent'] / 1000,
+            $eriRouterOpticalTransceiverParamTable['eriRouterOpticalTransceiverCurrentValue'][$index]['laserBiasCurrent'] / 1000,
             'snmp',
             null,
             null,
