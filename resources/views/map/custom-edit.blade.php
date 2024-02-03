@@ -265,7 +265,7 @@
                 edgeid = node.id.split("_")[0];
                 edge1 = network_edges.get(edgeid + "_from");
                 edge2 = network_edges.get(edgeid + "_to");
-                edges[edgeid] = {id: edgeid, text_colour: edge1.font.color, text_size: edge1.font.size, text_face: edge1.font.face, from: edge1.from, to: edge2.from, showpct: (edge1.label ? true : false), port_id: edge1.title, style: edge1.smooth.type, mid_x: node.x, mid_y: node.y, reverse: (edgeid in edge_port_map ? edge_port_map[edgeid].reverse : false)};
+                edges[edgeid] = {id: edgeid, text_colour: edge1.font.color, text_size: edge1.font.size, text_face: edge1.font.face, from: edge1.from, to: edge2.from, showpct: (edge1.label != null && edge1.label.includes("xx%")), showbps: (edge1.label != null && edge1.label.includes("bps")), label: (node.label || ''), port_id: edge1.title, style: edge1.smooth.type, mid_x: node.x, mid_y: node.y, reverse: (edgeid in edge_port_map ? edge_port_map[edgeid].reverse : false)};
             } else {
                 if(node.icon.code) {
                     node.icon = node.icon.code.charCodeAt(0).toString(16);
@@ -646,12 +646,30 @@
         $("#edgetextface").val(newedgeconf.font.face);
         $("#edgetextsize").val(newedgeconf.font.size);
         $("#edgetextcolour").val(newedgeconf.font.color);
-        $("#edgetextshow").bootstrapSwitch('state', Boolean(newedgeconf.label));
+        $("#edgetextshow").bootstrapSwitch('state', (newedgeconf.label.includes('xx%') || newedgeconf.label.includes('true')));
+        $("#edgebpsshow").bootstrapSwitch('state', (newedgeconf.label.includes('bps')));
         $('#edgecolourtextreset').attr('disabled', 'disabled');
 
         $("#edge-saveButton").hide();
         $("#edge-saveDefaultsButton").show();
         $('#edgeModal').modal({backdrop: 'static', keyboard: false}, 'show');
+    }
+
+    function edgeLabel(show_pct, show_bps, default_val) {
+        var label = '';
+        if(show_pct) {
+            label = 'xx%';
+        }
+        if(show_bps) {
+            if(Boolean(label.length)) {
+                label += "\n";
+            }
+            label += 'xx bps';
+        }
+        if(Boolean(label.length)) {
+            return label;
+        }
+        return default_val;
     }
 
     function editEdgeDefaultsSave() {
@@ -660,7 +678,7 @@
         newedgeconf.font.face = $("#edgetextface").val();
         newedgeconf.font.size = $("#edgetextsize").val();
         newedgeconf.font.color = $("#edgetextcolour").val();
-        newedgeconf.label = $("#edgetextshow").prop('checked');
+        newedgeconf.label = edgeLabel($("#edgetextshow").prop('checked'), $("#edgebpsshow").prop('checked'), '');
         $("#map-saveDataButton").show();
     }
 
@@ -690,7 +708,8 @@
         $("#edgetextface").val(edgedata.edge1.font.face);
         $("#edgetextsize").val(edgedata.edge1.font.size);
         $("#edgetextcolour").val(edgedata.edge1.font.color);
-        $("#edgetextshow").bootstrapSwitch('state', Boolean(edgedata.edge1.label));
+        $("#edgetextshow").bootstrapSwitch('state', (edgedata.edge1.label != null && edgedata.edge1.label.includes('xx%')));
+        $("#edgebpsshow").bootstrapSwitch('state', (edgedata.edge1.label != null && edgedata.edge1.label.includes('bps')));
 
         $("#edgeRecenterRow").show();
         $("#divEdgeFrom").show();
@@ -713,8 +732,9 @@
         edgedata.edge1.font.face = edgedata.edge2.font.face = $("#edgetextface").val();
         edgedata.edge1.font.size = edgedata.edge2.font.size = $("#edgetextsize").val();
         edgedata.edge1.font.color = edgedata.edge2.font.color = $("#edgetextcolour").val();
-        edgedata.edge1.label = edgedata.edge2.label = $("#edgetextshow").prop('checked') ? "xx%" : null;
+        edgedata.edge1.label = edgedata.edge2.label = edgeLabel($("#edgetextshow").prop('checked'), $("#edgebpsshow").prop('checked'), null);
         edgedata.edge1.title = edgedata.edge2.title = $("#port_id").val();
+        edgedata.mid.label = ($("#edgelabel").val() || '');
 
         if(edgedata.id) {
             if($("#port_id").val()) {
@@ -738,6 +758,7 @@
             network_edges.flush();
         } else {
             network_edges.update([edgedata.edge1, edgedata.edge2]);
+            network_nodes.update([edgedata.mid]);
 
             if($("#edgerecenter").is(":checked")) {
                 var pos = network.getPositions([edgedata.edge1.from, edgedata.edge2.from]);
@@ -874,11 +895,7 @@
                     } else {
                         edge1.title = edge2.title = '';
                     }
-                    if(edge.showpct) {
-                        edge1.label = edge2.label = 'xx%';
-                    } else {
-                        edge1.label = edge2.label = '';
-                    }
+                    edge1.label = edge2.label = edgeLabel(edge.showpct, edge.showbps, '');
                     if (network_nodes.get(mid.id)) {
                         network_nodes.update(mid);
                         network_edges.update(edge1);

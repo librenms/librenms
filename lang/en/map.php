@@ -126,6 +126,8 @@ return [
                     'cubicBezier' => 'Cubic Bezier',
                 ],
                 'show_usage_percent' => 'Show percent usage',
+                'show_usage_bps' => 'Show bps usage',
+                'label' => 'Label',
                 'recenter' => 'Recenter Line',
             ],
             'validate' => [

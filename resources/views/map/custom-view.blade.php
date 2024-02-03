@@ -134,7 +134,7 @@
                     var mid_x = edge.mid_x;
                     var mid_y = edge.mid_y;
 
-                    var mid = {id: edgeid + "_mid", shape: "dot", size: 0, x: mid_x, y: mid_y};
+                    var mid = {id: edgeid + "_mid", shape: "dot", size: 0, x: mid_x, y: mid_y, label: edge.label};
 
                     var edge1 = {id: edgeid + "_from", from: edge.custom_map_node1_id, to: edgeid + "_mid", arrows: {to: {enabled: true, scaleFactor: 0.6}}, font: {face: edge.text_face, size: edge.text_size, color: edge.text_colour}, smooth: {type: edge.style}};
                     var edge2 = {id: edgeid + "_to", from: edge.custom_map_node2_id, to: edgeid + "_mid", arrows: {to: {enabled: true, scaleFactor: 0.6}}, font: {face: edge.text_face, size: edge.text_size, color: edge.text_colour}, smooth: {type: edge.style}};
@@ -150,6 +150,17 @@
                         if(edge.showpct) {
                             edge1.label = edge.port_frompct + "%";
                             edge2.label = edge.port_topct + "%";
+                        }
+                        if(edge.showbps) {
+                            if(edge1.label == null) {
+                                edge1.label = '';
+                                edge2.label = '';
+                            } else {
+                                edge1.label += "\n";
+                                edge2.label += "\n";
+                            }
+                            edge1.label += edge.port_frombps;
+                            edge2.label += edge.port_tobps;
                         }
                         edge1.color = {color: edge.colour_from};
                         edge1.width = edge.width_from;

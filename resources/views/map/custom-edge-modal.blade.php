@@ -62,10 +62,22 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="form-group row">
+                            <div class="form-group row single-node">
                                 <label for="edgetextshow" class="col-sm-3 control-label">{{ __('map.custom.edit.edge.show_usage_percent') }}</label>
                                 <div class="col-sm-9">
                                     <input class="form-check-input" type="checkbox" role="switch" id="edgetextshow">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="edgebpsshow" class="col-sm-3 control-label">{{ __('map.custom.edit.edge.show_usage_bps') }}</label>
+                                <div class="col-sm-9">
+                                    <input class="form-check-input" type="checkbox" role="switch" id="edgebpsshow">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="edgelabel" class="col-sm-3 control-label">{{ __('map.custom.edit.edge.label') }}</label>
+                                <div class="col-sm-9">
+                                    <input type=text id="edgelabel" class="form-control input-sm" value="" />
                                 </div>
                             </div>
                             <div class="form-group row">
