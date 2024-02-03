@@ -14,6 +14,6 @@ $stateLookupTable = [
     'in_other_fragment' => 15,
 ];
 
-if ($sensor['sensor_type'] === "arubaWiredVsfv2OperStatus" || $sensor['sensor_type'] === "arubaWiredVsfv2MemberTable") {
-  $sensor_value = $stateLookupTable[$sensor_value];
+if ($sensor['sensor_type'] === 'arubaWiredVsfv2OperStatus' || $sensor['sensor_type'] === 'arubaWiredVsfv2MemberTable') {
+    $sensor_value = $stateLookupTable[$sensor_value];
 }
