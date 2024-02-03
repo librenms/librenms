@@ -53,18 +53,6 @@ class Procurve extends \LibreNMS\OS implements OSPolling, NacPolling
         }
     }
 
-    private static function pivotTable(array $table): array
-    {
-        $res = [];
-        foreach ($table as $column => $data) {
-            foreach ($data as $index => $value) {
-                $res[$index][$column] = $value;
-            }
-        }
-
-        return $res;
-    }
-
     public function pollNac()
     {
         $nac = new Collection();
@@ -77,11 +65,10 @@ class Procurve extends \LibreNMS\OS implements OSPolling, NacPolling
         $rowSet = [];
         $ifIndex_map = $this->getDevice()->ports()->pluck('port_id', 'ifIndex');
 
-        $table = SnmpQuery::mibDir('hp')->mibs(['HP-DOT1X-EXTENSIONS-MIB'])->hideMib()->enumStrings()->walk('hpicfDot1xSMAuthConfigTable')->table();
-        $table = self::pivotTable($table);
+        $table = SnmpQuery::mibDir('hp')->mibs(['HP-DOT1X-EXTENSIONS-MIB'])->hideMib()->enumStrings()->walk('hpicfDot1xSMAuthConfigTable')->table(2);
 
-        foreach ($table as $ifIndex => $nacEntry) {
-            $key = array_key_first($nacEntry['hpicfDot1xSMAuthMacAddr']);
+        foreach ($table as $ifIndex => $entry) {
+            $nacEntry = array_pop($entry);
 
             $rowSet[$ifIndex] = [
                 'domain' => '',
@@ -91,20 +78,19 @@ class Procurve extends \LibreNMS\OS implements OSPolling, NacPolling
                 'username' => '',
             ];
 
-            $rowSet[$ifIndex]['authc_status'] = match ($nacEntry['hpicfDot1xSMAuthPaeState'][$key]) {
+            $rowSet[$ifIndex]['authc_status'] = match ($nacEntry['hpicfDot1xSMAuthPaeState']) {
                 null => '',
                 'connecting' => 'authcFailed',
                 'authenticated' => 'authcSuccess',
-                default => $nacEntry['hpicfDot1xSMAuthPaeState'][$key]
+                default => $nacEntry['hpicfDot1xSMAuthPaeState']
             };
 
-            $rowSet[$ifIndex]['mac_address'] = $nacEntry['hpicfDot1xSMAuthMacAddr'][$key];
+            $rowSet[$ifIndex]['mac_address'] = $nacEntry['hpicfDot1xSMAuthMacAddr'];
 
-            $rowSet[$ifIndex]['timeout'] = $nacEntry['hpicfDot1xSMAuthSessionTimeout'][$key];
+            $rowSet[$ifIndex]['timeout'] = $nacEntry['hpicfDot1xSMAuthSessionTimeout'];
         }
 
-        $table = SnmpQuery::mibs(['IEEE8021-PAE-MIB'])->hideMib()->enumStrings()->walk('dot1xAuthConfigTable')->table();
-        $table = self::pivotTable($table);
+        $table = SnmpQuery::mibs(['IEEE8021-PAE-MIB'])->hideMib()->enumStrings()->walk('dot1xAuthConfigTable')->table(2);
         foreach ($table as $ifIndex => $row) {
             if (! isset($rowSet[$ifIndex])) {
                 continue;
@@ -120,24 +106,21 @@ class Procurve extends \LibreNMS\OS implements OSPolling, NacPolling
             $rowSet[$ifIndex]['port_id'] = $ifIndex_map->get($ifIndex, 0);
         }
 
-        $table = SnmpQuery::mibs(['HP-DOT1X-EXTENSIONS-MIB'])->mibDir('hp')->hideMib()->enumStrings()->walk('hpicfDot1xAuthSessionStatsTable')->table();
 
-        $table = self::pivotTable($table);
-        foreach ($table as $ifIndex => $nacEntry) {
+        $table = SnmpQuery::mibs(['HP-DOT1X-EXTENSIONS-MIB'])->mibDir('hp')->hideMib()->enumStrings()->walk('hpicfDot1xAuthSessionStatsTable')->table(2);
+        foreach ($table as $ifIndex => $entry) {
             if (! isset($rowSet[$ifIndex])) {
                 continue;
             }
+            $nacEntry = array_pop($entry);
 
-            $key = array_key_first($nacEntry['hpicfDot1xAuthSessionVid']);
-            $rowSet[$ifIndex]['vlan'] = $nacEntry['hpicfDot1xAuthSessionVid'][$key];
-            $rowSet[$ifIndex]['authz_by'] = $nacEntry['hpicfDot1xAuthSessionAuthenticMethod'][$key];
-            $rowSet[$ifIndex]['username'] = $nacEntry['hpicfDot1xAuthSessionUserName'][$key];
-            $rowSet[$ifIndex]['time_elapsed'] = $nacEntry['hpicfDot1xAuthSessionTime'][$key] / 100;
+            $rowSet[$ifIndex]['vlan'] = $nacEntry['hpicfDot1xAuthSessionVid'];
+            $rowSet[$ifIndex]['authz_by'] = $nacEntry['hpicfDot1xAuthSessionAuthenticMethod'];
+            $rowSet[$ifIndex]['username'] = $nacEntry['hpicfDot1xAuthSessionUserName'];
+            $rowSet[$ifIndex]['time_elapsed'] = $nacEntry['hpicfDot1xAuthSessionTime'] / 100;
         }
 
-        $table = SnmpQuery::mibs(['HP-DOT1X-EXTENSIONS-MIB'])->hideMib()->enumStrings()->walk('hpicfDot1xPaePortTable')->table();
-
-        $table = self::pivotTable($table);
+        $table = SnmpQuery::mibs(['HP-DOT1X-EXTENSIONS-MIB'])->hideMib()->enumStrings()->walk('hpicfDot1xPaePortTable')->table(2);
         foreach ($table as $ifIndex => $nacEntry) {
             if (! isset($rowSet[$ifIndex])) {
                 continue;
