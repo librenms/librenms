@@ -1996,10 +1996,9 @@
             "section": "graph",
             "order": 16,
             "default": 90,
-            "type": "int"
+            "type": "integer"
         },
         "graph_stat_percentile_x1_default": {
-			"default": 0,
             "group": "webui",
             "section": "graph",
             "order": 17,
@@ -2015,7 +2014,7 @@
             "section": "graph",
             "order": 18,
             "default": 95,
-            "type": "int"
+            "type": "integer"
         },
         "graph_colours.blues": {
             "default": [
