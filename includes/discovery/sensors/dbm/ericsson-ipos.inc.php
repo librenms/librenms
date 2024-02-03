@@ -44,4 +44,3 @@ foreach ($index_list as $index) {
         );
     }
 }
-
