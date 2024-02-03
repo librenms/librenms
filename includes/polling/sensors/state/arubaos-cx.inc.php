@@ -1,4 +1,5 @@
 <?php
+
 $stateLookupTable = [
     // arubaWiredVsfv2OperStatus
     'no_split' => 0,
