@@ -1,0 +1,314 @@
+-- %DNP% $Id: ERICSSON-ROUTER-BIND-CAP.my,v 1.1.4.6.386.3 2011/06/15 18:19:45 danielhe Exp $
+-- %DNP% $Source: /cvsroot/pkt/sw/se/xc/bsd/config/snmp/mibs/Attic/ERICSSON-ROUTER-BIND-CAP.my,v $
+-- *****************************************************************
+-- ERICSSON-ROUTER-BIND-CAP	    Bind Mib Capabilities
+--
+-- Copyright (c) 2002-2003, 2010-2011, 2015 Ericsson AB
+-- All rights reserved.
+--
+-- *****************************************************************
+
+ERICSSON-ROUTER-BIND-CAP DEFINITIONS ::= BEGIN
+
+IMPORTS
+
+	MODULE-IDENTITY
+			FROM SNMPv2-SMI
+	AGENT-CAPABILITIES
+			FROM SNMPv2-CONF
+	SnmpAdminString
+			FROM SNMP-FRAMEWORK-MIB
+	eriRouterCapabilities
+			FROM ERICSSON-ROUTER-SMI;
+
+eriRouterBindMibCap MODULE-IDENTITY
+        LAST-UPDATED    "201501141800Z" -- Jan 14, 2015
+        ORGANIZATION    "Ericsson Inc."
+        CONTACT-INFO
+                "       Ericsson, Inc.
+
+                Postal: 100 Headquarters Dr.
+                        San Jose, CA  95134
+                        USA
+
+                 Phone: +1 408 750 5000
+                   Fax: +1 408 750 5599
+                "
+	DESCRIPTION
+		"The Agent Capabilities of the Bind MIB.
+
+                If this MIB implementation is platform-dependent,
+                the PRODUCT-RELEASE clause contains Ericsson SEOS version and
+                at least one of the following Ericsson product families:
+                    [SE]  SmartEdge Multi-service Edge Router (MSER) family
+                    [SM]  SM family of Metro Ethernet Service Transport platforms
+                    [SSR] Smart Service Router (SSR) family"
+
+        REVISION        "201501141800Z" -- Jan 14, 2015
+        DESCRIPTION
+                "Updated RBN/rbn/Rbn as ERICSSON-ROUTER/eriRouter/EriRouter
+                 to migrate RBN MIB to ERICSSON MIB."
+
+        REVISION        "201106150000Z" -- Jun 15, 2011
+        DESCRIPTION
+                "Update DESCRIPTION clause of MODULE-IDENTITY
+                 and PRODUCT-RELEASE clause of AGENT-CAPABILITIES."
+
+        REVISION        "201011010000Z" -- Nov 1, 2010
+        DESCRIPTION
+                "Modified PRODUCT-RELEASE clause for consistent naming.
+                 Updated CONTACT-INFO."
+
+        REVISION        "200310131700Z" -- October 13, 2003
+        DESCRIPTION
+                "Added eriRouterBindMibCap4 for AOS release 7.0.X.X"
+
+        REVISION        "200307070000Z" -- Jul 7, 2003
+        DESCRIPTION
+                "Added eriRouterBindMibCap3 for SmartEdge release 2.5.4."
+
+        REVISION        "200301100000Z" -- Jan 10, 2003
+        DESCRIPTION
+                "Added eriRouterBindMibCap2 for SmartEdge release 2.4.4."
+
+	REVISION	"200201071700Z" -- Jan 7, 2001
+	DESCRIPTION
+		"Initial version ."
+
+	::= { eriRouterCapabilities 40 }
+
+eriRouterBindMibCap1 AGENT-CAPABILITIES
+	PRODUCT-RELEASE	"AOS 6.0.X.X"
+	STATUS		current
+	DESCRIPTION	"ERICSSON-ROUTER-BIND-MIB capabilities"
+	SUPPORTS	ERICSSON-ROUTER-BIND-MIB
+	INCLUDES {
+		eriRouterBindConfigGroup
+	}
+
+	VARIATION eriRouterBindName
+	WRITE-SYNTAX SnmpAdminString (SIZE (1..64))
+	DESCRIPTION
+		"The length of a line allowed in the CLI is 128 characters.
+		Thus, in order to manipulate objects created with SNMP via
+		the CLI, the length must be limited."
+
+	::= { eriRouterBindMibCap 1 }
+
+eriRouterBindMibCap2 AGENT-CAPABILITIES
+        PRODUCT-RELEASE "SEOS 2.4.4"
+        STATUS          current
+        DESCRIPTION     "ERICSSON-ROUTER-BIND-MIB capabilities"
+        SUPPORTS        ERICSSON-ROUTER-BIND-MIB
+        INCLUDES {
+                eriRouterBindConfigGroup
+        }
+
+        VARIATION       eriRouterBindType
+        ACCESS          read-only
+        DESCRIPTION
+                 "The following types are supported in Release 2.4
+                      unbound,
+                      authBind,
+                      interfaceBind,
+                      subscriberBind,
+                 Write access is not allowed.
+
+                 REFERENCE SmartEdge 800 Router Configuration Guide Release 2.4"
+
+        VARIATION       eriRouterBindName
+        WRITE-SYNTAX    SnmpAdminString (SIZE (1..64))
+        ACCESS          read-only
+        DESCRIPTION
+                "The length of a line allowed in the CLI is 128 characters.
+                Thus, in order to manipulate objects created with SNMP via
+                the CLI, the length must be limited. Write access is not
+                allowed"
+
+        VARIATION       eriRouterBindPassword
+        ACCESS          read-only
+        DESCRIPTION     "Write access is not allowed."
+
+        VARIATION       eriRouterBindContext
+        ACCESS          read-only
+        DESCRIPTION
+                 "The object is only applicable to the following type[s]
+                      interfaceBind,
+                      subscriberBind
+                  Write access is not allowed."
+
+        VARIATION       eriRouterBindAuthContext
+        ACCESS          read-only
+        DESCRIPTION
+                 "The object is only applicable to the following type[s]
+                      authBind
+                  Write access is not allowed."
+
+        VARIATION       eriRouterBindServiceGrp
+        ACCESS          not-implemented
+        DESCRIPTION    "Object not supported."
+
+        VARIATION       eriRouterBindAcl
+        ACCESS          not-implemented
+        DESCRIPTION    "Object not supported."
+
+        VARIATION       eriRouterBindAuthChap
+        ACCESS          read-only
+        DESCRIPTION
+                 "The object is only applicable to the following type[s]
+                      authBind
+                  Write access is not allowed."
+
+        VARIATION       eriRouterBindAuthPap
+        ACCESS          read-only
+        DESCRIPTION
+                 "The object is only applicable to the following type[s]
+                      authBind
+                  Write access is not allowed."
+
+        VARIATION       eriRouterBindAuthWait
+        ACCESS          read-only
+        DESCRIPTION
+                 "The object is only applicable to the following type[s]
+                      authBind
+                  Write access is not allowed."
+
+        VARIATION       eriRouterBindMaxSessions
+        ACCESS          read-only
+        DESCRIPTION
+                 "The object is only applicable to the following type[s]
+                      authBind
+                  Write access is not allowed."
+
+        VARIATION      eriRouterBindPvcSlot
+        ACCESS         not-implemented
+        DESCRIPTION    "Object not supported."
+
+        VARIATION      eriRouterBindPvcPort
+        ACCESS         not-implemented
+        DESCRIPTION    "Object not supported."
+
+        VARIATION      eriRouterBindVpn
+        ACCESS         not-implemented
+        DESCRIPTION    "Object not supported."
+
+        ::= { eriRouterBindMibCap 2 }
+
+eriRouterBindMibCap3 AGENT-CAPABILITIES
+        PRODUCT-RELEASE "SEOS 2.5.4 [SE]; SEOS 6.3.X [SM]; SEOS 11.1.X [SSR]"
+        STATUS          current
+        DESCRIPTION     "ERICSSON-ROUTER-BIND-MIB capabilities"
+        SUPPORTS        ERICSSON-ROUTER-BIND-MIB
+        INCLUDES {
+                eriRouterBindConfigGroup
+        }
+
+        VARIATION       eriRouterBindType
+        SYNTAX          INTEGER {
+                        unbound(1),            -- state on initial creation
+                        authBind(2),           -- "bind authentication"
+                        interfaceBind(4),      -- "bind interface"
+                        subscriberBind(5)      -- "bind subscriber"
+                        }
+        ACCESS          read-only
+        DESCRIPTION
+                "Write access is not allowed.  The values bypassBind(3),
+                l2tptunnelBind(6), sessionBind(7), dot1qBind(8),
+                multiIntfBind(9), multiSubBind(10), and multiClipsBind(11)
+                are not supported."
+
+        VARIATION       eriRouterBindName
+        SYNTAX          SnmpAdminString (SIZE (1..127))
+        ACCESS          read-only
+        DESCRIPTION
+                "Write access is not allowed."
+
+        VARIATION       eriRouterBindPassword
+        ACCESS          read-only
+        DESCRIPTION
+                "Write access is not allowed."
+
+        VARIATION       eriRouterBindContext
+        ACCESS          read-only
+        DESCRIPTION
+                "Write access is not allowed."
+
+        VARIATION       eriRouterBindAuthContext
+        ACCESS          read-only
+        DESCRIPTION
+                "Write access is not allowed."
+
+        VARIATION       eriRouterBindServiceGrp
+        ACCESS          not-implemented
+        DESCRIPTION
+                "Object not supported."
+
+        VARIATION       eriRouterBindAcl
+        ACCESS          not-implemented
+        DESCRIPTION
+                "Object not supported."
+
+        VARIATION       eriRouterBindAuthChap
+        ACCESS          read-only
+        DESCRIPTION
+                "Write access is not allowed."
+
+        VARIATION       eriRouterBindAuthPap
+        ACCESS          read-only
+        DESCRIPTION
+                "Write access is not allowed."
+
+        VARIATION       eriRouterBindAuthWait
+        ACCESS          read-only
+        DESCRIPTION
+                "Write access is not allowed."
+
+        VARIATION       eriRouterBindAuthPapFirst
+        ACCESS          read-only
+        DESCRIPTION
+                "Write access is not allowed."
+
+        VARIATION       eriRouterBindMaxSessions
+        ACCESS          read-only
+        DESCRIPTION
+                "The maximum number of concurrent PPPoE sessions allowed
+                on the circuit on the SE800/400 platform is 8000.
+
+                Write access is not allowed."
+
+        VARIATION      eriRouterBindPvcSlot
+        ACCESS         not-implemented
+        DESCRIPTION
+                "Object not supported."
+
+        VARIATION      eriRouterBindPvcPort
+        ACCESS         not-implemented
+        DESCRIPTION
+                "Object not supported."
+
+        VARIATION      eriRouterBindVpn
+        ACCESS         not-implemented
+        DESCRIPTION
+                "Object not supported."
+
+        ::= { eriRouterBindMibCap 3 }
+
+eriRouterBindMibCap4 AGENT-CAPABILITIES
+	PRODUCT-RELEASE	"AOS 7.0.X.X"
+	STATUS		current
+	DESCRIPTION	"ERICSSON-ROUTER-BIND-MIB capabilities"
+	SUPPORTS	ERICSSON-ROUTER-BIND-MIB
+	INCLUDES {
+		eriRouterBindConfigGroup2
+	}
+
+	VARIATION eriRouterBindName
+	WRITE-SYNTAX SnmpAdminString (SIZE (1..64))
+	DESCRIPTION
+		"The length of a line allowed in the CLI is 128 characters.
+		Thus, in order to manipulate objects created with SNMP via
+		the CLI, the length must be limited."
+
+	::= { eriRouterBindMibCap 4 }
+
+END

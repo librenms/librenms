@@ -1,0 +1,261 @@
+
+-- -------------------------------------------------------------
+-- COPYRIGHT Ericsson AB 2005
+-- Doc no: 3/196 03 - CXC 132 4958
+-- Version: '$Id: ERICSSON-ELN-TRAP-MIB.mib,v 1.11 2005/07/15 10:15:59 hka Exp $'
+-- -------------------------------------------------------------
+
+-- -------------------------------------------------------------
+-- MIB for Ericsson Local Node, Ethernet Switch
+-- Trap Definitions
+-- -------------------------------------------------------------
+
+
+ERICSSON-ELN-TRAP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+   MODULE-IDENTITY, 
+   OBJECT-TYPE, 
+   TimeTicks, 
+   mib-2, 
+   NOTIFICATION-TYPE			    FROM SNMPv2-SMI
+   DisplayString                            FROM SNMPv2-TC
+   NOTIFICATION-GROUP, 
+   MODULE-COMPLIANCE                        FROM SNMPv2-CONF
+   snmpTraps                                FROM SNMPv2-MIB
+   managedObjectClass, 
+   managedObjectInstance,
+   sequenceNumber, 
+   perceivedSeverity,
+   eventTime, 
+   eventTypePem, 
+   probableCause	                    FROM PEM-STANDARD
+   elnMainBoardTemperature,                 
+   elnMainBoardTemperatureLimit             FROM ERICSSON-ELN-MIB
+   eln                                      FROM ERICSSON-ELN-SMI;
+
+
+elnTrapMIB MODULE-IDENTITY
+    LAST-UPDATED 
+         "200503170000Z"
+    ORGANIZATION 
+         "Ericsson"
+    CONTACT-INFO
+         "Ericsson Diax A/S
+          Faelledvej 17
+          DK-7600 Struer
+          Denmark
+          E-mail: support@dxd.ericsson.se"       
+    DESCRIPTION
+         "This MIB module defines the Traps for the ELN"
+    REVISION     "200112100000Z"
+    DESCRIPTION
+            "Initial revision"
+    REVISION     "200203250000Z"
+    DESCRIPTION
+            "Updated revision"
+    REVISION     "200301100000Z"
+    DESCRIPTION
+            "Updatad with new varbinds for ITU data"
+    REVISION     "200503170000Z"
+    DESCRIPTION
+            "Updatad with new name for start trap, and new parameters
+             for overheat traps. Usage of ERICSSON-ELN-SMI.
+             Addition of 'Ericsson Diax additional information' format."
+    ::= { eln 2 }
+    
+elnTrap			OBJECT IDENTIFIER ::= { elnTrapMIB 0 }
+
+
+elnStart NOTIFICATION-TYPE
+    OBJECTS { managedObjectClass, managedObjectInstance, sequenceNumber,
+    	      perceivedSeverity, eventTime, eventTypePem, probableCause }
+    STATUS  current
+    DESCRIPTION
+    "The switch has started / restarted."
+
+    --Ericsson Diax additional information:
+    --Format: The switch has started (or restarted): $2; Probable cause: $9; Sequence Number: $3;
+    --CeasingId: "agent-addr", 0
+    --CeasingId: "agent-addr", 0
+
+    ::= { elnTrap 1 }
+    
+elnLinkDown NOTIFICATION-TYPE
+    OBJECTS { managedObjectClass, managedObjectInstance, sequenceNumber,
+    	      perceivedSeverity, eventTime, eventTypePem, probableCause }
+    STATUS  current
+    DESCRIPTION
+    "The agent has detected that ifOperStatus for one communication link 
+     is about to enter the down state."
+    
+    --Ericsson Diax additional information:
+    --Format: One ethernet port has gone down: $2; Probable cause: $9; Sequence Number: $3;
+    --CeasingId: "agent-addr", 0
+    --CeasingId: "agent-addr", 0
+    
+    ::= { elnTrap 2 }
+
+elnLinkUp NOTIFICATION-TYPE
+    OBJECTS { managedObjectClass, managedObjectInstance, sequenceNumber,
+    	      perceivedSeverity, eventTime, eventTypePem, probableCause }
+    STATUS  current
+    DESCRIPTION
+    "The agent has detected ifOperStatus for one communication links has left 
+     down state and transitioned into another state."
+    
+    --Ericsson Diax additional information:
+    --Format: One ethernet port has gone up: $2; Probable cause: $9; Sequence Number: $3;
+    --CeasingId: "agent-addr", 0
+    --CeasingId: "agent-addr", 0
+    
+    ::= { elnTrap 3 }
+
+elnOverheat NOTIFICATION-TYPE
+    OBJECTS { managedObjectClass, managedObjectInstance, sequenceNumber,
+    	      perceivedSeverity, eventTime, eventTypePem, probableCause,
+	      elnMainBoardTemperature, elnMainBoardTemperatureLimit
+	    }
+    STATUS  current
+    DESCRIPTION
+    "The on board temperature sensor has detected an overheat condition."
+    
+    --Ericsson Diax additional information:
+    --Format: Temperature is too high from: $2; Probable cause: $7; Temperature Value: $8; Temperature Limit: $9; Sequence Number: $3;
+    --CeasingId: "agent-addr", 0
+    --CeasingId: "agent-addr", 0
+    
+    ::= { elnTrap 4 }
+
+elnFanFail NOTIFICATION-TYPE
+    OBJECTS { managedObjectClass, managedObjectInstance, sequenceNumber,
+    	      perceivedSeverity, eventTime, eventTypePem, probableCause }
+    STATUS  current
+    DESCRIPTION
+    "One or more fans is not working."
+    
+    --Ericsson Diax additional information:
+    --Format: One or more fans is not working: $2; Probable cause: $7; Sequence Number: $3; 
+    --CeasingId: "agent-addr", 0
+    --CeasingId: "agent-addr", 0
+    
+    ::= { elnTrap 5 }
+    
+elnPowerSupplyFail NOTIFICATION-TYPE
+    OBJECTS { managedObjectClass, managedObjectInstance, sequenceNumber,
+    	      perceivedSeverity, eventTime, eventTypePem, probableCause }
+    STATUS  current
+    DESCRIPTION
+    "One or more sources of power has failed.
+     Presumably a redundant power-supply has taken over."
+    
+    --Ericsson Diax additional information:
+    --Format: One or more sources of power has failed: $2; Probable cause: $7; Sequence Number: $3;
+    --CeasingId: "agent-addr", 0
+    --CeasingId: "agent-addr", 0
+    
+    ::= { elnTrap 6 }
+
+elnPowerBackupFail NOTIFICATION-TYPE
+    OBJECTS { managedObjectClass, managedObjectInstance, sequenceNumber,
+    	      perceivedSeverity, eventTime, eventTypePem, probableCause }
+    STATUS  current
+    DESCRIPTION
+    "One or more sources of backup power has failed."
+    
+    --Ericsson Diax additional information:
+    --Format: One or more sources of backup power has failed: $2; Probable cause: $7; Sequence Number: $3;
+    --CeasingId: "agent-addr", 0
+    --CeasingId: "agent-addr", 0
+    
+    ::= { elnTrap 7 }
+
+elnCabinetDoorOpen NOTIFICATION-TYPE
+    OBJECTS { managedObjectClass, managedObjectInstance, sequenceNumber,
+    	      perceivedSeverity, eventTime, eventTypePem, probableCause }
+    STATUS  current
+    DESCRIPTION
+    "The door to the cabinet has been opened."
+    
+    --Ericsson Diax additional information:
+    --Format: The door to the cabinet has been opened: $2; Probable cause: $7; Sequence Number: $3;
+    --CeasingId: "agent-addr", 0
+    --CeasingId: "agent-addr", 0
+    
+    ::= { elnTrap 8 }
+
+elnHighTrafficLoad NOTIFICATION-TYPE
+    OBJECTS { managedObjectClass, managedObjectInstance, sequenceNumber,
+    	      perceivedSeverity, eventTime, eventTypePem, probableCause }
+    STATUS  current
+    DESCRIPTION
+    "The number of free Cell Descriptors in the network processor has
+     fallen below a threshold value. "
+    
+    --Ericsson Diax additional information:
+    --Format: The door to the cabinet has been opened: $2; Probable cause: $7; Sequence Number: $3;
+    --CeasingId: "agent-addr", 0
+    --CeasingId: "agent-addr", 0
+    
+    ::= { elnTrap 9 }
+
+elnOverheatOK NOTIFICATION-TYPE
+    OBJECTS { managedObjectClass, managedObjectInstance, sequenceNumber,
+    	      perceivedSeverity, eventTime, eventTypePem, probableCause,
+	      elnMainBoardTemperature, elnMainBoardTemperatureLimit
+	    }
+    STATUS  current
+    DESCRIPTION
+    "An on board temperature sensor has detected that the overheat 
+     condition has ceased."
+    
+    --Ericsson Diax additional information:
+    --Format: Temperature is normal again from: $2; Probable cause: $7; Temperature Value: $8; Temperature Limit: $9; Sequence Number: $3;
+    
+    ::= { elnTrap 11 }
+
+elnFanOK NOTIFICATION-TYPE
+    OBJECTS { managedObjectClass, managedObjectInstance, sequenceNumber,
+    	      perceivedSeverity, eventTime, eventTypePem, probableCause }
+    STATUS  current
+    DESCRIPTION
+    "The fan is working again after a failure."
+	      
+    --Ericsson Diax additional information:
+    --Format: The fans are working again after a failure: $2; Probable cause: $7; Sequence Number: $3; 
+    --CeasingId: "agent-addr", 0
+    --CeasingId: "agent-addr", 0
+	      
+    ::= { elnTrap 12 }
+    
+elnPowerSupplyOK NOTIFICATION-TYPE
+    OBJECTS { managedObjectClass, managedObjectInstance, sequenceNumber,
+    	      perceivedSeverity, eventTime, eventTypePem, probableCause }
+    STATUS  current
+    DESCRIPTION
+    "All sources of power is working again after a failure."
+	      
+    --Ericsson Diax additional information:
+    --Format: All sources of power is working again after a failure: $2; Probable cause: $7; Sequence Number: $3; 
+    --CeasingId: "agent-addr", 0
+    --CeasingId: "agent-addr", 0
+	      
+    ::= { elnTrap 13 }
+    
+elnPowerBackupOK NOTIFICATION-TYPE
+    OBJECTS { managedObjectClass, managedObjectInstance, sequenceNumber,
+    	      perceivedSeverity, eventTime, eventTypePem, probableCause }
+    STATUS  current
+    DESCRIPTION
+    "All sources of backup power is working again after a failure."
+	      
+    --Ericsson Diax additional information:
+    --Format: All sources of backup power is working again after a failure: $2; Probable cause: $7; Sequence Number: $3; 
+    --CeasingId: "agent-addr", 0
+    --CeasingId: "agent-addr", 0
+	      
+    ::= { elnTrap 14 }
+    
+    
+END
+

@@ -1,0 +1,55 @@
+-- *****************************************************************
+-- AGENTX-MIB-CAP    Ericsson AGENTX Master Capabilities
+--
+-- Copyright (c) 2013, 2015 Ericsson AB.
+-- All rights reserved.
+--
+-- *****************************************************************
+
+ERICSSON-ROUTER-AGENTX-CAP DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY
+                FROM SNMPv2-SMI
+        AGENT-CAPABILITIES
+                FROM SNMPv2-CONF
+        eriRouterCapabilities
+                FROM ERICSSON-ROUTER-SMI;
+
+eriRouterAgentXCap MODULE-IDENTITY
+    LAST-UPDATED    "201501141800Z" -- Jan 14, 2015
+    ORGANIZATION    "Ericsson AB."
+    CONTACT-INFO    "postal:   Kovacs Zsolt
+                            Budapest
+                            1117 Irinyi ut
+		  email:    kovacs.zsolt@ericssson.com
+                 "
+    DESCRIPTION
+        "
+	MIB module for the SNMP Agent Extensibility Protocol (AgentX).
+	This MIB module will be implemented by the master agent.
+	"
+    REVISION    "201501141800Z" -- Jan 14, 2015
+    DESCRIPTION
+           "Updated RBN/rbn/Rbn as ERICSSON-ROUTER/eriRouter/EriRouter
+            to migrate RBN MIB to ERICSSON MIB."
+
+    REVISION    "2013032700Z" -- March 27, 2013
+    DESCRIPTION
+           "Initial version"
+        ::= { eriRouterCapabilities 104 }
+
+eriRouterAgentXCap1 AGENT-CAPABILITIES
+    PRODUCT-RELEASE "IPOS 13.2.x [SSR]"
+    STATUS          current
+    DESCRIPTION     "AGENTX-MIB capabilities"
+    SUPPORTS        AGENTX-MIB
+    INCLUDES {
+       agentxConnectionTable,
+       agentxSessionTable,
+       agentxRegistrationTable
+    }
+
+    ::= { eriRouterAgentXCap 1 }
+
+END

@@ -1,0 +1,633 @@
+-- %DNP% $Id: ERICSSON-ROUTER-CARDMON-MIB.my,v 1.1.2.8.154.2 2011/02/22 17:26:16 thatcher Exp $
+-- %DNP% $Source: /cvsroot/pkt/sw/se/xc/bsd/config/snmp/mibs/Attic/ERICSSON-ROUTER-CARDMON-MIB.my,v $
+-- *****************************************************************
+-- ERICSSON-ROUTER-CARDMON-MIB              Card Monitor MIB
+--
+-- Copyright (c) 2004-2006, 2011, 2015 Ericsson AB
+-- All rights reserved.
+-- 
+-- *****************************************************************
+
+ERICSSON-ROUTER-CARDMON-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        NOTIFICATION-TYPE,
+        Gauge32,
+        Unsigned32
+                FROM SNMPv2-SMI
+        MODULE-COMPLIANCE,
+        OBJECT-GROUP,
+        NOTIFICATION-GROUP
+                FROM SNMPv2-CONF
+        SnmpAdminString
+                FROM SNMP-FRAMEWORK-MIB
+        DateAndTime
+                FROM SNMPv2-TC
+        EriRouterSlot
+                FROM ERICSSON-ROUTER-TC
+        EriRouterAlarmType,
+        EriRouterAlarmProbableCause,
+        EriRouterAlarmPerceivedSeverity,
+        EriRouterAlarmId,
+        EriRouterAlarmServiceAffecting
+                FROM ERICSSON-ROUTER-ALARM-TC
+        eriRouterMgmt
+                FROM ERICSSON-ROUTER-SMI;
+
+eriRouterCardMonMIB MODULE-IDENTITY
+        LAST-UPDATED    "201501141800Z" -- Jan 14, 2015
+        ORGANIZATION    "Ericsson AB."
+        CONTACT-INFO
+                "       Ericsson AB.
+
+                Postal: 100 Headquarters Dr
+                        San Jose, CA  95134
+                        USA
+
+                 Phone: +1 408 750 5000
+                   Fax: +1 408 750 5599
+                "
+        DESCRIPTION
+                "The MIB used to manage the Controller, I/O and
+                System Card Monitor functionality on network devices."
+
+        REVISION        "201501141800Z" -- Jan 14, 2015
+        DESCRIPTION
+                "Updated RBN/rbn/Rbn as ERICSSON-ROUTER/eriRouter/EriRouter
+                 to migrate RBN MIB to ERICSSON MIB."
+
+        REVISION        "201101191800Z" -- Jan 19, 2011
+        DESCRIPTION
+                "Update CONTACT-INFO & ORGANIZATION. "
+
+        REVISION        "200610020000Z" -- October 2, 2006
+        DESCRIPTION
+                "Added new MIB objects:
+                    eriRouterCardStatsVplsCircuits
+                    eriRouterCardStatsIpipCircuits
+                    eriRouterCardStatsIpv6v4ManualCircuits
+                    eriRouterCardStatsIpv6v4AutoCircuits
+                "
+
+        REVISION        "200505090000Z" -- May 9, 2005
+        DESCRIPTION
+                "Added eriRouterCardAlarmServiceAffecting."
+
+        REVISION        "200409270000Z" -- September 27, 2004
+        DESCRIPTION
+                "Added eriRouterCardStatsTable and updated conformance 
+                 information."
+
+        REVISION        "200406290000Z" -- Jun 29, 2004
+        DESCRIPTION
+                "Initial version."
+        ::= { eriRouterMgmt 31 }
+
+eriRouterCardMonMIBNotifications OBJECT IDENTIFIER
+        ::= { eriRouterCardMonMIB 0 }
+
+eriRouterCardMonMIBObjects OBJECT IDENTIFIER
+        ::= { eriRouterCardMonMIB 1 }
+
+eriRouterCardMonMIBConformance OBJECT IDENTIFIER
+        ::= { eriRouterCardMonMIB 2 }
+
+
+-- Textual Conventions
+
+
+-- MIB Objects
+
+eriRouterCardAlarmActiveTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF EriRouterCardAlarmActiveEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                "This table contains the card alarms currently
+                active on the system."
+        ::= { eriRouterCardMonMIBObjects 1 }
+
+eriRouterCardAlarmActiveEntry OBJECT-TYPE
+        SYNTAX      EriRouterCardAlarmActiveEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                "Entries appear in this table when alarms are
+                raised. They are removed when the alarms are cleared."
+        INDEX   { eriRouterCardAlarmSlot, eriRouterCardAlarmActiveIndex }
+        ::= { eriRouterCardAlarmActiveTable 1 }
+
+EriRouterCardAlarmActiveEntry ::= SEQUENCE {
+        eriRouterCardAlarmSlot                EriRouterSlot,
+        eriRouterCardAlarmActiveIndex         Unsigned32,
+        eriRouterCardAlarmId                  EriRouterAlarmId,
+        eriRouterCardAlarmType                EriRouterAlarmType,
+        eriRouterCardAlarmDateAndTime         DateAndTime,
+        eriRouterCardAlarmDescription         SnmpAdminString,
+        eriRouterCardAlarmProbableCause       EriRouterAlarmProbableCause,
+        eriRouterCardAlarmSeverity            EriRouterAlarmPerceivedSeverity,
+        eriRouterCardAlarmServiceAffecting    EriRouterAlarmServiceAffecting
+}
+
+eriRouterCardAlarmSlot OBJECT-TYPE
+        SYNTAX      EriRouterSlot
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                "The chassis slot number in which the card is present."
+        ::= { eriRouterCardAlarmActiveEntry 1 }
+
+eriRouterCardAlarmActiveIndex OBJECT-TYPE
+        SYNTAX      Unsigned32 (1..4294967295)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                "A monotonically increasing integer index. It wraps
+                back to 1 after it reaches its maximum value."
+        ::= { eriRouterCardAlarmActiveEntry 2 }
+
+eriRouterCardAlarmId OBJECT-TYPE 
+        SYNTAX      EriRouterAlarmId
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "An identifier for the alarm."
+        ::= { eriRouterCardAlarmActiveEntry 3 }
+
+eriRouterCardAlarmType OBJECT-TYPE 
+        SYNTAX      EriRouterAlarmType
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The type of the alarm."
+        ::= { eriRouterCardAlarmActiveEntry 4 }
+
+eriRouterCardAlarmDateAndTime OBJECT-TYPE 
+        SYNTAX      DateAndTime
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The local date and time when the alarm was raised"
+        ::= { eriRouterCardAlarmActiveEntry 5 }
+
+eriRouterCardAlarmDescription OBJECT-TYPE 
+        SYNTAX      SnmpAdminString (SIZE(0..64))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "A text string which conveys additional information
+                about the alarm."
+        ::= { eriRouterCardAlarmActiveEntry 6 }
+
+eriRouterCardAlarmProbableCause OBJECT-TYPE 
+        SYNTAX      EriRouterAlarmProbableCause
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The probable cause for this alarm."
+        ::= { eriRouterCardAlarmActiveEntry 7 }
+
+eriRouterCardAlarmSeverity OBJECT-TYPE 
+        SYNTAX      EriRouterAlarmPerceivedSeverity
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The perceived severity of the alarm."
+        ::= { eriRouterCardAlarmActiveEntry 8 }
+
+eriRouterCardAlarmServiceAffecting OBJECT-TYPE
+        SYNTAX      EriRouterAlarmServiceAffecting
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Indicates whether the alarm is perceived to be
+                service impacting."
+        ::= { eriRouterCardAlarmActiveEntry 9 }
+
+eriRouterCardStatsTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF EriRouterCardStatsEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                "This table contains per card statistics for traffic 
+                 cards. This table also provides an entry for the card
+                 that contains the ethernet management port."
+        ::= { eriRouterCardMonMIBObjects 2 }
+
+eriRouterCardStatsEntry OBJECT-TYPE
+        SYNTAX      EriRouterCardStatsEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                "A table providing per card statistics."
+        INDEX   { eriRouterCardStatsSlot}
+        ::= { eriRouterCardStatsTable 1 }
+
+EriRouterCardStatsEntry ::= SEQUENCE {
+        eriRouterCardStatsSlot                   EriRouterSlot,
+        eriRouterCardStatsTotalCircuits          Gauge32,
+        eriRouterCardStatsUpCircuits             Gauge32,
+        eriRouterCardStatsDownCircuits           Gauge32,
+        eriRouterCardStatsUnboundCircuits        Gauge32,
+        eriRouterCardStatsNoBindCircuits         Gauge32,
+        eriRouterCardStatsBindTotalCircuits      Gauge32,
+        eriRouterCardStatsBindIfCircuits         Gauge32,
+        eriRouterCardStatsBindAuthCircuits       Gauge32,
+        eriRouterCardStatsBindSubCircuits        Gauge32,
+        eriRouterCardStatsAtmCircuits            Gauge32,
+        eriRouterCardStatsEthCircuits            Gauge32,
+        eriRouterCardStatsPppCircuits            Gauge32,
+        eriRouterCardStatsPppoeCircuits          Gauge32,
+        eriRouterCardStatsDot1qCircuits          Gauge32,
+        eriRouterCardStatsFrCircuits             Gauge32,
+        eriRouterCardStatsChdlcCircuits          Gauge32,
+        eriRouterCardStatsGreCircuits            Gauge32,
+        eriRouterCardStatsMplsCircuits           Gauge32,
+        eriRouterCardStatsClipsCircuits          Gauge32,
+        eriRouterCardStatsVplsCircuits           Gauge32,
+        eriRouterCardStatsIpipCircuits           Gauge32,
+        eriRouterCardStatsIpv6v4ManualCircuits   Gauge32,
+        eriRouterCardStatsIpv6v4AutoCircuits     Gauge32
+}
+
+eriRouterCardStatsSlot OBJECT-TYPE
+        SYNTAX      EriRouterSlot
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                "The chassis slot number in which the card is present."
+        ::= { eriRouterCardStatsEntry 1 }
+
+eriRouterCardStatsTotalCircuits OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The count of all circuits configured on the card."
+        ::= { eriRouterCardStatsEntry  2}
+
+eriRouterCardStatsUpCircuits OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The count of circuits in an up state configured on the 
+                 card."
+        ::= { eriRouterCardStatsEntry  3}
+
+eriRouterCardStatsDownCircuits OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The count of circuits in a down state configured on the
+                 card."
+        ::= { eriRouterCardStatsEntry  4}
+
+eriRouterCardStatsUnboundCircuits OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The count of circuits not bound to an interface that 
+                 are configured on the card."
+        ::= { eriRouterCardStatsEntry  5}
+
+eriRouterCardStatsNoBindCircuits OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The count of circuits configured on the card that are 
+                 not bound to an interface and are not subscriber or
+                 clips circuits."
+        ::= { eriRouterCardStatsEntry  6}
+
+eriRouterCardStatsBindTotalCircuits OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The count of all circuits bound to an interface that
+                 are configured on the card." 
+        ::= { eriRouterCardStatsEntry  7}
+
+eriRouterCardStatsBindIfCircuits OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The count of circuits configured on the card that are 
+                 bound to an interface and are not subscriber circuits."
+        ::= { eriRouterCardStatsEntry  8} 
+
+eriRouterCardStatsBindAuthCircuits OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The count of subscriber and clips bind authentication 
+                 circuits configured on the card."
+        ::= { eriRouterCardStatsEntry  9}
+
+eriRouterCardStatsBindSubCircuits OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The count of bind subscriber, including clips, and bind
+                 auto-subscriber circuits configured on the card." 
+        ::= { eriRouterCardStatsEntry  10}
+
+eriRouterCardStatsAtmCircuits OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The count of atm circuits configured on the card."
+        ::= { eriRouterCardStatsEntry  11}
+
+eriRouterCardStatsEthCircuits OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The count of ethernet circuits configured on the card."
+        ::= { eriRouterCardStatsEntry  12}
+
+eriRouterCardStatsPppCircuits OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The count of ppp circuits configured on the card."
+        ::= { eriRouterCardStatsEntry  13}
+
+eriRouterCardStatsPppoeCircuits OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The count of pppoe circuits configured on the card."
+        ::= { eriRouterCardStatsEntry  14}
+
+eriRouterCardStatsDot1qCircuits OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The count of dot1q circuits configured on the card."
+        ::= { eriRouterCardStatsEntry  15}
+
+eriRouterCardStatsFrCircuits OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The count of frame relay circuits configured on the 
+                 card."
+        ::= { eriRouterCardStatsEntry  16}
+
+eriRouterCardStatsChdlcCircuits OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The count of chdlc circuits configured on the card."
+        ::= { eriRouterCardStatsEntry  17}
+
+eriRouterCardStatsGreCircuits OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The count of gre circuits configured on the card."
+        ::= { eriRouterCardStatsEntry  18}
+
+eriRouterCardStatsMplsCircuits OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The count of mpls circuits configured on the card."
+        ::= { eriRouterCardStatsEntry  19}
+
+eriRouterCardStatsClipsCircuits OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The count of clips circuits configured on the card."
+        ::= { eriRouterCardStatsEntry  20}
+
+eriRouterCardStatsVplsCircuits OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The count of vpls circuits configured on the card."
+        ::= { eriRouterCardStatsEntry  21}
+
+eriRouterCardStatsIpipCircuits OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The count of IP-in-IP tunnel circuits configured on the
+                card."
+        ::= { eriRouterCardStatsEntry  22}
+
+eriRouterCardStatsIpv6v4ManualCircuits OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The count of IPv6v4-manual tunnel circuits configured
+                on the card."
+        ::= { eriRouterCardStatsEntry  23}
+
+eriRouterCardStatsIpv6v4AutoCircuits OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The count of IPv6v4-auto tunnel circuits configured on
+                the card."
+        ::= { eriRouterCardStatsEntry  24}
+
+-- Notifications
+
+eriRouterCardAlarm NOTIFICATION-TYPE
+        OBJECTS     {
+                        eriRouterCardAlarmSlot,
+                        eriRouterCardAlarmId,
+                        eriRouterCardAlarmType,
+                        eriRouterCardAlarmDateAndTime,
+                        eriRouterCardAlarmDescription,
+                        eriRouterCardAlarmProbableCause,
+                        eriRouterCardAlarmSeverity,
+                        eriRouterCardAlarmServiceAffecting
+                    }
+        STATUS      current
+        DESCRIPTION
+                "An eriRouterCardAlarm notification signifies that an
+                alarm has been raised/cleared on a controller,
+                system or i/o card."
+        ::= { eriRouterCardMonMIBNotifications 1 }
+
+-- Conformance Statements
+
+eriRouterCardMonMIBGroups OBJECT IDENTIFIER
+        ::= { eriRouterCardMonMIBConformance 1 }
+
+eriRouterCardMonMIBCompliances OBJECT IDENTIFIER
+        ::= { eriRouterCardMonMIBConformance 2 }
+
+eriRouterCardMonMIBObjectGroup OBJECT-GROUP
+      OBJECTS     {   eriRouterCardAlarmId, eriRouterCardAlarmType,
+                      eriRouterCardAlarmDateAndTime, eriRouterCardAlarmDescription,
+                      eriRouterCardAlarmProbableCause, eriRouterCardAlarmSeverity
+                  }
+      STATUS      current
+      DESCRIPTION
+              "A collection of objects providing card monitor
+              information."
+      ::= { eriRouterCardMonMIBGroups 1 }
+
+eriRouterCardMonMIBObjectGroup2 OBJECT-GROUP
+      OBJECTS     {   eriRouterCardAlarmId, eriRouterCardAlarmType,
+                      eriRouterCardAlarmDateAndTime, eriRouterCardAlarmDescription,
+                      eriRouterCardAlarmProbableCause, eriRouterCardAlarmSeverity,
+                      eriRouterCardAlarmServiceAffecting
+                  }
+      STATUS      current
+      DESCRIPTION
+              "A collection of objects providing card monitor
+              information."
+      ::= { eriRouterCardMonMIBGroups 4 }
+
+eriRouterCardMonMIBNotificationGroup NOTIFICATION-GROUP
+      NOTIFICATIONS   {   eriRouterCardAlarm
+                      }
+      STATUS      current
+      DESCRIPTION
+              "A collection of notifications providing card
+              monitor information."
+      ::= { eriRouterCardMonMIBGroups 2 }
+
+eriRouterCardStatsMIBObjectGroup OBJECT-GROUP
+      OBJECTS     {
+                   eriRouterCardStatsTotalCircuits,          
+                   eriRouterCardStatsUpCircuits,             
+                   eriRouterCardStatsDownCircuits,           
+                   eriRouterCardStatsUnboundCircuits,        
+                   eriRouterCardStatsNoBindCircuits,         
+                   eriRouterCardStatsBindTotalCircuits,      
+                   eriRouterCardStatsBindIfCircuits,         
+                   eriRouterCardStatsBindAuthCircuits,       
+                   eriRouterCardStatsBindSubCircuits,        
+                   eriRouterCardStatsAtmCircuits,            
+                   eriRouterCardStatsEthCircuits,            
+                   eriRouterCardStatsPppCircuits,            
+                   eriRouterCardStatsPppoeCircuits,          
+                   eriRouterCardStatsDot1qCircuits,          
+                   eriRouterCardStatsFrCircuits,             
+                   eriRouterCardStatsChdlcCircuits,          
+                   eriRouterCardStatsGreCircuits,            
+                   eriRouterCardStatsMplsCircuits,           
+                   eriRouterCardStatsClipsCircuits
+                  }
+      STATUS      current
+      DESCRIPTION
+              "A group of objects providing card statistics."
+      ::= { eriRouterCardMonMIBGroups 3 }
+
+eriRouterCardStatsMIBObjectGroup2 OBJECT-GROUP
+      OBJECTS     {
+                   eriRouterCardStatsTotalCircuits,          
+                   eriRouterCardStatsUpCircuits,             
+                   eriRouterCardStatsDownCircuits,           
+                   eriRouterCardStatsUnboundCircuits,        
+                   eriRouterCardStatsNoBindCircuits,         
+                   eriRouterCardStatsBindTotalCircuits,      
+                   eriRouterCardStatsBindIfCircuits,         
+                   eriRouterCardStatsBindAuthCircuits,       
+                   eriRouterCardStatsBindSubCircuits,        
+                   eriRouterCardStatsAtmCircuits,            
+                   eriRouterCardStatsEthCircuits,            
+                   eriRouterCardStatsPppCircuits,            
+                   eriRouterCardStatsPppoeCircuits,          
+                   eriRouterCardStatsDot1qCircuits,          
+                   eriRouterCardStatsFrCircuits,             
+                   eriRouterCardStatsChdlcCircuits,          
+                   eriRouterCardStatsGreCircuits,            
+                   eriRouterCardStatsMplsCircuits,           
+                   eriRouterCardStatsClipsCircuits,
+                   eriRouterCardStatsVplsCircuits,
+                   eriRouterCardStatsIpipCircuits,
+                   eriRouterCardStatsIpv6v4ManualCircuits,
+                   eriRouterCardStatsIpv6v4AutoCircuits
+                  }
+      STATUS      current
+      DESCRIPTION
+              "A group of objects providing card statistics."
+      ::= { eriRouterCardMonMIBGroups 5 }
+
+eriRouterCardMonMIBCompliance MODULE-COMPLIANCE
+      STATUS      current
+      DESCRIPTION
+              "The compliance statement for the Card Monitor MIB"
+      MODULE      -- this module
+      GROUP       eriRouterCardMonMIBObjectGroup
+      DESCRIPTION
+              "This group is mandatory for devices which contain
+              Card Monitoring capabilities"
+      GROUP       eriRouterCardMonMIBNotificationGroup
+      DESCRIPTION
+              "This group is mandatory for devices which contain
+              Card Monitoring capabilities"
+
+      ::= { eriRouterCardMonMIBCompliances 1 }
+
+eriRouterCardMonMIBCompliance2 MODULE-COMPLIANCE
+      STATUS      current
+      DESCRIPTION
+              "The compliance statement for the Card Monitor MIB, 
+               including card statistics."
+      MODULE      -- this module
+      MANDATORY-GROUPS {
+              eriRouterCardMonMIBObjectGroup,
+              eriRouterCardMonMIBNotificationGroup,
+              eriRouterCardStatsMIBObjectGroup
+      }
+      ::= { eriRouterCardMonMIBCompliances 2 }
+
+eriRouterCardMonMIBCompliance3 MODULE-COMPLIANCE
+      STATUS      current
+      DESCRIPTION
+              "The compliance statement for the Card Monitor MIB, 
+               including card statistics."
+      MODULE      -- this module
+      MANDATORY-GROUPS {
+              eriRouterCardMonMIBObjectGroup2,
+              eriRouterCardMonMIBNotificationGroup,
+              eriRouterCardStatsMIBObjectGroup
+      }
+      ::= { eriRouterCardMonMIBCompliances 3 }
+
+eriRouterCardMonMIBCompliance4 MODULE-COMPLIANCE
+      STATUS      current
+      DESCRIPTION
+              "The compliance statement for the Card Monitor MIB, 
+               including card statistics."
+      MODULE      -- this module
+      MANDATORY-GROUPS {
+              eriRouterCardMonMIBObjectGroup2,
+              eriRouterCardMonMIBNotificationGroup,
+              eriRouterCardStatsMIBObjectGroup2
+      }
+      ::= { eriRouterCardMonMIBCompliances 4 }
+
+END

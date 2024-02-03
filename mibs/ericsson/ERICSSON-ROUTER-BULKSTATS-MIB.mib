@@ -1,0 +1,331 @@
+-- %DNP%
+-- %DNP% $Source: /cvsroot/pkt/sw/se/xc/bsd/config/snmp/mibs/Attic/ERICSSON-ROUTER-BULKSTATS-MIB.my,v $
+-- *****************************************************************
+-- ERICSSON-ROUTER-BULKSTATS-MIB	Bulk Statistics MIB
+--
+-- Copyright (c) 2012-2013, 2015 Ericsson AB.
+-- Copyright (c) 2002-2003, 2011 Ericsson AB.
+-- All rights reserved.
+-- 
+-- *****************************************************************
+
+ERICSSON-ROUTER-BULKSTATS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY,
+	NOTIFICATION-TYPE,
+	OBJECT-TYPE
+		FROM SNMPv2-SMI
+	MODULE-COMPLIANCE,
+	NOTIFICATION-GROUP,
+	OBJECT-GROUP
+		FROM SNMPv2-CONF
+	SnmpAdminString
+		FROM SNMP-FRAMEWORK-MIB
+	vacmContextName 
+		FROM SNMP-VIEW-BASED-ACM-MIB
+	InetAddressType,
+	InetAddress
+		FROM INET-ADDRESS-MIB
+	eriRouterMgmt
+		FROM ERICSSON-ROUTER-SMI;
+
+eriRouterBulkStatsMIB MODULE-IDENTITY
+	LAST-UPDATED    "201501141800Z" -- Jan 14, 2015
+	ORGANIZATION	"Ericsson AB."
+	CONTACT-INFO
+		"	Ericsson AB.
+
+		Postal:	100 Headquarters Dr.
+			San Jose, CA  95134
+			USA
+
+		 Phone:	+1 408 750 3500
+		   Fax: +1 408 750 3599
+		"
+	DESCRIPTION
+		"The MIB used to generically manage Bulk Statistics
+		gathering functionality on enterprise devices."
+
+
+        REVISION        "201501141800Z" -- Jan 14, 2015
+        DESCRIPTION
+                "Updated RBN/rbn/Rbn as ERICSSON-ROUTER/eriRouter/EriRouter
+                to migrate RBN MIB to ERICSSON MIB."
+
+	REVISION	"201101191800Z" -- Jan 19, 2011
+	DESCRIPTION
+		"Update CONTACT-INFO & ORGANIZATION."
+
+	REVISION	"200302280000Z" -- Feb 28, 2003
+	DESCRIPTION
+		"Added a new table eriRouterBulkStatsLastTrfrTable, to
+		accommodate the Multi-Instance Bulkstats feature.
+		Also obsoleted the old objects."
+
+	REVISION	"200205030000Z" -- May 03, 2002
+	DESCRIPTION
+		"Initial version. This version includes objects for
+		notifying the failure of bulk statistics data transfer
+		only."
+	::= { eriRouterMgmt 21 }
+
+eriRouterBulkStatsMIBNotifications OBJECT IDENTIFIER
+	::= { eriRouterBulkStatsMIB 0 }
+
+eriRouterBulkStatsMIBObjects OBJECT IDENTIFIER
+	::= { eriRouterBulkStatsMIB 1 }
+
+eriRouterBulkStatsMIBConformance OBJECT IDENTIFIER
+	::= { eriRouterBulkStatsMIB 2 }
+
+
+-- groups
+
+eriRouterBulkStatsLastTrfr OBJECT IDENTIFIER
+	::= { eriRouterBulkStatsMIBObjects 1 }
+
+
+-- eriRouterBulkStatsLastTrfr group
+
+-- This group contains information about the last attempted transfer of
+-- the bulk statistics data.
+
+eriRouterBulkStatsLastTrfrIpAddrType OBJECT-TYPE
+	SYNTAX	    InetAddressType
+	MAX-ACCESS  read-only
+	STATUS	    obsolete
+	DESCRIPTION
+		"The address type contained in eriRouterBulkStatsLastTrfrIpAddr."
+	::= { eriRouterBulkStatsLastTrfr 1 }
+
+eriRouterBulkStatsLastTrfrIpAddr OBJECT-TYPE
+	SYNTAX	    InetAddress
+	MAX-ACCESS  read-only
+	STATUS	    obsolete
+	DESCRIPTION
+		"The IP Address of the receiver station to which transfer
+		of bulk statistics data was last attempted.
+		If the IP address type is unknown, or if no transfers have
+		occured, a zero-length string will be returned."
+	::= { eriRouterBulkStatsLastTrfr 2 }
+
+eriRouterBulkStatsLastTrfrStatus OBJECT-TYPE
+	SYNTAX	    INTEGER {
+			none(1),             -- no trfr attempted
+			success(2),          -- trfr success
+			genError(3),         -- memory alloc failed, etc
+			loginFailed(4),      -- bad username, passwd
+			badFilename(5),      -- bad remote filename, invalid dir
+			remoteHostFailed(6), -- bad ip addr, conn refused
+			other(7)
+		    }
+	MAX-ACCESS  read-only
+	STATUS	    obsolete
+	DESCRIPTION
+		"The status of the last bulk statistics data transfer."
+	::= { eriRouterBulkStatsLastTrfr 3 }
+
+eriRouterBulkStatsLastTrfrTable OBJECT-TYPE
+	SYNTAX      SEQUENCE OF EriRouterBulkStatsLastTrfrEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+		"A table which is used to monitor the last attempted transfer
+		of the bulk statistics data for each bulkstats policy. All
+		rows in this table are accessible when the context 'local' is
+		specified in the snmp message. Snmp requests using other
+		contexts shall return only the row which matches the context."
+	::= { eriRouterBulkStatsLastTrfr 4 }
+
+eriRouterBulkStatsLastTrfrEntry OBJECT-TYPE
+	SYNTAX      EriRouterBulkStatsLastTrfrEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+		"An entry that indicates the status of the last attempted
+		transfer of the bulk statistics data for each policy."
+	INDEX { vacmContextName, eriRouterBulkStatsLastTrfrPolicy }
+	::= { eriRouterBulkStatsLastTrfrTable 1 }
+
+EriRouterBulkStatsLastTrfrEntry ::= SEQUENCE {
+    eriRouterBulkStatsLastTrfrPolicy		SnmpAdminString,
+    eriRouterBulkStatsLastTrfrIpAddrType2	InetAddressType,
+    eriRouterBulkStatsLastTrfrIpAddr2		InetAddress,
+    eriRouterBulkStatsLastTrfrStatus2		INTEGER,
+    eriRouterBulkStatsLastTrfrFiletype        INTEGER
+}
+
+eriRouterBulkStatsLastTrfrPolicy OBJECT-TYPE
+	SYNTAX      SnmpAdminString (SIZE (1..20))
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The bulkstats policy name."
+	::= { eriRouterBulkStatsLastTrfrEntry 1 }
+
+eriRouterBulkStatsLastTrfrIpAddrType2 OBJECT-TYPE
+	SYNTAX	    InetAddressType
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The address type contained in eriRouterBulkStatsLastTrfrIpAddr2."
+	::= { eriRouterBulkStatsLastTrfrEntry 2 }
+
+eriRouterBulkStatsLastTrfrIpAddr2 OBJECT-TYPE
+	SYNTAX	    InetAddress
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The IP Address of the receiver station to which transfer
+		of bulk statistics data was last attempted.
+		If the IP address type is unknown, or if no transfers have
+		occured, a zero-length string will be returned."
+	::= { eriRouterBulkStatsLastTrfrEntry 3 }
+
+eriRouterBulkStatsLastTrfrStatus2 OBJECT-TYPE
+	SYNTAX	    INTEGER {
+			none(1),             -- no trfr attempted
+			success(2),          -- trfr success
+			genError(3),         -- memory alloc failed, etc
+			loginFailed(4),      -- bad username, passwd
+			badFilename(5),      -- bad remote filename, invalid dir
+			remoteHostFailed(6), -- bad ip addr, conn refused
+			other(7)
+		    }
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The status of the last bulk statistics data transfer."
+	::= { eriRouterBulkStatsLastTrfrEntry 4 }
+
+eriRouterBulkStatsLastTrfrFiletype OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        text(1),             -- plain text format
+                        xml(2)               -- eXtensible Markup Language format
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The file type of the last bulk statistics data transfer."
+       DEFVAL { text }
+        ::= { eriRouterBulkStatsLastTrfrEntry 5 }
+
+-- Notifications
+
+eriRouterBulkStatsTrfrFail NOTIFICATION-TYPE
+	OBJECTS	    {	eriRouterBulkStatsLastTrfrIpAddrType,
+			eriRouterBulkStatsLastTrfrIpAddr, 
+			eriRouterBulkStatsLastTrfrStatus
+		    }
+	STATUS	    obsolete
+	DESCRIPTION
+		"A eriRouterBulkStatsTrfrFail notification signifies
+		that there has been a failure in the transfer of
+		the bulk statistics data onto the receiver."
+	::= { eriRouterBulkStatsMIBNotifications 1 }
+
+eriRouterBulkStatsTrfrFail2 NOTIFICATION-TYPE
+	OBJECTS	    {	eriRouterBulkStatsLastTrfrIpAddrType2,
+			eriRouterBulkStatsLastTrfrIpAddr2, 
+			eriRouterBulkStatsLastTrfrStatus2,
+            eriRouterBulkStatsLastTrfrFiletype
+		    }
+	STATUS	    current
+	DESCRIPTION
+		"A eriRouterBulkStatsTrfrFail2 notification signifies
+		that there has been a failure in the transfer of
+		the bulk statistics data onto the receiver."
+	::= { eriRouterBulkStatsMIBNotifications 2 }
+
+eriRouterBulkStatsFileWrapped NOTIFICATION-TYPE
+    OBJECTS     {   eriRouterBulkStatsLastTrfrIpAddrType2,
+          eriRouterBulkStatsLastTrfrIpAddr2,
+          eriRouterBulkStatsLastTrfrStatus2,
+          eriRouterBulkStatsLastTrfrFiletype
+          }
+    STATUS      current
+    DESCRIPTION
+        "A eriRouterBulkStatsFileWrapped notification signifies
+         that there has been a file wrapped event while 
+         collecting the Bulk Statistics data."
+    ::= { eriRouterBulkStatsMIBNotifications 3 }
+
+-- Conformance Statements
+
+eriRouterBulkStatsMIBGroups OBJECT IDENTIFIER
+	::= { eriRouterBulkStatsMIBConformance 1 }
+
+eriRouterBulkStatsMIBCompliances OBJECT IDENTIFIER
+	::= { eriRouterBulkStatsMIBConformance 2 }
+
+
+eriRouterBulkStatsMIBObjectGroup OBJECT-GROUP
+	OBJECTS	    {	eriRouterBulkStatsLastTrfrIpAddrType,
+			eriRouterBulkStatsLastTrfrIpAddr,
+			eriRouterBulkStatsLastTrfrStatus
+		    }
+	STATUS	    obsolete
+	DESCRIPTION
+		"A collection of objects providing bulk statistics
+		transfer information.
+		The eriRouterBulkStatsMIBObjectGroup is mandatory when 
+		the eriRouterBulkStatsMIBNotificationGroup is implemented."
+	::= { eriRouterBulkStatsMIBGroups 1 }
+
+eriRouterBulkStatsMIBNotificationGroup NOTIFICATION-GROUP
+	NOTIFICATIONS {	eriRouterBulkStatsTrfrFail
+		    }
+	STATUS	    obsolete
+	DESCRIPTION
+		"A collection of notifications providing Bulk
+		Statistics transfer information."
+	::= { eriRouterBulkStatsMIBGroups 2 }
+
+eriRouterBulkStatsMIBObjectGroup2 OBJECT-GROUP
+	OBJECTS	    {	eriRouterBulkStatsLastTrfrIpAddrType2,
+			eriRouterBulkStatsLastTrfrIpAddr2,
+			eriRouterBulkStatsLastTrfrStatus2
+		    }
+	STATUS	    current
+	DESCRIPTION
+		"A collection of objects providing bulk statistics
+		transfer information.
+		The eriRouterBulkStatsMIBObjectGroup2 is mandatory when 
+		the eriRouterBulkStatsMIBNotificationGroup2 is implemented."
+	::= { eriRouterBulkStatsMIBGroups 3 }
+
+eriRouterBulkStatsMIBNotificationGroup2 NOTIFICATION-GROUP
+	NOTIFICATIONS {	eriRouterBulkStatsTrfrFail2
+		    }
+	STATUS	    current
+	DESCRIPTION
+		"A collection of notifications providing Bulk
+		Statistics transfer failure information."
+	::= { eriRouterBulkStatsMIBGroups 4 }
+
+
+eriRouterBulkStatsMIBCompliance MODULE-COMPLIANCE
+	STATUS	    obsolete
+	DESCRIPTION
+		"The compliance statement for the BulkStats MIB"
+	MODULE	    -- this module
+	GROUP	    eriRouterBulkStatsMIBNotificationGroup
+	DESCRIPTION
+		"This group is optional for devices which support
+		Bulk Statistics collection capabilities"
+	::= { eriRouterBulkStatsMIBCompliances 1 }
+
+eriRouterBulkStatsMIBCompliance2 MODULE-COMPLIANCE
+	STATUS	    current
+	DESCRIPTION
+		"The compliance statement for the BulkStats MIB"
+	MODULE	    -- this module
+	GROUP	    eriRouterBulkStatsMIBNotificationGroup2
+	DESCRIPTION
+		"This group is optional for devices which support
+		Bulk Statistics collection capabilities"
+	::= { eriRouterBulkStatsMIBCompliances 2 }
+
+END
+

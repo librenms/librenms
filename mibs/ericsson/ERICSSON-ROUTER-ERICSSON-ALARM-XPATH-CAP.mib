@@ -1,0 +1,82 @@
+-- *****************************************************************
+-- ERICSSON-ROUTER-ERICSSON-ALARM-XPATH-CAP   Ericsson Alarm XPATH MIB Capabilities
+--                          for EPS-C/CGW
+-- Copyright (c) 2017 Ericsson AB.
+-- Copyright (c) 2009, 2015 RedBack Networks, Inc.
+-- All rights reserved.
+--
+-- *****************************************************************
+
+ERICSSON-ROUTER-ERICSSON-ALARM-XPATH-CAP DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY
+                FROM SNMPv2-SMI
+        AGENT-CAPABILITIES
+                FROM SNMPv2-CONF
+        eriRouterCapabilities
+                FROM ERICSSON-ROUTER-SMI;
+
+eriRouterEriAlarmXCap MODULE-IDENTITY
+        LAST-UPDATED    "201706201800Z" -- Jun 20, 2017
+        ORGANIZATION    "RedBack Networks, Inc."
+        CONTACT-INFO
+                "       RedBack Networks, Inc.
+
+                Postal: 300 Holger Way
+                        San Jose, CA  95134
+                        USA
+
+                 Phone: +1 408 750 5000
+                   Fax: +1 408 750 5599
+
+                E-mail: mib-info@redback.com"
+        DESCRIPTION
+                "The Agent Capabilities of the RedBack Networks
+                Ericsson Alarm XPATH MIB (ERICSSON-ALARM-XPATH-MIB)."
+
+
+        REVISION        "201706201800Z" -- Jun 20, 2017
+        DESCRIPTION
+                "Initial version."
+        ::= { eriRouterCapabilities 122 }
+
+
+eriRouterEriAlarmXCap1 AGENT-CAPABILITIES
+        PRODUCT-RELEASE "SEOS 6.1.6"
+        STATUS          current
+        DESCRIPTION     "ERICSSON-ALARM-XPATH-MIB capabilities"
+        SUPPORTS        ERICSSON-ALARM-XPATH-MIB
+        INCLUDES {
+                eriAlarmXSummaryGroup,
+                eriAlarmXActiveAlarmsGroup,
+                eriAlarmXHeartBeatGroup,
+                eriAlarmXSimpleAlarmGroup,
+                eriAlarmXHeartBeatNotifGroup,
+                eriAlarmXAlertNotifGroup
+        }
+
+        VARIATION       eriAlarmXIndeterminate
+            ACCESS          not-implemented
+            DESCRIPTION
+            "Object not supported"
+
+        VARIATION       eriAlarmXAppendInfo
+            ACCESS          not-implemented
+            DESCRIPTION
+            "Object not supported"
+
+        VARIATION       eriAlarmXIndAlert
+            ACCESS          not-implemented
+            DESCRIPTION
+            "Object not supported"
+
+        VARIATION       eriAlarmXAppendAlertInfo
+            ACCESS          not-implemented
+            DESCRIPTION
+            "Object not supported"
+
+        ::= { eriRouterEriAlarmXCap 1 }
+
+END
+

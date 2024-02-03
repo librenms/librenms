@@ -1,0 +1,137 @@
+-- *****************************************************************
+-- ERICSSON-ROUTER-HW-RES-MGMT-MIB
+--
+-- Copyright (c) 2016 Ericsson AB.
+-- All rights reserved.
+--
+-- *****************************************************************
+
+ ERICSSON-ROUTER-HW-RES-MGMT-MIB DEFINITIONS ::= BEGIN
+
+     IMPORTS
+         MODULE-IDENTITY, OBJECT-TYPE, OBJECT-IDENTITY,
+         NOTIFICATION-TYPE, mib-2, Counter32,
+         Integer32, TimeTicks, Unsigned32                   FROM SNMPv2-SMI
+
+         TEXTUAL-CONVENTION, DisplayString      FROM SNMPv2-TC
+
+         MODULE-COMPLIANCE, OBJECT-GROUP,
+         NOTIFICATION-GROUP                     FROM SNMPv2-CONF
+
+         DateAndTime                            FROM SNMPv2-TC
+
+         ItuPerceivedSeverity                   FROM ITU-ALARM-TC-MIB
+
+         eriRouterMgmt                          FROM ERICSSON-ROUTER-SMI
+
+         EriAlarmType                           FROM ERICSSON-ALARM-TC-MIB;
+
+
+ eriRouterHWResMgmtMib MODULE-IDENTITY
+     LAST-UPDATED "201604250000Z"  -- 25 April, 2016
+     ORGANIZATION "Ericsson AB"
+     CONTACT-INFO
+         "
+          Rong Fu R
+          Email: rong.r.fu@ericsson.com
+
+          Zephyr Nie
+          Email: zephyr.nie@ericsson.com
+
+          Jiang He
+          Email: jiang.he@ericsson.com
+         "
+     DESCRIPTION
+         "Defines the objects necessary support the management of HW resources."
+
+     REVISION "201604250000Z"
+     DESCRIPTION
+         "Initial revision."
+
+     ::= { eriRouterMgmt 112 }
+
+--
+-- MIB table
+--
+
+ eriRouterHWResMgmtAlarmActiveTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF EriRouterHWResMgmtAlarmActiveEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+         "A list of HW-Resource-Management active alarm entries."
+     ::= { eriRouterHWResMgmtMib 1 }
+
+ eriRouterHWResMgmtAlarmActiveEntry OBJECT-TYPE
+     SYNTAX     EriRouterHWResMgmtAlarmActiveEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+         "A collection of HW-Resource-Management active alarm info."
+     INDEX { eriRouterHWResMgmtAlarmActiveIndex }
+     ::= { eriRouterHWResMgmtAlarmActiveTable 1 }
+
+ EriRouterHWResMgmtAlarmActiveEntry ::= SEQUENCE {
+     eriRouterHWResMgmtAlarmActiveIndex            Unsigned32,
+     eriRouterHWResMgmtAlarmDateAndTime            DateAndTime,
+     eriRouterHWResMgmtEriAlarmType                EriAlarmType,
+     eriRouterHWResMgmtAlarmSeverity               ItuPerceivedSeverity,
+     eriRouterHWResMgmtAlarmDescription            DisplayString
+ }
+
+ eriRouterHWResMgmtAlarmActiveIndex OBJECT-TYPE
+     SYNTAX     Unsigned32 (1..65535)
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The unique identification of HW-Resource-Management alarm."
+     ::= { eriRouterHWResMgmtAlarmActiveEntry 1 }
+
+ eriRouterHWResMgmtAlarmDateAndTime OBJECT-TYPE
+     SYNTAX     DateAndTime
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The date and time when the alarm was raised or cleared."
+     ::= { eriRouterHWResMgmtAlarmActiveEntry 2 }
+
+ eriRouterHWResMgmtEriAlarmType OBJECT-TYPE
+        SYNTAX              EriAlarmType
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION
+            "The Ericsson alarm type id of this alarm."
+    ::= { eriRouterHWResMgmtAlarmActiveEntry 3 }
+
+ eriRouterHWResMgmtAlarmSeverity OBJECT-TYPE
+     SYNTAX     ItuPerceivedSeverity
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The Severity of this alarm."
+     ::= { eriRouterHWResMgmtAlarmActiveEntry 4 }
+
+ eriRouterHWResMgmtAlarmDescription OBJECT-TYPE
+     SYNTAX     DisplayString
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The description of this alarm."
+     ::= { eriRouterHWResMgmtAlarmActiveEntry 5 }
+
+
+--
+-- Notifications
+--
+ eriRouterHWResMgmtAlarm NOTIFICATION-TYPE
+     OBJECTS  { eriRouterHWResMgmtAlarmActiveIndex,
+                eriRouterHWResMgmtAlarmDateAndTime,
+                eriRouterHWResMgmtEriAlarmType,
+                eriRouterHWResMgmtAlarmSeverity,
+                eriRouterHWResMgmtAlarmDescription}
+     STATUS   current
+     DESCRIPTION
+         "This notification signifies a HW-Resource-Management alarm."
+     ::= { eriRouterHWResMgmtMib 2 }
+
+ END

@@ -1,0 +1,151 @@
+-- %DNP% $Id: ERICSSON-ROUTER-FAST-VRRP-MIB.my,v 1.1.18.2 2011/02/22 17:26:16 thatcher Exp $
+-- %DNP% $Source: /cvsroot/pkt/sw/se/xc/bsd/config/snmp/mibs/Attic/ERICSSON-ROUTER-FAST-VRRP-MIB.my,v $
+-- *****************************************************************
+-- ERICSSON-ROUTER-FAST-VRRP-MIB    Fast VRRP MIB
+--
+-- Copyright (c) 2008, 2011, 2015 Ericsson AB.
+-- All rights reserved.
+--
+-- *****************************************************************
+
+ERICSSON-ROUTER-FAST-VRRP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    Integer32
+            FROM SNMPv2-SMI
+
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP
+            FROM SNMPv2-CONF
+
+    ifIndex
+            FROM IF-MIB
+
+    VrId
+            FROM VRRP-MIB
+
+    eriRouterMgmt
+            FROM ERICSSON-ROUTER-SMI;
+
+eriRouterFastVrrpMIB MODULE-IDENTITY
+    LAST-UPDATED    "201609081800Z" -- Sep 08, 2016
+    ORGANIZATION    "Ericsson AB."
+    CONTACT-INFO
+            "       Ericsson AB.
+
+            Postal: 100 Headquarters Dr
+                    San Jose, CA  95134
+                    USA
+
+             Phone: +1 408 750 5000
+               Fax: +1 408 750 5599
+            "
+    DESCRIPTION
+        "This MIB describes objects used for managing Fast Virtual
+         Router Redundancy Protocol (FVRRP) routers."
+
+    REVISION        "201609081800Z" -- Sep 08, 2016
+    DESCRIPTION
+        "Updated eriRouterFastVrrpOperAdvertisementInterval to extend
+         the range from (100..999) to (3..999)."
+
+    REVISION        "201501141800Z" -- Jan 14, 2015
+    DESCRIPTION
+        "Updated RBN/rbn/Rbn as ERICSSON-ROUTER/eriRouter/EriRouter
+         to migrate RBN MIB to ERICSSON MIB."
+
+    REVISION        "201101191800Z" -- Jan 19, 2011
+    DESCRIPTION
+        "Update CONTACT-INFO & ORGANIZATION. "
+
+    REVISION        "200805210000Z" -- May 21, 2008
+    DESCRIPTION
+        " Initial Version."
+    ::= { eriRouterMgmt 45 }
+
+eriRouterFastVrrpMIBObjects    OBJECT IDENTIFIER ::= { eriRouterFastVrrpMIB 1 }
+eriRouterFastVrrpConformance   OBJECT IDENTIFIER ::= { eriRouterFastVrrpMIB 2 }
+
+--
+-- Fast VRRP objects
+--
+eriRouterFastVrrpOperTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EriRouterFastVrrpOperEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table contains eriRouterFastVrrpOperEntry entries"
+    ::= { eriRouterFastVrrpMIBObjects 1 }
+
+eriRouterFastVrrpOperEntry OBJECT-TYPE
+    SYNTAX      EriRouterFastVrrpOperEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Fast VRRP operational characteristics entries"
+    INDEX { ifIndex, eriRouterFastVrrpOperVrId }
+    ::= { eriRouterFastVrrpOperTable 1 }
+
+EriRouterFastVrrpOperEntry ::=
+    SEQUENCE {
+        eriRouterFastVrrpOperVrId                     VrId,
+        eriRouterFastVrrpOperAdvertisementInterval    Integer32
+    }
+
+eriRouterFastVrrpOperVrId OBJECT-TYPE
+     SYNTAX      VrId
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+         "This object contains the Virtual Router Identifier (VRID) of
+          Fast VRRP routers."
+     ::= { eriRouterFastVrrpOperEntry 1 }
+
+eriRouterFastVrrpOperAdvertisementInterval OBJECT-TYPE
+    SYNTAX      Integer32 (3..999)
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Fast VRRP advertisement messages time interval. This MIB object
+         is used to replace the standard vrrpOperAdvertisementInterval(seconds)
+         when Fast VRRP is enabled. Either vrrpOperAdvertisementInterval or
+         eriRouterFastVrrpOperAdvertisementInterval is valid based on the VRRP
+         configurations"
+    ::= { eriRouterFastVrrpOperEntry 2 }
+
+--
+-- compliance statements
+--
+
+eriRouterFastVrrpMIBCompliances OBJECT IDENTIFIER ::= { eriRouterFastVrrpConformance 1 }
+eriRouterFastVrrpMIBGroups      OBJECT IDENTIFIER ::= { eriRouterFastVrrpConformance 2 }
+
+eriRouterFastVrrpCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+        "The compliance statement for SNMP entities which implement
+         this Fast VRRP MIB."
+
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+            eriRouterFastVrrpObjectGroup
+        }
+    ::= { eriRouterFastVrrpMIBCompliances 1 }
+
+--
+-- groupings
+--
+
+eriRouterFastVrrpObjectGroup OBJECT-GROUP
+    OBJECTS {
+         eriRouterFastVrrpOperAdvertisementInterval
+    }
+    STATUS current
+    DESCRIPTION
+        "The collection of objects related to Fast VRRP objects."
+    ::= { eriRouterFastVrrpMIBGroups 1 }
+
+END

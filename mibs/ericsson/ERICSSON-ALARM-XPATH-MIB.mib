@@ -1,0 +1,1797 @@
+--
+-- The Ericsson Alarm Xpath MIB
+--
+-- Copyright (c) 2017 by Ericsson AB.
+-- All rights reserved.
+--
+-- This MIB is part of the ERICSSON-ALARM-MIB Suite, and its use is documented
+-- further in TEA (The Ericsson Architecture), O&M System Architecture
+-- Principles, FAE 151 01.
+--
+
+ERICSSON-ALARM-XPATH-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+        Unsigned32, Gauge32
+                FROM SNMPv2-SMI
+        TruthValue, DateAndTime
+                FROM SNMPv2-TC
+        SnmpAdminString
+                FROM SNMP-FRAMEWORK-MIB
+        ericssonModules
+                FROM ERICSSON-TOP-MIB
+        EriAdditionalText, EriLargeAdditionalText, EriAlarmType,
+        EriAlarmSequenceNumber, EriAlarmIndex, EriAlarmSpecificProblem,
+		EriAdditionalInfo, EriLargeAdditionalInfo, EriAlarmRecordType,
+		EriAppendedAdditionalInfo
+                FROM ERICSSON-ALARM-TC-MIB
+        EriProbableCause
+                FROM ERICSSON-ALARM-PC-MIB
+        EriPath
+                FROM ERICSSON-TC-MIB
+        ResourceId
+                FROM ALARM-MIB
+        ItuPerceivedSeverity
+                FROM ITU-ALARM-TC-MIB
+        IANAItuEventType
+                FROM IANA-ITU-ALARM-TC-MIB
+        snmpTargetBasicGroup
+                FROM SNMP-TARGET-MIB
+        snmpNotifyGroup
+                FROM SNMP-NOTIFICATION-MIB
+        OBJECT-GROUP, NOTIFICATION-GROUP, MODULE-COMPLIANCE
+                FROM SNMPv2-CONF;
+
+
+ericssonAlarmXpathMIB MODULE-IDENTITY
+        LAST-UPDATED "201708110000Z"
+        ORGANIZATION "Ericsson AB"
+        CONTACT-INFO
+                "EEIEMY"
+        DESCRIPTION
+                "This MIB Module is an Ericsson-wide SNMP
+                interface for managing alarms. Main inputs to
+                the MIB design are the 3GPP Alarm IRP and X.733.
+                However, an important restriction is that the MIB
+                only represents the resource view and not
+                management activities like acknowledgment, etc.
+                It describes generic notifications used to send
+                alarm state changes and a table which represents
+                the current active alarms in the system. The MIB
+                supports both stateful alarms and stateless
+                alerts.
+
+                It is important to identify clearly what is to be
+                considered the same alarm object instance. All
+                unique alarm *types* are identified by
+                'AlarmType'. An AlarmType is a one-to-one
+                mapping with X.733 EventType, ProbabableCause and
+                SpecificProblem. A pair of integers are used to
+                specify the alarm type.
+
+                A unique alarm object *instance* is the
+                combination of YangNodeInstance and AlarmType.
+				In this way, there is no ambiguity about how alarm
+                and alarm clear correlation should be performed:
+                the same YANG resource instance and AlarmType
+                shall be used. The same is true for changing
+                existing alarm states. Severity, Additional Text
+                and Additional Info can be changed on an existing
+                alarm.
+
+                For stateful alarms there are notifications to
+                report a new alarm and a cleared alarm. Changing
+                an alarm is done via the new alarm notification.
+                The management system shall match the alarm by
+                using alarm type and YangNodeInstance
+                in the same way as for clear notifications.
+
+                The MIB has different notifications for different
+                severities in order to support SNMP managers
+                which maps severities based on notification
+                identifiers. For stateless alerts, there are
+                generic notifications to send the alerts
+                with different severities.
+
+				NOTE - Updated Definition of Alerts in TEA (The
+					Ericsson Architecture):
+
+					Alerts are used by service management systems
+					to evaluate service impact, and are only applicable
+					to very specific state changes with potential service
+					impact like restart and redundancy shifts.
+
+					Alerts SHALL NOT be used for fault indication.
+
+					Alerts should always have Perceived Severity
+					Indeterminate, and should only be sent using
+					eriAlarmXIndAlert notification. The other severity
+					alert notifications should not be used, and are
+					only present in this specification for
+					backward compatibility reasons.
+
+                A table lists all active alarms so that a manager
+                can read an initial state and also perform an
+                alarm resynchronization procedure. There is also
+                a table of latest stateless alarms. Since the
+                stateless alarms do not have a corresponding
+                clear message, the table size is limited by the
+                agent instrumentation.
+
+                The MIB supports two approaches for detecting
+                lost notifications:
+                - sequence numbers are used in the alarm
+                 notifications, and are shown in the active
+                 alarm table. The last used sequence number can
+                 be read in a scalar variable
+                - a time stamp indicates the last time alarm
+                 tables were updated.
+
+                Heartbeat mechanisms are supported both in pull
+                and push mode:
+                - Pull: the classical SNMP polling where a
+                 manager polls a scalar variable, for example
+                 the last sequence number used
+                - Push: the agent can be configured to send
+                 heartbeat notifications. These contains the
+                 last used sequence numbers.
+
+                Document number: 11/196 03-CXC 172 7549."
+
+        REVISION "201708110000Z"
+        DESCRIPTION
+                "Fixed duplicate object names issue, by replacing
+				prefix eriAlarm with prefix eriAlarmX where needed.
+				Increased overall size of Additional Info.
+				Added new OBJECT-TYPE:
+				eriAlarmXNObjAppendedAdditionalInfo.
+				Added new IMPORT:
+				EriAppendedAdditionalInfo.
+				Fixed CONFORMANCE GROUPS issue by separating
+				recently added OBJECT-TYPES into new
+				CONFORMANCE GROUPS.
+				Added new GROUPS:
+				eriAlarmXActiveAlarmsAdditionalInfoGroup,
+				eriAlarmXAlertsAdditionalInfoGroup,
+				eriAlarmXRecordTypeGroup.
+				Added more detail to DESCRIPTION for each REVISION.
+                Document number: 11/196 03-CXC 172 7549, Rev C."
+
+		REVISION "201704130000Z"
+        DESCRIPTION
+                "Updated as part of ERICSSON ALARM MIB 2.1 package.
+				Added new OBJECT-TYPES:
+				eriAlarmNObjAdditionalInfo,
+				eriAlarmNObjMoreAdditionalInfo,
+				eriAlarmNObjRecordType,
+				eriAlarmActiveAdditionalInfo,
+				eriAlarmAlertAdditionalInfo.
+				Added new IMPORTS:
+				EriAdditionalInfo,
+				EriLargeAdditionalInfo,
+				EriAlarmRecordType.
+				Document number: 11/196 03-CXC 172 7549, Rev B."
+
+        REVISION "201606240000Z"
+        DESCRIPTION
+                "Initial version of this MIB module.
+				Document number: 11/196 03-CXC 172 7549, Rev A."
+        ::= { ericssonModules 6 }
+
+--==========
+--==Groups==
+--==========
+
+eriAlarmXObjects                OBJECT IDENTIFIER ::= { ericssonAlarmXpathMIB 1 }
+eriAlarmXNotifications        OBJECT IDENTIFIER ::= { ericssonAlarmXpathMIB 2 }
+eriAlarmXNotifsPrefix        OBJECT IDENTIFIER ::= { eriAlarmXNotifications 0 }
+eriAlarmXConformance        OBJECT IDENTIFIER ::= { ericssonAlarmXpathMIB 4 }
+
+eriAlarmXSummary                OBJECT IDENTIFIER ::= { eriAlarmXObjects 1 } -- eriAlarmXSum
+eriAlarmXNotifObjects        OBJECT IDENTIFIER ::= { eriAlarmXObjects 2 } -- eriAlarmXNObj
+eriAlarmXActiveAlarms        OBJECT IDENTIFIER ::= { eriAlarmXObjects 3 } -- eriAlarmXActive
+eriAlarmXAlerts          OBJECT IDENTIFIER ::= { eriAlarmXObjects 4 } -- eriAlarmXAlert
+eriAlarmXHeartBeat        OBJECT IDENTIFIER ::= { eriAlarmXObjects 5 } -- eriAlarmXHb
+
+--====================
+--==Alarm summary==
+--====================
+
+eriAlarmXSumIndeterminate OBJECT-TYPE
+        SYNTAX                Gauge32
+        MAX-ACCESS        read-only
+        STATUS                current
+        DESCRIPTION
+                "This object shows the number of currently active
+                alarms with perceived severity 'indeterminate'.
+                Note that only stateful alarms are included."
+        ::= { eriAlarmXSummary 1 }
+
+eriAlarmXSumCritical OBJECT-TYPE
+        SYNTAX                Gauge32
+        MAX-ACCESS        read-only
+        STATUS                current
+        DESCRIPTION
+                "This object shows the number of currently active
+                alarms with perceived severity 'critical'. Note
+                that only stateful alarms are included."
+        ::= { eriAlarmXSummary 2 }
+
+eriAlarmXSumMajor OBJECT-TYPE
+        SYNTAX                Gauge32
+        MAX-ACCESS        read-only
+        STATUS                current
+        DESCRIPTION
+                "This object shows the number of currently active
+                alarms with perceived severity 'major'. Note
+                that only stateful alarms are included."
+        ::= { eriAlarmXSummary 3 }
+
+eriAlarmXSumMinor OBJECT-TYPE
+        SYNTAX                Gauge32
+        MAX-ACCESS        read-only
+        STATUS                current
+        DESCRIPTION
+                "This object shows the number of currently active
+                alarms with perceived severity 'minor'. Note
+                that only stateful alarms are included."
+        ::= { eriAlarmXSummary 4 }
+
+eriAlarmXSumWarning OBJECT-TYPE
+        SYNTAX                Gauge32
+        MAX-ACCESS        read-only
+        STATUS                current
+        DESCRIPTION
+                "This object shows the number of currently active
+                alarms with perceived severity 'warning'. Note
+                that only stateful alarms are included."
+        ::= { eriAlarmXSummary 5 }
+
+--=============================
+-- Notification objects
+--==============================
+
+eriAlarmXNObjAdditionalText OBJECT-TYPE
+        SYNTAX                EriAdditionalText
+        MAX-ACCESS        accessible-for-notify
+        STATUS                current
+         DESCRIPTION
+                "This is a scalar variable only used in
+                notifications. It is size ranged with a smaller
+                size than the corresponding type used in the
+                active alarm table. This is in order to make sure
+                that all alarm information will fit into one UDP
+                packet. The additional text can be further
+                appended by using the dedicated append
+                notification."
+         ::= { eriAlarmXNotifObjects 1 }
+
+eriAlarmXNObjMoreAdditionalText OBJECT-TYPE
+        SYNTAX                TruthValue
+        MAX-ACCESS        accessible-for-notify
+        STATUS                current
+         DESCRIPTION
+                "This is a scalar variable only used in
+                notifications. It tells the management system
+                that the additional text will be appended by
+                subsequent append additional text notifications.
+                NOTE: this object exists simply because of the
+                limitations of PDU size inherent in SNMP over
+                UDP, which limits the size of the PDU+headers to
+                under 1500 octets.  Otherwise, the notification
+                will be fragmented."
+         ::= { eriAlarmXNotifObjects 2 }
+
+
+eriAlarmXNObjResourceId OBJECT-TYPE
+        SYNTAX                TruthValue
+        MAX-ACCESS        accessible-for-notify
+        STATUS                current
+         DESCRIPTION
+                "This is a scalar variable only used in
+                notifications. It tells the management system
+                that there is an SNMP-based Resource ID (OID)
+                that identifies the alarming resource.  NOTE:
+                this object exists simply because of the
+                limitations of PDU size inherent in SNMP over
+                UDP, which limits the size of the PDU+headers to
+                under 1500 octets.  Otherwise, the notification
+                will be fragmented."
+         ::= { eriAlarmXNotifObjects 3 }
+
+eriAlarmXNObjAdditionalInfo OBJECT-TYPE
+        SYNTAX                EriAdditionalInfo
+        MAX-ACCESS        accessible-for-notify
+        STATUS                current
+         DESCRIPTION
+                "This is a scalar variable only used in
+                notifications. It is size ranged with a smaller
+                size than the corresponding type used in the
+                active alarm table. This is in order to make sure
+                that all alarm information will fit into one UDP
+                packet. The additional info can be further
+                appended by using the dedicated append
+                notification."
+         ::= { eriAlarmXNotifObjects 4 }
+
+eriAlarmXNObjMoreAdditionalInfo OBJECT-TYPE
+        SYNTAX                TruthValue
+        MAX-ACCESS        accessible-for-notify
+        STATUS                current
+         DESCRIPTION
+                "This is a scalar variable only used in
+                notifications. It tells the management system
+                that the additional info will be appended by
+                subsequent append additional info notifications.
+                NOTE: this object exists simply because of the
+                limitations of PDU size inherent in SNMP over
+                UDP, which limits the size of the PDU+headers to
+                under 1500 octets.  Otherwise, the notification
+                will be fragmented."
+         ::= { eriAlarmXNotifObjects 5 }
+
+eriAlarmXNObjRecordType OBJECT-TYPE
+        SYNTAX                 EriAlarmRecordType
+        MAX-ACCESS        accessible-for-notify
+        STATUS                current
+         DESCRIPTION
+                "This is a scalar variable only used in
+                notifications. It tells the management system
+                whether the alarm record being reported in the
+                notification represents a new alarm instance
+                or an update of an existing alarm instance."
+         ::= { eriAlarmXNotifObjects 6 }
+
+eriAlarmXNObjAppendedAdditionalInfo OBJECT-TYPE
+        SYNTAX                EriAppendedAdditionalInfo
+        MAX-ACCESS        accessible-for-notify
+        STATUS                current
+        DESCRIPTION
+                "This scalar variable is used for spillover of
+				the additional info in the append trap."
+        ::= { eriAlarmXNotifObjects 7 }
+
+
+--======================
+--==Active Alarm table==
+--======================
+
+eriAlarmXActiveNumber OBJECT-TYPE
+        SYNTAX                Unsigned32
+        MAX-ACCESS        read-only
+        STATUS                current
+        DESCRIPTION
+                "This object shows the total number of currently
+                active alarms, i.e. the total number of entries
+                in the Alarm Table."
+        ::= { eriAlarmXActiveAlarms 1 }
+
+eriAlarmXActiveLastChanged OBJECT-TYPE
+        SYNTAX                DateAndTime
+        MAX-ACCESS        read-only
+        STATUS                current
+        DESCRIPTION
+                "A timestamp when the active alarm table was last
+                changed. The value can be used by a manager to
+                initiate an alarm resynchronization procedure.
+                NOTE: All fields of the DateAndTime MUST be
+                filled out, including the hours and minutes from
+                UTC. As such, the value should be 11 octets
+                long."
+        REFERENCE
+                "DateAndTime is defined in RFC 2579, page 18"
+        ::= { eriAlarmXActiveAlarms 2 }
+
+eriAlarmXActiveLastSequenceNo OBJECT-TYPE
+        SYNTAX                EriAlarmSequenceNumber
+        MAX-ACCESS        read-only
+        STATUS                current
+        DESCRIPTION
+                "The last used sequence number for a alarm state
+                change notification. A management system can poll
+                this variable in order to detect lost alarm
+                change notifications."
+        ::= { eriAlarmXActiveAlarms 3 }
+
+eriAlarmXActiveTableURL OBJECT-TYPE
+        SYNTAX                SnmpAdminString
+        MAX-ACCESS        read-only
+        STATUS                current
+        DESCRIPTION
+                "A URL pointing to a location where the contents
+                of the alarm table can be retrieved as a file.
+                The actual format of the file is out of the scope
+                of this MIB and can be found in the system
+                documentation. A Uniform Resource Locator in
+                accordance with RFC 4248. A string of length
+                zero means that the agent does not have a URL to
+                provide."
+        ::= { eriAlarmXActiveAlarms 4 }
+
+eriAlarmXActiveAlarmTable OBJECT-TYPE
+        SYNTAX                SEQUENCE OF EriAlarmXActiveAlarmEntry
+        MAX-ACCESS        not-accessible
+        STATUS                current
+        DESCRIPTION
+                "This table list all active alarms in the system.
+                The aspect is the resource view of the alarms,
+                not the administrative states and processes
+                performed by users. The number of entries,
+                active alarms, can be read in
+                eriAlarmXActiveNumber. Entries are created when a
+                resource has a new alarm state. If the same
+                resource has several active alarms, with
+                different Alarm Types, this will be represented
+                as separate rows. Rows disappear whenever the
+                alarm is cleared in the resource.
+
+                Rows can be changed when an alarm changes severity,
+                additional text or additional info. Alarms where
+				the clear state cannot be detected by the resource
+                are not represented in this table.
+
+                The contents of the active alarm table can also
+                be fetched using file transfer.
+                eriAlarmXActiveTableURL provides a URL to the
+                file."
+        ::= { eriAlarmXActiveAlarms 5 }
+
+eriAlarmXActiveAlarmEntry OBJECT-TYPE
+        SYNTAX                EriAlarmXActiveAlarmEntry
+        MAX-ACCESS        not-accessible
+        STATUS                current
+        DESCRIPTION
+                "One entry in the table holds one active alarm
+                for a given resource. Entries are created by the
+                system when a resource has a new alarm state.
+                Entries are deleted by the system when a resource
+                alarm state is cleared.
+
+                Alarm severity, additional text and additional
+                info can later be changed in a row."
+        INDEX {
+                eriAlarmXActiveIndex
+        }
+        ::= { eriAlarmXActiveAlarmTable 1 }
+
+EriAlarmXActiveAlarmEntry ::= SEQUENCE {
+        eriAlarmXActiveIndex                        EriAlarmIndex,
+        eriAlarmXActiveMajorType                  EriAlarmType, -- Unique integer
+        eriAlarmXActiveMinorType                  EriAlarmType, -- Unique integer
+        eriAlarmXActiveSpecificProblem    EriAlarmSpecificProblem, -- Unique text
+        eriAlarmXActiveYangNodeInstance  EriPath, -- Abridged YANG Instance-Identifier
+        eriAlarmXActiveEventType                       IANAItuEventType, -- X.733
+        eriAlarmXActiveEventTime       DateAndTime, -- Time for last state change
+        eriAlarmXActiveOriginalEventTime     DateAndTime, -- Time for alarm raise
+        eriAlarmXActiveProbableCause                EriProbableCause, -- X.733
+        eriAlarmXActiveSeverity        ItuPerceivedSeverity, -- Last state change
+        eriAlarmXActiveOriginalSeverity      ItuPerceivedSeverity, -- Alarm raise
+        eriAlarmXActiveAdditionalText  EriLargeAdditionalText, -- Last state change
+        eriAlarmXActiveOrigAdditionalText  EriLargeAdditionalText, -- Alarm raise
+        eriAlarmXActiveResourceId                ResourceId, -- SNMP OID for MO
+        eriAlarmXActiveAdditionalInfo  EriLargeAdditionalInfo -- Last state change
+}
+
+eriAlarmXActiveIndex OBJECT-TYPE
+        SYNTAX                EriAlarmIndex
+        MAX-ACCESS        not-accessible
+        STATUS                current
+        DESCRIPTION
+                "A unique value, greater than zero, for each
+                alarm. It is recommended that values are
+                assigned contiguously starting from 1. The value
+                for each alarm must remain constant at least from
+                one re-initialization of the entity to the next
+                re-initialization. Note that this index should
+                not be used for alarm synchronization purposes
+                since the 'logical' index for an alarm is
+                - eriAlarmXActiveMajorType
+                - eriAlarmXActiveMinorType
+                - eriAlarmXActiveYangNodeInstance"
+        ::= { eriAlarmXActiveAlarmEntry 1 }
+
+eriAlarmXActiveMajorType OBJECT-TYPE
+        SYNTAX                EriAlarmType
+        MAX-ACCESS        read-only
+        STATUS                current
+        DESCRIPTION
+                "In combination with eriAlarmXActiveMinorType,
+                this provides a unique identification of the
+                fault type. Different YANG Schema Nodes and
+                instances can share alarm types, but if the same
+                YANG resource instance reports the same alarm type,
+                it is to be considered as the same alarm state.
+                The alarm type is a simplification of the different
+                X.733 and 3GPP alarm IRP alarm correlation
+                mechanisms based on EventType, ProbableCause,
+                SpecificProblem and NotificationId. For systems
+                where eriAlarmXActiveMajorType is not needed for
+                identification purposes, it is not used and MUST
+                be zero-valued."
+        ::= { eriAlarmXActiveAlarmEntry 2 }
+
+eriAlarmXActiveMinorType OBJECT-TYPE
+        SYNTAX                EriAlarmType
+        MAX-ACCESS        read-only
+        STATUS                current
+        DESCRIPTION
+                "In combination with with
+                eriAlarmXActiveMajorType, this provides a unique
+                identification of the fault type, not including
+                the YANG Schema Node. Different YANG Schema Nodes
+				and instances can share alarm types, but if the
+                same YANG resource instance reports the same alarm
+                type it is to be considered as the same alarm
+                state. The alarm type is a simplification of the
+                different X.733 and 3GPP alarm IRP alarm
+                correlation mechanisms based on EventType,
+                ProbableCause, SpecificProblem and
+                NotificationId."
+        ::= { eriAlarmXActiveAlarmEntry 3 }
+
+eriAlarmXActiveSpecificProblem OBJECT-TYPE
+        SYNTAX                EriAlarmSpecificProblem
+        MAX-ACCESS        read-only
+        STATUS                current
+        DESCRIPTION
+                "This is a clear-text unique identification of
+                the alarm type. There is a one-to-one mapping
+                between eriAlarmXActiveSpecificProblem and
+                [eriAlarmXActiveMajorType,eriAlarmXActiveMinorType]"
+        ::= { eriAlarmXActiveAlarmEntry 4 }
+
+eriAlarmXActiveYangNodeInstance OBJECT-TYPE
+        SYNTAX                EriPath
+        MAX-ACCESS        read-only
+        STATUS                current
+        DESCRIPTION
+				"An Abridged YANG Instance-Identifier that references
+				the alarming resource within the Managed Element."
+        REFERENCE
+                "YANG module ericsson-yang-types;
+				RFC 7950 , The YANG 1.1 Data Modeling Language"
+        ::= { eriAlarmXActiveAlarmEntry 5 }
+
+eriAlarmXActiveEventType OBJECT-TYPE
+        SYNTAX                IANAItuEventType
+        MAX-ACCESS        read-only
+        STATUS                current
+        DESCRIPTION
+                "The event type as defined in X.733/X.736."
+        REFERENCE
+                "ITU Recommendation X.733, 'Information
+                Technology - Open Systems Interconnection -
+                System Management: Alarm Reporting Function',
+                1992"
+        ::= { eriAlarmXActiveAlarmEntry 6 }
+
+eriAlarmXActiveEventTime OBJECT-TYPE
+        SYNTAX                DateAndTime
+        MAX-ACCESS        read-only
+        STATUS                current
+        DESCRIPTION
+                "A time stamp of the alarm state change event.
+                Note that this variable represents the last
+                change of the alarm state, like changed severity
+                or additional text/info. If the alarm has not changed
+                state this variable represents the alarm raise
+                time and will be the same as originalEventTime.
+
+                NOTE: All fields of the DateAndTime MUST be
+                filled out, including the hours and minutes from
+                UTC. As such, the value should be 11 octets
+                long."
+        REFERENCE
+                "DateAndTime is defined in RFC 2579, page 18.
+                ITU Recommendation X.733, 'Information Technology
+                - Open Systems Interconnection - System
+                Management: Alarm Reporting Function', 1992"
+        ::= { eriAlarmXActiveAlarmEntry 7 }
+
+eriAlarmXActiveOriginalEventTime OBJECT-TYPE
+        SYNTAX                DateAndTime
+        MAX-ACCESS        read-only
+        STATUS                current
+        DESCRIPTION
+                "The time-stamp of the original alarm raise
+                notification.
+                NOTE: All fields of the DateAndTime MUST be
+                filled out, including the hours and minutes from
+                UTC. As such, the value should be 11 octets
+                long."
+        REFERENCE
+                "DateAndTime is defined in RFC 2579, page 18."
+        ::= { eriAlarmXActiveAlarmEntry 8 }
+
+eriAlarmXActiveProbableCause OBJECT-TYPE
+        SYNTAX                EriProbableCause
+        MAX-ACCESS        read-only
+        STATUS                current
+        DESCRIPTION
+                "The probable cause for the alarm originally
+                defined by X.733 and subsequent standards. See
+                also the ERICSSON-ALARM-PC-MIB. Due to the
+                history of problems in maintaining a standardized
+                probable cause the probable cause is not unique.
+                A best effort mapping of the alarm to existing
+                probable causes        are used."
+        REFERENCE
+                "ITU Recommendation X.733, 'Information
+                Technology - Open Systems Interconnection -
+                System Management: Alarm Reporting Function',
+                1992"
+        ::= { eriAlarmXActiveAlarmEntry 9 }
+
+eriAlarmXActiveSeverity OBJECT-TYPE
+        SYNTAX                ItuPerceivedSeverity
+        MAX-ACCESS        read-only
+        STATUS                current
+        DESCRIPTION
+                "The severity of the alarm as defined by X.733.
+                Note that this may not be the original severity
+                since the alarm may have changed severity."
+        REFERENCE
+                "ITU Recommendation X.733, 'Information
+                Technology - Open Systems Interconnection -
+                System Management: Alarm Reporting Function',
+                1992"
+        ::= { eriAlarmXActiveAlarmEntry 10 }
+
+eriAlarmXActiveOriginalSeverity OBJECT-TYPE
+        SYNTAX                ItuPerceivedSeverity
+        MAX-ACCESS        read-only
+        STATUS                current
+        DESCRIPTION
+                "The original severity as reported by the alarm
+                raise notification."
+        ::= { eriAlarmXActiveAlarmEntry 11 }
+
+eriAlarmXActiveAdditionalText OBJECT-TYPE
+        SYNTAX                EriLargeAdditionalText
+        MAX-ACCESS        read-only
+        STATUS                current
+        DESCRIPTION
+                "A user friendly text describing the alarm. The
+                text is both static depending on the alarm type
+                (probable cause), and dynamic depending on
+                YANG resource instance and other conditions.
+                This string is longer than the corresponding
+                varbind in the notification in order to manage
+                large strings."
+        REFERENCE
+                "ITU Recommendation X.733, 'Information
+                Technology - Open Systems Interconnection -
+                System Management: Alarm Reporting Function',
+                1992"
+        ::= { eriAlarmXActiveAlarmEntry 12 }
+
+eriAlarmXActiveOrigAdditionalText OBJECT-TYPE
+        SYNTAX                EriLargeAdditionalText
+        MAX-ACCESS        read-only
+        STATUS                current
+        DESCRIPTION
+                "A user-friendly text describing the alarm. The
+                text is both static depending on the alarm type
+                (probable cause), and dynamic depending on
+                YANG resource instance and other conditions. This is the
+                original text as reported by the first alarm
+                notification, after which it is not altered."
+        REFERENCE
+                "ITU Recommendation X.733, 'Information
+                Technology - Open Systems Interconnection -
+                System Management: Alarm Reporting Function',
+                1992"
+        ::= { eriAlarmXActiveAlarmEntry 13 }
+
+eriAlarmXActiveResourceId OBJECT-TYPE
+        SYNTAX                ResourceId
+        MAX-ACCESS        read-only
+        STATUS                current
+        DESCRIPTION
+                "In case the alarm refers to an object which is
+                instrumented by SNMP this variable indicates the
+                corresponding OID for the YANG resource instance."
+        REFERENCE
+                "RFC 3877 IETF ALARM MIB"
+        ::= { eriAlarmXActiveAlarmEntry 14 }
+
+eriAlarmXActiveAdditionalInfo OBJECT-TYPE
+        SYNTAX                EriLargeAdditionalInfo
+        MAX-ACCESS        read-only
+        STATUS                current
+        DESCRIPTION
+                "Additional Information for the alarm,
+				structured in a way that is suitable for
+				machine to machine communication.
+                This string is longer than the corresponding
+                varbind in the notification in order to manage
+                large strings."
+        ::= { eriAlarmXActiveAlarmEntry 15 }
+
+--======================
+--==Alert table==
+--======================
+-- This table lists the latest reported alerts.
+
+eriAlarmXAlertNumber OBJECT-TYPE
+        SYNTAX                Unsigned32
+        MAX-ACCESS        read-only
+        STATUS                current
+        DESCRIPTION
+                "The number of rows in the alert table."
+        ::= { eriAlarmXAlerts 1 }
+
+eriAlarmXAlertLastChanged OBJECT-TYPE
+        SYNTAX                DateAndTime
+        MAX-ACCESS        read-only
+        STATUS                current
+        DESCRIPTION
+                "A timestamp when the alert table was last
+                changed. Can be used by a manager to initiate a
+                an update of alerts procedure.
+                NOTE: All fields of the DateAndTime MUST be
+                filled out, including the hours and minutes from
+                UTC. As such, the value should be 11 octets
+                long."
+        REFERENCE
+                "DateAndTime is defined in RFC 2579, page 18"
+        ::= { eriAlarmXAlerts 2 }
+
+eriAlarmXAlertLastSequenceNo OBJECT-TYPE
+        SYNTAX                EriAlarmSequenceNumber
+        MAX-ACCESS        read-only
+        STATUS                current
+        DESCRIPTION
+                "The last sequence number used in alert
+                notifications. This can be used to detect a lost
+                notification."
+        ::= { eriAlarmXAlerts 3 }
+
+eriAlarmXAlertTableURL OBJECT-TYPE
+        SYNTAX                SnmpAdminString
+        MAX-ACCESS        read-only
+        STATUS                current
+        DESCRIPTION
+                "A URL pointing to a location where the contents
+                of alert table can be retrieved as a file. The
+                format of the file is out of the scope of this
+                MIB and system dependant. A Uniform Resource
+                Locator in accordance with RFC 4248."
+        ::= { eriAlarmXAlerts 4 }
+
+eriAlarmXAlertTable OBJECT-TYPE
+        SYNTAX                SEQUENCE OF EriAlarmXAlertEntry
+        MAX-ACCESS        not-accessible
+        STATUS                current
+        DESCRIPTION
+                "This table lists the last alerts in the system.
+                An alert is a stateless event, that is no clear
+                notification will be sent. Rows in this table are
+                created when a new alert event is detected. Rows
+                are deleted by the instrumentation at a
+                predefined size or age."
+        ::= { eriAlarmXAlerts 5 }
+
+eriAlarmXAlertEntry OBJECT-TYPE
+        SYNTAX                EriAlarmXAlertEntry
+        MAX-ACCESS        not-accessible
+        STATUS                current
+        DESCRIPTION
+                "One entry in the table holds one alert for a
+                given resource. Rows in this table are created
+                when a new alert is detected. Rows are deleted
+                by the instrumentation        at a predefined size or
+                age."
+        INDEX { eriAlarmXAlertIndex }
+        ::= { eriAlarmXAlertTable 1 }
+
+EriAlarmXAlertEntry ::= SEQUENCE {
+        eriAlarmXAlertIndex                EriAlarmIndex,
+
+        eriAlarmXAlertMajorType                EriAlarmType,
+        eriAlarmXAlertMinorType                EriAlarmType,
+        eriAlarmXAlertSpecificProblem        EriAlarmSpecificProblem,
+        eriAlarmXAlertYangNodeInstance        EriPath,
+        eriAlarmXAlertEventType                IANAItuEventType,
+        eriAlarmXAlertEventTime                DateAndTime,
+        eriAlarmXAlertProbableCause        EriProbableCause,
+        eriAlarmXAlertSeverity                ItuPerceivedSeverity,
+        eriAlarmXAlertAdditionalText        EriLargeAdditionalText,
+        eriAlarmXAlertResourceId                ResourceId,
+		eriAlarmXAlertAdditionalInfo		   EriLargeAdditionalInfo
+}
+
+
+eriAlarmXAlertIndex OBJECT-TYPE
+        SYNTAX                EriAlarmIndex
+        MAX-ACCESS        not-accessible
+        STATUS                current
+        DESCRIPTION
+                "Index in the alert table."
+        ::= { eriAlarmXAlertEntry 1 }
+
+eriAlarmXAlertMajorType OBJECT-TYPE
+        SYNTAX                EriAlarmType
+        MAX-ACCESS        read-only
+        STATUS                current
+        DESCRIPTION
+                "In combination with eriAlarmXAlertMinorType, this
+                provides unique identification of the alert.
+				This is a simplification of the different X.733
+                and 3GPP alarm IRP alarm correlation mechanisms
+                based on EventType, ProbableCause,
+                SpecificProblem and NotificationId."
+        ::= { eriAlarmXAlertEntry 2 }
+
+eriAlarmXAlertMinorType OBJECT-TYPE
+        SYNTAX                EriAlarmType
+        MAX-ACCESS        read-only
+        STATUS                current
+        DESCRIPTION
+                "In combination with eriAlarmXAlertMajorType, this
+                provides a unique identification of the alert.
+				This is a simplification of the different X.733
+                and 3GPP alarm IRP alarm correlation mechanisms
+                based on EventType, ProbableCause,
+                SpecificProblem and NotificationId."
+        ::= { eriAlarmXAlertEntry 3 }
+
+eriAlarmXAlertSpecificProblem OBJECT-TYPE
+        SYNTAX                EriAlarmSpecificProblem
+        MAX-ACCESS        read-only
+        STATUS                current
+        DESCRIPTION
+                "This is a clear-text unique identification of
+                the alert type. There is a one-to-one mapping
+                between eriAlarmXAlertSpecificProblem and
+                [eriAlarmXAlertMajorType, eriAlarmXAlertMinorType]"
+        ::= { eriAlarmXAlertEntry 4 }
+
+eriAlarmXAlertYangNodeInstance OBJECT-TYPE
+        SYNTAX                EriPath
+        MAX-ACCESS        read-only
+        STATUS                current
+        DESCRIPTION
+				"An Abridged YANG Instance-Identifier that references a
+				resource within the Managed Element."
+        REFERENCE
+                "YANG module ericsson-yang-types;
+				RFC 7950 , The YANG 1.1 Data Modeling Language"
+        ::= { eriAlarmXAlertEntry 5 }
+
+eriAlarmXAlertEventType OBJECT-TYPE
+        SYNTAX                IANAItuEventType
+        MAX-ACCESS        read-only
+        STATUS                current
+        DESCRIPTION
+                "The event type as defined in X.733/X.736."
+        REFERENCE
+                "ITU Recommendation X.733, 'Information
+                Technology - Open Systems Interconnection -
+                System Management: Alarm Reporting Function',
+                1992"
+        ::= { eriAlarmXAlertEntry 6 }
+
+eriAlarmXAlertEventTime OBJECT-TYPE
+        SYNTAX                DateAndTime
+        MAX-ACCESS        read-only
+        STATUS                current
+        DESCRIPTION
+                "A time stamp of the alert. NOTE: All fields of
+                the DateAndTime MUST be filled out, including the
+                hours and minutes from UTC. As such, the value
+                should be 11 octets long."
+        REFERENCE
+                "DateAndTime is defined in RFC 2579, page 18.
+                ITU Recommendation X.733, 'Information Technology
+                - Open Systems Interconnection - System
+                Management: Alarm Reporting Function', 1992"
+        ::= { eriAlarmXAlertEntry 7 }
+
+eriAlarmXAlertProbableCause OBJECT-TYPE
+        SYNTAX                EriProbableCause
+        MAX-ACCESS        read-only
+        STATUS                current
+        DESCRIPTION
+                "The probable cause, originally defined by X.733
+                and subsequent standards.
+                See also the ERICSSON-ALARM-PC-MIB. Due to the
+                history of problems in maintaining a standardized
+                probable cause the probable cause is not unique.
+                A best effort mapping of the alert to existing
+                probable causes are used."
+        REFERENCE
+                "ITU Recommendation X.733, 'Information
+                Technology - Open Systems Interconnection -
+                System Management: Alarm Reporting Function',
+                1992"
+        ::= { eriAlarmXAlertEntry 8 }
+
+eriAlarmXAlertSeverity OBJECT-TYPE
+        SYNTAX                ItuPerceivedSeverity
+        MAX-ACCESS        read-only
+        STATUS                current
+        DESCRIPTION
+                "The severity of the alert as defined by X.733"
+        REFERENCE
+                "ITU Recommendation X.733, 'Information
+                Technology - Open Systems Interconnection -
+                System Management: Alarm Reporting Function',
+                1992"
+        ::= { eriAlarmXAlertEntry 9 }
+
+eriAlarmXAlertAdditionalText OBJECT-TYPE
+        SYNTAX                EriLargeAdditionalText
+        MAX-ACCESS        read-only
+        STATUS                current
+        DESCRIPTION
+                "A user friendly text describing the alert. The
+                text is both static depending on the alert type
+                and dynamic depending on YANG resource instance
+				and other conditions."
+        REFERENCE
+                "ITU Recommendation X.733, 'Information
+                Technology - Open Systems Interconnection -
+                System Management: Alarm Reporting Function',
+                1992"
+        ::= { eriAlarmXAlertEntry 10 }
+
+eriAlarmXAlertResourceId OBJECT-TYPE
+        SYNTAX                ResourceId
+        MAX-ACCESS        read-only
+        STATUS                current
+        DESCRIPTION
+                "In case the alert refers to an object which is
+                instrumented by SNMP this variable indicates the
+                corresponding OID for the YANG resource instance."
+        REFERENCE
+                "RFC 3877 IETF ALARM MIB"
+
+        ::= { eriAlarmXAlertEntry 11 }
+
+eriAlarmXAlertAdditionalInfo OBJECT-TYPE
+        SYNTAX                EriLargeAdditionalInfo
+        MAX-ACCESS        read-only
+        STATUS                current
+        DESCRIPTION
+                "Additional Information for the alert,
+				structured in a way that is suitable for
+				machine to machine communication.
+                This string is longer than the corresponding
+                varbind in the notification in order to manage
+                large strings."
+        ::= { eriAlarmXAlertEntry 12 }
+
+
+--=============
+-- Heartbeat
+--==============
+
+eriAlarmXHbInterval OBJECT-TYPE
+        SYNTAX                Unsigned32
+        MAX-ACCESS        read-write
+        STATUS                current
+         DESCRIPTION
+                "The notification eriAlarmXHeartBeatNotif will be
+                sent every eriAlarmXHbInterval. Managers can
+                subscribe to the notification using the SNMP
+                framework MIBS by using the snmpNotifyName
+                'heartbeat'. (SNMP-NOTIFICATION-MIB,
+                snmpNotifyTable)"
+         ::= { eriAlarmXHeartBeat 1 }
+
+--====================================================
+--==Notifications and notification specific objects ==
+--====================================================
+
+
+eriAlarmXIndeterminate NOTIFICATION-TYPE
+        OBJECTS {
+
+                eriAlarmXActiveYangNodeInstance,
+                eriAlarmXActiveMajorType,
+                eriAlarmXActiveMinorType,
+                eriAlarmXActiveSpecificProblem,
+                eriAlarmXActiveLastSequenceNo,
+                eriAlarmXActiveEventType,
+                eriAlarmXActiveEventTime,
+                eriAlarmXActiveProbableCause,
+                eriAlarmXNObjAdditionalText,
+                eriAlarmXNObjMoreAdditionalText,
+                eriAlarmXNObjResourceId,
+                eriAlarmXNObjAdditionalInfo,
+				eriAlarmXNObjMoreAdditionalInfo,
+				eriAlarmXNObjRecordType
+        }
+        STATUS                current
+        DESCRIPTION
+                "This notification is sent when a resource
+                detects a new alarm state with severity
+                indeterminate. The notification is also used to
+                change severity, additional text and/or additional
+                info of an alarm. The eriAlarmXNObjRecordType
+                varbind will indicate whether this is a new alarm
+                instance or a change to an existing alarm instance.
+
+                The combination of YangNodeInstance
+				and MajorType/MinorType is always unique and can be
+                used by management systems to correlate alarm,
+                alarm change, and alarm clear. A corresponding
+                row will be created in the Alarm Table. The
+                sequence number will increase for every
+                notification and can be used to detect lost
+                notifications.
+
+                A management system should be prepared for
+                appending text to additional text, indicated by
+                the eriAlarmXNObjMoreAdditionalText varbind, and
+                sent with eriAlarmXAppendInfo.  (Note do not
+                confuse this with a change of additional text.)
+
+                A management system should be prepared for
+                appending text to additional info, indicated by
+                the eriAlarmXNObjMoreAdditionalInfo varbind, and
+                sent with eriAlarmXAppendInfo.  (Note do not
+                confuse this with a change of additional info.)
+
+				A management system should also be prepared to
+                receive a resource ID (OID) identifying the
+                alarming resource if the system sending the
+                notification can provide that information.  In
+                that case, eriAlarmXNObjResourceId will be set to
+                'true' and the resource ID will be sent in an
+                eriAlarmXAppendInfo notification."
+        ::= { eriAlarmXNotifsPrefix 1 }
+
+eriAlarmXWarning NOTIFICATION-TYPE
+        OBJECTS {
+
+                eriAlarmXActiveYangNodeInstance,
+                eriAlarmXActiveMajorType,
+                eriAlarmXActiveMinorType,
+                eriAlarmXActiveSpecificProblem,
+                eriAlarmXActiveLastSequenceNo,
+                eriAlarmXActiveEventType,
+                eriAlarmXActiveEventTime,
+                eriAlarmXActiveProbableCause,
+                eriAlarmXNObjAdditionalText,
+                eriAlarmXNObjMoreAdditionalText,
+                eriAlarmXNObjResourceId,
+                eriAlarmXNObjAdditionalInfo,
+				eriAlarmXNObjMoreAdditionalInfo,
+				eriAlarmXNObjRecordType
+        }
+        STATUS                current
+        DESCRIPTION
+                "This notification is sent when a resource
+                detects a new alarm state with severity warning.
+                The notification is also used to change severity,
+                additional text and/or additional info
+                of an alarm. The eriAlarmXNObjRecordType
+                varbind will indicate whether this is a new alarm
+                instance or a change to an existing alarm instance.
+
+                The combination of YangNodeInstance and
+				MajorType/MinorType is always unique and can be
+                used by management systems to correlate alarm,
+                alarm change, and alarm clear. A corresponding
+                row will be created in the Alarm Table,
+                (eriAlarmXActiveAlarmTable). The sequence number
+                will increase for every notification and can be
+                used to detect lost notifications.
+
+                A management system should be prepared for
+                appending text to additional text, indicated by
+                the eriAlarmXNObjMoreAdditionalText varbind, and
+                sent with eriAlarmXAppendInfo. (Note do not
+                confuse this with a change of additional text.)
+
+                A management system should be prepared for
+                appending text to additional info, indicated by
+                the eriAlarmXNObjMoreAdditionalInfo varbind, and
+                sent with eriAlarmXAppendInfo.  (Note do not
+                confuse this with a change of additional info.)
+
+                A management system should also be prepared to
+                receive a resource ID (OID) identifying the
+                alarming resource if the system sending the
+                notification can provide that information.  In
+                that case, eriAlarmXNObjResourceId will be set to
+                'true' and the resource ID will be sent in an
+                eriAlarmXAppendInfo notification."
+        ::= { eriAlarmXNotifsPrefix 2 }
+
+eriAlarmXMinor NOTIFICATION-TYPE
+        OBJECTS {
+                eriAlarmXActiveYangNodeInstance,
+                eriAlarmXActiveMajorType,
+                eriAlarmXActiveMinorType,
+                eriAlarmXActiveSpecificProblem,
+                eriAlarmXActiveLastSequenceNo,
+                eriAlarmXActiveEventType,
+                eriAlarmXActiveEventTime,
+                eriAlarmXActiveProbableCause,
+                eriAlarmXNObjAdditionalText,
+                eriAlarmXNObjMoreAdditionalText,
+                eriAlarmXNObjResourceId,
+                eriAlarmXNObjAdditionalInfo,
+				eriAlarmXNObjMoreAdditionalInfo,
+				eriAlarmXNObjRecordType
+        }
+        STATUS                current
+        DESCRIPTION
+                "This notification is sent when a resource
+                detects a new alarm state with severity minor.
+                The notification is also used to change severity,
+                additional text and/or additional info
+                of an alarm. The eriAlarmXNObjRecordType
+                varbind will indicate whether this is a new alarm
+                instance or a change to an existing alarm instance.
+
+                The combination of YangNodeInstance and
+				MajorType/MinorType is always unique and can be
+                used by management systems to correlate alarm,
+                alarm change, and alarm clear. A corresponding
+                row will be created in the Alarm Table,
+                (eriAlarmXActiveAlarmTable). The sequence number
+                will increase for every notification and can be
+                used to detect lost notifications.
+
+                A management system should be prepared for
+                appending text to additional text, indicated by
+                the eriAlarmXNObjMoreAdditionalText varbind, and
+                sent with eriAlarmXAppendInfo. (Note do not
+                confuse this with a change of additional text.)
+
+                A management system should be prepared for
+                appending text to additional info, indicated by
+                the eriAlarmXNObjMoreAdditionalInfo varbind, and
+                sent with eriAlarmXAppendInfo.  (Note do not
+                confuse this with a change of additional info.)
+
+                A management system should also be prepared to
+                receive a resource ID (OID) identifying the
+                alarming resource if the system sending the
+                notification can provide that information.  In
+                that case, eriAlarmXNObjResourceId will be set to
+                'true' and the resource ID will be sent in an
+                eriAlarmXAppendInfo notification."
+        ::= { eriAlarmXNotifsPrefix 3 }
+
+eriAlarmXMajor NOTIFICATION-TYPE
+        OBJECTS {
+                eriAlarmXActiveYangNodeInstance,
+                eriAlarmXActiveMajorType,
+                eriAlarmXActiveMinorType,
+                eriAlarmXActiveSpecificProblem,
+                eriAlarmXActiveLastSequenceNo,
+                eriAlarmXActiveEventType,
+                eriAlarmXActiveEventTime,
+                eriAlarmXActiveProbableCause,
+                eriAlarmXNObjAdditionalText,
+                eriAlarmXNObjMoreAdditionalText,
+                eriAlarmXNObjResourceId,
+                eriAlarmXNObjAdditionalInfo,
+				eriAlarmXNObjMoreAdditionalInfo,
+				eriAlarmXNObjRecordType
+        }
+        STATUS                current
+        DESCRIPTION
+                "This notification is sent when a resource
+                detects a new alarm state with severity major.
+                The notification is also used to change severity,
+                additional text and/or additional info
+                of an alarm. The eriAlarmXNObjRecordType
+                varbind will indicate whether this is a new alarm
+                instance or a change to an existing alarm instance.
+
+                The combination of YangNodeInstance and
+				MajorType/MinorType is always unique and can be
+                used by management systems to correlate alarm,
+                alarm change, and alarm clear. A corresponding
+                row will be created in the Alarm Table,
+                (eriAlarmXActiveAlarmTable). The sequence number
+                will increase for every notification and can be
+                used to detect lost notifications.
+
+                A management system should be prepared for
+                appending text to additional text, indicated by
+                the eriAlarmXNObjMoreAdditionalText varbind, and
+                sent with eriAlarmXAppendInfo. (Note do not
+                confuse this with a change of additional text.)
+
+                A management system should be prepared for
+                appending text to additional info, indicated by
+                the eriAlarmXNObjMoreAdditionalInfo varbind, and
+                sent with eriAlarmXAppendInfo.  (Note do not
+                confuse this with a change of additional info.)
+
+                A management system should also be prepared to
+                receive a resource ID (OID) identifying the
+                alarming resource if the system sending the
+                notification can provide that information.  In
+                that case, eriAlarmXNObjResourceId will be set to
+                'true' and the resource ID will be sent in an
+                eriAlarmXAppendInfo notification."
+        ::= { eriAlarmXNotifsPrefix 4 }
+
+eriAlarmXCritical NOTIFICATION-TYPE
+        OBJECTS {
+
+                eriAlarmXActiveYangNodeInstance,
+                eriAlarmXActiveMajorType,
+                eriAlarmXActiveMinorType,
+                eriAlarmXActiveSpecificProblem,
+                eriAlarmXActiveLastSequenceNo,
+                eriAlarmXActiveEventType,
+                eriAlarmXActiveEventTime,
+                eriAlarmXActiveProbableCause,
+                eriAlarmXNObjAdditionalText,
+                eriAlarmXNObjMoreAdditionalText,
+                eriAlarmXNObjResourceId,
+                eriAlarmXNObjAdditionalInfo,
+				eriAlarmXNObjMoreAdditionalInfo,
+				eriAlarmXNObjRecordType
+        }
+        STATUS                current
+        DESCRIPTION
+                "This notification is sent when a resource
+                detects a new alarm state with severity critical.
+                The notification is also used to change severity,
+                additional text and/or additional info
+                of an alarm. The eriAlarmXNObjRecordType
+                varbind will indicate whether this is a new alarm
+                instance or a change to an existing alarm instance.
+
+                The combination of YangNodeInstance and
+				MajorType/MinorType is always unique and can be
+                used by management systems to correlate alarm,
+                alarm change, and alarm clear. A corresponding
+                row will be created in the Alarm Table,
+                (eriAlarmXActiveAlarmTable). The sequence number
+                will increase for every notification and can be
+                used to detect lost notifications.
+
+                A management system should be prepared for
+                appending text to additional text, indicated by
+                the eriAlarmXNObjMoreAdditionalText varbind, and
+                sent with eriAlarmXAppendInfo. (Note do not
+                confuse this with a change of additional text.)
+
+                A management system should be prepared for
+                appending text to additional info, indicated by
+                the eriAlarmXNObjMoreAdditionalInfo varbind, and
+                sent with eriAlarmXAppendInfo.  (Note do not
+                confuse this with a change of additional info.)
+
+                A management system should also be prepared to
+                receive a resource ID (OID) identifying the
+                alarming resource if the system sending the
+                notification can provide that information.  In
+                that case, eriAlarmXNObjResourceId will be set to
+                'true' and the resource ID will be sent in an
+                eriAlarmXAppendInfo notification."
+        ::= { eriAlarmXNotifsPrefix 5 }
+
+eriAlarmXCleared NOTIFICATION-TYPE
+        OBJECTS {
+
+                eriAlarmXActiveYangNodeInstance,
+                eriAlarmXActiveMajorType,
+                eriAlarmXActiveMinorType,
+                eriAlarmXActiveSpecificProblem,
+                eriAlarmXActiveLastSequenceNo,
+                eriAlarmXActiveEventType,
+                eriAlarmXActiveEventTime,
+                eriAlarmXActiveProbableCause,
+                eriAlarmXNObjAdditionalText,
+                eriAlarmXNObjMoreAdditionalText,
+                eriAlarmXNObjResourceId,
+                eriAlarmXNObjAdditionalInfo,
+				eriAlarmXNObjMoreAdditionalInfo
+                }
+        STATUS                current
+        DESCRIPTION
+                "This notification is sent when a resource
+                detects a cleared alarm state. The combination of
+                YangNodeInstance and MajorType/MinorType is
+                always unique and shall be used by management
+                systems to correlate alarm and alarm clear.
+
+				The corresponding row in the alarm table will be
+                deleted, (eriAlarmXActiveAlarmTable). The
+                sequence number will increase for every
+                notification and can be used to detect lost
+                notifications.
+
+                Note that it should not be required to send an
+				append trap for a cleared alarm. Those varbinds
+				which flag that an append trap will follow are
+				kept here for backward compatibility reasons."
+        ::= { eriAlarmXNotifsPrefix 7 }
+
+eriAlarmXAppendInfo NOTIFICATION-TYPE
+        OBJECTS {
+
+                eriAlarmXActiveYangNodeInstance,
+                eriAlarmXActiveMajorType,
+                eriAlarmXActiveMinorType,
+                eriAlarmXNObjAdditionalText,
+                eriAlarmXActiveResourceId,
+                eriAlarmXNObjAppendedAdditionalInfo
+        }
+        STATUS                current
+        DESCRIPTION
+                "This notification is sent in order to append
+                further info to an alarm notification. It might be
+                additional text, additional info or a resource ID
+                (OID) identifying the alarming resource using an OID.
+                If additional text/info is sent, do not confuse this
+                with an actual change of additional text/info which
+                is reported using the eriAlarmX<severity>
+                notification.
+
+                A zero-length string value for
+                eriAlarmXNObjAdditionalText means that no
+                additional text is being sent in this
+                notification.
+
+                A zero-length string value for
+                eriAlarmXNObjAppendedAdditionalInfo means that no
+                additional info is being sent in this
+                notification.
+
+                A null OID (0.0) value for
+                eriAlarmXActiveResourceId means that no resource
+                ID is being sent in this notification."
+        ::= { eriAlarmXNotifsPrefix 8 }
+
+--============================
+-- Alerts
+--===============================
+
+eriAlarmXIndAlert NOTIFICATION-TYPE
+        OBJECTS {
+
+                eriAlarmXAlertYangNodeInstance,
+                eriAlarmXAlertMajorType,
+                eriAlarmXAlertMinorType,
+                eriAlarmXAlertSpecificProblem,
+                eriAlarmXAlertLastSequenceNo,
+                eriAlarmXAlertEventType,
+                eriAlarmXAlertEventTime,
+                eriAlarmXAlertProbableCause,
+                eriAlarmXNObjAdditionalText,
+                eriAlarmXNObjMoreAdditionalText,
+                eriAlarmXNObjResourceId,
+                eriAlarmXNObjAdditionalInfo,
+				eriAlarmXNObjMoreAdditionalInfo
+                }
+        STATUS        current
+        DESCRIPTION
+                "This notification is sent when a resource
+                detects a new alert with severity indeterminate.
+                A corresponding row will be created in the Alert
+                Table. The sequence number will increase for
+                every notification and can be used to detect lost
+                notifications."
+        ::= { eriAlarmXNotifsPrefix 10 }
+
+eriAlarmXWarnAlert NOTIFICATION-TYPE
+        OBJECTS {
+
+                eriAlarmXAlertYangNodeInstance,
+                eriAlarmXAlertMajorType,
+                eriAlarmXAlertMinorType,
+                eriAlarmXAlertSpecificProblem,
+                eriAlarmXAlertLastSequenceNo,
+                eriAlarmXAlertEventType,
+                eriAlarmXAlertEventTime,
+                eriAlarmXAlertProbableCause,
+                eriAlarmXNObjAdditionalText,
+                eriAlarmXNObjMoreAdditionalText,
+                eriAlarmXNObjResourceId,
+                eriAlarmXNObjAdditionalInfo,
+				eriAlarmXNObjMoreAdditionalInfo
+                }
+        STATUS                current
+        DESCRIPTION
+                "This notification is sent when a resource
+                detects a new alert with severity warning. A
+                corresponding row will be created in the Alert
+                Table. The sequence number will increase for
+                every notification and can be used to detect lost
+                notifications."
+        ::= { eriAlarmXNotifsPrefix 11 }
+
+eriAlarmXMinorAlert NOTIFICATION-TYPE
+        OBJECTS {
+
+                eriAlarmXAlertYangNodeInstance,
+                eriAlarmXAlertMajorType,
+                eriAlarmXAlertMinorType,
+                eriAlarmXAlertSpecificProblem,
+                eriAlarmXAlertLastSequenceNo,
+                eriAlarmXAlertEventType,
+                eriAlarmXAlertEventTime,
+                eriAlarmXAlertProbableCause,
+                eriAlarmXNObjAdditionalText,
+                eriAlarmXNObjMoreAdditionalText,
+                eriAlarmXNObjResourceId,
+                eriAlarmXNObjAdditionalInfo,
+				eriAlarmXNObjMoreAdditionalInfo
+                }
+        STATUS                current
+        DESCRIPTION
+                "This notification is sent when a resource
+                detects a new alert with severity minor. A
+                corresponding row will be created in the Alert
+                Table. The sequence number will increase for
+                every notification and can be used to detect lost
+                notifications."
+        ::= { eriAlarmXNotifsPrefix 12 }
+
+eriAlarmXMajorAlert NOTIFICATION-TYPE
+        OBJECTS {
+
+                eriAlarmXAlertYangNodeInstance,
+                eriAlarmXAlertMajorType,
+                eriAlarmXAlertMinorType,
+                eriAlarmXAlertSpecificProblem,
+                eriAlarmXAlertLastSequenceNo,
+                eriAlarmXAlertEventType,
+                eriAlarmXAlertEventTime,
+                eriAlarmXAlertProbableCause,
+                eriAlarmXNObjAdditionalText,
+                eriAlarmXNObjMoreAdditionalText,
+                eriAlarmXNObjResourceId,
+                eriAlarmXNObjAdditionalInfo,
+				eriAlarmXNObjMoreAdditionalInfo
+                }
+        STATUS                current
+        DESCRIPTION
+                "This notification is sent when a resource
+                detects a new alert with severity major. A
+                corresponding row will be created in the Alert
+                Table. The sequence number will increase for
+                every notification and can be used to detect lost
+                notifications."
+        ::= { eriAlarmXNotifsPrefix 13 }
+
+eriAlarmXCriticalAlert NOTIFICATION-TYPE
+        OBJECTS {
+
+                eriAlarmXAlertYangNodeInstance,
+                eriAlarmXAlertMajorType,
+                eriAlarmXAlertMinorType,
+                eriAlarmXAlertSpecificProblem,
+                eriAlarmXAlertLastSequenceNo,
+                eriAlarmXAlertEventType,
+                eriAlarmXAlertEventTime,
+                eriAlarmXAlertProbableCause,
+                eriAlarmXNObjAdditionalText,
+                eriAlarmXNObjMoreAdditionalText,
+                eriAlarmXNObjResourceId,
+                eriAlarmXNObjAdditionalInfo,
+				eriAlarmXNObjMoreAdditionalInfo
+                }
+        STATUS                current
+        DESCRIPTION
+                "This notification is sent when a resource
+                detects a new alert with severity critical. A
+                corresponding row will be created in the Alert
+                Table. The sequence number will increase for
+                every notification and can be used to detect lost
+                notifications."
+        ::= { eriAlarmXNotifsPrefix 14 }
+
+eriAlarmXAppendAlertInfo NOTIFICATION-TYPE
+        OBJECTS {
+
+                eriAlarmXAlertYangNodeInstance,
+                eriAlarmXAlertMajorType,
+                eriAlarmXAlertMinorType,
+                eriAlarmXNObjAdditionalText,
+                eriAlarmXAlertResourceId,
+                eriAlarmXNObjAppendedAdditionalInfo
+        }
+        STATUS                current
+        DESCRIPTION
+                "This notification is sent in order to append
+                further info to an alert notification. It might be
+                additional text or a resource ID (OID)
+                identifying the alarming resource using an OID.
+                This complements information sent in a previous
+                notification.
+
+                If additional text/info is sent, do not confuse this
+                with an actual change of additional text/info which is
+                reported using the eriAlarmXAlert<severity>
+                notification.
+
+                A zero-length string value for
+                eriAlarmXNObjAdditionalText means that no
+                additional text is being sent in this
+                notification.
+
+                A zero-length string value for
+                eriAlarmXNObjAppendedAdditionalInfo means that no
+                additional info is being sent in this
+                notification.
+
+                A null OID (0.0) value for
+                eriAlarmXAlertResourceId means that no resource
+                ID is being sent in this notification."
+        ::= { eriAlarmXNotifsPrefix 15 }
+
+
+eriAlarmXHeartBeatNotif NOTIFICATION-TYPE
+        OBJECTS {
+                eriAlarmXActiveLastSequenceNo,
+                eriAlarmXAlertLastSequenceNo,
+                eriAlarmXActiveLastChanged,
+                eriAlarmXAlertLastChanged
+        }
+        STATUS                current
+        DESCRIPTION
+                "This is a heartbeat notification with interval
+                according to the eriAlarmXHbInterval. It contains
+                the last sequence numbers used for alarms and
+                alarm events. These varbinds can be used to
+                detect lost notifications.
+
+                The notification eriAlarmXHeartBeatNotif will be
+                sent every eriAlarmXHbInterval. Managers can
+                subscribe to the notification using the SNMP
+                framework MIBS by using the snmpNotifyName
+                'heartbeat'. (SNMP-NOTIFICATION-MIB,
+                snmpNotifyTable)."
+        ::= { eriAlarmXNotifsPrefix 20}
+
+eriAlarmXAlarmListRebuilt NOTIFICATION-TYPE
+        OBJECTS { eriAlarmXActiveTableURL }
+        STATUS                current
+        DESCRIPTION
+                "This notification is sent when the active alarm
+                list has reached a stable situation after a
+                restart or after a system internal audit process.
+                It is an indication to the manager to perform a
+                alarm resynchronization procedure."
+        ::= { eriAlarmXNotifsPrefix 30}
+
+--======================================================================
+-- CONFORMANCE INFORMATION
+--======================================================================
+
+eriAlarmXCompliances        OBJECT IDENTIFIER ::= { eriAlarmXConformance 1 }
+eriAlarmXGroups        OBJECT IDENTIFIER ::= { eriAlarmXConformance 2 }
+
+
+--======================================================================
+-- COMPLIANCE STATEMENTS
+--======================================================================
+
+eriAlarmXBasicAlarmsCompliance MODULE-COMPLIANCE
+        STATUS current
+        DESCRIPTION
+                "Minimal compliance for the Ericsson Alarm MIB.
+                Minimal compliance is to support heartbeat,
+                active alarm list, and alarm notifications for
+                raise and clear."
+        MODULE -- this module
+                MANDATORY-GROUPS
+                        {
+                        eriAlarmXSummaryGroup,
+                        eriAlarmXActiveAlarmsGroup,
+                        eriAlarmXHeartBeatGroup,
+                        eriAlarmXSimpleAlarmGroup,
+                        eriAlarmXHeartBeatNotifGroup
+                        }
+        GROUP eriAlarmXAlertsGroup
+                DESCRIPTION "If the system supports history of
+                stateless events, alerts."
+        GROUP eriAlarmXAlertNotifGroup
+                DESCRIPTION "If the system supports notifications
+                for stateless events, alerts."
+        GROUP eriAlarmXChangeAlarmGroup
+                DESCRIPTION "If the system supports columns in
+                the alarm table for original attribute values of
+                additional text, severity and event time."
+        GROUP eriAlarmXAddAddInfoGroup
+                DESCRIPTION "If the system supports notifications
+                to append text or resource id to existing alarms."
+        GROUP eriAlarmXSNMPResourceGroup
+                DESCRIPTION "If the system supports SNMP Object
+                Identifiers to identify YANG resource instances in
+                parallel with XPath addressing."
+
+        OBJECT eriAlarmXHbInterval
+        MIN-ACCESS  read-only
+        DESCRIPTION
+                "Write access is not required, but is highly
+                desirable."
+
+		GROUP eriAlarmXActiveAlarmsAdditionalInfoGroup
+                DESCRIPTION "If the system supports Additional
+				Information for alarms."
+        GROUP eriAlarmXAlertsAdditionalInfoGroup
+                DESCRIPTION "If the system supports Additional
+				Information for alerts."
+        GROUP eriAlarmXRecordTypeGroup
+                DESCRIPTION "If the system supports
+                Record Type for alarms."
+
+
+        MODULE SNMP-TARGET-MIB
+                MANDATORY-GROUPS {snmpTargetBasicGroup}
+        MODULE SNMP-NOTIFICATION-MIB
+                MANDATORY-GROUPS {snmpNotifyGroup}
+::= {eriAlarmXCompliances 1}
+
+
+eriAlarmXSummaryGroup OBJECT-GROUP
+        OBJECTS {
+                 eriAlarmXSumIndeterminate,
+                 eriAlarmXSumCritical,
+                eriAlarmXSumMajor,
+                eriAlarmXSumMinor,
+                eriAlarmXSumWarning
+                }
+        STATUS  current
+        DESCRIPTION
+                "Group containing the summary counters for alarms."
+        ::= { eriAlarmXGroups 1 }
+
+eriAlarmXActiveAlarmsGroup OBJECT-GROUP
+        OBJECTS {
+                eriAlarmXActiveNumber,
+                eriAlarmXActiveLastChanged,
+                eriAlarmXActiveLastSequenceNo,
+                eriAlarmXActiveTableURL,
+                eriAlarmXActiveMajorType,
+                eriAlarmXActiveMinorType,
+                eriAlarmXActiveSpecificProblem,
+                eriAlarmXActiveYangNodeInstance,
+                eriAlarmXActiveEventType,
+                eriAlarmXActiveEventTime,
+                eriAlarmXActiveProbableCause,
+                eriAlarmXActiveSeverity,
+                eriAlarmXActiveAdditionalText,
+                eriAlarmXNObjAdditionalText,
+                eriAlarmXNObjResourceId
+                }
+        STATUS  current
+        DESCRIPTION
+                "The group of objects needed to support the
+                active alarm list."
+        ::= { eriAlarmXGroups 2 }
+
+eriAlarmXAlertsGroup OBJECT-GROUP
+        OBJECTS {
+                eriAlarmXAlertNumber,
+                eriAlarmXAlertLastChanged,
+                eriAlarmXAlertLastSequenceNo,
+                eriAlarmXAlertTableURL,
+                eriAlarmXAlertMajorType,
+                eriAlarmXAlertMinorType,
+                eriAlarmXAlertSpecificProblem,
+                eriAlarmXAlertYangNodeInstance,
+                eriAlarmXAlertEventType,
+                eriAlarmXAlertEventTime,
+                eriAlarmXAlertProbableCause,
+                eriAlarmXAlertSeverity,
+                eriAlarmXAlertAdditionalText
+                }
+        STATUS  current
+        DESCRIPTION
+                "The group of objects needed to support the alert
+                history."
+        ::= { eriAlarmXGroups 3 }
+
+eriAlarmXHeartBeatGroup OBJECT-GROUP
+        OBJECTS {eriAlarmXHbInterval}
+        STATUS  current
+        DESCRIPTION
+                "Only read is required for compliance"
+        ::= { eriAlarmXGroups 4 }
+
+eriAlarmXSNMPResourceGroup OBJECT-GROUP
+        OBJECTS {
+                eriAlarmXActiveResourceId,
+                eriAlarmXAlertResourceId
+                }
+        STATUS  current
+        DESCRIPTION
+                "Objects that support SNMP object identifiers for
+                resource identification."
+        ::= { eriAlarmXGroups 5 }
+
+eriAlarmXChangeAlarmGroup OBJECT-GROUP
+        OBJECTS {
+                eriAlarmXActiveOriginalEventTime,
+                eriAlarmXActiveOriginalSeverity,
+                eriAlarmXActiveOrigAdditionalText,
+                eriAlarmXNObjMoreAdditionalText
+                }
+     STATUS  current
+     DESCRIPTION
+        "Objects that stores previous state of an alarm."
+     ::= { eriAlarmXGroups 6 }
+
+eriAlarmXActiveAlarmsAdditionalInfoGroup OBJECT-GROUP
+        OBJECTS {
+                eriAlarmXActiveAdditionalInfo,
+                eriAlarmXNObjAdditionalInfo,
+				eriAlarmXNObjAppendedAdditionalInfo,
+                eriAlarmXNObjMoreAdditionalInfo
+				}
+        STATUS  current
+        DESCRIPTION
+				"The group of objects needed to support
+                Additional Information for alarms."
+		::= { eriAlarmXGroups 7 }
+
+eriAlarmXAlertsAdditionalInfoGroup OBJECT-GROUP
+        OBJECTS {eriAlarmXAlertAdditionalInfo}
+        STATUS  current
+        DESCRIPTION
+                "The group of objects needed to support
+                Additional Information for alerts."
+        ::= { eriAlarmXGroups 8 }
+
+eriAlarmXRecordTypeGroup OBJECT-GROUP
+        OBJECTS {eriAlarmXNObjRecordType}
+        STATUS  current
+        DESCRIPTION
+                "The group of objects needed to support
+                Record Type for alarms."
+        ::= { eriAlarmXGroups 9 }
+
+eriAlarmXSimpleAlarmGroup NOTIFICATION-GROUP
+        NOTIFICATIONS {
+                eriAlarmXIndeterminate,
+                eriAlarmXWarning,
+                eriAlarmXMinor,
+                eriAlarmXMajor,
+                eriAlarmXCritical,
+                eriAlarmXCleared,
+                eriAlarmXAlarmListRebuilt
+                }
+        STATUS  current
+        DESCRIPTION
+                "The notifications in this MIB module."
+        ::= { eriAlarmXGroups 10 }
+
+eriAlarmXAddAddInfoGroup NOTIFICATION-GROUP
+        NOTIFICATIONS {
+                eriAlarmXAppendInfo,
+                eriAlarmXAppendAlertInfo
+                }
+        STATUS  current
+        DESCRIPTION
+                "Notification to support appending of additional text."
+		::= { eriAlarmXGroups 12 }
+
+eriAlarmXAlertNotifGroup NOTIFICATION-GROUP
+        NOTIFICATIONS {
+                eriAlarmXIndAlert,
+                eriAlarmXWarnAlert,
+                eriAlarmXMinorAlert,
+                eriAlarmXMajorAlert,
+                eriAlarmXCriticalAlert
+				}
+        STATUS  current
+        DESCRIPTION
+                "Notifications for stateless events, alerts"
+		::= { eriAlarmXGroups 13 }
+
+eriAlarmXHeartBeatNotifGroup NOTIFICATION-GROUP
+        NOTIFICATIONS {eriAlarmXHeartBeatNotif}
+        STATUS  current
+        DESCRIPTION
+                "Heartbeat notifications."
+		::= { eriAlarmXGroups 14 }
+
+
+END --this file

@@ -1,0 +1,437 @@
+-- %DNP%
+-- %DNP% $Source: /cvsroot/pkt/sw/se/xc/bsd/config/snmp/doc/Attic/header.mib,v $
+-- *****************************************************************
+-- ERICSSON-DISCOVERY-MIB       Ericsson global MIB
+--
+-- Copyright (c) 2015 Ericsson AB.
+-- All rights reserved.
+--
+-- *****************************************************************
+--
+-- This MIB Module is an Ericsson-wide SNMP
+-- interface for auto discovery of nodes during an
+-- auto integration procedure. See the module identity
+-- description below.
+--
+-- Authors:
+-- Peter Loborg
+-- Johan Flinck
+--
+--===================================================
+-- TODO:
+--  - Allocate product number in PRIM
+--
+-- This version of the MIB is in alignment with
+-- the NDS 1/102 68-FCP 111 1006 rev PA26.
+--
+-- The MIB passes smilint at level 6.
+
+ERICSSON-DISCOVERY-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+        Integer32
+                FROM SNMPv2-SMI
+        TEXTUAL-CONVENTION
+                FROM SNMPv2-TC
+        InetAddress, InetAddressType
+                FROM INET-ADDRESS-MIB
+        -- SnmpAdminString
+        --        FROM SNMP-FRAMEWORK-MIB
+        ericssonModules
+                FROM ERICSSON-TOP-MIB
+        -- IANAItuEventType
+        --        FROM IANA-ITU-ALARM-TC-MIB
+        -- snmpTargetBasicGroup
+        --        FROM SNMP-TARGET-MIB
+        -- snmpNotifyGroup
+        --        FROM SNMP-NOTIFICATION-MIB
+        OBJECT-GROUP, NOTIFICATION-GROUP, MODULE-COMPLIANCE
+                FROM SNMPv2-CONF;
+
+
+ericssonDiscoveryMIB MODULE-IDENTITY
+        LAST-UPDATED "201601131500Z"
+        ORGANIZATION "Ericsson AB"
+        CONTACT-INFO
+                "       Ericsson AB.
+
+                Postal: 300 Holger Way
+                        San Jose, CA  95134-1362
+                        USA
+
+                 Phone: +1 408 750-5000
+                   Fax: +1 408 750-5599
+
+                "
+        DESCRIPTION
+                "This MIB Module is an Ericsson-wide SNMP
+                interface for auto discovery of nodes during an
+                auto integration procedure or after restart. It describes the
+                notification used to send an intial discovery message
+                to a management system, and an optional mechanism
+                for a management system to acknowledge the reception
+                of this message and that the integration process
+                is started. A few alternative (node type specific)
+                variants of the discovery message is expected over time,
+                modeled as optional parts in the message.
+
+                The agent is expected to repeatedly send the discovery
+                message untill reception has been acknoleged by the
+                management system through the optional mechanism
+                in this MIB or by an other node specific mechanism.
+
+                See eriDiscoveryStatus for detailes.
+
+                The frequency at which to send dicovery messages is
+                implementation specific, but must not be more often
+                than one message per minute or more seldom than one message
+                per hour.
+
+                MIB Product number in GASK: n/nnn nn-CXC nnn nnnn, Rev x"
+
+        REVISION "201601131500Z"
+        DESCRIPTION
+                "Minor, non-functinal modifications according Spitfire/SSR rules."
+
+        REVISION "201210310000Z"
+        DESCRIPTION
+                 "Adding FDN as node ID type, increased value size (changed name of
+                 the value type to avoid referencing the value size in the name).
+                 The same trap shall also be possible to use after node restart,
+                 it is the recieving management system that will have to remember
+                 if it is a new node to discover or if it has been seen before.
+                 Smilint validation level 6 passed."
+        -- Note: This is actually not a bw-compatible change - but as this MIB has
+        --       not yet been delivered there is no baseline to be compatible with.
+
+        REVISION "201210040000Z"
+        DESCRIPTION
+                 "Ready for functional review - smilint validation and allocation
+                 of mib identifier remains."
+
+        REVISION "201208210000Z"
+        DESCRIPTION
+                "Initial version of this MIB module."
+
+        ::= { ericssonModules 5 }
+
+
+--===================================================
+-- Groups
+--===================================================
+
+
+eriDiscoveryControl         OBJECT IDENTIFIER ::= { ericssonDiscoveryMIB 1 }
+eriDiscoveryObjects         OBJECT IDENTIFIER ::= { ericssonDiscoveryMIB 2 }
+eriDiscoveryOptionalObjects OBJECT IDENTIFIER ::= { ericssonDiscoveryMIB 3 }
+
+eriDiscoveryNotifications   OBJECT IDENTIFIER ::= { ericssonDiscoveryMIB 4 }
+eriDiscoveryMIBCompliances  OBJECT IDENTIFIER ::= { ericssonDiscoveryMIB 5 }
+
+-- The following is needed for SMIv1 backward compatibility,
+-- see section 8.5 of RFC 2578.
+eriDiscoveryNotifsPrefix    OBJECT IDENTIFIER ::= { eriDiscoveryNotifications 0 }
+
+--===================================================
+-- Control and status objects
+--===================================================
+
+eriDiscoveryStatus OBJECT-TYPE
+        SYNTAX          EriDiscoveryStateValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+           "This object shows if discovery messages are beeing issued
+           from the node or not. A manager may turn off issuing of
+           discovery messages by setting this object to disabled(0).
+
+           The node may conclude that discovery has succeeded by other
+           means of communication with a manager and will then indicate
+           that by changing this value to disabled(0).
+
+           If a manager sets this value to enabled(1) the node may
+           choose to resume sending of discovery messages - or it
+           may deny such a request by immediately reseting this value
+           to disabled(0).
+
+           Open issue: Shall we have this flexibility - or shall we
+           mandate the possibility to re-start the dicovery process?
+           It's good for testing and some error scenarios,
+           but may have security implications and impacts on OSS,
+           so we have to decide..."
+        ::= { eriDiscoveryControl 1 }
+
+--===================================================
+--== Textual conventions for staus data
+--===================================================
+
+EriDiscoveryStateValue ::= TEXTUAL-CONVENTION
+        STATUS current
+        DESCRIPTION
+                "Values for indicating if the node is currently issuing
+                discovery messages or not."
+        SYNTAX INTEGER {
+                disabled(0),
+                enabled(1)
+        }
+
+
+
+--====================================================
+-- Notification objects
+--
+-- These are the 'attributes' of all possible
+-- discovery messages defined by this MIB.
+-- They are grouped as securitymandatory objects
+-- and optional objects.
+--====================================================
+
+--====================================================
+-- Discovery trap objects
+--
+-- These are the attributes used in the discovery trap.
+--====================================================
+
+eriDiscoveryNodeIdType    OBJECT-TYPE
+    SYNTAX      EriDiscoveryNodeIdTypeType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The type of node ID value to expect in eriDiscoveryNodeIdValue"
+    ::= { eriDiscoveryObjects 1 }
+
+
+eriDiscoveryNodeIdValue     OBJECT-TYPE
+    SYNTAX      EriDiscoveryIdValueText      -- 0..400 oct
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The node ID value"
+    ::= { eriDiscoveryObjects 2 }
+
+
+eriDiscoverySecCS  OBJECT-TYPE
+    SYNTAX      EriDiscoveryCheckSum   -- 32bit (4 oct)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The security check sum (SCC) calculated by the NE."
+    ::= { eriDiscoveryObjects 3 }
+
+eriDiscoverySecCSVer  OBJECT-TYPE
+    SYNTAX      EriDiscoveryText16   -- 0..16 oct
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The version of the SCC. Only one version is currently supported, represented by the literal '1.0'"
+    ::= { eriDiscoveryObjects 4 }
+
+eriDiscoveryNodeIpAddrOam1Type     OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "The type of address used for O&M address 1 (see RFC 4001)"
+    REFERENCE "Revision 200006080000Z of the inetAddressMIB (RFC 4001)"
+    ::= { eriDiscoveryObjects 5 }
+
+eriDiscoveryNodeIpAddrOam1     OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The first O&M address of the node"
+    REFERENCE "Revision 200006080000Z of the inetAddressMIB (RFC 4001)"
+    ::= { eriDiscoveryObjects 6 }
+
+
+--====================================================
+-- Additional but optional Discovery trap objects
+--
+-- These are the attributes used in the discovery trap.
+--====================================================
+
+
+eriDiscoveryNodeIpAddrOam2Type     OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The type of address used for O&M address 2, if any (see RFC 4001)"
+    REFERENCE "Revision 200006080000Z of the inetAddressMIB (RFC 4001)"
+    ::= { eriDiscoveryOptionalObjects 1 }
+
+eriDiscoveryNodeIpAddrOam2     OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "A second or alternative IP O&M address - if any"
+    REFERENCE "Revision 200006080000Z of the inetAddressMIB (RFC 4001)"
+    ::= { eriDiscoveryOptionalObjects 2 }
+
+
+
+--====================================================
+-- Notifications and notification specific objects.
+--
+-- This is the generic discovery message that
+-- any node may send to an OSS.
+--
+-- The definition allows for different formats (types of)
+-- node ID to be used. A new node ID format
+-- can be introduced by adding to the textual
+-- convention EriDiscoveryNodeIdType.
+--
+-- If the node only presents a single O&M interface
+-- it will only use one of the two IpAddress/IpAddressType
+-- pairs to present a valid address (IPv4, IPv4z, IPv6,
+-- IPv6z or dns), indicating that a pair is not used
+-- by supplying unknown(0) as the type for that pair
+-- or by omitting the second pair all together (see
+-- comformance statements).
+--====================================================
+
+
+eriDiscoveryEvent NOTIFICATION-TYPE
+        OBJECTS {
+                eriDiscoveryNodeIdType,             -- 1
+                eriDiscoveryNodeIdValue,            -- 0..400
+                eriDiscoverySecCS,                  -- 4
+                eriDiscoverySecCSVer,               -- 0..16
+                eriDiscoveryNodeIpAddrOam1Type,     -- 1
+                eriDiscoveryNodeIpAddrOam1,         -- 0..256
+                eriDiscoveryNodeIpAddrOam2Type,     -- 1
+                eriDiscoveryNodeIpAddrOam2          -- 0..256
+        }
+        STATUS  current                           -- 935 + overhead for encoding and headers
+        DESCRIPTION
+           "This is the discovery notification sent from a
+           node supporting auto dicovery and integration
+           regardless of node type and radio standard.
+           It is asumed that some data has been prepared in an
+           OSS to recognise the node by the ID.
+           Future revisions may add attributes to this MIB
+           not used by all node types."
+        ::= { eriDiscoveryNotifsPrefix 1 }
+
+
+
+--=============================================
+--==Textual conventions for notification data==
+--=============================================
+
+-- The type of value used as identifier for a node.
+-- future possible values (that have been used for macro RBSes)
+-- are:
+--   'ipAdress'  (...but perhaps we never want to use that?)
+
+EriDiscoveryNodeIdTypeType ::= TEXTUAL-CONVENTION
+        STATUS current
+        DESCRIPTION
+                "The Node ID can be identified using several types of ID values.
+                This TC lists the alternative value types."
+        SYNTAX INTEGER {
+                unknown(0),
+                serialNumber(1),
+                fdn(2)           -- Full distinguished name, 3GPP TS 32.300.
+        }
+
+EriDiscoveryText16 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "16a"
+    STATUS      current
+    DESCRIPTION "ASCII string data of max length 16 octets."
+    SYNTAX      OCTET STRING(SIZE(0..16))
+
+EriDiscoveryIdValueText ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "400a"
+    STATUS      current
+    DESCRIPTION "ASCII string data of max length 400 octets."
+    SYNTAX      OCTET STRING(SIZE(0..400))
+-- 3GPP TS 32.300 v9.0.0 chapter 7.4 states max DN length to 400 octets.
+
+EriDiscoveryCheckSum ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "x"
+    STATUS      current
+    DESCRIPTION "32 bit checksum value"
+    SYNTAX      Integer32
+
+
+--=============================================
+-- Comformance Information - group definitions
+--=============================================
+
+
+eriDiscoveryMIBComplianceGroups	OBJECT IDENTIFIER ::= { eriDiscoveryMIBCompliances 1 }
+
+
+eriDiscoveryControlGroup OBJECT-GROUP
+    OBJECTS     {
+                eriDiscoveryStatus
+                }
+    STATUS      current
+    DESCRIPTION "Objects to control the discovery mechanism - mandatory to implement"
+    ::= {eriDiscoveryMIBComplianceGroups 1}
+
+eriDiscoveryEventContentGroup1 OBJECT-GROUP
+    OBJECTS     {
+                eriDiscoveryNodeIdType,
+                eriDiscoveryNodeIdValue,
+                eriDiscoverySecCS,
+                eriDiscoverySecCSVer,
+                eriDiscoveryNodeIpAddrOam1Type,
+                eriDiscoveryNodeIpAddrOam1
+                }
+    STATUS	current
+    DESCRIPTION  "Mandatory objects to include in the events"
+    ::= {eriDiscoveryMIBComplianceGroups 2}
+
+eriDiscoveryEventGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+                  eriDiscoveryEvent
+                  }
+    STATUS        current
+    DESCRIPTION   "Mandatory events"
+       ::= {eriDiscoveryMIBComplianceGroups 3}
+
+--==========================================================
+-- Optional extensions to the notification.
+-- Additional extensions should be placed in separate
+-- object groups or notification groups (do not alter
+-- existing groups) and be referenced from the
+-- module complicance declaration at the end.
+--==========================================================
+
+eriDiscoveryEventOptionalContentGroup1 OBJECT-GROUP
+    OBJECTS	{
+                eriDiscoveryNodeIpAddrOam2Type,
+                eriDiscoveryNodeIpAddrOam2
+                }
+    STATUS	current
+    DESCRIPTION  "Additional objects to send in the event"
+       ::= {eriDiscoveryMIBComplianceGroups 4}
+
+
+--=============================================
+-- Comformance Information - compliance
+--=============================================
+
+
+ericssonDiscoveryMIBBasicCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION "Compliance descriptions - mandatory groups and optional groups"
+    MODULE      -- compliance for this MIB module
+    MANDATORY-GROUPS {
+                        eriDiscoveryControlGroup,
+                        eriDiscoveryEventGroup,
+                        eriDiscoveryEventContentGroup1
+                     }
+
+    GROUP  eriDiscoveryEventOptionalContentGroup1
+    DESCRIPTION
+        "This group MAY be implemented by an agent to inform about a second OaM address."
+
+    ::= { eriDiscoveryMIBCompliances 2 }
+
+END
