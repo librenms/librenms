@@ -19,7 +19,7 @@ $index_list_param = array_keys($eriRouterOpticalTransceiverParamTable['eriRouter
 $index_list_port = array_keys($eriRouterOpticalTransceiverPortTable['eriRouterOpticalTransceiverCardSlot']);
 $index_list = array_intersect($index_list_param, $index_list_port);
 
-foreach($index_list as $index) {
+foreach ($index_list as $index) {
     if (isset($eriRouterOpticalTransceiverParamTable['eriRouterOpticalTransceiverCurrentValue'][$index]['laserBiasCurrent'])) {
         discover_sensor(
             $valid['sensor'],
