@@ -1,0 +1,87 @@
+-- %DNP% $Id: ERICSSON-ROUTER-PING-CAP.my,v 1.1.6.1.2.4 2011/06/15 18:19:46 danielhe Exp $
+-- %DNP% $Source: /cvsroot/pkt/sw/se/xc/bsd/config/snmp/mibs/Attic/ERICSSON-ROUTER-PING-CAP.my,v $
+-- *****************************************************************
+-- ERICSSON-ROUTER-PING-CAP      ERICSSON-ROUTER Ping Mib Capabilities
+--
+-- Copyright (c) 2008, 2010-2011, 2015 Ericsson AB
+-- All rights reserved.
+--
+-- *****************************************************************
+
+ERICSSON-ROUTER-PING-CAP DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,Unsigned32
+                                        FROM SNMPv2-SMI
+    AGENT-CAPABILITIES                  FROM SNMPv2-CONF
+    eriRouterCapabilities                     FROM ERICSSON-ROUTER-SMI;
+
+eriRouterPingMibCap MODULE-IDENTITY
+    LAST-UPDATED    "201501141800Z" -- Jan 14, 2015
+    ORGANIZATION    "Ericsson AB."
+    CONTACT-INFO
+            "       Ericsson AB.
+
+            Postal: 100 Headquarters Dr.
+                    San Jose, CA  95134
+                    USA
+
+             Phone: +1 408 750 5000
+               Fax: +1 408 750 5599
+            "
+    DESCRIPTION
+        "The Agent Capabilities of the ERICSSON-ROUTER-PING MIB.
+
+        If this MIB implementation is platform-dependent,
+        the PRODUCT-RELEASE clause contains Ericsson SEOS version and
+        at least one of the following Ericsson product families:
+            [SE]  SmartEdge Multi-service Edge Router (MSER) family
+            [SM]  SM family of Metro Ethernet Service Transport platforms
+            [SSR] Smart Service Router (SSR) family"
+
+    REVISION        "201501141800Z" -- Jan 14, 2015
+    DESCRIPTION
+        "Updated RBN/rbn/Rbn as ERICSSON-ROUTER/eriRouter/EriRouter
+         to migrate RBN MIB to ERICSSON MIB."
+
+    REVISION        "201106150000Z" -- Jun 15, 2011
+    DESCRIPTION
+        "Update DESCRIPTION clause of MODULE-IDENTITY
+         and PRODUCT-RELEASE clause of AGENT-CAPABILITIES."
+
+    REVISION        "201101191800Z" -- Jan 19, 2011
+    DESCRIPTION
+        "Update CONTACT-INFO & ORGANIZATION. "
+
+    REVISION        "201011010000Z" -- Nov 1, 2010
+    DESCRIPTION
+        "Modified PRODUCT-RELEASE clause for consistent naming.
+         Updated CONTACT-INFO."
+
+    REVISION        "200807300000Z" -- Jul 30, 2008
+    DESCRIPTION
+        "Initial version ."
+
+    ::= { eriRouterCapabilities 82 }
+
+eriRouterPingMibCap1 AGENT-CAPABILITIES
+    PRODUCT-RELEASE     "SEOS 6.1.4.2 [SE]; SEOS 6.3.X [SM]; SEOS 11.1.x [SSR]"
+    STATUS              current
+    DESCRIPTION "ERICSSON-ROUTER-PING-MIB capabilities"
+    SUPPORTS    ERICSSON-ROUTER-PING-MIB
+    INCLUDES {
+            eriRouterPingGlobalsGroup,
+            eriRouterPingResultsGroup,
+            eriRouterPingCtlGroup,
+            eriRouterPingIpGroup
+    }
+
+    VARIATION    eriRouterPingCtlMaxHistoryRows
+    WRITE-SYNTAX Unsigned32 (0..12)
+    DESCRIPTION
+        "Maximum number of corresponding entries allowed in the
+         eriRouterPingHistoryTable is 12."
+
+    ::= { eriRouterPingMibCap 1 }
+
+END

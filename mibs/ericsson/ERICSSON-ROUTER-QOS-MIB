@@ -1,0 +1,2947 @@
+-- %DNP% $Id: ERICSSON-ROUTER-QOS-MIB.my,v 1.1.4.12.92.2 2011/02/22 17:26:17 thatcher Exp $
+-- %DNP% $Source: /cvsroot/pkt/sw/se/xc/bsd/config/snmp/mibs/Attic/ERICSSON-ROUTER-QOS-MIB.my,v $
+-- *****************************************************************
+-- ERICSSON-ROUTER-QOS-MIB
+--
+-- Copyright (c) 2002-2003, 2005-2007, 2011, 2015, 2016 Ericsson AB.
+-- All rights reserved.
+--
+-- *****************************************************************
+
+ERICSSON-ROUTER-QOS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    ifIndex
+            FROM IF-MIB
+
+    Counter32,
+    Counter64,
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    Unsigned32
+            FROM SNMPv2-SMI
+
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP
+            FROM SNMPv2-CONF
+
+    SnmpAdminString
+            FROM SNMP-FRAMEWORK-MIB
+
+    eriRouterSubsActiveName,
+    eriRouterSubsActiveSessionId
+            FROM ERICSSON-ROUTER-SUBSCRIBER-ACTIVE-MIB
+
+    eriRouterMgmt
+            FROM ERICSSON-ROUTER-SMI
+
+    TEXTUAL-CONVENTION
+            FROM SNMPv2-TC;
+
+
+eriRouterQosMib MODULE-IDENTITY
+    LAST-UPDATED "201501141800Z" -- Jan 14, 2015
+    ORGANIZATION "Ericsson AB."
+    CONTACT-INFO
+        "         Ericsson AB.
+          Postal: 100 Headquarters Dr.
+                  San Jose, CA  95134
+                  USA
+
+           Phone: +1 408 750 5000
+             Fax: +1 408 750 5599
+        "
+    DESCRIPTION
+        "This MIB defines statistical counters that may be used to monitor
+         subscriber circuits and those IF-MIB layers, which support
+         ifPacketGroup, ifHCPacketGroup or ifVHCPacketGroup, that have
+         Quality Of Service enabled.
+        "
+
+    REVISION      "201501141800Z" -- Jan 14, 2015
+    DESCRIPTION
+        "Updated RBN/rbn/Rbn as ERICSSON-ROUTER/eriRouter/EriRouter
+         to migrate RBN MIB to ERICSSON MIB."
+
+    REVISION      "201101191800Z" -- Jan 19, 2011
+    DESCRIPTION
+        "Update CONTACT-INFO & ORGANIZATION. "
+
+    REVISION      "200707300000Z" -- July 30, 2007
+    DESCRIPTION
+        "Added two new tables, eriRouterQosHierarchicalPolicyStatsTable and
+         eriRouterQosHierarchicalPClassStatsTable, containing drop counts
+         due to hierarchical policies or policy classes applied to a
+         child circuit.
+        "
+
+    REVISION      "200609120000Z" -- September 12, 2006
+    DESCRIPTION
+        "Added two new tables, eriRouterQosIntfRLClassStatsTable and
+         eriRouterQosSubscriberRLClassStatsTable, to monitor interfaces and
+         subscriber circuits that have policing/metering policy class
+         counters enabled.
+        "
+
+    REVISION      "200509260000Z" -- September 26, 2005
+    DESCRIPTION
+        "Added a new table eriRouterQosSubscriberQueueStatsTable to monitor the
+         qos statistics per transmit queue on a subscriber circuit.
+        "
+
+    REVISION      "200307180000Z" -- July 18, 2003
+    DESCRIPTION
+        "Added a new table eriRouterQosInterfaceQueueStatsTable to monitor the
+         qos statistics per transmit queue on an interface.
+        "
+
+    REVISION      "200203220000Z" -- March 22, 2002
+    DESCRIPTION
+        "Initial version."
+    ::= { eriRouterMgmt 22 }
+
+
+eriRouterQosMibObjects
+        OBJECT IDENTIFIER ::= { eriRouterQosMib 1 }
+
+eriRouterQosMibConformance
+        OBJECT IDENTIFIER ::= { eriRouterQosMib 2 }
+
+--
+-- Textual Conventions
+--
+
+EriRouterQosPolicyType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "QoS policy type"
+    SYNTAX      INTEGER {
+                    policing(1), -- inbound policing
+                    metering(2), -- outbound
+                    edrr(3),     -- enhanced deficit round robin
+                    mdrr(4),     -- modified deficit round robin
+                    pq(5),       -- priority queuing
+                    atmwfq(6),   -- ATM weighted fair queuing
+                    pwfq(7)      -- priority weighted fair queuing
+                }
+
+EriRouterQosClassId ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS       current
+    DESCRIPTION
+        "A unique QoS class identifier."
+    SYNTAX  Unsigned32 (1..8)
+
+--
+-- QoS interface objects
+--
+
+eriRouterQosInterfaceTable   OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EriRouterQosInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains entries for every packet oriented 
+         IF-MIB layer for which QoS is enabled."
+    ::= { eriRouterQosMibObjects 1 }
+
+eriRouterQosInterfaceEntry OBJECT-TYPE
+    SYNTAX      EriRouterQosInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A conceptual row in the eriRouterQosInterfaceTable."
+    INDEX { ifIndex }
+    ::= { eriRouterQosInterfaceTable 1 }
+    
+EriRouterQosInterfaceEntry ::= SEQUENCE {
+    eriRouterQosIfInOctets            Counter32,
+    eriRouterQosIfHCInOctets          Counter64,
+    eriRouterQosIfOutOctets           Counter32,
+    eriRouterQosIfHCOutOctets         Counter64,
+    eriRouterQosIfInDroppedOctets     Counter32,
+    eriRouterQosIfHCInDroppedOctets   Counter64,
+    eriRouterQosIfOutDroppedOctets    Counter32,
+    eriRouterQosIfHCOutDroppedOctets  Counter64
+}
+
+eriRouterQosIfInOctets OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The total number of post-limited octets received on the interface,
+            including framing characters.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times as indicated by the value of
+            ifCounterDiscontinuityTime."
+    ::= { eriRouterQosInterfaceEntry 1}
+
+eriRouterQosIfHCInOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The total number of post-limited octets received on the interface,
+            including framing characters.  This object is 64-bit version of
+            eriRouterQosIfInOctets.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times as indicated by the value of
+            ifCounterDiscontinuityTime."
+    ::= { eriRouterQosInterfaceEntry 2}
+
+eriRouterQosIfOutOctets OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The total number of pre-limited octets transmitted out of the
+            interface, including framing characters.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times as indicated by the value of
+            ifCounterDiscontinuityTime."
+    ::= { eriRouterQosInterfaceEntry 3}
+
+eriRouterQosIfHCOutOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The total number of pre-limited octets transmitted out of the
+            interface, including framing characters.  This object is a
+            64-bit version of eriRouterQosIfOutOctets.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times as indicated by the value of
+            ifCounterDiscontinuityTime."
+    ::= { eriRouterQosInterfaceEntry 4 }
+
+eriRouterQosIfInDroppedOctets OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The total number of received octets that were dropped on the 
+            interface, including but not limited to octets dropped due to 
+            limiting.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times as indicated by the value of
+            ifCounterDiscontinuityTime."
+    ::= { eriRouterQosInterfaceEntry 5 }
+
+eriRouterQosIfHCInDroppedOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The total number of received octets that were dropped on the 
+            interface, including but not limited to octets dropped due to 
+            limiting. This object is a 64-bit version of 
+            eriRouterQosIfInDroppedOctets.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times as indicated by the value of
+            ifCounterDiscontinuityTime."
+    ::= { eriRouterQosInterfaceEntry 6 }
+
+
+eriRouterQosIfOutDroppedOctets OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The total number of outbound octets that were dropped on the 
+            interface, including but not limited to octets dropped due to 
+            limiting.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times as indicated by the value of
+            ifCounterDiscontinuityTime."
+    ::= { eriRouterQosInterfaceEntry 7 }
+
+eriRouterQosIfHCOutDroppedOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The total number of outbound octets that were dropped on the 
+            interface, including but not limited to octets dropped due to 
+            limiting. This object is a 64-bit version of 
+            eriRouterQosIfOutDroppedOctets.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times as indicated by the value of
+            ifCounterDiscontinuityTime."
+    ::= { eriRouterQosInterfaceEntry 8 }
+
+--
+-- QoS interface transmit queue objects
+--
+
+eriRouterQosInterfaceQueueStatsTable   OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EriRouterQosInterfaceQueueStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table specifies per transmit queue statistical information.
+         It contains the transmit queue packet/octet counts for each
+         packet oriented IF-MIB layer for which QoS is enabled."
+    ::= { eriRouterQosMibObjects 2 }
+
+eriRouterQosInterfaceQueueStatsEntry OBJECT-TYPE
+    SYNTAX      EriRouterQosInterfaceQueueStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A conceptual row in the eriRouterQosInterfaceQueueStatsTable. Each row
+         contains the transmitted and dropped packets/octets count for
+         each transmit queue on an interface."
+    INDEX { ifIndex, eriRouterQosIfQueueId }
+    ::= { eriRouterQosInterfaceQueueStatsTable 1 }
+    
+EriRouterQosInterfaceQueueStatsEntry ::= SEQUENCE {
+    eriRouterQosIfQueueId                     Unsigned32,
+    eriRouterQosIfQueueOutOctets              Counter32,
+    eriRouterQosIfQueueOutPkts                Counter32,
+    eriRouterQosIfQueueWredDroppedOctets      Counter32,
+    eriRouterQosIfQueueWredDroppedPkts        Counter32,
+    eriRouterQosIfQueueTailDroppedOctets      Counter32,
+    eriRouterQosIfQueueTailDroppedPkts        Counter32,
+    eriRouterQosIfQueueHCOutOctets            Counter64,
+    eriRouterQosIfQueueHCOutPkts              Counter64,
+    eriRouterQosIfQueueHCWredDroppedOctets    Counter64,
+    eriRouterQosIfQueueHCWredDroppedPkts      Counter64,
+    eriRouterQosIfQueueHCTailDroppedOctets    Counter64,
+    eriRouterQosIfQueueHCTailDroppedPkts      Counter64,
+    eriRouterQosIfQueueIPv4OutOctets              Counter32,
+    eriRouterQosIfQueueIPv4OutPkts                Counter32,
+    eriRouterQosIfQueueIPv4WredDroppedOctets      Counter32,
+    eriRouterQosIfQueueIPv4WredDroppedPkts        Counter32,
+    eriRouterQosIfQueueIPv4TailDroppedOctets      Counter32,
+    eriRouterQosIfQueueIPv4TailDroppedPkts        Counter32,
+    eriRouterQosIfQueueHCIPv4OutOctets            Counter64,
+    eriRouterQosIfQueueHCIPv4OutPkts              Counter64,
+    eriRouterQosIfQueueHCIPv4WredDroppedOctets    Counter64,
+    eriRouterQosIfQueueHCIPv4WredDroppedPkts      Counter64,
+    eriRouterQosIfQueueHCIPv4TailDroppedOctets    Counter64,
+    eriRouterQosIfQueueHCIPv4TailDroppedPkts      Counter64,
+    eriRouterQosIfQueueIPv6OutOctets              Counter32,
+    eriRouterQosIfQueueIPv6OutPkts                Counter32,
+    eriRouterQosIfQueueIPv6WredDroppedOctets      Counter32,
+    eriRouterQosIfQueueIPv6WredDroppedPkts        Counter32,
+    eriRouterQosIfQueueIPv6TailDroppedOctets      Counter32,
+    eriRouterQosIfQueueIPv6TailDroppedPkts        Counter32,
+    eriRouterQosIfQueueHCIPv6OutOctets            Counter64,
+    eriRouterQosIfQueueHCIPv6OutPkts              Counter64,
+    eriRouterQosIfQueueHCIPv6WredDroppedOctets    Counter64,
+    eriRouterQosIfQueueHCIPv6WredDroppedPkts      Counter64,
+    eriRouterQosIfQueueHCIPv6TailDroppedOctets    Counter64,
+    eriRouterQosIfQueueHCIPv6TailDroppedPkts      Counter64,
+    eriRouterQosIfQueueGreenOutOctets             Counter64,
+    eriRouterQosIfQueueGreenOutPkts               Counter64,
+    eriRouterQosIfQueueYellowOutOctets            Counter64,
+    eriRouterQosIfQueueYellowOutPkts              Counter64,
+    eriRouterQosIfQueueRedOutOctets               Counter64,
+    eriRouterQosIfQueueRedOutPkts                 Counter64,
+    eriRouterQosIfQueueGreenDroppedOctets         Counter64,
+    eriRouterQosIfQueueGreenDroppedPkts           Counter64,
+    eriRouterQosIfQueueYellowDroppedOctets        Counter64,
+    eriRouterQosIfQueueYellowDroppedPkts          Counter64,
+    eriRouterQosIfQueueRedDroppedOctets           Counter64,
+    eriRouterQosIfQueueRedDroppedPkts             Counter64,
+    eriRouterQosIfQueueTotalDroppedOctets         Counter64,
+    eriRouterQosIfQueueTotalDroppedPkts           Counter64
+}
+
+eriRouterQosIfQueueId OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+           "A unique identifier for a transmit queue within an
+            interface."
+    ::= { eriRouterQosInterfaceQueueStatsEntry 1}
+
+eriRouterQosIfQueueOutOctets OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of octets transmitted out of this queue.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times as indicated by the value of
+            ifCounterDiscontinuityTime."
+    ::= { eriRouterQosInterfaceQueueStatsEntry 2}
+
+eriRouterQosIfQueueOutPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of packets transmitted out of this queue.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times as indicated by the value of
+            ifCounterDiscontinuityTime."
+    ::= { eriRouterQosInterfaceQueueStatsEntry 3}
+
+eriRouterQosIfQueueWredDroppedOctets OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of octets dropped due to the application of a
+            weighted random early detection algorithm.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times as indicated by the value of
+            ifCounterDiscontinuityTime."
+    ::= { eriRouterQosInterfaceQueueStatsEntry 4}
+
+eriRouterQosIfQueueWredDroppedPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of packets dropped due to the application of a
+            weighted random early detection algorithm.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times as indicated by the value of
+            ifCounterDiscontinuityTime."
+    ::= { eriRouterQosInterfaceQueueStatsEntry 5}
+
+eriRouterQosIfQueueTailDroppedOctets OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of octets dropped when the total number of packets
+            in this queue was greater than the maximum threshold.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times as indicated by the value of
+            ifCounterDiscontinuityTime."
+    ::= { eriRouterQosInterfaceQueueStatsEntry 6}
+
+eriRouterQosIfQueueTailDroppedPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of packets dropped when the total number of
+            packets in this queue was greater than the maximum threshold.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times as indicated by the value of
+            ifCounterDiscontinuityTime."
+    ::= { eriRouterQosInterfaceQueueStatsEntry 7}
+
+eriRouterQosIfQueueHCOutOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of octets transmitted out of this queue. This
+            object is a 64-bit version of eriRouterQosIfQueueOutOctets.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times as indicated by the value of
+            ifCounterDiscontinuityTime."
+    ::= { eriRouterQosInterfaceQueueStatsEntry 8}
+
+eriRouterQosIfQueueHCOutPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of packets transmitted out of this queue. This
+            object is a 64-bit version of eriRouterQosIfQueueOutPkts.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times as indicated by the value of
+            ifCounterDiscontinuityTime."
+    ::= { eriRouterQosInterfaceQueueStatsEntry 9}
+
+eriRouterQosIfQueueHCWredDroppedOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of octets dropped due to the application of a
+            weighted random early detection algorithm. This object is
+            a 64-bit version of eriRouterQosIfQueueWredDroppedOctets.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times as indicated by the value of
+            ifCounterDiscontinuityTime."
+    ::= { eriRouterQosInterfaceQueueStatsEntry 10}
+
+eriRouterQosIfQueueHCWredDroppedPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of packets dropped due to the application of a
+            weighted random early detection algorithm. This object is
+            a 64-bit version of eriRouterQosIfQueueWredDroppedPkts.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times as indicated by the value of
+            ifCounterDiscontinuityTime."
+    ::= { eriRouterQosInterfaceQueueStatsEntry 11}
+
+eriRouterQosIfQueueHCTailDroppedOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of octets dropped when the total number of packets
+            in this queue was greater than the maximum threshold. This
+            object is a 64-bit version of eriRouterQosIfQueueTailDroppedOctets.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times as indicated by the value of
+            ifCounterDiscontinuityTime."
+    ::= { eriRouterQosInterfaceQueueStatsEntry 12}
+
+eriRouterQosIfQueueHCTailDroppedPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of packets dropped when the total number of
+            packets in this queue was greater than the maximum
+            threshold. This object is a 64-bit version of
+            eriRouterQosIfQueueTailDroppedPkts.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times as indicated by the value of
+            ifCounterDiscontinuityTime."
+    ::= { eriRouterQosInterfaceQueueStatsEntry 13}
+
+eriRouterQosIfQueueIPv4OutOctets OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv4 octets transmitted out of this queue.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times as indicated by the value of
+            ifCounterDiscontinuityTime."
+    ::= { eriRouterQosInterfaceQueueStatsEntry 14 }
+
+eriRouterQosIfQueueIPv4OutPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv4 packets transmitted out of this queue.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times as indicated by the value of
+            ifCounterDiscontinuityTime."
+    ::= { eriRouterQosInterfaceQueueStatsEntry 15 }
+
+eriRouterQosIfQueueIPv4WredDroppedOctets OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv4 octets dropped due to the application
+            of a weighted random early detection algorithm.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times as indicated by the value of
+            ifCounterDiscontinuityTime."
+    ::= { eriRouterQosInterfaceQueueStatsEntry 16 }
+
+eriRouterQosIfQueueIPv4WredDroppedPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv4 packets dropped due to the application
+            of a weighted random early detection algorithm.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times as indicated by the value of
+            ifCounterDiscontinuityTime."
+    ::= { eriRouterQosInterfaceQueueStatsEntry 17 }
+
+eriRouterQosIfQueueIPv4TailDroppedOctets OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv4 octets dropped when the total number of
+            packets in this queue was greater than the maximum threshold.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times as indicated by the value of
+            ifCounterDiscontinuityTime."
+    ::= { eriRouterQosInterfaceQueueStatsEntry 18 }
+
+eriRouterQosIfQueueIPv4TailDroppedPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv4 packets dropped when the total number of
+            packets in this queue was greater than the maximum threshold.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times as indicated by the value of
+            ifCounterDiscontinuityTime."
+    ::= { eriRouterQosInterfaceQueueStatsEntry 19 }
+
+eriRouterQosIfQueueHCIPv4OutOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv4 octets transmitted out of this queue.
+            This object is a 64-bit version of eriRouterQosIfQueueIPv4OutOctets.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times as indicated by the value of
+            ifCounterDiscontinuityTime."
+    ::= { eriRouterQosInterfaceQueueStatsEntry 20 }
+
+eriRouterQosIfQueueHCIPv4OutPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv4 packets transmitted out of this queue.
+            This object is a 64-bit version of eriRouterQosIfQueueIPv4OutPkts.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times as indicated by the value of
+            ifCounterDiscontinuityTime."
+    ::= { eriRouterQosInterfaceQueueStatsEntry 21 }
+
+eriRouterQosIfQueueHCIPv4WredDroppedOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv4 octets dropped due to the application of a
+            weighted random early detection algorithm. This object is a
+            64-bit version of eriRouterQosIfQueueIPv4WredDroppedOctets.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times as indicated by the value of
+            ifCounterDiscontinuityTime."
+    ::= { eriRouterQosInterfaceQueueStatsEntry 22 }
+
+eriRouterQosIfQueueHCIPv4WredDroppedPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv4 packets dropped due to the application of a
+            weighted random early detection algorithm. This object is a
+            64-bit version of eriRouterQosIfQueueIPv4WredDroppedPkts.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times as indicated by the value of
+            ifCounterDiscontinuityTime."
+    ::= { eriRouterQosInterfaceQueueStatsEntry 23 }
+
+eriRouterQosIfQueueHCIPv4TailDroppedOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv4 octets dropped when the total number of packets
+            in this queue was greater than the maximum threshold. This
+            object is a 64-bit version of eriRouterQosIfQueueIPv4TailDroppedOctets.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times as indicated by the value of
+            ifCounterDiscontinuityTime."
+    ::= { eriRouterQosInterfaceQueueStatsEntry 24 }
+
+eriRouterQosIfQueueHCIPv4TailDroppedPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv4 packets dropped when the total number of
+            packets in this queue was greater than the maximum threshold.
+            This object is a 64-bit version of eriRouterQosIfQueueIPv4TailDroppedPkts.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times as indicated by the value of
+            ifCounterDiscontinuityTime."
+    ::= { eriRouterQosInterfaceQueueStatsEntry 25 }
+
+eriRouterQosIfQueueIPv6OutOctets OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv6 octets transmitted out of this queue.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times as indicated by the value of
+            ifCounterDiscontinuityTime."
+    ::= { eriRouterQosInterfaceQueueStatsEntry 26 }
+
+eriRouterQosIfQueueIPv6OutPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv6 packets transmitted out of this queue.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times as indicated by the value of
+            ifCounterDiscontinuityTime."
+    ::= { eriRouterQosInterfaceQueueStatsEntry 27 }
+
+eriRouterQosIfQueueIPv6WredDroppedOctets OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv6 octets dropped due to the application
+            of a weighted random early detection algorithm.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times as indicated by the value of
+            ifCounterDiscontinuityTime."
+    ::= { eriRouterQosInterfaceQueueStatsEntry 28 }
+
+eriRouterQosIfQueueIPv6WredDroppedPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv6 packets dropped due to the application
+            of a weighted random early detection algorithm.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times as indicated by the value of
+            ifCounterDiscontinuityTime."
+    ::= { eriRouterQosInterfaceQueueStatsEntry 29 }
+
+eriRouterQosIfQueueIPv6TailDroppedOctets OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv6 octets dropped when the total number of
+            packets in this queue was greater than the maximum threshold.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times as indicated by the value of
+            ifCounterDiscontinuityTime."
+    ::= { eriRouterQosInterfaceQueueStatsEntry 30 }
+
+eriRouterQosIfQueueIPv6TailDroppedPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv6 packets dropped when the total number of
+            packets in this queue was greater than the maximum threshold.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times as indicated by the value of
+            ifCounterDiscontinuityTime."
+    ::= { eriRouterQosInterfaceQueueStatsEntry 31 }
+
+eriRouterQosIfQueueHCIPv6OutOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv6 octets transmitted out of this queue.
+            This object is a 64-bit version of eriRouterQosIfQueueIPv6OutOctets.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times as indicated by the value of
+            ifCounterDiscontinuityTime."
+    ::= { eriRouterQosInterfaceQueueStatsEntry 32 }
+
+eriRouterQosIfQueueHCIPv6OutPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv6 packets transmitted out of this queue.
+            This object is a 64-bit version of eriRouterQosIfQueueIPv6OutPkts.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times as indicated by the value of
+            ifCounterDiscontinuityTime."
+    ::= { eriRouterQosInterfaceQueueStatsEntry 33 }
+
+eriRouterQosIfQueueHCIPv6WredDroppedOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv6 octets dropped due to the application of a
+            weighted random early detection algorithm. This object is a
+            64-bit version of eriRouterQosIfQueueIPv6WredDroppedOctets.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times as indicated by the value of
+            ifCounterDiscontinuityTime."
+    ::= { eriRouterQosInterfaceQueueStatsEntry 34 }
+
+eriRouterQosIfQueueHCIPv6WredDroppedPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv6 packets dropped due to the application of a
+            weighted random early detection algorithm. This object is a
+            64-bit version of eriRouterQosIfQueueIPv6WredDroppedPkts.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times as indicated by the value of
+            ifCounterDiscontinuityTime."
+    ::= { eriRouterQosInterfaceQueueStatsEntry 35 }
+
+eriRouterQosIfQueueHCIPv6TailDroppedOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv6 octets dropped when the total number of packets
+            in this queue was greater than the maximum threshold. This
+            object is a 64-bit version of eriRouterQosIfQueueIPv6TailDroppedOctets.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times as indicated by the value of
+            ifCounterDiscontinuityTime."
+    ::= { eriRouterQosInterfaceQueueStatsEntry 36 }
+
+eriRouterQosIfQueueHCIPv6TailDroppedPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv6 packets dropped when the total number of
+            packets in this queue was greater than the maximum threshold.
+            This object is a 64-bit version of eriRouterQosIfQueueIPv6TailDroppedPkts.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times as indicated by the value of
+            ifCounterDiscontinuityTime."
+    ::= { eriRouterQosInterfaceQueueStatsEntry 37 }
+
+eriRouterQosIfQueueGreenOutOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of conformed octets transmitted out of this queue.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times as indicated by the value of
+            ifCounterDiscontinuityTime."
+    ::= { eriRouterQosInterfaceQueueStatsEntry 38}
+    
+eriRouterQosIfQueueGreenOutPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of conformed packets transmitted out of this queue.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times as indicated by the value of
+            ifCounterDiscontinuityTime."
+    ::= { eriRouterQosInterfaceQueueStatsEntry 39}
+    
+eriRouterQosIfQueueYellowOutOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of exceeded octets transmitted out of this queue.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times as indicated by the value of
+            ifCounterDiscontinuityTime."
+    ::= { eriRouterQosInterfaceQueueStatsEntry 40}
+    
+eriRouterQosIfQueueYellowOutPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of exceeded packets transmitted out of this queue.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times as indicated by the value of
+            ifCounterDiscontinuityTime."
+    ::= { eriRouterQosInterfaceQueueStatsEntry 41}
+    
+eriRouterQosIfQueueRedOutOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of violated octets transmitted out of this queue.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times as indicated by the value of
+            ifCounterDiscontinuityTime."
+    ::= { eriRouterQosInterfaceQueueStatsEntry 42}
+    
+eriRouterQosIfQueueRedOutPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of violated packets transmitted out of this queue.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times as indicated by the value of
+            ifCounterDiscontinuityTime."
+    ::= { eriRouterQosInterfaceQueueStatsEntry 43}
+       
+eriRouterQosIfQueueGreenDroppedOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of conformed octets dropped in this queue.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times as indicated by the value of
+            ifCounterDiscontinuityTime."
+    ::= { eriRouterQosInterfaceQueueStatsEntry 44}
+    
+eriRouterQosIfQueueGreenDroppedPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of conformed packets dropped in this queue.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times as indicated by the value of
+            ifCounterDiscontinuityTime."
+    ::= { eriRouterQosInterfaceQueueStatsEntry 45}
+    
+eriRouterQosIfQueueYellowDroppedOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of exceeded octets dropped in this queue.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times as indicated by the value of
+            ifCounterDiscontinuityTime."
+    ::= { eriRouterQosInterfaceQueueStatsEntry 46}
+    
+eriRouterQosIfQueueYellowDroppedPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of exceeded packets dropped in this queue.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times as indicated by the value of
+            ifCounterDiscontinuityTime."
+    ::= { eriRouterQosInterfaceQueueStatsEntry 47}
+    
+eriRouterQosIfQueueRedDroppedOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of violated octets dropped in this queue.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times as indicated by the value of
+            ifCounterDiscontinuityTime."
+    ::= { eriRouterQosInterfaceQueueStatsEntry 48}
+    
+eriRouterQosIfQueueRedDroppedPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of violated packets dropped in this queue.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times as indicated by the value of
+            ifCounterDiscontinuityTime."
+    ::= { eriRouterQosInterfaceQueueStatsEntry 49}
+    
+eriRouterQosIfQueueTotalDroppedOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The total number of octets dropped in this queue, 
+            either by the WRED (Weighted Random Early Detection)
+            algorithm, or because the total number of packets
+            in this queue was greater than the maximum threshold.
+            The value is the sum of eriRouterQosIfQueueWredDroppedOctets 
+            and eriRouterQosIfQueueTailDroppedOctets.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times as indicated by the value of
+            ifCounterDiscontinuityTime."
+    ::= { eriRouterQosInterfaceQueueStatsEntry 50}
+    
+eriRouterQosIfQueueTotalDroppedPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The total number of packets dropped in this queue, 
+            either by the WRED (Weighted Random Early Detection)
+            algorithm, or because the total number of packets
+            in this queue was greater than the maximum threshold.
+            The value is the sum of eriRouterQosIfQueueWredDroppedPkts
+            and eriRouterQosIfQueueTailDroppedPkts.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times as indicated by the value of
+            ifCounterDiscontinuityTime."
+    ::= { eriRouterQosInterfaceQueueStatsEntry 51}
+
+--
+-- QoS subscriber transmit queue objects
+--
+
+eriRouterQosSubscriberQueueStatsTable   OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EriRouterQosSubscriberQueueStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table specifies per transmit queue statistical information.
+         It contains the transmit queue packet/octet counts for each active
+         subscriber session for which QoS queuing policy is enabled."
+    ::= { eriRouterQosMibObjects 3 }
+
+eriRouterQosSubscriberQueueStatsEntry OBJECT-TYPE
+    SYNTAX      EriRouterQosSubscriberQueueStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A conceptual row in the eriRouterQosSubscriberQueueStatsTable. Each row
+         contains the transmitted and dropped packets/octets count for
+         each transmit queue used on a subscriber circuit."
+    INDEX { eriRouterSubsActiveName, eriRouterSubsActiveSessionId, eriRouterQosSubsQueueId }
+    ::= { eriRouterQosSubscriberQueueStatsTable 1 }
+    
+EriRouterQosSubscriberQueueStatsEntry ::= SEQUENCE {
+    eriRouterQosSubsQueueId                     Unsigned32,
+    eriRouterQosSubsQueuePolicyName             SnmpAdminString,
+    eriRouterQosSubsQueueOutOctets              Counter32,
+    eriRouterQosSubsQueueOutPkts                Counter32,
+    eriRouterQosSubsQueueWredDroppedOctets      Counter32,
+    eriRouterQosSubsQueueWredDroppedPkts        Counter32,
+    eriRouterQosSubsQueueTailDroppedOctets      Counter32,
+    eriRouterQosSubsQueueTailDroppedPkts        Counter32,
+    eriRouterQosSubsQueueHCOutOctets            Counter64,
+    eriRouterQosSubsQueueHCOutPkts              Counter64,
+    eriRouterQosSubsQueueHCWredDroppedOctets    Counter64,
+    eriRouterQosSubsQueueHCWredDroppedPkts      Counter64,
+    eriRouterQosSubsQueueHCTailDroppedOctets    Counter64,
+    eriRouterQosSubsQueueHCTailDroppedPkts      Counter64,
+    eriRouterQosSubsQueueIPv4OutOctets              Counter32,
+    eriRouterQosSubsQueueIPv4OutPkts                Counter32,
+    eriRouterQosSubsQueueIPv4WredDroppedOctets      Counter32,
+    eriRouterQosSubsQueueIPv4WredDroppedPkts        Counter32,
+    eriRouterQosSubsQueueIPv4TailDroppedOctets      Counter32,
+    eriRouterQosSubsQueueIPv4TailDroppedPkts        Counter32,
+    eriRouterQosSubsQueueHCIPv4OutOctets            Counter64,
+    eriRouterQosSubsQueueHCIPv4OutPkts              Counter64,
+    eriRouterQosSubsQueueHCIPv4WredDroppedOctets    Counter64,
+    eriRouterQosSubsQueueHCIPv4WredDroppedPkts      Counter64,
+    eriRouterQosSubsQueueHCIPv4TailDroppedOctets    Counter64,
+    eriRouterQosSubsQueueHCIPv4TailDroppedPkts      Counter64,
+    eriRouterQosSubsQueueIPv6OutOctets              Counter32,
+    eriRouterQosSubsQueueIPv6OutPkts                Counter32,
+    eriRouterQosSubsQueueIPv6WredDroppedOctets      Counter32,
+    eriRouterQosSubsQueueIPv6WredDroppedPkts        Counter32,
+    eriRouterQosSubsQueueIPv6TailDroppedOctets      Counter32,
+    eriRouterQosSubsQueueIPv6TailDroppedPkts        Counter32,
+    eriRouterQosSubsQueueHCIPv6OutOctets            Counter64,
+    eriRouterQosSubsQueueHCIPv6OutPkts              Counter64,
+    eriRouterQosSubsQueueHCIPv6WredDroppedOctets    Counter64,
+    eriRouterQosSubsQueueHCIPv6WredDroppedPkts      Counter64,
+    eriRouterQosSubsQueueHCIPv6TailDroppedOctets    Counter64,
+    eriRouterQosSubsQueueHCIPv6TailDroppedPkts      Counter64
+}
+
+eriRouterQosSubsQueueId OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..7)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+           "A unique identifier for a transmit queue used by the circuit."
+    ::= { eriRouterQosSubscriberQueueStatsEntry 1 }
+
+eriRouterQosSubsQueuePolicyName OBJECT-TYPE
+       SYNTAX      SnmpAdminString (SIZE(1..39))
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+           "The name of the queuing policy the subscriber circuit is using."
+    ::= { eriRouterQosSubscriberQueueStatsEntry 2 }
+
+eriRouterQosSubsQueueOutOctets OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of octets transmitted out of this queue.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system."
+    ::= { eriRouterQosSubscriberQueueStatsEntry 3 }
+
+eriRouterQosSubsQueueOutPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of packets transmitted out of this queue.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system."
+    ::= { eriRouterQosSubscriberQueueStatsEntry 4 }
+
+eriRouterQosSubsQueueWredDroppedOctets OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of octets dropped due to the application of a
+            weighted random early detection algorithm.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system."
+    ::= { eriRouterQosSubscriberQueueStatsEntry 5 }
+
+eriRouterQosSubsQueueWredDroppedPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of packets dropped due to the application of a
+            weighted random early detection algorithm.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system."
+    ::= { eriRouterQosSubscriberQueueStatsEntry 6 }
+
+eriRouterQosSubsQueueTailDroppedOctets OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of octets dropped when the total number of packets
+            in this queue was greater than the maximum threshold.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system."
+    ::= { eriRouterQosSubscriberQueueStatsEntry 7 }
+
+eriRouterQosSubsQueueTailDroppedPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of packets dropped when the total number of
+            packets in this queue was greater than the maximum threshold.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system."
+    ::= { eriRouterQosSubscriberQueueStatsEntry 8 }
+
+eriRouterQosSubsQueueHCOutOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of octets transmitted out of this queue. This
+            object is a 64-bit version of eriRouterQosSubsQueueOutOctets.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system."
+    ::= { eriRouterQosSubscriberQueueStatsEntry 9 }
+
+eriRouterQosSubsQueueHCOutPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of packets transmitted out of this queue. This
+            object is a 64-bit version of eriRouterQosSubsQueueOutPkts.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system."
+    ::= { eriRouterQosSubscriberQueueStatsEntry 10 }
+
+eriRouterQosSubsQueueHCWredDroppedOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of octets dropped due to the application of a
+            weighted random early detection algorithm. This object is
+            a 64-bit version of eriRouterQosSubsQueueWredDroppedOctets.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system."
+    ::= { eriRouterQosSubscriberQueueStatsEntry 11 }
+
+eriRouterQosSubsQueueHCWredDroppedPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of packets dropped due to the application of a
+            weighted random early detection algorithm. This object is
+            a 64-bit version of eriRouterQosSubsQueueWredDroppedPkts.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system."
+    ::= { eriRouterQosSubscriberQueueStatsEntry 12 }
+
+eriRouterQosSubsQueueHCTailDroppedOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of octets dropped when the total number of packets
+            in this queue was greater than the maximum threshold. This
+            object is a 64-bit version of eriRouterQosSubsQueueTailDroppedOctets.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system."
+    ::= { eriRouterQosSubscriberQueueStatsEntry 13 }
+
+eriRouterQosSubsQueueHCTailDroppedPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of packets dropped when the total number of
+            packets in this queue was greater than the maximum
+            threshold. This object is a 64-bit version of
+            eriRouterQosSubsQueueTailDroppedPkts.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system."
+    ::= { eriRouterQosSubscriberQueueStatsEntry 14 }
+
+eriRouterQosSubsQueueIPv4OutOctets OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv4 octets transmitted out of this queue.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system."
+    ::= { eriRouterQosSubscriberQueueStatsEntry 15 }
+
+eriRouterQosSubsQueueIPv4OutPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv4 packets transmitted out of this queue.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system."
+    ::= { eriRouterQosSubscriberQueueStatsEntry 16 }
+
+eriRouterQosSubsQueueIPv4WredDroppedOctets OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv4 octets dropped due to the application
+            of a weighted random early detection algorithm.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system."
+    ::= { eriRouterQosSubscriberQueueStatsEntry 17 }
+
+eriRouterQosSubsQueueIPv4WredDroppedPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv4 packets dropped due to the application
+            of a weighted random early detection algorithm.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system."
+    ::= { eriRouterQosSubscriberQueueStatsEntry 18 }
+
+eriRouterQosSubsQueueIPv4TailDroppedOctets OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv4 octets dropped when the total number of
+            packets in this queue was greater than the maximum threshold.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system."
+    ::= { eriRouterQosSubscriberQueueStatsEntry 19 }
+
+eriRouterQosSubsQueueIPv4TailDroppedPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv4 packets dropped when the total number of
+            packets in this queue was greater than the maximum threshold.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system."
+    ::= { eriRouterQosSubscriberQueueStatsEntry 20 }
+
+eriRouterQosSubsQueueHCIPv4OutOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv4 octets transmitted out of this queue. This
+            object is a 64-bit version of eriRouterQosSubsQueueIPv4OutOctets.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system."
+    ::= { eriRouterQosSubscriberQueueStatsEntry 21 }
+
+eriRouterQosSubsQueueHCIPv4OutPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv4 packets transmitted out of this queue. This
+            object is a 64-bit version of eriRouterQosSubsQueueIPv4OutPkts.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system."
+    ::= { eriRouterQosSubscriberQueueStatsEntry 22 }
+
+eriRouterQosSubsQueueHCIPv4WredDroppedOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv4 octets dropped due to the application of
+            a weighted random early detection algorithm. This object is
+            a 64-bit version of eriRouterQosSubsQueueIPv4WredDroppedOctets.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system."
+    ::= { eriRouterQosSubscriberQueueStatsEntry 23 }
+
+eriRouterQosSubsQueueHCIPv4WredDroppedPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv4 packets dropped due to the application of
+            a weighted random early detection algorithm. This object is
+            a 64-bit version of eriRouterQosSubsQueueIPv4WredDroppedPkts.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system."
+    ::= { eriRouterQosSubscriberQueueStatsEntry 24 }
+
+eriRouterQosSubsQueueHCIPv4TailDroppedOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv4 octets dropped when the total number of packets
+            in this queue was greater than the maximum threshold. This object
+            is a 64-bit version of eriRouterQosSubsQueueIPv4TailDroppedOctets.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system."
+    ::= { eriRouterQosSubscriberQueueStatsEntry 25 }
+
+eriRouterQosSubsQueueHCIPv4TailDroppedPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv4 packets dropped when the total number of packets
+            in this queue was greater than the maximum threshold. This object
+            is a 64-bit version of eriRouterQosSubsQueueIPv4TailDroppedPkts.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system."
+    ::= { eriRouterQosSubscriberQueueStatsEntry 26 }
+
+eriRouterQosSubsQueueIPv6OutOctets OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv6 octets transmitted out of this queue.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system."
+    ::= { eriRouterQosSubscriberQueueStatsEntry 27 }
+
+eriRouterQosSubsQueueIPv6OutPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv6 packets transmitted out of this queue.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system."
+    ::= { eriRouterQosSubscriberQueueStatsEntry 28 }
+
+eriRouterQosSubsQueueIPv6WredDroppedOctets OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv6 octets dropped due to the application
+            of a weighted random early detection algorithm.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system."
+    ::= { eriRouterQosSubscriberQueueStatsEntry 29 }
+
+eriRouterQosSubsQueueIPv6WredDroppedPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv6 packets dropped due to the application
+            of a weighted random early detection algorithm.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system."
+    ::= { eriRouterQosSubscriberQueueStatsEntry 30 }
+
+eriRouterQosSubsQueueIPv6TailDroppedOctets OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv6 octets dropped when the total number of
+            packets in this queue was greater than the maximum threshold.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system."
+    ::= { eriRouterQosSubscriberQueueStatsEntry 31 }
+
+eriRouterQosSubsQueueIPv6TailDroppedPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv6 packets dropped when the total number of
+            packets in this queue was greater than the maximum threshold.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system."
+    ::= { eriRouterQosSubscriberQueueStatsEntry 32 }
+
+eriRouterQosSubsQueueHCIPv6OutOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv6 octets transmitted out of this queue. This
+            object is a 64-bit version of eriRouterQosSubsQueueIPv6OutOctets.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system."
+    ::= { eriRouterQosSubscriberQueueStatsEntry 33 }
+
+eriRouterQosSubsQueueHCIPv6OutPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv6 packets transmitted out of this queue. This
+            object is a 64-bit version of eriRouterQosSubsQueueIPv6OutPkts.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system."
+    ::= { eriRouterQosSubscriberQueueStatsEntry 34 }
+
+eriRouterQosSubsQueueHCIPv6WredDroppedOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv6 octets dropped due to the application of
+            a weighted random early detection algorithm. This object is
+            a 64-bit version of eriRouterQosSubsQueueIPv6WredDroppedOctets.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system."
+    ::= { eriRouterQosSubscriberQueueStatsEntry 35 }
+
+eriRouterQosSubsQueueHCIPv6WredDroppedPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv6 packets dropped due to the application of
+            a weighted random early detection algorithm. This object is
+            a 64-bit version of eriRouterQosSubsQueueIPv6WredDroppedPkts.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system."
+    ::= { eriRouterQosSubscriberQueueStatsEntry 36 }
+
+eriRouterQosSubsQueueHCIPv6TailDroppedOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv6 octets dropped when the total number of packets
+            in this queue was greater than the maximum threshold. This object
+            is a 64-bit version of eriRouterQosSubsQueueIPv6TailDroppedOctets.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system."
+    ::= { eriRouterQosSubscriberQueueStatsEntry 37 }
+
+eriRouterQosSubsQueueHCIPv6TailDroppedPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv6 packets dropped when the total number of packets
+            in this queue was greater than the maximum threshold. This object
+            is a 64-bit version of eriRouterQosSubsQueueIPv6TailDroppedPkts.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system."
+    ::= { eriRouterQosSubscriberQueueStatsEntry 38 }
+
+--
+-- QoS interface rate-limit class objects
+--
+
+eriRouterQosIntfRLClassStatsTable   OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EriRouterQosIntfRLClassStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+           "This table specifies per class statistical information.
+            It contains the class packet/octet counts for each packet
+            oriented IF-MIB layer to which the class-based policing/
+            metering policy is applied."
+    ::= { eriRouterQosMibObjects 4 }
+
+eriRouterQosIntfRLClassStatsEntry OBJECT-TYPE
+    SYNTAX      EriRouterQosIntfRLClassStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+           "An entry containing statistical information before and after
+            the class-based rate-limit action is taken on the interface."
+    INDEX { ifIndex,
+            eriRouterQosIfRLPolicyType,
+            eriRouterQosIfRLClassId }
+    ::= { eriRouterQosIntfRLClassStatsTable 1 }
+    
+EriRouterQosIntfRLClassStatsEntry ::= SEQUENCE {
+    eriRouterQosIfRLPolicyType                EriRouterQosPolicyType,
+    eriRouterQosIfRLClassId                   EriRouterQosClassId,
+    eriRouterQosIfRLPolicyName                SnmpAdminString,
+    eriRouterQosIfRLClassName                 SnmpAdminString,
+    eriRouterQosIfRLClassConformOctets        Counter64,
+    eriRouterQosIfRLClassConformPkts          Counter64,
+    eriRouterQosIfRLClassConformDroppedOctets Counter64,
+    eriRouterQosIfRLClassConformDroppedPkts   Counter64,
+    eriRouterQosIfRLClassExceedOctets         Counter64,
+    eriRouterQosIfRLClassExceedPkts           Counter64,
+    eriRouterQosIfRLClassExceedDroppedOctets  Counter64,
+    eriRouterQosIfRLClassExceedDroppedPkts    Counter64,
+    eriRouterQosIfRLClassViolateOctets        Counter64,
+    eriRouterQosIfRLClassViolatePkts          Counter64,
+    eriRouterQosIfRLClassViolateDroppedOctets Counter64,
+    eriRouterQosIfRLClassViolateDroppedPkts   Counter64,
+    eriRouterQosIfRLClassIPv4ConformOctets        Counter64,
+    eriRouterQosIfRLClassIPv4ConformPkts          Counter64,
+    eriRouterQosIfRLClassIPv4ConformDroppedOctets Counter64,
+    eriRouterQosIfRLClassIPv4ConformDroppedPkts   Counter64,
+    eriRouterQosIfRLClassIPv4ExceedOctets         Counter64,
+    eriRouterQosIfRLClassIPv4ExceedPkts           Counter64,
+    eriRouterQosIfRLClassIPv4ExceedDroppedOctets  Counter64,
+    eriRouterQosIfRLClassIPv4ExceedDroppedPkts    Counter64,
+    eriRouterQosIfRLClassIPv4ViolateOctets        Counter64,
+    eriRouterQosIfRLClassIPv4ViolatePkts          Counter64,
+    eriRouterQosIfRLClassIPv4ViolateDroppedOctets Counter64,
+    eriRouterQosIfRLClassIPv4ViolateDroppedPkts   Counter64,
+    eriRouterQosIfRLClassIPv6ConformOctets        Counter64,
+    eriRouterQosIfRLClassIPv6ConformPkts          Counter64,
+    eriRouterQosIfRLClassIPv6ConformDroppedOctets Counter64,
+    eriRouterQosIfRLClassIPv6ConformDroppedPkts   Counter64,
+    eriRouterQosIfRLClassIPv6ExceedOctets         Counter64,
+    eriRouterQosIfRLClassIPv6ExceedPkts           Counter64,
+    eriRouterQosIfRLClassIPv6ExceedDroppedOctets  Counter64,
+    eriRouterQosIfRLClassIPv6ExceedDroppedPkts    Counter64,
+    eriRouterQosIfRLClassIPv6ViolateOctets        Counter64,
+    eriRouterQosIfRLClassIPv6ViolatePkts          Counter64,
+    eriRouterQosIfRLClassIPv6ViolateDroppedOctets Counter64,
+    eriRouterQosIfRLClassIPv6ViolateDroppedPkts   Counter64
+}
+
+eriRouterQosIfRLPolicyType OBJECT-TYPE
+    SYNTAX      EriRouterQosPolicyType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+           "The type of the rate-limit policy which is applied to the
+            interface."
+    ::= { eriRouterQosIntfRLClassStatsEntry 1 }
+
+eriRouterQosIfRLClassId OBJECT-TYPE
+    SYNTAX      EriRouterQosClassId
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+           "A value that uniquely identifies a class defined in the 
+            rate-limit policy access list."
+    ::= { eriRouterQosIntfRLClassStatsEntry 2 }
+
+eriRouterQosIfRLPolicyName OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(1..39))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "Name of the rate-limit policy."
+    ::= { eriRouterQosIntfRLClassStatsEntry 3 }
+
+eriRouterQosIfRLClassName OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(1..39))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "Name of the class in the rate-limit policy access list."
+    ::= { eriRouterQosIntfRLClassStatsEntry 4 }
+
+eriRouterQosIfRLClassConformOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of octets that conform to the rate limit set on
+            the interface for which class counters are enabled."
+    ::= { eriRouterQosIntfRLClassStatsEntry 5 }
+
+eriRouterQosIfRLClassConformPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of packets that conform to the rate limit set on
+            the interface for which class counters are enabled."
+    ::= { eriRouterQosIntfRLClassStatsEntry 6 }
+
+eriRouterQosIfRLClassConformDroppedOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of octets that were dropped due to the application
+            of a conform action on packets that conform to the rate limit
+            set on the interface for which class counters are enabled."
+    ::= { eriRouterQosIntfRLClassStatsEntry 7 }
+
+eriRouterQosIfRLClassConformDroppedPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of packets that were dropped due to the application
+            of a conform action on packets that conform to the rate limit
+            set on the interface for which class counters are enabled."
+    ::= { eriRouterQosIntfRLClassStatsEntry 8 }
+
+eriRouterQosIfRLClassExceedOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of octets that exceed the rate limit set on the
+            interface for which class counters are enabled."
+    ::= { eriRouterQosIntfRLClassStatsEntry 9 }
+
+eriRouterQosIfRLClassExceedPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of packets that exceed the rate limit set on the
+            interface."
+    ::= { eriRouterQosIntfRLClassStatsEntry 10 }
+
+eriRouterQosIfRLClassExceedDroppedOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of octets that were dropped due to the application
+            of an exceed action on packets that exceed the rate limit set
+            on the interface for which class counters are enabled."
+    ::= { eriRouterQosIntfRLClassStatsEntry 11 }
+
+eriRouterQosIfRLClassExceedDroppedPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of packets that were dropped due to the application
+            of an exceed action on packets that exceed the rate limit set
+            on the interface for which class counters are enabled."
+    ::= { eriRouterQosIntfRLClassStatsEntry 12 }
+
+eriRouterQosIfRLClassViolateOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of octets that violate the normal and maximum burst
+            sizes on the interface for which class counters are enabled."
+    ::= { eriRouterQosIntfRLClassStatsEntry 13 }
+
+eriRouterQosIfRLClassViolatePkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of packets that violate the normal and maximum burst
+            sizes on the interface for which class counters are enabled."
+    ::= { eriRouterQosIntfRLClassStatsEntry 14 }
+
+eriRouterQosIfRLClassViolateDroppedOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of octets that were dropped due to the application
+            of a violate action on packets that violate the normal and
+            maximum burst sizes on the interface for which class counters
+            are enabled."
+    ::= { eriRouterQosIntfRLClassStatsEntry 15 }
+
+eriRouterQosIfRLClassViolateDroppedPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of packets that were dropped due to the application
+            of a violate action on packets that violate the normal and
+            maximum burst sizes on the interface for which class counters
+            are enabled."
+    ::= { eriRouterQosIntfRLClassStatsEntry 16 }
+
+eriRouterQosIfRLClassIPv4ConformOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv4 octets that conform to the rate limit set on
+            the interface for which class counters dual-stack are enabled."
+    ::= { eriRouterQosIntfRLClassStatsEntry 17 }
+
+eriRouterQosIfRLClassIPv4ConformPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv4 packets that conform to the rate limit set on
+            the interface for which class counters dual-stack are enabled."
+    ::= { eriRouterQosIntfRLClassStatsEntry 18 }
+
+eriRouterQosIfRLClassIPv4ConformDroppedOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv4 octets that were dropped due to the application
+            of a conform action on packets that conform to the rate limit set
+            on the interface for which class counters dual-stack are enabled."
+    ::= { eriRouterQosIntfRLClassStatsEntry 19 }
+
+eriRouterQosIfRLClassIPv4ConformDroppedPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv4 packets that were dropped due to the application
+            of a conform action on packets that conform to the rate limit set
+            on the interface for which class counters dual-stack are enabled."
+    ::= { eriRouterQosIntfRLClassStatsEntry 20 }
+
+eriRouterQosIfRLClassIPv4ExceedOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv4 octets that exceed the rate limit set on the
+            interface for which class counters dual-stack are enabled."
+    ::= { eriRouterQosIntfRLClassStatsEntry 21 }
+
+eriRouterQosIfRLClassIPv4ExceedPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv4 packets that exceed the rate limit set on the
+            interface for which class counters dual-stack are enabled."
+    ::= { eriRouterQosIntfRLClassStatsEntry 22 }
+
+eriRouterQosIfRLClassIPv4ExceedDroppedOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv4 octets that were dropped due to the application
+            of an exceed action on packets that exceed the rate limit set on
+            the interface for which class counters dual-stack are enabled."
+    ::= { eriRouterQosIntfRLClassStatsEntry 23 }
+
+eriRouterQosIfRLClassIPv4ExceedDroppedPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv4 packets that were dropped due to the application
+            of an exceed action on packets that exceed the rate limit set on
+            the interface for which class counters dual-stack are enabled."
+    ::= { eriRouterQosIntfRLClassStatsEntry 24 }
+
+eriRouterQosIfRLClassIPv4ViolateOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv4 octets that violate the normal and maximum burst
+            sizes on the interface for which class counters dual-stack are enabled."
+    ::= { eriRouterQosIntfRLClassStatsEntry 25 }
+
+eriRouterQosIfRLClassIPv4ViolatePkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv4 packets that violate the normal and maximum burst
+            sizes on the interface for which class counters dual-stack are enabled."
+    ::= { eriRouterQosIntfRLClassStatsEntry 26 }
+
+eriRouterQosIfRLClassIPv4ViolateDroppedOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv4 octets that were dropped due to the application
+            of a violate action on packets that violate the normal and maximum
+            burst sizes on the interface for which class counters dual-stack
+            are enabled."
+    ::= { eriRouterQosIntfRLClassStatsEntry 27 }
+
+eriRouterQosIfRLClassIPv4ViolateDroppedPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv4 packets that were dropped due to the application
+            of a violate action on packets that violate the normal and maximum
+            burst sizes on the interface for which class counters dual-stack
+            are enabled."
+    ::= { eriRouterQosIntfRLClassStatsEntry 28 }
+
+eriRouterQosIfRLClassIPv6ConformOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv6 octets that conform to the rate limit set on
+            the interface for which class counters dual-stack are enabled."
+    ::= { eriRouterQosIntfRLClassStatsEntry 29 }
+
+eriRouterQosIfRLClassIPv6ConformPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv6 packets that conform to the rate limit set on
+            the interface for which class counters dual-stack are enabled."
+    ::= { eriRouterQosIntfRLClassStatsEntry 30 }
+
+eriRouterQosIfRLClassIPv6ConformDroppedOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv6 octets that were dropped due to the application
+            of a conform action on packets that conform to the rate limit set
+            on the interface for which class counters dual-stack are enabled."
+    ::= { eriRouterQosIntfRLClassStatsEntry 31 }
+
+eriRouterQosIfRLClassIPv6ConformDroppedPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv6 packets that were dropped due to the application
+            of a conform action on packets that conform to the rate limit set
+            on the interface for which class counters dual-stack are enabled."
+    ::= { eriRouterQosIntfRLClassStatsEntry 32 }
+
+eriRouterQosIfRLClassIPv6ExceedOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv6 octets that exceed the rate limit set on the
+            interface for which class counters dual-stack are enabled."
+    ::= { eriRouterQosIntfRLClassStatsEntry 33 }
+
+eriRouterQosIfRLClassIPv6ExceedPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv6 packets that exceed the rate limit set on the
+            interface for which class counters dual-stack are enabled."
+    ::= { eriRouterQosIntfRLClassStatsEntry 34 }
+
+eriRouterQosIfRLClassIPv6ExceedDroppedOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv6 octets that were dropped due to the application
+            of an exceed action on packets that exceed the rate limit set on
+            the interface for which class counters dual-stack are enabled."
+    ::= { eriRouterQosIntfRLClassStatsEntry 35 }
+
+eriRouterQosIfRLClassIPv6ExceedDroppedPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv6 packets that were dropped due to the application
+            of an exceed action on packets that exceed the rate limit set on
+            the interface for which class counters dual-stack are enabled."
+    ::= { eriRouterQosIntfRLClassStatsEntry 36 }
+
+eriRouterQosIfRLClassIPv6ViolateOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv6 octets that violate the normal and maximum burst
+            sizes on the interface for which class dual-stack counters are enabled."
+    ::= { eriRouterQosIntfRLClassStatsEntry 37 }
+
+eriRouterQosIfRLClassIPv6ViolatePkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv6 packets that violate the normal and maximum burst
+            sizes on the interface for which class dual-stack counters are enabled."
+    ::= { eriRouterQosIntfRLClassStatsEntry 38 }
+
+eriRouterQosIfRLClassIPv6ViolateDroppedOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv6 octets that were dropped due to the application
+            of a violate action on packets that violate the normal and maximum
+            burst sizes on the interface for which class counters dual-stack
+            are enabled."
+    ::= { eriRouterQosIntfRLClassStatsEntry 39 }
+
+eriRouterQosIfRLClassIPv6ViolateDroppedPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv6 packets that were dropped due to the application
+            of a violate action on packets that violate the normal and maximum
+            burst sizes on the interface for which class counters dual-stack
+            are enabled."
+    ::= { eriRouterQosIntfRLClassStatsEntry 40 }
+
+--
+-- QoS subscriber rate-limit class objects
+--
+
+eriRouterQosSubscriberRLClassStatsTable   OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EriRouterQosSubscriberRLClassStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+           "This table specifies per class statistical information on
+            the subscriber circuits.  It contains the class packet/octet
+            counts for each active subscriber session to which the
+            class-based policing/metering policy is applied when the
+            counters are enabled for the class.
+
+            All MIB objects defined in the table are viewed within the
+            context identified in the SNMP protocol (i.e. the community
+            string in v1/v2c or the contextName in v3)."
+    ::= { eriRouterQosMibObjects 5 }
+
+eriRouterQosSubscriberRLClassStatsEntry OBJECT-TYPE
+    SYNTAX      EriRouterQosSubscriberRLClassStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+           "An entry containing statistical information before and after
+            the class-based rate-limit action is taken on the subscriber
+            session."
+    INDEX { eriRouterSubsActiveName,
+            eriRouterSubsActiveSessionId,
+            eriRouterQosSubsRLPolicyType,
+            eriRouterQosSubsRLClassId }
+    ::= { eriRouterQosSubscriberRLClassStatsTable 1 }
+
+EriRouterQosSubscriberRLClassStatsEntry ::= SEQUENCE {
+    eriRouterQosSubsRLPolicyType                EriRouterQosPolicyType,
+    eriRouterQosSubsRLClassId                   EriRouterQosClassId,
+    eriRouterQosSubsRLPolicyName                SnmpAdminString,
+    eriRouterQosSubsRLClassName                 SnmpAdminString,
+    eriRouterQosSubsRLClassConformOctets        Counter64,
+    eriRouterQosSubsRLClassConformPkts          Counter64,
+    eriRouterQosSubsRLClassConformDroppedOctets Counter64,
+    eriRouterQosSubsRLClassConformDroppedPkts   Counter64,
+    eriRouterQosSubsRLClassExceedOctets         Counter64,
+    eriRouterQosSubsRLClassExceedPkts           Counter64,
+    eriRouterQosSubsRLClassExceedDroppedOctets  Counter64,
+    eriRouterQosSubsRLClassExceedDroppedPkts    Counter64,
+    eriRouterQosSubsRLClassViolateOctets        Counter64,
+    eriRouterQosSubsRLClassViolatePkts          Counter64,
+    eriRouterQosSubsRLClassViolateDroppedOctets Counter64,
+    eriRouterQosSubsRLClassViolateDroppedPkts   Counter64,
+    eriRouterQosSubsRLClassIPv4ConformOctets        Counter64,
+    eriRouterQosSubsRLClassIPv4ConformPkts          Counter64,
+    eriRouterQosSubsRLClassIPv4ConformDroppedOctets Counter64,
+    eriRouterQosSubsRLClassIPv4ConformDroppedPkts   Counter64,
+    eriRouterQosSubsRLClassIPv4ExceedOctets         Counter64,
+    eriRouterQosSubsRLClassIPv4ExceedPkts           Counter64,
+    eriRouterQosSubsRLClassIPv4ExceedDroppedOctets  Counter64,
+    eriRouterQosSubsRLClassIPv4ExceedDroppedPkts    Counter64,
+    eriRouterQosSubsRLClassIPv4ViolateOctets        Counter64,
+    eriRouterQosSubsRLClassIPv4ViolatePkts          Counter64,
+    eriRouterQosSubsRLClassIPv4ViolateDroppedOctets Counter64,
+    eriRouterQosSubsRLClassIPv4ViolateDroppedPkts   Counter64,
+    eriRouterQosSubsRLClassIPv6ConformOctets        Counter64,
+    eriRouterQosSubsRLClassIPv6ConformPkts          Counter64,
+    eriRouterQosSubsRLClassIPv6ConformDroppedOctets Counter64,
+    eriRouterQosSubsRLClassIPv6ConformDroppedPkts   Counter64,
+    eriRouterQosSubsRLClassIPv6ExceedOctets         Counter64,
+    eriRouterQosSubsRLClassIPv6ExceedPkts           Counter64,
+    eriRouterQosSubsRLClassIPv6ExceedDroppedOctets  Counter64,
+    eriRouterQosSubsRLClassIPv6ExceedDroppedPkts    Counter64,
+    eriRouterQosSubsRLClassIPv6ViolateOctets        Counter64,
+    eriRouterQosSubsRLClassIPv6ViolatePkts          Counter64,
+    eriRouterQosSubsRLClassIPv6ViolateDroppedOctets Counter64,
+    eriRouterQosSubsRLClassIPv6ViolateDroppedPkts   Counter64
+}
+
+eriRouterQosSubsRLPolicyType OBJECT-TYPE
+    SYNTAX      EriRouterQosPolicyType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+           "The type of the rate-limit policy which is applied to the
+            circuit."
+    ::= { eriRouterQosSubscriberRLClassStatsEntry 1 }
+
+eriRouterQosSubsRLClassId OBJECT-TYPE
+    SYNTAX      EriRouterQosClassId
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+           "A value that uniquely identifies a class defined in the
+            rate-limit policy access list."
+    ::= { eriRouterQosSubscriberRLClassStatsEntry 2 }
+
+eriRouterQosSubsRLPolicyName OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(1..39))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "Name of the rate-limit policy."
+    ::= { eriRouterQosSubscriberRLClassStatsEntry 3 }
+
+eriRouterQosSubsRLClassName OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(1..39))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "Name of the class in the rate-limit policy access list."
+    ::= { eriRouterQosSubscriberRLClassStatsEntry 4 }
+
+eriRouterQosSubsRLClassConformOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of octets that conform to the rate limit set on
+            the subscriber circuit."
+    ::= { eriRouterQosSubscriberRLClassStatsEntry 5 }
+
+eriRouterQosSubsRLClassConformPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of packets that conform to the rate limit set on
+            the subscriber circuit."
+    ::= { eriRouterQosSubscriberRLClassStatsEntry 6 }
+
+eriRouterQosSubsRLClassConformDroppedOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of octets that were dropped due to the application
+            of a conform action on packets that conform to the rate limit
+            set on the subscriber circuit."
+    ::= { eriRouterQosSubscriberRLClassStatsEntry 7 }
+
+eriRouterQosSubsRLClassConformDroppedPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of packets that were dropped due to the application
+            of a conform action on packets that conform to the rate limit
+            set on the subscriber circuit."
+    ::= { eriRouterQosSubscriberRLClassStatsEntry 8 }
+
+eriRouterQosSubsRLClassExceedOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of octets that exceed the rate limit set on the
+            subscriber circuit."
+    ::= { eriRouterQosSubscriberRLClassStatsEntry 9 }
+
+eriRouterQosSubsRLClassExceedPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of packets that exceed the rate limit set on the
+            subscriber circuit."
+    ::= { eriRouterQosSubscriberRLClassStatsEntry 10 }
+
+eriRouterQosSubsRLClassExceedDroppedOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of octets that were dropped due to the application
+            of an exceed action on packets that exceed the rate limit set
+            on the subscriber circuit."
+    ::= { eriRouterQosSubscriberRLClassStatsEntry 11 }
+
+eriRouterQosSubsRLClassExceedDroppedPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of packets that were dropped due to the application
+            of an exceed action on packets that exceed the rate limit set
+            on the subscriber circuit."
+    ::= { eriRouterQosSubscriberRLClassStatsEntry 12 }
+
+eriRouterQosSubsRLClassViolateOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of octets that violate the normal and maximum burst
+            sizes on the subscriber circuit."
+    ::= { eriRouterQosSubscriberRLClassStatsEntry 13 }
+
+eriRouterQosSubsRLClassViolatePkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of packets that violate the normal and maximum burst
+            sizes on the subscriber circuit."
+    ::= { eriRouterQosSubscriberRLClassStatsEntry 14 }
+
+eriRouterQosSubsRLClassViolateDroppedOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of octets that were dropped due to the application
+            of a violate action on packets that violate the normal and
+            maximum burst sizes on the subscriber circuit."
+    ::= { eriRouterQosSubscriberRLClassStatsEntry 15 }
+
+eriRouterQosSubsRLClassViolateDroppedPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of packets that were dropped due to the application
+            of a violate action on packets that violate the normal and
+            maximum burst sizes on the subscriber circuit."
+    ::= { eriRouterQosSubscriberRLClassStatsEntry 16 }
+
+eriRouterQosSubsRLClassIPv4ConformOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv4 octets that conform to the rate limit set on
+            the subscriber circuit."
+    ::= { eriRouterQosSubscriberRLClassStatsEntry 17 }
+
+eriRouterQosSubsRLClassIPv4ConformPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv4 packets that conform to the rate limit set on
+            the subscriber circuit."
+    ::= { eriRouterQosSubscriberRLClassStatsEntry 18 }
+
+eriRouterQosSubsRLClassIPv4ConformDroppedOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv4 octets that were dropped due to the application
+            of a conform action on packets that conform to the rate limit set
+            on the subscriber circuit."
+    ::= { eriRouterQosSubscriberRLClassStatsEntry 19 }
+
+eriRouterQosSubsRLClassIPv4ConformDroppedPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv4 packets that were dropped due to the application
+            of a conform action on packets that conform to the rate limit set
+            on the subscriber circuit."
+    ::= { eriRouterQosSubscriberRLClassStatsEntry 20 }
+
+eriRouterQosSubsRLClassIPv4ExceedOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv4 octets that exceed the rate limit set on the
+            subscriber circuit."
+    ::= { eriRouterQosSubscriberRLClassStatsEntry 21 }
+
+eriRouterQosSubsRLClassIPv4ExceedPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv4 packets that exceed the rate limit set on the
+            subscriber circuit."
+    ::= { eriRouterQosSubscriberRLClassStatsEntry 22 }
+
+eriRouterQosSubsRLClassIPv4ExceedDroppedOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv4 octets that were dropped due to the application
+            of an exceed action on packets that exceed the rate limit set on
+            the subscriber circuit."
+    ::= { eriRouterQosSubscriberRLClassStatsEntry 23 }
+
+eriRouterQosSubsRLClassIPv4ExceedDroppedPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv4 packets that were dropped due to the application
+            of an exceed action on packets that exceed the rate limit set on
+            the subscriber circuit."
+    ::= { eriRouterQosSubscriberRLClassStatsEntry 24 }
+
+eriRouterQosSubsRLClassIPv4ViolateOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv4 octets that violate the normal and maximum
+            burst sizes on the subscriber circuit."
+    ::= { eriRouterQosSubscriberRLClassStatsEntry 25 }
+
+eriRouterQosSubsRLClassIPv4ViolatePkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv4 packets that violate the normal and maximum
+            burst sizes on the subscriber circuit."
+    ::= { eriRouterQosSubscriberRLClassStatsEntry 26 }
+
+eriRouterQosSubsRLClassIPv4ViolateDroppedOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv4 octets that were dropped due to the application
+            of a violate action on packets that violate the normal and maximum
+            burst sizes on the subscriber circuit."
+    ::= { eriRouterQosSubscriberRLClassStatsEntry 27 }
+
+eriRouterQosSubsRLClassIPv4ViolateDroppedPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv4 packets that were dropped due to the application
+            of a violate action on packets that violate the normal and maximum
+            burst sizes on the subscriber circuit."
+    ::= { eriRouterQosSubscriberRLClassStatsEntry 28 }
+
+eriRouterQosSubsRLClassIPv6ConformOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv6 octets that conform to the rate limit set on
+            the subscriber circuit."
+    ::= { eriRouterQosSubscriberRLClassStatsEntry 29 }
+
+eriRouterQosSubsRLClassIPv6ConformPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv6 packets that conform to the rate limit set on
+            the subscriber circuit."
+    ::= { eriRouterQosSubscriberRLClassStatsEntry 30 }
+
+eriRouterQosSubsRLClassIPv6ConformDroppedOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv6 octets that were dropped due to the application
+            of a conform action on packets that conform to the rate limit set
+            on the subscriber circuit."
+    ::= { eriRouterQosSubscriberRLClassStatsEntry 31 }
+
+eriRouterQosSubsRLClassIPv6ConformDroppedPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv6 packets that were dropped due to the application
+            of a conform action on packets that conform to the rate limit set
+            on the subscriber circuit."
+    ::= { eriRouterQosSubscriberRLClassStatsEntry 32 }
+
+eriRouterQosSubsRLClassIPv6ExceedOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv6 octets that exceed the rate limit set on the
+            subscriber circuit."
+    ::= { eriRouterQosSubscriberRLClassStatsEntry 33 }
+
+eriRouterQosSubsRLClassIPv6ExceedPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv6 packets that exceed the rate limit set on the
+            subscriber circuit."
+    ::= { eriRouterQosSubscriberRLClassStatsEntry 34 }
+
+eriRouterQosSubsRLClassIPv6ExceedDroppedOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv6 octets that were dropped due to the application
+            of an exceed action on packets that exceed the rate limit set on
+            the subscriber circuit."
+    ::= { eriRouterQosSubscriberRLClassStatsEntry 35 }
+
+eriRouterQosSubsRLClassIPv6ExceedDroppedPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv6 packets that were dropped due to the application
+            of an exceed action on packets that exceed the rate limit set on
+            the subscriber circuit."
+    ::= { eriRouterQosSubscriberRLClassStatsEntry 36 }
+
+eriRouterQosSubsRLClassIPv6ViolateOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv6 octets that violate the normal and maximum
+            burst sizes on the subscriber circuit."
+    ::= { eriRouterQosSubscriberRLClassStatsEntry 37 }
+
+eriRouterQosSubsRLClassIPv6ViolatePkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv6 packets that violate the normal and maximum
+            burst sizes on the subscriber circuit."
+    ::= { eriRouterQosSubscriberRLClassStatsEntry 38 }
+
+eriRouterQosSubsRLClassIPv6ViolateDroppedOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv6 octets that were dropped due to the application
+            of a violate action on packets that violate the normal and maximum
+            burst sizes on the subscriber circuit."
+    ::= { eriRouterQosSubscriberRLClassStatsEntry 39 }
+
+eriRouterQosSubsRLClassIPv6ViolateDroppedPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of IPv6 packets that were dropped due to the application
+            of a violate action on packets that violate the normal and maximum
+            burst sizes on the subscriber circuit."
+    ::= { eriRouterQosSubscriberRLClassStatsEntry 40 }
+
+--
+-- Hierarchical Policies
+--
+
+eriRouterQosHierarchicalPolicyStatsTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EriRouterQosHierarchicalPolicyStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+           "A table of drop counters for child circuits of hierarchical 
+           qos policies applied to the child."
+    ::= { eriRouterQosMibObjects 6 }
+
+eriRouterQosHierarchicalPolicyStatsEntry    OBJECT-TYPE
+    SYNTAX      EriRouterQosHierarchicalPolicyStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+           "An entry containing the drop counters for one child circuit
+           of hierarchical qos policies applied to the child."
+    INDEX { ifIndex, eriRouterQosHierarchicalPolicyType }
+    ::=  {eriRouterQosHierarchicalPolicyStatsTable 1 }
+    
+EriRouterQosHierarchicalPolicyStatsEntry ::=  SEQUENCE {
+    eriRouterQosHierarchicalPolicyType              EriRouterQosPolicyType,
+    eriRouterQosHierarchicalPolicyName              SnmpAdminString,
+    eriRouterQosHierarchicalPolicyDroppedOctets     Counter64,
+    eriRouterQosHierarchicalPolicyDroppedPkts       Counter64
+}
+
+eriRouterQosHierarchicalPolicyType OBJECT-TYPE
+    SYNTAX      EriRouterQosPolicyType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+          "The type of the hierarchical parent rate-limit policy which 
+           is applied to the child circuit."
+    ::= { eriRouterQosHierarchicalPolicyStatsEntry 1 }
+
+eriRouterQosHierarchicalPolicyName OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(1..39))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+          "Name of the hierarchical parent policy applied to the child
+           circuit."
+    ::= { eriRouterQosHierarchicalPolicyStatsEntry 2 }
+
+eriRouterQosHierarchicalPolicyDroppedOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of octets that were dropped due to the hierarchical
+            parent's policy applied to the child circuit."
+    ::= { eriRouterQosHierarchicalPolicyStatsEntry 3 }
+
+eriRouterQosHierarchicalPolicyDroppedPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The number of packets that dropped due to the hierarchical
+           parent's policy applied to the child circuit."
+    ::= { eriRouterQosHierarchicalPolicyStatsEntry 4 }
+
+--
+--
+--
+eriRouterQosHierarchicalPClassStatsTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EriRouterQosHierarchicalPClassStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+           "A table of drop counters for child circuits of hierarchical 
+            qos policy classes applied to the child."
+    ::= { eriRouterQosMibObjects 7 }
+
+eriRouterQosHierarchicalPClassStatsEntry    OBJECT-TYPE
+    SYNTAX      EriRouterQosHierarchicalPClassStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+          "An entry containing the drop counters for one child circuit
+           of hierarchical qos policy classes applied to the child."
+    INDEX { ifIndex, eriRouterQosHierarchicalPolicyType, eriRouterQosHierarchicalPClassId }
+    ::=  { eriRouterQosHierarchicalPClassStatsTable 1 }
+    
+EriRouterQosHierarchicalPClassStatsEntry ::=  SEQUENCE {
+    eriRouterQosHierarchicalPClassId              EriRouterQosClassId,
+    eriRouterQosHierarchicalPClassName            SnmpAdminString,
+    eriRouterQosHierarchicalPClassDroppedOctets   Counter64,
+    eriRouterQosHierarchicalPClassDroppedPkts     Counter64
+}
+
+eriRouterQosHierarchicalPClassId OBJECT-TYPE
+    SYNTAX      EriRouterQosClassId
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+          "The class id of the hierarchical parent policy class which 
+           is applied to the child circuit."
+    ::= { eriRouterQosHierarchicalPClassStatsEntry 1 }
+
+eriRouterQosHierarchicalPClassName OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(1..39))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+          "Name of the hierarchical parent policy class which
+           is applied to the child circuit."
+    ::= { eriRouterQosHierarchicalPClassStatsEntry 2 }
+
+eriRouterQosHierarchicalPClassDroppedOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+          "The number of octets that were dropped due to the hierarchical
+           parent's policy class applied to the child circuit."
+    ::= { eriRouterQosHierarchicalPClassStatsEntry 3 }
+
+eriRouterQosHierarchicalPClassDroppedPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+          "The number of packets that dropped due to the hierarchical
+           parent's policy class applied to the child circuit."
+    ::= { eriRouterQosHierarchicalPClassStatsEntry 4 }
+
+
+
+--
+-- compliance statements
+--
+
+eriRouterQosCompliances
+        OBJECT IDENTIFIER ::= { eriRouterQosMibConformance 1 }
+eriRouterQosGroups
+        OBJECT IDENTIFIER ::= { eriRouterQosMibConformance 2 }
+
+eriRouterQosCompliance MODULE-COMPLIANCE
+    STATUS  deprecated
+    DESCRIPTION
+        "The compliance statement for SNMP entities which implement
+         this QOS MIB."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+            eriRouterQosIfGroup
+        }
+    ::= { eriRouterQosCompliances  1 }
+
+eriRouterQosCompliance2 MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+        "The compliance statement for SNMP entities which implement
+         this QOS MIB."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+            eriRouterQosIfGroup,
+            eriRouterQosIfQueueGroup
+        }
+    ::= { eriRouterQosCompliances  2 }
+
+eriRouterQosCompliance3 MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+        "The compliance statement for SNMP entities which implement
+         this QOS MIB."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+            eriRouterQosIfGroup,
+            eriRouterQosIfQueueGroup,
+            eriRouterQosSubscriberQueueGroup
+        }
+    ::= { eriRouterQosCompliances  3 }
+
+eriRouterQosCompliance4 MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+        "The compliance statement for SNMP entities which implement
+         this QOS MIB."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+            eriRouterQosIfGroup,
+            eriRouterQosIfQueueGroup,
+            eriRouterQosSubscriberQueueGroup,
+            eriRouterQosIfRLClassStatsGroup,
+            eriRouterQosSubscriberRLClassStatsGroup
+        }
+    ::= { eriRouterQosCompliances  4 }
+
+eriRouterQosCompliance5 MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+        "The compliance statement for SNMP entities which implement
+         this QOS MIB."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+            eriRouterQosIfGroup,
+            eriRouterQosIfQueueGroup,
+            eriRouterQosSubscriberQueueGroup,
+            eriRouterQosIfRLClassStatsGroup,
+            eriRouterQosSubscriberRLClassStatsGroup,
+            eriRouterQosHierarchicalPolicyStatsGroup
+        }
+    ::= { eriRouterQosCompliances 5 }
+
+eriRouterQosIfGroup OBJECT-GROUP
+    OBJECTS {
+        eriRouterQosIfInOctets,
+        eriRouterQosIfHCInOctets,
+        eriRouterQosIfOutOctets,
+        eriRouterQosIfHCOutOctets,
+        eriRouterQosIfInDroppedOctets,
+        eriRouterQosIfHCInDroppedOctets,
+        eriRouterQosIfOutDroppedOctets,
+        eriRouterQosIfHCOutDroppedOctets
+    }
+    STATUS    current
+    DESCRIPTION
+        "The collection of objects which allow monitoring of interfaces
+         with QoS enabled."
+    ::= { eriRouterQosGroups 1 }
+
+eriRouterQosIfQueueGroup OBJECT-GROUP
+    OBJECTS {
+        eriRouterQosIfQueueOutOctets,
+        eriRouterQosIfQueueHCOutOctets,
+        eriRouterQosIfQueueOutPkts,
+        eriRouterQosIfQueueHCOutPkts,
+        eriRouterQosIfQueueWredDroppedOctets,
+        eriRouterQosIfQueueHCWredDroppedOctets,
+        eriRouterQosIfQueueWredDroppedPkts,
+        eriRouterQosIfQueueHCWredDroppedPkts,
+        eriRouterQosIfQueueTailDroppedOctets,
+        eriRouterQosIfQueueHCTailDroppedOctets,
+        eriRouterQosIfQueueTailDroppedPkts,
+        eriRouterQosIfQueueHCTailDroppedPkts,
+        eriRouterQosIfQueueIPv4OutOctets,
+        eriRouterQosIfQueueHCIPv4OutOctets,
+        eriRouterQosIfQueueIPv4OutPkts,
+        eriRouterQosIfQueueHCIPv4OutPkts,
+        eriRouterQosIfQueueIPv4WredDroppedOctets,
+        eriRouterQosIfQueueHCIPv4WredDroppedOctets,
+        eriRouterQosIfQueueIPv4WredDroppedPkts,
+        eriRouterQosIfQueueHCIPv4WredDroppedPkts,
+        eriRouterQosIfQueueIPv4TailDroppedOctets,
+        eriRouterQosIfQueueHCIPv4TailDroppedOctets,
+        eriRouterQosIfQueueIPv4TailDroppedPkts,
+        eriRouterQosIfQueueHCIPv4TailDroppedPkts,
+        eriRouterQosIfQueueIPv6OutOctets,
+        eriRouterQosIfQueueHCIPv6OutOctets,
+        eriRouterQosIfQueueIPv6OutPkts,
+        eriRouterQosIfQueueHCIPv6OutPkts,
+        eriRouterQosIfQueueIPv6WredDroppedOctets,
+        eriRouterQosIfQueueHCIPv6WredDroppedOctets,
+        eriRouterQosIfQueueIPv6WredDroppedPkts,
+        eriRouterQosIfQueueHCIPv6WredDroppedPkts,
+        eriRouterQosIfQueueIPv6TailDroppedOctets,
+        eriRouterQosIfQueueHCIPv6TailDroppedOctets,
+        eriRouterQosIfQueueIPv6TailDroppedPkts,
+        eriRouterQosIfQueueHCIPv6TailDroppedPkts,
+        eriRouterQosIfQueueGreenOutOctets,
+        eriRouterQosIfQueueGreenOutPkts,
+        eriRouterQosIfQueueYellowOutOctets,
+        eriRouterQosIfQueueYellowOutPkts,
+        eriRouterQosIfQueueRedOutOctets,
+        eriRouterQosIfQueueRedOutPkts,
+        eriRouterQosIfQueueGreenDroppedOctets,
+        eriRouterQosIfQueueGreenDroppedPkts,
+        eriRouterQosIfQueueYellowDroppedOctets,
+        eriRouterQosIfQueueYellowDroppedPkts,
+        eriRouterQosIfQueueRedDroppedOctets,
+        eriRouterQosIfQueueRedDroppedPkts,
+        eriRouterQosIfQueueTotalDroppedOctets,
+        eriRouterQosIfQueueTotalDroppedPkts
+    }
+    STATUS    current
+    DESCRIPTION
+        "The collection of objects which allow monitoring of transmit
+         queues on interfaces with QoS enabled."
+    ::= { eriRouterQosGroups 2 }
+
+eriRouterQosSubscriberQueueGroup OBJECT-GROUP
+    OBJECTS {
+        eriRouterQosSubsQueuePolicyName,
+        eriRouterQosSubsQueueOutOctets,
+        eriRouterQosSubsQueueOutPkts,
+        eriRouterQosSubsQueueWredDroppedOctets,
+        eriRouterQosSubsQueueWredDroppedPkts,
+        eriRouterQosSubsQueueTailDroppedOctets,
+        eriRouterQosSubsQueueTailDroppedPkts,
+        eriRouterQosSubsQueueHCOutOctets,
+        eriRouterQosSubsQueueHCOutPkts,
+        eriRouterQosSubsQueueHCWredDroppedOctets,
+        eriRouterQosSubsQueueHCWredDroppedPkts,
+        eriRouterQosSubsQueueHCTailDroppedOctets,
+        eriRouterQosSubsQueueHCTailDroppedPkts,
+        eriRouterQosSubsQueueIPv4OutOctets,
+        eriRouterQosSubsQueueIPv4OutPkts,
+        eriRouterQosSubsQueueIPv4WredDroppedOctets,
+        eriRouterQosSubsQueueIPv4WredDroppedPkts,
+        eriRouterQosSubsQueueIPv4TailDroppedOctets,
+        eriRouterQosSubsQueueIPv4TailDroppedPkts,
+        eriRouterQosSubsQueueHCIPv4OutOctets,
+        eriRouterQosSubsQueueHCIPv4OutPkts,
+        eriRouterQosSubsQueueHCIPv4WredDroppedOctets,
+        eriRouterQosSubsQueueHCIPv4WredDroppedPkts,
+        eriRouterQosSubsQueueHCIPv4TailDroppedOctets,
+        eriRouterQosSubsQueueHCIPv4TailDroppedPkts,
+        eriRouterQosSubsQueueIPv6OutOctets,
+        eriRouterQosSubsQueueIPv6OutPkts,
+        eriRouterQosSubsQueueIPv6WredDroppedOctets,
+        eriRouterQosSubsQueueIPv6WredDroppedPkts,
+        eriRouterQosSubsQueueIPv6TailDroppedOctets,
+        eriRouterQosSubsQueueIPv6TailDroppedPkts,
+        eriRouterQosSubsQueueHCIPv6OutOctets,
+        eriRouterQosSubsQueueHCIPv6OutPkts,
+        eriRouterQosSubsQueueHCIPv6WredDroppedOctets,
+        eriRouterQosSubsQueueHCIPv6WredDroppedPkts,
+        eriRouterQosSubsQueueHCIPv6TailDroppedOctets,
+        eriRouterQosSubsQueueHCIPv6TailDroppedPkts
+    }
+    STATUS    current
+    DESCRIPTION
+        "The collection of objects which allow monitoring of transmit
+         queues on subscriber circuits with QoS queuing enabled."
+    ::= { eriRouterQosGroups 3 }
+
+eriRouterQosIfRLClassStatsGroup OBJECT-GROUP
+    OBJECTS {
+        eriRouterQosIfRLPolicyName,
+        eriRouterQosIfRLClassName,
+        eriRouterQosIfRLClassConformOctets,
+        eriRouterQosIfRLClassConformPkts,
+        eriRouterQosIfRLClassConformDroppedOctets,
+        eriRouterQosIfRLClassConformDroppedPkts,
+        eriRouterQosIfRLClassExceedOctets,
+        eriRouterQosIfRLClassExceedPkts,
+        eriRouterQosIfRLClassExceedDroppedOctets,
+        eriRouterQosIfRLClassExceedDroppedPkts,
+        eriRouterQosIfRLClassViolateOctets,
+        eriRouterQosIfRLClassViolatePkts,
+        eriRouterQosIfRLClassViolateDroppedOctets,
+        eriRouterQosIfRLClassViolateDroppedPkts,
+        eriRouterQosIfRLClassIPv4ConformOctets,
+        eriRouterQosIfRLClassIPv4ConformPkts,
+        eriRouterQosIfRLClassIPv4ConformDroppedOctets,
+        eriRouterQosIfRLClassIPv4ConformDroppedPkts,
+        eriRouterQosIfRLClassIPv4ExceedOctets,
+        eriRouterQosIfRLClassIPv4ExceedPkts,
+        eriRouterQosIfRLClassIPv4ExceedDroppedOctets,
+        eriRouterQosIfRLClassIPv4ExceedDroppedPkts,
+        eriRouterQosIfRLClassIPv4ViolateOctets,
+        eriRouterQosIfRLClassIPv4ViolatePkts,
+        eriRouterQosIfRLClassIPv4ViolateDroppedOctets,
+        eriRouterQosIfRLClassIPv4ViolateDroppedPkts,
+        eriRouterQosIfRLClassIPv6ConformOctets,
+        eriRouterQosIfRLClassIPv6ConformPkts,
+        eriRouterQosIfRLClassIPv6ConformDroppedOctets,
+        eriRouterQosIfRLClassIPv6ConformDroppedPkts,
+        eriRouterQosIfRLClassIPv6ExceedOctets,
+        eriRouterQosIfRLClassIPv6ExceedPkts,
+        eriRouterQosIfRLClassIPv6ExceedDroppedOctets,
+        eriRouterQosIfRLClassIPv6ExceedDroppedPkts,
+        eriRouterQosIfRLClassIPv6ViolateOctets,
+        eriRouterQosIfRLClassIPv6ViolatePkts,
+        eriRouterQosIfRLClassIPv6ViolateDroppedOctets,
+        eriRouterQosIfRLClassIPv6ViolateDroppedPkts
+    }
+    STATUS    current
+    DESCRIPTION
+        "The collection of objects which allow monitoring interfaces
+         that have class-based policing/metering policies enabled."
+    ::= { eriRouterQosGroups 4 }
+
+eriRouterQosSubscriberRLClassStatsGroup OBJECT-GROUP
+    OBJECTS {
+        eriRouterQosSubsRLPolicyName,
+        eriRouterQosSubsRLClassName,
+        eriRouterQosSubsRLClassConformOctets,
+        eriRouterQosSubsRLClassConformPkts,
+        eriRouterQosSubsRLClassConformDroppedOctets,
+        eriRouterQosSubsRLClassConformDroppedPkts,
+        eriRouterQosSubsRLClassExceedOctets,
+        eriRouterQosSubsRLClassExceedPkts,
+        eriRouterQosSubsRLClassExceedDroppedOctets,
+        eriRouterQosSubsRLClassExceedDroppedPkts,
+        eriRouterQosSubsRLClassViolateOctets,
+        eriRouterQosSubsRLClassViolatePkts,
+        eriRouterQosSubsRLClassViolateDroppedOctets,
+        eriRouterQosSubsRLClassViolateDroppedPkts,
+        eriRouterQosSubsRLClassIPv4ConformOctets,
+        eriRouterQosSubsRLClassIPv4ConformPkts,
+        eriRouterQosSubsRLClassIPv4ConformDroppedOctets,
+        eriRouterQosSubsRLClassIPv4ConformDroppedPkts,
+        eriRouterQosSubsRLClassIPv4ExceedOctets,
+        eriRouterQosSubsRLClassIPv4ExceedPkts,
+        eriRouterQosSubsRLClassIPv4ExceedDroppedOctets,
+        eriRouterQosSubsRLClassIPv4ExceedDroppedPkts,
+        eriRouterQosSubsRLClassIPv4ViolateOctets,
+        eriRouterQosSubsRLClassIPv4ViolatePkts,
+        eriRouterQosSubsRLClassIPv4ViolateDroppedOctets,
+        eriRouterQosSubsRLClassIPv4ViolateDroppedPkts,
+        eriRouterQosSubsRLClassIPv6ConformOctets,
+        eriRouterQosSubsRLClassIPv6ConformPkts,
+        eriRouterQosSubsRLClassIPv6ConformDroppedOctets,
+        eriRouterQosSubsRLClassIPv6ConformDroppedPkts,
+        eriRouterQosSubsRLClassIPv6ExceedOctets,
+        eriRouterQosSubsRLClassIPv6ExceedPkts,
+        eriRouterQosSubsRLClassIPv6ExceedDroppedOctets,
+        eriRouterQosSubsRLClassIPv6ExceedDroppedPkts,
+        eriRouterQosSubsRLClassIPv6ViolateOctets,
+        eriRouterQosSubsRLClassIPv6ViolatePkts,
+        eriRouterQosSubsRLClassIPv6ViolateDroppedOctets,
+        eriRouterQosSubsRLClassIPv6ViolateDroppedPkts
+    }
+    STATUS    current
+    DESCRIPTION
+        "The collection of objects which allow monitoring subscriber
+         circuits that have class-based policing/metering policies
+         enabled."
+    ::= { eriRouterQosGroups 5 }
+
+eriRouterQosHierarchicalPolicyStatsGroup OBJECT-GROUP
+    OBJECTS {
+        eriRouterQosHierarchicalPolicyName,
+        eriRouterQosHierarchicalPolicyDroppedOctets,
+        eriRouterQosHierarchicalPolicyDroppedPkts,
+        eriRouterQosHierarchicalPClassName,
+        eriRouterQosHierarchicalPClassDroppedOctets,
+        eriRouterQosHierarchicalPClassDroppedPkts
+    }
+    STATUS    current
+    DESCRIPTION
+        "The collection of objects which allow monitoring circuits
+         that have hierarchical policies enabled."
+    ::= { eriRouterQosGroups 6 }
+
+END

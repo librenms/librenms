@@ -1,0 +1,115 @@
+-- %DNP%
+-- %DNP% $Source: /cvsroot/pkt/sw/se/xc/bsd/config/snmp/mibs/Attic/ERICSSON-ROUTER-ICR-CAP.my,v $
+-- *****************************************************************
+-- ERICSSON-ROUTER-CPG-MIB    Ericsson Inter Chassis Resilience(ICR) MIB 
+--
+-- Copyright (c) 2011, 2015 Ericsson AB.
+-- All rights reserved.
+--
+-- *****************************************************************
+
+ERICSSON-ROUTER-ICR-CAP DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY
+                FROM SNMPv2-SMI
+        AGENT-CAPABILITIES
+                FROM SNMPv2-CONF
+        eriRouterCapabilities
+                FROM ERICSSON-ROUTER-SMI;
+
+eriRouterIcrCap MODULE-IDENTITY
+    LAST-UPDATED    "201501141800Z" -- Jan 14, 2015
+    ORGANIZATION    "Ericsson AB."
+    CONTACT-INFO
+            "       Ericsson, Inc.
+
+            Postal: 100 Headquarters Drive
+                    San Jose, CA  95134-1370
+                    USA
+
+             Phone: +1 408 750 5000
+               Fax: +1 408 750 5599"
+
+    DESCRIPTION
+        "The Agent Capabilities of Inter Chassis Resilience(ICR) MIB
+        implementation."
+
+    REVISION    "201501141800Z" -- Jan 14, 2015
+    DESCRIPTION
+           "Updated RBN/rbn/Rbn as ERICSSON-ROUTER/eriRouter/EriRouter
+            to migrate RBN MIB to ERICSSON MIB."
+
+    REVISION    "201101100000Z" -- Jan 10, 2011
+    DESCRIPTION
+           "Initial version"
+        ::= { eriRouterCapabilities 101 }
+
+eriRouterIcrCap1 AGENT-CAPABILITIES
+    PRODUCT-RELEASE "SEOS 11.1.x"
+    STATUS          current
+    DESCRIPTION     "ERICSSON-ROUTER-ICR-MIB capabilities"
+    SUPPORTS        ERICSSON-ROUTER-ICR-MIB
+    INCLUDES {
+        eriRouterIcrGroup,
+        eriRouterIcrNotificationObjectGroup,
+        eriRouterIcrNotificationGroup
+    }
+
+    VARIATION   eriRouterIcrLocalAddressType 
+    ACCESS      read-only 
+    DESCRIPTION
+        "Write access is not supported."
+
+    VARIATION   eriRouterIcrLocalAddress 
+    ACCESS      read-only 
+    DESCRIPTION
+        "Write access is not supported."
+
+    VARIATION   eriRouterIcrLocalPort 
+    ACCESS      read-only 
+    DESCRIPTION
+        "Write access is not supported."
+
+    VARIATION   eriRouterIcrPeerAddressType 
+    ACCESS      read-only 
+    DESCRIPTION
+        "Write access is not supported."
+
+    VARIATION   eriRouterIcrPeerAddress 
+    ACCESS      read-only 
+    DESCRIPTION
+        "Write access is not supported."
+
+    VARIATION   eriRouterIcrPeerPort 
+    ACCESS      read-only 
+    DESCRIPTION
+        "Write access is not supported."
+
+    VARIATION   eriRouterIcrPriority 
+    ACCESS      read-only 
+    DESCRIPTION
+        "Write access is not supported."
+
+    VARIATION   eriRouterIcrKeepAliveInterval
+    ACCESS      read-only 
+    DESCRIPTION
+        "Write access is not supported."
+
+    VARIATION   eriRouterIcrHoldTime 
+    ACCESS      read-only 
+    DESCRIPTION
+        "Write access is not supported."
+
+    VARIATION   eriRouterIcrAdminStatus 
+    ACCESS      read-only
+    DESCRIPTION
+        "Writ access is not supported."
+
+    VARIATION   eriRouterIcrRowStatus 
+    ACCESS      read-only
+    DESCRIPTION
+        "Write access is not supported."
+    ::= { eriRouterIcrCap 1 }
+
+END

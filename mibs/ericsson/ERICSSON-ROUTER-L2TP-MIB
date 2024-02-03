@@ -1,0 +1,1813 @@
+-- %DNP% $Id: ERICSSON-ROUTER-L2TP-MIB.my,v 1.1.2.5.250.2 2011/02/22 17:26:17 thatcher Exp $
+-- %DNP% $Source: /cvsroot/pkt/sw/se/xc/bsd/config/snmp/mibs/Attic/ERICSSON-ROUTER-L2TP-MIB.my,v $
+-- *****************************************************************
+-- ERICSSON-ROUTER-L2TP-MIB    L2TP MIB
+--
+-- Copyright (c) 2003-2009, 2011, 2015 Ericsson AB.
+-- All rights reserved.
+--
+-- *****************************************************************
+
+ERICSSON-ROUTER-L2TP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    	Counter32, Gauge32, Counter64, Unsigned32,
+    	MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE
+        	FROM SNMPv2-SMI
+    	TEXTUAL-CONVENTION, TruthValue, DateAndTime
+        	FROM SNMPv2-TC
+        SnmpAdminString
+                FROM SNMP-FRAMEWORK-MIB
+    	OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP
+        	FROM SNMPv2-CONF
+        InetAddressType, InetAddress
+                FROM INET-ADDRESS-MIB
+
+    	eriRouterMgmt
+        	FROM ERICSSON-ROUTER-SMI;
+
+
+eriRouterL2tpMib    MODULE-IDENTITY
+        LAST-UPDATED    "201501141800Z" -- Jan 14, 2015
+        ORGANIZATION    "Ericsson AB."
+        CONTACT-INFO
+                "       Ericsson AB.
+
+                Postal: 100 Headquarters Dr
+                        San Jose, CA  95134
+                        USA
+
+                 Phone: +1 408 750 5000
+                   Fax: +1 408 750 5599
+                "
+    	DESCRIPTION
+        	"Defines the objects necessary to monitor L2TP configuration
+		information, counters and the state changes of an L2TP tunnel.
+
+		All mib objects defined in the module are viewed within the
+		context identified in the SNMP protocol (i.e. the community
+		string in the v1/v2 or the contextName in v3)."
+
+        REVISION        "201501141800Z" -- Jan 14, 2015
+        DESCRIPTION
+                "Updated RBN/rbn/Rbn as ERICSSON-ROUTER/eriRouter/EriRouter
+                 to migrate RBN MIB to ERICSSON MIB."
+
+        REVISION        "201101191800Z" -- Jan 19, 2011
+        DESCRIPTION
+                "Update CONTACT-INFO & ORGANIZATION. "
+
+    	REVISION        "200904200000Z" -- April 20, 2009
+    	DESCRIPTION
+                "Added waitRouteUp in TunStateType. "
+
+    	REVISION        "200502280000Z" -- Feb 28, 2005
+    	DESCRIPTION
+		"Added new table eriRouterL2tpPeerTunCfgTable.
+
+		Updated the compliance statements and groups to reflect the 
+		change."
+
+    	REVISION        "200402040000Z" -- Feb 4, 2004
+    	DESCRIPTION
+		"Added new objects eriRouterL2tpTCfgRemoteTunnelID and 
+		eriRouterL2tpTCfgTunnelContext to eriRouterL2tpTunnelCfgEntry.
+		Added new NOTIFICATION-TYPE eriRouterL2tpMibTunnelStateChange2.
+		Deprecated eriRouterL2tpMibTunnelTrapContext, 
+		eriRouterL2tpMibTunnelTrapState, and eriRouterL2tpMibTunnelStateChange.
+		Updated the compliance statements and groups to reflect the 
+		changes."
+
+    	REVISION        "200304250000Z"
+    	DESCRIPTION
+        	"Initial version."
+
+       	::= { eriRouterMgmt 28}
+
+
+   --
+   --      Definitions of significant branches
+   --
+eriRouterL2tpMibNotifications       OBJECT IDENTIFIER  ::= { eriRouterL2tpMib 0 }
+eriRouterL2tpMibObjects         OBJECT IDENTIFIER  ::= { eriRouterL2tpMib 1 }
+eriRouterL2tpMibConformance     OBJECT IDENTIFIER  ::= { eriRouterL2tpMib 2 }
+
+   --      textual conventions
+
+	AuthType ::=TEXTUAL-CONVENTION
+	    STATUS    current
+	    DESCRIPTION 
+		"Common authentication types."
+
+	    SYNTAX	INTEGER {
+			    other(0),
+			    pap(1),
+			    chap(2),
+			    chapPap(3)
+			}
+
+
+	LacLnsType ::=TEXTUAL-CONVENTION
+	    STATUS    current
+	    DESCRIPTION 
+		"Peer operational mode types."
+
+	    SYNTAX	INTEGER {
+			    other(1),
+			    lac(2),
+			    lns(3),
+			    lacLns(4)
+			}
+
+	TunStateType ::=TEXTUAL-CONVENTION
+	    STATUS    current
+	    DESCRIPTION 
+		"Tunnel operational states."
+
+	    SYNTAX	INTEGER {
+        		    invalid(0),
+			    deleted(1),
+			    idle(2),
+        		    created(3),
+			    waitAAA(4),
+			    waitCtlReply(5),
+			    waitCtlConn(6),
+			    established(7),
+			    waitRouteUp(8)
+			}
+
+	CtlErrType ::=TEXTUAL-CONVENTION
+	    STATUS    current
+	    DESCRIPTION 
+		"Tunnel control errors."
+
+	    SYNTAX	INTEGER {
+			    ctlrunt(0),
+			    hdr2long(1),
+			    dupSCCRQ(2),
+			    duppkt(3),
+			    droppkt(4),
+			    badCmType(5),
+			    avp2long(6),
+			    avpUnknown(7),
+			    typeNot1st(8),
+			    mtype000(9),
+			    cantUnhide(10),
+			    avpLen(11),
+			    missAvp(12),
+			    invalidAvp(13),
+			    avp2big(14),
+			    badAvpLen(15),
+			    rexmt(16),
+			    scksnderr(17),
+			    remWndoful(18),
+			    maxRexmts(19),
+			    sccrqColide(20),
+			    badVers(21),
+			    noChapRsp(22),
+			    authFailed(23),
+			    sesExists(24),
+			    badcrpsesi(25),
+			    cdnBadid(26),
+			    iccnBadid(27),
+			    dataRunt(28),
+			    badSCCRQna(29),
+			    badSCCRP(30),
+			    dupIcrq(31),
+			    badSCCCN(32),
+			    badMsgType(33),
+			    sccrqSteal(34),
+			    remXmtState(35),
+			    cdnThrottle(36),
+			    none(255)
+			}
+			    
+	EthEncapType ::=TEXTUAL-CONVENTION
+	    STATUS    current
+	    DESCRIPTION 
+		"Ethernet encapsulation types."
+
+	    SYNTAX	INTEGER {
+			    other(0),
+			    ethPpoe(1),
+			    ethMulti(2),
+			    ethernet(3)
+			}
+
+	DNISType ::=TEXTUAL-CONVENTION
+	    STATUS    current
+	    DESCRIPTION 
+		"Tunnel switch DNIS type."
+
+	    SYNTAX	INTEGER {
+			    other(0),
+			    dnis(1),
+			    dnisonly(2)
+			}
+
+   --      The L2TP Peer Information Table
+   --
+   --      This table contains objects that can be used to
+   --      display the information about an L2TP peer.
+
+eriRouterL2tpPeerCfgTable   OBJECT-TYPE
+       SYNTAX          SEQUENCE OF EriRouterL2tpPeerCfgEntry
+       MAX-ACCESS      not-accessible
+       STATUS          current
+       DESCRIPTION
+          "The L2TP Peer Information Table."
+       ::= { eriRouterL2tpMibObjects 1 }
+
+eriRouterL2tpPeerCfgEntry   OBJECT-TYPE
+       SYNTAX          EriRouterL2tpPeerCfgEntry
+       MAX-ACCESS      not-accessible
+       STATUS          current
+       DESCRIPTION
+	    "An L2TP Peer Information entry. An entry in this
+	    table corresponds to the resources assigned to a
+	    single peer configuration. This configuration will
+	    be inherited by all of the tunnels that are assigned 
+	    to the peer group. Entries are added to the table once
+	    communication is established with the peer.  Entries
+	    are removed if communication is lost."
+       INDEX { IMPLIED eriRouterL2tpMibPeerName }
+       ::= { eriRouterL2tpPeerCfgTable 1 }
+
+EriRouterL2tpPeerCfgEntry ::=
+       SEQUENCE {
+	    eriRouterL2tpMibPeerName         SnmpAdminString,
+	    eriRouterL2tpPCfgMedia           SnmpAdminString,
+	    eriRouterL2tpPCfgVendor          SnmpAdminString,
+	    eriRouterL2tpPCfgRev             Unsigned32,
+	    eriRouterL2tpPCfgHostName        SnmpAdminString,
+	    eriRouterL2tpPCfgRadius          TruthValue,
+	    eriRouterL2tpPCfgRemIPAddType    InetAddressType,
+	    eriRouterL2tpPCfgRemIPAdd        InetAddress,
+	    eriRouterL2tpPCfgStatic          TruthValue,
+	    eriRouterL2tpPCfgLocalIPAddType  InetAddressType,
+	    eriRouterL2tpPCfgLocalIPAdd      InetAddress,
+	    eriRouterL2tpPCfgMode            LacLnsType,
+	    eriRouterL2tpPCfgMaxTunnels      Gauge32,
+	    eriRouterL2tpPCfgMaxSesPerTun    Gauge32,
+	    eriRouterL2tpPCfgCtlRetranCnt    Counter32,
+	    eriRouterL2tpPCfgCtlRetranTO     Unsigned32,
+	    eriRouterL2tpPCfgSessAuth        AuthType,
+	    eriRouterL2tpPCfgCtlWin          Gauge32,
+	    eriRouterL2tpPCfgDNIS            DNISType,
+	    eriRouterL2tpPCfgPoliceRate      Unsigned32,
+	    eriRouterL2tpPCfgPoliceBurst     Unsigned32,
+	    eriRouterL2tpPCfgLimitRate       Unsigned32,
+	    eriRouterL2tpPCfgLimitBurst      Unsigned32,
+	    eriRouterL2tpPCfgGroup           SnmpAdminString,
+	    eriRouterL2tpPCfgPref            Unsigned32,
+	    eriRouterL2tpPCfgPasswd          SnmpAdminString,
+	    eriRouterL2tpPCfgHelloTimer      Unsigned32,
+	    eriRouterL2tpPCfgRecQue          TruthValue,
+	    eriRouterL2tpPCfgSessContext     SnmpAdminString,
+	    eriRouterL2tpPCfgSessService     SnmpAdminString,
+	    eriRouterL2tpPCfgEthEncap        EthEncapType,
+	    eriRouterL2tpPCfgEthSession      SnmpAdminString,
+	    eriRouterL2tpPCfgTunnelCount     Counter32,
+	    eriRouterL2tpPCfgTunCtlErrs      Counter32,
+	    eriRouterL2tpPCfgSessionCount    Counter32
+	   
+	    }
+
+eriRouterL2tpMibPeerName OBJECT-TYPE
+    	SYNTAX  SnmpAdminString (SIZE (1..255))
+    	MAX-ACCESS  not-accessible
+    	STATUS      current
+    	DESCRIPTION
+	    "This object identifies the name of the Peer on the local
+	    system.  This peer is the name of an identifier for a 
+	    tunnel configuration and each tunnel that is assigned to 
+	    this peer will take on the peer's configuration parameters."
+    	::= { eriRouterL2tpPeerCfgEntry 1 }
+
+eriRouterL2tpPCfgMedia OBJECT-TYPE
+    	SYNTAX          SnmpAdminString (SIZE (0..10))
+    	MAX-ACCESS      read-create
+    	STATUS          current
+    	DESCRIPTION 
+	    "This object identifies the transport media utilized 
+	    between communicating peers. A media length of 0 means that
+	    no transport media type was set."
+    	::= { eriRouterL2tpPeerCfgEntry 2 }
+
+eriRouterL2tpPCfgVendor OBJECT-TYPE
+    	SYNTAX          SnmpAdminString (SIZE (0..60))
+    	MAX-ACCESS      read-only
+    	STATUS          current
+    	DESCRIPTION 
+	    "This object identifies the vendor of L2TP stack running on
+	    the remote peer. The length of the string will be zero if no
+	    vendor name can be obtained from the peer." 
+    	::= { eriRouterL2tpPeerCfgEntry 3 }
+
+eriRouterL2tpPCfgRev  OBJECT-TYPE
+    	SYNTAX          Unsigned32
+    	MAX-ACCESS      read-only
+    	STATUS          current
+    	DESCRIPTION 
+	    "This object identifies the firmware revision for the L2TP
+	    protocol stack running on the remote peer."
+    	::= { eriRouterL2tpPeerCfgEntry 4 }
+
+eriRouterL2tpPCfgHostName OBJECT-TYPE
+    	SYNTAX          SnmpAdminString (SIZE (0..255))
+    	MAX-ACCESS      read-only
+    	STATUS          current
+    	DESCRIPTION 
+	    "This object identifies the name assigned to this peer on the
+	    remote host system. A host name length of 0 means that this
+ 	    information could not be obtained from the remote host."
+    	::= { eriRouterL2tpPeerCfgEntry 5 }
+
+eriRouterL2tpPCfgRadius OBJECT-TYPE
+    	SYNTAX          TruthValue
+    	MAX-ACCESS      read-only
+    	STATUS          current
+    	DESCRIPTION 
+	    "This object indicates whether or not a RADIUS server
+	    has been configured for this peer group. A value of true (1) indicates 
+	    that there is a RADIUS server and it will be used for authenticating
+	    and authorizing access to a tunnel in this group and accounting 
+	    information will be sent to the radius server. A value of false (2) 
+	    indicates that there is no RADIUS server and authentication and
+	    authorization will be done locally."
+    	::= { eriRouterL2tpPeerCfgEntry 6 }
+
+eriRouterL2tpPCfgRemIPAddType OBJECT-TYPE
+        SYNTAX      InetAddressType     
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object identifies the address type contained in 
+	    eriRouterL2tpPCfgRemIPAdd."
+        ::= { eriRouterL2tpPeerCfgEntry 7 }
+
+eriRouterL2tpPCfgRemIPAdd OBJECT-TYPE
+    	SYNTAX          InetAddress
+    	MAX-ACCESS      read-create
+    	STATUS          current
+    	DESCRIPTION
+	    "This object identifies the remote IP address for
+	    this tunnel (utilized only with User Datagram Protocol)."
+    	::= { eriRouterL2tpPeerCfgEntry 8 }
+
+eriRouterL2tpPCfgStatic OBJECT-TYPE
+    	SYNTAX          TruthValue 
+    	MAX-ACCESS      read-create
+    	STATUS          current
+    	DESCRIPTION 
+	    "This objects indicates whether the tunnel is
+	    static or dynamic. A value of true (1) means that it is static.
+	    A value of (2) indicates that it is dynamic."
+    	::= { eriRouterL2tpPeerCfgEntry 9 }
+
+eriRouterL2tpPCfgLocalIPAddType OBJECT-TYPE
+        SYNTAX      InetAddressType     
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object identifies the address type contained in 
+	    eriRouterL2tpPCfgLocalIPAdd."
+        ::= { eriRouterL2tpPeerCfgEntry 10 }
+
+eriRouterL2tpPCfgLocalIPAdd OBJECT-TYPE
+    	SYNTAX          InetAddress
+    	MAX-ACCESS      read-create
+    	STATUS          current
+    	DESCRIPTION 
+	    "This object indicates the local IP address
+	    for this tunnel (utilized only with UDP)."
+    	::= { eriRouterL2tpPeerCfgEntry 11 }
+
+eriRouterL2tpPCfgMode OBJECT-TYPE
+    	SYNTAX          LacLnsType
+    	MAX-ACCESS      read-create
+    	STATUS          current
+        DESCRIPTION 
+	    "This object indicates whether the peer
+	    is operating as an LNS, a LAC, or both."
+    	::= { eriRouterL2tpPeerCfgEntry 12 }
+
+eriRouterL2tpPCfgMaxTunnels OBJECT-TYPE
+        SYNTAX          Gauge32
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION 
+	    "This object indicates the maximum number 
+	    of tunnels that may be configured on this peer."
+        ::= { eriRouterL2tpPeerCfgEntry 14 }
+
+eriRouterL2tpPCfgMaxSesPerTun OBJECT-TYPE
+        SYNTAX          Gauge32
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION 
+	    "This object indicates the maximum number of 
+	    sessions that may be allocated to one tunnel."
+        ::= { eriRouterL2tpPeerCfgEntry 15 }
+
+eriRouterL2tpPCfgCtlRetranCnt OBJECT-TYPE
+    	SYNTAX          Counter32
+    	MAX-ACCESS      read-only
+    	STATUS          current
+    	DESCRIPTION 
+	    "This object indicates a count of the number of
+	    times that a control packet was retransmitted."
+    	::= { eriRouterL2tpPeerCfgEntry 16 }
+
+eriRouterL2tpPCfgCtlRetranTO OBJECT-TYPE
+    	SYNTAX          Unsigned32 (0..255)
+	UNITS		"seconds"
+    	MAX-ACCESS      read-create
+    	STATUS          current
+    	DESCRIPTION 
+	    "This object indicates the control retransmit
+	    timeout in seconds."
+    	::= { eriRouterL2tpPeerCfgEntry 17 }
+
+eriRouterL2tpPCfgSessAuth OBJECT-TYPE
+    	SYNTAX          AuthType
+    	MAX-ACCESS      read-create
+    	STATUS          current
+    	DESCRIPTION 
+	    "This object indicates the session authentication
+	    type."
+    	::= { eriRouterL2tpPeerCfgEntry 18 }
+
+eriRouterL2tpPCfgCtlWin OBJECT-TYPE
+    	SYNTAX          Gauge32 (0..65535)
+    	MAX-ACCESS      read-create
+    	STATUS          current
+    	DESCRIPTION 
+	    "This object indicates the control window size."
+    	::= { eriRouterL2tpPeerCfgEntry 19 }
+
+eriRouterL2tpPCfgDNIS OBJECT-TYPE
+    	SYNTAX          DNISType
+    	MAX-ACCESS      read-create
+    	STATUS          current
+        DESCRIPTION 
+	    "This object indicates whether the critera used 
+	    for a tunnel switch is Dialed Number Identification 
+	    String first (a value of (1)), DNIS only (a value of (2)) or
+	    the no preference has been set (a value of (0))."
+    	::= { eriRouterL2tpPeerCfgEntry 20 }
+
+eriRouterL2tpPCfgPoliceRate OBJECT-TYPE
+        SYNTAX          Unsigned32
+	UNITS		"kbps"
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION 
+	    "This object indicates the received aggregate
+	    stream limit, in kilobits per second."
+        ::= { eriRouterL2tpPeerCfgEntry 21 }
+
+eriRouterL2tpPCfgPoliceBurst OBJECT-TYPE
+        SYNTAX          Unsigned32
+	UNITS		"kbps"
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION 
+	    "This object indicates the packet burst tolerance
+	    for tunnels received by this peer group."
+        ::= { eriRouterL2tpPeerCfgEntry 22 }
+
+eriRouterL2tpPCfgLimitRate OBJECT-TYPE
+        SYNTAX          Unsigned32
+	UNITS		"kbps"
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION 
+            "This object indicates the limit of the aggregate packet 
+	    stream transmitted through a tunnel in kilobits per 
+	    second (kpbs)."
+        ::= { eriRouterL2tpPeerCfgEntry 23 }
+
+eriRouterL2tpPCfgLimitBurst OBJECT-TYPE
+        SYNTAX          Unsigned32
+	UNITS		"kbps"
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION 
+            "This object indicates the the packet burst tolerance limit 
+	    transmitted on a tunnel."
+        ::= { eriRouterL2tpPeerCfgEntry 24 }
+
+eriRouterL2tpPCfgGroup OBJECT-TYPE
+        SYNTAX          SnmpAdminString 
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION 
+	    "This object indicates the l2tp group which is assigned
+	    to this peer. Each peer configuration may be assigned only one 
+	    tunnel group. A length of 0 means that the group name was not 
+	    assigned."
+        ::= { eriRouterL2tpPeerCfgEntry 25 }
+
+eriRouterL2tpPCfgPref OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION 
+	    "This object indicates the RADIUS based preference
+	    number (used by tunnel groups only). A lower number indicates a
+	    more favorible preference."
+        ::= { eriRouterL2tpPeerCfgEntry 26 }
+
+eriRouterL2tpPCfgPasswd OBJECT-TYPE
+        SYNTAX          SnmpAdminString (SIZE (0..20))
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION 
+	    "This object indicates the password for this account
+	    utilized when performing the connection handshake protocol with the
+	    remote host. A length of 0 indicates that no password has been
+	    assigned."
+        ::= { eriRouterL2tpPeerCfgEntry 27 }
+
+eriRouterL2tpPCfgHelloTimer OBJECT-TYPE
+        SYNTAX          Unsigned32 (0..3600)
+	UNITS		"seconds"
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION 
+	    "This object defines the interval (in seconds) in
+            which Hello (or keep-alive) packets are to be sent
+            by local tunnels belonging to this tunnel configuration."
+        ::= { eriRouterL2tpPeerCfgEntry 28 }
+
+eriRouterL2tpPCfgRecQue OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION 
+	    "This object indicates whether there is receive
+	    queueing of out of sequence messages. A value of true (1)
+	    indicates that the messages are queued."
+        ::= { eriRouterL2tpPeerCfgEntry 29 }
+
+eriRouterL2tpPCfgSessContext OBJECT-TYPE
+        SYNTAX          SnmpAdminString (SIZE (0..80))
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION 
+	    "This object indicates the name of the session 
+	    context. A size of 0 indicates that the context could not
+	    be determined.  Any context name length greater than 80 
+	    will be truncated. This will have a value for PPPoE only."
+        ::= { eriRouterL2tpPeerCfgEntry 30 }
+
+eriRouterL2tpPCfgSessService OBJECT-TYPE
+        SYNTAX          SnmpAdminString (SIZE (0..20))
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION 
+	    "The service group to which this session belongs.
+	    A length of 0 indicates that no service group was assigned."
+        ::= { eriRouterL2tpPeerCfgEntry 31 }
+
+eriRouterL2tpPCfgEthEncap OBJECT-TYPE
+        SYNTAX          EthEncapType
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION 
+	    "This object indicates the ethernet encap type."
+        ::= { eriRouterL2tpPeerCfgEntry 32 }
+
+eriRouterL2tpPCfgEthSession OBJECT-TYPE
+        SYNTAX          SnmpAdminString (SIZE (0..20))
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION 
+	    "This object indicates the ethernet session of
+	    which this is a part. This is only set for non PPPoE sessions
+	    otherwise it will have a zero length."
+        ::= { eriRouterL2tpPeerCfgEntry 33 }
+
+eriRouterL2tpPCfgTunnelCount OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION 
+	    "This object indicates the number of tunnels 
+	    that are active for this peer configuration."
+        ::= { eriRouterL2tpPeerCfgEntry 34 }
+
+eriRouterL2tpPCfgTunCtlErrs OBJECT-TYPE
+        SYNTAX          Counter32 
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION 
+	    "This object is a count of the number of tunnel
+	    control errors encountered by tunnels connected to this peer."
+        ::= { eriRouterL2tpPeerCfgEntry 35 }
+
+eriRouterL2tpPCfgSessionCount OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION 
+	    "This object is a count of the number of sessions 
+	    that are part of this peer."
+        ::= { eriRouterL2tpPeerCfgEntry 36 }
+
+
+
+
+
+eriRouterL2tpTunnelCfgTable   OBJECT-TYPE
+        SYNTAX          SEQUENCE OF EriRouterL2tpTunnelCfgEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+           "The L2TP Tunnel Information Table."
+        ::= { eriRouterL2tpMibObjects 2 }
+
+eriRouterL2tpTunnelCfgEntry   OBJECT-TYPE
+        SYNTAX          EriRouterL2tpTunnelCfgEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+           "An L2TP Tunnel Information entry. An entry in this
+            table corresponds to a single tunnel. Entries are added
+	    to this table as tunnels become connected. Entries are
+	    removed from the table if the communication with one or 
+	    both ends of a tunnel is lost."
+        INDEX { eriRouterL2tpMibTunnelID }
+        ::= { eriRouterL2tpTunnelCfgTable 1 }
+
+EriRouterL2tpTunnelCfgEntry ::=
+        SEQUENCE {
+	    eriRouterL2tpMibTunnelID          Unsigned32,
+	    eriRouterL2tpTCfgTunnelNm		SnmpAdminString,
+	    eriRouterL2tpTCfgPeerName		SnmpAdminString,
+	    eriRouterL2tpTCfgTunCtlErrs       Counter32,
+	    eriRouterL2tpTCfgLastCtlErr       CtlErrType,
+	    eriRouterL2tpTCfgLastCErrTime     DateAndTime,
+	    eriRouterL2tpTCfgTunDataErrs      Counter32,
+	    eriRouterL2tpTCfgLastDataErr      Unsigned32,
+	    eriRouterL2tpTCfgLastDErrTime     DateAndTime,
+	    eriRouterL2tpTCfgSessionCount     Gauge32,
+	    eriRouterL2tpTCfgTotActSessions   Counter32,
+	    eriRouterL2tpTCfgActSessCnt       Gauge32,
+	    eriRouterL2tpTCfgTotFailSessions  Counter32,
+	    eriRouterL2tpMibTunnelState       TunStateType,
+	    eriRouterL2tpTCfgRemoteTunnelID   Unsigned32,
+	    eriRouterL2tpTCfgTunnelContext    SnmpAdminString
+        }
+
+eriRouterL2tpMibTunnelID OBJECT-TYPE
+    	SYNTAX  Unsigned32 (0..65535)
+    	MAX-ACCESS  	not-accessible
+    	STATUS      	current
+        DESCRIPTION
+            "This object indicates the ID number of this tunnel."
+        ::= { eriRouterL2tpTunnelCfgEntry 1 }
+
+eriRouterL2tpTCfgTunnelNm OBJECT-TYPE
+    	SYNTAX  	SnmpAdminString (SIZE (1..80))
+    	MAX-ACCESS  	read-only
+    	STATUS      	current
+    	DESCRIPTION
+       	    "This object indicates the local name that was given to this
+	    tunnel."
+    	::= { eriRouterL2tpTunnelCfgEntry 2 }
+
+eriRouterL2tpTCfgPeerName OBJECT-TYPE
+        SYNTAX          SnmpAdminString (SIZE (1..80))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION 
+	    "This object indicates the remote peer to which this
+	    tunnel is connected."
+        ::= { eriRouterL2tpTunnelCfgEntry 3 }
+
+eriRouterL2tpTCfgTunCtlErrs OBJECT-TYPE
+        SYNTAX          Counter32 
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION 
+	    "This object is a count of the number of tunnel
+	    control errors encountered by this tunnel."
+        ::= { eriRouterL2tpTunnelCfgEntry 4 }
+
+eriRouterL2tpTCfgLastCtlErr OBJECT-TYPE
+        SYNTAX          CtlErrType 
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION 
+	    "The value of the last control error."
+        ::= { eriRouterL2tpTunnelCfgEntry 5 }
+
+eriRouterL2tpTCfgLastCErrTime OBJECT-TYPE
+        SYNTAX          DateAndTime
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION 
+	    "The time of the last control error."
+        ::= { eriRouterL2tpTunnelCfgEntry 6 }
+
+eriRouterL2tpTCfgTunDataErrs OBJECT-TYPE
+        SYNTAX          Counter32 
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION 
+	    "The number of tunnel data errors."
+        ::= { eriRouterL2tpTunnelCfgEntry 7 }
+
+eriRouterL2tpTCfgLastDataErr OBJECT-TYPE
+        SYNTAX          Unsigned32 
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION 
+	    "The value of the last tunnel data error."
+        ::= { eriRouterL2tpTunnelCfgEntry 8 }
+
+eriRouterL2tpTCfgLastDErrTime OBJECT-TYPE
+        SYNTAX          DateAndTime
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION 
+	    "The time of the last tunnel data error."
+        ::= { eriRouterL2tpTunnelCfgEntry 9 }
+
+eriRouterL2tpTCfgSessionCount OBJECT-TYPE
+        SYNTAX          Gauge32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION 
+	    "The number of sessions belonging to this tunnel."
+        ::= { eriRouterL2tpTunnelCfgEntry 10 }
+
+eriRouterL2tpTCfgTotActSessions OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION 
+	    "This object indicates the total number of 
+	sessions that, at some time, reached the established state."
+        ::= { eriRouterL2tpTunnelCfgEntry 11 }
+
+eriRouterL2tpTCfgActSessCnt OBJECT-TYPE
+        SYNTAX          Gauge32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION 
+	    "This object indicates the total number of 
+	sessions that are presently in the established state."
+        ::= { eriRouterL2tpTunnelCfgEntry 12 }
+
+eriRouterL2tpTCfgTotFailSessions OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION 
+	    "This object indicates the number of sessions that
+	failed to reach the established state."
+        ::= { eriRouterL2tpTunnelCfgEntry 13 }
+
+eriRouterL2tpMibTunnelState OBJECT-TYPE
+    	SYNTAX      TunStateType
+    	MAX-ACCESS  read-only
+    	STATUS      current
+    	DESCRIPTION
+       	    "This object is the current state of the tunnel."
+    	::= { eriRouterL2tpTunnelCfgEntry 14 }
+
+eriRouterL2tpTCfgRemoteTunnelID OBJECT-TYPE
+        SYNTAX  Unsigned32 (0..65535)
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the remote tunnel ID.  A value of
+            zero indicates that the remote tunnel ID could not be
+            determined."
+        ::= { eriRouterL2tpTunnelCfgEntry 15 }
+
+eriRouterL2tpTCfgTunnelContext OBJECT-TYPE
+        SYNTAX          SnmpAdminString (SIZE (0..80))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object identifies the context of this tunnel. The
+            empty context name (zero length) indicates that the context
+            could not be determined.  Any context name length greater
+            than 80 will be truncated."
+        ::= { eriRouterL2tpTunnelCfgEntry 16 }
+
+
+
+
+
+eriRouterL2tpPeerCntTable   OBJECT-TYPE
+        SYNTAX          SEQUENCE OF EriRouterL2tpPeerCntEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+              "The L2TP Peer Statistics Table."
+        ::= { eriRouterL2tpMibObjects 4 }
+
+eriRouterL2tpPeerCntEntry   OBJECT-TYPE
+        SYNTAX          EriRouterL2tpPeerCntEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+              "An L2TP Peer Statistics entry. An entry in this
+               table corresponds to a single peer. The statistics
+	       reported are the totals for all tunnels that are
+	       a part of this peer group."
+        INDEX { IMPLIED eriRouterL2tpMibPeerName }
+        ::= { eriRouterL2tpPeerCntTable 1 }
+
+EriRouterL2tpPeerCntEntry ::=
+        SEQUENCE {
+	    eriRouterL2tpPCDataPktSent    Counter32,
+	    eriRouterL2tpPCDataPktRx      Counter32,
+	    eriRouterL2tpPCDataByteSent   Counter32,
+	    eriRouterL2tpPCDataByteRx     Counter32,
+	    eriRouterL2tpPCCtlPktSent     Counter32,
+	    eriRouterL2tpPCCtlPktRx       Counter32,
+	    eriRouterL2tpPCCtlByteSent    Counter32,
+	    eriRouterL2tpPCCtlByteRx      Counter32,
+	    eriRouterL2tpPCPolicePktDrop  Counter32,
+	    eriRouterL2tpPCRatePktDrop    Counter32,
+	    eriRouterL2tpPCTxSCCRQCnt     Counter32,
+	    eriRouterL2tpPCRxSCCRQCnt     Counter32,
+	    eriRouterL2tpPCActTunnels     Gauge32,
+	    eriRouterL2tpPCTunnelCtlErr   Counter32,
+	    eriRouterL2tpPCSessionCount   Gauge32,
+	    eriRouterL2tpPCTunnelDataErr  Counter32
+
+	}
+
+eriRouterL2tpPCDataPktSent OBJECT-TYPE
+        SYNTAX          Counter32
+	UNITS		"packets"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION 
+	    "This object is a count of the total number of 
+	    data packets sent through tunnels that are part of this 
+	    group to the the L2TP peer."
+        ::= { eriRouterL2tpPeerCntEntry 1 }
+
+eriRouterL2tpPCDataPktRx OBJECT-TYPE
+        SYNTAX          Counter32
+	UNITS		"packets"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION 
+	    "This object is a count of the total number of 
+	    data packets received through tunnels that are part of this
+	    group from the the L2TP peer."
+        ::= { eriRouterL2tpPeerCntEntry 2 }
+
+eriRouterL2tpPCDataByteSent OBJECT-TYPE
+        SYNTAX          Counter32
+	UNITS		"bytes"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION 
+	    "This object is a count of the total number of 
+	    data bytes sent through tunnels that are part of this group
+	    to the the L2TP peer."
+        ::= { eriRouterL2tpPeerCntEntry 3 }
+
+eriRouterL2tpPCDataByteRx OBJECT-TYPE
+        SYNTAX          Counter32
+	UNITS		"bytes"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION 
+	    "This object is a count of the total number of 
+	    data bytes received through tunnels that are part of this group
+	    from the the L2TP peer."
+        ::= { eriRouterL2tpPeerCntEntry 4 }
+
+eriRouterL2tpPCCtlPktSent OBJECT-TYPE
+        SYNTAX          Counter32
+	UNITS		"packets"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION 
+	    "This object is a count of the total number of 
+	    control packets sent through tunnels that are part of this group
+	    to the the L2TP peer."
+        ::= { eriRouterL2tpPeerCntEntry 5 }
+
+eriRouterL2tpPCCtlPktRx OBJECT-TYPE
+        SYNTAX          Counter32
+	UNITS		"packets"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION 
+	    "This object is a count of the total number of 
+	    control packets received through tunnels that are a part of this
+	    group from the L2TP peer."
+        ::= { eriRouterL2tpPeerCntEntry 6 }
+
+eriRouterL2tpPCCtlByteSent OBJECT-TYPE
+        SYNTAX          Counter32
+	UNITS		"bytes"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION 
+	    "This object is a count of the total number of 
+	    control bytes sent through tunnels that are a part of this 
+	    group to the the L2TP peer."
+        ::= { eriRouterL2tpPeerCntEntry 7 }
+
+eriRouterL2tpPCCtlByteRx OBJECT-TYPE
+        SYNTAX          Counter32
+	UNITS		"bytes"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION 
+	    "This object is a count of the total number of 
+	    control bytes received through tunnels that are a part of this
+	    group from the L2TP peer."
+        ::= { eriRouterL2tpPeerCntEntry 8 }
+
+eriRouterL2tpPCPolicePktDrop OBJECT-TYPE
+        SYNTAX          Counter32
+	UNITS		"packets"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION 
+	    "This object indicates the total number of 
+	    packets received from L2TP peers of tunnels that are 
+	    a part of this group that were dropped."
+        ::= { eriRouterL2tpPeerCntEntry 9 }
+
+eriRouterL2tpPCRatePktDrop OBJECT-TYPE
+        SYNTAX          Counter32
+	UNITS		"packets"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION 
+	    "This object indicates the total number of 
+	    packets transmitted to the L2TP peers of tunnels in this group 
+	    that were dropped."
+        ::= { eriRouterL2tpPeerCntEntry 10 }
+
+eriRouterL2tpPCTxSCCRQCnt OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION 
+	    "This object indicates a count of the SCCRQ 
+	    transmits for this group."
+        ::= { eriRouterL2tpPeerCntEntry 11 }
+
+eriRouterL2tpPCRxSCCRQCnt OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION 
+	    "This object is a count of the received SCCRQ's 
+	    for this group."
+        ::= { eriRouterL2tpPeerCntEntry 12 }
+
+eriRouterL2tpPCActTunnels OBJECT-TYPE
+        SYNTAX          Gauge32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION 
+	    "This object indicates the number of the 
+	    active tunnels for this group."
+        ::= { eriRouterL2tpPeerCntEntry 13 }
+
+eriRouterL2tpPCTunnelCtlErr OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION 
+	    "This object indicates the total number of 
+	    tunnel control errors for all of the tunnels that are a 
+	    part of this group."
+        ::= { eriRouterL2tpPeerCntEntry 14 }
+
+eriRouterL2tpPCSessionCount OBJECT-TYPE
+        SYNTAX          Gauge32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION 
+	    "This object indicates the total number of 
+	    sessions for this group."
+        ::= { eriRouterL2tpPeerCntEntry 15 }
+
+eriRouterL2tpPCTunnelDataErr OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION 
+	    "This object indicates the total number of 
+	    tunnel data errors reported by members of this group."
+        ::= { eriRouterL2tpPeerCntEntry 16 }
+
+
+
+
+eriRouterL2tpTunnelCntTable   OBJECT-TYPE
+        SYNTAX          SEQUENCE OF EriRouterL2tpTunnelCntEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+              "The L2TP Tunnel Statistics Table."
+        ::= { eriRouterL2tpMibObjects 5 }
+
+eriRouterL2tpTunnelCntEntry   OBJECT-TYPE
+        SYNTAX          EriRouterL2tpTunnelCntEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+              "An L2TP Tunnel Statistics entry. An entry in this
+               table corresponds to a single tunnel."
+        INDEX { eriRouterL2tpMibTunnelID }
+        ::= { eriRouterL2tpTunnelCntTable 1 }
+
+EriRouterL2tpTunnelCntEntry ::=
+        SEQUENCE {
+	    eriRouterL2tpTCDataPktSent     Counter32,
+	    eriRouterL2tpTCDataPktRcvd     Counter32,
+	    eriRouterL2tpTCDataByteSent    Counter32,
+	    eriRouterL2tpTCDataByteRcvd    Counter32,
+	    eriRouterL2tpTCCntrlPktSent    Counter32,
+	    eriRouterL2tpTCCntrlPktRcvd    Counter32,
+	    eriRouterL2tpTCCntrlByteSent   Counter32,
+	    eriRouterL2tpTCCntrlByteRcvd   Counter32,
+	    eriRouterL2tpTCPolicePktDrop   Counter32,
+	    eriRouterL2tpTCRatePktDrop     Counter32,
+	    eriRouterL2tpTCCntrlErr	     Unsigned32,
+	    eriRouterL2tpTCLastCtlErr	     CtlErrType,
+	    eriRouterL2tpTCLastCtlErrTime  DateAndTime,
+	    eriRouterL2tpTCMaxResendQ	     Gauge32,
+	    eriRouterL2tpTCMaxUnsentQ      Gauge32,
+	    eriRouterL2tpTCCurResendQ      Gauge32,
+	    eriRouterL2tpTCCurUnsentQ      Gauge32,
+	    eriRouterL2tpTCCurWindow       Gauge32
+
+	}
+
+eriRouterL2tpTCDataPktSent OBJECT-TYPE
+        SYNTAX          Counter32
+	UNITS		"packets"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION 
+	    "This object indicates the number of data 
+	    packets sent from this platform through this tunnel to
+	its peer."
+        ::= { eriRouterL2tpTunnelCntEntry 1 }
+
+eriRouterL2tpTCDataPktRcvd OBJECT-TYPE
+        SYNTAX          Counter32
+	UNITS		"packets"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION 
+	    "This object indicates the number of packets received 
+	    from the L2TP peer for this tunnel."
+        ::= { eriRouterL2tpTunnelCntEntry 2 }
+
+eriRouterL2tpTCDataByteSent OBJECT-TYPE
+        SYNTAX          Counter32
+	UNITS		"bytes"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION 
+	    "This object indicates the number of data bytes sent
+	    from this platform through this tunnel to its peer."
+        ::= { eriRouterL2tpTunnelCntEntry 3 }
+
+eriRouterL2tpTCDataByteRcvd OBJECT-TYPE
+        SYNTAX          Counter32
+	UNITS		"bytes"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION 
+	    "This object indicates the number of data bytes received
+	    from the L2TP peer for this tunnel."
+        ::= { eriRouterL2tpTunnelCntEntry 4 }
+
+eriRouterL2tpTCCntrlPktSent OBJECT-TYPE
+        SYNTAX          Counter32
+	UNITS		"packets"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION 
+	    "This object indicates the number of control packets sent
+	    from this platform through this tunnel to its L2TP peer."
+        ::= { eriRouterL2tpTunnelCntEntry 5 }
+
+eriRouterL2tpTCCntrlPktRcvd OBJECT-TYPE
+        SYNTAX          Counter32
+	UNITS		"packets"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION 
+	    "This object indicates the number of control packets received
+	    from the L2TP peer for this tunnel."
+        ::= { eriRouterL2tpTunnelCntEntry 6 }
+
+eriRouterL2tpTCCntrlByteSent OBJECT-TYPE
+        SYNTAX          Counter32
+	UNITS		"bytes"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION 
+	    "This object indicates the number of control bytes sent
+	    from this platform through this tunnel to its L2TP peer."
+        ::= { eriRouterL2tpTunnelCntEntry 7 }
+
+eriRouterL2tpTCCntrlByteRcvd OBJECT-TYPE
+        SYNTAX          Counter32
+	UNITS		"bytes"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION 
+	    "This object indicates the number of control bytes received
+	    from the L2TP peer of this tunnel."
+        ::= { eriRouterL2tpTunnelCntEntry 8 }
+
+eriRouterL2tpTCPolicePktDrop OBJECT-TYPE
+        SYNTAX          Counter32
+	UNITS		"packets"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION 
+	    "This object indicates the number of packets received from
+	    the L2TP peer of this tunnel that were dropped."
+        ::= { eriRouterL2tpTunnelCntEntry 9 }
+
+eriRouterL2tpTCRatePktDrop OBJECT-TYPE
+        SYNTAX          Counter32
+	UNITS		"packets"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION 
+	    "This object indicates the number of packets transmitted
+	    from this platform through this tunnel that were dropped."
+        ::= { eriRouterL2tpTunnelCntEntry 10 }
+
+eriRouterL2tpTCCntrlErr OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION 
+	    "This object indicate the number of control
+	    errors that were detected."
+        ::= { eriRouterL2tpTunnelCntEntry 11 }
+
+eriRouterL2tpTCLastCtlErr OBJECT-TYPE
+        SYNTAX          CtlErrType
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION 
+	    "This object indicates the last control error for this
+	    tunnel that was detected."
+        ::= { eriRouterL2tpTunnelCntEntry 12 }
+
+eriRouterL2tpTCLastCtlErrTime OBJECT-TYPE
+        SYNTAX          DateAndTime
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION 
+	    "This object indicates the time that the last
+	    control error for this tunnel was detected."
+        ::= { eriRouterL2tpTunnelCntEntry 13 }
+
+eriRouterL2tpTCMaxResendQ OBJECT-TYPE
+        SYNTAX          Gauge32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION 
+	    "This object indicates the maximum length of the
+	    resend queue."
+        ::= { eriRouterL2tpTunnelCntEntry 14 }
+
+eriRouterL2tpTCMaxUnsentQ OBJECT-TYPE
+        SYNTAX          Gauge32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION 
+	    "This object indicates the maximum length of the
+	    unsent queue."
+        ::= { eriRouterL2tpTunnelCntEntry 15 }
+
+eriRouterL2tpTCCurResendQ OBJECT-TYPE
+        SYNTAX          Gauge32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION 
+	    "This object indicates the current length of
+	    the resend queue."
+        ::= { eriRouterL2tpTunnelCntEntry 16 }
+
+eriRouterL2tpTCCurUnsentQ OBJECT-TYPE
+        SYNTAX          Gauge32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION 
+	    "This object indicates the current length of
+	    the unsent queue."
+        ::= { eriRouterL2tpTunnelCntEntry 17 }
+
+eriRouterL2tpTCCurWindow OBJECT-TYPE
+        SYNTAX          Gauge32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION 
+	    "This object indicates the current window size."
+        ::= { eriRouterL2tpTunnelCntEntry 18 }
+
+eriRouterL2tpSessionCntTable   OBJECT-TYPE
+        SYNTAX          SEQUENCE OF EriRouterL2tpSessionCntEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The L2TP Session Statistics Table."
+        ::= { eriRouterL2tpMibObjects 6 }
+
+eriRouterL2tpSessionCntEntry   OBJECT-TYPE
+        SYNTAX          EriRouterL2tpSessionCntEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An L2TP Session Statistics entry. An entry in this
+               table corresponds to a single session."
+        INDEX { eriRouterL2tpMibTunnelID,eriRouterL2tpMibSessionID }
+        ::= { eriRouterL2tpSessionCntTable 1 }
+
+EriRouterL2tpSessionCntEntry ::=
+        SEQUENCE {
+	    eriRouterL2tpMibSessionID      Unsigned32,
+	    eriRouterL2tpSCPktSent         Counter32,
+	    eriRouterL2tpSCPktRcvd         Counter32,
+	    eriRouterL2tpSCByteSent        Counter32,
+	    eriRouterL2tpSCByteRcvd        Counter32,
+	    eriRouterL2tpSCMcastPktSent    Counter64,
+	    eriRouterL2tpSCMcastPktRcvd    Counter64,
+	    eriRouterL2tpSCMcastByteSent   Counter64,
+	    eriRouterL2tpSCMcastByteRcvd   Counter64
+	}
+
+eriRouterL2tpMibSessionID OBJECT-TYPE
+    	SYNTAX  Unsigned32 (0..65535)
+    	MAX-ACCESS  not-accessible
+    	STATUS      current
+    	DESCRIPTION
+       	    "This object identifies the Session ID for a given
+	    L2TP session."
+    	::= { eriRouterL2tpSessionCntEntry 1 }
+
+eriRouterL2tpSCPktSent OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION 
+	    "This object indicates the number of packets sent 
+	    by this platform in this session."
+        ::= { eriRouterL2tpSessionCntEntry 2 }
+
+eriRouterL2tpSCPktRcvd OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION 
+	    "This object indicates the number of packets received 
+	    by this platform in this session."
+        ::= { eriRouterL2tpSessionCntEntry 3 }
+
+eriRouterL2tpSCByteSent OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION 
+	    "This object indicates the number of bytes sent by
+	    this platform in this session."
+        ::= { eriRouterL2tpSessionCntEntry 4 }
+
+eriRouterL2tpSCByteRcvd OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION 
+	    "This object indicates the number of bytes received by 
+	    this platform in this session."
+        ::= { eriRouterL2tpSessionCntEntry 5 }
+
+eriRouterL2tpSCMcastPktSent OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION 
+	    "This object indicates the number of multicast packets 
+	    sent by this platform in this session."
+        ::= { eriRouterL2tpSessionCntEntry 6 }
+
+eriRouterL2tpSCMcastPktRcvd OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION 
+	    "This object indicates the number of multicast packets 
+	    received by this platform in this session."
+        ::= { eriRouterL2tpSessionCntEntry 7 }
+
+eriRouterL2tpSCMcastByteSent OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION 
+	    "This object indicates the number of multicast bytes sent 
+	    by this platform in this session."
+        ::= { eriRouterL2tpSessionCntEntry 8 }
+
+eriRouterL2tpSCMcastByteRcvd OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION 
+	    "This object indicates the number of multicast bytes received 
+	    by this platform in this session."
+        ::= { eriRouterL2tpSessionCntEntry 9 }
+
+eriRouterL2tpPeerTunCfgTable  OBJECT-TYPE
+        SYNTAX          SEQUENCE OF EriRouterL2tpPeerTunCfgEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+           "This table contains objects which identify L2TP peers and tunnels."
+        ::= { eriRouterL2tpMibObjects 8 }
+
+eriRouterL2tpPeerTunCfgEntry  OBJECT-TYPE
+        SYNTAX          EriRouterL2tpPeerTunCfgEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "A conceptual row in the eriRouterL2tpPeerTunCfgTable.  An entry in
+            this table corresponds to a single tunnel of a L2TP peer.
+            Entries are added to this table as tunnels become connected.
+            Entries are removed from the table if the communication with one
+            or both ends of a tunnel is lost."
+        INDEX { eriRouterL2tpMibPeerName, eriRouterL2tpMibTunnelID }
+        ::= { eriRouterL2tpPeerTunCfgTable 1 }
+
+EriRouterL2tpPeerTunCfgEntry ::=
+        SEQUENCE {
+	    eriRouterL2tpPTCfgTunnelRemoteID         Unsigned32,
+	    eriRouterL2tpPTCfgTunnelLocalNm          SnmpAdminString,
+	    eriRouterL2tpPTCfgTunnelRemoteNm         SnmpAdminString,
+	    eriRouterL2tpPTCfgPeerLocalNm            SnmpAdminString,
+	    eriRouterL2tpPTCfgTunnelRemoteIPAddrType InetAddressType,
+	    eriRouterL2tpPTCfgTunnelRemoteIPAddr     InetAddress,
+	    eriRouterL2tpPTCfgTunnelState            TunStateType,
+	    eriRouterL2tpPTCfgTunnelContext          SnmpAdminString,
+	    eriRouterL2tpPTCfgSessionCount           Gauge32,
+	    eriRouterL2tpPTCfgActSessCnt             Gauge32,
+	    eriRouterL2tpPTCfgTotActSessions         Counter32,
+	    eriRouterL2tpPTCfgTotFailSessions        Counter32
+        }
+
+eriRouterL2tpPTCfgTunnelRemoteID OBJECT-TYPE
+        SYNTAX          Unsigned32 (0..65535)
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the remote tunnel ID.  A value of zero
+            indicates that the remote tunnel ID could not be determined."
+        ::= { eriRouterL2tpPeerTunCfgEntry 1 }
+
+eriRouterL2tpPTCfgTunnelLocalNm OBJECT-TYPE
+        SYNTAX  	SnmpAdminString (SIZE (0..80))
+        MAX-ACCESS  	read-only
+        STATUS      	current
+        DESCRIPTION
+            "This object indicates the local name that was given to this
+            tunnel.  The length of the string will be zero if no local
+            name assigned to the tunnel."
+        ::= { eriRouterL2tpPeerTunCfgEntry 2 }
+
+eriRouterL2tpPTCfgTunnelRemoteNm OBJECT-TYPE
+        SYNTAX  	SnmpAdminString (SIZE (1..80))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the name that was given to the remote
+            end of this tunnel.  The length of the string will be zero if
+            no tunnel name can be obtained from the peer." 
+        ::= { eriRouterL2tpPeerTunCfgEntry 3 }
+
+eriRouterL2tpPTCfgPeerLocalNm OBJECT-TYPE
+        SYNTAX          SnmpAdminString (SIZE (0..80))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION 
+            "This object identifies the local peer name.  The empty peer
+            name (zero length) indicates that the name could not be
+            determined."
+        ::= { eriRouterL2tpPeerTunCfgEntry 4 }
+
+eriRouterL2tpPTCfgTunnelRemoteIPAddrType OBJECT-TYPE
+        SYNTAX          InetAddressType     
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object identifies the address type contained in 
+            eriRouterL2tpPTCfgTunnelRemoteIPAddr."
+        ::= { eriRouterL2tpPeerTunCfgEntry 5 }
+
+eriRouterL2tpPTCfgTunnelRemoteIPAddr OBJECT-TYPE
+    	SYNTAX          InetAddress
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object identifies the remote IP address for
+            this tunnel (utilized only with User Datagram Protocol)."
+        ::= { eriRouterL2tpPeerTunCfgEntry 6 }
+
+eriRouterL2tpPTCfgTunnelState OBJECT-TYPE
+        SYNTAX          TunStateType
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object is the current state of the tunnel."
+        ::= { eriRouterL2tpPeerTunCfgEntry 7 }
+
+eriRouterL2tpPTCfgTunnelContext OBJECT-TYPE
+        SYNTAX          SnmpAdminString (SIZE (0..80))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object identifies the context of this tunnel. The empty
+            context name (zero length) indicates that the context could
+            not be determined.  Any context name length greater than 80
+            will be truncated."
+        ::= { eriRouterL2tpPeerTunCfgEntry 8 }
+
+eriRouterL2tpPTCfgSessionCount OBJECT-TYPE
+        SYNTAX          Gauge32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION 
+            "The number of sessions belonging to this tunnel."
+        ::= { eriRouterL2tpPeerTunCfgEntry 9 }
+
+eriRouterL2tpPTCfgActSessCnt OBJECT-TYPE
+        SYNTAX          Gauge32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION 
+            "This object indicates the total number of sessions that are
+            presently in the established state."
+        ::= { eriRouterL2tpPeerTunCfgEntry 10 }
+
+eriRouterL2tpPTCfgTotActSessions OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION 
+            "This object indicates the total number of sessions that, at
+            some time, reached the established state."
+        ::= { eriRouterL2tpPeerTunCfgEntry 11 }
+
+eriRouterL2tpPTCfgTotFailSessions OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION 
+            "This object indicates the number of sessions that failed to
+            reach the established state."
+        ::= { eriRouterL2tpPeerTunCfgEntry 12 }
+
+
+--- L2TP objects
+
+eriRouterL2tpMibTrapObj    OBJECT IDENTIFIER ::= { eriRouterL2tpMibObjects 7 }
+
+
+eriRouterL2tpMibTunnelTrapContext OBJECT-TYPE
+    	SYNTAX      SnmpAdminString  (SIZE (0..80))
+    	MAX-ACCESS  accessible-for-notify
+    	STATUS      deprecated
+    	DESCRIPTION
+       	    "This object contains the context name to which this tunnel
+	    belongs."
+    	::= { eriRouterL2tpMibTrapObj 1 }
+
+eriRouterL2tpMibTunnelTrapState OBJECT-TYPE
+    	SYNTAX      TruthValue
+    	MAX-ACCESS  accessible-for-notify
+    	STATUS      deprecated
+    	DESCRIPTION
+       	    "The tunnel state. A value of 1 (true) indicates that
+       	    a the tunnel is up (in the ESTABLISHED state). A value of 
+	    2 (false) indicates that the tunnel is down (no longer in 
+	    the ESTABLISHED state)."
+    	::= { eriRouterL2tpMibTrapObj 2 }
+
+eriRouterL2tpMibDisableTrap  OBJECT-TYPE
+	SYNTAX	    TruthValue
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	    "This object will provide a mechanism for disabling and
+	    enabling tunnel traps.  A value of 1 (true) indicates that
+	    tunnel traps are disabled.  A value of 2 (false) indicates
+	    that tunnel traps are enabled."
+	DEFVAL { true } 
+	::= { eriRouterL2tpMibTrapObj 3 }
+
+eriRouterL2tpMibTunnelStateChange NOTIFICATION-TYPE
+        OBJECTS         {
+                           eriRouterL2tpMibTunnelTrapContext,
+                           eriRouterL2tpMibTunnelTrapState
+                           }
+        STATUS          deprecated
+        DESCRIPTION
+            "A eriRouterL2tpMibTunnelStateChange trap signifies that this
+            particular tunnel has changed state."
+        ::= { eriRouterL2tpMibNotifications 1 }
+
+eriRouterL2tpMibTunnelStateChange2 NOTIFICATION-TYPE
+        OBJECTS         {
+                           eriRouterL2tpTCfgTunnelContext,
+                           eriRouterL2tpMibTunnelState,
+                           eriRouterL2tpTCfgRemoteTunnelID
+                           }
+        STATUS          current 
+        DESCRIPTION
+            "This notification signifies that the SNMP entity has
+            detected that the operational state of a tunnel has
+            entered or moved from the established state.  The current
+            tunnel operational state is indicated by the included
+            value of eriRouterL2tpMibTunnelState."
+        ::= { eriRouterL2tpMibNotifications 2 }
+
+
+   --
+   --      conformance information
+   --
+
+   eriRouterL2tpMibGroups      OBJECT IDENTIFIER ::= { eriRouterL2tpMibConformance 1 }
+   eriRouterL2tpMibCompliances OBJECT IDENTIFIER ::= { eriRouterL2tpMibConformance 2 }
+
+   --
+   --      compliance statements
+   --
+
+eriRouterL2tpMibCompliance MODULE-COMPLIANCE
+        STATUS          deprecated
+        DESCRIPTION
+            "The compliance statement for SNMPv2 entities
+            which implement the L2TP MIB."
+
+        MODULE          -- this module
+
+        -- unconditionally mandatory groups
+        MANDATORY-GROUPS {
+                           eriRouterL2tpMibPeerCfgGroup,
+                           eriRouterL2tpMibTunnelCfgGroup,
+                           eriRouterL2tpMibPeerCntGroup, 
+                           eriRouterL2tpMibTunnelCntGroup,
+                           eriRouterL2tpMibSessionCntGroup, 
+                           eriRouterL2tpMibGroup,
+                           eriRouterL2tpMibNotificationGroup
+                            }
+
+        ::= { eriRouterL2tpMibCompliances 1 }
+
+eriRouterL2tpMibCompliance2 MODULE-COMPLIANCE
+        STATUS          current
+        DESCRIPTION        
+            "The compliance statement for SNMP entities which implement
+            this MIB."
+                           
+        MODULE          -- this module
+
+        -- unconditionally mandatory groups 
+        MANDATORY-GROUPS {
+                           eriRouterL2tpMibPeerCfgGroup,
+                           eriRouterL2tpMibTunnelCfgGroup,
+                           eriRouterL2tpMibPeerCntGroup,
+                           eriRouterL2tpMibTunnelCntGroup,
+                           eriRouterL2tpMibSessionCntGroup,
+                           eriRouterL2tpMibGroup2,
+                           eriRouterL2tpMibNotificationGroup2,
+                           eriRouterL2tpMibPeerTunCfgGroup
+                            }
+   
+        ::= { eriRouterL2tpMibCompliances 2 }
+
+
+   -- units of conformance
+
+eriRouterL2tpMibPeerCfgGroup OBJECT-GROUP
+        OBJECTS {
+               eriRouterL2tpPCfgMedia,
+               eriRouterL2tpPCfgVendor,
+               eriRouterL2tpPCfgRev,  
+               eriRouterL2tpPCfgHostName,
+               eriRouterL2tpPCfgRadius, 
+	       eriRouterL2tpPCfgRemIPAddType,
+               eriRouterL2tpPCfgRemIPAdd, 
+               eriRouterL2tpPCfgStatic,
+               eriRouterL2tpPCfgLocalIPAddType,
+               eriRouterL2tpPCfgLocalIPAdd,
+               eriRouterL2tpPCfgMode,     
+               eriRouterL2tpPCfgMaxTunnels,    
+               eriRouterL2tpPCfgMaxSesPerTun, 
+               eriRouterL2tpPCfgCtlRetranCnt,
+               eriRouterL2tpPCfgCtlRetranTO,
+               eriRouterL2tpPCfgSessAuth,  
+               eriRouterL2tpPCfgCtlWin,   
+               eriRouterL2tpPCfgDNIS,    
+               eriRouterL2tpPCfgPoliceRate,
+               eriRouterL2tpPCfgPoliceBurst,
+               eriRouterL2tpPCfgLimitRate,
+               eriRouterL2tpPCfgLimitBurst,
+               eriRouterL2tpPCfgGroup,      
+               eriRouterL2tpPCfgPref,      
+               eriRouterL2tpPCfgPasswd,   
+               eriRouterL2tpPCfgHelloTimer,
+               eriRouterL2tpPCfgRecQue,     
+               eriRouterL2tpPCfgSessContext,   
+               eriRouterL2tpPCfgSessService,  
+               eriRouterL2tpPCfgEthEncap,    
+               eriRouterL2tpPCfgEthSession, 
+               eriRouterL2tpPCfgTunnelCount,
+               eriRouterL2tpPCfgTunCtlErrs, 
+               eriRouterL2tpPCfgSessionCount
+
+        }
+        STATUS          current
+        DESCRIPTION
+            "A collection of objects providing peer
+            information of the L2TP protocol, tunnels and sessions."
+        ::= { eriRouterL2tpMibGroups 1 }
+
+eriRouterL2tpMibTunnelCfgGroup OBJECT-GROUP
+        OBJECTS {
+	       eriRouterL2tpTCfgTunnelNm,
+	       eriRouterL2tpTCfgPeerName,
+               eriRouterL2tpTCfgTunCtlErrs, 
+               eriRouterL2tpTCfgLastCtlErr,
+               eriRouterL2tpTCfgLastCErrTime,    
+               eriRouterL2tpTCfgTunDataErrs,    
+               eriRouterL2tpTCfgLastDataErr,   
+               eriRouterL2tpTCfgLastDErrTime,    
+               eriRouterL2tpTCfgSessionCount,   
+               eriRouterL2tpTCfgTotActSessions,
+               eriRouterL2tpTCfgActSessCnt,   
+               eriRouterL2tpTCfgTotFailSessions,
+               eriRouterL2tpMibTunnelState,
+               eriRouterL2tpTCfgRemoteTunnelID,
+               eriRouterL2tpTCfgTunnelContext
+        }
+        STATUS          current
+        DESCRIPTION
+            "A collection of objects providing status and
+            statistics of the L2TP protocol, tunnels and
+            sessions."
+        ::= { eriRouterL2tpMibGroups 2 }
+
+eriRouterL2tpMibPeerCntGroup OBJECT-GROUP
+        OBJECTS {
+                    eriRouterL2tpPCDataPktSent,
+                    eriRouterL2tpPCDataPktRx,
+                    eriRouterL2tpPCDataByteSent,
+                    eriRouterL2tpPCDataByteRx,
+                    eriRouterL2tpPCCtlPktSent,
+                    eriRouterL2tpPCCtlPktRx,
+                    eriRouterL2tpPCCtlByteSent,
+                    eriRouterL2tpPCCtlByteRx,
+                    eriRouterL2tpPCPolicePktDrop,
+                    eriRouterL2tpPCRatePktDrop,
+                    eriRouterL2tpPCTxSCCRQCnt,
+                    eriRouterL2tpPCRxSCCRQCnt,
+                    eriRouterL2tpPCActTunnels,
+                    eriRouterL2tpPCTunnelCtlErr,
+                    eriRouterL2tpPCSessionCount,
+                    eriRouterL2tpPCTunnelDataErr
+
+        }
+        STATUS          current
+        DESCRIPTION
+            "A collection of objects providing peer count statistics."
+        ::= { eriRouterL2tpMibGroups 3 }
+
+eriRouterL2tpMibTunnelCntGroup OBJECT-GROUP
+        OBJECTS {
+                    eriRouterL2tpTCDataPktSent,
+                    eriRouterL2tpTCDataPktRcvd,
+                    eriRouterL2tpTCDataByteSent,
+                    eriRouterL2tpTCDataByteRcvd,
+                    eriRouterL2tpTCCntrlPktSent,
+                    eriRouterL2tpTCCntrlPktRcvd,
+                    eriRouterL2tpTCCntrlByteSent,
+                    eriRouterL2tpTCCntrlByteRcvd,
+                    eriRouterL2tpTCPolicePktDrop,
+                    eriRouterL2tpTCRatePktDrop,
+                    eriRouterL2tpTCCntrlErr,
+                    eriRouterL2tpTCLastCtlErr,
+                    eriRouterL2tpTCLastCtlErrTime,
+                    eriRouterL2tpTCMaxResendQ,
+                    eriRouterL2tpTCMaxUnsentQ,
+                    eriRouterL2tpTCCurResendQ,
+                    eriRouterL2tpTCCurUnsentQ,
+                    eriRouterL2tpTCCurWindow
+
+        }
+        STATUS          current
+        DESCRIPTION
+            "A collection of objects providing tunnel count statistics."
+        ::= { eriRouterL2tpMibGroups 4 }
+           
+eriRouterL2tpMibSessionCntGroup OBJECT-GROUP
+        OBJECTS {
+		    eriRouterL2tpSCPktSent,
+		    eriRouterL2tpSCPktRcvd,
+		    eriRouterL2tpSCByteSent,
+		    eriRouterL2tpSCByteRcvd,
+		    eriRouterL2tpSCMcastPktSent,
+		    eriRouterL2tpSCMcastPktRcvd,
+		    eriRouterL2tpSCMcastByteSent,
+		    eriRouterL2tpSCMcastByteRcvd
+        }
+        STATUS          current
+        DESCRIPTION
+            "A collection of objects providing session count statistics."
+        ::= { eriRouterL2tpMibGroups 5 }
+
+eriRouterL2tpMibGroup OBJECT-GROUP
+	OBJECTS {
+               eriRouterL2tpMibTunnelTrapContext,
+               eriRouterL2tpMibTunnelTrapState,
+	       eriRouterL2tpMibDisableTrap 
+        }
+        STATUS deprecated
+        DESCRIPTION
+            "The collection of groups which represent a tunnel state
+	    change or can effect the notification of such change.
+
+	    This group is replaced by eriRouterL2tpMibGroup2."
+        ::= { eriRouterL2tpMibGroups 7 }
+		
+eriRouterL2tpMibNotificationGroup NOTIFICATION-GROUP
+        NOTIFICATIONS {
+               eriRouterL2tpMibTunnelStateChange
+        }
+        STATUS          deprecated
+        DESCRIPTION
+            "A collection of eriRouterL2tpMib notifications.
+ 
+            This group is replaced by eriRouterL2tpMibNotificationGroup2."
+        ::= { eriRouterL2tpMibGroups 8 }
+
+eriRouterL2tpMibGroup2 OBJECT-GROUP
+	OBJECTS {
+	       eriRouterL2tpMibDisableTrap
+        }
+        STATUS current
+        DESCRIPTION
+            "Object for managing L2TP notifications."
+        ::= { eriRouterL2tpMibGroups 9 }
+		
+eriRouterL2tpMibNotificationGroup2 NOTIFICATION-GROUP
+        NOTIFICATIONS {
+               eriRouterL2tpMibTunnelStateChange2
+        }
+        STATUS          current
+        DESCRIPTION
+            "Notification for tracking the status of L2TP tunnels."
+        ::= { eriRouterL2tpMibGroups 10 }
+
+eriRouterL2tpMibPeerTunCfgGroup OBJECT-GROUP
+        OBJECTS {
+	    eriRouterL2tpPTCfgTunnelRemoteID,
+	    eriRouterL2tpPTCfgTunnelLocalNm,
+	    eriRouterL2tpPTCfgTunnelRemoteNm,
+	    eriRouterL2tpPTCfgPeerLocalNm,
+	    eriRouterL2tpPTCfgTunnelRemoteIPAddrType,
+	    eriRouterL2tpPTCfgTunnelRemoteIPAddr,
+	    eriRouterL2tpPTCfgTunnelState,
+	    eriRouterL2tpPTCfgTunnelContext,
+	    eriRouterL2tpPTCfgSessionCount,
+	    eriRouterL2tpPTCfgTotActSessions,
+	    eriRouterL2tpPTCfgActSessCnt,
+	    eriRouterL2tpPTCfgTotFailSessions
+        }
+        STATUS          current
+        DESCRIPTION
+            "A collection of objects providing status and
+            statistics of the L2TP peers and tunnels."
+        ::= { eriRouterL2tpMibGroups 11 }
+END
+
+

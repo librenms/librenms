@@ -1,0 +1,242 @@
+-- %DNP% $Id: ERICSSON-ROUTER-STACKEDVLAN-MIB.my,v 1.1.2.2.114.1 2011/02/22 17:26:18 thatcher Exp $
+-- %DNP% $Source: /cvsroot/pkt/sw/se/xc/bsd/config/snmp/mibs/Attic/ERICSSON-ROUTER-STACKEDVLAN-MIB.my,v $
+-- *****************************************************************
+-- ERICSSON-ROUTER-STACKEDVLAN-MIB
+--
+-- Copyright (c) 2007, 2011, 2015 Ericsson AB
+-- All rights reserved.
+--
+-- *****************************************************************
+ERICSSON-ROUTER-STACKEDVLAN-MIB DEFINITIONS ::= BEGIN
+     
+IMPORTS
+     MODULE-IDENTITY, OBJECT-TYPE, 
+     Counter64                       FROM SNMPv2-SMI 
+     MODULE-COMPLIANCE,
+     OBJECT-GROUP
+                                     FROM SNMPv2-CONF
+     InterfaceIndex                  FROM IF-MIB
+     eriRouterMgmt                         FROM ERICSSON-ROUTER-SMI;
+
+eriRouterStackedVlanMIB MODULE-IDENTITY 
+     LAST-UPDATED    "201501141800Z" -- Jan 14, 2015
+     ORGANIZATION    "Ericsson AB."
+     CONTACT-INFO
+             "       Ericsson AB.
+   
+                     100 Headquarters Dr
+                     San Jose, CA  95134
+                     USA
+  
+             Phone:   +1 408 750-5000
+             Fax:     +1 408 750-5599
+             "
+     DESCRIPTION
+          "This management information module defines the
+          objects necessary to support the management of
+          stacked VLAN interfaces"
+
+     REVISION        "201501141800Z" -- Jan 14, 2015
+     DESCRIPTION
+         "Updated RBN/rbn/Rbn as ERICSSON-ROUTER/eriRouter/EriRouter
+          to migrate RBN MIB to ERICSSON MIB."
+
+     REVISION        "201101191800Z" -- Jan 19, 2011 
+     DESCRIPTION
+             "Update CONTACT-INFO & ORGANIZATION. "
+
+     REVISION        "200702270000Z" -- February 27, 2007 
+     DESCRIPTION
+             "Initial version"
+     ::= { eriRouterMgmt 40 }
+
+-- MIB Objects
+
+eriRouterStackedVlanMIBObjects OBJECT IDENTIFIER
+     ::= { eriRouterStackedVlanMIB 1 }
+
+eriRouterStackedVlanAggrStatsTable OBJECT-TYPE
+     SYNTAX      SEQUENCE OF EriRouterStackedVlanAggrStatsEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+           "A table containing aggregated statistics of inner 
+           VLAN's related to an outer VLAN."
+     ::= { eriRouterStackedVlanMIBObjects 1}
+
+eriRouterStackedVlanAggrStatsEntry OBJECT-TYPE
+     SYNTAX      EriRouterStackedVlanAggrStatsEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+           "An entry in the eriRouterStackedVlanStatisticsTable." 
+     INDEX   { eriRouterStackedVlanIndex }
+     ::= { eriRouterStackedVlanAggrStatsTable 1 }
+
+EriRouterStackedVlanAggrStatsEntry ::= 
+     SEQUENCE {
+         eriRouterStackedVlanIndex                     InterfaceIndex,
+         eriRouterStackedVlanHCInOctets                Counter64,
+         eriRouterStackedVlanHCInUcastPkts             Counter64,
+         eriRouterStackedVlanHCInMulticastPkts         Counter64,
+         eriRouterStackedVlanHCInBroadcastPkts         Counter64,
+         eriRouterStackedVlanHCOutOctets               Counter64,
+         eriRouterStackedVlanHCOutUcastPkts            Counter64,
+         eriRouterStackedVlanHCOutMulticastPkts        Counter64,
+         eriRouterStackedVlanHCOutBroadcastPkts        Counter64
+}
+
+--
+-- High Capacity Counter objects.   
+--
+ 
+eriRouterStackedVlanIndex OBJECT-TYPE
+SYNTAX      InterfaceIndex
+MAX-ACCESS  not-accessible 
+STATUS      current
+DESCRIPTION "An index value that uniquely identifies an
+             interface to an ethernet-like medium.  The
+             interface identified by a particular value of
+             this index is the same interface as identified
+             by the same value of ifIndex."
+      REFERENCE   "RFC 2233, ifIndex"
+::= { eriRouterStackedVlanAggrStatsEntry 1 }
+
+eriRouterStackedVlanHCInOctets OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+           "The aggregate of the total number of octets received on each 
+           outer vlan and its inner vlans, including framing characters." 
+         
+     ::= { eriRouterStackedVlanAggrStatsEntry 2 } 
+ 
+eriRouterStackedVlanHCInUcastPkts OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+           "The  aggregate of the number of packets, delivered by this 
+           sub-layer to a higher (sub-)layer, which were not addressed to 
+           a multicast or broadcast address at this sub-layer for each outer 
+           vlan  and its inner vlans."
+
+     ::= { eriRouterStackedVlanAggrStatsEntry 3 }
+
+eriRouterStackedVlanHCInMulticastPkts OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+           "The aggregate number of packets, delivered by this sub-layer to a
+           higher (sub-)layer, which were addressed to a multicast address at
+           this sub-layer for each outer vlan and its inner vlans.  For a
+           MAC layer protocol, this includes both Group and Functional 
+           addresses."
+
+   ::= { eriRouterStackedVlanAggrStatsEntry 4 }
+
+eriRouterStackedVlanHCInBroadcastPkts OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+           "The aggregate number of packets, delivered by this sub-layer to a
+           higher (sub-)layer, which were addressed to a broadcast address at
+           this sub-layer for each outer vlan and its inner vlans."
+   
+     ::= { eriRouterStackedVlanAggrStatsEntry 5 }
+
+eriRouterStackedVlanHCOutOctets OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+           "The aggregate of the total number of octets transmitted out of the
+           interface, including framing characters for each outer vlan and its 
+	   inner vlans."
+
+     ::= { eriRouterStackedVlanAggrStatsEntry 6 }
+
+eriRouterStackedVlanHCOutUcastPkts OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+           "The aggregate of the total number of packets that higher-level  
+           protocols requested be transmitted, and which were not addressed to 
+           a multicast or broadcast address at this sub-layer, including those
+           that were discarded or not sent for each outer vlan and its
+	   inner vlans."
+ 
+     ::= { eriRouterStackedVlanAggrStatsEntry 7 }
+
+eriRouterStackedVlanHCOutMulticastPkts OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+           "The  aggregate of the total number of packets that higher-level 
+           protocols requested be transmitted, and which were addressed to a
+           multicast address at this sub-layer, including those that were 
+           discarded or not sent for each outer vlan and its inner vlans.  
+           For a MAC layer protocol, this includes both Group and Functional 
+           addresses."
+ 
+     ::= { eriRouterStackedVlanAggrStatsEntry 8 }
+
+eriRouterStackedVlanHCOutBroadcastPkts OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+           "The aggregate of the total number of packets that higher-level
+           protocols requested be transmitted, and which were addressed to 
+           a broadcast address at this sub-layer, including those that were 
+           discarded or not sent for each outer vlan and its inner vlans."
+
+     ::= { eriRouterStackedVlanAggrStatsEntry 9 }
+
+-- Conformance Information
+
+eriRouterStackedVlanMIBConformance OBJECT IDENTIFIER ::=
+       { eriRouterStackedVlanMIB 2 }
+
+eriRouterStackedVlanMIBGroups OBJECT IDENTIFIER ::=
+         { eriRouterStackedVlanMIBConformance 1 }
+
+eriRouterStackedVlanMIBCompliances OBJECT IDENTIFIER ::=
+         { eriRouterStackedVlanMIBConformance 2 }
+
+-- Compliance Statements
+
+eriRouterStackedVlanMIBCompliance MODULE-COMPLIANCE
+         STATUS      current
+         DESCRIPTION
+                "The compliance statement for using this MIB." 
+         MODULE      -- this module
+         MANDATORY-GROUPS {
+             eriRouterStackedVlanMIBGroup
+             }
+         ::= { eriRouterStackedVlanMIBCompliances 1 }
+
+-- Units of Conformance
+
+eriRouterStackedVlanMIBGroup OBJECT-GROUP
+        OBJECTS {
+               eriRouterStackedVlanHCInOctets,
+               eriRouterStackedVlanHCInUcastPkts, 
+               eriRouterStackedVlanHCInMulticastPkts ,
+               eriRouterStackedVlanHCInBroadcastPkts,
+               eriRouterStackedVlanHCOutOctets, 
+               eriRouterStackedVlanHCOutUcastPkts,
+               eriRouterStackedVlanHCOutMulticastPkts,
+               eriRouterStackedVlanHCOutBroadcastPkts
+        }
+        STATUS      current
+        DESCRIPTION
+                "A collection of objects providing statistical information."
+        ::= { eriRouterStackedVlanMIBGroups 1 }
+
+END

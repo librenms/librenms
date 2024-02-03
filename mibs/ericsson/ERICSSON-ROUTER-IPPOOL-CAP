@@ -1,0 +1,148 @@
+-- %DNP% $Id: ERICSSON-ROUTER-IPPOOL-CAP.my,v 1.1.2.4.272.5 2011/06/15 18:19:46 danielhe Exp $
+-- %DNP% $Source: /cvsroot/pkt/sw/se/xc/bsd/config/snmp/mibs/Attic/ERICSSON-ROUTER-IPPOOL-CAP.my,v $
+-- *****************************************************************
+-- ERICSSON-ROUTER-IPPOOL-CAP	IP Pool Mib Capabilities
+--
+-- Copyright (c) 2001-2002, 2004-2005, 2010-2011, 2015 Ericsson AB.
+-- All rights reserved.
+-- 
+-- *****************************************************************
+
+ERICSSON-ROUTER-IPPOOL-CAP DEFINITIONS ::= BEGIN
+
+IMPORTS
+
+	MODULE-IDENTITY
+			FROM SNMPv2-SMI
+	AGENT-CAPABILITIES
+			FROM SNMPv2-CONF
+	eriRouterCapabilities
+			FROM ERICSSON-ROUTER-SMI;
+
+eriRouterIpPoolMibCap MODULE-IDENTITY
+    LAST-UPDATED    "201501141800Z" -- Jan 14, 2015
+    ORGANIZATION    "Ericsson AB"
+    CONTACT-INFO
+                "       Ericsson, AB.
+
+                 Postal: 100 Headquarters Dr
+                         San Jose, CA  95134
+                         USA
+
+                 Phone: +1 408 750 5000
+                 Fax: +1 408 750 5599"
+    DESCRIPTION
+        "The Agent Capabilities of ERICSSON-ROUTER-IPPOOL-MIB.
+
+        If this MIB implementation is platform-dependent,
+        the PRODUCT-RELEASE clause contains Ericsson SEOS version and
+        at least one of the following Ericsson product families:
+            [SE]  SmartEdge Multi-service Edge Router (MSER) family
+            [SM]  SM family of Metro Ethernet Service Transport platforms
+            [SSR] Smart Service Router (SSR) family"
+
+    REVISION    "201501141800Z" -- Jan 14, 2015
+    DESCRIPTION
+        "Updated RBN/rbn/Rbn as ERICSSON-ROUTER/eriRouter/EriRouter
+         to migrate RBN MIB to ERICSSON MIB."
+
+    REVISION    "201106150000Z" -- Jun 15, 2011
+    DESCRIPTION
+        "Update DESCRIPTION clause of MODULE-IDENTITY
+        and PRODUCT-RELEASE clause of AGENT-CAPABILITIES."
+
+    REVISION    "201011010000Z" -- Nov 1, 2010
+    DESCRIPTION
+        "Modified PRODUCT-RELEASE clause for consistent naming.
+        "
+
+    REVISION    "201003220000Z" -- March 22, 2010
+    DESCRIPTION
+        "Added eriRouterIpPoolMibCap5 for SEOS 6.4, supporting IPv6 Pool."
+
+    REVISION    "200506170000Z" -- June 17, 2005
+    DESCRIPTION
+        "Added eriRouterIpPoolMibCap4 for SEOS 4.0.5.1, supporting context
+        percentage threshold."
+
+    REVISION    "200503300000Z" -- March 30, 2005
+    DESCRIPTION
+        "Added range IP pool capability."
+
+    REVISION        "200409280000Z" -- September 28, 2004
+    DESCRIPTION
+        "Add named IP pool capability."
+
+    REVISION    "200111071700Z" -- Nov 7, 2001
+    DESCRIPTION
+        "Initial version."
+
+    ::= { eriRouterCapabilities 38 }
+
+eriRouterIpPoolMibCap1 AGENT-CAPABILITIES
+	PRODUCT-RELEASE	"AOS 6.0.X.X"
+	STATUS		current
+	DESCRIPTION	"ERICSSON-ROUTER-IPPOOL-MIB capabilities"
+	SUPPORTS	ERICSSON-ROUTER-IPPOOL-MIB
+	INCLUDES {
+		eriRouterIpPoolGroup,
+		eriRouterIpPoolNotifyGroup
+	}
+
+	::= { eriRouterIpPoolMibCap 1 }
+
+eriRouterIpPoolMibCap2 AGENT-CAPABILITIES
+	PRODUCT-RELEASE	"SEOS 4.0.3"
+	STATUS		current
+	DESCRIPTION	"ERICSSON-ROUTER-IPPOOL-MIB capabilities"
+	SUPPORTS	ERICSSON-ROUTER-IPPOOL-MIB
+	INCLUDES {
+		eriRouterIpPoolGroup,
+		eriRouterIpPoolNotifyGroup,
+		eriRouterIpPoolNameGroup
+	}
+
+	::= { eriRouterIpPoolMibCap 2 }
+
+eriRouterIpPoolMibCap3 AGENT-CAPABILITIES
+	PRODUCT-RELEASE	"SEOS 4.0.5"
+	STATUS		current
+	DESCRIPTION	"ERICSSON-ROUTER-IPPOOL-MIB capabilities"
+	SUPPORTS	ERICSSON-ROUTER-IPPOOL-MIB
+	INCLUDES {
+		eriRouterIpPoolGroupV2,
+		eriRouterIpPoolNotifyGroup,
+		eriRouterIpPoolNameGroup,
+		eriRouterIpPoolRangeGroup
+	}
+
+	::= {eriRouterIpPoolMibCap 3 }
+
+eriRouterIpPoolMibCap4 AGENT-CAPABILITIES
+	PRODUCT-RELEASE	"SEOS 4.0.5.1"
+	STATUS		current
+	DESCRIPTION	"ERICSSON-ROUTER-IPPOOL-MIB capabilities"
+	SUPPORTS	ERICSSON-ROUTER-IPPOOL-MIB
+	INCLUDES {
+		eriRouterIpPoolInterfaceGroup,
+		eriRouterIpPoolContextGroup,
+		eriRouterIpPoolNotifyGroupV2
+	}
+
+	::= {eriRouterIpPoolMibCap 4 }
+
+eriRouterIpPoolMibCap5 AGENT-CAPABILITIES
+    PRODUCT-RELEASE    "SEOS 6.4.x [SE]"
+    STATUS        current
+    DESCRIPTION    "ERICSSON-ROUTER-IPPOOL-MIB capabilities"
+    SUPPORTS    ERICSSON-ROUTER-IPPOOL-MIB
+    INCLUDES {
+        eriRouterIpPoolInterfaceGroup,
+        eriRouterIpPoolContextGroup,
+        eriRouterIpPoolNotifyGroupV2,
+        eriRouterInetIpPoolGroup,
+        eriRouterInetIpPoolNotifyGroup
+    }
+
+    ::= {eriRouterIpPoolMibCap 5 }
+END

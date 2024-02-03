@@ -1,0 +1,205 @@
+-- $Id: ERICSSON-ROUTER-MEDIA-GATEWAY-MIB.my,v 1.1.6.2 2010/04/23 18:56:55 saching Exp $
+-- $Source: /cvsroot/pkt/sw/se/xc/bsd/config/snmp/mibs/Attic/ERICSSON-ROUTER-MEDIA-GATEWAY-MIB.my,v $
+-- *****************************************************************
+-- ERICSSON-ROUTER-MEDIA-GATEWAY-MIB    MEDIA GATEWAY MIB
+--
+-- Copyright (c) 2009, 2015 Ericsson AB
+-- All rights reserved.
+--
+-- *****************************************************************
+
+ERICSSON-ROUTER-MEDIA-GATEWAY-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    NOTIFICATION-TYPE
+            FROM SNMPv2-SMI
+
+    DateAndTime
+            FROM SNMPv2-TC
+
+    SnmpAdminString
+            FROM SNMP-FRAMEWORK-MIB
+
+    IANAItuEventType,
+    IANAItuProbableCause
+                FROM IANA-ITU-ALARM-TC-MIB
+
+    ItuPerceivedSeverity
+                FROM ITU-ALARM-TC-MIB
+
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP,
+    NOTIFICATION-GROUP
+            FROM SNMPv2-CONF
+    eriRouterMgmt
+            FROM ERICSSON-ROUTER-SMI;
+
+eriRouterMediaGatewayMib MODULE-IDENTITY
+    LAST-UPDATED   "201501141800Z" -- Jan 14, 2015
+    ORGANIZATION   "Ericsson Inc."
+    CONTACT-INFO
+            "       Ericsson Inc.
+                    100 Headquarters Drive
+                    San Jose, CA 95134
+                    USA
+
+             Phone: +1 408 750 5000
+               Fax: +1 408 750 5599
+            "
+
+    DESCRIPTION
+            "Defines the objects necessary to support the management of
+            Media Gateway(MG) objects."
+
+    REVISION      "201501141800Z" -- Jan 14, 2015
+    DESCRIPTION
+        "Updated RBN/rbn/Rbn as ERICSSON-ROUTER/eriRouter/EriRouter
+         to migrate RBN MIB to ERICSSON MIB."
+
+    REVISION      "201004190000Z" -- April 19, 2010
+    DESCRIPTION
+        "Modified the eriRouterH248LinkStatusAlarm Description regarding 
+        timeout value which triggers this notification"
+
+    REVISION      "200909300000Z" -- September 30, 2009
+    DESCRIPTION
+        "Initial Version."
+
+    ::= { eriRouterMgmt 52 }
+
+eriRouterMediaGatewayNotifications OBJECT IDENTIFIER ::= { eriRouterMediaGatewayMib 0 }
+
+eriRouterMediaGatewayObjects       OBJECT IDENTIFIER ::= { eriRouterMediaGatewayMib 1 }
+
+eriRouterMediaGatewayConformance   OBJECT IDENTIFIER ::= { eriRouterMediaGatewayMib 2 }
+
+--
+-- some structure for the mib objects
+--
+
+eriRouterMediaGatewayNotify        OBJECT IDENTIFIER ::= { eriRouterMediaGatewayObjects 1 }
+
+--
+-- MEDIA GATEWAY notification objects
+--
+
+eriRouterMGEventDateAndTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The local date and time when the event was raised."
+    ::= { eriRouterMediaGatewayNotify 1 }
+
+eriRouterMGEventSeverity  OBJECT-TYPE
+    SYNTAX      ItuPerceivedSeverity
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The current severity of the event."
+    ::= { eriRouterMediaGatewayNotify 2 }
+
+eriRouterMGEventSender OBJECT-TYPE
+    SYNTAX      SnmpAdminString  (SIZE(1..64))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Identifier of the entity sending the event."
+    ::= { eriRouterMediaGatewayNotify 3 }
+
+eriRouterMGEventType OBJECT-TYPE
+    SYNTAX      IANAItuEventType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The type of the event."
+    ::= { eriRouterMediaGatewayNotify 4 }
+
+eriRouterMGEventProbableCause OBJECT-TYPE
+    SYNTAX      IANAItuProbableCause
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The probable cause for this event."
+    ::= { eriRouterMediaGatewayNotify 5 }
+
+eriRouterMGEventInformation OBJECT-TYPE
+    SYNTAX      SnmpAdminString  (SIZE(0..256))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Additional information to describe the problem."
+    ::= { eriRouterMediaGatewayNotify 6 }
+
+--
+-- NOTIFICATIONS - node for hanging notification definitions
+--
+
+eriRouterH248LinkStatusAlarm NOTIFICATION-TYPE
+OBJECTS {
+        eriRouterMGEventDateAndTime,
+        eriRouterMGEventSeverity,
+        eriRouterMGEventSender,
+        eriRouterMGEventType,
+        eriRouterMGEventProbableCause,
+        eriRouterMGEventInformation
+    }
+    STATUS current
+    DESCRIPTION
+        "This notification signifies that the SNMP entity has detected that 
+        the H.248 link for a Media Gateway Controller (MGC) Group is down for
+        more than configured timeout when eriRouterMGEventSeverity has the value 'major'.
+        The timeout value is out of scope of the MIB module.  
+        The notification is sent with a value of 'clear' for 
+        eriRouterMGEventSeverity when the link state is restored (operationally up) 
+        or is obsoleted due to certain configuration change."
+    ::= { eriRouterMediaGatewayNotifications 1 }
+
+--
+-- compliance statements
+--
+eriRouterMediaGatewayCompliances OBJECT IDENTIFIER ::= { eriRouterMediaGatewayConformance 1 }
+eriRouterMediaGatewayGroups      OBJECT IDENTIFIER ::= { eriRouterMediaGatewayConformance 2 }
+
+eriRouterMGCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+        "The compliance statement for SNMP entities which implement
+         the Media Gateway MIB."
+
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+            eriRouterMGNotifyObjectGroup,
+            eriRouterMGLinkNotifyGroup
+        }
+    ::= { eriRouterMediaGatewayCompliances 1 }
+
+--
+-- groupings
+--
+eriRouterMGNotifyObjectGroup OBJECT-GROUP
+    OBJECTS {
+        eriRouterMGEventDateAndTime,
+        eriRouterMGEventSeverity,
+        eriRouterMGEventSender,
+        eriRouterMGEventType,
+        eriRouterMGEventProbableCause,
+        eriRouterMGEventInformation
+    }
+    STATUS current
+    DESCRIPTION
+        "The collection of objects related to Media Gateway notifications."
+    ::= { eriRouterMediaGatewayGroups 1 }
+
+eriRouterMGLinkNotifyGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        eriRouterH248LinkStatusAlarm
+    }
+    STATUS current
+    DESCRIPTION
+        "Notification for tracking Media Gateway events."
+    ::= { eriRouterMediaGatewayGroups 2 }
+END
+                     

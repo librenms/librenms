@@ -1,0 +1,357 @@
+-- %DNP% $Id: ERICSSON-ROUTER-IETF-MPLS-L3VPN-STD-CAP.my,v 1.1.14.6 2011/06/15 18:19:45 danielhe Exp $
+-- %DNP% $Source: /cvsroot/pkt/sw/se/xc/bsd/config/snmp/mibs/Attic/ERICSSON-ROUTER-IETF-MPLS-L3VPN-STD-CAP.my,v $
+-- *********************************************************************
+-- ERICSSON-ROUTER-IETF-MPLS-L3VPN-STD-CAP.my: MPLS-L3VPN-STD-MIB Agent Capabilities
+--
+-- Copyright (c) 2008-2011, 2015 Ericsson AB.
+-- All rights reserved.
+-- 
+-- *********************************************************************
+
+ERICSSON-ROUTER-IETF-MPLS-L3VPN-STD-CAP DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY
+                FROM SNMPv2-SMI
+        AGENT-CAPABILITIES
+                FROM SNMPv2-CONF
+        eriRouterCapabilities
+                FROM ERICSSON-ROUTER-SMI;
+
+eriRouterIetfMplsL3VpnStdCap MODULE-IDENTITY
+        LAST-UPDATED    "201501141800Z" -- Jan 14, 2015
+
+        ORGANIZATION    "Ericsson AB. "
+        CONTACT-INFO
+            "           Ericsson AB.
+
+                Postal: 100 Headquarters Dr.
+                        San Jose, CA  95134
+                        USA
+
+                Phone:  +1 408 750 5000
+                Fax:    +1 408 750 5599"
+
+        DESCRIPTION
+             "The Agent Capabilities for MPLS-L3VPN-STD-MIB 
+              is based on RFC4382.
+
+             If this MIB implementation is platform-dependent,
+             the PRODUCT-RELEASE clause contains Ericsson SEOS version and
+             at least one of the following Ericsson product families:
+                 [SE]  SmartEdge Multi-service Edge Router (MSER) family
+                 [SM]  SM family of Metro Ethernet Service Transport platforms
+                 [SSR] Smart Service Router (SSR) family"
+
+        REVISION        "201501141800Z" -- Jan 14, 2015
+        DESCRIPTION
+            "Updated RBN/rbn/Rbn as ERICSSON-ROUTER/eriRouter/EriRouter
+             to migrate RBN MIB to ERICSSON MIB."
+
+        REVISION        "201106150000Z" -- Jun 15, 2011
+        DESCRIPTION
+            "Update DESCRIPTION clause of MODULE-IDENTITY
+            and PRODUCT-RELEASE clause of AGENT-CAPABILITIES."
+        REVISION        "201005100000Z" -- May 10, 2010 00:00:00 EST
+        DESCRIPTION
+            "added eriRouterIetfMplsL3VpnStdCap2"
+
+        REVISION        "201003030000Z" -- March 3, 2010 00:00:00 EST
+        DESCRIPTION
+            "ORGANIZATION/CONTACT-INFO update"
+
+        REVISION        "200805210000Z" -- May 21, 2008 00:00:00 EST
+        DESCRIPTION
+            "Initial version"
+        ::= { eriRouterCapabilities 75 }
+
+eriRouterIetfMplsL3VpnStdCap1 AGENT-CAPABILITIES
+    PRODUCT-RELEASE    "SEOS 6.3.x"
+    STATUS        current
+    DESCRIPTION    "MPLS-L3VPN-STD-MIB and ERICSSON-ROUTER-MPLS-L3VPN-STD-EXT-MIB capabilities"
+    SUPPORTS        ERICSSON-ROUTER-MPLS-L3VPN-STD-EXT-MIB
+    INCLUDES { eriRouterMplsL3VpnGroup }
+
+    SUPPORTS    MPLS-L3VPN-STD-MIB 
+    INCLUDES { mplsL3VpnScalarGroup,
+                   mplsL3VpnVrfGroup,
+                   mplsL3VpnIfGroup,
+                   mplsL3VpnPerfGroup,
+                   mplsL3VpnVrfRteGroup,
+                   mplsL3VpnNotificationGroup 
+                 }
+
+    -- mplsL3VpnScalarGroup  
+    VARIATION   mplsL3VpnIllLblRcvThrsh
+    ACCESS        not-implemented
+    DESCRIPTION "Information not available on SEOS"
+
+    -- mplsL3VpnVrfGroup
+    VARIATION   mplsL3VpnVrfVpnId
+    SYNTAX      OCTET STRING (SIZE (0))
+    ACCESS        read-only
+    DESCRIPTION "SEOS does not specify VPN IDs for VRFs"
+
+    VARIATION   mplsL3VpnVrfRD
+    ACCESS        read-only
+    DESCRIPTION "creation is not allowed."
+        
+    VARIATION   mplsL3VpnVrfConfMidRteThresh
+    ACCESS        read-only
+    DESCRIPTION "creation is not allowed."
+
+    VARIATION   mplsL3VpnVrfConfHighRteThresh
+    ACCESS        read-only
+    DESCRIPTION "creation is not allowed."
+
+    VARIATION   mplsL3VpnVrfConfMaxRoutes
+    ACCESS        read-only
+    DESCRIPTION "creation is not allowed."
+
+    VARIATION   mplsL3VpnVrfConfRowStatus
+    SYNTAX      INTEGER { active(1) }
+    ACCESS        read-only
+    DESCRIPTION "Row creation or modification is not allowed."
+
+    VARIATION   mplsL3VpnVrfConfAdminStatus
+    SYNTAX      INTEGER { up(1), down(2) }
+    ACCESS        read-only
+    DESCRIPTION "Unable to set test mode on SEOS."
+
+    VARIATION   mplsL3VpnVrfRTStorageType
+    ACCESS        read-only
+    DESCRIPTION "Creation is not allowed."
+
+    -- mplsL3VpnIfGroup
+    VARIATION   mplsL3VpnIfVpnClassification 
+    SYNTAX      INTEGER { enterprise (2) }
+    ACCESS      read-only        
+    DESCRIPTION "Row creation is not allowed. SEOS only supports enterprise(2)"
+
+    VARIATION   mplsL3VpnIfVpnRouteDistProtocol
+    ACCESS        read-only
+    DESCRIPTION "Row creation is not allowed."
+
+    VARIATION   mplsL3VpnIfConfStorageType 
+    ACCESS        read-only
+    DESCRIPTION "Row creation is not allowed."
+
+    VARIATION   mplsL3VpnIfConfRowStatus
+    SYNTAX      INTEGER { active(1) }
+    ACCESS        read-only
+    DESCRIPTION "Row creation or modification is not allowed."
+
+    -- mplsL3VpnPerfGroup
+
+    -- mplsL3VpnVrfRteGroup
+    VARIATION   mplsL3VpnVrfRteInetCidrIfIndex
+    ACCESS        read-only
+    DESCRIPTION "Row creation is not allowed."
+
+    VARIATION   mplsL3VpnVrfRteInetCidrType
+    SYNTAX      INTEGER { other(1), local(3), remote(4) }
+    ACCESS        read-only
+    DESCRIPTION "Row creation is not allowed."
+
+    VARIATION   mplsL3VpnVrfRteInetCidrNextHopAS
+    ACCESS        read-only
+    DESCRIPTION "Row creation is not allowed."
+
+    VARIATION   mplsL3VpnVrfRteInetCidrMetric1
+    ACCESS        read-only
+    DESCRIPTION "Row creation is not allowed."
+
+    VARIATION   mplsL3VpnVrfRteInetCidrMetric1
+    ACCESS        read-only
+    DESCRIPTION "Row creation is not allowed."
+
+    VARIATION   mplsL3VpnVrfRteInetCidrMetric2
+    ACCESS        read-only
+    DESCRIPTION "Row creation is not allowed."
+
+    VARIATION   mplsL3VpnVrfRteInetCidrMetric3
+    ACCESS        read-only
+    DESCRIPTION "Row creation is not allowed."
+
+    VARIATION   mplsL3VpnVrfRteInetCidrMetric4
+    ACCESS        read-only
+    DESCRIPTION "Row creation is not allowed."
+
+    VARIATION   mplsL3VpnVrfRteInetCidrMetric5
+    ACCESS        read-only
+    DESCRIPTION "Row creation is not allowed."
+
+    VARIATION   mplsL3VpnVrfRteXCPointer
+    ACCESS        not-implemented
+    DESCRIPTION "MPLS-LSR-STD-MIB(RFC3813)is not implemented"
+
+    VARIATION   mplsL3VpnVrfRteInetCidrStatus
+    SYNTAX      INTEGER { active(1) }
+    ACCESS      read-only
+    DESCRIPTION "Write access is not required."
+
+    -- mplsL3VpnVrfRTGroup is not supported
+
+    -- mplsL3VpnNotificationGroup
+    VARIATION   mplsL3VpnVrfRouteMidThreshExceeded
+    ACCESS      not-implemented
+    DESCRIPTION "Information is not available"
+
+    VARIATION   mplsL3VpnVrfNumVrfRouteMaxThreshExceeded
+    ACCESS      not-implemented
+    DESCRIPTION "Information is not available"
+
+    VARIATION   mplsL3VpnNumVrfSecIllglLblThrshExcd
+    ACCESS      not-implemented
+    DESCRIPTION "Information is not available"
+
+    VARIATION   mplsL3VpnNumVrfRouteMaxThreshCleared
+    ACCESS      not-implemented
+    DESCRIPTION "Information is not available"
+
+    ::= { eriRouterIetfMplsL3VpnStdCap 1 }
+
+eriRouterIetfMplsL3VpnStdCap2 AGENT-CAPABILITIES
+    PRODUCT-RELEASE    "SEOS 6.5.x [SE, SM]; SEOS 11.1.x [SSR]"
+    STATUS        current
+    DESCRIPTION    "MPLS-L3VPN-STD-MIB and ERICSSON-ROUTER-MPLS-L3VPN-STD-EXT-MIB capabilities"
+    SUPPORTS        ERICSSON-ROUTER-MPLS-L3VPN-STD-EXT-MIB
+    INCLUDES { eriRouterMplsL3VpnGroup }
+
+    SUPPORTS    MPLS-L3VPN-STD-MIB 
+    INCLUDES { mplsL3VpnScalarGroup,
+                   mplsL3VpnVrfGroup,
+                   mplsL3VpnIfGroup,
+                   mplsL3VpnPerfGroup,
+                   mplsL3VpnVrfRTGroup,
+                   mplsL3VpnVrfRteGroup,
+                   mplsL3VpnNotificationGroup 
+                 }
+
+    -- mplsL3VpnVrfGroup
+    VARIATION   mplsL3VpnVrfVpnId
+    SYNTAX      OCTET STRING (SIZE (0))
+    ACCESS        read-only
+    DESCRIPTION "SEOS does not specify VPN IDs for VRFs"
+
+    VARIATION   mplsL3VpnVrfRD
+    ACCESS        read-only
+    DESCRIPTION "creation is not allowed."
+        
+    VARIATION   mplsL3VpnVrfConfMidRteThresh
+    ACCESS        read-only
+    DESCRIPTION "creation is not allowed."
+
+    VARIATION   mplsL3VpnVrfConfHighRteThresh
+    ACCESS        read-only
+    DESCRIPTION "creation is not allowed."
+
+    VARIATION   mplsL3VpnVrfConfMaxRoutes
+    ACCESS        read-only
+    DESCRIPTION "creation is not allowed."
+
+    VARIATION   mplsL3VpnVrfConfRowStatus
+    SYNTAX      INTEGER { active(1) }
+    ACCESS        read-only
+    DESCRIPTION "Row creation or modification is not allowed."
+
+    VARIATION   mplsL3VpnVrfConfAdminStatus
+    SYNTAX      INTEGER { up(1), down(2) }
+    ACCESS        read-only
+    DESCRIPTION "Unable to set test mode on SEOS."
+
+    VARIATION   mplsL3VpnVrfRTStorageType
+    ACCESS        read-only
+    DESCRIPTION "Creation is not allowed."
+
+    -- mplsL3VpnIfGroup
+    VARIATION   mplsL3VpnIfVpnClassification 
+    ACCESS      read-only        
+    DESCRIPTION "Row creation is not allowed."
+
+    VARIATION   mplsL3VpnIfVpnRouteDistProtocol
+    ACCESS        read-only
+    DESCRIPTION "Row creation is not allowed."
+
+    VARIATION   mplsL3VpnIfConfStorageType 
+    ACCESS        read-only
+    DESCRIPTION "Row creation is not allowed."
+
+    VARIATION   mplsL3VpnIfConfRowStatus
+    SYNTAX      INTEGER { active(1) }
+    ACCESS        read-only
+    DESCRIPTION "Row creation or modification is not allowed."
+
+    -- implsL3VpnVrfRTGroup
+    VARIATION   mplsL3VpnVrfRT
+    ACCESS      read-only
+    DESCRIPTION "Write access is not required."
+
+    VARIATION   mplsL3VpnVrfRTDescr
+    ACCESS      read-only
+    DESCRIPTION "Write access is not required."
+
+    VARIATION   mplsL3VpnVrfRTRowStatus
+    SYNTAX      INTEGER { active(1) }
+    ACCESS      read-only
+    DESCRIPTION "Write access is not required."
+
+    VARIATION   mplsL3VpnVrfRTStorageType
+    ACCESS      read-only
+    DESCRIPTION "Write access is not required."
+
+        -- mplsL3VpnVrfRteGroup
+    VARIATION   mplsL3VpnVrfRteInetCidrIfIndex
+    ACCESS        read-only
+    DESCRIPTION "Row creation is not allowed."
+
+    VARIATION   mplsL3VpnVrfRteInetCidrType
+    SYNTAX      INTEGER { other(1), local(3), remote(4) }
+    ACCESS        read-only
+    DESCRIPTION "Row creation is not allowed."
+
+    VARIATION   mplsL3VpnVrfRteInetCidrNextHopAS
+    ACCESS        read-only
+    DESCRIPTION "Row creation is not allowed."
+
+    VARIATION   mplsL3VpnVrfRteInetCidrMetric1
+    ACCESS        read-only
+    DESCRIPTION "Row creation is not allowed."
+
+    VARIATION   mplsL3VpnVrfRteInetCidrMetric1
+    ACCESS        read-only
+    DESCRIPTION "Row creation is not allowed."
+
+    VARIATION   mplsL3VpnVrfRteInetCidrMetric2
+    ACCESS        read-only
+    DESCRIPTION "Row creation is not allowed."
+
+    VARIATION   mplsL3VpnVrfRteInetCidrMetric3
+    ACCESS        read-only
+    DESCRIPTION "Row creation is not allowed."
+
+    VARIATION   mplsL3VpnVrfRteInetCidrMetric4
+    ACCESS        read-only
+    DESCRIPTION "Row creation is not allowed."
+
+    VARIATION   mplsL3VpnVrfRteInetCidrMetric5
+    ACCESS        read-only
+    DESCRIPTION "Row creation is not allowed."
+
+    VARIATION   mplsL3VpnVrfRteXCPointer
+    ACCESS        not-implemented
+    DESCRIPTION "MPLS-LSR-STD-MIB(RFC3813)is not implemented"
+
+    VARIATION   mplsL3VpnVrfRteInetCidrStatus
+    SYNTAX      INTEGER { active(1) }
+    ACCESS      read-only
+    DESCRIPTION "Write access is not required."
+
+    -- mplsL3VpnNotificationGroup
+    VARIATION   mplsL3VpnNumVrfSecIllglLblThrshExcd
+    ACCESS      not-implemented
+    DESCRIPTION "Information is not available"
+
+    ::= { eriRouterIetfMplsL3VpnStdCap 2 }
+END
+

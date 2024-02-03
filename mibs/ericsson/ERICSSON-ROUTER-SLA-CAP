@@ -1,0 +1,60 @@
+-- *****************************************************************
+-- ERICSSON-ROUTER-SLA-CAP      SLA MIB Capabilities
+--
+-- Copyright (c) 2017 Ericsson AB
+-- All rights reserved.
+--
+-- *****************************************************************
+
+ERICSSON-ROUTER-SLA-CAP DEFINITIONS ::= BEGIN
+
+IMPORTS
+      MODULE-IDENTITY
+            FROM SNMPv2-SMI
+      AGENT-CAPABILITIES
+            FROM SNMPv2-CONF
+      eriRouterCapabilities
+            FROM ERICSSON-ROUTER-SMI;
+
+eriRouterSlaCap MODULE-IDENTITY
+        LAST-UPDATED    "201701070000Z" -- Jan 7, 2017
+        ORGANIZATION    "Ericsson Inc."
+        CONTACT-INFO
+                "       Ericsson, Inc.
+
+            Postal: 300 Holger Way
+                  San Jose, CA  95134-1362
+                        USA
+
+                 Phone: +1 408 750 5000
+                   Fax: +1 408 750 5599
+                "
+       DESCRIPTION
+                "The Agent Capabilities of the
+                SLA MIB (ERICSSON-ROUTER-SLA-MIB).
+
+                If this MIB implementation is platform-dependent,
+                the PRODUCT-RELEASE clause contains Ericsson SEOS version and
+                at least one of the following Ericsson product families:
+                   [SE]  SmartEdge Multi-service Edge Router (MSER) family
+                   [SM]  SM family of Metro Ethernet Service Transport platforms
+                   [SSR] Smart Service Router (SSR) family"
+
+      REVISION      "201701070000Z" -- Jan 7, 2017
+      DESCRIPTION
+            "Initial version."
+      ::= { eriRouterCapabilities 121 }
+
+eriRouterSlaCap1 AGENT-CAPABILITIES
+      PRODUCT-RELEASE      "IPOS 17.1"
+      STATUS            current
+      DESCRIPTION      "ERICSSON-ROUTER-SLA-MIB capabilities"
+      SUPPORTS      ERICSSON-ROUTER-SLA-MIB
+      INCLUDES {
+            eriRouterSlaReactionGroup,
+            eriRouterSlaNotificationGroup
+            }
+
+      ::= { eriRouterSlaCap 1 }
+
+END

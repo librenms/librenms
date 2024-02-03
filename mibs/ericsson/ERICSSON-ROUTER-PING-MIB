@@ -1,0 +1,465 @@
+-- %DNP% $Id: ERICSSON-ROUTER-PING-MIB.my,v 1.1.6.1.2.1 2011/02/22 17:26:17 thatcher Exp $
+-- %DNP% $Source: /cvsroot/pkt/sw/se/xc/bsd/config/snmp/mibs/Attic/ERICSSON-ROUTER-PING-MIB.my,v $
+-- *****************************************************************
+-- ERICSSON-ROUTER-PING-MIB          Ping MIB Extension
+--
+-- Copyright (c) 2008, 2011, 2015 Ericsson AB.
+-- All rights reserved.
+--
+-- *****************************************************************
+
+ERICSSON-ROUTER-PING-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Gauge32,
+    Unsigned32                                   FROM SNMPv2-SMI
+    DateAndTime, TruthValue                      FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP              FROM SNMPv2-CONF
+    InetAddressType, InetAddress                 FROM INET-ADDRESS-MIB
+    pingCtlEntry, pingResultsEntry,
+    pingCtlOwnerIndex, pingCtlTestName           FROM DISMAN-PING-MIB
+    eriRouterMgmt                                      FROM ERICSSON-ROUTER-SMI;
+
+eriRouterPingMib MODULE-IDENTITY
+    LAST-UPDATED    "201501141800Z" -- Jan 14, 2015
+    ORGANIZATION    "Ericsson AB."
+    CONTACT-INFO
+            "       Ericsson AB.
+
+            Postal: 100 Headquarters Dr
+                    San Jose, CA  95134
+                    USA
+
+             Phone: +1 408 750 5000
+               Fax: +1 408 750 5599
+            "
+    DESCRIPTION
+        "This MIB supplements the standard Ping MIB, namely:
+             DISMAN-PING-MIB (RFC 4560)
+
+         This module defines additional objects for creating and
+         monitoring ping tests.
+
+         All MIB objects defined in this module are viewed within the
+         context identified in the SNMP protocol (i.e. the community
+         string in v1/v2c or the contextName in v3)."
+
+    REVISION        "201501141800Z" -- Jan 14, 2015
+    DESCRIPTION
+        "Updated RBN/rbn/Rbn as ERICSSON-ROUTER/eriRouter/EriRouter
+             to migrate RBN MIB to ERICSSON MIB."
+
+    REVISION        "201101191800Z" -- Jan 19, 2011
+    DESCRIPTION
+        "Update CONTACT-INFO & ORGANIZATION. "
+
+    REVISION     "200807300000Z" -- Jul 30, 2008
+    DESCRIPTION
+        "Initial version."
+    ::= { eriRouterMgmt 46 }
+
+eriRouterPingObjects                   OBJECT IDENTIFIER ::= { eriRouterPingMib 1 }
+eriRouterPingConformance               OBJECT IDENTIFIER ::= { eriRouterPingMib 2 }
+eriRouterPingNotifications             OBJECT IDENTIFIER ::= { eriRouterPingMib 3 }
+
+--
+-- some structure for the mib objects
+--
+eriRouterPingGlobals       OBJECT IDENTIFIER ::= { eriRouterPingObjects 1 }
+eriRouterPingResults       OBJECT IDENTIFIER ::= { eriRouterPingObjects 2 }
+eriRouterPingControl       OBJECT IDENTIFIER ::= { eriRouterPingObjects 3 }
+eriRouterPingIp            OBJECT IDENTIFIER ::= { eriRouterPingObjects 4 }
+
+--
+-- Global objects
+--
+
+eriRouterPingNumTests OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of entries in the pingCtlTable."
+    ::= { eriRouterPingGlobals 1 }
+
+--
+-- Ping test results (common to all protocols)
+--
+
+eriRouterPingResultsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EriRouterPingResultsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table enhances the pingResultsTable, providing additional
+         statistics for completed ping tests."
+    ::= { eriRouterPingResults 1 }
+
+eriRouterPingResultsEntry OBJECT-TYPE
+    SYNTAX      EriRouterPingResultsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A conceptual row in the eriRouterPingResultsTable."
+    AUGMENTS { pingResultsEntry }
+    ::= { eriRouterPingResultsTable 1 }
+
+EriRouterPingResultsEntry ::= SEQUENCE {
+    eriRouterPingResultsJitter                Gauge32
+}
+
+eriRouterPingResultsJitter OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The calculated ping jitter value, which is the delta between
+         the minimum round-trip-time (RTT) and the maximum RTT. If no
+         RTT has been received, this object will have a value of 0."
+    ::= { eriRouterPingResultsEntry 1 }
+
+eriRouterPingHistoryTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EriRouterPingHistoryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Defines a table for storing the results of ping tests. This
+         is essentially a mirror of the pingResultsTable, with the
+         addition of an index object.
+
+         The number of entries in this table is limited per entry in
+         the pingCtlTable by the value of the corresponding
+         eriRouterPingCtlMaxHistoryRows object.
+
+         An entry in this table is created when a ping test completes.
+         The initial 2 instance identifier index values identify the
+         pingCtlEntry that these test results belong to. An entry is
+         removed from the table when its corresponding pingCtlEntry
+         is deleted.
+
+         The oldest entry in this table for a corresponding entry in
+         the pingCtlTable will be removed to allow the addition of a
+         new entry once the number of rows in this table reaches the
+         value specified by the eriRouterPingCtlMaxHistory for the
+         corresponding entry in the eriRouterPingCtlTable."
+    ::= { eriRouterPingResults 2 }
+
+eriRouterPingHistoryEntry OBJECT-TYPE
+    SYNTAX      EriRouterPingHistoryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A conceptual row in the eriRouterPingHistoryTable."
+    INDEX { pingCtlOwnerIndex, pingCtlTestName, eriRouterPingHistoryIndex }
+    ::= { eriRouterPingHistoryTable 1 }
+
+EriRouterPingHistoryEntry ::= SEQUENCE {
+    eriRouterPingHistoryIndex                 Unsigned32,
+    eriRouterPingHistoryIpTargetAddressType   InetAddressType,
+    eriRouterPingHistoryIpTargetAddress       InetAddress,
+    eriRouterPingHistoryMinRtt                Unsigned32,
+    eriRouterPingHistoryMaxRtt                Unsigned32,
+    eriRouterPingHistoryAverageRtt            Unsigned32,
+    eriRouterPingHistoryProbeResponses        Gauge32,
+    eriRouterPingHistorySentProbes            Gauge32,
+    eriRouterPingHistoryRttSumOfSquares       Unsigned32,
+    eriRouterPingHistoryLastGoodProbe         DateAndTime,
+    eriRouterPingHistoryJitter                Gauge32
+}
+
+eriRouterPingHistoryIndex OBJECT-TYPE
+   SYNTAX      Unsigned32 (1..'ffffffff'h)
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       "An entry in this table is created when a ping test
+       completes.  The initial 2 instance identifier index values
+       identify the pingCtlEntry that these results belongs to.
+
+       eriRouterPingHistoryIndex will be assigned values starting at 1 and
+       will wrap after exceeding the maximum possible value
+       ('ffffffff'h)."
+   ::= { eriRouterPingHistoryEntry 1 }
+
+eriRouterPingHistoryIpTargetAddressType OBJECT-TYPE
+   SYNTAX      InetAddressType
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "This object indicates the type of address stored
+       in the corresponding pingResultsIpTargetAddress
+       object."
+   DEFVAL { unknown }
+   ::= { eriRouterPingHistoryEntry 2 }
+
+eriRouterPingHistoryIpTargetAddress OBJECT-TYPE
+   SYNTAX      InetAddress
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "This object reports the IP address associated
+       with a pingCtlTargetAddress value when the destination
+       address is specified as a DNS name.  The value of
+       this object should be a zero-length octet string
+       when a DNS name is not specified or when a
+       specified DNS name fails to resolve.
+
+       The address type (InetAddressType) that relates to
+       this object is specified by the corresponding value
+       of pingResultsIpTargetAddressType."
+   DEFVAL { ''H }
+   ::= { eriRouterPingHistoryEntry 3 }
+
+eriRouterPingHistoryMinRtt OBJECT-TYPE
+   SYNTAX      Unsigned32
+   UNITS       "milliseconds"
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The minimum ping round-trip-time (RTT) received.  A value
+       of 0 for this object implies that no RTT has been received."
+   ::= { eriRouterPingHistoryEntry 4 }
+
+eriRouterPingHistoryMaxRtt OBJECT-TYPE
+   SYNTAX      Unsigned32
+   UNITS       "milliseconds"
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The maximum ping round-trip-time (RTT) received.  A value
+       of 0 for this object implies that no RTT has been received."
+   ::= { eriRouterPingHistoryEntry 5 }
+
+eriRouterPingHistoryAverageRtt OBJECT-TYPE
+   SYNTAX      Unsigned32
+   UNITS       "milliseconds"
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The current average ping round-trip-time (RTT)."
+   ::= { eriRouterPingHistoryEntry 6 }
+
+eriRouterPingHistoryProbeResponses OBJECT-TYPE
+   SYNTAX      Gauge32
+   UNITS       "responses"
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "Number of responses received for the corresponding
+       pingCtlEntry and pingResultsEntry.  The value of this object
+       MUST be reported as 0 when no probe responses have been
+       received."
+   ::= { eriRouterPingHistoryEntry 7 }
+
+eriRouterPingHistorySentProbes OBJECT-TYPE
+   SYNTAX      Gauge32
+   UNITS       "probes"
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The value of this object reflects the number of probes sent
+       for the corresponding pingCtlEntry and pingResultsEntry.
+       The value of this object MUST be reported as 0 when no probes
+       have been sent."
+   ::= { eriRouterPingHistoryEntry 8 }
+
+eriRouterPingHistoryRttSumOfSquares OBJECT-TYPE
+   SYNTAX      Unsigned32
+   UNITS       "milliseconds"
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "This object contains the sum of the squares for all ping
+       responses received.  Its purpose is to enable standard
+       deviation calculation.  The value of this object MUST
+       be reported as 0 when no ping responses have been
+       received."
+   ::= { eriRouterPingHistoryEntry 9 }
+
+eriRouterPingHistoryLastGoodProbe OBJECT-TYPE
+   SYNTAX      DateAndTime
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "Date and time when the last response was received for
+       a probe."
+   ::= { eriRouterPingHistoryEntry 10 }
+
+eriRouterPingHistoryJitter OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The calculated ping jitter value, which is the delta between
+         the minimum round-trip-time (RTT) and the maximum RTT. If no
+         RTT has been received, this object will have a value of 0."
+    ::= { eriRouterPingHistoryEntry 11 }
+
+--
+-- Ping test attributes (common to all protocols)
+--
+
+eriRouterPingCtlTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EriRouterPingCtlEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table enhances the pingCtlTable, providing additional
+         options for ping tests."
+    ::= { eriRouterPingControl 1 }
+
+eriRouterPingCtlEntry OBJECT-TYPE
+    SYNTAX      EriRouterPingCtlEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A conceptual row in the eriRouterPingCtlTable."
+    AUGMENTS { pingCtlEntry }
+    ::= { eriRouterPingCtlTable 1 }
+
+EriRouterPingCtlEntry ::= SEQUENCE {
+    eriRouterPingCtlMaxHistoryRows            Unsigned32
+}
+
+eriRouterPingCtlMaxHistoryRows OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The maximum number of corresponding entries allowed in
+         the eriRouterPingHistoryTable. The oldest corresponding entry in
+         the eriRouterPingHistoryTable will be removed to allow the addition
+         of a new entry once the number of corresponding rows in the
+         eriRouterPingHistoryTable reaches this value.
+
+         When a pingCtlTable entry is removed, all corresponding
+         entries in the eriRouterPingHistoryTable will also be removed.
+
+         A value of 0 for this object disables creation of
+         eriRouterPingHistoryTable entries."
+    DEFVAL { 12 }
+    ::= { eriRouterPingCtlEntry 1 }
+
+--
+-- Ping tests using IPv4
+--
+
+eriRouterPingCtlIpTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EriRouterPingCtlIpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table enhances the pingCtlTable, providing additional
+         options for IPv4 ping tests.
+
+         These objects are ignored in conceptual rows where the
+         pingCtlType instance does not equal pingIcmpEcho."
+    ::= { eriRouterPingIp 1 }
+
+eriRouterPingCtlIpEntry OBJECT-TYPE
+    SYNTAX      EriRouterPingCtlIpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A conceptual row in the eriRouterPingCtlIpTable."
+    AUGMENTS { pingCtlEntry }
+    ::= { eriRouterPingCtlIpTable 1 }
+
+EriRouterPingCtlIpEntry ::= SEQUENCE {
+    eriRouterPingCtlIpDontFragment            TruthValue,
+    eriRouterPingCtlIpTtl                     Unsigned32
+}
+
+eriRouterPingCtlIpDontFragment OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether the dont-fragment (DF) flag should be set
+         in the probe packet's IP header."
+    DEFVAL { false }
+    ::= { eriRouterPingCtlIpEntry 1 }
+
+eriRouterPingCtlIpTtl OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies a time-to-live (TTL) value to use in the probe
+         packet's IP header."
+    DEFVAL { 255 }
+    ::= { eriRouterPingCtlIpEntry 2 }
+
+--
+-- compliance statements
+--
+eriRouterPingCompliances OBJECT IDENTIFIER ::= { eriRouterPingConformance 1 }
+eriRouterPingGroups      OBJECT IDENTIFIER ::= { eriRouterPingConformance 2 }
+
+eriRouterPingIpCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+        "The compliance statement for SNMP entities which implement
+         this MIB for IPv4."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+            eriRouterPingGlobalsGroup,
+            eriRouterPingResultsGroup,
+            eriRouterPingCtlGroup,
+            eriRouterPingIpGroup
+        }
+    ::= { eriRouterPingCompliances 1 }
+
+--
+-- object groups
+--
+eriRouterPingGlobalsGroup OBJECT-GROUP
+    OBJECTS {
+        eriRouterPingNumTests
+    }
+    STATUS    current
+    DESCRIPTION
+        "The collection of global objects for ping tests."
+    ::= { eriRouterPingGroups 1 }
+
+eriRouterPingResultsGroup OBJECT-GROUP
+    OBJECTS {
+        eriRouterPingResultsJitter,
+        eriRouterPingHistoryIpTargetAddressType,
+        eriRouterPingHistoryIpTargetAddress,
+        eriRouterPingHistoryMinRtt,
+        eriRouterPingHistoryMaxRtt,
+        eriRouterPingHistoryAverageRtt,
+        eriRouterPingHistoryProbeResponses,
+        eriRouterPingHistorySentProbes,
+        eriRouterPingHistoryRttSumOfSquares,
+        eriRouterPingHistoryLastGoodProbe,
+        eriRouterPingHistoryJitter
+    }
+    STATUS    current
+    DESCRIPTION
+        "The collection of objects for ping test results."
+    ::= { eriRouterPingGroups 2 }
+
+eriRouterPingCtlGroup OBJECT-GROUP
+    OBJECTS {
+        eriRouterPingCtlMaxHistoryRows
+    }
+    STATUS    current
+    DESCRIPTION
+        "The maximum number of corresponding entries allowed in
+         the eriRouterPingHistoryTable."
+    ::= { eriRouterPingGroups 3 }
+ 
+eriRouterPingIpGroup OBJECT-GROUP
+    OBJECTS {
+        eriRouterPingCtlIpDontFragment,
+        eriRouterPingCtlIpTtl
+    }
+    STATUS    current
+    DESCRIPTION
+        "The collection of objects for executing a ping test over IPv4."
+    ::= { eriRouterPingGroups 4 }
+END

@@ -1,0 +1,395 @@
+-- %DNP% $Id: ERICSSON-ROUTER-IETF-IF-CAP.my,v 1.2.2.3.334.6 2011/06/15 18:19:45 danielhe Exp $
+-- %DNP% $Source: /cvsroot/pkt/sw/se/xc/bsd/config/snmp/mibs/ERICSSON-ROUTER-IETF-IF-CAP.my,v $
+-- *****************************************************************
+-- ERICSSON-ROUTER-IETF-IF-CAP.my:	IETF IF-MIB Agent Capabilities
+--
+-- Copyright (c) 1998, 2001-2002, 2005, 2010-2011, 2015 Ericsson AB.
+-- All rights reserved.
+-- 
+-- *****************************************************************
+
+ERICSSON-ROUTER-IETF-IF-CAP DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY
+		FROM SNMPv2-SMI
+	AGENT-CAPABILITIES
+		FROM SNMPv2-CONF
+	eriRouterCapabilities
+		FROM ERICSSON-ROUTER-SMI;
+
+eriRouterIetfIfCap MODULE-IDENTITY
+	LAST-UPDATED    "201501141800Z" -- Jan 14, 2015
+	ORGANIZATION	"Ericsson Inc."
+	CONTACT-INFO
+		"       Ericsson Inc.
+
+		Postal: 100 Headquarters Dr
+			San Jose, CA  95134
+			USA
+
+		Phone: +1 408 750-5000
+		Fax:   +1 408 750-5599 "
+
+	DESCRIPTION
+		"Added Agent Capabilities IETF IF-INVERTED-STACK-MIB (RFC 2864)
+                 for release 6.3.x.
+
+                If this MIB implementation is platform-dependent,
+                the PRODUCT-RELEASE clause contains Ericsson SEOS version and
+                at least one of the following Ericsson product families:
+                    [SE]  SmartEdge Multi-service Edge Router (MSER) family
+                    [SM]  SM family of Metro Ethernet Service Transport platforms
+                    [SSR] Smart Service Router (SSR) family"
+
+        REVISION        "201501141800Z" -- Jan 14, 2015
+        DESCRIPTION
+                "Updated RBN/rbn/Rbn as ERICSSON-ROUTER/eriRouter/EriRouter
+                to migrate RBN MIB to ERICSSON MIB."
+
+        REVISION        "201106150000Z" -- Jun 15, 2011
+        DESCRIPTION
+                "Update DESCRIPTION clause of MODULE-IDENTITY
+                and PRODUCT-RELEASE clause of AGENT-CAPABILITIES."
+
+	REVISION	"201011010000Z" -- Nov 1, 2010
+	DESCRIPTION
+		"Modified PRODUCT-RELEASE clause for consistent naming.
+                 Updated CONTACT-INFO."
+                
+	REVISION	"201001010000Z" -- January 01, 2010
+	DESCRIPTION
+		"Added an AGENT-CAPABILITIES adding partial support for
+		ifOldObjectsGroup, for SmartEdge release 2.5.7.9."
+
+	REVISION	"200501200000Z" -- January 20, 2005
+	DESCRIPTION
+		"Added an AGENT-CAPABILITIES adding partial support for
+		ifOldObjectsGroup, for SmartEdge release 2.5.7.9."
+	REVISION	"200205310000Z"
+	DESCRIPTION
+		"With update of IF-MIB to RFC2863, can add to the INCLUDES
+                the linkUpDownNotificationsGroup missing from RFC 2233.
+                Correct/update CONTACT-INFO."
+
+	REVISION	"200111112300Z"
+	DESCRIPTION
+		"Added an AGENT-CAPABILITIES for SmartEdge release 2.1.0.0"
+	REVISION	"200108072300Z"
+	DESCRIPTION
+		"Added an AGENT-CAPABILITIES for the SmartEdge."
+	::= { eriRouterCapabilities 2 }
+
+eriRouterIetfIfCap1 AGENT-CAPABILITIES
+	PRODUCT-RELEASE	"AOS 1.0.X.X"
+	STATUS		current
+	DESCRIPTION	"IF-MIB capabilities"
+	SUPPORTS	IF-MIB
+	INCLUDES {
+		ifGeneralInformationGroup,
+		ifFixedLengthGroup,
+		ifHCFixedLengthGroup,
+		ifPacketGroup,
+		ifHCPacketGroup,
+		ifVHCPacketGroup,
+		ifStackGroup2,
+		ifCounterDiscontinuityGroup,
+                linkUpDownNotificationsGroup
+		}
+
+	VARIATION	ifAdminStatus
+	SYNTAX		INTEGER { up(1), down(2) }
+	ACCESS		read-only
+	DESCRIPTION
+		"Write access is not allowed.  The value testing(3)
+		is not allowed.  However the value of an instance
+		of this object may be toggled between up and down
+		via the kraft interface using the 'shutdown' port
+		configuration command"
+
+	VARIATION	ifLinkUpDownTrapEnable
+	ACCESS		read-only
+	DESCRIPTION
+		"Write access is not allowed"
+
+	VARIATION	ifPromiscuousMode
+	ACCESS		read-only
+	DESCRIPTION
+		"Write access is not allowed.  However the value of
+		an instance of this object may be set via the kraft
+		interface using the 'promiscuous' port configuration
+		command"
+
+	VARIATION	ifAlias
+	ACCESS		read-only
+	DESCRIPTION
+		"Write access is not allowed.  However, the value of
+		an instance of this object may be set via the kraft
+		interface using the 'description' interface or port
+		configuration command"
+
+	VARIATION	ifStackStatus
+	SYNTAX		INTEGER { active(1) }
+	ACCESS		read-only
+	DESCRIPTION
+		"Row creation or modification is not allowed"
+
+	::= { eriRouterIetfIfCap 1 }
+
+eriRouterIetfIfCapSE AGENT-CAPABILITIES
+	PRODUCT-RELEASE	"SEOS 2.0.4.0"
+	STATUS		current
+	DESCRIPTION	"SmartEdge IF-MIB capabilities"
+	SUPPORTS	IF-MIB
+	INCLUDES {
+		ifGeneralInformationGroup,
+		ifFixedLengthGroup,
+		ifHCFixedLengthGroup,
+		ifPacketGroup,
+		ifHCPacketGroup,
+		ifVHCPacketGroup,
+		ifStackGroup2,
+		ifCounterDiscontinuityGroup,
+                linkUpDownNotificationsGroup
+		}
+
+	VARIATION	ifAdminStatus
+	SYNTAX		INTEGER { up(1), down(2) }
+	ACCESS		read-only
+	DESCRIPTION
+		"Write access is not allowed.  The value testing(3)
+		is not allowed."
+
+        VARIATION       ifOperStatus
+        SYNTAX  INTEGER {
+                   up(1),        -- ready to pass packets
+                   down(2),
+                   notPresent(6),    -- some component is missing
+                   lowerLayerDown(7) -- down due to state of
+                                     -- lower-layer interface(s)
+               }
+        DESCRIPTION
+                "The values testing(3), unknown(4) and dormant(5) are not supported."
+
+
+	VARIATION	ifLinkUpDownTrapEnable
+	ACCESS		read-only
+	DESCRIPTION
+		"Write access is not allowed"
+
+	VARIATION	ifPromiscuousMode
+	ACCESS		read-only
+	DESCRIPTION
+		"Write access is not allowed."
+
+	VARIATION	ifAlias
+	ACCESS		read-only
+	DESCRIPTION
+		"Write access is not allowed."
+
+	VARIATION	ifStackStatus
+	SYNTAX		INTEGER { active(1) }
+	ACCESS		read-only
+	DESCRIPTION
+		"Row creation or modification is not allowed"
+
+	::= { eriRouterIetfIfCap 2 }
+
+eriRouterIetfIfCapSE2 AGENT-CAPABILITIES
+	PRODUCT-RELEASE	"SEOS 2.1.0.0"
+	STATUS		current
+	DESCRIPTION	"SmartEdge IF-MIB capabilities"
+	SUPPORTS	IF-MIB
+	INCLUDES {
+		ifGeneralInformationGroup,
+		ifFixedLengthGroup,
+		ifHCFixedLengthGroup,
+		ifPacketGroup,
+		ifHCPacketGroup,
+		ifVHCPacketGroup,
+		ifStackGroup2,
+		ifCounterDiscontinuityGroup,
+		linkUpDownNotificationsGroup
+                }
+
+	VARIATION	ifAdminStatus
+	SYNTAX		INTEGER { up(1), down(2) }
+	ACCESS		read-only
+	DESCRIPTION
+		"Write access is not allowed.  The value testing(3)
+		is not allowed."
+
+        VARIATION       ifOperStatus
+        SYNTAX  INTEGER {
+                   up(1),        -- ready to pass packets
+                   down(2),
+                   dormant(5),
+                   notPresent(6),    -- some component is missing
+                   lowerLayerDown(7) -- down due to state of
+                                     -- lower-layer interface(s)
+               }
+        DESCRIPTION
+                "The values testing(3) and unknown(4) are not supported."
+
+
+	VARIATION	ifLinkUpDownTrapEnable
+	ACCESS		read-only
+	DESCRIPTION
+		"Write access is not allowed"
+
+	VARIATION	ifPromiscuousMode
+	ACCESS		read-only
+	DESCRIPTION
+		"Write access is not allowed."
+
+	VARIATION	ifAlias
+	ACCESS		read-only
+	DESCRIPTION
+		"Write access is not allowed."
+
+	VARIATION	ifStackStatus
+	SYNTAX		INTEGER { active(1) }
+	ACCESS		read-only
+	DESCRIPTION
+		"Row creation or modification is not allowed"
+
+	::= { eriRouterIetfIfCap 3 }
+
+eriRouterIetfIfCapSE3 AGENT-CAPABILITIES
+	PRODUCT-RELEASE	"SEOS 2.5.7.9"
+	STATUS		current
+	DESCRIPTION	"SmartEdge IF-MIB capabilities"
+	SUPPORTS	IF-MIB
+	INCLUDES {
+		ifGeneralInformationGroup,
+		ifFixedLengthGroup,
+		ifHCFixedLengthGroup,
+		ifPacketGroup,
+		ifHCPacketGroup,
+		ifVHCPacketGroup,
+		ifStackGroup2,
+		ifCounterDiscontinuityGroup,
+		linkUpDownNotificationsGroup,
+		ifOldObjectsGroup
+		}
+
+	VARIATION	ifAdminStatus
+	SYNTAX		INTEGER { up(1), down(2) }
+	ACCESS		read-only
+	DESCRIPTION
+		"Write access is not allowed.  The value testing(3)
+		is not allowed."
+
+	VARIATION       ifOperStatus
+	SYNTAX  INTEGER {
+		   up(1),	-- ready to pass packets
+		   down(2),
+		   dormant(5),
+		   notPresent(6),    -- some component is missing
+		   lowerLayerDown(7) -- down due to state of
+				     -- lower-layer interface(s)
+	       }
+	DESCRIPTION
+		"The values testing(3) and unknown(4) are not supported."
+
+
+	VARIATION	ifLinkUpDownTrapEnable
+	ACCESS		read-only
+	DESCRIPTION
+		"Write access is not allowed"
+
+	VARIATION	ifPromiscuousMode
+	ACCESS		read-only
+	DESCRIPTION           
+		"Write access is not allowed."
+
+	VARIATION	ifAlias
+	ACCESS		read-only
+	DESCRIPTION
+		"Write access is not allowed."
+
+	VARIATION	ifStackStatus
+	SYNTAX		INTEGER { active(1) }
+	ACCESS		read-only
+	DESCRIPTION
+		"Row creation or modification is not allowed"
+
+	VARIATION	ifOutQLen
+	ACCESS		not-implemented
+	DESCRIPTION
+		"This deprecated object is not supported."
+
+	VARIATION	ifSpecific
+	ACCESS		not-implemented
+	DESCRIPTION
+		"This deprecated object is not supported."
+
+	::= { eriRouterIetfIfCap 4 }
+
+
+eriRouterIetfIfCapSE4 AGENT-CAPABILITIES
+	PRODUCT-RELEASE	"SEOS 6.3.X [SE, SM]; SEOS 11.1.x [SSR]"
+	STATUS		current
+	DESCRIPTION	"SmartEdge IF-MIB capabilities"
+	SUPPORTS	IF-MIB
+	INCLUDES {
+		ifGeneralInformationGroup,
+		ifFixedLengthGroup,
+		ifHCFixedLengthGroup,
+		ifPacketGroup,
+		ifHCPacketGroup,
+		ifVHCPacketGroup,
+		ifStackGroup2,
+		ifCounterDiscontinuityGroup,
+		linkUpDownNotificationsGroup
+		}
+
+	VARIATION	ifAdminStatus
+	SYNTAX		INTEGER { up(1), down(2) }
+	ACCESS		read-only
+	DESCRIPTION
+		"Write access is not allowed.  The value testing(3)
+		is not allowed."
+
+	VARIATION       ifOperStatus
+	SYNTAX  INTEGER {
+		   up(1),	-- ready to pass packets
+		   down(2),
+		   dormant(5),
+		   notPresent(6),    -- some component is missing
+		   lowerLayerDown(7) -- down due to state of
+				     -- lower-layer interface(s)
+	       }
+	DESCRIPTION
+		"The values testing(3) and unknown(4) are not supported."
+
+
+	VARIATION	ifLinkUpDownTrapEnable
+	ACCESS		read-only
+	DESCRIPTION
+		"Write access is not allowed"
+
+	VARIATION	ifPromiscuousMode
+	ACCESS		read-only
+	DESCRIPTION
+		"Write access is not allowed."
+
+	VARIATION	ifAlias
+	ACCESS		read-only
+	DESCRIPTION
+		"Write access is not allowed."
+
+	VARIATION	ifStackStatus
+	SYNTAX		INTEGER { active(1) }
+	ACCESS		read-only
+	DESCRIPTION
+		"Row creation or modification is not allowed"
+
+	SUPPORTS	IF-INVERTED-STACK-MIB 
+	INCLUDES {
+		ifInvStackGroup
+		}
+
+	::= { eriRouterIetfIfCap 5 }
+END
+

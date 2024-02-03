@@ -1,0 +1,1954 @@
+-- %DNP% $Id: ERICSSON-ROUTER-SUBSCRIBER-ACTIVE-MIB.my,v 1.1.2.14.130.6 2011/02/22 17:26:18 thatcher Exp $
+-- %DNP% $Source: /cvsroot/pkt/sw/se/xc/bsd/config/snmp/mibs/Attic/ERICSSON-ROUTER-SUBSCRIBER-ACTIVE-MIB.my,v $
+-- *****************************************************************
+-- ERICSSON-ROUTER-SUBSCRIBER-ACTIVE-MIB    SUBSCRIBER MIB for active
+--                              subscribers
+--
+-- Copyright (c) 2003-2011, 2014, 2015, 2016, 2017 Ericsson AB.
+-- All rights reserved.
+--
+-- *****************************************************************
+
+ERICSSON-ROUTER-SUBSCRIBER-ACTIVE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    Gauge32,
+    Integer32,
+    Counter32,
+    Counter64,
+    Unsigned32,
+	IpAddress,
+    zeroDotZero,
+    NOTIFICATION-TYPE
+            FROM SNMPv2-SMI
+
+    DateAndTime,
+    TruthValue,
+    TimeStamp,
+    RowPointer
+            FROM SNMPv2-TC
+
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP,
+    NOTIFICATION-GROUP
+            FROM SNMPv2-CONF
+
+    SnmpAdminString
+            FROM SNMP-FRAMEWORK-MIB
+
+    vacmContextName
+            FROM SNMP-VIEW-BASED-ACM-MIB
+
+    InetAddressType,
+    InetAddress,
+    InetAddressPrefixLength
+            FROM INET-ADDRESS-MIB
+
+    EriRouterCircuitHandle,
+    EriRouterPortMediumType,
+    EriRouterPercentage,
+    EriRouterSubscriberState
+            FROM ERICSSON-ROUTER-TC
+
+    eriRouterMgmt
+            FROM ERICSSON-ROUTER-SMI;
+
+eriRouterSubscriberActiveMib MODULE-IDENTITY
+    LAST-UPDATED "201712060000Z" -- Dec 06, 2017
+    ORGANIZATION "Ericsson AB."
+    CONTACT-INFO
+        "   
+                Ericsson AB.
+                2755 Augustine Drive
+                Santa Clara, CA 95054
+                USA
+
+         Phone: +1 408 750 5000
+           Fax: +1 408 750 5599
+        "
+    DESCRIPTION
+        "Defines the objects necessary to support the management of
+        active subscribers.
+
+        All mib objects, except eriRouterSubsCntxtCountTable, defined in
+        the module are viewed within the context identified in the
+        SNMP protocol (i.e. the community string in v1/v2c or the
+        contextName in v3).
+        "
+
+    REVISION      "201712060000Z" -- Dec 06, 2017
+    DESCRIPTION
+        "Added eriRouterSubsActiveIpv4GlobalTable"
+
+    REVISION      "201705120000Z" -- May 12, 2017
+    DESCRIPTION
+        "Added eriRouterSubsActiveSessionNx entry to eriRouterSubsActiveTable
+         Added eriRouterSubsActiveAddrInt entry to eriRouterSubsActiveIpTable"
+
+    REVISION      "201601040000Z" -- Nov 01, 2015
+    DESCRIPTION
+        " Modified below attribute names of table eriRouterSubsServiceVolumeTable
+          for better readability.
+          eriRouterSubsServiceIPv4VolumeOctetsIn  --> eriRouterSubsIPv4ServiceVolumeOctetsIn
+          eriRouterSubsServiceIPv4VolumeOctetsOut --> eriRouterSubsIPv4ServiceVolumeOctetsOut
+          eriRouterSubsServiceIPv4VolumePktsIn    --> eriRouterSubsIPv4ServiceVolumePktsIn
+          eriRouterSubsServiceIPv4VolumePktsOut   --> eriRouterSubsIPv4ServiceVolumePktsOut
+          eriRouterSubsServiceIPv6VolumeOctetsIn  --> eriRouterSubsIPv6ServiceVolumeOctetsIn
+          eriRouterSubsServiceIPv6VolumeOctetsOut --> eriRouterSubsIPv6ServiceVolumeOctetsOut
+          eriRouterSubsServiceIPv6VolumePktsIn    --> eriRouterSubsIPv6ServiceVolumePktsIn
+          eriRouterSubsServiceIPv6VolumePktsOut   --> eriRouterSubsIPv6ServiceVolumePktsOut
+        "
+
+    REVISION      "201501141800Z" -- Jan 14, 2015
+    DESCRIPTION
+        "Updated RBN/rbn/Rbn as ERICSSON-ROUTER/eriRouter/EriRouter
+         to migrate RBN MIB to ERICSSON MIB."
+
+    REVISION      "201407191800Z" -- July 19, 2014
+    DESCRIPTION
+        "Add eriRouterSubsActiveState to eriRouterSubsActiveEntry."
+ 
+    REVISION      "201302270000Z" -- Feb 27, 2013
+    DESCRIPTION
+        " Changed the following not-accessible objects to read-only
+              eriRouterSubsActiveIpAddrType
+              eriRouterSubsActiveIpAddr
+              eriRouterSubsActiveIpPfxLen" 
+ 
+
+    REVISION      "201101191800Z" -- Jan 19, 2011
+    DESCRIPTION
+        "Update CONTACT-INFO & ORGANIZATION. "
+
+    REVISION      "201002080000Z" -- Feb 8, 2010
+    DESCRIPTION
+        "Add eriRouterSubsIPv4OctetsSent,
+              eriRouterSubsIPv4OctetsReceived,    
+              eriRouterSubsIPv6OctetsSent,      
+              eriRouterSubsIPv6OctetsReceived, 
+              eriRouterSubsIPv4PktsSent,              
+              eriRouterSubsIPv4PktsReceived,         
+              eriRouterSubsIPv6PktsSent,            
+              eriRouterSubsIPv6PktsReceived,       
+              eriRouterSubsIPv4McastOctetsSent,   
+              eriRouterSubsIPv4McastOctetsReceived, 
+              eriRouterSubsIPv6McastOctetsSent,   
+              eriRouterSubsIPv6McastOctetsReceived,
+              eriRouterSubsIPv4McastPktsSent,
+              eriRouterSubsIPv4McastPktsReceived,
+              eriRouterSubsIPv6McastPktsSent,
+              eriRouterSubsIPv6McastPktsReceived to EriRouterSubsStatsEntry table
+              eriRouterSubsServiceIPv4VolumeOctetsIn,
+              eriRouterSubsServiceIPv4VolumeOctetsOut,
+              eriRouterSubsServiceIPv6VolumeOctetsIn,
+              eriRouterSubsServiceIPv6VolumeOctetsOut,
+              eriRouterSubsServiceIPv4VolumePktsIn,
+              eriRouterSubsServiceIPv4VolumePktsOut,
+              eriRouterSubsServiceIPv6VolumePktsIn,
+              eriRouterSubsServiceIPv6VolumePktsOut to EriRouterSubsServiceVolumeEntry table"
+
+
+    REVISION      "201002010000Z" -- Feb 1, 2010
+    DESCRIPTION
+        "Add eriRouterSubsActiveSessionTable,
+             eriRouterSubsActiveIpAddrTable
+
+         Update ORGANIZATION/CONTACT-INFO. "
+
+
+    REVISION      "200901191800Z" -- Jan 19, 2009
+    DESCRIPTION
+        "Add eriRouterSubsActiveResendSvcAcct to eriRouterSubsActiveEntry."
+
+    REVISION      "200812031800Z" -- Dec 3, 2008
+    DESCRIPTION
+        "Add eriRouterSubsMaxSupportedSessions, eriRouterSubsLicensedSessions,
+        eriRouterSubsActiveSessions, and eriRouterSubsCapacityPercentageUsed. 
+        Defined eriRouterSubsCompliance5 and eriRouterSubsLicenseGroup
+        for compliance.
+
+        Deprecated eriRouterSubsCompliance4 and obsoleted eriRouterSubsCompliance3."
+
+    REVISION      "200705241800Z" -- May 24, 2007
+    DESCRIPTION
+        "Add eriRouterSubsConfigErrorEvent notification along with the associated
+        objects.  Defined eriRouterSubsNotifyObjectGroup and eriRouterSubsNotifyGroup
+        for compliance."
+
+    REVISION      "200705091800Z" -- May 9, 2007
+    DESCRIPTION
+        "Add eriRouterSubsServiceVolumeTable and eriRouterSubsServicesTable along with
+        associated objects.  Defined eriRouterSubsCompliance4 and
+        eriRouterSubsServicesGroup for compliance.
+        
+        Deprecated eriRouterSubsCompliance3 and obsoleted eriRouterSubsCompliance2."
+
+    REVISION      "200406281800Z" -- June 28, 2004
+    DESCRIPTION
+        "Add eriRouterSubsActiveNasPortType and eriRouterSubsActiveMediumType to
+         EriRouterSubsActiveEntry. Update conformance objects appropriately."
+
+    REVISION      "200402021800Z" -- February 2, 2004
+    DESCRIPTION
+        "Add objects eriRouterSubsReauthName and eriRouterSubsReauthSessionId. These
+        objects supercede the objects defined in the ERICSSON-ROUTER-SUBSCRIBER-REAUTH-MIB."
+
+    REVISION      "200311011800Z" -- Nov 1, 2003
+    DESCRIPTION
+        "Add eriRouterSubsActiveResend to eriRouterSubsActiveEntry.
+         Add eriRouterSubsProfileCountTable with objects eriRouterSubsProfileName and
+         eriRouterSubsProfileCount. Updated compliance and groups to reflect
+         new objects."
+
+    REVISION      "200306260000Z" -- June 26, 2003
+    DESCRIPTION
+        "Initial version."
+    ::= { eriRouterMgmt 27 }
+
+eriRouterSubsActiveObjects       OBJECT IDENTIFIER ::= { eriRouterSubscriberActiveMib 1 }
+
+eriRouterSubsActiveConformance   OBJECT IDENTIFIER ::= { eriRouterSubscriberActiveMib 2 }
+
+eriRouterSubsActiveNotifications OBJECT IDENTIFIER ::= { eriRouterSubscriberActiveMib 3 }
+
+--
+-- Textual Conventions
+--
+
+--
+-- some structure for the mib objects
+--
+eriRouterSubsActive         OBJECT IDENTIFIER ::= { eriRouterSubsActiveObjects 1 }
+eriRouterSubsStats          OBJECT IDENTIFIER ::= { eriRouterSubsActiveObjects 2 }
+eriRouterSubsNotify         OBJECT IDENTIFIER ::= { eriRouterSubsActiveObjects 3 }
+
+--
+-- ACTIVE Subscribers
+--
+eriRouterSubsActiveTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EriRouterSubsActiveEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains subscriber sessions which have been
+        authenticated on an circuit."
+    ::= { eriRouterSubsActive 1 }
+
+eriRouterSubsActiveEntry OBJECT-TYPE
+    SYNTAX      EriRouterSubsActiveEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A conceptual row in the eriRouterSubsActiveTable."
+    INDEX { eriRouterSubsActiveName, eriRouterSubsActiveSessionId }
+    ::= { eriRouterSubsActiveTable 1 }
+
+EriRouterSubsActiveEntry ::= SEQUENCE {
+    eriRouterSubsActiveName                   SnmpAdminString,
+    eriRouterSubsActiveSessionId              SnmpAdminString,
+    eriRouterSubsActiveCircuitDescr           SnmpAdminString,
+    eriRouterSubsActiveCircuitHandle          EriRouterCircuitHandle,
+    eriRouterSubsActiveStartTime              DateAndTime,
+    eriRouterSubsActiveClear                  TruthValue,
+    eriRouterSubsActiveResend                 TruthValue,
+    eriRouterSubsActiveNasPortType            Unsigned32,
+    eriRouterSubsActiveMediumType             EriRouterPortMediumType,
+    eriRouterSubsActiveResendSvcAcct          TruthValue,
+    eriRouterSubsActiveState                  EriRouterSubscriberState,
+    eriRouterSubsActiveSessionNx              SnmpAdminString
+}
+
+eriRouterSubsActiveName OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE (1..80))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The name identifying this entry.  An entry configured
+        by other means may have been given a name whose length is
+        greater than 80.  Names which exceed this length
+        are not accessible via SNMP operations."
+    ::= { eriRouterSubsActiveEntry 1 }
+
+eriRouterSubsActiveSessionId OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE (1..32))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A value that uniquely identifies an active subscriber
+        session. If RADIUS is being used to configure/authenticate
+        subscribers, this value will appear in the RADIUS
+        Acct-Session-Id attribute."
+    REFERENCE   "Rigney, C., RADIUS Accounting, RFC 2866, June 2000"
+    ::= { eriRouterSubsActiveEntry 2 }
+
+eriRouterSubsActiveCircuitDescr OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE (1..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A string which provides identifying information (e.g
+        slot/port) of the circuit the subscriber is using."
+    ::= { eriRouterSubsActiveEntry 3}
+
+eriRouterSubsActiveCircuitHandle OBJECT-TYPE
+    SYNTAX      EriRouterCircuitHandle
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A value for identifying circuits."
+    ::= { eriRouterSubsActiveEntry 4 }
+
+eriRouterSubsActiveStartTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time when the subscriber became active."
+    ::= { eriRouterSubsActiveEntry 5 }
+
+eriRouterSubsActiveClear OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Setting this value to 'true' will clear the active
+        subscriber session. In the case of PPP, the PPP state
+        machinery attempts to renegotiate and re-authenticate a new
+        session with the remote peer on the circuit. In the case of
+        RFC 1483 encapsulated circuits the session is brought down
+        and then back up and an attempt is made to re-authenticate
+        the subscriber.
+
+        An SNMP get operation always returns 'false'"
+    ::= { eriRouterSubsActiveEntry 6 }
+
+eriRouterSubsActiveResend OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Setting this value to 'true' will cause a resend of the
+        Radius acct-start packet.
+
+        An SNMP get operation always returns 'false'"
+    ::= { eriRouterSubsActiveEntry 7 }
+
+eriRouterSubsActiveNasPortType OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The RADIUS attribute NAS-Port-Type which indicates the type of the
+         physical port which is authenticating the user."
+    REFERENCE "Rigney, C., Rubens, A., Simpson, W., and Willens, S., Remote
+         Authentication Dial In User Service (RADIUS), RFC 2865, June 2000"
+    ::= { eriRouterSubsActiveEntry 8 }
+
+eriRouterSubsActiveMediumType OBJECT-TYPE
+    SYNTAX      EriRouterPortMediumType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The medium type of the NAS-Port."
+    ::= { eriRouterSubsActiveEntry 9 }
+
+eriRouterSubsActiveResendSvcAcct OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Setting this value to 'true' will cause a resend of the
+        Radius acct-start packet for all services associated with
+        the active subscriber session.
+
+        An SNMP get operation always returns 'false'"
+    ::= { eriRouterSubsActiveEntry 10 }
+
+eriRouterSubsActiveState OBJECT-TYPE
+    SYNTAX      EriRouterSubscriberState 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "State of subscriber session." 
+
+    ::= { eriRouterSubsActiveEntry 11 }
+
+eriRouterSubsActiveSessionNx OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE (1..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object returns the same value as eriRouterSubsActiveSessionId,
+         Only difference is it's accessible object."
+    ::= { eriRouterSubsActiveEntry 12 }
+
+--
+-- Active IP Addresses
+--
+eriRouterSubsActiveIpTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EriRouterSubsActiveIpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains IP addresses used by active subscribers."
+    ::= { eriRouterSubsActive 2 }
+
+eriRouterSubsActiveIpEntry OBJECT-TYPE
+    SYNTAX      EriRouterSubsActiveIpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A conceptual row in the eriRouterSubsActiveIpTable."
+    INDEX { eriRouterSubsActiveName,
+            eriRouterSubsActiveSessionId,
+            eriRouterSubsActiveAddrType,
+            eriRouterSubsActiveAddr }
+    ::= { eriRouterSubsActiveIpTable 1 }
+
+EriRouterSubsActiveIpEntry ::= SEQUENCE {
+    eriRouterSubsActiveAddrType     InetAddressType,
+    eriRouterSubsActiveAddr         InetAddress,
+    eriRouterSubsActiveAddrInt      Unsigned32
+}
+
+eriRouterSubsActiveAddrType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The address type of eriRouterSubsActiveAddr. "
+    ::= { eriRouterSubsActiveIpEntry 1 }
+
+eriRouterSubsActiveAddr OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE(4 | 16 | 20))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The host IP address of the active subscriber."
+    ::= { eriRouterSubsActiveIpEntry 2 }
+
+eriRouterSubsActiveAddrInt OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The host IP address of the active subscriber.
+         The value of this object is limited to the IPv4 address.
+         Hence, mustbe used only when eriRouterSubsActiveIpAddrType
+         is of type v4."
+    ::= { eriRouterSubsActiveIpEntry 3 }
+
+--
+-- Subscriber Session List
+--
+eriRouterSubsActiveSessionTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EriRouterSubsActiveSessionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains active subscriber sessions which have been
+        authenticated on an circuit."
+    ::= { eriRouterSubsActive 6 }
+
+eriRouterSubsActiveSessionEntry OBJECT-TYPE
+    SYNTAX      EriRouterSubsActiveSessionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A conceptual row in the eriRouterSubsActiveSessionTable."
+    INDEX { eriRouterSubsActiveSessionId }
+    ::= { eriRouterSubsActiveSessionTable 1 }
+
+EriRouterSubsActiveSessionEntry ::= SEQUENCE {
+    eriRouterSubsActiveSessionSubscriberName         SnmpAdminString,
+    eriRouterSubsActiveSessionPointer                RowPointer
+}
+
+eriRouterSubsActiveSessionSubscriberName OBJECT-TYPE
+    SYNTAX      SnmpAdminString(SIZE (1..256))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The subscriber name associated with this session."
+    ::= { eriRouterSubsActiveSessionEntry 1 }
+
+eriRouterSubsActiveSessionPointer OBJECT-TYPE
+    SYNTAX      RowPointer
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A pointer to the row in eriRouterSubsActiveTable to which this session
+        belongs. May be {0 0} if there is no such row."
+    DEFVAL { zeroDotZero }
+    ::= { eriRouterSubsActiveSessionEntry 2 }
+
+--
+-- Active IPv4/v6 Addresses
+--
+
+eriRouterSubsActiveIpAddrTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EriRouterSubsActiveIpAddrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains IPv4/IPv6 addresses used by active
+         subscriber sessions.  "
+    ::= { eriRouterSubsActive 7 }
+
+eriRouterSubsActiveIpAddrEntry OBJECT-TYPE
+    SYNTAX      EriRouterSubsActiveIpAddrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A conceptual row in the eriRouterSubsActiveIpAddrTable."
+    INDEX { eriRouterSubsActiveSessionId,
+            eriRouterSubsActiveIpAddrType,
+            eriRouterSubsActiveIpAddr,
+            eriRouterSubsActiveIpPfxLen }
+    ::= { eriRouterSubsActiveIpAddrTable 1 }
+
+EriRouterSubsActiveIpAddrEntry ::= SEQUENCE {
+    eriRouterSubsActiveIpAddrType     InetAddressType,
+    eriRouterSubsActiveIpAddr         InetAddress,
+    eriRouterSubsActiveIpPfxLen       InetAddressPrefixLength,
+    eriRouterSubsActiveIpAddrDescr    SnmpAdminString
+}
+
+eriRouterSubsActiveIpAddrType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The address type of eriRouterSubsActiveIpAddr."
+    ::= { eriRouterSubsActiveIpAddrEntry 1 }
+
+eriRouterSubsActiveIpAddr OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The address prefix.  The address type of this object is specified 
+         in eriRouterSubsActiveIpAddrType.  The length of this object is the 
+         standard length for objects of that type (4 or 16 bytes).  
+         Any bits after eriRouterSubsActiveIpPfxLen must be zero. "
+    REFERENCE "[RFC4291] IP Version 6 Addressing Architectur
+               [RFC4632] Classless Inter-domain Routing (CIDR):
+               The Internet Address Assignment and Aggregation Plan"
+    ::= { eriRouterSubsActiveIpAddrEntry 2 }
+
+eriRouterSubsActiveIpPfxLen OBJECT-TYPE
+    SYNTAX      InetAddressPrefixLength
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The prefix length associated with this prefix. For IPv4 active
+         subscriber session, the prefix length is always 32."
+    ::= { eriRouterSubsActiveIpAddrEntry 3 }
+
+eriRouterSubsActiveIpAddrDescr OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Human readable textual format of IP address. "
+    REFERENCE "[RFC4291] 2.2. Text Representation of Addresses"
+    ::= { eriRouterSubsActiveIpAddrEntry 4 }
+
+--
+-- set of clear objects to clear by subscriber name
+-- RADIUS acct-session-id, or by ip address.
+--
+eriRouterSubsClear  OBJECT IDENTIFIER ::= { eriRouterSubsActive 3 }
+
+eriRouterSubsClearSubscriberName OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE (0..80))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Setting this object to the subscriber name will clear all
+        the sessions associated with the subscriber.
+
+        In the case of PPP circuit, the PPP state machinery attempts
+        to renegotiate and re-authenticate a new session with the
+        remote peer on the circuit. In the case of RFC 1483 and RFC
+        1490 encapsulated circuits the circuit is brought down and
+        then back up and an attempt is made to re-authenticate the
+        subscriber bound to the circuit.
+
+        This object returns a zero-length string when queried.
+        "
+    DEFVAL { "" }
+    ::= { eriRouterSubsClear 1}
+
+--
+-- object to clear subscriber using the RADIUS attribute
+-- acct-session-id
+--
+eriRouterSubsClearSessionId OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE (0..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "A set of this object will clear the subscriber
+        session identified by this value.
+
+        In the case of PPP circuit, the PPP state machinery attempts
+        to renegotiate and re-authenticate a new session with the
+        remote peer on the circuit. In the case of RFC 1483 and RFC
+        1490 encapsulated circuits the circuit is brought down and
+        then back up and an attempt is made to re-authenticate the
+        subscriber bound to the circuit.
+
+        This object returns a zero-length string when queried.
+        "
+    ::= { eriRouterSubsClear 2 }
+
+-- BOUNCE objects
+--
+eriRouterSubsBounceName OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..80))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Each circuit using CLIPS encapsulation used by the named subscriber
+        is brought down and immediately recreated using the RADIUS Access-
+        Accept attributes. Any other circuit encapsulation type is cleared.
+
+        This object returns a zero-length string when queried."
+    ::= { eriRouterSubsClear 3}
+
+eriRouterSubsBounceSessionId OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The circuit using CLIPS encapsulation identified by the RADIUS
+        Acct-Session-Id is brought down and immediately recreated using the
+        RADIUS Access-Accept attributes. Any other circuit encapsulation
+        type is cleared.
+
+        This object returns a zero-length string when queried."
+    ::= { eriRouterSubsClear 4 }
+
+--
+-- REAUTH objects
+--
+eriRouterSubsReauthRadiusIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "An unsigned integer identifying a set of subscribers
+        defined at the RADIUS server which are to be re-authorized.
+        The source of this value and the set of subscribers to be
+        re-authorized are defined outside the context of this mib module.
+
+        An get of this attribute returns 0."
+    ::= { eriRouterSubsClear 5}
+
+eriRouterSubsReauthRadiusID OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(0..240))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "An octet string identifying a set of subscribers
+        defined at the RADIUS server which are to be re-authorized.
+        The source of this value and the set of subscribers to be
+        re-authorized are defined outside the context of this mib module.
+
+        This object returns a zero-length string when queried."
+    ::= { eriRouterSubsClear 6}
+
+eriRouterSubsReauthName OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..80))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Used to reauthorize all of the active sessions associated
+        with the given subscriber in the context identified in the
+        SNMP protocol (i.e. the community string in v1/v2c or the
+        contextName in v3).
+
+        This object returns a zero-length string when queried.
+        "
+    ::= { eriRouterSubsClear 7 }
+
+eriRouterSubsReauthSessionId OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Used to reauthorize the active session identified by the
+        value of this object and the context identified in the
+        SNMP protocol (i.e. the community string in v1/v2c or the
+        contextName in v3).
+
+        This object returns a zero-length string when queried.
+        "
+    ::= { eriRouterSubsClear 8 }
+
+eriRouterSubsClearReason OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "An unsigned integer value which may be included in the set request
+         for eriRouterSubsClearSubscriberName, eriRouterSubsClearSessionId,
+         eriRouterSubsBounceName, eriRouterSubsBounceSessionId, or any other objects
+         define under the eriRouterSubsClear OID node. The use of this object value
+         is implementation dependent.
+
+         This object returns 0 when queried."
+    ::= { eriRouterSubsClear 9 }
+
+--
+--Subscriber Statistics
+--
+eriRouterSubsCntxtCountTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EriRouterSubsCntxtCountEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains counts of active subscribers by context
+        name.  Unlike any of the other tables in this mib module, all
+        rows in this table are accessible when the context 'local' is
+        specified in the snmp message, unless restricted by entries in
+        the vacmAccessTable. Snmp requests using other contexts shall
+        return only the row which matches the context."
+    ::= { eriRouterSubsStats 1 }
+
+eriRouterSubsCntxtCountEntry OBJECT-TYPE
+    SYNTAX      EriRouterSubsCntxtCountEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The conceptual row containing the count of active subscribers
+        for each context."
+    INDEX { vacmContextName }
+    ::= { eriRouterSubsCntxtCountTable 1 }
+
+EriRouterSubsCntxtCountEntry::= SEQUENCE {
+    eriRouterSubsCntxtCount      Gauge32,
+    eriRouterSubsCntxtIp4OnlyCount  Gauge32,
+    eriRouterSubsCntxtIp6OnlyCount  Gauge32,
+    eriRouterSubsCntxtDualCount   Gauge32,
+    eriRouterSubsCntxtLacCount    Gauge32
+}
+
+eriRouterSubsCntxtCount OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The count of active subscribers with either IPv4 or IPv6 or both 
+         stack UP."
+    ::= { eriRouterSubsCntxtCountEntry 1 }
+
+eriRouterSubsCntxtIp4OnlyCount OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The count of IPv4 active subscribers which are authorized for only
+        IPv4 protocol stack. 
+		
+		This counter does not include subscribers authorized
+        for dual IPv4/IPv6 protocol stack. "
+    ::= { eriRouterSubsCntxtCountEntry 2 }
+
+eriRouterSubsCntxtIp6OnlyCount OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The count of IPv6 active subscribers which are authorized for only
+        IPv6 protocol stack. 
+		
+		This counter does not include subscribers authorized
+        for dual IPv4/IPv6 protocol stack. "
+    ::= { eriRouterSubsCntxtCountEntry 3 }
+
+eriRouterSubsCntxtDualCount OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The count of active subscribers which are authorized for both 
+         IPv4 and IPv6 for the context. At any time either one or both stacks 
+         may be UP. "
+    ::= { eriRouterSubsCntxtCountEntry 4 }
+
+eriRouterSubsCntxtLacCount OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The count of active LAC subscribers."
+    ::= { eriRouterSubsCntxtCountEntry 5 }
+
+--
+-- Subscriber counts by encapsulation type
+--
+eriRouterSubsEncapsCountTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EriRouterSubsEncapsCountEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains counts of active subscribers by
+        encapsulation type."
+    ::= { eriRouterSubsStats 2 }
+
+eriRouterSubsEncapsCountEntry OBJECT-TYPE
+    SYNTAX      EriRouterSubsEncapsCountEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A conceptual row in the eriRouterSubsEncapsCountTable. "
+    INDEX { eriRouterSubsEncapsulationType }
+    ::= { eriRouterSubsEncapsCountTable 1 }
+
+EriRouterSubsEncapsCountEntry ::= SEQUENCE {
+    eriRouterSubsEncapsulationType  INTEGER,
+    eriRouterSubsEncapsCount        Gauge32
+}
+
+eriRouterSubsEncapsulationType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    ppp(1),
+                    pppoe(2),
+                    bridged1483(3),
+                    routed1483(4),
+                    multi1483(5),
+                    dot1q1483(6),
+                    dot1qEnet(7),
+                    bridged1490(8),
+                    routed1490(9),
+                    multi1490(10),
+                    dot1q1490(11),
+                    clips(12),
+                    other(255)
+                }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the type of encapsulation the
+        subscriber is using.  Note that 'ppp' includes all types of
+        supported ppp, excluding pppoe."
+    ::= { eriRouterSubsEncapsCountEntry 1 }
+
+eriRouterSubsEncapsCount OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "subscribers"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The count of active subscribers for the encapsulation type."
+    ::= { eriRouterSubsEncapsCountEntry 2 }
+
+--
+-- Statistics
+--
+eriRouterSubsStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EriRouterSubsStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains counters for individual circuits."
+    ::= { eriRouterSubsStats 3 }
+
+eriRouterSubsStatsEntry OBJECT-TYPE
+    SYNTAX      EriRouterSubsStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A conceptual row in the eriRouterSubsStatsTable."
+    INDEX { eriRouterSubsActiveName, eriRouterSubsActiveSessionId }
+    ::= { eriRouterSubsStatsTable 1 }
+
+EriRouterSubsStatsEntry ::= SEQUENCE {
+    eriRouterSubsOctetsSent            Counter64,
+    eriRouterSubsOctetsReceived        Counter64,
+    eriRouterSubsPktsSent              Counter64,
+    eriRouterSubsPktsReceived          Counter64,
+    eriRouterSubsXmitOctetsDropped     Counter32,
+    eriRouterSubsXmitPktsDropped       Counter32,
+    eriRouterSubsMcastOctetsSent       Counter64,
+    eriRouterSubsMcastOctetsReceived   Counter64,
+    eriRouterSubsMcastPktsSent         Counter64,
+    eriRouterSubsMcastPktsReceived     Counter64,
+    eriRouterSubsIPv4OctetsSent            Counter64,
+    eriRouterSubsIPv4OctetsReceived        Counter64,
+    eriRouterSubsIPv6OctetsSent            Counter64,
+    eriRouterSubsIPv6OctetsReceived        Counter64,
+    eriRouterSubsIPv4PktsSent              Counter64,
+    eriRouterSubsIPv4PktsReceived          Counter64,
+    eriRouterSubsIPv6PktsSent              Counter64,
+    eriRouterSubsIPv6PktsReceived          Counter64,
+    eriRouterSubsIPv4McastOctetsSent       Counter64,
+    eriRouterSubsIPv4McastOctetsReceived   Counter64,
+    eriRouterSubsIPv6McastOctetsSent       Counter64,
+    eriRouterSubsIPv6McastOctetsReceived   Counter64,
+    eriRouterSubsIPv4McastPktsSent         Counter64,
+    eriRouterSubsIPv4McastPktsReceived     Counter64,
+    eriRouterSubsIPv6McastPktsSent         Counter64,
+    eriRouterSubsIPv6McastPktsReceived     Counter64
+
+}
+
+eriRouterSubsOctetsSent OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of octets sent by the circuit. This counter includes
+        multicast activity."
+    ::= { eriRouterSubsStatsEntry 1 }
+
+eriRouterSubsOctetsReceived OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of octets received by the circuit. This counter includes
+        multicast activity."
+    ::= { eriRouterSubsStatsEntry 2 }
+
+eriRouterSubsPktsSent OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets sent by the circuit. This counter
+        includes multicast activity."
+    ::= { eriRouterSubsStatsEntry 3 }
+
+eriRouterSubsPktsReceived OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets received by the circuit. This counter
+        includes multicast activity."
+    ::= { eriRouterSubsStatsEntry 4 }
+
+eriRouterSubsXmitOctetsDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of octets dropped by the circuit before
+        transmission."
+    ::= { eriRouterSubsStatsEntry 5 }
+
+eriRouterSubsXmitPktsDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets dropped by the circuit before
+        transmission."
+    ::= { eriRouterSubsStatsEntry 6 }
+
+eriRouterSubsMcastOctetsSent OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of multicast octets sent by the circuit."
+    ::= { eriRouterSubsStatsEntry 7 }
+
+eriRouterSubsMcastOctetsReceived OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of multicast octets received by the circuit."
+    ::= { eriRouterSubsStatsEntry 8 }
+
+eriRouterSubsMcastPktsSent OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of multicast packets sent by the circuit."
+    ::= { eriRouterSubsStatsEntry 9 }
+
+eriRouterSubsMcastPktsReceived OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of multicast packets received by the circuit."
+    ::= { eriRouterSubsStatsEntry 10 }
+
+eriRouterSubsIPv4OctetsSent OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of IPv4 octets sent by the circuit. This counter includes
+        multicast activity."
+    ::= { eriRouterSubsStatsEntry 11 }
+
+eriRouterSubsIPv4OctetsReceived OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of IPv4 octets received by the circuit. This counter includes
+        multicast activity."
+    ::= { eriRouterSubsStatsEntry 12 }
+
+eriRouterSubsIPv6OctetsSent OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of IPv6 octets sent by the circuit. This counter includes
+        multicast activity."
+    ::= { eriRouterSubsStatsEntry 13 }
+
+eriRouterSubsIPv6OctetsReceived OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of IPv6 octets received by the circuit. This counter includes
+        multicast activity."
+    ::= { eriRouterSubsStatsEntry 14 }
+
+eriRouterSubsIPv4PktsSent OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of IPv4 packets sent by the circuit. This counter
+        includes multicast activity."
+    ::= { eriRouterSubsStatsEntry 15 }
+
+eriRouterSubsIPv4PktsReceived OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of IPv4 packets received by the circuit. This counter
+        includes multicast activity."
+    ::= { eriRouterSubsStatsEntry 16 }
+
+eriRouterSubsIPv6PktsSent OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of IPv6 packets sent by the circuit. This counter
+        includes multicast activity."
+    ::= { eriRouterSubsStatsEntry 17 }
+
+eriRouterSubsIPv6PktsReceived OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of IPv6 packets received by the circuit. This counter
+        includes multicast activity."
+    ::= { eriRouterSubsStatsEntry 18 }
+
+eriRouterSubsIPv4McastOctetsSent OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of IPv4 multicast octets sent by the circuit."
+    ::= { eriRouterSubsStatsEntry 19 }
+
+eriRouterSubsIPv4McastOctetsReceived OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of IPv4 multicast octets received by the circuit."
+    ::= { eriRouterSubsStatsEntry 20 }
+
+eriRouterSubsIPv6McastOctetsSent OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of IPv6 multicast octets sent by the circuit."
+    ::= { eriRouterSubsStatsEntry 21 }
+
+eriRouterSubsIPv6McastOctetsReceived OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of IPv6 multicast octets received by the circuit."
+    ::= { eriRouterSubsStatsEntry 22 }
+
+
+eriRouterSubsIPv4McastPktsSent OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of IPv4 multicast packets sent by the circuit."
+    ::= { eriRouterSubsStatsEntry 23 }
+
+eriRouterSubsIPv4McastPktsReceived OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of IPv4 multicast packets received by the circuit."
+    ::= { eriRouterSubsStatsEntry 24 }
+
+eriRouterSubsIPv6McastPktsSent OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of IPv6 multicast packets sent by the circuit."
+    ::= { eriRouterSubsStatsEntry 25 }
+
+eriRouterSubsIPv6McastPktsReceived OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of IPv6 multicast packets received by the circuit."
+    ::= { eriRouterSubsStatsEntry 26 }
+
+
+
+--
+-- Subscriber counts by profile name
+--
+eriRouterSubsProfileCountTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EriRouterSubsProfileCountEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains counts of active subscribers by
+        encapsulation type."
+    ::= { eriRouterSubsStats 4 }
+
+eriRouterSubsProfileCountEntry OBJECT-TYPE
+    SYNTAX      EriRouterSubsProfileCountEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A conceptual row in the eriRouterSubsProfileCountTable. "
+    INDEX { IMPLIED eriRouterSubsProfileName }
+    ::= { eriRouterSubsProfileCountTable 1 }
+
+EriRouterSubsProfileCountEntry ::= SEQUENCE {
+    eriRouterSubsProfileName        SnmpAdminString,
+    eriRouterSubsProfileCount       Gauge32
+}
+
+eriRouterSubsProfileName OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE (1..80))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The profile name which applies to a set of subscribers."
+    ::= { eriRouterSubsProfileCountEntry 1 }
+
+eriRouterSubsProfileCount OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "subscribers"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The count of active subscribers for the profile name."
+    ::= { eriRouterSubsProfileCountEntry 2 }
+
+--
+-- Subscriber software license
+--
+eriRouterSubsLicense OBJECT IDENTIFIER ::= { eriRouterSubsStats 5 }
+
+eriRouterSubsMaxSupportedSessions OBJECT-TYPE
+   SYNTAX      Gauge32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+        "The maximum number of active subscriber sessions that
+        are supported on the SmartEdge router."
+   ::= { eriRouterSubsLicense 1 }
+
+eriRouterSubsLicensedSessions OBJECT-TYPE
+   SYNTAX      Gauge32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+        "The number of licensed subscriber sessions on the 
+        SmartEdge router."
+   ::= { eriRouterSubsLicense 2 }
+
+eriRouterSubsActiveSessions OBJECT-TYPE
+   SYNTAX      Gauge32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+        "The number of active subscriber sessions on the SmartEdge
+        router."
+   ::= { eriRouterSubsLicense 3 }
+
+eriRouterSubsCapacityPercentageUsed OBJECT-TYPE
+   SYNTAX      EriRouterPercentage 
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+        "The percentage of licensed subscriber sessions in use 
+        on the SmartEdge router. This value is computed as: 
+
+        if eriRouterSubsLicensedSessions equals 0 then 
+            if eriRouterSubsActiveSessions equals 0 then 0 else 100    
+        else 
+            MIN((eriRouterSubsActiveSessions * 100)/eriRouterSubsLicensedSessions), 100)."
+   ::= { eriRouterSubsLicense 4 }
+
+--
+-- Services Volume Limits
+--
+eriRouterSubsServiceVolumeTable    OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EriRouterSubsServiceVolumeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table specifies service volume information on
+         the subscriber circuits.  It contains the volume octet
+         counts for each active subscriber session for which the
+         service is active.
+
+         All MIB objects defined in the table are viewed within the
+         context identified in the SNMP protocol (i.e. the community
+         string in v1/v2c or the contextName in v3)."
+    ::= { eriRouterSubsActive 4 }
+
+eriRouterSubsServiceVolumeEntry OBJECT-TYPE
+    SYNTAX      EriRouterSubsServiceVolumeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A conceptual row in the EriRouterSubsServiceVolumeTable. Each
+         row contains the service volume limit and volume octet count 
+         for each active service session."
+    INDEX { eriRouterSubsActiveName,
+            eriRouterSubsActiveSessionId,
+            eriRouterSubsServiceIndex }
+    ::= { eriRouterSubsServiceVolumeTable 1 }
+
+EriRouterSubsServiceVolumeEntry ::= SEQUENCE {
+    eriRouterSubsServiceVolumeLimitIn         Unsigned32,
+    eriRouterSubsServiceVolumeLimitOut        Unsigned32,
+    eriRouterSubsServiceActiveTime            TimeStamp,
+    eriRouterSubsServiceVolumeOctetsIn        Counter64,
+    eriRouterSubsServiceVolumeOctetsOut       Counter64,
+    eriRouterSubsServiceVolumePktsIn          Counter64,
+    eriRouterSubsServiceVolumePktsOut         Counter64,
+    eriRouterSubsIPv4ServiceVolumeOctetsIn    Counter64,
+    eriRouterSubsIPv4ServiceVolumeOctetsOut   Counter64,
+    eriRouterSubsIPv4ServiceVolumePktsIn      Counter64,
+    eriRouterSubsIPv4ServiceVolumePktsOut     Counter64,
+    eriRouterSubsIPv6ServiceVolumeOctetsIn    Counter64,
+    eriRouterSubsIPv6ServiceVolumeOctetsOut   Counter64,
+    eriRouterSubsIPv6ServiceVolumePktsIn      Counter64,
+    eriRouterSubsIPv6ServiceVolumePktsOut     Counter64
+
+}
+    
+eriRouterSubsServiceVolumeLimitIn   OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "KiloBytes"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The volume limit in kilobytes (KB) allowed for the subscriber
+        service to input (or receive) for this subscriber. If
+        the value is 0, then there is no limit."
+    ::= { eriRouterSubsServiceVolumeEntry 1 }
+    
+eriRouterSubsServiceVolumeLimitOut OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "KiloBytes"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The volume limit in kilobytes (KB) allowed for the subscriber
+        service to output (or transmit) for this subscriber. If
+        the value is 0, then there is no limit."
+    ::= { eriRouterSubsServiceVolumeEntry 2 }
+    
+eriRouterSubsServiceActiveTime  OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of sysUpTime when the service became active for this
+        subscriber. 
+        
+        If sysUpTime is reset to zero as a result of a reinitialization
+        of the network management (sub)system, then the values of all
+        TimeStamp objects are also reset."
+    ::= { eriRouterSubsServiceVolumeEntry 3 }
+
+eriRouterSubsServiceVolumeOctetsIn  OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The subscriber session volume octets in count. "
+    ::= { eriRouterSubsServiceVolumeEntry 4 }
+    
+eriRouterSubsServiceVolumeOctetsOut  OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The subscriber session volume octets out count."
+    ::= { eriRouterSubsServiceVolumeEntry 5 }
+
+eriRouterSubsServiceVolumePktsIn  OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The subscriber session volume packet in count. "
+    ::= { eriRouterSubsServiceVolumeEntry 6 }
+
+eriRouterSubsServiceVolumePktsOut  OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The subscriber session volume packet out count. "
+    ::= { eriRouterSubsServiceVolumeEntry 7 }
+
+eriRouterSubsIPv4ServiceVolumeOctetsIn  OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The subscriber session volume IPv4 octets in count. "
+    ::= { eriRouterSubsServiceVolumeEntry 8 }
+
+eriRouterSubsIPv4ServiceVolumeOctetsOut  OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The subscriber session volume IPv4 octets out count."
+    ::= { eriRouterSubsServiceVolumeEntry 9 }
+
+eriRouterSubsIPv4ServiceVolumePktsIn  OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The subscriber session volume IPv4 packet in count. "
+    ::= { eriRouterSubsServiceVolumeEntry 10 }
+
+eriRouterSubsIPv4ServiceVolumePktsOut  OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The subscriber session volume IPv4 packet out count. "
+    ::= { eriRouterSubsServiceVolumeEntry 11 }
+
+eriRouterSubsIPv6ServiceVolumeOctetsIn  OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The subscriber session volume IPv6 octets in count. "
+    ::= { eriRouterSubsServiceVolumeEntry 12 }
+
+eriRouterSubsIPv6ServiceVolumeOctetsOut  OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The subscriber session volume IPv6 octets out count."
+    ::= { eriRouterSubsServiceVolumeEntry 13 }
+
+eriRouterSubsIPv6ServiceVolumePktsIn  OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The subscriber session volume IPv6 packet in count. "
+    ::= { eriRouterSubsServiceVolumeEntry 14 }
+
+eriRouterSubsIPv6ServiceVolumePktsOut  OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The subscriber session volume IPv6 packet out count. "
+    ::= { eriRouterSubsServiceVolumeEntry 15 }
+
+
+--
+-- Services Table
+--
+eriRouterSubsServicesTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EriRouterSubsServicesEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains services available to subscribers."
+    ::= { eriRouterSubsActive 5 }
+    
+eriRouterSubsServicesEntry OBJECT-TYPE
+    SYNTAX      EriRouterSubsServicesEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A conceptual row in the eriRouterSubsServicesTable. "
+    INDEX { eriRouterSubsServiceIndex }
+    ::= { eriRouterSubsServicesTable 1 }
+    
+EriRouterSubsServicesEntry ::= SEQUENCE {
+    eriRouterSubsServiceIndex         Integer32,
+    eriRouterSubsServiceName          SnmpAdminString,
+    eriRouterSubsServiceTag           SnmpAdminString
+}
+
+eriRouterSubsServiceIndex OBJECT-TYPE
+    SYNTAX      Integer32(1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A unique index assigned to the entry."
+    ::= { eriRouterSubsServicesEntry 1}
+    
+eriRouterSubsServiceName OBJECT-TYPE
+    SYNTAX      SnmpAdminString(SIZE(1..128))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The name identifying the service."
+    ::= { eriRouterSubsServicesEntry 2}
+    
+eriRouterSubsServiceTag OBJECT-TYPE
+    SYNTAX      SnmpAdminString(SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A tag associated with the service name which may provide
+        additional qualification to the name."
+    ::= { eriRouterSubsServicesEntry 3}
+    
+--
+-- Subscriber Active Ipv4 Global table
+--
+eriRouterSubsActiveIpv4GlobalTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EriRouterSubsActiveIpv4GlobalEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains information about the active
+         subscribers in the system.
+         A walk on the table with a specific context would
+         return only those active subscribers belonging to the
+         context.
+         A walk on this table with context local would return
+         all the active subscribers across all contexts in the 
+         system.
+         A walk on this table without specifying any context
+         would return all active subscribers across all contexts
+         in the system.
+         This table is supported only for IPv4 subscribers and
+         will not be instantiated for single stack IPv6 subscriber."
+    ::= { eriRouterSubsActive 8 }
+
+eriRouterSubsActiveIpv4GlobalEntry OBJECT-TYPE
+    SYNTAX      EriRouterSubsActiveIpv4GlobalEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A conceptual row in the eriRouterSubsActiveIpv4GlobalTable."
+    INDEX { eriRouterSubsActiveSessionId } 
+    ::= { eriRouterSubsActiveIpv4GlobalTable 1 }
+
+EriRouterSubsActiveIpv4GlobalEntry ::= SEQUENCE {
+    eriRouterSubsActiveIpv4GlobalSessionId     SnmpAdminString,
+    eriRouterSubsActiveIpv4GlobalName          SnmpAdminString,
+    eriRouterSubsActiveIpv4GlobalAddress       IpAddress,
+    eriRouterSubsActiveIpv4GlobalMask          IpAddress 
+}
+
+eriRouterSubsActiveIpv4GlobalSessionId OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The session ID for the active subscriber. This object
+         returns the same value as Acct-Session-ID AVP used for
+         subscriber accounting."
+    ::= { eriRouterSubsActiveIpv4GlobalEntry 1 }
+
+eriRouterSubsActiveIpv4GlobalName OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Username for the active subscriber. User name can 
+         be of the format name@context or name@domain."
+    ::= { eriRouterSubsActiveIpv4GlobalEntry 2 }
+
+eriRouterSubsActiveIpv4GlobalAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The IPv4 address assigned to the active subscriber.
+         For dual stack subscriber, the address of the IPv4
+         stack is returned."
+    ::= { eriRouterSubsActiveIpv4GlobalEntry 3 }
+
+eriRouterSubsActiveIpv4GlobalMask OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The IPv4 subnet mask assigned to the active subscriber.
+         The subnet mask is always 255.255.255.255."
+    ::= { eriRouterSubsActiveIpv4GlobalEntry 4 }
+
+--
+-- Subscriber notification objects
+--
+eriRouterSubsNotifyEnable  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object will provide a mechanism for enabling and
+        disabling subscriber notifications.  A value of 1 (true)
+        indicates that subscriber notifications are enabled.
+        A value of 2 (false) indicates that subscriber
+        notifications are disabled."
+    DEFVAL { true }
+    ::= { eriRouterSubsNotify 1 }
+
+eriRouterSubsConfigErrorMsgs OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Detailed error messages that describes the mis-configured 
+        attributes that failed authentication."
+    ::= { eriRouterSubsNotify 2 }
+
+--
+-- NOTIFICATIONS - node for hanging notification definitions
+--
+eriRouterSubsNotifyPrefix OBJECT IDENTIFIER
+        ::= { eriRouterSubsActiveNotifications 0 }
+
+eriRouterSubsConfigErrorEvent NOTIFICATION-TYPE
+    OBJECTS         {
+        eriRouterSubsActiveCircuitHandle,
+        eriRouterSubsConfigErrorMsgs
+    }
+    STATUS current
+    DESCRIPTION
+        "This notification signifies that the subscriber session
+        received one or more attribute(s) referring non-existing
+        configuration, and the subscriber session is allowed to 
+        stay up."
+    ::= { eriRouterSubsNotifyPrefix 1 }
+
+--
+-- compliance statements
+--
+eriRouterSubsCompliances OBJECT IDENTIFIER ::= { eriRouterSubsActiveConformance 1 }
+eriRouterSubsGroups      OBJECT IDENTIFIER ::= { eriRouterSubsActiveConformance 2 }
+
+eriRouterSubsCompliance MODULE-COMPLIANCE
+    STATUS  obsolete
+    DESCRIPTION
+        "The compliance statement for SNMP entities which implement
+         the Subscriber MIB.
+
+         This compliance is replaced by eriRouterSubsCompliance2"
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+            eriRouterSubsActiveGroup,
+            eriRouterSubsStatsGroup
+        }
+    ::= { eriRouterSubsCompliances 1}
+
+eriRouterSubsCompliance2 MODULE-COMPLIANCE
+    STATUS  obsolete
+    DESCRIPTION
+        "The compliance statement for SNMP entities which implement
+         the Subscriber MIB.
+         
+         This compliance is replaced by eriRouterSubsCompliance3"
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+            eriRouterSubsActiveGroup2,
+            eriRouterSubsStatsGroup2
+        }
+    ::= { eriRouterSubsCompliances 2}
+
+eriRouterSubsCompliance3 MODULE-COMPLIANCE
+    STATUS  obsolete 
+    DESCRIPTION
+        "The compliance statement for SNMP entities which implement
+         the Subscriber MIB.
+         
+         This compliance is replaced by eriRouterSubsCompliance4."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+            eriRouterSubsActiveGroup3,
+            eriRouterSubsStatsGroup2
+        }
+    ::= { eriRouterSubsCompliances 3}
+
+eriRouterSubsCompliance4 MODULE-COMPLIANCE
+    STATUS  obsolete
+    DESCRIPTION
+        "The compliance statement for SNMP entities which implement
+         the Subscriber MIB. "
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+            eriRouterSubsActiveGroup3,
+            eriRouterSubsStatsGroup2,
+            eriRouterSubsServicesGroup,
+            eriRouterSubsNotifyObjectGroup,
+            eriRouterSubsNotifyGroup
+        }
+    ::= { eriRouterSubsCompliances 4}
+
+eriRouterSubsCompliance5 MODULE-COMPLIANCE
+    STATUS  obsolete
+    DESCRIPTION
+        "The compliance statement for SNMP entities which implement
+         the Subscriber MIB. "
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+            eriRouterSubsActiveGroup3,
+            eriRouterSubsStatsGroup2,
+            eriRouterSubsServicesGroup,
+            eriRouterSubsNotifyObjectGroup,
+            eriRouterSubsNotifyGroup,
+            eriRouterSubsLicenseGroup
+        }
+    ::= { eriRouterSubsCompliances 5}
+
+eriRouterSubsCompliance6 MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+        "The compliance statement for SNMP entities which implement
+         the Subscriber MIB. "
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+            eriRouterSubsActiveGroup4,
+            eriRouterSubsStatsGroup3,
+            eriRouterSubsServicesGroup,
+            eriRouterSubsNotifyObjectGroup,
+            eriRouterSubsNotifyGroup,
+            eriRouterSubsLicenseGroup
+        }
+    ::= { eriRouterSubsCompliances 6}
+--
+-- groupings
+--
+eriRouterSubsActiveGroup OBJECT-GROUP
+    OBJECTS {
+        eriRouterSubsActiveCircuitDescr,
+        eriRouterSubsActiveCircuitHandle,
+        eriRouterSubsActiveStartTime,
+        eriRouterSubsActiveClear,
+        eriRouterSubsActiveAddr,
+        eriRouterSubsClearSubscriberName,
+        eriRouterSubsClearSessionId,
+        eriRouterSubsBounceName,
+        eriRouterSubsBounceSessionId,
+        eriRouterSubsReauthRadiusIndex,
+        eriRouterSubsReauthRadiusID,
+        eriRouterSubsClearReason
+    }
+    STATUS    obsolete
+    DESCRIPTION
+        "The collection of objects which represent an active subscriber.
+
+        This group is replaced by eriRouterSubsActiveGroup2."
+    ::= { eriRouterSubsGroups 1 }
+
+eriRouterSubsStatsGroup OBJECT-GROUP
+    OBJECTS {
+        eriRouterSubsCntxtCount,
+        eriRouterSubsEncapsCount,
+        eriRouterSubsOctetsSent,
+        eriRouterSubsOctetsReceived,
+        eriRouterSubsPktsSent,
+        eriRouterSubsPktsReceived,
+        eriRouterSubsXmitOctetsDropped,
+        eriRouterSubsXmitPktsDropped,
+        eriRouterSubsMcastOctetsSent,
+        eriRouterSubsMcastOctetsReceived,
+        eriRouterSubsMcastPktsSent,
+        eriRouterSubsMcastPktsReceived
+    }
+    STATUS    obsolete
+    DESCRIPTION
+        "The collection of objects which are generic counters of
+        subscriber activity.
+
+        This group is replaced by eriRouterSubsStatsGroup2"
+    ::= { eriRouterSubsGroups 2 }
+
+eriRouterSubsActiveGroup2 OBJECT-GROUP
+    OBJECTS {
+        eriRouterSubsActiveCircuitDescr,
+        eriRouterSubsActiveCircuitHandle,
+        eriRouterSubsActiveStartTime,
+        eriRouterSubsActiveClear,
+        eriRouterSubsActiveAddr,
+        eriRouterSubsClearSubscriberName,
+        eriRouterSubsClearSessionId,
+        eriRouterSubsBounceName,
+        eriRouterSubsBounceSessionId,
+        eriRouterSubsReauthRadiusIndex,
+        eriRouterSubsReauthRadiusID,
+        eriRouterSubsReauthName,
+        eriRouterSubsReauthSessionId,
+        eriRouterSubsClearReason,
+        eriRouterSubsActiveResend
+    }
+    STATUS    deprecated
+    DESCRIPTION
+        "The collection of objects which represent an active subscriber."
+    ::= { eriRouterSubsGroups 3 }
+
+eriRouterSubsStatsGroup2 OBJECT-GROUP
+    OBJECTS {
+        eriRouterSubsCntxtCount,
+        eriRouterSubsEncapsCount,
+        eriRouterSubsOctetsSent,
+        eriRouterSubsOctetsReceived,
+        eriRouterSubsPktsSent,
+        eriRouterSubsPktsReceived,
+        eriRouterSubsXmitOctetsDropped,
+        eriRouterSubsXmitPktsDropped,
+        eriRouterSubsMcastOctetsSent,
+        eriRouterSubsMcastOctetsReceived,
+        eriRouterSubsMcastPktsSent,
+        eriRouterSubsMcastPktsReceived,
+        eriRouterSubsProfileCount
+    }
+    STATUS    current
+    DESCRIPTION
+        "The collection of objects which are generic counters of
+        subscriber activity."
+    ::= { eriRouterSubsGroups 4 }
+
+eriRouterSubsActiveGroup3 OBJECT-GROUP
+    OBJECTS {
+        eriRouterSubsActiveCircuitDescr,
+        eriRouterSubsActiveCircuitHandle,
+        eriRouterSubsActiveStartTime,
+        eriRouterSubsActiveClear,
+        eriRouterSubsActiveAddr,
+        eriRouterSubsActiveNasPortType,
+        eriRouterSubsActiveMediumType,
+        eriRouterSubsClearSubscriberName,
+        eriRouterSubsClearSessionId,
+        eriRouterSubsBounceName,
+        eriRouterSubsBounceSessionId,
+        eriRouterSubsReauthRadiusIndex,
+        eriRouterSubsReauthRadiusID,
+        eriRouterSubsReauthName,
+        eriRouterSubsReauthSessionId,
+        eriRouterSubsClearReason,
+        eriRouterSubsActiveResend
+    }
+    STATUS    current
+    DESCRIPTION
+        "The collection of objects which represent an active subscriber.
+        This collection includes the objects eriRouterSubsActiveNasPortType and
+        eriRouterSubsActiveMediumType."
+    ::= { eriRouterSubsGroups 5 }
+
+eriRouterSubsServicesGroup OBJECT-GROUP
+    OBJECTS {
+        eriRouterSubsServiceName,
+        eriRouterSubsServiceTag,
+        eriRouterSubsServiceVolumeLimitIn,
+        eriRouterSubsServiceVolumeLimitOut,
+        eriRouterSubsServiceActiveTime,
+        eriRouterSubsServiceVolumeOctetsIn,
+        eriRouterSubsServiceVolumeOctetsOut,
+        eriRouterSubsServiceVolumePktsIn,
+        eriRouterSubsServiceVolumePktsOut,
+        eriRouterSubsIPv4ServiceVolumeOctetsIn,
+        eriRouterSubsIPv4ServiceVolumeOctetsOut,
+        eriRouterSubsIPv4ServiceVolumePktsIn,
+        eriRouterSubsIPv4ServiceVolumePktsOut,
+        eriRouterSubsIPv6ServiceVolumeOctetsIn,
+        eriRouterSubsIPv6ServiceVolumeOctetsOut,
+        eriRouterSubsIPv6ServiceVolumePktsIn,
+        eriRouterSubsIPv6ServiceVolumePktsOut
+
+    }
+    STATUS    current
+    DESCRIPTION
+        "The collection of objects which represent Service Volume attributes."
+    ::= { eriRouterSubsGroups 6 }
+        
+
+eriRouterSubsNotifyObjectGroup OBJECT-GROUP
+    OBJECTS {
+        eriRouterSubsNotifyEnable,
+        eriRouterSubsConfigErrorMsgs
+    }
+    STATUS current
+    DESCRIPTION
+        "The collection of objects related to subscriber notifications."
+    ::= { eriRouterSubsGroups 7 }
+
+eriRouterSubsNotifyGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        eriRouterSubsConfigErrorEvent
+    }
+    STATUS current
+    DESCRIPTION
+        "Notification for tracking the failed attributes of subscriber active
+        sessions."
+    ::= { eriRouterSubsGroups 8 }
+
+eriRouterSubsLicenseGroup OBJECT-GROUP
+    OBJECTS {
+        eriRouterSubsMaxSupportedSessions,
+        eriRouterSubsLicensedSessions,
+        eriRouterSubsActiveSessions,
+        eriRouterSubsCapacityPercentageUsed 
+    }
+    STATUS current
+    DESCRIPTION
+        "The collection of objects related to subscriber licenses."
+    ::= { eriRouterSubsGroups 9 }
+
+eriRouterSubsActiveGroup4 OBJECT-GROUP
+    OBJECTS {
+        eriRouterSubsActiveCircuitDescr,
+        eriRouterSubsActiveCircuitHandle,
+        eriRouterSubsActiveStartTime,
+        eriRouterSubsActiveClear,
+        eriRouterSubsActiveAddr,
+        eriRouterSubsActiveNasPortType,
+        eriRouterSubsActiveMediumType,
+        eriRouterSubsActiveState,
+        eriRouterSubsActiveResendSvcAcct,
+        eriRouterSubsClearSubscriberName,
+        eriRouterSubsActiveSessionSubscriberName,
+        eriRouterSubsActiveSessionPointer,
+        eriRouterSubsActiveIpAddrDescr,
+        eriRouterSubsClearSessionId,
+        eriRouterSubsBounceName,
+        eriRouterSubsBounceSessionId,
+        eriRouterSubsReauthRadiusIndex,
+        eriRouterSubsReauthRadiusID,
+        eriRouterSubsReauthName,
+        eriRouterSubsReauthSessionId,
+        eriRouterSubsClearReason,
+        eriRouterSubsActiveResend
+    }
+    STATUS    current
+    DESCRIPTION
+        "The collection of objects which represent an active subscriber.
+        This collection includes the objects eriRouterSubsActiveNasPortType and
+        eriRouterSubsActiveMediumType."
+    ::= { eriRouterSubsGroups 10 }
+
+eriRouterSubsStatsGroup3 OBJECT-GROUP
+    OBJECTS {
+        eriRouterSubsCntxtCount,
+        eriRouterSubsCntxtIp4OnlyCount,
+        eriRouterSubsCntxtIp6OnlyCount,
+        eriRouterSubsCntxtDualCount,
+        eriRouterSubsCntxtLacCount,
+        eriRouterSubsEncapsCount,
+        eriRouterSubsOctetsSent,
+        eriRouterSubsOctetsReceived,
+        eriRouterSubsPktsSent,
+        eriRouterSubsPktsReceived,
+        eriRouterSubsXmitOctetsDropped,
+        eriRouterSubsXmitPktsDropped,
+        eriRouterSubsMcastOctetsSent,
+        eriRouterSubsMcastOctetsReceived,
+        eriRouterSubsMcastPktsSent,
+        eriRouterSubsMcastPktsReceived,
+        eriRouterSubsProfileCount,
+        eriRouterSubsIPv4OctetsSent,
+        eriRouterSubsIPv4OctetsReceived,
+        eriRouterSubsIPv6OctetsSent,
+        eriRouterSubsIPv6OctetsReceived,
+        eriRouterSubsIPv4PktsSent,
+        eriRouterSubsIPv4PktsReceived,
+        eriRouterSubsIPv6PktsSent,
+        eriRouterSubsIPv6PktsReceived,
+        eriRouterSubsIPv4McastOctetsSent,
+        eriRouterSubsIPv4McastOctetsReceived,
+        eriRouterSubsIPv6McastOctetsSent,
+        eriRouterSubsIPv6McastOctetsReceived,
+        eriRouterSubsIPv4McastPktsSent,
+        eriRouterSubsIPv4McastPktsReceived,
+        eriRouterSubsIPv6McastPktsSent,
+        eriRouterSubsIPv6McastPktsReceived
+
+    }
+    STATUS    current
+    DESCRIPTION
+        "The collection of objects which are generic counters of
+        subscriber activity."
+    ::= { eriRouterSubsGroups 11 }
+
+END

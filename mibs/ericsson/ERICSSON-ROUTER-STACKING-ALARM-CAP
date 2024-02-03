@@ -1,0 +1,55 @@
+-- *****************************************************************
+-- ERICSSON-ROUTER-STACKING-ALARM-CAP   Ericsson Alarm MIB Capabilities
+--
+-- Copyright (c) 2015-2017 Ericsson AB.
+-- All rights reserved.
+--
+-- *****************************************************************
+
+ERICSSON-ROUTER-STACKING-ALARM-CAP DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY
+        FROM SNMPv2-SMI
+    AGENT-CAPABILITIES
+        FROM SNMPv2-CONF
+    eriRouterCapabilities
+        FROM ERICSSON-ROUTER-SMI;
+
+eriRouterStackingAlarmMibCap MODULE-IDENTITY
+    LAST-UPDATED    "201708300000Z" -- 30 Aug, 2017
+    ORGANIZATION    "Ericsson AB"
+    CONTACT-INFO
+            "       Ericsson AB.
+
+            Postal: 100 Headquarters Dr.
+                    San Jose, CA  95134
+                    USA
+
+            Phone:  +1 408 750 5000
+            Fax:    +1 408 750 5599
+            "
+    DESCRIPTION
+            "The agent capabilities of ericsson router stacking implementation
+            alarms (ERICSSON-ROUTER-STACKING-ALARM-MIB)."
+
+    REVISION        "201708300000Z" -- 30 Aug, 2017
+    DESCRIPTION
+            "Corrected unnecessary objects."
+
+    REVISION        "201510130000Z" -- Oct 13, 2015
+    DESCRIPTION
+            "Initial version"
+    ::= { eriRouterCapabilities 117 }
+
+eriRouterStackingAlarmMibCap1 AGENT-CAPABILITIES
+    PRODUCT-RELEASE "IPOS 17.2 "
+    STATUS          current
+    DESCRIPTION     "STACKING-ALARM-MIB capabilities"
+    SUPPORTS        ERICSSON-ROUTER-STACKING-ALARM-MIB
+    INCLUDES {
+                eriRouterStackingAlarmNotifyObjectGroup,
+                eriRouterStackingAlarmNotifyGroup
+            }
+    ::= { eriRouterStackingAlarmMibCap 1 }
+END

@@ -1,0 +1,3348 @@
+-- %DNP% $Id: ERICSSON-ROUTER-PRODUCT-MIB.my,v 1.2.2.27.2.23 2012/04/18 12:02:19 ethasas Exp $
+-- %DNP% $Source: /cvsroot/pkt/sw/se/xc/bsd/config/snmp/mibs/ERICSSON-ROUTER-PRODUCT-MIB.my,v $
+-- *****************************************************************
+-- ERICSSON-ROUTER-PRODUCT-MIB    Enterprise Product and Entity Assignments
+--
+-- Copyright (c) 1999-2014, 2015 Ericsson AB.
+-- All rights reserved.
+--
+-- *****************************************************************
+
+ERICSSON-ROUTER-PRODUCT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-IDENTITY
+        FROM SNMPv2-SMI
+    eriRouterModules,
+    eriRouterProducts,
+    eriRouterEntities
+        FROM ERICSSON-ROUTER-SMI;
+
+eriRouterProductMIB MODULE-IDENTITY
+    LAST-UPDATED    "201709121800Z" -- Sep 12, 2017
+    ORGANIZATION    "Ericsson AB"
+    CONTACT-INFO
+                "       Ericsson AB
+
+                        100 Headquarters Dr
+                        San Jose, CA  95134
+                        USA
+
+                 Phone: +1 408 750 5000
+                   Fax: +1 408 750 5599
+                "
+    DESCRIPTION
+                "Update for Router6x71
+                 Added new OIDs:
+                   eriRouterrouter6x71
+                   eriRouterEntChassisrouter6371
+                   eriRouterEntChassisrouter6471
+                   eriRouterEntBackplanerouter6371Data
+                   eriRouterEntBackplanerouter6471Data
+                   eriRouterEntContainerrouter6371Data
+                   eriRouterEntContainerrouter6471Data
+                   eriRouterEntContainerrouter6471FanTray
+                   eriRouterEntFanTrayrouter6471
+                   eriRouterEntModulerouter6371RPFP
+                   eriRouterEntModulerouter63712Port10GE4Port1GE
+                   eriRouterEntModulerouter6471RPFP
+                   eriRouterEntModulerouter64712Port10GE8Port1GE
+                   eriRouterEntPortrouter63711GE
+                   eriRouterEntPortrouter637110GE
+                   eriRouterEntPortrouter6371RPMgmt
+                   eriRouterEntPortrouter64711GE
+                   eriRouterEntPortrouter647110GE
+                   eriRouterEntPortrouter6471RPMgmt
+                 ."
+
+    REVISION        "201709121800Z" -- Sep 12, 2017
+    DESCRIPTION
+                "Update for Router6274
+                 Added new OIDs:
+                   eriRouterrouter6274
+                   eriRouterEntChassisrouter6274
+                   eriRouterEntBackplanerouter6274Data
+                   eriRouterEntContainerrouter6274PowerAndFanTray
+                   eriRouterEntContainerrouter6274Data
+                   eriRouterEntPowerAndFanTrayRouter6274AC
+                   eriRouterEntPowerAndFanTrayRouter6274DC
+                   eriRouterEntModulerouter6274RP
+                   eriRouterEntModulerouter627448Port10GE
+                   eriRouterEntModulerouter627432Port10GE4Port100GE
+                   eriRouterEntPowerAndFanTrayRouter6274AC
+                   eriRouterEntPowerAndFanTrayRouter6274DC
+                   eriRouterEntPortrouter62741GE
+                   eriRouterEntPortrouter627410GE
+                   eriRouterEntPortrouter6274100GE
+                   eriRouterEntPortrouter6274RPMgmt
+                 ."
+
+    REVISION        "201604271800Z" -- June 27, 2016
+       DESCRIPTION
+                "This management information module contains the
+                 administrative assignments which are used to
+                 uniquely identify physical components"
+
+       REVISION        "201501141800Z" -- Jan 14, 2015
+       DESCRIPTION
+                "Updated RBN/rbn/Rbn as ERICSSON-ROUTER/eriRouter/EriRouter
+                 to migrate RBN MIB to ERICSSON MIB."
+
+       REVISION        "201409221800Z" -- Sept 22, 2014
+       DESCRIPTION
+                "Added new OIDs:
+                        eriRouterEntModuleSSR20PortOC3orOC12orOC48orOC192
+                        eriRouterEntPortSSR20POSOCorOC12orOC48orOC192
+                "
+
+       REVISION        "201310171800Z" -- Oct 17, 2013
+       DESCRIPTION
+                "Added new OIDs:
+                        eriRouterEntFanTrayAlarmIOSPSC1
+                        eriRouterEntPortSPSC1AlarmIn
+                        eriRouterEntPortSPSC1AlarmOut
+                "
+
+       REVISION        "201309161800Z" -- Sept 3, 2013
+       DESCRIPTION
+                "Removed OIDs:
+                        eriRouterSSR8006
+                        eriRouterEntChassisSSR8006
+                        eriRouterEntBackplaneSSR8006Data
+                        eriRouterEntContainerSSR8006FanTray
+                        eriRouterEntContainerSSR8006PowerModule
+                        eriRouterEntContainerSSR8006Data
+                 Added new OIDs:
+                        eriRouterSSR8004
+                        eriRouterEntChassisSSR8004
+                        eriRouterEntBackplaneSSR8004Data
+                        eriRouterEntContainerSSR8004FanTray
+                        eriRouterEntContainerSSR8004PowerModule
+                        eriRouterEntContainerSSR8004Data
+                "
+       REVISION        "201306191800Z" -- June 19, 2013
+       DESCRIPTION
+                "Added new OIDs:
+                        eriRouterEntBackplaneSP415Data
+                        eriRouterEntBackplaneSP420Data
+                        eriRouterEntBackplanerouter6672Data
+                        eriRouterEntBackplanerouter6675Data
+                        eriRouterEntBackplaneSFFUMData
+                "
+
+       REVISION        "201304181800Z" -- April 18, 2013
+       DESCRIPTION
+                "Added new OIDs:
+                        eriRouterSP415
+                        eriRouterSP420
+                        eriRouterrouter6672
+                        eriRouterrouter6675
+                        eriRouterSFFUM
+                        eriRouterEntChassisSP415
+                        eriRouterEntChassisSP420
+                        eriRouterEntChassisrouter6672
+                        eriRouterEntChassisrouter6675
+                        eriRouterEntChassisSFFUM
+                        eriRouterEntContainerSPSC1FanTray
+                        eriRouterEntContainerSPSC1PowerModule
+                        eriRouterEntContainerSPSC1Data
+                        eriRouterEntContainerrouter6672FanTray
+                        eriRouterEntContainerrouter6672PowerModule
+                        eriRouterEntContainerrouter6672Data
+                        eriRouterEntContainerrouter6675FanTray
+                        eriRouterEntContainerrouter6675PowerModule
+                        eriRouterEntContainerrouter6675Data
+                        eriRouterEntFanTraySPSC1
+                        eriRouterEntFanTrayrouter6672
+                        eriRouterEntFanTrayrouter6675
+                        eriRouterEntPowerModuleSPSC1AC
+                        eriRouterEntPowerModuleSPSC1DC
+                        eriRouterEntPowerModulerouter6672AC
+                        eriRouterEntPowerModulerouter6672DC
+                        eriRouterEntPowerModulerouter6675AC
+                        eriRouterEntPowerModulerouter6675DC
+                        eriRouterEntModuleSPSC1SC
+                        eriRouterEntModuleSPSC11Port10GE
+                        eriRouterEntModuleSPSC18PortCES
+                        eriRouterEntModuleSPSC116Port1GE
+                        eriRouterEntModuleSPSC120and2Port1and10GE
+                        eriRouterEntModulerouter6672RPFP
+                        eriRouterEntModulerouter66728Port10GE12Port1GE
+                        eriRouterEntModulerouter667220Port1GE
+                        eriRouterEntModulerouter6675RPFP
+                        eriRouterEntModulerouter667524Port10GE24Port1GE
+                        eriRouterEntModulerouter66754Port100GE24Port10GE
+                        eriRouterEntPortSPSC11GE
+                        eriRouterEntPortSPSC110GE
+                        eriRouterEntPortSPSC1SCMgmt
+                        eriRouterEntPortrouter66721GE
+                        eriRouterEntPortrouter667210GE
+                        eriRouterEntPortrouter6672SCMgmt
+                        eriRouterEntPortrouter66751GE
+                        eriRouterEntPortrouter667510GE
+                        eriRouterEntPortrouter6675100GE
+                        eriRouterEntPortrouter6675SCMgmt
+                "
+
+       REVISION        "201301141800Z" -- Jan 14, 2013
+       DESCRIPTION
+                "Added new OIDs:
+                        eriRouterEntModuleSSC2
+                        eriRouterEntModuleSSR20Port1GEor10GE
+                "
+
+       REVISION        "201206251800Z" -- June 25, 2012
+       DESCRIPTION
+                "Added new OIDs:
+                       eriRouterEntModuleSSR20Port1GEor4Port10GE
+                "
+
+       REVISION        "201203191800Z" -- Mar 19, 2012
+       DESCRIPTION
+                "Added new OIDs:
+                        eriRouterEntModuleSSR2Port40GEor100GE
+                        eriRouterEntPortSSR40GEor100GE
+                "
+
+       REVISION        "201202101800Z" -- Feb 10, 2012
+       DESCRIPTION
+                "Added new OID:
+                        eriRouterEntModuleSSC1
+                "
+
+       REVISION        "201106021800Z" -- June 02, 2011
+       DESCRIPTION
+                "Added new OID:
+                        eriRouterEntPortSSRRPSWMgmt
+                "
+
+       REVISION        "201101191800Z" -- Jan 19, 2011
+       DESCRIPTION
+                "Update CONTACT-INFO & ORGANIZATION. Remove previous
+                company name from descriptions."
+
+
+       REVISION        "201010010000Z" -- Oct 01, 2010
+       DESCRIPTION
+                "Added new OIDs:
+                        eriRouterEntCpuUnknown
+                        eriRouterEntCpuOcteon
+                        eriRouterEntModuleSEASE2
+                        eriRouterSSR8020
+                        eriRouterSSR8010
+                        eriRouterSSR8006
+                        eriRouterEntChassisSSR8020
+                        eriRouterEntChassisSSR8010
+                        eriRouterEntChassisSSR8006
+                        eriRouterEntBackplaneSSR8020Data
+                        eriRouterEntBackplaneSSR8010Data
+                        eriRouterEntBackplaneSSR8006Data
+                        eriRouterEntContainerSSR8020FanTray
+                        eriRouterEntContainerSSR8020PowerModule
+                        eriRouterEntContainerSSR8020Data
+                        eriRouterEntContainerSSR8010FanTray
+                        eriRouterEntContainerSSR8010PowerModule
+                        eriRouterEntContainerSSR8010Data
+                        eriRouterEntContainerSSR8006FanTray
+                        eriRouterEntContainerSSR8006PowerModule
+                        eriRouterEntContainerSSR8006Data
+                        eriRouterEntFanTraySSR
+                        eriRouterEntPowerModuleSSR
+                        eriRouterEntModuleSSRALSW
+                        eriRouterEntModuleSSRRPSW
+                        eriRouterEntModuleSSRSW
+                        eriRouterEntModuleSSR40Port1GE
+                        eriRouterEntModuleSSR10Port10GE
+                        eriRouterEntModuleSSR1Port100GE
+                        eriRouterEntModuleSSR2Port40GE
+                        eriRouterEntModuleSSR2or1Port40or100GE
+                        eriRouterEntPortSSR1GE
+                        eriRouterEntPortSSR10GE
+                        eriRouterEntPortSSR100GE
+                        eriRouterEntPortSSR40GE
+                        eriRouterEntPortSSR40or100GE
+                "
+
+        REVISION        "201008270000Z" -- August 27, 2010
+        DESCRIPTION
+                "Added new OIDs:    
+                        eriRouterEntModuleSM8OR2PORTCHOC3OC12
+                        eriRouterEntPortSMCHOC3OC12
+                        eriRouterEntPortSMCHOC3
+                "
+
+        REVISION        "201004010000Z" -- April 01, 2010
+        DESCRIPTION
+                "Added new OIDs:
+                        eriRouterEntModuleSEPos8xOC3
+                        eriRouterEntModuleSEPos4xOC12
+                        eriRouterEntModuleSEAtm2xOC12
+                "
+
+        REVISION        "201001270000Z" -- January 27, 2010
+        DESCRIPTION
+                "Added new OIDs:
+                        eriRouterEntModuleSE1Port10GEOC192
+                        eriRouterEntModuleSM1Port10GEOC192
+                "
+        REVISION        "200910050000Z" -- October 05, 2009
+        DESCRIPTION
+                "Added new OIDs:
+                        eriRouterEntChassisSE1200H
+                        eriRouterEntBackplaneSE1200HData
+                        eriRouterEntContainerSE1200HData
+                        eriRouterEntFanSE1200H
+                "
+
+        REVISION        "200909240000Z" -- September 24, 2009
+        DESCRIPTION
+                "Added new OIDs:    
+                        eriRouterEntModuleSE8OR2PORTCHOC3OC12
+                        eriRouterEntPortSECHOC3OC12
+                        eriRouterEntPortSECHOC3
+                "
+
+        REVISION        "200909130000Z" -- September 13, 2009
+        DESCRIPTION
+                "Added new OID:
+                        eriRouterEntModuleSE10PortGIGEDDR2
+                        eriRouterEntModuleSM10PortGIGEDDR2
+                "
+
+        REVISION        "200909100000Z" -- September 10, 2009
+        DESCRIPTION
+                "Added new OIDs:
+                        eriRouterEntModuleSE4PortOC48
+                        eriRouterEntModuleSE8PortOC3
+                "
+
+        REVISION        "200907160000Z" -- July 16, 2009
+        DESCRIPTION
+                "Added new OIDs:
+                        eriRouterEntityTypeStack
+                        eriRouterEntityTypeCPU
+                        eriRouterEntityTypeMemory
+                        eriRouterEntModuleSESSE
+                        eriRouterEntityTypeDisk
+                        eriRouterEntDiskSSE
+                "
+
+        REVISION        "200902040000Z" -- February 04, 2009
+        DESCRIPTION
+                "
+                        eriRouterSmartEdge600
+                        eriRouterSM240
+                        eriRouterEntChassisSE600
+                        eriRouterEntChassisSM240
+                        eriRouterEntBackplaneSE600Data
+                        eriRouterEntBackplaneSM240Data
+                        eriRouterEntContainerSE600Data
+                        eriRouterEntContainerSM240Data
+                        eriRouterEntFanSE600
+                        eriRouterEntFanSM240
+                        eriRouterEntSensorAlarmSE600
+                        eriRouterEntSensorAlarmSM240
+                "
+
+    REVISION        "200901200000Z" -- January 20, 2009
+    DESCRIPTION
+        "Added new OIDs:    
+            eriRouterEntModuleSMFE60GE2
+                        eriRouterEntModuleSM20PortGIGE
+                        eriRouterEntModuleSM4Port10GIGE
+                        eriRouterEntPortSMEIM
+                 Removed OID
+                        eriRouterEntModuleSMRP1"
+
+        REVISION        "200809230000Z" -- Sep, 23, 2008
+        DESCRIPTION
+                "Added new OIDs:
+                    eriRouterEntPortSM10GIGEIM
+            eriRouterEntPortSMRPMGMT
+            eriRouterEntPortSMGIGEIM
+            eriRouterEntPortSMGIGETM
+            eriRouterEntPortSM10GIGETM"
+
+        REVISION        "200807020000Z" -- July 02, 2008
+        DESCRIPTION
+                "Added new OIDs:
+                      eriRouterEntModuleSE20PortGIGE
+            eriRouterEntModuleSE4Port10GIGE
+            eriRouterEntModuleSE10GIGETM
+            eriRouterEntPortSE10GIGETM "
+
+        REVISION        "200805200000Z" -- May 20, 2008
+        DESCRIPTION
+                "Added new OIDs:
+            eriRouterSM480
+            eriRouterEntChassisSM480
+                        eriRouterEntBackplaneSM480Data
+                        eriRouterEntContainerSM480Data
+                        eriRouterEntFanSM480
+            eriRouterEntModuleSM10GIGEIM
+            eriRouterEntModuleSMRP2
+            eriRouterEntModuleSMGIGEIM
+            eriRouterEntModuleSMRP1
+            eriRouterEntModuleSMGIGETM
+            eriRouterEntModuleSM10GIGETM
+                "
+        REVISION        "200805080000Z" -- May 08, 2008
+        DESCRIPTION
+                "Added new OIDs:
+                        eriRouterEntModuleSE5PortGIG
+                "
+
+        REVISION        "200709200000Z" -- September 20, 2007
+        DESCRIPTION
+                "Added new OIDs:
+                        eriRouterEntModuleSEPOSOC192
+                        eriRouterEntPortSEPOSOC192
+                "
+
+        REVISION        "200708080000Z" -- August 08, 2007
+        DESCRIPTION
+                "Added new OIDs:
+                        eriRouterEntModuleSEFE60GE2
+                "
+
+    REVISION    "200705090000Z" -- May 09, 2007
+    DESCRIPTION
+        "Added new OIDs:
+            eriRouterEntModuleSEASE
+        "
+
+        REVISION        "200702280000Z" -- February 28, 2007
+        DESCRIPTION
+                "Added new OIDs:
+                        eriRouterEntModuleSEXC4
+                        eriRouterEntPortSEXC4MGMT
+                "
+
+        REVISION        "200702140000Z" -- February 14, 2007
+        DESCRIPTION
+            "Added new OIDs:
+                eriRouterSmartEdge1200
+            eriRouterEntChassisSE1200
+            eriRouterEntBackplaneSE1200Data
+            eriRouterEntContainerSE1200Data
+            eriRouterEntFanSE1200
+                "
+
+    REVISION    "200702050000Z" -- February 05, 2007
+    DESCRIPTION
+        "Added new OIDs:
+            eriRouterEntModuleSE100AIMOC3MIC
+            eriRouterEntPortSE100AIMOC3
+        "
+    REVISION        "200512270000Z" -- December 27, 2005
+    DESCRIPTION
+        "Added new OIDs:
+            eriRouterSmartEdge100
+            eriRouterEntChassisSE100
+            eriRouterEntBackplaneSE100Data
+            eriRouterEntContainerSE100Data
+            eriRouterEntContainerSE100Carrier
+            eriRouterEntModuleSE100XC
+            eriRouterEntModuleSE100EMIC
+            eriRouterEntModuleSE100FXMIC
+            eriRouterEntModuleSE100GERJMIC
+            eriRouterEntModuleSE100GEFXMIC
+            eriRouterEntPortSE100XCMGMT
+            eriRouterEntPortSE100EIM
+            eriRouterEntPortSE100FXIM
+            eriRouterEntPortSE100GERJIM
+            eriRouterEntPortSE100GEFXIM
+        "
+    REVISION    "200503010000Z" -- March 1, 2005
+    DESCRIPTION
+        "Added new OIDs:
+            eriRouterEntModuleSE10GIGEIM
+            eriRouterEntPortSE10GIGEIM
+        "
+    REVISION    "200411050000Z" -- November 5, 2004
+    DESCRIPTION
+        "Added new OIDs:
+            eriRouterEntModuleSEGIGETM
+            eriRouterEntPortSEGIGETM
+        "
+    REVISION    "200405110000Z" -- May 11, 2004
+    DESCRIPTION
+        "Added new OIDs:
+            eriRouterEntModuleSEAIMOC12E
+            eriRouterEntPortSEAIMOC12E
+        "
+    REVISION    "200309250000Z" -- September 25, 2003
+    DESCRIPTION
+        "Added new OIDs:
+            eriRouterEntModuleSEE3
+            eriRouterEntPortSEE3
+        "
+    REVISION    "200307240000Z" -- July 24, 2003
+    DESCRIPTION
+        "Added new OIDs:
+            eriRouterEntSensorAlarmSE400
+        "
+    REVISION    "200305191700Z" -- May 19, 2003
+    DESCRIPTION
+        "Added new OIDs:
+            eriRouterEntModuleSMSXFE
+        "
+    REVISION    "200305050000Z" -- May 5,2003
+    DESCRIPTION
+        "Added new OID:
+            eriRouterEntPortSEXC3MGMT
+        "
+    REVISION    "200303250000Z" -- March 25,2003
+    DESCRIPTION
+        "Added new OIDs:
+            eriRouterSmartEdge400
+            eriRouterEntChassisSE400
+            eriRouterEntBackplaneSE400Data
+            eriRouterEntContainerSE400Data
+            eriRouterEntFanSE400
+            eriRouterEntModuleSEXC3
+        "
+    REVISION    "200206130000Z" -- June 13, 2002
+    DESCRIPTION
+        "Added new OIDs:
+            eriRouterEntModuleSECHSTM1E1
+            eriRouterEntModuleSEE1
+            eriRouterEntPortSECHSTM1E1
+            eriRouterEntPortSEE1
+        "
+    REVISION    "200206060000Z" -- June 6, 2002
+    DESCRIPTION
+        "Updated the Contact Phone and Fax numbers.
+        Added new OIDs:
+            eriRouterEntModuleSEDS3
+            eriRouterEntPortSEDS3
+            eriRouterEntModuleSEAIMDS3
+            eriRouterEntPortSEAIMDS3
+        "
+    REVISION    "200112120000Z" -- December 12, 2001
+    DESCRIPTION
+        "Changed the CONTACT-INFO postal address.
+        Added new OIDs:
+            eriRouterEntModuleSECHDS3
+            eriRouterEntPortSECHDS3
+        "
+    REVISION    "200109261700Z" -- September 25, 2001
+    DESCRIPTION
+        "Added new OIDs:
+            eriRouterEntModuleSEAIMOC3
+            eriRouterEntModuleSEAIMOC12
+            eriRouterEntPortSEAIMOC3
+            eriRouterEntPortSEAIMOC12
+        "
+    REVISION    "200107251000Z" -- July 25, 2001
+    DESCRIPTION
+        "Added new OIDs:
+            eriRouterEntModuleSECHOC12DS1
+            eriRouterEntModuleSECHOC12DS3
+            eriRouterEntPortSECHOC12DS1
+            eriRouterEntPortSECHOC12DS3
+        "
+    REVISION    "200105151507Z" -- May 15, 2001
+    DESCRIPTION
+        "Updated name for new SMS platform.
+        "
+    REVISION    "200105041642Z" -- May 04, 2001
+    DESCRIPTION
+        "Added new OIDs:
+            eriRouterEntChassisSE800
+            eriRouterEntBackplaneSE800Data
+            eriRouterEntContainerSE800Data
+            eriRouterEntFanSE800
+            eriRouterEntModuleSEXC
+            eriRouterEntModuleSEEIM
+            eriRouterEntModuleSEGIGEIM
+            eriRouterEntModuleSEPOSOC12
+            eriRouterEntModuleSEPOSOC48
+            eriRouterEntModuleSEPOSOC3
+            eriRouterEntPortSEXCMGMT
+            eriRouterEntPortSEEIM
+            eriRouterEntPortSEGIGEIM
+            eriRouterEntPortSEPOSOC12
+            eriRouterEntPortSEPOSOC48
+            eriRouterEntPortSEPOSOC3
+        "
+    REVISION    "200102131857Z" -- February 13, 2001
+    DESCRIPTION
+        "Added new OID:
+            eriRouterSmartEdge800
+        "
+    REVISION    "200102131007Z" -- February 13, 2001
+    DESCRIPTION
+        "Added support for new SMS platform.
+        "
+    REVISION    "200102011707Z" -- February 1, 2001
+    DESCRIPTION
+        "Added new OID:
+-- %DNP% --            eriRouterSMS2800
+        "
+    REVISION    "200101051834Z" -- January 5, 2001
+    DESCRIPTION
+        "Added new OIDs:
+-- %DNP% --            eriRouterEntModuleSMSCSM
+-- %DNP% --            eriRouterEntPortSMSCSMMGMT
+        "
+    REVISION    "200012281704Z" -- December 28, 2000
+    DESCRIPTION
+        "Added new OIDs:
+-- %DNP% --            eriRouterEntChassisSMS2800
+-- %DNP% --            eriRouterEntBackplaneSMS2800Data
+-- %DNP% --            eriRouterEntBackplaneSMS2800Power
+-- %DNP% --            eriRouterEntContainerSMS2800IO
+-- %DNP% --            eriRouterEntContainerSMS2800Power
+-- %DNP% --            eriRouterEntContainerSMS2800CSM
+-- %DNP% --            eriRouterEntPowerSupplySMS2800AC
+-- %DNP% --            eriRouterEntPowerSupplySMS2800DC
+        "
+    REVISION    "200011151704Z" -- November 15, 2000
+    DESCRIPTION
+        "Added new OID:
+            eriRouterEntBackplaneSMS10000Midplane
+        "
+    REVISION    "200011021454Z" -- November 2, 2000
+    DESCRIPTION
+        "Added new OID:
+            eriRouterEntModuleSMSFE3
+        "
+    REVISION    "200010251523Z" -- October 25, 2000
+    DESCRIPTION
+        "Added new OIDs:
+            eriRouterEntModuleSMSPIMCDS3
+            eriRouterEntPortSMSPIMCDS3
+        "
+    REVISION    "200010201730Z" -- October 20, 2000
+    DESCRIPTION
+        "Added new OIDs:
+            eriRouterEntModuleSMSFABRIC
+            eriRouterEntModuleSMSTIMING
+            eriRouterEntModuleSMSCM
+            eriRouterEntModuleSMSSM
+        "
+    REVISION    "200009261330Z"    -- September 26, 2000
+    DESCRIPTION
+        "Added new OIDs:
+-- %DNP% --            eriRouterEsp200
+-- %DNP% --            eriRouterEsp5000
+-- %DNP% --            eriRouterEsp6000
+        "
+    REVISION    "200009251120Z"    -- Sep 25, 2000
+    DESCRIPTION
+        "Added new OID:
+            eriRouterEntPortSMSAIME1
+        "
+    REVISION    "200007191544Z"    -- Jul 19, 2000
+    DESCRIPTION
+        "Added new OID:
+            eriRouterEntModuleSMSAIME1
+        "
+    REVISION    "200007062150Z"    -- July 6, 2000
+    DESCRIPTION
+        "Added new OID:
+-- %DNP% --            eriRouterSmartEdgeIDT
+        "
+    REVISION    "200006161700Z"    -- Jun 16, 2000
+    DESCRIPTION
+        "In MODULE-IDENTITY, updated CONTACT-INFO and added
+        new REVISION info.
+
+        Added new OIDs:
+            eriRouterEntModuleSMSAIMOC12
+            eriRouterEntPortSMSAIMOC12"
+
+    REVISION    "200006131700Z"    -- Jun 13, 2000
+    DESCRIPTION
+        "In MODULE-IDENTITY, updated CONTACT-INFO and added
+        new REVISION info.
+
+        Added new OIDs:
+            eriRouterEntModuleSMSAIMT1
+            eriRouterEntPortSMSAIMT1
+            eriRouterEntModuleSMSAIME3
+            eriRouterEntPortSMSAIME3"
+
+    REVISION    "200005180000Z"    -- May 18, 2000
+    DESCRIPTION
+        "Addition of eriRouterSMS10000"
+
+    REVISION    "9907081712Z"    -- Jul 8, 1999
+    DESCRIPTION
+        "Addition of eriRouterSMS1800"
+
+    REVISION    "9808051900Z"    -- Aug 5, 1998
+    DESCRIPTION
+        "Initial version"
+    ::= { eriRouterModules 1 }
+
+
+--
+-- Product Assignments
+--
+
+eriRouterSMS1000 OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+        "The definitive identifier of the SMS 1000"
+    ::= { eriRouterProducts 1 }
+
+eriRouterSMS500 OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+        "The definitive identifier of the SMS 500"
+    ::= { eriRouterProducts 2 }
+
+eriRouterSMS1800 OBJECT-IDENTITY
+        STATUS  current
+        DESCRIPTION
+                "The definitive identifier of the SMS 1800"
+        ::= { eriRouterProducts 3 }
+
+eriRouterSMS10000 OBJECT-IDENTITY
+        STATUS  current
+        DESCRIPTION
+                "The definitive identifier of the SMS 10000"
+        ::= { eriRouterProducts 4 }
+
+
+-- %DNP% --eriRouterSmartEdgeIDT OBJECT-IDENTITY
+-- %DNP% --        STATUS  obsolete
+-- %DNP% --        DESCRIPTION
+-- %DNP% --                "The definitive identifier of the SmartEdge IDT"
+-- %DNP% --        ::= { eriRouterProducts 5 }
+
+-- %DNP% --eriRouterEsp200 OBJECT-IDENTITY
+-- %DNP% --        STATUS  obsolete
+-- %DNP% --        DESCRIPTION
+-- %DNP% --                "The definitive identifier of the ESP 200"
+-- %DNP% --        ::= { eriRouterProducts 6 }
+
+-- %DNP% --eriRouterEsp5000 OBJECT-IDENTITY
+-- %DNP% --        STATUS  obsolete
+-- %DNP% --        DESCRIPTION
+-- %DNP% --                "The definitive identifier of the ESP 5000"
+-- %DNP% --        ::= { eriRouterProducts 7 }
+
+-- %DNP% --eriRouterEsp6000 OBJECT-IDENTITY
+-- %DNP% --        STATUS  obsolete
+-- %DNP% --        DESCRIPTION
+-- %DNP% --                "The definitive identifier of the ESP 6000"
+-- %DNP% --        ::= { eriRouterProducts 8 }
+
+-- %DNP% --eriRouterSMS2800 OBJECT-IDENTITY
+-- %DNP% --        STATUS  obsolete
+-- %DNP% --        DESCRIPTION
+-- %DNP% --                "The definitive identifier of the SMS 2800"
+-- %DNP% --        ::= { eriRouterProducts 9 }
+
+eriRouterSmartEdge800 OBJECT-IDENTITY
+        STATUS  current
+        DESCRIPTION
+                "The definitive identifier of the SmartEdge 800"
+        ::= { eriRouterProducts 10 }
+
+eriRouterSmartEdge400 OBJECT-IDENTITY
+        STATUS  current
+        DESCRIPTION
+                "The definitive identifier of the SmartEdge 400"
+        ::= { eriRouterProducts 11 }
+
+eriRouterSmartEdge100 OBJECT-IDENTITY
+        STATUS  current
+        DESCRIPTION
+                "The definitive identifier of the SmartEdge 100"
+        ::= { eriRouterProducts 12 }
+
+eriRouterSmartEdge1200 OBJECT-IDENTITY
+        STATUS  current
+        DESCRIPTION
+                "The definitive identifier of the SmartEdge 1200"
+        ::= { eriRouterProducts 13 }
+
+eriRouterSM480 OBJECT-IDENTITY
+        STATUS  current
+        DESCRIPTION
+                "The definitive identifier of the SM 480"
+        ::= { eriRouterProducts 14 }
+
+eriRouterSmartEdge600 OBJECT-IDENTITY
+        STATUS  current
+        DESCRIPTION
+                "The definitive identifier of the SmartEdge 600"
+        ::= { eriRouterProducts 15 }
+
+eriRouterSM240 OBJECT-IDENTITY
+        STATUS  current
+        DESCRIPTION
+                "The definitive identifier of the SM240"
+        ::= { eriRouterProducts 16 }
+
+eriRouterSSR8020 OBJECT-IDENTITY
+        STATUS  current
+        DESCRIPTION
+                "The definitive identifier for the Smart Services
+                Router(SSR) 8020"
+        ::= { eriRouterProducts 17 }
+
+eriRouterSSR8010 OBJECT-IDENTITY
+        STATUS  current
+        DESCRIPTION
+                "The definitive identifier for the Smart Services
+                Router(SSR) 8010"
+        ::= { eriRouterProducts 18 }
+
+eriRouterSSR8004 OBJECT-IDENTITY
+        STATUS  current
+        DESCRIPTION
+                "The definitive identifier for the Smart Services
+                Router(SSR) 8004"
+        ::= { eriRouterProducts 19 }
+
+eriRouterSP415 OBJECT-IDENTITY
+        STATUS  current
+        DESCRIPTION
+                "The definitive identifier for the Smart Packet
+                (SP) 415"
+        ::= { eriRouterProducts 20 }
+
+eriRouterSP420 OBJECT-IDENTITY
+        STATUS  current
+        DESCRIPTION
+                "The definitive identifier for the Smart Packet
+                (SP) 420"
+        ::= { eriRouterProducts 21 }
+
+eriRouterrouter6672 OBJECT-IDENTITY
+        STATUS  current
+        DESCRIPTION
+                "The definitive identifier for the Smart Packet
+                (Router) router6672"
+        ::= { eriRouterProducts 40 }
+
+eriRouterrouter6274 OBJECT-IDENTITY
+        STATUS  current
+        DESCRIPTION
+                "The definitive identifier for the Smart Packet
+                (Router) router6274"
+        ::= { eriRouterProducts 41 }
+
+eriRouterrouter6675 OBJECT-IDENTITY
+        STATUS  current
+        DESCRIPTION
+                "The definitive identifier for the Smart Packet
+                (Router) router6675"
+        ::= { eriRouterProducts 42 }
+
+eriRouterrouter6x71 OBJECT-IDENTITY
+        STATUS  current
+        DESCRIPTION
+                "The definitive identifier for the Smart Packet
+                (Router) router6x71"
+        ::= { eriRouterProducts 43 }
+
+eriRouterSFFUM OBJECT-IDENTITY
+        STATUS  current
+        DESCRIPTION
+                "The definitive identifier for the Smart Packet
+                (SF) FUM"
+        ::= { eriRouterProducts 99 }
+
+--
+-- Entity Assignments
+--
+-- { eriRouterEntities 1 } and { eriRouterEntities 2 } are unassigned
+
+eriRouterEntityTypeOther OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The top-level category identifier for entities which
+              reside in the ENTITY-MIB PhysicalClass *other*"
+      ::= { eriRouterEntities 1 }
+
+eriRouterEntityTypeUnknown OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The top-level category identifier for entities which
+              reside in the ENTITY-MIB PhysicalClass *unknown*"
+      ::= { eriRouterEntities 2 }
+
+eriRouterEntityTypeChassis OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The top-level category identifier for entities which
+              reside in the ENTITY-MIB PhysicalClass *chassis*"
+      ::= { eriRouterEntities 3 }
+
+eriRouterEntChassisSMS1000 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the SMS 1000 chassis entity."
+      ::= { eriRouterEntityTypeChassis 1 }
+
+eriRouterEntChassisSMS500 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the SMS 500 chassis entity."
+      ::= { eriRouterEntityTypeChassis 2 }
+
+eriRouterEntChassisSMS1800 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the SMS 1800 chassis entity."
+      ::= { eriRouterEntityTypeChassis 3 }
+
+eriRouterEntChassisSMS10000 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the SMS 10000 chassis entity."
+      ::= { eriRouterEntityTypeChassis 4 }
+
+-- %DNP% --eriRouterEntChassisSMS2800 OBJECT-IDENTITY
+-- %DNP% --      STATUS  obsolete
+-- %DNP% --      DESCRIPTION
+-- %DNP% --              "The definitive identifier for the
+-- %DNP% --              SMS 2800 chassis entity."
+-- %DNP% --      ::= { eriRouterEntityTypeChassis 5 }
+
+eriRouterEntChassisSE800 OBJECT-IDENTITY
+      STATUS current
+      DESCRIPTION
+              "The definitive identifier for the
+              SE 800 chassis entity."
+      ::= { eriRouterEntityTypeChassis 6 }
+
+eriRouterEntChassisSE400 OBJECT-IDENTITY
+      STATUS current
+      DESCRIPTION
+              "The definitive identifier for the
+              SE 400 chassis entity."
+      ::= { eriRouterEntityTypeChassis 7 }
+
+eriRouterEntChassisSE100 OBJECT-IDENTITY
+      STATUS current
+      DESCRIPTION
+              "The definitive identifier for the
+              SE 100 chassis entity."
+      ::= { eriRouterEntityTypeChassis 8 }
+
+eriRouterEntChassisSE1200 OBJECT-IDENTITY
+      STATUS current
+      DESCRIPTION
+              "The definitive identifier for the
+              SE 1200 chassis entity."
+      ::= { eriRouterEntityTypeChassis 9 }
+
+eriRouterEntChassisSM480 OBJECT-IDENTITY
+      STATUS current
+      DESCRIPTION
+              "The definitive identifier for the
+              SM 480 chassis entity."
+      ::= { eriRouterEntityTypeChassis 10 }
+
+eriRouterEntChassisSE600 OBJECT-IDENTITY
+      STATUS current
+      DESCRIPTION
+              "The definitive identifier for the
+              SmartEdge 600 chassis entity."
+      ::= { eriRouterEntityTypeChassis 11 }
+
+eriRouterEntChassisSM240 OBJECT-IDENTITY
+      STATUS current
+      DESCRIPTION
+              "The definitive identifier for the
+              SM240 chassis entity."
+      ::= { eriRouterEntityTypeChassis 12 }
+
+eriRouterEntChassisSE1200H OBJECT-IDENTITY
+      STATUS current
+      DESCRIPTION
+              "The definitive identifier for the SE1200H chassis entity."
+      ::= { eriRouterEntityTypeChassis 13 }
+
+eriRouterEntChassisSSR8020 OBJECT-IDENTITY
+      STATUS current
+      DESCRIPTION
+              "The definitive identifier for the Smart Services Router 8020
+              chassis entity."
+      ::= { eriRouterEntityTypeChassis 14 }
+
+eriRouterEntChassisSSR8010 OBJECT-IDENTITY
+      STATUS current
+      DESCRIPTION
+              "The definitive identifier for the Smart Services Router 8010
+              chassis entity."
+      ::= { eriRouterEntityTypeChassis 15 }
+
+eriRouterEntChassisSSR8004 OBJECT-IDENTITY
+      STATUS current
+      DESCRIPTION
+              "The definitive identifier for the Smart Services Router 8004
+              chassis entity."
+      ::= { eriRouterEntityTypeChassis 16 }
+
+eriRouterEntChassisSP415 OBJECT-IDENTITY
+      STATUS current
+      DESCRIPTION
+              "The definitive identifier for the Smart Packet 415
+              chassis entity."
+      ::= { eriRouterEntityTypeChassis 17 }
+
+eriRouterEntChassisSP420 OBJECT-IDENTITY
+      STATUS current
+      DESCRIPTION
+              "The definitive identifier for the Smart Packet 420
+              chassis entity."
+      ::= { eriRouterEntityTypeChassis 18 }
+
+eriRouterEntChassisrouter6672 OBJECT-IDENTITY
+      STATUS current
+      DESCRIPTION
+              "The definitive identifier for the Smart Packet router6672
+              chassis entity."
+      ::= { eriRouterEntityTypeChassis 19 }
+
+eriRouterEntChassisSFFUM OBJECT-IDENTITY
+      STATUS current
+      DESCRIPTION
+              "The definitive identifier for the Smart Packet FUM
+              chassis entity."
+      ::= { eriRouterEntityTypeChassis 20 }
+
+eriRouterEntChassisrouter6274 OBJECT-IDENTITY
+      STATUS current
+      DESCRIPTION
+              "The definitive identifier for the Smart Packet router6274
+              chassis entity."
+      ::= { eriRouterEntityTypeChassis 21 }
+
+eriRouterEntChassisrouter6675 OBJECT-IDENTITY
+      STATUS current
+      DESCRIPTION
+              "The definitive identifier for the Smart Packet router6675
+              chassis entity."
+      ::= { eriRouterEntityTypeChassis 22 }
+
+eriRouterEntChassisrouter6371 OBJECT-IDENTITY
+      STATUS current
+      DESCRIPTION
+              "The definitive identifier for the Smart Packet router6371
+              chassis entity."
+      ::= { eriRouterEntityTypeChassis 23 }
+
+eriRouterEntChassisrouter6471 OBJECT-IDENTITY
+      STATUS current
+      DESCRIPTION
+              "The definitive identifier for the Smart Packet router6471
+              chassis entity."
+      ::= { eriRouterEntityTypeChassis 24 }
+
+eriRouterEntityTypeBackplane OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The top-level category identifier for entities which
+              reside in the ENTITY-MIB PhysicalClass *backplane*"
+      ::= { eriRouterEntities 4 }
+
+eriRouterEntBackplaneSMS1000Data OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SMS 1000 data backplane entity."
+      ::= { eriRouterEntityTypeBackplane 1 }
+
+eriRouterEntBackplaneSMS1000Power OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SMS 1000 power backplane entity."
+      ::= { eriRouterEntityTypeBackplane 2 }
+
+eriRouterEntBackplaneSMS500Data OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SMS 500 data backplane entity."
+      ::= { eriRouterEntityTypeBackplane 3 }
+
+eriRouterEntBackplaneSMS500Power OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SMS 500 power backplane entity."
+      ::= { eriRouterEntityTypeBackplane 4 }
+
+eriRouterEntBackplaneSMS1800Data OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SMS 1800 data backplane entity."
+      ::= { eriRouterEntityTypeBackplane 5 }
+
+eriRouterEntBackplaneSMS1800Power OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SMS 1800 power backplane entity."
+      ::= { eriRouterEntityTypeBackplane 6 }
+
+eriRouterEntBackplaneSMS10000Midplane OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SMS 10000 midplane entity."
+      ::= { eriRouterEntityTypeBackplane 7 }
+
+-- %DNP% --eriRouterEntBackplaneSMS2800Data OBJECT-IDENTITY
+-- %DNP% --      STATUS  obsolete
+-- %DNP% --      DESCRIPTION
+-- %DNP% --              "The definitive identifier for the
+-- %DNP% --              SMS 2800 data backplane entity."
+-- %DNP% --      ::= { eriRouterEntityTypeBackplane 8 }
+
+-- %DNP% --eriRouterEntBackplaneSMS2800Power OBJECT-IDENTITY
+-- %DNP% --      STATUS  obsolete
+-- %DNP% --      DESCRIPTION
+-- %DNP% --              "The definitive identifier for the
+-- %DNP% --              SMS 2800 power backplane entity."
+-- %DNP% --      ::= { eriRouterEntityTypeBackplane 9 }
+
+eriRouterEntBackplaneSE800Data OBJECT-IDENTITY
+      STATUS current
+      DESCRIPTION
+              "The definitive identifier for the
+              SE 800 data backplane entity."
+      ::= { eriRouterEntityTypeBackplane 10 }
+
+eriRouterEntBackplaneSE400Data OBJECT-IDENTITY
+      STATUS current
+      DESCRIPTION
+              "The definitive identifier for the
+              SE 400 data backplane entity."
+      ::= { eriRouterEntityTypeBackplane 11 }
+
+eriRouterEntBackplaneSE100Data OBJECT-IDENTITY
+      STATUS current
+      DESCRIPTION
+              "The definitive identifier for the
+              SE 100 data backplane entity."
+      ::= { eriRouterEntityTypeBackplane 12 }
+
+eriRouterEntBackplaneSE1200Data OBJECT-IDENTITY
+      STATUS current
+      DESCRIPTION
+              "The definitive identifier for the
+              SE 1200 data backplane entity."
+      ::= { eriRouterEntityTypeBackplane 13 }
+
+eriRouterEntBackplaneSM480Data OBJECT-IDENTITY
+      STATUS current
+      DESCRIPTION
+              "The definitive identifier for the
+              SM 480 data backplane entity."
+      ::= { eriRouterEntityTypeBackplane 14 }
+
+eriRouterEntBackplaneSE600Data OBJECT-IDENTITY
+      STATUS current
+      DESCRIPTION
+              "The definitive identifier for the
+              SmartEdge 600 data backplane entity."
+      ::= { eriRouterEntityTypeBackplane 15 }
+
+eriRouterEntBackplaneSM240Data OBJECT-IDENTITY
+      STATUS current
+      DESCRIPTION
+              "The definitive identifier for the
+              SM240 data backplane entity."
+      ::= { eriRouterEntityTypeBackplane 16 }
+
+eriRouterEntBackplaneSE1200HData OBJECT-IDENTITY
+      STATUS current
+      DESCRIPTION
+              "The definitive identifier for the SE1200H data backplane entity."
+      ::= { eriRouterEntityTypeBackplane 17 }
+
+eriRouterEntBackplaneSSR8020Data OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the Smart Services Router 8020
+              data backplane entity."
+      ::= { eriRouterEntityTypeBackplane 18 }
+
+eriRouterEntBackplaneSSR8010Data OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the Smart Services Router 8010
+              data backplane entity."
+      ::= { eriRouterEntityTypeBackplane 19 }
+
+eriRouterEntBackplaneSSR8004Data OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the Smart Services Router 8004
+              data backplane entity."
+      ::= { eriRouterEntityTypeBackplane 20 }
+
+eriRouterEntBackplaneSP415Data OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the Smart Packet 415
+              data backplane entity."
+      ::= { eriRouterEntityTypeBackplane 21 }
+
+eriRouterEntBackplaneSP420Data OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the Smart Packet 420
+              data backplane entity."
+      ::= { eriRouterEntityTypeBackplane 22 }
+
+eriRouterEntBackplanerouter6672Data OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the Smart Packet router6672
+              data backplane entity."
+      ::= { eriRouterEntityTypeBackplane 23 }
+
+eriRouterEntBackplaneSFFUMData OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the Smart Packet FUM
+              data backplane entity."
+      ::= { eriRouterEntityTypeBackplane 24 }
+
+eriRouterEntBackplanerouter6274Data OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the Smart Packet router6274
+              data backplane entity."
+      ::= { eriRouterEntityTypeBackplane 25 }
+
+eriRouterEntBackplanerouter6675Data OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the Smart Packet router6675
+              data backplane entity."
+      ::= { eriRouterEntityTypeBackplane 26 }
+
+eriRouterEntBackplanerouter6371Data OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the Smart Packet router6371
+              data backplane entity."
+      ::= { eriRouterEntityTypeBackplane 27 }
+
+eriRouterEntBackplanerouter6471Data OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the Smart Packet router6471
+              data backplane entity."
+      ::= { eriRouterEntityTypeBackplane 28 }
+
+eriRouterEntityTypeContainer OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The top-level category identifier for entities which
+              reside in the ENTITY-MIB PhysicalClass *container*"
+      ::= { eriRouterEntities 5 }
+
+eriRouterEntContainerSMS1000Data OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SMS 1000 data container (slot) entity."
+      ::= { eriRouterEntityTypeContainer 1 }
+
+eriRouterEntContainerSMS1000Power OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SMS 1000 power container (slot) entity."
+      ::= { eriRouterEntityTypeContainer 2 }
+
+eriRouterEntContainerSMS500Data OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SMS 500 data container (slot) entity."
+      ::= { eriRouterEntityTypeContainer 3 }
+
+eriRouterEntContainerSMS500Power OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SMS 500 power container (slot) entity."
+      ::= { eriRouterEntityTypeContainer 4 }
+
+eriRouterEntContainerSMS1800Data OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SMS 1800 data container (slot) entity."
+      ::= { eriRouterEntityTypeContainer 5 }
+
+eriRouterEntContainerSMS1800Power OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SMS 1800 power container (slot) entity."
+      ::= { eriRouterEntityTypeContainer 6 }
+
+eriRouterEntContainerSMS10000Fabric OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SMS 10000 fabric container (slot) entity."
+      ::= { eriRouterEntityTypeContainer 7 }
+
+eriRouterEntContainerSMS10000Timing OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SMS 10000 timing container (slot) entity."
+      ::= { eriRouterEntityTypeContainer 8 }
+
+eriRouterEntContainerSMS10000SMCM OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SMS 10000 SM/CM container (slot) entity."
+      ::= { eriRouterEntityTypeContainer 9 }
+
+eriRouterEntContainerSMS10000IO OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SMS 10000 IO container (slot) entity."
+      ::= { eriRouterEntityTypeContainer 10 }
+
+-- %DNP% --eriRouterEntContainerSMS2800Power OBJECT-IDENTITY
+-- %DNP% --      STATUS  obsolete
+-- %DNP% --      DESCRIPTION
+-- %DNP% --              "The definitive identifier for the
+-- %DNP% --              SMS 2800 Power container (slot) entity."
+-- %DNP% --      ::= { eriRouterEntityTypeContainer 11 }
+
+-- %DNP% --eriRouterEntContainerSMS2800CSM OBJECT-IDENTITY
+-- %DNP% --      STATUS  obsolete
+-- %DNP% --      DESCRIPTION
+-- %DNP% --              "The definitive identifier for the
+-- %DNP% --              SMS 2800 CSM container (slot) entity."
+-- %DNP% --      ::= { eriRouterEntityTypeContainer 12 }
+
+-- %DNP% --eriRouterEntContainerSMS2800IO OBJECT-IDENTITY
+-- %DNP% --      STATUS  obsolete
+-- %DNP% --      DESCRIPTION
+-- %DNP% --              "The definitive identifier for the
+-- %DNP% --              SMS 2800 IO container (slot) entity."
+-- %DNP% --      ::= { eriRouterEntityTypeContainer 13 }
+
+eriRouterEntContainerSE800Data OBJECT-IDENTITY
+      STATUS current
+      DESCRIPTION
+              "The definitive identifier for the
+              SE 800 data container (slot) entity."
+      ::= { eriRouterEntityTypeContainer 14 }
+
+eriRouterEntContainerSE400Data OBJECT-IDENTITY
+      STATUS current
+      DESCRIPTION
+              "The definitive identifier for the
+              SE 400 data container (slot) entity."
+      ::= { eriRouterEntityTypeContainer 15 }
+
+eriRouterEntContainerSE100Data OBJECT-IDENTITY
+      STATUS current
+      DESCRIPTION
+              "The definitive identifier for the
+              SE 100 data container (slot) entity."
+      ::= { eriRouterEntityTypeContainer 16 }
+
+eriRouterEntContainerSE100Carrier OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SE 100 carrier container (MIC-card holder) entity"
+      ::= { eriRouterEntityTypeContainer 17 }
+
+eriRouterEntContainerSE1200Data OBJECT-IDENTITY
+      STATUS current
+      DESCRIPTION
+              "The definitive identifier for the
+              SE 1200 data container (slot) entity."
+      ::= { eriRouterEntityTypeContainer 18 }
+
+eriRouterEntContainerSM480Data OBJECT-IDENTITY
+      STATUS current
+      DESCRIPTION
+              "The definitive identifier for the
+              SM480 data container (slot) entity."
+      ::= { eriRouterEntityTypeContainer 19 }
+
+eriRouterEntContainerSE600Data OBJECT-IDENTITY
+      STATUS current
+      DESCRIPTION
+              "The definitive identifier for the
+              SE 600 data container (slot) entity."
+      ::= { eriRouterEntityTypeContainer 20 }
+
+eriRouterEntContainerSM240Data OBJECT-IDENTITY
+      STATUS current
+      DESCRIPTION
+              "The definitive identifier for the
+              SM240 data container (slot) entity."
+      ::= { eriRouterEntityTypeContainer 21 }
+
+eriRouterEntContainerSE1200HData OBJECT-IDENTITY
+      STATUS current
+      DESCRIPTION
+              "The definitive identifier for the SE1200H data
+               container (slot) entity."
+      ::= { eriRouterEntityTypeContainer 22 }
+
+eriRouterEntContainerSSR8020FanTray OBJECT-IDENTITY
+      STATUS current
+      DESCRIPTION
+              "The definitive identifier for the Smart Services Router 8020
+              fan tray container (slot) entity."
+      ::= { eriRouterEntityTypeContainer 23 }
+
+eriRouterEntContainerSSR8020PowerModule OBJECT-IDENTITY
+      STATUS current
+      DESCRIPTION
+              "The definitive identifier for the Smart Services Router 8020
+              power module container (slot) entity."
+      ::= { eriRouterEntityTypeContainer 24 }
+
+eriRouterEntContainerSSR8020Data OBJECT-IDENTITY
+      STATUS current
+      DESCRIPTION
+              "The definitive identifier for the Smart Services Router 8020
+              data container (slot) entity."
+      ::= { eriRouterEntityTypeContainer 25 }
+
+eriRouterEntContainerSSR8010FanTray OBJECT-IDENTITY
+      STATUS current
+      DESCRIPTION
+              "The definitive identifier for the Smart Services Router 8010
+              fan tray container (slot) entity."
+      ::= { eriRouterEntityTypeContainer 26 }
+
+eriRouterEntContainerSSR8010PowerModule OBJECT-IDENTITY
+      STATUS current
+      DESCRIPTION
+              "The definitive identifier for the Smart Services Router 8010
+              power module container (slot) entity."
+      ::= { eriRouterEntityTypeContainer 27 }
+
+eriRouterEntContainerSSR8010Data OBJECT-IDENTITY
+      STATUS current
+      DESCRIPTION
+              "The definitive identifier for the Smart Services Router 8010
+              data container (slot) entity."
+      ::= { eriRouterEntityTypeContainer 28 }
+
+eriRouterEntContainerSSR8004FanTray OBJECT-IDENTITY
+      STATUS current
+      DESCRIPTION
+              "The definitive identifier for the Smart Services Router 8004
+              fan tray container (slot) entity."
+      ::= { eriRouterEntityTypeContainer 29 }
+
+eriRouterEntContainerSSR8004PowerModule OBJECT-IDENTITY
+      STATUS current
+      DESCRIPTION
+              "The definitive identifier for the Smart Services Router 8004
+              power module container (slot) entity."
+      ::= { eriRouterEntityTypeContainer 30 }
+
+eriRouterEntContainerSSR8004Data OBJECT-IDENTITY
+      STATUS current
+      DESCRIPTION
+              "The definitive identifier for the Smart Services Router 8004
+              data container (slot) entity."
+      ::= { eriRouterEntityTypeContainer 31 }
+
+eriRouterEntContainerSPSC1FanTray OBJECT-IDENTITY
+      STATUS current
+      DESCRIPTION
+              "The definitive identifier for the Smart Packet SP-SC1
+              fan tray container (slot) entity."
+      ::= { eriRouterEntityTypeContainer 32 }
+
+eriRouterEntContainerSPSC1PowerModule OBJECT-IDENTITY
+      STATUS current
+      DESCRIPTION
+              "The definitive identifier for the Smart Packet SP-SC1
+              power module container (slot) entity."
+      ::= { eriRouterEntityTypeContainer 33 }
+
+eriRouterEntContainerSPSC1Data OBJECT-IDENTITY
+      STATUS current
+      DESCRIPTION
+              "The definitive identifier for the Smart Packet SP-SC1
+              data container (slot) entity."
+      ::= { eriRouterEntityTypeContainer 34 }
+
+eriRouterEntContainerrouter6672FanTray OBJECT-IDENTITY
+      STATUS current
+      DESCRIPTION
+              "The definitive identifier for the Smart Packet router6672
+              fan tray container (slot) entity."
+      ::= { eriRouterEntityTypeContainer 35 }
+
+eriRouterEntContainerrouter6672PowerModule OBJECT-IDENTITY
+      STATUS current
+      DESCRIPTION
+              "The definitive identifier for the Smart Packet router6672
+              power module container (slot) entity."
+      ::= { eriRouterEntityTypeContainer 36 }
+
+
+eriRouterEntContainerrouter6672Data OBJECT-IDENTITY
+      STATUS current
+      DESCRIPTION
+              "The definitive identifier for the Smart Packet router6672
+              data container (slot) entity."
+      ::= { eriRouterEntityTypeContainer 37 }
+
+eriRouterEntContainerrouter6274PowerAndFanTray OBJECT-IDENTITY
+      STATUS current
+      DESCRIPTION
+              "The definitive identifier for the Smart Packet router6274
+              power and fan tray container (slot) entity."
+      ::= { eriRouterEntityTypeContainer 38 }
+
+eriRouterEntContainerrouter6274Data OBJECT-IDENTITY
+      STATUS current
+      DESCRIPTION
+              "The definitive identifier for the Smart Packet router6274
+              data container (slot) entity."
+      ::= { eriRouterEntityTypeContainer 39 }
+
+eriRouterEntContainerrouter6675FanTray OBJECT-IDENTITY
+      STATUS current
+      DESCRIPTION
+              "The definitive identifier for the Smart Packet router6675
+              fan tray container (slot) entity."
+      ::= { eriRouterEntityTypeContainer 40 }
+
+eriRouterEntContainerrouter6675PowerModule OBJECT-IDENTITY
+      STATUS current
+      DESCRIPTION
+              "The definitive identifier for the Smart Packet router6675
+              power module container (slot) entity."
+      ::= { eriRouterEntityTypeContainer 41 }
+
+
+eriRouterEntContainerrouter6675Data OBJECT-IDENTITY
+      STATUS current
+      DESCRIPTION
+              "The definitive identifier for the Smart Packet router6675
+              data container (slot) entity."
+      ::= { eriRouterEntityTypeContainer 42 }
+
+eriRouterEntContainerrouter6371Data OBJECT-IDENTITY
+      STATUS current
+      DESCRIPTION
+              "The definitive identifier for the Smart Packet router6371
+              data container (slot) entity."
+      ::= { eriRouterEntityTypeContainer 43 }
+
+eriRouterEntContainerrouter6471Data OBJECT-IDENTITY
+      STATUS current
+      DESCRIPTION
+              "The definitive identifier for the Smart Packet router6471
+              data container (slot) entity."
+      ::= { eriRouterEntityTypeContainer 44 }
+
+eriRouterEntContainerrouter6471FanTray OBJECT-IDENTITY
+      STATUS current
+      DESCRIPTION
+              "The definitive identifier for the Smart Packet router6471
+              Fan Tray container (slot) entity."
+      ::= { eriRouterEntityTypeContainer 45 }
+
+eriRouterEntityTypePowerSupply OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The top-level category identifier for entities which
+              reside in the ENTITY-MIB PhysicalClass *powerSupply*"
+      ::= { eriRouterEntities 6 }
+
+eriRouterEntPowerSupplyUnknown OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The identifier use to represent any power supply which
+              cannot be definitively identified, probably due to the
+              fact that its configuration EEPROM is not valid"
+      ::= { eriRouterEntityTypePowerSupply 1 }
+
+eriRouterEntPowerSupplySMS1000AC OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SMS 1000 AC Power Supply, model PS-1K-AC"
+      ::= { eriRouterEntityTypePowerSupply 2 }
+
+eriRouterEntPowerSupplySMS1000DC OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SMS 1000 DC Power Supply, model PS-1K-DC"
+      ::= { eriRouterEntityTypePowerSupply 3 }
+
+eriRouterEntPowerSupplySMS500AC OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SMS 500 AC Power Supply"
+      ::= { eriRouterEntityTypePowerSupply 4 }
+
+eriRouterEntPowerSupplySMS500DC OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SMS 500 DC Power Supply"
+      ::= { eriRouterEntityTypePowerSupply 5 }
+
+eriRouterEntPowerSupplySMS1800AC OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SMS 1800 AC Power Supply"
+      ::= { eriRouterEntityTypePowerSupply 6 }
+
+eriRouterEntPowerSupplySMS1800DC OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SMS 1800 DC Power Supply"
+      ::= { eriRouterEntityTypePowerSupply 7 }
+
+-- %DNP% --eriRouterEntPowerSupplySMS2800AC OBJECT-IDENTITY
+-- %DNP% --      STATUS  obsolete
+-- %DNP% --      DESCRIPTION
+-- %DNP% --              "The definitive identifier for the
+-- %DNP% --              SMS 2800 AC Power Supply"
+-- %DNP% --      ::= { eriRouterEntityTypePowerSupply 8 }
+
+-- %DNP% --eriRouterEntPowerSupplySMS2800DC OBJECT-IDENTITY
+-- %DNP% --      STATUS  obsolete
+-- %DNP% --      DESCRIPTION
+-- %DNP% --              "The definitive identifier for the
+-- %DNP% --              SMS 2800 DC Power Supply"
+-- %DNP% --      ::= { eriRouterEntityTypePowerSupply 9 }
+
+eriRouterEntPowerModuleSSR OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the Smart Services Router
+              Power Supply Module"
+      ::= { eriRouterEntityTypePowerSupply 10 }
+
+eriRouterEntPowerModuleSPSC1AC OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the Smart Packet SP-SC1
+              AC Power Supply Module"
+      ::= { eriRouterEntityTypePowerSupply 11 }
+
+eriRouterEntPowerModuleSPSC1DC OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the Smart Packet SP-SC1
+              DC Power Supply Module"
+      ::= { eriRouterEntityTypePowerSupply 12 }
+
+eriRouterEntPowerModulerouter6672AC OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the Smart Packet router6672
+              AC Power Supply Module"
+      ::= { eriRouterEntityTypePowerSupply 13 }
+
+eriRouterEntPowerModulerouter6672DC OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the Smart Packet router6672
+              DC Power Supply Module"
+      ::= { eriRouterEntityTypePowerSupply 14 }
+
+eriRouterEntPowerAndFanTrayRouter6274AC OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the Smart Packet router6274
+              AC Power Supply Module"
+      ::= { eriRouterEntityTypePowerSupply 15 }
+
+eriRouterEntPowerAndFanTrayRouter6274DC OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the Smart Packet router6274
+              DC Power Supply Module"
+      ::= { eriRouterEntityTypePowerSupply 16 }
+
+eriRouterEntPowerAndFanTrayRouter6675AC OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the Smart Packet router6675
+              AC Power Supply Module"
+      ::= { eriRouterEntityTypePowerSupply 17 }
+
+eriRouterEntPowerAndFanTrayRouter6675DC OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the Smart Packet router6675
+              DC Power Supply Module"
+      ::= { eriRouterEntityTypePowerSupply 18 }
+
+eriRouterEntityTypeFan OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The top-level category identifier for entities which
+              reside in the ENTITY-MIB PhysicalClass *fan*"
+      ::= { eriRouterEntities 7 }
+
+eriRouterEntFanSE800 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SE 800 Fan Tray"
+      ::= { eriRouterEntityTypeFan 1 }
+
+eriRouterEntFanSE400 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SE 400 Fan Tray"
+      ::= { eriRouterEntityTypeFan 2 }
+
+eriRouterEntFanSE1200 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SE 1200 Fan Tray"
+      ::= { eriRouterEntityTypeFan 3 }
+
+eriRouterEntFanSM480 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SM 480 Fan Tray"
+      ::= { eriRouterEntityTypeFan 4 }
+
+eriRouterEntFanSE600 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SE 600 Fan Tray"
+      ::= { eriRouterEntityTypeFan 5 }
+
+eriRouterEntFanSM240 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SM240 Fan Tray"
+      ::= { eriRouterEntityTypeFan 6 }
+
+eriRouterEntFanSE1200H OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the SE1200H Fan Tray"
+      ::= { eriRouterEntityTypeFan 7 }
+
+eriRouterEntFanTraySSR OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the Smart Services Router
+              Fan Tray"
+      ::= { eriRouterEntityTypeFan 8 }
+
+eriRouterEntFanTraySPSC1 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the Smart Packet Fan Tray"
+      ::= { eriRouterEntityTypeFan 9 }
+
+eriRouterEntFanTrayAlarmIOSPSC1 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the Smart Packet Fan Tray
+              with DB-15 Alarm IO"
+      ::= { eriRouterEntityTypeFan 10 }
+
+eriRouterEntFanTrayrouter6672 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the Smart Packet Fan Tray"
+      ::= { eriRouterEntityTypeFan 11 }
+
+eriRouterEntFanTrayrouter6675 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the Smart Packet Fan Tray"
+      ::= { eriRouterEntityTypeFan 12 }
+
+eriRouterEntFanTrayrouter6471 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the Smart Packet Fan Tray"
+      ::= { eriRouterEntityTypeFan 13 }
+
+eriRouterEntityTypeSensor OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The top-level category identifier for entities which
+              reside in the ENTITY-MIB PhysicalClass *sensor*"
+      ::= { eriRouterEntities 8 }
+
+eriRouterEntSensorAlarmSE400 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SE 400 Alarm Card"
+      ::= { eriRouterEntityTypeSensor 1 }
+
+eriRouterEntSensorAlarmSE600 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SE 600 Alarm Card"
+      ::= { eriRouterEntityTypeSensor 2 }
+
+eriRouterEntSensorAlarmSM240 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SM 240 Alarm Card"
+      ::= { eriRouterEntityTypeSensor 3 }
+
+eriRouterEntityTypeModule OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The top-level category identifier for entities which
+              reside in the ENTITY-MIB PhysicalClass *module*"
+      ::= { eriRouterEntities 9 }
+
+eriRouterEntModuleUnknown OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The identifier use to represent any module which
+              cannot be definitively identified, probably due
+              to the fact that its configuration EEPROM is not
+              valid"
+      ::= { eriRouterEntityTypeModule 1 }
+
+eriRouterEntModuleSMSCE1 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SMS Control Engine 1"
+      ::= { eriRouterEntityTypeModule 16 }
+
+eriRouterEntModuleSMSCE2 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SMS Control Engine 2"
+      ::= { eriRouterEntityTypeModule 17 }
+
+eriRouterEntModuleSMSCE3 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SMS Control Engine 3"
+      ::= { eriRouterEntityTypeModule 18 }
+
+eriRouterEntModuleSMSFE1 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SMS Forwarding Engine 1"
+      ::= { eriRouterEntityTypeModule 10 }
+
+eriRouterEntModuleSMSFE2 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SMS Forwarding Engine 2"
+      ::= { eriRouterEntityTypeModule 12 }
+
+eriRouterEntModuleSMSFE3 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SMS Forwarding Engine 3"
+      ::= { eriRouterEntityTypeModule 35 }
+
+eriRouterEntModuleSMSXFE OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SMS Extended Forwarding Engine"
+      ::= { eriRouterEntityTypeModule 40 }
+
+eriRouterEntModuleSMSFABRIC OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SMS Switch Fabric module"
+      ::= { eriRouterEntityTypeModule 29 }
+
+eriRouterEntModuleSMSTIMING OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SMS Timing module"
+      ::= { eriRouterEntityTypeModule 31 }
+
+eriRouterEntModuleSMSCM OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SMS Connection Manager module"
+      ::= { eriRouterEntityTypeModule 30 }
+
+eriRouterEntModuleSMSSM OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SMS System Manager module"
+      ::= { eriRouterEntityTypeModule 32 }
+
+-- %DNP% --eriRouterEntModuleSMSCSM OBJECT-IDENTITY
+-- %DNP% --      STATUS  obsolete
+-- %DNP% --      DESCRIPTION
+-- %DNP% --              "The definitive identifier for the
+-- %DNP% --              Connection System Manager (CSM) module"
+-- %DNP% --      ::= { eriRouterEntityTypeModule 36 }
+
+eriRouterEntModuleSMSEIM OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SMS 10/100BaseT Ethernet Interface Module"
+      ::= { eriRouterEntityTypeModule 6 }
+
+eriRouterEntModuleSMSGIGEIM OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SMS Gigabit Ethernet Interface Module"
+      ::= { eriRouterEntityTypeModule 26 }
+
+eriRouterEntModuleSMSAIMDS3 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SMS ATM DS3 Interface Module"
+      ::= { eriRouterEntityTypeModule 4 }
+
+eriRouterEntModuleSMSPIME3 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SMS Packet E3 Interface Module"
+      ::= { eriRouterEntityTypeModule 8 }
+
+eriRouterEntModuleSMSPIME1 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SMS Packet E1 Interface Module"
+      ::= { eriRouterEntityTypeModule 22 }
+
+eriRouterEntModuleSMSAIME3 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SMS ATM E3 Interface Module"
+      ::= { eriRouterEntityTypeModule 5 }
+
+eriRouterEntModuleSMSAIME1 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SMS ATM E1 Interface Module"
+      ::= { eriRouterEntityTypeModule 23 }
+
+eriRouterEntModuleSMSAIMT1 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SMS ATM T1 Interface Module"
+      ::= { eriRouterEntityTypeModule 20 }
+
+eriRouterEntModuleSMSAIMOC3 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SMS ATM OC3 Interface Module"
+      ::= { eriRouterEntityTypeModule 3 }
+
+eriRouterEntModuleSMSAIMOC12 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SMS ATM OC12 Interface Module"
+      ::= { eriRouterEntityTypeModule 27 }
+
+eriRouterEntModuleSMSPOSOC3 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SMS POS OC3 Interface Module"
+      ::= { eriRouterEntityTypeModule 24 }
+
+eriRouterEntModuleSMSPOSOC12 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SMS POS OC12 Interface Module"
+      ::= { eriRouterEntityTypeModule 25 }
+
+eriRouterEntModuleSMSIPSEC OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SMS IPSEC Interface Module"
+      ::= { eriRouterEntityTypeModule 28 }
+
+eriRouterEntModuleSMSPIMDS1 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SMS Packet DS1 Interface Module"
+      ::= { eriRouterEntityTypeModule 14 }
+
+eriRouterEntModuleSMSPIMDS3 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SMS Packet DS3 Interface Module"
+      ::= { eriRouterEntityTypeModule 7 }
+
+eriRouterEntModuleSMSPIMCDS3 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SMS Channelized DS3 Interface Module"
+      ::= { eriRouterEntityTypeModule 15 }
+
+eriRouterEntModuleSMSPIMHSSI OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SMS Packet HSSI Interface Module"
+      ::= { eriRouterEntityTypeModule 9 }
+
+eriRouterEntModuleSEXC OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SE Cross Connect Module"
+      ::= { eriRouterEntityTypeModule 41 }
+
+eriRouterEntModuleSEEIM OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SE 10/100BaseT Ethernet Interface Module"
+      ::= { eriRouterEntityTypeModule 42}
+
+eriRouterEntModuleSEGIGEIM OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SE Gigabit Ethernet Interface Module"
+      ::= { eriRouterEntityTypeModule 43 }
+
+eriRouterEntModuleSEPOSOC12 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SE POS OC12 Interface Module"
+      ::= { eriRouterEntityTypeModule 44 }
+
+eriRouterEntModuleSEPOSOC48 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SE POS OC48 Interface Module"
+      ::= { eriRouterEntityTypeModule 45 }
+
+eriRouterEntModuleSEPOSOC3 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SE POS OC3 Interface Module"
+      ::= { eriRouterEntityTypeModule 46 }
+
+eriRouterEntModuleSECHOC12DS1 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SE Channelized OC12 DS1 Interface Module"
+      ::= { eriRouterEntityTypeModule 47 }
+
+eriRouterEntModuleSECHOC12DS3 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SE Channelized OC12 DS3 Interface Module"
+      ::= { eriRouterEntityTypeModule 48 }
+
+eriRouterEntModuleSEAIMOC3 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SE ATM OC3 Interface Module"
+      ::= { eriRouterEntityTypeModule 49 }
+
+eriRouterEntModuleSEAIMOC12 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SE ATM OC12 Interface Module"
+      ::= { eriRouterEntityTypeModule 50 }
+
+eriRouterEntModuleSECHDS3 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SE Channelized DS3 Interface Module"
+      ::= { eriRouterEntityTypeModule 51 }
+
+eriRouterEntModuleSEDS3 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SE DS3 Interface Module"
+      ::= { eriRouterEntityTypeModule 52 }
+
+eriRouterEntModuleSEAIMDS3 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SE ATM DS3 Interface Module"
+      ::= { eriRouterEntityTypeModule 53 }
+
+eriRouterEntModuleSECHSTM1E1 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SE Channelized STM-1 to E1 Interface Module"
+      ::= { eriRouterEntityTypeModule 54 }
+
+eriRouterEntModuleSEE1 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SE E1 Interface Module"
+      ::= { eriRouterEntityTypeModule 55 }
+
+eriRouterEntModuleSEXC3 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SE Cross Connect Module Version 3"
+      ::= { eriRouterEntityTypeModule 56 }
+
+eriRouterEntModuleSEE3 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SE E3 Interface Module"
+      ::= { eriRouterEntityTypeModule 57 }
+
+eriRouterEntModuleSEAIMOC12E OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SE ATM OC12 Enhanced Interface Module"
+      ::= { eriRouterEntityTypeModule 58 }
+
+eriRouterEntModuleSEGIGETM OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SE Gigabit Ethernet with Traffic Management Module"
+      ::= { eriRouterEntityTypeModule 59 }
+
+eriRouterEntModuleSE10GIGEIM OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SE 10 Gigabit Ethernet Interface Module"
+      ::= { eriRouterEntityTypeModule 60 }
+
+eriRouterEntModuleSE100XC OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SE 100 Cross Connect Module"
+      ::= { eriRouterEntityTypeModule 61 }
+
+eriRouterEntModuleSE100EMIC OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SE 100 10/100BaseT Ethernet Media Interface Connect
+              Module"
+      ::= { eriRouterEntityTypeModule 62 }
+
+eriRouterEntModuleSE100FXMIC OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SE 100 FX-100 Ethernet Media Interface Connect Module"
+      ::= { eriRouterEntityTypeModule 63 }
+
+eriRouterEntModuleSE100GERJMIC OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SE 100 Gigabit Ethernet Media Interface Connect Module"
+      ::= { eriRouterEntityTypeModule 64 }
+
+eriRouterEntModuleSE100GEFXMIC OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SE 100 FX-1000 Ethernet Media Interface Connect Module"
+      ::= { eriRouterEntityTypeModule 65 }
+
+eriRouterEntModuleSEXC4 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SE Cross Connect Module Version 4"
+      ::= { eriRouterEntityTypeModule 66 }
+
+eriRouterEntModuleSE100AIMOC3MIC OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SE 100 2-port ATM OC3 Media Interface Connect Module"
+      ::= { eriRouterEntityTypeModule 67 }
+
+eriRouterEntModuleSEASE OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SE Advanced Services Engine Module"
+      ::= { eriRouterEntityTypeModule 68 }
+
+eriRouterEntModuleSEFE60GE2 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              FE60GE2 Ethernet Interface Module"
+      ::= { eriRouterEntityTypeModule 69 }
+
+eriRouterEntModuleSEPOSOC192 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SE POS OC192 Media Interface Module"
+      ::= { eriRouterEntityTypeModule 70 }
+
+eriRouterEntModuleSE5PortGIGE OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the 5 port PPA2
+             based Gigabit Ethernet Media Interface Connect Module"
+      ::= { eriRouterEntityTypeModule 71 }
+
+eriRouterEntModuleSE20PortGIGE OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the 20 port PPA3/PMA3
+              based Gigabit Ethernet Media Interface Connect Module"
+      ::= { eriRouterEntityTypeModule 72 }
+
+eriRouterEntModuleSE4Port10GIGE OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the 4 port PPA3/PMA3
+              based 10 Gigabit Ethernet Media Interface Connect Module"
+      ::= { eriRouterEntityTypeModule 73 }
+
+eriRouterEntModuleSE10GIGETM OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the SE 10 Gigabit
+              Ethernet with Traffic Management Interface Module"
+      ::= { eriRouterEntityTypeModule 74 }
+
+eriRouterEntModuleSESSE OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SmartEdge Server Engine(Winchester)"
+      ::= { eriRouterEntityTypeModule 75 }
+
+eriRouterEntModuleSE10PortGIGEDDR2 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+               "The definitive identifier for the
+               SE 10 Gigabit Ethernet with DDR Upgrade"
+      ::= { eriRouterEntityTypeModule 76 }
+
+eriRouterEntModuleSE4PortOC48 OBJECT-IDENTITY
+      STATUS current
+      DESCRIPTION
+              "The definitive identifier for the
+              SE 4 port OC-48 POS  Media Interface Module"
+      ::= { eriRouterEntityTypeModule 77 }
+
+eriRouterEntModuleSE8PortOC3 OBJECT-IDENTITY
+      STATUS current
+      DESCRIPTION
+              "The definitive identifier for the
+              SE 8 port OC-3 ATM Media Interface Module"
+      ::= { eriRouterEntityTypeModule 78 }
+
+eriRouterEntModuleSE8OR2PORTCHOC3OC12 OBJECT-IDENTITY
+      STATUS current
+      DESCRIPTION
+              "The definitive identifier for the SE Channelized
+              OC3/STM1 or OC12/STM4 8 or 2 Port Interface Module"
+      ::= { eriRouterEntityTypeModule 79 }
+
+eriRouterEntModuleSEASE2 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the SE Advanced Services
+              Engine 2 Module"
+      ::= { eriRouterEntityTypeModule 80 }
+
+eriRouterEntModuleSE1Port10GEOC192 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the SE version of
+              a line card supporting  either 10GE (gigabit ethernet)
+              or OC192 but not both."
+      ::= { eriRouterEntityTypeModule 81 }
+
+eriRouterEntModuleSEPos8xOC3 OBJECT-IDENTITY
+      STATUS current
+      DESCRIPTION
+              "The definitive identifier for the
+              SE 8 port OC-3 POS PPA2 Media Interface Module"
+      ::= { eriRouterEntityTypeModule 82 }
+
+eriRouterEntModuleSEPos4xOC12 OBJECT-IDENTITY
+      STATUS current
+      DESCRIPTION
+              "The definitive identifier for the
+              SE 4 port OC-12 POS PPA2 Media Interface Module"
+      ::= { eriRouterEntityTypeModule 83 }
+
+eriRouterEntModuleSEAtm2xOC12 OBJECT-IDENTITY
+      STATUS current
+      DESCRIPTION
+              "The definitive identifier for the
+              SE 2 port OC-12 ATM PPA2  Media Interface Module"
+      ::= { eriRouterEntityTypeModule 84 }
+
+eriRouterEntModuleSM10GIGEIM OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SM 10 Gigabit Ethernet Interface Module"
+      ::= { eriRouterEntityTypeModule 101 }
+
+eriRouterEntModuleSMRP2 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SM Routing Processor Module version 2 "
+      ::= { eriRouterEntityTypeModule 102 }
+
+eriRouterEntModuleSMGIGEIM OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SM Gigabit Ethernet Interface Module"
+      ::= { eriRouterEntityTypeModule 104 }
+
+eriRouterEntModuleSMGIGETM OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SM Gigabit Ethernet with Traffic Management Module"
+      ::= { eriRouterEntityTypeModule 105 }
+
+eriRouterEntModuleSM10GIGETM OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SM 10 Gigabit Ethernet with Traffic Management
+              Module"
+      ::= { eriRouterEntityTypeModule 106 }
+
+eriRouterEntModuleSMFE60GE2 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SM FE60GE2 Ethernet Interface Module"
+      ::= { eriRouterEntityTypeModule 107 }
+
+eriRouterEntModuleSM20PortGIGE OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SM 20 port PPA3/PMA3 based Gigabit Ethernet
+              Media Interface Connect Module"
+      ::= { eriRouterEntityTypeModule 108 }
+
+eriRouterEntModuleSM4Port10GIGE OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SM 4 port PPA3/PMA3 based 10 Gigabit Ethernet
+              Media Interface Connect Module"
+      ::= { eriRouterEntityTypeModule 109 }
+
+eriRouterEntModuleSM10PortGIGEDDR2 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+               "The definitive identifier for the SM version of
+               the 10 Gigabit Ethernet with DDR Upgrade"
+      ::= { eriRouterEntityTypeModule 110 }
+
+eriRouterEntModuleSM1Port10GEOC192 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+               "The definitive identifier for the SM version of
+               a line card supporting either 10GE (gigabit ethernet)
+               or OC192 but not both."
+      ::= { eriRouterEntityTypeModule 111 }
+
+eriRouterEntModuleSM8OR2PORTCHOC3OC12 OBJECT-IDENTITY
+      STATUS current
+      DESCRIPTION
+              "The definitive identifier for the SM Channelized
+              OC3/STM1 or OC12/STM4 8 or 2 Port Interface Module"
+      ::= { eriRouterEntityTypeModule 112 }
+
+eriRouterEntModuleSSRALSW OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the Smart Services Router
+              Alarm with Switch Fabric module."
+      ::= { eriRouterEntityTypeModule 201 }
+
+eriRouterEntModuleSSRRPSW OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the Smart Services Router
+              Route Processor with Switch Fabric module."
+      ::= { eriRouterEntityTypeModule 202 }
+
+eriRouterEntModuleSSRSW OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the Smart Services Router
+              Switch module."
+      ::= { eriRouterEntityTypeModule 203 }
+
+eriRouterEntModuleSSR40Port1GE OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the Smart Services Router
+              40 port 1 Gigabit Ethernet Interface Module."
+      ::= { eriRouterEntityTypeModule 204 }
+
+eriRouterEntModuleSSR10Port10GE OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the Smart Services Router
+              10 port 10 Gigabit Ethernet Interface Module."
+      ::= { eriRouterEntityTypeModule 205 }
+
+eriRouterEntModuleSSC1 OBJECT-IDENTITY
+      STATUS current
+      DESCRIPTION
+              "The definitive identifier for the Smart Services Card
+              with Storage (SSC1)."
+      ::= { eriRouterEntityTypeModule 207 }
+
+eriRouterEntModuleSSC2 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the Smart Services Card
+              with Pluggable Daughter Cards (SSC2)."
+      ::= { eriRouterEntityTypeModule 208 }
+
+eriRouterEntModuleSSR20Port1GEor10GE OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the Smart Services Router
+              20 port 1 Gigabit or 10 Gigabit Ethernet Interface Module."
+      ::= { eriRouterEntityTypeModule 209 }
+
+eriRouterEntModuleSSR2Port40GEor100GE OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the Smart Services Router
+              1 port 100 Gigabit or 2 port 40 Gigabit Ethernet Interface Module."
+      ::= { eriRouterEntityTypeModule 210 }
+
+eriRouterEntModuleSSR20Port1GEor4Port10GE OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the Smart Services Router
+              4 port 10 Gigabit or
+              20 port 1 Gigabit + 2 port 10 Gigabit or
+              24 port 1 gigabit Ethernet Interface Module."
+      ::= { eriRouterEntityTypeModule 211 }
+
+eriRouterEntModuleSPSC1SC OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the Smart Packet SP-SC1
+              System Controller module."
+      ::= { eriRouterEntityTypeModule 212 }
+
+eriRouterEntModuleSPSC11Port10GE OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the Smart Packet SP-SC1
+              1 port 10 Gigabit Ethernet Interface Service Module."
+      ::= { eriRouterEntityTypeModule 213 }
+
+eriRouterEntModuleSPSC18PortCES OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the Smart Packet SP-SC1
+              8 port T1 or E1 CES Service Module."
+      ::= { eriRouterEntityTypeModule 214 }
+
+eriRouterEntModuleSPSC116Port1GE OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the Smart Packet SP-SC1
+              16 port 1 Gigabit Ethernet Interface Service Module
+              (physically located in SC card)."
+      ::= { eriRouterEntityTypeModule 215 }
+
+eriRouterEntModuleSPSC120and2Port1and10GE OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the Smart Packet SP-SC1
+              20 port 1 Gigabit  + 2 port 10 Gigabit
+              Ethernet Interface Service Module (physically
+              located in SC card)."
+      ::= { eriRouterEntityTypeModule 216 }
+
+eriRouterEntModuleSSR20PortOC3orOC12orOC48orOC192 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the Smart Services Router
+              4 port OC192 and 16 port OC3 or OC12 or OC48
+              POS Interface Module."
+      ::= { eriRouterEntityTypeModule 217 }
+
+eriRouterEntModulerouter6672RPFP OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the Smart Packet router6672
+              System Controller module."
+      ::= { eriRouterEntityTypeModule 218 }
+
+eriRouterEntModulerouter66728Port10GE12Port1GE OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the Smart Packet router6672
+              20 port 1 Gigabit  or 8 port 10 Gigabit + 12 port 1 Gigabit
+              Ethernet Interface Service Module (physically
+              located in RPFP card)."
+      ::= { eriRouterEntityTypeModule 219 }
+
+eriRouterEntModulerouter667220Port1GE OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the Smart Packet router6672
+              20 port 1 Gigabit
+              Ethernet Interface Service Module (physically
+              located in RPFP card)."
+      ::= { eriRouterEntityTypeModule 220 }
+
+eriRouterEntModulerouter6274RP OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the Smart Packet router6274
+              System Controller module."
+      ::= { eriRouterEntityTypeModule 221 }
+
+eriRouterEntModulerouter627448Port10GE OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the Smart Packet router6274
+              48 port 1 Gigabit Ethernet Interface Service Module."
+      ::= { eriRouterEntityTypeModule 222 }
+
+eriRouterEntModulerouter627432Port10GE4Port100GE OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the Smart Packet router6274
+              10 port 10 Gigabit or 1 Gigabit and 4 port 100 Gigabit
+              Ethernet Interface Service Module."
+      ::= { eriRouterEntityTypeModule 223 }
+
+eriRouterEntModulerouter6675RPFP OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the Smart Packet router6672
+              System Controller module."
+      ::= { eriRouterEntityTypeModule 224 }
+
+eriRouterEntModulerouter667524Port10GE24Port1GE OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the Smart Packet router6675
+              24 port 1 Gigabit  or 24 port 10 Gigabit
+              Ethernet Interface Service Module (physically
+              located in RPFP card)."
+      ::= { eriRouterEntityTypeModule 225 }
+
+eriRouterEntModulerouter66754Port100GE24Port10GE OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the Smart Packet router6672
+              4 port 100 Gigabit or 16 port 10 Gigabit
+              Ethernet Interface Service Module (physically
+              located in RPFP card)."
+      ::= { eriRouterEntityTypeModule 226 }
+
+
+eriRouterEntModulerouter6371RPFP OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the Smart Packet router6371
+              System Controller module."
+      ::= { eriRouterEntityTypeModule 227 }
+
+eriRouterEntModulerouter63712Port10GE4Port1GE OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the Smart Packet router6371
+              2 port 10 Gigabit and 4 port 1 Gigabit
+              Ethernet Interface Service Module (physically
+              located in RPFP card)."
+      ::= { eriRouterEntityTypeModule 228 }
+
+
+eriRouterEntModulerouter6471RPFP OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the Smart Packet router6471
+              System Controller module."
+      ::= { eriRouterEntityTypeModule 229 }
+
+eriRouterEntModulerouter64712Port10GE8Port1GE OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the Smart Packet router6471
+              2 port 10 Gigabit and 8 port 1 Gigabit
+              Ethernet Interface Service Module (physically
+              located in RPFP card)."
+      ::= { eriRouterEntityTypeModule 230 }
+
+eriRouterEntityTypePort OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The top-level category identifier for entities which
+              reside in the ENTITY-MIB PhysicalClass *port*"
+      ::= { eriRouterEntities 10 }
+
+eriRouterEntPortUnknown OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The identifier use to represent any module which
+              cannot be definitively identified, probably due
+              to the fact that its configuration EEPROM is not
+              valid"
+      ::= { eriRouterEntityTypePort 1 }
+
+eriRouterEntPortSMSCE1MGMT OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SMS Control Engine 1, Local Management Port"
+      ::= { eriRouterEntityTypePort 16 }
+
+eriRouterEntPortSMSCE2MGMT OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SMS Control Engine 2, Local Management Port"
+      ::= { eriRouterEntityTypePort 17 }
+
+eriRouterEntPortSMSCE3MGMT OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SMS Control Engine 3, Local Management Port"
+      ::= { eriRouterEntityTypePort 18 }
+
+-- %DNP% --eriRouterEntPortSMSCSMMGMT OBJECT-IDENTITY
+-- %DNP% --      STATUS  obsolete
+-- %DNP% --      DESCRIPTION
+-- %DNP% --              "The definitive identifier for the
+-- %DNP% --              Connection System Manager (CSM), Local Management Port"
+-- %DNP% --      ::= { eriRouterEntityTypePort 36 }
+
+eriRouterEntPortSMSEIM OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SMS 10/100BaseT Ethernet Interface Port"
+      ::= { eriRouterEntityTypePort 6 }
+
+eriRouterEntPortSMSGIGEIM OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SMS Gigabit Ethernet Interface Port"
+      ::= { eriRouterEntityTypePort 26 }
+
+eriRouterEntPortSMSAIMDS3 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SMS ATM DS3 Interface Port"
+      ::= { eriRouterEntityTypePort 4 }
+
+eriRouterEntPortSMSPIME3 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SMS Packet E3 Interface Port"
+      ::= { eriRouterEntityTypePort 8 }
+
+eriRouterEntPortSMSPIME1 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SMS Packet E1 Interface Port"
+      ::= { eriRouterEntityTypePort 22 }
+
+eriRouterEntPortSMSAIME3 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SMS ATM E3 Interface Port"
+      ::= { eriRouterEntityTypePort 5 }
+
+eriRouterEntPortSMSAIME1 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SMS ATM E1 Interface Port"
+      ::= { eriRouterEntityTypePort 23 }
+
+eriRouterEntPortSMSAIMT1 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SMS ATM T1 Interface Port"
+      ::= { eriRouterEntityTypePort 20 }
+
+eriRouterEntPortSMSAIMOC3 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SMS ATM OC3 Interface Port"
+      ::= { eriRouterEntityTypePort 3 }
+
+eriRouterEntPortSMSAIMOC12 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SMS ATM OC12 Interface Port"
+      ::= { eriRouterEntityTypePort 27 }
+
+eriRouterEntPortSMSPOSOC3 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SMS POS OC3 Interface Port"
+      ::= { eriRouterEntityTypePort 24 }
+
+eriRouterEntPortSMSPOSOC12 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SMS POS OC12 Interface Port"
+      ::= { eriRouterEntityTypePort 25 }
+
+eriRouterEntPortSMSPIMDS1 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SMS Packet DS1 Interface Port"
+      ::= { eriRouterEntityTypePort 14 }
+
+eriRouterEntPortSMSPIMDS3 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SMS Packet DS3 Interface Port"
+      ::= { eriRouterEntityTypePort 7 }
+
+eriRouterEntPortSMSPIMCDS3 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SMS Channelized DS3 Interface Port"
+      ::= { eriRouterEntityTypePort 15 }
+
+eriRouterEntPortSMSPIMHSSI OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SMS Packet HSSI Interface Port"
+      ::= { eriRouterEntityTypePort 9 }
+
+eriRouterEntPortSEXCMGMT OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SE Cross Connect, Local Management Port"
+      ::= { eriRouterEntityTypePort 41 }
+
+eriRouterEntPortSEEIM OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SE 10/100BaseT Ethernet Interface Port"
+      ::= { eriRouterEntityTypePort 42 }
+
+eriRouterEntPortSEGIGEIM OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SE Gigabit Ethernet Interface Port"
+      ::= { eriRouterEntityTypePort 43 }
+
+eriRouterEntPortSEPOSOC12 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SE POS OC12 Interface Port"
+      ::= { eriRouterEntityTypePort 44 }
+
+eriRouterEntPortSEPOSOC48 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SE POS OC48 Interface Port"
+      ::= { eriRouterEntityTypePort 45 }
+
+eriRouterEntPortSEPOSOC3 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SE POS OC3 Interface Port"
+      ::= { eriRouterEntityTypePort 46 }
+
+eriRouterEntPortSECHOC12DS1 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SE Channelized OC12 DS1 Interface Port"
+      ::= { eriRouterEntityTypePort 47 }
+
+eriRouterEntPortSECHOC12DS3 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SE Channelized OC12 DS3 Interface Port"
+      ::= { eriRouterEntityTypePort 48 }
+
+eriRouterEntPortSEAIMOC3 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SE ATM OC3 Interface Port"
+      ::= { eriRouterEntityTypePort 49 }
+
+eriRouterEntPortSEAIMOC12 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SE ATM OC12 Interface Port"
+      ::= { eriRouterEntityTypePort 50 }
+
+eriRouterEntPortSECHDS3 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SE Channelized DS3 Interface Port"
+      ::= { eriRouterEntityTypePort 51 }
+
+eriRouterEntPortSEDS3 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SE DS3 Interface Port"
+      ::= { eriRouterEntityTypePort 52 }
+
+eriRouterEntPortSEAIMDS3 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SE ATM DS3 Interface Port"
+      ::= { eriRouterEntityTypePort 53 }
+
+eriRouterEntPortSECHSTM1E1 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SE Channelized STM-1 to E1 Interface Port"
+      ::= { eriRouterEntityTypePort 54 }
+
+eriRouterEntPortSEE1 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SE E1 Interface Port"
+      ::= { eriRouterEntityTypePort 55 }
+
+eriRouterEntPortSEXC3MGMT OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SE Cross Connect 3, Local Management Port"
+      ::= { eriRouterEntityTypePort 56 }
+
+eriRouterEntPortSEE3 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SE E3 Interface Port"
+      ::= { eriRouterEntityTypePort 57 }
+
+eriRouterEntPortSEAIMOC12E OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SE ATM OC12 Enhanced Interface Port"
+      ::= { eriRouterEntityTypePort 58 }
+
+eriRouterEntPortSEGIGETM OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SE Gigabit Ethernet with Traffic Management Interface
+              Port"
+      ::= { eriRouterEntityTypePort 59 }
+
+eriRouterEntPortSE10GIGEIM OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SE 10 Gigabit Ethernet Interface Port"
+      ::= { eriRouterEntityTypePort 60 }
+
+eriRouterEntPortSE100XCMGMT OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SE 100 Cross Connect, Local Management Port"
+      ::= { eriRouterEntityTypePort 61 }
+
+eriRouterEntPortSE100EIM OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SE 100 10/100BaseT Ethernet Interface Port"
+      ::= { eriRouterEntityTypePort 62 }
+
+eriRouterEntPortSE100FXIM OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SE 100 FX-100 Ethernet Interface Port"
+      ::= { eriRouterEntityTypePort 63 }
+
+eriRouterEntPortSE100GERJIM OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SE 100 Gigabit Ethernet Interface Port"
+      ::= { eriRouterEntityTypePort 64 }
+
+eriRouterEntPortSE100GEFXIM OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SE 100 FX-1000 Ethernet Interface Port"
+      ::= { eriRouterEntityTypePort 65 }
+
+eriRouterEntPortSEXC4MGMT OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SE Cross Connect 4, Local Management Port"
+      ::= { eriRouterEntityTypePort 66 }
+
+
+eriRouterEntPortSE100AIMOC3 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SE 100 ATM OC3 Interface Port"
+      ::= { eriRouterEntityTypePort 67 }
+
+eriRouterEntPortSEPOSOC192 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SE POS OC192 Interface Port"
+      ::= { eriRouterEntityTypePort 68 }
+
+eriRouterEntPortSE10GIGETM OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the SE 10 Gigabit
+              Ethernet with Traffic Management Interface Port"
+      ::= { eriRouterEntityTypePort 69 }
+
+eriRouterEntPortSECHOC3OC12 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the SE Channelized
+              OC3/STM1 or OC12/STM4 Interface Port"
+      ::= { eriRouterEntityTypePort 70 }
+
+eriRouterEntPortSECHOC3 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the SE Channelized
+              OC3/STM1 Interface Port"
+      ::= { eriRouterEntityTypePort 71 }
+
+eriRouterEntPortSM10GIGEIM OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SM 10 Gigabit Ethernet Interface Port"
+      ::= { eriRouterEntityTypePort 101 }
+
+eriRouterEntPortSMRPMGMT OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+                SM Routing Processor, Local Management Port"
+      ::= { eriRouterEntityTypePort 103 }
+
+eriRouterEntPortSMGIGEIM OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SM Gigabit Ethernet Interface Port"
+      ::= { eriRouterEntityTypePort 104 }
+
+eriRouterEntPortSMGIGETM OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the SM Gigabit
+              Ethernet with Traffic Management Interface
+              Port"
+      ::= { eriRouterEntityTypePort 105 }
+
+eriRouterEntPortSM10GIGETM OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the SM 10 Gigabit
+              Ethernet with Traffic Management port"
+      ::= { eriRouterEntityTypePort 106 }
+
+eriRouterEntPortSMEIM OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              SM 10/100BaseT Ethernet Interface Port"
+      ::= { eriRouterEntityTypePort 107 }
+
+eriRouterEntPortSMCHOC3OC12 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the SM Channelized
+              OC3/STM1 or OC12/STM4 Interface Port"
+      ::= { eriRouterEntityTypePort 108 }
+
+eriRouterEntPortSMCHOC3 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the SM Channelized
+              OC3/STM1 Interface Port"
+      ::= { eriRouterEntityTypePort 109 }
+
+eriRouterEntPortSSR1GE OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the Smart Services Router
+              1 Gigabit Ethernet Interface Port"
+      ::= { eriRouterEntityTypePort 201 }
+
+eriRouterEntPortSSR10GE OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the Smart Services Router
+              10 Gigabit Ethernet Interface Port"
+      ::= { eriRouterEntityTypePort 202 }
+
+eriRouterEntPortSSRRPSWMgmt OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the Smart Services Router
+              Route Processor with Switch Fabric card Local Management Port"
+      ::= { eriRouterEntityTypePort 203 }
+
+eriRouterEntPortSSR100GE OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the Smart Services Router
+               100 Gigabit Ethernet Interface Port"
+      ::= { eriRouterEntityTypePort 204 }
+
+eriRouterEntPortSSR40GE OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the Smart Services Router
+               40 Gigabit Ethernet Interface Port"
+      ::= { eriRouterEntityTypePort 205 }
+
+eriRouterEntPortSSR40GEor100GE OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the Smart Services Router
+               40 or 100 Gigabit Ethernet Interface Port"
+      ::= { eriRouterEntityTypePort 206 }
+
+eriRouterEntPortSPSC11GE OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the Smart Packet SP-SC1
+              1 Gigabit Ethernet Interface Port"
+      ::= { eriRouterEntityTypePort 207 }
+
+eriRouterEntPortSPSC110GE OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the Smart Packet SP-SC1
+              10 Gigabit Ethernet Interface Port"
+      ::= { eriRouterEntityTypePort 208 }
+
+eriRouterEntPortSPSC1SCMgmt OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the Smart Packet SP-SC1
+              System Controller Local Management Port"
+      ::= { eriRouterEntityTypePort 209 }
+
+eriRouterEntPortSPSC1AlarmIn OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the Smart Packet SP-SC1
+              Input Alarm Port"
+      ::= { eriRouterEntityTypePort 210 }
+
+eriRouterEntPortSPSC1AlarmOut OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the Smart Packet SP-SC1
+              Output Alarm Port"
+      ::= { eriRouterEntityTypePort 211 }
+
+eriRouterEntPortSSR20POSOCorOC12orOC48orOC192 OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the Smart Services Router
+               OC3 or OC12 or OC48 or OC192 POS Interface Port"
+      ::= { eriRouterEntityTypePort 212 }
+
+eriRouterEntPortrouter66721GE OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the Smart Packet router6672
+              1 Gigabit Ethernet Interface Port"
+      ::= { eriRouterEntityTypePort 213 }
+
+eriRouterEntPortrouter667210GE OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the Smart Packet router6672
+              10 Gigabit Ethernet Interface Port"
+      ::= { eriRouterEntityTypePort 214 }
+
+eriRouterEntPortrouter6672SCMgmt OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the Smart Packet router6672
+              System Controller Local Management Port"
+      ::= { eriRouterEntityTypePort 215 }
+
+eriRouterEntPortrouter62741GE OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the Smart Packet router6274
+              1 Gigabit Ethernet Interface Port"
+      ::= { eriRouterEntityTypePort 216 }
+
+eriRouterEntPortrouter627410GE OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the Smart Packet router6274
+              10 Gigabit Ethernet Interface Port"
+      ::= { eriRouterEntityTypePort 217 }
+
+eriRouterEntPortrouter6274100GE OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the Smart Packet router6274
+              100 Gigabit Ethernet Interface Port"
+      ::= { eriRouterEntityTypePort 218 }
+
+eriRouterEntPortrouter6274RPMgmt OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the Smart Packet router6274
+              System Controller Local Management Port"
+      ::= { eriRouterEntityTypePort 219 }
+
+eriRouterEntPortrouter66751GE OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the Smart Packet router6675
+              1 Gigabit Ethernet Interface Port"
+      ::= { eriRouterEntityTypePort 220 }
+
+eriRouterEntPortrouter667510GE OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the Smart Packet router6675
+              10 Gigabit Ethernet Interface Port"
+      ::= { eriRouterEntityTypePort 221 }
+
+eriRouterEntPortrouter6675100GE OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the Smart Packet router6675
+              100 Gigabit Ethernet Interface Port"
+      ::= { eriRouterEntityTypePort 222 }
+
+eriRouterEntPortrouter6675RPMgmt OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the Smart Packet router6675
+              System Controller Local Management Port"
+      ::= { eriRouterEntityTypePort 223 }
+
+eriRouterEntPortrouter63711GE OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the Smart Packet router6371
+              1 Gigabit Ethernet Interface Port"
+      ::= { eriRouterEntityTypePort 224 }
+
+eriRouterEntPortrouter637110GE OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the Smart Packet router6371
+              10 Gigabit Ethernet Interface Port"
+      ::= { eriRouterEntityTypePort 225 }
+
+eriRouterEntPortrouter6371RPMgmt OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the Smart Packet router6371
+              System Controller Local Management Port"
+      ::= { eriRouterEntityTypePort 226 }
+
+eriRouterEntPortrouter64711GE OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the Smart Packet router6471
+              1 Gigabit Ethernet Interface Port"
+      ::= { eriRouterEntityTypePort 227 }
+
+eriRouterEntPortrouter647110GE OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the Smart Packet router6471
+              10 Gigabit Ethernet Interface Port"
+      ::= { eriRouterEntityTypePort 228 }
+
+eriRouterEntPortrouter6471RPMgmt OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the Smart Packet router6471
+              System Controller Local Management Port"
+      ::= { eriRouterEntityTypePort 229 }
+
+eriRouterEntityTypeStack OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The top-level category identifier for entities which
+              reside in the ENTITY-MIB PhysicalClass *module*"
+      ::= { eriRouterEntities 11 }
+
+eriRouterEntityTypeCPU OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The top-level category identifier for entities which
+              reside in the ENTITY-MIB PhysicalClass *module*"
+      ::= { eriRouterEntities 12 }
+
+eriRouterEntCpuUnknown OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The identifier use to represent any cpu which
+              cannot be definitively identified."
+      ::= { eriRouterEntityTypeCPU 1 }
+
+eriRouterEntCpuOcteon OBJECT-IDENTITY
+STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the RedBack Networks
+              Octeon Processor."
+      ::= { eriRouterEntityTypeCPU 2 }
+
+eriRouterEntityTypeDisk OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The top-level category identifier for entities which
+              reside in the ENTITY-MIB PhysicalClass *module*"
+      ::= { eriRouterEntities 13 }
+
+eriRouterEntDiskUnknown OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The identifier use to represent any disk which
+              cannot be definitively identified."
+      ::= { eriRouterEntityTypeDisk 1 }
+
+eriRouterEntDiskSSE OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The definitive identifier for the
+              removable disks on SSE card."
+      ::= { eriRouterEntityTypeDisk 2 }
+
+eriRouterEntityTypeMemory OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+              "The top-level category identifier for entities which
+              reside in the ENTITY-MIB PhysicalClass *module*"
+      ::= { eriRouterEntities 14 }
+
+END

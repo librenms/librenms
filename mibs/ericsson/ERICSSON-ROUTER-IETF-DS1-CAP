@@ -1,0 +1,198 @@
+-- %DNP% $Id: ERICSSON-ROUTER-IETF-DS1-CAP.my,v 1.1.4.7.370.4 2011/06/15 18:19:45 danielhe Exp $
+-- %DNP% $Source: /cvsroot/pkt/sw/se/xc/bsd/config/snmp/mibs/ERICSSON-ROUTER-IETF-DS1-CAP.my,v $
+-- *****************************************************************
+-- ERICSSON-ROUTER-IETF-DS1-CAP   IETF DS1-MIB Agents Capabilities
+--
+-- Copyright (c) 1999, 2001-2002, 2004, 2010-2011, 2015 Ericsson AB
+-- All rights reserved.
+-- 
+-- *****************************************************************
+
+ERICSSON-ROUTER-IETF-DS1-CAP DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY
+		FROM SNMPv2-SMI
+	AGENT-CAPABILITIES
+		FROM SNMPv2-CONF
+	eriRouterCapabilities
+		FROM ERICSSON-ROUTER-SMI;
+
+eriRouterIetfDS1Cap MODULE-IDENTITY
+        LAST-UPDATED    "201501141800Z" -- Jan 14, 2015
+        ORGANIZATION    "Ericsson Inc."
+        CONTACT-INFO
+                "           Ericsson, Inc. 
+
+                            100 Headquarters Dr
+                            San Jose, CA  95134
+                            USA
+
+                     Phone: +1 408 750 5000
+                       Fax: +1 408 750 5599
+                "
+        DESCRIPTION
+		"The Agent Capabilities of the DS1-MIB.
+
+                If this MIB implementation is platform-dependent,
+                the PRODUCT-RELEASE clause contains Ericsson SEOS version and
+                at least one of the following Ericsson product families:
+                    [SE]  SmartEdge Multi-service Edge Router (MSER) family
+                    [SM]  SM family of Metro Ethernet Service Transport platforms
+                    [SSR] Smart Service Router (SSR) family"
+
+        REVISION        "201501141800Z" -- Jan 14, 2015
+        DESCRIPTION
+                "Updated RBN/rbn/Rbn as ERICSSON-ROUTER/eriRouter/EriRouter
+                 to migrate RBN MIB to ERICSSON MIB."
+
+        REVISION        "201106150000Z" -- Jun 15, 2011
+        DESCRIPTION
+                "Update DESCRIPTION clause of MODULE-IDENTITY
+                 and PRODUCT-RELEASE clause of AGENT-CAPABILITIES."
+
+        REVISION        "201011010000Z" -- Nov 1, 2010
+        DESCRIPTION
+                "Modified PRODUCT-RELEASE clause for consistent naming.
+                Updated CONTACT-INFO."
+
+	REVISION	"200405280000Z" -- May 28, 2004
+	DESCRIPTION
+		"Added new AGENT-CAPABILITIES for the SE 2.6.5 release."
+
+	REVISION	"200110160000Z" -- Oct 16, 2001
+	DESCRIPTION
+		"Added SmartEdge capabilities.  Updated CONTACT-INFO."
+
+	REVISION	"199902251000Z" -- February 25, 1999
+	DESCRIPTION
+		"The original revision of this module."
+		
+	::= { eriRouterCapabilities 238 }
+
+eriRouterIetfDS1Cap1 AGENT-CAPABILITIES
+	PRODUCT-RELEASE	"AOS 3.0.X.X"
+	STATUS		current
+	DESCRIPTION	"DS1-MIB capabilities"
+	SUPPORTS	DS1-MIB
+	INCLUDES {
+		ds1NearEndConfigGroup,
+		ds1NearEndOptionalConfigGroup
+		}
+
+	VARIATION	dsx1LineIndex
+	ACCESS		not-implemented
+	DESCRIPTION
+		"Not Supported."
+
+
+	VARIATION	dsx1TimeElapsed
+	ACCESS		not-implemented
+	DESCRIPTION
+		"Not Supported."
+
+
+	VARIATION	dsx1ValidIntervals
+	ACCESS		not-implemented
+	DESCRIPTION
+		"Not Supported."
+
+
+	VARIATION	dsx1LineType
+	ACCESS		not-implemented
+	DESCRIPTION
+		"Not Supported."
+
+
+	VARIATION	dsx1LineCoding
+	ACCESS		not-implemented
+	DESCRIPTION
+		"Not Supported."
+
+
+	VARIATION	dsx1SendCode
+	ACCESS		not-implemented
+	DESCRIPTION
+		"Not Supported."
+
+
+	VARIATION	dsx1CircuitIdentifier
+	ACCESS		not-implemented
+	DESCRIPTION
+		"Not Supported."
+
+
+	VARIATION	dsx1LoopbackConfig
+	ACCESS		not-implemented
+	DESCRIPTION
+		"Not Supported."
+
+
+	VARIATION	dsx1LineStatus
+	ACCESS		not-implemented
+	DESCRIPTION
+		"Not Supported."
+
+
+	VARIATION	dsx1SignalMode
+	ACCESS		not-implemented
+	DESCRIPTION
+		"Not Supported."
+
+
+	VARIATION	dsx1TransmitClockSource
+	ACCESS		not-implemented
+	DESCRIPTION
+		"Not Supported."
+
+
+	VARIATION	dsx1Fdl
+	ACCESS		not-implemented
+	DESCRIPTION
+		"Not Supported."
+
+
+	VARIATION	dsx1InvalidIntervals
+	ACCESS		not-implemented
+	DESCRIPTION
+		"Not Supported."
+
+
+	VARIATION	dsx1LineLength
+	ACCESS		not-implemented
+	DESCRIPTION
+		"Not Supported."
+
+
+	VARIATION	dsx1LoopbackStatus
+	ACCESS		not-implemented
+	DESCRIPTION
+		"Not Supported."
+
+
+	VARIATION	dsx1Ds1ChannelNumber
+	ACCESS		not-implemented
+	DESCRIPTION
+		"Not Supported."
+
+
+	VARIATION	dsx1Channelization
+	ACCESS		not-implemented
+	DESCRIPTION
+		"Not Supported."
+
+       
+	VARIATION	dsx1LineStatusLastChange
+	ACCESS		not-implemented
+	DESCRIPTION
+		"Not Supported."
+
+
+	VARIATION	dsx1LineStatusChangeTrapEnable
+	ACCESS		not-implemented
+	DESCRIPTION
+		"Not Supported."
+	
+        ::= { eriRouterIetfDS1Cap 1  }	
+
+END

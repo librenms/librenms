@@ -1,0 +1,199 @@
+-- %DNP% $Id: ERICSSON-ROUTER-IP-BIND-MIB.my,v 1.1.2.2.444.2 2011/02/22 17:26:17 thatcher Exp $
+-- %DNP% $Source: /cvsroot/pkt/sw/se/xc/bsd/config/snmp/mibs/Attic/ERICSSON-ROUTER-IP-BIND-MIB.my,v $
+-- *****************************************************************
+-- ERICSSON-ROUTER-IP-BIND-MIB
+--
+-- Copyright (c) 2002, 2011, 2015 Ericsson AB.
+-- All rights reserved.
+--
+-- *****************************************************************
+
+ERICSSON-ROUTER-IP-BIND-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY, OBJECT-TYPE
+		FROM SNMPv2-SMI
+
+	MODULE-COMPLIANCE, OBJECT-GROUP
+		FROM SNMPv2-CONF
+
+	SnmpAdminString
+		FROM SNMP-FRAMEWORK-MIB
+
+	EriRouterCircuitHandle
+		FROM ERICSSON-ROUTER-TC
+
+        ifIndex, InterfaceIndexOrZero
+                FROM IF-MIB
+
+	eriRouterMgmt
+		FROM ERICSSON-ROUTER-SMI;
+
+eriRouterIpBindMib MODULE-IDENTITY
+        LAST-UPDATED    "201501141800Z" -- Jan 14, 2015
+        ORGANIZATION    "Ericsson AB."
+        CONTACT-INFO
+                "       Ericsson AB.
+
+                Postal: 100 Headquarters Dr
+                        San Jose, CA  95134
+                        USA
+
+                 Phone: +1 408 750 5000
+                   Fax: +1 408 750 5599
+                "
+	DESCRIPTION
+		"The MIB module for monitoring IP interface binding
+                 to physical ports and circuits as they are represented 
+                 in the IF-MIB."
+
+        REVISION        "201501141800Z" -- Jan 14, 2015
+        DESCRIPTION
+                "Updated RBN/rbn/Rbn as ERICSSON-ROUTER/eriRouter/EriRouter
+                 to migrate RBN MIB to ERICSSON MIB."
+
+        REVISION        "201101191800Z" -- Jan 19, 2011
+        DESCRIPTION
+                "Update CONTACT-INFO & ORGANIZATION."
+
+        REVISION        "200208201200Z" -- August 20, 2002
+        DESCRIPTION
+                "Initial version."
+
+         ::= { eriRouterMgmt 26 } 
+
+eriRouterIpBindMibNotifications OBJECT IDENTIFIER ::= { eriRouterIpBindMib 0 }
+
+eriRouterIpBindMibObjects       OBJECT IDENTIFIER ::= { eriRouterIpBindMib 1 }
+
+eriRouterIpBindMibConformance   OBJECT IDENTIFIER ::= { eriRouterIpBindMib 2 }
+
+eriRouterIpBindTable OBJECT-TYPE
+	SYNTAX       SEQUENCE OF EriRouterIpBindEntry
+	MAX-ACCESS   not-accessible
+	STATUS       current
+	DESCRIPTION
+      		"
+                A table that shows IP interface bindings to physical ports 
+                and circuit encapsulation layers as they are represented in 
+                the IF-MIB. This table displays all IP interface bindings 
+                in all contexts but is only visible from the local context.
+                "
+	::= { eriRouterIpBindMibObjects 1 }
+
+eriRouterIpBindEntry OBJECT-TYPE
+	SYNTAX       EriRouterIpBindEntry
+	MAX-ACCESS   not-accessible
+	STATUS       current
+	DESCRIPTION
+		"A conceptual row in the eriRouterIpBindTable.
+
+                 Each ifIndex instance that is included as an INDEX component 
+                 represents an IP interface and has an ifType value of 
+                 propVirtual.
+                 "
+	INDEX        { ifIndex, eriRouterIpBindCircuitHandle }
+	::= { eriRouterIpBindTable 1 }
+
+EriRouterIpBindEntry ::=
+	SEQUENCE {
+		eriRouterIpBindCircuitHandle	     EriRouterCircuitHandle,
+                eriRouterIpBindIfIndex             InterfaceIndexOrZero,
+                eriRouterIpBindHierarchicalIfIndex InterfaceIndexOrZero,
+		eriRouterIpBindCircuitDescr	     SnmpAdminString,
+                eriRouterIpBindContextName         SnmpAdminString
+	}
+
+eriRouterIpBindCircuitHandle OBJECT-TYPE
+	SYNTAX       EriRouterCircuitHandle
+	MAX-ACCESS   not-accessible
+	STATUS       current
+	DESCRIPTION
+        "A unique identifier for the circuit the IP interface is bound to.
+         Note that the term circuit as defined in this table can represent 
+         a port, channel, subchannel or a virtual circuit configured to run 
+         over a port, channel or subchannel.
+        "
+	::= { eriRouterIpBindEntry 1 }
+
+eriRouterIpBindIfIndex   OBJECT-TYPE
+     SYNTAX        InterfaceIndexOrZero
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION
+            "If the IP interface is bound to a port, channel, subchannel,
+             or virtual circuit that is included in the IF-MIB, this object 
+             contains the ifIndex of that layer, otherwise this object is 
+             set to zero.
+            "
+	::= { eriRouterIpBindEntry 2 }
+
+eriRouterIpBindHierarchicalIfIndex   OBJECT-TYPE
+     SYNTAX        InterfaceIndexOrZero
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION
+            "If the IP interface is bound to a port, channel, subchannel,
+             or virtual circuit that is not included in the IF-MIB, but 
+             that interface is part of a port stack that is included in the
+             IF-MIB, this object contains the ifIndex of the port encapsulation 
+             layer that sits on top of that port stack. If eriRouterIpBindIfIndex
+             is set to a non-zero value this object is set to zero. 
+            "
+	::= { eriRouterIpBindEntry 3 }
+
+eriRouterIpBindCircuitDescr OBJECT-TYPE
+	SYNTAX       SnmpAdminString (SIZE (0..192))
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"A descriptive version of eriRouterIpBindCircuitHandle that is 
+                 consistent with information displayed in the CLI.
+
+                 On the SE router this string is formatted as
+                 slot/port:channel:subchannel authority/level/index,
+                 with the exception that channel and subchannel are
+                 only included when appropriate. For example,
+                 4/1 1/2/7, 4/1:1 1/2/7 or 4/1:1:1 1/2/7.                  
+                 "
+	::= { eriRouterIpBindEntry 4 }
+
+eriRouterIpBindContextName OBJECT-TYPE
+	SYNTAX       SnmpAdminString (SIZE (0..63))
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"The name of the context in which this IP interface is defined."
+	::= { eriRouterIpBindEntry 5 }
+
+
+eriRouterIpBindCompliances OBJECT IDENTIFIER ::= { eriRouterIpBindMibConformance 1 }
+eriRouterIpBindGroups      OBJECT IDENTIFIER ::= { eriRouterIpBindMibConformance 2 }
+
+eriRouterIpBindCompliance MODULE-COMPLIANCE
+	STATUS       current
+	DESCRIPTION
+		"The compliance statement for SNMP entities which implement
+		 the ERICSSON-ROUTER-IP-BIND-MIB."
+	MODULE      -- this module
+	MANDATORY-GROUPS {
+		eriRouterIpBindDisplayGroup
+	}
+	::= { eriRouterIpBindCompliances 1}
+
+eriRouterIpBindDisplayGroup	OBJECT-GROUP
+	OBJECTS {
+                eriRouterIpBindIfIndex,
+                eriRouterIpBindHierarchicalIfIndex,
+		eriRouterIpBindCircuitDescr,
+                eriRouterIpBindContextName
+	}
+	STATUS       current
+	DESCRIPTION
+		"A collection of objects that shows IP interface bindings
+                 to physical ports and circuits as represented in the 
+                 IF-MIB."
+	::= { eriRouterIpBindGroups 1}
+
+END
+ 

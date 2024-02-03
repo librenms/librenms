@@ -1,0 +1,239 @@
+-- %DNP% $Id: ERICSSON-ROUTER-IETF-PING-CAP.my,v 1.1.6.1.2.8 2011/06/15 18:19:45 danielhe Exp $
+-- %DNP% $Source: /cvsroot/pkt/sw/se/xc/bsd/config/snmp/mibs/Attic/ERICSSON-ROUTER-IETF-PING-CAP.my,v $
+-- *****************************************************************
+-- ERICSSON-ROUTER-IETF-PING-CAP.my:        IETF DISMAN-PING-MIB Agent Capabilities
+--
+-- Copyright (c) 2008-2011, 2015 Ericsson AB.
+-- All rights reserved.
+-- ***************************************************************** 
+ERICSSON-ROUTER-IETF-PING-CAP DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,Unsigned32
+                                   FROM SNMPv2-SMI
+    AGENT-CAPABILITIES             FROM SNMPv2-CONF
+    eriRouterCapabilities                FROM ERICSSON-ROUTER-SMI;
+
+eriRouterIetfPingCap MODULE-IDENTITY
+    LAST-UPDATED        "201501141800Z" -- Jan 14, 2015
+    ORGANIZATION        "Ericsson Inc."
+    CONTACT-INFO
+        "               Ericsson, Inc. 
+
+                        100 Headquarters Drive
+                        San Jose, CA  95134
+                        USA
+
+                 Phone: +1 408 750 5000
+                   Fax: +1 408 750 5599"
+    DESCRIPTION
+            "The Agent Capabilities of the 
+            implementation of the IETF DISMAN-PING-MIB (RFC 4560)
+
+            If this MIB implementation is platform-dependent,
+            the PRODUCT-RELEASE clause contains Ericsson SEOS version and
+            at least one of the following Ericsson product families:
+                [SE]  SmartEdge Multi-service Edge Router (MSER) family
+                [SM]  SM family of Metro Ethernet Service Transport platforms
+                [SSR] Smart Service Router (SSR) family"
+
+    REVISION      "201501141800Z" -- Jan 14, 2015
+    DESCRIPTION
+            "Updated RBN/rbn/Rbn as ERICSSON-ROUTER/eriRouter/EriRouter
+             to migrate RBN MIB to ERICSSON MIB."
+
+    REVISION      "201106150000Z" -- Jun 15, 2011
+    DESCRIPTION
+            "Update DESCRIPTION clause of MODULE-IDENTITY
+            and PRODUCT-RELEASE clause of AGENT-CAPABILITIES."
+    REVISION      "201010140000Z" -- Oct 14, 2010
+    DESCRIPTION
+            "Updated range for pingCtlDataSize." 
+
+    REVISION      "201005030000Z" -- May 3, 2010
+    DESCRIPTION
+            "Add eriRouterIetfPingCap2 and update ORGANIZATION/CONTACT-INFO"
+
+    REVISION      "200909090000Z" -- Sept 9, 2008
+    DESCRIPTION
+            "Updated CAP with objects not supported."
+
+    REVISION      "200807300000Z" -- Jul 30, 2008
+    DESCRIPTION
+            "Initial version."
+
+    ::= { eriRouterCapabilities 83 }
+
+eriRouterIetfPingCap1 AGENT-CAPABILITIES
+    PRODUCT-RELEASE "SEOS 6.1.4.2"
+    STATUS          current
+    DESCRIPTION     "DISMAN-PING-MIB capabilities"
+    SUPPORTS        DISMAN-PING-MIB
+    INCLUDES {
+            pingMinimumGroup,
+            pingCtlRowStatusGroup,
+            pingNotificationsGroup
+            }
+
+    VARIATION    pingMaxConcurrentRequests
+    ACCESS       read-only
+    DESCRIPTION
+        "Write access not supported."
+
+    VARIATION    pingCtlOwnerIndex
+    DESCRIPTION
+        "Each character must be printable (the posix function isprint()
+        returns true for each character)."
+
+    VARIATION    pingCtlTestName
+    DESCRIPTION
+        "Each character must be printable (the posix function isprint()
+        returns true for each character)."
+
+    VARIATION    pingCtlTargetAddressType
+    WRITE-SYNTAX INTEGER {
+                   unknown(0),
+                   ipv4(1),
+                   dns(16)
+                 }
+    DESCRIPTION
+        "IPv6 address types are not supported."
+
+    VARIATION    pingCtlDataSize
+    WRITE-SYNTAX Unsigned32 (0..18024)
+    DESCRIPTION
+        "Maximum size for the data portion of a ping packet is 18024 octets."
+
+    VARIATION    pingCtlDataFill
+    WRITE-SYNTAX OCTET STRING (SIZE(0..2))
+    DESCRIPTION
+        "Maximum size for a data pattern is 2 octets."
+
+    VARIATION    pingCtlFrequency
+    WRITE-SYNTAX Unsigned32 (0..86400) 
+    DESCRIPTION
+        "Maximum frequency is 86400 seconds."
+
+    VARIATION    pingCtlMaxRows
+    ACCESS       read-only
+    DEFVAL { 0 }
+    DESCRIPTION
+        "pingProbeHistoryTable is not supported."
+
+    VARIATION    pingCtlStorageType
+    ACCESS       read-only
+    DESCRIPTION
+        "Write access not supported."
+
+    VARIATION    pingCtlTrapProbeFailureFilter
+    ACCESS       read-only
+    DESCRIPTION
+        "Write access not supported."
+
+    VARIATION    pingCtlType
+    ACCESS       read-only
+    DESCRIPTION
+        "Only pingIcmpEcho is supported."
+
+    VARIATION    pingCtlDescr
+    WRITE-SYNTAX OCTET STRING (SIZE(0..32))
+    DESCRIPTION
+        "Each character must be printable (the posix function isprint()
+        returns true for each character) and the maximum length is 32
+        characters."
+  
+    VARIATION    pingCtlSourceAddressType
+    WRITE-SYNTAX INTEGER {
+                   unknown(0),
+                   ipv4(1)
+                 }
+    DESCRIPTION
+        "IPv4 address types are supported. unknown indicates no
+         source address has been specified."
+
+    VARIATION    pingCtlIfIndex
+    ACCESS       read-only
+    DESCRIPTION
+        "Write access not supported."
+
+    VARIATION    pingCtlByPassRouteTable
+    ACCESS       read-only
+    DESCRIPTION
+        "Write access not supported."
+
+    VARIATION    pingProbeFailed
+    ACCESS       not-implemented
+    DESCRIPTION
+        "This information is not supported."
+
+    ::= { eriRouterIetfPingCap 1 }
+
+eriRouterIetfPingCap2 AGENT-CAPABILITIES
+    PRODUCT-RELEASE "SEOS 6.3.x [SE, SM]; SEOS 11.1.x [SSR]"
+    STATUS          current
+    DESCRIPTION     "DISMAN-PING-MIB capabilities"
+    SUPPORTS        DISMAN-PING-MIB
+    INCLUDES {
+            pingMinimumGroup,
+            pingCtlRowStatusGroup,
+            pingHistoryGroup,
+            pingNotificationsGroup
+            }
+
+    VARIATION    pingCtlOwnerIndex
+    DESCRIPTION
+        "Each character must be printable (the posix function isprint()
+        returns true for each character)."
+
+    VARIATION    pingCtlTestName
+    DESCRIPTION
+        "Each character must be printable (the posix function isprint()
+        returns true for each character)."
+
+    VARIATION    pingCtlTargetAddressType
+    WRITE-SYNTAX INTEGER {
+                   unknown(0),
+                   ipv4(1),
+                   dns(16)
+                 }
+    DESCRIPTION
+        "IPv6 address types are not supported."
+
+    VARIATION    pingCtlDataSize
+    WRITE-SYNTAX Unsigned32 (36..18024)
+    DESCRIPTION
+        "Range for the data portion of a ping packet."
+
+    VARIATION    pingCtlDataFill
+    WRITE-SYNTAX OCTET STRING (SIZE(0..2))
+    DESCRIPTION
+        "Maximum size for a data pattern is 2 octets."
+
+    VARIATION    pingCtlFrequency
+    WRITE-SYNTAX Unsigned32 (0..86400) 
+    DESCRIPTION
+        "Maximum frequency is 86400 seconds."
+
+    VARIATION    pingCtlType
+    DESCRIPTION
+        "Only pingIcmpEcho is supported."
+
+    VARIATION    pingCtlDescr
+    WRITE-SYNTAX OCTET STRING (SIZE(0..32))
+    DESCRIPTION
+        "Each character must be printable (the posix function isprint()
+        returns true for each character) and the maximum length is 32
+        characters."
+  
+    VARIATION    pingCtlSourceAddressType
+    WRITE-SYNTAX INTEGER {
+                   unknown(0),
+                   ipv4(1)
+                 }
+    DESCRIPTION
+        "IPv4 address types are supported. unknown indicates no
+         source address has been specified."
+
+    ::= { eriRouterIetfPingCap 2 }
+
+END

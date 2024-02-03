@@ -1,0 +1,304 @@
+-- %DNP% $Id: ERICSSON-ROUTER-NOTIFY-ENHANCE-MIB.my,v 1.1.2.5.180.4 2011/02/22 17:26:17 thatcher Exp $
+-- %DNP% $Source: /cvsroot/pkt/sw/se/xc/bsd/config/snmp/mibs/Attic/ERICSSON-ROUTER-NOTIFY-ENHANCE-MIB.my,v $
+-- *****************************************************************
+-- ERICSSON-ROUTER-NOTIFY-ENHANCE-MIB       Notify Enhance MIB
+--
+-- Copyright (c) 2005-2009, 2011, 2015-2016 Ericsson AB.
+-- All rights reserved.
+--
+-- *****************************************************************
+
+ERICSSON-ROUTER-NOTIFY-ENHANCE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        NOTIFICATION-TYPE
+                FROM SNMPv2-SMI
+        DisplayString
+                FROM SNMPv2-TC
+        MODULE-COMPLIANCE,
+        OBJECT-GROUP,
+        NOTIFICATION-GROUP
+                FROM SNMPv2-CONF
+        sysName
+                FROM SNMPv2-MIB
+        SnmpAdminString
+                FROM SNMP-FRAMEWORK-MIB
+        EriRouterSlot
+                FROM ERICSSON-ROUTER-TC
+        eriRouterCardAlarmId,
+        eriRouterCardAlarmType,
+        eriRouterCardAlarmDateAndTime,
+        eriRouterCardAlarmDescription,
+        eriRouterCardAlarmProbableCause,
+        eriRouterCardAlarmSeverity,
+        eriRouterCardAlarmServiceAffecting
+                FROM ERICSSON-ROUTER-CARDMON-MIB
+        ifIndex,
+        ifAdminStatus,
+        ifOperStatus,
+        ifSpeed,
+        ifHighSpeed
+                FROM IF-MIB
+        eriRouterMgmt
+                FROM ERICSSON-ROUTER-SMI;
+
+eriRouterNotifyEnhanceMIB MODULE-IDENTITY
+        LAST-UPDATED    "201501141800Z" -- Jan 14, 2015
+        ORGANIZATION    "Ericsson AB."
+        CONTACT-INFO
+                "       Ericsson AB.
+
+                Postal: 100 Headquarters Dr
+                        San Jose, CA  95134
+                        USA
+
+                 Phone: +1 408 750 5000
+                   Fax: +1 408 750 5599
+                "
+        DESCRIPTION
+                "The MIB used to enhance the notification objects on
+                network devices."
+
+        REVISION        "201501141800Z" -- Jan 14, 2015
+        DESCRIPTION
+            "Updated RBN/rbn/Rbn as ERICSSON-ROUTER/eriRouter/EriRouter
+             to migrate RBN MIB to ERICSSON MIB."
+
+        REVISION        "201101191800Z" -- Jan 19, 2011
+        DESCRIPTION
+            "Update CONTACT-INFO & ORGANIZATION. "
+
+        REVISION        "200903231700Z" -- March 23, 2009
+        DESCRIPTION
+            "Added eriRouterNEGroupName.
+             Modified description of eriRouterNECircuitId to contain the
+             link group name for circuits which are type link group. "
+
+        REVISION        "200505090000Z" -- May 9, 2005
+        DESCRIPTION
+            "Initial version."
+        ::= { eriRouterMgmt 36 }
+
+eriRouterNotifyEnhanceMIBNotifications OBJECT IDENTIFIER
+        ::= { eriRouterNotifyEnhanceMIB 0 }
+
+eriRouterNotifyEnhanceMIBObjects OBJECT IDENTIFIER
+        ::= { eriRouterNotifyEnhanceMIB 1 }
+
+eriRouterNotifyEnhanceMIBConformance OBJECT IDENTIFIER
+        ::= { eriRouterNotifyEnhanceMIB 2 }
+
+
+-- MIB Object groups
+
+eriRouterNEGeneral OBJECT IDENTIFIER ::= { eriRouterNotifyEnhanceMIBObjects 1 }
+
+
+eriRouterNESlot OBJECT-TYPE
+        SYNTAX      EriRouterSlot
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+                "Represents the chassis slot number in which the entity
+                associated with the notification is contained in.
+
+                A value of '0' indicates that the entity is not contained
+                within a chassis slot."
+        ::= { eriRouterNEGeneral 1 }
+
+eriRouterNECardName OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE (0..255))
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+                "A textual description of the linecard associated with
+                the notification."
+        ::= { eriRouterNEGeneral 2 }
+
+eriRouterNECardOp OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        insert(1),
+                        remove(2),
+                        other(3)
+                    }
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+                "Represents the operation performed on the linecard
+                associated with the notification."
+        ::= { eriRouterNEGeneral 3 }
+
+eriRouterNECircuitId OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE (0..255))
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+                "Represents a string that identifies the circuit
+                associated with the notification.
+
+                On the SE router this string is formatted as
+                slot-port-channel-subchannel, with the exception that
+                channel and subchannel are only included when appropriate.
+
+                If the circuit is a link-group circuit, then the value
+                contains the link group name rather than the formatted
+                slot-port-channel-subchannel."
+        ::= { eriRouterNEGeneral 4 }
+
+eriRouterNEGroupName OBJECT-TYPE
+        SYNTAX      SnmpAdminString
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+                "The link group name associated with the resource
+                 identified in a notification. "
+
+        ::= { eriRouterNEGeneral 5 }
+
+-- Notifications
+
+eriRouterNEentConfigChange NOTIFICATION-TYPE
+        OBJECTS     {
+                        eriRouterNESlot,
+                        eriRouterNECardName,
+                        eriRouterNECardOp,
+                        sysName
+                    }
+        STATUS      current
+        DESCRIPTION
+                "This is an enhanced version of entConfigChange trap
+                defined in ENTITY-MIB.
+
+                The eriRouterNEentConfigChange trap generation is enabled only
+                when 'traps nemib {exclusive | non-exclusive}' CLI command
+                is configured."
+        ::= { eriRouterNotifyEnhanceMIBNotifications 1 }
+
+eriRouterNECardAlarm NOTIFICATION-TYPE
+        OBJECTS     {
+                        eriRouterCardAlarmId,
+                        eriRouterCardAlarmType,
+                        eriRouterCardAlarmDateAndTime,
+                        eriRouterCardAlarmDescription,
+                        eriRouterCardAlarmProbableCause,
+                        eriRouterCardAlarmSeverity,
+                        eriRouterCardAlarmServiceAffecting,
+                        eriRouterNECardName,
+                        sysName
+                    }
+        STATUS      current
+        DESCRIPTION
+                "This is an enhanced version of eriRouterCardAlarm trap defined
+                in ERICSSON-ROUTER-CARDMON-MIB.
+
+                The eriRouterNECardAlarm trap generation is enabled only when
+                'traps nemib {exclusive | non-exclusive}' CLI command
+                is configured."
+        ::= { eriRouterNotifyEnhanceMIBNotifications 2 }
+
+eriRouterNElinkDown NOTIFICATION-TYPE
+        OBJECTS     {
+                        ifIndex,
+                        ifAdminStatus,
+                        ifOperStatus,
+                        ifSpeed,
+                        ifHighSpeed,
+                        eriRouterNECircuitId,
+                        sysName,
+                        eriRouterNEGroupName
+                    }
+        STATUS      current
+        DESCRIPTION
+                "This is an enhanced version of linkDown trap defined in
+                IF-MIB.
+
+                The eriRouterNElinkDown trap generation is enabled only when
+                'traps nemib {exclusive | non-exclusive}' CLI command
+                is configured."
+        ::= { eriRouterNotifyEnhanceMIBNotifications 3 }
+
+eriRouterNElinkUp NOTIFICATION-TYPE
+        OBJECTS     {
+                        ifIndex,
+                        ifAdminStatus,
+                        ifOperStatus,
+                        ifSpeed,
+                        ifHighSpeed,
+                        eriRouterNECircuitId,
+                        sysName,
+                        eriRouterNEGroupName
+                    }
+        STATUS      current
+        DESCRIPTION
+                "This is an enhanced version of linkUp trap defined in
+                IF-MIB.
+
+                The eriRouterNElinkUp trap generation is enabled only when
+                'traps nemib {exclusive | non-exclusive}' CLI command
+                is configured."
+        ::= { eriRouterNotifyEnhanceMIBNotifications 4 }
+
+-- Conformance Statements
+
+eriRouterNotifyEnhanceMIBGroups OBJECT IDENTIFIER
+        ::= { eriRouterNotifyEnhanceMIBConformance 1 }
+
+eriRouterNotifyEnhanceMIBCompliances OBJECT IDENTIFIER
+        ::= { eriRouterNotifyEnhanceMIBConformance 2 }
+
+eriRouterNotifyEnhanceMIBObjectGroup OBJECT-GROUP
+        OBJECTS {
+                  eriRouterNESlot,
+                  eriRouterNECardName,
+                  eriRouterNECardOp,
+                  eriRouterNECircuitId,
+                  eriRouterNEGroupName
+                }
+        STATUS      current
+        DESCRIPTION
+                "A collection of objects providing enhanced
+                notification information."
+        ::= { eriRouterNotifyEnhanceMIBGroups 1 }
+
+eriRouterNotifyEnhanceMIBNotificationGroup NOTIFICATION-GROUP
+        NOTIFICATIONS {
+                        eriRouterNEentConfigChange,
+                        eriRouterNECardAlarm,
+                        eriRouterNElinkDown,
+                        eriRouterNElinkUp
+                    }
+        STATUS      current
+        DESCRIPTION
+                "A collection of notifications providing enhanced
+                notification information."
+        ::= { eriRouterNotifyEnhanceMIBGroups 2 }
+
+eriRouterNotifyEnhanceMIBCompliance MODULE-COMPLIANCE
+        STATUS      deprecated
+        DESCRIPTION
+                "The compliance statement for the NotifyEnhance MIB"
+        MODULE      -- this module
+        GROUP eriRouterNotifyEnhanceMIBNotificationGroup
+        DESCRIPTION
+                "This group is mandatory for devices which support
+                notification enhancement capabilities"
+        ::= { eriRouterNotifyEnhanceMIBCompliances 1 }
+
+eriRouterNotifyEnhanceMIBCompliance2 MODULE-COMPLIANCE
+        STATUS      current
+        DESCRIPTION
+                "The compliance statement for the NotifyEnhance MIB"
+        MODULE      -- this module
+        MANDATORY-GROUPS {
+            eriRouterNotifyEnhanceMIBObjectGroup,
+            eriRouterNotifyEnhanceMIBNotificationGroup
+        }
+        GROUP eriRouterNotifyEnhanceMIBNotificationGroup
+        DESCRIPTION
+                "This group is mandatory for devices which support
+                notification enhancement capabilities"
+        ::= { eriRouterNotifyEnhanceMIBCompliances 2 }
+
+END

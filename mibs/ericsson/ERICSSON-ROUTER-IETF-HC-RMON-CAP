@@ -1,0 +1,42 @@
+-- *****************************************************************
+-- ERICSSON-ROUTER-IETF-HC-RMON-CAP.my:        IETF HC-RMON-MIB Agent Capabilities
+--
+-- Copyright (c) 2016 Ericsson AB
+-- All rights reserved.
+--
+-- *****************************************************************
+
+ERICSSON-ROUTER-IETF-HC-RMON-CAP DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY
+                FROM SNMPv2-SMI
+        AGENT-CAPABILITIES
+                FROM SNMPv2-CONF
+        eriRouterCapabilities
+                FROM ERICSSON-ROUTER-SMI;
+
+eriRouterIetfHcRmonCap MODULE-IDENTITY
+    LAST-UPDATED "201612060000Z"    -- Dec 06, 2016
+    ORGANIZATION "Ericsson, Inc."
+    CONTACT-INFO
+        "Ericsson, Inc."
+    DESCRIPTION
+        "Support two groups in RFC3273 Remote Network
+         Monitoring Management Information Base for High Capacity Networks"
+    ::= { eriRouterCapabilities 118 }
+
+ eriRouterIetfHcRmonCap1 AGENT-CAPABILITIES
+     PRODUCT-RELEASE "Spitfire 1.1.x [SP]"
+     STATUS          current
+     DESCRIPTION     "ERICSSON-ROUTER-HC-RMON-MIB capabilities"
+     SUPPORTS        HC-RMON-MIB
+     INCLUDES {
+        etherStatsHighCapacityGroup,
+        etherHistoryHighCapacityGroup
+     }
+
+     ::= { eriRouterIetfHcRmonCap 1 }
+
+
+END

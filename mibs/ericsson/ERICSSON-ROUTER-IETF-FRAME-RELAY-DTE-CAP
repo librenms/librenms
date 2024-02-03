@@ -1,0 +1,360 @@
+-- %DNP% $Id: ERICSSON-ROUTER-IETF-FRAME-RELAY-DTE-CAP.my,v 1.1.4.6.122.5 2011/06/15 18:19:45 danielhe Exp $
+-- %DNP% $Source: /cvsroot/pkt/sw/se/xc/bsd/config/snmp/mibs/ERICSSON-ROUTER-IETF-FRAME-RELAY-DTE-CAP.my,v $
+-- *****************************************************************
+-- ERICSSON-ROUTER-IETF-FRAME-RELAY-DTE-CAP.my:  FRAME-RELAY-DTE-MIB Agent Capabilities
+--
+-- Copyright (c) 1998-2007, 2010-2011, 2015 Ericsson AB
+-- All rights reserved.
+-- 
+-- *****************************************************************
+
+ERICSSON-ROUTER-IETF-FRAME-RELAY-DTE-CAP DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY, Integer32
+		FROM SNMPv2-SMI
+	AGENT-CAPABILITIES
+		FROM SNMPv2-CONF
+	eriRouterCapabilities
+		FROM ERICSSON-ROUTER-SMI;
+
+eriRouterIetfFrameRelayDteCap MODULE-IDENTITY
+	LAST-UPDATED    "201501141800Z" -- Jan 14, 2015
+	ORGANIZATION	"Ericsson AB"
+	CONTACT-INFO
+		"	Ericsson AB.
+
+		Postal:	100 Headquarters Dr
+			San Jose, CA  95134
+			USA
+
+		 Phone:	+1 408 570-5000
+		   Fax: +1 408 570-5599
+		"
+	DESCRIPTION
+		"The Agent Capabilities of the 
+		implementation of the IETF FRAME-RELAY-DTE-MIB
+		(RFC 2115).
+
+                If this MIB implementation is platform-dependent,
+                the PRODUCT-RELEASE clause contains Ericsson SEOS version and
+                at least one of the following Ericsson product families:
+                    [SE]  SmartEdge Multi-service Edge Router (MSER) family
+                    [SM]  SM family of Metro Ethernet Service Transport platforms
+                    [SSR] Smart Service Router (SSR) family"
+
+        REVISION        "201501141800Z" -- Jan 14, 2015
+        DESCRIPTION
+                "Updated RBN/rbn/Rbn as ERICSSON-ROUTER/eriRouter/EriRouter
+                 to migrate RBN MIB to ERICSSON MIB."
+
+        REVISION        "201106150000Z" -- Jun 15, 2011
+        DESCRIPTION
+                "Update DESCRIPTION clause of MODULE-IDENTITY
+                and PRODUCT-RELEASE clause of AGENT-CAPABILITIES."
+
+	REVISION	"201011010000Z" -- Nov 1, 2010
+	DESCRIPTION
+		"Modified PRODUCT-RELEASE clause for consistent naming.
+                "
+                
+	REVISION	"201003041600Z" -- Mar 4, 2010
+	DESCRIPTION
+		"Update CONTACT-INFO, add Integer32 to IMPORTS"
+
+	REVISION	"200708220000Z"	-- Aug 22, 2007
+	DESCRIPTION
+		"updated range limits of frDlcmiTable to reflect 
+                  SE implementation limits"
+
+	REVISION	"200206060000Z"	-- June 6, 2002
+	DESCRIPTION
+		"Correct syntax error, REVISIONs not ordered 
+                newest first. Update CONTACT-INFO"
+
+	REVISION	"200201172300Z"	-- Jan 17, 2002
+	DESCRIPTION
+		"Obsolete eriRouterIetfFrameRelayDteCap2
+		Add eriRouterIetfFrameRelayDteCap3"
+
+	REVISION	"200108150000Z"	-- August 15, 2001
+	DESCRIPTION
+		"Add eriRouterIetfFrameRelayDteCap2"
+
+        REVISION        "9808052300Z"
+        DESCRIPTION
+                "Initial version."
+	::= { eriRouterCapabilities 15 }
+
+eriRouterIetfFrameRelayDteCap1 AGENT-CAPABILITIES
+	PRODUCT-RELEASE	"AOS 2.1.X.X"
+	STATUS		current
+	DESCRIPTION	"FRAME-RELAY-DTE-MIB capabilities"
+	SUPPORTS	FRAME-RELAY-DTE-MIB
+	INCLUDES {
+		frPortGroup,
+		frCircuitGroup
+		}
+
+	VARIATION	frDlcmiState
+	ACCESS		read-only
+	DESCRIPTION
+		"frDlcmiTable is read-only"
+
+	VARIATION	frDlcmiAddress
+	ACCESS		read-only
+	DESCRIPTION
+		"frDlcmiTable is read-only"
+
+	VARIATION	frDlcmiAddressLen
+	ACCESS		read-only
+	DESCRIPTION
+		"frDlcmiTable is read-only"
+
+	VARIATION	frDlcmiPollingInterval
+	ACCESS		read-only
+	DESCRIPTION
+		"frDlcmiTable is read-only"
+
+	VARIATION	frDlcmiFullEnquiryInterval
+	ACCESS		read-only
+	DESCRIPTION
+		"frDlcmiTable is read-only"
+
+	VARIATION	frDlcmiErrorThreshold
+	ACCESS		read-only
+	DESCRIPTION
+		"frDlcmiTable is read-only"
+
+	VARIATION	frDlcmiMonitoredEvents
+	ACCESS		read-only
+	DESCRIPTION
+		"frDlcmiTable is read-only"
+
+	VARIATION	frDlcmiMaxSupportedVCs
+	ACCESS		read-only
+	DESCRIPTION
+		"frDlcmiTable is read-only"
+
+	VARIATION	frDlcmiMulticast
+	ACCESS		read-only
+	DESCRIPTION
+		"frDlcmiTable is read-only"
+
+	VARIATION	frDlcmiRowStatus
+	ACCESS		read-only
+	DESCRIPTION
+		"frDlcmiTable is read-only"
+
+	VARIATION	frCircuitState
+	ACCESS		read-only
+	DESCRIPTION
+		"frCircuitTable is read-only"
+
+	VARIATION	frCircuitCommittedBurst
+	ACCESS		read-only
+	DESCRIPTION
+		"frCircuitTable is read-only"
+
+	VARIATION	frCircuitExcessBurst
+	ACCESS		read-only
+	DESCRIPTION
+		"frCircuitTable is read-only"
+
+	VARIATION	frCircuitThroughput
+	ACCESS		read-only
+	DESCRIPTION
+		"frCircuitTable is read-only"
+
+	VARIATION	frCircuitMulticast
+	ACCESS		read-only
+	DESCRIPTION
+		"frCircuitTable is read-only"
+
+	VARIATION	frCircuitLogicalIfIndex
+	ACCESS		read-only
+	DESCRIPTION
+		"frCircuitTable is read-only"
+
+	VARIATION	frCircuitRowStatus
+	ACCESS		read-only
+	DESCRIPTION
+		"frCircuitTable is read-only"
+
+	::= { eriRouterIetfFrameRelayDteCap 1 }
+
+
+eriRouterIetfFrameRelayDteCap2 AGENT-CAPABILITIES
+	PRODUCT-RELEASE	"SEOS 2.0.4.0"
+	STATUS		obsolete
+	DESCRIPTION	"SmartEdge FRAME-RELAY-DTE-MIB capabilities
+			obsoleted by eriRouterIetfFrameRelayDteCap3"
+	SUPPORTS	FRAME-RELAY-DTE-MIB
+	INCLUDES {
+		frPortGroup
+		}
+
+	VARIATION	frDlcmiState
+	ACCESS		read-only
+	DESCRIPTION
+		"frDlcmiTable is read-only"
+
+	VARIATION	frDlcmiAddress
+	ACCESS		read-only
+	DESCRIPTION
+		"frDlcmiTable is read-only"
+
+	VARIATION	frDlcmiAddressLen
+	ACCESS		read-only
+	DESCRIPTION
+		"frDlcmiTable is read-only"
+
+	VARIATION	frDlcmiPollingInterval
+	ACCESS		read-only
+	DESCRIPTION
+		"frDlcmiTable is read-only"
+
+	VARIATION	frDlcmiFullEnquiryInterval
+	ACCESS		read-only
+	DESCRIPTION
+		"frDlcmiTable is read-only"
+
+	VARIATION	frDlcmiErrorThreshold
+	ACCESS		read-only
+	DESCRIPTION
+		"frDlcmiTable is read-only"
+
+	VARIATION	frDlcmiMonitoredEvents
+	ACCESS		read-only
+	DESCRIPTION
+		"frDlcmiTable is read-only"
+
+	VARIATION	frDlcmiMaxSupportedVCs
+	ACCESS		read-only
+	DESCRIPTION
+		"frDlcmiTable is read-only"
+
+	VARIATION	frDlcmiMulticast
+	ACCESS		read-only
+	DESCRIPTION
+		"frDlcmiTable is read-only"
+
+	VARIATION	frDlcmiRowStatus
+	ACCESS		read-only
+	DESCRIPTION
+		"frDlcmiTable is read-only"
+
+	::= { eriRouterIetfFrameRelayDteCap 2 }
+
+
+eriRouterIetfFrameRelayDteCap3 AGENT-CAPABILITIES
+	PRODUCT-RELEASE	"SEOS 2.1.X.X [SE]"
+	STATUS		current
+	DESCRIPTION	"FRAME-RELAY-DTE-MIB capabilities"
+	SUPPORTS	FRAME-RELAY-DTE-MIB
+	INCLUDES {
+		frPortGroup,
+		frCircuitGroup
+		}
+
+	VARIATION	frDlcmiState
+	ACCESS		read-only
+	DESCRIPTION
+		"frDlcmiTable is read-only"
+
+	VARIATION	frDlcmiAddress
+	ACCESS		read-only
+	DESCRIPTION
+		"frDlcmiTable is read-only"
+
+	VARIATION	frDlcmiAddressLen
+	ACCESS		read-only
+	DESCRIPTION
+		"frDlcmiTable is read-only"
+
+	VARIATION	frDlcmiPollingInterval
+        SYNTAX          Integer32 (0..60)
+	ACCESS		read-only
+	DESCRIPTION
+		"frDlcmiTable is read-only.
+                 rfc2115 limits the range of frDlcmiPollingInterval to 5..30, 
+                 ERICSSON-ROUTER SE allows 0..60"
+
+	VARIATION	frDlcmiFullEnquiryInterval
+        SYNTAX          Integer32 (0..255)
+	ACCESS		read-only
+	DESCRIPTION
+		"frDlcmiTable is read-only.
+                 rfc2115 limits the range of frDlcmiFullEnquiryInterval to 1..255, 
+                 ERICSSON-ROUTER SE allows 0..255"
+
+	VARIATION	frDlcmiErrorThreshold
+        SYNTAX          Integer32 (0..10)
+	ACCESS		read-only
+	DESCRIPTION
+		"frDlcmiTable is read-only.
+                 rfc2115 limits the range of frDlcmiErrorThreshold to 1..10, 
+                 ERICSSON-ROUTER SE allows 0..10"
+
+	VARIATION	frDlcmiMonitoredEvents
+        SYNTAX          Integer32 (0..10)
+	ACCESS		read-only
+	DESCRIPTION
+		"frDlcmiTable is read-only.
+                 rfc2115 limits the range of frDlcmiMonitoredEvents to 1..10, 
+                 ERICSSON-ROUTER SE allows 0..10"
+
+	VARIATION	frDlcmiMaxSupportedVCs
+	ACCESS		read-only
+	DESCRIPTION
+		"frDlcmiTable is read-only"
+
+	VARIATION	frDlcmiMulticast
+	ACCESS		read-only
+	DESCRIPTION
+		"frDlcmiTable is read-only"
+
+	VARIATION	frDlcmiRowStatus
+	ACCESS		read-only
+	DESCRIPTION
+		"frDlcmiTable is read-only"
+
+	VARIATION	frCircuitState
+	ACCESS		read-only
+	DESCRIPTION
+		"frCircuitTable is read-only"
+
+	VARIATION	frCircuitCommittedBurst
+	ACCESS		read-only
+	DESCRIPTION
+		"frCircuitTable is read-only"
+
+	VARIATION	frCircuitExcessBurst
+	ACCESS		read-only
+	DESCRIPTION
+		"frCircuitTable is read-only"
+
+	VARIATION	frCircuitThroughput
+	ACCESS		read-only
+	DESCRIPTION
+		"frCircuitTable is read-only"
+
+	VARIATION	frCircuitMulticast
+	ACCESS		read-only
+	DESCRIPTION
+		"frCircuitTable is read-only"
+
+	VARIATION	frCircuitLogicalIfIndex
+	ACCESS		read-only
+	DESCRIPTION
+		"frCircuitTable is read-only"
+
+	VARIATION	frCircuitRowStatus
+	ACCESS		read-only
+	DESCRIPTION
+		"frCircuitTable is read-only"
+
+	::= { eriRouterIetfFrameRelayDteCap 3 }
+
+
+END

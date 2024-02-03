@@ -1,0 +1,705 @@
+-- %DNP% $Id: ERICSSON-ROUTER-RADIUS-MIB.my,v 1.1.2.4.274.2 2011/02/22 17:26:17 thatcher Exp $
+-- %DNP% $Source: /cvsroot/pkt/sw/se/xc/bsd/config/snmp/mibs/Attic/ERICSSON-ROUTER-RADIUS-MIB.my,v $
+-- *****************************************************************
+-- ERICSSON-ROUTER-RADIUS-MIB               RADIUS MIB
+--
+-- Copyright (c) 2003-2005, 2011, 2015 Ericsson AB.
+-- All rights reserved.
+--
+-- *****************************************************************
+
+ERICSSON-ROUTER-RADIUS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32, Counter32,
+    NOTIFICATION-TYPE                      FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, TimeStamp,
+    TruthValue                             FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP,
+    NOTIFICATION-GROUP                     FROM SNMPv2-CONF
+    SnmpAdminString                        FROM SNMP-FRAMEWORK-MIB
+    radiusAuthServerEntry, radiusAuthServerAddress,
+    radiusAuthClientServerPortNumber       FROM RADIUS-AUTH-CLIENT-MIB
+    radiusAccServerEntry, radiusAccServerAddress,
+    radiusAccClientServerPortNumber        FROM RADIUS-ACC-CLIENT-MIB
+    eriRouterMgmt                                FROM ERICSSON-ROUTER-SMI;
+
+eriRouterRadiusMib MODULE-IDENTITY
+    LAST-UPDATED    "201501141800Z" -- Jan 14, 2015
+    ORGANIZATION "Ericsson AB."
+    CONTACT-INFO
+        "       Ericsson AB.
+
+        Postal: 100 Headquarters Dr.
+                San Jose, CA  95134
+                USA
+
+         Phone: +1 408 750-5000
+           Fax: +1 408 750-5599
+        "
+    DESCRIPTION
+        "This enterprise MIB supplements the standard Remote Access
+         Dialin User Service (RADIUS) MIBs, namely:
+             RADIUS-AUTH-CLIENT-MIB (RFC 2618)
+             RADIUS-ACC-CLIENT-MIB  (RFC 2620)
+
+         This module defines additional objects and notifications for
+         managing the RADIUS authentication and accounting servers
+         in use by the enterprise system.
+
+         All mib objects defined in this module are viewed within the
+         context identified in the SNMP protocol (i.e. the community
+         string in v1/v2c or the contextName in v3)."
+
+    REVISION    "201501141800Z" -- Jan 14, 2015
+    DESCRIPTION
+        "Updated RBN/rbn/Rbn as ERICSSON-ROUTER/eriRouter/EriRouter
+         to migrate RBN MIB to ERICSSON MIB."
+
+    REVISION     "201101191800Z" -- Jan 19, 2011
+    DESCRIPTION
+        "Update CONTACT-INFO & ORGANIZATION. "
+
+    REVISION     "200503291700Z" -- Mar 29, 2005
+    DESCRIPTION
+        "Added new objects:
+            eriRouterRadiusAuthStripDomain
+            eriRouterRadiusAcctStripDomain
+        Added new groups:
+            eriRouterRadiusAuthGroup2
+            eriRouterRadiusAcctGroup2
+        Added new compliance:
+            eriRouterRadiusCompliance2."
+
+    REVISION     "200312160000Z" -- Dec 16, 2003
+    DESCRIPTION
+        "Initial verison."
+
+    ::= { eriRouterMgmt 32 }
+
+eriRouterRadiusMIBNotifications OBJECT IDENTIFIER ::= { eriRouterRadiusMib 0 }
+eriRouterRadiusMIBObjects       OBJECT IDENTIFIER ::= { eriRouterRadiusMib 1 }
+eriRouterRadiusMIBConformance   OBJECT IDENTIFIER ::= { eriRouterRadiusMib 2 }
+
+eriRouterRadiusAuthObjects      OBJECT IDENTIFIER ::= { eriRouterRadiusMIBObjects 1 }
+eriRouterRadiusAcctObjects      OBJECT IDENTIFIER ::= { eriRouterRadiusMIBObjects 2 }
+eriRouterRadiusNotifyObjects    OBJECT IDENTIFIER ::= { eriRouterRadiusMIBObjects 3 }
+
+--
+-- Textual Conventions
+--
+
+EriRouterRadiusServerState ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "The current state of a RADIUS server. When a server is
+         initially configured its state is 'unknown'. When requests
+         are sent to this server it will transition to either 'up' or
+         'down', depending on whether the server replies to the
+         requests. It will then transition between 'up' and 'down'
+         accordingly. It will never transition back to 'unknown'."
+    SYNTAX INTEGER {
+        unknown(1),            -- state on initial creation
+        up(2),                 -- server is responding
+        down(3)                -- server is not responding
+    }
+
+EriRouterRadiusServerReason ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "When a RADIUS transitions to a new state, this identifies the
+         reason for the transition.
+
+         Note that there are two types of timeouts: packet-level and
+         server-level. The packet-level timeout is managed via
+         eriRouterRadiusAuthPktTimeout and eriRouterRadiusAcctPktTimeout. The
+         server-level timeout is managed via eriRouterRadiusAuthSrvTimeout
+         and eriRouterRadiusAcctSrvTimeout.
+
+         All requests will timeout if no response is received within
+         the packet-level timeout window. If there is no configured
+         server-level timeout the server will be transitioned to 'down'
+         immediately. Otherwise the server will transition to 'down'
+         only if no replies have been received from the server within
+         the server-level timeout window."
+    SYNTAX INTEGER {
+        -- the following are only valid for a transition to 'up'
+        responding(1),          -- server is responding
+
+        -- the following are only valid for a transition to 'down'
+        packetTimeout(2),       -- the server is not responding and a
+                                -- packet-level timeout has occurred
+        serverTimeout(3),       -- the server is not responding and a
+                                -- server-level timeout has occurred
+        portDown(4)             -- the physical port used to access the server
+                                -- has been shutdown
+    }
+
+--
+-- RADIUS authorization objects
+--
+-- these objects supplement the RADIUS-AUTH-CLIENT-MIB (RFC 2618)
+--
+
+eriRouterRadiusAuthPktTimeout OBJECT-TYPE
+    SYNTAX     Unsigned32 (1..2147483647)
+    UNITS      "seconds"
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "The maximum amount of time to wait for a response from a
+         RADIUS authorization server before assuming the packet was
+         lost.
+
+         The SNMP set command is not supported for this MIB attribute."
+    ::= { eriRouterRadiusAuthObjects 1 }
+
+eriRouterRadiusAuthSrvTimeout OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..2147483647)
+    UNITS      "seconds"
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "The maximum amount of time to wait for any response from a
+         RADIUS authorization server before assuming the server is
+         unreachable.
+
+         A value of '0' indicates that there is no timeout value. In
+         this case a server is considered to be unreachable when no
+         response is received within the eriRouterRadiusAuthPktTimeout
+         window.
+
+         The SNMP set command is not supported for this MIB attribute."
+    ::= { eriRouterRadiusAuthObjects 2 }
+
+eriRouterRadiusAuthDeadtime OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..65535)
+    UNITS      "minutes"
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "After a RADIUS authorization server has been transitioned to
+         'down' it will be assumed to be unreachable for this
+         interval. After that point the system may start sending
+         requests to the server again.
+
+         A value of '0' indicates the system may start sending
+         requests to the server immediately.
+
+         The SNMP set command is not supported for this MIB attribute."
+    ::= { eriRouterRadiusAuthObjects 3 }
+
+eriRouterRadiusAuthTries OBJECT-TYPE
+    SYNTAX     Unsigned32 (1..2147483647)
+    UNITS      "tries"
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "The number of times the system will attempt to transmit
+         an authorization request to a RADIUS server. If multiple
+         RADIUS authorization servers have been configured
+         retransmissions will cycle through the other servers before
+         being retransmitted to the server that originally failed to
+         respond.
+
+         The SNMP set command is not supported for this MIB attribute."
+    ::= { eriRouterRadiusAuthObjects 4 }
+
+eriRouterRadiusAuthStripDomain OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "If this object is false, the entire username, including the
+        domain name is sent to the RADIUS server.  If true, the
+        domain portion of a structured username is stripped before
+        relaying a request to a RADIUS server.
+
+        The SNMP set command is not supported for this MIB attribute."
+    ::= { eriRouterRadiusAuthObjects 6 }
+
+eriRouterRadiusAuthSrvTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF EriRouterRadiusAuthSrvEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "This table augments the radiusAuthServerTable. All entries
+         that exist in that table will have a corresponding entry in
+         this table."
+    ::= { eriRouterRadiusAuthObjects 5 }
+
+eriRouterRadiusAuthSrvEntry OBJECT-TYPE
+    SYNTAX     EriRouterRadiusAuthSrvEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "A proprietary extension to the radiusAuthServerEntry."
+    AUGMENTS { radiusAuthServerEntry }
+    ::= { eriRouterRadiusAuthSrvTable 1 }
+
+EriRouterRadiusAuthSrvEntry ::= SEQUENCE {
+    eriRouterRadiusAuthSrvState            EriRouterRadiusServerState,
+    eriRouterRadiusAuthSrvLastChange       TimeStamp,
+    eriRouterRadiusAuthSrvCounterResetTime TimeStamp,
+    eriRouterRadiusAuthSrvSendErrors       Counter32
+}
+
+eriRouterRadiusAuthSrvState OBJECT-TYPE
+    SYNTAX     EriRouterRadiusServerState
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The current state of the RADIUS server."
+    ::= { eriRouterRadiusAuthSrvEntry 1 }
+
+eriRouterRadiusAuthSrvLastChange OBJECT-TYPE
+    SYNTAX     TimeStamp
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The value of sysUpTime when this server last changed
+         state. If eriRouterRadiusAuthSrvState is 'unknown' this is
+         effectively the value of sysUpTime when this server was
+         initially configured."
+    ::= { eriRouterRadiusAuthSrvEntry 2 }
+
+eriRouterRadiusAuthSrvCounterResetTime OBJECT-TYPE
+    SYNTAX     TimeStamp
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The value of sysUpTime on the most recent occasion when any
+         of the counters for this RADIUS server experienced a
+         discontinuity.
+
+         Note: this includes counters in this table as well as those in
+         radiusAuthServerTable."
+    ::= { eriRouterRadiusAuthSrvEntry 3 }
+
+eriRouterRadiusAuthSrvSendErrors OBJECT-TYPE
+    SYNTAX     Counter32
+    UNITS      "packets"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of packets destined to this RADIUS server which
+         could not be transmitted due to an error.
+
+         Discontinuities in the value of this counter are indicated by
+         the value of eriRouterRadiusAuthSrvCounterResetTime."
+    ::= { eriRouterRadiusAuthSrvEntry 4 }
+
+--
+-- RADIUS accounting objects
+--
+-- these objects supplement the RADIUS-ACCT-CLIENT-MIB (RFC 2620)
+--
+
+eriRouterRadiusAcctPktTimeout OBJECT-TYPE
+    SYNTAX     Unsigned32 (1..2147483647)
+    UNITS      "seconds"
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "The maximum amount of time to wait for a response from a
+         RADIUS accounting server before assuming the packet was lost.
+
+         Note: if the system is using a RADIUS server for both
+         authorization and accounting, this object's value will be
+         ignored for that server. Instead the eriRouterRadiusAuthPktTimeout
+         value will be used for all requests going to that server.
+
+         The SNMP set command is not supported for this MIB attribute."
+    ::= { eriRouterRadiusAcctObjects 1 }
+
+eriRouterRadiusAcctSrvTimeout OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..2147483647)
+    UNITS      "seconds"
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "The maximum amount of time to wait for any response from a
+         RADIUS accounting server before assuming the server is
+         unreachable.
+
+         A value of '0' indicates that there is no timeout value. In
+         this case a server is considered to be unreachable when no
+         response is received within the eriRouterRadiusAcctPktTimeout
+         window.
+
+         Note: if the system is using a RADIUS server for both
+         authorization and accounting, this object's value will be
+         ignored for that server. Instead the eriRouterRadiusAuthSrvTimeout
+         value will be used for that server.
+
+         The SNMP set command is not supported for this MIB attribute."
+    ::= { eriRouterRadiusAcctObjects 2 }
+
+eriRouterRadiusAcctDeadtime OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..65535)
+    UNITS      "minutes"
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "After a RADIUS accounting server has been transitioned to
+         'down' it will be assumed to be unreachable for this
+         interval. After that point the system may start sending
+         accounting records to the server again.
+
+         A value of '0' indicates the system may start sending
+         records to the server immediately.
+
+         Note: if the system is using a RADIUS server for both
+         authorization and accounting, this object's value will be
+         ignored for that server. Instead the eriRouterRadiusAuthDeadtime
+         value will be used for that server.
+
+         The SNMP set command is not supported for this MIB attribute."
+    ::= { eriRouterRadiusAcctObjects 3 }
+
+eriRouterRadiusAcctTries OBJECT-TYPE
+    SYNTAX     Unsigned32 (1..2147483647)
+    UNITS      "retries"
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "The number of times the system will attempt to transmit
+         an accounting record to a RADIUS server. If multiple RADIUS
+         accounting servers have been configured retransmissions will
+         cycle through the other servers before being retransmitted to
+         the server that originally failed to respond.
+
+         Note: if the system is using a RADIUS server for both
+         authorization and accounting, this object's value will be
+         ignored for that server. Instead the eriRouterRadiusAuthTries
+         value will be used for that server.
+
+         The SNMP set command is not supported for this MIB attribute."
+    ::= { eriRouterRadiusAcctObjects 4 }
+
+eriRouterRadiusAcctStripDomain OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "If this object is false, the entire username, including the
+        domain name is sent to the RADIUS server.  If true, the
+        domain portion of a structured username is stripped before
+        relaying a request to a RADIUS server.
+
+        The SNMP set command is not supported for this MIB attribute."
+    ::= { eriRouterRadiusAcctObjects 6 }
+
+eriRouterRadiusAcctSrvTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF EriRouterRadiusAcctSrvEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "This table augments the radiusAccServerTable. All entries
+         that exist in that table will have a corresponding entry in
+         this table."
+    ::= { eriRouterRadiusAcctObjects 5 }
+
+eriRouterRadiusAcctSrvEntry OBJECT-TYPE
+    SYNTAX     EriRouterRadiusAcctSrvEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "A proprietary extension to the radiusAccServerEntry."
+    AUGMENTS { radiusAccServerEntry }
+    ::= { eriRouterRadiusAcctSrvTable 1 }
+
+EriRouterRadiusAcctSrvEntry ::= SEQUENCE {
+    eriRouterRadiusAcctSrvState            EriRouterRadiusServerState,
+    eriRouterRadiusAcctSrvLastChange       TimeStamp,
+    eriRouterRadiusAcctSrvCounterResetTime TimeStamp,
+    eriRouterRadiusAcctSrvSendErrors       Counter32
+}
+
+eriRouterRadiusAcctSrvState OBJECT-TYPE
+    SYNTAX     EriRouterRadiusServerState
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The current state of the RADIUS server."
+    ::= { eriRouterRadiusAcctSrvEntry 1 }
+
+eriRouterRadiusAcctSrvLastChange OBJECT-TYPE
+    SYNTAX     TimeStamp
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The value of sysUpTime when this server last changed
+         state. If eriRouterRadiusAcctSrvState is 'unknown' this is effectively
+         the value of sysUpTime when this server was initially
+         configured."
+    ::= { eriRouterRadiusAcctSrvEntry 2 }
+
+eriRouterRadiusAcctSrvCounterResetTime OBJECT-TYPE
+    SYNTAX     TimeStamp
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The value of sysUpTime on the most recent occasion when any
+         of the counters for this RADIUS server experienced a
+         discontinuity.
+
+         Note: this includes counters in this table as well as those in
+         radiusAccServerTable."
+    ::= { eriRouterRadiusAcctSrvEntry 3 }
+
+eriRouterRadiusAcctSrvSendErrors OBJECT-TYPE
+    SYNTAX     Counter32
+    UNITS      "packets"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of packets destined to this RADIUS server which
+         could not be transmitted due to an error.
+
+         Discontinuities in the value of this counter are indicated by
+         the value of eriRouterRadiusAcctSrvCounterResetTime."
+    ::= { eriRouterRadiusAcctSrvEntry 4 }
+
+--
+-- RADIUS notification objects
+--
+-- these objects will only appear in notifications
+--
+
+eriRouterRadiusClientPort OBJECT-TYPE
+    SYNTAX     Unsigned32 (1024..65535)
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+        "A system may be configured to use a range of source TCP/IP
+         ports when sending requests to a RADIUS server. When a server
+         transitions to 'up' or 'down' and a state-change notification
+         is generated, an instance of this object is included to
+         indicate which source port was being used when the server
+         changed state."
+    ::= { eriRouterRadiusNotifyObjects 1 }
+
+eriRouterRadiusContext OBJECT-TYPE
+    SYNTAX     SnmpAdminString (SIZE (1..63))
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+        "The name of the context in which this server is configured."
+    ::= { eriRouterRadiusNotifyObjects 2 }
+
+eriRouterRadiusReason OBJECT-TYPE
+    SYNTAX     EriRouterRadiusServerReason
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+        "The reason for the server's last state change."
+    ::= { eriRouterRadiusNotifyObjects 3 }
+
+eriRouterRadiusUsername OBJECT-TYPE
+    SYNTAX     SnmpAdminString (SIZE (0..128))
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+        "The name of the user the system was trying to authenticate
+         or send accouting information for when the RADIUS server
+         transitioned to 'down'.
+
+         Note: the 'username' is only valid when transitioning due to
+         a packet-level timeout.
+
+         When transitioning due to any other reason the value for this
+         object will be a zero-length string."
+    ::= { eriRouterRadiusNotifyObjects 4 }
+
+--
+-- RADIUS notifications
+--
+
+eriRouterRadiusAuthStateChange NOTIFICATION-TYPE
+    OBJECTS {
+        eriRouterRadiusAuthSrvState,
+        radiusAuthServerAddress,
+        radiusAuthClientServerPortNumber,
+        eriRouterRadiusClientPort,
+        eriRouterRadiusContext,
+        eriRouterRadiusReason,
+        eriRouterRadiusUsername
+    }
+    STATUS  current
+    DESCRIPTION
+        "This notification signifies that a RADIUS authorization
+         server has transitioned to 'up' or 'down'.
+
+         Note: if eriRouterRadiusAuthSrvState's value is 'down' and
+         eriRouterRadiusReason's value is 'packetTimeout', then
+         eriRouterRadiusUsername's value will be a username. For all other
+         cases, eriRouterRadiusUsername's value will be a zero-length
+         string."
+    ::= { eriRouterRadiusMIBNotifications 1 }
+
+eriRouterRadiusAcctStateChange NOTIFICATION-TYPE
+    OBJECTS {
+        eriRouterRadiusAcctSrvState,
+        radiusAccServerAddress,
+        radiusAccClientServerPortNumber,
+        eriRouterRadiusClientPort,
+        eriRouterRadiusContext,
+        eriRouterRadiusReason,
+        eriRouterRadiusUsername
+    }
+    STATUS  current
+    DESCRIPTION
+        "This notification signifies that a RADIUS accounting
+         server has transitioned to 'up' or 'down'.
+
+         Note: if eriRouterRadiusAcctSrvState's value is 'down' and
+         eriRouterRadiusReason's value is 'packetTimeout', then
+         eriRouterRadiusUsername's value will be a username. For all other
+         cases, eriRouterRadiusUsername's value will be a zero-length
+         string."
+    ::= { eriRouterRadiusMIBNotifications 2 }
+
+--
+-- compliance statements
+--
+eriRouterRadiusCompliances OBJECT IDENTIFIER ::= { eriRouterRadiusMIBConformance 1 }
+eriRouterRadiusGroups      OBJECT IDENTIFIER ::= { eriRouterRadiusMIBConformance 2 }
+
+eriRouterRadiusCompliance2 MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION
+        "The compliance statement for SNMP entities which implement
+        this MIB."
+    MODULE  -- this module
+    MANDATORY-GROUPS {
+        eriRouterRadiusAuthGroup2,
+        eriRouterRadiusAcctGroup2,
+        eriRouterRadiusNotifyGroup,
+        eriRouterRadiusAuthNotifyGroup,
+        eriRouterRadiusAcctNotifyGroup
+    }
+    ::= { eriRouterRadiusCompliances 2 }
+
+eriRouterRadiusAuthGroup2 OBJECT-GROUP
+    OBJECTS {
+        eriRouterRadiusAuthPktTimeout,
+        eriRouterRadiusAuthSrvTimeout,
+        eriRouterRadiusAuthDeadtime,
+        eriRouterRadiusAuthTries,
+        eriRouterRadiusAuthSrvState,
+        eriRouterRadiusAuthSrvLastChange,
+        eriRouterRadiusAuthSrvCounterResetTime,
+        eriRouterRadiusAuthSrvSendErrors,
+        eriRouterRadiusAuthStripDomain
+    }
+    STATUS current
+    DESCRIPTION
+        "The collection of objects used to manage RADIUS
+         authentication servers."
+    ::= { eriRouterRadiusGroups 6 }
+
+eriRouterRadiusAcctGroup2 OBJECT-GROUP
+    OBJECTS {
+        eriRouterRadiusAcctPktTimeout,
+        eriRouterRadiusAcctSrvTimeout,
+        eriRouterRadiusAcctDeadtime,
+        eriRouterRadiusAcctTries,
+        eriRouterRadiusAcctSrvState,
+        eriRouterRadiusAcctSrvLastChange,
+        eriRouterRadiusAcctSrvCounterResetTime,
+        eriRouterRadiusAcctSrvSendErrors,
+        eriRouterRadiusAcctStripDomain
+    }
+    STATUS current
+    DESCRIPTION
+        "The collection of objects used to manage RADIUS
+         accounting servers."
+    ::= { eriRouterRadiusGroups 7 }
+
+eriRouterRadiusNotifyGroup OBJECT-GROUP
+    OBJECTS {
+        eriRouterRadiusClientPort,
+        eriRouterRadiusContext,
+        eriRouterRadiusReason,
+        eriRouterRadiusUsername
+    }
+    STATUS current
+    DESCRIPTION
+        "The collection of objects used only in notifications."
+    ::= { eriRouterRadiusGroups 3 }
+
+eriRouterRadiusAuthNotifyGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        eriRouterRadiusAuthStateChange
+    }
+    STATUS current
+    DESCRIPTION
+        "Notification for tracking the status of RADIUS authentication
+         servers."
+    ::= { eriRouterRadiusGroups 4 }
+
+eriRouterRadiusAcctNotifyGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        eriRouterRadiusAcctStateChange
+    }
+    STATUS current
+    DESCRIPTION
+        "Notification for tracking the status of RADIUS accounting
+         servers."
+    ::= { eriRouterRadiusGroups 5 }
+
+--
+-- Deprecated Compliances and Groups
+--
+
+eriRouterRadiusCompliance MODULE-COMPLIANCE
+    STATUS deprecated
+    DESCRIPTION
+        "The compliance statement for SNMP entities which implement
+        this MIB."
+    MODULE  -- this module
+    MANDATORY-GROUPS {
+        eriRouterRadiusAuthGroup,
+        eriRouterRadiusAcctGroup,
+        eriRouterRadiusNotifyGroup,
+        eriRouterRadiusAuthNotifyGroup,
+        eriRouterRadiusAcctNotifyGroup
+    }
+    ::= { eriRouterRadiusCompliances 1 }
+
+eriRouterRadiusAuthGroup OBJECT-GROUP
+    OBJECTS {
+        eriRouterRadiusAuthPktTimeout,
+        eriRouterRadiusAuthSrvTimeout,
+        eriRouterRadiusAuthDeadtime,
+        eriRouterRadiusAuthTries,
+        eriRouterRadiusAuthSrvState,
+        eriRouterRadiusAuthSrvLastChange,
+        eriRouterRadiusAuthSrvCounterResetTime,
+        eriRouterRadiusAuthSrvSendErrors
+    }
+    STATUS deprecated
+    DESCRIPTION
+        "The collection of objects used to manage RADIUS
+         authentication servers."
+    ::= { eriRouterRadiusGroups 1 }
+
+eriRouterRadiusAcctGroup OBJECT-GROUP
+    OBJECTS {
+        eriRouterRadiusAcctPktTimeout,
+        eriRouterRadiusAcctSrvTimeout,
+        eriRouterRadiusAcctDeadtime,
+        eriRouterRadiusAcctTries,
+        eriRouterRadiusAcctSrvState,
+        eriRouterRadiusAcctSrvLastChange,
+        eriRouterRadiusAcctSrvCounterResetTime,
+        eriRouterRadiusAcctSrvSendErrors
+    }
+    STATUS deprecated
+    DESCRIPTION
+        "The collection of objects used to manage RADIUS
+         accounting servers."
+    ::= { eriRouterRadiusGroups 2 }
+
+END

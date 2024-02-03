@@ -1,0 +1,144 @@
+-- %DNP% $Id: ERICSSON-ROUTER-L2VPN-CAP.my,v 1.1.2.2.2.5 2011/06/15 18:19:46 danielhe Exp $
+-- %DNP% $Source: /cvsroot/pkt/sw/se/xc/bsd/config/snmp/mibs/Attic/ERICSSON-ROUTER-L2VPN-CAP.my,v $
+-- *****************************************************************
+-- ERICSSON-ROUTER-L2VPN-CAP.my   L2VPN MIB agent capabilities
+--
+-- Copyright (c) 2005-2008, 2010-2011, 2015 Ericsson AB.
+-- All rights reserved.
+-- 
+-- *****************************************************************
+
+ERICSSON-ROUTER-L2VPN-CAP DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY
+                FROM SNMPv2-SMI
+        AGENT-CAPABILITIES
+                FROM SNMPv2-CONF
+        eriRouterCapabilities
+                FROM ERICSSON-ROUTER-SMI;
+
+eriRouterL2vpnCap MODULE-IDENTITY
+	LAST-UPDATED    "201501141800Z" -- Jan 14, 2015
+        ORGANIZATION    "Ericsson AB. "
+        CONTACT-INFO
+            "           Ericsson AB.
+
+                Postal: 100 Headquarters Dr.
+                        San Jose, CA  95134
+                        USA
+
+                Phone:  +1 408 750 5000
+                Fax:    +1 408 750 5599"
+        DESCRIPTION
+               "The Agent Capabilities for ERICSSON-ROUTER-L2VPN-MIB
+
+               If this MIB implementation is platform-dependent,
+               the PRODUCT-RELEASE clause contains Ericsson SEOS version and
+               at least one of the following Ericsson product families:
+                   [SE]  SmartEdge Multi-service Edge Router (MSER) family
+                   [SM]  SM family of Metro Ethernet Service Transport platforms
+                   [SSR] Smart Service Router (SSR) family"
+
+        REVISION        "201501141800Z" -- Jan 14, 2015
+        DESCRIPTION
+                "Updated RBN/rbn/Rbn as ERICSSON-ROUTER/eriRouter/EriRouter
+                 to migrate RBN MIB to ERICSSON MIB."
+
+        REVISION        "201106150000Z" -- Jun 15, 2011
+        DESCRIPTION
+                "Update DESCRIPTION clause of MODULE-IDENTITY
+                and PRODUCT-RELEASE clause of AGENT-CAPABILITIES."
+                
+        REVISION        "201101191800Z" -- Jan 19, 2011
+        DESCRIPTION
+                "Update CONTACT-INFO & ORGANIZATION. "
+
+	REVISION	"201004010000Z" -- April 1, 2010
+	DESCRIPTION
+                " Added eriRouterL2vpnCap3 including eriRouterMplsL2VpnPwScalarGroup,
+                eriRouterMplsL2VpnStaticPwGroup, eriRouterMplsL2VpnLdpPwGroup to 
+                deprecate eriRouterMplsL2VpnStaticGroup, eriRouterMplsL2VpnLdpGroup. "
+
+        REVISION        "200810130000Z" -- Oct 13, 2008
+        DESCRIPTION
+                "Changed the indexing sequence of L2VPN static and ldp tables.
+                Obsoleted eriRouterL2vpnCap1, and added eriRouterL2vpnCap2."
+
+	REVISION        "200510010000Z" -- Oct. 1, 2005
+	DESCRIPTION
+		"Initial version."
+
+        ::= { eriRouterCapabilities 67 }
+
+eriRouterL2vpnCap1 AGENT-CAPABILITIES
+        PRODUCT-RELEASE "SEOS 5.0.3"
+        STATUS          obsolete
+        DESCRIPTION     "ERICSSON-ROUTER-L2VPN-MIB capabilities"
+        SUPPORTS        ERICSSON-ROUTER-L2VPN-MIB
+        INCLUDES {
+                   eriRouterL2VpnStaticGroup,
+                   eriRouterL2VpnLdpGroup
+         }
+
+        ::= { eriRouterL2vpnCap 1 }
+
+eriRouterL2vpnCap2 AGENT-CAPABILITIES
+        PRODUCT-RELEASE "SEOS 6.1.4.2"
+        STATUS          obsolete
+        DESCRIPTION     "ERICSSON-ROUTER-L2VPN-MIB capabilities"
+        SUPPORTS        ERICSSON-ROUTER-L2VPN-MIB
+        INCLUDES {
+                   eriRouterMplsL2VpnStaticGroup,
+                   eriRouterMplsL2VpnLdpGroup
+         }
+
+        ::= { eriRouterL2vpnCap 2 }
+
+eriRouterL2vpnCap3 AGENT-CAPABILITIES
+        PRODUCT-RELEASE "SEOS 6.5.x"
+        STATUS          current
+        DESCRIPTION     "ERICSSON-ROUTER-L2VPN-MIB capabilities"
+        SUPPORTS        ERICSSON-ROUTER-L2VPN-MIB
+        INCLUDES {
+                   eriRouterMplsL2VpnPwScalarGroup,
+                   eriRouterMplsL2VpnStaticPwGroup,
+                   eriRouterMplsL2VpnLdpPwGroup,
+                   eriRouterMplsL2VpnPwNotificationGroup
+         }
+
+        ::= { eriRouterL2vpnCap 3 }
+
+eriRouterL2vpnCap4 AGENT-CAPABILITIES
+        PRODUCT-RELEASE "SEOS 11.1.x [SE, SM]"
+        STATUS          current
+        DESCRIPTION     "ERICSSON-ROUTER-L2VPN-MIB capabilities"
+        SUPPORTS        ERICSSON-ROUTER-L2VPN-MIB
+        INCLUDES {
+                   eriRouterMplsL2VpnPwScalarGroup,
+                   eriRouterMplsL2VpnStaticPwGroup,
+                   eriRouterMplsL2VpnLdpPwGroup,
+                   eriRouterMplsL2VpnPwNotificationGroup,
+                   eriRouterUdpL2VpnStaticPwGroup
+         }
+        
+        VARIATION   eriRouterUdpL2VpnStaticPeerPort 
+        DESCRIPTION
+            "The range of the UDP L2 VPN peer port number is
+            from 1 to 65535."
+        
+        VARIATION   eriRouterUdpL2VpnStaticPeerAddressType 
+        DESCRIPTION
+            "Only ipv4(1) is supported."
+        
+        VARIATION   eriRouterUdpL2VpnStaticSourceAddressType 
+        DESCRIPTION
+            "Only ipv4(1) is supported."
+        
+        VARIATION   eriRouterUdpL2VpnStaticSourcePort 
+        DESCRIPTION
+            "The range of the UDP L2 VPN source port number is
+            from 1024 to 65535."
+        
+        ::= { eriRouterL2vpnCap 4 }
+END

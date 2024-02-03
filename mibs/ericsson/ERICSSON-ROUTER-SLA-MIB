@@ -1,0 +1,430 @@
+-- *****************************************************************
+-- ERICSSON-ROUTER-SLA-MIB      SLA MIB
+--
+-- Copyright (c) 2017 Ericsson AB.
+-- All rights reserved.
+--
+-- *****************************************************************
+
+ERICSSON-ROUTER-SLA-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+      MODULE-IDENTITY,
+      NOTIFICATION-TYPE,
+      OBJECT-TYPE,
+      Integer32
+            FROM SNMPv2-SMI
+      TruthValue
+              FROM SNMPv2-TC
+      MODULE-COMPLIANCE,
+      NOTIFICATION-GROUP,
+      OBJECT-GROUP
+            FROM SNMPv2-CONF
+      eriRouterMgmt
+            FROM ERICSSON-ROUTER-SMI;
+
+eriRouterSlaMIB MODULE-IDENTITY
+      LAST-UPDATED    "201701070000Z" -- Jan 7, 2017
+      ORGANIZATION      "Ericsson AB."
+      CONTACT-INFO "Email: snmp.mib.contact@ericsson.com."
+      DESCRIPTION
+            "The SLA MIB defines the necessary objects and
+             notifications for service level agreement."
+      REVISION      "201701070000Z" -- Jan 7, 2017
+      DESCRIPTION
+            "Initial version. This version includes objects for
+            notifying the occurrence and disappearance of a
+            SLA job threshold violation."
+      ::= { eriRouterMgmt 121 }
+
+eriRouterSlaNotifications OBJECT IDENTIFIER
+      ::= { eriRouterSlaMIB 0 }
+
+eriRouterSlaObjects OBJECT IDENTIFIER
+      ::= { eriRouterSlaMIB 1 }
+
+eriRouterSlaConformance OBJECT IDENTIFIER
+      ::= { eriRouterSlaMIB 2 }
+
+eriRouterSlaReactionTable OBJECT-TYPE
+      SYNTAX      SEQUENCE OF EriRouterSlaReactionEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+            "A table that is used to notifying the occurrence and disappearance
+            of the SLA job threshold violation. Each row includes part of a SLA
+            reaction configuration.
+
+            Each SLA job can have multiple reactions and hence there can be
+            multiple rows for a particular SLA job."
+      ::= { eriRouterSlaObjects 1 }
+
+eriRouterSlaReactionEntry OBJECT-TYPE
+      SYNTAX      EriRouterSlaReactionEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+            "An entry that indicates the status of the reaction occurrence
+            and includes main objects such as job id, monitored-element and
+            threshold type."
+      INDEX { eriRouterSlaJobID, eriRouterSlaMonitoredElement, eriRouterSlaThresholdType}
+      ::= { eriRouterSlaReactionTable 1 }
+
+EriRouterSlaReactionEntry ::= SEQUENCE {
+      eriRouterSlaJobID                    Integer32,
+      eriRouterSlaMonitoredElement         Integer32,
+      eriRouterSlaThresholdType            Integer32,
+      eriRouterSlaJobType                  Integer32,
+      eriRouterSlaReactionStatus           TruthValue
+}
+
+eriRouterSlaJobID OBJECT-TYPE
+      SYNTAX      Integer32 (1..65535)
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+            "The Sla JOB ID that identifies a SLA job."
+      ::= { eriRouterSlaReactionEntry 1 }
+
+eriRouterSlaMonitoredElement OBJECT-TYPE
+      SYNTAX   INTEGER {
+                       delayNearEnd(1),
+                       delayFarEnd(2),
+                       delayTwoWay(3),
+                       delayVariationNearEnd(4),
+                       delayVariationFarEnd(5),
+                       delayVariationTwoWay(6),
+                       lostPktsNearEnd(7),
+                       lostPktsFarEnd(8),
+                       lostPktsTwoWay(9)
+              }
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+              "The object to be monitored and checked in a SLA measurement job."
+      ::= { eriRouterSlaReactionEntry 2 }
+
+eriRouterSlaThresholdType OBJECT-TYPE
+      SYNTAX  INTEGER {
+                      percentage(1),
+                      value(2)
+              }
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+              "Defines the method about how to calculate and check the threshold."
+      ::= { eriRouterSlaReactionEntry 3 }
+
+eriRouterSlaJobType OBJECT-TYPE
+      SYNTAX      INTEGER {
+                          twamp(1)
+                  }
+      MAX-ACCESS  read-only
+      STATUS          current
+      DESCRIPTION
+             "The measurement type of the SLA job."
+      ::= { eriRouterSlaReactionEntry 4 }
+
+eriRouterSlaReactionStatus OBJECT-TYPE
+      SYNTAX      TruthValue
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+              "This object is set to true when threshold violation is occurred,
+              and it will be set to false when the threshold violation disappears."
+      DEFVAL { false }
+      ::= { eriRouterSlaReactionEntry 5 }
+
+-- Notifications
+
+eriRouterSlaNearEndDelayRisingThresholdMet NOTIFICATION-TYPE
+      OBJECTS {
+              eriRouterSlaJobID,
+              eriRouterSlaJobType,
+              eriRouterSlaThresholdType
+      }
+      STATUS  current
+      DESCRIPTION
+              "A eriRouterSlaNearEndDelayRisingThresholdMet signifies
+              that there has been a near end delay threshold
+              violation during the SLA job measurement."
+      ::= { eriRouterSlaNotifications 1 }
+
+eriRouterSlaNearEndDelayFallingThresholdMet NOTIFICATION-TYPE
+      OBJECTS {
+              eriRouterSlaJobID,
+              eriRouterSlaJobType,
+              eriRouterSlaThresholdType
+      }
+      STATUS  current
+      DESCRIPTION
+            "A eriRouterSlaNearEndDelayFallingThresholdMet signifies
+            that a near end delay threshold violation has been
+            disappeared during the SLA job measurement."
+      ::= { eriRouterSlaNotifications 2 }
+
+eriRouterSlaFarEndDelayRisingThresholdMet NOTIFICATION-TYPE
+      OBJECTS {
+              eriRouterSlaJobID,
+              eriRouterSlaJobType,
+              eriRouterSlaThresholdType
+      }
+      STATUS  current
+      DESCRIPTION
+              "A eriRouterSlaFarEndDelayRisingThresholdMet signifies
+            that there has been a far end delay threshold violation during the SLA job measurement."
+      ::= { eriRouterSlaNotifications 3 }
+
+eriRouterSlaFarEndDelayFallingThresholdMet NOTIFICATION-TYPE
+      OBJECTS {
+              eriRouterSlaJobID,
+              eriRouterSlaJobType,
+              eriRouterSlaThresholdType
+      }
+      STATUS  current
+      DESCRIPTION
+              "A eriRouterSlaFarEndDelayFallingThresholdMet signifies
+              that a far end delay threshold violation has been
+              disappeared during the SLA job measurement."
+      ::= { eriRouterSlaNotifications 4 }
+
+eriRouterSlaTwoWayDelayRisingThresholdMet NOTIFICATION-TYPE
+      OBJECTS {
+              eriRouterSlaJobID,
+              eriRouterSlaJobType,
+              eriRouterSlaThresholdType
+      }
+      STATUS  current
+      DESCRIPTION
+            "A eriRouterSlaTwoWayDelayRisingThresholdMet signifies
+            that there has been a two way delay threshold
+            violation during the SLA job measurement."
+      ::= { eriRouterSlaNotifications 5 }
+
+eriRouterSlaTwoWayDelayFallingThresholdMet NOTIFICATION-TYPE
+      OBJECTS {
+              eriRouterSlaJobID,
+              eriRouterSlaJobType,
+              eriRouterSlaThresholdType
+      }
+      STATUS  current
+      DESCRIPTION
+            "A eriRouterSlaTwoWayDelayFallingThresholdMet signifies
+            that a two way delay threshold violation has been
+            disappeared during the SLA job measurement."
+      ::= { eriRouterSlaNotifications 6 }
+
+eriRouterSlaNearEndDelayVariationRisingThresholdMet NOTIFICATION-TYPE
+      OBJECTS {
+              eriRouterSlaJobID,
+              eriRouterSlaJobType,
+              eriRouterSlaThresholdType
+      }
+      STATUS  current
+      DESCRIPTION
+            "A eriRouterSlaNearEndDelayVariationRisingThresholdMet signifies
+            that there has been a near end delayVariation
+            threshold violation during the SLA job measurement."
+      ::= { eriRouterSlaNotifications 7 }
+
+eriRouterSlaNearEndDelayVariationFallingThresholdMet NOTIFICATION-TYPE
+      OBJECTS {
+              eriRouterSlaJobID,
+              eriRouterSlaJobType,
+              eriRouterSlaThresholdType
+      }
+      STATUS  current
+      DESCRIPTION
+            "A eriRouterSlaNearEndDelayVariationFallingThresholdMet signifies
+            that a near end delayVariation threshold violation has been
+            disappeared during the SLA job measurement."
+      ::= { eriRouterSlaNotifications 8 }
+
+eriRouterSlaFarEndDelayVariationRisingThresholdMet NOTIFICATION-TYPE
+      OBJECTS {
+              eriRouterSlaJobID,
+              eriRouterSlaJobType,
+              eriRouterSlaThresholdType
+      }
+      STATUS  current
+      DESCRIPTION
+            "A eriRouterSlaFarEndDelayVariationRisingThresholdMet signifies
+            that there has been a far end delayVariation
+            threshold violation during the SLA job measurement."
+      ::= { eriRouterSlaNotifications 9 }
+
+eriRouterSlaFarEndDelayVariationFallingThresholdMet NOTIFICATION-TYPE
+      OBJECTS {
+              eriRouterSlaJobID,
+              eriRouterSlaJobType,
+              eriRouterSlaThresholdType
+      }
+      STATUS  current
+      DESCRIPTION
+            "A eriRouterSlaFarEndDelayVariationFallingThresholdMet signifies
+            that a far end delayVariation threshold violation has been
+            disappeared during the SLA job measurement."
+      ::= { eriRouterSlaNotifications 10 }
+
+eriRouterSlaTwoWayDelayVariationRisingThresholdMet NOTIFICATION-TYPE
+      OBJECTS {
+              eriRouterSlaJobID,
+              eriRouterSlaJobType,
+              eriRouterSlaThresholdType
+      }
+      STATUS  current
+      DESCRIPTION
+            "A eriRouterSlaTwoWayDelayVariationRisingThresholdMet signifies
+            that there has been a two way delayVariation threshold
+            violation during the SLA job measurement."
+      ::= { eriRouterSlaNotifications 11 }
+
+eriRouterSlaTwoWayDelayVariationFallingThresholdMet NOTIFICATION-TYPE
+      OBJECTS {
+              eriRouterSlaJobID,
+              eriRouterSlaJobType,
+              eriRouterSlaThresholdType
+      }
+      STATUS  current
+      DESCRIPTION
+            "A eriRouterSlaTwoWayDelayVariationFallingThresholdMet signifies
+            that a two way delayVariation threshold violation has been
+            disappeared during the SLA job measurement."
+      ::= { eriRouterSlaNotifications 12 }
+
+eriRouterSlaNearEndLostPacketsRisingThresholdMet NOTIFICATION-TYPE
+      OBJECTS {
+              eriRouterSlaJobID,
+              eriRouterSlaJobType,
+              eriRouterSlaThresholdType
+      }
+      STATUS  current
+      DESCRIPTION
+            "A eriRouterSlaNearEndLostPacketsRisingThresholdMet signifies
+            that there has been a near end lost packets threshold
+            violation during the SLA job measurement."
+      ::= { eriRouterSlaNotifications 13 }
+
+eriRouterSlaNearEndLostPacketsFallingThresholdMet NOTIFICATION-TYPE
+      OBJECTS {
+              eriRouterSlaJobID,
+              eriRouterSlaJobType,
+              eriRouterSlaThresholdType
+      }
+      STATUS  current
+      DESCRIPTION
+            "A eriRouterSlaNearEndLostPacketsFallingThresholdMet signifies
+            that a near end lost packets threshold violation has been
+            disappeared during the SLA job measurement."
+      ::= { eriRouterSlaNotifications 14 }
+
+eriRouterSlaFarEndLostPacketsRisingThresholdMet NOTIFICATION-TYPE
+      OBJECTS {
+              eriRouterSlaJobID,
+              eriRouterSlaJobType,
+              eriRouterSlaThresholdType
+      }
+      STATUS  current
+      DESCRIPTION
+            "A eriRouterSlaFarEndLostPacketsRisingThresholdMet signifies
+            that there has been a far end lost packets threshold
+            violation during the SLA job measurement."
+      ::= { eriRouterSlaNotifications 15 }
+
+eriRouterSlaFarEndLostPacketsFallingThresholdMet NOTIFICATION-TYPE
+      OBJECTS {
+              eriRouterSlaJobID,
+              eriRouterSlaJobType,
+              eriRouterSlaThresholdType
+      }
+      STATUS  current
+      DESCRIPTION
+            "A eriRouterSlaFarEndLostPacketsFallingThresholdMet signifies
+            that a far end lost packets threshold violation has been
+            disappeared during the SLA job measurement."
+      ::= { eriRouterSlaNotifications 16 }
+
+eriRouterSlaTwoWayLostPacketsRisingThresholdMet NOTIFICATION-TYPE
+      OBJECTS {
+              eriRouterSlaJobID,
+              eriRouterSlaJobType,
+              eriRouterSlaThresholdType
+      }
+      STATUS  current
+      DESCRIPTION
+            "A eriRouterSlaTwoWayLostPacketsRisingThresholdMet signifies
+            that there has been a two way lost packets threshold
+            violation during the SLA job measurement."
+      ::= { eriRouterSlaNotifications 17 }
+
+eriRouterSlaTwoWayLostPacketsFallingThresholdMet NOTIFICATION-TYPE
+      OBJECTS {
+              eriRouterSlaJobID,
+              eriRouterSlaJobType,
+              eriRouterSlaThresholdType
+      }
+      STATUS  current
+      DESCRIPTION
+            "A eriRouterSlaTwoWayLostPacketsFallingThresholdMet signifies
+            that a two way lost packets threshold violation has been
+            disappeared during the SLA job measurement."
+      ::= { eriRouterSlaNotifications 18 }
+
+-- Conformance Statements
+
+eriRouterSlaCompliances OBJECT IDENTIFIER
+      ::= { eriRouterSlaConformance 1 }
+eriRouterSlaGroups OBJECT IDENTIFIER
+    ::= { eriRouterSlaConformance 2 }
+
+eriRouterSlaCompliance MODULE-COMPLIANCE
+      STATUS  current
+      DESCRIPTION
+            "The compliance statement for the Sla MIB"
+      MODULE          -- this module
+      MANDATORY-GROUPS {
+                       eriRouterSlaReactionGroup,
+                       eriRouterSlaNotificationGroup
+      }
+      ::= { eriRouterSlaCompliances 1 }
+
+eriRouterSlaReactionGroup OBJECT-GROUP
+      OBJECTS {
+              eriRouterSlaJobID,
+              eriRouterSlaMonitoredElement,
+              eriRouterSlaThresholdType,
+              eriRouterSlaJobType,
+              eriRouterSlaReactionStatus
+      }
+      STATUS  current
+      DESCRIPTION
+            "A collection of objects providing SLA job reaction information."
+      ::= { eriRouterSlaGroups 1 }
+
+eriRouterSlaNotificationGroup NOTIFICATION-GROUP
+      NOTIFICATIONS {
+                    eriRouterSlaNearEndDelayRisingThresholdMet,
+                    eriRouterSlaNearEndDelayFallingThresholdMet,
+                    eriRouterSlaFarEndDelayRisingThresholdMet,
+                    eriRouterSlaFarEndDelayFallingThresholdMet,
+                    eriRouterSlaTwoWayDelayRisingThresholdMet,
+                    eriRouterSlaTwoWayDelayFallingThresholdMet,
+                    eriRouterSlaNearEndDelayVariationRisingThresholdMet,
+                    eriRouterSlaNearEndDelayVariationFallingThresholdMet,
+                    eriRouterSlaFarEndDelayVariationRisingThresholdMet,
+                    eriRouterSlaFarEndDelayVariationFallingThresholdMet,
+                    eriRouterSlaTwoWayDelayVariationRisingThresholdMet,
+                    eriRouterSlaTwoWayDelayVariationFallingThresholdMet,
+                    eriRouterSlaNearEndLostPacketsRisingThresholdMet,
+                    eriRouterSlaNearEndLostPacketsFallingThresholdMet,
+                    eriRouterSlaFarEndLostPacketsRisingThresholdMet,
+                    eriRouterSlaFarEndLostPacketsFallingThresholdMet,
+                    eriRouterSlaTwoWayLostPacketsRisingThresholdMet,
+                    eriRouterSlaTwoWayLostPacketsFallingThresholdMet
+      }
+      STATUS  current
+      DESCRIPTION
+            "Notifications for reaction."
+      ::= { eriRouterSlaGroups 2 }
+
+END

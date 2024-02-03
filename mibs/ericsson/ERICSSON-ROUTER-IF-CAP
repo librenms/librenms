@@ -1,0 +1,54 @@
+-- *****************************************************************
+-- ERICSSON-ROUTER-IF-MIB     Extension of IF-MIB.my
+--
+-- %DNP% Copyright (c) 2011, 2015 Ericsson AB.
+-- %DNP% All rights reserved.
+-- 
+-- *****************************************************************
+ERICSSON-ROUTER-IF-CAP DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY
+                FROM SNMPv2-SMI
+        AGENT-CAPABILITIES
+                FROM SNMPv2-CONF
+        eriRouterCapabilities
+                FROM ERICSSON-ROUTER-SMI;
+
+eriRouterIfCap MODULE-IDENTITY
+    LAST-UPDATED    "201501141800Z" -- Jan 14, 2015
+    ORGANIZATION    "Ericsson AB."
+    CONTACT-INFO
+            "       Ericsson, Inc.
+
+            Postal: 100 Headquarters Drive
+                    San Jose, CA  95134-1370
+                    USA
+    
+             Phone: +1 408 750 5000
+               Fax: +1 408 750 5599"
+
+    DESCRIPTION 
+        "The Agent Capabilities of ERICSSON-ROUTER-IF-MIB implementation."
+
+    REVISION    "201501141800Z" -- Jan 14, 2015
+    DESCRIPTION
+        "Updated RBN/rbn/Rbn as ERICSSON-ROUTER/eriRouter/EriRouter
+         to migrate RBN MIB to ERICSSON MIB."
+
+    REVISION    "201208280000Z" --  Aug 28, 2012
+    DESCRIPTION 
+           "Initial version"
+        ::= { eriRouterCapabilities 102 }
+
+eriRouterIfCap1 AGENT-CAPABILITIES
+    PRODUCT-RELEASE "SEOS 11.1.x"
+    STATUS          current
+    DESCRIPTION     "ERICSSON-ROUTER-IF-MIB capabilities"
+    SUPPORTS        ERICSSON-ROUTER-IF-MIB
+    INCLUDES {
+        eriRouterIfMIBGroup
+    }
+    ::= { eriRouterIfCap 1 }   
+
+END
