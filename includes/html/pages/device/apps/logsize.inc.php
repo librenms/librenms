@@ -7,7 +7,7 @@ $link_array = [
     'app' => 'logsize',
 ];
 
-$extra_vars=[
+$extra_vars = [
     'log_set',
     'log_file',
 ];
@@ -29,7 +29,7 @@ foreach ($sets_list as $index => $log_set) {
         : $log_set;
 
     $new_link_extra_array = $link_extra_array;
-    $new_link_extra_array['log_set']= $log_set;
+    $new_link_extra_array['log_set'] = $log_set;
     unset($new_link_extra_array['log_file']);
 
     echo generate_link($label, $link_array, $new_link_extra_array) . "\n";
@@ -117,8 +117,8 @@ foreach ($graphs as $key => $text) {
     $graph_array['gstats_no_daily_min'] = $vars['gstats_no_daily_min'];
     $graph_array['gstats_no_daily_max'] = $vars['gstats_no_daily_max'];
     $graph_array['gstats_no_weekly'] = $vars['gstats_no_weekly'];
-    $graph_array['gstats_no_weekly_min'] =  $vars['gstats_no_weekly_min'];
-    $graph_array['gstats_no_weekly_max'] =  $vars['gstats_no_weekly_max'];
+    $graph_array['gstats_no_weekly_min'] = $vars['gstats_no_weekly_min'];
+    $graph_array['gstats_no_weekly_max'] = $vars['gstats_no_weekly_max'];
     $graph_array['gstats_no_percentile'] = $vars['gstats_no_percentile'];
     $graph_array['gstats_no_percentile_x0'] = $vars['gstats_no_percentile_x0'];
     $graph_array['gstats_percentile_x0_val'] = $vars['gstats_percentile_x0_val'];
