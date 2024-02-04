@@ -7,7 +7,12 @@ $link_array = [
     'app' => 'logsize',
 ];
 
-require 'includes/html/graphs/generic_stats.inc.php';
+$extra_vars=[
+    'log_set',
+    'log_file',
+];
+
+require 'includes/html/graphs/generic_stats_options_init.inc.php';
 
 $no_minus_d = $app->data['no_minus_d'] ?? false;
 
@@ -23,20 +28,11 @@ foreach ($sets_list as $index => $log_set) {
         ? '<span class="pagemenu-selected">' . $log_set . '</span>'
         : $log_set;
 
-    echo generate_link($label, $link_array, [
-        'log_set' => $log_set,
-        'gstats_no_hourly' => $vars['gstats_no_hourly'],
-        'gstats_no_hourly_max' => $vars['gstats_no_hourly_max'],
-        'gstats_no_daily' => $vars['gstats_no_daily'],
-        'gstats_no_daily_max' => $vars['gstats_no_daily_max'],
-        'gstats_no_weekly' => $vars['gstats_no_weekly'],
-        'gstats_no_weekly_max' =>  $vars['gstats_no_weekly_max'],
-        'gstats_no_percentile' => $vars['gstats_no_percentile'],
-        'gstats_percentile_x0' => $vars['gstats_percentile_x0'],
-        'gstats_percentile_x0_val' => $vars['gstats_percentile_x0_val'],
-        'gstats_percentile_x1' => $vars['gstats_percentile_x1'],
-        'gstats_percentile_x1_val' => $vars['gstats_percentile_x1_val'],
-    ]) . "\n";
+    $new_link_extra_array = $link_extra_array;
+    $new_link_extra_array['log_set']= $log_set;
+    unset($new_link_extra_array['log_file']);
+
+    echo generate_link($label, $link_array, $new_link_extra_array) . "\n";
 
     if ($index < (count($sets_list) - 1)) {
         echo ', ';
@@ -54,27 +50,18 @@ if (isset($vars['log_set']) && isset($sets[$vars['log_set']])) {
             ? '<span class="pagemenu-selected">' . $log_file . '</span>'
             : $log_file;
 
-        echo generate_link($label, $link_array, [
-            'log_set' => $vars['log_set'],
-            'log_file' => $log_file,
-            'gstats_no_hourly' => $vars['gstats_no_hourly'],
-            'gstats_no_hourly_max' => $vars['gstats_no_hourly_max'],
-            'gstats_no_daily' => $vars['gstats_no_daily'],
-            'gstats_no_daily_max' => $vars['gstats_no_daily_max'],
-            'gstats_no_weekly' => $vars['gstats_no_weekly'],
-            'gstats_no_weekly_max' =>  $vars['gstats_no_weekly_max'],
-            'gstats_no_percentile' => $vars['gstats_no_percentile'],
-            'gstats_percentile_x0' => $vars['gstats_percentile_x0'],
-            'gstats_percentile_x0_val' => $vars['gstats_percentile_x0_val'],
-            'gstats_percentile_x1' => $vars['gstats_percentile_x1'],
-            'gstats_percentile_x1_val' => $vars['gstats_percentile_x1_val'],
-        ]) . "\n";
+        $new_link_extra_array = $link_extra_array;
+        $new_link_extra_array['log_file'] = $log_file;
+
+        echo generate_link($label, $link_array, $new_link_extra_array) . "\n";
 
         if ($index < (count($log_files) - 1)) {
             echo ', ';
         }
     }
 }
+
+require 'includes/html/graphs/generic_stats_options_line.inc.php';
 
 print_optionbar_end();
 
@@ -105,6 +92,7 @@ if (isset($vars['log_file']) && isset($vars['log_set'])) {
         'logsize_min_size' => 'Min Set Size',
     ];
 }
+
 
 foreach ($graphs as $key => $text) {
     $graph_type = $key;
