@@ -8,7 +8,7 @@
                     "sysDescr": "Aruba JL635A 8325 GL.10.04.2000",
                     "sysContact": "<private>",
                     "version": "GL.10.04.2000",
-                    "hardware": "8325",
+                    "hardware": "Aruba 8325 1-slot Chassis",
                     "features": null,
                     "location": "<private>",
                     "os": "arubaos-cx",

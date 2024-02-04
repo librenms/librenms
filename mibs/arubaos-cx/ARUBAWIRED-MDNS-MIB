@@ -1,0 +1,523 @@
+--**MOD+***********************************************************************
+--* Module:    ARUBAWIRED-MDNS-MIB.mib
+--*
+--* (c) Copyright 2020 Hewlett Packard Enterprise Development LP
+--* All Rights Reserved.
+--*
+--* The contents of this software are proprietary and confidential
+--* to the Hewlett-Packard Development Company, L.P.  No part of this
+--* program may be photocopied, reproduced, or translated into another
+--* programming language without prior written consent of the
+--* Hewlett-Packard Development Company, L.P.
+--*
+--* Purpose: This file contains MIB definition of ARUBAWIRED-MDNS-MIB
+--*
+--**MOD-***********************************************************************
+
+ARUBAWIRED-MDNS-MIB DEFINITIONS ::= BEGIN
+
+-- ****************************************************************************
+-- MDNS - Multicast DNS Protocol (Mdns)
+-- ****************************************************************************
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, IpAddress, Integer32, Unsigned32
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    VlanIndex
+        FROM Q-BRIDGE-MIB
+    DisplayString, MacAddress, TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    wndFeatures
+        FROM ARUBAWIRED-NETWORKING-OID;
+
+arubaWiredMdnsMIB MODULE-IDENTITY
+        LAST-UPDATED "202004170000Z"  -- April 17, 2020
+        ORGANIZATION "HPE/Aruba Networking Division"
+        CONTACT-INFO "Hewlett-Packard Enterprise
+                      8000 Foothills Blvd.
+                      Roseville, CA 95747"
+        DESCRIPTION  "This MIB module describes objects for managing the mDNS
+                      gateway feature."
+
+        REVISION     "202004170000Z"  -- April 17, 2020
+        DESCRIPTION  "Initial version"
+
+        ::= { wndFeatures 14 }
+
+-- -------------------------------------------------------------
+-- Textual Conventions
+-- -------------------------------------------------------------
+
+   VidList ::= TEXTUAL-CONVENTION
+      DISPLAY-HINT "512x"
+      STATUS      current
+      DESCRIPTION
+         "Each octet within this value specifies a set of eight
+         VLAN index (VID), with the first octet specifying VIDs 1
+         through 8, the second octet specifying VIDs 9 through 16,
+         etc.  Within each octet, the most significant bit represents
+         the lowest numbered VID, and the least significant bit
+         represents the highest numbered VID.  Thus, each VID
+         is represented by a single bit within the value of this
+         object.  If that bit has a value of 1 then that VID is
+         included in the set of VIDs; the VID is not included if its
+         bit has a value of 0.  This list represents the entire
+         range of VLAN index values defined in the scope of IEEE
+         802.1Q."
+      SYNTAX      OCTET STRING (SIZE (512))
+
+-- ****************************************************************************
+-- This MIB module contains the following groups
+-- ****************************************************************************
+
+    arubaWiredMdnsNotifications  OBJECT IDENTIFIER ::= { arubaWiredMdnsMIB 0 }
+    arubaWiredMdnsObjects        OBJECT IDENTIFIER ::= { arubaWiredMdnsMIB 1 }
+    arubaWiredMdnsConformance    OBJECT IDENTIFIER ::= { arubaWiredMdnsMIB 2 }
+
+-- ****************************************************************************
+-- Individual object definitions for Mdns
+-- ****************************************************************************
+   -- Mdns admin State
+   arubaWiredMdnsAdminState OBJECT-TYPE
+      SYNTAX  INTEGER {
+                          disable (0),
+                          enable (1)
+                      }
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "Indicates whether the mDNS based service discovery is
+                   enabled or disabled."
+      DEFVAL          { disable }
+      ::= {arubaWiredMdnsObjects 1}
+
+-- ****************************************************************************
+-- Tabular object definitions for Mdns
+-- ****************************************************************************
+   -- List of Mdns Services
+
+   arubaWiredMdnsServiceTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF ArubaWiredMdnsServiceEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION "This table lists the mDNS services that are configured on
+                   the device."
+      ::= { arubaWiredMdnsObjects 2}
+
+   arubaWiredMdnsServiceEntry OBJECT-TYPE
+      SYNTAX ArubaWiredMdnsServiceEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION "An entry in the arubaWiredMdnsServiceTable."
+      INDEX { arubaWiredMdnsServiceName,
+              arubaWiredMdnsServiceIdIndex }
+      ::= { arubaWiredMdnsServiceTable 1}
+
+   ArubaWiredMdnsServiceEntry ::=
+      SEQUENCE {
+                  arubaWiredMdnsServiceName             DisplayString,
+                  arubaWiredMdnsServiceIdIndex          Unsigned32,
+                  arubaWiredMdnsServiceId               DisplayString
+               }
+
+   arubaWiredMdnsServiceName OBJECT-TYPE
+      SYNTAX DisplayString(SIZE (1..32))
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION "Specifies the name of the mDNS service."
+      ::= { arubaWiredMdnsServiceEntry 1}
+
+   arubaWiredMdnsServiceIdIndex OBJECT-TYPE
+      SYNTAX Unsigned32
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION "Service Id Index."
+      ::= { arubaWiredMdnsServiceEntry 2}
+
+   arubaWiredMdnsServiceId OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "Specifies service-ids in given service-name"
+      ::= { arubaWiredMdnsServiceEntry 3}
+
+   -- List of Mdns Profiles
+
+   arubaWiredMdnsProfileTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF ArubaWiredMdnsProfileEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION "This table lists the mDNS profiles that are configured
+                   on the device."
+      ::= { arubaWiredMdnsObjects 3}
+
+   arubaWiredMdnsProfileEntry OBJECT-TYPE
+      SYNTAX ArubaWiredMdnsProfileEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION "An entry in the arubaWiredMdnsProfileTable."
+      INDEX { arubaWiredMdnsProfileName }
+      ::= { arubaWiredMdnsProfileTable 1}
+
+   ArubaWiredMdnsProfileEntry ::=
+      SEQUENCE {
+                  arubaWiredMdnsProfileName             DisplayString,
+                  arubaWiredMdnsProfileVIDList          VidList,
+                  arubaWiredMdnsProfilePermitCount      Unsigned32,
+                  arubaWiredMdnsProfileDenyCount        Unsigned32
+               }
+
+   arubaWiredMdnsProfileName OBJECT-TYPE
+      SYNTAX DisplayString(SIZE (1..32))
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION "Specifies the name of the mDNS profile."
+      ::= { arubaWiredMdnsProfileEntry 1}
+
+   arubaWiredMdnsProfileVIDList OBJECT-TYPE
+      SYNTAX VidList
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "List of SVI VLANs Part of the given mDNS profile."
+      ::= { arubaWiredMdnsProfileEntry 2}
+
+   arubaWiredMdnsProfilePermitCount OBJECT-TYPE
+      SYNTAX Unsigned32(1..4294967295)
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "Number of packets permitted by the mDNS profile."
+      ::= { arubaWiredMdnsProfileEntry 3}
+
+   arubaWiredMdnsProfileDenyCount OBJECT-TYPE
+      SYNTAX Unsigned32(1..4294967295)
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "Number of packets denied by the mDNS profile."
+      ::= { arubaWiredMdnsProfileEntry 4}
+
+   -- List of profile filter rules.
+
+   arubaWiredMdnsProfileFilterRuleTable    OBJECT-TYPE
+      SYNTAX SEQUENCE OF ArubaWiredMdnsProfileFilterRuleEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION "This table lists the filter-rules that are configured in
+                   a given profile on the device."
+      ::= { arubaWiredMdnsObjects 4 }
+
+   arubaWiredMdnsProfileFilterRuleEntry OBJECT-TYPE
+      SYNTAX ArubaWiredMdnsProfileFilterRuleEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION "An entry in the arubaWiredMdnsProfileFilterRuleTable."
+      INDEX { arubaWiredMdnsProfileFilterRuleProfileName,
+              arubaWiredMdnsProfileFilterRuleIndex }
+      ::= { arubaWiredMdnsProfileFilterRuleTable 1}
+
+   ArubaWiredMdnsProfileFilterRuleEntry ::=
+      SEQUENCE {
+                  arubaWiredMdnsProfileFilterRuleProfileName    DisplayString,
+                  arubaWiredMdnsProfileFilterRuleIndex          Integer32,
+                  arubaWiredMdnsProfileFilterRuleServiceName    OCTET STRING,
+                  arubaWiredMdnsProfileFilterRuleInstanceName   OCTET STRING,
+                  arubaWiredMdnsProfileFilterRuleAction         INTEGER
+               }
+
+   arubaWiredMdnsProfileFilterRuleProfileName OBJECT-TYPE
+      SYNTAX DisplayString(SIZE (1..32))
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION "The mdns profile name."
+      ::= { arubaWiredMdnsProfileFilterRuleEntry 1}
+
+   arubaWiredMdnsProfileFilterRuleIndex OBJECT-TYPE
+      SYNTAX Integer32 (1..100)
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION "Uniquely identifies the mdns profile rule within the mdns
+                   profile."
+      ::= { arubaWiredMdnsProfileFilterRuleEntry 2 }
+
+   arubaWiredMdnsProfileFilterRuleServiceName OBJECT-TYPE
+      SYNTAX OCTET STRING (SIZE(0..255))
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "Specifies the service name of the mdns profile rule."
+      ::= { arubaWiredMdnsProfileFilterRuleEntry 3 }
+
+   arubaWiredMdnsProfileFilterRuleInstanceName OBJECT-TYPE
+      SYNTAX OCTET STRING (SIZE(0..255))
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "Specifies the instance name of the mdns profile rule."
+      ::= { arubaWiredMdnsProfileFilterRuleEntry 4 }
+
+   arubaWiredMdnsProfileFilterRuleAction OBJECT-TYPE
+      SYNTAX  INTEGER {
+                          deny (0),
+                          permit (1)
+                      }
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "Specifies the action associated with the mDNS profile rule."
+      ::= { arubaWiredMdnsProfileFilterRuleEntry 5 }
+
+   -- List of Ports on which Mdns configured.
+
+   arubaWiredMdnsPortTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF ArubaWiredMdnsPortEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION "This table lists mDNS configured
+                   VLAN Ports on the device."
+      ::= { arubaWiredMdnsObjects 5 }
+
+   arubaWiredMdnsPortEntry OBJECT-TYPE
+      SYNTAX ArubaWiredMdnsPortEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION "An entry in the arubaWiredMdnsPortTable."
+      INDEX { arubaWiredMdnsPortVlanId }
+      ::= { arubaWiredMdnsPortTable 1 }
+
+   ArubaWiredMdnsPortEntry ::=
+      SEQUENCE {
+                  arubaWiredMdnsPortVlanId          VlanIndex,
+                  arubaWiredMdnsPortMdnsEnabled     INTEGER,
+                  arubaWiredMdnsPortTxProfileName   DisplayString,
+                  arubaWiredMdnsPortRxProfileName   DisplayString
+               }
+
+   arubaWiredMdnsPortVlanId OBJECT-TYPE
+      SYNTAX VlanIndex
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION "Specifies the vlan index."
+      ::= { arubaWiredMdnsPortEntry 1}
+
+   arubaWiredMdnsPortMdnsEnabled OBJECT-TYPE
+      SYNTAX  INTEGER {
+                          disable (0),
+                          enable (1)
+                      }
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "Specifies the mDNS-SD enable status on VLAN interface"
+      ::= { arubaWiredMdnsPortEntry 2}
+
+   arubaWiredMdnsPortTxProfileName OBJECT-TYPE
+      SYNTAX DisplayString(SIZE (1..32))
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "Specifies the Tx profile name configured on VLAN interface"
+      ::= { arubaWiredMdnsPortEntry 3}
+
+   arubaWiredMdnsPortRxProfileName OBJECT-TYPE
+      SYNTAX DisplayString(SIZE (1..32))
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "Specifies the Rx profile name configured on VLAN interface"
+      ::= { arubaWiredMdnsPortEntry 4}
+
+
+   -- List of Mdns Service Providers.
+
+   arubaWiredMdnsServiceProviderTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF ArubaWiredMdnsServiceProviderEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION "This table represents the list of all the Service
+                   providers who have advertised Mdns Services on
+                   the device."
+      ::= { arubaWiredMdnsObjects 6 }
+
+   arubaWiredMdnsServiceProviderEntry OBJECT-TYPE
+      SYNTAX ArubaWiredMdnsServiceProviderEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION "An entry in the arubaWiredMdnsServiceProviderTable."
+      INDEX { arubaWiredMdnsServiceProviderServiceId,
+              arubaWiredMdnsServiceProviderServiceIdIndex }
+      ::= { arubaWiredMdnsServiceProviderTable 1 }
+
+   ArubaWiredMdnsServiceProviderEntry ::=
+      SEQUENCE {
+                  arubaWiredMdnsServiceProviderServiceId            DisplayString,
+                  arubaWiredMdnsServiceProviderServiceIdIndex       Unsigned32,
+                  arubaWiredMdnsServiceProviderServiceInstanceName  DisplayString,
+                  arubaWiredMdnsServiceProviderVlanId               VlanIndex,
+                  arubaWiredMdnsServiceProviderMacAddress           MacAddress,
+                  arubaWiredMdnsServiceProviderHostname             DisplayString,
+                  arubaWiredMdnsServiceProviderIpAddress            IpAddress,
+                  arubaWiredMdnsServiceProviderTtl                  Unsigned32,
+                  arubaWiredMdnsServiceProviderExpireTime           Unsigned32
+               }
+
+   arubaWiredMdnsServiceProviderServiceId OBJECT-TYPE
+      SYNTAX DisplayString(SIZE (1..100))
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION "Service Id of the Service provider table."
+      ::= { arubaWiredMdnsServiceProviderEntry 1}
+
+   arubaWiredMdnsServiceProviderServiceIdIndex OBJECT-TYPE
+      SYNTAX Unsigned32
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION "Service Id index of the Service provider table."
+      ::= { arubaWiredMdnsServiceProviderEntry 2}
+
+   arubaWiredMdnsServiceProviderServiceInstanceName OBJECT-TYPE
+      SYNTAX  DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "Specifies the Service instance name of the service provider"
+      ::= { arubaWiredMdnsServiceProviderEntry 3}
+
+   arubaWiredMdnsServiceProviderVlanId OBJECT-TYPE
+      SYNTAX  VlanIndex
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "Specifies the VLAN on which
+          the service provider is operating."
+      ::= { arubaWiredMdnsServiceProviderEntry 4}
+
+   arubaWiredMdnsServiceProviderMacAddress OBJECT-TYPE
+      SYNTAX MacAddress
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "Specifies the hardware address
+          of the service provider machine."
+      ::= { arubaWiredMdnsServiceProviderEntry 5}
+
+   arubaWiredMdnsServiceProviderHostname OBJECT-TYPE
+      SYNTAX  DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "This object specifies the hostname
+          assigned to the service provider machine."
+      ::= { arubaWiredMdnsServiceProviderEntry 6}
+
+   arubaWiredMdnsServiceProviderIpAddress OBJECT-TYPE
+      SYNTAX IpAddress
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "Specifies the IP address assigned to the domain"
+      ::= { arubaWiredMdnsServiceProviderEntry 7}
+
+   arubaWiredMdnsServiceProviderTtl OBJECT-TYPE
+      SYNTAX  Unsigned32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "This object specifies the TTL (time to live)
+          value in secondes, assigned when the service
+          provider entry is added. The entry will be
+          removed from the switch on the expiry of this."
+      ::= { arubaWiredMdnsServiceProviderEntry 8}
+
+   arubaWiredMdnsServiceProviderExpireTime OBJECT-TYPE
+      SYNTAX  Unsigned32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "This object specifies the Time in seconds
+          since Epoch when the record would be expired."
+      ::= { arubaWiredMdnsServiceProviderEntry 9}
+
+
+-- ****************************************************************************
+-- MIB Conformance Information / Details
+-- ****************************************************************************
+
+    arubaWiredMdnsCompliances  OBJECT IDENTIFIER ::= { arubaWiredMdnsConformance 1 }
+    arubaWiredMdnsGroups       OBJECT IDENTIFIER ::= { arubaWiredMdnsConformance 2 }
+
+-- ****************************************************************************
+-- Compliance Statements
+-- ****************************************************************************
+
+    arubaWiredMdnsCompliance MODULE-COMPLIANCE
+       STATUS      current
+       DESCRIPTION "The compliance statement for HP switches implementing the
+                    ARUBAWIRED-MDNS-MIB MIB."
+       MODULE
+       MANDATORY-GROUPS {
+                             arubaWiredMdnsScalarGroup,
+                             arubaWiredMdnsServiceGroup,
+                             arubaWiredMdnsProfileGroup,
+                             arubaWiredMdnsProfileFilterRuleGroup,
+                             arubaWiredMdnsPortGroup,
+                             arubaWiredMdnsServiceProviderGroup
+                        }
+       ::= { arubaWiredMdnsCompliances 1 }
+
+-- ****************************************************************************
+-- Conformance Groups
+-- ****************************************************************************
+   arubaWiredMdnsScalarGroup OBJECT-GROUP
+       OBJECTS    {
+                         arubaWiredMdnsAdminState
+                  }
+       STATUS current
+       DESCRIPTION "A collection of objects that provides the mDNS scalar
+                    configuration."
+       ::= { arubaWiredMdnsGroups 1 }
+
+   arubaWiredMdnsServiceGroup OBJECT-GROUP
+       OBJECTS    {
+                         arubaWiredMdnsServiceId
+                  }
+       STATUS current
+       DESCRIPTION "A collection of objects that provides the mDNS service
+                    configuration."
+       ::= { arubaWiredMdnsGroups 2 }
+
+   arubaWiredMdnsProfileGroup OBJECT-GROUP
+       OBJECTS    {
+                         arubaWiredMdnsProfileVIDList,
+                         arubaWiredMdnsProfilePermitCount,
+                         arubaWiredMdnsProfileDenyCount
+                  }
+       STATUS current
+       DESCRIPTION "A collection of objects that provides the mDNS profile
+                    configuration."
+       ::= { arubaWiredMdnsGroups 3 }
+
+    arubaWiredMdnsProfileFilterRuleGroup OBJECT-GROUP
+       OBJECTS {
+                       arubaWiredMdnsProfileFilterRuleServiceName,
+                       arubaWiredMdnsProfileFilterRuleInstanceName,
+                       arubaWiredMdnsProfileFilterRuleAction
+               }
+       STATUS current
+       DESCRIPTION "A collection of objects that provides the mDNS profile
+                    filter rule configuration."
+       ::= { arubaWiredMdnsGroups 4 }
+
+   arubaWiredMdnsPortGroup OBJECT-GROUP
+       OBJECTS    {
+                         arubaWiredMdnsPortMdnsEnabled,
+                         arubaWiredMdnsPortTxProfileName,
+                         arubaWiredMdnsPortRxProfileName
+                  }
+       STATUS current
+       DESCRIPTION "A collection of objects that provides the mDNS Vlan out
+                    filter configuration."
+       ::= { arubaWiredMdnsGroups 5 }
+
+   arubaWiredMdnsServiceProviderGroup OBJECT-GROUP
+       OBJECTS    {
+                         arubaWiredMdnsServiceProviderServiceInstanceName,
+                         arubaWiredMdnsServiceProviderVlanId,
+                         arubaWiredMdnsServiceProviderMacAddress,
+                         arubaWiredMdnsServiceProviderHostname,
+                         arubaWiredMdnsServiceProviderIpAddress,
+                         arubaWiredMdnsServiceProviderTtl,
+                         arubaWiredMdnsServiceProviderExpireTime
+                  }
+       STATUS current
+       DESCRIPTION "A collection of objects that provides the mDNS
+                    Service providers."
+       ::= { arubaWiredMdnsGroups 6 }
+
+END
