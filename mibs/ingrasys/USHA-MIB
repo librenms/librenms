@@ -1,0 +1,2620 @@
+-- Ingrasys USHA MIB
+-- MIB for Uninterruptible Power Supplies
+--
+-- { iso org(3) dod(6) internet(1) private(4) enterprises(1) ingrasys(2468)
+-- product(1) webAppliance(2) upsAgent(1) usha(1)
+-- ==============================================================================================
+---
+---     Revision History
+---
+---     v0.80   17-Apr-2000     Johnny Lin/Allion
+---                             Created
+--
+---     v0.81   27-Apr-2000     Johnny Lin/Allion
+---                             Add upsTest objects 8, 9 and 10
+---     v1.00   09-Oct-2000     Johnny Lin/Allion
+---                             Fix the problems that HPOV6.0 cann't read this
+---                             mib file due to some incorrect ','
+---                             Change upsControlEvent from DisplayString to
+---                             enum INTEGER
+---     v1.01   25-Oct-2001     Johnny Lin/Allion
+---                             Change ENTERPRISE name from usha to ushap
+---                             Add "usha" in every trap event name
+---                             Change object (usha, upsObjects, upsTraps) name from usha to ushap
+---
+---     v1.02   30-Oct-2001     Kenneth/Allion
+---                             1. Import PositiveInteger and NonNegativeInteger from RFC-1628.
+---                             2. Fixed: The final item of SYNTAX must not have a comma ending.
+---                             3. Correct upsInputmandatory to upsInputCurrent.
+---                             4. Correct upsOutputmandatory to upsOutputCurrent.
+---                             5. Correct upsBypassmandatory to upsBypassCurrent.
+---                             6. Fixed: SYNTAX "DisplayString" must use "SIZE()" to define its range
+---                             7. Change BatteryTestScheduleEntry to UpsBatteryTestScheduleEntry
+---                             8. Fixed some SYNTAX error :
+---                                  Exp: Change "SYNTAX upsControlWeeklyScheduleEntry" to "SYNTAX
+---                                       UpsControlWeeklyScheduleEntry". And it can avoid conflict
+---                                       between names.
+---
+---     v1.03   28-Dec-2001     Johnny/Allion
+---                             1. Add Simplified Chinese support for agentConfigDefaultLanguage
+---
+---     v1.04   03-Jan-2002     Johnny/Allion
+---                             1. Fixed some typo
+---
+---     v1.05   16-Jul-2003     Johnny/Ingrasys
+---                             1. Fixed errors of
+---                                     "mconfigUnmpEvent" for "upsBatteryTestScheduleEntry"
+---                                     "mconfigUnmpEvent" for "shutdownParametersEntry"
+---                                     "mconfigScheduleIndex" for "upsControlWeeklyScheduleEntry"
+---                                     "mconfigScheduleIndex" for "upsControlSpecialScheduleEntry"
+---
+---                             2. Change "read/write" to "read-write" of Access table for
+---                                some NMS which may not accept '/' within MIB file.
+---
+---     v2.00b1 20-Feb-2004     Johnny/Ingrasys
+---                             1. Add EMD support, include emdStatus, emdConfig, and traps
+---
+---
+---     v2.01   16-Jul-2004     Johnny/Ingrasys
+---                             1. Change all traps Enterprise from ushap to upsTraps
+---
+---
+---     v2.02   05-Jan-2007     Kevin/Ingrasys
+---                             1. Modified MIB error issuse for http://www.simpleweb.org/ietf/mibs/validate/ web site
+---                             2. Included RFC1628.MIB
+---
+---     v2.03   5-Jan-2007     Kevin/Ingrasys
+---                             1. Modified MIB error issue for http://www.simpleweb.org/ietf/mibs/validate/ web side.
+---
+---     v2.04   20-Sep-2007     Kevin/Ingrasys
+---                             1. Added IpAddress type.
+---
+---     v2.05   23-Jan-2008     Kenneth/Ingrasys
+---                             1. Add upsBatteryTestScheduleSpecialDay and upsBatteryTestScheduleTestWithTime to upsBatteryTestScheduleTable.
+---                             2. Add emdTemperatureOverThreshold(7), emdAlarm1(8) and emdAlarm2(9) to upsControlEvent.
+---                             3. Add timeOfConnectionTime and timeOfConnectionTimeout to upsDevicesTable.
+---                             4. Change "allion" string to "ingrasys".
+---                             5. change for http://wwwsnmp.cs.utwente.nl/ietf/mibs/validate/ Level:4
+---                             6. Change "shutdownParametersEntry/ShutdownParametersEntry" strings to "upsControlShutdownParametersEntry/UpsControlShutdownParametersEntry".
+---
+---     v2.06   04-Feb-2008     Figo/Ingrasys
+---                             1. Fixed MIB Object description(upsControlWeeklyShutdownTime upsControlWeeklyRestartTime upsControlSpecialShutdownTime upsControlSpecialRestartTime) to hh:mm format.
+---
+---     v2.07   25-Feb-2008     Figo/Ingrasys
+---                             1. Change upsBatteryTestScheduleTable order list.
+---
+---     v2.08   30-May-2008     Figo/Ingrasys
+---                             1. Fixed upsBatteryGroupSecondsOnBattery DESCRIPTION"0 shall be returned if the unit is not on battery power.".
+---
+---     v2.09   02-Sep-2008     Figo/Ingrasys
+---                             1. Change "ushaUpsOverTemperature" and "ushaUpsOverLoad" trap level from "WARNING" to "SEVERE".
+---                             2. Add Q6 warning code definition in trap group.
+---
+---     v2.10   16-Sep-2008     Figo/Ingrasys
+---                             1. Rearrange order for Q6 warning code in trap group.
+---                             2. Define Q6 warning code recover trap.
+---
+---     v2.11   23-Sep-2008     Figo/Ingrasys
+---                             1. Modified trap1~38 description in coincidence with FW.
+---
+
+USHA-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+  enterprises,Counter,IpAddress
+    FROM RFC1155-SMI
+  OBJECT-TYPE
+    FROM RFC-1212
+  DisplayString
+    FROM RFC1213-MIB
+  TRAP-TYPE
+    FROM RFC-1215
+  PositiveInteger,NonNegativeInteger
+    FROM UPS-MIB;
+
+ingrasys        OBJECT IDENTIFIER ::= { enterprises 2468 }
+product         OBJECT IDENTIFIER ::= { ingrasys 1 }
+upsAgent        OBJECT IDENTIFIER ::= { product 2 }
+ushap           OBJECT IDENTIFIER ::= { upsAgent 1 }
+upsObjectGroup  OBJECT IDENTIFIER ::= { ushap 1 }
+upsTrapGroup    OBJECT IDENTIFIER ::= { ushap 2 }
+
+upsIdentGroup   OBJECT IDENTIFIER ::= { upsObjectGroup 1 }
+upsBatteryGroup OBJECT IDENTIFIER ::= { upsObjectGroup 2 }
+upsInputGroup   OBJECT IDENTIFIER ::= { upsObjectGroup 3 }
+upsOutputGroup  OBJECT IDENTIFIER ::= { upsObjectGroup 4 }
+upsBypassGroup  OBJECT IDENTIFIER ::= { upsObjectGroup 5 }
+upsTestGroup         OBJECT IDENTIFIER ::= { upsObjectGroup 6 }
+upsControlGroup      OBJECT IDENTIFIER ::= { upsObjectGroup 7 }
+upsConfigGroup  OBJECT IDENTIFIER ::= { upsObjectGroup 8 }
+upsClients      OBJECT IDENTIFIER ::= { upsObjectGroup 9 }
+agentConfig     OBJECT IDENTIFIER ::= { upsObjectGroup 10 }
+emdStatus       OBJECT IDENTIFIER ::= { upsObjectGroup 11 }
+emdConfig       OBJECT IDENTIFIER ::= { upsObjectGroup 12 }
+
+-- ===========================================================================
+--
+-- upsIdentification
+--
+--     All objects in this group except for upsIdentGroupName and
+--     upsIdentGroupAttachedDevices are set at device initialization
+--     and remain static.
+--
+-- ===========================================================================
+
+upsIdentGroupManufacturer OBJECT-TYPE
+       SYNTAX     DisplayString (SIZE (0..31))
+       ACCESS read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "The name of the UPS manufacturer."
+       ::= { upsIdentGroup 1 }
+
+upsIdentGroupModel OBJECT-TYPE
+      SYNTAX DisplayString (SIZE (0..63))
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The UPS Model designation."
+      ::= { upsIdentGroup 2 }
+
+upsIdentGroupUPSFirmwareVersion OBJECT-TYPE
+       SYNTAX     DisplayString (SIZE (0..63))
+       ACCESS read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "The UPS firmware/software version(s).  This variable
+               may or may not have the same value as
+               upsIdentGroupAgentSoftwareVersion in some implementations."
+      ::= { upsIdentGroup 3 }
+
+upsIdentGroupAgentSoftwareVersion OBJECT-TYPE
+      SYNTAX DisplayString (SIZE(0..31))
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+               "The USHA software/firmware version.  This variable may or
+               may not have the same value as
+               upsIdentGroupUPSSoftwareVersion in some implementations."
+      ::= { upsIdentGroup 4 }
+
+upsIdentGroupName OBJECT-TYPE
+       SYNTAX     DisplayString (SIZE(0..31))
+       ACCESS read-write
+       STATUS     mandatory
+       DESCRIPTION
+               "A string identifying the UPS.  This object should be
+               set by the administrator."
+       ::= { upsIdentGroup 5 }
+
+upsIdentGroupAttachedDevices OBJECT-TYPE
+       SYNTAX     DisplayString (SIZE(0..63))
+       ACCESS read-write
+       STATUS     mandatory
+       DESCRIPTION
+               "A string identifying the devices attached to the
+               output(s) of the UPS.  This object should be set by
+               the administrator."
+       ::= { upsIdentGroup 6 }
+
+upsIdentGroupUpsSerialNumber OBJECT-TYPE
+      SYNTAX DisplayString (SIZE(0..15))
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The UPS serial no."
+      ::= { upsIdentGroup 7 }
+
+-- ===========================================================================
+-- upsBatteryGroup
+--
+--     The Battery group.
+-- ===========================================================================
+
+upsBatteryGroupStatus OBJECT-TYPE
+     SYNTAX     INTEGER {
+           unknown(1),
+           batteryNormal(2),
+           batteryLow(3),
+           batteryDepleted(4),
+           batteryDischarging(5),
+           batteryFailure(6)
+     }
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+               "The indication of the status in the UPS system's batteries."
+     ::= { upsBatteryGroup 1 }
+
+upsBatteryGroupSecondsOnBattery OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+        "If the unit is on battery power, the elapsed time
+        since the UPS last switched to battery power, or the
+        time since the network management subsystem was last
+        restarted, whichever is less.  0 shall be returned
+        if the unit is not on battery power."
+     ::= { upsBatteryGroup 2 }
+
+upsBatteryGroupEstimatedMinutesRemaining OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+        "An estimate of the time to battery charge depletion
+        under the present load conditions if the utility power
+        is off and remains off, or if it were to be lost and
+        remain off."
+     ::= { upsBatteryGroup 3 }
+
+upsBatteryGroupEstimatedChargeRemaining OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+        "An estimate of the battery charge remaining expressed
+         as a percent of full charge."
+     ::= { upsBatteryGroup 4 }
+
+upsBatteryGroupVoltage OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The magnitude of the present battery voltage in 0.1 Volt DC."
+     ::= { upsBatteryGroup 5 }
+
+upsBatteryGroupMandatory OBJECT-TYPE
+    SYNTAX     INTEGER
+    --      "0.1 Amp DC"
+    ACCESS read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The present battery mandatory."
+    ::= { upsBatteryGroup 6 }
+
+upsBatteryGroupTemperature OBJECT-TYPE
+    SYNTAX     INTEGER
+    --      "degrees 0.1 Centigrade"
+    ACCESS read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The ambient temperature at or near the UPS Battery
+            casing."
+    ::= { upsBatteryGroup 7 }
+
+-- ===========================================================================
+-- upsInputGroup
+--
+-- Input group.
+-- ===========================================================================
+
+upsInputGroupLineBads OBJECT-TYPE
+       SYNTAX     Counter
+       ACCESS read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "A count of the number of times the input entered an
+               out-of-tolerance condition as defined by the
+               manufacturer.  This count is incremented by one each
+               time the input transitions from zero out-of-tolerance
+               lines to one or more input lines out-of-tolerance."
+       ::= { upsInputGroup 1 }
+
+upsInputGroupNumLines OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The number of input lines utilized in this device.
+          This variable indicates the number of rows in the
+          input table."
+     ::= { upsInputGroup 2 }
+
+upsInputGroupTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF UpsInputGroupEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "A list of input table entries.  The number of entries
+         is given by the value of upsInputGroupNumLines."
+    ::= { upsInputGroup  3 }
+
+upsInputGroupEntry OBJECT-TYPE
+    SYNTAX  UpsInputGroupEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "An entry containing information applicable to a
+         particular input line."
+    INDEX { upsInputGroupLineIndex }
+    ::= { upsInputGroupTable  1 }
+
+UpsInputGroupEntry ::=
+    SEQUENCE {
+             upsInputGroupLineIndex   PositiveInteger,
+             upsInputGroupFrequency   NonNegativeInteger,
+             upsInputGroupVoltage     NonNegativeInteger,
+             upsInputGroupCurrent     NonNegativeInteger,
+             upsInputGroupTruePower   NonNegativeInteger,
+             upsInputGroupVoltageMax  NonNegativeInteger,
+             upsInputGroupVoltageMin  NonNegativeInteger
+             }
+
+upsInputGroupLineIndex OBJECT-TYPE
+     SYNTAX PositiveInteger (0..65535)
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The index of UpsInputGroupEntry."
+     ::= { upsInputGroupEntry 1 }
+
+upsInputGroupFrequency OBJECT-TYPE
+       SYNTAX     NonNegativeInteger
+       --      "0.1 Hertz"
+       ACCESS read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "The present input frequency."
+       ::= { upsInputGroupEntry 2 }
+
+upsInputGroupVoltage OBJECT-TYPE
+     SYNTAX NonNegativeInteger
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The input utility line voltage in 0.1 volts."
+     ::= { upsInputGroupEntry 3 }
+
+upsInputGroupCurrent OBJECT-TYPE
+     SYNTAX NonNegativeInteger
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The magnitude of the present input current in 0.1 A."
+     ::= { upsInputGroupEntry 4 }
+
+upsInputGroupTruePower OBJECT-TYPE
+       SYNTAX     NonNegativeInteger
+       --      "Watts"
+       ACCESS read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "The magnitude of the present input true power."
+       ::= { upsInputGroupEntry 5 }
+
+upsInputGroupVoltageMax OBJECT-TYPE
+     SYNTAX NonNegativeInteger
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The maximum utility line voltage in 0.1 VAC for last 1 minute."
+     ::= { upsInputGroupEntry 6 }
+
+upsInputGroupVoltageMin OBJECT-TYPE
+     SYNTAX NonNegativeInteger
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The minimum utility line voltage in 0.1 VAC for last 1 minute."
+     ::= { upsInputGroupEntry 7 }
+
+-- ===========================================================================
+-- upsOutputGroup
+--
+-- Output group
+-- ===========================================================================
+
+upsOutputGroupSource OBJECT-TYPE
+     SYNTAX     INTEGER {
+           other(1),
+           none(2),
+           normal(3),
+           bypass(4),
+           battery(5),
+           booster(6),
+           reducer(7)
+     }
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The present source of output power.  The enumeration
+             none(2) indicates that there is no source of output
+             power (and therefore no output power), for example,
+             the system has opened the output breaker."
+     ::= { upsOutputGroup 1 }
+
+upsOutputGroupFrequency OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The current output frequency of the UPS system in 0.1 of HZ."
+     ::= { upsOutputGroup 2 }
+
+upsOutputGroupNumLines OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The number of output lines utilized in this device.
+          This variable indicates the number of rows in the
+          output table."
+     ::= { upsOutputGroup 3 }
+
+upsOutputGroupTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF UpsOutputGroupEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "A list of output table entries.  The number of
+         entries is given by the value of upsOutputGroupNumLines."
+    ::= { upsOutputGroup  4 }
+
+upsOutputGroupEntry OBJECT-TYPE
+    SYNTAX  UpsOutputGroupEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "An entry containing information applicable to a
+         particular output line."
+    INDEX { upsOutputGroupLineIndex }
+    ::= { upsOutputGroupTable  1 }
+
+UpsOutputGroupEntry ::=
+    SEQUENCE {
+             upsOutputGroupLineIndex   PositiveInteger,
+             upsOutputGroupVoltage     NonNegativeInteger,
+             upsOutputGroupCurrent     NonNegativeInteger,
+             upsOutputGroupPower       NonNegativeInteger,
+             upsOutputGroupPercentLoad INTEGER
+             }
+
+upsOutputGroupLineIndex OBJECT-TYPE
+     SYNTAX PositiveInteger (0..65535)
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The output line identifier."
+     ::= { upsOutputGroupEntry 1 }
+
+upsOutputGroupVoltage OBJECT-TYPE
+     SYNTAX NonNegativeInteger
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The output voltage of the UPS system in 0.1 volts."
+     ::= { upsOutputGroupEntry 2 }
+
+upsOutputGroupCurrent OBJECT-TYPE
+     SYNTAX NonNegativeInteger
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The output current of the UPS system in 0.1 Amps."
+     ::= { upsOutputGroupEntry 3 }
+
+upsOutputGroupPower OBJECT-TYPE
+       SYNTAX     NonNegativeInteger
+       --      "Watts"
+       ACCESS read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "The present output true power."
+       ::= { upsOutputGroupEntry 4 }
+
+upsOutputGroupPercentLoad OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The percentage of the UPS power capacity presently
+             being used on this output line, i.e., the greater of
+             the percent load of true power capacity and the
+             percent load of VA."
+     ::= { upsOutputGroupEntry 5 }
+
+-- ===========================================================================
+-- upsBypassGroup
+-- ===========================================================================
+
+upsBypassGroupFrequency OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The present bypass frequency."
+     ::= { upsBypassGroup 1 }
+
+upsBypassGroupNumLines OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The number of bypass lines utilized in this device.
+             This entry indicates the number of rows in the bypass
+             table."
+     ::= { upsBypassGroup 2 }
+
+upsBypassGroupTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF UpsBypassGroupEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "A list of bypass table entries.  The number of
+         entries is given by the value of upsBypassGroupNumLines."
+    ::= { upsBypassGroup  3 }
+
+upsBypassGroupEntry OBJECT-TYPE
+    SYNTAX  UpsBypassGroupEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+           "An entry containing information applicable to a
+               particular bypass input."
+    INDEX { upsBypassGroupLineIndex }
+    ::= { upsBypassGroupTable  1 }
+
+UpsBypassGroupEntry ::=
+    SEQUENCE {
+             upsBypassGroupLineIndex          PositiveInteger,
+             upsBypassGroupVoltage            NonNegativeInteger,
+             upsBypassGroupCurrent            NonNegativeInteger,
+             upsBypassGroupPower              NonNegativeInteger
+             }
+
+upsBypassGroupLineIndex OBJECT-TYPE
+     SYNTAX PositiveInteger (0..65535)
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The bypass line identifier."
+     ::= { upsBypassGroupEntry 1 }
+
+upsBypassGroupVoltage OBJECT-TYPE
+     SYNTAX NonNegativeInteger
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The present bypass voltage."
+     ::= { upsBypassGroupEntry 2 }
+
+upsBypassGroupCurrent OBJECT-TYPE
+     SYNTAX NonNegativeInteger
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The present bypass current."
+     ::= { upsBypassGroupEntry 3 }
+
+upsBypassGroupPower OBJECT-TYPE
+       SYNTAX     NonNegativeInteger
+       --      "Watts"
+       ACCESS read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "The present true power conveyed by the bypass."
+       ::= { upsBypassGroupEntry 4 }
+
+-- ===========================================================================
+-- upsTestGroup
+--
+-- ===========================================================================
+
+upsTestBatteryTestSettingTime OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The object specify the test time for battery test."
+     ::= { upsTestGroup 1 }
+
+upsBatteryTest OBJECT-TYPE
+        SYNTAX INTEGER {
+            none(1),
+            battTest10sec(2),
+            battTestUntilLow(3),
+            battTestWithTime(4),
+            battTestCancelTest(5),
+            battTestClearInfo(6)
+        }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "This object specify the battery test type and initiate
+                 battery test. If battTestWithTime selected, the test
+                 time is refer to upsTestBatteryTestTime."
+     ::= { upsTestGroup 2 }
+
+upsTestBatteryTestResult OBJECT-TYPE
+        SYNTAX  INTEGER {
+                donePassed(1),
+                doneWarning(2),
+                doneError(3),
+                aborted(4),
+                inProgress(5),
+                noTestsInitiated(6)
+        }
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+         "The results of the current or last UPS diagnostics
+               test performed.  The values for donePassed(1),
+               doneWarning(2), and doneError(3) indicate that the
+               test completed either successfully, with a warning, or
+               with an error, respectively.  The value aborted(4) is
+               returned for tests which are aborted by setting the
+               value of upsTestId to upsTestAbortTestInProgress.
+               Tests which have not yet concluded are indicated by
+               inProgress(5).  The value noTestsInitiated(6)
+               indicates that no previous test results are available,
+               such as is the case when no tests have been run since
+               the last reinitialization of the network management
+               subsystem and the system has no provision for non-
+               volatile storage of test results."
+     ::= { upsTestGroup 3 }
+
+upsTestBatteryTestStartTime OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(1..19))
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+         "The value of the time the test in progress was initiated,
+          or, if no test is in progress, the time the previous test
+          was initiated. If the value of upsTestBatteryTestResult
+          is noTestsInitiated(6), upsTestStartTime has the value
+          01/01/1970 00:00:00."
+     ::= { upsTestGroup 4 }
+
+upsTestBatteryTestElapsedTime OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(11..11))
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+         "The amount of time, in TimeTicks, since the test in
+          progress was initiated, or, if no test is in progress,
+          the previous test took to complete.  If the value of
+          upsTestResultsSummary is noTestsInitiated(6),
+          upsTestElapsedTime has the value 00:00:00.00."
+     ::= { upsTestGroup 5 }
+
+upsBatteryTestScheduleTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF UpsBatteryTestScheduleEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "Table which describes the schedule for automatically battery
+                 test."
+     ::= { upsTestGroup 6 }
+
+upsBatteryTestScheduleEntry OBJECT-TYPE
+        SYNTAX UpsBatteryTestScheduleEntry
+        ACCESS not-accessible
+        STATUS mandatory
+DESCRIPTION ""
+        INDEX { upsBatteryTestScheduleIndex }
+                ::= { upsBatteryTestScheduleTable 1 }
+
+UpsBatteryTestScheduleEntry ::= SEQUENCE {
+                upsBatteryTestScheduleIndex
+                        INTEGER,
+                upsBatteryTestScheduleDay
+                        INTEGER,
+                upsBatteryTestScheduleTime
+                        DisplayString,
+                upsBatteryTestScheduleType
+                        INTEGER,
+                upsBatteryTestScheduleTestWithTime
+                        INTEGER,
+                upsBatteryTestScheduleSpecialDay
+                        DisplayString
+        }
+
+upsBatteryTestScheduleIndex OBJECT-TYPE
+        SYNTAX INTEGER (0..65535)
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The index of battery test scheduled."
+        ::= { upsBatteryTestScheduleEntry 1 }
+
+upsBatteryTestScheduleDay    OBJECT-TYPE
+        SYNTAX  INTEGER {
+                sunday(1),
+                monday(2),
+                tuesday(3),
+                wednesday(4),
+                thursday(5),
+                friday(6),
+                saturday(7),
+                specialDay(8),
+                none(9)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The weekday on which the UPS should start battery test."
+        ::= { upsBatteryTestScheduleEntry 2 }
+
+upsBatteryTestScheduleTime OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(5..5))
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+         "The time that the battery test will be initiated in hh:mm format."
+        ::= { upsBatteryTestScheduleEntry 3 }
+
+upsBatteryTestScheduleType    OBJECT-TYPE
+        SYNTAX  INTEGER {
+            none(1),
+            battTest10sec(2),
+            battTestUntilLow(3),
+            battTestWithTime(4)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The type of battery test."
+        ::= { upsBatteryTestScheduleEntry 4 }
+
+upsBatteryTestScheduleTestWithTime    OBJECT-TYPE
+        SYNTAX  INTEGER {
+            supported(1),
+            notSupported(2)
+                }
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The battTestWithTime of battery test is supported or not."
+        ::= { upsBatteryTestScheduleEntry 5 }
+
+upsBatteryTestScheduleSpecialDay OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(10..10))
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+         "The special day that the battery test will be initiated in dd/mm/yyyy format."
+        ::= { upsBatteryTestScheduleEntry 6 }
+
+-- ===========================================================================
+-- upsControlGroup
+--
+-- ===========================================================================
+
+upsControlUpsShutdownDelay OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The delay in seconds the UPS remains on after being told
+                 to turn off."
+        ::= { upsControlGroup 1 }
+
+upsControlUpsSleepTime OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The time in minutes for the UPS to go to sleep  when
+                 instructed.  When in sleep mode, the UPS will not provide
+                 output power regardless of the input line state.  Once the
+                 specified time has elapsed, output power will be restored.
+
+                 This is a configuration setting.  The UPS will not go to
+                 sleep until told to do so by the manager from a management
+                 station.
+
+                 Any input value is allowed, however the UPS only recognizes
+                 0 - 9999 minutes in one minute increments.
+
+                 If the provided value is higher than the highest acceptable
+                 value, the highest acceptable value is used."
+        ::= { upsControlGroup 2 }
+
+upsControlUpsOnOffControl OBJECT-TYPE
+        SYNTAX  INTEGER {
+                turnUpsOff(1),
+                putUpsToSleep(2),
+                turnOnUpsOrCancelShutdown(3),
+                none(4)
+           }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Setting this variable to control UPS output status.
+                 turnUpsOff(1) will set UPS turn off output after
+                 upsControlUpsShutdownDelay period expired.
+                 putUpsToSleep(2) will set UPS turn off output after
+                 upsControlUpsShutdownDelay period expired, UPS output
+                 will stay off with the period defined by
+                 upsControlUpsSleepTime, then turn output on.
+                 turnOnUpsOrCancelShutdown(3) can used to turn on UPS
+                 output, or cancel any shutdown process."
+        ::= { upsControlGroup 3 }
+
+upsControlShutdownParametersTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF UpsControlShutdownParametersEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "Table which describes the parametes for shutdown process
+                 when shutdown event occurs"
+                ::= { upsControlGroup 4 }
+
+upsControlShutdownParametersEntry OBJECT-TYPE
+        SYNTAX UpsControlShutdownParametersEntry
+        ACCESS not-accessible
+        STATUS mandatory
+DESCRIPTION ""
+        INDEX { upsControlEvent }
+                ::= { upsControlShutdownParametersTable 1 }
+
+UpsControlShutdownParametersEntry  ::= SEQUENCE {
+                upsControlEvent            INTEGER,
+                upsControlEventStatus      INTEGER,
+                upsControlDelay            INTEGER,
+                upsControlFirstWarning     INTEGER,
+                upsControlWarningInterval  INTEGER
+                }
+
+upsControlEvent OBJECT-TYPE
+--   SYNTAX DisplayString
+        SYNTAX INTEGER {
+            acFail(1),
+            batteryLow (2),
+            upsOverload (3),
+            upsOverTempeature (4),
+            weeklySchedule (5),
+            specialDaySchedule (6),
+            emdTemperatureOverThreshold (7),
+            emdAlarm1 (8),
+            emdAlarm2 (9)
+        }
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                " The shutdown event identification "
+                ::= { upsControlShutdownParametersEntry 1 }
+
+upsControlEventStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+--          enable(1),
+--          disable(2)
+            disable(1),
+            warning(2),
+            clientShutdown(3),
+            upsTurnOff(4)
+        }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Status of the corresponding shutdown Event.
+                 When set to disable(), shutdown process will not start when
+                 corresponding event occured."
+                 ::= { upsControlShutdownParametersEntry 2 }
+
+upsControlDelay OBJECT-TYPE
+        SYNTAX INTEGER (0..10080)
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The Delay after the occurance of the curresponding shutdown
+                 event that USHA should issue shutdown request to
+                 connected clients. For WeeklyScheduledShutdown and
+                 SpecialScheduledShutdown, this is the time before the
+                 configured Shutdowntime when USHA will start sending the
+                 warning message to the connected clients. The value is in
+                 units of minutes."
+                 ::= { upsControlShutdownParametersEntry 3 }
+
+upsControlFirstWarning OBJECT-TYPE
+        SYNTAX INTEGER (0..3600)
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The delay after the occurance of the curresponding shutdown
+                 event that the USHA will start sending the warning
+                 message to the connected clients. The value is in units of
+                 seconds"
+                 ::= { upsControlShutdownParametersEntry 4 }
+
+upsControlWarningInterval OBJECT-TYPE
+        SYNTAX INTEGER (0..3600)
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The frequency of sending warning messages to the connected
+                clients when the curresponding shutdown event occurs.
+                The value is in units of seconds."
+                ::= { upsControlShutdownParametersEntry 5 }
+
+upsControlWeeklyScheduleTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF UpsControlWeeklyScheduleEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "The table to schedule shutting down the ups by weekly."
+        ::= { upsControlGroup 5 }
+
+upsControlWeeklyScheduleEntry OBJECT-TYPE
+        SYNTAX UpsControlWeeklyScheduleEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "The entries for each day."
+        INDEX  { upsControlWeeklyIndex }
+        ::= {upsControlWeeklyScheduleTable 1 }
+
+UpsControlWeeklyScheduleEntry ::= SEQUENCE {
+                upsControlWeeklyIndex
+                        INTEGER,
+                upsControlWeeklyShutdownDay
+                        INTEGER,
+                upsControlWeeklyShutdownTime
+                        DisplayString,
+                upsControlWeeklyRestartDay
+                        INTEGER,
+                upsControlWeeklyRestartTime
+                        DisplayString
+        }
+
+upsControlWeeklyIndex OBJECT-TYPE
+        SYNTAX INTEGER (0..65535)
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The index of scheduled events."
+        ::= { upsControlWeeklyScheduleEntry 1 }
+
+upsControlWeeklyShutdownDay    OBJECT-TYPE
+        SYNTAX  INTEGER {
+                sunday(1),
+                monday(2),
+                tuesday(3),
+                wednesday(4),
+                thursday(5),
+                friday(6),
+                saturday(7),
+                none(8)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The weekday on which the UPS should shut down."
+        ::= { upsControlWeeklyScheduleEntry 2 }
+
+upsControlWeeklyShutdownTime OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(5..5))
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+         "The time that the process of shutting down the UPS will be initiated
+        in hh:mm format."
+        ::= { upsControlWeeklyScheduleEntry 3 }
+
+upsControlWeeklyRestartDay     OBJECT-TYPE
+        SYNTAX  INTEGER {
+                sunday(1),
+                monday(2),
+                tuesday(3),
+                wednesday(4),
+                thursday(5),
+                friday(6),
+                saturday(7),
+                none(8)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The weekday on which the UPS should restart"
+
+        ::= { upsControlWeeklyScheduleEntry 4 }
+
+upsControlWeeklyRestartTime OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(5..5))
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+        "The time the UPS will restart in hh:mm format."
+        ::= { upsControlWeeklyScheduleEntry 5 }
+
+upsControlSpecialScheduleTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF UpsControlSpecialScheduleEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "The table to schedule shutting down the ups."
+        ::= { upsControlGroup 6 }
+
+upsControlSpecialScheduleEntry OBJECT-TYPE
+        SYNTAX UpsControlSpecialScheduleEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "The entries for each day."
+        INDEX  { upsControlSpecialIndex }
+        ::= {upsControlSpecialScheduleTable 1 }
+
+UpsControlSpecialScheduleEntry ::= SEQUENCE {
+                upsControlSpecialIndex
+                        INTEGER,
+                upsControlSpecialShutdownDay
+                        DisplayString,
+                upsControlSpecialShutdownTime
+                        DisplayString,
+                upsControlSpecialRestartDay
+                        DisplayString,
+                upsControlSpecialRestartTime
+                        DisplayString
+        }
+
+upsControlSpecialIndex OBJECT-TYPE
+        SYNTAX INTEGER (0..65535)
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The index of scheduled events."
+        ::= { upsControlSpecialScheduleEntry 1 }
+
+upsControlSpecialShutdownDay    OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(10..10))
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The date on which the UPS should shut down in dd/mm/yyyy
+                 format."
+         ::= { upsControlSpecialScheduleEntry 2 }
+
+upsControlSpecialShutdownTime OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(5..5))
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+         "The time that the process of shutting down the UPS will be initiated
+          in hh:mm format"
+        ::= { upsControlSpecialScheduleEntry 3 }
+
+upsControlSpecialRestartDay     OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(10..10))
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The date on which the UPS should restart in dd/mm/yyyy format"
+
+        ::= { upsControlSpecialScheduleEntry 4 }
+
+upsControlSpecialRestartTime OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(5..5))
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The time the UPS will restart in hh:mm format."
+        ::= { upsControlSpecialScheduleEntry 5 }
+
+-- ===========================================================================
+--
+-- upsConfigGroup
+--
+-- ===========================================================================
+
+upsConfigGroupInputVoltage OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+               "The magnitude of the nominal input voltage.  On those
+               systems which support read-write access to this
+               object, if there is an attempt to set this variable to
+               a value that is not supported, the request must be
+               rejected and the agent shall respond with an
+               appropriate error message, i.e., badValue for SNMPv1,
+               or inconsistentValue for SNMPv2."
+     ::= { upsConfigGroup 1 }
+
+upsConfigGroupInputFreq OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+               "The nominal input frequency.  On those systems which
+               support read-write access to this object, if there is
+               an attempt to set this variable to a value that is not
+               supported, the request must be rejected and the agent
+               shall respond with an appropriate error message, i.e.,
+               badValue for SNMPv1, or inconsistentValue for SNMPv2."
+     ::= { upsConfigGroup 2 }
+
+upsConfigGroupOutputVoltage OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+               "The magnitude of the nominal output voltage.  On
+               those systems which support read-write access to this
+               object, if there is an attempt to set this variable to
+               a value that is not supported, the request must be
+               rejected and the agent shall respond with an
+               appropriate error message, i.e., badValue for SNMPv1,
+               or inconsistentValue for SNMPv2."
+     ::= { upsConfigGroup 3 }
+
+upsConfigGroupOutputFreq OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+               "The nominal output frequency.  On those systems which
+               support read-write access to this object, if there is
+               an attempt to set this variable to a value that is not
+               supported, the request must be rejected and the agent
+               shall respond with an appropriate error message, i.e.,
+               badValue for SNMPv1, or inconsistentValue for SNMPv2."
+     ::= { upsConfigGroup 4 }
+
+upsConfigGroupOutputVA OBJECT-TYPE
+       SYNTAX     NonNegativeInteger
+       --      "Volt-Amps"
+       ACCESS read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "The magnitude of the nominal Volt-Amp rating."
+       ::= { upsConfigGroup 5 }
+
+upsConfigGroupOutputPower OBJECT-TYPE
+       SYNTAX     NonNegativeInteger
+       --      "Watts"
+       ACCESS read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "The magnitude of the nominal true power rating."
+       ::= { upsConfigGroup 6 }
+
+upsConfigGroupOverTemperatureSetPoint OBJECT-TYPE
+       SYNTAX     NonNegativeInteger (10..70)
+       ACCESS read-write
+       STATUS     mandatory
+       DESCRIPTION
+               "The maximum temperature allowed before the UPS
+               operation temperature is too high."
+       ::= { upsConfigGroup 7 }
+
+upsConfigGroupOverLoadSetPoint OBJECT-TYPE
+       SYNTAX     NonNegativeInteger (0..120)
+       ACCESS read-write
+       STATUS     mandatory
+       DESCRIPTION
+               "The maximum output load allowed before the load is
+               too high for UPS operation."
+       ::= { upsConfigGroup 8 }
+
+
+
+-- ===========================================================================
+--
+-- upsClients
+--
+-- ===========================================================================
+
+upsClientsConnectedNum OBJECT-TYPE
+       SYNTAX     NonNegativeInteger
+       ACCESS read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "The count of clients which have resgistered for UPS
+               shutdown control."
+       ::= { upsClients 1 }
+
+upsDevicesTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF UpsDevicesEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "The devices powered by UPS and registered to USHA"
+--        INDEX  { indexOfDevice }
+        ::= { upsClients 2 }
+
+upsDevicesEntry OBJECT-TYPE
+        SYNTAX UpsDevicesEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "The devices protected by USHA"
+--        INDEX  { trapsIndex}
+        INDEX  { indexOfDevice}
+        ::= { upsDevicesTable 1 }
+
+UpsDevicesEntry ::=
+        SEQUENCE {
+                indexOfDevice
+                        NonNegativeInteger,
+                addrOfDevice
+                        IpAddress,
+                nameOfDevice
+                        DisplayString,
+                timeOfConnection
+                        DisplayString,
+                timeOfConnectionTime
+                        DisplayString,
+                timeOfConnectionTimeout
+                        INTEGER
+        }
+
+indexOfDevice OBJECT-TYPE
+        SYNTAX NonNegativeInteger
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The index of the device that is plugged into the UPS."
+        ::= { upsDevicesEntry 1 }
+
+addrOfDevice OBJECT-TYPE
+        SYNTAX IpAddress
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The ip address of the device."
+        ::= { upsDevicesEntry 2 }
+
+nameOfDevice OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..31))
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The name/description of the device plugged into the UPS."
+        ::= { upsDevicesEntry 3 }
+
+timeOfConnection OBJECT-TYPE
+        SYNTAX DisplayString
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The device registered to USHA"
+        ::= { upsDevicesEntry 4 }
+
+timeOfConnectionTime OBJECT-TYPE
+        SYNTAX DisplayString
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The device registered time to USHA."
+        ::= { upsDevicesEntry 5 }
+
+timeOfConnectionTimeout OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The device timeout counter. Unit: 10 seconds"
+        ::= { upsDevicesEntry 6 }
+
+-- ===========================================================================
+--
+-- agentConfig
+--
+-- ===========================================================================
+
+agentConfigIpaddress OBJECT-TYPE
+        SYNTAX IpAddress
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                " The ip address that NMS can identify the managed
+                device"
+        ::= { agentConfig 1}
+
+agentConfigGateway OBJECT-TYPE
+        SYNTAX IpAddress
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                " The default gateway that allow device managed
+                through routers "
+        ::= { agentConfig 2}
+
+agentConfigSubnetMask OBJECT-TYPE
+        SYNTAX IpAddress
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                " Internet address subnet mask"
+        ::= { agentConfig 3}
+
+agentConfigDate OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (10..10))
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The date in agent, format is (dd/mm/yyyy)"
+        ::= { agentConfig 4}
+
+agentConfigTime OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (8..8))
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The time in agent, format is (hh:mm:ss)"
+        ::= { agentConfig 5}
+
+agentConfigPrimaryTimeServer       OBJECT-TYPE
+        SYNTAX  IpAddress
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "The primary time server is responsible for sending the
+                 correct time to the agent."
+        ::= { agentConfig 6 }
+
+agentConfigSecondaryTimeServer     OBJECT-TYPE
+        SYNTAX  IpAddress
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "The secondary time server is responsible for sending the
+                 correct time to the agent."
+        ::= { agentConfig 7 }
+
+agentConfigHistoryLogFrequency OBJECT-TYPE
+        SYNTAX INTEGER (5..28800) -- in seconds
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The frequency of the updation of the history log. The value
+                 is in seconds"
+        ::= { agentConfig 8 }
+
+agentConfigExtHistoryLogFrequency      OBJECT-TYPE
+        SYNTAX INTEGER (1..10080) -- in minutes
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                 "The ups parameters are sampled at the rate governed by the
+                  mconfigHistroyLogFrequency. These sampled values are further
+                  conslidated over period of time which is determined by this
+                  object."
+        ::= { agentConfig 9 }
+
+agentConfigPollRate OBJECT-TYPE
+        SYNTAX INTEGER (1..999) -- in seconds
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                " The frequency that proxy agent polls the connected
+                UPS in JBUS protocol. (unit : second)"
+        ::= { agentConfig 10}
+
+agentConfigBaudRate OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The serial port communication speed. only 9600 allowed"
+        ::= { agentConfig 11}
+
+agentConfigDhcpStatue OBJECT-TYPE
+        SYNTAX  INTEGER {
+                enabled(1),
+                disabled(2)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Enable or disable DHCP/BootP capability"
+        ::= { agentConfig 12}
+
+agentConfigTelnetStatue OBJECT-TYPE
+        SYNTAX  INTEGER {
+                enabled(1),
+                disabled(2)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Enable or disable telnet access"
+        ::= { agentConfig 13}
+
+agentConfigTftpStatue OBJECT-TYPE
+        SYNTAX  INTEGER {
+                enabled(1),
+                disabled(2)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Enable or disable network upgrade capability"
+        ::= { agentConfig 14}
+
+agentConfigResetToDefault OBJECT-TYPE
+        SYNTAX  INTEGER {
+                reset(1),
+                nothing(2)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Reset all parameters of USHA to default value"
+        ::= { agentConfig 15}
+
+agentConfigRestart OBJECT-TYPE
+        SYNTAX  INTEGER {
+                restart(1),
+                nothing(2)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Restart USHA"
+        ::= { agentConfig 16}
+
+agentConfigClearAgentLog OBJECT-TYPE
+        SYNTAX  INTEGER {
+                clear(1),
+                nothing(2)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Clear agent log data"
+        ::= { agentConfig 17}
+
+agentConfigClearEventLog OBJECT-TYPE
+        SYNTAX  INTEGER {
+                clear(1),
+                nothing(2)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Clear event log data"
+        ::= { agentConfig 18}
+
+agentConfigClearExtHistoryLog OBJECT-TYPE
+        SYNTAX  INTEGER {
+                clear(1),
+                nothing(2)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Clear extented history log data"
+        ::= { agentConfig 19}
+
+agentConfigClearHistoryLog OBJECT-TYPE
+        SYNTAX  INTEGER {
+                clear(1),
+                nothing(2)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Clear history log data"
+        ::= { agentConfig 20}
+
+agentConfigTrapRetryCount OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The count of repeat traps to send to NMS before trap
+                 acknowledge received."
+        ::= { agentConfig 21}
+
+agentConfigTrapRetryTime OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The time between retry traps sned to NMS."
+        ::= { agentConfig 22}
+
+agentConfigTrapAckSignature OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The signature of trap acknowledge."
+        ::= { agentConfig 23}
+
+agentConfigMibVersion OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The version of MIB spec."
+        ::= { agentConfig 24 }
+
+agentConfigTrapsReceiversTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF AgentConfigTrapsReceiversEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "A list of managers to send traps to.  The number of
+                 entries is given by the value of agentConfigNumTrapReceivers"
+        ::= { agentConfig 25}
+
+agentConfigTrapsReceiversEntry OBJECT-TYPE
+        SYNTAX AgentConfigTrapsReceiversEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "The managers to send traps to."
+        INDEX  { trapsIndex}
+        ::= { agentConfigTrapsReceiversTable 1 }
+
+AgentConfigTrapsReceiversEntry ::=
+        SEQUENCE {
+                trapsIndex
+                        INTEGER,
+                trapsReceiverAddr
+                        IpAddress,
+                receiverCommunityString
+                         DisplayString,
+                receiverNmsType
+                        INTEGER,
+                receiverSeverityLevel
+                        INTEGER,
+                receiverDescription
+                         DisplayString
+        }
+
+trapsIndex OBJECT-TYPE
+        SYNTAX INTEGER (0..65535)
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The index to a trap receiver entry."
+        ::= { agentConfigTrapsReceiversEntry 1 }
+
+trapsReceiverAddr OBJECT-TYPE
+        SYNTAX IpAddress
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The IP address of the manager to send a trap to."
+        ::= { agentConfigTrapsReceiversEntry 2 }
+
+receiverCommunityString OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..19))
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The community name to use in the trap when
+                 sent to the manager."
+        ::= { agentConfigTrapsReceiversEntry 3 }
+
+receiverNmsType OBJECT-TYPE
+        SYNTAX  INTEGER {
+                none(1),
+                rfc1628-trap(2),
+                usha-trap(3)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The trap group that NMS desired."
+        ::= { agentConfigTrapsReceiversEntry 4 }
+
+receiverSeverityLevel OBJECT-TYPE
+        SYNTAX  INTEGER {
+                informational(1),
+                warning(2),
+                severe(3)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The severity level of traps to be received by this manager."
+        ::= { agentConfigTrapsReceiversEntry 5 }
+
+receiverDescription OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..31))
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Description of trap receivers"
+        ::= { agentConfigTrapsReceiversEntry 6 }
+
+agentConfigAccessControlTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF AgentConfigAccessControlEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "A list of managers which can access USHA with private
+                community string."
+        ::= { agentConfig 26}
+
+agentConfigAccessControlEntry OBJECT-TYPE
+        SYNTAX AgentConfigAccessControlEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "The managers."
+        INDEX  { trapsIndex}
+        ::= { agentConfigAccessControlTable 1 }
+
+AgentConfigAccessControlEntry ::=
+        SEQUENCE {
+                accessIndex
+                        INTEGER,
+                accessControlAddr
+                        IpAddress,
+                accessCommunityString
+                         DisplayString,
+                accessControlMode
+                        INTEGER
+        }
+
+accessIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The index to a access control entry."
+        ::= { agentConfigAccessControlEntry 1 }
+
+accessControlAddr OBJECT-TYPE
+        SYNTAX IpAddress
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The IP address of the manager to access USHA"
+        ::= { agentConfigAccessControlEntry 2 }
+
+accessCommunityString OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..19))
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The community name to use in the manager when
+                 access USHA"
+        ::= { agentConfigAccessControlEntry 3 }
+
+accessControlMode OBJECT-TYPE
+        SYNTAX  INTEGER {
+                readOnly (1),
+                readWrite (2),
+                notAccess (3)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Access type, only read/Write access type can change parameter
+                 of USHA"
+        ::= { agentConfigAccessControlEntry 4 }
+
+agentConfigDefaultLanguage OBJECT-TYPE
+        SYNTAX  INTEGER {
+                                auto(1),
+                                english(2),
+                                traditionalChinese(3),
+                                simplifiedChinese(4)
+                        }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                        "The default languauge for browser, when set to auto(1)
+                         USHA will send page in the language depends on the
+                         request language of browser."
+        ::= { agentConfig 27 }
+
+
+-- ===========================================================================
+--
+-- emdStatus
+--
+-- ===========================================================================
+
+emdSatatusEmdType OBJECT-TYPE
+        SYNTAX  INTEGER {
+                                unknown(1),
+                                disabled(2),
+                                emdHT(3),
+                                emdT(4)
+                        }
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The type of EMD plugged into the port."
+        ::= { emdStatus 1}
+
+emdSatatusTemperature OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The measurement of EMD temperature, in 0.1 degree"
+        ::= { emdStatus 2}
+
+emdSatatusHumidity OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The measurement of EMD humidity, in 0.1 degree"
+        ::= { emdStatus 3}
+
+emdSatatusAlarm1 OBJECT-TYPE
+        SYNTAX  INTEGER {
+                                unknow(1),
+                                disabled(2),
+                                active(3),
+                                inactive(4)
+                        }
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The EMD alarm-1 status"
+        ::= { emdStatus 4}
+
+emdSatatusAlarm2 OBJECT-TYPE
+        SYNTAX  INTEGER {
+                                unknow(1),
+                                disabled(2),
+                                active(3),
+                                inactive(4)
+                        }
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The EMD alarm-2 status"
+        ::= { emdStatus 5}
+
+
+-- ===========================================================================
+--
+-- emdConfig
+--
+-- ===========================================================================
+
+usahEmdConfigEmdConfig OBJECT-TYPE
+        SYNTAX  INTEGER {
+                                disabled(1),
+                                auto(2)
+                        }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Enable or disable to detect presence of EMD"
+        ::= { emdConfig 1}
+
+emdConfigEmdName    OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..15))
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Description of EMD"
+        ::= { emdConfig 2}
+
+emdConfigTemperature OBJECT IDENTIFIER ::= { emdConfig 3 }
+
+emdConfigTempName   OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..15))
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Description of EMD temperature sensor"
+        ::= { emdConfigTemperature 1}
+
+emdConfigTempHighSetPoint OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The set point for high temperature warning, in degrees"
+        ::= { emdConfigTemperature 2}
+
+emdConfigTempHighStatus   OBJECT-TYPE
+        SYNTAX  INTEGER {
+                                enabled(1),
+                                disabled(2)
+                        }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "To enable/disable high set point check with emd temperature."
+        ::= { emdConfigTemperature 3}
+
+emdConfigTempLowSetPoint OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The set point for low temperature warning, in degrees"
+        ::= { emdConfigTemperature 4}
+
+emdConfigTempLowStatus   OBJECT-TYPE
+        SYNTAX  INTEGER {
+                                enabled(1),
+                                disabled(2)
+                        }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "To enable/disable low set point check with emd temperature."
+        ::= { emdConfigTemperature 5}
+
+emdConfigTempOffset OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The offset to calibrate temperature of EMD, in degrees"
+        ::= { emdConfigTemperature 6}
+
+emdConfigHumidity OBJECT IDENTIFIER ::= { emdConfig 4 }
+
+emdConfigHumidityName OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..15))
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Description of EMD humidity sensor"
+        ::= { emdConfigHumidity 1}
+
+emdConfigHumidityHighSetPoint OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The set point for high humidity warning, in %"
+        ::= { emdConfigHumidity 2}
+
+emdConfigHumidityLowStatus   OBJECT-TYPE
+        SYNTAX  INTEGER {
+                                enabled(1),
+                                disabled(2)
+                        }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "To enable/disable high set point check with emd humidity."
+        ::= { emdConfigHumidity 3}
+
+emdConfigHumidityLowSetPoint OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The set point for low humidity warning, in %"
+        ::= { emdConfigHumidity 4}
+
+emdConfigHumidityHighStatus   OBJECT-TYPE
+        SYNTAX  INTEGER {
+                                enabled(1),
+                                disabled(2)
+                        }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "To enable/disable low set point check with emd humidity."
+        ::= { emdConfigHumidity 5}
+
+emdConfigHumidityOffset OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The offset to calibrate humidity of EMD, in %"
+        ::= { emdConfigHumidity 6}
+
+emdConfigAlarm1 OBJECT IDENTIFIER ::= { emdConfig 5 }
+
+emdConfigAlarm1Name OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..15))
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Description of EMD alarm-1"
+        ::= { emdConfigAlarm1 1}
+
+emdConfigAlarm1Type OBJECT-TYPE
+        SYNTAX  INTEGER {
+                                disabled(1),
+                                nomralOpen(2),
+                                normalClose(3)
+                        }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The alarm-1 operation type"
+        ::= { emdConfigAlarm1 2 }
+
+emdConfigAlarm2 OBJECT IDENTIFIER ::= { emdConfig 6 }
+
+emdConfigAlarm2Name OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..15))
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Description of EMD alarm-2"
+        ::= { emdConfigAlarm2 1}
+
+emdConfigAlarm2Type OBJECT-TYPE
+        SYNTAX  INTEGER {
+                                disabled(1),
+                                nomralOpen(2),
+                                normalClose(3)
+                        }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The alarm-1 operation type"
+        ::= { emdConfigAlarm2 2 }
+
+-- ===========================================================================
+-- upsTrapGroup
+--
+-- Traps group
+-- ===========================================================================
+
+   -- This section defines the well-known notifications sent by
+   -- UPS agents.
+   -- Care must be taken to insure that no particular notification
+   -- is sent to a single receiving entity more often than once
+   -- every five seconds.
+
+ushaPowerRestored TRAP-TYPE
+        ENTERPRISE upsTrapGroup
+        DESCRIPTION
+                "INFORMATION: Utility power has been restore."
+        ::= 1
+
+ushaPowerFail       TRAP-TYPE
+        ENTERPRISE      upsTrapGroup
+        DESCRIPTION
+                "WARNING: Utility power not available."
+        ::= 2
+
+ushaReturnFromLowBattery TRAP-TYPE
+        ENTERPRISE upsTrapGroup
+        DESCRIPTION
+                "INFORMATION: The UPS has return from a low battery condition."
+        ::= 3
+
+ushaLowBattery TRAP-TYPE
+        ENTERPRISE upsTrapGroup
+        DESCRIPTION
+                "SEVERE: The UPS batteries are low and will soon be exhausted."
+        ::= 4
+
+ushaUpsOk   TRAP-TYPE
+        ENTERPRISE      upsTrapGroup
+        DESCRIPTION
+                "INFORMATION: The ups is working fine."
+        ::= 5
+
+ushaUpsFailed       TRAP-TYPE
+        ENTERPRISE      upsTrapGroup
+        DESCRIPTION
+                "SEVERE: The ups is not working fine."
+        ::= 6
+
+ushaUpsNotOnBattery TRAP-TYPE
+        ENTERPRISE upsTrapGroup
+        DESCRIPTION
+                "INFORMATION: The UPS is not on battery power."
+        ::= 7
+
+ushaUpsOnBattery TRAP-TYPE
+        ENTERPRISE upsTrapGroup
+        VARIABLES {
+        upsBatteryGroupEstimatedChargeRemaining,
+        upsBatteryGroupVoltage,
+        upsBatteryGroupSecondsOnBattery
+        }
+        DESCRIPTION
+                "WARNING: The UPS has switched to battery backup power."
+        ::= 8
+
+ushaTestOver TRAP-TYPE
+        ENTERPRISE upsTrapGroup
+        VARIABLES {
+        upsBatteryTest,
+        upsTestBatteryTestSettingTime,
+        upsTestBatteryTestResult,
+        upsTestBatteryTestStartTime,
+        upsTestBatteryTestElapsedTime
+        }
+        DESCRIPTION
+                "INFORMATION: The testing of UPS is completed."
+        ::= 9
+
+ushaTestInProgress TRAP-TYPE
+        ENTERPRISE upsTrapGroup
+        DESCRIPTION
+                "INFORMATION: The testing is going on ups."
+        ::= 10
+
+ushaBypassOn TRAP-TYPE
+        ENTERPRISE upsTrapGroup
+        DESCRIPTION
+                "INFORMATION: The UPS has enabled bypass."
+        ::= 11
+
+ushaUpsOnline TRAP-TYPE
+        ENTERPRISE upsTrapGroup
+                DESCRIPTION
+                        "INFORMATION: The UPS is not on Bypass and return to normal status."
+        ::= 12
+
+ushaCommunicationLost TRAP-TYPE
+        ENTERPRISE upsTrapGroup
+        DESCRIPTION
+                 "SEVERE: Communication to the UPS has been lost."
+        ::= 13
+
+ushaCommunicationEstablished TRAP-TYPE
+        ENTERPRISE upsTrapGroup
+        DESCRIPTION
+                "INFORMATION: Communication with the UPS has been established."
+        ::= 14
+
+ushaUpsGoingDown    TRAP-TYPE
+        ENTERPRISE      upsTrapGroup
+        DESCRIPTION
+                "WARNING: The ups has been given shutdown command."
+        ::= 15
+
+ushaUpsTurnedOff    TRAP-TYPE
+        ENTERPRISE      upsTrapGroup
+        DESCRIPTION
+                "INFORMATION: UPS turn off."
+        ::= 16
+
+ushaUpsSleeping             TRAP-TYPE
+        ENTERPRISE      upsTrapGroup
+        VARIABLES {
+        upsControlUpsSleepTime
+        }
+        DESCRIPTION
+                "INFORMATION: UPS has entered sleep mode."
+        ::= 17
+
+ushaUpsWokeUp               TRAP-TYPE
+        ENTERPRISE      upsTrapGroup
+        DESCRIPTION
+                "INFORMATION: The UPS woke up from sleep mode."
+        ::= 18
+
+ushaUpsRebooted             TRAP-TYPE
+        ENTERPRISE      upsTrapGroup
+        DESCRIPTION
+                "INFORMATION: The UPS is reboot."
+        ::= 19
+
+ushaUpsShutdownCancelled TRAP-TYPE
+        ENTERPRISE      upsTrapGroup
+        DESCRIPTION
+                "INFORMATION: The UPS shutdown process had been cancelled."
+        ::= 20
+
+ushaUpsNotOverTemperature   TRAP-TYPE
+        ENTERPRISE      upsTrapGroup
+        VARIABLES {
+        upsBatteryGroupTemperature,
+        upsConfigGroupOverTemperatureSetPoint
+        }
+        DESCRIPTION
+                "INFORMATION: The UPS internal temperature return to normal."
+        ::= 21
+
+ushaUpsOverTemperature   TRAP-TYPE
+        ENTERPRISE      upsTrapGroup
+        VARIABLES {
+        upsBatteryGroupTemperature,
+        upsConfigGroupOverTemperatureSetPoint
+        }
+        DESCRIPTION
+                "SEVERE: The UPS temperature is too high."
+        ::= 22
+
+ushaUpsNotOverLoad       TRAP-TYPE
+        ENTERPRISE      upsTrapGroup
+        VARIABLES {
+        upsOutputGroupPercentLoad,
+        upsConfigGroupOverLoadSetPoint
+        }
+        DESCRIPTION
+                "INFORMATION: The UPS load return from overload."
+        ::= 23
+
+ushaUpsOverLoad   TRAP-TYPE
+        ENTERPRISE      upsTrapGroup
+        VARIABLES {
+        upsOutputGroupPercentLoad,
+        upsConfigGroupOverLoadSetPoint
+        }
+        DESCRIPTION
+                "SEVERE: The UPS is overload."
+        ::= 24
+
+ushaUpsModuleInserted   TRAP-TYPE
+        ENTERPRISE      upsTrapGroup
+        DESCRIPTION
+                "WARNING: UPS Battery Module plug-in."
+        ::= 25
+
+ushaUpsModuleRemoved    TRAP-TYPE
+        ENTERPRISE      upsTrapGroup
+        DESCRIPTION
+                "WARNING: UPS Battery Module unplug."
+        ::= 26
+
+emdTemperatureNotHigh   TRAP-TYPE
+        ENTERPRISE      upsTrapGroup
+        VARIABLES {
+        emdSatatusTemperature,
+        emdConfigTempHighSetPoint,
+        emdConfigTempName
+        }
+        DESCRIPTION
+                "INFORMATION: EMD Temperature not over high Set point."
+        ::= 27
+
+emdTemperatureTooHigh   TRAP-TYPE
+        ENTERPRISE      upsTrapGroup
+        VARIABLES {
+        emdSatatusTemperature,
+        emdConfigTempHighSetPoint,
+        emdConfigTempName
+        }
+        DESCRIPTION
+                "WARNING: EMD Temperature over high Set point."
+        ::= 28
+
+emdTemperatureNotLow    TRAP-TYPE
+        ENTERPRISE      upsTrapGroup
+        VARIABLES {
+        emdSatatusTemperature,
+        emdConfigTempLowSetPoint,
+        emdConfigTempName
+        }
+        DESCRIPTION
+                "INFORMATION: EMD Temperature not under low Set point."
+        ::= 29
+
+emdTemperatureTooLow    TRAP-TYPE
+        ENTERPRISE      upsTrapGroup
+        VARIABLES {
+        emdSatatusTemperature,
+        emdConfigTempLowSetPoint,
+        emdConfigTempName
+        }
+        DESCRIPTION
+                "WARNING: EMD Temperature under low Set point."
+        ::= 30
+
+emdHumidityNotHigh      TRAP-TYPE
+        ENTERPRISE      upsTrapGroup
+        VARIABLES {
+        emdSatatusHumidity,
+        emdConfigHumidityHighSetPoint,
+        emdConfigHumidityName
+        }
+        DESCRIPTION
+                "INFORMATION: EMD Humidity not over high Set point."
+        ::= 31
+
+emdHumidityTooHigh      TRAP-TYPE
+        ENTERPRISE      upsTrapGroup
+        VARIABLES {
+        emdSatatusHumidity,
+        emdConfigHumidityHighSetPoint,
+        emdConfigHumidityName
+        }
+        DESCRIPTION
+                "WARNING: EMD Humidity over high Set point."
+        ::= 32
+
+emdHumidityNotLow       TRAP-TYPE
+        ENTERPRISE      upsTrapGroup
+        VARIABLES {
+        emdSatatusHumidity,
+        emdConfigHumidityLowSetPoint,
+        emdConfigHumidityName
+        }
+        DESCRIPTION
+                "INFORMATION: EMD Humidity not under low Set point."
+        ::= 33
+
+emdHumidityTooLow       TRAP-TYPE
+        ENTERPRISE      upsTrapGroup
+        VARIABLES {
+        emdSatatusHumidity,
+        emdConfigHumidityLowSetPoint,
+        emdConfigHumidityName
+        }
+        DESCRIPTION
+                "WARNING: EMD Humidity under low Set point."
+        ::= 34
+
+emdAlarm1Normal TRAP-TYPE
+        ENTERPRISE      upsTrapGroup
+        VARIABLES {
+        emdConfigAlarm1Type,
+        emdConfigAlarm1Name
+        }
+        DESCRIPTION
+                "INFORMATION: EMD Alarm-1 not active."
+        ::= 35
+
+emdAlarm1Active TRAP-TYPE
+        ENTERPRISE      upsTrapGroup
+        VARIABLES {
+        emdConfigAlarm1Type,
+        emdConfigAlarm1Name
+        }
+        DESCRIPTION
+                "WARNING: EMD Alarm-1 activated."
+        ::= 36
+
+emdAlarm2Normal TRAP-TYPE
+        ENTERPRISE      upsTrapGroup
+        VARIABLES {
+        emdConfigAlarm2Type,
+        emdConfigAlarm2Name
+        }
+        DESCRIPTION
+                "INFORMATION: EMD Alarm-2 not active."
+        ::= 37
+
+emdAlarm2Active TRAP-TYPE
+        ENTERPRISE      upsTrapGroup
+        VARIABLES {
+        emdConfigAlarm2Type,
+        emdConfigAlarm2Name
+        }
+        DESCRIPTION
+                "WARNING: EMD Alarm-2 activated."
+        ::= 38
+
+ushaUpsInternalwarning       TRAP-TYPE
+        ENTERPRISE      upsTrapGroup
+        DESCRIPTION
+                "WARNING: Internal warning."
+        ::= 39
+
+ushaUpsReturnFromInternalwarning       TRAP-TYPE
+        ENTERPRISE      upsTrapGroup
+        DESCRIPTION
+                "INFORMATION: Return from Internal warning."
+        ::= 40
+
+ushaUpsEPOActive       TRAP-TYPE
+        ENTERPRISE      upsTrapGroup
+        DESCRIPTION
+                "WARNING: EPO Active."
+        ::= 41
+
+ushaUpsReturnFromEPOActive       TRAP-TYPE
+        ENTERPRISE      upsTrapGroup
+        DESCRIPTION
+                "INFORMATION: Return from EPO Active."
+        ::= 42
+
+ushaUpsModuleUnlock       TRAP-TYPE
+        ENTERPRISE      upsTrapGroup
+        DESCRIPTION
+                "WARNING: Module Unlock."
+        ::= 43
+
+ushaUpsReturnFromModuleUnlock       TRAP-TYPE
+        ENTERPRISE      upsTrapGroup
+        DESCRIPTION
+                "INFORMATION: Return from Module Unlock."
+        ::= 44
+
+ushaUpsMain1Neutralloss       TRAP-TYPE
+        ENTERPRISE      upsTrapGroup
+        DESCRIPTION
+                "WARNING: Main 1 Neutral loss."
+        ::= 45
+
+ushaUpsReturnFromMain1Neutralloss       TRAP-TYPE
+        ENTERPRISE      upsTrapGroup
+        DESCRIPTION
+                "INFORMATION: Return from Main 1 Neutral loss."
+        ::= 46
+
+ushaUpsMain1phaseerror       TRAP-TYPE
+        ENTERPRISE      upsTrapGroup
+        DESCRIPTION
+                "WARNING: Main 1 phase error."
+        ::= 47
+
+ushaUpsReturnFromMain1phaseerror       TRAP-TYPE
+        ENTERPRISE      upsTrapGroup
+        DESCRIPTION
+                "INFORMATION: Return from Main 1 phase error."
+        ::= 48
+
+ushaUpsSitefault       TRAP-TYPE
+        ENTERPRISE      upsTrapGroup
+        DESCRIPTION
+                "WARNING: Site fault."
+        ::= 49
+
+ushaUpsReturnFromSitefault       TRAP-TYPE
+        ENTERPRISE      upsTrapGroup
+        DESCRIPTION
+                "INFORMATION: Return from Site fault."
+        ::= 50
+
+ushaUpsBypassAbnormal       TRAP-TYPE
+        ENTERPRISE      upsTrapGroup
+        DESCRIPTION
+                "WARNING: Bypass Abnormal."
+        ::= 51
+
+ushaUpsReturnFromBypassAbnormal       TRAP-TYPE
+        ENTERPRISE      upsTrapGroup
+        DESCRIPTION
+                "INFORMATION: Return from Bypass Abnormal."
+        ::= 52
+
+ushaUpsBypassPhaseError       TRAP-TYPE
+        ENTERPRISE      upsTrapGroup
+        DESCRIPTION
+                "WARNING: Bypass Phase Error."
+        ::= 53
+
+ushaUpsReturnFromBypassPhaseError       TRAP-TYPE
+        ENTERPRISE      upsTrapGroup
+        DESCRIPTION
+                "INFORMATION: Return from Bypass Phase Error."
+        ::= 54
+
+ushaUpsBatteryOpen       TRAP-TYPE
+        ENTERPRISE      upsTrapGroup
+        DESCRIPTION
+                "WARNING: Battery Open."
+        ::= 55
+
+ushaUpsReturnFromBatteryOpen       TRAP-TYPE
+        ENTERPRISE      upsTrapGroup
+        DESCRIPTION
+                "INFORMATION: Return from Battery Open."
+        ::= 56
+
+ushaUpsBatteryOverCharge       TRAP-TYPE
+        ENTERPRISE      upsTrapGroup
+        DESCRIPTION
+                "WARNING: Battery Over Charge."
+        ::= 57
+
+ushaUpsReturnFromBatteryOverCharge       TRAP-TYPE
+        ENTERPRISE      upsTrapGroup
+        DESCRIPTION
+                "INFORMATION: Return from Battery Over Charge."
+        ::= 58
+
+ushaUpsBatteryReverse       TRAP-TYPE
+        ENTERPRISE      upsTrapGroup
+        DESCRIPTION
+                "WARNING: Battery Reverse."
+        ::= 59
+
+ushaUpsReturnFromBatteryReverse       TRAP-TYPE
+        ENTERPRISE      upsTrapGroup
+        DESCRIPTION
+                "INFORMATION: Return from Battery Reverse."
+        ::= 60
+
+ushaUpsOverloadforewarning       TRAP-TYPE
+        ENTERPRISE      upsTrapGroup
+        DESCRIPTION
+                "WARNING: Overload forewarning."
+        ::= 61
+
+ushaUpsReturnFromOverloadforewarning       TRAP-TYPE
+        ENTERPRISE      upsTrapGroup
+        DESCRIPTION
+                "INFORMATION: Return from Overload forewarning."
+        ::= 62
+
+ushaUpsOverloadWarning       TRAP-TYPE
+        ENTERPRISE      upsTrapGroup
+        DESCRIPTION
+                "WARNING: Overload Warning."
+        ::= 63
+
+ushaUpsReturnFromOverloadWarning       TRAP-TYPE
+        ENTERPRISE      upsTrapGroup
+        DESCRIPTION
+                "INFORMATION: Return from Overload Warning."
+        ::= 64
+
+ushaUpsFanLock       TRAP-TYPE
+        ENTERPRISE      upsTrapGroup
+        DESCRIPTION
+                "WARNING: Fan Lock."
+        ::= 65
+
+ushaUpsReturnFromFanLock       TRAP-TYPE
+        ENTERPRISE      upsTrapGroup
+        DESCRIPTION
+                "INFORMATION: Return from Fan Lock."
+        ::= 66
+
+ushaUpsMaintaincoverisopen       TRAP-TYPE
+        ENTERPRISE      upsTrapGroup
+        DESCRIPTION
+                "WARNING: Maintain cover is open."
+        ::= 67
+
+ushaUpsReturnFromMaintaincoverisopen       TRAP-TYPE
+        ENTERPRISE      upsTrapGroup
+        DESCRIPTION
+                "INFORMATION: Return from Maintain cover is open."
+        ::= 68
+
+ushaUpsChargerfault       TRAP-TYPE
+        ENTERPRISE      upsTrapGroup
+        DESCRIPTION
+                "WARNING: Charger fault."
+        ::= 69
+
+ushaUpsReturnFromChargerfault       TRAP-TYPE
+        ENTERPRISE      upsTrapGroup
+        DESCRIPTION
+                "INFORMATION: Return from Charger fault."
+        ::= 70
+
+ushaUpsModulelocationerror       TRAP-TYPE
+        ENTERPRISE      upsTrapGroup
+        DESCRIPTION
+                "WARNING: Module location error."
+        ::= 71
+
+ushaUpsReturnFromModulelocationerror       TRAP-TYPE
+        ENTERPRISE      upsTrapGroup
+        DESCRIPTION
+                "INFORMATION: Return from Module location error."
+        ::= 72
+
+ushaUpsTurnonabnormal       TRAP-TYPE
+        ENTERPRISE      upsTrapGroup
+        DESCRIPTION
+                "WARNING: Turn on abnormal."
+        ::= 73
+
+ushaUpsReturnFromTurnonabnormal       TRAP-TYPE
+        ENTERPRISE      upsTrapGroup
+        DESCRIPTION
+                "INFORMATION: Return from Turn on abnormal."
+        ::= 74
+
+ushaUpsRedundancyloss       TRAP-TYPE
+        ENTERPRISE      upsTrapGroup
+        DESCRIPTION
+                "WARNING: Redundancy loss."
+        ::= 75
+
+ushaUpsReturnFromRedundancyloss       TRAP-TYPE
+        ENTERPRISE      upsTrapGroup
+        DESCRIPTION
+                "INFORMATION: Return from Redundancy loss."
+        ::= 76
+
+ushaUpsHotSwapActived       TRAP-TYPE
+        ENTERPRISE      upsTrapGroup
+        DESCRIPTION
+                "WARNING: Hot Swap Actived."
+        ::= 77
+
+ushaUpsReturnFromHotSwapActived       TRAP-TYPE
+        ENTERPRISE      upsTrapGroup
+        DESCRIPTION
+                "INFORMATION: Return from Hot Swap Actived."
+        ::= 78
+
+ushaUpsBatteryInform       TRAP-TYPE
+        ENTERPRISE      upsTrapGroup
+        DESCRIPTION
+                "WARNING: Battery Inform."
+        ::= 79
+
+ushaUpsReturnFromBatteryInform       TRAP-TYPE
+        ENTERPRISE      upsTrapGroup
+        DESCRIPTION
+                "INFORMATION: Return from Battery Inform."
+        ::= 80
+
+ushaUpsInspectionInform       TRAP-TYPE
+        ENTERPRISE      upsTrapGroup
+        DESCRIPTION
+                "WARNING: Inspection Inform."
+        ::= 81
+
+ushaUpsReturnFromInspectionInform       TRAP-TYPE
+        ENTERPRISE      upsTrapGroup
+        DESCRIPTION
+                "INFORMATION: Return from Inspection Inform."
+        ::= 82
+
+ushaUpsGuaranteeInform       TRAP-TYPE
+        ENTERPRISE      upsTrapGroup
+        DESCRIPTION
+                "WARNING: Guarantee Inform."
+        ::= 83
+
+ushaUpsReturnFromGuaranteeInform       TRAP-TYPE
+        ENTERPRISE      upsTrapGroup
+        DESCRIPTION
+                "INFORMATION: Return from Guarantee Inform."
+        ::= 84
+
+ushaUpsTemperatureLow       TRAP-TYPE
+        ENTERPRISE      upsTrapGroup
+        DESCRIPTION
+                "WARNING: Temperature Low."
+        ::= 85
+
+ushaUpsReturnFromTemperatureLow       TRAP-TYPE
+        ENTERPRISE      upsTrapGroup
+        DESCRIPTION
+                "INFORMATION: Return from Temperature Low."
+        ::= 86
+
+ushaUpsTemperatureHigh       TRAP-TYPE
+        ENTERPRISE      upsTrapGroup
+        DESCRIPTION
+                "WARNING: Temperature High."
+        ::= 87
+
+ushaUpsReturnFromTemperatureHigh       TRAP-TYPE
+        ENTERPRISE      upsTrapGroup
+        DESCRIPTION
+                "INFORMATION: Return from Temperature High."
+        ::= 88
+
+ushaUpsBatteryOverTemperature       TRAP-TYPE
+        ENTERPRISE      upsTrapGroup
+        DESCRIPTION
+                "WARNING: Battery Over Temperature."
+        ::= 89
+
+ushaUpsReturnFromBatteryOverTemperature       TRAP-TYPE
+        ENTERPRISE      upsTrapGroup
+        DESCRIPTION
+                "INFORMATION: Return from Battery Over Temperature."
+        ::= 90
+
+ushaUpsFanMaintainInform       TRAP-TYPE
+        ENTERPRISE      upsTrapGroup
+        DESCRIPTION
+                "WARNING: Fan Maintain Inform."
+        ::= 91
+
+ushaUpsReturnFromFanMaintainInform       TRAP-TYPE
+        ENTERPRISE      upsTrapGroup
+        DESCRIPTION
+                "INFORMATION: Return from Fan Maintain Inform."
+        ::= 92
+
+ushaUpsBusCapacitanceMaintainInform       TRAP-TYPE
+        ENTERPRISE      upsTrapGroup
+        DESCRIPTION
+                "WARNING: Bus Capacitance Maintain Inform."
+        ::= 93
+
+ushaUpsReturnFromBusCapacitanceMaintainInform       TRAP-TYPE
+        ENTERPRISE      upsTrapGroup
+        DESCRIPTION
+                "INFORMATION: Return from Bus Capacitance Maintain Inform."
+        ::= 94
+
+ushaUpsSystemOverCapacity       TRAP-TYPE
+        ENTERPRISE      upsTrapGroup
+        DESCRIPTION
+                "WARNING: System Over Capacity."
+        ::= 95
+
+ushaUpsReturnFromSystemOverCapacity       TRAP-TYPE
+        ENTERPRISE      upsTrapGroup
+        DESCRIPTION
+                "INFORMATION: Return from System Over Capacity."
+        ::= 96
+
+   END

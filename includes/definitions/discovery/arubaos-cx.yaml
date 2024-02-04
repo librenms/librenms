@@ -1,16 +1,19 @@
 mib: ENTITY-MIB:ENTITY-SENSOR-MIB
 modules:
     os:
-        sysDescr_regex: 
+        sysDescr_regex:
             - '/ (?<hardware>\d{4,}.*) Swch (?<version>\D{2}\.\d{2}\.\d{2}\.\d{4})/'
             - '/ (?<hardware>\d{4,}) (?<version>\D{2}\.\d{2}\.\d{2}\.\d{4})/'
             - '/(?<version>\D{2}\.\d{2}\.\d{2}\.\d{4})/'
-        version:
-            - ENTITY-MIB::entPhysicalSoftwareRev.1
-            - ENTITY-MIB::entPhysicalSoftwareRev.101001
         serial:
             - ENTITY-MIB::entPhysicalSerialNum.1
             - ENTITY-MIB::entPhysicalSerialNum.101001
+        version:
+            - ENTITY-MIB::entPhysicalSoftwareRev.1
+            - ENTITY-MIB::entPhysicalSoftwareRev.101001
+        hardware:
+            - ENTITY-MIB::entPhysicalDescr.1
+            - ENTITY-MIB::entPhysicalDescr.101001
     sensors:
         pre-cache:
             data:

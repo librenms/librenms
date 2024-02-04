@@ -8,7 +8,7 @@
                     "sysDescr": "Aruba JL727A 6200F 48G CL4 4SFP+370W Swch ML.10.07.0005",
                     "sysContact": "<private>",
                     "version": "ML.10.07.0005",
-                    "hardware": "6200F 48G CL4 4SFP+370W",
+                    "hardware": "Aruba 6200 VSF Stack",
                     "features": null,
                     "location": "<private>",
                     "os": "arubaos-cx",
