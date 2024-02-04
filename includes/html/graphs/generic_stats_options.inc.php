@@ -16,6 +16,21 @@ if (isset($vars['gstats_no_hourly'])) {
 }
 
 //
+// do not display hourly min
+//
+if (isset($vars['gstats_no_hourly_min'])) {
+    if ($vars['gstats_no_hourly_min'] == 0) {
+        $no_hourly_min = false;
+    } elseif ($vars['gstats_no_hourly_min'] == 1) {
+        $no_hourly_min = true;
+    } else {
+        $no_hourly_min = true;
+    }
+} else {
+    $no_hourly_min = true;
+}
+
+//
 // do not display hourly max
 //
 if (isset($vars['gstats_no_hourly_max'])) {
@@ -46,6 +61,21 @@ if (isset($vars['gstats_no_daily'])) {
 }
 
 //
+// do not display daily min
+//
+if (isset($vars['gstats_no_daily_min'])) {
+    if ($vars['gstats_no_daily_min'] == 0) {
+        $no_daily_min = false;
+    } elseif ($vars['gstats_no_daily_min'] == 1) {
+        $no_daily_min = true;
+    } else {
+        $no_daily_min = true;
+    }
+} else {
+    $no_daily_min = true;
+}
+
+//
 // do not display daily max
 //
 if (isset($vars['gstats_no_daily_max'])) {
@@ -73,6 +103,21 @@ if (isset($vars['gstats_no_weekly'])) {
     }
 } else {
     $no_weekly = false;
+}
+
+//
+// do not display weekly min
+//
+if (isset($vars['gstats_no_weekly_min'])) {
+    if ($vars['gstats_no_weekly_min'] == 0) {
+        $no_weekly_min = false;
+    } elseif ($vars['gstats_no_weekly_min'] == 1) {
+        $no_weekly_min = true;
+    } else {
+        $no_weekly_min = true;
+    }
+} else {
+    $no_weekly_min = true;
 }
 
 //
@@ -157,12 +202,12 @@ if (isset($vars['gstats_no_percentile_x1'])) {
 if (isset($vars['gstats_percentile_x1_val'])) {
     if (!is_numeric($vars['gstats_percentile_x1_val'])) {
         $vars['gstats_percentile_x1_val'] = 95;
-    } elseif ($vars['gstats_percentile_x0_val'] <= 0) {
+    } elseif ($vars['gstats_percentile_x1_val'] <= 0) {
         $vars['gstats_percentile_x1_val'] = 95;
-    } elseif ($vars['gstats_percentile_x0_val'] >= 100) {
+    } elseif ($vars['gstats_percentile_x1_val'] >= 100) {
         $vars['gstats_percentile_x1_val'] = 95;
     }
-    $percentile_x1 = $vars['gstats_percentile_x0_val'];
+    $percentile_x1 = $vars['gstats_percentile_x1_val'];
 } else {
     $percentile_x1 = 95;
 }

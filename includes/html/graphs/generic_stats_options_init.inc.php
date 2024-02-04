@@ -7,6 +7,13 @@ if (!isset($vars['gstats_no_hourly'])) {
 }
 
 //
+// do not display hourly min
+//
+if (!isset($vars['gstats_no_hourly_min'])) {
+    $vars['gstats_no_hourly_min'] = \LibreNMS\Config::get('graph_stat_no_hourly_min_default');
+}
+
+//
 // do not display hourly max
 //
 if (!isset($vars['gstats_no_hourly_max'])) {
@@ -21,6 +28,14 @@ if (!isset($vars['gstats_no_daily'])) {
 }
 
 //
+// do not display daily min
+//
+if (!isset($vars['gstats_no_daily_min'])) {
+    $vars['gstats_no_daily_min'] = \LibreNMS\Config::get('graph_stat_no_daily_min_default');
+}
+
+
+//
 // do not display daily max
 //
 if (!isset($vars['gstats_no_daily_max'])) {
@@ -32,6 +47,13 @@ if (!isset($vars['gstats_no_daily_max'])) {
 //
 if (!isset($vars['gstats_no_weekly'])) {
     $vars['gstats_no_weekly'] = \LibreNMS\Config::get('graph_stat_no_weekly_default');
+}
+
+//
+// do not display weekly min
+//
+if (!isset($vars['gstats_no_weekly_min'])) {
+    $vars['gstats_no_weekly_min'] = \LibreNMS\Config::get('graph_stat_no_weekly_min_default');
 }
 
 //
@@ -79,10 +101,13 @@ if (!isset($vars['gstats_percentile_x1_val'])) {
 // build the linke array
 $link_extra_array=[
     'gstats_no_hourly' => $vars['gstats_no_hourly'],
+    'gstats_no_hourly_min' => $vars['gstats_no_hourly_min'],
     'gstats_no_hourly_max' => $vars['gstats_no_hourly_max'],
     'gstats_no_daily' => $vars['gstats_no_daily'],
+    'gstats_no_daily_min' => $vars['gstats_no_daily_min'],
     'gstats_no_daily_max' => $vars['gstats_no_daily_max'],
     'gstats_no_weekly' => $vars['gstats_no_weekly'],
+    'gstats_no_weekly_min' =>  $vars['gstats_no_weekly_min'],
     'gstats_no_weekly_max' =>  $vars['gstats_no_weekly_max'],
     'gstats_no_percentile' => $vars['gstats_no_percentile'],
     'gstats_no_percentile_x0' => $vars['gstats_no_percentile_x0'],

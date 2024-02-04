@@ -111,10 +111,13 @@ foreach ($graphs as $key => $text) {
     }
 
     $graph_array['gstats_no_hourly'] = $vars['gstats_no_hourly'];
+    $graph_array['gstats_no_hourly_min'] = $vars['gstats_no_hourly_min'];
     $graph_array['gstats_no_hourly_max'] = $vars['gstats_no_hourly_max'];
     $graph_array['gstats_no_daily'] = $vars['gstats_no_daily'];
+    $graph_array['gstats_no_daily_min'] = $vars['gstats_no_daily_min'];
     $graph_array['gstats_no_daily_max'] = $vars['gstats_no_daily_max'];
     $graph_array['gstats_no_weekly'] = $vars['gstats_no_weekly'];
+    $graph_array['gstats_no_weekly_min'] =  $vars['gstats_no_weekly_min'];
     $graph_array['gstats_no_weekly_max'] =  $vars['gstats_no_weekly_max'];
     $graph_array['gstats_no_percentile'] = $vars['gstats_no_percentile'];
     $graph_array['gstats_no_percentile_x0'] = $vars['gstats_no_percentile_x0'];

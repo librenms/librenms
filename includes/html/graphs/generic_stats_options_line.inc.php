@@ -7,10 +7,13 @@ $gstat_val_vars = [
 
 $gstat_vars = [
     'gstats_no_hourly' => 'Avg',
+    'gstats_no_hourly_min' => 'Min',
     'gstats_no_hourly_max' => 'Max',
     'gstats_no_daily' => 'Avg',
+    'gstats_no_daily_min' => 'Min',
     'gstats_no_daily_max' => 'Max',
     'gstats_no_weekly' => 'Avg',
+    'gstats_no_weekly_min' => 'Min',
     'gstats_no_weekly_max' => 'Max',
     'gstats_no_percentile' => '25/50/75',
     'gstats_no_percentile_x0' => $vars['gstats_percentile_x0_val'],
@@ -21,10 +24,13 @@ echo "<br>\nStat Options <b>::</b>\n";
 
 $gstat_var_start = [
     'gstats_no_hourly' => 'Hourly: ',
+    'gstats_no_hourly_min' => '; ',
     'gstats_no_hourly_max' => '; ',
     'gstats_no_daily' => '| Daily: ',
+    'gstats_no_daily_min' => '; ',
     'gstats_no_daily_max' => '; ',
     'gstats_no_weekly' => '| Weekly: ',
+    'gstats_no_weekly_min' => ';',
     'gstats_no_weekly_max' => ';',
     'gstats_no_percentile' => '| Percentile:',
     'gstats_no_percentile_x0' => '; ',
