@@ -1,3 +1,18 @@
+--**MOD+***********************************************************************
+--* Module: hpicfDot1x.mib
+--*
+--* Copyright (C) 2014-2016 Hewlett Packard Enterprise Development Company LP
+--* All Right Reserved.
+--*
+--* The contents of this software are proprietary and confidential
+--* to the Hewlett Packard Enterprise Development Company LP.  No part of this
+--* program may be photocopied, reproduced, or translated into another
+--* programming language without prior written consent of the
+--* Hewlett Packard Enterprise Development Company LP.
+--*
+--* Purpose: This file contains MIB definition of HP-DOT1X-EXTENSIONS-MIB
+--*
+--**MOD-**************************************************************************
 HP-DOT1X-EXTENSIONS-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
@@ -20,23 +35,101 @@ IMPORTS
         FROM Q-BRIDGE-MIB
     hpSwitch
         FROM HP-ICF-OID
-    ;
+    HpAutzUserRoleName
+        FROM HP-AUTZ-MIB;
 
 hpicfDot1xMIB MODULE-IDENTITY
-    LAST-UPDATED "200509210000Z"  -- September 21, 2005
-    ORGANIZATION "Hewlett-Packard Company
-                  ProCurve Networking Business"
+    LAST-UPDATED "202106210000Z"  -- June 21, 2021
+    ORGANIZATION "HP Networking"
     CONTACT-INFO "Hewlett-Packard Company
                   8000 Foothills Blvd.
                   Roseville, CA 95747"
    DESCRIPTION  "This MIB module contains the definitions of Managed
-                 Objects for HP ProCurve extensions to IEEE 802.1X.
-                 
-                 This MIB supplements the IEEE 802.1X MIB to 
-                 provide a mechanism by which to configure and 
+                 Objects for HP extensions to IEEE 802.1X.
+
+                 This MIB supplements the IEEE 802.1X MIB to
+                 provide a mechanism by which to configure and
                  retrieve status on shared-media ports, such as in
                  wireless access points or multi-supplicant mode on
-                 ProCurve switches/routers." 
+                 HP switches/routers."
+
+    REVISION     "202106210000Z" -- June 21, 2021
+    DESCRIPTION  "Added hpicfDot1xAuthEapTlsFragmentSize"
+
+    REVISION     "201810300000Z"  -- October 30, 2018
+    DESCRIPTION  "Added hpicfDot1xAuthUnauthVidLLDPNwkPolicy"
+
+    REVISION     "201806060000Z"  -- June 6, 2018
+    DESCRIPTION  "Added new MIB objects for EAP retries that can be
+                  configured per port:
+		  hpicfAuthMaxEapReq"
+
+    REVISION     "201710120000Z"  -- October 12, 2017
+    DESCRIPTION  "Added new MIB object for initial role that can be
+                  configured per port:
+                  hpicfDot1xPaePortInitialRole"
+
+    REVISION     "201709280000Z"  -- September 28, 2017
+    DESCRIPTION  "Added new MIB objects for port-access critical/open auth commands
+                  hpicfDot1xPaePortCritAuthVoiceVid,
+                  hpicfDot1xPaePortCritAuthDataVid,
+		  hpicfDot1xPaePortCritAuthUserRole,
+                  hpicfDot1xPaePortOpenAuthVoiceVid,
+                  hpicfDot1xPaePortOpenAuthDataVid,
+                  hpicfDot1xPaePortOpenAuthUserRole"
+
+    REVISION     "201709130000Z"  -- September 13, 2017
+    DESCRIPTION  "Added object hpicfDot1xAuthEnforceCacheReauth and
+                  corresponding compliance."
+
+    REVISION     "201602250000Z"  -- February 25, 2016
+    DESCRIPTION  "Added object hpicfDot1x2010 and corresponding
+                  compliance."
+
+    REVISION     "201601210000Z"  -- January 21, 2016
+    DESCRIPTION  "Added objects hpicfDot1xAuthSessionRoleName and
+                  hpicfDot1xAuthSessionStatsGroup1. Added initialRole
+                  and heldInitialRoleFailed to hpicfDot1xSMAuthPaeState.
+                  Added applyInitialRole to hpicfDot1xSMAuthBackendAuthState.
+                  Added compliance hpicfDot1xCompliance11. Updated
+                  description for objects hpicfDot1xSMAuthReAuthPeriod,
+                  hpicfDot1xAuthAuthVid, hpicfDot1xAuthUnauthVid, and
+                  hpicfDot1xAuthUnauthPeriod."
+
+    REVISION     "201306120000Z"  -- June 12, 2013
+    DESCRIPTION  "Added object hpicfDot1xPaePortSpeedVSA, compliance
+                  hpicfDot1xCompliance9 and group
+                  hpicfDot1xPaeAuthSessionGroup1  ."
+
+    REVISION     "201301100000Z"  -- January 10, 2013
+    DESCRIPTION  "Added description for hpicfDot1xPaePortMBV
+                  object in HpicfDot1xPaePortEntry."
+
+    REVISION     "201211150000Z"  -- November 15, 2012
+    DESCRIPTION  "Added objects hpicfDot1xPaePortMixed."
+
+    REVISION     "201108290000Z"  -- August 29, 2011
+    DESCRIPTION  "Added description for hpicfDot1xSMAuthSessionTimeout
+                  object in HpicfDot1xSMAuthConfigEntry."
+
+    REVISION     "201107210000Z"  -- July 21, 2011
+    DESCRIPTION  "Added hpicfDot1xSMAuthSessionTimeout object in
+                  HpicfDot1xSMAuthConfigEntry."
+
+    REVISION     "201102120000Z"  -- February 12, 2011
+    DESCRIPTION  "Added hpicfDot1xSuppConfigPasswordEncrypted object in
+                  hpicfDot1xSuppConfigTable."
+
+    REVISION     "201004150000Z"  -- April 15, 2010
+    DESCRIPTION  "Added hpicfDot1xAuthCachedReauthDelay."
+
+    REVISION     "200907080000Z"  -- JULY 08, 2009
+    DESCRIPTION  "Added two more values for hpicfDot1xSMAuthPaeState.
+                 Added hpicfDot1xAuthCachedReauthPeriod."
+
+    REVISION     "200907020000Z"  -- July 02, 2009
+    DESCRIPTION  "Added two more values for hpicfDot1xSMAuthPaeState."
+
     REVISION     "200702020000Z"  -- February 2, 2007
     DESCRIPTION  "Added hpicfDot1xAuthAllowGvrpVlans."
 
@@ -63,11 +156,11 @@ hpicfDot1xMIBObjects OBJECT IDENTIFIER ::= { hpicfDot1xMIB 1 }
 -- groups in the hpicfdot1xExt MIB
 -- ---------------------------------------------------------- --
 
-hpicfDot1xSystem        
+hpicfDot1xSystem
         OBJECT IDENTIFIER ::= { hpicfDot1xMIBObjects 1 }
-hpicfDot1xAuthenticator 
+hpicfDot1xAuthenticator
         OBJECT IDENTIFIER ::= { hpicfDot1xMIBObjects 2 }
-hpicfDot1xSupplicant    
+hpicfDot1xSupplicant
         OBJECT IDENTIFIER ::= { hpicfDot1xMIBObjects 3 }
 
 -- ---------------------------------------------------------- --
@@ -81,13 +174,21 @@ hpicfDot1xSupplicant
 -- (AUGMENTS dot1xPaePortEntry)
 -- ------------------------------------------------------------
 
+-- ------------------------------------------------------------
+-- Note: hpicfDot1xPaePortTable was formerly located at:
+-- iso(1).org(3).dod(6).internet(1).private(4).enterprises(1).
+--  hp(11).nm(2).icf(14).hpicfObjects(11).hpicfSwitch(5).
+--   hpSwitch(1).hpSwitchAuthenticationMIB(16).
+--    hpDot1xPaePortTable(8)
+-- ------------------------------------------------------------
+
     hpicfDot1xPaePortTable OBJECT-TYPE
          SYNTAX      SEQUENCE OF HpicfDot1xPaePortEntry
          MAX-ACCESS  not-accessible
          STATUS      current
-         DESCRIPTION "This table suplements the 'dot1xPaePortTable'."
+         DESCRIPTION "This table supplements the 'dot1xPaePortTable'."
     ::= { hpicfDot1xSystem 1 }
- 
+
     hpicfDot1xPaePortEntry OBJECT-TYPE
          SYNTAX      HpicfDot1xPaePortEntry
          MAX-ACCESS  not-accessible
@@ -96,11 +197,21 @@ hpicfDot1xSupplicant
                       'dot1xPaePortEntry'."
          AUGMENTS { dot1xPaePortEntry }
     ::= { hpicfDot1xPaePortTable 1 }
- 
+
     HpicfDot1xPaePortEntry ::=
          SEQUENCE {
             hpicfDot1xPaePortAuth TruthValue,
-            hpicfDot1xPaePortSupp TruthValue
+            hpicfDot1xPaePortSupp TruthValue,
+            hpicfDot1xPaePortMixed TruthValue,
+            hpicfDot1xPaePortSpeedVSA TruthValue,
+            hpicfDot1xPaePortMBV   TruthValue,
+            hpicfDot1xPaePortCritAuthVoiceVid VlanIndex,
+            hpicfDot1xPaePortCritAuthDataVid VlanIndex,
+            hpicfDot1xPaePortCritAuthUserRole DisplayString,
+            hpicfDot1xPaePortOpenAuthVoiceVid VlanIndex,
+            hpicfDot1xPaePortOpenAuthDataVid VlanIndex,
+            hpicfDot1xPaePortOpenAuthUserRole DisplayString,
+            hpicfDot1xPaePortInitialRole DisplayString
          }
 
     hpicfDot1xPaePortAuth OBJECT-TYPE
@@ -110,7 +221,7 @@ hpicfDot1xSupplicant
          DESCRIPTION "This object allows enable/disable authenticator
                       functionality on a port."
     ::= { hpicfDot1xPaePortEntry 1 }
- 
+
     hpicfDot1xPaePortSupp OBJECT-TYPE
          SYNTAX      TruthValue
          MAX-ACCESS  read-write
@@ -118,6 +229,92 @@ hpicfDot1xSupplicant
          DESCRIPTION "This object allows enable/disable supplicant
                   functionality on a port."
     ::= { hpicfDot1xPaePortEntry 2 }
+
+    hpicfDot1xPaePortMixed OBJECT-TYPE
+         SYNTAX      TruthValue
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION "This object allows enable/disable guests
+                      on ports with authenticated clients."
+         DEFVAL { false }
+    ::= { hpicfDot1xPaePortEntry 3 }
+
+    hpicfDot1xPaePortSpeedVSA OBJECT-TYPE
+         SYNTAX      TruthValue
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION "This object allows enable or disable
+                      port speed VSA processing on a port."
+         DEFVAL { false }
+    ::= { hpicfDot1xPaePortEntry 4 }
+
+    hpicfDot1xPaePortMBV OBJECT-TYPE
+                    SYNTAX            TruthValue
+                    MAX-ACCESS   read-write
+                    STATUS           current
+                    DESCRIPTION   "This object enables and disables the MAC-based VLANs feature on the
+                         port."
+         DEFVAL { true }
+    ::= { hpicfDot1xPaePortEntry 5 }
+
+    hpicfDot1xPaePortCritAuthVoiceVid OBJECT-TYPE
+        SYNTAX      VlanIndex
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The VLANID which is being assinged as a critical-auth voice vlan."
+    ::= { hpicfDot1xPaePortEntry 6 }
+
+    hpicfDot1xPaePortCritAuthDataVid OBJECT-TYPE
+        SYNTAX      VlanIndex
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The VLANID which is being assinged as a critical-auth data vlan."
+    ::= { hpicfDot1xPaePortEntry 7 }
+
+    hpicfDot1xPaePortCritAuthUserRole OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..64))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "This object specifies the user role of the client for critical-auth."
+    ::= { hpicfDot1xPaePortEntry 8 }
+
+    hpicfDot1xPaePortOpenAuthVoiceVid OBJECT-TYPE
+        SYNTAX      VlanIndex
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The VLANID which is being assinged as a open-auth voice vlan."
+    ::= { hpicfDot1xPaePortEntry 9 }
+
+    hpicfDot1xPaePortOpenAuthDataVid OBJECT-TYPE
+        SYNTAX      VlanIndex
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The VLANID which is being assinged as a open-auth data vlan."
+    ::= { hpicfDot1xPaePortEntry 10 }
+
+    hpicfDot1xPaePortOpenAuthUserRole OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..64))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "This object specifies the user role of the client for open-auth."
+    ::= { hpicfDot1xPaePortEntry 11 }
+
+    hpicfDot1xPaePortInitialRole OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..64))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "This object specifies the initial role that is configured for a port."
+    ::= { hpicfDot1xPaePortEntry 12 }
+
+    hpicfDot1x2010  OBJECT-TYPE
+         SYNTAX INTEGER { disabled(0), authenticator(1), supplicant(2),
+                          authenticatorAndSupplicant(3)}
+         MAX-ACCESS read-write
+         STATUS current
+         DESCRIPTION "The  administrative enable dot1x 2010 compliance support
+                     gobally for authenticator and supplicant."
+         DEFVAL { 0 }
+   ::= { hpicfDot1xSystem 2 }
 
 
 -- ---------------------------------------------------------- --
@@ -133,13 +330,21 @@ hpicfDot1xSupplicant
 -- (AUGMENTS dot1xAuthConfigEntry)
 -- ------------------------------------------------------------
 
+-- ------------------------------------------------------------
+-- Note: hpicfDot1xAuthConfigTable was formerly located at:
+-- iso(1).org(3).dod(6).internet(1).private(4).enterprises(1).
+--  hp(11).nm(2).icf(14).hpicfObjects(11).hpicfSwitch(5).
+--   hpSwitch(1).hpSwitchAuthenticationMIB(16).
+--    hpDot1xAuthConfigTable(10)
+-- ------------------------------------------------------------
+
     hpicfDot1xAuthConfigTable OBJECT-TYPE
          SYNTAX      SEQUENCE OF HpicfDot1xAuthConfigEntry
          MAX-ACCESS  not-accessible
          STATUS      current
-         DESCRIPTION "This table suplements the 'dot1xAuthConfigTable'."
+         DESCRIPTION "This table supplements the 'dot1xAuthConfigTable'."
     ::= { hpicfDot1xAuthenticator 1 }
- 
+
     hpicfDot1xAuthConfigEntry OBJECT-TYPE
          SYNTAX      HpicfDot1xAuthConfigEntry
          MAX-ACCESS  not-accessible
@@ -148,7 +353,7 @@ hpicfDot1xSupplicant
                       'dot1xAuthConfigEntry'."
          AUGMENTS { dot1xAuthConfigEntry }
     ::= { hpicfDot1xAuthConfigTable 1 }
- 
+
     HpicfDot1xAuthConfigEntry ::=
          SEQUENCE {
             hpicfDot1xAuthAuthVid VlanIndex,
@@ -156,67 +361,125 @@ hpicfDot1xSupplicant
             hpicfDot1xAuthUnauthPeriod Unsigned32,
             hpicfDot1xAuthClientLimit Unsigned32,
             hpicfDot1xAuthLogoffPeriod Unsigned32,
-            hpicfDot1xAuthClientLimit2 Unsigned32
+            hpicfDot1xAuthClientLimit2 Unsigned32,
+            hpicfDot1xAuthCachedReauthPeriod Unsigned32,
+            hpicfDot1xAuthEnforceCacheReauth TruthValue,
+            hpicfAuthMaxEapReq Unsigned32,
+	    hpicfDot1xAuthUnauthVidLLDPNwkPolicy TruthValue
          }
 
     hpicfDot1xAuthAuthVid OBJECT-TYPE
          SYNTAX      VlanIndex
          MAX-ACCESS  read-write
          STATUS      current
-         DESCRIPTION "This object configures PVID for authorized 
-                      802.1x port."
+         DESCRIPTION "This object configures the PVID for the authorized
+                      802.1x port. When hpSwitchAutzUserRoleEnabled is
+                      true, this value may be superseded by the value of
+                      hpSwitchAutzUserRoleVlanId or
+                      hpSwitchAutzUserRoleVlanName from the client's
+                      assigned role."
     ::= { hpicfDot1xAuthConfigEntry 1 }
 
     hpicfDot1xAuthUnauthVid OBJECT-TYPE
          SYNTAX      VlanIndex
          MAX-ACCESS  read-write
          STATUS      current
-         DESCRIPTION "This object configures PVID for unauthorized 
-                      802.1x port."
+         DESCRIPTION "This object configures the PVID for the unauthorized
+                      802.1x port. When hpSwitchAutzUserRoleEnabled is
+                      true, this value may be superseded by the value of
+                      hpSwitchAutzUserRoleVlanId or
+                      hpSwitchAutzUserRoleVlanName from the role
+                      identified by hpSwitchAutzUserRoleInitialRoleName."
     ::= { hpicfDot1xAuthConfigEntry 2 }
 
-    hpicfDot1xAuthUnauthPeriod OBJECT-TYPE 
+    hpicfDot1xAuthUnauthPeriod OBJECT-TYPE
          SYNTAX      Unsigned32 (0..255)
          UNITS       "seconds"
          MAX-ACCESS  read-write
-         STATUS current
+         STATUS      current
          DESCRIPTION "This objects configures the period of time, in seconds,
-                      which authenticator will wait for authentication before
-                      transition to guest VLAN mode."
-         DEFVAL { 0 } 
+                      which the authenticator will wait for authentication
+                      before transitioning to guest VLAN mode, or assigning
+                      the role identified by hpSwitchAutzUserRoleInitialRoleName
+                      when hpSwitchAutzUserRoleEnabled is true."
+         DEFVAL { 0 }
     ::= { hpicfDot1xAuthConfigEntry 3 }
 
     hpicfDot1xAuthClientLimit OBJECT-TYPE
          SYNTAX      Unsigned32 (1..32)
          MAX-ACCESS  read-write
-         STATUS      deprecated 
+         STATUS      deprecated
          DESCRIPTION "*************THIS OBJECT IS DEPRECATED **********
-                      The maximum number of authenticated clients to allow on 
+                      The maximum number of authenticated clients to allow on
                       the port."
          DEFVAL { 1 }
     ::= { hpicfDot1xAuthConfigEntry 4 }
-    
+
     hpicfDot1xAuthLogoffPeriod OBJECT-TYPE
          SYNTAX      Unsigned32 (1..999999999)
          UNITS       "seconds"
          MAX-ACCESS  read-write
          STATUS      current
-         DESCRIPTION "Specifies the period, in seconds, at which an 
+         DESCRIPTION "Specifies the period, in seconds, at which an
                      authenticated client will be considered unauthenticated
-                     for a lack of activity (i.e. traffic originating 
-                     from client)."  
+                     for a lack of activity (i.e. traffic originating
+                     from client)."
          DEFVAL { 300 }
     ::= { hpicfDot1xAuthConfigEntry 5 }
 
     hpicfDot1xAuthClientLimit2 OBJECT-TYPE
          SYNTAX      Unsigned32 (0..1024)
          MAX-ACCESS  read-write
-         STATUS      current 
+         STATUS      current
          DESCRIPTION "The maximum number of authenticated clients to allow on
                       the port if greater than 0. If 0 then authenticator
                       controls port as a single entity - no client limit."
          DEFVAL { 0 }
     ::= { hpicfDot1xAuthConfigEntry 6 }
+
+    hpicfDot1xAuthCachedReauthPeriod OBJECT-TYPE
+         SYNTAX      Unsigned32 (0..2147483647)
+         UNITS       "seconds"
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION "The value indicates the period in seconds, during which
+                      cached reauthentication is allowed on the port. If
+                      value is zero then the period of cached
+                      reauthentication is unlimited."
+         DEFVAL { 0 }
+    ::= { hpicfDot1xAuthConfigEntry 7 }
+
+    hpicfDot1xAuthEnforceCacheReauth OBJECT-TYPE
+         SYNTAX       TruthValue
+         MAX-ACCESS   read-write
+         STATUS       current
+         DESCRIPTION  "Setting this attribute TRUE(1) will allow cached
+                       reauthentication when server-timeout is configured
+                       lesser than radius connection timeout or
+                       when client initiates authentication before the radius
+                       connection timeout during reauthentication."
+         DEFVAL { false}
+    ::= { hpicfDot1xAuthConfigEntry 8 }
+
+    hpicfAuthMaxEapReq OBJECT-TYPE
+        SYNTAX       Unsigned32
+        MAX-ACCESS   read-write
+        STATUS       current
+        DESCRIPTION  "The value of the maxEapReq is used for sending
+                     by Auth Order to send EAP Identity requests."
+        DEFVAL { 2 }
+    ::= { hpicfDot1xAuthConfigEntry 9 }
+
+    hpicfDot1xAuthUnauthVidLLDPNwkPolicy OBJECT-TYPE
+	 SYNTAX       TruthValue
+         MAX-ACCESS   read-write
+         STATUS       current
+	 DESCRIPTION  "Setting this attribute TRUE(1) will suppress
+                      the transmission of LLDP Network Policy TLV
+                      from port when an unauthorized client is placed
+                      in unauth VLAN during 802.1x authentication."
+         DEFVAL { false }
+    ::= { hpicfDot1xAuthConfigEntry 11 }
 
 -- ---------------------------------------------------------- --
 -- The Shared-Media Authenticator Configuration Table
@@ -227,8 +490,8 @@ hpicfDot1xSMAuthConfigTable OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-        "A table that contains the configuration and basic status 
-        objects for Authenticator PAEs associated with each 
+        "A table that contains the configuration and basic status
+        objects for Authenticator PAEs associated with each
         shared-media port."
     REFERENCE
         "802.1X-2001 9.4.1 Authenticator Configuration"
@@ -262,15 +525,17 @@ HpicfDot1xSMAuthConfigEntry ::=
         hpicfDot1xSMAuthReAuthPeriod
             Unsigned32,
         hpicfDot1xSMAuthReAuthEnabled
-            TruthValue
+            TruthValue,
+        hpicfDot1xSMAuthSessionTimeout
+            Unsigned32
         }
 
 hpicfDot1xSMAuthPaePort OBJECT-TYPE
     SYNTAX      InterfaceIndex
-    MAX-ACCESS  not-accessible 
+    MAX-ACCESS  not-accessible
     STATUS      current
-    DESCRIPTION "The interface index associated with this 
-                 Authenticator PAE. On wired ProCurve products
+    DESCRIPTION "The interface index associated with this
+                 Authenticator PAE. On wired HP products
                  the interface index is the physical port.  On
                  wireless products it is the instance (whether
                  real or virtual) of an AP."
@@ -278,9 +543,9 @@ hpicfDot1xSMAuthPaePort OBJECT-TYPE
 
 hpicfDot1xSMAuthMacAddr OBJECT-TYPE
     SYNTAX      MacAddress
-    MAX-ACCESS  read-only 
+    MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION "The 48-bit IEEE media access control address of 
+    DESCRIPTION "The 48-bit IEEE media access control address of
                 The supplicant associated with this Authenticator
                  PAE."
     ::= { hpicfDot1xSMAuthConfigEntry 2 }
@@ -290,9 +555,9 @@ hpicfDot1xSMAuthInitialize OBJECT-TYPE
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
-        "The initialization control for this Authenticator PAE. 
-        Setting this attribute TRUE causes the PAE to be 
-        initialized. The attribute value reverts to FALSE 
+        "The initialization control for this Authenticator PAE.
+        Setting this attribute TRUE causes the PAE to be
+        initialized. The attribute value reverts to FALSE
         once initialization has completed."
     REFERENCE
         "802.1X-2001 9.6.1.3, Initialize Port"
@@ -303,9 +568,9 @@ hpicfDot1xSMAuthReauthenticate OBJECT-TYPE
     MAX-ACCESS read-write
     STATUS current
     DESCRIPTION
-        "The reauthentication control for this Authenticator PAE. 
-        Setting this attribute TRUE causes the Authenticator 
-        PAE state machine for the Port to reauthenticate the 
+        "The reauthentication control for this Authenticator PAE.
+        Setting this attribute TRUE causes the Authenticator
+        PAE state machine for the Port to reauthenticate the
         Supplicant. Setting this attribute FALSE has no effect.
         This attribute always returns FALSE when it is read."
     REFERENCE
@@ -323,7 +588,13 @@ hpicfDot1xSMAuthPaeState OBJECT-TYPE
                     held(7),
                     forceAuth(8),
                     forceUnauth(9),
-                    restart(10)
+                    restart(10),
+                    heldNoVlan(11),
+                    heldUnauthVlan(12),
+                    initialRole(14),
+                    heldInitialRoleFailed(15),
+                    criticalAuth(16),
+                    openAuth(17)
                 }
     MAX-ACCESS  read-only
     STATUS      current
@@ -343,7 +614,8 @@ hpicfDot1xSMAuthBackendAuthState OBJECT-TYPE
                     timeout(5),
                     idle(6),
                     initialize(7),
-                    ignore(8)
+                    ignore(8),
+                    applyInitialRole(9)
                 }
     MAX-ACCESS  read-only
     STATUS      current
@@ -361,7 +633,10 @@ hpicfDot1xSMAuthReAuthPeriod OBJECT-TYPE
     DESCRIPTION
         "The value, in seconds, of the reAuthPeriod constant
         currently in use by the Reauthentication Timer state
-        machine."
+        machine. When hpSwitchAutzUserRoleEnabled is true,
+        this value will be superseded by the value of
+        hpSwitchAutzUserRoleReauthPeriod from the
+        client's assigned role."
     REFERENCE
         "802.1X-2001 9.4.1, reAuthPeriod"
     DEFVAL { 3600 }
@@ -379,6 +654,20 @@ hpicfDot1xSMAuthReAuthEnabled OBJECT-TYPE
     DEFVAL { false }
     ::= { hpicfDot1xSMAuthConfigEntry 8 }
 
+hpicfDot1xSMAuthSessionTimeout OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Specifies the RADIUS Server set session timeout for
+        reauthentication of the user. When ST = 0, user gets
+        reauthenticated at reauth-period secs, ST < 60 it is
+        set to 60 secs and then user is reauthenticated, ST > 60
+        user is reauthenticated at ST secs."
+    DEFVAL { 0 }
+    ::= { hpicfDot1xSMAuthConfigEntry 9 }
+
 -- ---------------------------------------------------------- --
 -- The Authenticator Diagnostics Table
 -- ---------------------------------------------------------- --
@@ -391,7 +680,7 @@ hpicfDot1xAuthDiagTable OBJECT-TYPE
        "A table that contains the diagnostics objects for the
        Authenticator PAE associated with each Port.
        An entry appears in this table for each port that may
-       authenticate access to itself."   
+       authenticate access to itself."
     ::= { hpicfDot1xAuthenticator 3 }
 
 hpicfDot1xAuthDiagEntry OBJECT-TYPE
@@ -403,7 +692,7 @@ hpicfDot1xAuthDiagEntry OBJECT-TYPE
     INDEX { dot1xPaePortNumber }
     ::= { hpicfDot1xAuthDiagTable 1 }
 
-HpicfDot1xAuthDiagEntry ::= 
+HpicfDot1xAuthDiagEntry ::=
     SEQUENCE {
         hpicfDot1xAuthNumberOfSuccessAuthentication
             Counter32,
@@ -417,8 +706,8 @@ hpicfDot1xAuthNumberOfSuccessAuthentication OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "Counts the number of times that authenticator received
-        an EAP-Success message from Authentication Server. 
-        Indicates that Supplicant has successfully authenticated to 
+        an EAP-Success message from Authentication Server.
+        Indicates that Supplicant has successfully authenticated to
         the Authentication Server."
     ::= { hpicfDot1xAuthDiagEntry 1 }
 
@@ -428,8 +717,8 @@ hpicfDot1xAuthNumberOfFailedAuthentication OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "Counts the number of times that authenticator received
-        an EAP-Failure message from Authentication Server. 
-        Indicates that Supplicant has failed to authenticate to 
+        an EAP-Failure message from Authentication Server.
+        Indicates that Supplicant has failed to authenticate to
         the Authentication Server."
     ::= { hpicfDot1xAuthDiagEntry 2 }
 
@@ -444,7 +733,7 @@ hpicfDot1xAuthStatsTable OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "A table that contains the statistics objects for the
-         Authenticator PAE's associated with each shared-media 
+         Authenticator PAE's associated with each shared-media
          Port."
     REFERENCE
         "802.1X-2001 9.4.2 Authenticator Statistics"
@@ -634,7 +923,7 @@ hpicfDot1xAuthSessionStatsTable OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "A table that contains the session statistics objects
-        for the Authenticator PAE's associated with each 
+        for the Authenticator PAE's associated with each
         shared-media Port."
     REFERENCE
         "802.1X-2001 9.4.4"
@@ -676,7 +965,7 @@ HpicfDot1xAuthSessionStatsEntry ::=
             TimeStamp,
         hpicfDot1xAuthSessionStopTime
             TimeStamp,
-        hpicfDot1xAuthSessionInactiveTime 
+        hpicfDot1xAuthSessionInactiveTime
             TimeTicks,
         hpicfDot1xAuthSessionTerminateCause
             INTEGER,
@@ -685,7 +974,9 @@ HpicfDot1xAuthSessionStatsEntry ::=
         hpicfDot1xAuthSessionIsForwarding
             TruthValue,
         hpicfDot1xAuthSessionVid
-            VlanIndex           
+            VlanIndex,
+        hpicfDot1xAuthSessionRoleName
+            HpAutzUserRoleName
     }
 
 hpicfDot1xAuthSessionPerPAECountersEnabled OBJECT-TYPE
@@ -693,16 +984,16 @@ hpicfDot1xAuthSessionPerPAECountersEnabled OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-       "Specifies whether individualized PAE octet and 
-        frame counts are supported.  
+       "Specifies whether individualized PAE octet and
+        frame counts are supported.
 
-        If TRUE then system is capable of maintaining 
-        separate counter sets for each, of possibly many, 
+        If TRUE then system is capable of maintaining
+        separate counter sets for each, of possibly many,
         Authenticator PAE instance on a port.
 
-        If FALSE then system is incapable of maintaining 
-        separate counter sets. Frame and octet counter values 
-        returned are an aggregate of all PAE sessions on the 
+        If FALSE then system is incapable of maintaining
+        separate counter sets. Frame and octet counter values
+        returned are an aggregate of all PAE sessions on the
         port."
     ::= { hpicfDot1xAuthSessionStatsEntry 1 }
 
@@ -712,7 +1003,7 @@ hpicfDot1xAuthSessionOctetsRx OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "The number of octets received in user data
-        frames during the session." 
+        frames during the session."
     REFERENCE
         "802.1X-2001 9.4.4, Session Octets Received"
     ::= { hpicfDot1xAuthSessionStatsEntry 2 }
@@ -800,8 +1091,8 @@ hpicfDot1xAuthSessionStopTime OBJECT-TYPE
     SYNTAX      TimeStamp
     MAX-ACCESS  read-only
     STATUS	    current
-    DESCRIPTION  
-        "This object contains the value of sysUpTime at the 
+    DESCRIPTION
+        "This object contains the value of sysUpTime at the
          time an authenticated Supplicant was de-authenticated,
          as a result of an EAPOL-Logoff, reauthentication period
          expiration, or forced asynchronous reauthentication."
@@ -811,9 +1102,9 @@ hpicfDot1xAuthSessionInactiveTime OBJECT-TYPE
     SYNTAX      TimeTicks
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION 
+    DESCRIPTION
         "This time (in seconds) since last user data frames,
-         either rx or tx, were observed."
+         either received or transmitted, were observed."
     ::= { hpicfDot1xAuthSessionStatsEntry 11 }
 
 
@@ -851,13 +1142,13 @@ hpicfDot1xAuthSessionIsForwarding OBJECT-TYPE
     SYNTAX      TruthValue
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION 
-        "Specifies whether traffic originating from 
-         Supplicant PAE is being forwarded by 
+    DESCRIPTION
+        "Specifies whether traffic originating from
+         Supplicant PAE is being forwarded by
          Authenticator PAE.
-         
-         If TRUE, then Authenticator is forwarding 
-         Supplicant's traffic 
+
+         If TRUE, then Authenticator is forwarding
+         Supplicant's traffic
 
          If FALSE, then Authenticator is not forwarding
          (blocking) Supplicant's traffic."
@@ -871,6 +1162,15 @@ hpicfDot1xAuthSessionVid OBJECT-TYPE
         "The PVID on which user data frames are being forwarded."
     ::= { hpicfDot1xAuthSessionStatsEntry 15 }
 
+hpicfDot1xAuthSessionRoleName OBJECT-TYPE
+    SYNTAX      HpAutzUserRoleName
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "When hpSwitchAutzUserRoleEnabled is true, specifies the user
+         role of the client assigned to the Supplicant PAE."
+    ::= { hpicfDot1xAuthSessionStatsEntry 16 }
+
 -- ---------------------------------------------------------- --
 -- Global Objects for Authenticator
 -- ---------------------------------------------------------- --
@@ -883,11 +1183,34 @@ hpicfDot1xAuthAllowGvrpVlans OBJECT-TYPE
                  of RADIUS-assigned dynamic (GVRP) VLANs."
     ::= { hpicfDot1xAuthenticator 6 }
 
+hpicfDot1xAuthCachedReauthDelay OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..2147483647)
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "The value indicates the period in seconds, during which
+                 all reauthentications will be suppressed after a cached
+                 reauthentication."
+    DEFVAL { 0 }
+    ::= { hpicfDot1xAuthenticator 7 }
+
+hpicfDot1xAuthEapTlsFragmentSize OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 | 576..3072)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "The value indicates the maximum size of the EAP-TLS
+                 fragment size which is send towards the RADIUS server.
+                 When configured with value 0 the fragmentation is done
+                 only when the EAP-TLS data cannot be fit in RADIUS packet.
+                 A fragment size of 1011 is used then."
+    DEFVAL { 0 }
+    ::= { hpicfDot1xAuthenticator 10 }
+
 -- ---------------------------------------------------------- --
 -- The PAE Supplicant Group
 -- ---------------------------------------------------------- --
 
--- placeholder 
+-- placeholder
 
 
 -- ---------------------------------------------------------- --
@@ -895,14 +1218,22 @@ hpicfDot1xAuthAllowGvrpVlans OBJECT-TYPE
 -- (AUGMENTS dot1xSuppConfigEntry)
 -- ---------------------------------------------------------- --
 
+-- ------------------------------------------------------------
+-- Note: hpicfDot1xSuppConfigTable was formerly located at:
+-- iso(1).org(3).dod(6).internet(1).private(4).enterprises(1).
+--  hp(11).nm(2).icf(14).hpicfObjects(11).hpicfSwitch(5).
+--   hpSwitch(1).hpSwitchAuthenticationMIB(16).
+--    hpDot1xSuppConfigTable(9)
+-- ------------------------------------------------------------
+
 -- place holder
     hpicfDot1xSuppConfigTable OBJECT-TYPE
          SYNTAX      SEQUENCE OF HpicfDot1xSuppConfigEntry
          MAX-ACCESS  not-accessible
          STATUS      current
-         DESCRIPTION "This table suplements the 'dot1xSuppConfigTable'."
+         DESCRIPTION "This table supplements the 'dot1xSuppConfigTable'."
     ::= { hpicfDot1xSupplicant 1 }
- 
+
     hpicfDot1xSuppConfigEntry OBJECT-TYPE
          SYNTAX      HpicfDot1xSuppConfigEntry
          MAX-ACCESS  not-accessible
@@ -911,11 +1242,12 @@ hpicfDot1xAuthAllowGvrpVlans OBJECT-TYPE
                       'dot1xSuppConfigEntry'."
          AUGMENTS { dot1xSuppConfigEntry }
     ::= { hpicfDot1xSuppConfigTable 1 }
- 
+
     HpicfDot1xSuppConfigEntry ::=
          SEQUENCE {
-            hpicfDot1xSuppConfigIdentity DisplayString,
-            hpicfDot1xSuppConfigPassword DisplayString
+            hpicfDot1xSuppConfigIdentity          DisplayString,
+            hpicfDot1xSuppConfigPassword          DisplayString,
+            hpicfDot1xSuppConfigPasswordEncrypted OCTET STRING
          }
 
     hpicfDot1xSuppConfigIdentity OBJECT-TYPE
@@ -925,14 +1257,30 @@ hpicfDot1xAuthAllowGvrpVlans OBJECT-TYPE
          DESCRIPTION "This object can be used to set/get the identity
                       802.1x supplicant supplies to its authenticator."
     ::= { hpicfDot1xSuppConfigEntry 1 }
- 
+
     hpicfDot1xSuppConfigPassword OBJECT-TYPE
          SYNTAX      DisplayString (SIZE(0..64))
          MAX-ACCESS  read-write
          STATUS      current
-         DESCRIPTION "This object can be used to set the password 
+         DESCRIPTION "This object can be used to set the password
                       the supplicant uses for MD5 authentication."
     ::= { hpicfDot1xSuppConfigEntry 2 }
+
+    hpicfDot1xSuppConfigPasswordEncrypted OBJECT-TYPE
+        SYNTAX       OCTET STRING (SIZE(0..256))
+        MAX-ACCESS   read-write
+        STATUS       current
+        DESCRIPTION  "The encrypted form of the password used by
+                     supplicant for MD5 authentication. This object
+                     may only be read or written when
+                     hpSwitchAuthenticationEncryptCredentialsMethod
+                     is set to a value other than none(0). At most
+                     one of hpicfDot1xSuppConfigPassword and
+                     hpicfDot1xSuppConfigPasswordEncrypted may be set
+                     in any transaction. This object should only be
+                     written with an encrypted password previously
+                     read from a compatible HP Networking device."
+    ::= { hpicfDot1xSuppConfigEntry 3 }
 
 -- ---------------------------------------------------------- --
 -- Conformance Information
@@ -952,16 +1300,17 @@ hpicfDot1xCompliances OBJECT IDENTIFIER
 hpicfDot1xPaePortGroup OBJECT-GROUP
     OBJECTS {
         hpicfDot1xPaePortAuth,
-        hpicfDot1xPaePortSupp
+        hpicfDot1xPaePortSupp,
+        hpicfDot1xPaePortMBV
      }
      STATUS     current
-     DESCRIPTION    
+     DESCRIPTION
        "A collection of objects providing basic administrative
-        control over Authenticator PAE and Supplicant PAE in 
+        control over Authenticator PAE and Supplicant PAE in
         system."
     ::= { hpicfDot1xGroups 1 }
 
-hpicfDot1xAuthConfigGroup OBJECT-GROUP 
+hpicfDot1xAuthConfigGroup OBJECT-GROUP
     OBJECTS {
         hpicfDot1xAuthAuthVid,
         hpicfDot1xAuthUnauthVid,
@@ -970,17 +1319,17 @@ hpicfDot1xAuthConfigGroup OBJECT-GROUP
         hpicfDot1xAuthLogoffPeriod
     }
     STATUS      deprecated
-    DESCRIPTION 
+    DESCRIPTION
         "********* THIS GROUP IS DEPRECATED *********
         A collection of objects providing basic configuration
         control of over Authenticator PAEs."
     ::= { hpicfDot1xGroups 2 }
-       
 
-hpicfDot1xSMAuthConfigGroup OBJECT-GROUP 
+
+hpicfDot1xSMAuthConfigGroup OBJECT-GROUP
     OBJECTS {
         hpicfDot1xSMAuthInitialize,
-        hpicfDot1xSMAuthReauthenticate,     
+        hpicfDot1xSMAuthReauthenticate,
         hpicfDot1xSMAuthPaeState,
         hpicfDot1xSMAuthBackendAuthState,
         hpicfDot1xSMAuthReAuthPeriod,
@@ -988,7 +1337,7 @@ hpicfDot1xSMAuthConfigGroup OBJECT-GROUP
     }
     STATUS      current
     DESCRIPTION
-        "A collection of objects providing basic status and 
+        "A collection of objects providing basic status and
          configuration control over Authenticator PAEs running
          on a shared-media port."
     ::= { hpicfDot1xGroups 3 }
@@ -1022,7 +1371,7 @@ hpicfDot1xAuthStatsGroup OBJECT-GROUP
     }
     STATUS      current
     DESCRIPTION
-        "A collection of objects providing statistics about 
+        "A collection of objects providing statistics about
          Authenticator PAEs running on a shared-media port."
     ::= { hpicfDot1xGroups 5 }
 
@@ -1044,14 +1393,14 @@ hpicfDot1xAuthSessionStatsGroup OBJECT-GROUP
         hpicfDot1xAuthSessionIsForwarding,
         hpicfDot1xAuthSessionVid
     }
-    STATUS      current
+    STATUS      deprecated
     DESCRIPTION
         "A collection of objects providing statistics about the
-        current, or last sessions for Authenticator PAEs running 
+        current, or last sessions for Authenticator PAEs running
         on a shared-media port."
     ::= { hpicfDot1xGroups 6 }
 
-hpicfDot1xAuthConfigGroup2 OBJECT-GROUP 
+hpicfDot1xAuthConfigGroup2 OBJECT-GROUP
     OBJECTS {
         hpicfDot1xAuthAuthVid,
         hpicfDot1xAuthUnauthVid,
@@ -1060,12 +1409,12 @@ hpicfDot1xAuthConfigGroup2 OBJECT-GROUP
         hpicfDot1xAuthClientLimit2
     }
     STATUS      current
-    DESCRIPTION 
+    DESCRIPTION
         "A collection of objects providing basic configuration
         control of over Authenticator PAEs."
     ::= { hpicfDot1xGroups 7 }
 
-hpicfDot1xAuthConfigGroup3 OBJECT-GROUP 
+hpicfDot1xAuthConfigGroup3 OBJECT-GROUP
     OBJECTS {
         hpicfDot1xAuthAuthVid,
         hpicfDot1xAuthUnauthVid,
@@ -1075,10 +1424,205 @@ hpicfDot1xAuthConfigGroup3 OBJECT-GROUP
         hpicfDot1xAuthAllowGvrpVlans
     }
     STATUS      current
-    DESCRIPTION 
+    DESCRIPTION
         "A collection of objects providing basic configuration
         control of over Authenticator PAEs."
     ::= { hpicfDot1xGroups 8 }
+
+hpicfDot1xAuthConfigGroup4 OBJECT-GROUP
+    OBJECTS {
+        hpicfDot1xAuthAuthVid,
+        hpicfDot1xAuthUnauthVid,
+        hpicfDot1xAuthUnauthPeriod,
+        hpicfDot1xAuthLogoffPeriod,
+        hpicfDot1xAuthClientLimit2,
+        hpicfDot1xAuthAllowGvrpVlans,
+        hpicfDot1xAuthCachedReauthPeriod
+    }
+    STATUS      deprecated
+    DESCRIPTION
+        "A collection of objects providing basic configuration
+        control of over Authenticator PAEs."
+    ::= { hpicfDot1xGroups 9 }
+
+hpicfDot1xAuthConfigGroup5 OBJECT-GROUP
+    OBJECTS {
+        hpicfDot1xAuthAuthVid,
+        hpicfDot1xAuthUnauthVid,
+        hpicfDot1xAuthUnauthPeriod,
+        hpicfDot1xAuthLogoffPeriod,
+        hpicfDot1xAuthClientLimit2,
+        hpicfDot1xAuthAllowGvrpVlans,
+        hpicfDot1xAuthCachedReauthPeriod,
+        hpicfDot1xAuthCachedReauthDelay
+    }
+    STATUS      deprecated
+    DESCRIPTION
+        "A collection of objects providing basic configuration
+        control of over Authenticator PAEs."
+    ::= { hpicfDot1xGroups 10 }
+
+hpicfDot1xSuppConfigGroup OBJECT-GROUP
+    OBJECTS {
+        hpicfDot1xSuppConfigIdentity,
+        hpicfDot1xSuppConfigPassword,
+        hpicfDot1xSuppConfigPasswordEncrypted
+    }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects providing basic configuration
+        of the 802.1x supplicant."
+    ::= { hpicfDot1xGroups 11 }
+
+hpicfDot1xPaeAuthSessionGroup OBJECT-GROUP
+    OBJECTS {
+       hpicfDot1xSMAuthMacAddr,
+       hpicfDot1xPaePortMixed,
+       hpicfDot1xAuthSessionPerPAECountersEnabled
+    }
+    STATUS deprecated
+    DESCRIPTION
+        "A collection of Dot1x objects ."
+    ::= { hpicfDot1xGroups 12 }
+
+hpicfDot1xSMAuthSessionTimeoutGroup OBJECT-GROUP
+    OBJECTS {
+        hpicfDot1xSMAuthSessionTimeout
+    }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects providing RADIUS server set session
+         timeout for user reauthentication"
+    ::= { hpicfDot1xGroups 13 }
+
+hpicfDot1xPaeAuthSessionGroup1 OBJECT-GROUP
+    OBJECTS {
+       hpicfDot1xSMAuthMacAddr,
+       hpicfDot1xPaePortMixed,
+       hpicfDot1xPaePortSpeedVSA,
+       hpicfDot1xAuthSessionPerPAECountersEnabled
+    }
+    STATUS current
+    DESCRIPTION
+        "A collection of Dot1x objects ."
+    ::= { hpicfDot1xGroups 14 }
+hpicfDot1xAuthSessionStatsGroup1 OBJECT-GROUP
+    OBJECTS {
+        hpicfDot1xAuthSessionOctetsRx,
+        hpicfDot1xAuthSessionOctetsTx,
+        hpicfDot1xAuthSessionFramesRx,
+        hpicfDot1xAuthSessionFramesTx,
+        hpicfDot1xAuthSessionId,
+        hpicfDot1xAuthSessionAuthenticMethod,
+        hpicfDot1xAuthSessionTime,
+        hpicfDot1xAuthSessionStartTime,
+        hpicfDot1xAuthSessionStopTime,
+        hpicfDot1xAuthSessionInactiveTime,
+        hpicfDot1xAuthSessionTerminateCause,
+        hpicfDot1xAuthSessionUserName,
+        hpicfDot1xAuthSessionIsForwarding,
+        hpicfDot1xAuthSessionVid,
+        hpicfDot1xAuthSessionRoleName
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing statistics about the
+        current, or last sessions for Authenticator PAEs running
+        on a shared-media port."
+    ::= { hpicfDot1xGroups 18 }
+
+hpicfDot1xSystemGroup OBJECT-GROUP
+    OBJECTS {
+        hpicfDot1x2010
+    }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects providing dot1x 2010 support
+         for authenticator and supplicant."
+    ::= { hpicfDot1xGroups 19 }
+
+hpicfDot1xPaePortGroup1 OBJECT-GROUP
+    OBJECTS {
+        hpicfDot1xPaePortCritAuthVoiceVid,
+        hpicfDot1xPaePortCritAuthDataVid,
+        hpicfDot1xPaePortCritAuthUserRole,
+        hpicfDot1xPaePortOpenAuthVoiceVid,
+        hpicfDot1xPaePortOpenAuthDataVid,
+        hpicfDot1xPaePortOpenAuthUserRole,
+        hpicfDot1xPaePortInitialRole
+    }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects providing configuration support
+         for critial/open auth vlan."
+    ::= { hpicfDot1xGroups 20 }
+
+hpicfDot1xPaePortEapRetriesGroup OBJECT-GROUP
+    OBJECTS {
+        hpicfAuthMaxEapReq
+    }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects providing configuration support
+         for EAP Retries in Authentication order on Port."
+    ::= { hpicfDot1xGroups 22 }
+
+hpicfDot1xAuthConfigGroup7 OBJECT-GROUP
+    OBJECTS {
+        hpicfDot1xAuthAuthVid,
+        hpicfDot1xAuthUnauthVid,
+        hpicfDot1xAuthUnauthPeriod,
+        hpicfDot1xAuthLogoffPeriod,
+        hpicfDot1xAuthClientLimit2,
+        hpicfDot1xAuthAllowGvrpVlans,
+        hpicfDot1xAuthCachedReauthPeriod,
+        hpicfDot1xAuthCachedReauthDelay
+    }
+    STATUS      deprecated
+    DESCRIPTION
+        "A collection of objects providing basic configuration
+        control of over Authenticator PAEs."
+    ::= { hpicfDot1xGroups 23 }
+
+
+hpicfDot1xAuthConfigGroup8 OBJECT-GROUP
+    OBJECTS {
+        hpicfDot1xAuthAuthVid,
+        hpicfDot1xAuthUnauthVid,
+        hpicfDot1xAuthUnauthPeriod,
+        hpicfDot1xAuthLogoffPeriod,
+        hpicfDot1xAuthClientLimit2,
+        hpicfDot1xAuthAllowGvrpVlans,
+        hpicfDot1xAuthCachedReauthPeriod,
+        hpicfDot1xAuthCachedReauthDelay,
+        hpicfDot1xAuthEnforceCacheReauth,
+	hpicfDot1xAuthUnauthVidLLDPNwkPolicy
+    }
+    STATUS      deprecated
+    DESCRIPTION
+        "A collection of objects providing basic configuration
+        control of over Authenticator PAEs."
+    ::= { hpicfDot1xGroups 24 }
+
+hpicfDot1xAuthConfigGroup10 OBJECT-GROUP
+    OBJECTS {
+        hpicfDot1xAuthAuthVid,
+        hpicfDot1xAuthUnauthVid,
+        hpicfDot1xAuthUnauthPeriod,
+        hpicfDot1xAuthLogoffPeriod,
+        hpicfDot1xAuthClientLimit2,
+        hpicfDot1xAuthAllowGvrpVlans,
+        hpicfDot1xAuthCachedReauthPeriod,
+        hpicfDot1xAuthCachedReauthDelay,
+        hpicfDot1xAuthEnforceCacheReauth,
+        hpicfDot1xAuthUnauthVidLLDPNwkPolicy,
+        hpicfDot1xAuthEapTlsFragmentSize
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing basic configuration
+        control of over Authenticator PAEs."
+    ::= { hpicfDot1xGroups 26 }
 
 -- ---------------------------------------------------------- --
 -- compliance statements
@@ -1089,7 +1633,7 @@ hpicfDot1xCompliance MODULE-COMPLIANCE
     DESCRIPTION
         "********* THIS COMPLIANCE IS DEPRECATED *********
         The compliance statement for devices support of
-        HP ProCurve IEEE 802.1X extensions MIB."
+        HP IEEE 802.1X extensions MIB."
 
     MODULE
         GROUP   hpicfDot1xPaePortGroup
@@ -1106,7 +1650,6 @@ hpicfDot1xCompliance MODULE-COMPLIANCE
         DESCRIPTION
             "This group is mandatory for systems that support
             shared-media Authenticator functions of the PAE."
-      
 
         GROUP   hpicfDot1xAuthStatsGroup
         DESCRIPTION
@@ -1122,11 +1665,11 @@ hpicfDot1xCompliance MODULE-COMPLIANCE
     ::= { hpicfDot1xCompliances 1 }
 
 hpicfDot1xCompliance2 MODULE-COMPLIANCE
-    STATUS  deprecated
+    STATUS deprecated
     DESCRIPTION
         "********* THIS COMPLIANCE IS DEPRECATED *********
         The compliance statement for devices support of
-        HP ProCurve IEEE 802.1X extensions MIB."
+        HP IEEE 802.1X extensions MIB."
 
     MODULE
         GROUP   hpicfDot1xPaePortGroup
@@ -1143,7 +1686,6 @@ hpicfDot1xCompliance2 MODULE-COMPLIANCE
         DESCRIPTION
             "This group is mandatory for systems that support
             shared-media Authenticator functions of the PAE."
-      
 
         GROUP   hpicfDot1xAuthStatsGroup
         DESCRIPTION
@@ -1159,10 +1701,11 @@ hpicfDot1xCompliance2 MODULE-COMPLIANCE
     ::= { hpicfDot1xCompliances 2 }
 
 hpicfDot1xCompliance3 MODULE-COMPLIANCE
-    STATUS  current
+    STATUS deprecated
     DESCRIPTION
-        "The compliance statement for devices support of
-        HP ProCurve IEEE 802.1X extensions MIB."
+        "********* THIS COMPLIANCE IS DEPRECATED *********
+        The compliance statement for devices support of
+        HP IEEE 802.1X extensions MIB."
 
     MODULE
         GROUP   hpicfDot1xPaePortGroup
@@ -1179,7 +1722,6 @@ hpicfDot1xCompliance3 MODULE-COMPLIANCE
         DESCRIPTION
             "This group is mandatory for systems that support
             shared-media Authenticator functions of the PAE."
-      
 
         GROUP   hpicfDot1xAuthStatsGroup
         DESCRIPTION
@@ -1191,6 +1733,372 @@ hpicfDot1xCompliance3 MODULE-COMPLIANCE
             "This group is mandatory for systems that support
             the Authenticator functions of the PAE."
 
+
     ::= { hpicfDot1xCompliances 3 }
 
- END
+hpicfDot1xCompliance4 MODULE-COMPLIANCE
+    STATUS  deprecated
+    DESCRIPTION
+        "********* THIS COMPLIANCE IS DEPRECATED *********
+        The compliance statement for devices support of
+        HP IEEE 802.1X extensions MIB."
+
+    MODULE
+        GROUP   hpicfDot1xPaePortGroup
+        DESCRIPTION
+            "This group is mandatory for systems that support
+            Authenticator and/or Supplicant functions of the PAE."
+
+        GROUP   hpicfDot1xAuthConfigGroup4
+        DESCRIPTION
+            "This group is mandatory for systems that support
+            Authenticator functions of the PAE."
+
+        GROUP   hpicfDot1xSMAuthConfigGroup
+        DESCRIPTION
+            "This group is mandatory for systems that support
+            shared-media Authenticator functions of the PAE."
+
+
+        GROUP   hpicfDot1xAuthStatsGroup
+        DESCRIPTION
+            "This group is mandatory for systems that support
+            the Authenticator functions of the PAE."
+
+        GROUP   hpicfDot1xAuthSessionStatsGroup
+        DESCRIPTION
+            "This group is mandatory for systems that support
+            the Authenticator functions of the PAE."
+
+
+    ::= { hpicfDot1xCompliances 4 }
+
+hpicfDot1xCompliance5 MODULE-COMPLIANCE
+    STATUS  deprecated
+    DESCRIPTION
+        "The compliance statement for devices support of
+        HP IEEE 802.1X extensions MIB."
+    MODULE
+        GROUP   hpicfDot1xPaePortGroup
+        DESCRIPTION
+            "This group is mandatory for systems that support
+            Authenticator and/or Supplicant functions of the PAE."
+
+        GROUP   hpicfDot1xAuthConfigGroup5
+        DESCRIPTION
+            "This group is mandatory for systems that support
+            Authenticator functions of the PAE."
+
+        GROUP   hpicfDot1xSMAuthConfigGroup
+        DESCRIPTION
+            "This group is mandatory for systems that support
+            shared-media Authenticator functions of the PAE."
+
+        GROUP   hpicfDot1xAuthStatsGroup
+        DESCRIPTION
+            "This group is mandatory for systems that support
+            the Authenticator functions of the PAE."
+
+        GROUP   hpicfDot1xAuthSessionStatsGroup
+        DESCRIPTION
+            "This group is mandatory for systems that support
+            the Authenticator functions of the PAE."
+    ::= { hpicfDot1xCompliances 5 }
+
+hpicfDot1xCompliance6 MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+        "The compliance statement for devices support of
+        HP IEEE 802.1X extensions MIB."
+    MODULE
+        GROUP   hpicfDot1xPaePortGroup
+        DESCRIPTION
+            "This group is mandatory for systems that support
+            Authenticator and/or Supplicant functions of the PAE."
+
+        GROUP   hpicfDot1xAuthConfigGroup5
+        DESCRIPTION
+            "This group is mandatory for systems that support
+            Authenticator functions of the PAE."
+
+        GROUP   hpicfDot1xSMAuthConfigGroup
+        DESCRIPTION
+            "This group is mandatory for systems that support
+            shared-media Authenticator functions of the PAE."
+
+        GROUP   hpicfDot1xAuthStatsGroup
+        DESCRIPTION
+            "This group is mandatory for systems that support
+            the Authenticator functions of the PAE."
+
+        GROUP   hpicfDot1xAuthSessionStatsGroup
+        DESCRIPTION
+            "This group is mandatory for systems that support
+            the Authenticator functions of the PAE."
+
+        GROUP   hpicfDot1xSuppConfigGroup
+        DESCRIPTION
+            "A collection of objects providing basic configuration
+            of the 802.1x supplicant."
+    ::= { hpicfDot1xCompliances 6 }
+
+hpicfDot1xCompliance7 MODULE-COMPLIANCE
+    STATUS  deprecated
+    DESCRIPTION
+        "The compliance statement for devices support of
+        HP IEEE 802.1X extensions MIB."
+    MODULE
+        GROUP hpicfDot1xAuthDiagGroup
+        DESCRIPTION
+            "This group is mandatory for systems that support
+             basic diagnostic Information over Authenticator PAEs."
+
+        GROUP hpicfDot1xPaeAuthSessionGroup
+        DESCRIPTION
+            "This group is mandatory for systems that support
+             basic diagnostic Information over Authenticator PAEs."
+
+    ::= { hpicfDot1xCompliances 7 }
+
+hpicfDot1xCompliance8 MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+        "The compliance statement for devices support of
+        HP IEEE 802.1X extensions MIB."
+    MODULE
+        GROUP hpicfDot1xSMAuthSessionTimeoutGroup
+        DESCRIPTION
+            "This group is mandatory for systems that support
+            shared-media Authenticator functions of the PAE."
+
+    ::= { hpicfDot1xCompliances 8 }
+
+hpicfDot1xCompliance9 MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+        "The compliance statement for devices support of
+        HP IEEE 802.1X extensions MIB."
+    MODULE
+        GROUP hpicfDot1xAuthDiagGroup
+        DESCRIPTION
+            "This group is mandatory for systems that support
+             basic diagnostic Information over Authenticator PAEs."
+
+        GROUP hpicfDot1xPaeAuthSessionGroup1
+        DESCRIPTION
+            "This group is mandatory for systems that support
+             basic diagnostic Information over Authenticator PAEs."
+
+    ::= { hpicfDot1xCompliances 9 }
+
+hpicfDot1xCompliance11 MODULE-COMPLIANCE
+    STATUS deprecated
+    DESCRIPTION
+        "The compliance statement for devices support of
+        HP IEEE 802.1X extensions MIB."
+    MODULE
+
+        GROUP   hpicfDot1xPaePortGroup
+        DESCRIPTION
+            "This group is mandatory for systems that support
+            Authenticator and/or Supplicant functions of the PAE."
+
+        GROUP   hpicfDot1xSMAuthConfigGroup
+        DESCRIPTION
+            "This group is mandatory for systems that support
+            shared-media Authenticator functions of the PAE."
+
+        GROUP   hpicfDot1xAuthStatsGroup
+        DESCRIPTION
+            "This group is mandatory for systems that support
+            the Authenticator functions of the PAE."
+
+        GROUP   hpicfDot1xAuthSessionStatsGroup1
+        DESCRIPTION
+            "This group is mandatory for systems that support
+            the Authenticator functions of the PAE."
+
+    ::= { hpicfDot1xCompliances 11 }
+
+hpicfDot1xCompliance12 MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+        "The compliance statement for devices support of
+        HP IEEE 802.1X extensions MIB."
+    MODULE
+       GROUP hpicfDot1xSystemGroup
+       DESCRIPTION
+            "This group is mandatory for systems that support
+             basic diagnostic Information over Authenticator PAEs."
+
+     ::= { hpicfDot1xCompliances 12 }
+
+hpicfDot1xCompliance13 MODULE-COMPLIANCE
+    STATUS  deprecated
+    DESCRIPTION
+        "The compliance statement for devices support of
+        HP IEEE 802.1X extensions MIB."
+    MODULE
+        GROUP   hpicfDot1xPaePortGroup
+        DESCRIPTION
+            "This group is mandatory for systems that support
+            Authenticator and/or Supplicant functions of the PAE."
+
+        GROUP   hpicfDot1xSMAuthConfigGroup
+        DESCRIPTION
+            "This group is mandatory for systems that support
+            shared-media Authenticator functions of the PAE."
+
+        GROUP   hpicfDot1xAuthStatsGroup
+        DESCRIPTION
+            "This group is mandatory for systems that support
+            the Authenticator functions of the PAE."
+
+        GROUP   hpicfDot1xAuthSessionStatsGroup
+        DESCRIPTION
+            "This group is mandatory for systems that support
+            the Authenticator functions of the PAE."
+
+        GROUP   hpicfDot1xSuppConfigGroup
+        DESCRIPTION
+            "A collection of objects providing basic configuration
+            of the 802.1x supplicant."
+    ::= { hpicfDot1xCompliances 13 }
+
+hpicfDot1xCompliance14 MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+        "The compliance statement for devices support of
+        HP IEEE 802.1X extensions MIB."
+    MODULE
+       GROUP hpicfDot1xPaePortGroup1
+       DESCRIPTION
+            "This group is mandatory for systems that support
+             critical/open auth vlan over Authenticator PAEs."
+
+     ::= { hpicfDot1xCompliances 14 }
+
+hpicfDot1xCompliance15 MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+        "The compliance statement for devices support of
+        HP IEEE 802.1X extensions MIB."
+    MODULE
+       GROUP hpicfDot1xPaePortEapRetriesGroup
+       DESCRIPTION
+            "This group is mandatory for systems that support
+             Eap Request retries of Authenticator PAEs."
+
+     ::= { hpicfDot1xCompliances 15 }
+
+hpicfDot1xCompliance16 MODULE-COMPLIANCE
+    STATUS  deprecated
+    DESCRIPTION
+        "The compliance statement for devices support of
+        HP IEEE 802.1X extensions MIB."
+    MODULE
+        GROUP   hpicfDot1xPaePortGroup
+        DESCRIPTION
+            "This group is mandatory for systems that support
+            Authenticator and/or Supplicant functions of the PAE."
+
+        GROUP   hpicfDot1xAuthConfigGroup7
+        DESCRIPTION
+            "This group is mandatory for systems that support
+            Authenticator functions of the PAE."
+
+        GROUP   hpicfDot1xSMAuthConfigGroup
+        DESCRIPTION
+            "This group is mandatory for systems that support
+            shared-media Authenticator functions of the PAE."
+
+        GROUP   hpicfDot1xAuthStatsGroup
+        DESCRIPTION
+            "This group is mandatory for systems that support
+            the Authenticator functions of the PAE."
+
+        GROUP   hpicfDot1xAuthSessionStatsGroup
+        DESCRIPTION
+            "This group is mandatory for systems that support
+            the Authenticator functions of the PAE."
+
+        GROUP   hpicfDot1xSuppConfigGroup
+        DESCRIPTION
+            "A collection of objects providing basic configuration
+            of the 802.1x supplicant."
+    ::= { hpicfDot1xCompliances 16 }
+
+hpicfDot1xCompliance17 MODULE-COMPLIANCE
+    STATUS  deprecated
+    DESCRIPTION
+        "The compliance statement for devices support of
+        HP IEEE 802.1X extensions MIB."
+    MODULE
+	GROUP   hpicfDot1xPaePortGroup
+        DESCRIPTION
+            "This group is mandatory for systems that support
+            Authenticator and/or Supplicant functions of the PAE."
+
+        GROUP   hpicfDot1xAuthConfigGroup8
+        DESCRIPTION
+            "This group is mandatory for systems that support
+            Authenticator functions of the PAE."
+
+        GROUP   hpicfDot1xSMAuthConfigGroup
+        DESCRIPTION
+            "This group is mandatory for systems that support
+            shared-media Authenticator functions of the PAE."
+
+        GROUP   hpicfDot1xAuthStatsGroup
+        DESCRIPTION
+            "This group is mandatory for systems that support
+            the Authenticator functions of the PAE."
+
+        GROUP   hpicfDot1xAuthSessionStatsGroup
+        DESCRIPTION
+            "This group is mandatory for systems that support
+            the Authenticator functions of the PAE."
+
+        GROUP   hpicfDot1xSuppConfigGroup
+        DESCRIPTION
+            "A collection of objects providing basic configuration
+            of the 802.1x supplicant."
+    ::= { hpicfDot1xCompliances 17 }
+
+hpicfDot1xCompliance19 MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+        "The compliance statement for devices support of
+        HP IEEE 802.1X extensions MIB."
+    MODULE
+	GROUP   hpicfDot1xPaePortGroup
+        DESCRIPTION
+            "This group is mandatory for systems that support
+            Authenticator and/or Supplicant functions of the PAE."
+
+        GROUP   hpicfDot1xAuthConfigGroup10
+        DESCRIPTION
+            "This group is mandatory for systems that support
+            Authenticator functions of the PAE."
+
+        GROUP   hpicfDot1xSMAuthConfigGroup
+        DESCRIPTION
+            "This group is mandatory for systems that support
+            shared-media Authenticator functions of the PAE."
+
+        GROUP   hpicfDot1xAuthStatsGroup
+        DESCRIPTION
+            "This group is mandatory for systems that support
+            the Authenticator functions of the PAE."
+
+        GROUP   hpicfDot1xAuthSessionStatsGroup
+        DESCRIPTION
+            "This group is mandatory for systems that support
+            the Authenticator functions of the PAE."
+
+        GROUP   hpicfDot1xSuppConfigGroup
+        DESCRIPTION
+            "A collection of objects providing basic configuration
+            of the 802.1x supplicant."
+    ::= { hpicfDot1xCompliances 19 }
+END

@@ -8,7 +8,7 @@
                     "sysDescr": "PL.10.10.0002",
                     "sysContact": "<private>",
                     "version": "PL.10.10.0002",
-                    "hardware": null,
+                    "hardware": "6100 12G Class4 PoE 2G/2SFP+ 139W Switch",
                     "features": null,
                     "location": "<private>",
                     "os": "arubaos-cx",
