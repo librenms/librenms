@@ -17,6 +17,7 @@
     </div>
   </div>
 </div>
+@endsection
 
 @section('javascript')
 <script type="text/javascript" src="{{ asset('js/vis.min.js') }}"></script>

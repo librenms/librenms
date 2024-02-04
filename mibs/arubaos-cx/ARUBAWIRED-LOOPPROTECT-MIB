@@ -1,0 +1,361 @@
+--**MOD+***********************************************************************
+--* Module:    ARUBAWIRED-LOOPPROTECT-MIB.mib
+--*
+--* (c) Copyright 2017,2022 Hewlett Packard Enterprise Development LP
+--* All Rights Reserved.
+--*
+--* The contents of this software are proprietary and confidential
+--* to the Hewlett-Packard Development Company, L.P.  No part of this
+--* program may be photocopied, reproduced, or translated into another
+--* programming language without prior written consent of the
+--* Hewlett-Packard Development Company, L.P.
+--*
+--* Purpose: This file contains MIB definition of ARUBAWIRED-LOOPPROTECT-MIB
+--*
+--**MOD-***********************************************************************
+
+ARUBAWIRED-LOOPPROTECT-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE, Integer32,
+        Counter32
+            FROM SNMPv2-SMI
+        TruthValue, TimeStamp, TEXTUAL-CONVENTION
+            FROM SNMPv2-TC
+        MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+            FROM SNMPv2-CONF
+        wndFeatures
+              FROM ARUBAWIRED-NETWORKING-OID
+        InterfaceIndex, ifIndex
+            FROM IF-MIB;
+
+    arubaWiredLoopProtectMIB MODULE-IDENTITY
+        LAST-UPDATED "201711020000Z" -- November 02, 2017
+        ORGANIZATION "HPE/Aruba Networking Division"
+        CONTACT-INFO "Hewlett-Packard Company
+                      8000 Foothills Blvd.
+                      Roseville, CA 95747"
+        DESCRIPTION  "This MIB module contains HP proprietary
+                      extensions to the standard Loop Protect MIBs."
+
+        REVISION     "201711020000Z" -- November 02, 2017
+        DESCRIPTION  "Initial revision."
+        ::= { wndFeatures 1 }
+
+    ConfigStatus ::= TEXTUAL-CONVENTION
+        STATUS      current
+        DESCRIPTION "Used to indicate the configuration status for
+                    a group of objects.  'active' means that the
+                    values of the related objects are currently in
+                    use by the device.  'notInService' indicates that
+                    the objects have been reconfigured in such a way
+                    that the values cannot take effect until after the
+                    next reboot of the device.  'notReady' indicates
+                    that the objects are not consistent with each other."
+        SYNTAX      INTEGER {
+                        active(1),
+                        notInService(2),
+                        notReady(3)
+                    }
+
+    VidList ::= TEXTUAL-CONVENTION
+        STATUS current
+        DESCRIPTION "Each octet within this value specifies a set of eight
+                    VlanIIndex (VID), with the first octet specifying VIDs 1
+                    through 8, the second octet specifying VIDs 9 through 16,
+                    etc.  Within each octet, the most significant bit represents
+                    the lowest numbered VID, and the least significant bit
+                    represents the highest numbered VID.  Thus, each VID
+                    is represented by a single bit within the value of this
+                    object.  If that bit has a value of 1 then that VID is
+                    included in the set of VIDs; the VID is not included if its
+                    bit has a value of 0.  This list represents the entire
+                    range of VlanIndex values defined in the scope of IEEE
+                    802.1Q."
+        SYNTAX OCTET STRING (SIZE (512))
+
+    arubaWiredLoopProtectObjects
+        OBJECT IDENTIFIER ::= { arubaWiredLoopProtectMIB 1 }
+
+-- **********************************************************************
+-- Loop Protection Objects
+-- **********************************************************************
+
+    LoopProtectReceiverAction ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+            " This TC describes the actions a port that receives a Loop
+              Protection Protocol packet can take.
+
+              The disableTx(1) enumeration indicates that the sender of
+              the Loop Protect packet will be disabled.
+
+              The noDisable(2) enumeration indicates that no port is to
+              be disabled.
+
+              The disableTxRx(3) enumeration indicates that the senders
+              and receivers of the Loop Protect packets will be disabled."
+    SYNTAX   INTEGER
+             {
+                disableTx(1),
+                noDisable(2),
+                disableTxRx(3)
+             }
+
+    arubaWiredLoopProtect   OBJECT IDENTIFIER ::= { arubaWiredLoopProtectObjects 5 }
+
+    arubaWiredLoopProtectNotifications
+                             OBJECT IDENTIFIER ::= { arubaWiredLoopProtect 0 }
+    arubaWiredLoopProtectBase
+                             OBJECT IDENTIFIER ::= { arubaWiredLoopProtect 1 }
+    arubaWiredLoopProtectPort
+                             OBJECT IDENTIFIER ::= { arubaWiredLoopProtect 2 }
+
+    arubaWiredLoopProtectInterval OBJECT-TYPE
+        SYNTAX      Integer32 (1..10)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The interval in seconds at which Loop Protection packets are
+                     transmitted. The default value is 5 seconds."
+        ::= { arubaWiredLoopProtectBase 1 }
+
+    arubaWiredLoopProtectTrapLoopDetectEnable OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Indicates whether notifications should be sent when a loop
+                     is detected on a port.  By default this object will
+                     have a value of false(2)."
+        ::= { arubaWiredLoopProtectBase 2 }
+
+    arubaWiredLoopProtectEnableTimer OBJECT-TYPE
+        SYNTAX      Integer32 (0..2147483647)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The time in seconds to wait before re-enabling a port
+                     disabled by Loop Protection. When a port is disabled by
+                     Loop Protection, a re-enable timer for the port is initialized.
+                     If the re-enable timer value is specified as zero seconds the port remains
+                     disabled, else the port is re-enabled after the specified time."
+        ::= { arubaWiredLoopProtectBase 3 }
+
+    arubaWiredLoopProtectMode OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            port (1),
+            vlan (2)
+            }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "This object is used to configure the operational mode of Loop Protection
+                     feature. The Loop Protection feature can be configured to operate in port mode
+                     or VLAN mode."
+        DEFVAL      { port }
+        ::= { arubaWiredLoopProtectBase 4 }
+
+    arubaWiredLoopProtectVIDList    OBJECT-TYPE
+        SYNTAX      VidList
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "A list of VLANs on which Loop Protection is enabled."
+        ::= { arubaWiredLoopProtectBase 5 }
+
+    arubaWiredLoopProtectPortTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF ArubaWiredLoopProtectPortEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Per-interface configuration for Loop Protection."
+        ::= { arubaWiredLoopProtectPort 1 }
+
+    arubaWiredLoopProtectPortEntry OBJECT-TYPE
+        SYNTAX      ArubaWiredLoopProtectPortEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Loop Protection configuration information for
+                     a single port."
+        INDEX       { arubaWiredLoopProtectPortInterfaceIndex }
+        ::= { arubaWiredLoopProtectPortTable 1 }
+
+    ArubaWiredLoopProtectPortEntry ::= SEQUENCE {
+            arubaWiredLoopProtectPortInterfaceIndex  InterfaceIndex,
+            arubaWiredLoopProtectPortEnable          TruthValue,
+            arubaWiredLoopProtectPortLoopDetected    TruthValue,
+            arubaWiredLoopProtectPortLastLoopTime    TimeStamp,
+            arubaWiredLoopProtectPortLoopCount       Counter32,
+            arubaWiredLoopProtectPortReceiverAction  LoopProtectReceiverAction,
+            arubaWiredLoopProtectLoopDetectedVlan    Integer32,
+            arubaWiredLoopProtectPortVlanList        VidList
+        }
+
+    arubaWiredLoopProtectPortInterfaceIndex OBJECT-TYPE
+        SYNTAX  InterfaceIndex
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION "The index value that uniquely identifies the interface to
+                    which this entry is applicable.  The interface identified by
+                    a particular value of this index is the same interface as
+                    identified by the same value of the IF-MIB's ifIndex."
+       ::= { arubaWiredLoopProtectPortEntry 1 }
+
+    arubaWiredLoopProtectPortEnable  OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "This object indicates whether the Loop Protection is enabled
+                     on a port. The default value is FALSE"
+        ::= { arubaWiredLoopProtectPortEntry 2 }
+
+    arubaWiredLoopProtectPortLoopDetected OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "This object will be set to TRUE when a loop is detected on
+                     the port. The value of this object will be reset to FALSE when
+                     the port's arubaWiredLoopProtectPortEnable is set to
+                     FALSE."
+        ::= { arubaWiredLoopProtectPortEntry 3 }
+
+    arubaWiredLoopProtectPortLastLoopTime OBJECT-TYPE
+        SYNTAX      TimeStamp
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The value of sysUpTime when a loop was last detected
+                     on this port. A value of 0 means that the timestamp has
+                     not been set."
+        ::= { arubaWiredLoopProtectPortEntry 4 }
+
+    arubaWiredLoopProtectPortLoopCount OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "This object provides the number of loops detected on a Loop Protection enabled
+                     port. The value of this object is set to zero when Loop Protection is disabled on
+                     a port."
+        ::= { arubaWiredLoopProtectPortEntry 5 }
+
+    arubaWiredLoopProtectPortReceiverAction OBJECT-TYPE
+        SYNTAX      LoopProtectReceiverAction
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Controls the action taken when a Loop Protection packet is
+                     received on this port.
+                     When set to 'disableTx' the port that transmitted the packet is disabled.
+
+                     When set to 'noDisable' the transmitting port is not disabled.
+
+                     When set to 'disableTxRx' the ports transmitting and receiving the packets are disabled."
+        ::= { arubaWiredLoopProtectPortEntry 6 }
+
+
+    arubaWiredLoopProtectLoopDetectedVlan OBJECT-TYPE
+        SYNTAX      Integer32(1..4096)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Refers to this object for the port on which loop is
+                     detected."
+        ::= { arubaWiredLoopProtectPortEntry 7 }
+
+
+    arubaWiredLoopProtectPortVlanList OBJECT-TYPE
+        SYNTAX      VidList
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "A list of VLANs for this interface in which Loop Protection is enabled."
+        ::= { arubaWiredLoopProtectPortEntry 8 }
+
+-- **********************************************************************
+-- arubaWiredLoopProtect Notifications
+-- **********************************************************************
+
+    arubaWiredLoopProtectLoopDetectedNotification NOTIFICATION-TYPE
+        OBJECTS     { ifIndex,
+                      arubaWiredLoopProtectPortLoopCount,
+                      arubaWiredLoopProtectPortReceiverAction
+                    }
+        STATUS      current
+        DESCRIPTION "A arubaWiredLoopProtectLoopDetectedNotification signifies
+                     that a loop is detected by the Loop Protection Protocol.
+                     Generation of this notification is controlled by
+                     arubaWiredLoopProtectTrapLoopDetectEnable.
+
+                     To prevent excessive notifications, this trap allows only
+                     one notifications every 30 seconds.
+                     Notifications that are missed due to this limitation are
+                     dropped and are not sent later."
+        ::= { arubaWiredLoopProtectNotifications 1 }
+
+    arubaWiredLoopProtectVlanLoopDetectedNotification NOTIFICATION-TYPE
+        OBJECTS     { ifIndex,
+                      arubaWiredLoopProtectPortLoopCount,
+                      arubaWiredLoopProtectPortReceiverAction,
+                      arubaWiredLoopProtectLoopDetectedVlan
+                    }
+        STATUS      current
+        DESCRIPTION "A arubaWiredLoopProtectVlanLoopDetectedNotification signifies
+                     that a loop is detected by the Loop Protection feature while
+                     operating in VLAN  mode. Generation of this notification is
+                     controlled by arubaWiredLoopProtectTrapLoopDetectEnable.
+
+                     To prevent excessive notifications, this trap allows only
+                     one notifications every 30 seconds.
+                     Notifications that are missed due to this limitation are
+                     dropped and are not sent later."
+        ::= { arubaWiredLoopProtectNotifications 2 }
+
+
+-- **********************************************************************
+-- Conformance information
+-- **********************************************************************
+
+    arubaWiredLoopProtectConformance   OBJECT IDENTIFIER ::= { arubaWiredLoopProtect 3 }
+    arubaWiredLoopProtectGroups        OBJECT IDENTIFIER ::= { arubaWiredLoopProtectConformance 1 }
+    arubaWiredLoopProtectCompliances   OBJECT IDENTIFIER ::= { arubaWiredLoopProtectConformance 2 }
+
+    arubaWiredLoopProtectBaseGroup OBJECT-GROUP
+        OBJECTS     { arubaWiredLoopProtectInterval,
+                      arubaWiredLoopProtectEnableTimer,
+                      arubaWiredLoopProtectTrapLoopDetectEnable,
+                      arubaWiredLoopProtectPortEnable,
+                      arubaWiredLoopProtectPortLoopDetected,
+                      arubaWiredLoopProtectPortLastLoopTime,
+                      arubaWiredLoopProtectPortLoopCount,
+                      arubaWiredLoopProtectPortReceiverAction
+                    }
+        STATUS      current
+        DESCRIPTION "A collection of objects providing basic instrumentation
+                     and control of the HP Loop protection entity."
+        ::= {arubaWiredLoopProtectGroups 4 }
+
+
+    arubaWiredLoopProtectVLANGroup OBJECT-GROUP
+        OBJECTS     { arubaWiredLoopProtectMode,
+                      arubaWiredLoopProtectVIDList,
+                      arubaWiredLoopProtectLoopDetectedVlan,
+                      arubaWiredLoopProtectPortVlanList
+                    }
+        STATUS      current
+        DESCRIPTION "A collection of objects providing support for Loop Protect
+                     per VLAN feature."
+
+        ::= {arubaWiredLoopProtectGroups 10 }
+
+    arubaWiredLoopProtectNotificationsGroup NOTIFICATION-GROUP
+         NOTIFICATIONS { arubaWiredLoopProtectLoopDetectedNotification,
+                         arubaWiredLoopProtectVlanLoopDetectedNotification
+                       }
+         STATUS current
+         DESCRIPTION "Aruba Wired Loop Protect notification group."
+         ::= { arubaWiredLoopProtectGroups 11 }
+
+    arubaWiredLoopProtectCompliance MODULE-COMPLIANCE
+        STATUS      current
+        DESCRIPTION "The compliance statement for HP Switches with
+                     support for arubaWired loop protection objects."
+        MODULE
+        MANDATORY-GROUPS { arubaWiredLoopProtectBaseGroup,
+                           arubaWiredLoopProtectNotificationsGroup,
+                           arubaWiredLoopProtectVLANGroup
+                         }
+        ::= { arubaWiredLoopProtectCompliances 5 }
+
+END
