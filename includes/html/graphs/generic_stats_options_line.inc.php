@@ -38,14 +38,14 @@ $gstat_var_start = [
 ];
 
 foreach ($gstat_vars as $gstat_var => $gstat_var_descr) {
-    if (!isset($gstat_val_vars[$gstat_var])) {
+    if (! isset($gstat_val_vars[$gstat_var])) {
         echo $gstat_var_start[$gstat_var];
         echo $gstat_var_descr . ': ';
         $label = $vars[$gstat_var] == '1'
             ? '<span class="pagemenu-selected">Off</span>'
             : 'Off';
         $new_link_extra_array = $link_extra_array;
-        $new_link_extra_array[$gstat_var]= 1;
+        $new_link_extra_array[$gstat_var] = 1;
         echo generate_link($label, $link_array, $new_link_extra_array) . "\n";
 
         $label = $vars[$gstat_var] == '0'

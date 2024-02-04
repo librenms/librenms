@@ -120,7 +120,7 @@ if (! isset($colour75th) && ! $no_percentile) {
     $iter++;
 }
 
-if (! isset($colourx0th)  && ! $no_percentile_x0) {
+if (! isset($colourx0th) && ! $no_percentile_x0) {
     if (! \LibreNMS\Config::get("graph_colours.$colours.$iter")) {
         $iter = 0;
     }
@@ -279,10 +279,10 @@ if ($height > 25) {
     $rrd_options .= ' VDEF:' . $id . '50th=' . $id . ',50,PERCENTNAN';
     $rrd_options .= ' VDEF:' . $id . '25th=' . $id . ',25,PERCENTNAN';
     $rrd_options .= ' VDEF:' . $id . '75th=' . $id . ',75,PERCENTNAN';
-    if (!$no_percentile_x0) {
+    if (! $no_percentile_x0) {
         $rrd_options .= ' VDEF:' . $id . 'x0th=' . $id . ',' . $percentile_x0 . ',PERCENTNAN';
     }
-    if (!$no_percentile_x1) {
+    if (! $no_percentile_x1) {
         $rrd_options .= ' VDEF:' . $id . 'x1th=' . $id . ',' . $percentile_x1 . ',PERCENTNAN';
     }
 
@@ -332,7 +332,6 @@ if ($height > 25) {
             }
         }
     }
-
 
     // weekly breaks and causes issues if it is less than 8 days
     if (! $no_weekly) {
@@ -435,11 +434,11 @@ if ($height > 25) {
             $rrd_optionsb .= ' GPRINT:' . $id . '75th:%' . $float_precision . 'lf%s\n';
         }
     }
-    if (!$no_percentile_x0) {
+    if (! $no_percentile_x0) {
         $rrd_optionsb .= ' HRULE:' . $id . 'x0th#' . $colourx0th . ':' . $percentile_x0 . 'th_Percentile';
         $rrd_optionsb .= ' GPRINT:' . $id . 'x0th:%' . $float_precision . 'lf%s\n';
     }
-    if (!$no_percentile_x1) {
+    if (! $no_percentile_x1) {
         $rrd_optionsb .= ' HRULE:' . $id . 'x1th#' . $colourx1th . ':' . $percentile_x1 . 'th_Percentile';
         $rrd_optionsb .= ' GPRINT:' . $id . 'x1th:%' . $float_precision . 'lf%s\n';
     }

@@ -12,7 +12,7 @@ if (isset($vars['gstats_no_hourly'])) {
         $no_hourly = false;
     }
 } else {
-        $no_hourly = false;
+    $no_hourly = false;
 }
 
 //
@@ -169,7 +169,7 @@ if (isset($vars['gstats_no_percentile_x0'])) {
 // percentile x0 value, default 90
 //
 if (isset($vars['gstats_percentile_x0_val'])) {
-    if (!is_numeric($vars['gstats_percentile_x0_val'])) {
+    if (! is_numeric($vars['gstats_percentile_x0_val'])) {
         $vars['gstats_percentile_x0_val'] = 90;
     } elseif ($vars['gstats_percentile_x0_val'] <= 0) {
         $vars['gstats_percentile_x0_val'] = 90;
@@ -200,7 +200,7 @@ if (isset($vars['gstats_no_percentile_x1'])) {
 // percentile x1 value, default 95
 //
 if (isset($vars['gstats_percentile_x1_val'])) {
-    if (!is_numeric($vars['gstats_percentile_x1_val'])) {
+    if (! is_numeric($vars['gstats_percentile_x1_val'])) {
         $vars['gstats_percentile_x1_val'] = 95;
     } elseif ($vars['gstats_percentile_x1_val'] <= 0) {
         $vars['gstats_percentile_x1_val'] = 95;
