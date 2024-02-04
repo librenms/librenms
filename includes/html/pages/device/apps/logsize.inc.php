@@ -93,7 +93,6 @@ if (isset($vars['log_file']) && isset($vars['log_set'])) {
     ];
 }
 
-
 foreach ($graphs as $key => $text) {
     $graph_type = $key;
     $graph_array['height'] = '100';
