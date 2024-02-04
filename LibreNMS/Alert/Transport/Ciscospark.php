@@ -31,18 +31,20 @@ class Ciscospark extends Transport
             'roomId' => $room_id,
         ];
 
-        if (strlen($alert_data['msg']) > Ciscospark::$MAX_MSG_SIZE) {
-            $msg = substr($alert_data['msg'], 0, Ciscospark::$MAX_MSG_SIZE) . '...';
-        } else {
-            $msg = $alert_data['msg'];
-        }
-
         if ($this->config['use-markdown'] === 'on') {
             // Remove blank lines as they create weird markdown behaviors.
-            $data['markdown'] = preg_replace('/^\s+/m', '', $msg);
+            $msg = preg_replace('/^\s+/m', '', $alert_data['msg']);
+            $mtype = 'markdown';
         } else {
-            $data['text'] = strip_tags($msg);
+            $msg = strip_tags($alert_data['msg']);
+            $mtype = 'text';
         }
+
+        if (strlen($msg) > Ciscospark::$MAX_MSG_SIZE) {
+            $msg = substr($msg, 0, Ciscospark::$MAX_MSG_SIZE) . '...';
+        }
+
+        $data[$mtype] = $msg;
 
         $res = Http::client()
             ->withToken($token)
