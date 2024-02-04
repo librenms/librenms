@@ -21,6 +21,14 @@ if (! isset($munge)) {
     $munge = false;
 }
 
+if (! isset($no_percentile_x0)) {
+    $no_percentile_x0 = true;
+}
+
+if (! isset($no_percentile_x1)) {
+    $no_percentile_x1 = true;
+}
+
 if (! isset($no_hourly)) {
     $no_hourly = false;
 }
@@ -87,7 +95,7 @@ if (! isset($colour25th) && ! $no_percentile) {
     $iter++;
 }
 
-if (! isset($colour50th)) {
+if (! isset($colour50th) && ! $no_percentile) {
     if (! \LibreNMS\Config::get("graph_colours.$colours.$iter")) {
         $iter = 0;
     }
@@ -95,7 +103,7 @@ if (! isset($colour50th)) {
     $iter++;
 }
 
-if (! isset($colour75th)) {
+if (! isset($colour75th) && ! $no_percentile) {
     if (! \LibreNMS\Config::get("graph_colours.$colours.$iter")) {
         $iter = 0;
     }
@@ -103,7 +111,23 @@ if (! isset($colour75th)) {
     $iter++;
 }
 
-if (! isset($colour1h)) {
+if (! isset($colourx0th)  && ! $no_percentile_x0) {
+    if (! \LibreNMS\Config::get("graph_colours.$colours.$iter")) {
+        $iter = 0;
+    }
+    $colourx0th = \LibreNMS\Config::get("graph_colours.$colours.$iter");
+    $iter++;
+}
+
+if (! isset($colourx1th) && ! $no_percentile_x1) {
+    if (! \LibreNMS\Config::get("graph_colours.$colours.$iter")) {
+        $iter = 0;
+    }
+    $colourx1th = \LibreNMS\Config::get("graph_colours.$colours.$iter");
+    $iter++;
+}
+
+if (! isset($colour1h) && ! $no_hourly) {
     if (! \LibreNMS\Config::get("graph_colours.$colours.$iter")) {
         $iter = 0;
     }
@@ -119,7 +143,7 @@ if (! isset($colour1h_max) && ! $no_hourly_max) {
     $iter++;
 }
 
-if (! isset($colour1d)) {
+if (! isset($colour1d) && ! $no_daily) {
     if (! \LibreNMS\Config::get("graph_colours.$colours.$iter")) {
         $iter = 0;
     }
@@ -135,7 +159,7 @@ if (! isset($colour1d_max) && ! $no_daily_max) {
     $iter++;
 }
 
-if (! isset($colour1w)) {
+if (! isset($colour1w) && ! $no_weekly) {
     if (! \LibreNMS\Config::get("graph_colours.$colours.$iter")) {
         $iter = 0;
     }
@@ -213,6 +237,19 @@ if ($height > 25) {
     $rrd_options .= ' VDEF:' . $id . '50th=' . $id . ',50,PERCENTNAN';
     $rrd_options .= ' VDEF:' . $id . '25th=' . $id . ',25,PERCENTNAN';
     $rrd_options .= ' VDEF:' . $id . '75th=' . $id . ',75,PERCENTNAN';
+    if (!$no_percentile_x0) {
+        $rrd_options .= ' VDEF:' . $id . 'x0th=' . $id . ',' . $percentile_x0 . ',PERCENTNAN';
+    }
+    if (!$no_percentile_x1) {
+        $rrd_options .= ' VDEF:' . $id . 'x1th=' . $id . ',' . $percentile_x1 . ',PERCENTNAN';
+    }
+
+    if (! $no_hourly_max) {
+        $rrd_options .= ' DEF:' . $id . "1hmax$munge_helper=$filename:$ds:MAX:step=3600";
+        if ($munge) {
+            $rrd_options .= ' CDEF:dsm01h=dsm01hmaxds,' . $munge_opts;
+        }
+    }
 
     // the if is needed as with out it the group page will case an error
     // devices/group=1/format=graph_poller_perf/from=-24hour/to=now/
@@ -246,6 +283,14 @@ if ($height > 25) {
             $rrd_options .= ' DEF:' . $id . "1w$munge_helper=$filename:$ds:AVERAGE:step=604800";
             if ($munge) {
                 $rrd_options .= ' CDEF:dsm01w=dsm01wds,' . $munge_opts;
+            }
+        }
+    }
+    if (! $no_weekly) {
+        if ($time_diff >= 691200) {
+            $rrd_options .= ' DEF:' . $id . "1wmax$munge_helper=$filename:$ds:MAX:step=604800";
+            if ($munge) {
+                $rrd_options .= ' CDEF:dsm01w=dsm01wmaxds,' . $munge_opts;
             }
         }
     }
@@ -305,6 +350,14 @@ if ($height > 25) {
             $rrd_optionsb .= ' HRULE:' . $id . '75th#' . $colour75th . ':75th_Percentile';
             $rrd_optionsb .= ' GPRINT:' . $id . '75th:%' . $float_precision . 'lf%s\n';
         }
+    }
+    if (!$no_percentile_x0) {
+        $rrd_optionsb .= ' HRULE:' . $id . 'x0th#' . $colourx0th . ':' . $percentile_x0 . 'th_Percentile';
+        $rrd_optionsb .= ' GPRINT:' . $id . 'x0th:%' . $float_precision . 'lf%s\n';
+    }
+    if (!$no_percentile_x1) {
+        $rrd_optionsb .= ' HRULE:' . $id . 'x1th#' . $colourx1th . ':' . $percentile_x1 . 'th_Percentile';
+        $rrd_optionsb .= ' GPRINT:' . $id . 'x1th:%' . $float_precision . 'lf%s\n';
     }
 }
 $rrd_options .= $rrd_optionsb;

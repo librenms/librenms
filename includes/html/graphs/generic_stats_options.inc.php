@@ -11,6 +11,8 @@ if (isset($vars['gstats_no_hourly'])) {
     } else {
         $no_hourly = false;
     }
+} else {
+        $no_hourly = false;
 }
 
 //
@@ -24,6 +26,8 @@ if (isset($vars['gstats_no_hourly_max'])) {
     } else {
         $no_hourly_max = true;
     }
+} else {
+    $no_hourly_max = true;
 }
 
 //
@@ -37,6 +41,8 @@ if (isset($vars['gstats_no_daily'])) {
     } else {
         $no_daily = false;
     }
+} else {
+    $no_daily = false;
 }
 
 //
@@ -50,6 +56,8 @@ if (isset($vars['gstats_no_daily_max'])) {
     } else {
         $no_daily_max = true;
     }
+} else {
+    $no_daily_max = true;
 }
 
 //
@@ -63,6 +71,8 @@ if (isset($vars['gstats_no_weekly'])) {
     } else {
         $no_weekly = false;
     }
+} else {
+    $no_weekly = false;
 }
 
 //
@@ -76,6 +86,8 @@ if (isset($vars['gstats_no_weekly_max'])) {
     } else {
         $no_weekly_max = true;
     }
+} else {
+    $no_weekly_max = true;
 }
 
 //
@@ -89,23 +101,27 @@ if (isset($vars['gstats_no_percentile'])) {
     } else {
         $no_percentile = false;
     }
+} else {
+    $no_percentile = false;
 }
 
 //
 // display percentile x0
 //
-if (isset($vars['gstats_percentile_x0'])) {
-    if ($vars['gstats_percentile_x0'] == 0) {
+if (isset($vars['gstats_no_percentile_x0'])) {
+    if ($vars['gstats_no_percentile_x0'] == 0) {
         $no_percentile_x0 = false;
-    } elseif ($vars['gstats_percentile_x0'] == 1) {
+    } elseif ($vars['gstats_no_percentile_x0'] == 1) {
         $no_percentile_x0 = true;
     } else {
         $no_percentile_x0 = true;
     }
+} else {
+    $no_percentile_x0 = true;
 }
 
 //
-// percential x0 value, default 90
+// percentile x0 value, default 90
 //
 if (isset($vars['gstats_percentile_x0_val'])) {
     if (!is_numeric($vars['gstats_percentile_x0_val'])) {
@@ -116,23 +132,27 @@ if (isset($vars['gstats_percentile_x0_val'])) {
         $vars['gstats_percentile_x0_val'] = 90;
     }
     $percentile_x0 = $vars['gstats_percentile_x0_val'];
+} else {
+    $percentile_x0 = 90;
 }
 
 //
 // display percentile x1
 //
-if (isset($vars['gstats_percentile_x1'])) {
-    if ($vars['gstats_percentile_x1'] == 0) {
+if (isset($vars['gstats_no_percentile_x1'])) {
+    if ($vars['gstats_no_percentile_x1'] == 0) {
         $no_percentile_x1 = false;
-    } elseif ($vars['gstats_percentile_x1'] == 1) {
+    } elseif ($vars['gstats_no_percentile_x1'] == 1) {
         $no_percentile_x1 = true;
     } else {
         $no_percentile_x1 = true;
     }
+} else {
+    $no_percentile_x1 = true;
 }
 
 //
-// percential x1 value, default 95
+// percentile x1 value, default 95
 //
 if (isset($vars['gstats_percentile_x1_val'])) {
     if (!is_numeric($vars['gstats_percentile_x1_val'])) {
@@ -143,6 +163,8 @@ if (isset($vars['gstats_percentile_x1_val'])) {
         $vars['gstats_percentile_x1_val'] = 95;
     }
     $percentile_x1 = $vars['gstats_percentile_x0_val'];
+} else {
+    $percentile_x1 = 95;
 }
 
 require 'includes/html/graphs/generic_stats.inc.php';

@@ -117,9 +117,9 @@ foreach ($graphs as $key => $text) {
     $graph_array['gstats_no_weekly'] = $vars['gstats_no_weekly'];
     $graph_array['gstats_no_weekly_max'] =  $vars['gstats_no_weekly_max'];
     $graph_array['gstats_no_percentile'] = $vars['gstats_no_percentile'];
-    $graph_array['gstats_percentile_x0'] = $vars['gstats_percentile_x0'];
+    $graph_array['gstats_no_percentile_x0'] = $vars['gstats_no_percentile_x0'];
     $graph_array['gstats_percentile_x0_val'] = $vars['gstats_percentile_x0_val'];
-    $graph_array['gstats_percentile_x1'] = $vars['gstats_percentile_x1'];
+    $graph_array['gstats_no_percentile_x1'] = $vars['gstats_no_percentile_x1'];
     $graph_array['gstats_percentile_x1_val'] = $vars['gstats_percentile_x1_val'];
 
     echo '<div class="panel panel-default">

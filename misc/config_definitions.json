@@ -1980,11 +1980,11 @@
                 "1": "True"
             }
         },
-        "graph_stat_percentile_x0_default": {
+        "graph_stat_no_percentile_x0_default": {
             "group": "webui",
             "section": "graph",
             "order": 15,
-            "default": "0",
+            "default": "1",
             "type": "select",
             "options": {
                 "0": "False",
@@ -1998,11 +1998,11 @@
             "default": 90,
             "type": "integer"
         },
-        "graph_stat_percentile_x1_default": {
+        "graph_stat_no_percentile_x1_default": {
             "group": "webui",
             "section": "graph",
             "order": 17,
-            "default": "0",
+            "default": "1",
             "type": "select",
             "options": {
                 "0": "False",
