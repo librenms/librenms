@@ -25,7 +25,7 @@
                     "sysObjectID": ".1.3.6.1.4.1.890.1.5.8.27",
                     "sysDescr": "ES-2024PWR",
                     "sysContact": null,
-                    "version": "",
+                    "version": null,
                     "hardware": "ES-2024PWR",
                     "features": null,
                     "location": null,
