@@ -60,10 +60,112 @@
     var network_height;
     var network_width;
     var node_align = {{$node_align}};
+    var edge_sep = 10; // TODO: Make this a map level option
     var network_nodes = new vis.DataSet({queue: {delay: 100}});
     var network_edges = new vis.DataSet({queue: {delay: 100}});
+    var edge_nodes_map = [];
     var node_device_map = {};
     var custom_image_base = "{{ $base_url }}images/custommap/icons/";
+
+    function edgeNodesRemove(nm_id, edgeid) {
+        // Remove old item from map if it exists
+        if (nm_id in edge_nodes_map) {
+            const edge_idx = edge_nodes_map[nm_id].indexOf(edgeid);
+            if (edge_idx >= 0) {
+                edge_nodes_map[nm_id].splice(edge_idx, 1);
+            }
+        }
+    }
+
+    function edgeNodesUpdate(edgeid, node1_id, node2_id, old_node1_id, old_node2_id) {
+        var nm_id = node1_id < node2_id ? node1_id + '.' + node2_id : node2_id + '.' + node1_id;
+        var old_nm_id = old_node1_id < old_node2_id ? old_node1_id + '.' + old_node2_id : old_node2_id + '.' + old_node1_id;
+
+        // No update is needed if the new and old are the same
+        if (nm_id == old_nm_id) {
+            return;
+        }
+
+        if (old_node1_id > 0 && old_node2_id > 0) {
+            edgeNodesRemove(old_nm_id, edgeid);
+        }
+
+        if (!(nm_id in edge_nodes_map)) {
+            edge_nodes_map[nm_id] = [];
+        }
+        edge_nodes_map[nm_id].push(edgeid);
+    }
+
+    function getMidOffests(pos1, pos2) {
+        // First work out which pos is on the left-hand side
+        var left_pos;
+        var right_pos;
+        if(pos1.x < pos2.x) {
+            left_pos = pos1;
+            right_pos = pos2;
+        } else {
+            left_pos = pos2;
+            right_pos = pos1;
+        }
+
+        // The X axis needs to move left/right based on whether the line rises or falls
+        var x_diff = right_pos.y - left_pos.y;
+        // The Y axis needs to move up always based on how far apart the left and right nodes are
+        var y_diff = left_pos.x - right_pos.x;
+
+        // Calculate how far each mid point needs to move
+        var tot_diff = Math.abs(x_diff) + Math.abs(y_diff);
+        return {x: Math.round(edge_sep * (x_diff / tot_diff)), y: Math.round(edge_sep * (y_diff / tot_diff))};
+    }
+
+    function getMidPos(edgeid, from_id, to_id) {
+        var nm_id = from_id < to_id ? from_id + '.' + to_id : to_id + '.' + from_id;
+        const node_links = nm_id in edge_nodes_map ? edge_nodes_map[nm_id] : [];
+
+        var node_offsets = [];
+        node_links.forEach((link_edgeid) => {
+            // Ignore the edge we are creating
+            if (link_edgeid == edgeid) {
+                return;
+            }
+
+            // Save the offset in the hash
+            let link_mid = network_nodes.get(link_edgeid + "_mid");
+            let link_mid_offset = link_mid.x + '.' + link_mid.y;
+            node_offsets[link_mid_offset] = true;
+        });
+
+        var pos = network.getPositions([from_id, to_id]);
+
+        const offsets = getMidOffests(pos[from_id], pos[to_id]);
+
+        // Calculate the center point
+        var mid_center = {x: (pos[from_id].x + pos[to_id].x) >> 1, y: (pos[from_id].y + pos[to_id].y) >> 1};
+        var mids = [mid_center];
+        for (let i = 1; i < node_links.length; i++) {
+            let multiplier = ((i + 1) >> 1);
+            let this_x = mid_center.x;
+            let this_y = mid_center.y;
+            if(i & 1) {
+                // Odd numbers go the normal direction
+                mids.push({x: mid_center.x + (multiplier * offsets.x), y: mid_center.y + (multiplier * offsets.y)});
+            } else {
+                // Even numbers go the opposite direction
+                mids.push({x: mid_center.x - (multiplier * offsets.x), y: mid_center.y - (multiplier * offsets.y)});
+            }
+        }
+
+        // Find the first unused mid point from the center
+        for (let i = 0; i < mids.length; i++) {
+            let this_offset = mids[i].x + '.' + mids[i].y;
+            if (!(this_offset in node_offsets)) {
+                return {x: mids[i].x, y: mids[i].y};
+            }
+        }
+
+        // Default to mid point
+        return {x: mid_center.x, y: mid_center.y};
+    }
 
     function CreateNetwork() {
         // Flush the nodes and edges so they are rendered immediately
@@ -120,11 +222,14 @@
                     return;
                 }
 
-                var pos = network.getPositions([data.from, data.to]);
-                var mid_x = (pos[data.from].x + pos[data.to].x) >> 1;
-                var mid_y = (pos[data.from].y + pos[data.to].y) >> 1;
-
                 var edgeid = "new" + newcount++;
+
+                edgeNodesUpdate(edgeid, data.from, data.to, -1, -1);
+                const mid_pos = getMidPos(edgeid, data.from, data.to);
+
+                // Default to using the center point
+                var mid_x = mid_pos.x;
+                var mid_y = mid_pos.y;
 
                 var mid = {id: edgeid + "_mid", shape: "dot", size: 3, x: mid_x, y: mid_y};
 
@@ -724,6 +829,8 @@
     function editEdgeSave(event) {
         edgedata = event.data.data;
 
+        edgeNodesUpdate(edgedata.id, $("#edgefrom").val(), $("#edgeto").val(), edgedata.edge1.from, edgedata.edge2.from);
+
         editEdgeHide();
         edgedata.edge1.smooth.type = $("#edgestyle").val();
         edgedata.edge2.smooth.type = $("#edgestyle").val();
@@ -762,11 +869,10 @@
 
             if($("#edgerecenter").is(":checked")) {
                 var pos = network.getPositions([edgedata.edge1.from, edgedata.edge2.from]);
-                var mid_x = (pos[edgedata.edge1.from].x + pos[edgedata.edge2.from].x) >> 1;
-                var mid_y = (pos[edgedata.edge1.from].y + pos[edgedata.edge2.from].y) >> 1;
+                const mid_pos = getMidPos(edgedata.id, edgedata.edge1.from, edgedata.edge2.from);
 
-                edgedata.mid.x = mid_x;
-                edgedata.mid.y = mid_y;
+                edgedata.mid.x = mid_pos.x;
+                edgedata.mid.y = mid_pos.y;
                 network_nodes.update([edgedata.mid]);
                 $("#map-renderButton").show();
             }
@@ -815,6 +921,10 @@
     }
 
     function deleteEdge(edgeid) {
+        const edge1 = network_edges.get(edgeid + "_from");
+        const edge2 = network_edges.get(edgeid + "_to");
+        var nm_id = edge1.from < edge2.from ? edge1.from + '.' + edge2.from : edge2.from + '.' + edge1.from;
+        edgeNodesRemove(nm_id, edgeid);
         network_edges.remove(edgeid + "_to");
         network_edges.remove(edgeid + "_from");
         network_edges.flush();
@@ -824,6 +934,7 @@
     }
 
     function refreshMap() {
+        edge_nodes_map = [];
         $.get( '{{ route('maps.custom.data', ['map' => $map_id]) }}')
             .done(function( data ) {
                 // Add/update nodes
@@ -874,6 +985,8 @@
                 });
 
                 $.each( data.edges, function( edgeid, edge) {
+                    edgeNodesUpdate(edgeid, edge.custom_map_node1_id, edge.custom_map_node2_id, -1, -1);
+
                     var mid_x = edge.mid_x;
                     var mid_y = edge.mid_y;
 
