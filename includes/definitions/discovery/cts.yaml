@@ -50,7 +50,6 @@ modules:
             data:
                 -
                     oid: IPS-3110-MIB::swhPOETotalPower
-                    #num_oid: '.1.3.6.1.4.1.9304.100.3110.5.48.1.0'
                     num_oid: '.1.3.6.1.4.1.9304.100.3110.5.48.1.{{ $index }}'
                     descr: 'Total PoE Power Consumption'
 
