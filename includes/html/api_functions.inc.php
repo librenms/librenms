@@ -2293,6 +2293,28 @@ function update_device_group(Illuminate\Http\Request $request)
     return api_success_noresult(200, "Device group $name updated");
 }
 
+function delete_device_group(Illuminate\Http\Request $request)
+{
+    $name = $request->route('name');
+    if (! $name) {
+        return api_error(400, 'No device group name provided');
+    }
+
+    $deviceGroup = ctype_digit($name) ? DeviceGroup::find($name) : DeviceGroup::where('name', $name)->first();
+
+    if (! $deviceGroup) {
+        return api_error(404, "Device group $name not found");
+    }
+
+    $deleted = $deviceGroup->delete();
+
+    if (! $deleted) {
+        return api_error(500, "Device group $name could not be removed");
+    }
+
+    return api_success_noresult(200, "Device group $name deleted");
+}
+
 function update_device_group_add_devices(Illuminate\Http\Request $request)
 {
     $data = json_decode($request->getContent(), true);

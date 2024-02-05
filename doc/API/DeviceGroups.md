@@ -134,6 +134,36 @@ Output:
 }
 ```
 
+### `delete_devicegroup`
+
+Deletes a device group.
+
+Route: `/api/v0/devicegroups/:name`
+
+- name Is the name of the device group which can be obtained using
+  [`get_devicegroups`](#function-get_devicegroups). Please ensure that
+  the name is urlencoded if it needs to be (i.e Linux Servers would
+  need to be urlencoded.
+
+Input:
+
+-
+
+Examples:
+
+```curl
+curl -X DELETE -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/LinuxServers
+```
+
+Output:
+
+```json
+{
+    "status": "ok",
+    "message": "Device group LinuxServers deleted"
+}
+```
+
 ### `get_devices_by_group`
 
 List all devices matching the group provided.
