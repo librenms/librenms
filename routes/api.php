@@ -68,6 +68,8 @@ Route::prefix('v0')->namespace('\App\Api\Controllers')->group(function () {
         });
 
         Route::prefix('devicegroups')->group(function () {
+            Route::patch('{name}', 'LegacyApiController@update_device_group')->name('update_device_group');
+            Route::delete('{name}', 'LegacyApiController@delete_device_group')->name('delete_device_group');
             Route::post('{name}/devices', 'LegacyApiController@update_device_group_add_devices')->name('update_device_group_add_devices');
             Route::delete('{name}/devices', 'LegacyApiController@update_device_group_remove_devices')->name('update_device_group_remove_devices');
             Route::post('{name}/maintenance', 'LegacyApiController@maintenance_devicegroup')->name('maintenance_devicegroup');

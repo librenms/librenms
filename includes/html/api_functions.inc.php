@@ -2233,6 +2233,88 @@ function add_device_group(Illuminate\Http\Request $request)
     return api_success($deviceGroup->id, 'id', 'Device group ' . $deviceGroup->name . ' created', 201);
 }
 
+function update_device_group(Illuminate\Http\Request $request)
+{
+    $data = json_decode($request->getContent(), true);
+    if (json_last_error() || ! is_array($data)) {
+        return api_error(400, "We couldn't parse the provided json. " . json_last_error_msg());
+    }
+
+    $name = $request->route('name');
+    if (! $name) {
+        return api_error(400, 'No device group name provided');
+    }
+
+    $deviceGroup = ctype_digit($name) ? DeviceGroup::find($name) : DeviceGroup::where('name', $name)->first();
+
+    if (! $deviceGroup) {
+        return api_error(404, "Device group $name not found");
+    }
+
+    $rules = [
+        'name' => 'sometimes|string|unique:device_groups',
+        'desc' => 'sometimes|string',
+        'type' => 'sometimes|in:dynamic,static',
+        'devices' => 'array|required_if:type,static',
+        'devices.*' => 'integer',
+        'rules' => 'json|required_if:type,dynamic',
+    ];
+
+    $v = Validator::make($data, $rules);
+    if ($v->fails()) {
+        return api_error(422, $v->messages());
+    }
+
+    if (! empty($data['rules'])) {
+        // Only use the rules if they are able to be parsed by the QueryBuilder
+        $query = QueryBuilderParser::fromJson($data['rules'])->toSql();
+        if (empty($query)) {
+            return api_error(500, "We couldn't parse your rule");
+        }
+    }
+
+    $validatedData = $v->safe()->only(['name', 'desc', 'type']);
+    $deviceGroup->fill($validatedData);
+
+    if ($deviceGroup->type == 'static' && array_key_exists('devices', $data)) {
+        $deviceGroup->devices()->sync($data['devices']);
+    }
+
+    if ($deviceGroup->type == 'dynamic' && ! empty($data['rules'])) {
+        $deviceGroup->rules = json_decode($data['rules']);
+    }
+
+    try {
+        $deviceGroup->save();
+    } catch (\Illuminate\Database\QueryException $e) {
+        return api_error(500, 'Failed to save changes device group');
+    }
+
+    return api_success_noresult(200, "Device group $name updated");
+}
+
+function delete_device_group(Illuminate\Http\Request $request)
+{
+    $name = $request->route('name');
+    if (! $name) {
+        return api_error(400, 'No device group name provided');
+    }
+
+    $deviceGroup = ctype_digit($name) ? DeviceGroup::find($name) : DeviceGroup::where('name', $name)->first();
+
+    if (! $deviceGroup) {
+        return api_error(404, "Device group $name not found");
+    }
+
+    $deleted = $deviceGroup->delete();
+
+    if (! $deleted) {
+        return api_error(500, "Device group $name could not be removed");
+    }
+
+    return api_success_noresult(200, "Device group $name deleted");
+}
+
 function update_device_group_add_devices(Illuminate\Http\Request $request)
 {
     $data = json_decode($request->getContent(), true);
