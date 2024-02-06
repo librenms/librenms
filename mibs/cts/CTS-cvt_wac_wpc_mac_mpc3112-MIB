@@ -1,0 +1,60 @@
+	CTS-cvt_wac_wpc_mac_mpc3112-MIB DEFINITIONS ::= BEGIN
+
+	IMPORTS
+		enterprises,Counter, TimeTicks, Gauge     
+											FROM RFC1155-SMI
+		mib-2, DisplayString				FROM RFC1213-MIB
+		TRAP-TYPE							FROM RFC-1215
+		OBJECT-TYPE							FROM RFC-1212;
+       
+	CTS OBJECT IDENTIFIER ::= { enterprises 9304 }
+	
+	PhysAddress ::=	OCTET STRING
+	
+	-- This data type is used to model media addresses.  For many
+	-- types of media, this will be in a binary representation.
+	-- For example, an ethernet address would be represented as
+	-- a string of 6 octets. 
+ 
+	-- All representations of MAC addresses in this MIB Module use,
+	-- as a textual convention (i.e., this convention does not affect
+	-- their encoding), the data type:
+
+	MacAddress ::= OCTET STRING (SIZE (6))		-- a 6 octet address in
+												-- the "canonical" order     
+                                                                                          
+	VLANPortMember ::= DisplayString (SIZE (0..27))
+   
+	CVT
+			OBJECT IDENTIFIER ::= { CTS 50 }
+
+	cvt_wac_wpc_mac_mpc3112
+		OBJECT IDENTIFIER ::= { CVT 3112 }       
+
+
+-- cvt_wac_wpc_mac_mpc3112
+
+	SaveConfiguration OBJECT-TYPE
+		SYNTAX    INTEGER { normal(0), save(1)}
+		ACCESS    write-only
+		STATUS    mandatory
+		DESCRIPTION
+			"Save Configuration to Flash ROM"
+		::= { cvt_wac_wpc_mac_mpc3112 7 }		
+	
+	cvt_wac_wpc_mac_mpc3112Traps	OBJECT IDENTIFIER
+		::= { cvt_wac_wpc_mac_mpc3112 9 }
+
+
+-- cvt_wac_wpc_mac_mpc3112Traps
+	SystemPowerDown	TRAP-TYPE
+		ENTERPRISE		cvt_wac_wpc_mac_mpc3112Traps
+		--&ACTIONS      { critical }
+		--&MESG			"System Power Down"
+		DESCRIPTION		"when system power down, send this trap."
+		::=  1
+
+	END
+
+
+
