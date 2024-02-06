@@ -30,6 +30,7 @@ use App\Http\Requests\CustomMapSettingsRequest;
 use App\Models\CustomMap;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Storage;
 use LibreNMS\Config;
@@ -75,8 +76,14 @@ class CustomMapController extends Controller
                   ->header('Content-Type', 'text/plain');
     }
 
-    public function show(CustomMap $map): View
+    public function show(Request $request, CustomMap $map): View
     {
+        $request->validate([
+            'screenshot' => 'nullable|in:yes',
+        ]);
+
+        $screenshot = $request->input('screenshot') === 'yes' ? 1 : 0;
+
         $map_conf = $map->options;
         $map_conf['width'] = $map->width;
         $map_conf['height'] = $map->height;
@@ -93,6 +100,7 @@ class CustomMapController extends Controller
             'newnode_conf' => $map->newnodeconfig,
             'vmargin' => 20,
             'hmargin' => 20,
+            'screenshot' => $screenshot,
         ];
 
         return view('map.custom-view', $data);
