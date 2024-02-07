@@ -60,7 +60,9 @@
     var network_height;
     var network_width;
     var node_align = {{$node_align}};
-    var edge_sep = 10; // TODO: Make this a map level option
+    var edge_sep = {{$edge_separation}};
+    var reverse_arrows = {{$reverse_arrows}};
+    var legend = @json($legend);
     var network_nodes = new vis.DataSet({queue: {delay: 100}});
     var network_edges = new vis.DataSet({queue: {delay: 100}});
     var edge_nodes_map = [];
@@ -347,11 +349,85 @@
         window.location.href = "{{ route('maps.custom.index') }}";
     }
 
+    function swapArrows(reverse) {
+        var arrows;
+        if (reverse) {
+            arrows = {from: {enabled: true, scaleFactor: 0.6}, to: {enabled: false}};
+        } else {
+            arrows = {to: {enabled: true, scaleFactor: 0.6}, from: {enabled: false}};
+        }
+        network_edges.forEach((edge) => {
+            edge.arrows = arrows;
+            network_edges.update(edge);
+        });
+        network_edges.flush();
+    }
+
+    function legendPctColour(pct) {
+        if (pct < 0) {
+            return "black";
+        } else if (pct < 50) {
+            // 100% green and slowly increase the red until we get to yellow
+            return '#' + parseInt(5.1 * pct).toString(16).padStart(2, 0) + 'ff00';
+        } else if (pct < 100) {
+            // 100% red and slowly remove green to go from yellow to red
+            return '#ff' + parseInt(5.1 * (100.0 - pct)).toString(16).padStart(2, 0) + '00';
+        } else if (pct < 150) {
+            // 100% red and slowly increase blue to go purple
+            return '#ff00' + parseInt(5.1 * (pct - 100.0)).toString(16).padStart(2, 0);
+        }
+
+        // Default to purple for links over 150%
+        return '#ff00ff';
+    }
+
+    function redrawLegend() {
+        // Clear out the old legend
+        old_nodes = network_nodes.get({filter: function(node) { return node.id.startsWith("legend_") }});
+        old_nodes.forEach((node) => {
+            network_nodes.remove(node.id);
+        });
+        if (legend.x >= 0) {
+            let y_pos = legend.y;
+            let y_inc = legend.font_size + 10;
+
+            let legend_header = {id: "legend_header", label: "<b>Legend</b>", shape: "box", borderWidth: 0, x: legend.x, y: y_pos, font: {multi: 'html', size: legend.font_size}, color: {background: "white"}};
+            network_nodes.add(legend_header);
+            y_pos += y_inc;
+
+            if (!(Boolean(legend.hide_invalid))) {
+                let legend_invalid = {id: "legend_invalid", label: "???", title: "Link is down or link speed is not defined", shape: "box", borderWidth: 0, x: legend.x, y: y_pos, font: {face: 'courier new', size: legend.font_size, color: "white"}, color: {background: "black"}};
+                y_pos += y_inc;
+                network_nodes.add(legend_invalid);
+            }
+
+            let pct_step;
+            if (Boolean(legend.hide_overspeed)) {
+                pct_step = 100.0 / (legend.steps - 1);
+            } else {
+                pct_step = 150.0 / (legend.steps - 1);
+            }
+            for (let i=0; i < legend.steps; i++) {
+                let this_pct = Math.round(pct_step * i);
+                let legend_step = {id: "legend_" + i.toString(), label: this_pct.toString().padStart(3, " ") + "%", shape: "box", borderWidth: 0, x: legend.x, y: y_pos, font: {face: 'courier new', size: legend.font_size, color: "black"}, color: {background: legendPctColour(this_pct)}};
+                network_nodes.add(legend_step);
+                y_pos += y_inc;
+            }
+        }
+    }
+
     function editMapSuccess(data) {
         $("#title").text(data.name);
         $("#savemap-alert").attr("class", "col-sm-12");
         $("#savemap-alert").text("");
         network.setSize(data.width, data.height);
+
+        edge_sep = data.edge_separation;
+        if(reverse_arrows != parseInt(data.reverse_arrows)) {
+            swapArrows(Boolean(parseInt(data.reverse_arrows)));
+        }
+        reverse_arrows = parseInt(data.reverse_arrows);
+        redrawLegend();
 
         editMapCancel();
     }
@@ -366,7 +442,9 @@
         var edges = {};
 
         $.each(network_nodes.get(), function (node_idx, node) {
-            if(node.id.endsWith("_mid")) {
+            if(node.id.startsWith("legend_")) {
+                return;
+            } else if(node.id.endsWith("_mid")) {
                 edgeid = node.id.split("_")[0];
                 edge1 = network_edges.get(edgeid + "_from");
                 edge2 = network_edges.get(edgeid + "_to");
@@ -993,8 +1071,15 @@
                     var mid = {id: edgeid + "_mid", shape: "dot", size: 0, x: mid_x, y: mid_y, label: edge.label};
                     mid.size = 3;
 
-                    var edge1 = {id: edgeid + "_from", from: edge.custom_map_node1_id, to: edgeid + "_mid", arrows: {to: {enabled: true, scaleFactor: 0.6}}, font: {face: edge.text_face, size: edge.text_size, color: edge.text_colour}, smooth: {type: edge.style}};
-                    var edge2 = {id: edgeid + "_to", from: edge.custom_map_node2_id, to: edgeid + "_mid", arrows: {to: {enabled: true, scaleFactor: 0.6}}, font: {face: edge.text_face, size: edge.text_size, color: edge.text_colour}, smooth: {type: edge.style}};
+                    var arrows;
+                    if (Boolean(reverse_arrows)) {
+                        arrows = {from: {enabled: true, scaleFactor: 0.6}, to: {enabled: false}};
+                    } else {
+                        arrows = {to: {enabled: true, scaleFactor: 0.6}, from: {enabled: false}};
+                    }
+
+                    var edge1 = {id: edgeid + "_from", from: edge.custom_map_node1_id, to: edgeid + "_mid", arrows: arrows, font: {face: edge.text_face, size: edge.text_size, color: edge.text_colour}, smooth: {type: edge.style}};
+                    var edge2 = {id: edgeid + "_to", from: edge.custom_map_node2_id, to: edgeid + "_mid", arrows: arrows, font: {face: edge.text_face, size: edge.text_size, color: edge.text_colour}, smooth: {type: edge.style}};
 
                     // Special case for curved lines
                     if(edge2.smooth.type == "curvedCW") {
@@ -1062,7 +1147,16 @@
         }, '', '{{ __('map.custom.edit.edge.port_select') }}', {dropdownParent: $('#edgeModal')});
         $("#portsearch").on("select2:select", edgePortSelect);
 
+        if(legend.x < 0 || legend.y < 0) {
+            $(".maplegend").hide();
+        }
+        $("#mapreversearrows").bootstrapSwitch('state', Boolean(reverse_arrows));
+        $("#maplegend").bootstrapSwitch('state', (legend.x >= 0 && legend.y >= 0));
+        $("#maplegendhideinvalid").bootstrapSwitch('state', Boolean(legend.hide_invalid));
+        $("#maplegendhideoverspeed").bootstrapSwitch('state', Boolean(legend.hide_overspeed));
+
         refreshMap();
+        redrawLegend();
     });
 </script>
 @endsection
