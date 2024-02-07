@@ -95,6 +95,11 @@
 </div>
 
 <script>
+    var node_align = {{$node_align}};
+    var edge_sep = {{$edge_separation}};
+    var reverse_arrows = {{$reverse_arrows}};
+    var legend = @json($legend);
+
     function saveMapSettings() {
         $("#map-saveButton").attr('disabled','disabled');
         $("#savemap-alert").text('{{ __('map.custom.edit.map.saving') }}');
@@ -191,4 +196,14 @@
             $(".maplegend").hide();
         }
     }
+
+    $(document).ready(function () {
+        if(legend.x < 0 || legend.y < 0) {
+            $(".maplegend").hide();
+        }
+        $("#mapreversearrows").bootstrapSwitch('state', Boolean(reverse_arrows));
+        $("#maplegend").bootstrapSwitch('state', (legend.x >= 0 && legend.y >= 0));
+        $("#maplegendhideinvalid").bootstrapSwitch('state', Boolean(legend.hide_invalid));
+        $("#maplegendhideoverspeed").bootstrapSwitch('state', Boolean(legend.hide_overspeed));
+    });
 </script>

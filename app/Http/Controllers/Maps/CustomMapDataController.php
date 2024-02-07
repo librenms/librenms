@@ -189,11 +189,20 @@ class CustomMapDataController extends Controller
             'newedgeconf' => 'array',
             'nodes' => 'array',
             'edges' => 'array',
+            'legend_x' => 'integer',
+            'legend_y' => 'integer',
         ]);
 
         $map->load(['nodes', 'edges']);
 
         DB::transaction(function () use ($map, $data) {
+            if ($map->legend_x != $data['legend_x'] || $map->legend_y != $data['legend_y']) {
+                $map->legend_x = $data['legend_x'];
+                $map->legend_y = $data['legend_y'];
+
+                $map->save();
+            }
+
             $dbnodes = $map->nodes->keyBy('custom_map_node_id')->all();
             $dbedges = $map->edges->keyBy('custom_map_edge_id')->all();
 

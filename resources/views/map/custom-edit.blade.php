@@ -59,10 +59,6 @@
     var network;
     var network_height;
     var network_width;
-    var node_align = {{$node_align}};
-    var edge_sep = {{$edge_separation}};
-    var reverse_arrows = {{$reverse_arrows}};
-    var legend = @json($legend);
     var network_nodes = new vis.DataSet({queue: {delay: 100}});
     var network_edges = new vis.DataSet({queue: {delay: 100}});
     var edge_nodes_map = [];
@@ -167,6 +163,30 @@
 
         // Default to mid point
         return {x: mid_center.x, y: mid_center.y};
+    }
+
+    function fixNodePos(nodeid, node) {
+        var move=false;
+        if ( node_align && !nodeid.endsWith("_mid")) {
+            node.x = Math.round(node.x / node_align) * node_align;
+            node.y = Math.round(node.y / node_align) * node_align;
+            move = true;
+        }
+        if ( node.x < {{ $hmargin }} ) {
+            node.x = {{ $hmargin }};
+            move = true;
+        } else if ( node.x > network_width - {{ $hmargin }} ) {
+            node.x = network_width - {{ $hmargin }};
+            move = true;
+        }
+        if ( node.y < {{ $vmargin }} ) {
+            node.y = {{ $vmargin }};
+            move = true;
+        } else if ( node.y > network_height - {{ $vmargin }} ) {
+            node.y = network_height - {{ $vmargin }};
+            move = true;
+        }
+        return move;
     }
 
     function CreateNetwork() {
@@ -292,26 +312,21 @@
                 // Make sure a node is not dragged outside the canvas
                 nodepos = network.getPositions(data.nodes);
                 $.each( nodepos, function( nodeid, node ) {
-                    move = false;
-                    if ( node_align && !nodeid.endsWith("_mid")) {
-                        node.x = Math.round(node.x / node_align) * node_align;
-                        node.y = Math.round(node.y / node_align) * node_align;
-                        move = true;
+                    if ( nodeid == "legend_header" ) {
+                        // If the legend header was moved, just redraw it
+                        fixNodePos(nodeid, node);
+                        legend.x = node.x;
+                        legend.y = node.y;
+
+                        redrawLegend();
+                        return;
+                    } else if ( nodeid.startsWith("legend_") ) {
+                        // Get the original node and move  it back
+                        node = network_nodes.get(nodeid);
+                        network_nodes.update(node);
+                        return;
                     }
-                    if ( node.x < {{ $hmargin }} ) {
-                        node.x = {{ $hmargin }};
-                        move = true;
-                    } else if ( node.x > network_width - {{ $hmargin }} ) {
-                        node.x = network_width - {{ $hmargin }};
-                        move = true;
-                    }
-                    if ( node.y < {{ $vmargin }} ) {
-                        node.y = {{ $vmargin }};
-                        move = true;
-                    } else if ( node.y > network_height - {{ $vmargin }} ) {
-                        node.y = network_height - {{ $vmargin }};
-                        move = true;
-                    }
+                    let move = fixNodePos(nodeid, node);
                     if ( move ) {
                         network.moveNode(nodeid, node.x, node.y);
                     }
@@ -413,6 +428,7 @@
                 network_nodes.add(legend_step);
                 y_pos += y_inc;
             }
+            network_nodes.flush();
         }
     }
 
@@ -473,6 +489,8 @@
                 newedgeconf: newedgeconf,
                 nodes: nodes,
                 edges: edges,
+                legend_x: legend.x,
+                legend_y: legend.y,
             },
             dataType: 'json',
             type: 'POST'
@@ -1120,6 +1138,9 @@
                     }
                 });
 
+                // Add the legend back to the map
+                redrawLegend();
+
                 // Flush in order to make sure nodes exist for edges to connect to
                 network_nodes.flush();
                 network_edges.flush();
@@ -1147,16 +1168,7 @@
         }, '', '{{ __('map.custom.edit.edge.port_select') }}', {dropdownParent: $('#edgeModal')});
         $("#portsearch").on("select2:select", edgePortSelect);
 
-        if(legend.x < 0 || legend.y < 0) {
-            $(".maplegend").hide();
-        }
-        $("#mapreversearrows").bootstrapSwitch('state', Boolean(reverse_arrows));
-        $("#maplegend").bootstrapSwitch('state', (legend.x >= 0 && legend.y >= 0));
-        $("#maplegendhideinvalid").bootstrapSwitch('state', Boolean(legend.hide_invalid));
-        $("#maplegendhideoverspeed").bootstrapSwitch('state', Boolean(legend.hide_overspeed));
-
         refreshMap();
-        redrawLegend();
     });
 </script>
 @endsection

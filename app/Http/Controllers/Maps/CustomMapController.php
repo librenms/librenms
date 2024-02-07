@@ -48,6 +48,16 @@ class CustomMapController extends Controller
             'maps' => CustomMap::orderBy('name')->get(['custom_map_id', 'name']),
             'name' => 'New Map',
             'node_align' => 10,
+            'edge_separation' => 10,
+            'reverse_arrows' => 0,
+            'legend' => [
+                'x' => -1,
+                'y' => -1,
+                'steps' => 7,
+                'hide_invalid' => 0,
+                'hide_overspeed' => 0,
+                'font_size' => 14,
+            ],
             'background' => null,
             'map_conf' => [
                 'height' => '800px',
