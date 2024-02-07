@@ -42,7 +42,7 @@ class Zyxelwlc extends Zyxel implements WirelessApCountDiscovery, WirelessClient
 
     public function discoverWirelessApCount()
     {
-        $oid = '.1.3.6.1.4.1.890.1.15.3.3.1.1.0'; //  ZYXEL-ES-CAPWAP::capwapOnlineAP
+        $oid = '.1.3.6.1.4.1.890.1.15.3.3.1.1.0'; //ZYXEL-ES-CAPWAP::capwapOnlineAP
         $number_ap = (int) snmp_get($this->getDeviceArray(),'.1.3.6.1.4.1.890.1.15.3.3.1.1.0', '-Ovq');
         if ($this->getDeviceArray()['hardware'] == 'NXC2500') {
             $max_ap = 64;
