@@ -36,6 +36,9 @@ return [
                 'width' => 'Width',
                 'height' => 'Height',
                 'alignment' => 'Node Alignment',
+                'edgeseparation' => 'Link Separation',
+                'reverse' => 'Reverse Arrows',
+                'enable_legend' => 'Enable Legend',
                 'saving' => 'Saving...',
                 'save_errors' => 'Save failed due to the following errors:',
                 'save_error' => 'Save failed.  Server returned error response code: :code',
@@ -45,6 +48,12 @@ return [
                 'edit' => 'Edit Map Settings',
                 'rerender' => 'Re-Render Map',
                 'save' => 'Save Map',
+                'legend' => [
+                    'font_size' => 'Legend Text Size',
+                    'steps' => 'Legend Steps',
+                    'hideinvalid' => 'Hide Invalid',
+                    'hideoverspeed' => 'Hide 100%+',
+                ],
             ],
             'node' => [
                 'new' => 'New Node',
@@ -126,6 +135,8 @@ return [
                     'cubicBezier' => 'Cubic Bezier',
                 ],
                 'show_usage_percent' => 'Show percent usage',
+                'show_usage_bps' => 'Show bps usage',
+                'label' => 'Label',
                 'recenter' => 'Recenter Line',
             ],
             'validate' => [
