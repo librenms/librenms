@@ -29,7 +29,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('custom_maps', function (Blueprint $table) {
-            $table->dropColumn(['reverse_arrows','edge_separation','legend_x','legend_y','legend_steps','legend_steps','legend_hide_invalid','legend_hide_overspeed']);
+            $table->dropColumn(['reverse_arrows', 'edge_separation', 'legend_x', 'legend_y', 'legend_steps', 'legend_steps', 'legend_hide_invalid', 'legend_hide_overspeed']);
         });
     }
 };

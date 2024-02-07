@@ -203,6 +203,7 @@ class CustomMapController extends Controller
             'hide_overspeed' => $map->legend_hide_overspeed,
             'font_size' => $map->legend_font_size,
         ];
+
         return $legend;
     }
 }
