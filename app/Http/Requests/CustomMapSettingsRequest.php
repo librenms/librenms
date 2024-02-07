@@ -25,6 +25,8 @@ class CustomMapSettingsRequest extends FormRequest
         return [
             'name' => 'required|string',
             'node_align' => 'integer',
+            'reverse_arrows' => 'boolean',
+            'edge_separation' => 'integer',
             'width_type' => 'in:px,%',
             'width' => [
                 function (string $attribute, mixed $value, Closure $fail) {
@@ -49,6 +51,12 @@ class CustomMapSettingsRequest extends FormRequest
                     }
                 },
             ],
+            'legend_x' => 'integer',
+            'legend_y' => 'integer',
+            'legend_steps' => 'integer',
+            'legend_font_size' => 'integer',
+            'legend_hide_invalid' => 'boolean',
+            'legend_hide_overspeed' => 'boolean',
         ];
     }
 }
