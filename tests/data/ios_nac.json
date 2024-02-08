@@ -2427,7 +2427,6 @@
                     "time_left": "32",
                     "vlan": 0,
                     "time_elapsed": null,
-                    "historical": 0,
                     "ifIndex": 10001
                 },
                 {
@@ -2445,7 +2444,6 @@
                     "time_left": "43",
                     "vlan": 0,
                     "time_elapsed": null,
-                    "historical": 0,
                     "ifIndex": 10001
                 },
                 {
@@ -2463,7 +2461,6 @@
                     "time_left": "23",
                     "vlan": 0,
                     "time_elapsed": null,
-                    "historical": 0,
                     "ifIndex": 10002
                 },
                 {
@@ -2481,7 +2478,6 @@
                     "time_left": "0",
                     "vlan": 0,
                     "time_elapsed": null,
-                    "historical": 0,
                     "ifIndex": 10003
                 },
                 {
@@ -2499,7 +2495,6 @@
                     "time_left": "12",
                     "vlan": 0,
                     "time_elapsed": null,
-                    "historical": 0,
                     "ifIndex": 10003
                 }
             ]
