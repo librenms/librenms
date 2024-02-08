@@ -10,7 +10,11 @@ over:
 discovery:
     -
         sysObjectID: .1.3.6.1.4.1.664
-    -
         sysDescr: 'NetVanta'
+        sysDescr_except:
+            - '1560'
+            - '1570'
+            - '1760'
+            - '1670'
 good_if:
     - EtsecBasedVirtualEthernet1
