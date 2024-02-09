@@ -312,18 +312,18 @@
                 // Make sure a node is not dragged outside the canvas
                 nodepos = network.getPositions(data.nodes);
                 $.each( nodepos, function( nodeid, node ) {
-                    if ( nodeid == "legend_header" ) {
-                        // If the legend header was moved, just redraw it
+                    if ( nodeid.startsWith("legend_") ) {
+                        // Make sure the moved node is still on the map
                         fixNodePos(nodeid, node);
-                        legend.x = node.x;
-                        legend.y = node.y;
+
+                        // Get the current node config
+                        cur_node = network_nodes.get(nodeid);
+
+                        // Move the header relative to the node movement
+                        legend.x = legend.x + node.x - cur_node.x;
+                        legend.y = legend.y + node.y - cur_node.y;
 
                         redrawLegend();
-                        return;
-                    } else if ( nodeid.startsWith("legend_") ) {
-                        // Get the original node and move  it back
-                        node = network_nodes.get(nodeid);
-                        network_nodes.update(node);
                         return;
                     }
                     let move = fixNodePos(nodeid, node);
@@ -349,6 +349,15 @@
     var newcount = 1;
     var port_search_device_id_1 = 0;
     var port_search_device_id_2 = 0;
+
+    // Make sure the new edge config has an appropriate label value
+    if (!("label" in newedgeconf)) {
+        newedgeconf.label = "xx%";
+    } else if (newedgeconf.label == null) {
+        newedgeconf.label = "xx%";
+    } else if (typeof(newedgeconf.label) == 'boolean') {
+        newedgeconf.label = newedgeconf.label ? "xx%" : "";
+    }
 
     var edge_port_map = {};
 
@@ -436,7 +445,6 @@
         $("#title").text(data.name);
         $("#savemap-alert").attr("class", "col-sm-12");
         $("#savemap-alert").text("");
-        network.setSize(data.width, data.height);
 
         edge_sep = data.edge_separation;
         if(reverse_arrows != parseInt(data.reverse_arrows)) {
@@ -444,6 +452,9 @@
         }
         reverse_arrows = parseInt(data.reverse_arrows);
         redrawLegend();
+
+        // Re-create the network because network.setSize() blanks out the map
+        CreateNetwork();
 
         editMapCancel();
     }
@@ -484,14 +495,15 @@
 
         $.ajax({
             url: '{{ route('maps.custom.data.save', ['map' => $map_id]) }}',
-            data: {
+            data: JSON.stringify({
                 newnodeconf: newnodeconf,
                 newedgeconf: newedgeconf,
                 nodes: nodes,
                 edges: edges,
                 legend_x: legend.x,
                 legend_y: legend.y,
-            },
+            }),
+            contentType: "application/json",
             dataType: 'json',
             type: 'POST'
         }).done(function (data, status, resp) {
