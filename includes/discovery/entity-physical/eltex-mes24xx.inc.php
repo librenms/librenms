@@ -36,16 +36,16 @@ if (! empty($oidSfp) && ! empty($oidEnt)) {
         foreach ($oidEnt as $entIndex => $entData) {
             if ($entData['entPhysicalParentRelPos'] == $index) {
                 $entity_array[] = [
-                    'entPhysicalIndex'        => $index,
-                    'entPhysicalSerialNum'    => $data['eltexPhyTransceiverInfoSerialNumber'],
-                    'entPhysicalModelName'    => $data['eltexPhyTransceiverInfoPartNumber'],
-                    'entPhysicalName'         => $connType[$data['eltexPhyTransceiverInfoConnectorType']],
-                    'entPhysicalDescr'        => $infoType[$data['eltexPhyTransceiverInfoType']],
-                    'entPhysicalClass'        => 'sfp-cage',
-                    'entPhysicalContainedIn'  => $entIndex,
-                    'entPhysicalMfgName'      => $data['eltexPhyTransceiverInfoVendorName'],
-                    'entPhysicalHardwareRev'  => $data['eltexPhyTransceiverInfoVendorRevision'],
-                    'entPhysicalIsFRU'        => 'true',
+                    'entPhysicalIndex' => $index,
+                    'entPhysicalSerialNum' => $data['eltexPhyTransceiverInfoSerialNumber'],
+                    'entPhysicalModelName' => $data['eltexPhyTransceiverInfoPartNumber'],
+                    'entPhysicalName' => $connType[$data['eltexPhyTransceiverInfoConnectorType']],
+                    'entPhysicalDescr' => $infoType[$data['eltexPhyTransceiverInfoType']],
+                    'entPhysicalClass' => 'sfp-cage',
+                    'entPhysicalContainedIn' => $entIndex,
+                    'entPhysicalMfgName' => $data['eltexPhyTransceiverInfoVendorName'],
+                    'entPhysicalHardwareRev' => $data['eltexPhyTransceiverInfoVendorRevision'],
+                    'entPhysicalIsFRU' => 'true',
                 ];
                 break;
             }
