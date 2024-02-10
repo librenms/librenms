@@ -1,10 +1,11 @@
 <?php
+
 $cur_oid = '.1.3.6.1.3.94.1.8.1.6.';
 
-# These sensors are not provided as tables. They are strings of the form:
-#    Sensor Name: Value
-#
-# The list is also a mix of voltages, temperatures, and state, and uses both F and C for temperatures
+// These sensors are not provided as tables. They are strings of the form:
+//    Sensor Name: Value
+//
+// The list is also a mix of voltages, temperatures, and state, and uses both F and C for temperatures
 
 if (is_array($pre_cache['dell-powervault'])) {
     foreach ($pre_cache['dell-powervault'] as $index => $entry) {
