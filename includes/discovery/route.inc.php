@@ -230,11 +230,13 @@ $oid = 'mplsL3VpnVrfPerfCurrNumRoutes';
 $mpls_vpn_route_nb = snmpwalk_group($device, $oid, $mib, 6, []);
 $mpls_skip = false;
 
-foreach ($mpls_vpn_route_nb as $vpnId => $route_nb) {
-    if ($route_nb['mplsL3VpnVrfPerfCurrNumRoutes'] > $max_routes) {
-        echo "Skipping all MPLS routes because vpn instance $vpnId has more than $max_routes routes.";
-        $mpls_skip = true;
-        break;
+if (! empty($mpls_vpn_route_nb) && count($mpls_vpn_route_nb) > 1) {
+    foreach ($mpls_vpn_route_nb as $vpnId => $route_nb) {
+        if ($route_nb['mplsL3VpnVrfPerfCurrNumRoutes'] > $max_routes) {
+            echo "Skipping all MPLS routes because vpn instance $vpnId has more than $max_routes routes.";
+            $mpls_skip = true;
+            break;
+        }
     }
 }
 
