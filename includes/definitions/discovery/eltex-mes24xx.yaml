@@ -1,0 +1,78 @@
+mib: ELTEX-MES-ISS-CPU-UTIL-MIB:ELTEX-MES-ISS-ENV-MIB:ARICENT-ISS-MIB
+modules:
+    os:
+        serial: .1.3.6.1.4.1.2076.81.1.120.0
+        sysDescr_regex: '/(?<hardware>\S+\s\S+)/'
+        version: ENTITY-MIB::entPhysicalFirmwareRev.1
+        features: ENTITY-MIB::entPhysicalSoftwareRev.1
+
+    processors:
+        data:
+            -
+                oid: eltMesIssCpuUtilLastMinute
+                num_oid: '.1.3.6.1.4.1.35265.1.139.6.1.1.2.2.0'
+    mempools:
+        data:
+            -
+                total: ARICENT-ISS-MIB::issSwitchMaxRAMUsage
+                used: ARICENT-ISS-MIB::issSwitchCurrentRAMUsage
+                descr: 'System Memory'
+    sensors:
+        pre-cache:
+            data:
+                -
+                    oid:
+                        - eltMesIssBatteryStatusTable
+        state:
+            data:
+                -
+                    oid: eltMesIssBatteryStatusTable
+                    value: eltMesIssBatteryStatus
+                    num_oid: '.1.3.6.1.4.1.35265.1.139.12.1.3.1.1.2.{{ $index }}'
+                    descr: 'Backup battery status'
+                    group: 'Chassis PSU'
+                    index: 'eltMesIssBatteryStatus.{{ $index }}'
+                    states:
+                        - { value: 1, descr: NotSupported, graph: 1, generic: 3 }
+                        - { value: 2, descr: Missing, graph: 1, generic: 2 }
+                        - { value: 3, descr: Charging, graph: 1, generic: 1 }
+                        - { value: 4, descr: Low, graph: 1, generic: 2 }
+                        - { value: 5, descr: Discharged, graph: 1, generic: 2 }
+                        - { value: 6, descr: Charged, graph: 1, generic: 0 }
+        charge:
+            data:
+                -
+                    oid: eltMesIssBatteryStatusTable
+                    value: eltMesIssBatteryLevel
+                    num_oid: '.1.3.6.1.4.1.35265.1.139.12.1.3.1.1.3.{{ $index }}'
+                    descr: 'Backup battery level'
+                    index: 'eltMesIssBatteryLevel.{{ $index }}'
+                    skip_values:
+                        -
+                            oid: eltMesIssBatteryStatus
+                            op: '<'
+                            value: '3'
+        fanspeed:
+            data:
+                -
+                    oid: eltMesIssEnvFanTable
+                    value: eltMesIssEnvFanSpeedLevel
+                    num_oid: '.1.3.6.1.4.1.35265.1.139.12.1.5.1.1.2.{{ $index }}'
+                    descr: 'Fan {{ $index }}'
+                    index: 'eltMesIssEnvFanSpeedLevel.{{ $index }}'
+        voltage:
+            data:
+                -
+                    oid: ARICENT-ISS-MIB::issSwitchCurrentPowerSupply
+                    value: ARICENT-ISS-MIB::issSwitchCurrentPowerSupply
+                    num_oid: '.1.3.6.1.4.1.2076.81.1.71.{{ $index }}'
+                    descr: 'Main PSU'
+                    index: 'issSwitchCurrentPowerSupply.{{ $index }}'
+        temperature:
+            data:
+                -
+                    oid: ARICENT-ISS-MIB::issSwitchCurrentTemperature
+                    value: ARICENT-ISS-MIB::issSwitchCurrentTemperature
+                    num_oid: '.1.3.6.1.4.1.2076.81.1.66.{{ $index }}'
+                    descr: 'Chassis'
+                    index: 'issSwitchCurrentTemperature.{{ $index }}'
