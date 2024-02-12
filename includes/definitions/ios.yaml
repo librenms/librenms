@@ -16,6 +16,10 @@ discovery:
             - 'IOS (tm)'
             - 'Cisco IOS Software'
             - 'Global Site Selector'
+    -
+        sysDescr_regex:
+            - '/^IE\d{4} Industrial Ethernet Switch/'
+    -
         sysDescr_except:
             - 'LINUX_IOSD'
             - 'IOS-XE'
