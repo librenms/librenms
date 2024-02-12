@@ -16,15 +16,14 @@ discovery:
             - 'IOS (tm)'
             - 'Cisco IOS Software'
             - 'Global Site Selector'
-    -
-        sysDescr_regex:
-            - '/^IE\d{4} Industrial Ethernet Switch/'
-    -
         sysDescr_except:
             - 'LINUX_IOSD'
             - 'IOS-XE'
             - 'IOSXE'
             - 'CAT3K_CAA'
+    -
+        sysDescr_regex:
+            - '/^IE\d{4} Industrial Ethernet Switch/'
 bad_ifXEntry:
     - cisco1941
     - cisco886Va
