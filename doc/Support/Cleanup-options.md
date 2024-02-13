@@ -16,6 +16,7 @@ These options rely on ```daily.sh``` running from cron as per the installation i
     lnms config:set alert_log_purge 365
     lnms config:set authlog_purge 30
     lnms config:set ports_fdb_purge 10
+    lnms config:set ports_nac_purge 10
     lnms config:set device_perf_purge 7
     lnms config:set rrd_purge 0
     lnms config:set ports_purge true

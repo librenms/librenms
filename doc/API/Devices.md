@@ -1179,6 +1179,7 @@ Route: `/api/v0/devices`
 Input (JSON):
 
 Fields:
+
 - hostname (required): device hostname or IP
 - display: A string to display as the name of this device, defaults to 
   hostname (or device_display_default setting). May be a simple
@@ -1192,13 +1193,16 @@ Fields:
 - location or location_id: set the location by text or location id
 
 Options:
+
 - force_add: Skip all checks and attempts to detect credentials. Add the device as given directly to the database.
 - ping_fallback: if snmp checks fail, add the device as ping only instead of failing
 
 SNMP v1 or v2c credentials:
+
 - community: Required for SNMP v1 or v2c.
 
 SNMP v3 credentials:
+
 - authlevel: SNMP authlevel (noAuthNoPriv, authNoPriv, authPriv).
 - authname: SNMP Auth username
 - authpass: SNMP Auth password
@@ -1207,6 +1211,7 @@ SNMP v3 credentials:
 - cryptoalgo: SNMP Crypto algorithm (AES, DES)
 
 For ICMP only:
+
 - snmp_disable: set to true for ICMP only. Disables SNMP checks and polling.
 - os: OS short name for the device (defaults to ping).
 - sysName: sysName for the device.

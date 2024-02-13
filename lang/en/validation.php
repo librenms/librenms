@@ -235,7 +235,7 @@ return [
             ],
             'CheckSqlServerTime' => [
                 'fail' => "Time between this server and the mysql database is off\n Mysql time :mysql_time\n PHP time :php_time",
-                'ok' => 'MySQl and PHP time match',
+                'ok' => 'MySQL and PHP time match',
             ],
             'CheckSchemaVersion' => [
                 'fail_outdated' => 'Your database is out of date!',

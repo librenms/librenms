@@ -1,0 +1,224 @@
+--**MOD+************************************************************************
+--* Module:    ARUBAWIRED-TEMPSENSOR-MIB :TEMPSENSOR MIB file
+--*
+--* (c) Copyright 2020 Hewlett Packard Enterprise Development LP
+--* All Rights Reserved.
+--*
+--* The contents of this software are proprietary and confidential
+--* to the Hewlett-Packard Development Company, L.P.  No part of this
+--* program may be photocopied, reproduced, or translated into another
+--* programming language without prior written consent of the
+--* Hewlett-Packard Development Company, L.P.
+--*
+--* Purpose: This file contains MIB definition of ARUBAWIRED-TEMPSENSOR-MIB
+--*
+--**MOD-************************************************************************
+
+ARUBAWIRED-TEMPSENSOR-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+    DisplayString
+        FROM SNMPv2-TC
+    arubaWiredChassisMIB
+        FROM ARUBAWIRED-CHASSIS-MIB;
+
+arubaWiredTempSensor MODULE-IDENTITY
+    LAST-UPDATED "202002130000Z" -- February 13, 2020
+    ORGANIZATION "HPE/Aruba Networking Division"
+    CONTACT-INFO "Hewlett Packard Company
+                  8000 Foothills Blvd.
+                  Roseville, CA 95747"
+    DESCRIPTION
+        "This MIB module describes management objects that manage Temperature
+         Sensors."
+
+    REVISION     "202002130000Z" -- February 13, 2020
+    DESCRIPTION  "Initial revision."
+    ::= { arubaWiredChassisMIB 3 }
+
+-- **********************************************************************
+-- Temperature Sensor notifications
+-- **********************************************************************
+
+arubaWiredTempSensorNotifications OBJECT IDENTIFIER
+      ::= { arubaWiredTempSensor 0 }
+
+arubaWiredTempSensorStateNotification NOTIFICATION-TYPE
+      OBJECTS {
+                arubaWiredTempSensorName,
+                arubaWiredTempSensorState
+              }
+      STATUS current
+      DESCRIPTION
+               "A notification generated when a temperature sensor state change
+                occurs.  This can happen if a temperature sensor experiences a
+                fault or critical temperature value."
+      ::= { arubaWiredTempSensorNotifications 1 }
+
+-- **********************************************************************
+-- Temperature Sensor Objects
+-- **********************************************************************
+
+arubaWiredTempSensorTable OBJECT-TYPE
+      SYNTAX      SEQUENCE OF ArubaWiredTempSensorEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION "This table contains one row per switch temperature sensor
+                   entity."
+      ::= { arubaWiredTempSensor 1 }
+
+arubaWiredTempSensorEntry OBJECT-TYPE
+      SYNTAX      ArubaWiredTempSensorEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION "Information about the temperature sensor physical entity
+                   table."
+      INDEX       {
+                    arubaWiredTempSensorGroupIndex,
+                    arubaWiredTempSensorSlotTypeIndex,
+                    arubaWiredTempSensorSlotIndex,
+                    arubaWiredTempSensorIndex
+                  }
+      ::= { arubaWiredTempSensorTable 1 }
+
+ArubaWiredTempSensorEntry ::=
+    SEQUENCE {
+        arubaWiredTempSensorGroupIndex    Integer32,
+        arubaWiredTempSensorSlotTypeIndex Integer32,
+        arubaWiredTempSensorSlotIndex     Integer32,
+        arubaWiredTempSensorIndex         Integer32,
+        arubaWiredTempSensorName          DisplayString,
+        arubaWiredTempSensorState         DisplayString,
+        arubaWiredTempSensorTemperature   Integer32,
+        arubaWiredTempSensorMinTemp       Integer32,
+        arubaWiredTempSensorMaxTemp       Integer32
+    }
+
+arubaWiredTempSensorGroupIndex OBJECT-TYPE
+      SYNTAX      Integer32 (1..2147483647)
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION "This variable uniquely identifies the group containing the
+                   temperature sensor. Group means chassis in the stack and the
+                   value 1 MUST be used for non-modular devices."
+
+      ::= { arubaWiredTempSensorEntry 1 }
+
+arubaWiredTempSensorSlotTypeIndex OBJECT-TYPE
+      SYNTAX      Integer32 (1..2147483647)
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION "This variable uniquely identifies the type of subsystem in a
+                   chassis that the temperature sensor is in.  A value 1 must be
+                   used for non-modular devices."
+
+      ::= { arubaWiredTempSensorEntry 2 }
+
+arubaWiredTempSensorSlotIndex OBJECT-TYPE
+      SYNTAX      Integer32 (1..2147483647)
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION "This variable uniquely identifies the subsystem instance in a
+                   chassis and value 1 must be used for non-modular devices."
+
+      ::= { arubaWiredTempSensorEntry 3 }
+
+arubaWiredTempSensorIndex OBJECT-TYPE
+      SYNTAX      Integer32 (1..2147483647)
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION "This variable uniquely identifies the temperature sensor
+                   instance in a subsystem.  A value 1 must be used for
+                   non-modular devices."
+
+      ::= { arubaWiredTempSensorEntry 4 }
+
+arubaWiredTempSensorName OBJECT-TYPE
+      SYNTAX      DisplayString (SIZE(0..40))
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "Identification of the temperature sensor for the system."
+      ::= { arubaWiredTempSensorEntry 5 }
+
+arubaWiredTempSensorState OBJECT-TYPE
+      SYNTAX      DisplayString (SIZE(0..20))
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "Current status for the temperature sensor."
+      ::= { arubaWiredTempSensorEntry 6 }
+
+arubaWiredTempSensorTemperature OBJECT-TYPE
+      SYNTAX      Integer32
+      UNITS       "millidegrees Celsius"
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "Current temperature value read from the temperature sensor."
+      ::= { arubaWiredTempSensorEntry 7 }
+
+arubaWiredTempSensorMinTemp OBJECT-TYPE
+      SYNTAX      Integer32
+      UNITS       "millidegrees Celsius"
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "Historic minimum temperature of the temperature sensor."
+      ::= { arubaWiredTempSensorEntry 8 }
+
+arubaWiredTempSensorMaxTemp OBJECT-TYPE
+      SYNTAX      Integer32
+      UNITS       "millidegrees Celsius"
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "Historic maximum temperature of the temperature sensor."
+      ::= { arubaWiredTempSensorEntry 9 }
+
+-- **********************************************************************
+-- compliance statements
+-- **********************************************************************
+
+arubaWiredTempSensorConformance OBJECT IDENTIFIER
+      ::= { arubaWiredTempSensor 99 }
+
+arubaWiredTempSensorCompliances OBJECT IDENTIFIER
+      ::= { arubaWiredTempSensorConformance 1 }
+
+arubaWiredTempSensorGroups      OBJECT IDENTIFIER
+      ::= { arubaWiredTempSensorConformance 2 }
+
+arubaWiredTempSensorCompliance MODULE-COMPLIANCE
+      STATUS      current
+      DESCRIPTION "A compliance statement for Aruba switch chassis."
+      MODULE
+      MANDATORY-GROUPS
+      {
+         arubaWiredTempSensorTable,
+         arubaWiredTempSensorNotificationsGroup
+      }
+      GROUP       arubaWiredTempSensorTableGroup
+      DESCRIPTION "A Collection of Object(s) that display the current
+                   temperature sensor parameters information."
+
+      ::= { arubaWiredTempSensorCompliances 1 }
+
+arubaWiredTempSensorTableGroup OBJECT-GROUP
+      OBJECTS     {
+                    arubaWiredTempSensorName,
+                    arubaWiredTempSensorState,
+                    arubaWiredTempSensorTemperature,
+                    arubaWiredTempSensorMinTemp,
+                    arubaWiredTempSensorMaxTemp
+                  }
+      STATUS      current
+      DESCRIPTION "A collection of objects display configuration, status,
+                   and measurements of Temperature Sensor table."
+      ::= { arubaWiredTempSensorGroups 1 }
+
+arubaWiredTempSensorNotificationsGroup NOTIFICATION-GROUP
+     NOTIFICATIONS { arubaWiredTempSensorStateNotification }
+     STATUS current
+     DESCRIPTION "Notifications sent by temperature sensor management."
+     ::= { arubaWiredTempSensorGroups 2 }
+END

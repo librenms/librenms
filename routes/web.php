@@ -4,6 +4,10 @@ use App\Http\Controllers\AboutController;
 use App\Http\Controllers\AlertController;
 use App\Http\Controllers\AlertTransportController;
 use App\Http\Controllers\Auth\SocialiteController;
+use App\Http\Controllers\Maps\CustomMapBackgroundController;
+use App\Http\Controllers\Maps\CustomMapController;
+use App\Http\Controllers\Maps\CustomMapDataController;
+use App\Http\Controllers\Maps\DeviceDependencyController;
 use App\Http\Controllers\PushNotificationController;
 use App\Http\Controllers\ValidateController;
 use App\Http\Middleware\AuthenticateGraph;
@@ -77,9 +81,15 @@ Route::middleware(['auth'])->group(function () {
         ->name('device')->where('vars', '.*');
 
     // Maps
-    Route::prefix('maps')->namespace('Maps')->group(function () {
-        Route::get('devicedependency', 'DeviceDependencyController@dependencyMap');
+    Route::prefix('maps')->group(function () {
+        Route::resource('custom', CustomMapController::class, ['as' => 'maps'])
+            ->parameters(['custom' => 'map'])->except('create');
+        Route::get('custom/{map}/background', [CustomMapBackgroundController::class, 'get'])->name('maps.custom.background');
+        Route::post('custom/{map}/background', [CustomMapBackgroundController::class, 'save'])->name('maps.custom.background.save');
+        Route::get('custom/{map}/data', [CustomMapDataController::class, 'get'])->name('maps.custom.data');
+        Route::post('custom/{map}/data', [CustomMapDataController::class, 'save'])->name('maps.custom.data.save');
     });
+    Route::get('maps/devicedependency', [DeviceDependencyController::class, 'dependencyMap']);
 
     // dashboard
     Route::resource('dashboard', 'DashboardController')->except(['create', 'edit']);

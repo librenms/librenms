@@ -87,6 +87,11 @@ class Ospf implements Module
                 if (empty($ospf_entry['ospfRouterId'])) {
                     continue; // skip invalid data
                 }
+                foreach (['ospfRxNewLsas', 'ospfOriginateNewLsas', 'ospfAreaBdrRtrStatus', 'ospfTOSSupport', 'ospfExternLsaCksumSum', 'ospfExternLsaCount', 'ospfASBdrRtrStatus', 'ospfVersionNumber', 'ospfAdminStat'] as $column) {
+                    if (! array_key_exists($column, $ospf_entry) || is_null($ospf_entry[$column])) {
+                        continue 2; // This column must exist and not be null
+                    }
+                }
 
                 $instance = OspfInstance::updateOrCreate([
                     'device_id' => $os->getDeviceId(),

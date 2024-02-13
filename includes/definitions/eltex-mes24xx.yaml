@@ -1,0 +1,29 @@
+os: eltex-mes24xx
+text: Eltex
+ifname: true
+type: network
+icon: eltex
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+
+discovery:
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.35265.1.176 # MES2424B AC
+
+mib_dir: eltexmes24xx
+
+bad_iftype:
+    - tunnel
+    - softwareLoopback
+    - propPointToPointSerial
+
+
+poller_modules:
+    ospf: false
+    mpls: false
+discovery_modules:
+    ospf: false
+    mpls: false

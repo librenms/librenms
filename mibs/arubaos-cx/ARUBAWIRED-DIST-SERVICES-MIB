@@ -1,0 +1,394 @@
+--**MOD+************************************************************************
+--* Module:    ARUBAWIRED-INTERFACE-MIB :INTERFACE MIB file
+--*
+--* (c) Copyright 2022 Hewlett Packard Enterprise Development LP
+--* All Rights Reserved.
+--*
+--* The contents of this software are proprietary and confidential
+--* to the Hewlett-Packard Development Company, L.P.  No part of this
+--* program may be photocopied, reproduced, or translated into another
+--* programming language without prior written consent of the
+--* Hewlett-Packard Development Company, L.P.
+--*
+--* Purpose: This file contains MIB definition of ARUBAWIRED-INTERFACE-MIB
+--*
+--**MOD-************************************************************************
+
+ARUBAWIRED-DIST-SERVICES-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        OBJECT-TYPE, MODULE-IDENTITY, Counter64, Integer32, Unsigned32
+            FROM SNMPv2-SMI
+        DisplayString, MacAddress
+            FROM SNMPv2-TC
+        MODULE-COMPLIANCE, OBJECT-GROUP
+            FROM SNMPv2-CONF
+        wndFeatures
+            FROM ARUBAWIRED-NETWORKING-OID;
+
+    arubaWiredDistServicesMIB MODULE-IDENTITY
+        LAST-UPDATED "202201310000Z" -- January 31, 2022
+        ORGANIZATION "HPE/Aruba Networking Division"
+        CONTACT-INFO "Hewlett Packard Enterprise Company
+                      8000 Foothills Blvd,
+                      Roseville, CA 95747"
+        DESCRIPTION
+            "This MIB module describes settings and properties that are
+            applicable to interfaces"
+
+        REVISION     "202201310000Z" -- January 31, 2022
+        DESCRIPTION  "Initial revision."
+        ::= { wndFeatures 25 }
+
+-- **********************************************************************
+-- subtrees in the MIB
+-- **********************************************************************
+
+arubaWiredDSMStatus      OBJECT IDENTIFIER ::= { arubaWiredDistServicesMIB 1 }
+arubaWiredDSSInterfaces  OBJECT IDENTIFIER ::= { arubaWiredDistServicesMIB 2 }
+arubaWiredDSSConformance OBJECT IDENTIFIER ::= { arubaWiredDistServicesMIB 3 }
+
+-- **********************************************************************
+-- Distributed Services Module Status Table
+-- **********************************************************************
+
+arubaWiredDSMStatusTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF ArubaWiredDSMStatusEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "A table of objects that display the status of each
+                     distributed services module in the switch."
+        ::= { arubaWiredDSMStatus 1 }
+
+arubaWiredDSMStatusEntry OBJECT-TYPE
+        SYNTAX      ArubaWiredDSMStatusEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Table of distributed services module entries"
+        INDEX       {
+                        arubaWiredDSMIndex
+                    }
+        ::= { arubaWiredDSMStatusTable 1 }
+
+ArubaWiredDSMStatusEntry ::=
+    SEQUENCE {
+        arubaWiredDSMIndex            Unsigned32,
+        arubaWiredDSMName             DisplayString,
+        arubaWiredDSMDescr            DisplayString,
+        arubaWiredDSMSerialNum        DisplayString,
+        arubaWiredDSMProductNum       DisplayString,
+        arubaWiredDSMPhysAddress      MacAddress,
+        arubaWiredDSMOperStatus       INTEGER
+    }
+
+arubaWiredDSMIndex OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The index value that uniquely identifies the distributed
+                    services module."
+        ::= { arubaWiredDSMStatusEntry 1}
+
+arubaWiredDSMName OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE (0..20))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The textual name of the distributed services module. The
+                    value of this object is the name of the module as assigned
+                    by the local device and is suitable for use in commands
+                    entered at the device's `console'."
+        ::= { arubaWiredDSMStatusEntry 2}
+
+arubaWiredDSMDescr OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE (0..80))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The textual string containing information about the
+                    distributed services module."
+        ::= { arubaWiredDSMStatusEntry 3}
+
+arubaWiredDSMSerialNum OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE (0..20))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The textual string containing the serial number assigned
+                    to the distributed services module."
+        ::= { arubaWiredDSMStatusEntry 4}
+
+arubaWiredDSMProductNum OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE (0..20))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The textual string containing the product number assigned
+                    to the distributed services module."
+        ::= { arubaWiredDSMStatusEntry 5}
+
+arubaWiredDSMPhysAddress OBJECT-TYPE
+        SYNTAX      MacAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The address of the distributed services module at its
+                    protocol sub-layer. This normally contains a MAC address."
+        ::= { arubaWiredDSMStatusEntry 6}
+
+arubaWiredDSMOperStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+                initializing(1),
+                ready(2),
+                failed(3)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The operational status of the distributed services module.
+                    A value of initializing(1) indicates that the module firmware
+                    is being downloaded, booted and programmed. A value of
+                    ready(2) indicates that the module is fully programmed and
+                    ready to accept traffic for processing. A value of failed(3)
+                    indicates that the module failed to initialize correctly."
+        ::= { arubaWiredDSMStatusEntry 7}
+
+-- **********************************************************************
+-- Distributed Services Module Interface Table
+-- **********************************************************************
+
+arubaWiredDSSIfTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF ArubaWiredDSSIfEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "A table of objects indicating the interfaces connecting to
+                    the distributed services modules."
+        ::= {arubaWiredDSSInterfaces 1}
+
+arubaWiredDSSIfEntry OBJECT-TYPE
+        SYNTAX      ArubaWiredDSSIfEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Table of distributed services module entries"
+        INDEX       {
+                        arubaWiredDSSModuleIndex,
+                        arubaWiredDSSIfIndex
+                    }
+        ::= { arubaWiredDSSIfTable 1 }
+
+ArubaWiredDSSIfEntry ::= SEQUENCE {
+        arubaWiredDSSModuleIndex             Integer32,
+        arubaWiredDSSIfIndex                 Integer32,
+        arubaWiredDSSIfDescr                 DisplayString,
+        arubaWiredDSSIfInOctets              Counter64,
+        arubaWiredDSSIfInUcastPkts           Counter64,
+        arubaWiredDSSIfInDiscards            Counter64,
+        arubaWiredDSSIfInErrors              Counter64,
+        arubaWiredDSSIfInUnknownProtos       Counter64,
+        arubaWiredDSSIfInMulticastPkts       Counter64,
+        arubaWiredDSSIfInBroadcastPkts       Counter64,
+        arubaWiredDSSIfOutOctets             Counter64,
+        arubaWiredDSSIfOutUcastPkts          Counter64,
+        arubaWiredDSSIfOutDiscards           Counter64,
+        arubaWiredDSSIfOutErrors             Counter64,
+        arubaWiredDSSIfOutMulticastPkts      Counter64,
+        arubaWiredDSSIfOutBroadcastPkts      Counter64
+}
+
+arubaWiredDSSModuleIndex OBJECT-TYPE
+        SYNTAX      Integer32 (1..2147483647)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An integer value uniquely identifying the distributed
+                    services module that this interface is connected to."
+        ::= { arubaWiredDSSIfEntry 1 }
+
+arubaWiredDSSIfIndex OBJECT-TYPE
+        SYNTAX      Integer32 (1..2147483647)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An integer value representing the interface number of
+                     the interface connecting to the distributed services
+                     module."
+        ::= { arubaWiredDSSIfEntry 2 }
+
+arubaWiredDSSIfDescr OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE (0..80))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "A textual string containing information about the
+                    interface."
+        ::= { arubaWiredDSSIfEntry 3 }
+
+arubaWiredDSSIfInOctets OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The total number of octets received on the interface,
+                    including framing characters."
+        ::= { arubaWiredDSSIfEntry 4 }
+
+arubaWiredDSSIfInUcastPkts OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The number of packets, delivered by this sub-layer to a
+                    higher (sub-)layer, which were not addressed to a multicast
+                    or broadcast address at this sub-layer."
+        ::= { arubaWiredDSSIfEntry 5 }
+
+arubaWiredDSSIfInDiscards OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The number of inbound packets which were chosen to be
+                    discarded even though no errors had been detected to prevent
+                    their being deliverable to a higher-layer protocol.  One
+                    possible reason for discarding such a packet could be to
+                    free up buffer space."
+        ::= { arubaWiredDSSIfEntry 6 }
+
+arubaWiredDSSIfInErrors OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The number of inbound packets that contained errors
+                    preventing them from being deliverable to a higher-layer
+                    protocol."
+        ::= { arubaWiredDSSIfEntry 7 }
+
+arubaWiredDSSIfInUnknownProtos OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The number of inbound packets received via the interface
+                    which were discarded because of an unknown or unsupported
+                    protocol."
+        ::= { arubaWiredDSSIfEntry 8 }
+
+arubaWiredDSSIfInMulticastPkts OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The number of packets, delivered by this sub-layer to a
+                    higher (sub-)layer, which were addressed to a multicast
+                    address at this sub-layer.  For a MAC layer protocol, this
+                    includes both Group and Functional addresses."
+        ::= { arubaWiredDSSIfEntry 9 }
+
+arubaWiredDSSIfInBroadcastPkts OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The number of packets, delivered by this sub-layer to a
+                    higher (sub-)layer, which were addressed to a broadcast
+                    address at this sub-layer."
+        ::= { arubaWiredDSSIfEntry 10 }
+
+arubaWiredDSSIfOutOctets OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The total number of octets transmitted out of the
+                    interface, including framing characters."
+        ::= { arubaWiredDSSIfEntry 11 }
+
+arubaWiredDSSIfOutUcastPkts OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The total number of packets that higher-level protocols
+                    requested be transmitted, and which were not addressed to a
+                    multicast or broadcast address at this sub-layer, including
+                    those that were discarded or not sent."
+        ::= { arubaWiredDSSIfEntry 12 }
+
+arubaWiredDSSIfOutDiscards OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The number of outbound packets which were chosen to be
+                    discarded even though no errors had been detected to
+                    prevent their being transmitted.  One possible reason for
+                    discarding such a packet could be to free up buffer space."
+        ::= { arubaWiredDSSIfEntry 13 }
+
+arubaWiredDSSIfOutErrors OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The number of outbound packets that could not be
+                    transmitted because of errors."
+        ::= { arubaWiredDSSIfEntry 14 }
+
+arubaWiredDSSIfOutMulticastPkts OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The total number of packets that higher-level protocols
+                    requested be transmitted, and which were addressed to a
+                    multicast address at this sub-layer, including those that
+                    were discarded or not sent.  For a MAC layer protocol, this
+                    includes both Group and Functional addresses."
+        ::= { arubaWiredDSSIfEntry 15 }
+
+arubaWiredDSSIfOutBroadcastPkts OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The total number of packets that higher-level protocols
+                    requested be transmitted, and which were addressed to a
+                    broadcast address at this sub-layer, including those that
+                    were discarded or not sent."
+        ::= { arubaWiredDSSIfEntry 16 }
+
+
+-- **********************************************************************
+-- Conformance information
+-- **********************************************************************
+
+arubaWiredDSSCompliances OBJECT IDENTIFIER ::= { arubaWiredDSSConformance 1}
+arubaWiredDSSGroups      OBJECT IDENTIFIER ::= { arubaWiredDSSConformance 2}
+
+arubaWiredDSMStatusTableGroup OBJECT-GROUP
+        OBJECTS {
+            arubaWiredDSMName,
+            arubaWiredDSMDescr,
+            arubaWiredDSMSerialNum,
+            arubaWiredDSMProductNum,
+            arubaWiredDSMPhysAddress,
+            arubaWiredDSMOperStatus
+        }
+        STATUS      current
+        DESCRIPTION "A collection of Distributed Services Module status table
+                    objects."
+        ::= { arubaWiredDSSGroups 1 }
+
+arubaWiredDSSIfTableGroup OBJECT-GROUP
+        OBJECTS {
+            arubaWiredDSSIfDescr,
+            arubaWiredDSSIfInOctets,
+            arubaWiredDSSIfInUcastPkts,
+            arubaWiredDSSIfInDiscards,
+            arubaWiredDSSIfInErrors,
+            arubaWiredDSSIfInUnknownProtos,
+            arubaWiredDSSIfInMulticastPkts,
+            arubaWiredDSSIfInBroadcastPkts,
+            arubaWiredDSSIfOutOctets,
+            arubaWiredDSSIfOutUcastPkts,
+            arubaWiredDSSIfOutDiscards,
+            arubaWiredDSSIfOutErrors,
+            arubaWiredDSSIfOutMulticastPkts,
+            arubaWiredDSSIfOutBroadcastPkts
+        }
+        STATUS      current
+        DESCRIPTION "A collection of Distributed Services Interface table
+                    objects."
+        ::= { arubaWiredDSSGroups 2 }
+
+arubaWiredDSSMibCompliance MODULE-COMPLIANCE
+        STATUS      current
+        DESCRIPTION "The compliance statement for devices implementing the
+                    ARUBA WIRED Distributed Services MIB."
+        MODULE
+        MANDATORY-GROUPS {
+            arubaWiredDSMStatusTableGroup,
+            arubaWiredDSSIfTableGroup
+        }
+        ::= { arubaWiredDSSCompliances 1}
+
+END

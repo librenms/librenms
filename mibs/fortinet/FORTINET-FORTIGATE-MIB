@@ -32,7 +32,7 @@ IMPORTS
         FROM SNMPv2-TC;
 
 fnFortiGateMib MODULE-IDENTITY
-    LAST-UPDATED "202303160000Z"
+    LAST-UPDATED "202307210000Z"
     ORGANIZATION
         "Fortinet Technologies, Inc."
     CONTACT-INFO
@@ -42,6 +42,9 @@ fnFortiGateMib MODULE-IDENTITY
          http://www.fortinet.com"
     DESCRIPTION
         "MIB module for Fortinet FortiGate devices."
+    REVISION    "202307210000Z"
+    DESCRIPTION
+        "Add fgTrapFaz for FortiAnalyzer event."
     REVISION    "202303160000Z"
     DESCRIPTION
         "Added OID fgServiceGroupWorkerBlades for 6K7K slbc platform."
@@ -581,7 +584,6 @@ fg900D           OBJECT IDENTIFIER ::= { fgModel 900 }
 fgr60F           OBJECT IDENTIFIER ::= { fgModel 643 }
 fgr60FI          OBJECT IDENTIFIER ::= { fgModel 648 }
 fgt1000D         OBJECT IDENTIFIER ::= { fgModel 10005 }
-fgt100D          OBJECT IDENTIFIER ::= { fgModel 1004 }
 fgt100E          OBJECT IDENTIFIER ::= { fgModel 1041 }
 fgt100EF         OBJECT IDENTIFIER ::= { fgModel 1042 }
 fgt100F          OBJECT IDENTIFIER ::= { fgModel 1000 }
@@ -4428,6 +4430,19 @@ fgManIfIp6 OBJECT-TYPE
     DESCRIPTION 
         "IPv6 address of the interface listed in the trap"
     ::= { fgMgmtTrapObjects 3 }
+
+fgFazTrapType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                  mainFailover(1),
+                  altFailover(2)
+                }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Fortianalyzer trap type, there are 2 different values as below:
+           mainFailover(1)    - Fortianalyzer main server failover and alternate server take over.
+           altFailover(2)     - Fortianalyzer alternate server failover and main server take over."
+    ::= { fgMgmtTrapObjects 4 }
 
 --
 -- fortinet.fnFortiGateMib.fgIntf
@@ -12992,6 +13007,13 @@ fgTrapFazDisconnect NOTIFICATION-TYPE
         "The device has been disconnected from the FortiAnalyzer."
     ::= { fgTrapPrefix 701 }
     
+fgTrapFaz NOTIFICATION-TYPE
+    OBJECTS     { fnSysSerial, sysName, fgFazTrapType }
+    STATUS      current
+    DESCRIPTION
+        "A trap for Fortianalyzer event."
+    ::= { fgTrapPrefix 702}
+
 fgTrapWcApUp NOTIFICATION-TYPE
     OBJECTS     { fnSysSerial, sysName, fgWcApVdom, fgWcApSerial, fgWcApName }
     STATUS      current
@@ -13103,7 +13125,7 @@ fgFmTrapGroup NOTIFICATION-GROUP
     ::= { fgMibConformance 1 }
 
 fgFmTrapObjectGroup OBJECT-GROUP
-    OBJECTS     { fgManIfIp, fgManIfMask,fgManIfIp6 }
+    OBJECTS     { fgManIfIp, fgManIfMask,fgManIfIp6, fgFazTrapType }
     STATUS      current
     DESCRIPTION 
         "These objects support the traps in the fgFmTrapGroup."
@@ -13411,7 +13433,7 @@ fgNotificationGroup NOTIFICATION-GROUP
                   fgTrapAvPattern, fgTrapAvFragmented, 
                   fgTrapAvEnterConserve, fgTrapAvBypass, 
                   fgTrapAvOversizePass, fgTrapAvOversizeBlock, 
-                  fgTrapFazDisconnect, fgTrapWcApUp, fgTrapWcApDown, fgTrapDeviceNew, 
+                  fgTrapFazDisconnect, fgTrapFaz, fgTrapWcApUp, fgTrapWcApDown, fgTrapDeviceNew, 
                   fgTrapPerCpuHigh, fgTrapDhcp, fgTrapPoolUsage,
                   fgTrapFcSwUp, fgTrapFcSwDown, fgTrapServerLoadBalanceRealServerDown,
                   fgTrapSlbc }
