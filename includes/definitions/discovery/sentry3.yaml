@@ -40,7 +40,7 @@ modules:
                 - oid: infeedTable
                   value: infeedVoltage
                   num_oid: '.1.3.6.1.4.1.1718.3.2.2.1.11.{{ $index }}'
-                  descr: infeedName
+                  descr: '{{ $infeedName or "Infeed $infeedID" }}'
                   # recording voltage for additional feeds (3-phase)
                   # will require reindexing and moving RRD files
                   index: '{{ $subindex0 }}'
