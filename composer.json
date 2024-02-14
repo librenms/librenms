@@ -26,7 +26,6 @@
         "ext-xml": "*",
         "ext-zlib": "*",
         "amenadiel/jpgraph": "^4",
-        "awobaz/compoships": "^2.2",
         "clue/socket-raw": "^1.4",
         "dapphp/radius": "^3.0",
         "doctrine/dbal": "^3.5",
