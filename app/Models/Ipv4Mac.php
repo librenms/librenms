@@ -6,8 +6,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Ipv4Mac extends PortRelatedModel
 {
-    use \Awobaz\Compoships\Compoships;
-
     protected $table = 'ipv4_mac';
     public $timestamps = false;
 
