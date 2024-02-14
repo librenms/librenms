@@ -162,7 +162,7 @@ if (! empty($entity_oids)) {
                 $type = 'percent';
                 $divisor = 1;
             }
-            
+
             if ($device['os'] == 'rittal-lcp') {
                 if ($type == 'voltage') {
                     $divisor = 1000;
