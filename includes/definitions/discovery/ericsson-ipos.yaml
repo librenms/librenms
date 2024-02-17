@@ -2,6 +2,9 @@ mib: ERICSSON-ROUTER-ENVMON-MIB:ERICSSON-ROUTER-CPU-METER-MIB:ERICSSON-ROUTER-OP
 modules:
     os:
         version: SNMPv2-MIB::sysDescr.0
+        hardware: ENTITY-MIB::entPhysicalDescr.1
+        serial: ENTITY-MIB::entPhysicalDescr.2
+        serial_regex: '/SN:(?<serial>[^ ]+)/'
     processors:
         data:
             -
