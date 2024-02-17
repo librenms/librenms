@@ -55,9 +55,8 @@ class LinkUp implements SnmptrapHandler
 
         $port->ifOperStatus = 'up';
         $port->ifAdminStatus = $trap->getOidData("IF-MIB::ifAdminStatus.$ifIndex") ?: 'up'; // If we receive LinkUp trap, we can safely assume that the ifAdminStatus is also up.
-        $prevOperStatus = $trap->getOidData("IF-MIB::ifOperStatus.$ifIndex") ? '(was ' . $trap->getOidData("IF-MIB::ifOperStatus.$ifIndex") . ') ' : '';
 
-        $trap->log("SNMP Trap: linkUp $port->ifAdminStatus/$port->ifOperStatus " . $prevOperStatus . $port->ifDescr, Severity::Ok, 'interface', $port->port_id);
+        $trap->log("SNMP Trap: linkUp $port->ifAdminStatus/$port->ifOperStatus " . $port->ifDescr, Severity::Ok, 'interface', $port->port_id);
 
         if ($port->isDirty('ifAdminStatus')) {
             $trap->log("Interface Enabled : $port->ifDescr (TRAP)", Severity::Notice, 'interface', $port->port_id);

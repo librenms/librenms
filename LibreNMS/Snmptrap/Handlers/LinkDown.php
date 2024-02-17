@@ -54,13 +54,12 @@ class LinkDown implements SnmptrapHandler
         }
 
         $port->ifOperStatus = 'down';
-        $prevOperStatus = $trap->getOidData("IF-MIB::ifOperStatus.$ifIndex") ? '(was ' . $trap->getOidData("IF-MIB::ifOperStatus.$ifIndex") . ') ' : '';
 
         $trapAdminStatus = $trap->getOidData("IF-MIB::ifAdminStatus.$ifIndex");
         if ($trapAdminStatus) {
             $port->ifAdminStatus = $trapAdminStatus;
         }
-        $trap->log("SNMP Trap: linkDown $port->ifAdminStatus/$port->ifOperStatus " . $prevOperStatus . $port->ifDescr, Severity::Error, 'interface', $port->port_id);
+        $trap->log("SNMP Trap: linkDown $port->ifAdminStatus/$port->ifOperStatus " . $port->ifDescr, Severity::Error, 'interface', $port->port_id);
 
         if ($port->isDirty('ifAdminStatus')) {
             $trap->log("Interface Disabled : $port->ifDescr (TRAP)", Severity::Notice, 'interface', $port->port_id);
