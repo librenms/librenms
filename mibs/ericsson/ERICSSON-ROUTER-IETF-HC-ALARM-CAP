@@ -1,0 +1,42 @@
+-- *****************************************************************
+-- ERICSSON-ROUTER-IETF-HC-ALARM-CAP.my:        IETF HC-ALARM-MIB Agent Capabilities
+--
+-- Copyright (c) 2016 Ericsson AB
+-- All rights reserved.
+--
+-- *****************************************************************
+
+ERICSSON-ROUTER-IETF-HC-ALARM-CAP DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY
+                FROM SNMPv2-SMI
+        AGENT-CAPABILITIES
+                FROM SNMPv2-CONF
+        eriRouterCapabilities
+                FROM ERICSSON-ROUTER-SMI;
+
+eriRouterIetfHcAlarmCap MODULE-IDENTITY
+        LAST-UPDATED    "201610251800Z" -- Oct 25, 2016
+        ORGANIZATION "Ericsson, Inc."
+        CONTACT-INFO
+                "Ericsson, Inc."
+        DESCRIPTION
+                "The Agent Capabilities of the
+                implementation of the IETF HC-ALARM-MIB (RFC 3434)"
+        ::= { eriRouterCapabilities 119 }
+
+eriRouterIetfHcAlarmCap1 AGENT-CAPABILITIES
+        PRODUCT-RELEASE "SEOS 2.3.3"
+        STATUS          current
+        DESCRIPTION     "HC-ALARM-MIB control/notify capabilities"
+        SUPPORTS        HC-ALARM-MIB
+        INCLUDES {
+                hcAlarmControlGroup,
+                hcAlarmCapabilitiesGroup,
+                hcAlarmNotificationsGroup
+        }
+
+        ::= { eriRouterIetfHcAlarmCap 1 }
+
+END

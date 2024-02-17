@@ -1,0 +1,116 @@
+-- %DNP% $Id: ERICSSON-ROUTER-IETF-SNMP-TARGET-CAP.my,v 1.1.6.3.448.4 2011/06/15 18:19:45 danielhe Exp $
+-- %DNP% $Source: /cvsroot/pkt/sw/se/xc/bsd/config/snmp/mibs/ERICSSON-ROUTER-IETF-SNMP-TARGET-CAP.my,v $
+-- *****************************************************************
+-- ERICSSON-ROUTER-IETF-SNMP-TARGET-CAP.my: IETF SNMP-TARGET-MIB Agent Capabilities
+--
+-- Copyright (c) 2001-2002, 2010-2011, 2015 Ericsson AB
+-- All rights reserved.
+-- 
+-- *****************************************************************
+
+ERICSSON-ROUTER-IETF-SNMP-TARGET-CAP DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY
+                FROM SNMPv2-SMI
+        AGENT-CAPABILITIES
+                FROM SNMPv2-CONF
+        eriRouterCapabilities
+                FROM ERICSSON-ROUTER-SMI;
+
+eriRouterIetfSnmpTargetCap MODULE-IDENTITY
+        LAST-UPDATED    "201501141800Z" -- Jan 14, 2015
+        ORGANIZATION    "Ericsson Inc."
+        CONTACT-INFO
+            "               Ericsson, Inc. 
+
+                            100 Headquarters Dr
+                            San Jose, CA  95134
+                            USA
+
+                     Phone: +1 408 750 5000
+                       Fax: +1 408 750 5599"
+        DESCRIPTION
+                "The Agent Capabilities of the 
+                implementation of the IETF SNMP-TARGET-MIB (RFC 2573).
+
+                If this MIB implementation is platform-dependent,
+                the PRODUCT-RELEASE clause contains Ericsson SEOS version and
+                at least one of the following Ericsson product families:
+                    [SE]  SmartEdge Multi-service Edge Router (MSER) family
+                    [SM]  SM family of Metro Ethernet Service Transport platforms
+                    [SSR] Smart Service Router (SSR) family"
+
+        REVISION        "201501141800Z" -- Jan 14, 2015
+        DESCRIPTION
+                "Updated RBN/rbn/Rbn as ERICSSON-ROUTER/eriRouter/EriRouter
+                to migrate RBN MIB to ERICSSON MIB."
+
+        REVISION        "201106150000Z" -- Jun 15, 2011
+        DESCRIPTION
+                "Update DESCRIPTION clause of MODULE-IDENTITY
+                and PRODUCT-RELEASE clause of AGENT-CAPABILITIES."
+
+        REVISION	"201011010000Z" -- Nov 1, 2010
+        DESCRIPTION
+	        "Modified PRODUCT-RELEASE clause for consistent naming.
+                Updated CONTACT-INFO."
+
+        REVISION        "200207230000Z"    -- July 23, 2002
+        DESCRIPTION
+                "Define capability for AOS 6.0."
+
+        REVISION        "200206060000Z"    -- June 6, 2002
+        DESCRIPTION
+                "Recover initial version information. Update
+                CONTACT-INFO."
+
+        REVISION        "200202221135Z"    --  Feb 22, 2002
+        DESCRIPTION
+                "Add eriRouterIetfSnmpTargetCap2; update contact-info"
+
+        REVISION        "200105260000Z"     -- May 26, 2001
+        DESCRIPTION
+                "Initial version."
+        ::= { eriRouterCapabilities 34 }
+
+eriRouterIetfSnmpTargetCap1 AGENT-CAPABILITIES
+        PRODUCT-RELEASE "SEOS 2.0"
+        STATUS          current
+        DESCRIPTION     "SNMP-TARGET-MIB capabilities"
+        SUPPORTS        SNMP-TARGET-MIB
+        INCLUDES        { snmpTargetBasicGroup,
+                          snmpTargetResponseGroup,
+                          snmpTargetCommandResponderGroup }
+
+        VARIATION   snmpTargetSpinLock
+            ACCESS  not-implemented
+            DESCRIPTION "Object not supported."
+
+        VARIATION   snmpTargetParamsRowStatus
+            ACCESS  not-implemented
+            DESCRIPTION "Object not supported."
+
+        ::= { eriRouterIetfSnmpTargetCap 1 }
+
+eriRouterIetfSnmpTargetCap2 AGENT-CAPABILITIES
+        PRODUCT-RELEASE "SEOS 2.1 [SE]; SEOS 6.3.X [SM]; SEOS 11.1.x [SSR]"
+        STATUS          current
+        DESCRIPTION     "SNMP-TARGET-MIB capabilities"
+        SUPPORTS        SNMP-TARGET-MIB
+        INCLUDES        { snmpTargetBasicGroup,
+                          snmpTargetResponseGroup,
+                          snmpTargetCommandResponderGroup }
+
+        ::= { eriRouterIetfSnmpTargetCap 2 }
+
+eriRouterIetfSnmpTargetCap3 AGENT-CAPABILITIES
+        PRODUCT-RELEASE "AOS 6.0.x"
+        STATUS          current
+        DESCRIPTION     "SNMP-TARGET-MIB capabilities"
+        SUPPORTS        SNMP-TARGET-MIB
+        INCLUDES        { snmpTargetBasicGroup,
+                          snmpTargetResponseGroup,
+                          snmpTargetCommandResponderGroup }
+        ::= { eriRouterIetfSnmpTargetCap 3 }
+END

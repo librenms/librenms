@@ -1,0 +1,1418 @@
+
+-- -------------------------------------------------------------
+-- COPYRIGHT LM Ericsson AB 2001
+-- Doc no: 2/196 03 - CXC 132 4958
+-- Version: '$Id: ERICSSON-ELN-MIB.mib,v 1.28 2006/06/15 14:13:41 hka Exp $'
+-- -------------------------------------------------------------
+
+-- -------------------------------------------------------------
+-- MIB for Ericsson Local Node, Ethernet Switch
+-- Basic Parameters
+-- -------------------------------------------------------------
+
+ERICSSON-ELN-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+   MODULE-IDENTITY, 
+   OBJECT-TYPE, 
+   Counter32, 
+   Gauge32, 
+   Counter64,
+   Integer32, 
+   TimeTicks, 
+   mib-2, 
+   IpAddress	           FROM SNMPv2-SMI
+   TEXTUAL-CONVENTION, 
+   DisplayString,
+   PhysAddress, 
+   TruthValue, 
+   RowStatus,
+   DateAndTime, 
+   TimeStamp, 
+   AutonomousType         FROM SNMPv2-TC
+   MODULE-COMPLIANCE, 
+   OBJECT-GROUP           FROM SNMPv2-CONF
+   ifIndex                FROM IF-MIB
+   eln                    FROM ERICSSON-ELN-SMI;
+
+
+elnMIB MODULE-IDENTITY
+    LAST-UPDATED    
+         "200606140000Z" -- 14 June 2006
+    ORGANIZATION    
+         "Ericsson"
+    CONTACT-INFO 
+         "Ericsson Diax A/S
+          Faelledvej 17
+          DK-7600 Struer
+          Denmark
+          E-mail: support@dxd.ericsson.se"       
+    DESCRIPTION
+         "This MIB module defines ELN parameters for:
+          Network Processor, Main Board, Mezzanine Boards,
+	  Host Processor, Ethernet Ports, VLAN, QOS and IGMP"
+    REVISION     "200112100000Z"
+    DESCRIPTION
+         "Initial revision"
+    REVISION     "200203250000Z"
+    DESCRIPTION
+         "Updated revision"
+    REVISION     "200204250000Z"
+    DESCRIPTION
+         "Updated revision, added Priority"
+    REVISION     "200209100000Z"
+    DESCRIPTION
+         "Updated revision, added QOS and Redundancy"
+    REVISION     "200209250000Z"
+    DESCRIPTION
+         "Updated revision, added Speed and Duplex"
+    REVISION     "200301200000Z"
+    DESCRIPTION
+         "Updated revision, added IGMP Snooping"
+    REVISION     "200305050000Z"
+    DESCRIPTION
+         "Updated revision, added Ingress and Egress
+          Port Connections"
+    REVISION     "200501200000Z"  
+    DESCRIPTION
+         "First R4 version, removed ERICSSON-ELN-SERVICE-MIB and moved/changed 
+          forced forwarding and topology parameters to this MIB. 
+          Added whitelist for IGMP snooping."
+    REVISION     "200502070000Z"  
+    DESCRIPTION
+         "Minor updates, added DHCP Option 82."
+    REVISION     "200503170000Z"  
+    DESCRIPTION
+         "Updated revision, added Connection Data for DHCP Option 82 info strings.
+          New Tables for Static and Dynamic IP tables for IP validation."
+    REVISION     "200505040000Z"  
+    DESCRIPTION
+         "Updated revision, moved Tag from VLAN table to PortConnectionTable.
+          Updated format and description for Gateway in VLAN table, and range
+          in Bandwidth table."
+    REVISION     "200601240000Z"
+    DESCRIPTION
+         "Changed parameters for VLAN (IP Address, MAC Address, Option 82),
+          Changed parameters for Connection Data (Option 82 Circuit/Remote Id),
+          New parameters for Ingress/Egress Connections (Second Tags for QinQ)."
+    REVISION     "200606140000Z"
+    DESCRIPTION
+         "Made elnIgmpGroup obsolete."
+    ::= { eln 1 }
+
+
+elnNetworkProcessorGroup    OBJECT IDENTIFIER ::= { elnMIB 1 }
+elnBoardGroup               OBJECT IDENTIFIER ::= { elnMIB 2 }
+elnPortGroup                OBJECT IDENTIFIER ::= { elnMIB 3 }
+elnVlanGroup                OBJECT IDENTIFIER ::= { elnMIB 4 }
+elnQosGroup                 OBJECT IDENTIFIER ::= { elnMIB 5 }
+elnConnectionGroup	    OBJECT IDENTIFIER ::= { elnMIB 6 }
+elnIgmpGroup	            OBJECT IDENTIFIER ::= { elnMIB 7 }
+elnConnectionDataGroup	    OBJECT IDENTIFIER ::= { elnMIB 8 }
+
+
+-- -------------------------------------------------------------
+-- Textual Conventions
+-- -------------------------------------------------------------
+
+PortList ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+    "Each octet within this value specifies a set of eight
+     ports, with the first octet specifying ports 1 through
+     8, the second octet specifying ports 9 through 16, etc.
+     Within each octet, the most significant bit represents
+     the lowest numbered port, and the least significant bit
+     represents the highest numbered port.  Thus, each port
+     of the bridge is represented by a single bit within the
+     value of this object.  If that bit has a value of '1'
+     then that port is included in the set of ports; the port
+     is not included if its bit has a value of '0'."
+    SYNTAX OCTET STRING 
+
+
+-- -------------------------------------------------------------
+-- Network Processor Group
+-- -------------------------------------------------------------
+
+elnNetworkProcessorModel OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "The network processor model."
+    ::= { elnNetworkProcessorGroup 1 }
+
+elnNetworkProcessorVersion OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "The network processor version."
+    ::= { elnNetworkProcessorGroup 2 }
+
+elnRealTimeClock OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Date and Time settings."
+    ::= { elnNetworkProcessorGroup 3 }
+
+elnNtpClientStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+      unicast(1),
+      broadcast(2),
+      multicast(3),
+      disabled(4)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Set the mode in which the NTP client will operate. 
+    At unicast mode the elnNtpServer must have been set."
+    ::= { elnNetworkProcessorGroup 4 }
+
+elnNtpServer OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (0..255))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "The Hostname or IP address of the NTP server.
+    Used when client is in unicast(1) status."
+    ::= { elnNetworkProcessorGroup 5 }
+
+elnSysLogServer OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (0..255))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "The Hostname or IP address of the Syslog server."
+    ::= { elnNetworkProcessorGroup 6 }
+
+
+-- -------------------------------------------------------------
+-- Board Group 
+-- -------------------------------------------------------------
+
+--
+-- Main Board
+--
+
+elnMainBoardType OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "The main board type."
+    ::= { elnBoardGroup 1 }
+
+elnMainBoardProductNo OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "The main board product number."
+    ::= { elnBoardGroup 2 }
+
+elnMainBoardRevision OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "The main board revision."
+    ::= { elnBoardGroup 3 }
+
+elnMainBoardSerialNo OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "The main board serial number."
+    ::= { elnBoardGroup 4 }
+
+elnMainBoardTemperature OBJECT-TYPE
+    SYNTAX      INTEGER
+    UNITS       "centigrades"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "The main board temperature in centigrades."
+    ::= { elnBoardGroup 5 }
+
+elnMainBoardTemperatureLimit OBJECT-TYPE
+    SYNTAX      INTEGER
+    UNITS       "centigrades"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "The main board temperature limit in centigrades.
+    When the limit is exceeded an 'elnOverheat' trap is sent."
+    ::= { elnBoardGroup 6 }
+
+
+--
+-- Mezzanine Boards
+--
+
+elnMezzanineBoardTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF ElnMezzanineBoardEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "A list of mezzanine board entries. "
+    ::= { elnBoardGroup 7 }
+
+elnMezzanineBoardEntry OBJECT-TYPE
+    SYNTAX      ElnMezzanineBoardEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "An entry containing management information applicable to a
+    specific mezzanine board."
+    INDEX   { elnMezzanineBoardIndex }
+    ::= { elnMezzanineBoardTable 1 }
+
+ElnMezzanineBoardEntry ::=
+    SEQUENCE {
+      elnMezzanineBoardIndex          INTEGER,
+      elnMezzanineBoardType           DisplayString,
+      elnMezzanineBoardProductNo      DisplayString,
+      elnMezzanineBoardRevision       DisplayString,
+      elnMezzanineBoardSerialNo       DisplayString
+    }
+    
+elnMezzanineBoardIndex OBJECT-TYPE
+    SYNTAX  INTEGER (1..4)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "The mezzanine board index."
+    ::= { elnMezzanineBoardEntry 1 }
+
+elnMezzanineBoardType OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "The mezzanine board type."
+    ::= { elnMezzanineBoardEntry 2 }
+
+elnMezzanineBoardProductNo OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "The mezzanine board product number."
+    ::= { elnMezzanineBoardEntry 3 }
+
+elnMezzanineBoardRevision OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "The mezzanine board revision."
+    ::= { elnMezzanineBoardEntry 4 }
+
+elnMezzanineBoardSerialNo OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "The mezzanine board serial number."
+    ::= { elnMezzanineBoardEntry 5 }
+
+
+-- -------------------------------------------------------------
+-- Port Group 
+-- -------------------------------------------------------------
+
+-- 
+-- Ethernet Ports 
+-- 
+
+elnPortRedundancyList OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "The port number list of reduntant ports."
+    ::= { elnPortGroup 1 }
+
+elnPortRedundancyActivePort OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "The port number of the currently active reduntant port.
+    The value 0 if there are no active port."
+    ::= { elnPortGroup 2 }
+    
+elnPortIndex OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    ""
+    ::= { elnPortGroup 3 }
+    
+elnPortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF ElnPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "A list of interface entries. This table is an extension 
+    of the ifTable in the Interface MIB."
+    ::= { elnPortGroup 4 }
+
+elnPortEntry OBJECT-TYPE
+    SYNTAX      ElnPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "An entry containing management information applicable to a
+    specific interface."
+    INDEX   { elnPortIndex }
+    ::= { elnPortTable 1 }
+
+ElnPortEntry ::=
+    SEQUENCE {
+      elnPortCrossover                    INTEGER,
+      elnPortConfiguredAutoNegotiation    TruthValue,
+      elnPortPosition			  INTEGER,
+      elnPortConfiguredSpeed		  INTEGER,
+      elnPortConfiguredDuplex		  INTEGER,
+      elnPortMediaType      		  INTEGER,
+      elnPortLinkUpDownTrapEnable         TruthValue
+    }
+
+elnPortCrossover OBJECT-TYPE
+    SYNTAX  INTEGER {
+      false(1),       
+      true(2),
+      auto(3)   
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Cable crossover switch.
+     No write access for ports with no crossover switch."
+    ::= { elnPortEntry 1 }
+
+elnPortConfiguredAutoNegotiation OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Defines if speed auto negotiation is active or not.
+    No write access for ports with no auto negotiation."
+    ::= { elnPortEntry 2 }
+
+elnPortPosition OBJECT-TYPE
+    SYNTAX  	INTEGER (0..4)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Board position, that is mezzanine board this port is on.
+    An index in the mezzanine table, elnMezzanineBoardIndex.
+    If there ar no mezzanine boards, the port is on the 
+    main board, and position 0 is returned."
+    ::= { elnPortEntry 3 }
+
+elnPortConfiguredSpeed OBJECT-TYPE
+    SYNTAX  INTEGER {
+      speed10(10),       
+      speed100(100),
+      speed1000(1000)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Defines the configured port speed in Mbits per second.
+    No write access for ports with fixed speed."
+    ::= { elnPortEntry 4 }
+
+elnPortConfiguredDuplex OBJECT-TYPE
+    SYNTAX  INTEGER {
+      full(1),       
+      half(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Defines the configured half or full duplex mode.
+    No write access for ports with fixed duplex mode."
+    ::= { elnPortEntry 5 }
+
+elnPortMediaType OBJECT-TYPE
+    SYNTAX  INTEGER {
+      electrical(1),       
+      optical(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Reports the media type for the port."
+    ::= { elnPortEntry 6 }
+    
+elnPortLinkUpDownTrapEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Indicates whether linkUp/linkDown traps should be generated
+    for this interface.
+    By default, this object have the value enabled true."
+    ::= { elnPortEntry 7 }
+    
+
+
+
+-- -------------------------------------------------------------
+-- VLAN Group 
+-- -------------------------------------------------------------
+
+elnVlanTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF ElnVlanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "A list of VLAN entries."
+    ::= { elnVlanGroup 1 }
+
+elnVlanEntry OBJECT-TYPE
+    SYNTAX      ElnVlanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "An entry containing management information applicable 
+    to a specific VLAN."
+    INDEX   { elnVlanIndex }
+    ::= { elnVlanTable  1 }
+
+ElnVlanEntry ::=
+    SEQUENCE {        
+      elnVlanIndex                        INTEGER,
+      elnVlanUntaggedPorts                PortList,    
+      elnVlanTaggedPorts                  PortList,	 
+      elnVlanDescription                  DisplayString,
+      elnVlanSwitchingRule                INTEGER,      	
+      elnVlanMaxVirtualMacAddresses       INTEGER,	 	
+      elnVlanMaxDynamicIpAddresses        INTEGER,       	
+      elnVlanArpAndDhcpTag                INTEGER,       	
+      elnVlanMacAddressLearning           TruthValue,    	
+      elnVlanUplink                       INTEGER,     		
+      elnVlanTransitlink                  INTEGER,     		
+      elnVlanIpAddress                    IpAddress,
+      elnVlanGateway                      OCTET STRING,		
+      elnVlanDhcpOption82                 TruthValue,
+      elnVlanMulticast                    INTEGER,
+      elnVlanMacAddress                   OCTET STRING, 
+      elnVlanIpAddressN                   OCTET STRING, 
+      elnVlanDhcpOption82N                INTEGER	
+    }
+
+elnVlanIndex OBJECT-TYPE
+    SYNTAX      INTEGER 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "The index for the VLAN."
+    ::= { elnVlanEntry 1 }
+
+elnVlanUntaggedPorts OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "List of untagged ports in the VLAN."
+    ::= { elnVlanEntry 5 }
+
+elnVlanTaggedPorts OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "List of tagged ports in the VLAN."
+    ::= { elnVlanEntry 6 }
+
+elnVlanDescription OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "The description for the VLAN."
+    ::= { elnVlanEntry 7 }
+
+elnVlanSwitchingRule OBJECT-TYPE
+    SYNTAX      INTEGER { 
+      normal(0), 
+      forcedForwardingIpValidation(2), 
+      forcedForwardingIpValidationAndVirtualMac(3),
+      sourceAddress(4),
+      broadcast(5)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Defines the switching options to use for the VLAN.
+     0 - normal switching, 
+     2 - forced forwarding with ip validation, 
+     3 - forced forwarding with ip validation and virtual mac,
+     4 - source address switching,
+     5 - broadcast switching."
+    ::= { elnVlanEntry 8 }
+
+elnVlanMaxVirtualMacAddresses OBJECT-TYPE
+    SYNTAX      INTEGER (0..255)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "The number of allowed Virtual MAC Addresses
+    for each Port in this VLAN."
+    ::= { elnVlanEntry 9 }
+
+elnVlanMaxDynamicIpAddresses OBJECT-TYPE
+    SYNTAX      INTEGER (0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "The number of allowed dynamic IP addresses 
+    for each Port in this VLAN. 
+    The value 65535 implies an infinite number of addresses."
+    ::= { elnVlanEntry 10 }
+
+elnVlanArpAndDhcpTag OBJECT-TYPE
+    SYNTAX      INTEGER (0..4096) -- untagged(0), tag(1-4095), undefined(4096)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "The tag for the downstream VLAN from the gateway.
+    The value 0 is used for an untagged VLAN, the value 4096
+    indicates that the function is not used."
+    ::= { elnVlanEntry 11 }
+    
+elnVlanMacAddressLearning OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Defines if MAC address learning is active on the VLAN."    
+    ::= { elnVlanEntry 12 }
+
+elnVlanUplink OBJECT-TYPE
+    SYNTAX      INTEGER (0..26)
+    MAX-ACCESS  read-write 
+    STATUS      current
+    DESCRIPTION
+    "The up link port for the VLAN.
+    The value 0 means that the up-link is undefined."
+    ::= { elnVlanEntry 14 }
+
+elnVlanTransitlink OBJECT-TYPE
+    SYNTAX      INTEGER (0..26)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "The transit link port for the VLAN.
+    The value 0 means that the transit-link is undefined."
+    ::= { elnVlanEntry 15 }
+
+elnVlanIpAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      obsolete
+    DESCRIPTION
+    "The own IP Address used in ARP messages for the VLAN."
+    ::= { elnVlanEntry 16 }
+    
+elnVlanGateway OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (0..6))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "The IP Address or MAC Address of the Gateway for the VLAN.
+    A value of length 4 will be handled as an IP Address, and
+    of length 6 as a MAC Address. 
+    Or the string 'A' if the IP/MAC address shall be automatically 
+    detected from DHCP messages."
+    ::= { elnVlanEntry 17 }
+    
+elnVlanDhcpOption82 OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      obsolete
+    DESCRIPTION
+    "Determines if DHCP option 82 shall be added to upstream DHCP 
+    requests towards a DHCP server. And removed from downstream
+    DHCP replies towards the user, see RFC 3046."
+    ::= { elnVlanEntry 18 }
+    
+elnVlanMulticast OBJECT-TYPE
+    SYNTAX      INTEGER { 
+      notAllowed(0), 
+      allowed(1), 
+      withIgmpSnooping(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Defines if Multicast is allowed on the VLAN."    
+    ::= { elnVlanEntry 19 }
+
+elnVlanMacAddress OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (0..6))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "The source MAC Address to be used in ARP messages for the VLAN.
+    Or the string 'A' if the MAC address shall be automatically 
+    borrowed from a client MAC addresses in the VLAN."
+    ::= { elnVlanEntry 20 } 
+    
+elnVlanIpAddressN OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (0..4))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "The source IP Address to be used in ARP messages for the VLAN.
+    Or the string 'A' if the IP address shall be automatically 
+    borrowed from a client IP addresses in the VLAN."
+    ::= { elnVlanEntry 21 } 
+
+elnVlanDhcpOption82N OBJECT-TYPE
+    SYNTAX      INTEGER { 
+      no(0), 
+      configurable(1), 
+      vlanPortMac(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Determines if DHCP option 82 shall be added to upstream DHCP 
+    requests towards a DHCP server, nnd removed from downstream
+    DHCP replies towards the user, see RFC 3046.
+    no(0) implies no option 82, 
+    configurable(1) means that the connection data defined for
+    elnConnectionDataOption82CircuitId and/or
+    elnConnectionDataOption82RemoteId are used,
+    vlanPortMac(2) means that a 'predefined' format that includes
+    Vlan, Port, MAC address are used for CircuitId and RemoteId."
+    ::= { elnVlanEntry 22 } 
+
+
+-- -------------------------------------------------------------
+-- QOS Group 
+-- -------------------------------------------------------------
+
+elnBandwidthLimitationTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF ElnBandwidthLimitationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "A list of bandwidth limitation entries."
+    ::= { elnQosGroup 1 }
+
+elnBandwidthLimitationEntry OBJECT-TYPE
+    SYNTAX      ElnBandwidthLimitationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "An entry containing management information applicable 
+    to a specific bandwidth limitation profile."
+    INDEX   { elnBandwidthLimitationIndex }
+    ::= { elnBandwidthLimitationTable  1 }
+
+ElnBandwidthLimitationEntry ::=
+    SEQUENCE {        
+        elnBandwidthLimitationIndex		INTEGER,
+        elnBandwidthLimitationBandWidth		Integer32,
+        elnBandwidthLimitationBurstTolerance	INTEGER
+    }
+
+elnBandwidthLimitationIndex OBJECT-TYPE
+    SYNTAX      INTEGER (1..8)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "The bandwidth limitation index."
+    ::= { elnBandwidthLimitationEntry 1 }
+
+elnBandwidthLimitationBandWidth OBJECT-TYPE
+    SYNTAX      Integer32 (5000..100000000)
+    MAX-ACCESS  read-write    
+    STATUS      current       
+    DESCRIPTION
+    "The maximum bandwidth, in bits per second,
+    allowed for a service with this rate shape."
+    ::= { elnBandwidthLimitationEntry 2 }
+    
+elnBandwidthLimitationBurstTolerance OBJECT-TYPE
+    SYNTAX      INTEGER (0..10000) -- 0 implies auto
+    UNITS       "ms"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "The burst tolerance measured in milli-seconds.
+    The value 0 means that the burst tolerance is 
+    automatically calculated."
+    ::= { elnBandwidthLimitationEntry 3 }
+
+
+
+-- -------------------------------------------------------------
+-- Port to Vlan Connection Group
+-- -------------------------------------------------------------
+
+--
+-- Bothway Connections
+-- 
+    
+elnPortConnectionTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF ElnPortConnectionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "A list of Port to VLAN connection entries.
+    An entry is created/removed by using the RowStatus."
+    ::= { elnConnectionGroup 1 }
+
+elnPortConnectionEntry OBJECT-TYPE
+    SYNTAX      ElnPortConnectionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "An entry containing management information applicable 
+    to a specific Port to VLAN connection.
+    The entry uses the index from the elnPortTable and elnVlanTable."
+    INDEX   { elnPortIndex, elnVlanIndex }
+    ::= { elnPortConnectionTable 1 }
+
+ElnPortConnectionEntry ::=
+    SEQUENCE {
+      elnPortConnectionPriority          		INTEGER,
+      elnPortConnectionBandwidthLimitationReceive	INTEGER,
+      elnPortConnectionBandwidthLimitationTransmit	INTEGER,
+      elnPortConnectionDescription       		DisplayString,
+      elnPortConnectionStatus            		RowStatus,
+      elnPortConnectionVlanTag                          INTEGER
+    }
+
+elnPortConnectionPriority  OBJECT-TYPE
+    SYNTAX     INTEGER {
+      highest(1),
+      high(2),
+      medium(3),
+      low(4)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+    "The priority for the Port to VLAN connection."
+    ::= { elnPortConnectionEntry 2 }
+
+elnPortConnectionBandwidthLimitationReceive OBJECT-TYPE
+    SYNTAX      INTEGER (0..8)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+    "The bandwidth limitation profile in the receive direction,
+    (the index in the elnBandwidthLimitationTable).
+    The value 0 means no bandwidth limitation."
+    ::= { elnPortConnectionEntry 3 }
+
+elnPortConnectionBandwidthLimitationTransmit OBJECT-TYPE
+    SYNTAX      INTEGER (0..8)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+    "The bandwidth limitation profile in the transmit direction.
+    (the index in the elnBandwidthLimitationTable).
+    The value 0 means no bandwidth limitation."
+    ::= { elnPortConnectionEntry 4 }
+
+elnPortConnectionDescription OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+    "A description of the Port to VLAN connection."
+    ::= { elnPortConnectionEntry 7 }
+
+elnPortConnectionStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+    "The row status."
+    ::= { elnPortConnectionEntry 8 }
+    
+elnPortConnectionVlanTag OBJECT-TYPE
+    SYNTAX      INTEGER (0..4096) -- untagged(0), tag(1-4095), all(4096)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+    "Defines the vlan-tag for the connection, untagged(0), tag(1-4095), 
+    all(4096). All means all ingress tags are accepted and used
+    transparent for egress."
+    ::= { elnPortConnectionEntry 9 }
+
+
+
+--
+-- Ingress Connections
+-- 
+    
+elnIngressConnectionTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF ElnIngressConnectionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "A list of Ingress connection entries.
+    An entry is created/removed by using the RowStatus."
+    ::= { elnConnectionGroup 2 }
+
+elnIngressConnectionEntry OBJECT-TYPE
+    SYNTAX      ElnIngressConnectionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "An entry containing management information applicable 
+    to a specific connection.
+    The entry uses the index from elnPortTable and elnVlanTable."
+    INDEX   { elnPortIndex, elnVlanIndex }
+    ::= { elnIngressConnectionTable 1 }
+
+ElnIngressConnectionEntry ::=
+    SEQUENCE {
+      elnIngressConnectionDescription       		DisplayString,
+      elnIngressConnectionPriority          		INTEGER,
+      elnIngressConnectionReliability			INTEGER,
+      elnIngressConnectionBandwidthLimitation		INTEGER,
+      elnIngressConnectionFilterProfile                 INTEGER, 		
+      elnIngressConnectionIpDestinations                OCTET STRING,
+      elnIngressConnectionStatus            		RowStatus
+    }
+
+elnIngressConnectionDescription OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+    "A description of the connection."
+    ::= { elnIngressConnectionEntry 1 }
+
+elnIngressConnectionPriority  OBJECT-TYPE
+    SYNTAX     INTEGER {
+      highest(1),
+      high(2),
+      medium(3),
+      low(4)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+    "The priority for the connection."   
+    ::= { elnIngressConnectionEntry 3 }
+
+elnIngressConnectionReliability  OBJECT-TYPE
+    SYNTAX     INTEGER {
+      highest(1),
+      high(2),
+      medium(3),
+      low(4),
+      lowest(5)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+    "The reliability for the connection."
+    ::= { elnIngressConnectionEntry 4 }
+
+elnIngressConnectionBandwidthLimitation OBJECT-TYPE
+    SYNTAX      INTEGER (0..8)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+    "The bandwidth limitation profile, an index in elnBandwidthLimitationTable.
+    The value 0 implies no bandwidth limitation."
+    ::= { elnIngressConnectionEntry 5 }
+
+elnIngressConnectionFilterProfile OBJECT-TYPE
+    SYNTAX      INTEGER (0..8)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+    "Defines a filter profile for the connection.
+    The value 0 implies no filter profile."
+    ::= { elnIngressConnectionEntry 7 }
+    
+elnIngressConnectionIpDestinations OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..255))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+    "Only IP Packets with these IP Addresses as destinations are
+    directed to this VLAN (Switching Domain).
+    If the string is empty all destinations are directed to the VLAN.
+    Each range is 8 bytes,
+    e.g. to represent the range >=100.10.10.10 <=100.10.10.40,
+    then use: 0x64 0x0a 0x0a 0x0a 0x64 0x0a 0x0a 0x28,
+    an empty string is all zeros."
+    ::= { elnIngressConnectionEntry 8 }
+
+elnIngressConnectionStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+    "The row status."
+    ::= { elnIngressConnectionEntry 20 }
+    
+    
+--    
+-- Ingress Connection Tags
+--    
+    
+elnIngressConnectionTagTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF ElnIngressConnectionTagEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "A list of ingress connection tag entries."
+    ::= { elnConnectionGroup 3 }
+
+elnIngressConnectionTagEntry OBJECT-TYPE
+    SYNTAX      ElnIngressConnectionTagEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "An entry containing management information applicable 
+    to a specific ingress tag entry."
+    INDEX   { elnPortIndex, elnVlanIndex, elnIngressConnectionTagValue }
+    ::= { elnIngressConnectionTagTable 1 }
+
+ElnIngressConnectionTagEntry ::=
+    SEQUENCE {
+      elnIngressConnectionTagValue           		INTEGER,
+      elnIngressConnectionTagStatus          	        RowStatus
+    }
+      
+elnIngressConnectionTagValue OBJECT-TYPE
+    SYNTAX      INTEGER (0..4096) -- untagged(0), tag(1-4095), all(4096)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+    "Allowed vlan-tag for the port ingress connection,
+     untagged(0), tag(1-4095), all(4096).
+     If the value is all(4096) there is only one
+     entry for that ingress connection."
+    ::= { elnIngressConnectionTagEntry 1 }
+    
+elnIngressConnectionTagStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+    "The row status."
+    ::= { elnIngressConnectionTagEntry 2 }
+      
+      
+      
+--    
+-- Ingress Connection Second Tags (QinQ)
+--    
+    
+elnIngressConnectionSecondTagTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF ElnIngressConnectionSecondTagEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "A list of ingress connection tag entries."
+    ::= { elnConnectionGroup 5 }
+
+elnIngressConnectionSecondTagEntry OBJECT-TYPE
+    SYNTAX      ElnIngressConnectionSecondTagEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "An entry containing management information applicable 
+    to a specific ingress tag entry."
+    INDEX   { elnPortIndex, elnVlanIndex, elnIngressConnectionSecondTagValue }
+    ::= { elnIngressConnectionSecondTagTable 1 }
+
+ElnIngressConnectionSecondTagEntry ::=
+    SEQUENCE {
+      elnIngressConnectionSecondTagValue           		INTEGER,
+      elnIngressConnectionSecondTagStatus          	        RowStatus
+    }
+      
+elnIngressConnectionSecondTagValue OBJECT-TYPE
+    SYNTAX      INTEGER (0..4096) -- untagged(0), tag(1-4095), all(4096)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+    "Allowed vlan-tag for the port ingress connection,
+     untagged(0), tag(1-4095), all(4096).
+     If the value is all(4096) there is only one
+     entry for that ingress connection."
+    ::= { elnIngressConnectionSecondTagEntry 1 }
+    
+elnIngressConnectionSecondTagStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+    "The row status."
+    ::= { elnIngressConnectionSecondTagEntry 2 }
+      
+    
+--
+-- Egress Connections
+-- 
+      
+elnEgressConnectionTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF ElnEgressConnectionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of Egress connection entries.
+         An entry is created/removed by using the RowStatus."
+    ::= { elnConnectionGroup 4 }
+
+elnEgressConnectionEntry OBJECT-TYPE
+    SYNTAX      ElnEgressConnectionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "An entry containing management information applicable 
+    to a specific Port to VLAN connection.
+    an index from the elnPortTable and elnVlanTable."
+    INDEX   { elnPortIndex, elnVlanIndex }
+    ::= { elnEgressConnectionTable 1 }
+
+ElnEgressConnectionEntry ::=
+    SEQUENCE {
+      elnEgressConnectionDescription       	DisplayString,
+      elnEgressConnectionTag               	INTEGER,
+      elnEgressConnectionPriorityTag		INTEGER,
+      elnEgressConnectionBandwidthLimitation    INTEGER,
+      elnEgressConnectionBroadcastAllowed       TruthValue,		
+      elnEgressConnectionSecondTag             	INTEGER,
+      elnEgressConnectionSecondPriorityTag	INTEGER,
+      elnEgressConnectionStatus            	RowStatus
+    }
+
+elnEgressConnectionDescription OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+    "A description of the connection."
+    ::= { elnEgressConnectionEntry 1 }
+
+elnEgressConnectionTag OBJECT-TYPE
+    SYNTAX      INTEGER (0..4096) -- untagged(0), tag(1-4095), transparent(4096)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+    "Defines the vlan-tag for the connection, untagged(0), tag(1-4095), transparent(4096).
+    for transparent(4096) the ingress tag is used."
+    ::= { elnEgressConnectionEntry 2 }
+
+elnEgressConnectionPriorityTag OBJECT-TYPE
+    SYNTAX      INTEGER  (0..8) -- priority(0-7), transparent(8)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+    "Defines the P-tag for the connection, priority(0-7), transparent(8).
+    For transparent(8) the ingress tag is used."
+    ::= { elnEgressConnectionEntry 3 }
+
+elnEgressConnectionBandwidthLimitation OBJECT-TYPE
+    SYNTAX      INTEGER (0..8)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+    "The bandwidth limitation profile, an index in elnBandwidthLimitationTable.
+    The value 0 implies no bandwidth limitation."
+    ::= { elnEgressConnectionEntry 4 }
+
+elnEgressConnectionBroadcastAllowed OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+    "Defines if Broadcast is allowed for the connection."
+    ::= { elnEgressConnectionEntry 6 } 
+
+elnEgressConnectionSecondTag OBJECT-TYPE
+    SYNTAX      INTEGER (0..4096) -- untagged(0), tag(1-4095), transparent(4096)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+    "Defines the vlan-tag for the connection, untagged(0), tag(1-4095), transparent(4096).
+    for transparent(4096) the ingress tag is used."
+    ::= { elnEgressConnectionEntry 7 } 
+
+elnEgressConnectionSecondPriorityTag OBJECT-TYPE
+    SYNTAX      INTEGER  (0..8) -- priority(0-7), transparent(8)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+    "Defines the P-tag for the connection, priority(0-7), transparent(8).
+    For transparent(8) the ingress tag is used."
+    ::= { elnEgressConnectionEntry 8 } 
+    
+elnEgressConnectionStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+    "The row status."
+    ::= { elnEgressConnectionEntry 20 }
+    
+
+    
+    
+-- -------------------------------------------------------------
+-- Connection Data Group
+-- -------------------------------------------------------------
+    
+--
+-- Connection Data Table
+--
+
+elnConnectionDataTable OBJECT-TYPE         		
+    SYNTAX      SEQUENCE OF ElnConnectionDataEntry
+    MAX-ACCESS  not-accessible						
+    STATUS      current
+    DESCRIPTION
+    "A list of connection entries."
+    ::= { elnConnectionDataGroup 1 }
+
+elnConnectionDataEntry OBJECT-TYPE
+    SYNTAX      ElnConnectionDataEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "An entry containing management information applicable 
+    to specific connection data."
+    INDEX   { elnPortIndex, elnVlanIndex }
+    ::= { elnConnectionDataTable 1 }
+
+ElnConnectionDataEntry ::=
+    SEQUENCE {        
+      elnConnectionDataOption82String		        OCTET STRING,
+      elnConnectionDataOption82Config		        INTEGER,
+      elnConnectionMulticastGroupLimit                  INTEGER,
+      elnConnectionMulticastWhiteList                   OCTET STRING,
+      elnConnectionDataOption82CircuitId		OCTET STRING,
+      elnConnectionDataOption82RemoteId	         	OCTET STRING
+    }
+
+elnConnectionDataOption82String OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (0..253))
+    MAX-ACCESS  read-write
+    STATUS      obsolete
+    DESCRIPTION
+    "The specified string will be inserted as 'Agent Circuit ID' 
+     or 'Agent Remote ID', see RFC 3046."
+    ::= { elnConnectionDataEntry 1 }
+
+elnConnectionDataOption82Config OBJECT-TYPE
+    SYNTAX      INTEGER { notUsed                 (0), 
+			  remoteIdString          (1), 
+			  remoteIdCisco           (2), 
+			  remoteIdCustomer        (3),
+			  circuitIdString         (4), 
+			  circuitIdCustomer       (5), 
+			  remoteIdEda             (6), 
+			  circuitIdEda            (7),
+			  remoteAndCircuitIdFea   (8) 
+			}
+    MAX-ACCESS  read-write
+    STATUS      obsolete
+    DESCRIPTION
+    "Determines which DHCP Snooping configuration to use. The snooping agent 
+     adds DHCP option 82 to upstream DHCP requests, and removes the option 82 
+     from downstream DHCP replies. See also RFC 3046.
+    
+     0 - notUsed:           No relay-agent information will be added or removed from 
+                            the frames.
+     1 - remoteIdString:    A specified string will be inserted as 'Agent Remote ID'.
+                            The parameter relayAgentString has to be set with the 
+                            string before using this configuration.
+     2 - remoteIdCisco:     Not supported.
+     3 - remoteIdCustomer:  The customer Id will be inserted as Agent Remote ID.
+                            The parameter relayAgentString has to be set with the 
+                            correct customer Id before using this configuration.
+     4 - circuitIdString:   Same as remoteIdString except that it will be encoded in
+                            'Agent Circuit ID'.
+     5 - circuitIdCustomer: Same as remoteIdCustomer except that it will be encoded 
+                            in 'Agent Circuit ID'.
+     6 - remoteIdEda:       Not supported.
+     7 - circuitIdEda:      Not supported.
+     8 - remoteAndCircuitIdFea:
+                            'Agent Remote ID' and 'Agent Circuit ID' will be inserted 
+                            according to a format specified for FEA.
+    " 
+    ::= { elnConnectionDataEntry 3 }
+			    
+elnConnectionMulticastGroupLimit OBJECT-TYPE
+    SYNTAX      INTEGER (0..100) 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Defines the maximum number of active Multicast groups, i.e. the 
+    maximum number of parallel channels for this VLAN on this port.
+    The value 0 means that there are no limit."
+    ::= { elnConnectionDataEntry 4 }
+    
+elnConnectionMulticastWhiteList    OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..255))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Multicast groups which are within the range are allowed.
+    If the string is empty all multicast groups are allowed. 
+    Each range is 8 bytes. 
+    To represent the range >=224.10.10.10 <=224.10.10.40,
+    then add: 0xe0 0x0a 0x0a 0x0a 0xe0 0x0a 0x0a 0x28."
+    ::= { elnConnectionDataEntry 5 }
+    
+elnConnectionDataOption82CircuitId OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (0..255))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "The specified string will be inserted as 'Agent Circuit ID' 
+    sub-option 1, see RFC 3046."
+    ::= { elnConnectionDataEntry 10 } 
+
+elnConnectionDataOption82RemoteId OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (0..255))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "The specified string will be inserted as 'Agent Remote ID' 
+    sub-option 2, see RFC 3046."
+    ::= { elnConnectionDataEntry 11 } 
+    
+    
+--
+-- Static IP Addresses
+--
+
+elnStaticIpAddressTable OBJECT-TYPE				
+    SYNTAX      SEQUENCE OF ElnStaticIpAddressEntry		
+    MAX-ACCESS  not-accessible					
+    STATUS      current
+    DESCRIPTION
+    "A list of user port static ip entries."
+    ::= { elnConnectionDataGroup 2 }
+
+elnStaticIpAddressEntry OBJECT-TYPE
+    SYNTAX      ElnStaticIpAddressEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "An entry containing management information applicable 
+    to a specific static ip address."
+    INDEX   { elnPortIndex, elnVlanIndex, elnStaticIpAddress }
+    ::= { elnStaticIpAddressTable  1 }
+
+ElnStaticIpAddressEntry ::=
+    SEQUENCE {        
+        elnStaticIpAddress			IpAddress,
+        elnStaticIpAddressStatus		RowStatus
+    }
+
+elnStaticIpAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+    "Valid source IP adress."
+    ::= { elnStaticIpAddressEntry 1 }
+
+elnStaticIpAddressStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+    "Rowstatus for creation and deletion of rows"
+    ::= { elnStaticIpAddressEntry 2 }
+    
+    
+--
+-- Dynamic IP Addresses
+--
+
+elnDynamicIpAddressTable OBJECT-TYPE			        
+    SYNTAX      SEQUENCE OF ElnDynamicIpAddressEntry	
+    MAX-ACCESS  not-accessible				
+    STATUS      current
+    DESCRIPTION
+    "A list of user port dynamic ip entries."
+    ::= { elnConnectionDataGroup 3 }
+
+elnDynamicIpAddressEntry OBJECT-TYPE
+    SYNTAX      ElnDynamicIpAddressEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "An entry containing management information applicable 
+    to a specific dynamic ip address."
+    INDEX   { elnPortIndex, elnVlanIndex, elnDynamicIpAddress }
+    ::= { elnDynamicIpAddressTable  1 }
+
+ElnDynamicIpAddressEntry ::=
+    SEQUENCE {        
+        elnDynamicIpAddress			IpAddress
+    }
+
+elnDynamicIpAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Dynamic IP address assigned to VLAN and Port."
+    ::= { elnDynamicIpAddressEntry 1 }
+
+
+    
+-- -------------------------------------------------------------
+-- IGMP Snooping Group
+-- -------------------------------------------------------------
+    
+elnIgmpSnoopingHostDisconnectTime OBJECT-TYPE
+    SYNTAX      INTEGER (60..1000000001)
+    UNITS       "sec"
+    MAX-ACCESS  read-write
+    STATUS      obsolete
+    DESCRIPTION
+    "Maximum timeout value (in seconds) between host membership
+    reports. At expiry the host is removed from the group.
+    A value above 1000000000 is handled as infinite."
+    ::= { elnIgmpGroup 3 }
+
+elnIgmpSnoopingDisconnectOldest OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      obsolete
+    DESCRIPTION
+    "Defines the action when the maximum number of active Multicast groups 
+    is reached (according elnIgmpSnoopingConnectionMulticastGroupLimit). 
+    The value true means disconnect the oldest group and false means reject 
+    the new group."
+    ::= { elnIgmpGroup 4 }
+    
+    
+END
+
+
+
+
+
+

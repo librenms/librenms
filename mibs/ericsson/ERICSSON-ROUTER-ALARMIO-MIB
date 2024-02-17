@@ -1,0 +1,132 @@
+-- *****************************************************************
+-- ERICSSON-ROUTER-ALARMIO-MIB
+--
+-- Copyright (c) 2015 Ericsson AB.
+-- All rights reserved.
+--
+-- *****************************************************************
+
+ ERICSSON-ROUTER-ALARMIO-MIB DEFINITIONS ::= BEGIN
+
+     IMPORTS
+         MODULE-IDENTITY, OBJECT-TYPE, OBJECT-IDENTITY,
+         NOTIFICATION-TYPE, mib-2, Counter32,
+         Integer32, TimeTicks, Unsigned32                   FROM SNMPv2-SMI
+
+         TEXTUAL-CONVENTION, DisplayString      FROM SNMPv2-TC
+
+         MODULE-COMPLIANCE, OBJECT-GROUP,
+         NOTIFICATION-GROUP                     FROM SNMPv2-CONF
+
+         DateAndTime                            FROM SNMPv2-TC
+
+         ItuPerceivedSeverity                   FROM ITU-ALARM-TC-MIB
+
+         eriRouterMgmt                          FROM ERICSSON-ROUTER-SMI;
+
+ --  Alarmio MIB
+
+ eriRouterAlarmioMib MODULE-IDENTITY
+     LAST-UPDATED "201506300000Z"  -- 30 Jun, 2015
+     ORGANIZATION "Ericsson AB"
+     CONTACT-INFO
+         "David Xia
+         Email: David.Xia@ericsson.com"
+     DESCRIPTION
+         "Alarmio is physical connector held external IOs. This module is product specific.
+          It's only used in Spitfire series products.
+          It holds some input pins(ports) and output pins(ports).
+          The input ports are connected with other devices and used to accept signal from them.
+          Alarms are trapped when signal detected.
+          The output ports are connected with other devices and used to send out signal to them.
+          When critical or major alarms are detected, signal will be sent out by these ports.
+          Detailed usage is product specific."
+
+     REVISION "201506300000Z"
+     DESCRIPTION
+         "Initial revision."
+
+     ::= { eriRouterMgmt 108 }
+
+ -- Alarmio table
+
+ eriRouterAlarmioAlarmActiveTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF EriRouterAlarmioAlarmActiveEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+         "A list of alarmio active alarm entries."
+     ::= { eriRouterAlarmioMib 1 }
+
+ eriRouterAlarmioAlarmActiveEntry OBJECT-TYPE
+     SYNTAX     EriRouterAlarmioAlarmActiveEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+         "A collection of alarmio active alarm info."
+     INDEX { eriRouterAlarmioPortId, eriRouterAlarmioAlarmActiveIndex }
+     ::= { eriRouterAlarmioAlarmActiveTable 1 }
+
+ EriRouterAlarmioAlarmActiveEntry ::= SEQUENCE {
+     eriRouterAlarmioPortId                        Unsigned32,
+     eriRouterAlarmioAlarmActiveIndex              Unsigned32,
+     eriRouterAlarmioAlarmSeverity                 ItuPerceivedSeverity,
+     eriRouterAlarmioDescription                   DisplayString,
+     eriRouterAlarmioAlarmDateAndTime              DateAndTime
+ }
+
+ eriRouterAlarmioPortId OBJECT-TYPE
+     SYNTAX     Unsigned32 (1..3)
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The value of this object contains the alarmio's port id."
+     ::= { eriRouterAlarmioAlarmActiveEntry 1 }
+
+ eriRouterAlarmioAlarmActiveIndex OBJECT-TYPE
+     SYNTAX     Unsigned32 (1..65535)
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The value of this object uniquely identifies this
+         alarmio entry."
+     ::= { eriRouterAlarmioAlarmActiveEntry 2 }
+
+
+ eriRouterAlarmioAlarmSeverity OBJECT-TYPE
+     SYNTAX     ItuPerceivedSeverity
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The value of this object contains the alarmio alarm's severity."
+     ::= { eriRouterAlarmioAlarmActiveEntry 3 }
+
+ eriRouterAlarmioDescription OBJECT-TYPE
+     SYNTAX     DisplayString
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The value of this object contains the alarmio's description."
+     ::= { eriRouterAlarmioAlarmActiveEntry 4 }
+
+ eriRouterAlarmioAlarmDateAndTime OBJECT-TYPE
+     SYNTAX     DateAndTime
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The value of this object contains the alarmio alarm's trigger time."
+     ::= { eriRouterAlarmioAlarmActiveEntry 5 }
+
+ -- Alarmio notification(s) trap
+ eriRouterAlarmioAlarm NOTIFICATION-TYPE
+     OBJECTS  { eriRouterAlarmioAlarmActiveIndex,
+                eriRouterAlarmioPortId,
+                eriRouterAlarmioAlarmSeverity,
+                eriRouterAlarmioDescription,
+                eriRouterAlarmioAlarmDateAndTime}
+     STATUS   current
+     DESCRIPTION
+         "This notification is triggered when a alarmio input alarm is triggered."
+     ::= { eriRouterAlarmioMib 2 }
+
+ END

@@ -1,0 +1,166 @@
+-- %DNP% $Id: ERICSSON-ROUTER-IETF-RMON-CAP.my,v 1.1.6.3.444.4 2011/06/15 18:19:45 danielhe Exp $
+-- %DNP% $Source: /cvsroot/pkt/sw/se/xc/bsd/config/snmp/mibs/Attic/ERICSSON-ROUTER-IETF-RMON-CAP.my,v $
+-- *****************************************************************
+-- ERICSSON-ROUTER-IETF-RMON-CAP.my:        IETF RMON-MIB Agent Capabilities
+--
+-- Copyright (c) 1998, 2002, 2010-2011, 2015,2016 Ericsson AB
+-- All rights reserved.
+-- 
+-- *****************************************************************
+
+ERICSSON-ROUTER-IETF-RMON-CAP DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY
+                FROM SNMPv2-SMI
+        AGENT-CAPABILITIES
+                FROM SNMPv2-CONF
+        eriRouterCapabilities
+                FROM ERICSSON-ROUTER-SMI;
+
+eriRouterIetfRmonCap MODULE-IDENTITY
+        LAST-UPDATED   "201610190000Z" -- Oct 19, 2016
+        ORGANIZATION    "Ericsson Inc."
+        CONTACT-INFO
+                "       Ericsson, Inc.
+                "
+        DESCRIPTION
+            "support rmonEtherStatsGroup,rmonHistoryControlGroup,rmonEthernetHistoryGroup for Spitfire"
+
+        REVISION      "201501141800Z" -- Jan 14, 2015
+        DESCRIPTION
+            "Updated RBN/rbn/Rbn as ERICSSON-ROUTER/eriRouter/EriRouter
+             to migrate RBN MIB to ERICSSON MIB."
+
+        REVISION      "201106150000Z" -- Jun 15, 2011
+        DESCRIPTION
+            "Update DESCRIPTION clause of MODULE-IDENTITY
+            and PRODUCT-RELEASE clause of AGENT-CAPABILITIES."
+
+        REVISION      "201011010000Z" -- Nov 1, 2010
+        DESCRIPTION
+            "Modified PRODUCT-RELEASE clause for consistent naming.
+             Updated CONTACT-INFO."
+                
+        REVISION      "200210300000Z" -- October 30, 2002
+        DESCRIPTION
+            "Added eriRouterIetfRmonCap3 for SmartEdge release 2.3.4."
+
+        REVISION      "200205300000Z" -- May 30, 2002
+        DESCRIPTION
+            "Added eriRouterIetfRmonCap2 for SmartEdge release 2.3.3."
+
+        REVISION      "200205290000Z" -- May 29, 2002
+        DESCRIPTION
+            "Update CONTACT-INFO. RMON mib module is now based on
+            RFC 2819. Updated the INCLUDES to the correct group names
+            in RFC 2819."
+
+        REVISION      "9804162300Z"
+        DESCRIPTION
+            "Initial version."
+
+        ::= { eriRouterCapabilities 8 }
+
+eriRouterIetfRmonCap1 AGENT-CAPABILITIES
+        PRODUCT-RELEASE "AOS 1.0.X.X"
+        STATUS          current
+        DESCRIPTION     "RMON-MIB event/alarm capabilities"
+        SUPPORTS        RMON-MIB
+        INCLUDES {
+                rmonAlarmGroup,
+                rmonEventGroup,
+                rmonNotificationGroup
+                }
+        ::= { eriRouterIetfRmonCap 1 }
+
+eriRouterIetfRmonCap2 AGENT-CAPABILITIES
+        PRODUCT-RELEASE "SEOS 2.3.3"
+        STATUS          current
+        DESCRIPTION     "RMON-MIB event/alarm capabilities"
+        SUPPORTS        RMON-MIB 
+        INCLUDES {
+                rmonAlarmGroup,    
+                rmonEventGroup,
+                rmonNotificationGroup
+                }
+
+        VARIATION   eventCommunity
+        SYNTAX      OCTET STRING (SIZE (0..64))
+        DESCRIPTION        
+                "Limit this community string to a maximum of 64 octets 
+                in length which is the same as the implementation in
+                snmpCommunityName."
+        ::= { eriRouterIetfRmonCap 2 }
+
+eriRouterIetfRmonCap3 AGENT-CAPABILITIES
+        PRODUCT-RELEASE "SEOS 2.3.4 [SE]; SEOS 6.3.X [SM]; SEOS 11.1.x [SSR]"
+        STATUS          current
+        DESCRIPTION     "RMON-MIB event/alarm capabilities"
+        SUPPORTS        RMON-MIB 
+        INCLUDES {
+                rmonAlarmGroup,    
+                rmonEventGroup,
+                rmonNotificationGroup
+                }
+
+        VARIATION   eventCommunity
+        ACCESS      read-only
+        DESCRIPTION
+                "According to Section 5.2.3, RFC 2576: In a 
+                multi-lingual SNMP entity, the parameters used for
+                generating notifications will be obtained by examining
+                the SNMP-TARGET-MIB and SNMP-NOTIFICATION-MIB.  This is
+                in conflict with the intention behind the RMON MIB's 
+                eventcommunity object.  
+
+                In deference to RFC 2576, write access is not allowed 
+                for this object.  Reading this object will always 
+                return a zero-length string.  The destination for RMON
+                notifications will be determined solely by the contents 
+                of the SNMP-TARGET-MIB and SNMP-NOTIFICATION-MIB."
+        ::= { eriRouterIetfRmonCap 3 }
+
+eriRouterIetfRmonCap4 AGENT-CAPABILITIES
+        PRODUCT-RELEASE "Spitfire 1.1.x [SP]"
+        STATUS          current
+        DESCRIPTION     "RMON-MIB event/alarm/stats capabilities"
+        SUPPORTS        RMON-MIB
+        INCLUDES {
+                rmonAlarmGroup,
+                rmonEventGroup,
+                rmonNotificationGroup,
+                rmonEtherStatsGroup,
+                rmonHistoryControlGroup,
+                rmonEthernetHistoryGroup
+                }
+
+        VARIATION   eventCommunity
+        ACCESS      read-only
+        DESCRIPTION
+                "According to Section 5.2.3, RFC 2576: In a
+                multi-lingual SNMP entity, the parameters used for
+                generating notifications will be obtained by examining
+                the SNMP-TARGET-MIB and SNMP-NOTIFICATION-MIB.  This is
+                in conflict with the intention behind the RMON MIB's
+                eventcommunity object.
+
+                In deference to RFC 2576, write access is not allowed
+                for this object.  Reading this object will always
+                return a zero-length string.  The destination for RMON
+                notifications will be determined solely by the contents
+                of the SNMP-TARGET-MIB and SNMP-NOTIFICATION-MIB."
+
+        VARIATION   etherStatsDropEvents
+        ACCESS      not-implemented
+        DESCRIPTION     "not support etherStatsDropEvents"
+
+        VARIATION   etherStatsJabbers
+        ACCESS      not-implemented
+        DESCRIPTION     "not support etherStatsJabbers"
+
+        VARIATION   etherStatsCollisions
+        ACCESS      not-implemented
+        DESCRIPTION     "not support etherStatsCollisions"
+        ::= { eriRouterIetfRmonCap 4 }
+END

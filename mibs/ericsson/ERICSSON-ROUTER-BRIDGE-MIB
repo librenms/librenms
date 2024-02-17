@@ -1,0 +1,380 @@
+-- %DNP% $Id: ERICSSON-ROUTER-BRIDGE-MIB.my,v 1.1.2.9.4.2 2011/02/22 17:26:16 thatcher Exp $
+-- %DNP% $Source: /cvsroot/pkt/sw/se/xc/bsd/config/snmp/mibs/Attic/ERICSSON-ROUTER-BRIDGE-MIB.my,v $
+-- *****************************************************************
+-- ERICSSON-ROUTER-BRIDGE-MIB    BRIDGE MIB 
+--
+-- Copyright (c) 2007-2008, 2011, 2015 Ericsson AB.
+-- All rights reserved.
+--
+-- *****************************************************************
+
+ERICSSON-ROUTER-BRIDGE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    NOTIFICATION-TYPE,
+    Integer32 
+            FROM SNMPv2-SMI
+
+    TruthValue
+            FROM SNMPv2-TC
+
+    SnmpAdminString
+            FROM SNMP-FRAMEWORK-MIB
+
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP,
+    NOTIFICATION-GROUP
+            FROM SNMPv2-CONF
+
+    dot1dBasePortEntry, dot1dStpPortState
+            FROM BRIDGE-MIB
+
+    eriRouterMgmt
+            FROM ERICSSON-ROUTER-SMI;
+
+eriRouterBridgeMib MODULE-IDENTITY
+    LAST-UPDATED    "201501141800Z" -- Jan 14, 2015
+    ORGANIZATION   "Ericsson AB."
+    CONTACT-INFO
+            "       Ericsson AB
+            Postal: 100 Headquarters Dr
+                    San Jose, CA 95134
+                    USA
+
+             Phone: +1 408 750 5000
+               Fax: +1 408 750 5599
+            "
+
+    DESCRIPTION
+            "Defines the objects necessary to support the management of
+            Bridge objects.
+
+            Add eriRouterBridgeCircuitStateEvent notification along with 
+            the associated objects. Defined eriRouterBridgeNotifyObjectGroup and 
+            eriRouterBridgeNotifyGroup for compliance."
+
+    REVISION      "201501141800Z" -- Jan 14, 2015
+    DESCRIPTION
+            "Updated RBN/rbn/Rbn as ERICSSON-ROUTER/eriRouter/EriRouter
+             to migrate RBN MIB to ERICSSON MIB."
+
+    REVISION      "201101191800Z" -- Jan 19, 2011
+    DESCRIPTION
+            "Update CONTACT-INFO & ORGANIZATION."
+
+    REVISION      "200808270000Z" -- August 27, 2008
+    DESCRIPTION
+            "Updated dot1dStpPortState in place of current port state,
+            and changed eriRouterBridgePortPrevState to eriRouterBridgePortPreviousState
+            for trap, and updated groups accordingly."
+
+    REVISION      "200802250000Z" -- Feb 25, 2008
+    DESCRIPTION
+            "Add eriRouterBridgeCompliance2, eriRouterBridgeStateNotifyObjectGroup,
+            eriRouterBridgeBaseObjectGroup, eriRouterBridgeStateNotifyGroup, 
+            eriRouterBridgeNewRootEvent, and eriRouterBridgeTopologyChangeEvent."
+
+    REVISION      "200706200000Z" -- June 20, 2007
+    DESCRIPTION
+        "Initial Version."
+        
+
+    ::= { eriRouterMgmt 42 }
+
+eriRouterBridgeNotifications OBJECT IDENTIFIER ::= { eriRouterBridgeMib 0 }
+
+eriRouterBridgeObjects       OBJECT IDENTIFIER ::= { eriRouterBridgeMib 1 } 
+
+eriRouterBridgeConformance   OBJECT IDENTIFIER ::= { eriRouterBridgeMib 2 }
+
+
+--
+-- some structure for the mib objects
+--
+
+eriRouterBridgeNotify        OBJECT IDENTIFIER ::= { eriRouterBridgeObjects  1 }
+eriRouterBridgeBase          OBJECT IDENTIFIER ::= { eriRouterBridgeObjects  2 }
+
+--
+-- Bridge notification objects
+--
+
+eriRouterBridgeNotifyEnable  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "This object will provide a mechanism for enabling and
+       disabling bridge circuit state notifications.  A value of 1 (true)
+       indicates that bridge circuit state notifications are enabled.
+       A value of 2 (false) indicates that bridge circuit state
+       notifications are disabled."
+    DEFVAL { true }
+    ::= { eriRouterBridgeNotify 1 }
+
+eriRouterBridgeGroupName OBJECT-TYPE
+    SYNTAX      SnmpAdminString  (SIZE(1..32)) 
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+       "Identifier for the bridge instance."
+    ::= { eriRouterBridgeNotify 2 }
+
+eriRouterBridgeCircuitDescriptor OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE (1..255)) 
+    MAX-ACCESS  accessible-for-notify 
+    STATUS      current
+    DESCRIPTION
+        "A descriptor for identifying the Bridge circuit."
+    ::= { eriRouterBridgeNotify 3 }
+
+eriRouterBridgeCircuitStatus OBJECT-TYPE 
+    SYNTAX      INTEGER {
+                  blocked(1),
+                  cleared(2)
+                 }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The status of the circuit in the Bridge if it is blocked/cleared 
+         based on loop detection."
+    ::= { eriRouterBridgeNotify 4 }
+
+eriRouterBridgeGroupContextName OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(1..64))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The context in which the circuit is defined."
+    ::= { eriRouterBridgeNotify 5 }
+
+eriRouterBridgePortPreviousState OBJECT-TYPE
+    SYNTAX      INTEGER {
+                  disabled(1),
+                  blocking(2),
+                  listening(3),
+                  learning(4),
+                  forwarding(5),
+                  broken(6)
+                 }
+    MAX-ACCESS  accessible-for-notify 
+    STATUS      current
+    DESCRIPTION
+        "This object contains the previous state of the same port as 
+        dot1dStpPortState in the same notification."
+    ::= { eriRouterBridgeNotify 6 }
+
+--
+-- Bridge base objects
+--
+
+eriRouterBridgeIdTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EriRouterBridgeIdEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table contains Bridge identifier."
+    ::= { eriRouterBridgeBase 1 }
+
+eriRouterBridgeIdEntry OBJECT-TYPE
+    SYNTAX      EriRouterBridgeIdEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Bridge ID table entry."
+    INDEX { eriRouterBridgeName }
+    ::= { eriRouterBridgeIdTable 1 }
+
+EriRouterBridgeIdEntry ::=
+    SEQUENCE {
+        eriRouterBridgeName   
+             SnmpAdminString,
+        eriRouterBridgeId           
+             Integer32
+    }
+
+eriRouterBridgeName OBJECT-TYPE
+    SYNTAX      SnmpAdminString  (SIZE(1..32)) 
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The Bridge name. It is the same as eriRouterBridgeGroupName."
+    ::= { eriRouterBridgeIdEntry 1 }
+
+eriRouterBridgeId OBJECT-TYPE
+    SYNTAX  Integer32 (1..65535)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The Bridge identifier referring to this Bridge."
+    ::= { eriRouterBridgeIdEntry 2 }
+
+eriRouterBridgePortCctDescrTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EriRouterBridgePortCctDescrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table contains Bridge port number and its circuit description."
+    ::= { eriRouterBridgeBase 2 }
+
+eriRouterBridgePortCctDescrEntry OBJECT-TYPE
+    SYNTAX      EriRouterBridgePortCctDescrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Bridge port circuit description table entry."
+    AUGMENTS    { dot1dBasePortEntry }
+    ::= { eriRouterBridgePortCctDescrTable 1 }
+
+EriRouterBridgePortCctDescrEntry ::=
+    SEQUENCE {
+        eriRouterBridgePortCctDescr
+            SnmpAdminString 
+    }
+
+eriRouterBridgePortCctDescr OBJECT-TYPE
+    SYNTAX  SnmpAdminString (SIZE (0..64))
+    MAX-ACCESS  read-only 
+    STATUS  current
+    DESCRIPTION
+        "The circuit description of this Bridge port."
+    ::= { eriRouterBridgePortCctDescrEntry 1 }
+
+--
+-- NOTIFICATIONS - node for hanging notification definitions
+--
+
+eriRouterBridgeCctStateEvent NOTIFICATION-TYPE
+    OBJECTS {
+        eriRouterBridgeGroupName,
+        eriRouterBridgeCircuitDescriptor,
+        eriRouterBridgeCircuitStatus,
+        eriRouterBridgeGroupContextName
+    }
+    STATUS current
+    DESCRIPTION
+        "This notification signifies that a loop has been detected
+        leading to the bridge circuit being blocked/cleared." 
+    ::= { eriRouterBridgeNotifications 1 }
+
+eriRouterBridgeNewRootEvent NOTIFICATION-TYPE
+OBJECTS {
+        eriRouterBridgeId,
+        dot1dStpPortState
+    }
+    STATUS current
+    DESCRIPTION
+        "This notification indicates that the sending agent has
+        become the new root of the Spanning Tree; the trap is
+        sent by a bridge soon after its election as the new
+        root."
+    ::= { eriRouterBridgeNotifications 2  }
+
+eriRouterBridgeTopologyChangeEvent NOTIFICATION-TYPE
+OBJECTS {
+        eriRouterBridgeId,
+        dot1dStpPortState,
+        eriRouterBridgePortPreviousState 
+    }
+    STATUS current
+    DESCRIPTION
+        "This notification is sent by a bridge when any of its 
+        configured ports transitions from the Learning state
+        to the Forwarding state, or from the Forwarding state to
+        the Blocking state."        
+    ::= { eriRouterBridgeNotifications 3 }
+
+--
+-- compliance statements
+--
+eriRouterBridgeCompliances OBJECT IDENTIFIER ::= { eriRouterBridgeConformance 1 }
+eriRouterBridgeGroups      OBJECT IDENTIFIER ::= { eriRouterBridgeConformance 2 }
+
+eriRouterBridgeCompliance MODULE-COMPLIANCE
+    STATUS  deprecated 
+    DESCRIPTION
+        "The compliance statement for SNMP entities which implement
+         the Bridge MIB."
+
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+            eriRouterBridgeNotifyObjectGroup,
+            eriRouterBridgeNotifyGroup
+        }
+    ::= { eriRouterBridgeCompliances 1 }
+
+eriRouterBridgeCompliance2 MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+        "The compliance statement for SNMP entities which implement
+         the Bridge MIB."
+
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+            eriRouterBridgeNotifyObjectGroup,
+            eriRouterBridgeStateNotifyObjectGroup,
+            eriRouterBridgeNotifyGroup,
+            eriRouterBridgeStateNotifyGroup,
+            eriRouterBridgeBaseObjectGroup
+        }
+    ::= { eriRouterBridgeCompliances 2}
+
+--
+-- groupings
+--
+eriRouterBridgeNotifyObjectGroup OBJECT-GROUP
+    OBJECTS {
+         eriRouterBridgeNotifyEnable,
+         eriRouterBridgeGroupName,
+         eriRouterBridgeCircuitDescriptor,
+         eriRouterBridgeCircuitStatus,
+         eriRouterBridgeGroupContextName
+    }
+    STATUS current
+    DESCRIPTION
+        "The collection of objects related to Bridge notifications."
+    ::= { eriRouterBridgeGroups 1 }
+
+eriRouterBridgeStateNotifyObjectGroup OBJECT-GROUP
+    OBJECTS {
+         eriRouterBridgePortPreviousState 
+    }
+    STATUS current
+    DESCRIPTION
+        "The collection of objects related to Bridge notifications."
+    ::= { eriRouterBridgeGroups 2 }
+
+eriRouterBridgeNotifyGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        eriRouterBridgeCctStateEvent
+    }
+    STATUS current
+    DESCRIPTION
+        "Notification for tracking the bridge circuit blocked/cleared
+        on detecting a loop."
+    ::= { eriRouterBridgeGroups 3 }
+
+eriRouterBridgeStateNotifyGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        eriRouterBridgeNewRootEvent,
+        eriRouterBridgeTopologyChangeEvent
+    }
+    STATUS current
+    DESCRIPTION
+        "Notification for tracking the new root and topology changes
+         in the bridge."
+    ::= { eriRouterBridgeGroups 4 }
+
+eriRouterBridgeBaseObjectGroup OBJECT-GROUP
+    OBJECTS {
+         eriRouterBridgeId,
+         eriRouterBridgePortCctDescr
+    }
+    STATUS current
+    DESCRIPTION
+        "The collection of objects related to Bridge base objects."
+    ::= { eriRouterBridgeGroups 5 }
+
+END

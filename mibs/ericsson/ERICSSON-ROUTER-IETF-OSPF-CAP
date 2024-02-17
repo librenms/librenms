@@ -1,0 +1,606 @@
+-- %DNP% $Id: ERICSSON-ROUTER-IETF-OSPF-CAP.my,v 1.1.2.4.2.4 2011/06/15 18:19:45 danielhe Exp $
+-- %DNP% $Source: /cvsroot/pkt/sw/se/xc/bsd/config/snmp/mibs/Attic/ERICSSON-ROUTER-IETF-OSPF-CAP.my,v $
+-- *****************************************************************
+-- ERICSSON-ROUTER-IETF-OSPF-CAP.my: IETF OSPF-MIB Agent Capabilities
+--
+-- Copyright (c) 2006, 2008, 2010-2011, 2015 Ericsson AB
+-- All rights reserved.
+--
+-- *****************************************************************
+
+ERICSSON-ROUTER-IETF-OSPF-CAP DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY
+                FROM SNMPv2-SMI
+        AGENT-CAPABILITIES
+                FROM SNMPv2-CONF
+        eriRouterCapabilities
+                FROM ERICSSON-ROUTER-SMI;
+
+eriRouterIetfOspfCap MODULE-IDENTITY
+        LAST-UPDATED    "201501141800Z" -- Jan 14, 2015
+	ORGANIZATION	"Ericsson Inc."
+	CONTACT-INFO
+		"	Ericsson, Inc.
+
+		Postal:	100 Headquarters Dr.
+			San Jose, CA  95134
+			USA
+
+		 Phone:	+1 408 750 5000
+		   Fax: +1 408 750 5599
+		"
+         DESCRIPTION
+            "The Agent Capabilities of the 
+             implementation of the IETF OSPF-MIB.
+
+            If this MIB implementation is platform-dependent,
+            the PRODUCT-RELEASE clause contains Ericsson SEOS version and
+            at least one of the following Ericsson product families:
+                [SE]  SmartEdge Multi-service Edge Router (MSER) family
+                [SM]  SM family of Metro Ethernet Service Transport platforms
+                [SSR] Smart Service Router (SSR) family"
+
+        REVISION        "201501141800Z" -- Jan 14, 2015
+        DESCRIPTION
+            "Updated RBN/rbn/Rbn as ERICSSON-ROUTER/eriRouter/EriRouter
+             to migrate RBN MIB to ERICSSON MIB."
+
+        REVISION        "201106150000Z" -- Jun 15, 2011
+        DESCRIPTION
+            "Update DESCRIPTION clause of MODULE-IDENTITY
+            and PRODUCT-RELEASE clause of AGENT-CAPABILITIES."
+
+	REVISION	"201011010000Z" -- Nov 1, 2010
+	DESCRIPTION
+		"Modified PRODUCT-RELEASE clause for consistent naming.
+                "
+                
+        REVISION        "200810150000Z" -- Oct 15, 2008 
+        DESCRIPTION
+            "Added eriRouterIetfOspfCap2, updating to rfc4750 and adding
+            support for objects previously not supported.  Corrected
+            spelling errors in DESCRIPTION clauses."
+
+        REVISION        "200611100000Z" -- November 10, 2006 00:00:00 EST 
+        DESCRIPTION
+            "Initial version"
+        ::= { eriRouterCapabilities 68 }
+
+eriRouterIetfOspfCap1 AGENT-CAPABILITIES
+        PRODUCT-RELEASE     "SEOS 5.0.7.4"
+        STATUS              current
+        DESCRIPTION         "OSPF-MIB capabilities"
+        SUPPORTS            OSPF-MIB
+        INCLUDES {
+                ospfBasicGroup2,
+                ospfIfGroup2,
+                ospfNbrGroup2
+                }
+                
+        VARIATION       ospfRouterId
+        ACCESS          read-only
+        DESCRIPTION     
+            "Write access is not allowed."
+            
+        VARIATION       ospfAdminStat
+        ACCESS          read-only
+        DESCRIPTION     
+            "Write access is not allowed."
+
+        VARIATION       ospfASBdrRtrStatus 
+        ACCESS          read-only
+        DESCRIPTION     
+            "Write access is not allowed."
+            
+        VARIATION       ospfTOSSupport
+        ACCESS          read-only
+        DESCRIPTION     
+            "Write access is not allowed."
+
+        VARIATION       ospfExtLsdbLimit
+        ACCESS          read-only
+        DESCRIPTION     
+            "Write access is not allowed."
+
+        VARIATION       ospfMulticastExtensions
+        ACCESS          read-only
+        DESCRIPTION     
+            "Write access is not allowed."
+
+        VARIATION       ospfExitOverflowInterval
+        ACCESS          read-only
+        DESCRIPTION     
+            "Write access is not allowed."
+
+        VARIATION       ospfDemandExtensions
+        ACCESS          read-only
+        DESCRIPTION     
+            "Write access is not allowed."
+
+        VARIATION       ospfRFC1583Compatibility
+        ACCESS          not-implemented
+        DESCRIPTION     
+            "This information is not available to SNMP."
+
+        VARIATION       ospfOpaqueLsaSupport
+        ACCESS          not-implemented
+        DESCRIPTION     
+            "This information is not available to SNMP." 
+
+        VARIATION       ospfReferenceBandwidth
+        ACCESS          not-implemented
+        DESCRIPTION     
+            "This information is not available to SNMP." 
+
+        VARIATION       ospfRestartSupport
+        ACCESS          not-implemented
+        DESCRIPTION     
+            "This information is not available to SNMP." 
+
+        VARIATION       ospfRestartInterval
+        ACCESS          not-implemented
+        DESCRIPTION     
+            "This information is not available to SNMP." 
+
+        VARIATION       ospfRestartStrictLsaChecking
+        ACCESS          not-implemented
+        DESCRIPTION     
+            "This information is not available to SNMP." 
+
+        VARIATION       ospfRestartStatus
+        ACCESS          not-implemented
+        DESCRIPTION     
+            "This information is not available to SNMP." 
+
+        VARIATION       ospfRestartAge
+        ACCESS          not-implemented
+        DESCRIPTION     
+            "This information is not available to SNMP." 
+
+        VARIATION       ospfRestartExitReason
+        ACCESS          not-implemented
+        DESCRIPTION     
+            "This information is not available to SNMP." 
+
+        VARIATION       ospfAsLsaCount
+        ACCESS          not-implemented
+        DESCRIPTION     
+            "This information is not available to SNMP." 
+
+        VARIATION       ospfAsLsaCksumSum
+        ACCESS          not-implemented
+        DESCRIPTION     
+            "This information is not available to SNMP." 
+
+        VARIATION       ospfStubRouterSupport
+        ACCESS          not-implemented
+        DESCRIPTION     
+            "This information is not available to SNMP." 
+
+        VARIATION       ospfStubRouterAdvertisement
+        ACCESS          not-implemented
+        DESCRIPTION     
+            "This information is not available to SNMP." 
+
+        VARIATION       ospfDiscontinuityTime
+        ACCESS          not-implemented
+        DESCRIPTION     
+            "This information is not available to SNMP." 
+
+        VARIATION       ospfIfAreaId
+        ACCESS          read-only
+        DESCRIPTION     
+            "Write access is not allowed."
+
+        VARIATION       ospfIfType
+        ACCESS          read-only
+        DESCRIPTION     
+            "Write access is not allowed."
+
+        VARIATION       ospfIfAdminStat
+        ACCESS          read-only
+        DESCRIPTION     
+            "Write access is not allowed."
+
+        VARIATION       ospfIfRtrPriority
+        ACCESS          read-only
+        DESCRIPTION     
+            "Write access is not allowed."
+
+        VARIATION       ospfIfTransitDelay
+        ACCESS          read-only
+        DESCRIPTION     
+            "Write access is not allowed."
+
+        VARIATION       ospfIfRetransInterval
+        ACCESS          read-only
+        DESCRIPTION     
+            "Write access is not allowed."
+
+        VARIATION       ospfIfHelloInterval
+        ACCESS          read-only
+        DESCRIPTION     
+            "Write access is not allowed."
+
+        VARIATION       ospfIfRtrDeadInterval
+        ACCESS          read-only
+        DESCRIPTION     
+            "Write access is not allowed."
+
+        VARIATION       ospfIfPollInterval
+        ACCESS          read-only
+        DESCRIPTION     
+            "Write access is not allowed."
+
+        VARIATION       ospfIfAuthKey
+        ACCESS          read-only
+        DESCRIPTION     
+            "Write access is not allowed."
+
+        VARIATION       ospfIfStatus
+        ACCESS          read-only
+        DESCRIPTION     
+            "Write access is not allowed."
+
+        VARIATION       ospfIfMulticastForwarding
+        ACCESS          read-only
+        DESCRIPTION     
+            "Write access is not allowed."
+
+        VARIATION       ospfIfDemand
+        ACCESS          read-only
+        DESCRIPTION     
+            "Write access is not allowed."
+
+        VARIATION       ospfIfAuthType
+        ACCESS          read-only
+        DESCRIPTION     
+            "Write access is not allowed."
+
+        VARIATION       ospfIfDesignatedRouterId
+        ACCESS          not-implemented
+        DESCRIPTION     
+            "This information is not available to SNMP." 
+
+        VARIATION       ospfIfBackupDesignatedRouterId
+        ACCESS          not-implemented
+        DESCRIPTION     
+            "This information is not available to SNMP." 
+
+        VARIATION       ospfIfLsaCount
+        ACCESS          not-implemented
+        DESCRIPTION     
+            "This information is not available to SNMP." 
+
+        VARIATION       ospfIfLsaCksumSum
+        ACCESS          not-implemented
+        DESCRIPTION     
+            "This information is not available to SNMP." 
+
+        VARIATION       ospfNbrPriority
+        ACCESS          read-only
+        DESCRIPTION     
+            "Write access is not allowed."
+
+        VARIATION       ospfNbmaNbrStatus
+        ACCESS          read-only
+        DESCRIPTION     
+            "Write access is not allowed."
+
+        VARIATION       ospfNbrRestartHelperStatus
+        ACCESS          not-implemented
+        DESCRIPTION     
+            "This information is not available to SNMP." 
+
+        VARIATION       ospfNbrRestartHelperAge
+        ACCESS          not-implemented
+        DESCRIPTION     
+            "This information is not available to SNMP." 
+
+        VARIATION       ospfNbrRestartHelperExitReason 
+        ACCESS          not-implemented
+        DESCRIPTION     
+            "This information is not available to SNMP." 
+
+        ::= { eriRouterIetfOspfCap 1 }
+
+eriRouterIetfOspfCap2 AGENT-CAPABILITIES
+        PRODUCT-RELEASE     "SEOS 6.1.4.2 [SE]; SEOS 6.3.X [SM]; SEOS 11.1.x [SSR]"
+        STATUS              current
+        DESCRIPTION         "OSPF-MIB capabilities"
+        SUPPORTS            OSPF-MIB
+        INCLUDES {
+            ospfBasicGroup2,
+            ospfIfGroup2,
+            ospfIfMetricGroup,
+            ospfNbrGroup2,
+            ospfAreaGroup2,
+            ospfStubAreaGroup,
+            ospfVirtIfGroup2,
+            ospfNbrGroup2,
+            ospfVirtNbrGroup2,
+            ospfAreaAggregateGroup2,
+            ospfAsLsdbGroup,
+            ospfAreaLsaCountGroup
+        }
+                
+        VARIATION       ospfRouterId
+        ACCESS          read-only
+        DESCRIPTION     
+            "Write access is not allowed."
+            
+        VARIATION       ospfAdminStat
+        ACCESS          read-only
+        DESCRIPTION     
+            "Write access is not allowed."
+
+        VARIATION       ospfASBdrRtrStatus 
+        ACCESS          read-only
+        DESCRIPTION     
+            "Write access is not allowed."
+            
+        VARIATION       ospfTOSSupport
+        ACCESS          read-only
+        DESCRIPTION     
+            "Write access is not allowed."
+
+        VARIATION       ospfExtLsdbLimit
+        ACCESS          read-only
+        DESCRIPTION     
+            "Write access is not allowed."
+
+        VARIATION       ospfMulticastExtensions
+        ACCESS          read-only
+        DESCRIPTION     
+            "Write access is not allowed."
+
+        VARIATION       ospfExitOverflowInterval
+        ACCESS          read-only
+        DESCRIPTION     
+            "Write access is not allowed."
+
+        VARIATION       ospfDemandExtensions
+        ACCESS          read-only
+        DESCRIPTION     
+            "Write access is not allowed."
+
+        VARIATION       ospfRFC1583Compatibility
+        ACCESS          read-only
+        DESCRIPTION     
+            "Write access is not allowed."
+
+        VARIATION       ospfReferenceBandwidth
+        ACCESS          read-only
+        DESCRIPTION     
+            "Write access is not allowed."
+
+        VARIATION       ospfRestartSupport
+        ACCESS          read-only
+        DESCRIPTION     
+            "Write access is not allowed."
+
+        VARIATION       ospfRestartInterval
+        ACCESS          read-only
+        DESCRIPTION     
+            "Write access is not allowed."
+
+        VARIATION       ospfRestartStrictLsaChecking
+        ACCESS          read-only
+        DESCRIPTION     
+            "Write access is not allowed."
+
+        VARIATION       ospfStubRouterAdvertisement
+        ACCESS          read-only
+        DESCRIPTION     
+            "Write access is not allowed."
+
+        VARIATION       ospfDiscontinuityTime
+        ACCESS          not-implemented
+        DESCRIPTION     
+            "This information is not available to SNMP." 
+
+        VARIATION       ospfIfAreaId
+        ACCESS          read-only
+        DESCRIPTION     
+            "Write access is not allowed."
+
+        VARIATION       ospfIfType
+        ACCESS          read-only
+        DESCRIPTION     
+            "Write access is not allowed."
+
+        VARIATION       ospfIfAdminStat
+        ACCESS          read-only
+        DESCRIPTION     
+            "Write access is not allowed."
+
+        VARIATION       ospfIfRtrPriority
+        ACCESS          read-only
+        DESCRIPTION     
+            "Write access is not allowed."
+
+        VARIATION       ospfIfTransitDelay
+        ACCESS          read-only
+        DESCRIPTION     
+            "Write access is not allowed."
+
+        VARIATION       ospfIfRetransInterval
+        ACCESS          read-only
+        DESCRIPTION     
+            "Write access is not allowed."
+
+        VARIATION       ospfIfHelloInterval
+        ACCESS          read-only
+        DESCRIPTION     
+            "Write access is not allowed."
+
+        VARIATION       ospfIfRtrDeadInterval
+        ACCESS          read-only
+        DESCRIPTION     
+            "Write access is not allowed."
+
+        VARIATION       ospfIfPollInterval
+        ACCESS          read-only
+        DESCRIPTION     
+            "Write access is not allowed."
+
+        VARIATION       ospfIfAuthKey
+        ACCESS          read-only
+        DESCRIPTION     
+            "Write access is not allowed."
+
+        VARIATION       ospfIfStatus
+        ACCESS          read-only
+        DESCRIPTION     
+            "Write access is not allowed."
+
+        VARIATION       ospfIfMulticastForwarding
+        ACCESS          read-only
+        DESCRIPTION     
+            "Write access is not allowed."
+
+        VARIATION       ospfIfDemand
+        ACCESS          read-only
+        DESCRIPTION     
+            "Write access is not allowed."
+
+        VARIATION       ospfIfAuthType
+        ACCESS          read-only
+        DESCRIPTION     
+            "Write access is not allowed."
+
+        VARIATION       ospfIfMetricValue
+        ACCESS          read-only
+        DESCRIPTION     
+            "Write access is not allowed."
+
+        VARIATION       ospfIfMetricStatus
+        ACCESS          read-only
+        DESCRIPTION     
+            "Write access is not allowed."
+
+        VARIATION       ospfNbrPriority
+        ACCESS          read-only
+        DESCRIPTION     
+            "Write access is not allowed."
+
+        VARIATION       ospfNbmaNbrStatus
+        ACCESS          read-only
+        DESCRIPTION     
+            "Write access is not allowed."
+
+        VARIATION       ospfImportAsExtern
+        ACCESS          read-only
+        DESCRIPTION
+            "Write access is not allowed."
+
+        VARIATION       ospfSpfRuns
+        ACCESS          read-only
+        DESCRIPTION
+            "Write access is not allowed."
+
+        VARIATION       ospfAreaBdrRtrCount
+        ACCESS          read-only
+        DESCRIPTION
+            "Write access is not allowed."
+
+        VARIATION       ospfAsBdrRtrCount
+        ACCESS          read-only
+        DESCRIPTION
+            "Write access is not allowed."
+
+        VARIATION       ospfAreaLsaCount
+        ACCESS          read-only
+        DESCRIPTION
+            "Write access is not allowed."
+
+        VARIATION       ospfAreaLsaCksumSum
+        ACCESS          read-only
+        DESCRIPTION
+            "Write access is not allowed."
+
+        VARIATION       ospfAreaSummary
+        ACCESS          read-only
+        DESCRIPTION
+            "Write access is not allowed."
+
+        VARIATION       ospfAreaStatus
+        ACCESS          read-only
+        DESCRIPTION
+            "Write access is not allowed."
+
+        VARIATION       ospfAreaNssaTranslatorRole
+        ACCESS          read-only
+        DESCRIPTION     
+            "Write access is not allowed."
+
+        VARIATION       ospfAreaNssaTranslatorState
+        ACCESS          read-only
+        DESCRIPTION     
+            "Write access is not allowed."
+
+        VARIATION       ospfAreaNssaTranslatorStabilityInterval
+        ACCESS          read-only
+        DESCRIPTION     
+            "Write access is not allowed."
+
+        VARIATION       ospfAreaNssaTranslatorEvents
+        ACCESS          read-only
+        DESCRIPTION     
+            "Write access is not allowed."
+
+        VARIATION       ospfVirtIfTransitDelay
+        ACCESS          read-only
+        DESCRIPTION
+            "Write access is not allowed."
+
+        VARIATION       ospfVirtIfRetransInterval
+        ACCESS          read-only
+        DESCRIPTION
+            "Write access is not allowed."
+
+        VARIATION       ospfVirtIfHelloInterval
+        ACCESS          read-only
+        DESCRIPTION
+            "Write access is not allowed."
+
+        VARIATION       ospfVirtIfRtrDeadInterval
+        ACCESS          read-only
+        DESCRIPTION
+            "Write access is not allowed."
+
+        VARIATION       ospfVirtIfAuthType
+        ACCESS          read-only
+        DESCRIPTION
+            "Write access is not allowed."
+
+        VARIATION       ospfVirtIfAuthKey
+        ACCESS          read-only
+        DESCRIPTION
+            "Write access is not allowed."
+
+        VARIATION       ospfVirtIfStatus
+        ACCESS          read-only
+        DESCRIPTION
+            "Write access is not allowed."
+
+        VARIATION       ospfAreaAggregateStatus
+        ACCESS          read-only
+        DESCRIPTION
+            "Write access is not allowed."
+
+        VARIATION       ospfAreaAggregateEffect
+        ACCESS          read-only
+        DESCRIPTION
+            "Write access is not allowed."
+
+        VARIATION       ospfAreaAggregateExtRouteTag
+        ACCESS          read-only
+        DESCRIPTION
+            "Write access is not allowed."
+
+        ::= { eriRouterIetfOspfCap 2 }
+
+END

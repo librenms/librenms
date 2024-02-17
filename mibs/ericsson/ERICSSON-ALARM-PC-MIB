@@ -1,0 +1,495 @@
+--
+-- The Ericsson Alarm Probable Cause MIB
+--
+-- Copyright (c) 2016 by Ericsson AB.
+-- All rights reserved.
+--
+-- This MIB is part of the ERICSSON-ALARM-MIB Suite, and its use is documented
+-- further in TEA (The Ericsson Architecture), O&M System Architecture
+-- Principles, FAE 151 01.
+--
+-- Author:
+-- Enda Murphy
+--
+--
+ERICSSON-ALARM-PC-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY
+                FROM SNMPv2-SMI
+        TEXTUAL-CONVENTION
+                FROM SNMPv2-TC
+        ericssonModules
+                FROM ERICSSON-TOP-MIB;
+
+ericssonAlarmPCMIB MODULE-IDENTITY
+        LAST-UPDATED "201703310000Z"
+        ORGANIZATION "Ericsson AB"
+        CONTACT-INFO
+                "Email: snmp.mib.contact@ericsson.com "
+
+        DESCRIPTION
+                "This is a module with the single purpose of
+                maintaining a global definition of probable cause
+                values. Due to the history of probable cause
+                usage, probable cause alone is not unique enough
+                to identify an alarm type.  This document is
+                compiled from known sources of information.
+                Others may be added, but existing definitions
+                MUST NOT be changed.
+
+                Document number: 4/196 03-CXC 172 7549"
+
+        REVISION      "201703310000Z"
+        DESCRIPTION
+                "Updated as part of ERICSSON ALARM MIB 2.1 package."
+		REVISION      "201606240000Z"
+        DESCRIPTION
+                "Updated as part of ERICSSON ALARM MIB 2.0 package."
+        REVISION      "200810170000Z"
+        DESCRIPTION
+                "Initial version of this MIB module."
+        ::= { ericssonModules 2 }
+
+--=======================
+--==Textual conventions==
+--=======================
+EriProbableCause ::= TEXTUAL-CONVENTION
+        STATUS current
+        DESCRIPTION
+                "Probable cause as specified in ITU
+                recommendations M.3100, X.733 and X.736, and in
+                ETSI recommendation GSM 12.11.
+
+                This list is updated upon internal requests from
+                Ericsson organizations. We do not use the
+                standard probable cause TC, IANAItuProbableCause
+                from ITU-ALARM-MIB since we have no change
+                control over that document.
+
+                The initial list was created by merging the
+                existing enumerations used within Ericsson.
+
+                Should we discover that there are conflicts in
+                the semantics associated with a particular value,
+                one of them will be moved, as it is the
+                identifier which is important, not the integer
+                value."
+        SYNTAX INTEGER {
+                -- The following values are defined in M.3100 (0795)
+                m3100Indeterminate(0),
+                m3100AlarmIndicationSignal(1),
+                m3100CallSetupFailure(2),
+                m3100DegradedSignal(3),
+                m3100FarEndReceiverFailure(4),
+                m3100FramingError(5),
+                m3100LossOfFrame(6),
+                m3100LossOfPointer(7),
+                m3100LossOfSignal(8),
+                m3100PayloadTypeMismatch(9),
+                m3100TransmissionError(10),
+                m3100RemoteAlarmInterface(11),
+                m3100ExcessiveBitErrorRate(12),
+                m3100PathTraceMismatch(13),
+                m3100Unavailable(14),
+                m3100SignalLabelMismatch(15),
+                m3100LossOfMultiFrame(16),
+                receiveFailure (17),
+                transmitFailure (18),
+                modulationFailure (19),
+                demodulationFailure (20),
+                broadcastChannelFailure (21),
+                connectionEstablishmentError (22),
+                invalidMessageReceived (23),
+                localNodeTransmissionError (24),
+                remoteNodeTransmissionError (25),
+                routingFailure (26),
+
+                -- This info from IANAItuProbableCause in RFC3877
+                -- Values 27-50 are reserved for communications
+                -- alarm related probable causes
+
+                m3100BackPlaneFailure(51),
+                m3100DataSetProblem(52),
+                m3100EquipmentIdentifierDuplication(53),
+                m3100ExternalIfDeviceProblem(54),
+                m3100LineCardProblem(55),
+                m3100MultiplexerProblem(56),
+                m3100NeIdentifierDuplication(57),
+                m3100PowerProblem(58),
+                m3100ProcessorProblem(59),
+                m3100ProtectionPathFailure(60),
+                m3100ReceiverFailure(61),
+                m3100ReplaceableUnitMissing(62),
+                m3100ReplaceableUnitTypeMismatch(63),
+                m3100SynchronisationSourceMismatch(64),
+                m3100TerminalProblem(65),
+                m3100TimingProblem(66),
+                m3100TransmitterFailure(67),
+                m3100TrunkCardProblem(68),
+                m3100ReplaceableUnitProblem(69),
+                realTimeClockFailure (70),
+                antennaFailure (71),
+                batteryChargingFailure (72),
+                diskFailure (73),
+                frequencyHoppingFailure (74),
+                iODeviceError (75),
+                lossOfSynchronisation (76),
+                lossOfRedundancy (77),
+                powerSupplyFailure (78),
+                signalQualityEvaluationFailure (79),
+                tranceiverFailure (80),
+                protectionMechanismFailure (81),
+                protectingResourceFailure (82),
+
+                -- This info from IANAItuProbableCause in RFC3877
+                -- Values 83-100 are reserved for equipment
+                -- alarm related probable causes
+
+                m3100AirCompressorFailure(101),
+                m3100AirConditioningFailure(102),
+                m3100AirDryerFailure(103),
+                m3100BatteryDischarging(104),
+                m3100BatteryFailure(105),
+                m3100CommercialPowerFailure(106),
+                m3100CoolingFanFailure(107),
+                m3100EngineFailure(108),
+                m3100FireDetectorFailure(109),
+                m3100FuseFailure(110),
+                m3100GeneratorFailure(111),
+                m3100LowBatteryThreshold(112),
+                m3100PumpFailure(113),
+                m3100RectifierFailure(114),
+                m3100RectifierHighVoltage(115),
+                m3100RectifierLowVoltage(116),
+                m3100VentilationSystemFailure(117),
+                m3100EnclosureDoorOpen(118),
+                m3100ExplosiveGas(119),
+                m3100Fire(120),
+                m3100Flood(121),
+                m3100HighHumidity(122),
+                m3100HighTemperature(123),
+                m3100HighWind(124),
+                m3100IceBuildUp(125),
+                -- m3100IntrusionDetection (use X.736 value)
+                m3100LowFuel(127),
+                m3100LowHumidity(128),
+                m3100LowCablePressure(129),
+                m3100LowTemperature(130),
+                m3100LowWater(131),
+                m3100Smoke(132),
+                m3100ToxicGas(133),
+                m3100CoolingSystemFailure (134),
+                m3100ExternalEquipmentFailure (135),
+                m3100ExternalPointFailure (136),
+
+                -- This info from IANAItuProbableCause in RFC3877
+                -- Values 137-150 are reserved for environmental
+                -- alarm related probable causes
+
+                m3100StorageCapacityProblem(151),
+                m3100MemoryMismatch(152),
+                m3100CorruptData(153),
+                m3100OutOfCPUCycles(154),
+                m3100SoftwareEnvironmentProblem(155),
+                m3100SoftwareDownloadFailure(156),
+                m3100LossOfRealTimel (157),
+
+                -- 158 through 207 are taken directly from
+                -- IANAItuProbableCause in RFC3877
+                applicationSubsystemFailure (158),
+                configurationOrCustomisationError (159),
+                databaseInconsistency (160),
+                fileError (161),
+                outOfMemory (162),
+                softwareError (163),
+                timeoutExpired (164),
+                underlayingResourceUnavailable (165),
+                versionMismatch (166),
+                --Values 168-200 are reserved for processing error alarm related
+                -- probable causes.
+                bandwidthReduced (201),
+                congestion (202),
+                excessiveErrorRate (203),
+                excessiveResponseTime (204),
+                excessiveRetransmissionRate (205),
+                reducedLoggingCapability (206),
+                systemResourcesOverload (207),
+
+                -- The following values are defined in X.733 (0292)
+                x733AdapterError(301),
+                x733ApplicationSubsystemFailure(302),
+                x733BandwidthReduced(303),
+                -- x733CallEstablishmentError (use M.3100 value)
+                x733CommunicationsProtocolError(305),
+                x733CommunicationsSubsystemFailure(306),
+                x733ConfigurationOrCustomizationError(307),
+                x733Congestion(308),
+                -- x733CorruptData (use M.3100 value)
+                x733CpuCyclesLimitExceeded(310),
+                x733DataSetOrModemError(311),
+                -- x733DegradedSignal (use M.3100 value)
+                x733DTEDCEInterfaceError(313),
+                -- x733EnclosureDoorOpen (use M.3100 value)
+                x733EquipmentMalfunction(315),
+                x733ExcessiveVibration(316),
+                x733FileError(317),
+                -- x733FireDetected (use M.3100 value)
+                -- x733FloodDetected (use M.3100 value)
+                -- x733FramingError  (use M.3100 value)
+                x733HeatingOrVentilationOrCoolingSystemProblem(321),
+                x733HumidityUnacceptable(322),
+                x733InputOutputDeviceError(323),
+                x733InputDeviceError(324),
+                x733LANError(325),
+                x733LeakDetected(326),
+                x733LocalNodeTransmissionError(327),
+                -- x733LossOfFrame (use M.3100 value)
+                -- x733LossOfSignal (use M.3100 value)
+                x733MaterialSupplyExhausted(330),
+                -- x733MultiplexerProblem (use M.3100 value)
+                x733OutOfMemory(332),
+                x733OuputDeviceError(333),
+                x733PerformanceDegraded(334),
+                -- x733PowerProblem (use M.3100 value)
+                x733PressureUnacceptable(336),
+                -- x733ProcessorProblem (use M.3100 value)
+                -- x733PumpFailure (use M.3100 value)
+                x733QueueSizeExceeded(339),
+                x733ReceiveFailure(340),
+                -- x733ReceiverFailure (use M.3100 value)
+                x733RemoteNodeTransmissionError(342),
+                x733ResourceAtOrNearingCapacity(343),
+                x733ResponseTimeExcessive(344),
+                x733RetransmissionRateExcessive(345),
+                x733SoftwareError(346),
+                x733SoftwareProgramAbnormallyTerminated(347),
+                x733SoftwareProgramError(348),
+                -- x733StorageCapacityProblem (use M.3100 value)
+                x733TemperatureUnacceptable(350),
+                x733ThresholdCrossed(351),
+                -- x733TimingProblem (use M.3100 value)
+                x733ToxicLeakDetected(353),
+                x733TransmitFailure(354),
+                -- x733TransmitterFailure (use M.3100 value)
+                x733UnderlyingResourceUnavailable(356),
+                x733VersionMismatch(357),
+                --
+                -- The following values are defined in X.736
+                x736AuthenticationFailure(401),
+                x736BreachOfConfidentiality(402),
+                x736CableTamper(403),
+                x736DelayedInformation(404),
+                x736DenialOfService(405),
+                x736DuplicateInformation(406),
+                x736InformationMissing(407),
+                x736InformationModificationDetected(408),
+                x736InformationOutOfSequence(409),
+                x736IntrusionDetection(410),
+                x736KeyExpired(411),
+                x736NonRepudiationFailure(412),
+                x736OutOfHoursActivity(413),
+                x736OutOfService(414),
+                x736ProceduralError(415),
+                x736UnauthorizedAccessAttempt(416),
+                x736UnexpectedInformation(417),
+                x736UnspecifiedReason(418),
+
+                -- According to the definition of
+                -- IANAItuProbableCause in RFC3877, 500 through
+                -- 555 are also defined in X.733.  These conflict
+                -- with Ericsson definitions from GSM 12.11.  The
+                -- definitions in X.733 have been "moved" to 100xxx,
+                -- where xxx is the original definition in X.733.
+                -- The assumption is that Ericsson will never have
+                -- enough probable cause values to exceed 100000.
+                -- As such, any value above 100000 is a conflicting
+                -- definition that has been moved.
+
+                -- The following values are defined in GSM 12.11
+                gsm1211AbisToBTSInterfaceFailure(501),
+                gsm1211AbisToTRXInterfaceFailure(502),
+                gsm1211AntennaProblem(503),
+                gsm1211BatteryBreakdown(504),
+                gsm1211BatteryChargingFault(505),
+                gsm1211ClockSynchronisationProblem(506),
+                gsm1211CombinerProblem(507),
+                gsm1211DiskProblem(508),
+                -- gsm1211EquipmentFailure (use X.733 value)
+                gsm1211ExcessiveReceiverTemperature(510),
+                gsm1211ExcessiveTransmitterOutputPower(511),
+                gsm1211ExcessiveTransmitterTemperature(512),
+                gsm1211FrequencyHoppingDegraded(513),
+                gsm1211FrequencyHoppingFailure(514),
+                gsm1211FrequencyRedefinitionFailed(515),
+                gsm1211LineInterfaceFailure(516),
+                gsm1211LinkFailure(517),
+                gsm1211LossOfSynchronisation(518),
+                gsm1211LostRedundancy(519),
+                gsm1211MainsBreakdownWithBatteryBackUp(520),
+                gsm1211MainsBreakdownWithoutBatteryBackUp(521),
+                gsm1211PowerSupplyFailure(522),
+                gsm1211ReceiverAntennaFault(523),
+                -- gsm1211ReceiverFailure (use M.3100 value)
+                gsm1211ReceiverMulticouplerFailure(525),
+                gsm1211ReducedTransmitterOutputPower(526),
+                gsm1211SignalQualityEvaluationFault(527),
+                gsm1211TimeslotHardwareFailure(528),
+                gsm1211TransceiverProblem(529),
+                gsm1211TranscoderProblem(530),
+                gsm1211TranscoderOrRateAdapterProblem(531),
+                gsm1211TransmitterAntennaFailure(532),
+                gsm1211TransmitterAntennaNotAdjusted(533),
+                -- gsm1211TransmitterFailure (use M.3100 value)
+                gsm1211TransmitterLowVoltageOrCurrent(535),
+                gsm1211TransmitterOffFrequency(536),
+                gsm1211DatabaseInconsistency(537),
+                gsm1211FileSystemCallUnsuccessful(538),
+                gsm1211InputParameterOutOfRange(539),
+                gsm1211InvalidParameter(540),
+                gsm1211InvalidPointer(541),
+                gsm1211MessageNotExpected(542),
+                gsm1211MessageNotInitialised(543),
+                gsm1211MessageOutOfSequence(544),
+                gsm1211SystemCallUnsuccessful(545),
+                gsm1211TimeoutExpired(546),
+                gsm1211VariableOutOfRange(547),
+                gsm1211WatchDogTimerExpired(548),
+                gsm1211CoolingSystemFailure(549),
+                gsm1211ExternalEquipmentFailure(550),
+                gsm1211ExternalPowerSupplyFailure(551),
+                gsm1211ExternalTransmissionDeviceFailure(552),
+                -- gsm1211FanFailure (use M.3100 value)
+                -- gsm1211HighHumidity (use M.3100 value)
+                -- gsm1211HighTemperature (use M.3100 value)
+                -- gsm1211IntrusionDetected (use X.736 value)
+                -- gsm1211LowHumidity (use M.3100 value)
+                -- gsm1211LowTemperature (use M.3100 value)
+                -- gsm1211SmokeDetected (use M.3100 value)
+                -- gsm1211ExcessiveErrorRate (use M.3100 value)
+                gsm1211ReducedAlarmReporting(561),
+                gsm1211ReducedEventReporting(562),
+                gsm1211ReducedLoggingCapability(563),
+                gsm1211SystemResourcesOverload(564),
+                gsm1211BroadcastChannelFailure(565),
+                gsm1211ConnectionEstablishmentError(566),
+                gsm1211InvalidMessageReceived(567),
+                gsm1211InvalidMSUReceived(568),
+                gsm1211LAPDLinkProtocolFailure(569),
+                gsm1211LocalAlarmIndication(570),
+                gsm1211RemoteAlarmIndication(571),
+                gsm1211RoutingFailure(572),
+                gsm1211SS7ProtocolFailure(573),
+                gsm1211TransmissionError(574),
+
+                -- 600-608 conflict with values defined
+                -- in X.736.  Someone moved them to
+                -- 1600-1615 instead, so we leave them there.
+
+                i610LocEndToEnd(600),
+                i610AisEndToEnd(601),
+                i610RdiEndToEnd(602),
+                i610LocSegmentLinkSide(603),
+                i610LocSegmentCoreSide(604),
+                i610AisSegmentLinkSide(605),
+                i610AisSegmentCoreSide(606),
+                i610RdiSegmentLinkSide(607),
+                i610RdiSegmentCoreSide(608),
+
+                -- X.736, where they are 600 - 615 instead.
+                authenticationFailure (1600),
+                breachOfConfidentiality (1601),
+                cableTamper (1602),
+                delayedInformation (1603),
+                denialOfService (1604),
+                duplicateInformation (1605),
+                informationMissing (1606),
+                informationModificationDetected (1607),
+                informationOutOfSequence (1608),
+                keyExpired (1609),
+                nonRepudiationFailure (1610),
+                outOfHoursActivity (1611),
+                outOfService (1612),
+                proceduralError (1613),
+                unauthorizedAccessAttempt (1614),
+                unexpectedInformation (1615),
+
+                -- When there are conflicts between internal
+                -- probable cause values and standard
+                -- definitions, the standard definitions are
+                -- moved above 100000.  Unless there are multiple
+                -- conflicts, whatever the value is above 100000
+                -- is the original probable cause value.
+
+                -- According to the definition of
+                -- IANAItuProbableCause in RFC3877, 500 through
+                -- 555 are also defined in X.733.  These conflict
+                -- with Ericsson definitions from GSM 12.11.  The
+                -- definitions in X.733 have been "moved" to 100xxx,
+                -- where xxx is the original definition in X.733.
+                -- The assumption is that Ericsson will never have
+                -- enough probable cause values to exceed 100000.
+                -- As such, any value above 100000 is a conflicting
+                -- definition that has been moved.
+
+                -- The following were defined X.733
+                adapterError (100500),
+                applicationSubsystemFailture (100501),
+                bandwidthReducedX733 (100502),
+                callEstablishmentError (100503),
+                communicationsProtocolError (100504),
+                communicationsSubsystemFailure (100505),
+                configurationOrCustomizationError (100506),
+                congestionX733 (100507),
+                coruptData (100508),
+                cpuCyclesLimitExceeded (100509),
+                dataSetOrModemError (100510),
+                degradedSignalX733 (100511),
+                dteDceInterfaceError (100512),
+                enclosureDoorOpenX733 (100513),
+                equipmentMalfunction (100514),
+                excessiveVibration (100515),
+                fileErrorX733 (100516),
+                fireDetected (100517),
+                framingErrorX733 (100518),
+                heatingVentCoolingSystemProblem (100519),
+                humidityUnacceptable (100520),
+                inputOutputDeviceError (100521),
+                inputDeviceError (100522),
+                lanError (100523),
+                leakDetected (100524),
+                localNodeTransmissionErrorX733 (100525),
+                lossOfFrameX733 (100526),
+                lossOfSignalX733 (100527),
+                materialSupplyExhausted (100528),
+                multiplexerProblemX733 (100529),
+                outOfMemoryX733 (100530),
+                ouputDeviceError (100531),
+                performanceDegraded (100532),
+                powerProblems (100533),
+                pressureUnacceptable (100534),
+                processorProblems (100535),
+                pumpFailureX733 (100536),
+                queueSizeExceeded (100537),
+                receiveFailureX733 (100538),
+                receiverFailureX733 (100539),
+                remoteNodeTransmissionErrorX733 (100540),
+                resourceAtOrNearingCapacity (100541),
+                responseTimeExecessive (100542),
+                retransmissionRateExcessive (100543),
+                softwareErrorX733 (100544),
+                softwareProgramAbnormallyTerminated (100545),
+                softwareProgramError (100546),
+                storageCapacityProblemX733 (100547),
+                temperatureUnacceptable (100548),
+                thresholdCrossed (100549),
+                timingProblemX733 (100550),
+                toxicLeakDetected (100551),
+                transmitFailureX733 (100552),
+                transmiterFailure (100553),
+                underlyingResourceUnavailable (100554),
+                versionMismatchX733 (100555)
+
+        }
+END
+

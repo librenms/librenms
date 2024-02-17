@@ -1,0 +1,137 @@
+-- %DNP% $Id: ERICSSON-ROUTER-IETF-TRACEROUTE-CAP.my,v 1.1.4.5 2011/06/15 18:19:45 danielhe Exp $
+-- %DNP% $Source: /cvsroot/pkt/sw/se/xc/bsd/config/snmp/mibs/Attic/ERICSSON-ROUTER-IETF-TRACEROUTE-CAP.my,v $
+-- *****************************************************************
+-- ERICSSON-ROUTER-IETF-TRACEROUTE-CAP.my:   IETF DISMAN-TRACEROUTE-MIB Agent Capabilities
+--
+-- Copyright (c) 2010-2011, 2015 Ericsson AB.
+-- All rights reserved.
+--
+-- ***************************************************************** 
+ERICSSON-ROUTER-IETF-TRACEROUTE-CAP DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, Unsigned32
+                                   FROM SNMPv2-SMI
+    AGENT-CAPABILITIES             FROM SNMPv2-CONF
+    eriRouterCapabilities                FROM ERICSSON-ROUTER-SMI;
+
+eriRouterIetfTracerouteCap MODULE-IDENTITY
+    LAST-UPDATED        "201501141800Z" -- Jan 14, 2015
+    ORGANIZATION        "Ericsson AB."
+    CONTACT-INFO
+        "       Postal: 100 Headquarters Dr
+                        San Jose, CA 95134
+                        USA
+
+                 Phone: +1 408 750 5000
+                   Fax: +1 408 750 5599
+        "
+    DESCRIPTION
+            "The Agent Capabilities of the IETF 
+             DISMAN-TRACEROUTE-MIB (RFC 2925)
+
+            If this MIB implementation is platform-dependent,
+            the PRODUCT-RELEASE clause contains Ericsson SEOS version and
+            at least one of the following Ericsson product families:
+                [SE]  SmartEdge Multi-service Edge Router (MSER) family
+                [SM]  SM family of Metro Ethernet Service Transport platforms
+                [SSR] Smart Service Router (SSR) family"
+
+    REVISION            "201501141800Z" -- Jan 14, 2015
+    DESCRIPTION
+            "Updated RBN/rbn/Rbn as ERICSSON-ROUTER/eriRouter/EriRouter
+             to migrate RBN MIB to ERICSSON MIB."
+
+    REVISION            "201106150000Z" -- Jun 15, 2011
+    DESCRIPTION
+            "Update DESCRIPTION clause of MODULE-IDENTITY
+            and PRODUCT-RELEASE clause of AGENT-CAPABILITIES."
+
+    REVISION            "201009140000Z" -- Sept 14, 2010
+    DESCRIPTION
+            "Added default value and supported range fortraceRouteCtlDataSize."
+
+    REVISION            "201004140000Z" -- Apr 14, 2010
+    DESCRIPTION
+            "Initial version."
+
+    ::= { eriRouterCapabilities 98 }
+
+eriRouterIetfTracerouteCap1 AGENT-CAPABILITIES
+    PRODUCT-RELEASE "SEOS 6.5.1 [SE, SM]"
+    STATUS          current
+    DESCRIPTION     "DISMAN-TRACEROUTE-MIB capabilities"
+    SUPPORTS        DISMAN-TRACEROUTE-MIB
+    INCLUDES {
+            traceRouteGroup,
+            traceRouteTimeStampGroup,
+            traceRouteNotificationsGroup,
+            traceRouteHopsTableGroup
+            }
+
+    VARIATION    traceRouteCtlOwnerIndex
+    DESCRIPTION
+        "Each character must be printable (the posix function isprint()
+        returns true for each character)."
+
+    VARIATION    traceRouteCtlTestName
+    DESCRIPTION
+        "Each character must be printable (the posix function isprint()
+        returns true for each character)."
+
+    VARIATION    traceRouteCtlTargetAddressType
+    WRITE-SYNTAX INTEGER {
+                   unknown(0),
+                   ipv4(1)
+                 }
+    DESCRIPTION
+        "IPv6 and dns  address types are not supported." 
+
+    VARIATION    traceRouteCtlDescr
+    WRITE-SYNTAX OCTET STRING (SIZE(0..32))
+    DESCRIPTION
+        "Each character must be printable (the posix function isprint()
+        returns true for each character) and the maximum length is 32
+        characters."
+
+    VARIATION    traceRouteCtlFrequency
+    WRITE-SYNTAX Unsigned32 (0..86400)
+    DESCRIPTION
+        "Maximum frequency is 86400 seconds."
+ 
+    VARIATION    traceRouteCtlMaxRows
+    WRITE-SYNTAX Unsigned32 (0..50)
+    DESCRIPTION
+        "50 is the maximum number of entries allowed in the
+        traceRouteProbeHistoryTable.."
+
+    VARIATION    traceRouteCtlSourceAddressType
+    WRITE-SYNTAX INTEGER {
+                   unknown(0),
+                   ipv4(1)
+                 }
+    DESCRIPTION
+        "IPv4 address types are supported. unknown indicates no
+         source address has been specified."
+
+    VARIATION    traceRouteCtlTimeOut
+    WRITE-SYNTAX Unsigned32 (2..60)
+    DESCRIPTION
+        "Specifies the time-out value, in seconds, for
+        a traceroute request."
+
+    VARIATION    traceRouteCtlInitialTtl
+    WRITE-SYNTAX Unsigned32 (1..30)
+    DESCRIPTION
+        "The value of this object specifies the initial TTL 
+        value to use."
+
+    VARIATION    traceRouteCtlDataSize
+    WRITE-SYNTAX Unsigned32 (40..32768)
+    DEFVAL { 40 }
+    DESCRIPTION
+        "The value of this object specifies the data size."
+
+    ::= { eriRouterIetfTracerouteCap 1 }
+
+END

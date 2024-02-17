@@ -1,0 +1,86 @@
+-- %DNP% $Id: ERICSSON-ROUTER-IETF-ALARM-CAP.my,v 1.1.4.3 2011/06/15 18:19:45 danielhe Exp $
+-- %DNP% $Source: /cvsroot/pkt/sw/se/xc/bsd/config/snmp/mibs/Attic/ERICSSON-ROUTER-IETF-ALARM-CAP.my,v $
+-- *****************************************************************
+-- ERICSSON-ROUTER-IETF-ALARM-CAP.my    IETF ALARM-MIB 
+--
+-- Copyright (c) 2009, 2011, 2015 Ericsson AB.
+-- All rights reserved.
+-- 
+-- *****************************************************************
+
+ERICSSON-ROUTER-IETF-ALARM-CAP DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY
+		FROM SNMPv2-SMI
+	AGENT-CAPABILITIES
+		FROM SNMPv2-CONF
+	eriRouterCapabilities
+		FROM ERICSSON-ROUTER-SMI;
+
+eriRouterIetfAlarmCap MODULE-IDENTITY
+        LAST-UPDATED    "201501141800Z" -- Jan 14, 2015
+        ORGANIZATION    "Ericsson AB."
+        CONTACT-INFO
+                "       Ericsson AB.
+
+                Postal: 100 Headquarters Dr
+                        San Jose, CA  95134
+                        USA
+
+                 Phone: +1 408 750 5000
+                   Fax: +1 408 750 5599
+                "
+	DESCRIPTION
+		"The Agent Capabilities of the IETF ALARM-MIB
+
+                If this MIB implementation is platform-dependent,
+                the PRODUCT-RELEASE clause contains Ericsson SEOS version and
+                at least one of the following Ericsson product families:
+                    [SE]  SmartEdge Multi-service Edge Router (MSER) family
+                    [SM]  SM family of Metro Ethernet Service Transport platforms
+                    [SSR] Smart Service Router (SSR) family"
+
+        REVISION        "201501141800Z" -- Jan 14, 2015
+        DESCRIPTION
+                "Updated RBN/rbn/Rbn as ERICSSON-ROUTER/eriRouter/EriRouter
+                 to migrate RBN MIB to ERICSSON MIB."
+
+        REVISION        "201106150000Z" -- Jun 15, 2011
+        DESCRIPTION
+                "Update DESCRIPTION clause of MODULE-IDENTITY
+                 and PRODUCT-RELEASE clause of AGENT-CAPABILITIES."
+        
+        REVISION        "201101191800Z" -- Jan 19, 2011
+        DESCRIPTION
+                "Update CONTACT-INFO & ORGANIZATION. "
+
+	REVISION	"200903031700Z" -- March 3, 2009
+	DESCRIPTION
+		"Initial version"
+	::= { eriRouterCapabilities 91 }
+
+eriRouterIetfAlarmCap1 AGENT-CAPABILITIES
+	PRODUCT-RELEASE	"SEOS 6.2 [SE]; SEOS 6.3.X [SM]; SEOS 11.1.X [SSR]"
+	STATUS		current
+	DESCRIPTION	"ALARM-MIB capabilities"
+	SUPPORTS	ALARM-MIB
+	INCLUDES {
+            alarmActiveGroup,
+            alarmActiveStatsGroup,
+            alarmClearGroup,
+            alarmModelGroup
+	}
+        VARIATION   alarmModelRowStatus
+	WRITE-SYNTAX INTEGER { active(1), createAndGo(4), destroy(6) }
+        DESCRIPTION
+	    "Restrict row creation to createAndGo. Setting object value 
+	    to createAndWait or notInService are not supported."
+            
+        VARIATION   alarmActiveVariableOpaqueVal
+        ACCESS      not-implemented
+        DESCRIPTION
+            "This object is not implemented"
+	::= { eriRouterIetfAlarmCap 1 }
+
+END

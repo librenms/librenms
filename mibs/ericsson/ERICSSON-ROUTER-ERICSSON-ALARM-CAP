@@ -1,0 +1,91 @@
+-- *****************************************************************
+-- ERICSSON-ROUTER-ERICSSON-ALARM-CAP   Ericsson Alarm MIB Capabilities
+--                          for EPS-C/CGW
+-- Copyright (c) 2015 Ericsson AB.
+-- Copyright (c) 2009, 2015 RedBack Networks, Inc.
+-- All rights reserved.
+-- 
+-- *****************************************************************
+
+ERICSSON-ROUTER-ERICSSON-ALARM-CAP DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY
+                FROM SNMPv2-SMI
+        AGENT-CAPABILITIES
+                FROM SNMPv2-CONF
+        eriRouterCapabilities
+                FROM ERICSSON-ROUTER-SMI;
+
+eriRouterEriAlarmCap MODULE-IDENTITY
+        LAST-UPDATED    "201501141800Z" -- Jan 14, 2015
+        ORGANIZATION    "RedBack Networks, Inc."
+        CONTACT-INFO
+                "       RedBack Networks, Inc.
+
+                Postal: 300 Holger Way
+                        San Jose, CA  95134
+                        USA
+
+                 Phone: +1 408 750 5000
+                   Fax: +1 408 750 5599
+
+                E-mail: mib-info@redback.com"
+        DESCRIPTION
+                "The Agent Capabilities of the RedBack Networks
+                Ericsson Alarm MIB (ERICSSON-ALARM-MIB)."
+
+
+        REVISION        "201501141800Z" -- Jan 14, 2015
+        DESCRIPTION
+                "Updated RBN/rbn/Rbn as ERICSSON-ROUTER/eriRouter/EriRouter
+                 to migrate RBN MIB to ERICSSON MIB."
+
+        REVISION        "200906010000Z" -- June 1, 2009
+        DESCRIPTION
+                "Changed assigned number from 87 to 88."
+
+        REVISION        "200901130000Z" -- Jan 13, 2009
+        DESCRIPTION
+                "Initial version."
+        ::= { eriRouterCapabilities 88 }
+
+
+eriRouterEriAlarmCap1 AGENT-CAPABILITIES
+        PRODUCT-RELEASE "SEOS 6.1.6"
+        STATUS          current
+        DESCRIPTION     "ERICSSON-ALARM-MIB capabilities"
+        SUPPORTS        ERICSSON-ALARM-MIB
+        INCLUDES {
+                eriAlarmSummaryGroup,
+                eriAlarmActiveAlarmsGroup,
+                eriAlarmHeartBeatGroup,
+                eriAlarmSimpleAlarmGroup,
+                eriAlarmHeartBeatNotifGroup,
+                eriAlarmAlertNotifGroup
+        }
+
+        VARIATION       eriAlarmIndeterminate
+            ACCESS          not-implemented
+            DESCRIPTION
+            "Object not supported"
+
+        VARIATION       eriAlarmAppendInfo
+            ACCESS          not-implemented
+            DESCRIPTION
+            "Object not supported"
+
+        VARIATION       eriAlarmIndAlert
+            ACCESS          not-implemented
+            DESCRIPTION
+            "Object not supported"
+
+        VARIATION       eriAlarmAppendAlertInfo
+            ACCESS          not-implemented
+            DESCRIPTION
+            "Object not supported"
+
+        ::= { eriRouterEriAlarmCap 1 }
+
+END
+

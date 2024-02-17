@@ -1,0 +1,86 @@
+-- %DNP% $Id: ERICSSON-ROUTER-IETF-SNMPv3-USM-CAP.my,v 1.1.2.1.448.3 2011/06/15 18:19:45 danielhe Exp $
+-- %DNP% $Source: /cvsroot/pkt/sw/se/xc/bsd/config/snmp/mibs/Attic/ERICSSON-ROUTER-IETF-SNMPv3-USM-CAP.my,v $
+-- *****************************************************************
+-- ERICSSON-ROUTER-IETF-SNMPv3-USM-CAP	SNMPv3-USM-MIB Capabilities
+--
+-- Copyright (c) 2002, 2010-2011, 2015 Ericsson AB
+-- All rights reserved.
+-- 
+-- *****************************************************************
+
+ERICSSON-ROUTER-IETF-SNMPv3-USM-CAP DEFINITIONS ::= BEGIN
+
+IMPORTS
+
+    MODULE-IDENTITY
+            FROM SNMPv2-SMI
+    AGENT-CAPABILITIES
+            FROM SNMPv2-CONF    
+    eriRouterCapabilities
+            FROM ERICSSON-ROUTER-SMI;
+
+eriRouterIetfSnmpUsmCap MODULE-IDENTITY
+    LAST-UPDATED    "201501141800Z" -- Jan 14, 2015
+    ORGANIZATION    "Ericsson Inc."
+    CONTACT-INFO
+        "               Ericsson, Inc. 
+
+                        100 Headquarters Dr
+                        San Jose, CA  95134
+                        USA
+
+                 Phone: +1 408 750 5000
+                   Fax: +1 408 750 5599"
+    DESCRIPTION
+            "The Agent Capabilities of the 
+            SNMP-USER-BASED-SM-MIB.
+
+            If this MIB implementation is platform-dependent,
+            the PRODUCT-RELEASE clause contains Ericsson SEOS version and
+            at least one of the following Ericsson product families:
+                [SE]  SmartEdge Multi-service Edge Router (MSER) family
+                [SM]  SM family of Metro Ethernet Service Transport platforms
+                [SSR] Smart Service Router (SSR) family"
+
+    REVISION        "201501141800Z" -- Jan 14, 2015
+    DESCRIPTION
+            "Updated RBN/rbn/Rbn as ERICSSON-ROUTER/eriRouter/EriRouter
+             to migrate RBN MIB to ERICSSON MIB."
+
+    REVISION        "201106150000Z" -- Jun 15, 2011
+    DESCRIPTION
+            "Update DESCRIPTION clause of MODULE-IDENTITY
+            and PRODUCT-RELEASE clause of AGENT-CAPABILITIES."
+
+    REVISION        "201011010000Z" -- Nov 1, 2010
+    DESCRIPTION
+            "Modified PRODUCT-RELEASE clause for consistent naming.
+            Updated CONTACT-INFO."
+
+    REVISION        "200207220000Z" -- July 22, 2002
+    DESCRIPTION
+            "Initial version."
+    ::= { eriRouterCapabilities 49 }
+
+eriRouterIetfSnmpUsmCap1 AGENT-CAPABILITIES
+    PRODUCT-RELEASE "AOS 6.0.X.X"
+    STATUS          current
+    DESCRIPTION     "SNMP-USER-BASED-SM-MIB capabilities"
+    SUPPORTS        SNMP-USER-BASED-SM-MIB
+    INCLUDES {
+        usmMIBBasicGroup
+    }
+    
+    ::= { eriRouterIetfSnmpUsmCap 1 }
+
+eriRouterIetfSnmpUsmCap2 AGENT-CAPABILITIES
+    PRODUCT-RELEASE "SEOS 2.3.X.X [SE]; SEOS 6.3.X [SM]; SEOS 11.1.x [SSR]"
+    STATUS          current
+    DESCRIPTION     "SNMP-USER-BASED-SM-MIB capabilities"
+    SUPPORTS        SNMP-USER-BASED-SM-MIB
+    INCLUDES {
+        usmMIBBasicGroup
+    }
+
+    ::= { eriRouterIetfSnmpUsmCap 2 }
+END

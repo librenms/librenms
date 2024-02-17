@@ -1,0 +1,155 @@
+-- *****************************************************************
+-- ERICSSON-ROUTER-FAST-VRRPV3-MIB    Fast VRRPV3 MIB
+--
+-- Copyright (c) 2008, 2011, 2015, 2016 Ericsson AB.
+-- All rights reserved.
+--
+-- *****************************************************************
+
+ERICSSON-ROUTER-FAST-VRRPV3-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    Integer32
+            FROM SNMPv2-SMI
+
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP
+            FROM SNMPv2-CONF
+
+    ifIndex
+            FROM IF-MIB
+
+    Vrrpv3VrIdTC
+            FROM VRRPV3-MIB
+
+    InetAddressType, InetAddress
+            FROM INET-ADDRESS-MIB           -- RFC4001
+
+    eriRouterMgmt
+            FROM ERICSSON-ROUTER-SMI;
+
+eriRouterFastVrrpv3MIB MODULE-IDENTITY
+    LAST-UPDATED    "201609221400Z" -- Sep 22, 2016
+    ORGANIZATION    "Ericsson AB."
+    CONTACT-INFO
+            "       Ericsson AB.
+
+            Postal: 100 Headquarters Dr
+                    San Jose, CA  95134
+                    USA
+
+             Phone: +1 408 750 5000
+               Fax: +1 408 750 5599
+            "
+    DESCRIPTION
+        "This MIB describes objects used for managing Fast Virtual
+         Router Redundancy Protocol (FVRRPv3) routers."
+
+    REVISION        "201609221400Z" -- Sep 22, 2016
+    DESCRIPTION     "Modify syntax error"
+
+    REVISION        "201609211400Z" -- Sep 21, 2016
+    DESCRIPTION
+        " Initial Version."
+
+    ::= { eriRouterMgmt 114 }
+
+eriRouterFastVrrpv3MIBObjects    OBJECT IDENTIFIER ::= { eriRouterFastVrrpv3MIB 1 }
+eriRouterFastVrrpv3Conformance   OBJECT IDENTIFIER ::= { eriRouterFastVrrpv3MIB 2 }
+
+--
+-- Fast VRRPv3 objects
+--
+eriRouterFastVrrpv3OperTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EriRouterFastVrrpv3OperEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table contains eriRouterFastVrrpv3OperEntry entries"
+    ::= { eriRouterFastVrrpv3MIBObjects 1 }
+
+eriRouterFastVrrpv3OperEntry OBJECT-TYPE
+    SYNTAX      EriRouterFastVrrpv3OperEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Fast VRRPv3 operational characteristics entries"
+    INDEX { ifIndex, eriRouterFastVrrpv3OperVrId,
+            eriRouterFastVrrpv3OperInetAddrType
+           }
+    ::= { eriRouterFastVrrpv3OperTable 1 }
+
+EriRouterFastVrrpv3OperEntry ::=
+    SEQUENCE {
+        eriRouterFastVrrpv3OperVrId                  Vrrpv3VrIdTC,
+        eriRouterFastVrrpv3OperInetAddrType          InetAddressType,
+        eriRouterFastVrrpv3OperAdvInterval           Integer32
+    }
+
+eriRouterFastVrrpv3OperVrId OBJECT-TYPE
+     SYNTAX      Vrrpv3VrIdTC
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+         "This object contains the Virtual Router Identifier (VRID) of
+          Fast VRRPv3 routers."
+     ::= { eriRouterFastVrrpv3OperEntry 1 }
+
+eriRouterFastVrrpv3OperInetAddrType OBJECT-TYPE
+     SYNTAX      InetAddressType
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+         "The IP address type of EriRouterFastVrrpv3OperEntry.
+          This value determines the type for master IP Address,
+          ipv4(1) and ipv6(2) are the only two values supported
+          in this MIB module."
+
+     ::= { eriRouterFastVrrpv3OperEntry 2 }
+
+eriRouterFastVrrpv3OperAdvInterval OBJECT-TYPE
+    SYNTAX      Integer32 (1..40950)
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time interval, in milliseconds, between sending
+         advertisement messages.  Only the master router sends
+         VRRPv3 advertisements."
+   ::= { eriRouterFastVrrpv3OperEntry 3 }
+
+--
+-- compliance statements
+--
+
+eriRouterFastVrrpv3MIBCompliances OBJECT IDENTIFIER ::= { eriRouterFastVrrpv3Conformance 1 }
+eriRouterFastVrrpv3MIBGroups      OBJECT IDENTIFIER ::= { eriRouterFastVrrpv3Conformance 2 }
+
+eriRouterFastVrrpv3Compliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+        "The compliance statement for SNMP entities which implement
+         this Fast VRRPv3 MIB."
+
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+            eriRouterFastVrrpv3ObjectGroup
+        }
+    ::= { eriRouterFastVrrpv3MIBCompliances 1 }
+
+--
+-- groupings
+--
+
+eriRouterFastVrrpv3ObjectGroup OBJECT-GROUP
+    OBJECTS {
+         eriRouterFastVrrpv3OperAdvInterval
+    }
+    STATUS current
+    DESCRIPTION
+        "The collection of objects related to Fast VRRPv3 objects."
+    ::= { eriRouterFastVrrpv3MIBGroups 1 }
+
+END

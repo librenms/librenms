@@ -1,0 +1,212 @@
+-- %DNP% $Id: ERICSSON-ROUTER-IETF-OSPF-TRAP-CAP.my,v 1.1.2.3.2.4 2011/06/15 18:19:45 danielhe Exp $
+-- %DNP% $Source: /cvsroot/pkt/sw/se/xc/bsd/config/snmp/mibs/Attic/ERICSSON-ROUTER-IETF-OSPF-TRAP-CAP.my,v $
+-- *****************************************************************
+-- ERICSSON-ROUTER-IETF-OSPF-TRAP-CAP.my: IETF OSPF-TRAP-MIB Agent Capabilities
+--
+-- Copyright (c) 2006, 2008, 2010-2011, 2015 Ericsson AB
+-- All rights reserved.
+--
+-- *****************************************************************
+
+ERICSSON-ROUTER-IETF-OSPF-TRAP-CAP DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY
+                FROM SNMPv2-SMI
+        AGENT-CAPABILITIES
+                FROM SNMPv2-CONF
+        eriRouterCapabilities
+                FROM ERICSSON-ROUTER-SMI;
+
+eriRouterIetfOspfTrapCap MODULE-IDENTITY
+        LAST-UPDATED    "201501141800Z" -- Jan 14, 2015
+	ORGANIZATION	"Ericsson Inc."
+	CONTACT-INFO
+		"	Ericsson, Inc.
+
+		Postal:	100 Headquarters Dr.
+			San Jose, CA  95134
+			USA
+
+		 Phone:	+1 408 750 5000
+		   Fax: +1 408 750 5599
+		"
+        DESCRIPTION
+            "The Agent Capabilities of the 
+             implementation of the IETF OSPF-TRAP-MIB.
+
+            If this MIB implementation is platform-dependent,
+            the PRODUCT-RELEASE clause contains Ericsson SEOS version and
+            at least one of the following Ericsson product families:
+                [SE]  SmartEdge Multi-service Edge Router (MSER) family
+                [SM]  SM family of Metro Ethernet Service Transport platforms
+                [SSR] Smart Service Router (SSR) family"
+
+        REVISION        "201501141800Z" -- Jan 14, 2015
+        DESCRIPTION
+            "Updated RBN/rbn/Rbn as ERICSSON-ROUTER/eriRouter/EriRouter
+             to migrate RBN MIB to ERICSSON MIB."
+
+        REVISION        "201106150000Z" -- Jun 15, 2011
+        DESCRIPTION
+            "Update DESCRIPTION clause of MODULE-IDENTITY
+            and PRODUCT-RELEASE clause of AGENT-CAPABILITIES."
+
+	REVISION	"201011010000Z" -- Nov 1, 2010
+	DESCRIPTION
+	    "Modified PRODUCT-RELEASE clause for consistent naming.
+             Updated CONTACT-INFO."
+                
+        REVISION        "200806180000Z" -- Jun 18, 2008 
+        DESCRIPTION
+            "Added eriRouterIetfOspfTrapCap2."
+
+        REVISION        "200611100000Z" -- November 10, 2006 00:00:00 EST 
+        DESCRIPTION
+            "Initial version"
+        ::= { eriRouterCapabilities 69 }
+
+eriRouterIetfOspfTrapCap1 AGENT-CAPABILITIES
+        PRODUCT-RELEASE     "SmartEdge 5.0.7.4"
+        STATUS              current
+        DESCRIPTION         "OSPF-TRAP-MIB capabilities"
+        SUPPORTS            OSPF-TRAP-MIB
+        INCLUDES {
+                ospfTrapEventGroup
+                }
+
+        VARIATION       ospfVirtIfStateChange
+        ACCESS          not-implemented 
+        DESCRIPTION
+           "This information is not available to SNMP." 
+
+        VARIATION       ospfVirtNbrStateChange
+        ACCESS          not-implemented 
+        DESCRIPTION
+           "This information is not available to SNMP." 
+
+        VARIATION       ospfIfConfigError
+        ACCESS          not-implemented 
+        DESCRIPTION
+           "This information is not available to SNMP." 
+
+        VARIATION       ospfVirtIfConfigError
+        ACCESS          not-implemented 
+        DESCRIPTION
+           "This information is not available to SNMP." 
+
+        VARIATION       ospfIfAuthFailure
+        ACCESS          not-implemented 
+        DESCRIPTION
+           "This information is not available to SNMP." 
+
+        VARIATION       ospfVirtIfAuthFailure
+        ACCESS          not-implemented 
+        DESCRIPTION
+           "This information is not available to SNMP." 
+
+        VARIATION       ospfIfRxBadPacket
+        ACCESS          not-implemented 
+        DESCRIPTION
+           "This information is not available to SNMP." 
+
+        VARIATION       ospfVirtIfRxBadPacket
+        ACCESS          not-implemented 
+        DESCRIPTION
+           "This information is not available to SNMP." 
+
+        VARIATION       ospfTxRetransmit
+        ACCESS          not-implemented 
+        DESCRIPTION
+           "This information is not available to SNMP." 
+
+        VARIATION       ospfVirtIfTxRetransmit
+        ACCESS          not-implemented 
+        DESCRIPTION
+           "This information is not available to SNMP." 
+
+        VARIATION       ospfOriginateLsa
+        ACCESS          not-implemented 
+        DESCRIPTION
+           "This information is not available to SNMP." 
+
+        VARIATION       ospfMaxAgeLsa
+        ACCESS          not-implemented 
+        DESCRIPTION
+           "This information is not available to SNMP." 
+
+        VARIATION       ospfLsdbOverflow
+        ACCESS          not-implemented 
+        DESCRIPTION
+           "This information is not available to SNMP." 
+
+        VARIATION       ospfLsdbApproachingOverflow
+        ACCESS          not-implemented 
+        DESCRIPTION
+           "This information is not available to SNMP." 
+
+        VARIATION       ospfNssaTranslatorStatusChange
+        ACCESS          not-implemented 
+        DESCRIPTION
+           "This information is not available to SNMP." 
+
+        VARIATION       ospfRestartStatusChange
+        ACCESS          not-implemented 
+        DESCRIPTION
+           "This information is not available to SNMP." 
+
+        VARIATION       ospfNbrRestartHelperStatusChange
+        ACCESS          not-implemented 
+        DESCRIPTION
+           "This information is not available to SNMP." 
+
+        VARIATION       ospfVirtNbrRestartHelperStatusChange
+        ACCESS          not-implemented 
+        DESCRIPTION
+           "This information is not available to SNMP." 
+
+        ::= { eriRouterIetfOspfTrapCap 1 }
+
+
+eriRouterIetfOspfTrapCap2     AGENT-CAPABILITIES
+        PRODUCT-RELEASE     "SmartEdge 6.1.4.2 [SE]; SEOS 6.3.X [SM]; SEOS 11.1.x [SSR]"
+        STATUS              current
+        DESCRIPTION         "OSPF-TRAP-MIB capabilities"
+        SUPPORTS            OSPF-TRAP-MIB
+        INCLUDES {
+                ospfTrapEventGroup
+                }
+
+        VARIATION       ospfLsdbOverflow
+        ACCESS          not-implemented 
+        DESCRIPTION
+           "This information is not available to SNMP." 
+
+        VARIATION       ospfLsdbApproachingOverflow
+        ACCESS          not-implemented 
+        DESCRIPTION
+           "This information is not available to SNMP." 
+
+        VARIATION       ospfNssaTranslatorStatusChange
+        ACCESS          not-implemented 
+        DESCRIPTION
+           "This information is not available to SNMP." 
+
+        VARIATION       ospfRestartStatusChange
+        ACCESS          not-implemented 
+        DESCRIPTION
+           "This information is not available to SNMP." 
+
+        VARIATION       ospfNbrRestartHelperStatusChange
+        ACCESS          not-implemented 
+        DESCRIPTION
+           "This information is not available to SNMP." 
+
+        VARIATION       ospfVirtNbrRestartHelperStatusChange
+        ACCESS          not-implemented 
+        DESCRIPTION
+           "This information is not available to SNMP." 
+
+        ::= { eriRouterIetfOspfTrapCap 2 }
+
+END

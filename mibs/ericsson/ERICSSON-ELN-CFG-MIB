@@ -1,0 +1,531 @@
+
+-- -------------------------------------------------------------
+-- COPYRIGHT LM Ericsson AB 2001
+-- Doc no: 4/196 03 - CXC 132 4958
+-- Version: '$Id: ERICSSON-ELN-CFG-MIB.mib,v 1.17 2006/01/24 16:57:35 hka Exp $'
+-- -------------------------------------------------------------
+
+-- -------------------------------------------------------------
+-- MIB for Ericsson Local Node, Ethernet Switch
+-- Software Handling
+-- -------------------------------------------------------------
+
+ERICSSON-ELN-CFG-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+   MODULE-IDENTITY, 
+   OBJECT-TYPE, 
+   mib-2,
+   NOTIFICATION-TYPE, 
+   IpAddress		              FROM SNMPv2-SMI
+   TEXTUAL-CONVENTION, 
+   DisplayString,
+   PhysAddress, 
+   TruthValue, 
+   RowStatus,
+   DateAndTime, 
+   TimeStamp, 
+   AutonomousType	              FROM SNMPv2-TC
+   MODULE-COMPLIANCE, 
+   OBJECT-GROUP,
+   NOTIFICATION-GROUP                 FROM SNMPv2-CONF
+   eln                                FROM ERICSSON-ELN-SMI;
+
+elnCfgMIB MODULE-IDENTITY
+    LAST-UPDATED 	
+         "200304020000Z"
+    ORGANIZATION 	
+         "Ericsson"
+    CONTACT-INFO
+         "Ericsson Diax A/S
+          Faelledvej 17
+          DK-7600 Struer
+          Denmark
+          E-mail: support@dxd.ericsson.se"       
+    DESCRIPTION
+        "This MIB module defines the parameters for Software 
+         handling in the ELN"
+    REVISION     "200203250000Z"
+    DESCRIPTION
+        "Initial revision"
+    REVISION     "200209250000Z"
+    DESCRIPTION
+        "Updated revision"
+    REVISION     "200210150000Z"
+    DESCRIPTION
+        "Updated revision, added URL and more some errorcodes"
+    REVISION     "200304020000Z"
+    DESCRIPTION
+        "Updated revision, added load release progress"
+    REVISION     "200503170000Z"
+    DESCRIPTION
+        "Minor update, removed conformance and added ERICSSON-ELN-SMI."
+    REVISION     "200601240000Z"
+    DESCRIPTION
+        "Added elnHostProcessorGroup and elnResetGroup."
+    ::= { eln 3 }
+    
+    
+elnSoftwareGroup 		OBJECT IDENTIFIER ::= { elnCfgMIB 1 }
+elnConfigGroup 			OBJECT IDENTIFIER ::= { elnCfgMIB 2 }
+elnHostProcessorGroup           OBJECT IDENTIFIER ::= { elnCfgMIB 3 }
+elnResetGroup                   OBJECT IDENTIFIER ::= { elnCfgMIB 4 }
+
+-- -------------------------------------------------------------
+-- Textual Conventions 
+-- -------------------------------------------------------------
+
+URLString ::= TEXTUAL-CONVENTION
+	DISPLAY-HINT "255a"
+	STATUS current
+	DESCRIPTION
+           "A Uniform Resource Locator represented in accordance
+            with RFCs 1738 and 2368, presented in the NVT ASCII
+            charset defined in RFC 854."
+	SYNTAX OCTET STRING (SIZE (0..255))
+
+
+-- -------------------------------------------------------------
+-- Software Group 
+-- -------------------------------------------------------------
+
+elnSoftwareCurrent  OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The version of the currently running software."
+    ::= { elnSoftwareGroup 1 }
+
+elnSoftwareCurrentReleaseTime  OBJECT-TYPE
+    SYNTAX     DateAndTime 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The release time of the currently running software."
+    ::= { elnSoftwareGroup 2 }
+
+elnSoftwarePermanent  OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "The software version which is permanent, i.e. the
+         one that is applied at reboot"
+    ::= { elnSoftwareGroup 3 }
+
+elnSoftwareLoadedTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF ElnSoftwareLoadedEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of loaded software entries. "
+    ::= { elnSoftwareGroup 4 }
+
+elnSoftwareLoadedEntry OBJECT-TYPE
+    SYNTAX      ElnSoftwareLoadedEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry containing information applicable to
+            loaded software."
+    INDEX   { elnSoftwareLoadedIndex }
+    ::= { elnSoftwareLoadedTable 1 }
+
+ElnSoftwareLoadedEntry ::=
+    SEQUENCE {
+        elnSoftwareLoadedIndex          INTEGER,
+        elnSoftwareLoadedVersion	DisplayString
+    }
+    
+elnSoftwareLoadedIndex OBJECT-TYPE
+    SYNTAX  	INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The software loaded index."
+    ::= { elnSoftwareLoadedEntry 1 }
+
+elnSoftwareLoadedVersion OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The software version."
+    ::= { elnSoftwareLoadedEntry 2 }
+
+
+elnSoftwareAction OBJECT-TYPE
+    SYNTAX     INTEGER {
+                  loadRelease(1),
+                  startRelease(2),
+                  makePermanent(3),
+                  removeRelease(4)
+               }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+       "loadRelease(1) downloads a release specified by 
+        a URL (or File, Host, Protocol, User, Password)
+        
+	startRelease(2) makes the node restart with a named Version 
+        
+	makePermanent(3) makes the named Version permanent, i.e.
+        the default release used at reboot
+        
+	removeRelease(4) removes a Version (must not be running)
+
+        The results of the loadRelease(1) and removeRelease(4) actions 
+        are availabe in the elnSoftwareActionStatus object, all other 
+        results are directly returned.
+
+	The parameters for the action must be set before or 
+        in the same SNMP-SET as the action."
+
+    ::= { elnSoftwareGroup 5 }
+
+elnSoftwareActionVersion  OBJECT-TYPE
+    SYNTAX     DisplayString 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "The version of the software. Required for startRelease(2), 
+	 makePermanent(3) and removeRelease(4)."
+    ::= { elnSoftwareGroup 6 }
+
+elnSoftwareActionFile  OBJECT-TYPE
+    SYNTAX     DisplayString 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "THIS OBJECT IS DEPRECATED use elnSoftwareActionURL."
+    ::= { elnSoftwareGroup 7 }
+
+elnSoftwareActionHost  OBJECT-TYPE
+    SYNTAX     OCTET STRING (SIZE (0..255))
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "THIS OBJECT IS DEPRECATED use elnSoftwareActionURL."
+    ::= { elnSoftwareGroup 8 }
+
+elnSoftwareActionProtocol  OBJECT-TYPE
+    SYNTAX     INTEGER {
+                  ftp(1),
+                  tftp(2)
+               }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "THIS OBJECT IS DEPRECATED use elnSoftwareActionURL."
+    ::= { elnSoftwareGroup 9 }
+
+elnSoftwareActionUser  OBJECT-TYPE
+    SYNTAX     DisplayString 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "THIS OBJECT IS DEPRECATED use elnSoftwareActionURL."
+    ::= { elnSoftwareGroup 10 }
+
+elnSoftwareActionPassword  OBJECT-TYPE
+    SYNTAX     DisplayString 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "THIS OBJECT IS DEPRECATED use elnSoftwareActionURL."
+    ::= { elnSoftwareGroup 11 }
+
+elnSoftwareActionStatus  OBJECT-TYPE
+    SYNTAX     INTEGER {
+		loadReleaseInProgress(1),
+		loadReleaseSuccess(2),
+		loadReleaseHostNotFound(3),
+		loadReleaseLoginIncorrect(4),
+		loadReleaseNoSuchDirectory(5),
+		loadReleaseNoSuchFile(6),
+		loadReleaseErroneousUrl(7),
+		loadReleaseError(8),
+		removeReleaseInProgress(9),
+		removeReleaseSuccess(10),
+		removeReleaseError(11)
+               }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The status of the current 'loadRelease' or 'removeRelease' 
+         software action."
+    ::= { elnSoftwareGroup 12 }
+
+elnSoftwareActionURL  OBJECT-TYPE
+    SYNTAX     URLString
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "The location of the file to be downloaded,
+         e.g. 'ftp://user:password@host/file',  'tftp://host/file'.
+         Required for the loadRelease(1) action."
+    ::= { elnSoftwareGroup 13 }
+
+elnSoftwareActionMaxTime  OBJECT-TYPE
+    SYNTAX     INTEGER
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "The maximum time (in seconds), for the loadRelease(1) action.
+         This is an optional parameter, a default time is used otherwise."
+	::= { elnSoftwareGroup 14 }
+
+elnSoftwareLoadReleaseProgress OBJECT-TYPE
+    SYNTAX     INTEGER (0..100)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The progress in percent of the current 'loadRelease' 
+	 software action."
+	::= { elnSoftwareGroup 15 }
+
+
+-- -------------------------------------------------------------
+-- Configuration Group 
+-- -------------------------------------------------------------
+
+elnConfigPermanent  OBJECT-TYPE
+    SYNTAX     DisplayString 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The version of the permanent configuration."
+    ::= { elnConfigGroup 1 }
+
+elnConfigTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF ElnConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of configuration entries. "
+    ::= { elnConfigGroup 2 }
+
+elnConfigEntry OBJECT-TYPE
+    SYNTAX      ElnConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry containing information applicable to a
+            specific configuration."
+    INDEX   { elnConfigIndex }
+    ::= { elnConfigTable 1 }
+
+ElnConfigEntry ::=
+    SEQUENCE {
+        elnConfigIndex          INTEGER,
+        elnConfigName           DisplayString
+    }
+    
+elnConfigIndex OBJECT-TYPE
+    SYNTAX  	INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The configuration index."
+    ::= { elnConfigEntry 1 }
+
+elnConfigName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The configuration name."
+    ::= { elnConfigEntry 2 }
+
+
+elnConfigAction OBJECT-TYPE
+    SYNTAX     INTEGER {
+                  save(1),
+                  restore(2),
+                  remove(3),
+                  makePermanent(4),
+                  removePermanent(5),
+                  copyAllToVersion(6),
+                  copyFromRemote(7),
+                  copyFromRemoteToVersion(8),
+                  copyToRemote(9),
+                  copyToRemoteFromVersion(10)
+               }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+    	"save(1) saves the current configuration as Name
+    	
+    	 restore(2) applies the named configuration,
+    	 (all previous configurations are removed first)
+    	 
+    	 remove(3) deletes the named configuration
+    	 (if it is permanent it can not be removed)
+    	 
+    	 makePermanent(4) makes the named configuration permanent
+    	 (the one that is applied at reboot)
+    	 
+    	 removePermanent(5) the permanent configuration is made 
+    	 non-permanent
+
+    	 copyAllToVersion(6) copies all configurations from the current 
+    	 release to a named release
+
+         copyFromRemote(7) copies one configuration from a URL to the 
+         current release and a local name
+    	 
+         copyFromRemoteToVersion(8) copies one configuration from a URL 
+         to a release and local name 
+
+    	 copyToRemote(9) copies one configuration from the current relase
+    	 and local name to a URL
+    	 
+    	 copyToRemoteFromVersion(10) copies one configuration from a release 
+    	 and local name to a URL
+    	 
+         The results from the copy(7..10) actions is availabe from
+         elnConfigActionStatus, all other results are directly returned.
+
+	 The parameters for the action must be set before or 
+	 in the same SNMP-SET as the action."
+
+    ::= { elnConfigGroup 3 }
+
+ elnConfigActionName  OBJECT-TYPE
+    SYNTAX     DisplayString 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "This is used by the action when refering to the name of 
+         a local Configuration. 
+         This corresponds to elnConfigName in elnConfigTable."
+    ::= { elnConfigGroup 4 }
+
+ elnConfigActionVersion  OBJECT-TYPE
+    SYNTAX     DisplayString 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "This is used by the action when refering to a Release. 
+         This corresponds to elnSoftwareLoadedVersion in elnSoftwareLoadedTable."
+    ::= { elnConfigGroup 5 }
+
+elnConfigActionURL  OBJECT-TYPE
+    SYNTAX     URLString
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "This is used by the action when refering to a URL. 
+         e.g. 'ftp://user:password@host/file',  'tftp://host/file'."
+    ::= { elnConfigGroup 6 }
+
+elnConfigActionStatus  OBJECT-TYPE
+    SYNTAX     INTEGER {
+                    copyInProgress(1),
+                    copySuccess(2),
+                    copyHostNotFound(3),
+                    copyLoginIncorrect(4),
+                    copyNoSuchDirectory(5),
+                    copyNoSuchFile(6),
+                    copyErroneousUrl(7),
+                    copyError(8)
+               }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The status of the current copy action."
+    ::= { elnConfigGroup 7 }
+    
+elnConfigCurrent  OBJECT-TYPE
+    SYNTAX     DisplayString 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The version of the currently used configuration."
+    ::= { elnConfigGroup 8 }
+    
+    
+-- -------------------------------------------------------------
+-- Host Processor Group
+-- -------------------------------------------------------------
+
+elnHostIpAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "The IP Address for the Host."
+    ::= { elnHostProcessorGroup 1 }
+
+elnHostNetmask OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "The IP Netmask for the Host."
+    ::= { elnHostProcessorGroup 2 }
+    
+elnHostGateway OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "The IP Address for the Gateway."
+    ::= { elnHostProcessorGroup 3 }
+     
+elnHostDnsDomain OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "The IP Address for the primary DNS."
+    ::= { elnHostProcessorGroup 4 }
+    
+elnHostPrimaryDns OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "The IP Address for the primary DNS."
+    ::= { elnHostProcessorGroup 5 }
+    
+elnHostSecondaryDns OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "The IP Address for the secondary DNS."
+    ::= { elnHostProcessorGroup 6 }
+    
+elnHostCommit OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "The values for Ip Address, Netmask and Gateway have been set, 
+    validated and accepted. But the values must be commited by setting 
+    this parameter to 'true' before they are applied on the host."
+    ::= { elnHostProcessorGroup 10 }
+    
+-- -------------------------------------------------------------
+-- Reset Group
+-- -------------------------------------------------------------
+
+elnResetAction OBJECT-TYPE
+    SYNTAX     INTEGER {
+      resetAll(1),
+      resetAllExceptManagementVlan(2)
+    }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+    "resetAll(1) resets all resources (to default values),
+     resetAllExceptManagementVlan(2) resets all resources except 
+     management vlan, i.e.  host_port, cpu, management vlan and 
+     ports connected to management vlan."
+    ::= { elnResetGroup 1 }    	 
+    
+END
+
+

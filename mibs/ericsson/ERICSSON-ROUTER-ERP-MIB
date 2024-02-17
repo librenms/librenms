@@ -1,0 +1,149 @@
+-- %DNP% $Id: $
+-- %DNP% $Source: /cvsroot/pkt/sw/se/xc/bsd/config/snmp/mibs/Attic/ERICSSON-ROUTER-ERP-MIB,v $
+-- *****************************************************************
+-- ERICSSON-ROUTER-ERP-MIB
+--
+-- Copyright (c) 2017 Ericsson AB.
+-- All rights reserved.
+--
+-- *****************************************************************
+
+
+
+ERICSSON-ROUTER-ERP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+  MODULE-IDENTITY,
+  OBJECT-TYPE,
+  NOTIFICATION-TYPE
+    FROM SNMPv2-SMI
+
+  DisplayString
+    FROM SNMPv2-TC
+
+  MODULE-COMPLIANCE,
+  OBJECT-GROUP,
+  NOTIFICATION-GROUP
+    FROM SNMPv2-CONF
+
+  SnmpAdminString
+    FROM SNMP-FRAMEWORK-MIB
+
+  eriRouterMgmt
+    FROM ERICSSON-ROUTER-SMI;
+
+eriRouterERPMib MODULE-IDENTITY
+     LAST-UPDATED    "201701161800Z" -- Jan 16, 2017
+     ORGANIZATION    "Ericsson AB."
+     CONTACT-INFO
+             "       Ericsson AB.
+
+                     100 Headquarters Dr
+                     San Jose, CA  95134
+                     USA
+
+             Phone:  +1 408 750-5000
+             Fax:    +1 408 750-5599
+
+             "
+     DESCRIPTION
+             " ERP MIB"
+
+    ::= { eriRouterMgmt 115 }
+
+eriRouterERPMibObjects OBJECT IDENTIFIER
+    ::= { eriRouterERPMib 1 }
+eriRouterERPNotifications OBJECT IDENTIFIER
+    ::= { eriRouterERPMib 2 }
+ eriRouterERPConformance OBJECT IDENTIFIER
+    ::= { eriRouterERPMib 3 }
+
+--
+-- Object definitions of eriRouterERPMibObjects
+--
+
+eriRouterERPName OBJECT-TYPE
+  SYNTAX  DisplayString (SIZE(1..64))
+  MAX-ACCESS accessible-for-notify
+  STATUS  current
+  DESCRIPTION
+      "Represents the name of the ethernet ring instance."
+  ::= { eriRouterERPMibObjects 1 }
+
+--
+-- END OF Object definitions of eriRouterERPMibObjects
+--
+
+
+--
+-- Notification type definitions of eriRouterERPNotifications
+--
+
+eriRouterERPRplUnblocked NOTIFICATION-TYPE
+  OBJECTS {
+      eriRouterERPName
+       }
+  STATUS  current
+  DESCRIPTION
+      "Notification Type for ERP instance RPL unblocked event."
+  ::= { eriRouterERPNotifications 1 }
+
+eriRouterERPRplOwnerConfErr NOTIFICATION-TYPE
+  OBJECTS {
+      eriRouterERPName
+       }
+  STATUS  current
+  DESCRIPTION
+      "Notification Type for ERP instance RPL configuration conflict event."
+  ::= { eriRouterERPNotifications 2 }
+
+
+--
+-- END OF Notification type definitions of eriRouterERPNotifications
+--
+
+--
+-- Conformance definitions of eriRouterERPpNotifications
+--
+
+eriRouterERPGroups OBJECT IDENTIFIER ::= { eriRouterERPConformance 1 }
+eriRouterERPCompliances OBJECT IDENTIFIER ::= { eriRouterERPConformance 2 }
+--
+-- END OF Conformance definitions of eriRouterERPConformance
+--
+
+eriRouterERPObjectsGroup OBJECT-GROUP
+    OBJECTS {
+        eriRouterERPName
+    }
+    STATUS current
+    DESCRIPTION
+        "The collection of objects used in ERP notifications"
+    ::= { eriRouterERPGroups 1 }
+
+
+eriRouterERPNotifyGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        eriRouterERPRplUnblocked,
+        eriRouterERPRplOwnerConfErr
+    }
+    STATUS current
+    DESCRIPTION
+        "Notifications for ERP instances."
+    ::= { eriRouterERPGroups 2 }
+
+eriRouterERPCompliance MODULE-COMPLIANCE
+    STATUS       current
+    DESCRIPTION
+        "The compliance statement for ERP objects in this
+        ERP MIB."
+    MODULE      -- this module
+    MANDATORY-GROUPS {
+        eriRouterERPObjectsGroup,
+        eriRouterERPNotifyGroup
+    }
+    ::= { eriRouterERPCompliances 1 }
+
+
+END
+

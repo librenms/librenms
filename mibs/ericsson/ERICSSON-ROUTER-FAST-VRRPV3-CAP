@@ -1,0 +1,59 @@
+-- *****************************************************************
+-- ERICSSON-ROUTER-FAST-VRRPV3-CAP: ERICSSON-ROUTER-FAST-VRRPV3-MIB Agent Capabilities
+--
+-- Copyright (c) 2008, 2011, 2015, 2016 Ericsson AB.
+-- All rights reserved.
+--
+-- *****************************************************************
+
+ERICSSON-ROUTER-FAST-VRRPV3-CAP DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY
+                FROM SNMPv2-SMI
+        AGENT-CAPABILITIES
+                FROM SNMPv2-CONF
+        eriRouterCapabilities
+                FROM ERICSSON-ROUTER-SMI;
+
+eriRouterFastVrrpv3Cap MODULE-IDENTITY
+        LAST-UPDATED    "201609231100Z" -- Sep 23, 2016
+        ORGANIZATION    "Ericsson AB."
+        CONTACT-INFO
+                "       Ericsson AB.
+
+                Postal: 100 Headquarters Dr
+                        San Jose, CA  95134
+                        USA
+
+                 Phone: +1 408 750 5000
+                   Fax: +1 408 750 5599
+                "
+        DESCRIPTION
+                "The Agent Capabilities of the Fast VRRPV3 MIB
+                 (ERICSSON-ROUTER-FAST-VRRPV3-MIB).
+
+                If this MIB implementation is platform-dependent,
+                the PRODUCT-RELEASE clause contains Ericsson SEOS version and
+                at least one of the following Ericsson product families:
+                    [SE]  SmartEdge Multi-service Edge Router (MSER) family
+                    [SM]  SM family of Metro Ethernet Service Transport platforms
+                    [SSR] Smart Service Router (SSR) family"
+
+        REVISION        "201609231100Z" -- Sep 23, 2016
+        DESCRIPTION
+                "Initial version"
+        ::= { eriRouterCapabilities 114 }
+
+eriRouterFastVrrpv3Cap1 AGENT-CAPABILITIES
+        PRODUCT-RELEASE "SEOS 6.1.4.3"
+        STATUS          current
+        DESCRIPTION     "ERICSSON-ROUTER-FAST-VRRPV3-MIB capabilities"
+        SUPPORTS        ERICSSON-ROUTER-FAST-VRRPV3-MIB
+        INCLUDES {
+                    eriRouterFastVrrpv3ObjectGroup
+                 }
+
+        ::= { eriRouterFastVrrpv3Cap 1 }
+
+END

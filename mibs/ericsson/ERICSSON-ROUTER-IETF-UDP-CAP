@@ -1,0 +1,108 @@
+-- %DNP% $Id: ERICSSON-ROUTER-IETF-UDP-CAP.my,v 1.1.4.3.452.5 2011/06/15 18:19:45 danielhe Exp $
+-- %DNP% $Source: /cvsroot/pkt/sw/se/xc/bsd/config/snmp/mibs/ERICSSON-ROUTER-IETF-UDP-CAP.my,v $
+-- *****************************************************************
+-- ERICSSON-ROUTER-IETF-UDP-CAP.my:	IETF UDP-MIB Agent Capabilities
+--
+-- Copyright (c) 1998-2011, 2015 Ericsson AB.
+-- All rights reserved.
+-- 
+-- *****************************************************************
+
+ERICSSON-ROUTER-IETF-UDP-CAP DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY
+        FROM SNMPv2-SMI
+    AGENT-CAPABILITIES
+        FROM SNMPv2-CONF
+    eriRouterCapabilities
+        FROM ERICSSON-ROUTER-SMI;
+
+eriRouterIetfUdpCap MODULE-IDENTITY
+    LAST-UPDATED    "201501141800Z" -- Jan 14, 2015
+    ORGANIZATION    "Ericsson AB"
+    CONTACT-INFO
+                "       Ericsson, Inc.
+
+                 Postal: 100 Headquarters Drive
+                         San Jose, CA  95134
+                         USA
+
+                 Phone: +1 408 750 5000
+                 Fax: +1 408 750 5599"
+
+    DESCRIPTION
+        "The Agent Capabilities of IETF UDP-MIB (RFC 4113).
+
+        If this MIB implementation is platform-dependent,
+        the PRODUCT-RELEASE clause contains Ericsson SEOS version and
+        at least one of the following Ericsson product families:
+            [SE]  SmartEdge Multi-service Edge Router (MSER) family
+            [SM]  SM family of Metro Ethernet Service Transport platforms
+            [SSR] Smart Service Router (SSR) family"
+
+    REVISION        "201501141800Z" -- Jan 14, 2015
+    DESCRIPTION
+        "Updated RBN/rbn/Rbn as ERICSSON-ROUTER/eriRouter/EriRouter
+         to migrate RBN MIB to ERICSSON MIB."
+
+    REVISION        "201106150000Z" -- Jun 15, 2011
+    DESCRIPTION
+        "Update DESCRIPTION clause of MODULE-IDENTITY
+          and PRODUCT-RELEASE clause of AGENT-CAPABILITIES."
+
+    REVISION        "201011010000Z" -- Nov 1, 2010
+    DESCRIPTION
+        "Modified PRODUCT-RELEASE clause for consistent naming."
+
+    REVISION        "201003220000Z" -- March 22, 2010
+    DESCRIPTION
+        "Update ORGANIZATION/CONTACT-INFO. 
+         Add eriRouterIetfUdpCap3 per RFC 4113 implementation"
+
+    REVISION        "200205310000Z" --May 31, 2002
+    DESCRIPTION
+        "Correct/Update contact info. Restore initial revision
+         information."
+
+    REVISION        "200108160000Z"
+    DESCRIPTION
+        "Add eriRouterIetfUdpCap2; update contact-info"
+
+    REVISION        "9803242300Z"
+    DESCRIPTION
+        "Initial version"
+    ::= { eriRouterCapabilities 5 }
+
+eriRouterIetfUdpCap1 AGENT-CAPABILITIES
+        PRODUCT-RELEASE "AOS 1.0.X.X"
+        STATUS          current
+        DESCRIPTION     "UDP-MIB capabilities"
+        SUPPORTS        UDP-MIB
+        INCLUDES {
+            udpGroup
+        }
+        ::= { eriRouterIetfUdpCap 1 }
+
+eriRouterIetfUdpCap2 AGENT-CAPABILITIES
+        PRODUCT-RELEASE "SEOS 2.0.x"
+        STATUS          current
+        DESCRIPTION     "UDP-MIB capabilities"
+        SUPPORTS        UDP-MIB
+        INCLUDES {
+            udpGroup
+        }
+        ::= { eriRouterIetfUdpCap 2 }
+
+eriRouterIetfUdpCap3 AGENT-CAPABILITIES
+        PRODUCT-RELEASE "SEOS 6.4.x [SE, SM]; SEOS 11.1.x [SSR]"
+        STATUS          current
+        DESCRIPTION     "UDP-MIB capabilities"
+        SUPPORTS        UDP-MIB
+        INCLUDES {
+            udpBaseGroup, 
+            udpEndpointGroup
+        }
+        ::= { eriRouterIetfUdpCap 3 }
+
+END

@@ -1,0 +1,929 @@
+-- %DNP% $Id: ERICSSON-ROUTER-DHCP-MIB.my,v 1.1.8.1.252.3 2011/02/22 17:26:16 thatcher Exp $
+-- %DNP% $Source: /cvsroot/pkt/sw/se/xc/bsd/config/snmp/mibs/Attic/ERICSSON-ROUTER-DHCP-MIB.my,v $
+-- *****************************************************************
+-- ERICSSON-ROUTER-DHCP-MIB		DHCP Mib
+--
+-- Copyright (c) 2004-2009, 2011, 2015 Ericsson AB.
+-- All rights reserved.
+--
+-- *****************************************************************
+
+ERICSSON-ROUTER-DHCP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+	Unsigned32, IpAddress
+		FROM SNMPv2-SMI
+
+        TruthValue
+                FROM SNMPv2-TC
+
+	MODULE-COMPLIANCE,
+	OBJECT-GROUP,
+	NOTIFICATION-GROUP
+		FROM SNMPv2-CONF
+
+	SnmpAdminString
+		FROM SNMP-FRAMEWORK-MIB
+
+        EriRouterSlot
+                FROM ERICSSON-ROUTER-TC
+
+	eriRouterMgmt
+		FROM ERICSSON-ROUTER-SMI;
+
+eriRouterDhcpMib MODULE-IDENTITY
+	LAST-UPDATED    "201501141800Z" -- Jan 14, 2015
+	ORGANIZATION	"Ericsson AB"
+        CONTACT-INFO
+                "       Ericsson AB.
+
+                Postal: 100 Headquarters Dr 
+                        San Jose, CA  95134
+                        USA
+
+                 Phone: +1 408 750 5000
+                   Fax: +1 408 750 5599"
+	DESCRIPTION
+		"Defines the objects necessary to obtain information about
+		DHCP Servers for interfaces within a context."
+
+        REVISION        "201501141800Z" -- Jan 14, 2015
+        DESCRIPTION
+                "Updated RBN/rbn/Rbn as ERICSSON-ROUTER/eriRouter/EriRouter
+                 to migrate RBN MIB to ERICSSON MIB."
+
+	REVISION	"201003101700Z" -- Mar 10, 2010
+	DESCRIPTION
+                "Added eriRouterDhcpLeaseFileStorageSlot, eriRouterDhcpLeaseFileErrorType,
+                and eriRouterDhcpLeaseFileFailure."
+
+	REVISION	"200510141700Z" -- Oct 14, 2005
+	DESCRIPTION
+		"Added new eriRouterDhcpRangeThresholdTable table."
+
+	REVISION	"200405031700Z" -- May 3, 2004
+	DESCRIPTION
+		"Initial version."
+
+	::= { eriRouterMgmt 30 }
+
+
+eriRouterDhcpMIBNotifications OBJECT IDENTIFIER ::= { eriRouterDhcpMib 0 }
+
+eriRouterDhcpMIBObjects       OBJECT IDENTIFIER ::= { eriRouterDhcpMib 1 }
+
+eriRouterDhcpMIBConformance   OBJECT IDENTIFIER ::= { eriRouterDhcpMib 2 }
+
+
+eriRouterDhcpIntfThresholdTable OBJECT-TYPE
+	SYNTAX       SEQUENCE OF EriRouterDhcpIntfThresholdEntry
+	MAX-ACCESS   not-accessible
+	STATUS       current
+	DESCRIPTION
+		"The purpose of this table is to allow monitoring of
+		per interface DHCP server thresholds through SNMP.
+
+		This table contains the objects which characterize DHCP
+		server thresholds.  Each row in the table corresponds to
+		information about the leases in a DHCP server range for a
+		particular interface and the corresponding capacity,
+		usage and falling and rising thresholds.
+
+		Objects defined in this table are only accessible within the
+		context identified in the SNMP protocol (i.e. the community
+		string in v1/v2c or the contextName in v3)."
+	::= { eriRouterDhcpMIBObjects 1 }
+
+eriRouterDhcpIntfThresholdEntry OBJECT-TYPE
+	SYNTAX       EriRouterDhcpIntfThresholdEntry
+	MAX-ACCESS   not-accessible
+	STATUS       current
+	DESCRIPTION
+		"A conceptual row in the eriRouterDhcpIntfThresholdTable."
+	INDEX        { IMPLIED eriRouterDhcpIntfThresholdName }
+	::= { eriRouterDhcpIntfThresholdTable 1 }
+
+EriRouterDhcpIntfThresholdEntry ::=
+	SEQUENCE {
+		eriRouterDhcpIntfThresholdName		SnmpAdminString,
+		eriRouterDhcpIntfThresholdContextName		SnmpAdminString,
+		eriRouterDhcpIntfThresholdSize		Unsigned32,
+		eriRouterDhcpIntfThresholdAvailable		Unsigned32,
+		eriRouterDhcpIntfThresholdInuse		Unsigned32,
+		eriRouterDhcpIntfThresholdFallingThreshold	Unsigned32,
+		eriRouterDhcpIntfThresholdFallingSendTrap	TruthValue,
+		eriRouterDhcpIntfThresholdFallingLogMessage	TruthValue,
+		eriRouterDhcpIntfThresholdRisingThreshold	Unsigned32,
+		eriRouterDhcpIntfThresholdRisingSendTrap	TruthValue,
+		eriRouterDhcpIntfThresholdRisingLogMessage	TruthValue
+	}
+
+eriRouterDhcpIntfThresholdName OBJECT-TYPE
+	SYNTAX       SnmpAdminString (SIZE (1..80))
+	MAX-ACCESS   not-accessible
+	STATUS       current
+	DESCRIPTION
+		"The name of the interface.
+
+		An entry configured by other means may have been given
+		a name whose length is greater than 80.  Names which exceed
+		this length are not accessible via SNMP operations."
+	::= { eriRouterDhcpIntfThresholdEntry 1 }
+
+eriRouterDhcpIntfThresholdContextName OBJECT-TYPE
+        SYNTAX      SnmpAdminString  (SIZE (0..63))
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The name of the context which contains the interface."
+	::= { eriRouterDhcpIntfThresholdEntry 2 }
+
+eriRouterDhcpIntfThresholdSize OBJECT-TYPE
+	SYNTAX       Unsigned32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"The number of leases that have been reserved for the
+		DHCP server in this interface."
+	::= { eriRouterDhcpIntfThresholdEntry 3 }
+
+eriRouterDhcpIntfThresholdAvailable OBJECT-TYPE
+	SYNTAX       Unsigned32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"The number of leases that are available in this interface."
+	::= { eriRouterDhcpIntfThresholdEntry 4 }
+
+eriRouterDhcpIntfThresholdInuse OBJECT-TYPE
+	SYNTAX       Unsigned32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"The number of leases that are in use in this interface."
+	::= { eriRouterDhcpIntfThresholdEntry 5 }
+
+eriRouterDhcpIntfThresholdFallingThreshold OBJECT-TYPE
+	SYNTAX       Unsigned32 (0..196608)
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"The falling threshold is a value which specifies
+		that any enabled falling threshold events are to
+		be generated when the value of the currently available
+		leases drops to the falling threshold value via an
+		allocation of a lease from the pool.
+
+		The number of available leases is reported in
+		eriRouterDhcpIntfThresholdAvailable.  A falling threshold event
+		is either a notification or a log message or both.
+		Falling threshold events are enabled if either or
+		both of eriRouterDhcpIntfThresholdFallingSendTrap and
+		eriRouterDhcpIntfThresholdFallingLogMessage are true.
+
+		Note, this is a falling threshold, so a falling threshold
+		event will only be triggered on a transition of the value of
+		eriRouterDhcpIntfThresholdAvailable dropping from
+		(eriRouterDhcpIntfThresholdFallingThreshold+1) to
+		eriRouterDhcpIntfThresholdFallingThreshold."
+	::= { eriRouterDhcpIntfThresholdEntry 6 }
+
+eriRouterDhcpIntfThresholdFallingSendTrap OBJECT-TYPE
+	SYNTAX       TruthValue
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"If true, upon detection of reaching a falling threshold,
+		a trap will be sent.  See the definition of the
+		eriRouterDhcpIntfThresholdFallingThresholdMet notification for the
+		information included in the trap."
+	::= { eriRouterDhcpIntfThresholdEntry 7 }
+
+eriRouterDhcpIntfThresholdFallingLogMessage OBJECT-TYPE
+	SYNTAX       TruthValue
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"If true, upon detection of reaching a falling threshold,
+		a message will be logged.  See the definition of the
+		eriRouterDhcpIntfThresholdFallingThresholdMet notification for the
+		information included in the trap."
+	::= { eriRouterDhcpIntfThresholdEntry 8 }
+
+eriRouterDhcpIntfThresholdRisingThreshold OBJECT-TYPE
+	SYNTAX       Unsigned32 (0..196608)
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"The rising threshold is a value which specifies
+		that any enabled rising threshold events are to be
+		generated when the value of the currently available
+		leases reaches the rising threshold value via
+		a returning of a lease to the pool.
+
+                The number of available leases is reported in
+		eriRouterDhcpIntfThresholdAvailable.  A rising threshold event
+		is either a notification or a log message or both.
+		Rising threshold events are enabled if either or
+		both of eriRouterDhcpIntfThresholdRisingSendTrap and
+		eriRouterDhcpIntfThresholdRisingLogMessage are true.
+
+		Note, this is a rising threshold, so a rising threshold
+		event will only be triggered on a transition of the value of
+		eriRouterDhcpIntfThresholdAvailable increasing from
+		(eriRouterDhcpIntfThresholdRisingThreshold-1) to
+		eriRouterDhcpIntfThresholdRisingThreshold."
+	::= { eriRouterDhcpIntfThresholdEntry 9 }
+
+eriRouterDhcpIntfThresholdRisingSendTrap OBJECT-TYPE
+	SYNTAX       TruthValue
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"If true, upon detection of reaching a rising threshold,
+		a trap will be sent.  See the definition of the
+		eriRouterDhcpIntfThresholdRisingThresholdMet notification for the
+		information included in the trap."
+	::= { eriRouterDhcpIntfThresholdEntry 10 }
+
+eriRouterDhcpIntfThresholdRisingLogMessage OBJECT-TYPE
+	SYNTAX       TruthValue
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"If true, upon detection of reaching a rising threshold,
+		a message will be logged.  See the definition of the
+		eriRouterDhcpIntfThresholdRisingThresholdMet notification for the
+		information included in the trap."
+	::= { eriRouterDhcpIntfThresholdEntry 11 }
+
+
+eriRouterDhcpRangeThresholdTable OBJECT-TYPE
+	SYNTAX       SEQUENCE OF EriRouterDhcpRangeThresholdEntry
+	MAX-ACCESS   not-accessible
+	STATUS       current
+	DESCRIPTION
+		"The purpose of this table is to allow monitoring of
+		DHCP server ranges within interfaces.
+
+		This table contains the objects which characterize DHCP
+		server ranges.  Each row in the table corresponds to
+		information about the leases in a DHCP server for a
+		particular range within a particular interface and the
+		corresponding capacity, usage and falling and rising
+		thresholds.
+
+		Objects defined in this table are only accessible within the
+		context identified in the SNMP protocol (i.e. the community
+		string in v1/v2c or the contextName in v3)."
+	::= { eriRouterDhcpMIBObjects 3 }
+
+eriRouterDhcpRangeThresholdEntry OBJECT-TYPE
+	SYNTAX       EriRouterDhcpRangeThresholdEntry
+	MAX-ACCESS   not-accessible
+	STATUS       current
+	DESCRIPTION
+		"A conceptual row in the eriRouterDhcpRangeThresholdTable."
+	INDEX {
+		eriRouterDhcpRangeThresholdInterfaceIdx,
+		eriRouterDhcpRangeThresholdAddr
+	}
+	::= { eriRouterDhcpRangeThresholdTable 1 }
+
+EriRouterDhcpRangeThresholdEntry ::=
+	SEQUENCE {
+		eriRouterDhcpRangeThresholdInterfaceIdx	Unsigned32,
+		eriRouterDhcpRangeThresholdAddr		IpAddress,
+		eriRouterDhcpRangeThresholdEndAddr		IpAddress,
+		eriRouterDhcpRangeThresholdContextName	SnmpAdminString,
+		eriRouterDhcpRangeThresholdInterfaceName	SnmpAdminString,
+		eriRouterDhcpRangeThresholdSize		Unsigned32,
+		eriRouterDhcpRangeThresholdAvailable		Unsigned32,
+		eriRouterDhcpRangeThresholdInuse		Unsigned32,
+		eriRouterDhcpRangeThresholdFallingThreshold	Unsigned32,
+		eriRouterDhcpRangeThresholdFallingSendTrap	TruthValue,
+		eriRouterDhcpRangeThresholdFallingLogMessage	TruthValue,
+		eriRouterDhcpRangeThresholdRisingThreshold	Unsigned32,
+		eriRouterDhcpRangeThresholdRisingSendTrap	TruthValue,
+		eriRouterDhcpRangeThresholdRisingLogMessage	TruthValue
+	}
+
+eriRouterDhcpRangeThresholdInterfaceIdx OBJECT-TYPE
+	SYNTAX       Unsigned32
+	MAX-ACCESS   not-accessible
+	STATUS       current
+	DESCRIPTION
+		"The index of the interface containing the DHCP range."
+	::= { eriRouterDhcpRangeThresholdEntry 1 }
+
+eriRouterDhcpRangeThresholdAddr OBJECT-TYPE
+	SYNTAX       IpAddress
+	MAX-ACCESS   not-accessible
+	STATUS       current
+	DESCRIPTION
+		"The start address of the DHCP range."
+	::= { eriRouterDhcpRangeThresholdEntry 2 }
+
+eriRouterDhcpRangeThresholdEndAddr OBJECT-TYPE
+	SYNTAX       IpAddress
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"The end address of the DHCP range."
+	::= { eriRouterDhcpRangeThresholdEntry 3 }
+
+eriRouterDhcpRangeThresholdContextName OBJECT-TYPE
+        SYNTAX      SnmpAdminString  (SIZE (0..63))
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The name of the context which contains the interface."
+	::= { eriRouterDhcpRangeThresholdEntry 4 }
+
+eriRouterDhcpRangeThresholdInterfaceName OBJECT-TYPE
+	SYNTAX       SnmpAdminString (SIZE (1..80))
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"The name of the interface containing the DHCP range."
+	::= { eriRouterDhcpRangeThresholdEntry 5 }
+
+eriRouterDhcpRangeThresholdSize OBJECT-TYPE
+	SYNTAX       Unsigned32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"The number of leases that have been reserved for the
+		DHCP server in this range."
+	::= { eriRouterDhcpRangeThresholdEntry 6 }
+
+eriRouterDhcpRangeThresholdAvailable OBJECT-TYPE
+	SYNTAX       Unsigned32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"The number of leases that are available in this range."
+	::= { eriRouterDhcpRangeThresholdEntry 7 }
+
+eriRouterDhcpRangeThresholdInuse OBJECT-TYPE
+	SYNTAX       Unsigned32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"The number of leases that are in use in this range."
+	::= { eriRouterDhcpRangeThresholdEntry 8 }
+
+eriRouterDhcpRangeThresholdFallingThreshold OBJECT-TYPE
+	SYNTAX       Unsigned32 (0..196608)
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"The falling threshold is a value which specifies
+		that any enabled falling threshold events are to
+		be generated when the value of the currently available
+		leases drops to the falling threshold value via an
+		allocation of a lease from the range.
+
+		The number of available leases is reported in
+		eriRouterDhcpRangeThresholdAvailable.  A falling threshold event
+		is either a notification or a log message or both.
+		Falling threshold events are enabled if either or
+		both of eriRouterDhcpRangeThresholdFallingSendTrap and
+		eriRouterDhcpRangeThresholdFallingLogMessage are true.
+
+		Note, this is a falling threshold, so a falling threshold
+		event will only be triggered on a transition of the value of
+		eriRouterDhcpRangeThresholdAvailable dropping from
+		(eriRouterDhcpRangeThresholdFallingThreshold+1) to
+		eriRouterDhcpRangeThresholdFallingThreshold."
+	::= { eriRouterDhcpRangeThresholdEntry 9 }
+
+eriRouterDhcpRangeThresholdFallingSendTrap OBJECT-TYPE
+	SYNTAX       TruthValue
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"If true, upon detection of reaching a falling threshold,
+		a trap will be sent.  See the definition of the
+		eriRouterDhcpRangeThresholdFallingThresholdMet notification for the
+		information included in the trap."
+	::= { eriRouterDhcpRangeThresholdEntry 10 }
+
+eriRouterDhcpRangeThresholdFallingLogMessage OBJECT-TYPE
+	SYNTAX       TruthValue
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"If true, upon detection of reaching a falling threshold,
+		a message will be logged.  See the definition of the
+		eriRouterDhcpRangeThresholdFallingThresholdMet notification for the
+		information included in the trap."
+	::= { eriRouterDhcpRangeThresholdEntry 11 }
+
+eriRouterDhcpRangeThresholdRisingThreshold OBJECT-TYPE
+	SYNTAX       Unsigned32 (0..196608)
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"The rising threshold is a value which specifies
+		that any enabled rising threshold events are to be
+		generated when the value of the currently available
+		leases reaches the rising threshold value via
+		a returning of a lease to the range.
+
+                The number of available leases is reported in
+		eriRouterDhcpRangeThresholdAvailable.  A rising threshold event
+		is either a notification or a log message or both.
+		Rising threshold events are enabled if either or
+		both of eriRouterDhcpRangeThresholdRisingSendTrap and
+		eriRouterDhcpRangeThresholdRisingLogMessage are true.
+
+		Note, this is a rising threshold, so a rising threshold
+		event will only be triggered on a transition of the value of
+		eriRouterDhcpRangeThresholdAvailable increasing from
+		(eriRouterDhcpRangeThresholdRisingThreshold-1) to
+		eriRouterDhcpRangeThresholdRisingThreshold."
+	::= { eriRouterDhcpRangeThresholdEntry 12 }
+
+eriRouterDhcpRangeThresholdRisingSendTrap OBJECT-TYPE
+	SYNTAX       TruthValue
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"If true, upon detection of reaching a rising threshold,
+		a trap will be sent.  See the definition of the
+		eriRouterDhcpRangeThresholdRisingThresholdMet notification for the
+		information included in the trap."
+	::= { eriRouterDhcpRangeThresholdEntry 13 }
+
+eriRouterDhcpRangeThresholdRisingLogMessage OBJECT-TYPE
+	SYNTAX       TruthValue
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"If true, upon detection of reaching a rising threshold,
+		a message will be logged.  See the definition of the
+		eriRouterDhcpRangeThresholdRisingThresholdMet notification for the
+		information included in the trap."
+	::= { eriRouterDhcpRangeThresholdEntry 14 }
+
+
+--
+-- DHCP Threshold per context objects
+--
+
+eriRouterDhcpCtxThreshold	OBJECT IDENTIFIER ::= { eriRouterDhcpMIBObjects 2 }
+
+eriRouterDhcpCtxThresholdName OBJECT-TYPE
+	SYNTAX       SnmpAdminString (SIZE (0..63))
+	MAX-ACCESS   accessible-for-notify
+	STATUS       current
+	DESCRIPTION
+		"This object identifies the context in which a falling
+		or rising per context threshold event occurs"
+	::= { eriRouterDhcpCtxThreshold 1 }
+
+eriRouterDhcpCtxThresholdSize OBJECT-TYPE
+	SYNTAX       Unsigned32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"The total number of leases in all DHCP ranges of all
+		 interfaces in the context valid in the current view."
+	::= { eriRouterDhcpCtxThreshold 2 }
+
+eriRouterDhcpCtxThresholdAvailable OBJECT-TYPE
+	SYNTAX       Unsigned32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"The total number of leases available in all DHCP ranges of
+		 all interfaces in the context valid in the current view."
+	::= { eriRouterDhcpCtxThreshold 3 }
+
+eriRouterDhcpCtxThresholdInuse OBJECT-TYPE
+	SYNTAX       Unsigned32
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"The total number of leases in use in all DHCP ranges of
+		 all interfaces in the context valid in the current view."
+	::= { eriRouterDhcpCtxThreshold 4 }
+
+eriRouterDhcpCtxThresholdFallingThreshold OBJECT-TYPE
+	SYNTAX       Unsigned32 (0..196608)
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"The falling threshold value for the context valid in the
+		current view.  Just as eriRouterDhcpIntfThresholdFallingThreshold
+		is the per interface falling threshold, this object
+		is the per context falling threshold.
+
+		When the sum of the all available DHCP leases in all
+		interfaces of the context valid in the current view reaches
+		the value of this object a falling threshold action of a
+		trap, a log message, or both will be generated.
+
+		This is a falling threshold, so the evaluation of whether
+		to perform the action occurs upon allocation of a lease from
+		the available pool of leases from any interface within
+		the context.
+
+		The action of whether to send a trap and/or log message
+		is specified by the values of
+		eriRouterDhcpCtxThresholdFallingSendTrap and
+		eriRouterDhcpCtxThresholdFallingLogMessage.
+
+		If there is no per context rising threshold, the value of
+		this object will be zero and the values of
+		eriRouterDhcpCtxThresholdFallingSendTrap and
+		eriRouterDhcpCtxThresholdFallingLogMessage will be false."
+	::= { eriRouterDhcpCtxThreshold 5 }
+
+eriRouterDhcpCtxThresholdFallingSendTrap OBJECT-TYPE
+	SYNTAX       TruthValue
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"If true, upon detection of reaching the per context falling
+		threshold, a trap will be sent.  See the definition of the
+		eriRouterDhcpCtxThresholdFallingThresholdMet for the information
+		included in the trap."
+	::= { eriRouterDhcpCtxThreshold 6 }
+
+eriRouterDhcpCtxThresholdFallingLogMessage OBJECT-TYPE
+	SYNTAX       TruthValue
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"If true, upon detection of reaching the per context falling
+		threshold, a message will be logged.  The information contained
+		in the message logged is the same as that included in the
+		eriRouterDhcpCtxThresholdFallingThresholdMet trap."
+	::= { eriRouterDhcpCtxThreshold 7 }
+
+eriRouterDhcpCtxThresholdRisingThreshold OBJECT-TYPE
+	SYNTAX       Unsigned32 (0..196608)
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"The rising threshold value for the context valid in the
+		current view.  Just as eriRouterDhcpIntfThresholdRisingThreshold
+		is the per interface rising threshold, this object
+		is the per context rising threshold.
+
+		When the sum of the all available DHCP leases in all
+		interfaces of the context valid in the current view reaches
+		the value of this object a rising threshold action of a
+		trap, a log message, or both will be generated.
+
+		This is a rising threshold, so the evaluation of whether
+		to perform the action occurs upon return of a lease to
+		the available pool of leases defined in any interface within
+		the context.
+
+		The action of whether to send a trap and/or log message
+		is specified by the values of
+		eriRouterDhcpCtxThresholdRisingSendTrap and
+		eriRouterDhcpCtxThresholdRisingLogMessage.
+
+		If there is no per context rising threshold, the value of
+		this object will be zero and the values of
+		eriRouterDhcpCtxThresholdRisingSendTrap and
+		eriRouterDhcpCtxThresholdRisingLogMessage will be false."
+	::= { eriRouterDhcpCtxThreshold 8 }
+
+eriRouterDhcpCtxThresholdRisingSendTrap OBJECT-TYPE
+	SYNTAX       TruthValue
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"If true, upon detection of reaching the per context rising
+		threshold, a trap will be sent.  See the definition of the
+		eriRouterDhcpCtxThresholdRisingThresholdMet for the information
+		included in the trap."
+	::= { eriRouterDhcpCtxThreshold 9 }
+
+eriRouterDhcpCtxThresholdRisingLogMessage OBJECT-TYPE
+	SYNTAX       TruthValue
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"If true, upon detection of reaching the per context rising
+		threshold, a message will be logged.  The information contained
+		in the message logged is the same as that included in the
+		eriRouterDhcpCtxThresholdRisingThresholdMet trap."
+	::= { eriRouterDhcpCtxThreshold 10 }
+
+--
+-- Definition of notifications.
+--
+eriRouterDhcpLeaseFileStorageSlot OBJECT-TYPE
+         SYNTAX       EriRouterSlot 
+         MAX-ACCESS   accessible-for-notify
+         STATUS       current
+         DESCRIPTION
+                 "The slot number of the storage device containing
+                 the DHCP lease file."
+         ::= { eriRouterDhcpMIBObjects 4 }
+
+eriRouterDhcpLeaseFileErrorType OBJECT-TYPE
+         SYNTAX       INTEGER {
+                storageDeviceDegraded (1),
+                storageDeviceFailed   (2)
+         }
+         MAX-ACCESS   accessible-for-notify
+         STATUS       current
+         DESCRIPTION
+                 "Error types of DHCP lease file failure."
+         ::= { eriRouterDhcpMIBObjects 5 }
+
+eriRouterDhcpIntfThresholdFallingThresholdMet NOTIFICATION-TYPE
+	OBJECTS {
+		eriRouterDhcpIntfThresholdContextName,
+		eriRouterDhcpIntfThresholdAvailable,
+		eriRouterDhcpIntfThresholdFallingThreshold
+	}
+	STATUS	current
+	DESCRIPTION
+		"A notification indicating that a per interface falling
+		threshold has been reached."
+	::= { eriRouterDhcpMIBNotifications 1 }
+
+eriRouterDhcpIntfThresholdRisingThresholdMet NOTIFICATION-TYPE
+	OBJECTS {
+		eriRouterDhcpIntfThresholdContextName,
+		eriRouterDhcpIntfThresholdAvailable,
+		eriRouterDhcpIntfThresholdRisingThreshold
+	}
+	STATUS	current
+	DESCRIPTION
+		"A notification indicating that a per interface rising
+		threshold has been reached."
+	::= { eriRouterDhcpMIBNotifications 2 }
+
+eriRouterDhcpCtxThresholdFallingThresholdMet NOTIFICATION-TYPE
+	OBJECTS {
+		eriRouterDhcpCtxThresholdName,
+		eriRouterDhcpCtxThresholdAvailable,
+		eriRouterDhcpCtxThresholdFallingThreshold
+	}
+	STATUS	current
+	DESCRIPTION
+		"A notification indicating that the per context falling
+		threshold has been reached."
+	::= { eriRouterDhcpMIBNotifications 3 }
+
+eriRouterDhcpCtxThresholdRisingThresholdMet NOTIFICATION-TYPE
+	OBJECTS {
+		eriRouterDhcpCtxThresholdName,
+		eriRouterDhcpCtxThresholdAvailable,
+		eriRouterDhcpCtxThresholdRisingThreshold
+	}
+	STATUS	current
+	DESCRIPTION
+		"A notification indicating that the per context rising
+		threshold has been reached."
+	::= { eriRouterDhcpMIBNotifications 4 }
+
+eriRouterDhcpRangeThresholdFallingThresholdMet NOTIFICATION-TYPE
+	OBJECTS {
+		eriRouterDhcpRangeThresholdContextName,
+		eriRouterDhcpRangeThresholdInterfaceName,
+		eriRouterDhcpRangeThresholdEndAddr,
+		eriRouterDhcpRangeThresholdAvailable,
+		eriRouterDhcpRangeThresholdFallingThreshold
+	}
+	STATUS	current
+	DESCRIPTION
+		"A notification indicating that a per subnet falling
+		threshold has been reached."
+	::= { eriRouterDhcpMIBNotifications 5 }
+
+eriRouterDhcpRangeThresholdRisingThresholdMet NOTIFICATION-TYPE
+	OBJECTS {
+		eriRouterDhcpRangeThresholdContextName,
+		eriRouterDhcpRangeThresholdInterfaceName,
+		eriRouterDhcpRangeThresholdEndAddr,
+		eriRouterDhcpRangeThresholdAvailable,
+		eriRouterDhcpRangeThresholdRisingThreshold
+	}
+	STATUS	current
+	DESCRIPTION
+		"A notification indicating that a per subnet rising
+		threshold has been reached."
+	::= { eriRouterDhcpMIBNotifications 6 }
+
+eriRouterDhcpLeaseFileFailure NOTIFICATION-TYPE
+        OBJECTS {
+                eriRouterDhcpLeaseFileStorageSlot,
+                eriRouterDhcpLeaseFileErrorType
+        }
+        STATUS  current
+        DESCRIPTION
+                "A notification indicating that the system has stopped 
+                reading/updating the DHCP lease file."
+        ::= { eriRouterDhcpMIBNotifications 7 }
+
+--
+-- Compliance statements.
+--
+
+eriRouterDhcpCompliances OBJECT IDENTIFIER ::= { eriRouterDhcpMIBConformance 1 }
+eriRouterDhcpGroups      OBJECT IDENTIFIER ::= { eriRouterDhcpMIBConformance 2 }
+
+eriRouterDhcpThresholdGroup	OBJECT-GROUP
+	OBJECTS {
+		eriRouterDhcpIntfThresholdContextName,
+		eriRouterDhcpIntfThresholdSize,
+		eriRouterDhcpIntfThresholdInuse,
+		eriRouterDhcpIntfThresholdAvailable,
+		eriRouterDhcpIntfThresholdFallingThreshold,
+		eriRouterDhcpIntfThresholdFallingSendTrap,
+		eriRouterDhcpIntfThresholdFallingLogMessage,
+		eriRouterDhcpIntfThresholdRisingThreshold,
+		eriRouterDhcpIntfThresholdRisingSendTrap,
+		eriRouterDhcpIntfThresholdRisingLogMessage,
+		eriRouterDhcpCtxThresholdName,
+		eriRouterDhcpCtxThresholdSize,
+		eriRouterDhcpCtxThresholdAvailable,
+		eriRouterDhcpCtxThresholdInuse,
+		eriRouterDhcpCtxThresholdFallingThreshold,
+		eriRouterDhcpCtxThresholdFallingSendTrap,
+		eriRouterDhcpCtxThresholdFallingLogMessage,
+		eriRouterDhcpCtxThresholdRisingThreshold,
+		eriRouterDhcpCtxThresholdRisingSendTrap,
+		eriRouterDhcpCtxThresholdRisingLogMessage
+	}
+	STATUS	current
+	DESCRIPTION
+		"The collection of objects providing DHCP range information."
+	::= { eriRouterDhcpGroups 1 }
+
+eriRouterDhcpThresholdNotifyGroup NOTIFICATION-GROUP
+	NOTIFICATIONS {
+		eriRouterDhcpIntfThresholdFallingThresholdMet,
+		eriRouterDhcpIntfThresholdRisingThresholdMet,
+		eriRouterDhcpCtxThresholdFallingThresholdMet,
+		eriRouterDhcpCtxThresholdRisingThresholdMet
+	}
+	STATUS	current
+	DESCRIPTION
+        	"The collection of notifications related to a DHCP range."
+	::= { eriRouterDhcpGroups 2 }
+
+eriRouterDhcpIntfThresholdGroup	OBJECT-GROUP
+	OBJECTS {
+		eriRouterDhcpIntfThresholdSize,
+		eriRouterDhcpIntfThresholdInuse,
+		eriRouterDhcpIntfThresholdAvailable,
+		eriRouterDhcpIntfThresholdFallingThreshold,
+		eriRouterDhcpIntfThresholdFallingSendTrap,
+		eriRouterDhcpIntfThresholdFallingLogMessage,
+		eriRouterDhcpIntfThresholdRisingThreshold,
+		eriRouterDhcpIntfThresholdRisingSendTrap,
+		eriRouterDhcpIntfThresholdRisingLogMessage
+	}
+	STATUS	current
+	DESCRIPTION
+		"The collection of objects providing DHCP range information."
+	::= { eriRouterDhcpGroups 3 }
+
+eriRouterDhcpCtxThresholdGroup	OBJECT-GROUP
+	OBJECTS {
+		eriRouterDhcpCtxThresholdName,
+		eriRouterDhcpCtxThresholdSize,
+		eriRouterDhcpCtxThresholdAvailable,
+		eriRouterDhcpCtxThresholdInuse,
+		eriRouterDhcpCtxThresholdFallingThreshold,
+		eriRouterDhcpCtxThresholdFallingSendTrap,
+		eriRouterDhcpCtxThresholdFallingLogMessage,
+		eriRouterDhcpCtxThresholdRisingThreshold,
+		eriRouterDhcpCtxThresholdRisingSendTrap,
+		eriRouterDhcpCtxThresholdRisingLogMessage
+	}
+	STATUS	current
+	DESCRIPTION
+		"The collection of objects providing DHCP range information."
+	::= { eriRouterDhcpGroups 4 }
+
+eriRouterDhcpRangeThresholdGroup	OBJECT-GROUP
+	OBJECTS {
+		eriRouterDhcpRangeThresholdEndAddr,
+		eriRouterDhcpRangeThresholdContextName,
+		eriRouterDhcpRangeThresholdInterfaceName,
+		eriRouterDhcpRangeThresholdSize,
+		eriRouterDhcpRangeThresholdInuse,
+		eriRouterDhcpRangeThresholdAvailable,
+		eriRouterDhcpRangeThresholdFallingThreshold,
+		eriRouterDhcpRangeThresholdFallingSendTrap,
+		eriRouterDhcpRangeThresholdFallingLogMessage,
+		eriRouterDhcpRangeThresholdRisingThreshold,
+		eriRouterDhcpRangeThresholdRisingSendTrap,
+		eriRouterDhcpRangeThresholdRisingLogMessage
+	}
+	STATUS	current
+	DESCRIPTION
+		"The collection of objects providing DHCP range information."
+	::= { eriRouterDhcpGroups 5 }
+
+eriRouterDhcpIntfThresholdNotifyGroup NOTIFICATION-GROUP
+	NOTIFICATIONS {
+		eriRouterDhcpIntfThresholdFallingThresholdMet,
+		eriRouterDhcpIntfThresholdRisingThresholdMet
+	}
+	STATUS	current
+	DESCRIPTION
+        	"The collection of notifications related to a DHCP range."
+	::= { eriRouterDhcpGroups 6 }
+
+eriRouterDhcpCtxThresholdNotifyGroup NOTIFICATION-GROUP
+	NOTIFICATIONS {
+		eriRouterDhcpCtxThresholdFallingThresholdMet,
+		eriRouterDhcpCtxThresholdRisingThresholdMet
+	}
+	STATUS	current
+	DESCRIPTION
+        	"The collection of notifications related to a DHCP range."
+	::= { eriRouterDhcpGroups 7 }
+
+eriRouterDhcpRangeThresholdNotifyGroup NOTIFICATION-GROUP
+	NOTIFICATIONS {
+		eriRouterDhcpRangeThresholdFallingThresholdMet,
+		eriRouterDhcpRangeThresholdRisingThresholdMet
+	}
+	STATUS	current
+	DESCRIPTION
+        	"The collection of notifications related to a DHCP range."
+	::= { eriRouterDhcpGroups 8 }
+
+eriRouterDhcpLeaseFileFailureTrapGroup OBJECT-GROUP
+        OBJECTS {
+                eriRouterDhcpLeaseFileStorageSlot,
+                eriRouterDhcpLeaseFileErrorType
+        }
+        STATUS  current
+        DESCRIPTION
+                "The collection of objects related to DHCP lease
+                file failures."
+        ::= { eriRouterDhcpGroups 9 }
+
+eriRouterDhcpLeaseFileFailureNotifyGroup NOTIFICATION-GROUP
+        NOTIFICATIONS {
+                eriRouterDhcpLeaseFileFailure
+        }
+        STATUS  current
+        DESCRIPTION
+                "The collection of notifications related to DHCP lease
+                file failures."
+        ::= { eriRouterDhcpGroups 10 }
+
+eriRouterDhcpThresholdCompliance MODULE-COMPLIANCE
+	STATUS       current
+	DESCRIPTION
+		"The compliance statement for threshold objects in this
+		DHCP MIB."
+	MODULE      -- this module
+	MANDATORY-GROUPS {
+		eriRouterDhcpThresholdGroup,
+		eriRouterDhcpThresholdNotifyGroup
+	}
+	::= { eriRouterDhcpCompliances 1 }
+
+eriRouterDhcpThresholdCompliance2 MODULE-COMPLIANCE
+	STATUS       deprecated 
+	DESCRIPTION
+		"The compliance statement for threshold objects in this
+		DHCP MIB."
+	MODULE      -- this module
+	MANDATORY-GROUPS {
+		eriRouterDhcpIntfThresholdGroup,
+		eriRouterDhcpCtxThresholdGroup,
+		eriRouterDhcpRangeThresholdGroup,
+		eriRouterDhcpIntfThresholdNotifyGroup,
+		eriRouterDhcpCtxThresholdNotifyGroup,
+		eriRouterDhcpRangeThresholdNotifyGroup
+	}
+	::= { eriRouterDhcpCompliances 2 }
+
+eriRouterDhcpThresholdCompliance3 MODULE-COMPLIANCE
+        STATUS       current
+        DESCRIPTION
+                "The compliance statement for threshold objects in this
+                DHCP MIB."
+        MODULE      -- this module
+        MANDATORY-GROUPS {
+                eriRouterDhcpIntfThresholdGroup,
+                eriRouterDhcpCtxThresholdGroup,
+                eriRouterDhcpRangeThresholdGroup,
+                eriRouterDhcpIntfThresholdNotifyGroup,
+                eriRouterDhcpCtxThresholdNotifyGroup,
+                eriRouterDhcpRangeThresholdNotifyGroup,
+                eriRouterDhcpLeaseFileFailureTrapGroup,
+                eriRouterDhcpLeaseFileFailureNotifyGroup
+        }
+        ::= { eriRouterDhcpCompliances 3 }
+
+END
