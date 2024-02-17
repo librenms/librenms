@@ -7,6 +7,7 @@ mib_dir: ericsson
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_storage, text: 'Device Storage' }
 discovery:
     -
         sysObjectID:
