@@ -1,0 +1,1448 @@
+-- *****************************************************************
+-- ERICSSON-ROUTER-L2VPN-MIB    The ERICSSON-ROUTER Layer 2 VPN /PW Information MIB
+--
+-- Copyright (c) 2005-2011, 2015 Ericsson AB
+-- All rights reserved.
+-- 
+-- *****************************************************************
+
+ERICSSON-ROUTER-L2VPN-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,  Unsigned32, IpAddress, Integer32,
+    NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+    TEXTUAL-CONVENTION, TruthValue
+        FROM SNMPv2-TC
+    EriRouterCircuitHandle
+        FROM ERICSSON-ROUTER-TC
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB
+    InterfaceIndexOrZero
+        FROM IF-MIB
+    eriRouterMgmt
+        FROM ERICSSON-ROUTER-SMI
+    InetAddressType, InetAddress, InetPortNumber 
+        FROM INET-ADDRESS-MIB;
+
+eriRouterL2VpnMIB MODULE-IDENTITY
+    LAST-UPDATED    "201501141800Z" -- Jan 14, 2015
+    ORGANIZATION    "Ericsson AB"
+    CONTACT-INFO
+                "       Ericsson AB.
+                Postal: 100 Headquarters Dr
+                        San Jose, CA  95134
+                        USA
+
+                 Phone: +1 408 750 5000
+                 Fax:   +1 408 750 5599"
+    DESCRIPTION
+                "This management information base displays Layer 2
+                Virtual Private Networks(VPN) / Pesudowires(PWs) information."
+
+    REVISION        "201501141800Z" -- Jan 14, 2015
+    DESCRIPTION
+                "Updated RBN/rbn/Rbn as ERICSSON-ROUTER/eriRouter/EriRouter
+                 to migrate RBN MIB to ERICSSON MIB."
+
+    REVISION        "201011160000Z" -- Nov 16, 2010
+    DESCRIPTION
+                "The key changes made to this MIB module are as follows: 
+
+                (1) Added eriRouterUdpL2VpnStaticTable.
+                (2) Added eriRouterUdpL2VpnStaticTable compliance information:
+                    eriRouterUdpL2VpnPwMIBCompliance,
+                    eriRouterUdpL2VpnStaticPwGroup.
+                (3) Added EriRouterVpnPsnType.
+                (4) Added encapError(23) in EriRouterVpnPwFlagsType.
+                (5) Changed eriRouterMplsL2VpnMIBGroups and 
+                    eriRouterMplsL2VpnMIBCompliances status to current."
+
+    REVISION        "201101191800Z" -- Jan 19, 2011
+    DESCRIPTION
+            "Update CONTACT-INFO & ORGANIZATION. "
+
+    REVISION        "201004010000Z" -- April 1, 2010
+    DESCRIPTION
+                "This version is to support PW and PW state change 
+                notifications. The key changes made to this MIB module 
+                are as follows:
+                (1) Updated ORGANIZATION/CONTACT-INFO
+                (2) Obsolete all MIB objects under eriRouterL2VpnMIBObjects
+                    and eriRouterL2VpnMIBConformance.
+                (3) Deprecated 
+                    eriRouterMplsL2VpnStaticXcFlags
+                    eriRouterMplsL2VpnLdpXcCctUp, 
+                    eriRouterMplsL2VpnLdpXcFlags 
+                (4) Added EriRouterVpnPwFlagsType, and EriRouterVpnPwStateType 
+                    TEXTUAL-CONVENTIONs.
+                (5) Added new objects 
+                    eriRouterMplsL2VpnStaticPwFlags, 
+                    eriRouterMplsL2VpnStaticPwState,
+                    eriRouterMplsL2VpnLdpPwFlags, 
+                    eriRouterMplsL2VpnLdpPwState
+                    to indicate L2VPN pseduowire flags and states.
+                (6) Added eriRouterMplsL2VpnLdpPwStateChange notification.
+                (7) Added PW compliance and object groups:
+                    eriRouterMplsL2VpnPwMIBCompliance,
+                    eriRouterMplsL2VpnPwScalarGroup,
+                    eriRouterMplsL2VpnStaticPwGroup,
+                    eriRouterMplsL2VpnLdpPwGroup. "
+
+    REVISION        "200906020000Z" -- June 2, 2009
+    DESCRIPTION
+                "Updated EriRouterVpnXcFlagsType TC.
+                 (1) Deprecated ismUp(12)
+                 (2) Added 
+                   primary(17), backup(18), primaryAutoRevert(19),
+                   standby(20), cwMismatch(21), sigParamsMatch(22)
+
+                 Updated the description of both eriRouterMplsL2VpnLdpXcCctUp and
+                 eriRouterMplsL2VpnLdpInputCctUp"
+
+    REVISION	    "200810130000Z" -- Oct. 13, 2008
+    DESCRIPTION
+                "This version is to redefine L2Vpn Static and LDP tables
+                 for indexing consistency with an MPLS L2VPN implementation
+                 on a device.
+
+                 The key changes made to this MIB module are as follows.
+
+                (1) Deprecated all MIB objects under eriRouterL2VpnMIBObjects.
+
+                (2) Added eriRouterMplsL2VpnMIBObjects.
+        
+                (3) Redefined objects corresponding to deprecated objects 
+                    under eriRouterL2VpnMIBObjects.
+
+                (4) Deprecated all MIB objects under eriRouterL2VpnMIBConformance
+        
+                (5) Added eriRouterMplsL2VpnMIBConformance.
+                 
+                (6) Redefined objects corresponding to deprecated objects
+                    under eriRouterMplsL2VpnMIBConformance.
+
+                (7) Changed VPN virtual circuit id (eriRouterMplsL2VpnLdpVcId) SYNTAX 
+                    to Unsigned32 (0..4294967295).
+                "
+
+    REVISION        "200510010000Z" -- Oct. 1, 2005
+    DESCRIPTION
+                "Initial version."
+
+    ::= { eriRouterMgmt 39 }
+
+--
+--      Textual Conventions
+--
+
+EriRouterVpnVcType ::= TEXTUAL-CONVENTION
+        STATUS    current
+        DESCRIPTION
+            "Layer 2 VPN VC types."
+        SYNTAX  INTEGER {
+                unknown(0),
+                frame(1),
+                aal5(2),
+                atmTransCell(3),
+                vlan(4),
+                ethernet(5),
+                hdlc(6),
+                ppp(7),
+                cem(8),
+                atmVccCell(9),
+                atmVpcCell(10)
+                }
+
+EriRouterVpnXcFlagsType ::= TEXTUAL-CONVENTION
+        STATUS    current
+        DESCRIPTION
+            "Layer 2 VPN Cross connect flag values."
+        SYNTAX  BITS {
+                none(0),           -- no flags set
+                inRib(1),          -- This VPN circuit entry is in the RIB
+                deletingSignal(2), -- In the process of deleting a signal
+                deletingConfig(3), -- In the process of deleting the
+                                   -- configuration
+                inLblmap(4),       -- This VPN circuit entry is in the label map
+                updating(5),       -- Presently updating the configuration
+                                   -- information
+                up(6),             -- The VPN circuit is up and running
+                inLdp(7),          -- Setting up the LDP
+                fromLdp(8),        -- Returned from the LDP setup/delete
+                fromConfig(9),     -- Completed the configuration
+                stale(10),         -- XC needs to be deleted but it needs
+                                   -- further circuit cleanup first
+                expSet(11),        -- The exp flags have been set for this
+                                   -- VPN circuit
+                ismUp(12),         -- Obselete
+                peerUp(13),        -- The peer for this VPN circuit is up
+                remoteEncap(14),   -- Indicates that the remote encap has been
+                                   -- set
+                localCbit(15),     -- Indicates that the local cbit control bit
+                                   -- is set
+                remoteCbit(16),    -- Indicates that the remote cbit control bit
+                                   -- is set.
+                primary(17),       -- Indicates the primary XC  
+                backup(18),        -- Indicates the backup XC
+                primaryAutoRevert(19), -- Indicate the auto revert
+                standby(20),        -- Indicates that state of the PWE is
+                                    -- standby
+                cwMismatch(21),     -- Indicates that the case were the Remote
+                                    -- CW bit is set and locally not set
+                sigParamsMatch(22)  -- Indicates that the signaling parameters
+                                    -- are matched and the PW state can be
+                                    -- made up
+                }
+
+EriRouterVpnPwFlagsType ::= TEXTUAL-CONVENTION
+        STATUS    current
+        DESCRIPTION
+            "Layer 2 VPN Pesudowire (PW) flag values."
+        SYNTAX  BITS {
+                none(0),           -- no flags set
+                inRib(1),          -- This VPN circuit entry is in the RIB
+                deletingSignal(2), -- In the process of deleting a signal
+                deletingConfig(3), -- In the process of deleting the
+                                   -- configuration
+                inLblmap(4),       -- This VPN circuit entry is in the label map
+                updating(5),       -- Presently updating the configuration
+                                   -- information
+                up(6),             -- The VPN circuit is up and running
+                inLdp(7),          -- Setting up the LDP
+                fromLdp(8),        -- Returned from the LDP setup/delete
+                fromConfig(9),     -- Completed the configuration
+                stale(10),         -- XC needs to be deleted but it needs
+                                   -- further circuit cleanup first
+                expSet(11),        -- The exp flags have been set for this
+                                   -- VPN circuit
+                ismUp(12),         -- Obselete
+                peerUp(13),        -- The peer for this VPN circuit is up
+                remoteEncap(14),   -- Indicates that the remote encap has been
+                                   -- set
+                localCbit(15),     -- Indicates that the local cbit control bit
+                                   -- is set
+                remoteCbit(16),    -- Indicates that the remote cbit control bit
+                                   -- is set.
+                primary(17),       -- Indicates the primary XC  
+                backup(18),        -- Indicates the backup XC
+                primaryAutoRevert(19), -- Indicate the auto revert
+                standby(20),        -- Indicates that state of the PWE is
+                                    -- standby
+                cwMismatch(21),     -- Indicates that the case were the Remote
+                                    -- CW bit is set and locally not set
+                sigParamsMatch(22), -- Indicates that the signaling parameters
+                                    -- are matched and the PW state can be
+                                    -- made up
+                encapError(23)      -- Indicates that the encap error happens
+                }
+
+EriRouterVpnPwStateType ::= TEXTUAL-CONVENTION
+        STATUS    current
+        DESCRIPTION
+            "Layer 2 VPN Cross connect (XC) state."
+        SYNTAX  INTEGER {
+                unknown (0),
+                up      (1), -- The VPN circuit is up and running (active)
+                down    (2), -- The VPN circuit is down.
+                standby (3)  -- The VPN circuit is in standby state.
+                }
+
+EriRouterVpnPsnType ::= TEXTUAL-CONVENTION
+        STATUS    current
+        DESCRIPTION
+            "Layer 2 VPN packet switched network(PSN) type."
+        SYNTAX  INTEGER {
+                unknown (0),
+                ip      (1),
+                ipsec   (2),
+                mpls    (3)
+                }
+
+-- Top level components of this MIB.
+eriRouterMplsL2VpnMIBNotifications OBJECT IDENTIFIER ::= { eriRouterL2VpnMIB 0 }
+eriRouterL2VpnMIBObjects           OBJECT IDENTIFIER ::= { eriRouterL2VpnMIB 1 }-- obsolete
+eriRouterL2VpnMIBConformance       OBJECT IDENTIFIER ::= { eriRouterL2VpnMIB 2 }-- obsolete
+eriRouterMplsL2VpnMIBObjects       OBJECT IDENTIFIER ::= { eriRouterL2VpnMIB 3 }
+eriRouterMplsL2VpnMIBConformance   OBJECT IDENTIFIER ::= { eriRouterL2VpnMIB 4 }
+eriRouterMplsL2VpnMIBScalars       OBJECT IDENTIFIER ::= { eriRouterL2VpnMIB 5 }     
+eriRouterUdpL2VpnMIBObjects        OBJECT IDENTIFIER ::= { eriRouterL2VpnMIB 6 }
+
+--  Current objects
+
+--
+-- Scalar Objects
+--
+eriRouterMplsL2VpnNotificationEnable OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "If this object is true, then it enables the generation of all
+            notifications defined in this MIB. This object's value should be
+            preserved across agent reboots."
+        REFERENCE
+            "See also [RFC3413] for explanation that notifications are under
+            the ultimate control of the MIB modules in this document."
+        DEFVAL { false }
+        ::= { eriRouterMplsL2VpnMIBScalars 1 }
+
+--      The L2 VPN Static Table
+--
+--      This table contains objects that can be used to
+--      display the information about an L2 VPN.
+
+eriRouterMplsL2VpnStaticTable   OBJECT-TYPE
+        SYNTAX      SEQUENCE OF EriRouterMplsL2VpnStaticEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This table contains objects which identify static Layer 2 VPN
+            circuits. With respect to creation and deletion of entries in this
+            table, rows are created or deleted when the VPN circuit
+            is configured."
+        ::= { eriRouterMplsL2VpnMIBObjects 3 }
+
+eriRouterMplsL2VpnStaticEntry   OBJECT-TYPE
+        SYNTAX      EriRouterMplsL2VpnStaticEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A conceptual row in the eriRouterMplsL2VpnStaticTable."
+        INDEX { eriRouterMplsL2VpnStaticInLabel, eriRouterMplsL2VpnStaticPeerAddr }
+        ::= { eriRouterMplsL2VpnStaticTable 1 }
+
+EriRouterMplsL2VpnStaticEntry ::=
+        SEQUENCE {
+             eriRouterMplsL2VpnStaticInLabel        Unsigned32,
+             eriRouterMplsL2VpnStaticPeerAddr        IpAddress,
+             eriRouterMplsL2VpnStaticCctHandle       EriRouterCircuitHandle,
+             eriRouterMplsL2VpnStaticVpnCctHandle    EriRouterCircuitHandle,
+             eriRouterMplsL2VpnStaticExpBits         Unsigned32,
+             eriRouterMplsL2VpnStaticInputCctUp      TruthValue,
+             eriRouterMplsL2VpnStaticXcFlags         EriRouterVpnXcFlagsType,
+             eriRouterMplsL2VpnStaticIfIndexOrZero   InterfaceIndexOrZero,
+             eriRouterMplsL2VpnStaticPwFlags         EriRouterVpnPwFlagsType,
+             eriRouterMplsL2VpnStaticPwState         EriRouterVpnPwStateType,
+             eriRouterMplsL2VpnStaticVpnLabel         Unsigned32
+             }
+
+eriRouterMplsL2VpnStaticInLabel OBJECT-TYPE
+        SYNTAX      Unsigned32(4096..65535)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This object indicates the value used by the remote connection
+            in order to identify this VPN circuit when communicating with
+            the label manager (Label allocated in the local node)"
+        ::= { eriRouterMplsL2VpnStaticEntry 1 }
+
+
+eriRouterMplsL2VpnStaticPeerAddr OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This object indicates the ip address of the VPN peer."
+        ::= { eriRouterMplsL2VpnStaticEntry 2 }
+
+eriRouterMplsL2VpnStaticCctHandle OBJECT-TYPE
+        SYNTAX      EriRouterCircuitHandle
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object indicates the internal representation of the physical 
+             circuit to which this VPN is connected. A hexadecimal value of 
+             ff ff ff ff ff ff ff ff indicates an invalid circuit."
+        ::= { eriRouterMplsL2VpnStaticEntry 3 }
+
+eriRouterMplsL2VpnStaticVpnCctHandle OBJECT-TYPE
+        SYNTAX      EriRouterCircuitHandle
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object indicates the internal representation of VPN 
+             pseudo circuit."
+        ::= { eriRouterMplsL2VpnStaticEntry 4 }
+        
+eriRouterMplsL2VpnStaticExpBits OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object indicates the number of exp bits configured for this
+             VPN circuit."
+        ::= { eriRouterMplsL2VpnStaticEntry 5 }
+
+eriRouterMplsL2VpnStaticInputCctUp OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            " This object indicates the status of the VPN attachment circuit. 
+            A value of true indicates that the VPN attachment circuit is
+            connected with its remote site. A value of false indicates that
+            the remote site is not presently connected."
+        ::= { eriRouterMplsL2VpnStaticEntry 6 }
+
+eriRouterMplsL2VpnStaticXcFlags OBJECT-TYPE
+        SYNTAX      EriRouterVpnXcFlagsType 
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object indicates more detailed information on the status
+            of the VPN circuit. This object is a bit field so it may contain
+            one or more of these values."
+        ::= { eriRouterMplsL2VpnStaticEntry 7 }
+
+eriRouterMplsL2VpnStaticIfIndexOrZero OBJECT-TYPE
+        SYNTAX      InterfaceIndexOrZero
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object indicates whether there is a corresponding entry in
+            the ifTable. A non-zero value indicates the ifIndex of the entry
+            in the ifTable. A value of zero indicates that there is no entry."
+        ::= { eriRouterMplsL2VpnStaticEntry 8 }
+        
+eriRouterMplsL2VpnStaticPwFlags OBJECT-TYPE
+        SYNTAX      EriRouterVpnPwFlagsType 
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object indicates more detailed information on the status
+            of the VPN circuit. This object is a bit field so it may contain
+            one or more of these values."
+        ::= { eriRouterMplsL2VpnStaticEntry 9 }
+
+eriRouterMplsL2VpnStaticPwState OBJECT-TYPE
+        SYNTAX      EriRouterVpnPwStateType
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object indicates the status of the VPN input circuit.
+            A value of up(1) indicates that the VPN circuit is active i.e.
+            connected with its remote site. A value of down(2) indicates that
+            the remote site is not presently connected. A value of standby(3)
+            indicates the the PW is in pending state to become active(i.e. up)"
+        ::= { eriRouterMplsL2VpnStaticEntry 10 }
+
+eriRouterMplsL2VpnStaticVpnLabel OBJECT-TYPE
+        SYNTAX      Unsigned32 
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object indicates the unique value assigned to a particular
+             static VPN circuit (Label allocated in the remote node)"
+        ::= { eriRouterMplsL2VpnStaticEntry 11 }
+
+
+--      The L2 VPN LDP Table
+--
+--      This table contains objects that can be used to
+--      display the information about an L2 VPN.
+
+eriRouterMplsL2VpnLdpTable OBJECT-TYPE
+       SYNTAX      SEQUENCE OF EriRouterMplsL2VpnLdpEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+           "This table contains objects which identify Layer
+           Distribution Protocol Layer 2 VPN circuits.
+           With respect to creation and deletion of entries in this
+           table, rows are created or deleted when the VPN circuit is 
+           configured."
+       ::= { eriRouterMplsL2VpnMIBObjects 4 }
+
+eriRouterMplsL2VpnLdpEntry OBJECT-TYPE
+       SYNTAX      EriRouterMplsL2VpnLdpEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+           "A conceptual row in the eriRouterMplsL2VpnLdpTable."
+       INDEX { eriRouterMplsL2VpnLdpVcId, eriRouterMplsL2VpnLdpPeerAddr }
+       ::= { eriRouterMplsL2VpnLdpTable 1 }
+
+EriRouterMplsL2VpnLdpEntry ::=
+       SEQUENCE {
+            eriRouterMplsL2VpnLdpVcId            Unsigned32,
+            eriRouterMplsL2VpnLdpPeerAddr        IpAddress,
+            eriRouterMplsL2VpnLdpCctHandle       EriRouterCircuitHandle,
+            eriRouterMplsL2VpnLdpVpnCctHandle    EriRouterCircuitHandle,
+            eriRouterMplsL2VpnLdpInLabel         Unsigned32,
+            eriRouterMplsL2VpnLdpVpnLabel        Unsigned32,
+            eriRouterMplsL2VpnLdpRemGrpId        Unsigned32,
+            eriRouterMplsL2VpnLdpLocEncap        SnmpAdminString,
+            eriRouterMplsL2VpnLdpRemEncap        SnmpAdminString,
+            eriRouterMplsL2VpnLdpLocVcType       EriRouterVpnVcType,
+            eriRouterMplsL2VpnLdpRemVcType       EriRouterVpnVcType,
+            eriRouterMplsL2VpnLdpLocMtu          Unsigned32,
+            eriRouterMplsL2VpnLdpRemMtu          Unsigned32,
+            eriRouterMplsL2VpnLdpXcCctUp         TruthValue,
+            eriRouterMplsL2VpnLdpExpBits         Unsigned32,
+            eriRouterMplsL2VpnLdpInputCctUp      TruthValue,
+            eriRouterMplsL2VpnLdpXcFlags         EriRouterVpnXcFlagsType,
+            eriRouterMplsL2VpnLdpIfIndexOrZero   InterfaceIndexOrZero,
+            eriRouterMplsL2VpnLdpPwFlags         EriRouterVpnPwFlagsType,
+            eriRouterMplsL2VpnLdpPwState         EriRouterVpnPwStateType
+            }
+
+eriRouterMplsL2VpnLdpVcId OBJECT-TYPE
+        SYNTAX      Unsigned32 (0..4294967295)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This object indicates the unique virtual VPN circuit id assigned 
+            to this circuit."
+        ::= { eriRouterMplsL2VpnLdpEntry 1 }
+
+eriRouterMplsL2VpnLdpPeerAddr OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This object indicates the ip address if the VPN peer."
+        ::= { eriRouterMplsL2VpnLdpEntry 2 }
+
+eriRouterMplsL2VpnLdpCctHandle OBJECT-TYPE
+        SYNTAX      EriRouterCircuitHandle
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object indicates the internal representation of the physical
+            circuit to which this VPN is connected. A hexadecimal value of
+            ff ff ff ff ff ff ff ff indicates an invalid circuit."
+        ::= { eriRouterMplsL2VpnLdpEntry 3 }
+
+eriRouterMplsL2VpnLdpVpnCctHandle OBJECT-TYPE
+        SYNTAX      EriRouterCircuitHandle
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object indicates the internal representation of the VPN 
+            pseudo circuit."
+        ::= { eriRouterMplsL2VpnLdpEntry 4 }
+
+eriRouterMplsL2VpnLdpInLabel OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object indicates the value used by the remote connection in
+            order to identify this VPN circuit when communicating with
+            the local manager."
+        ::= { eriRouterMplsL2VpnLdpEntry 5 }
+
+eriRouterMplsL2VpnLdpVpnLabel OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object indicates the value setup in the local configuration
+            to identify this VPN circuit."
+        ::= { eriRouterMplsL2VpnLdpEntry 6 }
+
+eriRouterMplsL2VpnLdpRemGrpId OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object indicates the remote group of which this VPN circuit 
+            is a part."
+        ::= { eriRouterMplsL2VpnLdpEntry 7 }
+
+eriRouterMplsL2VpnLdpLocEncap OBJECT-TYPE
+        SYNTAX      SnmpAdminString (SIZE (0..80))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object indicates the local encaps type associated with 
+            this VPN circuit."
+        ::= { eriRouterMplsL2VpnLdpEntry 8 }
+
+eriRouterMplsL2VpnLdpRemEncap OBJECT-TYPE
+        SYNTAX      SnmpAdminString (SIZE (0..80))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object indicates the remote encaps type associated with 
+            this VPN circuit."
+        ::= { eriRouterMplsL2VpnLdpEntry 9 }
+
+eriRouterMplsL2VpnLdpLocVcType OBJECT-TYPE
+        SYNTAX      EriRouterVpnVcType
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object indicates the type of virtual circuit on the 
+            local system."
+        ::= { eriRouterMplsL2VpnLdpEntry 10 }
+
+eriRouterMplsL2VpnLdpRemVcType OBJECT-TYPE
+        SYNTAX      EriRouterVpnVcType
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object indicates the type of virtual circuit on the 
+            remote system."
+        ::= { eriRouterMplsL2VpnLdpEntry 11 }
+
+eriRouterMplsL2VpnLdpLocMtu OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object indicates the maximum transmission unit of the
+            local VPN circuit."
+        ::= { eriRouterMplsL2VpnLdpEntry 12 }
+
+eriRouterMplsL2VpnLdpRemMtu OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object indicates the maximum transmission unit of the
+            remote connection."
+        ::= { eriRouterMplsL2VpnLdpEntry 13 }
+
+eriRouterMplsL2VpnLdpXcCctUp OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-only
+        STATUS      deprecated
+        DESCRIPTION
+            "This object indicates the status of the VPN cross connect circuit 
+            state. A value of true indicates that the VPN circuit is connected
+            with its remote site and attachment circuit is up 
+            (eriRouterMplsL2VpnLdpInputCctUp is true). A value of false indicates
+            that the remote site is not presently connected, this mean that 
+            either the PSN is not reachable or the attachment circuit is down 
+            or signaling parameters mismatched."
+        ::= { eriRouterMplsL2VpnLdpEntry 14 }
+
+eriRouterMplsL2VpnLdpExpBits OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object indicates the number of exp bits configured for this
+            VPN circuit."
+        ::= { eriRouterMplsL2VpnLdpEntry 15 }
+
+eriRouterMplsL2VpnLdpInputCctUp OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object indicates the status of the VPN attachment circuit. A
+            value of true indicates that the VPN attachment circuit is up. 
+            A value of false indicates the attachment circuit state is down."
+        ::= { eriRouterMplsL2VpnLdpEntry 16 }
+
+eriRouterMplsL2VpnLdpXcFlags OBJECT-TYPE
+        SYNTAX      EriRouterVpnXcFlagsType
+        MAX-ACCESS  read-only
+        STATUS      deprecated
+        DESCRIPTION
+            "This object indicates more detailed information on the status
+            of the VPN circuit. This object is a bit field so it may contain
+            one or more of these values."
+        ::= { eriRouterMplsL2VpnLdpEntry 17 }
+
+eriRouterMplsL2VpnLdpIfIndexOrZero OBJECT-TYPE
+        SYNTAX      InterfaceIndexOrZero
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object indicates whether there is a corresponding entry in
+            the ifTable. A non-zero value indicates the ifIndex of the entry
+            in the ifTable. A value of zero indicates that there is no entry."
+        ::= { eriRouterMplsL2VpnLdpEntry 18 }
+
+eriRouterMplsL2VpnLdpPwFlags OBJECT-TYPE
+        SYNTAX      EriRouterVpnPwFlagsType 
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object indicates more detailed information on the status
+            of the VPN circuit. This object is a bit field so it may contain
+            one or more of these values."
+        ::= { eriRouterMplsL2VpnLdpEntry 19 }
+
+eriRouterMplsL2VpnLdpPwState OBJECT-TYPE
+        SYNTAX      EriRouterVpnPwStateType
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object indicates the status of the VPN input circuit.
+            A value of up(1) indicates that the VPN circuit is active i.e.
+            connected with its remote site. A value of down(2) indicates that
+            the remote site is not presently connected. A value of standby(3)
+            indicates the the PW is in pending state to become active(i.e. up)"
+        ::= { eriRouterMplsL2VpnLdpEntry 20 }
+            
+eriRouterUdpL2VpnStaticTable OBJECT-TYPE
+       SYNTAX      SEQUENCE OF EriRouterUdpL2VpnStaticEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+           "This table contains objects which identify static
+           UDP Layer 2 VPN circuits.
+           With respect to creation and deletion of entries in this
+           table, rows are created or deleted when the VPN circuit is
+           configured."
+       ::= { eriRouterUdpL2VpnMIBObjects 1 }
+
+eriRouterUdpL2VpnStaticEntry OBJECT-TYPE
+       SYNTAX      EriRouterUdpL2VpnStaticEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+            "A conceptual row in the eriRouterUdpL2VpnStaticTable."
+       INDEX { 
+                 eriRouterUdpL2VpnStaticPeerPort,
+                 eriRouterUdpL2VpnStaticPeerAddressType,
+                 eriRouterUdpL2VpnStaticPeerAddress
+             }
+       ::= { eriRouterUdpL2VpnStaticTable 1 }
+
+EriRouterUdpL2VpnStaticEntry ::=
+       SEQUENCE {
+            eriRouterUdpL2VpnStaticPeerPort           InetPortNumber,
+            eriRouterUdpL2VpnStaticPeerAddressType    InetAddressType,
+            eriRouterUdpL2VpnStaticPeerAddress        InetAddress,
+            eriRouterUdpL2VpnStaticSourceAddressType  InetAddressType,
+            eriRouterUdpL2VpnStaticSourceAddress      InetAddress,
+            eriRouterUdpL2VpnStaticSourcePort         InetPortNumber,
+            eriRouterUdpL2vpnStaticAccessCctHandle    EriRouterCircuitHandle,
+            eriRouterUdpL2VpnStaticVpnCctHandle       EriRouterCircuitHandle,
+            eriRouterUdpL2VpnStaticInputCctUp         TruthValue,
+            eriRouterUdpL2VpnStaticIfIndexOrZero      InterfaceIndexOrZero,
+            eriRouterUdpL2VpnStaticPwFlags            EriRouterVpnPwFlagsType,
+            eriRouterUdpL2VpnStaticPwState            EriRouterVpnPwStateType,
+            eriRouterUdpL2vpnStaticDscpCode           INTEGER,
+            eriRouterUdpL2VpnStaticPsnType            EriRouterVpnPsnType
+            }
+
+eriRouterUdpL2VpnStaticPeerPort OBJECT-TYPE
+        SYNTAX      InetPortNumber 
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This object indicates the peer port number for this UDP L2 VPN
+            circuit."
+        ::= { eriRouterUdpL2VpnStaticEntry 1 }
+
+eriRouterUdpL2VpnStaticPeerAddressType OBJECT-TYPE
+        SYNTAX      InetAddressType 
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This object indicates the peer IP address type for this
+            UDP L2 VPN circuit."
+        ::= { eriRouterUdpL2VpnStaticEntry 2 }
+
+eriRouterUdpL2VpnStaticPeerAddress OBJECT-TYPE
+        SYNTAX      InetAddress 
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This object indicates the peer IP address for this UDP L2 VPN
+            circuit. The peer address type is determined by the value of
+            the corresponding eriRouterUdpL2VpnStaticPeerAddressType."
+        ::= { eriRouterUdpL2VpnStaticEntry 3 }
+
+eriRouterUdpL2VpnStaticSourceAddressType OBJECT-TYPE
+        SYNTAX      InetAddressType 
+        MAX-ACCESS  read-only 
+        STATUS      current
+        DESCRIPTION
+            "This object indicates the source IP address type for this
+            UDP L2 VPN circuit."
+        ::= { eriRouterUdpL2VpnStaticEntry 4 }
+
+eriRouterUdpL2VpnStaticSourceAddress OBJECT-TYPE
+        SYNTAX      InetAddress 
+        MAX-ACCESS  read-only 
+        STATUS      current
+        DESCRIPTION
+            "This object indicates the source IP address for this UDP L2 VPN
+            circuit. The source address type is determined by the value of
+            the corresponding eriRouterUdpL2VpnStaticSourceAddressType."
+        ::= { eriRouterUdpL2VpnStaticEntry 5 }
+
+eriRouterUdpL2VpnStaticSourcePort OBJECT-TYPE
+        SYNTAX      InetPortNumber 
+        MAX-ACCESS  read-only 
+        STATUS      current
+        DESCRIPTION
+            "This object indicates the source port number for this UDP L2 VPN
+            circuit."
+        ::= { eriRouterUdpL2VpnStaticEntry 6 }
+
+eriRouterUdpL2vpnStaticAccessCctHandle OBJECT-TYPE
+        SYNTAX      EriRouterCircuitHandle
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object indicates the internal representation of the 
+            access circuit for this UDP L2 VPN circuit."
+        ::= { eriRouterUdpL2VpnStaticEntry 7 }
+
+eriRouterUdpL2VpnStaticVpnCctHandle OBJECT-TYPE
+        SYNTAX      EriRouterCircuitHandle
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object indicates the internal representation of this
+            UDP L2 VPN circuit."
+        ::= { eriRouterUdpL2VpnStaticEntry 8 }
+
+eriRouterUdpL2VpnStaticInputCctUp OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object indicates the status of this UDP L2 VPN circuit.
+            A value of true indicates that the VPN circuit is connected with
+            it's remote site.  A value of false indicates that the remote
+            site is not presently connected."
+        ::= { eriRouterUdpL2VpnStaticEntry 9 }
+
+eriRouterUdpL2VpnStaticIfIndexOrZero OBJECT-TYPE
+        SYNTAX      InterfaceIndexOrZero
+        MAX-ACCESS  read-only
+        STATUS      current 
+        DESCRIPTION
+            "This object indicates whether there is a corresponding entry of
+            this UDP L2 VPN access circuit in the ifTable. A non-zero value
+            indicates the ifIndex of the entry in the ifTable. A value of zero
+            indicates that there is no entry (for example, a
+            pre-provisioned access circuit is used)."
+        ::= { eriRouterUdpL2VpnStaticEntry 10 }
+
+eriRouterUdpL2VpnStaticPwFlags OBJECT-TYPE
+        SYNTAX      EriRouterVpnPwFlagsType
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object indicates more detailed information on the status
+            of this UDP L2 VPN circuit. This object is a bit field so it may 
+            contain one or more of these values."
+        ::= { eriRouterUdpL2VpnStaticEntry 11 }
+
+eriRouterUdpL2vpnStaticDscpCode OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Diffserver code for the CES over UDP PW. Default is Zero.
+            The dscp code values are listed as follows:
+
+            0..63  Differentiated services codepoint value
+            af11   Assured Forwarding  - Class 1/Drop precedence 1
+            af12   Assured Forwarding  - Class 1/Drop precedence 2
+            af13   Assured Forwarding  - Class 1/Drop precedence 3
+            af21   Assured Forwarding  - Class 2/Drop precedence 1
+            af22   Assured Forwarding  - Class 2/Drop precedence 2
+            af23   Assured Forwarding  - Class 2/Drop precedence 3
+            af31   Assured Forwarding  - Class 3/Drop precedence 1
+            af32   Assured Forwarding  - Class 3/Drop precedence 2
+            af33   Assured Forwarding  - Class 3/Drop precedence 3
+            af41   Assured Forwarding  - Class 4/Drop precedence 1
+            af42   Assured Forwarding  - Class 4/Drop precedence 2
+            af43   Assured Forwarding  - Class 4/Drop precedence 3"
+        ::= { eriRouterUdpL2VpnStaticEntry 12 }
+
+eriRouterUdpL2VpnStaticPwState OBJECT-TYPE
+        SYNTAX      EriRouterVpnPwStateType
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object indicates the status of this UDP L2 VPN circuit.
+            A value of up(1) indicates that the VPN circuit is active i.e.
+            connected with its remote site. A value of down(2) indicates
+            that the remote site is not presently connected. A value of
+            standby(3) indicates the the PW is in pending state to become
+            active (i.e. up)"
+        ::= { eriRouterUdpL2VpnStaticEntry 13 }
+
+eriRouterUdpL2VpnStaticPsnType OBJECT-TYPE
+        SYNTAX      EriRouterVpnPsnType 
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object indicates the packet switched networks(PSN) type for
+            this UDP L2 VPN circuit."
+        ::= { eriRouterUdpL2VpnStaticEntry 14 }
+
+--
+-- eriRouterMplsL2VpnLdpPwState change Notifications
+--
+eriRouterMplsL2VpnLdpPwStateChange NOTIFICATION-TYPE
+        OBJECTS     { eriRouterMplsL2VpnLdpPwState }
+        STATUS      current
+        DESCRIPTION
+            "This notification is generated when PW state transitions
+            operationally to UP/DOWN/STANDBY."
+   ::= { eriRouterMplsL2VpnMIBNotifications 1 }
+
+-- Conformance Information
+eriRouterL2VpnMIBGroups          OBJECT IDENTIFIER ::= { eriRouterL2VpnMIBConformance 1 }
+eriRouterL2VpnMIBCompliances     OBJECT IDENTIFIER ::= { eriRouterL2VpnMIBConformance 2 }
+eriRouterMplsL2VpnMIBGroups      OBJECT IDENTIFIER ::= { eriRouterL2VpnMIBConformance 3 }
+eriRouterMplsL2VpnMIBCompliances OBJECT IDENTIFIER ::= { eriRouterL2VpnMIBConformance 4 }  
+
+-- current object groups and compliances
+eriRouterMplsL2VpnPwMIBCompliance MODULE-COMPLIANCE
+    STATUS        current
+    DESCRIPTION
+        "The compliance statement for the L2VPN MIB."
+    MODULE        -- this module
+    MANDATORY-GROUPS 
+            {
+                eriRouterMplsL2VpnPwScalarGroup,
+                eriRouterMplsL2VpnStaticPwGroup,
+                eriRouterMplsL2VpnLdpPwGroup,
+                eriRouterMplsL2VpnPwNotificationGroup
+            }
+    ::= { eriRouterL2VpnMIBCompliances 2 }
+
+eriRouterMplsL2VpnPwScalarGroup OBJECT-GROUP
+    OBJECTS {
+            eriRouterMplsL2VpnNotificationEnable
+    }
+    STATUS        current
+    DESCRIPTION
+        "Collection of scalar objects required for L2VPN PW management"
+    ::= { eriRouterL2VpnMIBGroups 3 }
+
+eriRouterMplsL2VpnStaticPwGroup OBJECT-GROUP
+    OBJECTS {
+            eriRouterMplsL2VpnStaticCctHandle,
+            eriRouterMplsL2VpnStaticVpnCctHandle,
+            eriRouterMplsL2VpnStaticInputCctUp,
+            eriRouterMplsL2VpnStaticExpBits,
+            eriRouterMplsL2VpnStaticIfIndexOrZero,
+            eriRouterMplsL2VpnStaticPwFlags,
+            eriRouterMplsL2VpnStaticPwState,
+            eriRouterMplsL2VpnStaticInLabel            
+    }
+    STATUS        current
+    DESCRIPTION
+        "A collection of objects providing information about
+        the status of static L2 VPN Pesudowires."
+    ::= { eriRouterL2VpnMIBGroups 4 }
+    
+eriRouterMplsL2VpnLdpPwGroup OBJECT-GROUP
+    OBJECTS {
+            eriRouterMplsL2VpnLdpCctHandle,
+            eriRouterMplsL2VpnLdpVpnCctHandle,
+            eriRouterMplsL2VpnLdpInLabel,
+            eriRouterMplsL2VpnLdpVpnLabel,
+            eriRouterMplsL2VpnLdpRemGrpId,
+            eriRouterMplsL2VpnLdpLocEncap,
+            eriRouterMplsL2VpnLdpRemEncap,
+            eriRouterMplsL2VpnLdpLocVcType,
+            eriRouterMplsL2VpnLdpRemVcType,
+            eriRouterMplsL2VpnLdpLocMtu,
+            eriRouterMplsL2VpnLdpRemMtu,
+            eriRouterMplsL2VpnLdpExpBits,
+            eriRouterMplsL2VpnLdpIfIndexOrZero,
+            eriRouterMplsL2VpnLdpPwFlags,
+            eriRouterMplsL2VpnLdpPwState
+    }
+    STATUS        current
+    DESCRIPTION
+        "A collection of objects providing information about
+        the status of L2 VPN Pesudowires using Label Detection
+        Protocol."
+    ::= { eriRouterL2VpnMIBGroups 5 }
+
+eriRouterMplsL2VpnPwNotificationGroup NOTIFICATION-GROUP
+    NOTIFICATIONS { eriRouterMplsL2VpnLdpPwStateChange }
+    STATUS  current
+    DESCRIPTION
+        "Objects required for L2VPN PW notifications."
+   ::= { eriRouterL2VpnMIBGroups 6 }
+
+eriRouterUdpL2VpnPwMIBCompliance MODULE-COMPLIANCE
+    STATUS        current
+    DESCRIPTION
+        "The compliance statement for the L2VPN MIB."
+    MODULE        -- this module
+    MANDATORY-GROUPS 
+            {
+                eriRouterUdpL2VpnStaticPwGroup
+            }
+    ::= { eriRouterL2VpnMIBCompliances 3 }
+
+eriRouterUdpL2VpnStaticPwGroup OBJECT-GROUP
+    OBJECTS {
+            eriRouterUdpL2VpnStaticSourceAddressType,
+            eriRouterUdpL2VpnStaticSourceAddress,
+            eriRouterUdpL2VpnStaticSourcePort,
+            eriRouterUdpL2vpnStaticAccessCctHandle,
+            eriRouterUdpL2VpnStaticVpnCctHandle,
+            eriRouterUdpL2VpnStaticInputCctUp,
+            eriRouterUdpL2VpnStaticIfIndexOrZero,
+            eriRouterUdpL2VpnStaticPwFlags,
+            eriRouterUdpL2VpnStaticPwState,
+            eriRouterUdpL2vpnStaticDscpCode,
+            eriRouterUdpL2VpnStaticPsnType
+    }
+    STATUS        current
+    DESCRIPTION
+        "A collection of objects providing information about
+        the status of static L2 VPN Pesudowires."
+    ::= { eriRouterL2VpnMIBGroups 7 }
+    
+--      Obsolete objects
+
+--      The L2 VPN Static Table
+--
+--      This table contains objects that can be used to
+--      display the information about an L2 VPN.
+
+eriRouterL2VpnStaticTable   OBJECT-TYPE
+       SYNTAX          SEQUENCE OF EriRouterL2VpnStaticEntry
+       MAX-ACCESS      not-accessible
+       STATUS          obsolete
+       DESCRIPTION
+           "This table contains objects which identify static
+           Layer 2 VPN circuits.
+           With respect to creation and deletion of entries in this
+           table, rows are created or deleted when the VPN circuit is 
+           configured."
+       ::= { eriRouterL2VpnMIBObjects 1 }
+
+eriRouterL2VpnStaticEntry   OBJECT-TYPE
+       SYNTAX          EriRouterL2VpnStaticEntry
+       MAX-ACCESS      not-accessible
+       STATUS          obsolete
+       DESCRIPTION
+            "A conceptual row in the eriRouterL2VpnStaticTable."
+       INDEX { eriRouterL2VpnStaticPeerAddr, eriRouterL2VpnStaticVpnLabel }
+       ::= { eriRouterL2VpnStaticTable 1 }
+
+EriRouterL2VpnStaticEntry ::=
+       SEQUENCE {
+            eriRouterL2VpnStaticPeerAddr        IpAddress,
+            eriRouterL2VpnStaticVpnLabel        Unsigned32,
+            eriRouterL2VpnStaticCctHandle       EriRouterCircuitHandle,
+            eriRouterL2VpnStaticVpnCctHandle    EriRouterCircuitHandle,
+            eriRouterL2VpnStaticExpBits         Unsigned32,
+            eriRouterL2VpnStaticInputCctUp      TruthValue,
+            eriRouterL2VpnStaticXcFlags         EriRouterVpnXcFlagsType,
+            eriRouterL2VpnStaticIfIndexOrZero   InterfaceIndexOrZero
+            }
+
+eriRouterL2VpnStaticPeerAddr OBJECT-TYPE
+        SYNTAX  IpAddress
+        MAX-ACCESS  not-accessible
+        STATUS      obsolete
+        DESCRIPTION
+            "This object indicates the ip address of the VPN peer."
+        ::= { eriRouterL2VpnStaticEntry 1 }
+
+eriRouterL2VpnStaticVpnLabel OBJECT-TYPE
+        SYNTAX  Unsigned32 (4096..65535)
+        MAX-ACCESS  not-accessible
+        STATUS      obsolete
+        DESCRIPTION
+            "This object indicates the unique value assigned to a particular
+             static VPN circuit."
+        ::= { eriRouterL2VpnStaticEntry 2 }
+
+eriRouterL2VpnStaticCctHandle OBJECT-TYPE
+        SYNTAX  EriRouterCircuitHandle
+        MAX-ACCESS  read-only
+        STATUS      obsolete
+        DESCRIPTION
+            "This object indicates the internal representation of the physical 
+             circuit to which this VPN is connected. A hexadecimal value of 
+             ff ff ff ff ff ff ff ff indicates an invalid circuit."
+        ::= { eriRouterL2VpnStaticEntry 3 }
+
+
+eriRouterL2VpnStaticVpnCctHandle OBJECT-TYPE
+        SYNTAX  EriRouterCircuitHandle
+        MAX-ACCESS  read-only
+        STATUS      obsolete
+        DESCRIPTION
+            "This object indicates the internal representation of VPN 
+            pseudo circuit."
+        ::= { eriRouterL2VpnStaticEntry 4 }
+
+eriRouterL2VpnStaticExpBits OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      obsolete
+        DESCRIPTION
+            "This object indicates the number of exp bits configured for this
+             VPN circuit."
+        ::= { eriRouterL2VpnStaticEntry 5 }
+
+eriRouterL2VpnStaticInputCctUp OBJECT-TYPE
+        SYNTAX  TruthValue
+        MAX-ACCESS  read-only
+        STATUS      obsolete
+        DESCRIPTION
+            "This object indicates the status of the VPN input circuit. A 
+            value of true indicates that the VPN circuit is connected with 
+            it's remote site.  A value of false indicates that the remote 
+            site is not presently connected."
+        ::= { eriRouterL2VpnStaticEntry 6 }
+
+eriRouterL2VpnStaticXcFlags OBJECT-TYPE
+        SYNTAX  EriRouterVpnXcFlagsType 
+        MAX-ACCESS  read-only
+        STATUS      obsolete
+        DESCRIPTION
+            "This object indicates more detailed information on the status
+             of the VPN circuit. This object is a bit field so it may contain one 
+             or more of these values."
+
+        ::= { eriRouterL2VpnStaticEntry 7 }
+
+eriRouterL2VpnStaticIfIndexOrZero OBJECT-TYPE
+        SYNTAX  InterfaceIndexOrZero
+        MAX-ACCESS  read-only
+        STATUS      obsolete
+        DESCRIPTION
+            "This object indicates whether there is a corresponding entry in
+             the ifTable.  A non-zero value indicates the ifIndex of the entry
+             in the ifTable.  A value of zero indicates that there is no entry."
+        ::= { eriRouterL2VpnStaticEntry 8 }
+
+   --      The L2 VPN LDP Table
+   --
+   --      This table contains objects that can be used to
+   --      display the information about an L2 VPN.
+
+eriRouterL2VpnLdpTable   OBJECT-TYPE
+       SYNTAX          SEQUENCE OF EriRouterL2VpnLdpEntry
+       MAX-ACCESS      not-accessible
+       STATUS          obsolete
+       DESCRIPTION
+           "This table contains objects which identify Layer
+           Distribution Protocol Layer 2 VPN circuits.
+           With respect to creation and deletion of entries in this
+           table, rows are created or deleted when the VPN circuit is 
+           configured."
+       ::= { eriRouterL2VpnMIBObjects 2 }
+
+eriRouterL2VpnLdpEntry   OBJECT-TYPE
+       SYNTAX          EriRouterL2VpnLdpEntry
+       MAX-ACCESS      not-accessible
+       STATUS          obsolete
+       DESCRIPTION
+           "A conceptual row in the eriRouterL2VpnStaticTable."
+       INDEX { eriRouterL2VpnLdpPeerAddr, eriRouterL2VpnLdpVcId }
+       ::= { eriRouterL2VpnLdpTable 1 }
+
+EriRouterL2VpnLdpEntry ::=
+       SEQUENCE {
+            eriRouterL2VpnLdpPeerAddr        IpAddress,
+            eriRouterL2VpnLdpVcId            Integer32,
+            eriRouterL2VpnLdpCctHandle       EriRouterCircuitHandle,
+            eriRouterL2VpnLdpVpnCctHandle    EriRouterCircuitHandle,
+            eriRouterL2VpnLdpInLabel         Unsigned32,
+            eriRouterL2VpnLdpVpnLabel        Unsigned32,
+            eriRouterL2VpnLdpRemGrpId        Unsigned32,
+            eriRouterL2VpnLdpLocEncap        SnmpAdminString,
+            eriRouterL2VpnLdpRemEncap        SnmpAdminString,
+            eriRouterL2VpnLdpLocVcType       EriRouterVpnVcType,
+            eriRouterL2VpnLdpRemVcType       EriRouterVpnVcType,
+            eriRouterL2VpnLdpLocMtu          Unsigned32,
+            eriRouterL2VpnLdpRemMtu          Unsigned32,
+            eriRouterL2VpnLdpXcCctUp         TruthValue,
+            eriRouterL2VpnLdpExpBits         Unsigned32,
+            eriRouterL2VpnLdpInputCctUp      TruthValue,
+            eriRouterL2VpnLdpXcFlags         EriRouterVpnXcFlagsType,
+            eriRouterL2VpnLdpIfIndexOrZero   InterfaceIndexOrZero
+            }
+
+eriRouterL2VpnLdpPeerAddr OBJECT-TYPE
+        SYNTAX  IpAddress
+        MAX-ACCESS  not-accessible
+        STATUS      obsolete
+        DESCRIPTION
+            "This object indicates the ip address if the VPN peer."
+        ::= { eriRouterL2VpnLdpEntry 1 }
+
+eriRouterL2VpnLdpVcId OBJECT-TYPE
+        SYNTAX  Integer32 (0..2147483647)
+        MAX-ACCESS  not-accessible
+        STATUS      obsolete
+        DESCRIPTION
+            "This object indicates the unique virtual VPN circuit id assigned 
+            to this circuit."
+        ::= { eriRouterL2VpnLdpEntry 2 }
+
+
+eriRouterL2VpnLdpCctHandle OBJECT-TYPE
+        SYNTAX  EriRouterCircuitHandle
+        MAX-ACCESS  read-only
+        STATUS      obsolete
+        DESCRIPTION
+            "This object indicates the internal representation of the physical
+             circuit to which this VPN is connected. A hexadecimal value of
+             ff ff ff ff ff ff ff ff indicates an invalid circuit."
+        ::= { eriRouterL2VpnLdpEntry 3 }
+
+eriRouterL2VpnLdpVpnCctHandle OBJECT-TYPE
+        SYNTAX  EriRouterCircuitHandle
+        MAX-ACCESS  read-only
+        STATUS      obsolete
+        DESCRIPTION
+            "This object indicates the internal representation of the VPN 
+             pseudo circuit."
+        ::= { eriRouterL2VpnLdpEntry 4 }
+
+eriRouterL2VpnLdpInLabel OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      obsolete
+        DESCRIPTION
+            "This object indicates the value used by the remote connection in
+             order to identify this VPN circuit when communicating with the local
+             manager."
+        ::= { eriRouterL2VpnLdpEntry 5 }
+
+eriRouterL2VpnLdpVpnLabel OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      obsolete
+        DESCRIPTION
+            "This object indicates the value setup in the local configuration
+             to identify this VPN circuit."
+        ::= { eriRouterL2VpnLdpEntry 6 }
+
+eriRouterL2VpnLdpRemGrpId OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      obsolete
+        DESCRIPTION
+            "This object indicates the remote group of which this VPN circuit 
+            is a part."
+        ::= { eriRouterL2VpnLdpEntry 7 }
+
+eriRouterL2VpnLdpLocEncap OBJECT-TYPE
+        SYNTAX  SnmpAdminString (SIZE (0..80))
+        MAX-ACCESS  read-only
+        STATUS      obsolete
+        DESCRIPTION
+            "This object indicates the local encaps type associated with 
+            this VPN circuit."
+        ::= { eriRouterL2VpnLdpEntry 8 }
+
+eriRouterL2VpnLdpRemEncap OBJECT-TYPE
+        SYNTAX  SnmpAdminString (SIZE (0..80))
+        MAX-ACCESS  read-only
+        STATUS      obsolete
+        DESCRIPTION
+            "This object indicates the remote encaps type associated with 
+            this VPN circuit."
+        ::= { eriRouterL2VpnLdpEntry 9 }
+
+eriRouterL2VpnLdpLocVcType OBJECT-TYPE
+        SYNTAX  EriRouterVpnVcType
+        MAX-ACCESS  read-only
+        STATUS      obsolete
+        DESCRIPTION
+            "This object indicates the type of virtual circuit on the 
+            local system."
+        ::= { eriRouterL2VpnLdpEntry 10 }
+
+eriRouterL2VpnLdpRemVcType OBJECT-TYPE
+        SYNTAX  EriRouterVpnVcType
+        MAX-ACCESS  read-only
+        STATUS      obsolete
+        DESCRIPTION
+            "This object indicates the type of virtual circuit on the 
+            remote system."
+        ::= { eriRouterL2VpnLdpEntry 11 }
+
+eriRouterL2VpnLdpLocMtu OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      obsolete
+        DESCRIPTION
+            "This object indicates the maximum transmission unit of the
+             local VPN circuit."
+        ::= { eriRouterL2VpnLdpEntry 12 }
+
+eriRouterL2VpnLdpRemMtu OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      obsolete
+        DESCRIPTION
+            "This object indicates the maximum transmission unit of the
+             remote connection."
+        ::= { eriRouterL2VpnLdpEntry 13 }
+
+eriRouterL2VpnLdpXcCctUp OBJECT-TYPE
+        SYNTAX  TruthValue
+        MAX-ACCESS  read-only
+        STATUS      obsolete
+        DESCRIPTION
+            "This object indicates the status of the VPN cross connect circuit. 
+             A value of true indicates that the VPN circuit is connected with it's 
+             remote site.  A value of false indicates that the remote site is 
+             not presently connected."
+        ::= { eriRouterL2VpnLdpEntry 14 }
+
+eriRouterL2VpnLdpExpBits OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      obsolete
+        DESCRIPTION
+            "This object indicates the number of exp bits configured for this
+             VPN circuit."
+        ::= { eriRouterL2VpnLdpEntry 15 }
+
+eriRouterL2VpnLdpInputCctUp OBJECT-TYPE
+        SYNTAX  TruthValue
+        MAX-ACCESS  read-only
+        STATUS      obsolete
+        DESCRIPTION
+            "This object indicates the status of the VPN input circuit. A 
+            value of true indicates that the VPN circuit is connected with 
+            it's remote site. 
+            A value of false indicates that the remote site is not 
+            presently connected."
+        ::= { eriRouterL2VpnLdpEntry 16 }
+
+eriRouterL2VpnLdpXcFlags OBJECT-TYPE
+        SYNTAX  EriRouterVpnXcFlagsType
+        MAX-ACCESS  read-only
+        STATUS      obsolete
+        DESCRIPTION
+            "This object indicates more detailed information on the status
+             of the VPN circuit. This object is a bit field so it may contain one 
+             or more of these values."
+
+        ::= { eriRouterL2VpnLdpEntry 17 }
+
+eriRouterL2VpnLdpIfIndexOrZero OBJECT-TYPE
+        SYNTAX  InterfaceIndexOrZero
+        MAX-ACCESS  read-only
+        STATUS      obsolete
+        DESCRIPTION
+            "This object indicates whether there is a corresponding entry in
+             the ifTable.  A non-zero value indicates the ifIndex of the entry
+             in the ifTable.  A value of zero indicates that there is no entry."
+        ::= { eriRouterL2VpnLdpEntry 18 }
+
+-- deprecated/obsolete object groups and compliance    
+eriRouterL2VpnMIBCompliance MODULE-COMPLIANCE
+        STATUS      obsolete
+        DESCRIPTION
+                "The compliance statement for the L2VPN MIB."
+        MODULE      -- this module
+        MANDATORY-GROUPS 
+                {
+                    eriRouterL2VpnStaticGroup,
+                    eriRouterL2VpnLdpGroup
+                }
+        ::= { eriRouterL2VpnMIBCompliances 1 }
+
+eriRouterMplsL2VpnMIBCompliance MODULE-COMPLIANCE
+    STATUS        current 
+    DESCRIPTION
+        "The compliance statement for the L2VPN MIB."
+    MODULE        -- this module
+    MANDATORY-GROUPS 
+            {
+                eriRouterMplsL2VpnStaticGroup,
+                eriRouterMplsL2VpnLdpGroup
+            }
+    ::= { eriRouterMplsL2VpnMIBCompliances 1 }
+
+-- Units of Conformance
+
+eriRouterL2VpnStaticGroup OBJECT-GROUP
+    OBJECTS {
+            eriRouterL2VpnStaticCctHandle,
+            eriRouterL2VpnStaticVpnCctHandle,
+            eriRouterL2VpnStaticExpBits,
+            eriRouterL2VpnStaticInputCctUp,
+            eriRouterL2VpnStaticXcFlags,
+            eriRouterL2VpnStaticIfIndexOrZero
+
+    }
+    STATUS        obsolete
+    DESCRIPTION
+        "A collection of objects providing information about
+         the status of static L2 VPN connections."
+    ::= { eriRouterL2VpnMIBGroups 1 }
+
+eriRouterMplsL2VpnStaticGroup OBJECT-GROUP
+    OBJECTS {
+            eriRouterMplsL2VpnStaticCctHandle,
+            eriRouterMplsL2VpnStaticVpnCctHandle,
+            eriRouterMplsL2VpnStaticExpBits,
+            eriRouterMplsL2VpnStaticInputCctUp,
+            eriRouterMplsL2VpnStaticXcFlags,
+            eriRouterMplsL2VpnStaticIfIndexOrZero
+    }
+    STATUS        current 
+    DESCRIPTION
+        "A collection of objects providing information about
+         the status of static L2 VPN connections."
+    ::= { eriRouterMplsL2VpnMIBGroups 1 }
+
+eriRouterL2VpnLdpGroup OBJECT-GROUP
+    OBJECTS {
+            eriRouterL2VpnLdpCctHandle,
+            eriRouterL2VpnLdpVpnCctHandle,
+            eriRouterL2VpnLdpInLabel,
+            eriRouterL2VpnLdpVpnLabel,
+            eriRouterL2VpnLdpRemGrpId,
+            eriRouterL2VpnLdpLocEncap,
+            eriRouterL2VpnLdpRemEncap,
+            eriRouterL2VpnLdpLocVcType,
+            eriRouterL2VpnLdpRemVcType,
+            eriRouterL2VpnLdpLocMtu,
+            eriRouterL2VpnLdpRemMtu,
+            eriRouterL2VpnLdpXcCctUp,
+            eriRouterL2VpnLdpExpBits,
+            eriRouterL2VpnLdpInputCctUp,
+            eriRouterL2VpnLdpXcFlags,
+            eriRouterL2VpnLdpIfIndexOrZero
+    }
+    STATUS        obsolete
+    DESCRIPTION
+        "A collection of objects providing information about
+         the status of L2 VPN connections using Label Detection
+         Protocol."
+    ::= { eriRouterL2VpnMIBGroups 2 }
+
+eriRouterMplsL2VpnLdpGroup OBJECT-GROUP
+    OBJECTS {
+            eriRouterMplsL2VpnLdpCctHandle,
+            eriRouterMplsL2VpnLdpVpnCctHandle,
+            eriRouterMplsL2VpnLdpInLabel,
+            eriRouterMplsL2VpnLdpVpnLabel,
+            eriRouterMplsL2VpnLdpRemGrpId,
+            eriRouterMplsL2VpnLdpLocEncap,
+            eriRouterMplsL2VpnLdpRemEncap,
+            eriRouterMplsL2VpnLdpLocVcType,
+            eriRouterMplsL2VpnLdpRemVcType,
+            eriRouterMplsL2VpnLdpLocMtu,
+            eriRouterMplsL2VpnLdpRemMtu,
+            eriRouterMplsL2VpnLdpXcCctUp,
+            eriRouterMplsL2VpnLdpExpBits,
+            eriRouterMplsL2VpnLdpInputCctUp,
+            eriRouterMplsL2VpnLdpXcFlags,
+            eriRouterMplsL2VpnLdpIfIndexOrZero
+    }
+    STATUS        current 
+    DESCRIPTION
+        "A collection of objects providing information about
+         the status of L2 VPN connections using Label Detection
+         Protocol."
+    ::= { eriRouterMplsL2VpnMIBGroups 2 }
+END

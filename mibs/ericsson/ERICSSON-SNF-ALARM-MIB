@@ -1,0 +1,141 @@
+-- *****************************************************************
+--
+-- %DNP% Copyright (c) 2013 Ericsson AB.
+-- %DNP% All rights reserved.
+--
+-- *****************************************************************
+
+ERICSSON-SNF-ALARM-MIB DEFINITIONS ::= BEGIN
+	IMPORTS
+		MODULE-IDENTITY, OBJECT-TYPE,
+		NOTIFICATION-TYPE FROM SNMPv2-SMI
+
+		alarmActiveResourceId,
+		alarmModelDescription,
+		alarmActiveDescription FROM ALARM-MIB
+
+		ituAlarmPerceivedSeverity,
+		ituAlarmProbableCause,
+		ituAlarmEventType,
+		ituAlarmAdditionalText FROM ITU-ALARM-MIB
+
+		MODULE-COMPLIANCE,
+		NOTIFICATION-GROUP,
+		OBJECT-GROUP FROM SNMPv2-CONF
+
+		snfGeneric FROM ERICSSON-SNF-TOP-MIB;
+
+		snfAlarmModule MODULE-IDENTITY
+			LAST-UPDATED "200205310000Z"
+			ORGANIZATION "Ericsson SNF Team"
+			CONTACT-INFO
+				"Magnus Johansson C
+				KA/EPK/LU/RL
+				Ericsson AB
+				Olandsgatan 1
+				P.O. Box 518
+				37123 Karlskrona
+				Sweden
+				E-Mail: Magnus.C.Johansson@epk.ericsson.se
+				Phone: +46 455 395730
+				"
+			DESCRIPTION
+				"This MiB provides the possibility to
+				report alarms according to the SNF
+				requirements for Fault Management.
+				Document number: 1/1551-FAY 320 0008 A"
+			REVISION "200205310000Z"
+			DESCRIPTION
+				"Initial Version of SNF FM MIB"
+			::= { snfGeneric 10}
+
+	snfAlarmObjects
+	OBJECT IDENTIFIER ::= { snfAlarmModule 1 }
+
+	snfAlarmNotifications
+	OBJECT IDENTIFIER ::= { snfAlarmModule 2 }
+
+	snfAlarmNotificationsPrefix
+	OBJECT IDENTIFIER ::= { snfAlarmNotifications 0 }
+	
+	snfAlarmConformance
+	OBJECT IDENTIFIER ::= { snfAlarmModule 3 }
+
+	snfAlarmCompliances
+	OBJECT IDENTIFIER ::= { snfAlarmConformance 1 }
+	
+	snfAlarmGroups
+	OBJECT IDENTIFIER ::= { snfAlarmConformance 2 }
+
+	-- Notifications
+	snfAlarmActiveState NOTIFICATION-TYPE
+	OBJECTS {alarmModelDescription,
+		alarmActiveResourceId,
+		alarmActiveDescription,
+		ituAlarmEventType,
+		ituAlarmProbableCause
+	}
+
+	STATUS current
+	DESCRIPTION "This notification reports an active state
+		of an alarm. It mirrors the notification specified in
+		the IETF ALARM MIB. We have made following additions:
+		send itu params as var-binds, and not sending index
+		vars.
+		Note that the ituAlarmPerceivedSeverity is available
+		implicit since it is an index"
+	::= {snfAlarmNotificationsPrefix 1}
+
+	snfAlarmClearState NOTIFICATION-TYPE
+	OBJECTS {alarmModelDescription,
+		alarmActiveResourceId,
+		alarmActiveDescription,
+		ituAlarmEventType,
+		ituAlarmProbableCause }
+	
+	STATUS current
+	DESCRIPTION "This notification reports the clearance
+		of an alarm. It mirrors the notification specified in
+		the IETF ALARM MIB. We have made following additions:
+		send itu params as var-binds, and not sending index
+		vars.
+		Note that the ituAlarmPerceivedSeverity is available
+		implicit since it is an index"
+	::= {snfAlarmNotificationsPrefix 2}
+
+	snfAlarmCompliance MODULE-COMPLIANCE
+		STATUS current
+		DESCRIPTION
+			"The compliance statement for systems
+			supporting the ITU Alarm MIB."
+		MODULE -- this module
+			MANDATORY-GROUPS {
+				snfAlarms
+			}
+		MODULE ALARM-MIB
+			MANDATORY-GROUPS {
+				alarmModelGroup,
+				alarmActiveGroup,
+				alarmActiveStatsGroup
+			}
+		MODULE ITU-ALARM-MIB
+			MANDATORY-GROUPS {
+				ituAlarmGroup,
+				ituAlarmStatisticsGroup
+			}
+	::= { snfAlarmCompliances 1 }
+	
+	snfAlarms NOTIFICATION-GROUP
+		NOTIFICATIONS {
+			snfAlarmActiveState,
+			snfAlarmClearState
+		}
+		STATUS current
+		DESCRIPTION
+			"This group contains the two notifications that
+			exists within the SNF tosupport with Fault
+			Reporting. For more information check the
+			description for snfAlarmActiveState and
+			snfAlarmClearState"
+		::= { snfAlarmGroups 1}
+END

@@ -1,0 +1,985 @@
+-- %DNP% $Id: ERICSSON-ROUTER-SUBSCRIBER-ACTIVE-CAP.my,v 1.1.2.14.62.7 2012/04/13 03:45:23 pkuncham Exp $
+-- %DNP% $Source: /cvsroot/pkt/sw/se/xc/bsd/config/snmp/mibs/Attic/ERICSSON-ROUTER-SUBSCRIBER-ACTIVE-CAP.my,v $
+-- *****************************************************************
+-- ERICSSON-ROUTER-SUBSCRIBER-ACTIVE-CAP    Subscriber MIB Capabilities
+--
+-- Copyright (c) 2003-2007, 2010-2011, 2015 Ericsson AB
+-- All rights reserved.
+--
+-- *****************************************************************
+
+ERICSSON-ROUTER-SUBSCRIBER-ACTIVE-CAP DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY     FROM SNMPv2-SMI
+    AGENT-CAPABILITIES  FROM SNMPv2-CONF
+    eriRouterCapabilities     FROM ERICSSON-ROUTER-SMI;
+
+eriRouterSubscriberActiveMibCap MODULE-IDENTITY
+    LAST-UPDATED    "201501141800Z" -- Jan 14, 2015
+    ORGANIZATION    "Ericsson AB"
+    CONTACT-INFO
+                "       Ericsson AB.
+
+                 Postal: 100 Headquarters Dr
+                         San Jose, CA  95134
+                         USA
+
+                 Phone: +1 408 750 5000
+                 Fax: +1 408 750 5599"
+    DESCRIPTION
+        "The Agent Capabilities of ERICSSON-ROUTER-SUBSCRIBER-ACTIVE-MIB.
+
+        If this MIB implementation is platform-dependent,
+        the PRODUCT-RELEASE clause contains Ericsson SEOS version and
+        at least one of the following Ericsson product families:
+            [SE]  SmartEdge Multi-service Edge Router (MSER) family
+            [SM]  SM family of Metro Ethernet Service Transport platforms
+            [SSR] Smart Service Router (SSR) family"
+
+    REVISION    "201501141800Z" -- Jan 14, 2015
+    DESCRIPTION
+        "Updated RBN/rbn/Rbn as ERICSSON-ROUTER/eriRouter/EriRouter
+         to migrate RBN MIB to ERICSSON MIB."
+
+    REVISION    "201204060000Z" -- Apr 6, 2012
+    DESCRIPTION
+        "Add eriRouterSubscriberActiveMibCap12 for SEOS 12.1"      
+
+    REVISION    "201106150000Z" -- Jun 15, 2011
+    DESCRIPTION
+        "Update DESCRIPTION clause of MODULE-IDENTITY
+        and PRODUCT-RELEASE clause of AGENT-CAPABILITIES."
+        
+    REVISION    "201011010000Z" -- Nov 1, 2010
+    DESCRIPTION
+        "Modified PRODUCT-RELEASE clause for consistent naming."
+
+    REVISION     "201003220000Z" -- March 22, 2010
+    DESCRIPTION
+        "Added eriRouterSubsActiveGroup4, eriRouterSubsStatsGroup3 support for SEOS 6.4+"
+
+    REVISION     "200812031800Z" -- Dec 3, 2008
+    DESCRIPTION
+        "Added eriRouterSubsLicenseGroup support for SEOS 6.1.5"
+
+    REVISION    "200711281800Z" -- Nov 28, 2007
+    DESCRIPTION
+        "Add eriRouterSubscriberActiveMibCap9 for SEOS 5.0.7.10"
+
+    REVISION    "200703211700Z" -- Mar 21, 2007
+    DESCRIPTION
+        "Add eriRouterSubscriberActiveMibCap8 for SEOS 6.1"
+
+    REVISION    "200610241700Z" -- Oct 24, 2006
+    DESCRIPTION
+        "Add eriRouterSubscriberActiveMibCap7 for SEOS 5.0.7.x"
+
+    REVISION    "200505041700Z" -- May 4, 2005
+    DESCRIPTION
+        "Add eriRouterSubscriberActiveMibCap6 for AOS 6.2.3.x"
+    REVISION    "200408111800Z" -- Aug 11, 2004
+    DESCRIPTION
+        "Add eriRouterSubscriberActiveMibCap5 for SEOS 2.6.5."
+    REVISION    "200404131800Z" -- Apr 13, 2004
+    DESCRIPTION
+        "Add eriRouterSubscriberActiveMibCap4 for AOS 6.1.3."
+    REVISION    "200311051800Z" -- Nov 5, 2003
+    DESCRIPTION
+        "Add eriRouterSubscriberActiveMibCap2 for SEOS 2.5.7, supporting
+        eriRouterSubsEncapsulationType clips(12)."
+    REVISION    "200305140000Z" -- May 14, 2003
+    DESCRIPTION
+        "Initial version."
+    ::= { eriRouterCapabilities 55 }
+
+eriRouterSubscriberActiveMibCap1 AGENT-CAPABILITIES
+    PRODUCT-RELEASE     "SEOS 2.4.4.x"
+    STATUS      current
+    DESCRIPTION "ERICSSON-ROUTER-SUBSCRIBER-ACTIVE-MIB capabilities"
+    SUPPORTS    ERICSSON-ROUTER-SUBSCRIBER-ACTIVE-MIB
+    INCLUDES {
+        eriRouterSubsActiveGroup,
+        eriRouterSubsStatsGroup
+    }
+
+    VARIATION eriRouterSubsActiveName
+        DESCRIPTION
+        "Each character must be printable (the posix funtion isprint()
+        returns true for each character) and the string may not contain
+        any of the characters double quote, single quote ('), bar (|), or
+        exclamation point (!)."
+
+    VARIATION eriRouterSubsClearSubscriberName
+        DESCRIPTION
+        "Each character must be printable (the posix funtion isprint()
+        returns true for each character) and the string may not contain
+        any of the characters double quote, single quote ('), bar (|), or
+        exclamation point (!)."
+
+    VARIATION eriRouterSubsBounceName
+        DESCRIPTION
+        "Each character must be printable (the posix funtion isprint()
+        returns true for each character) and the string may not contain
+        any of the characters double quote, single quote ('), bar (|), or
+        exclamation point (!)."
+
+    VARIATION eriRouterSubsEncapsulationType
+        SYNTAX  INTEGER {
+                    ppp(1),
+                    pppoe(2),
+                    bridged1483(3),
+                    routed1483(4),
+                    multi1483(5),
+                    dot1q1483(6),
+                    dot1qEnet(7),
+                    other(255)
+                }
+        DESCRIPTION
+        "SmartEdge does not support any 1490 (Frame Relay) or clips based
+        subscribers at this time."
+    ::= { eriRouterSubscriberActiveMibCap 1 }
+
+eriRouterSubscriberActiveMibCap2 AGENT-CAPABILITIES
+    PRODUCT-RELEASE     "SEOS 2.5.7.x"
+    STATUS      current
+    DESCRIPTION "ERICSSON-ROUTER-SUBSCRIBER-ACTIVE-MIB capabilities"
+    SUPPORTS    ERICSSON-ROUTER-SUBSCRIBER-ACTIVE-MIB
+    INCLUDES {
+        eriRouterSubsActiveGroup,
+        eriRouterSubsStatsGroup
+    }
+
+    VARIATION eriRouterSubsActiveName
+        DESCRIPTION
+        "Each character must be printable (the posix funtion isprint()
+        returns true for each character) and the string may not contain
+        any of the characters double quote, single quote ('), bar (|), or
+        exclamation point (!)."
+
+    VARIATION eriRouterSubsClearSubscriberName
+        DESCRIPTION
+        "Each character must be printable (the posix funtion isprint()
+        returns true for each character) and the string may not contain
+        any of the characters double quote, single quote ('), bar (|), or
+        exclamation point (!)."
+
+    VARIATION eriRouterSubsBounceName
+        DESCRIPTION
+        "Each character must be printable (the posix funtion isprint()
+        returns true for each character) and the string may not contain
+        any of the characters double quote, single quote ('), bar (|), or
+        exclamation point (!)."
+
+    VARIATION eriRouterSubsEncapsulationType
+        SYNTAX  INTEGER {
+                    ppp(1),
+                    pppoe(2),
+                    bridged1483(3),
+                    routed1483(4),
+                    multi1483(5),
+                    dot1q1483(6),
+                    dot1qEnet(7),
+                    clips(12),
+                    other(255)
+                }
+        DESCRIPTION
+        "SmartEdge does not support any 1490 (Frame Relay) at this time."
+
+    ::= { eriRouterSubscriberActiveMibCap 2 }
+
+
+eriRouterSubscriberActiveMibCap3 AGENT-CAPABILITIES
+    PRODUCT-RELEASE     "SEOS 2.6.3.x"
+    STATUS      obsolete
+    DESCRIPTION "ERICSSON-ROUTER-SUBSCRIBER-ACTIVE-MIB capabilities"
+    SUPPORTS    ERICSSON-ROUTER-SUBSCRIBER-ACTIVE-MIB
+    INCLUDES {
+        eriRouterSubsActiveGroup2,
+        eriRouterSubsStatsGroup2
+    }
+
+    VARIATION eriRouterSubsActiveName
+        DESCRIPTION
+        "Each character must be printable (the posix funtion isprint()
+        returns true for each character) and the string may not contain
+        any of the characters double quote, single quote ('), bar (|), or
+        exclamation point (!)."
+
+    VARIATION eriRouterSubsClearSubscriberName
+        DESCRIPTION
+        "Each character must be printable (the posix funtion isprint()
+        returns true for each character) and the string may not contain
+        any of the characters double quote, single quote ('), bar (|), or
+        exclamation point (!)."
+
+    VARIATION eriRouterSubsClearSessionId
+        DESCRIPTION
+        "Each character must be printable (the posix funtion isprint()
+        returns true for each character) and the string may not contain
+        any of the characters double quote, single quote ('), bar (|), or
+        exclamation point (!)."
+
+    VARIATION eriRouterSubsReauthName
+        DESCRIPTION
+        "Each character must be printable (the posix funtion isprint()
+        returns true for each character) and the string may not contain
+        any of the characters double quote, single quote ('), bar (|), or
+        exclamation point (!)."
+
+    VARIATION eriRouterSubsReauthSessionId
+        DESCRIPTION
+        "Each character must be printable (the posix funtion isprint()
+        returns true for each character) and the string may not contain
+        any of the characters double quote, single quote ('), bar (|), or
+        exclamation point (!)."
+
+    VARIATION eriRouterSubsBounceName
+        DESCRIPTION
+        "Each character must be printable (the posix funtion isprint()
+        returns true for each character) and the string may not contain
+        any of the characters double quote, single quote ('), bar (|), or
+        exclamation point (!)."
+
+    VARIATION eriRouterSubsEncapsulationType
+        SYNTAX  INTEGER {
+                    ppp(1),
+                    pppoe(2),
+                    bridged1483(3),
+                    routed1483(4),
+                    multi1483(5),
+                    dot1q1483(6),
+                    dot1qEnet(7),
+                    clips(12),
+                    other(255)
+                }
+        DESCRIPTION
+        "SmartEdge does not support any 1490 (Frame Relay) at this time."
+
+    ::= { eriRouterSubscriberActiveMibCap 3 }
+
+eriRouterSubscriberActiveMibCap4 AGENT-CAPABILITIES
+    PRODUCT-RELEASE     "AOS 6.1.3.X"
+    STATUS      current
+    DESCRIPTION "ERICSSON-ROUTER-SUBSCRIBER-ACTIVE-MIB capabilities"
+    SUPPORTS    ERICSSON-ROUTER-SUBSCRIBER-ACTIVE-MIB
+    INCLUDES {
+        eriRouterSubsActiveGroup2,
+        eriRouterSubsStatsGroup2
+    }
+
+    VARIATION eriRouterSubsActiveName
+        DESCRIPTION
+        "Each character must be printable (the posix funtion isprint()
+        returns true for each character) and the string may not contain
+        any of the characters double quote, single quote ('), bar (|), or
+        exclamation point (!)."
+
+    VARIATION eriRouterSubsClearSubscriberName
+        DESCRIPTION
+        "Each character must be printable (the posix funtion isprint()
+        returns true for each character) and the string may not contain
+        any of the characters double quote, single quote ('), bar (|), or
+        exclamation point (!)."
+
+    VARIATION eriRouterSubsBounceName
+        ACCESS  not-implemented
+        DESCRIPTION "Object is not supported."
+
+    VARIATION eriRouterSubsBounceSessionId
+        ACCESS  not-implemented
+        DESCRIPTION "Object is not supported."
+
+    VARIATION eriRouterSubsClearReason
+        ACCESS  not-implemented
+        DESCRIPTION "Object is not supported."
+
+    VARIATION eriRouterSubsReauthRadiusID
+        ACCESS  not-implemented
+        DESCRIPTION "Object is not supported."
+
+    VARIATION eriRouterSubsReauthRadiusIndex
+        ACCESS  not-implemented
+        DESCRIPTION "Object is not supported."
+
+    VARIATION eriRouterSubsProfileCountTable
+        ACCESS  not-implemented
+        DESCRIPTION "Object is not supported."
+
+    ::= { eriRouterSubscriberActiveMibCap 4 }
+
+eriRouterSubscriberActiveMibCap5 AGENT-CAPABILITIES
+    PRODUCT-RELEASE     "SEOS 2.6.5.x"
+    STATUS      current
+    DESCRIPTION "ERICSSON-ROUTER-SUBSCRIBER-ACTIVE-MIB capabilities"
+    SUPPORTS    ERICSSON-ROUTER-SUBSCRIBER-ACTIVE-MIB
+    INCLUDES {
+        eriRouterSubsActiveGroup3,
+        eriRouterSubsStatsGroup2
+    }
+
+    VARIATION eriRouterSubsActiveName
+        DESCRIPTION
+        "Each character must be printable (the posix funtion isprint()
+        returns true for each character) and the string may not contain
+        any of the characters double quote, single quote ('), bar (|), or
+        exclamation point (!)."
+
+    VARIATION eriRouterSubsClearSubscriberName
+        DESCRIPTION
+        "Each character must be printable (the posix funtion isprint()
+        returns true for each character) and the string may not contain
+        any of the characters double quote, single quote ('), bar (|), or
+        exclamation point (!)."
+
+    VARIATION eriRouterSubsClearSessionId
+        DESCRIPTION
+        "Each character must be printable (the posix funtion isprint()
+        returns true for each character) and the string may not contain
+        any of the characters double quote, single quote ('), bar (|), or
+        exclamation point (!)."
+
+    VARIATION eriRouterSubsReauthName
+        DESCRIPTION
+        "Each character must be printable (the posix funtion isprint()
+        returns true for each character) and the string may not contain
+        any of the characters double quote, single quote ('), bar (|), or
+        exclamation point (!)."
+
+    VARIATION eriRouterSubsReauthSessionId
+        DESCRIPTION
+        "Each character must be printable (the posix funtion isprint()
+        returns true for each character) and the string may not contain
+        any of the characters double quote, single quote ('), bar (|), or
+        exclamation point (!)."
+
+    VARIATION eriRouterSubsBounceName
+        DESCRIPTION
+        "Each character must be printable (the posix funtion isprint()
+        returns true for each character) and the string may not contain
+        any of the characters double quote, single quote ('), bar (|), or
+        exclamation point (!)."
+
+    VARIATION eriRouterSubsEncapsulationType
+        SYNTAX  INTEGER {
+                    ppp(1),
+                    pppoe(2),
+                    bridged1483(3),
+                    routed1483(4),
+                    multi1483(5),
+                    dot1q1483(6),
+                    dot1qEnet(7),
+                    clips(12),
+                    other(255)
+                }
+        DESCRIPTION
+        "SmartEdge does not support any 1490 (Frame Relay) at this time."
+
+    ::= { eriRouterSubscriberActiveMibCap 5 }
+
+eriRouterSubscriberActiveMibCap6 AGENT-CAPABILITIES
+    PRODUCT-RELEASE     "AOS 6.2.3.X"
+    STATUS      current
+    DESCRIPTION "ERICSSON-ROUTER-SUBSCRIBER-ACTIVE-MIB capabilities"
+    SUPPORTS    ERICSSON-ROUTER-SUBSCRIBER-ACTIVE-MIB
+    INCLUDES {
+        eriRouterSubsActiveGroup2,
+        eriRouterSubsStatsGroup2
+    }
+
+    VARIATION eriRouterSubsActiveName
+        DESCRIPTION
+        "Each character must be printable (the posix funtion isprint()
+        returns true for each character) and the string may not contain
+        any of the characters double quote, single quote ('), bar (|), or
+        exclamation point (!)."
+
+    VARIATION eriRouterSubsClearSubscriberName
+        DESCRIPTION
+        "Each character must be printable (the posix funtion isprint()
+        returns true for each character) and the string may not contain
+        any of the characters double quote, single quote ('), bar (|), or
+        exclamation point (!)."
+
+    VARIATION eriRouterSubsClearReason
+        DESCRIPTION
+        "An unsigned integer value which may be included in the set request
+         for eriRouterSubsClearSubscriberName or eriRouterSubsClearSessionId."
+
+    VARIATION eriRouterSubsBounceName
+        ACCESS  not-implemented
+        DESCRIPTION "Object is not supported."
+
+    VARIATION eriRouterSubsBounceSessionId
+        ACCESS  not-implemented
+        DESCRIPTION "Object is not supported."
+
+    VARIATION eriRouterSubsReauthRadiusID
+        ACCESS  not-implemented
+        DESCRIPTION "Object is not supported."
+
+    VARIATION eriRouterSubsReauthRadiusIndex
+        ACCESS  not-implemented
+        DESCRIPTION "Object is not supported."
+
+    VARIATION eriRouterSubsProfileCountTable
+        ACCESS  not-implemented
+        DESCRIPTION "Object is not supported."
+
+    ::= { eriRouterSubscriberActiveMibCap 6 }
+
+eriRouterSubscriberActiveMibCap7 AGENT-CAPABILITIES
+    PRODUCT-RELEASE     "SEOS 5.0.7.4"
+    STATUS      current
+    DESCRIPTION "ERICSSON-ROUTER-SUBSCRIBER-ACTIVE-MIB capabilities"
+    SUPPORTS    ERICSSON-ROUTER-SUBSCRIBER-ACTIVE-MIB
+    INCLUDES {
+        eriRouterSubsActiveGroup3,
+        eriRouterSubsStatsGroup2
+    }
+
+    VARIATION eriRouterSubsActiveName
+        DESCRIPTION
+        "Each character must be printable (the posix funtion isprint()
+        returns true for each character) and the string may not contain
+        any of the characters double quote, single quote ('), bar (|), or
+        exclamation point (!)."
+
+    VARIATION eriRouterSubsClearSubscriberName
+        DESCRIPTION
+        "Each character must be printable (the posix funtion isprint()
+        returns true for each character) and the string may not contain
+        any of the characters double quote, single quote ('), bar (|), or
+        exclamation point (!)."
+
+    VARIATION eriRouterSubsClearSessionId
+        DESCRIPTION
+        "Each character must be printable (the posix funtion isprint()
+        returns true for each character) and the string may not contain
+        any of the characters double quote, single quote ('), bar (|), or
+        exclamation point (!)."
+
+    VARIATION eriRouterSubsReauthName
+        DESCRIPTION
+        "Each character must be printable (the posix funtion isprint()
+        returns true for each character) and the string may not contain
+        any of the characters double quote, single quote ('), bar (|), or
+        exclamation point (!)."
+
+    VARIATION eriRouterSubsReauthSessionId
+        DESCRIPTION
+        "Each character must be printable (the posix funtion isprint()
+        returns true for each character) and the string may not contain
+        any of the characters double quote, single quote ('), bar (|), or
+        exclamation point (!)."
+
+    VARIATION eriRouterSubsBounceName
+        DESCRIPTION
+        "Each character must be printable (the posix funtion isprint()
+        returns true for each character) and the string may not contain
+        any of the characters double quote, single quote ('), bar (|), or
+        exclamation point (!)."
+
+    VARIATION eriRouterSubsEncapsulationType
+        SYNTAX  INTEGER {
+                    ppp(1),
+                    pppoe(2),
+                    bridged1483(3),
+                    routed1483(4),
+                    multi1483(5),
+                    dot1q1483(6),
+                    dot1qEnet(7),
+                    clips(12),
+                    other(255)
+                }
+        DESCRIPTION
+        "SmartEdge does not support any 1490 (Frame Relay) at this time."
+
+    VARIATION eriRouterSubsXmitOctetsDropped
+        ACCESS  not-implemented
+        DESCRIPTION "Object is not supported."
+
+    VARIATION eriRouterSubsXmitPktsDropped
+        ACCESS  not-implemented
+        DESCRIPTION "Object is not supported."
+
+    ::= { eriRouterSubscriberActiveMibCap 7 }
+
+eriRouterSubscriberActiveMibCap8 AGENT-CAPABILITIES
+    PRODUCT-RELEASE     "SEOS 6.1"
+    STATUS      current
+    DESCRIPTION "ERICSSON-ROUTER-SUBSCRIBER-ACTIVE-MIB capabilities"
+    SUPPORTS    ERICSSON-ROUTER-SUBSCRIBER-ACTIVE-MIB
+    INCLUDES {
+        eriRouterSubsActiveGroup3,
+        eriRouterSubsStatsGroup2,
+        eriRouterSubsServicesGroup,
+        eriRouterSubsNotifyObjectGroup,
+        eriRouterSubsNotifyGroup
+    }
+
+    VARIATION eriRouterSubsActiveName
+        DESCRIPTION
+        "Each character must be printable (the posix funtion isprint()
+        returns true for each character) and the string may not contain
+        any of the characters double quote, single quote ('), bar (|), or
+        exclamation point (!)."
+
+    VARIATION eriRouterSubsClearSubscriberName
+        DESCRIPTION
+        "Each character must be printable (the posix funtion isprint()
+        returns true for each character) and the string may not contain
+        any of the characters double quote, single quote ('), bar (|), or
+        exclamation point (!)."
+
+    VARIATION eriRouterSubsClearSessionId
+        DESCRIPTION
+        "Each character must be printable (the posix funtion isprint()
+        returns true for each character) and the string may not contain
+        any of the characters double quote, single quote ('), bar (|), or
+        exclamation point (!)."
+
+    VARIATION eriRouterSubsReauthName
+        DESCRIPTION
+        "Each character must be printable (the posix funtion isprint()
+        returns true for each character) and the string may not contain
+        any of the characters double quote, single quote ('), bar (|), or
+        exclamation point (!)."
+
+    VARIATION eriRouterSubsReauthSessionId
+        DESCRIPTION
+        "Each character must be printable (the posix funtion isprint()
+        returns true for each character) and the string may not contain
+        any of the characters double quote, single quote ('), bar (|), or
+        exclamation point (!)."
+
+    VARIATION eriRouterSubsBounceName
+        DESCRIPTION
+        "Each character must be printable (the posix funtion isprint()
+        returns true for each character) and the string may not contain
+        any of the characters double quote, single quote ('), bar (|), or
+        exclamation point (!)."
+
+    VARIATION eriRouterSubsEncapsulationType
+        SYNTAX  INTEGER {
+                    ppp(1),
+                    pppoe(2),
+                    bridged1483(3),
+                    routed1483(4),
+                    multi1483(5),
+                    dot1q1483(6),
+                    dot1qEnet(7),
+                    clips(12),
+                    other(255)
+                }
+        DESCRIPTION
+        "SmartEdge does not support any 1490 (Frame Relay) at this time."
+
+    VARIATION eriRouterSubsXmitOctetsDropped
+        ACCESS  not-implemented
+        DESCRIPTION "Object is not supported."
+
+    VARIATION eriRouterSubsXmitPktsDropped
+        ACCESS  not-implemented
+        DESCRIPTION "Object is not supported."
+
+    VARIATION eriRouterSubsServiceName
+        ACCESS read-only
+        DESCRIPTION "Object is read-only"
+
+    VARIATION eriRouterSubsServiceTag
+        ACCESS read-only
+        DESCRIPTION "Object is read-only"
+
+    VARIATION eriRouterSubsServiceVolumeLimitIn
+        ACCESS read-only
+        DESCRIPTION "Object is read-only"
+
+    VARIATION eriRouterSubsServiceVolumeLimitOut
+        ACCESS read-only
+        DESCRIPTION "Object is read-only"
+
+    ::= { eriRouterSubscriberActiveMibCap 8 }
+
+eriRouterSubscriberActiveMibCap9 AGENT-CAPABILITIES
+    PRODUCT-RELEASE     "SEOS 5.0.7.10"
+    STATUS      current
+    DESCRIPTION "ERICSSON-ROUTER-SUBSCRIBER-ACTIVE-MIB capabilities"
+    SUPPORTS    ERICSSON-ROUTER-SUBSCRIBER-ACTIVE-MIB
+    INCLUDES {
+        eriRouterSubsActiveGroup3,
+        eriRouterSubsStatsGroup2,
+        eriRouterSubsNotifyObjectGroup,
+        eriRouterSubsNotifyGroup
+    }
+
+    VARIATION eriRouterSubsActiveName
+        DESCRIPTION
+        "Each character must be printable (the posix funtion isprint()
+        returns true for each character) and the string may not contain
+        any of the characters double quote, single quote ('), bar (|), or
+        exclamation point (!)."
+
+    VARIATION eriRouterSubsClearSubscriberName
+        DESCRIPTION
+        "Each character must be printable (the posix funtion isprint()
+        returns true for each character) and the string may not contain
+        any of the characters double quote, single quote ('), bar (|), or
+        exclamation point (!)."
+
+    VARIATION eriRouterSubsClearSessionId
+        DESCRIPTION
+        "Each character must be printable (the posix funtion isprint()
+        returns true for each character) and the string may not contain
+        any of the characters double quote, single quote ('), bar (|), or
+        exclamation point (!)."
+
+    VARIATION eriRouterSubsReauthName
+        DESCRIPTION
+        "Each character must be printable (the posix funtion isprint()
+        returns true for each character) and the string may not contain
+        any of the characters double quote, single quote ('), bar (|), or
+        exclamation point (!)."
+
+    VARIATION eriRouterSubsReauthSessionId
+        DESCRIPTION
+        "Each character must be printable (the posix funtion isprint()
+        returns true for each character) and the string may not contain
+        any of the characters double quote, single quote ('), bar (|), or
+        exclamation point (!)."
+
+    VARIATION eriRouterSubsBounceName
+        DESCRIPTION
+        "Each character must be printable (the posix funtion isprint()
+        returns true for each character) and the string may not contain
+        any of the characters double quote, single quote ('), bar (|), or
+        exclamation point (!)."
+
+    VARIATION eriRouterSubsEncapsulationType
+        SYNTAX  INTEGER {
+                    ppp(1),
+                    pppoe(2),
+                    bridged1483(3),
+                    routed1483(4),
+                    multi1483(5),
+                    dot1q1483(6),
+                    dot1qEnet(7),
+                    clips(12),
+                    other(255)
+                }
+        DESCRIPTION
+        "SmartEdge does not support any 1490 (Frame Relay) at this time."
+
+    VARIATION eriRouterSubsXmitOctetsDropped
+        ACCESS  not-implemented
+        DESCRIPTION "Object is not supported."
+
+    VARIATION eriRouterSubsXmitPktsDropped
+        ACCESS  not-implemented
+        DESCRIPTION "Object is not supported."
+
+    ::= { eriRouterSubscriberActiveMibCap 9 }
+
+eriRouterSubscriberActiveMibCap10 AGENT-CAPABILITIES
+    PRODUCT-RELEASE     "SEOS 6.1.5"
+    STATUS      current
+    DESCRIPTION "ERICSSON-ROUTER-SUBSCRIBER-ACTIVE-MIB capabilities"
+    SUPPORTS    ERICSSON-ROUTER-SUBSCRIBER-ACTIVE-MIB
+    INCLUDES {
+        eriRouterSubsActiveGroup3,
+        eriRouterSubsStatsGroup2,
+        eriRouterSubsServicesGroup,
+        eriRouterSubsNotifyObjectGroup,
+        eriRouterSubsNotifyGroup,
+        eriRouterSubsLicenseGroup
+    }
+
+    VARIATION eriRouterSubsActiveName
+        DESCRIPTION
+        "Each character must be printable (the posix funtion isprint()
+        returns true for each character) and the string may not contain
+        any of the characters double quote, single quote ('), bar (|), or
+        exclamation point (!)."
+
+    VARIATION eriRouterSubsClearSubscriberName
+        DESCRIPTION
+        "Each character must be printable (the posix funtion isprint()
+        returns true for each character) and the string may not contain
+        any of the characters double quote, single quote ('), bar (|), or
+        exclamation point (!)."
+
+    VARIATION eriRouterSubsClearSessionId
+        DESCRIPTION
+        "Each character must be printable (the posix funtion isprint()
+        returns true for each character) and the string may not contain
+        any of the characters double quote, single quote ('), bar (|), or
+        exclamation point (!)."
+
+    VARIATION eriRouterSubsReauthName
+        DESCRIPTION
+        "Each character must be printable (the posix funtion isprint()
+        returns true for each character) and the string may not contain
+        any of the characters double quote, single quote ('), bar (|), or
+        exclamation point (!)."
+
+    VARIATION eriRouterSubsReauthSessionId
+        DESCRIPTION
+        "Each character must be printable (the posix funtion isprint()
+        returns true for each character) and the string may not contain
+        any of the characters double quote, single quote ('), bar (|), or
+        exclamation point (!)."
+
+    VARIATION eriRouterSubsBounceName
+        DESCRIPTION
+        "Each character must be printable (the posix funtion isprint()
+        returns true for each character) and the string may not contain
+        any of the characters double quote, single quote ('), bar (|), or
+        exclamation point (!)."
+
+    VARIATION eriRouterSubsEncapsulationType
+        SYNTAX  INTEGER {
+                    ppp(1),
+                    pppoe(2),
+                    bridged1483(3),
+                    routed1483(4),
+                    multi1483(5),
+                    dot1q1483(6),
+                    dot1qEnet(7),
+                    clips(12),
+                    other(255)
+                }
+        DESCRIPTION
+        "SmartEdge does not support any 1490 (Frame Relay) at this time."
+
+    VARIATION eriRouterSubsXmitOctetsDropped
+        ACCESS  not-implemented
+        DESCRIPTION "Object is not supported."
+
+    VARIATION eriRouterSubsXmitPktsDropped
+        ACCESS  not-implemented
+        DESCRIPTION "Object is not supported."
+
+    VARIATION eriRouterSubsServiceName
+        ACCESS read-only
+        DESCRIPTION "Object is read-only"
+
+    VARIATION eriRouterSubsServiceTag
+        ACCESS read-only
+        DESCRIPTION "Object is read-only"
+
+    VARIATION eriRouterSubsServiceVolumeLimitIn
+        ACCESS read-only
+        DESCRIPTION "Object is read-only"
+
+    VARIATION eriRouterSubsServiceVolumeLimitOut
+        ACCESS read-only
+        DESCRIPTION "Object is read-only"
+
+    ::= { eriRouterSubscriberActiveMibCap 10 }
+
+
+eriRouterSubscriberActiveMibCap11 AGENT-CAPABILITIES
+    PRODUCT-RELEASE     "SEOS 6.4.x [SE, SM]"
+    STATUS      current
+    DESCRIPTION "ERICSSON-ROUTER-SUBSCRIBER-ACTIVE-MIB capabilities"
+    SUPPORTS    ERICSSON-ROUTER-SUBSCRIBER-ACTIVE-MIB
+    INCLUDES {
+        eriRouterSubsActiveGroup4,
+        eriRouterSubsStatsGroup3,
+        eriRouterSubsServicesGroup,
+        eriRouterSubsNotifyObjectGroup,
+        eriRouterSubsNotifyGroup,
+        eriRouterSubsLicenseGroup
+    }
+
+    VARIATION eriRouterSubsActiveName
+        DESCRIPTION
+        "Each character must be printable (the posix funtion isprint()
+        returns true for each character) and the string may not contain
+        any of the characters double quote, single quote ('), bar (|), or
+        exclamation point (!)."
+
+    VARIATION eriRouterSubsClearSubscriberName
+        DESCRIPTION
+        "Each character must be printable (the posix funtion isprint()
+        returns true for each character) and the string may not contain
+        any of the characters double quote, single quote ('), bar (|), or
+        exclamation point (!)."
+
+    VARIATION eriRouterSubsClearSessionId
+        DESCRIPTION
+        "Each character must be printable (the posix funtion isprint()
+        returns true for each character) and the string may not contain
+        any of the characters double quote, single quote ('), bar (|), or
+        exclamation point (!)."
+
+    VARIATION eriRouterSubsReauthName
+        DESCRIPTION
+        "Each character must be printable (the posix funtion isprint()
+        returns true for each character) and the string may not contain
+        any of the characters double quote, single quote ('), bar (|), or
+        exclamation point (!)."
+
+    VARIATION eriRouterSubsReauthSessionId
+        DESCRIPTION
+        "Each character must be printable (the posix funtion isprint()
+        returns true for each character) and the string may not contain
+        any of the characters double quote, single quote ('), bar (|), or
+        exclamation point (!)."
+
+    VARIATION eriRouterSubsBounceName
+        DESCRIPTION
+        "Each character must be printable (the posix funtion isprint()
+        returns true for each character) and the string may not contain
+        any of the characters double quote, single quote ('), bar (|), or
+        exclamation point (!)."
+
+    VARIATION eriRouterSubsEncapsulationType
+        SYNTAX  INTEGER {
+                    ppp(1),
+                    pppoe(2),
+                    bridged1483(3),
+                    routed1483(4),
+                    multi1483(5),
+                    dot1q1483(6),
+                    dot1qEnet(7),
+                    clips(12),
+                    other(255)
+                }
+        DESCRIPTION
+        "SmartEdge does not support any 1490 (Frame Relay) at this time."
+
+    VARIATION eriRouterSubsXmitOctetsDropped
+        ACCESS  not-implemented
+        DESCRIPTION "Object is not supported."
+
+    VARIATION eriRouterSubsXmitPktsDropped
+        ACCESS  not-implemented
+        DESCRIPTION "Object is not supported."
+
+    VARIATION eriRouterSubsServiceName
+        ACCESS read-only
+        DESCRIPTION "Object is read-only"
+
+    VARIATION eriRouterSubsServiceTag
+        ACCESS read-only
+        DESCRIPTION "Object is read-only"
+
+    VARIATION eriRouterSubsServiceVolumeLimitIn
+        ACCESS read-only
+        DESCRIPTION "Object is read-only"
+
+    VARIATION eriRouterSubsServiceVolumeLimitOut
+        ACCESS read-only
+        DESCRIPTION "Object is read-only"
+
+    ::= { eriRouterSubscriberActiveMibCap 11 }
+
+
+eriRouterSubscriberActiveMibCap12 AGENT-CAPABILITIES
+    PRODUCT-RELEASE     "SEOS 12.1[SE, SM]"
+    STATUS      current
+    DESCRIPTION "ERICSSON-ROUTER-SUBSCRIBER-ACTIVE-MIB capabilities"
+    SUPPORTS    ERICSSON-ROUTER-SUBSCRIBER-ACTIVE-MIB
+    INCLUDES {
+        eriRouterSubsActiveGroup4,
+        eriRouterSubsStatsGroup3,
+        eriRouterSubsServicesGroup,
+        eriRouterSubsNotifyObjectGroup,
+        eriRouterSubsNotifyGroup,
+        eriRouterSubsLicenseGroup
+    }
+
+    VARIATION eriRouterSubsActiveName
+        DESCRIPTION
+        "Each character must be printable (the posix funtion isprint()
+        returns true for each character) and the string may not contain
+        any of the characters double quote, single quote ('), bar (|), or
+        exclamation point (!). When the knob :
+        radius attribute acct-session-id [format physical]  is turned on, 
+        the eriRouterSubsActiveName is truncated to 74."
+
+    VARIATION eriRouterSubsClearSubscriberName
+        DESCRIPTION
+        "Each character must be printable (the posix funtion isprint()
+        returns true for each character) and the string may not contain
+        any of the characters double quote, single quote ('), bar (|), or
+        exclamation point (!)."
+
+    VARIATION eriRouterSubsClearSessionId
+        DESCRIPTION
+        "Each character must be printable (the posix funtion isprint()
+        returns true for each character) and the string may not contain
+        any of the characters double quote, single quote ('), bar (|), or
+        exclamation point (!)."
+
+    VARIATION eriRouterSubsReauthName
+        DESCRIPTION
+        "Each character must be printable (the posix funtion isprint()
+        returns true for each character) and the string may not contain
+        any of the characters double quote, single quote ('), bar (|), or
+        exclamation point (!)."
+
+    VARIATION eriRouterSubsReauthSessionId
+        DESCRIPTION
+        "Each character must be printable (the posix funtion isprint()
+        returns true for each character) and the string may not contain
+        any of the characters double quote, single quote ('), bar (|), or
+        exclamation point (!)."
+
+    VARIATION eriRouterSubsBounceName
+        DESCRIPTION
+        "Each character must be printable (the posix funtion isprint()
+        returns true for each character) and the string may not contain
+        any of the characters double quote, single quote ('), bar (|), or
+        exclamation point (!)."
+
+    VARIATION eriRouterSubsEncapsulationType
+        SYNTAX  INTEGER {
+                    ppp(1),
+                    pppoe(2),
+                    bridged1483(3),
+                    routed1483(4),
+                    multi1483(5),
+                    dot1q1483(6),
+                    dot1qEnet(7),
+                    clips(12),
+                    other(255)
+                }
+        DESCRIPTION
+        "SmartEdge does not support any 1490 (Frame Relay) at this time."
+
+    VARIATION eriRouterSubsXmitOctetsDropped
+        ACCESS  not-implemented
+        DESCRIPTION "Object is not supported."
+
+    VARIATION eriRouterSubsXmitPktsDropped
+        ACCESS  not-implemented
+        DESCRIPTION "Object is not supported."
+
+    VARIATION eriRouterSubsServiceName
+        ACCESS read-only
+        DESCRIPTION "Object is read-only"
+
+    VARIATION eriRouterSubsServiceTag
+        ACCESS read-only
+        DESCRIPTION "Object is read-only"
+
+    VARIATION eriRouterSubsServiceVolumeLimitIn
+        ACCESS read-only
+        DESCRIPTION "Object is read-only"
+
+    VARIATION eriRouterSubsServiceVolumeLimitOut
+        ACCESS read-only
+        DESCRIPTION "Object is read-only"
+
+    VARIATION eriRouterSubsActiveSessionId      
+        ACCESS read-only
+        DESCRIPTION
+            " When the knob :
+              radius attribute acct-session-id [format physical]
+              is turned on, the length of eriRouterSubsActiveSessionId is 33."
+
+    ::= { eriRouterSubscriberActiveMibCap 12 }
+
+END

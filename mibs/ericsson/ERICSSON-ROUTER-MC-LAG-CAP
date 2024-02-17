@@ -1,0 +1,70 @@
+-- %DNP%
+-- %DNP% $Source: /cvsroot/pkt/sw/se/xc/bsd/config/snmp/mibs/Attic/ERICSSON-ROUTER-MC-LAG-CAP.my,v $
+-- *****************************************************************
+-- ERICSSON-ROUTER-MC-LAG-MIB    Ericsson LAG MIB
+--
+-- Copyright (c) 2012, 2015, 2016 Ericsson AB.
+-- All rights reserved.
+--
+-- *****************************************************************
+
+ERICSSON-ROUTER-MC-LAG-CAP DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY
+                FROM SNMPv2-SMI
+        AGENT-CAPABILITIES
+                FROM SNMPv2-CONF
+        eriRouterCapabilities
+                FROM ERICSSON-ROUTER-SMI;
+
+eriRouterMcLagCap MODULE-IDENTITY
+    LAST-UPDATED    "201604111400Z" -- Apr 11, 2016
+    ORGANIZATION    "Ericsson AB."
+    CONTACT-INFO
+            "       Ericsson, Inc.
+
+            Postal: 300 Headquarters Drive
+                    San Jose, CA  95134-1370
+                    USA
+
+             Phone: +1 408 750 5000
+               Fax: +1 408 750 5599"
+
+    DESCRIPTION
+        "Creating new file with same renamed contents from
+        ERICSSON-ROUTER-LAG-CAP.my. Renaming: Lag to McLag."
+
+    REVISION        "201501141800Z" -- Jan 14, 2015
+    DESCRIPTION
+        "The Agent Capabilities of Circuit Emulation Service(LAG) MIB
+        implementation."
+
+    REVISION        "201501141800Z" -- Jan 14, 2015
+    DESCRIPTION
+        "Updated RBN/rbn/Rbn as ERICSSON-ROUTER/eriRouter/EriRouter
+         to migrate RBN MIB to ERICSSON MIB."
+
+    REVISION        "201210070000Z" -- Oct 7, 2012
+    DESCRIPTION
+        "Update DESCRIPTION clause of MODULE-IDENTITY
+         and PRODUCT-RELEASE clause of AGENT-CAPABILITIES."
+
+    REVISION        "201210070000Z" -- Oct 7, 2012
+    DESCRIPTION
+        "Initial version"
+        ::= { eriRouterCapabilities 105 }
+
+eriRouterMcLagCap1 AGENT-CAPABILITIES
+    PRODUCT-RELEASE "IPOS 12.2.x [SSR]"
+    STATUS          current
+    DESCRIPTION     "ERICSSON-ROUTER-MC-LAG-MIB capabilities"
+    SUPPORTS        ERICSSON-ROUTER-MC-LAG-MIB
+    INCLUDES {
+       eriRouterMcLagObjectGroup,
+       eriRouterMcLagNotificationGroup
+    }
+
+    ::= { eriRouterMcLagCap 1 }
+
+END

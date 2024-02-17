@@ -1,0 +1,266 @@
+-- %DNP% $Id: ERICSSON-ROUTER-TACACS-MIB.my,v 1.1.4.1.370.2 2011/02/22 17:26:18 thatcher Exp $
+-- %DNP% $Source: /cvsroot/pkt/sw/se/xc/bsd/config/snmp/mibs/Attic/ERICSSON-ROUTER-TACACS-MIB.my,v $
+-- *****************************************************************
+-- ERICSSON-ROUTER-TACACS-MIB               TACACS+ MIB
+--
+-- Copyright (c) 2004, 2011, 2015 Ericsson AB.
+-- All rights reserved.
+-- 
+-- *****************************************************************
+
+ERICSSON-ROUTER-TACACS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32,
+    NOTIFICATION-TYPE                      FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION                     FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP,
+    NOTIFICATION-GROUP                     FROM SNMPv2-CONF
+    SnmpAdminString                        FROM SNMP-FRAMEWORK-MIB
+    InetAddress, InetAddressType           FROM INET-ADDRESS-MIB
+    eriRouterMgmt                                FROM ERICSSON-ROUTER-SMI;
+
+eriRouterTacacsMib MODULE-IDENTITY
+    LAST-UPDATED "201501141800Z" -- Jan 14, 2015
+    ORGANIZATION "Ericsson AB."
+    CONTACT-INFO
+        "       Ericsson AB.
+
+        Postal: 100 Headquarters Dr.
+                San Jose, CA  95134
+                USA
+
+         Phone: +1 408 750-5000
+           Fax: +1 408 750-5599
+        "
+    DESCRIPTION
+        "This MIB defines a notification for the state
+         of the TACACS+ server."
+
+    REVISION     "201501141800Z" -- Jan 14, 2015
+    DESCRIPTION
+        "Updated RBN/rbn/Rbn as ERICSSON-ROUTER/eriRouter/EriRouter
+         to migrate RBN MIB to ERICSSON MIB."
+
+    REVISION	 "201101191800Z" -- Jan 19, 2011
+    DESCRIPTION
+        "Update CONTACT-INFO & ORGANIZATION."
+
+    REVISION	 "200403011800Z" -- March 1, 2004
+    DESCRIPTION
+        "Initial verison."
+
+    ::= { eriRouterMgmt 33 }
+
+eriRouterTacacsMIBNotifications OBJECT IDENTIFIER ::= { eriRouterTacacsMib 0 }
+eriRouterTacacsMIBObjects       OBJECT IDENTIFIER ::= { eriRouterTacacsMib 1 }
+eriRouterTacacsMIBConformance   OBJECT IDENTIFIER ::= { eriRouterTacacsMib 2 }
+
+eriRouterTacacsObjects          OBJECT IDENTIFIER ::= { eriRouterTacacsMIBObjects 1 }
+eriRouterTacacsAcctObjects      OBJECT IDENTIFIER ::= { eriRouterTacacsMIBObjects 2 }
+eriRouterTacacsNotifyObjects    OBJECT IDENTIFIER ::= { eriRouterTacacsMIBObjects 3 }
+
+--
+-- Textual Conventions
+--
+
+EriRouterTacacsState ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "The current state of a TACACS+ server. When a server is
+         initially configured its state is 'unknown'. When requests
+         are sent to this server it will transition to either 'up' or
+         'down', depending on whether the server replies to the
+         requests. It will then transition between 'up' and 'down'
+         accordingly. It will never transition back to 'unknown'."
+    SYNTAX INTEGER {
+        unknown(1),            -- state on initial creation
+        up(2),                 -- server is responding
+        down(3)                -- server is not responding
+    }
+
+EriRouterTacacsReason ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "When a TACACS+ server transitions to a new state, this identifies
+         the reason for the transition. "
+    SYNTAX INTEGER {
+        -- the following are only valid for a transition to 'up'
+        responding(1),          -- server is responding
+
+        -- the following are only valid for a transition to 'down'
+        packetTimeout(2),       -- the server is not responding and a
+                                -- packet-level timeout has occurred
+        serverTimeout(3),       -- the server is not responding and a
+                                -- server-level timeout has occurred
+        serverError(4)          -- server has an error resulting in
+                                -- a transition to down state
+    }
+
+--
+-- TACACS+ notification objects
+--
+-- these objects will only appear in notifications
+--
+
+eriRouterTacacsContext OBJECT-TYPE
+    SYNTAX     SnmpAdminString (SIZE (1..63))
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+        "The name of the context in which this server is configured."
+    ::= { eriRouterTacacsNotifyObjects 1 }
+
+eriRouterTacacsServerIndex OBJECT-TYPE
+    SYNTAX     Unsigned32 (1..4294967295)
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+        "A unique index value assigned to each TACACS server"
+    ::= { eriRouterTacacsNotifyObjects 2 }
+
+eriRouterTacacsServerAddressType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+        "The type of address contained in eriRouterTacacsServerAddress."
+    ::= { eriRouterTacacsNotifyObjects 3 }
+
+eriRouterTacacsServerAddress OBJECT-TYPE
+    SYNTAX     InetAddress
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+          "The TACACS+ server address."
+    ::= { eriRouterTacacsNotifyObjects 4 }
+
+eriRouterTacacsServerPort OBJECT-TYPE
+    SYNTAX     Unsigned32(0..65535)
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+          "The TCP port number."
+    ::= { eriRouterTacacsNotifyObjects 5 }
+
+eriRouterTacacsServerState OBJECT-TYPE
+    SYNTAX     EriRouterTacacsState
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+        "The current state of the TACACS+ server."
+    ::= { eriRouterTacacsNotifyObjects 6 }
+
+eriRouterTacacsServerReason OBJECT-TYPE
+    SYNTAX     EriRouterTacacsReason
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+        "The reason for the server's last state change."
+    ::= { eriRouterTacacsNotifyObjects 7 }
+
+eriRouterTacacsUserName OBJECT-TYPE
+    SYNTAX     SnmpAdminString (SIZE (0..128))
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+        "The name of the user the system was trying to authenticate
+         or send accouting information for when the TACACS+ server
+         transitioned to 'down'.
+
+         Note: the 'username' is only valid when transitioning due to
+         a packet-level timeout.
+
+         When transitioning due to any other reason the value for this
+         object will be a zero-length string."
+    ::= { eriRouterTacacsNotifyObjects 8 }
+
+eriRouterTacacsServerMsg OBJECT-TYPE
+    SYNTAX     SnmpAdminString (SIZE (0..256))
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+        "A text string optionally provided by the TACACS+ server when
+         eriRouterTacacsServerReason is 'serverError'. In all other cases
+         this is a zero-length string."
+    ::= { eriRouterTacacsNotifyObjects 9 }
+         
+--
+-- TACACS+ notifications
+--
+
+eriRouterTacacsStateChange NOTIFICATION-TYPE
+    OBJECTS { 
+        eriRouterTacacsContext,
+        eriRouterTacacsServerIndex,
+        eriRouterTacacsServerAddressType,
+        eriRouterTacacsServerAddress,
+        eriRouterTacacsServerPort,
+        eriRouterTacacsServerState, 
+        eriRouterTacacsServerReason,
+        eriRouterTacacsUserName,
+        eriRouterTacacsServerMsg
+    }
+    STATUS  current
+    DESCRIPTION
+        "This notification signifies that a TACACS+ authorization
+         server has transitioned to 'up' or 'down'.
+
+         Note: if eriRouterTacacsState's value is 'down' and
+         eriRouterTacacsReason's value is 'packetTimeout', then
+         eriRouterTacacsUserName's value will be a username. For all other
+         cases, eriRouterTacacsUserName's value will be a zero-length
+         string.
+         
+         If eriRouterTacacsServerReason is 'serverError', then eriRouterTacacsServerMsg
+         may contain a string from the server, otherwise the value is a
+         zero-length string."
+    ::= { eriRouterTacacsMIBNotifications 1 }
+
+
+--
+-- compliance statements
+--
+eriRouterTacacsCompliances OBJECT IDENTIFIER ::= { eriRouterTacacsMIBConformance 1 }
+eriRouterTacacsGroups      OBJECT IDENTIFIER ::= { eriRouterTacacsMIBConformance 2 }
+
+eriRouterTacacsCompliance MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION
+        "The compliance statement for SNMP entities which implement
+        this TACACS+ MIB."
+    MODULE  -- this module
+    MANDATORY-GROUPS {
+        eriRouterTacacsNotifyObjectsGroup,
+        eriRouterTacacsNotifyGroup
+    }
+    ::= { eriRouterTacacsCompliances 1 }
+
+eriRouterTacacsNotifyObjectsGroup OBJECT-GROUP
+    OBJECTS {
+        eriRouterTacacsContext,
+        eriRouterTacacsServerIndex,
+        eriRouterTacacsServerAddressType,
+        eriRouterTacacsServerAddress,
+        eriRouterTacacsServerPort,
+        eriRouterTacacsServerState, 
+        eriRouterTacacsServerReason,
+        eriRouterTacacsUserName,
+        eriRouterTacacsServerMsg
+    }
+    STATUS current
+    DESCRIPTION
+        "The collection of objects used only in notifications."
+    ::= { eriRouterTacacsGroups 2 }
+
+eriRouterTacacsNotifyGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        eriRouterTacacsStateChange
+    }
+    STATUS current
+    DESCRIPTION
+        "Notification for tracking the status of TACACS+ servers."
+    ::= { eriRouterTacacsGroups 3 }
+
+
+END

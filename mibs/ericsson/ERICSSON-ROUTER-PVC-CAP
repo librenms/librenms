@@ -1,0 +1,608 @@
+-- %DNP% $Id: ERICSSON-ROUTER-PVC-CAP.my,v 1.1.4.11.154.4 2011/06/15 18:19:46 danielhe Exp $
+-- %DNP% $Source: /cvsroot/pkt/sw/se/xc/bsd/config/snmp/mibs/Attic/ERICSSON-ROUTER-PVC-CAP.my,v $
+-- *****************************************************************
+-- ERICSSON-ROUTER-PVC-CAP	 PVC Mib Capabilities
+--
+-- Copyright (c) 2000-2007, 2010-2011, 2015 Ericsson AB
+-- All rights reserved.
+-- 
+-- *****************************************************************
+
+ERICSSON-ROUTER-PVC-CAP DEFINITIONS ::= BEGIN
+
+IMPORTS
+
+	MODULE-IDENTITY, Unsigned32, Integer32 
+			FROM SNMPv2-SMI
+	AGENT-CAPABILITIES
+			FROM SNMPv2-CONF
+	eriRouterCapabilities
+			FROM ERICSSON-ROUTER-SMI;
+
+eriRouterPvcMibCap MODULE-IDENTITY
+        LAST-UPDATED    "201501141800Z" -- Jan 14, 2015
+        ORGANIZATION    "Ericsson AB."
+        CONTACT-INFO
+                "       Ericsson AB.
+
+                Postal: 100 Headquarters Dr.
+                        San Jose, CA  95134
+                        USA
+
+                 Phone: +1 408 750 5000
+                   Fax: +1 408 750 5599
+                "
+	DESCRIPTION
+		"The Agent Capabilities of the ERICSSON-ROUTER-PVC MIB.
+
+                If this MIB implementation is platform-dependent,
+                the PRODUCT-RELEASE clause contains Ericsson SEOS version and
+                at least one of the following Ericsson product families:
+                    [SE]  SmartEdge Multi-service Edge Router (MSER) family
+                    [SM]  SM family of Metro Ethernet Service Transport platforms
+                    [SSR] Smart Service Router (SSR) family"
+
+        REVISION        "201501141800Z" -- Jan 14, 2015
+        DESCRIPTION
+                "Updated RBN/rbn/Rbn as ERICSSON-ROUTER/eriRouter/EriRouter
+                 to migrate RBN MIB to ERICSSON MIB."
+
+        REVISION        "201106150000Z" -- Jun 15, 2011
+        DESCRIPTION
+                "Update DESCRIPTION clause of MODULE-IDENTITY
+                 and PRODUCT-RELEASE clause of AGENT-CAPABILITIES."
+
+        REVISION        "201011010000Z" -- Nov 1, 2010
+        DESCRIPTION
+            "Modified PRODUCT-RELEASE clause for consistent naming.
+             Updated CONTACT-INFO."
+
+	REVISION        "200701230000Z" -- Jan 23, 2007
+	DESCRIPTION
+                "Added new OID: eriRouterPvcMibCap6.
+                 Updated eriRouterDot1qPvcOnEthEncapsulation with the encapuslations
+                 not currently supported."
+
+	REVISION        "200312120000Z" -- December 12, 2003
+	DESCRIPTION
+		"Added new AGENT-CAPABILITIES for the SE 2.6.3 release."
+
+	REVISION        "200303171700Z" -- March 17, 2003
+	DESCRIPTION
+		"Added new AGENT-CAPABILITIES for the SMS 6.0.7.x release."
+
+	REVISION        "200301130000Z" -- January 13, 2003
+	DESCRIPTION
+		"Added new AGENT-CAPABILITIES for the SE 2.4.4 release."
+
+	REVISION	"200212201700Z" -- December 20, 2002
+	DESCRIPTION
+		"Added new AGENT-CAPABILITIES for the AOS 6.x release."
+
+	REVISION	"200205231700Z" -- May 23, 2002
+	DESCRIPTION
+		"Updated CONTACT-INFO clause in MODULE-IDENTITY."
+
+	REVISION	"200105081700Z" -- May 8, 2001
+	DESCRIPTION
+		"Added VARIATION for eriRouterAtmPvcEncapsulation."
+
+	REVISION	"200003152300Z"
+	DESCRIPTION
+		"Initial version ."
+	::= { eriRouterCapabilities 31 }
+
+eriRouterPvcMibCap1 AGENT-CAPABILITIES
+	PRODUCT-RELEASE	"AOS 5.X.X.X"
+	STATUS		current
+	DESCRIPTION	"ERICSSON-ROUTER-PVC-MIB capabilities"
+	SUPPORTS	ERICSSON-ROUTER-PVC-MIB
+	INCLUDES {
+		eriRouterAtmPvcGroup,
+		eriRouterFrameRelayPvcGroup
+	}
+
+	VARIATION eriRouterAtmPvcEncapsulation
+	WRITE-SYNTAX INTEGER {
+		auto1483(1),      -- auto detect bridge or routed encapsulation
+		bridge1483(2),    -- bridged 1483
+		multi1483(3),     -- 1483 bridge or PPPoE encapsulation
+		route1483(4),     -- Routed 1483 encapsulation
+		l2tp(5),          -- l2tp encapsulation
+		l2tpVcMuxed(6),   -- vc-muxed l2tp encapsulation
+		ppp(7),           -- PPP encapsulation
+		pppAuto(8),       -- Automatically detect PPP encapsulation
+		pppOverEthernet(9), -- PPP over Ethernet (PPPOE) encapsulation
+		pppSerial(10),    -- SERIAL PPP encaps used in non compliant
+				  -- configurations
+		pppNlpid(11),     -- NLPID PPP encaps
+		pppLlc(12),       -- LLC/SNAP PPP encaps per RFC 2364
+		pppVcMuxed(13),   -- vc-based mux encaps per RFC-2364
+		dot1q1483(15)     -- 802.1Q over bridged 1483
+	}
+	DESCRIPTION	
+		"Restrict modification and creation. Setting object value
+		to raw(14) not supported."
+
+	VARIATION eriRouterAtmPvcRowStatus
+	WRITE-SYNTAX INTEGER { active(1), createAndGo(4), destroy(6) }
+	DESCRIPTION	
+		"Restrict row creation to createAndGo. Setting object value 
+		to createAndWait or notInService are not supported."
+			
+	VARIATION eriRouterFrameRelayPvcRowStatus
+	WRITE-SYNTAX INTEGER { active(1), createAndGo(4), destroy(6) }
+	DESCRIPTION	
+		"Restrict row creation to createAndGo. Setting object value 
+		to createAndWait or notInService are not supported."
+			
+	::= { eriRouterPvcMibCap 1 }
+	
+eriRouterPvcMibCap2 AGENT-CAPABILITIES
+	PRODUCT-RELEASE	"AOS 6.X.X.X"
+	STATUS		current
+	DESCRIPTION	"ERICSSON-ROUTER-PVC-MIB capabilities"
+	SUPPORTS	ERICSSON-ROUTER-PVC-MIB
+	INCLUDES {
+		eriRouterAtmPvcGroup2,
+		eriRouterFrameRelayPvcGroup2
+	}
+
+	VARIATION eriRouterAtmPvcEncapsulation
+	WRITE-SYNTAX INTEGER {
+		auto1483(1),      -- auto detect bridge or routed encapsulation
+		bridge1483(2),    -- bridged 1483
+		multi1483(3),     -- 1483 bridge or PPPoE encapsulation
+		route1483(4),     -- Routed 1483 encapsulation
+		l2tp(5),          -- l2tp encapsulation
+		l2tpVcMuxed(6),   -- vc-muxed l2tp encapsulation
+		ppp(7),           -- PPP encapsulation
+		pppAuto(8),       -- Automatically detect PPP encapsulation
+		pppOverEthernet(9), -- PPP over Ethernet (PPPOE) encapsulation
+		pppSerial(10),    -- SERIAL PPP encaps used in non compliant
+				  -- configurations
+		pppNlpid(11),     -- NLPID PPP encaps
+		pppLlc(12),       -- LLC/SNAP PPP encaps per RFC 2364
+		pppVcMuxed(13),   -- vc-based mux encaps per RFC-2364
+		dot1q1483(15)     -- 802.1Q over bridged 1483
+	}
+	DESCRIPTION	
+		"Restrict modification and creation. Setting object value
+		to raw(14) not supported."
+
+	VARIATION eriRouterAtmPvcRowStatus
+	WRITE-SYNTAX INTEGER { active(1), createAndGo(4), destroy(6) }
+	DESCRIPTION	
+		"Restrict row creation to createAndGo. Setting object value 
+		to createAndWait or notInService are not supported."
+			
+	VARIATION eriRouterAtmPvcCircuitType
+	WRITE-SYNTAX INTEGER { explicit(1) }
+	DESCRIPTION	
+		"Restrict circuit type to explicit(1). Setting object value 
+		to explicitRange(2), onDemandRange(3), or protection(4) is
+		not supported."
+
+	VARIATION eriRouterFrameRelayPvcRowStatus
+	WRITE-SYNTAX INTEGER { active(1), createAndGo(4), destroy(6) }
+	DESCRIPTION	
+		"Restrict row creation to createAndGo. Setting object value 
+		to createAndWait or notInService are not supported."
+			
+	VARIATION eriRouterFrameRelayPvcCircuitType
+	WRITE-SYNTAX INTEGER { explicit(1) }
+	DESCRIPTION	
+		"Restrict circuit type to explicit(1). Setting object value 
+		to explicitRange(2), onDemandRange(3), or protection(4) is
+		not supported."
+
+	::= { eriRouterPvcMibCap 2 }
+
+eriRouterPvcMibCap3 AGENT-CAPABILITIES
+	PRODUCT-RELEASE "SEOS 2.4.4"
+	STATUS		current
+	DESCRIPTION	"ERICSSON-ROUTER-PVC-MIB capabilities"
+	SUPPORTS	ERICSSON-ROUTER-PVC-MIB
+	INCLUDES {
+		eriRouterAtmPvcGroup2,
+		eriRouterDot1qPvcOnEthGroup
+	}
+
+	VARIATION eriRouterAtmPvcProfileName
+	ACCESS    read-only
+	DESCRIPTION
+		"Write access is not allowed."
+
+	VARIATION eriRouterAtmPvcEncapsulation
+	SYNTAX INTEGER {
+		bridge1483(2),    -- bridged 1483
+		multi1483(3),     -- 1483 bridge or PPPoE encapsulation
+		route1483(4),     -- Routed 1483 encapsulation
+		ppp(7),           -- PPP encapsulation
+		pppOverEthernet(9), -- PPP over Ethernet (PPPOE) encapsulation
+		raw(14)           -- raw encaps
+	}
+	ACCESS    read-only
+	DESCRIPTION
+		"Write access is not allowed.  The value auto1483(1), l2tp(5),
+		l2tpVcMuxed(6), pppAuto(8), pppSerial(10), pppNlpid(11), 
+		pppLlc(12), pppVcMuxed(13), or dot1q1483(15) is not 
+		supported."
+
+	VARIATION eriRouterAtmPvcRowStatus
+	SYNTAX    INTEGER { active(1) }
+	ACCESS    read-only
+	DESCRIPTION
+		"Row creation, deletion or modification is not allowed"
+
+	VARIATION eriRouterAtmPvcCircuitType
+	SYNTAX    INTEGER { 
+		explicit(1),      -- a single explicit circuit
+		explicitRange(2), -- an explicit circuit range
+		onDemandRange(3)  -- an ondemand circuit range
+	}
+	ACCESS    read-only
+	DESCRIPTION
+		"Write access is not allowed.  The value protection(4)
+		is not supported."
+
+	VARIATION eriRouterDot1qPvcOnEthVlanId
+	SYNTAX    Integer32 ( 1..4095 )
+	DESCRIPTION
+		"Restrict to 802.1Q-tagged traffic on a Ethernet port. 
+		Untagged traffic is not supported."
+
+	VARIATION eriRouterDot1qPvcOnEthRowStatus
+	SYNTAX    INTEGER { active(1) }
+	ACCESS    read-only
+	DESCRIPTION
+		"Row creation, deletion or modification is not allowed"
+
+	VARIATION eriRouterDot1qPvcOnEthProfileName
+	ACCESS    read-only
+	DESCRIPTION
+		"Write access is not allowed."
+
+	VARIATION eriRouterDot1qPvcOnEthEncapsulation
+	ACCESS    read-only
+	DESCRIPTION
+		"Write access is not allowed."
+
+	VARIATION eriRouterDot1qPvcOnEthCircuitType
+	SYNTAX    INTEGER { explicit(1) }
+	ACCESS    read-only
+	DESCRIPTION
+		"Write access is not allowed.  The value explicitRange(2),
+		onDemandRange(3), or protection(4) is not supported."
+
+	::= { eriRouterPvcMibCap 3 }
+
+eriRouterPvcMibCap4 AGENT-CAPABILITIES
+	PRODUCT-RELEASE	"AOS 6.0.7.X"
+	STATUS		current
+	DESCRIPTION	"ERICSSON-ROUTER-PVC-MIB capabilities"
+	SUPPORTS	ERICSSON-ROUTER-PVC-MIB
+	INCLUDES {
+		eriRouterAtmPvcGroup2,
+		eriRouterFrameRelayPvcGroup2,
+		eriRouterDot1qPvcOnEthGroup,
+		eriRouterDot1qPvcOnAtmGroup,
+		eriRouterDot1qPvcOnFrGroup
+	}
+
+	VARIATION eriRouterAtmPvcEncapsulation
+	WRITE-SYNTAX INTEGER {
+		auto1483(1),      -- auto detect bridge or routed encapsulation
+		bridge1483(2),    -- bridged 1483
+		multi1483(3),     -- 1483 bridge or PPPoE encapsulation
+		route1483(4),     -- Routed 1483 encapsulation
+		l2tp(5),          -- l2tp encapsulation
+		l2tpVcMuxed(6),   -- vc-muxed l2tp encapsulation
+		ppp(7),           -- PPP encapsulation
+		pppAuto(8),       -- Automatically detect PPP encapsulation
+		pppOverEthernet(9), -- PPP over Ethernet (PPPOE) encapsulation
+		pppSerial(10),    -- SERIAL PPP encaps used in non compliant
+				  -- configurations
+		pppNlpid(11),     -- NLPID PPP encaps
+		pppLlc(12),       -- LLC/SNAP PPP encaps per RFC 2364
+		pppVcMuxed(13),   -- vc-based mux encaps per RFC-2364
+		dot1q1483(15),    -- 802.1Q over bridged 1483
+		clips1483(16)     -- clientless IP 1483
+	}
+	DESCRIPTION
+		"Restrict modification and creation. Setting object value
+		to raw(14) not supported."
+
+	VARIATION eriRouterAtmPvcRowStatus
+	WRITE-SYNTAX INTEGER { active(1), createAndGo(4), destroy(6) }
+	DESCRIPTION
+		"Restrict row creation to createAndGo. Setting object value 
+		to createAndWait or notInService are not supported."
+
+	VARIATION eriRouterAtmPvcCircuitType
+	WRITE-SYNTAX INTEGER { explicit(1) }
+	DESCRIPTION
+		"Restrict circuit type to explicit(1). Setting object value 
+		to explicitRange(2), onDemandRange(3), or protection(4) is
+		not supported."
+
+	VARIATION eriRouterFrameRelayPvcRowStatus
+	WRITE-SYNTAX INTEGER { active(1), createAndGo(4), destroy(6) }
+	DESCRIPTION
+		"Restrict row creation to createAndGo. Setting object value 
+		to createAndWait or notInService are not supported."
+
+	VARIATION eriRouterFrameRelayPvcCircuitType
+	WRITE-SYNTAX INTEGER { explicit(1) }
+	DESCRIPTION
+		"Restrict circuit type to explicit(1). Setting object value 
+		to explicitRange(2), onDemandRange(3), or protection(4) is
+		not supported."
+
+	VARIATION eriRouterDot1qPvcOnEthVlanId
+	WRITE-SYNTAX Integer32 ( 2..4094 | 4096 )
+	DESCRIPTION
+		"The lower bound of the VID on the SMS platorm is restricted
+		to 2, the upper bound is restricted to 4094, except that a
+		value of 4096 designates an untagged PVC."
+
+	VARIATION eriRouterDot1qPvcOnEthRowStatus
+	SYNTAX    INTEGER { active(1) }
+	ACCESS    read-only
+	DESCRIPTION
+		"Create and write access is not supported."
+
+	VARIATION eriRouterDot1qPvcOnEthProfileName
+	ACCESS    read-only
+	DESCRIPTION
+		"Write access is not supported."
+
+	VARIATION eriRouterDot1qPvcOnEthEncapsulation
+	ACCESS    read-only
+	DESCRIPTION
+		"Write access is not supported."
+
+	VARIATION eriRouterDot1qPvcOnEthCircuitType
+	ACCESS    read-only
+	DESCRIPTION
+		"Write access is not supported."
+
+	VARIATION eriRouterDot1qPvcOnAtmVlanId
+	WRITE-SYNTAX Integer32 ( 2..4094 | 4096 )
+	DESCRIPTION
+		"The lower bound of the VID on the SMS platorm is restricted
+		to 2, the upper bound is restricted to 4094, except that a
+		value of 4096 designates an untagged PVC."
+
+	VARIATION eriRouterDot1qPvcOnAtmRowStatus
+	SYNTAX    INTEGER { active(1) }
+	ACCESS    read-only
+	DESCRIPTION
+		"Create and write access is not supported."
+
+	VARIATION eriRouterDot1qPvcOnAtmProfileName
+	ACCESS    read-only
+	DESCRIPTION
+		"Write access is not supported."
+
+	VARIATION eriRouterDot1qPvcOnAtmEncapsulation
+	ACCESS    read-only
+        DESCRIPTION
+		"Write access is not supported."
+
+	VARIATION eriRouterDot1qPvcOnAtmCircuitType
+	ACCESS    read-only
+	DESCRIPTION
+		"Write access is not supported."
+
+	VARIATION eriRouterDot1qPvcOnFrChannel
+	SYNTAX    Unsigned32 (0..255)
+	DESCRIPTION
+		"The Frame Relay Channel number is restricted to an
+		8-bit number on the SMS platform."
+
+	VARIATION eriRouterDot1qPvcOnFrVlanId
+	WRITE-SYNTAX Integer32 ( 2..4094 | 4096 )
+	DESCRIPTION
+		"The lower bound of the VID on the SMS platorm is restricted
+		to 2, the upper bound is restricted to 4094, except that a
+		value of 4096 designates an untagged PVC."
+
+	VARIATION eriRouterDot1qPvcOnFrRowStatus
+	SYNTAX    INTEGER { active(1) }
+	ACCESS    read-only
+	DESCRIPTION
+		"Create and write access is not supported."
+
+	VARIATION eriRouterDot1qPvcOnFrProfileName
+	ACCESS    read-only
+	DESCRIPTION
+		"Write access is not supported."
+
+	VARIATION eriRouterDot1qPvcOnFrEncapsulation
+	ACCESS    read-only
+        DESCRIPTION
+		"Write access is not supported."
+
+	VARIATION eriRouterDot1qPvcOnFrCircuitType
+	ACCESS    read-only
+	DESCRIPTION
+		"Write access is not supported."
+
+	::= { eriRouterPvcMibCap 4 }
+
+eriRouterPvcMibCap5 AGENT-CAPABILITIES
+	PRODUCT-RELEASE "SEOS 2.6.3"
+	STATUS		current
+	DESCRIPTION	"ERICSSON-ROUTER-PVC-MIB capabilities"
+	SUPPORTS	ERICSSON-ROUTER-PVC-MIB
+	INCLUDES {
+		eriRouterAtmPvcGroup2,
+		eriRouterDot1qPvcOnEthGroup
+	}
+
+	VARIATION eriRouterAtmPvcProfileName
+	ACCESS    read-only
+	DESCRIPTION
+		"Write access is not allowed."
+
+	VARIATION eriRouterAtmPvcEncapsulation
+	SYNTAX    INTEGER {
+		bridge1483(2),    -- bridged 1483 encapsulation
+		multi1483(3),     -- 1483 bridge or PPPoE encapsulation
+		route1483(4),     -- Routed 1483 encapsulation
+		ppp(7),           -- PPP encapsulation
+		pppOverEthernet(9), -- PPP over Ethernet (PPPOE) encapsulation
+		raw(14)           -- raw encapsulation
+	}
+	ACCESS    read-only
+	DESCRIPTION
+		"Write access is not allowed.  The value auto1483(1), l2tp(5),
+		l2tpVcMuxed(6), pppAuto(8), pppSerial(10), pppNlpid(11), 
+		pppLlc(12), pppVcMuxed(13), or dot1q1483(15) is not 
+		supported."
+
+	VARIATION eriRouterAtmPvcRowStatus
+	SYNTAX    INTEGER { active(1) }
+	ACCESS    read-only
+	DESCRIPTION
+		"Row creation, deletion or modification is not allowed"
+
+	VARIATION eriRouterAtmPvcCircuitType
+	SYNTAX    INTEGER { 
+		explicit(1),      -- a single explicit circuit
+		explicitRange(2), -- an explicit circuit range
+		onDemandRange(3)  -- an ondemand circuit range
+	}
+	ACCESS    read-only
+	DESCRIPTION
+		"Write access is not allowed.  The value protection(4)
+		is not supported."
+
+	VARIATION eriRouterDot1qPvcOnEthVlanId
+	SYNTAX    Integer32 ( 1..4095 )
+	DESCRIPTION
+		"Restrict to 802.1Q-tagged traffic on a Ethernet port. 
+		Untagged traffic is not supported."
+
+	VARIATION eriRouterDot1qPvcOnEthRowStatus
+	SYNTAX    INTEGER { active(1) }
+	ACCESS    read-only
+	DESCRIPTION
+		"Row creation, deletion or modification is not allowed"
+
+	VARIATION eriRouterDot1qPvcOnEthProfileName
+	ACCESS    read-only
+	DESCRIPTION
+		"Write access is not allowed."
+
+	VARIATION eriRouterDot1qPvcOnEthEncapsulation
+	ACCESS    read-only
+	DESCRIPTION
+		"Write access is not allowed."
+
+	VARIATION eriRouterDot1qPvcOnEthCircuitType
+	SYNTAX    INTEGER { 
+		explicit(1),
+	        onDemandRange(3) 
+	}
+	ACCESS    read-only
+	DESCRIPTION
+		"Write access is not allowed.  The value explicitRange(2),
+		or protection(4) is not supported."
+
+	::= { eriRouterPvcMibCap 5 }
+
+eriRouterPvcMibCap6 AGENT-CAPABILITIES
+        PRODUCT-RELEASE "SEOS 6.0.3 [SE]; SEOS 6.3.X [SM]; SEOS 11.1.x [SSR]"
+        STATUS          current
+        DESCRIPTION     "ERICSSON-ROUTER-PVC-MIB capabilities"
+        SUPPORTS        ERICSSON-ROUTER-PVC-MIB
+        INCLUDES {
+                eriRouterAtmPvcGroup2,
+                eriRouterDot1qPvcOnEthGroup
+        }
+
+        VARIATION eriRouterAtmPvcProfileName
+        ACCESS    read-only
+        DESCRIPTION
+                "Write access is not allowed."
+
+        VARIATION eriRouterAtmPvcEncapsulation
+        SYNTAX    INTEGER {
+                bridge1483(2),    -- bridged 1483 encapsulation
+                multi1483(3),     -- 1483 bridge or PPPoE encapsulation
+                route1483(4),     -- Routed 1483 encapsulation
+                ppp(7),           -- PPP encapsulation
+                pppOverEthernet(9), -- PPP over Ethernet (PPPOE) encapsulation
+                raw(14)           -- raw encapsulation
+        }
+        ACCESS    read-only
+        DESCRIPTION
+                "Write access is not allowed.  The value auto1483(1), l2tp(5),
+                l2tpVcMuxed(6), pppAuto(8), pppSerial(10), pppNlpid(11),
+                pppLlc(12), pppVcMuxed(13), or dot1q1483(15) is not
+                supported."
+
+        VARIATION eriRouterAtmPvcRowStatus
+        SYNTAX    INTEGER { active(1) }
+        ACCESS    read-only
+        DESCRIPTION
+                "Row creation, deletion or modification is not allowed"
+
+        VARIATION eriRouterAtmPvcCircuitType
+        SYNTAX    INTEGER {
+                explicit(1),      -- a single explicit circuit
+                explicitRange(2), -- an explicit circuit range
+                onDemandRange(3)  -- an ondemand circuit range
+        }
+        ACCESS    read-only
+        DESCRIPTION
+                "Write access is not allowed.  The value protection(4)
+                is not supported."
+
+        VARIATION eriRouterDot1qPvcOnEthVlanId
+        SYNTAX    Integer32 ( 1..4095 )
+        DESCRIPTION
+                "Restrict to 802.1Q-tagged traffic on a Ethernet port.
+                Untagged traffic is not supported."
+
+        VARIATION eriRouterDot1qPvcOnEthRowStatus
+        SYNTAX    INTEGER { active(1) }
+        ACCESS    read-only
+        DESCRIPTION
+                "Row creation, deletion or modification is not allowed"
+
+        VARIATION eriRouterDot1qPvcOnEthProfileName
+        ACCESS    read-only
+        DESCRIPTION
+                "Write access is not allowed."
+
+        VARIATION eriRouterDot1qPvcOnEthEncapsulation
+        SYNTAX  INTEGER {
+                unknown(0),             -- unknown encapsulation
+                ipOverEthernet(1),      -- IP over Ethernet encapsulation
+                dot1qMulti(2),          -- PPPoE, IPoE, or IPv6oE encapsulation
+                pppOverEthernet(3),     -- PPP over Ethernet encapsulation
+                dot1qRaw(4)             -- dot1qRaw over Ethernet encapsulation
+        }
+        ACCESS    read-only
+        DESCRIPTION
+                "Write access is not allowed. The value dot1qClips(5),
+                dot1qTunnelMulti(6), dot1qTunnelPppOverEthernet(7),
+                dot1qTunnelRaw(8), dot1qTunnelClips(9) is not supported."
+
+
+        VARIATION eriRouterDot1qPvcOnEthCircuitType
+        SYNTAX    INTEGER {
+                explicit(1),
+                onDemandRange(3)
+        }
+        ACCESS    read-only
+        DESCRIPTION
+                "Write access is not allowed.  The value explicitRange(2),
+                 or protection(4) is not supported."
+
+        ::= { eriRouterPvcMibCap 6 }
+
+END

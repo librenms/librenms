@@ -1,0 +1,436 @@
+-- %DNP%
+-- %DNP% $Source: /cvsroot/pkt/sw/se/xc/bsd/config/snmp/mibs/Attic/ERICSSON-ROUTER-MC-LAG-MIB.my,v $
+-- *****************************************************************
+-- ERICSSON-ROUTER-MC-LAG-MIB
+--
+-- Copyright (c) 2012 RedBack Networks, Inc.
+-- All rights reserved.
+--
+-- Copyright (c) 2012, 2015, 2016 Ericsson AB.
+-- All rights reserved.
+--
+-- *****************************************************************
+
+ERICSSON-ROUTER-MC-LAG-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+  MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, Integer32
+      FROM SNMPv2-SMI
+  MODULE-COMPLIANCE
+         FROM SNMPv2-CONF                                    -- [RFC2580]
+  MacAddress,
+  TruthValue,
+  DateAndTime
+      FROM SNMPv2-TC
+  SnmpAdminString
+      FROM SNMP-FRAMEWORK-MIB
+  eriRouterMgmt
+      FROM ERICSSON-ROUTER-SMI
+  EriRouterSlot, EriRouterPort
+      FROM ERICSSON-ROUTER-TC
+  InterfaceIndex
+      FROM IF-MIB
+  OBJECT-GROUP, NOTIFICATION-GROUP
+      FROM SNMPv2-CONF;
+
+eriRouterMcLagMIB MODULE-IDENTITY
+     LAST-UPDATED    "201604111400Z" -- Apr 11, 2016
+     ORGANIZATION    "Ericsson AB."
+     CONTACT-INFO
+             "       Ericsson AB.
+
+                     100 Headquarters Dr
+                     San Jose, CA  95134
+                     USA
+
+             Phone:  +1 408 750-5000
+             Fax:    +1 408 750-5599
+
+             "
+     DESCRIPTION
+             "Creating new file with same renamed contents from
+              ERICSSON-ROUTER-LAG-MIB.my. Renaming: Lag to McLag."
+
+     REVISION        "201501141800Z" -- Jan 14, 2015
+     DESCRIPTION
+             " Defines the objects necessary to monitor the MC-LAG information
+               and the state changes of the MC-LAG and its constituent circuits."
+
+-- Revision history
+     REVISION        "201501141800Z" -- Jan 14, 2015
+     DESCRIPTION
+             "Updated RBN/rbn/Rbn as ERICSSON-ROUTER/eriRouter/EriRouter
+              to migrate RBN MIB to ERICSSON MIB."
+
+    ::= { eriRouterMgmt 102 }
+
+-- Top level components of this MIB.
+eriRouterMcLagNotifications OBJECT IDENTIFIER ::= { eriRouterMcLagMIB 0 }
+eriRouterMcLagObjects OBJECT IDENTIFIER ::= { eriRouterMcLagMIB 1 }
+eriRouterMcLagConformance   OBJECT IDENTIFIER ::= { eriRouterMcLagMIB 2 }
+
+--
+-- Scalars and Tables
+--
+eriRouterMcLagTable OBJECT-TYPE
+  SYNTAX  SEQUENCE OF EriRouterMcLagEntry
+  MAX-ACCESS not-accessible
+  STATUS  current
+  DESCRIPTION
+      "This table consists of MC-LAG management objects."
+  ::= { eriRouterMcLagObjects 1 }
+
+
+eriRouterMcLagEntry OBJECT-TYPE
+  SYNTAX  EriRouterMcLagEntry
+  MAX-ACCESS not-accessible
+  STATUS  current
+  DESCRIPTION
+      "Each entry contains management objects of an MC-LAG node."
+  INDEX {
+      eriRouterMcLagName }
+  ::= { eriRouterMcLagTable 1 }
+
+
+EriRouterMcLagEntry ::= SEQUENCE {
+  eriRouterMcLagName                 SnmpAdminString,
+  eriRouterMcLagId                   Integer32,
+  eriRouterMcLagSystemPriority       Integer32,
+  eriRouterMcLagSystemMacAddress     MacAddress,
+  eriRouterMcLagRevertiveMode        TruthValue,
+  eriRouterMcLagRevertiveHoldTimer   Integer32,
+  eriRouterMcLagOperState            INTEGER,
+  eriRouterMcLagOperErrorCode        INTEGER,
+  eriRouterMcLagSwitchOverTime       DateAndTime,
+  eriRouterMcLagSwitchOverReason     SnmpAdminString 
+  }
+
+
+eriRouterMcLagName OBJECT-TYPE
+  SYNTAX  SnmpAdminString (SIZE(1..16))
+  MAX-ACCESS not-accessible
+  STATUS  current
+  DESCRIPTION
+      "This string name uniquely identifies an MC-LAG within an MC-LAG
+      cluster. Within an MC-LAG cluster, there could not be two LAG with
+      the same name on the same chassis. The MC-LAGs with the same name on
+      different chassis are peer to each other."
+  ::= { eriRouterMcLagEntry 1 }
+
+eriRouterMcLagId OBJECT-TYPE
+  SYNTAX  Integer32
+  MAX-ACCESS read-only 
+  STATUS  current
+  DESCRIPTION
+      "The identifier is assigned to a LAG on individual chassis at the
+      time of LAG configuration. This identifier could be different
+      between LAG in the same MC-LAG. There is no coordination between the
+      two id manager on the two chassis in assigning the LAG ID on
+      different chassis."
+  ::= { eriRouterMcLagEntry 2 }
+
+eriRouterMcLagSystemPriority OBJECT-TYPE
+  SYNTAX  Integer32
+  MAX-ACCESS read-only
+  STATUS  current
+  DESCRIPTION
+      "This is a configurable value. The system priority will form part of
+      the link-group system id. System priority priority will occupy the
+      last 32 bit of the system-id."
+  ::= { eriRouterMcLagEntry 3 }
+
+
+eriRouterMcLagSystemMacAddress OBJECT-TYPE
+  SYNTAX  MacAddress
+  MAX-ACCESS read-only
+  STATUS  current
+  DESCRIPTION
+      "The ."
+  ::= { eriRouterMcLagEntry 4 }
+
+
+eriRouterMcLagRevertiveMode OBJECT-TYPE
+  SYNTAX  TruthValue 
+  MAX-ACCESS read-only
+  STATUS  current
+  DESCRIPTION
+      "This boolean value indicates whether revertive mode is set for an
+      MC-LAG. If revertive mode is set, the LAG with higher priority starts the
+      revertive process once it recovers from some failures to a state
+      where it has regained capacity to take over as the active LAG of an MC-LAG."
+  ::= { eriRouterMcLagEntry 5 }
+
+
+eriRouterMcLagRevertiveHoldTimer OBJECT-TYPE
+  SYNTAX  Integer32
+  UNITS
+      "seconds"
+  MAX-ACCESS read-only
+  STATUS  current
+  DESCRIPTION
+      "This is a configurable value in revertive mode. If this value is
+      configured, the LAG with higher priority will hold off for the
+      seconds configured by the value before starting the revertive
+      procedure."
+  ::= { eriRouterMcLagEntry 6 }
+
+eriRouterMcLagOperState OBJECT-TYPE
+  SYNTAX  INTEGER {
+          up(1),
+          down(2),
+          standby(3) }
+  MAX-ACCESS read-only
+  STATUS  current
+  DESCRIPTION
+      "The current MC-LAG state:
+      Up      -  When the MC-LAG is active on one of the two chassis.
+                 In this state, the traffic are flowing through the active
+                 LAG.
+      Down    -  When the MC-LAG is down, the LAG is not in a position to 
+                 take over as active LAG of an MC-LAG.
+      Standby -  When the MC-LAG is standby, the LAG is ready to take over
+                 as the active LAG fails."
+  ::= { eriRouterMcLagEntry 7 }
+
+eriRouterMcLagOperErrorCode OBJECT-TYPE
+  SYNTAX  INTEGER {
+          noError(0),
+          configMismatch(1),
+          priorityError(2),
+          downMinLink(3)
+          }
+  MAX-ACCESS read-only
+  STATUS  current
+  DESCRIPTION
+      " The reason that MC-LAG is Down.
+        configMismatch - MC-LAG is down because LAG related configuration
+                         is not the same between the two LAGs in an MC-LAG.
+        priorityError - MC-LAG is down because the configured port priority 
+                        values between the two LAGs of an MC-LAG are
+                        ambiguous as to which LAG is higher in priority.
+        downMinLink - MC-LAG is down because the LAG doesn't have enough
+                      links that are up to satisfy the configured minimum link
+                      requirement."
+  ::= { eriRouterMcLagEntry 8 }
+
+eriRouterMcLagSwitchOverTime OBJECT-TYPE
+  SYNTAX DateAndTime
+  MAX-ACCESS read-only
+  STATUS  current
+  DESCRIPTION "This indicated the last time MC-LAG was switched-over."
+  ::= { eriRouterMcLagEntry 9 }
+
+eriRouterMcLagSwitchOverReason OBJECT-TYPE
+  SYNTAX  SnmpAdminString
+  MAX-ACCESS read-only
+  STATUS  current
+  DESCRIPTION " This indicate in text the reason for MC-LAG switchover. "
+  ::= { eriRouterMcLagEntry 10 }
+
+-- Multi-chassis Link-group constituent Table
+
+eriRouterMcLagConstituentTable OBJECT-TYPE
+  SYNTAX  SEQUENCE OF EriRouterMcLagConstituentEntry
+  MAX-ACCESS not-accessible
+  STATUS  current
+  DESCRIPTION " This is a table of constituent links for a LAG"
+  ::= { eriRouterMcLagObjects 2 }
+
+eriRouterMcLagConstituentEntry OBJECT-TYPE
+  SYNTAX  EriRouterMcLagConstituentEntry
+  MAX-ACCESS not-accessible
+  STATUS  current
+  DESCRIPTION "A constituent link of an MCLAG. A constituent link is
+               uniquely identified by a slot, port, and port priority."
+  INDEX {
+      eriRouterMcLagConstituentName, eriRouterMcLagConstituentSlot, eriRouterMcLagConstituentPort
+  }
+  ::= { eriRouterMcLagConstituentTable 1 }
+
+EriRouterMcLagConstituentEntry ::= SEQUENCE {
+  eriRouterMcLagConstituentName           SnmpAdminString,
+  eriRouterMcLagConstituentSlot           EriRouterSlot,
+  eriRouterMcLagConstituentPort           EriRouterPort,
+  eriRouterMcLagConstituentPortPriority   INTEGER,
+  eriRouterMcLagConstituentPortIfIndex    InterfaceIndex,
+  eriRouterMcLagConstituentLACPErrorCode  INTEGER
+}
+
+eriRouterMcLagConstituentName OBJECT-TYPE
+  SYNTAX  SnmpAdminString (SIZE(1..16))
+  MAX-ACCESS not-accessible
+  STATUS  current
+  DESCRIPTION
+      "This string name uniquely identifies an MC-LAG within an MC-LAG
+      cluster. Within an MC-LAG cluster, there could not be two LAG with
+      the same name on the same chassis. The MC-LAGs with the same name on
+      different chassis are peer to each other."
+  ::= { eriRouterMcLagConstituentEntry 1 }
+ 
+eriRouterMcLagConstituentSlot  OBJECT-TYPE
+  SYNTAX  EriRouterSlot
+  MAX-ACCESS not-accessible
+  STATUS  current
+  DESCRIPTION
+      " This indicates the slot number of the constituent link."
+  ::= { eriRouterMcLagConstituentEntry 2 }
+
+eriRouterMcLagConstituentPort OBJECT-TYPE
+  SYNTAX  EriRouterPort
+  MAX-ACCESS not-accessible
+  STATUS  current
+  DESCRIPTION
+      " This indicates the port number of the constituent link."
+  ::= { eriRouterMcLagConstituentEntry 3 }
+
+eriRouterMcLagConstituentPortPriority OBJECT-TYPE
+  SYNTAX  Integer32
+  MAX-ACCESS read-only
+  STATUS  current
+  DESCRIPTION " This indicates the configured priority of the constituent
+                link."
+  ::= { eriRouterMcLagConstituentEntry 4 }
+
+eriRouterMcLagConstituentPortIfIndex OBJECT-TYPE
+  SYNTAX  InterfaceIndex
+  MAX-ACCESS read-only
+  STATUS  current
+  DESCRIPTION " The hardware interface index associated with the constituent link."
+  ::= { eriRouterMcLagConstituentEntry 5 }
+
+eriRouterMcLagConstituentLACPErrorCode OBJECT-TYPE
+  SYNTAX  INTEGER {
+          noError(0),
+          portFailure(1),
+          ccmFailure(2),
+          bfdFailure(3)
+          }
+  MAX-ACCESS read-only 
+  STATUS  current
+  DESCRIPTION
+      " The reason LACP on a constituent is down.
+        portFailure   - LACP is down because the consitutent port is down.
+        ccmFailure    - LACP is down because the ccm is down.
+        bfdFailure    - LACP is down because bfd is down."
+  ::= { eriRouterMcLagConstituentEntry 6 }
+
+--
+-- Notification Types
+--
+
+-- MC-LAG level 
+
+eriRouterMcLagSwitchOverEvent NOTIFICATION-TYPE
+  OBJECTS {
+      eriRouterMcLagOperState,
+      eriRouterMcLagSwitchOverReason
+      }
+  STATUS  current
+  DESCRIPTION
+      "An MC-LAG switch-over trap indicates that a switch-over has happened
+      and also it identifies which LAG will become active LAG."
+  ::= { eriRouterMcLagNotifications 1 }
+
+eriRouterMcLagOperFailed NOTIFICATION-TYPE
+  OBJECTS {
+      eriRouterMcLagOperState,
+      eriRouterMcLagOperErrorCode
+      }
+  STATUS  current
+  DESCRIPTION
+      "This trap indicates an MC-LAG has failed and why."
+  ::= { eriRouterMcLagNotifications 2 }
+
+eriRouterMcLagOperFailureCleared NOTIFICATION-TYPE
+  OBJECTS {
+      eriRouterMcLagOperState
+      }
+  STATUS  current
+  DESCRIPTION
+      "This trap indicates an MC-LAG has recovered from a failure."
+  ::= { eriRouterMcLagNotifications 3 }
+
+-- MC-LAG constituent port level
+
+eriRouterMcLagConstituentPortUp NOTIFICATION-TYPE
+  OBJECTS {
+          eriRouterMcLagConstituentPortPriority,
+          eriRouterMcLagConstituentPortIfIndex
+       }
+  STATUS  current
+  DESCRIPTION
+      "This trap indicates whether LACP on a constituent link is active in a LAG of
+       an MC-LAG."
+  ::= { eriRouterMcLagNotifications 4 }
+
+eriRouterMcLagConstituentPortDown NOTIFICATION-TYPE
+  OBJECTS {
+          eriRouterMcLagConstituentPortPriority,
+          eriRouterMcLagConstituentPortIfIndex,
+          eriRouterMcLagConstituentLACPErrorCode
+       }
+  STATUS  current
+  DESCRIPTION
+      "This trap indicates whether LACP on a constituent link has failed
+       in a LAG of an  MC-LAG."
+  ::= { eriRouterMcLagNotifications 5 }
+
+
+-- Conformance Statement
+eriRouterMcLagGroups
+      OBJECT IDENTIFIER ::= { eriRouterMcLagConformance 1 }
+
+eriRouterMcLagCompliances
+      OBJECT IDENTIFIER ::= { eriRouterMcLagConformance 2 }
+
+-- Module Compliance
+
+eriRouterMcLagModuleCompliance MODULE-COMPLIANCE
+      STATUS current
+      DESCRIPTION
+          "Compliance statement for agents that provide support
+           for the ERICSSON-ROUTER-LAG-MIB"
+      MODULE -- this module
+         MANDATORY-GROUPS    { 
+                               eriRouterMcLagObjectGroup,
+                               eriRouterMcLagNotificationGroup
+                             }
+   ::= { eriRouterMcLagCompliances 1 }
+
+-- Units of conformance.
+
+eriRouterMcLagObjectGroup OBJECT-GROUP
+      OBJECTS {
+         eriRouterMcLagId,
+         eriRouterMcLagSystemPriority,
+         eriRouterMcLagSystemMacAddress,
+         eriRouterMcLagRevertiveMode, 
+         eriRouterMcLagRevertiveHoldTimer,
+         eriRouterMcLagOperState,
+         eriRouterMcLagOperErrorCode,
+         eriRouterMcLagSwitchOverTime,
+         eriRouterMcLagSwitchOverReason,
+         eriRouterMcLagConstituentPortPriority,
+         eriRouterMcLagConstituentPortIfIndex,
+         eriRouterMcLagConstituentLACPErrorCode
+        }
+      STATUS  current
+      DESCRIPTION
+             "Collection of scalar objects required for Multi-chassis
+             Link-group management."
+      ::= { eriRouterMcLagGroups 1 }
+
+eriRouterMcLagNotificationGroup NOTIFICATION-GROUP
+       NOTIFICATIONS {
+       eriRouterMcLagSwitchOverEvent,
+       eriRouterMcLagOperFailed,
+       eriRouterMcLagOperFailureCleared,
+       eriRouterMcLagConstituentPortUp,
+       eriRouterMcLagConstituentPortDown
+                     }
+      STATUS  current
+      DESCRIPTION
+             "Objects required for Multi-chassis Link-group notifications."
+   ::= { eriRouterMcLagGroups 2 }
+END
+

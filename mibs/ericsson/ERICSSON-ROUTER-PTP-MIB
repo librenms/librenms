@@ -1,0 +1,131 @@
+-- *****************************************************************
+-- ERICSSON-ROUTER-PTP-MIB               PTP MIB
+--
+-- Copyright (c) 2018 Ericsson AB.
+-- All rights reserved.
+--
+-- *****************************************************************
+
+ ERICSSON-ROUTER-PTP-MIB DEFINITIONS ::= BEGIN
+
+     IMPORTS
+         MODULE-IDENTITY, OBJECT-TYPE, OBJECT-IDENTITY,
+         NOTIFICATION-TYPE, mib-2, Counter32,
+         Integer32, Unsigned32, TimeTicks       FROM SNMPv2-SMI
+
+         TEXTUAL-CONVENTION, DisplayString,
+         DateAndTime                            FROM SNMPv2-TC
+
+         MODULE-COMPLIANCE, OBJECT-GROUP,
+         NOTIFICATION-GROUP                     FROM SNMPv2-CONF
+
+         ItuPerceivedSeverity                   FROM ITU-ALARM-TC-MIB
+
+         eriRouterMgmt                          FROM ERICSSON-ROUTER-SMI
+
+         EriAlarmType                           FROM ERICSSON-ALARM-TC-MIB;
+
+
+ eriRouterPTPMib MODULE-IDENTITY
+     LAST-UPDATED "201801110000Z"  -- 11 Jan, 2018
+     ORGANIZATION "Ericsson AB"
+     CONTACT-INFO
+         "
+          Tonghe Liu
+          Email: tonghe.liu@ericsson.com
+
+         "
+     DESCRIPTION
+         "Defines the objects necessary support PTP."
+
+     REVISION "201801110000Z"
+     DESCRIPTION
+         "Initial revision."
+
+     ::= { eriRouterMgmt 118 }
+
+--
+-- MIB table
+--
+
+ eriRouterPTPAlarmActiveTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF EriRouterPTPAlarmActiveEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+         "A list of PTP active alarm entries."
+     ::= { eriRouterPTPMib 1 }
+
+ eriRouterPTPAlarmActiveEntry OBJECT-TYPE
+     SYNTAX     EriRouterPTPAlarmActiveEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+         "A collection of PTP active alarm info."
+     INDEX { eriRouterPTPAlarmActiveIndex }
+     ::= { eriRouterPTPAlarmActiveTable 1 }
+
+ EriRouterPTPAlarmActiveEntry ::= SEQUENCE {
+     eriRouterPTPAlarmActiveIndex            Unsigned32,
+     eriRouterPTPAlarmDateAndTime            DateAndTime,
+     eriRouterPTPEriAlarmType                EriAlarmType,
+     eriRouterPTPAlarmSeverity               ItuPerceivedSeverity,
+     eriRouterPTPAlarmDescription            DisplayString
+ }
+
+ eriRouterPTPAlarmActiveIndex OBJECT-TYPE
+     SYNTAX     Unsigned32 (1..65535)
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The unique identification of PTP alarm."
+     ::= { eriRouterPTPAlarmActiveEntry 1 }
+
+ eriRouterPTPAlarmDateAndTime OBJECT-TYPE
+     SYNTAX     DateAndTime
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The date and time when the alarm was raised or cleared."
+     ::= { eriRouterPTPAlarmActiveEntry 2 }
+
+ eriRouterPTPEriAlarmType OBJECT-TYPE
+        SYNTAX              EriAlarmType
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION
+            "The Ericsson alarm type id of this alarm."
+    ::= { eriRouterPTPAlarmActiveEntry 3 }
+
+ eriRouterPTPAlarmSeverity OBJECT-TYPE
+     SYNTAX     ItuPerceivedSeverity
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The Severity of this alarm."
+     ::= { eriRouterPTPAlarmActiveEntry 4 }
+
+ eriRouterPTPAlarmDescription OBJECT-TYPE
+     SYNTAX     DisplayString
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The description of this alarm."
+     ::= { eriRouterPTPAlarmActiveEntry 5 }
+
+
+--
+-- Notifications
+--
+ eriRouterPTPAlarm NOTIFICATION-TYPE
+     OBJECTS  { eriRouterPTPAlarmActiveIndex,
+                eriRouterPTPAlarmDateAndTime,
+                eriRouterPTPEriAlarmType,
+                eriRouterPTPAlarmSeverity,
+                eriRouterPTPAlarmDescription}
+     STATUS   current
+     DESCRIPTION
+         "This notification signifies a PTP alarm."
+     ::= { eriRouterPTPMib 2 }
+
+ END

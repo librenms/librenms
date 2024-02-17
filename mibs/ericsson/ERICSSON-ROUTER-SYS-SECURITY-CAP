@@ -1,0 +1,99 @@
+-- %DNP% $Id: ERICSSON-ROUTER-SYS-SECURITY-CAP.my,v 1.1.6.3 2011/06/15 18:19:46 danielhe Exp $
+-- %DNP% $Source: /cvsroot/pkt/sw/se/xc/bsd/config/snmp/mibs/Attic/ERICSSON-ROUTER-SYS-SECURITY-CAP.my,v $
+-- *****************************************************************
+-- ERICSSON-ROUTER-SYS-SECURITY-CAP.my  
+--
+-- Copyright (c) 2009, 2015 Ericsson AB
+-- All rights reserved.
+-- 
+-- *****************************************************************
+
+ERICSSON-ROUTER-SYS-SECURITY-CAP DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY
+		FROM SNMPv2-SMI
+	AGENT-CAPABILITIES
+		FROM SNMPv2-CONF
+	eriRouterCapabilities
+		FROM ERICSSON-ROUTER-SMI;
+
+eriRouterSysSecCap MODULE-IDENTITY
+	LAST-UPDATED    "201501141800Z" -- Jan 14, 2015
+	ORGANIZATION	"Ericsson Inc."
+	CONTACT-INFO
+		"	Ericsson Inc.
+
+                Postal: 100 Headquarters Dr
+                        San Jose, CA  95134
+                        USA
+
+                 Phone: +1 408 570 5000
+                   Fax: +1 408 570 5599
+
+                "
+	DESCRIPTION
+		"The Agent Capabilities of the implementation
+		 of the ERICSSON-ROUTER-SYS-SECURITY-MIB
+
+                If this MIB implementation is platform-dependent,
+                the PRODUCT-RELEASE clause contains Ericsson SEOS version and
+                at least one of the following Ericsson product families:
+                    [SE]  SmartEdge Multi-service Edge Router (MSER) family
+                    [SM]  SM family of Metro Ethernet Service Transport platforms
+                    [SSR] Smart Service Router (SSR) family"
+
+        REVISION        "201501141800Z" -- Jan 14, 2015
+        DESCRIPTION
+                "Updated RBN/rbn/Rbn as ERICSSON-ROUTER/eriRouter/EriRouter
+                 to migrate RBN MIB to ERICSSON MIB."
+
+        REVISION        "201106150000Z" -- Jun 15, 2011
+        DESCRIPTION
+                "Update DESCRIPTION clause of MODULE-IDENTITY
+                 and PRODUCT-RELEASE clause of AGENT-CAPABILITIES."
+        
+	REVISION	"200911051800Z" -- Nov 5, 2009
+	DESCRIPTION
+		"Initial version"
+	::= { eriRouterCapabilities 95 }
+
+eriRouterSysSecCap1 AGENT-CAPABILITIES
+	PRODUCT-RELEASE	"SEOS 6.3 [SE]"
+	STATUS		current
+	DESCRIPTION	"ERICSSON-ROUTER-SYS-SECURITY-MIB capabilities"
+	SUPPORTS	ERICSSON-ROUTER-SYS-SECURITY-MIB
+	INCLUDES {
+            eriRouterMaliciousPktGroup,
+            eriRouterSysSecNotifyObjectsGroup,
+            eriRouterSysSecNotificationGroup
+	}
+        
+        VARIATION   eriRouterMeasurementInterval
+        ACCESS      read-only
+        DESCRIPTION
+            "Object is read-only."
+        
+        VARIATION   eriRouterMaliciousPktsThresholdHi
+        ACCESS      read-only
+        DESCRIPTION
+            "Object is read-only."
+        
+        VARIATION   eriRouterMaliciousPktsThresholdLow
+        ACCESS      read-only
+        DESCRIPTION
+            "Object is read-only."
+        
+        VARIATION   eriRouterMaliciousPktsDelta
+        ACCESS      accessible-for-notify
+        DESCRIPTION
+            "Object is available only in notification."
+        
+        VARIATION   eriRouterSysSecNotifyEnable
+        ACCESS      read-only
+        DESCRIPTION
+            "Object is read-only."
+            
+	::= { eriRouterSysSecCap 1 }
+
+END

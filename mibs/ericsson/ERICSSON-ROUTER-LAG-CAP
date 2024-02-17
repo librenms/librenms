@@ -1,0 +1,55 @@
+-- %DNP% $Id: $
+-- %DNP% $Source: /cvsroot/pkt/sw/se/xc/bsd/config/snmp/mibs/Attic/ERICSSON-ROUTER-LAG-CAP.my,v $
+-- *****************************************************************
+-- ERICSSON-ROUTER-LAG-CAP        LAG Mib Capabilities
+--
+-- Copyright (c) 2016 Ericsson AB.
+-- All rights reserved.
+--
+-- *****************************************************************
+
+ERICSSON-ROUTER-LAG-CAP DEFINITIONS ::= BEGIN
+
+IMPORTS
+
+    MODULE-IDENTITY
+            FROM SNMPv2-SMI
+    AGENT-CAPABILITIES
+            FROM SNMPv2-CONF
+    eriRouterCapabilities
+            FROM ERICSSON-ROUTER-SMI;
+
+eriRouterLAGMibCap MODULE-IDENTITY
+    LAST-UPDATED    "201511061800Z" -- Nov 06, 2015
+    ORGANIZATION    "Ericsson AB"
+    CONTACT-INFO
+        "    Ericsson, AB.
+
+        Postal:    100 Headquarters Dr
+            San Jose, CA  95134
+            USA
+
+         Phone:    +1 408 750 5000
+           Fax: +1 408 750 5599"
+    DESCRIPTION
+        "The Agent Capabilities of the LAG MIB."
+
+    REVISION    "201511061800Z" -- Nov 06, 2015
+    DESCRIPTION
+        "Initial version."
+
+    ::= { eriRouterCapabilities 111 }
+
+eriRouterLAGMibCap1 AGENT-CAPABILITIES
+    PRODUCT-RELEASE    "IPOS x.x.x [SSR]"
+    STATUS        current
+    DESCRIPTION    "ERICSSON-ROUTER-LAG-MIB capabilities"
+    SUPPORTS    ERICSSON-ROUTER-LAG-MIB
+    INCLUDES {
+        eriRouterLAGObjectsGroup,
+        eriRouterLAGNotifyGroup
+    }
+
+    ::= { eriRouterLAGMibCap 1 }
+
+END

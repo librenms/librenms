@@ -1,0 +1,43 @@
+-- ************************************************************************************
+-- ERICSSON-ROUTER-YANG-SERVER-CAP: ERICSSON-ROUTER-YANG-SERVER-MIB Agent Capabilities
+--
+-- Copyright (c) 2016 Ericsson AB
+-- All rights reserved.
+--
+-- ************************************************************************************
+
+ERICSSON-ROUTER-YANG-SERVER-CAP DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY
+                FROM SNMPv2-SMI
+        AGENT-CAPABILITIES
+                FROM SNMPv2-CONF
+        eriRouterCapabilities
+                FROM ERICSSON-ROUTER-SMI;
+
+eriRouterYangServerCap MODULE-IDENTITY
+        LAST-UPDATED   "201611110000Z" -- Nov 11, 2016
+        ORGANIZATION   "Ericsson AB"
+        CONTACT-INFO "Email: snmp.mib.contact@ericsson.com."
+        DESCRIPTION
+                "The Agent Capabilities of the YANG SERVER MIB
+                 (ERICSSON-ROUTER-YANG-SERVER-MIB)."
+
+        REVISION       "201611110000Z" -- Nov 11, 2016
+        DESCRIPTION
+                "Initial version"
+        ::= { eriRouterCapabilities 116}
+
+eriRouterYangServerCap1 AGENT-CAPABILITIES
+        PRODUCT-RELEASE "IPOS 17A"
+        STATUS          current
+        DESCRIPTION     "ERICSSON-ROUTER-YANG-SERVER-MIB capabilities"
+        SUPPORTS        ERICSSON-ROUTER-YANG-SERVER-MIB
+        INCLUDES {
+                    eriRouterYangServerNotifyObjectGroup,
+                    eriRouterYangServerNotifyGroup
+                 }
+        ::= { eriRouterYangServerCap 1 }
+
+END

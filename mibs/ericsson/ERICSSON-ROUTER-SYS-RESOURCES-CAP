@@ -1,0 +1,238 @@
+-- %DNP% $Id: ERICSSON-ROUTER-SYS-RESOURCES-CAP.my,v 1.1.2.8.136.6 2011/07/11 20:00:30 ekimpri Exp $
+-- %DNP% $Source: /cvsroot/pkt/sw/se/xc/bsd/config/snmp/mibs/Attic/ERICSSON-ROUTER-SYS-RESOURCES-CAP.my,v $
+-- *************************************************************
+-- ERICSSON-ROUTER-SYS-RESOURCES-CAP   ERICSSON-ROUTER-SYS-RESOURCES-MIB Capabilities
+--
+-- Copyright (c) 2010, 2015 Ericsson AB
+-- Copyright (c) 2002-2003, 2005, 2007 RedBack Networks, Inc.
+-- All rights reserved.
+--
+-- *************************************************************
+
+ERICSSON-ROUTER-SYS-RESOURCES-CAP DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY
+                FROM SNMPv2-SMI
+        AGENT-CAPABILITIES
+                FROM SNMPv2-CONF
+        eriRouterCapabilities
+                FROM ERICSSON-ROUTER-SMI;
+
+eriRouterSysResourcesCap MODULE-IDENTITY
+        LAST-UPDATED    "201501141800Z" -- Jan 14, 2015
+        ORGANIZATION    "Ericsson AB"
+        CONTACT-INFO
+                    "       Ericsson, Inc.
+
+                     Postal: 100 Headquarters Drive
+                             San Jose, CA  95134-1370
+                             USA
+
+                     Phone: +1 408 750 5000
+                     Fax: +1 408 750 5599"
+        DESCRIPTION
+                "The Agent Capabilities of the System Resources MIB.
+
+                If this MIB implementation is platform-dependent,
+                the PRODUCT-RELEASE clause contains Ericsson SEOS version and
+                at least one of the following Ericsson product families:
+                    [SE]  SmartEdge Multi-service Edge Router (MSER) family
+                    [SM]  SM family of Metro Ethernet Service Transport platforms
+                    [SSR] Smart Service Router (SSR) family"
+
+        REVISION        "201501141800Z" -- Jan 14, 2015
+        DESCRIPTION
+                "Updated RBN/rbn/Rbn as ERICSSON-ROUTER/eriRouter/EriRouter
+                 to migrate RBN MIB to ERICSSON MIB."
+
+        REVISION        "201106150000Z" -- Jun 15, 2011
+        DESCRIPTION
+            "Update DESCRIPTION clause of MODULE-IDENTITY
+            and PRODUCT-RELEASE clause of AGENT-CAPABILITIES."
+        
+        REVISION        "201011010000Z" -- Nov 1, 2010
+        DESCRIPTION
+            "Modified PRODUCT-RELEASE clause for consistent naming.
+             Updated CONTACT-INFO.
+             
+             Add eriRouterSysResourcesCap6"
+
+        REVISION        "200907160000Z" -- July 16, 2009
+        DESCRIPTION
+                        "Add eriRouterSysResourcesCap5, includes
+                        SSE objects."
+
+        REVISION        "200705300000Z" -- May 30, 2007
+	DESCRIPTION
+	                "Add eriRouterSysResourcesCap4."
+
+        REVISION        "200504180000Z" -- April 18, 2005
+        DESCRIPTION
+                "Add eriRouterSysResourcesCap3 and updated the VARIATION
+                clause in eriRouterSysResourcesCap1 and eriRouterSysResourcesCap2."
+        REVISION      	"200309101800Z" -- Sept 10, 2003
+        DESCRIPTION
+                "Add eriRouterSysResourcesCap2."
+
+        REVISION      	"200206140000Z" -- June 6, 2002
+        DESCRIPTION
+                "Initial version."
+        ::= { eriRouterCapabilities 44 }
+
+eriRouterSysResourcesCap1 AGENT-CAPABILITIES
+	PRODUCT-RELEASE "SEOS 2.3.3"
+	STATUS          obsolete 
+	DESCRIPTION     "This is superceeded by eriRouterSysResourcesCap4"
+	SUPPORTS        ERICSSON-ROUTER-SYS-RESOURCES-MIB
+	INCLUDES {
+		eriRouterSRProcessNotifyGroup,
+		eriRouterSRStorageGroup,
+		eriRouterSRProcessEventNotificationGroup
+		}
+
+	VARIATION       eriRouterSRStorageDescr
+	DESCRIPTION
+		"Limit this textual information to the human readable
+		form as specified in the TEXTUAL-CONVENTION DisplayString."
+
+        VARIATION       eriRouterSRStorageTable
+        DESCRIPTION
+                "This table is supported for the internal SEOS storage
+                device only."
+
+    ::= { eriRouterSysResourcesCap 1 }
+
+eriRouterSysResourcesCap2 AGENT-CAPABILITIES
+	PRODUCT-RELEASE "SEOS 2.5.6.X"
+	STATUS          obsolete
+	DESCRIPTION     "This is superceeded by eriRouterSysResourcesCap4"
+	SUPPORTS        ERICSSON-ROUTER-SYS-RESOURCES-MIB
+	INCLUDES {
+		eriRouterSRProcessNotifyGroup,
+		eriRouterSRStorageGroup,
+		eriRouterSRNotificationGroup
+		}
+
+	VARIATION       eriRouterSRStorageDescr
+	DESCRIPTION
+		"Limit this textual information to the human readable
+		form as specified in the TEXTUAL-CONVENTION DisplayString."
+
+        VARIATION       eriRouterSRStorageTable
+        DESCRIPTION
+                "This table is supported for the internal SEOS storage
+                device only."
+
+    ::= { eriRouterSysResourcesCap 2 }
+
+eriRouterSysResourcesCap3 AGENT-CAPABILITIES
+        PRODUCT-RELEASE "SEOS 4.0.5.X"
+        STATUS          current
+        DESCRIPTION     "ERICSSON-ROUTER-SYS-RESOURCES-MIB capabilities"
+        SUPPORTS        ERICSSON-ROUTER-SYS-RESOURCES-MIB
+        INCLUDES {
+                eriRouterSRProcessNotifyGroup,
+                eriRouterSRStorageGroup2,
+                eriRouterSRNotificationGroup2,
+                eriRouterSRSystemGroup
+                }
+
+        VARIATION       eriRouterSRStorageDescr
+        DESCRIPTION
+                "Limit this textual information to the human readable
+                form as specified in the TEXTUAL-CONVENTION DisplayString."
+
+        VARIATION       eriRouterSRSystemDate
+        ACCESS          read-only
+        DESCRIPTION
+                "Write access is not allowed."
+
+    ::= { eriRouterSysResourcesCap 3 }
+
+eriRouterSysResourcesCap4 AGENT-CAPABILITIES
+        PRODUCT-RELEASE "SEOS 6.1.X.X"
+        STATUS          current
+        DESCRIPTION     "ERICSSON-ROUTER-SYS-RESOURCES-MIB capabilities"
+        SUPPORTS        ERICSSON-ROUTER-SYS-RESOURCES-MIB
+        INCLUDES {
+                eriRouterSRProcessNotifyGroup,
+                eriRouterSRStorageGroup2,
+                eriRouterSRNotificationGroup2,
+                eriRouterSRSystemGroup,
+		eriRouterSRPowerExceededGroup,
+		eriRouterSRPowerNotifyGroup
+        }
+        VARIATION       eriRouterSRStorageDescr
+        DESCRIPTION
+                "Limit this textual information to the human readable
+                form as specified in the TEXTUAL-CONVENTION DisplayString."
+
+        VARIATION       eriRouterSRSystemDate
+        ACCESS          read-only
+        DESCRIPTION
+                "Write access is not allowed."
+
+     ::= { eriRouterSysResourcesCap 4  }
+
+eriRouterSysResourcesCap5 AGENT-CAPABILITIES
+        PRODUCT-RELEASE "SEOS 6.2.1 [SE]; SEOS 6.3.X [SM]; SEOS 11.1.x [SSR]"
+        STATUS          current
+        DESCRIPTION     "ERICSSON-ROUTER-SYS-RESOURCES-MIB capabilities"
+        SUPPORTS        ERICSSON-ROUTER-SYS-RESOURCES-MIB
+        INCLUDES {
+                eriRouterSRProcessNotifyGroup,
+                eriRouterSRStorageGroup2,
+                eriRouterSRNotificationGroup2,
+                eriRouterSRSystemGroup,
+                eriRouterSRPowerExceededGroup,
+                eriRouterSRPowerNotifyGroup,
+                eriRouterSseDiskGroup,
+                eriRouterSseDiskEventObjectGroup,
+                eriRouterSseDiskNotifyGroup
+        }
+        VARIATION       eriRouterSRStorageDescr
+        DESCRIPTION
+                "Limit this textual information to the human readable
+                form as specified in the TEXTUAL-CONVENTION DisplayString."
+
+        VARIATION       eriRouterSRSystemDate
+        ACCESS          read-only
+        DESCRIPTION
+                "Write access is not allowed."
+
+     ::= { eriRouterSysResourcesCap 5  }
+
+
+eriRouterSysResourcesCap6 AGENT-CAPABILITIES
+        PRODUCT-RELEASE "SEOS 11.1"
+        STATUS          current
+        DESCRIPTION     "ERICSSON-ROUTER-SYS-RESOURCES-MIB capabilities"
+        SUPPORTS        ERICSSON-ROUTER-SYS-RESOURCES-MIB
+        INCLUDES {
+                eriRouterSRProcessNotifyGroup,
+                eriRouterSRStorageGroup2,
+                eriRouterSRNotificationGroup2,
+                eriRouterSRSystemGroup,
+                eriRouterSRPowerExceededGroup,
+                eriRouterSRPowerNotifyGroup,
+                eriRouterSseDiskGroup,
+                eriRouterSseDiskEventObjectGroup,
+                eriRouterSseDiskNotifyGroup,
+                eriRouterIssuGroup,
+                eriRouterIssuNotifyGroup
+        }
+        VARIATION       eriRouterSRStorageDescr
+        DESCRIPTION
+                "Limit this textual information to the human readable
+                form as specified in the TEXTUAL-CONVENTION DisplayString."
+
+        VARIATION       eriRouterSRSystemDate
+        ACCESS          read-only
+        DESCRIPTION
+                "Write access is not allowed."
+
+     ::= { eriRouterSysResourcesCap 6 }
+
+
+END

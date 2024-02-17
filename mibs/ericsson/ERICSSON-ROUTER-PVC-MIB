@@ -1,0 +1,1083 @@
+-- %DNP% $Id: ERICSSON-ROUTER-PVC-MIB.my,v 1.1.4.8.82.2 2011/02/22 17:26:17 thatcher Exp $
+-- %DNP% $Source: /cvsroot/pkt/sw/se/xc/bsd/config/snmp/mibs/Attic/ERICSSON-ROUTER-PVC-MIB.my,v $
+-- *****************************************************************
+-- ERICSSON-ROUTER-PVC-MIB	
+--
+-- Copyright (c) 2000-2004, 2006-2007, 2011, 2015 Ericsson AB.
+-- All rights reserved.
+-- 
+-- *****************************************************************
+
+ERICSSON-ROUTER-PVC-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY, OBJECT-TYPE,
+	Unsigned32
+		FROM SNMPv2-SMI
+
+	TEXTUAL-CONVENTION, RowStatus,
+	TruthValue
+		FROM SNMPv2-TC
+
+	MODULE-COMPLIANCE, OBJECT-GROUP
+		FROM SNMPv2-CONF
+
+	SnmpAdminString
+		FROM SNMP-FRAMEWORK-MIB
+
+	eriRouterMgmt
+		FROM ERICSSON-ROUTER-SMI
+
+	EriRouterSlot, EriRouterPort, EriRouterCircuitHandle,
+	EriRouterVidOrUntagged
+		FROM ERICSSON-ROUTER-TC;
+
+eriRouterPvcMib MODULE-IDENTITY
+	LAST-UPDATED    "201501141800Z" -- Jan 14, 2015
+	ORGANIZATION	"Ericsson AB."
+	CONTACT-INFO
+                "       Ericsson AB.
+
+                Postal: 100 Headquarters Dr
+                        San Jose, CA  95134
+                        USA
+
+                 Phone: +1 408 750 5000
+                   Fax: +1 408 750 5599
+
+                "
+	DESCRIPTION
+		"Defines the objects necessary to support the management of
+		ATM, Frame Relay and IEEE 802.1Q permanent virtual circuits
+		(PVC)."
+
+        REVISION        "201501141800Z" -- Jan 14, 2015
+        DESCRIPTION
+                "Updated RBN/rbn/Rbn as ERICSSON-ROUTER/eriRouter/EriRouter
+                 to migrate RBN MIB to ERICSSON MIB."
+
+        REVISION        "201101191800Z" -- Jan 19, 2011
+        DESCRIPTION
+                "Update CONTACT-INFO & ORGANIZATION."
+
+        REVISION        "200710291700Z" -- Oct 29, 2007
+        DESCRIPTION
+                "Added new encaps type to TEXTUAL-CONVENTION
+                EriRouterAtmEncapsulation."
+
+	REVISION	"200405211700Z" -- May 21, 2004
+	DESCRIPTION
+		"Added new encaps type to TEXTUAL-CONVENTION
+		EriRouterFrameRelayEncapsulation.
+		Added new encaps type to TEXTUAL-CONVENTION
+		EriRouterAtmEncapsulation."
+
+	REVISION	"200303171700Z" -- March 17, 2003
+	DESCRIPTION
+		"The following changes were made to manage the configuration 
+		of 802.1Q PVCs on Ethernet ports, ATM circuits and Frame 
+		Relay circuits:
+		    Updated MODULE-IDENTITY.
+		    Added TEXTUAL-CONVENTION EriRouterDot1qEncapsulation.
+		    Added three new tables: 
+			eriRouterDot1qPvcOnEthConfigTable 
+			eriRouterDot1qPvcOnAtmConfigTable
+			eriRouterDot1qPvcOnFrConfigTable
+		    Added new compliance module and groups:
+			eriRouterPvcCompliance3 
+			eriRouterDot1qPvcOnEthGroup 
+			eriRouterDot1qPvcOnAtmGroup
+			eriRouterDot1qPvcOnFrGroup"
+
+	REVISION	"200212201700Z" -- December 20, 2002
+	DESCRIPTION
+		"To support categorization of circuit types, to provide
+		an object to link entries in the eriRouterAtmPvcConfigTable and
+		the eriRouterFrameRelayPvcConfigTable to the eriRouterBindTable from
+		the ERICSSON-ROUTER-BIND-MIB, and to provide the capability to clear
+		subscribers from circuits, witness the following changes:
+		    Updated MODULE-IDENTITY.
+		    Added TEXTUAL-CONVENTION EriRouterPvcCircuitType.
+		    Added new objects to eriRouterAtmPvcConfigTable:
+			eriRouterAtmPvcCircuitType
+			eriRouterAtmPvcCircuitHandle
+			eriRouterAtmPvcClearCircuit
+		    Added new objects to eriRouterFrameRelayPvcConfigTable:
+			eriRouterFrameRelayPvcCircuitType
+			eriRouterFrameRelayPvcCircuitHandle
+			eriRouterFrameRelayPvcClearCircuit
+		    Added new MODULE-COMPLIANCE and OBJECT-GROUPs:
+			eriRouterPvcCompliance2
+			eriRouterAtmPvcGroup2
+			eriRouterFrameRelayPvcGroup2"
+
+	REVISION	"200211130000Z" -- November 13, 2002
+	DESCRIPTION
+		"Moved EriRouterSlot and EriRouterPort definitions to Textual 
+		Convention MIB (ERICSSON-ROUTER-TC)."
+
+	REVISION	"200205231700Z" -- May 23, 2002
+	DESCRIPTION
+		"Updated CONTACT-INFO clause in MODULE-IDENTITY.
+		Added new CLIPs encaps type to the EriRouterFrameRelayEncapsulation
+		and EriRouterAtmEncapsulation TEXTUAL-CONVENTION definitions."
+
+	REVISION	"200105091700Z" -- May 9, 2001
+	DESCRIPTION
+		"Updated range on EriRouterSlot, EriRouterPort, and eriRouterAtmPvcVpi."
+
+	REVISION	"200102101700Z" -- February 10, 2001
+	DESCRIPTION
+		"Removed all references to padding which was an obsoleted
+		 attribute of PVC circuits."
+
+	REVISION	"200008301200Z" -- August 30, 2000
+	DESCRIPTION
+		"Initial version."
+	::= { eriRouterMgmt 7 }
+
+eriRouterPvcMIBObjects       OBJECT IDENTIFIER ::= { eriRouterPvcMib 1 }
+
+eriRouterPvcMIBConformance   OBJECT IDENTIFIER ::= { eriRouterPvcMib 2 }
+
+eriRouterPvcMIBNotifications OBJECT IDENTIFIER ::= { eriRouterPvcMib 3 }
+
+--
+-- Textual Conventions
+--
+EriRouterFrameRelayEncapsulation ::= TEXTUAL-CONVENTION
+	STATUS       current
+	DESCRIPTION
+		"The encapsulation types supported by frame relay."
+	SYNTAX	INTEGER {
+		auto1490(1),    -- auto detect bridge or routed encapsulation
+		bridge1490(2),  -- bridged 1490
+		multi1490(3),   -- 1490 bridge or PPPoE encapsulation
+		route1490(4),   -- Routed 1490 encapsulation
+		l2tp(5),        -- l2tp encapsulation
+		l2tpVcMuxed(6), -- vc-muxed l2tp encapsulation
+		ppp(7),         -- PPP encapsulation
+		pppAuto(8),     -- Automatically detect PPP encapsulation
+		pppOverEthernet(9), -- PPP over Ethernet (PPPOE) encapsulation
+		dot1q1490(10),  -- 802.1Q over bridged 1490
+		clips1490(11),  -- clientless IP 1490
+		pppAutoNopoe(12) -- pppAuto without pppoe
+	}
+
+EriRouterAtmEncapsulation ::= TEXTUAL-CONVENTION
+	STATUS       current
+	DESCRIPTION
+		"The encapsulation types supported by ATM."
+	SYNTAX	INTEGER {
+		unknown(0),       -- unknown encapsulation
+		auto1483(1),      -- auto detect bridge or routed encapsulation
+		bridge1483(2),    -- bridged 1483
+		multi1483(3),     -- 1483 bridge or PPPoE encapsulation
+		route1483(4),     -- Routed 1483 encapsulation
+		l2tp(5),          -- l2tp encapsulation
+		l2tpVcMuxed(6),   -- vc-muxed l2tp encapsulation
+		ppp(7),           -- PPP encapsulation
+		pppAuto(8),       -- Automatically detect PPP encapsulation
+		pppOverEthernet(9), -- PPP over Ethernet (PPPOE) encapsulation
+		pppSerial(10),    -- SERIAL PPP encaps used in non compliant
+				  -- configurations
+		pppNlpid(11),     -- NLPID PPP encaps
+		pppLlc(12),       -- LLC/SNAP PPP encaps per RFC 2364
+		pppVcMuxed(13),   -- vc-based mux encaps per RFC-2364
+		raw(14),          -- raw encaps
+		dot1q1483(15),    -- 802.1Q over bridged 1483
+		clips1483(16),    -- clientless IP 1483
+		pppAutoNopoe(17), -- pppAuto without pppoe
+        	cell(18)          -- cell
+	}
+
+EriRouterDot1qEncapsulation ::= TEXTUAL-CONVENTION
+        STATUS       current
+        DESCRIPTION
+                "The encapsulation types supported by 802.1Q PVC."
+        SYNTAX  INTEGER {
+		unknown(0),                    -- unknown encapsulation
+		ipOverEthernet(1),             -- IP over Ethernet encapsulation
+		dot1qMulti(2),                 -- PPPoE, IPoE, or IPv6oE encapsulation
+		pppOverEthernet(3),            -- PPP over Ethernet encapsulation
+		dot1qRaw(4),                   -- dot1qRaw over Ethernet encapsulation
+		dot1qClips(5),                 -- dot1qClips over Ethernet encapsulation
+		dot1qTunnelMulti(6),           -- PPPoE, IPoE, or IPv6oE encapsulation
+		dot1qTunnelPppOverEthernet(7), -- PPP over Ethernet encapsulation
+        	dot1qTunnelRaw(8),             -- dot1qTunnelRaw over Ethernet encapsulation
+		dot1qTunnelClips(9)            -- do1tqTunnelclips over Ethernet encapsulation
+}
+
+EriRouterPvcCircuitType ::= TEXTUAL-CONVENTION
+	STATUS       current
+	DESCRIPTION
+		"The PVC circuit type."
+	SYNTAX	INTEGER {
+		explicit(1),		-- a single explicit circuit
+		explicitRange(2),	-- an explicit circuit range
+		onDemandRange(3),	-- an ondemand circuit range
+		protection(4)		-- an APS protection circuit
+	}
+
+
+--
+-- ATM PVC Configuration Group
+--
+-- This table supports the identification, addition, configuration and
+-- deletion of ATM PVCs.
+--
+
+eriRouterAtmPvcConfigTable OBJECT-TYPE
+	SYNTAX       SEQUENCE OF EriRouterAtmPvcConfigEntry
+	MAX-ACCESS   not-accessible
+	STATUS       current
+	DESCRIPTION
+		"This table contains the objects which identify and configure
+		ATM PVCs."
+	::= { eriRouterPvcMIBObjects 1 }
+
+eriRouterAtmPvcConfigEntry OBJECT-TYPE
+	SYNTAX       EriRouterAtmPvcConfigEntry
+	MAX-ACCESS   not-accessible
+	STATUS       current
+	DESCRIPTION
+		"A conceptual row in the eriRouterAtmPvcConfigTable."
+	INDEX {
+		eriRouterAtmPvcSlot,
+		eriRouterAtmPvcPort,
+		eriRouterAtmPvcVpi,
+		eriRouterAtmPvcVci
+	}
+	::= { eriRouterAtmPvcConfigTable 1 }
+
+EriRouterAtmPvcConfigEntry ::=
+	SEQUENCE {
+		eriRouterAtmPvcSlot		EriRouterSlot,
+		eriRouterAtmPvcPort		EriRouterPort,
+		eriRouterAtmPvcVpi		Unsigned32,
+		eriRouterAtmPvcVci		Unsigned32,
+		eriRouterAtmPvcProfileName	SnmpAdminString,
+		eriRouterAtmPvcEncapsulation	EriRouterAtmEncapsulation,
+		eriRouterAtmPvcRowStatus	RowStatus,
+		eriRouterAtmPvcCircuitType	EriRouterPvcCircuitType,
+		eriRouterAtmPvcCircuitHandle	EriRouterCircuitHandle,
+		eriRouterAtmPvcClearCircuit	TruthValue
+	}
+
+eriRouterAtmPvcSlot OBJECT-TYPE
+	SYNTAX       EriRouterSlot
+	MAX-ACCESS   not-accessible
+	STATUS       current
+	DESCRIPTION
+		"The chassis slot number"
+	::= { eriRouterAtmPvcConfigEntry 1 }
+
+eriRouterAtmPvcPort OBJECT-TYPE
+	SYNTAX       EriRouterPort
+	MAX-ACCESS   not-accessible
+	STATUS       current
+	DESCRIPTION
+		"The port number"
+	::= { eriRouterAtmPvcConfigEntry 2 }
+
+eriRouterAtmPvcVpi OBJECT-TYPE
+	SYNTAX       Unsigned32 (0..255)
+	MAX-ACCESS   not-accessible
+	STATUS       current
+	DESCRIPTION
+		"The Virtual Path Identifier for the PVC."
+	::= { eriRouterAtmPvcConfigEntry 3 }
+
+eriRouterAtmPvcVci OBJECT-TYPE
+	SYNTAX       Unsigned32 (0..65535)
+	MAX-ACCESS   not-accessible
+	STATUS       current
+	DESCRIPTION 
+		"The Virtual Channel Identifier for the PVC."
+	::= { eriRouterAtmPvcConfigEntry 4 }
+
+eriRouterAtmPvcProfileName OBJECT-TYPE
+	SYNTAX       SnmpAdminString (SIZE(1..63))
+	MAX-ACCESS   read-create
+	STATUS       current
+	DESCRIPTION 
+		"The profile name to use with the PVC."
+	::= { eriRouterAtmPvcConfigEntry 5 }
+
+eriRouterAtmPvcEncapsulation OBJECT-TYPE
+	SYNTAX       EriRouterAtmEncapsulation
+	MAX-ACCESS   read-create
+	STATUS       current
+	DESCRIPTION 
+		"The encapsulation to use with the PVC."
+	::= { eriRouterAtmPvcConfigEntry 6 }
+
+eriRouterAtmPvcRowStatus OBJECT-TYPE
+	SYNTAX       RowStatus
+	MAX-ACCESS   read-create
+	STATUS       current
+	DESCRIPTION 
+		"The row status for creating, modifying, or deleting an entry
+		in the table."
+	::= { eriRouterAtmPvcConfigEntry 8 }
+
+eriRouterAtmPvcCircuitType OBJECT-TYPE
+	SYNTAX       EriRouterPvcCircuitType
+	MAX-ACCESS   read-create
+	STATUS       current
+	DESCRIPTION 
+		"The PVC circuit type.  With respect to this mib
+		object, only those entries whose eriRouterAtmPvcCircuitType
+		has a value 'explicit' may be removed by setting
+		eriRouterAtmPvcRowStatus equal to 'destroy'.  A set
+		operation with eriRouterAtmPvcRowStatus equal to 'destroy'
+		on any row with eriRouterAtmPvcCircuitType not equal to
+		'explicit' will result in an INCONSISTENT_VALUE_ERROR."
+	DEFVAL { explicit }
+	::= { eriRouterAtmPvcConfigEntry 9 }
+
+eriRouterAtmPvcCircuitHandle OBJECT-TYPE
+	SYNTAX       EriRouterCircuitHandle
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION 
+		"This object is used internally to uniquely identify
+		a circuit.  The value of this object may be used to
+		correlate entries with those in the eriRouterBindTable defined
+		in the ERICSSON-ROUTER-BIND-MIB."
+	::= { eriRouterAtmPvcConfigEntry 10 }
+
+eriRouterAtmPvcClearCircuit OBJECT-TYPE
+	SYNTAX       TruthValue
+	MAX-ACCESS   read-create
+	STATUS       current
+	DESCRIPTION 
+		"When this object is true(1), the system will clear active
+		subscriber sessions on the specified circuit.  When false(2),
+		there is no action taken.  This object can only be written
+		when the conceptual row exists.
+
+		When this object is set to true(1) and the encapsulation
+		of the circuit is bridged or routed, e.g. bridge1483(2) or
+		route1483(4), subscribers will re-authenticate after
+		being cleared."
+	DEFVAL { false }
+	::= { eriRouterAtmPvcConfigEntry 11 }
+
+--
+-- Frame Relay PVC Configuration Group
+--
+-- This table supports the identification, addition, configuration and
+-- deletion of frame relay PVCs.
+--
+
+eriRouterFrameRelayPvcConfigTable OBJECT-TYPE
+	SYNTAX       SEQUENCE OF EriRouterFrameRelayPvcConfigEntry
+	MAX-ACCESS   not-accessible
+	STATUS       current
+	DESCRIPTION
+		"This table contains the objects which identify and configure
+		Frame Relay PVCs."
+	::= { eriRouterPvcMIBObjects 2 }
+
+eriRouterFrameRelayPvcConfigEntry OBJECT-TYPE
+	SYNTAX       EriRouterFrameRelayPvcConfigEntry
+	MAX-ACCESS   not-accessible
+	STATUS       current
+	DESCRIPTION
+		"A conceptual row in the eriRouterFrameRelayPvcConfigTable."
+	INDEX {
+		eriRouterFrameRelayPvcSlot,
+		eriRouterFrameRelayPvcPort,
+		eriRouterFrameRelayPvcChannel,
+		eriRouterFrameRelayPvcDLCI
+	}
+	::= { eriRouterFrameRelayPvcConfigTable 1 }
+
+EriRouterFrameRelayPvcConfigEntry ::=
+	SEQUENCE {
+		eriRouterFrameRelayPvcSlot		EriRouterSlot,
+		eriRouterFrameRelayPvcPort		EriRouterPort,
+		eriRouterFrameRelayPvcChannel		Unsigned32,
+		eriRouterFrameRelayPvcDLCI		Unsigned32,
+		eriRouterFrameRelayPvcProfileName	SnmpAdminString,
+		eriRouterFrameRelayPvcEncapsulation	EriRouterFrameRelayEncapsulation,
+		eriRouterFrameRelayPvcRowStatus	RowStatus,
+		eriRouterFrameRelayPvcCircuitType	EriRouterPvcCircuitType,
+		eriRouterFrameRelayPvcCircuitHandle	EriRouterCircuitHandle,
+		eriRouterFrameRelayPvcClearCircuit	TruthValue
+	}
+
+eriRouterFrameRelayPvcSlot OBJECT-TYPE
+	SYNTAX       EriRouterSlot
+	MAX-ACCESS   not-accessible
+	STATUS       current
+	DESCRIPTION
+		"The chassis slot number"
+	::= { eriRouterFrameRelayPvcConfigEntry 1 }
+
+eriRouterFrameRelayPvcPort OBJECT-TYPE
+	SYNTAX       EriRouterPort
+	MAX-ACCESS   not-accessible
+	STATUS       current
+	DESCRIPTION
+		"The port number"
+	::= { eriRouterFrameRelayPvcConfigEntry 2 }
+
+eriRouterFrameRelayPvcChannel OBJECT-TYPE
+	SYNTAX       Unsigned32 (0..255)
+	MAX-ACCESS   not-accessible
+	STATUS       current
+	DESCRIPTION
+		"The channel number"
+	::= { eriRouterFrameRelayPvcConfigEntry 3 }
+
+eriRouterFrameRelayPvcDLCI OBJECT-TYPE
+	SYNTAX       Unsigned32 (0..65535)
+	MAX-ACCESS   not-accessible
+	STATUS       current
+	DESCRIPTION 
+		"The Data Link Connection Identifier"
+	::= { eriRouterFrameRelayPvcConfigEntry 4 }
+
+eriRouterFrameRelayPvcProfileName OBJECT-TYPE
+	SYNTAX       SnmpAdminString (SIZE(1..63))
+	MAX-ACCESS   read-create
+	STATUS       current
+	DESCRIPTION 
+		"The profile name to use with the PVC."
+	::= { eriRouterFrameRelayPvcConfigEntry 5 }
+
+eriRouterFrameRelayPvcEncapsulation OBJECT-TYPE
+	SYNTAX       EriRouterFrameRelayEncapsulation
+	MAX-ACCESS   read-create
+	STATUS       current
+	DESCRIPTION 
+		"The encapsulation to use with the PVC."
+	::= { eriRouterFrameRelayPvcConfigEntry 6 }
+
+eriRouterFrameRelayPvcRowStatus OBJECT-TYPE
+	SYNTAX       RowStatus
+	MAX-ACCESS   read-create
+	STATUS       current
+	DESCRIPTION 
+		"The row status for creating, modifying, or deleting an entry
+		in the table."
+	::= { eriRouterFrameRelayPvcConfigEntry 8 }
+
+eriRouterFrameRelayPvcCircuitType OBJECT-TYPE
+	SYNTAX       EriRouterPvcCircuitType
+	MAX-ACCESS   read-create
+	STATUS       current
+	DESCRIPTION 
+		"The PVC circuit type.  With respect to this mib
+		object, only those entries whose eriRouterFrameRelayPvcCircuitType
+		has a value 'explicit' may be removed by setting
+		eriRouterFrameRelayPvcRowStatus equal to 'destroy'.  A set
+		operation with eriRouterFrameRelayPvcRowStatus equal to 'destroy'
+		on any row with eriRouterFrameRelayPvcCircuitType not equal to
+		'explicit' will result in an INCONSISTENT_VALUE_ERROR."
+	DEFVAL { explicit }
+	::= { eriRouterFrameRelayPvcConfigEntry 9 }
+
+eriRouterFrameRelayPvcCircuitHandle OBJECT-TYPE
+	SYNTAX       EriRouterCircuitHandle
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION 
+		"This object is used internally to uniquely identify
+		a circuit.  The value of this object may be used to
+		correlate entries with those in the eriRouterBindTable defined
+		in the ERICSSON-ROUTER-BIND-MIB."
+	::= { eriRouterFrameRelayPvcConfigEntry 10 }
+
+eriRouterFrameRelayPvcClearCircuit OBJECT-TYPE
+	SYNTAX       TruthValue
+	MAX-ACCESS   read-create
+	STATUS       current
+	DESCRIPTION 
+		"When this object is true(1), the system will clear active
+		subscriber sessions on the specified circuit.  When false(2),
+		there is no action taken.  This object can only be written
+		when the conceptual row exists.
+
+		When this object is set to true(1) and the encapsulation
+		of the circuit is bridged or routed, e.g. bridge1490(2) or
+		route1490(4), subscribers will re-authenticate after
+		being cleared."
+	::= { eriRouterFrameRelayPvcConfigEntry 11 }
+
+--
+-- 802.1Q PVC on Ethernet Configuration Group
+--
+-- This table supports the identification, addition, configuration and
+-- deletion of IEEE 802.1Q PVCs on Ethernet ports.
+--
+
+eriRouterDot1qPvcOnEthConfigTable OBJECT-TYPE
+        SYNTAX       SEQUENCE OF EriRouterDot1qPvcOnEthConfigEntry
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION
+                "This table contains the objects which identify and configure
+                IEEE 802.1Q PVCs on Ethernet ports."
+        ::= { eriRouterPvcMIBObjects 3 }
+
+eriRouterDot1qPvcOnEthConfigEntry OBJECT-TYPE
+        SYNTAX       EriRouterDot1qPvcOnEthConfigEntry
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION
+                "A conceptual row in the eriRouterDot1qPvcOnEthConfigTable."
+        INDEX {
+                eriRouterDot1qPvcOnEthSlot,
+                eriRouterDot1qPvcOnEthPort,
+                eriRouterDot1qPvcOnEthVlanId
+        }
+        ::= { eriRouterDot1qPvcOnEthConfigTable 1 }
+
+EriRouterDot1qPvcOnEthConfigEntry ::=
+        SEQUENCE {
+                eriRouterDot1qPvcOnEthSlot                 EriRouterSlot,
+                eriRouterDot1qPvcOnEthPort                 EriRouterPort,
+                eriRouterDot1qPvcOnEthVlanId               EriRouterVidOrUntagged,
+                eriRouterDot1qPvcOnEthRowStatus            RowStatus, 
+                eriRouterDot1qPvcOnEthProfileName          SnmpAdminString,
+                eriRouterDot1qPvcOnEthEncapsulation        EriRouterDot1qEncapsulation,
+                eriRouterDot1qPvcOnEthCircuitType          EriRouterPvcCircuitType,
+                eriRouterDot1qPvcOnEthCircuitHandle        EriRouterCircuitHandle,
+                eriRouterDot1qPvcOnEthClearCircuit         TruthValue
+        } 
+
+eriRouterDot1qPvcOnEthSlot OBJECT-TYPE
+        SYNTAX       EriRouterSlot
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION
+                "The chassis slot number."
+        ::= { eriRouterDot1qPvcOnEthConfigEntry 1 }
+
+eriRouterDot1qPvcOnEthPort OBJECT-TYPE
+        SYNTAX       EriRouterPort
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION
+                "The port number."
+        ::= { eriRouterDot1qPvcOnEthConfigEntry 2 }
+
+eriRouterDot1qPvcOnEthVlanId OBJECT-TYPE
+        SYNTAX       EriRouterVidOrUntagged
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION 
+                "IEEE 802.1Q Virtual LAN (VLAN) tag value."
+        ::= { eriRouterDot1qPvcOnEthConfigEntry 3 } 
+
+eriRouterDot1qPvcOnEthRowStatus OBJECT-TYPE
+        SYNTAX       RowStatus
+        MAX-ACCESS   read-create
+        STATUS       current
+        DESCRIPTION 
+                "The row status for creating, modifying, or deleting an entry
+                in the table."
+        ::= { eriRouterDot1qPvcOnEthConfigEntry 4 }
+
+eriRouterDot1qPvcOnEthProfileName OBJECT-TYPE
+        SYNTAX       SnmpAdminString (SIZE(1..63))
+        MAX-ACCESS   read-create
+        STATUS       current
+        DESCRIPTION  
+                "The profile name to use with the PVC."
+        ::= { eriRouterDot1qPvcOnEthConfigEntry 5 }
+
+eriRouterDot1qPvcOnEthEncapsulation OBJECT-TYPE
+        SYNTAX       EriRouterDot1qEncapsulation
+        MAX-ACCESS   read-create
+        STATUS       current
+        DESCRIPTION  
+                "The encapsulation to use with the PVC."
+        ::= { eriRouterDot1qPvcOnEthConfigEntry 6 }
+
+eriRouterDot1qPvcOnEthCircuitType OBJECT-TYPE
+        SYNTAX       EriRouterPvcCircuitType
+        MAX-ACCESS   read-create
+        STATUS       current
+        DESCRIPTION
+                "The PVC circuit type.  With respect to this mib object,
+                only those entries whose eriRouterDot1qPvcOnEthCircuitType
+                has a value 'explicit' may be removed by setting
+                eriRouterDot1qPvcOnEthRowStatus equal to 'destroy'.  A set
+                operation with eriRouterDot1qPvcOnEthRowStatus equal to 'destroy'
+                on any row with eriRouterDot1qPvcOnEthCircuitType not equal to
+                'explicit' will result in an INCONSISTENT_VALUE_ERROR."
+        DEFVAL { explicit }
+        ::= { eriRouterDot1qPvcOnEthConfigEntry 7 }
+
+eriRouterDot1qPvcOnEthCircuitHandle OBJECT-TYPE
+        SYNTAX       EriRouterCircuitHandle
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+                "This object is used internally to uniquely identify
+                a circuit.  The value of this object may be used to
+                correlate entries with those in the eriRouterBindTable defined
+                in the ERICSSON-ROUTER-BIND-MIB."
+        ::= { eriRouterDot1qPvcOnEthConfigEntry 8 }
+
+eriRouterDot1qPvcOnEthClearCircuit OBJECT-TYPE
+        SYNTAX       TruthValue
+        MAX-ACCESS   read-create
+        STATUS       current
+        DESCRIPTION
+               "When this object is true(1), the system will clear active
+                subscriber sessions on the specified circuit.  When false(2),
+		there is no action taken.  This object can only be written
+		when the conceptual row exists."
+        DEFVAL { false }
+        ::= { eriRouterDot1qPvcOnEthConfigEntry 9 }
+
+--
+-- 802.1Q PVC Configuration On ATM Circuits Group
+--
+-- This table supports the identification, addition, configuration and
+-- deletion of IEEE 802.1Q PVCs on ATM circuits.
+--
+
+eriRouterDot1qPvcOnAtmConfigTable OBJECT-TYPE
+        SYNTAX       SEQUENCE OF EriRouterDot1qPvcOnAtmConfigEntry
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION
+                "This table contains the objects which identify and configure
+                IEEE 802.1Q PVCs on ATM circuits."
+        ::= { eriRouterPvcMIBObjects 4 }
+
+eriRouterDot1qPvcOnAtmConfigEntry OBJECT-TYPE
+        SYNTAX       EriRouterDot1qPvcOnAtmConfigEntry
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION
+                "A conceptual row in the eriRouterDot1qPvcOnAtmConfigTable."
+        INDEX {
+                eriRouterDot1qPvcOnAtmSlot,
+                eriRouterDot1qPvcOnAtmPort,
+                eriRouterDot1qPvcOnAtmVpi,
+                eriRouterDot1qPvcOnAtmVci,
+                eriRouterDot1qPvcOnAtmVlanId
+        }
+        ::= { eriRouterDot1qPvcOnAtmConfigTable 1 }
+
+EriRouterDot1qPvcOnAtmConfigEntry ::=
+        SEQUENCE {
+                eriRouterDot1qPvcOnAtmSlot                 EriRouterSlot,
+                eriRouterDot1qPvcOnAtmPort                 EriRouterPort,
+                eriRouterDot1qPvcOnAtmVpi                  Unsigned32,
+                eriRouterDot1qPvcOnAtmVci                  Unsigned32,
+                eriRouterDot1qPvcOnAtmVlanId               EriRouterVidOrUntagged,
+                eriRouterDot1qPvcOnAtmRowStatus            RowStatus, 
+                eriRouterDot1qPvcOnAtmProfileName          SnmpAdminString,
+                eriRouterDot1qPvcOnAtmEncapsulation        EriRouterDot1qEncapsulation,
+                eriRouterDot1qPvcOnAtmCircuitType          EriRouterPvcCircuitType,
+                eriRouterDot1qPvcOnAtmCircuitHandle        EriRouterCircuitHandle,
+                eriRouterDot1qPvcOnAtmClearCircuit         TruthValue
+        } 
+
+eriRouterDot1qPvcOnAtmSlot OBJECT-TYPE
+        SYNTAX       EriRouterSlot
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION
+                "The chassis slot number."
+        ::= { eriRouterDot1qPvcOnAtmConfigEntry 1 }
+
+eriRouterDot1qPvcOnAtmPort OBJECT-TYPE
+        SYNTAX       EriRouterPort
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION
+                "The port number."
+        ::= { eriRouterDot1qPvcOnAtmConfigEntry 2 }
+
+eriRouterDot1qPvcOnAtmVpi OBJECT-TYPE
+	SYNTAX       Unsigned32 (0..255)
+	MAX-ACCESS   not-accessible
+	STATUS       current
+	DESCRIPTION
+		"The Virtual Path Identifier for the PVC."
+	::= { eriRouterDot1qPvcOnAtmConfigEntry 3 }
+
+eriRouterDot1qPvcOnAtmVci OBJECT-TYPE
+	SYNTAX       Unsigned32 (0..65535)
+	MAX-ACCESS   not-accessible
+	STATUS       current
+	DESCRIPTION 
+		"The Virtual Channel Identifier for the PVC."
+	::= { eriRouterDot1qPvcOnAtmConfigEntry 4 }
+
+eriRouterDot1qPvcOnAtmVlanId OBJECT-TYPE
+        SYNTAX       EriRouterVidOrUntagged
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION 
+                "IEEE 802.1Q Virtual LAN (VLAN) tag value."
+        ::= { eriRouterDot1qPvcOnAtmConfigEntry 5 } 
+
+eriRouterDot1qPvcOnAtmRowStatus OBJECT-TYPE
+        SYNTAX       RowStatus
+        MAX-ACCESS   read-create
+        STATUS       current
+        DESCRIPTION 
+                "The row status for creating, modifying, or deleting an entry
+                in the table."
+        ::= { eriRouterDot1qPvcOnAtmConfigEntry 6 }
+
+eriRouterDot1qPvcOnAtmProfileName OBJECT-TYPE
+        SYNTAX       SnmpAdminString (SIZE(1..63))
+        MAX-ACCESS   read-create
+        STATUS       current
+        DESCRIPTION  
+                "The profile name to use with the PVC."
+        ::= { eriRouterDot1qPvcOnAtmConfigEntry 7 }
+
+eriRouterDot1qPvcOnAtmEncapsulation OBJECT-TYPE
+        SYNTAX       EriRouterDot1qEncapsulation
+        MAX-ACCESS   read-create
+        STATUS       current
+        DESCRIPTION  
+                "The encapsulation to use with the PVC."
+        ::= { eriRouterDot1qPvcOnAtmConfigEntry 8 }
+
+eriRouterDot1qPvcOnAtmCircuitType OBJECT-TYPE
+        SYNTAX       EriRouterPvcCircuitType
+        MAX-ACCESS   read-create
+        STATUS       current
+        DESCRIPTION
+                "The PVC circuit type.  With respect to this mib object,
+                only those entries whose eriRouterDot1qPvcOnAtmCircuitType
+                has a value 'explicit' may be removed by setting
+                eriRouterDot1qPvcOnAtmRowStatus equal to 'destroy'.  A set
+                operation with eriRouterDot1qPvcOnAtmRowStatus equal to 'destroy'
+                on any row with eriRouterDot1qPvcOnAtmCircuitType not equal to
+                'explicit' will result in an INCONSISTENT_VALUE_ERROR."
+        DEFVAL { explicit }
+        ::= { eriRouterDot1qPvcOnAtmConfigEntry 9 }
+
+eriRouterDot1qPvcOnAtmCircuitHandle OBJECT-TYPE
+        SYNTAX       EriRouterCircuitHandle
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+                "This object is used internally to uniquely identify
+                a circuit.  The value of this object may be used to
+                correlate entries with those in the eriRouterBindTable defined
+                in the ERICSSON-ROUTER-BIND-MIB."
+        ::= { eriRouterDot1qPvcOnAtmConfigEntry 10 }
+
+eriRouterDot1qPvcOnAtmClearCircuit OBJECT-TYPE
+        SYNTAX       TruthValue
+        MAX-ACCESS   read-create
+        STATUS       current
+        DESCRIPTION
+               "When this object is true(1), the system will clear active
+                subscriber sessions on the specified circuit.  When false(2),
+		there is no action taken.  This object can only be written
+		when the conceptual row exists."
+        DEFVAL { false }
+        ::= { eriRouterDot1qPvcOnAtmConfigEntry 11 }
+
+--
+-- 802.1Q PVC Configuration On Frame Relay Circuits Group
+--
+-- This table supports the identification, addition, configuration and
+-- deletion of IEEE 802.1Q PVCs on Frame Relay circuits.  In addition,
+-- clearing subscribers from circuits is supported.
+--
+
+eriRouterDot1qPvcOnFrConfigTable OBJECT-TYPE
+        SYNTAX       SEQUENCE OF EriRouterDot1qPvcOnFrConfigEntry
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION
+                "This table contains the objects which identify and configure
+                IEEE 802.1Q PVCs on ATM circuits."
+        ::= { eriRouterPvcMIBObjects 5 }
+
+eriRouterDot1qPvcOnFrConfigEntry OBJECT-TYPE
+        SYNTAX       EriRouterDot1qPvcOnFrConfigEntry
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION
+                "A conceptual row in the eriRouterDot1qPvcOnFrConfigTable."
+        INDEX {
+                eriRouterDot1qPvcOnFrSlot,
+                eriRouterDot1qPvcOnFrPort,
+                eriRouterDot1qPvcOnFrChannel,
+                eriRouterDot1qPvcOnFrDLCI,
+                eriRouterDot1qPvcOnFrVlanId
+        }
+        ::= { eriRouterDot1qPvcOnFrConfigTable 1 }
+
+EriRouterDot1qPvcOnFrConfigEntry ::=
+        SEQUENCE {
+                eriRouterDot1qPvcOnFrSlot                 EriRouterSlot,
+                eriRouterDot1qPvcOnFrPort                 EriRouterPort,
+                eriRouterDot1qPvcOnFrChannel              Unsigned32,
+                eriRouterDot1qPvcOnFrDLCI                 Unsigned32,
+                eriRouterDot1qPvcOnFrVlanId               EriRouterVidOrUntagged,
+                eriRouterDot1qPvcOnFrRowStatus            RowStatus, 
+                eriRouterDot1qPvcOnFrProfileName          SnmpAdminString,
+                eriRouterDot1qPvcOnFrEncapsulation        EriRouterDot1qEncapsulation,
+                eriRouterDot1qPvcOnFrCircuitType          EriRouterPvcCircuitType,
+                eriRouterDot1qPvcOnFrCircuitHandle        EriRouterCircuitHandle,
+                eriRouterDot1qPvcOnFrClearCircuit         TruthValue
+        } 
+
+eriRouterDot1qPvcOnFrSlot OBJECT-TYPE
+        SYNTAX       EriRouterSlot
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION
+                "The chassis slot number."
+        ::= { eriRouterDot1qPvcOnFrConfigEntry 1 }
+
+eriRouterDot1qPvcOnFrPort OBJECT-TYPE
+        SYNTAX       EriRouterPort
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION
+                "The port number."
+        ::= { eriRouterDot1qPvcOnFrConfigEntry 2 }
+
+eriRouterDot1qPvcOnFrChannel OBJECT-TYPE
+	SYNTAX       Unsigned32 (0..65535)
+	MAX-ACCESS   not-accessible
+	STATUS       current
+	DESCRIPTION
+		"The channel number."
+	::= { eriRouterDot1qPvcOnFrConfigEntry 3 }
+
+eriRouterDot1qPvcOnFrDLCI OBJECT-TYPE
+	SYNTAX       Unsigned32 (0..65535)
+	MAX-ACCESS   not-accessible
+	STATUS       current
+	DESCRIPTION 
+		"The Data Link Connection Identifier."
+	::= { eriRouterDot1qPvcOnFrConfigEntry 4 }
+
+eriRouterDot1qPvcOnFrVlanId OBJECT-TYPE
+        SYNTAX       EriRouterVidOrUntagged
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION 
+                "IEEE 802.1Q Virtual LAN (VLAN) tag value."
+        ::= { eriRouterDot1qPvcOnFrConfigEntry 5 } 
+
+eriRouterDot1qPvcOnFrRowStatus OBJECT-TYPE
+        SYNTAX       RowStatus
+        MAX-ACCESS   read-create
+        STATUS       current
+        DESCRIPTION 
+                "The row status for creating, modifying, or deleting an entry
+                in the table."
+        ::= { eriRouterDot1qPvcOnFrConfigEntry 6 }
+
+eriRouterDot1qPvcOnFrProfileName OBJECT-TYPE
+        SYNTAX       SnmpAdminString (SIZE(1..63))
+        MAX-ACCESS   read-create
+        STATUS       current
+        DESCRIPTION  
+                "The profile name to use with the PVC."
+        ::= { eriRouterDot1qPvcOnFrConfigEntry 7 }
+
+eriRouterDot1qPvcOnFrEncapsulation OBJECT-TYPE
+        SYNTAX       EriRouterDot1qEncapsulation
+        MAX-ACCESS   read-create
+        STATUS       current
+        DESCRIPTION  
+                "The encapsulation to use with the PVC."
+        ::= { eriRouterDot1qPvcOnFrConfigEntry 8 }
+
+eriRouterDot1qPvcOnFrCircuitType OBJECT-TYPE
+        SYNTAX       EriRouterPvcCircuitType
+        MAX-ACCESS   read-create
+        STATUS       current
+        DESCRIPTION
+                "The PVC circuit type.  With respect to this mib object,
+                only those entries whose eriRouterDot1qPvcOnFrCircuitType
+                has a value 'explicit' may be removed by setting
+                eriRouterDot1qPvcOnFrRowStatus equal to 'destroy'.  A set
+                operation with eriRouterDot1qPvcOnFrRowStatus equal to 'destroy'
+                on any row with eriRouterDot1qPvcOnFrCircuitType not equal to
+                'explicit' will result in an INCONSISTENT_VALUE_ERROR."
+        DEFVAL { explicit }
+        ::= { eriRouterDot1qPvcOnFrConfigEntry 9 }
+
+eriRouterDot1qPvcOnFrCircuitHandle OBJECT-TYPE
+        SYNTAX       EriRouterCircuitHandle
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+                "This object is used internally to uniquely identify
+                a circuit.  The value of this object may be used to
+                correlate entries with those in the eriRouterBindTable defined
+                in the ERICSSON-ROUTER-BIND-MIB."
+        ::= { eriRouterDot1qPvcOnFrConfigEntry 10 }
+
+eriRouterDot1qPvcOnFrClearCircuit OBJECT-TYPE
+        SYNTAX       TruthValue
+        MAX-ACCESS   read-create
+        STATUS       current
+        DESCRIPTION
+               "When this object is true(1), the system will clear active
+                subscriber sessions on the specified circuit.  When false(2),
+		there is no action taken.  This object can only be written
+		when the conceptual row exists."
+        DEFVAL { false }
+        ::= { eriRouterDot1qPvcOnFrConfigEntry 11 }
+
+--
+-- compliance statements
+--
+
+eriRouterPvcCompliances OBJECT IDENTIFIER ::= { eriRouterPvcMIBConformance 1 }
+eriRouterPvcGroups      OBJECT IDENTIFIER ::= { eriRouterPvcMIBConformance 2 }
+
+eriRouterPvcCompliance MODULE-COMPLIANCE
+	STATUS       deprecated
+	DESCRIPTION
+		"The compliance statement for SNMP entities which implement
+		 the ERICSSON-ROUTER-PVC-MIB."
+	MODULE      -- this module
+	MANDATORY-GROUPS {
+		eriRouterAtmPvcGroup,
+		eriRouterFrameRelayPvcGroup
+	}
+	::= { eriRouterPvcCompliances 1 }
+
+eriRouterPvcCompliance2 MODULE-COMPLIANCE
+	STATUS       deprecated
+	DESCRIPTION
+		"The compliance statement for SNMP entities which implement
+		 the ERICSSON-ROUTER-PVC-MIB."
+	MODULE      -- this module
+	MANDATORY-GROUPS {
+		eriRouterAtmPvcGroup2,
+		eriRouterFrameRelayPvcGroup2
+	}
+	::= { eriRouterPvcCompliances 2 }
+
+eriRouterPvcCompliance3 MODULE-COMPLIANCE
+	STATUS       current
+	DESCRIPTION
+		"The compliance statement for SNMP entities which implement
+		 the ERICSSON-ROUTER-PVC-MIB."
+	MODULE      -- this module
+	MANDATORY-GROUPS {
+		eriRouterAtmPvcGroup2,
+		eriRouterFrameRelayPvcGroup2,
+		eriRouterDot1qPvcOnEthGroup,
+		eriRouterDot1qPvcOnAtmGroup,
+		eriRouterDot1qPvcOnFrGroup
+	}
+	::= { eriRouterPvcCompliances 3 }
+
+--
+-- groupings
+--
+
+eriRouterAtmPvcGroup 	OBJECT-GROUP
+	OBJECTS {
+		eriRouterAtmPvcProfileName,
+		eriRouterAtmPvcEncapsulation,
+		eriRouterAtmPvcRowStatus
+	}
+	STATUS       deprecated
+	DESCRIPTION
+		"the collection of objects which represent the ATM PVC."
+	::= { eriRouterPvcGroups 1 }
+
+eriRouterFrameRelayPvcGroup 	OBJECT-GROUP
+	OBJECTS {
+		eriRouterFrameRelayPvcProfileName,
+		eriRouterFrameRelayPvcEncapsulation,
+		eriRouterFrameRelayPvcRowStatus
+	}
+	STATUS       deprecated
+	DESCRIPTION
+		"the collection of objects which represent the FrameRelay PVC."
+	::= { eriRouterPvcGroups 2 }
+
+eriRouterAtmPvcGroup2 	OBJECT-GROUP
+	OBJECTS {
+		eriRouterAtmPvcProfileName,
+		eriRouterAtmPvcEncapsulation,
+		eriRouterAtmPvcRowStatus,
+		eriRouterAtmPvcCircuitType,
+		eriRouterAtmPvcCircuitHandle,
+		eriRouterAtmPvcClearCircuit
+	}
+	STATUS       current
+	DESCRIPTION
+		"The collection of objects which represent the ATM PVC."
+	::= { eriRouterPvcGroups 3 }
+
+eriRouterFrameRelayPvcGroup2 	OBJECT-GROUP
+	OBJECTS {
+		eriRouterFrameRelayPvcProfileName,
+		eriRouterFrameRelayPvcEncapsulation,
+		eriRouterFrameRelayPvcRowStatus,
+		eriRouterFrameRelayPvcCircuitType,
+		eriRouterFrameRelayPvcCircuitHandle,
+		eriRouterFrameRelayPvcClearCircuit
+	}
+	STATUS       current
+	DESCRIPTION
+		"The collection of objects which represent the FrameRelay PVC."
+	::= { eriRouterPvcGroups 4 }
+
+eriRouterDot1qPvcOnEthGroup  OBJECT-GROUP
+	OBJECTS {
+		eriRouterDot1qPvcOnEthRowStatus,
+		eriRouterDot1qPvcOnEthProfileName,
+		eriRouterDot1qPvcOnEthEncapsulation,
+		eriRouterDot1qPvcOnEthCircuitType,
+		eriRouterDot1qPvcOnEthCircuitHandle,
+		eriRouterDot1qPvcOnEthClearCircuit
+	}
+	STATUS       current
+	DESCRIPTION
+		"A collection of objects providing information specific
+		to IEEE 802.1Q PVCs on Ethernet ports."
+	::= { eriRouterPvcGroups 5 }
+
+eriRouterDot1qPvcOnAtmGroup  OBJECT-GROUP
+	OBJECTS {
+		eriRouterDot1qPvcOnAtmRowStatus,
+		eriRouterDot1qPvcOnAtmProfileName,
+		eriRouterDot1qPvcOnAtmEncapsulation,
+		eriRouterDot1qPvcOnAtmCircuitType,
+		eriRouterDot1qPvcOnAtmCircuitHandle,
+		eriRouterDot1qPvcOnAtmClearCircuit
+	}
+	STATUS       current
+	DESCRIPTION
+		"A collection of objects providing information specific
+		to IEEE 802.1Q PVCs on ATM circuits."
+	::= { eriRouterPvcGroups 6 }
+
+eriRouterDot1qPvcOnFrGroup  OBJECT-GROUP
+	OBJECTS {
+		eriRouterDot1qPvcOnFrRowStatus,
+		eriRouterDot1qPvcOnFrProfileName,
+		eriRouterDot1qPvcOnFrEncapsulation,
+		eriRouterDot1qPvcOnFrCircuitType,
+		eriRouterDot1qPvcOnFrCircuitHandle,
+		eriRouterDot1qPvcOnFrClearCircuit
+	}
+	STATUS       current
+	DESCRIPTION
+		"A collection of objects providing information specific
+		to IEEE 802.1Q PVCs on Frame Relay circuits."
+	::= { eriRouterPvcGroups 7 }
+
+END

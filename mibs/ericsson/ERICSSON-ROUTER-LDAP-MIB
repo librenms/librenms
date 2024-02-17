@@ -1,0 +1,187 @@
+-- *****************************************************************
+-- ERICSSON-ROUTER-LDAP-MIB
+--
+-- Copyright (c) 2017 Ericsson AB.
+-- All rights reserved.
+--
+-- *****************************************************************
+
+ERICSSON-ROUTER-LDAP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+  MODULE-IDENTITY,
+  OBJECT-TYPE,
+  NOTIFICATION-TYPE,
+  Integer32,
+  Unsigned32
+    FROM SNMPv2-SMI
+  DisplayString
+    FROM SNMPv2-TC
+  MODULE-COMPLIANCE
+         FROM SNMPv2-CONF
+  SnmpAdminString
+      FROM SNMP-FRAMEWORK-MIB
+  eriRouterMgmt
+      FROM ERICSSON-ROUTER-SMI
+  OBJECT-GROUP, NOTIFICATION-GROUP
+      FROM SNMPv2-CONF;
+
+eriRouterLdapMib MODULE-IDENTITY
+     LAST-UPDATED    "201709261600Z" -- Sept 26, 2017
+     ORGANIZATION    "Ericsson AB."
+     CONTACT-INFO
+             "       Ericsson AB.
+
+                     100 Headquarters Dr
+                     San Jose, CA  95134
+                     USA
+
+             Phone:  +1 408 750-5000
+             Fax:    +1 408 750-5599
+
+             "
+     DESCRIPTION
+             "This MIB defines a notification(s) for the LDAP client."
+
+-- Revision history
+     REVISION        "201709261600Z" -- Sept 26, 2017
+     DESCRIPTION
+             "Initial version of LDAP MIB defenition."
+
+    ::= { eriRouterMgmt 123 }
+
+eriRouterLdapMibObjects OBJECT IDENTIFIER
+    ::= { eriRouterLdapMib 1 }
+eriRouterLdapNotifications OBJECT IDENTIFIER
+    ::= { eriRouterLdapMib 2 }
+eriRouterLdapConformance OBJECT IDENTIFIER
+    ::= { eriRouterLdapMib 3 }
+
+--
+-- Object definitions of eriRouterLdapMibObjects
+--
+
+eriRouterLdapContextName OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (1..64))
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+        "The name of the context in which this server is configured."
+    ::= { eriRouterLdapMibObjects 1 }
+
+eriRouterLdapServerName OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (1..16))
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+        "A unique index value assigned to each Ldap server."
+    ::= { eriRouterLdapMibObjects 2 }
+
+eriRouterLdapServerIPAddress OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE(1..46))
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+        "The server IP address (v4 or v6)."
+    ::= { eriRouterLdapMibObjects 3 }
+
+eriRouterLdapServerPort OBJECT-TYPE
+    SYNTAX     Unsigned32(0..65535)
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+          "The TCP port number."
+    ::= { eriRouterLdapMibObjects 4 }
+
+eriRouterLdapUserName OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (0..255))
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+        "The name of the user the system was trying to authenticate."
+    ::= { eriRouterLdapMibObjects 5 }
+
+--
+-- END OF Object definitions of eriRouterLdapMibObjects
+--
+
+--
+-- Notification type definitions of eriRouterLdapNotifications
+--
+
+eriRouterLdapServerAuthenticationFailed NOTIFICATION-TYPE
+  OBJECTS {
+      eriRouterLdapContextName,
+      eriRouterLdapServerName,
+      eriRouterLdapServerIPAddress,
+      eriRouterLdapServerPort,
+      eriRouterLdapUserName
+       }
+  STATUS  current
+  DESCRIPTION
+      "Notification type for an LDAP authentication failed event due to the incorrect password or incorrect username."
+  ::= { eriRouterLdapNotifications 1 }
+
+eriRouterLdapServerUnavailable NOTIFICATION-TYPE
+  OBJECTS {
+      eriRouterLdapContextName,
+      eriRouterLdapServerName,
+      eriRouterLdapServerIPAddress,
+      eriRouterLdapServerPort
+       }
+  STATUS  current
+  DESCRIPTION
+      "Notification type for an LDAP server unavailable event."
+  ::= { eriRouterLdapNotifications 2 }
+
+--
+-- END OF Notification type definitions of eriRouterLdapNotifications
+--
+
+--
+-- Conformance and group definitions of eriRouterLdapNotifications
+--
+
+eriRouterLdapGroups OBJECT IDENTIFIER ::= { eriRouterLdapConformance 1 }
+eriRouterLdapCompliances OBJECT IDENTIFIER ::= { eriRouterLdapConformance 2 }
+
+eriRouterLdapObjectsGroup OBJECT-GROUP
+    OBJECTS {
+      eriRouterLdapContextName,
+      eriRouterLdapServerName,
+      eriRouterLdapServerIPAddress,
+      eriRouterLdapServerPort,
+      eriRouterLdapUserName
+    }
+    STATUS current
+    DESCRIPTION
+        "The collection of objects used in LDAP."
+    ::= { eriRouterLdapGroups 1 }
+
+eriRouterLdapNotifyGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+      eriRouterLdapServerAuthenticationFailed,
+      eriRouterLdapServerUnavailable
+    }
+    STATUS current
+    DESCRIPTION
+        "Notifications for LDAP client."
+    ::= { eriRouterLdapGroups 2 }
+
+eriRouterLdapCompliance MODULE-COMPLIANCE
+    STATUS       current
+    DESCRIPTION
+        "The compliance statement for LDAP objects in this
+        LDAP MIB."
+    MODULE      -- this module
+    MANDATORY-GROUPS {
+        eriRouterLdapObjectsGroup,
+        eriRouterLdapNotifyGroup
+    }
+    ::= { eriRouterLdapCompliances 1 }
+
+--
+-- END OF Conformance and group definitions of eriRouterLdapNotifications
+--
+
+END

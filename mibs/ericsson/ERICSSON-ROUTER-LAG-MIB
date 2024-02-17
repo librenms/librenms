@@ -1,0 +1,207 @@
+-- %DNP% $Id: $
+-- %DNP% $Source: /cvsroot/pkt/sw/se/xc/bsd/config/snmp/doc/Attic/header.mib,v $
+-- *****************************************************************
+-- ERICSSON-ROUTER-LAG-MIB
+--
+-- Copyright (c) 2016 Ericsson AB.
+-- All rights reserved.
+--
+-- *****************************************************************
+
+
+
+ERICSSON-ROUTER-LAG-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+  MODULE-IDENTITY,
+  OBJECT-TYPE,
+  NOTIFICATION-TYPE,
+  Integer32
+    FROM SNMPv2-SMI
+  DisplayString
+    FROM SNMPv2-TC
+  MODULE-COMPLIANCE
+         FROM SNMPv2-CONF
+  SnmpAdminString
+      FROM SNMP-FRAMEWORK-MIB
+  eriRouterMgmt
+      FROM ERICSSON-ROUTER-SMI
+  OBJECT-GROUP, NOTIFICATION-GROUP
+      FROM SNMPv2-CONF;
+
+eriRouterLAGMib MODULE-IDENTITY
+     LAST-UPDATED    "201511061800Z" -- Nov 06, 2015
+     ORGANIZATION    "Ericsson AB."
+     CONTACT-INFO
+             "       Ericsson AB.
+
+                     100 Headquarters Dr
+                     San Jose, CA  95134
+                     USA
+
+             Phone:  +1 408 750-5000
+             Fax:    +1 408 750-5599
+
+             "
+     DESCRIPTION
+             " LAG MIB"
+
+-- Revision history
+     REVISION        "201511061800Z" -- Nov 06, 2015
+     DESCRIPTION
+             "Initial version of Linkgroup MIB defenition."
+
+    ::= { eriRouterMgmt 111 }
+
+eriRouterLAGMibObjects OBJECT IDENTIFIER
+    ::= { eriRouterLAGMib 1 }
+eriRouterLAGNotifications OBJECT IDENTIFIER
+    ::= { eriRouterLAGMib 2 }
+ eriRouterLAGConformance OBJECT IDENTIFIER
+    ::= { eriRouterLAGMib 3 }
+
+--
+-- Object definitions of eriRouterLAGMibObjects
+--
+
+eriRouterLAGName OBJECT-TYPE
+  SYNTAX  DisplayString (SIZE(1..16))
+  MAX-ACCESS accessible-for-notify
+  STATUS  current
+  DESCRIPTION
+      "Represents the name of the link aggregation group."
+  ::= { eriRouterLAGMibObjects 1 }
+
+eriRouterLAGId OBJECT-TYPE
+  SYNTAX  Integer32
+  MAX-ACCESS accessible-for-notify
+  STATUS  current
+  DESCRIPTION
+      "Represents the link aggregation group identifier."
+  ::= { eriRouterLAGMibObjects 2 }
+
+eriRouterLAGConstituentSlot OBJECT-TYPE
+    SYNTAX Integer32 (0..255)
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Represents the slot of the Constituent Circuit."
+    ::= { eriRouterLAGMibObjects 3 }
+
+eriRouterLAGConstituentPort OBJECT-TYPE
+    SYNTAX Integer32 (0..255)
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Represents the port of the Constituent Circuit."
+    ::= { eriRouterLAGMibObjects 4 }
+
+--
+-- END OF Object definitions of eriRouterLAGMibObjects
+--
+
+
+--
+-- Notification type definitions of eriRouterLAGNotifications
+--
+
+eriRouterLAGUp NOTIFICATION-TYPE
+  OBJECTS {
+      eriRouterLAGName,
+      eriRouterLAGId
+       }
+  STATUS  current
+  DESCRIPTION
+      "Notification Type for a Link-Group Up event."
+  ::= { eriRouterLAGNotifications 1 }
+
+eriRouterLAGDown NOTIFICATION-TYPE
+  OBJECTS {
+      eriRouterLAGName,
+      eriRouterLAGId
+       }
+  STATUS  current
+  DESCRIPTION
+      "Notification Type for a Link-Group Down event."
+  ::= { eriRouterLAGNotifications 2 }
+
+eriRouterLAGConstituentUp NOTIFICATION-TYPE
+  OBJECTS {
+      eriRouterLAGName,
+      eriRouterLAGId,
+      eriRouterLAGConstituentSlot,
+      eriRouterLAGConstituentPort
+      }
+  STATUS  current
+  DESCRIPTION
+     "Notification Type for a Constituent Circuit Up event."
+  ::= { eriRouterLAGNotifications 3 }
+
+eriRouterLAGConstituentDown NOTIFICATION-TYPE
+  OBJECTS {
+      eriRouterLAGName,
+      eriRouterLAGId,
+      eriRouterLAGConstituentSlot,
+      eriRouterLAGConstituentPort
+      }
+  STATUS  current
+  DESCRIPTION
+     "Notification Type for a Constituent Circuit Down event."
+  ::= { eriRouterLAGNotifications 4 }
+
+
+--
+-- END OF Notification type definitions of eriRouterLAGNotifications
+--
+
+--
+-- Conformance definitions of eriRouterLAGpNotifications
+--
+
+eriRouterLAGGroups OBJECT IDENTIFIER ::= { eriRouterLAGConformance 1 }
+eriRouterLAGCompliances OBJECT IDENTIFIER ::= { eriRouterLAGConformance 2 }
+--
+-- END OF Conformance definitions of eriRouterLAGConformance
+--
+
+eriRouterLAGObjectsGroup OBJECT-GROUP
+    OBJECTS {
+        eriRouterLAGId,
+        eriRouterLAGName,
+        eriRouterLAGConstituentSlot,
+        eriRouterLAGConstituentPort
+    }
+    STATUS current
+    DESCRIPTION
+        "The collection of objects used in link aggregation group
+         and constituent circuit notifications"
+    ::= { eriRouterLAGGroups 1 }
+
+
+eriRouterLAGNotifyGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        eriRouterLAGUp,
+        eriRouterLAGDown,
+        eriRouterLAGConstituentUp,
+        eriRouterLAGConstituentDown
+    }
+    STATUS current
+    DESCRIPTION
+        "Notifications for link aggregation groups and constituent circuits."
+    ::= { eriRouterLAGGroups 2 }
+
+eriRouterLAGCompliance MODULE-COMPLIANCE
+    STATUS       current
+    DESCRIPTION
+        "The compliance statement for linkgroup objects in this
+        LAG MIB."
+    MODULE      -- this module
+    MANDATORY-GROUPS {
+        eriRouterLAGObjectsGroup,
+        eriRouterLAGNotifyGroup
+    }
+    ::= { eriRouterLAGCompliances 1 }
+
+
+END
+

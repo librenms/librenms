@@ -1,0 +1,482 @@
+-- $Id: ERICSSON-ROUTER-IP-SECURITY-MIB.my,v 1.1.2.4 2011/02/22 17:26:17 thatcher Exp $
+-- $Source: /cvsroot/pkt/sw/se/xc/bsd/config/snmp/mibs/Attic/ERICSSON-ROUTER-IP-SECURITY-MIB.my,v $
+-- *****************************************************************
+-- ERICSSON-ROUTER-IP-SECURITY-MIB    IP SECURITY MIB
+--
+-- Copyright (c) 2010-2011, 2015 Ericsson AB
+-- All rights reserved.
+--
+-- *****************************************************************
+
+ERICSSON-ROUTER-IP-SECURITY-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE, Unsigned32,
+    NOTIFICATION-TYPE
+            FROM SNMPv2-SMI
+
+    DateAndTime
+            FROM SNMPv2-TC
+
+    SnmpAdminString
+            FROM SNMP-FRAMEWORK-MIB
+
+    IANAItuEventType,
+    IANAItuProbableCause
+            FROM IANA-ITU-ALARM-TC-MIB
+
+    InetAddressType, InetAddress
+           FROM INET-ADDRESS-MIB          -- RFC4001
+
+    ItuPerceivedSeverity
+            FROM ITU-ALARM-TC-MIB
+
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP,
+    NOTIFICATION-GROUP
+            FROM SNMPv2-CONF
+
+    eriRouterMgmt
+            FROM ERICSSON-ROUTER-SMI;
+
+eriRouterIpSecurityMib MODULE-IDENTITY
+    LAST-UPDATED   "201501141800Z" -- Jan 14, 2015
+    ORGANIZATION   "Ericsson AB"
+    CONTACT-INFO
+            "       Ericsson AB
+                    100 Headquarters Dr
+                    San Jose, CA 95134
+                    USA
+
+             Phone: +1 408 750 5000
+               Fax: +1 408 750 5599
+            "
+    DESCRIPTION
+        "Defines the objects necessary to support the management of
+        IPSEC objects."
+
+    REVISION       "201501141800Z" -- Jan 14, 2015
+    DESCRIPTION
+        "Updated RBN/rbn/Rbn as ERICSSON-ROUTER/eriRouter/EriRouter
+         to migrate RBN MIB to ERICSSON MIB."
+
+    REVISION       "201101140000Z" -- Jan 14, 2011
+    DESCRIPTION
+        "Initial Version."
+
+    ::= { eriRouterMgmt 55}
+
+eriRouterIpSecNotifications OBJECT IDENTIFIER ::= { eriRouterIpSecurityMib 0 }
+
+eriRouterIpSecObjects       OBJECT IDENTIFIER ::= { eriRouterIpSecurityMib 1 }
+
+eriRouterIpSecConformance   OBJECT IDENTIFIER ::= { eriRouterIpSecurityMib 2 }
+
+--
+-- some structure for the mib objects
+--
+
+eriRouterIpSecNotify        OBJECT IDENTIFIER ::= { eriRouterIpSecObjects 1 }
+
+--
+-- IPSEC notification objects
+--
+
+eriRouterIpSecEventDateAndTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The date and time when the event was raised."
+    ::= { eriRouterIpSecNotify 1 }
+
+eriRouterIpSecEventSeverity  OBJECT-TYPE
+    SYNTAX      ItuPerceivedSeverity
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The current severity of the event."
+    ::= { eriRouterIpSecNotify 2 }
+
+eriRouterIpSecEventType OBJECT-TYPE
+    SYNTAX      IANAItuEventType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The type of the event."
+    ::= { eriRouterIpSecNotify 3 }
+
+eriRouterIpSecEventProbableCause OBJECT-TYPE
+    SYNTAX      IANAItuProbableCause
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The probable cause for this event."
+    ::= { eriRouterIpSecNotify 4 }
+
+eriRouterIpSecTunnelIdentifier OBJECT-TYPE
+    SYNTAX      SnmpAdminString  (SIZE(0..270))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Key to identify the tunnel alarm, consists of the remote-id type
+        and remote-id, or tunnel name. The string starts with a sub-string 
+        identifying the type, followed by the value.
+        ipv4-
+        fqdn-
+        rfc822Addr-
+        ipv6-
+        derAsn1Dn-
+        derAsn1Gn-
+        keyId-
+        name-"
+    ::= { eriRouterIpSecNotify 5 }
+
+eriRouterIpSecTunnelName OBJECT-TYPE
+    SYNTAX      SnmpAdminString  (SIZE(0..50))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Name of the tunnel."
+    ::= { eriRouterIpSecNotify 6 }
+
+eriRouterIpSecTunnelType OBJECT-TYPE
+    SYNTAX      INTEGER  {
+                           static(1),
+                           dynamic(2),
+                           manual(3)
+                         }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Type of tunnel."
+    ::= { eriRouterIpSecNotify 7 }
+
+eriRouterIpSecTunnelDownCause  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                          general(0),
+                          noRoute(1),
+                          aspHomingFailure(2),
+                          ppaHomingFailure(3),
+                          configuredDown(4),
+                          keepaliveFailure(5),
+                          downByPeer(6),
+                          rekeyFailure(7),
+                          aspSoftReset(8),
+                          indeterminate(9)
+                        }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Additional information to describe the cause for
+        tunnel being down."
+    ::= { eriRouterIpSecNotify 8 }
+
+eriRouterIpSecRemoteIdType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                          reserved(0),
+                          ipv4(1),
+                          fqdn(2),
+                          rfcAddr(3),
+                          -- Values 4, 6-8, 12-200 and
+                          -- 201-255 are reseved for IANA
+                          ipv6(5),
+                          derAsn1Dn(9),
+                          derAsn1Gn(10),
+                          keyId(11)
+    }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Remote Id Type  of eriRouterIpSecRemoteId "
+    ::= { eriRouterIpSecNotify 9 }
+
+eriRouterIpSecRemoteId OBJECT-TYPE
+    SYNTAX      SnmpAdminString  (SIZE(0..256))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Remote Id."
+    ::= { eriRouterIpSecNotify 10 }
+
+eriRouterIpSecLocalAddrContextName OBJECT-TYPE
+    SYNTAX      SnmpAdminString  (SIZE(0..32))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Context name of the local address ."
+    ::= { eriRouterIpSecNotify 11 }
+
+eriRouterIpSecLocalAddressType OBJECT-TYPE
+       SYNTAX      InetAddressType
+       MAX-ACCESS  accessible-for-notify
+       STATUS      current
+       DESCRIPTION
+           "Specifies the type of local address to be used."
+       ::= { eriRouterIpSecNotify 12 }
+
+eriRouterIpSecLocalAddress OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Local IP address of the tunnel."
+    ::= { eriRouterIpSecNotify 13 }
+
+eriRouterIpSecRemoteAddressType OBJECT-TYPE
+       SYNTAX      InetAddressType
+       MAX-ACCESS  accessible-for-notify
+       STATUS      current
+       DESCRIPTION
+           "Specifies the type of remote address to be used."
+       ::= { eriRouterIpSecNotify 14 }
+
+eriRouterIpSecRemoteAddress OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Remote IP address of the tunnel."
+    ::= { eriRouterIpSecNotify 15 }
+
+eriRouterIpSecTunnelState OBJECT-TYPE
+    SYNTAX      INTEGER {
+                          up(1),
+                          down(2)
+                        }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Tunnel State."
+    ::= { eriRouterIpSecNotify 16 }
+
+eriRouterIpSecSelfCertificateIdentifier OBJECT-TYPE
+    SYNTAX      SnmpAdminString  (SIZE(0..522))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "<Subject Name> :ISSUER- <Issuer Name>"
+    ::= { eriRouterIpSecNotify 17 }
+
+eriRouterIpSecCertificateHandle OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Self Certificate Handle."
+    ::= { eriRouterIpSecNotify 18 }
+
+eriRouterIpSecExpiryDateAndTime OBJECT-TYPE
+    SYNTAX      SnmpAdminString  (SIZE(0..128))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Date and Time the certificate will expire."
+    ::= { eriRouterIpSecNotify 19 }
+
+eriRouterIpSecCertificateSubjectName OBJECT-TYPE
+    SYNTAX      SnmpAdminString  (SIZE(0..256))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Subject Name of the self certificate"
+    ::= { eriRouterIpSecNotify 20 }
+
+eriRouterIpSecCrlIdentifier OBJECT-TYPE
+    SYNTAX      SnmpAdminString  (SIZE(0..256))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "ISSUER- <Issuer Name>"
+    ::= { eriRouterIpSecNotify 21 }
+
+--
+-- NOTIFICATIONS - node for hanging notification definitions
+--
+
+eriRouterIpSecTunnelStatusChangeAlarm NOTIFICATION-TYPE
+OBJECTS {
+        eriRouterIpSecEventDateAndTime,
+        eriRouterIpSecEventSeverity,
+        eriRouterIpSecEventType,
+        eriRouterIpSecEventProbableCause,
+        eriRouterIpSecTunnelIdentifier,
+        eriRouterIpSecTunnelName,
+        eriRouterIpSecTunnelType,
+        eriRouterIpSecTunnelDownCause,
+        eriRouterIpSecRemoteIdType,
+        eriRouterIpSecRemoteId,
+        eriRouterIpSecLocalAddrContextName,
+        eriRouterIpSecLocalAddressType,
+        eriRouterIpSecLocalAddress,
+        eriRouterIpSecRemoteAddressType,
+        eriRouterIpSecRemoteAddress,
+        eriRouterIpSecTunnelState
+    }
+    STATUS current
+    DESCRIPTION
+         "This notification signifies a change in the
+          IpSecTunnelState. When IPSecTunnelState has the value
+          'down', eriRouterIpSecEventSeverity has the value 'major'.  When
+          IPSecTunnelState has the value 'up' or is obsoleted due to 
+          configuration change eriRouterIpSecEventSeverity has the value 'clear'"
+    ::= { eriRouterIpSecNotifications 1 }
+
+eriRouterIpSecNoValidRSASelfCertificateAlarm NOTIFICATION-TYPE
+OBJECTS {
+        eriRouterIpSecEventDateAndTime,
+        eriRouterIpSecEventSeverity,
+        eriRouterIpSecEventType,
+        eriRouterIpSecEventProbableCause
+    }
+    STATUS current
+    DESCRIPTION
+        "This alarm is set, when there is no valid RSA self-certificate
+         for a context. It.s cleared when a valid self-certificate is
+         configured or when system time is change to make the existing
+         certificate valid.  As long as any valid RSA self-certificate exists from any
+         CA, this alarm will not be set. This alarm is set at .Major. severity."
+    ::= { eriRouterIpSecNotifications 2 }
+
+eriRouterIpSecNoValidRSATrustedCertificateAlarm NOTIFICATION-TYPE
+OBJECTS {
+        eriRouterIpSecEventDateAndTime,
+        eriRouterIpSecEventSeverity,
+        eriRouterIpSecEventType,
+        eriRouterIpSecEventProbableCause
+    }
+    STATUS current
+    DESCRIPTION
+         "This alarm is raised, when there is no valid RSA trusted-certificate for
+          a context. It.s cleared, when a valid trusted-certificate is
+          configured or when system time is change to make the existing certificate
+          valid. As long as any valid RSA trusted-certificate exists for any CA, this
+          alarm will not be raised. This alarm is set at .Major. severity."
+    ::= { eriRouterIpSecNotifications 3 }
+
+eriRouterIpSecRSASelfCertificateNearingExpiryAlarm NOTIFICATION-TYPE
+OBJECTS {
+        eriRouterIpSecEventDateAndTime,
+        eriRouterIpSecEventSeverity,
+        eriRouterIpSecEventType,
+        eriRouterIpSecEventProbableCause,
+        eriRouterIpSecSelfCertificateIdentifier,
+        eriRouterIpSecCertificateHandle,
+        eriRouterIpSecExpiryDateAndTime
+    }
+    STATUS current
+    DESCRIPTION
+        " This alarm notifies the operator that the RSA self certificate
+          expiration is near. It will be raised at the user specified time
+          before the expiration.  It will be cleared when a new certificate with
+          the self subject name is added, the certificate is deleted, or the system
+          time pulled up. This alarm is set at .Warning. severity."
+    ::= { eriRouterIpSecNotifications 4 }
+
+eriRouterIpSecRSATrustedCertificateNearingExpiryAlarm NOTIFICATION-TYPE
+OBJECTS {
+        eriRouterIpSecEventDateAndTime,
+        eriRouterIpSecEventSeverity,
+        eriRouterIpSecEventType,
+        eriRouterIpSecEventProbableCause,
+        eriRouterIpSecCertificateSubjectName,
+        eriRouterIpSecCertificateHandle,
+        eriRouterIpSecExpiryDateAndTime
+    }
+    STATUS current
+    DESCRIPTION
+        " This alarm notifies the operator that the RSA self certificate
+          expiration is near. It will be raised at the user specified time
+          before the expiration.  It will be cleared when a new certificate with
+          the self subject name is added, the certificate is deleted, or the system
+          time is pulled up. This alarm is set at .Warning. severity."
+    ::= { eriRouterIpSecNotifications 5 }
+
+eriRouterIpSecRSACrlNearingExpiryAlarm NOTIFICATION-TYPE
+OBJECTS {
+        eriRouterIpSecEventDateAndTime,
+        eriRouterIpSecEventSeverity,
+        eriRouterIpSecEventType,
+        eriRouterIpSecEventProbableCause,
+        eriRouterIpSecCrlIdentifier,
+        eriRouterIpSecCertificateHandle,
+        eriRouterIpSecExpiryDateAndTime
+    }
+    STATUS current
+    DESCRIPTION
+        " This alarm notifies the operator that the CRL
+          expiration is near. It will be raised at the user specified time
+          before the expiration.  It will be cleared when a new crl with
+          the same issuer name is added, the crl is deleted, or the system
+          time pulled up. This alarm is set at .Warning. severity."
+    ::= { eriRouterIpSecNotifications 6 }
+
+--
+-- compliance statements
+--
+eriRouterIpSecCompliances OBJECT IDENTIFIER ::= { eriRouterIpSecConformance 1 }
+eriRouterIpSecGroups      OBJECT IDENTIFIER ::= { eriRouterIpSecConformance 2 }
+
+eriRouterIpSecCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+        "The compliance statement for SNMP entities which implement
+         the IPSEC MIB."
+
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+            eriRouterIpSecNotifyObjectGroup,
+            eriRouterIpSecNotifyGroup
+        }
+    ::= { eriRouterIpSecCompliances 1 }
+
+--
+-- groupings
+--
+
+eriRouterIpSecNotifyObjectGroup OBJECT-GROUP
+    OBJECTS {
+        eriRouterIpSecEventDateAndTime,
+        eriRouterIpSecEventSeverity,
+        eriRouterIpSecEventType,
+        eriRouterIpSecEventProbableCause,
+        eriRouterIpSecTunnelIdentifier,
+        eriRouterIpSecTunnelName,
+        eriRouterIpSecTunnelType,
+        eriRouterIpSecTunnelDownCause,
+        eriRouterIpSecRemoteIdType,
+        eriRouterIpSecRemoteId,
+        eriRouterIpSecLocalAddrContextName,
+        eriRouterIpSecLocalAddressType,
+        eriRouterIpSecLocalAddress,
+        eriRouterIpSecRemoteAddressType,
+        eriRouterIpSecRemoteAddress,
+        eriRouterIpSecTunnelState,
+        eriRouterIpSecSelfCertificateIdentifier,
+        eriRouterIpSecCertificateSubjectName,
+        eriRouterIpSecCertificateHandle,
+        eriRouterIpSecExpiryDateAndTime,
+        eriRouterIpSecCrlIdentifier
+    }
+    STATUS current
+    DESCRIPTION
+        "The collection of objects related to IPSEC
+        notifications."
+    ::= { eriRouterIpSecGroups 1 }
+
+eriRouterIpSecNotifyGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        eriRouterIpSecTunnelStatusChangeAlarm,
+        eriRouterIpSecNoValidRSASelfCertificateAlarm,
+        eriRouterIpSecNoValidRSATrustedCertificateAlarm,
+        eriRouterIpSecRSASelfCertificateNearingExpiryAlarm,
+        eriRouterIpSecRSATrustedCertificateNearingExpiryAlarm,
+        eriRouterIpSecRSACrlNearingExpiryAlarm
+    }
+    STATUS current
+    DESCRIPTION
+        "Notification for tracking IPSEC events."
+    ::= { eriRouterIpSecGroups 2 }
+
+END
