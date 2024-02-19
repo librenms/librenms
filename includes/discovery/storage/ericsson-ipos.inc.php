@@ -12,7 +12,7 @@
  */
 
 if ($device['os'] == 'ericsson-ipos') {
-    $eri_filesystem = snmpwalk_cache_oid($device, 'eriRouterSRStorageTable', [], 'ERICSSON-ROUTER-SYS-RESOURCES-MIB');
+    $eri_filesystem = SnmpQuery::hideMib()->walk('ERICSSON-ROUTER-SYS-RESOURCES-MIB::eriRouterSRStorageTable')->table(1);
 
     if (is_array($eri_filesystem)) {
         echo 'Ericsson IPOS Filesystem:';
