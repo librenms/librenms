@@ -10,11 +10,11 @@
  */
 
 if ($storage['storage_type'] === "eriRouterSRStorage") {
-    $data_used = snmpwalk_cache_oid($device, 'eriRouterSRStorageUtilization.' . $storage['storage_index'], [], 'ERICSSON-ROUTER-SYS-RESOURCES-MIB')[$storage['storage_index']];
-    $data_size = snmpwalk_cache_oid($device, 'eriRouterSRStorageSize.' . $storage['storage_index'], [], 'ERICSSON-ROUTER-SYS-RESOURCES-MIB')[$storage['storage_index']];
+    $data_used = SnmpQuery::hideMib()->get('ERICSSON-ROUTER-SYS-RESOURCES-MIB::eriRouterSRStorageUtilization.'.$storage['storage_index'])->value();
+    $data_size = SnmpQuery::hideMib()->get('ERICSSON-ROUTER-SYS-RESOURCES-MIB::eriRouterSRStorageSize.'.$storage['storage_index'])->value();
 
-    $storage['size'] = $data_size['eriRouterSRStorageSize'];
-    $storage['used'] = round(($storage['storage_size'] / 100) * $data_used['eriRouterSRStorageUtilization'], 0);
+    $storage['size'] = $data_size;
+    $storage['used'] = round(($storage['storage_size'] / 100) * $data_used, 0);
     $storage['free'] = round($storage['storage_size'] - $used, 0);
     $storage['units'] = 1024;
 }
