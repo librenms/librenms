@@ -59,62 +59,57 @@ try {
 // Use the mapping variable in systemd-shared.inc.php to parse
 // the json data received from the systemd.py script.
 foreach ($systemd_mapper as $state_type => $state_statuses) {
-    if (! in_array($state_type, $state_type_ternary_depth)) {
-        // Process systemd states that do not have three
-        // levels of depth (load and active)
+    $shared_rrd_def = RrdDefinition::make();
+    $shared_fields = [];
+    $sub_state_type = null;
+    $flattened_type = $state_type;
 
-        $rrd_def = RrdDefinition::make();
-        $fields = [];
-
-        // Iterate through unit state type's statuses.
-        foreach ($systemd_mapper[$state_type] as $state_status) {
-            $field_name = $state_status;
-            $field_value = $systemd_data[$state_type][$state_status] ?? null;
-
-            // Verify data passed by application script is valid.
-            // Update fields and rrd definition.
-            if (is_int($field_value) || is_null($field_value)) {
-                $fields[$field_name] = $field_value;
-            } else {
-                $log_message = 'Systemd Polling Warning: Invalid data returned by application for systemd unit ' .
-                    $state_type . ' state with' . $state_status . ' state status: ' . $field_value;
-                log_event($log_message, $device, 'application');
-                continue;
-            }
-            $rrd_def->addDataset($field_name, 'GAUGE', 0);
+    // Ternary-depth systemd type check.
+    if (preg_match('/^(.+)_(.+)$/', $state_type, $regex_matches)) {
+        if (! in_array($regex_matches[1], $state_type_ternary_depth)) {
+            continue;
         }
-        $metrics = systemd_data_update_helper($device, $app->app_id, $fields, $metrics, $name, $polling_type, $rrd_def, $state_type);
-    } else {
-        // Process systemd states that have three
-        // levels of depth (sub)
-
-        // Iterate through unit sub state types.
-        foreach ($systemd_mapper[$state_type] as $sub_state_type => $sub_state_statuses) {
-            $rrd_def = RrdDefinition::make();
-            $fields = [];
-
-            // Iterate through unit sub state type's statuses.
-            foreach ($sub_state_statuses as $sub_state_status) {
-                $field_name = $sub_state_status;
-                $field_value = $systemd_data[$state_type][$sub_state_type][$sub_state_status] ?? null;
-
-                // Verify data passed by application script is valid.
-                // Update fields and rrd definition.
-                if (is_int($field_value) || is_null($field_value)) {
-                    $fields[$field_name] = $field_value;
-                } else {
-                    $log_message = 'Systemd Polling Warning: Invalid data returned by application for systemd unit ' .
-                        $state_type . ' state with ' . $sub_state_type . ' sub state type with ' . $sub_state_status .
-                        ' sub state status: ' . $field_value;
-                    log_event($log_message, $device, 'application');
-                    continue;
-                }
-                $rrd_def->addDataset($field_name, 'GAUGE', 0);
-            }
-            $flat_type = $state_type . '_' . $sub_state_type;
-            $metrics = systemd_data_update_helper($device, $app->app_id, $fields, $metrics, $name, $polling_type, $rrd_def, $flat_type);
-        }
+        $state_type = $regex_matches[1];
+        $sub_state_type = $regex_matches[2];
     }
+
+    // Iterate through unit state type's statuses.
+    foreach ($systemd_mapper[$flattened_type] as $state_status => $rrd_location) {
+        $field_value = null;
+        $field_name = $state_status;
+
+        if (empty($sub_state_type)) {
+            $field_value = $systemd_data[$state_type][$state_status] ?? null;
+        } else {
+            $field_value = $systemd_data[$state_type][$sub_state_type][$state_status] ?? null;
+        }
+
+        // Verify data passed by application script is valid.
+        if (! is_int($field_value) && ! is_null($field_value)) {
+            $log_message = 'Systemd Polling Warning: Invalid data returned by application for systemd unit ' .
+            $flattened_type . ' state with' . $state_status . ' state status: ' . $field_value;
+            log_event($log_message, $device, 'application');
+            continue;
+        }
+
+        // New metrics MUST use the "individual" type because
+        // it is not possible to automatically update "shared"
+        // RRDs with new metrics.
+        if ($rrd_location === 'individual') {
+            $individual_rrd_def = RrdDefinition::make();
+            $individual_fields[$field_name] = $field_value;
+            $individual_rrd_def->addDataset($field_name, 'GAUGE', 0);
+            $rrd_flattened_type = $flattened_type . '-' . $field_name;
+            $metrics = systemd_data_update_helper($device, $app->app_id, $individual_fields, $metrics, $name, $polling_type, $individual_rrd_def, $rrd_flattened_type);
+            continue;
+        }
+
+        // Update shared_fields and rrd definition.
+        $shared_fields[$field_name] = $field_value;
+        $shared_rrd_def->addDataset($field_name, 'GAUGE', 0);
+    }
+
+    $metrics = systemd_data_update_helper($device, $app->app_id, $shared_fields, $metrics, $name, $polling_type, $shared_rrd_def, $flattened_type);
 }
 
 update_application($app, $output, $metrics);

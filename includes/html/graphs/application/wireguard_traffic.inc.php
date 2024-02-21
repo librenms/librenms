@@ -1,23 +1,15 @@
 <?php
 
-$name = 'wireguard';
-$polling_type = 'app';
+require 'wireguard-common.inc.php';
 
-if (isset($vars['interface']) && isset($vars['client'])) {
-    $interface = $vars['interface'];
-    $client = $vars['client'];
-    $interface_client = $vars['interface'] . '-' . $vars['client'];
-} else {
-    $interface_client_list = Rrd::getRrdApplicationArrays($device, $app->app_id, $name);
-    $interface_client = $interface_client_list[0] ?? '';
-}
+$wg_intf_client = $vars['interface'] . '-' . $vars['client'];
 
-$unit_text = 'Bytes';
+$unit_text = 'Bytes/s';
 
 $ds_in = 'bytes_rcvd';
-$in_text = 'Rcvd';
+$in_text = 'In';
 $ds_out = 'bytes_sent';
-$out_text = 'Sent';
+$out_text = 'Out';
 
 $format = 'bytes';
 $print_total = true;
@@ -34,11 +26,11 @@ $rrd_filename = Rrd::name($device['hostname'], [
     $polling_type,
     $name,
     $app->app_id,
-    $interface_client,
+    $wg_intf_client,
 ]);
 
 if (! Rrd::checkRrdExists($rrd_filename)) {
-    d_echo('RRD ' . $rrd_filename . ' not found');
+    graph_error('No Data file ' . basename($rrd_filename), 'No Data');
 }
 
 require 'includes/html/graphs/generic_duplex.inc.php';

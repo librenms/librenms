@@ -15,13 +15,22 @@ function systemd_graph_builder($state_type, $systemd_mapper, $state_type_ternary
 {
     $graph_name = 'systemd_' . $state_type;
     $graphs[$graph_name]['type'] = $state_type;
+
     if (! in_array($state_type, $state_type_ternary_depth)) {
         $graph_descr = ucfirst($state_type . ' State');
         $graphs[$graph_name]['desc'] = $graph_descr;
     } else {
-        foreach ($systemd_mapper[$state_type] as $sub_state_type => $sub_state_statuses) {
-            $graph_descr = ucfirst($state_type) . ' ' . ucfirst($sub_state_type) . ' State';
-            $graphs[$graph_name]['sub_states'][$sub_state_type]['desc'] = $graph_descr;
+        foreach ($systemd_mapper as $flattened_type => $state_statuses) {
+            // Ternary-depth systemd type check.
+            if (! preg_match('/^(.+)_(.+)$/', $flattened_type, $regex_matches)) {
+                continue;
+            }
+            if ($regex_matches[1] !== $state_type) {
+                continue;
+            }
+
+            $graph_descr = ucfirst($flattened_type) . ' State';
+            $graphs[$graph_name]['sub_states'][$flattened_type]['desc'] = $graph_descr;
         }
     }
 
@@ -73,11 +82,13 @@ print_optionbar_start();
 echo generate_link('All Unit States', $link_array) . ' | ';
 
 $i = 0;
-foreach ($systemd_mapper as $state_type => $state_statuses) {
+foreach ($systemd_state_types as $state_type) {
     echo generate_link(ucfirst($state_type) . ' State', $link_array, ['section' => $state_type]);
-    if ($i < count($systemd_mapper) - 1) {
+
+    if ($i < count($systemd_state_types) - 1) {
         echo ', ';
     }
+
     $i++;
 }
 
@@ -91,7 +102,7 @@ if (isset($vars['section'])) {
     $graphs = systemd_graph_builder($vars['section'], $systemd_mapper, $state_type_ternary_depth, $graphs);
 } else {
     // Build graphs for the combined states section (load, active, and sub).
-    foreach ($systemd_mapper as $state_type => $state_status) {
+    foreach ($systemd_state_types as $state_type) {
         $graphs = systemd_graph_builder($state_type, $systemd_mapper, $state_type_ternary_depth, $graphs);
     }
 }
