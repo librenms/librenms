@@ -1,6 +1,8 @@
 #!/usr/bin/env php
 <?php
 
+require realpath(__DIR__ . '/..') . '/includes/init.php';
+
 // Pulled from includes/polling/functions.inc.php
 function data_flatten($array, $prefix = '', $joiner = '_')
 {
