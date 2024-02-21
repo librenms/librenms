@@ -12,9 +12,11 @@ class LocationController extends Controller
     public function index()
     {
         $maps_api = Config::get('geoloc.api_key');
+        $maps_config = ['tile_url' => Config::get('leaflet.tile_url', '{s}.tile.openstreetmap.org')];
         $data = [
             'maps_api' => $maps_api,
             'maps_engine' => $maps_api ? Config::get('geoloc.engine') : '',
+            'maps_config' => $maps_config,
         ];
 
         $data['graph_template'] = '';
