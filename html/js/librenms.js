@@ -64,8 +64,8 @@ $(document).ready(function() {
 function submitCustomRange(frmdata) {
     var reto = /to=([0-9a-zA-Z\-])+/g;
     var refrom = /from=([0-9a-zA-Z\-])+/g;
-    var tsto = moment(frmdata.dtpickerto.value).unix();
-    var tsfrom = moment(frmdata.dtpickerfrom.value).unix();
+    var tsto = $("#dtpickerto").data("DateTimePicker").date().unix();
+    var tsfrom = $("#dtpickerfrom").data("DateTimePicker").date().unix();
     frmdata.selfaction.value = frmdata.selfaction.value.replace(reto, 'to=' + tsto);
     frmdata.selfaction.value = frmdata.selfaction.value.replace(refrom, 'from=' + tsfrom);
     frmdata.action = frmdata.selfaction.value;
