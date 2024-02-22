@@ -145,7 +145,7 @@ class Jira extends Transport
                     'type' => 'text',
                 ],
                 [
-                    'title' => 'Custom Fileds',
+                    'title' => 'Custom Fields',
                     'name' => 'jira-custom',
                     'type' => 'textarea',
                     'descr' => '{&quot;components&quot;: [{&quot;id&quot;: &quot;00001&quot;}],&#xA;&quot;customfield_10001&quot;: [{&quot;id&quot;: &quot;00002&quot;}]}',
