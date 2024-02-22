@@ -450,6 +450,7 @@ $graphs['pwrstatd'] = [
     'minutes',
 ];
 $graphs['systemd'] = [
+    'all',
     'sub',
     'active',
     'load',
