@@ -45,7 +45,7 @@ if (! empty($snmpData)) {
     $snmpData = array_shift($snmpData); //drop [ups-nut]
     $upsnut = [
         24 => ['descr' => 'Battery Temperature', 'LL' => 10, 'LW' => 15, 'W' => 35, 'H' => 40],
-        ];
+    ];
     foreach ($snmpData as $index => $upsData) {
         if ($upsnut[$index]) {
             $value = intval($upsData['nsExtendOutLine']);

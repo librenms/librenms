@@ -29,7 +29,7 @@ if (! empty($snmpData)) {
     $snmpData = array_shift($snmpData); //drop [ups-nut]
     $upsnut = [
         1 => ['descr' => 'Battery Charge', 'LL' => 0, 'LW' => 10, 'W' => null, 'H' => 100],
-        ];
+    ];
     foreach ($snmpData as $index => $upsData) {
         if ($upsnut[$index]) {
             $value = intval($upsData['nsExtendOutLine']);

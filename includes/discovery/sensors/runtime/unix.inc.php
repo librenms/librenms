@@ -29,7 +29,7 @@ if (! empty($snmpData)) {
     $snmpData = array_shift($snmpData); //drop [ups-nut]
     $upsnut = [
         3 => ['descr' => 'Time Remaining', 'LL' => 0, 'LW' => 0, 'W' => null, 'H' => 1000],
-        ];
+    ];
     foreach ($snmpData as $index => $upsData) {
         if ($upsnut[$index]) {
             $value = intval($upsData['nsExtendOutLine']) / 60;

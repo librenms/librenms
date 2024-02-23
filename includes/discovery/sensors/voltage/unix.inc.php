@@ -48,7 +48,7 @@ if (! empty($snmpData)) {
         5 => ['descr' => 'Battery Nominal', 'LL' => 0, 'LW' => 0, 'W' => null, 'H' => 60],
         6 => ['descr' => 'Line Nominal', 'LL' => 0, 'LW' => 0, 'W' => null, 'H' => 0],
         7 => ['descr' => 'Input Voltage', 'LL' => 200, 'LW' => 0, 'W' => null, 'H' => 280],
-        ];
+    ];
     foreach ($snmpData as $index => $upsData) {
         if ($upsnut[$index]) {
             $value = $upsData['nsExtendOutLine'];
