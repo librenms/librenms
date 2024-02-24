@@ -25,17 +25,17 @@
 $lib_data = snmpwalk_cache_oid($device, 'lgpEnvTemperatureEntryDegC', [], 'LIEBERT-GP-ENVIRONMENTAL-MIB');
 
 foreach ($lib_data as $index => $data) {
-    if (is_numeric($data['lgpEnvTemperatureMeasurementTenthsDegC'])) {
+    if (isset($data['lgpEnvTemperatureMeasurementTenthsDegC']) && is_numeric($data['lgpEnvTemperatureMeasurementTenthsDegC'])) {
         $oid = '.1.3.6.1.4.1.476.1.42.3.4.1.3.3.1.50.' . $index;
         $low_limit = $data['lgpEnvTemperatureLowThresholdTenthsDegC'];
         $high_limit = $data['lgpEnvTemperatureHighThresholdTenthsDegC'];
         $current = $data['lgpEnvTemperatureMeasurementTenthsDegC'];
         $divisor = 10;
         $new_index = 'lgpEnvTemperatureMeasurementTenthsDegC.' . $index;
-    } elseif (is_numeric($data['lgpEnvTemperatureMeasurementDegC'])) {
+    } elseif (isset($data['lgpEnvTemperatureMeasurementDegC']) && is_numeric($data['lgpEnvTemperatureMeasurementDegC'])) {
         $oid = '.1.3.6.1.4.1.476.1.42.3.4.1.3.3.1.3.' . $index;
-        $low_limit = $data['lgpEnvTemperatureLowThresholdDegC'];
-        $high_limit = $data['lgpEnvTemperatureHighThresholdDegC'];
+        $low_limit = $data['lgpEnvTemperatureLowThresholdDegC'] ?? null;
+        $high_limit = $data['lgpEnvTemperatureHighThresholdDegC'] ?? null;
         $current = $data['lgpEnvTemperatureMeasurementDegC'];
         $divisor = 1;
         $new_index = 'lgpEnvTemperatureDescrDegC.' . $index;

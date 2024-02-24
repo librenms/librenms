@@ -27,57 +27,64 @@ namespace LibreNMS\Tests\Feature\SnmpTraps;
 
 use App\Models\BgpPeer;
 use App\Models\Device;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Config;
-use LibreNMS\Snmptrap\Dispatcher;
-use LibreNMS\Snmptrap\Trap;
+use LibreNMS\Enum\Severity;
+use LibreNMS\Tests\Traits\RequiresDatabase;
+use LibreNMS\Util\AutonomousSystem;
 
 class BgpTrapTest extends SnmpTrapTestCase
 {
-    public function testBgpUp()
+    use RequiresDatabase;
+    use DatabaseTransactions;
+
+    public function testBgpUp(): void
     {
         // Cache it to avoid DNS Lookup
         Config::set('astext.1', 'PHPUnit ASTEXT');
-        $device = Device::factory()->create(); /** @var Device $device */
-        $bgppeer = BgpPeer::factory()->make(['bgpPeerState' => 'idle', 'bgpPeerRemoteAs' => 1]); /** @var BgpPeer $bgppeer */
+        $device = Device::factory()->create();
+        /** @var Device $device */
+        $bgppeer = BgpPeer::factory()->make(['bgpPeerState' => 'idle', 'bgpPeerRemoteAs' => 1]);
+        /** @var BgpPeer $bgppeer */
         $device->bgppeers()->save($bgppeer);
 
-        $trapText = "$device->hostname
-UDP: [$device->ip]:57602->[192.168.5.5]:162
+        $this->assertTrapLogsMessage("{{ hostname }}
+UDP: [{{ ip }}]:57602->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 302:12:56:24.81
 SNMPv2-MIB::snmpTrapOID.0 BGP4-MIB::bgpEstablished
 BGP4-MIB::bgpPeerLastError.$bgppeer->bgpPeerIdentifier \"04 00 \"
-BGP4-MIB::bgpPeerState.$bgppeer->bgpPeerIdentifier established\n";
-
-        $message = "SNMP Trap: BGP Up $bgppeer->bgpPeerIdentifier " . get_astext($bgppeer->bgpPeerRemoteAs) . ' is now established';
-        \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'bgpPeer', 1, $bgppeer->bgpPeerIdentifier);
-
-        $trap = new Trap($trapText);
-        $this->assertTrue(Dispatcher::handle($trap), 'Could not handle bgpEstablished');
+BGP4-MIB::bgpPeerState.$bgppeer->bgpPeerIdentifier established\n",
+            "SNMP Trap: BGP Up $bgppeer->bgpPeerIdentifier " . AutonomousSystem::get($bgppeer->bgpPeerRemoteAs)->name() . ' is now established',
+            'Could not handle bgpEstablished',
+            [Severity::Ok, 'bgpPeer', $bgppeer->bgpPeerIdentifier],
+            $device,
+        );
 
         $bgppeer = $bgppeer->fresh(); // refresh from database
         $this->assertEquals($bgppeer->bgpPeerState, 'established');
     }
 
-    public function testBgpDown()
+    public function testBgpDown(): void
     {
         // Cache it to avoid DNS Lookup
         Config::set('astext.1', 'PHPUnit ASTEXT');
-        $device = Device::factory()->create(); /** @var Device $device */
-        $bgppeer = BgpPeer::factory()->make(['bgpPeerState' => 'established', 'bgpPeerRemoteAs' => 1]); /** @var BgpPeer $bgppeer */
+        $device = Device::factory()->create();
+        /** @var Device $device */
+        $bgppeer = BgpPeer::factory()->make(['bgpPeerState' => 'established', 'bgpPeerRemoteAs' => 1]);
+        /** @var BgpPeer $bgppeer */
         $device->bgppeers()->save($bgppeer);
 
-        $trapText = "$device->hostname
-UDP: [$device->ip]:57602->[185.29.68.52]:162
+        $this->assertTrapLogsMessage("{{ hostname }}
+UDP: [{{ ip }}]:57602->[185.29.68.52]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 302:12:55:33.47
 SNMPv2-MIB::snmpTrapOID.0 BGP4-MIB::bgpBackwardTransition
 BGP4-MIB::bgpPeerLastError.$bgppeer->bgpPeerIdentifier \"04 00 \"
-BGP4-MIB::bgpPeerState.$bgppeer->bgpPeerIdentifier idle\n";
-
-        $message = "SNMP Trap: BGP Down $bgppeer->bgpPeerIdentifier " . get_astext($bgppeer->bgpPeerRemoteAs) . ' is now idle';
-        \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'bgpPeer', 5, $bgppeer->bgpPeerIdentifier);
-
-        $trap = new Trap($trapText);
-        $this->assertTrue(Dispatcher::handle($trap), 'Could not handle bgpBackwardTransition');
+BGP4-MIB::bgpPeerState.$bgppeer->bgpPeerIdentifier idle\n",
+            "SNMP Trap: BGP Down $bgppeer->bgpPeerIdentifier " . AutonomousSystem::get($bgppeer->bgpPeerRemoteAs)->name() . ' is now idle',
+            'Could not handle bgpBackwardTransition',
+            [Severity::Error, 'bgpPeer', $bgppeer->bgpPeerIdentifier],
+            $device,
+        );
 
         $bgppeer = $bgppeer->fresh(); // refresh from database
         $this->assertEquals($bgppeer->bgpPeerState, 'idle');

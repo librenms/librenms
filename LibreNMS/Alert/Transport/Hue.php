@@ -26,7 +26,8 @@ namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
 use LibreNMS\Enum\AlertState;
-use LibreNMS\Util\Proxy;
+use LibreNMS\Exceptions\AlertTransportDeliveryException;
+use LibreNMS\Util\Http;
 
 /**
  * The Hue API currently is fairly limited for alerts.
@@ -35,73 +36,47 @@ use LibreNMS\Util\Proxy;
  */
 class Hue extends Transport
 {
-    public function deliverAlert($obj, $opts)
-    {
-        if (! empty($this->config)) {
-            $opts['user'] = $this->config['hue-user'];
-            $opts['bridge'] = $this->config['hue-host'];
-            $opts['duration'] = $this->config['hue-duration'];
-        }
-
-        return $this->contactHue($obj, $opts);
-    }
-
-    public function contactHue($obj, $opts)
+    public function deliverAlert(array $alert_data): bool
     {
         // Don't alert on resolve at this time
-        if ($obj['state'] == AlertState::RECOVERED) {
+        if ($alert_data['state'] == AlertState::RECOVERED) {
             return true;
-        } else {
-            $hue_user = $opts['user'];
-            $url = $opts['bridge'] . "/api/$hue_user/groups/0/action";
-            $curl = curl_init();
-            $duration = $opts['duration'];
-            $data = ['alert' => $duration];
-            $datastring = json_encode($data);
-
-            Proxy::applyToCurl($curl);
-
-            $headers = ['Accept: application/json', 'Content-Type: application/json'];
-
-            curl_setopt($curl, CURLOPT_URL, $url);
-            curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
-            curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'PUT');
-            curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($curl, CURLOPT_VERBOSE, 1);
-            curl_setopt($curl, CURLOPT_POSTFIELDS, $datastring);
-
-            $ret = curl_exec($curl);
-            $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-            if ($code == 200) {
-                d_echo('Sent alert to Phillips Hue Bridge ' . $opts['host'] . ' for ' . $obj['hostname']);
-
-                return true;
-            } else {
-                d_echo('Hue bridge connection error: ' . serialize($ret));
-
-                return false;
-            }
         }
+
+        $hue_user = $this->config['hue-user'];
+        $url = $this->config['hue-host'] . "/api/$hue_user/groups/0/action";
+        $duration = $this->config['hue-duration'];
+        $data = ['alert' => $duration];
+
+        $res = Http::client()
+            ->acceptJson()
+            ->put($url, $data);
+
+        if ($res->successful()) {
+            return true;
+        }
+
+        throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), $duration, $data);
     }
 
-    public static function configTemplate()
+    public static function configTemplate(): array
     {
         return [
-            'config'=>[
+            'config' => [
                 [
-                    'title'=> 'Host',
+                    'title' => 'Host',
                     'name' => 'hue-host',
                     'descr' => 'Hue Host',
                     'type' => 'text',
                 ],
                 [
-                    'title'=> 'Hue User',
+                    'title' => 'Hue User',
                     'name' => 'hue-user',
                     'descr' => 'Phillips Hue Host',
                     'type' => 'text',
                 ],
                 [
-                    'title'=> 'Duration',
+                    'title' => 'Duration',
                     'name' => 'hue-duration',
                     'descr' => 'Phillips Hue Duration',
                     'type' => 'select',

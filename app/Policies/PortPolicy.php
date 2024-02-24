@@ -15,9 +15,8 @@ class PortPolicy
      * Determine whether the user can view any ports.
      *
      * @param  \App\Models\User  $user
-     * @return mixed
      */
-    public function viewAny(User $user)
+    public function viewAny(User $user): bool
     {
         return $user->hasGlobalRead();
     }
@@ -27,9 +26,8 @@ class PortPolicy
      *
      * @param  \App\Models\User  $user
      * @param  \App\Models\Port  $port
-     * @return mixed
      */
-    public function view(User $user, Port $port)
+    public function view(User $user, Port $port): bool
     {
         return $this->viewAny($user) || Permissions::canAccessDevice($port->device_id, $user) || Permissions::canAccessPort($port, $user);
     }
@@ -38,9 +36,8 @@ class PortPolicy
      * Determine whether the user can create ports.
      *
      * @param  \App\Models\User  $user
-     * @return mixed
      */
-    public function create(User $user)
+    public function create(User $user): bool
     {
         return false;
     }
@@ -50,9 +47,8 @@ class PortPolicy
      *
      * @param  \App\Models\User  $user
      * @param  \App\Models\Port  $port
-     * @return mixed
      */
-    public function update(User $user, Port $port)
+    public function update(User $user, Port $port): bool
     {
         return $user->hasGlobalAdmin();
     }
@@ -62,9 +58,8 @@ class PortPolicy
      *
      * @param  \App\Models\User  $user
      * @param  \App\Models\Port  $port
-     * @return mixed
      */
-    public function delete(User $user, Port $port)
+    public function delete(User $user, Port $port): bool
     {
         return $user->hasGlobalAdmin();
     }
@@ -74,9 +69,8 @@ class PortPolicy
      *
      * @param  \App\Models\User  $user
      * @param  \App\Models\Port  $port
-     * @return mixed
      */
-    public function restore(User $user, Port $port)
+    public function restore(User $user, Port $port): bool
     {
         return $user->hasGlobalAdmin();
     }
@@ -86,9 +80,8 @@ class PortPolicy
      *
      * @param  \App\Models\User  $user
      * @param  \App\Models\Port  $port
-     * @return mixed
      */
-    public function forceDelete(User $user, Port $port)
+    public function forceDelete(User $user, Port $port): bool
     {
         return $user->hasGlobalAdmin();
     }

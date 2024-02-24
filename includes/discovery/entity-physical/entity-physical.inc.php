@@ -15,26 +15,26 @@ if ($device['os'] == 'junos') {
     $ai_mib = 'AI-AP-MIB';
     $ai_ig_data = snmpwalk_group($device, 'aiInfoGroup', $ai_mib);
     discover_entity_physical(
-         $valid,
-         $device,
-         1,                                              // entPhysicalIndex
-         $ai_ig_data['aiVirtualControllerIPAddress.0'],  // entPhysicalDescr
-         'chassis',                                      // entPhysicalClass
-         $ai_ig_data['aiVirtualControllerName.0'],       // entPhysicalName
-         'Instant Virtual Controller Cluster',           // entPhysicalModelName
-         $ai_ig_data['aiVirtualControllerKey.0'],        // entPhysicalSerialNum
-         '0',                                            // entPhysicalContainedIn
-         'Aruba',                                        // entPhysicalMfgName
-         '-1',                                           // entPhysicalParentRelPos
-         'Aruba',                                        // entPhysicalVendorType
-         null,                                           // entPhysicalHardwareRev
-         null,                                           // entPhysicalFirmwareRev
-         null,                                           // entPhysicalSoftwareRev
-         null,                                           // entPhysicalIsFRU
-         null,                                           // entPhysicalAlias
-         null,                                           // entPhysicalAssetID
-         null                                            // ifIndex
-     );
+        $valid,
+        $device,
+        1,                                              // entPhysicalIndex
+        $ai_ig_data['aiVirtualControllerIPAddress.0'],  // entPhysicalDescr
+        'chassis',                                      // entPhysicalClass
+        $ai_ig_data['aiVirtualControllerName.0'],       // entPhysicalName
+        'Instant Virtual Controller Cluster',           // entPhysicalModelName
+        $ai_ig_data['aiVirtualControllerKey.0'],        // entPhysicalSerialNum
+        '0',                                            // entPhysicalContainedIn
+        'Aruba',                                        // entPhysicalMfgName
+        '-1',                                           // entPhysicalParentRelPos
+        'Aruba',                                        // entPhysicalVendorType
+        null,                                           // entPhysicalHardwareRev
+        null,                                           // entPhysicalFirmwareRev
+        null,                                           // entPhysicalSoftwareRev
+        null,                                           // entPhysicalIsFRU
+        null,                                           // entPhysicalAlias
+        null,                                           // entPhysicalAssetID
+        null                                            // ifIndex
+    );
 
     $entity_array = snmpwalk_group($device, 'aiAccessPointEntry', $ai_mib);
     $instant_index = 2;
@@ -269,24 +269,24 @@ foreach ($entity_array as $entPhysicalIndex => $entry) {
 
     // List of real names for cisco entities
     $entPhysicalVendorTypes = [
-        'cevC7xxxIo1feTxIsl'   => 'C7200-IO-FE-MII',
+        'cevC7xxxIo1feTxIsl' => 'C7200-IO-FE-MII',
         'cevChassis7140Dualfe' => 'C7140-2FE',
-        'cevChassis7204'       => 'C7204',
-        'cevChassis7204Vxr'    => 'C7204VXR',
-        'cevChassis7206'       => 'C7206',
-        'cevChassis7206Vxr'    => 'C7206VXR',
-        'cevCpu7200Npe200'     => 'NPE-200',
-        'cevCpu7200Npe225'     => 'NPE-225',
-        'cevCpu7200Npe300'     => 'NPE-300',
-        'cevCpu7200Npe400'     => 'NPE-400',
-        'cevCpu7200Npeg1'      => 'NPE-G1',
-        'cevCpu7200Npeg2'      => 'NPE-G2',
-        'cevPa1feTxIsl'        => 'PA-FE-TX-ISL',
-        'cevPa2feTxI82543'     => 'PA-2FE-TX',
-        'cevPa8e'              => 'PA-8E',
-        'cevPaA8tX21'          => 'PA-8T-X21',
-        'cevMGBIC1000BaseLX'   => '1000BaseLX GBIC',
-        'cevPort10GigBaseLR'   => '10GigBaseLR',
+        'cevChassis7204' => 'C7204',
+        'cevChassis7204Vxr' => 'C7204VXR',
+        'cevChassis7206' => 'C7206',
+        'cevChassis7206Vxr' => 'C7206VXR',
+        'cevCpu7200Npe200' => 'NPE-200',
+        'cevCpu7200Npe225' => 'NPE-225',
+        'cevCpu7200Npe300' => 'NPE-300',
+        'cevCpu7200Npe400' => 'NPE-400',
+        'cevCpu7200Npeg1' => 'NPE-G1',
+        'cevCpu7200Npeg2' => 'NPE-G2',
+        'cevPa1feTxIsl' => 'PA-FE-TX-ISL',
+        'cevPa2feTxI82543' => 'PA-2FE-TX',
+        'cevPa8e' => 'PA-8E',
+        'cevPaA8tX21' => 'PA-8T-X21',
+        'cevMGBIC1000BaseLX' => '1000BaseLX GBIC',
+        'cevPort10GigBaseLR' => '10GigBaseLR',
     ];
 
     if (! empty($entPhysicalVendorTypes[$entPhysicalVendorType]) && ! $entPhysicalModelName) {

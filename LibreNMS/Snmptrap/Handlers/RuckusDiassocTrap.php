@@ -31,7 +31,6 @@ namespace LibreNMS\Snmptrap\Handlers;
 use App\Models\Device;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
-use Log;
 
 class RuckusDiassocTrap implements SnmptrapHandler
 {
@@ -47,6 +46,6 @@ class RuckusDiassocTrap implements SnmptrapHandler
     {
         $macRaw = $trap->getOidData($trap->findOid('RUCKUS-EVENT-MIB::ruckusEventClientMacAddr'));
         $mac = substr($macRaw, 0, 17);
-        Log::event("Client $mac disassociated", $device->device_id, 'trap', 2);
+        $trap->log("Client $mac disassociated");
     }
 }

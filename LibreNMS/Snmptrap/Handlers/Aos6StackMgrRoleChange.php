@@ -33,7 +33,6 @@ namespace LibreNMS\Snmptrap\Handlers;
 use App\Models\Device;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
-use Log;
 
 class Aos6StackMgrRoleChange implements SnmptrapHandler
 {
@@ -49,6 +48,6 @@ class Aos6StackMgrRoleChange implements SnmptrapHandler
     {
         $p_nr = $trap->getOidData($trap->findOid('ALCATEL-IND1-STACK-MANAGER-MIB::alaStackMgrPrimary'));
         $s_nr = $trap->getOidData($trap->findOid('ALCATEL-IND1-STACK-MANAGER-MIB::alaStackMgrSecondary'));
-        Log::event("Stack management change.Primary unit of the stack is now chassis: $p_nr. Secondary unit of the stack is now chassis: $s_nr.", $device->device_id, 'trap', 2);
+        $trap->log("Stack management change.Primary unit of the stack is now chassis: $p_nr. Secondary unit of the stack is now chassis: $s_nr.");
     }
 }

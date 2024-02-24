@@ -6,7 +6,7 @@ $components = $component->getComponents($device['device_id'], ['type'=>'Cisco-CI
 // We only care about our device id.
 $components = $components[$device['device_id']];
 
-if (count($components) > 0) {
+if (! empty($components)) {
     ?>
         <div class="row">
             <div class="col-md-12">

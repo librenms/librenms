@@ -18,7 +18,7 @@
             </td>
             <td>
                 <input id="value-{{ $value }}" type="text" name="settings[{{ $name }}]" value="{{ $value }}">
-                <button type="button" onclick="deleteSetting('{{ $name }}')" class="delete-button"><i class="fa fa-trash"></i></button>
+                <button id="delete-{{ $name }}" type="button" onclick="deleteSetting(this.id)" class="delete-button"><i class="fa fa-trash"></i></button>
             </td>
         </tr>
     @empty
@@ -79,8 +79,8 @@
         document.getElementById('new-setting-value').value = '';
     }
 
-    function deleteSetting(name) {
-        document.getElementById('settings-row-' + name).remove();
+    function deleteSetting(nameId) {
+        document.getElementById('settings-row-' + nameId.substring(7)).remove();
     }
 </script>
 

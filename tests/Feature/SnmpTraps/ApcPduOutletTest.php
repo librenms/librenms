@@ -22,63 +22,58 @@
 
 namespace LibreNMS\Tests\Feature\SnmpTraps;
 
-use App\Models\Device;
-use LibreNMS\Snmptrap\Dispatcher;
-use LibreNMS\Snmptrap\Trap;
+use LibreNMS\Enum\Severity;
 
 class ApcPduOutletTest extends SnmpTrapTestCase
 {
-    public function testOutletOff()
+    public function testOutletOff(): void
     {
-        $device = Device::factory()->create(); /** @var Device $device */
-        $trapText = "$device->hostname
-UDP: [$device->ip]:161->[192.168.5.5]:162
+        $this->assertTrapLogsMessage(<<<'TRAP'
+{{ hostname }}
+UDP: [{{ ip }}]:161->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 84:21:45:07.07
 SNMPv2-MIB::snmpTrapOID.0 PowerNet-MIB::outletOff
 PowerNet-MIB::mtrapargsInteger.0 2
 PowerNet-MIB::mtrapargsString.0 \"An outlet has turned on. If the outlet number is 0, then all outlets have turned on.\"
-SNMPv2-MIB::snmpTrapEnterprise.0 PowerNet-MIB::apc";
-
-        $message = 'APC PDU: Outlet has turned off: 2';
-        \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 4);
-
-        $trap = new Trap($trapText);
-        $this->assertTrue(Dispatcher::handle($trap), 'Could not handle outletOff trap');
+SNMPv2-MIB::snmpTrapEnterprise.0 PowerNet-MIB::apc
+TRAP,
+            'APC PDU: Outlet has turned off: 2',
+            'Could not handle outletOff trap',
+            [Severity::Warning],
+        );
     }
 
-    public function testOutletOn()
+    public function testOutletOn(): void
     {
-        $device = Device::factory()->create(); /** @var Device $device */
-        $trapText = "$device->hostname
-UDP: [$device->ip]:161->[192.168.5.5]:162
+        $this->assertTrapLogsMessage(<<<'TRAP'
+{{ hostname }}
+UDP: [{{ ip }}]:161->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 84:21:45:07.07
 SNMPv2-MIB::snmpTrapOID.0 PowerNet-MIB::outletOn
 PowerNet-MIB::mtrapargsInteger.0 2
 PowerNet-MIB::mtrapargsString.0 \"An outlet has turned on. If the outlet number is 0, then all outlets have turned on.\"
-SNMPv2-MIB::snmpTrapEnterprise.0 PowerNet-MIB::apc";
-
-        $message = 'APC PDU: Outlet has been turned on: 2';
-        \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 4);
-
-        $trap = new Trap($trapText);
-        $this->assertTrue(Dispatcher::handle($trap), 'Could not handle outletOn trap');
+SNMPv2-MIB::snmpTrapEnterprise.0 PowerNet-MIB::apc
+TRAP,
+            'APC PDU: Outlet has been turned on: 2',
+            'Could not handle outletOn trap',
+            [Severity::Warning],
+        );
     }
 
-    public function testOutletReboot()
+    public function testOutletReboot(): void
     {
-        $device = Device::factory()->create(); /** @var Device $device */
-        $trapText = "$device->hostname
-UDP: [$device->ip]:161->[192.168.5.5]:162
+        $this->assertTrapLogsMessage(<<<'TRAP'
+{{ hostname }}
+UDP: [{{ ip }}]:161->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 84:21:45:07.07
 SNMPv2-MIB::snmpTrapOID.0 PowerNet-MIB::outletReboot
 PowerNet-MIB::mtrapargsInteger.0 2
 PowerNet-MIB::mtrapargsString.0 \"An outlet has rebooted. If the outlet number is 0, then all outlets have rebooted.\"
-SNMPv2-MIB::snmpTrapEnterprise.0 PowerNet-MIB::apc";
-
-        $message = 'APC PDU: Outlet has rebooted: 2';
-        \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 4);
-
-        $trap = new Trap($trapText);
-        $this->assertTrue(Dispatcher::handle($trap), 'Could not handle outletReboot trap');
+SNMPv2-MIB::snmpTrapEnterprise.0 PowerNet-MIB::apc
+TRAP,
+            'APC PDU: Outlet has rebooted: 2',
+            'Could not handle outletReboot trap',
+            [Severity::Warning],
+        );
     }
 }

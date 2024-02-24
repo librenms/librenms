@@ -32,7 +32,7 @@ if (is_array($hrstorage_array)) {
         $fstype = $storage['hrStorageType'] ?? null;
         $descr = $storage['hrStorageDescr'];
         $storage['hrStorageSize'] = fix_integer_value($storage['hrStorageSize']);
-        $storage['hrStorageUsed'] = fix_integer_value($storage['hrStorageUsed']);
+        $storage['hrStorageUsed'] = isset($storage['hrStorageUsed']) ? fix_integer_value($storage['hrStorageUsed']) : 0;
         $size = ($storage['hrStorageSize'] * $storage['hrStorageAllocationUnits']);
         $used = ($storage['hrStorageUsed'] * $storage['hrStorageAllocationUnits']);
         $units = $storage['hrStorageAllocationUnits'];

@@ -25,17 +25,15 @@
 
 namespace LibreNMS\Tests\Feature\SnmpTraps;
 
-use App\Models\Device;
-use LibreNMS\Snmptrap\Dispatcher;
-use LibreNMS\Snmptrap\Trap;
+use LibreNMS\Enum\Severity;
 
 class TrippliteTrapTest extends SnmpTrapTestCase
 {
-    public function testTlpNotificationsAlarmEntryAdded()
+    public function testTlpNotificationsAlarmEntryAdded(): void
     {
-        $device = Device::factory()->create(); /** @var Device $device */
-        $trapText = "$device->hostname
-UDP: [$device->ip]:46024->[1.1.1.1]:162
+        $this->assertTrapLogsMessage(<<<'TRAP'
+{{ hostname }}
+UDP: [{{ ip }}]:46024->[1.1.1.1]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 0:1:55:34.92
 SNMPv2-MIB::snmpTrapOID.0 TRIPPLITE-PRODUCTS::tlpNotificationsAlarmEntryAdded
 TRIPPLITE-PRODUCTS::tlpAlarmId 6
@@ -49,21 +47,19 @@ TRIPPLITE-PRODUCTS::tlpAlarmState active
 TRIPPLITE-PRODUCTS::tlpDeviceName.1 $device->sysDescr
 TRIPPLITE-PRODUCTS::tlpDeviceLocation.1 $device->location
 TRIPPLITE-PRODUCTS::tlpAgentMAC.0 00:06:67:AE:BE:13
-TRIPPLITE-PRODUCTS::tlpAgentUuid.0 c94e376a-8080-44fb-96ad-0fe6583d1c4a";
-
-        $trap = new Trap($trapText);
-
-        $message = 'Trap Alarm active: On Battery';
-        \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 4);
-
-        $this->assertTrue(Dispatcher::handle($trap), 'Could not handle tlpNotificationsAlarmEntryAdded');
+TRIPPLITE-PRODUCTS::tlpAgentUuid.0 c94e376a-8080-44fb-96ad-0fe6583d1c4a
+TRAP,
+            'Trap Alarm active: On Battery',
+            'Could not handle tlpNotificationsAlarmEntryAdded',
+            [Severity::Warning],
+        );
     }
 
-    public function testTlpNotificationsAlarmEntryRemoved()
+    public function testTlpNotificationsAlarmEntryRemoved(): void
     {
-        $device = Device::factory()->create(); /** @var Device $device */
-        $trapText = "$device->hostname
-UDP: [$device->ip]:46024->[1.1.1.1]:162
+        $this->assertTrapLogsMessage(<<<'TRAP'
+{{ hostname }}
+UDP: [{{ ip }}]:46024->[1.1.1.1]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 0:1:56:40.26
 SNMPv2-MIB::snmpTrapOID.0 TRIPPLITE-PRODUCTS::tlpNotificationsAlarmEntryRemoved
 TRIPPLITE-PRODUCTS::tlpAlarmId 6
@@ -77,13 +73,11 @@ TRIPPLITE-PRODUCTS::tlpAlarmState inactive
 TRIPPLITE-PRODUCTS::tlpDeviceName.1 $device->sysDescr
 TRIPPLITE-PRODUCTS::tlpDeviceLocation.1 $device->location
 TRIPPLITE-PRODUCTS::tlpAgentMAC.0 00:06:67:AE:BE:13
-TRIPPLITE-PRODUCTS::tlpAgentUuid.0 c94e376a-8080-44fb-96ad-0fe6583d1c4a";
-
-        $trap = new Trap($trapText);
-
-        $message = 'Trap Alarm inactive: On Utility Power';
-        \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 2);
-
-        $this->assertTrue(Dispatcher::handle($trap), 'Could not handle tlpNotificationsAlarmEntryRemoved');
+TRIPPLITE-PRODUCTS::tlpAgentUuid.0 c94e376a-8080-44fb-96ad-0fe6583d1c4a
+TRAP,
+            'Trap Alarm inactive: On Utility Power',
+            'Could not handle tlpNotificationsAlarmEntryRemoved',
+            [Severity::Info],
+        );
     }
 }

@@ -1,5 +1,9 @@
 mib: FORTINET-FORTIVOICE-MIB
 modules:
+    os:
+        version: FORTINET-FORTIVOICE-MIB::fvSysVersion.0
+        serial: FORTINET-FORTIVOICE-MIB::fvSysSerial.0
+        hardware: FORTINET-FORTIVOICE-MIB::fvSysModel.0
     processors:
         data:
             -

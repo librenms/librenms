@@ -1,0 +1,172 @@
+mib: USHA-MIB
+modules:
+    os:
+        hardware:
+            - UPS-MIB::upsIdentManufacturer.0
+            - UPS-MIB::upsIdentModel.0
+        hardware_template: "{{ UPS-MIB::upsIdentManufacturer.0 }} {{ UPS-MIB::upsIdentModel.0 }}"
+        version: UPS-MIB::upsIdentAgentSoftwareVersion.0
+        version_regex: '/v(?<version>[0-9]+.[0-9]+)/'
+        serial: UPS-MIB::upsIdentAgentSoftwareVersion.0
+        serial_regex: '/SN (?<serial>[0-9]+)/'
+    sensors:
+        pre-cache:
+            data:
+                -
+                    oid:
+                        - upsBatteryGroup
+                        - upsInputGroupTable
+                        - upsOutputGroupTable
+        state:
+            data:
+                -
+                    oid: upsTestGroup
+                    value: upsTestBatteryTestResult
+                    num_oid: '.1.3.6.1.4.1.2468.1.2.1.1.6.3.{{ $index }}'
+                    descr: 'UPS Test #{{ $index }} Result'
+                    index: 'upsTestBatteryTestResult.{{ $index }}'
+                    state_name: upsBatteryTest
+                    skip_values:
+                        -
+                            oid: upsBatteryTest
+                            op: '!='
+                            value: 1
+                    states:
+                        - { value: 1, generic: 0, graph: 1, descr: 'OK' }
+                        - { value: 2, generic: 1, graph: 1, descr: 'Warning' }
+                        - { value: 3, generic: 2, graph: 1, descr: 'Error' }
+                        - { value: 4, generic: 3, graph: 1, descr: 'Aborted' }
+                        - { value: 5, generic: 3, graph: 1, descr: 'inProgress' }
+                        - { value: 6, generic: 3, graph: 1, descr: 'noData' }
+                -
+                    oid: upsBatteryGroup
+                    value: upsBatteryGroupStatus
+                    num_oid: '.1.3.6.1.4.1.2468.1.2.1.1.2.1.{{ $index }}'
+                    descr: 'UPS Battery #{{ $index }} Status'
+                    index: 'upsBatteryGroupStatus.{{ $index }}'
+                    state_name: upsBatteryGroupStatus
+                    states:
+                        - { value: 1, generic: 3, graph: 1, descr: 'Unknown' }
+                        - { value: 2, generic: 0, graph: 1, descr: 'Normal' }
+                        - { value: 3, generic: 1, graph: 1, descr: 'Low' }
+                        - { value: 4, generic: 2, graph: 1, descr: 'Depleeted' }
+                        - { value: 5, generic: 1, graph: 1, descr: 'Discharging' }
+                        - { value: 6, generic: 2, graph: 1, descr: 'Failure' }
+                -
+                    oid: upsOutputGroupSource
+                    value: upsOutputGroupSource
+                    num_oid: '.1.3.6.1.4.1.2468.1.2.1.1.4.1.{{ $index }}'
+                    descr: 'UPS Output #{{ $index }} Source'
+                    index: 'upsOutputGroupSource.{{ $index }}'
+                    state_name: upsOutputGroupSource
+                    states:
+                        - { value: 1, generic: 3, graph: 1, descr: 'Other' }
+                        - { value: 2, generic: 3, graph: 1, descr: 'None' }
+                        - { value: 3, generic: 0, graph: 1, descr: 'Normal' }
+                        - { value: 4, generic: 1, graph: 1, descr: 'Bypass' }
+                        - { value: 5, generic: 1, graph: 1, descr: 'Battery' }
+                        - { value: 6, generic: 2, graph: 1, descr: 'Booster' }
+                        - { value: 7, generic: 2, graph: 1, descr: 'Reducer' }
+        voltage:
+            data:
+                -
+                    oid: upsInputGroupTable
+                    value: upsInputGroupVoltage
+                    num_oid: '.1.3.6.1.4.1.2468.1.2.1.1.3.3.1.3.{{ $index }}'
+                    descr: 'Input #{{ $index }} Voltage'
+                    index: 'upsInputGroupVoltage.{{ $index }}'
+                    divisor: 10
+                    low_limit: 180
+                    low_warn_limit: 200
+                    warn_limit: 235
+                    high_limit: 240
+                -
+                    oid: upsOutputGroupTable
+                    value: upsOutputGroupVoltage
+                    num_oid: '.1.3.6.1.4.1.2468.1.2.1.1.4.4.1.2.{{ $index }}'
+                    descr: 'Output #{{ $index }} Voltage'
+                    index: 'upsOutputGroupVoltage.{{ $index }}'
+                    divisor: 10
+                    low_limit: 200
+                    low_warn_limit: 210
+                    warn_limit: 230
+                    high_limit: 235
+                -
+                    oid: upsBatteryGroup
+                    value: upsBatteryGroupVoltage
+                    num_oid: '.1.3.6.1.4.1.2468.1.2.1.1.2.5.{{ $index }}'
+                    descr: 'Battery #{{ $index }} Voltage'
+                    index: 'upsBatteryGroupVoltage.{{ $index }}'
+                    divisor: 10
+        current:
+            data:
+                -
+                    oid: upsInputGroupTable
+                    value: upsInputGroupCurrent
+                    num_oid: '.1.3.6.1.4.1.2468.1.2.1.1.3.3.1.4.{{ $index }}'
+                    descr: 'Input #{{ $index }} Current'
+                    index: 'upsInputGroupCurrent.{{ $index }}'
+                    divisor: 10
+                -
+                    oid: upsOutputGroupTable
+                    value: upsOutputGroupCurrent
+                    num_oid: '.1.3.6.1.4.1.2468.1.2.1.1.4.4.1.3.{{ $index }}'
+                    descr: 'Output #{{ $index }} Current'
+                    index: 'upsOutputGroupCurrent.{{ $index }}'
+                    divisor: 10
+        load:
+            data:
+                -
+                    oid: upsOutputGroupTable
+                    value: upsOutputGroupPercentLoad
+                    num_oid: '.1.3.6.1.4.1.2468.1.2.1.1.4.4.1.5.{{ $index }}'
+                    descr: 'Output #{{ $index }} Load'
+                    index: 'upsOutputGroupPercentLoad.{{ $index }}'
+        frequency:
+            data:
+                -
+                    oid: upsInputGroupTable
+                    value: upsInputGroupFrequency
+                    num_oid: '.1.3.6.1.4.1.2468.1.2.1.1.3.3.1.2.{{ $index }}'
+                    descr: 'Input #{{ $index }} Frequency'
+                    index: 'upsInputGroupFrequency.{{ $index }}'
+                    divisor: 10
+        count:
+            data:
+                -
+                    oid: upsInputGroupLineBads
+                    value: upsInputGroupLineBads
+                    num_oid: '.1.3.6.1.4.1.2468.1.2.1.1.3.1.{{ $index }}'
+                    descr: 'Input #{{ $index }} Out-Of-Tolerance'
+                    index: 'upsInputGroupLineBads.{{ $index }}'
+        charge:
+            data:
+                -
+                    oid: upsBatteryGroup
+                    value: upsBatteryGroupEstimatedChargeRemaining
+                    num_oid: '.1.3.6.1.4.1.2468.1.2.1.1.2.4.{{ $index }}'
+                    descr: 'Battery #{{ $index }} Charge remaining'
+                    index: 'upsBatteryGroupEstimatedChargeRemaining.{{ $index }}'
+        temperature:
+            data:
+                -
+                    oid: upsBatteryGroup
+                    value: upsBatteryGroupTemperature
+                    num_oid: '.1.3.6.1.4.1.2468.1.2.1.1.2.4.{{ $index }}'
+                    descr: 'Battery #{{ $index }} Temperature'
+                    index: 'upsBatteryGroupTemperature.{{ $index }}'
+                    divisor: 10
+        runtime:
+            data:
+                -
+                    oid: upsBatteryGroup
+                    value: upsBatteryGroupEstimatedMinutesRemaining
+                    num_oid: '.1.3.6.1.4.1.2468.1.2.1.1.2.3.{{ $index }}'
+                    descr: 'Battery #{{ $index }} Minutes remaining'
+                    index: 'upsBatteryGroupEstimatedMinutesRemaining.{{ $index }}'
+                -
+                    oid: upsBatteryGroup
+                    value: upsBatteryGroupSecondsOnBattery
+                    num_oid: '.1.3.6.1.4.1.2468.1.2.1.1.2.2.{{ $index }}'
+                    descr: 'Runtime on Battery #{{ $index }}'
+                    index: 'upsBatteryGroupSecondsOnBattery.{{ $index }}'

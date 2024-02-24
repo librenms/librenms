@@ -1,0 +1,322 @@
+AXOS-ALARM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    NOTIFICATION-TYPE, MODULE-IDENTITY, OBJECT-TYPE, Integer32
+        FROM SNMPv2-SMI
+    DisplayString
+	    FROM SNMPv2-TC
+    axosModules
+        FROM CALIX-PRODUCT-MIB;
+
+    axosAlarmModule MODULE-IDENTITY
+        LAST-UPDATED "201604250000Z"
+        ORGANIZATION "Calix"
+        CONTACT-INFO
+            "       Calix Networks, Inc.
+
+	    Postal: 1035 North McDowell Boulevard
+	            Petaluma, CA  94954-1173
+		    USA
+
+	     Phone: +1 707 766 3000
+	       Fax: +1 707 766 3100
+
+	    E-mail: mib-info@calix.com"
+        DESCRIPTION
+            "Describes active alarm table for Calix Axos
+             based products"
+        REVISION "201604250000Z"
+        DESCRIPTION
+            "Initial revision"
+    ::= { axosModules 2 }
+
+    axosAlarm           OBJECT IDENTIFIER ::= {axosAlarmModule 1}
+    axosActiveAlarms    OBJECT IDENTIFIER ::= {axosAlarm 1}
+    axosEventAttributes OBJECT IDENTIFIER ::= {axosAlarm 3}
+
+--Alarm Table
+
+axosAlarmTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AxosAlarmEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "This table holds all the active alarms"
+    ::= { axosActiveAlarms 1 }
+     
+axosAlarmEntry OBJECT-TYPE
+    SYNTAX      AxosAlarmEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "List of attributes regarding alarm table"
+    INDEX { axosIndex }
+    ::= { axosAlarmTable 1 }
+
+AxosAlarmEntry ::= SEQUENCE {
+    axosIndex                 Integer32,
+    axosAlarmIndex            Integer32,
+    axosAlarmName             DisplayString,
+    axosAlarmType             INTEGER,
+    axosAlarmCategory         INTEGER,
+    axosAlarmInstanceId       DisplayString,
+    axosAlarmSeverity         INTEGER,
+    axosAlarmServiceAffecting INTEGER,
+    axosAlarmAddress          DisplayString,
+    axosAlarmText             DisplayString,
+    axosAlarmTimeStamp        DisplayString,
+    axosAlarmTime             Integer32,
+    axosAlarmAdditionalInfo   DisplayString
+    }
+ 
+axosAlarmIndex OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Alarm index from device sequence number"
+    ::= { axosAlarmEntry 1 }
+
+axosAlarmName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Unique name for this alarm. This should match the
+                Netconf/Yang notification type."
+    ::= { axosAlarmEntry 2 }
+
+axosAlarmType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                       communication(0),
+                       qos(1),
+                       processing-error(2),
+                       equipment(3),
+                       environmental(4),
+                       operational-violation(5),
+                       integrity-violation(6),
+                       informational(7)
+                   }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "ITU Event type."
+    ::= { axosAlarmEntry 3 }
+
+axosAlarmCategory OBJECT-TYPE
+    SYNTAX      INTEGER {
+                        general(0),
+                        security(1), 
+                        dbchange(2),
+                        qos(3),
+                        environmental(4),
+                        tca(5),
+                        ntp(6),
+                        oam(7),
+                        erps(8),
+                        g8032(9),
+                        rstp(10),
+                        port(11),
+                        lag(12),
+                        lacp(13),
+                        arc(14),
+                        dhcp(15),
+                        ntwkclk(16),
+                        pm(17),
+                        configuration(18),
+                        isis(19),
+                        ospf(20),
+                        bgp(21),
+                        pon(22),
+                        bondedgroup(23),
+                        cardimgmgmt(24),
+                        ontimgmgmt(25),
+                        slot(26),
+                        subscriber(27),
+                        mpls(28),
+                        l2vpn(29),
+                        aeont(30),
+                        bfd(31),
+                        vrrp(32),
+                        pim(33),
+                        connection(34),
+                        mfib(35)
+                    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Category of the alarm"
+    ::= { axosAlarmEntry 4 }
+
+axosAlarmInstanceId OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Non-volatile instance id for this alarm"
+    ::= { axosAlarmEntry 5 }
+
+axosAlarmSeverity OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    critical(0),
+                    major(1),
+                    minor(2),
+                    warning(3),
+                    unknown(4),
+                    info(5), -- shouldn't be in active alarm list
+                    clear(6),-- shouldn't be in active alarm list
+                    none(7)  -- shouldn't be in active alarm list
+                    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Severity of the alarm"
+    ::= { axosAlarmEntry 6 }
+
+axosAlarmServiceAffecting OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    yes(1),
+                    no(2)
+                    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicated the nature of the alarm i.e. service
+                 affecting or not"
+    ::= { axosAlarmEntry 7 }
+ 
+axosAlarmAddress OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This is the entity that the alarm is raised
+                 against. e.g. a port identifier"
+    ::= { axosAlarmEntry 8 }
+
+axosAlarmText OBJECT-TYPE
+   SYNTAX      DisplayString
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION "Alarm description"
+   ::= { axosAlarmEntry 9 } 
+
+axosAlarmTimeStamp OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE (1..50))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Timestamp indicating the set/clear time of the
+                alarm"
+    ::= { axosAlarmEntry 10 }
+
+axosAlarmTime OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION "UTC time - this provides a UNIX Epoch fomat of the axosAlarmTimeStamp adjusted for UTC."
+   ::= { axosAlarmEntry 11 } 
+
+axosAlarmAdditionalInfo OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Any additional info relevnat to this alarm may
+                be provided here"
+    ::= { axosAlarmEntry 12 }
+ 
+axosIndex OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Index for this alarm in this table"
+    ::= { axosAlarmEntry 13 }
+
+
+--Alarm Severity Count Group
+
+axosAlarmCount      OBJECT IDENTIFIER ::= {axosActiveAlarms 2}
+
+axosAlarmCountTotal OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The count of all active alarms"
+    ::= { axosAlarmCount 1 }
+
+axosAlarmCountCritical OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The count of critical alarms"
+    ::= { axosAlarmCount 2 }
+
+axosAlarmCountMajor OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The count of major alarms"
+    ::= { axosAlarmCount 3 }
+
+axosAlarmCountMinor OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The count of minor alarms"
+    ::= { axosAlarmCount 4 }
+
+axosAlarmCountWarning OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The count of warning alarms (reported conditions)"
+    ::= { axosAlarmCount 5 }
+
+axosAlarmCountInfo OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The count of info alarms (unreported conditions)"
+    ::= { axosAlarmCount 6 }
+
+-- Event attributes group
+
+axosEventAdditionalInfo1 OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Generic Display string to be used to pass event info"
+    ::= { axosEventAttributes 1 }
+
+axosEventAdditionalInfo2 OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Generic Display string to be used to pass event info"
+    ::= { axosEventAttributes 2 }
+
+axosEventAdditionalInfo3 OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Generic Display string to be used to pass event info"
+    ::= { axosEventAttributes 3 }
+
+axosEventAdditionalInfo4 OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Generic Display string to be used to pass event info"
+    ::= { axosEventAttributes 4 }
+
+axosEventAdditionalInfo5 OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Generic Display string to be used to pass event info"
+    ::= { axosEventAttributes 5 }
+
+axosEventAdditionalInfo6 OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Generic Display string to be used to pass event info"
+    ::= { axosEventAttributes 6 }
+
+axosEventAdditionalInfo7 OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Generic Display string to be used to pass event info"
+    ::= { axosEventAttributes 7 }
+
+END

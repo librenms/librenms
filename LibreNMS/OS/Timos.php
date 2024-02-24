@@ -69,9 +69,10 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
     }
 
     /**
-     * Discover wireless Rx (Received Signal Strength). This is in dBm. Type is power.
+     * Discover wireless Rx & Tx (Signal Strength). This is in dBm. Type is power.
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
      * ALU-MICROWAVE-MIB::aluMwRadioLocalRxMainPower
+     * ALU-MICROWAVE-MIB::aluMwRadioLocalTxPower
      *
      * @return array
      */
@@ -79,6 +80,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
     {
         $name = $this->getCacheByIndex('aluMwRadioName', 'ALU-MICROWAVE-MIB');
         $rsl = snmpwalk_cache_oid($this->getDeviceArray(), 'aluMwRadioLocalRxMainPower', [], 'ALU-MICROWAVE-MIB');
+        $tx = snmpwalk_cache_oid($this->getDeviceArray(), 'aluMwRadioLocalTxPower', [], 'ALU-MICROWAVE-MIB');
 
         $sensors = [];
         $divisor = 10;
@@ -92,8 +94,22 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
                 $index,
                 "Rx ({$name[$index]})",
                 $data['aluMwRadioLocalRxMainPower'] / $divisor,
-                '1',
-                '10'
+                1,
+                $divisor
+            );
+        }
+
+        foreach ($tx as $index => $data) {
+            $sensors[] = new WirelessSensor(
+                'power',
+                $this->getDeviceId(),
+                '.1.3.6.1.4.1.6527.6.1.2.2.7.1.3.1.1.' . $index,
+                'Nokia-Packet-MW-Tx',
+                $index,
+                "Tx ({$name[$index]})",
+                $data['aluMwRadioLocalTxPower'] / $divisor,
+                1,
+                $divisor
             );
         }
 
@@ -130,15 +146,15 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
             $mplsLspCache = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'vRtrMplsLspLastChange', $mplsLspCache, 'TIMETRA-MPLS-MIB', 'nokia', '-OQUst');
         }
 
-        $lsps = collect();
+        $lsps = new Collection();
         foreach ($mplsLspCache as $key => $value) {
             [$vrf_oid, $lsp_oid] = explode('.', $key);
 
-            $mplsLspFromAddr = $value['vRtrMplsLspFromAddr'];
+            $mplsLspFromAddr = $value['vRtrMplsLspFromAddr'] ?? null;
             if (isset($value['vRtrMplsLspNgFromAddr'])) {
                 $mplsLspFromAddr = long2ip(hexdec(str_replace(' ', '', $value['vRtrMplsLspNgFromAddr'])));
             }
-            $mplsLspToAddr = $value['vRtrMplsLspToAddr'];
+            $mplsLspToAddr = $value['vRtrMplsLspToAddr'] ?? null;
             if (isset($value['vRtrMplsLspNgToAddr'])) {
                 $mplsLspToAddr = long2ip(hexdec(str_replace(' ', '', $value['vRtrMplsLspNgToAddr'])));
             }
@@ -147,15 +163,15 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
                 'vrf_oid' => $vrf_oid,
                 'lsp_oid' => $lsp_oid,
                 'device_id' => $this->getDeviceId(),
-                'mplsLspRowStatus' => $value['vRtrMplsLspRowStatus'],
-                'mplsLspLastChange' => round($value['vRtrMplsLspLastChange'] / 100),
-                'mplsLspName' => $value['vRtrMplsLspName'],
-                'mplsLspAdminState' => $value['vRtrMplsLspAdminState'],
-                'mplsLspOperState' => $value['vRtrMplsLspOperState'],
-                'mplsLspFromAddr' => $mplsLspFromAddr,
-                'mplsLspToAddr' => $mplsLspToAddr,
-                'mplsLspType' => $value['vRtrMplsLspType'],
-                'mplsLspFastReroute' => $value['vRtrMplsLspFastReroute'],
+                'mplsLspRowStatus' => $value['vRtrMplsLspRowStatus'] ?? null,
+                'mplsLspLastChange' => round(($value['vRtrMplsLspLastChange'] ?? 0) / 100),
+                'mplsLspName' => $value['vRtrMplsLspName'] ?? null,
+                'mplsLspAdminState' => $value['vRtrMplsLspAdminState'] ?? null,
+                'mplsLspOperState' => $value['vRtrMplsLspOperState'] ?? null,
+                'mplsLspFromAddr' => $mplsLspFromAddr ?? null,
+                'mplsLspToAddr' => $mplsLspToAddr ?? null,
+                'mplsLspType' => $value['vRtrMplsLspType'] ?? null,
+                'mplsLspFastReroute' => $value['vRtrMplsLspFastReroute'] ?? null,
             ]));
         }
 
@@ -173,7 +189,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
             $mplsPathCache = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'vRtrMplsLspPathLastChange', $mplsPathCache, 'TIMETRA-MPLS-MIB', 'nokia', '-OQUst');
         }
 
-        $paths = collect();
+        $paths = new Collection();
         foreach ($mplsPathCache as $key => $value) {
             [$vrf_oid, $lsp_oid, $path_oid] = explode('.', $key);
             $lsp_id = $lsps->where('lsp_oid', $lsp_oid)->firstWhere('vrf_oid', $vrf_oid)->lsp_id;
@@ -208,28 +224,28 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
     {
         $mplsSdpCache = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'sdpInfoTable', [], 'TIMETRA-SDP-MIB', 'nokia', '-OQUst');
 
-        $sdps = collect();
+        $sdps = new Collection();
         foreach ($mplsSdpCache as $value) {
             if ((! empty($value['sdpFarEndInetAddress'])) && ($value['sdpFarEndInetAddressType'] == 'ipv4')) {
                 $ip = long2ip(hexdec(str_replace(' ', '', $value['sdpFarEndInetAddress'])));
             } else {
                 //Fixme implement ipv6 conversion
-                $ip = $value['sdpFarEndInetAddress'];
+                $ip = $value['sdpFarEndInetAddress'] ?? null;
             }
             $sdps->push(new MplsSdp([
                 'sdp_oid' => $value['sdpId'],
                 'device_id' => $this->getDeviceId(),
-                'sdpRowStatus' => $value['sdpRowStatus'],
-                'sdpDelivery' => $value['sdpDelivery'],
-                'sdpDescription' => $value['sdpDescription'],
-                'sdpAdminStatus' => $value['sdpAdminStatus'],
-                'sdpOperStatus' => $value['sdpOperStatus'],
-                'sdpAdminPathMtu' => $value['sdpAdminPathMtu'],
-                'sdpOperPathMtu' => $value['sdpOperPathMtu'],
-                'sdpLastMgmtChange' => round($value['sdpLastMgmtChange'] / 100),
-                'sdpLastStatusChange' => round($value['sdpLastStatusChange'] / 100),
-                'sdpActiveLspType' => $value['sdpActiveLspType'],
-                'sdpFarEndInetAddressType' => $value['sdpFarEndInetAddressType'],
+                'sdpRowStatus' => $value['sdpRowStatus'] ?? null,
+                'sdpDelivery' => $value['sdpDelivery'] ?? null,
+                'sdpDescription' => $value['sdpDescription'] ?? null,
+                'sdpAdminStatus' => $value['sdpAdminStatus'] ?? null,
+                'sdpOperStatus' => $value['sdpOperStatus'] ?? null,
+                'sdpAdminPathMtu' => $value['sdpAdminPathMtu'] ?? null,
+                'sdpOperPathMtu' => $value['sdpOperPathMtu'] ?? null,
+                'sdpLastMgmtChange' => round(($value['sdpLastMgmtChange'] ?? 0) / 100),
+                'sdpLastStatusChange' => round(($value['sdpLastStatusChange'] ?? 0) / 100),
+                'sdpActiveLspType' => $value['sdpActiveLspType'] ?? null,
+                'sdpFarEndInetAddressType' => $value['sdpFarEndInetAddressType'] ?? null,
                 'sdpFarEndInetAddress' => $ip,
             ]));
         }
@@ -245,7 +261,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
         $mplsSvcCache = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'svcBaseInfoTable', [], 'TIMETRA-SERV-MIB', 'nokia', '-OQUst');
         $mplsSvcCache = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'svcTlsInfoTable', $mplsSvcCache, 'TIMETRA-SERV-MIB', 'nokia', '-OQUst');
 
-        $svcs = collect();
+        $svcs = new Collection();
 
         // Workaround, remove some defalt entries we do not want to see
         $filter = '/^\w* Service for internal purposes only/';
@@ -291,7 +307,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
         $mplsSapCache = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'sapBaseInfoTable', [], 'TIMETRA-SAP-MIB', 'nokia', '-OQUst');
         $mplsSapTrafficCache = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'sapBaseStatsTable', [], 'TIMETRA-SAP-MIB', 'nokia', '-OQUst');
 
-        $saps = collect();
+        $saps = new Collection();
 
         // Workaround, there are some oids not covered by actual MIB, try to filter them
         // i.e. sapBaseInfoEntry.300.118208001.1342177283.10
@@ -321,10 +337,10 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
                 'sapOperStatus' => $value['sapOperStatus'],
                 'sapLastMgmtChange' => round(($value['sapLastMgmtChange'] ?? 0) / 100),
                 'sapLastStatusChange' => round(($value['sapLastStatusChange'] ?? 0) / 100),
-                'sapIngressBytes' => $mplsSapTrafficCache[$traffic_id]['sapBaseStatsIngressPchipOfferedLoPrioOctets'] ?? null,
-                'sapEgressBytes' => $mplsSapTrafficCache[$traffic_id]['sapBaseStatsEgressQchipForwardedOutProfOctets'] ?? null,
-                'sapIngressDroppedBytes' => $mplsSapTrafficCache[$traffic_id]['sapBaseStatsIngressQchipDroppedLoPrioOctets'] ?? null,
-                'sapEgressDroppedBytes' => $mplsSapTrafficCache[$traffic_id]['sapBaseStatsEgressQchipDroppedOutProfOctets'] ?? null,
+                'sapIngressBytes' => ($mplsSapTrafficCache[$traffic_id]['sapBaseStatsIngressPchipOfferedLoPrioOctets'] ?? 0) + ($mplsSapTrafficCache[$traffic_id]['sapBaseStatsIngressPchipOfferedHiPrioOctets'] ?? 0),
+                'sapEgressBytes' => ($mplsSapTrafficCache[$traffic_id]['sapBaseStatsEgressQchipForwardedOutProfOctets'] ?? 0) + ($mplsSapTrafficCache[$traffic_id]['sapBaseStatsEgressQchipForwardedInProfOctets'] ?? 0),
+                'sapIngressDroppedBytes' => ($mplsSapTrafficCache[$traffic_id]['sapBaseStatsIngressQchipDroppedLoPrioOctets'] ?? 0) + ($mplsSapTrafficCache[$traffic_id]['sapBaseStatsIngressQchipDroppedHiPrioOctets'] ?? 0),
+                'sapEgressDroppedBytes' => ($mplsSapTrafficCache[$traffic_id]['sapBaseStatsEgressQchipDroppedOutProfOctets'] ?? 0) + ($mplsSapTrafficCache[$traffic_id]['sapBaseStatsEgressQchipDroppedInProfOctets'] ?? 0),
             ]));
         }
 
@@ -339,10 +355,10 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
         $mplsBindCache = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'sdpBindTable', [], 'TIMETRA-SDP-MIB', 'nokia', '-OQUsbt');
         $mplsBindCache = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'sdpBindBaseStatsTable', $mplsBindCache, 'TIMETRA-SDP-MIB', 'nokia', '-OQUsb');
 
-        $binds = collect();
+        $binds = new Collection();
         foreach ($mplsBindCache as $key => $value) {
             [$svcId] = explode('.', $key);
-            $bind_id = str_replace(' ', '', $value['sdpBindId']);
+            $bind_id = str_replace(' ', '', $value['sdpBindId'] ?? '');
             $sdp_oid = hexdec(substr($bind_id, 0, 8));
             $svc_oid = hexdec(substr($bind_id, 9, 16));
             $sdp_id = $sdps->firstWhere('sdp_oid', $sdp_oid)->sdp_id;
@@ -354,17 +370,17 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
                     'sdp_oid' => $sdp_oid,
                     'svc_oid' => $svc_oid,
                     'device_id' => $this->getDeviceId(),
-                    'sdpBindRowStatus' => $value['sdpBindRowStatus'],
-                    'sdpBindAdminStatus' => $value['sdpBindAdminStatus'],
-                    'sdpBindOperStatus' => $value['sdpBindOperStatus'],
-                    'sdpBindLastMgmtChange' => round($value['sdpBindLastMgmtChange'] / 100),
-                    'sdpBindLastStatusChange' => round($value['sdpBindLastStatusChange'] / 100),
+                    'sdpBindRowStatus' => $value['sdpBindRowStatus'] ?? null,
+                    'sdpBindAdminStatus' => $value['sdpBindAdminStatus'] ?? null,
+                    'sdpBindOperStatus' => $value['sdpBindOperStatus'] ?? null,
+                    'sdpBindLastMgmtChange' => round(($value['sdpBindLastMgmtChange'] ?? 0) / 100),
+                    'sdpBindLastStatusChange' => round(($value['sdpBindLastStatusChange'] ?? 0) / 100),
                     'sdpBindType' => $value['sdpBindType'],
                     'sdpBindVcType' => $value['sdpBindVcType'],
-                    'sdpBindBaseStatsIngFwdPackets' => $value['sdpBindBaseStatsIngressForwardedPackets'],
-                    'sdpBindBaseStatsIngFwdOctets' => $value['sdpBindBaseStatsIngFwdOctets'],
-                    'sdpBindBaseStatsEgrFwdPackets' => $value['sdpBindBaseStatsEgressForwardedPackets'],
-                    'sdpBindBaseStatsEgrFwdOctets' => $value['sdpBindBaseStatsEgressForwardedOctets'],
+                    'sdpBindBaseStatsIngFwdPackets' => $value['sdpBindBaseStatsIngressForwardedPackets'] ?? null,
+                    'sdpBindBaseStatsIngFwdOctets' => $value['sdpBindBaseStatsIngFwdOctets'] ?? null,
+                    'sdpBindBaseStatsEgrFwdPackets' => $value['sdpBindBaseStatsEgressForwardedPackets'] ?? null,
+                    'sdpBindBaseStatsEgrFwdOctets' => $value['sdpBindBaseStatsEgressForwardedOctets'] ?? null,
                 ]));
             }
         }
@@ -388,7 +404,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
         $preemptionPending = 0b00001000;
         $nodeId = 0b00000100;
 
-        $arhops = collect();
+        $arhops = new Collection();
         foreach ($mplsTunnelArHopCache as $key => $value) {
             [$mplsTunnelARHopListIndex, $mplsTunnelARHopIndex] = explode('.', $key);
             $lsp_path_id = $paths->firstWhere('mplsLspPathTunnelARHopListIndex', $mplsTunnelARHopListIndex)->lsp_path_id;
@@ -435,7 +451,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
         $mplsTunnelCHopCache = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'vRtrMplsTunnelCHopTable', [], 'TIMETRA-MPLS-MIB', 'nokia', '-OQUsb');
 
         $lsp_ids = $paths->pluck('lsp_path_id', 'mplsLspPathTunnelCHopListIndex');
-        $chops = collect();
+        $chops = new Collection();
         foreach ($mplsTunnelCHopCache as $key => $value) {
             [$mplsTunnelCHopListIndex, $mplsTunnelCHopIndex] = explode('.', $key);
             $lsp_path_id = $lsp_ids->get($mplsTunnelCHopListIndex);
@@ -468,15 +484,15 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
             $mplsLspCache = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'vRtrMplsLspStatTable', $mplsLspCache, 'TIMETRA-MPLS-MIB', 'nokia');
         }
 
-        $lsps = collect();
+        $lsps = new Collection();
         foreach ($mplsLspCache as $key => $value) {
             [$vrf_oid, $lsp_oid] = explode('.', $key);
 
-            $mplsLspFromAddr = $value['vRtrMplsLspFromAddr'];
+            $mplsLspFromAddr = $value['vRtrMplsLspFromAddr'] ?? null;
             if (isset($value['vRtrMplsLspNgFromAddr'])) {
                 $mplsLspFromAddr = long2ip(hexdec(str_replace(' ', '', $value['vRtrMplsLspNgFromAddr'])));
             }
-            $mplsLspToAddr = $value['vRtrMplsLspToAddr'];
+            $mplsLspToAddr = $value['vRtrMplsLspToAddr'] ?? null;
             if (isset($value['vRtrMplsLspNgToAddr'])) {
                 $mplsLspToAddr = long2ip(hexdec(str_replace(' ', '', $value['vRtrMplsLspNgToAddr'])));
             }
@@ -521,7 +537,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
             $mplsPathCache = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'vRtrMplsLspPathStatTable', $mplsPathCache, 'TIMETRA-MPLS-MIB', 'nokia');
         }
 
-        $paths = collect();
+        $paths = new Collection();
         foreach ($mplsPathCache as $key => $value) {
             [$vrf_oid, $lsp_oid, $path_oid] = explode('.', $key);
             $lsp_id = $lsps->where('lsp_oid', $lsp_oid)->firstWhere('vrf_oid', $vrf_oid)->lsp_id;
@@ -559,13 +575,16 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
     {
         $mplsSdpCache = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'sdpInfoTable', [], 'TIMETRA-SDP-MIB', 'nokia', '-OQUst');
 
-        $sdps = collect();
+        $sdps = new Collection();
         foreach ($mplsSdpCache as $value) {
             if ((! empty($value['sdpFarEndInetAddress'])) && ($value['sdpFarEndInetAddressType'] == 'ipv4')) {
                 $ip = long2ip(hexdec(str_replace(' ', '', $value['sdpFarEndInetAddress'])));
             } else {
                 //Fixme implement ipv6 conversion
-                $ip = $value['sdpFarEndInetAddress'];
+                //$value['sdpFarEndInetAddress'] might still be any of these:
+                //  -> unknown(0), ipv4(1), ipv6(2), ipv4z(3), ipv6z(4), dns(16)
+
+                $ip = $value['sdpFarEndInetAddress'] ?? null;
             }
             $sdps->push(new MplsSdp([
                 'sdp_oid' => $value['sdpId'],
@@ -579,8 +598,8 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
                 'sdpOperPathMtu' => $value['sdpOperPathMtu'],
                 'sdpLastMgmtChange' => round($value['sdpLastMgmtChange'] / 100),
                 'sdpLastStatusChange' => round($value['sdpLastStatusChange'] / 100),
-                'sdpActiveLspType' => $value['sdpActiveLspType'],
-                'sdpFarEndInetAddressType' => $value['sdpFarEndInetAddressType'],
+                'sdpActiveLspType' => $value['sdpActiveLspType'] ?? null,
+                'sdpFarEndInetAddressType' => $value['sdpFarEndInetAddressType'] ?? null,
                 'sdpFarEndInetAddress' => $ip,
             ]));
         }
@@ -596,7 +615,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
         $mplsSvcCache = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'svcBaseInfoTable', [], 'TIMETRA-SERV-MIB', 'nokia', '-OQUst');
         $mplsSvcCache = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'svcTlsInfoTable', $mplsSvcCache, 'TIMETRA-SERV-MIB', 'nokia', '-OQUst');
 
-        $svcs = collect();
+        $svcs = new Collection();
 
         // Workaround, remove some default entries we do not want to see
         $filter = '/^\w* Service for internal purposes only/';
@@ -641,7 +660,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
         $mplsSapCache = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'sapBaseInfoTable', [], 'TIMETRA-SAP-MIB', 'nokia', '-OQUst');
         $mplsSapTrafficCache = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'sapBaseStatsTable', [], 'TIMETRA-SAP-MIB', 'nokia', '-OQUst');
 
-        $saps = collect();
+        $saps = new Collection();
 
         // Workaround, there are some oids not covered by actual MIB, try to filter them
         // i.e. sapBaseInfoEntry.300.118208001.1342177283.10
@@ -692,10 +711,10 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
             ->addDataset('sapEgressDroppedBits', 'COUNTER', 0);
 
             $fields = [
-                'sapIngressBits' => ($mplsSapTrafficCache[$traffic_id]['sapBaseStatsIngressPchipOfferedLoPrioOctets'] ?? 0) * 8,
-                'sapEgressBits' => ($mplsSapTrafficCache[$traffic_id]['sapBaseStatsEgressQchipForwardedOutProfOctets'] ?? 0) * 8,
-                'sapIngressDroppedBits' => ($mplsSapTrafficCache[$traffic_id]['sapBaseStatsIngressQchipDroppedLoPrioOctets'] ?? 0) * 8,
-                'sapEgressDroppedBits' => ($mplsSapTrafficCache[$traffic_id]['sapBaseStatsEgressQchipDroppedOutProfOctets'] ?? 0) * 8,
+                'sapIngressBits' => (($mplsSapTrafficCache[$traffic_id]['sapBaseStatsIngressPchipOfferedLoPrioOctets'] ?? 0) + ($mplsSapTrafficCache[$traffic_id]['sapBaseStatsIngressPchipOfferedHiPrioOctets'] ?? 0)) * 8,
+                'sapEgressBits' => (($mplsSapTrafficCache[$traffic_id]['sapBaseStatsEgressQchipForwardedOutProfOctets'] ?? 0) + ($mplsSapTrafficCache[$traffic_id]['sapBaseStatsEgressQchipForwardedInProfOctets'] ?? 0)) * 8,
+                'sapIngressDroppedBits' => (($mplsSapTrafficCache[$traffic_id]['sapBaseStatsIngressQchipDroppedLoPrioOctets'] ?? 0) + ($mplsSapTrafficCache[$traffic_id]['sapBaseStatsIngressQchipDroppedHiPrioOctets'] ?? 0)) * 8,
+                'sapEgressDroppedBits' => (($mplsSapTrafficCache[$traffic_id]['sapBaseStatsEgressQchipDroppedOutProfOctets'] ?? 0) + ($mplsSapTrafficCache[$traffic_id]['sapBaseStatsEgressQchipDroppedInProfOctets'] ?? 0)) * 8,
             ];
 
             $tags = [
@@ -704,7 +723,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
                 'rrd_def' => $rrd_def,
             ];
 
-            data_update($this->getDeviceArray(), 'sap', $tags, $fields);
+            app('Datastore')->put($this->getDeviceArray(), 'sap', $tags, $fields);
             $this->enableGraph('sap');
         }
 
@@ -719,10 +738,10 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
         $mplsBindCache = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'sdpBindTable', [], 'TIMETRA-SDP-MIB', 'nokia', '-OQUsbt');
         $mplsBindCache = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'sdpBindBaseStatsTable', $mplsBindCache, 'TIMETRA-SDP-MIB', 'nokia', '-OQUsb');
 
-        $binds = collect();
+        $binds = new Collection();
         foreach ($mplsBindCache as $key => $value) {
             [$svcId] = explode('.', $key);
-            $bind_id = str_replace(' ', '', $value['sdpBindId']);
+            $bind_id = str_replace(' ', '', $value['sdpBindId'] ?? '');
             $sdp_oid = hexdec(substr($bind_id, 0, 8));
             $svc_oid = hexdec(substr($bind_id, 9, 16));
             $sdp_id = $sdps->firstWhere('sdp_oid', $sdp_oid)->sdp_id;
@@ -734,17 +753,17 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
                     'sdp_oid' => $sdp_oid,
                     'svc_oid' => $svc_oid,
                     'device_id' => $this->getDeviceId(),
-                    'sdpBindRowStatus' => $value['sdpBindRowStatus'],
-                    'sdpBindAdminStatus' => $value['sdpBindAdminStatus'],
-                    'sdpBindOperStatus' => $value['sdpBindOperStatus'],
-                    'sdpBindLastMgmtChange' => round($value['sdpBindLastMgmtChange'] / 100),
-                    'sdpBindLastStatusChange' => round($value['sdpBindLastStatusChange'] / 100),
-                    'sdpBindType' => $value['sdpBindType'],
-                    'sdpBindVcType' => $value['sdpBindVcType'],
-                    'sdpBindBaseStatsIngFwdPackets' => $value['sdpBindBaseStatsIngressForwardedPackets'],
-                    'sdpBindBaseStatsIngFwdOctets' => $value['sdpBindBaseStatsIngFwdOctets'],
-                    'sdpBindBaseStatsEgrFwdPackets' => $value['sdpBindBaseStatsEgressForwardedPackets'],
-                    'sdpBindBaseStatsEgrFwdOctets' => $value['sdpBindBaseStatsEgressForwardedOctets'],
+                    'sdpBindRowStatus' => $value['sdpBindRowStatus'] ?? null,
+                    'sdpBindAdminStatus' => $value['sdpBindAdminStatus'] ?? null,
+                    'sdpBindOperStatus' => $value['sdpBindOperStatus'] ?? null,
+                    'sdpBindLastMgmtChange' => round(($value['sdpBindLastMgmtChange'] ?? 0) / 100),
+                    'sdpBindLastStatusChange' => round(($value['sdpBindLastStatusChange'] ?? 0) / 100),
+                    'sdpBindType' => $value['sdpBindType'] ?? null,
+                    'sdpBindVcType' => $value['sdpBindVcType'] ?? null,
+                    'sdpBindBaseStatsIngFwdPackets' => $value['sdpBindBaseStatsIngressForwardedPackets'] ?? null,
+                    'sdpBindBaseStatsIngFwdOctets' => $value['sdpBindBaseStatsIngFwdOctets'] ?? null,
+                    'sdpBindBaseStatsEgrFwdPackets' => $value['sdpBindBaseStatsEgressForwardedPackets'] ?? null,
+                    'sdpBindBaseStatsEgrFwdOctets' => $value['sdpBindBaseStatsEgressForwardedOctets'] ?? null,
                 ]));
             }
         }
@@ -768,18 +787,22 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
         $preemptionPending = 0b00001000;
         $nodeId = 0b00000100;
 
-        $arhops = collect();
+        $arhops = new Collection();
         foreach ($mplsTunnelArHopCache as $key => $value) {
             [$mplsTunnelARHopListIndex, $mplsTunnelARHopIndex] = explode('.', $key);
-            $lsp_path_id = $paths->firstWhere('mplsLspPathTunnelARHopListIndex', $mplsTunnelARHopListIndex)->lsp_path_id;
-            $protection = intval($value['vRtrMplsTunnelARHopProtection'], 16);
+            $firstPath = $paths->firstWhere('mplsLspPathTunnelARHopListIndex', $mplsTunnelARHopListIndex);
+            if (! isset($firstPath)) {
+                continue;
+            }
+            $lsp_path_id = $firstPath->lsp_path_id;
+            $protection = intval($value['vRtrMplsTunnelARHopProtection'] ?? 0, 16);
 
             $localLinkProtection = ($protection & $localAvailable) ? 'true' : 'false';
             $linkProtectionInUse = ($protection & $localInUse) ? 'true' : 'false';
             $bandwidthProtection = ($protection & $bandwidthProtected) ? 'true' : 'false';
             $nextNodeProtection = ($protection & $nodeProtected) ? 'true' : 'false';
 
-            $ARHopRouterId = $value['vRtrMplsTunnelARHopRouterId'];
+            $ARHopRouterId = $value['vRtrMplsTunnelARHopRouterId'] ?? null;
             if (isset($value['vRtrMplsTunnelARHopNgRouterId'])) {
                 $ARHopRouterId = long2ip(hexdec(str_replace(' ', '', $value['vRtrMplsTunnelARHopNgRouterId'])));
             }
@@ -815,7 +838,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
         $mplsTunnelCHopCache = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'vRtrMplsTunnelCHopTable', [], 'TIMETRA-MPLS-MIB', 'nokia', '-OQUsb');
         $path_ids = $paths->pluck('lsp_path_id', 'mplsLspPathTunnelCHopListIndex');
 
-        $chops = collect();
+        $chops = new Collection();
         foreach ($mplsTunnelCHopCache as $key => $value) {
             [$mplsTunnelCHopListIndex, $mplsTunnelCHopIndex] = explode('.', $key);
             $lsp_path_id = $path_ids[$mplsTunnelCHopListIndex] ?? null;
@@ -825,12 +848,12 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
                 'mplsTunnelCHopIndex' => $mplsTunnelCHopIndex,
                 'lsp_path_id' => $lsp_path_id,
                 'device_id' => $this->getDeviceId(),
-                'mplsTunnelCHopAddrType' => $value['vRtrMplsTunnelCHopAddrType'],
-                'mplsTunnelCHopIpv4Addr' => $value['vRtrMplsTunnelCHopIpv4Addr'],
-                'mplsTunnelCHopIpv6Addr' => $value['vRtrMplsTunnelCHopIpv6Addr'],
-                'mplsTunnelCHopAsNumber' => $value['vRtrMplsTunnelCHopAsNumber'],
-                'mplsTunnelCHopStrictOrLoose' => $value['vRtrMplsTunnelCHopStrictOrLoose'],
-                'mplsTunnelCHopRouterId' => $value['vRtrMplsTunnelCHopRtrID'],
+                'mplsTunnelCHopAddrType' => $value['vRtrMplsTunnelCHopAddrType'] ?? null,
+                'mplsTunnelCHopIpv4Addr' => $value['vRtrMplsTunnelCHopIpv4Addr'] ?? null,
+                'mplsTunnelCHopIpv6Addr' => $value['vRtrMplsTunnelCHopIpv6Addr'] ?? null,
+                'mplsTunnelCHopAsNumber' => $value['vRtrMplsTunnelCHopAsNumber'] ?? null,
+                'mplsTunnelCHopStrictOrLoose' => $value['vRtrMplsTunnelCHopStrictOrLoose'] ?? null,
+                'mplsTunnelCHopRouterId' => $value['vRtrMplsTunnelCHopRtrID'] ?? null,
             ]));
         }
 
@@ -896,10 +919,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
                 '.1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.8.' . $index,
                 'timos',
                 $index,
-                'RSSI: ' . $carrier[$index]['ifName'],
-                null,
-                1,
-                10
+                'RSSI: ' . $carrier[$index]['ifName']
             );
         }
 
@@ -919,10 +939,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
                 '.1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.9.' . $index,
                 'timos',
                 $index,
-                'RSRP: ' . $carrier[$index]['ifName'],
-                null,
-                1,
-                10
+                'RSRP: ' . $carrier[$index]['ifName']
             );
         }
 

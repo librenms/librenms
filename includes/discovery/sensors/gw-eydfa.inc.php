@@ -79,7 +79,7 @@ foreach (explode("\n", $oids) as $data) {
     unset($oids, $split_oid, $index, $divisor, $descr, $low_limit, $low_warn, $high_warn, $sensor_index);
 }
 
-$oids = snmp_walk($device, 'oaDCPowerTable', '-Osq', 'NSCRTV-HFCEMS-OPTICALAMPLIFIER-MIB');
+$oids = trim(snmp_walk($device, 'oaDCPowerTable', '-Osq', 'NSCRTV-HFCEMS-OPTICALAMPLIFIER-MIB'));
 d_echo($oids . "\n");
 
 if ($oids) {

@@ -31,7 +31,6 @@ namespace LibreNMS\Snmptrap\Handlers;
 use App\Models\Device;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
-use Log;
 
 class AdvaObjectCreation implements SnmptrapHandler
 {
@@ -47,10 +46,10 @@ class AdvaObjectCreation implements SnmptrapHandler
     {
         if ($trap_oid = $trap->findOid('CM-SECURITY-MIB::cmSecurityUserName')) {
             $UserName = $trap->getOidData($trap_oid);
-            Log::event("User object $UserName created", $device->device_id, 'trap', 2);
+            $trap->log("User object $UserName created");
         } elseif ($trap_oid = $trap->findOid('F3-LAG-MIB::f3LagName')) {
             $lagID = substr($trap_oid, -1);
-            Log::event("LAG $lagID created", $device->device_id, 'trap', 2);
+            $trap->log("LAG $lagID created");
         }
     }
 }

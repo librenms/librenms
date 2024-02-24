@@ -26,9 +26,9 @@
 namespace LibreNMS\Snmptrap\Handlers;
 
 use App\Models\Device;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
-use Log;
 
 class JnxVpnPwDown implements SnmptrapHandler
 {
@@ -45,6 +45,6 @@ class JnxVpnPwDown implements SnmptrapHandler
         $vpnType = $trap->getOidData($trap->findOid('JUNIPER-VPN-MIB::jnxVpnPwVpnType'));
         $vpnName = $trap->getOidData($trap->findOid('JUNIPER-VPN-MIB::jnxVpnPwVpnName'));
 
-        Log::event("$vpnType on a pseudowire belonging to $vpnName has gone down", $device->device_id, 'trap', 4);
+        $trap->log("$vpnType on a pseudowire belonging to $vpnName has gone down", Severity::Warning);
     }
 }

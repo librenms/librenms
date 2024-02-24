@@ -7,11 +7,7 @@
             <tr>
                 <th data-column-id="device">Device</th>
                 <th data-column-id="mac_address" data-width="150px" data-formatter="tooltip">MAC Address</th>
-<?php
-if (\LibreNMS\Config::get('mac_oui.enabled') === true) {
-    echo '                <th data-column-id="mac_oui" data-sortable="false" data-width="150px" data-visible="false" data-formatter="tooltip">Vendor</th>';
-}
-?>
+                <th data-column-id="mac_oui" data-sortable="false" data-width="150px" data-visible="<?php echo \LibreNMS\Config::get('mac_oui.enabled') ? 'true' : 'false' ?>" data-formatter="tooltip">Vendor</th>
                 <th data-column-id="ipv4_address" data-sortable="false" data-formatter="tooltip">IPv4 Address</th>
                 <th data-column-id="interface">Port</th>
                 <th data-column-id="vlan" data-width="60px">Vlan</th>
@@ -95,6 +91,14 @@ if ($vars['searchby'] == 'description') {
 ?>
 
                 ">Description</option>"+
+                "<option value=\"vendor\" "+
+<?php
+if ($vars['searchby'] == 'vendor') {
+    echo '" selected "+';
+}
+?>
+
+                ">Vendor</option>"+
                 "<option value=\"vlan\" "+
 <?php
 if ($vars['searchby'] == 'vlan') {
@@ -108,7 +112,7 @@ if ($vars['searchby'] == 'vlan') {
                 "<div class=\"form-group\">"+
                 "<input type=\"text\" name=\"searchPhrase\" id=\"address\" value=\""+
 <?php
-echo '"' . $vars['searchPhrase'] . '"+';
+echo '"' . htmlspecialchars($vars['searchPhrase']) . '"+';
 ?>
 
                 "\" class=\"form-control input-sm\" placeholder=\"Value\" />"+
@@ -120,9 +124,9 @@ echo '"' . $vars['searchPhrase'] . '"+';
     post: function ()
     {
         return {
-            device_id: '<?php echo $vars['device_id']; ?>',
-            searchby: '<?php echo $vars['searchby']; ?>',
-            searchPhrase: '<?php echo $vars['searchPhrase']; ?>',
+            device_id: '<?php echo htmlspecialchars($vars['device_id']); ?>',
+            searchby: '<?php echo htmlspecialchars($vars['searchby']); ?>',
+            searchPhrase: '<?php echo htmlspecialchars($vars['searchPhrase']); ?>',
             dns: $("#fdb-search").bootgrid("getColumnSettings").find(col => col.id === "dnsname").visible,
         };
     },

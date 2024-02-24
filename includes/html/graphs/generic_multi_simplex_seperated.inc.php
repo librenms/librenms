@@ -3,19 +3,15 @@
 require 'includes/html/graphs/common.inc.php';
 
 $unitlen = $unitlen ?? 0;
-$descr_len = $descr_len ?? 0;
+$descr_len = $descr_len ?? 12;
 $multiplier = $multiplier ?? false;
-$previous = $_GET['previous'] ?? 'no';
+$previous = $graph_params->visible('previous');
 $stack = $stack ?? '';
 
 $seperatorX = '';
 $thingX = '';
 $plusX = '';
 $plusesX = '';
-
-if (! isset($descr_len)) {
-    $descr_len = 12;
-}
 
 if ($nototal) {
     $descr_len += 2;
@@ -24,7 +20,7 @@ if ($nototal) {
 
 $rrd_options .= " COMMENT:'" . \LibreNMS\Data\Store\Rrd::fixedSafeDescr($unit_text, $descr_len) . "        Now       Min       Max     Avg\l'";
 
-$unitlen = '10';
+$unitlen = 10;
 if ($nototal) {
     $descr_len += 2;
     $unitlen += 2;
@@ -111,7 +107,7 @@ foreach ($rrd_list as $i => $rrd) {
     $rrd_options .= " COMMENT:'\\n'";
 }//end foreach
 
-if ($previous == 'yes') {
+if ($previous) {
     if (is_numeric($multiplier)) {
         $rrd_options .= ' CDEF:X=' . $thingX . $plusesX . ',' . $multiplier . ',*';
     } elseif (is_numeric($divider)) {

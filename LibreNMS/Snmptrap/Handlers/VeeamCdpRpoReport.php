@@ -5,9 +5,8 @@ namespace LibreNMS\Snmptrap\Handlers;
 use App\Models\Device;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
-use Log;
 
-class VeeamCdpRpoReport implements SnmptrapHandler
+class VeeamCdpRpoReport extends VeeamTrap implements SnmptrapHandler
 {
     /**
      * Handle snmptrap.
@@ -22,8 +21,8 @@ class VeeamCdpRpoReport implements SnmptrapHandler
         $policy_name = $trap->getOidData('VEEAM-MIB::cdpPolicyName');
         $vm_name = $trap->getOidData('VEEAM-MIB::vmName');
         $result = $trap->getOidData('VEEAM-MIB::cdpRpoStatus');
-        $color = ['Success' => 1, 'Warning' => 4, 'Failed' => 5];
+        $severity = $this->getResultSeverity($result);
 
-        Log::event('SNMP Trap: CDP policy RPO status change' . $result . ' - ' . $policy_name . ' ' . $vm_name, $device->device_id, 'policy', $color[$result]);
+        $trap->log('SNMP Trap: CDP policy RPO status change' . $result . ' - ' . $policy_name . ' ' . $vm_name, $severity, 'policy');
     }
 }

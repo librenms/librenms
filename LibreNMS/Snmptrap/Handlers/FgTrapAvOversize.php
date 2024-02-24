@@ -31,7 +31,6 @@ namespace LibreNMS\Snmptrap\Handlers;
 use App\Models\Device;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
-use Log;
 
 class FgTrapAvOversize implements SnmptrapHandler
 {
@@ -45,6 +44,6 @@ class FgTrapAvOversize implements SnmptrapHandler
      */
     public function handle(Device $device, Trap $trap)
     {
-        Log::event("$device->hostname received a file that exceeds proxy buffer, skipping AV scan", $device->device_id, 'trap', 2);
+        $trap->log("$device->hostname received a file that exceeds proxy buffer, skipping AV scan");
     }
 }

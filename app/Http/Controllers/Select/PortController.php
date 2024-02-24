@@ -38,6 +38,7 @@ class PortController extends SelectController
     {
         return [
             'device' => 'nullable|int',
+            'devices' => 'nullable|array',
         ];
     }
 
@@ -65,7 +66,7 @@ class PortController extends SelectController
             ->isNotDeleted()
             ->has('device')
             ->with(['device' => function ($query) {
-                $query->select('device_id', 'hostname', 'sysName');
+                $query->select('device_id', 'hostname', 'sysName', 'display');
             }])
             ->select('ports.device_id', 'port_id', 'ifAlias', 'ifName', 'ifDescr')
             ->groupBy(['ports.device_id', 'port_id', 'ifAlias', 'ifName', 'ifDescr']);
@@ -77,6 +78,10 @@ class PortController extends SelectController
 
         if ($device_id = $request->get('device')) {
             $query->where('ports.device_id', $device_id);
+        }
+
+        if ($device_ids = $request->get('devices')) {
+            $query->whereIn('ports.device_id', $device_ids);
         }
 
         return $query;
@@ -91,6 +96,7 @@ class PortController extends SelectController
         return [
             'id' => $port->port_id,
             'text' => $label . ' - ' . $port->device->shortDisplayName() . $description,
+            'device_id' => $port->device_id,
         ];
     }
 }

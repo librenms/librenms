@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\Device;
 use Illuminate\Console\Command;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
@@ -34,7 +35,7 @@ class BashCompletionCommand extends Command
      */
     public function handle()
     {
-        $completions = collect();
+        $completions = new Collection();
         $line = getenv('COMP_LINE');
         $current = getenv('COMP_CURRENT');
         $previous = getenv('COMP_PREVIOUS');
@@ -74,7 +75,7 @@ class BashCompletionCommand extends Command
                 if ($option = $this->optionExpectsValue($current, $previous, $command_def)) {
                     $completions = $this->completeOptionValue($option, $current);
                 } else {
-                    $completions = collect();
+                    $completions = new Collection();
                     if (! Str::startsWith($previous, '-')) {
                         $completions = $this->completeArguments($command_name, $current, end($words));
                     }
@@ -233,7 +234,7 @@ class BashCompletionCommand extends Command
                 });
         }
 
-        return collect();
+        return new Collection();
     }
 
     /**
@@ -259,7 +260,7 @@ class BashCompletionCommand extends Command
             case 'help':
                 return $this->completeCommand($current_word);
             default:
-                return collect();
+                return new Collection();
         }
     }
 }

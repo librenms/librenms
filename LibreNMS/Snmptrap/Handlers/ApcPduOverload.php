@@ -31,9 +31,9 @@
 namespace LibreNMS\Snmptrap\Handlers;
 
 use App\Models\Device;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
-use Log;
 
 class ApcPduOverload implements SnmptrapHandler
 {
@@ -51,6 +51,6 @@ class ApcPduOverload implements SnmptrapHandler
         $pdu_id = ApcTrapUtil::getPduIdentName($trap);
         $phase_num = ApcTrapUtil::getPduPhaseNum($trap);
         $alarm_str = ApcTrapUtil::getApcTrapString($trap);
-        Log::event("$pdu_id phase $phase_num $alarm_str", $device->device_id, 'trap', 5);
+        $trap->log("$pdu_id phase $phase_num $alarm_str", Severity::Error);
     }
 }

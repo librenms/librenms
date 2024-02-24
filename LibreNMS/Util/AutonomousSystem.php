@@ -31,28 +31,20 @@ use LibreNMS\Config;
 
 class AutonomousSystem
 {
-    /** @var int */
-    private $asn;
-
-    public function __construct(int $asn)
-    {
-        $this->asn = $asn;
+    public function __construct(
+        private int $asn
+    ) {
     }
 
-    /**
-     * @param  string|int  $asn
-     */
-    public static function get($asn): self
+    public static function get(int|string $asn): self
     {
-        return new static((int) $asn);
+        return app(AutonomousSystem::class, ['asn' => (int) $asn]);
     }
 
     /**
      * Get the ASN text from Team Cymru.
      * May be overridden in the config with astext.<asn>
      * Caches results for 1 day
-     *
-     * @return string
      */
     public function name(): string
     {

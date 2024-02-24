@@ -8,7 +8,7 @@
                     "sysDescr": "ELTEK Power System",
                     "sysContact": "<private>",
                     "version": "2.8.1",
-                    "hardware": "AM3_RECT_01",
+                    "hardware": "SmartPack2",
                     "features": null,
                     "location": "AM3 [52.21183,4.57424]",
                     "os": "enexus",
@@ -31,7 +31,7 @@
                     "sensor_index": "battery.0",
                     "sensor_type": "enexus",
                     "sensor_descr": "Overal Battery Current",
-                    "group": "Input",
+                    "group": "Battery",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -45,6 +45,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -54,8 +55,8 @@
                     "sensor_oid": ".1.3.6.1.4.1.12148.10.5.2.5.0",
                     "sensor_index": "current.0",
                     "sensor_type": "enexus",
-                    "sensor_descr": "System Output Current",
-                    "group": "Output",
+                    "sensor_descr": "Rectifier Output Current",
+                    "group": "Rectifier",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 72,
@@ -69,6 +70,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -79,7 +81,7 @@
                     "sensor_index": "output.1",
                     "sensor_type": "enexus",
                     "sensor_descr": "FLATPACK2 48/2000 HE 1 Output Current",
-                    "group": "Output",
+                    "group": "Rectifier",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
                     "sensor_current": 12,
@@ -93,6 +95,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -103,7 +106,7 @@
                     "sensor_index": "output.2",
                     "sensor_type": "enexus",
                     "sensor_descr": "FLATPACK2 48/2000 HE 2 Output Current",
-                    "group": "Output",
+                    "group": "Rectifier",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
                     "sensor_current": 11.8,
@@ -117,6 +120,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -127,7 +131,7 @@
                     "sensor_index": "output.3",
                     "sensor_type": "enexus",
                     "sensor_descr": "FLATPACK2 48/2000 HE 3 Output Current",
-                    "group": "Output",
+                    "group": "Rectifier",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
                     "sensor_current": 12,
@@ -141,6 +145,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -151,7 +156,7 @@
                     "sensor_index": "output.4",
                     "sensor_type": "enexus",
                     "sensor_descr": "FLATPACK2 48/2000 HE 4 Output Current",
-                    "group": "Output",
+                    "group": "Rectifier",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
                     "sensor_current": 12,
@@ -165,6 +170,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -175,7 +181,7 @@
                     "sensor_index": "output.5",
                     "sensor_type": "enexus",
                     "sensor_descr": "FLATPACK2 48/2000 HE 5 Output Current",
-                    "group": "Output",
+                    "group": "Rectifier",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
                     "sensor_current": 12.3,
@@ -189,6 +195,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -199,7 +206,7 @@
                     "sensor_index": "output.6",
                     "sensor_type": "enexus",
                     "sensor_descr": "FLATPACK2 48/2000 HE 6 Output Current",
-                    "group": "Output",
+                    "group": "Rectifier",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
                     "sensor_current": 11.9,
@@ -213,6 +220,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -237,6 +245,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -261,6 +270,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "batteryStatus"
                 },
                 {
@@ -285,6 +295,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "loadFusesStatus"
                 },
                 {
@@ -309,6 +320,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "loadFuseStatus"
                 },
                 {
@@ -333,6 +345,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "mainsStatus"
                 },
                 {
@@ -357,6 +370,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "outputStatus"
                 },
                 {
@@ -381,6 +395,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "outputStatus"
                 },
                 {
@@ -405,6 +420,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "outputStatus"
                 },
                 {
@@ -429,6 +445,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "powerSystemStatus"
                 },
                 {
@@ -453,6 +470,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "rectifierStatus"
                 },
                 {
@@ -477,6 +495,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "rectifierStatus"
                 },
                 {
@@ -501,6 +520,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "rectifierStatus"
                 },
                 {
@@ -525,6 +545,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "rectifierStatus"
                 },
                 {
@@ -549,6 +570,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "rectifierStatus"
                 },
                 {
@@ -573,6 +595,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "rectifierStatus"
                 },
                 {
@@ -597,6 +620,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -607,7 +631,7 @@
                     "sensor_index": "battery.0",
                     "sensor_type": "enexus",
                     "sensor_descr": "BatteryVoltage",
-                    "group": null,
+                    "group": "Battery",
                     "sensor_divisor": 100,
                     "sensor_multiplier": 1,
                     "sensor_current": 54.53,
@@ -621,6 +645,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -631,7 +656,7 @@
                     "sensor_index": "input.1",
                     "sensor_type": "enexus",
                     "sensor_descr": "FLATPACK2 48/2000 HE 1 Input Voltage",
-                    "group": null,
+                    "group": "Rectifier",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 228,
@@ -645,6 +670,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -655,7 +681,7 @@
                     "sensor_index": "input.2",
                     "sensor_type": "enexus",
                     "sensor_descr": "FLATPACK2 48/2000 HE 2 Input Voltage",
-                    "group": null,
+                    "group": "Rectifier",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 229,
@@ -669,6 +695,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -679,7 +706,7 @@
                     "sensor_index": "input.3",
                     "sensor_type": "enexus",
                     "sensor_descr": "FLATPACK2 48/2000 HE 3 Input Voltage",
-                    "group": null,
+                    "group": "Rectifier",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 224,
@@ -693,6 +720,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -703,7 +731,7 @@
                     "sensor_index": "input.4",
                     "sensor_type": "enexus",
                     "sensor_descr": "FLATPACK2 48/2000 HE 4 Input Voltage",
-                    "group": null,
+                    "group": "Rectifier",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 226,
@@ -717,6 +745,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -727,7 +756,7 @@
                     "sensor_index": "input.5",
                     "sensor_type": "enexus",
                     "sensor_descr": "FLATPACK2 48/2000 HE 5 Input Voltage",
-                    "group": null,
+                    "group": "Rectifier",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 229,
@@ -741,6 +770,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -751,7 +781,7 @@
                     "sensor_index": "input.6",
                     "sensor_type": "enexus",
                     "sensor_descr": "FLATPACK2 48/2000 HE 6 Input Voltage",
-                    "group": null,
+                    "group": "Rectifier",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 225,
@@ -765,6 +795,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -775,7 +806,7 @@
                     "sensor_index": "mains.1",
                     "sensor_type": "enexus",
                     "sensor_descr": "MainsVolt 1",
-                    "group": null,
+                    "group": "Mains",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 228,
@@ -789,6 +820,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -799,7 +831,7 @@
                     "sensor_index": "mains.2",
                     "sensor_type": "enexus",
                     "sensor_descr": "MainsVolt 2",
-                    "group": null,
+                    "group": "Mains",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 229,
@@ -813,6 +845,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -823,7 +856,7 @@
                     "sensor_index": "mains.3",
                     "sensor_type": "enexus",
                     "sensor_descr": "MainsVolt 3",
-                    "group": null,
+                    "group": "Mains",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 225,
@@ -837,6 +870,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 }
             ],

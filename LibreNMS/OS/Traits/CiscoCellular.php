@@ -61,7 +61,7 @@ trait CiscoCellular
                 'ios',
                 $index,
                 'RSSI: ' . $this->profileApn($index),
-                $entry['c3gCurrentGsmRssi.1']
+                $entry['c3gCurrentGsmRssi']
             );
         }
 
@@ -87,7 +87,7 @@ trait CiscoCellular
                 'ios',
                 $index,
                 'SNR: ' . $this->profileApn($index),
-                $entry['cwceLteCurrSnr.1'],
+                $entry['cwceLteCurrSnr'],
                 1,
                 10
             );
@@ -115,7 +115,7 @@ trait CiscoCellular
                 'ios',
                 $index,
                 'RSRQ: ' . $this->profileApn($index),
-                $entry['cwceLteCurrRsrq.1'],
+                $entry['cwceLteCurrRsrq'],
                 1,
                 10
             );
@@ -143,7 +143,7 @@ trait CiscoCellular
                 'ios',
                 $index,
                 'RSRP: ' . $this->profileApn($index),
-                $entry['cwceLteCurrRsrp.1']
+                $entry['cwceLteCurrRsrp']
             );
         }
 
@@ -169,7 +169,7 @@ trait CiscoCellular
                 'ios',
                 $index,
                 'ChannelRx: ' . $this->profileApn($index),
-                $entry['c3gGsmChannelNumber.1']
+                $entry['c3gGsmChannelNumber']
             );
         }
 
@@ -195,7 +195,7 @@ trait CiscoCellular
                 'ios',
                 $index,
                 'Cell: ' . $this->profileApn($index),
-                $entry['c3gGsmCurrentCellId.1']
+                $entry['c3gGsmCurrentCellId']
             );
         }
 

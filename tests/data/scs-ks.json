@@ -36,7 +36,6 @@
                     "ifSpeed": null,
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
-                    "ifPromiscuousMode": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -46,15 +45,11 @@
                     "ifType": "ethernetCsmacd",
                     "ifAlias": "ETH",
                     "ifPhysAddress": null,
-                    "ifHardType": null,
                     "ifLastChange": 0,
-                    "ifVlan": "",
+                    "ifVlan": null,
                     "ifTrunk": null,
-                    "counter_in": null,
-                    "counter_out": null,
                     "ignore": 0,
                     "disabled": 0,
-                    "detailed": 0,
                     "deleted": 0,
                     "pagpOperationMode": null,
                     "pagpPortState": null,
@@ -141,7 +136,6 @@
                     "ifSpeed": null,
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
-                    "ifPromiscuousMode": null,
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -151,15 +145,11 @@
                     "ifType": "ethernetCsmacd",
                     "ifAlias": "USB",
                     "ifPhysAddress": null,
-                    "ifHardType": null,
                     "ifLastChange": 0,
-                    "ifVlan": "",
+                    "ifVlan": null,
                     "ifTrunk": null,
-                    "counter_in": null,
-                    "counter_out": null,
                     "ignore": 0,
                     "disabled": 0,
-                    "detailed": 0,
                     "deleted": 0,
                     "pagpOperationMode": null,
                     "pagpPortState": null,
@@ -250,25 +240,20 @@
                     "ifSpeed": 100000000,
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
-                    "ifPromiscuousMode": null,
-                    "ifOperStatus": null,
-                    "ifOperStatus_prev": null,
-                    "ifAdminStatus": null,
+                    "ifOperStatus": "up",
+                    "ifOperStatus_prev": "up",
+                    "ifAdminStatus": "up",
                     "ifAdminStatus_prev": null,
                     "ifDuplex": null,
                     "ifMtu": 1500,
                     "ifType": "ethernetCsmacd",
                     "ifAlias": "ETH",
-                    "ifPhysAddress": null,
-                    "ifHardType": null,
-                    "ifLastChange": 0,
-                    "ifVlan": "",
+                    "ifPhysAddress": "000000000001",
+                    "ifLastChange": 120517535,
+                    "ifVlan": null,
                     "ifTrunk": null,
-                    "counter_in": null,
-                    "counter_out": null,
                     "ignore": 0,
                     "disabled": 0,
-                    "detailed": 0,
                     "deleted": 0,
                     "pagpOperationMode": null,
                     "pagpPortState": null,
@@ -280,11 +265,11 @@
                     "pagpEthcOperationMode": null,
                     "pagpDeviceId": null,
                     "pagpGroupIfIndex": null,
-                    "ifInUcastPkts": 0,
+                    "ifInUcastPkts": 85065021,
                     "ifInUcastPkts_prev": 0,
                     "ifInUcastPkts_delta": null,
                     "ifInUcastPkts_rate": null,
-                    "ifOutUcastPkts": 0,
+                    "ifOutUcastPkts": 67907408,
                     "ifOutUcastPkts_prev": 0,
                     "ifOutUcastPkts_delta": null,
                     "ifOutUcastPkts_rate": null,
@@ -296,20 +281,20 @@
                     "ifOutErrors_prev": 0,
                     "ifOutErrors_delta": null,
                     "ifOutErrors_rate": null,
-                    "ifInOctets": 0,
+                    "ifInOctets": 509368580,
                     "ifInOctets_prev": 0,
                     "ifInOctets_delta": null,
                     "ifInOctets_rate": null,
-                    "ifOutOctets": 0,
+                    "ifOutOctets": 2749288297,
                     "ifOutOctets_prev": 0,
                     "ifOutOctets_delta": null,
                     "ifOutOctets_rate": null,
                     "poll_prev": null,
-                    "ifInNUcastPkts": 0,
+                    "ifInNUcastPkts": 349,
                     "ifInNUcastPkts_prev": 0,
                     "ifInNUcastPkts_delta": null,
                     "ifInNUcastPkts_rate": null,
-                    "ifOutNUcastPkts": 0,
+                    "ifOutNUcastPkts": 578617,
                     "ifOutNUcastPkts_prev": 0,
                     "ifOutNUcastPkts_delta": null,
                     "ifOutNUcastPkts_rate": null,
@@ -321,7 +306,7 @@
                     "ifOutDiscards_prev": 0,
                     "ifOutDiscards_delta": null,
                     "ifOutDiscards_rate": null,
-                    "ifInUnknownProtos": 0,
+                    "ifInUnknownProtos": 6877290,
                     "ifInUnknownProtos_prev": 0,
                     "ifInUnknownProtos_delta": null,
                     "ifInUnknownProtos_rate": null,
@@ -355,25 +340,20 @@
                     "ifSpeed": 0,
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
-                    "ifPromiscuousMode": null,
-                    "ifOperStatus": null,
-                    "ifOperStatus_prev": null,
-                    "ifAdminStatus": null,
+                    "ifOperStatus": "down",
+                    "ifOperStatus_prev": "down",
+                    "ifAdminStatus": "up",
                     "ifAdminStatus_prev": null,
                     "ifDuplex": null,
                     "ifMtu": 1500,
                     "ifType": "ethernetCsmacd",
                     "ifAlias": "USB",
-                    "ifPhysAddress": null,
-                    "ifHardType": null,
+                    "ifPhysAddress": "000000000000",
                     "ifLastChange": 0,
-                    "ifVlan": "",
+                    "ifVlan": null,
                     "ifTrunk": null,
-                    "counter_in": null,
-                    "counter_out": null,
                     "ignore": 0,
                     "disabled": 0,
-                    "detailed": 0,
                     "deleted": 0,
                     "pagpOperationMode": null,
                     "pagpPortState": null,
@@ -475,6 +455,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -499,6 +480,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "status-compressor.0"
                 },
                 {
@@ -523,6 +505,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "status-condenser-fan.0"
                 },
                 {
@@ -547,6 +530,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "status-evaporator-fan.0"
                 },
                 {
@@ -571,6 +555,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "status-exhaust-air-sensor.0"
                 },
                 {
@@ -595,6 +580,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "status-filter-monitoring.0"
                 },
                 {
@@ -619,6 +605,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "status-heater-thermal-protection.0"
                 },
                 {
@@ -643,6 +630,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "status-max-exhaust-air-temperature.0"
                 },
                 {
@@ -667,6 +655,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "status-min-exhaust-air-temperature.0"
                 },
                 {
@@ -691,6 +680,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "status-min-supply-air-temperature.0"
                 },
                 {
@@ -715,6 +705,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "status-outside-sensor.0"
                 },
                 {
@@ -739,6 +730,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "status-room-humidity-sensor.0"
                 },
                 {
@@ -763,6 +755,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "status-room-temperature-sensor.0"
                 },
                 {
@@ -787,6 +780,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "status-supply-air-sensor.0"
                 },
                 {
@@ -811,6 +805,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "status-water-sensor.0"
                 },
                 {
@@ -835,6 +830,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 }
             ],
@@ -1159,6 +1155,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1183,6 +1180,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "status-compressor.0"
                 },
                 {
@@ -1207,6 +1205,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "status-condenser-fan.0"
                 },
                 {
@@ -1231,6 +1230,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "status-evaporator-fan.0"
                 },
                 {
@@ -1255,6 +1255,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "status-exhaust-air-sensor.0"
                 },
                 {
@@ -1279,6 +1280,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "status-filter-monitoring.0"
                 },
                 {
@@ -1303,6 +1305,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "status-heater-thermal-protection.0"
                 },
                 {
@@ -1327,6 +1330,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "status-max-exhaust-air-temperature.0"
                 },
                 {
@@ -1351,6 +1355,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "status-min-exhaust-air-temperature.0"
                 },
                 {
@@ -1375,6 +1380,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "status-min-supply-air-temperature.0"
                 },
                 {
@@ -1399,6 +1405,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "status-outside-sensor.0"
                 },
                 {
@@ -1423,6 +1430,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "status-room-humidity-sensor.0"
                 },
                 {
@@ -1447,6 +1455,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "status-room-temperature-sensor.0"
                 },
                 {
@@ -1471,6 +1480,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "status-supply-air-sensor.0"
                 },
                 {
@@ -1495,6 +1505,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "status-water-sensor.0"
                 },
                 {
@@ -1519,6 +1530,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 21.2,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 }
             ],

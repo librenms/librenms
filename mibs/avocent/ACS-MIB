@@ -1,0 +1,2572 @@
+--------------------------------------------------------------------------------
+--  Avocent ACS MIB
+--  Copyright 2009 Avocent Corporation
+--  Revision: 2.0.1
+--  Last Modified: October 10, 2010
+--------------------------------------------------------------------------------
+
+ACS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+   Gauge,TimeTicks,IpAddress,Counter,NetworkAddress
+      FROM RFC1155-SMI
+  PhysAddress
+      FROM RFC1213-MIB
+  enterprises, MODULE-IDENTITY
+      FROM SNMPv2-SMI 
+  OBJECT-TYPE, MODULE-IDENTITY, OBJECT-IDENTITY, Integer32
+      FROM SNMPv2-SMI
+  DisplayString
+      FROM SNMPv2-TC
+  InterfaceIndex, InterfaceIndexOrZero
+        FROM IF-MIB
+   TRAP-TYPE
+      FROM RFC-1215;
+
+--------------------------------------------------------------------------------
+-- Object Groupings
+--------------------------------------------------------------------------------
+
+--@ Note: every product type should be uniquely identified underneath the
+--@ acsProducts object group. Each product should report its unique acsProducts
+--@ OBJECT IDENTIFIER in mib-2.system.sysObjectID. Please see the file
+--@ "_Avocent Enterprise Object Identifier Assignment.txt" for a list of the
+--@ IDs that have been assigned.
+
+-- enterprises  .1.3.6.1.4.1
+
+-- avocent         OBJECT IDENTIFIER ::= { enterprises 10418 }
+
+acs     MODULE-IDENTITY
+        LAST-UPDATED    "201010100000Z"
+        ORGANIZATION    "Avocent Corporation"
+        CONTACT-INFO    "postal : Avocent Corporation
+                                  47281 Bayside Parkway
+                                  Fremont, CA 94538, USA
+                         e-mail : Technical Support
+                                  techsupport@avocent.com"
+        DESCRIPTION        
+        "This module defines the Avocent MIB extensions to 
+         ACS60xx products."
+	REVISION	"201010100000Z"
+	DESCRIPTION	"Add products acs6004 and acs6008"
+        REVISION        "200912110000Z"
+        DESCRIPTION     "Extended acsPowerMgmt to support data monitoring 
+                         and Avocent PM-PDUs"
+        REVISION        "200709170000Z"
+        DESCRIPTION     "First Draft"
+::= { enterprises 10418 16 }
+
+acsProducts     OBJECT IDENTIFIER ::= { acs 1 }
+acsManagement   OBJECT IDENTIFIER ::= { acs 2 }
+--
+acs6016         OBJECT IDENTIFIER ::= { acsProducts 1 }    -- 10418.16.1.1
+acs6032         OBJECT IDENTIFIER ::= { acsProducts 2 }    -- 10418.16.1.2
+acs6048         OBJECT IDENTIFIER ::= { acsProducts 3 }    -- 10418.16.1.3
+acs6004         OBJECT IDENTIFIER ::= { acsProducts 4 }    -- 10418.16.1.4
+acs6008         OBJECT IDENTIFIER ::= { acsProducts 5 }    -- 10418.16.1.5
+
+acsAppliance    OBJECT IDENTIFIER ::= { acsManagement 1  }  -- 10418.16.2.1
+acsSessions     OBJECT IDENTIFIER ::= { acsManagement 2  }  -- 10418.16.2.2
+acsSerialPort   OBJECT IDENTIFIER ::= { acsManagement 3  }  -- 10418.16.2.3
+acsPowerMgmt    OBJECT IDENTIFIER ::= { acsManagement 5  }  -- 10418.16.2.5
+
+-- objects under acsPowerMgmt
+-- acsPowerMgmtNumSerialPorts 	::=  { acsPowerMgmt 1 } 
+-- acsPowerMgmtSerialTable    	::=  { acsPowerMgmt 2 }
+-- acsPowerMgmtPDUTable	      	::=  { acsPowerMgmt 3 }
+-- acsPowerMgmtTotalNumberOfOutlets ::= { acsPowerMgmt 4 }
+-- acsPowerMgmtOutletsTable   	::= { acsPowerMgmt 5 }
+-- acsPowerMgmtNumberOfOutletGroup ::= { acsPowerMgmt 6 }
+-- acsPowerMgmtGroupTable     	::= { acsPowerMgmt 7 }
+-- acsPowerMgmtPhasesTable    	::= { acsPowerMgmt 8 } 
+-- acsPowerMgmtBanksTable     	::= { acsPowerMgmt 9 } 
+-- acsPowerMgmtEnvMonTable    	::= { acsPowerMgmt 10 } 
+-- acsPowerMgmtOutElecMonTable 	::= { acsPowerMgmt 11 }
+
+
+--
+-- Note that traps are defined in a separate trap MIB 
+--
+acsTrapObject   OBJECT IDENTIFIER ::= { acsManagement 6 }  -- 10418.16.2.6
+
+--
+-- Type Definitions
+--
+
+--
+-- Each enumeration represents the states of the appliance power supplies.
+PowerSupplyState ::= INTEGER
+{        
+        statePowerOn(1),
+        statePowerOff(2),
+        powerNotInstaled(9999)
+}
+
+--
+-- Each enumeration represents the speed of the serial port.
+SerialPortSpeed ::= INTEGER
+{
+        speed300bps(300),
+        speed600bps(600),
+        speed1200bps(1200),
+        speed2400bps(2400),
+        speed4800bps(4800),
+        speed9600bps(9600),
+        speed19200bps(19200),
+        speed38400bps(38400),
+        speed57600bps(57600),
+        speed115200bps(115200),
+        speed230400bps(230400),
+        speed460800bps(460800)
+}
+
+--
+-- Each enumeration represents the state of the RS-232C signal.        
+SerialPortSignalState ::=INTEGER
+{
+        up(1),
+        down(2)
+}
+
+--
+-- Each enumeration represents the RJ-45 pin-out
+SerialPortPinOut ::=INTEGER
+{
+        cyclades(1),
+        cisco(2)
+} 
+
+--
+-- acsAppliance 
+-- OBJECT IDENTIFIER ::= { acsManagement 1  }  10418.16.2.1
+--
+acsHostName OBJECT-TYPE
+        SYNTAX             DisplayString ( SIZE (0..32) )
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "The appliance name"
+::= { acsAppliance 1 }
+
+acsProductModel OBJECT-TYPE
+        SYNTAX             DisplayString ( SIZE (0..50) )
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "The appliance product model"
+::= { acsAppliance 2 }
+
+acsPartNumber OBJECT-TYPE
+        SYNTAX             DisplayString ( SIZE (0..32) )
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "The part number of this appliance as shown on the label
+         attached or imprinted on the appliance."
+::= { acsAppliance 3 }
+
+acsSerialNumber OBJECT-TYPE
+        SYNTAX             DisplayString ( SIZE (0..32) )
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "The serial number of this appliance as shown on the label
+         attached or imprinted on the appliance."
+::= { acsAppliance 4 }
+
+acsEIDNumber OBJECT-TYPE
+        SYNTAX             DisplayString ( SIZE (0..32) )
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "The electronic ID number (EID) of this appliance as shown on the label
+         attached or imprinted on the appliance."
+::= { acsAppliance 5 }
+
+acsBootcodeVersion OBJECT-TYPE
+        SYNTAX             DisplayString ( SIZE (0..32) )
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION 
+        "The version of the bootcode of this appliance."
+::= { acsAppliance 6 }
+
+acsFirmwareVersion OBJECT-TYPE
+        SYNTAX             DisplayString ( SIZE (0..32) )
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION 
+        "The version of the firmware of this appliance."
+::= { acsAppliance 7 }
+
+acsPowerSupply OBJECT-IDENTITY
+        STATUS             current
+        DESCRIPTION 
+        "It gives information about Power Supply of this appliance"
+::= { acsAppliance 8 }
+
+acsPowerSupplyNumber OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION 
+        "Number of the power supplies of this appliance"
+::= { acsPowerSupply 1 }
+
+acsPowerSupplyStatePw1 OBJECT-TYPE
+        SYNTAX             PowerSupplyState
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION 
+        "State of the first power supply"
+::= { acsPowerSupply 2 }
+
+acsPowerSupplyStatePw2 OBJECT-TYPE
+        SYNTAX             PowerSupplyState
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION 
+        "State of the second power supply"
+::= { acsPowerSupply 3 }
+
+acsReboot OBJECT-TYPE
+        SYNTAX INTEGER {
+                noAction(1),
+                reboot(2)
+             }
+        MAX-ACCESS         read-write
+        STATUS             current
+        DESCRIPTION 
+        "A set value of reboot(2) will reboot the appliance.
+         noAction(1) = always returned in a GET. Does nothing if SET.        
+         reboot(2)   = when SET the appliance immediately reboots."
+::= { acsAppliance 9 }
+
+--
+-- acsSessions      
+-- OBJECT IDENTIFIER ::= { acsManagement 2  }   10418.16.2.2
+--
+acsActiveSessionsNumberOfSession OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "Number of active sessions."
+::= { acsSessions 1 }
+
+acsActiveSessionsTable OBJECT-TYPE
+        SYNTAX             SEQUENCE OF AcsActiveSessionsTableEntry
+        MAX-ACCESS         not-accessible
+        STATUS             current
+        DESCRIPTION
+        "This table contains the list of active sessions."
+::= { acsSessions 2 }
+ 
+acsActiveSessionsTableEntry        OBJECT-TYPE
+        SYNTAX            AcsActiveSessionsTableEntry
+        MAX-ACCESS        not-accessible
+        STATUS            current
+        DESCRIPTION                
+        "each entry has the information about the active session"
+        INDEX        { acsActiveSessionsTableIndex }
+::= { acsActiveSessionsTable 1 }
+
+AcsActiveSessionsTableEntry ::= SEQUENCE  {
+        acsActiveSessionsTableIndex        InterfaceIndexOrZero,     
+        acsActiveSessionsTableUser         DisplayString, -- user name
+	  acsActiveSessionsTableGroup        DisplayString, -- group name
+        acsActiveSessionsTableType		 DisplayString, -- RO/RW-ssh,telnet or web 
+        acsActiveSessionsTableConnection   DisplayString, -- type + target name
+        acsActiveSessionsTableSessionTime  DisplayString, -- time of session
+        acsActiveSessionsTableFrom         DisplayString, -- source of the session
+        acsActiveSessionsTableKill         INTEGER
+}
+
+acsActiveSessionsTableIndex OBJECT-TYPE
+        SYNTAX             InterfaceIndexOrZero
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "A unique index representing an entry in this table."
+::= { acsActiveSessionsTableEntry 1 }
+
+acsActiveSessionsTableUser OBJECT-TYPE
+        SYNTAX             DisplayString ( SIZE (0..32) )
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION 
+        "The name of the user that opens this session."
+::= { acsActiveSessionsTableEntry 2 }
+
+acsActiveSessionsTableGroup OBJECT-TYPE
+        SYNTAX             DisplayString ( SIZE (0..32) )
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION 
+        "The name of the group that the user belongs to."
+::= { acsActiveSessionsTableEntry 3 }
+
+acsActiveSessionsTableType OBJECT-TYPE
+        SYNTAX             DisplayString ( SIZE (0..32) )
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION 
+        "The session type."
+::= { acsActiveSessionsTableEntry 4 }
+
+acsActiveSessionsTableConnection OBJECT-TYPE
+        SYNTAX             DisplayString ( SIZE (0..32) )
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION 
+        "Connection type."
+::= { acsActiveSessionsTableEntry 5 }
+
+acsActiveSessionsTableSessionTime OBJECT-TYPE
+        SYNTAX             DisplayString ( SIZE (0..32) )
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION 
+        "Time of the session"
+::= { acsActiveSessionsTableEntry 6 }
+
+acsActiveSessionsTableFrom OBJECT-TYPE
+        SYNTAX             DisplayString ( SIZE (0..32) )
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION 
+        "The source IP address of the session."
+::= { acsActiveSessionsTableEntry 7 }
+
+acsActiveSessionsTableKill OBJECT-TYPE
+        SYNTAX INTEGER {
+                noAction(1),
+                killSession(2)
+             }
+        MAX-ACCESS     read-write
+        STATUS         current
+        DESCRIPTION 
+        "A set value of killSession(2) will kill the session.
+          noAction(1)   = always returned in a GET. Does nothing if SET.
+         killSession(2)= when SET the appliance immediately kills the session."
+::= { acsActiveSessionsTableEntry 8 }
+
+--
+-- acsSerialPort     
+-- OBJECT IDENTIFIER ::= { acsManagement 3  }   10418.16.2.3
+--
+
+acsSerialPortNumberOfPorts OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "Number of Serial Ports (physical serial port plus Aux Port."
+::= { acsSerialPort 1 }
+
+acsSerialPortTable OBJECT-TYPE
+        SYNTAX             SEQUENCE OF AcsSerialPortTableEntry
+        MAX-ACCESS         not-accessible
+        STATUS             current
+        DESCRIPTION
+        "This table contains information about serial ports."
+::= { acsSerialPort 2 }
+ 
+acsSerialPortTableEntry        OBJECT-TYPE
+        SYNTAX            AcsSerialPortTableEntry
+        MAX-ACCESS        not-accessible
+        STATUS            current
+        DESCRIPTION                
+        "each entry has the information about specific serial port."
+        INDEX            { acsSerialPortTableNumber }
+::= { acsSerialPortTable 1 }
+
+AcsSerialPortTableEntry ::= SEQUENCE  {
+        acsSerialPortTableNumber          Integer32,    -- serial port number
+        acsSerialPortTableDeviceName      DisplayString, -- associated device name
+        acsSerialPortTableStatus          INTEGER,      -- status of serial port
+        acsSerialPortTableName            DisplayString, -- associated name
+        acsSerialPortTableProfile         INTEGER,      -- configured profile
+        acsSerialPortTablePinOut          SerialPortPinOut,      -- configure RJ45 pin-out
+        acsSerialPortTableComSpeed        SerialPortSpeed,      -- configured speed
+        acsSerialPortTableComParity       INTEGER,      -- configured parity
+        acsSerialPortTableComDataSize     Integer32,    -- configured data size
+        acsSerialPortTableComStopBits     Integer32,      -- configured stop bits
+        acsSerialPortTableComFlowControl  INTEGER,      -- configured flow control
+        acsSerialPortTableSignalStateDTR  SerialPortSignalState,      -- state of DTR RS-232C signal
+        acsSerialPortTableSignalStateDCD  SerialPortSignalState,      -- state of DCD RS-232C signal
+        acsSerialPortTableSignalStateRTS  SerialPortSignalState,      -- state of RTS RS-232C signal
+        acsSerialPortTableSignalStateCTS  SerialPortSignalState,      -- state of CTS RS-232C signal
+        acsSerialPortTableTxBytes         Integer32,    -- number of transmitted bytes
+        acsSerialPortTableRxBytes         Integer32,    -- number of received bytes
+        acsSerialPortTableFrameError      Integer32,    -- number of detected frame errors
+        acsSerialPortTableParityError     Integer32,    -- number of detected parity errors
+        acsSerialPortTableBreak           Integer32,    -- number of detected break
+        acsSerialPortTableOverrun         Integer32    -- number of detected overrun errors
+}
+
+acsSerialPortTableNumber OBJECT-TYPE
+        SYNTAX             Integer32 (1..49)
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "A unique index representing an entry in this table.
+         It is the number of the serial port. For AUX port,
+         the number will be the number of physical serial ports plus 1."
+::= { acsSerialPortTableEntry 1 }
+
+acsSerialPortTableDeviceName OBJECT-TYPE
+        SYNTAX            DisplayString (SIZE (0..25))
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION        
+        "The associated device name for the serial port."
+::= { acsSerialPortTableEntry 2 }        
+
+acsSerialPortTableStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+                        disabled(1),
+                        idle(2),
+                        inUse(3)
+             }
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION 
+        "The status of the serial port:
+         disabled(1) = it was configured as disable.        
+         idle(2)     = there is not any session opened in this port.
+         inUse(3)    = there is session(s) opened in this port."
+::= { acsSerialPortTableEntry 3 }
+
+acsSerialPortTableName    OBJECT-TYPE
+        SYNTAX            DisplayString (SIZE (0..25))
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION        
+        "Name associated with this serial port."
+::= { acsSerialPortTableEntry 4 }        
+
+acsSerialPortTableProfile    OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        casProfile(1),
+                        tsProfile(2),
+                        dialInProfile(3),
+                        powerProfile(4)
+                  }
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION        
+        "Configured profile for this serial port."
+::= { acsSerialPortTableEntry 5 }
+
+acsSerialPortTablePinOut    OBJECT-TYPE
+        SYNTAX            SerialPortPinOut
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION    
+        "RJ45 Pin-out configured for this serial port."
+::= { acsSerialPortTableEntry 6 }
+
+acsSerialPortTableComSpeed OBJECT-TYPE
+        SYNTAX            SerialPortSpeed
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION        
+        "Speed configured for this serial port."
+::= { acsSerialPortTableEntry 7 }
+
+acsSerialPortTableComParity    OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        none(1),
+                        odd(2),
+                        even(3)
+                  }
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION        
+        "Parity configured for this serial port."
+::= { acsSerialPortTableEntry 8 }
+
+acsSerialPortTableComDataSize    OBJECT-TYPE
+        SYNTAX            Integer32 
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION        
+        "Data Size configured for this serial port."
+::= { acsSerialPortTableEntry 9 }
+
+acsSerialPortTableComStopBits    OBJECT-TYPE
+        SYNTAX            Integer32
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION        
+        "Number of Stop Bits configured for this serial port."
+::= { acsSerialPortTableEntry 10 }
+
+acsSerialPortTableComFlowControl        OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        none(1),
+                        hardware(2),
+                        software(3)
+                  }
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION        
+        "Flow Control configured for this serial port."
+::= { acsSerialPortTableEntry 11 }
+
+acsSerialPortTableSignalStateDTR        OBJECT-TYPE
+        SYNTAX            SerialPortSignalState
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION        
+        "State of the DTR RS-232C signal."
+::= { acsSerialPortTableEntry 12 }
+
+acsSerialPortTableSignalStateDCD        OBJECT-TYPE
+        SYNTAX            SerialPortSignalState
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION        
+        "State of the DCD RS-232C signal."
+::= { acsSerialPortTableEntry 13 }
+
+acsSerialPortTableSignalStateRTS        OBJECT-TYPE
+        SYNTAX            SerialPortSignalState
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION        
+        "State of the RTS RS-232C signal."
+::= { acsSerialPortTableEntry 14 }
+
+acsSerialPortTableSignalStateCTS        OBJECT-TYPE
+        SYNTAX            SerialPortSignalState
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION        
+        "State of the CTS RS-232C signal."
+::= { acsSerialPortTableEntry 15 }
+
+acsSerialPortTableTxBytes        OBJECT-TYPE
+        SYNTAX            Integer32 
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION        
+        "The number of transmited bytes by the serial port."
+::= { acsSerialPortTableEntry 16 }
+
+acsSerialPortTableRxBytes        OBJECT-TYPE
+        SYNTAX            Integer32 
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION        
+        "The number of received bytes by the serial port."
+::= { acsSerialPortTableEntry 17 }
+
+acsSerialPortTableFrameError        OBJECT-TYPE
+        SYNTAX            Integer32 
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION        
+        "The number of frame error detected in the serial port."
+::= { acsSerialPortTableEntry 18 }
+
+acsSerialPortTableParityError        OBJECT-TYPE
+        SYNTAX            Integer32 
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION        
+        "The number of parity error detected in the serial port."
+::= { acsSerialPortTableEntry 19 }
+
+acsSerialPortTableBreak        OBJECT-TYPE
+        SYNTAX            Integer32 
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION        
+        "The number of break detected in the serial port."
+::= { acsSerialPortTableEntry 20 }
+
+acsSerialPortTableOverrun        OBJECT-TYPE
+        SYNTAX            Integer32 
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION        
+        "The number of overrun error detected in the serial port."
+::= { acsSerialPortTableEntry 21 }
+
+--
+-- acsPowerMgmt     
+-- OBJECT IDENTIFIER ::= { acsManagement 5  }   10418.16.2.5
+--
+acsPowerMgmtNumSerialPorts OBJECT-TYPE
+	  SYNTAX		Integer32
+	  MAX-ACCESS	read-only
+	  STATUS		current
+	  DESCRIPTION	
+        "The number of Serial Ports that has PDU connected on the appliance."
+::= { acsPowerMgmt 1 }
+
+acsPowerMgmtSerialTable OBJECT-TYPE
+	  SYNTAX		SEQUENCE OF AcsPowerMgmtSerialTableEntry
+	  MAX-ACCESS	not-accessible
+	  STATUS		current
+	  DESCRIPTION	
+        "Information about each serial port thas has PDU connect."
+::= { acsPowerMgmt 2 }
+
+acsPowerMgmtSerialTableEntry	OBJECT-TYPE
+        SYNTAX          AcsPowerMgmtSerialTableEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION	
+        "Information about each serial port thas has PDU connect."
+        INDEX           { acsPowerMgmtSerialTableIndex }
+::= { acsPowerMgmtSerialTable 1 }
+
+AcsPowerMgmtSerialTableEntry ::= SEQUENCE  {
+        acsPowerMgmtSerialTableIndex          InterfaceIndex,   
+        acsPowerMgmtSerialTablePortNumber     Integer32,
+        acsPowerMgmtSerialTableDeviceName     DisplayString,     
+        acsPowerMgmtSerialTableNumberPDUs     Integer32
+}
+
+acsPowerMgmtSerialTableIndex	OBJECT-TYPE
+        SYNTAX         InterfaceIndex	
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION
+        "The index of the register."
+::= { acsPowerMgmtSerialTableEntry 1 }
+
+acsPowerMgmtSerialTablePortNumber	OBJECT-TYPE
+        SYNTAX         Integer32	
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION
+        "The number of the serial port when the PDU is connected."
+::= { acsPowerMgmtSerialTableEntry 2 }
+
+acsPowerMgmtSerialTableDeviceName  OBJECT-TYPE
+        SYNTAX             DisplayString
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "The device name of this serial port."
+::= { acsPowerMgmtSerialTableEntry 3 }
+
+acsPowerMgmtSerialTableNumberPDUs		OBJECT-TYPE
+	  SYNTAX          Integer32	
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+        "Total number of units connected in this serial port."
+::= { acsPowerMgmtSerialTableEntry 4 }
+	
+acsPowerMgmtPDUTable OBJECT-TYPE
+        SYNTAX             SEQUENCE OF AcsPowerMgmtPDUTableEntry
+        MAX-ACCESS         not-accessible
+        STATUS             current
+        DESCRIPTION
+        "This table contains the list of detected PDUs."
+::= { acsPowerMgmt 3 }
+ 
+acsPowerMgmtPDUTableEntry        OBJECT-TYPE
+        SYNTAX            AcsPowerMgmtPDUTableEntry
+        MAX-ACCESS        not-accessible
+        STATUS            current
+        DESCRIPTION                
+        "each entry has the information about the PDU."
+        INDEX                { acsPowerMgmtPDUTablePortNumber, acsPowerMgmtPDUTablePduIndex }
+::= { acsPowerMgmtPDUTable 1 }
+
+AcsPowerMgmtPDUTableEntry ::= SEQUENCE  {
+        acsPowerMgmtPDUTablePortNumber        InterfaceIndex,  -- number of serial port
+        acsPowerMgmtPDUTablePduIndex          InterfaceIndexOrZero,     
+        acsPowerMgmtPDUTablePduId             DisplayString,   -- PDU identification
+	acsPowerMgmtPDUTablePortName          DisplayString,   -- Serial Port Name
+        acsPowerMgmtPDUTableModel             DisplayString,   -- PDU model
+        acsPowerMgmtPDUTableVendor            DisplayString,   -- Vendor
+        acsPowerMgmtPDUTableFirmwareVersion   DisplayString,   -- Firmware Version
+        acsPowerMgmtPDUTableNumberOfOutlets   Integer32, 
+        acsPowerMgmtPDUTableCurrentNOS        Integer32,        -- OBSOLETED number of current sensors
+        acsPowerMgmtPDUTableCurrent1Value     Integer32,        -- OBSOLETED actual value for current of the sensor 1
+        acsPowerMgmtPDUTableCurrent1Max       Integer32,        -- OBSOLETED max value for current of the sensor 1
+        acsPowerMgmtPDUTableCurrent2Value     Integer32,        -- OBSOLETED actual value for current of the sensor 2
+        acsPowerMgmtPDUTableCurrent2Max       Integer32,        -- OBSOLETED max value for current of the sensor 2
+        acsPowerMgmtPDUTableCurrent3Value     Integer32,        -- OBSOLETED actual value for current of the sensor 3
+        acsPowerMgmtPDUTableCurrent3Max       Integer32,        -- OBSOLETED max value for current of the sensor 3
+        acsPowerMgmtPDUTableTemperatureNOS    Integer32,        -- OBSOLETED number of temperature  sensors
+        acsPowerMgmtPDUTableTemperature1Value Integer32,        -- OBSOLETED actual value for Temperature 1
+        acsPowerMgmtPDUTableTemperature1Max   Integer32,        -- OBSOLETED max value for Temperature 1
+        acsPowerMgmtPDUTableTemperature2Value Integer32,        -- OBSOLETED actual value for Temperaturet 2
+        acsPowerMgmtPDUTableTemperature2Max   Integer32,        -- OBSOLETED max value for Temperature 2
+        acsPowerMgmtPDUTableTemperature3Value Integer32,        -- OBSOLETED actual value for Temperature 3
+        acsPowerMgmtPDUTableTemperature3Max   Integer32,        -- OBSOLETED max value for Temperature 3
+        acsPowerMgmtPDUTableHumidityNOS       Integer32,        -- OBSOLETED humidity number of humidity sensors
+        acsPowerMgmtPDUTableHumidity1Value    Integer32,        -- OBSOLETED actual value for Humidity of the sensor 1
+        acsPowerMgmtPDUTableHumidity1Max      Integer32,        -- OBSOLETED max value for Humidityof the sensor 1
+        acsPowerMgmtPDUTableHumidity2Value    Integer32,        -- OBSOLETED actual value for Humidity of the sensor 2
+        acsPowerMgmtPDUTableHumidity2Max      Integer32,        -- OBSOLETED max value for Humidity of the sensor 2
+        acsPowerMgmtPDUTableHumidity3Value    Integer32,        -- OBSOLETED actual value for Humidity of the sensor 3
+        acsPowerMgmtPDUTableHumidity3Max      Integer32,        -- OBSOLETED max value for Humidity of the sensor 3
+        acsPowerMgmtPDUTableVoltageNOS        Integer32,        -- OBSOLETED number of voltage sensor
+        acsPowerMgmtPDUTableVoltage1Value     Integer32,        -- OBSOLETED actual value for Voltage of the sensor 1
+        acsPowerMgmtPDUTableVoltage1Max       Integer32,        -- OBSOLETED max value for Voltage of the sensor 1
+        acsPowerMgmtPDUTableVoltage2Value     Integer32,        -- OBSOLETED actual value for Voltage of the sensor 2
+        acsPowerMgmtPDUTableVoltage2Max       Integer32,        -- OBSOLETED max value for Voltaget of the sensor 2
+        acsPowerMgmtPDUTableVoltage3Value     Integer32,        -- OBSOLETED actual value for Voltage of the sensor 3
+        acsPowerMgmtPDUTableVoltage3Max       Integer32,        -- OBSOLETED max value for Voltage of the sensor 3
+	acsPowerMgmtPDUTableNumberOfPhases    Integer32,	-- number of phases (single or 3-phases)
+	acsPowerMgmtPDUTableNumberOfBanks     Integer32,	-- number of banks
+	acsPowerMgmtPDUTableCurrentValue      Integer32,	-- actual value of PDU current sensor 
+	acsPowerMgmtPDUTableCurrentMax	      Integer32,	-- max detected value of current sensor
+	acsPowerMgmtPDUTableCurrentMin	      Integer32,	-- min detected value of current sensor
+	acsPowerMgmtPDUTableCurrentAvg	      Integer32,	-- average value for current sensor
+	acsPowerMgmtPDUTableCurrentReset      INTEGER,		-- reset max, min and avg values
+	acsPowerMgmtPDUTableVoltageType	      INTEGER,		-- type of PDU voltage 
+	acsPowerMgmtPDUTableVoltageValue      Integer32,	-- actual value of PDU voltage
+	acsPowerMgmtPDUTableVoltageMax 	      Integer32,	-- max value of voltage sensor
+	acsPowerMgmtPDUTableVoltageMin	      Integer32,	-- min value of voltage sensor
+	acsPowerMgmtPDUTableVoltageAvg	      Integer32,		-- avg value of voltage sensor
+	acsPowerMgmtPDUTableVoltageReset      INTEGER,		-- reset max, min and avg values
+	acsPowerMgmtPDUTablePowerType	      INTEGER,		-- type of PDU power consumption
+	acsPowerMgmtPDUTablePowerValue	      Integer32,	-- actual value of PDU power consumption
+	acsPowerMgmtPDUTablePowerMax	      Integer32,	-- max value
+	acsPowerMgmtPDUTablePowerMin	      Integer32,	-- min value
+	acsPowerMgmtPDUTablePowerAvg	      Integer32,	-- average value
+	acsPowerMgmtPDUTablePowerReset	      INTEGER,		-- reset max, min and avg values
+	acsPowerMgmtPDUTablePowerFactorType   INTEGER,		-- type of PDU power factor
+	acsPowerMgmtPDUTablePowerFactorValue  Integer32,	-- actual value of PDU power factor
+	acsPowerMgmtPDUTablePowerFactorMax    Integer32,	-- max value for power factor
+	acsPowerMgmtPDUTablePowerFactorMin    Integer32,	-- min value for power factor
+	acsPowerMgmtPDUTablePowerFactorAvg    Integer32,	-- avg value for power factor
+	acsPowerMgmtPDUTablePowerFactorReset  INTEGER,		-- reset max, min and avg values
+	acsPowerMgmtPDUTableAlarm 	      INTEGER,		-- status of PDU alarm
+	acsPowerMgmtPDUTableEnvSensors	      Integer32		-- number of environmental sensors	
+}
+
+acsPowerMgmtPDUTablePortNumber OBJECT-TYPE
+        SYNTAX            InterfaceIndex
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION
+        "Number of serial port when the PDU is connected."
+::= { acsPowerMgmtPDUTableEntry 1 }
+
+acsPowerMgmtPDUTablePduIndex OBJECT-TYPE
+        SYNTAX            InterfaceIndexOrZero
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION
+        "A PDU position in the chain."
+::= { acsPowerMgmtPDUTableEntry 2 }
+
+acsPowerMgmtPDUTablePduId  OBJECT-TYPE
+        SYNTAX             DisplayString
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "PDU identification."
+::= { acsPowerMgmtPDUTableEntry 3 }
+
+acsPowerMgmtPDUTablePortName OBJECT-TYPE
+        SYNTAX             DisplayString
+
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "Name of serial port when the PDU is connected."
+::= { acsPowerMgmtPDUTableEntry 4 }
+
+acsPowerMgmtPDUTableModel  OBJECT-TYPE
+        SYNTAX             DisplayString
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "Model of the PDU."
+::= { acsPowerMgmtPDUTableEntry 5 }
+
+acsPowerMgmtPDUTableVendor   OBJECT-TYPE
+        SYNTAX             DisplayString
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "Vendor of the PDU."
+::= { acsPowerMgmtPDUTableEntry 6 }
+
+acsPowerMgmtPDUTableFirmwareVersion        OBJECT-TYPE
+        SYNTAX             DisplayString
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "Version of the PDU firmware."
+::= { acsPowerMgmtPDUTableEntry 7 }
+
+acsPowerMgmtPDUTableNumberOfOutlets OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "Number of outlets of the PDU."
+::= { acsPowerMgmtPDUTableEntry 8 }
+
+acsPowerMgmtPDUTableCurrentNOS OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-only
+        STATUS             obsolete
+        DESCRIPTION
+        "Number of current sensors in the PDU."
+::= { acsPowerMgmtPDUTableEntry 9 }
+
+acsPowerMgmtPDUTableCurrent1Value OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-only
+        STATUS             obsolete
+        DESCRIPTION
+        "Current of the sensor 1 in this PDU unit in AMP.
+         The value of this object is the actual current in 
+         AMP * 10. You need to translate the readed value
+         (Ex. : value is 5, the current is 0.5 AMP.)" 
+::= { acsPowerMgmtPDUTableEntry 10 }
+
+acsPowerMgmtPDUTableCurrent1Max OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-write
+        STATUS             obsolete
+        DESCRIPTION
+        "Maximum current of the sensor 1 in this PDU unit in AMP.
+         When the PDU does not have support for maximum value,
+         the value will be 0.
+         The value of this object is the actual current in 
+         AMP * 10. You need to translate the readed value
+         (Ex. : value is 5, the current is 0.5 AMP.)
+         Clear this value, set it with Zero value." 
+::= { acsPowerMgmtPDUTableEntry 11 }
+
+acsPowerMgmtPDUTableCurrent2Value OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-only
+        STATUS             obsolete
+        DESCRIPTION
+        "Current of the sensor 2 in this PDU unit in AMP.
+         The value of this object is the actual current in 
+         AMP * 10. You need to translate the readed value
+         (Ex. : value is 5, the current is 0.5 AMP.)" 
+::= { acsPowerMgmtPDUTableEntry 12 }
+
+acsPowerMgmtPDUTableCurrent2Max OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-write
+        STATUS             obsolete
+        DESCRIPTION
+        "Maximum current of the sensor 2 in this PDU unit in AMP.
+          When the PDU does not have support for maximum value,
+         the value will be 0.
+         The value of this object is the actual current in 
+         AMP * 10. You need to translate the readed value
+         (Ex. : value is 5, the current is 0.5 AMP.)
+         Clear this value, set it with Zero value." 
+::= { acsPowerMgmtPDUTableEntry 13}
+
+acsPowerMgmtPDUTableCurrent3Value OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-only
+        STATUS             obsolete
+        DESCRIPTION
+        "Current of the sensor 3 in this PDU unit in AMP.
+         The value of this object is the actual current in 
+         AMP * 10. You need to translate the readed value
+        (Ex. : value is 5, the current is 0.5 AMP.)" 
+::= { acsPowerMgmtPDUTableEntry 14 }
+
+acsPowerMgmtPDUTableCurrent3Max OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-write
+        STATUS             obsolete
+        DESCRIPTION
+         "Maximum current of the sensor 3 in this PDU unit in AMP.
+         When the PDU does not have support for maximum value,
+         the value will be 0.
+         The value of this object is the actual current in 
+         AMP * 10. You need to translate the readed value
+         (Ex. : value is 5, the current is 0.5 AMP.)
+         Clear this value, set it with Zero value." 
+::= { acsPowerMgmtPDUTableEntry 15 }
+
+acsPowerMgmtPDUTableTemperatureNOS OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-only
+        STATUS             obsolete
+        DESCRIPTION
+        "Number of temperature sensors in the PDU."
+::= { acsPowerMgmtPDUTableEntry 16 }
+
+acsPowerMgmtPDUTableTemperature1Value OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-only
+        STATUS             obsolete
+        DESCRIPTION
+        "Temperature of this PM unit in Celsius degrees.
+         The value of this object is the actual temperature in 
+         degrees C * 10. You need to translate the readed value
+        (Ex. : value is 240, the temperature is 24 Celsius.) 
+         If the temperature measurement is not installed this 
+         value will be 0.
+        Valid values are 5 to 999 ( 0.5 to 99.9 Celsius)." 
+::= { acsPowerMgmtPDUTableEntry 17 }
+
+acsPowerMgmtPDUTableTemperature1Max OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-write
+        STATUS             obsolete
+        DESCRIPTION
+        "Maximum temperature detected in this PM unit in Celsius degrees.
+        The value will be Zero when the PDU does not have support for maximum value.
+         The value of this object is the actual temperature in 
+         degrees C * 10. You need to translate the readed value
+        (Ex. : value is 240, the temperature is 24 Celsius.) 
+         If the temperature measurement is not installed this 
+         value will be 0.
+         Valid values are 5 to 999 ( 0.5 to 99.9 Celsius).
+        Set with Zero value to clear the max. temperature." 
+::= { acsPowerMgmtPDUTableEntry 18 }
+
+acsPowerMgmtPDUTableTemperature2Value OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-only
+        STATUS             obsolete
+        DESCRIPTION
+        "Temperature of this PM unit in Celsius degrees.
+         The value of this object is the actual temperature in 
+         degrees C * 10. You need to translate the readed value
+         (Ex. : value is 240, the temperature is 24 Celsius.) 
+         If the temperature measurement is not installed this 
+         value will be 0.
+          Valid values are 5 to 999 ( 0.5 to 99.9 Celsius)." 
+::= { acsPowerMgmtPDUTableEntry 19 }
+
+acsPowerMgmtPDUTableTemperature2Max OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-write
+        STATUS             obsolete
+        DESCRIPTION
+        "Maximum temperature detected in this PM unit in Celsius degrees.
+         The value will be Zero when the PDU does not have support for maximum value.
+         The value of this object is the actual temperature in 
+         degrees C * 10. You need to translate the readed value
+         (Ex. : value is 240, the temperature is 24 Celsius.) 
+         If the temperature measurement is not installed this 
+         value will be 0.
+         Valid values are 5 to 999 ( 0.5 to 99.9 Celsius).
+         Set with Zero value to clear the max. temperature." 
+::= { acsPowerMgmtPDUTableEntry 20 }
+
+acsPowerMgmtPDUTableTemperature3Value OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-only
+        STATUS             obsolete
+        DESCRIPTION
+        "Temperature of this PM unit in Celsius degrees.
+        The value of this object is the actual temperature in 
+        degrees C * 10. You need to translate the readed value
+        (Ex. : value is 240, the temperature is 24 Celsius.) 
+        If the temperature measurement is not installed this 
+        value will be 0.
+        Valid values are 5 to 999 ( 0.5 to 99.9 Celsius)." 
+::= { acsPowerMgmtPDUTableEntry 21 }
+
+acsPowerMgmtPDUTableTemperature3Max OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-write
+        STATUS             obsolete
+        DESCRIPTION
+        "Maximum temperature detected in this PM unit in Celsius degrees.
+        The value will be Zero when the PDU does not have support for maximum value.
+         The value of this object is the actual temperature in 
+         degrees C * 10. You need to translate the readed value
+         (Ex. : value is 240, the temperature is 24 Celsius.) 
+         If the temperature measurement is not installed this 
+         value will be 0.
+         Valid values are 5 to 999 ( 0.5 to 99.9 Celsius).
+         Set with Zero value to clear the max. temperature." 
+::= { acsPowerMgmtPDUTableEntry 22 }
+
+acsPowerMgmtPDUTableHumidityNOS OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-only
+        STATUS             obsolete
+        DESCRIPTION
+        "Number of humidity sensors in the PDU."
+::= { acsPowerMgmtPDUTableEntry 23 }
+
+acsPowerMgmtPDUTableHumidity1Value OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-only
+        STATUS             obsolete
+        DESCRIPTION
+        "Humidity of this PM unit .
+         If the humidity measurement is not installed this 
+         value will be 0." 
+::= {  acsPowerMgmtPDUTableEntry 24 }
+
+acsPowerMgmtPDUTableHumidity1Max OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-write
+        STATUS             obsolete
+        DESCRIPTION
+        "Maximum humidity detected in this PM unit.
+         If the humidity measurement  is not installed  or the PDU does not have support for maximum value this 
+         value will be 0.
+         Set with Zero value to clear the max. temperature." 
+::= {  acsPowerMgmtPDUTableEntry 25 }
+
+acsPowerMgmtPDUTableHumidity2Value OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-only
+        STATUS             obsolete
+        DESCRIPTION
+        "Humidity of this PM unit .
+         If the humidity measurement is not installed this 
+         value will be 0." 
+::= {  acsPowerMgmtPDUTableEntry 26 }
+
+acsPowerMgmtPDUTableHumidity2Max OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-write
+        STATUS             obsolete
+        DESCRIPTION
+        "Maximum humidity detected in this PM unit.
+         If the humidity measurement  is not installed  or the PDU does not have support for maximum value this 
+         value will be 0.
+         Set with Zero value to clear the max. temperature." 
+::= {  acsPowerMgmtPDUTableEntry 27 }
+
+acsPowerMgmtPDUTableHumidity3Value OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-only
+        STATUS             obsolete
+        DESCRIPTION
+        "Humidity of this PM unit .
+         If the humidity measurement is not installed this 
+         value will be 0." 
+::= {  acsPowerMgmtPDUTableEntry 28 }
+
+acsPowerMgmtPDUTableHumidity3Max OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-write
+        STATUS             obsolete
+        DESCRIPTION
+        "Maximum humidity detected in this PM unit.
+         If the humidity measurement  is not installed  or the PDU does not have support for maximum value this 
+         value will be 0.
+         Set with Zero value to clear the max. temperature." 
+::= {  acsPowerMgmtPDUTableEntry 29 }
+
+acsPowerMgmtPDUTableVoltageNOS OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-only
+        STATUS             obsolete
+        DESCRIPTION
+        "Number of voltage sensors in the PDU."
+::= { acsPowerMgmtPDUTableEntry 30 }
+
+acsPowerMgmtPDUTableVoltage1Value OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-only
+        STATUS             obsolete
+        DESCRIPTION
+        "Voltage of this sensor in this PDU unit." 
+::= { acsPowerMgmtPDUTableEntry 31 }
+
+acsPowerMgmtPDUTableVoltage1Max OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-write
+        STATUS             obsolete
+        DESCRIPTION
+        "Maximum voltage of this sensor in this PDU unit.
+         Set with Zero value to clear the maximum voltage." 
+::= { acsPowerMgmtPDUTableEntry 32 }
+
+acsPowerMgmtPDUTableVoltage2Value OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-only
+        STATUS             obsolete
+        DESCRIPTION
+        "Voltage of this sensor in this PDU unit." 
+::= { acsPowerMgmtPDUTableEntry 33 }
+
+acsPowerMgmtPDUTableVoltage2Max OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-write
+        STATUS             obsolete
+        DESCRIPTION
+        "Maximum voltage of this sensor in this PDU unit.
+         Set with Zero value to clear the maximum voltage." 
+::= { acsPowerMgmtPDUTableEntry 34 }
+
+acsPowerMgmtPDUTableVoltage3Value OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-only
+        STATUS             obsolete
+        DESCRIPTION
+        "Voltage of this sensor in this PDU unit." 
+::= { acsPowerMgmtPDUTableEntry 35 }
+
+acsPowerMgmtPDUTableVoltage3Max OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-write
+        STATUS             obsolete
+        DESCRIPTION
+        "Maximum voltage of this sensor in this PDU unit.
+         Set with Zero value to clear the maximum voltage." 
+::= { acsPowerMgmtPDUTableEntry 36 }
+
+acsPowerMgmtPDUTableNumberOfPhases OBJECT-TYPE
+        SYNTAX       INTEGER {
+			single-phase (0),
+			three-phase (3)
+                    }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Number of phases of this PDU unit."
+::= { acsPowerMgmtPDUTableEntry 37 }
+
+acsPowerMgmtPDUTableNumberOfBanks OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Number of banks of this PDU unit."
+::= { acsPowerMgmtPDUTableEntry 38 }
+
+acsPowerMgmtPDUTableCurrentValue OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "Actual value of current sensor in this PDU.( A x 10 )" 
+::= { acsPowerMgmtPDUTableEntry 39 }
+
+acsPowerMgmtPDUTableCurrentMax OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "Max detected value of current sensor in this PDU.( A x 10 )" 
+::= { acsPowerMgmtPDUTableEntry 40 }
+
+acsPowerMgmtPDUTableCurrentMin OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "Min detected value of current sensor in this PDU.( A x 10 )" 
+::= { acsPowerMgmtPDUTableEntry 41 }
+
+acsPowerMgmtPDUTableCurrentAvg OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "Average value for current sensor in this PDU.( A x 10 )" 
+::= { acsPowerMgmtPDUTableEntry 42 }
+
+acsPowerMgmtPDUTableCurrentReset OBJECT-TYPE
+        SYNTAX       INTEGER {
+			no-action (1),
+			reset (2)
+                    }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "Reset max, min and avg values of current."
+::= { acsPowerMgmtPDUTableEntry 43 }
+
+acsPowerMgmtPDUTableVoltageType OBJECT-TYPE
+        SYNTAX       INTEGER {
+			none-sensor (0),
+			estimated (1),
+			read (2)
+                    }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Type of voltage values."
+::= { acsPowerMgmtPDUTableEntry 44 }
+
+acsPowerMgmtPDUTableVoltageValue OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "Actual value of voltage sensor in this PDU unit.( V )" 
+::= { acsPowerMgmtPDUTableEntry 45 }
+
+acsPowerMgmtPDUTableVoltageMax OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "Max detected value of voltage sensor in this PDU unit.( V )" 
+::= { acsPowerMgmtPDUTableEntry 46 }
+
+acsPowerMgmtPDUTableVoltageMin OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "Min detected value of voltage sensor in this PDU unit.( V )" 
+::= { acsPowerMgmtPDUTableEntry 47 }
+
+acsPowerMgmtPDUTableVoltageAvg OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "Average value for voltage sensor in this PDU unit.( V )" 
+::= { acsPowerMgmtPDUTableEntry 48 }
+
+acsPowerMgmtPDUTableVoltageReset OBJECT-TYPE
+        SYNTAX       INTEGER {
+			no-action (1),
+			reset (2)
+                    }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "Reset max, min and avg values of voltage."
+::= { acsPowerMgmtPDUTableEntry 49 }
+
+acsPowerMgmtPDUTablePowerType OBJECT-TYPE
+        SYNTAX       INTEGER {
+			none-sensor (0),
+			estimated (1),
+			read (2)
+                    }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Type of power consumption values.( W x 10 )"
+::= { acsPowerMgmtPDUTableEntry 50 }
+
+acsPowerMgmtPDUTablePowerValue OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "Actual value of power consumption in this PDU unit.( W x 10 )" 
+::= { acsPowerMgmtPDUTableEntry 51 }
+
+acsPowerMgmtPDUTablePowerMax OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "Max detected value of power consumption in this PDU unit.( W x 10 )" 
+::= { acsPowerMgmtPDUTableEntry 52 }
+
+acsPowerMgmtPDUTablePowerMin OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "Min detected value of power consumption in this PDU unit.( W x 10 )" 
+::= { acsPowerMgmtPDUTableEntry 53 }
+
+acsPowerMgmtPDUTablePowerAvg OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "Average value for power consumption in this PDU unit.( W x 10 )" 
+::= { acsPowerMgmtPDUTableEntry 54 }
+
+acsPowerMgmtPDUTablePowerReset OBJECT-TYPE
+        SYNTAX       INTEGER {
+			no-action (1),
+			reset (2)
+                    }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "Reset max, min and avg values of power consumption."
+::= { acsPowerMgmtPDUTableEntry 55 }
+
+acsPowerMgmtPDUTablePowerFactorType OBJECT-TYPE
+        SYNTAX       INTEGER {
+			none-sensor (0),
+			estimated (1),
+			read (2)
+                    }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Type of power factor values."
+::= { acsPowerMgmtPDUTableEntry 56 }
+
+acsPowerMgmtPDUTablePowerFactorValue OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "Actual value of power factor in this PDU unit.( PF x 100 )" 
+::= { acsPowerMgmtPDUTableEntry 57 }
+
+acsPowerMgmtPDUTablePowerFactorMax OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "Max detected value of power factor in this PDU unit.( PF x 100 )" 
+::= { acsPowerMgmtPDUTableEntry 58 }
+
+acsPowerMgmtPDUTablePowerFactorMin OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "Min detected value of power factor in this PDU unit.( PF x 100 )" 
+::= { acsPowerMgmtPDUTableEntry 59 }
+
+acsPowerMgmtPDUTablePowerFactorAvg OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "Average value for power factor in this PDU unit.( PF x 100 )" 
+::= { acsPowerMgmtPDUTableEntry 60 }
+
+acsPowerMgmtPDUTablePowerFactorReset OBJECT-TYPE
+        SYNTAX       INTEGER {
+			no-action (1),
+			reset (2)
+                    }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "Reset max, min and avg values of power factor."
+::= { acsPowerMgmtPDUTableEntry 61 }
+
+acsPowerMgmtPDUTableAlarm OBJECT-TYPE
+        SYNTAX       INTEGER {
+			normal (1),
+			blow-fuse (2),
+			hw-ocp (3),
+			high-critical (4),
+			high-warning (5),
+			low-warning (6),
+			low-critical (7)
+                    }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Show the PDU alarm status."
+::= { acsPowerMgmtPDUTableEntry 62 }
+
+acsPowerMgmtPDUTableEnvSensors OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "Number of environmental sensor in this PDU." 
+::= { acsPowerMgmtPDUTableEntry 63 }
+
+	
+acsPowerMgmtTotalNumberOfOutlets OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "Number of outlets managed by the appliance."
+::= { acsPowerMgmt 4 }
+
+acsPowerMgmtOutletsTable OBJECT-TYPE
+        SYNTAX             SEQUENCE OF AcsPowerMgmtOutletsTableEntry
+        MAX-ACCESS         not-accessible
+        STATUS             current
+        DESCRIPTION
+        "This table contains the information about outlets."
+::= { acsPowerMgmt 5 }
+ 
+acsPowerMgmtOutletsTableEntry  OBJECT-TYPE
+        SYNTAX            AcsPowerMgmtOutletsTableEntry
+        MAX-ACCESS        not-accessible
+        STATUS            current
+        DESCRIPTION                
+        "each entry has the information about the outlet."
+        INDEX             { acsPowerMgmtOutletsTablePortNumber,
+                            acsPowerMgmtOutletsTablePduNumber,
+                            acsPowerMgmtOutletsTableNumber }
+::= { acsPowerMgmtOutletsTable 1 }
+
+AcsPowerMgmtOutletsTableEntry ::= SEQUENCE  {
+        acsPowerMgmtOutletsTablePortNumber   InterfaceIndex, -- serial port #
+        acsPowerMgmtOutletsTablePduNumber    InterfaceIndex,     
+        acsPowerMgmtOutletsTableNumber       InterfaceIndex, -- outlet number in PDU
+        acsPowerMgmtOutletsTableName         DisplayString,  -- outlet name
+        acsPowerMgmtOutletsTableStatus       INTEGER,        -- outlet status
+        acsPowerMgmtOutletsTablePowerControl INTEGER,        -- manage the outlet
+        acsPowerMgmtOutletsTablePortName     DisplayString,  -- serial port name
+        acsPowerMgmtOutletsTablePduId        DisplayString  -- PDU ID
+}
+
+acsPowerMgmtOutletsTablePortNumber OBJECT-TYPE
+        SYNTAX             InterfaceIndex
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "Serial Port number."
+::= { acsPowerMgmtOutletsTableEntry 1 }
+
+acsPowerMgmtOutletsTablePduNumber OBJECT-TYPE
+        SYNTAX             InterfaceIndex
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "Index."
+::= { acsPowerMgmtOutletsTableEntry 2 }
+
+acsPowerMgmtOutletsTableNumber OBJECT-TYPE
+        SYNTAX             InterfaceIndex
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "Number of the outlet in the PDU."
+::= { acsPowerMgmtOutletsTableEntry 3 }
+
+acsPowerMgmtOutletsTableName OBJECT-TYPE
+        SYNTAX             DisplayString
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "Name of the outlet." 
+::= { acsPowerMgmtOutletsTableEntry 4 }
+
+acsPowerMgmtOutletsTableStatus OBJECT-TYPE
+        SYNTAX        INTEGER {
+                off(1),
+                on(2)
+        }
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "Status of the outlet."
+::= { acsPowerMgmtOutletsTableEntry 5 }
+
+acsPowerMgmtOutletsTablePowerControl OBJECT-TYPE
+        SYNTAX INTEGER {
+                noAction(1),
+                powerOn(2),
+                powerOff(3),
+                powerCycle(4),
+                powerLock(5),
+                powerUnlock(6)
+        }
+        MAX-ACCESS         read-write
+        STATUS             current
+        DESCRIPTION 
+        "A set value of power*(2-6) will send command to PDU.
+         noAction(1) = always returned in a GET. Does nothing if SET.
+         powerOn(2)  = when SET the power On command is sent to PDU.
+         powerOff(3) = when SET the power Off command is sent to PDU.
+         powerCycle(4)=when SET the power cycle command is sent to PDU.
+         powerLock(5)= when SET the power lock command is sent to PDU.
+         powerUnlock(6)=when SET the power unlock command is sent to PDU.
+        The powerLock and powerUnlock are valid only for Cyclades-PM PDUs"
+::= { acsPowerMgmtOutletsTableEntry 6 }
+
+acsPowerMgmtOutletsTablePortName OBJECT-TYPE
+        SYNTAX             DisplayString
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "Serial Port Name where the PDU is connected."
+::= { acsPowerMgmtOutletsTableEntry 7 }
+
+acsPowerMgmtOutletsTablePduId        OBJECT-TYPE
+        SYNTAX             DisplayString
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "PDU identification."
+::= { acsPowerMgmtOutletsTableEntry 8 }
+
+acsPowerMgmtNumberOfOutletGroup OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "Number of configured group of outlets."
+::= { acsPowerMgmt 6 }
+
+acsPowerMgmtGroupTable OBJECT-TYPE
+        SYNTAX             SEQUENCE OF AcsPowerMgmtGroupTableEntry
+        MAX-ACCESS         not-accessible
+        STATUS             current
+        DESCRIPTION
+        "This table contains the information about group of outlets."
+::= { acsPowerMgmt 7 }
+ 
+acsPowerMgmtGroupTableEntry  OBJECT-TYPE
+        SYNTAX            AcsPowerMgmtGroupTableEntry
+        MAX-ACCESS        not-accessible
+        STATUS            current
+        DESCRIPTION                
+        "each entry has the information about group of outlets."
+        INDEX             { acsPowerMgmtGroupTableIndex }
+::= { acsPowerMgmtGroupTable 1 }
+
+AcsPowerMgmtGroupTableEntry ::= SEQUENCE  {
+        acsPowerMgmtGroupTableIndex           InterfaceIndexOrZero,      
+        acsPowerMgmtGroupTableName            DisplayString, -- group name
+        acsPowerMgmtGroupTableStatus          INTEGER,            -- group status
+        acsPowerMgmtGroupTablePowerControl    INTEGER    -- manage the group        
+}
+
+acsPowerMgmtGroupTableIndex OBJECT-TYPE
+        SYNTAX             InterfaceIndexOrZero
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "Index of the group."
+::= { acsPowerMgmtGroupTableEntry 1 }
+
+acsPowerMgmtGroupTableName OBJECT-TYPE
+        SYNTAX             DisplayString
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "Name of the group of outlets." 
+::= { acsPowerMgmtGroupTableEntry 2 }
+
+acsPowerMgmtGroupTableStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+                off(1),
+                on(2)
+                }
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "Status of the group of outlet."
+::= { acsPowerMgmtGroupTableEntry 3 }
+
+acsPowerMgmtGroupTablePowerControl OBJECT-TYPE
+        SYNTAX INTEGER {
+                noAction(1),
+                powerOn(2),
+                powerOff(3),
+                powerCycle(4)
+        }
+        MAX-ACCESS         read-write
+        STATUS             current
+        DESCRIPTION 
+        "A set value of power*(2-6) will send command to PDU.
+         noAction(1) = always returned in a GET. Does nothing if SET.
+         powerOn(2)  = when SET the power On command is sent to PDU.
+         powerOff(3) = when SET the power Off command is sent to PDU.
+         powerCycle(4)=when SET the power cycle command is sent to PDU."
+::= { acsPowerMgmtGroupTableEntry 4 }
+
+acsPowerMgmtPhasesTable OBJECT-TYPE
+        SYNTAX             SEQUENCE OF AcsPowerMgmtPhasesTableEntry
+        MAX-ACCESS         not-accessible
+        STATUS             current
+        DESCRIPTION
+        "This table contains data monitoring of each detected phase."
+::= { acsPowerMgmt 8 }
+ 
+acsPowerMgmtPhasesTableEntry        OBJECT-TYPE
+        SYNTAX            AcsPowerMgmtPhasesTableEntry
+        MAX-ACCESS        not-accessible
+        STATUS            current
+        DESCRIPTION                
+        "each entry has the data monitoring about phases."
+        INDEX  { acsPowerMgmtPhasesTablePortNumber, acsPowerMgmtPhasesTablePduIndex, acsPowerMgmtPhasesTablePhaseIndex }
+::= { acsPowerMgmtPhasesTable 1 }
+
+AcsPowerMgmtPhasesTableEntry ::= SEQUENCE  {
+        acsPowerMgmtPhasesTablePortNumber        InterfaceIndex,  -- number of serial port
+        acsPowerMgmtPhasesTablePduIndex          InterfaceIndexOrZero, -- number of PDU
+        acsPowerMgmtPhasesTablePhaseIndex        InterfaceIndexOrZero, -- phase index
+	acsPowerMgmtPhasesTablePhaseName         DisplayString,   -- Phase Name
+        acsPowerMgmtPhasesTablePduId             DisplayString,   -- PDU identification
+	acsPowerMgmtPhasesTablePortName          DisplayString,   -- Serial Port Name
+	acsPowerMgmtPhasesTableCurrentValue      Integer32,	-- actual value of Phase current sensor 
+	acsPowerMgmtPhasesTableCurrentMax	 Integer32,	-- max detected value of current sensor
+	acsPowerMgmtPhasesTableCurrentMin	 Integer32,	-- min detected value of current sensor
+	acsPowerMgmtPhasesTableCurrentAvg	 Integer32,	-- average value for current sensor
+	acsPowerMgmtPhasesTableCurrentReset      INTEGER,	-- reset max, min and avg values
+	acsPowerMgmtPhasesTableVoltageType	 INTEGER,	-- type of phase voltage 
+	acsPowerMgmtPhasesTableVoltageValue      Integer32,	-- actual value of phase voltage
+	acsPowerMgmtPhasesTableVoltageMax 	 Integer32,	-- max value of voltage sensor
+	acsPowerMgmtPhasesTableVoltageMin	 Integer32,	-- min value of voltage sensor
+	acsPowerMgmtPhasesTableVoltageAvg	 Integer32,	-- avg value of voltage sensor
+	acsPowerMgmtPhasesTableVoltageReset      INTEGER,	-- reset max, min and avg values
+	acsPowerMgmtPhasesTablePowerType	 INTEGER,	-- type of phase power consumption
+	acsPowerMgmtPhasesTablePowerValue	 Integer32,	-- actual value of phase power consumption
+	acsPowerMgmtPhasesTablePowerMax	         Integer32,	-- max value
+	acsPowerMgmtPhasesTablePowerMin	         Integer32,	-- min value
+	acsPowerMgmtPhasesTablePowerAvg	         Integer32,	-- average value
+	acsPowerMgmtPhasesTablePowerReset	 INTEGER,	-- reset max, min and avg values
+	acsPowerMgmtPhasesTablePowerFactorType   INTEGER,	-- type of phase power factor
+	acsPowerMgmtPhasesTablePowerFactorValue  Integer32,	-- actual value of phase power factor
+	acsPowerMgmtPhasesTablePowerFactorMax    Integer32,	-- max value for power factor
+	acsPowerMgmtPhasesTablePowerFactorMin    Integer32,	-- min value for power factor
+	acsPowerMgmtPhasesTablePowerFactorAvg    Integer32,	-- avg value for power factor
+	acsPowerMgmtPhasesTablePowerFactorReset  INTEGER,	-- reset max, min and avg values
+	acsPowerMgmtPhasesTableAlarm 	         INTEGER	-- phase alarm status
+}
+
+acsPowerMgmtPhasesTablePortNumber OBJECT-TYPE
+        SYNTAX            InterfaceIndex
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION
+        "Number of serial port when the PDU is connected."
+::= { acsPowerMgmtPhasesTableEntry 1 }
+
+acsPowerMgmtPhasesTablePduIndex OBJECT-TYPE
+        SYNTAX            InterfaceIndexOrZero
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION
+        "A PDU position in the chain."
+::= { acsPowerMgmtPhasesTableEntry 2 }
+
+acsPowerMgmtPhasesTablePhaseIndex OBJECT-TYPE
+        SYNTAX            InterfaceIndexOrZero
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION
+        "phase index in the PDU."
+::= { acsPowerMgmtPhasesTableEntry 3 }
+
+acsPowerMgmtPhasesTablePhaseName OBJECT-TYPE
+        SYNTAX             DisplayString
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "phase name in the PDU."
+::= { acsPowerMgmtPhasesTableEntry 4 }
+
+acsPowerMgmtPhasesTablePduId  OBJECT-TYPE
+        SYNTAX             DisplayString
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "PDU identification."
+::= { acsPowerMgmtPhasesTableEntry 5 }
+
+acsPowerMgmtPhasesTablePortName OBJECT-TYPE
+        SYNTAX             DisplayString
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "Name of serial port when the PDU is connected."
+::= { acsPowerMgmtPhasesTableEntry 6 }
+
+acsPowerMgmtPhasesTableCurrentValue OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "Actual value of current sensor in this phase.( A x 10 )" 
+::= { acsPowerMgmtPhasesTableEntry 7 }
+
+acsPowerMgmtPhasesTableCurrentMax OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "Max detected value of current sensor in this phase.( A x 10 )" 
+::= { acsPowerMgmtPhasesTableEntry 8 }
+
+acsPowerMgmtPhasesTableCurrentMin OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "Min detected value of current sensor in this phase.( A x 10 )" 
+::= { acsPowerMgmtPhasesTableEntry 9 }
+
+acsPowerMgmtPhasesTableCurrentAvg OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "Average value for current sensor in this phase.( A x 10 )" 
+::= { acsPowerMgmtPhasesTableEntry 10 }
+
+acsPowerMgmtPhasesTableCurrentReset OBJECT-TYPE
+        SYNTAX       INTEGER {
+			no-action (1),
+			reset (2)
+                    }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "Reset max, min and avg values of current."
+::= { acsPowerMgmtPhasesTableEntry 11 }
+
+acsPowerMgmtPhasesTableVoltageType OBJECT-TYPE
+        SYNTAX       INTEGER {
+			none-sensor (0),
+			estimated (1),
+			read (2)
+                    }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Type of voltage values."
+::= { acsPowerMgmtPhasesTableEntry 12 }
+
+acsPowerMgmtPhasesTableVoltageValue OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "Actual value of voltage sensor in this phase.( V )" 
+::= { acsPowerMgmtPhasesTableEntry 13 }
+
+acsPowerMgmtPhasesTableVoltageMax OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "Max detected value of voltage sensor in this phase.( V )" 
+::= { acsPowerMgmtPhasesTableEntry 14 }
+
+acsPowerMgmtPhasesTableVoltageMin OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "Min detected value of voltage sensor in this phase.( V )" 
+::= { acsPowerMgmtPhasesTableEntry 15 }
+
+acsPowerMgmtPhasesTableVoltageAvg OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "Average value for voltage sensor in this phase.( V )" 
+::= { acsPowerMgmtPhasesTableEntry 16 }
+
+acsPowerMgmtPhasesTableVoltageReset OBJECT-TYPE
+        SYNTAX       INTEGER {
+			no-action (1),
+			reset (2)
+                    }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "Reset max, min and avg values of voltage."
+::= { acsPowerMgmtPhasesTableEntry 17 }
+
+acsPowerMgmtPhasesTablePowerType OBJECT-TYPE
+        SYNTAX       INTEGER {
+			none-sensor (0),
+			estimated (1),
+			read (2)
+                    }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Type of power consumption values."
+::= { acsPowerMgmtPhasesTableEntry 18 }
+
+acsPowerMgmtPhasesTablePowerValue OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "Actual value of power consumption in this phase.( W x 10 )" 
+::= { acsPowerMgmtPhasesTableEntry 19 }
+
+acsPowerMgmtPhasesTablePowerMax OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "Max detected value of power consumption in this phase.( W x 10 )" 
+::= { acsPowerMgmtPhasesTableEntry 20 }
+
+acsPowerMgmtPhasesTablePowerMin OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "Min detected value of power consumption in this phase.( W x 10 )" 
+::= { acsPowerMgmtPhasesTableEntry 21 }
+
+acsPowerMgmtPhasesTablePowerAvg OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "Average value for power consumption in this phase.( W x 10 )" 
+::= { acsPowerMgmtPhasesTableEntry 22 }
+
+acsPowerMgmtPhasesTablePowerReset OBJECT-TYPE
+        SYNTAX       INTEGER {
+			no-action (1),
+			reset (2)
+                    }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "Reset max, min and avg values of power consumption."
+::= { acsPowerMgmtPhasesTableEntry 23 }
+
+acsPowerMgmtPhasesTablePowerFactorType OBJECT-TYPE
+        SYNTAX       INTEGER {
+			none-sensor (0),
+			estimated (1),
+			read (2)
+                    }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Type of power factor values."
+::= { acsPowerMgmtPhasesTableEntry 24 }
+
+acsPowerMgmtPhasesTablePowerFactorValue OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "Actual value of power factor in this phase.( PF x 100 )" 
+::= { acsPowerMgmtPhasesTableEntry 25 }
+
+acsPowerMgmtPhasesTablePowerFactorMax OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "Max detected value of power factor in this phase.( PF x 100 )" 
+::= { acsPowerMgmtPhasesTableEntry 26 }
+
+acsPowerMgmtPhasesTablePowerFactorMin OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "Min detected value of power factor in this phase.( PF x 100 )" 
+::= { acsPowerMgmtPhasesTableEntry 27 }
+
+acsPowerMgmtPhasesTablePowerFactorAvg OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "Average value for power factor in this phase.( PF x 100 )" 
+::= { acsPowerMgmtPhasesTableEntry 28 }
+
+acsPowerMgmtPhasesTablePowerFactorReset OBJECT-TYPE
+        SYNTAX       INTEGER {
+			no-action (1),
+			reset (2)
+                    }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "Reset max, min and avg values of power factor."
+::= { acsPowerMgmtPhasesTableEntry 29 }
+
+acsPowerMgmtPhasesTableAlarm OBJECT-TYPE
+        SYNTAX       INTEGER {
+			normal (1),
+			blow-fuse (2),
+			hw-ocp (3),
+			high-critical (4),
+			high-warning (5),
+			low-warning (6),
+			low-critical (7)
+                    }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Show the phase alarm status."
+::= { acsPowerMgmtPhasesTableEntry 30 }
+
+acsPowerMgmtBanksTable OBJECT-TYPE
+        SYNTAX             SEQUENCE OF AcsPowerMgmtBanksTableEntry
+        MAX-ACCESS         not-accessible
+        STATUS             current
+        DESCRIPTION
+        "This table contains data monitoring of each detected bank."
+::= { acsPowerMgmt 9 }
+ 
+acsPowerMgmtBanksTableEntry        OBJECT-TYPE
+        SYNTAX            AcsPowerMgmtBanksTableEntry
+        MAX-ACCESS        not-accessible
+        STATUS            current
+        DESCRIPTION                
+        "each entry has the data monitoring about bank."
+        INDEX  { acsPowerMgmtBanksTablePortNumber, acsPowerMgmtBanksTablePduIndex, acsPowerMgmtBanksTableBankIndex }
+::= { acsPowerMgmtBanksTable 1 }
+
+AcsPowerMgmtBanksTableEntry ::= SEQUENCE  {
+        acsPowerMgmtBanksTablePortNumber        InterfaceIndex,  -- number of serial port
+        acsPowerMgmtBanksTablePduIndex          InterfaceIndexOrZero, -- number of PDU
+        acsPowerMgmtBanksTableBankIndex         InterfaceIndexOrZero, -- bank index
+	acsPowerMgmtBanksTableBankName          DisplayString,   -- Bank Name
+        acsPowerMgmtBanksTablePduId             DisplayString,   -- PDU identification
+	acsPowerMgmtBanksTablePortName          DisplayString,   -- Serial Port Name
+	acsPowerMgmtBanksTableCurrentValue      Integer32,	-- actual value of bank current sensor 
+	acsPowerMgmtBanksTableCurrentMax	Integer32,	-- max detected value of current sensor
+	acsPowerMgmtBanksTableCurrentMin	Integer32,	-- min detected value of current sensor
+	acsPowerMgmtBanksTableCurrentAvg	Integer32,	-- average value for current sensor
+	acsPowerMgmtBanksTableCurrentReset      INTEGER,	-- reset max, min and avg values
+	acsPowerMgmtBanksTableVoltageType	INTEGER,	-- type of bank voltage 
+	acsPowerMgmtBanksTableVoltageValue      Integer32,	-- actual value of bank voltage
+	acsPowerMgmtBanksTableVoltageMax 	Integer32,	-- max value of voltage sensor
+	acsPowerMgmtBanksTableVoltageMin	Integer32,	-- min value of voltage sensor
+	acsPowerMgmtBanksTableVoltageAvg	Integer32,	-- avg value of voltage sensor
+	acsPowerMgmtBanksTableVoltageReset      INTEGER,	-- reset max, min and avg values
+	acsPowerMgmtBanksTablePowerType	 	INTEGER,	-- type of bank power consumption
+	acsPowerMgmtBanksTablePowerValue	Integer32,	-- actual value of bank power consumption
+	acsPowerMgmtBanksTablePowerMax	        Integer32,	-- max value
+	acsPowerMgmtBanksTablePowerMin	        Integer32,	-- min value
+	acsPowerMgmtBanksTablePowerAvg	        Integer32,	-- average value
+	acsPowerMgmtBanksTablePowerReset	INTEGER,	-- reset max, min and avg values
+	acsPowerMgmtBanksTablePowerFactorType   INTEGER,	-- type of bank power factor
+	acsPowerMgmtBanksTablePowerFactorValue  Integer32,	-- actual value of bank power factor
+	acsPowerMgmtBanksTablePowerFactorMax    Integer32,	-- max value for power factor
+	acsPowerMgmtBanksTablePowerFactorMin    Integer32,	-- min value for power factor
+	acsPowerMgmtBanksTablePowerFactorAvg    Integer32,	-- avg value for power factor
+	acsPowerMgmtBanksTablePowerFactorReset  INTEGER,	-- reset max, min and avg values
+	acsPowerMgmtBanksTableAlarm 	        INTEGER	-- status of bank alarm
+}
+
+acsPowerMgmtBanksTablePortNumber OBJECT-TYPE
+        SYNTAX            InterfaceIndex
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION
+        "Number of serial port when the PDU is connected."
+::= { acsPowerMgmtBanksTableEntry 1 }
+
+acsPowerMgmtBanksTablePduIndex OBJECT-TYPE
+        SYNTAX            InterfaceIndexOrZero
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION
+        "A PDU position in the chain."
+::= { acsPowerMgmtBanksTableEntry 2 }
+
+acsPowerMgmtBanksTableBankIndex OBJECT-TYPE
+        SYNTAX            InterfaceIndexOrZero
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION
+        "Bank index in the PDU."
+::= { acsPowerMgmtBanksTableEntry 3 }
+
+acsPowerMgmtBanksTableBankName OBJECT-TYPE
+        SYNTAX             DisplayString
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "Bank name in the PDU."
+::= { acsPowerMgmtBanksTableEntry 4 }
+
+acsPowerMgmtBanksTablePduId  OBJECT-TYPE
+        SYNTAX             DisplayString
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "PDU identification."
+::= { acsPowerMgmtBanksTableEntry 5 }
+
+acsPowerMgmtBanksTablePortName OBJECT-TYPE
+        SYNTAX             DisplayString
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "Name of serial port when the PDU is connected."
+::= { acsPowerMgmtBanksTableEntry 6 }
+
+acsPowerMgmtBanksTableCurrentValue OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "Actual value of current sensor in this bank.( A x 10 )" 
+::= { acsPowerMgmtBanksTableEntry 7 }
+
+acsPowerMgmtBanksTableCurrentMax OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "Max detected value of current sensor in this bank.( A x 10 )" 
+::= { acsPowerMgmtBanksTableEntry 8 }
+
+acsPowerMgmtBanksTableCurrentMin OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "Min detected value of current sensor in this bank.( A x 10 )" 
+::= { acsPowerMgmtBanksTableEntry 9 }
+
+acsPowerMgmtBanksTableCurrentAvg OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "Average value for current sensor in this bank.( A x 10 )" 
+::= { acsPowerMgmtBanksTableEntry 10 }
+
+acsPowerMgmtBanksTableCurrentReset OBJECT-TYPE
+        SYNTAX       INTEGER {
+			no-action (1),
+			reset (2)
+                    }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "Reset max, min and avg values of current."
+::= { acsPowerMgmtBanksTableEntry 11 }
+
+acsPowerMgmtBanksTableVoltageType OBJECT-TYPE
+        SYNTAX       INTEGER {
+			none-sensor (0),
+			estimated (1),
+			read (2)
+                    }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Type of voltage values."
+::= { acsPowerMgmtBanksTableEntry 12 }
+
+acsPowerMgmtBanksTableVoltageValue OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "Actual value of voltage sensor in this bank.( V )" 
+::= { acsPowerMgmtBanksTableEntry 13 }
+
+acsPowerMgmtBanksTableVoltageMax OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "Max detected value of voltage sensor in this bank.( V )" 
+::= { acsPowerMgmtBanksTableEntry 14 }
+
+acsPowerMgmtBanksTableVoltageMin OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "Min detected value of voltage sensor in this bank.( V )" 
+::= { acsPowerMgmtBanksTableEntry 15 }
+
+acsPowerMgmtBanksTableVoltageAvg OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "Average value for voltage sensor in this bank.( V )" 
+::= { acsPowerMgmtBanksTableEntry 16 }
+
+acsPowerMgmtBanksTableVoltageReset OBJECT-TYPE
+        SYNTAX       INTEGER {
+			no-action (1),
+			reset (2)
+                    }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "Reset max, min and avg values of voltage."
+::= { acsPowerMgmtBanksTableEntry 17 }
+
+acsPowerMgmtBanksTablePowerType OBJECT-TYPE
+        SYNTAX       INTEGER {
+			none-sensor (0),
+			estimated (1),
+			read (2)
+                    }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Type of power consumption values."
+::= { acsPowerMgmtBanksTableEntry 18 }
+
+acsPowerMgmtBanksTablePowerValue OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "Actual value of power consumption in this bank.( W x 10 )" 
+::= { acsPowerMgmtBanksTableEntry 19 }
+
+acsPowerMgmtBanksTablePowerMax OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "Max detected value of power consumption in this bank.( W x 10 )" 
+::= { acsPowerMgmtBanksTableEntry 20 }
+
+acsPowerMgmtBanksTablePowerMin OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "Min detected value of power consumption in this bank.( W x 10 )" 
+::= { acsPowerMgmtBanksTableEntry 21 }
+
+acsPowerMgmtBanksTablePowerAvg OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "Average value for power consumption in this bank.( W x 10 )" 
+::= { acsPowerMgmtBanksTableEntry 22 }
+
+acsPowerMgmtBanksTablePowerReset OBJECT-TYPE
+        SYNTAX       INTEGER {
+			no-action (1),
+			reset (2)
+                    }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "Reset max, min and avg values of power consumption."
+::= { acsPowerMgmtBanksTableEntry 23 }
+
+acsPowerMgmtBanksTablePowerFactorType OBJECT-TYPE
+        SYNTAX       INTEGER {
+			none-sensor (0),
+			estimated (1),
+			read (2)
+                    }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Type of power factor values."
+::= { acsPowerMgmtBanksTableEntry 24 }
+
+acsPowerMgmtBanksTablePowerFactorValue OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "Actual value of power factor in this bank.( PF x 100 )" 
+::= { acsPowerMgmtBanksTableEntry 25 }
+
+acsPowerMgmtBanksTablePowerFactorMax OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "Max detected value of power factor in this bank.( PF x 100 )" 
+::= { acsPowerMgmtBanksTableEntry 26 }
+
+acsPowerMgmtBanksTablePowerFactorMin OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "Min detected value of power factor in this bank.( PF x 100 )" 
+::= { acsPowerMgmtBanksTableEntry 27 }
+
+acsPowerMgmtBanksTablePowerFactorAvg OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "Average value for power factor in this bank.( PF x 100 )" 
+::= { acsPowerMgmtBanksTableEntry 28 }
+
+acsPowerMgmtBanksTablePowerFactorReset OBJECT-TYPE
+        SYNTAX       INTEGER {
+			no-action (1),
+			reset (2)
+                    }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "Reset max, min and avg values of power factor."
+::= { acsPowerMgmtBanksTableEntry 29 }
+
+acsPowerMgmtBanksTableAlarm OBJECT-TYPE
+        SYNTAX       INTEGER {
+			normal (1),
+			blow-fuse (2),
+			hw-ocp (3),
+			high-critical (4),
+			high-warning (5),
+			low-warning (6),
+			low-critical (7)
+                    }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Show the bank alarm status."
+::= { acsPowerMgmtBanksTableEntry 30 }
+
+acsPowerMgmtEnvMonTable OBJECT-TYPE
+        SYNTAX             SEQUENCE OF AcsPowerMgmtEnvMonTableEntry
+        MAX-ACCESS         not-accessible
+        STATUS             current
+        DESCRIPTION
+        "This table contains data monitoring of each detected environmental sensor."
+::= { acsPowerMgmt 10 }
+ 
+acsPowerMgmtEnvMonTableEntry        OBJECT-TYPE
+        SYNTAX            AcsPowerMgmtEnvMonTableEntry
+        MAX-ACCESS        not-accessible
+        STATUS            current
+        DESCRIPTION                
+        "each entry has the data monitoring about environmental sensors."
+        INDEX  { acsPowerMgmtEnvMonTablePortNumber, acsPowerMgmtEnvMonTablePduIndex, acsPowerMgmtEnvMonTableIndex }
+::= { acsPowerMgmtEnvMonTable 1 }
+
+AcsPowerMgmtEnvMonTableEntry ::= SEQUENCE  {
+        acsPowerMgmtEnvMonTablePortNumber    InterfaceIndex,  -- number of serial port
+        acsPowerMgmtEnvMonTablePduIndex      InterfaceIndexOrZero, -- number of PDU
+        acsPowerMgmtEnvMonTableIndex         InterfaceIndexOrZero, -- index
+	acsPowerMgmtEnvMonTableName          DisplayString,   -- sensor name 
+        acsPowerMgmtEnvMonTablePduId         DisplayString,   -- PDU identification
+	acsPowerMgmtEnvMonTablePortName      DisplayString,   -- Serial Port Name
+	acsPowerMgmtEnvMonTableType          INTEGER,         -- environmental sensor type 
+	acsPowerMgmtEnvMonTableStatus	     INTEGER,	      -- state of digital sensor
+	acsPowerMgmtEnvMonTableValue	     Integer32,	      -- value
+	acsPowerMgmtEnvMonTableMaxValue	     Integer32	      -- max value
+}
+	
+acsPowerMgmtEnvMonTablePortNumber OBJECT-TYPE
+        SYNTAX            InterfaceIndex
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION
+        "Number of serial port when the PDU is connected."
+::= { acsPowerMgmtEnvMonTableEntry 1 }
+
+acsPowerMgmtEnvMonTablePduIndex OBJECT-TYPE
+        SYNTAX            InterfaceIndexOrZero
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION
+        "A PDU position in the chain."
+::= { acsPowerMgmtEnvMonTableEntry 2 }
+
+acsPowerMgmtEnvMonTableIndex OBJECT-TYPE
+        SYNTAX            InterfaceIndexOrZero
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION
+        "envmon sensor index."
+::= { acsPowerMgmtEnvMonTableEntry 3 }
+
+acsPowerMgmtEnvMonTableName OBJECT-TYPE
+        SYNTAX             DisplayString
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "envmon sensor name."
+::= { acsPowerMgmtEnvMonTableEntry 4 }
+
+acsPowerMgmtEnvMonTablePduId  OBJECT-TYPE
+        SYNTAX             DisplayString
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "PDU identification."
+::= { acsPowerMgmtEnvMonTableEntry 5 }
+
+acsPowerMgmtEnvMonTablePortName OBJECT-TYPE
+        SYNTAX             DisplayString
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "Name of serial port when the PDU is connected."
+::= { acsPowerMgmtEnvMonTableEntry 6 }
+
+acsPowerMgmtEnvMonTableType OBJECT-TYPE
+	SYNTAX  INTEGER {
+		temp-internal (1),
+		temperature (2),
+		humidity (3),
+		air-flow (4),
+		smoke (5),
+		dry-concact (6),
+		water-level (7),
+		motion (8),
+		unplugged (9),
+		unknown (10)
+	}
+	MAX-ACCESS      read-only
+	STATUS          current
+	DESCRIPTION     "The type of environmental monitor."
+::= { acsPowerMgmtEnvMonTableEntry 7 }
+
+acsPowerMgmtEnvMonTableStatus OBJECT-TYPE
+	SYNTAX  INTEGER {
+		normal(1),
+		triggered(2),
+		not-applicable(3)
+	}
+	MAX-ACCESS      read-only
+	STATUS          current
+	DESCRIPTION     "Status of digital sensors:
+		Dry-Contact, Water level, Smoke sensor, Motion sensor."
+::= { acsPowerMgmtEnvMonTableEntry 8 }
+
+acsPowerMgmtEnvMonTableValue OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "Detected value for envmon sensors. Temperature: C x 10. Humidity: %. Air flow: afu." 
+::= { acsPowerMgmtEnvMonTableEntry 9 }
+
+acsPowerMgmtEnvMonTableMaxValue OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "Max detected value for envmon sensors. Temperature: C x 10. Humidity: %. Air flow: afu." 
+::= { acsPowerMgmtEnvMonTableEntry 10 }
+
+acsPowerMgmtOutElecMonTable OBJECT-TYPE
+        SYNTAX             SEQUENCE OF AcsPowerMgmtOutElecMonTableEntry
+        MAX-ACCESS         not-accessible
+        STATUS             current
+        DESCRIPTION
+        "This table contains the information about data monitoring of outlets."
+::= { acsPowerMgmt 11 }
+ 
+acsPowerMgmtOutElecMonTableEntry  OBJECT-TYPE
+        SYNTAX            AcsPowerMgmtOutElecMonTableEntry
+        MAX-ACCESS        not-accessible
+        STATUS            current
+        DESCRIPTION                
+        "each entry has the information about the outlet."
+        INDEX             { acsPowerMgmtOutElecMonTablePortNumber,
+                            acsPowerMgmtOutElecMonTablePduNumber,
+                            acsPowerMgmtOutElecMonTableNumber }
+::= { acsPowerMgmtOutElecMonTable 1 }
+
+AcsPowerMgmtOutElecMonTableEntry ::= SEQUENCE  {
+        acsPowerMgmtOutElecMonTablePortNumber   InterfaceIndex, -- serial port #
+        acsPowerMgmtOutElecMonTablePduNumber    InterfaceIndex,     
+        acsPowerMgmtOutElecMonTableNumber       InterfaceIndex, -- outlet number in PDU
+	acsPowerMgmtOutElecMonTableCurrentValue Integer32,	     -- actual value for current
+	acsPowerMgmtOutElecMonTableCurrentMax   Integer32,	     -- max detected value for current
+	acsPowerMgmtOutElecMonTableCurrentMin   Integer32,	     -- min detected value for current
+	acsPowerMgmtOutElecMonTableCurrentAvg   Integer32,	     -- average value for current
+	acsPowerMgmtOutElecMonTableCurrentReset INTEGER,      -- reset max, min and avg values of current
+	acsPowerMgmtOutElecMonTablePowerValue   Integer32,	     -- actual value for power
+	acsPowerMgmtOutElecMonTablePowerMax     Integer32,	     -- max detected value for power
+	acsPowerMgmtOutElecMonTablePowerMin     Integer32,	     -- min detected value for power
+	acsPowerMgmtOutElecMonTablePowerAvg     Integer32,	     -- average value for power
+	acsPowerMgmtOutElecMonTablePowerReset   INTEGER,	     -- reset max, min and avg values of power
+	acsPowerMgmtOutElecMonTableVoltageValue Integer32,      -- actual value for voltage
+	acsPowerMgmtOutElecMonTableVoltageMax   Integer32,	     -- max detected value for voltage
+	acsPowerMgmtOutElecMonTableVoltageMin   Integer32,	     -- min detected value for voltage
+	acsPowerMgmtOutElecMonTableVoltageAvg   Integer32,	     -- average value for voltage
+	acsPowerMgmtOutElecMonTableVoltageReset INTEGER,      -- reset max, min and avg values of voltage
+	acsPowerMgmtOutElecMonTablePowerFactorValue Integer32,  -- actual value for power factor
+	acsPowerMgmtOutElecMonTablePowerFactorMax   Integer32,  -- max detected value for power factor
+	acsPowerMgmtOutElecMonTablePowerFactorMin   Integer32,  -- min detected value for power factor
+	acsPowerMgmtOutElecMonTablePowerFactorAvg   Integer32,  -- avg value for power factor
+	acsPowerMgmtOutElecMonTablePowerFactorReset INTEGER,   -- reset max, min and avg values of power factor
+	acsPowerMgmtOutElecMonTableAlarm	     INTEGER	    -- outlet alarm status 
+}
+
+acsPowerMgmtOutElecMonTablePortNumber OBJECT-TYPE
+        SYNTAX             InterfaceIndex
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "Serial Port number."
+::= { acsPowerMgmtOutElecMonTableEntry 1 }
+
+acsPowerMgmtOutElecMonTablePduNumber OBJECT-TYPE
+        SYNTAX             InterfaceIndex
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "Index."
+::= { acsPowerMgmtOutElecMonTableEntry 2 }
+
+acsPowerMgmtOutElecMonTableNumber OBJECT-TYPE
+        SYNTAX             InterfaceIndex
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "Number of the outlet in the PDU."
+::= { acsPowerMgmtOutElecMonTableEntry 3 }
+
+acsPowerMgmtOutElecMonTableCurrentValue OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "Actual value of outlet current sensor.( A x 10 )" 
+::= { acsPowerMgmtOutElecMonTableEntry 4 }
+
+acsPowerMgmtOutElecMonTableCurrentMax OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "Max detected value of outlet current sensor.( A x 10 )" 
+::= { acsPowerMgmtOutElecMonTableEntry 5 }
+
+acsPowerMgmtOutElecMonTableCurrentMin OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "Min detected value of outlet current sensor.( A x 10 )" 
+::= { acsPowerMgmtOutElecMonTableEntry 6 }
+
+acsPowerMgmtOutElecMonTableCurrentAvg OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "Average value for outlet current sensor.( A x 10 )" 
+::= { acsPowerMgmtOutElecMonTableEntry 7 }
+
+acsPowerMgmtOutElecMonTableCurrentReset OBJECT-TYPE
+        SYNTAX        INTEGER {
+                noAction(1),
+                reset(2)
+        }
+        MAX-ACCESS         read-write
+        STATUS             current
+        DESCRIPTION
+        "Reset max, min and avertage values of outlet current."
+::= { acsPowerMgmtOutElecMonTableEntry 8 }
+
+acsPowerMgmtOutElecMonTablePowerValue OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "Actual value of outlet power comsumption sensor.( W x 10 )" 
+::= { acsPowerMgmtOutElecMonTableEntry 9 }
+
+acsPowerMgmtOutElecMonTablePowerMax OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "Max detected value of outlet power comsumption sensor.( W x 10 )" 
+::= { acsPowerMgmtOutElecMonTableEntry 10 }
+
+acsPowerMgmtOutElecMonTablePowerMin OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "Min detected value of outlet power comsumption sensor.( W x 10 )" 
+::= { acsPowerMgmtOutElecMonTableEntry 11 }
+
+acsPowerMgmtOutElecMonTablePowerAvg OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "Average value for outlet power comsumption sensor.( W x 10 )" 
+::= { acsPowerMgmtOutElecMonTableEntry 12 }
+
+acsPowerMgmtOutElecMonTablePowerReset OBJECT-TYPE
+        SYNTAX        INTEGER {
+                noAction(1),
+                reset(2)
+        }
+        MAX-ACCESS         read-write
+        STATUS             current
+        DESCRIPTION
+        "Reset max, min and avertage values of outlet power comsumption."
+::= { acsPowerMgmtOutElecMonTableEntry 13 }
+
+acsPowerMgmtOutElecMonTableVoltageValue OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "Actual value of outlet voltage sensor.( V )" 
+::= { acsPowerMgmtOutElecMonTableEntry 14 }
+
+acsPowerMgmtOutElecMonTableVoltageMax OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "Max detected value of outlet voltage sensor.( V )" 
+::= { acsPowerMgmtOutElecMonTableEntry 15 }
+
+acsPowerMgmtOutElecMonTableVoltageMin OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "Min detected value of outlet voltage sensor.( V )" 
+::= { acsPowerMgmtOutElecMonTableEntry 16 }
+
+acsPowerMgmtOutElecMonTableVoltageAvg OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "Average value for outlet voltage sensor.( V )" 
+::= { acsPowerMgmtOutElecMonTableEntry 17 }
+
+acsPowerMgmtOutElecMonTableVoltageReset OBJECT-TYPE
+        SYNTAX        INTEGER {
+                noAction(1),
+                reset(2)
+        }
+        MAX-ACCESS         read-write
+        STATUS             current
+        DESCRIPTION
+        "Reset max, min and avertage values of outlet voltage."
+::= { acsPowerMgmtOutElecMonTableEntry 18 }
+
+acsPowerMgmtOutElecMonTablePowerFactorValue OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "Actual value of outlet power-factor sensor.( PF x 100 )" 
+::= { acsPowerMgmtOutElecMonTableEntry 19 }
+
+acsPowerMgmtOutElecMonTablePowerFactorMax OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "Max detected value of outlet power-factor sensor.( PF x 100 )" 
+::= { acsPowerMgmtOutElecMonTableEntry 20 }
+
+acsPowerMgmtOutElecMonTablePowerFactorMin OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "Min detected value of outlet power-factor sensor.( PF x 100 )" 
+::= { acsPowerMgmtOutElecMonTableEntry 21 }
+
+acsPowerMgmtOutElecMonTablePowerFactorAvg OBJECT-TYPE
+        SYNTAX             Integer32
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+        "Average value for outlet power-factor sensor.( PF x 100 )" 
+::= { acsPowerMgmtOutElecMonTableEntry 22 }
+
+acsPowerMgmtOutElecMonTablePowerFactorReset OBJECT-TYPE
+        SYNTAX        INTEGER {
+                noAction(1),
+                reset(2)
+        }
+        MAX-ACCESS         read-write
+        STATUS             current
+        DESCRIPTION
+        "Reset max, min and avertage values of outlet power-factor."
+::= { acsPowerMgmtOutElecMonTableEntry 23 }
+
+acsPowerMgmtOutElecMonTableAlarm OBJECT-TYPE
+        SYNTAX       INTEGER {
+			normal (1),
+			blow-fuse (2),
+			hw-ocp (3),
+			high-critical (4),
+			high-warning (5),
+			low-warning (6),
+			low-critical (7)
+                    }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Show the outlet alarm status."
+::= { acsPowerMgmtOutElecMonTableEntry 24 }
+
+END

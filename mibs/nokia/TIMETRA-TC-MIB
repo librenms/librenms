@@ -129,7 +129,7 @@ TmnxFPNumber                     ::= TEXTUAL-CONVENTION
     DESCRIPTION
         "The unique value that identifies the forwarding plane within a
          specific IOM card in the system."
-    SYNTAX      Unsigned32 (1..8)
+    SYNTAX      Unsigned32 (1..12)
 
 TmnxFPNumberOrZero               ::= TEXTUAL-CONVENTION
     STATUS      current
@@ -138,7 +138,7 @@ TmnxFPNumberOrZero               ::= TEXTUAL-CONVENTION
          specific IOM card in the system.
 
          Value 0 means this value is not applicable."
-    SYNTAX      Unsigned32 (0 | 1..8)
+    SYNTAX      Unsigned32 (0 | 1..12)
 
 InterfaceIndex                   ::= TEXTUAL-CONVENTION
     DISPLAY-HINT "d"
@@ -586,6 +586,13 @@ TItemLongDescription             ::= TEXTUAL-CONVENTION
          characters here, no control characters, no UTF-8, etc."
     SYNTAX      DisplayString
 
+TItemVeryLongDescription         ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Longer description for an item.  Note, use only NVT ASCII displayable
+         characters here, no control characters, no UTF-8, etc."
+    SYNTAX      DisplayString (SIZE (0..255))
+
 TRegularExpression               ::= TEXTUAL-CONVENTION
     STATUS      current
     DESCRIPTION
@@ -818,7 +825,7 @@ TPolicyID                        ::= TEXTUAL-CONVENTION
     STATUS      current
     DESCRIPTION
         "The identification number of a policy."
-    SYNTAX      Unsigned32 (0..65535 | 65536 | 65537 | 65538 | 65539)
+    SYNTAX      Unsigned32 (0..65535 | 65536 | 65537 | 65538 | 65539 | 65540)
 
 TTmplPolicyID                    ::= TEXTUAL-CONVENTION
     STATUS      current
@@ -865,7 +872,7 @@ TAnyQosPolicyID                  ::= TEXTUAL-CONVENTION
                                       identifier is 1..65535. This is the user
                                       configured values.
          When policy type = 1 (0001b)  [NAT/LNS], the acceptable range for base
-                                      policy identifier is 0..3. These policies
+                                      policy identifier is 0..4. These policies
                                       are considered 'internal' and cannot be
                                       created or modified by the user.
          When policy type = 2 (0010b)  The auxiliary identifier represents
@@ -930,8 +937,8 @@ TmnxCreateOrigin                 ::= TEXTUAL-CONVENTION
         tli            (19),
         pdn            (20),
         ipsec          (23),
-        reserved24     (24),
-        reserved25     (25),
+        esa            (24),
+        pfcpCups       (25),
         manual-mci     (26)
     }
 
@@ -1054,6 +1061,14 @@ TmnxBsxAaGrpPartIndexOrZero      ::= TEXTUAL-CONVENTION
          The value of zero indicates that no Application Assurance partition is
          specified"
     SYNTAX      Unsigned32 (0..16777215)
+
+TmnxBsxAaSubHttpUrlParam         ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Optional text string used to customize the URL used for Application
+         Assurance HTTP In-Browser Notification and automatically appended at
+         the end of the notification script URL as an argument."
+    SYNTAX      DisplayString (SIZE (0..247))
 
 TSapEgrEncapGrpQosPolicyIdOrZero ::= TEXTUAL-CONVENTION
     STATUS      current
@@ -2159,14 +2174,14 @@ TmnxIgpInstance                  ::= TEXTUAL-CONVENTION
 
          IGP      Address Family   Supported Range
          ------   --------------   ---------------
-         IS-IS    all                        0..31
+         IS-IS    all                        0..127
          OSPFv2   all                        0..31
          OSPFv3   IPv4 unicast              64..95
          OSPFv3   IPv6 unicast               0..31 "
     REFERENCE
         "RFC 5838, 'Support of Address Families in OSPFv3', Section 2.1,
          'Instance ID Values for New AFs'."
-    SYNTAX      Unsigned32 (0..31 | 64..95)
+    SYNTAX      Unsigned32 (0..127)
 
 TmnxOspfInstance                 ::= TEXTUAL-CONVENTION
     STATUS      current
@@ -2212,7 +2227,9 @@ TmnxBGPFamilyType                ::= TEXTUAL-CONVENTION
         bgpLs          (20),
         mcastVpnIpv6   (21),
         srplcyIpv4     (22),
-        srplcyIpv6     (23)
+        srplcyIpv6     (23),
+        reserved24     (24),
+        reserved25     (25)
     }
 
 TmnxIgmpGroupFilterMode          ::= TEXTUAL-CONVENTION
@@ -2239,19 +2256,22 @@ TmnxIgmpGroupType                ::= TEXTUAL-CONVENTION
         "The data type TmnxIgmpGroupType describes how a multicast group is
          learned."
     SYNTAX      INTEGER {
-        static  (1),
-        dynamic (2)
+        static   (1),
+        dynamic  (2),
+        bgp-smet (3),
+        bgp-sync (4)
     }
 
 TmnxIgmpSnpgGroupType            ::= TEXTUAL-CONVENTION
     STATUS      current
     DESCRIPTION
-        "The data type TmnxIgmpSnpgGroupType describes how a multicast  group
-         is learned."
+        "The data type TmnxIgmpSnpgGroupType describes how a multicast group is
+         learned."
     SYNTAX      INTEGER {
         static   (1),
         dynamic  (2),
-        bgp-smet (3)
+        bgp-smet (3),
+        bgp-sync (4)
     }
 
 TmnxIgmpVersion                  ::= TEXTUAL-CONVENTION
@@ -2291,8 +2311,10 @@ TmnxMldGroupType                 ::= TEXTUAL-CONVENTION
         "The data type TmnxMldGroupType describes how a multicast group is
          learned."
     SYNTAX      INTEGER {
-        static  (1),
-        dynamic (2)
+        static   (1),
+        dynamic  (2),
+        bgp-smet (3),
+        bgp-sync (4)
     }
 
 TmnxMldVersion                   ::= TEXTUAL-CONVENTION
@@ -2350,7 +2372,8 @@ TmnxTunnelTypeExt                ::= TEXTUAL-CONVENTION
         mplsFwdPolicy (14),
         srPolicy      (15),
         ribApi        (16),
-        reserved17    (17)
+        bgpEpe        (17),
+        srv6Isis      (18)
     }
 
 TmnxIgpSCFamilyType              ::= TEXTUAL-CONVENTION
@@ -2846,7 +2869,7 @@ TmnxSubShcvSrcIpOrigin           ::= TEXTUAL-CONVENTION
 TmnxSubSpiGroupId                ::= TEXTUAL-CONVENTION
     STATUS      current
     DESCRIPTION
-        "The TmnxSubSpiGroupId data type is an integer that specifies  the SLA
+        "The TmnxSubSpiGroupId data type is an integer that specifies the SLA
          profile instance group identifier.
 
          A value of minus one means that there is no group identifier
@@ -2856,10 +2879,10 @@ TmnxSubSpiGroupId                ::= TEXTUAL-CONVENTION
 TmnxSubOperSpiGroupId            ::= TEXTUAL-CONVENTION
     STATUS      current
     DESCRIPTION
-        "The TmnxSubOperSpiGroupId data type is an integer that indicates  the
+        "The TmnxSubOperSpiGroupId data type is an integer that indicates the
          SLA profile instance group identifier specified by the AAA server.
 
-         A value of minus one indicates that the AAA server  did not specify
+         A value of minus one indicates that the AAA server did not specify
          such a group identifier."
     SYNTAX      Integer32
 
@@ -2875,6 +2898,62 @@ TmnxReferenceBandwidth           ::= TEXTUAL-CONVENTION
 
          The value zero specifies that no reference-bandwidth is configured."
     SYNTAX      Unsigned32 (0..4000000000)
+
+TmnxSubPfcpNodeIdType            ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The TmnxSubPfcpNodeIdType data type is an enumerated integer that
+         describes the values used to identify a PFCP node.
+
+         The value 'useIpAddress' means that an IP address is used.
+
+         The value 'fqdn' means that a Fully Qualified Domain Name (FQDN) is
+         used."
+    SYNTAX      INTEGER {
+        none         (0),
+        useIpAddress (1),
+        fqdn         (2)
+    }
+
+TmnxSubPfcpNodeIdDomainName      ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "A Fully Qualified Domain Name."
+    SYNTAX      DisplayString (SIZE (0..255))
+
+TmnxSubPfcpPeerNodeIdType        ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The TmnxSubPfcpPeerNodeIdType data type is an enumerated integer that
+         describes the values used to identify a PFCP peer node.
+
+         The value 'useIpAddress' means that an IP address is used.
+
+         The value 'fqdn' means that a Fully Qualified Domain Name (FQDN) is
+         used."
+    SYNTAX      INTEGER {
+        none         (0),
+        useIpAddress (1),
+        reserved2    (2)
+    }
+
+TmnxSubPfcpCurrPeerNodeIdType    ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The TmnxSubPfcpCurrPeerNodeIdType data type is an enumerated integer
+         that describes the values used to identify a PFCP peer node.
+
+         The value 'none' means that the peer nodeId is not yet known.
+
+         The value 'useIpAddress' means that an IP address is used.
+
+         The value 'fqdn' means that a Fully Qualified Domain Name (FQDN) is
+         used."
+    SYNTAX      INTEGER {
+        none         (0),
+        useIpAddress (1),
+        fqdn         (2)
+    }
 
 TmnxSubPoolName                  ::= TEXTUAL-CONVENTION
     STATUS      current
@@ -3102,9 +3181,16 @@ TmnxFpeId                        ::= TEXTUAL-CONVENTION
 TmnxFpeIdOrZero                  ::= TEXTUAL-CONVENTION
     STATUS      current
     DESCRIPTION
-        "The data type TmnxFpeIdOrZero is a number that either  uniquely
+        "The data type TmnxFpeIdOrZero is a number that either uniquely
          identifies a Forward Path Extension (FPE), or is equal to zero."
     SYNTAX      Unsigned32 (0..64)
+
+TmnxFpePathId                    ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxFpePathId is a number that uniquely identifies a
+         path within a multi-path Forward Path Extension (FPE)."
+    SYNTAX      Unsigned32 (1..64)
 
 TmnxAccessLoopEncapDataLink      ::= TEXTUAL-CONVENTION
     STATUS      current
@@ -3796,11 +3882,12 @@ TmnxMdaQos                       ::= TEXTUAL-CONVENTION
         "TmnxMdaQos is an enumerated integer whose value specifies the Quality
          of Service support of a Media Dependent Adapter (MDA)."
     SYNTAX      INTEGER {
-        unknown (0),
-        mda     (1),
-        hsmda1  (2),
-        hsmda2  (3),
-        hs      (4)
+        unknown       (0),
+        mda           (1),
+        hsmda1        (2),
+        hsmda2        (3),
+        hs            (4),
+        fpHwAggShaper (5)
     }
 
 TAtmTdpDescrType                 ::= TEXTUAL-CONVENTION
@@ -4234,7 +4321,8 @@ TmnxIsaScalingProfile            ::= TEXTUAL-CONVENTION
          implementation."
     SYNTAX      INTEGER {
         profile1 (1),
-        profile2 (2)
+        profile2 (2),
+        profile3 (3)
     }
 
 TmnxVdoGrpIdIndex                ::= TEXTUAL-CONVENTION
@@ -4500,6 +4588,13 @@ TEgrDynPolicerIdOrNone           ::= TEXTUAL-CONVENTION
          side or zero when not specified."
     SYNTAX      Integer32 (0 | 1..63)
 
+TEgrDynQueueIdOrNone             ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type describes the QoS dynamic queue identifier on egress
+         side or zero when not specified."
+    SYNTAX      Integer32 (0 | 1..63)
+
 TFIRRate                         ::= TEXTUAL-CONVENTION
     STATUS      current
     DESCRIPTION
@@ -4563,6 +4658,14 @@ TBurstSizeBytesOverride          ::= TEXTUAL-CONVENTION
          buffer policy's default value. A value of -2 specifies no override."
     SYNTAX      Integer32 (-2 | -1 | 0..134217728)
 
+TPolicerBurstSizeBytes           ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The amount of buffer space (in bytes) assigned to a queue by policer.
+         The value -1 means that the actual value is derived from the
+         corresponding buffer policy's default value."
+    SYNTAX      Integer32 (-1 | 0..268435456)
+
 THSMDABurstSizeBytesOverride     ::= TEXTUAL-CONVENTION
     STATUS      current
     DESCRIPTION
@@ -4579,6 +4682,15 @@ TPlcrBurstSizeBytesOverride      ::= TEXTUAL-CONVENTION
          corresponding buffer policy's default value. A value of -2 specifies
          no override."
     SYNTAX      Integer32 (-2 | -1 | 0..16777216)
+
+TPolicerBurstSizeBytesOverride   ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The amount of buffer space (in bytes) assigned to a queue by policer.
+         The value -1 means that the actual value is derived from the
+         corresponding buffer policy's default value. A value of -2 specifies
+         no override."
+    SYNTAX      Integer32 (-2 | -1 | 0..268435456)
 
 TmnxBfdSessionProtocols          ::= TEXTUAL-CONVENTION
     STATUS      current
@@ -4611,7 +4723,9 @@ TmnxBfdSessionProtocols          ::= TEXTUAL-CONVENTION
         ripng       (23),
         mplsLsp     (24),
         reserved25  (25),
-        reserved26  (26)
+        srPolicy    (26),
+        treeSid     (27),
+        bier        (28)
     }
 
 TmnxBfdSessOperState             ::= TEXTUAL-CONVENTION
@@ -4640,11 +4754,56 @@ TmnxBfdOnLspSessFecType          ::= TEXTUAL-CONVENTION
         "RFC 5884, 'Bidirectional Forwarding Detection (BFD) for MPLS Label
          Switched Paths (LSPs)', Section 3.1, 'BFD for MPLS LSPs: Motivation'."
     SYNTAX      INTEGER {
-        rsvp      (1),
-        ldp       (2),
-        bgp       (3),
-        srTe      (4),
-        reserved5 (5)
+        rsvp     (1),
+        ldp      (2),
+        bgp      (3),
+        srTe     (4),
+        srPolicy (5)
+    }
+
+TmnxBfdSessProtocolState         ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The TmnxBfdSessProtocolState data type is an enumerated integer that
+         describes the state of the BFD protocol."
+    SYNTAX      INTEGER {
+        adminDown (0),
+        down      (1),
+        init      (2),
+        up        (3)
+    }
+
+TmnxBfdSessOperFlags             ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The value of TmnxBfdSessOperFlags indicates the reasons why a BFD
+         session is not up."
+    SYNTAX      BITS {
+        noProtocols   (0),
+        noHeartBeat   (1),
+        echoFailed    (2),
+        nbrSignalDown (3),
+        fwdPlaneReset (4),
+        pathDown      (5),
+        nbrAdminDown  (6),
+        adminClear    (7),
+        misConnDefect (8)
+    }
+
+TmnxBfdTermination               ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The TmnxBfdTermination data type is an enumerated integer that indicates
+         the termination of the BFD session as follows:
+            'iom (1)'   - termination on the IOM card main processor,
+            'cpm (2)'   - termination on the CPM card main processor,
+            'cpmNp (3)' - termination on the CPM card Network Processor,
+            'fp(4)'     - termination on the forwarding plane"
+    SYNTAX      INTEGER {
+        iom   (1),
+        cpm   (2),
+        cpmNp (3),
+        fp    (4)
     }
 
 TmnxIngPolicerStatMode           ::= TEXTUAL-CONVENTION
@@ -4807,8 +4966,9 @@ TIPFilterType                    ::= TEXTUAL-CONVENTION
         "A type containing the possible types of IP/IPv6 filters provided by
          the system."
     SYNTAX      INTEGER {
-        normal   (1),
-        vxlanVni (2)
+        normal         (1),
+        vxlanVni       (2),
+        tagged-entries (3)
     }
 
 TmnxPwGlobalId                   ::= TEXTUAL-CONVENTION
@@ -5153,6 +5313,13 @@ TmnxDistCpuProtPacketRateLimit   ::= TEXTUAL-CONVENTION
          CPU Protection Policy parameters. The value -1 means max rate."
     SYNTAX      Integer32 (-1 | 0..255)
 
+TmnxDistCpuProtPacketPolicerRateLimit ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "A packet rate limit expressed in packets per second for Distributed
+         CPU Protection Policy parameters. The value -1 means max rate."
+    SYNTAX      Integer32 (-1 | 0..8000)
+
 TmnxDistCpuProtRate              ::= TEXTUAL-CONVENTION
     STATUS      current
     DESCRIPTION
@@ -5226,7 +5393,9 @@ TmnxDistCpuProtProtocolId        ::= TEXTUAL-CONVENTION
         ldp             (15),
         ospf            (16),
         pim             (17),
-        rsvp            (18)
+        rsvp            (18),
+        icmp-ping-check (19),
+        lacp            (21)
     }
 
 TmnxDistCpuProtRateType          ::= TEXTUAL-CONVENTION
@@ -5561,11 +5730,13 @@ TmnxScriptAuthType               ::= TEXTUAL-CONVENTION
         "The tmnxCliScriptAuthUserType datatype is an enumerated integer that
          indicates the type of module executing a CLI command script."
     SYNTAX      INTEGER {
-        none         (0),
-        cron         (1),
-        xmpp         (2),
-        event-script (3),
-        vsd          (4)
+        none                (0),
+        cron                (1),
+        xmpp                (2),
+        event-script        (3),
+        vsd                 (4),
+        cron-python         (5),
+        event-script-python (6)
     }
 
 TmnxISIDNoZero                   ::= TEXTUAL-CONVENTION
@@ -5581,7 +5752,7 @@ TmnxSvcEvi                       ::= TEXTUAL-CONVENTION
     STATUS      current
     DESCRIPTION
         "The TmnxSvcEvi specifies an ethernet EVPN identifier value."
-    SYNTAX      Integer32 (1..65535)
+    SYNTAX      Integer32 (1..16777215)
 
 TmnxSecRadiusServAlgorithm       ::= TEXTUAL-CONVENTION
     STATUS      current
@@ -5606,7 +5777,7 @@ TmnxSvcEviOrZero                 ::= TEXTUAL-CONVENTION
     DESCRIPTION
         "The TmnxSvcEviOrZero specifies an ethernet EVPN identifier value. Zero
          indicates no such value specified."
-    SYNTAX      Integer32 (0..65535)
+    SYNTAX      Integer32 (0..16777215)
 
 TmnxSubTerminationType           ::= TEXTUAL-CONVENTION
     STATUS      current
@@ -6236,7 +6407,7 @@ TmnxMplsLabel                    ::= TEXTUAL-CONVENTION
 TmnxMplsLabelOrZero              ::= TEXTUAL-CONVENTION
     STATUS      current
     DESCRIPTION
-        "The TmnxMplsLabelOrZero data type indicates range for MPLS label.  The
+        "The TmnxMplsLabelOrZero data type indicates range for MPLS label. The
          value 0 indicates that no MPLS label is specified."
     SYNTAX      Unsigned32 (0 | 32..1048575)
 
@@ -6355,9 +6526,9 @@ TPolRateTypeRefOrLocalLimit      ::= TEXTUAL-CONVENTION
          'percentReferPortLimit' means the rate is specified in percentage of
          reference port limit."
     SYNTAX      INTEGER {
-        kbps              (1),
-        percentLocalLimit (2),
-        reserved3         (3)
+        kbps                  (1),
+        percentLocalLimit     (2),
+        percentReferPortLimit (3)
     }
 
 TPolicerRateTypeWithRefLimit     ::= TEXTUAL-CONVENTION
@@ -6370,10 +6541,10 @@ TPolicerRateTypeWithRefLimit     ::= TEXTUAL-CONVENTION
          'percentReferPortLimit' means the rate is specified in percentage of
          reference port limit."
     SYNTAX      INTEGER {
-        kbps              (1),
-        percentPortLimit  (2),
-        percentLocalLimit (3),
-        reserved4         (4)
+        kbps                  (1),
+        percentPortLimit      (2),
+        percentLocalLimit     (3),
+        percentReferPortLimit (4)
     }
 
 TWredSlopeProfile                ::= TEXTUAL-CONVENTION
@@ -6417,6 +6588,23 @@ TmnxFlexAlgoId                   ::= TEXTUAL-CONVENTION
         "TmnxFlexAlgoId identifies a specific Flexible Algorithm in the system."
     SYNTAX      Unsigned32 (128..255)
 
+TmnxFlexAlgoIdOrZero             ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "TmnxFlexAlgoId identifies a specific Flexible Algorithm in the system.
+
+         The value '0' indicates that no Flexible Algorithm is specified."
+    SYNTAX      Unsigned32 (0 | 128..255)
+
+TmnxAlgorithmId                  ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "TmnxAlgorithmId identifies a specific Algorithm in the system.
+
+         The value can indentify a defined IGP Algorithm (value 0 is SPF) or a
+         Flexible Algorithm (range 128..255)."
+    SYNTAX      Unsigned32 (0..255)
+
 TmnxTreeSidOwner                 ::= TEXTUAL-CONVENTION
     STATUS      current
     DESCRIPTION
@@ -6436,6 +6624,415 @@ TmnxTreeSidOrigin                ::= TEXTUAL-CONVENTION
         pcep          (10),
         bgpSrPolicy   (20),
         configuration (30)
+    }
+
+TmnxMacMask                      ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The TmnxMacMask is the 6 byte mask to provide the range of MAC
+         addresses."
+    SYNTAX      OCTET STRING (SIZE (6))
+
+TmnxVeId                         ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The TmnxVeId is the vpls-edge-range."
+    SYNTAX      Integer32 (-1 | 1..65535)
+
+TmnxMcIPsecDomainId              ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "TmnxMcIPsecDomainId is an integer identifying a Multi-chassis IPsec
+         Domain."
+    SYNTAX      Unsigned32 (1..255)
+
+TmnxMcIPsecDomainDesignatedRole  ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "TmnxMcIPsecDomainDesignatedRole indicates the designated role of a
+         Multi-chassis IPsec Domain."
+    SYNTAX      INTEGER {
+        standby (1),
+        active  (2)
+    }
+
+TmnxMcIPsecDomainAdjRmtDesignatedRole ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "TmnxMcIPsecDomainAdjRmtDesignatedRole indicated the designated role of
+         remote MC IPsec Domain."
+    SYNTAX      INTEGER {
+        standby (1),
+        active  (2),
+        unknown (3)
+    }
+
+TmnxSubHostSessionLimitOverride  ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The TmnxSubHostSessionLimitOverride data type is an integer that
+         indicates the maximum number of hosts using....
+
+         The value -1 indicates that there is no limit
+
+         The value -2 indicates that the AAA server did not specify an
+         override."
+    SYNTAX      Integer32 (-2..131071)
+
+TPlcyAcctPolicerId               ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type describes the router policer accounting template policer
+         identifier."
+    SYNTAX      Unsigned32 (1..63)
+
+TPktByteOffset                   ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The value, in bytes, of the adjustment to make to the size of each
+         packet."
+    SYNTAX      Integer32 (-8 | -4 | 0 | 4 | 8)
+
+TmnxAuthAlgorithm                ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "TmnxAuthAlgorithm data type is an enumerated integer that describes
+         the values used to identify the hashing algorithm.
+
+         Value Descriptions:
+
+         null           - Choosing this value configures the high-speed
+                          null algorithm, which does nothing. This is same
+                          as not having authentication turned on, same as
+                          turning the protocol off.
+
+         md5            - Choosing this value configures the use of
+                          hmac-md5 algorithm for authentication.
+
+         sha1           - Choosing this value configures the use of
+                          hmac-sha1 algorithm for authentication.
+
+         sha256         - Choosing this value configures the use of
+                          hmac-sha256 algorithm for authentication.
+
+         sha384         - Choosing this value configures the use of
+                          hmac-sha384 algorithm for authentication.
+
+         sha512         - Choosing this value configures the use of
+                           hmac-sha512 algorithm for authentication.
+
+         aesXcbc        - Choosing this value configures the use of
+                          aes-xcbc(RFC3566) algorithm for authentication.
+
+         authEncryption - Choosing this value configures the use of
+                          Authenticated Encryption (AE) algorithm for
+                          authentiation."
+    SYNTAX      INTEGER {
+        null           (1),
+        md5            (2),
+        sha1           (3),
+        sha256         (4),
+        sha384         (5),
+        sha512         (6),
+        aesXcbc        (7),
+        authEncryption (8)
+    }
+
+TmnxEncrAlgorithm                ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "TmnxEncrAlgorithm data type is an enumerated integer that describes
+         the values used to identify the encryption algorithm.
+
+         Value Descriptions:
+
+         null          - Choosing this value configures the high-speed
+                         null algorithm, which does nothing. This is same
+                         as not having encryption turned on.
+
+         des           - Choosing this value configures the 56-bit DES
+                         algorithm for encryption. This is an older
+                         algorithm with relatively weak security. While
+                         better than nothing, it should only be used
+                         where a strong algorithm is not available on
+                         both ends at an acceptable performance level.
+
+         des3          - Choosing this value configures the 3-DES
+                         algorithm for encryption. This is a modified
+                         application of the des algorithm which uses
+                         multiple des operations to make things more
+                         secure.
+
+         aes128        - Choosing this value configures the AES algorithm
+                         with a block size of 128 bits. This is a
+                         mandatory implementation size for AES. As of
+                         today, this is a very strong algorithm choice.
+
+         aes192        - Choosing this value configures the AES algorithm
+                         with a block size of 192 bits. This is a
+                         stronger version of AES.
+
+         aes256        - Choosing this value configures the AES algorithm
+                         with a block size of 256 bits. This is the
+                         strongest available version of AES.
+
+         aes128Gcm8     - Choosing this value configures the AES algorithm
+                         with a block size of 128 bits in Galois/Counter
+                         Mode (GCM) with an 8 octet Integrity Check Value (ICV).
+
+         aes128Gcm12    - Choosing this value configures the AES algorithm
+                         with a block size of 128 bits in Galois/Counter
+                         Mode (GCM) with an 12 octet ICV.
+
+         aes128Gcm16    - Choosing this value configures the AES algorithm
+                         with a block size of 128 bits in Galois/Counter
+                         Mode (GCM) with an 16 octet ICV.
+
+         aes192Gcm8     - Choosing this value configures the AES algorithm
+                         with a block size of 192 bits in Galois/Counter
+                         Mode (GCM) with an 8 octet ICV.
+
+         aes192Gcm12    - Choosing this value configures the AES algorithm
+                         with a block size of 192 bits in Galois/Counter
+                         Mode (GCM) with an 12 octet ICV.
+
+         aes192Gcm16    - Choosing this value configures the AES algorithm
+                         with a block size of 192 bits in Galois/Counter
+                         Mode (GCM) with an 16 octet ICV.
+
+         aes256Gcm8     - Choosing this value configures the AES algorithm
+                         with a block size of 256 bits in Galois/Counter
+                         Mode (GCM) with an 8 octet ICV.
+
+         aes256Gcm12    - Choosing this value configures the AES algorithm
+                         with a block size of 256 bits in Galois/Counter
+                         Mode (GCM) with an 12 octet ICV.
+
+         aes256Gcm16    - Choosing this value configures the AES algorithm
+                         with a block size of 256 bits in Galois/Counter
+                         Mode (GCM) with an 16 octet ICV.
+
+         nullAes128Gmac - Choosing this value configures the AES algorithm
+                         with a block size of 128 bits in Galois Message
+                         Authentication Code (GMAC).
+
+         nullAes192Gmac - Choosing this value configures the AES algorithm
+                         with a block size of 192 bits in Galois Message
+                         Authentication Code (GMAC).
+
+         nullAes256Gmac - Choosing this value configures the AES algorithm
+                         with a block size of 256 bits in Galois Message
+                         Authentication Code (GMAC)."
+    SYNTAX      INTEGER {
+        null           (1),
+        des            (2),
+        des3           (3),
+        aes128         (4),
+        aes192         (5),
+        aes256         (6),
+        aes128Gcm8     (7),
+        aes128Gcm12    (8),
+        aes128Gcm16    (9),
+        aes192Gcm8     (10),
+        aes192Gcm12    (11),
+        aes192Gcm16    (12),
+        aes256Gcm8     (13),
+        aes256Gcm12    (14),
+        aes256Gcm16    (15),
+        nullAes128Gmac (16),
+        nullAes192Gmac (17),
+        nullAes256Gmac (18)
+    }
+
+TmnxIkePolicyDHGroupOrZero       ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "TmnxIkePolicyDHGroupOrZero data type is similar to
+         TmnxIkePolicyDHGroup but allows the value 'unspecified (0)'."
+    SYNTAX      INTEGER {
+        unspecified (0),
+        group1      (1),
+        group2      (2),
+        group5      (5),
+        group14     (14),
+        group15     (15),
+        group19     (19),
+        group20     (20),
+        group21     (21)
+    }
+
+TmnxIPsecDirection               ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "TmnxIPsecDirection data type is an enumerated integer that describes
+         the values used to identify the direction of an IPsec tunnel."
+    SYNTAX      INTEGER {
+        inbound  (1),
+        outbound (2)
+    }
+
+TmnxIPsecKeyingType              ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "TmnxIPsecKeyingType data type is an enumerated integer that describes
+         the values used to identify the IPsec keying type."
+    SYNTAX      INTEGER {
+        none    (0),
+        manual  (1),
+        dynamic (2)
+    }
+
+TDCpuProtPolicyType              ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "TDCpuProtPolicyType data type is an enumerated integer that describes
+         the values for distributed CPU protection policy type."
+    SYNTAX      INTEGER {
+        accessNetwork (1),
+        port          (2)
+    }
+
+TQosHwAggShaperSchedClass        ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The scheduling class for the specified hardware aggregate shaper
+         scheduler entity."
+    SYNTAX      Integer32 (1..6)
+
+TSrv6FunctionValue               ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The value to be assigned to all routes for the instance."
+    SYNTAX      Unsigned32 (0..1048575)
+
+TSrv6FunctionType                ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The type of function to be assigned to all routes for the instance."
+    SYNTAX      INTEGER {
+        none    (0),
+        dynamic (1),
+        static  (2)
+    }
+
+TSrv6FunctionErrorCode           ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The error-code for the function."
+    SYNTAX      INTEGER {
+        noError      (0),
+        error        (1),
+        noResource   (2),
+        locAdminDown (3),
+        noIntConfig  (4),
+        fpeOperDown  (5)
+    }
+
+TSrv6Function                    ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The function for srv6."
+    SYNTAX      INTEGER {
+        end      (0),
+        end-x    (1),
+        end-dt4  (2),
+        end-dt6  (3),
+        end-dt46 (4),
+        end-dx2  (5),
+        end-dt2u (6),
+        end-dt2m (7)
+    }
+
+TSrv6EndpointBehavior            ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The SRv6 endpoint behaviors."
+    SYNTAX      INTEGER {
+        none           (0),
+        end            (1),
+        endPsp         (2),
+        endUsp         (3),
+        endPspUsp      (4),
+        endX           (5),
+        endXPsp        (6),
+        endXUsp        (7),
+        endXPspUsp     (8),
+        endT           (9),
+        endTPsp        (10),
+        endTUsp        (11),
+        endTPspUsp     (12),
+        endB6Encaps    (14),
+        endBM          (15),
+        endDX6         (16),
+        endDX4         (17),
+        endDT6         (18),
+        endDT4         (19),
+        endDT46        (20),
+        endDX2         (21),
+        endDX2V        (22),
+        endDT2U        (23),
+        endDT2M        (24),
+        endB6EncapsRed (27),
+        endUsd         (28),
+        endPspUsd      (29),
+        endUspUsd      (30),
+        endPspUspUsd   (31),
+        endXUsd        (32),
+        endXPspUsd     (33),
+        endXUspUsd     (34),
+        endXPspUspUsd  (35),
+        endTUsd        (36),
+        endTPspUsd     (37),
+        endTUspUsd     (38),
+        endTPspUspUsd  (39)
+    }
+
+TFirBurstLimit                   ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "An explicit shaping burst size for a queue. The value of -1 specifies
+         system default value."
+    SYNTAX      Integer32 (-1 | 1..102400)
+
+TSchedulerMode                   ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The shared queue scheduler mode."
+    SYNTAX      INTEGER {
+        none    (0),
+        vlanQos (1)
+    }
+
+TmnxPacketMode                   ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Specifies the packet-mode of an aggregate shaper"
+    SYNTAX      INTEGER {
+        dataOtwOtw          (0),
+        lmotwLmotwOtwAtm    (1),
+        lmotwLmotwOtwNonAtm (2),
+        otwOtwOtw           (3),
+        dataData            (4)
+    }
+
+TmnxDPathDomainId                ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The D-Path Domain Id is a 6-octet object. It contains a 4-octet of
+         Global Admin Value followed by a 2-octet Local Admin Value."
+    SYNTAX      OCTET STRING (SIZE (6))
+
+TmnxTacplusAccessOpType          ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The TmnxTacplusAccessOpType data type is an enumerated integer
+         that specifies the access operation for tacplus authorization.
+         Values:
+           none       (0) - No operation.
+           subscriber (1) - Delete operation."
+    SYNTAX      INTEGER {
+        none   (0),
+        delete (1)
     }
 
 END

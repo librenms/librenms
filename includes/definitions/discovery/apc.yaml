@@ -41,6 +41,29 @@ modules:
                         - { descr: chargerSpotmode, graph: 0, value: 21, generic: 0 }
                         - { descr: inverterSpotmode, graph: 0, value: 22, generic: 0 }
                 -
+                    oid: memInputsConfigTable
+                    state_name: memInputNormalState
+                    value: memInputNormalState
+                    num_oid: '.1.3.6.1.4.1.318.1.1.10.4.3.4.1.7.{{ $index }}'
+                    index: 'memInputNormalState.{{ $index }}'
+                    descr: 'Normal state: {{ $memInputName }}'
+                    states:
+                        - { descr: Closed, graph: 1, value: 1, generic: 0 }
+                        - { descr: Open, graph: 1, value: 2, generic: 0 }
+                        - { descr: Disabled, graph: 1, value: 3, generic: 0 }
+                        - { descr: No State, graph: 1, value: 4, generic: 0 }
+                -
+                    oid: memInputsStatusTable
+                    state_name: memInputsStatusAlarmStatus
+                    value: memInputsStatusAlarmStatus
+                    num_oid: '.1.3.6.1.4.1.318.1.1.10.4.3.2.1.7.{{ $index }}'
+                    index: 'memInputStatusAlarmState.{{ $index }}'
+                    descr: memInputsStatusInputName
+                    states:
+                        - { descr: Ok, graph: 1, value: 1, generic: 0 }
+                        - { descr: Alarm, graph: 1, value: 2, generic: 1 }
+                        - { descr: Critical, graph: 1, value: 3, generic: 2 }
+                -
                     oid: airIRRP100UnitStatusOperateMode
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.3.3.1.2.2.1.{{ $index }}'
                     descr: Unit Status
@@ -229,7 +252,7 @@ modules:
                     oid: sPDUOutletControlTable
                     value: sPDUOutletCtl
                     num_oid: '.1.3.6.1.4.1.318.1.1.4.4.2.1.3.{{ $index }}'
-                    descr: 'Outlet {{ $subindex0 }} State'
+                    descr: '#{{ $subindex0 }} : {{ sPDUOutletCtlName }}'
                     index: 'sPDUOutletCtl.{{ $index }}'
                     state_name: sPDUOutletCtl
                     states:
@@ -515,6 +538,72 @@ modules:
                         - { value: 1, generic: 0, graph: 0, descr: ok }
                         - { value: 2, generic: 1, graph: 0, descr: low }
                         - { value: 3, generic: 3, graph: 0, descr: unknown }
+                -
+                    oid: xPDUSystemBreakerTable
+                    value: xPDUSystemBreakerPosition
+                    num_oid: '.1.3.6.1.4.1.318.1.1.15.4.1.2.1.3.{{ $index }}'
+                    descr: 'Breaker - {{ $xPDUSystemBreakerDescription }}'
+                    index: 'xPDUSystemBreakerPosition.{{ $index }}'
+                    state_name: xPDUSystemBreakerPosition
+                    states:
+                        - { descr: open, graph: 0, value: 1, generic: 0 }
+                        - { descr: closed, graph: 0, value: 2, generic: 0 }
+                        - { descr: unknown, graph: 0, value: 3, generic: 3 }
+                -
+                    oid: xPDUEPOMode
+                    value: xPDUEPOMode
+                    num_oid: '.1.3.6.1.4.1.318.1.1.15.7.1.{{ $index }}'
+                    descr: 'Emergency Power Off (EPO)'
+                    index: 'xPDUEPOMode.{{ $index }}'
+                    state_name: xPDUEPOMode
+                    states:
+                        - { descr: armed, graph: 0, value: 1, generic: 0 }
+                        - { descr: disarmed, graph: 0, value: 2, generic: 1 }
+                        - { descr: unknown, graph: 0, value: 3, generic: 3 }
+                -
+                    oid: xPDUTransformTempStatus
+                    value: xPDUTransformTempStatus
+                    num_oid: '.1.3.6.1.4.1.318.1.1.15.7.2.{{ $index }}'
+                    descr: 'Transformer Temperature'
+                    index: 'xPDUTransformTempStatus.{{ $index }}'
+                    state_name: xPDUTransformTempStatus
+                    states:
+                        - { descr: normal, graph: 0, value: 1, generic: 0 }
+                        - { descr: overtemp, graph: 0, value: 2, generic: 1 }
+                        - { descr: noTransformerPresent, graph: 0, value: 3, generic: 0 }
+                        - { descr: unknown, graph: 0, value: 4, generic: 3 }
+                    skip_values: 3
+                -
+                    oid: xPDUCoolingFanStatus
+                    value: xPDUCoolingFanStatus
+                    num_oid: '.1.3.6.1.4.1.318.1.1.15.7.3.{{ $index }}'
+                    descr: 'Cooling Fan'
+                    index: 'xPDUCoolingFanStatus.{{ $index }}'
+                    state_name: xPDUCoolingFanStatus
+                    states:
+                        - { descr: normal, graph: 0, value: 1, generic: 0 }
+                        - { descr: failed, graph: 0, value: 2, generic: 2 }
+                        - { descr: noCoolingFansPresent, graph: 0, value: 3, generic: 0 }
+                        - { descr: unknown, graph: 0, value: 4, generic: 3 }
+                    skip_values: 3
+                -
+                    oid: upsAdvInputLineFailCause
+                    value: upsAdvInputLineFailCause
+                    num_oid: '.1.3.6.1.4.1.318.1.1.1.3.2.5.{{ $index }}'
+                    descr: 'Last failure cause'
+                    index: 'upsAdvInputLineFailCause.{{ $index }}'
+                    state_name: upsAdvInputLineFailCause
+                    states:
+                        - { descr: noTransfer, graph: 0, value: 1, generic: 0 }
+                        - { descr: highLineVoltage, graph: 0, value: 2, generic: 0 }
+                        - { descr: brownout, graph: 0, value: 3, generic: 0 }
+                        - { descr: blackout, graph: 0, value: 4, generic: 0 }
+                        - { descr: smallMomentarySag, graph: 0, value: 5, generic: 0 }
+                        - { descr: deepMomentarySag, graph: 0, value: 6, generic: 0 }
+                        - { descr: smallMomentarySag, graph: 0, value: 7, generic: 0 }
+                        - { descr: largeMomentarySpike, graph: 0, value: 8, generic: 0 }
+                        - { descr: selfTest, graph: 0, value: 9, generic: 0 }
+                        - { descr: rateOfVoltageChange, graph: 0, value: 10, generic: 0 }
 
         temperature:
             data:
@@ -753,6 +842,7 @@ modules:
                     descr: Air Flow
         voltage:
             data:
+                # rPDUIdentDeviceLinetoLineVoltage is done in includes/discovery/sensors/voltage/apc.inc.php:141
                 -
                     oid: airIRRP100UnitStatusCompressorDriveVoltage
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.3.3.1.2.2.37.{{ $index }}'
@@ -833,8 +923,45 @@ modules:
                     descr: 'Generator Battery'
                     divisor: 10
                     skip_values: -1
+                -
+                    oid: xPDUMainInputVoltagePhaseTable
+                    value: xPDUMainInputVoltageLtoL
+                    num_oid: '.1.3.6.1.4.1.318.1.1.15.3.1.4.1.2.{{ $index }}'
+                    index: 'xPDUMainInputVoltageLtoL.{{ $index }}'
+                    snmp_flags: '-OQUsbe'
+                    descr: 'Input - Phase {{ $index }} L-L'
+                    divisor: 10
+                    skip_values: -1
+                -
+                    oid: xPDUMainInputVoltagePhaseTable
+                    value: xPDUMainInputVoltageLtoN
+                    num_oid: '.1.3.6.1.4.1.318.1.1.15.3.1.4.1.3.{{ $index }}'
+                    index: 'xPDUMainInputVoltageLtoN.{{ $index }}'
+                    snmp_flags: '-OQUsbe'
+                    descr: 'Input - Phase {{ $index }} L-N'
+                    divisor: 10
+                    skip_values: -1
+                -
+                    oid: xPDUSystemOutputPhaseTable
+                    value: xPDUSystemOutputVoltageLtoL
+                    num_oid: '.1.3.6.1.4.1.318.1.1.15.3.4.14.1.2.{{ $index }}'
+                    index: 'xPDUSystemOutputVoltageLtoL.{{ $index }}'
+                    snmp_flags: '-OQUsbe'
+                    descr: 'Output - Phase {{ $index }} L-L'
+                    divisor: 10
+                    skip_values: -1
+                -
+                    oid: xPDUSystemOutputPhaseTable
+                    value: xPDUSystemOutputVoltageLtoN
+                    num_oid: '.1.3.6.1.4.1.318.1.1.15.3.4.14.1.3.{{ $index }}'
+                    index: 'xPDUSystemOutputVoltageLtoN.{{ $index }}'
+                    snmp_flags: '-OQUsbe'
+                    descr: 'Output - Phase {{ $index }} L-N'
+                    divisor: 10
+                    skip_values: -1
         current:
             data:
+                # rPDULoadStatusLoad and rPDU2PhaseStatusCurrent at OID .1.3.6.1.4.1.318.1.1.26.6.3.1.5 is done in the includes/discovery/sensors/current/apc.inc.php:19 file
                 -
                     oid: airIRRP100UnitStatusHumidifierCurrent
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.3.3.1.2.2.33.{{ $index }}'
@@ -860,6 +987,23 @@ modules:
                     descr: Humidifier
                     divisor: 10
                     skip_values: -2147483648
+                -
+                    oid: xPDUSystemOutputPhaseTable
+                    value: xPDUSystemOutputPhaseCurrent
+                    num_oid: '.1.3.6.1.4.1.318.1.1.15.3.4.14.1.4.{{ $index }}'
+                    index: 'xPDUSystemOutputPhaseCurrent.{{ $index }}'
+                    snmp_flags: '-OQUsbe'
+                    descr: 'Output - Phase {{ $index }}'
+                    divisor: 10
+                    skip_values: -1
+                -
+                    oid: xPDUSystemOutput
+                    value: xPDUSystemOutputNeutralCurrent
+                    num_oid: '.1.3.6.1.4.1.318.1.1.15.3.4.2.{{ $index }}'
+                    index: 'xPDUSystemOutputNeutralCurrent.{{ $index }}'
+                    descr: 'Neutral Current'
+                    divisor: 10
+                    skip_values: -1
         fanspeed:
             data:
                 -
@@ -910,8 +1054,21 @@ modules:
                     descr: 'Blower 2 Actual Frequency'
                     divisor: 10
                     skip_values: -2147483648
+                -
+                    oid: xPDUSystemOutput
+                    value: xPDUSystemOutputFrequency
+                    num_oid: '.1.3.6.1.4.1.318.1.1.15.3.4.1.{{ $index }}'
+                    index: 'xPDUSystemOutputFrequency.{{ $index }}'
+                    descr: 'System Output'
+                    divisor: 10
+                    skip_values: -1
         power:
             data:
+                -
+                    oid: upsAdvOutputActivePower
+                    num_oid: '.1.3.6.1.4.1.318.1.1.1.4.2.8.{{ $index }}'
+                    index: 'PowerNet-MIB::upsAdvOutputActivePower.{{ $index }}'
+                    descr: 'Active Power'
                 -
                     oid: airIRRP100UnitStatusCompressorDrivePower
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.3.3.1.2.2.35.{{ $index }}'
@@ -949,6 +1106,61 @@ modules:
                     multiplier: 10
                     index: 'rPDU2DeviceStatusPower.{{ $index }}'
                     descr: 'Power, Total'
+                    skip_value_lt: 0
+                -
+                    oid: xPDUSystemOutput
+                    value: xPDUSystemOutputTotalPower
+                    num_oid: '.1.3.6.1.4.1.318.1.1.15.3.4.3.{{ $index }}'
+                    index: 'xPDUSystemOutputTotalPower.{{ $index }}'
+                    descr: 'Real Power - Total'
+                    multiplier: 100
+                    skip_values: -1
+                -
+                    oid: xPDUSystemOutput
+                    value: xPDUSystemOutputTotalApparentPower
+                    num_oid: '.1.3.6.1.4.1.318.1.1.15.3.4.4.{{ $index }}'
+                    index: 'xPDUSystemOutputTotalApparentPower.{{ $index }}'
+                    descr: 'Apparent Power - Total'
+                    multiplier: 100
+                    skip_values: -1
+                -
+                    oid: xPDUSystemOutputPhaseTable
+                    value: xPDUSystemOutputPower
+                    num_oid: '.1.3.6.1.4.1.318.1.1.15.3.4.14.1.5.{{ $index }}'
+                    index: 'xPDUSystemOutputPower.{{ $index }}'
+                    snmp_flags: '-OQUsbe'
+                    descr: 'Real Power - Phase {{ $index }}'
+                    multiplier: 100
+                    skip_values: -1
+                -
+                    oid: xPDUSystemOutputPhaseTable
+                    value: xPDUSystemOutputApparentPower
+                    num_oid: '.1.3.6.1.4.1.318.1.1.15.3.4.14.1.6.{{ $index }}'
+                    index: 'xPDUSystemOutputApparentPower.{{ $index }}'
+                    snmp_flags: '-OQUsbe'
+                    descr: 'Apparent Power - Phase {{ $index }}'
+                    multiplier: 100
+                    skip_values: -1
+                -
+                    oid: rPDUIdentDevicePowerWatts
+                    num_oid: '.1.3.6.1.4.1.318.1.1.12.1.16.{{ $index }}'
+                    index: 'rPDUIdentDevicePowerWatts.{{ $index }}'
+                    descr: 'Total power'
+                    skip_values:
+                        -
+                            device: hardware
+                            op: 'not_starts'
+                            value: 'AP7'
+        power_consumed:
+            data:
+                -
+                    oid: rPDU2DeviceStatusTable
+                    value: rPDU2DeviceStatusEnergy
+                    num_oid: '.1.3.6.1.4.1.318.1.1.26.4.3.1.9.{{ $index }}'
+                    divisor: 10
+                    index: 'rPDU2DeviceStatusEnergy.{{ $index }}'
+                    descr: 'Energy since {{ rPDU2DeviceStatusEnergyStartTime }}'
+                    skip_value_lt: 0
         pressure:
             data:
                 -
@@ -1099,3 +1311,23 @@ modules:
                     warn_limit: 1
                     high_limit: 3
 
+                -
+                    oid: upsAdvBatteryRecommendedReplaceDate
+                    num_oid: '.1.3.6.1.4.1.318.1.1.1.2.2.21.{{ $index }}'
+                    index: 'upsAdvBatteryRecommendedReplaceDate.{{ $index }}'
+                    descr: 'Battery Recommended Days Remaining'
+                    user_func: dateToDays
+                    low_warn_limit: 30
+                    low_limit: 0
+                -
+                    oid: upsAdvBatteryNumOfBattPacks
+                    num_oid: '.1.3.6.1.4.1.318.1.1.1.2.2.5.{{ $index }}'
+                    index: 'upsAdvBatteryNumOfBattPacks.{{ $index }}'
+                    descr: 'Installed batteries'
+                    low_limit: 0
+                -
+                    oid: upsAdvBatteryNumOfBadBattPacks
+                    num_oid: '.1.3.6.1.4.1.318.1.1.1.2.2.6.{{ $index }}'
+                    index: 'upsAdvBatteryNumOfBadBattPacks.{{ $index }}'
+                    descr: 'Bad batteries'
+                    high_limit: 1

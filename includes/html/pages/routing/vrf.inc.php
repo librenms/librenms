@@ -1,12 +1,13 @@
 <?php
 
+use App\Facades\DeviceCache;
 use LibreNMS\Config;
 
 if (! Auth::user()->hasGlobalRead()) {
     include 'includes/html/error-no-perm.inc.php';
 } else {
     $link_array = [
-        'page'     => 'routing',
+        'page' => 'routing',
         'protocol' => 'vrf',
     ];
 
@@ -40,10 +41,10 @@ if (! Auth::user()->hasGlobalRead()) {
     echo ' Graphs: ';
 
     $graph_types = [
-        'bits'      => 'Bits',
-        'upkts'     => 'Unicast Packets',
-        'nupkts'    => 'Non-Unicast Packets',
-        'errors'    => 'Errors',
+        'bits' => 'Bits',
+        'upkts' => 'Unicast Packets',
+        'nupkts' => 'Non-Unicast Packets',
+        'errors' => 'Errors',
         'etherlike' => 'Etherlike',
     ];
 
@@ -62,6 +63,20 @@ if (! Auth::user()->hasGlobalRead()) {
     }
 
     print_optionbar_end();
+
+    echo '
+      <div>
+        <div class="panel panel-default">
+          <div class="panel-body">
+            <table class="table table-condensed table-hover" style="border-collapse:collapse;">
+              <thead>
+                <tr>
+                  <th>&nbsp;</th>
+                  <th>VRF</th>
+                  <th>RD</th>
+                  <th>Interfaces</th>
+		</tr>
+              </thead>';
 
     if ($vars['view'] == 'basic' || $vars['view'] == 'graphs') {
         // Pre-Cache in arrays
@@ -88,16 +103,10 @@ if (! Auth::user()->hasGlobalRead()) {
             }
         }
 
-        echo "<div style='margin: 5px;'><table border=0 cellspacing=0 cellpadding=5 width=100%>";
         $i = '1';
+        echo '<tbody>';
         foreach (dbFetchRows('SELECT `vrf_name`, `mplsVpnVrfRouteDistinguisher`, `mplsVpnVrfDescription` FROM `vrfs` GROUP BY `mplsVpnVrfRouteDistinguisher`, `mplsVpnVrfDescription`,`vrf_name`') as $vrf) {
-            if (($i % 2)) {
-                $bg_colour = Config::get('list_colour.even');
-            } else {
-                $bg_colour = Config::get('list_colour.odd');
-            }
-
-            echo "<tr valign=top bgcolor='$bg_colour'>";
+            echo '<td></td>';
             echo '<td width=240>';
             echo '<a class=list-large href=' . \LibreNMS\Util\Url::generate($vars, ['view' => 'detail', 'vrf' => $vrf['vrf_name']]) . '>';
             echo $vrf['vrf_name'] . '</a><br />';
@@ -106,23 +115,23 @@ if (! Auth::user()->hasGlobalRead()) {
             echo '<td><table border=0 cellspacing=0 cellpadding=5 width=100%>';
             $x = 1;
             foreach ($vrf_devices[$vrf['vrf_name']][$vrf['mplsVpnVrfRouteDistinguisher']] as $device) {
-                if (($i % 2)) {
-                    if (($x % 2)) {
+                if ($i % 2) {
+                    if ($x % 2) {
                         $dev_colour = Config::get('list_colour.even_alt');
                     } else {
                         $dev_colour = Config::get('list_colour.even_alt2');
                     }
                 } else {
-                    if (($x % 2)) {
+                    if ($x % 2) {
                         $dev_colour = Config::get('list_colour.odd_alt2');
                     } else {
                         $dev_colour = Config::get('list_colour.odd_alt');
                     }
                 }
 
-                echo "<tr bgcolor='$dev_colour'><td width=150><a href='";
+                echo "<tr bgcolor='$dev_colour'><td width=200><a href='";
                 echo \LibreNMS\Util\Url::generate(['page' => 'device'], ['device' => $device['device_id'], 'tab' => 'routing', 'view' => 'basic', 'proto' => 'vrf']);
-                echo "'>" . $device['hostname'] . '</a> ';
+                echo "'>" . DeviceCache::get($device['device_id'])->displayName() . '</a> ';
 
                 if ($device['vrf_name'] != $vrf['vrf_name']) {
                     echo "<a href='#' onmouseover=\" return overlib('Expected Name : " . $vrf['vrf_name'] . '<br />Configured : ' . $device['vrf_name'] . "', CAPTION, '<span class=list-large>VRF Inconsistency</span>' ,FGCOLOR,'#e5e5e5', BGCOLOR, '#c0c0c0', BORDER, 5, CELLPAD, 4, CAPCOLOR, '#050505');\" onmouseout=\"return nd();\"> <i class='fa fa-flag fa-lg' style='color:red' aria-hidden='true'></i></a>";
@@ -161,11 +170,11 @@ if (! Auth::user()->hasGlobalRead()) {
                     }//end switch
                 }//end foreach
 
-                echo '</td></tr>';
+                echo '</td>';
                 $x++;
             } //end foreach
 
-            echo '</table></td>';
+            echo '</tbody></table></td>';
             $i++;
         }//end foreach
         echo '</table></div>';

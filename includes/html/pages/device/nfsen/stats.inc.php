@@ -44,19 +44,19 @@ echo '
 $option_default = $vars['stattype'] ?? \LibreNMS\Config::get('nfsen_stats_default');
 
 $stat_types = [
-    'record'=>'Flow Records',
-    'ip'=>'Any IP Address',
-    'srcip'=>'SRC IP Address',
-    'dstip'=>'DST IP Address',
-    'port'=>'Any Port',
-    'srcport'=>'SRC Port',
-    'dstport'=>'DST Port',
-    'srctos'=>'SRC TOS',
-    'dsttos'=>'DST TOS',
-    'tos'=>'TOS',
-    'as'=>'AS',
-    'srcas'=>'SRC AS',
-    'dstas'=>'DST AS',
+    'record' => 'Flow Records',
+    'ip' => 'Any IP Address',
+    'srcip' => 'SRC IP Address',
+    'dstip' => 'DST IP Address',
+    'port' => 'Any Port',
+    'srcport' => 'SRC Port',
+    'dstport' => 'DST Port',
+    'srctos' => 'SRC TOS',
+    'dsttos' => 'DST TOS',
+    'tos' => 'TOS',
+    'as' => 'AS',
+    'srcas' => 'SRC AS',
+    'dstas' => 'DST AS',
 ];
 
 // puts together the drop down options
@@ -82,12 +82,12 @@ if (isset($vars['statorder'])) {
 // WARNING: order is relevant as it has to match the
 // check later in the process part of this page.
 $order_types = [
-    'flows'=>1,
-    'packets'=>1,
-    'bytes'=>1,
-    'pps'=>1,
-    'bps'=>1,
-    'bpp'=>1,
+    'flows' => 1,
+    'packets' => 1,
+    'bytes' => 1,
+    'pps' => 1,
+    'bps' => 1,
+    'bpp' => 1,
 ];
 
 // puts together the drop down options
@@ -114,7 +114,7 @@ if (isset($vars['process'])) {
     if (isset($vars['lastN']) &&
          is_numeric($vars['lastN']) &&
          ($vars['lastN'] <= \LibreNMS\Config::get('nfsen_last_max'))
-        ) {
+    ) {
         $lastN = $vars['lastN'];
     }
 
@@ -123,7 +123,7 @@ if (isset($vars['process'])) {
     if (isset($vars['topN']) &&
          is_numeric($vars['topN']) &&
          ($vars['topN'] <= \LibreNMS\Config::get('nfsen_top_max'))
-        ) {
+    ) {
         $topN = $vars['topN'];
     }
 

@@ -26,13 +26,16 @@
 namespace LibreNMS\Data\Source;
 
 use App\Models\Device;
+use App\Models\Eventlog;
 use App\Polling\Measure\Measurement;
 use DeviceCache;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
-use LibreNMS\Enum\Alert;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Util\Debug;
+use LibreNMS\Util\Oid;
 use LibreNMS\Util\Rewrite;
 use Log;
 use Symfony\Component\Process\Process;
@@ -71,26 +74,18 @@ class NetSnmpQuery implements SnmpQueryInterface
             '*',
         ],
     ];
+
     /**
-     * @var string
+     * @var string[]
      */
-    private $context = '';
-    /**
-     * @var string
-     */
-    private $mibDir;
-    /**
-     * @var array|string
-     */
-    private $options = [self::DEFAULT_FLAGS];
-    /**
-     * @var \App\Models\Device
-     */
-    private $device;
-    /**
-     * @var bool
-     */
-    private $abort = false;
+    private array $mibDirs = [];
+    private string $context = '';
+    private array|string $options = [self::DEFAULT_FLAGS];
+    private Device $device;
+    private bool $abort = false;
+    private bool $cache = false;
+    // defaults for net-snmp https://net-snmp.sourceforge.io/docs/man/snmpcmd.html
+    private array $mibs = ['SNMPv2-TC', 'SNMPv2-MIB', 'IF-MIB', 'IP-MIB', 'TCP-MIB', 'UDP-MIB', 'NET-SNMP-VACM-MIB'];
 
     public function __construct()
     {
@@ -133,6 +128,13 @@ class NetSnmpQuery implements SnmpQueryInterface
         return $this;
     }
 
+    public function cache(): SnmpQueryInterface
+    {
+        $this->cache = true;
+
+        return $this;
+    }
+
     /**
      * Set a context for the snmp query
      * This is most commonly used to fetch alternate sets of data, such as different VRFs
@@ -158,7 +160,18 @@ class NetSnmpQuery implements SnmpQueryInterface
      */
     public function mibDir(?string $dir): SnmpQueryInterface
     {
-        $this->mibDir = $dir;
+        $this->mibDirs[] = $dir;
+
+        return $this;
+    }
+
+    /**
+     * Set MIBs to use for this query. Base mibs are included by default.
+     * They will be appended to existing mibs unless $append is set to false.
+     */
+    public function mibs(array $mibs, bool $append = true): SnmpQueryInterface
+    {
+        $this->mibs = $append ? array_merge($this->mibs, $mibs) : $mibs;
 
         return $this;
     }
@@ -188,9 +201,23 @@ class NetSnmpQuery implements SnmpQueryInterface
     /**
      * Output all OIDs numerically
      */
-    public function numeric(): SnmpQueryInterface
+    public function numeric(bool $numeric = true): SnmpQueryInterface
     {
-        $this->options = array_merge($this->options, ['-On']);
+        $this->options = $numeric
+            ? array_merge($this->options, ['-On'])
+            : array_diff($this->options, ['-On']);
+
+        return $this;
+    }
+
+    /**
+     * Output all OIDs numerically
+     */
+    public function numericIndex(bool $numericIndex = true): SnmpQueryInterface
+    {
+        $this->options = $numericIndex
+            ? array_merge($this->options, ['-Ob'])
+            : array_diff($this->options, ['-Ob']);
 
         return $this;
     }
@@ -246,7 +273,7 @@ class NetSnmpQuery implements SnmpQueryInterface
      */
     public function get($oid): SnmpResponse
     {
-        return $this->exec('snmpget', $this->parseOid($oid));
+        return $this->execMultiple('snmpget', $this->limitOids($this->parseOid($oid)));
     }
 
     /**
@@ -270,20 +297,32 @@ class NetSnmpQuery implements SnmpQueryInterface
      */
     public function next($oid): SnmpResponse
     {
-        return $this->exec('snmpgetnext', $this->parseOid($oid));
+        return $this->execMultiple('snmpgetnext', $this->limitOids($this->parseOid($oid)));
     }
 
     /**
      * Translate an OID.
      * call numeric() on the query to output numeric OID
      */
-    public function translate(string $oid, ?string $mib = null): SnmpResponse
+    public function translate(string $oid): string
     {
-        if ($mib) {
-            $this->options = array_merge($this->options, ['-m', $mib]);
+        $this->options = array_diff($this->options, [self::DEFAULT_FLAGS]); // remove default options
+
+        $this->options[] = '-Pu'; // don't error on _
+
+        // user did not specify numeric, output full text
+        if (! in_array('-On', $this->options)) {
+            $this->options[] = '-OS';
+        } elseif (Oid::isNumeric($oid)) {
+            return Str::start($oid, '.'); // numeric to numeric optimization
         }
 
-        return $this->exec('snmptranslate', [$oid]);
+        // if mib is not directly specified and it doesn't have a numeric root
+        if (! str_contains($oid, '::') && ! Oid::hasNumericRoot($oid)) {
+            $this->options[] = '-IR'; // search for mib
+        }
+
+        return $this->exec('snmptranslate', [$oid])->value();
     }
 
     private function buildCli(string $command, array $oids): array
@@ -291,6 +330,7 @@ class NetSnmpQuery implements SnmpQueryInterface
         $cmd = $this->initCommand($command, $oids);
 
         array_push($cmd, '-M', $this->mibDirectories());
+        array_push($cmd, '-m', implode(':', $this->mibs));
 
         if ($command === 'snmptranslate') {
             return array_merge($cmd, $this->options, $oids);
@@ -327,11 +367,11 @@ class NetSnmpQuery implements SnmpQueryInterface
                 case 'authpriv':
                     array_push($cmd, '-x', $this->device->cryptoalgo);
                     array_push($cmd, '-X', $this->device->cryptopass);
-                // fallthrough
+                    // fallthrough
                 case 'authnopriv':
                     array_push($cmd, '-a', $this->device->authalgo);
                     array_push($cmd, '-A', $this->device->authpass);
-                // fallthrough
+                    // fallthrough
                 case 'noauthnopriv':
                     array_push($cmd, '-u', $this->device->authname ?: 'root');
                     break;
@@ -350,11 +390,12 @@ class NetSnmpQuery implements SnmpQueryInterface
         $response = new SnmpResponse('');
 
         foreach ($oids as $oid) {
-            $response = $response->append($this->exec($command, [$oid]));
+            $response = $response->append($this->exec($command, Arr::wrap($oid)));
 
             // if abort on failure is set, return after first failure
             if ($this->abort && ! $response->isValid()) {
-                Log::debug("SNMP failed walking $oid of " . implode(',', $oids) . ' aborting.');
+                $oid_list = implode(',', array_map(fn ($group) => is_array($group) ? implode(',', $group) : $group, $oids));
+                Log::debug("SNMP failed walking $oid of $oid_list aborting.");
 
                 return $response;
             }
@@ -365,25 +406,30 @@ class NetSnmpQuery implements SnmpQueryInterface
 
     private function exec(string $command, array $oids): SnmpResponse
     {
-        $measure = Measurement::start($command);
+        // use runtime(array) cache if requested. The 'null' driver will simply return the value without caching
+        $driver = $this->cache ? 'array' : 'null';
+        $key = $this->cache ? $this->getCacheKey($command, $oids) : '';
 
-        $proc = new Process($this->buildCli($command, $oids));
-        $proc->setTimeout(Config::get('snmp.exec_timeout', 1200));
+        return Cache::driver($driver)->rememberForever($key, function () use ($command, $oids) {
+            $measure = Measurement::start($command);
+            $proc = new Process($this->buildCli($command, $oids));
+            $proc->setTimeout(Config::get('snmp.exec_timeout', 1200));
 
-        $this->logCommand($proc->getCommandLine());
+            $this->logCommand($proc->getCommandLine());
 
-        $proc->run();
-        $exitCode = $proc->getExitCode();
-        $output = $proc->getOutput();
-        $stderr = $proc->getErrorOutput();
+            $proc->run();
+            $exitCode = $proc->getExitCode();
+            $output = $proc->getOutput();
+            $stderr = $proc->getErrorOutput();
 
-        // check exit code and log possible bad auth
-        $this->checkExitCode($exitCode, $stderr);
-        $this->logOutput($output, $stderr);
+            // check exit code and log possible bad auth
+            $this->checkExitCode($exitCode, $stderr);
+            $this->logOutput($output, $stderr);
 
-        $measure->manager()->recordSnmp($measure->end());
+            $measure->manager()->recordSnmp($measure->end());
 
-        return new SnmpResponse($output, $stderr, $exitCode);
+            return new SnmpResponse($output, $stderr, $exitCode);
+        });
     }
 
     private function initCommand(string $binary, array $oids): array
@@ -418,22 +464,23 @@ class NetSnmpQuery implements SnmpQueryInterface
         $base = Config::get('mib_dir');
         $dirs = [$base];
 
-        // os directory
-        if ($os_mibdir = Config::get("os.{$this->device->os}.mib_dir")) {
-            $dirs[] = "$base/$os_mibdir";
-        } elseif (file_exists($base . '/' . $this->device->os)) {
-            $dirs[] = $base . '/' . $this->device->os;
-        }
-
         // os group
-        if ($os_group = Config::get("os.{$this->device->os}.group")) {
+        if ($os_group = Config::getOsSetting($this->device->os, 'group')) {
             if (file_exists("$base/$os_group")) {
                 $dirs[] = "$base/$os_group";
             }
         }
 
-        if ($this->mibDir) {
-            $dirs[] = "$base/$this->mibDir";
+        // os directory
+        $os_mibdir = Config::getOsSetting($this->device->os, 'mib_dir');
+        if ($os_mibdir && is_string($os_mibdir)) {
+            $dirs[] = "$base/$os_mibdir";
+        } elseif (file_exists($base . '/' . $this->device->os)) {
+            $dirs[] = $base . '/' . $this->device->os;
+        }
+
+        foreach ($this->mibDirs as $mibDir) {
+            $dirs[] = "$base/$mibDir";
         }
 
         // remove trailing /, remove empty dirs, and remove duplicates
@@ -448,9 +495,9 @@ class NetSnmpQuery implements SnmpQueryInterface
     {
         if ($code) {
             if (Str::startsWith($error, 'Invalid authentication protocol specified')) {
-                Log::event('Unsupported SNMP authentication algorithm - ' . $code, $this->device, 'poller', Alert::ERROR);
+                Eventlog::log('Unsupported SNMP authentication algorithm - ' . $code, $this->device, 'poller', Severity::Error);
             } elseif (Str::startsWith($error, 'Invalid privacy protocol specified')) {
-                Log::event('Unsupported SNMP privacy algorithm - ' . $code, $this->device, 'poller', Alert::ERROR);
+                Eventlog::log('Unsupported SNMP privacy algorithm - ' . $code, $this->device, 'poller', Severity::Error);
             }
             Log::debug('Exitcode: ' . $code, [$error]);
         }
@@ -476,11 +523,29 @@ class NetSnmpQuery implements SnmpQueryInterface
         Log::debug($error);
     }
 
-    /**
-     * @param  array|string  $oid
-     */
-    private function parseOid($oid): array
+    private function limitOids(array $oids): array
+    {
+        // get max oids per query device attrib > os setting > global setting
+        $configured_max = $this->device->getAttrib('snmp_max_oid') ?: Config::getOsSetting($this->device->os, 'snmp_max_oid', Config::get('snmp.max_oid', 10));
+        $max_oids = max($configured_max, 1); // 0 or less would break things.
+
+        if (count($oids) > $max_oids) {
+            return array_chunk($oids, $max_oids);
+        }
+
+        return [$oids]; // wrap in array for execMultiple so they are all done at once
+    }
+
+    private function parseOid(array|string $oid): array
     {
         return is_string($oid) ? explode(' ', $oid) : $oid;
+    }
+
+    private function getCacheKey(string $type, array $oids): string
+    {
+        $oids = implode(',', $oids);
+        $options = implode(',', $this->options);
+
+        return "$type|{$this->device->hostname}|$this->context|$oids|$options";
     }
 }

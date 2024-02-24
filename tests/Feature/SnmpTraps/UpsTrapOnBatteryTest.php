@@ -26,11 +26,15 @@ namespace LibreNMS\Tests\Feature\SnmpTraps;
 
 use App\Models\Device;
 use App\Models\Sensor;
-use LibreNMS\Snmptrap\Dispatcher;
-use LibreNMS\Snmptrap\Trap;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
+use LibreNMS\Enum\Severity;
+use LibreNMS\Tests\Traits\RequiresDatabase;
 
 class UpsTrapOnBatteryTest extends SnmpTrapTestCase
 {
+    use RequiresDatabase;
+    use DatabaseTransactions;
+
     public function testOnBattery(): void
     {
         $device = Device::factory()->create(); /** @var Device $device */
@@ -41,23 +45,22 @@ class UpsTrapOnBatteryTest extends SnmpTrapTestCase
         $device->sensors()->save($time);
         $device->sensors()->save($remaining);
 
-        $trapText = "$device->hostname
+        \Log::shouldReceive('warning')->never()->with("Snmptrap upsTrapOnBattery: Could not find matching sensor \'Estimated battery time remaining\' for device: " . $device->hostname);
+        \Log::shouldReceive('warning')->never()->with("Snmptrap upsTrapOnBattery: Could not find matching sensor \'Time on battery\' for device: " . $device->hostname);
+        \Log::shouldReceive('warning')->never()->with("Snmptrap upsTrapOnBattery: Could not find matching sensor \'upsOutputSourceState\' for device: " . $device->hostname);
+
+        $this->assertTrapLogsMessage("$device->hostname
 UDP: [$device->ip]:161->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 9:22:15:00.01
 SNMPv2-MIB::snmpTrapOID.0 UPS-MIB::upsTrapOnBattery
 UPS-MIB::upsEstimatedMinutesRemaining 100 minutes
 UPS-MIB::upsSecondsOnBattery 120 seconds
-UPS-MIB::upsConfigLowBattTime 1 minutes";
-
-        \Log::shouldReceive('warning')->never()->with("Snmptrap upsTrapOnBattery: Could not find matching sensor \'Estimated battery time remaining\' for device: " . $device->hostname);
-        \Log::shouldReceive('warning')->never()->with("Snmptrap upsTrapOnBattery: Could not find matching sensor \'Time on battery\' for device: " . $device->hostname);
-        \Log::shouldReceive('warning')->never()->with("Snmptrap upsTrapOnBattery: Could not find matching sensor \'upsOutputSourceState\' for device: " . $device->hostname);
-
-        $message = 'UPS running on battery for 120 seconds. Estimated 100 minutes remaining';
-        \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 5);
-
-        $trap = new Trap($trapText);
-        $this->assertTrue(Dispatcher::handle($trap), 'Could not handle UPS-MIB::upsTrapOnBattery trap');
+UPS-MIB::upsConfigLowBattTime 1 minutes",
+            'UPS running on battery for 120 seconds. Estimated 100 minutes remaining',
+            'Could not handle UPS-MIB::upsTrapOnBattery trap',
+            [Severity::Error],
+            $device,
+        );
 
         $state = $state->fresh();
         $time = $time->fresh();

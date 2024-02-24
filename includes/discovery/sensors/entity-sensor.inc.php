@@ -26,21 +26,29 @@ if (! empty($entity_array)) {
     if ($device['os'] === 'arista_eos') {
         $entity_oids = snmpwalk_cache_oid($device, 'aristaEntSensorThresholdTable', $entity_oids, 'ARISTA-ENTITY-SENSOR-MIB');
     }
+    if ($device['os'] === 'xos') {
+        echo ' XOS:entPhysicalContainedIn';
+        $entity_oids = snmpwalk_cache_oid($device, 'entPhysicalContainedIn', $entity_oids, 'ENTITY-MIB');
+        echo ' XOS:entAliasMappingIdentifier';
+        $entity_oids = snmpwalk_cache_oid($device, 'entAliasMappingIdentifier', $entity_oids, 'ENTITY-MIB');
+        echo ' XOS:ifName';
+        $xos_ifname = snmpwalk_cache_oid($device, 'ifName', [], 'IF-MIB');
+    }
     echo ' entPhySensorOperStatus';
     $entity_oids = snmpwalk_cache_multi_oid($device, 'entPhySensorOperStatus', $entity_oids, 'ENTITY-SENSOR-MIB');
 }
 
 if (! empty($entity_oids)) {
     $entitysensor = [
-        'voltsDC'   => 'voltage',
-        'voltsAC'   => 'voltage',
-        'amperes'   => 'current',
-        'watts'     => 'power',
-        'hertz'     => 'freq',
+        'voltsDC' => 'voltage',
+        'voltsAC' => 'voltage',
+        'amperes' => 'current',
+        'watts' => 'power',
+        'hertz' => 'freq',
         'percentRH' => 'humidity',
-        'rpm'       => 'fanspeed',
-        'celsius'   => 'temperature',
-        'dBm'       => 'dbm',
+        'rpm' => 'fanspeed',
+        'celsius' => 'temperature',
+        'dBm' => 'dbm',
     ];
 
     foreach ($entity_oids as $index => $entry) {
@@ -48,6 +56,14 @@ if (! empty($entity_oids)) {
         $low_warn_limit = null;
         $warn_limit = null;
         $high_limit = null;
+        $group = null;
+        $type = null;
+        $oid = null;
+        $descr = null;
+        $divisor = null;
+        $multiplier = null;
+        $current = null;
+        $entPhysicalIndex = null;
 
         // Fix for Cisco ASR920, 15.5(2)S
         if ($entry['entPhySensorType'] == 'other' && Str::contains($entity_array[$index]['entPhysicalName'], ['Rx Power Sensor', 'Tx Power Sensor'])) {
@@ -64,7 +80,11 @@ if (! empty($entity_oids)) {
                 } elseif (count($card) === 4) {
                     $card = $card[0] . $card[1] . '00';
                 }
-                $descr = ucwords($entity_array[$card]['entPhysicalName']) . ' ' . ucwords($entity_array[$index]['entPhysicalDescr']);
+                $descr = ucwords($entity_array[$card]['entPhysicalName'] ?? '') . ' ' . ucwords($entity_array[$index]['entPhysicalDescr'] ?? '');
+            } elseif ($device['os'] === 'xos' && str_starts_with($entity_oids[$entity_oids[$index]['entPhysicalContainedIn'] . '.0']['entAliasMappingIdentifier'], 'mib-2.2.2.1.1.')) {
+                $xos_ifindex = end(explode('.', $entity_oids[$entity_oids[$index]['entPhysicalContainedIn'] . '.0']['entAliasMappingIdentifier']));
+                $xos_portname = $xos_ifname[$xos_ifindex]['ifName'];
+                $descr = ucwords($xos_portname . ' ' . str_replace(' Sensor', '', $entity_array[$index]['entPhysicalDescr']));
             } else {
                 $descr = ucwords($entity_array[$index]['entPhysicalName']);
             }
@@ -75,7 +95,13 @@ if (! empty($entity_oids)) {
                 if ($device['os'] === 'arista_eos') {
                     $descr = $entity_array[$index]['entPhysicalDescr'];
                     if (preg_match('/(Input|Output) (voltage|current) sensor/i', $descr) || Str::startsWith($descr, 'Power supply') || preg_match('/^(Power Supply|Hotspot|Inlet|Board)/i', $descr)) {
-                        $descr = ucwords($entity_array[substr_replace($index, '000', -3)]['entPhysicalDescr']) . ' ' . preg_replace('/(Voltage|Current|Power Supply) Sensor$/i', '', ucwords($entity_array[$index]['entPhysicalDescr']));
+                        $descr = ucwords($entity_array[substr_replace($index, '000', -3)]['entPhysicalDescr'] ?? '')
+                                 . ' '
+                                 . preg_replace(
+                                     '/(Voltage|Current|Power Supply) Sensor$/i',
+                                     '',
+                                     ucwords($entity_array[$index]['entPhysicalDescr'])
+                                 );
                     }
                     if (preg_match('/(temp|temperature) sensor$/i', $descr)) {
                         $descr = preg_replace('/(temp|temperature) sensor$/i', '', $descr);
@@ -148,7 +174,7 @@ if (! empty($entity_oids)) {
                 $valid_sensor = false;
             }
             // Check for valid sensors
-            if (isset($entry['entPhySensorOperStatus']) && $entry['entPhySensorOperStatus'] === 'unavailable') {
+            if (isset($entry['entPhySensorOperStatus']) && ($entry['entPhySensorOperStatus'] === 'unavailable' || $entry['entPhySensorOperStatus'] === 'nonoperational')) {
                 $valid_sensor = false;
             }
             if ($valid_sensor && dbFetchCell("SELECT COUNT(*) FROM `sensors` WHERE device_id = ? AND `sensor_class` = ? AND `sensor_type` = 'cisco-entity-sensor' AND `sensor_index` = ?", [$device['device_id'], $type, $index]) == '0') {
@@ -217,7 +243,7 @@ if (! empty($entity_oids)) {
                     // End grouping sensors
                 }
                 $descr = trim($descr);
-                discover_sensor($valid['sensor'], $type, $device, $oid, $index, 'entity-sensor', $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $warn_limit, $high_limit, $current, 'snmp', $entPhysicalIndex, $entry['entSensorMeasuredEntity'], null, $group);
+                discover_sensor($valid['sensor'], $type, $device, $oid, $index, 'entity-sensor', $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $warn_limit, $high_limit, $current, 'snmp', $entPhysicalIndex, $entry['entSensorMeasuredEntity'] ?? null, null, $group);
             }
         }//end if
     }//end foreach

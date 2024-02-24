@@ -76,6 +76,23 @@
                                         @endforeach
                                     </ul></li>
                                 @endif
+                                @admin
+                                <li><a href="{{ route('maps.custom.index') }}"><i class="fa fa-map-marked fa-fw fa-lg"
+                                                                            aria-hidden="true"></i> {{ __('Custom Map Editor') }}
+                                    </a></li>
+                                @endadmin
+                                @if($custommaps->isNotEmpty())
+                                    <li class="dropdown-submenu"><a><i class="fa fa-map-marked fa-fw fa-lg"
+                                                                                aria-hidden="true"></i> {{ __('Custom Maps') }}
+                                        </a>
+                                        <ul class="dropdown-menu scrollable-menu">
+                                        @foreach($custommaps as $map)
+                                            <li><a href="{{ route('maps.custom.show', ['map' => $map->custom_map_id]) }}" title="{{ $map->name }}"><i class="fa fa-map-marked fa-fw fa-lg" aria-hidden="true"></i>
+                                                {{ ucfirst($map->name) }}
+                                            </a></li>
+                                        @endforeach
+                                    </ul></li>
+                                @endif
                                 <li><a href="{{ url('fullscreenmap') }}"><i class="fa fa-expand fa-fw fa-lg"
                                                                             aria-hidden="true"></i> {{ __('Geographical') }}
                                     </a></li>
@@ -133,7 +150,7 @@
                                                               aria-hidden="true"></i> {{ __('Graylog') }}</a></li>
                         @endconfig
 
-                        <li><a href="{{ url('inventory') }}"><i class="fa fa-cube fa-fw fa-lg"
+                        <li><a href="{{ route('inventory') }}"><i class="fa fa-cube fa-fw fa-lg"
                                                                 aria-hidden="true"></i> {{ __('Inventory') }}</a></li>
                         <li><a href="{{ url('outages') }}"><i class="fa fa-bar-chart fa-fw fa-lg"
                                                                aria-hidden="true"></i> {{ __('Outages') }}</a></li>
@@ -295,6 +312,12 @@
                             </li>
                         @endif
 
+
+                        @if($port_nac)
+                            <li role="presentation" class="divider"></li>
+                            <li><a href="{{ url('nac') }}"><i class="fa fa-lock fa-fw fa-lg"
+                                                              aria-hidden="true"></i> NAC</a></li>
+                        @endif
                         @if(auth()->user()->hasGlobalRead())
                             @if($port_groups_exist)
                                 <li role="presentation" class="divider"></li>
@@ -592,7 +615,7 @@
                         </li>
                         <li role="presentation" class="divider"></li>
                         @endif
-                        <li><a href="{{ url('about') }}"><i class="fa fa-info-circle fa-fw fa-lg"
+                        <li><a href="{{ url('about') }}"><i class="fa-solid fa-circle-info fa-fw fa-lg"
                                                             aria-hidden="true"></i> {{ __('About :project_name', ['project_name' => \LibreNMS\Config::get('project_name')]) }}
                             </a></li>
                     </ul>
@@ -760,4 +783,23 @@
             });
         }
     @endif
+
+    @if($global_search_ctrlf_focus)
+        $(document).ready(function(){
+            // Function to focus Global Search on Ctrl-F
+            window.addEventListener("keydown",function (e) {
+                if (e.keyCode === 114 || (e.ctrlKey && e.keyCode === 70)){
+                    if($('#gsearch').is(":focus")) {
+                        //allow normal Ctrl-F on a 2nd Hit
+                        return true;
+                    } else {
+                        //set Focus on Global Search and ignore Browsers defaults
+                        e.preventDefault();
+                        $('#gsearch').focus();
+                    }
+                }
+            })
+        })
+    @endif
+
 </script>

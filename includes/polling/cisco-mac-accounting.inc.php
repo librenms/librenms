@@ -1,6 +1,7 @@
 <?php
 
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Util\Mac;
 
 if ($device['os_group'] == 'cisco') {
     $acc_rows = dbFetchRows('SELECT *, A.poll_time AS poll_time FROM `mac_accounting` as A, `ports` AS I where A.port_id = I.port_id AND I.device_id = ?', [$device['device_id']]);
@@ -10,32 +11,29 @@ if ($device['os_group'] == 'cisco') {
             'cipMacHCSwitchedBytes',
             'cipMacHCSwitchedPkts',
         ];
-        $cip_array = [];
 
-        foreach (array_merge($cip_oids, ['cipMacSwitchedBytes', 'cipMacSwitchedPkts']) as $oid) {
-            echo "$oid ";
-            $cip_array = snmpwalk_cache_cip($device, $oid, $cip_array, 'CISCO-IP-STAT-MIB');
+        $cip_response = SnmpQuery::walk([
+            'CISCO-IP-STAT-MIB::cipMacHCSwitchedBytes',
+            'CISCO-IP-STAT-MIB::cipMacHCSwitchedPkts',
+        ]);
+        if (! $cip_response->isValid()) {
+            $cip_response = SnmpQuery::walk([
+                'CISCO-IP-STAT-MIB::cipMacSwitchedBytes',
+                'CISCO-IP-STAT-MIB::cipMacSwitchedPkts',
+            ]);
         }
 
         // Normalize cip_array
-        $cip_array = array_map(function ($entries) {
-            return array_map(function ($entry) {
-                $new_entry = [];
-
-                foreach (['Bytes', 'Pkts'] as $unit) {
-                    $returned_oid = (array_key_exists('cipMacHCSwitched' . $unit, $entry)) ? 'cipMacHCSwitched' : 'cipMacSwitched';
-                    $new_value = [];
-
-                    foreach ($entry[$returned_oid . $unit] as $key => $value) {
-                        $new_value[$key] = intval($value);
-                    }
-
-                    $new_entry['cipMacHCSwitched' . $unit] = $new_value;
+        $cip_array = [];
+        foreach ($cip_response->table(3) as $ifIndex => $port_data) {
+            foreach ($port_data as $direction => $dir_data) {
+                foreach ($dir_data as $mac => $mac_data) {
+                    $mac = Mac::parse($mac)->hex();
+                    $cip_array[$ifIndex][$mac]['cipMacHCSwitchedBytes'][$direction] = $mac_data['CISCO-IP-STAT-MIB::cipMacHCSwitchedBytes'] ?? $mac_data['CISCO-IP-STAT-MIB::cipMacSwitchedBytes'] ?? null;
+                    $cip_array[$ifIndex][$mac]['cipMacHCSwitchedPkts'][$direction] = $mac_data['CISCO-IP-STAT-MIB::cipMacHCSwitchedPkts'] ?? $mac_data['CISCO-IP-STAT-MIB::cipMacSwitchedPkts'] ?? null;
                 }
-
-                return $new_entry;
-            }, $entries);
-        }, $cip_array);
+            }
+        }
 
         $polled = time();
 
@@ -55,10 +53,10 @@ if ($device['os_group'] == 'cisco') {
 
                 $mac_entries++;
 
-                $b_in = $cip_array[$ifIndex][$mac]['cipMacHCSwitchedBytes']['input'];
-                $b_out = $cip_array[$ifIndex][$mac]['cipMacHCSwitchedBytes']['output'];
-                $p_in = $cip_array[$ifIndex][$mac]['cipMacHCSwitchedPkts']['input'];
-                $p_out = $cip_array[$ifIndex][$mac]['cipMacHCSwitchedPkts']['output'];
+                $b_in = $cip_array[$ifIndex][$mac]['cipMacHCSwitchedBytes']['input'] ?? null;
+                $b_out = $cip_array[$ifIndex][$mac]['cipMacHCSwitchedBytes']['output'] ?? null;
+                $p_in = $cip_array[$ifIndex][$mac]['cipMacHCSwitchedPkts']['input'] ?? null;
+                $p_out = $cip_array[$ifIndex][$mac]['cipMacHCSwitchedPkts']['output'] ?? null;
 
                 $this_ma = &$cip_array[$ifIndex][$mac];
 
@@ -66,10 +64,10 @@ if ($device['os_group'] == 'cisco') {
                 foreach ($cip_oids as $oid) {
                     foreach (['input', 'output'] as $dir) {
                         $oid_dir = $oid . '_' . $dir;
-                        $acc['update'][$oid_dir] = $this_ma[$oid][$dir];
+                        $acc['update'][$oid_dir] = $this_ma[$oid][$dir] ?? null;
                         $acc['update'][$oid_dir . '_prev'] = $acc[$oid_dir];
                         $oid_prev = $oid_dir . '_prev';
-                        if ($this_ma[$oid][$dir]) {
+                        if (isset($this_ma[$oid][$dir])) {
                             $oid_diff = ($this_ma[$oid][$dir] - $acc[$oid_dir]);
                             $oid_rate = ($oid_diff / $polled_period);
                             $acc['update'][$oid_dir . '_rate'] = $oid_rate;
@@ -79,7 +77,7 @@ if ($device['os_group'] == 'cisco') {
                     }
                 }
 
-                d_echo("\n" . $acc['hostname'] . ' ' . $acc['ifDescr'] . "  $mac -> $b_in:$b_out:$p_in:$p_out ");
+                d_echo("\nDevice id: " . $acc['device_id'] . ' -> ' . $acc['ifDescr'] . "  $mac -> $b_in:$b_out:$p_in:$p_out ");
 
                 $rrd_name = ['cip', $ifIndex, $mac];
                 $rrd_def = RrdDefinition::make()
@@ -117,6 +115,7 @@ if ($device['os_group'] == 'cisco') {
 
 unset(
     $cip_oids,
+    $cip_response,
     $oid,
     $polled,
     $mac_entries,

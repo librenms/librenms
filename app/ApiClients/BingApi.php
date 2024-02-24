@@ -34,16 +34,13 @@ class BingApi extends BaseApi implements Geocoder
 {
     use GeocodingHelper;
 
-    protected $base_uri = 'http://dev.virtualearth.net';
-    protected $geocoding_uri = '/REST/v1/Locations';
+    protected string $base_uri = 'http://dev.virtualearth.net';
+    protected string $geocoding_uri = '/REST/v1/Locations';
 
     /**
      * Get latitude and longitude from geocode response
-     *
-     * @param  array  $data
-     * @return array
      */
-    protected function parseLatLng($data)
+    protected function parseLatLng(array $data): array
     {
         return [
             'lat' => isset($data['resourceSets'][0]['resources'][0]['point']['coordinates'][0]) ? $data['resourceSets'][0]['resources'][0]['point']['coordinates'][0] : 0,
@@ -52,14 +49,11 @@ class BingApi extends BaseApi implements Geocoder
     }
 
     /**
-     * Build Guzzle request option array
-     *
-     * @param  string  $address
-     * @return array
+     * Build request option array
      *
      * @throws \Exception you may throw an Exception if validation fails
      */
-    protected function buildGeocodingOptions($address)
+    protected function buildGeocodingOptions(string $address): array
     {
         $api_key = Config::get('geoloc.api_key');
         if (! $api_key) {

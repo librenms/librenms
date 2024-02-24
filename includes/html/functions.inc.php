@@ -10,7 +10,9 @@
  * @copyright  (C) 2013 LibreNMS Group
  */
 
+use App\Facades\DeviceCache;
 use LibreNMS\Config;
+use LibreNMS\Enum\ImageFormat;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\Rewrite;
 
@@ -436,28 +438,10 @@ function generate_port_image($args)
  * @param  string  $text
  * @param  int[]  $color
  */
-function graph_error($text, $color = [128, 0, 0])
+function graph_error($text, $short = null, $color = [128, 0, 0])
 {
-    echo \LibreNMS\Util\Graph::error($text, null, 300, null, $color);
-}
-
-/**
- * Output message to user in image format.
- *
- * @param  string  $text  string to display
- */
-function graph_text_and_exit($text)
-{
-    global $vars;
-
-    if ($vars['showcommand'] == 'yes') {
-        echo $text;
-
-        return;
-    }
-
-    graph_error($text, [13, 21, 210]);
-    exit;
+    header('Content-Type: ' . ImageFormat::forGraph()->contentType());
+    echo \LibreNMS\Util\Graph::error($text, $short, 300, null, $color);
 }
 
 function print_port_thumbnail($args)
@@ -841,7 +825,7 @@ function dynamic_override_config($type, $name, $device)
  * One or an array of strings can be provided as an argument; if an array is passed, all ports matching
  * any of the types in the array are returned.
  *
- * @param $types mixed String or strings matching 'port_descr_type's.
+ * @param  $types  mixed String or strings matching 'port_descr_type's.
  * @return array Rows from the ports table for matching ports.
  */
 function get_ports_from_type($given_types)
@@ -893,8 +877,8 @@ function get_ports_from_type($given_types)
 }
 
 /**
- * @param $filename
- * @param $content
+ * @param  $filename
+ * @param  $content
  */
 function file_download($filename, $content)
 {
@@ -940,6 +924,7 @@ function search_oxidized_config($search_in_conf_textbox)
     foreach ($nodes as &$n) {
         $dev = device_by_name($n['node']);
         $n['dev_id'] = $dev ? $dev['device_id'] : false;
+        $n['full_name'] = $n['dev_id'] ? DeviceCache::get($n['dev_id'])->displayName() : $n['full_name'];
     }
 
     /*
@@ -953,7 +938,7 @@ function search_oxidized_config($search_in_conf_textbox)
 }
 
 /**
- * @param $data
+ * @param  $data
  * @return bool|mixed
  */
 function array_to_htmljson($data)
@@ -988,17 +973,6 @@ function eventlog_severity($eventlog_severity)
             return 'label-default'; //Unknown
     }
 } // end eventlog_severity
-
-/**
- * Get the http content type of the image
- *
- * @param  string  $type  svg or png
- * @return string
- */
-function get_image_type(string $type)
-{
-    return \LibreNMS\Util\Graph::imageType($type);
-}
 
 function get_oxidized_nodes_list()
 {
@@ -1036,43 +1010,13 @@ function get_oxidized_nodes_list()
  * @param  string  $transparency  value of desired transparency applied to rrdtool options (values 01 - 99)
  * @return array containing transparency and stacked setup
  */
-function generate_stacked_graphs($transparency = '88')
+function generate_stacked_graphs($force_stack = false, $transparency = '88')
 {
-    if (Config::get('webui.graph_stacked') == true) {
+    if (Config::get('webui.graph_stacked') == true || $force_stack == true) {
         return ['transparency' => $transparency, 'stacked' => '1'];
     } else {
         return ['transparency' => '', 'stacked' => '-1'];
     }
-}
-
-/**
- * Parse AT time spec, does not handle the entire spec.
- *
- * @param  string|int  $time
- * @return int
- */
-function parse_at_time($time)
-{
-    if (is_numeric($time)) {
-        return $time < 0 ? time() + $time : intval($time);
-    }
-
-    if (preg_match('/^[+-]\d+[hdmy]$/', $time)) {
-        $units = [
-            'm' => 60,
-            'h' => 3600,
-            'd' => 86400,
-            'y' => 31557600,
-        ];
-        $value = substr($time, 1, -1);
-        $unit = substr($time, -1);
-
-        $offset = ($time[0] == '-' ? -1 : 1) * $units[$unit] * $value;
-
-        return time() + $offset;
-    }
-
-    return (int) strtotime($time);
 }
 
 /**
@@ -1156,8 +1100,17 @@ function get_sensor_label_color($sensor, $type = 'sensors')
 
         return "<span class='label $label_style'>" . trim($sensor['sensor_current']) . '</span>';
     }
+
     if ($sensor['sensor_class'] == 'frequency' && $sensor['sensor_type'] == 'openwrt') {
         return "<span class='label $label_style'>" . trim($sensor['sensor_current']) . ' ' . $unit . '</span>';
+    }
+
+    if ($sensor['sensor_class'] == 'power_consumed') {
+        return "<span class='label $label_style'>" . trim(Number::formatSi($sensor['sensor_current'] * 1000, 5, 5, 'Wh')) . '</span>';
+    }
+    if (in_array($sensor['rrd_type'], ['COUNTER', 'DERIVE', 'DCOUNTER', 'DDERIVE'])) {
+        //compute and display an approx rate for this sensor
+        return "<span class='label $label_style'>" . trim(Number::formatSi(max(0, $sensor['sensor_current'] - $sensor['sensor_prev']) / Config::get('rrd.step', 300), 2, 3, $unit)) . '</span>';
     }
 
     if ($type == 'wireless' && $sensor['sensor_class'] == 'frequency') {

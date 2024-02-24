@@ -47,10 +47,12 @@ if (is_numeric($template_id)) {
         'invert' => Config::get('alert_rule.invert_rule_match'),
         'interval' => 60 * Config::get('alert_rule.interval'),
         'recovery' => Config::get('alert_rule.recovery_alerts'),
+        'acknowledgement' => Config::get('alert_rule.acknowledgement_alerts'),
     ];
     $output = [
         'status' => 'ok',
         'name' => $rule['name'],
+        'notes' => $rule['notes'],
         'builder' => $rule['builder'] ?: QueryBuilderParser::fromOld($rule['rule'])->toArray(),
         'extra' => array_replace($default_extra, (array) $rule['extra']),
         'severity' => $rule['severity'] ?: Config::get('alert_rule.severity'),

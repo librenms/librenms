@@ -6,6 +6,7 @@ echo 'AXIS Temperatures ';
 $oids_tmp = snmpwalk_cache_multi_oid($device, 'tempSensorTable', [], 'AXIS-VIDEO-MIB');
 $cur_oid = '.1.3.6.1.4.1.368.4.1.3.1.4.1.';
 
+$oids = [];
 // Exclude from $oids content .common string
 foreach ($oids_tmp as $key_oids_tmp => $val_oids_tmp) {
     $oids[str_replace('common.', '', $key_oids_tmp)] = $val_oids_tmp;

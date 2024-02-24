@@ -1,0 +1,179 @@
+ELTEX-MES-ISS-CPU-UTIL-MIB DEFINITIONS ::= BEGIN
+
+-- Title:      ELTEX CPU Utilization Private MIB
+-- Version:    1.0
+-- Date:       26 Deс 2018
+
+IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE
+            FROM SNMPv2-SMI
+        OBJECT-GROUP
+            FROM SNMPv2-CONF
+        TruthValue, DisplayString
+            FROM SNMPv2-TC
+        eltMesIss
+            FROM ELTEX-MES-ISS-MIB;
+
+eltMesIssCpuUtilMIB MODULE-IDENTITY
+        LAST-UPDATED "201812260000Z"
+        ORGANIZATION "Eltex Enterprise, Ltd."
+        CONTACT-INFO
+                "eltex-co.ru"
+        DESCRIPTION
+                "CPU utilization MIB definitions."
+        REVISION "201812260000Z"
+        DESCRIPTION "Initial revision."
+    ::= { eltMesIss 6 }
+
+eltMesIssCpuUtilObjects       OBJECT IDENTIFIER ::= { eltMesIssCpuUtilMIB 1 }
+
+eltMesIssCpuUtilGlobal        OBJECT IDENTIFIER ::= { eltMesIssCpuUtilObjects 1 }
+
+eltMesIssCpuUtilGlobalConfig  OBJECT IDENTIFIER ::= { eltMesIssCpuUtilGlobal 1 }
+
+eltMesIssCpuUtilGlobalStat    OBJECT IDENTIFIER ::= { eltMesIssCpuUtilGlobal 2 }
+
+eltMesIssCpuUtilTask          OBJECT IDENTIFIER ::= { eltMesIssCpuUtilObjects 2 }
+
+eltMesIssCpuUtilTaskConfig    OBJECT IDENTIFIER ::= { eltMesIssCpuUtilTask 1 }
+
+eltMesIssCpuUtilTaskStat      OBJECT IDENTIFIER ::= { eltMesIssCpuUtilTask 2 }
+
+-- ------------------
+-- CPU Util Enable --
+-- ------------------
+
+eltMesIssCpuUtilEnable OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Enables measurement of the device CPU utilization.
+         In order to get real values for eltMesIssCpuUtilLast5Seconds, eltMesIssCpuUtilLastMinute
+         and eltMesIssCpuUtilLast5Minutes, the value of this object must be true."
+    DEFVAL { true }
+    ::= { eltMesIssCpuUtilGlobalConfig 1 }
+
+-- ----------------------
+-- CPU Util Statistics --
+-- ----------------------
+
+eltMesIssCpuUtilLast5Seconds OBJECT-TYPE
+    SYNTAX INTEGER (0..100)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Percentage of the device CPU utilization during last 5 seconds.
+         If CPU utilization was not measured (since measurement is disabled
+         or was disabled during last 5 seconds) then this value will be 0."
+    ::= { eltMesIssCpuUtilGlobalStat 1 }
+
+eltMesIssCpuUtilLastMinute OBJECT-TYPE
+    SYNTAX INTEGER (0..100)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Percentage of the device CPU utilization during last minute.
+         If CPU utilization was not measured (since measurement is disabled
+         or was disabled during last minute) then this value will be 0."
+    ::= { eltMesIssCpuUtilGlobalStat 2 }
+
+eltMesIssCpuUtilLast5Minutes OBJECT-TYPE
+    SYNTAX INTEGER (0..100)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Percentage of the device CPU utilization during the last 5 minutes.
+         If CPU utilization was not measured (since measurement is disabled
+         or was disabled during last 5 minutes) then this value will be 0."
+    ::= { eltMesIssCpuUtilGlobalStat 3 }
+
+-- ------------------------
+-- CPU Tasks Util Enable --
+-- ------------------------
+
+eltMesIssCpuUtilTaskEnable OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Enables measurement of the device CPU tasks utilization.
+         In order to get real values for eltMesIssCpuUtilTaskStatLast5Seconds,
+         eltMesIssCpuUtilTaskStatLastMinute
+         and eltMesIssCpuUtilTaskStatLast5Minutes,
+         the value of this object must be true."
+    DEFVAL { true }
+    ::= { eltMesIssCpuUtilTaskConfig 1 }
+
+-- ----------------------------------
+-- CPU Tasks Util Statistics Table --
+-- ----------------------------------
+
+eltMesIssCpuUtilTaskStatTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF EltMesIssCpuUtilTaskStatEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "A list of measurement of the device CPU tasks utilization."
+    ::= { eltMesIssCpuUtilTaskStat 1 }
+
+eltMesIssCpuUtilTaskStatEntry OBJECT-TYPE
+    SYNTAX          EltMesIssCpuUtilTaskStatEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "An entry containing measurement of the device CPU tasks utilization."
+    INDEX           { eltMesIssCpuUtilTaskStatIndex }
+    ::= { eltMesIssCpuUtilTaskStatTable 1 }
+
+EltMesIssCpuUtilTaskStatEntry ::= SEQUENCE {
+        eltMesIssCpuUtilTaskStatIndex            INTEGER,
+        eltMesIssCpuUtilTaskStatName             DisplayString,
+        eltMesIssCpuUtilTaskStatLast5Seconds     INTEGER,
+        eltMesIssCpuUtilTaskStatLastMinute       INTEGER,
+        eltMesIssCpuUtilTaskStatLast5Minutes     INTEGER
+}
+
+eltMesIssCpuUtilTaskStatIndex OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "Index of the device CPU task."
+    ::= { eltMesIssCpuUtilTaskStatEntry 1 }
+
+eltMesIssCpuUtilTaskStatName OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "Name of the device CPU task."
+    ::= { eltMesIssCpuUtilTaskStatEntry 2 }
+
+eltMesIssCpuUtilTaskStatLast5Seconds OBJECT-TYPE
+    SYNTAX          INTEGER (0..100)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Percentage of the device CPU task utilization during last 5 seconds.
+         If task's CPU utilization was not measured (since measurement is disabled
+         or was disabled during last 5 seconds) then this value will be 0."
+    ::= { eltMesIssCpuUtilTaskStatEntry 3 }
+
+eltMesIssCpuUtilTaskStatLastMinute OBJECT-TYPE
+    SYNTAX          INTEGER (0..100)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Percentage of the device CPU task utilization during last minute.
+         If task's CPU utilization was not measured (since measurement is disabled
+         or was disabled during last minute) then this value will be 0."
+    ::= { eltMesIssCpuUtilTaskStatEntry 4 }
+
+eltMesIssCpuUtilTaskStatLast5Minutes OBJECT-TYPE
+    SYNTAX          INTEGER (0..100)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Percentage of the device CPU task utilization during the last 5 minutes.
+         If task's CPU utilization was not measured (since measurement is disabled
+         or was disabled during last 5 minutes) then this value will be 0."
+    ::= { eltMesIssCpuUtilTaskStatEntry 5 }
+
+END

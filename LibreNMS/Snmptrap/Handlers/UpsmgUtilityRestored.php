@@ -24,6 +24,7 @@
 namespace LibreNMS\Snmptrap\Handlers;
 
 use App\Models\Device;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
 use Log;
@@ -48,6 +49,6 @@ class UpsmgUtilityRestored implements SnmptrapHandler
         }
         $sensor->sensor_current = 2;
         $sensor->save();
-        Log::event('UPS power restored, state sensor ' . $sensor->sensor_descr . ' has changed to ' . $sensor->sensor_current . '.', $device->device_id, 'Power', 1);
+        $trap->log('UPS power restored, state sensor ' . $sensor->sensor_descr . ' has changed to ' . $sensor->sensor_current . '.', Severity::Ok, 'Power');
     }
 }

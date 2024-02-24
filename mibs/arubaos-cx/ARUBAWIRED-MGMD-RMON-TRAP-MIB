@@ -1,0 +1,59 @@
+--**MOD+***********************************************************************
+--* Module:    ARUBAWIRED-RMON-TRAP-MIB.mib
+--*
+--* (c) Copyright 2017 Hewlett Packard Enterprise Development LP
+--* All Rights Reserved.
+--*
+--* The contents of this software are proprietary and confidential
+--* to the Hewlett-Packard Development Company, L.P.  No part of this
+--* program may be photocopied, reproduced, or translated into another
+--* programming language without prior written consent of the
+--* Hewlett-Packard Development Company, L.P.
+--*
+--* Purpose: This file contains MIB definition of ARUBAWIRED-RMON-TRAP-MIB
+--*
+--**MOD-***********************************************************************
+
+ARUBAWIRED-MGMD-RMON-TRAP-MIB DEFINITIONS  ::= BEGIN
+
+IMPORTS
+  MODULE-IDENTITY, NOTIFICATION-TYPE
+                FROM SNMPv2-SMI
+  eventDescription, eventIndex
+                FROM RMON-MIB
+  wndFeatures
+                FROM ARUBAWIRED-NETWORKING-OID;
+
+arubaWiredMgmdRmonTrapMIB MODULE-IDENTITY
+  LAST-UPDATED "201711020000Z" -- November 02, 2017
+  ORGANIZATION "HPE/Aruba Networking Division"
+  CONTACT-INFO "Hewlett Packard Company
+                       8000 Foothills Blvd.
+                       Roseville, CA 95747"
+  DESCRIPTION  "This MIB module describes objects to configure
+               RMON traps."
+  
+  REVISION     "201711020000Z" -- November 02, 2017
+  DESCRIPTION  "Initial revision."
+  ::= { wndFeatures 4 }
+
+--**********************************************************************
+-- The ARUBAWIRED MGMG RMON Trap MIB Objects
+-- **********************************************************************
+
+arubaWiredMgmdRmonTrapNotifications     OBJECT IDENTIFIER ::= { arubaWiredMgmdRmonTrapMIB 1 }
+
+--**********************************************************************
+--  NOTIFICATIONS (TRAPS)
+--**********************************************************************
+
+arubaWiredMgmdRmonTrapEvent NOTIFICATION-TYPE
+  OBJECTS      { eventIndex,
+                 eventDescription
+               }
+  STATUS current
+  DESCRIPTION
+             "The event ID for which the trap is set has occured."
+  ::= { arubaWiredMgmdRmonTrapNotifications 1 }
+
+END

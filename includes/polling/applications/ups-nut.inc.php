@@ -62,10 +62,10 @@ if (! $ups_nut) {
     $UPSUPSOverloaded,
     $UPSUPSBuck,
     $UPSUPSBoost,
-    $UPSForcedShutdown
-    ] = explode("\n", $ups_nut);
+    $UPSForcedShutdown,
+    $UPSAlarm
+] = array_pad(explode("\n", $ups_nut), 23, 0);
 
-$rrd_name = ['app', $name, $app->app_id];
 $rrd_def = RrdDefinition::make()
     ->addDataset('charge', 'GAUGE', 0, 100)
     ->addDataset('battery_low', 'GAUGE', 0, 100)
@@ -102,6 +102,7 @@ $sensors = [
     ['state_name' => 'UPSUPSBuck', 'value' => $UPSUPSBuck],
     ['state_name' => 'UPSUPSBoost', 'value' => $UPSUPSBoost],
     ['state_name' => 'UPSForcedShutdown', 'value' => $UPSForcedShutdown],
+    ['state_name' => 'UPSAlarm', 'value' => $UPSAlarm],
 ];
 
 foreach ($sensors as $index => $sensor) {
@@ -109,6 +110,11 @@ foreach ($sensors as $index => $sensor) {
     $fields[$sensor['state_name']] = $sensor['value'];
 }
 
-$tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
+$tags = [
+    'name' => $name,
+    'app_id' => $app->app_id,
+    'rrd_name' => ['app', $name, $app->app_id],
+    'rrd_def' => $rrd_def,
+];
 data_update($device, 'app', $tags, $fields);
 update_application($app, $ups_nut, $fields);

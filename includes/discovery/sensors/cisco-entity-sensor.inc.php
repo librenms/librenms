@@ -19,6 +19,15 @@ if ($device['os_group'] == 'cisco') {
         $entity_array = snmpwalk_cache_twopart_oid($device, 'entAliasMappingIdentifier', $entity_array, 'ENTITY-MIB:IF-MIB');
     }
 
+    $port_array = [];
+    $port_array = snmpwalk_cache_multi_oid($device, 'ifName', $port_array, 'ENTITY-MIB:IF-MIB');
+    $port_reverse_array = [];
+    foreach ($port_array as $index => $port) {
+        $port['ifIndex'] = $index;
+        $port_reverse_array[$port['ifName']] = $port;
+    }
+    d_echo($port_reverse_array);
+
     echo '  entSensorType';
     $oids = snmpwalk_cache_multi_oid($device, 'entSensorType', $oids, 'CISCO-ENTITY-SENSOR-MIB');
     echo ' entSensorScale';
@@ -63,7 +72,7 @@ if ($device['os_group'] == 'cisco') {
                 }
 
                 // Set description based on measured entity if it exists
-                if (is_numeric($entry['entSensorMeasuredEntity']) && $entry['entSensorMeasuredEntity']) {
+                if (isset($entry['entSensorMeasuredEntity']) && is_numeric($entry['entSensorMeasuredEntity']) && $entry['entSensorMeasuredEntity']) {
                     $measured_descr = $entity_array[$entry['entSensorMeasuredEntity']]['entPhysicalName'];
                     if (! $measured_descr) {
                         $measured_descr = $entity_array[$entry['entSensorMeasuredEntity']]['entPhysicalDescr'];
@@ -136,7 +145,7 @@ if ($device['os_group'] == 'cisco') {
                 $warn_limit_low = null;
 
                 // Check thresholds for this entry (bit dirty, but it works!)
-                if (is_array($t_oids[$index])) {
+                if (isset($t_oids[$index]) && is_array($t_oids[$index])) {
                     foreach ($t_oids[$index] as $t_index => $key) {
                         // Skip invalid treshold values
                         if ($key['entSensorThresholdValue'] == '-32768') {
@@ -182,24 +191,37 @@ if ($device['os_group'] == 'cisco') {
 
                 if ($ok) {
                     $phys_index = $entity_array[$index]['entPhysicalContainedIn'];
+                    $tmp_ifindex = 0;
                     while ($phys_index != 0) {
                         if ($index === $phys_index) {
                             break;
                         }
-                        if ($entity_array[$phys_index]['entPhysicalClass'] === 'port') {
-                            if (Str::contains($entity_array[$phys_index][0]['entAliasMappingIdentifier'], 'ifIndex.')) {
-                                [, $tmp_ifindex] = explode('.', $entity_array[$phys_index][0]['entAliasMappingIdentifier']);
-                                $tmp_port = get_port_by_index_cache($device['device_id'], $tmp_ifindex);
-                                if (is_array($tmp_port)) {
-                                    $entPhysicalIndex = $tmp_ifindex;
-                                    $entry['entSensorMeasuredEntity'] = 'ports';
-                                }
+
+                        $entPhysicalClass = $entity_array[$phys_index]['entPhysicalClass'];
+                        $entPhysicalName = $entity_array[$phys_index]['entPhysicalName'];
+                        //either sensor is contained by a port class entity.
+                        if ($entPhysicalClass === 'port') {
+                            $entAliasMappingIdentifier = $entity_array[$phys_index][0]['entAliasMappingIdentifier'];
+                            if (Str::contains($entAliasMappingIdentifier, 'ifIndex.')) {
+                                [, $tmp_ifindex] = explode('.', $entAliasMappingIdentifier);
                             }
+                            break;
+                        //or sensor entity has a parent entity with module class and entPhysicalName set to an existing ifName.
+                        } elseif ($entPhysicalClass === 'module' && array_key_exists($entPhysicalName, $port_reverse_array)) {
+                            $tmp_ifindex = $port_reverse_array[$entPhysicalName]['ifIndex'];
                             break;
                         } else {
                             $phys_index = $entity_array[$phys_index]['entPhysicalContainedIn'];
                         }
                     }
+                    if ($tmp_ifindex != 0) {
+                        $tmp_port = get_port_by_index_cache($device['device_id'], $tmp_ifindex);
+                        if (is_array($tmp_port)) {
+                            $entPhysicalIndex = $tmp_ifindex;
+                            $entry['entSensorMeasuredEntity'] = 'ports';
+                        }
+                    }
+
                     discover_sensor($valid['sensor'], $type, $device, $oid, $index, 'cisco-entity-sensor', ucwords($descr), $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, 'snmp', $entPhysicalIndex, $entry['entSensorMeasuredEntity'], null);
                     //Cisco IOS-XR : add a fake sensor to graph as dbm
                     if ($type == 'power' and $device['os'] == 'iosxr' and (preg_match('/power (R|T)x/i', $descr) or preg_match('/(R|T)x Power/i', $descr) or preg_match('/(R|T)x Lane/i', $descr))) {

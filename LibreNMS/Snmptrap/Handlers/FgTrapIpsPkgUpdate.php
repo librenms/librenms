@@ -30,7 +30,6 @@ namespace LibreNMS\Snmptrap\Handlers;
 use App\Models\Device;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
-use Log;
 
 class FgTrapIpsPkgUpdate implements SnmptrapHandler
 {
@@ -44,6 +43,6 @@ class FgTrapIpsPkgUpdate implements SnmptrapHandler
      */
     public function handle(Device $device, Trap $trap)
     {
-        Log::event("IPS package updated on $device->hostname", $device->device_id, 'trap', 2);
+        $trap->log("IPS package updated on $device->hostname");
     }
 }

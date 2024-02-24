@@ -10,6 +10,7 @@ discovery:
     -
         sysObjectID: .1.3.6.1.4.1.41112.1.5
         sysDescr_regex:
+            - '/^Ubiquiti\ EdgeOS/'
             - '/^EdgeOS/'
             - '/^EdgeRouter/'
         snmpget_except:

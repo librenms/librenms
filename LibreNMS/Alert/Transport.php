@@ -4,7 +4,6 @@ namespace LibreNMS\Alert;
 
 use App\Models\AlertTransport;
 use App\View\SimpleTemplate;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Enum\AlertState;
@@ -12,11 +11,8 @@ use LibreNMS\Interfaces\Alert\Transport as TransportInterface;
 
 abstract class Transport implements TransportInterface
 {
-    protected $config;
-    /**
-     * @var string
-     */
-    protected $name;
+    protected ?array $config;
+    protected string $name = '';
 
     public static function make(string $type): TransportInterface
     {
@@ -43,25 +39,9 @@ abstract class Transport implements TransportInterface
         return $list;
     }
 
-    /**
-     * Transport constructor.
-     *
-     * @param  null  $transport
-     */
-    public function __construct($transport = null)
+    public function __construct(?AlertTransport $transport = null)
     {
-        if (! empty($transport)) {
-            if ($transport instanceof AlertTransport) {
-                $this->config = $transport->transport_config;
-            } else {
-                try {
-                    $model = \App\Models\AlertTransport::findOrFail($transport); /** @var AlertTransport $model */
-                    $this->config = $model->transport_config;
-                } catch (ModelNotFoundException $e) {
-                    $this->config = [];
-                }
-            }
-        }
+        $this->config = $transport ? $transport->transport_config : [];
     }
 
     /**
@@ -69,7 +49,7 @@ abstract class Transport implements TransportInterface
      */
     public function name(): string
     {
-        if ($this->name !== null) {
+        if ($this->name !== '') {
             return $this->name;
         }
 
@@ -107,11 +87,11 @@ abstract class Transport implements TransportInterface
     public static function getColorForState($state)
     {
         $colors = [
-            AlertState::CLEAR        => Config::get('alert_colour.ok'),
-            AlertState::ACTIVE       => Config::get('alert_colour.bad'),
+            AlertState::CLEAR => Config::get('alert_colour.ok'),
+            AlertState::ACTIVE => Config::get('alert_colour.bad'),
             AlertState::ACKNOWLEDGED => Config::get('alert_colour.acknowledged'),
-            AlertState::WORSE        => Config::get('alert_colour.worse'),
-            AlertState::BETTER       => Config::get('alert_colour.better'),
+            AlertState::WORSE => Config::get('alert_colour.worse'),
+            AlertState::BETTER => Config::get('alert_colour.better'),
         ];
 
         return isset($colors[$state]) ? $colors[$state] : '#337AB7';
@@ -158,7 +138,7 @@ abstract class Transport implements TransportInterface
         return 'LibreNMS\\Alert\\Transport\\' . ucfirst($type);
     }
 
-    protected function isHtmlContent($content): bool
+    protected function isHtmlContent(string $content): bool
     {
         return $content !== strip_tags($content);
     }

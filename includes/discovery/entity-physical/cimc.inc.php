@@ -13,7 +13,7 @@
 
 $comp_module = 'Cisco-CIMC';
 $component = new LibreNMS\Component();
-$components = $component->getComponents($device['device_id'], ['type'=>$comp_module]);
+$components = $component->getComponents($device['device_id'], ['type' => $comp_module]);
 
 // We only care about our device id.
 $components = $components[$device['device_id']];
@@ -72,10 +72,10 @@ if (is_null($tblUCSObjects)) {
 
             // Lets Set some defaults.
             $entPhysicalData = [
-                'entPhysicalHardwareRev'    => '',
-                'entPhysicalFirmwareRev'    => '',
-                'entPhysicalSoftwareRev'    => '',
-                'entPhysicalIsFRU'          => 'FALSE',
+                'entPhysicalHardwareRev' => '',
+                'entPhysicalFirmwareRev' => '',
+                'entPhysicalSoftwareRev' => '',
+                'entPhysicalIsFRU' => 'FALSE',
             ];
 
             switch ($tbl) {
@@ -125,7 +125,7 @@ if (is_null($tblUCSObjects)) {
                     }
                     break;
 
-                // System Board - rack-unit-1/board
+                    // System Board - rack-unit-1/board
                 case '1.3.6.1.4.1.9.9.719.1.9.6.1':
                     foreach ($array[3] as $key => $item) {
                         $result = [];
@@ -161,7 +161,7 @@ if (is_null($tblUCSObjects)) {
                     }
                     break;
 
-                // Memory Modules - rack-unit-1/board/memarray-1/mem-0
+                    // Memory Modules - rack-unit-1/board/memarray-1/mem-0
                 case '1.3.6.1.4.1.9.9.719.1.30.11.1':
                     foreach ($array[3] as $key => $item) {
                         $result = [];
@@ -203,7 +203,7 @@ if (is_null($tblUCSObjects)) {
                     }
                     break;
 
-                // CPU's - rack-unit-1/board/cpu-1
+                    // CPU's - rack-unit-1/board/cpu-1
                 case '1.3.6.1.4.1.9.9.719.1.41.9.1':
                     foreach ($array[3] as $key => $item) {
                         $result = [];
@@ -245,7 +245,7 @@ if (is_null($tblUCSObjects)) {
                     }
                     break;
 
-                // SAS Storage Module - rack-unit-1/board/storage-SAS-2
+                    // SAS Storage Module - rack-unit-1/board/storage-SAS-2
                 case '1.3.6.1.4.1.9.9.719.1.45.1.1':
                     foreach ($array[3] as $key => $item) {
                         $result = [];
@@ -282,7 +282,7 @@ if (is_null($tblUCSObjects)) {
                     }
                     break;
 
-                // SAS Disks - rack-unit-1/board/storage-SAS-2/disk-1
+                    // SAS Disks - rack-unit-1/board/storage-SAS-2/disk-1
                 case '1.3.6.1.4.1.9.9.719.1.45.4.1':
                     foreach ($array[3] as $key => $item) {
                         $result = [];
@@ -294,7 +294,7 @@ if (is_null($tblUCSObjects)) {
 
                         // Old Firmware returns 4294967296 as 1 MB.
                         // The if below assumes we will never have < 1 Gb on old firmware or > 4 Pb on new firmware
-                        if (($array[13][$key]) > 4294967296000) {
+                        if ($array[13][$key] > 4294967296000) {
                             // Old Firmware
                             $result['string'] = $array[14][$key] . ' ' . $array[7][$key] . ', Rev: ' . $array[11][$key] . ', Size: ' . round($array[13][$key] / 4294967296000, 2) . ' GB';
                             d_echo('Disk: ' . $array[2][$key] . ', Raw Size: ' . $array[13][$key] . ', converted (old FW): ' . round($array[13][$key] / 4294967296000, 2) . "GB\n");
@@ -330,7 +330,7 @@ if (is_null($tblUCSObjects)) {
                     }
                     break;
 
-                // LUN's - rack-unit-1/board/storage-SAS-2/lun-0
+                    // LUN's - rack-unit-1/board/storage-SAS-2/lun-0
                 case '1.3.6.1.4.1.9.9.719.1.45.8.1':
                     foreach ($array[3] as $key => $item) {
                         $result = [];
@@ -342,7 +342,7 @@ if (is_null($tblUCSObjects)) {
 
                         // Old Firmware returns 4294967296 as 1 MB.
                         // The if below assumes we will never have < 1 Gb on old firmware or > 4 Pb on new firmware
-                        if (($array[13][$key]) > 4294967296000) {
+                        if ($array[13][$key] > 4294967296000) {
                             // Old Firmware
                             $result['string'] = $array[3][$key] . ', Size: ' . round($array[13][$key] / 4294967296000, 2) . ' GB';
                             d_echo('LUN: ' . $array[2][$key] . ', Raw Size: ' . $array[13][$key] . ', converted (Old FW): ' . round($array[13][$key] / 4294967296000, 2) . "GB\n");
@@ -378,7 +378,7 @@ if (is_null($tblUCSObjects)) {
                     }
                     break;
 
-                // RAID Battery - rack-unit-1/board/storage-SAS-2/raid-battery
+                    // RAID Battery - rack-unit-1/board/storage-SAS-2/raid-battery
                 case '1.3.6.1.4.1.9.9.719.1.45.11.1':
                     foreach ($array[3] as $key => $item) {
                         $result = [];
@@ -415,7 +415,7 @@ if (is_null($tblUCSObjects)) {
                     }
                     break;
 
-                // Fan's - rack-unit-1/fan-module-1-1/fan-1
+                    // Fan's - rack-unit-1/fan-module-1-1/fan-1
                 case '1.3.6.1.4.1.9.9.719.1.15.12.1':
                     foreach ($array[3] as $key => $item) {
                         $result = [];
@@ -452,7 +452,7 @@ if (is_null($tblUCSObjects)) {
                     }
                     break;
 
-                // PSU's - rack-unit-1/psu-1
+                    // PSU's - rack-unit-1/psu-1
                 case '1.3.6.1.4.1.9.9.719.1.15.56.1':
                     foreach ($array[3] as $key => $item) {
                         $result = [];
@@ -489,7 +489,7 @@ if (is_null($tblUCSObjects)) {
                     }
                     break;
 
-                // Adaptors - rack-unit-1/adaptor-1
+                    // Adaptors - rack-unit-1/adaptor-1
                 case '1.3.6.1.4.1.9.9.719.1.3.85.1':
                     foreach ($array[3] as $key => $item) {
                         $result = [];
@@ -526,7 +526,7 @@ if (is_null($tblUCSObjects)) {
                     }
                     break;
 
-                // Unknown Table, ask the user to log an issue so this can be identified.
+                    // Unknown Table, ask the user to log an issue so this can be identified.
                 default:
                     d_echo("Cisco-CIMC Error...\n");
                     d_echo("Please log an issue on github with the following information:\n");

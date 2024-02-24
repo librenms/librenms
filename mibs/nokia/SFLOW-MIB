@@ -1,8 +1,8 @@
 SFLOW-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
-
-      MODULE-IDENTITY, OBJECT-TYPE, Integer32, enterprises
+      
+      MODULE-IDENTITY, OBJECT-TYPE, Integer32, enterprises 
               FROM SNMPv2-SMI
       TEXTUAL-CONVENTION
               FROM SNMPv2-TC
@@ -15,7 +15,7 @@ IMPORTS
       MODULE-COMPLIANCE, OBJECT-GROUP
               FROM SNMPv2-CONF;
 
-      sFlow  MODULE-IDENTITY
+      sFlowMIB  MODULE-IDENTITY 
         LAST-UPDATED "200309240000Z"   -- September 24, 2003
         ORGANIZATION "sFlow.org"
         CONTACT-INFO
@@ -52,7 +52,7 @@ IMPORTS
         DESCRIPTION
                 "Version 1.3 (draft 3)
 
-                 Clarify semantics of counter polling interval,
+                 Clarify semantics of counter polling interval, 
                  sFlowCpInterval."
 
         REVISION    "200209170000Z"     -- September 17, 2002
@@ -61,11 +61,11 @@ IMPORTS
 
                  Adds support for multiple sFlow samplers per sFlowDataSource.
                  Moved to sflow.org enterprise number.
-                 Splits flow sampling, counter polling and receiver
+                 Splits flow sampling, counter polling and receiver 
                  specification into separate tables."
 
-        REVISION    "200107310000Z"     -- July 31, 2001
-        DESCRIPTION
+        REVISION    "200107310000Z"     -- July 31, 2001 
+        DESCRIPTION 
                 "Version 1.2
 
                  Brings MIB into SMI v2 compliance."
@@ -76,10 +76,7 @@ IMPORTS
 
                   Adds sfDatagramVersion."
 
-        ::= { enterprises 14706}
-
-
-      sFlowMIB OBJECT IDENTIFIER ::= { sFlow 1}
+        ::= { enterprises 14706 1 }
 
       sFlowAgent OBJECT IDENTIFIER ::= { sFlowMIB 1 }
 
@@ -92,12 +89,12 @@ IMPORTS
 
                 - ifIndex.<I>
                 SFlowDataSources of this traditional form are called
-                'port-based'. Ideally the sampling entity will perform
-                sampling on all flows originating from or destined to
-                the specified interface. However, if the switch architecture
-                only allows input or output sampling then the sampling agent
-                is permitted to only sample input flows input or output flows.
-                Each packet must only be considered once for sampling,
+                'port-based'. Ideally the sampling entity will perform 
+                sampling on all flows originating from or destined to 
+                the specified interface. However, if the switch architecture 
+                only allows input or output sampling then the sampling agent 
+                is permitted to only sample input flows input or output flows. 
+                Each packet must only be considered once for sampling, 
                 irrespective of the number of ports it will be forwarded to.
                 Note: Port 0 is used to indicate that all ports on the device
                       are represented by a single data source.
@@ -115,18 +112,18 @@ IMPORTS
                 of the specified VLAN (no matter which port they arrived on).
                 Each packet will only be considered once for sampling,
                 irrespective of the number of ports it will be forwarded to.
-
+                
                 - entPhysicalEntry.<N>
-                An SFlowDataSource of this form refers to a physical entity
-                within the agent (e.g. entPhysicalClass = backplane(4)) and
-                is called an 'entity-based' dataSource. Sampling is performed
-                on all packets entering the resource (e.g. If the backplane
-                is being sampled, all packets transmitted onto the backplane
-                will be considered as single candidates for sampling
+                An SFlowDataSource of this form refers to a physical entity 
+                within the agent (e.g. entPhysicalClass = backplane(4)) and 
+                is called an 'entity-based' dataSource. Sampling is performed 
+                on all packets entering the resource (e.g. If the backplane 
+                is being sampled, all packets transmitted onto the backplane 
+                will be considered as single candidates for sampling 
                 irrespective of the number of ports they ultimately reach).
 
-                Note: Since each SFlowDataSource operates independently a
-                      packet that crosses multiple DataSources may generate
+                Note: Since each SFlowDataSource operates independently a 
+                      packet that crosses multiple DataSources may generate 
                       multiple flow records."
               SYNTAX      OBJECT IDENTIFIER
 
@@ -135,7 +132,7 @@ IMPORTS
               DESCRIPTION
                 "If more than one sFlow sampler is available for this
                  SFlowDataSource then individual samplers are distinguished
-                 using the SFlowInstance variable. The value of
+                 using the SFlowInstance variable. The value of 
                  SFlowInstance ranges from 1..n where n is the number of
                  samplers associated with this SFlowDataSource.
 
@@ -152,7 +149,7 @@ IMPORTS
                 "Identify the sFlow receiver associated with this resource.
 
                  A value of zero indicates that this resource is available.
-                 If non-zero the value must correspond to a valid, active
+                 If non-zero the value must correspond to a valid, active 
                  sFlowRcvrIndex.
 
                  If the value is currently zero it may be set to any
@@ -178,7 +175,7 @@ IMPORTS
                  without first aquiring it by successfully writing its
                  sFlowRcvrIndex value as the SFlowReceiver for the resource."
               SYNTAX       Integer32
-
+      
       sFlowVersion OBJECT-TYPE
               SYNTAX      SnmpAdminString
               MAX-ACCESS  read-only
@@ -231,13 +228,13 @@ IMPORTS
                  agent. The sFlowAgent address must provide SNMP connectivity
                  to the agent. The address should be an invariant that does not
                  change as interfaces are reconfigured, enabled, disabled,
-                 added or removed. A manager should be able to use the
+                 added or removed. A manager should be able to use the 
                  sFlowAgentAddress as a unique key that will identify this
                  agent over extended periods of time so that a history can
                  be maintained."
-             ::= { sFlowAgent 3 }
+             ::= { sFlowAgent 3 }   
 
-      --
+      -- 
       -- Receiver Table
       --
 
@@ -295,10 +292,10 @@ IMPORTS
                  sFlowRcvrTimeout in the same SNMP set request.
 
                  When a management entity is finished using the sampler,
-                 it should set the value of sFlowRcvrOwner back to unclaimed.
+                 it should set the value of sFlowRcvrOwner back to unclaimed. 
                  The agent must restore all other entities this row to their
                  default values when the owner is set to unclaimed. It must
-                 also free all other resources associated with this
+                 also free all other resources associated with this 
                  sFlowRcvrTable entry.
 
                  This mechanism provides no enforcement and relies on the
@@ -321,12 +318,12 @@ IMPORTS
                  is responsible for setting a new value before the old one
                  expires.
 
-                 When the interval expires, the agent is responsible for
-                 restoring all other entities in this row to their default
+                 When the interval expires, the agent is responsible for 
+                 restoring all other entities in this row to their default 
                  values. It must also free all other resources associated with
-                 this sFlowRcvrTable entry."
+                 this sFlowRcvrTable entry." 
               DEFVAL { 0 }
-              ::= { sFlowRcvrEntry 3 }
+              ::= { sFlowRcvrEntry 3 } 
 
       sFlowRcvrMaximumDatagramSize OBJECT-TYPE
               SYNTAX      Integer32
@@ -376,12 +373,12 @@ IMPORTS
 
                  When set to a value not support by the agent, the agent should
                  adjust the value to the highest supported value less than the
-                 requested value, or return an SNMP bad value error if no
+                 requested value, or return an SNMP bad value error if no 
                  such value exists."
               DEFVAL { 5 }
-              ::= { sFlowRcvrEntry 8 }
+              ::= { sFlowRcvrEntry 8 }                
 
-      --
+      -- 
       -- Flow Sampling Table
       --
 
@@ -433,7 +430,7 @@ IMPORTS
               DESCRIPTION
                 "The SFlowReceiver for this flow sampler."
               DEFVAL { 0 }
-              ::= { sFlowFsEntry 3 }
+              ::= { sFlowFsEntry 3 } 
 
       sFlowFsPacketSamplingRate OBJECT-TYPE
               SYNTAX      Integer32
@@ -441,20 +438,20 @@ IMPORTS
               STATUS      current
               DESCRIPTION
                 "The statistical sampling rate for packet sampling from this
-                 source.
+                 source. 
 
                  Set to N to sample 1/Nth of the packets in the monitored flows.
                  An agent should choose its own algorithm to introduce variance
                  into the sampling so that exactly every Nth packet is not
                  counted. A sampling rate of 1 counts all packets. A sampling
                  rate of 0 disables sampling.
-
+                 
                  The agent is permitted to have minimum and maximum allowable
                  values for the sampling rate. A minimum rate lets the agent
                  designer set an upper bound on the overhead associated with
                  sampling, and a maximum rate may be the result of hardware
                  restrictions (such as counter size). In addition not all values
-                 between the maximum and minimum may be realizable as the
+                 between the maximum and minimum may be realizable as the 
                  sampling rate (again because of implementation considerations).
 
                  When the sampling rate is set the agent is free to adjust the
@@ -476,8 +473,8 @@ IMPORTS
               DESCRIPTION
                 "The maximum number of bytes that should be copied from a
                  sampled packet. The agent may have an internal maximum and
-                 minimum permissible sizes. If an attempt is made to set this
-                 value outside the permissible range then the agent should
+                 minimum permissible sizes. If an attempt is made to set this 
+                 value outside the permissible range then the agent should 
                  adjust the value to the closest permissible value."
               DEFVAL { 128 }
               ::= { sFlowFsEntry 5 }
@@ -485,7 +482,7 @@ IMPORTS
       --
       -- Counter Polling Table
       --
-
+      
 
       sFlowCpTable OBJECT-TYPE
               SYNTAX      SEQUENCE OF SFlowCpEntry
@@ -542,7 +539,7 @@ IMPORTS
               STATUS      current
               DESCRIPTION
                 "The maximum number of seconds between successive samples of the
-                 counters associated with this data source. A sampling interval
+                 counters associated with this data source. A sampling interval 
                  of 0 disables counter sampling.
 
                  The agent is permitted to have minimum and maximum allowable
@@ -583,29 +580,31 @@ IMPORTS
                   MANDATORY-GROUPS { sFlowAgentGroup }
 
                   OBJECT     sFlowAgentAddressType
-                  SYNTAX     InetAddressType
+                  SYNTAX     InetAddressType { ipv4(1) }
                   DESCRIPTION
                     "Agents need only support ipv4."
 
                   OBJECT sFlowRcvrAddressType
-                  SYNTAX InetAddressType
+                  SYNTAX InetAddressType { ipv4(1) }
                   DESCRIPTION
                     "Agents need only support ipv4."
-
+              
               ::= { sFlowMIBCompliances 1 }
 
       sFlowAgentGroup OBJECT-GROUP
               OBJECTS { sFlowVersion, sFlowAgentAddressType, sFlowAgentAddress,
-                        sFlowRcvrOwner, sFlowRcvrTimeout,
-                        sFlowRcvrMaximumDatagramSize, sFlowRcvrAddressType,
-                        sFlowRcvrAddress, sFlowRcvrPort,
-                        sFlowRcvrDatagramVersion, sFlowFsReceiver,
-                        sFlowFsPacketSamplingRate, sFlowFsMaximumHeaderSize,
+                        sFlowRcvrOwner, sFlowRcvrTimeout, 
+                        sFlowRcvrMaximumDatagramSize, sFlowRcvrAddressType, 
+                        sFlowRcvrAddress, sFlowRcvrPort, 
+                        sFlowRcvrDatagramVersion, sFlowFsReceiver, 
+                        sFlowFsPacketSamplingRate, sFlowFsMaximumHeaderSize, 
                         sFlowCpReceiver, sFlowCpInterval }
                STATUS current
                DESCRIPTION
                  "A collection of objects for managing the generation and
                   transportation of sFlow data records."
                 ::= { sFlowMIBGroups 1 }
-
+ 
 END
+
+

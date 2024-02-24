@@ -22,39 +22,35 @@
 
 namespace LibreNMS\Tests\Feature\SnmpTraps;
 
-use App\Models\Device;
-use LibreNMS\Snmptrap\Dispatcher;
-use LibreNMS\Snmptrap\Trap;
+use LibreNMS\Enum\Severity;
 
 class NetgearFailedUserLoginTest extends SnmpTrapTestCase
 {
-    public function testManagedSeries()
+    public function testManagedSeries(): void
     {
-        $device = Device::factory()->create(); /** @var Device $device */
-        $trapText = "$device->hostname
-UDP: [$device->ip]:44298->[192.168.5.5]:162
+        $this->assertTrapLogsMessage(<<<'TRAP'
+{{ hostname }}
+UDP: [{{ ip }}]:44298->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 0:6:11:31.55
-SNMPv2-MIB::snmpTrapOID.0 NETGEAR-SWITCHING-MIB::failedUserLoginTrap";
-
-        $message = "SNMP Trap: Failed User Login: {$device->displayName()}";
-        \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'auth', 4);
-
-        $trap = new Trap($trapText);
-        $this->assertTrue(Dispatcher::handle($trap), 'Could not handle NETGEAR-SWITCHING-MIB::failedUserLoginTrap trap');
+SNMPv2-MIB::snmpTrapOID.0 NETGEAR-SWITCHING-MIB::failedUserLoginTrap
+TRAP,
+            'SNMP Trap: Failed User Login: {{ hostname }}',
+            'Could not handle NETGEAR-SWITCHING-MIB::failedUserLoginTrap trap',
+            [Severity::Warning, 'auth'],
+        );
     }
 
-    public function testSmartSeries()
+    public function testSmartSeries(): void
     {
-        $device = Device::factory()->create(); /** @var Device $device */
-        $trapText = "$device->hostname
-UDP: [$device->ip]:1026->[192.168.5.5]:162
+        $this->assertTrapLogsMessage(<<<'TRAP'
+{{ hostname }}
+UDP: [{{ ip }}]:1026->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 30:22:57:58.00
-SNMPv2-MIB::snmpTrapOID.0 NETGEAR-SMART-SWITCHING-MIB::failedUserLoginTrap";
-
-        $message = "SNMP Trap: Failed User Login: {$device->displayName()}";
-        \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'auth', 4);
-
-        $trap = new Trap($trapText);
-        $this->assertTrue(Dispatcher::handle($trap), 'Could not handle NETGEAR-SMART-SWITCHING-MIB::failedUserLoginTrap trap');
+SNMPv2-MIB::snmpTrapOID.0 NETGEAR-SMART-SWITCHING-MIB::failedUserLoginTrap
+TRAP,
+            'SNMP Trap: Failed User Login: {{ hostname }}',
+            'Could not handle NETGEAR-SMART-SWITCHING-MIB::failedUserLoginTrap trap',
+            [Severity::Warning, 'auth'],
+        );
     }
 }

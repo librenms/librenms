@@ -39,9 +39,9 @@ Create a new class in `LibreNMS\Snmptrap\Handlers` that implements the
 namespace LibreNMS\Snmptrap\Handlers;
 
 use App\Models\Device;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
-use Log;
 
 class ColdBoot implements SnmptrapHandler
 {
@@ -55,20 +55,20 @@ class ColdBoot implements SnmptrapHandler
      */
     public function handle(Device $device, Trap $trap)
     {
-        Log::event('SNMP Trap: Device ' . $device->displayName() . ' cold booted', $device->device_id, 'reboot', 4);
+        $trap->log('SNMP Trap: Device ' . $device->displayName() . ' cold booted', $device->device_id, 'reboot', Severity::Warning);
     }
 }
 
 ```
 
-where number on the end of the row `Log::event` means color of the eventlog:
+where number on the end means color of the eventlog:
 
 ```
-1 green
-2 cyan
-3 blue
-4 yellow
-5 red
+Severity::Ok = green
+Severity::Info = cyan
+Severity::Notice = blue
+Severity::Warning = yellow
+Severity::Error = red
 ```
 
 Register the mapping in the `config/snmptraps.php` file. Make sure to
@@ -88,8 +88,7 @@ event log entries within the handle function.
 
 ```php
 $trap->getDevice();   // gets Device model for the device associated with this trap
-$trap->getHostname(); // gets hostname sent with the trap
-$trap->getIp();       // gets source IP of this trap
+$trap->ip;            // gets source IP of this trap
 $trap->getTrapOid();  // returns the string you registered your class with
 ```
 
@@ -112,5 +111,36 @@ $trap->findOids('ifDescr'); // returns all oid keys containing the string
 If the above isn't adequate, you can get the entire trap text:
 
 ```php
-$trap->getRaw();
+$trap->raw;
+```
+
+### Tests
+
+Submitting new traps requires them to be fully tested. You can find many examples in the
+`tests/Feature/SnmpTraps/` directory.
+
+Here is a basic example of a test that trap handler only creates a log message.
+If your trap modifies the database, you should also test that it does so.
+
+```php
+<?php
+
+namespace LibreNMS\Tests\Feature\SnmpTraps;
+
+class ColdStratTest extends SnmpTrapTestCase
+{
+    public function testColdStart(): void
+    {
+        $this->assertTrapLogsMessage(rawTrap: <<<'TRAP'
+{{ hostname }}
+UDP: [{{ ip }}]:44298->[192.168.5.5]:162
+DISMAN-EVENT-MIB::sysUpTimeInstance 0:0:1:12.7
+SNMPv2-MIB::snmpTrapOID.0 SNMPv2-MIB::coldStart
+TRAP,
+            log: 'SNMP Trap: Device {{ hostname }} cold booted', // The log message sent
+            failureMessage: 'Failed to handle SNMPv2-MIB::coldStart', // an informative message to let user know what failed
+            args: [4, 'reboot'], // the additional arguments to the log method
+        );
+    }
+}
 ```

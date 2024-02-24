@@ -24,7 +24,7 @@
         "discovery": {
             "bgpPeers": [
                 {
-                    "astext": "SDC-AS, US",
+                    "astext": "AS26479-MOCK-TEXT",
                     "bgpPeerIdentifier": "10.16.7.2",
                     "bgpPeerRemoteAs": 26479,
                     "bgpPeerState": "established",
@@ -47,7 +47,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "SDC-AS, US",
+                    "astext": "AS26479-MOCK-TEXT",
                     "bgpPeerIdentifier": "10.45.1.1",
                     "bgpPeerRemoteAs": 26479,
                     "bgpPeerState": "established",
@@ -70,7 +70,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "SDC-AS, US",
+                    "astext": "AS26479-MOCK-TEXT",
                     "bgpPeerIdentifier": "10.45.2.2",
                     "bgpPeerRemoteAs": 26479,
                     "bgpPeerState": "established",
@@ -93,7 +93,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "SDC-AS, US",
+                    "astext": "AS26479-MOCK-TEXT",
                     "bgpPeerIdentifier": "10.45.3.2",
                     "bgpPeerRemoteAs": 26479,
                     "bgpPeerState": "established",
@@ -116,7 +116,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "REDES DEL OESTE S.A, AR",
+                    "astext": "AS264685-MOCK-TEXT",
                     "bgpPeerIdentifier": "10.65.11.2",
                     "bgpPeerRemoteAs": 264685,
                     "bgpPeerState": "established",
@@ -139,7 +139,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "YOUTUBE, US",
+                    "astext": "AS11344-MOCK-TEXT",
                     "bgpPeerIdentifier": "45.189.216.158",
                     "bgpPeerRemoteAs": 11344,
                     "bgpPeerState": "established",
@@ -162,7 +162,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "NETFLIX-ASN, US",
+                    "astext": "AS40027-MOCK-TEXT",
                     "bgpPeerIdentifier": "45.189.216.166",
                     "bgpPeerRemoteAs": 40027,
                     "bgpPeerState": "established",
@@ -185,7 +185,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "NETFLIX-ASN, US",
+                    "astext": "AS40027-MOCK-TEXT",
                     "bgpPeerIdentifier": "45.189.216.170",
                     "bgpPeerRemoteAs": 40027,
                     "bgpPeerState": "established",
@@ -208,7 +208,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "FACEBOOK-OFFNET, US",
+                    "astext": "AS63293-MOCK-TEXT",
                     "bgpPeerIdentifier": "45.189.216.208",
                     "bgpPeerRemoteAs": 63293,
                     "bgpPeerState": "established",
@@ -231,7 +231,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "Nucleo de Inf. e Coord. do Ponto BR - NIC., BR",
+                    "astext": "AS20121-MOCK-TEXT",
                     "bgpPeerIdentifier": "187.16.216.252",
                     "bgpPeerRemoteAs": 20121,
                     "bgpPeerState": "established",
@@ -254,7 +254,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "Nucleo de Inf. e Coord. do Ponto BR - NIC., BR",
+                    "astext": "AS26162-MOCK-TEXT",
                     "bgpPeerIdentifier": "187.16.216.253",
                     "bgpPeerRemoteAs": 26162,
                     "bgpPeerState": "established",
@@ -277,7 +277,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "Nucleo de Inf. e Coord. do Ponto BR - NIC., BR",
+                    "astext": "AS26162-MOCK-TEXT",
                     "bgpPeerIdentifier": "187.16.216.254",
                     "bgpPeerRemoteAs": 26162,
                     "bgpPeerState": "established",
@@ -300,7 +300,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "Nucleo de Inf. e Coord. do Ponto BR - NIC., BR",
+                    "astext": "AS26162-MOCK-TEXT",
                     "bgpPeerIdentifier": "187.16.223.253",
                     "bgpPeerRemoteAs": 26162,
                     "bgpPeerState": "established",
@@ -323,7 +323,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "Nucleo de Inf. e Coord. do Ponto BR - NIC., BR",
+                    "astext": "AS26162-MOCK-TEXT",
                     "bgpPeerIdentifier": "187.16.223.254",
                     "bgpPeerRemoteAs": 26162,
                     "bgpPeerState": "established",
@@ -346,7 +346,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "PowerHost Telecom SPA, CL",
+                    "astext": "AS263237-MOCK-TEXT",
                     "bgpPeerIdentifier": "198.18.202.5",
                     "bgpPeerRemoteAs": 263237,
                     "bgpPeerState": "established",
@@ -369,7 +369,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "PIT CHILE SP, CL",
+                    "astext": "AS61522-MOCK-TEXT",
                     "bgpPeerIdentifier": "200.23.206.1",
                     "bgpPeerRemoteAs": 61522,
                     "bgpPeerState": "established",
@@ -392,7 +392,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "PIT CHILE SP, CL",
+                    "astext": "AS61522-MOCK-TEXT",
                     "bgpPeerIdentifier": "200.23.206.2",
                     "bgpPeerRemoteAs": 61522,
                     "bgpPeerState": "established",
@@ -415,7 +415,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "LVLT-3549, US",
+                    "astext": "AS3549-MOCK-TEXT",
                     "bgpPeerIdentifier": "204.199.0.169",
                     "bgpPeerRemoteAs": 3549,
                     "bgpPeerState": "established",
@@ -438,7 +438,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "Nucleo de Inf. e Coord. do Ponto BR - NIC., BR",
+                    "astext": "AS20121-MOCK-TEXT",
                     "bgpPeerIdentifier": "2001:12f8::252",
                     "bgpPeerRemoteAs": 20121,
                     "bgpPeerState": "established",
@@ -461,7 +461,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "Nucleo de Inf. e Coord. do Ponto BR - NIC., BR",
+                    "astext": "AS26162-MOCK-TEXT",
                     "bgpPeerIdentifier": "2001:12f8::253",
                     "bgpPeerRemoteAs": 26162,
                     "bgpPeerState": "established",
@@ -484,7 +484,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "Nucleo de Inf. e Coord. do Ponto BR - NIC., BR",
+                    "astext": "AS26162-MOCK-TEXT",
                     "bgpPeerIdentifier": "2001:12f8::254",
                     "bgpPeerRemoteAs": 26162,
                     "bgpPeerState": "established",
@@ -507,7 +507,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "Nucleo de Inf. e Coord. do Ponto BR - NIC., BR",
+                    "astext": "AS26162-MOCK-TEXT",
                     "bgpPeerIdentifier": "2001:12f8::223:253",
                     "bgpPeerRemoteAs": 26162,
                     "bgpPeerState": "established",
@@ -530,7 +530,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "Nucleo de Inf. e Coord. do Ponto BR - NIC., BR",
+                    "astext": "AS26162-MOCK-TEXT",
                     "bgpPeerIdentifier": "2001:12f8::223:254",
                     "bgpPeerRemoteAs": 26162,
                     "bgpPeerState": "established",
@@ -1111,7 +1111,7 @@
         "poller": {
             "bgpPeers": [
                 {
-                    "astext": "SDC-AS, US",
+                    "astext": "AS26479-MOCK-TEXT",
                     "bgpPeerIdentifier": "10.16.7.2",
                     "bgpPeerRemoteAs": 26479,
                     "bgpPeerState": "established",
@@ -1134,7 +1134,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "SDC-AS, US",
+                    "astext": "AS26479-MOCK-TEXT",
                     "bgpPeerIdentifier": "10.45.1.1",
                     "bgpPeerRemoteAs": 26479,
                     "bgpPeerState": "established",
@@ -1157,7 +1157,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "SDC-AS, US",
+                    "astext": "AS26479-MOCK-TEXT",
                     "bgpPeerIdentifier": "10.45.2.2",
                     "bgpPeerRemoteAs": 26479,
                     "bgpPeerState": "established",
@@ -1180,7 +1180,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "SDC-AS, US",
+                    "astext": "AS26479-MOCK-TEXT",
                     "bgpPeerIdentifier": "10.45.3.2",
                     "bgpPeerRemoteAs": 26479,
                     "bgpPeerState": "established",
@@ -1203,7 +1203,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "REDES DEL OESTE S.A, AR",
+                    "astext": "AS264685-MOCK-TEXT",
                     "bgpPeerIdentifier": "10.65.11.2",
                     "bgpPeerRemoteAs": 264685,
                     "bgpPeerState": "established",
@@ -1226,7 +1226,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "YOUTUBE, US",
+                    "astext": "AS11344-MOCK-TEXT",
                     "bgpPeerIdentifier": "45.189.216.158",
                     "bgpPeerRemoteAs": 11344,
                     "bgpPeerState": "established",
@@ -1249,7 +1249,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "NETFLIX-ASN, US",
+                    "astext": "AS40027-MOCK-TEXT",
                     "bgpPeerIdentifier": "45.189.216.166",
                     "bgpPeerRemoteAs": 40027,
                     "bgpPeerState": "established",
@@ -1272,7 +1272,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "NETFLIX-ASN, US",
+                    "astext": "AS40027-MOCK-TEXT",
                     "bgpPeerIdentifier": "45.189.216.170",
                     "bgpPeerRemoteAs": 40027,
                     "bgpPeerState": "established",
@@ -1295,7 +1295,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "FACEBOOK-OFFNET, US",
+                    "astext": "AS63293-MOCK-TEXT",
                     "bgpPeerIdentifier": "45.189.216.208",
                     "bgpPeerRemoteAs": 63293,
                     "bgpPeerState": "established",
@@ -1318,7 +1318,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "Nucleo de Inf. e Coord. do Ponto BR - NIC., BR",
+                    "astext": "AS20121-MOCK-TEXT",
                     "bgpPeerIdentifier": "187.16.216.252",
                     "bgpPeerRemoteAs": 20121,
                     "bgpPeerState": "established",
@@ -1341,7 +1341,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "Nucleo de Inf. e Coord. do Ponto BR - NIC., BR",
+                    "astext": "AS26162-MOCK-TEXT",
                     "bgpPeerIdentifier": "187.16.216.253",
                     "bgpPeerRemoteAs": 26162,
                     "bgpPeerState": "established",
@@ -1364,7 +1364,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "Nucleo de Inf. e Coord. do Ponto BR - NIC., BR",
+                    "astext": "AS26162-MOCK-TEXT",
                     "bgpPeerIdentifier": "187.16.216.254",
                     "bgpPeerRemoteAs": 26162,
                     "bgpPeerState": "established",
@@ -1387,7 +1387,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "Nucleo de Inf. e Coord. do Ponto BR - NIC., BR",
+                    "astext": "AS26162-MOCK-TEXT",
                     "bgpPeerIdentifier": "187.16.223.253",
                     "bgpPeerRemoteAs": 26162,
                     "bgpPeerState": "established",
@@ -1410,7 +1410,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "Nucleo de Inf. e Coord. do Ponto BR - NIC., BR",
+                    "astext": "AS26162-MOCK-TEXT",
                     "bgpPeerIdentifier": "187.16.223.254",
                     "bgpPeerRemoteAs": 26162,
                     "bgpPeerState": "established",
@@ -1433,7 +1433,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "PowerHost Telecom SPA, CL",
+                    "astext": "AS263237-MOCK-TEXT",
                     "bgpPeerIdentifier": "198.18.202.5",
                     "bgpPeerRemoteAs": 263237,
                     "bgpPeerState": "established",
@@ -1456,7 +1456,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "PIT CHILE SP, CL",
+                    "astext": "AS61522-MOCK-TEXT",
                     "bgpPeerIdentifier": "200.23.206.1",
                     "bgpPeerRemoteAs": 61522,
                     "bgpPeerState": "established",
@@ -1479,7 +1479,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "PIT CHILE SP, CL",
+                    "astext": "AS61522-MOCK-TEXT",
                     "bgpPeerIdentifier": "200.23.206.2",
                     "bgpPeerRemoteAs": 61522,
                     "bgpPeerState": "established",
@@ -1502,7 +1502,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "LVLT-3549, US",
+                    "astext": "AS3549-MOCK-TEXT",
                     "bgpPeerIdentifier": "204.199.0.169",
                     "bgpPeerRemoteAs": 3549,
                     "bgpPeerState": "established",
@@ -1525,7 +1525,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "Nucleo de Inf. e Coord. do Ponto BR - NIC., BR",
+                    "astext": "AS20121-MOCK-TEXT",
                     "bgpPeerIdentifier": "2001:12f8::252",
                     "bgpPeerRemoteAs": 20121,
                     "bgpPeerState": "established",
@@ -1548,7 +1548,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "Nucleo de Inf. e Coord. do Ponto BR - NIC., BR",
+                    "astext": "AS26162-MOCK-TEXT",
                     "bgpPeerIdentifier": "2001:12f8::253",
                     "bgpPeerRemoteAs": 26162,
                     "bgpPeerState": "established",
@@ -1571,7 +1571,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "Nucleo de Inf. e Coord. do Ponto BR - NIC., BR",
+                    "astext": "AS26162-MOCK-TEXT",
                     "bgpPeerIdentifier": "2001:12f8::254",
                     "bgpPeerRemoteAs": 26162,
                     "bgpPeerState": "established",
@@ -1594,7 +1594,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "Nucleo de Inf. e Coord. do Ponto BR - NIC., BR",
+                    "astext": "AS26162-MOCK-TEXT",
                     "bgpPeerIdentifier": "2001:12f8::223:253",
                     "bgpPeerRemoteAs": 26162,
                     "bgpPeerState": "established",
@@ -1617,7 +1617,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "Nucleo de Inf. e Coord. do Ponto BR - NIC., BR",
+                    "astext": "AS26162-MOCK-TEXT",
                     "bgpPeerIdentifier": "2001:12f8::223:254",
                     "bgpPeerRemoteAs": 26162,
                     "bgpPeerState": "established",

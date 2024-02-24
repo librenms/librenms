@@ -28,10 +28,10 @@ unset($oids);
 //Three Phase Detection & Support
 
 $phasecount = $pre_cache['apcups_phase_count'];
-    d_echo($phasecount);
-    d_echo($pre_cache['apcups_phase_count']);
+d_echo($phasecount);
+d_echo($pre_cache['apcups_phase_count']);
 // Check for three phase UPS devices - else skip to normal discovery
-if ($phasecount > 1) {
+if ($phasecount > 2) {
     $oids = snmpwalk_cache_oid($device, 'upsPhaseOutputVoltage', $oids, 'PowerNet-MIB');
     $in_oids = snmpwalk_cache_oid($device, 'upsPhaseInputVoltage', $in_oids, 'PowerNet-MIB');
     foreach ($oids as $index => $data) {
@@ -72,7 +72,7 @@ if ($phasecount > 1) {
             if ($data) {
                 [$oid, $current] = explode(' ', $data, 2);
                 $split_oid = explode('.', $oid);
-                $index = $split_oid[(count($split_oid) - 3)];
+                $index = $split_oid[count($split_oid) - 3];
                 $oid = '.1.3.6.1.4.1.318.1.1.8.5.3.3.1.3.' . $index . '.1.1';
                 $descr = 'Input Feed ' . chr(64 + $index);
                 discover_sensor($valid['sensor'], 'voltage', $device, $oid, "3.3.1.3.$index", $type, $descr, $divisor, '1', null, null, null, null, $current);
@@ -90,7 +90,7 @@ if ($phasecount > 1) {
             if ($data) {
                 [$oid, $current] = explode(' ', $data, 2);
                 $split_oid = explode('.', $oid);
-                $index = $split_oid[(count($split_oid) - 3)];
+                $index = $split_oid[count($split_oid) - 3];
                 $oid = '.1.3.6.1.4.1.318.1.1.8.5.4.3.1.3.' . $index . '.1.1';
                 $descr = 'Output Feed';
                 if (count(explode("\n", $oids)) > 1) {
@@ -158,10 +158,12 @@ if ($phasecount > 1) {
     if ($oids) {
         echo ' Voltage In ';
         [$oid,$current] = explode(' ', $oids);
-        $divisor = 1;
-        $type = 'apc';
-        $index = '1';
-        $descr = 'Input';
-        discover_sensor($valid['sensor'], 'voltage', $device, $oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
+        if ($current >= 0) { // Some units using rPDU2 can return rPDU2PhaseStatusVoltage.1; Value (Integer): -1 hence this check. Example : AP7900B
+            $divisor = 1;
+            $type = 'apc';
+            $index = '1';
+            $descr = 'Input';
+            discover_sensor($valid['sensor'], 'voltage', $device, $oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
+        }
     }
 }

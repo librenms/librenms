@@ -22,75 +22,66 @@
 
 namespace LibreNMS\Tests\Feature\SnmpTraps;
 
-use App\Models\Device;
-use LibreNMS\Snmptrap\Dispatcher;
-use LibreNMS\Snmptrap\Trap;
+use LibreNMS\Enum\Severity;
 
 class HpFaultTest extends SnmpTrapTestCase
 {
     public function testBadCable(): void
     {
-        $device = Device::factory()->create(); /** @var Device $device */
-        $trapText = "$device->hostname
-UDP: [$device->ip]:44298->[192.168.5.5]:162
+        $this->assertTrapLogsMessage(<<<'TRAP'
+{{ hostname }}
+UDP: [{{ ip }}]:44298->[192.168.5.5]:162
 SNMPv2-MIB::snmpTrapOID.0 HP-ICF-FAULT-FINDER-MIB::hpicfFaultFinderTrap
 DISMAN-EVENT-MIB::sysUpTimeInstance 133:19:41:09.17
 HP-ICF-FAULT-FINDER-MIB::hpicfFfLogFaultType.1510 badCable
 HP-ICF-FAULT-FINDER-MIB::hpicfFfLogAction.1510 warn
 HP-ICF-FAULT-FINDER-MIB::hpicfFfLogSeverity.1510 medium
-HP-ICF-FAULT-FINDER-MIB::hpicfFfFaultInfoURL.0.1510 http:\/\/$device->ip\/cgi\/fDetail?index=1510
-SNMP-COMMUNITY-MIB::snmpTrapAddress.0 $device->ip
+HP-ICF-FAULT-FINDER-MIB::hpicfFfFaultInfoURL.0.1510 http:\/\/{{ ip }}\/cgi\/fDetail?index=1510
+SNMP-COMMUNITY-MIB::snmpTrapAddress.0 {{ ip }}
 SNMP-COMMUNITY-MIB::snmpTrapCommunity.0 public
-SNMPv2-MIB::snmpTrapEnterprise.0 HP-ICF-OID::hpicfCommonTraps";
-
-        $message = "Fault - Bad Cable http:\/\/$device->ip\/cgi\/fDetail?index=1510";
-        \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'badCable', 4);
-
-        $trap = new Trap($trapText);
-        $this->assertTrue(Dispatcher::handle($trap), 'Could not handle HP-ICF-FAULT-FINDER-MIB::hpicfFaultFinderTrap trap');
+SNMPv2-MIB::snmpTrapEnterprise.0 HP-ICF-OID::hpicfCommonTraps
+TRAP,
+            "Fault - Bad Cable http:\/\/{{ ip }}\/cgi\/fDetail?index=1510",
+            'Could not handle HP-ICF-FAULT-FINDER-MIB::hpicfFaultFinderTrap trap',
+            [Severity::Warning, 'badCable'],
+        );
     }
 
     public function testBadDriver(): void
     {
-        $device = Device::factory()->create(); /** @var Device $device */
-        $trapText = "$device->hostname
-UDP: [$device->ip]:44298->[192.168.5.5]:162
+        $this->assertTrapLogsMessage("{{ hostname }}
+UDP: [{{ ip }}]:44298->[192.168.5.5]:162
 SNMPv2-MIB::snmpTrapOID.0 HP-ICF-FAULT-FINDER-MIB::hpicfFaultFinderTrap
 DISMAN-EVENT-MIB::sysUpTimeInstance 133:19:41:09.17
 HP-ICF-FAULT-FINDER-MIB::hpicfFfLogFaultType.1510 badDriver
 HP-ICF-FAULT-FINDER-MIB::hpicfFfLogAction.1510 warn
 HP-ICF-FAULT-FINDER-MIB::hpicfFfLogSeverity.1510 medium
-HP-ICF-FAULT-FINDER-MIB::hpicfFfFaultInfoURL.0.1510 http:\/\/$device->ip\/cgi\/fDetail?index=1510
-SNMP-COMMUNITY-MIB::snmpTrapAddress.0 $device->ip
+HP-ICF-FAULT-FINDER-MIB::hpicfFfFaultInfoURL.0.1510 http:\/\/{{ ip }}\/cgi\/fDetail?index=1510
+SNMP-COMMUNITY-MIB::snmpTrapAddress.0 {{ ip }}
 SNMP-COMMUNITY-MIB::snmpTrapCommunity.0 public
-SNMPv2-MIB::snmpTrapEnterprise.0 HP-ICF-OID::hpicfCommonTraps";
-
-        $message = "Fault - Unhandled http:\/\/$device->ip\/cgi\/fDetail?index=1510";
-        \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'badDriver', 2);
-
-        $trap = new Trap($trapText);
-        $this->assertTrue(Dispatcher::handle($trap), 'Could not handle HP-ICF-FAULT-FINDER-MIB::hpicfFaultFinderTrap trap');
+SNMPv2-MIB::snmpTrapEnterprise.0 HP-ICF-OID::hpicfCommonTraps",
+            "Fault - Unhandled http:\/\/{{ ip }}\/cgi\/fDetail?index=1510",
+            'Could not handle HP-ICF-FAULT-FINDER-MIB::hpicfFaultFinderTrap trap',
+            [Severity::Info, 'badDriver'],
+        );
     }
 
     public function testBcastStorm(): void
     {
-        $device = Device::factory()->create(); /** @var Device $device */
-        $trapText = "$device->hostname
-UDP: [$device->ip]:44298->[192.168.5.5]:162
+        $this->assertTrapLogsMessage("{{ hostname }}
+UDP: [{{ ip }}]:44298->[192.168.5.5]:162
 SNMPv2-MIB::snmpTrapOID.0 HP-ICF-FAULT-FINDER-MIB::hpicfFaultFinderTrap
 DISMAN-EVENT-MIB::sysUpTimeInstance 133:19:41:09.17
 HP-ICF-FAULT-FINDER-MIB::hpicfFfLogFaultType.1510 bcastStorm
 HP-ICF-FAULT-FINDER-MIB::hpicfFfLogAction.1510 warn
 HP-ICF-FAULT-FINDER-MIB::hpicfFfLogSeverity.1510 medium
-HP-ICF-FAULT-FINDER-MIB::hpicfFfFaultInfoURL.0.1510 http:\/\/$device->ip\/cgi\/fDetail?index=1510
-SNMP-COMMUNITY-MIB::snmpTrapAddress.0 $device->ip
+HP-ICF-FAULT-FINDER-MIB::hpicfFfFaultInfoURL.0.1510 http:\/\/{{ ip }}\/cgi\/fDetail?index=1510
+SNMP-COMMUNITY-MIB::snmpTrapAddress.0 {{ ip }}
 SNMP-COMMUNITY-MIB::snmpTrapCommunity.0 public
-SNMPv2-MIB::snmpTrapEnterprise.0 HP-ICF-OID::hpicfCommonTraps";
-
-        $message = "Fault - Broadcaststorm http:\/\/$device->ip\/cgi\/fDetail?index=1510";
-        \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'bcastStorm', 5);
-
-        $trap = new Trap($trapText);
-        $this->assertTrue(Dispatcher::handle($trap), 'Could not handle HP-ICF-FAULT-FINDER-MIB::hpicfFaultFinderTrap trap');
+SNMPv2-MIB::snmpTrapEnterprise.0 HP-ICF-OID::hpicfCommonTraps",
+            "Fault - Broadcaststorm http:\/\/{{ ip }}\/cgi\/fDetail?index=1510",
+            'Could not handle HP-ICF-FAULT-FINDER-MIB::hpicfFaultFinderTrap trap',
+            [Severity::Error, 'bcastStorm'],
+        );
     }
 }

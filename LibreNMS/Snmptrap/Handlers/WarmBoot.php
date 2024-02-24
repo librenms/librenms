@@ -23,9 +23,9 @@
 namespace LibreNMS\Snmptrap\Handlers;
 
 use App\Models\Device;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
-use Log;
 
 class WarmBoot implements SnmptrapHandler
 {
@@ -39,6 +39,6 @@ class WarmBoot implements SnmptrapHandler
      */
     public function handle(Device $device, Trap $trap)
     {
-        Log::event('SNMP Trap: Device ' . $device->displayName() . ' warm booted', $device->device_id, 'reboot', 4);
+        $trap->log('SNMP Trap: Device ' . $device->displayName() . ' warm booted', Severity::Warning, 'reboot');
     }
 }

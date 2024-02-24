@@ -1,4 +1,4 @@
-mib: TIMETRA-SYSTEM-MIB:TIMETRA-CHASSIS-MIB:TIMETRA-SUBSCRIBER-MGMT-MIB:TIMETRA-CELLULAR-MIB:IF-MIB
+mib: TIMETRA-SYSTEM-MIB:TIMETRA-CHASSIS-MIB:TIMETRA-SUBSCRIBER-MGMT-MIB:TIMETRA-CELLULAR-MIB:IF-MIB:ALU-MICROWAVE-MIB
 modules:
     mempools:
         data:
@@ -25,6 +25,9 @@ modules:
                     oid:
                         - ifName
                         - tmnxCellPdnApn
+                        - tmnxPortAdminStatus
+                        - tmnxPortSFPNumLanes
+                    snmp_flags: ['-OtbeQUs']
         state:
             data:
                 -
@@ -105,7 +108,7 @@ modules:
                 -
                     oid: tmnxCellPortRegistrationStatus
                     num_oid: '.1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.2.{{ $index }}'
-                    descr: 'Registration state {{ $ifName }}'
+                    descr: 'Registration state {{ ifName }}'
                     index: 'tmnxCellPortRegistrationStatus.{{ $index }}'
                     state_name: tmnxCellPortRegistrationStatus
                     states:
@@ -124,7 +127,7 @@ modules:
                 -
                     oid: tmnxCellPortWirelessTechnology
                     num_oid: '.1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.3.{{ $index }}'
-                    descr: 'Wireless technology {{ $ifName }}'
+                    descr: 'Wireless technology {{ ifName }}'
                     index: 'tmnxCellPortWirelessTechnology.{{ $index }}'
                     state_name: tmnxCellPortWirelessTechnology
                     states:
@@ -136,7 +139,7 @@ modules:
                 -
                     oid: tmnxCellSimCardEquipped
                     num_oid: '.1.3.6.1.4.1.6527.3.1.2.109.3.1.3.1.1.{{ $index }}'
-                    descr: 'Simcard {{ $ifName }}'
+                    descr: 'Simcard {{ ifName:0 }}'
                     index: 'tmnxCellSimCardEquipped.{{ $index }}'
                     state_name: tmnxCellSimCardEquipped
                     states:
@@ -144,16 +147,60 @@ modules:
                         - { value: 2, generic: 0, graph: 0, descr: Not installed }
                     group: 'Cellular status'
                 -
-                    
+
                     oid: tmnxCellPdnConnectionState
                     num_oid: '.1.3.6.1.4.1.6527.3.1.2.109.3.1.4.1.1.{{ $index }}'
-                    descr: 'Pdn state {{ $ifName }} {{ $tmnxCellPdnApn }}'
+                    descr: 'Pdn state {{ ifName:0 }} {{ $tmnxCellPdnApn }}'
                     index: 'tmnxCellPdnConnectionState.{{ $index }}'
-                    state_name: tmnxCellPdnConnectionState 
+                    state_name: tmnxCellPdnConnectionState
                     states:
                         - { value: 0, generic: 0, graph: 0, descr: Not connected }
                         - { value: 1, generic: 0, graph: 0, descr: Connected }
                     group: 'Cellular status'
+                -
+                    oid: tmnxPhysChassisFanEntry
+                    value: tmnxPhysChassisFanOperStatus
+                    num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.1.24.1.1.2.{{ $index }}'
+                    descr: 'Fan {{ $subindex2 }}'
+                    index: 'tmnxPhysChassisFanOperStatus.{{ $index }}'
+                    state_name: tmnxPhysChassisFanOperStatus
+                    group: 'Fan State'
+                    states:
+                        - { value: 1, generic: 3, graph: 0, descr: Unknown }
+                        - { value: 2, generic: 3, graph: 0, descr: NotEquipped }
+                        - { value: 3, generic: 0, graph: 0, descr: OK }
+                        - { value: 4, generic: 2, graph: 0, descr: Failed }
+                        - { value: 5, generic: 1, graph: 0, descr: OOS }
+                        - { value: 6, generic: 1, graph: 0, descr: NotProvisioned }
+                        - { value: 7, generic: 3, graph: 0, descr: NotApplicable }
+                -
+                    oid: aluMwRadioTable
+                    value: aluMwRadioAlarmState
+                    num_oid: '.1.3.6.1.4.1.6527.6.1.2.2.7.1.2.1.12.{{ $index }}'
+                    descr: 'Current Alarm Severity {{ $aluMwRadioName }}'
+                    index: 'aluMwRadioPortID.{{ $index }}'
+                    state_name: 'aluMwRadioAlarmState'
+                    states:
+                        - { value: 0, generic: 0, graph: 0, descr: alarmCleared }
+                        - { value: 1, generic: 2, graph: 0, descr: Critical }
+                        - { value: 2, generic: 2, graph: 0, descr: Major }
+                        - { value: 3, generic: 1, graph: 0, descr: Minor }
+                        - { value: 4, generic: 1, graph: 0, descr: Warning }
+                        - { value: 5, generic: 3, graph: 0, descr: Indeterminate }
+                        - { value: 6, generic: 0, graph: 0, descr: Unsupported }
+                        - { value: 7, generic: 3, graph: 0, descr: Unknown }
+                -
+                    oid: aluMwRadioTable
+                    value: aluMwRadioTxMuted
+                    num_oid: '.1.3.6.1.4.1.6527.6.1.2.2.7.1.2.1.20.{{ $index }}'
+                    descr: 'Tx Mute {{ $aluMwRadioName }}'
+                    index: 'aluMwRadioPortID.{{ $index }}'
+                    state_name: 'aluMwRadioTxMuted'
+                    states:
+                        - { value: 0, generic: 3, graph: 0, descr: Unknown }
+                        - { value: 1, generic: 0, graph: 0, descr: None }
+                        - { value: 2, generic: 1, graph: 0, descr: Manual }
+                        - { value: 3, generic: 0, graph: 0, descr: Auto }
         temperature:
             data:
                 -
@@ -168,14 +215,190 @@ modules:
                             oid: tmnxHwTempSensor
                             op: '='
                             value: 2
-        load:
+                -
+                    oid: tmnxDigitalDiagMonitorEntry
+                    value: tmnxDDMTemperature
+                    num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.4.31.1.1.{{ $index }}'
+                    descr: '{{ ifName:1 }}'
+                    index: '{{ $index }}'
+                    high_limit: tmnxDDMTempHiAlarm
+                    warn_limit: tmnxDDMTempHiWarning
+                    low_limit: tmnxDDMTempLowAlarm
+                    low_warn_limit: tmnxDDMTempLowWarning
+                    divisor: 256
+                -
+                    oid: aluMwRadioInfoTable
+                    value: aluMwRadioTemperature
+                    num_oid: '.1.3.6.1.4.1.6527.6.1.2.2.7.1.6.1.12.{{ $index }}'
+                    descr: 'RFU Temp {{ $aluMwRadioSerialNumber }}'
+                    index: 'aluMwRadioPortID.{{ $index }}'
+                    high_limit: '50'
+                    low_limit: '-20'
+
+        current:
             data:
                 -
-                    oid: tmnxPhysChassisFanEntry
+                    oid: tmnxDigitalDiagMonitorEntry
+                    value: tmnxDDMTxBiasCurrent
+                    num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.4.31.1.11.{{ $index }}'
+                    descr: '{{ ifName:1 }} Tx Bias'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: ports
+                    index: 'tx-bias-{{ $index }}'
+                    divisor: 500000
+                    high_limit: tmnxDDMTxBiasCurrentHiAlarm
+                    warn_limit: tmnxDDMTxBiasCurrentHiWarning
+                    low_limit: tmnxDDMTxBiasCurrentLowAlarm
+                    low_warn_limit: tmnxDDMTxBiasCurrentLowWarning
+                    skip_values:
+                        -
+                            oid: tmnxDDMRxOpticalPower
+                            op: '<='
+                            value: 0
+                        -
+                            oid: tmnxPortAdminStatus
+                            op: '='
+                            value: 3
+                -
+                    oid: tmnxDDMLaneTable
+                    value: tmnxDDMLaneTxBiasCurrent
+                    num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.4.66.1.7.{{ $index }}'
+                    descr: '{{ ifName:1 }} Lane {{ $subindex2 }} Tx Bias'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: ports
+                    index: 'tx-bias-{{ $index }}'
+                    divisor: 500000
+                    high_limit: tmnxDDMLaneTxBiasCurrentHiAlarm
+                    warn_limit: tmnxDDMLaneTxBiasCurrentHiWarning
+                    low_limit: tmnxDDMLaneTxBiasCurrentLowAlarm
+                    low_warn_limit: tmnxDDMLaneTxBiasCurrentLowWarning
+                    group: '{{ ifName:1 }}'
+                    skip_values:
+                        -
+                            oid: tmnxDDMLaneTxBiasCurrent
+                            op: '<='
+                            value: 0
+                        -
+                            oid: tmnxPortAdminStatus
+                            op: '='
+                            value: 3
+        dbm:
+            data:
+                -
+                    oid: tmnxDigitalDiagMonitorEntry
+                    value: tmnxDDMRxOpticalPower
+                    num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.4.31.1.21.{{ $index }}'
+                    descr: '{{ ifName:1 }} Rx'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: ports
+                    index: 'rx-{{ $index }}'
+                    divisor: 10
+                    high_limit: tmnxDDMRxOpticalPowerHiAlarm
+                    warn_limit: tmnxDDMRxOpticalPowerHiWarning
+                    low_limit: tmnxDDMRxOpticalPowerLowAlarm
+                    low_warn_limit: tmnxDDMRxOpticalPowerLowWarning
+                    user_func: 'uw_to_dbm'
+                    group: '{{ ifName:1 }}'
+                    skip_values:
+                        -
+                            oid: tmnxPortAdminStatus
+                            op: '='
+                            value: 3
+                        -
+                            oid: tmnxPortSFPNumLanes
+                            op: '>'
+                            value: 0
+                -
+                    oid: tmnxDigitalDiagMonitorEntry
+                    value: tmnxDDMTxOutputPower
+                    num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.4.31.1.16.{{ $index }}'
+                    descr: '{{ ifName:1 }} Tx'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: ports
+                    index: 'tx-{{ $index }}'
+                    divisor: 10
+                    high_limit: tmnxDDMTxOutputPowerHiAlarm
+                    warn_limit: tmnxDDMTxOutputPowerHiWarning
+                    low_limit: tmnxDDMTxOutputPowerLowAlarm
+                    low_warn_limit: tmnxDDMTxOutputPowerLowWarning
+                    user_func: 'uw_to_dbm'
+                    group: '{{ ifName:1 }}'
+                    skip_values:
+                        -
+                            oid: tmnxPortAdminStatus
+                            op: '='
+                            value: 3
+                        -
+                            oid: tmnxPortSFPNumLanes
+                            op: '>'
+                            value: 0
+                -
+                    oid: tmnxDDMLaneTable
+                    value: tmnxDDMLaneRxOpticalPower
+                    num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.4.66.1.17.{{ $index }}'
+                    descr: '{{ ifName:1 }} Lane {{ $subindex2 }} Rx'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: ports
+                    index: 'lane-rx-{{ $index }}'
+                    user_func: 'uw_to_dbm'
+                    divisor: 10
+                    group: '{{ ifName:1 }}'
+                    high_limit: tmnxDDMLaneRxOpticalPwrHiAlarm
+                    warn_limit: tmnxDDMLaneRxOpticalPwrHiWarn
+                    low_limit: tmnxDDMLaneRxOpticalPwrLowAlarm
+                    low_warn_limit: tmnxDDMLaneRxOpticalPwrLowWarn
+                    skip_values:
+                        -
+                            oid: tmnxPortAdminStatus
+                            op: '='
+                            value: 3
+                -
+                    oid: tmnxDDMLaneTable
+                    value: tmnxDDMLaneTxOutputPower
+                    num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.4.66.1.12.{{ $index }}'
+                    descr: '{{ ifName:1 }} Lane {{ $subindex2 }} Tx'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: ports
+                    index: 'lane-tx-{{ $index }}'
+                    user_func: 'uw_to_dbm'
+                    divisor: 10
+                    group: '{{ ifName:1 }}'
+                    high_limit: tmnxDDMLaneTxOutputPowerHiAlarm
+                    warn_limit: tmnxDDMLaneTxOutputPowerHiWarn
+                    low_limit: tmnxDDMLaneTxOutputPowerLowAlarm
+                    low_warn_limit: tmnxDDMLaneTxOutputPowerLowWarn
+                    skip_values:
+                        -
+                            oid: tmnxPortAdminStatus
+                            op: '='
+                            value: 3
+        voltage:
+            data:
+                -
+                    oid: tmnxDigitalDiagMonitorEntry
+                    value: tmnxDDMSupplyVoltage
+                    num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.4.31.1.6.{{ $index }}'
+                    descr: '{{ ifName:1 }}'
+                    index: '{{ $index }}'
+                    high_limit: tmnxDDMSupplyVoltageHiAlarm
+                    warn_limit: tmnxDDMSupplyVoltageHiWarning
+                    low_limit: tmnxDDMSupplyVoltageLowAlarm
+                    low_warn_limit: tmnxDDMSupplyVoltageLowWarning
+                    divisor: 10000
+
+        percent:
+            data:
+                -
+                    oid: tmnxPhysChassisFanTable
                     value: tmnxPhysChassisFanSpeedPercent
                     num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.1.24.1.1.5.{{ $index }}'
-                    descr: 'Fanspeed {{ $index }}'
-                    index: 'tmnxPhysChassisFanSpeedPercent.{{ $index }}'
+                    descr: 'Fan {{ $subindex2 }}'
+                    group: 'Chassis {{ $subindex0 }}-{{ $subindex1 }}'
+                    warn_limit: 90
+                    high_limit: 95
+                    low_limit: 0
+                    index: '{{ $index }}'
+                    snmp_flags: ['-OtbeQUs']
         count:
             data:
                 -
@@ -209,13 +432,22 @@ modules:
                 -
                     oid: tmnxCellPortFrequencyBand
                     num_oid: '.1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.4.{{ $index }}'
-                    descr: 'Interface {{ $ifName }}'
+                    descr: 'Interface {{ ifName }}'
                     index: 'tmnxCellPortFrequencyBand.{{ $index }}'
                     group: 'Frequency band'
                 -
                     oid: tmnxCellularPortBearerTable
                     value: tmnxCellPortBearerQci
                     num_oid: '.1.3.6.1.4.1.6527.3.1.2.109.3.1.5.1.3.{{ $index }}'
-                    descr: 'Interface {{ $ifName }}'
+                    descr: 'Interface {{ ifName:0 }}'
                     index: 'tmnxCellularPortBearerTable.{{ $index }}'
                     group: 'QoS Class Identifier'
+        frequency:
+            data:
+                -
+                    oid: aluMwRadioTable
+                    value: aluMwRadioFrequency
+                    num_oid: '.1.3.6.1.4.1.6527.6.1.2.2.7.1.2.1.11.{{ $index }}'
+                    descr: 'RFU Frequency Band {{ $aluMwRadioName }}'
+                    multiplier: 1000000
+                    index: 'aluMwRadioPortID.{{ $index }}'

@@ -2,9 +2,9 @@
 
 // Graphs are printed in the order they exist in \LibreNMS\Config::get('graph_types')
 $link_array = [
-    'page'   => 'device',
+    'page' => 'device',
     'device' => $device['device_id'],
-    'tab'    => 'graphs',
+    'tab' => 'graphs',
 ];
 
 $bg = '#ffffff';
@@ -56,7 +56,7 @@ print_optionbar_end();
 $group = $vars['group'] ?? array_key_first($graph_enable);
 $graph_enable = $graph_enable[$group] ?? [];
 
-if (($group != 'customoid') && (is_file("includes/html/pages/device/graphs/$group.inc.php"))) {
+if (($group != 'customoid') && is_file("includes/html/pages/device/graphs/$group.inc.php")) {
     include "includes/html/pages/device/graphs/$group.inc.php";
 } else {
     foreach ($graph_enable as $graph => $entry) {

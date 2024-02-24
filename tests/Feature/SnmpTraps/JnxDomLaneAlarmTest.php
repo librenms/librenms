@@ -29,18 +29,27 @@ namespace LibreNMS\Tests\Feature\SnmpTraps;
 
 use App\Models\Device;
 use App\Models\Port;
-use LibreNMS\Snmptrap\Dispatcher;
-use LibreNMS\Snmptrap\Trap;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
+use LibreNMS\Enum\Severity;
+use LibreNMS\Tests\Traits\RequiresDatabase;
 
 class JnxDomLaneAlarmTest extends SnmpTrapTestCase
 {
-    public function testJnxDomLaneAlarmSetTrap()
+    use RequiresDatabase;
+    use DatabaseTransactions;
+
+    public function testJnxDomLaneAlarmSetTrap(): void
     {
-        $device = Device::factory()->create(); /** @var Device $device */
-        $port = Port::factory()->make(['ifAdminStatus' => 'up', 'ifOperStatus' => 'up']); /** @var Port $port */
+        $device = Device::factory()->create();
+        /** @var Device $device */
+        $port = Port::factory()->make(['ifAdminStatus' => 'up', 'ifOperStatus' => 'up']);
+        /** @var Port $port */
         $device->ports()->save($port);
 
-        $trapText = "$device->hostname
+        $warning = "Snmptrap JnxDomLaneAlarmSet: Could not find port at ifIndex $port->ifIndex for device: $device->hostname";
+        \Log::shouldReceive('warning')->never()->with($warning);
+
+        $this->assertTrapLogsMessage("$device->hostname
 UDP: [$device->ip]:64610->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 198:2:10:48.91
 SNMPv2-MIB::snmpTrapOID.0 JUNIPER-DOM-MIB::jnxDomLaneAlarmSet
@@ -49,24 +58,26 @@ JUNIPER-DOM-MIB::jnxDomLaneIndex.$port->ifIndex 0
 JUNIPER-DOM-MIB::jnxDomLaneLastAlarms.$port->ifIndex \"00 00 00 \"
 JUNIPER-DOM-MIB::jnxDomCurrentLaneAlarms.$port->ifIndex \"40 00 00 \"
 JUNIPER-DOM-MIB::jnxDomCurrentLaneAlarmDate.$port->ifIndex 2019-4-10,0:9:35.0,-5:0
-SNMPv2-MIB::snmpTrapEnterprise.0 JUNIPER-CHASSIS-DEFINES-MIB::jnxProductNameMX960";
-
-        \Log::shouldReceive('warning')->never()->with("Snmptrap JnxDomLaneAlarmSet: Could not find port at ifIndex $port->ifIndex for device: $device->hostname");
-
-        $trap = new Trap($trapText);
-        $message = "DOM lane alarm on interface $port->ifDescr lane 0. Current alarm(s): input signal low";
-        \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 5);
-
-        $this->assertTrue(Dispatcher::handle($trap), 'Could not handle JnxDomLaneAlarmSet');
+SNMPv2-MIB::snmpTrapEnterprise.0 JUNIPER-CHASSIS-DEFINES-MIB::jnxProductNameMX960",
+            "DOM lane alarm on interface $port->ifDescr lane 0. Current alarm(s): input signal low",
+            'Could not handle JnxDomLaneAlarmSet',
+            [Severity::Error],
+            $device,
+        );
     }
 
-    public function testJnxDomLaneAlarmClearedTrap()
+    public function testJnxDomLaneAlarmClearedTrap(): void
     {
-        $device = Device::factory()->create(); /** @var Device $device */
-        $port = Port::factory()->make(['ifAdminStatus' => 'up', 'ifOperStatus' => 'up']); /** @var Port $port */
+        $device = Device::factory()->create();
+        /** @var Device $device */
+        $port = Port::factory()->make(['ifAdminStatus' => 'up', 'ifOperStatus' => 'up']);
+        /** @var Port $port */
         $device->ports()->save($port);
 
-        $trapText = "$device->hostname
+        $warning = "Snmptrap JnxDomLaneAlarmCleared: Could not find port at ifIndex $port->ifIndex for device: $device->hostname";
+        \Log::shouldReceive('warning')->never()->with($warning);
+
+        $this->assertTrapLogsMessage("$device->hostname
 UDP: [$device->ip]:64610->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 198:2:10:48.91
 SNMPv2-MIB::snmpTrapOID.0 JUNIPER-DOM-MIB::jnxDomLaneAlarmCleared
@@ -75,14 +86,11 @@ JUNIPER-DOM-MIB::jnxDomLaneIndex.$port->ifIndex 0
 JUNIPER-DOM-MIB::jnxDomLaneLastAlarms.$port->ifIndex \"00 00 00 \"
 JUNIPER-DOM-MIB::jnxDomCurrentLaneAlarms.$port->ifIndex \"08 00 00 \"
 JUNIPER-DOM-MIB::jnxDomCurrentLaneAlarmDate.$port->ifIndex 2019-4-10,0:9:35.0,-5:0
-SNMPv2-MIB::snmpTrapEnterprise.0 JUNIPER-CHASSIS-DEFINES-MIB::jnxProductNameMX960";
-
-        \Log::shouldReceive('warning')->never()->with("Snmptrap JnxDomLaneAlarmCleared: Could not find port at ifIndex $port->ifIndex for device: $device->hostname");
-
-        $trap = new Trap($trapText);
-        $message = "DOM lane alarm cleared on interface $port->ifDescr lane 0. Current alarm(s): output signal high";
-        \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 1);
-
-        $this->assertTrue(Dispatcher::handle($trap), 'Could not handle JnxDomLaneAlarmCleared');
+SNMPv2-MIB::snmpTrapEnterprise.0 JUNIPER-CHASSIS-DEFINES-MIB::jnxProductNameMX960",
+            "DOM lane alarm cleared on interface $port->ifDescr lane 0. Current alarm(s): output signal high",
+            'Could not handle JnxDomLaneAlarmCleared',
+            [Severity::Ok],
+            $device,
+        );
     }
 }

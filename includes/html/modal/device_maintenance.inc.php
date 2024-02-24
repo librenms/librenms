@@ -22,6 +22,8 @@
  * @copyright  2020 Thomas Berberich
  * @author     Thomas Berberich <sourcehhdoctor@gmail.com>
  */
+use App\Facades\DeviceCache;
+
 if (! Auth::user()->hasGlobalAdmin()) {
     exit('ERROR: You need to be admin');
 }
@@ -88,7 +90,7 @@ foreach ($hour_steps as $hour) {
 <script>
     $("#maintenance-submit").on("click", function() {
         var device_id = $(this).data("device_id");
-        var title = '<?=\LibreNMS\Util\Clean::html($device['hostname'], []); ?>';
+        var title = '<?=\LibreNMS\Util\Clean::html(DeviceCache::get($device['device_id'])->displayName(), []); ?>';
         var notes = $('#notes').val();
         var recurring = 0;
         var start = '<?=date('Y-m-d H:i:00'); ?>';

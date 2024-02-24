@@ -30,6 +30,7 @@ use LibreNMS\Interfaces\Discovery\DiscoveryModule;
 use LibreNMS\Interfaces\Polling\PollerModule;
 use LibreNMS\OS;
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Util\StringHelpers;
 
 class Sensor implements DiscoveryModule, PollerModule
 {
@@ -58,6 +59,7 @@ class Sensor implements DiscoveryModule, PollerModule
     private $low_warn;
     private $entPhysicalIndex;
     private $entPhysicalMeasured;
+    private string $rrd_type = 'GAUGE';
 
     /**
      * Sensor constructor. Create a new sensor to be discovered.
@@ -78,6 +80,7 @@ class Sensor implements DiscoveryModule, PollerModule
      * @param  int|float  $low_warn  Alerting: Low warning value
      * @param  int|float  $entPhysicalIndex  The entPhysicalIndex this sensor is associated, often a port
      * @param  int|float  $entPhysicalMeasured  the table to look for the entPhysicalIndex, for example 'ports' (maybe unused)
+     * @param  string  $rrd_type  the type of RRD file to use (GAUGE, COUNTER, DCOUNTER, DERIVE, DDERIVE, ABSOLUTE), default to GAUGE
      */
     public function __construct(
         $type,
@@ -95,7 +98,8 @@ class Sensor implements DiscoveryModule, PollerModule
         $high_warn = null,
         $low_warn = null,
         $entPhysicalIndex = null,
-        $entPhysicalMeasured = null
+        $entPhysicalMeasured = null,
+        $rrd_type = 'GAUGE'
     ) {
         $this->type = $type;
         $this->device_id = $device_id;
@@ -113,6 +117,7 @@ class Sensor implements DiscoveryModule, PollerModule
         $this->low_limit = $low_limit;
         $this->high_warn = $high_warn;
         $this->low_warn = $low_warn;
+        $this->rrd_type = $rrd_type;
 
         // ensure leading dots
         array_walk($this->oids, function (&$oid) {
@@ -123,12 +128,9 @@ class Sensor implements DiscoveryModule, PollerModule
         // validity not checked yet
         if (is_null($this->current)) {
             $sensor['sensor_oids'] = $this->oids;
-            $sensors = [$sensor];
 
-            $prefetch = self::fetchSnmpData(device_by_id_cache($device_id), $sensors);
-            $data = static::processSensorData($sensors, $prefetch);
-
-            $this->current = current($data);
+            $prefetch = self::fetchSnmpData(device_by_id_cache($device_id), [$sensor]);
+            $this->current = static::processSensorValue($prefetch, $this->aggregator, $this->divisor, $this->multiplier);
             $this->valid = is_numeric($this->current);
         }
 
@@ -159,11 +161,11 @@ class Sensor implements DiscoveryModule, PollerModule
             if (empty($update)) {
                 echo '.';
             } else {
-                dbUpdate($this->escapeNull($update), $this->getTable(), '`sensor_id`=?', [$this->sensor_id]);
+                dbUpdate($update, $this->getTable(), '`sensor_id`=?', [$this->sensor_id]);
                 echo 'U';
             }
         } else {
-            $this->sensor_id = dbInsert($this->escapeNull($new_sensor), $this->getTable());
+            $this->sensor_id = dbInsert($new_sensor, $this->getTable());
             if ($this->sensor_id !== null) {
                 $name = static::$name;
                 $message = "$name Discovered: {$this->type} {$this->subtype} {$this->index} {$this->description}";
@@ -236,21 +238,8 @@ class Sensor implements DiscoveryModule, PollerModule
             'sensor_current' => $this->current,
             'entPhysicalIndex' => $this->entPhysicalIndex,
             'entPhysicalIndex_measured' => $this->entPhysicalMeasured,
+            'rrd_type' => $this->rrd_type,
         ];
-    }
-
-    /**
-     * Escape null values so dbFacile doesn't mess them up
-     * honestly, this should be the default, but could break shit
-     *
-     * @param  array  $array
-     * @return array
-     */
-    private function escapeNull($array)
-    {
-        return array_map(function ($value) {
-            return is_null($value) ? ['NULL'] : $value;
-        }, $array);
     }
 
     /**
@@ -393,36 +382,39 @@ class Sensor implements DiscoveryModule, PollerModule
             $requested_oids = array_flip($sensor['sensor_oids']);
             $data = array_intersect_key($prefetch, $requested_oids);
 
-            // if no data set null and continue to the next sensor
-            if (empty($data)) {
-                $data[$sensor['sensor_id']] = null;
-                continue;
-            }
-
-            if (count($data) > 1) {
-                // aggregate data
-                if ($sensor['sensor_aggregator'] == 'avg') {
-                    $sensor_value = array_sum($data) / count($data);
-                } else {
-                    // sum
-                    $sensor_value = array_sum($data);
-                }
-            } else {
-                $sensor_value = current($data);
-            }
-
-            if ($sensor['sensor_divisor'] && $sensor_value !== 0) {
-                $sensor_value = (cast_number($sensor_value) / $sensor['sensor_divisor']);
-            }
-
-            if ($sensor['sensor_multiplier']) {
-                $sensor_value = (cast_number($sensor_value) * $sensor['sensor_multiplier']);
-            }
-
-            $sensor_data[$sensor['sensor_id']] = $sensor_value;
+            $sensor_data[$sensor['sensor_id']] = self::processSensorValue($data, $sensor['sensor_aggregator'], $sensor['sensor_divisor'], $sensor['sensor_multiplier']);
         }
 
         return $sensor_data;
+    }
+
+    protected static function processSensorValue(array $data, string $aggregator, int $divisor, int $multiplier): mixed
+    {
+        if (empty($data)) {
+            return null;
+        }
+
+        if (count($data) > 1) {
+            // aggregate data
+            if ($aggregator == 'avg') {
+                $sensor_value = array_sum($data) / count($data);
+            } else {
+                // sum
+                $sensor_value = array_sum($data);
+            }
+        } else {
+            $sensor_value = current($data);
+        }
+
+        if ($divisor && $sensor_value !== 0) {
+            $sensor_value = (cast_number($sensor_value) / $divisor);
+        }
+
+        if ($multiplier) {
+            $sensor_value = (cast_number($sensor_value) * $multiplier);
+        }
+
+        return $sensor_value;
     }
 
     /**
@@ -505,22 +497,22 @@ class Sensor implements DiscoveryModule, PollerModule
 
     protected static function getDiscoveryInterface($type)
     {
-        return str_to_class($type, 'LibreNMS\\Interfaces\\Discovery\\Sensors\\') . 'Discovery';
+        return StringHelpers::toClass($type, 'LibreNMS\\Interfaces\\Discovery\\Sensors\\') . 'Discovery';
     }
 
     protected static function getDiscoveryMethod($type)
     {
-        return 'discover' . str_to_class($type);
+        return 'discover' . StringHelpers::toClass($type, null);
     }
 
     protected static function getPollingInterface($type)
     {
-        return str_to_class($type, 'LibreNMS\\Interfaces\\Polling\\Sensors\\') . 'Polling';
+        return StringHelpers::toClass($type, 'LibreNMS\\Interfaces\\Polling\\Sensors\\') . 'Polling';
     }
 
     protected static function getPollingMethod($type)
     {
-        return 'poll' . str_to_class($type);
+        return 'poll' . StringHelpers::toClass($type, null);
     }
 
     /**
@@ -630,7 +622,7 @@ class Sensor implements DiscoveryModule, PollerModule
                 $sensor['sensor_type'],
                 $sensor['sensor_index'],
             ];
-            $rrd_type = isset($types[$sensor['sensor_class']]['type']) ? strtoupper($types[$sensor['sensor_class']]['type']) : 'GAUGE';
+            $rrd_type = isset($types[$sensor['sensor_class']]['type']) ? strtoupper($types[$sensor['sensor_class']]['type']) : $sensor['rrd_type'];
             $rrd_def = RrdDefinition::make()->addDataset('sensor', $rrd_type);
 
             $fields = [

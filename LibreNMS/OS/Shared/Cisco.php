@@ -118,7 +118,7 @@ class Cisco extends OS implements
             $hardware = $data[1000]['entPhysicalModelName'];
         } elseif (empty($hardware) && ! empty($data[1000]['entPhysicalContainedIn'])) {
             $hardware = $data[$data[1000]['entPhysicalContainedIn']]['entPhysicalName'];
-        } elseif ((preg_match('/stack/i', $hardware) || empty($hardware)) && ! empty($data[1001]['entPhysicalModelName'])) {
+        } elseif ((preg_match('/stack/i', $hardware ?? '') || empty($hardware)) && ! empty($data[1001]['entPhysicalModelName'])) {
             $hardware = $data[1001]['entPhysicalModelName'];
         } elseif (empty($hardware) && ! empty($data[1001]['entPhysicalContainedIn'])) {
             $hardware = $data[$data[1001]['entPhysicalContainedIn']]['entPhysicalName'];
@@ -133,7 +133,7 @@ class Cisco extends OS implements
             return parent::discoverMempools(); // yaml
         }
 
-        $mempools = collect();
+        $mempools = new Collection();
         $cemp = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'cempMemPoolTable', [], 'CISCO-ENHANCED-MEMPOOL-MIB');
 
         foreach (Arr::wrap($cemp) as $index => $entry) {
@@ -294,7 +294,7 @@ class Cisco extends OS implements
              * Could be dynamically changed to appropriate value if config had pol interval value
              */
             $qfp_usage_oid = '.1.3.6.1.4.1.9.9.715.1.1.6.1.14.' . $entQfpPhysicalIndex . '.3';
-            $qfp_usage = $entry['fiveMinute'];
+            $qfp_usage = $entry['fiveMinute'] ?? null;
 
             if ($entQfpPhysicalIndex) {
                 $qfp_descr = $this->getCacheByIndex('entPhysicalName', 'ENTITY-MIB')[$entQfpPhysicalIndex];
@@ -316,11 +316,11 @@ class Cisco extends OS implements
         return $processors;
     }
 
-    public function discoverSlas()
+    public function discoverSlas(): Collection
     {
-        $slas = collect();
+        $slas = new Collection();
 
-        $sla_data = snmpwalk_cache_oid($this->getDeviceArray(), 'rttMonCtrl', [], 'CISCO-RTTMON-MIB');
+        $sla_data = snmpwalk_cache_oid($this->getDeviceArray(), 'rttMonCtrl', [], 'CISCO-RTTMON-MIB', null, '-OQUsx');
 
         if (! empty($sla_data)) {
             $sla_data = snmpwalk_cache_oid($this->getDeviceArray(), 'rttMonLatestRttOperCompletionTime', $sla_data, 'CISCO-RTTMON-MIB');
@@ -372,7 +372,7 @@ class Cisco extends OS implements
 
     public function pollNac()
     {
-        $nac = collect();
+        $nac = new Collection();
 
         $portAuthSessionEntry = snmpwalk_cache_oid($this->getDeviceArray(), 'cafSessionEntry', [], 'CISCO-AUTH-FRAMEWORK-MIB');
         if (! empty($portAuthSessionEntry)) {
@@ -414,13 +414,14 @@ class Cisco extends OS implements
         return $nac;
     }
 
-    public function pollSlas($slas)
+    public function pollSlas($slas): void
     {
         $device = $this->getDeviceArray();
 
         $data = snmpwalk_group($device, 'rttMonLatestRttOperTable', 'CISCO-RTTMON-MIB');
         $data = snmpwalk_group($device, 'rttMonLatestOper', 'CISCO-RTTMON-MIB', 1, $data);
         $data = snmpwalk_group($device, 'rttMonEchoAdminNumPackets', 'CISCO-RTTMON-MIB', 1, $data);
+        $data = snmpwalk_group($device, 'rttMonLatestIcmpJitterOperTable', 'CISCO-RTTMON-ICMP-MIB', 1, $data);
 
         $time_offset = time() - $this->getDevice()->uptime;
 
@@ -430,7 +431,7 @@ class Cisco extends OS implements
             $rtt_type = $sla->rtt_type;
 
             // Lets process each SLA
-            $unixtime = intval(($data[$sla_nr]['rttMonLatestRttOperTime'] / 100 + $time_offset));
+            $unixtime = intval($data[$sla_nr]['rttMonLatestRttOperTime'] / 100 + $time_offset);
             $time = date('Y-m-d H:i:s', $unixtime);
 
             // Save data
@@ -440,15 +441,7 @@ class Cisco extends OS implements
 
             echo 'SLA ' . $sla_nr . ': ' . $rtt_type . ' ' . $sla['owner'] . ' ' . $sla['tag'] . '... ' . $sla->rtt . 'ms at ' . $time . "\n";
 
-            $fields = [
-                'rtt' => $sla->rtt,
-            ];
-
-            // The base RRD
-            $rrd_name = ['sla', $sla['sla_nr']];
-            $rrd_def = RrdDefinition::make()->addDataset('rtt', 'GAUGE', 0, 300000);
-            $tags = compact('sla_nr', 'rrd_name', 'rrd_def');
-            data_update($device, 'sla', $tags, $fields);
+            $collected = ['rtt' => $sla->rtt];
 
             // Let's gather some per-type fields.
             switch ($rtt_type) {
@@ -480,8 +473,8 @@ class Cisco extends OS implements
                         ->addDataset('AvgSDJ', 'GAUGE', 0)
                         ->addDataset('AvgDSJ', 'GAUGE', 0);
                     $tags = compact('rrd_name', 'rrd_def', 'sla_nr', 'rtt_type');
-                    data_update($device, 'sla', $tags, $jitter);
-                    $fields = array_merge($fields, $jitter);
+                    app('Datastore')->put($device, 'sla', $tags, $jitter);
+                    $collected = array_merge($collected, $jitter);
                     // Additional rrd for total number packet in sla
                     $numPackets = [
                         'NumPackets' => $data[$sla_nr]['rttMonEchoAdminNumPackets'],
@@ -490,21 +483,26 @@ class Cisco extends OS implements
                     $rrd_def = RrdDefinition::make()
                         ->addDataset('NumPackets', 'GAUGE', 0);
                     $tags = compact('rrd_name', 'rrd_def', 'sla_nr', 'rtt_type');
-                    data_update($device, 'sla', $tags, $numPackets);
-                    $fields = array_merge($fields, $numPackets);
+                    app('Datastore')->put($device, 'sla', $tags, $numPackets);
+                    $collected = array_merge($collected, $numPackets);
                     break;
                 case 'icmpjitter':
+                    // icmpJitter data is placed at different locations in MIB tree, possibly based on IOS version
+                    // First look for values as originally implemented in lnms (from CISCO-RTTMON-MIB), then look for OIDs defined in CISCO-RTTMON-ICMP-MIB
+                    // This MIGHT mix values if a device presents some data from one and some from the other
+
                     $icmpjitter = [
-                        'PacketLoss' => $data[$sla_nr]['rttMonLatestJitterOperPacketLossSD'],
-                        'PacketOosSD' => $data[$sla_nr]['rttMonLatestJitterOperPacketOutOfSequence'],
-                        'PacketOosDS' => $data[$sla_nr]['rttMonLatestJitterOperPacketMIA'],
-                        'PacketLateArrival' => $data[$sla_nr]['rttMonLatestJitterOperPacketLateArrival'],
-                        'JitterAvgSD' => $data[$sla_nr]['rttMonLatestJitterOperAvgSDJ'],
-                        'JitterAvgDS' => $data[$sla_nr]['rttMonLatestJitterOperAvgDSJ'],
-                        'LatencyOWAvgSD' => $data[$sla_nr]['rttMonLatestJitterOperOWAvgSD'],
-                        'LatencyOWAvgDS' => $data[$sla_nr]['rttMonLatestJitterOperOWAvgDS'],
-                        'JitterIAJOut' => $data[$sla_nr]['rttMonLatestJitterOperIAJOut'],
-                        'JitterIAJIn' => $data[$sla_nr]['rttMonLatestJitterOperIAJIn'],
+                        'PacketLoss' => $data[$sla_nr]['rttMonLatestJitterOperPacketLossSD'] ?? $data[$sla_nr]['rttMonLatestIcmpJitterPktLoss'],
+                        'PacketOosSD' => $data[$sla_nr]['rttMonLatestJitterOperPacketOutOfSequence'] ?? $data[$sla_nr]['rttMonLatestIcmpJPktOutSeqBoth'],
+                        // No equivalent found in CISCO-RTTMON-ICMP-MIB, return null
+                        'PacketOosDS' => $data[$sla_nr]['rttMonLatestJitterOperPacketMIA'] ?? null,
+                        'PacketLateArrival' => $data[$sla_nr]['rttMonLatestJitterOperPacketLateArrival'] ?? $data[$sla_nr]['rttMonLatestIcmpJitterPktLateA'],
+                        'JitterAvgSD' => $data[$sla_nr]['rttMonLatestJitterOperAvgSDJ'] ?? $data[$sla_nr]['rttMonLatestIcmpJitterAvgSDJ'],
+                        'JitterAvgDS' => $data[$sla_nr]['rttMonLatestJitterOperAvgDSJ'] ?? $data[$sla_nr]['rttMonLatestIcmpJitterAvgDSJ'],
+                        'LatencyOWAvgSD' => $data[$sla_nr]['rttMonLatestJitterOperOWAvgSD'] ?? $data[$sla_nr]['rttMonLatestIcmpJitterOWAvgSD'],
+                        'LatencyOWAvgDS' => $data[$sla_nr]['rttMonLatestJitterOperOWAvgDS'] ?? $data[$sla_nr]['rttMonLatestIcmpJitterOWAvgDS'],
+                        'JitterIAJOut' => $data[$sla_nr]['rttMonLatestJitterOperIAJOut'] ?? $data[$sla_nr]['rttMonLatestIcmpJitterIAJOut'],
+                        'JitterIAJIn' => $data[$sla_nr]['rttMonLatestJitterOperIAJIn'] ?? $data[$sla_nr]['rttMonLatestIcmpJitterIAJIn'],
                     ];
                     $rrd_name = ['sla', $sla_nr, $rtt_type];
                     $rrd_def = RrdDefinition::make()
@@ -519,13 +517,13 @@ class Cisco extends OS implements
                         ->addDataset('JitterIAJOut', 'GAUGE', 0)
                         ->addDataset('JitterIAJIn', 'GAUGE', 0);
                     $tags = compact('rrd_name', 'rrd_def', 'sla_nr', 'rtt_type');
-                    data_update($device, 'sla', $tags, $icmpjitter);
-                    $fields = array_merge($fields, $icmpjitter);
+                    app('Datastore')->put($device, 'sla', $tags, $icmpjitter);
+                    $collected = array_merge($collected, $icmpjitter);
                     break;
             }
 
             d_echo('The following datasources were collected for #' . $sla['sla_nr'] . ":\n");
-            d_echo($fields);
+            d_echo($collected);
         }
     }
 

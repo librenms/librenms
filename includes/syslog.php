@@ -65,7 +65,7 @@ function process_syslog($entry, $update)
         if (Config::get('enable_syslog_hooks') && is_array(Config::getOsSetting($os, 'syslog_hook'))) {
             foreach (Config::getOsSetting($os, 'syslog_hook') as $k => $v) {
                 $syslogprogmsg = $entry['program'] . ': ' . $entry['msg'];
-                if ((isset($v['script'])) && (isset($v['regex'])) && ((preg_match($v['regex'], $syslogprogmsg)))) {
+                if ((isset($v['script'])) && (isset($v['regex'])) && preg_match($v['regex'], $syslogprogmsg)) {
                     shell_exec(escapeshellcmd($v['script']) . ' ' . escapeshellarg($hostname) . ' ' . escapeshellarg($os) . ' ' . escapeshellarg($syslogprogmsg) . ' >/dev/null 2>&1 &');
                 }
             }
@@ -153,12 +153,12 @@ function process_syslog($entry, $update)
             dbInsert(
                 [
                     'device_id' => $entry['device_id'],
-                    'program'   => $entry['program'],
-                    'facility'  => $entry['facility'],
-                    'priority'  => $entry['priority'],
-                    'level'     => $entry['level'],
-                    'tag'       => $entry['tag'],
-                    'msg'       => $entry['msg'],
+                    'program' => $entry['program'],
+                    'facility' => $entry['facility'],
+                    'priority' => $entry['priority'],
+                    'level' => $entry['level'],
+                    'tag' => $entry['tag'],
+                    'msg' => $entry['msg'],
                     'timestamp' => $entry['timestamp'],
                 ],
                 'syslog'

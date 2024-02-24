@@ -73,7 +73,7 @@ if (! Auth::user()->hasGlobalAdmin()) {
                     }
 
                     $hostname = format_hostname($myrow);
-                    $sysname = ($hostname == $myrow['sysName']) ? $myrow['hostname'] : $myrow['sysName'];
+                    $sysname = htmlspecialchars(($hostname == $myrow['sysName']) ? $myrow['hostname'] : $myrow['sysName']);
                     array_push($res_arr, ['deviceid' => $myrow['id'], 'hostname' => $hostname, 'sysname' => $sysname, 'parent' => $parent, 'parentid' => $myrow['parentid']]);
                 }
                 $status = ['current' => $_POST['current'], 'rowCount' => $_POST['rowCount'], 'rows' => $res_arr, 'total' => $rec_count];

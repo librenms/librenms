@@ -54,7 +54,7 @@ class OSDiscoveryTest extends TestCase
     /**
      * Populate a list of files to check and make sure it isn't empty
      */
-    public function testHaveFilesToTest()
+    public function testHaveFilesToTest(): void
     {
         $this->assertNotEmpty(self::$unchecked_files);
     }
@@ -63,11 +63,12 @@ class OSDiscoveryTest extends TestCase
      * Test each OS provided by osProvider
      *
      * @group os
+     *
      * @dataProvider osProvider
      *
      * @param  string  $os_name
      */
-    public function testOSDetection($os_name)
+    public function testOSDetection($os_name): void
     {
         if (! getenv('SNMPSIM')) {
             $this->app->bind(NetSnmpQuery::class, SnmpQueryMock::class);
@@ -100,7 +101,7 @@ class OSDiscoveryTest extends TestCase
      *
      * @depends testOSDetection
      */
-    public function testAllFilesTested()
+    public function testAllFilesTested(): void
     {
         $this->assertEmpty(
             self::$unchecked_files,

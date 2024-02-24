@@ -165,7 +165,7 @@ $start = (($page_number - 1) * $results);
         <th data-column-id="Name">Name</th>
         <th data-column-id="Devices">Devices<th>
         <th data-column-id="Transports">Transports<th>
-        <th data-column-id="Extra">Extra</th>
+        <th data-column-id="Extra">Notification Settings</th>
         <th data-column-id="Rule">Rule</th>
         <th data-column-id="Severity">Severity</th>
         <th data-column-id="Status">Status</th>
@@ -430,7 +430,7 @@ foreach ($rule_list as $rule) {
 <?php
 // Pagination
 
-if (($count % $results) > 0) {
+if ($count > $results) {
     echo '<div class="table-responsive">';
     echo '<div class="col pull-left">';
     echo generate_pagination($count, $results, $page_number);

@@ -17,10 +17,6 @@ $rrd_list[2]['filename'] = $file;
 $rrd_list[2]['descr'] = 'Failed';
 $rrd_list[2]['ds'] = 'failed';
 
-if ($_GET['debug']) {
-    print_r($rrd_list);
-}
-
 $colours = 'mixed';
 $nototal = 1;
 $unit_text = 'Sessions';

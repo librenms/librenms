@@ -185,12 +185,13 @@ and all the data received with the trap will be logged.
 
 The parameter can be found in General Settings / External / SNMP Traps Integration.
 
-It can also be configured in ```config.php```
+It can also be configured in your config.
 
-```php
-$config['snmptraps']['eventlog'] = 'unhandled'; //default value
-$config['snmptraps']['eventlog_detailed'] = 'false'; //default value
-```
+!!! setting "external/snmptrapd"
+    ```bash
+    lnms config:set snmptraps.eventlog 'unhandled'
+    lnms config:set snmptraps.eventlog_detailed false
+    ```
 
 Valid options are:
 

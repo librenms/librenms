@@ -29,15 +29,12 @@ use LibreNMS\Config;
 
 class Oxidized extends BaseApi
 {
-    /**
-     * @var bool if Oxidized is enabled
-     */
-    private $enabled;
+    private bool $enabled;
 
     public function __construct()
     {
         $this->timeout = 90;
-        $this->base_uri = Config::get('oxidized.url');
+        $this->base_uri = Config::get('oxidized.url') ?? '';
         $this->enabled = Config::get('oxidized.enabled') === true && $this->base_uri;
     }
 

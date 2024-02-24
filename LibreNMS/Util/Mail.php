@@ -71,7 +71,7 @@ class Mail
      * @param  bool  $html
      * @return bool|string
      */
-    public static function send($emails, $subject, $message, bool $html = false, ?bool $embedGraphs = null)
+    public static function send($emails, $subject, $message, bool $html = false, bool $bcc = false, ?bool $embedGraphs = null)
     {
         if (is_array($emails) || ($emails = self::parseEmails($emails))) {
             d_echo("Attempting to email $subject to: " . implode('; ', array_keys($emails)) . PHP_EOL);
@@ -82,9 +82,13 @@ class Mail
                 foreach (self::parseEmails(Config::get('email_from')) as $from => $from_name) {
                     $mail->setFrom($from, $from_name);
                 }
+
+                // add addresses
+                $addMethod = $bcc ? 'addBcc' : 'addAddress';
                 foreach ($emails as $email => $email_name) {
-                    $mail->addAddress($email, $email_name);
+                    $mail->$addMethod($email, $email_name);
                 }
+
                 $mail->Subject = $subject;
                 $mail->XMailer = Config::get('project_name');
                 $mail->CharSet = 'utf-8';
@@ -148,13 +152,13 @@ class Mail
                 $image = Graph::getImage($url);
 
                 // attach image
-                $fileName = substr(Clean::fileName($image->title() ?: $cid), 0, 250);
+                $fileName = substr(Clean::fileName($image->title ?: $cid), 0, 250);
                 $mail->addStringEmbeddedImage(
-                    $image->data(),
+                    $image->data,
                     $cid,
                     $fileName . '.' . $image->fileExtension(),
                     PHPMailer::ENCODING_BASE64,
-                    $image->imageType()
+                    $image->format->contentType()
                 );
 
                 // update image tag to link to attached image, or just the image name

@@ -5,11 +5,7 @@ $no_refresh = true;
     <thead>
         <tr>
             <th data-column-id="mac_address" data-formatter="tooltip">MAC address</th>
-<?php
-if (\LibreNMS\Config::get('mac_oui.enabled') === true) {
-    echo '            <th data-column-id="mac_oui" data-sortable="false" data-width="" data-visible="true" data-formatter="tooltip">Vendor</th>';
-}
-?>
+            <th data-column-id="mac_oui" data-sortable="false" data-width="" data-visible="<?php echo \LibreNMS\Config::get('mac_oui.enabled') ? 'true' : 'false' ?>" data-formatter="tooltip">Vendor</th>
             <th data-column-id="ipv4_address" data-formatter="tooltip">IPv4 address</th>
             <th data-column-id="remote_device" data-sortable="false">Remote device</th>
             <th data-column-id="remote_interface" data-sortable="false">Remote interface</th>

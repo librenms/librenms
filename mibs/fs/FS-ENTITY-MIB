@@ -1,0 +1,743 @@
+-- *****************************************************************
+-- FS-ENTITY-MIB.mib:  FS Entity MIB file
+--
+-- March 2002, Wuzg
+--
+-- Copyright (c) 2002 by FS.COM Inc..
+-- All rights reserved.
+-- 
+-- *****************************************************************
+--
+
+FS-ENTITY-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        NOTIFICATION-TYPE,
+        Integer32
+                FROM SNMPv2-SMI
+        DisplayString,
+        MacAddress
+                FROM SNMPv2-TC
+        MODULE-COMPLIANCE,
+        OBJECT-GROUP,
+        NOTIFICATION-GROUP
+                FROM SNMPv2-CONF
+        fsMgmt
+                FROM FS-SMI;
+
+fsEntityMIB MODULE-IDENTITY
+	LAST-UPDATED "200203200000Z"
+	ORGANIZATION "FS.COM Inc.."
+	CONTACT-INFO
+        " 
+		    Tel: 400-865-2852 
+
+		    E-mail: https://www.fs.com/live_chat_service_mail.html"
+	DESCRIPTION
+		"This module defines fs entity mibs."
+	REVISION      "200203200000Z"
+	DESCRIPTION
+		"Initial version of this MIB module."
+	::= { fsMgmt 21}
+
+fsDeviceMIBObjects OBJECT IDENTIFIER ::= { fsEntityMIB 1 }
+
+
+--
+-- device information
+--
+fsDeviceMaxNumber OBJECT-TYPE
+          SYNTAX Integer32
+          MAX-ACCESS read-only
+          STATUS current
+          DESCRIPTION
+              "Max number of devices of the system permitting."
+          ::= { fsDeviceMIBObjects 1 }
+        
+fsDeviceInfoTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF FSDeviceInfoEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "List of devices."
+        ::= { fsDeviceMIBObjects 2 }
+        
+fsDeviceInfoEntry OBJECT-TYPE
+        SYNTAX FSDeviceInfoEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Entry of a device information."
+        INDEX { fsDeviceInfoIndex }
+        ::= { fsDeviceInfoTable 1 }
+    
+FSDeviceInfoEntry ::=
+        SEQUENCE {
+	       fsDeviceInfoIndex Integer32,
+	       fsDeviceInfoDescr DisplayString,
+	       fsDeviceInfoSlotNumber Integer32,
+               fsDevicePowerStatus  INTEGER,
+	       fsDeviceMacAddress MacAddress,
+               fsDevicePriority Integer32,
+               fsDeviceAlias  DisplayString,
+               fsDeviceSWVersion DisplayString,
+               fsDeviceHWVersion DisplayString,
+	       fsDeviceSerialNumber DisplayString,
+           fsDeviceOid   OBJECT IDENTIFIER
+        }
+        
+fsDeviceInfoIndex OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "An unique value of each devices in system. Its value ranges between
+            1 and the value of the object fsDeviceNumber."
+        ::= { fsDeviceInfoEntry 1 }
+              
+fsDeviceInfoDescr OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..32))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Description of the device."
+        ::= { fsDeviceInfoEntry 2 }
+        
+fsDeviceInfoSlotNumber OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of slots exists on the device."
+        ::= { fsDeviceInfoEntry 3 }
+        
+          
+fsDevicePowerStatus OBJECT-TYPE
+          SYNTAX  INTEGER {
+                    rpsNoLink   (1), -- no rps link or rps not electrifying,
+                    rpsLinkAndNoPower (2), -- rps linked but not electrifying,
+                    rpsLinkAndReadyForPower (3), -- rps is ready for power,
+                    rpsLinkAndPower (4)  -- rps is serving as a power
+                }
+          MAX-ACCESS read-only
+          STATUS current
+          DESCRIPTION
+              "The power status of device"
+          ::= { fsDeviceInfoEntry 4 }
+        
+fsDeviceMacAddress OBJECT-TYPE
+          SYNTAX  MacAddress
+          MAX-ACCESS read-only
+          STATUS current
+          DESCRIPTION
+              "The physical address of device"
+          ::= { fsDeviceInfoEntry 5 }
+
+fsDevicePriority OBJECT-TYPE
+          SYNTAX  Integer32(1..10)
+          MAX-ACCESS read-write
+          STATUS current
+          DESCRIPTION
+              "The device priority value"
+          ::= { fsDeviceInfoEntry 6 }
+          
+fsDeviceAlias OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..32))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Alias of the device."
+        ::= { fsDeviceInfoEntry 7 }     
+
+
+fsDeviceSWVersion OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(1..32))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Description of the device."
+        ::= { fsDeviceInfoEntry 8 }
+        
+fsDeviceHWVersion OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(1..32))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Description of the device."
+        ::= { fsDeviceInfoEntry 9 }  
+
+fsDeviceSerialNumber OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(1..32))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Serial number of the device. For a chassis device, it refers to the serial number of the chassis"
+        ::= { fsDeviceInfoEntry 10 }
+		
+fsDeviceOid OBJECT-TYPE
+        SYNTAX OBJECT IDENTIFIER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Oid number of the device."
+        ::= { fsDeviceInfoEntry 11 }
+       
+--
+-- module information  
+--
+--fsModuleNumber OBJECT-TYPE
+--        SYNTAX Integer32
+--        MAX-ACCESS read-only
+--        STATUS current
+--        DESCRIPTION
+--            "Current number of modules in the system."
+--        ::= { fsDeviceMIBObjects 2 }
+
+fsSlotInfoTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF FSSlotInfoEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "a list of module Entries."
+        ::= { fsDeviceMIBObjects 3 }
+    
+fsSlotInfoEntry OBJECT-TYPE
+        SYNTAX FSSlotInfoEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Entry containing status information about one slot."
+        INDEX { fsSlotInfoDeviceIndex, fsSlotInfoIndex }
+        ::= { fsSlotInfoTable 1 }
+
+FSSlotInfoEntry ::= 
+        SEQUENCE {
+             fsSlotInfoDeviceIndex Integer32,
+             fsSlotInfoIndex Integer32,
+             fsSlotModuleInfoDescr DisplayString,
+             fsSlotInfoPortNumber Integer32,
+             fsSlotInfoPortMaxNumber Integer32,
+             fsSlotInfoDesc  DisplayString,
+             fsSlotConfigModuleInfoDescr DisplayString,
+             fsSlotUserStatus Integer32,
+             fsSlotSoftwareStatus Integer32,
+             fsSlotSerialNumber DisplayString,
+             fsSlotHWVersion DisplayString
+        }
+    
+fsSlotInfoDeviceIndex OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The index of the device, that the slot exists on."
+        ::= { fsSlotInfoEntry 1 }
+    
+fsSlotInfoIndex OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "A unique value for each slot exist on the device specified by
+            the field fsSlotInfoDeviceIndex, Its value ranges
+            between 1 and the value of the solt num  of this device."
+        ::= { fsSlotInfoEntry 2 }
+    
+fsSlotModuleInfoDescr OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Descriptions for the module in the Slot. just like 's1902m' etc. It is a 
+             unique value for identifing a kind of module.This value will be null string
+             if slot is empty is NULL"
+        ::= { fsSlotInfoEntry 3 }
+    
+fsSlotInfoPortNumber OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Number of ports on this slot.This value will be 0  if slot is empty"
+        ::= { fsSlotInfoEntry 4 }
+
+fsSlotInfoPortMaxNumber OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Max number of ports on this slot has possibly."
+        ::= { fsSlotInfoEntry 5 }
+                      
+fsSlotInfoDesc OBJECT-TYPE
+        SYNTAX  DisplayString(SIZE(0..32))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Description of the slot,the same as the pannel show."
+        ::= { fsSlotInfoEntry 6 }
+        
+fsSlotConfigModuleInfoDescr OBJECT-TYPE
+        SYNTAX  DisplayString(SIZE(0..32))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Description of the configured module name on the slot, such as 'M8600-48GT/4SFP','NMX-8E1/CE1H',etc.
+            This value will be 'none' if module on the slot isn't configured, or 'N/A' if not allowed to configure."
+        ::= { fsSlotInfoEntry 7 }        
+        
+fsSlotUserStatus OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "User status of the slot.
+	             value      status          	description
+			     0          NONE  	  			not configured(for linecard)
+			     1          INSTALLED 			configured to install(for linecard)
+			     2          UNINSTALLED			configured to uninstall(for linecard)
+			     3          NA             		not allowed to configure(for mainboard or Cassette switch)
+            "
+        ::= { fsSlotInfoEntry 8 }
+        
+fsSlotSoftwareStatus OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Software status of the slot.
+	            value       status          		description
+				0			NONE            		not running(for all)
+				1			OK              		running(for linecard or Cassette switch)
+				2			CONFLICT        		confilct with installed module(for linecard)  
+				3			REMOVED					module removed(for linecard)
+				4			VERSION_IMCOMPATIBLE	version error(for linecard)
+				5			CANNOT_STARTUP			can not start(for linecard)
+				6			RESETTING				restarting(for linecard)
+				7			MASTER            		master board(for mainboard)
+				8			BACKUP            		slave board(for mainboard)            
+            "
+        ::= { fsSlotInfoEntry 9 } 
+
+fsSlotSerialNumber OBJECT-TYPE
+        SYNTAX  DisplayString(SIZE(0..32))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Serial number of the module in the Slot."
+        ::= { fsSlotInfoEntry 10 }
+ 
+fsSlotHWVersion OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(1..32))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Description of the slot."
+        ::= { fsSlotInfoEntry 11 }
+
+--
+--ModuleTempState
+--          
+fsModuleTempStateTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF FSModuleTempStateEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Table of entrance to module temperature state table."
+        ::= { fsDeviceMIBObjects 4 }
+    
+fsModuleTempStateEntry OBJECT-TYPE
+        SYNTAX FSModuleTempStateEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Entrance to module temperature state." 
+        INDEX { fsModuleTempStateDeviceIndex, fsModuleTempStateIndex }
+        ::= { fsModuleTempStateTable 1 }
+
+FSModuleTempStateEntry ::= 
+        SEQUENCE {
+	     fsModuleTempStateDeviceIndex Integer32, 
+             fsModuleTempStateIndex Integer32,
+             fsModuleTempState  INTEGER
+        }
+
+fsModuleTempStateDeviceIndex OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The index number for the device which the module is in." 
+        ::= { fsModuleTempStateEntry 1 }
+  
+fsModuleTempStateIndex OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            " The module index number, ranging from 1 to the maximal slot number." 
+        ::= { fsModuleTempStateEntry 2 }
+    
+fsModuleTempState OBJECT-TYPE
+        SYNTAX INTEGER{
+        	tempNormal(1),
+        	tempWarning(2)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            " The module temperature state." 
+        ::= { fsModuleTempStateEntry 3 }
+
+fsPowerStateTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF FSPowerStateEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Table of entrance to the power state." 
+        ::= { fsDeviceMIBObjects 5 }
+    
+fsPowerStateEntry OBJECT-TYPE
+        SYNTAX FSPowerStateEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Entrance to the power state." 
+        INDEX { fsPowerStateDeviceIndex, fsPowerStateIndex }
+        ::= { fsPowerStateTable 1 }
+
+FSPowerStateEntry ::= 
+        SEQUENCE {
+	     fsPowerStateDeviceIndex Integer32,
+             fsPowerStateIndex Integer32,
+             fsPowerState  INTEGER,
+             fsPowerStatePowerDescr  DisplayString,
+             fsPowerStateSerialNumber DisplayString
+        }
+
+fsPowerStateDeviceIndex OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+             "The index number for the device which the power is in." 
+        ::= { fsPowerStateEntry 1 }
+    
+fsPowerStateIndex OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The power index number."
+        ::= { fsPowerStateEntry 2 }
+    
+fsPowerState OBJECT-TYPE
+        SYNTAX INTEGER{
+        	noLink(1),                 --no exist
+        	linkAndNoPower(2),         --exist but no power
+        	linkAndReadyForPower(3),   --exist and ready for power
+        	linkAndPower(4),           --normal power 
+		linkAndPowerAbnormal(5)    --power,but abnormal at fan
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Power state."
+        ::= { fsPowerStateEntry 3 }
+
+fsPowerStatePowerDescr OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..32))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Description of the power."
+        ::= { fsPowerStateEntry 4 }
+
+fsPowerStateSerialNumber OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..32))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Serial number of the power."
+        ::= { fsPowerStateEntry 5 }
+		
+fsFanStateTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF FSFanStateEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Table of entrance to the fan state." 
+        ::= { fsDeviceMIBObjects 6 }
+    
+fsFanStateEntry OBJECT-TYPE
+        SYNTAX FSFanStateEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Entrance to the fan state."
+        INDEX {  fsFanStateDeviceIndex, fsFanStateIndex }
+        ::= { fsFanStateTable 1 }
+
+FSFanStateEntry ::= 
+        SEQUENCE {
+	     fsFanStateDeviceIndex Integer32,
+             fsFanStateIndex Integer32,
+             fsFanState  INTEGER,
+             fsFanStateFanDescr  DisplayString,
+             fsFanStateSerialNumber DisplayString
+        }
+
+fsFanStateDeviceIndex OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The index number for the device which the fan is in."
+        ::= { fsFanStateEntry 1 }
+    
+fsFanStateIndex OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Fan index number."  
+        ::= { fsFanStateEntry 2 }
+    
+fsFanState OBJECT-TYPE
+        SYNTAX INTEGER{
+        	work(1),      --fan working
+        	stop(2)      --fan stopping or no exist 
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Fan state."  
+        ::= { fsFanStateEntry 3 }
+           
+fsFanStateFanDescr OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..32))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Description of the fan."
+        ::= { fsFanStateEntry 4 }
+ 
+fsFanStateSerialNumber OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..32))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Serial number of the fan."
+        ::= { fsFanStateEntry 5 } 
+
+fsEntityMIBTraps OBJECT IDENTIFIER ::= { fsEntityMIB 2 }      
+
+fsEntityStateChgDesc OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+          "The description of entity change."
+        ::= { fsEntityMIBTraps 1 }       
+        
+fsEntityStatusChange NOTIFICATION-TYPE
+        OBJECTS   {fsEntityStateChgDesc}
+        STATUS     current
+        DESCRIPTION
+                "while status of the entity changed, then this trap will be sent."
+        ::= { fsEntityMIBTraps 2 }                    
+        
+fsTemperatureWarningDesc OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..255))
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+          "Description on the temperature state changes." 
+        ::= { fsEntityMIBTraps 3 }       
+        
+fsTemperatureWarning NOTIFICATION-TYPE
+        OBJECTS   { fsTemperatureWarningDesc }
+        STATUS     current
+        DESCRIPTION
+            " When the temperature state of this module changes, this Trap will be sent." 
+        ::= { fsEntityMIBTraps 4 }
+        
+        
+-- conformance information
+
+fsDeviceMIBConformance OBJECT IDENTIFIER ::= { fsEntityMIB 3 }
+fsDeviceMIBCompliances OBJECT IDENTIFIER ::= { fsDeviceMIBConformance 1 }
+fsDeviceMIBGroups      OBJECT IDENTIFIER ::= { fsDeviceMIBConformance 2 }
+
+
+-- compliance statements
+
+fsDeviceMIBCompliance MODULE-COMPLIANCE
+        STATUS  current
+        DESCRIPTION
+                "The compliance statement for entities which implement
+                the FS Device MIB"
+        MODULE  -- this module
+                MANDATORY-GROUPS { fsDeviceInfoMIBGroup,
+                                   fsModuleInfoMIBGroup
+                 }
+                 GROUP      fsOptionalDevInfoMIBGroup
+                 DESCRIPTION
+                     "This group is optional for those system which support device priority,alias and macaddress 
+                      information"  
+                 
+                 GROUP      fsEntityChgDescGroup
+                 DESCRIPTION
+                     "This group is mandatory only for those system which support entity
+                     change notification."  
+                                      
+                GROUP       fsDeviceMIBNotificationGroup
+                DESCRIPTION
+                     "This group is mandatory only for those system which support entity
+                     change notification."  
+                      
+                GROUP   fsModuleTempStateGroup
+		DESCRIPTION  
+                     "This group is mandatory when the system supports temperature state detection."   
+
+                GROUP   fsPowerStateGroup
+		DESCRIPTION  
+                      "This group is mandatory when the system supports power state identification." 
+
+                GROUP   fsFanStateGroup
+		DESCRIPTION  
+                     "This group is mandatory when the system supports fan state identification." 
+  
+		GROUP  fsTemperatureWarningDescGroup 
+		DESCRIPTION
+                      "This group is mandatory when the system supports temperature state notification." 
+
+                GROUP   fsTemperatureWarningGroup
+                DESCRIPTION 
+                      "This group is mandatory when the system supports temperature state notification." 
+
+        ::= { fsDeviceMIBCompliances 1 }
+                
+-- units of conformance
+
+fsDeviceInfoMIBGroup OBJECT-GROUP
+        OBJECTS {
+          fsDeviceMaxNumber, 
+	       fsDeviceInfoIndex,
+	       fsDeviceInfoDescr,
+	       fsDeviceInfoSlotNumber,
+	       fsDevicePowerStatus
+        }
+        STATUS  current
+        DESCRIPTION
+                "A collection of objects providing device information to a
+                FS agent."
+        ::= { fsDeviceMIBGroups 1 } 
+
+fsOptionalDevInfoMIBGroup OBJECT-GROUP
+        OBJECTS {
+	       fsDeviceMacAddress,
+	       fsDevicePriority,
+	       fsDeviceAlias,
+               fsDeviceSWVersion,
+               fsDeviceHWVersion,
+               fsDeviceSerialNumber,
+               fsDeviceOid
+        }
+        STATUS  current
+        DESCRIPTION
+                "A collection of objects providing optional device information to a
+                FS agent."
+        ::= { fsDeviceMIBGroups 2 } 
+        
+fsModuleInfoMIBGroup OBJECT-GROUP
+        OBJECTS {
+             fsSlotInfoDeviceIndex,
+             fsSlotInfoIndex,
+             fsSlotModuleInfoDescr,
+             fsSlotInfoPortNumber,
+             fsSlotInfoPortMaxNumber,
+	     fsSlotInfoDesc, 
+             fsSlotConfigModuleInfoDescr,
+             fsSlotUserStatus,
+             fsSlotSoftwareStatus,
+	     fsSlotSerialNumber,
+	     fsSlotHWVersion
+        }
+        STATUS  current
+        DESCRIPTION
+                "A collection of objects providing module information to a
+                FS agent."
+        ::= { fsDeviceMIBGroups 3 }                
+                               
+fsEntityChgDescGroup OBJECT-GROUP
+        OBJECTS {fsEntityStateChgDesc}
+        STATUS  current
+        DESCRIPTION
+                "Objects that providing a literal description of entity's change."
+        ::= { fsDeviceMIBGroups 4 }             
+        
+fsDeviceMIBNotificationGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {fsEntityStatusChange}
+    STATUS        current
+    DESCRIPTION
+            "The collection of notifications which used to inform entity general status information"
+    ::= { fsDeviceMIBGroups 5}
+
+fsModuleTempStateGroup OBJECT-GROUP
+        OBJECTS {
+	     fsModuleTempStateDeviceIndex, 
+             fsModuleTempStateIndex,
+             fsModuleTempState
+		}
+        STATUS  current
+        DESCRIPTION
+                "Collection of information on temperature state."
+        ::= { fsDeviceMIBGroups 6 }             
+
+fsPowerStateGroup OBJECT-GROUP
+        OBJECTS {
+	     fsPowerStateDeviceIndex,
+             fsPowerStateIndex,
+             fsPowerState,
+             fsPowerStatePowerDescr
+		}
+        STATUS  current
+        DESCRIPTION
+                 "Collection of information on power state." 
+        ::= { fsDeviceMIBGroups 7 } 
+            
+fsFanStateGroup OBJECT-GROUP
+        OBJECTS {
+	     fsFanStateDeviceIndex,
+             fsFanStateIndex,
+             fsFanState,
+             fsFanStateFanDescr
+		}
+        STATUS  current
+        DESCRIPTION
+                 "Collection of information on fan state." 
+        ::= { fsDeviceMIBGroups 8 }   
+
+fsTemperatureWarningDescGroup OBJECT-GROUP
+        OBJECTS { fsTemperatureWarningDesc }
+        STATUS  current
+        DESCRIPTION
+                 "Collection of description on temperature change notification." 
+        ::= { fsDeviceMIBGroups 9 } 
+
+fsTemperatureWarningGroup NOTIFICATION-GROUP
+	NOTIFICATIONS { fsTemperatureWarning }
+	STATUS        current
+	DESCRIPTION
+             "Collection of temperature change notification." 
+    ::= { fsDeviceMIBGroups 10}
+          
+
+-- definitions in RFC 1213 made
+
+        
+END
+      

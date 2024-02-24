@@ -25,25 +25,21 @@
 
 namespace LibreNMS\Tests\Feature\SnmpTraps;
 
-use App\Models\Device;
-use LibreNMS\Snmptrap\Dispatcher;
-use LibreNMS\Snmptrap\Trap;
+use LibreNMS\Enum\Severity;
 
 class AdvaDyingGaspTrapTest extends SnmpTrapTestCase
 {
-    public function testDyingGasp()
+    public function testDyingGasp(): void
     {
-        $device = Device::factory()->create(); /** @var Device $device */
-        $trapText = "$device->hostname
-UDP: [$device->ip]:57602->[192.168.5.5]:162
+        $this->assertTrapLogsMessage(<<<'TRAP'
+{{ hostname }}
+UDP: [{{ ip }}]:57602->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 26:19:43:37.24
-SNMPv2-MIB::snmpTrapOID.0 CM-SYSTEM-MIB::cmSnmpDyingGaspTrap";
-
-        $trap = new Trap($trapText);
-
-        $message = 'Dying Gasp received';
-        \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 5);
-
-        $this->assertTrue(Dispatcher::handle($trap), 'Could not handle cmSnmpDyingGaspTrap');
+SNMPv2-MIB::snmpTrapOID.0 CM-SYSTEM-MIB::cmSnmpDyingGaspTrap
+TRAP,
+            'Dying Gasp received',
+            'Could not handle cmSnmpDyingGaspTrap',
+            [Severity::Error],
+        );
     }
 }

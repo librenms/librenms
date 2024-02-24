@@ -31,7 +31,6 @@ namespace LibreNMS\Snmptrap\Handlers;
 use App\Models\Device;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
-use Log;
 
 class RuckusSzApMiscEvent implements SnmptrapHandler
 {
@@ -47,6 +46,6 @@ class RuckusSzApMiscEvent implements SnmptrapHandler
     {
         $severity = RuckusSzSeverity::getSeverity($trap->getOidData($trap->findOid('RUCKUS-SZ-EVENT-MIB::ruckusSZEventSeverity')));
         $eventDescr = $trap->getOidData($trap->findOid('RUCKUS-SZ-EVENT-MIB::ruckusSZEventDescription'));
-        Log::event("AP event: $eventDescr", $device->device_id, 'trap', $severity);
+        $trap->log("AP event: $eventDescr", $severity);
     }
 }

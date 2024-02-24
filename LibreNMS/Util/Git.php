@@ -196,7 +196,7 @@ class Git
         return $this->cacheGet('remoteCommit', function () {
             if ($this->isAvailable()) {
                 try {
-                    return (array) \Http::withOptions(['proxy' => Proxy::forGuzzle()])->get(Config::get('github_api') . 'commits/master')->json();
+                    return (array) Http::client()->get(Config::get('github_api') . 'commits/master')->json();
                 } catch (ConnectionException $e) {
                 }
             }

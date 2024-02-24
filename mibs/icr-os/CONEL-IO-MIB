@@ -1,0 +1,39 @@
+CONEL-IO-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+			enterprises, Gauge
+				FROM RFC1155-SMI
+			OBJECT-TYPE
+				FROM RFC-1212;
+
+conel			OBJECT IDENTIFIER ::= { enterprises 30140 }
+
+protocols		OBJECT IDENTIFIER ::= { conel 2 }
+
+io			OBJECT IDENTIFIER ::= { protocols 3 }
+
+ioBin0			OBJECT-TYPE
+			SYNTAX	Gauge
+			ACCESS	read-only
+			STATUS	current
+			::= { io 1 }
+
+ioOut0			OBJECT-TYPE
+			SYNTAX	Gauge
+			ACCESS	read-write
+			STATUS	current
+			::= { io 2 }
+
+ioBin1			OBJECT-TYPE
+			SYNTAX	Gauge
+			ACCESS	read-only
+			STATUS	current
+			::= { io 3 }
+
+ioOut1			OBJECT-TYPE
+			SYNTAX	Gauge
+			ACCESS	read-write
+			STATUS	current
+			::= { io 4 }
+
+END

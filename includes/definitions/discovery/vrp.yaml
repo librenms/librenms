@@ -488,7 +488,8 @@ modules:
                     index: 1
                     divisor: 1000
                 -
-                    oid: hwBoardCurrentPower
+                    oid: hwBoardPowerMngtTable
+                    value: hwBoardCurrentPower
                     num_oid: '.1.3.6.1.4.1.2011.6.157.2.1.1.4.{{ $index }}'
                     descr: '{{ $entPhysicalName }}'
                     index: '{{ $index }}'
@@ -498,6 +499,26 @@ modules:
                             oid: hwBoardCurrentPower
                             op: '='
                             value: '-1'
+                        -
+                            oid: entPhysicalName
+                            op: '='
+                            value: ''
+                -
+                    oid: hwBoardPowerMngtTable
+                    value: hwBoardCurrentPower
+                    num_oid: '.1.3.6.1.4.1.2011.6.157.2.1.1.4.{{ $index }}'
+                    descr: '{{ $hwBoardType }} {{ $hwBoardName }}'
+                    index: '{{ $index }}'
+                    divisor: 1000
+                    skip_values:
+                        -
+                            oid: hwBoardCurrentPower
+                            op: '='
+                            value: '-1'
+                        -
+                            oid: entPhysicalName
+                            op: '!='
+                            value: ''
         percent:
             data:
                 -

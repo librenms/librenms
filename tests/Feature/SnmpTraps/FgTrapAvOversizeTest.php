@@ -25,26 +25,20 @@
 
 namespace LibreNMS\Tests\Feature\SnmpTraps;
 
-use App\Models\Device;
-use LibreNMS\Snmptrap\Dispatcher;
-use LibreNMS\Snmptrap\Trap;
-
 class FgTrapAvOversizeTest extends SnmpTrapTestCase
 {
-    public function testAvOversize()
+    public function testAvOversize(): void
     {
-        $device = Device::factory()->create(); /** @var Device $device */
-        $trapText = "$device->hostname
-UDP: [$device->ip]:57602->[192.168.5.5]:162
+        $this->assertTrapLogsMessage(<<<'TRAP'
+{{ hostname }}
+UDP: [{{ ip }}]:57602->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 302:12:56:24.81
 SNMPv2-MIB::snmpTrapOID.0 FORTINET-FORTIGATE-MIB::fgTrapAvOversize
 FORTINET-CORE-MIB::fnSysSerial.0 $device->serial
-SNMPv2-MIB::sysName.0 $device->hostname";
-
-        $message = "$device->hostname received a file that exceeds proxy buffer, skipping AV scan";
-        \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 2);
-
-        $trap = new Trap($trapText);
-        $this->assertTrue(Dispatcher::handle($trap), 'Could not handle fgTrapIpsAvOversize');
+SNMPv2-MIB::sysName.0 $device->hostname
+TRAP,
+            '{{ hostname }} received a file that exceeds proxy buffer, skipping AV scan',
+            'Could not handle fgTrapIpsAvOversize',
+        );
     }
 }

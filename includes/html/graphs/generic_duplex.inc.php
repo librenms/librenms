@@ -61,7 +61,7 @@ if (! empty($graph_max)) {
     $rrd_options .= ' AREA:dout_max#' . $colour_area_out_max . $stacked['transparency'] . ':';
 }
 
-if (isset($_GET['previous']) && $_GET['previous'] == 'yes') {
+if ($graph_params->visible('previous')) {
     $rrd_options .= ' DEF:' . $out . 'X=' . $rrd_filename . ':' . $ds_out . ':AVERAGE:start=' . $prev_from . ':end=' . $from;
     $rrd_options .= ' DEF:' . $in . 'X=' . $rrd_filename . ':' . $ds_in . ':AVERAGE:start=' . $prev_from . ':end=' . $from;
     $rrd_options .= ' DEF:' . $out . '_maxX=' . $rrd_filename . ':' . $ds_out . ':MAX:start=' . $prev_from . ':end=' . $from;
@@ -133,7 +133,7 @@ if ($percentile) {
     $rrd_options .= ' LINE1:dpercentile_out#aa0000';
 }
 
-if (isset($_GET['previous']) && $_GET['previous'] == 'yes') {
+if ($graph_params->visible('previous')) {
     $rrd_options .= ' LINE1.25:in' . $format . "X#666666:'Prev In \\\\n'";
     $rrd_options .= ' AREA:in' . $format . 'X#99999966' . $stacked['transparency'] . ':';
     $rrd_options .= ' LINE1.25:dout' . $format . "X#666666:'Prev Out'";

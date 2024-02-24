@@ -1,0 +1,18 @@
+os: hatteras
+text: 'Hatteras Overdue DSLAM'
+type: network 
+icon: hatteras
+
+empty_ifdescr: true
+ifname: true
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+discovery:
+    - sysDescr:
+            - HN4000-I
+            - HN4000e
+bad_if:
+  - notPresent
+  - serConsole
+good_if:
+  - ras #all interfaces has 'Hatteras' in it...

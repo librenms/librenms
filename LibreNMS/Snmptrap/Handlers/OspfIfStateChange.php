@@ -29,6 +29,7 @@
 namespace LibreNMS\Snmptrap\Handlers;
 
 use App\Models\Device;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
 use Log;
@@ -58,34 +59,14 @@ class OspfIfStateChange implements SnmptrapHandler
 
         $ospfPort->ospfIfState = $trap->getOidData($trap->findOid('OSPF-MIB::ospfIfState'));
 
-        switch ($ospfPort->ospfIfState) {
-            case 'down':
-                $severity = 5;
-                break;
-            case 'designatedRouter':
-                $severity = 1;
-                break;
-            case 'backupDesignatedRouter':
-                $severity = 1;
-                break;
-            case 'otherDesignatedRouter':
-                $severity = 1;
-                break;
-            case 'pointToPoint':
-                $severity = 1;
-                break;
-            case 'waiting':
-                $severity = 4;
-                break;
-            case 'loopback':
-                $severity = 4;
-                break;
-            default:
-                $severity = 0;
-                break;
-        }
+        $severity = match ($ospfPort->ospfIfState) {
+            'down' => Severity::Error,
+            'designatedRouter', 'backupDesignatedRouter', 'otherDesignatedRouter', 'pointToPoint' => Severity::Ok,
+            'waiting', 'loopback' => Severity::Warning,
+            default => Severity::Unknown,
+        };
 
-        Log::event("OSPF interface $port->ifName is $ospfPort->ospfIfState", $device->device_id, 'trap', $severity);
+        $trap->log("OSPF interface $port->ifName is $ospfPort->ospfIfState", $severity);
 
         $ospfPort->save();
     }

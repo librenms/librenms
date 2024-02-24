@@ -26,6 +26,7 @@
 namespace LibreNMS\Snmptrap\Handlers;
 
 use App\Models\Device;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
 use Log;
@@ -54,6 +55,6 @@ class JnxDomLaneAlarmSet implements SnmptrapHandler
             return;
         }
 
-        Log::event("DOM lane alarm on interface $port->ifDescr lane $lane. Current alarm(s): $alarmList", $device->device_id, 'trap', 5);
+        $trap->log("DOM lane alarm on interface $port->ifDescr lane $lane. Current alarm(s): $alarmList", Severity::Error);
     }
 }

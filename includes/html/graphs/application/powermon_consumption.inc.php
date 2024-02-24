@@ -49,10 +49,6 @@ $ds_list[1]['descr'] = '  Total Cost';
 $ds_list[1]['units_text'] = '$';
 $ds_list[1]['colour'] = '006600'; // money green
 
-if ($_GET['debug']) {
-    print_r($ds_list);
-}
-
 // COMMON OPTIONS
 
 //$from = ;

@@ -24,48 +24,40 @@
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
-use LibreNMS\Util\Proxy;
+use LibreNMS\Exceptions\AlertTransportDeliveryException;
+use LibreNMS\Util\Http;
 
 class Playsms extends Transport
 {
-    protected $name = 'playSMS';
+    protected string $name = 'playSMS';
 
-    public function deliverAlert($obj, $opts)
+    public function deliverAlert(array $alert_data): bool
     {
-        $playsms_opts['url'] = $this->config['playsms-url'];
-        $playsms_opts['user'] = $this->config['playsms-user'];
-        $playsms_opts['token'] = $this->config['playsms-token'];
-        $playsms_opts['from'] = $this->config['playsms-from'];
-        $playsms_opts['to'] = preg_split('/([,\r\n]+)/', $this->config['playsms-mobiles']);
+        $to = preg_split('/([,\r\n]+)/', $this->config['playsms-mobiles']);
 
-        return $this->contactPlaysms($obj, $playsms_opts);
-    }
-
-    public static function contactPlaysms($obj, $opts)
-    {
-        $data = ['u' => $opts['user'], 'h' => $opts['token'], 'to' => implode(',', $opts['to']), 'msg' => $obj['title']];
-        if (! empty($opts['from'])) {
-            $data['from'] = $opts['from'];
-        }
-        $url = $opts['url'] . '&op=pv&' . http_build_query($data);
-        $curl = curl_init($url);
-
-        Proxy::applyToCurl($curl);
-        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'GET');
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-
-        $ret = curl_exec($curl);
-        $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-        if ($code > 202) {
-            var_dump($ret);
-
-            return;
+        $url = str_replace('?app=ws', '', $this->config['playsms-url']); // remove old format
+        $data = [
+            'app' => 'ws',
+            'op' => 'pv',
+            'u' => $this->config['playsms-user'],
+            'h' => $this->config['playsms-token'],
+            'to' => implode(',', $to),
+            'msg' => $alert_data['title'],
+        ];
+        if (! empty($this->config['playsms-from'])) {
+            $data['from'] = $this->config['playsms-from'];
         }
 
-        return true;
+        $res = Http::client()->get($url, $data);
+
+        if ($res->successful()) {
+            return true;
+        }
+
+        throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), $data['msg'], $data);
     }
 
-    public static function configTemplate()
+    public static function configTemplate(): array
     {
         return [
             'config' => [
@@ -85,7 +77,7 @@ class Playsms extends Transport
                     'title' => 'Token',
                     'name' => 'playsms-token',
                     'descr' => 'PlaySMS Token',
-                    'type' => 'text',
+                    'type' => 'password',
                 ],
                 [
                     'title' => 'From',
@@ -101,9 +93,9 @@ class Playsms extends Transport
                 ],
             ],
             'validation' => [
-                'playsms-url'     => 'required|url',
-                'playsms-user'    => 'required|string',
-                'playsms-token'   => 'required|string',
+                'playsms-url' => 'required|url',
+                'playsms-user' => 'required|string',
+                'playsms-token' => 'required|string',
                 'playsms-mobiles' => 'required',
             ],
         ];

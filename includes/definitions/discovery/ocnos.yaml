@@ -1,0 +1,9 @@
+modules:
+  os:
+    sysDescr_regex: '/Hardware Model:(?<hardware>\S+), Software version: OcNOS,(?<version>\S+)/'
+    hardware:
+      - CMM-CHASSIS-MIB::cmmStackUnitModelName.1
+      - CMM-CHASSIS-MIB::cmmStackVendorName.1
+    hardware_template: '{{ CMM-CHASSIS-MIB::cmmStackVendorName.1 }} {{ CMM-CHASSIS-MIB::cmmStackUnitModelName.1 }}'
+    serial: CMM-CHASSIS-MIB::cmmStackUnitSerialNumber.1
+

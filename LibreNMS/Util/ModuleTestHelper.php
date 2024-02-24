@@ -54,7 +54,7 @@ class ModuleTestHelper
 
     // Definitions
     // ignore these when dumping all modules
-    private $exclude_from_all = ['arp-table', 'fdb-table'];
+    private $exclude_from_all = ['arp-table', 'availability', 'fdb-table'];
 
     /**
      * ModuleTester constructor.
@@ -147,11 +147,11 @@ class ModuleTestHelper
 
                 $snmp_options = ['-OUneb', '-Ih', '-m', '+' . $oid_data['mib']];
                 if ($oid_data['method'] == 'walk') {
-                    $data = \SnmpQuery::options($snmp_options)->context($context)->mibDir($oid_data['mibdir'])->walk($oid_data['oid']);
+                    $data = \SnmpQuery::options($snmp_options)->context($context)->mibDir($oid_data['mibdir'] ?? null)->walk($oid_data['oid']);
                 } elseif ($oid_data['method'] == 'get') {
-                    $data = \SnmpQuery::options($snmp_options)->context($context)->mibDir($oid_data['mibdir'])->get($oid_data['oid']);
+                    $data = \SnmpQuery::options($snmp_options)->context($context)->mibDir($oid_data['mibdir'] ?? null)->get($oid_data['oid']);
                 } elseif ($oid_data['method'] == 'getnext') {
-                    $data = \SnmpQuery::options($snmp_options)->context($context)->mibDir($oid_data['mibdir'])->next($oid_data['oid']);
+                    $data = \SnmpQuery::options($snmp_options)->context($context)->mibDir($oid_data['mibdir'] ?? null)->next($oid_data['oid']);
                 }
 
                 if (isset($data) && $data->isValid()) {
@@ -191,7 +191,7 @@ class ModuleTestHelper
         $collection_output = preg_replace('/\033\[[\d;]+m/', '', $collection_output);
 
         // extract snmp queries
-        $snmp_query_regex = '/SNMP\[.*snmp(?:bulk)?([a-z]+)\' .+(udp|tcp|tcp6|udp6):(?:\[[0-9a-f:]+\]|[^:]+):[0-9]+\' \'(.+)\']/';
+        $snmp_query_regex = '/^SNMP\[\'.*snmp(?:bulk)?(walk|get|getnext)\' .+\'(udp|tcp|tcp6|udp6):(?:\[[0-9a-f:]+\]|[^:]+):[0-9]+\' \'(.+)\'\]$/m';
         preg_match_all($snmp_query_regex, $collection_output, $snmp_matches);
 
         // extract mibs and group with oids
@@ -203,7 +203,7 @@ class ModuleTestHelper
         ];
         foreach ($snmp_matches[0] as $index => $line) {
             preg_match("/'-m' '\+?([a-zA-Z0-9:\-]+)'/", $line, $mib_matches);
-            $mib = $mib_matches[1];
+            $mib = $mib_matches[1] ?? null;
             preg_match("/'-M' '\+?([a-zA-Z0-9:\-\/]+)'/", $line, $mibdir_matches);
             $mibdir = $mibdir_matches[1];
             $method = $snmp_matches[1][$index];
@@ -357,7 +357,7 @@ class ModuleTestHelper
     private function convertSnmpToSnmprec(SnmpResponse $snmp_data): array
     {
         $result = [];
-        foreach (explode(PHP_EOL, $snmp_data->raw()) as $line) {
+        foreach (explode(PHP_EOL, $snmp_data->raw) as $line) {
             if (empty($line)) {
                 continue;
             }
@@ -489,7 +489,7 @@ class ModuleTestHelper
 
         foreach ($snmprec_data as $line) {
             if (! empty($line)) {
-                [$oid,] = explode('|', $line, 2);
+                [$oid] = explode('|', $line, 2);
                 $result[$oid] = $line;
             }
         }
@@ -512,6 +512,19 @@ class ModuleTestHelper
                 $data[$oid] = implode('|', $parts);
             }
         }
+
+        // IF-MIB::ifPhysAddress, Make sure it is in hex format
+        foreach ($data as $oid => $oid_data) {
+            if (str_starts_with($oid, '1.3.6.1.2.1.2.2.1.6.')) {
+                $parts = explode('|', $oid_data, 3);
+                $mac = Mac::parse($parts[2])->hex();
+                if ($mac) {
+                    $parts[2] = $mac;
+                    $parts[1] = '4x';
+                    $data[$oid] = implode('|', $parts);
+                }
+            }
+        }
     }
 
     /**
@@ -529,6 +542,17 @@ class ModuleTestHelper
         global $device;
         Config::set('rrd.enable', false); // disable rrd
         Config::set('rrdtool_version', '1.7.2'); // don't detect rrdtool version, rrdtool is not install on ci
+
+        // don't allow external DNS queries that could fail
+        app()->bind(\LibreNMS\Util\AutonomousSystem::class, function ($app, $parameters) {
+            $asn = $parameters['asn'];
+            $mock = \Mockery::mock(\LibreNMS\Util\AutonomousSystem::class);
+            $mock->shouldReceive('name')->withAnyArgs()->zeroOrMoreTimes()->andReturnUsing(function () use ($asn) {
+                return "AS$asn-MOCK-TEXT";
+            });
+
+            return $mock;
+        });
 
         if (! is_file($this->snmprec_file)) {
             throw new FileNotFoundException("$this->snmprec_file does not exist!");

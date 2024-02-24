@@ -79,7 +79,7 @@ class SmokepingGenerateCommand extends LnmsCommand
 
         $devices = Device::isNotDisabled()->orderBy('type')->orderBy('hostname')->get();
 
-        if (sizeof($devices) < 1) {
+        if (count($devices) < 1) {
             $this->error(__('commands.smokeping:generate.no-devices'));
 
             return 3;
@@ -127,7 +127,10 @@ class SmokepingGenerateCommand extends LnmsCommand
         // Take the devices array and build it into a hierarchical list
         $smokelist = [];
         foreach ($devices as $device) {
-            $smokelist[$device->type][$device->hostname] = ['transport' => $device->transport];
+            $smokelist[$device->type][$device->hostname] = [
+                'transport' => $device->transport,
+                'displayname' => $device->displayName(),
+            ];
         }
 
         $targets = $this->buildTargets($smokelist, Config::get('smokeping.probes'), $this->option('single-process'));
@@ -315,8 +318,8 @@ class SmokepingGenerateCommand extends LnmsCommand
         foreach ($devices as $hostname => $config) {
             if (! $this->dnsLookup || $this->deviceIsResolvable($hostname)) {
                 $lines[] = sprintf('++ %s', $this->buildMenuEntry($hostname));
-                $lines[] = sprintf('   menu = %s', $hostname);
-                $lines[] = sprintf('   title = %s', $hostname);
+                $lines[] = sprintf('   menu = %s', $config['displayname']);
+                $lines[] = sprintf('   title = %s', $config['displayname']);
 
                 if (! $singleProcess) {
                     $lines[] = sprintf('   probe = %s', $this->balanceProbes($config['transport'], $probeCount));
@@ -338,6 +341,9 @@ class SmokepingGenerateCommand extends LnmsCommand
      */
     private function deviceIsResolvable($hostname)
     {
+        if (empty($hostname)) {
+            return false;
+        }
         // First we check for IP literals, then for a dns entry, finally for a hosts entry due to a PHP/libc limitation
         // We look for the hosts entry last (and separately) as this only works for v4 - v6 host entries won't be found
         if (filter_var($hostname, FILTER_VALIDATE_IP) || checkdnsrr($hostname, 'ANY') || is_array(gethostbynamel($hostname))) {

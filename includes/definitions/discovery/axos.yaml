@@ -1,0 +1,146 @@
+mib: CALIX-PRODUCT-MIB:AXOS-ALARM-MIB:Axos-Card-MIB:Axos-Ont-MIB:Axos-System-MIB:Axos-Trap-MIB
+modules:
+    os:
+        serial: Axos-System-MIB::axosSystemChassisSerialNumber.0
+        sysDescr_regex: '/(?<hardware>.*)/'
+    sensors:
+        temperature:
+            data:
+                -
+                    oid: AxosOltPonPortEntry
+                    value: axosOltPonPortTemperature
+                    num_oid: '.1.3.6.1.4.1.6321.1.2.4.2.4.2.1.4.{{ $index }}'
+                    descr: 'axosOltPonPortName'
+                    index: 'axosOltPonPortTemperature.{{ $index }}'
+                    divisor: 1000
+                    skip_values:
+                        -
+                            oid: axosOltPonPortStatus
+                            op: '='
+                            value: 0
+        voltage:
+            data:
+                -
+                    oid: AxosOltPonPortEntry
+                    value: axosOltPonPortVoltage
+                    num_oid: '.1.3.6.1.4.1.6321.1.2.4.2.4.2.1.8.{{ $index }}'
+                    descr: 'axosOltPonPortName'
+                    index: 'axosOltPonPortVoltage.{{ $index }}'
+                    divisor: 1000
+                    skip_values:
+                        -
+                            oid: axosOltPonPortStatus
+                            op: '='
+                            value: 0
+
+        state:
+            data:
+                -
+                    oid: axosCardTable
+                    value: axosCardAdminStatus
+                    num_oid: '.1.3.6.1.4.1.6321.1.2.4.2.4.1.1.3.{{ $index }}'
+                    descr: '{{ $axosCardSerialNumber }}'
+                    index: axosCardAdminStatus.{{ $index }}
+                    state_name: axosCardAdminStatus
+                    states:
+                        - { value: 0, generic: 3, graph: 0, descr: Unknown }
+                        - { value: 1, generic: 0, graph: 0, descr: Enabled }
+                        - { value: 2, generic: 1, graph: 0, descr: Alarm Suppress }
+                        - { value: 3, generic: 0, graph: 0, descr: Disabled }
+                -
+                    oid: axosOntTable
+                    value: axosOntOperStatus
+                    num_oid: '.1.3.6.1.4.1.6321.1.2.4.2.6.1.1.4.{{ $index }}'
+                    descr: 'ONT {{ $axosOntID }} Oper Status'
+                    index: axosOntOperStatus.{{ $index }}
+                    state_name: axosOntOperStatus
+                    states:
+                      - { value: 0, generic: 3, graph: 0, descr: Unknown }
+                      - { value: 1, generic: 0, graph: 0, descr: Enabled }
+                      - { value: 2, generic: 0, graph: 0, descr: Disabled }
+                -
+                    oid: axosOntTable
+                    value: axosOntAdminStatus
+                    num_oid: '.1.3.6.1.4.1.6321.1.2.4.2.6.1.1.3.{{ $index }}'
+                    descr: 'ONT {{ $axosOntID }} Admin Status'
+                    index: axosOntAdminStatus.{{ $index }}
+                    state_name: axosOntAdminStatus
+                    states:
+                      - { value: 0, generic: 3, graph: 0, descr: Unknown }
+                      - { value: 1, generic: 0, graph: 0, descr: Enabled }
+                      - { value: 2, generic: 0, graph: 0, descr: Disabled }
+
+        dbm:
+            data:
+                -
+                    oid: AxosOltPonPortEntry
+                    value: axosOltPonPortRxPower
+                    num_oid: '.1.3.6.1.4.1.6321.1.2.4.2.4.2.1.7.{{ $index }}'
+                    descr: '{{ $axosOltPonPortName }} Rx Power'
+                    index: 'axosOltPonPortRxPower.{{ $index }}'
+                    group: '{{ $axosOltPonPortName }}'
+                    divisor: 10000
+                    user_func: 'mw_to_dbm'
+                    skip_values:
+                        -
+                            oid: axosOltPonPortStatus
+                            op: '='
+                            value: 2
+                -
+                    oid: AxosOltPonPortEntry
+                    value: axosOltPonPortTxPower
+                    num_oid: '.1.3.6.1.4.1.6321.1.2.4.2.4.2.1.6.{{ $index }}'
+                    descr: '{{ $axosOltPonPortName }} Tx Power'
+                    index: 'axosOltPonPortTxPower.{{ $index }}'
+                    group: '{{ $axosOltPonPortName }}'
+                    divisor: 10000
+                    user_func: 'mw_to_dbm'
+                    skip_values:
+                        -
+                            oid: axosOltPonPortStatus
+                            op: '='
+                            value: 2
+
+                -
+                    oid: AxosOntTable
+                    value: axosOntRxOpticalLevel
+                    num_oid: '.1.3.6.1.4.1.6321.1.2.4.2.6.1.1.6.{{ $index }}'
+                    descr: "ONT {{ $axosOntID }} RX Power"
+                    group: 'ONT {{ $axosOntID }}'
+                    index: 'axosOntRxOpticalLevel.{{ $index }}'
+                    divisor: 10000
+                    user_func: 'mw_to_dbm'
+                    skip_values:
+                        -
+                            oid: axosOntAdminStatus
+                            op: '='
+                            value: 2
+                -
+                    oid: AxosOntTable
+                    value: axosOntFarEndRxOpticalLevel
+                    num_oid: '.1.3.6.1.4.1.6321.1.2.4.2.6.1.1.6.{{ $index }}'
+                    descr: "ONT {{ $axosOntID }} OLT RX Signal Level"
+                    group: 'ONT {{ $axosOntID }}'
+                    index: 'axosOntFarEndRxOpticalLevel.{{ $index }}'
+                    divisor: 10000
+                    user_func: 'mw_to_dbm'
+                    skip_values:
+                        -
+                            oid: axosOntAdminStatus
+                            op: '='
+                            value: 2
+                -
+                    oid: AxosOntTable
+                    value: axosOntTxOpticalLevel
+                    num_oid: '.1.3.6.1.4.1.6321.1.2.4.2.6.1.1.7.{{ $index }}'
+                    descr: "ONT {{ $axosOntID }} TX Power"
+                    group: 'ONT {{ $axosOntID }}'
+                    index: 'axosOntTxOpticalLevel.{{ $index }}'
+                    divisor: 10000
+                    user_func: 'mw_to_dbm'
+                    skip_values:
+                        -
+                            oid: axosOntAdminStatus
+                            op: '='
+                            value: 2
+

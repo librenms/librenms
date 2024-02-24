@@ -22,9 +22,7 @@
 
 namespace LibreNMS\Tests\Feature\SnmpTraps;
 
-use App\Models\Device;
-use LibreNMS\Snmptrap\Dispatcher;
-use LibreNMS\Snmptrap\Trap;
+use LibreNMS\Enum\Severity;
 
 class ApcPduOverloadTest extends SnmpTrapTestCase
 {
@@ -33,23 +31,23 @@ class ApcPduOverloadTest extends SnmpTrapTestCase
      *
      * @return void
      */
-    public function testNearOverload()
+    public function testNearOverload(): void
     {
-        $device = Device::factory()->create(); /** @var Device $device */
-        $trapText = "$device->hostname
-UDP: [$device->ip]:57602->[192.168.5.5]:162
+        $this->assertTrapLogsMessage(<<<'TRAP'
+{{ hostname }}
+UDP: [{{ ip }}]:57602->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 318:0:09:38.28
 SNMPv2-MIB::snmpTrapOID.0 PowerNet-MIB::rPDUNearOverload
-PowerNet-MIB::rPDUIdentSerialNumber.0 \"5A1036E02224\"
-PowerNet-MIB::rPDUIdentName.0 \"Grand POP PDU R15 A1\"
+PowerNet-MIB::rPDUIdentSerialNumber.0 "5A1036E02224"
+PowerNet-MIB::rPDUIdentName.0 "Grand POP PDU R15 A1"
 PowerNet-MIB::rPDULoadStatusPhaseNumber.0 1
-PowerNet-MIB::mtrapargsString.0 \"Metered Rack PDU: Near overload.\"
-SNMPv2-MIB::snmpTrapEnterprise.0 PowerNet-MIB::apc";
-
-        $trap = new Trap($trapText);
-        $message = 'Grand POP PDU R15 A1 phase 1 Metered Rack PDU: Near overload.';
-        \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 4);
-        $this->assertTrue(Dispatcher::handle($trap), 'Could not handle rPDUNearOverload trap');
+PowerNet-MIB::mtrapargsString.0 "Metered Rack PDU: Near overload."
+SNMPv2-MIB::snmpTrapEnterprise.0 PowerNet-MIB::apc
+TRAP,
+            'Grand POP PDU R15 A1 phase 1 Metered Rack PDU: Near overload.',
+            'Could not handle rPDUNearOverload trap',
+            [Severity::Warning],
+        );
     }
 
     /**
@@ -57,23 +55,23 @@ SNMPv2-MIB::snmpTrapEnterprise.0 PowerNet-MIB::apc";
      *
      * @return void
      */
-    public function testNearOverloadClear()
+    public function testNearOverloadClear(): void
     {
-        $device = Device::factory()->create(); /** @var Device $device */
-        $trapText = "$device->hostname
-UDP: [$device->ip]:57602->[192.168.5.5]:162
+        $this->assertTrapLogsMessage(<<<'TRAP'
+{{ hostname }}
+UDP: [{{ ip }}]:57602->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 318:0:09:38.28
 SNMPv2-MIB::snmpTrapOID.0 PowerNet-MIB::rPDUNearOverloadCleared
-PowerNet-MIB::rPDUIdentSerialNumber.0 \"5A1036E02224\"
-PowerNet-MIB::rPDUIdentName.0 \"Grand POP PDU R15 A1\"
+PowerNet-MIB::rPDUIdentSerialNumber.0 "5A1036E02224"
+PowerNet-MIB::rPDUIdentName.0 "Grand POP PDU R15 A1"
 PowerNet-MIB::rPDULoadStatusPhaseNumber.0 1
-PowerNet-MIB::mtrapargsString.0 \"Metered Rack PDU: Near overload cleared.\"
-SNMPv2-MIB::snmpTrapEnterprise.0 PowerNet-MIB::apc";
-
-        $trap = new Trap($trapText);
-        $message = 'Grand POP PDU R15 A1 phase 1 Metered Rack PDU: Near overload cleared.';
-        \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 1);
-        $this->assertTrue(Dispatcher::handle($trap), 'Could not handle rPDUNearOverloadClear trap');
+PowerNet-MIB::mtrapargsString.0 "Metered Rack PDU: Near overload cleared."
+SNMPv2-MIB::snmpTrapEnterprise.0 PowerNet-MIB::apc
+TRAP,
+            'Grand POP PDU R15 A1 phase 1 Metered Rack PDU: Near overload cleared.',
+            'Could not handle rPDUNearOverloadClear trap',
+            [Severity::Ok],
+        );
     }
 
     /**
@@ -81,23 +79,23 @@ SNMPv2-MIB::snmpTrapEnterprise.0 PowerNet-MIB::apc";
      *
      * @return void
      */
-    public function testOverload()
+    public function testOverload(): void
     {
-        $device = Device::factory()->create(); /** @var Device $device */
-        $trapText = "$device->hostname
-UDP: [$device->ip]:57602->[192.168.5.5]:162
+        $this->assertTrapLogsMessage(<<<'TRAP'
+{{ hostname }}
+UDP: [{{ ip }}]:57602->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 318:0:09:38.28
 SNMPv2-MIB::snmpTrapOID.0 PowerNet-MIB::rPDUOverload
-PowerNet-MIB::rPDUIdentSerialNumber.0 \"5A1036E02224\"
-PowerNet-MIB::rPDUIdentName.0 \"Grand POP PDU R15 A1\"
+PowerNet-MIB::rPDUIdentSerialNumber.0 "5A1036E02224"
+PowerNet-MIB::rPDUIdentName.0 "Grand POP PDU R15 A1"
 PowerNet-MIB::rPDULoadStatusPhaseNumber.0 1
-PowerNet-MIB::mtrapargsString.0 \"APC Rack PDU: Overload condition.\"
-SNMPv2-MIB::snmpTrapEnterprise.0 PowerNet-MIB::apc";
-
-        $trap = new Trap($trapText);
-        $message = 'Grand POP PDU R15 A1 phase 1 APC Rack PDU: Overload condition.';
-        \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 5);
-        $this->assertTrue(Dispatcher::handle($trap), 'Could not handle rPDUOverload trap');
+PowerNet-MIB::mtrapargsString.0 "APC Rack PDU: Overload condition."
+SNMPv2-MIB::snmpTrapEnterprise.0 PowerNet-MIB::apc
+TRAP,
+            'Grand POP PDU R15 A1 phase 1 APC Rack PDU: Overload condition.',
+            'Could not handle rPDUOverload trap',
+            [Severity::Error],
+        );
     }
 
     /**
@@ -105,22 +103,22 @@ SNMPv2-MIB::snmpTrapEnterprise.0 PowerNet-MIB::apc";
      *
      * @return void
      */
-    public function testOverloadClear()
+    public function testOverloadClear(): void
     {
-        $device = Device::factory()->create(); /** @var Device $device */
-        $trapText = "$device->hostname
-UDP: [$device->ip]:57602->[192.168.5.5]:162
+        $this->assertTrapLogsMessage(<<<'TRAP'
+{{ hostname }}
+UDP: [{{ ip }}]:57602->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 318:0:09:38.28
 SNMPv2-MIB::snmpTrapOID.0 PowerNet-MIB::rPDUOverloadCleared
-PowerNet-MIB::rPDUIdentSerialNumber.0 \"5A1036E02224\"
-PowerNet-MIB::rPDUIdentName.0 \"Grand POP PDU R15 A1\"
+PowerNet-MIB::rPDUIdentSerialNumber.0 "5A1036E02224"
+PowerNet-MIB::rPDUIdentName.0 "Grand POP PDU R15 A1"
 PowerNet-MIB::rPDULoadStatusPhaseNumber.0 1
-PowerNet-MIB::mtrapargsString.0 \"APC Rack PDU: Overload condition has cleared.\"
-SNMPv2-MIB::snmpTrapEnterprise.0 PowerNet-MIB::apc";
-
-        $trap = new Trap($trapText);
-        $message = 'Grand POP PDU R15 A1 phase 1 APC Rack PDU: Overload condition has cleared.';
-        \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 1);
-        $this->assertTrue(Dispatcher::handle($trap), 'Could not handle rPDUOverloadClear trap');
+PowerNet-MIB::mtrapargsString.0 "APC Rack PDU: Overload condition has cleared."
+SNMPv2-MIB::snmpTrapEnterprise.0 PowerNet-MIB::apc
+TRAP,
+            'Grand POP PDU R15 A1 phase 1 APC Rack PDU: Overload condition has cleared.',
+            'Could not handle rPDUOverloadClear trap',
+            [Severity::Ok],
+        );
     }
 }

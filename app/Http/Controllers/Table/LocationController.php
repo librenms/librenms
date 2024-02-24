@@ -35,6 +35,7 @@ class LocationController extends TableController
      *
      * @param  \Illuminate\Http\Request  $request
      * @return array
+     *
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function searchFields($request)
@@ -78,7 +79,7 @@ class LocationController extends TableController
     {
         return [
             'id' => $location->id,
-            'location' => $location->location,
+            'location' => htmlspecialchars($location->location),
             'lat' => $location->lat,
             'lng' => $location->lng,
             'down' => $location->devices()->isDown()->count(),

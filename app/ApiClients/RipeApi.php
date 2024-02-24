@@ -25,25 +25,21 @@
 
 namespace App\ApiClients;
 
-use GuzzleHttp\Exception\RequestException;
-use LibreNMS\Exceptions\ApiException;
+use LibreNMS\Exceptions\ApiClientException;
 
 class RipeApi extends BaseApi
 {
-    protected $base_uri = 'https://stat.ripe.net';
+    protected string $base_uri = 'https://stat.ripe.net';
 
-    protected $whois_uri = '/data/whois/data.json';
-    protected $abuse_uri = '/data/abuse-contact-finder/data.json';
+    protected string $whois_uri = '/data/whois/data.json';
+    protected string $abuse_uri = '/data/abuse-contact-finder/data.json';
 
     /**
      * Get whois info
      *
-     * @param  string  $resource  ASN/IPv4/IPv6
-     * @return array
-     *
-     * @throws ApiException
+     * @throws ApiClientException
      */
-    public function getWhois($resource)
+    public function getWhois(string $resource): array
     {
         return $this->makeApiCall($this->whois_uri, [
             'query' => [
@@ -55,12 +51,9 @@ class RipeApi extends BaseApi
     /**
      * Get Abuse contact
      *
-     * @param  string  $resource  prefix, single IP address or ASN
-     * @return array|mixed
-     *
-     * @throws ApiException
+     * @throws ApiClientException
      */
-    public function getAbuseContact($resource)
+    public function getAbuseContact(string $resource): mixed
     {
         return $this->makeApiCall($this->abuse_uri, [
             'query' => [
@@ -70,27 +63,16 @@ class RipeApi extends BaseApi
     }
 
     /**
-     * @return array|mixed
-     *
-     * @throws ApiException
+     * @throws ApiClientException
      */
-    private function makeApiCall(string $uri, array $options)
+    private function makeApiCall(string $uri, array $options): mixed
     {
-        try {
-            $response_data = $this->getClient()->get($uri, $options)->json();
-            if (isset($response_data['status']) && $response_data['status'] == 'ok') {
-                return $response_data;
-            } else {
-                throw new ApiException('RIPE API call failed', $response_data);
-            }
-        } catch (RequestException $e) {
-            $message = 'RIPE API call to ' . $e->getRequest()->getUri() . ' failed: ';
-            $message .= $e->getResponse()->getReasonPhrase() . ' ' . $e->getResponse()->getStatusCode();
+        $response_data = $this->getClient()->get($uri, $options['query'])->json();
 
-            throw new ApiException(
-                $message,
-                json_decode($e->getResponse()->getBody(), true)
-            );
+        if (isset($response_data['status']) && $response_data['status'] == 'ok') {
+            return $response_data;
         }
+
+        throw new ApiClientException("RIPE API call to $this->base_uri/$uri failed: " . $this->getClient()->get($uri, $options['query'])->status(), $response_data);
     }
 }

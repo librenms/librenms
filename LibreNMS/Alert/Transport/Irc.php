@@ -25,34 +25,36 @@ namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
 use LibreNMS\Config;
+use LibreNMS\Exceptions\AlertTransportDeliveryException;
 
 class Irc extends Transport
 {
-    protected $name = 'IRC';
+    protected string $name = 'IRC';
 
-    public function deliverAlert($obj, $opts)
+    public function deliverAlert(array $alert_data): bool
     {
-        return $this->contactIrc($obj, $opts);
-    }
-
-    public function contactIrc($obj, $opts)
-    {
-        $f = Config::get('install_dir') . '/.ircbot.alert';
+        $container_dir = '/data';
+        if (file_exists($container_dir) and posix_getpwuid(fileowner($container_dir))['name'] == 'librenms') {
+            $f = $container_dir . '/.ircbot.alert';
+        } else {
+            $f = Config::get('install_dir') . '/.ircbot.alert';
+        }
         if (file_exists($f) && filetype($f) == 'fifo') {
             $f = fopen($f, 'w+');
-            $r = fwrite($f, json_encode($obj) . "\n");
-            $f = fclose($f);
+            $r = fwrite($f, json_encode($alert_data) . "\n");
+            fclose($f);
+
             if ($r === false) {
-                return false;
-            } else {
-                return true;
+                throw new AlertTransportDeliveryException($alert_data, 0, 'Could not write to fifo', $alert_data['msg'], $alert_data);
             }
+
+            return true;
         }
 
-        return false;
+        throw new AlertTransportDeliveryException($alert_data, 0, 'fifo does not exist', $alert_data['msg'], $alert_data);
     }
 
-    public static function configTemplate()
+    public static function configTemplate(): array
     {
         return [
             'config' => [
@@ -60,7 +62,7 @@ class Irc extends Transport
                     'title' => 'IRC',
                     'name' => 'irc',
                     'descr' => 'Enable IRC alerts',
-                    'type'  => 'checkbox',
+                    'type' => 'checkbox',
                     'default' => true,
                 ],
             ],

@@ -1,0 +1,1659 @@
+CONEL-MOBILE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+					enterprises, IpAddress
+						FROM RFC1155-SMI
+					OBJECT-TYPE
+						FROM RFC-1212;
+
+conel					OBJECT IDENTIFIER ::= { enterprises 30140 }
+
+mobile					OBJECT IDENTIFIER ::= { conel 4 }
+
+mobileTechnology			OBJECT-TYPE
+					SYNTAX	INTEGER {
+						none (0),
+						gprs (2),
+						edge (4),
+						umts (6),
+						hsdpa (8),
+						hsupa (10),
+						hspa (12),
+						lte (14),
+						cdma (16),
+						evdo (18),
+						evdo0 (20),
+						evdoA (22),
+						evdoB (24),
+						nbiot (26),
+						lteM (28),
+						nr5gNSA (30),
+						nr5gSA (32)
+					}
+					ACCESS	read-only
+					STATUS	current
+					::= { mobile 1 }
+
+mobilePLMN				OBJECT-TYPE
+					SYNTAX	OCTET STRING
+					ACCESS	read-only
+					STATUS	current
+					::= { mobile 2 }
+
+mobileCell				OBJECT-TYPE
+					SYNTAX	OCTET STRING
+					ACCESS	read-only
+					STATUS	current
+					::= { mobile 3 }
+
+mobileChannel				OBJECT-TYPE
+					SYNTAX	OCTET STRING
+					ACCESS	read-only
+					STATUS	current
+					::= { mobile 4 }
+
+mobileSignalStrength			OBJECT-TYPE
+					SYNTAX	INTEGER
+					ACCESS	read-only
+					STATUS	current
+					::= { mobile 5 }
+
+mobileChannelN1				OBJECT-TYPE
+					SYNTAX	OCTET STRING
+					ACCESS	read-only
+					STATUS	current
+					::= { mobile 6 }
+
+mobileSignalStrengthN1			OBJECT-TYPE
+					SYNTAX	INTEGER
+					ACCESS	read-only
+					STATUS	current
+					::= { mobile 7 }
+
+mobileChannelN2				OBJECT-TYPE
+					SYNTAX	OCTET STRING
+					ACCESS	read-only
+					STATUS	current
+					::= { mobile 8 }
+
+mobileSignalStrengthN2			OBJECT-TYPE
+					SYNTAX	INTEGER
+					ACCESS	read-only
+					STATUS	current
+					::= { mobile 9 }
+
+mobileChannelN3				OBJECT-TYPE
+					SYNTAX	OCTET STRING
+					ACCESS	read-only
+					STATUS	current
+					::= { mobile 10 }
+
+mobileSignalStrengthN3			OBJECT-TYPE
+					SYNTAX	INTEGER
+					ACCESS	read-only
+					STATUS	current
+					::= { mobile 11 }
+
+mobileChannelN4				OBJECT-TYPE
+					SYNTAX	OCTET STRING
+					ACCESS	read-only
+					STATUS	current
+					::= { mobile 12 }
+
+mobileSignalStrengthN4			OBJECT-TYPE
+					SYNTAX	INTEGER
+					ACCESS	read-only
+					STATUS	current
+					::= { mobile 13 }
+
+mobileChannelN5				OBJECT-TYPE
+					SYNTAX	OCTET STRING
+					ACCESS	read-only
+					STATUS	current
+					::= { mobile 14 }
+
+mobileSignalStrengthN5			OBJECT-TYPE
+					SYNTAX	INTEGER
+					ACCESS	read-only
+					STATUS	current
+					::= { mobile 15 }
+
+mobileUpTime				OBJECT-TYPE
+					SYNTAX	TimeTicks
+					ACCESS	read-only
+					STATUS	current
+					::= { mobile 16 }
+
+mobileConnect				OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobile 17 }
+
+mobileDisconnect			OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobile 18 }
+
+mobileCard				OBJECT-TYPE
+					SYNTAX	INTEGER {
+						primary (0),
+						secondary (1),
+						tertiary (2),
+						quaternary (3)
+					}
+					ACCESS	read-only
+					STATUS	current
+					::= { mobile 19 }
+
+mobileIPAddress				OBJECT-TYPE
+					SYNTAX	IpAddress
+					ACCESS	read-only
+					STATUS	current
+					::= { mobile 20 }
+
+mobileLatency				OBJECT-TYPE
+					SYNTAX	INTEGER
+					ACCESS	read-only
+					STATUS	current
+					::= { mobile 21 }
+
+mobileReportPeriod			OBJECT-TYPE
+					SYNTAX	INTEGER
+					ACCESS	read-only
+					STATUS	current
+					::= { mobile 22 }
+
+mobileRegistration			OBJECT-TYPE
+					SYNTAX	INTEGER {
+						unknown (0),
+						idle (1),
+						search (2),
+						denied (3),
+						home (4),
+						foregien (5)
+					}
+					ACCESS	read-only
+					STATUS	current
+					::= { mobile 23 }
+
+mobileOperator				OBJECT-TYPE
+					SYNTAX	OCTET STRING
+					ACCESS	read-only
+					STATUS	current
+					::= { mobile 24 }
+
+mobileLAC				OBJECT-TYPE
+					SYNTAX	OCTET STRING
+					ACCESS	read-only
+					STATUS	current
+					::= { mobile 25 }
+
+mobileSignalQuality			OBJECT-TYPE
+					SYNTAX	INTEGER
+					ACCESS	read-only
+					STATUS	current
+					::= { mobile 26 }
+
+mobileCSQ				OBJECT-TYPE
+					SYNTAX	INTEGER
+					ACCESS	read-only
+					STATUS	current
+					::= { mobile 27 }
+
+mobilePNOffset				OBJECT-TYPE
+					SYNTAX	INTEGER
+					ACCESS	read-only
+					STATUS	current
+					::= { mobile 28 }
+
+mobileBand				OBJECT-TYPE
+					SYNTAX	OCTET STRING
+					ACCESS	read-only
+					STATUS	current
+					::= { mobile 29 }
+
+mobileRSSI				OBJECT-TYPE
+					SYNTAX	INTEGER
+					ACCESS	read-only
+					STATUS	current
+					::= { mobile 30 }
+
+mobileRSCP				OBJECT-TYPE
+					SYNTAX	INTEGER
+					ACCESS	read-only
+					STATUS	current
+					::= { mobile 31 }
+
+mobileRSRP				OBJECT-TYPE
+					SYNTAX	INTEGER
+					ACCESS	read-only
+					STATUS	current
+					::= { mobile 32 }
+
+mobileRSRQ				OBJECT-TYPE
+					SYNTAX	INTEGER
+					ACCESS	read-only
+					STATUS	current
+					::= { mobile 33 }
+
+mobileEcIo				OBJECT-TYPE
+					SYNTAX	INTEGER
+					ACCESS	read-only
+					STATUS	current
+					::= { mobile 34 }
+
+mobileNRBand				OBJECT-TYPE
+					SYNTAX	OCTET STRING
+					ACCESS	read-only
+					STATUS	current
+					::= { mobile 35 }
+
+mobileNRChannel				OBJECT-TYPE
+					SYNTAX	INTEGER
+					ACCESS	read-only
+					STATUS	current
+					::= { mobile 36 }
+
+mobileNRRSSI				OBJECT-TYPE
+					SYNTAX	INTEGER
+					ACCESS	read-only
+					STATUS	current
+					::= { mobile 37 }
+
+mobileNRRSRP				OBJECT-TYPE
+					SYNTAX	INTEGER
+					ACCESS	read-only
+					STATUS	current
+					::= { mobile 38 }
+
+mobileNRRSRQ				OBJECT-TYPE
+					SYNTAX	INTEGER
+					ACCESS	read-only
+					STATUS	current
+					::= { mobile 39 }
+
+mobileNRSINR				OBJECT-TYPE
+					SYNTAX	INTEGER
+					ACCESS	read-only
+					STATUS	current
+					::= { mobile 40 }
+
+mobileSINR				OBJECT-TYPE
+					SYNTAX	INTEGER
+					ACCESS	read-only
+					STATUS	current
+					::= { mobile 41 }
+
+mobile2Technology			OBJECT-TYPE
+					SYNTAX	INTEGER {
+						none (0),
+						gprs (2),
+						edge (4),
+						umts (6),
+						hsdpa (8),
+						hsupa (10),
+						hspa (12),
+						lte (14),
+						cdma (16),
+						evdo (18),
+						evdo0 (20),
+						evdoA (22),
+						evdoB (24),
+						nbiot (26),
+						lteM (28),
+						nr5gNSA (30),
+						nr5gSA (32)
+					}
+					ACCESS	read-only
+					STATUS	current
+					::= { mobile 101 }
+
+mobile2PLMN				OBJECT-TYPE
+					SYNTAX	OCTET STRING
+					ACCESS	read-only
+					STATUS	current
+					::= { mobile 102 }
+
+mobile2Cell				OBJECT-TYPE
+					SYNTAX	OCTET STRING
+					ACCESS	read-only
+					STATUS	current
+					::= { mobile 103 }
+
+mobile2Channel				OBJECT-TYPE
+					SYNTAX	OCTET STRING
+					ACCESS	read-only
+					STATUS	current
+					::= { mobile 104 }
+
+mobile2SignalStrength			OBJECT-TYPE
+					SYNTAX	INTEGER
+					ACCESS	read-only
+					STATUS	current
+					::= { mobile 105 }
+
+mobile2ChannelN1			OBJECT-TYPE
+					SYNTAX	OCTET STRING
+					ACCESS	read-only
+					STATUS	current
+					::= { mobile 106 }
+
+mobile2SignalStrengthN1			OBJECT-TYPE
+					SYNTAX	INTEGER
+					ACCESS	read-only
+					STATUS	current
+					::= { mobile 107 }
+
+mobile2ChannelN2			OBJECT-TYPE
+					SYNTAX	OCTET STRING
+					ACCESS	read-only
+					STATUS	current
+					::= { mobile 108 }
+
+mobile2SignalStrengthN2			OBJECT-TYPE
+					SYNTAX	INTEGER
+					ACCESS	read-only
+					STATUS	current
+					::= { mobile 109 }
+
+mobile2ChannelN3			OBJECT-TYPE
+					SYNTAX	OCTET STRING
+					ACCESS	read-only
+					STATUS	current
+					::= { mobile 110 }
+
+mobile2SignalStrengthN3			OBJECT-TYPE
+					SYNTAX	INTEGER
+					ACCESS	read-only
+					STATUS	current
+					::= { mobile 111 }
+
+mobile2ChannelN4			OBJECT-TYPE
+					SYNTAX	OCTET STRING
+					ACCESS	read-only
+					STATUS	current
+					::= { mobile 112 }
+
+mobile2SignalStrengthN4			OBJECT-TYPE
+					SYNTAX	INTEGER
+					ACCESS	read-only
+					STATUS	current
+					::= { mobile 113 }
+
+mobile2ChannelN5			OBJECT-TYPE
+					SYNTAX	OCTET STRING
+					ACCESS	read-only
+					STATUS	current
+					::= { mobile 114 }
+
+mobile2SignalStrengthN5			OBJECT-TYPE
+					SYNTAX	INTEGER
+					ACCESS	read-only
+					STATUS	current
+					::= { mobile 115 }
+
+mobile2UpTime				OBJECT-TYPE
+					SYNTAX	TimeTicks
+					ACCESS	read-only
+					STATUS	current
+					::= { mobile 116 }
+
+mobile2Connect				OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobile 117 }
+
+mobile2Disconnect			OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobile 118 }
+
+mobile2Card				OBJECT-TYPE
+					SYNTAX	INTEGER {
+						primary (0),
+						secondary (1),
+						tertiary (2),
+						quaternary (3)
+					}
+					ACCESS	read-only
+					STATUS	current
+					::= { mobile 119 }
+
+mobile2IPAddress			OBJECT-TYPE
+					SYNTAX	IpAddress
+					ACCESS	read-only
+					STATUS	current
+					::= { mobile 120 }
+
+mobile2Latency				OBJECT-TYPE
+					SYNTAX	INTEGER
+					ACCESS	read-only
+					STATUS	current
+					::= { mobile 121 }
+
+mobile2ReportPeriod			OBJECT-TYPE
+					SYNTAX	INTEGER
+					ACCESS	read-only
+					STATUS	current
+					::= { mobile 122 }
+
+mobile2Registration			OBJECT-TYPE
+					SYNTAX	INTEGER {
+						unknown (0),
+						idle (1),
+						search (2),
+						denied (3),
+						home (4),
+						foregien (5)
+					}
+					ACCESS	read-only
+					STATUS	current
+					::= { mobile 123 }
+
+mobile2Operator				OBJECT-TYPE
+					SYNTAX	OCTET STRING
+					ACCESS	read-only
+					STATUS	current
+					::= { mobile 124 }
+
+mobile2LAC				OBJECT-TYPE
+					SYNTAX	OCTET STRING
+					ACCESS	read-only
+					STATUS	current
+					::= { mobile 125 }
+
+mobile2SignalQuality			OBJECT-TYPE
+					SYNTAX	INTEGER
+					ACCESS	read-only
+					STATUS	current
+					::= { mobile 126 }
+
+mobile2CSQ				OBJECT-TYPE
+					SYNTAX	INTEGER
+					ACCESS	read-only
+					STATUS	current
+					::= { mobile 127 }
+
+mobile2PNOffset				OBJECT-TYPE
+					SYNTAX	INTEGER
+					ACCESS	read-only
+					STATUS	current
+					::= { mobile 128 }
+
+mobile2Band				OBJECT-TYPE
+					SYNTAX	OCTET STRING
+					ACCESS	read-only
+					STATUS	current
+					::= { mobile 129 }
+
+mobile2RSSI				OBJECT-TYPE
+					SYNTAX	INTEGER
+					ACCESS	read-only
+					STATUS	current
+					::= { mobile 130 }
+
+mobile2RSCP				OBJECT-TYPE
+					SYNTAX	INTEGER
+					ACCESS	read-only
+					STATUS	current
+					::= { mobile 131 }
+
+mobile2RSRP				OBJECT-TYPE
+					SYNTAX	INTEGER
+					ACCESS	read-only
+					STATUS	current
+					::= { mobile 132 }
+
+mobile2RSRQ				OBJECT-TYPE
+					SYNTAX	INTEGER
+					ACCESS	read-only
+					STATUS	current
+					::= { mobile 133 }
+
+mobile2EcIo				OBJECT-TYPE
+					SYNTAX	INTEGER
+					ACCESS	read-only
+					STATUS	current
+					::= { mobile 134 }
+
+mobile2NRBand				OBJECT-TYPE
+					SYNTAX	OCTET STRING
+					ACCESS	read-only
+					STATUS	current
+					::= { mobile 135 }
+
+mobile2NRChannel			OBJECT-TYPE
+					SYNTAX	INTEGER
+					ACCESS	read-only
+					STATUS	current
+					::= { mobile 136 }
+
+mobile2NRRSSI				OBJECT-TYPE
+					SYNTAX	INTEGER
+					ACCESS	read-only
+					STATUS	current
+					::= { mobile 137 }
+
+mobile2NRRSRP				OBJECT-TYPE
+					SYNTAX	INTEGER
+					ACCESS	read-only
+					STATUS	current
+					::= { mobile 138 }
+
+mobile2NRRSRQ				OBJECT-TYPE
+					SYNTAX	INTEGER
+					ACCESS	read-only
+					STATUS	current
+					::= { mobile 139 }
+
+mobile2NRSINR				OBJECT-TYPE
+					SYNTAX	INTEGER
+					ACCESS	read-only
+					STATUS	current
+					::= { mobile 140 }
+
+mobile2SINR				OBJECT-TYPE
+					SYNTAX	INTEGER
+					ACCESS	read-only
+					STATUS	current
+					::= { mobile 141 }
+
+mobile-2				OBJECT IDENTIFIER ::= { conel 5 }
+
+mobileToday				OBJECT IDENTIFIER ::= { mobile-2 1 }
+
+mobileTodayRxPri			OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileToday 1 }
+
+mobileTodayRxSec			OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileToday 2 }
+
+mobileTodayTxPri			OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileToday 3 }
+
+mobileTodayTxSec			OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileToday 4 }
+
+mobileTodayConnectionsPri		OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileToday 5 }
+
+mobileTodayConnectionsSec		OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileToday 6 }
+
+mobileTodayOnlinePri			OBJECT-TYPE
+					SYNTAX	TimeTicks
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileToday 7 }
+
+mobileTodayOnlineSec			OBJECT-TYPE
+					SYNTAX	TimeTicks
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileToday 8 }
+
+mobileTodayOffline			OBJECT-TYPE
+					SYNTAX	TimeTicks
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileToday 9 }
+
+mobileTodayCells			OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileToday 10 }
+
+mobileTodaySignalAvg			OBJECT-TYPE
+					SYNTAX	INTEGER
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileToday 11 }
+
+mobileTodaySignalMin			OBJECT-TYPE
+					SYNTAX	INTEGER
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileToday 12 }
+
+mobileTodaySignalMax			OBJECT-TYPE
+					SYNTAX	INTEGER
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileToday 13 }
+
+mobileTodayDateMin			OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileToday 14 }
+
+mobileTodayDateMax			OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileToday 15 }
+
+mobile2TodayRxPri			OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileToday 101 }
+
+mobile2TodayRxSec			OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileToday 102 }
+
+mobile2TodayTxPri			OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileToday 103 }
+
+mobile2TodayTxSec			OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileToday 104 }
+
+mobile2TodayConnectionsPri		OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileToday 105 }
+
+mobile2TodayConnectionsSec		OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileToday 106 }
+
+mobile2TodayOnlinePri			OBJECT-TYPE
+					SYNTAX	TimeTicks
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileToday 107 }
+
+mobile2TodayOnlineSec			OBJECT-TYPE
+					SYNTAX	TimeTicks
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileToday 108 }
+
+mobile2TodayOffline			OBJECT-TYPE
+					SYNTAX	TimeTicks
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileToday 109 }
+
+mobile2TodayCells			OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileToday 110 }
+
+mobile2TodaySignalAvg			OBJECT-TYPE
+					SYNTAX	INTEGER
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileToday 111 }
+
+mobile2TodaySignalMin			OBJECT-TYPE
+					SYNTAX	INTEGER
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileToday 112 }
+
+mobile2TodaySignalMax			OBJECT-TYPE
+					SYNTAX	INTEGER
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileToday 113 }
+
+mobile2TodayDateMin			OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileToday 114 }
+
+mobile2TodayDateMax			OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileToday 115 }
+
+mobileYesterday				OBJECT IDENTIFIER ::= { mobile-2 2 }
+
+mobileYesterdayRxPri			OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileYesterday 1 }
+
+mobileYesterdayRxSec			OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileYesterday 2 }
+
+mobileYesterdayTxPri			OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileYesterday 3 }
+
+mobileYesterdayTxSec			OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileYesterday 4 }
+
+mobileYesterdayConnectionsPri		OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileYesterday 5 }
+
+mobileYesterdayConnectionsSec		OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileYesterday 6 }
+
+mobileYesterdayOnlinePri		OBJECT-TYPE
+					SYNTAX	TimeTicks
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileYesterday 7 }
+
+mobileYesterdayOnlineSec		OBJECT-TYPE
+					SYNTAX	TimeTicks
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileYesterday 8 }
+
+mobileYesterdayOffline			OBJECT-TYPE
+					SYNTAX	TimeTicks
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileYesterday 9 }
+
+mobileYesterdayCells			OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileYesterday 10 }
+
+mobileYesterdaySignalAvg		OBJECT-TYPE
+					SYNTAX	INTEGER
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileYesterday 11 }
+
+mobileYesterdaySignalMin		OBJECT-TYPE
+					SYNTAX	INTEGER
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileYesterday 12 }
+
+mobileYesterdaySignalMax		OBJECT-TYPE
+					SYNTAX	INTEGER
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileYesterday 13 }
+
+mobileYesterdayDateMin			OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileYesterday 14 }
+
+mobileYesterdayDateMax			OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileYesterday 15 }
+
+mobile2YesterdayRxPri			OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileYesterday 101 }
+
+mobile2YesterdayRxSec			OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileYesterday 102 }
+
+mobile2YesterdayTxPri			OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileYesterday 103 }
+
+mobile2YesterdayTxSec			OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileYesterday 104 }
+
+mobile2YesterdayConnectionsPri		OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileYesterday 105 }
+
+mobile2YesterdayConnectionsSec		OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileYesterday 106 }
+
+mobile2YesterdayOnlinePri		OBJECT-TYPE
+					SYNTAX	TimeTicks
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileYesterday 107 }
+
+mobile2YesterdayOnlineSec		OBJECT-TYPE
+					SYNTAX	TimeTicks
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileYesterday 108 }
+
+mobile2YesterdayOffline			OBJECT-TYPE
+					SYNTAX	TimeTicks
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileYesterday 109 }
+
+mobile2YesterdayCells			OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileYesterday 110 }
+
+mobile2YesterdaySignalAvg		OBJECT-TYPE
+					SYNTAX	INTEGER
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileYesterday 111 }
+
+mobile2YesterdaySignalMin		OBJECT-TYPE
+					SYNTAX	INTEGER
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileYesterday 112 }
+
+mobile2YesterdaySignalMax		OBJECT-TYPE
+					SYNTAX	INTEGER
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileYesterday 113 }
+
+mobile2YesterdayDateMin			OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileYesterday 114 }
+
+mobile2YesterdayDateMax			OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileYesterday 115 }
+
+mobileThisWeek				OBJECT IDENTIFIER ::= { mobile-2 3 }
+
+mobileThisWeekRxPri			OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileThisWeek 1 }
+
+mobileThisWeekRxSec			OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileThisWeek 2 }
+
+mobileThisWeekTxPri			OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileThisWeek 3 }
+
+mobileThisWeekTxSec			OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileThisWeek 4 }
+
+mobileThisWeekConnectionsPri		OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileThisWeek 5 }
+
+mobileThisWeekConnectionsSec		OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileThisWeek 6 }
+
+mobileThisWeekOnlinePri			OBJECT-TYPE
+					SYNTAX	TimeTicks
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileThisWeek 7 }
+
+mobileThisWeekOnlineSec			OBJECT-TYPE
+					SYNTAX	TimeTicks
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileThisWeek 8 }
+
+mobileThisWeekOffline			OBJECT-TYPE
+					SYNTAX	TimeTicks
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileThisWeek 9 }
+
+mobileThisWeekCells			OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileThisWeek 10 }
+
+mobileThisWeekSignalAvg			OBJECT-TYPE
+					SYNTAX	INTEGER
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileThisWeek 11 }
+
+mobileThisWeekSignalMin			OBJECT-TYPE
+					SYNTAX	INTEGER
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileThisWeek 12 }
+
+mobileThisWeekSignalMax			OBJECT-TYPE
+					SYNTAX	INTEGER
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileThisWeek 13 }
+
+mobileThisWeekDateMin			OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileThisWeek 14 }
+
+mobileThisWeekDateMax			OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileThisWeek 15 }
+
+mobile2ThisWeekRxPri			OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileThisWeek 101 }
+
+mobile2ThisWeekRxSec			OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileThisWeek 102 }
+
+mobile2ThisWeekTxPri			OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileThisWeek 103 }
+
+mobile2ThisWeekTxSec			OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileThisWeek 104 }
+
+mobile2ThisWeekConnectionsPri		OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileThisWeek 105 }
+
+mobile2ThisWeekConnectionsSec		OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileThisWeek 106 }
+
+mobile2ThisWeekOnlinePri		OBJECT-TYPE
+					SYNTAX	TimeTicks
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileThisWeek 107 }
+
+mobile2ThisWeekOnlineSec		OBJECT-TYPE
+					SYNTAX	TimeTicks
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileThisWeek 108 }
+
+mobile2ThisWeekOffline			OBJECT-TYPE
+					SYNTAX	TimeTicks
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileThisWeek 109 }
+
+mobile2ThisWeekCells			OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileThisWeek 110 }
+
+mobile2ThisWeekSignalAvg		OBJECT-TYPE
+					SYNTAX	INTEGER
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileThisWeek 111 }
+
+mobile2ThisWeekSignalMin		OBJECT-TYPE
+					SYNTAX	INTEGER
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileThisWeek 112 }
+
+mobile2ThisWeekSignalMax		OBJECT-TYPE
+					SYNTAX	INTEGER
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileThisWeek 113 }
+
+mobile2ThisWeekDateMin			OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileThisWeek 114 }
+
+mobile2ThisWeekDateMax			OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileThisWeek 115 }
+
+mobileLastWeek				OBJECT IDENTIFIER ::= { mobile-2 4 }
+
+mobileLastWeekRxPri			OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileLastWeek 1 }
+
+mobileLastWeekRxSec			OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileLastWeek 2 }
+
+mobileLastWeekTxPri			OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileLastWeek 3 }
+
+mobileLastWeekTxSec			OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileLastWeek 4 }
+
+mobileLastWeekConnectionsPri		OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileLastWeek 5 }
+
+mobileLastWeekConnectionsSec		OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileLastWeek 6 }
+
+mobileLastWeekOnlinePri			OBJECT-TYPE
+					SYNTAX	TimeTicks
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileLastWeek 7 }
+
+mobileLastWeekOnlineSec			OBJECT-TYPE
+					SYNTAX	TimeTicks
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileLastWeek 8 }
+
+mobileLastWeekOffline			OBJECT-TYPE
+					SYNTAX	TimeTicks
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileLastWeek 9 }
+
+mobileLastWeekCells			OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileLastWeek 10 }
+
+mobileLastWeekSignalAvg			OBJECT-TYPE
+					SYNTAX	INTEGER
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileLastWeek 11 }
+
+mobileLastWeekSignalMin			OBJECT-TYPE
+					SYNTAX	INTEGER
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileLastWeek 12 }
+
+mobileLastWeekSignalMax			OBJECT-TYPE
+					SYNTAX	INTEGER
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileLastWeek 13 }
+
+mobileLastWeekDateMin			OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileLastWeek 14 }
+
+mobileLastWeekDateMax			OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileLastWeek 15 }
+
+mobile2LastWeekRxPri			OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileLastWeek 101 }
+
+mobile2LastWeekRxSec			OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileLastWeek 102 }
+
+mobile2LastWeekTxPri			OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileLastWeek 103 }
+
+mobile2LastWeekTxSec			OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileLastWeek 104 }
+
+mobile2LastWeekConnectionsPri		OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileLastWeek 105 }
+
+mobile2LastWeekConnectionsSec		OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileLastWeek 106 }
+
+mobile2LastWeekOnlinePri		OBJECT-TYPE
+					SYNTAX	TimeTicks
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileLastWeek 107 }
+
+mobile2LastWeekOnlineSec		OBJECT-TYPE
+					SYNTAX	TimeTicks
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileLastWeek 108 }
+
+mobile2LastWeekOffline			OBJECT-TYPE
+					SYNTAX	TimeTicks
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileLastWeek 109 }
+
+mobile2LastWeekCells			OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileLastWeek 110 }
+
+mobile2LastWeekSignalAvg		OBJECT-TYPE
+					SYNTAX	INTEGER
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileLastWeek 111 }
+
+mobile2LastWeekSignalMin		OBJECT-TYPE
+					SYNTAX	INTEGER
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileLastWeek 112 }
+
+mobile2LastWeekSignalMax		OBJECT-TYPE
+					SYNTAX	INTEGER
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileLastWeek 113 }
+
+mobile2LastWeekDateMin			OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileLastWeek 114 }
+
+mobile2LastWeekDateMax			OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileLastWeek 115 }
+
+mobileThisPeriod			OBJECT IDENTIFIER ::= { mobile-2 5 }
+
+mobileThisPeriodRxPri			OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileThisPeriod 1 }
+
+mobileThisPeriodRxSec			OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileThisPeriod 2 }
+
+mobileThisPeriodTxPri			OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileThisPeriod 3 }
+
+mobileThisPeriodTxSec			OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileThisPeriod 4 }
+
+mobileThisPeriodConnectionsPri		OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileThisPeriod 5 }
+
+mobileThisPeriodConnectionsSec		OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileThisPeriod 6 }
+
+mobileThisPeriodOnlinePri		OBJECT-TYPE
+					SYNTAX	TimeTicks
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileThisPeriod 7 }
+
+mobileThisPeriodOnlineSec		OBJECT-TYPE
+					SYNTAX	TimeTicks
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileThisPeriod 8 }
+
+mobileThisPeriodOffline			OBJECT-TYPE
+					SYNTAX	TimeTicks
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileThisPeriod 9 }
+
+mobileThisPeriodCells			OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileThisPeriod 10 }
+
+mobileThisPeriodSignalAvg		OBJECT-TYPE
+					SYNTAX	INTEGER
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileThisPeriod 11 }
+
+mobileThisPeriodSignalMin		OBJECT-TYPE
+					SYNTAX	INTEGER
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileThisPeriod 12 }
+
+mobileThisPeriodSignalMax		OBJECT-TYPE
+					SYNTAX	INTEGER
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileThisPeriod 13 }
+
+mobileThisPeriodDateMin			OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileThisPeriod 14 }
+
+mobileThisPeriodDateMax			OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileThisPeriod 15 }
+
+mobile2ThisPeriodRxPri			OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileThisPeriod 101 }
+
+mobile2ThisPeriodRxSec			OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileThisPeriod 102 }
+
+mobile2ThisPeriodTxPri			OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileThisPeriod 103 }
+
+mobile2ThisPeriodTxSec			OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileThisPeriod 104 }
+
+mobile2ThisPeriodConnectionsPri		OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileThisPeriod 105 }
+
+mobile2ThisPeriodConnectionsSec		OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileThisPeriod 106 }
+
+mobile2ThisPeriodOnlinePri		OBJECT-TYPE
+					SYNTAX	TimeTicks
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileThisPeriod 107 }
+
+mobile2ThisPeriodOnlineSec		OBJECT-TYPE
+					SYNTAX	TimeTicks
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileThisPeriod 108 }
+
+mobile2ThisPeriodOffline		OBJECT-TYPE
+					SYNTAX	TimeTicks
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileThisPeriod 109 }
+
+mobile2ThisPeriodCells			OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileThisPeriod 110 }
+
+mobile2ThisPeriodSignalAvg		OBJECT-TYPE
+					SYNTAX	INTEGER
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileThisPeriod 111 }
+
+mobile2ThisPeriodSignalMin		OBJECT-TYPE
+					SYNTAX	INTEGER
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileThisPeriod 112 }
+
+mobile2ThisPeriodSignalMax		OBJECT-TYPE
+					SYNTAX	INTEGER
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileThisPeriod 113 }
+
+mobile2ThisPeriodDateMin		OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileThisPeriod 114 }
+
+mobile2ThisPeriodDateMax		OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileThisPeriod 115 }
+
+mobileLastPeriod			OBJECT IDENTIFIER ::= { mobile-2 6 }
+
+mobileLastPeriodRxPri			OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileLastPeriod 1 }
+
+mobileLastPeriodRxSec			OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileLastPeriod 2 }
+
+mobileLastPeriodTxPri			OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileLastPeriod 3 }
+
+mobileLastPeriodTxSec			OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileLastPeriod 4 }
+
+mobileLastPeriodConnectionsPri		OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileLastPeriod 5 }
+
+mobileLastPeriodConnectionsSec		OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileLastPeriod 6 }
+
+mobileLastPeriodOnlinePri		OBJECT-TYPE
+					SYNTAX	TimeTicks
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileLastPeriod 7 }
+
+mobileLastPeriodOnlineSec		OBJECT-TYPE
+					SYNTAX	TimeTicks
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileLastPeriod 8 }
+
+mobileLastPeriodOffline			OBJECT-TYPE
+					SYNTAX	TimeTicks
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileLastPeriod 9 }
+
+mobileLastPeriodCells			OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileLastPeriod 10 }
+
+mobileLastPeriodSignalAvg		OBJECT-TYPE
+					SYNTAX	INTEGER
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileLastPeriod 11 }
+
+mobileLastPeriodSignalMin		OBJECT-TYPE
+					SYNTAX	INTEGER
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileLastPeriod 12 }
+
+mobileLastPeriodSignalMax		OBJECT-TYPE
+					SYNTAX	INTEGER
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileLastPeriod 13 }
+
+mobileLastPeriodDateMin			OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileLastPeriod 14 }
+
+mobileLastPeriodDateMax			OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileLastPeriod 15 }
+
+mobile2LastPeriodRxPri			OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileLastPeriod 101 }
+
+mobile2LastPeriodRxSec			OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileLastPeriod 102 }
+
+mobile2LastPeriodTxPri			OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileLastPeriod 103 }
+
+mobile2LastPeriodTxSec			OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileLastPeriod 104 }
+
+mobile2LastPeriodConnectionsPri		OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileLastPeriod 105 }
+
+mobile2LastPeriodConnectionsSec		OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileLastPeriod 106 }
+
+mobile2LastPeriodOnlinePri		OBJECT-TYPE
+					SYNTAX	TimeTicks
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileLastPeriod 107 }
+
+mobile2LastPeriodOnlineSec		OBJECT-TYPE
+					SYNTAX	TimeTicks
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileLastPeriod 108 }
+
+mobile2LastPeriodOffline		OBJECT-TYPE
+					SYNTAX	TimeTicks
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileLastPeriod 109 }
+
+mobile2LastPeriodCells			OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileLastPeriod 110 }
+
+mobile2LastPeriodSignalAvg		OBJECT-TYPE
+					SYNTAX	INTEGER
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileLastPeriod 111 }
+
+mobile2LastPeriodSignalMin		OBJECT-TYPE
+					SYNTAX	INTEGER
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileLastPeriod 112 }
+
+mobile2LastPeriodSignalMax		OBJECT-TYPE
+					SYNTAX	INTEGER
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileLastPeriod 113 }
+
+mobile2LastPeriodDateMin		OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileLastPeriod 114 }
+
+mobile2LastPeriodDateMax		OBJECT-TYPE
+					SYNTAX	Counter32
+					ACCESS	read-only
+					STATUS	current
+					::= { mobileLastPeriod 115 }
+
+END

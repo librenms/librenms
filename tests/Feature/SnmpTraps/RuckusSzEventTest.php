@@ -27,109 +27,99 @@
 
 namespace LibreNMS\Tests\Feature\SnmpTraps;
 
-use App\Models\Device;
-use LibreNMS\Snmptrap\Dispatcher;
-use LibreNMS\Snmptrap\Trap;
+use LibreNMS\Enum\Severity;
 
 class RuckusSzEventTest extends SnmpTrapTestCase
 {
-    public function testSzApConf()
+    public function testSzApConf(): void
     {
-        $device = Device::factory()->create(); /** @var Device $device */
-        $trapText = "$device->hostname
-UDP: [$device->ip]:57602->[192.168.5.5]:162
+        $this->assertTrapLogsMessage(<<<'TRAP'
+{{ hostname }}
+UDP: [{{ ip }}]:57602->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 26:19:43:37.24
 SNMPv2-MIB::snmpTrapOID.0 RUCKUS-SZ-EVENT-MIB::ruckusSZAPConfUpdatedTrap
-RUCKUS-SZ-EVENT-MIB::ruckusSZEventSeverity.0 \"Informational\"
-RUCKUS-SZ-EVENT-MIB::ruckusSZEventCode.0 \"110\"
-RUCKUS-SZ-EVENT-MIB::ruckusSZEventType.0 \"apConfUpdated\"
-RUCKUS-SZ-EVENT-MIB::ruckusSZEventAPName.0 \"$device->hostname\"
-RUCKUS-SZ-EVENT-MIB::ruckusSZEventAPMacAddr.0 \"de:ad:be:ef:33:40\"
-RUCKUS-SZ-EVENT-MIB::ruckusSZEventAPIP.0 \"$device->ip\"
-RUCKUS-SZ-EVENT-MIB::ruckusSZEventAPLocation.0 \"$device->location\"
-RUCKUS-SZ-EVENT-MIB::ruckusSZEventAPDescription.0 \"$device->sysDescr\"
-RUCKUS-SZ-EVENT-MIB::ruckusSZAPConfigID.0 \"2f860f70-6b88-11e9-a3c5-000000937916\"";
-
-        $trap = new Trap($trapText);
-
-        $message = "AP at location $device->location configuration updated with config-id 2f860f70-6b88-11e9-a3c5-000000937916";
-        \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 2);
-
-        $this->assertTrue(Dispatcher::handle($trap), 'Could not handle ruckusSZAPConfUpdatedTrap');
+RUCKUS-SZ-EVENT-MIB::ruckusSZEventSeverity.0 "Informational"
+RUCKUS-SZ-EVENT-MIB::ruckusSZEventCode.0 "110"
+RUCKUS-SZ-EVENT-MIB::ruckusSZEventType.0 "apConfUpdated"
+RUCKUS-SZ-EVENT-MIB::ruckusSZEventAPName.0 "{{ hostname }}"
+RUCKUS-SZ-EVENT-MIB::ruckusSZEventAPMacAddr.0 "de:ad:be:ef:33:40"
+RUCKUS-SZ-EVENT-MIB::ruckusSZEventAPIP.0 "{{ ip }}"
+RUCKUS-SZ-EVENT-MIB::ruckusSZEventAPLocation.0 "{{ location }}"
+RUCKUS-SZ-EVENT-MIB::ruckusSZEventAPDescription.0 "{{ sysDescr }}"
+RUCKUS-SZ-EVENT-MIB::ruckusSZAPConfigID.0 "2f860f70-6b88-11e9-a3c5-000000937916"
+TRAP,
+            'AP at location {{ location }} configuration updated with config-id 2f860f70-6b88-11e9-a3c5-000000937916',
+            'Could not handle ruckusSZAPConfUpdatedTrap',
+            [Severity::Info],
+        );
     }
 
-    public function testSzApConnect()
+    public function testSzApConnect(): void
     {
-        $device = Device::factory()->create(); /** @var Device $device */
-        $trapText = "$device->hostname
-UDP: [$device->ip]:57602->[192.168.5.5]:162
+        $this->assertTrapLogsMessage(<<<'TRAP'
+{{ hostname }}
+UDP: [{{ ip }}]:57602->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 26:19:43:37.24
 SNMPv2-MIB::snmpTrapOID.0 RUCKUS-SZ-EVENT-MIB::ruckusSZAPConnectedTrap
-RUCKUS-SZ-EVENT-MIB::ruckusSZEventSeverity.0 \"Informational\"
-RUCKUS-SZ-EVENT-MIB::ruckusSZEventCode.0 \"312\"
-RUCKUS-SZ-EVENT-MIB::ruckusSZEventType.0 \"apConnected\"
-RUCKUS-SZ-EVENT-MIB::ruckusSZEventAPName.0 \"$device->hostname\"
-RUCKUS-SZ-EVENT-MIB::ruckusSZEventAPMacAddr.0 \"de:ad:be:ef:33:40\"
-RUCKUS-SZ-EVENT-MIB::ruckusSZEventAPIP.0 \"$device->ip\"
-RUCKUS-SZ-EVENT-MIB::ruckusSZEventAPLocation.0 \"$device->location\"
-RUCKUS-SZ-EVENT-MIB::ruckusSZEventAPDescription.0 \"$device->sysDescr\"
-RUCKUS-SZ-EVENT-MIB::ruckusSZEventReason.0 \"AP connected after rebooting\"";
-
-        $trap = new Trap($trapText);
-
-        $message = "AP at location $device->location has connected to the SmartZone with reason AP connected after rebooting";
-        \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 2);
-
-        $this->assertTrue(Dispatcher::handle($trap), 'Could not handle ruckusSZAPConnectedTrap');
+RUCKUS-SZ-EVENT-MIB::ruckusSZEventSeverity.0 "Informational"
+RUCKUS-SZ-EVENT-MIB::ruckusSZEventCode.0 "312"
+RUCKUS-SZ-EVENT-MIB::ruckusSZEventType.0 "apConnected"
+RUCKUS-SZ-EVENT-MIB::ruckusSZEventAPName.0 "{{ hostname }}"
+RUCKUS-SZ-EVENT-MIB::ruckusSZEventAPMacAddr.0 "de:ad:be:ef:33:40"
+RUCKUS-SZ-EVENT-MIB::ruckusSZEventAPIP.0 "{{ ip }}"
+RUCKUS-SZ-EVENT-MIB::ruckusSZEventAPLocation.0 "{{ location }}"
+RUCKUS-SZ-EVENT-MIB::ruckusSZEventAPDescription.0 "{{ sysDescr }}"
+RUCKUS-SZ-EVENT-MIB::ruckusSZEventReason.0 "AP connected after rebooting"
+TRAP,
+            'AP at location {{ location }} has connected to the SmartZone with reason AP connected after rebooting',
+            'Could not handle ruckusSZAPConnectedTrap',
+            [Severity::Info],
+        );
     }
 
-    public function testSzApMiscEvent()
+    public function testSzApMiscEvent(): void
     {
-        $device = Device::factory()->create(); /** @var Device $device */
-        $trapText = "$device->hostname
-UDP: [$device->ip]:57602->[192.168.5.5]:162
+        $this->assertTrapLogsMessage(<<<'TRAP'
+{{ hostname }}
+UDP: [{{ ip }}]:57602->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 26:19:43:37.24
 SNMPv2-MIB::snmpTrapOID.0 RUCKUS-SZ-EVENT-MIB::ruckusSZAPMiscEventTrap
-RUCKUS-SZ-EVENT-MIB::ruckusSZEventSeverity.0 \"Minor\"
-RUCKUS-SZ-EVENT-MIB::ruckusSZEventCode.0 \"322\"
-RUCKUS-SZ-EVENT-MIB::ruckusSZEventType.0 \"apWLANStateChanged\"
-RUCKUS-SZ-EVENT-MIB::ruckusSZEventAPName.0 \"$device->hostname\"
-RUCKUS-SZ-EVENT-MIB::ruckusSZEventAPMacAddr.0 \"de:ad:be:ef:33:40\"
-RUCKUS-SZ-EVENT-MIB::ruckusSZEventAPIP.0 \"$device->ip\"
-RUCKUS-SZ-EVENT-MIB::ruckusSZEventAPLocation.0 \"$device->location\"
-RUCKUS-SZ-EVENT-MIB::ruckusSZEventAPDescription.0 \"$device->sysDescr\"
-RUCKUS-SZ-EVENT-MIB::ruckusSZEventDescription.0 \"Test AP event has occured\"";
-
-        $trap = new Trap($trapText);
-
-        $message = 'AP event: Test AP event has occured';
-        \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 4);
-
-        $this->assertTrue(Dispatcher::handle($trap), 'Could not handle ruckusSZAPMiscEventTrap');
+RUCKUS-SZ-EVENT-MIB::ruckusSZEventSeverity.0 "Minor"
+RUCKUS-SZ-EVENT-MIB::ruckusSZEventCode.0 "322"
+RUCKUS-SZ-EVENT-MIB::ruckusSZEventType.0 "apWLANStateChanged"
+RUCKUS-SZ-EVENT-MIB::ruckusSZEventAPName.0 "{{ hostname }}"
+RUCKUS-SZ-EVENT-MIB::ruckusSZEventAPMacAddr.0 "de:ad:be:ef:33:40"
+RUCKUS-SZ-EVENT-MIB::ruckusSZEventAPIP.0 "{{ ip }}"
+RUCKUS-SZ-EVENT-MIB::ruckusSZEventAPLocation.0 "{{ location }}"
+RUCKUS-SZ-EVENT-MIB::ruckusSZEventAPDescription.0 "{{ sysDescr }}"
+RUCKUS-SZ-EVENT-MIB::ruckusSZEventDescription.0 "Test AP event has occurred"
+TRAP,
+            'AP event: Test AP event has occurred',
+            'Could not handle ruckusSZAPMiscEventTrap',
+            [Severity::Warning],
+        );
     }
 
-    public function testSzApRebooted()
+    public function testSzApRebooted(): void
     {
-        $device = Device::factory()->create(); /** @var Device $device */
-        $trapText = "$device->hostname
-UDP: [$device->ip]:57602->[192.168.5.5]:162
+        $this->assertTrapLogsMessage(<<<'TRAP'
+{{ hostname }}
+UDP: [{{ ip }}]:57602->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 26:19:43:37.24
 SNMPv2-MIB::snmpTrapOID.0 RUCKUS-SZ-EVENT-MIB::ruckusSZAPRebootTrap
-RUCKUS-SZ-EVENT-MIB::ruckusSZEventSeverity.0 \"Critical\"
-RUCKUS-SZ-EVENT-MIB::ruckusSZEventCode.0 \"301\"
-RUCKUS-SZ-EVENT-MIB::ruckusSZEventType.0 \"apRebootByUser\"
-RUCKUS-SZ-EVENT-MIB::ruckusSZEventAPName.0 \"$device->hostname\"
-RUCKUS-SZ-EVENT-MIB::ruckusSZEventAPMacAddr.0 \"de:ad:be:ef:33:40\"
-RUCKUS-SZ-EVENT-MIB::ruckusSZEventAPIP.0 \"$device->ip\"
-RUCKUS-SZ-EVENT-MIB::ruckusSZEventAPLocation.0 \"$device->location\"
-RUCKUS-SZ-EVENT-MIB::ruckusSZEventAPDescription.0 \"$device->sysDescr\"
-RUCKUS-SZ-EVENT-MIB::ruckusSZEventReason.0 \"AP rebooted by controller user\"";
-
-        $trap = new Trap($trapText);
-
-        $message = "AP at site $device->location rebooted with reason AP rebooted by controller user";
-        \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 5);
-
-        $this->assertTrue(Dispatcher::handle($trap), 'Could not handle ruckusSZAPRebootTrap');
+RUCKUS-SZ-EVENT-MIB::ruckusSZEventSeverity.0 "Critical"
+RUCKUS-SZ-EVENT-MIB::ruckusSZEventCode.0 "301"
+RUCKUS-SZ-EVENT-MIB::ruckusSZEventType.0 "apRebootByUser"
+RUCKUS-SZ-EVENT-MIB::ruckusSZEventAPName.0 "{{ hostname }}"
+RUCKUS-SZ-EVENT-MIB::ruckusSZEventAPMacAddr.0 "de:ad:be:ef:33:40"
+RUCKUS-SZ-EVENT-MIB::ruckusSZEventAPIP.0 "{{ ip }}"
+RUCKUS-SZ-EVENT-MIB::ruckusSZEventAPLocation.0 "{{ location }}"
+RUCKUS-SZ-EVENT-MIB::ruckusSZEventAPDescription.0 "{{ sysDescr }}"
+RUCKUS-SZ-EVENT-MIB::ruckusSZEventReason.0 "AP rebooted by controller user"
+TRAP,
+            'AP at site {{ location }} rebooted with reason AP rebooted by controller user',
+            'Could not handle ruckusSZAPRebootTrap',
+            [Severity::Error],
+        );
     }
 }

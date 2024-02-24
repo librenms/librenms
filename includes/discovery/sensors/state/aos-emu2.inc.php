@@ -23,7 +23,7 @@
  * @author     Ben Gibbons <axemann@gmail.com>
  */
 
- // Input Contact discovery
+// Input Contact discovery
 
 $contacts['emu2_contacts'] = snmpwalk_group($device, 'emsInputContactStatusEntry', 'PowerNet-MIB');
 

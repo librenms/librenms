@@ -22,9 +22,19 @@ $port_stats = snmpwalk_cache_oid($device, 'ifAlias', $port_stats, 'IF-MIB');
 $port_stats = snmpwalk_cache_oid($device, 'ifType', $port_stats, 'IF-MIB', null, $typeSnmpFlags);
 $port_stats = snmpwalk_cache_oid($device, 'ifOperStatus', $port_stats, 'IF-MIB', null, $operStatusSnmpFlags);
 
+// Get Trellix NSP ports
+if ($device['os'] == 'mlos-nsp') {
+    require base_path('includes/discovery/ports/mlos-nsp.inc.php');
+}
+
 //Get UFiber OLT ports
 if ($device['os'] == 'edgeosolt') {
     require base_path('includes/discovery/ports/edgeosolt.inc.php');
+}
+
+//Get loop-telecom line card interfaces
+if ($device['os'] == 'loop-telecom') {
+    require base_path('includes/discovery/ports/loop-telecom.inc.php');
 }
 
 //Change Zynos ports from swp to 1/1
@@ -40,6 +50,21 @@ if ($device['os'] == 'airos-af-ltu') {
 //Teleste Luminato ifOperStatus
 if ($device['os'] == 'luminato') {
     require base_path('includes/discovery/ports/luminato.inc.php');
+}
+
+//Moxa Etherdevice portName mapping
+if ($device['os'] == 'moxa-etherdevice') {
+    require base_path('includes/discovery/ports/moxa-etherdevice.inc.php');
+}
+
+//Remove extra ports on Zhone slms devices
+if ($device['os'] == 'slms') {
+    require base_path('includes/discovery/ports/slms.inc.php');
+}
+
+//Cambium cnMatrix port description mapping
+if ($device['os'] == 'cnmatrix') {
+    require base_path('includes/discovery/ports/cnmatrix.inc.php');
 }
 
 // End Building SNMP Cache Array
@@ -86,7 +111,7 @@ $default_port_group = Config::get('default_port_group');
 // New interface detection
 foreach ($port_stats as $ifIndex => $snmp_data) {
     $snmp_data['ifIndex'] = $ifIndex; // Store ifIndex in port entry
-    $snmp_data['ifAlias'] = StringHelpers::inferEncoding($snmp_data['ifAlias']);
+    $snmp_data['ifAlias'] = StringHelpers::inferEncoding($snmp_data['ifAlias'] ?? null);
 
     // Get port_id according to port_association_mode used for this device
     $port_id = get_port_id($ports_mapped, $snmp_data, $port_association_mode);
@@ -94,8 +119,12 @@ foreach ($port_stats as $ifIndex => $snmp_data) {
     if (is_port_valid($snmp_data, $device)) {
         port_fill_missing_and_trim($snmp_data, $device);
 
+        if ($device['os'] == 'vmware-vcsa' && preg_match('/Device ([a-z0-9]+) at .*/', $snmp_data['ifDescr'], $matches)) {
+            $snmp_data['ifName'] = $matches[1];
+        }
+
         // Port newly discovered?
-        if (! is_array($ports_db[$port_id])) {
+        if (! isset($ports_db[$port_id]) || ! is_array($ports_db[$port_id])) {
             $snmp_data['device_id'] = $device['device_id'];
             $port_id = dbInsert($snmp_data, 'ports');
 
@@ -121,7 +150,7 @@ foreach ($port_stats as $ifIndex => $snmp_data) {
         }
     } else {
         // Port vanished (mark as deleted)
-        if (is_array($ports_db[$port_id])) {
+        if (isset($ports_db[$port_id]) && is_array($ports_db[$port_id])) {
             if ($ports_db[$port_id]['deleted'] != 1) {
                 dbUpdate(['deleted' => 1], 'ports', '`port_id` = ?', [$port_id]);
                 $ports_db[$port_id]['deleted'] = 1;

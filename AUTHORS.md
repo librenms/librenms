@@ -173,7 +173,6 @@ LibreNMS contributors:
 - Robert Towster <rnt-github at towster.com> (towster)
 - Rocky Luke <rockyluke@offline.net> (rockyluke)
 - Tim Jackson <jackson.tim@gmail.com> (jackson-tim)
-- Jørn-Stian Lønsetteig <jeg@glemte.no> (gilrim)
 - Viktoria Rei Bauer <vbauer@stargazer.at> (ToeiRei)
 - Ryan Eno <ryaneno@gmail.com> (VimCommando)
 - Matt Peterson <matt@peterson.org> (dorkmatt)
@@ -218,6 +217,7 @@ LibreNMS contributors:
 - Daniel Baeza <doctoruve@gmail.com> (TheGreatDoc)
 - Thom Cleary <me@thomcat.rocks> (thomcatdotrocks)
 - Kayck Matias <kayckmatias04@gmail.com> [KayckMatias](https://github.com/KayckMatias/)
+- Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
 
 Observium was written by:
 - Adam Armstrong

@@ -26,9 +26,9 @@
 namespace LibreNMS\Snmptrap\Handlers;
 
 use App\Models\Device;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
-use Log;
 
 class Aos7stpRootPortChange implements SnmptrapHandler
 {
@@ -42,6 +42,6 @@ class Aos7stpRootPortChange implements SnmptrapHandler
      */
     public function handle(Device $device, Trap $trap)
     {
-        Log::event('SNMP Trap: A root port has changed for a spanning tree bridge. The root port is the port that offers the lowest cost path from this bridge to the root bridge.', $device->device_id, 'stp', 3);
+        $trap->log('SNMP Trap: A root port has changed for a spanning tree bridge. The root port is the port that offers the lowest cost path from this bridge to the root bridge.', Severity::Notice, 'stp');
     }
 }

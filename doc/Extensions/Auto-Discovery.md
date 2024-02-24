@@ -43,19 +43,21 @@ any mixture of these.
 To add devices, we need to know what are your subnets so we don't go
 blindly attempting to add devices not under your control.
 
-```php
-$config['nets'][] = '192.168.0.0/24';
-$config['nets'][] = '172.2.4.0/22';
-```
+!!! setting "discovery/networks"
+    ```bash
+    lnms config:set nets.+ '192.168.0.0/24'
+    lnms config:set nets.+ '172.2.4.0/22'
+    ```
 
 ### Exclusions
 
 If you have added a network as above but a single device exists within
 it that you can't auto add, then you can exclude this with the following:
 
-```php
-$config['autodiscovery']['nets-exclude'][] = '192.168.0.1/32';
-```
+!!! setting "discovery/networks"
+    ```bash
+    lnms config:set autodiscovery.nets-exclude.+ '192.168.0.1/32'
+    ```
 
 ## Additional Options
 
@@ -70,14 +72,23 @@ need to set `$config['discovery_by_ip'] = true;`
 
 If your devices only return a short hostname such as lax-fa0-dc01 but
 the full name should be lax-fa0-dc01.example.com then you can
-set `$config['mydomain'] = 'example.com';`
+set
+
+!!! setting "discovery/general"
+    ```bash
+    lnms config:set mydomain example.com
+    ```
 
 ### Allow Duplicate sysName
 
 By default we require unique sysNames when adding devices (this is
 returned over snmp by your devices). If you would like to allow
 devices to be added with duplicate sysNames then please set
-`$config['allow_duplicate_sysName'] = true;`.
+
+!!! setting "discovery/discovery_modules"
+    ```bash
+    lnms config:set allow_duplicate_sysName true
+    ```
 
 ## Discovery Methods
 
@@ -93,8 +104,13 @@ module depends on the arp-table module being enabled and returning
 data.
 
 To enable, switch on globally the
-`$config['discovery_modules']['discovery-arp'] = true;` or per device
+`discovery_modules.discovery-arp` or per device
 within the Modules section.
+
+!!! setting "discovery/discovery_modules"
+    ```bash
+    lnms config:set discovery_modules.discovery-arp true
+    ```
 
 ### XDP
 
@@ -129,7 +145,7 @@ $config['autodiscovery']['cdp_exclude']['platform_regexp'][] = '/WS-C3750G/';
 These devices are excluded by default:
 
 ```php
-$config['autodiscovery']['xdp_exclude']['sysdesc_regexp'][] = '/-K9W8-/'; // Cisco Lightweight Access Point
+$config['autodiscovery']['xdp_exclude']['sysdesc_regexp'][] = '/-K9W8/'; // Cisco Lightweight Access Point
 $config['autodiscovery']['cdp_exclude']['platform_regexp'][] = '/^Cisco IP Phone/'; //Cisco IP Phone
 ```
 
@@ -153,7 +169,7 @@ Apart from the aforementioned Auto-Discovery options, LibreNMS is also
 able to proactively scan a network for SNMP-enabled devices using the
 configured version/credentials.
 
-SNMP Scan will scan `$config['nets']` by default and respects `$config['autodiscovery']['nets-exclude']`.
+SNMP Scan will scan `nets` by default and respects `autodiscovery.nets-exclude`.
 
 To run the SNMP-Scanner you need to execute the `snmp-scan.py` from
 within your LibreNMS installation directory.

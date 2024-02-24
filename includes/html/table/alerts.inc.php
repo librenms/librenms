@@ -105,7 +105,7 @@ if (! isset($vars['sort']) || empty($vars['sort'])) {
 $sql .= " ORDER BY $sort";
 
 if (isset($current)) {
-    $limit_low = (($current * $rowCount) - ($rowCount));
+    $limit_low = (($current * $rowCount) - $rowCount);
     $limit_high = $rowCount;
 }
 
@@ -113,7 +113,12 @@ if ($rowCount != -1) {
     $sql .= " LIMIT $limit_low,$limit_high";
 }
 
-$sql = "SELECT `alerts`.*, `devices`.`hostname`, `devices`.`sysName`, `devices`.`display`, `devices`.`os`, `devices`.`hardware`, `locations`.`location`, `alert_rules`.`rule`, `alert_rules`.`name`, `alert_rules`.`severity` $sql";
+if (session('preferences.timezone')) {
+    $sql = "SELECT `alerts`.*, IFNULL(CONVERT_TZ(`alerts`.`timestamp`, @@global.time_zone, ?),`alerts`.`timestamp`) AS timestamp_display, `devices`.`hostname`, `devices`.`sysName`, `devices`.`display`, `devices`.`os`, `devices`.`hardware`, `locations`.`location`, `alert_rules`.`rule`, `alert_rules`.`name`, `alert_rules`.`severity` $sql";
+    $param = array_merge([session('preferences.timezone')], $param);
+} else {
+    $sql = "SELECT `alerts`.*, `alerts`.`timestamp` AS timestamp_display, `devices`.`hostname`, `devices`.`sysName`, `devices`.`display`, `devices`.`os`, `devices`.`hardware`, `locations`.`location`, `alert_rules`.`rule`, `alert_rules`.`name`, `alert_rules`.`severity` $sql";
+}
 
 $rulei = 0;
 $format = $vars['format'];
@@ -145,7 +150,7 @@ foreach (dbFetchRows($sql, $param) as $alert) {
         }
     }
 
-    $hostname = '<div class="incident">' . generate_device_link($alert, shorthost(format_hostname($alert))) . '<div id="incident' . ($alert['id']) . '"';
+    $hostname = '<div class="incident">' . generate_device_link($alert, shorthost(format_hostname($alert))) . '<div id="incident' . $alert['id'] . '"';
     if (is_numeric($vars['uncollapse_key_count'])) {
         $hostname .= $max_row_length < (int) $vars['uncollapse_key_count'] ? '' : ' class="collapse"';
     } else {
@@ -186,11 +191,11 @@ foreach (dbFetchRows($sql, $param) as $alert) {
     $response[] = [
         'id' => $rulei++,
         'rule' => '<i title="' . htmlentities($alert['rule']) . '"><a href="' . \LibreNMS\Util\Url::generate(['page' => 'alert-rules']) . '">' . htmlentities($alert['name']) . '</a></i>',
-        'details' => '<a class="fa fa-plus incident-toggle" style="display:none" data-toggle="collapse" data-target="#incident' . ($alert['id']) . '" data-parent="#alerts"></a>',
-        'verbose_details' => "<button type='button' class='btn btn-alert-details fa fa-info command-alert-details' aria-label='Details' id='alert-details' data-alert_log_id='{$alert_log_id}'></button>",
+        'details' => '<a class="fa-solid fa-plus incident-toggle" style="display:none" data-toggle="collapse" data-target="#incident' . $alert['id'] . '" data-parent="#alerts"></a>',
+        'verbose_details' => "<button type='button' class='btn btn-alert-details command-alert-details' aria-label='Details' id='alert-details' data-alert_log_id='{$alert_log_id}'><i class='fa-solid fa-circle-info'></i></button>",
         'hostname' => $hostname,
-        'location' => generate_link($alert['location'], ['page' => 'devices', 'location' => $alert['location']]),
-        'timestamp' => ($alert['timestamp'] ? $alert['timestamp'] : 'N/A'),
+        'location' => generate_link(htmlspecialchars($alert['location']), ['page' => 'devices', 'location' => $alert['location']]),
+        'timestamp' => ($alert['timestamp_display'] ? $alert['timestamp_display'] : 'N/A'),
         'severity' => $severity_ico,
         'state' => $alert['state'],
         'alert_id' => $alert['id'],

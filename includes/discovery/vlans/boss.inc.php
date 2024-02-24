@@ -11,7 +11,7 @@ if ($device['os'] == 'boss') {
 
     foreach ($vlans as $vlan_id => $vlan) {
         d_echo(" $vlan_id");
-        if (is_array($vlans_db[$vtpdomain_id][$vlan_id])) {
+        if (! empty($vlans_db) && is_array($vlans_db[$vtpdomain_id][$vlan_id])) {
             $vlan_data = $vlans_db[$vtpdomain_id][$vlan_id];
             if ($vlan_data['vlan_name'] != $vlan['rcVlanName']) {
                 $vlan_upd['vlan_name'] = $vlan['rcVlanName'];
@@ -27,7 +27,7 @@ if ($device['os'] == 'boss') {
                 'vlan_domain' => $vtpdomain_id,
                 'vlan_vlan' => $vlan_id,
                 'vlan_name' => $vlan['rcVlanName'],
-                'vlan_type' => ['NULL'],
+                'vlan_type' => null,
             ], 'vlans');
             echo '+';
         }
@@ -43,7 +43,7 @@ if ($device['os'] == 'boss') {
         }
 
         foreach ($egress_ids as $port_id) {
-            $ifIndex = $base_to_index[$port_id - 1]; // -1 fixes off by one error
+            $ifIndex = $base_to_index[$port_id - 1] ?? null; // -1 fixes off by one error
             $per_vlan_data[$vlan_id][$ifIndex]['untagged'] = (in_array($port_id - 1, $untagged_ids) ? 1 : 0); // -1 fixes off by one error
         }
     }

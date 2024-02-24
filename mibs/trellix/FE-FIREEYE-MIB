@@ -1,0 +1,2922 @@
+FE-FIREEYE-MIB DEFINITIONS ::= BEGIN
+
+--
+--  Revision:  $Revision: 202227 $
+--  Date:      $Date: 2014-04-16 17:00:10 -0700 (Wed, 16 Apr 2014) $
+--
+--  (C) Copyright 2005-2014 FireEye, Inc.
+--  All rights reserved.
+--
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, enterprises,
+    Integer32, Unsigned32, Counter32, Counter64,
+    IpAddress, Gauge32                               FROM SNMPv2-SMI
+    TruthValue                                       FROM SNMPv2-TC
+    MODULE-COMPLIANCE, 
+    OBJECT-GROUP, NOTIFICATION-GROUP                 FROM SNMPv2-CONF
+    InetAddressType, InetAddress                     FROM INET-ADDRESS-MIB
+    CounterBasedGauge64                              FROM HCNUM-TC
+;
+
+fireeyeMibModule MODULE-IDENTITY
+    LAST-UPDATED        "201404071120Z"
+    ORGANIZATION        "FireEye, Inc."
+    CONTACT-INFO
+            "email:     support@fireeye.com"
+    DESCRIPTION
+            "FireEye Inc Vendor MIB"
+    REVISION            "201404071120Z"
+    DESCRIPTION
+            "Added IPS traps."
+    REVISION            "201404021040Z"
+    DESCRIPTION
+            "Enhance feLicenseStateChanged notification."
+    REVISION            "201403191040Z"
+    DESCRIPTION
+            "Added MAS specific info and traps."
+    REVISION            "201403101000Z"
+    DESCRIPTION
+            "Add interface speed change notification."
+    REVISION            "201401212100Z"
+    DESCRIPTION
+            "Updated revision, FireEye 7.1"
+    REVISION            "201109081900Z"
+    DESCRIPTION
+            "Updated revision, FireEye 3.1"
+    ::= { feMibAdminInfo 1 }
+
+fireeye OBJECT IDENTIFIER ::= { enterprises 25597 }
+
+variables OBJECT IDENTIFIER
+    ::= { fireeye 1 }
+
+notifications OBJECT IDENTIFIER
+    ::= { fireeye 3 }
+
+--
+-- VARIABLES
+--
+
+lms OBJECT IDENTIFIER
+    ::= { variables 1 }
+
+lmsVersion OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "System software version string"
+    ::= { lms 1 }
+
+eventTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EventEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "List of events"
+    ::= { lms 2 }
+
+eventCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Number of events"
+    ::= { lms 3 }
+
+eventEntry OBJECT-TYPE
+    SYNTAX      EventEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Entry for one event"
+    INDEX   { eventIndex }
+    ::= { eventTable 1 }
+
+EventEntry ::=
+    SEQUENCE {
+        eventIndex            Unsigned32,
+        eventId               Unsigned32,
+        eventType             OCTET STRING,
+        eventDate             OCTET STRING,
+        eventTime             OCTET STRING,
+        eventTraceId          Counter64,
+        eventSrcIp            IpAddress,
+        eventDstIp            IpAddress,
+        eventSrcMac           OCTET STRING,
+        eventDstMac           OCTET STRING,
+        eventDstPort          Integer32,
+        eventVlan             Integer32,
+        eventProtocol         OCTET STRING,
+        eventProfileId        Unsigned32,
+        eventOsInfo           OCTET STRING,
+        eventService          OCTET STRING,
+        eventAttackType       OCTET STRING,
+        eventSignatureName    OCTET STRING,
+        eventSignatureType    OCTET STRING,
+        eventSrcHost          OCTET STRING,
+        eventCncNo            Unsigned32,
+        alertSignatureId      Unsigned32,
+        alertCncHost          OCTET STRING,
+        alertCncPort          Integer32,
+        alertChecksum         OCTET STRING,
+        alertAnalysisType     OCTET STRING,
+        alertProfile          OCTET STRING,
+        alertAction           OCTET STRING,
+        alertInterface        OCTET STRING,
+        alertSensorIp         IpAddress,
+        alertSensorHost       OCTET STRING,
+        alertSensorProduct    OCTET STRING,
+        alertSensorRelease    OCTET STRING,
+        alertUrl              OCTET STRING,
+        eventSrcAddrType      InetAddressType,
+        eventSrcAddr          InetAddress,
+        eventDstAddrType      InetAddressType,
+        eventDstAddr          InetAddress,
+        eventSensorAddrType   InetAddressType,
+        eventSensorAddr       InetAddress,
+        eventSrcPort          Integer32,
+        eventDateTime         OCTET STRING,
+        ipsSignatureId        Unsigned32,
+        ipsSignatureRevision  Unsigned32,
+        ipsMatchCount         Gauge32,
+        ipsSeverity           OCTET STRING,
+        ipsSignatureName      OCTET STRING,
+        ipsReferenceId        OCTET STRING,
+        ipsBlockMode          OCTET STRING,
+        ipsAttackTarget       OCTET STRING
+    }
+
+eventIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "Synthetic numeric unique ID of event"
+    ::= { eventEntry 1 }
+
+eventId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "Id of event"
+    ::= { eventEntry 2 }
+
+eventType OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "Type of event"
+    ::= { eventEntry 3 }
+
+eventDate OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "Date of event"
+    ::= { eventEntry 4 }
+
+eventTime OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "Time of event"
+    ::= { eventEntry 5 }
+
+eventTraceId OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "Trace ID of event"
+    ::= { eventEntry 6 }
+
+eventSrcIp OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "Source IP address of event"
+    ::= { eventEntry 7 }
+
+eventDstIp OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "Destination IP address of event"
+    ::= { eventEntry 8 }
+
+eventSrcMac OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "Source MAC address of event"
+    ::= { eventEntry 9 }
+
+eventDstMac OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "Destination MAC address of event"
+    ::= { eventEntry 10 }
+
+eventDstPort OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "Attacked port of event"
+    ::= { eventEntry 11 }
+
+eventVlan OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "VLAN of event"
+    ::= { eventEntry 12 }
+
+eventProtocol OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "IP protocol of event"
+    ::= { eventEntry 13 }
+
+eventProfileId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "Profile ID of event"
+    ::= { eventEntry 14 }
+
+eventOsInfo OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "OS info of event"
+    ::= { eventEntry 15 }
+
+eventService OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "Attacked service of event"
+    ::= { eventEntry 16 }
+
+eventAttackType OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "Attack type of event"
+    ::= { eventEntry 17 }
+
+eventSignatureName OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "Signature name of event"
+    ::= { eventEntry 18 }
+
+eventSignatureType OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "Signature type of event"
+    ::= { eventEntry 19 }
+
+eventSrcHost OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "Host name of event"
+    ::= { eventEntry 20 }
+
+eventCncNo OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "Cncno of event"
+    ::= { eventEntry 21 }
+
+alertSignatureId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "Malware Identification"
+    ::= { eventEntry 22 }
+
+alertCncHost OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "Alert CNC host name"
+    ::= { eventEntry 23 }
+
+alertCncPort OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "Alert CNC Port"
+    ::= { eventEntry 24 }
+
+alertChecksum OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "Alert Malware Checksum"
+    ::= { eventEntry 25 }
+
+alertAnalysisType OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "Alert analysis type"
+    ::= { eventEntry 26 }
+
+alertProfile OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "Alert analysis profile"
+    ::= { eventEntry 27 }
+
+alertAction OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "Alert action taken"
+    ::= { eventEntry 28 }
+
+alertInterface OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "Appliance interface"
+    ::= { eventEntry 29 }
+
+
+alertSensorIp OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "Appliance IP address"
+    ::= { eventEntry 30 }
+
+alertSensorHost OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "Appliance host name"
+    ::= { eventEntry 31 }
+
+alertSensorProduct OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "Product Name"
+    ::= { eventEntry 32 }
+
+alertSensorRelease OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "Alert URL"
+    ::= { eventEntry 33 }
+
+alertUrl OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "Alert URL"
+    ::= { eventEntry 34 }
+
+eventSrcAddrType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "Source IP address type"
+    ::= { eventEntry 35 }
+            
+eventSrcAddr    OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "Source IP address"
+    ::= { eventEntry 36 }
+            
+eventDstAddrType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "Destination IP address type"
+    ::= { eventEntry 37 }
+            
+eventDstAddr    OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "Destination IP address"
+    ::= { eventEntry 38 }
+            
+eventSensorAddrType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "Sensor IP address type"
+    ::= { eventEntry 39 }
+            
+eventSensorAddr OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "Sensor IP address"
+    ::= { eventEntry 40 }
+
+eventSrcPort OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "Source port"
+    ::= { eventEntry 41 }
+
+eventDateTime OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "Date and time of the event"
+    ::= { eventEntry 42 }
+
+ipsSignatureId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "IPS signature id"
+    ::= { eventEntry 43 }
+
+ipsSignatureRevision OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "IPS signature revision"
+    ::= { eventEntry 44 }
+
+ipsMatchCount OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "Attack count"
+    ::= { eventEntry 45 }
+
+ipsSeverity OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "Severity"
+    ::= { eventEntry 46 }
+
+ipsSignatureName OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "Name of the signature"
+    ::= { eventEntry 47 }
+
+ipsReferenceId OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "Reference ID"
+    ::= { eventEntry 48 }
+
+ipsBlockMode OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "isBlocked"
+    ::= { eventEntry 49 }
+
+ipsAttackTarget OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "Attack target"
+    ::= { eventEntry 50 }
+
+
+--
+-- NOTIFICATIONS
+--
+
+notificationPrefix OBJECT IDENTIFIER
+    ::= { notifications 0 }
+
+fireeyeAlert NOTIFICATION-TYPE
+    OBJECTS {
+        eventIndex,
+        eventId,
+        eventType,
+        eventDate,
+        eventTime,
+        eventTraceId,
+        eventSrcIp,
+        eventDstIp,
+        eventSrcMac,
+        eventDstMac,
+        eventDstPort,
+        eventVlan,
+        eventProtocol,
+        eventProfileId,
+        eventOsInfo,
+        eventService,
+        eventAttackType,
+        eventSignatureName,
+        eventSignatureType,
+        eventSrcHost,
+        eventCncNo,
+        alertSignatureId,
+        alertCncHost,
+        alertCncPort,
+        alertChecksum,
+        alertAnalysisType,
+        alertProfile,
+        alertAction,
+        alertInterface,
+        alertSensorIp,
+        alertSensorHost,
+        alertSensorRelease,
+        alertSensorProduct, 
+        alertUrl,
+        eventSrcAddrType,
+        eventSrcAddr,
+        eventDstAddrType,
+        eventDstAddr,
+        eventSensorAddrType,
+        eventSensorAddr
+    }
+    STATUS  current
+    DESCRIPTION
+            "Execution anomaly detected"
+    ::= { notificationPrefix 1 }
+
+
+executionAnomaly NOTIFICATION-TYPE
+    OBJECTS { 
+        eventIndex,
+        eventId,
+        eventType,
+        eventDate,
+        eventTime,
+        eventTraceId,
+        eventSrcIp,
+        eventDstIp,
+        eventSrcMac,
+        eventDstMac,
+        eventDstPort,
+        eventVlan,
+        eventProtocol,
+        eventProfileId,
+        eventOsInfo,
+        eventService,
+        eventAttackType,
+        eventSrcHost,
+        eventSrcAddrType,
+        eventSrcAddr,
+        eventDstAddrType,
+        eventDstAddr
+    }
+    STATUS  current
+    DESCRIPTION
+            "Execution anomaly detected"
+    ::= { notificationPrefix 2 }
+
+networkAnomaly NOTIFICATION-TYPE
+    OBJECTS { 
+        eventIndex,
+        eventId,
+        eventType,
+        eventDate,
+        eventTime,
+        eventTraceId,
+        eventSrcIp,
+        eventDstIp,
+        eventSrcMac,
+        eventDstMac,
+        eventDstPort,
+        eventVlan,
+        eventProtocol,
+        eventProfileId,
+        eventOsInfo,
+        eventService,
+        eventSrcHost,
+        eventCncNo,
+        eventSrcAddrType,
+        eventSrcAddr,
+        eventDstAddrType,
+        eventDstAddr
+    }
+    STATUS  current
+    DESCRIPTION
+            "Network anomaly detected"
+    ::= { notificationPrefix 3 }
+
+signatureMatch NOTIFICATION-TYPE
+    OBJECTS { 
+        eventIndex,
+        eventId,
+        eventType,
+        eventDate,
+        eventTime,
+        eventTraceId,
+        eventSrcIp,
+        eventDstIp,
+        eventSrcMac,
+        eventDstMac,
+        eventDstPort,
+        eventVlan,
+        eventProtocol,
+        eventSignatureName,
+        eventSignatureType,
+        eventSrcHost,
+        eventSrcAddrType,
+        eventSrcAddr,
+        eventDstAddrType,
+        eventDstAddr
+    }
+    STATUS  current
+    DESCRIPTION
+            "Signature match detected"
+    ::= { notificationPrefix 4 }
+
+ccConnect NOTIFICATION-TYPE
+    OBJECTS { 
+        eventIndex,
+        eventId,
+        eventType,
+        eventDate,
+        eventTime,
+        eventTraceId,
+        eventSrcIp,
+        eventDstIp,
+        eventDstPort,
+        eventVlan,
+        eventProtocol,
+        eventSrcHost,
+        eventCncNo,
+        eventSrcAddrType,
+        eventSrcAddr,
+        eventDstAddrType,
+        eventDstAddr
+    }
+    STATUS  current
+    DESCRIPTION
+            "CC connect detected"
+    ::= { notificationPrefix 9 }
+
+ccSigmatch NOTIFICATION-TYPE
+    OBJECTS { 
+        eventIndex,
+        eventId,
+        eventType,
+        eventDate,
+        eventTime,
+        eventTraceId,
+        eventSrcIp,
+        eventDstIp,
+        eventDstPort,
+        eventVlan,
+        eventProtocol,
+        eventSrcHost,
+        eventCncNo,
+        eventSrcAddrType,
+        eventSrcAddr,
+        eventDstAddrType,
+        eventDstAddr
+    }
+    STATUS  current
+    DESCRIPTION
+            "CC sigmatch detected"
+    ::= { notificationPrefix 10 }
+
+osChange NOTIFICATION-TYPE
+    OBJECTS {
+        eventIndex,
+        eventId,
+        eventType,
+        eventDate,
+        eventTime,
+        eventTraceId,
+        eventSrcIp,
+        eventDstIp,
+        eventSrcMac,
+        eventDstMac,
+        eventDstPort,
+        eventVlan,
+        eventProtocol,
+        eventSrcHost,
+        eventSrcAddrType,
+        eventSrcAddr,
+        eventDstAddrType,
+        eventDstAddr
+    }
+    STATUS  current
+    DESCRIPTION
+            "OS change anomaly detected"
+    ::= { notificationPrefix 11 }
+
+ipsAlert NOTIFICATION-TYPE
+    OBJECTS {
+        eventIndex,
+        eventId,
+        eventType,
+        eventTime,
+        eventSrcAddrType,
+        eventSrcAddr,
+        eventSrcPort,
+        eventSrcMac,
+        eventDstAddrType,
+        eventDstAddr,
+        eventDstPort,
+        eventDstMac,
+        ipsSignatureId,
+        ipsSignatureRevision,
+        ipsMatchCount,
+        ipsSeverity,
+        ipsSignatureName,
+        ipsReferenceId,
+        ipsBlockMode,
+        ipsAttackTarget,
+        alertSensorProduct, 
+        alertSensorHost,
+        alertSensorRelease,
+        alertUrl
+    }
+    STATUS  current
+    DESCRIPTION
+            "IPS anomaly detected."
+    ::= { notificationPrefix 12 }
+
+
+--
+-- products
+--
+
+feCommon        OBJECT IDENTIFIER ::= { fireeye 11 }
+feCMS           OBJECT IDENTIFIER ::= { fireeye 12 }
+feEMPS          OBJECT IDENTIFIER ::= { fireeye 13 }
+feWMPS          OBJECT IDENTIFIER ::= { fireeye 14 }
+feMAS           OBJECT IDENTIFIER ::= { fireeye 15 }
+feMibAdminInfo  OBJECT IDENTIFIER ::= { fireeye 20 }
+
+--
+-- feCommon
+--
+
+feSystem        OBJECT IDENTIFIER ::= { feCommon 1 }
+feStorage       OBJECT IDENTIFIER ::= { feCommon 2 }
+fePowerSupply   OBJECT IDENTIFIER ::= { feCommon 3 }
+feFanHealth     OBJECT IDENTIFIER ::= { feCommon 4 }
+feApplication   OBJECT IDENTIFIER ::= { feCommon 5 }
+
+--
+-- feSystem
+--
+
+feSystemInfo    OBJECT IDENTIFIER ::= { feSystem 1 }
+feSystemTraps   OBJECT IDENTIFIER ::= { feSystem 0 }
+
+feSystemStatus  OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Overall system status"
+    ::= { feSystemInfo 1 }
+
+feHardwareModel OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Hardware model"
+    ::= { feSystemInfo 2 }
+
+feSerialNumber  OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Serial number"
+    ::= { feSystemInfo 3 }
+
+feTemperatureValue OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "System temperature in Celsius"
+    ::= { feSystemInfo 4 }
+
+feTemperatureStatus OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "System temperature status"
+    ::= { feSystemInfo 5 }
+
+feTemperatureIsHealthy OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Whether or not the temperature is normal."
+    ::= { feSystemInfo 6 }
+
+feIfLinkChangeIfname OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The name of the interface that has changed its speed."
+    ::= { feSystemInfo 7 }
+
+feIfLinkChangeOldAdminUp OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The old admin up state of the interface."
+    ::= { feSystemInfo 8 }
+
+feIfLinkChangeNewAdminUp OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The new admin up state of the interface."
+    ::= { feSystemInfo 9 }
+
+feIfLinkChangeOldLinkUp OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The old link up state of the interface."
+    ::= { feSystemInfo 10 }
+
+feIfLinkChangeNewLinkUp OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The new link up state of the interface."
+    ::= { feSystemInfo 11 }
+
+feIfLinkChangeOldSpeed OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The old speed of the interface."
+    ::= { feSystemInfo 12 }
+
+feIfLinkChangeNewSpeed OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The new speed of the interface."
+    ::= { feSystemInfo 13 }
+
+feIfLinkChangeOldDuplex OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The old duplex of the interface."
+    ::= { feSystemInfo 14 }
+
+feIfLinkChangeNewDuplex OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The new duplex of the interface."
+    ::= { feSystemInfo 15 }
+
+feIfLinkChangeOldAutoNeg OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The old auto negotiation of the interface."
+    ::= { feSystemInfo 16 }
+
+feIfLinkChangeNewAutoNeg OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The new auto negotiation of the interface."
+    ::= { feSystemInfo 17 }
+
+feExcessiveTemperature NOTIFICATION-TYPE
+    OBJECTS     { feTemperatureIsHealthy }
+    STATUS      current
+    DESCRIPTION
+        "Excessive temperature has reached."
+    ::= { feSystemTraps 1 }
+
+feNormalTemperature NOTIFICATION-TYPE
+    OBJECTS     { feTemperatureIsHealthy }
+    STATUS      current
+    DESCRIPTION
+        "Temperature is normal."
+    ::= { feSystemTraps 2 }
+
+feIfLinkChange NOTIFICATION-TYPE
+    OBJECTS     { feIfLinkChangeIfname,
+                  feIfLinkChangeOldAdminUp,
+                  feIfLinkChangeNewAdminUp,
+                  feIfLinkChangeOldLinkUp,
+                  feIfLinkChangeNewLinkUp,
+                  feIfLinkChangeOldSpeed,
+                  feIfLinkChangeNewSpeed,
+                  feIfLinkChangeOldDuplex,
+                  feIfLinkChangeNewDuplex,
+                  feIfLinkChangeOldAutoNeg,
+                  feIfLinkChangeNewAutoNeg }
+    STATUS      current
+    DESCRIPTION
+        "The speed of an interface has changed."
+    ::= { feSystemTraps 3 }
+
+--
+-- feStorage
+--
+
+feStorageInfo   OBJECT IDENTIFIER ::= { feStorage 1 }
+feStorageTraps  OBJECT IDENTIFIER ::= { feStorage 0 }
+
+feRaidStatus    OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "RAID status"
+    ::= { feStorageInfo 1 }
+
+feRaidIsHealthy OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Whether or not RAID is healthy overall."
+    ::= { feStorageInfo 2 }
+
+fePhysicalDiskTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FePhysicalDiskEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The physical disk table"
+    ::= { feStorageInfo 3 }
+
+fePhysicalDiskEntry OBJECT-TYPE
+    SYNTAX     FePhysicalDiskEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "An entry for one physical disk"
+    INDEX { fePhysicalDiskIndex }
+    ::= { fePhysicalDiskTable 1 }
+
+FePhysicalDiskEntry ::= SEQUENCE {
+        fePhysicalDiskIndex             Unsigned32,
+        fePhysicalDiskName              OCTET STRING,
+        fePhysicalDiskStatus            OCTET STRING,
+        fePhysicalDiskIsHealthy         TruthValue,
+        fePhysicalDiskDeviceSupport     OCTET STRING,
+        fePhysicalDiskSelfAssess        OCTET STRING,
+        fePhysicalDiskTotalBytes        OCTET STRING
+    }
+
+fePhysicalDiskIndex OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "A unique value for each disk"
+    ::= { fePhysicalDiskEntry 1 }
+
+fePhysicalDiskName OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Physical disk name"
+    ::= { fePhysicalDiskEntry 2 }
+
+fePhysicalDiskStatus OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Physical disk status"
+    ::= { fePhysicalDiskEntry 3 }
+
+fePhysicalDiskIsHealthy OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Whether a physical disk is healthy."
+    ::= { fePhysicalDiskEntry 4 }
+
+fePhysicalDiskDeviceSupport OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Physical disk configuration, e.g. RAID"
+    ::= { fePhysicalDiskEntry 5 }
+
+fePhysicalDiskSelfAssess OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Self assess of a physical disk"
+    ::= { fePhysicalDiskEntry 6 }
+
+fePhysicalDiskTotalBytes OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The capacity of a physical disk."
+    ::= { fePhysicalDiskEntry 7 }
+
+feRaidFailure   NOTIFICATION-TYPE
+    OBJECTS     { feRaidIsHealthy }
+    STATUS      current
+    DESCRIPTION
+        "A RAID error has occurred."
+    ::= { feStorageTraps 1 }
+
+feRaidRecover   NOTIFICATION-TYPE
+    OBJECTS     { feRaidIsHealthy }
+    STATUS      current
+    DESCRIPTION
+        "RAID has recovered."
+    ::= { feStorageTraps 2 }
+
+fePhysicalDiskFailure NOTIFICATION-TYPE
+    OBJECTS     { fePhysicalDiskIsHealthy }
+    STATUS      current
+    DESCRIPTION
+        "A physical disk has failed."
+    ::= { feStorageTraps 3 }
+
+fePhysicalDiskRecover NOTIFICATION-TYPE
+    OBJECTS     { fePhysicalDiskIsHealthy }
+    STATUS      current
+    DESCRIPTION
+        "A physical disk has recovered."
+    ::= { feStorageTraps 4 }
+
+--
+-- fePowerSupply
+--
+
+fePowerSupplyInfo  OBJECT IDENTIFIER ::= { fePowerSupply 1 }
+fePowerSupplyTraps OBJECT IDENTIFIER ::= { fePowerSupply 0 }
+
+fePowerSupplyOverallStatus OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Overall power supply status"
+    ::= { fePowerSupplyInfo 1 }
+
+fePowerSupplyOverallIsHealthy OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Whether or not power supply is healthy overall."
+    ::= { fePowerSupplyInfo 2 }
+
+fePowerSupplyTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FePowerSupplyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The power supply table"
+    ::= { fePowerSupplyInfo 3 }
+
+fePowerSupplyEntry OBJECT-TYPE
+    SYNTAX      FePowerSupplyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry for one physical disk"
+    INDEX { fePowerSupplyIndex }
+    ::= { fePowerSupplyTable 1 }
+
+FePowerSupplyEntry ::= SEQUENCE {
+        fePowerSupplyIndex      Unsigned32,
+        fePowerSupplyStatus     OCTET STRING,
+        fePowerSupplyIsHealthy  TruthValue
+    }
+
+fePowerSupplyIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A unique value for each power supply"
+    ::= { fePowerSupplyEntry 1 }
+
+fePowerSupplyStatus OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Power supply status"
+    ::= { fePowerSupplyEntry 2 }
+
+fePowerSupplyIsHealthy OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Whether a power supply is healthy."
+    ::= { fePowerSupplyEntry 3 }
+
+fePowerSupplyFailure NOTIFICATION-TYPE
+    OBJECTS     { fePowerSupplyOverallIsHealthy }
+    STATUS      current
+    DESCRIPTION
+        "A power supply has failed."
+    ::= { fePowerSupplyTraps 1 }
+
+fePowerSupplyRecover NOTIFICATION-TYPE
+    OBJECTS     { fePowerSupplyOverallIsHealthy }
+    STATUS      current
+    DESCRIPTION
+        "A power supply has recovered."
+    ::= { fePowerSupplyTraps 2 }
+
+--
+-- feFanHealth
+--
+
+feFanHealthInfo  OBJECT IDENTIFIER ::= { feFanHealth 1 }
+feFanHealthTraps OBJECT IDENTIFIER ::= { feFanHealth 0 }
+
+feFanOverallStatus OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Overall fan status"
+    ::= { feFanHealthInfo 1 }
+
+feFanOverallIsHealthy OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Whether or not fan is healthy overall."
+    ::= { feFanHealthInfo 2 }
+
+feFanStatusTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FeFanStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Fan Status table"
+    ::= { feFanHealthInfo 3 }
+
+feFanStatusEntry OBJECT-TYPE
+    SYNTAX      FeFanStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry for one fan"
+    INDEX { feFanIndex }
+    ::= { feFanStatusTable 1 }
+
+FeFanStatusEntry ::= SEQUENCE {
+        feFanIndex      Unsigned32,
+        feFanStatus     OCTET STRING,
+        feFanIsHealthy  TruthValue,
+        feFanSpeed      Unsigned32
+    }
+
+feFanIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A unique value for each fan status table entry"
+    ::= { feFanStatusEntry 1 }
+
+feFanStatus     OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Fan status"
+    ::= { feFanStatusEntry 2 }
+
+feFanIsHealthy  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Whether a fan is healthy."
+    ::= { feFanStatusEntry 3 }
+
+feFanSpeed      OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Fan speed in rpm"
+    ::= { feFanStatusEntry 4 }
+
+feFanFailure NOTIFICATION-TYPE
+    OBJECTS     { feFanOverallIsHealthy }
+    STATUS      current
+    DESCRIPTION
+        "A fan has failed."
+    ::= { feFanHealthTraps 1 }
+
+feFanRecover NOTIFICATION-TYPE
+    OBJECTS     { feFanOverallIsHealthy }
+    STATUS      current
+    DESCRIPTION
+        "A fan has recovered."
+    ::= { feFanHealthTraps 2 }
+
+--
+-- feApplication
+--
+
+feApplicationInfo  OBJECT IDENTIFIER ::= { feApplication 1 }
+feApplicationTraps OBJECT IDENTIFIER ::= { feApplication 0 }
+
+feInstalledSystemImage OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Current installed system image"
+    ::= { feApplicationInfo 1 }
+
+feSystemImageVersionCurrent OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Current system image version"
+    ::= { feApplicationInfo 2 }
+
+feSystemImageVersionLatest OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Latest system image version"
+    ::= { feApplicationInfo 3 }
+
+feIsSystemImageLatest OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Whether or not the current system image is the latest."
+    ::= { feApplicationInfo 4 }
+
+feSecurityContentVersion OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Security content version"
+    ::= { feApplicationInfo 5 }
+
+feLastContentUpdatePassed OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Whether the last security content updated has passed."
+    ::= { feApplicationInfo 6 }
+
+feLastContentUpdateTime OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The last update time for security contents"
+    ::= { feApplicationInfo 7 }
+
+feGIVersionTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FeGIVersionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The guest image version table"
+    ::= { feApplicationInfo 8 }
+
+feGIVersionEntry OBJECT-TYPE
+    SYNTAX     FeGIVersionEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "An entry for one guest image"
+    INDEX { feGIIndex }
+    ::= { feGIVersionTable 1 }
+
+FeGIVersionEntry ::= SEQUENCE {
+        feGIIndex               Unsigned32,
+        feGIName                OCTET STRING,
+        feGIVersion             OCTET STRING,
+        feGIEnabled             TruthValue,
+        feGIInstallDateTime     OCTET STRING
+    }
+
+feGIIndex      OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "A unique value for each guest image"
+    ::= { feGIVersionEntry 1 }
+
+feGIName       OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Guest image name"
+    ::= { feGIVersionEntry 2 }
+
+feGIVersion    OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Guest image version"
+    ::= { feGIVersionEntry 3 }
+
+feGIEnabled    OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Whether guest image is enabled."
+    ::= { feGIVersionEntry 4 }
+
+feGIInstallDateTime OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Guest image install date and time"
+    ::= { feGIVersionEntry 5 }
+
+feActiveVMs     OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of active VMs"
+    ::= { feApplicationInfo 9 }
+
+feProductLicenseActive OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Whether the product license is active."
+    ::= { feApplicationInfo 10 }
+
+feContentLicenseActive OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Whether the content license is active."
+    ::= { feApplicationInfo 11 }
+
+feSupportLicenseActive OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Whether the support license is active."
+    ::= { feApplicationInfo 12 }
+
+feLicenseFeatureName OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "License feature name for the feLicenseStateChanged event."
+    ::= { feApplicationInfo 13 }
+
+feLicenseNewActiveState OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The new license active state for the feLicenseStateChanged event."
+    ::= { feApplicationInfo 14 }
+
+feLicenseOldActiveState OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The old license active state for the feLicenseStateChanged event."
+    ::= { feApplicationInfo 15 }
+
+feLicenseStateChanged NOTIFICATION-TYPE
+    OBJECTS     { feLicenseFeatureName,        
+                  feLicenseNewActiveState, 
+                  feLicenseOldActiveState }
+    STATUS      current
+    DESCRIPTION
+        "A license state has changed."
+    ::= { feApplicationTraps 1 }
+
+feSecurityUpdateFailed NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "Security update has failed."
+    ::= { feApplicationTraps 2 }
+
+--
+-- feCMS
+--
+
+feCMSInfo      OBJECT IDENTIFIER ::= { feCMS 1 }
+feCMSTraps     OBJECT IDENTIFIER ::= { feCMS 0 }
+
+feTotalAppliancesAttached OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total appliances attached"
+    ::= { feCMSInfo 1 }
+
+feTotalWMPSAttached OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total WMPS attached"
+    ::= { feCMSInfo 2 }
+
+feTotalEMPSAttached OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total EMPS attached"
+    ::= { feCMSInfo 3 }
+
+feTotalFMPSAttached OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total FMPS attached"
+    ::= { feCMSInfo 4 }
+
+feTotalMASAttached OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total MAS attached"
+    ::= { feCMSInfo 5 }
+
+feCMSApplianceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FeCMSApplianceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The CMS managed appliance table"
+    ::= { feCMSInfo 6 }
+
+feCMSApplianceEntry OBJECT-TYPE
+    SYNTAX     FeCMSApplianceEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "An entry for one CMS managed appliance"
+    INDEX { feCMSApplianceIndex }
+    ::= { feCMSApplianceTable 1 }
+
+FeCMSApplianceEntry ::= SEQUENCE {
+        feCMSApplianceIndex             Unsigned32,
+        feCMSApplianceName              OCTET STRING,
+        feCMSApplianceDiskSpacePassed   TruthValue,
+        feCMSApplianceFanPassed         TruthValue,
+        feCMSAppliancePowerSupplyPassed TruthValue,
+        feCMSApplianceRaidPassed        TruthValue,
+        feCMSApplianceTemperaturePassed TruthValue
+    }
+
+feCMSApplianceIndex OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "A unique value for each CMS managed appliance"
+    ::= { feCMSApplianceEntry 1 }
+
+feCMSApplianceName OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The name of the CMS managed appliance"
+    ::= { feCMSApplianceEntry 2 }
+
+feCMSApplianceDiskSpacePassed OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Whether a CMS managed appliance passed disk space check."
+    ::= { feCMSApplianceEntry 3 }
+
+feCMSApplianceFanPassed OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Whether a CMS managed appliance passed fan check."
+    ::= { feCMSApplianceEntry 4 }
+
+feCMSAppliancePowerSupplyPassed OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Whether a CMS managed appliance passed power supply check."
+    ::= { feCMSApplianceEntry 5 }
+
+feCMSApplianceRaidPassed OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Whether a CMS managed appliance passed RAID check."
+    ::= { feCMSApplianceEntry 6 }
+
+feCMSApplianceTemperaturePassed OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Whether a CMS managed appliance passed temperature check."
+    ::= { feCMSApplianceEntry 7 }
+
+feCMSHAUnexpectedFailover NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "An unexpected fail-over on CMS-HA has occurred."
+    ::= { feCMSTraps 1 }
+
+feCMSHAManualFailover NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "A manual fail-over on CMS-HA has occurred."
+    ::= { feCMSTraps 2 }
+
+--
+-- feEMPS
+--
+
+feEMPSInfo      OBJECT IDENTIFIER ::= { feEMPS 1 }
+feEMPSTraps     OBJECT IDENTIFIER ::= { feEMPS 0 }
+
+feTotalEmailCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of all the emails coming into postfix and also 
+        includes emails which do not contain any URL or attachment (email on 
+        fast path). This will be the cumulative value and maintained across 
+        appliance reboots."
+    ::= { feEMPSInfo 1 }
+
+feTotalEmailCountH OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of all the emails coming into postfix and also 
+        includes emails which do not contain any URL or attachment (email on 
+        fast path). This will be the cumulative value and maintained across 
+        appliance reboots.  feTotalEmailCountH is the high order 32bit of the
+        64bit counter."
+    ::= { feEMPSInfo 2 }
+
+feTotalEmailCountL OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of all the emails coming into postfix and also 
+        includes emails which do not contain any URL or attachment (email on 
+        fast path). This will be the cumulative value and maintained across 
+        appliance reboots.  feTotalEmailCountL is the low order 32bit of the
+        64bit counter."
+    ::= { feEMPSInfo 3 }
+
+feInfectedEmailCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of all the email which are determined to be malicious. 
+        This is the same as 'Total Email Received with Malicious Content' that we 
+        currently show in the output to CLI command 'show email-analysis 
+        statistics'. This will be the cumulative value and is maintained across 
+        appliance reboots."
+    ::= { feEMPSInfo 4 }
+
+feInfectedEmailCountH OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of all the email which are determined to be malicious. 
+        This is the same as 'Total Email Received with Malicious Content' that we 
+        currently show in the output to CLI command 'show email-analysis 
+        statistics'. This will be the cumulative value and is maintained across 
+        appliance reboots.  feInfectedEmailCountH is the high order 32bit of the
+        64bit counter."
+    ::= { feEMPSInfo 5 }
+
+feInfectedEmailCountL OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of all the email which are determined to be malicious. 
+        This is the same as 'Total Email Received with Malicious Content' that we 
+        currently show in the output to CLI command 'show email-analysis 
+        statistics'. This will be the cumulative value and is maintained across 
+        appliance reboots.  feInfectedEmailCountL is the low order 32bit of the
+        64bit counter."
+    ::= { feEMPSInfo 6 }
+
+feAnalyzedEmailCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is cumulative count of all the email which were analyzed. This 
+        is the same as 'Total Emails Received and Analyzed' that we currently 
+        show in the output to CLI command 'show email-analysis statistics'. 
+        This counter will maintain its value across reboots."
+    ::= { feEMPSInfo 7 }
+
+feAnalyzedEmailCountH OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is cumulative count of all the email which were analyzed. This 
+        is the same as 'Total Emails Received and Analyzed' that we currently 
+        show in the output to CLI command 'show email-analysis statistics'. 
+        This counter will maintain its value across reboots.  feAnalyzedEmailCountH
+        is the high order 32bit of the 64bit counter."
+    ::= { feEMPSInfo 8 }
+
+feAnalyzedEmailCountL OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is cumulative count of all the email which were analyzed. This 
+        is the same as 'Total Emails Received and Analyzed' that we currently 
+        show in the output to CLI command 'show email-analysis statistics'. 
+        This counter will maintain its value across reboots.  feAnalyzedEmailCountL
+        is the low order 32bit of the 64bit counter."
+    ::= { feEMPSInfo 9 }
+
+feTotalUrlCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of all the URLs received whether they are processed or 
+        not. This is the same as 'Total URLs Received' that we currently show in 
+        the output to CLI command 'show email-analysis statistics'. This will 
+        be the cumulative value and is maintained across appliance reboots."
+    ::= { feEMPSInfo 10 }
+
+feTotalUrlCountH OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of all the URLs received whether they are processed or 
+        not. This is the same as 'Total URLs Received' that we currently show in 
+        the output to CLI command 'show email-analysis statistics'. This will 
+        be the cumulative value and is maintained across appliance reboots.
+        feTotalUrlCountH is the high order 32bit of the 64bit counter."
+    ::= { feEMPSInfo 11 }
+
+feTotalUrlCountL OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of all the URLs received whether they are processed or 
+        not. This is the same as 'Total URLs Received' that we currently show in 
+        the output to CLI command 'show email-analysis statistics'. This will 
+        be the cumulative value and is maintained across appliance reboots.
+        feTotalUrlCountL is the low order 32bit of the 64bit counter."
+    ::= { feEMPSInfo 12 }
+
+feInfectedUrlCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of all the URLs that are determined to be malicious and 
+        is the same as 'Total URLs Considered Malicious' that we currently show 
+        in the output to CLI command 'show email-analysis statistics'. This 
+        will be the cumulative value and is maintained across appliance reboots."
+    ::= { feEMPSInfo 13 }
+
+feInfectedUrlCountH OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of all the URLs that are determined to be malicious and 
+        is the same as 'Total URLs Considered Malicious' that we currently show 
+        in the output to CLI command 'show email-analysis statistics'. This 
+        will be the cumulative value and is maintained across appliance reboots.
+        feInfectedUrlCountH is the high order 32bit of the 64bit counter."
+    ::= { feEMPSInfo 14 }
+
+feInfectedUrlCountL OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of all the URLs that are determined to be malicious and 
+        is the same as 'Total URLs Considered Malicious' that we currently show 
+        in the output to CLI command 'show email-analysis statistics'. This 
+        will be the cumulative value and is maintained across appliance reboots.
+        feInfectedUrlCountH is the low order 32bit of the 64bit counter."
+    ::= { feEMPSInfo 15 }
+
+feAnalyzedUrlCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is the cumulative count of all the URLs that were analyzed and is 
+        the same as 'Total URLs Analyzed' that we currently show in the output 
+        to CLI command 'show email-analysis statistics'. This counter will 
+        maintain its value across reboots."
+    ::= { feEMPSInfo 16 }
+
+feAnalyzedUrlCountH OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is the cumulative count of all the URLs that were analyzed and is 
+        the same as 'Total URLs Analyzed' that we currently show in the output 
+        to CLI command 'show email-analysis statistics'. This counter will 
+        maintain its value across reboots.  feAnalyzedUrlCountH is the high order 
+        32bit of the 64bit counter."
+    ::= { feEMPSInfo 17 }
+
+feAnalyzedUrlCountL OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is the cumulative count of all the URLs that were analyzed and is 
+        the same as 'Total URLs Analyzed' that we currently show in the output 
+        to CLI command 'show email-analysis statistics'. This counter will 
+        maintain its value across reboots. feAnalyzedUrlCountL is the low order 
+        32bit of the 64bit counter."
+    ::= { feEMPSInfo 18 }
+
+feTotalAttachmentCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of all the attachment received whether they are 
+        processed or not.  This is the same as 'Total Attachments Received' that 
+        we currently show in the output to CLI command 'show email-analysis 
+        statistics'. This will be the cumulative value and is maintained across 
+        appliance reboots."
+    ::= { feEMPSInfo 19 }
+
+feTotalAttachmentCountH OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of all the attachment received whether they are 
+        processed or not.  This is the same as 'Total Attachments Received' that 
+        we currently show in the output to CLI command 'show email-analysis 
+        statistics'. This will be the cumulative value and is maintained across 
+        appliance reboots.  feTotalAttachmentCountH is the high order 32bit 
+        of the 64bit counter."
+    ::= { feEMPSInfo 20 }
+
+feTotalAttachmentCountL OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of all the attachment received whether they are 
+        processed or not.  This is the same as 'Total Attachments Received' that 
+        we currently show in the output to CLI command 'show email-analysis 
+        statistics'. This will be the cumulative value and is maintained across 
+        appliance reboots.  feTotalAttachmentCountL is the low order 32bit 
+        of the 64bit counter."
+    ::= { feEMPSInfo 21 }
+
+feInfectedAttachmentCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of all the attachment that are determined to be 
+        malicious and is the same as 'Total Attachments Considered Malicious' 
+        that we currently show in the output to CLI command 'show 
+        email-analysis statistics'. This will be the cumulative value and is 
+        maintained across appliance reboots."
+    ::= { feEMPSInfo 22 }
+
+feInfectedAttachmentCountH OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of all the attachment that are determined to be 
+        malicious and is the same as 'Total Attachments Considered Malicious' 
+        that we currently show in the output to CLI command 'show 
+        email-analysis statistics'. This will be the cumulative value and is 
+        maintained across appliance reboots.  feInfectedAttachmentCountH is
+        the high order 32bit of the 64bit counter."
+    ::= { feEMPSInfo 23 }
+
+feInfectedAttachmentCountL OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of all the attachment that are determined to be 
+        malicious and is the same as 'Total Attachments Considered Malicious' 
+        that we currently show in the output to CLI command 'show 
+        email-analysis statistics'. This will be the cumulative value and is 
+        maintained across appliance reboots.  feInfectedAttachmentCountL is
+        the low order 32bit of the 64bit counter."
+    ::= { feEMPSInfo 24 }
+
+feAnalyzedAttachmentCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is the cumulative count of all the attachment that we analyzed for 
+        maliciousness. This is the same as 'Total Attachments Analyzed' that we 
+        currently show in the output to CLI command 'show email-analysis 
+        statistics'. This counter will maintain its value across reboots."
+    ::= { feEMPSInfo 25 }
+
+feAnalyzedAttachmentCountH OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is the cumulative count of all the attachment that we analyzed for 
+        maliciousness. This is the same as 'Total Attachments Analyzed' that we 
+        currently show in the output to CLI command 'show email-analysis 
+        statistics'. This counter will maintain its value across reboots.  
+        feAnalyzedAttachmentCountH is the high order 32bit of the 64bit 
+        counter."
+    ::= { feEMPSInfo 26 }
+
+feAnalyzedAttachmentCountL OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is the cumulative count of all the attachment that we analyzed for 
+        maliciousness. This is the same as 'Total Attachments Analyzed' that we 
+        currently show in the output to CLI command 'show email-analysis 
+        statistics'. This counter will maintain its value across reboots.
+        feAnalyzedAttachmentCountL is the low order 32bit of the 64bit 
+        counter."
+    ::= { feEMPSInfo 27 }
+
+feTotalEmailHasAttachment OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of all the emails containing at least one attachment. 
+        This value will be the cumulative and preserved across appliance reboots."
+    ::= { feEMPSInfo 28 }
+
+feTotalEmailHasAttachmentH OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of all the emails containing at least one attachment. 
+        This value will be the cumulative and preserved across appliance reboots.
+        feTotalEmailHasAttachmentH is the high order 32bit of the 64bit 
+        counter."
+    ::= { feEMPSInfo 29 }
+
+feTotalEmailHasAttachmentL OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of all the emails containing at least one attachment. 
+        This value will be the cumulative and preserved across appliance reboots.
+        feTotalEmailHasAttachmentL is the low order 32bit of the 64bit 
+        counter."
+    ::= { feEMPSInfo 30 }
+
+feTotalEmailHasUrl OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of all the emails containing at least one URL. This 
+        value will be the cumulative and preserved across appliance reboots."
+    ::= { feEMPSInfo 31 }
+
+feTotalEmailHasUrlH OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of all the emails containing at least one URL. This 
+        value will be the cumulative and preserved across appliance reboots.
+        feTotalEmailHasUrlH is the high order 32bit of the 64bit counter."
+    ::= { feEMPSInfo 32 }
+
+feTotalEmailHasUrlL OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of all the emails containing at least one URL. This 
+        value will be the cumulative and preserved across appliance reboots.
+        feTotalEmailHasUrlL is the low order 32bit of the 64bit counter."
+    ::= { feEMPSInfo 33 }
+
+feTotalEmailHasBadAttachment OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of all the emails containing at least one attachment 
+        determined to be malicious. This value will be the cumulative and preserved 
+        across appliance reboots."
+    ::= { feEMPSInfo 34 }
+
+feTotalEmailHasBadAttachmentH OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of all the emails containing at least one attachment 
+        determined to be malicious. This value will be the cumulative and preserved 
+        across appliance reboots.  feTotalEmailHasBadAttachmentH is the high 
+        order 32bit of the 64bit counter."
+    ::= { feEMPSInfo 35 }
+
+feTotalEmailHasBadAttachmentL OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of all the emails containing at least one attachment 
+        determined to be malicious. This value will be the cumulative and preserved 
+        across appliance reboots.  feTotalEmailHasBadAttachmentL is the low 
+        order 32bit of the 64bit counter."
+    ::= { feEMPSInfo 36 }
+
+feTotalEmailHasBadUrl OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of all the emails containing at least one URL 
+        determined to be malicious.  This value will be the cumulative and preserved 
+        across appliance reboots."
+    ::= { feEMPSInfo 37 }
+
+feTotalEmailHasBadUrlH OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of all the emails containing at least one URL 
+        determined to be malicious.  This value will be the cumulative and preserved 
+        across appliance reboots.  feTotalEmailHasBadUrlH is the high order 
+        32bit of the 64bit counter."
+    ::= { feEMPSInfo 38 }
+
+feTotalEmailHasBadUrlL OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of all the emails containing at least one URL 
+        determined to be malicious.  This value will be the cumulative and preserved 
+        across appliance reboots.  feTotalEmailHasBadUrlL is the low order 
+        32bit of the 64bit counter."
+    ::= { feEMPSInfo 39 }
+
+feeQuarantineUsage OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..100) 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is consumed capacity in term of percentage of max capacity. 
+        This is a snapshot value and represents current consumption value."
+    ::= { feEMPSInfo 40 }
+
+feBypassEmailCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of Bypassed Emails and is the same as 'Total Emails 
+        Bypassed' that we currently show in the output to CLI command 'show 
+        email-analysis statistics'. This will be the cumulative value and is 
+        maintained across appliance reboots."
+    ::= { feEMPSInfo 41 }
+
+feBypassEmailCountH OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of Bypassed Emails and is the same as 'Total Emails 
+        Bypassed' that we currently show in the output to CLI command 'show 
+        email-analysis statistics'. This will be the cumulative value and is 
+        maintained across appliance reboots.  feBypassEmailCountH is the high 
+        order 32bit of the 64bit counter."
+    ::= { feEMPSInfo 42 }
+
+feBypassEmailCountL OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of Bypassed Emails and is the same as 'Total Emails 
+        Bypassed' that we currently show in the output to CLI command 'show 
+        email-analysis statistics'. This will be the cumulative value and is 
+        maintained across appliance reboots.  feBypassEmailCountL is the low 
+        order 32bit of the 64bit counter."
+    ::= { feEMPSInfo 43 }
+
+feDeferredEmailCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of deferred emails and will represent snapshot current 
+        value."
+    ::= { feEMPSInfo 44 }
+
+feHoldQueueEmailCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of emails in the hold queue and will represent current 
+        snapshot value."
+    ::= { feEMPSInfo 45 }
+
+feOpenSmtpConnections OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a snapshot value of currently open SMTP connections."
+    ::= { feEMPSInfo 46 }
+
+feDeferredQueueThreshold NOTIFICATION-TYPE
+    OBJECTS     { feDeferredEmailCount }
+    STATUS      current
+    DESCRIPTION
+        "Deferred queue email count exceeded a certain threshold."
+    ::= { feEMPSTraps 1 }
+
+feBypassCountThreshold NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "Current bypass count exceeded a certain threshold."
+    ::= { feEMPSTraps 2 }
+
+feSmtpInterfaceRefuseConnection NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "SMTP interface set to refuse connections because of congestion."
+    ::= { feEMPSTraps 3 }
+
+feSmtpInterfaceRecover NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "SMTP interface re-enabled after recover."
+    ::= { feEMPSTraps 4 }
+
+feEMPSBypassStateEntered NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "Email bypass state entered."
+    ::= { feEMPSTraps 5 }
+
+feEMPSBypassStateExited NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "Email bypass state exited."
+    ::= { feEMPSTraps 6 }
+
+--
+-- feWMPS
+--
+
+feWMPSInfo      OBJECT IDENTIFIER ::= { feWMPS 1 }
+feWMPSTraps     OBJECT IDENTIFIER ::= { feWMPS 0 }
+
+feHttpThroughputNotIncrease NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "HTTP throughput has not increased for a specified time."
+    ::= { feWMPSTraps 1 }
+
+feHardwareBypassEntered NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "Permanent hardware bypass mode entered."
+    ::= { feWMPSTraps 2 }
+
+--
+-- feMAS
+--
+
+feMASInfo      OBJECT IDENTIFIER ::= { feMAS 1 }
+feMASTraps     OBJECT IDENTIFIER ::= { feMAS 0 }
+
+feTotalObjectAnalyzedCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of all the object analyzed, including all children of 
+        any samples, including URL."
+    ::= { feMASInfo 1 }
+
+feTotalObjectAnalyzedCountH OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of all the object analyzed, including all children of 
+        any samples, including URL. feTotalObjectAnalyzedCountH is the high 
+        order 32bit of the 64bit counter."
+    ::= { feMASInfo 2 }
+
+feTotalObjectAnalyzedCountL OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of all the object analyzed, including all children of 
+        any samples, including URL. feTotalObjectAnalyzedCountL is the low 
+        order 32bit of the 64bit counter."
+    ::= { feMASInfo 3 }
+
+feTotalMaliciousObjectCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of all malicious samples detected."
+    ::= { feMASInfo 4 }
+
+feTotalMaliciousObjectCountH OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of all malicious samples detected. 
+        feTotalMaliciousObjectCountH is the high order 32bit of the 64bit 
+        counter."
+    ::= { feMASInfo 5 }
+
+feTotalMaliciousObjectCountL OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of all malicious samples detected. 
+        feTotalMaliciousObjectCountL is the low order 32bit of the 64bit 
+        counter."
+    ::= { feMASInfo 6 }
+
+feTotalUrlAnalyzedCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of all samples that has file type: url."
+    ::= { feMASInfo 7 }
+
+feTotalUrlAnalyzedCountH OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of all samples that has file type: url. 
+        feTotalUrlAnalyzedCountH is the high order 32bit of the 64bit counter."
+    ::= { feMASInfo 8 }
+
+feTotalUrlAnalyzedCountL OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of all samples that has file type: url. 
+        feTotalUrlAnalyzedCountL is the low order 32bit of the 64bit counter."
+    ::= { feMASInfo 9 }
+
+feTotalMaliciousUrlCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of all samples that has file type 'url' and also are 
+        malicious."
+    ::= { feMASInfo 10 }
+
+feTotalMaliciousUrlCountH OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of all samples that has file type 'url' and also are 
+        malicious. feTotalMaliciousUrlCountH is the high order 32bit of the 
+        64bit counter."
+    ::= { feMASInfo 11 }
+
+feTotalMaliciousUrlCountL OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of all samples that has file type 'url' and also are 
+        malicious. feTotalMaliciousUrlCountL is the low order 32bit of the 
+        64bit counter."
+    ::= { feMASInfo 12 }
+
+feTotalFileUploadedCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of all object that has no parent (basically, children 
+        will not be counted)."
+    ::= { feMASInfo 13 }
+
+feTotalFileUploadedCountH OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of all object that has no parent (basically, children 
+        will not be counted). feTotalFileUploadedCountH is the high order 32bit 
+        of the 64bit counter."
+    ::= { feMASInfo 14 }
+
+feTotalFileUploadedCountL OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of all object that has no parent (basically, children 
+        will not be counted). feTotalFileUploadedCountL is the low order 32bit 
+        of the 64bit counter."
+    ::= { feMASInfo 15 }
+
+feTotalMaliciousFileCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of all object that has no parent (basically children 
+        will not be counted), and are not URL."
+    ::= { feMASInfo 16 }
+
+feTotalMaliciousFileCountH OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of all object that has no parent (basically children 
+        will not be counted), and are not URL. feTotalMaliciousFileCountH is the
+        high order 32bit of the 64bit counter."
+    ::= { feMASInfo 17 }
+
+feTotalMaliciousFileCountL OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of all object that has no parent (basically children 
+        will not be counted), and are not URL. feTotalMaliciousFileCountL is the
+        low order 32bit of the 64bit counter."
+    ::= { feMASInfo 18 }
+
+feTotalLiveModeCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of all object that are submitted for live mode."
+    ::= { feMASInfo 19 }
+
+feTotalLiveModeCountH OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of all object that are submitted for live mode. 
+        feTotalLiveModeCountH is the high order 32bit of the 64bit counter."
+    ::= { feMASInfo 20 }
+
+feTotalLiveModeCountL OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of all object that are submitted for live mode. 
+        feTotalLiveModeCountL is the low order 32bit of the 64bit counter."
+    ::= { feMASInfo 21 }
+
+feTotalMaliciousLiveModeCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of all object that are submitted for live mode and are 
+        malicious. Live mode object has no children."
+    ::= { feMASInfo 22 }
+
+feTotalMaliciousLiveModeCountH OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of all object that are submitted for live mode and are 
+        malicious. Live mode object has no children. 
+        feTotalMaliciousLiveModeCountH is the high order 32bit of the 64bit 
+        counter."
+    ::= { feMASInfo 23 }
+
+feTotalMaliciousLiveModeCountL OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of all object that are submitted for live mode and are 
+        malicious. Live mode object has no children. 
+        feTotalMaliciousLiveModeCountL is the low order 32bit of the 64bit 
+        counter."
+    ::= { feMASInfo 24 }
+
+feMaid          OBJECT-TYPE
+    SYNTAX      CounterBasedGauge64
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "ID of the malicious sample/url."
+    ::= { feMASInfo 25 }
+
+feMaliciousMaid NOTIFICATION-TYPE
+    OBJECTS     { feMaid }
+    STATUS      current
+    DESCRIPTION
+        "A malicious URL or file detected."
+    ::= { feMASTraps 1 }
+
+--
+-- feMibAdminInfo
+--
+
+feMibCompliances    OBJECT IDENTIFIER ::= { feMibAdminInfo 2 }
+feMibGroups         OBJECT IDENTIFIER ::= { feMibAdminInfo 3 }
+
+feMibCompliance     MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION
+        "The requirements for conformance to the FireEye MIB."
+    MODULE -- this module
+        MANDATORY-GROUPS { feVariablesGroup,
+                           feNotificationsGroup,
+                           feSystemInfoGroup,
+                           feSystemTrapGroup, 
+                           feStorageInfoGroup, 
+                           feStorageTrapGroup, 
+                           fePowerSupplyInfoGroup, 
+                           fePowerSupplyTrapGroup, 
+                           feFanHealthInfoGroup, 
+                           feFanHealthTrapGroup, 
+                           feApplicationInfoGroup,
+                           feApplicationTrapGroup }
+
+        GROUP feCMSInfoGroup
+        DESCRIPTION
+            "This group defines CMS info counters.
+             It's mandatory for CMS appliances."
+
+        GROUP feCMSTrapGroup
+        DESCRIPTION
+            "This group defines CMS traps.
+             It's mandatory for CMS appliances."
+    
+        GROUP feEMPSInfoGroup
+        DESCRIPTION
+            "This group defines eMPS info counters.
+             It's mandatory for eMPS appliances."
+
+        GROUP feEMPSTrapGroup
+        DESCRIPTION
+            "This group defines eMPS traps.
+             It's mandatory for eMPS appliances."
+    
+        GROUP feWMPSTrapGroup
+        DESCRIPTION
+            "This group defines wMPS traps.
+             It's mandatory for wMPS appliances."
+
+        GROUP feMASInfoGroup
+        DESCRIPTION
+            "This group defines MAS info counters.
+             It's mandatory for MAS appliances."
+
+        GROUP feMASTrapGroup
+        DESCRIPTION
+            "This group defines MAS traps.
+             It's mandatory for MAS appliances."
+    
+    ::= { feMibCompliances 1 }
+
+    feVariablesGroup OBJECT-GROUP
+        OBJECTS {
+            lmsVersion,
+            eventCount,
+            eventIndex,
+            eventId,
+            eventType,
+            eventDate,
+            eventTime,
+            eventTraceId,
+            eventSrcIp,
+            eventDstIp,
+            eventSrcMac,
+            eventDstMac,
+            eventDstPort,
+            eventVlan, 
+            eventProtocol,
+            eventProfileId,
+            eventOsInfo,
+            eventService,
+            eventAttackType,
+            eventSignatureName,
+            eventSignatureType,
+            eventSrcHost,
+            eventCncNo,
+            alertSignatureId,
+            alertCncHost,
+            alertCncPort,
+            alertChecksum,
+            alertAnalysisType,
+            alertProfile,
+            alertAction,
+            alertInterface,
+            alertSensorIp,
+            alertSensorHost,
+            alertSensorProduct,
+            alertSensorRelease,
+            alertUrl,
+            eventSrcAddrType,
+            eventSrcAddr,
+            eventDstAddrType,
+            eventDstAddr,
+            eventSensorAddrType,
+            eventSensorAddr,
+            eventSrcPort,
+            eventDateTime,
+            ipsSignatureId,
+            ipsSignatureRevision,
+            ipsMatchCount,
+            ipsSeverity,
+            ipsSignatureName,
+            ipsReferenceId,
+            ipsBlockMode,
+            ipsAttackTarget
+        }
+        STATUS current
+        DESCRIPTION
+            "This groups contains objects for malware alerts."
+        ::= { feMibGroups 1 }
+
+    feNotificationsGroup NOTIFICATION-GROUP
+        NOTIFICATIONS {
+            fireeyeAlert,
+            executionAnomaly,
+            networkAnomaly,
+            signatureMatch,
+            ccConnect,
+            ccSigmatch,
+            osChange,
+            ipsAlert
+        }
+        STATUS current
+        DESCRIPTION
+            "This groups contains notifications for malware alerts."
+        ::= { feMibGroups 2 }
+
+   feSystemInfoGroup OBJECT-GROUP
+        OBJECTS {
+            feSystemStatus,
+            feHardwareModel,
+            feSerialNumber,
+            feTemperatureValue,
+            feTemperatureStatus,
+            feTemperatureIsHealthy,
+            feIfLinkChangeIfname,
+            feIfLinkChangeIfname,
+            feIfLinkChangeOldAdminUp,
+            feIfLinkChangeNewAdminUp,
+            feIfLinkChangeOldLinkUp,
+            feIfLinkChangeNewLinkUp,
+            feIfLinkChangeOldSpeed,
+            feIfLinkChangeNewSpeed,
+            feIfLinkChangeOldDuplex,
+            feIfLinkChangeNewDuplex,
+            feIfLinkChangeOldAutoNeg,
+            feIfLinkChangeNewAutoNeg
+        }
+        STATUS current
+        DESCRIPTION
+            "FireEye System Info Group."
+        ::= { feMibGroups 11 }
+
+    feSystemTrapGroup NOTIFICATION-GROUP
+        NOTIFICATIONS {
+            feExcessiveTemperature,
+            feNormalTemperature,
+            feIfLinkChange
+        }
+        STATUS current
+        DESCRIPTION
+            "FireEye System Trap Group."
+        ::= { feMibGroups 12 }
+
+    feStorageInfoGroup OBJECT-GROUP
+        OBJECTS {
+            feRaidStatus,
+            feRaidIsHealthy,
+            fePhysicalDiskIndex,
+            fePhysicalDiskName,
+            fePhysicalDiskStatus,
+            fePhysicalDiskIsHealthy,
+            fePhysicalDiskDeviceSupport,
+            fePhysicalDiskSelfAssess,
+            fePhysicalDiskTotalBytes
+        }
+        STATUS current
+        DESCRIPTION
+            "FireEye Storage Info Group."
+        ::= { feMibGroups 13 }
+
+    feStorageTrapGroup NOTIFICATION-GROUP
+        NOTIFICATIONS {
+            feRaidFailure,
+            feRaidRecover,
+            fePhysicalDiskFailure,
+            fePhysicalDiskRecover
+        }
+        STATUS current
+        DESCRIPTION
+            "FireEye Storage Trap Group."
+        ::= { feMibGroups 14 }
+
+    fePowerSupplyInfoGroup OBJECT-GROUP
+        OBJECTS {
+            fePowerSupplyOverallStatus,
+            fePowerSupplyOverallIsHealthy,
+            fePowerSupplyIndex,
+            fePowerSupplyStatus,
+            fePowerSupplyIsHealthy
+        }
+        STATUS current
+        DESCRIPTION
+            "FireEye Power Supply Info Group."
+        ::= { feMibGroups 15 }
+
+    fePowerSupplyTrapGroup NOTIFICATION-GROUP
+        NOTIFICATIONS {
+            fePowerSupplyFailure,
+            fePowerSupplyRecover
+        }
+        STATUS current
+        DESCRIPTION
+            "FireEye Power Supply Trap Group."
+        ::= { feMibGroups 16 }
+
+    feFanHealthInfoGroup OBJECT-GROUP
+        OBJECTS {
+            feFanOverallStatus,
+            feFanOverallIsHealthy,
+            feFanIndex,
+            feFanStatus,
+            feFanIsHealthy,
+            feFanSpeed
+        }
+        STATUS current
+        DESCRIPTION
+            "FireEye Fan Health Info Group."
+        ::= { feMibGroups 17 }
+
+    feFanHealthTrapGroup NOTIFICATION-GROUP
+        NOTIFICATIONS {
+            feFanFailure,
+            feFanRecover
+        }
+        STATUS current
+        DESCRIPTION
+            "FireEye Fan Health Trap Group."
+        ::= { feMibGroups 18 }
+
+    feApplicationInfoGroup OBJECT-GROUP
+        OBJECTS {
+            feInstalledSystemImage,
+            feSystemImageVersionCurrent,
+            feSystemImageVersionLatest,
+            feIsSystemImageLatest,
+            feSecurityContentVersion,
+            feLastContentUpdatePassed,
+            feLastContentUpdateTime,
+            feGIIndex,
+            feGIName,
+            feGIVersion,
+            feGIEnabled,
+            feGIInstallDateTime,
+            feActiveVMs,
+            feProductLicenseActive,
+            feContentLicenseActive,
+            feSupportLicenseActive,
+            feLicenseFeatureName,
+            feLicenseNewActiveState,
+            feLicenseOldActiveState
+        }
+        STATUS current
+        DESCRIPTION
+            "FireEye Application Info Group."
+        ::= { feMibGroups 19 }
+
+    feApplicationTrapGroup NOTIFICATION-GROUP
+        NOTIFICATIONS {
+            feLicenseStateChanged,
+            feSecurityUpdateFailed
+        }
+        STATUS current
+        DESCRIPTION
+            "FireEye Application Trap Group."
+        ::= { feMibGroups 20 }
+
+    feCMSInfoGroup OBJECT-GROUP
+        OBJECTS {
+            feTotalAppliancesAttached,
+            feTotalWMPSAttached,
+            feTotalEMPSAttached,
+            feTotalFMPSAttached,
+            feTotalMASAttached,
+            feCMSApplianceIndex,
+            feCMSApplianceName,
+            feCMSApplianceDiskSpacePassed,
+            feCMSApplianceFanPassed,
+            feCMSAppliancePowerSupplyPassed,
+            feCMSApplianceRaidPassed,
+            feCMSApplianceTemperaturePassed
+        }
+        STATUS current
+        DESCRIPTION
+            "FireEye CMPS Info Group."
+        ::= { feMibGroups 21 }
+
+    feCMSTrapGroup NOTIFICATION-GROUP
+        NOTIFICATIONS {
+            feCMSHAUnexpectedFailover,
+            feCMSHAManualFailover
+        }
+        STATUS current
+        DESCRIPTION
+            "FireEye CMS Trap Group."
+        ::= { feMibGroups 22 }
+
+    feEMPSInfoGroup OBJECT-GROUP
+        OBJECTS {
+            feTotalEmailCount,
+            feTotalEmailCountH,
+            feTotalEmailCountL,
+            feInfectedEmailCount,
+            feInfectedEmailCountH,
+            feInfectedEmailCountL,
+            feAnalyzedEmailCount,
+            feAnalyzedEmailCountH,
+            feAnalyzedEmailCountL,
+            feTotalUrlCount,
+            feTotalUrlCountH,
+            feTotalUrlCountL,
+            feInfectedUrlCount,
+            feInfectedUrlCountH,
+            feInfectedUrlCountL,
+            feAnalyzedUrlCount,
+            feAnalyzedUrlCountH,
+            feAnalyzedUrlCountL,
+            feTotalAttachmentCount,
+            feTotalAttachmentCountH,
+            feTotalAttachmentCountL,
+            feInfectedAttachmentCount,
+            feInfectedAttachmentCountH,
+            feInfectedAttachmentCountL,
+            feAnalyzedAttachmentCount,
+            feAnalyzedAttachmentCountH,
+            feAnalyzedAttachmentCountL,
+            feTotalEmailHasAttachment,
+            feTotalEmailHasAttachmentH,
+            feTotalEmailHasAttachmentL,
+            feTotalEmailHasUrl,
+            feTotalEmailHasUrlH,
+            feTotalEmailHasUrlL,
+            feTotalEmailHasBadAttachment,
+            feTotalEmailHasBadAttachmentH,
+            feTotalEmailHasBadAttachmentL,
+            feTotalEmailHasBadUrl,
+            feTotalEmailHasBadUrlH,
+            feTotalEmailHasBadUrlL,
+            feeQuarantineUsage,
+            feBypassEmailCount,
+            feBypassEmailCountH,
+            feBypassEmailCountL,
+            feDeferredEmailCount,
+            feHoldQueueEmailCount,
+            feOpenSmtpConnections
+        }
+        STATUS current
+        DESCRIPTION
+            "FireEye Email MPS Group."
+        ::= { feMibGroups 23 }
+
+    feEMPSTrapGroup NOTIFICATION-GROUP
+        NOTIFICATIONS {
+            feDeferredQueueThreshold,
+            feBypassCountThreshold,
+            feSmtpInterfaceRefuseConnection,
+            feSmtpInterfaceRecover,
+            feEMPSBypassStateEntered,
+            feEMPSBypassStateExited
+        }
+        STATUS current
+        DESCRIPTION
+            "FireEye Email MPS Trap Group."
+        ::= { feMibGroups 24 }
+
+    feWMPSTrapGroup NOTIFICATION-GROUP
+        NOTIFICATIONS {
+            feHttpThroughputNotIncrease,
+            feHardwareBypassEntered
+        }
+        STATUS current
+        DESCRIPTION
+            "FireEye Web MPS Trap Group."
+        ::= { feMibGroups 26 }
+
+    feMASInfoGroup OBJECT-GROUP
+        OBJECTS {
+            feTotalObjectAnalyzedCount,
+            feTotalObjectAnalyzedCountH,
+            feTotalObjectAnalyzedCountL,
+            feTotalMaliciousObjectCount,
+            feTotalMaliciousObjectCountH,
+            feTotalMaliciousObjectCountL,
+            feTotalUrlAnalyzedCount,
+            feTotalUrlAnalyzedCountH,
+            feTotalUrlAnalyzedCountL,
+            feTotalMaliciousUrlCount,
+            feTotalMaliciousUrlCountH,
+            feTotalMaliciousUrlCountL,
+            feTotalFileUploadedCount,
+            feTotalFileUploadedCountH,
+            feTotalFileUploadedCountL,
+            feTotalMaliciousFileCount,
+            feTotalMaliciousFileCountH,
+            feTotalMaliciousFileCountL,
+            feTotalLiveModeCount,
+            feTotalLiveModeCountH,
+            feTotalLiveModeCountL,
+            feTotalMaliciousLiveModeCount,
+            feTotalMaliciousLiveModeCountH,
+            feTotalMaliciousLiveModeCountL,
+            feMaid
+        }
+        STATUS current
+        DESCRIPTION
+            "FireEye MAS Group."
+        ::= { feMibGroups 27 }
+
+    feMASTrapGroup NOTIFICATION-GROUP
+        NOTIFICATIONS {
+            feMaliciousMaid
+        }
+        STATUS current
+        DESCRIPTION
+            "FireEye MAS Trap Group."
+        ::= { feMibGroups 28 }
+END

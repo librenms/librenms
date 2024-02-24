@@ -31,9 +31,9 @@
 namespace LibreNMS\Snmptrap\Handlers;
 
 use App\Models\Device;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
-use Log;
 
 class Aos6LbdStateChangeToShutdown implements SnmptrapHandler
 {
@@ -52,6 +52,6 @@ class Aos6LbdStateChangeToShutdown implements SnmptrapHandler
         $ifDescr = $trap->getOidData($trap->findOid('IF-MIB::ifDescr'));
         $ifIndex = $trap->getOidData($trap->findOid('ALCATEL-IND1-LBD-MIB::alaLbdPortIfIndex'));
         $port = $device->ports()->where('ifIndex', $ifIndex)->first();
-        Log::event("There has been a loop detected on the port $port->ifDescr. Status of the port before was $before and now is $current.", $device->device_id, 'trap', 5);
+        $trap->log("There has been a loop detected on the port $port->ifDescr. Status of the port before was $before and now is $current.", Severity::Error);
     }
 }

@@ -11,6 +11,8 @@ modules:
                 type: saf-integra
     sensors:
         temperature:
+            options:
+                divisor: 10
             data:
                 -
                     oid: integraXsysCPUtemperature

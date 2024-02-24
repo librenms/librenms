@@ -9,7 +9,7 @@ $print_total = $print_total ?? false;
 $percentile = $percentile ?? false;
 $unit_text = $unit_text ?? '';
 $line_text = $line_text ?? '';
-$previous = $_GET['previous'] ?? 'no';
+$previous = $graph_params->visible('previous');
 
 $unit_text = str_pad(substr($unit_text, 0, 18), 18);
 $line_text = str_pad(substr($line_text, 0, 12), 12);
@@ -33,7 +33,7 @@ if ($percentile) {
     $rrd_options .= ' VDEF:' . $ds . '_percentile=' . $ds . ',' . $percentile . ',PERCENT';
 }
 
-if ($previous == 'yes') {
+if ($previous) {
     if ($multiplier) {
         if (empty($multiplier_action)) {
             $multiplier_action = '*';
@@ -90,7 +90,7 @@ if ($percentile) {
     $rrd_options .= ' LINE1:' . $ds . '_percentile#aa0000';
 }
 
-if ($previous == 'yes') {
+if ($previous) {
     $rrd_options .= ' LINE1.25:' . $ds . "X#666666:'Prev \\n'";
     $rrd_options .= ' AREA:' . $ds . 'X#99999966:';
 }

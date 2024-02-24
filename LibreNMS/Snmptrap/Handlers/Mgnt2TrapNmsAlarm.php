@@ -28,9 +28,9 @@
 namespace LibreNMS\Snmptrap\Handlers;
 
 use App\Models\Device;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
-use Log;
 
 class Mgnt2TrapNmsAlarm implements SnmptrapHandler
 {
@@ -70,30 +70,14 @@ class Mgnt2TrapNmsAlarm implements SnmptrapHandler
             $msg = "Alarm on slot $slot, $sourcePm Issue: $probSpecific Possible Cause: $probCause";
         }
 
-        switch ($alarmSeverity) {
-            case 'cleared':
-                $severity = 1;
-                break;
-            case 'critical':
-                $severity = 5;
-                break;
-            case 'major':
-                $severity = 5;
-                break;
-            case 'minor':
-                $severity = 4;
-                break;
-            case 'warning':
-                $severity = 4;
-                break;
-            case 'indeterminate':
-                $severity = 0;
-                break;
-            default:
-                $severity = 2;
-                break;
-        }
+        $severity = match ($alarmSeverity) {
+            'cleared' => Severity::Ok,
+            'critical', 'major' => Severity::Error,
+            'minor', 'warning' => Severity::Warning,
+            'indeterminate' => Severity::Unknown,
+            default => Severity::Info,
+        };
 
-        Log::event($msg, $device->device_id, 'trap', $severity);
+        $trap->log($msg, $severity);
     }
 }

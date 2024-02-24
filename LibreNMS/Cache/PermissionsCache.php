@@ -28,8 +28,8 @@ use App\Models\Bill;
 use App\Models\Device;
 use App\Models\Port;
 use App\Models\User;
-use DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use LibreNMS\Config;
 
 class PermissionsCache

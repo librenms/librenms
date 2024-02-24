@@ -101,7 +101,7 @@ if (! empty($components) && is_array($components)) {
         if (! empty($util_data) && ! empty($memory_data)) {
             $total_packets = $util_data[$util_oids['InTotalPps']] + $util_data[$util_oids['OutTotalPps']];
             $throughput = $util_data[$util_oids['InTotalBps']] + $util_data[$util_oids['OutTotalBps']];
-            $average_packet = $throughput / 8 / $total_packets;
+            $average_packet = $total_packets ? floor($throughput / 8 / $total_packets) : 0;
             /*
              * Create component data array for `component_prefs`
              * and update components

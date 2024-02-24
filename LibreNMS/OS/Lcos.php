@@ -35,7 +35,7 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessRateDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
 use LibreNMS\Interfaces\Polling\Sensors\WirelessFrequencyPolling;
 use LibreNMS\OS;
-use LibreNMS\Util\Rewrite;
+use LibreNMS\Util\Mac;
 
 class Lcos extends OS implements
     WirelessFrequencyDiscovery,
@@ -222,11 +222,11 @@ class Lcos extends OS implements
             $sensors[$bssid] = new WirelessSensor(
                 'ccq',
                 $this->getDeviceId(),
-                '.1.3.6.1.4.1.2356.11.1.3.44.1.10.' . Rewrite::oidMac($bssid) . '.0',
+                '.1.3.6.1.4.1.2356.11.1.3.44.1.10.' . Mac::parse($bssid)->oid() . '.0',
                 'lcos',
                 $bssid,
                 'CCQ ' . $entry['lcsStatusWlanCompetingNetworksEntryInterpointPeerName'] . " $bssid",
-                $entry['lcsStatusWlanCompetingNetworksEntryPhySigal']
+                $entry['lcsStatusWlanCompetingNetworksEntryPhySignal']
             );
         }
 
@@ -255,7 +255,7 @@ class Lcos extends OS implements
             $sensors[$bssid] = new WirelessSensor(
                 'rate',
                 $this->getDeviceId(),
-                '.1.3.6.1.4.1.2356.11.1.3.44.1.35.' . Rewrite::oidMac($bssid) . '.0',
+                '.1.3.6.1.4.1.2356.11.1.3.44.1.35.' . Mac::parse($bssid)->oid() . '.0',
                 'lcos-tx',
                 $bssid,
                 'TX Rate ' . $entry['lcsStatusWlanCompetingNetworksEntryInterpointPeerName'] . " $bssid",
@@ -290,7 +290,7 @@ class Lcos extends OS implements
             $sensors[$bssid] = new WirelessSensor(
                 'rssi',
                 $this->getDeviceId(),
-                '.1.3.6.1.4.1.2356.11.1.3.44.1.26.' . Rewrite::oidMac($bssid) . '.0',
+                '.1.3.6.1.4.1.2356.11.1.3.44.1.26.' . Mac::parse($bssid)->oid() . '.0',
                 'lcos',
                 $bssid,
                 'RSSI ' . $entry['lcsStatusWlanCompetingNetworksEntryInterpointPeerName'] . " $bssid",

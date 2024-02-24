@@ -33,7 +33,6 @@ namespace LibreNMS\Snmptrap\Handlers;
 use App\Models\Device;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
-use Log;
 
 class Aos6HicServerTrap implements SnmptrapHandler
 {
@@ -48,6 +47,6 @@ class Aos6HicServerTrap implements SnmptrapHandler
     public function handle(Device $device, Trap $trap)
     {
         $ip = $trap->getOidData($trap->findOid('ALCATEL-IND1-AAA-MIB::aaaHSvrIpAddress'));
-        Log::event("Radius server with the IP: $ip might be unreachable or recovered.", $device->device_id, 'trap', 2);
+        $trap->log("Radius server with the IP: $ip might be unreachable or recovered.");
     }
 }

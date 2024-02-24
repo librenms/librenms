@@ -20,7 +20,7 @@
                         @endif
                     </span>
                     {{ __('install.database.credentials') }}
-                    <span class="fa-pull-right"><i class="fa-solid fa-lg fa-chevron-down rotate-if-collapsed"></i></span>
+                    <span class="float-right"><i class="fa-solid fa-lg fa-chevron-down rotate-if-collapsed"></i></span>
                 </div>
                 <div id="db-form-container" class="card-body collapse @if(!$valid_credentials) show @endif">
                     <form id="database-form" class="form-horizontal" role="form" method="post" action="{{ route('install.acton.test-database') }}">
@@ -90,7 +90,7 @@
                         @endif
                     </span>
                     {{ __('install.migrate.migrate') }}
-                    <span class="fa-pull-right"><i class="fa-solid fa-lg fa-chevron-down rotate-if-collapsed"></i></span>
+                    <span class="float-right"><i class="fa-solid fa-lg fa-chevron-down rotate-if-collapsed"></i></span>
                 </div>
                 <div id="migrate-container" class="card-body collapse @if(!$migrated) show @endif">
                     <div class="row">

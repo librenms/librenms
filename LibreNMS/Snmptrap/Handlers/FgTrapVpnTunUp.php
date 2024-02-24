@@ -28,9 +28,9 @@
 namespace LibreNMS\Snmptrap\Handlers;
 
 use App\Models\Device;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
-use Log;
 
 class FgTrapVpnTunUp implements SnmptrapHandler
 {
@@ -46,6 +46,6 @@ class FgTrapVpnTunUp implements SnmptrapHandler
     {
         $remoteGw = $trap->getOidData($trap->findOid('FORTIGATE-MIB::fgVpnTrapRemoteGateway'));
         $tunName = $trap->getOidData($trap->findOid('FORTIGATE-MIB::fgVpnTrapPhase1Name'));
-        Log::event("VPN tunnel $tunName to $remoteGw is up", $device->device_id, 'trap', 1);
+        $trap->log("VPN tunnel $tunName to $remoteGw is up", Severity::Ok);
     }
 }

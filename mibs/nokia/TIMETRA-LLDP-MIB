@@ -1410,7 +1410,7 @@ tmnxLldpRemEntryPeerRemoved      NOTIFICATION-TYPE
     STATUS      current
     DESCRIPTION
         "The tmnxLldpRemEntryPeerRemoved notification is generated when a
-         remote peer is added deleted from the LLDP."
+         remote peer is deleted from the LLDP."
     ::= { tmnxLldpNotifs 3 }
 
 tmnxLldpRemManAddrEntryAdded     NOTIFICATION-TYPE

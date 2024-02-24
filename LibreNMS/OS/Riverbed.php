@@ -25,13 +25,14 @@
 
 namespace LibreNMS\OS;
 
+use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\OS;
 use LibreNMS\RRD\RrdDefinition;
 
 class Riverbed extends OS implements OSPolling
 {
-    public function pollOS(): void
+    public function pollOS(DataStorageInterface $datastore): void
     {
         /* optimisation oids
          *
@@ -67,16 +68,16 @@ class Riverbed extends OS implements OSPolling
                 ->addDataset('total', 'GAUGE', 0);
 
             $fields = [
-                'half_open'   => $conn_half_open,
+                'half_open' => $conn_half_open,
                 'half_closed' => $conn_half_closed,
                 'established' => $conn_established,
-                'active'      => $conn_active,
-                'total'       => $conn_total,
+                'active' => $conn_active,
+                'total' => $conn_total,
             ];
 
             $tags = compact('rrd_def');
 
-            data_update($this->getDeviceArray(), 'riverbed_connections', $tags, $fields);
+            $datastore->put($this->getDeviceArray(), 'riverbed_connections', $tags, $fields);
             $this->enableGraph('riverbed_connections');
         }
 
@@ -107,7 +108,7 @@ class Riverbed extends OS implements OSPolling
 
             $tags = compact('rrd_def');
 
-            data_update($this->getDeviceArray(), 'riverbed_datastore', $tags, $fields);
+            $datastore->put($this->getDeviceArray(), 'riverbed_datastore', $tags, $fields);
             $this->enableGraph('riverbed_datastore');
         }
 
@@ -139,7 +140,7 @@ class Riverbed extends OS implements OSPolling
 
             $tags = compact('rrd_def');
 
-            data_update($this->getDeviceArray(), 'riverbed_optimization', $tags, $fields);
+            $datastore->put($this->getDeviceArray(), 'riverbed_optimization', $tags, $fields);
             $this->enableGraph('riverbed_optimization');
         }
 
@@ -177,7 +178,7 @@ class Riverbed extends OS implements OSPolling
 
             $tags = compact('rrd_def');
 
-            data_update($this->getDeviceArray(), 'riverbed_passthrough', $tags, $fields);
+            $datastore->put($this->getDeviceArray(), 'riverbed_passthrough', $tags, $fields);
             $this->enableGraph('riverbed_passthrough');
         }
     }

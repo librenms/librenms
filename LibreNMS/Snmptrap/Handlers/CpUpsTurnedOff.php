@@ -28,9 +28,9 @@
 namespace LibreNMS\Snmptrap\Handlers;
 
 use App\Models\Device;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
-use Log;
 
 class CpUpsTurnedOff implements SnmptrapHandler
 {
@@ -45,6 +45,6 @@ class CpUpsTurnedOff implements SnmptrapHandler
     public function handle(Device $device, Trap $trap)
     {
         $status = CyberPowerUtil::getMessage($trap);
-        Log::event("$status", $device->device_id, 'trap', 4);
+        $trap->log("$status", Severity::Warning);
     }
 }

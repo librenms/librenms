@@ -18,8 +18,8 @@ $rrd_list = [];
 if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Uptime',
-        'ds'       => 'uptime',
+        'descr' => 'Uptime',
+        'ds' => 'uptime',
     ];
 } else {
     d_echo('RRD "' . $rrd_filename . '" not found');

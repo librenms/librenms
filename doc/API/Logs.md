@@ -33,6 +33,7 @@ Example:
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/logs/eventlog/:hostname
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/logs/syslog/:hostname?limit=20
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/logs/eventlog/:hostname?limit=20&start=5&from=2017-07-22%2023:00:00
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/logs/eventlog/:hostname?sortorder=DESC
 ```
 
 Output:
@@ -73,4 +74,35 @@ Output:
         }
     ]
 }
+```
+
+### `syslogsink`
+
+Route: `/api/v0/logs/syslogsink`
+
+Accept any json messages and passes to further syslog processing. single messages or an array of multiple messages is accepted. see [Syslog](../Extensions/Syslog.md) for more details and logstash integration
+
+
+Example
+```
+curl -L -X POST 'https://sink.librenms.org/api/v0/syslogsink/' -H 'X-Auth-Token: xxxxxxxLibreNMSApiToken' --data-raw '[   
+    {
+        "msg": "kernel: minimum Message",
+        "host": "mydevice.fqdn.com"
+    },
+    {
+        "msg": "Line protocol on Interface GigabitEthernet1/0/41, changed state to up",
+        "facility": 23,
+        "priority": "189",
+        "program": "LINEPROTO-5-UPDOWN",
+        "host": "172.29.10.24",
+        "@timestamp": "2022-12-01T20:14:28.257Z",
+        "severity": 5,
+        "level": "ERROR"
+    },
+    {
+        "msg": "kernel: a unknown host",
+        "host": "unknown.fqdn.com"
+    }
+]'
 ```

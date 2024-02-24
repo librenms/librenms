@@ -27,9 +27,9 @@
 namespace LibreNMS\Snmptrap\Handlers;
 
 use App\Models\Device;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
-use Log;
 
 class ApcOnBattery implements SnmptrapHandler
 {
@@ -44,6 +44,6 @@ class ApcOnBattery implements SnmptrapHandler
     public function handle(Device $device, Trap $trap)
     {
         $message = $trap->getOidData($trap->findOid('PowerNet-MIB::mtrapargsString'));
-        Log::event($message, $device->device_id, 'trap', 4);
+        $trap->log($message, Severity::Warning);
     }
 }

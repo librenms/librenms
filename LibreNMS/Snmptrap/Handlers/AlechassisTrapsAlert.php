@@ -33,7 +33,6 @@ namespace LibreNMS\Snmptrap\Handlers;
 use App\Models\Device;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
-use Log;
 
 class AlechassisTrapsAlert implements SnmptrapHandler
 {
@@ -51,9 +50,9 @@ class AlechassisTrapsAlert implements SnmptrapHandler
         $descr_aos7 = $trap->getOidData($trap->findOid('ALCATEL-IND1-CHASSIS-MIB::chassisTrapsAlertDescr.0'));
 
         if (! empty($descr_aos6)) {
-            Log::event("$descr_aos6", $device->device_id, 'trap', 2);
+            $trap->log("$descr_aos6");
         } elseif (! empty($descr_aos7)) {
-            Log::event("$descr_aos7", $device->device_id, 'trap', 2);
+            $trap->log("$descr_aos7");
         }
     }
 }

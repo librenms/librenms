@@ -38,6 +38,11 @@ if (in_array($device['hardware'], $bad_HC_counter_devices)) {
         // PM index for port 1/1 -- 1000001
         // if index for port 1/1 --  100001
 
+        // Ignore ports with index of example 61.1000001
+        if (Str::contains($index, '.')) {
+            continue;
+        }
+
         $nms_index = $index - 900000;
 
         if (isset($port_stats[$nms_index])) {

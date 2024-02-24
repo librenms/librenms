@@ -62,7 +62,7 @@ class CheckRedis implements \LibreNMS\Interfaces\Validation
     private function redisIsAvailable(): bool
     {
         try {
-            Redis::ping();
+            Redis::command('ping');
 
             return true;
         } catch (\Exception $e) {

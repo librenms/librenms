@@ -24,7 +24,7 @@
         "discovery": {
             "bgpPeers": [
                 {
-                    "astext": "",
+                    "astext": "AS4200000000-MOCK-TEXT",
                     "bgpPeerIdentifier": "169.254.1.1",
                     "bgpPeerRemoteAs": 4200000000,
                     "bgpPeerState": "idle",
@@ -47,7 +47,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "",
+                    "astext": "AS4200000004-MOCK-TEXT",
                     "bgpPeerIdentifier": "169.254.1.9",
                     "bgpPeerRemoteAs": 4200000004,
                     "bgpPeerState": "idle",
@@ -74,7 +74,7 @@
         "poller": {
             "bgpPeers": [
                 {
-                    "astext": "",
+                    "astext": "AS4200000000-MOCK-TEXT",
                     "bgpPeerIdentifier": "169.254.1.1",
                     "bgpPeerRemoteAs": 4200000000,
                     "bgpPeerState": "established",
@@ -97,7 +97,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "",
+                    "astext": "AS4200000004-MOCK-TEXT",
                     "bgpPeerIdentifier": "169.254.1.9",
                     "bgpPeerRemoteAs": 4200000004,
                     "bgpPeerState": "established",

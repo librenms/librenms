@@ -490,7 +490,7 @@ COMMUNITY. Use `snmpwalk` instead of `snmpbulkwalk` for v1 devices.
 
 ```bash
 ./discovery.php -h HOSTNAME -d | ./pbin.sh
-./poller.php -h HOSTNAME -r -f -d | ./pbin.sh
+lnms device:poll HOSTNAME -vv | ./pbin.sh
 snmpbulkwalk -OUneb -v2c -c COMMUNITY HOSTNAME .  | ./pbin.sh
 ```
 

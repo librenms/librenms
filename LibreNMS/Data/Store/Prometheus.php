@@ -27,38 +27,33 @@
 namespace LibreNMS\Data\Store;
 
 use App\Polling\Measure\Measurement;
-use GuzzleHttp\Exception\GuzzleException;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
-use LibreNMS\Util\Proxy;
+use LibreNMS\Util\Http;
 use Log;
 
 class Prometheus extends BaseDatastore
 {
     private $client;
     private $base_uri;
-    private $default_opts;
+
     private $enabled;
     private $prefix;
 
-    public function __construct(\GuzzleHttp\Client $client)
+    public function __construct()
     {
         parent::__construct();
-        $this->client = $client;
 
         $url = Config::get('prometheus.url');
         $job = Config::get('prometheus.job', 'librenms');
         $this->base_uri = "$url/metrics/job/$job/instance/";
+
+        $this->client = Http::client()->baseUrl($this->base_uri);
+
         $this->prefix = Config::get('prometheus.prefix', '');
         if ($this->prefix) {
             $this->prefix = "$this->prefix" . '_';
-        }
-
-        $this->default_opts = [
-            'headers' => ['Content-Type' => 'text/plain'],
-        ];
-        if ($proxy = Proxy::get($url)) {
-            $this->default_opts['proxy'] = $proxy;
         }
 
         $this->enabled = self::isEnabled();
@@ -82,52 +77,46 @@ class Prometheus extends BaseDatastore
             return;
         }
 
+        $vals = '';
+        $promtags = '/measurement/' . $measurement;
+
+        foreach ($fields as $k => $v) {
+            if ($v !== null) {
+                $vals .= $this->prefix . "$k $v\n";
+            }
+        }
+
+        foreach ($tags as $t => $v) {
+            if ($v !== null) {
+                $promtags .= (Str::contains($v, '/') ? "/$t@base64/" . base64_encode($v) : "/$t/$v");
+            }
+        }
+
+        $promurl = $device['hostname'] . $promtags;
+        if (Config::get('prometheus.attach_sysname', false)) {
+            $promurl .= '/sysName/' . $device['sysName'];
+        }
+        $promurl = str_replace(' ', '-', $promurl); // Prometheus doesn't handle tags with spaces in url
+
+        Log::debug("Prometheus put $promurl: ", [
+            'measurement' => $measurement,
+            'tags' => $tags,
+            'fields' => $fields,
+            'vals' => $vals,
+        ]);
+
         try {
-            $vals = '';
-            $promtags = '/measurement/' . $measurement;
-
-            foreach ($fields as $k => $v) {
-                if ($v !== null) {
-                    $vals .= $this->prefix . "$k $v\n";
-                }
-            }
-
-            foreach ($tags as $t => $v) {
-                if ($v !== null) {
-                    $promtags .= (Str::contains($v, '/') ? "/$t@base64/" . base64_encode($v) : "/$t/$v");
-                }
-            }
-            $options = $this->getDefaultOptions();
-            $options['body'] = $vals;
-
-            $promurl = $this->base_uri . $device['hostname'] . $promtags;
-            if (Config::get('prometheus.attach_sysname', false)) {
-                $promurl .= '/sysName/' . $device['sysName'];
-            }
-            $promurl = str_replace(' ', '-', $promurl); // Prometheus doesn't handle tags with spaces in url
-
-            Log::debug("Prometheus put $promurl: ", [
-                'measurement' => $measurement,
-                'tags' => $tags,
-                'fields' => $fields,
-                'vals' => $vals,
-            ]);
-
-            $result = $this->client->request('POST', $promurl, $options);
+            $result = $this->client->withBody($vals, 'text/plain')->post($promurl);
 
             $this->recordStatistic($stat->end());
 
-            if ($result->getStatusCode() !== 200) {
-                Log::error('Prometheus Error: ' . $result->getReasonPhrase());
+            if (! $result->successful()) {
+                Log::error('Prometheus Error: ' . $result->body());
             }
-        } catch (GuzzleException $e) {
-            Log::error('Prometheus Exception: ' . $e->getMessage());
+        } catch (ConnectionException $e) {
+            \Illuminate\Support\Facades\Log::error("%RFailed to connect to Prometheus server $this->base_uri, temporarily disabling.%n", ['color' => true]);
+            $this->enabled = false;
         }
-    }
-
-    private function getDefaultOptions()
-    {
-        return $this->default_opts;
     }
 
     /**

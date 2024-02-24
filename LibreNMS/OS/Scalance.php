@@ -26,6 +26,7 @@
 namespace LibreNMS\OS;
 
 use App\Models\Mempool;
+use Illuminate\Support\Collection;
 use LibreNMS\Device\Processor;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
@@ -61,7 +62,7 @@ class Scalance extends OS implements MempoolsDiscovery, ProcessorDiscovery
         $mempool_data = snmp_get_multi_oid($this->getDeviceArray(), [$perc_oid, $warn_oid]);
 
         if ($mempool_data[$perc_oid] === false) {
-            return collect();
+            return new Collection();
         }
 
         return collect()->push((new Mempool([

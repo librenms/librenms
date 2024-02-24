@@ -9,7 +9,7 @@ if (in_array($device['os'], ['windows', 'hpe-ilo']) || $device['os_group'] == 'u
             $type = $storage['cpqHoFileSysDesc'];
             preg_match_all('/\[.*?:(.*?)\]/', $type, $matches);
 
-            $fstype = $matches[1][0];
+            $fstype = $matches[1][0] ?? null;
             $descr = $storage['cpqHoFileSysDesc'];
             $size = $storage['cpqHoFileSysSpaceTotal'];
             $used = $storage['cpqHoFileSysSpaceUsed'];

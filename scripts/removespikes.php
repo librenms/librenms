@@ -528,7 +528,7 @@ function calculateOverallStatistics(&$rra, &$samples)
                             foreach ($samples[$rra_num][$ds_num] as $sample) {
                                 if (($sample > $rra[$rra_num][$ds_num]['max_cutoff']) ||
                                     ($sample < $rra[$rra_num][$ds_num]['min_cutoff'])) {
-                                    debug(sprintf("Std Kill: Value '%.4e', StandardDev '%.4e', StdDevLimit '%.4e'", $sample, $rra[$rra_num][$ds_num]['standard_deviation'], ($rra[$rra_num][$ds_num]['max_cutoff'] * (1 + $percent))));
+                                    debug(sprintf("Std Kill: Value '%.4e', StandardDev '%.4e', StdDevLimit '%.4e'", $sample, $rra[$rra_num][$ds_num]['standard_deviation'], $rra[$rra_num][$ds_num]['max_cutoff'] * (1 + $percent)));
                                     $rra[$rra_num][$ds_num]['stddev_killed']++;
                                     $std_kills = true;
                                 } else {
@@ -540,7 +540,7 @@ function calculateOverallStatistics(&$rra, &$samples)
                                     /* not enought samples to calculate */
                                 } elseif ($sample > ($rra[$rra_num][$ds_num]['variance_avg'] * (1 + $percent))) {
                                     /* kill based upon variance */
-                                    debug(sprintf("Var Kill: Value '%.4e', VarianceDev '%.4e', VarianceLimit '%.4e'", $sample, $rra[$rra_num][$ds_num]['variance_avg'], ($rra[$rra_num][$ds_num]['variance_avg'] * (1 + $percent))));
+                                    debug(sprintf("Var Kill: Value '%.4e', VarianceDev '%.4e', VarianceLimit '%.4e'", $sample, $rra[$rra_num][$ds_num]['variance_avg'], $rra[$rra_num][$ds_num]['variance_avg'] * (1 + $percent)));
                                     $rra[$rra_num][$ds_num]['variance_killed']++;
                                     $var_kills = true;
                                 }
@@ -637,17 +637,17 @@ function outputStatistics($rra)
                             $ds_name[$dskey],
                             $rra_cf[$rra_key],
                             $ds['totalsamples'],
-                            (isset($ds['numsamples']) ? $ds['numsamples'] : '0'),
-                            ($ds['average'] != 'N/A' ? round($ds['average'], 2) : $ds['average']),
-                            ($ds['standard_deviation'] != 'N/A' ? round($ds['standard_deviation'], 2) : $ds['standard_deviation']),
-                            (isset($ds['max_value']) ? round($ds['max_value'], 2) : 'N/A'),
-                            (isset($ds['min_value']) ? round($ds['min_value'], 2) : 'N/A'),
-                            ($ds['max_cutoff'] != 'N/A' ? round($ds['max_cutoff'], 2) : $ds['max_cutoff']),
-                            ($ds['min_cutoff'] != 'N/A' ? round($ds['min_cutoff'], 2) : $ds['min_cutoff']),
+                            isset($ds['numsamples']) ? $ds['numsamples'] : '0',
+                            $ds['average'] != 'N/A' ? round($ds['average'], 2) : $ds['average'],
+                            $ds['standard_deviation'] != 'N/A' ? round($ds['standard_deviation'], 2) : $ds['standard_deviation'],
+                            isset($ds['max_value']) ? round($ds['max_value'], 2) : 'N/A',
+                            isset($ds['min_value']) ? round($ds['min_value'], 2) : 'N/A',
+                            $ds['max_cutoff'] != 'N/A' ? round($ds['max_cutoff'], 2) : $ds['max_cutoff'],
+                            $ds['min_cutoff'] != 'N/A' ? round($ds['min_cutoff'], 2) : $ds['min_cutoff'],
                             $ds['stddev_killed'],
                             $ds['variance_killed'],
-                            ($ds['avgnksamples'] != 'N/A' ? round($ds['avgnksamples'], 2) : $ds['avgnksamples']),
-                            (isset($ds['variance_avg']) ? round($ds['variance_avg'], 2) : 'N/A')
+                            $ds['avgnksamples'] != 'N/A' ? round($ds['avgnksamples'], 2) : $ds['avgnksamples'],
+                            isset($ds['variance_avg']) ? round($ds['variance_avg'], 2) : 'N/A'
                         );
                     }
                 }
@@ -691,17 +691,17 @@ function outputStatistics($rra)
                             $ds_name[$dskey],
                             $rra_cf[$rra_key],
                             $ds['totalsamples'],
-                            (isset($ds['numsamples']) ? $ds['numsamples'] : '0'),
-                            ($ds['average'] != 'N/A' ? round($ds['average'], 2) : $ds['average']),
-                            ($ds['standard_deviation'] != 'N/A' ? round($ds['standard_deviation'], 2) : $ds['standard_deviation']),
-                            (isset($ds['max_value']) ? round($ds['max_value'], 2) : 'N/A'),
-                            (isset($ds['min_value']) ? round($ds['min_value'], 2) : 'N/A'),
-                            ($ds['max_cutoff'] != 'N/A' ? round($ds['max_cutoff'], 2) : $ds['max_cutoff']),
-                            ($ds['min_cutoff'] != 'N/A' ? round($ds['min_cutoff'], 2) : $ds['min_cutoff']),
+                            isset($ds['numsamples']) ? $ds['numsamples'] : '0',
+                            $ds['average'] != 'N/A' ? round($ds['average'], 2) : $ds['average'],
+                            $ds['standard_deviation'] != 'N/A' ? round($ds['standard_deviation'], 2) : $ds['standard_deviation'],
+                            isset($ds['max_value']) ? round($ds['max_value'], 2) : 'N/A',
+                            isset($ds['min_value']) ? round($ds['min_value'], 2) : 'N/A',
+                            $ds['max_cutoff'] != 'N/A' ? round($ds['max_cutoff'], 2) : $ds['max_cutoff'],
+                            $ds['min_cutoff'] != 'N/A' ? round($ds['min_cutoff'], 2) : $ds['min_cutoff'],
                             $ds['stddev_killed'],
                             $ds['variance_killed'],
-                            ($ds['avgnksamples'] != 'N/A' ? round($ds['avgnksamples'], 2) : $ds['avgnksamples']),
-                            (isset($ds['variance_avg']) ? round($ds['variance_avg'], 2) : 'N/A')
+                            $ds['avgnksamples'] != 'N/A' ? round($ds['avgnksamples'], 2) : $ds['avgnksamples'],
+                            isset($ds['variance_avg']) ? round($ds['variance_avg'], 2) : 'N/A'
                         );
                     }
                 }
@@ -816,6 +816,7 @@ function removeComments(&$output)
                 }
             }
         }
+
         /* transfer the new array back to the original array */
         return $new_array;
     }
@@ -866,7 +867,7 @@ function standard_deviation($samples)
         $sample_square[$current_sample] = pow($samples[$current_sample], 2);
     }
 
-    return sqrt(array_sum($sample_square) / $sample_count - pow((array_sum($samples) / $sample_count), 2));
+    return sqrt(array_sum($sample_square) / $sample_count - pow(array_sum($samples) / $sample_count, 2));
 }
 
 /* display_help - displays the usage of the function */

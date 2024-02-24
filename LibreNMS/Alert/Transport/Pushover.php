@@ -39,88 +39,79 @@ namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
 use LibreNMS\Enum\AlertState;
-use LibreNMS\Util\Proxy;
+use LibreNMS\Exceptions\AlertTransportDeliveryException;
+use LibreNMS\Util\Http;
 
 class Pushover extends Transport
 {
-    public function deliverAlert($obj, $opts)
+    public function deliverAlert(array $alert_data): bool
     {
-        $pushover_opts = $this->config;
-        $pushover_opts['options'] = $this->parseUserOptions($this->config['options']);
+        $options = $this->parseUserOptions($this->config['options']);
 
-        return $this->contactPushover($obj, $pushover_opts);
-    }
-
-    public function contactPushover($obj, $api)
-    {
+        $url = 'https://api.pushover.net/1/messages.json';
         $data = [];
-        $data['token'] = $api['appkey'];
-        $data['user'] = $api['userkey'];
-        switch ($obj['severity']) {
+        $data['token'] = $this->config['appkey'];
+        $data['user'] = $this->config['userkey'];
+        // Entities are html encoded so this will cause them to be displayed correctly in pushover alerts
+        $data['html'] = '1';
+        switch ($alert_data['severity']) {
             case 'critical':
                 $data['priority'] = 1;
-                if (! empty($api['options']['sound_critical'])) {
-                    $data['sound'] = $api['options']['sound_critical'];
+                if (! empty($options['sound_critical'])) {
+                    $data['sound'] = $options['sound_critical'];
                 }
                 break;
             case 'warning':
                 $data['priority'] = 1;
-                if (! empty($api['options']['sound_warning'])) {
-                    $data['sound'] = $api['options']['sound_warning'];
+                if (! empty($options['sound_warning'])) {
+                    $data['sound'] = $options['sound_warning'];
                 }
                 break;
         }
-        switch ($obj['state']) {
+        switch ($alert_data['state']) {
             case AlertState::RECOVERED:
                 $data['priority'] = 0;
-                if (! empty($api['options']['sound_ok'])) {
-                    $data['sound'] = $api['options']['sound_ok'];
+                if (! empty($options['sound_ok'])) {
+                    $data['sound'] = $options['sound_ok'];
                 }
                 break;
         }
-        $data['title'] = $obj['title'];
-        $data['message'] = $obj['msg'];
-        if ($api['options']) {
-            $data = array_merge($data, $api['options']);
-        }
-        $curl = curl_init();
-        Proxy::applyToCurl($curl);
-        curl_setopt($curl, CURLOPT_URL, 'https://api.pushover.net/1/messages.json');
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($curl, CURLOPT_SAFE_UPLOAD, true);
-        curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
-        $ret = curl_exec($curl);
-        $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-        if ($code != 200) {
-            var_dump('Pushover returned error'); //FIXME: proper debugging
-
-            return 'HTTP Status code ' . $code;
+        $data['title'] = $alert_data['title'];
+        $data['message'] = $alert_data['msg'];
+        if ($options) {
+            $data = array_merge($data, $options);
         }
 
-        return true;
+        $res = Http::client()->asForm()->post($url, $data);
+
+        if ($res->successful()) {
+            return true;
+        }
+
+        throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), $data['message'], $data);
     }
 
-    public static function configTemplate()
+    public static function configTemplate(): array
     {
         return [
             'config' => [
                 [
                     'title' => 'Api Key',
-                    'name'  => 'appkey',
+                    'name' => 'appkey',
                     'descr' => 'Api Key',
-                    'type'  => 'text',
+                    'type' => 'password',
                 ],
                 [
                     'title' => 'User Key',
-                    'name'  => 'userkey',
+                    'name' => 'userkey',
                     'descr' => 'User Key',
-                    'type'  => 'text',
+                    'type' => 'password',
                 ],
                 [
                     'title' => 'Pushover Options',
-                    'name'  => 'options',
+                    'name' => 'options',
                     'descr' => 'Pushover options',
-                    'type'  => 'textarea',
+                    'type' => 'textarea',
                 ],
             ],
             'validation' => [

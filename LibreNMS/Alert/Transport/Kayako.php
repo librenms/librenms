@@ -14,29 +14,18 @@ namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
 use LibreNMS\Config;
-use LibreNMS\Util\Proxy;
+use LibreNMS\Exceptions\AlertTransportDeliveryException;
+use LibreNMS\Util\Http;
 
 class Kayako extends Transport
 {
-    public function deliverAlert($host, $kayako)
+    public function deliverAlert(array $alert_data): bool
     {
-        if (! empty($this->config)) {
-            $kayako['url'] = $this->config['kayako-url'];
-            $kayako['key'] = $this->config['kayako-key'];
-            $kayako['secret'] = $this->config['kayako-secret'];
-            $kayako['department'] = $this->config['kayako-department'];
-        }
-
-        return $this->contactKayako($host, $kayako);
-    }
-
-    public function contactKayako($host, $kayako)
-    {
-        $url = $kayako['url'] . '/Tickets/Ticket';
-        $key = $kayako['key'];
-        $secret = $kayako['secret'];
+        $url = $this->config['kayako-url'] . '/Tickets/Ticket';
+        $key = $this->config['kayako-key'];
+        $secret = $this->config['kayako-secret'];
         $user = Config::get('email_from');
-        $department = $kayako['department'];
+        $department = $this->config['kayako-department'];
         $ticket_type = 1;
         $ticket_status = 1;
         $ticket_prio = 1;
@@ -44,10 +33,10 @@ class Kayako extends Transport
         $signature = base64_encode(hash_hmac('sha256', $salt, $secret, true));
 
         $protocol = [
-            'subject' => ($host['name'] ? $host['name'] . ' on ' . $host['hostname'] : $host['title']),
+            'subject' => ($alert_data['name'] ? $alert_data['name'] . ' on ' . $alert_data['hostname'] : $alert_data['title']),
             'fullname' => 'LibreNMS Alert',
             'email' => $user,
-            'contents' => strip_tags($host['msg']),
+            'contents' => strip_tags($alert_data['msg']),
             'departmentid' => $department,
             'ticketstatusid' => $ticket_status,
             'ticketpriorityid' => $ticket_prio,
@@ -58,27 +47,19 @@ class Kayako extends Transport
             'salt' => $salt,
             'signature' => $signature,
         ];
-        $post_data = http_build_query($protocol, '', '&');
 
-        $curl = curl_init();
-        Proxy::applyToCurl($curl);
-        curl_setopt($curl, CURLOPT_POST, true);
-        curl_setopt($curl, CURLOPT_URL, $url);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($curl, CURLOPT_POSTFIELDS, $post_data);
-        curl_exec($curl);
+        $res = Http::client()
+            ->asForm() // unsure if this is needed, can't access docs
+            ->post($url, $protocol);
 
-        $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-        if ($code != 200) {
-            var_dump('Kayako returned Error, retry later');
-
-            return false;
+        if ($res->successful()) {
+            return true;
         }
 
-        return true;
+        throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), $protocol['contents'], $protocol);
     }
 
-    public static function configTemplate()
+    public static function configTemplate(): array
     {
         return [
             'config' => [
@@ -98,7 +79,7 @@ class Kayako extends Transport
                     'title' => 'Kayako API Secret',
                     'name' => 'kayako-secret',
                     'descr' => 'ServiceDesk API Secret Key',
-                    'type' => 'text',
+                    'type' => 'password',
                 ],
                 [
                     'title' => 'Kayako Department',

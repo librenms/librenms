@@ -5,7 +5,7 @@ $scale_max = '100';
 
 require 'includes/html/graphs/common.inc.php';
 
-$previous = $_GET['previous'] ?? 'no';
+$previous = $graph_params->visible('previous');
 
 $rrd_options .= ' -b 1024';
 

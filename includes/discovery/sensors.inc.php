@@ -44,6 +44,9 @@ if (isset($device['hardware']) && strstr($device['hardware'], 'ProLiant')) {
 if ($device['os'] == 'gw-eydfa') {
     include 'includes/discovery/sensors/gw-eydfa.inc.php';
 }
+if ($device['os'] == 'loop-telecom') {
+    include 'includes/discovery/sensors/temperature/loop-telecom.inc.php';
+}
 
 $run_sensors = [
     'airflow',

@@ -27,6 +27,7 @@ namespace App\Http\ViewComposers;
 
 use App\Models\AlertRule;
 use App\Models\BgpPeer;
+use App\Models\CustomMap;
 use App\Models\Dashboard;
 use App\Models\Device;
 use App\Models\DeviceGroup;
@@ -34,11 +35,13 @@ use App\Models\Location;
 use App\Models\Notification;
 use App\Models\Package;
 use App\Models\PortGroup;
+use App\Models\PortsNac;
 use App\Models\User;
 use App\Models\UserPref;
 use App\Models\Vminfo;
 use App\Models\WirelessSensor;
 use App\Plugins\Hooks\MenuEntryHook;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 use LibreNMS\Config;
@@ -74,6 +77,9 @@ class MenuComposer
         //Dashboards
         $vars['dashboards'] = Dashboard::select('dashboard_id', 'dashboard_name')->allAvailable($user)->orderBy('dashboard_name')->get();
 
+        //Custom Maps
+        $vars['custommaps'] = CustomMap::select('custom_map_id', 'name')->hasAccess($user)->orderBy('name')->get();
+
         // Device menu
         $vars['device_groups'] = DeviceGroup::hasAccess($user)->orderBy('name')->get(['device_groups.id', 'name', 'desc']);
         $vars['package_count'] = Package::hasAccess($user)->count();
@@ -82,7 +88,7 @@ class MenuComposer
 
         $vars['locations'] = (Config::get('show_locations') && Config::get('show_locations_dropdown')) ?
             Location::hasAccess($user)->where('location', '!=', '')->orderBy('location')->get(['location', 'id']) :
-            collect();
+            new Collection();
         $vars['show_vmwinfo'] = Vminfo::hasAccess($user)->exists();
 
         // Service menu
@@ -115,6 +121,8 @@ class MenuComposer
             $vars['custom_port_descr']->isNotEmpty();
 
         $vars['port_groups'] = PortGroup::hasAccess($user)->orderBy('name')->get(['port_groups.id', 'name', 'desc']);
+
+        $vars['port_nac'] = PortsNac::hasAccess($user)->exists();
 
         // Sensor menu
         $vars['sensor_menu'] = ObjectCache::sensors();
@@ -255,6 +263,7 @@ class MenuComposer
 
         // Search bar
         $vars['typeahead_limit'] = Config::get('webui.global_search_result_limit');
+        $vars['global_search_ctrlf_focus'] = UserPref::getPref(Auth::user(), 'global_search_ctrlf_focus');
 
         // Plugins
         $vars['has_v1_plugins'] = Plugins::count() != 0;

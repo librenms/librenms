@@ -29,6 +29,7 @@ $tmp_output = '
         <thead>
             <tr>
             <th data-column-id="severity" data-sortable="false"></th>
+            <th data-column-id="origin">Origin</th>
             <th data-column-id="timestamp" data-formatter="browserTime">Timestamp</th>
             <th data-column-id="level">Level</th>
             <th data-column-id="source">Source</th>
@@ -135,7 +136,7 @@ $tmp_output .= '
             return {
                 stream: "' . (isset($_POST['stream']) ? $_POST['stream'] : '') . '",
                 device: "' . (isset($filter_device) ? $filter_device : '') . '",
-                range: "' . (isset($_POST['range']) ? $_POST['range'] : '') . '",
+                range: "' . (isset($_POST['range']) ? $_POST['range'] : 0) . '",
                 loglevel: "' . (isset($_POST['loglevel']) ? $_POST['loglevel'] : '') . '",
             };
         },

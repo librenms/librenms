@@ -47,6 +47,7 @@ class StringHelpers
     {
         $replacements = [
             'bind' => 'BIND',
+            'cape' => 'CAPEv2',
             'dbm' => 'dBm',
             'dhcp-stats' => 'DHCP Stats',
             'entropy' => 'Random entropy',
@@ -55,6 +56,8 @@ class StringHelpers
             'fbsd-nfs-server' => 'FreeBSD NFS Server',
             'freeradius' => 'FreeRADIUS',
             'gpsd' => 'GPSD',
+            'hv-monitor' => 'HV Monitor',
+            'mojo_cape_submit' => 'Mojo CAPE Submit',
             'mailcow-postfix' => 'mailcow-dockerized postfix',
             'mysql' => 'MySQL',
             'nfs-server' => 'NFS Server',
@@ -76,6 +79,7 @@ class StringHelpers
             'rrdcached' => 'RRDCached',
             'sdfsinfo' => 'SDFS info',
             'smart' => 'SMART',
+            'ss' => 'Socket Statistics',
             'ups-apcups' => 'UPS apcups',
             'ups-nut' => 'UPS nut',
             'zfs' => 'ZFS',
@@ -157,5 +161,16 @@ class StringHelpers
     public static function isStringable($var): bool
     {
         return $var === null || is_scalar($var) || (is_object($var) && method_exists($var, '__toString'));
+    }
+
+    public static function asciiToHex(string $ascii, string $seperator = ''): string
+    {
+        $hex = [];
+        $len = strlen($ascii);
+        for ($i = 0; $i < $len; $i++) {
+            $hex[] = str_pad(strtoupper(dechex(ord($ascii[$i]))), 2, '0', STR_PAD_LEFT);
+        }
+
+        return implode($seperator, $hex);
     }
 }

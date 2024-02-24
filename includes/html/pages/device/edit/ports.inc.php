@@ -81,29 +81,29 @@
             success: function (data) {
                 if (data.status == 'ok') {
                     $this.closest('.form-group').addClass('has-success');
-                    $this.next().addClass('fa-check');
+                    $this.next().children().first().addClass('fa-check');
                     $this.val(speed);
                     setTimeout(function(){
                         $this.closest('.form-group').removeClass('has-success');
-                        $this.next().removeClass('fa-check');
+                        $this.next().children().first().removeClass('fa-check');
                     }, 2000);
                 } else if (data.status == 'na') {
 
                 } else {
                     $(this).closest('.form-group').addClass('has-error');
-                    $this.next().addClass('fa-times');
+                    $this.next().children().first().addClass('fa-times');
                     setTimeout(function(){
                         $this.closest('.form-group').removeClass('has-error');
-                        $this.next().removeClass('fa-times');
+                        $this.next().children().first().removeClass('fa-times');
                     }, 2000);
                 }
             },
             error: function () {
                 $(this).closest('.form-group').addClass('has-error');
-                $this.next().addClass('fa-times');
+                $this.next().children().first().addClass('fa-times');
                 setTimeout(function(){
                    $this.closest('.form-group').removeClass('has-error');
-                   $this.next().removeClass('fa-times');
+                   $this.next().children().first().removeClass('fa-times');
                 }, 2000);
             }
         });

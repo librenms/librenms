@@ -25,7 +25,7 @@
  * Modified for FEC, Magnus Bergroth
  */
 foreach ($pre_cache['infineragroove_portTable'] as $index => $data) {
-    if (is_numeric($data['ochOsPreFecBer']) && $data['ochOsPreFecBer'] > 0) {
+    if (isset($data['ochOsPreFecBer']) && is_numeric($data['ochOsPreFecBer']) && $data['ochOsPreFecBer'] > 0) {
         $descr = $data['portAlias'] . ' PreFecBer';
         $oid = '.1.3.6.1.4.1.42229.1.2.4.1.19.1.1.26.' . $index;
         $value = $data['ochOsPreFecBer'];

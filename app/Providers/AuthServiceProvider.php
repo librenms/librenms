@@ -6,16 +6,18 @@ use App\Guards\ApiTokenGuard;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
+use Silber\Bouncer\BouncerFacade as Bouncer;
 
 class AuthServiceProvider extends ServiceProvider
 {
     /**
      * The policy mappings for the application.
      *
-     * @var array
+     * @var array<class-string, class-string>
      */
     protected $policies = [
         \App\Models\User::class => \App\Policies\UserPolicy::class,
+        \App\Models\CustomMap::class => \App\Policies\CustomMapPolicy::class,
         \App\Models\Dashboard::class => \App\Policies\DashboardPolicy::class,
         \App\Models\Device::class => \App\Policies\DevicePolicy::class,
         \App\Models\DeviceGroup::class => \App\Policies\DeviceGroupPolicy::class,
@@ -29,9 +31,9 @@ class AuthServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function boot()
+    public function boot(): void
     {
-        $this->registerPolicies();
+        Bouncer::cache();
 
         Auth::provider('legacy', function ($app, array $config) {
             return new LegacyUserProvider();

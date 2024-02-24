@@ -42,7 +42,7 @@ Please ensure you set `APP_URL` within your `.env` file so that callback URLs wo
 
 === "Okta"
 
-    `lnms plugin:add socialiteproviders/okta'
+    `lnms plugin:add socialiteproviders/okta`
 
 ### Find the provider name
 
@@ -123,7 +123,7 @@ Now we need some values from the OAuth provider itself, in most cases you need t
 === "Okta"
     For our example with Okta, we go to `Applications>Create App Integration`, Select `OIDC - OpenID Connect`, then `Web Application`.
 
-    ! [socialite-okta-1](/img/socialite-okta-1.png)
+    ![socialite-okta-1](/img/socialite-okta-1.png)
 
     Fill in the Name, Logo, and Assignments based on your preferred settings. Leave the `Sign-In Redirect URI` field, this is where you will edit this later:
     ![socialite-okta-2](/img/socialite-okta-2.png)
@@ -174,7 +174,7 @@ The format of the configuration string is `auth.socialite.configs.*provider name
 
 === "GitHub"
 
-    !!! setting "auth/socialite"
+    !!! setting "settings/auth/socialite"
         ```bash
         lnms config:set auth.socialite.configs.github.client_id 7a41f1d8215640ca6b00
         lnms config:set auth.socialite.configs.github.client_secret ea03957288edd0e590be202b239e4f0ff26b8047
@@ -182,7 +182,7 @@ The format of the configuration string is `auth.socialite.configs.*provider name
 
 === "Microsoft"
 
-    !!! setting "auth/socialite"
+    !!! setting "settings/auth/socialite"
         ```bash
         lnms config:set auth.socialite.configs.microsoft.client_id 7983ac13-c955-40e9-9b85-5ba27be52a52
         lnms config:set auth.socialite.configs.microsoft.client_secret J9P7Q~K2F5C.L243sqzbGj.cOOcjTBgAPak_l
@@ -191,7 +191,7 @@ The format of the configuration string is `auth.socialite.configs.*provider name
 
 === "Okta"
 
-    !!! setting "auth/socialite"
+    !!! setting "settings/auth/socialite"
         ```bash
         lnms config:set auth.socialite.configs.okta.client_id 0oa1c08tti8D7xgXb697
         lnms config:set auth.socialite.configs.okta.client_secret sWew90IKqKDmURj1XLsCPjXjre0U3zmJuFR6SzsG
@@ -219,7 +219,7 @@ The final step is to now add an event listener.
     ```
 
     Copy the part: `\SocialiteProviders\GitHub\GitHubExtendSocialite` and run;
-    !!! setting "auth/socialite"
+    !!! setting "settings/auth/socialite"
         ```bash
         lnms config:set auth.socialite.configs.github.listener "\SocialiteProviders\GitHub\GitHubExtendSocialite"
         ```
@@ -238,7 +238,7 @@ The final step is to now add an event listener.
     ```
 
     Copy the part: `\SocialiteProviders\Microsoft\MicrosoftExtendSocialite` and run;
-    !!! setting "auth/socialite"
+    !!! setting "settings/auth/socialite"
         ```bash
         lnms config:set auth.socialite.configs.microsoft.listener "\SocialiteProviders\Microsoft\MicrosoftExtendSocialite"
         ```
@@ -257,7 +257,7 @@ The final step is to now add an event listener.
     ```
 
     Copy the part: `\SocialiteProviders\Okta\OktaExtendSocialite` and run;
-    !!! setting "auth/socialite"
+    !!! setting "settings/auth/socialite"
         ```bash
         lnms config:set auth.socialite.configs.okta.listener "\SocialiteProviders\Okta\OktaExtendSocialite"
         ```
@@ -266,10 +266,54 @@ The final step is to now add an event listener.
 Now you are done with setting up the OAuth provider!
 If it doesn't work, please double check your configuration values by using the `config:get` command below.
 
-!!! setting "auth/socialite"
+!!! setting "settings/auth/socialite"
     ```bash
     lnms config:get auth.socialite
     ```
+
+### Default Role
+
+Since most Socialite Providers don't provide Authorization only Authentication it is possible to set
+the default User Role for Authorized users.   Appropriate care should be taken.
+
+- none: **No Access**: User has no access
+
+- normal: **Normal User**: You will need to assign device / port
+      permissions for users at this level.
+
+- global-read: **Global Read**: Read only Administrator.
+
+- admin: **Administrator**: This is a global read/write admin account.
+
+!!! setting "settings/auth/socialite"
+    ```bash
+    lnms config:set auth.socialite.default_role global-read
+    ```
+
+###  Claims / Access Scopes
+
+Socialite can specifiy scopes that should be included with in the authentication request.
+(see [Larvel docs](https://laravel.com/docs/10.x/socialite#access-scopes) )
+
+For example, if Okta is configured to expose group information it is possible to use these group
+names to configure User Roles.
+
+First enable sending the 'groups' claim (along with the normal openid, profile, and email claims).
+Be aware that the scope name must match the claim name. For identity providers where the scope does
+not match (e.g. Keycloak: roles -> groups) you need to configure a custom scope.
+
+!!! setting "settings/auth/socialite"
+    ```bash
+    lnms config:set auth.socialite.scopes.+ groups
+    ```
+
+Then setup mappings from the returned claim arrays to the User levels you want
+!!! setting "settings/auth/socialite"
+    ```bash
+    lnms config:set auth.socialite.claims.RETURN_FROM_CLAIM.roles '["admin"]'
+    lnms config:set auth.socialite.claims.OTHER_RETURN_FROM_CLAIM.roles '["global-read","cleaner"]'
+    ```
+
 
 ## SAML2 Example
 
@@ -316,13 +360,13 @@ It is up the IdP to provide the relevant details that you will need for configur
     ![socialite-saml-google-6](/img/socialite-saml-google-6.png)
 
 
-    !!! setting "auth/socialite"
+    !!! setting "settings/auth/socialite"
     ```bash
     lnms config:set auth.socialite.configs.saml2.metadata "$(cat /tmp/GoogleIDPMetadata.xml)"
     ```
 
     Alternatively, you can copy the content of the file and run it like so, this will result in the exact same result as above.
-    !!! setting "auth/socialite"
+    !!! setting "settings/auth/socialite"
     ```bash
     lnms config:set auth.socialite.configs.saml2.metadata '''<?xml version="1.0" encoding
     ...
@@ -330,28 +374,43 @@ It is up the IdP to provide the relevant details that you will need for configur
     </md:EntityDescriptor>'''
     ```
 
+=== "Azure"
 
+    ![LibreNMS-SAML-Azure](https://user-images.githubusercontent.com/8980985/222431219-af2369dc-1abd-4943-8dfb-5a21d8b9976c.png)
+    ```bash
+    echo "SESSION_SAME_SITE_COOKIE=none" >> .env
+    lnms plugin:add socialiteproviders/saml2
+    lnms config:set auth.socialite.redirect true
+    lnms config:set auth.socialite.register true
+    lnms config:set auth.socialite.configs.saml2.acs https://login.microsoftonline.com/xxxidfromazurexxx/saml2
+    lnms config:set auth.socialite.configs.saml2.entityid https://sts.windows.net/xxxidfromazurexxx/
+    lnms config:set auth.socialite.configs.saml2.certificate xxxcertinonelinexxx
+    lnms config:set auth.socialite.configs.saml2.listener "\SocialiteProviders\Saml2\Saml2ExtendSocialite"
+    lnms config:set auth.socialite.configs.saml2.metadata https://nexus.microsoftonline-p.com/federationmetadata/saml20/federationmetadata.xml
+    lnms config:set auth.socialite.configs.saml2.sp_default_binding_method urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST
+    lnms config:clear
+    ```
 
 #### Using an Identity Provider metadata URL
 
 !!! note
     This is the prefered and easiest way, if your IdP supports it!
 
-!!! setting "auth/socialite"
+!!! setting "settings/auth/socialite"
     ```bash
     lnms config:set auth.socialite.configs.saml2.metadata https://idp.co/metadata/xml
     ```
 
 #### Using an Identity Provider metadata XML file
 
-!!! setting "auth/socialite"
+!!! setting "settings/auth/socialite"
     ```bash
     lnms config:set auth.socialite.configs.saml2.metadata "$(cat GoogleIDPMetadata.xml)"
     ```
 
 #### Manually configuring the Identity Provider with a certificate string
 
-!!! setting "auth/socialite"
+!!! setting "settings/auth/socialite"
     ```bash
     lnms config:set auth.socialite.configs.saml2.acs https://idp.co/auth/acs
     lnms config:set auth.socialite.configs.saml2.entityid http://saml.to/trust
@@ -360,7 +419,7 @@ It is up the IdP to provide the relevant details that you will need for configur
 
 #### Manually configuring the Identity Provider with a certificate file
 
-!!! setting "auth/socialite"
+!!! setting "settings/auth/socialite"
     ```bash
     lnms config:set auth.socialite.configs.saml2.acs https://idp.co/auth/acs
     lnms config:set auth.socialite.configs.saml2.entityid http://saml.to/trust
@@ -371,7 +430,7 @@ It is up the IdP to provide the relevant details that you will need for configur
 
 Now we just need to define the listener service within LibreNMS:
 
-!!! setting "auth/socialite"
+!!! setting "settings/auth/socialite"
     ```bash
     lnms config:set auth.socialite.configs.saml2.listener "\SocialiteProviders\Saml2\Saml2ExtendSocialite"
     ```
@@ -379,6 +438,7 @@ Now we just need to define the listener service within LibreNMS:
 ### SESSION_SAME_SITE_COOKIE
 
 You most likely will need to set `SESSION_SAME_SITE_COOKIE=none` in `.env` if you use SAML2!
+If you get an error with http code 419, you should try to remove `SESSION_SAME_SITE_COOKIE=none` from your `.env`.
 
 !!! note
     Don't forget to run `lnms config:clear` after you modify `.env` to flush the config cache
@@ -392,7 +452,7 @@ LibreNMS exposes all of this information from your [LibreNMS install](https://*y
 ## Troubleshooting
 If it doesn't work, please double check your configuration values by using the `config:get` command below.
 
-!!! setting "auth/socialite"
+!!! setting "settings/auth/socialite"
     ```bash
     lnms config:get auth.socialite
     ```
@@ -409,7 +469,7 @@ If you have a need to, then you can override redirect url with the following com
 
 ## Post configuration settings
 
-!!! setting "auth/socialite"
+!!! setting "settings/auth/socialite"
     From here you can configure the settings for any identity providers you have configured along with some bespoke options.
 
     Redirect Login page: This setting will skip your LibreNMS login and take the end user straight to the first idP you configured.

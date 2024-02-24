@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   viewBox="0 0 52.916666 15.875"
+   version="1.1"
+   id="svg5"
+   inkscape:version="1.1.1 (3bf5ae0d25, 2021-09-20)"
+   sodipodi:docname="hatteras_logo.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:document-units="mm"
+     showgrid="false"
+     inkscape:zoom="4.5102858"
+     inkscape:cx="45.22995"
+     inkscape:cy="86.801596"
+     inkscape:window-width="2560"
+     inkscape:window-height="1383"
+     inkscape:window-x="1920"
+     inkscape:window-y="282"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1"
+     units="px" />
+  <defs
+     id="defs2" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <g
+       id="g24153"
+       transform="translate(0.17190267,-0.1508948)">
+      <path
+         style="fill:#004076;fill-opacity:1;stroke-width:0.201378"
+         d="m 0.4258538,1.3550605 1.5355053,0.00152 1.535504,7.612e-4 1.5355052,0.00152 L 6.919106,1.3423457 6.0644284,1.5964584 5.5609844,1.8329208 C 4.1955022,2.3235837 3.7909815,3.718505 3.654631,4.987919 4.807124,4.0864802 6.0334051,3.7400217 7.3733848,3.2606274 8.8149141,2.7770013 10.363098,2.2015469 11.441185,1.3283986 l 0.284143,0.016516 c -0.03021,0.9307875 -0.02232,1.7369579 -0.02232,2.635984 L 11.312323,4.2155649 10.921641,4.4621957 10.53096,4.708819 10.140278,4.95545 9.549244,5.2004673 8.9582095,5.4454922 8.367175,5.6905172 7.7761405,5.9355421 7.0713187,6.1638454 6.3664969,6.3921563 5.661675,6.6204596 4.9568532,6.8487705 4.5977063,7.0289183 4.2385582,7.2090661 C 3.069427,7.6798294 2.8166227,8.9635522 2.6122502,10.031508 L 2.485121,10.640709 c 3.4598531,-2.2350142 6.3840703,-2.4603568 9.249677,-4.2738977 0,1.240621 -0.0098,1.3941602 -0.0098,2.540936 l -0.282385,0.230191 -0.282384,0.2301909 -0.282384,0.23019 -0.282384,0.230199 -0.7048225,0.3316858 -0.704823,0.331693 -0.7048218,0.331693 -0.704823,0.331692 -1.0935723,0.394562 -1.0935713,0.39456 -1.0935735,0.394562 -1.0935724,0.39456 c -1.2131199,0.489334 -1.566403,1.100508 -1.566403,2.114865 H 0.4268256 C 0.4871676,11.119709 0.4258366,5.6174656 0.4258366,1.3554638 Z M 5.0575335,14.763215 v -0.04209 -0.04209 c 2.3552864,-0.618298 4.5711391,-1.824441 6.4496895,-2.96314 l 0.195769,-0.07825 v 3.209687 H 5.0575289 v -0.04209 z"
+         id="path2890-6"
+         sodipodi:nodetypes="ccccccccccccccccccccccccccccccccccccccccccccccccccccccc" />
+      <text
+         xml:space="preserve"
+         style="font-style:normal;font-weight:normal;font-size:8.86194px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#004076;fill-opacity:1;stroke:none;stroke-width:0.221548"
+         x="13.629499"
+         y="7.8431616"
+         id="text11415"
+         transform="scale(0.9208773,1.085921)"><tspan
+           sodipodi:role="line"
+           id="tspan11413"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';fill:#004076;fill-opacity:1;stroke-width:0.221548"
+           x="13.629499"
+           y="7.8431616">HATTERAS</tspan></text>
+      <text
+         xml:space="preserve"
+         style="font-style:normal;font-weight:normal;font-size:6.94177px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#004076;fill-opacity:1;stroke:none;stroke-width:0.173545"
+         x="11.912472"
+         y="15.65391"
+         id="text11415-7"
+         transform="scale(1.0603272,0.94310511)"><tspan
+           sodipodi:role="line"
+           id="tspan11413-6"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';fill:#004076;fill-opacity:1;stroke-width:0.173545"
+           x="11.912472"
+           y="15.65391">NETWORKS</tspan></text>
+    </g>
+  </g>
+</svg>

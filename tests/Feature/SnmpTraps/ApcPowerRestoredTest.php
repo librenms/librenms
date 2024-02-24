@@ -24,9 +24,7 @@
 
 namespace LibreNMS\Tests\Feature\SnmpTraps;
 
-use App\Models\Device;
-use LibreNMS\Snmptrap\Dispatcher;
-use LibreNMS\Snmptrap\Trap;
+use LibreNMS\Enum\Severity;
 
 class ApcPowerRestoredTest extends SnmpTrapTestCase
 {
@@ -35,19 +33,19 @@ class ApcPowerRestoredTest extends SnmpTrapTestCase
      *
      * @return void
      */
-    public function testApcPowerRestored()
+    public function testApcPowerRestored(): void
     {
-        $device = Device::factory()->create(); /** @var Device $device */
-        $trapText = "$device->hostname
-UDP: [$device->ip]:57602->[10.0.0.1]:162
+        $this->assertTrapLogsMessage(<<<'TRAP'
+{{ hostname }}
+UDP: [{{ ip }}]:57602->[10.0.0.1]:162
 SNMPv2-MIB::sysUpTime.0 18:30:30.32
 SNMPv2-MIB::snmpTrapOID.0 PowerNet-MIB::powerRestored
-PowerNet-MIB::mtrapargsString.0 \"INFORMATIONAL: Utility power has been restored.\"
-SNMPv2-MIB::snmpTrapEnterprise.0 PowerNet-MIB::apc";
-
-        $trap = new Trap($trapText);
-        $message = 'INFORMATIONAL: Utility power has been restored.';
-        \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 1);
-        $this->assertTrue(Dispatcher::handle($trap), 'Could not handle testApcPowerRestored trap');
+PowerNet-MIB::mtrapargsString.0 "INFORMATIONAL: Utility power has been restored."
+SNMPv2-MIB::snmpTrapEnterprise.0 PowerNet-MIB::apc
+TRAP,
+            'INFORMATIONAL: Utility power has been restored.',
+            'Could not handle testApcPowerRestored trap',
+            [Severity::Ok],
+        );
     }
 }

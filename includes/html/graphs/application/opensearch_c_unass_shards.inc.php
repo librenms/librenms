@@ -14,8 +14,8 @@ $rrd_list = [];
 if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Unassigned',
-        'ds'       => 'c_unass_shards',
+        'descr' => 'Unassigned',
+        'ds' => 'c_unass_shards',
     ];
 } else {
     d_echo('RRD "' . $rrd_filename . '" not found');

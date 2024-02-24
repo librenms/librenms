@@ -29,9 +29,9 @@
 namespace LibreNMS\Snmptrap\Handlers;
 
 use App\Models\Device;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
-use Log;
 
 class FmTrapLogRateThreshold implements SnmptrapHandler
 {
@@ -47,6 +47,6 @@ class FmTrapLogRateThreshold implements SnmptrapHandler
     {
         $logRate = $trap->getOidData($trap->findOid('FORTINET-FORTIMANAGER-FORTIANALYZER-MIB::fmLogRate'));
         $logThresh = $trap->getOidData($trap->findOid('FORTINET-FORTIMANAGER-FORTIANALYZER-MIB::fmLogRateThreshold'));
-        Log::event("Recommended log rate exceeded. Current Rate: $logRate Recommended Rate: $logThresh", $device->device_id, 'trap', 3);
+        $trap->log("Recommended log rate exceeded. Current Rate: $logRate Recommended Rate: $logThresh", Severity::Notice);
     }
 }

@@ -339,7 +339,7 @@ main () {
             no-code-update)
                 # Updates of the code are disabled, just check for schema updates
                 # and clean up the db.
-                status_run 'Updating SQL-Schema' 'php includes/sql-schema/update.php'
+                status_run 'Updating SQL-Schema' './lnms migrate --force --no-interaction --isolated'
                 status_run 'Cleaning up DB' "'$DAILY_SCRIPT' cleanup"
             ;;
             post-pull)
@@ -365,12 +365,11 @@ main () {
                 fi
 
                 # List all tasks to do after pull in the order of execution
-                status_run 'Updating SQL-Schema' 'php includes/sql-schema/update.php'
+                status_run 'Updating SQL-Schema' './lnms migrate --force --no-interaction --isolated'
                 status_run 'Updating submodules' "$DAILY_SCRIPT submodules"
                 status_run 'Cleaning up DB' "$DAILY_SCRIPT cleanup"
                 status_run 'Fetching notifications' "$DAILY_SCRIPT notifications"
                 status_run 'Caching PeeringDB data' "$DAILY_SCRIPT peeringdb"
-                status_run 'Caching Mac OUI data' "$DAILY_SCRIPT mac_oui"
             ;;
             cleanup)
                 # Cleanups
@@ -388,6 +387,7 @@ main () {
                                "alert_log"
                                "rrd_purge"
                                "ports_fdb"
+                               "ports_nac"
                                "route"
                                "ports_purge")
                 call_daily_php "${options[@]}"
@@ -404,10 +404,6 @@ main () {
             ;;
             peeringdb)
                 options=("peeringdb")
-                call_daily_php "${options[@]}"
-            ;;
-            mac_oui)
-                options=("mac_oui")
                 call_daily_php "${options[@]}"
         esac
     fi

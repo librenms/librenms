@@ -28,9 +28,9 @@
 namespace LibreNMS\Snmptrap\Handlers;
 
 use App\Models\Device;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
-use Log;
 
 class FgTrapIpsSignature implements SnmptrapHandler
 {
@@ -47,6 +47,6 @@ class FgTrapIpsSignature implements SnmptrapHandler
         $srcIp = $trap->getOidData($trap->findOid('FORTINET-FORTIGATE-MIB::fgIpsTrapSrcIp'));
         $sigNum = $trap->getOidData($trap->findOid('FORTINET-FORTIGATE-MIB::fgIpsTrapSigId'));
         $sigName = $trap->getOidData($trap->findOid('FORTINET-FORTIGATE-MIB::fgIpsTrapSigMsg'));
-        Log::event("IPS signature $sigName detected from $srcIp with Fortiguard ID $sigNum", $device->device_id, 'trap', 4);
+        $trap->log("IPS signature $sigName detected from $srcIp with Fortiguard ID $sigNum", Severity::Warning);
     }
 }

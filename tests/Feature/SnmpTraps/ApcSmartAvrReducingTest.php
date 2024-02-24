@@ -24,9 +24,7 @@
 
 namespace LibreNMS\Tests\Feature\SnmpTraps;
 
-use App\Models\Device;
-use LibreNMS\Snmptrap\Dispatcher;
-use LibreNMS\Snmptrap\Trap;
+use LibreNMS\Enum\Severity;
 
 class ApcSmartAvrReducingTest extends SnmpTrapTestCase
 {
@@ -35,19 +33,19 @@ class ApcSmartAvrReducingTest extends SnmpTrapTestCase
      *
      * @return void
      */
-    public function testApcSmartAvrReducing()
+    public function testApcSmartAvrReducing(): void
     {
-        $device = Device::factory()->create(); /** @var Device $device */
-        $trapText = "$device->hostname
-UDP: [$device->ip]:57602->[10.0.0.1]:162
+        $this->assertTrapLogsMessage(<<<'TRAP'
+{{ hostname }}
+UDP: [{{ ip }}]:57602->[10.0.0.1]:162
 SNMPv2-MIB::sysUpTime.0 459:20:47:26.90
 SNMPv2-MIB::snmpTrapOID.0 PowerNet-MIB::smartAvrReducing
-PowerNet-MIB::mtrapargsString \"UPS: Compensating for a high input voltage.\"
-SNMPv2-MIB::snmpTrapEnterprise.0 PowerNet-MIB::apc";
-
-        $trap = new Trap($trapText);
-        $message = 'UPS: Compensating for a high input voltage.';
-        \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 3);
-        $this->assertTrue(Dispatcher::handle($trap), 'Could not handle testApcSmartAvrReducing trap');
+PowerNet-MIB::mtrapargsString "UPS: Compensating for a high input voltage."
+SNMPv2-MIB::snmpTrapEnterprise.0 PowerNet-MIB::apc
+TRAP,
+            'UPS: Compensating for a high input voltage.',
+            'Could not handle testApcSmartAvrReducing trap',
+            [Severity::Notice],
+        );
     }
 }

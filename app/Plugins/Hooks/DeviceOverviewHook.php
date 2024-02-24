@@ -27,14 +27,14 @@ namespace App\Plugins\Hooks;
 
 use App\Models\Device;
 use App\Models\User;
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\Str;
 
 abstract class DeviceOverviewHook
 {
-    /** @var string */
-    public $view = 'resources.views.device-overview';
+    public string $view = 'resources.views.device-overview';
 
-    public function authorize(User $user, Device $device, array $settings): bool
+    public function authorize(User $user, Device $device): bool
     {
         return true;
     }
@@ -43,12 +43,15 @@ abstract class DeviceOverviewHook
     {
         return [
             'title' => __CLASS__,
-            'device'  => $device,
+            'device' => $device,
         ];
     }
 
-    final public function handle(string $pluginName, Device $device): \Illuminate\Contracts\View\View
+    final public function handle(string $pluginName, array $settings, Device $device, Application $app): \Illuminate\Contracts\View\View
     {
-        return view(Str::start($this->view, "$pluginName::"), $this->data($device));
+        return view(Str::start($this->view, "$pluginName::"), $app->call([$this, 'data'], [
+            'device' => $device,
+            'settings' => $settings,
+        ]));
     }
 }

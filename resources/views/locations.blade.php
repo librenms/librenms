@@ -148,7 +148,7 @@
                 locationId = $btn.data('id');
 
                 if (locationMap === null) {
-                    config = {"tile_url": "{{ \LibreNMS\Config::get('leaflet.tile_url', '{s}.tile.openstreetmap.org') }}"};
+                    config = {{ Js::from($maps_config) }}
                     locationMap = init_map('location-edit-map', '{{ $maps_engine }}', '{{ $maps_api }}', config);
                     locationMarker = init_map_marker(locationMap, location);
                 }

@@ -11,7 +11,7 @@ $colours = 'mixed';
 
 $array = [
     'download' => 'Download',
-    'upload'   => 'Upload',
+    'upload' => 'Upload',
 ];
 
 $rrd_filename = Rrd::name($device['hostname'], ['app', 'pureftpd', $app->app_id, 'bitrate']);

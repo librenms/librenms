@@ -36,7 +36,7 @@ use App\Models\Storage;
 $qfp = 0;
 if ($device['os_group'] == 'cisco') {
     $component = new LibreNMS\Component();
-    $components = $component->getComponents($device['device_id'], ['type'=> 'cisco-qfp']);
+    $components = $component->getComponents($device['device_id'], ['type' => 'cisco-qfp']);
     $components = $components[$device['device_id']];
     $qfp = isset($components) ? count($components) : 0;
 }
@@ -75,7 +75,7 @@ foreach ($sensors as $sensor_name) {
         //strtolower because 'dBm - dbm' difference
         $lowname = strtolower($sensor_name);
         $datas[] = $lowname;
-        $type_text[$lowname] = trans('sensors.' . $lowname)['short'];
+        $type_text[$lowname] = trans('sensors.' . $lowname . '.short');
     }
 }
 
@@ -87,9 +87,9 @@ $type_text['storage'] = 'Disk Usage';
 $type_text['diskio'] = 'Disk I/O';
 
 $link_array = [
-    'page'   => 'device',
+    'page' => 'device',
     'device' => $device['device_id'],
-    'tab'    => 'health',
+    'tab' => 'health',
 ];
 
 print_optionbar_start();

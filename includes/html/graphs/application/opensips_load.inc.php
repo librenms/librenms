@@ -20,7 +20,6 @@ $colour_line = 'FF4500';
 $colour_area_max = 'FFEE99';
 
 $graph_max = 1000;
-$graph_min = 1;
 
 $unit_text = 'Load Average %';
 

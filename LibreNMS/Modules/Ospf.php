@@ -32,8 +32,11 @@ use App\Models\OspfInstance;
 use App\Models\OspfNbr;
 use App\Models\OspfPort;
 use App\Observers\ModuleModelObserver;
+use Illuminate\Support\Collection;
+use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
+use LibreNMS\Polling\ModuleStatus;
 use LibreNMS\RRD\RrdDefinition;
 use SnmpQuery;
 
@@ -47,6 +50,11 @@ class Ospf implements Module
         return ['ports'];
     }
 
+    public function shouldDiscover(OS $os, ModuleStatus $status): bool
+    {
+        return false;
+    }
+
     /**
      * @inheritDoc
      */
@@ -55,10 +63,15 @@ class Ospf implements Module
         // no discovery
     }
 
+    public function shouldPoll(OS $os, ModuleStatus $status): bool
+    {
+        return $status->isEnabledAndDeviceUp($os->getDevice());
+    }
+
     /**
      * @inheritDoc
      */
-    public function poll(OS $os): void
+    public function poll(OS $os, DataStorageInterface $datastore): void
     {
         foreach ($os->getDevice()->getVrfContexts() as $context_name) {
             echo ' Processes: ';
@@ -69,10 +82,15 @@ class Ospf implements Module
                 ->hideMib()->enumStrings()
                 ->walk('OSPF-MIB::ospfGeneralGroup')->valuesByIndex();
 
-            $ospf_instances = collect();
+            $ospf_instances = new Collection();
             foreach ($ospf_instances_poll as $ospf_instance_id => $ospf_entry) {
                 if (empty($ospf_entry['ospfRouterId'])) {
                     continue; // skip invalid data
+                }
+                foreach (['ospfRxNewLsas', 'ospfOriginateNewLsas', 'ospfAreaBdrRtrStatus', 'ospfTOSSupport', 'ospfExternLsaCksumSum', 'ospfExternLsaCount', 'ospfASBdrRtrStatus', 'ospfVersionNumber', 'ospfAdminStat'] as $column) {
+                    if (! array_key_exists($column, $ospf_entry) || is_null($ospf_entry[$column])) {
+                        continue 2; // This column must exist and not be null
+                    }
                 }
 
                 $instance = OspfInstance::updateOrCreate([
@@ -180,20 +198,25 @@ class Ospf implements Module
             echo ' TOS Metrics: ';
 
             // Pull data from device
+            $ospf_ports_by_ip = $ospf_ports->keyBy('ospfIfIpAddress');
             $ospf_tos_metrics = SnmpQuery::context($context_name)
                 ->hideMib()->enumStrings()
                 ->walk('OSPF-MIB::ospfIfMetricTable')
-                ->mapTable(function ($ospf_tos, $ip) use ($context_name, $os) {
-                    $ospf_tos['ospf_port_id'] = OspfPort::query()
-                        ->where('ospfIfIpAddress', $ip)
-                        ->where('context_name', $context_name)
-                        ->value('ospf_port_id');
+                ->mapTable(function ($ospf_tos, $ip) use ($ospf_ports_by_ip) {
+                    $port = $ospf_ports_by_ip->get($ip);
 
-                    return OspfPort::updateOrCreate([
-                        'device_id' => $os->getDeviceId(),
-                        'ospf_port_id' => $ospf_tos['ospf_port_id'],
-                        'context_name' => $context_name,
-                    ], $ospf_tos);
+                    if (! $port) {
+                        // didn't find port by IP, try harder
+                        $port = $ospf_ports_by_ip->where(fn ($p) => str_starts_with($p->ospf_port_id, $ip))->first();
+                    }
+
+                    if ($port) {
+                        $port->fill($ospf_tos)->save();
+                    } else {
+                        \Log::error("No port found when fetching metrics for $ip");
+                    }
+
+                    return $port;
                 });
 
             echo $ospf_tos_metrics->count();
@@ -215,7 +238,7 @@ class Ospf implements Module
                 ];
 
                 $tags = compact('rrd_def');
-                app('Datastore')->put($os->getDeviceArray(), 'ospf-statistics', $tags, $fields);
+                $datastore->put($os->getDeviceArray(), 'ospf-statistics', $tags, $fields);
             }
         }
     }

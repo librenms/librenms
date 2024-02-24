@@ -31,9 +31,9 @@
 namespace LibreNMS\Snmptrap\Handlers;
 
 use App\Models\Device;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
-use Log;
 
 class Aos6LbdStateChangeForAutoRecovery implements SnmptrapHandler
 {
@@ -51,6 +51,6 @@ class Aos6LbdStateChangeForAutoRecovery implements SnmptrapHandler
         $current = $trap->getOidData($trap->findOid('ALCATEL-IND1-LBD-MIB::alaLbdCurrentStateAutoRecovery'));
         $ifIndex = $trap->getOidData($trap->findOid('ALCATEL-IND1-LBD-MIB::alaLbdPortIfIndex'));
         $port = $device->ports()->where('ifIndex', $ifIndex)->first();
-        Log::event("Loopback detection has been recovered on the port $port->ifDescr. Status of the port before was $before and now is $current.", $device->device_id, 'trap', 1);
+        $trap->log("Loopback detection has been recovered on the port $port->ifDescr. Status of the port before was $before and now is $current.", Severity::Ok);
     }
 }

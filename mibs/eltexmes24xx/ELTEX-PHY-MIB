@@ -1,0 +1,529 @@
+ELTEX-PHY-MIB DEFINITIONS ::= BEGIN
+
+  IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    Integer32
+      FROM SNMPv2-SMI
+
+    TEXTUAL-CONVENTION,
+    DisplayString,
+    TruthValue
+      FROM SNMPv2-TC
+
+    ifIndex
+      FROM IF-MIB
+
+    eltexLtd
+      FROM ELTEX-SMI-ACTUAL;
+
+  eltexPhyMIB MODULE-IDENTITY
+    LAST-UPDATED "202010150000Z" -- Oct 15 00:00:00 GMT 2020
+    ORGANIZATION "Eltex Enterprise Co, Ltd."
+    CONTACT-INFO
+        "www.eltex-co.ru"
+    DESCRIPTION
+        "The MIB module describes the private MIB for L1 testing."
+    REVISION "202010150000Z"
+    DESCRIPTION
+            "Added cross-pair tests for EltexPhyTestGetType."
+    REVISION "201810300000Z"
+    DESCRIPTION
+            "Initial revision."
+  ::= { eltexLtd 52 }
+
+-------------------------------------------------------------------------------
+-- Textual Conventions.
+
+EltexPhyTransConnectorType ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "Transceiver connector type."
+    SYNTAX  INTEGER {
+        unknown(0),
+        sc(1),
+        fibre-ch-st1(2),
+        fibre-ch-st2(3),
+        bnc-tnc(4),
+        fibre-ch-coaxial-headers(5),
+        fibrejack(6),
+        lc(7),
+        mt-rj(8),
+        mu(9),
+        sg(10),
+        optical-pigtail(11),
+        mpo-parallel-optic(12),
+        hssdc-ii(32),
+        copper-pigtail(33),
+        rj45(34),
+        no-separable-connector(35),
+        unallocated(127),
+        vendorspec(255)
+    }
+
+EltexPhyTransType ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "Transceiver type."
+    SYNTAX  INTEGER {
+        unknown(0),
+        gbic(1),
+        sff(2),
+        sfp-sfpplus(3),
+        xbi-300-pin(4),
+        xenpak(5),
+        xfp(6),
+        xff(7),
+        xfp-e(8),
+        xpak(9),
+        x2(10),
+        dwdm-sfp(11),
+        qsfp(12),
+        qsfpplus(13),
+        reserved(127),
+        vendorspec(255)
+    }
+
+EltexPhyTransFiberDiameter ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "The diameter of the fiber, measured in micron.
+         fiber9   - 9 micron multi-mode fiber
+         fiber50  - 50 micron multi-mode fiber
+         fiber625 - 62.5 micron multi-mode fiber
+         copper   - copper cable."
+    SYNTAX  INTEGER {
+        fiber9(1),
+        fiber50(2),
+        fiber625(3),
+        copper(4),
+        unknown(65535)
+    }
+
+EltexPhyTransDiagnosticType ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "Transceiver diagnostic type."
+    SYNTAX  INTEGER {
+        temperature(1),
+        supplyVoltage(2),
+        txBiasCurrent(3),
+        txOpticalPower(4),
+        rxOpticalPower(5),
+        lossOfSignal(6)
+    }
+
+EltexPhyTestSetType ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "A value indicating the test to perform."
+    SYNTAX  INTEGER {
+        cableStatus(1) -- long accurate test with link down
+    }
+
+EltexPhyTestGetStatus ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "Status of test"
+    SYNTAX INTEGER {
+        none(1),          -- no test yet requested
+        success(2),
+        inProgress(3),
+        notSupported(4),
+        unableToRun(5),   -- due to state of system
+        aborted(6),
+        failed(7)
+    }
+
+EltexPhyTestGetUnits ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "Units of test"
+    SYNTAX INTEGER {
+        integer(1),
+        boolean(2),
+        meter(3)
+    }
+
+EltexPhyTestGetType ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "A value indicating the performed test."
+    SYNTAX  INTEGER {
+        channelAShort(1),
+        channelBShort(2),
+        channelCShort(3),
+        channelDShort(4),
+        channelAOpen(5),
+        channelBOpen(6),
+        channelCOpen(7),
+        channelDOpen(8),
+        channelAMismatch(9),
+        channelBMismatch(10),
+        channelCMismatch(11),
+        channelDMismatch(12),
+        channelALineDriver(13),
+        channelBLineDriver(14),
+        channelCLineDriver(15),
+        channelDLineDriver(16),
+        channelALength(17),
+        channelBLength(18),
+        channelCLength(19),
+        channelDLength(20),
+        channelACross(21),
+        channelBCross(22),
+        channelCCross(23),
+        channelDCross(24)
+    }
+
+-------------------------------------------------------------------------------
+
+eltexPhyObjects                   OBJECT IDENTIFIER ::= { eltexPhyMIB 1 }
+eltexPhyTransceiverObjects        OBJECT IDENTIFIER ::= { eltexPhyObjects 1 }
+eltexPhyTestObjects               OBJECT IDENTIFIER ::= { eltexPhyObjects 2 }
+
+eltexPhyTransceiverGlobals        OBJECT IDENTIFIER ::= { eltexPhyTransceiverObjects 1 }
+eltexPhyTransceiverConfigs        OBJECT IDENTIFIER ::= { eltexPhyTransceiverObjects 2 }
+eltexPhyTransceiverStatistics     OBJECT IDENTIFIER ::= { eltexPhyTransceiverObjects 3 }
+
+eltexPhyTestGlobals               OBJECT IDENTIFIER ::= { eltexPhyTestObjects 1 }
+
+-------------------------------------------------------------------------------
+
+--
+-- Transceiver information tadle.
+--
+
+eltexPhyTransceiverInfoTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF EltexPhyTransceiverInfoEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "This table show the information of interfaces transceivers."
+    ::= { eltexPhyTransceiverStatistics 1 }
+
+eltexPhyTransceiverInfoEntry OBJECT-TYPE
+    SYNTAX       EltexPhyTransceiverInfoEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "The entry of the eltexPhyTransceiverInfoTable."
+    INDEX { ifIndex }
+    ::= { eltexPhyTransceiverInfoTable 1 }
+
+EltexPhyTransceiverInfoEntry ::=
+    SEQUENCE {
+        eltexPhyTransceiverInfoConnectorType        EltexPhyTransConnectorType,
+        eltexPhyTransceiverInfoType                 EltexPhyTransType,
+        eltexPhyTransceiverInfoComplianceCode       OCTET STRING,
+        eltexPhyTransceiverInfoWaveLength           Integer32,
+        eltexPhyTransceiverInfoVendorName           OCTET STRING,
+        eltexPhyTransceiverInfoSerialNumber         OCTET STRING,
+        eltexPhyTransceiverInfoFiberDiameter        EltexPhyTransFiberDiameter,
+        eltexPhyTransceiverInfoTransferDistance     Integer32,
+        eltexPhyTransceiverInfoDiagnosticSupported  TruthValue,
+        eltexPhyTransceiverInfoPartNumber           OCTET STRING,
+        eltexPhyTransceiverInfoVendorRevision       OCTET STRING
+    }
+
+eltexPhyTransceiverInfoConnectorType OBJECT-TYPE
+    SYNTAX       EltexPhyTransConnectorType
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Connector type of the interface transceiver."
+    ::= { eltexPhyTransceiverInfoEntry 1 }
+
+eltexPhyTransceiverInfoType OBJECT-TYPE
+    SYNTAX       EltexPhyTransType
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Type of the interface transceiver."
+    ::= { eltexPhyTransceiverInfoEntry 2 }
+
+eltexPhyTransceiverInfoComplianceCode OBJECT-TYPE
+    SYNTAX       OCTET STRING
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Compliance code of the interface transceiver."
+    ::= { eltexPhyTransceiverInfoEntry 3 }
+
+eltexPhyTransceiverInfoWaveLength OBJECT-TYPE
+    SYNTAX       Integer32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Wave length of the interface transceiver, measured in nanometer."
+    ::= { eltexPhyTransceiverInfoEntry 4 }
+
+eltexPhyTransceiverInfoVendorName OBJECT-TYPE
+    SYNTAX       OCTET STRING
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Vendor name of the interface transceiver."
+    ::= { eltexPhyTransceiverInfoEntry 5 }
+
+eltexPhyTransceiverInfoSerialNumber OBJECT-TYPE
+    SYNTAX       OCTET STRING
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Serial number of the interface transceiver."
+    ::= { eltexPhyTransceiverInfoEntry 6 }
+
+eltexPhyTransceiverInfoFiberDiameter OBJECT-TYPE
+    SYNTAX       EltexPhyTransFiberDiameter
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Fiber diameter of the interface transceiver."
+    ::= { eltexPhyTransceiverInfoEntry 7 }
+
+eltexPhyTransceiverInfoTransferDistance OBJECT-TYPE
+    SYNTAX       Integer32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The maximal distance which the interface transceiver
+         could transmit, measured in meter."
+    ::= { eltexPhyTransceiverInfoEntry 8 }
+
+eltexPhyTransceiverInfoDiagnosticSupported OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Indicating whether the digital diagnostic monitoring function
+         is supported or not on the interface transceiver."
+    ::= { eltexPhyTransceiverInfoEntry 9 }
+
+eltexPhyTransceiverInfoPartNumber OBJECT-TYPE
+    SYNTAX       OCTET STRING
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Part number of the interface transceiver provided by SFP vendor."
+    ::= { eltexPhyTransceiverInfoEntry 10 }
+
+eltexPhyTransceiverInfoVendorRevision OBJECT-TYPE
+    SYNTAX       OCTET STRING
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Revision level for part number provided by vendor."
+    ::= { eltexPhyTransceiverInfoEntry 11 }
+
+-------------------------------------------------------------------------------
+
+--
+-- Transceiver DDM values and thresholds.
+--
+
+eltexPhyTransceiverDiagnosticTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF EltexPhyTransceiverDiagnosticEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "This table show current DDM values and thresholds
+         of the interface transceiver."
+    ::= { eltexPhyTransceiverStatistics 2 }
+
+eltexPhyTransceiverDiagnosticEntry OBJECT-TYPE
+    SYNTAX       EltexPhyTransceiverDiagnosticEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "The entry of the eltexPhyTransceiverDiagnosticTable."
+    INDEX { ifIndex, eltexPhyTransceiverDiagnosticType, eltexPhyTransceiverDiagnosticChannel }
+    ::= { eltexPhyTransceiverDiagnosticTable 1 }
+
+EltexPhyTransceiverDiagnosticEntry ::=
+    SEQUENCE {
+        eltexPhyTransceiverDiagnosticType          EltexPhyTransDiagnosticType,
+        eltexPhyTransceiverDiagnosticChannel                     INTEGER,
+        eltexPhyTransceiverDiagnosticUnits                       DisplayString,
+        eltexPhyTransceiverDiagnosticHighAlarmThreshold          INTEGER,
+        eltexPhyTransceiverDiagnosticHighWarningThreshold        INTEGER,
+        eltexPhyTransceiverDiagnosticLowWarningThreshold         INTEGER,
+        eltexPhyTransceiverDiagnosticLowAlarmThreshold           INTEGER,
+        eltexPhyTransceiverDiagnosticCurrentValue                INTEGER
+    }
+
+eltexPhyTransceiverDiagnosticType OBJECT-TYPE
+    SYNTAX       EltexPhyTransDiagnosticType
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Type of the transceiver diagnostic."
+    ::= { eltexPhyTransceiverDiagnosticEntry 1 }
+
+eltexPhyTransceiverDiagnosticChannel OBJECT-TYPE
+    SYNTAX       INTEGER (1..4)
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Transceiver channel number."
+    ::= { eltexPhyTransceiverDiagnosticEntry 2 }
+
+eltexPhyTransceiverDiagnosticUnits OBJECT-TYPE
+    SYNTAX       DisplayString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Unit of measure for current diagnostic type."
+    ::= { eltexPhyTransceiverDiagnosticEntry 3 }
+
+eltexPhyTransceiverDiagnosticHighAlarmThreshold OBJECT-TYPE
+    SYNTAX       INTEGER
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Transceiver HighAlarm threshold for current diagnostic type."
+    ::= { eltexPhyTransceiverDiagnosticEntry 4 }
+
+eltexPhyTransceiverDiagnosticHighWarningThreshold OBJECT-TYPE
+    SYNTAX       INTEGER
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Transceiver HighWarning threshold for current diagnostic type."
+    ::= { eltexPhyTransceiverDiagnosticEntry 5 }
+
+eltexPhyTransceiverDiagnosticLowWarningThreshold OBJECT-TYPE
+    SYNTAX       INTEGER
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Transceiver LowWarning threshold for current diagnostic type."
+    ::= { eltexPhyTransceiverDiagnosticEntry 6 }
+
+eltexPhyTransceiverDiagnosticLowAlarmThreshold OBJECT-TYPE
+    SYNTAX       INTEGER
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Transceiver LowAlarm threshold for current diagnostic type."
+    ::= { eltexPhyTransceiverDiagnosticEntry 7 }
+
+eltexPhyTransceiverDiagnosticCurrentValue OBJECT-TYPE
+    SYNTAX       INTEGER
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Measured value for current transceiver diagnostic type."
+    ::= { eltexPhyTransceiverDiagnosticEntry 8 }
+
+-------------------------------------------------------------------------------
+
+--
+-- VCT
+--
+
+eltexPhyTestSetTable   OBJECT-TYPE
+    SYNTAX SEQUENCE OF EltexPhyTestSetEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "A table containing objects for invoking tests on an interface."
+    ::= { eltexPhyTestGlobals 1}
+
+eltexPhyTestSetEntry OBJECT-TYPE
+    SYNTAX       EltexPhyTestSetEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+            "An entry containing objects for invoking tests on an interface."
+    INDEX {ifIndex }
+    ::= { eltexPhyTestSetTable 1 }
+
+EltexPhyTestSetEntry ::=
+    SEQUENCE {
+        eltexPhyTestSetType        EltexPhyTestSetType
+    }
+
+eltexPhyTestSetType       OBJECT-TYPE
+    SYNTAX  EltexPhyTestSetType
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+            "A control variable used to start operator initiated interface
+             tests."
+    ::= { eltexPhyTestSetEntry 1 }
+
+eltexPhyTestGetTable   OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EltexPhyTestGetEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "A table containing results of tests on an interface."
+    ::= { eltexPhyTestGlobals 2 }
+
+eltexPhyTestGetEntry OBJECT-TYPE
+    SYNTAX       EltexPhyTestGetEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+            "An entry containing results of tests on an interface."
+    INDEX {ifIndex, eltexPhyTestGetType}
+    ::= { eltexPhyTestGetTable 1 }
+
+EltexPhyTestGetEntry ::=
+    SEQUENCE {
+        eltexPhyTestGetType        EltexPhyTestGetType,
+        eltexPhyTestGetStatus      EltexPhyTestGetStatus,
+        eltexPhyTestGetResult      INTEGER,
+        eltexPhyTestGetUnits       EltexPhyTestGetUnits,
+        eltexPhyTestGetTimeStamp   DisplayString
+    }
+
+eltexPhyTestGetType       OBJECT-TYPE
+    SYNTAX     EltexPhyTestGetType
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The type of test the user performed."
+    ::= { eltexPhyTestGetEntry 1 }
+
+eltexPhyTestGetStatus  OBJECT-TYPE
+    SYNTAX       EltexPhyTestGetStatus
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "This object contains the status of the most recently
+        requested test for operator initiated tests or the value
+        none(1) if no tests have been requested since the last
+        reset. For non operator initiated tests the value is always
+        none(1).
+        Note that this facility provides no provision for saving
+        the results of one test when starting another, as could
+        be required if used by multiple managers concurrently."
+    ::= { eltexPhyTestGetEntry 2 }
+
+eltexPhyTestGetResult  OBJECT-TYPE
+    SYNTAX       INTEGER
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+            "This object holds the test result"
+    ::= { eltexPhyTestGetEntry 3 }
+
+eltexPhyTestGetUnits   OBJECT-TYPE
+   SYNTAX  EltexPhyTestGetUnits
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The test result unit of measure. The units can be standard unit or special units
+         that are designed for special test."
+   ::= { eltexPhyTestGetEntry 4 }
+
+eltexPhyTestGetTimeStamp   OBJECT-TYPE
+   SYNTAX  DisplayString (SIZE(1..32))
+   MAX-ACCESS   read-only
+   STATUS       current
+   DESCRIPTION
+        "The time in string (formated DD-MMM-YYYY HH:MM:SS e.g
+         14-Apr-2002 10:33:31)"
+    ::= { eltexPhyTestGetEntry 5 }
+
+END

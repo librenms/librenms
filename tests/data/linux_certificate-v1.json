@@ -1,0 +1,67 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.8072.3.2.10",
+                    "sysDescr": "Linux server 3.10.0-693.5.2.el7.x86_64 #1 SMP Fri Oct 20 20:32:50 UTC 2017 x86_64",
+                    "sysContact": "<private>",
+                    "version": "3.10.0-693.5.2.el7.x86_64",
+                    "hardware": "Generic x86 64-bit",
+                    "features": null,
+                    "location": "<private>",
+                    "os": "linux",
+                    "type": "server",
+                    "serial": null,
+                    "icon": "linux.svg"
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    },
+    "applications": {
+        "discovery": {
+            "applications": [
+                {
+                    "app_type": "certificate",
+                    "app_state": "UNKNOWN",
+                    "discovered": 1,
+                    "app_state_prev": null,
+                    "app_status": "",
+                    "app_instance": "",
+                    "data": null,
+                    "deleted_at": null
+                }
+            ]
+        },
+        "poller": {
+            "applications": [
+                {
+                    "app_type": "certificate",
+                    "app_state": "OK",
+                    "discovered": 1,
+                    "app_state_prev": "UNKNOWN",
+                    "app_status": "",
+                    "app_instance": "",
+                    "data": null,
+                    "deleted_at": null
+                }
+            ],
+            "application_metrics": [
+                {
+                    "metric": "host.realm.net_age",
+                    "value": 1,
+                    "value_prev": null,
+                    "app_type": "certificate"
+                },
+                {
+                    "metric": "host.realm.net_remaining_days",
+                    "value": 88,
+                    "value_prev": null,
+                    "app_type": "certificate"
+                }
+            ]
+        }
+    }
+}

@@ -7,16 +7,26 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Str;
+use LibreNMS\Interfaces\Models\Keyable;
 use LibreNMS\Util\Html;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\Rewrite;
 
-class Vminfo extends DeviceRelatedModel
+class Vminfo extends DeviceRelatedModel implements Keyable
 {
     use HasFactory;
 
     protected $table = 'vminfo';
     public $timestamps = false;
+    protected $fillable = [
+        'vm_type',
+        'vmwVmVMID',
+        'vmwVmDisplayName',
+        'vmwVmGuestOS',
+        'vmwVmMemSize',
+        'vmwVmCpus',
+        'vmwVmState',
+    ];
 
     public function getStateLabelAttribute(): array
     {
@@ -54,6 +64,11 @@ class Vminfo extends DeviceRelatedModel
 
     public function parentDevice(): HasOne
     {
-        return $this->hasOne('App\Models\Device', 'hostname', 'vmwVmDisplayName');
+        return $this->hasOne(\App\Models\Device::class, 'hostname', 'vmwVmDisplayName');
+    }
+
+    public function getCompositeKey()
+    {
+        return $this->vm_type . $this->vmwVmVMID;
     }
 }

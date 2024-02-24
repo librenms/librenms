@@ -50,7 +50,7 @@ foreach ($modules as $module_index => $module) {
 
             $cdef[] = $module . $index . $suffix;
             $suffix = ',+';
-            if ($_GET['previous'] == 'yes') {
+            if ($graph_params->visible('previous')) {
                 $rrd_options .= " DEF:{$module}RawX$index=$rrd_filename:poller:AVERAGE:start=$prev_from:end=$from";
                 // change undefined to 0
                 $rrd_options .= " CDEF:{$module}X$index={$module}RawX$index,UN,0,{$module}RawX$index,IF";
@@ -67,7 +67,7 @@ foreach ($modules as $module_index => $module) {
     } else {
         // have data for this module, display it
         $rrd_options .= " CDEF:$module=" . implode(',', $cdef);
-        if ($_GET['previous']) {
+        if ($graph_params->visible('previous')) {
             $rrd_options .= " CDEF:{$module}X=" . implode(',', $cdefX);
         }
     }
@@ -75,7 +75,7 @@ foreach ($modules as $module_index => $module) {
 
 $rrd_options .= " 'COMMENT:Seconds                 Cur     Min     Max      Avg'";
 
-if ($_GET['previous']) {
+if ($graph_params->visible('previous')) {
     $rrd_options .= " COMMENT:' \t    P Min   P Max   P Avg'";
 }
 
@@ -86,7 +86,7 @@ foreach ($modules as $index => $module) {
     $rrd_options .= " AREA:$module#$color:'" . \LibreNMS\Data\Store\Rrd::fixedSafeDescr($module, 16) . "':STACK";
     $rrd_options .= " GPRINT:$module:LAST:%6.2lf  GPRINT:$module:MIN:%6.2lf";
     $rrd_options .= " GPRINT:$module:MAX:%6.2lf  'GPRINT:$module:AVERAGE:%6.2lf'";
-    if ($_GET['previous']) {
+    if ($graph_params->visible('previous')) {
         $rrd_options .= ' AREA:' . $module . 'X#99999999' . $stacked['transparency'] . ':';
         $rrd_options .= ' LINE1.25:' . $module . 'X#666666:';
         $rrd_options .= " COMMENT:'\t'";

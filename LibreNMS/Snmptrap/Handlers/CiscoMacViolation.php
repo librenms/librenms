@@ -26,9 +26,9 @@
 namespace LibreNMS\Snmptrap\Handlers;
 
 use App\Models\Device;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
-use Log;
 
 class CiscoMacViolation implements SnmptrapHandler
 {
@@ -45,6 +45,6 @@ class CiscoMacViolation implements SnmptrapHandler
         $ifName = $trap->getOidData($trap->findOid('IF-MIB::ifName'));
         $mac = $trap->getOidData($trap->findOid('CISCO-PORT-SECURITY-MIB::cpsIfSecureLastMacAddress'));
 
-        Log::event("SNMP Trap: Secure MAC Address Violation on port $ifName. Last MAC address: $mac", $device->device_id, 'trap', 4);
+        $trap->log("SNMP Trap: Secure MAC Address Violation on port $ifName. Last MAC address: $mac", Severity::Warning);
     }
 }

@@ -1,0 +1,90 @@
+modules:
+    sensors:
+        state:
+            data:
+                -
+                    oid: CORERO-CMS-SYSTEM-STATUS-MIB::protection
+                    num_oid: '.1.3.6.1.4.1.41036.4.1.6.1.0'
+                    descr: Protection Status
+                    group: System Status
+                    states:
+                        - { value: 0, descr: Normal, graph: 0, generic: 0 }
+                        - { value: 1, descr: Warning, graph: 0, generic: 1 }
+                        - { value: 2, descr: Error, graph: 0, generic: 2 }
+                -
+                    oid: CORERO-CMS-SYSTEM-STATUS-MIB::analytics
+                    num_oid: '.1.3.6.1.4.1.41036.4.1.6.5.0'
+                    descr: Analytics Status
+                    group: System Status
+                    states:
+                        - { value: 0, descr: Normal, graph: 0, generic: 0 }
+                        - { value: 1, descr: Warning, graph: 0, generic: 1 }
+                        - { value: 2, descr: Error, graph: 0, generic: 2 }
+                -
+                    oid: CORERO-CMS-SEGMENTS-MIB::segmentTable
+                    num_oid: '.1.3.6.1.4.1.41036.4.1.4.1.1.11.{{ $index }}'
+                    index: 'CORERO-CMS-SEGMENTS-MIB::segmentNtdExternalInterfaceStatus.{{ $index }}'
+                    group: "{{ $CORERO-CMS-SEGMENTS-MIB::segmentDevice }} Interface Status"
+                    descr: "{{ $CORERO-CMS-SEGMENTS-MIB::segmentName }} NTD External"
+                    value: CORERO-CMS-SEGMENTS-MIB::segmentNtdExternalInterfaceStatus
+                    states:
+                        - { value: 0, descr: Up, graph: 0, generic: 0 }
+                        - { value: 1, descr: Down, graph: 0, generic: 2 }
+                        - { value: 2, descr: Down - Link State Propagation, graph: 0, generic: 2 }
+                        - { value: 3, descr: Disabled, graph: 0, generic: 0 }
+                        - { value: 4, descr: Unknown, graph: 0, generic: 3 }
+                        - { value: 5, descr: Unused, graph: 0, generic: 0 }
+                        - { value: 6, descr: Partially Down, graph: 0, generic: 1 }
+                        - { value: 7, descr: Down - Remote Fault, graph: 0, generic: 1 }
+                        - { value: 8, descr: Down - Local Fault, graph: 0, generic: 2 }
+                -
+                    oid: CORERO-CMS-SEGMENTS-MIB::segmentTable
+                    num_oid: '.1.3.6.1.4.1.41036.4.1.4.1.1.14.{{ $index }}'
+                    index: 'CORERO-CMS-SEGMENTS-MIB::segmentNtdInternalInterfaceStatus.{{ $index }}'
+                    group: "{{ $CORERO-CMS-SEGMENTS-MIB::segmentDevice }} Interface Status"
+                    descr: "{{ $CORERO-CMS-SEGMENTS-MIB::segmentName }} NTD Internal"
+                    value: CORERO-CMS-SEGMENTS-MIB::segmentNtdInternalInterfaceStatus
+                    states:
+                        - { value: 0, descr: Up, graph: 0, generic: 0 }
+                        - { value: 1, descr: Down, graph: 0, generic: 2 }
+                        - { value: 2, descr: Down - Link State Propagation, graph: 0, generic: 2 }
+                        - { value: 3, descr: Disabled, graph: 0, generic: 0 }
+                        - { value: 4, descr: Unknown, graph: 0, generic: 3 }
+                        - { value: 5, descr: Unused, graph: 0, generic: 0 }
+                        - { value: 6, descr: Partially Down, graph: 0, generic: 1 }
+                        - { value: 7, descr: Down - Remote Fault, graph: 0, generic: 1 }
+                        - { value: 8, descr: Down - Local Fault, graph: 0, generic: 2 }
+                -
+                    oid: CORERO-CMS-SEGMENTS-MIB::segmentTable
+                    num_oid: '.1.3.6.1.4.1.41036.4.1.4.1.1.17.{{ $index }}'
+                    index: 'segmentNbaExternalInterfaceStatus.{{ $index }}'
+                    group: "{{ $CORERO-CMS-SEGMENTS-MIB::segmentDevice }} Interface Status"
+                    descr: "{{ $CORERO-CMS-SEGMENTS-MIB::segmentName }} NBA External"
+                    value: CORERO-CMS-SEGMENTS-MIB::segmentNbaExternalInterfaceStatus
+                    states:
+                        - { value: 0, descr: Up, graph: 0, generic: 0 }
+                        - { value: 1, descr: Down, graph: 0, generic: 2 }
+                        - { value: 2, descr: Down - Link State Propagation, graph: 0, generic: 2 }
+                        - { value: 3, descr: Disabled, graph: 0, generic: 0 }
+                        - { value: 4, descr: Unknown, graph: 0, generic: 3 }
+                        - { value: 5, descr: Unused, graph: 0, generic: 0 }
+                        - { value: 6, descr: Partially Down, graph: 0, generic: 1 }
+                        - { value: 7, descr: Down - Remote Fault, graph: 0, generic: 1 }
+                        - { value: 8, descr: Down - Local Fault, graph: 0, generic: 2 }
+                -
+                    oid: CORERO-CMS-SEGMENTS-MIB::segmentTable
+                    num_oid: '.1.3.6.1.4.1.41036.4.1.4.1.1.20.{{ $index }}'
+                    index: 'CORERO-CMS-SEGMENTS-MIB::segmentNbaInternalInterfaceStatus.{{ $index }}'
+                    group: "{{ $CORERO-CMS-SEGMENTS-MIB::segmentDevice }} Interface Status"
+                    descr: "{{ $CORERO-CMS-SEGMENTS-MIB::segmentName }} NBA Internal"
+                    value: CORERO-CMS-SEGMENTS-MIB::segmentNbaInternalInterfaceStatus
+                    states:
+                        - { value: 0, descr: Up, graph: 0, generic: 0 }
+                        - { value: 1, descr: Down, graph: 0, generic: 2 }
+                        - { value: 2, descr: Down - Link State Propagation, graph: 0, generic: 2 }
+                        - { value: 3, descr: Disabled, graph: 0, generic: 0 }
+                        - { value: 4, descr: Unknown, graph: 0, generic: 3 }
+                        - { value: 5, descr: Unused, graph: 0, generic: 0 }
+                        - { value: 6, descr: Partially Down, graph: 0, generic: 1 }
+                        - { value: 7, descr: Down - Remote Fault, graph: 0, generic: 1 }
+                        - { value: 8, descr: Down - Local Fault, graph: 0, generic: 2 }

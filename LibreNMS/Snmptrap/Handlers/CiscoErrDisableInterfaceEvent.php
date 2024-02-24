@@ -26,9 +26,9 @@
 namespace LibreNMS\Snmptrap\Handlers;
 
 use App\Models\Device;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
-use Log;
 
 class CiscoErrDisableInterfaceEvent implements SnmptrapHandler
 {
@@ -48,10 +48,10 @@ class CiscoErrDisableInterfaceEvent implements SnmptrapHandler
         $cause = $trap->getOidData($trap->findOid('CISCO-ERR-DISABLE-MIB::cErrDisableIfStatusCause.' . $ifIndex[1] . '.0'));
 
         if (! $port) {
-            Log::event('SNMP TRAP: ' . $cause . ' error detected on unknown port. Either ifIndex is not found in the trap, or it does not match a port on this device.', $device->device_id, 'trap', 4);
+            $trap->log('SNMP TRAP: ' . $cause . ' error detected on unknown port. Either ifIndex is not found in the trap, or it does not match a port on this device.', Severity::Warning);
 
             return;
         }
-        Log::event('SNMP TRAP: ' . $cause . ' error detected on ' . $port->ifName . ' (Description: ' . $port->ifDescr . '). ' . $port->ifName . ' in err-disable state.', $device->device_id, 'trap', 4);
+        $trap->log('SNMP TRAP: ' . $cause . ' error detected on ' . $port->ifName . ' (Description: ' . $port->ifDescr . '). ' . $port->ifName . ' in err-disable state.', Severity::Warning);
     }
 }

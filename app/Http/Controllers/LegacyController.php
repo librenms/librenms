@@ -59,7 +59,6 @@ class LegacyController extends Controller
         $html = ob_get_clean();
         ob_end_clean();
 
-        /** @phpstan-ignore-next-line */
         if (isset($pagetitle) && is_array($pagetitle)) {
             // if prefix is set, put it in front
             if (Config::get('page_title_prefix')) {
@@ -72,7 +71,7 @@ class LegacyController extends Controller
             }
 
             // create and set the title
-            $title = join(' - ', $pagetitle);
+            $title = implode(' - ', $pagetitle);
             $html .= "<script type=\"text/javascript\">\ndocument.title = '$title';\n</script>";
         }
 

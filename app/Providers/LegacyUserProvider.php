@@ -26,9 +26,9 @@
 namespace App\Providers;
 
 use App\Models\User;
-use DB;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\UserProvider;
+use Illuminate\Support\Facades\DB;
 use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Exceptions\AuthenticationException;
 use LibreNMS\Util\Debug;
@@ -71,7 +71,7 @@ class LegacyUserProvider implements UserProvider
      * @param  string  $token
      * @return \Illuminate\Contracts\Auth\Authenticatable|null
      */
-    public function retrieveByToken($identifier, $token)
+    public function retrieveByToken($identifier, $token): ?Authenticatable
     {
         $user = new User();
         $user = $user->where($user->getAuthIdentifierName(), $identifier)->first();
@@ -97,7 +97,7 @@ class LegacyUserProvider implements UserProvider
      * @param  string  $token
      * @return void
      */
-    public function updateRememberToken(Authenticatable $user, $token)
+    public function updateRememberToken(Authenticatable $user, $token): void
     {
         /** @var User $user */
         $user->setRememberToken($token);
@@ -207,6 +207,12 @@ class LegacyUserProvider implements UserProvider
         $user->auth_type = $type; // doing this here in case it was null (legacy)
         $user->auth_id = (string) $auth_id;
         $user->save();
+
+        // create and update roles, if provided
+        $roles = $auth->getRoles($user->username);
+        if ($roles !== false) {
+            $user->setRoles($roles, true);
+        }
 
         return $user;
     }

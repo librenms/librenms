@@ -44,7 +44,7 @@ modules:
                     index: 'healthNetworkConnLogChan1State.{{ $index }}'
                     state_name: healthNetworkConnLogChan1State
                     states:
-                        - { descr: inactive, graph: 1, value: 0, generic: 1 }
+                        - { descr: inactive, graph: 1, value: 0, generic: 3 }
                         - { descr: idle, graph: 1, value: 1, generic: 3 }
                         - { descr: traffic, graph: 1, value: 2, generic: 0 }
                         - { descr: control, graph: 1, value: 3, generic: 0 }
@@ -60,7 +60,7 @@ modules:
                     index: 'healthNetworkConnLogChan2State.{{ $index }}'
                     state_name: healthNetworkConnLogChan2State
                     states:
-                        - { descr: inactive, graph: 1, value: 0, generic: 1 }
+                        - { descr: inactive, graph: 1, value: 0, generic: 3 }
                         - { descr: idle, graph: 1, value: 1, generic: 3 }
                         - { descr: traffic, graph: 1, value: 2, generic: 0 }
                         - { descr: control, graph: 1, value: 3, generic: 0 }
@@ -115,6 +115,11 @@ modules:
                         - { descr: bad, graph: 1, value: 0, generic: 1 }
                         - { descr: good, graph: 1, value: 1, generic: 0 }
                         - { descr: not fitted, graph: 1, value: 2, generic: 3 }
+                    skip_values:
+                        -
+                            oid: pmuStateBusConnect
+                            op: '='
+                            value: '2'
                 -
                     oid: pmuState
                     value: pmuStateBusConnect
@@ -137,11 +142,11 @@ modules:
                     states:
                         - { descr: unconnected, graph: 1, value: 0, generic: 1 }
                         - { descr: deprecatedUnconnected, graph: 1, value: 1, generic: 1 }
-                        - { descr: standby, graph: 1, value: 2, generic: 1 }
+                        - { descr: standby, graph: 1, value: 2, generic: 3 }
                         - { descr: dmr-aligned, graph: 1, value: 3, generic: 0 }
                         - { descr: dmr-offset, graph: 1, value: 4, generic: 3 }
                         - { descr: dmr-two-slot-data, graph: 1, value: 5, generic: 0 }
-                        - { descr: dmr-hibernate, graph: 1, value: 6, generic: 1 }
+                        - { descr: dmr-hibernate, graph: 1, value: 6, generic: 3 }
                         - { descr: analogue, graph: 1, value: 7, generic: 3 }
                         - { descr: test-mode, graph: 1, value: 8, generic: 3 }
                         - { descr: dmr-tier2-aligned, graph: 1, value: 9, generic: 0 }

@@ -31,7 +31,6 @@ namespace LibreNMS\Snmptrap\Handlers;
 use App\Models\Device;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
-use Log;
 
 class RuckusSzApReboot implements SnmptrapHandler
 {
@@ -48,6 +47,6 @@ class RuckusSzApReboot implements SnmptrapHandler
         $location = $trap->getOidData($trap->findOid('RUCKUS-SZ-EVENT-MIB::ruckusSZEventAPLocation'));
         $reason = $trap->getOidData($trap->findOid('RUCKUS-SZ-EVENT-MIB::ruckusSZEventReason'));
         $severity = RuckusSzSeverity::getSeverity($trap->getOidData($trap->findOid('RUCKUS-SZ-EVENT-MIB::ruckusSZEventSeverity')));
-        Log::event("AP at site $location rebooted with reason $reason", $device->device_id, 'trap', $severity);
+        $trap->log("AP at site $location rebooted with reason $reason", $severity);
     }
 }
