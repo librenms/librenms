@@ -59,8 +59,8 @@ if ($response === false) {
 
 $url_get = 'https://' . $device_ip . '/api/v2/monitor/switch/mac-address';
 $curl_connection = curl_init($url_get);
-curl_setopt($curl_connection, CURLOPT_SSL_VERIFYPEER, FALSE);
-curl_setopt($curl_connection, CURLOPT_SSL_VERIFYHOST, FALSE);
+curl_setopt($curl_connection, CURLOPT_SSL_VERIFYPEER, false);
+curl_setopt($curl_connection, CURLOPT_SSL_VERIFYHOST, false);
 curl_setopt($curl_connection, CURLOPT_COOKIE, $matches[1][0]);
 curl_setopt($curl_connection, CURLOPT_RETURNTRANSFER, true);
 $response = curl_exec($curl_connection);
