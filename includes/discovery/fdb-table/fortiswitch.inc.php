@@ -121,4 +121,4 @@ for ($i = 0; $i < count($vlan_sw); $i++) {
 if (empty($insert)) { //if there aren't any mac on any port I insert a 0, cause if $insert is null, then  bridge.inc.php is called
     $insert[0][0][0] = '0';
 }
-?>
+echo PHP_EOL;
