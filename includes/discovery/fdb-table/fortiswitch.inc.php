@@ -34,7 +34,7 @@ $user = $config['fortiswitch']['usuari'];
 $pass = $config['fortiswitch']['password'];
 $timeout_seconds = 10;
 
-echo 'Connecting: ' . $device_ip . '\n';
+echo 'Connecting: ' . $device_ip;
 $url_login = 'https://' . $device_ip . '/logincheck';
 $data = ['username' => $user, 'secretkey' => $pass];
 $post_data = http_build_query($data);
@@ -47,6 +47,22 @@ curl_setopt($curl_connection, CURLOPT_POST, true);
 curl_setopt($curl_connection, CURLOPT_POSTFIELDS, $post_data);
 curl_setopt($curl_connection, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($curl_connection, CURLOPT_HEADER, true);
+$response = curl_exec($curl_connection);
+
+preg_match_all('/^Set-Cookie:\s*([^;]*)/mi', $response, $matches);
+
+if ($response === false) {
+    echo 'Error cURL: ' . curl_error($ch) . "\n";
+    echo 'Código de error: ' . curl_errno($ch) . "\n";
+    return; // No hay conectividad, salimos
+}
+
+$url_get = 'https://' . $device_ip . '/api/v2/monitor/switch/mac-address';
+$curl_connection = curl_init($url_get);
+curl_setopt($curl_connection, CURLOPT_SSL_VERIFYPEER, FALSE);
+curl_setopt($curl_connection, CURLOPT_SSL_VERIFYHOST, FALSE);
+curl_setopt($curl_connection, CURLOPT_COOKIE, $matches[1][0]);
+curl_setopt($curl_connection, CURLOPT_RETURNTRANSFER, true);
 $response = curl_exec($curl_connection);
 
 $response_data = json_decode($response, true);
