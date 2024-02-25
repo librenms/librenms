@@ -51,7 +51,7 @@ if ($vlanversion == 'version1' || $vlanversion == '2') {
         $vlan_id = implode('', $matches[0]);
 
         echo "Processing $vlan_name \n";
-        //try to get existing data from DB 
+        //try to get existing data from DB
         $vlanDB = Vlan::firstOrNew([
             'device_id' => $device['device_id'],
             'vlan_vlan' => $vlan_id,
