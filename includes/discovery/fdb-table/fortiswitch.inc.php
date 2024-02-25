@@ -36,7 +36,7 @@ $timeout_seconds = 10;
 
 echo 'Connecting: ' . $device_ip . '\n';
 $url_login = 'https://' . $device_ip . '/logincheck';
-$data = array('username'=>$user,'secretkey'=>$pass);
+$data = ['username' => $user, 'secretkey' => $pass];
 $post_data = http_build_query($data);
 
 $curl_connection = curl_init($url_login);
