@@ -1,6 +1,5 @@
 <?php
 
-
 /**
  * fortiswitch.inc.php
  *
@@ -24,10 +23,6 @@
  * @author     Oriol Lorenzo <oriol.lorenzo@urv.cat>
  */
 
-
-
-
-
 use App\Models\Vlan;
 use LibreNMS\Enum\Severity;
 
@@ -49,15 +44,14 @@ if ($vlanversion == 'version1' || $vlanversion == '2') {
     //print_r($vlans);
 
     foreach ($vlans as $vlan_id => $vlan) {
-        echo ("Processing $vlan_id \n");
+        echo "Processing $vlan_id \n";
         d_echo('Processing vlan ID: ' . $vlan_id);
         $vlan_name = empty($vlan['Q-BRIDGE-MIB::dot1qVlanStaticName']) ? "VLAN $vlan_id" : $vlan['Q-BRIDGE-MIB::dot1qVlanStaticName'];
         preg_match_all('!\d+!', $vlan_name, $matches);
         $vlan_id = implode('', $matches[0]);
 
-        echo ("Processing $vlan_name \n");
-        //try to get existing data from DB
-        
+        echo "Processing $vlan_name \n";
+        //try to get existing data from DB 
         $vlanDB = Vlan::firstOrNew([
             'device_id' => $device['device_id'],
             'vlan_vlan' => $vlan_id,
@@ -65,13 +59,13 @@ if ($vlanversion == 'version1' || $vlanversion == '2') {
             'vlan_domain' => $vtpdomain_id,
             'vlan_name' => $vlan_name,
         ]);
-        echo ("vlanDB-> $vlanDB\n");
+        echo "vlanDB-> $vlanDB\n";
 
         //vlan does not exist
         if (! $vlanDB->exists) {
             \App\Models\Eventlog::log("Vlan added: $vlan_id with name $vlan_name ", $device['device_id'], 'vlan', Severity::Warning);
         }
-        echo ("vlan_name-> $vlan_name , $vlanDB->vlan_name\n");
+        echo "vlan_name-> $vlan_name , $vlanDB->vlan_name\n";
 
         if ($vlanDB->vlan_name != $vlan_name) {
             $vlanDB->vlan_name = $vlan_name;
