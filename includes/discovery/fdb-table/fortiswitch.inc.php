@@ -54,7 +54,7 @@ preg_match_all('/^Set-Cookie:\s*([^;]*)/mi', $response, $matches);
 if ($response === false) {
     echo 'Error cURL: ' . curl_error($ch) . "\n";
     echo 'Código de error: ' . curl_errno($ch) . "\n";
-  
+
     return; // No hay conectividad, salimos
 }
 
