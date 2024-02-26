@@ -3425,7 +3425,7 @@ extend voipmon /etc/snmp/voipmon-stats.sh
 
 ## Wireguard
 
-The wireguard application polls the Wireguard service and scrapes all client statistics for all interfaces configured as Wireguard interfaces.
+The Wireguard application polls the Wireguard service and scrapes all client statistics for all interfaces configured as Wireguard interfaces.
 
 ### SNMP Extend
 
