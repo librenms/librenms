@@ -1212,8 +1212,8 @@ extend linux_config_files /etc/snmp/linux_config_files.py
 ```
 
 4. (Optional on an RPM-based distribution) Create a /etc/snmp/linux_config_files.json file and specify the following:
-a.) "pkg_system" - String designating the distribution name of the system.  At the moment only "rpm" is supported ["rpm"]
-b.) "pkg_tool_cmd" - String path to the package tool binary ["/sbin/rpmconf"]
+    1. "pkg_system" - String designating the distribution name of the system.  At the moment only "rpm" is supported ["rpm"]
+    2. "pkg_tool_cmd" - String path to the package tool binary ["/sbin/rpmconf"]
 ```
 {
     "pkg_system": "rpm",
@@ -3026,7 +3026,7 @@ sagan_stat_check](https://metacpan.org/dist/Sagan-Monitoring/view/bin/sagan_stat
 
 The Socket Statistics application polls ss and scrapes socket statuses.  Individual sockets and address-families may be filtered out within the script's optional configuration JSON file.
 
-* The following socket types are polled directly.  Filtering a socket type will disable direct polling as-well-as indirect polling within any address-families that list the socket type as their child:
+1. The following socket types are polled directly.  Filtering a socket type will disable direct polling as-well-as indirect polling within any address-families that list the socket type as their child:
 ```
 dccp (also exists within address-families "inet" and "inet6")
 mptcp (also exists within address-families "inet" and "inet6")
@@ -3037,7 +3037,7 @@ udp (also exists within address-families "inet" and "inet6")
 xdp
 ```
 
-* The following socket types are polled within an address-family only:
+2. The following socket types are polled within an address-family only:
 ```
 inet6 (within address-family "inet6")
 p_dgr (within address-family "link")
@@ -3051,7 +3051,7 @@ v_str (within address-family "vsock")
 unknown (within address-families "inet", "inet6", "link", "tipc", and "vsock")
 ```
 
-* The following address-families are polled directly and have their child socket types tab-indented below them.  Filtering a socket type (see "a" above) will filter it from the address-family.  Filtering an address-family will filter out all of its child socket types.  However, if those socket types are not DIRECTLY filtered out (see "a" above), then they will continue to be monitored either directly or within other address-families in which they exist:
+3. The following address-families are polled directly and have their child socket types tab-indented below them.  Filtering a socket type (see "1" above) will filter it from the address-family.  Filtering an address-family will filter out all of its child socket types.  However, if those socket types are not DIRECTLY filtered out (see "1" above), then they will continue to be monitored either directly or within other address-families in which they exist:
 ```
 inet
     dccp
@@ -3109,9 +3109,9 @@ extend ss /etc/snmp/ss.py
 ```
 
 4. (Optional) Create a /etc/snmp/ss.json file and specify:
-a. "ss_cmd" - String path to the ss binary: ["/sbin/ss"]
-b. "socket_types"  - A comma-delimited list of socket types to include.  The following socket types are valid: dccp, icmp6, mptcp, p_dgr, p_raw, raw, sctp, tcp, ti_dg, ti_rd, ti_sq, ti_st, u_dgr, u_seq, u_str, udp, unknown, v_dgr, v_dgr, xdp.  Please note that the "unknown" socket type is represented in /sbin/ss output with the netid "???".  Please also note that the p_dgr and p_raw socket types are specific to the "link" address family; the ti_dg, ti_rd, ti_sq, and ti_st socket types are specific to the "tipc" address family; the u_dgr, u_seq, and u_str socket types are specific to the "unix" address family; and the v_dgr and v_str socket types are specific to the "vsock" address family.  Filtering out the parent address families for the aforementioned will also filter out their specific socket types.  Specifying "all" includes all of the socket types.  For example: to include only tcp, udp, icmp6 sockets, you would specify "tcp,udp,icmp6": ["all"]
-c. "addr_families" - A comma-delimited list of address families to include.  The following families are valid: inet, inet6, link, netlink, tipc, unix, vsock.  As mentioned above under (b), filtering out the link, tipc, unix, or vsock address families will also filter out their respective socket types.  Specifying "all" includes all of the families.  For example: to include only inet and inet6 families, you would specify "inet,inet6": ["all"]
+    1. "ss_cmd" - String path to the ss binary: ["/sbin/ss"]
+    2. "socket_types" - A comma-delimited list of socket types to include.  The following socket types are valid: dccp, icmp6, mptcp, p_dgr, p_raw, raw, sctp, tcp, ti_dg, ti_rd, ti_sq, ti_st, u_dgr, u_seq, u_str, udp, unknown, v_dgr, v_dgr, xdp.  Please note that the "unknown" socket type is represented in /sbin/ss output with the netid "???".  Please also note that the p_dgr and p_raw socket types are specific to the "link" address family; the ti_dg, ti_rd, ti_sq, and ti_st socket types are specific to the "tipc" address family; the u_dgr, u_seq, and u_str socket types are specific to the "unix" address family; and the v_dgr and v_str socket types are specific to the "vsock" address family.  Filtering out the parent address families for the aforementioned will also filter out their specific socket types.  Specifying "all" includes all of the socket types.  For example: to include only tcp, udp, icmp6 sockets, you would specify "tcp,udp,icmp6": ["all"]
+    3. "addr_families" - A comma-delimited list of address families to include.  The following families are valid: inet, inet6, link, netlink, tipc, unix, vsock.  As mentioned above under (b), filtering out the link, tipc, unix, or vsock address families will also filter out their respective socket types.  Specifying "all" includes all of the families.  For example: to include only inet and inet6 families, you would specify "inet,inet6": ["all"]
 ```
 {
     "ss_cmd": "/sbin/ss",
@@ -3127,7 +3127,6 @@ In order to filter out uncommon/unused socket types, the following JSON configur
     "addr_families": "inet,inet6,link,netlink,unix"
 }
 ```
-
 
 5. (Optional) If SELinux is in Enforcing mode, you must add a module so the script can poll sockets:
 ```
@@ -3149,7 +3148,6 @@ semodule -i snmpd_ss.pp
 ```
 
 6. Restart snmpd.
-
 
 ## Suricata
 
@@ -3225,8 +3223,8 @@ extend systemd /etc/snmp/systemd.py
 ```
 
 4. (Optional) Create a /etc/snmp/systemd.json file and specify:
-    a.) "systemctl_cmd" - String path to the systemctl binary [Default: "/usr/bin/systemctl"]
-    b.) "include_inactive_units" - True/False string to include inactive units in results [Default: "False"]
+    1. "systemctl_cmd" - String path to the systemctl binary [Default: "/usr/bin/systemctl"]
+    2. "include_inactive_units" - True/False string to include inactive units in results [Default: "False"]
 ```
 {
     "systemctl_cmd": "/bin/systemctl",
@@ -3259,7 +3257,6 @@ semodule -i snmpd_systemctl.pp
 ```
 
 6. Restart snmpd.
-
 
 ## TinyDNS aka djbdns
 
@@ -3428,7 +3425,7 @@ extend voipmon /etc/snmp/voipmon-stats.sh
 
 ## Wireguard
 
-The wireguard application polls the Wireguard service and scrapes all client statistics for all interfaces configured as Wireguard interfaces.
+The Wireguard application polls the Wireguard service and scrapes all client statistics for all interfaces configured as Wireguard interfaces.
 
 ### SNMP Extend
 
@@ -3448,8 +3445,8 @@ extend wireguard /etc/snmp/wireguard.py
 ```
 
 4. Create a /etc/snmp/wireguard.json file and specify:
-a.) (optional) "wg_cmd" - String path to the wg binary ["/usr/bin/wg"]
-b.) "public_key_to_arbitrary_name" - A dictionary to convert between the publickey assigned to the client (specified in the wireguard interface conf file) to an arbitrary, friendly name.  The friendly names MUST be unique within each interface.  Also note that the interface name and friendly names are used in the RRD filename, so using special characters is highly discouraged.
+    1. (optional) "wg_cmd" - String path to the wg binary ["/usr/bin/wg"]
+    2. "public_key_to_arbitrary_name" - A dictionary to convert between the publickey assigned to the client (specified in the wireguard interface conf file) to an arbitrary, friendly name.  The friendly names MUST be unique within each interface.  Also note that the interface name and friendly names are used in the RRD filename, so using special characters is highly discouraged.
 ```
 {
     "wg_cmd": "/bin/wg",
