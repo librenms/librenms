@@ -2,7 +2,7 @@
 /**
  * unix.inc.php
  *
- * LibreNMS voltage discovery module for UNIX based OS
+ * LibreNMS voltage sensor discovery module for UNIX based OS
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,6 +35,47 @@ if (! empty($snmpData)) {
         if (! empty($descr)) {
             $oid = Oid::toNumeric('LM-SENSORS-MIB::' . $type . 'Value.' . $index);
             discover_sensor($valid['sensor'], 'voltage', $device, $oid, $index, 'lmsensors', $descr, $divisor, 1, null, null, null, null, $value, 'snmp', null, null, null, 'lmsensors');
+        }
+    }
+}
+
+$snmpData = SnmpQuery::cache()->hideMib()->walk('NET-SNMP-EXTEND-MIB::nsExtendOutLine."ups-nut"')->table(3);
+if (! empty($snmpData)) {
+    echo 'UPS-NUT-MIB: ' . PHP_EOL;
+    $snmpData = array_shift($snmpData); //drop [ups-nut]
+    $upsnut = [
+        4 => ['descr' => 'Battery Voltage', 'LL' => 0, 'LW' => 0, 'W' => null, 'H' => 60],
+        5 => ['descr' => 'Battery Nominal', 'LL' => 0, 'LW' => 0, 'W' => null, 'H' => 60],
+        6 => ['descr' => 'Line Nominal', 'LL' => 0, 'LW' => 0, 'W' => null, 'H' => 0],
+        7 => ['descr' => 'Input Voltage', 'LL' => 200, 'LW' => 0, 'W' => null, 'H' => 280],
+    ];
+    foreach ($snmpData as $index => $upsData) {
+        if ($upsnut[$index]) {
+            $value = $upsData['nsExtendOutLine'];
+            if (is_numeric($value)) {
+                $oid = Oid::toNumeric('NET-SNMP-EXTEND-MIB::nsExtendOutLine."ups-nut".' . $index);
+                discover_sensor(
+                    $valid['sensor'],
+                    'voltage',
+                    $device,
+                    $oid,
+                    $index,
+                    'ups-nut',
+                    $upsnut[$index]['descr'],
+                    1,
+                    1,
+                    $upsnut[$index]['LL'],
+                    $upsnut[$index]['LW'],
+                    $upsnut[$index]['W'],
+                    $upsnut[$index]['H'],
+                    $value,
+                    'snmp',
+                    null,
+                    null,
+                    null,
+                    'ups-nut'
+                );
+            }
         }
     }
 }
