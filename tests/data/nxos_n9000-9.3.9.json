@@ -3,7 +3,7 @@
         "discovery": {
             "slas": [
                 {
-                    "sla_nr": 100,
+                    "sla_nr": 101,
                     "owner": "",
                     "tag": "SLA1",
                     "rtt_type": "jitter",
