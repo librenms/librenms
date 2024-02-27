@@ -904,23 +904,20 @@ ipv4_networks:
 ipv6_addresses:
   Columns:
     - { Field: ipv6_address_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
+    - { Field: device_id, Type: 'int unsigned', 'Null': true, Extra: '' }
     - { Field: ipv6_address, Type: varchar(128), 'Null': false, Extra: '' }
     - { Field: ipv6_compressed, Type: varchar(128), 'Null': false, Extra: '' }
     - { Field: ipv6_prefixlen, Type: int, 'Null': false, Extra: '' }
     - { Field: ipv6_origin, Type: varchar(16), 'Null': false, Extra: '' }
-    - { Field: ipv6_network_id, Type: varchar(128), 'Null': false, Extra: '' }
+    - { Field: ipv6_network, Type: varchar(64), 'Null': false, Extra: '' }
     - { Field: port_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: context_name, Type: varchar(128), 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [ipv6_address_id], Unique: true, Type: BTREE }
+    ipv6_addresses_device_id_index: { Name: ipv6_addresses_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
     ipv6_addresses_port_id_index: { Name: ipv6_addresses_port_id_index, Columns: [port_id], Unique: false, Type: BTREE }
-ipv6_networks:
-  Columns:
-    - { Field: ipv6_network_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
-    - { Field: ipv6_network, Type: varchar(64), 'Null': false, Extra: '' }
-    - { Field: context_name, Type: varchar(128), 'Null': true, Extra: '' }
-  Indexes:
-    PRIMARY: { Name: PRIMARY, Columns: [ipv6_network_id], Unique: true, Type: BTREE }
+  Constraints:
+    ipv6_addresses_device_id_foreign: { name: ipv6_addresses_device_id_foreign, foreign_key: device_id, table: devices, key: device_id, extra: 'ON DELETE CASCADE' }
 isis_adjacencies:
   Columns:
     - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }

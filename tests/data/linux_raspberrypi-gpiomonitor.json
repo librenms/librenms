@@ -1111,5 +1111,19 @@
                 }
             ]
         }
+    },
+    "ipv6-addresses": {
+        "discovery": {
+            "ipv6_data": [
+                {
+                    "ipv6_compressed": "2a02:810a:8140:4571:ba27:ebff:fe43:f11e",
+                    "ipv6_prefixlen": 64,
+                    "ipv6_network": "2a02:810a:8140:4571::/64",
+                    "ipv6_origin": "linklayer",
+                    "context_name": null,
+                    "ifIndex": 2
+                }
+            ]
+        }
     }
 }

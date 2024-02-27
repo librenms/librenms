@@ -637,8 +637,8 @@
                     "ifName": "bond0",
                     "portName": null,
                     "ifIndex": 2,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
@@ -837,8 +837,8 @@
                     "ifName": "eth1",
                     "portName": null,
                     "ifIndex": 4,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
@@ -2162,17 +2162,31 @@
                 {
                     "mac_address": "005056a92c33",
                     "ipv4_address": "20.48.53.25",
-                    "context_name": ""
+                    "context_name": null
                 },
                 {
                     "mac_address": "005056a923b4",
                     "ipv4_address": "20.48.53.28",
-                    "context_name": ""
+                    "context_name": null
                 },
                 {
                     "mac_address": "e8f7244947d3",
                     "ipv4_address": "20.48.53.30",
-                    "context_name": ""
+                    "context_name": null
+                }
+            ]
+        }
+    },
+    "ipv6-addresses": {
+        "discovery": {
+            "ipv6_data": [
+                {
+                    "ipv6_compressed": "2001:5f8:7f0d:1::26",
+                    "ipv6_prefixlen": 128,
+                    "ipv6_network": "2001:5f8:7f0d:1::26/128",
+                    "ipv6_origin": "manual",
+                    "context_name": null,
+                    "ifIndex": 5
                 }
             ]
         }

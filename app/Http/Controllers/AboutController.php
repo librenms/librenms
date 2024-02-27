@@ -36,7 +36,6 @@ use App\Models\HrDevice;
 use App\Models\Ipv4Address;
 use App\Models\Ipv4Network;
 use App\Models\Ipv6Address;
-use App\Models\Ipv6Network;
 use App\Models\Mempool;
 use App\Models\Port;
 use App\Models\PrinterSupply;
@@ -91,7 +90,7 @@ class AboutController extends Controller
             'stat_ipv4_addy' => Ipv4Address::count(),
             'stat_ipv4_nets' => Ipv4Network::count(),
             'stat_ipv6_addy' => Ipv6Address::count(),
-            'stat_ipv6_nets' => Ipv6Network::count(),
+            'stat_ipv6_nets' => Ipv6Address::groupBy('ipv6_network')->count(),
             'stat_memory' => Mempool::count(),
             'stat_ports' => Port::count(),
             'stat_processors' => Processor::count(),

@@ -1479,7 +1479,7 @@
         "discovery": {
             "route": [
                 {
-                    "context_name": "",
+                    "context_name": null,
                     "inetCidrRouteIfIndex": 5,
                     "inetCidrRouteType": 4,
                     "inetCidrRouteProto": 2,
@@ -1493,7 +1493,7 @@
                     "inetCidrRoutePfxLen": 0
                 },
                 {
-                    "context_name": "",
+                    "context_name": null,
                     "inetCidrRouteIfIndex": 7,
                     "inetCidrRouteType": 4,
                     "inetCidrRouteProto": 2,

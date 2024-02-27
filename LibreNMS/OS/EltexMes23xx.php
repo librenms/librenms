@@ -19,13 +19,20 @@
  *
  * @copyright  2022 PipoCanaja
  * @author     PipoCanaja
+ * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
  */
 
 namespace LibreNMS\OS;
 
+use LibreNMS\Exceptions\InvalidIpException;
+use LibreNMS\Interfaces\Discovery\Ipv6Discovery;
 use LibreNMS\OS;
+use LibreNMS\Util\IPv6;
+use Log;
+use SnmpQuery;
 
-class EltexMes23xx extends OS
+class EltexMes23xx extends OS implements
+    Ipv6Discovery
 {
     /**
      * Specific HexToString for Eltex
@@ -36,5 +43,33 @@ class EltexMes23xx extends OS
         $ret = preg_match('/^[0-9A-F]+$/', $tmp) ? hex2str($tmp) : $par; //if string is pure hex, convert to ascii
 
         return $ret;
+    }
+
+    public function discoverIpv6(): array
+    {
+        $retData = [];
+
+        Log::debug('IPv6 -> discovering Eltex ...');
+        $oids = SnmpQuery::hideMib()->walk('IP-MIB::ipAddressIfIndex.ipv6')->table(2);
+        $oids = SnmpQuery::hideMib()->walk('RADLAN-IPv6::rlIpAddressTable')->table(2, $oids);
+
+        if (! empty($oids)) {
+            foreach ($oids['ipv6'] as $ip => $addrData) {
+                try {
+                    $ifIndex = $addrData['ipAddressIfIndex'];
+                    $address = IPv6::fromHexString($ip)->compressed();
+                    $prefixlen = intval($addrData['rlIpAddressPrefixLength']);
+                    $origin = $addrData['rlIpAddressType'] ?? null;
+
+                    if (! empty($prefixlen) && ! empty($origin)) {
+                        $retData[] = ['ifIndex' => $ifIndex, 'address' => $address, 'prefixlen' => $prefixlen, 'origin' => $origin];
+                    }
+                } catch (InvalidIpException $e) {
+                    Log::debug('IPv6 -> Failed to decode ipv6: ' . $ip);
+                }
+            }
+        }
+
+        return $retData;
     }
 }

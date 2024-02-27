@@ -119,7 +119,6 @@ class Stats
             'ipv4_macaddress' => $this->selectTotal('ipv4_mac'),
             'ipv4_networks' => $this->selectTotal('ipv4_networks'),
             'ipv6_addresses' => $this->selectTotal('ipv6_addresses'),
-            'ipv6_networks' => $this->selectTotal('ipv6_networks'),
             'xdp' => $this->selectTotal('links', ['protocol']),
             'ospf' => $this->selectTotal('ospf_instances', ['ospfVersionNumber']),
             'ospf_links' => $this->selectTotal('ospf_ports', ['ospfIfType']),

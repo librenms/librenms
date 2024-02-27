@@ -3437,8 +3437,8 @@
                     "ifName": "NULL0",
                     "portName": null,
                     "ifIndex": 2,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "false",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -3537,8 +3537,8 @@
                     "ifName": "InLoopBack0",
                     "portName": null,
                     "ifIndex": 3,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "false",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -3637,8 +3637,8 @@
                     "ifName": "GigabitEthernet0/0/0",
                     "portName": null,
                     "ifIndex": 4,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
@@ -6437,8 +6437,8 @@
                     "ifName": "LoopBack1",
                     "portName": null,
                     "ifIndex": 50,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "false",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -6855,5 +6855,59 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "ipv6-addresses": {
+        "discovery": {
+            "ipv6_data": [
+                {
+                    "ipv6_compressed": "2001:7f8:2f::130",
+                    "ipv6_prefixlen": 64,
+                    "ipv6_network": "2001:7f8:2f::/64",
+                    "ipv6_origin": "manual",
+                    "context_name": null,
+                    "ifIndex": 12
+                },
+                {
+                    "ipv6_compressed": "2001:7f8:7f::222",
+                    "ipv6_prefixlen": 64,
+                    "ipv6_network": "2001:7f8:7f::/64",
+                    "ipv6_origin": "manual",
+                    "context_name": null,
+                    "ifIndex": 15
+                },
+                {
+                    "ipv6_compressed": "2a00:12a8:1:21::2",
+                    "ipv6_prefixlen": 64,
+                    "ipv6_network": "2a00:12a8:1:21::/64",
+                    "ipv6_origin": "manual",
+                    "context_name": null,
+                    "ifIndex": 51
+                },
+                {
+                    "ipv6_compressed": "2a00:12a8:1:22::2",
+                    "ipv6_prefixlen": 64,
+                    "ipv6_network": "2a00:12a8:1:22::/64",
+                    "ipv6_origin": "manual",
+                    "context_name": null,
+                    "ifIndex": 52
+                },
+                {
+                    "ipv6_compressed": "2a03:2760:0:1::1",
+                    "ipv6_prefixlen": 64,
+                    "ipv6_network": "2a03:2760:0:1::/64",
+                    "ipv6_origin": "manual",
+                    "context_name": null,
+                    "ifIndex": 49
+                },
+                {
+                    "ipv6_compressed": "fd00:99:99::3",
+                    "ipv6_prefixlen": 128,
+                    "ipv6_network": "fd00:99:99::3/128",
+                    "ipv6_origin": "manual",
+                    "context_name": null,
+                    "ifIndex": 50
+                }
+            ]
+        }
     }
 }
