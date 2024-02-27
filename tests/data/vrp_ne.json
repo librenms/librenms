@@ -3437,8 +3437,8 @@
                     "ifName": "NULL0",
                     "portName": null,
                     "ifIndex": 2,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "false",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -3537,8 +3537,8 @@
                     "ifName": "InLoopBack0",
                     "portName": null,
                     "ifIndex": 3,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "false",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -3637,8 +3637,8 @@
                     "ifName": "GigabitEthernet0/0/0",
                     "portName": null,
                     "ifIndex": 4,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
@@ -6437,8 +6437,8 @@
                     "ifName": "LoopBack1",
                     "portName": null,
                     "ifIndex": 50,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "false",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -6855,5 +6855,73 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "ipv6-addresses": {
+        "discovery": {
+            "addresses": [
+                {
+                    "ipv6_address": "2001:07f8:002f:0000:0000:0000:0000:0130",
+                    "ipv6_prefixlen": 64,
+                    "ipv6_origin": "manual",
+                    "context_name": ""
+                },
+                {
+                    "ipv6_address": "2001:07f8:007f:0000:0000:0000:0000:0222",
+                    "ipv6_prefixlen": 64,
+                    "ipv6_origin": "manual",
+                    "context_name": ""
+                },
+                {
+                    "ipv6_address": "2a00:12a8:0001:0021:0000:0000:0000:0002",
+                    "ipv6_prefixlen": 64,
+                    "ipv6_origin": "manual",
+                    "context_name": ""
+                },
+                {
+                    "ipv6_address": "2a00:12a8:0001:0022:0000:0000:0000:0002",
+                    "ipv6_prefixlen": 64,
+                    "ipv6_origin": "manual",
+                    "context_name": ""
+                },
+                {
+                    "ipv6_address": "2a03:2760:0000:0001:0000:0000:0000:0001",
+                    "ipv6_prefixlen": 64,
+                    "ipv6_origin": "manual",
+                    "context_name": ""
+                },
+                {
+                    "ipv6_address": "fd00:0099:0099:0000:0000:0000:0000:0003",
+                    "ipv6_prefixlen": 128,
+                    "ipv6_origin": "manual",
+                    "context_name": ""
+                }
+            ],
+            "networks": [
+                {
+                    "ipv6_network": "2001:7f8:2f::/64",
+                    "context_name": ""
+                },
+                {
+                    "ipv6_network": "2001:7f8:7f::/64",
+                    "context_name": ""
+                },
+                {
+                    "ipv6_network": "2a00:12a8:1:21::/64",
+                    "context_name": ""
+                },
+                {
+                    "ipv6_network": "2a00:12a8:1:22::/64",
+                    "context_name": ""
+                },
+                {
+                    "ipv6_network": "2a03:2760:0:1::/64",
+                    "context_name": ""
+                },
+                {
+                    "ipv6_network": "fd00:99:99::3/128",
+                    "context_name": ""
+                }
+            ]
+        }
     }
 }
