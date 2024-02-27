@@ -1,0 +1,377 @@
+
+SUB-EXCHANGEINFORMATION DEFINITIONS ::= BEGIN
+
+IMPORTS
+	StorageType,
+	RowStatus,
+	DisplayString,
+	TEXTUAL-CONVENTION
+FROM SNMPv2-TC
+	OBJECT-GROUP,
+	MODULE-COMPLIANCE
+FROM SNMPv2-CONF
+	exchangeInformation
+FROM ZTT-GLOBAL
+	experimental,
+	MODULE-IDENTITY,
+	OBJECT-IDENTITY,
+	OBJECT-TYPE,
+	Integer32,
+	TimeTicks
+FROM SNMPv2-SMI;
+
+exchangeInformationTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF ExchangeInformationEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The table of exchangeInformation devices."
+ -- 1.3.6.1.4.1.49692.1.1.1 --  ::= { exchangeInformation 1 }
+
+exchangeInformationEntry OBJECT-TYPE
+	SYNTAX ExchangeInformationEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The exchangeInformation entry."
+	INDEX {
+		devIndex }
+ -- 1.3.6.1.4.1.49692.1.1.1.1 --  ::= { exchangeInformationTable 1 }
+
+ExchangeInformationEntry ::= SEQUENCE {
+	devIndex	Integer32,
+	devId	OCTET STRING,
+	ACinputphaseAovervoltagealarm001	Integer32,
+	ACinputphaseAundervoltagealarm001	Integer32,
+	ACinputphaseAphaselossalarm001	Integer32,
+	ACinputphaseBovervoltagealarm001	Integer32,
+	ACinputphaseBundervoltagealarm001	Integer32,
+	ACinputphaseBphaselossalarm001	Integer32,
+	ACinputphaseCovervoltagealarm001	Integer32,
+	ACinputphaseCundervoltagealarm001	Integer32,
+	ACinputphaseCphaselossalarm001	Integer32,
+	Highfrequencyalarm001	Integer32,
+	lowfrequencyalarm001	Integer32,
+	ACSPDalarm001	Integer32,
+	ACpowerfailurealarm001	Integer32,
+	InputcurrentphaseAovercurrentalarm001	Integer32,
+	InputcurrentphaseBovercurrentalarm001	Integer32,
+	InputcurrentphaseCovercurrentalarm001	Integer32,
+	ACinputphaseAvoltage001	Integer32,
+	ACinputphaseBvoltage001	Integer32,
+	ACinputphaseCvoltage001	Integer32,
+	ACinputphaseAcurrent001	Integer32,
+	ACinputphaseBcurrent001	Integer32,
+	ACinputphaseCcurrent001	Integer32,
+	ACinputfrequency001	Integer32,
+	ACinputovervoltagepointV001	Integer32,
+	ACinputundervoltagepointV001	Integer32,
+	ACphasevoltagepowerfailureV001	Integer32,
+	ExcessiveACfrequencyHz001	Integer32,
+	ACfrequencyistoolowHz001	Integer32,
+	ACinputcurrenthighpointA001	Integer32,
+	ACinputovervoltagepointsetting001	Integer32,
+	ACinputundervoltagepointsetting001	Integer32,
+	ACphasevoltagepower-downsetting001	Integer32,
+	ACfrequencytoohighsetting001	Integer32,
+	ACfrequencylowpointsetting001	Integer32,
+	ACinputcurrenthighpointsetting001	Integer32 }
+
+devIndex OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The index of the device."
+ -- 1.3.6.1.4.1.49692.1.1.1.1.1 --  ::= { exchangeInformationEntry 1 }
+
+devId OBJECT-TYPE
+	SYNTAX OCTET STRING
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The deviceId of the device."
+ -- 1.3.6.1.4.1.49692.1.1.1.1.2 --  ::= { exchangeInformationEntry 2 }
+
+ACinputphaseAovervoltagealarm001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"AC input phase A overvoltage alarm(001), meterId(433010001)."
+ -- 1.3.6.1.4.1.49692.1.1.1.1.3 --  ::= { exchangeInformationEntry 3 }
+
+ACinputphaseAundervoltagealarm001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"AC input phase A undervoltage alarm(001), meterId(433011001)."
+ -- 1.3.6.1.4.1.49692.1.1.1.1.4 --  ::= { exchangeInformationEntry 4 }
+
+ACinputphaseAphaselossalarm001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"AC input phase A phase loss alarm(001), meterId(433012001)."
+ -- 1.3.6.1.4.1.49692.1.1.1.1.5 --  ::= { exchangeInformationEntry 5 }
+
+ACinputphaseBovervoltagealarm001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"AC input phase B overvoltage alarm(001), meterId(433013001)."
+ -- 1.3.6.1.4.1.49692.1.1.1.1.6 --  ::= { exchangeInformationEntry 6 }
+
+ACinputphaseBundervoltagealarm001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"AC input phase B undervoltage alarm(001), meterId(433014001)."
+ -- 1.3.6.1.4.1.49692.1.1.1.1.7 --  ::= { exchangeInformationEntry 7 }
+
+ACinputphaseBphaselossalarm001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"AC input phase B phase loss alarm(001), meterId(433015001)."
+ -- 1.3.6.1.4.1.49692.1.1.1.1.8 --  ::= { exchangeInformationEntry 8 }
+
+ACinputphaseCovervoltagealarm001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"AC input phase C overvoltage alarm(001), meterId(433016001)."
+ -- 1.3.6.1.4.1.49692.1.1.1.1.9 --  ::= { exchangeInformationEntry 9 }
+
+ACinputphaseCundervoltagealarm001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"AC input phase C undervoltage alarm(001), meterId(433017001)."
+ -- 1.3.6.1.4.1.49692.1.1.1.1.10 --  ::= { exchangeInformationEntry 10 }
+
+ACinputphaseCphaselossalarm001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"AC input phase C phase loss alarm(001), meterId(433018001)."
+ -- 1.3.6.1.4.1.49692.1.1.1.1.11 --  ::= { exchangeInformationEntry 11 }
+
+Highfrequencyalarm001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"High frequency alarm(001), meterId(433019001)."
+ -- 1.3.6.1.4.1.49692.1.1.1.1.12 --  ::= { exchangeInformationEntry 12 }
+
+lowfrequencyalarm001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"low frequency alarm(001), meterId(433020001)."
+ -- 1.3.6.1.4.1.49692.1.1.1.1.13 --  ::= { exchangeInformationEntry 13 }
+
+ACSPDalarm001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"AC SPD alarm(001), meterId(433022001)."
+ -- 1.3.6.1.4.1.49692.1.1.1.1.14 --  ::= { exchangeInformationEntry 14 }
+
+ACpowerfailurealarm001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"AC power failure alarm(001), meterId(433021001)."
+ -- 1.3.6.1.4.1.49692.1.1.1.1.15 --  ::= { exchangeInformationEntry 15 }
+
+InputcurrentphaseAovercurrentalarm001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Input current phase A overcurrent alarm(001), meterId(433023001)."
+ -- 1.3.6.1.4.1.49692.1.1.1.1.16 --  ::= { exchangeInformationEntry 16 }
+
+InputcurrentphaseBovercurrentalarm001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Input current phase B overcurrent alarm(001), meterId(433024001)."
+ -- 1.3.6.1.4.1.49692.1.1.1.1.17 --  ::= { exchangeInformationEntry 17 }
+
+InputcurrentphaseCovercurrentalarm001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Input current phase C overcurrent alarm(001), meterId(433025001)."
+ -- 1.3.6.1.4.1.49692.1.1.1.1.18 --  ::= { exchangeInformationEntry 18 }
+
+ACinputphaseAvoltage001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"AC input phase A voltage(001), meterId(433001001), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.1.1.1.19 --  ::= { exchangeInformationEntry 19 }
+
+ACinputphaseBvoltage001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"AC input phase B voltage(001), meterId(433002001), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.1.1.1.20 --  ::= { exchangeInformationEntry 20 }
+
+ACinputphaseCvoltage001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"AC input phase C voltage(001), meterId(433003001), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.1.1.1.21 --  ::= { exchangeInformationEntry 21 }
+
+ACinputphaseAcurrent001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"AC input phase A current(001), meterId(433004001), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.1.1.1.22 --  ::= { exchangeInformationEntry 22 }
+
+ACinputphaseBcurrent001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"AC input phase B current(001), meterId(433005001), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.1.1.1.23 --  ::= { exchangeInformationEntry 23 }
+
+ACinputphaseCcurrent001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"AC input phase C current(001), meterId(433006001), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.1.1.1.24 --  ::= { exchangeInformationEntry 24 }
+
+ACinputfrequency001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"AC input frequency(001), meterId(433007001), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.1.1.1.25 --  ::= { exchangeInformationEntry 25 }
+
+ACinputovervoltagepointV001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"AC input overvoltage point (V)(001), meterId(433026001), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.1.1.1.26 --  ::= { exchangeInformationEntry 26 }
+
+ACinputundervoltagepointV001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"AC input undervoltage point (V)(001), meterId(433027001), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.1.1.1.27 --  ::= { exchangeInformationEntry 27 }
+
+ACphasevoltagepowerfailureV001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"AC phase voltage power failure (V)(001), meterId(433028001), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.1.1.1.28 --  ::= { exchangeInformationEntry 28 }
+
+ExcessiveACfrequencyHz001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Excessive AC frequency (Hz)(001), meterId(433029001), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.1.1.1.29 --  ::= { exchangeInformationEntry 29 }
+
+ACfrequencyistoolowHz001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"AC frequency is too low (Hz)(001), meterId(433030001), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.1.1.1.30 --  ::= { exchangeInformationEntry 30 }
+
+ACinputcurrenthighpointA001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"AC input current high point (A)(001), meterId(433031001), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.1.1.1.31 --  ::= { exchangeInformationEntry 31 }
+
+ACinputovervoltagepointsetting001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"AC input overvoltage point setting(001), meterId(433032001), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.1.1.1.32 --  ::= { exchangeInformationEntry 32 }
+
+ACinputundervoltagepointsetting001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"AC input undervoltage point setting(001), meterId(433033001), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.1.1.1.33 --  ::= { exchangeInformationEntry 33 }
+
+ACphasevoltagepower-downsetting001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"AC phase voltage power-down setting(001), meterId(433034001), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.1.1.1.34 --  ::= { exchangeInformationEntry 34 }
+
+ACfrequencytoohighsetting001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"AC frequency too high setting(001), meterId(433035001), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.1.1.1.35 --  ::= { exchangeInformationEntry 35 }
+
+ACfrequencylowpointsetting001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"AC frequency low point setting(001), meterId(433036001), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.1.1.1.36 --  ::= { exchangeInformationEntry 36 }
+
+ACinputcurrenthighpointsetting001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"AC input current high point setting(001), meterId(433037001), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.1.1.1.37 --  ::= { exchangeInformationEntry 37 }
+
+
+END
