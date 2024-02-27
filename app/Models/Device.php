@@ -78,9 +78,10 @@ class Device extends BaseModel
         'sysObjectID',
         'timeout',
         'transport',
-        'version',
         'uptime',
-    ];
+        'under_maint',
+        'version',
+     ];
 
     protected $casts = [
         'inserted' => 'datetime',
