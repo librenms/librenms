@@ -1,0 +1,49 @@
+
+ZTT-GLOBAL DEFINITIONS ::= BEGIN
+
+IMPORTS
+	enterprises,
+	MODULE-IDENTITY,
+	OBJECT-IDENTITY
+FROM SNMPv2-SMI;
+
+ztt MODULE-IDENTITY
+	ORGANIZATION "ztt"
+	CONTACT-INFO
+		"Intenet:https://www.chinaztt.com"
+	DESCRIPTION
+		"ZTT Gateway"
+ -- 1.3.6.1.4.1.49692 --  ::= { enterprises 49692 }
+
+gateway OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		"The root of the gateway device."
+ -- 1.3.6.1.4.1.49692.1 --  ::= { ztt 1 }
+
+exchangeInformation OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		"ExchangeInformation, ExchangeInformation, devBaseId(3331001)"
+ -- 1.3.6.1.4.1.49692.1.1 --  ::= { gateway 1 }
+
+dCPowerDistributionInformation OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		"DCPowerDistributionInformation, DCPowerDistributionInformation, devBaseId(3333001)"
+ -- 1.3.6.1.4.1.49692.1.2 --  ::= { gateway 2 }
+
+publicInformation OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		"PublicInformation, PublicInformation, devBaseId(3336001)"
+ -- 1.3.6.1.4.1.49692.1.3 --  ::= { gateway 3 }
+
+rectifierModuleInformation OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		"RectifierModuleInformation, RectifierModuleInformation, devBaseId(3332001)"
+ -- 1.3.6.1.4.1.49692.1.4 --  ::= { gateway 4 }
+
+
+END

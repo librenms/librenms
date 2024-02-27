@@ -1,0 +1,1043 @@
+
+SUB-DCPOWERDISTRIBUTIONINFORMATION DEFINITIONS ::= BEGIN
+
+IMPORTS
+	StorageType,
+	RowStatus,
+	DisplayString,
+	TEXTUAL-CONVENTION
+FROM SNMPv2-TC
+	OBJECT-GROUP,
+	MODULE-COMPLIANCE
+FROM SNMPv2-CONF
+	dCPowerDistributionInformation
+FROM ZTT-GLOBAL
+	experimental,
+	MODULE-IDENTITY,
+	OBJECT-IDENTITY,
+	OBJECT-TYPE,
+	Integer32,
+	TimeTicks
+FROM SNMPv2-SMI;
+
+dCPowerDistributionInformationTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF DCPowerDistributionInformationEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The table of dCPowerDistributionInformation devices."
+ -- 1.3.6.1.4.1.49692.1.2.1 --  ::= { dCPowerDistributionInformation 1 }
+
+dCPowerDistributionInformationEntry OBJECT-TYPE
+	SYNTAX DCPowerDistributionInformationEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The dCPowerDistributionInformation entry."
+	INDEX {
+		devIndex }
+ -- 1.3.6.1.4.1.49692.1.2.1.1 --  ::= { dCPowerDistributionInformationTable 1 }
+
+DCPowerDistributionInformationEntry ::= SEQUENCE {
+	devIndex	Integer32,
+	devId	OCTET STRING,
+	DCoutputvoltage001	Integer32,
+	totalloadcurrent001	Integer32,
+	Numberofbatterypacks001	Integer32,
+	batterycurrent001	Integer32,
+	DCshunt1current001	Integer32,
+	DCshunt2current001	Integer32,
+	DCshunt3current001	Integer32,
+	DCshunt4current001	Integer32,
+	DCshunt5current001	Integer32,
+	DCshunt6current001	Integer32,
+	DCshunt7current001	Integer32,
+	DCshunt8current001	Integer32,
+	totalbatterycurrent001	Integer32,
+	Batterypackremainingcapacitypercentage001	Integer32,
+	Batterypacktemperature001	Integer32,
+	Ambienttemperatureinsidethecabinet001	Integer32,
+	Ambienthumidityinthecabinet001	Integer32,
+	abnormalvoltageofbatterypack5001	Integer32,
+	abnormalvoltageofbatterypack6001	Integer32,
+	batterytestfailed001	Integer32,
+	abnormalbatterytestresultalarm001	Integer32,
+	heateralarm001	Integer32,
+	inverteralarm001	Integer32,
+	InverterSPDalarm001	Integer32,
+	batterycabinetcommunicationfailure001	Integer32,
+	Lithiumbatterycommunicationfailure001	Integer32,
+	Lithiumbatteryfailure001	Integer32,
+	Timedequalchargeintervaldays001	Integer32,
+	Numberofbatterypacksonthefirstscreen001	Integer32,
+	Numberofbatterypacksonthesecondscreen001	Integer32,
+	Thenumberofbatterypacksonthethirdscreen001	Integer32,
+	Numberofbatterypacksonthe4thscreen001	Integer32,
+	Thenumberofbatterypacksonthefifthscreen001	Integer32,
+	Thenumberofbatterypacksonthe6thscreen001	Integer32,
+	Numberofbatterypacksonthe7thscreen001	Integer32,
+	Numberofbatterypacksonthe8thscreen001	Integer32,
+	Numberofbatterypacksonthe9thscreen001	Integer32,
+	Numberofbatteriesonthe10thscreen001	Integer32,
+	BatterypackovervoltagewarningpointV001	Integer32,
+	BatterypackundervoltagewarningpointV001	Integer32,
+	BatterypackchargingovercurrentwarningpointC10001	Integer32,
+	Batteryover-temperaturewarningpoint001	Integer32,
+	Batteryundertemperaturewarningpoint001	Integer32,
+	Environmentalover-temperaturewarningpoint001	Integer32,
+	Environmentalundertemperaturewarningpoint001	Integer32,
+	Environmentalover-humiditywarningpoint001	Integer32,
+	Environmentallowhumiditywarningpoint001	Integer32,
+	BatterychargingcurrentlimitA001	Integer32,
+	floatvoltageV001	Integer32,
+	EqualchargingvoltageV001	Integer32,
+	BatterydownvoltageV001	Integer32,
+	batterypower-upvoltage001	Integer32,
+	LLVD1powerdownvoltage001	Integer32,
+	LLVD1power-onvoltage001	Integer32,
+	LLVD2powerdownvoltage001	Integer32,
+	LLVD4powerdownvoltage001	Integer32,
+	LLVD4power-onvoltage001	Integer32,
+	RatedcapacityofeachbatterypackAh001	Integer32,
+	Batterytestterminationvoltage001	Integer32,
+	BatterypacktemperaturecompensationcoefficientmV/℃001	Integer32,
+	Batterywarmingcenterpoint001	Integer32,
+	Enablebatterytemperaturecompensation001	Integer32,
+	Batteryhightemperatureprotectionaction001	Integer32,
+	Batteryhightemperatureprotectionvoltagesetting001	Integer32,
+	Batteryhightemperatureprotectionvoltage001	Integer32,
+	ManualFloatCharge001	Integer32,
+	pre-equalizationenable001	Integer32,
+	EnableFastEqualizedCharge001	Integer32,
+	Floatchargetoequalchargecoefficient001	Integer32,
+	equalchargingtofloatingchargingcoefficient001	Integer32,
+	Floatingchargingtoequalizingchargingtimeminutes001	Integer32,
+	equalchargetofloatchargetimeminutes001	Integer32,
+	Equalizationchargingprotectiontimehour001	Integer32,
+	Quickevenchargemin001	Integer32,
+	Systemovercurrentalarmpoint001	Integer32,
+	BLVDpower-offmode001	Integer32,
+	DCovervoltagealarm001	Integer32,
+	DCvoltagelowalarm001	Integer32,
+	LightningProtectionAlarm001	Integer32,
+	loadfusebroken001	Integer32,
+	BLVDwillbepoweredoffsoon001	Integer32,
+	TheloadisabouttopoweroffLLVD1001	Integer32,
+	TheloadisabouttopoweroffLLVD2001	Integer32,
+	TheloadisabouttobepoweredoffLLVD3001	Integer32,
+	TheloadisabouttobepoweredoffLLVD4001	Integer32,
+	batterywarmingactivation001	Integer32,
+	BatteryEqualChargeAlarm001	Integer32,
+	Batterytemperaturesensor5abnormal001	Integer32,
+	Ambienttemperaturesensor1isabnormal001	Integer32,
+	AmbientHumidityLowAlarmStatus001	Integer32,
+	Ambienthumiditysensor1isabnormal001	Integer32,
+	Ambienthumiditysensor2isabnormal001	Integer32,
+	abnormalvoltageofbatterypack2001	Integer32,
+	abnormalbatterypack4voltage001	Integer32,
+	Setthenumberofbatterypacksonthe8thscreen001	Integer32,
+	Setthenumberofbatterypacksonthe9thscreen001	Integer32,
+	LLVD1power-offmode001	Integer32,
+	LLVD2power-offmode001	Integer32,
+	Setthenumberofbatterypacksontheseventhscreen001	Integer32,
+	Batterychargingcurrentlimitsetting001	Integer32,
+	Equalchargingvoltagesetting001	Integer32,
+	LLVD4power-offmode001	Integer32,
+	Batterypower-onvoltagesetting001	Integer32,
+	Quickequalizationchargingtimesetting001	Integer32,
+	floatvoltagesetting001	Integer32,
+	LLVD3power-offmode001	Integer32,
+	BLVDpower-offduration001	Integer32,
+	LLVD1power-offduration001	Integer32,
+	LLVD4power-offduration001	Integer32 }
+
+devIndex OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The index of the device."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.1 --  ::= { dCPowerDistributionInformationEntry 1 }
+
+devId OBJECT-TYPE
+	SYNTAX OCTET STRING
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The deviceId of the device."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.2 --  ::= { dCPowerDistributionInformationEntry 2 }
+
+DCoutputvoltage001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"DC output voltage(001), meterId(433201001), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.3 --  ::= { dCPowerDistributionInformationEntry 3 }
+
+totalloadcurrent001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"total load current(001), meterId(433202001), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.4 --  ::= { dCPowerDistributionInformationEntry 4 }
+
+Numberofbatterypacks001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Number of battery packs(001), meterId(433203001), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.5 --  ::= { dCPowerDistributionInformationEntry 5 }
+
+batterycurrent001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"battery current(001), meterId(433204001), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.6 --  ::= { dCPowerDistributionInformationEntry 6 }
+
+DCshunt1current001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"DC shunt 1 current(001), meterId(433205001), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.7 --  ::= { dCPowerDistributionInformationEntry 7 }
+
+DCshunt2current001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"DC shunt 2 current(001), meterId(433206001), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.8 --  ::= { dCPowerDistributionInformationEntry 8 }
+
+DCshunt3current001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"DC shunt 3 current(001), meterId(433207001), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.9 --  ::= { dCPowerDistributionInformationEntry 9 }
+
+DCshunt4current001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"DC shunt 4 current(001), meterId(433208001), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.10 --  ::= { dCPowerDistributionInformationEntry 10 }
+
+DCshunt5current001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"DC shunt 5 current(001), meterId(433209001), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.11 --  ::= { dCPowerDistributionInformationEntry 11 }
+
+DCshunt6current001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"DC shunt 6 current(001), meterId(433210001), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.12 --  ::= { dCPowerDistributionInformationEntry 12 }
+
+DCshunt7current001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"DC shunt 7 current(001), meterId(433211001), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.13 --  ::= { dCPowerDistributionInformationEntry 13 }
+
+DCshunt8current001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"DC shunt 8 current(001), meterId(433212001), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.14 --  ::= { dCPowerDistributionInformationEntry 14 }
+
+totalbatterycurrent001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"total battery current(001), meterId(433213001), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.15 --  ::= { dCPowerDistributionInformationEntry 15 }
+
+Batterypackremainingcapacitypercentage001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Battery pack remaining capacity percentage(001), meterId(433214001), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.16 --  ::= { dCPowerDistributionInformationEntry 16 }
+
+Batterypacktemperature001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Battery pack temperature(001), meterId(433215001), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.17 --  ::= { dCPowerDistributionInformationEntry 17 }
+
+Ambienttemperatureinsidethecabinet001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Ambient temperature inside the cabinet(001), meterId(433216001), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.18 --  ::= { dCPowerDistributionInformationEntry 18 }
+
+Ambienthumidityinthecabinet001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Ambient humidity in the cabinet(001), meterId(433217001), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.19 --  ::= { dCPowerDistributionInformationEntry 19 }
+
+abnormalvoltageofbatterypack5001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"abnormal voltage of battery pack 5(001), meterId(433307001)."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.20 --  ::= { dCPowerDistributionInformationEntry 20 }
+
+abnormalvoltageofbatterypack6001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"abnormal voltage of battery pack 6(001), meterId(433308001)."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.21 --  ::= { dCPowerDistributionInformationEntry 21 }
+
+batterytestfailed001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"battery test failed(001), meterId(433309001)."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.22 --  ::= { dCPowerDistributionInformationEntry 22 }
+
+abnormalbatterytestresultalarm001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"abnormal battery test result alarm(001), meterId(433310001)."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.23 --  ::= { dCPowerDistributionInformationEntry 23 }
+
+heateralarm001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"heater alarm(001), meterId(433311001)."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.24 --  ::= { dCPowerDistributionInformationEntry 24 }
+
+inverteralarm001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"inverter alarm(001), meterId(433312001)."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.25 --  ::= { dCPowerDistributionInformationEntry 25 }
+
+InverterSPDalarm001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Inverter SPD alarm(001), meterId(433313001)."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.26 --  ::= { dCPowerDistributionInformationEntry 26 }
+
+batterycabinetcommunicationfailure001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"battery cabinet communication failure(001), meterId(433314001)."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.27 --  ::= { dCPowerDistributionInformationEntry 27 }
+
+Lithiumbatterycommunicationfailure001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Lithium battery communication failure(001), meterId(433315001)."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.28 --  ::= { dCPowerDistributionInformationEntry 28 }
+
+Lithiumbatteryfailure001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Lithium battery failure(001), meterId(433316001)."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.29 --  ::= { dCPowerDistributionInformationEntry 29 }
+
+Timedequalchargeintervaldays001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Timed equal charge interval (days)(001), meterId(433328001)."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.30 --  ::= { dCPowerDistributionInformationEntry 30 }
+
+Numberofbatterypacksonthefirstscreen001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Number of battery packs on the first screen(001), meterId(433329001)."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.31 --  ::= { dCPowerDistributionInformationEntry 31 }
+
+Numberofbatterypacksonthesecondscreen001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Number of battery packs on the second screen(001), meterId(433330001)."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.32 --  ::= { dCPowerDistributionInformationEntry 32 }
+
+Thenumberofbatterypacksonthethirdscreen001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The number of battery packs on the third screen(001), meterId(433331001)."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.33 --  ::= { dCPowerDistributionInformationEntry 33 }
+
+Numberofbatterypacksonthe4thscreen001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Number of battery packs on the 4th screen(001), meterId(433332001)."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.34 --  ::= { dCPowerDistributionInformationEntry 34 }
+
+Thenumberofbatterypacksonthefifthscreen001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The number of battery packs on the fifth screen(001), meterId(433333001)."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.35 --  ::= { dCPowerDistributionInformationEntry 35 }
+
+Thenumberofbatterypacksonthe6thscreen001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The number of battery packs on the 6th screen(001), meterId(433334001)."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.36 --  ::= { dCPowerDistributionInformationEntry 36 }
+
+Numberofbatterypacksonthe7thscreen001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Number of battery packs on the 7th screen(001), meterId(433335001)."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.37 --  ::= { dCPowerDistributionInformationEntry 37 }
+
+Numberofbatterypacksonthe8thscreen001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Number of battery packs on the 8th screen(001), meterId(433336001)."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.38 --  ::= { dCPowerDistributionInformationEntry 38 }
+
+Numberofbatterypacksonthe9thscreen001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Number of battery packs on the 9th screen(001), meterId(433337001)."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.39 --  ::= { dCPowerDistributionInformationEntry 39 }
+
+Numberofbatteriesonthe10thscreen001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Number of batteries on the 10th screen(001), meterId(433338001)."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.40 --  ::= { dCPowerDistributionInformationEntry 40 }
+
+BatterypackovervoltagewarningpointV001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Battery pack overvoltage warning point (V)(001), meterId(433339001), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.41 --  ::= { dCPowerDistributionInformationEntry 41 }
+
+BatterypackundervoltagewarningpointV001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Battery pack undervoltage warning point (V)(001), meterId(433340001), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.42 --  ::= { dCPowerDistributionInformationEntry 42 }
+
+BatterypackchargingovercurrentwarningpointC10001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Battery pack charging overcurrent warning point (C10)(001), meterId(433341001), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.43 --  ::= { dCPowerDistributionInformationEntry 43 }
+
+Batteryover-temperaturewarningpoint001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Battery over-temperature warning point(001), meterId(433342001), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.44 --  ::= { dCPowerDistributionInformationEntry 44 }
+
+Batteryundertemperaturewarningpoint001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Battery undertemperature warning point(001), meterId(433343001), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.45 --  ::= { dCPowerDistributionInformationEntry 45 }
+
+Environmentalover-temperaturewarningpoint001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Environmental over-temperature warning point(001), meterId(433344001), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.46 --  ::= { dCPowerDistributionInformationEntry 46 }
+
+Environmentalundertemperaturewarningpoint001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Environmental undertemperature warning point(001), meterId(433345001), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.47 --  ::= { dCPowerDistributionInformationEntry 47 }
+
+Environmentalover-humiditywarningpoint001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Environmental over-humidity warning point(001), meterId(433346001), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.48 --  ::= { dCPowerDistributionInformationEntry 48 }
+
+Environmentallowhumiditywarningpoint001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Environmental low humidity warning point(001), meterId(433347001), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.49 --  ::= { dCPowerDistributionInformationEntry 49 }
+
+BatterychargingcurrentlimitA001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Battery charging current limit (A)(001), meterId(433348001), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.50 --  ::= { dCPowerDistributionInformationEntry 50 }
+
+floatvoltageV001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"float voltage (V)(001), meterId(433349001), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.51 --  ::= { dCPowerDistributionInformationEntry 51 }
+
+EqualchargingvoltageV001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Equal charging voltage (V)(001), meterId(433350001), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.52 --  ::= { dCPowerDistributionInformationEntry 52 }
+
+BatterydownvoltageV001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Battery down voltage (V)(001), meterId(433351001), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.53 --  ::= { dCPowerDistributionInformationEntry 53 }
+
+batterypower-upvoltage001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"battery power-up voltage(001), meterId(433352001), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.54 --  ::= { dCPowerDistributionInformationEntry 54 }
+
+LLVD1powerdownvoltage001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"LLVD1 power down voltage(001), meterId(433353001), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.55 --  ::= { dCPowerDistributionInformationEntry 55 }
+
+LLVD1power-onvoltage001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"LLVD1 power-on voltage(001), meterId(433354001), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.56 --  ::= { dCPowerDistributionInformationEntry 56 }
+
+LLVD2powerdownvoltage001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"LLVD2 power down voltage(001), meterId(433355001), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.57 --  ::= { dCPowerDistributionInformationEntry 57 }
+
+LLVD4powerdownvoltage001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"LLVD4 power down voltage(001), meterId(433359001), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.58 --  ::= { dCPowerDistributionInformationEntry 58 }
+
+LLVD4power-onvoltage001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"LLVD4 power-on voltage(001), meterId(433360001), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.59 --  ::= { dCPowerDistributionInformationEntry 59 }
+
+RatedcapacityofeachbatterypackAh001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Rated capacity of each battery pack (Ah)(001), meterId(433361001), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.60 --  ::= { dCPowerDistributionInformationEntry 60 }
+
+Batterytestterminationvoltage001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Battery test termination voltage(001), meterId(433362001), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.61 --  ::= { dCPowerDistributionInformationEntry 61 }
+
+BatterypacktemperaturecompensationcoefficientmV  OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Battery pack temperature compensation coefficient (mV/℃)(001), meterId(433363001), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.62 --  ::= { dCPowerDistributionInformationEntry 62 }
+
+Batterywarmingcenterpoint001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Battery warming center point(001), meterId(433364001), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.63 --  ::= { dCPowerDistributionInformationEntry 63 }
+
+Enablebatterytemperaturecompensation001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Enable battery temperature compensation(001), meterId(433365001)."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.64 --  ::= { dCPowerDistributionInformationEntry 64 }
+
+Batteryhightemperatureprotectionaction001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Battery high temperature protection action(001), meterId(433366001)."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.65 --  ::= { dCPowerDistributionInformationEntry 65 }
+
+Batteryhightemperatureprotectionvoltagesetting001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Battery high temperature protection voltage setting(001), meterId(433441001), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.66 --  ::= { dCPowerDistributionInformationEntry 66 }
+
+Batteryhightemperatureprotectionvoltage001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Battery high temperature protection voltage(001), meterId(433368001), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.67 --  ::= { dCPowerDistributionInformationEntry 67 }
+
+ManualFloatCharge001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Manual Float Charge(001), meterId(433369001)."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.68 --  ::= { dCPowerDistributionInformationEntry 68 }
+
+pre-equalizationenable001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"pre-equalization enable(001), meterId(433370001)."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.69 --  ::= { dCPowerDistributionInformationEntry 69 }
+
+EnableFastEqualizedCharge001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Enable Fast Equalized Charge(001), meterId(433371001)."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.70 --  ::= { dCPowerDistributionInformationEntry 70 }
+
+Floatchargetoequalchargecoefficient001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Float charge to equal charge coefficient(001), meterId(433372001), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.71 --  ::= { dCPowerDistributionInformationEntry 71 }
+
+equalchargingtofloatingchargingcoefficient001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"equal charging to floating charging coefficient(001), meterId(433373001), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.72 --  ::= { dCPowerDistributionInformationEntry 72 }
+
+Floatingchargingtoequalizingchargingtimeminutes001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Floating charging to equalizing charging time (minutes)(001), meterId(433374001)."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.73 --  ::= { dCPowerDistributionInformationEntry 73 }
+
+equalchargetofloatchargetimeminutes001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"equal charge to float charge time (minutes)(001), meterId(433375001)."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.74 --  ::= { dCPowerDistributionInformationEntry 74 }
+
+Equalizationchargingprotectiontimehour001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Equalization charging protection time (hour)(001), meterId(433376001)."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.75 --  ::= { dCPowerDistributionInformationEntry 75 }
+
+Quickevenchargemin001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Quick even charge (min)(001), meterId(433377001)."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.76 --  ::= { dCPowerDistributionInformationEntry 76 }
+
+Systemovercurrentalarmpoint001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"System overcurrent alarm point(001), meterId(433378001), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.77 --  ::= { dCPowerDistributionInformationEntry 77 }
+
+BLVDpower-offmode001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"BLVD power-off mode(001), meterId(433379001)."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.78 --  ::= { dCPowerDistributionInformationEntry 78 }
+
+DCovervoltagealarm001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"DC overvoltage alarm(001), meterId(433218001)."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.79 --  ::= { dCPowerDistributionInformationEntry 79 }
+
+DCvoltagelowalarm001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"DC voltage low alarm(001), meterId(433219001)."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.80 --  ::= { dCPowerDistributionInformationEntry 80 }
+
+LightningProtectionAlarm001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Lightning Protection Alarm(001), meterId(433220001)."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.81 --  ::= { dCPowerDistributionInformationEntry 81 }
+
+loadfusebroken001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"load fuse broken(001), meterId(433221001)."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.82 --  ::= { dCPowerDistributionInformationEntry 82 }
+
+BLVDwillbepoweredoffsoon001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"BLVD will be powered off soon(001), meterId(433226001)."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.83 --  ::= { dCPowerDistributionInformationEntry 83 }
+
+TheloadisabouttopoweroffLLVD1001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The load is about to power off LLVD1(001), meterId(433228001)."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.84 --  ::= { dCPowerDistributionInformationEntry 84 }
+
+TheloadisabouttopoweroffLLVD2001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The load is about to power off LLVD2(001), meterId(433230001)."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.85 --  ::= { dCPowerDistributionInformationEntry 85 }
+
+TheloadisabouttobepoweredoffLLVD3001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The load is about to be powered off LLVD3(001), meterId(433232001)."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.86 --  ::= { dCPowerDistributionInformationEntry 86 }
+
+TheloadisabouttobepoweredoffLLVD4001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The load is about to be powered off LLVD4(001), meterId(433234001)."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.87 --  ::= { dCPowerDistributionInformationEntry 87 }
+
+batterywarmingactivation001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"battery warming activation(001), meterId(433244001)."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.88 --  ::= { dCPowerDistributionInformationEntry 88 }
+
+BatteryEqualChargeAlarm001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Battery Equal Charge Alarm(001), meterId(433246001)."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.89 --  ::= { dCPowerDistributionInformationEntry 89 }
+
+Batterytemperaturesensor5abnormal001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Battery temperature sensor 5 abnormal(001), meterId(433253001)."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.90 --  ::= { dCPowerDistributionInformationEntry 90 }
+
+Ambienttemperaturesensor1isabnormal001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Ambient temperature sensor 1 is abnormal(001), meterId(433257001)."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.91 --  ::= { dCPowerDistributionInformationEntry 91 }
+
+AmbientHumidityLowAlarmStatus001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Ambient Humidity Low Alarm Status(001), meterId(433261001)."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.92 --  ::= { dCPowerDistributionInformationEntry 92 }
+
+Ambienthumiditysensor1isabnormal001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Ambient humidity sensor 1 is abnormal(001), meterId(433262001)."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.93 --  ::= { dCPowerDistributionInformationEntry 93 }
+
+Ambienthumiditysensor2isabnormal001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Ambient humidity sensor 2 is abnormal(001), meterId(433263001)."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.94 --  ::= { dCPowerDistributionInformationEntry 94 }
+
+abnormalvoltageofbatterypack2001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"abnormal voltage of battery pack 2(001), meterId(433304001)."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.95 --  ::= { dCPowerDistributionInformationEntry 95 }
+
+abnormalbatterypack4voltage001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"abnormal battery pack 4 voltage(001), meterId(433306001)."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.96 --  ::= { dCPowerDistributionInformationEntry 96 }
+
+Setthenumberofbatterypacksonthe8thscreen001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Set the number of battery packs on the 8th screen(001), meterId(433409001)."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.97 --  ::= { dCPowerDistributionInformationEntry 97 }
+
+Setthenumberofbatterypacksonthe9thscreen001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Set the number of battery packs on the 9th screen(001), meterId(433410001)."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.98 --  ::= { dCPowerDistributionInformationEntry 98 }
+
+LLVD1power-offmode001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"LLVD1 power-off mode(001), meterId(433380001)."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.99 --  ::= { dCPowerDistributionInformationEntry 99 }
+
+LLVD2power-offmode001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"LLVD2 power-off mode(001), meterId(433381001)."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.100 --  ::= { dCPowerDistributionInformationEntry 100 }
+
+Setthenumberofbatterypacksontheseventhscreen001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Set the number of battery packs on the seventh screen(001), meterId(433408001)."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.101 --  ::= { dCPowerDistributionInformationEntry 101 }
+
+Batterychargingcurrentlimitsetting001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Battery charging current limit setting(001), meterId(433421001), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.102 --  ::= { dCPowerDistributionInformationEntry 102 }
+
+Equalchargingvoltagesetting001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Equal charging voltage setting(001), meterId(433423001), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.103 --  ::= { dCPowerDistributionInformationEntry 103 }
+
+LLVD4power-offmode001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"LLVD4 power-off mode(001), meterId(433383001)."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.104 --  ::= { dCPowerDistributionInformationEntry 104 }
+
+Batterypower-onvoltagesetting001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Battery power-on voltage setting(001), meterId(433425001), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.105 --  ::= { dCPowerDistributionInformationEntry 105 }
+
+Quickequalizationchargingtimesetting001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Quick equalization charging time setting(001), meterId(433451001)."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.106 --  ::= { dCPowerDistributionInformationEntry 106 }
+
+floatvoltagesetting001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"float voltage setting(001), meterId(433422001), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.107 --  ::= { dCPowerDistributionInformationEntry 107 }
+
+LLVD3power-offmode001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"LLVD3 power-off mode(001), meterId(433382001)."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.108 --  ::= { dCPowerDistributionInformationEntry 108 }
+
+BLVDpower-offduration001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"BLVD power-off duration(001), meterId(433384001), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.109 --  ::= { dCPowerDistributionInformationEntry 109 }
+
+LLVD1power-offduration001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"LLVD1 power-off duration(001), meterId(433385001), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.110 --  ::= { dCPowerDistributionInformationEntry 110 }
+
+LLVD4power-offduration001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"LLVD4 power-off duration(001), meterId(433388001), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.2.1.1.111 --  ::= { dCPowerDistributionInformationEntry 111 }
+
+
+END
