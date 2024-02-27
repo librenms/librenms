@@ -111,7 +111,7 @@ class Cisco extends OS implements
             }
             if (! empty($data[1]['entPhysicalModelName'])) {
                 $hardware = $data[1]['entPhysicalModelName'];
-7            }
+            }
         }
 
         if ((empty($hardware) || preg_match('/Switch System/', $hardware)) && ! empty($data[1000]['entPhysicalModelName'])) {
