@@ -128,7 +128,7 @@ class Ipv6Addresses implements Module
         self::cleanupIpv6($device, $valid);
     }
 
-    private function discoverIpv6_StandardOS(array $device)
+    private function discoverIpv6_StandardOS(array $device): array
     {
         $valid = [];
 
@@ -169,7 +169,7 @@ class Ipv6Addresses implements Module
         return $valid;
     }
 
-    private function discoverIpv6_eltex_mes24xx(array $device)
+    private function discoverIpv6_eltex_mes24xx(array $device): array
     {
         $valid = [];
 
@@ -202,7 +202,7 @@ class Ipv6Addresses implements Module
         return $valid;
     }
 
-    private function discoverIpv6_eltex_mes23xx(array $device)
+    private function discoverIpv6_eltex_mes23xx(array $device): array
     {
         $valid = [];
 
@@ -230,7 +230,7 @@ class Ipv6Addresses implements Module
         return $valid;
     }
 
-    private function discoverIpv6_eltex_mes21xx(array $device)
+    private function discoverIpv6_eltex_mes21xx(array $device): array
     {
         $valid = [];
 
@@ -258,7 +258,7 @@ class Ipv6Addresses implements Module
         return $valid;
     }
 
-    private function discoverIpv6_jetstream(array $device)
+    private function discoverIpv6_jetstream(array $device): array
     {
         $valid = [];
 
@@ -285,9 +285,9 @@ class Ipv6Addresses implements Module
                     }
                 }
             }
-
-            return $valid;
         }
+
+        return $valid;
     }
 
     private function processIpv6(array $device, int $ifIndex = 0, string $ipv6_address = '', int $ipv6_prefixlen = 0, string $ipv6_origin = ''): string
@@ -354,7 +354,7 @@ class Ipv6Addresses implements Module
         return '0';
     }
 
-    private function cleanupIpv6(array $device, array $valid)
+    private function cleanupIpv6(array $device, array $valid): void
     {
         Log::debug('IPv6 -> Cleanup');
 
