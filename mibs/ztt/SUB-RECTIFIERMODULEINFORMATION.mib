@@ -1,0 +1,584 @@
+
+SUB-RECTIFIERMODULEINFORMATION DEFINITIONS ::= BEGIN
+
+IMPORTS
+	StorageType,
+	RowStatus,
+	DisplayString,
+	TEXTUAL-CONVENTION
+FROM SNMPv2-TC
+	OBJECT-GROUP,
+	MODULE-COMPLIANCE
+FROM SNMPv2-CONF
+	rectifierModuleInformation
+FROM ZTT-GLOBAL
+	experimental,
+	MODULE-IDENTITY,
+	OBJECT-IDENTITY,
+	OBJECT-TYPE,
+	Integer32,
+	TimeTicks
+FROM SNMPv2-SMI;
+
+rectifierModuleInformationTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF RectifierModuleInformationEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The table of rectifierModuleInformation devices."
+ -- 1.3.6.1.4.1.49692.1.4.1 --  ::= { rectifierModuleInformation 1 }
+
+rectifierModuleInformationEntry OBJECT-TYPE
+	SYNTAX RectifierModuleInformationEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The rectifierModuleInformation entry."
+	INDEX {
+		devIndex }
+ -- 1.3.6.1.4.1.49692.1.4.1.1 --  ::= { rectifierModuleInformationTable 1 }
+
+RectifierModuleInformationEntry ::= SEQUENCE {
+	devIndex	Integer32,
+	devId	OCTET STRING,
+	outputvoltage001	Integer32,
+	numberofrectifiermodules001	Integer32,
+	rectifiercurrent001	Integer32,
+	rectifiercurrent002	Integer32,
+	rectifiercurrent003	Integer32,
+	rectifiercurrent004	Integer32,
+	rectifiercurrent005	Integer32,
+	Currentlimitpointofrectifier001	Integer32,
+	Currentlimitpointofrectifier002	Integer32,
+	Currentlimitpointofrectifier003	Integer32,
+	Currentlimitpointofrectifier004	Integer32,
+	Currentlimitpointofrectifier005	Integer32,
+	Theoutputvoltageoftherectifier001	Integer32,
+	Theoutputvoltageoftherectifier002	Integer32,
+	Theoutputvoltageoftherectifier003	Integer32,
+	Theoutputvoltageoftherectifier004	Integer32,
+	Theoutputvoltageoftherectifier005	Integer32,
+	RectifierInletTemperature001	Integer32,
+	RectifierInletTemperature002	Integer32,
+	RectifierInletTemperature003	Integer32,
+	RectifierInletTemperature004	Integer32,
+	RectifierInletTemperature005	Integer32,
+	ACinputvoltageofrectifier001	Integer32,
+	ACinputvoltageofrectifier002	Integer32,
+	ACinputvoltageofrectifier003	Integer32,
+	ACinputvoltageofrectifier004	Integer32,
+	ACinputvoltageofrectifier005	Integer32,
+	Inputcurrentofrectifier001	Integer32,
+	Inputcurrentofrectifier002	Integer32,
+	Inputcurrentofrectifier003	Integer32,
+	Inputcurrentofrectifier004	Integer32,
+	Inputcurrentofrectifier005	Integer32,
+	numberofrectifiermodules002	Integer32,
+	RectifierFaultStatus001	Integer32,
+	RectifierFaultStatus002	Integer32,
+	RectifierFaultStatus003	Integer32,
+	RectifierFaultStatus004	Integer32,
+	RectifierFaultStatus005	Integer32,
+	Moduleandmonitoringcommunicationdisconnected001	Integer32,
+	Moduleandmonitoringcommunicationdisconnected002	Integer32,
+	Moduleandmonitoringcommunicationdisconnected003	Integer32,
+	Moduleandmonitoringcommunicationdisconnected004	Integer32,
+	Moduleandmonitoringcommunicationdisconnected005	Integer32,
+	Rectifiermoduleprotection001	Integer32,
+	Rectifiermoduleprotection002	Integer32,
+	Rectifiermoduleprotection003	Integer32,
+	Rectifiermoduleprotection004	Integer32,
+	Rectifiermoduleprotection005	Integer32,
+	RectifiermodulefanAfailure001	Integer32,
+	RectifiermodulefanAfailure002	Integer32,
+	RectifiermodulefanAfailure003	Integer32,
+	RectifiermodulefanAfailure004	Integer32,
+	RectifiermodulefanAfailure005	Integer32,
+	RectifierACpowerfailure001	Integer32,
+	RectifierACpowerfailure002	Integer32,
+	RectifierACpowerfailure003	Integer32,
+	RectifierACpowerfailure004	Integer32,
+	RectifierACpowerfailure005	Integer32 }
+
+devIndex OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The index of the device."
+ -- 1.3.6.1.4.1.49692.1.4.1.1.1 --  ::= { rectifierModuleInformationEntry 1 }
+
+devId OBJECT-TYPE
+	SYNTAX OCTET STRING
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The deviceId of the device."
+ -- 1.3.6.1.4.1.49692.1.4.1.1.2 --  ::= { rectifierModuleInformationEntry 2 }
+
+outputvoltage001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"output voltage(001), meterId(433101001), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.4.1.1.3 --  ::= { rectifierModuleInformationEntry 3 }
+
+numberofrectifiermodules001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"number of rectifier modules(001), meterId(433102001)."
+ -- 1.3.6.1.4.1.49692.1.4.1.1.4 --  ::= { rectifierModuleInformationEntry 4 }
+
+rectifiercurrent001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"rectifier current(001), meterId(433103001), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.4.1.1.5 --  ::= { rectifierModuleInformationEntry 5 }
+
+rectifiercurrent002 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"rectifier current(002), meterId(433103002), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.4.1.1.6 --  ::= { rectifierModuleInformationEntry 6 }
+
+rectifiercurrent003 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"rectifier current(003), meterId(433103003), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.4.1.1.7 --  ::= { rectifierModuleInformationEntry 7 }
+
+rectifiercurrent004 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"rectifier current(004), meterId(433103004), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.4.1.1.8 --  ::= { rectifierModuleInformationEntry 8 }
+
+rectifiercurrent005 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"rectifier current(005), meterId(433103005), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.4.1.1.9 --  ::= { rectifierModuleInformationEntry 9 }
+
+Currentlimitpointofrectifier001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Current limit point of rectifier(001), meterId(433111001), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.4.1.1.10 --  ::= { rectifierModuleInformationEntry 10 }
+
+Currentlimitpointofrectifier002 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Current limit point of rectifier(002), meterId(433111002), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.4.1.1.11 --  ::= { rectifierModuleInformationEntry 11 }
+
+Currentlimitpointofrectifier003 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Current limit point of rectifier(003), meterId(433111003), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.4.1.1.12 --  ::= { rectifierModuleInformationEntry 12 }
+
+Currentlimitpointofrectifier004 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Current limit point of rectifier(004), meterId(433111004), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.4.1.1.13 --  ::= { rectifierModuleInformationEntry 13 }
+
+Currentlimitpointofrectifier005 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Current limit point of rectifier(005), meterId(433111005), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.4.1.1.14 --  ::= { rectifierModuleInformationEntry 14 }
+
+Theoutputvoltageoftherectifier001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The output voltage of the rectifier(001), meterId(433104001), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.4.1.1.15 --  ::= { rectifierModuleInformationEntry 15 }
+
+Theoutputvoltageoftherectifier002 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The output voltage of the rectifier(002), meterId(433104002), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.4.1.1.16 --  ::= { rectifierModuleInformationEntry 16 }
+
+Theoutputvoltageoftherectifier003 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The output voltage of the rectifier(003), meterId(433104003), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.4.1.1.17 --  ::= { rectifierModuleInformationEntry 17 }
+
+Theoutputvoltageoftherectifier004 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The output voltage of the rectifier(004), meterId(433104004), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.4.1.1.18 --  ::= { rectifierModuleInformationEntry 18 }
+
+Theoutputvoltageoftherectifier005 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The output voltage of the rectifier(005), meterId(433104005), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.4.1.1.19 --  ::= { rectifierModuleInformationEntry 19 }
+
+RectifierInletTemperature001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Rectifier Inlet Temperature(001), meterId(433107001), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.4.1.1.20 --  ::= { rectifierModuleInformationEntry 20 }
+
+RectifierInletTemperature002 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Rectifier Inlet Temperature(002), meterId(433107002), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.4.1.1.21 --  ::= { rectifierModuleInformationEntry 21 }
+
+RectifierInletTemperature003 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Rectifier Inlet Temperature(003), meterId(433107003), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.4.1.1.22 --  ::= { rectifierModuleInformationEntry 22 }
+
+RectifierInletTemperature004 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Rectifier Inlet Temperature(004), meterId(433107004), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.4.1.1.23 --  ::= { rectifierModuleInformationEntry 23 }
+
+RectifierInletTemperature005 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Rectifier Inlet Temperature(005), meterId(433107005), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.4.1.1.24 --  ::= { rectifierModuleInformationEntry 24 }
+
+ACinputvoltageofrectifier001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"AC input voltage of rectifier(001), meterId(433105001), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.4.1.1.25 --  ::= { rectifierModuleInformationEntry 25 }
+
+ACinputvoltageofrectifier002 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"AC input voltage of rectifier(002), meterId(433105002), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.4.1.1.26 --  ::= { rectifierModuleInformationEntry 26 }
+
+ACinputvoltageofrectifier003 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"AC input voltage of rectifier(003), meterId(433105003), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.4.1.1.27 --  ::= { rectifierModuleInformationEntry 27 }
+
+ACinputvoltageofrectifier004 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"AC input voltage of rectifier(004), meterId(433105004), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.4.1.1.28 --  ::= { rectifierModuleInformationEntry 28 }
+
+ACinputvoltageofrectifier005 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"AC input voltage of rectifier(005), meterId(433105005), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.4.1.1.29 --  ::= { rectifierModuleInformationEntry 29 }
+
+Inputcurrentofrectifier001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Input current of rectifier(001), meterId(433112001), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.4.1.1.30 --  ::= { rectifierModuleInformationEntry 30 }
+
+Inputcurrentofrectifier002 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Input current of rectifier(002), meterId(433112002), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.4.1.1.31 --  ::= { rectifierModuleInformationEntry 31 }
+
+Inputcurrentofrectifier003 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Input current of rectifier(003), meterId(433112003), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.4.1.1.32 --  ::= { rectifierModuleInformationEntry 32 }
+
+Inputcurrentofrectifier004 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Input current of rectifier(004), meterId(433112004), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.4.1.1.33 --  ::= { rectifierModuleInformationEntry 33 }
+
+Inputcurrentofrectifier005 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Input current of rectifier(005), meterId(433112005), scale:1000."
+ -- 1.3.6.1.4.1.49692.1.4.1.1.34 --  ::= { rectifierModuleInformationEntry 34 }
+
+numberofrectifiermodules002 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"number of rectifier modules(002), meterId(433102002)."
+ -- 1.3.6.1.4.1.49692.1.4.1.1.35 --  ::= { rectifierModuleInformationEntry 35 }
+
+RectifierFaultStatus001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Rectifier Fault Status(001), meterId(433117001)."
+ -- 1.3.6.1.4.1.49692.1.4.1.1.36 --  ::= { rectifierModuleInformationEntry 36 }
+
+RectifierFaultStatus002 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Rectifier Fault Status(002), meterId(433117002)."
+ -- 1.3.6.1.4.1.49692.1.4.1.1.37 --  ::= { rectifierModuleInformationEntry 37 }
+
+RectifierFaultStatus003 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Rectifier Fault Status(003), meterId(433117003)."
+ -- 1.3.6.1.4.1.49692.1.4.1.1.38 --  ::= { rectifierModuleInformationEntry 38 }
+
+RectifierFaultStatus004 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Rectifier Fault Status(004), meterId(433117004)."
+ -- 1.3.6.1.4.1.49692.1.4.1.1.39 --  ::= { rectifierModuleInformationEntry 39 }
+
+RectifierFaultStatus005 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Rectifier Fault Status(005), meterId(433117005)."
+ -- 1.3.6.1.4.1.49692.1.4.1.1.40 --  ::= { rectifierModuleInformationEntry 40 }
+
+Moduleandmonitoringcommunicationdisconnected001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Module and monitoring communication disconnected(001), meterId(433135001)."
+ -- 1.3.6.1.4.1.49692.1.4.1.1.41 --  ::= { rectifierModuleInformationEntry 41 }
+
+Moduleandmonitoringcommunicationdisconnected002 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Module and monitoring communication disconnected(002), meterId(433135002)."
+ -- 1.3.6.1.4.1.49692.1.4.1.1.42 --  ::= { rectifierModuleInformationEntry 42 }
+
+Moduleandmonitoringcommunicationdisconnected003 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Module and monitoring communication disconnected(003), meterId(433135003)."
+ -- 1.3.6.1.4.1.49692.1.4.1.1.43 --  ::= { rectifierModuleInformationEntry 43 }
+
+Moduleandmonitoringcommunicationdisconnected004 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Module and monitoring communication disconnected(004), meterId(433135004)."
+ -- 1.3.6.1.4.1.49692.1.4.1.1.44 --  ::= { rectifierModuleInformationEntry 44 }
+
+Moduleandmonitoringcommunicationdisconnected005 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Module and monitoring communication disconnected(005), meterId(433135005)."
+ -- 1.3.6.1.4.1.49692.1.4.1.1.45 --  ::= { rectifierModuleInformationEntry 45 }
+
+Rectifiermoduleprotection001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Rectifier module protection(001), meterId(433154001)."
+ -- 1.3.6.1.4.1.49692.1.4.1.1.46 --  ::= { rectifierModuleInformationEntry 46 }
+
+Rectifiermoduleprotection002 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Rectifier module protection(002), meterId(433154002)."
+ -- 1.3.6.1.4.1.49692.1.4.1.1.47 --  ::= { rectifierModuleInformationEntry 47 }
+
+Rectifiermoduleprotection003 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Rectifier module protection(003), meterId(433154003)."
+ -- 1.3.6.1.4.1.49692.1.4.1.1.48 --  ::= { rectifierModuleInformationEntry 48 }
+
+Rectifiermoduleprotection004 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Rectifier module protection(004), meterId(433154004)."
+ -- 1.3.6.1.4.1.49692.1.4.1.1.49 --  ::= { rectifierModuleInformationEntry 49 }
+
+Rectifiermoduleprotection005 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Rectifier module protection(005), meterId(433154005)."
+ -- 1.3.6.1.4.1.49692.1.4.1.1.50 --  ::= { rectifierModuleInformationEntry 50 }
+
+RectifiermodulefanAfailure001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Rectifier module fan A failure(001), meterId(433123001)."
+ -- 1.3.6.1.4.1.49692.1.4.1.1.51 --  ::= { rectifierModuleInformationEntry 51 }
+
+RectifiermodulefanAfailure002 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Rectifier module fan A failure(002), meterId(433123002)."
+ -- 1.3.6.1.4.1.49692.1.4.1.1.52 --  ::= { rectifierModuleInformationEntry 52 }
+
+RectifiermodulefanAfailure003 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Rectifier module fan A failure(003), meterId(433123003)."
+ -- 1.3.6.1.4.1.49692.1.4.1.1.53 --  ::= { rectifierModuleInformationEntry 53 }
+
+RectifiermodulefanAfailure004 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Rectifier module fan A failure(004), meterId(433123004)."
+ -- 1.3.6.1.4.1.49692.1.4.1.1.54 --  ::= { rectifierModuleInformationEntry 54 }
+
+RectifiermodulefanAfailure005 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Rectifier module fan A failure(005), meterId(433123005)."
+ -- 1.3.6.1.4.1.49692.1.4.1.1.55 --  ::= { rectifierModuleInformationEntry 55 }
+
+RectifierACpowerfailure001 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Rectifier AC power failure(001), meterId(433155001)."
+ -- 1.3.6.1.4.1.49692.1.4.1.1.56 --  ::= { rectifierModuleInformationEntry 56 }
+
+RectifierACpowerfailure002 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Rectifier AC power failure(002), meterId(433155002)."
+ -- 1.3.6.1.4.1.49692.1.4.1.1.57 --  ::= { rectifierModuleInformationEntry 57 }
+
+RectifierACpowerfailure003 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Rectifier AC power failure(003), meterId(433155003)."
+ -- 1.3.6.1.4.1.49692.1.4.1.1.58 --  ::= { rectifierModuleInformationEntry 58 }
+
+RectifierACpowerfailure004 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Rectifier AC power failure(004), meterId(433155004)."
+ -- 1.3.6.1.4.1.49692.1.4.1.1.59 --  ::= { rectifierModuleInformationEntry 59 }
+
+RectifierACpowerfailure005 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Rectifier AC power failure(005), meterId(433155005)."
+ -- 1.3.6.1.4.1.49692.1.4.1.1.60 --  ::= { rectifierModuleInformationEntry 60 }
+
+
+END
