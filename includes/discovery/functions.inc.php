@@ -749,11 +749,11 @@ function discover_process_ipv4(&$valid_v4, $device, int $ifIndex, $ipv4_address,
 
             if (! $dbIpv4Net->wasRecentlyCreated && $dbIpv4Net->wasChanged()) {
                 Eventlog::log('IPv4 network ' . $ipv4_network . ' changed', $device['device_id'], 'ipv4', Severity::Warning);
-                echo 'S.';
+                echo 'Nu';
             }
             if ($dbIpv4Net->wasRecentlyCreated) {
-                Eventlog::log('IPv4 network ' . $ipv4_network . ' created', $device['device_id'], 'ipv4', Severity::Warning);
-                echo 'S+';
+                Eventlog::log('IPv4 network ' . $ipv4_network . ' created', $device['device_id'], 'ipv4', Severity::Notice);
+                echo 'N+';
             }
 
             $ipv4_network_id = Ipv4Network::where('ipv4_network', $ipv4_network)->value('ipv4_network_id');
@@ -767,14 +767,14 @@ function discover_process_ipv4(&$valid_v4, $device, int $ifIndex, $ipv4_address,
             ]);
 
             if (! $dbIpv4Addr->wasRecentlyCreated && $dbIpv4Addr->wasChanged()) {
-                Eventlog::log('IPv4 address ' . $ipv4 . ' changed', $device['device_id'], 'ipv4', Severity::Warning);
-                echo 'A.';
+                Eventlog::log('IPv4 address ' . $ipv4_address . '/' . $cidr . ' changed', $device['device_id'], 'ipv4', Severity::Warning);
+                echo 'Au';
             }
             if ($dbIpv4Addr->wasRecentlyCreated) {
-                Eventlog::log('IPv4 address ' . $ipv4 . ' created', $device['device_id'], 'ipv4', Severity::Warning);
+                Eventlog::log('IPv4 address ' . $ipv4_address . '/' . $cidr . ' created', $device['device_id'], 'ipv4', Severity::Notice);
                 echo 'A+';
             }
-            $full_address = $ipv4 . '|' . $ifIndex;
+            $full_address = $ipv4_address . '/' . $cidr . '|' . $ifIndex;
             $valid_v4[$full_address] = 1;
         } else {
             d_echo('No port id found for ifindex: ' . $ifIndex . PHP_EOL);
