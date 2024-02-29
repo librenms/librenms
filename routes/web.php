@@ -87,7 +87,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('fullscreenmap', 'Maps\FullscreenMapController@fullscreenMap');
     Route::get('availability-map', 'Maps\AvailabilityMapController@availabilityMap');
     Route::get('map/{vars?}', 'Maps\NetMapController@netMap');
-    Route::prefix('maps')->group(function () {
+    Route::prefix('maps')->namespace('Maps')->group(function () {
         Route::resource('custom', CustomMapController::class, ['as' => 'maps'])
             ->parameters(['custom' => 'map'])->except('create');
         Route::get('custom/{map}/background', [CustomMapBackgroundController::class, 'get'])->name('maps.custom.background');
