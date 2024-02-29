@@ -1,17 +1,14 @@
-os: supermicro-bmc
-text: 'Supermicro-BMC'
+text: 'Supermicro BMC'
 type: appliance
 icon: supermicro
-snmp_bulk: false
 mib_dir: supermicro
 group: supermicro
 over:
-    - { graph: device_temperature, text: 'Temperatures' }
-    - { graph: device_fanspeed, text: 'Fan Speed' }
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
 discovery:
-    -
-        sysObjectID: .1.3.6.1.4.1.8072.3.2.10
-        snmpget:
-            oid: ATEN-IPMI-MIB::bmcMajorVesion.0
-            op: '!='
-            value: false
+    - snmpget:
+          oid: .1.3.6.1.4.1.21317.1.16.3.2.0
+          op: '='
+          value: "Supermicro"
