@@ -10,7 +10,7 @@ modules:
     os:
         sysDescr_regex: '/(?<hardware>\S+( TPS)?), ACOS (?<version>[^,]+)/'
         serial: A10-AX-MIB::axSysSerialNumber.0
-        version: A10-AX-MIB::axSysPrimaryVersionOnDisk.0
+        version: A10-AX-MIB::axSysPrimaryVersionOnDisk.
     processors:
         data:
             -
