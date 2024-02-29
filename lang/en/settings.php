@@ -60,8 +60,8 @@ return [
             'availability' => ['name' => 'Device Availability'],
             'distributed' => ['name' => 'Distributed Poller'],
             'graphite' => ['name' => 'Datastore: Graphite'],
-	        'influxdb' => ['name' => 'Datastore: InfluxDB'],
-	        'influxdbv2' => ['name' => 'Datastore: InfluxDBv2'],
+            'influxdb' => ['name' => 'Datastore: InfluxDB'],
+            'influxdbv2' => ['name' => 'Datastore: InfluxDBv2'],
             'opentsdb' => ['name' => 'Datastore: OpenTSDB'],
             'ping' => ['name' => 'Ping'],
             'prometheus' => ['name' => 'Datastore: Prometheus'],
@@ -934,7 +934,7 @@ return [
                 'description' => 'Verify SSL',
                 'help' => 'Verify the SSL certificate is valid and trusted',
             ],
-	],
+	    ],
         'influxdbv2' => [
             'bucket' => [
                 'description' => 'Bucket',
@@ -972,6 +972,7 @@ return [
                 'description' => 'Allow Redirects',
                 'help' => 'To allow redirect from the InfluxDB server',
             ],
+        
         ],
         'ipmitool' => [
             'description' => 'Path to ipmtool',

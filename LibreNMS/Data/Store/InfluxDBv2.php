@@ -28,8 +28,8 @@ namespace LibreNMS\Data\Store;
 
 use App\Polling\Measure\Measurement;
 use InfluxDB2\Client;
-use InfluxDB2\Point;
 use InfluxDB2\Model\WritePrecision;
+use InfluxDB2\Point;
 use LibreNMS\Config;
 use Log;
 
@@ -114,12 +114,12 @@ class InfluxDBv2 extends BaseDatastore
             $writeApi->write($point);
 
             $this->recordStatistic($stat->end());
-            } catch (Exception $e) {
-                print_r($e);
-                // Handle exceptions
-            } finally {
-              // Close the WriteApi to free resources
-              $writeApi->close();
+        } catch (Exception $e) {
+            print_r($e);
+            // Handle exceptions
+        } finally {
+            // Close the WriteApi to free resources
+            $writeApi->close();
         }
     }
 
@@ -140,7 +140,7 @@ class InfluxDBv2 extends BaseDatastore
             'org' => $organization,
             'precision' => WritePrecision::S,
             'allow_redirects' => $allow_redirects,
-            'debug'=> true,
+            'debug' => true,
         ]);
 
         return $client;
@@ -171,4 +171,5 @@ class InfluxDBv2 extends BaseDatastore
     {
         return false;
     }
+
 }
