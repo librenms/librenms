@@ -115,7 +115,7 @@ class InfluxDBv2 extends BaseDatastore
             $writeApi->write($point);
 
             $this->recordStatistic($stat->end());
-        } catch (Exception $e) {
+        } catch (\InfluxDB2\ApiException $e) {
             print_r($e);
             // Handle exceptions
         } finally {
