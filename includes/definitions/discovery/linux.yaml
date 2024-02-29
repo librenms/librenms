@@ -37,7 +37,7 @@ modules:
                     oid: adapterPropertiesTable
                     value: vdDegradedCount
                     num_oid: '.1.3.6.1.4.1.3582.4.1.4.1.2.1.19.{{ $index }}'
-                    index: 'vdfail.{{ $index }}'
+                    index: 'vddegraded.{{ $index }}'
                     group: 'RAID Controller {{ $adapterID-APT }}'
                     high_limit: 0
                     descr: 'Virtual disk degraded'
