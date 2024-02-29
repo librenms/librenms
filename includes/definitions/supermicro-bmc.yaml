@@ -1,3 +1,4 @@
+os: supermicro-bmc
 text: 'Supermicro BMC'
 type: appliance
 icon: supermicro
