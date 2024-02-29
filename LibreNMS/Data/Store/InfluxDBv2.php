@@ -172,5 +172,4 @@ class InfluxDBv2 extends BaseDatastore
     {
         return false;
     }
-
 }

@@ -1768,5 +1768,4 @@ return [
         'executable' => ':value is not a valid executable',
         'directory' => ':value is not a valid directory',
     ],
-
 ];
