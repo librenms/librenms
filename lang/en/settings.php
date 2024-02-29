@@ -934,7 +934,7 @@ return [
                 'description' => 'Verify SSL',
                 'help' => 'Verify the SSL certificate is valid and trusted',
             ],
-	    ],
+        ],
         'influxdbv2' => [
             'bucket' => [
                 'description' => 'Bucket',
@@ -972,7 +972,7 @@ return [
                 'description' => 'Allow Redirects',
                 'help' => 'To allow redirect from the InfluxDB server',
             ],
-        
+
         ],
         'ipmitool' => [
             'description' => 'Path to ipmtool',
@@ -1768,4 +1768,5 @@ return [
         'executable' => ':value is not a valid executable',
         'directory' => ':value is not a valid directory',
     ],
+
 ];
