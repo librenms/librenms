@@ -44,7 +44,7 @@ foreach (DeviceCache::getPrimary()->getVrfContexts() as $context_name) {
             echo 'A-';
             if (! Ipv4Address::where('ipv4_network_id', $row['ipv4_network_id'])->count()) {
                 Ipv4Network::where('ipv4_network_id', $row['ipv4_network_id'])->delete();
-                echo 'S-';
+                echo 'N-';
             }
         }
     }
