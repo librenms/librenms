@@ -449,7 +449,7 @@ return [
         ],
         'auth_ldap_userdn' => [
             'description' => 'Use full user DN',
-            'help' => "Uses a user's full DN as the value of the member attribute in a group instead of member: username using the prefix and suffix. (itâ€™s member: uid=username,ou=groups,dc=domain,dc=com)",
+            'help' => "Uses a user's full DN as the value of the member attribute in a group instead of member: username using the prefix and suffix. (it's member: uid=username,ou=groups,dc=domain,dc=com)",
         ],
         'auth_ldap_wildcard_ou' => [
             'description' => 'Wildcard user OU',
