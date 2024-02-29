@@ -1,7 +1,6 @@
 mib: ATEN-IPMI-MIB
 modules:
     os:
-<<<<<<< HEAD
         hardware: ATEN-IPMI-MIB::productPartNumber.0
         version:
             - ATEN-IPMI-MIB::bmcMajorVesion.0
@@ -93,25 +92,6 @@ modules:
                     value: sensorReading
                     num_oid: '.1.3.6.1.4.1.21317.1.3.1.2.{{ $index }}'
                     descr: sensorIDString
-        current:
-            data:
-                -
-                    oid: inputCurrent
-                    value: inputCurrent
-                    num_oid: '.1.3.6.1.4.1.21317.1.14.2.1.4.{{ $index }}'
-                    descr: 'PSU {{ $index }} Input Current'
-                    index: 'inputCurrent.{{ $index }}'
-        power:
-            data:
-                -
-                    oid: inputPower
-                    value: inputPower
-                    num_oid: '.1.3.6.1.4.1.21317.1.14.2.1.5.{{ $index }}'
-                    descr: 'PSU {{ $index }} Input Power'
-                    index: 'inputPower.{{ $index }}'
-        state:
-            data:
-                -
                     index: 'sensorReading.{{ $index }}'
                     skip_values:
                         -
@@ -130,6 +110,24 @@ modules:
                     warn_limit: ucThreshold
                     low_limit: lnrThreshold
                     high_limit: unrThreshold
+        current:
+            data:
+                -
+                    oid: inputCurrent
+                    value: inputCurrent
+                    num_oid: '.1.3.6.1.4.1.21317.1.14.2.1.4.{{ $index }}'
+                    descr: 'PSU {{ $index }} Input Current'
+                    index: 'inputCurrent.{{ $index }}'
+        power:
+            data:
+                -
+                    oid: inputPower
+                    value: inputPower
+                    num_oid: '.1.3.6.1.4.1.21317.1.14.2.1.5.{{ $index }}'
+                    descr: 'PSU {{ $index }} Input Power'
+                    index: 'inputPower.{{ $index }}'
+        state:
+            data:
                 -
                     oid: psuStatus
                     value: psuStatus
