@@ -60,8 +60,8 @@ return [
             'availability' => ['name' => 'Device Availability'],
             'distributed' => ['name' => 'Distributed Poller'],
             'graphite' => ['name' => 'Datastore: Graphite'],
-	    'influxdb' => ['name' => 'Datastore: InfluxDB'],
-	    'influxdbv2' => ['name' => 'Datastore: InfluxDBv2'],
+	        'influxdb' => ['name' => 'Datastore: InfluxDB'],
+	        'influxdbv2' => ['name' => 'Datastore: InfluxDBv2'],
             'opentsdb' => ['name' => 'Datastore: OpenTSDB'],
             'ping' => ['name' => 'Ping'],
             'prometheus' => ['name' => 'Datastore: Prometheus'],
@@ -971,7 +971,6 @@ return [
             'allow_redirects' => [
                 'description' => 'Allow Redirects',
                 'help' => 'To allow redirect from the InfluxDB server',
-            ],
             ],
         ],
         'ipmitool' => [
