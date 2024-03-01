@@ -33,4 +33,11 @@ class Ipv4Address extends PortRelatedModel
 
     public $timestamps = false;
     protected $primaryKey = 'ipv4_address_id';
+    protected $fillable = [
+        'ipv4_address',
+        'ipv4_prefixlen',
+        'ipv4_network_id',
+        'port_id',
+        'context_name',
+    ];
 }

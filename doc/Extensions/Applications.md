@@ -1074,32 +1074,45 @@ extend icecast /etc/snmp/icecast-stats.sh
 
 A small python3 script that reports current DHCP leases stats and pool usage of ISC DHCP Server.
 
-Also you have to install the dhcpd-pools Package.
-Under Ubuntu/Debian just run `apt install dhcpd-pools` or under
-FreeBSD `pkg install dhcpd-pools`.
+Also you have to install the dhcpd-pools and the required Perl
+modules. Under Ubuntu/Debian just run `apt install
+cpanminus ; cpanm Net::ISC::DHCPd::Leases Mime::Base64 File::Slurp` or under FreeBSD
+`pkg install p5-JSON p5-MIME-Base64 p5-App-cpanminus p5-File-Slurp ; cpanm Net::ISC::DHCPd::Leases`.
 
 ### SNMP Extend
 
 1. Copy the shell script to the desired host.
 ```
-wget https://github.com/librenms/librenms-agent/raw/master/snmp/dhcp.py -O /etc/snmp/dhcp.py
+wget https://github.com/librenms/librenms-agent/raw/master/snmp/dhcp -O /etc/snmp/dhcp
 ```
 
 2. Make the script executable
 ```
-chmod +x /etc/snmp/dhcp.py
+chmod +x /etc/snmp/dhcp
 ```
 
-3. Edit your config file, Content of an example /etc/snmp/dhcp.json
+3. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
 ```
-{"leasefile": "/var/lib/dhcp/dhcpd.leases" }
+# without using cron
+extend dhcpstats /etc/snmp/dhcp -Z
+# using cron
+extend dhcpstats /bin/cat /var/cache/dhcp_extend
 ```
-Key 'leasefile' specifies the path to your lease file.
 
-4. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
+4. If on a slow system running it via cron may be needed.
 ```
-extend dhcpstats /etc/snmp/dhcp.py
+*/5 * * * * /etc/snmp/dhcp -Z -w /var/cache/dhcp_extend
 ```
+
+The following options are also supported.
+
+| Option     | Description                     |
+|------------|---------------------------------|
+| `-c $file` | Path to dhcpd.conf.             |
+| `-l $file` | Path to lease file.             |
+| `-Z`       | Enable GZip+Base64 compression. |
+| `-d`       | Do not de-dup.                  |
+| `-w $file` | File to write it out to.        |
 
 5. Restart snmpd on your host
 
@@ -1199,8 +1212,8 @@ extend linux_config_files /etc/snmp/linux_config_files.py
 ```
 
 4. (Optional on an RPM-based distribution) Create a /etc/snmp/linux_config_files.json file and specify the following:
-a.) "pkg_system" - String designating the distribution name of the system.  At the moment only "rpm" is supported ["rpm"]
-b.) "pkg_tool_cmd" - String path to the package tool binary ["/sbin/rpmconf"]
+    1. "pkg_system" - String designating the distribution name of the system.  At the moment only "rpm" is supported ["rpm"]
+    2. "pkg_tool_cmd" - String path to the package tool binary ["/sbin/rpmconf"]
 ```
 {
     "pkg_system": "rpm",
@@ -3011,34 +3024,34 @@ sagan_stat_check](https://metacpan.org/dist/Sagan-Monitoring/view/bin/sagan_stat
 
 ## Socket Statistics (ss)
 
-The Socket Statistics application polls ss and scrapes socket statuses.  Individual sockets and address families may be filtered out within the script's optional configuration JSON file.
+The Socket Statistics application polls ss and scrapes socket statuses.  Individual sockets and address-families may be filtered out within the script's optional configuration JSON file.
 
-a. The following socket types are polled directly.  Filtering a socket will disable direct polling as-well-as indirect polling via any address families that list the socket as their child:
+1. The following socket types are polled directly.  Filtering a socket type will disable direct polling as-well-as indirect polling within any address-families that list the socket type as their child:
 ```
-dccp (also exists within AF inet,inet6)
-mptcp (also exists within AF inet,inet6)
-raw (also exists within AF inet,inet6)
-sctp (also exists within AF inet,inet6)
-tcp (also exists within AF inet,inet6)
-udp (also exists within AF inet,inet6)
+dccp (also exists within address-families "inet" and "inet6")
+mptcp (also exists within address-families "inet" and "inet6")
+raw (also exists within address-families "inet" and "inet6")
+sctp (also exists within address-families "inet" and "inet6")
+tcp (also exists within address-families "inet" and "inet6")
+udp (also exists within address-families "inet" and "inet6")
 xdp
 ```
 
-b. The following socket types are polled within an address family only:
+2. The following socket types are polled within an address-family only:
 ```
-inet6 (within AF inet6)
-p_dgr (within AF link)
-p_raw (within AF link)
-ti_dg (within AF tipc)
-ti_rd (within AF tipc)
-ti_sq (within AF tipc)
-ti_st (within AF tipc)
-v_dgr (within AF vsock)
-v_str (within AF vsock)
-unknown (within AF inet,inet6,link,tipc,vsock)
+inet6 (within address-family "inet6")
+p_dgr (within address-family "link")
+p_raw (within address-family "link")
+ti_dg (within address-family "tipc")
+ti_rd (within address-family "tipc")
+ti_sq (within address-family "tipc")
+ti_st (within address-family "tipc")
+v_dgr (within address-family "vsock")
+v_str (within address-family "vsock")
+unknown (within address-families "inet", "inet6", "link", "tipc", and "vsock")
 ```
 
-c. The following address families are polled directly, however, they also have socket types within their address family "umbrella".  Filtering a socket will filter it from the address family.  Filtering an address family will filter out all of its child sockets UNLESS those child sockets are polled directly; see (a) above:
+3. The following address-families are polled directly and have their child socket types tab-indented below them.  Filtering a socket type (see "1" above) will filter it from the address-family.  Filtering an address-family will filter out all of its child socket types.  However, if those socket types are not DIRECTLY filtered out (see "1" above), then they will continue to be monitored either directly or within other address-families in which they exist:
 ```
 inet
     dccp
@@ -3096,9 +3109,9 @@ extend ss /etc/snmp/ss.py
 ```
 
 4. (Optional) Create a /etc/snmp/ss.json file and specify:
-    a.) "ss_cmd" - String path to the ss binary: ["/sbin/ss"]
-    b.) "socket_types"  - A comma-delimited list of socket types to include.  The following socket types are valid: dccp, icmp6, mptcp, p_dgr, p_raw, raw, sctp, tcp, ti_dg, ti_rd, ti_sq, ti_st, u_dgr, u_seq, u_str, udp, unknown, v_dgr, v_dgr, xdp.  Please note that the "unknown" socket type is represented in ss output with the netid "???".  Please also note that the p_dgr and p_raw socket types are specific to the "link" address family; the ti_dg, ti_rd, ti_sq, and ti_st socket types are specific to the "tipc" address family; the u_dgr, u_seq, and u_str socket types are specific to the "unix" address family; and the v_dgr and v_str socket types are specific to the "vsock" address family.  Filtering out the parent address families for the aforementioned will also filter out their specific socket types.  Specifying "all" includes all of the socket types.  For example: to include only tcp, udp, icmp6 sockets, you would specify "tcp,udp,icmp6": ["all"]
-    c.) "addr_families" - A comma-delimited list of address families to include.  The following families are valid: inet, inet6, link, netlink, tipc, unix, vsock.  As mentioned above under (b), filtering out the link, tipc, unix, or vsock address families will also filter out their respective socket types.  Specifying "all" includes all of the families.  For example: to include only inet and inet6 families, you would specify "inet,inet6": ["all"]
+    1. "ss_cmd" - String path to the ss binary: ["/sbin/ss"]
+    2. "socket_types" - A comma-delimited list of socket types to include.  The following socket types are valid: dccp, icmp6, mptcp, p_dgr, p_raw, raw, sctp, tcp, ti_dg, ti_rd, ti_sq, ti_st, u_dgr, u_seq, u_str, udp, unknown, v_dgr, v_dgr, xdp.  Please note that the "unknown" socket type is represented in /sbin/ss output with the netid "???".  Please also note that the p_dgr and p_raw socket types are specific to the "link" address family; the ti_dg, ti_rd, ti_sq, and ti_st socket types are specific to the "tipc" address family; the u_dgr, u_seq, and u_str socket types are specific to the "unix" address family; and the v_dgr and v_str socket types are specific to the "vsock" address family.  Filtering out the parent address families for the aforementioned will also filter out their specific socket types.  Specifying "all" includes all of the socket types.  For example: to include only tcp, udp, icmp6 sockets, you would specify "tcp,udp,icmp6": ["all"]
+    3. "addr_families" - A comma-delimited list of address families to include.  The following families are valid: inet, inet6, link, netlink, tipc, unix, vsock.  As mentioned above under (b), filtering out the link, tipc, unix, or vsock address families will also filter out their respective socket types.  Specifying "all" includes all of the families.  For example: to include only inet and inet6 families, you would specify "inet,inet6": ["all"]
 ```
 {
     "ss_cmd": "/sbin/ss",
@@ -3106,7 +3119,7 @@ extend ss /etc/snmp/ss.py
     "addr_families": "all"
 }
 ```
-In order to filter out usually unused socket types, it is recommended to go with the following JSON:
+In order to filter out uncommon/unused socket types, the following JSON configuration is recommended:
 ```
 {
     "ss_cmd": "/sbin/ss",
@@ -3115,8 +3128,7 @@ In order to filter out usually unused socket types, it is recommended to go with
 }
 ```
 
-
-5. (Optional) If you have SELinux in Enforcing mode, you must add a module so the script can access socket state:
+5. (Optional) If SELinux is in Enforcing mode, you must add a module so the script can poll sockets:
 ```
 cat << EOF > snmpd_ss.te
 module snmp_ss 1.0;
@@ -3136,7 +3148,6 @@ semodule -i snmpd_ss.pp
 ```
 
 6. Restart snmpd.
-
 
 ## Suricata
 
@@ -3212,8 +3223,8 @@ extend systemd /etc/snmp/systemd.py
 ```
 
 4. (Optional) Create a /etc/snmp/systemd.json file and specify:
-    a.) "systemctl_cmd" - String path to the systemctl binary [Default: "/usr/bin/systemctl"]
-    b.) "include_inactive_units" - True/False string to include inactive units in results [Default: "False"]
+    1. "systemctl_cmd" - String path to the systemctl binary [Default: "/usr/bin/systemctl"]
+    2. "include_inactive_units" - True/False string to include inactive units in results [Default: "False"]
 ```
 {
     "systemctl_cmd": "/bin/systemctl",
@@ -3246,7 +3257,6 @@ semodule -i snmpd_systemctl.pp
 ```
 
 6. Restart snmpd.
-
 
 ## TinyDNS aka djbdns
 
@@ -3415,7 +3425,7 @@ extend voipmon /etc/snmp/voipmon-stats.sh
 
 ## Wireguard
 
-The wireguard application polls the Wireguard service and scrapes all client statistics for all interfaces configured as Wireguard interfaces.
+The Wireguard application polls the Wireguard service and scrapes all client statistics for all interfaces configured as Wireguard interfaces.
 
 ### SNMP Extend
 
@@ -3435,8 +3445,8 @@ extend wireguard /etc/snmp/wireguard.py
 ```
 
 4. Create a /etc/snmp/wireguard.json file and specify:
-a.) (optional) "wg_cmd" - String path to the wg binary ["/usr/bin/wg"]
-b.) "public_key_to_arbitrary_name" - A dictionary to convert between the publickey assigned to the client (specified in the wireguard interface conf file) to an arbitrary, friendly name.  The friendly names MUST be unique within each interface.  Also note that the interface name and friendly names are used in the RRD filename, so using special characters is highly discouraged.
+    1. (optional) "wg_cmd" - String path to the wg binary ["/usr/bin/wg"]
+    2. "public_key_to_arbitrary_name" - A dictionary to convert between the publickey assigned to the client (specified in the wireguard interface conf file) to an arbitrary, friendly name.  The friendly names MUST be unique within each interface.  Also note that the interface name and friendly names are used in the RRD filename, so using special characters is highly discouraged.
 ```
 {
     "wg_cmd": "/bin/wg",
