@@ -27,7 +27,7 @@ modules:
                     descr: HA Local Status
                     group: HA
                     states:
-                        - { value: 0, descr: 'standby', graph: 0, generic: 1 }
+                        - { value: 0, descr: 'standby', graph: 0, generic: 0 }
                         - { value: 1, descr: 'active', graph: 0, generic: 0 }
                         - { value: 9, descr: 'notConfigured', graph: 0, generic: 2 }
                 -
