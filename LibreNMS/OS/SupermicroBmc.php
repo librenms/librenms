@@ -45,10 +45,10 @@ class SupermicroBmc extends \LibreNMS\OS implements OSDiscovery, OSPolling
     }
 
     /**
-     * @param  \App\Models\Device  $device
+     * @param  Device  $device
      */
     private function customSysName(Device $device): void
     {
-        $device->sysName = \SnmpQuery::get('.1.3.6.1.4.1.21317.1.5.6.0')->value() ?: $device->sysName;
+        $device->sysName = \SnmpQuery::get('ATEN-IPMI-MIB::hostName.0')->value() ?: $device->sysName;
     }
 }
