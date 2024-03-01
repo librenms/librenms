@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f9d82e3ab007a96d3e7486599803294f",
+    "content-hash": "9885524d4ce5dc8aa2c7d861dd86d2fc",
     "packages": [
         {
             "name": "amenadiel/jpgraph",
