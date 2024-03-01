@@ -5,9 +5,8 @@ icon: supermicro
 mib_dir: supermicro
 group: supermicro
 over:
-    - { graph: device_bits, text: 'Device Traffic' }
-    - { graph: device_processor, text: 'CPU Usage' }
-    - { graph: device_mempool, text: 'Memory Usage' }
+    - { graph: device_temperature, text: 'Temperatures' }
+    - { graph: device_fanspeed, text: 'Fan Speed' }
 discovery:
     - snmpget:
           oid: ATEN-IPMI-MIB::bmcMajorVesion.0

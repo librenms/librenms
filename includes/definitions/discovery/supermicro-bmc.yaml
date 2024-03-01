@@ -135,8 +135,9 @@ modules:
                     descr: 'PSU {{ $index }} Status'
                     index: 'psuStatus.{{ $index }}'
                     states:
-                        - { value: 0, descr: "Fail",  graph: 1, generic: 2 }
-                        - { value: 1, descr: "OK" , graph: 1, generic: 0  }
+                        - { value: 0, descr: "Not Present",  graph: 1, generic: 2 }
+                        - { value: 1, descr: "Present: OK" , graph: 1, generic: 0  }
+                        - { value: 3, descr: "Present: Failed" , graph: 1, generic: 2  }
                 -
                     oid: sensorTable
                     value: sensorReading
@@ -164,6 +165,10 @@ modules:
                             op: '!='
                             value: "VBAT"
                     state_name: "VBAT"
+                    states:
+                        - { value: 0, descr: "Not Present", graph: 1, generic: 2 }
+                        - { value: 2, descr: "Present: Failed", graph: 1, generic: 2 }
+                        - { value: 4, descr: "Present: OK" , graph: 1, generic: 0  }
                 -
                     oid: sensorTable
                     value: sensorReading
