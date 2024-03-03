@@ -14,7 +14,7 @@
                     "os": "supermicro-bmc",
                     "type": "appliance",
                     "serial": "S12345678901234",
-                    "icon": "supermicro.svg"
+                    "icon": "supermicro.png"
                 }
             ]
         },
