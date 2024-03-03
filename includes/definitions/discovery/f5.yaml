@@ -1,3 +1,4 @@
+mib: F5-BIGIP-SYSTEM-MIB
 modules:
     os:
         hardware: F5-BIGIP-SYSTEM-MIB::sysPlatformInfoMarketingName.0
@@ -20,3 +21,94 @@ modules:
                 total: F5-BIGIP-SYSTEM-MIB::sysGlobalHostSwapTotal
                 descr: 'Swap Memory'
                 index: 2
+    sensors:
+        state:
+            data:
+                -
+                    oid: sysCmFailoverStatusId
+                    num_oid: '.1.3.6.1.4.1.3375.2.1.14.3.1.{{ $index }}'
+                    index: 'sysCmFailoverStatusId.{{ $index }}'
+                    descr: Failover State
+                    group: HA
+                    states:
+                        - { value: 0, descr: 'Unknown', graph: 0, generic: 3 }
+                        - { value: 1, descr: 'OffLine', graph: 0, generic: 2 }
+                        - { value: 2, descr: 'ForcedOffline', graph: 0, generic: 2 }
+                        - { value: 3, descr: 'Standby', graph: 0, generic: 0 }
+                        - { value: 4, descr: 'Active', graph: 0, generic: 0 }
+                -
+                    oid: sysCmSyncStatusId
+                    num_oid: '.1.3.6.1.4.1.3375.2.1.14.1.1.{{ $index }}'
+                    index: 'sysCmSyncStatusId.{{ $index }}'
+                    descr: Sync State
+                    group: HA
+                    states:
+                        - { value: 0, descr: 'unknown', graph: 0, generic: 3 }
+                        - { value: 1, descr: 'syncing', graph: 0, generic: 1 }
+                        - { value: 2, descr: 'needManualSync', graph: 0, generic: 2 }
+                        - { value: 3, descr: 'inSync', graph: 0, generic: 0 }
+                        - { value: 4, descr: 'syncFailed', graph: 0, generic: 1 }
+                        - { value: 5, descr: 'syncDisconnected', graph: 0, generic: 2 }
+                        - { value: 6, descr: 'standalone', graph: 0, generic: 0 }
+                        - { value: 7, descr: 'awaitingInitialSync', graph: 0, generic: 1 }
+                        - { value: 8, descr: 'incompatibleVersion', graph: 0, generic: 2 }
+                        - { value: 9, descr: 'partialSync', graph: 0, generic: 2 }
+                -
+                    oid: sysCmFailoverStatusColor
+                    num_oid: '.1.3.6.1.4.1.3375.2.1.14.3.3.{{ $index }}'
+                    index: 'sysCmFailoverStatusColor.{{ $index }}'
+                    descr: Failover State Color
+                    group: HA
+                    states:
+                        - { value: 0, descr: 'Green: functioning correctly', graph: 0, generic: 0 }
+                        - { value: 1, descr: 'Yellow: functioning suboptimally', graph: 0, generic: 1 }
+                        - { value: 2, descr: 'Red: requires attention to function correctly', graph: 0, generic: 2 }
+                        - { value: 3, descr: 'Blue: status is unknown', graph: 0, generic: 3 }
+                        - { value: 4, descr: 'Gray: intentionally not functioning', graph: 0, generic: 0 }
+                        - { value: 5, descr: 'Black: not connected to any peers', graph: 0, generic: 2 }
+                -
+                    oid: sysChassisPowerSupplyStatus
+                    num_oid: '.1.3.6.1.4.1.3375.2.1.3.2.2.2.1.2.{{ $index }}'
+                    index: 'sysChassisPowerSupplyStatus.{{ $index }}'
+                    descr: "Power Supply Status {{ $index }}"
+                    group: Hardware
+                    states:
+                        - { value: 0, descr: 'Bad', graph: 0, generic: 2 }
+                        - { value: 1, descr: 'Good', graph: 0, generic: 0 }
+                        - { value: 2, descr: 'NotPresent', graph: 0, generic: 3 }
+                -
+                    oid: sysChassisFanStatus
+                    num_oid: '.1.3.6.1.4.1.3375.2.1.3.2.1.2.1.2.{{ $index }}'
+                    index: 'sysChassisFanStatus.{{ $index }}'
+                    descr: "Fan Status {{ $index }}"
+                    group: Hardware
+                    states:
+                        - { value: 0, descr: 'Bad', graph: 0, generic: 2 }
+                        - { value: 1, descr: 'Good', graph: 0, generic: 0 }
+                        - { value: 2, descr: 'NotPresent', graph: 0, generic: 3 }
+        count:
+            data:
+                -
+                    oid: sysStatClientCurConns
+                    num_oid: '.1.3.6.1.4.1.3375.2.1.1.2.1.8.{{ $index }}'
+                    index: 'sysStatClientCurConns.{{ $index }}'
+                    descr: 'Current connections from client-side'
+                    group: Connections
+                -
+                    oid: sysStatServerCurConns
+                    num_oid: '.1.3.6.1.4.1.3375.2.1.1.2.1.15.{{ $index }}'
+                    index: 'sysStatServerCurConns.{{ $index }}'
+                    descr: 'Current connections from server-side'
+                    group: Connections
+                -
+                    oid: sysStatClientCurConns1m
+                    num_oid: '.1.3.6.1.4.1.3375.2.1.1.2.1.79.{{ $index }}'
+                    index: 'sysStatClientCurConns1m.{{ $index }}'
+                    descr: 'Average current connections from client-side'
+                    group: Connections
+                -
+                    oid: sysStatServerCurConns1m
+                    num_oid: '.1.3.6.1.4.1.3375.2.1.1.2.1.86.{{ $index }}'
+                    index: 'sysStatServerCurConns1m.{{ $index }}'
+                    descr: 'Average Current connections from server-side'
+                    group: Connections
