@@ -253,7 +253,7 @@
                 var mid_x = mid_pos.x;
                 var mid_y = mid_pos.y;
 
-                var mid = {id: edgeid + "_mid", shape: "dot", size: 3, x: mid_x, y: mid_y};
+                var mid = {id: edgeid + "_mid", shape: "dot", size: 3, x: mid_x, y: mid_y, label: ''};
 
                 var edge1 = structuredClone(newedgeconf);
                 edge1.id = edgeid + "_from";
@@ -952,7 +952,11 @@
         edgedata.edge1.font.color = edgedata.edge2.font.color = $("#edgetextcolour").val();
         edgedata.edge1.label = edgedata.edge2.label = edgeLabel($("#edgetextshow").prop('checked'), $("#edgebpsshow").prop('checked'), null);
         edgedata.edge1.title = edgedata.edge2.title = $("#port_id").val();
-        edgedata.mid.label = ($("#edgelabel").val() || '');
+	let newlabel = $("#edgelabel").val() || '';
+	if (newlabel == '' && edgedata.mid.label != '') {
+            $("#map-renderButton").show();
+	}
+        edgedata.mid.label = newlabel;
 
         if(edgedata.id) {
             if($("#port_id").val()) {
