@@ -3,7 +3,7 @@
 use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\RRD\RrdDefinition;
 
-$name = 'logsize';
+$name = 'nfs';
 
 try {
     $returned = json_app_get($device, $name, 1);
@@ -15,7 +15,7 @@ try {
     return;
 }
 
-include 'includes/nfs-shared.php';
+include 'includes/nfs-shared.inc.php';
 
 $data = $returned['data'];
 
