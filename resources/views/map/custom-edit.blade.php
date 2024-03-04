@@ -854,6 +854,7 @@
         $("#edgePortReverseRow").hide();
         $("#edgePortSearchRow").hide();
         $("#edgeRecenterRow").hide();
+        $("#edgelabel").hide();
 
         $("#edgestyle").val(newedgeconf.smooth.type);
         $("#edgetextface").val(newedgeconf.font.face);
@@ -923,10 +924,12 @@
         $("#edgetextcolour").val(edgedata.edge1.font.color);
         $("#edgetextshow").bootstrapSwitch('state', (edgedata.edge1.label != null && edgedata.edge1.label.includes('xx%')));
         $("#edgebpsshow").bootstrapSwitch('state', (edgedata.edge1.label != null && edgedata.edge1.label.includes('bps')));
+        $("#edgelabel").val('label' in edgedata.mid ? edgedata.mid.label : '');
 
         $("#edgeRecenterRow").show();
         $("#divEdgeFrom").show();
         $("#divEdgeTo").show();
+        $("#edgelabel").show();
         $("#edge-saveButton").show();
         $("#edge-saveDefaultsButton").hide();
         $("#edge-saveButton").on("click", {data: edgedata}, callback);
