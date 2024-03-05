@@ -17,6 +17,7 @@ modules:
                         - fwLSConnName
                         - mglsGWIP
                         - vsxStatusVsName
+                    snmp_flags: ['-OQUs', '-Cc']
         state:
             data:
                 -
@@ -85,6 +86,7 @@ modules:
                 -
                     oid: tunnelState
                     num_oid: '.1.3.6.1.4.1.2620.500.9002.1.3.{{ $index }}'
+                    snmp_flags: ['-OQUs', '-Cc']
                     index: 'tunnelStateIndex.{{ $index }}'
                     descr: "{{ $tunnelPeerObjName }} ({{ $tunnelPeerIpAddr }})"
                     group: IPSEC VPN
