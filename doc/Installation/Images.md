@@ -59,7 +59,7 @@ If you are using the VirtualBox image then to access your newly imported VM,
 these ports are forwarded from your machine to the VM: 8080 for WebUI and 2023 for SSH.
 Remember to edit/remove them if you change (and you should) the VM network configuration.
 
-- WebUI (http://localhost:8080)
+- WebUI (http://localhost)
   - username: librenms
   - password: `D32fwefwef`
 

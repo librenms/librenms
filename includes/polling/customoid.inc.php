@@ -15,6 +15,7 @@ foreach (dbFetchRows('SELECT * FROM `customoids` WHERE `customoid_passed` = 1 AN
     $user_funcs = [
         'celsius_to_fahrenheit',
         'fahrenheit_to_celsius',
+        'kelvin_to_celsius',
         'uw_to_dbm',
     ];
 
