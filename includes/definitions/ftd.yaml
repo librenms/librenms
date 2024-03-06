@@ -28,6 +28,7 @@ discovery:
             - .1.3.6.1.4.1.9.1.2294 # { ciscoProducts 2294 } -- Cisco FirePOWER 4120 Security Appliance, 1U with embedded security
             - .1.3.6.1.4.1.9.1.2778 # { ciscoProducts 2778 } -- Cisco FirePOWER 4125 Security Appliance, 1U with embedded security
             - .1.3.6.1.4.1.9.1.2870 # { ciscoProducts 2870 } -- Cisco FirePOWER 1150 Security Appliance, 1U with embedded security
+            - .1.3.6.1.4.1.9.1.3057 # { ciscoProducts 3057 } -- Cisco Secure Firewall 3105 Security Appliance
 
 discovery_modules:
     entity-physical: false
