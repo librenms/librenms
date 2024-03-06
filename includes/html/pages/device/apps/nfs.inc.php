@@ -40,7 +40,6 @@ $link_array_extra = [
     'app_page' => $vars['app_page'],
 ];
 
-
 $is_server = $app->data['is_server'] ?? false;
 $is_client = $app->data['is_client'] ?? false;
 
