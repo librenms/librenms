@@ -5,17 +5,20 @@ use App\Models\Ipv6Address;
 use App\Models\Port;
 use App\Models\Storage;
 
-$link_array = [
-    'page' => 'device',
-    'device' => $device['device_id'],
-    'tab' => 'apps',
-    'app' => 'nfs',
-];
-
-$is_server = $app->data['is_server'] ?? false;
-$is_client = $app->data['is_client'] ?? false;
-$flat_mount_options = true;
-$show_mount_options = true;
+if (!isset($vars['flat_mount_options'])) {
+    $vars['flat_mount_options']=1;
+} elseif (isset($vars['flat_mount_options']) &&
+          $vars['flat_mount_options'] != '0' &&
+          $vars['flat_mount_options'] != '1') {
+    $vars['flat_mount_options']=1;
+}
+if (!isset($vars['show_mount_options'])) {
+    $vars['show_mount_options']=1;
+} elseif (isset($vars['show_mount_options']) &&
+          $vars['show_mount_options'] != '0' &&
+          $vars['show_mount_options'] != '1') {
+    $vars['show_mount_options']=1;
+}
 
 // make sure $vars['app_page'] is something that is understood
 if (isset($vars['app_page']) && $vars['app_page'] != 'general'
@@ -24,6 +27,22 @@ if (isset($vars['app_page']) && $vars['app_page'] != 'general'
 } elseif (!isset($vars['app_page'])) {
     $vars['app_page'] = 'general';
 }
+
+$link_array = [
+    'page' => 'device',
+    'device' => $device['device_id'],
+    'tab' => 'apps',
+    'app' => 'nfs',
+];
+$link_array_extra = [
+    'flat_mount_options' => $vars['flat_mount_options'],
+    'show_mount_options' => $vars['show_mount_options'],
+    'app_page' => $vars['app_page'],
+];
+
+
+$is_server = $app->data['is_server'] ?? false;
+$is_client = $app->data['is_client'] ?? false;
 
 // The following is only relevant if it is a client or server.
 // Both can be false if it has been freshly started, which will also mean
@@ -44,6 +63,25 @@ if ($is_server || $is_client) {
             ? '<span class="pagemenu-selected">Mounted By</span>'
             : 'Mounted By';
         echo ', ' . generate_link($label, $link_array, ['app_page' => 'mounted_by']) . "\n";
+    }
+
+    if ($vars['app_page'] == 'mounts') {
+        echo '<br>Display Options :: ';
+        $label = $vars['flat_mount_options'] == '1'
+            ? '<span class="pagemenu-selected">Flat</span>'
+            : 'Flat';
+        $new_link_array_extra = $link_array_extra;
+        $new_link_array_extra['flat_mount_options'] = $vars['flat_mount_options'] == '1'
+            ? '0' : '1';
+        echo generate_link($label, $link_array, $new_link_array_extra) . ', ';
+
+        $label = $vars['show_mount_options'] == '1'
+            ? '<span class="pagemenu-selected">Show Mount Options</span>'
+            : 'Show Mount Options';
+        $new_link_array_extra = $link_array_extra;
+        $new_link_array_extra['show_mount_options'] = $vars['show_mount_options'] == '1'
+            ? '0' : '1';
+        echo generate_link($label, $link_array, $new_link_array_extra);
     }
     print_optionbar_end();
 }
@@ -182,7 +220,7 @@ if ($vars['app_page'] == 'general') {
         ],
         'rows' => [],
     ];
-    if ($show_mount_options) {
+    if ($vars['show_mount_options']) {
         $table_info['headers'][]='Mount Options';
     }
     $mounts = $app->data['mounts'] ?? [];
@@ -273,8 +311,8 @@ if ($vars['app_page'] == 'general') {
         if (isset($data['lpath'])) {
             $new_lpath['data']=$data['lpath'];
         }
-        if ($show_mount_options) {
-            if ($flat_mount_options) {
+        if ($vars['show_mount_options']) {
+            if ($vars['flat_mount_options']) {
                 $new_mntopts['raw'] = false;
                 if (isset($data['flags'])) {
                     $new_mntopts['data'] = join(',', $data['flags']);
@@ -283,7 +321,6 @@ if ($vars['app_page'] == 'general') {
                     $mnt_opts=array_keys($data['opts']);
                     sort($mnt_opts);
                     if (isset($data['flags'][0]) && isset($mnt_opts[0])) {
-#                        $new_mntopts['data'] = $new_mntopts['data'] . ', ';
                         foreach ($mnt_opts as $mnt_opt) {
                             $new_mntopts['data'] = $new_mntopts['data'] . ', ' . $mnt_opt . '=' . $data['opts'][$mnt_opt];
                         }
@@ -322,7 +359,7 @@ if ($vars['app_page'] == 'general') {
             $new_rpath,
             $new_lpath,
         ];
-        if ($show_mount_options) {
+        if ($vars['show_mount_options']) {
             $new_row[] = $new_mntopts;
         }
         $table_info['rows'][] = $new_row;
