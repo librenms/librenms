@@ -1377,7 +1377,7 @@
                 {
                     "ipv6_address": "fd00:2:100:0:220:6bff:fe4a:f325",
                     "ipv6_prefixlen": 64,
-                    "ipv6_origin": "1",
+                    "ipv6_origin": "stateless",
                     "context_name": ""
                 }
             ],

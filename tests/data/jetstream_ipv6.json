@@ -6665,19 +6665,19 @@
                 {
                     "ipv6_address": "fd00:0002:0001:0000:0000:0000:0000:0026",
                     "ipv6_prefixlen": 64,
-                    "ipv6_origin": "2",
+                    "ipv6_origin": "stateful",
                     "context_name": ""
                 },
                 {
                     "ipv6_address": "fd00:0002:0254:0000:0000:0000:0000:0026",
                     "ipv6_prefixlen": 64,
-                    "ipv6_origin": "2",
+                    "ipv6_origin": "stateful",
                     "context_name": ""
                 },
                 {
                     "ipv6_address": "fd00:0002:0254:0000:9ada:c4ff:fe73:3a5e",
                     "ipv6_prefixlen": 64,
-                    "ipv6_origin": "2",
+                    "ipv6_origin": "stateless",
                     "context_name": ""
                 }
             ],

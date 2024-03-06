@@ -155,12 +155,13 @@ class Ipv6Addresses implements Module
             $oids = SnmpQuery::hideMib()->walk('IPV6-MIB::ipv6AddrPfxLength')->table(2);
             $oids = SnmpQuery::hideMib()->walk('IPV6-MIB::ipv6AddrType')->table(2, $oids);
             if (! empty($oids)) {
-                foreach ($oids as $ifIndex => $data) {
-                    $ipv6_address = key($data);
-                    $ipv6_prefixlen = intval($data[$ipv6_address]['ipv6AddrPfxLength']);
-                    $ipv6_origin = $data[$ipv6_address]['ipv6AddrType'] ?? null;
-                    if (! empty($ipv6_address) && ! empty($ipv6_prefixlen) && ! empty($ipv6_origin)) {
-                        $valid[self::processIpv6($device, $ifIndex, $ipv6_address, $ipv6_prefixlen, $ipv6_origin)] = true;
+                foreach ($oids as $ifIndex => $entryData) {
+                    foreach ($entryData as $ipv6_address => $addrData) {
+                        $ipv6_prefixlen = intval($addrData['ipv6AddrPfxLength']);
+                        $ipv6_origin = self::translateAddrType_ipv6mib(intval($addrData['ipv6AddrType']));
+                        if (! empty($ipv6_address) && ! empty($ipv6_prefixlen) && ! empty($ipv6_origin)) {
+                            $valid[self::processIpv6($device, $ifIndex, $ipv6_address, $ipv6_prefixlen, $ipv6_origin)] = true;
+                        }
                     }
                 }
             }
@@ -174,7 +175,7 @@ class Ipv6Addresses implements Module
         $valid = [];
 
         Log::debug('IPv6 -> discovering Eltex ...');
-        $oids = SnmpQuery::hideMib()->walk('IP-MIB::ipAddressPrefixTable')->table(3);
+        $oids = SnmpQuery::hideMib()->walk('IP-MIB::ipAddressPrefixTable')->table(4);
 
         if (! empty($oids)) {
             foreach ($oids as $ifIndex => $indexData) {
@@ -184,10 +185,9 @@ class Ipv6Addresses implements Module
                             $ip = key($addrData);
                             $ipv6_address = IPv6::fromHexString($ip)->uncompressed();
                             $addrData = array_shift($addrData);
-                            $prefixArr = $addrData['ipAddressPrefixOrigin'];
-                            $ipv6_prefixlen = intval(key($prefixArr));
-                            $ipv6_origin = $prefixArr[$ipv6_prefixlen] ?? null;
-
+                            $ipv6_prefixlen = key($addrData);
+                            $addrData = array_shift($addrData);
+                            $ipv6_origin = self::translateAddrType_ipmib(intval($addrData['ipAddressPrefixOrigin']));
                             if (! empty($ipv6_prefixlen) && ! empty($ipv6_origin)) {
                                 $valid[self::processIpv6($device, $ifIndex, $ipv6_address, $ipv6_prefixlen, $ipv6_origin)] = true;
                             }
@@ -216,7 +216,7 @@ class Ipv6Addresses implements Module
                     $ifIndex = $addrData['ipAddressIfIndex'];
                     $ipv6_address = IPv6::fromHexString($ip)->uncompressed();
                     $ipv6_prefixlen = intval($addrData['rlIpAddressPrefixLength']);
-                    $ipv6_origin = $addrData['rlIpAddressType'] ?? null;
+                    $ipv6_origin = $addrData['rlIpAddressType'] ?? '';
 
                     if (! empty($ipv6_prefixlen) && ! empty($ipv6_origin)) {
                         $valid[self::processIpv6($device, $ifIndex, $ipv6_address, $ipv6_prefixlen, $ipv6_origin)] = true;
@@ -241,10 +241,10 @@ class Ipv6Addresses implements Module
         if (! empty($oids)) {
             foreach ($oids['ipv6'] as $ip => $addrData) {
                 try {
-                    $ifIndex = $addrData['ipAddressIfIndex'];
+                    $ifIndex = $addrData['ipAddressIfIndex'] ?? 0;
                     $ipv6_address = IPv6::fromHexString($ip)->uncompressed();
                     $ipv6_prefixlen = intval($addrData['rlIpAddressPrefixLength']);
-                    $ipv6_origin = $addrData['rlIpAddressType'] ?? null;
+                    $ipv6_origin = $addrData['rlIpAddressType'] ?? '';
 
                     if (! empty($ipv6_prefixlen) && ! empty($ipv6_origin)) {
                         $valid[self::processIpv6($device, $ifIndex, $ipv6_address, $ipv6_prefixlen, $ipv6_origin)] = true;
@@ -272,10 +272,10 @@ class Ipv6Addresses implements Module
                     try {
                         $perIpData = array_shift($perIpData); // drop [decimal dotted ipv6 address]
                         $ip = $perIpData['ipv6ParaConfigAddress'];
-                        $ifIndex = $perIpData['ipv6ParaConfigIfIndex'] ?? null;
-                        $ipv6_address = IPv6::fromHexString($ip)->uncompressed() ?? null;
+                        $ifIndex = $perIpData['ipv6ParaConfigIfIndex'] ?? 0;
+                        $ipv6_address = IPv6::fromHexString($ip)->uncompressed();
                         $ipv6_prefixlen = intval($perIpData['ipv6ParaConfigPrefixLength']);
-                        $ipv6_origin = $perIpData['ipv6ParaConfigAddrType'] ?? null;
+                        $ipv6_origin = self::translateAddrType_jetstream(intval($perIpData['ipv6ParaConfigSourceType']));
 
                         if (! empty($ipv6_prefixlen) && ! empty($ipv6_origin)) {
                             $valid[self::processIpv6($device, $ifIndex, $ipv6_address, $ipv6_prefixlen, $ipv6_origin)] = true;
@@ -370,11 +370,49 @@ class Ipv6Addresses implements Module
                 Eventlog::log('IPv6 address: ' . $row['ipv6_address'] . '/' . $row['ipv6_prefixlen'] . ' deleted', $device['device_id'], 'ipv6', Severity::Warning);
                 echo 'A-';
                 if (! Ipv6Address::where('ipv6_network_id', $row['ipv6_network_id'])->count()) {
+                    $ipv6_network = Ipv6Network::where('ipv6_network_id', $row['ipv6_network_id'])->value('ipv6_network');
                     Ipv6Network::where('ipv6_network_id', $row['ipv6_network_id'])->delete();
-                    Eventlog::log('IPv6 network: ' . $row['ipv6_network'] . '/' . $row['ipv6_prefixlen'] . ' deleted', $device['device_id'], 'ipv6', Severity::Warning);
+                    Eventlog::log('IPv6 network: ' . $ipv6_network . ' deleted', $device['device_id'], 'ipv6', Severity::Warning);
                     echo 'N-';
                 }
             }
         }
+    }
+
+    private function translateAddrType_ipv6mib(int $type): string
+    {
+        $addrTypes = [
+            1 => 'stateless',
+            2 => 'stateful',
+        ];
+
+        return $addrTypes[$type] ?? 'unknown';
+    }
+
+    private function translateAddrType_ipmib(int $type): string
+    {
+        $addrTypes = [
+            1 => 'other',
+            2 => 'stateful',
+            3 => 'wellknown',
+            4 => 'dhcp',
+            5 => 'stateless',
+        ];
+
+        return $addrTypes[$type] ?? 'unknown';
+    }
+
+    private function translateAddrType_jetstream(int $type): string
+    {
+        $addrTypes = [
+            1 => 'stateful',
+            2 => 'stateless',
+            3 => 'assignedLinklocalIp',
+            4 => 'autoIp',
+            5 => 'dhcpv6',
+            6 => 'negotiate',
+        ];
+
+        return $addrTypes[$type] ?? 'unknown';
     }
 }

@@ -2840,13 +2840,13 @@
                 {
                     "ipv6_address": "fc44:5:24:0:0:0:0:98",
                     "ipv6_prefixlen": 120,
-                    "ipv6_origin": "2",
+                    "ipv6_origin": "stateful",
                     "context_name": ""
                 },
                 {
                     "ipv6_address": "fd00:1:254:0:0:0:0:98",
                     "ipv6_prefixlen": 64,
-                    "ipv6_origin": "2",
+                    "ipv6_origin": "stateful",
                     "context_name": ""
                 }
             ],
