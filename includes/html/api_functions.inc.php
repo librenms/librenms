@@ -1107,6 +1107,62 @@ function get_port_info(Illuminate\Http\Request $request)
     });
 }
 
+function update_port_description(Illuminate\Http\Request $request)
+{
+    $port_id = $request->route('portid');
+    $port = Port::hasAccess(Auth::user())
+        ->where([
+            'port_id' => $port_id,
+        ])->first();
+    if (empty($port)) {
+        return api_error(400, 'Invalid port ID.');
+    }
+
+    $data = json_decode($request->getContent(), true);
+    $field = 'description';
+    $description = $data[$field];
+
+    if (empty($description)) {
+        // from update-ifalias.inc.php:
+        // "Set to repoll so we avoid using ifDescr on port poll"
+        $description = 'repoll';
+    }
+
+    $port->ifAlias = $description;
+    $port->save();
+
+    $ifName = $port->ifName;
+    $device = $port->device_id;
+
+    if ($description == 'repoll') {
+        // No description provided, clear description
+        del_dev_attrib($port, 'ifName:' . $ifName); // "port" object has required device_id
+        log_event("$ifName Port ifAlias cleared via API", $device, 'interface', 3, $port_id);
+
+        return api_success_noresult(200, 'Port description cleared.');
+    } else {
+        // Prevent poller from overwriting new description
+        set_dev_attrib($port, 'ifName:' . $ifName, 1); // see above
+        log_event("$ifName Port ifAlias set via API: $description", $device, 'interface', 3, $port_id);
+
+        return api_success_noresult(200, 'Port description updated.');
+    }
+}
+
+function get_port_description(Illuminate\Http\Request $request)
+{
+    $port_id = $request->route('portid');
+    $port = Port::hasAccess(Auth::user())
+        ->where([
+            'port_id' => $port_id,
+        ])->first();
+    if (empty($port)) {
+        return api_error(400, 'Invalid port ID.');
+    } else {
+        return api_success($port->ifAlias, 'port_description');
+    }
+}
+
 /**
  * @throws \LibreNMS\Exceptions\ApiException
  */
@@ -2175,6 +2231,162 @@ function add_device_group(Illuminate\Http\Request $request)
     }
 
     return api_success($deviceGroup->id, 'id', 'Device group ' . $deviceGroup->name . ' created', 201);
+}
+
+function update_device_group(Illuminate\Http\Request $request)
+{
+    $data = json_decode($request->getContent(), true);
+    if (json_last_error() || ! is_array($data)) {
+        return api_error(400, "We couldn't parse the provided json. " . json_last_error_msg());
+    }
+
+    $name = $request->route('name');
+    if (! $name) {
+        return api_error(400, 'No device group name provided');
+    }
+
+    $deviceGroup = ctype_digit($name) ? DeviceGroup::find($name) : DeviceGroup::where('name', $name)->first();
+
+    if (! $deviceGroup) {
+        return api_error(404, "Device group $name not found");
+    }
+
+    $rules = [
+        'name' => 'sometimes|string|unique:device_groups',
+        'desc' => 'sometimes|string',
+        'type' => 'sometimes|in:dynamic,static',
+        'devices' => 'array|required_if:type,static',
+        'devices.*' => 'integer',
+        'rules' => 'json|required_if:type,dynamic',
+    ];
+
+    $v = Validator::make($data, $rules);
+    if ($v->fails()) {
+        return api_error(422, $v->messages());
+    }
+
+    if (! empty($data['rules'])) {
+        // Only use the rules if they are able to be parsed by the QueryBuilder
+        $query = QueryBuilderParser::fromJson($data['rules'])->toSql();
+        if (empty($query)) {
+            return api_error(500, "We couldn't parse your rule");
+        }
+    }
+
+    $validatedData = $v->safe()->only(['name', 'desc', 'type']);
+    $deviceGroup->fill($validatedData);
+
+    if ($deviceGroup->type == 'static' && array_key_exists('devices', $data)) {
+        $deviceGroup->devices()->sync($data['devices']);
+    }
+
+    if ($deviceGroup->type == 'dynamic' && ! empty($data['rules'])) {
+        $deviceGroup->rules = json_decode($data['rules']);
+    }
+
+    try {
+        $deviceGroup->save();
+    } catch (\Illuminate\Database\QueryException $e) {
+        return api_error(500, 'Failed to save changes device group');
+    }
+
+    return api_success_noresult(200, "Device group $name updated");
+}
+
+function delete_device_group(Illuminate\Http\Request $request)
+{
+    $name = $request->route('name');
+    if (! $name) {
+        return api_error(400, 'No device group name provided');
+    }
+
+    $deviceGroup = ctype_digit($name) ? DeviceGroup::find($name) : DeviceGroup::where('name', $name)->first();
+
+    if (! $deviceGroup) {
+        return api_error(404, "Device group $name not found");
+    }
+
+    $deleted = $deviceGroup->delete();
+
+    if (! $deleted) {
+        return api_error(500, "Device group $name could not be removed");
+    }
+
+    return api_success_noresult(200, "Device group $name deleted");
+}
+
+function update_device_group_add_devices(Illuminate\Http\Request $request)
+{
+    $data = json_decode($request->getContent(), true);
+    if (json_last_error() || ! is_array($data)) {
+        return api_error(400, "We couldn't parse the provided json. " . json_last_error_msg());
+    }
+
+    $name = $request->route('name');
+    if (! $name) {
+        return api_error(400, 'No device group name provided');
+    }
+
+    $deviceGroup = ctype_digit($name) ? DeviceGroup::find($name) : DeviceGroup::where('name', $name)->first();
+
+    if (! $deviceGroup) {
+        return api_error(404, "Device group $name not found");
+    }
+
+    if ('static' != $deviceGroup->type) {
+        return api_error(422, 'Only static device group can have devices added');
+    }
+
+    $rules = [
+        'devices' => 'array',
+        'devices.*' => 'integer',
+    ];
+
+    $v = Validator::make($data, $rules);
+    if ($v->fails()) {
+        return api_error(422, $v->messages());
+    }
+
+    $deviceGroup->devices()->syncWithoutDetaching($data['devices']);
+
+    return api_success_noresult(200, 'Devices added');
+}
+
+function update_device_group_remove_devices(Illuminate\Http\Request $request)
+{
+    $data = json_decode($request->getContent(), true);
+    if (json_last_error() || ! is_array($data)) {
+        return api_error(400, "We couldn't parse the provided json. " . json_last_error_msg());
+    }
+
+    $name = $request->route('name');
+    if (! $name) {
+        return api_error(400, 'No device group name provided');
+    }
+
+    $deviceGroup = ctype_digit($name) ? DeviceGroup::find($name) : DeviceGroup::where('name', $name)->first();
+
+    if (! $deviceGroup) {
+        return api_error(404, "Device group $name not found");
+    }
+
+    if ('static' != $deviceGroup->type) {
+        return api_error(422, 'Only static device group can have devices added');
+    }
+
+    $rules = [
+        'devices' => 'array',
+        'devices.*' => 'integer',
+    ];
+
+    $v = Validator::make($data, $rules);
+    if ($v->fails()) {
+        return api_error(422, $v->messages());
+    }
+
+    $deviceGroup->devices()->detach($data['devices']);
+
+    return api_success_noresult(200, 'Devices removed');
 }
 
 function get_device_groups(Illuminate\Http\Request $request)

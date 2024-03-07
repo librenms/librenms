@@ -736,6 +736,23 @@ function celsius_to_fahrenheit($value, $scale = 'celsius')
 }
 
 /**
+ * Converts kelvin to fahrenheit (with 2 decimal places)
+ * if $scale is not celsius, it assumes celsius and  returns the value
+ *
+ * @param  float  $value
+ * @param  string  $scale  fahrenheit or celsius
+ * @return string (containing a float)
+ */
+function kelvin_to_celsius($value, $scale = 'celsius')
+{
+    if ($scale === 'celsius') {
+        $value = $value - 273.15;
+    }
+
+    return sprintf('%.02f', $value);
+}
+
+/**
  * Converts string to float
  */
 function string_to_float($value)

@@ -1,0 +1,88 @@
+--
+-- The Ericsson top-level Textual Conventions MIB
+--
+-- Copyright (c) 2017 by Ericsson AB.
+-- All rights reserved.
+--
+-- Author:
+-- Enda Murphy
+--
+
+ERICSSON-TC-MIB DEFINITIONS ::= BEGIN
+ 
+-- Add further imports as needed
+IMPORTS
+        MODULE-IDENTITY
+                FROM SNMPv2-SMI
+        TEXTUAL-CONVENTION
+                FROM SNMPv2-TC
+        ericssonModules
+                FROM ERICSSON-TOP-MIB;
+ 
+
+ericssonTCMIB MODULE-IDENTITY
+        LAST-UPDATED "201704130000Z"
+        ORGANIZATION "Ericsson AB"
+        CONTACT-INFO
+                "Email: Enda.Murphy@ericsson.com "
+        DESCRIPTION
+                "This MIB document includes textual conventions
+                that can be used by all of the Ericsson group.
+                The intention is to have shared definitions such
+                that integration and SNMP development are made
+                easier.
+				Document number: 2/196 03-CXC 172 7549."
+        REVISION "201704130000Z"
+        DESCRIPTION
+                "Updated as part of ERICSSON ALARM MIB 2.1 package."
+		REVISION      "201606240000Z"
+        DESCRIPTION
+                "Updated version of this MIB module. Included XPath
+				instance identifier."
+		REVISION      "200810170000Z"
+        DESCRIPTION
+                "Initial version of this MIB module."
+
+	::= { ericssonModules 1 }
+
+--=======================
+--==Textual conventions==
+--=======================
+
+EriMO ::= TEXTUAL-CONVENTION
+        DISPLAY-HINT "1a"
+        STATUS current
+        DESCRIPTION
+                "The 3GPP naming convention shall be used as the
+                format for the managed object parameter.  Note
+                that the granularity MUST be sufficient to
+                guarantee unique alarm states and relevant
+                resource identification to the operator.
+				NOTE: The DN should be *relative* to the Managed
+				Element's *own* root."
+        REFERENCE
+                "3GPP TS 32.106-8 V3.2, Name convention for
+                Managed Objects"
+        SYNTAX OCTET STRING(SIZE(4..150))
+
+EriPath ::= TEXTUAL-CONVENTION
+        DISPLAY-HINT "1a"
+        STATUS current
+        DESCRIPTION
+				"An Abridged YANG Instance-Identifier that references a
+				resource within the Managed Element. Prefixes used MUST
+				be the ones defined in the YANG module statement's prefix
+				substatement. A prefix SHALL be omitted if it is the same
+				as the previous prefix on the ancestor axis.
+				For example:
+				/ex:system/server[ip='192.0.2.1'][port='80']
+				See: YANG module ericsson-yang-types.
+				See also: RFC 7950 Section 9.13.
+				NOTE: The granularity must be good enough to guarantee
+				unique alarm states and relevant resource identification
+				to the operator."
+        REFERENCE
+                "YANG module ericsson-yang-types;
+				RFC 7950 , The YANG 1.1 Data Modeling Language"
+        SYNTAX OCTET STRING(SIZE(4..150))
+END

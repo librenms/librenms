@@ -411,8 +411,8 @@ Rule: @if ($alert->name) {{ $alert->name }} @else {{ $alert->rule }} @endif <br>
 @endforeach
 @if ($alert->faults) <b>Faults:</b><br>
 @foreach ($alert->faults as $key => $value)
-@signedGraphTag(['device_id' => $value['device_id'], 'type' => 'device_processor', 'width' => 459, 'height' => 213, 'from' => time() - 259200])<br>
-https://server/graphs/id={{ $value['device_id'] }}/type=device_processor/<br>
+@signedGraphTag(['device' => $value['device_id'], 'type' => 'device_processor', 'width' => 459, 'height' => 213, 'from' => time() - 259200])<br>
+https://server/graphs/device={{ $value['device_id'] }}/type=device_processor/<br>
 @endforeach
 Template: CPU alert <br>
 @endif

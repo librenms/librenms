@@ -122,10 +122,11 @@ class EnvHelper
 
                 $key = null;
                 if (php_sapi_name() == 'cli') {
-                    $key = trim(exec(PHP_BINARY . ' ' . base_path('artisan') . ' key:generate --show'));
+                    $key = trim(exec(PHP_BINARY . ' ' . base_path('artisan') . ' key:generate --show --no-ansi'));
                 } else {
                     if (Artisan::call('key:generate', [
                         '--show' => 'true',
+                        '--no-ansi' => 'true',
                     ]) == 0) {
                         $key = trim(Artisan::output());
                     }

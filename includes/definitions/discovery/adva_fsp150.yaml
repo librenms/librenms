@@ -26,7 +26,7 @@ modules:
                         - { value: 35,  generic: 2, graph: 0, descr: 'PSU B Failed' }
                         - { value: 53,  generic: 2, graph: 0, descr: 'SFP Mismatch' }
                         - { value: 59,  generic: 2, graph: 0, descr: 'Over Temperature' }
-                        - { value: 60,  generic: 2, graph: 0, descr: 'Under Tempurature' }
+                        - { value: 60,  generic: 2, graph: 0, descr: 'Under Temperature' }
                         - { value: 65,  generic: 2, graph: 0, descr: 'Input Power Fault' }
                         - { value: 86,  generic: 3, graph: 0, descr: 'SNMP Dying Gasp - Host Unreachable' }
                         - { value: 90,  generic: 3, graph: 0, descr: 'SFP Non Qualified' }

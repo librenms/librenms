@@ -7,7 +7,7 @@ mib_dir: ericsson
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }
-    - { graph: device_mempool, text: 'Memory Usage' }
+    - { graph: device_storage, text: 'Device Storage' }
 discovery:
     -
         sysObjectID:
@@ -17,6 +17,9 @@ discovery:
             - .1.3.6.1.4.1.193.218.1.43 # { ericssonProducts 6x71 } -- Ericsson 6371 and 6471
             - .1.3.6.1.4.1.193.218.1.44 # { ericssonProducts 6273 } -- Ericsson 6273
             - .1.3.6.1.4.1.193.218.1.45 # { ericssonProducts 6671 } -- Ericsson 6671
+            - .1.3.6.1.4.1.193.218.1.17 # SSR 8020
+            - .1.3.6.1.4.1.193.218.1.18 # SSR 8010
+            - .1.3.6.1.4.1.193.218.1.19 # SSR 8004
         sysDescr_regex:
             - '/^Ericsson\s+IPOS/'
 discovery_modules:

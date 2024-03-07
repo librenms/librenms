@@ -1,0 +1,268 @@
+--**MOD+************************************************************************
+--* Module:    ARUBAWIRED-POWERSUPPLY-MIB :POWERSUPPLY MIB file
+--*
+--* (c) Copyright 2020,2023 Hewlett Packard Enterprise Development LP
+--* All Rights Reserved.
+--*
+--* The contents of this software are proprietary and confidential
+--* to the Hewlett-Packard Development Company, L.P.  No part of this
+--* program may be photocopied, reproduced, or translated into another
+--* programming language without prior written consent of the
+--* Hewlett-Packard Development Company, L.P.
+--*
+--* Purpose: This file contains MIB definition of ARUBAWIRED-POWERSUPPLY-MIB
+--*
+--**MOD-************************************************************************
+
+ARUBAWIRED-POWERSUPPLY-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+    DisplayString
+        FROM SNMPv2-TC
+    arubaWiredChassisMIB
+        FROM ARUBAWIRED-CHASSIS-MIB;
+
+arubaWiredPowerSupply MODULE-IDENTITY
+    LAST-UPDATED "202303280000Z" -- March 28, 2023
+    ORGANIZATION "HPE/Aruba Networking Division"
+    CONTACT-INFO "Hewlett Packard Company
+                  8000 Foothills Blvd.
+                  Roseville, CA 95747"
+    DESCRIPTION
+        "This MIB module describes management objects that manage Power
+         Supply Units."
+
+    REVISION     "202303280000Z" -- March 28, 2023
+    DESCRIPTION  "Added arubaWiredPSUStateEnum."
+
+    REVISION     "202001070000Z" -- January 7, 2020
+    DESCRIPTION  "Initial revision."
+
+    ::= { arubaWiredChassisMIB 2 }
+
+-- **********************************************************************
+-- Power supply notifications
+-- **********************************************************************
+
+arubaWiredPSUNotifications OBJECT IDENTIFIER ::= { arubaWiredPowerSupply 0 }
+
+arubaWiredPSUStateNotification NOTIFICATION-TYPE
+      OBJECTS {
+                arubaWiredPSUGroupIndex,
+                arubaWiredPSUSlotIndex,
+                arubaWiredPSUState
+              }
+      STATUS current
+      DESCRIPTION
+               "A notification generated when a PSU state change occurs.  This
+                can happen if a PSU is powerd on, powerd off, inserted, removed,
+                or experiences a fault."
+      ::= { arubaWiredPSUNotifications 1 }
+
+-- **********************************************************************
+-- Power Supply Objects
+-- **********************************************************************
+
+arubaWiredPowerSupplyTable OBJECT-TYPE
+      SYNTAX      SEQUENCE OF ArubaWiredPowerSupplyEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION "This table contains one row per switch power supply entity."
+      ::= { arubaWiredPowerSupply 1 }
+
+arubaWiredPowerSupplyEntry OBJECT-TYPE
+      SYNTAX      ArubaWiredPowerSupplyEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION "Information about the power supply physical entity table."
+      INDEX       { arubaWiredPSUGroupIndex , arubaWiredPSUSlotIndex }
+      ::= { arubaWiredPowerSupplyTable 1 }
+
+ArubaWiredPowerSupplyEntry ::=
+    SEQUENCE {
+        arubaWiredPSUGroupIndex         Integer32,
+        arubaWiredPSUSlotIndex          Integer32,
+        arubaWiredPSUName               DisplayString,
+        arubaWiredPSUState              DisplayString,
+        arubaWiredPSUProductName        DisplayString,
+        arubaWiredPSUSerialNumber       DisplayString,
+        arubaWiredPSUInstantaneousPower Integer32,
+        arubaWiredPSUMaximumPower       Integer32,
+        arubaWiredPSUNumberFailures     Integer32,
+        arubaWiredPSUAirflowDirection   DisplayString,
+        arubaWiredPSUStateEnum          INTEGER
+    }
+
+arubaWiredPSUGroupIndex OBJECT-TYPE
+      SYNTAX      Integer32 (1..2147483647)
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "This variable uniquely identifies the group containing the
+                   power supply. Group means chassis in the stack and the value
+                   1 MUST be used for non-modular devices."
+
+      ::= { arubaWiredPowerSupplyEntry 1 }
+
+arubaWiredPSUSlotIndex OBJECT-TYPE
+      SYNTAX      Integer32 (1..2147483647)
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "This variable uniquely identifies the power supply in a
+                   chassis and value 1 must be used for non-modular devices."
+
+      ::= { arubaWiredPowerSupplyEntry 2 }
+
+arubaWiredPSUName OBJECT-TYPE
+      SYNTAX      DisplayString (SIZE(0..20))
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "Identification of the power supply for the system."
+      ::= { arubaWiredPowerSupplyEntry 3 }
+
+arubaWiredPSUState OBJECT-TYPE
+      SYNTAX      DisplayString (SIZE(0..20))
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "Current status for the power supply."
+      ::= { arubaWiredPowerSupplyEntry 4 }
+
+arubaWiredPSUProductName OBJECT-TYPE
+      SYNTAX      DisplayString (SIZE(0..20))
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "Power supply product name identification.  This field is used
+                   to determine if the power supply is supported."
+      ::= { arubaWiredPowerSupplyEntry 5 }
+
+arubaWiredPSUSerialNumber OBJECT-TYPE
+      SYNTAX      DisplayString (SIZE(0..20))
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "Power supply serial number to uniquely identify the power
+                   supply."
+      ::= { arubaWiredPowerSupplyEntry 6 }
+
+arubaWiredPSUInstantaneousPower OBJECT-TYPE
+      SYNTAX      Integer32
+      UNITS       "Watts"
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "Total instantaneous power supplied by the power supply in
+                   Watts."
+      DEFVAL      { 0 }
+      ::= { arubaWiredPowerSupplyEntry 7 }
+
+arubaWiredPSUMaximumPower OBJECT-TYPE
+      SYNTAX      Integer32
+      UNITS       "Watts"
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "Total maximum power capacity that can be supplied by the
+                   power supply in Watts."
+      DEFVAL      { 0 }
+      ::= { arubaWiredPowerSupplyEntry 8 }
+
+arubaWiredPSUNumberFailures OBJECT-TYPE
+      SYNTAX      Integer32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "Number of failures the power supply has experienced since the
+                   most recent insertion of the power supply and boot of the
+                   system.  The number of failures for a power supply will be
+                   cleared if the power supply is removed from the system or if
+                   the system is rebooted.  For non removable power supplies,
+                   the number of failures will not clear until the system
+                   reboots.  Failures are any events where power delivery from
+                   the power supply did not occur when expected.  This includes
+                   unsupported power supply types since their power delivery is
+                   not considered valid even though the power supply itself may
+                   not have an internal failure. Some examples of failures are
+                   over current, invalid input power, and unsupported power
+                   supply type."
+      DEFVAL      { 0 }
+      ::= { arubaWiredPowerSupplyEntry 9 }
+
+arubaWiredPSUAirflowDirection OBJECT-TYPE
+      SYNTAX      DisplayString (SIZE(0..20))
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "Power Supply airflow direction."
+      ::= { arubaWiredPowerSupplyEntry 10 }
+
+arubaWiredPSUStateEnum OBJECT-TYPE
+      SYNTAX      INTEGER {
+                          ok          (1),
+                          faultAbsent (2),
+                          faultInput  (3),
+                          faultOutput (4),
+                          faultPOE    (5),
+                          faultNoRecov(6),
+                          alert       (7),
+                          unknown     (8),
+                          unsupported (9),
+                          warning     (10),
+                          init        (11)
+                  }
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "Current status for the power supply as an enumerated value."
+      ::= { arubaWiredPowerSupplyEntry 11 }
+
+-- **********************************************************************
+-- compliance statements
+-- **********************************************************************
+
+arubaWiredPowerSupplyConformance OBJECT IDENTIFIER
+      ::= { arubaWiredPowerSupply 99 }
+
+arubaWiredPowerSupplyCompliances OBJECT IDENTIFIER
+      ::= { arubaWiredPowerSupplyConformance 1 }
+
+arubaWiredPowerSupplyGroups      OBJECT IDENTIFIER
+      ::= { arubaWiredPowerSupplyConformance 2 }
+
+arubaWiredPowerSupplyCompliance MODULE-COMPLIANCE
+      STATUS      current
+      DESCRIPTION "A compliance statement for Aruba switch chassis."
+      MODULE
+      MANDATORY-GROUPS
+      {
+         arubaWiredPowerSupplyTable,
+         arubaWiredPSUNotificationsGroup
+      }
+      GROUP       arubaWiredPowerSupplyTableGroup
+      DESCRIPTION "A Collection of Object(s) that display the current power
+                   supply parameters information."
+
+      ::= { arubaWiredPowerSupplyCompliances 1 }
+
+
+arubaWiredPowerSupplyTableGroup OBJECT-GROUP
+      OBJECTS     {
+                    arubaWiredPSUGroupIndex,
+                    arubaWiredPSUSlotIndex,
+                    arubaWiredPSUName,
+                    arubaWiredPSUState,
+                    arubaWiredPSUProductName,
+                    arubaWiredPSUSerialNumber,
+                    arubaWiredPSUInstantaneousPower,
+                    arubaWiredPSUMaximumPower,
+                    arubaWiredPSUNumberFailures,
+                    arubaWiredPSUAirflowDirection,
+                    arubaWiredPSUStateEnum
+                  }
+      STATUS      current
+      DESCRIPTION "A collection of objects display configuration, status,
+                   and measurements of Power Supply table."
+      ::= { arubaWiredPowerSupplyGroups 1 }
+
+arubaWiredPSUNotificationsGroup NOTIFICATION-GROUP
+     NOTIFICATIONS { arubaWiredPSUStateNotification }
+     STATUS current
+     DESCRIPTION "Notifications sent by power management."
+     ::= { arubaWiredPowerSupplyGroups 2 }
+END

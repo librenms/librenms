@@ -41,7 +41,9 @@ class Pagerduty extends Transport
         };
 
         $safe_message = strip_tags($alert_data['msg']) ?: 'Test';
-        $message = array_filter(explode("\n", $safe_message), 'strlen');
+        $message = array_filter(explode("\n", $safe_message), function ($value): bool {
+            return strlen($value) > 0;
+        });
         $data = [
             'routing_key' => $this->config['service_key'],
             'event_action' => $event_action,

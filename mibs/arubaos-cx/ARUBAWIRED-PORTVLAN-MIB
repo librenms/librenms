@@ -1,0 +1,143 @@
+--**MOD+************************************************************************
+--* Module:    ARUBAWIRED-PORTVLAN-MIB :Port VLAN MIB file
+--*
+--* (c) Copyright 2020-2022 Hewlett Packard Enterprise Development LP
+--* All Rights Reserved.
+--*
+--* The contents of this software are proprietary and confidential
+--* to the Hewlett-Packard Development Company, L.P.  No part of this
+--* program may be photocopied, reproduced, or translated into another
+--* programming language without prior written consent of the
+--* Hewlett-Packard Development Company, L.P.
+--*
+--* Purpose: This file contains MIB definition of ARUBAWIRED-PORTVLAN-MIB
+--*
+--**MOD-************************************************************************
+
+ARUBAWIRED-PORTVLAN-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    InterfaceIndex
+        FROM IF-MIB
+    wndFeatures
+        FROM ARUBAWIRED-NETWORKING-OID;
+
+arubaWiredPortVlanMIB MODULE-IDENTITY
+    LAST-UPDATED "202110140000Z" -- October 14, 2021
+    ORGANIZATION "HPE/Aruba Networking Division"
+    CONTACT-INFO "Hewlett Packard Company 8000 Foothills Blvd. Roseville,
+                  CA 95747"
+
+    DESCRIPTION   "This MIB module describes objects used to manage the
+                   association between physical port and Virtual Local
+                   Area Network (VLAN) feature"
+
+    REVISION     "202110140000Z" -- October 14, 2021
+    DESCRIPTION  "Added OID arubaWiredPortVlanMemberVid"
+
+    REVISION     "202011200000Z" -- November 20, 2020
+    DESCRIPTION  "Initial Revision"
+    ::= { wndFeatures 18 }
+
+VidList ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION  "Each octet within this value specifies a set of eight
+                  VlanIIndex (VID), with the first octet specifying VIDs 1
+                  through 8, the second octet specifying VIDs 9 through 16,
+                  etc.  Within each octet, the most significant bit represents
+                  the lowest numbered VID, and the least significant bit
+                  represents the highest numbered VID.  Thus, each VID
+                  is represented by a single bit within the value of this
+                  object.  If that bit has a value of 1 then that VID is
+                  included in the set of VIDs; the VID is not included if its
+                  bit has a value of 0.  This list represents the entire
+                  range of VlanIndex values defined in the scope of IEEE
+                  802.1Q."
+    SYNTAX OCTET STRING (SIZE (512))
+
+arubaWiredPortVlanNotifications OBJECT IDENTIFIER ::= { arubaWiredPortVlanMIB 0 }
+arubaWiredPortVlanObjects       OBJECT IDENTIFIER ::= { arubaWiredPortVlanMIB 1 }
+arubaWiredPortVlanConfig        OBJECT IDENTIFIER ::= { arubaWiredPortVlanObjects 0 }
+arubaWiredPortVlanStatus        OBJECT IDENTIFIER ::= { arubaWiredPortVlanObjects 1 }
+
+--*************************************************************
+--*    arubaWiredPortVlanMemberTable
+--*************************************************************
+
+arubaWiredPortVlanMemberTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF ArubaWiredPortVlanMemberEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "This table contains information about the L2 port associated with
+                 VLAN"
+    ::= { arubaWiredPortVlanStatus 1 }
+
+arubaWiredPortVlanMemberEntry OBJECT-TYPE
+    SYNTAX      ArubaWiredPortVlanMemberEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "A row in the PortVlan member table"
+    INDEX   { arubaWiredPortVlanMemberIndex }
+    ::= { arubaWiredPortVlanMemberTable 1 }
+
+ArubaWiredPortVlanMemberEntry ::=
+    SEQUENCE {
+             arubaWiredPortVlanMemberIndex    InterfaceIndex,
+             arubaWiredPortVlanMemberMode     INTEGER,
+             arubaWiredPortVlanMemberVid      VidList
+             }
+
+arubaWiredPortVlanMemberIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Port ifindex"
+    ::= { arubaWiredPortVlanMemberEntry 1 }
+
+arubaWiredPortVlanMemberMode OBJECT-TYPE
+    SYNTAX      INTEGER {
+                          trunk  (1),
+                          access (2)
+                        }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Port VLAN membership mode"
+    ::= { arubaWiredPortVlanMemberEntry 2 }
+
+arubaWiredPortVlanMemberVid OBJECT-TYPE
+    SYNTAX      VidList
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "VLAN IDs that the port is a member of."
+    ::= { arubaWiredPortVlanMemberEntry 3 }
+
+arubaWiredPortVlanConformance OBJECT IDENTIFIER ::= { arubaWiredPortVlanMIB 2 }
+arubaWiredPortVlanCompliances OBJECT IDENTIFIER ::= { arubaWiredPortVlanConformance 1 }
+arubaWiredPortVlanGroups      OBJECT IDENTIFIER ::= { arubaWiredPortVlanConformance 2 }
+
+arubaWiredPortVlanMemberTableGroup OBJECT-GROUP
+    OBJECTS   {
+              arubaWiredPortVlanMemberMode,
+              arubaWiredPortVlanMemberVid
+              }
+    STATUS      current
+    DESCRIPTION "A collection of VLAN table objects."
+    ::= { arubaWiredPortVlanGroups 1 }
+
+arubaWiredPortVlanMibCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION "The compliance statement for devices implementing the
+                 ARUBA WIRED PortVlan Mib."
+    MODULE
+    MANDATORY-GROUPS {
+                     arubaWiredPortVlanMemberTableGroup
+                     }
+    ::= { arubaWiredPortVlanCompliances 1 }
+END

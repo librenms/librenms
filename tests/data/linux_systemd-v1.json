@@ -5,9 +5,9 @@
                 {
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.8072.3.2.10",
-                    "sysDescr": "Linux enemess 4.18.0-408.el8.x86_64 #1 SMP Mon Jul 18 17:42:52 UTC 2022 x86_64",
+                    "sysDescr": "Linux server 3.10.0-693.5.2.el7.x86_64 #1 SMP Fri Oct 20 20:32:50 UTC 2017 x86_64",
                     "sysContact": "<private>",
-                    "version": "4.18.0-408.el8.x86_64",
+                    "version": "3.10.0-693.5.2.el7.x86_64",
                     "hardware": "Generic x86 64-bit",
                     "features": null,
                     "location": "<private>",
@@ -57,7 +57,7 @@
                 },
                 {
                     "metric": "active_active",
-                    "value": 148,
+                    "value": 160,
                     "value_prev": null,
                     "app_type": "systemd"
                 },
@@ -93,7 +93,7 @@
                 },
                 {
                     "metric": "active_total",
-                    "value": 148,
+                    "value": 160,
                     "value_prev": null,
                     "app_type": "systemd"
                 },
@@ -111,7 +111,7 @@
                 },
                 {
                     "metric": "load_loaded",
-                    "value": 148,
+                    "value": 160,
                     "value_prev": null,
                     "app_type": "systemd"
                 },
@@ -141,7 +141,7 @@
                 },
                 {
                     "metric": "load_total",
-                    "value": 148,
+                    "value": 160,
                     "value_prev": null,
                     "app_type": "systemd"
                 },
@@ -159,7 +159,7 @@
                 },
                 {
                     "metric": "sub_automount_running",
-                    "value": 0,
+                    "value": 1,
                     "value_prev": null,
                     "app_type": "systemd"
                 },
@@ -171,7 +171,7 @@
                 },
                 {
                     "metric": "sub_automount_waiting",
-                    "value": 1,
+                    "value": 0,
                     "value_prev": null,
                     "app_type": "systemd"
                 },
@@ -183,7 +183,7 @@
                 },
                 {
                     "metric": "sub_device_plugged",
-                    "value": 22,
+                    "value": 24,
                     "value_prev": null,
                     "app_type": "systemd"
                 },
@@ -195,7 +195,7 @@
                 },
                 {
                     "metric": "sub_device_total",
-                    "value": 22,
+                    "value": 24,
                     "value_prev": null,
                     "app_type": "systemd"
                 },
@@ -206,7 +206,19 @@
                     "app_type": "systemd"
                 },
                 {
+                    "metric": "sub_freezer_freezing-by-parent",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
                     "metric": "sub_freezer_frozen",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_freezer_frozen-by-parent",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "systemd"
@@ -249,7 +261,7 @@
                 },
                 {
                     "metric": "sub_mount_mounted",
-                    "value": 12,
+                    "value": 19,
                     "value_prev": null,
                     "app_type": "systemd"
                 },
@@ -285,7 +297,7 @@
                 },
                 {
                     "metric": "sub_mount_total",
-                    "value": 12,
+                    "value": 19,
                     "value_prev": null,
                     "app_type": "systemd"
                 },
@@ -392,6 +404,12 @@
                     "app_type": "systemd"
                 },
                 {
+                    "metric": "sub_service_auto-restart-queued",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
                     "metric": "sub_service_cleaning",
                     "value": 0,
                     "value_prev": null,
@@ -410,13 +428,31 @@
                     "app_type": "systemd"
                 },
                 {
+                    "metric": "sub_service_dead-before-auto-restart",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_service_dead-resources-pinned",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
                     "metric": "sub_service_exited",
-                    "value": 24,
+                    "value": 21,
                     "value_prev": null,
                     "app_type": "systemd"
                 },
                 {
                     "metric": "sub_service_failed",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_service_failed-before-auto-restart",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "systemd"
@@ -446,8 +482,20 @@
                     "app_type": "systemd"
                 },
                 {
+                    "metric": "sub_service_reload-notify",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
+                    "metric": "sub_service_reload-signal",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "systemd"
+                },
+                {
                     "metric": "sub_service_running",
-                    "value": 36,
+                    "value": 35,
                     "value_prev": null,
                     "app_type": "systemd"
                 },
@@ -501,13 +549,13 @@
                 },
                 {
                     "metric": "sub_service_total",
-                    "value": 60,
+                    "value": 56,
                     "value_prev": null,
                     "app_type": "systemd"
                 },
                 {
                     "metric": "sub_slice_active",
-                    "value": 9,
+                    "value": 11,
                     "value_prev": null,
                     "app_type": "systemd"
                 },
@@ -519,7 +567,7 @@
                 },
                 {
                     "metric": "sub_slice_total",
-                    "value": 9,
+                    "value": 11,
                     "value_prev": null,
                     "app_type": "systemd"
                 },
@@ -555,7 +603,7 @@
                 },
                 {
                     "metric": "sub_socket_listening",
-                    "value": 5,
+                    "value": 7,
                     "value_prev": null,
                     "app_type": "systemd"
                 },
@@ -609,7 +657,7 @@
                 },
                 {
                     "metric": "sub_socket_total",
-                    "value": 11,
+                    "value": 13,
                     "value_prev": null,
                     "app_type": "systemd"
                 },
@@ -675,7 +723,7 @@
                 },
                 {
                     "metric": "sub_target_active",
-                    "value": 23,
+                    "value": 25,
                     "value_prev": null,
                     "app_type": "systemd"
                 },
@@ -687,7 +735,7 @@
                 },
                 {
                     "metric": "sub_target_total",
-                    "value": 23,
+                    "value": 25,
                     "value_prev": null,
                     "app_type": "systemd"
                 },
@@ -717,13 +765,13 @@
                 },
                 {
                     "metric": "sub_timer_total",
-                    "value": 4,
+                    "value": 5,
                     "value_prev": null,
                     "app_type": "systemd"
                 },
                 {
                     "metric": "sub_timer_waiting",
-                    "value": 4,
+                    "value": 5,
                     "value_prev": null,
                     "app_type": "systemd"
                 }

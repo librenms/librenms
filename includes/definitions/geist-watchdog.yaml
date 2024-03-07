@@ -14,4 +14,5 @@ discovery:
             - RCM-O
 mib_dir: geist
 over:
-    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_temperature, text: 'Temperature' }
+    - { graph: device_humidity, text: 'Humidity' }

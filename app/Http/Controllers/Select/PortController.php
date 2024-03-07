@@ -38,6 +38,7 @@ class PortController extends SelectController
     {
         return [
             'device' => 'nullable|int',
+            'devices' => 'nullable|array',
         ];
     }
 
@@ -79,6 +80,10 @@ class PortController extends SelectController
             $query->where('ports.device_id', $device_id);
         }
 
+        if ($device_ids = $request->get('devices')) {
+            $query->whereIn('ports.device_id', $device_ids);
+        }
+
         return $query;
     }
 
@@ -91,6 +96,7 @@ class PortController extends SelectController
         return [
             'id' => $port->port_id,
             'text' => $label . ' - ' . $port->device->shortDisplayName() . $description,
+            'device_id' => $port->device_id,
         ];
     }
 }

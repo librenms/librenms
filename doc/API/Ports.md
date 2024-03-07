@@ -379,3 +379,49 @@ Output:
   ]
 }
 ```
+
+### `get_port_description`
+
+Get the description (`ifAlias`) for a given port id.
+
+Route: `/api/v0/ports/:portid/description`
+
+Example:
+
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/ports/323/description
+```
+
+Output:
+
+```json
+{
+    "status": "ok",
+    "port_description": "GigabitEthernet14"
+}
+```
+
+### `update_port_description`
+
+Change the description (`ifAlias`) for a given port id.
+
+Route: `/api/v0/ports/:portid/description`
+
+Input (JSON):
+
+- description: The string data to use as the new port description.
+Sending an empty string will reset the description to default.
+
+Example:
+
+```curl
+curl -X PATCH -d '{"description": "Out-of-Band Management Link"}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/ports/323/description
+```
+
+Output:
+```json
+{
+    "status": "ok",
+    "message": "Port description updated."
+}
+```
