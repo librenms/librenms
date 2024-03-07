@@ -34,6 +34,7 @@ class DevicePoll extends LnmsCommand
         if ($this->option('no-data')) {
             Config::set('rrd.enable', false);
             Config::set('influxdb.enable', false);
+            Config::set('influxdbv2.enable', false);
             Config::set('prometheus.enable', false);
             Config::set('graphite.enable', false);
         }
