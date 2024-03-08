@@ -5,6 +5,8 @@ use App\Models\Ipv6Address;
 use App\Models\Port;
 use App\Models\Storage;
 
+include 'includes/nfs-shared.inc.php';
+
 if (!isset($vars['flat_mount_options'])) {
     $vars['flat_mount_options']=1;
 } elseif (isset($vars['flat_mount_options']) &&
@@ -95,14 +97,95 @@ $path_cache = [];
 if ($vars['app_page'] == 'general') {
     $graphs=[];
     if ($is_server) {
-        $graphs['nfs_server_stats']='Server Stats';
         $graphs['nfs_server_cache']='Server Cache';
-        $graphs['nfs_server_rpc']='Server RPC';
+        // figure out what chunks we should add for the nfs_server_stats graph
+        $graphs['nfs_server_stats1']='Server';
+        if (isset($nfs_graphs['server_stats'][$app->data['os']])) {
+            $nfs_os = $app->data['os'];
+        } else {
+            $nfs_os='';
+        }
+        $nfs_graph_keys=array_keys($nfs_graphs['server_stats'][$nfs_os]);
+        if (isset($nfs_graph_keys[12])) {
+            $graphs['nfs_server_stats2']='Server';
+        }
+        if (isset($nfs_graph_keys[24])) {
+            $graphs['nfs_server_stats3']='Server';
+        }
+        if (isset($nfs_graph_keys[36])) {
+            $graphs['nfs_server_stats4']='Server';
+        }
+        if (isset($nfs_graph_keys[48])) {
+            $graphs['nfs_server_stats5']='Server';
+        }
+        if (isset($nfs_graph_keys[48])) {
+            $graphs['nfs_server_stats5']='Server';
+        }
+        if (isset($nfs_graph_keys[60])) {
+            $graphs['nfs_server_stats6']='Server';
+        }
+        if (isset($nfs_graph_keys[72])) {
+            $graphs['nfs_server_stats7']='Server';
+        }
+        if (isset($nfs_graph_keys[84])) {
+            $graphs['nfs_server_stats8']='Server';
+        }
+        if (isset($nfs_graph_keys[96])) {
+            $graphs['nfs_server_stats9']='Server';
+        }
+        if (isset($nfs_graph_keys[108])) {
+            $graphs['nfs_server_stats10']='Server';
+        }
+        if (isset($nfs_graph_keys[120])) {
+            $graphs['nfs_server_stats11']='Server';
+        }
     }
     if ($is_client) {
-        $graphs['nfs_client_stats']='Client Stats';
-        $graphs['nfs_client_cache']='Server Cache';
-        $graphs['nfs_client_rpc']='Client RPC';
+        if ($app->data['os'] == 'freebsd') {
+            $graphs['nfs_client_cache']='Client Cache';
+        }
+        $graphs['nfs_client_rpc_info']='RPC Info';
+        // figure out what chunks we should add for the nfs_client_stats graph
+        $graphs['nfs_client_stats1']='Client';
+        if (isset($nfs_graphs['client_stats'][$app->data['os']])) {
+            $nfs_os = $app->data['os'];
+        } else {
+            $nfs_os='';
+        }
+        $nfs_graph_keys=array_keys($nfs_graphs['client_stats'][$nfs_os]);
+        if (isset($nfs_graph_keys[12])) {
+            $graphs['nfs_client_stats2']='Client';
+        }
+        if (isset($nfs_graph_keys[24])) {
+            $graphs['nfs_client_stats3']='Client';
+        }
+        if (isset($nfs_graph_keys[36])) {
+            $graphs['nfs_client_stats4']='Client';
+        }
+        if (isset($nfs_graph_keys[48])) {
+            $graphs['nfs_client_stats5']='Client';
+        }
+        if (isset($nfs_graph_keys[48])) {
+            $graphs['nfs_client_stats5']='Client';
+        }
+        if (isset($nfs_graph_keys[60])) {
+            $graphs['nfs_client_stats6']='Client';
+        }
+        if (isset($nfs_graph_keys[72])) {
+            $graphs['nfs_client_stats7']='Client';
+        }
+        if (isset($nfs_graph_keys[84])) {
+            $graphs['nfs_client_stats8']='Client';
+        }
+        if (isset($nfs_graph_keys[96])) {
+            $graphs['nfs_client_stats9']='Client';
+        }
+        if (isset($nfs_graph_keys[108])) {
+            $graphs['nfs_client_stats10']='Client';
+        }
+        if (isset($nfs_graph_keys[120])) {
+            $graphs['nfs_client_stats11']='Client';
+        }
     }
 } elseif ($vars['app_page'] == 'mounted_by') {
     $table_info = [
@@ -373,6 +456,8 @@ foreach ($graphs as $key => $text) {
     $graph_array['to'] = \LibreNMS\Config::get('time.now');
     $graph_array['id'] = $app['app_id'];
     $graph_array['type'] = 'application_' . $key;
+
+    $graph_array['nfs_os'] = $app->data['os'];
 
     echo '<div class="panel panel-default">
     <div class="panel-heading">
