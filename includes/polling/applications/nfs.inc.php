@@ -48,6 +48,7 @@ $app_data = [
     'is_server' => $returned['data']['is_server'],
     'mounts' => $returned['data']['mounts'],
     'mounted_by' => $returned['data']['mounted_by'],
+    'os' => $returned['data']['os'],
 ];
 
 $app->data = $app_data;
