@@ -1973,8 +1973,8 @@ sensors:
     - { Field: sensor_limit_low_warn, Type: double, 'Null': true, Extra: '' }
     - { Field: sensor_alert, Type: tinyint, 'Null': false, Extra: '', Default: '1' }
     - { Field: sensor_custom, Type: "enum('No','Yes')", 'Null': false, Extra: '', Default: 'No' }
-    - { Field: entPhysicalIndex, Type: varchar(16), 'Null': true, Extra: '' }
-    - { Field: entPhysicalIndex_measured, Type: varchar(16), 'Null': true, Extra: '' }
+    - { Field: entPhysicalIndex, Type: varchar(64), 'Null': true, Extra: '', Default: 'NULL' }
+    - { Field: entPhysicalIndex_measured, Type: varchar(64), 'Null': true, Extra: '', Default: 'NULL' }
     - { Field: lastupdate, Type: timestamp, 'Null': false, Extra: 'on update CURRENT_TIMESTAMP', Default: CURRENT_TIMESTAMP }
     - { Field: sensor_prev, Type: double, 'Null': true, Extra: '' }
     - { Field: user_func, Type: varchar(100), 'Null': true, Extra: '' }
