@@ -2,6 +2,7 @@ os: cxc
 text: 'Alpha CXC HP Controller'
 type: power
 icon: alpha
+rfc1628_compat: true
 over:
     - { graph: device_current, text: Current }
     - { graph: device_voltage, text: Voltage }
