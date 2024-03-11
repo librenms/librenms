@@ -61,9 +61,9 @@ class RadiusAuthorizer extends MysqlAuthorizer
         throw new AuthenticationException();
     }
 
-    public function getRoles(string $username): array|false
+    public function getRoles(\App\Models\User $user): array|false
     {
-        return $this->roles[$username] ?? false;
+        return $this->roles[$user->username] ?? false;
     }
 
     private function getDefaultRoles(): array

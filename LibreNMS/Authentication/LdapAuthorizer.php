@@ -102,7 +102,7 @@ class LdapAuthorizer extends AuthorizerBase
         return false;
     }
 
-    public function getRoles(string $username): array|false
+    public function getRoles(\App\Models\User $user): array|false
     {
         try {
             $connection = $this->getLdapConnection();
@@ -118,9 +118,9 @@ class LdapAuthorizer extends AuthorizerBase
                 $ldap_group_filter = "(|{$ldap_group_filter})";
             }
             if (Config::get('auth_ldap_userdn') === true) {
-                $filter = "(&{$ldap_group_filter}(" . trim(Config::get('auth_ldap_groupmemberattr', 'memberUid')) . '=' . $this->getFullDn($username) . '))';
+                $filter = "(&{$ldap_group_filter}(" . trim(Config::get('auth_ldap_groupmemberattr', 'memberUid')) . '=' . $this->getFullDn($user->username) . '))';
             } else {
-                $filter = "(&{$ldap_group_filter}(" . trim(Config::get('auth_ldap_groupmemberattr', 'memberUid')) . '=' . $this->getMembername($username) . '))';
+                $filter = "(&{$ldap_group_filter}(" . trim(Config::get('auth_ldap_groupmemberattr', 'memberUid')) . '=' . $this->getMembername($user->username) . '))';
             }
             $search = ldap_search($connection, Config::get('auth_ldap_groupbase'), $filter);
             $entries = ldap_get_entries($connection, $search);

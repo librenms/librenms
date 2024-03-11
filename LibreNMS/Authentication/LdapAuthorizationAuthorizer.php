@@ -114,7 +114,7 @@ class LdapAuthorizationAuthorizer extends AuthorizerBase
         return false;
     }
 
-    public function getRoles(string $username): array|false
+    public function getRoles(\App\Models\User $user): array|false
     {
         $roles = $this->authLdapSessionCacheGet('roles');
         if ($roles !== null) {
@@ -123,7 +123,7 @@ class LdapAuthorizationAuthorizer extends AuthorizerBase
         $roles = [];
 
         // Find all defined groups $username is in
-        $filter = '(&(|(cn=' . implode(')(cn=', array_keys(Config::get('auth_ldap_groups'))) . '))(' . Config::get('auth_ldap_groupmemberattr') . '=' . $this->getMembername($username) . '))';
+        $filter = '(&(|(cn=' . implode(')(cn=', array_keys(Config::get('auth_ldap_groups'))) . '))(' . Config::get('auth_ldap_groupmemberattr') . '=' . $this->getMembername($user->username) . '))';
         $search = ldap_search($this->ldap_connection, Config::get('auth_ldap_groupbase'), $filter);
         $entries = ldap_get_entries($this->ldap_connection, $search);
 
