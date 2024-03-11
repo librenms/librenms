@@ -29,6 +29,7 @@ class LoadUserPreferences
         });
 
         $this->setPreference($request, 'timezone', function ($timezone) use ($request) {
+            $request->session()->put('preferences.timezone', $timezone);
             $request->session()->put('preferences.timezone_static', true);
         });
 
