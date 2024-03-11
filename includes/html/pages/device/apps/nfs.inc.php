@@ -98,93 +98,87 @@ if ($vars['app_page'] == 'general') {
     $graphs=[];
     if ($is_server) {
         $graphs['nfs_server_cache']='Server Cache';
+        if ($app->data['os'] == 'linux') {
+            $graphs['nfs_server_rpc_info']='Server General RPC Stats';
+            $graphs['nfs_server_RAcache']='Server Read Ahead Cache';
+            $graphs['nfs_server_network']='Server Network';
+            $graphs['nfs_server_io']='Server IO';
+        }
         // figure out what chunks we should add for the nfs_server_stats graph
-        $graphs['nfs_server_stats1']='Server';
-        if (isset($nfs_graphs['server_stats'][$app->data['os']])) {
+        $graphs['nfs_server_rpc1']='Server';
+        if (isset($nfs_graphs['server_rpc'][$app->data['os']])) {
             $nfs_os = $app->data['os'];
         } else {
             $nfs_os='';
         }
-        $nfs_graph_keys=array_keys($nfs_graphs['server_stats'][$nfs_os]);
+        $nfs_graph_keys=array_keys($nfs_graphs['server_rpc'][$nfs_os]);
         if (isset($nfs_graph_keys[12])) {
-            $graphs['nfs_server_stats2']='Server';
+            $graphs['nfs_server_rpc2']='Server';
         }
         if (isset($nfs_graph_keys[24])) {
-            $graphs['nfs_server_stats3']='Server';
+            $graphs['nfs_server_rpc3']='Server';
         }
         if (isset($nfs_graph_keys[36])) {
-            $graphs['nfs_server_stats4']='Server';
+            $graphs['nfs_server_rpc4']='Server';
         }
         if (isset($nfs_graph_keys[48])) {
-            $graphs['nfs_server_stats5']='Server';
+            $graphs['nfs_server_rpc5']='Server';
         }
         if (isset($nfs_graph_keys[48])) {
-            $graphs['nfs_server_stats5']='Server';
+            $graphs['nfs_server_rpc5']='Server';
         }
         if (isset($nfs_graph_keys[60])) {
-            $graphs['nfs_server_stats6']='Server';
+            $graphs['nfs_server_rpc6']='Server';
         }
         if (isset($nfs_graph_keys[72])) {
-            $graphs['nfs_server_stats7']='Server';
+            $graphs['nfs_server_rpc7']='Server';
         }
         if (isset($nfs_graph_keys[84])) {
-            $graphs['nfs_server_stats8']='Server';
+            $graphs['nfs_server_rpc8']='Server';
         }
         if (isset($nfs_graph_keys[96])) {
-            $graphs['nfs_server_stats9']='Server';
-        }
-        if (isset($nfs_graph_keys[108])) {
-            $graphs['nfs_server_stats10']='Server';
-        }
-        if (isset($nfs_graph_keys[120])) {
-            $graphs['nfs_server_stats11']='Server';
+            $graphs['nfs_server_rpc9']='Server';
         }
     }
     if ($is_client) {
+        $graphs['nfs_client_rpc_info']='Client General RPC Stats';
         if ($app->data['os'] == 'freebsd') {
             $graphs['nfs_client_cache']='Client Cache';
         }
-        $graphs['nfs_client_rpc_info']='RPC Info';
+        if ($app->data['os'] == 'linux') {
+            $graphs['nfs_client_network']='Client Network';
+        }
         // figure out what chunks we should add for the nfs_client_stats graph
-        $graphs['nfs_client_stats1']='Client';
-        if (isset($nfs_graphs['client_stats'][$app->data['os']])) {
+        $graphs['nfs_client_rpc1']='Client';
+        if (isset($nfs_graphs['client_rpc'][$app->data['os']])) {
             $nfs_os = $app->data['os'];
         } else {
             $nfs_os='';
         }
-        $nfs_graph_keys=array_keys($nfs_graphs['client_stats'][$nfs_os]);
+        $nfs_graph_keys=array_keys($nfs_graphs['client_rpc'][$nfs_os]);
         if (isset($nfs_graph_keys[12])) {
-            $graphs['nfs_client_stats2']='Client';
+            $graphs['nfs_client_rpc2']='Client';
         }
         if (isset($nfs_graph_keys[24])) {
-            $graphs['nfs_client_stats3']='Client';
+            $graphs['nfs_client_rpc3']='Client';
         }
         if (isset($nfs_graph_keys[36])) {
-            $graphs['nfs_client_stats4']='Client';
+            $graphs['nfs_client_rpc4']='Client';
         }
         if (isset($nfs_graph_keys[48])) {
-            $graphs['nfs_client_stats5']='Client';
-        }
-        if (isset($nfs_graph_keys[48])) {
-            $graphs['nfs_client_stats5']='Client';
+            $graphs['nfs_client_rpc5']='Client';
         }
         if (isset($nfs_graph_keys[60])) {
-            $graphs['nfs_client_stats6']='Client';
+            $graphs['nfs_client_rpc6']='Client';
         }
         if (isset($nfs_graph_keys[72])) {
-            $graphs['nfs_client_stats7']='Client';
+            $graphs['nfs_client_rpc7']='Client';
         }
         if (isset($nfs_graph_keys[84])) {
-            $graphs['nfs_client_stats8']='Client';
+            $graphs['nfs_client_rpc8']='Client';
         }
         if (isset($nfs_graph_keys[96])) {
-            $graphs['nfs_client_stats9']='Client';
-        }
-        if (isset($nfs_graph_keys[108])) {
-            $graphs['nfs_client_stats10']='Client';
-        }
-        if (isset($nfs_graph_keys[120])) {
-            $graphs['nfs_client_stats11']='Client';
+            $graphs['nfs_client_rpc9']='Client';
         }
     }
 } elseif ($vars['app_page'] == 'mounted_by') {

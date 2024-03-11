@@ -1,7 +1,7 @@
 <?php
 
-$nfs_graph_name = 'client_stats';
-$start_stat = 24;
-$end_stat = 35;
+$nfs_graph_name = 'client_rpc';
+$start_stat = 60;
+$end_stat = 71;
 
 include 'includes/html/graphs/application/nfs-common.inc.php';
