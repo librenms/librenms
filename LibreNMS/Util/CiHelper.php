@@ -295,7 +295,7 @@ class CiHelper
             $py_lint_cmd = [$this->checkPythonExec('pylint'), '-E', '-j', '0'];
 
             $files = $this->flags['full']
-                ? explode(PHP_EOL, rtrim(shell_exec("find . -name '*.py' -not -path './vendor/*' -not -path './tests/*'")))
+                ? explode(PHP_EOL, rtrim(shell_exec("find . -name '*.py' -not -path './vendor/*' -not -path './tests/*' -not -path './.python_venvs/*'")))
                 : $this->changed['python'];
 
             $py_lint_cmd = array_merge($py_lint_cmd, $files);

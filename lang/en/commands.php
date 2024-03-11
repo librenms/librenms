@@ -63,6 +63,7 @@ return [
         'exit' => 'Ctrl-C to stop',
         'removed' => 'Device :id removed',
         'updated' => 'Device :hostname (:id) updated',
+        'setup' => 'Setting up snmpsim venv in :dir',
     ],
     'device:add' => [
         'description' => 'Add a new device',
