@@ -6,6 +6,7 @@ $cur_oid = '.1.3.6.1.3.94.1.8.1.6.';
 //    Sensor Name: Value
 //
 // The list is also a mix of voltages, temperatures, and state, and uses both F and C for temperatures
+// The order is not stable between software versions
 
 if (is_array($pre_cache['dell-powervault'])) {
     foreach ($pre_cache['dell-powervault'] as $index => $entry) {
@@ -15,7 +16,7 @@ if (is_array($pre_cache['dell-powervault'])) {
             $value = $matches[1];
             $descr = implode(':', $connUnitSensorMessage);
 
-            discover_sensor($valid['sensor'], 'voltage', $device, $cur_oid . $index, $index, 'dellme', $descr, '1', '1', null, null, null, null, $value, 'snmp', $index);
+            discover_sensor($valid['sensor'], 'voltage', $device, $cur_oid . $index, $index, 'dellme', $descr, '1', '1', null, null, null, null, $value);
         }
     }
 }
