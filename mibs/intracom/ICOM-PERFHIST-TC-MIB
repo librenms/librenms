@@ -1,0 +1,116 @@
+ICOM-PERFHIST-TC-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+        MODULE-IDENTITY
+                FROM SNMPv2-SMI
+        TEXTUAL-CONVENTION
+                FROM SNMPv2-TC
+        intracom
+                FROM ICOM-SMI;
+
+icomPerfhistTcMIB MODULE-IDENTITY
+    LAST-UPDATED        "201412180000Z"     -- 18 December 2014
+    ORGANIZATION        "Intracom S.A."
+    CONTACT-INFO
+       "EMail:
+        Phone:
+        Co-editor:
+        EMail:
+        Phone:
+       "
+    DESCRIPTION
+       "This module provides proprietary Intracom textual conventions
+        to be used by systems that support collection of historical
+        performance statistics.
+       "
+
+-- Revision History
+
+    REVISION            "201412180000Z"     -- 18 December 2014
+    DESCRIPTION
+       "
+        This is the initial version of this MIB.
+       "
+
+::= { intracom 70 }
+
+-- -------------------------------------------------------------
+-- Textual Conventions
+-- -------------------------------------------------------------
+
+IcomDateTimeType ::= TEXTUAL-CONVENTION
+    --DISPLAY-HINT "2d-1d-1d,1d:1d:1d.1d,1a1d:1d"
+    STATUS       current
+    DESCRIPTION
+       "A date-time specification.
+
+        field  octets  contents                  range
+        -----  ------  --------                  -----
+          1      1-2   year*                     0..65536
+          2       3    month                     1..12
+          3       4    day                       1..31
+          4       5    hour                      0..23
+          5       6    minutes                   0..59
+          6       7    seconds                   0..60
+                       (use 60 for leap-second)
+          7       8    deci-seconds              0..9
+          8       9    direction from UTC        '+' / '-'
+          9      10    hours from UTC*           0..13
+         10      11    minutes from UTC          0..59
+
+        * Notes:
+        - the value of year is in network-byte order
+        - daylight saving time in New Zealand is +13
+
+        For example, Tuesday May 26, 1992 at 1:30:15 PM EDT would be
+        displayed as:
+
+                         1992-5-26,13:30:15.0,-4:0
+
+        Note that if only local time is known, then timezone
+        information (fields 8-10) is not present.
+
+        NOTE: effectively, this TC has an identical purpose & meaning as
+        DateAndTime of SNMPv2-TC, but lacks the DISPLAY-HINT clause, so
+        as to be mapped to the binary YANG type (see RFC 6643, section 2).
+       "
+    SYNTAX       OCTET STRING (SIZE(8 | 11))
+
+--IcomSuspectType ::= TEXTUAL-CONVENTION
+    --STATUS       current
+    --DESCRIPTION
+       --"Indicates the reliability of the related performance data.
+
+        --According to ITU-T G.7710/Y.1701 (clause 10.1.6.1), collected
+        --performance data may not be reliable. Some reasons for this
+        --occurring are:
+
+        --- The register belongs to the first or last interval of the
+        --measurement.
+        --- The register belongs to an interval during which the
+        --measurement is suspended or resumed.
+        --- The current register, designated for a counter, is reset by
+        --an external command.
+        --- The recent register, designated for a counter, holds an
+        --elapsed time attribute value, which deviates more than 10 s with
+        --the nominal value.
+        --- The register, designated for a snapshot or tidemark, contains
+        --no data, e.g., due to outage conditions.
+        --- The register, designated for a tidemark, belongs to an
+        --interval during which the periodical gauge measurements are not
+        --possible, e.g., due to outage conditions.
+
+        --Value 'suspect(1)' indicates that the related performance data
+        --have been marked as suspect.
+
+        --Value 'notSuspect(2)' indicates that the related performance
+        --data have not been marked as suspect.
+       --"
+    --REFERENCE
+       --"ITU-T G.7710/Y.1701 clause 10.1.6.1
+       --"
+    --SYNTAX       INTEGER {
+            --suspect      (1),
+            --notSuspect   (2)
+    --}
+
+END
