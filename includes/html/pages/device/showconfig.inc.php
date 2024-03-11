@@ -221,10 +221,14 @@ if (Auth::user()->hasGlobalAdmin()) {
                 $text = (new \App\ApiClients\Oxidized())->getContent($uri); // fetch diff
             } else {
                 // fetch current_version
-                $text = (new \App\ApiClients\Oxidized())->getContent('/node/version/view?node=' . $oxidized_hostname . (! empty($node_info['group']) ? '&group=' . $node_info['group'] : '') . '&oid=' . urlencode($current_config['oid']) . '&date=' . urlencode($current_config['date']) . '&num=' . urlencode($current_config['version']) . '&format=text');
+                $uri = '/node/version/view?node=' . $oxidized_hostname . (! empty($node_info['group']) ? '&group=' . $node_info['group'] : '') . '&oid=' . urlencode($current_config['oid']) . '&date=' . urlencode($current_config['date']) . '&num=' . urlencode($current_config['version']) . '&format=text';
+                $text = (new \App\ApiClients\Oxidized())->getContent($uri);
+                $download_uri = Config::get('oxidized.url') . $uri;
             }
         } else {  // just fetch the only version
-            $text = (new \App\ApiClients\Oxidized())->getContent('/node/fetch/' . (! empty($node_info['group']) ? $node_info['group'] . '/' : '') . $oxidized_hostname);
+            $uri = '/node/fetch/' . (! empty($node_info['group']) ? $node_info['group'] . '/' : '') . $oxidized_hostname;
+            $text = (new \App\ApiClients\Oxidized())->getContent($uri);
+            $download_uri = Config::get('oxidized.url') . $uri;
         }
 
         if (is_array($node_info) || $config_total > 1) {
@@ -260,8 +264,8 @@ if (Auth::user()->hasGlobalAdmin()) {
                 ';
 
                 $i = $config_total;
-                foreach ($config_versions as $version) {
-                    echo '<option value="' . $version['oid'] . '|' . $version['date'] . '|' . $config_total . '" ';
+                foreach ($config_versions as $key=>$version) {
+                    echo '<option value="' . $version['oid'] . '|' . $version['date'] . '|' . $config_total - $key . '" ';
                     if ($current_config['oid'] == $version['oid']) {
                         $author = $version['author']['name'];
                         $msg = $version['message'];
@@ -326,6 +330,9 @@ if (Auth::user()->hasGlobalAdmin()) {
         // $geshi->set_line_style('color: #999999');
         echo '<div class="config">';
         echo '<input id="linenumbers" class="btn btn-primary" type="submit" value="Hide line numbers"/>';
+        if ($download_uri) {
+            echo '<a class="btn btn-primary" href="' . $download_uri . '" download target="_blank">Download</a>';
+        }
         echo $geshi->parse_code();
         echo '</div>';
     }
