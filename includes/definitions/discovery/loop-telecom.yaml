@@ -98,6 +98,7 @@ modules:
           index: ' dpwmTemperature.{{ $index }}'
           descr: DPWM Temperature
           high_limit: 90
+          entPhysicalIndex_measured: tititi
 
     voltage:
       data:
