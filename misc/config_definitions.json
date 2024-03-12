@@ -4057,6 +4057,68 @@
             "section": "influxdb",
             "order": 8
         },
+	"influxdbv2.enable": {
+            "default": false,
+            "type": "boolean",
+            "group": "poller",
+            "section": "influxdbv2",
+            "order": 0
+        },
+        "influxdbv2.transport": {
+            "default": "http",
+            "type": "select",
+            "options": {
+                "http": "HTTP",
+                "https": "HTTPS"
+            },
+            "group": "poller",
+            "section": "influxdbv2",
+            "order": 1
+        },
+        "influxdbv2.host": {
+            "default": "127.0.0.1",
+            "type": "text",
+            "group": "poller",
+            "section": "influxdbv2",
+            "order": 2,
+            "validate": {
+                "value": "ip_or_hostname"
+            }
+        },
+        "influxdbv2.port": {
+            "default": 8086,
+            "type": "integer",
+            "group": "poller",
+            "section": "influxdbv2",
+            "order": 3
+        },
+        "influxdbv2.bucket": {
+            "default": "librenms",
+            "type": "text",
+            "group": "poller",
+            "section": "influxdbv2",
+            "order": 4
+        },
+        "influxdbv2.organization": {
+            "default": "librenms",
+            "type": "text",
+            "group": "poller",
+            "section": "influxdbv2",
+            "order": 5
+        },
+        "influxdbv2.allow_redirects": {
+            "default": false,
+            "type": "boolean",
+            "group": "poller",
+            "section": "influxdbv2",
+            "order": 6
+        },
+        "influxdbv2.token": {
+            "type": "password",
+            "group": "poller",
+            "section": "influxdbv2",
+            "order": 7
+        },
         "install_dir": {
             "type": "directory"
         },
