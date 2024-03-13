@@ -105,7 +105,7 @@ if ($vars['app_page'] == 'general') {
             $graphs['nfs_server_io']='Server IO';
         }
         // figure out what chunks we should add for the nfs_server_stats graph
-        $graphs['nfs_server_rpc1']='Server';
+        $graphs['nfs_server_rpc1']='Server RPC';
         if (isset($nfs_graphs['server_rpc'][$app->data['os']])) {
             $nfs_os = $app->data['os'];
         } else {
@@ -113,31 +113,31 @@ if ($vars['app_page'] == 'general') {
         }
         $nfs_graph_keys=array_keys($nfs_graphs['server_rpc'][$nfs_os]);
         if (isset($nfs_graph_keys[12])) {
-            $graphs['nfs_server_rpc2']='Server';
+            $graphs['nfs_server_rpc2']='Server RPC, continued';
         }
         if (isset($nfs_graph_keys[24])) {
-            $graphs['nfs_server_rpc3']='Server';
+            $graphs['nfs_server_rpc3']='Server RPC, continued';
         }
         if (isset($nfs_graph_keys[36])) {
-            $graphs['nfs_server_rpc4']='Server';
+            $graphs['nfs_server_rpc4']='Server RPC, continued';
         }
         if (isset($nfs_graph_keys[48])) {
-            $graphs['nfs_server_rpc5']='Server';
+            $graphs['nfs_server_rpc5']='Server RPC, continued';
         }
         if (isset($nfs_graph_keys[48])) {
-            $graphs['nfs_server_rpc5']='Server';
+            $graphs['nfs_server_rpc5']='Server RPC, continued';
         }
         if (isset($nfs_graph_keys[60])) {
-            $graphs['nfs_server_rpc6']='Server';
+            $graphs['nfs_server_rpc6']='Server RPC, continued';
         }
         if (isset($nfs_graph_keys[72])) {
-            $graphs['nfs_server_rpc7']='Server';
+            $graphs['nfs_server_rpc7']='Server RPC, continued';
         }
         if (isset($nfs_graph_keys[84])) {
-            $graphs['nfs_server_rpc8']='Server';
+            $graphs['nfs_server_rpc8']='Server RPC, continued';
         }
         if (isset($nfs_graph_keys[96])) {
-            $graphs['nfs_server_rpc9']='Server';
+            $graphs['nfs_server_rpc9']='Server RPC, continued';
         }
     }
     if ($is_client) {
@@ -149,7 +149,7 @@ if ($vars['app_page'] == 'general') {
             $graphs['nfs_client_network']='Client Network';
         }
         // figure out what chunks we should add for the nfs_client_stats graph
-        $graphs['nfs_client_rpc1']='Client';
+        $graphs['nfs_client_rpc1']='Client RPC';
         if (isset($nfs_graphs['client_rpc'][$app->data['os']])) {
             $nfs_os = $app->data['os'];
         } else {
@@ -157,28 +157,28 @@ if ($vars['app_page'] == 'general') {
         }
         $nfs_graph_keys=array_keys($nfs_graphs['client_rpc'][$nfs_os]);
         if (isset($nfs_graph_keys[12])) {
-            $graphs['nfs_client_rpc2']='Client';
+            $graphs['nfs_client_rpc2']='Client RPC, continued';
         }
         if (isset($nfs_graph_keys[24])) {
-            $graphs['nfs_client_rpc3']='Client';
+            $graphs['nfs_client_rpc3']='Client RPC, continued';
         }
         if (isset($nfs_graph_keys[36])) {
-            $graphs['nfs_client_rpc4']='Client';
+            $graphs['nfs_client_rpc4']='Client RPC, continued';
         }
         if (isset($nfs_graph_keys[48])) {
-            $graphs['nfs_client_rpc5']='Client';
+            $graphs['nfs_client_rpc5']='Client RPC, continued';
         }
         if (isset($nfs_graph_keys[60])) {
-            $graphs['nfs_client_rpc6']='Client';
+            $graphs['nfs_client_rpc6']='Client RPC, continued';
         }
         if (isset($nfs_graph_keys[72])) {
-            $graphs['nfs_client_rpc7']='Client';
+            $graphs['nfs_client_rpc7']='Client RPC, continued';
         }
         if (isset($nfs_graph_keys[84])) {
-            $graphs['nfs_client_rpc8']='Client';
+            $graphs['nfs_client_rpc8']='Client RPC, continued';
         }
         if (isset($nfs_graph_keys[96])) {
-            $graphs['nfs_client_rpc9']='Client';
+            $graphs['nfs_client_rpc9']='Client RPC, continued';
         }
     }
 } elseif ($vars['app_page'] == 'mounted_by') {
