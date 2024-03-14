@@ -2,7 +2,7 @@
 /**
  * Topdesk.php
  *
- * LibreNMS TopDesk alerting transport
+ * LibreNMS TOPdesk alerting transport
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,8 +19,8 @@
  *
  * @link       https://www.librenms.org
  *
- * @copyright  2024 Rudy Broersma
- * @author     Rudy Broersma <r.broersma@ctnet.nl> <tozz@kijkt.tv>
+ * @copyright  2024 Rudy Broersma - CTNET B.V.
+ * @author     Rudy Broersma <r.broersma@ctnet.nl>
  */
 /*
  * TODO
