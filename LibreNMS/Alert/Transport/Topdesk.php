@@ -482,7 +482,6 @@ class TopDeskIncident {
         return $this->number;
     }
 
-    // Nu vrij basaal maar kunnen we later eventueel mee excluden
     private function getProperties() {
         return get_object_vars($this);
     }
