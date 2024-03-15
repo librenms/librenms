@@ -73,7 +73,7 @@ class Topdesk extends Transport
                     }
                 } else {
                     $incident = $this->getTopdeskIncident($recent_uuid);
-                    $this->addAction('LibreNMS reported this issue again within ' . $reopen . ' hours. Reopening...', $incident, true);
+                    $this->addAction('LibreNMS reported this issue again within ' . $this->config['ticket-reopen'] . ' hours. Reopening...', $incident, true);
                     $this->updateIncident($incident, TicketAction::TICKET_OPEN);
                     \Log::channel('single')->alert('TOPdesk: Reopening incident ' . $incident->getNumber());
                 }
