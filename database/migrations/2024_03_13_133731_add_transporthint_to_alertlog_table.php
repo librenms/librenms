@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('alert_log', function (Blueprint $table) {
-            $table->json('transport_note')->nullable()->charset('utf8mb4')->collation('utf8mb4_unicode_ci');
+            $table->json('transport_note')->nullable();
         });
     }
 
