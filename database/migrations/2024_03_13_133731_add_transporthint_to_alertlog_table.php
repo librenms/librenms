@@ -13,6 +13,8 @@ return new class extends Migration
     {
         Schema::table('alert_log', function (Blueprint $table) {
             $table->json('transport_note')->nullable();
+            $table->collation('utf8mb4_unicode_ci');
+            $table->charset('utf8mb4');
         });
     }
 
@@ -23,6 +25,9 @@ return new class extends Migration
     {
         Schema::table('alert_log', function (Blueprint $table) {
             $table->dropColumn('transport_note');
+            $table->collation('utf8_unicode_ci');
+            $table->charset('utf8');
         });
     }
 };
+
