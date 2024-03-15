@@ -59,7 +59,6 @@ class Topdesk extends Transport
 
     public function deliverAlert(array $alert_data): bool
     {
-        $reopen = (int) $this->config['ticket-reopen'] ?? 24;
         $recent_uuid = $this->getRecentIncident($alert_data['device_id'], $alert_data['rule_id']);
         switch ($alert_data['state']) {
             case AlertState::ACTIVE:
@@ -460,13 +459,12 @@ class Topdesk extends Transport
 
     private function getRecentIncident(string $device_id, string $alertrule_id): bool|string
     {
-        $reopen = (int) $this->config['ticket-reopen'] ?? 24;
         $previous_alert = optional(AlertLog::where('device_id', '=', $device_id)
                         ->select('transport_note->topdesk_uuid AS topdesk_uuid')
                         ->where('rule_id', '=', $alertrule_id)
                         ->whereNotNull('transport_note')
                         ->where('state', '=', 1)
-                        ->where('time_logged', '>', 'NOW() - INTERVAL ' . $reopen . ' HOUR')
+                        ->where('time_logged', '>', 'NOW() - INTERVAL ' . $this->config['ticket-reopen'] . ' HOUR')
                         ->orderBy('id', 'DESC')
                         ->first())->toArray();
 
@@ -498,6 +496,7 @@ class TopDeskIncident
     private $caller;
     private $asset;
     private $object;
+    private $sla;
     private $closed = false;
     private $completed = false;
     private $updatedProperties = ['updatedProperties'];
@@ -510,12 +509,12 @@ class TopDeskIncident
     }
 
     // We cannot set number manually, so this is never an updatedProperty
-    public function setNumber($number, bool $update = true)
+    public function setNumber($number, bool $update = true): void
     {
         $this->number = $number;
     }
 
-    public function getNumber()
+    public function getNumber(): string
     {
         return $this->number;
     }
@@ -525,7 +524,7 @@ class TopDeskIncident
         return get_object_vars($this);
     }
 
-    public function _toJson(bool $update = true)
+    public function _toJson(bool $update = true): string
     {
         $properties = $this->getProperties();
         $object = new \stdClass();
@@ -555,13 +554,13 @@ class TopDeskIncident
         return json_encode($object);
     }
 
-    public function setID($id, bool $update = true)
+    public function setID($id, bool $update = true): void
     {
         $this->id = $id;
         $this->updatedProperties[] = 'id';
     }
 
-    public function setRequest($request, bool $update = true)
+    public function setRequest($request, bool $update = true): void
     {
         $this->request = addslashes($request);
         if ($update == false) {
@@ -569,7 +568,7 @@ class TopDeskIncident
         }
     }
 
-    public function setClosed(bool $closed = true, bool $update = true)
+    public function setClosed(bool $closed = true, bool $update = true): void
     {
         $this->closed = $closed;
         if ($update == false) {
@@ -577,7 +576,7 @@ class TopDeskIncident
         }
     }
 
-    public function setCompleted(bool $completed, bool $update = true)
+    public function setCompleted(bool $completed, bool $update = true): void
     {
         $this->completed = $completed;
         if ($update == false) {
@@ -585,7 +584,7 @@ class TopDeskIncident
         }
     }
 
-    public function setOperator($operator, bool $update = true)
+    public function setOperator($operator, bool $update = true): void
     {
         $this->operator = $this->getFieldValue($operator);
         if ($update == false) {
@@ -593,7 +592,7 @@ class TopDeskIncident
         }
     }
 
-    public function setOperatorGroup($operatorgroup, bool $update = true)
+    public function setOperatorGroup($operatorgroup, bool $update = true): void
     {
         $this->operatorGroup = $this->getFieldValue($operatorgroup);
         if ($update == false) {
@@ -601,7 +600,7 @@ class TopDeskIncident
         }
     }
 
-    public function setCategory($category, bool $update = true)
+    public function setCategory($category, bool $update = true): void
     {
         $this->category = $this->getFieldValue($category);
         if ($update == false) {
@@ -609,7 +608,7 @@ class TopDeskIncident
         }
     }
 
-    public function setSLA($sla, bool $update = true)
+    public function setSLA($sla, bool $update = true): void
     {
         $this->sla = $this->getFieldValue($sla);
         if ($update == false) {
@@ -617,7 +616,7 @@ class TopDeskIncident
         }
     }
 
-    public function setSubcategory($subcategory, bool $update = true)
+    public function setSubcategory($subcategory, bool $update = true): void
     {
         $this->subcategory = $this->getFieldValue($subcategory);
         if ($update == false) {
@@ -640,7 +639,7 @@ class TopDeskIncident
         return $returnArray;
     }
 
-    public function setCallType($callType, bool $update = true)
+    public function setCallType($callType, bool $update = true): void
     {
         $this->callType = $this->getFieldValue($callType);
         if ($update == false) {
@@ -648,7 +647,7 @@ class TopDeskIncident
         }
     }
 
-    public function setUrgency($urgency, bool $update = true)
+    public function setUrgency($urgency, bool $update = true): void
     {
         $this->urgency = $this->getFieldValue($urgency);
         if ($update == false) {
@@ -656,7 +655,7 @@ class TopDeskIncident
         }
     }
 
-    public function setImpact($impact, bool $update = true)
+    public function setImpact($impact, bool $update = true): void
     {
         $this->impact = $this->getFieldValue($impact);
         if ($update == false) {
@@ -664,7 +663,7 @@ class TopDeskIncident
         }
     }
 
-    public function setPriority($priority, bool $update = true)
+    public function setPriority($priority, bool $update = true): void
     {
         $this->priority = $this->getFieldValue($priority);
         if ($update == false) {
@@ -672,7 +671,7 @@ class TopDeskIncident
         }
     }
 
-    public function setStatus(string $status, bool $update = true)
+    public function setStatus(string $status, bool $update = true): void
     {
         $this->status = $status;
         if ($update == false) {
@@ -680,12 +679,12 @@ class TopDeskIncident
         }
     }
 
-    public function getID()
+    public function getID(): string
     {
         return $this->id;
     }
 
-    public function setEntryType($entryType, bool $update = true)
+    public function setEntryType($entryType, bool $update = true): void
     {
         $this->entryType = $this->getFieldValue($entryType);
         if ($update == false) {
@@ -693,7 +692,7 @@ class TopDeskIncident
         }
     }
 
-    public function setProcessingStatus($processingStatus, bool $update = true)
+    public function setProcessingStatus($processingStatus, bool $update = true): void
     {
         $this->processingStatus = $this->getFieldValue($processingStatus);
         if ($update == false) {
@@ -701,7 +700,7 @@ class TopDeskIncident
         }
     }
 
-    public function setCaller($caller, bool $update = true)
+    public function setCaller($caller, bool $update = true): void
     {
         $this->caller = $this->getFieldValue($caller);
         if ($update == false) {
@@ -709,7 +708,7 @@ class TopDeskIncident
         }
     }
 
-    public function setObject($object, bool $update = true)
+    public function setObject($object, bool $update = true): void
     {
         $this->object = $this->getFieldValue($object);
         if ($update == false) {
@@ -717,7 +716,7 @@ class TopDeskIncident
         }
     }
 
-    public function setAsset($asset, bool $update = true)
+    public function setAsset($asset, bool $update = true): void
     {
         $this->asset = $this->getFieldValue($asset);
         if ($update == false) {
@@ -725,7 +724,7 @@ class TopDeskIncident
         }
     }
 
-    public function setCallerLookup($callerLookup, bool $update = true)
+    public function setCallerLookup($callerLookup, bool $update = true): void
     {
         $this->callerLookup = $this->getFieldValue($callerLookup);
         if ($update == false) {
@@ -733,7 +732,7 @@ class TopDeskIncident
         }
     }
 
-    public function setBriefDescription($briefDescription, bool $update = true)
+    public function setBriefDescription($briefDescription, bool $update = true): void
     {
         $this->briefDescription = $briefDescription;
         if ($update == false) {
