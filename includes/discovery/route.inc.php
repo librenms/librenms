@@ -271,6 +271,12 @@ if ($mpls_skip == false) {
                         $entry['inetCidrRouteProto'] = $entry['mplsL3VpnVrfRteInetCidrProto'];
                         $entry['inetCidrRouteMetric1'] = $entry['mplsL3VpnVrfRteInetCidrMetric1'];
                         $entry['inetCidrRouteNextHopAS'] = $entry['mplsL3VpnVrfRteInetCidrNextHopAS'];
+                        unset($entry['mplsL3VpnVrfRteInetCidrPolicy']);
+                        unset($entry['mplsL3VpnVrfRteInetCidrNextHop']);
+                        unset($entry['mplsL3VpnVrfRteInetCidrNHopType']);
+                        unset($entry['mplsL3VpnVrfRteInetCidrDest']);
+                        unset($entry['mplsL3VpnVrfRteInetCidrDestType']);
+                        unset($entry['mplsL3VpnVrfRteInetCidrPfxLen']);
                         unset($entry['mplsL3VpnVrfRteXCPointer']);
                         unset($entry['mplsL3VpnVrfRteInetCidrMetric1']);
                         unset($entry['mplsL3VpnVrfRteInetCidrMetric2']);

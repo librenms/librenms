@@ -34,6 +34,7 @@
         "easybook/geshi": "^1.0.8",
         "ezyang/htmlpurifier": "^4.8",
         "fico7489/laravel-pivot": "^3.0",
+        "influxdata/influxdb-client-php": "^3.4",
         "influxdb/influxdb-php": "^1.15",
         "justinrainbow/json-schema": "^5.2",
         "laravel-notification-channels/webpush": "^7.1",
@@ -87,7 +88,10 @@
         "optimize-autoloader": true,
         "platform-check": true,
         "preferred-install": "dist",
-        "sort-packages": true
+        "sort-packages": true,
+        "allow-plugins": {
+            "php-http/discovery": false
+        }
     },
     "extra":
     {
