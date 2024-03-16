@@ -6,6 +6,7 @@
             <th data-column-id="timestamp" data-order="desc">{{ __('Timestamp') }}</th>
             <th data-column-id="level">{{ __('Level') }}</th>
             <th data-column-id="device_id">{{ __('Hostname') }}</th>
+            <th data-column-id="tag">{{ __('Tag') }}</th>
             <th data-column-id="program">{{ __('Program') }}</th>
             <th data-column-id="msg">{{ __('Message') }}</th>
             <th data-column-id="priority">{{ __('Priority') }}</th>
