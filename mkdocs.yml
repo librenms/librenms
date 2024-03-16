@@ -64,6 +64,7 @@ plugins:
         'Extensions/Email-Alerting.md': 'Alerting/Transports.md'
         'Extensions/Graphite.md': 'Extensions/metrics/Graphite.md'
         'Extensions/InfluxDB.md': 'Extensions/metrics/InfluxDB.md'
+        'Extensions/InfluxDBv2.md': 'Extensions/metrics/InfluxDBv2.md'
         'Extensions/OpenTSDB.md': 'Extensions/metrics/OpenTSDB.md'
         'Extensions/Poller-Service.md': 'Extensions/Dispatcher-Service.md'
         'Extensions/Port-Description-Parser.md': 'Extensions/Interface-Description-Parsing.md'
@@ -162,9 +163,14 @@ nav:
     - Check_MK Setup: Extensions/Agent-Setup.md
     - Dashboards: Extensions/Dashboards.md
     - Interface Description Parsing: Extensions/Interface-Description-Parsing.md
-    - Network Map: Extensions/Network-Map.md
+    - Network Maps:
+      - Availability Map: Extensions/Availability-Map.md
+      - Dependency Map: Extensions/Dependency-Map.md
+      - Network Map: Extensions/Network-Map.md
+      - Custom Map: Extensions/Custom-Map.md
+      - World Map: Extensions/World-Map.md
+      - VisJS Config: Extensions/VisJS-Config.md
     - Syslog: Extensions/Syslog.md
-    - World Map: Extensions/World-Map.md
     - Advanced Setup:
       - 1 Minute Polling: Support/1-Minute-Polling.md
       - Authentication Options: Extensions/Authentication.md
@@ -217,6 +223,7 @@ nav:
         - Intro: Extensions/Metric-Storage.md
         - Graphite: Extensions/metrics/Graphite.md
         - InfluxDB: Extensions/metrics/InfluxDB.md
+        - InfluxDBv2: Extensions/metrics/InfluxDBv2.md
         - OpenTSDB: Extensions/metrics/OpenTSDB.md
         - Prometheus: Extensions/metrics/Prometheus.md
 

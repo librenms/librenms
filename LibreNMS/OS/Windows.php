@@ -72,6 +72,7 @@ class Windows extends \LibreNMS\OS
         $default = $build > 22000 ? '11 Insider (NT 6.3)' : null;
 
         $builds = [
+            '22631' => '11 (23H2)',
             '22621' => '11 (22H2)',
             '22000' => '11 (21H2)',
             '19045' => '10 (22H2)',

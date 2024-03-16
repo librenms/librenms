@@ -96,11 +96,6 @@ parameters:
 			path: LibreNMS/OS/Ios.php
 
 		-
-			message: "#^If condition is always false\\.$#"
-			count: 1
-			path: LibreNMS/OS/Shared/Cisco.php
-
-		-
 			message: "#^Variable \\$index might not be defined\\.$#"
 			count: 2
 			path: LibreNMS/OS/SmOs.php
@@ -186,11 +181,6 @@ parameters:
 			path: app/Http/Controllers/LegacyController.php
 
 		-
-			message: "#^Variable \\$vars on left side of \\?\\? is never defined\\.$#"
-			count: 1
-			path: app/Http/Controllers/LegacyController.php
-
-		-
 			message: "#^Called 'Model\\:\\:make\\(\\)' which performs unnecessary work, use 'new Model\\(\\)'\\.$#"
 			count: 1
 			path: app/Http/Controllers/PortGroupController.php
@@ -219,6 +209,11 @@ parameters:
 			message: "#^Called 'Model\\:\\:make\\(\\)' which performs unnecessary work, use 'new Model\\(\\)'\\.$#"
 			count: 1
 			path: app/Http/Controllers/ServiceTemplateController.php
+
+		-
+			message: "#^Offset 'image_title' does not exist on null\\.$#"
+			count: 1
+			path: app/Http/Controllers/Widgets/ImageController.php
 
 		-
 			message: "#^Offset 'image_title' on null in empty\\(\\) does not exist\\.$#"

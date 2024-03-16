@@ -1,0 +1,177 @@
+-- %DNP% $Id: ERICSSON-ROUTER-TC.my,v 1.1.2.8.252.3 2011/02/22 17:26:18 thatcher Exp $
+-- %DNP% $Source: /cvsroot/pkt/sw/se/xc/bsd/config/snmp/mibs/Attic/ERICSSON-ROUTER-TC.my,v $
+-- *****************************************************************
+-- ERICSSON-ROUTER-TC    Textual Convention MIB
+--
+-- Copyright (c) 2000, 2002-2009, 2011, 2014, 2015, 2017 Ericsson AB
+-- All rights reserved.
+-- 
+-- *****************************************************************
+
+ERICSSON-ROUTER-TC DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    Integer32, Unsigned32
+            FROM SNMPv2-SMI
+
+    TEXTUAL-CONVENTION
+            FROM SNMPv2-TC
+
+    eriRouterModules
+            FROM ERICSSON-ROUTER-SMI;
+
+
+eriRouterTC MODULE-IDENTITY
+    LAST-UPDATED    "201707281800Z" -- Jul 28, 2017
+    ORGANIZATION    "Ericsson AB."
+    CONTACT-INFO
+            "       Ericsson AB.
+
+            Postal: 100 Headquarters Dr
+                    San Jose, CA  95134
+                    USA
+
+             Phone: +1 408 750 5000
+               Fax: +1 408 750 5599
+            "
+    DESCRIPTION
+        "Defines common textual conventions used in ERICSSON-ROUTER mib
+        modules."
+
+    REVISION      "201707281800Z" -- Jul 28, 2017
+    DESCRIPTION
+        "Updated the description of textual convention: EriRouterCircuitHandle.
+         The circuit handler is used internally and not necessary to export the
+         internal structure to users."
+
+    REVISION      "201501141800Z" -- Jan 14, 2015
+    DESCRIPTION
+        "Updated RBN/rbn/Rbn as ERICSSON-ROUTER/eriRouter/EriRouter
+         to migrate RBN MIB to ERICSSON MIB."
+
+    REVISION      "201407191700Z" -- July 19, 2014
+    DESCRIPTION
+        "Added new textual convention: EriRouterSubscriberState."
+
+    REVISION        "201101191800Z" -- Jan 19, 2011
+    DESCRIPTION
+            "Update CONTACT-INFO & ORGANIZATION. "
+
+    REVISION      "200910201700Z" -- Oct 20, 2009
+    DESCRIPTION
+        "Added new textual convention: EriRouterUnsigned64 for read-write
+        capable 64 bit integer value."
+
+    REVISION      "200406191700Z" -- June 19, 2004
+    DESCRIPTION
+        "Added new textual convention: EriRouterPortMediumType. Correct 
+        warnings given by smilint."
+
+    REVISION      "200303171700Z" -- March 17, 2003
+    DESCRIPTION
+        "Added new textual convention: EriRouterVidOrUntagged."
+
+    REVISION      "200211110000Z" -- November 11, 2002
+    DESCRIPTION
+        "Moved definitions of EriRouterSlot and EriRouterPort from ERICSSON-ROUTER-PVC-MIB.
+        Updated range on EriRouterSlot and EriRouterPort."
+
+    REVISION      "200206260000Z" -- June 26, 2002
+    DESCRIPTION
+        "Updated CONTACT-INFO. Added new textual conventions:
+        EriRouterKBytes and EriRouterPercentage."
+
+    REVISION      "200007140000Z" -- July 14, 2000
+    DESCRIPTION
+        "Initial version."
+    ::= { eriRouterModules 2 }
+
+
+EriRouterCircuitHandle ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1d:1d:2x-2x-2x"
+    STATUS current
+    DESCRIPTION
+        "A unique identifier for individual circuits."
+    SYNTAX  OCTET STRING (SIZE (8))
+    
+EriRouterKBytes ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS current
+    DESCRIPTION
+        "Storage size, expressed in units of 1024 bytes."
+    SYNTAX Integer32 (0..2147483647)
+
+EriRouterPercentage ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d%"
+    STATUS current
+    DESCRIPTION
+        "This Textual Convention describes an object that stores 
+        a whole integer percentage value."
+    SYNTAX Integer32 (0..100)    
+
+EriRouterSlot ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS       current
+    DESCRIPTION
+        "The chassis slot number.  This is the physical slot
+        number as reported in the CLI command 'show hardware'
+        on SMS and the CLI command 'show port' on SE."
+    SYNTAX  Unsigned32 (0..255)
+
+EriRouterPort ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS       current
+    DESCRIPTION
+        "The chassis port number.  This is the physical port
+        number as reported in the CLI command 'show hardware'
+        on SMS and the CLI command 'show port' on SE."
+    SYNTAX  Unsigned32 (0..255)
+
+EriRouterVidOrUntagged ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS       current
+    DESCRIPTION 
+        "The twelve-bit VLAN Identifer (VID) used to uniquely
+        identify the VLAN to which the frame belongs.  The VID is
+        encoded as an unsigned binary number.  An untagged frame
+        does not carry any identification of the VLAN to which it
+        belongs and is designated with a value of 4096."
+    SYNTAX	Integer32 (1..4096) 
+
+EriRouterPortMediumType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION 
+        "Medium type of NAS port."
+    SYNTAX	INTEGER {
+                    unknown(0),
+                    dsl(11),
+                    cable(12),
+                    wireless(13),
+                    satellite(14)
+                }
+
+EriRouterUnsigned64 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "8d"
+    STATUS       current
+    DESCRIPTION 
+        "Unsigned 64 bit integer value is represented as an
+         OCTET STRING.  This allows an unsigned integer value in
+         the range 0..18446744073709551615.  
+
+         The octets are ordered with the first octet containing
+         the highest ordered bits of the integer and the 8th octet
+         containing the lowest ordered bits, corresponding to
+         network byte order."
+    SYNTAX OCTET STRING (SIZE(8))
+
+EriRouterSubscriberState ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "State of subscriber session."
+    SYNTAX      INTEGER {
+                    up(9),
+                    standby-up(13)
+                }
+    
+END

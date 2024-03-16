@@ -1,0 +1,19 @@
+{
+    "slas": {
+        "discovery": {
+            "slas": [
+                {
+                    "sla_nr": 101,
+                    "owner": "",
+                    "tag": "SLA1",
+                    "rtt_type": "jitter",
+                    "rtt": 1,
+                    "status": 1,
+                    "opstatus": 0,
+                    "deleted": 0
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    }
+}

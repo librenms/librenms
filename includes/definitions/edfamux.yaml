@@ -5,7 +5,7 @@ icon: solidoptics
 mib_dir: solidoptics
 over:
   - { graph: device_dbm, text: 'dBm' }
-  - { graph: device_temperature, text: 'Tempurature' }
+  - { graph: device_temperature, text: 'Temperature' }
 discovery:
   -
     sysObjectID:

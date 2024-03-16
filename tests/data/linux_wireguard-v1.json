@@ -50,91 +50,115 @@
             ],
             "application_metrics": [
                 {
-                    "metric": "wg0_client1.domain.com_bytes_rcvd",
-                    "value": 1534068,
+                    "metric": "global_bytes_rcvd_total",
+                    "value": 14891148,
                     "value_prev": null,
                     "app_type": "wireguard"
                 },
                 {
-                    "metric": "wg0_client1.domain.com_bytes_sent",
-                    "value": 97772,
+                    "metric": "global_bytes_sent_total",
+                    "value": 105501824,
                     "value_prev": null,
                     "app_type": "wireguard"
                 },
                 {
-                    "metric": "wg0_client1.domain.com_minutes_since_last_handshake",
-                    "value": 1,
+                    "metric": "intf_wg0_bytes_rcvd_total_intf",
+                    "value": 14891148,
                     "value_prev": null,
                     "app_type": "wireguard"
                 },
                 {
-                    "metric": "wg0_client2_bytes_rcvd",
+                    "metric": "intf_wg0_bytes_sent_total_intf",
+                    "value": 105501824,
+                    "value_prev": null,
+                    "app_type": "wireguard"
+                },
+                {
+                    "metric": "intf_wg0_client_client1.domain.com_bytes_rcvd",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "wireguard"
                 },
                 {
-                    "metric": "wg0_client2_bytes_sent",
+                    "metric": "intf_wg0_client_client1.domain.com_bytes_sent",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "wireguard"
                 },
                 {
-                    "metric": "wg0_client2_minutes_since_last_handshake",
+                    "metric": "intf_wg0_client_client1.domain.com_minutes_since_last_handshake",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "wireguard"
                 },
                 {
-                    "metric": "wg0_computer_bytes_rcvd",
+                    "metric": "intf_wg0_client_client2_bytes_rcvd",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "wireguard"
                 },
                 {
-                    "metric": "wg0_computer_bytes_sent",
+                    "metric": "intf_wg0_client_client2_bytes_sent",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "wireguard"
                 },
                 {
-                    "metric": "wg0_computer_minutes_since_last_handshake",
+                    "metric": "intf_wg0_client_client2_minutes_since_last_handshake",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "wireguard"
                 },
                 {
-                    "metric": "wg0_it_admin.domain.org_bytes_rcvd",
+                    "metric": "intf_wg0_client_computer_bytes_rcvd",
+                    "value": 14891148,
+                    "value_prev": null,
+                    "app_type": "wireguard"
+                },
+                {
+                    "metric": "intf_wg0_client_computer_bytes_sent",
+                    "value": 105501824,
+                    "value_prev": null,
+                    "app_type": "wireguard"
+                },
+                {
+                    "metric": "intf_wg0_client_computer_minutes_since_last_handshake",
+                    "value": 2,
+                    "value_prev": null,
+                    "app_type": "wireguard"
+                },
+                {
+                    "metric": "intf_wg0_client_it_admin.domain.org_bytes_rcvd",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "wireguard"
                 },
                 {
-                    "metric": "wg0_it_admin.domain.org_bytes_sent",
+                    "metric": "intf_wg0_client_it_admin.domain.org_bytes_sent",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "wireguard"
                 },
                 {
-                    "metric": "wg0_it_admin.domain.org_minutes_since_last_handshake",
+                    "metric": "intf_wg0_client_it_admin.domain.org_minutes_since_last_handshake",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "wireguard"
                 },
                 {
-                    "metric": "wg0_my_phone_bytes_rcvd",
+                    "metric": "intf_wg0_client_my_phone_bytes_rcvd",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "wireguard"
                 },
                 {
-                    "metric": "wg0_my_phone_bytes_sent",
+                    "metric": "intf_wg0_client_my_phone_bytes_sent",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "wireguard"
                 },
                 {
-                    "metric": "wg0_my_phone_minutes_since_last_handshake",
+                    "metric": "intf_wg0_client_my_phone_minutes_since_last_handshake",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "wireguard"

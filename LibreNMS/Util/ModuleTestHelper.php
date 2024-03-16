@@ -85,6 +85,7 @@ class ModuleTestHelper
         Config::set('rrd.enable', false);
         Config::set('hide_rrd_disabled', true);
         Config::set('influxdb.enable', false);
+        Config::set('influxdbv2.enable', false);
         Config::set('graphite.enable', false);
         Config::set('prometheus.enable', false);
     }
@@ -191,7 +192,7 @@ class ModuleTestHelper
         $collection_output = preg_replace('/\033\[[\d;]+m/', '', $collection_output);
 
         // extract snmp queries
-        $snmp_query_regex = '/^SNMP\[\'.*snmp(?:bulk)?(walk|get|getnext)\' .+\'(udp|tcp|tcp6|udp6):(?:\[[0-9a-f:]+\]|[^:]+):[0-9]+\' \'(.+)\'\]$/m';
+        $snmp_query_regex = '/SNMP\[\'.*snmp(?:bulk)?(walk|get|getnext)\' .+\'(udp|tcp|tcp6|udp6):(?:\[[0-9a-f:]+\]|[^:]+):[0-9]+\' \'(.+)\'\]/m';
         preg_match_all($snmp_query_regex, $collection_output, $snmp_matches);
 
         // extract mibs and group with oids

@@ -1,0 +1,615 @@
+--**MOD+***********************************************************************
+--* Module:    ARUBAWIRED-CONFIG-MIB.mib
+--*
+--* (c) Copyright 2021-2022 Hewlett Packard Enterprise Development LP
+--* All Rights Reserved.
+--*
+--* The contents of this software are proprietary and confidential
+--* to the Hewlett-Packard Development Company, L.P.  No part of this
+--* program may be photocopied, reproduced, or translated into another
+--* programming language without prior written consent of the
+--* Hewlett-Packard Development Company, L.P.
+--*
+--* Purpose: This file contains the MIB definition of ARUBAWIRED-CONFIG-MIB
+--*
+--**MOD-***********************************************************************
+
+ARUBAWIRED-CONFIG-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    OBJECT-TYPE, MODULE-IDENTITY, Unsigned32, NOTIFICATION-TYPE, TimeTicks
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+    DisplayString, TEXTUAL-CONVENTION, TimeStamp, RowStatus, TruthValue
+        FROM SNMPv2-TC
+    InetAddressType, InetAddress
+        FROM INET-ADDRESS-MIB
+    wndFeatures
+        FROM ARUBAWIRED-NETWORKING-OID;
+
+arubaWiredConfigurationMIB MODULE-IDENTITY
+    LAST-UPDATED    "202108100000Z"
+    ORGANIZATION    "HPE/Aruba Networking Division"
+    CONTACT-INFO    "Hewlett-Packard Company
+                      8000 Foothills Blvd.
+                      Roseville, CA 95747"
+    DESCRIPTION     "This MIB module contains HPE proprietary configuration MIBs."
+    REVISION        "202108100000Z"
+    DESCRIPTION     "Initial revision."
+        ::= { wndFeatures 20 }
+
+-- *************************************************************
+-- Start of MIB Objects
+-- *************************************************************
+arubaWiredConfigurationNotifications OBJECT IDENTIFIER ::= { arubaWiredConfigurationMIB 0 }
+arubaWiredConfigurationObjects       OBJECT IDENTIFIER ::= { arubaWiredConfigurationMIB 1 }
+arubaWiredConfigurationConformance   OBJECT IDENTIFIER ::= { arubaWiredConfigurationMIB 2 }
+
+-- *************************************************************
+-- Textual conventions
+-- *************************************************************
+
+ConfigurationEventMedium ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+            "The source or destination of a configuration change,
+            save, or copy.
+
+            checkpoint: Automatic configuration checkpoint.
+            cli:        Console or SSH terminal.
+            internal:   Internal configurator.
+            rest:       RESTful interface.
+            snmp:       Simple Network Management Protocol.
+            ztp:        Zero-touch provisioning.
+            "
+    SYNTAX          INTEGER  {
+                        checkpoint(1),
+                        cli(2),
+                        internal(3),
+                        rest(4),
+                        snmp(5),
+                        ztp(6)
+                    }
+
+ConfigurationCopyProtocol ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "The protocol file transfer protocol that should be
+        used to copy the configuration file over the
+        network. If the config file transfer is to occur
+        locally on the SNMP agent, the method of transfer
+        is left up to the implementation, and is not
+        restricted to the protocols below.
+
+        scp:    Secure Copy Protocol
+        sftp:   Secure File Transfer Protocol
+        tftp:   Transfer File Transfer Protocol"
+    SYNTAX          INTEGER  {
+                        scp(1),
+                        sftp(2),
+                        tftp(3)
+                    }
+
+ConfigurationCopyState ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "The state of a external source configuration copy operation.
+        The description of each state is given below:
+
+        waiting:     A newly activated configuration copy request
+                     is placed in this state.
+
+                     Note: only one configuration copy request can run
+                     at any time. If another request is issued while there
+                     is one executing, it will fail with 'busy' as failure
+                     cause.
+        running:     this state signifies that the
+                     configuration copy request is running.
+        successful:  the state when a configuration copy request
+                     is successfully completed.
+        failed:      the configuration copy request was
+                     unsuccessful."
+    SYNTAX          INTEGER  {
+                        waiting(1),
+                        running(2),
+                        successful(3),
+                        failed(4)
+                    }
+
+ConfigurationCopyFailureCause ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "The reason a configuration copy request failed.
+
+        authenticationFailed: user/pass combination failed.
+        badFilename:          bad filename/path/permissions.
+        busy:                 there is another configuration copy
+                              operation running. Retry later.
+        invalidConfiguration:  source config is invalid.
+        invalidURL:     provided URL is invalid.
+        systemNotReady: system is not ready to copy configuration.
+        timeout:        the network may be overloaded,
+                        or the remote file server may not
+                        be responding.
+        unknown:        unknown failure.
+        "
+    SYNTAX          INTEGER  {
+                        authenticationFailed(1),
+                        badFilename(2),
+                        busy(3),
+                        invalidConfiguration(4),
+                        invalidURL(5),
+                        systemNotReady(6),
+                        timeout(7),
+                        unknown(8)
+                    }
+
+ConfigurationFileType ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "The various types of files on which a configuration copy
+        operation can be performed.
+
+        externalFile:      file on another device,
+                           e.g. a file-server on the
+                           network or on a USB drive.
+        startupConfiguration:     startup config.
+        runningConfiguration:     running config.
+        checkpoint:        non-startup user-defined checkpoint.
+        "
+
+    SYNTAX          INTEGER  {
+                        externalFile(1),
+                        startupConfiguration(2),
+                        runningConfiguration(3),
+                        checkpoint(4)
+                    }
+
+ConfigurationFileFormat ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "Configuration file format.
+
+        cli:  Command Line Interface.
+        json: JavaScript Object Notation."
+
+    SYNTAX          INTEGER  {
+                        cli(1),
+                        json(2)
+                    }
+
+-- ************************************************************
+--  Configuration copy requests table
+-- ************************************************************
+arubaWiredConfigurationCopy    OBJECT IDENTIFIER  ::= { arubaWiredConfigurationObjects 0 }
+
+    arubaWiredConfigurationCopyTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF ArubaWiredConfigurationCopyEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Contains copy configuration requests."
+        ::= { arubaWiredConfigurationCopy 1 }
+
+    arubaWiredConfigurationCopyEntry OBJECT-TYPE
+        SYNTAX      ArubaWiredConfigurationCopyEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "A configuration copy request.
+
+            A management station wishing to create an entry
+            should first generate a random serial number to be
+            used as the index to this sparse table. The station
+            should then create the associated instance of the
+            row status and row index objects.  It must also,
+            either in the same or in successive PDUs, create an
+            instance of arubaWiredConfigurationCopySourceFileType and
+            arubaWiredConfigurationCopyDestFileType. Only one
+            of the source or destination file types can be 'externalFile'.
+
+            If one of the file types is a 'externalFile', the following values
+            are expected as well:
+            - arubaWiredConfigurationCopyProtocol
+            - arubaWiredConfigurationCopyFileName
+            - arubaWiredConfigurationCopyServerAddressType
+            - arubaWiredConfigurationCopyServerAddress
+
+            If the 'externalFile' is the destination, then a valid
+            arubaWiredConfigurationCopyFileFormat is required as well.
+
+            If authentication is required, then both arubaWiredConfigurationCopyUserName
+            and arubaWiredConfigurationCopyUserPassword are necessary.
+
+            Once the appropriate instance of all the
+            configuration objects have been created, either by
+            an explicit SNMP set request or by default, the row
+            status should be set to active to initiate the
+            request. Note that this entire procedure may be
+            initiated via a single set request which specifies
+            a row status of createAndGo as well as
+            specifies valid values for the non-defaulted
+            configuration objects.
+
+            Once the configuration copy request has been created
+            (i.e. the arubaWiredConfigurationCopyEntryRowStatus has been made
+            active), the entry cannot be modified - the only
+            operation possible after this is to delete the row.
+
+            Once the request completes, the management station
+            should retrieve the values of the status objects of
+            interest, and should then delete the entry.  In
+            order to prevent old entries from clogging the
+            table, entries will be aged out, but an entry will
+            never be deleted within 5 minutes of completing."
+        INDEX       {
+                      arubaWiredConfigurationCopyIndex
+                    }
+        ::= { arubaWiredConfigurationCopyTable 1 }
+
+    ArubaWiredConfigurationCopyEntry ::= SEQUENCE {
+            arubaWiredConfigurationCopyIndex                    Unsigned32,
+            arubaWiredConfigurationCopySourceFileType           ConfigurationFileType,
+            arubaWiredConfigurationCopyDestFileType             ConfigurationFileType,
+            arubaWiredConfigurationCopyProtocol                 ConfigurationCopyProtocol,
+            arubaWiredConfigurationCheckpointName               DisplayString,
+            arubaWiredConfigurationCopyFileFormat               ConfigurationFileFormat,
+            arubaWiredConfigurationCopyFileName                 DisplayString,
+            arubaWiredConfigurationCopyServerAddressType        InetAddressType,
+            arubaWiredConfigurationCopyServerAddress            InetAddress,
+            arubaWiredConfigurationCopyUserName                 DisplayString,
+            arubaWiredConfigurationCopyUserPassword             DisplayString,
+            arubaWiredConfigurationCopyVRFName                  DisplayString,
+            arubaWiredConfigurationCopyNotificationOnCompletion TruthValue,
+            arubaWiredConfigurationCopyState                    ConfigurationCopyState,
+            arubaWiredConfigurationCopyTimeStarted              TimeStamp,
+            arubaWiredConfigurationCopyTimeCompleted            TimeStamp,
+            arubaWiredConfigurationCopyFailureCause             ConfigurationCopyFailureCause,
+            arubaWiredConfigurationCopyEntryRowStatus           RowStatus
+        }
+
+    arubaWiredConfigurationCopyIndex OBJECT-TYPE
+      SYNTAX      Unsigned32
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION "Object which specifies a unique entry in the arubaWiredConfigurationCopyTable.
+          A management station wishing to initiate a configuration copy operation
+          should use a random value for this object when creating or modifying
+          an instance of a ArubaWiredConfigurationCopyEntry. The RowStatus semantics of the
+          arubaWiredConfigurationCopyEntryRowStatus object will prevent access conflicts."
+      ::= { arubaWiredConfigurationCopyEntry 1 }
+
+    arubaWiredConfigurationCopySourceFileType OBJECT-TYPE
+    SYNTAX          ConfigurationFileType
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "Specifies the type of file to copy from. Either the
+        arubaWiredConfigurationCopySourceFileType or the
+        arubaWiredConfigurationCopyDestFileType (or both) must be of type:
+        - 'checkpoint'
+        - 'runningConfiguration'
+        - 'startupConfiguration'
+
+        The arubaWiredConfigurationCopySourceFileType
+        must be different from the arubaWiredConfigurationCopyDestFileType."
+    ::= { arubaWiredConfigurationCopyEntry 2 }
+
+arubaWiredConfigurationCopyDestFileType OBJECT-TYPE
+    SYNTAX          ConfigurationFileType
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "Specifies the type of file to copy to. Either the
+        arubaWiredConfigurationCopySourceFileType or the
+        arubaWiredConfigurationCopyDestFileType (or both) must be of type:
+        - 'checkpoint'
+        - 'runningConfiguration'
+        - 'startupConfiguration'
+
+        The arubaWiredConfigurationCopySourceFileType
+        must be different from the arubaWiredConfigurationCopyDestFileType."
+    ::= { arubaWiredConfigurationCopyEntry 3 }
+
+arubaWiredConfigurationCopyProtocol OBJECT-TYPE
+      SYNTAX      ConfigurationCopyProtocol
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+        "The protocol file transfer protocol that should be used to copy the configuration
+        file over the network. If the config file transfer is to occur locally on the SNMP
+        agent, the method of transfer is left up to the implementation."
+      ::= { arubaWiredConfigurationCopyEntry 4 }
+
+arubaWiredConfigurationCheckpointName OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "Specifies the name of the checkpoint to copy.
+        This object must be created when either
+        the arubaWiredConfigurationCopySourceFileType or
+        arubaWiredConfigurationCopyDestFileType has
+        the value 'checkpoint'."
+    ::= { arubaWiredConfigurationCopyEntry 5 }
+
+arubaWiredConfigurationCopyFileFormat OBJECT-TYPE
+    SYNTAX          ConfigurationFileFormat
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "File format to be used when exporting the configuration to a
+        remote device.
+
+        This value is ignored unless arubaWiredConfigurationCopyDestFileType
+        is 'externalFile'.
+        "
+    ::= { arubaWiredConfigurationCopyEntry 6 }
+
+arubaWiredConfigurationCopyFileName OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The name (including the path, if applicable) of the file.
+        This object must be created when either
+        the arubaWiredConfigurationCopySourceFileType or
+        arubaWiredConfigurationCopyDestFileType has
+        the value 'externalFile'."
+    ::= { arubaWiredConfigurationCopyEntry 7 }
+
+arubaWiredConfigurationCopyServerAddressType OBJECT-TYPE
+    SYNTAX          InetAddressType
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the transport type of the address contained in
+        arubaWiredConfigurationCopyServerAddress object. This must be created when either the
+        arubaWiredConfigurationCopySourceFileType or arubaWiredConfigurationCopyDestFileType
+        has the value 'externalFile'."
+    ::= { arubaWiredConfigurationCopyEntry 8 }
+
+arubaWiredConfigurationCopyServerAddress OBJECT-TYPE
+    SYNTAX          InetAddress
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The network address of the remote server from (or to) which to copy
+        the configuration. This object must be created when either the
+        arubaWiredConfigurationCopySourceFileType or arubaWiredConfigurationCopyDestFileType
+        has the value 'externalFile'.
+
+        All bits as 0s or 1s for arubaWiredConfigurationCopyServerAddress are not allowed.
+
+        The format of this address depends on the value of the
+        arubaWiredConfigurationCopyServerAddressType object."
+    ::= { arubaWiredConfigurationCopyEntry 9 }
+
+arubaWiredConfigurationCopyUserName OBJECT-TYPE
+    SYNTAX          DisplayString (SIZE  (1..40))
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "Remote username for copy via the protocol stated in arubaWiredConfigurationCopyProtocol."
+    ::= { arubaWiredConfigurationCopyEntry 10 }
+
+arubaWiredConfigurationCopyUserPassword OBJECT-TYPE
+    SYNTAX          DisplayString (SIZE  (1..40))
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "Remote password for copy via the protocol stated in arubaWiredConfigurationCopyProtocol.
+        This object must be created when the arubaWiredConfigurationCopyProtocol is:
+        - scp
+        - sftp
+
+        Reading it returns a zero-length string for security
+        reasons."
+    ::= { arubaWiredConfigurationCopyEntry 11 }
+
+arubaWiredConfigurationCopyVRFName OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "Remote vrf name for copy via the protocol stated in arubaWiredConfigurationCopyProtocol."
+    ::= { arubaWiredConfigurationCopyEntry 12 }
+
+arubaWiredConfigurationCopyNotificationOnCompletion OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "Specifies whether or not a arubaWiredConfigurationCopyCompletion
+        notification should be issued on completion of the
+        configuration transfer. If such a notification is desired,
+        it is the responsibility of the management entity to
+        ensure that the SNMP administrative model is
+        configured in such a way as to allow the
+        notification to be delivered."
+    DEFVAL          { false }
+    ::= { arubaWiredConfigurationCopyEntry 13 }
+
+arubaWiredConfigurationCopyState OBJECT-TYPE
+    SYNTAX          ConfigurationCopyState
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Specifies the state of this configuration copy request.
+        This value of this object is instantiated only after
+        the row has been instantiated, i.e. after the
+        arubaWiredConfigurationCopyEntryRowStatus has been made active."
+    ::= { arubaWiredConfigurationCopyEntry 14 }
+
+arubaWiredConfigurationCopyTimeStarted OBJECT-TYPE
+    SYNTAX          TimeStamp
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Specifies the time the arubaWiredConfigurationCopyState last
+        transitioned to 'running', or 0 if the state has
+        never transitioned to 'running' (e.g., stuck in
+        'waiting' state).
+
+        This object is instantiated only after the row has
+        been instantiated."
+    ::= { arubaWiredConfigurationCopyEntry 15 }
+
+arubaWiredConfigurationCopyTimeCompleted OBJECT-TYPE
+    SYNTAX          TimeStamp
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Specifies the time the arubaWiredConfigurationCopyState last
+        transitioned from 'running' to 'successful' or
+        'failed' states.
+
+        This object is instantiated only
+        after the row has been instantiated.
+        Its value will remain 0 until the request has
+        completed."
+    ::= { arubaWiredConfigurationCopyEntry 16 }
+
+arubaWiredConfigurationCopyFailureCause OBJECT-TYPE
+    SYNTAX          ConfigurationCopyFailureCause
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The reason why the configuration copy operation failed.
+        This object is instantiated only when the
+        arubaWiredConfigurationCopyState for this entry is in the
+        'failed' state."
+    ::= { arubaWiredConfigurationCopyEntry 17 }
+
+arubaWiredConfigurationCopyEntryRowStatus OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The status of this table entry. Once the entry
+        status is set to active, the associated entry cannot
+        be modified until the request completes
+        (arubaWiredConfigurationCopyState transitions to 'successful'
+        or 'failed' state)."
+    ::= { arubaWiredConfigurationCopyEntry 18 }
+
+-- ************************************************************
+--  Configuration Scalars
+-- ************************************************************
+arubaWiredConfigurationChange    OBJECT IDENTIFIER  ::= { arubaWiredConfigurationObjects 1 }
+
+    arubaWiredConfigurationChangeNotificationEnable OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+            "This variable indicates whether the system produces
+            the arubaWiredConfigurationChange notification. A false
+            value will prevent notifications from being generated
+            by this system."
+    DEFVAL          { false }
+    ::= { arubaWiredConfigurationChange 1 }
+
+    arubaWiredConfigurationChangeSource OBJECT-TYPE
+      SYNTAX      ConfigurationEventMedium
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "Configuration change source."
+      ::= { arubaWiredConfigurationChange 2 }
+
+    arubaWiredConfigurationChangeTimestamp OBJECT-TYPE
+      SYNTAX      TimeTicks
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION "The value of sysUpTime when the running configuration was last changed."
+      ::= { arubaWiredConfigurationChange 3 }
+
+--*************************************************************
+-- Configuration change notifications
+--*************************************************************
+arubaWiredConfigurationChangeNotification NOTIFICATION-TYPE
+    OBJECTS {
+        arubaWiredConfigurationChangeSource,
+        arubaWiredConfigurationChangeTimestamp
+    }
+    STATUS        current
+    DESCRIPTION
+            "This notification is generated when the running configuration changes."
+    ::= { arubaWiredConfigurationNotifications 1 }
+
+arubaWiredConfigurationNotificationOnCompletion NOTIFICATION-TYPE
+    OBJECTS {
+        arubaWiredConfigurationCopyServerAddress,
+        arubaWiredConfigurationCopyFileName,
+        arubaWiredConfigurationCopyState,
+        arubaWiredConfigurationCopyTimeStarted,
+        arubaWiredConfigurationCopyTimeCompleted,
+        arubaWiredConfigurationCopyFailureCause
+    }
+    STATUS        current
+    DESCRIPTION
+            "This notification is generated when a copy operation finishes."
+    ::= { arubaWiredConfigurationNotifications 2 }
+
+-- **********************************************************************
+-- Configuration Conformance information
+-- **********************************************************************
+arubaWiredConfigurationCompliances   OBJECT IDENTIFIER ::= { arubaWiredConfigurationConformance 1 }
+arubaWiredConfigurationGroups        OBJECT IDENTIFIER ::= { arubaWiredConfigurationConformance 2 }
+
+arubaWiredConfigurationScalarGroup OBJECT-GROUP
+    OBJECTS   {
+    arubaWiredConfigurationChangeNotificationEnable,
+    arubaWiredConfigurationChangeSource,
+    arubaWiredConfigurationChangeTimestamp
+    }
+    STATUS      current
+    DESCRIPTION "A collection of scalar objects."
+    ::= { arubaWiredConfigurationGroups 1 }
+
+arubaWiredConfigurationGroup OBJECT-GROUP
+        OBJECTS {
+            arubaWiredConfigurationCopyProtocol,
+            arubaWiredConfigurationCopySourceFileType,
+            arubaWiredConfigurationCopyDestFileType,
+            arubaWiredConfigurationCheckpointName,
+            arubaWiredConfigurationCopyFileFormat,
+            arubaWiredConfigurationCopyFileName,
+            arubaWiredConfigurationCopyServerAddressType,
+            arubaWiredConfigurationCopyServerAddress,
+            arubaWiredConfigurationCopyUserName,
+            arubaWiredConfigurationCopyUserPassword,
+            arubaWiredConfigurationCopyVRFName,
+            arubaWiredConfigurationCopyNotificationOnCompletion,
+            arubaWiredConfigurationCopyState,
+            arubaWiredConfigurationCopyTimeStarted,
+            arubaWiredConfigurationCopyTimeCompleted,
+            arubaWiredConfigurationCopyFailureCause,
+            arubaWiredConfigurationCopyEntryRowStatus
+        }
+        STATUS      current
+        DESCRIPTION "The configuration copy configuration."
+
+        ::= {arubaWiredConfigurationGroups 2 }
+
+arubaWiredConfigurationNotificationsGroup NOTIFICATION-GROUP
+    NOTIFICATIONS   {
+                     arubaWiredConfigurationChangeNotification,
+                     arubaWiredConfigurationNotificationOnCompletion
+                    }
+    STATUS      current
+    DESCRIPTION "A collection of configuration copy notifications objects."
+    ::= { arubaWiredConfigurationGroups 3 }
+
+arubaWiredConfigurationCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION "The compliance statement for devices implementing the
+                 ARUBA WIRED CONFIG Mib."
+    MODULE
+    MANDATORY-GROUPS {
+                      arubaWiredConfigurationScalarGroup,
+                      arubaWiredConfigurationGroup,
+                      arubaWiredConfigurationNotificationsGroup
+                     }
+    ::= { arubaWiredConfigurationCompliances 1 }
+
+END

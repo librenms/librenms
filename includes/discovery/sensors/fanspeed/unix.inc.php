@@ -1,24 +1,40 @@
 <?php
+/**
+ * unix.inc.php
+ *
+ * LibreNMS fanspeed discovery module for UNIX based OS
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ * @link       https://www.librenms.org
+ *
+ * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
+ */
+use LibreNMS\Util\Oid;
 
-$oids = snmp_walk($device, 'lmFanSensorsDevice', '-OsqnU', 'LM-SENSORS-MIB');
-d_echo($oids . "\n");
-
-$oids = trim($oids);
-if ($oids) {
-    echo 'LM-SENSORS ';
-}
-
-foreach (explode("\n", $oids) as $data) {
-    $data = trim($data);
-    if ($data) {
-        [$oid,$descr] = explode(' ', $data, 2);
-        $split_oid = explode('.', $oid);
-        $index = $split_oid[count($split_oid) - 1];
-        $oid = '.1.3.6.1.4.1.2021.13.16.3.1.3.' . $index;
-        $current = snmp_get($device, $oid, '-Oqv', 'LM-SENSORS-MIB');
-        $descr = trim(str_ireplace('fan-', '', $descr));
-        if ($current !== false && $current >= 0) {
-            discover_sensor($valid['sensor'], 'fanspeed', $device, $oid, $index, 'lmsensors', $descr, '1', '1', null, null, null, null, $current);
+$snmpData = SnmpQuery::cache()->hideMib()->walk('LM-SENSORS-MIB::lmSensors')->table(1);
+if (! empty($snmpData)) {
+    echo 'LM-SENSORS-MIB: ' . PHP_EOL;
+    foreach ($snmpData as $lmData) {
+        $type = 'lmFanSensors';
+        $divisor = 1;
+        $index = $lmData[$type . 'Index'];
+        $descr = $lmData[$type . 'Device'];
+        $value = intval($lmData[$type . 'Value']) / $divisor;
+        if (! empty($descr)) {
+            $oid = Oid::toNumeric('LM-SENSORS-MIB::' . $type . 'Value.' . $index);
+            discover_sensor($valid['sensor'], 'fanspeed', $device, $oid, $index, 'lmsensors', $descr, $divisor, 1, null, null, null, null, $value, 'snmp', null, null, null, 'lmsensors');
         }
     }
 }

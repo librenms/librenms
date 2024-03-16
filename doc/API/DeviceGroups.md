@@ -97,6 +97,72 @@ Output:
 }
 ```
 
+### `update_devicegroup`
+
+Updates a device group.
+
+Route: `/api/v0/devicegroups/:name`
+
+- name Is the name of the device group which can be obtained using
+  [`get_devicegroups`](#function-get_devicegroups). Please ensure that
+  the name is urlencoded if it needs to be (i.e Linux Servers would
+  need to be urlencoded.
+
+Input (JSON):
+
+- `name`: *optional* - The name of the device group
+- `type`: *optional* - should be `static` or `dynamic`. Setting this to static
+  requires that the devices input be provided
+- `desc`: *optional* - Description of the device group
+- `rules`: *required if type == dynamic* - A set of rules to determine which
+  devices should be included in this device group
+- `devices`: *required if type == static* - A list of devices that should be
+  included in this group. This is a static list of devices
+
+Examples:
+
+```curl
+curl -X PATCH -d '{"name": "NewLinuxServers"}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/LinuxServers
+```
+
+Output:
+
+```json
+{
+    "status": "ok",
+    "message": "Device group LinuxServers updated"
+}
+```
+
+### `delete_devicegroup`
+
+Deletes a device group.
+
+Route: `/api/v0/devicegroups/:name`
+
+- name Is the name of the device group which can be obtained using
+  [`get_devicegroups`](#function-get_devicegroups). Please ensure that
+  the name is urlencoded if it needs to be (i.e Linux Servers would
+  need to be urlencoded.
+
+Input:
+
+-
+
+Examples:
+
+```curl
+curl -X DELETE -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/LinuxServers
+```
+
+Output:
+
+```json
+{
+    "status": "ok",
+    "message": "Device group LinuxServers deleted"
+}
+```
 
 ### `get_devices_by_group`
 
@@ -206,3 +272,66 @@ Output:
 }
 ```
 
+### Add devices to group
+
+Add devices to a device group.
+
+Route: `/api/v0/devicesgroups/:name/devices`
+
+- name Is the name of the device group which can be obtained using
+  [`get_devicegroups`](#function-get_devicegroups). Please ensure that
+  the name is urlencoded if it needs to be (i.e Linux Servers would
+  need to be urlencoded.
+
+Input (JSON):
+
+- `devices`: *required* - A list of devices to be added to the group.
+
+Example:
+
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' \
+  -X POST https://librenms.org/api/v0/devicegroups/devices \
+  --data-raw '{"devices":[261,271]}'
+```
+
+Output:
+
+```json
+{
+    "status": "ok",
+    "message": "Devices added"
+}
+```
+
+### Remove devices from group
+
+Removes devices from a device group.
+
+Route: `/api/v0/devicesgroups/:name/devices`
+
+- name Is the name of the device group which can be obtained using
+  [`get_devicegroups`](#function-get_devicegroups). Please ensure that
+  the name is urlencoded if it needs to be (i.e Linux Servers would
+  need to be urlencoded.
+
+Input (JSON):
+
+- `devices`: *required* - A list of devices to be removed from the group.
+
+Example:
+
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' \
+  -X DELETE https://librenms.org/api/v0/devicegroups/devices \
+  --data-raw '{"devices":[261,271]}'
+```
+
+Output:
+
+```json
+{
+    "status": "ok",
+    "message": "Devices removed"
+}
+```

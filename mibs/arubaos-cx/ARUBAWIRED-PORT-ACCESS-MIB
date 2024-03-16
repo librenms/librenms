@@ -1,0 +1,294 @@
+--**MOD+************************************************************************
+--* Module:    ARUBAWIRED-PORT-ACCESS-MIB : PORT ACCESS MIB file
+--*
+--* (c) Copyright 2020-2021 Hewlett Packard Enterprise Development LP
+--* All Rights Reserved.
+--*
+--* The contents of this software are proprietary and confidential
+--* to the Hewlett-Packard Development Company, L.P.  No part of this
+--* program may be photocopied, reproduced, or translated into another
+--* programming language without prior written consent of the
+--* Hewlett-Packard Development Company, L.P.
+--*
+--* Purpose: This file contains MIB definition of ARUBAWIRED-PORT-ACCESS-MIB
+--*
+--**MOD-************************************************************************
+
+ARUBAWIRED-PORT-ACCESS-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+            MODULE-IDENTITY, OBJECT-TYPE,
+            Integer32
+                 FROM SNMPv2-SMI
+            DisplayString , MacAddress
+                 FROM  SNMPv2-TC
+            MODULE-COMPLIANCE , OBJECT-GROUP
+                 FROM SNMPv2-CONF
+            wndFeatures
+              FROM ARUBAWIRED-NETWORKING-OID;
+
+arubaWiredPortAccessMIB MODULE-IDENTITY
+        LAST-UPDATED "202102170000Z" -- February 17, 2021
+        ORGANIZATION "HPE/Aruba Networking Division"
+        CONTACT-INFO "Hewlett Packard Enterprise
+                          3000 Hanover St.
+                          Palo Alto, CA 94304-1112"
+        DESCRIPTION
+                     "This MIB module for Port Access"
+        REVISION     "202010140000Z" -- October 14, 2020
+        DESCRIPTION
+                     "Initial version of this MIB module"
+
+        REVISION     "202102170000Z" -- February 17, 2021
+        DESCRIPTION  "Modified Description of arubaWiredPacAppliedRoleType"
+        ::= { wndFeatures 17 }
+
+
+  -- Top-level structure of MIB
+     arubaWiredPortAccessNotifications  OBJECT IDENTIFIER ::= { arubaWiredPortAccessMIB 0}
+     arubaWiredPortAccessObjects        OBJECT IDENTIFIER ::= { arubaWiredPortAccessMIB 1}
+
+     -- PORT ACCESS CLIENT TABLE
+
+     arubaWiredPortAccessClientTable OBJECT-TYPE
+          SYNTAX          SEQUENCE OF ArubaWiredPortAccessClientEntry
+          MAX-ACCESS      not-accessible
+          STATUS          current
+          DESCRIPTION
+               "Information describing the port access
+               clients."
+          ::= { arubaWiredPortAccessObjects 1 }
+
+     arubaWiredPortAccessClientEntry OBJECT-TYPE
+          SYNTAX          ArubaWiredPortAccessClientEntry
+          MAX-ACCESS      not-accessible
+          STATUS          current
+          DESCRIPTION
+               "Information describing the port access
+               clients."
+          INDEX           { arubaWiredPacPortName, arubaWiredPacMac }
+          ::= { arubaWiredPortAccessClientTable 1 }
+
+     ArubaWiredPortAccessClientEntry ::= SEQUENCE {
+          arubaWiredPacPortName
+               DisplayString,
+          arubaWiredPacMac
+               MacAddress,
+          arubaWiredPacUserName
+               DisplayString,
+          arubaWiredPacAppliedRole
+               DisplayString,
+          arubaWiredPacAppliedRoleType
+               DisplayString,
+          arubaWiredPacOnboardedMethods
+               DisplayString,
+          arubaWiredPacAuthState
+               DisplayString,
+          arubaWiredPacAutzFailureReason
+               DisplayString,
+          arubaWiredPacVlanId
+               Integer32
+     }
+
+     arubaWiredPacPortName OBJECT-TYPE
+          SYNTAX         DisplayString (SIZE (0..8))
+          MAX-ACCESS     not-accessible
+          STATUS         current
+          DESCRIPTION    "The port ifIndex of the client"
+          ::= { arubaWiredPortAccessClientEntry 1 }
+
+     arubaWiredPacMac OBJECT-TYPE
+          SYNTAX       MacAddress
+          MAX-ACCESS   not-accessible
+          STATUS       current
+          DESCRIPTION  "MAC address of the client"
+          ::= { arubaWiredPortAccessClientEntry 2 }
+
+     arubaWiredPacUserName OBJECT-TYPE
+          SYNTAX         DisplayString (SIZE (0..255))
+          MAX-ACCESS     read-only
+          STATUS         current
+          DESCRIPTION    "User Name of the client."
+          ::= { arubaWiredPortAccessClientEntry 3 }
+
+     arubaWiredPacAppliedRole OBJECT-TYPE
+          SYNTAX         DisplayString (SIZE (0..128))
+          MAX-ACCESS     read-only
+          STATUS         current
+          DESCRIPTION    "Access Role applied for the client."
+          ::= { arubaWiredPortAccessClientEntry 4 }
+
+     arubaWiredPacAppliedRoleType OBJECT-TYPE
+          SYNTAX         DisplayString (SIZE (0..32))
+          MAX-ACCESS     read-only
+          STATUS         current
+          DESCRIPTION    "Type of role applied for the client"
+          ::= { arubaWiredPortAccessClientEntry 5 }
+
+     arubaWiredPacOnboardedMethods OBJECT-TYPE
+          SYNTAX        DisplayString (SIZE (0..16))
+          MAX-ACCESS    read-only
+          STATUS        current
+          DESCRIPTION   "Client on-boarded method:
+                        device-profile/dot1x/mac-auth/port-security"
+          ::= { arubaWiredPortAccessClientEntry 6 }
+
+     arubaWiredPacAuthState OBJECT-TYPE
+          SYNTAX        DisplayString (SIZE (0..32))
+          MAX-ACCESS    read-only
+          STATUS        current
+          DESCRIPTION   "State of port access authentication"
+          ::= { arubaWiredPortAccessClientEntry 7 }
+
+     arubaWiredPacAutzFailureReason OBJECT-TYPE
+          SYNTAX        DisplayString (SIZE (0..64))
+          MAX-ACCESS    read-only
+          STATUS        current
+          DESCRIPTION   "Reason for authorization failure"
+          ::= { arubaWiredPortAccessClientEntry 8 }
+
+     arubaWiredPacVlanId OBJECT-TYPE
+          SYNTAX         Integer32
+          MAX-ACCESS     read-only
+          STATUS         current
+          DESCRIPTION    "Vlan Id associated with the Client."
+          ::= { arubaWiredPortAccessClientEntry 9 }
+
+     -- PORT ACCESS ROLE TABLE
+
+     arubaWiredPortAccessRoleTable OBJECT-TYPE
+          SYNTAX          SEQUENCE OF ArubaWiredPortAccessRoleEntry
+          MAX-ACCESS      not-accessible
+          STATUS          current
+          DESCRIPTION
+               "Information describing the port access
+               Roles."
+          ::= { arubaWiredPortAccessObjects 2 }
+
+     arubaWiredPortAccessRoleEntry OBJECT-TYPE
+          SYNTAX          ArubaWiredPortAccessRoleEntry
+          MAX-ACCESS      not-accessible
+          STATUS          current
+          DESCRIPTION
+               "Information describing the port access
+               Roles."
+          INDEX           { arubaWiredParName }
+          ::= { arubaWiredPortAccessRoleTable 1 }
+
+     ArubaWiredPortAccessRoleEntry ::= SEQUENCE {
+          arubaWiredParName
+               DisplayString,
+          arubaWiredParOrigin
+               DisplayString,
+          arubaWiredParUbtGatewayRole
+               DisplayString,
+          arubaWiredParUbtGatewayClearpassRole
+               DisplayString,
+          arubaWiredParGatewayZone
+               DisplayString,
+          arubaWiredParVlanId
+               Integer32,
+          arubaWiredParVlanMode
+               DisplayString
+     }
+
+     arubaWiredParName OBJECT-TYPE
+          SYNTAX         DisplayString (SIZE (0..110))
+          MAX-ACCESS     not-accessible
+          STATUS         current
+          DESCRIPTION    "Name of the role."
+          ::= { arubaWiredPortAccessRoleEntry 1 }
+
+     arubaWiredParOrigin OBJECT-TYPE
+          SYNTAX       DisplayString (SIZE (0..128))
+          MAX-ACCESS   read-only
+          STATUS       current
+          DESCRIPTION  "Origin of the access role, i.e., how the access role is
+                        created."
+          ::= { arubaWiredPortAccessRoleEntry 2 }
+
+     arubaWiredParUbtGatewayRole OBJECT-TYPE
+          SYNTAX         DisplayString (SIZE (0..63))
+          MAX-ACCESS     read-only
+          STATUS         current
+          DESCRIPTION    "Role to be assigned to tunneled clients on the UBT
+                         cluster side."
+          ::= { arubaWiredPortAccessRoleEntry 3 }
+
+     arubaWiredParUbtGatewayClearpassRole OBJECT-TYPE
+          SYNTAX         DisplayString (SIZE (0..128))
+          MAX-ACCESS     read-only
+          STATUS         current
+          DESCRIPTION    "Indicates the role name that will be communicated to
+                         the UBT  cluster. The cluster needs to download the
+                         role definition from ClearPass."
+          ::= { arubaWiredPortAccessRoleEntry 4 }
+
+     arubaWiredParGatewayZone OBJECT-TYPE
+          SYNTAX         DisplayString (SIZE (0..255))
+          MAX-ACCESS     read-only
+          STATUS         current
+          DESCRIPTION    "Gateway zone associated with this user role."
+          ::= { arubaWiredPortAccessRoleEntry 5 }
+
+     arubaWiredParVlanId OBJECT-TYPE
+          SYNTAX         Integer32
+          MAX-ACCESS     read-only
+          STATUS         current
+          DESCRIPTION    "Vlan Id associated with the role."
+          ::= { arubaWiredPortAccessRoleEntry 6 }
+
+     arubaWiredParVlanMode OBJECT-TYPE
+          SYNTAX         DisplayString (SIZE (0..128))
+          MAX-ACCESS     read-only
+          STATUS         current
+          DESCRIPTION    "Vlan Mode associated with the role."
+          ::= { arubaWiredPortAccessRoleEntry 7 }
+
+-- Conformance Information
+
+     arubaWiredPortAccessConformance OBJECT IDENTIFIER ::= { arubaWiredPortAccessMIB 2 }
+     arubaWiredPortAccessGroups OBJECT IDENTIFIER ::= { arubaWiredPortAccessConformance 1 }
+
+     arubaWiredPortAccessClientGroup OBJECT-GROUP
+         OBJECTS {  arubaWiredPacUserName,
+                    arubaWiredPacAppliedRole,
+                    arubaWiredPacAppliedRoleType,
+                    arubaWiredPacOnboardedMethods,
+                    arubaWiredPacAuthState,
+                    arubaWiredPacAutzFailureReason,
+                    arubaWiredPacVlanId
+                   }
+        STATUS          current
+        DESCRIPTION     "These objects are used for describing
+                         Port Access Client parameters"
+        ::= { arubaWiredPortAccessGroups 1 }
+
+     arubaWiredPortAccessRoleGroup OBJECT-GROUP
+            OBJECTS       {
+                           arubaWiredParOrigin,
+                           arubaWiredParUbtGatewayRole,
+                           arubaWiredParUbtGatewayClearpassRole,
+                           arubaWiredParGatewayZone,
+                           arubaWiredParVlanId,
+                           arubaWiredParVlanMode
+                          }
+            STATUS        current
+            DESCRIPTION   "These objects are used for describing
+                           Port Access Role parameters"
+            ::= { arubaWiredPortAccessGroups 2 }
+
+-- Compliance Statements
+
+     arubaWiredPortAccessCompliances OBJECT IDENTIFIER ::=
+                    {arubaWiredPortAccessConformance 2}
+
+     arubaWiredPortAccessCompliance MODULE-COMPLIANCE
+          STATUS      current
+          DESCRIPTION "The compliance statement for devices
+                       with support of Port Access Clients"
+          MODULE  -- this module
+          MANDATORY-GROUPS { arubaWiredPortAccessClientGroup,
+                             arubaWiredPortAccessRoleGroup
+                           }
+          ::= { arubaWiredPortAccessCompliances 1 }
+END

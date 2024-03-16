@@ -917,6 +917,10 @@ return [
             'description' => 'Table port FDB, entrées plus anciennes que',
             'help' => 'Nettoyage effectué par daily.sh',
         ],
+        'ports_nac_purge' => [
+            'description' => 'Table port NAC, entrées plus anciennes que',
+            'help' => 'Nettoyage effectué par daily.sh',
+        ],
         'ports_purge' => [
             'description' => 'Purger les ports supprimés',
             'help' => 'Nettoyage effectué par daily.sh',

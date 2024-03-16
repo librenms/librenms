@@ -244,18 +244,21 @@ require {
         type httpd_t;
         type rrdcached_t;
         type httpd_sys_rw_content_t;
-        class dir { add_name getattr remove_name rmdir search write };
-        class file { create getattr open read rename setattr unlink write };
+        class dir { add_name getattr open read remove_name rmdir search write };
+        class file { create getattr open read rename setattr unlink write map lock };
         class sock_file { create setattr unlink write };
         class capability { fsetid sys_resource };
+        class unix_stream_socket connectto;
 }
  
 #============= rrdcached_t ==============
  
 allow rrdcached_t httpd_sys_rw_content_t:dir { add_name getattr remove_name search write };
-allow rrdcached_t httpd_sys_rw_content_t:file { create getattr open read rename setattr unlink write };
+allow rrdcached_t httpd_sys_rw_content_t:file { create getattr open read rename setattr unlink write map lock };
 allow rrdcached_t self:capability fsetid;
 allow rrdcached_t var_run_t:sock_file { create setattr unlink };
+allow httpd_t var_run_t:sock_file write;
+allow httpd_t rrdcached_t:unix_stream_socket connectto;
 EOF
 
 checkmodule -M -m -o rrdcached_librenms.mod rrdcached_librenms.te

@@ -8,7 +8,7 @@
                     "sysDescr": "Aruba JL635A 8325 GL.10.06.0110",
                     "sysContact": "<private>",
                     "version": "GL.10.06.0110",
-                    "hardware": "8325",
+                    "hardware": "Aruba 8325-48Y8C 48p 25G 8p 100G Swch",
                     "features": null,
                     "location": "<private>",
                     "os": "arubaos-cx",
