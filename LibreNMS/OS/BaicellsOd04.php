@@ -13,6 +13,6 @@ class BaicellsOd04 extends OS
     {
         [$h, $m, $s] = explode(':', $duration);
 
-        return $h * 60 + $m + $s / 60;
+        return (int)$h * 60 + (int)$m + (int)$s / 60;
     }
 }
