@@ -787,7 +787,7 @@ The alert template can make use of
 [Slack markdown](https://api.slack.com/reference/surfaces/formatting#basic-formatting).
 In the Slack markdown dialect, custom links are denoted with HTML angled
 brackets, but LibreNMS strips these out. To support embedding custom links in alerts,
-use the bracket/parenthese markdown syntax for links.  For example if you would
+use the bracket/parentheses markdown syntax for links.  For example if you would
 typically use this for a Slack link:
 
 `<https://www.example.com|My Link>`
