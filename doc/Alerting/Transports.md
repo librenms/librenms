@@ -790,11 +790,11 @@ brackets, but LibreNMS strips these out. To support embedding custom links in al
 use the bracket/parenthese markdown syntax for links.  For example if you would
 typically use this for a Slack link:
 
-&lt;https://www.example.com|My Link&gt;
+`&lt;https://www.example.com|My Link&gt;`
 
 Use this in your alert template:
 
-\[My Link](https://www.example.com)
+`\[My Link](https://www.example.com)`
 
 **Example:**
 
@@ -803,7 +803,7 @@ Use this in your alert template:
 | Webhook URL | <https://slack.com/url/somehook> |
 | Channel | network-alerts |
 | Author Name | LibreNMS Bot |
-| Icon | :scream: |
+| Icon | `:scream:` |
 
 ## SMSEagle
 
