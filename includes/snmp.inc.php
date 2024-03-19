@@ -805,3 +805,94 @@ function get_device_max_repeaters($device)
 
     return $attrib ?? Config::getOsSetting($device['os'], 'snmp.max_repeaters', Config::get('snmp.max_repeaters', false));
 }
+
+/**
+ * snmp walk function specially fitted to arista switches, that allows to give community as parameter
+ *
+ * @param  unknown  $device
+ * @param  unknown  $community
+ * @param  unknown  $vrf_name
+ * @param  unknown  $oid
+ * @param  array  $result_array
+ * @param  unknown  $mib
+ * @param  unknown  $mibdir
+ * @param  string  $snmpflags
+ * @return array|string
+ */
+function snmp_walk_arista($device, $community, $vrf_name, $oid, $result_array = [], $mib = null, $mibdir = null, $snmpflags = '-OQUs')
+{
+    $snmp_flags = [
+        '-c ',
+        $community . '@' . $vrf_name,
+        '-OQUs',
+    ];
+    $command = gen_snmpwalk_cmd($device, $oid, $snmp_flags, 'ARISTA-BGP4V2-MIB');
+    $exec_output = [];
+    exec(implode(' ', $command), $exec_output);
+
+    if (str_contains($exec_output[0], 'No more variables left in this MIB View')) {
+        return [];
+    }
+
+    foreach ($exec_output as $entry) {
+        if (! Str::contains($entry, ' =')) {
+            if (! empty($entry) && isset($index, $oid)) {
+                $result_array[$index][$oid] .= "\n$entry";
+            }
+            continue;
+        }
+
+        [$oid,$value] = explode('=', $entry, 2);
+        $oid = trim($oid);
+        $value = trim($value, "\" \\\n\r");
+        [$oid, $index] = explode('.', $oid, 2);
+        if (! strstr($value, 'at this OID') && ! empty($oid)) {
+            $result_array[$index][$oid] = $value;
+        }
+    }
+
+    return $result_array;
+}
+
+function snmp_get_multi_arista($device, $community, $vrf_name, $oids, $options = '-OQUs', $mib = null, $mibdir = null, $array = [])
+{
+    $measure = Measurement::start('snmpget');
+
+    if (! is_array($oids)) {
+        $oids = explode(' ', $oids);
+    }
+
+    $cmd = gen_snmpget_cmd($device, $oids, $options, $mib, $mibdir);
+    $cmd[3] = $community . '@' . $vrf_name;
+    $data = trim(external_exec($cmd));
+
+    foreach (explode("\n", $data) as $entry) {
+        if (! Str::contains($entry, ' =')) {
+            if (! empty($entry) && isset($index, $oid)) {
+                $array[$index][$oid] .= "\n$entry";
+            }
+
+            continue;
+        }
+
+        [$oid,$value] = explode('=', $entry, 2);
+        $oid = trim($oid);
+        $value = trim($value, "\" \n\r");
+        [$oid, $index] = explode('.', $oid, 2);
+
+        if (! Str::contains($value, 'at this OID')) {
+            if (is_null($index)) {
+                if (empty($oid)) {
+                    continue; // no index or oid
+                }
+                $array[$oid] = $value;
+            } else {
+                $array[$index][$oid] = $value;
+            }
+        }
+    }
+
+    $measure->manager()->recordSnmp($measure->end());
+
+    return $array;
+}//end snmp_get_multi()
