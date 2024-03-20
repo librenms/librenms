@@ -313,12 +313,10 @@ function list_devices(Illuminate\Http\Request $request)
     $query = $request->get('query');
     $param = [];
 
-    if (empty($order)) {
-        $order = 'hostname';
-    }
-
-    if (stristr($order, ' desc') === false && stristr($order, ' asc') === false) {
-        $order = 'd.`' . $order . '` ASC';
+    if (preg_match('/^([a-z_]+)(?: (desc|asc))?$/i', $order, $matches)) {
+        $order = "d.`$matches[1]` " . ($matches[2] ?? 'ASC');
+    } else {
+        $order = 'd.`hostname` ASC';
     }
 
     $select = ' d.*, GROUP_CONCAT(dd.device_id) AS dependency_parent_id, GROUP_CONCAT(dd.hostname) AS dependency_parent_hostname, `location`, `lat`, `lng` ';
