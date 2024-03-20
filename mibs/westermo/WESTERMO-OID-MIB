@@ -1,0 +1,68 @@
+WESTERMO-OID-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    enterprises, MODULE-IDENTITY
+    FROM SNMPv2-SMI;
+
+westermo MODULE-IDENTITY
+    LAST-UPDATED "201010200000Z"
+    ORGANIZATION "Westermo Teleindustri AB"
+    CONTACT-INFO
+        "Westermo Teleindustri AB
+	640 40 Stora Sundby
+	Sweden
+	registry@westermo.se"
+
+    DESCRIPTION
+	"This MIB module defines the top objects of the Westermo private MIB."
+
+    REVISION "201010200000Z"
+    DESCRIPTION
+	"Defined OID for the Westermo i-line series of switches, within the
+	products' branch."
+
+    REVISION "200905280000Z"
+    DESCRIPTION
+	"This MIB module (WESTERMO-OID-MIB) is now used also by the
+    	private MIB of 'traditional' (non-WeOS) Westermo Lynx/Viper
+    	switches. That is, for (non-WeOS) Lynx firmware version 3.17
+    	and later, the Lynx Private MIB is split into two modules; the
+    	top module (WESTERMO-OID-MIB) and a Lynx specific MIB module
+    	(WESTERMO-LYNX-MIB). 
+
+	Please see the Lynx Release Notes for information on MIB file
+    	updates."
+
+    REVISION "200905180000Z"
+    DESCRIPTION
+	"First WeOS revision. Used by WESTERMO-WEOS-MIB from WeOS version 4.0.0 and
+	later.  Please see the WeOS Release Notes for information on MIB file
+	updates."
+
+    ::= { enterprises 16177 }
+
+--
+-- Main branches
+--
+
+products	OBJECT IDENTIFIER ::= { westermo 1 }
+common		OBJECT IDENTIFIER ::= { westermo 2 }
+
+--
+-- Branches under the products node 
+-- * The 'lynx' and 'mrd' branches are defined in their respective
+--   product specific mib file.
+-- * The 'i-line' branch is defined here, and is used by all product
+--   specific mib files for in the i-line series of switches
+--
+-- lynx		OBJECT IDENTIFIER ::= { products 2 }
+-- mrd		OBJECT IDENTIFIER ::= { products 200 }
+i-line		OBJECT IDENTIFIER ::= { products 300 }
+
+--
+-- Branches under the common node (defined in branch specific files)
+--
+
+-- weos		OBJECT IDENTIFIER ::= { common 1 }
+
+END

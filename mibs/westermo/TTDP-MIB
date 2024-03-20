@@ -1,0 +1,1242 @@
+	TTDP-MIB DEFINITIONS::= BEGIN
+ 
+		IMPORTS
+			OBJECT-GROUP, MODULE-COMPLIANCE			
+				FROM SNMPv2-CONF			
+			iso, IpAddress, Integer32, Unsigned32, OBJECT-TYPE, 
+			MODULE-IDENTITY			
+				FROM SNMPv2-SMI			
+			MacAddress, TruthValue, TEXTUAL-CONVENTION			
+				FROM SNMPv2-TC;
+	
+	
+-- ***********************************************************************
+-- Root OID
+-- ***********************************************************************
+		-- 1.0.61375.2
+		iec61375 MODULE-IDENTITY 
+			LAST-UPDATED "201606100000Z"
+			ORGANIZATION 
+				"IEC"
+			CONTACT-INFO 
+				"International Electrotechnical Commission
+				IEC Central Office
+				3, rue de Varembé
+				P.O. Box 131
+				CH – 1211 GENEVA 20
+				Switzerland
+				Phone: +41 22 919 02 11
+				Fax: +41 22 919 03 00
+				email: info@iec.ch"
+			DESCRIPTION 
+				"This MIB module defines the Network Management interfaces
+				for the TTDP protocol defined by the IEC standard 61375-2-5.
+				
+				This definition specifies a pure monitoring variant of a SNMP entity."
+
+			REVISION "201606100000Z"
+    			DESCRIPTION
+				"Westermo temporary adaptions to handle limitations in the original MIB file.
+				This version is not official. The aim is to temporarily solve issues in
+				the MIB file for Westermo customers until a revised standard version of 
+				the MIB is published." 
+			::= { stdx61375 2 }
+
+		
+	
+--
+-- Textual conventions
+--
+	
+		TtdpPhysicalLineId::= TEXTUAL-CONVENTION
+			STATUS current
+			DESCRIPTION 
+				"Represents TTDP physical line Identifier (A, B, C, D or none)."
+			SYNTAX INTEGER
+				{
+				lineNone(45),
+				lineA(65),
+				lineB(66),
+				lineC(67),
+				lineD(68)
+				}
+
+		TtdpOrientation::= TEXTUAL-CONVENTION
+			STATUS current
+			DESCRIPTION 
+				"Represents orientation of an ETBN or a Consist"
+			SYNTAX INTEGER
+				{
+				direct(1),
+				inverse(2),
+				undefined(3)
+				}
+
+		Antivalent2::= TEXTUAL-CONVENTION
+			STATUS current
+			DESCRIPTION 
+				"Definition of ANTIVALENT2 type."
+			SYNTAX INTEGER
+				{
+				error(0),
+				false(1),
+				true(2),
+				undefined(3)
+				}
+
+		TtdpDirection::= TEXTUAL-CONVENTION
+			STATUS current
+			DESCRIPTION 
+				"Represents an ETB direction."
+			SYNTAX INTEGER
+				{
+				dir1(1),
+				dir2(2)
+				}
+
+	
+--
+-- Node definitions
+--
+	
+		-- 1.0
+		std OBJECT IDENTIFIER::= { iso 0 }
+
+		
+		-- 1.0.61375
+		stdx61375 OBJECT IDENTIFIER::= { std 61375 }
+
+		
+-- ***********************************************************************
+-- TTDP Protocol
+-- ***********************************************************************
+		-- 1.0.61375.2.5
+		ttdp OBJECT IDENTIFIER::= { iec61375 5 }
+
+		
+-- ***********************************************************************
+-- objects groups of TTDP object identifiers
+-- ***********************************************************************
+		-- 1.0.61375.2.5.1
+		ttdpObjects OBJECT IDENTIFIER::= { ttdp 1 }
+
+		
+-- ETBN TTDP general information.
+		-- 1.0.61375.2.5.1.1
+		ttdpGenInfo OBJECT IDENTIFIER::= { ttdpObjects 1 }
+
+		
+		-- 1.0.61375.2.5.1.1.1
+		ttdpVersion OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"TTDP protocol version.
+				
+				Interpreted version string is 'M.m.r.n' for raw value 'Mmrn'H.
+				First version is '1.0.0.0'."
+			::= { ttdpGenInfo 1 }
+
+		
+		-- 1.0.61375.2.5.1.1.2
+		ttdpSlowTimeout OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"TTDP HELLO frames slow timeout in ms."
+			::= { ttdpGenInfo 2 }
+
+		
+		-- 1.0.61375.2.5.1.1.3
+		ttdpFastTimeout OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"TTDP HELLO frames fast timeout in ms."
+			::= { ttdpGenInfo 3 }
+
+		
+		-- 1.0.61375.2.5.1.1.4
+		ttdpTopoTtl OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"TTDP TOPOLOGY frames TTL in ms."
+			::= { ttdpGenInfo 4 }
+
+		
+		-- 1.0.61375.2.5.1.1.5
+		ttdpGlobalTopoTimeout OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"global TTDP TOPOLOGY frames timeout in ms."
+			::= { ttdpGenInfo 5 }
+
+		
+-- ETBN ETB links information.
+		-- 1.0.61375.2.5.1.3
+		ttdpLinksInfo OBJECT IDENTIFIER::= { ttdpObjects 3 }
+
+		
+		-- 1.0.61375.2.5.1.3.1
+		ttdpLogicalLinksNb OBJECT-TYPE
+			SYNTAX Unsigned32 (2)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Number of ETBN logical links connected to ETB.
+				
+				Must always be 2."
+			::= { ttdpLinksInfo 1 }
+
+		
+		-- 1.0.61375.2.5.1.3.2
+		ttdpLogicalLinksTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF TtdpLogicalLinksEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"ETBN ETB logical links table.
+				
+				There are always 2 directions (dir1, dir2) for each ETBN."
+			::= { ttdpLinksInfo 2 }
+
+		
+		-- 1.0.61375.2.5.1.3.2.1
+		ttdpLogicalLinksEntry OBJECT-TYPE
+			SYNTAX TtdpLogicalLinksEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Entry for an ETBN logical links table."
+			INDEX { ttdpLogicalLinksIdx }
+			::= { ttdpLogicalLinksTable 1 }
+
+		
+		TtdpLogicalLinksEntry::=
+			SEQUENCE { 
+				ttdpLogicalLinksIdx
+					TtdpDirection,
+				ttdpConfiguredPhysLinesNb
+					Unsigned32,
+				ttdpActivePhysLinesNb
+					Unsigned32,
+				ttdpIsEndLink
+					TruthValue
+			 }
+
+		-- 1.0.61375.2.5.1.3.2.1.1
+		ttdpLogicalLinksIdx OBJECT-TYPE
+			SYNTAX TtdpDirection
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Link index in logical link table.
+				
+				1 is for dir1, 2 for dir2 of the ETBN."
+			::= { ttdpLogicalLinksEntry 1 }
+
+		
+		-- 1.0.61375.2.5.1.3.2.1.2
+		ttdpConfiguredPhysLinesNb OBJECT-TYPE
+			SYNTAX Unsigned32 (1..4)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Number of statically defined physical lines in LAG."
+			::= { ttdpLogicalLinksEntry 2 }
+
+		
+		-- 1.0.61375.2.5.1.3.2.1.3
+		ttdpActivePhysLinesNb OBJECT-TYPE
+			SYNTAX Unsigned32 (0..4)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Number of active physical lines in LAG."
+			::= { ttdpLogicalLinksEntry 3 }
+
+		
+		-- 1.0.61375.2.5.1.3.2.1.4
+		ttdpIsEndLink OBJECT-TYPE
+			SYNTAX TruthValue
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Logical link extremity status.
+				
+				true when logical link is an ETB end link, else false."
+			::= { ttdpLogicalLinksEntry 4 }
+
+		
+		-- 1.0.61375.2.5.1.3.3
+		ttdpPhysicalLinesTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF TtdpPhysicalLinesEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Physical lines table for an ETB direction."
+			::= { ttdpLinksInfo 3 }
+
+		
+		-- 1.0.61375.2.5.1.3.3.1
+		ttdpPhysicalLinesEntry OBJECT-TYPE
+			SYNTAX TtdpPhysicalLinesEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Physical lines table entry.
+				
+				ttdpLogicalLinksIdx is the first level index in ttdpLogicalLinksTable,
+				ttdpPhysicalLinesIdx is the second level index in ttdpPhysicalLinesTable."
+			INDEX { ttdpLogicalLinksIdx, ttdpPhysicalLinesIdx }
+			::= { ttdpPhysicalLinesTable 1 }
+
+		
+		TtdpPhysicalLinesEntry::=
+			SEQUENCE { 
+				ttdpPhysicalLinesIdx
+					TtdpPhysicalLineId,
+				ttdpPortState
+					INTEGER,
+				ttdpLineRcvState
+					INTEGER,
+				ttdpPeerLineId
+					TtdpPhysicalLineId
+			 }
+
+		-- 1.0.61375.2.5.1.3.3.1.1
+		ttdpPhysicalLinesIdx OBJECT-TYPE
+			SYNTAX TtdpPhysicalLineId
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Line index in physical lines table.
+				
+				None value is not allowed (only line A, B, C or D).
+				
+				"
+			::= { ttdpPhysicalLinesEntry 1 }
+
+		
+		-- 1.0.61375.2.5.1.3.3.1.2
+		ttdpPortState OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				disabled(0),
+				forwarding(2),
+				discarding(3)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"TTDP switch port state."
+			::= { ttdpPhysicalLinesEntry 2 }
+
+		
+		-- 1.0.61375.2.5.1.3.3.1.3
+		ttdpLineRcvState OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				lineNotOK(1),
+				lineOK(2),
+				notAvailable(3)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Physical line status (according to TTDP HELLO frames received and port status)."
+			::= { ttdpPhysicalLinesEntry 3 }
+
+		
+		-- 1.0.61375.2.5.1.3.3.1.4
+		ttdpPeerLineId OBJECT-TYPE
+			SYNTAX TtdpPhysicalLineId
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Physical line distant (peer) ID."
+			::= { ttdpPhysicalLinesEntry 4 }
+
+		
+		-- 1.0.61375.2.5.1.3.4
+		ttdpPhysicalLinesStatsTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF TtdpPhysicalLinesStatsEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Physical lines statistics table for physical lines (optional)."
+			::= { ttdpLinksInfo 4 }
+
+		
+		-- 1.0.61375.2.5.1.3.4.1
+		ttdpPhysicalLinesStatsEntry OBJECT-TYPE
+			SYNTAX TtdpPhysicalLinesStatsEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Physical line statistics table entry.
+				
+				ttdpLogicalLinksIdx is the first level index in ttdpLogicalLinksTable,
+				ttdpPhysicalLinesIdx is the second level index in ttdpPhysicalLinesStatsTable."
+			INDEX { ttdpLogicalLinksIdx, ttdpPhysicalLinesIdx }
+			::= { ttdpPhysicalLinesStatsTable 1 }
+
+		
+		TtdpPhysicalLinesStatsEntry::=
+			SEQUENCE { 
+				ttdpHelloSentFrames
+					Integer32,
+				ttdpHelloReceivedFrames
+					Integer32,
+				ttdpRemoteFastModeCnt
+					Integer32,
+				ttdpLocalFastModeCnt
+					Integer32
+			 }
+
+		-- 1.0.61375.2.5.1.3.4.1.1
+		ttdpHelloSentFrames OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Number of HELLO frames sent on this line
+				
+				Optional, = -1 if not provided."
+			::= { ttdpPhysicalLinesStatsEntry 1 }
+
+		
+		-- 1.0.61375.2.5.1.3.4.1.2
+		ttdpHelloReceivedFrames OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Number of HELLO frames received on this line
+				
+				Optional, = -1 if not provided."
+			::= { ttdpPhysicalLinesStatsEntry 2 }
+
+		
+		-- 1.0.61375.2.5.1.3.4.1.3
+		ttdpRemoteFastModeCnt OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Number of times fast mode was activated on peer.
+				
+				Optional, = -1 if not provided."
+			::= { ttdpPhysicalLinesStatsEntry 3 }
+
+		
+		-- 1.0.61375.2.5.1.3.4.1.4
+		ttdpLocalFastModeCnt OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Number of times fast mode was locally entered (activated by peer).
+				
+				Optional, = -1 if not provided."
+			::= { ttdpPhysicalLinesStatsEntry 4 }
+
+		
+-- ETBN TTDP TOPOLOGY information.
+		-- 1.0.61375.2.5.1.5
+		ttdpTopoInfo OBJECT IDENTIFIER::= { ttdpObjects 5 }
+
+		
+-- Local ETBN information
+		-- 1.0.61375.2.5.1.5.1
+		ttdpLocalEtbnInfo OBJECT IDENTIFIER::= { ttdpTopoInfo 1 }
+
+		
+		-- 1.0.61375.2.5.1.5.1.1
+		ttdpEtbId OBJECT-TYPE
+			SYNTAX Unsigned32 (0..3)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"ETB number on which local ETBN is connected to.
+				- 0: backbone
+				- 1: multimedia
+				- 2: not specialized
+				- 3: not specialized"
+			::= { ttdpLocalEtbnInfo 1 }
+
+		
+		-- 1.0.61375.2.5.1.5.1.2
+		ttdpLocalEtbnMacAddr OBJECT-TYPE
+			SYNTAX MacAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Local ETBN MAC address."
+			::= { ttdpLocalEtbnInfo 2 }
+
+		
+		-- 1.0.61375.2.5.1.5.1.3
+		ttdpLocalEtbnId OBJECT-TYPE
+			SYNTAX Unsigned32 (1..63)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This ETBN's inaugurated ETBN ID."
+			::= { ttdpLocalEtbnInfo 3 }
+
+		
+		-- 1.0.61375.2.5.1.5.1.4
+		ttdpNodePosition OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				intermediate(0),
+				extremity1(1),
+				extremity2(2)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Node position on ETB."
+			::= { ttdpLocalEtbnInfo 4 }
+
+		
+		-- 1.0.61375.2.5.1.5.1.5
+		ttdpIsAlone OBJECT-TYPE
+			SYNTAX TruthValue
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Flag which tells whether ETBN node is alone on ETB."
+			::= { ttdpLocalEtbnInfo 5 }
+
+		
+		-- 1.0.61375.2.5.1.5.1.6
+		ttdpConnTableValid OBJECT-TYPE
+			SYNTAX TruthValue
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Flag which describes whether physical topology is stable or not."
+			::= { ttdpLocalEtbnInfo 6 }
+
+		
+		-- 1.0.61375.2.5.1.5.1.7
+		ttdpEtbTopoCntValid OBJECT-TYPE
+			SYNTAX TruthValue
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Flag which describes whether logical topology is stable or not."
+			::= { ttdpLocalEtbnInfo 7 }
+
+		
+-- Statistics on local ETBN TOPOLOGY frames (optional)
+		-- 1.0.61375.2.5.1.5.1.8
+		ttdpTopoFrameStats OBJECT IDENTIFIER::= { ttdpLocalEtbnInfo 8 }
+
+		
+		-- 1.0.61375.2.5.1.5.1.8.1
+		ttdpTopoSentFrames OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Number of TOPOLOGY frames sent from this node.
+				
+				= -1 if not provided."
+			::= { ttdpTopoFrameStats 1 }
+
+		
+		-- 1.0.61375.2.5.1.5.1.8.2
+		ttdpTopoReceivedFrames OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Number of TOPOLOGY frames received on this node.
+				
+				= -1 if not provided."
+			::= { ttdpTopoFrameStats 2 }
+
+		
+		-- 1.0.61375.2.5.1.5.2
+		ttdpEtbnCnt OBJECT-TYPE
+			SYNTAX Unsigned32 (1..63)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Number of ETBN on ETB. Reports number of ETBNs currently present."
+			::= { ttdpTopoInfo 2 }
+
+		
+		-- 1.0.61375.2.5.1.5.3
+		ttdpEtbnTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF TtdpEtbnEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"corrected physical topology (connectivity table) + some more info."
+			::= { ttdpTopoInfo 3 }
+
+		
+		-- 1.0.61375.2.5.1.5.3.1
+		ttdpEtbnEntry OBJECT-TYPE
+			SYNTAX TtdpEtbnEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Entry for corrected physical topology (connectivity table)."
+			INDEX { ttdpEtbnTableIdx }
+			::= { ttdpEtbnTable 1 }
+
+		
+		TtdpEtbnEntry::=
+			SEQUENCE { 
+				ttdpEtbnTableIdx
+					Unsigned32,
+				ttdpEtbnId
+					Unsigned32,
+				ttdpEtbnMacAddr
+					MacAddress,
+				ttdpEtbnOrientation
+					TtdpOrientation,
+				ttdpEtbnIpAddr
+					IpAddress,
+				ttdpEtbnNodeRole
+					INTEGER,
+				ttdpEtbnInaugState
+					INTEGER,
+				ttdpEtbnInhibit
+					TruthValue,
+				ttdpRemoteInhibit
+					TruthValue,
+				ttdpConnTableCrc32
+					Unsigned32,
+				ttdpEtbTopoCnt
+					Unsigned32,
+				ttdpLengthen
+					Antivalent2,
+				ttdpShorten
+					Antivalent2
+			 }
+
+		-- 1.0.61375.2.5.1.5.3.1.1
+		ttdpEtbnTableIdx OBJECT-TYPE
+			SYNTAX Unsigned32 (1..63)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"ETBN index in ttdpEtbnTable (physical topology)."
+			::= { ttdpEtbnEntry 1 }
+
+		
+		-- 1.0.61375.2.5.1.5.3.1.2
+		ttdpEtbnId OBJECT-TYPE
+			SYNTAX Unsigned32 (0..63)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"ETBN ID on ETB.
+				
+				1..N ETBN are ordered from lowest cstUUID toward direction2 for ascending ETBN Ids.
+				Only present ETBNs are included, while missing ETBN are not listed. The sequence
+				may therefore include gaps. This may be changed to include entries with missing nodes, 
+				then reported as value '0'."
+			::= { ttdpEtbnEntry 2 }
+
+		
+		-- 1.0.61375.2.5.1.5.3.1.3
+		ttdpEtbnMacAddr OBJECT-TYPE
+			SYNTAX MacAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"ETBN MAC address.
+				
+				NULL if ETBN not present in case of corrected topology."
+			::= { ttdpEtbnEntry 3 }
+
+		
+		-- 1.0.61375.2.5.1.5.3.1.4
+		ttdpEtbnOrientation OBJECT-TYPE
+			SYNTAX TtdpOrientation
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"ETBN orientation in relation to train reference direction."
+			::= { ttdpEtbnEntry 4 }
+
+		
+		-- 1.0.61375.2.5.1.5.3.1.5
+		ttdpEtbnIpAddr OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"ETBN IP address on ETB.
+				
+				NULL if not defined."
+			::= { ttdpEtbnEntry 5 }
+
+		
+		-- 1.0.61375.2.5.1.5.3.1.6
+		ttdpEtbnNodeRole OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				undefined(0),
+				master(1),
+				backup(2),
+				notRedundant(3)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"ETBN node role."
+			::= { ttdpEtbnEntry 6 }
+
+		
+		-- 1.0.61375.2.5.1.5.3.1.7
+		ttdpEtbnInaugState OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				init(0),
+				notInaugurated(1),
+				inaugurated(2),
+				readyForInauguration(3)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"ETBN inauguration state."
+			::= { ttdpEtbnEntry 7 }
+
+		
+		-- 1.0.61375.2.5.1.5.3.1.8
+		ttdpEtbnInhibit OBJECT-TYPE
+			SYNTAX TruthValue
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Inhibit request from this node.
+				
+				Inauguration allowed true or false."
+			::= { ttdpEtbnEntry 8 }
+
+		
+		-- 1.0.61375.2.5.1.5.3.1.9
+		ttdpRemoteInhibit OBJECT-TYPE
+			SYNTAX TruthValue
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Remote composition inhibition.
+				
+				Inauguration allowed true or false."
+			::= { ttdpEtbnEntry 9 }
+
+		
+		-- 1.0.61375.2.5.1.5.3.1.10
+		ttdpConnTableCrc32 OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"CRC32 of raw physical topology (connectivity table), not corrected."
+			::= { ttdpEtbnEntry 10 }
+
+		
+		-- 1.0.61375.2.5.1.5.3.1.11
+		ttdpEtbTopoCnt OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"CRC32 of logical topology (Train Network Directory)."
+			::= { ttdpEtbnEntry 11 }
+
+		
+		-- 1.0.61375.2.5.1.5.3.1.12
+		ttdpLengthen OBJECT-TYPE
+			SYNTAX Antivalent2
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Lengthen flag.
+				
+				1(false)=stable length,
+				2(true)=lengthening,
+				3(undefined)=undefined."
+			::= { ttdpEtbnEntry 12 }
+
+		
+		-- 1.0.61375.2.5.1.5.3.1.13
+		ttdpShorten OBJECT-TYPE
+			SYNTAX Antivalent2
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Shorten flag.
+				
+				1(false)=stable length,
+				2(true)=shortening,
+				3(undefined)=undefined."
+			::= { ttdpEtbnEntry 13 }
+
+		
+		-- 1.0.61375.2.5.1.5.4
+		ttdpConnectTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF TtdpConnectEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Connection table for ETBNs in each ETB directions (always 2 directions).
+				
+				Contains 'connectivity vector' and 'ETBN vector' for each ETBN"
+			::= { ttdpTopoInfo 4 }
+
+		
+		-- 1.0.61375.2.5.1.5.4.1
+		ttdpConnectEntry OBJECT-TYPE
+			SYNTAX TtdpConnectEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Connection table entry.
+				
+				ttdpEtbnTableIdx is the first level index in ttdpEtbnTable,
+				ttdpConnectTableIdx is the second level index in ttdpConnectTable."
+			INDEX { ttdpEtbnTableIdx, ttdpConnectTableIdx }
+			::= { ttdpConnectTable 1 }
+
+		
+		TtdpConnectEntry::=
+			SEQUENCE { 
+				ttdpConnectTableIdx
+					TtdpDirection,
+				ttdpNeighbourMacAddr
+					MacAddress,
+				ttdpEtbnDirCnt
+					Unsigned32
+			 }
+
+		-- 1.0.61375.2.5.1.5.4.1.1
+		ttdpConnectTableIdx OBJECT-TYPE
+			SYNTAX TtdpDirection
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Direction index in ttdpConnecttable."
+			::= { ttdpConnectEntry 1 }
+
+		
+		-- 1.0.61375.2.5.1.5.4.1.2
+		ttdpNeighbourMacAddr OBJECT-TYPE
+			SYNTAX MacAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"MAC address of direct ETBN neighbour in this direction."
+			::= { ttdpConnectEntry 2 }
+
+		
+		-- 1.0.61375.2.5.1.5.4.1.3
+		ttdpEtbnDirCnt OBJECT-TYPE
+			SYNTAX Unsigned32 (0..62)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Number of ETBNs in this direction."
+			::= { ttdpConnectEntry 3 }
+
+		
+		-- 1.0.61375.2.5.1.5.5
+		ttdpEtbnVectorTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF TtdpEtbnVectorEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Table of ETBN vectors for each ETBN in each direction. 
+				The vector in each direction is currently an ordered list
+  				of MAC addresses, starting with the node closest to the ETBN. 
+				This may be subject to change, to match the unordered vectors
+				included in the TOPOLOGY messages."
+			::= { ttdpTopoInfo 5 }
+
+		
+		-- 1.0.61375.2.5.1.5.5.1
+		ttdpEtbnVectorEntry OBJECT-TYPE
+			SYNTAX TtdpEtbnVectorEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"ETBN vectors table entry.
+				
+				ttdpEtbnTableIdx is the first level index in ttdpEtbnTable,
+				ttdpConnectTableIdx is the second level index in ttdpConnectTable,
+				ttdpEtbnVectorIdx is the third level index in ttdpEtbnVectorTable"
+			INDEX { ttdpEtbnTableIdx, ttdpConnectTableIdx, ttdpEtbnVectorIdx }
+			::= { ttdpEtbnVectorTable 1 }
+
+		
+		TtdpEtbnVectorEntry::=
+			SEQUENCE { 
+				ttdpEtbnVectorIdx
+					Unsigned32,
+				ttdpEtbnVectorMacAddr
+					MacAddress
+			 }
+
+		-- 1.0.61375.2.5.1.5.5.1.1
+		ttdpEtbnVectorIdx OBJECT-TYPE
+			SYNTAX Unsigned32 (1..62)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Index of ETBN in ttdpEtbnVector."
+			::= { ttdpEtbnVectorEntry 1 }
+
+		
+		-- 1.0.61375.2.5.1.5.5.1.2
+		ttdpEtbnVectorMacAddr OBJECT-TYPE
+			SYNTAX MacAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"ETBN MAC address."
+			::= { ttdpEtbnVectorEntry 2 }
+
+		
+		-- 1.0.61375.2.5.1.5.6
+		ttdpCstCnt OBJECT-TYPE
+			SYNTAX Unsigned32 (1..31)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Number of Consists in train."
+			::= { ttdpTopoInfo 6 }
+
+		
+		-- 1.0.61375.2.5.1.5.7
+		ttdpCstTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF TtdpCstEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Consist table: logical topology = Train Network Directory (TNDir) + some more info.
+				
+				Organized conforming to the 3 levels of TNDir."
+			::= { ttdpTopoInfo 7 }
+
+		
+		-- 1.0.61375.2.5.1.5.7.1
+		ttdpCstEntry OBJECT-TYPE
+			SYNTAX TtdpCstEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Entry for Consist table."
+			INDEX { ttdpCstTableIdx }
+			::= { ttdpCstTable 1 }
+
+		
+		TtdpCstEntry::=
+			SEQUENCE { 
+				ttdpCstTableIdx
+					Unsigned32,
+				ttdpCstUuid
+					OCTET STRING,
+				ttdpCstOrientation
+					TtdpOrientation,
+				ttdpCstCnCnt
+					Unsigned32,
+				ttdpCstEtbnCnt
+					Unsigned32
+			 }
+
+		-- 1.0.61375.2.5.1.5.7.1.1
+		ttdpCstTableIdx OBJECT-TYPE
+			SYNTAX Unsigned32 (1..32)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Consist number (index in Consist table).
+				
+				Consist nb 1 is the reference at extremity 1 of the train with lowest CstUUID."
+			::= { ttdpCstEntry 1 }
+
+		
+		-- 1.0.61375.2.5.1.5.7.1.2
+		ttdpCstUuid OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (16))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Consist UUID (Universally Unique IDentifier)."
+			::= { ttdpCstEntry 2 }
+
+		
+		-- 1.0.61375.2.5.1.5.7.1.3
+		ttdpCstOrientation OBJECT-TYPE
+			SYNTAX TtdpOrientation
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Orientation of the Consist in relation to train reference direction."
+			::= { ttdpCstEntry 3 }
+
+		
+		-- 1.0.61375.2.5.1.5.7.1.4
+		ttdpCstCnCnt OBJECT-TYPE
+			SYNTAX Unsigned32 (0..32)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Number of CN in Consist."
+			::= { ttdpCstEntry 4 }
+
+		
+		-- 1.0.61375.2.5.1.5.7.1.5
+		ttdpCstEtbnCnt OBJECT-TYPE
+			SYNTAX Unsigned32 (0..32)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Number of ETBN in Consist."
+			::= { ttdpCstEntry 5 }
+
+		
+		-- 1.0.61375.2.5.1.5.8
+		ttdpCstCnTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF TtdpCstCnEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"List of CN in this Consist."
+			::= { ttdpTopoInfo 8 }
+
+		
+		-- 1.0.61375.2.5.1.5.8.1
+		ttdpCstCnEntry OBJECT-TYPE
+			SYNTAX TtdpCstCnEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Entry for list of Consist CNs.
+				
+				ttdpCstTableIdx is the first level index in ttdpCstTable,
+				ttdpCstCnTableIdx is the second level index in ttdpCstCnTable."
+			INDEX { ttdpCstTableIdx, ttdpCstCnTableIdx }
+			::= { ttdpCstCnTable 1 }
+
+		
+		TtdpCstCnEntry::=
+			SEQUENCE { 
+				ttdpCstCnTableIdx
+					Unsigned32,
+				ttdpCnType
+					INTEGER,
+				ttdpCnId
+					Unsigned32,
+				ttdpSubnetId
+					Unsigned32,
+				ttdpSubnetIpAddr
+					IpAddress,
+				ttdpSubnetIpMask
+					IpAddress
+			 }
+
+		-- 1.0.61375.2.5.1.5.8.1.1
+		ttdpCstCnTableIdx OBJECT-TYPE
+			SYNTAX Unsigned32 (1..32)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Index in this Consist CN table."
+			::= { ttdpCstCnEntry 1 }
+
+		
+		-- 1.0.61375.2.5.1.5.8.1.2
+		ttdpCnType OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				mvb(1),
+				notUsed(2),
+				can(3),
+				ethernet(4)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"CN type."
+			::= { ttdpCstCnEntry 2 }
+
+		
+		-- 1.0.61375.2.5.1.5.8.1.3
+		ttdpCnId OBJECT-TYPE
+			SYNTAX Unsigned32 (1..32)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"CN ID.
+				
+				Statically defined, it identifies the Consist Network inside the Consist"
+			::= { ttdpCstCnEntry 3 }
+
+		
+		-- 1.0.61375.2.5.1.5.8.1.4
+		ttdpSubnetId OBJECT-TYPE
+			SYNTAX Unsigned32 (1..63)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Used to number the CN subnet on ETB."
+			::= { ttdpCstCnEntry 4 }
+
+		
+		-- 1.0.61375.2.5.1.5.8.1.5
+		ttdpSubnetIpAddr OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"CN subnet IP address."
+			::= { ttdpCstCnEntry 5 }
+
+		
+		-- 1.0.61375.2.5.1.5.8.1.6
+		ttdpSubnetIpMask OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"CN subnet IP network mask."
+			::= { ttdpCstCnEntry 6 }
+
+		
+		-- 1.0.61375.2.5.1.5.9
+		ttdpCnEtbnTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF TtdpCnEtbnEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"List of ETBN connected to this CN."
+			::= { ttdpTopoInfo 9 }
+
+		
+		-- 1.0.61375.2.5.1.5.9.1
+		ttdpCnEtbnEntry OBJECT-TYPE
+			SYNTAX TtdpCnEtbnEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Entry for list of ETBN connected to this CN.
+				
+				ttdpCstTableIdx is the first level index in ttdpCstTable,
+				ttdpCstCnTableIdx is the second level index in ttdpCstCnTable.
+				ttdpCnEtbnTableIdx is the third level index in ttdpCnEtbnTable."
+			INDEX { ttdpCstTableIdx, ttdpCstCnTableIdx, ttdpCnEtbnTableIdx }
+			::= { ttdpCnEtbnTable 1 }
+
+		
+		TtdpCnEtbnEntry::=
+			SEQUENCE { 
+				ttdpCnEtbnTableIdx
+					Unsigned32,
+				ttdpCnEtbnId
+					Unsigned32
+			 }
+
+		-- 1.0.61375.2.5.1.5.9.1.1
+		ttdpCnEtbnTableIdx OBJECT-TYPE
+			SYNTAX Unsigned32 (1..63)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Index in this CN ETBN table."
+			::= { ttdpCnEtbnEntry 1 }
+
+		
+		-- 1.0.61375.2.5.1.5.9.1.2
+		ttdpCnEtbnId OBJECT-TYPE
+			SYNTAX Unsigned32 (1..63)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Number of the ETBN (on ETB) connected to this CN."
+			::= { ttdpCnEtbnEntry 2 }
+
+		
+-- *********************************************************************** 
+-- conformance statements 
+-- ***********************************************************************
+		-- 1.0.61375.2.5.2
+		ttdpConformance OBJECT IDENTIFIER::= { ttdp 2 }
+
+		
+		-- 1.0.61375.2.5.2.2
+		ttdpBasicGroup OBJECT-GROUP
+			OBJECTS { ttdpVersion, ttdpSlowTimeout, ttdpFastTimeout, ttdpTopoTtl, ttdpGlobalTopoTimeout, 
+				ttdpLogicalLinksNb, ttdpLogicalLinksIdx, ttdpIsEndLink, ttdpPortState, ttdpEtbId, 
+				ttdpLocalEtbnMacAddr, ttdpLocalEtbnId, ttdpNodePosition, ttdpIsAlone, ttdpConnTableValid, 
+				ttdpEtbnCnt, ttdpEtbnTableIdx, ttdpEtbnId, ttdpEtbnMacAddr, ttdpEtbnOrientation, 
+				ttdpEtbnIpAddr, ttdpEtbnNodeRole, ttdpEtbnInaugState, ttdpEtbnInhibit, ttdpRemoteInhibit, 
+				ttdpConnTableCrc32, ttdpLengthen, ttdpShorten, ttdpConnectTableIdx, ttdpNeighbourMacAddr, 
+				ttdpEtbnDirCnt, ttdpEtbnVectorIdx, ttdpEtbnVectorMacAddr, ttdpCstCnt, ttdpCstTableIdx, 
+				ttdpCstUuid, ttdpCstOrientation, ttdpCstCnCnt, ttdpCstEtbnCnt, ttdpCstCnTableIdx, 
+				ttdpCnType, ttdpCnId, ttdpSubnetId, ttdpSubnetIpAddr, ttdpSubnetIpMask, 
+				ttdpCnEtbnTableIdx, ttdpCnEtbnId, ttdpEtbTopoCntValid, ttdpEtbTopoCnt, ttdpConfiguredPhysLinesNb, 
+				ttdpActivePhysLinesNb, ttdpPhysicalLinesIdx, ttdpPeerLineId, ttdpLineRcvState }
+			STATUS current
+			DESCRIPTION 
+				"Mandatory parameters which are to monitor 
+				the status of TTDP on an ETBN."
+			::= { ttdpConformance 2 }
+
+		
+		-- 1.0.61375.2.5.2.3
+		ttdpStatsGroup OBJECT-GROUP
+			OBJECTS { ttdpHelloSentFrames, ttdpHelloReceivedFrames, ttdpRemoteFastModeCnt, ttdpLocalFastModeCnt, ttdpTopoSentFrames, 
+				ttdpTopoReceivedFrames }
+			STATUS current
+			DESCRIPTION 
+				"Parameters which are optional to monitor 
+				the status of TTDP on an ETBN (statistics)."
+			::= { ttdpConformance 3 }
+
+		
+		-- 1.0.61375.2.5.2.4
+		ttdpBasicCompliance MODULE-COMPLIANCE
+			STATUS current
+			DESCRIPTION 
+				"Basic implementation requirements for TTDP monitoring support.
+				The agent shall support the monitoring of mandatory parameters."
+			MODULE -- this module
+				MANDATORY-GROUPS { ttdpBasicGroup }
+			::= { ttdpConformance 4 }
+
+		
+		-- 1.0.61375.2.5.2.5
+		ttdpStatsCompliance MODULE-COMPLIANCE
+			STATUS current
+			DESCRIPTION 
+				"Optional implementation requirements for TTDP monitoring support.
+				The agent shall support the monitoring of statistics parameters."
+			MODULE -- this module
+				MANDATORY-GROUPS { ttdpStatsGroup }
+			::= { ttdpConformance 5 }
+
+		
+	
+	END
+
+--
+-- 
+--

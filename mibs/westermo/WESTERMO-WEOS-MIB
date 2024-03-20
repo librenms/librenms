@@ -1,0 +1,2746 @@
+WESTERMO-WEOS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    RowStatus,
+    TruthValue,
+    DisplayString,
+    PhysAddress,
+    MacAddress
+    FROM SNMPv2-TC
+
+    IpAddress,
+    Integer32,
+    Counter64,
+    TimeTicks,
+    OBJECT-TYPE,
+    MODULE-IDENTITY,
+    NOTIFICATION-TYPE
+    FROM SNMPv2-SMI
+
+    InetAddressType,
+    InetAddress
+    FROM INET-ADDRESS-MIB
+
+    common
+    FROM WESTERMO-OID-MIB
+
+    InterfaceIndex
+    FROM IF-MIB
+
+    VlanId
+    FROM Q-BRIDGE-MIB
+
+    entPhysicalName
+    FROM ENTITY-MIB
+
+    entPhySensorValue,
+    entPhySensorType,
+    entPhySensorScale,
+    entPhySensorPrecision
+    FROM ENTITY-SENSOR-MIB;
+
+-- WeOS module
+
+weos MODULE-IDENTITY
+    LAST-UPDATED "201810300000Z"
+    ORGANIZATION "Westermo"
+    CONTACT-INFO
+    "Copyright (c) 2010-2018:
+    Westermo Teleindustri AB
+    640 40 Stora Sundby
+    Sweden
+    url: http://www.westermo.com
+
+   Contact:  support@westermo.se
+   Description: Westermo WeOS Private MIB-file"
+
+    DESCRIPTION
+        "This MIB module controls the SNMP functionality in the WeOS
+        branch of the Westermo private MIB."
+
+    REVISION "201810300000Z"
+    DESCRIPTION
+        "Corrected mrpRingClosed and mrpRingOpen objects."
+
+    REVISION "201803120000Z"
+    DESCRIPTION
+        "Added configuration hash, for running and startup configuration
+        Added support for LLDP Custom TLV.
+        Corrected trapHostAddress value type to DisplayString."
+
+    REVISION "201710030000Z"
+    DESCRIPTION
+        "Added support for Alarm Status (alarmStatusTable) and ping trigger
+        notifications (pingTriggerOk, pingTriggerWarning). Added support for
+        MRP ring notifications"
+
+    REVISION "201703280000Z"
+    DESCRIPTION
+        "Clarified use of rowstatus in object riCoCfgRowStatus"
+
+    REVISION "201701230000Z"
+    DESCRIPTION
+        "Added support for configuration of Ring Coupling (RiCo) and Dual-Homing.
+        RiCo and Dual-Homing shares the same OIDs, and are distinguished by
+        looking at the ''Ring ID'' which is always '0' for Dual-Homing entries."
+
+    REVISION "201612160000Z"
+    DESCRIPTION
+        "Added support for status monitoring and alarm traps
+        for Ring Coupling (RiCo) and Dual-Homing. RiCo and Dual-Homing
+        shares the same OIDs, and are distinguished by looking at the
+        ''Ring ID'' which is always '0' for Dual-Homing entries.
+        The RiCo/Dual-Homing traps are sent to indicate if an Uplink
+        comes up or goes down, and the traps are enabled via the alarm
+        system.
+
+        Added support to configure an FRNT node as FRNT bus edge, i.e,
+        it is possible to configure FRNT port N to 'None'.
+
+        Updated descripton for frntv0RingStatus."
+
+    REVISION "201606140000Z"
+    DESCRIPTION
+        "Adding support for addressConflict and statusRelay.
+        Adding support for TTDP etbnInhibitionEnabled. The etbnInhibitionEnabled
+        object is only available for units with TTDP support.
+        Corrected access mode for lffPortIfIndex, l2QosVlanId, l2QosPortIfIndex,
+        igmpSnoopingVlanId, inet4BaseIfIndex, inet4StatIfIndex,
+        inet4DhcpIfIndex, trapHostId from not-accessible to read-only.
+        Corrected access mode for inetDhcpClientId to read-only.
+        Corrected sequence syntax for frntv0PortsSwapped to TruthValue."
+
+    REVISION "201512160000Z"
+    DESCRIPTION
+        "Added aggregated port statistics, phy.phyStats.aggrStats."
+
+    REVISION "201509090000Z"
+    DESCRIPTION
+        "Adding support for LLDP service"
+
+    REVISION "201410100000Z"
+    DESCRIPTION
+        "Corrected range and description for sfpDdmPortTxPower and
+        sfpDdmPortRxPower"
+
+    REVISION "201310170000Z"
+    DESCRIPTION
+        "Adding support for DDM traps"
+
+    REVISION "201305130000Z"
+    DESCRIPTION
+        "Adding support for SFP DDM."
+
+    REVISION "201201030000Z"
+    DESCRIPTION
+        "Corrected access mode for frntv0TopologyChangeCount,
+        frntv0TopologyTimeSinceLastChange and frntv0PortsSwapped from
+        read-create to read-only"
+
+    REVISION "201105160000Z"
+    DESCRIPTION
+        "Changed behaviour of inet4StatAddress. When the address is set
+        to 0.0.0.0 the interface will now be disabled instead of
+        configured as DHCP"
+
+    REVISION "201011150000Z"
+    DESCRIPTION
+        "Adding support for temperature traps and summary alarm traps."
+
+    REVISION "201008190000Z"
+    DESCRIPTION
+        "Adding support for link fail forward (LFF) to enable propagation
+        of remote link failure, when extending an Ethernet over an SHDSL
+        link."
+
+    REVISION "200911120000Z"
+    DESCRIPTION
+        "Possible values for frntv0Port1State and frntv0Port2State has been changed.
+        Adding support for FRNT ring status traps (FRNT traps are
+        added, and the frntv0InstanceId is assigned
+        accessibility 'accessible-for-notify'.
+        Descriptions for power and digital-in traps are modified."
+
+    REVISION "200910090000Z"
+    DESCRIPTION
+        "Adding support for Westermo specific traps (under
+        weos.weosTraps). Initially traps for Digital-In and Power
+        sensors are included."
+
+    REVISION "200908260000Z"
+    DESCRIPTION
+        "Adding support to manage the SNMP roCommunity and rwCommunity
+        (under weos.system.services.snmp)"
+
+    REVISION "200905310000Z"
+    DESCRIPTION
+        "Adding system branch (weos.system)."
+
+    REVISION "200905180000Z"
+    DESCRIPTION
+        "First WeOS revision. For WeOS software version 4.0.0 and later. Please see
+        the WeOS Release Notes for information on MIB file updates."
+
+::= { common 1 }
+
+
+-- -------------------------------------------------------------
+-- Textual Conventions
+-- -------------------------------------------------------------
+
+-- -------------------------------------------------------------
+-- Node top definitions
+-- -------------------------------------------------------------
+
+command                 OBJECT IDENTIFIER ::= { weos 1 }
+phy                     OBJECT IDENTIFIER ::= { weos 2 }
+link                    OBJECT IDENTIFIER ::= { weos 3 }
+net                     OBJECT IDENTIFIER ::= { weos 4 }
+system                  OBJECT IDENTIFIER ::= { weos 5 }
+notifications           OBJECT IDENTIFIER ::= { weos 6 }
+
+sfp                     OBJECT IDENTIFIER ::= { phy 2 }
+phyStats                OBJECT IDENTIFIER ::= { phy 3 }
+
+vlan                    OBJECT IDENTIFIER ::= { link 1 }
+l2Qos                   OBJECT IDENTIFIER ::= { link 2 }
+frnt                    OBJECT IDENTIFIER ::= { link 3 }
+igmpSnooping            OBJECT IDENTIFIER ::= { link 4 }
+rico                    OBJECT IDENTIFIER ::= { link 5 }
+lldpCtlv                OBJECT IDENTIFIER ::= { link 6 }
+
+frntv0                  OBJECT IDENTIFIER ::= { frnt 1 }
+
+
+iface                   OBJECT IDENTIFIER ::= { net 1 }
+ttdp                    OBJECT IDENTIFIER ::= { net 2 }
+
+ifaceCommon             OBJECT IDENTIFIER ::= { iface 1}
+ifaceInet4              OBJECT IDENTIFIER ::= { iface 2}
+-- ifaceInet6           OBJECT IDENTIFIER ::= { iface 3}
+addressConflict         OBJECT IDENTIFIER ::= { iface 4}
+
+services                OBJECT IDENTIFIER ::= { system 1 }
+eventSystem             OBJECT IDENTIFIER ::= { system 2 }
+statistics              OBJECT IDENTIFIER ::= { system 3 }
+integrity               OBJECT IDENTIFIER ::= { system 4 }
+
+cpuLoadAvg              OBJECT IDENTIFIER ::= { statistics 2 }
+
+snmp                    OBJECT IDENTIFIER ::= { services 1 }
+web                     OBJECT IDENTIFIER ::= { services 2 }
+ipconfig                OBJECT IDENTIFIER ::= { services 3 }
+ssh                     OBJECT IDENTIFIER ::= { services 4 }
+lldp                    OBJECT IDENTIFIER ::= { services 5 }
+
+sensorNotifications     OBJECT IDENTIFIER ::= { notifications 1 }
+frntNotifications       OBJECT IDENTIFIER ::= { notifications 2 }
+lffNotifications        OBJECT IDENTIFIER ::= { notifications 3 }
+genericNotifications    OBJECT IDENTIFIER ::= { notifications 4 }
+ddmNotifications        OBJECT IDENTIFIER ::= { notifications 5 }
+conflictNotifications   OBJECT IDENTIFIER ::= { notifications 6 }
+otherNotifications      OBJECT IDENTIFIER ::= { notifications 7 }
+riCoNotifications       OBJECT IDENTIFIER ::= { notifications 8 }
+pingNotifications       OBJECT IDENTIFIER ::= { notifications 9 }
+
+-- Construct to enable mapping of SNMPv2 to SNMPv1 traps
+sensorNotificationPrefix      OBJECT IDENTIFIER ::= { sensorNotifications 0 }
+frntNotificationPrefix        OBJECT IDENTIFIER ::= { frntNotifications 0 }
+lffNotificationPrefix         OBJECT IDENTIFIER ::= { lffNotifications 0 }
+genericNotificationPrefix     OBJECT IDENTIFIER ::= { genericNotifications 0 }
+ddmNotificationPrefix         OBJECT IDENTIFIER ::= { ddmNotifications 0 }
+otherNotificationPrefix       OBJECT IDENTIFIER ::= { otherNotifications 0 }
+conflictNotificationPrefix    OBJECT IDENTIFIER ::= { conflictNotifications 0 }
+riCoNotificationPrefix        OBJECT IDENTIFIER ::= { riCoNotifications 0 }
+
+pingNotificationPrefix OBJECT IDENTIFIER ::= { pingNotifications 0 }
+
+-- -------------------------------------------------------------
+-- OID Definitions
+-- -------------------------------------------------------------
+
+-- -------------------------------------------------------------
+-- Command group
+-- -------------------------------------------------------------
+
+reboot OBJECT-TYPE
+    SYNTAX  INTEGER {
+                    reboot(1)  -- reboot unit (using startup configuration)
+      }
+    MAX-ACCESS    read-write
+    STATUS     current
+    DESCRIPTION
+   "Writing value '1' will reboot the unit.
+   (The unit will boot up using the startup configuration)
+   Reading the reboot object will return '0' (zero)"
+    ::= { command 1 }
+
+factoryReset OBJECT-TYPE
+    SYNTAX  INTEGER {
+                    restoreAndReboot(1)  -- copy factory default configuration to startup configuration and reboot.
+      }
+    MAX-ACCESS    read-write
+    STATUS     current
+    DESCRIPTION
+   "Writing value '1' will reset unit configuration to
+   factory default values and reboot.
+   Reading the factoryReset object will return '0' (zero)"
+    ::= { command 2 }
+
+-- -------------------------------------------------------------
+-- Phy Group
+-- -------------------------------------------------------------
+
+-- -------------------------------------------------------------
+-- Phy: lffTable
+-- -------------------------------------------------------------
+
+lffTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF LffEntry
+    MAX-ACCESS    not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Table containing Westermo Link Fail Forward (LFF) settings and status
+        applicable ports.
+        Westermo LFF is used to indicate the state (up/down) of a remote link.
+        The currently supported use case is when extending an Ethernet over an SHDSL link.
+        LFF is used to inform the local end that the Ethernet link at the remote site is
+        up or down."
+    ::= { phy 1 }
+
+lffEntry OBJECT-TYPE
+    SYNTAX  LffEntry
+    MAX-ACCESS    not-accessible
+    STATUS  current
+    DESCRIPTION
+        "For each local (SHDSL) port, there is a row in the lffTable containing
+        LFF status and settings."
+    INDEX { lffPortIfIndex }
+    ::= { lffTable 1 }
+
+LffEntry ::= SEQUENCE {
+    lffPortIfIndex      InterfaceIndex,
+    lffPortIfName    DisplayString,
+    lffStatus        INTEGER
+}
+
+lffPortIfIndex OBJECT-TYPE
+    SYNTAX  InterfaceIndex
+    MAX-ACCESS read-only
+    STATUS  current
+    DESCRIPTION
+   "This index should map to the local (SHDSL) port's ifIndex in the ifTable."
+    ::=  { lffEntry 1 }
+
+lffPortIfName OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS read-only
+    STATUS  current
+    DESCRIPTION
+   "This name should map to the local (SHDSL) port's ifName in the ifXTable."
+    ::=  { lffEntry 2 }
+
+lffStatus OBJECT-TYPE
+    SYNTAX  INTEGER {
+                    disabled(1),   -- LFF disabled on the local (SHDSL) port
+                    unknown(2),    -- LFF enabled, but the state of remote (Ethernet)
+                                   -- is unknown. (perhaps because the intermediate
+                                   -- (SHDSL) link is down).
+                    remoteDown(3), -- LFF enabled, remote port down
+                    remoteUp(4)    -- LFF enabled, remote port up
+      }
+    MAX-ACCESS    read-only
+    STATUS  current
+    DESCRIPTION
+   "The lffStatus shows the status of a (Ethernet) link at the remote end of a SHDSL link:
+        - 1 (disabled):   LFF is configured 'disabled' on  local (SHDSL) port.
+   - 2 (unknown):    LFF enabled, but the state of remote (Ethernet)
+                          is unknown. (perhaps because the intermediate
+                          (SHDSL) link is down).
+        - 3 (remoteDown): LFF enabled, remote (Ethernet) port down
+        - 4 (remoteUp):   LFF enabled, remote (Ethernet) port up."
+    ::= { lffEntry 3 }
+
+-- -------------------------------------------------------------
+-- Phy: SFP
+-- -------------------------------------------------------------
+
+sfpDdmPortTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF SfpDdmPortEntry
+    MAX-ACCESS    not-accessible
+    STATUS  current
+    DESCRIPTION
+   "Table containing DDM diagnostics per DDM capable SFP."
+    ::= { sfp 1 }
+
+sfpDdmPortEntry OBJECT-TYPE
+    SYNTAX  SfpDdmPortEntry
+    MAX-ACCESS    not-accessible
+    STATUS  current
+    DESCRIPTION
+   "This row in the sfpDdmPortTable containing per port
+   SFP DDM diagnostics."
+    INDEX { sfpDdmPortIfIndex }
+    ::= { sfpDdmPortTable 1 }
+
+SfpDdmPortEntry ::= SEQUENCE {
+    sfpDdmPortIfIndex       InterfaceIndex,
+    sfpDdmPortIfName     DisplayString,
+    sfpDdmPortVoltage       Integer32,
+    sfpDdmPortTemperature   Integer32,
+    sfpDdmPortBiasCurrent   Integer32,
+    sfpDdmPortTxPower       Integer32,
+    sfpDdmPortRxPower       Integer32
+}
+
+sfpDdmPortIfIndex OBJECT-TYPE
+    SYNTAX  InterfaceIndex
+    MAX-ACCESS accessible-for-notify
+    STATUS  current
+    DESCRIPTION
+        "This index maps to the port's ifIndex in the ifTable."
+    ::=  { sfpDdmPortEntry 1 }
+
+sfpDdmPortIfName OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS read-only
+    STATUS  current
+    DESCRIPTION
+   "The system name of the port."
+    ::=  { sfpDdmPortEntry 2 }
+
+sfpDdmPortVoltage OBJECT-TYPE
+    SYNTAX  Integer32 (0..6550)
+    MAX-ACCESS read-only
+    STATUS  current
+    DESCRIPTION
+   "The supply voltage of the SFP. The accuracy is better than +/-3 %
+        and the total range of 0 - 6550 mV. The voltage is represented in mV."
+    ::=  { sfpDdmPortEntry 3 }
+
+sfpDdmPortTemperature OBJECT-TYPE
+    SYNTAX  Integer32 (-128..128)
+    MAX-ACCESS read-only
+    STATUS  current
+    DESCRIPTION
+   "Temperature of the SFP. The temperature accuracy is better than 3 degrees Celsius
+        and the total range of -128 degrees C to +128 degrees C. "
+    ::=  { sfpDdmPortEntry 4 }
+
+sfpDdmPortBiasCurrent OBJECT-TYPE
+    SYNTAX  Integer32 (0..131)
+    MAX-ACCESS read-only
+    STATUS  current
+    DESCRIPTION
+   "The transmitt bias current. The accuracy is better than +/- 10 %
+        and the total range of 0 - 131 mA. The current is represented in uA."
+    ::=  { sfpDdmPortEntry 5 }
+
+sfpDdmPortTxPower OBJECT-TYPE
+    SYNTAX  Integer32 (-4000..820)
+    MAX-ACCESS read-only
+    STATUS  current
+    DESCRIPTION
+   "Transmitt power of the laser. The accuracy is better than +/-3dB and
+        the total range of -40 to +8.2 dBm ~(0 - 6.5535 mW). The power is represented
+        in steps of 0.01 dBm"
+    ::=  { sfpDdmPortEntry 6 }
+
+sfpDdmPortRxPower OBJECT-TYPE
+    SYNTAX  Integer32 (-4000..820)
+    MAX-ACCESS read-only
+    STATUS  current
+    DESCRIPTION
+   "Receiving power of the laser. The accuracy is better than +/-3dB and
+        the total range of -40 to +8.2 dBm ~(0 - 6.5535 mW). The power is represented
+        in steps of 0.01 dBm"
+    ::=  { sfpDdmPortEntry 7 }
+
+
+-- -------------------------------------------------------------
+-- Phy: phyStats
+-- -------------------------------------------------------------
+
+summaryFCSErrors OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS    read-only
+    STATUS  current
+    DESCRIPTION
+        "The summaryFCSErrors display the total of FCS errors for
+        all ports on the unit"
+    ::=  { phyStats 1 }
+
+bwStatsTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF BwStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Table containing port bandwidth rates."
+    ::= { phyStats 2 }
+
+bwStatsEntry OBJECT-TYPE
+    SYNTAX  BwStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS  current
+    DESCRIPTION
+        "For each local port, there is a row in the bwStatsTable containing
+        port bandwidth rates."
+    INDEX { bwStatsIndex }
+    ::= { bwStatsTable 1 }
+
+BwStatsEntry ::= SEQUENCE {
+    bwStatsIndex     InterfaceIndex,
+    bwStatsEnabled      TruthValue,
+    bwStatsBitrateIn10s    Counter64,
+    bwStatsBitrateOut10s   Counter64,
+    bwStatsBitrateIn1m     Counter64,
+    bwStatsBitrateOut1m    Counter64,
+    bwStatsBitrateIn10m    Counter64,
+    bwStatsBitrateOut10m   Counter64,
+    bwStatsBitrateIn1h     Counter64,
+    bwStatsBitrateOut1h    Counter64
+}
+
+bwStatsIndex OBJECT-TYPE
+    SYNTAX  InterfaceIndex
+    MAX-ACCESS read-only
+    STATUS  current
+    DESCRIPTION
+   "The value of this object uniquely identifies this bwStats entry."
+    ::= { bwStatsEntry 1 }
+
+bwStatsEnabled OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS read-only
+    STATUS  current
+    DESCRIPTION
+   "Bandwidth statistics enabled or disabled for this port."
+    ::= { bwStatsEntry 2 }
+
+bwStatsBitrateIn10s OBJECT-TYPE
+    SYNTAX  Counter64
+    UNITS   "Bits per second"
+    MAX-ACCESS read-only
+    STATUS  current
+    DESCRIPTION
+   "The current average input traffic for the last 10 seconds.
+   This value is calculated via periodic sampling of the port counters
+   And will be updated at least every 10 seconds.
+   The unit is bits per second and this includes Ethernet
+   header data (Ethernet preamble not included)."
+    ::= { bwStatsEntry 3 }
+
+bwStatsBitrateOut10s OBJECT-TYPE
+    SYNTAX  Counter64
+    UNITS   "Bits per second"
+    MAX-ACCESS read-only
+    STATUS  current
+    DESCRIPTION
+   "The current average output traffic for the last 10 seconds.
+   This value is calculated via periodic sampling of the port counters
+   And will be updated at least every 10 seconds.
+   The unit is bits per second and this includes Ethernet
+   header data (Ethernet preamble not included)."
+    ::= { bwStatsEntry 4 }
+
+bwStatsBitrateIn1m OBJECT-TYPE
+    SYNTAX  Counter64
+    UNITS   "Bits per second"
+    MAX-ACCESS read-only
+    STATUS  current
+    DESCRIPTION
+   "The current moving average input traffic for the last minute.
+   This value is calculated and updated at least every 10 seconds.
+   The unit is bits per second and this includes Ethernet
+   header data (Ethernet preamble not included)."
+    ::= { bwStatsEntry 5 }
+
+bwStatsBitrateOut1m OBJECT-TYPE
+    SYNTAX  Counter64
+    UNITS   "Bits per second"
+    MAX-ACCESS read-only
+    STATUS  current
+    DESCRIPTION
+   "The current moving average output traffic for the last minute.
+   This value is calculated and updated at least every 10 seconds.
+   The unit is bits per second and this includes Ethernet
+   header data (Ethernet preamble not included)."
+    ::= { bwStatsEntry 6 }
+
+bwStatsBitrateIn10m OBJECT-TYPE
+    SYNTAX  Counter64
+    UNITS   "Bits per second"
+    MAX-ACCESS read-only
+    STATUS  current
+    DESCRIPTION
+   "The current moving average input traffic for the last 10 minutes.
+   This value is calculated and updated at least every 10 seconds.
+   The unit is bits per second and this includes Ethernet
+   header data (Ethernet preamble not included)."
+    ::= { bwStatsEntry 7 }
+
+bwStatsBitrateOut10m OBJECT-TYPE
+    SYNTAX  Counter64
+    UNITS   "Bits per second"
+    MAX-ACCESS read-only
+    STATUS  current
+    DESCRIPTION
+   "The current moving average output traffic for the last 10 minutes.
+   This value is calculated and updated at least every 10 seconds.
+   The unit is bits per second and this includes Ethernet
+   header data (Ethernet preamble not included)."
+    ::= { bwStatsEntry 8 }
+
+bwStatsBitrateIn1h OBJECT-TYPE
+    SYNTAX  Counter64
+    UNITS   "Bits per second"
+    MAX-ACCESS read-only
+    STATUS  current
+    DESCRIPTION
+   "The current moving average input traffic for the last hour.
+   This value is calculated and updated at least every 10 seconds.
+   The unit is bits per second and this includes Ethernet
+   header data (Ethernet preamble not included)."
+    ::= { bwStatsEntry 9 }
+
+bwStatsBitrateOut1h OBJECT-TYPE
+    SYNTAX  Counter64
+    UNITS   "Bits per second"
+    MAX-ACCESS read-only
+    STATUS  current
+    DESCRIPTION
+   "The current moving average output traffic for the last hour.
+   This value is calculated and updated at least every 10 seconds.
+   The unit is bits per second and this includes Ethernet
+   header data (Ethernet preamble not included)."
+    ::= { bwStatsEntry 10 }
+
+-- -------------------------------------------------------------
+-- Link Group
+-- -------------------------------------------------------------
+
+-- -------------------------------------------------------------
+-- Link: Layer 2 VLAN Group
+-- ##  No VLAN functionality included yet
+-- -------------------------------------------------------------
+
+-- -------------------------------------------------------------
+-- Link: Layer 2 QoS Group
+-- -------------------------------------------------------------
+
+l2QosVlanTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF L2QosVlanEntry
+    MAX-ACCESS    not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Table containing VLAN priority settings for
+   existing VLANs."
+    ::= { l2Qos 1 }
+
+l2QosVlanEntry OBJECT-TYPE
+    SYNTAX  L2QosVlanEntry
+    MAX-ACCESS    not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The row in the l2QosVlanTable containing per VLAN
+   priority settings."
+    INDEX { l2QosVlanId }
+    ::= { l2QosVlanTable 1 }
+
+L2QosVlanEntry ::= SEQUENCE {
+    l2QosVlanId      VlanId,
+    vlanPriorityEnabled TruthValue,
+    vlanPriorityLevel   Integer32
+}
+
+l2QosVlanId OBJECT-TYPE
+    SYNTAX  VlanId
+    MAX-ACCESS    read-only
+    STATUS  current
+    DESCRIPTION
+   "This index should be mapped to the VLAN ID of Q-bridge MIB."
+    ::= { l2QosVlanEntry 1 }
+
+vlanPriorityEnabled OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS    read-write
+    STATUS  current
+    DESCRIPTION
+   "Enable (true) or disable (false) VLAN priority for this VLAN."
+    ::= { l2QosVlanEntry 2 }
+
+vlanPriorityLevel OBJECT-TYPE
+    SYNTAX  Integer32 (0..7)
+    MAX-ACCESS    read-write
+    STATUS  current
+    DESCRIPTION
+   "The VLAN priority level for this VLAN.
+   0 is lowest and 7 is highest priority."
+    ::=  { l2QosVlanEntry 3 }
+
+-- -------------------------------------------------------------
+-- Link: Layer 2 Port Priority Group
+-- -------------------------------------------------------------
+
+l2QosPortTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF L2QosPortEntry
+    MAX-ACCESS    not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Table containing per port piority settings for LAN ports"
+    ::= { l2Qos 2 }
+
+l2QosPortEntry OBJECT-TYPE
+    SYNTAX  L2QosPortEntry
+    MAX-ACCESS    not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The row in the l2QosPortTable containing per port
+   priority settings."
+    INDEX { l2QosPortIfIndex }
+    ::= { l2QosPortTable 1 }
+
+L2QosPortEntry ::= SEQUENCE {
+    l2QosPortIfIndex    InterfaceIndex,
+    l2QosPortIfName     DisplayString,
+    l2QosPortPriorityMode  INTEGER,
+    l2QosPortPriorityLevel Integer32
+}
+
+l2QosPortIfIndex OBJECT-TYPE
+    SYNTAX  InterfaceIndex
+    MAX-ACCESS read-only
+    STATUS  current
+    DESCRIPTION
+   "This index should map to the port's ifIndex in the ifTable."
+    ::=  { l2QosPortEntry 1 }
+
+l2QosPortIfName OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS read-only
+    STATUS  current
+    DESCRIPTION
+   "This name should map to the port's ifName in the ifXTable."
+    ::=  { l2QosPortEntry 2 }
+
+
+l2QosPortPriorityMode OBJECT-TYPE
+    SYNTAX  INTEGER {
+                    tag(1),  -- Priority based on VLAN tag priority.
+                    ip(2),   -- Priority based on IP ToS/DSCP.
+                    port(3)  -- Priority based on Port priority.
+      }
+    MAX-ACCESS    read-write
+    STATUS  current
+    DESCRIPTION
+   "The priority mode (tag, ip or port) to be used on this specific port.
+   1. (tag): Use the incoming packet's VLAN tag priority value to determine
+   its priority. (Untagged packets will have their priority based on
+   the configured port priority.)
+   2. (ip): Use the incoming packet's IP ToS/DSCP priority value to determine
+   its priority. (Non-IP packets will have their priority based on
+   the configured port priority.)
+   3. (port): Use the ingress port's configured priority to determine the
+   packets priority."
+    ::=  { l2QosPortEntry 3 }
+
+l2QosPortPriorityLevel OBJECT-TYPE
+    SYNTAX  Integer32 (0..7)
+    MAX-ACCESS    read-write
+    STATUS  current
+    DESCRIPTION
+   "The port priority level for this port. 0 is lowest and 7 is highest priority."
+    ::=  { l2QosPortEntry 4 }
+
+
+-- -------------------------------------------------------------
+-- Link: Frnt: Layer 2 FRNT Group
+-- -------------------------------------------------------------
+
+frntv0Table OBJECT-TYPE
+    SYNTAX  SEQUENCE OF Frntv0Entry
+    MAX-ACCESS    not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Table containing a list of FRNTv0 instances/rings."
+    ::= { frntv0 1 }
+
+frntv0Entry OBJECT-TYPE
+    SYNTAX  Frntv0Entry
+    MAX-ACCESS    not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The row in the frntv0Table containing settings and status information
+   for a specific FRNTv0 instance/ring."
+    INDEX { frntv0InstanceId }
+    ::= { frntv0Table 1 }
+
+Frntv0Entry ::= SEQUENCE {
+    frntv0InstanceId       Integer32,
+    frntv0FocalPointEnabled      TruthValue,
+    frntv0Port1            DisplayString,
+    frntv0Port2            DisplayString,
+    frntv0Port1State       INTEGER,
+    frntv0Port2State       INTEGER,
+    frntv0RingStatus       INTEGER,
+    frntv0RowStatus        RowStatus,
+    frntv0TopologyChangeCount    Integer32,
+    frntv0TopologyTimeSinceLastChange  TimeTicks,
+    frntv0PortsSwapped        TruthValue
+}
+
+frntv0InstanceId OBJECT-TYPE
+    SYNTAX  Integer32 (1..64)
+    MAX-ACCESS    accessible-for-notify
+    STATUS  current
+    DESCRIPTION
+   "The instance id of this FRNTv0 Ring
+   (only of local significance to this unit)."
+    ::=  { frntv0Entry 1 }
+
+frntv0FocalPointEnabled OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS    read-create
+    STATUS  current
+    DESCRIPTION
+   "True(1) if this unit is configured as focal point for this FRNTv0 instance.
+   False(2) if this unit is configured as member switch for this FRNTv0 instance."
+    ::=  { frntv0Entry 2 }
+
+frntv0Port1 OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS read-create
+    STATUS  current
+    DESCRIPTION
+   "Name of FRNT port M in the FRNT port pair.
+        In case the unit is configured as focal point and the ring is fully connected,
+        it is port M that is put in BLOCKING."
+    ::=  { frntv0Entry 3 }
+
+frntv0Port2 OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS read-create
+    STATUS  current
+    DESCRIPTION
+   "Name of FRNT port N in the FRNT port pair. In case of an edge in a FRNT bus
+         rather than a node in a FRNT ring then port N shall be set to 'None' and it
+         will be read as 'None'. In case the unit is configured as focal point and
+         the ring is fully connected, it is port M that is put in BLOCKING."
+    ::=  { frntv0Entry 4 }
+
+
+frntv0Port1State OBJECT-TYPE
+    SYNTAX  INTEGER {
+                    disabled(1),        -- Link down
+                    blocking(2),        -- Link up, BLOCKING
+                    learning(4),        -- Link up, LEARNING (invalid state for an FRNT ring port)
+                    forwarding(5)       -- Link up, FORWARDING
+    }
+    MAX-ACCESS    read-only
+    STATUS  current
+    DESCRIPTION
+   "Provides information about the status of FRNT port M.
+         See frntv0RingStatus for more details."
+    ::= { frntv0Entry 5}
+
+frntv0Port2State OBJECT-TYPE
+    SYNTAX INTEGER {
+                    disabled(1),        -- Link down
+                    blocking(2),        -- Link up, BLOCKING
+                    learning(4),        -- Link up, LEARNING (invalid state for an FRNT ring port)
+                    forwarding(5)       -- Link up, FORWARDING
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+   "Provides information about the status of FRNT port N.
+         See frntv0RingStatus for more details."
+    ::= { frntv0Entry 6}
+
+frntv0RingStatus OBJECT-TYPE
+    SYNTAX    INTEGER {
+                    ring(1),
+                    bus(2)
+    }
+    MAX-ACCESS     read-only
+    STATUS    current
+    DESCRIPTION
+    "Read ring status information. The answer is to be interpreted
+    differently when asking a focal point or a member switch.
+
+    Focal point (status of the whole FRNT topology):
+    1. ring mode: A focal point reports 'ring(1)' when the FRNT
+       topology is intact. On a focal point this indicates OK.
+    2. bus mode: A focal point reports 'bus(2)' when it has
+       detected an ERROR in the FRNT topology, i.e., the topology
+       is broken. It can either be an error on any of its local
+       FRNT ports (M or N), or elsewhere in the FRNT topology.
+
+    Member switch (status of the member's local FRNT ports):
+    1. ring mode: A member switch reports 'ring(1)' when
+       one or both of its FRNT ports are down or in blocking
+       state. On a member switch this indicates an ERROR.
+    2. bus mode: A member switch reports 'bus(2)' when both its
+       FRNT ports are in forwarding state. On a member switch this
+       is an indication of OK, but it only has significance for
+       this member switch, not the whole FRNT topology."
+
+    ::=  { frntv0Entry 7 }
+
+frntv0RowStatus OBJECT-TYPE
+    SYNTAX  RowStatus
+    MAX-ACCESS    read-create
+    STATUS  current
+    DESCRIPTION
+   "This object indicates the status of this table entry."
+    ::=  { frntv0Entry 8 }
+
+    frntv0TopologyChangeCount OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS    read-only
+    STATUS  current
+    DESCRIPTION
+   "This object indicates the number of transitions between bus/ring mode
+    since FRNT was enabled."
+    ::=  { frntv0Entry 9 }
+
+    frntv0TopologyTimeSinceLastChange OBJECT-TYPE
+    SYNTAX  TimeTicks
+    MAX-ACCESS    read-only
+    STATUS  current
+    DESCRIPTION
+   "This object indicates the time that have passed since the last change of
+   ring status."
+    ::=  { frntv0Entry 10 }
+
+    frntv0PortsSwapped  OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS    read-only
+    STATUS  current
+    DESCRIPTION
+   "FRNT can detect if the FRNT ports have been swapped. For example if port1
+   is connected to port1 on another FRNT unit.
+   True(1) if the ports are swapped.
+   False(2) if the ports are not swapped."
+    ::=  { frntv0Entry 11 }
+
+----------------------------------------------------------------
+-- Link: RiCo: Ring coupling and Dual-Homing status (read)
+----------------------------------------------------------------
+
+riCoStatusTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RiCoStatusEntry
+    MAX-ACCESS    not-accessible
+    STATUS  current
+    DESCRIPTION
+    "Table containing status for a list of RiCo and/or Dual Homing
+    instances present on this unit."
+    ::= { rico 1 }
+
+riCoStatusEntry OBJECT-TYPE
+    SYNTAX  RiCoStatusEntry
+    MAX-ACCESS    not-accessible
+    STATUS  current
+    DESCRIPTION
+    "Row in the riCoStatusTable that is containing settings and
+   status information for a specific RiCo/Dual-Homing instance."
+    INDEX { riCoStatusRingIdx, riCoStatusCouplingIdx, riCoStatusNodeId }
+    ::= { riCoStatusTable 1  }
+
+RiCoStatusEntry ::= SEQUENCE {
+    riCoStatusRingIdx           Integer32,
+    riCoStatusCouplingIdx       Integer32,
+    riCoStatusNodeId            MacAddress,
+    riCoStatusHelloInterval     Integer32,
+    riCoStatusHelloEffective    Integer32
+    }
+
+riCoStatusRingIdx OBJECT-TYPE
+    SYNTAX  Integer32 (0..255)
+    MAX-ACCESS    accessible-for-notify
+    STATUS  current
+    DESCRIPTION
+    "The ring instance ID of this RiCo/Dual-Homing instance
+    (only of local significance to this unit).
+    - For RiCo instances, the ring ID corresponds to the
+    associated FRNT ring ID.
+    - For Dual Homing instances, the ring ID is always '0'."
+    ::=  { riCoStatusEntry 1 }
+
+riCoStatusCouplingIdx OBJECT-TYPE
+    SYNTAX  Integer32 (1..8)
+    MAX-ACCESS    accessible-for-notify
+    STATUS  current
+    DESCRIPTION
+    "The ID of this RiCo/Dual-Homing instance.
+    (only of local significance to this unit).
+    Unique per ring instance (riCoStatusRingIdx)."
+    ::=  { riCoStatusEntry 2 }
+
+riCoStatusNodeId OBJECT-TYPE
+    SYNTAX  MacAddress
+    MAX-ACCESS    accessible-for-notify
+    STATUS  current
+    DESCRIPTION
+    "The unique ID of this RiCo node. A MAC address (typically the
+    base MAC address) of this unit."
+    ::=  { riCoStatusEntry 3 }
+
+riCoStatusHelloInterval OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS read-only
+    STATUS  current
+    DESCRIPTION
+    "Configured RiCo Ring Hello interval in milliseconds.
+    Not applicable for Dual Homing instances (value '0')"
+    ::=  { riCoStatusEntry 4 }
+
+riCoStatusHelloEffective OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS read-only
+    STATUS  current
+    DESCRIPTION
+    "Effective RiCo Ring Hello interval in milliseconds. Shows
+    negotiated Hello interval.
+    Not applicable for Dual Homing instances (value '0')."
+    ::=  { riCoStatusEntry 5 }
+
+
+----------------------------------------------------------------
+-- Link: RiCo: Ring coupling and Dual-Homing uplink status (read)
+----------------------------------------------------------------
+
+riCoStatusUplinkTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RiCoStatusUplinkEntry
+    MAX-ACCESS not-accessible
+    STATUS  current
+    DESCRIPTION
+    "Table containing status of RiCo and Dual-Homing uplinks per link"
+    ::= { rico 2 }
+
+riCoStatusUplinkEntry OBJECT-TYPE
+    SYNTAX  RiCoStatusUplinkEntry
+    MAX-ACCESS    not-accessible
+    STATUS  current
+    DESCRIPTION
+    "The row in the riCoStatusUplinkTable containing status information
+    for a specific RiCo or Dual-Homing uplink. For RiCo, status
+    for all local uplinks, and for the best uplink of each RiCo
+    peer is listed. For dual-homing, status for all local
+    uplinks is listed."
+
+    INDEX { riCoStatusUplinkRingIdx, riCoStatusUplinkCouplingIdx, riCoStatusUplinkNodeId, riCoStatusUplinkIfIndex }
+    ::= { riCoStatusUplinkTable 1 }
+
+RiCoStatusUplinkEntry ::= SEQUENCE {
+    riCoStatusUplinkRingIdx                 Integer32,
+    riCoStatusUplinkCouplingIdx             Integer32,
+    riCoStatusUplinkNodeId                  MacAddress,
+    riCoStatusUplinkIfIndex                 InterfaceIndex,
+    riCoStatusUplinkStatus                  INTEGER,
+    riCoStatusUplinkIfName                  DisplayString,
+    riCoStatusUplinkPrio                    Integer32,
+    riCoStatusUplinkPathCost                Integer32,
+    riCoStatusUplinkHelloInterval           Integer32,
+    riCoStatusUplinkHelloIntervalEffective  Integer32,
+    riCoStatusUplinkChangedCounter          Integer32,
+    riCoStatusUplinkSynchronized            INTEGER,
+    riCoStatusUplinkPreferred               INTEGER,
+    riCoStatusUplinkLocal                   TruthValue
+    }
+
+riCoStatusUplinkRingIdx  OBJECT-TYPE
+    SYNTAX  Integer32 (0..255)
+    MAX-ACCESS    accessible-for-notify
+    STATUS  current
+    DESCRIPTION
+    "The ring instance ID of this RiCo/Dual-Homing instance
+    (only of local significance to this unit).
+    - For RiCo instances, the ring ID corresponds to the
+        associated FRNT ring ID.
+    - For Dual Homing instances, the ring ID is always '0'."
+    ::=  { riCoStatusUplinkEntry 1 }
+
+
+riCoStatusUplinkCouplingIdx  OBJECT-TYPE
+    SYNTAX  Integer32 (1..8)
+    MAX-ACCESS    accessible-for-notify
+    STATUS  current
+    DESCRIPTION
+    "The instance id of this riCo Uplink"
+    ::=  { riCoStatusUplinkEntry 2 }
+
+
+
+riCoStatusUplinkNodeId OBJECT-TYPE
+    SYNTAX  MacAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "The unique ID of the node, i.e., the MAC address of the
+    node. For RiCo, this can be the (base) MAC of the local unit,
+    or the MAC identifying a peer RiCo node. For
+    Dual-Homing, this is the (base) MAC of the local unit."
+    ::=  { riCoStatusUplinkEntry 3 }
+
+
+riCoStatusUplinkIfIndex OBJECT-TYPE
+    SYNTAX  InterfaceIndex
+    MAX-ACCESS read-only
+    STATUS  current
+    DESCRIPTION
+    "The interface index of the uplink port.
+    - For local uplinks, this index corresponds to the port's
+    index in the ifTable (IF-MIB).
+    - For non-local uplinks, the value is not valid (value '0')."
+    ::=  { riCoStatusUplinkEntry 4 }
+
+riCoStatusUplinkStatus OBJECT-TYPE
+    SYNTAX  INTEGER {
+            active(1),    -- Uplink active
+            backup(2),    -- Uplink backup
+            down(3)       -- Uplink down
+            }
+    MAX-ACCESS read-only
+    STATUS  current
+    DESCRIPTION
+   "Uplink active (1), backup (2) or down (3)."
+    ::=  { riCoStatusUplinkEntry 5 }
+
+
+riCoStatusUplinkIfName OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS read-only
+    STATUS  current
+    DESCRIPTION
+    "The name of the interface used for this uplink."
+    ::=   { riCoStatusUplinkEntry 6 }
+
+riCoStatusUplinkPrio OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS read-only
+    STATUS  current
+    DESCRIPTION
+    "Effective priority of this uplink. Based on configured
+    priority and 'adjust' value (sticky uplink)."
+    ::=  { riCoStatusUplinkEntry 7 }
+
+riCoStatusUplinkPathCost OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS read-only
+    STATUS  current
+    DESCRIPTION
+    "Current path cost for this uplink."
+    ::=  { riCoStatusUplinkEntry 8 }
+
+riCoStatusUplinkHelloInterval OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS read-only
+    STATUS  current
+    DESCRIPTION
+    "Configured Ring Hello Interval for the RiCo node of this
+    uplink. Not valid for Dual-Homing, value '0')"
+    ::=  { riCoStatusUplinkEntry 9 }
+
+
+riCoStatusUplinkHelloIntervalEffective OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS read-only
+    STATUS  current
+    DESCRIPTION
+    "Effective Ring Hello Interval for the RiCo node of this
+    uplink. Not valid for Dual-Homing, value '0')"
+    ::=  { riCoStatusUplinkEntry 10 }
+
+riCoStatusUplinkChangedCounter OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Number of times this uplink changed its state"
+    ::=  { riCoStatusUplinkEntry 11 }
+
+
+riCoStatusUplinkSynchronized OBJECT-TYPE
+    SYNTAX  INTEGER {
+            synchronized(1),
+            notSynchronized(2),
+            notApplicable(3)
+            }
+    MAX-ACCESS read-only
+    STATUS  current
+    DESCRIPTION
+    "Synchronization status for this uplink:
+    - synchronized(1): Synchronize enabled and ok
+    - notSynchronized(2): Synchronize enabled and fails
+    - notApplicable(3): Non-local RiCo uplink, or Dual-Homing
+        uplink where Synchronize is disabled"
+    ::=  { riCoStatusUplinkEntry 12 }
+
+riCoStatusUplinkPreferred OBJECT-TYPE
+    SYNTAX  INTEGER {
+            preferred(1),
+            notPreferred(2),
+            notApplicable(3)
+            }
+    MAX-ACCESS read-only
+    STATUS  current
+    DESCRIPTION
+    "Preferred uplink status.
+    Only valid for Dual-Homing uplinks whit synchronization enabled.
+    - preferred(1): Dual-Homing uplink has status 'Preferred'
+    - notPreferred(2): Dual-Homing uplink has status 'Not Preferred'
+    - notApplicable(3): Uplink is either
+        - a Dual-Homing uplink with synchronization disabled, or
+        - a RiCo uplink (local or non-local)"
+     ::=  { riCoStatusUplinkEntry 13 }
+
+riCoStatusUplinkLocal OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS read-only
+    STATUS  current
+    DESCRIPTION
+    "Local(true) or global(false) instance"
+    ::=  { riCoStatusUplinkEntry 14 }
+
+
+----------------------------------------------------------------
+-- Link: RiCo: Ring coupling and Dual-Homing configure (write/create)
+----------------------------------------------------------------
+
+riCoCfgTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RiCoCfgEntry
+    MAX-ACCESS    not-accessible
+    STATUS  current
+    DESCRIPTION
+    "Table containing a list of RiCo couplings."
+    ::= { rico 3 }
+
+riCoCfgEntry OBJECT-TYPE
+    SYNTAX  RiCoCfgEntry
+    MAX-ACCESS    not-accessible
+    STATUS  current
+    DESCRIPTION
+    "The row in the riCoTable containing settings for a specific
+    RiCo or Dual-Homing instance."
+    INDEX { riCoCfgRingIdx, riCoCfgCouplingIdx }
+    ::= { riCoCfgTable 1  }
+
+RiCoCfgEntry ::= SEQUENCE {
+    riCoCfgRingIdx              Integer32,
+    riCoCfgCouplingIdx          Integer32,
+    riCoCfgEnabled              TruthValue,
+    riCoCfgHelloInterval        Integer32,
+    riCoCfgSynchronize          INTEGER,
+    riCoCfgRowStatus            RowStatus
+    }
+
+riCoCfgRingIdx OBJECT-TYPE
+    SYNTAX  Integer32 (0..255)
+    MAX-ACCESS    read-create
+    STATUS  current
+    DESCRIPTION
+    "The ring instance ID of this RiCo/Dual-Homing instance
+    (only of local significance to this unit).
+    - For RiCo instances, the ring ID corresponds to the
+        associated FRNT ring ID.
+    - For Dual Homing instances, the ring ID is always '0'."
+    ::=  { riCoCfgEntry 1 }
+
+riCoCfgCouplingIdx OBJECT-TYPE
+    SYNTAX  Integer32 (1..8)
+    MAX-ACCESS    read-create
+    STATUS  current
+    DESCRIPTION
+    "The ID of this RiCo/Dual-Homing instance.
+    (only of local significance to this unit).
+    Unique per ring instance (riCoCfgRingIdx)."
+    ::=  { riCoCfgEntry 2 }
+
+riCoCfgEnabled OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS read-create
+    STATUS  current
+    DESCRIPTION
+    "Enable or disable the RiCo instance
+    True (1) or False (2)"
+    ::=  { riCoCfgEntry 3 }
+
+riCoCfgHelloInterval OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS read-create
+    STATUS  current
+    DESCRIPTION
+    "Configured RiCo Ring Hello interval in milliseconds.
+    - Default: 100 milliseconds
+    - Configurable in range: 50-1000 milliseconds
+    - Not applicable for Dual Homing instances (value '0')"
+    ::=  { riCoCfgEntry 4 }
+
+riCoCfgSynchronize OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS read-create
+    STATUS  current
+    DESCRIPTION
+    "Enable/disable Uplink synchronization. 'True' to enable,
+    and 'False' to disable synchronization.
+    Note: Only configurable for Dual-Homing Uplinks. For RiCo
+    Uplinks, synchronization is always enabled."
+    ::=  { riCoCfgEntry 5 }
+
+riCoCfgRowStatus OBJECT-TYPE
+    SYNTAX  RowStatus
+    MAX-ACCESS    read-create
+    STATUS  current
+    DESCRIPTION
+    "This object indicates the status of this table entry.
+     This object can also be used to create or delete instances.
+     At most 1 RiCo instance and at most 8 Dual-Homing instances
+     can be created."
+    ::=  { riCoCfgEntry 6 }
+
+
+----------------------------------------------------------------
+-- Link: RiCo: RiCo and Dual-Homing uplink configure (write)
+----------------------------------------------------------------
+
+riCoCfgUplinkTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RiCoCfgUplinkEntry
+    MAX-ACCESS not-accessible
+    STATUS  current
+    DESCRIPTION
+    "Table containing RiCo and Dual-Homing uplinks and
+    corresponding settings per link."
+    ::= { rico 4 }
+
+riCoCfgUplinkEntry OBJECT-TYPE
+    SYNTAX  RiCoCfgUplinkEntry
+    MAX-ACCESS    not-accessible
+    STATUS  current
+    DESCRIPTION
+    "The row in the riCoLinkTable containing settings and status information
+    for a specific RiCo or Dual-Homing Uplink."
+
+    INDEX { riCoCfgRingIdx, riCoCfgCouplingIdx, riCoCfgUplinkIfIndex }
+    ::= { riCoCfgUplinkTable 1 }
+
+RiCoCfgUplinkEntry ::= SEQUENCE {
+    riCoCfgUplinkRingIdx        Integer32,
+    riCoCfgUplinkCouplingIdx    Integer32,
+    riCoCfgUplinkIfIndex        InterfaceIndex,
+    riCoCfgUplinkPrio           Integer32,
+    riCoCfgUplinkAdjust         Integer32,
+    riCoCfgUplinkEchoTime       Integer32,
+    riCoCfgUplinkPathCost       Integer32,
+    riCoCfgUplinkRowStatus      RowStatus
+    }
+
+riCoCfgUplinkRingIdx  OBJECT-TYPE
+    SYNTAX  Integer32 (0..255)
+    MAX-ACCESS    read-create
+    STATUS  current
+    DESCRIPTION
+    "The ring instance ID of this RiCo/Dual-Homing instance
+    (only of local significance to this unit).
+    - For RiCo instances, the ring ID corresponds to the associated FRNT ring ID.
+    - For Dual Homing instances, the ring ID is always '0'."
+    ::=  { riCoCfgUplinkEntry 1 }
+
+
+riCoCfgUplinkCouplingIdx  OBJECT-TYPE
+    SYNTAX  Integer32 (1..8)
+    MAX-ACCESS    read-create
+    STATUS  current
+    DESCRIPTION
+    "The ID of this RiCo/Dual-Homing instance.
+    (only of local significance to this unit).
+    Unique per ring instance (riCoStatusRingIdx)."
+    ::=  { riCoCfgUplinkEntry 2 }
+
+riCoCfgUplinkIfIndex  OBJECT-TYPE
+    SYNTAX  InterfaceIndex
+    MAX-ACCESS    read-create
+    STATUS  current
+    DESCRIPTION
+    "The interface index of the uplink port.
+    For local uplinks, this index corresponds to the port's
+    index in the ifTable (IF-MIB)."
+    ::=  { riCoCfgUplinkEntry 3 }
+
+riCoCfgUplinkPrio OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS read-create
+    STATUS  current
+    DESCRIPTION
+    "Configure priority for this uplink (128 as default).
+    A lower value increases the chance to be elected as active
+    uplink."
+    ::=  { riCoCfgUplinkEntry 4 }
+
+riCoCfgUplinkAdjust OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS read-create
+    STATUS  current
+    DESCRIPTION
+    "Configure adjust value for this uplink (sticky uplink).
+    The effictive priority is reduced by the adjust value if the
+    link becomes elected as active uplink. Default '0'."
+    ::=  { riCoCfgUplinkEntry 5 }
+
+riCoCfgUplinkEchoTime OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS read-create
+    STATUS  current
+    DESCRIPTION
+    "Uplink echo interval to be set for this uplink in
+    milliseconds. Default: 200 ms Range: 20-1000 ms"
+    ::=  { riCoCfgUplinkEntry 6 }
+
+riCoCfgUplinkPathCost OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS read-create
+    STATUS  current
+    DESCRIPTION
+    "Path-cost to be set for this uplink. '0' means 'Auto', which
+    lets path cost depend on speed and duplex of the uplink."
+    ::=  { riCoCfgUplinkEntry 7 }
+
+riCoCfgUplinkRowStatus OBJECT-TYPE
+    SYNTAX  RowStatus
+    MAX-ACCESS    read-create
+    STATUS  current
+    DESCRIPTION
+    "This object indicates the status of this table entry."
+    ::=  { riCoCfgUplinkEntry 8 }
+
+----------------------------------------------------------------
+-- Link: LLDP: Custom TLV
+----------------------------------------------------------------
+
+lldpCtlvTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF LldpCtlvEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+    "The LLDP custom TLV (Type 127) configuration table"
+    ::= { lldpCtlv 1 }
+
+lldpCtlvEntry OBJECT-TYPE
+    SYNTAX        LldpCtlvEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+    "A custom TLV entry."
+    INDEX { lldpCtlvIdx }
+    ::= { lldpCtlvTable 1 }
+
+LldpCtlvEntry ::= SEQUENCE {
+    lldpCtlvIdx         INTEGER,
+    lldpCtlvOui         OCTET STRING,
+    lldpCtlvSubType     INTEGER,
+    lldpCtlvInfo        OCTET STRING,
+    lldpCtlvRowStatus   RowStatus
+}
+
+lldpCtlvIdx OBJECT-TYPE
+    SYNTAX        INTEGER (1..60)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+    "Index of this custom TLV. Only of local significance."
+    ::=  { lldpCtlvEntry 1 }
+
+lldpCtlvOui OBJECT-TYPE
+    SYNTAX        OCTET STRING
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+    "Organizationally unique identifier (OUI), 3 hex-encoded
+    bytes. Required."
+    ::=  { lldpCtlvEntry 2 }
+
+lldpCtlvSubType OBJECT-TYPE
+    SYNTAX  INTEGER (0..255)
+    MAX-ACCESS read-create
+    STATUS  current
+    DESCRIPTION
+    "Organizationally defined subtype, one byte. Default: 0"
+    ::=  { lldpCtlvEntry 3 }
+
+lldpCtlvInfo OBJECT-TYPE
+    SYNTAX  OCTET STRING
+    MAX-ACCESS read-create
+    STATUS  current
+    DESCRIPTION
+    "Information/value part of custom TLV. 0-507 octets encoded as
+    hex. Default: Empty"
+    ::=  { lldpCtlvEntry 4 }
+
+lldpCtlvRowStatus OBJECT-TYPE
+    SYNTAX  RowStatus
+    MAX-ACCESS    read-create
+    STATUS  current
+    DESCRIPTION
+    "This object indicates the status of this table entry. Used to
+    create or delete a custom TLV entry."
+    ::=  { lldpCtlvEntry 5 }
+
+----------------------------------------------------------------
+-- Link: LLDP: Custom TLV port -> ctlvIndex mapping
+----------------------------------------------------------------
+
+lldpCtlvPortTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF LldpCtlvPortEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+   "Table specifying which custom TLV(s) to transmit per
+    port. Each row in the table maps a custom TLV to a port. Each
+    custom TLV in the lldpCtlvTable can be mapped to one or more
+    ports."
+    ::= { lldpCtlv 2 }
+
+lldpCtlvPortEntry OBJECT-TYPE
+    SYNTAX        LldpCtlvPortEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION "Each entry maps a custom TLV to a port."
+    INDEX { lldpCtlvPortIdx, lldpCtlvIdx}
+    ::= { lldpCtlvPortTable 1 }
+
+LldpCtlvPortEntry ::= SEQUENCE {
+    lldpCtlvPortIdx        INTEGER,
+    lldpCtlvPortCtlvIdx    INTEGER,
+    lldpCtlvPortRowStatus  RowStatus
+}
+
+lldpCtlvPortIdx OBJECT-TYPE
+    SYNTAX        INTEGER (1..255)
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION "The logical number of the port. This is the same
+    number as the dot1dBasePort (dot1dBasePortTable of BRIDGE-MIB) for
+    this port."
+    ::=  { lldpCtlvPortEntry 1 }
+
+lldpCtlvPortCtlvIdx OBJECT-TYPE
+    SYNTAX        INTEGER
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION "Custom TLV index (lldpCtlvTable)"
+    ::=  { lldpCtlvPortEntry 2 }
+
+lldpCtlvPortRowStatus OBJECT-TYPE
+    SYNTAX        RowStatus
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+    "This object indicates the status of this table entry. Used to
+    create or delete a 'custom TLV to port' mapping."
+    ::=  { lldpCtlvPortEntry 3 }
+
+----------------------------------------------------------------
+-- Link: LLDP: Remote Custom TLV
+----------------------------------------------------------------
+
+lldpRemCtlvTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF LldpRemCtlvEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+    "Table listing all custom TLV(s) received. Each entry
+    represents a custom TLV received on a specific port from
+    individual neighbours. Entries are
+    removed when the TTL of the LLDP message expires, and will be
+    removed/replaced when a new LLDP message from the same neighbour
+    is received."
+    ::= { lldpCtlv 3 }
+
+lldpRemCtlvEntry OBJECT-TYPE
+    SYNTAX        LldpRemCtlvEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION "Custom TLV received on a port."
+    INDEX { lldpRemCtlvLocalPort, lldpRemCtlvMacAddress,
+    lldpRemCtlvOui, lldpRemCtlvSubType }
+    ::= { lldpRemCtlvTable 1 }
+
+LldpRemCtlvEntry ::= SEQUENCE {
+    lldpRemCtlvLocalPort     INTEGER,
+    lldpRemCtlvMacAddress    MacAddress,
+    lldpRemCtlvOui           OCTET STRING,
+    lldpRemCtlvSubType       INTEGER,
+    lldpRemCtlvInfo          OCTET STRING }
+
+ lldpRemCtlvLocalPort OBJECT-TYPE
+    SYNTAX        INTEGER (1..255)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION "The logical number of the local port receiving this
+    custom TLV. This is the same number as the dot1dBasePort
+    (dot1dBasePortTable of BRIDGE-MIB) for this port."
+    ::=  { lldpRemCtlvEntry 1 }
+
+lldpRemCtlvMacAddress OBJECT-TYPE
+    SYNTAX        MacAddress
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION "The MAC address of the neighbour node sending this
+    custom TLV."
+    ::=  { lldpRemCtlvEntry 2 }
+
+
+lldpRemCtlvOui OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (3))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+    "Organizationally unique identifier (OUI), 3 hex-encoded bytes."
+    ::=  { lldpRemCtlvEntry 3 }
+
+lldpRemCtlvSubType OBJECT-TYPE
+    SYNTAX        INTEGER (0..255)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+    "Organizationally defined subtype, one byte."
+    ::=  { lldpRemCtlvEntry 4 }
+
+lldpRemCtlvInfo OBJECT-TYPE
+    SYNTAX        OCTET STRING
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+    "Information/value part of custom TLV. 0-507 octets encoded as hex."
+    ::=  { lldpRemCtlvEntry 5 }
+
+-- -------------------------------------------------------------
+-- Link: IGMP Snooping Group
+-- -------------------------------------------------------------
+
+igmpSnoopingQuerierMode OBJECT-TYPE
+    SYNTAX  INTEGER {
+                    auto(1),  -- autonegotiate querier role
+          querier(2),  -- always act as querier
+          proxy(3)  -- operate in proxy querier mode
+      }
+    MAX-ACCESS    read-write
+    STATUS     current
+    DESCRIPTION
+   "The querierMode object controls the querier mode an IGMP snooping
+   switch will operate in on IGMP Snooping enabled VLANs.
+   If the switch does not have an IP address on a certain VLAN,
+   the switch will act in proxy querier mode irrespective of the
+   querierMode setting.
+   1. Autonegotiate querier. The switch will become querier on a VLAN
+   unless it hears IGMP queries on that VLAN from device with
+   lower IP address.
+   2. Force querier role. The switch will act as querier on every VLAN
+   where IGMP snooping is enabled.
+   3. Operate in proxy querier mode."
+    ::= { igmpSnooping 1 }
+
+igmpSnoopingQuerierInterval OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS    read-write
+    STATUS  current
+    DESCRIPTION
+   "The IGMP Querier Interval (seconds). This interval will be used on all
+   interfaces where this unit acts as IGMP Querier, unless multicast routing
+   protocol specific or interface specific querier setting exist.
+   Currently, the following interval values are valid: 12, 30, 70 and 150 (seconds)."
+    ::= { igmpSnooping 2 }
+
+staticMulticastRouterPorts OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+   "This is a comma-separated list of (LAN)port names, which
+   specifies statically configured 'multicast router ports'. All
+   layer-2 multicast traffic (known and unknown) should be forwarded
+   onto multicast router ports."
+   ::= { igmpSnooping 3 }
+
+currentMulticastRouterPorts OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+   "This is a comma-separated list of portnames, which lists
+   all ports operating as multicast router ports - both dynamically
+   discovered (e.g., by reception of IGMP Queries) or statically
+   configured multicast router ports. All (layer-2) multicast traffic
+   (known and unknown) should be forwarded onto multicast router
+   ports."
+    ::= { igmpSnooping 4 }
+
+igmpSnoopingVlanTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF IgmpSnoopingVlanEntry
+    MAX-ACCESS not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A list of configuration entries for VLAN specific IGMP Snooping objects."
+    ::= { igmpSnooping 5 }
+
+igmpSnoopingVlanEntry OBJECT-TYPE
+    SYNTAX  IgmpSnoopingVlanEntry
+    MAX-ACCESS not-accessible
+    STATUS  current
+    DESCRIPTION
+        "An IGMP Snooping VLAN entry contains IGMP Snooping objects relevant for
+   IGMP Snooping management per VLAN."
+    INDEX { igmpSnoopingVlanId }
+    ::= { igmpSnoopingVlanTable 1 }
+
+IgmpSnoopingVlanEntry ::= SEQUENCE {
+    igmpSnoopingVlanId  VlanId,
+    igmpSnoopingEnabled TruthValue
+}
+
+igmpSnoopingVlanId OBJECT-TYPE
+    SYNTAX  VlanId
+    MAX-ACCESS    read-only
+    STATUS  current
+    DESCRIPTION
+   "This index should match corresponding VLAN ID of Q-bridge MIB."
+    ::=  { igmpSnoopingVlanEntry 1 }
+
+igmpSnoopingEnabled OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS    read-write
+    STATUS  current
+    DESCRIPTION
+   "IGMP Snooping enabled or disabled on this particular VLAN."
+    ::=  { igmpSnoopingVlanEntry 2 }
+
+-- -------------------------------------------------------------
+-- Net Group
+-- -------------------------------------------------------------
+-- -------------------------------------------------------------
+-- Net: Iface: ifaceInet4 Group
+-- -------------------------------------------------------------
+
+inet4StaticDefaultGatewayAddress OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+   "IP Address of statically configured default gateway.
+   Setting the address to 0.0.0.0 means that there is 'no static
+   default gateway' configured."
+    ::= { ifaceInet4 1 }
+
+inet4BaseIfaceTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF Inet4BaseIfaceEntry
+    MAX-ACCESS not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Table containing base IPv4 settings per interface"
+    ::= { ifaceInet4 2 }
+
+inet4BaseIfaceEntry OBJECT-TYPE
+    SYNTAX  Inet4BaseIfaceEntry
+    MAX-ACCESS not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Entry in ipv4Interface table. Each row holds IPv4 settings
+   specific to this interface."
+    INDEX { inet4BaseIfIndex }
+    ::= { inet4BaseIfaceTable 1 }
+
+Inet4BaseIfaceEntry ::= SEQUENCE {
+    inet4BaseIfIndex    InterfaceIndex,
+    inet4BaseIfName     DisplayString,
+    inet4BaseAddressMode   INTEGER
+    }
+
+inet4BaseIfIndex OBJECT-TYPE
+    SYNTAX  InterfaceIndex
+    MAX-ACCESS    read-only
+    STATUS  current
+    DESCRIPTION
+   "Uniquely identifies an interface; same interface as identied by the
+   same value of ifIndex in the interfaces group."
+    ::=  { inet4BaseIfaceEntry 1 }
+
+inet4BaseIfName OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS    read-only
+    STATUS  current
+    DESCRIPTION
+   "The name matches the corresponding ifName in the ifXTable."
+    ::=  { inet4BaseIfaceEntry 2 }
+
+inet4BaseAddressMode OBJECT-TYPE
+    SYNTAX  INTEGER {
+                    static(1),   -- Static IPv4 address
+          dhcp(2)      -- Use DHCP/Bootp to acquire IP address.
+      }
+    MAX-ACCESS    read-write
+    STATUS  current
+    DESCRIPTION
+   "The IPv4 address assignment mode."
+    ::=  { inet4BaseIfaceEntry 3 }
+
+inet4StaticTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF Inet4StaticEntry
+    MAX-ACCESS not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Table containing settings for static IPv4 interfaces"
+    ::= { ifaceInet4 3 }
+
+inet4StaticEntry OBJECT-TYPE
+    SYNTAX  Inet4StaticEntry
+    MAX-ACCESS    not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Entry in ipv4Interface table. Each row holds IPv4 settings specific
+   to this interface."
+    INDEX { inet4StatIfIndex }
+    ::= { inet4StaticTable 1 }
+
+Inet4StaticEntry ::= SEQUENCE {
+    inet4StatIfIndex    InterfaceIndex,
+    inet4StatIfName     DisplayString,
+    inet4StatAddress    IpAddress,
+    inet4StatNetmask    IpAddress
+    }
+
+inet4StatIfIndex OBJECT-TYPE
+    SYNTAX  InterfaceIndex
+    MAX-ACCESS read-only
+    STATUS  current
+    DESCRIPTION
+   "Uniquely identifies an interface; same interface as identied by the same
+   value of ifIndex in the interfaces group."
+    ::=  { inet4StaticEntry 1 }
+
+inet4StatIfName OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS read-only
+    STATUS  current
+    DESCRIPTION
+   "The name matches the corresponding ifName in the ifXTable."
+    ::=  { inet4StaticEntry 2 }
+
+inet4StatAddress OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS read-write
+    STATUS  current
+    DESCRIPTION
+   "Statically configured IPv4 address for this interface.
+        Address 0.0.0.0 means that the interface is disabled."
+    ::=  { inet4StaticEntry 3 }
+
+inet4StatNetmask OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS read-write
+    STATUS  current
+    DESCRIPTION
+   "Netmask of statically assigned IP address."
+    ::=  { inet4StaticEntry 4 }
+
+-- -------------------------------------------------------------
+-- Net: Iface: DHCP table
+-- -------------------------------------------------------------
+
+inet4DhcpTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF Inet4DhcpEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "Table containing settings for IPv4 interfaces using DHCP for
+   address assignment"
+    ::= { ifaceInet4 4 }
+
+inet4DhcpEntry OBJECT-TYPE
+    SYNTAX  Inet4DhcpEntry
+    MAX-ACCESS    not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Entry in inet4Dhcp table. Each row holds DHCP settings specific
+   to this interface."
+    INDEX { inet4DhcpIfIndex }
+    ::= { inet4DhcpTable 1 }
+
+Inet4DhcpEntry ::= SEQUENCE {
+    inet4DhcpIfIndex    InterfaceIndex,
+    inet4DhcpIfName     DisplayString,
+    inet4DhcpClientId      DisplayString
+}
+
+inet4DhcpIfIndex OBJECT-TYPE
+    SYNTAX  InterfaceIndex
+    MAX-ACCESS    read-only
+    STATUS  current
+    DESCRIPTION
+   "Uniquely identifies an interface; same interface as identied by the
+   same value of ifIndex in the interfaces group."
+    ::=  { inet4DhcpEntry 1 }
+
+inet4DhcpIfName OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS    read-only
+    STATUS  current
+    DESCRIPTION
+   "The name matches the corresponding ifName in the ifXTable."
+    ::=  { inet4DhcpEntry 2 }
+
+inet4DhcpClientId OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS    read-only
+    STATUS  current
+    DESCRIPTION
+   "Client ID passed by DHCP client to DHCP server."
+    ::=  { inet4DhcpEntry 3 }
+
+-- -------------------------------------------------------------
+-- Net: Iface: AddressConflict (addressConflict)
+-- -------------------------------------------------------------
+
+addressConflictExists OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS    read-only
+    STATUS  current
+    DESCRIPTION
+   "True if there are any conflicts detected, False if there are no more conflicts detected."
+    ::= { addressConflict 1 }
+
+addressConflictTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AddressConflictEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "A list containing all IP and MAC address conflicts currently
+      on the this device"
+   ::={ addressConflict 2 }
+
+addressConflictEntry OBJECT-TYPE
+    SYNTAX       AddressConflictEntry
+    MAX-ACCESS  not-accessible
+    STATUS       current
+    DESCRIPTION
+      "An entry containing details for the conflict"
+    INDEX   { addressConflictIndex }
+    ::=    { addressConflictTable 1}
+
+AddressConflictEntry ::= SEQUENCE {
+    addressConflictIndex       Integer32,
+    addressConflictIfIndex     InterfaceIndex,
+    addressConflictIfName      DisplayString,
+    addressConflictType        INTEGER,
+    addressConflictMacAddress  PhysAddress,
+    addressConflictIPv4Address IpAddress,
+    addressConflictTime        TimeTicks
+    }
+
+addressConflictIndex OBJECT-TYPE
+    SYNTAX      Integer32 (0..256)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A unique value for each conflict."
+    ::= { addressConflictEntry 1 }
+
+addressConflictIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+   "Index of the interface on this device."
+    ::= { addressConflictEntry 2 }
+
+addressConflictIfName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+   "Name of the interface on this device."
+    ::= { addressConflictEntry 3 }
+
+addressConflictType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                     ip(1),
+                     mac(2),
+                     ipAndMac(3)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+   "Type of conflict:
+                1 : IP,
+                2 : MAC,
+                3 : IP & MAC"
+    ::= { addressConflictEntry 4 }
+
+addressConflictMacAddress OBJECT-TYPE
+    SYNTAX      PhysAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+   "The MAC address of the conflicting peer."
+    ::= { addressConflictEntry 5 }
+
+addressConflictIPv4Address OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+   "The IPv4 address of the conflicting peer."
+    ::= { addressConflictEntry 6 }
+
+addressConflictTime OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+   "Time (in seconds) elapsed since conflict was last detected."
+    ::= { addressConflictEntry 7 }
+
+-- -------------------------------------------------------------
+-- Net: TTDP Group
+-- -------------------------------------------------------------
+
+etbnInhibitionEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+   "ETBN inhibition enabled or disabled."
+    ::= { ttdp 1 }
+
+-- -------------------------------------------------------------
+-- System Group
+-- -------------------------------------------------------------
+
+-- -------------------------------------------------------------
+-- System: Services Group
+-- -------------------------------------------------------------
+
+-- -------------------------------------------------------------
+-- System: Services: SNMP Group
+-- -------------------------------------------------------------
+
+trapCommunity OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS    read-write
+    STATUS  current
+    DESCRIPTION
+   "The trap community name which traps destined to defined
+   traphost(s) are sent with."
+    ::=  { snmp 1 }
+
+
+trapHostTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TrapHostEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of SNMP trap host."
+    ::= { snmp 2 }
+
+trapHostEntry OBJECT-TYPE
+    SYNTAX      TrapHostEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry containing information about a specific SNMP trap host."
+    INDEX       { trapHostId}
+    ::= { trapHostTable 1 }
+
+TrapHostEntry ::= SEQUENCE {
+    trapHostId         Integer32,
+    trapHostAddressType InetAddressType,
+    trapHostAddress     InetAddress,
+    trapHostRowStatus   RowStatus
+}
+
+trapHostId OBJECT-TYPE
+    SYNTAX  Integer32 (1..64)
+    MAX-ACCESS    read-only
+    STATUS  current
+    DESCRIPTION
+   "The id of this SNMP Trap Host
+   (only of local significance to this unit)."
+    ::=  { trapHostEntry 1 }
+
+trapHostAddressType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The type of Internet address by which the trap host
+         is reachable."
+
+    ::= { trapHostEntry 2 }
+
+trapHostAddress OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The IP address or Domain name for the trap host."
+
+    ::= { trapHostEntry 3 }
+
+trapHostRowStatus OBJECT-TYPE
+    SYNTAX  RowStatus
+    MAX-ACCESS    read-create
+    STATUS  current
+    DESCRIPTION
+   "This object indicates the status of this table entry."
+    ::=  { trapHostEntry 4 }
+
+
+roCommunity OBJECT-TYPE
+    SYNTAX    DisplayString
+    MAX-ACCESS     read-write
+    STATUS    current
+    DESCRIPTION
+   "The read-only community name used to by SNMPv1/v2 to read
+   SNMP MIB parameters. The string 'Disabled' have a special
+   meaning and cannot be used as roCommunity string.
+        Reading:
+     String 'Disabled' - The read-only community is disabled
+     Otherwise the received string shows the current read-only community.
+        Writing:
+          String 'Disabled' - Disable the read-write community
+          Otherwise the written string becomes the new read-only community."
+    ::=  { snmp 3 }
+
+rwCommunity OBJECT-TYPE
+    SYNTAX    DisplayString
+    MAX-ACCESS     read-write
+    STATUS    current
+    DESCRIPTION
+   "Provides a mechanism to change or enable/disable the
+   read-write community name used to by SNMPv1/v2 to read and set
+   SNMP MIB parameters, however, for security reasons the configured
+   value is never displayed. The strings 'Enabled' and 'Disabled'
+   have special meanings and cannot be used as rwCommunity string.
+        Reading:
+          String 'Enabled'  - A read-write community is configured
+          String 'Disabled' - The read-write community is disabled.
+        Writing:
+          String 'Disabled' - Disable the read-write community
+          Otherwise the written string becomes the new read-write
+          community (this implies that the read-write community is
+          enabled if it was earlier disabled.
+        Note that enabling the read-write community via SNMP is only
+   possible from SNMPv3."
+    ::=  { snmp 4 }
+
+-- -------------------------------------------------------------
+-- System: Services: Web Group
+-- -------------------------------------------------------------
+
+webEnabled OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS    read-write
+    STATUS     current
+    DESCRIPTION
+   "Web daemon enabled or disabled."
+    ::= { web 1 }
+
+-- -------------------------------------------------------------
+-- System: Services: IPConfig Group
+-- -------------------------------------------------------------
+
+ipconfigEnabled OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS    read-write
+    STATUS     current
+    DESCRIPTION
+   "IPConfig daemon enabled or disabled."
+    ::= { ipconfig 1 }
+
+-- -------------------------------------------------------------
+-- System: Services: SSH Group
+-- -------------------------------------------------------------
+
+
+
+sshEnabled OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS    read-write
+    STATUS     current
+    DESCRIPTION
+   "SSH daemon enabled or disabled."
+    ::= { ssh 1 }
+
+-- -------------------------------------------------------------
+-- System: Services: LLDP Group
+-- -------------------------------------------------------------
+
+lldpEnabled OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS    read-write
+    STATUS     current
+    DESCRIPTION
+    "LLDP service enabled or disabled.
+    - True:  Enabling LLDP will enable the LLDP service with  default settings.
+    - False: Disabling LLDP will fully disable the LLDP service, remove any
+             existing configuration, and disableaccess to any other LLDP OID
+             in private MIB andin LLDP MIB."
+    ::= { lldp 1 }
+
+lldpActivated OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS    read-write
+    STATUS     current
+    DESCRIPTION
+   "Activate/deactivate LLDP configuration.
+    - True:  LLDP daemon enabled with existing configuration
+    - False: LLDP daemon deactivated. LLDP configuration (lldpPortConfigTable)
+             is kept and is still accessible. Configuration changes will not take
+             effect until lldpActivated is 'True'."
+    ::= { lldp 2 }
+
+-- -------------------------------------------------------------
+-- System: STATISTICS Group:
+-- -------------------------------------------------------------
+
+memoryAvail OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS    read-only
+    STATUS     current
+    DESCRIPTION
+   "Displays the amount of available memory in kb for the system."
+    ::= { statistics 1 }
+
+-- -------------------------------------------------------------
+-- System: STATISTICS : cpuLoadAvg Group:
+-- -------------------------------------------------------------
+
+loadAvg1 OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS    read-only
+    STATUS     current
+    DESCRIPTION
+   "Displays a the cpu load average over 1 minute. The
+   value is displayed by taking the cpu load avgerage
+   value and multiplying it with 100."
+    ::= { cpuLoadAvg 1 }
+
+loadAvg5 OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS    read-only
+    STATUS     current
+    DESCRIPTION
+   "Displays a the cpu load average over 5 minutes. The
+   value is displayed by taking the cpu load avgerage
+   value and multiplying it with 100."
+    ::= { cpuLoadAvg 2 }
+
+loadAvg15 OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS    read-only
+    STATUS     current
+    DESCRIPTION
+   "Displays a the cpu load average over 15 minute. The
+   value is displayed by taking the cpu load avgerage
+   value and multiplying it with 100."
+    ::= { cpuLoadAvg 3 }
+
+-- -------------------------------------------------------------
+-- System: eventSystem:
+-- -------------------------------------------------------------
+
+summaryAlarmStatus OBJECT-TYPE
+    SYNTAX  INTEGER {
+                    warning(1),    -- At least one of the configured
+                                   -- alarm sources reports alarm
+                                   -- condition.
+                    ok(2)          -- None of the configured alarm
+                                   -- sources reports alarm condition.
+                                   -- Alternatively, no alarm source
+                                   -- is configured.
+      }
+    MAX-ACCESS    read-only
+    STATUS  current
+    DESCRIPTION
+   "The summaryAlarmStatus reports ''warning'' when at least one
+   of the configured alarm/event sources reports alarm condition.
+        WeOS supports an extensive set of alarm/event sources and a
+   flexible alarm handling framework.
+   The sources affecting the summaryAlarmStatus are those
+   configured to affect the unit's status LED, typically
+   labeled ''ON'' and located on the unit's front panel."
+    ::= { eventSystem 1 }
+
+summaryAlarmTrapEnabled OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS    read-write
+    STATUS  current
+    DESCRIPTION
+        "Enable/Disable support for sending summaryAlarm traps.
+        True(1) if summaryAlarm traps are enabled.
+        False(2) if summaryAlarm traps are disabled.
+        Traps will be sent if (and only if) the summaryAlarmStatus
+        changes status ('warning => ok' or 'ok => warning')."
+    ::=  { eventSystem 2 }
+
+statusRelay OBJECT-TYPE
+   SYNTAX  INTEGER { warning(1), ok(2)}
+   MAX-ACCESS    read-only
+   STATUS  current
+   DESCRIPTION
+      "Displays the current state of the statusRelay (DigitalOut)."
+   ::= { eventSystem 3 }
+
+alarmStatusTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AlarmStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The status for alarm triggers."
+    ::= { eventSystem 4 }
+
+alarmStatusEntry OBJECT-TYPE
+    SYNTAX      AlarmStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "An entry containing information about a specific alarm trigger."
+    INDEX       { alarmStatusTriggerId}
+    ::= { alarmStatusTable 1 }
+
+AlarmStatusEntry ::= SEQUENCE {
+    alarmStatusTriggerId           INTEGER,
+    alarmStatusTriggerType         DisplayString,
+    alarmStatusTriggerEnabled      TruthValue,
+    alarmStatusTriggerStatus       INTEGER,
+    alarmStatusTriggerStatusReason DisplayString}
+
+alarmStatusTriggerId OBJECT-TYPE
+    SYNTAX  INTEGER (0..255)
+    MAX-ACCESS    read-only
+    STATUS  current
+    DESCRIPTION
+    "The id of alarm trigger"
+    ::=  { alarmStatusEntry 1 }
+
+alarmStatusTriggerType OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "A text string containing description about the trigger type"
+
+    ::= { alarmStatusEntry 2 }
+
+alarmStatusTriggerEnabled OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS    read-only
+    STATUS  current
+    DESCRIPTION
+    "Indicates if the trigger is enabled or not"
+    ::= { alarmStatusEntry 3 }
+
+alarmStatusTriggerStatus OBJECT-TYPE
+    SYNTAX  INTEGER {warning(1), ok(2)}
+    MAX-ACCESS    read-only
+    STATUS  current
+    DESCRIPTION
+    "The actual alarm status for the trigger"
+    ::= { alarmStatusEntry 4 }
+
+alarmStatusTriggerStatusReason OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "A text string containing status reason"
+
+    ::= { alarmStatusEntry 5 }
+
+-- -------------------------------------------------------------
+-- System: check:
+-- -------------------------------------------------------------
+
+-- -------------------------------------------------------------
+-- System: check: configurationHash Group
+-- -------------------------------------------------------------
+
+startupConfigurationHash OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS    read-only
+    STATUS     current
+    DESCRIPTION
+    "A SHA-1 hash of the saved startup configuration."
+    ::= { integrity 1 }
+
+runningConfigurationHash OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS    read-only
+    STATUS     current
+    DESCRIPTION
+   "A SHA-1 hash of the current running configuration."
+    ::= { integrity 2 }
+
+
+
+-- -------------------------------------------------------------
+-- Notification group
+-- -------------------------------------------------------------
+-- -------------------------------------------------------------
+-- Notification: Sensor
+-- -------------------------------------------------------------
+
+digitalInHigh NOTIFICATION-TYPE
+OBJECTS { entPhysicalName, entPhySensorValue }
+      STATUS current
+      DESCRIPTION
+          "Notification associated with digitalIn sensor state.
+     Sensor is of type TruthValue.
+     The 'entPhySensorValue' should always have value 'true(1)' in
+     a digitalInHigh trap, indicating that the voltage level is
+     above the required threshold (logical 1)."
+      ::= { sensorNotificationPrefix 1 }
+
+digitalInLow NOTIFICATION-TYPE
+OBJECTS { entPhysicalName, entPhySensorValue }
+      STATUS current
+      DESCRIPTION
+          "Notification associated with digitalIn sensor state.
+     Sensor is of type TruthValue.
+     The 'entPhySensorValue' should always have value 'false(2)' in
+     a digitalInLow trap, indicating that the voltage level is
+     below the required threshold (logical 0)."
+      ::= { sensorNotificationPrefix 2 }
+
+powerSupplyHigh NOTIFICATION-TYPE
+OBJECTS { entPhysicalName, entPhySensorValue }
+      STATUS current
+      DESCRIPTION
+          "Notification associated with power supply sensor state.
+     Sensor is of type TruthValue
+     The 'entPhySensorValue' should always have value 'true(1)' in
+     a powerSupplyHigh trap, indicating that the voltage level is
+     above the required threshold."
+      ::= { sensorNotificationPrefix 3 }
+
+powerSupplyLow NOTIFICATION-TYPE
+OBJECTS { entPhysicalName, entPhySensorValue }
+      STATUS current
+      DESCRIPTION
+          "Notification associated with power supply sensor state.
+     Sensor is of type TruthValue
+     The 'entPhySensorValue' should always have value 'false(2)' in
+     a powerSupplyLow trap, indicating that the voltage level is
+     below the required threshold."
+      ::= { sensorNotificationPrefix 4 }
+
+temperatureHigh NOTIFICATION-TYPE
+OBJECTS { entPhysicalName, entPhySensorValue, entPhySensorType, entPhySensorScale, entPhySensorPrecision }
+      STATUS current
+      DESCRIPTION
+          "Notification associated with temperature sensor state.
+          Sensor is of type 'Celsius'.
+          The 'entPhySensorValue' shows the temperature value at
+          the time the alarm system detected that the temperature had
+          rised to or passed beyond the configured alarm rising
+     threshold; except for temperatureHigh alarms at system
+     startup, this would typically be equal to the temperature
+     configured as the alarm rising threshold."
+      ::= { sensorNotificationPrefix 5 }
+
+temperatureLow NOTIFICATION-TYPE
+OBJECTS { entPhysicalName, entPhySensorValue, entPhySensorType, entPhySensorScale, entPhySensorPrecision }
+      STATUS current
+      DESCRIPTION
+          "Notification associated with temperature sensor state.
+          Sensor is of type 'Celsius'.
+          The 'entPhySensorValue' shows the temperature value at
+          the time the alarm system detected that the temperature had
+          fallen to or passed below the configured alarm falling
+     threshold; except for temperatureLow alarms at system
+     startup, this would typically be equal to the temperature
+     configured as the alarm falling threshold."
+      ::= { sensorNotificationPrefix 6 }
+
+-- -------------------------------------------------------------
+-- Notification: Frnt
+-- -------------------------------------------------------------
+
+frntv0RingUp NOTIFICATION-TYPE
+OBJECTS { frntv0InstanceId, frntv0FocalPointEnabled, frntv0RingStatus, frntv0Port1, frntv0Port1State, frntv0Port2, frntv0Port2State }
+
+      STATUS current
+      DESCRIPTION
+          "Notification associated with FRNTv0 ring status.
+     The 'frntv0RingStatus' should always have value 'ring(1)' in
+     an frntv0RingUp trap.
+     Note that a focal point can detect both local
+     failures and elsewhere in the FRNT ring, while a member
+     switch is only able to detect local failures."
+      ::= { frntNotificationPrefix 1 }
+
+frntv0RingDown NOTIFICATION-TYPE
+OBJECTS { frntv0InstanceId, frntv0FocalPointEnabled, frntv0RingStatus, frntv0Port1, frntv0Port1State, frntv0Port2, frntv0Port2State }
+
+      STATUS current
+      DESCRIPTION
+          "Notification associated with FRNTv0 ring status.
+     The 'frntv0RingStatus' should always have value 'bus(2)' in
+     an frntv0RingDown trap.
+     Note that a focal point can detect both local
+     failures and elsewhere in the FRNT ring, while a member
+     switch is only able to detect local failures."
+      ::= { frntNotificationPrefix 2 }
+
+-- -------------------------------------------------------------
+-- Notification: lff
+-- -------------------------------------------------------------
+
+lffRemoteUp NOTIFICATION-TYPE
+OBJECTS { lffPortIfName, lffStatus }
+      STATUS current
+      DESCRIPTION
+          "Notification associated with link fault forward of remote
+     (Ethernet) link over an intermediate (SHDSL) link.
+     The 'lffStatus' should always have value 'remoteUp(4)' in
+     a lffRemoteUp, indicating that remote (Ethernet) link is
+     up."
+      ::= { lffNotificationPrefix 1 }
+
+
+lffRemoteFail NOTIFICATION-TYPE
+OBJECTS { lffPortIfName, lffStatus }
+      STATUS current
+      DESCRIPTION
+          "Notification associated with link fault forward of remote
+     (Ethernet) link over an intermediate (SHDSL) link.
+     The 'lffStatus' will show value
+          - 'remoteDown(3)' when information that the remote
+     (Ethernet) link is down is available.
+          - 'unknown(2)' when there is no information about the
+          state of the remote available, typically because the
+          intermediate (SHDSL) link is down."
+      ::= { lffNotificationPrefix 2 }
+
+-- -------------------------------------------------------------
+-- Notification: Generic
+-- -------------------------------------------------------------
+
+summaryStatusOK NOTIFICATION-TYPE
+OBJECTS { summaryAlarmStatus }
+      STATUS current
+      DESCRIPTION
+          "Notification that _none_ of the configured alarm sources
+     reports a bad state, i.e.,
+          - that the summaryAlarmStatus has _shifted_ from 'Warning
+       (1)' to 'Ok (2)', or
+          - that the unit started up with summaryStatus 'Ok (2)'."
+      ::= { genericNotificationPrefix 1 }
+
+summaryStatusWarning NOTIFICATION-TYPE
+OBJECTS { summaryAlarmStatus }
+      STATUS current
+      DESCRIPTION
+          "Notification that at least one of the configured alarm
+     sources reports a bad state, i.e.,
+          - that the summaryAlarmStatus has _shifted_ from 'Ok (2)' to
+       'Warning (1)', or
+          - that the unit started up with summaryStatus 'Warning (1)'."
+      ::= { genericNotificationPrefix 2 }
+
+-- -------------------------------------------------------------
+-- Notification: DDM
+-- -------------------------------------------------------------
+
+ddmVoltageHigh NOTIFICATION-TYPE
+OBJECTS { sfpDdmPortIfIndex, sfpDdmPortIfName, sfpDdmPortVoltage }
+      STATUS current
+      DESCRIPTION
+          "Notification associated with DDM voltage sensor state. The
+          'sfpDdmPortVoltage' shows the voltage value at the time the alarm
+          system detected that the voltage had rised to or passed beyond the
+          configured alarm rising threshold."
+      ::= { ddmNotificationPrefix 1 }
+
+ddmVoltageLow NOTIFICATION-TYPE
+OBJECTS { sfpDdmPortIfIndex, sfpDdmPortIfName, sfpDdmPortVoltage }
+      STATUS current
+      DESCRIPTION
+          "Notification associated with DDM voltage sensor state. The
+          'sfpDdmPortVoltage' shows the voltage value at the time the alarm
+          system detected that the voltage had fallen to or passed below the
+          configured alarm falling threshold."
+      ::= { ddmNotificationPrefix 2 }
+
+ddmTemperatureHigh NOTIFICATION-TYPE
+OBJECTS { sfpDdmPortIfIndex, sfpDdmPortIfName, sfpDdmPortTemperature }
+      STATUS current
+      DESCRIPTION
+          "Notification associated with DDM temperature sensor state. The
+          'sfpDdmPortTemperature' shows the temperature value at the time the
+          alarm system detected that the temperature had rised to or passed
+          beyond the configured alarm rising threshold."
+      ::= { ddmNotificationPrefix 3 }
+
+ddmTemperatureLow NOTIFICATION-TYPE
+OBJECTS { sfpDdmPortIfIndex, sfpDdmPortIfName, sfpDdmPortTemperature }
+      STATUS current
+      DESCRIPTION
+          "Notification associated with DDM temperature sensor state. The
+          'sfpDdmPortTemperature' shows the temperature value at the time the
+          alarm system detected that the temperature had fallen to or passed
+          below the configured alarm falling threshold."
+      ::= { ddmNotificationPrefix 4 }
+
+ddmBiasCurrentHigh NOTIFICATION-TYPE
+OBJECTS { sfpDdmPortIfIndex, sfpDdmPortIfName, sfpDdmPortBiasCurrent }
+      STATUS current
+      DESCRIPTION
+          "Notification associated with DDM transmitt bias current sensor
+          state. The 'sfpDdmPortBiasCurrent' shows the bias current value at
+          the time the alarm system detected that the bias current had rised
+          to or passed beyond the configured alarm rising threshold."
+      ::= { ddmNotificationPrefix 5 }
+
+ddmBiasCurrentLow NOTIFICATION-TYPE
+OBJECTS { sfpDdmPortIfIndex, sfpDdmPortIfName, sfpDdmPortBiasCurrent }
+      STATUS current
+      DESCRIPTION
+          "Notification associated with DDM transmitt bias current sensor
+          state. The 'sfpDdmPortBiasCurrent' shows the bias current value at
+          the time the alarm system detected that the bias current had fallen
+          to or passed below the configured alarm falling threshold."
+      ::= { ddmNotificationPrefix 6 }
+
+ddmTxPowerHigh NOTIFICATION-TYPE
+OBJECTS { sfpDdmPortIfIndex, sfpDdmPortIfName, sfpDdmPortTxPower }
+      STATUS current
+      DESCRIPTION
+          "Notification associated with DDM transmitt power sensor state. The
+          'sfpDdmPortTxPower' shows the power value at the time the alarm
+          system detected that the power had rised to or passed beyond the
+          configured alarm rising threshold."
+      ::= { ddmNotificationPrefix 7 }
+
+ddmTxPowerLow NOTIFICATION-TYPE
+OBJECTS { sfpDdmPortIfIndex, sfpDdmPortIfName, sfpDdmPortTxPower }
+      STATUS current
+      DESCRIPTION
+          "Notification associated with DDM transmitt power sensor state. The
+          'sfpDdmPortTxPower' shows the power value at the time the alarm
+          system detected that the power had fallen to or passed below the
+          configured alarm falling threshold."
+      ::= { ddmNotificationPrefix 8 }
+
+ddmRxPowerHigh NOTIFICATION-TYPE
+OBJECTS { sfpDdmPortIfIndex, sfpDdmPortIfName, sfpDdmPortRxPower }
+      STATUS current
+      DESCRIPTION
+          "Notification associated with DDM receiving power sensor state. The
+          'sfpDdmPortRxPower' shows the power value at the time the alarm
+          system detected that the power had rised to or passed beyond the
+          configured alarm rising threshold."
+      ::= { ddmNotificationPrefix 9 }
+
+ddmRxPowerLow NOTIFICATION-TYPE
+OBJECTS { sfpDdmPortIfIndex, sfpDdmPortIfName, sfpDdmPortRxPower }
+      STATUS current
+      DESCRIPTION
+          "Notification associated with DDM receiving power sensor state. The
+          'sfpDdmPortRxPower' shows the power value at the time the alarm
+          system detected that the power had fallen to or passed below the
+          configured alarm falling threshold."
+      ::= { ddmNotificationPrefix 10 }
+
+-- -------------------------------------------------------------
+-- Notification: Address Conflict (addressConflict)
+-- -------------------------------------------------------------
+
+addressConflictDetected NOTIFICATION-TYPE
+OBJECTS { addressConflictIfIndex, addressConflictIfName,  addressConflictType, addressConflictMacAddress, addressConflictIPv4Address }
+      STATUS current
+      DESCRIPTION
+          "An Address Conflict have been detected."
+      ::= { conflictNotificationPrefix 1 }
+
+addressConflictCleared NOTIFICATION-TYPE
+OBJECTS { addressConflictIfIndex, addressConflictIfName,  addressConflictType, addressConflictMacAddress, addressConflictIPv4Address }
+      STATUS current
+      DESCRIPTION
+          "An Address Conflict have been resolved."
+      ::= { conflictNotificationPrefix 2 }
+
+
+addressConflictOK NOTIFICATION-TYPE
+OBJECTS { addressConflictExists }
+      STATUS current
+      DESCRIPTION
+          "There are no Address Conflicts. This trap is sent when the last conflict is resolved."
+      ::= { conflictNotificationPrefix 3 }
+
+addressConflictWarning NOTIFICATION-TYPE
+OBJECTS { addressConflictExists }
+      STATUS current
+      DESCRIPTION
+          "An address conflict exists. This trap is sent when the first address conflict is detected."
+      ::= { conflictNotificationPrefix 4 }
+
+-- -------------------------------------------------------------
+-- Notification: Other
+-- -------------------------------------------------------------
+
+mrpRingClosed NOTIFICATION-TYPE
+OBJECTS { alarmStatusTriggerId }
+      STATUS current
+      DESCRIPTION
+          "Notification associated with MRP ring state."
+      ::= { otherNotificationPrefix 3 }
+
+mrpRingOpen NOTIFICATION-TYPE
+OBJECTS { alarmStatusTriggerId }
+      STATUS current
+      DESCRIPTION
+          "Notification associated with MRP ring state."
+      ::= { otherNotificationPrefix 4 }
+
+-- -------------------------------------------------------------
+-- Notification: RiCo status
+-- -------------------------------------------------------------
+
+riCoUplinkUp NOTIFICATION-TYPE
+OBJECTS { riCoStatusUplinkNodeId, riCoStatusUplinkIfIndex, riCoStatusUplinkIfName, riCoStatusUplinkStatus }
+    STATUS current
+    DESCRIPTION
+    "A RiCo or Dual Homing uplink has come up. The
+    riCoStatusUplinkStatus shows if the link comes up in role
+    Active or Backup."
+    ::= { riCoNotificationPrefix 1 }
+
+riCoUplinkDown NOTIFICATION-TYPE
+OBJECTS { riCoStatusUplinkNodeId, riCoStatusUplinkIfIndex, riCoStatusUplinkIfName, riCoStatusUplinkStatus }
+    STATUS current
+    DESCRIPTION
+    "A RiCo or Dual Homing uplink has gone down. The
+    riCoStatusUplinkStatus shows 'Down'."
+    ::= { riCoNotificationPrefix 2 }
+
+-- -------------------------------------------------------------
+-- Notification: Ping
+-- -------------------------------------------------------------
+
+pingTriggerOk NOTIFICATION-TYPE
+OBJECTS { alarmStatusTriggerId}
+      STATUS current
+      DESCRIPTION
+          "Notification associated with ping trigger status."
+      ::= { pingNotificationPrefix 1 }
+
+pingTriggerWarning NOTIFICATION-TYPE
+OBJECTS { alarmStatusTriggerId}
+      STATUS current
+      DESCRIPTION
+          "Notification associated with ping trigger status."
+      ::= { pingNotificationPrefix 2 }
+
+
+
+END
