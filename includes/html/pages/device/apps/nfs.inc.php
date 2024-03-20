@@ -7,26 +7,26 @@ use App\Models\Storage;
 
 include 'includes/nfs-shared.inc.php';
 
-if (!isset($vars['flat_mount_options'])) {
-    $vars['flat_mount_options']=1;
+if (! isset($vars['flat_mount_options'])) {
+    $vars['flat_mount_options'] = 1;
 } elseif (isset($vars['flat_mount_options']) &&
           $vars['flat_mount_options'] != '0' &&
           $vars['flat_mount_options'] != '1') {
-    $vars['flat_mount_options']=1;
+    $vars['flat_mount_options'] = 1;
 }
-if (!isset($vars['show_mount_options'])) {
-    $vars['show_mount_options']=1;
+if (! isset($vars['show_mount_options'])) {
+    $vars['show_mount_options'] = 1;
 } elseif (isset($vars['show_mount_options']) &&
           $vars['show_mount_options'] != '0' &&
           $vars['show_mount_options'] != '1') {
-    $vars['show_mount_options']=1;
+    $vars['show_mount_options'] = 1;
 }
 
 // make sure $vars['app_page'] is something that is understood
 if (isset($vars['app_page']) && $vars['app_page'] != 'general'
     && $vars['app_page'] != 'mounts' && $vars['app_page'] != 'mounted_by') {
     $vars['app_page'] = 'general';
-} elseif (!isset($vars['app_page'])) {
+} elseif (! isset($vars['app_page'])) {
     $vars['app_page'] = 'general';
 }
 
@@ -87,7 +87,6 @@ if ($is_server || $is_client) {
     print_optionbar_end();
 }
 
-
 // cache stuff for tables to avoid execesive lookups
 $host_cache = [];
 $host_cache_device_id = [];
@@ -95,9 +94,9 @@ $rpath_cache = [];
 $path_cache = [];
 
 if ($vars['app_page'] == 'general') {
-    $graphs=[];
+    $graphs = [];
     if ($is_server) {
-        $graphs['nfs_server_cache']='Server Cache';
+        $graphs['nfs_server_cache'] = 'Server Cache';
         if ($app->data['os'] == 'linux') {
             $graphs['nfs_server_rpc_info'] = 'Server General RPC Stats';
             $graphs['nfs_server_RAcache'] = 'Server Read Ahead Cache';
@@ -107,80 +106,80 @@ if ($vars['app_page'] == 'general') {
             $graphs['nfs_server_general'] = 'Server General';
         }
         // figure out what chunks we should add for the nfs_server_stats graph
-        $graphs['nfs_server_rpc1']='Server RPC';
+        $graphs['nfs_server_rpc1'] = 'Server RPC';
         if (isset($nfs_graphs['server_rpc'][$app->data['os']])) {
             $nfs_os = $app->data['os'];
         } else {
-            $nfs_os='';
+            $nfs_os = '';
         }
-        $nfs_graph_keys=array_keys($nfs_graphs['server_rpc'][$nfs_os]);
+        $nfs_graph_keys = array_keys($nfs_graphs['server_rpc'][$nfs_os]);
         if (isset($nfs_graph_keys[12])) {
-            $graphs['nfs_server_rpc2']='Server RPC, continued';
+            $graphs['nfs_server_rpc2'] = 'Server RPC, continued';
         }
         if (isset($nfs_graph_keys[24])) {
-            $graphs['nfs_server_rpc3']='Server RPC, continued';
+            $graphs['nfs_server_rpc3'] = 'Server RPC, continued';
         }
         if (isset($nfs_graph_keys[36])) {
-            $graphs['nfs_server_rpc4']='Server RPC, continued';
+            $graphs['nfs_server_rpc4'] = 'Server RPC, continued';
         }
         if (isset($nfs_graph_keys[48])) {
-            $graphs['nfs_server_rpc5']='Server RPC, continued';
+            $graphs['nfs_server_rpc5'] = 'Server RPC, continued';
         }
         if (isset($nfs_graph_keys[48])) {
-            $graphs['nfs_server_rpc5']='Server RPC, continued';
+            $graphs['nfs_server_rpc5'] = 'Server RPC, continued';
         }
         if (isset($nfs_graph_keys[60])) {
-            $graphs['nfs_server_rpc6']='Server RPC, continued';
+            $graphs['nfs_server_rpc6'] = 'Server RPC, continued';
         }
         if (isset($nfs_graph_keys[72])) {
-            $graphs['nfs_server_rpc7']='Server RPC, continued';
+            $graphs['nfs_server_rpc7'] = 'Server RPC, continued';
         }
         if (isset($nfs_graph_keys[84])) {
-            $graphs['nfs_server_rpc8']='Server RPC, continued';
+            $graphs['nfs_server_rpc8'] = 'Server RPC, continued';
         }
         if (isset($nfs_graph_keys[96])) {
-            $graphs['nfs_server_rpc9']='Server RPC, continued';
+            $graphs['nfs_server_rpc9'] = 'Server RPC, continued';
         }
     }
     if ($is_client) {
-        $graphs['nfs_client_rpc_info']='Client General RPC Stats';
+        $graphs['nfs_client_rpc_info'] = 'Client General RPC Stats';
         if ($app->data['os'] == 'freebsd') {
-            $graphs['nfs_client_cache']='Client Cache';
+            $graphs['nfs_client_cache'] = 'Client Cache';
         }
         if ($app->data['os'] == 'linux') {
-            $graphs['nfs_client_network']='Client Network';
+            $graphs['nfs_client_network'] = 'Client Network';
         }
         // figure out what chunks we should add for the nfs_client_stats graph
-        $graphs['nfs_client_rpc1']='Client RPC';
+        $graphs['nfs_client_rpc1'] = 'Client RPC';
         if (isset($nfs_graphs['client_rpc'][$app->data['os']])) {
             $nfs_os = $app->data['os'];
         } else {
-            $nfs_os='';
+            $nfs_os = '';
         }
-        $nfs_graph_keys=array_keys($nfs_graphs['client_rpc'][$nfs_os]);
+        $nfs_graph_keys = array_keys($nfs_graphs['client_rpc'][$nfs_os]);
         if (isset($nfs_graph_keys[12])) {
-            $graphs['nfs_client_rpc2']='Client RPC, continued';
+            $graphs['nfs_client_rpc2'] = 'Client RPC, continued';
         }
         if (isset($nfs_graph_keys[24])) {
-            $graphs['nfs_client_rpc3']='Client RPC, continued';
+            $graphs['nfs_client_rpc3'] = 'Client RPC, continued';
         }
         if (isset($nfs_graph_keys[36])) {
-            $graphs['nfs_client_rpc4']='Client RPC, continued';
+            $graphs['nfs_client_rpc4'] = 'Client RPC, continued';
         }
         if (isset($nfs_graph_keys[48])) {
-            $graphs['nfs_client_rpc5']='Client RPC, continued';
+            $graphs['nfs_client_rpc5'] = 'Client RPC, continued';
         }
         if (isset($nfs_graph_keys[60])) {
-            $graphs['nfs_client_rpc6']='Client RPC, continued';
+            $graphs['nfs_client_rpc6'] = 'Client RPC, continued';
         }
         if (isset($nfs_graph_keys[72])) {
-            $graphs['nfs_client_rpc7']='Client RPC, continued';
+            $graphs['nfs_client_rpc7'] = 'Client RPC, continued';
         }
         if (isset($nfs_graph_keys[84])) {
-            $graphs['nfs_client_rpc8']='Client RPC, continued';
+            $graphs['nfs_client_rpc8'] = 'Client RPC, continued';
         }
         if (isset($nfs_graph_keys[96])) {
-            $graphs['nfs_client_rpc9']='Client RPC, continued';
+            $graphs['nfs_client_rpc9'] = 'Client RPC, continued';
         }
     }
 } elseif ($vars['app_page'] == 'mounted_by') {
@@ -193,23 +192,23 @@ if ($vars['app_page'] == 'general') {
     ];
     $mounted_by = $app->data['mounted_by'] ?? [];
     foreach ($mounted_by as $array_location => $data) {
-        $new_host=['data'=>''];
-        $new_path=['data'=>''];
+        $new_host = ['data'=>''];
+        $new_path = ['data'=>''];
         if (isset($data['host'])) {
             // if not cached yet, to see if we can find more info
-            if (!isset($host_cache[$data['host']])) {
+            if (! isset($host_cache[$data['host']])) {
                 // a quick dumb regex check to make determine if it is IPv4 or IPv6
                 // and make sure there are no unexpected charters
                 if (preg_match('/^[0-9\.]+$/', $data['host'])) {
-                    $ip_info = Ipv4Address::firstWhere(['ipv4_address'=>$data['host'] ]);
+                    $ip_info = Ipv4Address::firstWhere(['ipv4_address'=>$data['host']]);
                 } elseif (preg_match('/^[0-9\:a-fA-F]+$/', $data['host'])) {
-                    $ip_info = Ipv6Address::firstWhere(['ipv6_address'=>$data['host'] ]);
+                    $ip_info = Ipv6Address::firstWhere(['ipv6_address'=>$data['host']]);
                 }
                 if (isset($ip_info)) {
                     $port = Port::with('device')->firstWhere(['port_id' => $ip_info->port_id]);
                     if (isset($port)) {
-                        $new_host['raw']=true;
-                        $new_host['data']=$data['host'] . ' (' .
+                        $new_host['raw'] = true;
+                        $new_host['data'] = $data['host'] . ' (' .
                             generate_device_link(['device_id' => $port->device_id]) . ', ' .
                             generate_port_link([
                                 'label' => $port->label,
@@ -218,10 +217,10 @@ if ($vars['app_page'] == 'general') {
                                 'device_id' => $port->device_id,
                             ]) . ')';
                     } else {
-                        $new_host['data']=$data['host'];
+                        $new_host['data'] = $data['host'];
                     }
                 } else {
-                    $new_host['data']=$data['host'];
+                    $new_host['data'] = $data['host'];
                 }
                 $host_cache[$data['host']] = $new_host;
             } else {
@@ -229,20 +228,20 @@ if ($vars['app_page'] == 'general') {
             }
         }
         if (isset($data['path'])) {
-            if (!isset($path_cache[$data['host']][$data['path']])) {
+            if (! isset($path_cache[$data['host']][$data['path']])) {
                 $storage_info = Storage::firstWhere(
                     ['storage_descr' => $data['path']],
                     ['device_id' => $device['device_id']]
                 );
-                if (!isset($storage_info) && !preg_match('/^\/+$/', $data['path'])) {
+                if (! isset($storage_info) && ! preg_match('/^\/+$/', $data['path'])) {
                     $data_path_tmp = $data['path'];
                     $data_path_tmp = preg_replace('/\/[^\/]+$/', '', $data_path_tmp);
-                    while ($data_path_tmp != '' && !isset($storage_info)) {
+                    while ($data_path_tmp != '' && ! isset($storage_info)) {
                         $storage_info = Storage::firstWhere(
                             ['storage_descr' => $data_path_tmp],
                             ['device_id' => $device['device_id']]
                         );
-                        if (!isset($storage_info)) {
+                        if (! isset($storage_info)) {
                             $data_path_tmp = preg_replace('/\/[^\/]+$/', '', $data_path_tmp);
                         }
                     }
@@ -270,14 +269,14 @@ if ($vars['app_page'] == 'general') {
                     $path_graph_array['bg'] = 'ffffff00';
                     $path_minigraph = \LibreNMS\Util\Url::lazyGraphTag($path_graph_array);
 
-                    $new_path['data']=\LibreNMS\Util\Url::overlibLink($path_link, $data['path'], $path_overlib_content) .
+                    $new_path['data'] = \LibreNMS\Util\Url::overlibLink($path_link, $data['path'], $path_overlib_content) .
                         ' (' . round($storage_info['storage_perc']) . '%)' .
                         \LibreNMS\Util\Url::overlibLink($path_link, $path_minigraph, $path_overlib_content);
-                    $new_path['raw']=true;
+                    $new_path['raw'] = true;
 
                     $path_cache[$data['host']][$data['path']] = $new_path;
                 } else {
-                    $new_path['data']=$data['path'];
+                    $new_path['data'] = $data['path'];
                 }
             } else {
                 $new_path = $path_cache[$data['host']][$data['path']];
@@ -299,29 +298,29 @@ if ($vars['app_page'] == 'general') {
         'rows' => [],
     ];
     if ($vars['show_mount_options']) {
-        $table_info['headers'][]='Mount Options';
+        $table_info['headers'][] = 'Mount Options';
     }
     $mounts = $app->data['mounts'] ?? [];
     foreach ($mounts as $array_location => $data) {
-        $new_host=['data'=>''];
-        $new_rpath=['data'=>''];
-        $new_lpath=['data'=>''];
-        $new_mntopts=['data'=>''];
+        $new_host = ['data'=>''];
+        $new_rpath = ['data'=>''];
+        $new_lpath = ['data'=>''];
+        $new_mntopts = ['data'=>''];
         if (isset($data['host'])) {
             // if not cached yet, to see if we can find more info
-            if (!isset($host_cache[$data['host']])) {
+            if (! isset($host_cache[$data['host']])) {
                 // a quick dumb regex check to make determine if it is IPv4 or IPv6
                 // and make sure there are no unexpected charters
                 if (preg_match('/^[0-9\.]+$/', $data['host'])) {
-                    $ip_info = Ipv4Address::firstWhere(['ipv4_address'=>$data['host'] ]);
+                    $ip_info = Ipv4Address::firstWhere(['ipv4_address'=>$data['host']]);
                 } elseif (preg_match('/^[0-9\:a-fA-F]+$/', $data['host'])) {
-                    $ip_info = Ipv6Address::firstWhere(['ipv6_address'=>$data['host'] ]);
+                    $ip_info = Ipv6Address::firstWhere(['ipv6_address'=>$data['host']]);
                 }
                 if (isset($ip_info)) {
                     $port = Port::with('device')->firstWhere(['port_id' => $ip_info->port_id]);
                     if (isset($port)) {
-                        $new_host['raw']=true;
-                        $new_host['data']=$data['host'] . ' (' .
+                        $new_host['raw'] = true;
+                        $new_host['data'] = $data['host'] . ' (' .
                             generate_device_link(['device_id' => $port->device_id]) . ', ' .
                             generate_port_link([
                                 'label' => $port->label,
@@ -330,22 +329,22 @@ if ($vars['app_page'] == 'general') {
                                 'device_id' => $port->device_id,
                             ]) . ')';
                     } else {
-                        $new_host['data']=$data['host'];
+                        $new_host['data'] = $data['host'];
                     }
                 } else {
-                    $new_host['data']=$data['host'];
+                    $new_host['data'] = $data['host'];
                 }
                 $host_cache[$data['host']] = $new_host;
                 $host_cache_device_id[$data['host']] = $port->device_id;
             } else {
                 $new_host = $host_cache[$data['host']];
             }
-            if (!isset($rpath_cache[$data['host']])) {
+            if (! isset($rpath_cache[$data['host']])) {
                 $rpath_cache[$data['host']] = [];
             }
         }
         if (isset($data['rpath'])) {
-            if (!isset($rpath_cache[$data['host']][$data['rpath']]) && isset($host_cache_device_id[$data['host']])) {
+            if (! isset($rpath_cache[$data['host']][$data['rpath']]) && isset($host_cache_device_id[$data['host']])) {
                 $storage_info = Storage::firstWhere(
                     ['storage_descr' => $data['rpath']],
                     ['device_id' => $host_cache_device_id[$data['host']]]
@@ -373,30 +372,30 @@ if ($vars['app_page'] == 'general') {
                     $rpath_graph_array['bg'] = 'ffffff00';
                     $rpath_minigraph = \LibreNMS\Util\Url::lazyGraphTag($rpath_graph_array);
 
-                    $new_rpath['data']=\LibreNMS\Util\Url::overlibLink($rpath_link, $storage_info['storage_descr'], $rpath_overlib_content) .
+                    $new_rpath['data'] = \LibreNMS\Util\Url::overlibLink($rpath_link, $storage_info['storage_descr'], $rpath_overlib_content) .
                         ' (' . round($storage_info['storage_perc']) . '%)' .
                         \LibreNMS\Util\Url::overlibLink($rpath_link, $rpath_minigraph, $rpath_overlib_content);
-                    $new_rpath['raw']=true;
+                    $new_rpath['raw'] = true;
 
                     $rpath_cache[$data['host']][$data['rpath']] = $new_path;
                 } else {
-                    $new_rpath['data']=$data['rpath'];
+                    $new_rpath['data'] = $data['rpath'];
                 }
             } else {
                 $new_rpath = $rpath_cache[$data['host']][$data['rpath']];
             }
         }
         if (isset($data['lpath'])) {
-            $new_lpath['data']=$data['lpath'];
+            $new_lpath['data'] = $data['lpath'];
         }
         if ($vars['show_mount_options']) {
             if ($vars['flat_mount_options']) {
                 $new_mntopts['raw'] = false;
                 if (isset($data['flags'])) {
-                    $new_mntopts['data'] = join(',', $data['flags']);
+                    $new_mntopts['data'] = implode(',', $data['flags']);
                 }
                 if (isset($data['opts'])) {
-                    $mnt_opts=array_keys($data['opts']);
+                    $mnt_opts = array_keys($data['opts']);
                     sort($mnt_opts);
                     if (isset($data['flags'][0]) && isset($mnt_opts[0])) {
                         foreach ($mnt_opts as $mnt_opt) {
@@ -415,20 +414,20 @@ if ($vars['app_page'] == 'general') {
                         'rows' => [],
                     ];
                     if (isset($data['flags'])) {
-                        $mntopts_table_info['rows'][]=[
+                        $mntopts_table_info['rows'][] = [
                             ['data'=>'flags'],
-                            ['data'=>join(',', $data['flags'])],
+                            ['data'=>implode(',', $data['flags'])],
                         ];
                     }
                     if (isset($data['opts'])) {
                         foreach ($data['opts'] as $mntopts_key => $mntopts_data) {
-                            $mntopts_table_info['rows'][]=[
+                            $mntopts_table_info['rows'][] = [
                                 ['data'=>$mntopts_key],
                                 ['data'=>$mntopts_data],
                             ];
                         }
                     }
-                    $new_mntopts['data']=view('widgets/sortable_table', $mntopts_table_info);
+                    $new_mntopts['data'] = view('widgets/sortable_table', $mntopts_table_info);
                 }
             }
         }

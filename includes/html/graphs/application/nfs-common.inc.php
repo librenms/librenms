@@ -1,7 +1,7 @@
 <?php
 
 // use the default if not set
-if (!isset($vars['nfs_os'])) {
+if (! isset($vars['nfs_os'])) {
     $vars['nfs_os'] = '';
 }
 
@@ -9,32 +9,32 @@ include 'includes/nfs-shared.inc.php';
 
 $name = 'nfs';
 $app_id = $app['app_id'];
-if (!isset($unit_text)) {
+if (! isset($unit_text)) {
     $unit_text = 'per second';
 }
-if (!isset($colours)) {
+if (! isset($colours)) {
     if (isset($nfs_graphs_colours[$nfs_graph_name])) {
         $colours = $nfs_graphs_colours[$nfs_graph_name];
     } else {
         $colours = 'psychedelic';
     }
 }
-if (!isset($dostack)) {
+if (! isset($dostack)) {
     $dostack = 0;
 }
-if (!isset($printtotal)) {
+if (! isset($printtotal)) {
     $printtotal = 1;
 }
-if (!isset($addarea)) {
+if (! isset($addarea)) {
     $addarea = 0;
 }
 $transparency = 0;
-if (!isset($float_precision)) {
+if (! isset($float_precision)) {
     $float_precision = 3;
 }
 
 // if we don't have a OS specific graph set, use the default
-if (!isset($nfs_graphs[$nfs_graph_name][$vars['nfs_os']])) {
+if (! isset($nfs_graphs[$nfs_graph_name][$vars['nfs_os']])) {
     $vars['nfs_os'] = '';
 }
 
