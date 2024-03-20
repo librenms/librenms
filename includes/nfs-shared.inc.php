@@ -313,6 +313,26 @@ $nfs_graphs = [
             "client_rpc_info_authrefrsh" => 'AuthRefresh',
         ],
     ],
+    'server_general' => [
+        '' => [
+            "server_Clients" => 'Clients',
+            "server_Delegs" => 'Delegs',
+            "server_Layouts" => 'Layouts',
+            "server_LockOwner" => 'LockOwner',
+            "server_Locks" => 'Locks',
+            "server_OpenOwner" => 'OpenOwner',
+            "server_Opens" => 'Opens',
+        ],
+        'freebsd' => [
+            "server_Clients" => 'Clients',
+            "server_Delegs" => 'Delegs',
+            "server_Layouts" => 'Layouts',
+            "server_LockOwner" => 'LockOwner',
+            "server_Locks" => 'Locks',
+            "server_OpenOwner" => 'OpenOwner',
+            "server_Opens" => 'Opens',
+        ],
+    ],
     'server_rpc_info' => [
         '' => [
         ],
@@ -761,6 +781,17 @@ $nfs_graphs = [
     ],
     'server_RAcache' => [
         '' => [
+            "server_RAcache_0" => '0-10',
+            "server_RAcache_1" => '10-20',
+            "server_RAcache_2" => '20-30',
+            "server_RAcache_3" => '30-40',
+            "server_RAcache_4" => '40-50',
+            "server_RAcache_5" => '50-60',
+            "server_RAcache_6" => '60-70',
+            "server_RAcache_7" => '70-80',
+            "server_RAcache_8" => '80-90',
+            "server_RAcache_9" => '90-100',
+            "server_RAcache_notfound" => 'notFound',
         ],
         'linux' => [
                 "server_RAcache_0" => '0-10',
@@ -778,6 +809,10 @@ $nfs_graphs = [
     ],
     'client_network' => [
         '' => [
+            "client_network_packets" => 'Packets',
+            "client_network_tcp" => 'TCP',
+            "client_network_tcpconn" => 'TCP Conn',
+            "client_network_udp" => 'UDP',
         ],
         'linux' => [
             "client_network_packets" => 'Packets',
@@ -788,6 +823,10 @@ $nfs_graphs = [
     ],
     'server_network' => [
         '' => [
+            "server_network_packets" => 'Packets',
+            "server_network_tcp" => 'TCP',
+            "server_network_tcpconn" => 'TCP Conn',
+            "server_network_udp" => 'UDP',
         ],
         'linux' => [
             "server_network_packets" => 'Packets',
@@ -798,6 +837,8 @@ $nfs_graphs = [
     ],
     'server_io' => [
         '' => [
+            "server_io_read" => 'Read',
+            "server_io_write" => 'Write',
         ],
         'linux' => [
             "server_io_read" => 'Read',

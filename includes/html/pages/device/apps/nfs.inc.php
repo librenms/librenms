@@ -99,10 +99,12 @@ if ($vars['app_page'] == 'general') {
     if ($is_server) {
         $graphs['nfs_server_cache']='Server Cache';
         if ($app->data['os'] == 'linux') {
-            $graphs['nfs_server_rpc_info']='Server General RPC Stats';
-            $graphs['nfs_server_RAcache']='Server Read Ahead Cache';
-            $graphs['nfs_server_network']='Server Network';
-            $graphs['nfs_server_io']='Server IO';
+            $graphs['nfs_server_rpc_info'] = 'Server General RPC Stats';
+            $graphs['nfs_server_RAcache'] = 'Server Read Ahead Cache';
+            $graphs['nfs_server_network'] = 'Server Network';
+            $graphs['nfs_server_io'] = 'Server IO';
+        } elseif ($app->data['os'] == 'freebsd') {
+            $graphs['nfs_server_general'] = 'Server General';
         }
         // figure out what chunks we should add for the nfs_server_stats graph
         $graphs['nfs_server_rpc1']='Server RPC';
