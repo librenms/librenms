@@ -438,7 +438,7 @@ function round_Nth($val, $round_to)
 
 function is_customoid_graph($type, $subtype)
 {
-    if (! empty ($subtype) && $type == 'customoid') {
+    if (! empty($subtype) && $type == 'customoid') {
         return true;
     }
 
@@ -637,7 +637,7 @@ function ResolveGlues($tables, $target, $x = 0, $hist = [], $last = [])
                     } else {
                         [$tmp] = explode('_', $glue['COLUMN_NAME']);
                         $tmp .= 's';
-                        if (! in_array($tmp, $tables) && !in_array($tmp, $hist)) {
+                        if (! in_array($tmp, $tables) && ! in_array($tmp, $hist)) {
                             //Expand table
                             $tmp = ResolveGlues([$tmp], $target, $x++, array_merge($tables, [$tmp]), array_merge($last, [$table . '.' . $glue['COLUMN_NAME']]));
                             if (is_array($tmp)) {
