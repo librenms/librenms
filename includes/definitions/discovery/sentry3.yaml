@@ -40,9 +40,10 @@ modules:
                 - oid: infeedTable
                   value: infeedVoltage
                   num_oid: '.1.3.6.1.4.1.1718.3.2.2.1.11.{{ $index }}'
-                  descr: {{ $infeedName or "Infeed $infeedID" }}
+                  descr: infeedName
                   # recording voltage for additional feeds (3-phase)
-                  # will require reindexing and moving RRD files
+                  # would require reindexing and moving RRD files;
+                  # this is a configured value, not measured.
                   index: '{{ $subindex0 }}'
                   group: 'Configured Voltage'
         power:
@@ -52,7 +53,7 @@ modules:
                 - oid: infeedTable
                   value: infeedPower
                   num_oid: '.1.3.6.1.4.1.1718.3.2.2.1.12.{{ $index }}'
-                  descr: {{ $infeedName or "Tower $index" }}
+                  descr: infeedName
                   skip_value_lt: 0
 
                 - oid: systemTotalPower
