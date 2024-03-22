@@ -37,7 +37,7 @@ function external_exec($command)
     $proc = new Process($command);
     $proc->setTimeout(Config::get('snmp.exec_timeout', 1200));
 
-    if (Debug::isEnabled() && ! Debug::isVerbose()) {
+    if (Debug::isEnabled() && !Debug::isVerbose()) {
         $patterns = [
             '/-c\' \'[\S]+\'/',
             '/-u\' \'[\S]+\'/',
@@ -80,7 +80,7 @@ function external_exec($command)
         d_echo($proc->getErrorOutput());
     }
 
-    if (Debug::isEnabled() && ! Debug::isVerbose()) {
+    if (Debug::isEnabled() && !Debug::isVerbose()) {
         $ip_regex = '/(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)/';
         $debug_output = preg_replace($ip_regex, '*', $output);
         d_echo($debug_output . PHP_EOL);
@@ -153,7 +153,7 @@ function get_port_by_index_cache($device_id, $ifIndex)
 {
     global $port_index_cache;
 
-    if (isset($port_index_cache[$device_id][$ifIndex]) && is_array($port_index_cache[$device_id][$ifIndex])) {
+    if (isset ($port_index_cache[$device_id][$ifIndex]) && is_array($port_index_cache[$device_id][$ifIndex])) {
         $port = $port_index_cache[$device_id][$ifIndex];
     } else {
         $port = get_port_by_ifIndex($device_id, $ifIndex);
@@ -234,6 +234,7 @@ function device_by_id_cache($device_id, $refresh = false)
     $device['location'] = $model->location->location ?? null;
     $device['lat'] = $model->location->lat ?? null;
     $device['lng'] = $model->location->lng ?? null;
+    $device['maintenance'] = $model->isUnderMaintenance() ?? false;
 
     return $device;
 }
@@ -260,10 +261,70 @@ function gethostbyid($device_id)
 
 function strgen($length = 16)
 {
-    $entropy = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 'a', 'A', 'b', 'B', 'c', 'C', 'd', 'D', 'e',
-        'E', 'f', 'F', 'g', 'G', 'h', 'H', 'i', 'I', 'j', 'J', 'k', 'K', 'l', 'L', 'm', 'M', 'n',
-        'N', 'o', 'O', 'p', 'P', 'q', 'Q', 'r', 'R', 's', 'S', 't', 'T', 'u', 'U', 'v', 'V', 'w',
-        'W', 'x', 'X', 'y', 'Y', 'z', 'Z', ];
+    $entropy = [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        'a',
+        'A',
+        'b',
+        'B',
+        'c',
+        'C',
+        'd',
+        'D',
+        'e',
+        'E',
+        'f',
+        'F',
+        'g',
+        'G',
+        'h',
+        'H',
+        'i',
+        'I',
+        'j',
+        'J',
+        'k',
+        'K',
+        'l',
+        'L',
+        'm',
+        'M',
+        'n',
+        'N',
+        'o',
+        'O',
+        'p',
+        'P',
+        'q',
+        'Q',
+        'r',
+        'R',
+        's',
+        'S',
+        't',
+        'T',
+        'u',
+        'U',
+        'v',
+        'V',
+        'w',
+        'W',
+        'x',
+        'X',
+        'y',
+        'Y',
+        'z',
+        'Z',
+    ];
     $string = '';
 
     for ($i = 0; $i < $length; $i++) {
@@ -329,7 +390,7 @@ function del_dev_attrib($device, $attrib_type)
  */
 function c_echo($string, $enabled = true)
 {
-    if (! $enabled) {
+    if (!$enabled) {
         return;
     }
 
@@ -437,7 +498,7 @@ function round_Nth($val, $round_to)
 
 function is_customoid_graph($type, $subtype)
 {
-    if (! empty($subtype) && $type == 'customoid') {
+    if (!empty ($subtype) && $type == 'customoid') {
         return true;
     }
 
@@ -487,13 +548,13 @@ function format_hostname($device): string
 {
     $hostname = $device['hostname'] ?? 'invalid hostname';
     $hostname_is_ip = IP::isValid($hostname);
-    $sysName = empty($device['sysName']) ? $hostname : $device['sysName'];
+    $sysName = empty ($device['sysName']) ? $hostname : $device['sysName'];
 
-    return \App\View\SimpleTemplate::parse(empty($device['display']) ? Config::get('device_display_default', '{{ $hostname }}') : $device['display'], [
+    return \App\View\SimpleTemplate::parse(empty ($device['display']) ? Config::get('device_display_default', '{{ $hostname }}') : $device['display'], [
         'hostname' => $hostname,
         'sysName' => $sysName,
         'sysName_fallback' => $hostname_is_ip ? $sysName : $hostname,
-        'ip' => empty($device['overwrite_ip']) ? ($hostname_is_ip ? $device['hostname'] : $device['ip'] ?? '') : $device['overwrite_ip'],
+        'ip' => empty ($device['overwrite_ip']) ? ($hostname_is_ip ? $device['hostname'] : $device['ip'] ?? '') : $device['overwrite_ip'],
     ]);
 }
 
@@ -560,7 +621,7 @@ function get_port_id($ports_mapped, $port, $port_association_mode)
      * port mapping schema:
      *
      * $ports = $ports_mapped['ports'];
-    */
+     */
     $maps = $ports_mapped['maps'];
 
     if (in_array($port_association_mode, ['ifIndex', 'ifName', 'ifDescr', 'ifAlias'])) {
@@ -636,7 +697,7 @@ function ResolveGlues($tables, $target, $x = 0, $hist = [], $last = [])
                     } else {
                         [$tmp] = explode('_', $glue['COLUMN_NAME']);
                         $tmp .= 's';
-                        if (! in_array($tmp, $tables) && ! in_array($tmp, $hist)) {
+                        if (!in_array($tmp, $tables) && !in_array($tmp, $hist)) {
                             //Expand table
                             $tmp = ResolveGlues([$tmp], $target, $x++, array_merge($tables, [$tmp]), array_merge($last, [$table . '.' . $glue['COLUMN_NAME']]));
                             if (is_array($tmp)) {
@@ -691,10 +752,10 @@ function get_sql_filter_min_severity($min_severity, $alert_rules_name)
     ];
     if (is_numeric($min_severity)) {
         $min_severity_id = $min_severity;
-    } elseif (! empty($min_severity)) {
+    } elseif (!empty ($min_severity)) {
         $min_severity_id = $alert_severities[$min_severity];
     }
-    if (isset($min_severity_id)) {
+    if (isset ($min_severity_id)) {
         return " AND `$alert_rules_name`.`severity` " . ($min_severity_id > 3 ? '' : '>') . '= ' . ($min_severity_id > 3 ? $min_severity_id - 3 : $min_severity_id);
     }
 
@@ -786,13 +847,13 @@ function mw_to_dbm($value)
  */
 function set_null($value, $default = null, $min = null)
 {
-    if (! is_numeric($value)) {
+    if (!is_numeric($value)) {
         return $default;
     } elseif (is_nan($value)) {
         return $default;
     } elseif (is_infinite($value)) {
         return $default;
-    } elseif (isset($min) && $value < $min) {
+    } elseif (isset ($min) && $value < $min) {
         return $default;
     }
 
@@ -805,7 +866,8 @@ function set_null($value, $default = null, $min = null)
  */
 function set_numeric($value, $default = 0)
 {
-    if (! is_numeric($value) ||
+    if (
+        !is_numeric($value) ||
         is_nan($value) ||
         is_infinite($value)
     ) {
@@ -817,7 +879,7 @@ function set_numeric($value, $default = 0)
 
 function get_vm_parent_id($device)
 {
-    if (empty($device['hostname'])) {
+    if (empty ($device['hostname'])) {
         return false;
     }
 
