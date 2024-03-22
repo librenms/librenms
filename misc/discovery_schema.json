@@ -289,7 +289,8 @@
                                                 "type": ["integer", "string"]
                                             },
                                             "entPhysicalIndex_measured": {
-                                                "type": "string"
+                                                "type": [ "string", "null" ],
+                                                "enum": [ "ports", null ]
                                             },
                                             "snmp_no_Ih_flag": {
                                                 "type": "string"
@@ -469,7 +470,8 @@
                                 "type": ["integer", "string"]
                             },
                             "entPhysicalIndex_measured": {
-                                "type": "string"
+                                "type": [ "string", "null" ],
+                                "enum": [ "ports", null ]
                             },
                             "user_func": {
                                 "type": "string"
