@@ -192,17 +192,17 @@ if ($vars['app_page'] == 'general') {
     ];
     $mounted_by = $app->data['mounted_by'] ?? [];
     foreach ($mounted_by as $array_location => $data) {
-        $new_host = ['data'=>''];
-        $new_path = ['data'=>''];
+        $new_host = ['data' => ''];
+        $new_path = ['data' => ''];
         if (isset($data['host'])) {
             // if not cached yet, to see if we can find more info
             if (! isset($host_cache[$data['host']])) {
                 // a quick dumb regex check to make determine if it is IPv4 or IPv6
                 // and make sure there are no unexpected charters
                 if (preg_match('/^[0-9\.]+$/', $data['host'])) {
-                    $ip_info = Ipv4Address::firstWhere(['ipv4_address'=>$data['host']]);
+                    $ip_info = Ipv4Address::firstWhere(['ipv4_address' => $data['host']]);
                 } elseif (preg_match('/^[0-9\:a-fA-F]+$/', $data['host'])) {
-                    $ip_info = Ipv6Address::firstWhere(['ipv6_address'=>$data['host']]);
+                    $ip_info = Ipv6Address::firstWhere(['ipv6_address' => $data['host']]);
                 }
                 if (isset($ip_info)) {
                     $port = Port::with('device')->firstWhere(['port_id' => $ip_info->port_id]);
@@ -302,19 +302,19 @@ if ($vars['app_page'] == 'general') {
     }
     $mounts = $app->data['mounts'] ?? [];
     foreach ($mounts as $array_location => $data) {
-        $new_host = ['data'=>''];
-        $new_rpath = ['data'=>''];
-        $new_lpath = ['data'=>''];
-        $new_mntopts = ['data'=>''];
+        $new_host = ['data' => ''];
+        $new_rpath = ['data' => ''];
+        $new_lpath = ['data' => ''];
+        $new_mntopts = ['data' => ''];
         if (isset($data['host'])) {
             // if not cached yet, to see if we can find more info
             if (! isset($host_cache[$data['host']])) {
                 // a quick dumb regex check to make determine if it is IPv4 or IPv6
                 // and make sure there are no unexpected charters
                 if (preg_match('/^[0-9\.]+$/', $data['host'])) {
-                    $ip_info = Ipv4Address::firstWhere(['ipv4_address'=>$data['host']]);
+                    $ip_info = Ipv4Address::firstWhere(['ipv4_address' => $data['host']]);
                 } elseif (preg_match('/^[0-9\:a-fA-F]+$/', $data['host'])) {
-                    $ip_info = Ipv6Address::firstWhere(['ipv6_address'=>$data['host']]);
+                    $ip_info = Ipv6Address::firstWhere(['ipv6_address' => $data['host']]);
                 }
                 if (isset($ip_info)) {
                     $port = Port::with('device')->firstWhere(['port_id' => $ip_info->port_id]);
@@ -415,15 +415,15 @@ if ($vars['app_page'] == 'general') {
                     ];
                     if (isset($data['flags'])) {
                         $mntopts_table_info['rows'][] = [
-                            ['data'=>'flags'],
+                            ['data' => 'flags'],
                             ['data'=>implode(',', $data['flags'])],
                         ];
                     }
                     if (isset($data['opts'])) {
                         foreach ($data['opts'] as $mntopts_key => $mntopts_data) {
                             $mntopts_table_info['rows'][] = [
-                                ['data'=>$mntopts_key],
-                                ['data'=>$mntopts_data],
+                                ['data' => $mntopts_key],
+                                ['data' => $mntopts_data],
                             ];
                         }
                     }
