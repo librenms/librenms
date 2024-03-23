@@ -416,7 +416,7 @@ if ($vars['app_page'] == 'general') {
                     if (isset($data['flags'])) {
                         $mntopts_table_info['rows'][] = [
                             ['data' => 'flags'],
-                            ['data'=>implode(',', $data['flags'])],
+                            ['data' => implode(',', $data['flags'])],
                         ];
                     }
                     if (isset($data['opts'])) {
