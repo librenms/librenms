@@ -27,1580 +27,1460 @@
             ],
             "application_metrics": [
                 {
-                    "metric": "is_client",
-                    "value": 1,
-                    "value_prev": null,
-                    "app_type": "nfs"
-                },
-                {
-                    "metric": "is_server",
-                    "value": 1,
-                    "value_prev": null,
-                    "app_type": "nfs"
-                },
-                {
-                    "metric": "mounts_0_flags_0",
-                    "value": "rw",
-                    "value_prev": null,
-                    "app_type": "nfs"
-                },
-                {
-                    "metric": "mounts_0_flags_1",
-                    "value": "relatime",
-                    "value_prev": null,
-                    "app_type": "nfs"
-                },
-                {
-                    "metric": "mounts_0_flags_2",
-                    "value": "hard",
-                    "value_prev": null,
-                    "app_type": "nfs"
-                },
-                {
-                    "metric": "mounts_0_host",
-                    "value": "127.0.0.1",
-                    "value_prev": null,
-                    "app_type": "nfs"
-                },
-                {
-                    "metric": "mounts_0_lpath",
-                    "value": "\/mnt",
-                    "value_prev": null,
-                    "app_type": "nfs"
-                },
-                {
-                    "metric": "mounts_0_opts_addr",
-                    "value": "127.0.0.1",
-                    "value_prev": null,
-                    "app_type": "nfs"
-                },
-                {
-                    "metric": "mounts_0_opts_clientaddr",
-                    "value": "127.0.0.1",
-                    "value_prev": null,
-                    "app_type": "nfs"
-                },
-                {
-                    "metric": "mounts_0_opts_local_lock",
-                    "value": "none",
-                    "value_prev": null,
-                    "app_type": "nfs"
-                },
-                {
-                    "metric": "mounts_0_opts_namlen",
-                    "value": "255",
-                    "value_prev": null,
-                    "app_type": "nfs"
-                },
-                {
-                    "metric": "mounts_0_opts_proto",
-                    "value": "tcp",
-                    "value_prev": null,
-                    "app_type": "nfs"
-                },
-                {
-                    "metric": "mounts_0_opts_retrans",
-                    "value": "2",
-                    "value_prev": null,
-                    "app_type": "nfs"
-                },
-                {
-                    "metric": "mounts_0_opts_rsize",
-                    "value": "1048576",
-                    "value_prev": null,
-                    "app_type": "nfs"
-                },
-                {
-                    "metric": "mounts_0_opts_sec",
-                    "value": "sys",
-                    "value_prev": null,
-                    "app_type": "nfs"
-                },
-                {
-                    "metric": "mounts_0_opts_timeo",
-                    "value": "600",
-                    "value_prev": null,
-                    "app_type": "nfs"
-                },
-                {
-                    "metric": "mounts_0_opts_vers",
-                    "value": "4.2",
-                    "value_prev": null,
-                    "app_type": "nfs"
-                },
-                {
-                    "metric": "mounts_0_opts_wsize",
-                    "value": "1048576",
-                    "value_prev": null,
-                    "app_type": "nfs"
-                },
-                {
-                    "metric": "mounts_0_rpath",
-                    "value": "\/tmp",
-                    "value_prev": null,
-                    "app_type": "nfs"
-                },
-                {
-                    "metric": "os",
-                    "value": "linux",
-                    "value_prev": null,
-                    "app_type": "nfs"
-                },
-                {
-                    "metric": "stats_client_cache_Attr_Hits",
+                    "metric": "client_cache_Attr_Hits",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_cache_Attr_Misses",
+                    "metric": "client_cache_Attr_Misses",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_cache_BioD_Hits",
+                    "metric": "client_cache_BioD_Hits",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_cache_BioD_Misses",
+                    "metric": "client_cache_BioD_Misses",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_cache_BioR_Hits",
+                    "metric": "client_cache_BioR_Hits",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_cache_BioR_Misses",
+                    "metric": "client_cache_BioR_Misses",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_cache_BioRL_Hits",
+                    "metric": "client_cache_BioRL_Hits",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_cache_BioRL_Misses",
+                    "metric": "client_cache_BioRL_Misses",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_cache_BioW_Hits",
+                    "metric": "client_cache_BioW_Hits",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_cache_BioW_Misses",
+                    "metric": "client_cache_BioW_Misses",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_cache_DirE_Hits",
+                    "metric": "client_cache_DirE_Hits",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_cache_DirE_Misses",
+                    "metric": "client_cache_DirE_Misses",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_cache_Lkup_Hits",
+                    "metric": "client_cache_Lkup_Hits",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_cache_Lkup_Misses",
+                    "metric": "client_cache_Lkup_Misses",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_Delegs",
+                    "metric": "client_Delegs",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_Layouts",
+                    "metric": "client_Layouts",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_LocalLock",
+                    "metric": "client_LocalLock",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_LocalLown",
+                    "metric": "client_LocalLown",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_LocalOpen",
+                    "metric": "client_LocalOpen",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_LocalOwn",
+                    "metric": "client_LocalOwn",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_LockOwner",
+                    "metric": "client_LockOwner",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_Locks",
+                    "metric": "client_Locks",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_network_packets",
+                    "metric": "client_network_packets",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_network_tcp",
+                    "metric": "client_network_tcp",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_network_tcpconn",
+                    "metric": "client_network_tcpconn",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_network_udp",
+                    "metric": "client_network_udp",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_OpenOwner",
+                    "metric": "client_OpenOwner",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_Opens",
+                    "metric": "client_Opens",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_rpc_Access",
+                    "metric": "client_rpc_Access",
                     "value": 18,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_rpc_Allocate",
+                    "metric": "client_rpc_Allocate",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_rpc_BindConnSess",
+                    "metric": "client_rpc_BindConnSess",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_rpc_Close",
+                    "metric": "client_rpc_Close",
                     "value": 35,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_rpc_Commit",
+                    "metric": "client_rpc_Commit",
                     "value": 1,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_rpc_CommitDataS",
+                    "metric": "client_rpc_CommitDataS",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_rpc_confirm",
+                    "metric": "client_rpc_confirm",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_rpc_Copy",
+                    "metric": "client_rpc_Copy",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_rpc_Create",
+                    "metric": "client_rpc_Create",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_rpc_CreateLayout",
+                    "metric": "client_rpc_CreateLayout",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_rpc_CreateSess",
+                    "metric": "client_rpc_CreateSess",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_rpc_Deallocate",
+                    "metric": "client_rpc_Deallocate",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_rpc_DelegRet",
+                    "metric": "client_rpc_DelegRet",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_rpc_DestroyClId",
+                    "metric": "client_rpc_DestroyClId",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_rpc_DestroySess",
+                    "metric": "client_rpc_DestroySess",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_rpc_ExchangeId",
+                    "metric": "client_rpc_ExchangeId",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_rpc_FreeStateID",
+                    "metric": "client_rpc_FreeStateID",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_rpc_fs_locations",
+                    "metric": "client_rpc_fs_locations",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_rpc_fsid_present",
+                    "metric": "client_rpc_fsid_present",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_rpc_FSinfo",
+                    "metric": "client_rpc_FSinfo",
                     "value": 3,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_rpc_Fsstat",
+                    "metric": "client_rpc_Fsstat",
                     "value": 3129,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_rpc_get_lease_time",
+                    "metric": "client_rpc_get_lease_time",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_rpc_GetAcl",
+                    "metric": "client_rpc_GetAcl",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_rpc_Getattr",
+                    "metric": "client_rpc_Getattr",
                     "value": 397,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_rpc_getdevicelist",
+                    "metric": "client_rpc_getdevicelist",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_rpc_GetDevInfo",
+                    "metric": "client_rpc_GetDevInfo",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_rpc_GetExtattr",
+                    "metric": "client_rpc_GetExtattr",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_rpc_info_authrefrsh",
+                    "metric": "client_rpc_info_authrefrsh",
                     "value": 16590,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_rpc_info_calls",
+                    "metric": "client_rpc_info_calls",
                     "value": 16590,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_rpc_info_Invalid",
+                    "metric": "client_rpc_info_Invalid",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_rpc_info_Requests",
+                    "metric": "client_rpc_info_Requests",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_rpc_info_Retries",
+                    "metric": "client_rpc_info_Retries",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_rpc_info_TimedOut",
+                    "metric": "client_rpc_info_TimedOut",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_rpc_info_X_Replies",
+                    "metric": "client_rpc_info_X_Replies",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_rpc_IOAdvise",
+                    "metric": "client_rpc_IOAdvise",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_rpc_LayoutCommit",
+                    "metric": "client_rpc_LayoutCommit",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_rpc_LayoutError",
+                    "metric": "client_rpc_LayoutError",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_rpc_LayoutGet",
+                    "metric": "client_rpc_LayoutGet",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_rpc_LayoutReturn",
+                    "metric": "client_rpc_LayoutReturn",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_rpc_layoutstats",
+                    "metric": "client_rpc_layoutstats",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_rpc_Link",
+                    "metric": "client_rpc_Link",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_rpc_ListExtattr",
+                    "metric": "client_rpc_ListExtattr",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_rpc_Lock",
+                    "metric": "client_rpc_Lock",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_rpc_LockT",
+                    "metric": "client_rpc_LockT",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_rpc_LockU",
+                    "metric": "client_rpc_LockU",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_rpc_Lookup",
+                    "metric": "client_rpc_Lookup",
                     "value": 19,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_rpc_LookupOpen",
+                    "metric": "client_rpc_LookupOpen",
                     "value": 1,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_rpc_Mkdir",
+                    "metric": "client_rpc_Mkdir",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_rpc_Mknod",
+                    "metric": "client_rpc_Mknod",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_rpc_null",
+                    "metric": "client_rpc_null",
                     "value": 1,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_rpc_Open",
+                    "metric": "client_rpc_Open",
                     "value": 3,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_rpc_OpenCfr",
+                    "metric": "client_rpc_OpenCfr",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_rpc_OpenDownGr",
+                    "metric": "client_rpc_OpenDownGr",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_rpc_OpenLayout",
+                    "metric": "client_rpc_OpenLayout",
                     "value": 33,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_rpc_pathConf",
+                    "metric": "client_rpc_pathConf",
                     "value": 2,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_rpc_PutRootFH",
+                    "metric": "client_rpc_PutRootFH",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_rpc_RdirPlus",
+                    "metric": "client_rpc_RdirPlus",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_rpc_Read",
+                    "metric": "client_rpc_Read",
                     "value": 3,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_rpc_ReadDataS",
+                    "metric": "client_rpc_ReadDataS",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_rpc_Readdir",
+                    "metric": "client_rpc_Readdir",
                     "value": 34,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_rpc_Readlink",
+                    "metric": "client_rpc_Readlink",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_rpc_ReclaimCompl",
+                    "metric": "client_rpc_ReclaimCompl",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_rpc_RelLckOwn",
+                    "metric": "client_rpc_RelLckOwn",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_rpc_Remove",
+                    "metric": "client_rpc_Remove",
                     "value": 17,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_rpc_Rename",
+                    "metric": "client_rpc_Rename",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_rpc_Rmdir",
+                    "metric": "client_rpc_Rmdir",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_rpc_RmExtattr",
+                    "metric": "client_rpc_RmExtattr",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_rpc_root",
+                    "metric": "client_rpc_root",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_rpc_secinfo",
+                    "metric": "client_rpc_secinfo",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_rpc_secinfo_no",
+                    "metric": "client_rpc_secinfo_no",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_rpc_Seek",
+                    "metric": "client_rpc_Seek",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_rpc_SeekDataS",
+                    "metric": "client_rpc_SeekDataS",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_rpc_sequence",
+                    "metric": "client_rpc_sequence",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_rpc_server_caps",
+                    "metric": "client_rpc_server_caps",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_rpc_SetAcl",
+                    "metric": "client_rpc_SetAcl",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_rpc_Setattr",
+                    "metric": "client_rpc_Setattr",
                     "value": 50,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_rpc_SetClId",
+                    "metric": "client_rpc_SetClId",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_rpc_SetClIdCf",
+                    "metric": "client_rpc_SetClIdCf",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_rpc_SetExtattr",
+                    "metric": "client_rpc_SetExtattr",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_rpc_Symlink",
+                    "metric": "client_rpc_Symlink",
                     "value": 16,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_rpc_test_stateid",
+                    "metric": "client_rpc_test_stateid",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_rpc_wrcache",
+                    "metric": "client_rpc_wrcache",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_rpc_Write",
+                    "metric": "client_rpc_Write",
                     "value": 142,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_client_rpc_WriteDataS",
+                    "metric": "client_rpc_WriteDataS",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_cache_CacheSize",
+                    "metric": "server_cache_CacheSize",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_cache_hits",
+                    "metric": "server_cache_hits",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "nfs"
+                },
+                {
+                    "metric": "server_cache_Inprog",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "nfs"
+                },
+                {
+                    "metric": "server_cache_Misses",
                     "value": "0",
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_cache_Inprog",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "nfs"
-                },
-                {
-                    "metric": "stats_server_cache_Misses",
-                    "value": "0",
-                    "value_prev": null,
-                    "app_type": "nfs"
-                },
-                {
-                    "metric": "stats_server_cache_nocache",
+                    "metric": "server_cache_nocache",
                     "value": "16590",
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_cache_NonIdem",
+                    "metric": "server_cache_NonIdem",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_cache_TCPPeak",
+                    "metric": "server_cache_TCPPeak",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_Clients",
+                    "metric": "server_Clients",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_Delegs",
+                    "metric": "server_Delegs",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_FHcache_anon",
+                    "metric": "server_FHcache_anon",
                     "value": "0",
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_FHcache_lookup",
+                    "metric": "server_FHcache_lookup",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "nfs"
+                },
+                {
+                    "metric": "server_FHcache_ncachedir",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "nfs"
+                },
+                {
+                    "metric": "server_FHcache_ncachenondir",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "nfs"
+                },
+                {
+                    "metric": "server_FHcache_stale",
                     "value": "0",
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_FHcache_ncachedir",
-                    "value": "0",
+                    "metric": "server_io_read",
+                    "value": 59215,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_FHcache_ncachenondir",
-                    "value": "0",
+                    "metric": "server_io_write",
+                    "value": 131492205,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_FHcache_stale",
-                    "value": "0",
-                    "value_prev": null,
-                    "app_type": "nfs"
-                },
-                {
-                    "metric": "stats_server_io_read",
-                    "value": "59215",
-                    "value_prev": null,
-                    "app_type": "nfs"
-                },
-                {
-                    "metric": "stats_server_io_write",
-                    "value": "131492205",
-                    "value_prev": null,
-                    "app_type": "nfs"
-                },
-                {
-                    "metric": "stats_server_Layouts",
+                    "metric": "server_Layouts",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_LockOwner",
+                    "metric": "server_LockOwner",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_Locks",
+                    "metric": "server_Locks",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_network_packets",
-                    "value": "16590",
+                    "metric": "server_network_packets",
+                    "value": 16590,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_network_tcp",
-                    "value": "16590",
+                    "metric": "server_network_tcp",
+                    "value": 16590,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_network_tcpconn",
-                    "value": "1",
+                    "metric": "server_network_tcpconn",
+                    "value": 1,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_network_udp",
-                    "value": "0",
-                    "value_prev": null,
-                    "app_type": "nfs"
-                },
-                {
-                    "metric": "stats_server_OpenOwner",
+                    "metric": "server_network_udp",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_Opens",
+                    "metric": "server_OpenOwner",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_RAcache_0",
+                    "metric": "server_Opens",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_RAcache_1",
+                    "metric": "server_RAcache_0",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_RAcache_2",
+                    "metric": "server_RAcache_1",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_RAcache_3",
+                    "metric": "server_RAcache_2",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_RAcache_4",
+                    "metric": "server_RAcache_3",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_RAcache_5",
+                    "metric": "server_RAcache_4",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_RAcache_6",
+                    "metric": "server_RAcache_5",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_RAcache_7",
+                    "metric": "server_RAcache_6",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_RAcache_8",
+                    "metric": "server_RAcache_7",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_RAcache_9",
+                    "metric": "server_RAcache_8",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_RAcache_notfound",
+                    "metric": "server_RAcache_9",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_rpc_Access",
+                    "metric": "server_RAcache_notfound",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "nfs"
+                },
+                {
+                    "metric": "server_rpc_Access",
                     "value": 53,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_rpc_Allocate",
+                    "metric": "server_rpc_Allocate",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_rpc_BackChannelCt",
+                    "metric": "server_rpc_BackChannelCt",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_rpc_BindConnToSes",
+                    "metric": "server_rpc_BindConnToSes",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_rpc_Clone",
+                    "metric": "server_rpc_Clone",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_rpc_Close",
+                    "metric": "server_rpc_Close",
                     "value": 35,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_rpc_Commit",
+                    "metric": "server_rpc_Commit",
                     "value": 1,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_rpc_compound",
+                    "metric": "server_rpc_compound",
                     "value": 16589,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_rpc_Copy",
+                    "metric": "server_rpc_Copy",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_rpc_CopyNotify",
+                    "metric": "server_rpc_CopyNotify",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_rpc_Create",
+                    "metric": "server_rpc_Create",
                     "value": 16,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_rpc_CreateSess",
+                    "metric": "server_rpc_CreateSess",
                     "value": 1,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_rpc_Deallocate",
+                    "metric": "server_rpc_Deallocate",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_rpc_DelePurge",
+                    "metric": "server_rpc_DelePurge",
                     "value": "0",
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_rpc_DelRet",
+                    "metric": "server_rpc_DelRet",
                     "value": "17",
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_rpc_DestroyClId",
+                    "metric": "server_rpc_DestroyClId",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_rpc_DestroySess",
+                    "metric": "server_rpc_DestroySess",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_rpc_ExchangeID",
+                    "metric": "server_rpc_ExchangeID",
                     "value": 2,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_rpc_FreeStateID",
+                    "metric": "server_rpc_FreeStateID",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_rpc_FSinfo",
+                    "metric": "server_rpc_FSinfo",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_rpc_Fsstat",
+                    "metric": "server_rpc_Fsstat",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_rpc_Getattr",
+                    "metric": "server_rpc_Getattr",
                     "value": 3824,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_rpc_GetDevInfo",
+                    "metric": "server_rpc_GetDevInfo",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_rpc_GetDevList",
+                    "metric": "server_rpc_GetDevList",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_rpc_GetDirDeleg",
+                    "metric": "server_rpc_GetDirDeleg",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_rpc_GetExtattr",
+                    "metric": "server_rpc_GetExtattr",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_rpc_GetFH",
+                    "metric": "server_rpc_GetFH",
                     "value": 21,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_rpc_IOAdvise",
+                    "metric": "server_rpc_IOAdvise",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_rpc_layoutCommit",
+                    "metric": "server_rpc_layoutCommit",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_rpc_LayoutError",
+                    "metric": "server_rpc_LayoutError",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_rpc_LayoutGet",
+                    "metric": "server_rpc_LayoutGet",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_rpc_LayoutReturn",
+                    "metric": "server_rpc_LayoutReturn",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_rpc_LayoutStats",
+                    "metric": "server_rpc_LayoutStats",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_rpc_Link",
+                    "metric": "server_rpc_Link",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_rpc_ListExtattr",
+                    "metric": "server_rpc_ListExtattr",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_rpc_Lock",
+                    "metric": "server_rpc_Lock",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_rpc_LockT",
+                    "metric": "server_rpc_LockT",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_rpc_LockU",
+                    "metric": "server_rpc_LockU",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_rpc_Lookup",
+                    "metric": "server_rpc_Lookup",
                     "value": 19,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_rpc_LookupP",
+                    "metric": "server_rpc_LookupP",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_rpc_Mkdir",
+                    "metric": "server_rpc_Mkdir",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_rpc_Mknod",
+                    "metric": "server_rpc_Mknod",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_rpc_null",
+                    "metric": "server_rpc_null",
                     "value": 1,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_rpc_NVerify",
+                    "metric": "server_rpc_NVerify",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_rpc_OffloadCncl",
+                    "metric": "server_rpc_OffloadCncl",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_rpc_OffloadStat",
+                    "metric": "server_rpc_OffloadStat",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_rpc_op0_unused",
+                    "metric": "server_rpc_op0_unused",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_rpc_op1_unused",
+                    "metric": "server_rpc_op1_unused",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_rpc_op2_future",
+                    "metric": "server_rpc_op2_future",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_rpc_OpeAttr",
+                    "metric": "server_rpc_OpeAttr",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_rpc_Open",
+                    "metric": "server_rpc_Open",
                     "value": 36,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_rpc_OpenAttr",
+                    "metric": "server_rpc_OpenAttr",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_rpc_OpenCfrm",
+                    "metric": "server_rpc_OpenCfrm",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_rpc_OpenDwnGr",
+                    "metric": "server_rpc_OpenDwnGr",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_rpc_pathConf",
+                    "metric": "server_rpc_pathConf",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_rpc_PutFH",
+                    "metric": "server_rpc_PutFH",
                     "value": 3926,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_rpc_PutPubFH",
+                    "metric": "server_rpc_PutPubFH",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_rpc_PutRootFH",
+                    "metric": "server_rpc_PutRootFH",
                     "value": 2,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_rpc_RdirPlus",
+                    "metric": "server_rpc_RdirPlus",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_rpc_Read",
+                    "metric": "server_rpc_Read",
                     "value": 3,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_rpc_Readdir",
+                    "metric": "server_rpc_Readdir",
                     "value": 34,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_rpc_Readlink",
+                    "metric": "server_rpc_Readlink",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_rpc_ReadPlus",
+                    "metric": "server_rpc_ReadPlus",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_rpc_ReclaimCompl",
+                    "metric": "server_rpc_ReclaimCompl",
                     "value": 1,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_rpc_RelLockOwn",
+                    "metric": "server_rpc_RelLockOwn",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_rpc_Remove",
+                    "metric": "server_rpc_Remove",
                     "value": 17,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_rpc_Rename",
+                    "metric": "server_rpc_Rename",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_rpc_Renew",
+                    "metric": "server_rpc_Renew",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_rpc_RestoreFH",
+                    "metric": "server_rpc_RestoreFH",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_rpc_Rmdir",
+                    "metric": "server_rpc_Rmdir",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_rpc_RmExtattr",
+                    "metric": "server_rpc_RmExtattr",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_rpc_root",
+                    "metric": "server_rpc_root",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_rpc_SaveFH",
+                    "metric": "server_rpc_SaveFH",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_rpc_SecInfNoName",
+                    "metric": "server_rpc_SecInfNoName",
                     "value": 1,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_rpc_Secinfo",
+                    "metric": "server_rpc_Secinfo",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_rpc_Seek",
+                    "metric": "server_rpc_Seek",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_rpc_Sequence",
+                    "metric": "server_rpc_Sequence",
                     "value": 16586,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_rpc_Setattr",
+                    "metric": "server_rpc_Setattr",
                     "value": 50,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_rpc_SetClId",
+                    "metric": "server_rpc_SetClId",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_rpc_SetClIdCf",
+                    "metric": "server_rpc_SetClIdCf",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_rpc_SetExtattr",
+                    "metric": "server_rpc_SetExtattr",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_rpc_SetSSV",
+                    "metric": "server_rpc_SetSSV",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_rpc_Symlink",
+                    "metric": "server_rpc_Symlink",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_rpc_TestStateID",
+                    "metric": "server_rpc_TestStateID",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_rpc_V4Create",
+                    "metric": "server_rpc_V4Create",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_rpc_Verify",
+                    "metric": "server_rpc_Verify",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_rpc_WantDeleg",
+                    "metric": "server_rpc_WantDeleg",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_rpc_wrcache",
+                    "metric": "server_rpc_wrcache",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_rpc_Write",
+                    "metric": "server_rpc_Write",
                     "value": 142,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_rpc_WriteSame",
+                    "metric": "server_rpc_WriteSame",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_rpcStats_badauth",
-                    "value": "0",
+                    "metric": "server_rpcStats_badauth",
+                    "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_rpcStats_badcalls",
-                    "value": "0",
+                    "metric": "server_rpcStats_badcalls",
+                    "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_rpcStats_badclnt",
-                    "value": "0",
+                    "metric": "server_rpcStats_badclnt",
+                    "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_rpcStats_badfmt",
-                    "value": "0",
+                    "metric": "server_rpcStats_badfmt",
+                    "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "stats_server_rpcStats_calls",
-                    "value": "16590",
+                    "metric": "server_rpcStats_calls",
+                    "value": 16590,
                     "value_prev": null,
                     "app_type": "nfs"
                 }
