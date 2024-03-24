@@ -1002,7 +1002,7 @@
                 },
                 {
                     "metric": "server_rpc_DelRet",
-                    "value": "17",
+                    "value": 17,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
@@ -1223,6 +1223,12 @@
                     "app_type": "nfs"
                 },
                 {
+                    "metric": "server_rpc_OpenCfrm",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "nfs"
+                },
+                {
                     "metric": "server_rpc_OpenDwnGr",
                     "value": 0,
                     "value_prev": null,
@@ -1236,18 +1242,12 @@
                 },
                 {
                     "metric": "server_rpc_PutFH",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "nfs"
-                },
-                {
-                    "metric": "server_rpc_pathConf",
                     "value": 3926,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "server_rpc_PutFH",
+                    "metric": "server_rpc_PutPubFH",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
