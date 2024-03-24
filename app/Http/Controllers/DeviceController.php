@@ -2,19 +2,28 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\Device\ValidateDeviceAndCreate;
 use App\Facades\DeviceCache;
+use App\Http\Requests\StoreDeviceRequest;
 use App\Models\Device;
+use App\Models\PollerGroup;
 use App\Models\Vminfo;
 use Carbon\Carbon;
+use Exception;
 use Gate;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Blade;
 use LibreNMS\Config;
+use LibreNMS\Enum\PortAssociationMode;
+use LibreNMS\Exceptions\HostUnreachableException;
+use LibreNMS\SNMPCapabilities;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Graph;
+use LibreNMS\Util\IP;
 use LibreNMS\Util\Url;
+use LibreNMS\Util\Validate;
 
 class DeviceController extends Controller
 {
@@ -248,5 +257,90 @@ class DeviceController extends Controller
     private function editTabExists(string $tab): bool
     {
         return is_file(base_path("includes/html/pages/device/edit/$tab.inc.php"));
+    }
+
+    public function create()
+    {
+        $this->authorize('create', Device::class);
+
+        $transports = Config::get('snmp.transports');
+        $modes = PortAssociationMode::getModes();
+        $defaultMode = Config::get('default_port_association_mode');
+        $distributedPoller = Config::get('distributed_poller');
+        $pollerGroup = PollerGroup::select('id', 'group_name')->orderBy('group_name')->get();
+        $authAlgorithms = SNMPCapabilities::authAlgorithms();
+        $supportSHA2 = SNMPCapabilities::supportsSHA2();
+        $supportAES256 = SNMPCapabilities::supportsAES256();
+        $cryptoAlgorithms = SNMPCapabilities::cryptoAlgoritms();
+
+        return view('device.create', [
+            'transports' => $transports,
+            'modes' => $modes,
+            'defaultMode' => $defaultMode,
+            'distributedPoller' => $distributedPoller,
+            'pollerGroup' => $pollerGroup,
+            'authAlgorithms' => $authAlgorithms,
+            'supportSHA2' => $supportSHA2,
+            'supportAES256' => $supportAES256,
+            'cryptoAlgorithms' => $cryptoAlgorithms,
+        ]);
+    }
+
+    public function store(StoreDeviceRequest $request)
+    {
+        $this->authorize('create', Device::class);
+
+        if (! Validate::hostname($request->hostname) && ! IP::isValid($request->hostname)) {
+            return redirect()->back()->with(['error_message' => __('Invalid hostname or IP address:'), [$request->hostname]]);
+        }
+        $device = new Device(['hostname' => $request->hostname]);
+        if ($request->port) {
+            $device->port = $request->port;
+        }
+        if ($request->transport) {
+            $device->transport = strip_tags($request->transport);
+        }
+        $snmp_enabled = ! isset($_POST['hostname']) || isset($_POST['snmp']);
+        if (! $snmp_enabled) {
+            $device->snmp_disable = true;
+            $device->os = $request->os ? strip_tags($request->os_id) : 'ping';
+            $device->hardware = strip_tags($request->hardware);
+            $device->sysName = strip_tags($request->sysName);
+        } elseif ($request->snmpver === 'v2c' || $request->snmpver === 'v1') {
+            $device->snmpver = strip_tags($request->snmpver);
+            $communities = Config::get('snmp.community');
+            if ($request->community) {
+                $device->community = $request->community;
+                $communities = [$request->community];
+            }
+        } elseif ($request->snmpver === 'v3') {
+            $device->snmpver = 'v3';
+            $device->authlevel = strip_tags($request->authlevel);
+            $device->authname = $request->authname;
+            $device->authpass = $request->authpass;
+            $device->authalgo = strip_tags($request->authalgo);
+            $device->cryptopass = $request->cryptopass;
+            $device->cryptoalgo = $request->cryptoalgo;
+        } else {
+            return redirect()->back()->with(['error_message' => __('exceptions.snmp_version_unsupported.message', ['snmpver' => $request->snmpver])]);
+        }//end if
+
+        try {
+            $device->poller_group = (int) $request->poller_group;
+            $device->port_association_mode = PortAssociationMode::getId($request->port_assoc_mode);
+
+            $force_add = ($request->has('force_add') && $request->force_add == 'on');
+            $result = (new ValidateDeviceAndCreate($device, $force_add))->execute();
+
+            if ($result) {
+                return redirect()->back()->with(['success_message' => 'Device added: <a href="' . route('device', $device) . '">' . $device->hostname . '(' . $device->device_id . ')' . '</a>']);
+            }
+        } catch (HostUnreachableException $e) {
+            return redirect()->back()->withErrors(['error_message' => $e->getMessage(), 'reasons' => $e->getReasons()]);
+        } catch (Exception $e) {
+            return redirect()->back()->withErrors(['error_message' => $e->getMessage()]);
+        }
+
+        return $request;
     }
 }
