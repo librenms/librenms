@@ -335,6 +335,32 @@ $nfs_graphs = [
             'client_rpc_info_calls' => 'Calls',
         ],
     ],
+    'client_general' => [
+        '' => [
+            'client_Delegs' => 'Delegs',
+            'client_Layouts' => 'Layouts',
+            'client_LocalLock' => 'LocalLock',
+            'client_LocalLown' => 'LocalLown',
+            'client_LocalOpen' => 'LocalOpen',
+            'client_LocalOwn' => 'LocalOwn',
+            'client_LockOwner' => 'LockOwner',
+            'client_Locks' => 'Locks',
+            'client_OpenOwner' => 'OpenOwner',
+            'client_Opens' => 'Opens',
+        ],
+        'freebsd' => [
+            'client_Delegs' => 'Delegs',
+            'client_Layouts' => 'Layouts',
+            'client_LocalLock' => 'LocalLock',
+            'client_LocalLown' => 'LocalLown',
+            'client_LocalOpen' => 'LocalOpen',
+            'client_LocalOwn' => 'LocalOwn',
+            'client_LockOwner' => 'LockOwner',
+            'client_Locks' => 'Locks',
+            'client_OpenOwner' => 'OpenOwner',
+            'client_Opens' => 'Opens',
+        ],
+    ],
     'server_general' => [
         '' => [
             'server_Clients' => 'Clients',
@@ -775,6 +801,14 @@ $nfs_graphs = [
             'server_rpc_pathConf' => 'pathConf',
             'server_rpc_root' => 'root',
             'server_rpc_wrcache' => 'wrcache',
+        ],
+    ],
+    'server_cache_TCPPeak' => [
+        '' => [
+            'server_cache_TCPPeak' => 'TCPPeak',
+        ],
+        'freebsd' => [
+            'server_cache_TCPPeak' => 'TCPPeak',
         ],
     ],
     'server_cache' => [

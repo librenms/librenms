@@ -52,14 +52,16 @@ if ($is_server || $is_client) {
     print_optionbar_start();
     echo generate_link('General', $link_array);
 
-    if ($is_client) {
+    if ($is_client && isset($app->data['mounts']) && isset($app->data['mounts'][0])) {
         $label = $vars['app_page'] == 'mounts'
             ? '<span class="pagemenu-selected">Mounts</span>'
             : 'Mounts';
         echo ', ' . generate_link($label, $link_array, ['app_page' => 'mounts']) . "\n";
     }
 
-    if ($is_server) {
+    // showmount -a only works for NFSv2 and NFSv3... unfortunately no NFSv4 equivalent
+    // this means no mount info if v4
+    if ($is_server && isset($app->data['mounted_by']) && isset($app->data['mounted_by'][0])) {
         $label = $vars['app_page'] == 'mounted_by'
             ? '<span class="pagemenu-selected">Mounted By</span>'
             : 'Mounted By';
@@ -145,6 +147,7 @@ if ($vars['app_page'] == 'general') {
         $graphs['nfs_client_rpc_info'] = 'Client General RPC Stats';
         if ($app->data['os'] == 'freebsd') {
             $graphs['nfs_client_cache'] = 'Client Cache';
+            $graphs['nfs_client_general'] = 'Client General';
         }
         if ($app->data['os'] == 'linux') {
             $graphs['nfs_client_network'] = 'Client Network';
