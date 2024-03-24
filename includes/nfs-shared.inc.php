@@ -115,6 +115,7 @@ $nfs_stat_keys = [
     'client_rpc_server_caps' => 1,
     'client_rpc_test_stateid' => 1,
     'client_rpc_wrcache' => 1,
+    'client_rpc_info_calls' => 1,
     'server_Clients' => 1,
     'server_Delegs' => 1,
     'server_FHcache_anon' => 1,
@@ -296,6 +297,7 @@ $nfs_graphs = [
             'client_rpc_info_TimedOut' => 'Timedout',
             'client_rpc_info_X_Replies' => 'X Replies',
             'client_rpc_info_authrefrsh' => 'AuthRefresh',
+            'client_rpc_info_calls' => 'Calls',
         ],
         'freebsd' => [
             'client_rpc_info_Invalid' => 'Invalid',
@@ -311,6 +313,7 @@ $nfs_graphs = [
             'client_rpc_info_TimedOut' => 'Timedout',
             'client_rpc_info_X_Replies' => 'X Replies',
             'client_rpc_info_authrefrsh' => 'AuthRefresh',
+            'client_rpc_info_calls' => 'Calls',
         ],
     ],
     'server_general' => [

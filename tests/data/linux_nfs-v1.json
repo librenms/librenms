@@ -19,11 +19,11 @@
                 {
                     "app_type": "nfs",
                     "app_state": "OK",
-                    "discovered": "1",
+                    "discovered": 1,
                     "app_state_prev": "UNKNOWN",
                     "app_status": "",
                     "app_instance": "",
-                    "data": null,
+                    "data": "{\"is_client\":1,\"is_server\":1,\"mounts\":[{\"lpath\":\"\/mnt\",\"flags\":[\"rw\",\"relatime\",\"hard\"],\"host\":\"127.0.0.1\",\"opts\":{\"rsize\":\"1048576\",\"clientaddr\":\"127.0.0.1\",\"addr\":\"127.0.0.1\",\"proto\":\"tcp\",\"retrans\":\"2\",\"sec\":\"sys\",\"vers\":\"4.2\",\"namlen\":\"255\",\"local_lock\":\"none\",\"timeo\":\"600\",\"wsize\":\"1048576\"},\"rpath\":\"\/tmp\"}],\"mounted_by\":[],\"os\":\"linux\"}",
                     "deleted_at": null
                 }
             ],
