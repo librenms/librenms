@@ -23,7 +23,7 @@
                     "app_state_prev": "UNKNOWN",
                     "app_status": "",
                     "app_instance": "",
-                    "data": "{\"is_client\":1,\"is_server\":1,\"mounts\":[{\"lpath\":\"\/mnt\",\"flags\":[\"rw\",\"relatime\",\"hard\"],\"host\":\"127.0.0.1\",\"opts\":{\"rsize\":\"1048576\",\"clientaddr\":\"127.0.0.1\",\"addr\":\"127.0.0.1\",\"proto\":\"tcp\",\"retrans\":\"2\",\"sec\":\"sys\",\"vers\":\"4.2\",\"namlen\":\"255\",\"local_lock\":\"none\",\"timeo\":\"600\",\"wsize\":\"1048576\"},\"rpath\":\"\/tmp\"}],\"mounted_by\":[],\"os\":\"linux\"}",
+                    "data": "{\"is_client\":1,\"is_server\":1,\"mounts\":[{\"lpath\":\"\\/mnt\",\"flags\":[\"rw\",\"relatime\",\"hard\"],\"host\":\"127.0.0.1\",\"opts\":{\"rsize\":\"1048576\",\"clientaddr\":\"127.0.0.1\",\"addr\":\"127.0.0.1\",\"proto\":\"tcp\",\"retrans\":\"2\",\"sec\":\"sys\",\"vers\":\"4.2\",\"namlen\":\"255\",\"local_lock\":\"none\",\"timeo\":\"600\",\"wsize\":\"1048576\"},\"rpath\":\"\\/tmp\"}],\"mounted_by\":[],\"os\":\"linux\"}",
                     "deleted_at": null
                 }
             ],
@@ -720,13 +720,13 @@
                 },
                 {
                     "metric": "server_cache_Misses",
-                    "value": "0",
+                    "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
                     "metric": "server_cache_nocache",
-                    "value": "16590",
+                    "value": 16590,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
@@ -756,7 +756,7 @@
                 },
                 {
                     "metric": "server_FHcache_anon",
-                    "value": "0",
+                    "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
@@ -780,7 +780,7 @@
                 },
                 {
                     "metric": "server_FHcache_stale",
-                    "value": "0",
+                    "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
@@ -996,7 +996,7 @@
                 },
                 {
                     "metric": "server_rpc_DelePurge",
-                    "value": "0",
+                    "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
@@ -1211,12 +1211,6 @@
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "server_rpc_OpeAttr",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "nfs"
-                },
-                {
                     "metric": "server_rpc_Open",
                     "value": 36,
                     "value_prev": null,
@@ -1224,12 +1218,6 @@
                 },
                 {
                     "metric": "server_rpc_OpenAttr",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "nfs"
-                },
-                {
-                    "metric": "server_rpc_OpenCfrm",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
@@ -1248,12 +1236,18 @@
                 },
                 {
                     "metric": "server_rpc_PutFH",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "nfs"
+                },
+                {
+                    "metric": "server_rpc_pathConf",
                     "value": 3926,
                     "value_prev": null,
                     "app_type": "nfs"
                 },
                 {
-                    "metric": "server_rpc_PutPubFH",
+                    "metric": "server_rpc_PutFH",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "nfs"
