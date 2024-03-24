@@ -1370,5 +1370,23 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "ipv6-addresses": {
+        "discovery": {
+            "addresses": [
+                {
+                    "ipv6_address": "fd00:2:100:0:220:6bff:fe4a:f325",
+                    "ipv6_prefixlen": 64,
+                    "ipv6_origin": "stateless",
+                    "context_name": ""
+                }
+            ],
+            "networks": [
+                {
+                    "ipv6_network": "fd00:2:100::/64",
+                    "context_name": ""
+                }
+            ]
+        }
     }
 }

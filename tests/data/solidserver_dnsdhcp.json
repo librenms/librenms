@@ -1037,8 +1037,8 @@
                     "ifName": "lo0",
                     "portName": null,
                     "ifIndex": 5,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -2916,6 +2916,24 @@
                     "storage_perc": 3,
                     "storage_perc_warn": 60,
                     "storage_deleted": 0
+                }
+            ]
+        }
+    },
+    "ipv6-addresses": {
+        "discovery": {
+            "addresses": [
+                {
+                    "ipv6_address": "2a0b:6880:0000:0001:0000:0000:0000:0010",
+                    "ipv6_prefixlen": 64,
+                    "ipv6_origin": "other",
+                    "context_name": ""
+                }
+            ],
+            "networks": [
+                {
+                    "ipv6_network": "2a0b:6880:0:1::/64",
+                    "context_name": ""
                 }
             ]
         }
