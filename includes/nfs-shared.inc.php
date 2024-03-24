@@ -251,6 +251,8 @@ $nfs_stat_keys = [
 // list of stats that are gauges
 $gauge_stats = [
     'server_cache_CacheSize' => 1,
+    'server_Clients' => 1,
+    'server_cache_TCPPeak' => 1,
 ];
 
 // graph info
