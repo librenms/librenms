@@ -1,0 +1,35 @@
+--
+-- CIENA-6500R-SLOTS-MIB.
+--
+
+CIENA-6500R-SLOTS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    cienaRls
+        FROM CIENA-SMI
+    MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI;
+
+cienaRlsSlotsMIB MODULE-IDENTITY
+    LAST-UPDATED "202009300000Z"
+    ORGANIZATION 
+        "Ciena Corporation"
+    CONTACT-INFO 
+        "Web URL: http://www.ciena.com/
+         Postal:  7035 Ridge Road
+         Hanover, Maryland 21076
+         U.S.A.
+         Phone:   +1 800-921-1144
+         Fax:     +1 410-694-5750"
+    DESCRIPTION 
+        "This modules describes slots for the 6500r platform"
+    REVISION    "202009300000Z"
+    DESCRIPTION 
+        "Initial revision."
+    ::= { cienaRls 1 }
+
+
+rlsInventory OBJECT IDENTIFIER
+    ::= { cienaRlsSlotsMIB 1 }
+
+END -- end of module CIENA-6500R-SLOTS-MIB.
