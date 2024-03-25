@@ -119,6 +119,7 @@ class MempoolsController extends TableController
             'type' => 'mempool_usage',
             'id' => $mempool->mempool_id,
             'from' => Config::get('time.day'),
+            'to' => Config::get('time.now') ,
             'height' => 150,
             'width' => 400,
         ];
@@ -129,7 +130,7 @@ class MempoolsController extends TableController
         $total = $is_percent ? $mempool->mempool_total : Number::formatBi($mempool->mempool_total);
 
         $percent = Html::percentageBar(400, 20, $mempool->mempool_perc, "$used / $total", $free, $mempool->mempool_perc_warn);
-        $link = Url::generate(['page' => 'graphs'], Arr::only($graph, ['id', 'type', 'from']));
+        $link = Url::generate(['page' => 'graphs'], Arr::only($graph, ['id', 'type', 'from','to']));
 
         return Url::overlibLink($link, $percent, Url::graphTag($graph));
     }

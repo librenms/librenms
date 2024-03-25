@@ -116,6 +116,7 @@ class Html
         $graph_data = [];
         foreach ($periods as $period => $period_text) {
             $graph_array['from'] = Config::get("time.$period");
+            $graph_array['to'] = Config::get("time.now"); 
             $graph_array_zoom = $graph_array;
             $graph_array_zoom['height'] = '150';
             $graph_array_zoom['width'] = '400';
