@@ -3,7 +3,7 @@
 return [
     'default' => 'template.librenms',
 
-    'root_script' => null,
+    'use_cdn' => false,
 
     'template_factory' => [
         'templates' => [
