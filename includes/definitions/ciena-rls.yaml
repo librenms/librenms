@@ -6,6 +6,23 @@ over:
     - { graph: device_bits, text: Traffic }
 type: network
 mib_dir: ciena
+discovery_modules:
+    bgp-peers: false
+    cisco-vrf-lite: false
+    fdb-table: false
+    hr-device: false
+    mpls: false
+    ports-stack: false
+    stp: false
+    ucd-diskio: false
+    vlans: false
+poller_modules:
+    bgp-peers: false
+    hr-mib: false
+    mpls: false
+    stp: false
+    ucd-mib: false
+    ucd-diskio: false
 discovery:
     -
         sysObjectID:
