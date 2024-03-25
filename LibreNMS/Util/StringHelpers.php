@@ -60,6 +60,7 @@ class StringHelpers
             'mojo_cape_submit' => 'Mojo CAPE Submit',
             'mailcow-postfix' => 'mailcow-dockerized postfix',
             'mysql' => 'MySQL',
+            'nfs' => 'NFS',
             'nfs-server' => 'NFS Server',
             'nfs-stats' => 'NFS Stats',
             'nfs-v3-stats' => 'NFS v3 Stats',
