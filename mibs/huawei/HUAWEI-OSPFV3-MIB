@@ -1,9 +1,9 @@
 -- ==================================================================
--- Copyright (C) 2017 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2022 by  HUAWEI TECHNOLOGIES. All rights reserved.
 -- 
 -- Description: HUAWEI-OSPFV3-MIB.mib, The HUAWEI-OSPFV3-MIB provides information about OSPFv3
 -- Reference: draft-ietf-ospf-ospfv3-mib-11
--- Version:    V2.19
+-- Version:    V2.28
 -- History:
 -- ==================================================================
 
@@ -16,7 +16,7 @@
             MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, mib-2, 
             Counter32, Gauge32, Integer32, Unsigned32 
                     FROM SNMPv2-SMI  
-            TEXTUAL-CONVENTION, TruthValue, RowStatus 
+            TEXTUAL-CONVENTION, TruthValue, RowStatus, DisplayString 
                     FROM SNMPv2-TC 
             MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP 
                     FROM SNMPv2-CONF 
@@ -29,7 +29,7 @@
                     FROM OSPF-MIB; 
     
     hwOspfv3 MODULE-IDENTITY 
-            LAST-UPDATED "201708172015Z" 
+            LAST-UPDATED "202208151236Z" 
         ORGANIZATION 
                  "Huawei Technologies Co.,Ltd."
             CONTACT-INFO 
@@ -48,6 +48,53 @@
                   see the RFC itself for full legal 
                   notices." 
 
+            REVISION "202208151236Z"
+            DESCRIPTION "Added object hwOspfv3NbrThresholdUpper, hwOspfv3NbrExceedThreshold, hwOspfv3NbrExceedThresholdClear"
+
+            REVISION "202204191030Z"
+            DESCRIPTION "modify hwOspfv3IntraAreaRouteridConflict"
+
+            REVISION "202204181740Z"
+            DESCRIPTION "Added hwOspfv3IntraAreaRouteridConflict, hwOspfv3IntraAreaRouteridConflictClear"
+
+            REVISION "202203221540Z"
+            DESCRIPTION "modify hwOspfv3LinkCostAdjustment, hwOspfv3LinkCostAdjustmentClear"
+
+            REVISION "202203031538Z"
+            DESCRIPTION "Added hwOspfv3LinkCostAdjustment, hwOspfv3LinkCostAdjustmentClear, hwOspfCostAdjustReason, hwOspfv3OriginalCost, hwOspfv3AdjustedCost"
+
+            REVISION "202201201439Z"
+            DESCRIPTION "Added import DisplayString"
+
+            REVISION "202110201019Z"
+            DESCRIPTION "Added hwOspfv3RouteLoopDetected, hwOspfv3RouteLoopDetectedClear, hwOspfv3LoopDetectType, hwOspfv3LoopDetectProtocolAttr, hwOspfv3LoopDetectRedistributeID1, hwOspfv3LoopDetectRedistributeID2"
+
+
+            REVISION "202007272055Z"
+            DESCRIPTION "modify discription of 
+                                       hwOspfv3AreaNssaTranslatorState,
+                                       hwOspfv3AreaNssaTranslatorEvents,
+                                       hwOspfv3AsLsdbEntry,
+                                       hwOspfv3AreaLsdbEntry,
+                                       hwOspfv3LinkLsdbEntry,
+                                       hwOspfv3IfEntry,
+                                       hwOspfv3VirtIfEntry,
+                                       hwOspfv3NbrEntry,
+                                       hwOspfv3NbrRestartHelperExitRc,
+                                       hwOspfv3CfgNbrEntry,
+                                       hwOspfv3VirtNbrEntry,
+                                       hwOspfv3VirtNbrRestartHelperExitRc,
+                                       hwOspfv3AreaAggregateEntry,
+                                       hwOspfv3LsaId"
+
+            REVISION "201911041056Z"
+            DESCRIPTION "modify discription of 
+                                       hwOspfv3VirtIfStateChange,
+                                       hwOspfv3IfStateChange,
+                                       hwOspfv3NbrStateChange,
+                                       hwOspfv3VirtNbrStateChange,
+                                       hwOspfv3ExtAreaLsdbLimit,
+                                       hwOspfv3ReadOnlyCompliance"
 
             REVISION "201708172015Z"
             DESCRIPTION "modify hwOspfv3PeerFlappingSuppressStatus discription"
@@ -278,7 +325,7 @@
             MAX-ACCESS      read-only 
             STATUS          current 
             DESCRIPTION 
-                "The number of AS-Scope (e.g. AS-External) link state 
+                "The number of AS-Scope (for example AS-External) link state 
                 advertisements in the link state database." 
             ::= { hwOspfv3GeneralGroup 6 } 
  
@@ -347,7 +394,7 @@
                 ospfv3ExtAreaLsdbLimit non-default AS-external-LSAs 
                 in its database. Ospfv3ExtAreaLsdbLimit MUST be set 
                 identically in all routers attached to the OSPFv3 
-                backbone and/or any regular OSPFv3 area. (i.e., 
+                backbone and/or any regular OSPFv3 area. (that is, 
                 OSPFv3 stub areas and NSSAs are excluded)." 
             ::= { hwOspfv3GeneralGroup 11 } 
  
@@ -655,16 +702,7 @@
             MAX-ACCESS      read-only
             STATUS          current
             DESCRIPTION
-                 "Indicates if and how an NSSA border router is
-                 performing NSSA translation of NSSA-LSAs into
-                 AS-External-LSAs.  When this object is set to
-                 'enabled', the NSSA border router's
-                 ospfv3AreaNssaTranslatorRole has been set to 'always'.
-                 When this object is set to 'elected', a candidate
-                 NSSA border router is translating NSSA-LSAs into
-                 AS-External-LSAs.  When this object is set to
-                 'disabled', a candidate NSSA Border router is NOT
-                 translating NSSA-LSAs into AS-External-LSAs."
+                 "Indicates if and how an NSSA border router is performing NSSA translation of NSSA-LSAs into AS-External-LSAs.  When this object is set to 'enabled', the NSSA border router's ospfv3AreaNssaTranslatorRole has been set to 'always'. When this object is set to 'elected', a candidate NSSA border router is translating NSSA-LSAs into AS-External-LSAs.  When this object is set to 'disabled', a candidate NSSA Border router is NOT translating NSSA-LSAs into AS-External-LSAs."
             ::= { hwOspfv3AreaEntry 12 }
             
     hwOspfv3AreaNssaTranslatorStabInterval OBJECT-TYPE 
@@ -684,14 +722,7 @@
             MAX-ACCESS      read-only 
             STATUS          current 
             DESCRIPTION
-                "Indicates the number of Translator state changes
-                that have occurred since the last start-up of the
-                OSPFv3 routing process.
-
-                Discontinuities in the value of this counter
-                can occur at re-initialization of the management
-                system and at other times as indicated by the
-                value of ospfv3DiscontinuityTime."
+                "Indicates the number of Translator state changes that have occurred since the last start-up of the OSPFv3 routing process. Discontinuities in the value of this counter can occur at re-initialization of the management system and at other times as indicated by the value of ospfv3DiscontinuityTime."
             ::= { hwOspfv3AreaEntry 14 }
             
     -- OSPFv3 AS-Scope Link State Database 
@@ -713,9 +744,7 @@
             STATUS          current 
             DESCRIPTION 
                 "A single AS-Scope Link State Advertisement." 
-            INDEX           { hwOspfv3AsLsdbType, 
-                              hwOspfv3AsLsdbRouterId, 
-                              hwOspfv3AsLsdbLsId } 
+            INDEX           { hwOspfv3AsLsdbType, hwOspfv3AsLsdbRouterId, hwOspfv3AsLsdbLsId } 
             ::= { hwOspfv3AsLsdbTable 1 } 
  
     HwOspfv3AsLsdbEntry ::= SEQUENCE { 
@@ -861,10 +890,7 @@
             STATUS          current 
             DESCRIPTION 
                 "A single Area-Scope Link State Advertisement." 
-            INDEX           { hwOspfv3AreaLsdbAreaId, 
-                              hwOspfv3AreaLsdbType, 
-                              hwOspfv3AreaLsdbRouterId, 
-                              hwOspfv3AreaLsdbLsId } 
+            INDEX           { hwOspfv3AreaLsdbAreaId, hwOspfv3AreaLsdbType, hwOspfv3AreaLsdbRouterId, hwOspfv3AreaLsdbLsId } 
             ::= { hwOspfv3AreaLsdbTable 1 } 
  
     HwOspfv3AreaLsdbEntry ::= SEQUENCE { 
@@ -1023,11 +1049,7 @@
             STATUS          current 
             DESCRIPTION 
                 "A single Link-Scope Link State Advertisement." 
-            INDEX           { hwOspfv3LinkLsdbIfIndex, 
-                              hwOspfv3LinkLsdbIfInstId, 
-                              hwOspfv3LinkLsdbType, 
-                              hwOspfv3LinkLsdbRouterId, 
-                              hwOspfv3LinkLsdbLsId } 
+            INDEX           { hwOspfv3LinkLsdbIfIndex, hwOspfv3LinkLsdbIfInstId, hwOspfv3LinkLsdbType, hwOspfv3LinkLsdbRouterId, hwOspfv3LinkLsdbLsId } 
             ::= { hwOspfv3LinkLsdbTable 1 } 
  
     HwOspfv3LinkLsdbEntry ::= SEQUENCE { 
@@ -1199,8 +1221,7 @@
             DESCRIPTION 
                 "The OSPFv3 Interface Entry describes one 
                 interface from the viewpoint of OSPFv3." 
-            INDEX           { hwOspfv3IfIndex, 
-                              hwOspfv3IfInstId } 
+            INDEX           { hwOspfv3IfIndex, hwOspfv3IfInstId } 
             ::= { hwOspfv3IfTable 1 } 
  
  
@@ -1249,7 +1270,7 @@
  
     hwOspfv3IfIndex OBJECT-TYPE 
             SYNTAX          InterfaceIndex 
-            MAX-ACCESS      not-accessible 
+            MAX-ACCESS      accessible-for-notify 
             STATUS          current 
             DESCRIPTION 
                 "The interface index of this OSPFv3 interface. 
@@ -1259,7 +1280,7 @@
  
     hwOspfv3IfInstId OBJECT-TYPE 
             SYNTAX          HWOspfv3IfInstIdTc 
-            MAX-ACCESS      not-accessible 
+            MAX-ACCESS      accessible-for-notify 
             STATUS          current 
             DESCRIPTION 
                 "Enables multiple interface instances of OSPFv3 
@@ -1526,8 +1547,7 @@
             STATUS          current 
             DESCRIPTION 
                 "Information about a single Virtual Interface." 
-            INDEX           { hwOspfv3VirtIfAreaId, 
-                              hwOspfv3VirtIfNeighbor } 
+            INDEX           { hwOspfv3VirtIfAreaId, hwOspfv3VirtIfNeighbor } 
             ::= { hwOspfv3VirtIfTable 1 } 
  
     HwOspfv3VirtIfEntry ::= SEQUENCE { 
@@ -1738,9 +1758,7 @@
             REFERENCE 
                 "OSPF Version 2, Section 10 The Neighbor Data 
                 Structure" 
-            INDEX           { hwOspfv3NbrIfIndex, 
-                              hwOspfv3NbrIfInstId, 
-                              hwOspfv3NbrRtrId } 
+            INDEX           { hwOspfv3NbrIfIndex, hwOspfv3NbrIfInstId, hwOspfv3NbrRtrId } 
             ::= { hwOspfv3NbrTable 1 } 
  
     HwOspfv3NbrEntry ::= SEQUENCE { 
@@ -1933,15 +1951,12 @@
            MAX-ACCESS   read-only  
            STATUS       current  
            DESCRIPTION  
-              "Describes the outcome of the last attempt at acting  
-              as a Graceful restart helper for the neighbor. 
-    
-              none:............no restart has yet been attempted. 
-              inProgress:......a restart attempt is currently underway. 
-              completed:.......the last restart completed successfully. 
-              timedOut:........the last restart timed out. 
-              topologyChanged:.the last restart was aborted due to 
-                               a topology change."  
+              "Describes the outcome of the last attempt at acting as a Graceful restart helper for the neighbor.
+               - none: No restart has yet been attempted.
+               - inProgress: A restart attempt is currently underway.
+               - completed: The last restart completed successfully.
+               - timedOut: The last restart timed out.
+               - topologyChanged: The last restart was aborted due to a topology change."
         ::= { hwOspfv3NbrEntry 15 } 
  
  
@@ -1973,9 +1988,7 @@
             REFERENCE 
                 "OSPF Version 2, Section 10 The Neighbor Data 
                 Structure" 
-            INDEX           { hwOspfv3CfgNbrIfIndex, 
-                              hwOspfv3CfgNbrIfInstId,                                
-                              hwOspfv3CfgNbrRtrId } 
+            INDEX           { hwOspfv3CfgNbrIfIndex, hwOspfv3CfgNbrIfInstId, hwOspfv3CfgNbrRtrId } 
             ::= { hwOspfv3CfgNbrTable 1 } 
  
     HwOspfv3CfgNbrEntry ::= SEQUENCE { 
@@ -2067,8 +2080,7 @@
             STATUS          current 
             DESCRIPTION 
                 "Virtual neighbor information." 
-            INDEX           { hwOspfv3VirtNbrArea, 
-                              hwOspfv3VirtNbrRtrId } 
+            INDEX           { hwOspfv3VirtNbrArea, hwOspfv3VirtNbrRtrId } 
             ::= { hwOspfv3VirtNbrTable 1 } 
  
     HwOspfv3VirtNbrEntry ::= SEQUENCE { 
@@ -2292,11 +2304,7 @@
                 the preferred one." 
             REFERENCE 
                 "OSPF Version 2, Appendix C.2  Area parameters" 
-            INDEX           { hwOspfv3AreaAggregateAreaId,  
-                              hwOspfv3AreaAggregateAreaLsdbType, 
-                              hwOspfv3AreaAggregatePrefixType, 
-                              hwOspfv3AreaAggregatePrefix, 
-                              hwOspfv3AreaAggregatePrefixLength } 
+            INDEX           { hwOspfv3AreaAggregateAreaId, hwOspfv3AreaAggregateAreaLsdbType, hwOspfv3AreaAggregatePrefixType, hwOspfv3AreaAggregatePrefix, hwOspfv3AreaAggregatePrefixLength } 
             ::= { hwOspfv3AreaAggregateTable 1 } 
  
     HwOspfv3AreaAggregateEntry ::= SEQUENCE { 
@@ -2586,8 +2594,7 @@ holdmaxcost(3): OSPFv3 neighbor relationship flapping suppression works in Hold-
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                  "A 32-bit integer uniquely identifies an area.
-                LSA-ID 0.0.0.0 is used for the OSPF LSA."
+                  "A 32-bit integer uniquely identifies an area. LSA-ID 0.0.0.0 is used for the OSPF LSA."
             ::= { hwOspfv3NotificationEntry 12 } 
 
         hwOspfv3LsaAge OBJECT-TYPE
@@ -2733,6 +2740,70 @@ holdmaxcost(3): OSPFv3 neighbor relationship flapping suppression works in Hold-
             DESCRIPTION
                   "This object indicates the 32-bit integer that uniquely identifies the router in the Autonomous System."
             ::= { hwOspfv3NotificationEntry 30 }
+ 
+     hwOspfv3LoopDetectType OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (0..16))
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                  "This object indicates the type of the OSPFv3 import route loop detect."
+            ::= { hwOspfv3NotificationEntry 31 }
+             
+     hwOspfv3LoopDetectProtocolAttr OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (0..64))
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                  "This object indicates the protocol attribute of the OSPFv3 import route loop detect."
+            ::= { hwOspfv3NotificationEntry 32 }
+             
+     hwOspfv3LoopDetectRedistributeID1 OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (0..32))
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                  "This object indicates the redis-list router id and process id of the OSPFv3 import route loop detect."
+            ::= { hwOspfv3NotificationEntry 33 }
+             
+     hwOspfv3LoopDetectRedistributeID2 OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (0..32))
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                  "This object indicates the redis-list router id and process id of the OSPFv3 import route loop detect."
+            ::= { hwOspfv3NotificationEntry 34 }
+     
+     hwOspfv3CostAdjustReason OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (0..64))
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                  "This object indicates the reason why OSPFv3 adjusts the link cost."
+            ::= { hwOspfv3NotificationEntry 35 }
+
+     hwOspfv3OriginalCost OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                  "This object indicates the original cost."
+            ::= { hwOspfv3NotificationEntry 36 }
+
+     hwOspfv3AdjustedCost OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                  "This object indicates Link cost of the current event that triggers OSPFv3 adjustment."
+            ::= { hwOspfv3NotificationEntry 37 }
+
+     hwOspfv3NbrThresholdUpper OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                  "This object indicates the upper alarm threshold for the number of neighbors. "
+            ::= { hwOspfv3NotificationEntry 38 }
 
     -- Notification definitions  
  
@@ -2748,8 +2819,8 @@ holdmaxcost(3): OSPFv3 neighbor relationship flapping suppression works in Hold-
            interface. 
  
            This notification should be generated when the interface 
-           state regresses (e.g., goes from Point-to-Point to Down) 
-           or progresses to a terminal state (i.e., Point-to-Point)." 
+           state regresses (for example, goes from Point-to-Point to Down) 
+           or progresses to a terminal state (that is, Point-to-Point)." 
         ::= { hwOspfv3Notifications 1 } 
  
    hwOspfv3NbrStateChange NOTIFICATION-TYPE 
@@ -2764,8 +2835,8 @@ holdmaxcost(3): OSPFv3 neighbor relationship flapping suppression works in Hold-
            there has been a change in the state of a 
            non-virtual OSPFv3 neighbor. This notification should be 
            generated when the neighbor state regresses 
-           (e.g., goes from Attempt or Full to 1-Way or 
-           Down) or progresses to a terminal state (e.g., 
+           (for example, goes from Attempt or Full to 1-Way or 
+           Down) or progresses to a terminal state (for example, 
            2-Way or Full). When an neighbor transitions 
            from or to Full on non-broadcast multi-access 
            and broadcast networks, the notification should be 
@@ -2784,9 +2855,9 @@ holdmaxcost(3): OSPFv3 neighbor relationship flapping suppression works in Hold-
            "An ospfv3VirtNbrStateChange notification signifies 
            that there has been a change in the state of an OSPFv3 
            virtual neighbor. This notification should be generated 
-           when the neighbor state regresses (e.g., goes 
+           when the neighbor state regresses (for example, goes 
            from Attempt or Full to 1-Way or Down) or 
-           progresses to a terminal state (e.g., Full)." 
+           progresses to a terminal state (for example, Full)." 
         ::= { hwOspfv3Notifications 3 } 
  
    hwOspfv3IfConfigError NOTIFICATION-TYPE 
@@ -2864,9 +2935,9 @@ holdmaxcost(3): OSPFv3 neighbor relationship flapping suppression works in Hold-
            "An ospfv3IfStateChange notification signifies that there 
            has been a change in the state of a non-virtual 
            OSPFv3 interface. This notification should be generated 
-           when the interface state regresses (e.g., goes 
+           when the interface state regresses (for example, goes 
            from Dr to Down) or progresses to a terminal 
-           state (i.e., Point-to-Point, DR Other, Dr, or 
+           state (that is, Point-to-Point, DR Other, Dr, or 
            Backup)." 
         ::= { hwOspfv3Notifications 8 } 
  
@@ -3029,7 +3100,7 @@ holdmaxcost(3): OSPFv3 neighbor relationship flapping suppression works in Hold-
         OBJECTS { hwOspfv3ProcessId, hwOspfv3RouterId, hwOspfv3AreaIdIndex, hwOspfv3IfName, hwOspfv3LsaId, hwOspfv3LsaAge }  
         STATUS       current 
         DESCRIPTION 
-           "This object is used to monitor the router recive a greater age lsa in ospfv3." 
+           "This object is used to monitor the router receive a greater age lsa in ospfv3." 
         ::= { hwOspfv3Notifications 25 }
         
    hwOspfv3DeleteRouteByPurge NOTIFICATION-TYPE
@@ -3154,6 +3225,62 @@ holdmaxcost(3): OSPFv3 neighbor relationship flapping suppression works in Hold-
             "This object indicates that OSPFv3 routes advertised by another device were not deleted."
         ::= { hwOspfv3Notifications 39 }
 
+    hwOspfv3RouteLoopDetected NOTIFICATION-TYPE
+            OBJECTS { hwOspfv3LoopDetectType, hwOspfv3LoopDetectProtocolAttr, hwOspfv3LoopDetectRedistributeID1, hwOspfv3LoopDetectRedistributeID2 }
+            STATUS current
+            DESCRIPTION
+                "This object indicates that a routing loop has been detected on the local device."
+            ::= { hwOspfv3Notifications 40 }
+            
+    hwOspfv3RouteLoopDetectedClear NOTIFICATION-TYPE
+            OBJECTS { hwOspfv3LoopDetectType, hwOspfv3LoopDetectProtocolAttr, hwOspfv3LoopDetectRedistributeID1, hwOspfv3LoopDetectRedistributeID2 }
+            STATUS current
+            DESCRIPTION
+                "This object indicates that the routing loop is cleared."
+            ::= { hwOspfv3Notifications 41}
+            
+    hwOspfv3LinkCostAdjustment NOTIFICATION-TYPE
+            OBJECTS { hwOspfv3ProcessId, hwOspfv3AreaIdIndex, hwOspfv3IfIndex, hwOspfv3IfInstId, hwOspfv3IfName, hwOspfv3CostAdjustReason, hwOspfv3OriginalCost, hwOspfv3AdjustedCost}
+            STATUS current
+            DESCRIPTION
+                "This object indicates that an OSPF link cost adjustment event occurs."
+            ::= { hwOspfv3Notifications 42 }
+            
+    hwOspfv3LinkCostAdjustmentClear NOTIFICATION-TYPE
+            OBJECTS { hwOspfv3ProcessId, hwOspfv3AreaIdIndex, hwOspfv3IfIndex, hwOspfv3IfInstId, hwOspfv3IfName, hwOspfv3CostAdjustReason, hwOspfv3OriginalCost, hwOspfv3AdjustedCost}
+            STATUS current
+            DESCRIPTION
+                "This object indicates that an OSPF link cost adjustment event is cleared."
+            ::= { hwOspfv3Notifications 43}
+
+    hwOspfv3IntraAreaRouterIdConflict NOTIFICATION-TYPE
+            OBJECTS { hwOspfv3ProcessId, hwOspfv3RouterId, hwOspfv3AreaIdIndex }
+            STATUS current
+            DESCRIPTION
+                "The object is used to monitor router ID conflict in an intra area."
+            ::= { hwOspfv3Notifications 44}
+
+    hwOspfv3IntraAreaRouterIdConflictClear NOTIFICATION-TYPE
+            OBJECTS { hwOspfv3ProcessId, hwOspfv3AreaIdIndex, hwOspfv3RouterId, hwOspfv3NewRouterId }
+            STATUS current
+            DESCRIPTION
+                "The object is used to monitor router ID conflict recovery in an intra area."
+            ::= { hwOspfv3Notifications 45}
+
+    hwOspfv3NbrExceedThreshold NOTIFICATION-TYPE
+            OBJECTS { hwOspfv3NbrThresholdUpper }
+            STATUS current
+            DESCRIPTION
+                "This object indicates that the number of ospfv3 exceeds the configed threshold."
+            ::= { hwOspfv3Notifications 46}
+
+    hwOspfv3NbrExceedThresholdClear NOTIFICATION-TYPE
+            OBJECTS { hwOspfv3NbrThresholdUpper }
+            STATUS current
+            DESCRIPTION
+                "This object indicates that the number of ospfv3 has been less than the the configed threshold."
+            ::= { hwOspfv3Notifications 47}
+                        
     -- conformance information 
  
     hwOspfv3Groups      OBJECT IDENTIFIER ::= { hwOspfv3Conformance 1 } 
@@ -3231,7 +3358,7 @@ holdmaxcost(3): OSPFv3 neighbor relationship flapping suppression works in Hold-
           STATUS     current
           DESCRIPTION
                   "When this MIB module is implemented without
-                  support for read-create (i.e., in read-only
+                  support for read-create (that is, in read-only
                   mode), the implementation can claim read-only
                   compliance.  Such a device can then be monitored,
                   but cannot be configured with this MIB."
@@ -3660,7 +3787,36 @@ holdmaxcost(3): OSPFv3 neighbor relationship flapping suppression works in Hold-
                             hwOspfv3NbrStateChgReason,
                             hwOspfv3ProcessId,
                             hwOspfv3AreaIdIndex,
-                            hwOspfv3NewRouterId                            
+                            hwOspfv3NewRouterId,
+                            hwOspfv3PeerFlappingSuppressStatus,
+                            hwOspfv3PeerFlappingSuppressReason,
+                            hwOspfv3LsaId,
+                            hwOspfv3LsaAge,
+                            hwOspfv3PurgeHostName,
+                            hwOspfv3PurgeIpAddress,
+                            hwOspfv3PurgeRouterId,
+                            hwOspfv3FlushLsaNum,
+                            hwOspfv3AffectedNodeNum,
+                            hwOspfv3TotalNodeNum,
+                            hwOspfv3PurgeStatPeriod,
+                            hwOspfv3RuledOutDeviceNum,
+                            hwOspfv3PurgeHostName1,
+                            hwOspfv3PurgeHostName2,
+                            hwOspfv3PurgeHostName3,
+                            hwOspfv3PurgeIpAddress1,
+                            hwOspfv3PurgeIpAddress2,
+                            hwOspfv3PurgeIpAddress3,
+                            hwOspfv3PurgeRouterId1,
+                            hwOspfv3PurgeRouterId2,
+                            hwOspfv3PurgeRouterId3,
+                            hwOspfv3LoopDetectType,
+                            hwOspfv3LoopDetectProtocolAttr,
+                            hwOspfv3LoopDetectRedistributeID1,
+                            hwOspfv3LoopDetectRedistributeID2,
+                            hwOspfv3CostAdjustReason,
+                            hwOspfv3OriginalCost,
+                            hwOspfv3AdjustedCost,
+                            hwOspfv3NbrThresholdUpper
                             } 
             STATUS          current 
             DESCRIPTION 
@@ -3708,7 +3864,15 @@ holdmaxcost(3): OSPFv3 neighbor relationship flapping suppression works in Hold-
                             hwOspfv3ThirdPartRouteBeDeletedByPurgeInexact,
                             hwOspfv3ThirdPartRouteBeDeletedByPurgeInexactClear,
                             hwOspfv3ThirdPartRouteBeDeletedByPurge,
-                            hwOspfv3ThirdPartRouteBeDeletedByPurgeClear
+                            hwOspfv3ThirdPartRouteBeDeletedByPurgeClear,
+                            hwOspfv3RouteLoopDetected,
+                            hwOspfv3RouteLoopDetectedClear,
+                            hwOspfv3LinkCostAdjustment,
+                            hwOspfv3LinkCostAdjustmentClear,
+                            hwOspfv3IntraAreaRouterIdConflict,
+                            hwOspfv3IntraAreaRouterIdConflictClear,
+                            hwOspfv3NbrExceedThreshold,
+                            hwOspfv3NbrExceedThresholdClear 
                             } 
             STATUS          current 
             DESCRIPTION 
