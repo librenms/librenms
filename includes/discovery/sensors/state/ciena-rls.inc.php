@@ -27,7 +27,6 @@
  * @copyright  2024 KanREN, Inc
  * @author     Heath Barnhart <hbarnhart@kanren.net>
  */
-
 $ampModes = [
     ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'Power'],
     ['value' => 2, 'generic' => 0, 'graph' => 0, 'descr' => 'Gain'],
@@ -52,9 +51,8 @@ $ampForceShutdown = [
     ['value' => 2, 'generic' => 1, 'graph' => 0, 'descr' => 'Enabled'],
 ];
 
-$oidList = array('rlsInventoryAmpsAmpMode', 'rlsInventoryAmpsState', 'rlsInventoryAmpsGainMode', 'rlsInventoryAmpsForcedShutdown');
+$oidList = ['rlsInventoryAmpsAmpMode', 'rlsInventoryAmpsState', 'rlsInventoryAmpsGainMode', 'rlsInventoryAmpsForcedShutdown'];
 foreach ($oidList as $oidName) {
-
     $oids = snmp_walk($device, $oidName, '-OesqnU', 'CIENA-6500R-INVENTORY-AMPS-MIB');
     if (isset($oids) && $oids) {
         d_echo($oids . "\n");
@@ -85,15 +83,15 @@ foreach ($oidList as $oidName) {
             $slotLen = array_shift($expIndex);
             while ($slotLen > 0) {
                 $slotId .= chr(array_shift($expIndex));
-                --$slotLen;
+                $slotLen--;
             }
             $ampLen = array_shift($expIndex);
             while ($ampLen > 0) {
                 $ampId .= chr(array_shift($expIndex));
-                --$ampLen;
+                $ampLen--;
             }
             $descr = "Slot $slotId $ampId";
-            $stateIndex = $oidName . "." . $index;
+            $stateIndex = $oidName . '.' . $index;
             discover_sensor(
                 $valid['sensor'],
                 'state',

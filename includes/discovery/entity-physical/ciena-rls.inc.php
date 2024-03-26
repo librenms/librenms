@@ -27,14 +27,12 @@
  * @copyright  2024 KanREN, Inc
  * @author     Heath Barnhart <hbarnhart@kanren.net>
  */
-
 $entity_array = [];
 
 $inventory = snmpwalk_cache_multi_oid($device, 'rlsCircuitPackTable', [], 'CIENA-6500R-INVENTORY-MIB');
 
-foreach ($inventory as $inventory => $inventoryItems){
-
-        $entity_array[] = [
+foreach ($inventory as $inventory => $inventoryItems) {
+    $entity_array[] = [
         'entPhysicalIndex' => $inventory, //need to derive index from the oid
         'entPhysicalDescr' => $inventoryItems['rlsCircuitPackCtype'],
         'entPhysicalName' => $inventoryItems['rlsCircuitPackCtype'],
@@ -46,7 +44,6 @@ foreach ($inventory as $inventory => $inventoryItems){
         'entPhysicalHardwareRev' => $inventoryItems['rlsCircuitPackHardwareRelease'],
         'entPhysicalIsFRU' => 'true',
     ];
-
 }
 
 foreach ($entity_array as $entPhysicalIndex => $entry) {
