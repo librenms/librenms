@@ -1,8 +1,8 @@
 <?php
 /**
- * DependencyController.php
+ * NetMapController.php
  *
- * Controller for graphing Relationships
+ * Controller for dynamic network map base page
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,23 +19,25 @@
  *
  * @link       https://www.librenms.org
  *
- * @copyright  2019 Thomas Berberich
- * @author     Thomas Berberich <sourcehhdoctor@gmail.com>
+ * @copyright  2023 Steven Wilton
+ * @author     Steven Wilton <swilton@fluentit.com.au>
  */
 
 namespace App\Http\Controllers\Maps;
 
 use App\Http\Controllers\Controller;
+use App\Models\Device;
 use App\Models\DeviceGroup;
 use Illuminate\Http\Request;
 use LibreNMS\Config;
+use LibreNMS\Util\Url;
 
-class DeviceDependencyController extends Controller
+class NetMapController extends Controller
 {
     // Device Dependency Map
-    public function dependencyMap(Request $request)
+    public function netMap(Request $request, $vars = '')
     {
-        $group_id = $request->get('group');
+        $group_id = Url::parseOptions('group');
 
         $group_name = DeviceGroup::where('id', '=', $group_id)->first('name');
         if (! empty($group_name)) {
@@ -47,8 +49,9 @@ class DeviceDependencyController extends Controller
             'group_id' => $group_id,
             'options' => Config::get('network_map_vis_options'),
             'group_name' => $group_name,
+            'link_types' => Config::get('network_map_items', ['xdp', 'mac']),
         ];
 
-        return view('map.device-dependency', $data);
+        return view('map.netmap', $data);
     }
 }
