@@ -1,0 +1,193 @@
+-- ==================================================================
+-- Copyright (C) 2021 by HUAWEI TECHNOLOGIES. All rights reserved.
+-- Description:  HUAWEI LAN Switch KEYCHAIN MIB
+-- Reference:
+-- Version: V1.02
+-- Revision history: 
+--     REVISION     "203203240000Z"        
+--     DESCRIPTION  "V1.00, INIT"
+--     V1.00 2021-03-24 Created
+-- ==================================================================
+
+    HUAWEI-KEYCHAIN-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+            hwDatacomm            
+                FROM HUAWEI-MIB            
+            OBJECT-GROUP, MODULE-COMPLIANCE    
+                FROM SNMPv2-CONF          
+            OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE, Integer32
+                FROM SNMPv2-SMI
+            TEXTUAL-CONVENTION
+                FROM SNMPv2-TC;
+
+        hwKeychain MODULE-IDENTITY 
+            LAST-UPDATED "202110200000Z"
+            ORGANIZATION 
+                "Huawei Technologies Co.,Ltd."
+            CONTACT-INFO 
+                "Huawei Industrial Base
+                  Bantian, Longgang
+                   Shenzhen 518129
+                   People's Republic of China
+                   Website: http://www.huawei.com
+                   Email: support@huawei.com
+                 "
+            DESCRIPTION 
+                "Keychain is a centralized application that provides authentication 
+                 functionality to all applications that require them. It also provides 
+                 dynamic change of authentication keys to all required applications."
+            REVISION     "202110200000Z"        
+            DESCRIPTION
+               "modify HWKeychainAlgorithm"
+            REVISION     "202105100000Z"        
+            DESCRIPTION
+               "modify HWKeychainAlgorithm"
+            REVISION     "202103240000Z"        
+            DESCRIPTION  "Init"
+            ::= { hwDatacomm 369 }
+            
+        HWKeychainAlgorithm ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION 
+                "Keychain algorithm type."
+            SYNTAX INTEGER
+                {
+                notConfigured(0),
+                md5(1),
+                sha_1(2),
+                hmac_md5(3),
+                hmac_sha1_12(4),
+                hmac_sha1_20(5),
+                hmac_sha_256(6),
+                sha_256(7),
+                sm3(8),
+                aes_128_cmac(9),
+                hmac_sha_384(10),
+                hmac_sha_512(11)
+                }
+        HWKeychainMode ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION 
+                "The time mode of keychain instance."
+            SYNTAX INTEGER
+                {
+                daily(1),
+                monthly(2),
+                weekly(3),
+                yearly(4),
+                absolute(5)
+                }
+
+        hwKeychainTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwKeychainEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table containing information about configurations
+                and status of a keychain."
+            ::= { hwKeychain 1 }
+        hwKeychainEntry OBJECT-TYPE
+            SYNTAX HwKeychainEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Detailed information of a specified keychain."
+            INDEX { hwKeychainId }
+            ::= { hwKeychainTable 1 }
+        HwKeychainEntry ::=
+            SEQUENCE { 
+                hwKeychainId
+                    Integer32,
+                hwKeychainName
+                    OCTET STRING,
+                hwKeychainMode
+                    HWKeychainMode
+             }
+        hwKeychainId OBJECT-TYPE
+            SYNTAX Integer32 (1..5000)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An index uniquely identifies a keychain."
+            ::= { hwKeychainEntry 1 }
+        hwKeychainName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..47))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The name of keychain instance."
+            ::= { hwKeychainEntry 2 }
+        hwKeychainMode OBJECT-TYPE
+            SYNTAX HWKeychainMode
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The time mode of keychain instance."
+            ::= { hwKeychainEntry 3 }
+
+        hwKeyIdTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwKeyIdEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table containing information about configurations
+                and status of a keyid."
+            ::= { hwKeychain 2 }
+        hwKeyIdEntry OBJECT-TYPE
+            SYNTAX HwKeyIdEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Detailed information of a specified keyid."
+            INDEX { hwKeychainId, hwKeyId }
+            ::= { hwKeyIdTable 1 }
+        HwKeyIdEntry ::=
+            SEQUENCE { 
+                hwKeyId
+                    Integer32,
+                hwAlgorithm
+                    HWKeychainAlgorithm
+             }
+        hwKeyId OBJECT-TYPE
+            SYNTAX Integer32 (0..63)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An index uniquely identifies a keyid."
+            ::= { hwKeyIdEntry 1 }
+        hwAlgorithm OBJECT-TYPE
+            SYNTAX HWKeychainAlgorithm
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Algorithm type."
+            ::= { hwKeyIdEntry 2 }
+
+        hwKeychainMibGroup OBJECT IDENTIFIER ::= { hwKeychain 3 }
+        hwKeychainGroup OBJECT-GROUP
+            OBJECTS { hwKeychainName, hwKeychainMode }
+            STATUS current
+            DESCRIPTION 
+                "The keychain group."
+            ::= { hwKeychainMibGroup 1 }
+        hwKeyIdGroup OBJECT-GROUP
+            OBJECTS { hwAlgorithm }
+            STATUS current
+            DESCRIPTION 
+                "The key-id group."
+            ::= { hwKeychainMibGroup 2 }
+
+        hwKeychainConformance  OBJECT IDENTIFIER ::= { hwKeychain 4 }
+        hwKeychainCompliances  OBJECT IDENTIFIER ::= { hwKeychainConformance 1 }
+        hwKeychainCompliance MODULE-COMPLIANCE
+        STATUS current
+        DESCRIPTION
+                "The core compliance statement for all implementations."
+        MODULE
+        MANDATORY-GROUPS  {
+            hwKeychainMibGroup,
+            hwKeyIdGroup
+        }
+        ::= { hwKeychainCompliances 1 } 
+    END
