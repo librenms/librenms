@@ -29,28 +29,28 @@
  * @author     Heath Barnhart <hbarnhart@kanren.net>
  */
 
-$oidList = array('rlsInventoryAmpsInCurrPower', 'rlsInventoryAmpsInMinPower', 'rlsInventoryAmpsInMaxPower','rlsInventoryAmpsOutCurrPower', 'rlsInventoryAmpsOutMinPower', 'rlsInventoryAmpsOutMaxPower','rlsInventoryAmpsOpticalReturnLoss');
+$oidList = array('rlsInventoryAmpsInCurrPower', 'rlsInventoryAmpsInMinPower', 'rlsInventoryAmpsInMaxPower', 'rlsInventoryAmpsOutCurrPower', 'rlsInventoryAmpsOutMinPower', 'rlsInventoryAmpsOutMaxPower', 'rlsInventoryAmpsOpticalReturnLoss');
 
-foreach ($oidList as $oidName){
+foreach ($oidList as $oidName) {
     $oids = snmp_walk($device, $oidName, '-OsqnU', 'CIENA-6500R-INVENTORY-AMPS-MIB');
     if (isset($oids) && $oids) {
         d_echo($oids . "\n");
         $oids = trim($oids);
         $type = "ciena-rls";
-        foreach (explode(PHP_EOL, $oids) as $data){
-            [$oid,$value] = explode(' ', $data);
+        foreach (explode(PHP_EOL, $oids) as $data) {
+            [$oid, $value] = explode(' ', $data);
             $index = substr($oid, 37);
             //Index is a tuple byte string of SlotID and AmpID.
             $expIndex = explode('.', $index);
             $slotId = '';
             $ampId = '';
             $slotLen = array_shift($expIndex);
-            while ($slotLen > 0){
+            while ($slotLen > 0) {
                 $slotId .= chr(array_shift($expIndex));
                 --$slotLen;
             }
             $ampLen = array_shift($expIndex);
-            while ($ampLen > 0){
+            while ($ampLen > 0) {
                 $ampId .= chr(array_shift($expIndex));
                 --$ampLen;
             }
@@ -59,31 +59,31 @@ foreach ($oidList as $oidName){
             $group = null;
             $low_limit = null;
             $low_warn_limit = null;
-            if ($oidName == 'rlsInventoryAmpsInCurrPower'){
+            if ($oidName == 'rlsInventoryAmpsInCurrPower') {
                 $group = "Amplifier Input - Current";
                 $low_limit = snmp_walk($device, 'rlsInventoryAmpsInputLosThreshold.' . $index, '-OqvU', 'CIENA-6500R-INVENTORY-AMPS-MIB');
-            } elseif ($oidName == 'rlsInventoryAmpsInMinPower'){ 
+            } elseif ($oidName == 'rlsInventoryAmpsInMinPower') {
                 $group = "Amplifier Input - Minimum";
-            } elseif ($oidName == 'rlsInventoryAmpsInMaxPower'){
+            } elseif ($oidName == 'rlsInventoryAmpsInMaxPower') {
                 $group = "Amplifier Input - Maximum";
-            } elseif ($oidName == 'rlsInventoryAmpsOutCurrPower'){
+            } elseif ($oidName == 'rlsInventoryAmpsOutCurrPower') {
                 $group = "Amplifier Output - Current";
-            } elseif ($oidName == 'rlsInventoryAmpsOutMinPower'){
+            } elseif ($oidName == 'rlsInventoryAmpsOutMinPower') {
                 $group = "Amplifier Output - Minimum";
-            } elseif ($oidName == 'rlsInventoryAmpsOutMaxPower'){
+            } elseif ($oidName == 'rlsInventoryAmpsOutMaxPower') {
                 $group = "Amplifier Output - Maximum";
-            } elseif ($oidName == 'rlsInventoryAmpsOpticalReturnLoss'){
-                if(strpos($descr, 'Pre-Amp')){ //No ORL on Pre-Amps
+            } elseif ($oidName == 'rlsInventoryAmpsOpticalReturnLoss') {
+                if (strpos($descr, 'Pre-Amp')) { //No ORL on Pre-Amps
                     break;
                 }
                 $group = "Amplifier Optical Return Loss";
                 $low_warn_limit = snmp_walk($device, 'rlsInventoryAmpsOrlThreshold.' . $index, '-OqvU', 'CIENA-6500R-INVENTORY-AMPS-MIB'); //RLS ORL alarm level
                 $low_limit = snmp_walk($device, 'rlsInventoryAmpsAprThreshold.' . $index, '-OqvU', 'CIENA-6500R-INVENTORY-AMPS-MIB'); //RLS ORL level when APR becomes active
             }
-       
+
             discover_sensor(
                 $valid['sensor'],
-                'dbm', 
+                'dbm',
                 $device,
                 $oid,
                 $oidName . "." . $index,

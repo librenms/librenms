@@ -53,7 +53,7 @@ $ampForceShutdown = [
 ];
 
 $oidList = array('rlsInventoryAmpsAmpMode', 'rlsInventoryAmpsState', 'rlsInventoryAmpsGainMode', 'rlsInventoryAmpsForcedShutdown');
-foreach ($oidList as $oidName){
+foreach ($oidList as $oidName) {
 
     $oids = snmp_walk($device, $oidName, '-OesqnU', 'CIENA-6500R-INVENTORY-AMPS-MIB');
     if (isset($oids) && $oids) {
@@ -61,34 +61,34 @@ foreach ($oidList as $oidName){
         $oids = trim($oids);
 
         $group = null;
-        if ($oidName == 'rlsInventoryAmpsAmpMode'){
+        if ($oidName == 'rlsInventoryAmpsAmpMode') {
             $group = 'Amplifier Mode';
             create_state_index($oidName, $ampModes);
-        } elseif ($oidName == 'rlsInventoryAmpsState'){
+        } elseif ($oidName == 'rlsInventoryAmpsState') {
             $group = 'Amplifier State';
             create_state_index($oidName, $ampStates);
-        } elseif ($oidName == 'rlsInventoryAmpsGainMode'){
+        } elseif ($oidName == 'rlsInventoryAmpsGainMode') {
             $group = 'Amplifier Gain Mode';
             create_state_index($oidName, $ampGainModes);
-        } elseif ($oidName == 'rlsInventoryAmpsForcedShutdown'){
+        } elseif ($oidName == 'rlsInventoryAmpsForcedShutdown') {
             $group = 'Amplifier Forced Shutdown State';
             create_state_index($oidName, $ampForceShutdown);
         }
 
-        foreach (explode(PHP_EOL, $oids) as $data){
-            [$oid,$value] = explode(' ', $data);
+        foreach (explode(PHP_EOL, $oids) as $data) {
+            [$oid, $value] = explode(' ', $data);
             $index = substr($oid, 36);
             //Index is a tuple byte string of SlotID and AmpID.
             $expIndex = explode('.', $index);
             $slotId = '';
             $ampId = '';
             $slotLen = array_shift($expIndex);
-            while ($slotLen > 0){
+            while ($slotLen > 0) {
                 $slotId .= chr(array_shift($expIndex));
                 --$slotLen;
             }
             $ampLen = array_shift($expIndex);
-            while ($ampLen > 0){
+            while ($ampLen > 0) {
                 $ampId .= chr(array_shift($expIndex));
                 --$ampLen;
             }
@@ -96,7 +96,7 @@ foreach ($oidList as $oidName){
             $stateIndex = $oidName . "." . $index;
             discover_sensor(
                 $valid['sensor'],
-                'state', 
+                'state',
                 $device,
                 $oid,
                 $stateIndex,
