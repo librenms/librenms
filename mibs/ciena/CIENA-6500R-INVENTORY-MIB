@@ -1,0 +1,415 @@
+--
+-- CIENA-6500R-INVENTORY-MIB.
+--
+
+CIENA-6500R-INVENTORY-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    rlsInventory
+        FROM CIENA-6500R-SLOTS-MIB
+    DisplayString16, DisplayString32, DisplayString64
+        FROM CIENA-PRO-TYPES-MIB
+    AdminState, BandOccupancy, MeansurementType, 
+    PecCode, PowerEnum, RamEnum, RestartType
+        FROM CIENA-6500R-TYPES-MIB
+    Integer32, MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    TruthValue
+        FROM SNMPv2-TC;
+
+cienaRlsInventoryMIB MODULE-IDENTITY
+    LAST-UPDATED "202009300000Z"
+    ORGANIZATION 
+        "Ciena Corporation"
+    CONTACT-INFO 
+        "Web URL: http://www.ciena.com/
+         Postal:  7035 Ridge Road
+         Hanover, Maryland 21076
+         U.S.A.
+         Phone:   +1 800-921-1144
+         Fax:     +1 410-694-5750"
+    DESCRIPTION 
+        "This modules describes inventory for the 6500r platform"
+    REVISION    "202009300000Z"
+    DESCRIPTION 
+        "Initial revision."
+    ::= { rlsInventory 1 }
+
+
+rlsCircuitPack OBJECT IDENTIFIER
+    ::= { cienaRlsInventoryMIB 1 }
+
+rlsInventoryAmps OBJECT IDENTIFIER
+    ::= { cienaRlsInventoryMIB 2 }
+
+rlsInventoryProtectionGrp OBJECT IDENTIFIER
+    ::= { cienaRlsInventoryMIB 3 }
+
+rlsCircuitPackTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RlsCircuitPackEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { rlsCircuitPack 1 }
+
+rlsCircuitPackEntry OBJECT-TYPE
+    SYNTAX      RlsCircuitPackEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    INDEX       { rlsCircuitPackSlotName }
+    ::= { rlsCircuitPackTable 1 }
+
+RlsCircuitPackEntry ::= SEQUENCE {
+    rlsCircuitPackSlotName                              DisplayString32,
+    rlsCircuitPackPec                                   PecCode,
+    rlsCircuitPackCtype                                 DisplayString64,
+    rlsCircuitPackLabel                                 DisplayString64,
+    rlsCircuitPackLowPower                              Integer32,
+    rlsCircuitPackMaxPower                              Integer32,
+    rlsCircuitPackAdminState                            AdminState,
+    rlsCircuitPackOperationalState                      INTEGER,
+    rlsCircuitPackSlotType                              INTEGER,
+    rlsCircuitPackType                                  DisplayString32,
+    rlsCircuitPackFormFactor                            INTEGER,
+    rlsCircuitPackPowerType                             PowerEnum,
+    rlsCircuitPackRamSize                               RamEnum,
+    rlsCircuitPackBandInfo                              BandOccupancy,
+    rlsCircuitPackCctEncoding                           INTEGER,
+    rlsCircuitPackDiagActive                            TruthValue,
+    rlsCircuitPackDiagFailed                            TruthValue,
+    rlsCircuitPackDiagHardwareSubsystemFailed           TruthValue,
+    rlsCircuitPackDiagSoftwareSubsytemFailed            TruthValue,
+    rlsCircuitPackDiagHiTempWarning                     TruthValue,
+    rlsCircuitPackDiagHiTemp                            TruthValue,
+    rlsCircuitPackHardwareRelease                       DisplayString32,
+    rlsCircuitPackCommonLanguageEquipmentIndentifier    DisplayString32,
+    rlsCircuitPackSerialNumber                          DisplayString32,
+    rlsCircuitPackManufacturingDate                     DisplayString32,
+    rlsCircuitPackAge                                   DisplayString16,
+    rlsCircuitPackUptime                                DisplayString16,
+    rlsCircuitPackLastRestartType                       RestartType,
+    rlsCircuitPackCurrTemprature                        Integer32,
+    rlsCircuitPackAvgTemprature                         Integer32,
+    rlsCircuitPackFanSpeedValue                         Integer32,
+    rlsCircuitPackFanSpeedMeansurementType              MeansurementType,
+    rlsCircuitPackCurrPowerValue                        Integer32,
+    rlsCircuitPackCurrPowerMeansurementType             MeansurementType,
+    rlsCircuitPackPoweredUpTime                         DisplayString16
+}
+
+rlsCircuitPackSlotName OBJECT-TYPE
+    SYNTAX      DisplayString32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The name of the slot."
+    ::= { rlsCircuitPackEntry 1 }
+
+rlsCircuitPackPec OBJECT-TYPE
+    SYNTAX      PecCode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Product equipment code."
+    ::= { rlsCircuitPackEntry 2 }
+
+rlsCircuitPackCtype OBJECT-TYPE
+    SYNTAX      DisplayString64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "c-type."
+    ::= { rlsCircuitPackEntry 3 }
+
+rlsCircuitPackLabel OBJECT-TYPE
+    SYNTAX      DisplayString64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Operator identifier for equipment description. 64 Character Maximum."
+    ::= { rlsCircuitPackEntry 4 }
+
+rlsCircuitPackLowPower OBJECT-TYPE
+    SYNTAX      Integer32 (0..960)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Low power (in W) for this card."
+    ::= { rlsCircuitPackEntry 5 }
+
+rlsCircuitPackMaxPower OBJECT-TYPE
+    SYNTAX      Integer32 (0..960)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Maximum power (in W) for this card."
+    ::= { rlsCircuitPackEntry 6 }
+
+rlsCircuitPackAdminState OBJECT-TYPE
+    SYNTAX      AdminState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Identify the administrative state."
+    ::= { rlsCircuitPackEntry 7 }
+
+rlsCircuitPackOperationalState OBJECT-TYPE
+    SYNTAX      INTEGER { 
+        active(0),
+        idle(1)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "operational state."
+    ::= { rlsCircuitPackEntry 8 }
+
+rlsCircuitPackSlotType OBJECT-TYPE
+    SYNTAX      INTEGER {
+        single(0),
+        doubleWide(1),
+        doubleHigh(2), 
+        quad(3),
+        tripleHigh(4) 
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Card Slot type."
+    ::= { rlsCircuitPackEntry 9 }
+
+rlsCircuitPackType OBJECT-TYPE
+    SYNTAX      DisplayString32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The associated equipment family."
+    ::= { rlsCircuitPackEntry 10 }
+
+rlsCircuitPackFormFactor OBJECT-TYPE
+    SYNTAX      INTEGER {
+        backplane(0),
+        accessPanel(1),
+        ctm(2),
+        fan(3), 
+        power(4),
+        i2c(5),
+        passive(6),
+        sfp(7),
+        sfpplus(8), 
+        cfp(9),
+        cfp2(10),
+        xfp(11),
+        qsfp(12),
+        qsfp28(13), 
+        ctmFrontPanel(14),
+        backplane300mm(15)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { rlsCircuitPackEntry 11 }
+
+rlsCircuitPackPowerType OBJECT-TYPE
+    SYNTAX      PowerEnum
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Power Input Module type, i.e. DC or AC."
+    ::= { rlsCircuitPackEntry 12 }
+
+rlsCircuitPackRamSize OBJECT-TYPE
+    SYNTAX      RamEnum
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "RAM size, i.e. 8G or 16G."
+    ::= { rlsCircuitPackEntry 13 }
+
+rlsCircuitPackBandInfo OBJECT-TYPE
+    SYNTAX      BandOccupancy
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "supported band types of the circuit-pack"
+    ::= { rlsCircuitPackEntry 14 }
+
+rlsCircuitPackCctEncoding OBJECT-TYPE
+    SYNTAX      INTEGER {
+        none(0),
+        snBin(1),
+        xml(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicate how CCT is being encoded for the supported circuit-pack."
+    ::= { rlsCircuitPackEntry 15 }
+
+rlsCircuitPackDiagActive OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Active, carrying traffic."
+    ::= { rlsCircuitPackEntry 16 }
+
+rlsCircuitPackDiagFailed OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Card Failed."
+    ::= { rlsCircuitPackEntry 17 }
+
+rlsCircuitPackDiagHardwareSubsystemFailed OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Equipment hardware subsystem fail."
+    ::= { rlsCircuitPackEntry 18 }
+
+rlsCircuitPackDiagSoftwareSubsytemFailed OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Equipment software subsystem fail."
+    ::= { rlsCircuitPackEntry 19 }
+
+rlsCircuitPackDiagHiTempWarning OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "High temperature warning."
+    ::= { rlsCircuitPackEntry 20 }
+
+rlsCircuitPackDiagHiTemp OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "High temperature."
+    ::= { rlsCircuitPackEntry 21 }
+
+rlsCircuitPackHardwareRelease OBJECT-TYPE
+    SYNTAX      DisplayString32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Release Level."
+    ::= { rlsCircuitPackEntry 22 }
+
+rlsCircuitPackCommonLanguageEquipmentIndentifier OBJECT-TYPE
+    SYNTAX      DisplayString32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Common language equipment identifier."
+    ::= { rlsCircuitPackEntry 23 }
+
+rlsCircuitPackSerialNumber OBJECT-TYPE
+    SYNTAX      DisplayString32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Serial Number."
+    ::= { rlsCircuitPackEntry 24 }
+
+rlsCircuitPackManufacturingDate OBJECT-TYPE
+    SYNTAX      DisplayString32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Date of Manufacture, in the format: year-week of year (YYYY-MM-DD)."
+    ::= { rlsCircuitPackEntry 25 }
+
+rlsCircuitPackAge OBJECT-TYPE
+    SYNTAX      DisplayString16
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Cumulative in-service time elapsed since manufacture, in the format: days:hours:minutes:seconds (DDDD:HH:MM:00)."
+    ::= { rlsCircuitPackEntry 26 }
+
+rlsCircuitPackUptime OBJECT-TYPE
+    SYNTAX      DisplayString16
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Cumulative uptime since the unit was last restarted (warm or cold), in the format: days:hours:minutes:seconds (DDDD:HH:MM:SS)."
+    ::= { rlsCircuitPackEntry 27 }
+
+rlsCircuitPackLastRestartType OBJECT-TYPE
+    SYNTAX      RestartType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Last restart type reported by the card."
+    ::= { rlsCircuitPackEntry 28 }
+
+rlsCircuitPackCurrTemprature OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Current card temperature in celsius."
+    ::= { rlsCircuitPackEntry 29 }
+
+rlsCircuitPackAvgTemprature OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Average card temperature in celsius."
+    ::= { rlsCircuitPackEntry 30 }
+
+rlsCircuitPackFanSpeedValue OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "rpm"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Current fan speed value (units rpm)."
+    ::= { rlsCircuitPackEntry 31 }
+
+rlsCircuitPackFanSpeedMeansurementType OBJECT-TYPE
+    SYNTAX      MeansurementType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Flag to indicate if fan speed is measured, estimated or unknown."
+    ::= { rlsCircuitPackEntry 32 }
+
+rlsCircuitPackCurrPowerValue OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "W"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Current power value (units W)."
+    ::= { rlsCircuitPackEntry 33 }
+
+rlsCircuitPackCurrPowerMeansurementType OBJECT-TYPE
+    SYNTAX      MeansurementType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Flag to indicate if current power is measured, estimated or unknown."
+    ::= { rlsCircuitPackEntry 34 }
+
+rlsCircuitPackPoweredUpTime OBJECT-TYPE
+    SYNTAX      DisplayString16
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Cumulative time since the card was last powered on, in the format: days:hours:minutes:seconds (DDDD:HH:MM:SS)."
+    ::= { rlsCircuitPackEntry 35 }
+
+END -- end of module CIENA-6500R-INVENTORY-MIB.

@@ -1,4 +1,3 @@
--- This file was included in Ciena MIB release MIBS-CIENA-CES-08-07-00-024
 --
 -- CIENA-SMI.my
 --
@@ -11,7 +10,7 @@
 				FROM SNMPv2-SMI;
 	
 		ciena MODULE-IDENTITY
-			LAST-UPDATED "201903010756Z"
+			LAST-UPDATED "202011240000Z"
 			ORGANIZATION "Ciena Corp."
 			CONTACT-INFO
 			"   Mib Meister
@@ -21,25 +20,29 @@
 			    Phone:  +1 800 921 1144
 			    Email:  support@ciena.com"
 			DESCRIPTION
-				"MIB Version: 08-07-00-024."
+				"MIB Version: MIBS-CIENA-CES-XX-XX-XX-XXX."
 
-			REVISION "201903010756Z"
+			REVISION "202011240000Z"
+			DESCRIPTION  
+				"Updated for cienaRls and cienaPro."
+
+			REVISION "201706070000Z"
 			DESCRIPTION
 				"Updated contact info."
 
-			REVISION "201903010756Z"
+			REVISION "201507150000Z"
 			DESCRIPTION
 				"Updated for cienaGenericMIBs and cienaOpterametro."
 
-			REVISION "201903010756Z"
+			REVISION "201304220000Z"
 			DESCRIPTION
 				"Fixed miscellaneous spelling and description errors."
 
-			REVISION "201903010756Z"
+			REVISION "201212260000Z"
 			DESCRIPTION
 				"Fixed the revision and description minor errors."
 
-			REVISION "201903010756Z"
+			REVISION "201009272317Z"
 			DESCRIPTION
 				"Initial creation of MIB file structure for Ciena Packet Networking Products."
 			::= { enterprises 1271 }
@@ -95,12 +98,26 @@
 				"Provides a root object identifier for all the Trap MIBs."
 			::= { cienaCes 1 }			                                    
 
+		cienaRls OBJECT-IDENTITY
+			STATUS  current
+			DESCRIPTION
+				"cienaRls provides a root object identifier that is used to define MIBs
+				 pertaining to Ciena's 6500 Reconfigurable Line System product."
+			::= { ciena 4 }
+
 		cienaGenericMIBs OBJECT-IDENTITY
 			STATUS	current
 			DESCRIPTION
 				"This module represents the top-level MIB branch for some of the generic MIBs that are common to Ciena
 				 products."
 			::= { ciena 29 }			                                    
+
+		cienaPro  OBJECT-IDENTITY
+			STATUS  current
+			DESCRIPTION
+				"This module represents the top-level MIB branch for some of the PRO (Portable Resource Object) MIBs
+				 which are platform independent and are used in a variety of Ciena products."
+			::= { ciena 30 }
 
 		cienaOpterametro OBJECT-IDENTITY
 			STATUS	current
