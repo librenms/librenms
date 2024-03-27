@@ -97,6 +97,10 @@ if ($port->fdbEntries()->exists()) {
 $menu_options['events'] = 'Eventlog';
 $menu_options['notes'] = (get_dev_attrib($device, 'port_id_notes:' . $port->port_id) ?? '') == '' ? 'Notes' : 'Notes*';
 
+if ($port->transceivers()->exists()) {
+    $menu_options['transceiver'] = __('port.transceiver');
+}
+
 if (dbFetchCell("SELECT COUNT(*) FROM `sensors` WHERE `device_id` = ? AND `entPhysicalIndex` = ?  AND entPhysicalIndex_measured = 'ports'", [$device['device_id'], $port->ifIndex])) {
     $menu_options['sensors'] = 'Health';
 }

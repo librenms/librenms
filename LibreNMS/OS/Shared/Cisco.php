@@ -31,6 +31,7 @@ use App\Models\EntPhysical;
 use App\Models\Mempool;
 use App\Models\PortsNac;
 use App\Models\Sla;
+use App\Models\Transceiver;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
@@ -40,6 +41,7 @@ use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\Interfaces\Discovery\SlaDiscovery;
 use LibreNMS\Interfaces\Discovery\StpInstanceDiscovery;
+use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
 use LibreNMS\Interfaces\Polling\NacPolling;
 use LibreNMS\Interfaces\Polling\SlaPolling;
 use LibreNMS\OS;
@@ -54,7 +56,8 @@ class Cisco extends OS implements
     ProcessorDiscovery,
     MempoolsDiscovery,
     NacPolling,
-    SlaPolling
+    SlaPolling,
+    TransceiverDiscovery
 {
     use YamlOSDiscovery {
         YamlOSDiscovery::discoverOS as discoverYamlOS;
@@ -621,5 +624,53 @@ class Cisco extends OS implements
         }
 
         return null;
+    }
+
+    public function discoverTransceivers(): Collection
+    {
+        // use data collected by entPhysical module if available
+        $dbSfpCages = $this->getDevice()->entityPhysical()->where('entPhysicalVendorType', 'cevContainerSFP')->pluck('ifIndex', 'entPhysicalIndex');
+        if ($dbSfpCages->isNotEmpty()) {
+            $data = $this->getDevice()->entityPhysical()->whereIn('entPhysicalContainedIn', $dbSfpCages->keys())->get()->map(function ($ent) use ($dbSfpCages) {
+                if (empty($ent->ifIndex) && $dbSfpCages->has($ent->entPhysicalContainedIn)) {
+                    $ent->ifIndex = $dbSfpCages->get($ent->entPhysicalContainedIn);
+                }
+
+                return $ent;
+            })->keyBy('entPhysicalIndex');
+        } else {
+            // fetch data via snmp
+            $snmpData = \SnmpQuery::cache()->hideMib()->mibs(['CISCO-ENTITY-VENDORTYPE-OID-MIB'])->walk('ENTITY-MIB::entPhysicalTable')->table(1);
+            if (empty($snmpData)) {
+                return new Collection;
+            }
+
+            $snmpData = collect(\SnmpQuery::hideMib()->mibs(['IF-MIB'])->walk('ENTITY-MIB::entAliasMappingIdentifier')->table(1, $snmpData));
+
+            $sfpCages = $snmpData->filter(fn ($ent) => isset($ent['entPhysicalVendorType']) && $ent['entPhysicalVendorType'] == 'cevContainerSFP');
+            $data = $snmpData->filter(fn ($ent) => $sfpCages->has($ent['entPhysicalContainedIn'] ?? null))->map(function ($e) {
+                if (isset($e['entAliasMappingIdentifier'][0])) {
+                    $e['ifIndex'] = preg_replace('/^.*ifIndex[.[](\d+).*$/', '$1', $e['entAliasMappingIdentifier'][0]);
+                }
+
+                return $e;
+            });
+        }
+        $ifIndexToPortId = $this->getDevice()->ports()->pluck('port_id', 'ifIndex');
+
+        return $data->map(function ($ent, $index) use ($ifIndexToPortId) {
+            $ifIndex = $ent['ifIndex'] ?? null;
+
+            return new Transceiver([
+                'port_id' => $ifIndexToPortId->get($ifIndex, 0),
+                'index' => $index,
+                'type' => $ent['entPhysicalDescr'] ?? null,
+                'vendor' => $ent['entPhysicalMfgName'] ?? null,
+                'revision' => $ent['entPhysicalHardwareRev'] ?? null,
+                'model' => $ent['entPhysicalModelName'] ?? null,
+                'serial' => $ent['entPhysicalSerialNum'] ?? null,
+                'entity_physical_index' => $ifIndex,
+            ]);
+        });
     }
 }

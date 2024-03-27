@@ -1045,6 +1045,11 @@ class Device extends BaseModel
         return $this->hasMany(TnmsneInfo::class, 'device_id');
     }
 
+    public function transceivers(): HasMany
+    {
+        return $this->hasMany(Transceiver::class, 'device_id');
+    }
+
     public function users(): BelongsToMany
     {
         // FIXME does not include global read

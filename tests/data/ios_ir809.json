@@ -2909,7 +2909,7 @@
                     "entPhysicalContainedIn": 10,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "Sierra Wireless",
-                    "ifIndex": null
+                    "ifIndex": 8
                 },
                 {
                     "entPhysicalIndex": 15,
