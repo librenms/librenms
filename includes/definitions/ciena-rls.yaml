@@ -1,7 +1,6 @@
 os: ciena-rls
 text: 'Ciena Reconfigurable Line System'
 icon: ciena
-ifname: true
 over:
     - { graph: device_bits, text: Traffic }
 type: network
