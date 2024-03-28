@@ -276,14 +276,14 @@ class Port extends DeviceRelatedModel
 
     // ---- Define Relationships ----
 
-    public function adsl(): HasMany
+    public function adsl(): \Illuminate\Database\Eloquent\Relations\HasOne
     {
-        return $this->hasMany(PortAdsl::class, 'port_id');
+        return $this->hasOne(PortAdsl::class, 'port_id');
     }
 
-    public function vdsl(): HasMany
+    public function vdsl(): \Illuminate\Database\Eloquent\Relations\HasOne
     {
-        return $this->hasMany(PortVdsl::class, 'port_id');
+        return $this->hasOne(PortVdsl::class, 'port_id');
     }
 
     public function events(): MorphMany
