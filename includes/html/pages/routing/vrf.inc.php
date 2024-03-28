@@ -170,7 +170,7 @@ if (! Auth::user()->hasGlobalRead()) {
                     }//end switch
                 }//end foreach
 
-                echo '</td>';
+                echo '</td></tr>';
                 $x++;
             } //end foreach
 
