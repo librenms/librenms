@@ -202,9 +202,13 @@ echo '</td>';
 echo '<td width=375 valign=top class="interface-desc">';
 
 $neighborsCount = 0;
-$nbLinks = 0;
-$int_links = [];
+$nbLinks = 0; // unused really
+$int_links = []; // port_id > port_id
+$int_links_phys = []; // port_id > 1 (use + instead of ->) ??
+// if not loopback or showing graphs
 if (strpos($port['label'], 'oopback') === false && empty($graph_type)) {
+
+    // get neighbor ports from links table
     foreach (dbFetchRows('SELECT * FROM `links` AS L, `ports` AS I, `devices` AS D WHERE L.local_port_id = ? AND L.remote_port_id = I.port_id AND I.device_id = D.device_id', [$if_id]) as $link) {
         $int_links[$link['port_id']] = $link['port_id'];
         $int_links_phys[$link['port_id']] = 1;
@@ -213,6 +217,7 @@ if (strpos($port['label'], 'oopback') === false && empty($graph_type)) {
 
     unset($br);
 
+    // if detail, IPv4 + IPv6 Subnet
     if (! empty($port_details) && Config::get('enable_port_relationship') === true) {
         // Show which other devices are on the same subnet as this interface
         foreach (dbFetchRows("SELECT `ipv4_network_id` FROM `ipv4_addresses` WHERE `port_id` = ? AND `ipv4_address` NOT LIKE '127.%'", [$port['port_id']]) as $net) {
@@ -259,14 +264,17 @@ if (strpos($port['label'], 'oopback') === false && empty($graph_type)) {
         }//end foreach
     }//end if
 
+    // show collapse button
     if (count($int_links) > 3) {
         echo '<div class="collapse-neighbors"><i class="neighbors-button fa fa-plus fa-lg" aria-hidden="true"></i>
                <span class="neighbors-interface-list-firsts" style="display: inline;">';
     }
 
     if (! empty($port_details) && Config::get('enable_port_relationship') === true && port_permitted($int_link, $device['device_id'])) {
+        // PRINT LINKS finally
         foreach ($int_links as $int_link) {
             $neighborsCount++;
+            // START COLLAPSE
             if ($neighborsCount == 4) {
                 echo '<span class="neighbors-list-continued" style="display: inline;"></br>[...]</span>';
                 echo '</span>';
@@ -282,6 +290,7 @@ if (strpos($port['label'], 'oopback') === false && empty($graph_type)) {
                 echo "<i class='fa fa-arrow-right fa-lg' style='color:green' aria-hidden='true'></i> ";
             }
 
+            // actual link
             echo '<b>' . generate_port_link($link_if, makeshortif($link_if['label'])) . ' on ' . generate_device_link($link_if);
 
             if ($int_links_v6[$int_link]) {
@@ -301,6 +310,7 @@ if (strpos($port['label'], 'oopback') === false && empty($graph_type)) {
 
 $br = '';
 if (! empty($port_details) && Config::get('enable_port_relationship') === true && port_permitted($port['port_id'], $device['device_id'])) {
+    // Pseudowire links
     foreach (dbFetchRows('SELECT * FROM `pseudowires` WHERE `port_id` = ?', [$port['port_id']]) as $pseudowire) {
         // `port_id`,`peer_device_id`,`peer_ldp_id`,`cpwVcID`,`cpwOid`
         $pw_peer_dev = dbFetchRow('SELECT * FROM `devices` WHERE `device_id` = ?', [$pseudowire['peer_device_id']]);
@@ -311,12 +321,12 @@ if (! empty($port_details) && Config::get('enable_port_relationship') === true &
         $br = '<br />';
     }
 
+    // PAGP
     foreach (dbFetchRows('SELECT * FROM `ports` WHERE `pagpGroupIfIndex` = ? and `device_id` = ?', [$port['ifIndex'], $device['device_id']]) as $member) {
         $member = cleanPort($member);
         echo "$br<i class='fa fa-cube fa-lg icon-theme' aria-hidden='true'></i> <strong>" . generate_port_link($member) . ' (PAgP)</strong>';
         $br = '<br />';
     }
-
     if ($port['pagpGroupIfIndex'] && $port['pagpGroupIfIndex'] != $port['ifIndex']) {
         $parent = dbFetchRow('SELECT * FROM `ports` WHERE `ifIndex` = ? and `device_id` = ?', [$port['pagpGroupIfIndex'], $device['device_id']]);
         $parent = cleanPort($parent);
@@ -324,6 +334,7 @@ if (! empty($port_details) && Config::get('enable_port_relationship') === true &
         $br = '<br />';
     }
 
+    // Port stack
     foreach (dbFetchRows('SELECT * FROM `ports_stack` WHERE `port_id_low` = ? and `device_id` = ?', [$port['ifIndex'], $device['device_id']]) as $higher_if) {
         if ($higher_if['port_id_high']) {
             $this_port = get_port_by_index_cache($device['device_id'], $higher_if['port_id_high']);
@@ -332,7 +343,6 @@ if (! empty($port_details) && Config::get('enable_port_relationship') === true &
             $br = '<br />';
         }
     }
-
     foreach (dbFetchRows('SELECT * FROM `ports_stack` WHERE `port_id_high` = ? and `device_id` = ?', [$port['ifIndex'], $device['device_id']]) as $lower_if) {
         if ($lower_if['port_id_low']) {
             $this_port = get_port_by_index_cache($device['device_id'], $lower_if['port_id_low']);
@@ -345,6 +355,7 @@ if (! empty($port_details) && Config::get('enable_port_relationship') === true &
 
 unset($int_links, $int_links_v6, $int_links_v4, $int_links_phys, $br);
 
+// end collapse
 if ($nbLinks > 3) {
     echo '</span></div>';
 }

@@ -112,6 +112,7 @@
                     <div class="tw-text-base">MTU {{ $port->ifMtu }}</div>
                 </td>
                 <td>
+
                     links, etc
                 </td>
             </tr>
