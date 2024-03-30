@@ -522,6 +522,14 @@ custom_maps:
     - { Field: width, Type: varchar(10), 'Null': false, Extra: '' }
     - { Field: height, Type: varchar(10), 'Null': false, Extra: '' }
     - { Field: node_align, Type: smallint, 'Null': false, Extra: '', Default: '0' }
+    - { Field: reverse_arrows, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
+    - { Field: edge_separation, Type: smallint, 'Null': false, Extra: '', Default: '10' }
+    - { Field: legend_x, Type: int, 'Null': false, Extra: '', Default: '-1' }
+    - { Field: legend_y, Type: int, 'Null': false, Extra: '', Default: '-1' }
+    - { Field: legend_steps, Type: smallint, 'Null': false, Extra: '', Default: '7' }
+    - { Field: legend_font_size, Type: smallint, 'Null': false, Extra: '', Default: '14' }
+    - { Field: legend_hide_invalid, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
+    - { Field: legend_hide_overspeed, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
     - { Field: background_suffix, Type: varchar(10), 'Null': true, Extra: '' }
     - { Field: background_version, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: options, Type: longtext, 'Null': true, Extra: '' }
@@ -553,6 +561,8 @@ custom_map_edges:
     - { Field: reverse, Type: tinyint, 'Null': false, Extra: '' }
     - { Field: style, Type: varchar(50), 'Null': false, Extra: '' }
     - { Field: showpct, Type: tinyint, 'Null': false, Extra: '' }
+    - { Field: showbps, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
+    - { Field: label, Type: varchar(255), 'Null': false, Extra: '', Default: '' }
     - { Field: text_face, Type: varchar(50), 'Null': false, Extra: '' }
     - { Field: text_size, Type: int, 'Null': false, Extra: '' }
     - { Field: text_colour, Type: varchar(10), 'Null': false, Extra: '' }

@@ -15,6 +15,8 @@
 use App\Actions\Device\ValidateDeviceAndCreate;
 use App\Models\Device;
 use App\Models\Eventlog;
+use App\Models\Ipv4Address;
+use App\Models\Ipv4Network;
 use App\Models\Ipv6Address;
 use App\Models\Ipv6Network;
 use App\Models\Port;
@@ -26,6 +28,7 @@ use LibreNMS\Exceptions\HostExistsException;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\OS;
 use LibreNMS\Util\IP;
+use LibreNMS\Util\IPv4;
 use LibreNMS\Util\IPv6;
 use LibreNMS\Util\UserFuncHelper;
 
@@ -709,6 +712,75 @@ function discover_process_ipv6(&$valid, $ifIndex, $ipv6_address, $ipv6_prefixlen
     }//endif port_id && others
 }//end discover_process_ipv6()
 
+/**
+ * create or update IPv4 Addresses and/or IPv4 Networks
+ *
+ * @param  pointer  $valid_v4
+ * @param  array  $device
+ * @param  int  $ifIndex
+ * @param  string  $ipv4_address
+ * @param  string  $mask
+ * @param  string  $context_name
+ * @return array
+ *
+ * @throws InvalidIpException
+ */
+function discover_process_ipv4(&$valid_v4, $device, int $ifIndex, $ipv4_address, $mask, $context_name = '')
+{
+    $cidr = IPv4::netmask2cidr($mask);
+    try {
+        $ipv4 = new IPv4($ipv4_address . '/' . $cidr);
+    } catch (InvalidIpException $e) {
+        d_echo('Invalid data: ' . $ipv4_address);
+
+        return;
+    }
+    $ipv4_network = $ipv4->getNetworkAddress() . '/' . $ipv4->cidr;
+
+    if ($ipv4_address != '0.0.0.0' && $ifIndex > 0) {
+        $port_id = get_port_by_index_cache($device['device_id'], $ifIndex)['port_id'];
+
+        if (is_numeric($port_id)) {
+            $dbIpv4Net = Ipv4Network::updateOrCreate([
+                'ipv4_network' => $ipv4_network,
+            ], [
+                'context_name' => $device['context_name'],
+            ]);
+
+            if (! $dbIpv4Net->wasRecentlyCreated && $dbIpv4Net->wasChanged()) {
+                Eventlog::log('IPv4 network ' . $ipv4_network . ' changed', $device['device_id'], 'ipv4', Severity::Warning);
+                echo 'Nu';
+            }
+            if ($dbIpv4Net->wasRecentlyCreated) {
+                Eventlog::log('IPv4 network ' . $ipv4_network . ' created', $device['device_id'], 'ipv4', Severity::Notice);
+                echo 'N+';
+            }
+
+            $ipv4_network_id = Ipv4Network::where('ipv4_network', $ipv4_network)->value('ipv4_network_id');
+            $dbIpv4Addr = Ipv4Address::updateOrCreate([
+                'ipv4_address' => $ipv4_address,
+                'ipv4_prefixlen' => $cidr,
+                'ipv4_network_id' => $ipv4_network_id,
+                'port_id' => $port_id,
+            ], [
+                'context_name' => $device['context_name'],
+            ]);
+
+            if (! $dbIpv4Addr->wasRecentlyCreated && $dbIpv4Addr->wasChanged()) {
+                Eventlog::log('IPv4 address ' . $ipv4_address . '/' . $cidr . ' changed', $device['device_id'], 'ipv4', Severity::Warning);
+                echo 'Au';
+            }
+            if ($dbIpv4Addr->wasRecentlyCreated) {
+                Eventlog::log('IPv4 address ' . $ipv4_address . '/' . $cidr . ' created', $device['device_id'], 'ipv4', Severity::Notice);
+                echo 'A+';
+            }
+            $full_address = $ipv4_address . '/' . $cidr . '|' . $ifIndex;
+            $valid_v4[$full_address] = 1;
+        } else {
+            d_echo('No port id found for ifindex: ' . $ifIndex . PHP_EOL);
+        }
+    }
+}
 /*
  * Check entity sensors to be excluded
  *

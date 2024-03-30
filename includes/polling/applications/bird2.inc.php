@@ -5,12 +5,6 @@ use Carbon\Carbon;
 
 $name = 'bird2';
 
-if (! \LibreNMS\Config::get('enable_bgp')) {
-    echo PHP_EOL . $name . ': BGP is not enabled in config' . PHP_EOL;
-
-    return;
-}
-
 $birdOutput = snmp_get($device, 'nsExtendOutputFull.' . \LibreNMS\Util\Oid::ofString($name), '-Oqv', 'NET-SNMP-EXTEND-MIB');
 
 // make sure we actually get something back

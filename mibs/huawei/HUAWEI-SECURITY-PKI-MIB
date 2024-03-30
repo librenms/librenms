@@ -1,0 +1,743 @@
+-- =============================================================================
+-- Copyright (C) 2021 by HUAWEI TECHNOLOGIES. All rights reserved.
+--
+-- Description:
+-- Reference: Huawei Enterprise MIB
+-- Version: V1.05
+-- History:
+--          V1.01 The initial version created by LiShengbai 90004270.
+--          V1.02 Add the update mib by bianchao 00348464.
+--          V1.03 Add the crl mib by bianchao 00348464.
+--          V1.04 Add the pki data inconsistency mib by hutao 00505769.
+--          V1.05 Add the pki db unavailable err mib by luhao 00600678
+-- =============================================================================
+
+HUAWEI-SECURITY-PKI-MIB DEFINITIONS ::= BEGIN
+
+  IMPORTS
+      huaweiUtility
+            FROM HUAWEI-MIB
+      OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+        Gauge32, IpAddress, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE
+      FROM SNMPv2-SMI
+        enterprises
+        FROM RFC1155-SMI
+            DateAndTime
+      FROM SNMPv2-TC;
+
+
+    hwPKI MODULE-IDENTITY
+            LAST-UPDATED "202107141210Z"        --  July 14, 2021 at 12:10 GMT+8
+            ORGANIZATION
+"Huawei Technologies Co.,Ltd."
+            CONTACT-INFO
+"Huawei Industrial Base
+  Bantian, Longgang
+   Shenzhen 518129
+   People's Republic of China
+   Website: http://www.huawei.com
+   Email: support@huawei.com
+ "
+            DESCRIPTION
+                "V1.05
+               The PKI mib is for Eudemon and USG product series."
+               REVISION    "202107141210Z"
+               DESCRIPTION "Add mib nodes hwPKIDBUnavailable to hwPKIDBAvailable
+                                            can be compatible to last version's mib nodes."
+
+               REVISION    "202104091015Z"
+               DESCRIPTION "Add mib nodes hwPKIDataInconsistency to hwPKIDataInconsistencyClear
+                                            can be compatible to last version's mib nodes."
+
+               REVISION    "201711132000Z"
+               DESCRIPTION "Add mib nodes hwPKIGetCrlSucScep to hwPKIGetCrlFailScep
+                                            can be compatible to last version's mib nodes."
+
+               REVISION    "201707102000Z"
+               DESCRIPTION "Add mib nodes hwPKIUpdateLocalCertSucCmp to hwPKIUpdateLocalCertSucScep
+                                            can be compatible to last version's mib nodes."
+               REVISION    "201506022000Z"
+               DESCRIPTION "Modify mib nodes hwPKIDomainName to hwPKIRealmName
+                                            can be compatible to last version's mib nodes."
+              REVISION    "201504232000Z"
+               DESCRIPTION "Modify mib nodes OID.So that, eSAP V2R1 version mib nodes
+                                            can be compatible to last version's mib nodes."
+
+            ::= { hwSecurity 34 }
+
+
+-- ===============================================
+-- Node definitions
+-- ===============================================
+
+        -- 1.3.6.1.4.1.2011
+    --huawei OBJECT IDENTIFIER ::= { enterprises 2011 }
+
+    -- 1.3.6.1.4.1.2011.6
+    --huaweiUtility OBJECT IDENTIFIER ::= { huawei 6 }
+
+    -- 1.3.6.1.4.1.2011.6.122
+    hwSecurity OBJECT IDENTIFIER ::= { huaweiUtility 122 }
+
+
+    hwPKINotification OBJECT IDENTIFIER ::= { hwPKI 0 }
+    hwPKITrapObject OBJECT IDENTIFIER ::= { hwPKINotification 1 }
+    hwPKITraps OBJECT IDENTIFIER ::= { hwPKINotification 2 }
+
+
+-- ===============================================
+-- TrapObject.
+-- ===============================================
+
+        hwPKICrlUrl  OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..127))
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                  "the URL for getting CRL."
+            ::= { hwPKITrapObject 1 }
+
+          hwPKILdapIP OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                  "the IP address of LDAP server."
+            ::= { hwPKITrapObject 2 }
+
+        hwPKILdapPort OBJECT-TYPE
+            SYNTAX Gauge32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                  "the port of LDAP server."
+            ::= { hwPKITrapObject 3 }
+
+          hwPKILdapVersion OBJECT-TYPE
+            SYNTAX Gauge32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                  "the version of LDAP server."
+            ::= { hwPKITrapObject 4 }
+
+          hwPKICrlAttribute OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..63))
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                  "the attribute of CRL."
+            ::= { hwPKITrapObject 5 }
+
+
+             hwPKICrlDN OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..127))
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                  "the distinguished name of CRL."
+            ::= { hwPKITrapObject 6 }
+
+           hwPKICertUrl OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..127))
+              MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                  "the URL for getting certificate."
+            ::= { hwPKITrapObject 7 }
+
+           hwPKICertSaveName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (5..63))
+              MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                  "the saved name of certificate."
+            ::= { hwPKITrapObject 8 }
+
+           hwPKICertAttribute OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..63))
+              MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                  "the attribute of certificate."
+            ::= { hwPKITrapObject 9 }
+
+           hwPKICertDN OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..127))
+              MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                  "the distinguished name of certificate."
+            ::= { hwPKITrapObject 10 }
+
+           hwPKICACertStartTime OBJECT-TYPE
+            SYNTAX  DateAndTime
+              MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                  "the start time of CA certificate."
+            ::= { hwPKITrapObject 11 }
+
+           hwPKICACertFinishTime OBJECT-TYPE
+            SYNTAX  DateAndTime
+              MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                  "the finish time of CA certificate."
+            ::= { hwPKITrapObject 12 }
+
+           hwPKICACertIssuer OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..1023))
+              MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                  "the issuer of CA certificate."
+            ::= { hwPKITrapObject 13 }
+
+           hwPKICACertSubject OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..1023))
+              MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                  "the subject of CA certificate."
+            ::= { hwPKITrapObject 14 }
+
+           hwPKILocalCertStartTime OBJECT-TYPE
+            SYNTAX  DateAndTime
+              MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                  "the start time of local certificate."
+            ::= { hwPKITrapObject 15 }
+
+           hwPKILocalCertFinishTime OBJECT-TYPE
+            SYNTAX  DateAndTime
+              MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                  "the finish time of local certificate."
+            ::= { hwPKITrapObject 16 }
+
+           hwPKILocalCertIssuer OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..1023))
+              MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                  "the issuer of local certificate."
+            ::= { hwPKITrapObject 17 }
+
+           hwPKILocalCertSubject OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..1023))
+              MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                  "the subject of local certificate."
+            ::= { hwPKITrapObject 18 }
+
+           hwPKICrlStartTime OBJECT-TYPE
+            SYNTAX  DateAndTime
+              MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                  "the start time of CRL."
+            ::= { hwPKITrapObject 19 }
+
+           hwPKICrlFinishTime OBJECT-TYPE
+            SYNTAX  DateAndTime
+              MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                  "the finish time of CRL."
+            ::= { hwPKITrapObject 20 }
+
+           hwPKICrlIssuer OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..1023))
+              MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                  "the issuer of CRL."
+            ::= { hwPKITrapObject 21 }
+
+           hwPKICMPUrl OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..128))
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                  "the url of the CMP server"
+            ::= { hwPKITrapObject 22 }
+
+           hwPKICASubject OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..256))
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                  "the subject name of the CA"
+            ::= { hwPKITrapObject 23 }
+
+           hwPKICMPSessionName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..32))
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                  "the name of the CMP session"
+            ::= { hwPKITrapObject 24 }
+
+           hwPKISCEPUrl OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..128))
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                  "the url of the SCEP server"
+            ::= { hwPKITrapObject 25 }
+
+           hwPKIRealmName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..32))
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                  "the name of the PKI realm"
+            ::= { hwPKITrapObject 26 }
+
+           hwPKIKeyName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..33))
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                  "the name of the RSA key pair"
+            ::= { hwPKITrapObject 27 }
+
+           hwPKIKeyBit OBJECT-TYPE
+            SYNTAX Gauge32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                  "the bit of the RSA key pair"
+            ::= { hwPKITrapObject 28 }
+
+           hwPKIDataTypeDesp OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..127))
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                  "Description of the PKI data type, for example, certificate and CRL."
+            ::= { hwPKITrapObject 29 }
+
+           hwPKIVsysName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..63))
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                  "The virtual system name."
+            ::= { hwPKITrapObject 30 }
+
+           hwPKIDBFailDesp OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..256))
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                  "Description of reason why the PKI database is unavailable."
+            ::= { hwPKITrapObject 31 }
+-- ===============================================
+-- definition of traps.
+-- ===============================================
+          hwPKIGetCrlSucHttp NOTIFICATION-TYPE
+      OBJECTS {
+        hwPKICrlUrl
+              }
+      STATUS     current
+      DESCRIPTION
+          "Send the message when get crl successfully with HTTP."
+      ::= { hwPKITraps 1}
+
+      hwPKIGetCrlFailHttp NOTIFICATION-TYPE
+      OBJECTS {
+        hwPKICrlUrl
+              }
+      STATUS     current
+      DESCRIPTION
+          "Send the message when get crl unsuccessfully with HTTP."
+      ::= { hwPKITraps 2}
+
+          hwPKIGetCrlSucLdap NOTIFICATION-TYPE
+      OBJECTS {
+        hwPKILdapIP,
+        hwPKILdapPort,
+        hwPKICrlAttribute,
+        hwPKICrlDN,
+        hwPKILdapVersion
+              }
+      STATUS     current
+      DESCRIPTION
+          "Send the message when get crl successfully with LDAP."
+      ::= { hwPKITraps 3}
+
+          hwPKIGetCrlFailLdap NOTIFICATION-TYPE
+      OBJECTS {
+        hwPKILdapIP,
+        hwPKILdapPort,
+        hwPKICrlAttribute,
+        hwPKICrlDN,
+        hwPKILdapVersion
+              }
+      STATUS     current
+      DESCRIPTION
+          "Send the message when get crl unsuccessfully with LDAP."
+      ::= { hwPKITraps 4}
+
+
+          hwPKIGetCertSucHttp NOTIFICATION-TYPE
+      OBJECTS {
+        hwPKICertUrl,
+        hwPKICertSaveName
+              }
+      STATUS     current
+      DESCRIPTION
+          "Send the message when get certificate successfully with HTTP."
+      ::= { hwPKITraps 5}
+
+          hwPKIGetCertFailHttp NOTIFICATION-TYPE
+      OBJECTS {
+        hwPKICertUrl,
+        hwPKICertSaveName
+              }
+      STATUS     current
+      DESCRIPTION
+          "Send the message when get certificate unsuccessfully with HTTP."
+      ::= { hwPKITraps 6}
+
+          hwPKIGetCertSucLdap NOTIFICATION-TYPE
+      OBJECTS {
+        hwPKILdapIP,
+        hwPKILdapPort,
+        hwPKICertAttribute,
+        hwPKICertDN,
+        hwPKILdapVersion,
+        hwPKICertSaveName
+             }
+      STATUS     current
+      DESCRIPTION
+          "Send the message when get certificate successfully with LDAP."
+      ::= { hwPKITraps 7}
+
+          hwPKIGetCertFailLdap NOTIFICATION-TYPE
+      OBJECTS {
+        hwPKILdapIP,
+        hwPKILdapPort,
+        hwPKICertAttribute,
+        hwPKICertDN,
+        hwPKILdapVersion,
+        hwPKICertSaveName
+              }
+      STATUS     current
+      DESCRIPTION
+          "Send the message when get certificate unsuccessfully with LDAP."
+      ::= { hwPKITraps 8}
+
+      hwPKICACertInvalid NOTIFICATION-TYPE
+      OBJECTS {
+        hwPKICACertIssuer,
+        hwPKICACertSubject,
+        hwPKICACertStartTime,
+        hwPKICACertFinishTime
+             }
+      STATUS     current
+      DESCRIPTION
+          "Send the message when the CA certificate is invalid."
+      ::= { hwPKITraps 9}
+
+        hwPKICACertValid NOTIFICATION-TYPE
+      OBJECTS {
+        hwPKICACertIssuer,
+        hwPKICACertSubject,
+        hwPKICACertStartTime,
+        hwPKICACertFinishTime
+             }
+      STATUS     current
+      DESCRIPTION
+          "Send the message when the CA certificate is valid."
+      ::= { hwPKITraps 10}
+
+
+          hwPKICACertNearlyExpired NOTIFICATION-TYPE
+      OBJECTS {
+        hwPKICACertIssuer,
+        hwPKICACertSubject,
+        hwPKICACertStartTime,
+        hwPKICACertFinishTime
+             }
+      STATUS     current
+      DESCRIPTION
+          "Send the message when the CA certificate is nearly expired."
+      ::= { hwPKITraps 11}
+
+      hwPKILocalCertInvalid NOTIFICATION-TYPE
+      OBJECTS {
+        hwPKILocalCertIssuer,
+        hwPKILocalCertSubject,
+        hwPKILocalCertStartTime,
+        hwPKILocalCertFinishTime
+             }
+      STATUS     current
+      DESCRIPTION
+          "Send the message when the local certificate is invalid."
+      ::= { hwPKITraps 12}
+
+          hwPKILocalCertValid NOTIFICATION-TYPE
+      OBJECTS {
+        hwPKILocalCertIssuer,
+        hwPKILocalCertSubject,
+        hwPKILocalCertStartTime,
+        hwPKILocalCertFinishTime
+             }
+      STATUS     current
+      DESCRIPTION
+          "Send the message when the local certificate is valid."
+      ::= { hwPKITraps 13}
+
+
+          hwPKILocalCertNearlyExpired NOTIFICATION-TYPE
+      OBJECTS {
+        hwPKILocalCertIssuer,
+        hwPKILocalCertSubject,
+        hwPKILocalCertStartTime,
+        hwPKILocalCertFinishTime
+              }
+      STATUS     current
+      DESCRIPTION
+          "Send the message when the local certificate is nearly expired."
+      ::= { hwPKITraps 14}
+
+          hwPKICrlInvalid NOTIFICATION-TYPE
+      OBJECTS {
+        hwPKICrlIssuer,
+        hwPKICrlStartTime,
+        hwPKICrlFinishTime
+              }
+      STATUS     current
+      DESCRIPTION
+          "Send the message when the crl is invalid."
+      ::= { hwPKITraps 15}
+
+      hwPKICrlValid NOTIFICATION-TYPE
+      OBJECTS {
+        hwPKICrlIssuer,
+        hwPKICrlStartTime,
+        hwPKICrlFinishTime
+              }
+      STATUS     current
+      DESCRIPTION
+          "Send the message when the crl is valid."
+      ::= { hwPKITraps 16}
+
+      hwPKICrlNearlyExpired NOTIFICATION-TYPE
+      OBJECTS {
+        hwPKICrlIssuer,
+        hwPKICrlStartTime,
+        hwPKICrlFinishTime
+            }
+      STATUS     current
+      DESCRIPTION
+          "Send the message when the crl is nearly expired."
+      ::= { hwPKITraps 17}
+
+      hwPKIRequestCertSucCmp NOTIFICATION-TYPE
+      OBJECTS {
+        hwPKICMPUrl,
+        hwPKICASubject,
+        hwPKICMPSessionName
+            }
+      STATUS     current
+      DESCRIPTION
+          "Send the message when requesting local certificate through CMPv2 succeeded."
+      ::= { hwPKITraps 18}
+
+      hwPKIRequestCertFailCmp NOTIFICATION-TYPE
+      OBJECTS {
+        hwPKICMPUrl,
+        hwPKICASubject,
+        hwPKICMPSessionName
+            }
+      STATUS     current
+      DESCRIPTION
+          "Send the message when requesting local certificate through CMPv2 failed."
+      ::= { hwPKITraps 19}
+
+
+      hwPKIRequestCertSucScep NOTIFICATION-TYPE
+      OBJECTS {
+        hwPKISCEPUrl,
+        hwPKIRealmName
+            }
+      STATUS     current
+      DESCRIPTION
+          "Send the message when requesting local certificate through SCEP succeeded."
+      ::= { hwPKITraps 20}
+
+      hwPKIRequestCertFailScep NOTIFICATION-TYPE
+      OBJECTS {
+        hwPKISCEPUrl,
+        hwPKIRealmName
+            }
+      STATUS     current
+      DESCRIPTION
+          "Send the message when requesting local certificate through SCEP failed."
+      ::= { hwPKITraps 21}
+
+      hwPKIRsaHrpBackFail NOTIFICATION-TYPE
+      OBJECTS {
+        hwPKIKeyName,
+        hwPKIKeyBit
+            }
+      STATUS     current
+      DESCRIPTION
+          "Send the message when backing up the RSA key pair to the standby device failed."
+      ::= { hwPKITraps 22}
+
+      hwPKIUpdateLocalCertSucCmp NOTIFICATION-TYPE
+      OBJECTS {
+        hwPKILocalCertIssuer,
+        hwPKILocalCertSubject,
+        hwPKILocalCertStartTime,
+        hwPKILocalCertFinishTime
+            }
+      STATUS     current
+      DESCRIPTION
+          "Send the message when updating the local certificate through CMPv2 succeeded."
+      ::= { hwPKITraps 23}
+
+      hwPKIUpdateLocalCertFailCmp NOTIFICATION-TYPE
+      OBJECTS {
+        hwPKILocalCertIssuer,
+        hwPKILocalCertSubject
+            }
+      STATUS     current
+      DESCRIPTION
+          "Send the message when updating the local certificate through CMPv2 failed."
+      ::= { hwPKITraps 24}
+
+
+      hwPKIUpdateLocalCertSucScep NOTIFICATION-TYPE
+      OBJECTS {
+        hwPKILocalCertIssuer,
+        hwPKILocalCertSubject,
+        hwPKILocalCertStartTime,
+        hwPKILocalCertFinishTime
+            }
+      STATUS     current
+      DESCRIPTION
+          "Send the message when updating the local certificate through SCEP succeeded."
+      ::= { hwPKITraps 25}
+
+      hwPKIUpdateLocalCertFailScep NOTIFICATION-TYPE
+      OBJECTS {
+        hwPKILocalCertIssuer,
+        hwPKILocalCertSubject
+            }
+      STATUS     current
+      DESCRIPTION
+          "Send the message when updating the local certificate through SCEP failed."
+      ::= { hwPKITraps 26}
+
+          hwPKIGetCrlSucScep NOTIFICATION-TYPE
+      OBJECTS {
+        hwPKICrlUrl
+              }
+      STATUS     current
+      DESCRIPTION
+          "Send the message when get crl successfully with SCEP."
+      ::= { hwPKITraps 27}
+
+      hwPKIGetCrlFailScep NOTIFICATION-TYPE
+      OBJECTS {
+        hwPKICrlUrl
+              }
+      STATUS     current
+      DESCRIPTION
+          "Send the message when get crl unsuccessfully with SCEP."
+      ::= { hwPKITraps 28}
+
+      hwPKIDataInconsistency NOTIFICATION-TYPE
+      OBJECTS {
+        hwPKIDataTypeDesp,
+        hwPKIVsysName
+              }
+      STATUS     current
+      DESCRIPTION
+          "Send a message when the PKI data on the active device and that on the standby device are different."
+      ::= { hwPKITraps 29}
+
+      hwPKIDataInconsistencyClear NOTIFICATION-TYPE
+      OBJECTS {
+        hwPKIDataTypeDesp,
+        hwPKIVsysName
+              }
+      STATUS     current
+      DESCRIPTION
+          "Send a message when the PKI data on the active device and that on the standby device are the same."
+      ::= { hwPKITraps 30}
+
+      hwPKIDBUnavailable NOTIFICATION-TYPE
+      OBJECTS {
+        hwPKIDBFailDesp
+              }
+      STATUS     current
+      DESCRIPTION
+          "Send a message if the PKI database is unavailable."
+      ::= {hwPKITraps 31}
+
+      hwPKIDBAvailable NOTIFICATION-TYPE
+      STATUS     current
+      DESCRIPTION
+          "Send a message if the PKI database has been restored available."
+      ::= {hwPKITraps 32}
+
+--   Conformance information
+
+        hwPKIMIBConformance OBJECT IDENTIFIER ::= { hwPKI 4 }
+
+        hwPKIMIBCompliances OBJECT IDENTIFIER ::= { hwPKIMIBConformance 1 }
+
+
+--  this module
+
+       hwPKIMIBCompliance MODULE-COMPLIANCE
+            STATUS current
+            DESCRIPTION
+                "The compliance statement for devices running PKI."
+            MODULE -- this module
+                MANDATORY-GROUPS { hwTrapObjectGroup }
+            ::= { hwPKIMIBCompliances 1 }
+
+        hwPKIMIBGroups OBJECT IDENTIFIER ::= { hwPKIMIBConformance 2 }
+
+        hwPKINotificationGroup NOTIFICATION-GROUP
+            NOTIFICATIONS { hwPKIGetCrlSucHttp, hwPKIGetCrlFailHttp, hwPKIGetCrlSucLdap, hwPKIGetCrlFailLdap, hwPKIGetCertSucHttp,
+            hwPKIGetCertFailHttp, hwPKIGetCertSucLdap, hwPKIGetCertFailLdap, hwPKICACertInvalid, hwPKICACertValid,
+            hwPKICACertNearlyExpired, hwPKILocalCertInvalid, hwPKILocalCertValid, hwPKILocalCertNearlyExpired, hwPKICrlInvalid,
+            hwPKICrlValid, hwPKICrlNearlyExpired, hwPKIRequestCertSucCmp, hwPKIRequestCertFailCmp, hwPKIRequestCertSucScep,
+            hwPKIRequestCertFailScep, hwPKIRsaHrpBackFail,hwPKIUpdateLocalCertSucCmp, hwPKIUpdateLocalCertFailCmp,
+            hwPKIUpdateLocalCertSucScep,hwPKIUpdateLocalCertFailScep,hwPKIGetCrlSucScep,hwPKIGetCrlFailScep,
+            hwPKIDataInconsistency, hwPKIDataInconsistencyClear,
+            hwPKIDBUnavailable, hwPKIDBAvailable }
+            STATUS current
+            DESCRIPTION
+                "A collection of notifications generated by
+                devices supporting this MIB."
+            ::= { hwPKIMIBGroups 1 }
+
+        hwTrapObjectGroup OBJECT-GROUP
+            OBJECTS { hwPKICrlUrl, hwPKILdapIP, hwPKILdapPort, hwPKILdapVersion, hwPKICrlAttribute,
+            hwPKICrlDN, hwPKICertUrl, hwPKICertSaveName, hwPKICertAttribute, hwPKICertDN,
+            hwPKICACertStartTime, hwPKICACertFinishTime, hwPKICACertIssuer, hwPKICACertSubject, hwPKILocalCertStartTime,
+            hwPKILocalCertFinishTime, hwPKILocalCertIssuer, hwPKILocalCertSubject, hwPKICrlStartTime, hwPKICrlFinishTime,
+            hwPKICrlIssuer, hwPKICMPUrl, hwPKICASubject, hwPKICMPSessionName, hwPKISCEPUrl,
+            hwPKIRealmName, hwPKIKeyName, hwPKIKeyBit, hwPKIDataTypeDesp, hwPKIVsysName, hwPKIDBFailDesp }
+            STATUS current
+            DESCRIPTION
+                "A collection of pki trap objects required to support
+                management of devices."
+            ::= { hwPKIMIBGroups 2 }
+
+  END
+

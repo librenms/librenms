@@ -117,10 +117,11 @@ are as follows:
   over (see note below).
 - `skip_value_lt` (optional): If sensor value is less than this, skip the discovery.
 - `skip_value_gt` (optional): If sensor value is greater than this, skip the discovery.
-- `entPhysicalIndex` (optional): If the sensor belongs to a physical
-  entity then you can specify the index here.
-- `entPhysicalIndex_measured` (optional): If the sensor belongs to a
-  physical entity then you can specify the entity type here.
+- `entPhysicalIndex` and `entPhysicalIndex_measured` (optional) : If the
+  sensor belongs to a physical entity then you can link them here. The currently
+  supported variants are :
+    - `entPhysicalIndex` contains the entPhysicalIndex from entPhysical table, and `entPhysicalIndex_measured` is NULL
+    - `entPhysicalIndex` contains "ifIndex" value of the linked port and `entPhysicalIndex_measured` contains "ports"
 - `user_func` (optional): You can provide a function name for the
   sensors value to be processed through (i.e. Convert fahrenheit to
   celsius use `fahrenheit_to_celsius`)

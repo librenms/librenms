@@ -1,0 +1,730 @@
+-- ===================================================================
+-- Copyright (C) 2022 by HUAWEI TECHNOLOGIES. All rights reserved.
+-- Description: 
+-- Reference:
+-- Version: V1.09
+-- ===================================================================
+
+
+    HUAWEI-IFIT-MIB DEFINITIONS ::= BEGIN
+ 
+        IMPORTS       
+            hwDatacomm            
+                FROM HUAWEI-MIB                                                 
+            OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP            
+                FROM SNMPv2-CONF            
+            DisplayString, RowStatus                        
+                FROM SNMPv2-TC
+            TimeTicks, Integer32, Unsigned32, IpAddress, Counter32, OBJECT-TYPE, 
+            MODULE-IDENTITY, NOTIFICATION-TYPE            
+                FROM SNMPv2-SMI;
+    
+    
+        hwIfit MODULE-IDENTITY 
+            LAST-UPDATED "202208291800Z"        
+            ORGANIZATION 
+                  "Huawei Technologies Co.,Ltd."
+            CONTACT-INFO 
+                  "Huawei Industrial Base
+  Bantian, Longgang
+   Shenzhen 518129
+   People's Republic of China
+   Website: http://www.huawei.com
+   Email: support@huawei.com
+ "
+            DESCRIPTION 
+                "The mib is used for IFIT notifications."
+            REVISION "202208291800Z"   
+            DESCRIPTION
+                "V1.09, Modify Alarm description at 2022-08-29."
+            REVISION "202208081800Z"   
+            DESCRIPTION
+                "V1.08, Add new ifit trap node at 2022-08-08."
+            REVISION "202112011800Z"   
+            DESCRIPTION
+                "V1.07, Change the iFIT in the file to IFIT at 2021-12-01."
+            REVISION "202110111800Z"   
+            DESCRIPTION
+                "V1.06, Add node hwIfitMeasureFlowNumExceedAlarm,hwIfitMeasureFlowNumExceedResume at 2021-10-11."
+            REVISION "202107051800Z"   
+            DESCRIPTION
+                "V1.05, Add node hwIfitIngressNumExceedAlarm,hwIfitIngressNumExceedResume at 2021-07-05."
+            REVISION "202102041800Z"   
+            DESCRIPTION
+                "V1.04, Add node hwIfitDynFlowIngressNumExceedAlarm,hwIfitDynFlowIngressNumExceedResume at 2021-02-04."
+            REVISION "202101120000Z"   
+            DESCRIPTION
+                "V1.03, Add node  hwIfitExceedInstanceAlarm and hwIfitExceedInstanceAlarmResume at 2021-01-12."
+            REVISION "202008110000Z"   
+            DESCRIPTION
+                "V1.02, Change Description of node hwIfitStaticFlowNumExceedAlarm,hwIfitStaticFlowNumExceedResume at 2020-08-11."
+            REVISION "202004270000Z"
+            DESCRIPTION
+                "V1.01, Add node hwIfitDynFlowMidEgressNumExceedAlarm,hwIfitDynFlowMidEgressNumExceedResume at 2020-06-09."
+            REVISION    "202004270000Z"   
+            DESCRIPTION "V1.00, initial version."
+    
+            ::= { hwDatacomm 364 }
+
+    
+        hwIfitObjects OBJECT IDENTIFIER ::= { hwIfit 1 }
+            hwFlowNumExceedObjectsInBoard OBJECT IDENTIFIER ::= { hwIfitObjects 1 }
+                hwFlowNumExceedTable OBJECT-TYPE 
+                                        SYNTAX SEQUENCE OF HwFlowNumExceedEntry 
+                                        MAX-ACCESS not-accessible 
+                                        STATUS current 
+                                        DESCRIPTION  "The table is used to define variables in traps." 
+                                        --INDEX { hwIfitFlowExceedBoard, hwIfitMaxFlowInBoard }
+                                        ::= { hwFlowNumExceedObjectsInBoard 1 } 
+                                        
+                    hwFlowNumExceedEntry OBJECT-TYPE 
+                                        SYNTAX HwFlowNumExceedEntry 
+                                        MAX-ACCESS not-accessible 
+                                        STATUS current 
+                                        DESCRIPTION "Defined the entries on which occurred IFIT flow reaches the upper limit." 
+                                        INDEX { hwIfitFlowExceedBoard, hwIfitMaxFlowInBoard } 
+                                        ::= { hwFlowNumExceedTable 1 } 
+                                        
+                    HwFlowNumExceedEntry ::= 
+                                        SEQUENCE {  
+                                                hwIfitFlowExceedBoard 
+                                                        DisplayString, 
+                                                hwIfitMaxFlowInBoard 
+                                                        Integer32
+                                         } 
+                
+                
+                    hwIfitFlowExceedBoard OBJECT-TYPE 
+                                             SYNTAX DisplayString (SIZE (1..32))
+                                             MAX-ACCESS accessible-for-notify
+                                             STATUS     current
+                                             DESCRIPTION
+                                                "This object indicates the slot ID of the board."
+                                             ::= { hwFlowNumExceedEntry 1 }
+                                             
+                    hwIfitMaxFlowInBoard  OBJECT-TYPE 
+                                             SYNTAX Integer32
+                                             MAX-ACCESS accessible-for-notify
+                                             STATUS current
+                                             DESCRIPTION "This object indicates the max IFIT flow number in a board."
+                                             ::= { hwFlowNumExceedEntry 2 }
+
+            hwFlowNumExceedObjects OBJECT IDENTIFIER ::= { hwIfitObjects 4 }
+                hwDynFlowMidEgressNumExcTable OBJECT-TYPE 
+                                        SYNTAX SEQUENCE OF HwDynFlowMidEgressNumExcEntry
+                                        MAX-ACCESS not-accessible 
+                                        STATUS current 
+                                        DESCRIPTION  "The table is used to define variables in traps." 
+                                        --INDEX { hwIfitMaxDynFlowMidEgress }
+                                        ::= { hwFlowNumExceedObjects 1 } 
+                                        
+                    hwDynFlowMidEgressNumExcEntry OBJECT-TYPE 
+                                        SYNTAX HwDynFlowMidEgressNumExcEntry 
+                                        MAX-ACCESS not-accessible 
+                                        STATUS current 
+                                        DESCRIPTION "Defined the entries on which occurred IFIT flow reaches the upper limit." 
+                                        INDEX { hwIfitMaxDynFlowMidEgress } 
+                                        ::= { hwDynFlowMidEgressNumExcTable 1 } 
+                                        
+                    HwDynFlowMidEgressNumExcEntry::= 
+                                        SEQUENCE {  
+                                                hwIfitMaxDynFlowMidEgress 
+                                                        Integer32
+                                         } 
+
+                    hwIfitMaxDynFlowMidEgress  OBJECT-TYPE 
+                                             SYNTAX Integer32
+                                             MAX-ACCESS accessible-for-notify
+                                             STATUS current
+                                             DESCRIPTION "This object indicates the max IFIT dynamic midegress flow number."
+                                             ::= { hwDynFlowMidEgressNumExcEntry 1 }                                             
+            hwInstanceExceedObjectsInBoard OBJECT IDENTIFIER ::= { hwIfitObjects 5 }
+                hwInstanceExceedTable OBJECT-TYPE 
+                                        SYNTAX SEQUENCE OF HwInstanceExceedEntry 
+                                        MAX-ACCESS not-accessible 
+                                        STATUS current 
+                                        DESCRIPTION  "The table is used to define variables in traps." 
+                                        --INDEX { hwIfitInstanceType, hwIfitInstanceBoard, hwIfitMaxInstanceInBoard }
+                                        ::= { hwInstanceExceedObjectsInBoard 1 } 
+                                        
+                    hwInstanceExceedEntry OBJECT-TYPE 
+                                        SYNTAX HwInstanceExceedEntry 
+                                        MAX-ACCESS not-accessible 
+                                        STATUS current 
+                                        DESCRIPTION "Defined the entries on which occurred IFIT flow reaches the upper limit." 
+                                        INDEX { hwIfitInstanceType, hwIfitInstanceBoard, hwIfitMaxInstanceInBoard } 
+                                        ::= { hwInstanceExceedTable 1 } 
+                                        
+                    HwInstanceExceedEntry ::= 
+                                        SEQUENCE {  
+                                                hwIfitInstanceType 
+                                                        DisplayString,
+                                                hwIfitInstanceBoard 
+                                                        DisplayString, 
+                                                hwIfitMaxInstanceInBoard 
+                                                        Integer32
+                                         } 
+
+                    hwIfitInstanceType    OBJECT-TYPE 
+                                             SYNTAX DisplayString (SIZE (1..32))
+                                             MAX-ACCESS accessible-for-notify
+                                             STATUS     current
+                                             DESCRIPTION
+                                                "This object indicates the type of the ifit instance."
+                                             ::= { hwInstanceExceedEntry 1 }
+                
+                    hwIfitInstanceBoard OBJECT-TYPE 
+                                             SYNTAX DisplayString (SIZE (1..32))
+                                             MAX-ACCESS accessible-for-notify
+                                             STATUS     current
+                                             DESCRIPTION
+                                                "This object indicates the slot ID of the board."
+                                             ::= { hwInstanceExceedEntry 2 }
+                                             
+                    hwIfitMaxInstanceInBoard  OBJECT-TYPE 
+                                             SYNTAX Integer32
+                                             MAX-ACCESS accessible-for-notify
+                                             STATUS current
+                                             DESCRIPTION "This object indicates the max IFIT instance number in a board."
+                                             ::= { hwInstanceExceedEntry 3 }
+                                             
+            hwDynFlowIngressLimitObjects OBJECT IDENTIFIER ::= { hwIfitObjects 6 }
+                hwDynFlowIngressNumExcTable OBJECT-TYPE
+                                        SYNTAX SEQUENCE OF HwDynFlowIngressNumExcEntry
+                                        MAX-ACCESS not-accessible
+                                        STATUS current
+                                        DESCRIPTION  "The table is used to define variables in traps."
+                                        --INDEX { hwIfitDynFlowIngressUpperLimit }
+                                        ::= { hwDynFlowIngressLimitObjects 1 }
+                                       
+                    hwDynFlowIngressNumExcEntry OBJECT-TYPE
+                                        SYNTAX HwDynFlowIngressNumExcEntry
+                                        MAX-ACCESS not-accessible
+                                        STATUS current
+                                        DESCRIPTION "Defined the entries on which occurred IFIT flow reaches the upper limit."
+                                        INDEX { hwIfitDynFlowIngressUpperLimit }
+                                        ::= { hwDynFlowIngressNumExcTable 1 }
+                                       
+                    HwDynFlowIngressNumExcEntry::=
+                                        SEQUENCE {
+                                                hwIfitDynFlowIngressUpperLimit
+                                                        Integer32
+                                         }
+
+                    hwIfitDynFlowIngressUpperLimit  OBJECT-TYPE
+                                             SYNTAX Integer32
+                                             MAX-ACCESS accessible-for-notify
+                                             STATUS current
+                                             DESCRIPTION "This object indicates the IFIT total dynamic ingress flow number upper limit."
+                                             ::= { hwDynFlowIngressNumExcEntry 1 }
+
+            hwIngressLimitObjects OBJECT IDENTIFIER ::= { hwIfitObjects 7 }
+                hwIngressNumExcTable OBJECT-TYPE
+                                        SYNTAX SEQUENCE OF HwIngressNumExcEntry
+                                        MAX-ACCESS not-accessible
+                                        STATUS current
+                                        DESCRIPTION  "The table is used to define variables in traps."
+                                        --INDEX { hwIfitIngressUpperLimit }
+                                        ::= { hwIngressLimitObjects 1 }
+                                       
+                    hwIngressNumExcEntry OBJECT-TYPE
+                                        SYNTAX HwIngressNumExcEntry
+                                        MAX-ACCESS not-accessible
+                                        STATUS current
+                                        DESCRIPTION "Defined the entries on which occurred IFIT flow reaches the upper limit."
+                                        INDEX { hwIfitIngressUpperLimit }
+                                        ::= { hwIngressNumExcTable 1 }
+                                       
+                    HwIngressNumExcEntry::=
+                                        SEQUENCE {
+                                                hwIfitIngressUpperLimit
+                                                        Integer32
+                                         }
+
+                    hwIfitIngressUpperLimit  OBJECT-TYPE
+                                             SYNTAX Integer32
+                                             MAX-ACCESS accessible-for-notify
+                                             STATUS current
+                                             DESCRIPTION "This object indicates the IFIT total ingress flow number upper limit."
+                                             ::= { hwIngressNumExcEntry 1 }
+            hwMeasureFlowLimitObjects OBJECT IDENTIFIER ::= { hwIfitObjects 8 }
+                hwMeasureFlowNumExcTable OBJECT-TYPE
+                                        SYNTAX SEQUENCE OF HwMeasureFlowNumExcEntry
+                                        MAX-ACCESS not-accessible
+                                        STATUS current
+                                        DESCRIPTION  "The table is used to define measurement flow specifications."
+                                        --INDEX { hwIfitMeasureFlowNodeType, hwIfitMeasureFlowType, hwIfitMeasureFlowUpperLimit}
+                                        ::= { hwMeasureFlowLimitObjects 1 }
+
+                    hwMeasureFlowNumExcEntry OBJECT-TYPE
+                                        SYNTAX HwMeasureFlowNumExcEntry
+                                        MAX-ACCESS not-accessible
+                                        STATUS current
+                                        DESCRIPTION "Defined the measurement flow specifications entries."
+                                        INDEX { hwIfitMeasureFlowNodeType, hwIfitMeasureFlowType, hwIfitMeasureFlowUpperLimit}
+                                        ::= { hwMeasureFlowNumExcTable 1 }
+
+                    HwMeasureFlowNumExcEntry::=
+                                        SEQUENCE {
+                                                hwIfitMeasureFlowNodeType
+                                                    OCTET STRING,
+                                                hwIfitMeasureFlowType
+                                                    OCTET STRING,
+                                                hwIfitMeasureFlowUpperLimit
+                                                    Integer32
+                                         }
+
+                    hwIfitMeasureFlowNodeType  OBJECT-TYPE
+                                             SYNTAX OCTET STRING (SIZE (1..64))
+                                             MAX-ACCESS accessible-for-notify
+                                             STATUS current
+                                             DESCRIPTION "This object indicates the measurement flow node type."
+                                             ::= { hwMeasureFlowNumExcEntry 1 }
+
+                    hwIfitMeasureFlowType  OBJECT-TYPE
+                                             SYNTAX OCTET STRING (SIZE (1..64))
+                                             MAX-ACCESS accessible-for-notify
+                                             STATUS current
+                                             DESCRIPTION "This object indicates the measurement flow type."
+                                             ::= { hwMeasureFlowNumExcEntry 2 }
+
+                    hwIfitMeasureFlowUpperLimit  OBJECT-TYPE
+                                             SYNTAX Integer32
+                                             MAX-ACCESS accessible-for-notify
+                                             STATUS current
+                                             DESCRIPTION "This object indicates the measurement flow number upper limit."
+                                             ::= { hwMeasureFlowNumExcEntry 3 }
+
+            hwFlowNumAlmostExceedObjects OBJECT IDENTIFIER ::= { hwIfitObjects 9 }
+                hwDynFlowMidEgressNumAlmostExcTable OBJECT-TYPE
+                                        SYNTAX SEQUENCE OF HwDynFlowMidEgressNumAlmostExcEntry
+                                        MAX-ACCESS not-accessible
+                                        STATUS current
+                                        DESCRIPTION  "The table is used to define variables in traps."
+                                        --INDEX { hwIfitDynFlowMidEgressMaxLimit }
+                                        ::= { hwFlowNumAlmostExceedObjects 1 }
+                    hwDynFlowMidEgressNumAlmostExcEntry OBJECT-TYPE 
+                                        SYNTAX HwDynFlowMidEgressNumAlmostExcEntry
+                                        MAX-ACCESS not-accessible
+                                        STATUS current
+                                        DESCRIPTION "Defined the entries on which occurred IFIT flow almost reaches the upper limit."
+                                        INDEX { hwIfitDynFlowMidEgressMaxLimit }
+                                        ::= { hwDynFlowMidEgressNumAlmostExcTable 1 }
+                    HwDynFlowMidEgressNumAlmostExcEntry::=
+                                        SEQUENCE {
+                                                hwIfitDynFlowMidEgressMaxLimit
+                                                        Integer32
+                                         }
+                    hwIfitDynFlowMidEgressMaxLimit  OBJECT-TYPE
+                                             SYNTAX Integer32
+                                             MAX-ACCESS accessible-for-notify
+                                             STATUS current
+                                             DESCRIPTION "This object indicates the max IFIT dynamic midegress flow number."
+                                             ::= { hwDynFlowMidEgressNumAlmostExcEntry 1 }
+
+            hwDynFlowIngressAlmostExceedObjects OBJECT IDENTIFIER ::= { hwIfitObjects 10 }
+                hwDynFlowIngressNumAlmostExcTable OBJECT-TYPE
+                                        SYNTAX SEQUENCE OF HwDynFlowIngressNumAlmostExcEntry
+                                        MAX-ACCESS not-accessible
+                                        STATUS current
+                                        DESCRIPTION  "The table is used to define variables in traps."
+                                        --INDEX { hwIfitDynFlowIngressMaxLimit }
+                                        ::= { hwDynFlowIngressAlmostExceedObjects 1 }
+                    hwDynFlowIngressNumAlmostExcEntry OBJECT-TYPE
+                                        SYNTAX HwDynFlowIngressNumAlmostExcEntry
+                                        MAX-ACCESS not-accessible
+                                        STATUS current
+                                        DESCRIPTION "Defined the entries on which occurred IFIT flow almost reaches the upper limit."
+                                        INDEX { hwIfitDynFlowIngressMaxLimit }
+                                        ::= { hwDynFlowIngressNumAlmostExcTable 1 }
+                    HwDynFlowIngressNumAlmostExcEntry::=
+                                        SEQUENCE {
+                                                hwIfitDynFlowIngressMaxLimit
+                                                        Integer32
+                                         }
+                    hwIfitDynFlowIngressMaxLimit  OBJECT-TYPE
+                                             SYNTAX Integer32
+                                             MAX-ACCESS accessible-for-notify
+                                             STATUS current
+                                             DESCRIPTION "This object indicates the IFIT total dynamic ingress flow number upper limit."
+                                             ::= { hwDynFlowIngressNumAlmostExcEntry 1 }
+
+            hwIngressAlmostExceedObjects OBJECT IDENTIFIER ::= { hwIfitObjects 11 }
+                hwIngressNumAlmostExcTable OBJECT-TYPE
+                                        SYNTAX SEQUENCE OF HwIngressNumAlmostExcEntry
+                                        MAX-ACCESS not-accessible
+                                        STATUS current
+                                        DESCRIPTION  "The table is used to define variables in traps."
+                                        --INDEX { hwIfitIngressMaxLimit }
+                                        ::= { hwIngressAlmostExceedObjects 1 }
+                    hwIngressNumAlmostExcEntry OBJECT-TYPE
+                                        SYNTAX HwIngressNumAlmostExcEntry
+                                        MAX-ACCESS not-accessible
+                                        STATUS current
+                                        DESCRIPTION "Defined the entries on which occurred IFIT flow almost reaches the upper limit."
+                                        INDEX { hwIfitIngressMaxLimit }
+                                        ::= { hwIngressNumAlmostExcTable 1 }
+                    HwIngressNumAlmostExcEntry::=
+                                        SEQUENCE {
+                                                hwIfitIngressMaxLimit
+                                                        Integer32
+                                         }
+                    hwIfitIngressMaxLimit  OBJECT-TYPE
+                                             SYNTAX Integer32
+                                             MAX-ACCESS accessible-for-notify
+                                             STATUS current
+                                             DESCRIPTION "This object indicates the IFIT total ingress flow number upper limit."
+                                             ::= { hwIngressNumAlmostExcEntry 1 }
+
+            hwMeasureFlowAlmostExceedObjects OBJECT IDENTIFIER ::= { hwIfitObjects 12 }
+                hwMeasureFlowNumAlmostExcTable OBJECT-TYPE
+                                        SYNTAX SEQUENCE OF HwMeasureFlowNumAlmostExcEntry
+                                        MAX-ACCESS not-accessible
+                                        STATUS current
+                                        DESCRIPTION  "The table is used to define measurement flow specifications."
+                                        --INDEX { hwMeasureFlowNodeType, hwMeasureFlowType, hwMeasureFlowMaxLimit}
+                                        ::= { hwMeasureFlowAlmostExceedObjects 1 }
+                    hwMeasureFlowNumAlmostExcEntry OBJECT-TYPE
+                                        SYNTAX HwMeasureFlowNumAlmostExcEntry
+                                        MAX-ACCESS not-accessible
+                                        STATUS current
+                                        DESCRIPTION "Defined the measurement flow specifications entries."
+                                        INDEX { hwMeasureFlowNodeType, hwMeasureFlowType, hwMeasureFlowMaxLimit}
+                                        ::= { hwMeasureFlowNumAlmostExcTable 1 }
+                    HwMeasureFlowNumAlmostExcEntry::=
+                                        SEQUENCE {
+                                                hwMeasureFlowNodeType
+                                                    OCTET STRING,
+                                                hwMeasureFlowType
+                                                    OCTET STRING,
+                                                hwMeasureFlowMaxLimit
+                                                    Integer32
+                                         }
+                    hwMeasureFlowNodeType  OBJECT-TYPE
+                                             SYNTAX OCTET STRING (SIZE (1..64))
+                                             MAX-ACCESS accessible-for-notify
+                                             STATUS current
+                                             DESCRIPTION "This object indicates the measurement flow node type."
+                                             ::= { hwMeasureFlowNumAlmostExcEntry 1 }
+                    hwMeasureFlowType  OBJECT-TYPE
+                                             SYNTAX OCTET STRING (SIZE (1..64))
+                                             MAX-ACCESS accessible-for-notify
+                                             STATUS current
+                                             DESCRIPTION "This object indicates the measurement flow type."
+                                             ::= { hwMeasureFlowNumAlmostExcEntry 2 }
+                    hwMeasureFlowMaxLimit  OBJECT-TYPE
+                                             SYNTAX Integer32
+                                             MAX-ACCESS accessible-for-notify
+                                             STATUS current
+                                             DESCRIPTION "This object indicates the measurement flow number upper limit."
+                                             ::= { hwMeasureFlowNumAlmostExcEntry 3 }
+
+        hwIfitNotifications  OBJECT IDENTIFIER ::= { hwIfit 2 }
+            hwFlowNumExceedTrapInBoard   OBJECT IDENTIFIER ::= { hwIfitNotifications 1 }
+                hwIfitStaticFlowNumExceedAlarm  NOTIFICATION-TYPE
+                                                OBJECTS {
+                                                        hwIfitFlowExceedBoard,
+                                                        hwIfitMaxFlowInBoard
+                                                }
+                                                STATUS current
+                                                DESCRIPTION 
+                                                    "The total number of IFIT static flows and reverse flows in the board reaches the upper limit."
+                                                ::= { hwFlowNumExceedTrapInBoard 1 }      
+                
+                hwIfitStaticFlowNumExceedResume NOTIFICATION-TYPE
+                                                OBJECTS {
+                                                        hwIfitFlowExceedBoard,
+                                                        hwIfitMaxFlowInBoard
+                                                }
+                                                STATUS current
+                                                DESCRIPTION 
+                                                    "The total number of IFIT static flows and reverse flows in the board has been lower than the upper limit."
+                                                ::= { hwFlowNumExceedTrapInBoard 2 }
+                hwIfitDynamicFlowNumExceedAlarm NOTIFICATION-TYPE
+                                                OBJECTS {
+                                                        hwIfitFlowExceedBoard,
+                                                        hwIfitMaxFlowInBoard
+                                                }
+                                                STATUS current
+                                                DESCRIPTION 
+                                                    "The total number of IFIT dynamic flows in the board reaches the upper limit."
+                                                ::= { hwFlowNumExceedTrapInBoard 3 }
+                                                
+                hwIfitDynamicFlowNumExceedResume NOTIFICATION-TYPE
+                                                OBJECTS {
+                                                        hwIfitFlowExceedBoard,
+                                                        hwIfitMaxFlowInBoard
+                                                }
+                                                STATUS current
+                                                DESCRIPTION 
+                                                    "The total number of IFIT dynamic flows in the board has been lower than the upper limit."
+                                                ::= { hwFlowNumExceedTrapInBoard 4 }
+                hwIfitExceedInstanceAlarm        NOTIFICATION-TYPE
+                                                OBJECTS {
+                                                        hwIfitInstanceType,
+                                                        hwIfitInstanceBoard,
+                                                        hwIfitMaxInstanceInBoard
+                                                }
+                                                STATUS current
+                                                DESCRIPTION 
+                                                    "The total number of IFIT instances on the interface board reaches the upper limit."
+                                                ::= { hwFlowNumExceedTrapInBoard 5 }
+                                                
+                hwIfitExceedInstanceAlarmResume NOTIFICATION-TYPE
+                                                OBJECTS {
+                                                        hwIfitInstanceType,
+                                                        hwIfitInstanceBoard,
+                                                        hwIfitMaxInstanceInBoard
+                                                }
+                                                STATUS current
+                                                DESCRIPTION 
+                                                    "The total number of IFIT instances on the interface board has been lower the upper limit."
+                                                ::= { hwFlowNumExceedTrapInBoard 6 }
+            hwDynFlowMidEgressNumExcTrap   OBJECT IDENTIFIER ::= { hwIfitNotifications 2 }
+                hwIfitDynFlowMidEgressNumExceedAlarm NOTIFICATION-TYPE
+                                                OBJECTS {
+                                                        hwIfitMaxDynFlowMidEgress
+                                                }
+                                                STATUS current
+                                                DESCRIPTION 
+                                                    "The total number of IFIT dynamic flows in the machine reaches the upper limit."
+                                                ::= { hwDynFlowMidEgressNumExcTrap 1 }
+                                                
+                hwIfitDynFlowMidEgressNumExceedResume NOTIFICATION-TYPE
+                                                OBJECTS {
+                                                        hwIfitMaxDynFlowMidEgress
+                                                }
+                                                STATUS current
+                                                DESCRIPTION 
+                                                    "The total number of IFIT dynamic flows in the machine has been lower than the upper limit."
+                                                ::= { hwDynFlowMidEgressNumExcTrap 2 }
+                                                
+            hwDynFlowIngressNumExcTrap   OBJECT IDENTIFIER ::= { hwIfitNotifications 3 }
+                hwIfitDynFlowIngressNumExceedAlarm NOTIFICATION-TYPE
+                                                OBJECTS {
+                                                        hwIfitDynFlowIngressUpperLimit
+                                                }
+                                                STATUS current
+                                                DESCRIPTION
+                                                    "The number of IFIT dynamic ingress flow reaches the upper limit."
+                                                ::= { hwDynFlowIngressNumExcTrap 1 }
+                                               
+                hwIfitDynFlowIngressNumExceedResume NOTIFICATION-TYPE
+                                                OBJECTS {
+                                                        hwIfitDynFlowIngressUpperLimit
+                                                }
+                                                STATUS current
+                                                DESCRIPTION
+                                                    "The number of IFIT dynamic ingress flow is below the upper limit."
+                                                ::= { hwDynFlowIngressNumExcTrap 2 }
+                                                
+            hwIngressNumExcTrap   OBJECT IDENTIFIER ::= { hwIfitNotifications 4 }
+                hwIfitIngressNumExceedAlarm NOTIFICATION-TYPE
+                                                OBJECTS {
+                                                        hwIfitIngressUpperLimit
+                                                }
+                                                STATUS current
+                                                DESCRIPTION
+                                                    "The number of IFIT ingress flow reaches the upper limit."
+                                                ::= { hwIngressNumExcTrap 1 }
+                                               
+                hwIfitIngressNumExceedResume NOTIFICATION-TYPE
+                                                OBJECTS {
+                                                        hwIfitIngressUpperLimit
+                                                }
+                                                STATUS current
+                                                DESCRIPTION
+                                                    "The number of IFIT ingress flow is below the upper limit."
+                                                ::= { hwIngressNumExcTrap 2 }
+            hwMeasureFlowNumExcTrap   OBJECT IDENTIFIER ::= { hwIfitNotifications 5 }
+                hwIfitMeasureFlowNumExceedAlarm NOTIFICATION-TYPE
+                                                OBJECTS {
+                                                        hwIfitMeasureFlowNodeType,
+                                                        hwIfitMeasureFlowType,
+                                                        hwIfitMeasureFlowUpperLimit
+                                                }
+                                                STATUS current
+                                                DESCRIPTION
+                                                    "The number of IFIT measurement flow reaches the upper limit."
+                                                ::= { hwMeasureFlowNumExcTrap 1 }
+                                               
+                hwIfitMeasureFlowNumExceedResume NOTIFICATION-TYPE
+                                                OBJECTS {
+                                                        hwIfitMeasureFlowNodeType,
+                                                        hwIfitMeasureFlowType,
+                                                        hwIfitMeasureFlowUpperLimit
+                                                }
+                                                STATUS current
+                                                DESCRIPTION
+                                                    "The number of IFIT measurement flow is below the upper limit."
+                                                ::= { hwMeasureFlowNumExcTrap 2 }
+
+            hwSlaDataTrap   OBJECT IDENTIFIER ::= { hwIfitNotifications 6 }
+                hwIfitmcpSlaDataAlarm NOTIFICATION-TYPE
+                                                STATUS current
+                                                DESCRIPTION
+                                                    "IFITMCP has not been generating SLA data for a noticeable period of time. "
+                                                ::= { hwSlaDataTrap 1 }
+                                               
+                hwIfitmcpSlaDataResume NOTIFICATION-TYPE
+                                                STATUS current
+                                                DESCRIPTION
+                                                    "IFITMCP is generating SLA data now."
+                                                ::= { hwSlaDataTrap 2 }
+
+            hwDynFlowMidEgressNumAlmostExcTrap   OBJECT IDENTIFIER ::= { hwIfitNotifications 7 }
+                hwIfitDynFlowMidEgressNumAlmostExceedAlarm NOTIFICATION-TYPE
+                                                OBJECTS {
+                                                        hwIfitDynFlowMidEgressMaxLimit
+                                                }
+                                                STATUS current
+                                                DESCRIPTION 
+                                                    "The total number of IFIT dynamic flows in the machine almost reaches the upper limit."
+                                                ::= { hwDynFlowMidEgressNumAlmostExcTrap 1 }
+                hwIfitDynFlowMidEgressNumAlmostExceedResume NOTIFICATION-TYPE
+                                                OBJECTS {
+                                                        hwIfitDynFlowMidEgressMaxLimit
+                                                }
+                                                STATUS current
+                                                DESCRIPTION 
+                                                    "The total number of IFIT dynamic flows in the machine is below 80% of the upper limit."
+                                                ::= { hwDynFlowMidEgressNumAlmostExcTrap 2 }
+
+            hwDynFlowIngressNumAlmostExcTrap   OBJECT IDENTIFIER ::= { hwIfitNotifications 8 }
+                hwIfitDynFlowIngressNumAlmostExceedAlarm NOTIFICATION-TYPE
+                                                OBJECTS {
+                                                        hwIfitDynFlowIngressMaxLimit
+                                                }
+                                                STATUS current
+                                                DESCRIPTION
+                                                    "The number of IFIT dynamic ingress flows almost reaches the upper limit."
+                                                ::= { hwDynFlowIngressNumAlmostExcTrap 1 }
+                                               
+                hwIfitDynFlowIngressNumAlmostExceedResume NOTIFICATION-TYPE
+                                                OBJECTS {
+                                                        hwIfitDynFlowIngressMaxLimit
+                                                }
+                                                STATUS current
+                                                DESCRIPTION
+                                                    "The number of IFIT dynamic ingress flows is below 80% of the upper limit."
+                                                ::= { hwDynFlowIngressNumAlmostExcTrap 2 }
+
+            hwIngressNumAlmostExcTrap   OBJECT IDENTIFIER ::= { hwIfitNotifications 9 }
+                hwIfitIngressNumAlmostExceedAlarm NOTIFICATION-TYPE
+                                                OBJECTS {
+                                                        hwIfitIngressMaxLimit
+                                                }
+                                                STATUS current
+                                                DESCRIPTION
+                                                    "The number of IFIT ingress flows almost reaches the upper limit."
+                                                ::= { hwIngressNumAlmostExcTrap 1 }
+                                               
+                hwIfitIngressNumAlmostExceedResume NOTIFICATION-TYPE
+                                                OBJECTS {
+                                                        hwIfitIngressMaxLimit
+                                                }
+                                                STATUS current
+                                                DESCRIPTION
+                                                    "The number of IFIT ingress flows is below 80% of the upper limit."
+                                                ::= { hwIngressNumAlmostExcTrap 2 }
+
+            hwMeasureFlowNumAlmostExcTrap   OBJECT IDENTIFIER ::= { hwIfitNotifications 10 }
+                hwIfitMeasureFlowNumAlmostExceedAlarm NOTIFICATION-TYPE
+                                                OBJECTS {
+                                                        hwMeasureFlowNodeType,
+                                                        hwMeasureFlowType,
+                                                        hwMeasureFlowMaxLimit
+                                                }
+                                                STATUS current
+                                                DESCRIPTION
+                                                    "The number of IFIT measurement flows almost reaches the upper limit."
+                                                ::= { hwMeasureFlowNumAlmostExcTrap 1 }
+                hwIfitMeasureFlowNumAlmostExceedResume NOTIFICATION-TYPE
+                                                OBJECTS {
+                                                        hwMeasureFlowNodeType,
+                                                        hwMeasureFlowType,
+                                                        hwMeasureFlowMaxLimit
+                                                }
+                                                STATUS current
+                                                DESCRIPTION
+                                                    "The number of IFIT measurement flows is below 80% of the upper limit."
+                                                ::= { hwMeasureFlowNumAlmostExcTrap 2 }
+
+        hwIfitConfigObjects OBJECT IDENTIFIER ::= { hwIfitObjects 2 }
+                
+        hwIfitStatsObjects OBJECT IDENTIFIER ::= { hwIfitObjects 3 }
+        
+        hwIfitTrap OBJECT IDENTIFIER ::= { hwIfit 3 }
+        
+        hwIfitTrapObjects OBJECT IDENTIFIER ::= { hwIfitTrap 1 }
+        
+        hwIfitConformance OBJECT IDENTIFIER ::= { hwIfit 4 }
+            hwIfitGroups   OBJECT IDENTIFIER ::= { hwIfitConformance 1 }
+                hwIfitAlarmTrapGroup    NOTIFICATION-GROUP 
+                                            NOTIFICATIONS {
+                                                hwIfitStaticFlowNumExceedAlarm,
+                                                hwIfitStaticFlowNumExceedResume,
+                                                hwIfitDynamicFlowNumExceedAlarm,
+                                                hwIfitDynamicFlowNumExceedResume,
+                                                hwIfitExceedInstanceAlarm,
+                                                hwIfitExceedInstanceAlarmResume,
+                                                hwIfitDynFlowMidEgressNumExceedAlarm,
+                                                hwIfitDynFlowMidEgressNumExceedResume,
+                                                hwIfitDynFlowIngressNumExceedAlarm,
+                                                hwIfitDynFlowIngressNumExceedResume,
+                                                hwIfitIngressNumExceedAlarm,
+                                                hwIfitIngressNumExceedResume,
+                                                hwIfitMeasureFlowNumExceedAlarm,
+                                                hwIfitMeasureFlowNumExceedResume,
+                                                hwIfitmcpSlaDataAlarm,
+                                                hwIfitmcpSlaDataResume,
+                                                hwIfitDynFlowMidEgressNumAlmostExceedAlarm,
+                                                hwIfitDynFlowMidEgressNumAlmostExceedResume,
+                                                hwIfitDynFlowIngressNumAlmostExceedAlarm,
+                                                hwIfitDynFlowIngressNumAlmostExceedResume,
+                                                hwIfitIngressNumAlmostExceedAlarm,
+                                                hwIfitIngressNumAlmostExceedResume,
+                                                hwIfitMeasureFlowNumAlmostExceedAlarm,
+                                                hwIfitMeasureFlowNumAlmostExceedResume
+                                            }
+                                            STATUS current
+                                            DESCRIPTION "IFIT alarm group."
+                                            ::= { hwIfitGroups 1 }
+                                            
+                hwIfitObjectGroup      OBJECT-GROUP 
+                                            OBJECTS {
+                                                hwIfitFlowExceedBoard,
+                                                hwIfitMaxFlowInBoard,
+                                                hwIfitMaxDynFlowMidEgress,
+                                                hwIfitInstanceType,
+                                                hwIfitInstanceBoard,
+                                                hwIfitMaxInstanceInBoard,
+                                                hwIfitDynFlowIngressUpperLimit,
+                                                hwIfitIngressUpperLimit,
+                                                hwIfitMeasureFlowNodeType,
+                                                hwIfitMeasureFlowType,
+                                                hwIfitMeasureFlowUpperLimit,
+                                                hwIfitDynFlowMidEgressMaxLimit,
+                                                hwIfitDynFlowIngressMaxLimit,
+                                                hwIfitIngressMaxLimit,
+                                                hwMeasureFlowNodeType,
+                                                hwMeasureFlowType,
+                                                hwMeasureFlowMaxLimit
+                                            }
+                                            STATUS current
+                                            DESCRIPTION "IFIT Object group."
+                                            ::= { hwIfitGroups 2 }
+        hwIfitCompliances MODULE-COMPLIANCE
+            STATUS current
+            DESCRIPTION 
+                "Please provide the descritpion."
+            MODULE 
+--                MANDATORY-GROUPS {  }
+            ::= { hwIfitConformance 2 }
+        
+             
+    END
+
+--
+-- HUAWEI-IFIT-MIB.mib
+--

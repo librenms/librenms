@@ -7,7 +7,6 @@
                    class="form-control"
                    id="dtpickerfrom"
                    maxlength="16"
-                   value="<?php echo $graph_array['from']; ?>"
                    data-date-format="YYYY-MM-DD HH:mm">
         </div>
         <div class="form-group">
@@ -16,7 +15,6 @@
                    class="form-control"
                    id="dtpickerto"
                    maxlength=16
-                   value="<?php echo $graph_array['to']; ?>"
                    data-date-format="YYYY-MM-DD HH:mm">
         </div>
         <input type="submit"
@@ -25,24 +23,22 @@
                value="Update"
                onclick="submitCustomRange(this.form);">
     </form>
+    <script src="<?php echo asset('js/RrdGraphJS/moment-timezone-with-data.js'); ?>"></script>
     <script type="text/javascript">
         $(function () {
-            var strfrom = new Date($("#dtpickerfrom").val()*1000);
-            $("#dtpickerfrom").val(strfrom.getFullYear()+"-"+
-                ("0"+(strfrom.getMonth()+1)).slice(-2)+"-"+
-                ("0"+strfrom.getDate()).slice(-2)+" "+
-                ("0"+strfrom.getHours()).slice(-2)+":"+
-                ("0"+strfrom.getMinutes()).slice(-2)
-            );
-            var strto = new Date($("#dtpickerto").val()*1000);
-            $("#dtpickerto").val(strto.getFullYear()+"-"+
-                ("0"+(strto.getMonth()+1)).slice(-2)+"-"+
-                ("0"+strto.getDate()).slice(-2)+" "+
-                ("0"+strto.getHours()).slice(-2)+":"+
-                ("0"+strto.getMinutes()).slice(-2)
-            );
-            $("#dtpickerfrom").datetimepicker({useCurrent: true, sideBySide: true, useStrict: false, icons: {time: "fa fa-clock-o", date: "fa fa-calendar", up: "fa fa-chevron-up", down: "fa fa-chevron-down", previous: "fa fa-chevron-left", next: "fa fa-chevron-right", today: "fa fa-calendar-check-o", clear: "fa fa-trash-o", close: "fa fa-close"}});
-            $("#dtpickerto").datetimepicker({useCurrent: true, sideBySide: true, useStrict: false, icons: {time: "fa fa-clock-o", date: "fa fa-calendar", up: "fa fa-chevron-up", down: "fa fa-chevron-down", previous: "fa fa-chevron-left", next: "fa fa-chevron-right", today: "fa fa-calendar-check-o", clear: "fa fa-trash-o", close: "fa fa-close"}});
+            var ds_datefrom = new Date(<?php echo $graph_array['from']; ?>*1000);
+            var ds_dateto = new Date(<?php echo $graph_array['to']; ?>*1000);
+            var ds_tz = '<?php echo session('preferences.timezone'); ?>';
+            if (ds_tz) {
+                ds_datefrom = moment.tz(ds_datefrom, ds_tz);
+                ds_dateto = moment.tz(ds_dateto, ds_tz);
+            } else {
+                ds_datefrom = moment(ds_datefrom);
+                ds_dateto = moment(ds_dateto);
+            }
+
+            $("#dtpickerfrom").datetimepicker({useCurrent: true, sideBySide: true, useStrict: false, icons: {time: "fa fa-clock-o", date: "fa fa-calendar", up: "fa fa-chevron-up", down: "fa fa-chevron-down", previous: "fa fa-chevron-left", next: "fa fa-chevron-right", today: "fa fa-calendar-check-o", clear: "fa fa-trash-o", close: "fa fa-close"}, defaultDate: ds_datefrom, timeZone: ds_tz});
+            $("#dtpickerto").datetimepicker({useCurrent: true, sideBySide: true, useStrict: false, icons: {time: "fa fa-clock-o", date: "fa fa-calendar", up: "fa fa-chevron-up", down: "fa fa-chevron-down", previous: "fa fa-chevron-left", next: "fa fa-chevron-right", today: "fa fa-calendar-check-o", clear: "fa fa-trash-o", close: "fa fa-close"}, defaultDate: ds_dateto, timeZone: ds_tz});
         });
     </script>
 </div>

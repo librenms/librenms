@@ -1,0 +1,400 @@
+-- ==================================================================
+-- Copyright (C) 2022 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- 
+-- Description: HUAWEI EVPN Management MIB
+-- Reference:
+-- Version: V1.09
+-- History:
+--      V1.03 wangxiaoli, 2019-11-06, publish
+--      V1.0 wangyaru, 2018-07-09, publish
+-- ==================================================================
+
+HUAWEI-EVPN-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    
+    hwDatacomm 
+    FROM HUAWEI-MIB
+        
+    TruthValue,TEXTUAL-CONVENTION
+    FROM SNMPv2-TC
+
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, IpAddress, OBJECT-IDENTITY, NOTIFICATION-TYPE, 
+    Counter64, Unsigned32
+    FROM SNMPv2-SMI
+
+	MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+    FROM SNMPv2-CONF; 
+        
+    hwEvpnMgmt OBJECT IDENTIFIER ::= { hwDatacomm 356 }
+	
+--
+-- Module Identifier	
+--	
+
+    hwEvpnMib MODULE-IDENTITY
+        LAST-UPDATED "202206161100Z"
+    ORGANIZATION 
+        "Huawei Technologies Co.,Ltd."
+    CONTACT-INFO 
+        "Huawei Industrial Base
+          Bantian, Longgang
+           Shenzhen 518129
+           People's Republic of China
+           Website: http://www.huawei.com
+           Email: support@huawei.com
+         "
+    DESCRIPTION
+        "This object indicates EVPN management information." 
+
+    REVISION    "202206161100Z"
+	DESCRIPTION "Modify description for hwEvpnDiscardRoute ."
+
+    REVISION    "202206131800Z"
+	DESCRIPTION "Add hwEvpnQualifyBumTableResGroup."
+
+    REVISION    "202205301500Z"
+	DESCRIPTION "Add trap hwEvpnQualifyBumTableRes, hwEvpnQualifyBumTableResClear and one compliance of
+                 hwEvpnQualifyBumTableResNotificationGroup."
+
+    REVISION    "202101201800Z"
+	DESCRIPTION "Add trap hwEvpnRingIdConflictAlm, hwEvpnRingIdConflictAlm and two compliances of hwEvpnRingIdConflictGroup
+                 and hwEvpnRingIdConflictNotificationGroup."
+
+    REVISION    "202012301700Z"
+	DESCRIPTION "Add a trap of hwEvpnDiscardRoute and two compliances of hwEvpnDiscasdRouteGroup
+                 and hwEvpnDiscdRtNotificationGroup."
+
+    REVISION    "202011281500Z"
+	DESCRIPTION "Add trap hwEvpnEvplInstDown, hwEvpnEvplInstUp at 2020-11-28." 
+     
+    REVISION    "201911061000Z"
+	DESCRIPTION "Add a node of hwEvpnInstanceIfName, a table of hwEvpnSRv6ModifyArgTable, a trap of hwEvpnSRv6ModifyArglenCfg,
+                 and two compliances of hwEvpnSRv6ModifyGroup and hwEvpnSRv6MdfNotificationGroup."
+    
+    REVISION    "201807121447Z"   
+	DESCRIPTION "Add trap hwEvpnEtreeMulErrConfig at 2018-07-12."
+     
+                   REVISION    "201807101125Z"   
+	DESCRIPTION "V1.00, initial version."
+
+	REVISION    "201807091121Z"   
+	DESCRIPTION "V1.00, initial version."
+            ::= { hwEvpnMgmt 1 }
+      
+--
+-- Objects Identifier
+--
+                  
+    hwEvpnObjects OBJECT IDENTIFIER ::= { hwEvpnMib 1 }  
+    hwEvpnInstance OBJECT IDENTIFIER ::= { hwEvpnObjects 1 }
+
+--
+-- Node definitions
+--
+   
+    hwEvpnInstanceTable  OBJECT-TYPE 
+        SYNTAX  SEQUENCE OF HwEvpnInstanceEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION 
+            "This object indicates a table that contains basic information about queried EVPN instances."
+        ::= { hwEvpnInstance  1 }    
+
+    hwEvpnInstanceEntry  OBJECT-TYPE
+        SYNTAX HwEvpnInstanceEntry
+        MAX-ACCESS not-accessible
+        STATUS   current
+        DESCRIPTION 
+            "This object indicates the entry to an EVPN instance information table."
+        INDEX    { hwEvpnInstanceVpnName }
+        ::= { hwEvpnInstanceTable 1}
+
+    HwEvpnInstanceEntry ::=
+    SEQUENCE {
+        hwEvpnInstanceVpnName OCTET STRING,
+        hwEvpnInstanceIfName OCTET STRING   
+        }
+            
+    hwEvpnInstanceVpnName OBJECT-TYPE
+        SYNTAX OCTET STRING(SIZE(1..31))
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "This object indicates the name of an EVPN instance."
+        ::= { hwEvpnInstanceEntry 1 }
+        
+    hwEvpnInstanceIfName OBJECT-TYPE
+        SYNTAX OCTET STRING(SIZE(1..63))
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "This object indicates the name of an EVPN interface."
+        ::= { hwEvpnInstanceEntry 2 }
+       
+--
+--Traps Defination
+--		
+
+    hwEvpnTraps OBJECT IDENTIFIER ::= { hwEvpnObjects 2 }
+    
+    hwEvpnMacDupVpnAlarm NOTIFICATION-TYPE
+            OBJECTS {hwEvpnInstanceVpnName}
+            STATUS current
+            DESCRIPTION 
+                "This object indicates that an EVPN instance name is used to report an alarm when a MAC address is suppressed in the EVPN instance."
+            ::= { hwEvpnTraps 1 }        
+
+    hwEvpnMacDupVpnAlarmClear NOTIFICATION-TYPE
+            OBJECTS {hwEvpnInstanceVpnName} 
+            STATUS current     
+            DESCRIPTION 
+                "This object indicates that an EVPN instance name is used to clear an alarm when all MAC addresses are unsuppressed in the EVPN instance."
+            ::= { hwEvpnTraps 2 }                          
+
+    hwEvpnEtreeMulErrConfig NOTIFICATION-TYPE
+            OBJECTS {hwEvpnInstanceVpnName, hwEvpnInstanceIfName} 
+            STATUS current     
+            DESCRIPTION 
+                "This object indicates that an EVPN instance name is used to report an alarm for leaf attribute difference between AC interfaces bound to an EVPN instance in an EVPN E-Tree dual-homing scenario."
+            ::= { hwEvpnTraps 3 }
+            
+    hwEvpnSRv6ModifyArglenCfg NOTIFICATION-TYPE
+            OBJECTS {hwEvpnInstanceLastArgLen, hwEvpnInstanceCurrentArgLen}
+            STATUS current     
+            DESCRIPTION 
+                "This object indicates that the minimum length of the ARG is changed, split horizon function may fail temporarily."
+            ::= { hwEvpnTraps 4 }
+            
+    hwEvpnEvplInstDown NOTIFICATION-TYPE
+            OBJECTS {hwEvpnEvplInstanceId, hwEvpnEvplInstanceStatus}
+            STATUS current
+            DESCRIPTION
+                "The SNMP trap that is generated when an EVPL instance status change to down."
+            ::= { hwEvpnTraps 5 }
+        
+     hwEvpnEvplInstUp NOTIFICATION-TYPE
+            OBJECTS {hwEvpnEvplInstanceId, hwEvpnEvplInstanceStatus}
+            STATUS current
+            DESCRIPTION
+                "The SNMP trap that is generated when an EVPL instance status change to up."
+            ::= { hwEvpnTraps 6 }
+            
+    hwEvpnDiscardRoute NOTIFICATION-TYPE
+            OBJECTS {hwEvpnDiscardRouteType}
+            STATUS current     
+            DESCRIPTION 
+                "This object indicates that The EVPN instance discards newly learned MAC, MAC/IP, IMET, and Ethernet A-D per-EVI routes."
+            ::= { hwEvpnTraps 7 }
+
+    hwEvpnRingIdConflictAlm NOTIFICATION-TYPE
+            OBJECTS {hwEvpnRingId, hwEvpnRouterId}
+            STATUS current
+            DESCRIPTION 
+                "This object indicates that the number of peers with the same ring-id exceeded the upper limit."
+            ::= { hwEvpnTraps 8 }        
+
+    hwEvpnRingIdConflictAlmClear NOTIFICATION-TYPE
+            OBJECTS {hwEvpnRingId, hwEvpnRouterId}
+            STATUS current     
+            DESCRIPTION 
+                "This object indicates that the number of peers with the same ring-id not exceeded the upper limit."
+            ::= { hwEvpnTraps 9 } 
+
+    hwEvpnQualifyBumTableRes NOTIFICATION-TYPE
+            OBJECTS {hwEvpnBumUpperLimit}
+            STATUS current
+            DESCRIPTION
+                "This object indicates that the number of EVPN qualify BUM resources reached the upper limit."
+            ::= { hwEvpnTraps 10 }
+
+    hwEvpnQualifyBumTableResClear NOTIFICATION-TYPE
+            OBJECTS {hwEvpnBumUpperLimit}
+            STATUS current
+            DESCRIPTION
+                "This object indicates that the number of EVPN qualify BUM resources returned to normal."
+            ::= { hwEvpnTraps 11 }
+			
+    hwEvpnTrapOid OBJECT IDENTIFIER ::= { hwEvpnObjects 3 }
+    
+    hwEvpnInstanceLastArgLen   OBJECT-TYPE
+            SYNTAX        Unsigned32
+            MAX-ACCESS    accessible-for-notify
+            STATUS        current
+            DESCRIPTION
+                "The last length of the ARG."
+            ::= { hwEvpnTrapOid 1 }
+            
+    hwEvpnInstanceCurrentArgLen   OBJECT-TYPE
+            SYNTAX        Unsigned32
+            MAX-ACCESS    accessible-for-notify
+            STATUS        current
+            DESCRIPTION
+                "The current length of the ARG."
+            ::= { hwEvpnTrapOid 2 }
+            
+    hwEvpnEvplInstanceId   OBJECT-TYPE
+            SYNTAX        Unsigned32
+            MAX-ACCESS    accessible-for-notify
+            STATUS        current
+            DESCRIPTION
+                "The EVPL instance ID."
+            ::= { hwEvpnTrapOid 3 }
+            
+    hwEvpnEvplInstanceStatus  OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                up(1),
+                down(2)
+            }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The EVPL instance status."
+            ::= { hwEvpnTrapOid 4 }
+            
+    hwEvpnDiscardRouteType   OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS    accessible-for-notify
+            STATUS        current
+            DESCRIPTION
+                "The MAC or MAC/IP route type."
+            ::= { hwEvpnTrapOid 5 }
+
+    hwEvpnRingId   OBJECT-TYPE
+            SYNTAX        Unsigned32
+            MAX-ACCESS    accessible-for-notify
+            STATUS        current
+            DESCRIPTION
+                "The ring-id configuration."
+            ::= { hwEvpnTrapOid 6 }
+
+    hwEvpnRouterId   OBJECT-TYPE
+            SYNTAX        IpAddress
+            MAX-ACCESS    accessible-for-notify
+            STATUS        current
+            DESCRIPTION
+                "The router-id of the peer."
+            ::= { hwEvpnTrapOid 7 }
+
+    hwEvpnBumUpperLimit   OBJECT-TYPE
+            SYNTAX        Unsigned32
+            MAX-ACCESS    accessible-for-notify
+            STATUS        current
+            DESCRIPTION
+                "The upper limit of the qualify BUM resource."
+            ::= { hwEvpnTrapOid 8 }
+--
+--Compliance Defination
+--		
+    hwEvpnInstConformance OBJECT IDENTIFIER ::= { hwEvpnMib 2 }    
+    hwEvpnCompliances OBJECT IDENTIFIER ::= { hwEvpnInstConformance 1 } 
+	hwEvpnCompliance MODULE-COMPLIANCE
+                        STATUS current
+                        DESCRIPTION 
+                                "The compliance statement for systems supporting the HUAWEI-EVPN-MIB."
+                        MODULE -- this module
+                                MANDATORY-GROUPS { hwEvpnInstanceGroup, hwEvpnMacDupNotificationGroup, hwEvpnEtreeMulNotificationGroup,
+                                                   hwEvpnSRv6ModifyGroup, hwEvpnSRv6MdfNotificationGroup, hwEvpnEvplModifyGroup, hwEvpnEvplNotificationGroup, 
+                                                   hwEvpnDiscardRouteGroup, hwEvpnDiscdRtNotificationGroup, 
+												   hwEvpnRingIdConflictGroup, hwEvpnRingIdConflictNotificationGroup,
+                                                   hwEvpnQualifyBumTableResNotificationGroup, hwEvpnQualifyBumTableResGroup }
+                        ::= { hwEvpnCompliances 1 }
+
+	hwEvpnInstanceGroups OBJECT IDENTIFIER ::= { hwEvpnInstConformance 2 }
+		  
+	hwEvpnInstanceGroup OBJECT-GROUP
+			OBJECTS { hwEvpnInstanceVpnName, hwEvpnInstanceIfName }
+			STATUS current
+			DESCRIPTION 
+					"This object indicates an EVPN instance group, which is used for a MAC duplication suppression alarm."
+			::= { hwEvpnInstanceGroups 1 }
+
+
+	hwEvpnMacDupNotificationGroup NOTIFICATION-GROUP
+			NOTIFICATIONS { hwEvpnMacDupVpnAlarmClear, hwEvpnMacDupVpnAlarm }
+			STATUS current
+			DESCRIPTION 
+					"This object indicates a MAC duplication suppression alarm group, which is used to prompt an alarm or clear the alarm."
+			::= { hwEvpnInstanceGroups 2 }
+
+
+	hwEvpnEtreeMulNotificationGroup NOTIFICATION-GROUP
+			NOTIFICATIONS { hwEvpnEtreeMulErrConfig }
+			STATUS current
+			DESCRIPTION 
+					"This object indicates an error configuration alarm group, which is used to prompt an alarm in EVPN E-Tree scenarios."
+			::= { hwEvpnInstanceGroups 3 }
+            
+    hwEvpnSRv6ModifyGroup OBJECT-GROUP
+            OBJECTS {hwEvpnInstanceLastArgLen, hwEvpnInstanceCurrentArgLen}
+            STATUS current     
+            DESCRIPTION 
+                "This object indicates the minimum length of the ARG group."
+            ::= { hwEvpnInstanceGroups 4 }
+            
+    hwEvpnSRv6MdfNotificationGroup NOTIFICATION-GROUP
+            NOTIFICATIONS { hwEvpnSRv6ModifyArglenCfg }
+            STATUS current     
+            DESCRIPTION 
+                "This object indicates the minimum length of the ARG notification group."
+            ::= { hwEvpnInstanceGroups 5 }
+
+    hwEvpnEvplModifyGroup OBJECT-GROUP
+        OBJECTS { hwEvpnEvplInstanceId, hwEvpnEvplInstanceStatus }
+        STATUS current
+        DESCRIPTION
+            "This object indicates an EVPL instance state group."
+        ::= { hwEvpnInstanceGroups 6 }
+    
+    hwEvpnEvplNotificationGroup NOTIFICATION-GROUP    
+       NOTIFICATIONS { hwEvpnEvplInstDown, hwEvpnEvplInstUp}
+       STATUS current
+       DESCRIPTION
+           "This object indicates an EVPL instance state group."
+       ::= { hwEvpnInstanceGroups 7 }
+    
+    hwEvpnDiscardRouteGroup OBJECT-GROUP
+            OBJECTS {hwEvpnDiscardRouteType}
+            STATUS current     
+            DESCRIPTION 
+                "This object indicates the route of EVPN instance discarding group."
+            ::= { hwEvpnInstanceGroups 8 }
+            
+    hwEvpnDiscdRtNotificationGroup NOTIFICATION-GROUP
+            NOTIFICATIONS { hwEvpnDiscardRoute }
+            STATUS current     
+            DESCRIPTION 
+                "This object indicates the route of EVPN instance discarding notification group."
+            ::= { hwEvpnInstanceGroups 9 }
+
+    hwEvpnRingIdConflictGroup OBJECT-GROUP
+            OBJECTS {hwEvpnRingId, hwEvpnRouterId}
+            STATUS current     
+            DESCRIPTION 
+                "This object indicates the ring-id and router-id of the ring-id conflict group."
+            ::= { hwEvpnInstanceGroups 10 }
+
+	hwEvpnRingIdConflictNotificationGroup NOTIFICATION-GROUP
+			NOTIFICATIONS { hwEvpnRingIdConflictAlmClear, hwEvpnRingIdConflictAlm }
+			STATUS current
+			DESCRIPTION 
+					"This object indicates a ring-id conflict alarm group, which is used to prompt an alarm or clear the alarm."
+			::= { hwEvpnInstanceGroups 11 }
+
+	hwEvpnQualifyBumTableResNotificationGroup NOTIFICATION-GROUP
+			NOTIFICATIONS { hwEvpnQualifyBumTableResClear, hwEvpnQualifyBumTableRes }
+			STATUS current
+			DESCRIPTION 
+					"This object indicates a EVPN qualify BUM table res alarm group, which is used to prompt an alarm or clear the alarm."
+			::= { hwEvpnInstanceGroups 12 }
+
+	hwEvpnQualifyBumTableResGroup OBJECT-GROUP
+			OBJECTS { hwEvpnBumUpperLimit }
+			STATUS current
+			DESCRIPTION 
+					"This object indicates the upper limit value of the EVPN qualify BUM resource group."
+			::= { hwEvpnInstanceGroups 13 }
+
+END
+
