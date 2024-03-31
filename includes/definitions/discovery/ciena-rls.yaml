@@ -1,4 +1,4 @@
-mib: CIENA-PRO-SOFTWARE-MIB:CIENA-6500R-INVENTORY-MIB
+mib: CIENA-PRO-SOFTWARE-MIB:CIENA-6500R-INVENTORY-MIB:CIENA-6500R-INVENTORY-AMPS-MIB
 modules:
     os:
         hardware: SNMPv2-MIB::sysDescr.0
@@ -17,3 +17,62 @@ modules:
                     num_oid: '.1.3.6.1.4.1.1271.4.1.1.1.1.1.1.29.{{ $index_string }}'
                     index: 'rlsCircuitPackCurrTemprature.{{ $index_string }}'
                     descr: '{{ $rlsCircuitPackCtype }} Slot {{ $index }}'
+        dbm:
+            data:
+                -
+                    oid: rlsInventoryAmpsTable
+                    value: rlsInventoryAmpsInCurrPower
+                    num_oid: '.1.3.6.1.4.1.1271.4.1.1.1.2.1.1.1.48.{{ $index_string }}'
+                    index: 'rlsInventoryAmpsInCurrPower.{{ $index_string }}'
+                    descr: 'Slot {{ $index }}'
+                    group: 'Amplifier Input - Current'
+                    low_limit: rlsInventoryAmpsInputLosThreshold
+                -
+                    oid: rlsInventoryAmpsTable
+                    value: rlsInventoryAmpsInMinPower
+                    num_oid: '.1.3.6.1.4.1.1271.4.1.1.1.2.1.1.1.49.{{ $index_string }}'
+                    index: 'rlsInventoryAmpsInMinPower.{{ $index_string }}'
+                    descr: 'Slot {{ $index }}'
+                    group: 'Amplifier Input - Minimum'
+                -
+                    oid: rlsInventoryAmpsTable
+                    value: rlsInventoryAmpsInMaxPower
+                    num_oid: '.1.3.6.1.4.1.1271.4.1.1.1.2.1.1.1.50.{{ $index_string }}'
+                    index: 'rlsInventoryAmpsInMaxPower.{{ $index_string }}'
+                    descr: 'Slot {{ $index }}'
+                    group: 'Amplifier Input - Maximum'
+                -
+                    oid: rlsInventoryAmpsTable
+                    value: rlsInventoryAmpsOutCurrPower
+                    num_oid: '.1.3.6.1.4.1.1271.4.1.1.1.2.1.1.1.51.{{ $index_string }}'
+                    index: 'rlsInventoryAmpsOutCurrPower.{{ $index_string }}'
+                    descr: 'Slot {{ $index }}'
+                    group: 'Amplifier Output - Current'
+                -
+                    oid: rlsInventoryAmpsTable
+                    value: rlsInventoryAmpsOutMinPower
+                    num_oid: '.1.3.6.1.4.1.1271.4.1.1.1.2.1.1.1.52.{{ $index_string }}'
+                    index: 'rlsInventoryAmpsOutMinPower.{{ $index_string }}'
+                    descr: 'Slot {{ $index }}'
+                    group: 'Amplifier Output - Minimum'
+                -
+                    oid: rlsInventoryAmpsTable
+                    value: rlsInventoryAmpsOutMaxPower
+                    num_oid: '.1.3.6.1.4.1.1271.4.1.1.1.2.1.1.1.53.{{ $index_string }}'
+                    index: 'rlsInventoryAmpsOutMaxPower.{{ $index_string }}'
+                    descr: 'Slot {{ $index }}'
+                    group: 'Amplifier Output - Maximum'
+                -
+                    oid: rlsInventoryAmpsTable
+                    value: rlsInventoryAmpsOpticalReturnLoss
+                    num_oid: '.1.3.6.1.4.1.1271.4.1.1.1.2.1.1.1.54.{{ $index_string }}'
+                    index: 'rlsInventoryAmpsOpticalReturnLoss.{{ $index_string }}'
+                    descr: 'Slot {{ $index }}'
+                    group: 'Amplifier Optical Return Loss'
+                    low_warn_limit: rlsInventoryAmpsOrlThreshold
+                    low_limit: rlsInventoryAmpsAprThreshold
+                    skip_values:
+                        -
+                            oid: index
+                            op: 'contains'
+                            value: 'Pre-Amp'
