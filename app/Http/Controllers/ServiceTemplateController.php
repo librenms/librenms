@@ -69,7 +69,7 @@ class ServiceTemplateController extends Controller
                 'groups.*' => 'integer',
                 'devices' => 'array',
                 'devices.*' => 'integer',
-                'check' => 'string',
+                'check' => 'required|string',
                 'type' => 'required|in:dynamic,static',
                 'rules' => 'json|required_if:type,dynamic',
                 'param' => 'nullable|string',

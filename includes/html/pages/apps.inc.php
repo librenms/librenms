@@ -450,6 +450,7 @@ $graphs['pwrstatd'] = [
     'minutes',
 ];
 $graphs['systemd'] = [
+    'all',
     'sub',
     'active',
     'load',
@@ -523,6 +524,20 @@ $graphs['privoxy'] = [
 ];
 $graphs['ss'] = [
     'sockets',
+    'dccp',
+    'inet',
+    'inet6',
+    'link',
+    'mptcp',
+    'netlink',
+    'raw',
+    'sctp',
+    'tcp',
+    'tipc',
+    'udp',
+    'unix',
+    'vsock',
+    'xdp',
 ];
 $graphs['borgbackup'] = [
     'unique_csize',

@@ -53,7 +53,7 @@ class LinkDown implements SnmptrapHandler
             return;
         }
 
-        $port->ifOperStatus = $trap->getOidData("IF-MIB::ifOperStatus.$ifIndex") ?: 'down';
+        $port->ifOperStatus = 'down';
 
         $trapAdminStatus = $trap->getOidData("IF-MIB::ifAdminStatus.$ifIndex");
         if ($trapAdminStatus) {

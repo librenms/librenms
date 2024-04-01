@@ -55,6 +55,8 @@ class CustomMapDataController extends Controller
                 'reverse' => $edge->reverse,
                 'style' => $edge->style,
                 'showpct' => $edge->showpct,
+                'showbps' => $edge->showbps,
+                'label' => $edge->label,
                 'text_face' => $edge->text_face,
                 'text_size' => $edge->text_size,
                 'text_colour' => $edge->text_colour,
@@ -122,6 +124,8 @@ class CustomMapDataController extends Controller
                     $edges[$edgeid]['colour_to'] = $this->speedColour($edges[$edgeid]['port_topct']);
                     $edges[$edgeid]['colour_from'] = $this->speedColour($edges[$edgeid]['port_frompct']);
                 }
+                $edges[$edgeid]['port_tobps'] = $this->rateString($rateto);
+                $edges[$edgeid]['port_frombps'] = $this->rateString($ratefrom);
                 $edges[$edgeid]['width_to'] = $this->speedWidth($speedto);
                 $edges[$edgeid]['width_from'] = $this->speedWidth($speedfrom);
             }
@@ -185,11 +189,20 @@ class CustomMapDataController extends Controller
             'newedgeconf' => 'array',
             'nodes' => 'array',
             'edges' => 'array',
+            'legend_x' => 'integer',
+            'legend_y' => 'integer',
         ]);
 
         $map->load(['nodes', 'edges']);
 
         DB::transaction(function () use ($map, $data) {
+            if ($map->legend_x != $data['legend_x'] || $map->legend_y != $data['legend_y']) {
+                $map->legend_x = $data['legend_x'];
+                $map->legend_y = $data['legend_y'];
+
+                $map->save();
+            }
+
             $dbnodes = $map->nodes->keyBy('custom_map_node_id')->all();
             $dbedges = $map->edges->keyBy('custom_map_edge_id')->all();
 
@@ -249,6 +262,8 @@ class CustomMapDataController extends Controller
                 $dbedge->port_id = $edge['port_id'] ? $edge['port_id'] : null;
                 $dbedge->reverse = filter_var($edge['reverse'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
                 $dbedge->showpct = filter_var($edge['showpct'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+                $dbedge->showbps = filter_var($edge['showbps'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+                $dbedge->label = $edge['label'] ? $edge['label'] : '';
                 $dbedge->style = $edge['style'];
                 $dbedge->text_face = $edge['text_face'];
                 $dbedge->text_size = $edge['text_size'];
@@ -272,6 +287,23 @@ class CustomMapDataController extends Controller
         });
 
         return response()->json(['id' => $map->custom_map_id]);
+    }
+
+    private function rateString(int $rate): string
+    {
+        if ($rate < 1000) {
+            return $rate . ' bps';
+        } elseif ($rate < 1000000) {
+            return intval($rate / 1000) . ' kbps';
+        } elseif ($rate < 1000000000) {
+            return intval($rate / 1000000) . ' Mbps';
+        } elseif ($rate < 1000000000000) {
+            return intval($rate / 1000000000) . ' Gbps';
+        } elseif ($rate < 1000000000000000) {
+            return intval($rate / 1000000000000) . ' Tbps';
+        } else {
+            return intval($rate / 1000000000000000) . ' Pbps';
+        }
     }
 
     private function snmpSpeed(string $speeds): int

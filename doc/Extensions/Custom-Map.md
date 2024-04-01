@@ -25,6 +25,19 @@ Some key points about the viewer are:
    - Red at 100% utilisation, with a gradual change to
    - Purple at 150% utilisation and above
 
+### Viewer URL options
+
+You can manually add the following parameters to a URL to alter the display of a
+custom map.
+
+The following URL options are available:
+
+ - bare=yes : Removes the control bar from the top of the page.
+ - screenshot=yes : Removes all labels from the nodes and links
+
+e.g. If you want bare and screenshot enabled, https://_nmsserver_/maps/custom/2
+becomes https://_nmsserver_/maps/custom/2?bare=yes&screenshot=yes
+
 ## Editor
 
 To access the custom map editor, a user must be an admin.  The editor

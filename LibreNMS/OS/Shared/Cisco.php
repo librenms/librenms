@@ -449,8 +449,8 @@ class Cisco extends OS implements
                     $jitter = [
                         'PacketLossSD' => $data[$sla_nr]['rttMonLatestJitterOperPacketLossSD'],
                         'PacketLossDS' => $data[$sla_nr]['rttMonLatestJitterOperPacketLossDS'],
-                        'PacketOutOfSequence' => $data[$sla_nr]['rttMonLatestJitterOperPacketOutOfSequence'],
-                        'PacketMIA' => $data[$sla_nr]['rttMonLatestJitterOperPacketMIA'],
+                        'PacketOutOfSequence' => $data[$sla_nr]['rttMonLatestJitterOperPacketOutOfSequence'] ?? null,
+                        'PacketMIA' => $data[$sla_nr]['rttMonLatestJitterOperPacketMIA'] ?? null,
                         'PacketLateArrival' => $data[$sla_nr]['rttMonLatestJitterOperPacketLateArrival'],
                         'MOS' => isset($data[$sla_nr]['rttMonLatestJitterOperMOS']) ? intval($data[$sla_nr]['rttMonLatestJitterOperMOS']) / 100 : null,
                         'ICPIF' => $data[$sla_nr]['rttMonLatestJitterOperICPIF'] ?? null,

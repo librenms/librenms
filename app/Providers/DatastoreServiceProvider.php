@@ -36,6 +36,7 @@ class DatastoreServiceProvider extends ServiceProvider
     protected $stores = [
         'LibreNMS\Data\Store\Graphite',
         'LibreNMS\Data\Store\InfluxDB',
+        'LibreNMS\Data\Store\InfluxDBv2',
         'LibreNMS\Data\Store\OpenTSDB',
         'LibreNMS\Data\Store\Prometheus',
         'LibreNMS\Data\Store\Rrd',

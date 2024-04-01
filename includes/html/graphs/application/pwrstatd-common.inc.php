@@ -16,12 +16,16 @@ if (isset($vars['sn'])) {
 
 $rrd_list = [];
 
+if (! $sn_list) {
+    graph_error('No Data to Display', 'No Data');
+}
+
 $i = 0;
+$j = 0;
 while (isset($sn_list[$i])) {
     $sn = $sn_list[$i];
     $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, $sn]);
 
-    $j = 0;
     if (Rrd::checkRrdExists($rrd_filename)) {
         foreach ($rrdArray as $ds => $var) {
             $rrd_list[$j]['filename'] = $rrd_filename;
@@ -29,6 +33,8 @@ while (isset($sn_list[$i])) {
             $rrd_list[$j]['ds'] = $ds;
             $j++;
         }
+    } else {
+        graph_error('No Data file ' . basename($rrd_filename), 'No Data');
     }
     $i++;
 }

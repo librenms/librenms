@@ -35,11 +35,14 @@ class Ipv4Network extends Model
 
     public $timestamps = false;
     protected $primaryKey = 'ipv4_network_id';
-
+    protected $fillable = [
+        'ipv4_network',
+        'context_name',
+    ];
     // ---- Define Relationships ----
 
     public function ipv4(): HasMany
     {
-        return $this->hasMany(\App\Models\Ipv4Address::class, 'ipv4_network_id');
+        return $this->hasMany(Ipv4Address::class, 'ipv4_network_id');
     }
 }

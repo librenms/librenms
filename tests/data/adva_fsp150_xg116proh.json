@@ -451,7 +451,7 @@
                 },
                 {
                     "state_name": "cmSysCondType",
-                    "state_descr": "Under Tempurature",
+                    "state_descr": "Under Temperature",
                     "state_draw_graph": 0,
                     "state_value": 60,
                     "state_generic_value": 2
@@ -1098,7 +1098,7 @@
                 },
                 {
                     "state_name": "cmSysCondType",
-                    "state_descr": "Under Tempurature",
+                    "state_descr": "Under Temperature",
                     "state_draw_graph": 0,
                     "state_value": 60,
                     "state_generic_value": 2

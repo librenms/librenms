@@ -1,6 +1,69 @@
+mib: Sentry3-MIB
 modules:
     os:
         hardware: Sentry3-MIB::towerModelNumber.1
         serial: Sentry3-MIB::towerProductSN.1
         version: Sentry3-MIB::systemVersion.0
         version_regex: '/Version (?<version>\S+)/'
+    sensors:
+        # note 2-dimensional index tower.infeed for infeed
+        # and 3-dimensional index tower.infeed.outlet for outlets
+        current:
+            options:
+                divisor: 100
+                skip_value_lt: 0
+            data:
+                - oid: infeedTable
+                  value: infeedLoadValue
+                  num_oid: '.1.3.6.1.4.1.1718.3.2.2.1.7.{{ $index }}'
+                  descr: infeedName
+                  index: 'infeedID.{{ $index }}' 
+                  ## limits need to be excluded from the divisor somehow
+                  #warn_limit: infeedLoadHighThresh
+                  #high_limit: infeedCapacity
+                  
+                - oid: outletTable
+                  value: outletLoadValue
+                  num_oid: '.1.3.6.1.4.1.1718.3.2.3.1.7.{{ $index }}'
+                  descr: outletName
+                  index: 'outletID.{{ $index }}'
+                  ## limits need to be excluded from the divisor somehow
+                  #low_warn_limit: outletLoadLowThresh
+                  #warn_limit: outletLoadHighThresh
+                  #high_limit: outputCapacity
+        voltage:
+            # note: this is configured, not measured
+            options:
+                divisor: 10
+                skip_value_lt: 0
+            data:
+                - oid: infeedTable
+                  value: infeedVoltage
+                  num_oid: '.1.3.6.1.4.1.1718.3.2.2.1.11.{{ $index }}'
+                  descr: infeedName
+                  # recording voltage for additional feeds (3-phase)
+                  # would require reindexing and moving RRD files;
+                  # this is a configured value, not measured.
+                  index: '{{ $subindex0 }}'
+                  group: 'Configured Voltage'
+        power:
+            options:
+                skip_value_lt: 0
+            data:
+                - oid: infeedTable
+                  value: infeedPower
+                  num_oid: '.1.3.6.1.4.1.1718.3.2.2.1.12.{{ $index }}'
+                  descr: infeedName
+                  skip_value_lt: 0
+
+                - oid: systemTotalPower
+                  num_oid: '.1.3.6.1.4.1.1718.3.1.6.{{ $index }}'
+                  descr: 'System Total Power'
+
+        power_factor:
+            data:
+                - oid: systemPowerFactor
+                  num_oid: '.1.3.6.1.4.1.1718.3.1.10.{{ $index }}'
+                  descr: 'System Power Factor'
+                  group: 'Configured Power Factor'
+

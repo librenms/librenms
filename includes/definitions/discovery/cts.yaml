@@ -1,0 +1,55 @@
+mib: IPS-3110-MIB:IPS-3110-PB-MIB:IPS-3106-SE-PB-MIB:IES-3110-MIB:HES-3112-MIB
+
+modules:
+    os:
+        sysDescr_regex: '/(?<hardware>(.+)) (?<version>(Version .+))/'
+        serial:
+            - IPS-3110-MIB::swhSerialNumber.0
+            - IPS-3110-PB-MIB::swhSerialNumber.0
+            - IPS-3106-SE-PB-MIB::swhSerialNumber.0
+            - IES-3110-MIB::swhSerialNumber.0
+            - HES-3112-MIB::cvtSerialNumber.0
+            # The following is for IPS-3106 because I cannot find a MIB for it
+            - .1.3.6.1.4.1.9304.100.3106.1.2.14.0
+    sensors:
+        dbm:
+            data:
+                -
+                    oid: IPS-3110-MIB::swhSFPPortStateTable
+                    value: IPS-3110-MIB::swhSFPPortStateTXPower
+                    num_oid: '.1.3.6.1.4.1.9304.100.3110.5.34.2.1.1.11.{{ $index }}'
+                    descr: '{{ IPS-3110-MIB::swhSFPPortStatePortName }} SFP Tx Power'
+                    index: 'ddmTx-{{ $index }}'
+                    group: '{{ IPS-3110-MIB::swhSFPPortStatePortName }}'
+                -
+                    oid: IPS-3110-MIB::swhSFPPortStateTable
+                    value: IPS-3110-MIB::swhSFPPortStateRXPower
+                    num_oid: '.1.3.6.1.4.1.9304.100.3110.5.34.2.1.1.13.{{ $index }}'
+                    descr: '{{ IPS-3110-MIB::swhSFPPortStatePortName }} SFP Rx Power'
+                    index: 'ddmRx-{{ $index }}'
+                    group: '{{ IPS-3110-MIB::swhSFPPortStatePortName }}'
+        voltage:
+            data:
+                -
+                    oid: IPS-3110-MIB::swhSFPPortStateTable
+                    value: IPS-3110-MIB::swhSFPPortStateVoltage
+                    num_oid: '.1.3.6.1.4.1.9304.100.3110.5.34.2.1.1.7.{{ $index }}'
+                    descr: '{{ IPS-3110-MIB::swhSFPPortStatePortName }} SFP Voltage'
+                    index: 'ddmVolt-{{ $index }}'
+                    group: '{{ IPS-3110-MIB::swhSFPPortStatePortName }}'
+        temperature:
+            data:
+                -
+                    oid: IPS-3110-MIB::swhSFPPortStateTable
+                    value: IPS-3110-MIB::swhSFPPortStateTemperature
+                    num_oid: '.1.3.6.1.4.1.9304.100.3110.5.34.2.1.1.5.{{ $index }}'
+                    descr: '{{ IPS-3110-MIB::swhSFPPortStatePortName }} SFP Temperature'
+                    index: 'ddmTemp-{{ $index }}'
+                    group: '{{ IPS-3110-MIB::swhSFPPortStatePortName }}'
+        power:
+            data:
+                -
+                    oid: IPS-3110-MIB::swhPOETotalPower
+                    num_oid: '.1.3.6.1.4.1.9304.100.3110.5.48.1.{{ $index }}'
+                    descr: 'Total PoE Power Consumption'
+

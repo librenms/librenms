@@ -11,6 +11,7 @@
  */
 
 $pagetitle[] = 'Oxidized';
+$no_refresh = true;
 ?>
 <div class="col-xs-12">
     <h2>Oxidized</h2>

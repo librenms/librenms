@@ -30,6 +30,7 @@ use App\Http\Requests\CustomMapSettingsRequest;
 use App\Models\CustomMap;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Storage;
 use LibreNMS\Config;
@@ -47,6 +48,16 @@ class CustomMapController extends Controller
             'maps' => CustomMap::orderBy('name')->get(['custom_map_id', 'name']),
             'name' => 'New Map',
             'node_align' => 10,
+            'edge_separation' => 10,
+            'reverse_arrows' => 0,
+            'legend' => [
+                'x' => -1,
+                'y' => -1,
+                'steps' => 7,
+                'hide_invalid' => 0,
+                'hide_overspeed' => 0,
+                'font_size' => 14,
+            ],
             'background' => null,
             'map_conf' => [
                 'height' => '800px',
@@ -75,8 +86,14 @@ class CustomMapController extends Controller
                   ->header('Content-Type', 'text/plain');
     }
 
-    public function show(CustomMap $map): View
+    public function show(Request $request, CustomMap $map): View
     {
+        $request->validate([
+            'screenshot' => 'nullable|in:yes',
+        ]);
+
+        $screenshot = $request->input('screenshot') === 'yes' ? 1 : 0;
+
         $map_conf = $map->options;
         $map_conf['width'] = $map->width;
         $map_conf['height'] = $map->height;
@@ -84,6 +101,8 @@ class CustomMapController extends Controller
             'edit' => false,
             'map_id' => $map->custom_map_id,
             'name' => $map->name,
+            'reverse_arrows' => $map->reverse_arrows,
+            'legend' => $this->legendConfig($map),
             'background' => (bool) $map->background_suffix,
             'bgversion' => $map->background_version,
             'page_refresh' => Config::get('page_refresh', 300),
@@ -93,6 +112,7 @@ class CustomMapController extends Controller
             'newnode_conf' => $map->newnodeconfig,
             'vmargin' => 20,
             'hmargin' => 20,
+            'screenshot' => $screenshot,
         ];
 
         return view('map.custom-view', $data);
@@ -104,6 +124,9 @@ class CustomMapController extends Controller
             'map_id' => $map->custom_map_id,
             'name' => $map->name,
             'node_align' => $map->node_align,
+            'edge_separation' => $map->edge_separation,
+            'reverse_arrows' => $map->reverse_arrows,
+            'legend' => $this->legendConfig($map),
             'newedge_conf' => $map->newedgeconfig,
             'newnode_conf' => $map->newnodeconfig,
             'map_conf' => $map->options,
@@ -142,6 +165,8 @@ class CustomMapController extends Controller
             'name' => $map->name,
             'width' => $map->width,
             'height' => $map->height,
+            'reverse_arrows' => $map->reverse_arrows,
+            'edge_separation' => $map->edge_separation,
         ]);
     }
 
@@ -163,5 +188,22 @@ class CustomMapController extends Controller
         }
 
         return $images;
+    }
+
+    /**
+     * Return the legend config
+     */
+    private function legendConfig(CustomMap $map): array
+    {
+        $legend = [
+            'x' => $map->legend_x,
+            'y' => $map->legend_y,
+            'steps' => $map->legend_steps,
+            'hide_invalid' => $map->legend_hide_invalid,
+            'hide_overspeed' => $map->legend_hide_overspeed,
+            'font_size' => $map->legend_font_size,
+        ];
+
+        return $legend;
     }
 }
