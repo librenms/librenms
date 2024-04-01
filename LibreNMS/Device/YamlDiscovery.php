@@ -190,7 +190,7 @@ class YamlDiscovery
                 'count' => $count,
                 // we compute a numOid compatible version of index
                 // string length followed by ASCII of each char.
-                'index_string' => implode('.', array_map(function ($index) {
+                'index:str2num' => implode('.', array_map(function ($index) {
                     return strlen($index) . '.' . implode('.', unpack('c*', $index));
                 }, explode('.', $index))),
             ];
