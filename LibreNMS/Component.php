@@ -231,12 +231,12 @@ class Component
                 $component->fill($update);
                 // sanity check
                 if (! is_null($component->error)) {
-                    $component->error = substr($component->error, 0,255);
+                    $component->error = substr($component->error, 0, 255);
                 }
                 if (! is_null($component->label)) {
-                    $component->label = substr($component->label, 0,255);
+                    $component->label = substr($component->label, 0, 255);
                 }
-                $component->type = substr($component->type ?? '', 0,50);
+                $component->type = substr($component->type ?? '', 0, 50);
 
                 if ($component->isDirty()) {
                     // Log the update to the Eventlog.
