@@ -221,7 +221,6 @@ if (strpos($port['label'], 'oopback') === false && empty($graph_type)) {
     if (! empty($port_details) && Config::get('enable_port_relationship') === true) {
         // Show which other devices are on the same subnet as this interface
         foreach (dbFetchRows("SELECT `ipv4_network_id` FROM `ipv4_addresses` WHERE `port_id` = ? AND `ipv4_address` NOT LIKE '127.%'", [$port['port_id']]) as $net) {
-            $ipv4_network_id = $net['ipv4_network_id'];
             $sql = 'SELECT I.port_id FROM ipv4_addresses AS A, ports AS I, devices AS D
                 WHERE A.port_id = I.port_id
                 AND A.ipv4_network_id = ? AND D.device_id = I.device_id
@@ -231,18 +230,12 @@ if (strpos($port['label'], 'oopback') === false && empty($graph_type)) {
                 $device['device_id'],
             ];
             foreach (dbFetchRows($sql, $array) as $new) {
-                echo $new['ipv4_network_id'];
-                $this_ifid = $new['port_id'];
-                $this_hostid = $new['device_id'];
-                $this_hostname = $new['hostname'];
-                $this_ifname = \LibreNMS\Util\Rewrite::normalizeIfName($new['label']);
-                $int_links[$this_ifid] = $this_ifid;
-                $int_links_v4[$this_ifid] = 1;
+                $int_links[$new['port_id']] = $new['port_id'];
+                $int_links_v4[$new['port_id']] = 1;
             }
         }//end foreach
 
         foreach (dbFetchRows('SELECT ipv6_network_id FROM ipv6_addresses WHERE port_id = ?', [$port['port_id']]) as $net) {
-            $ipv6_network_id = $net['ipv6_network_id'];
             $sql = "SELECT I.port_id FROM ipv6_addresses AS A, ports AS I, devices AS D
                 WHERE A.port_id = I.port_id
                 AND A.ipv6_network_id = ? AND D.device_id = I.device_id
@@ -253,13 +246,8 @@ if (strpos($port['label'], 'oopback') === false && empty($graph_type)) {
             ];
 
             foreach (dbFetchRows($sql, $array) as $new) {
-                echo $new['ipv6_network_id'];
-                $this_ifid = $new['port_id'];
-                $this_hostid = $new['device_id'];
-                $this_hostname = $new['hostname'];
-                $this_ifname = \LibreNMS\Util\Rewrite::normalizeIfName($new['label']);
-                $int_links[$this_ifid] = $this_ifid;
-                $int_links_v6[$this_ifid] = 1;
+                $int_links[$new['port_id']] = $new['port_id'];
+                $int_links_v6[$new['port_id']] = 1;
             }
         }//end foreach
     }//end if

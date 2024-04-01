@@ -306,9 +306,19 @@ class Port extends DeviceRelatedModel
         return $this->hasMany(\App\Models\Ipv4Address::class, 'port_id');
     }
 
+    public function ipv4Networks()
+    {
+        return $this->hasManyThrough(Ipv4Network::class, Ipv4Address::class, 'port_id', 'ipv4_network_id', 'port_id', 'ipv4_network_id');
+    }
+
     public function ipv6(): HasMany
     {
         return $this->hasMany(\App\Models\Ipv6Address::class, 'port_id');
+    }
+
+    public function ipv6Networks()
+    {
+        return $this->hasManyThrough(Ipv4Network::class, Ipv4Address::class, 'port_id', 'ipv6_network_id', 'port_id', 'ipv6_network_id');
     }
 
     public function links(): HasMany

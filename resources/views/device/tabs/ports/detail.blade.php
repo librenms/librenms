@@ -112,7 +112,7 @@
                     <div class="tw-text-base">MTU {{ $port->ifMtu }}</div>
                 </td>
                 <td>
-
+                    @json($data['findPortNeighbors']($port))
                     links, etc
                 </td>
             </tr>

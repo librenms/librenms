@@ -26,6 +26,9 @@
 namespace App\Http\Controllers\Device\Tabs;
 
 use App\Models\Device;
+use App\Models\Link;
+use App\Models\Port;
+use App\Models\Pseudowire;
 use LibreNMS\Interfaces\UI\DeviceTab;
 
 class PortsController implements DeviceTab
@@ -78,36 +81,81 @@ class PortsController implements DeviceTab
     {
         $relationships = ['groups', 'ipv4', 'ipv6', 'vlans', 'adsl', 'vdsl'];
 
-        if ($detail) {
-            if (Config::get('enable_port_relationship')) {
-                $relationships[] = 'pseudowires';
-            }
-
+        if ($detail && Config::get('enable_port_relationship')) {
+            $relationships[] = 'pseudowires.endpoints';
+            $relationships[] = 'links';
+            $relationships[] = 'ipv4Networks';
+            $relationships[] = 'ipv4Networks.ipv4';
         }
 
 
         return [
-            'ports' => $device->ports()->with($relationships)->paginate(),
+            'ports' => $device->ports()->isUp()->with($relationships)->get(), // TODO paginate
             'graphs' => [
                 'bits' => [['type' => 'port_bits', 'title' => trans('Traffic'), 'vars' => [['from' => '-1d'], ['from' => '-7d'], ['from' => '-30d'], ['from' => '-1y']]]],
                 'upkts' => [['type' => 'port_upkts', 'title' => trans('Packets (Unicast)'), 'vars' => [['from' => '-1d'], ['from' => '-7d'], ['from' => '-30d'], ['from' => '-1y']]]],
                 'errors' => [['type' => 'port_errors', 'title' => trans('Errors'), 'vars' => [['from' => '-1d'], ['from' => '-7d'], ['from' => '-30d'], ['from' => '-1y']]]],
-            ]
+            ],
+            'findPortNeighbors' => fn(Port $port) => $this->findPortNeighbors($port),
         ];
     }
 
-    public function findPortNeighbors()
+    public function findPortNeighbors(Port $port): array
     {
         // if Loopback, skip
+        if (str_contains(strtolower($port->getLabel()), 'loopback')) {
+            return [];
+        }
+
+        $neighbors = [];
 
         // Links always included
         // fa-plus black portlink on devicelink
+        foreach ($port->links as $link) {
+            /** @var Link $link */
+            if ($link->remote_port_id) {
+                $neighbors[$link->remote_port_id] = [
+                    'type' => 'link',
+                    'port_id' => $link->remote_port_id,
+                    'device_id' => $link->remote_device_id,
+                ];
+            }
+        }
 
         // IPv4 + IPv6 subnet if detailed
         // fa-arrow-right green portlink on devicelink
+        if ($port->ipv4Networks->isNotEmpty()) {
+            $ids = $port->ipv4Networks->map(fn($net) => $net->ipv4->pluck('port_id'))->flatten();
+            foreach ($ids as $port_id) {
+                if ($port_id == $port->port_id) {
+                    continue;
+                }
+
+                $neighbors[$port_id] = [
+                    'type' => 'ipv4_network',
+                    'port_id' => $port_id,
+                ];
+            }
+        }
 
         // pseudowires
         // fa-cube green portlink on devicelink: cpwVcID
+        /** @var Pseudowire $pseudowire */
+        foreach ($port->pseudowires as $pseudowire) {
+//            $pws = Pseudowire::where('cpwVcID', $pseudowire->cpwVcID)
+//                ->whereNot('port_id', $port->port_id)->get();
+            foreach ($pseudowire->endpoints as $endpoint) {
+                if ($endpoint->port_id == $port->port_id) {
+                    continue;
+                }
+
+                $neighbors[$endpoint->port_id] = [
+                    'type' => 'pseudowire',
+                    'port_id' => $endpoint->port_id,
+                    'device_id' => $endpoint->device_id,
+                ];
+            }
+        }
 
         // PAGP members/parent
         // fa-cube portlink: pagpGroupIfIndex = ifIndex parent
@@ -116,6 +164,8 @@ class PortsController implements DeviceTab
         // port stack
         // fa-expand portlink: local is low port
         // fa-compress portlink: local is high port
+
+        return $neighbors;
     }
 
     private function xdslData(Device $device): array
