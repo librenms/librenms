@@ -1,3 +1,98 @@
+## 24.3.0
+*(2024-04-01)*
+
+A big thank you to the following 24 contributors this last month:
+
+  - [rpardim](https://github.com/rpardim) (4)
+  - [dependabot](https://github.com/apps/dependabot) (3)
+  - [electrocret](https://github.com/electrocret) (3)
+  - [bionicman](https://github.com/bionicman) (2)
+  - [PipoCanaja](https://github.com/PipoCanaja) (2)
+  - [eskyuu](https://github.com/eskyuu) (2)
+  - [Walkablenormal](https://github.com/Walkablenormal) (2)
+  - [bnerickson](https://github.com/bnerickson) (2)
+  - [rudybroersma](https://github.com/rudybroersma) (2)
+  - [d-k-7](https://github.com/d-k-7) (1)
+  - [murrant](https://github.com/murrant) (1)
+  - [czarnian](https://github.com/czarnian) (1)
+  - [dmbokhan](https://github.com/dmbokhan) (1)
+  - [TheMysteriousX](https://github.com/TheMysteriousX) (1)
+  - [msaringer](https://github.com/msaringer) (1)
+  - [Didr](https://github.com/Didr) (1)
+  - [vhuk](https://github.com/vhuk) (1)
+  - [Jellyfrog](https://github.com/Jellyfrog) (1)
+  - [KingDaveRa](https://github.com/KingDaveRa) (1)
+  - [Npeca75](https://github.com/Npeca75) (1)
+  - [dethmetaljeff](https://github.com/dethmetaljeff) (1)
+  - [blknight88](https://github.com/blknight88) (1)
+  - [gunkaaa](https://github.com/gunkaaa) (1)
+  - [pjordanovic](https://github.com/pjordanovic) (1)
+
+Thanks to maintainers and others that helped with pull requests this month:
+
+  - [Jellyfrog](https://github.com/Jellyfrog) (25)
+  - [electrocret](https://github.com/electrocret) (7)
+  - [PipoCanaja](https://github.com/PipoCanaja) (5)
+  - [murrant](https://github.com/murrant) (2)
+  - [laf](https://github.com/laf) (2)
+  - [mpikzink](https://github.com/mpikzink) (1)
+  - [VVelox](https://github.com/VVelox) (1)
+
+#### Feature
+* Support for InfluxDB V2 API ([#15861](https://github.com/librenms/librenms/pull/15861)) - [Walkablenormal](https://github.com/Walkablenormal)
+
+#### Breaking Change
+* Wireguard application graph cleanup and new wireguard interface/global metrics. ([#15847](https://github.com/librenms/librenms/pull/15847)) - [bnerickson](https://github.com/bnerickson)
+
+#### Device
+* Fix catos discovery ([#15915](https://github.com/librenms/librenms/pull/15915)) - [d-k-7](https://github.com/d-k-7)
+* Add health sensors ([#15910](https://github.com/librenms/librenms/pull/15910)) - [murrant](https://github.com/murrant)
+* Add support for Huawei YunShan OS ([#15903](https://github.com/librenms/librenms/pull/15903)) - [czarnian](https://github.com/czarnian)
+* Add support for Ubiquiti Unifi USP-RPS device ([#15900](https://github.com/librenms/librenms/pull/15900)) - [bionicman](https://github.com/bionicman)
+* Add support for Ubiquiti Unifi LTE devices. ([#15899](https://github.com/librenms/librenms/pull/15899)) - [bionicman](https://github.com/bionicman)
+* Checkpoint Gaia PowerSupply state sensor ([#15882](https://github.com/librenms/librenms/pull/15882)) - [rpardim](https://github.com/rpardim)
+* Add support for Cisco FTD 3105 ([#15881](https://github.com/librenms/librenms/pull/15881)) - [msaringer](https://github.com/msaringer)
+* Fix for Checkpoint Gaia VPN state sensor ([#15878](https://github.com/librenms/librenms/pull/15878)) - [rpardim](https://github.com/rpardim)
+* Support for Forcepoint NGFW 6.11 and later ([#15872](https://github.com/librenms/librenms/pull/15872)) - [vhuk](https://github.com/vhuk)
+* A10 ACOS version, state and count sensors ([#15871](https://github.com/librenms/librenms/pull/15871)) - [rpardim](https://github.com/rpardim)
+* F5 BIG-IP state and count sensors ([#15865](https://github.com/librenms/librenms/pull/15865)) - [rpardim](https://github.com/rpardim)
+* Supermicro bmc updates ([#15862](https://github.com/librenms/librenms/pull/15862)) - [dethmetaljeff](https://github.com/dethmetaljeff)
+* YAMLized version of previous PR for Ericsson SSR 80xx routers ([#15834](https://github.com/librenms/librenms/pull/15834)) - [rudybroersma](https://github.com/rudybroersma)
+* Fix for FortiSwitch RPM/percentage fans ([#15829](https://github.com/librenms/librenms/pull/15829)) - [rudybroersma](https://github.com/rudybroersma)
+* Move sentry3 current/voltage/power sensors to YAML ([#15715](https://github.com/librenms/librenms/pull/15715)) - [gunkaaa](https://github.com/gunkaaa)
+* Device - EPSON DS-860 + Network Interface Unit DSBXNW1 ([#15420](https://github.com/librenms/librenms/pull/15420)) - [pjordanovic](https://github.com/pjordanovic)
+
+#### Applications
+* Systemd Application Code Cleanup and new Systemd Unit State Metrics. ([#15848](https://github.com/librenms/librenms/pull/15848)) - [bnerickson](https://github.com/bnerickson)
+
+#### Discovery
+* Bug - Fix OSes 'Junos' and 'Hirschmann' misuse of entPhysicalIndex ([#15886](https://github.com/librenms/librenms/pull/15886)) - [TheMysteriousX](https://github.com/TheMysteriousX)
+
+#### Bug
+* Fix Vrf Table ([#15912](https://github.com/librenms/librenms/pull/15912)) - [electrocret](https://github.com/electrocret)
+* Fix for explicit timezone selection ([#15890](https://github.com/librenms/librenms/pull/15890)) - [eskyuu](https://github.com/eskyuu)
+* Bug - fix extra fields in DB entry create/update ([#15883](https://github.com/librenms/librenms/pull/15883)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Remove config_bgp config check in bird2 app ([#15877](https://github.com/librenms/librenms/pull/15877)) - [Didr](https://github.com/Didr)
+* Custommap label fixes ([#15875](https://github.com/librenms/librenms/pull/15875)) - [eskyuu](https://github.com/eskyuu)
+* [ipv4] fix /32 addresses discovery ([#15863](https://github.com/librenms/librenms/pull/15863)) - [Npeca75](https://github.com/Npeca75)
+
+#### Refactor
+* Refactor - remove unused entPhysicalIndex_measured ([#15892](https://github.com/librenms/librenms/pull/15892)) - [PipoCanaja](https://github.com/PipoCanaja)
+
+#### Documentation
+* Added additional lines for selinux config to work with RHEL8 ([#15864](https://github.com/librenms/librenms/pull/15864)) - [KingDaveRa](https://github.com/KingDaveRa)
+* Fix @signedGraphTag documention ([#15853](https://github.com/librenms/librenms/pull/15853)) - [blknight88](https://github.com/blknight88)
+
+#### Tests
+* Bump Github Actions to Node.JS 20. ([#15873](https://github.com/librenms/librenms/pull/15873)) - [Walkablenormal](https://github.com/Walkablenormal)
+
+#### Dependencies
+* Bump express from 4.18.2 to 4.19.2 ([#15913](https://github.com/librenms/librenms/pull/15913)) - [dependabot](https://github.com/apps/dependabot)
+* Bump webpack-dev-middleware from 5.3.3 to 5.3.4 ([#15907](https://github.com/librenms/librenms/pull/15907)) - [dependabot](https://github.com/apps/dependabot)
+* Bump follow-redirects from 1.15.4 to 1.15.6 ([#15897](https://github.com/librenms/librenms/pull/15897)) - [dependabot](https://github.com/apps/dependabot)
+* Update dependencies ([#15869](https://github.com/librenms/librenms/pull/15869)) - [Jellyfrog](https://github.com/Jellyfrog)
+
+
 ## 24.2.0
 *(2024-02-27)*
 
