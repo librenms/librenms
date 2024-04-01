@@ -193,7 +193,8 @@ if (! empty($components)) {
             if (($array['available'] == 1) && ($array['state'] == 3)) {
                 // Warning Alarm, the pool member is down.
                 $array['status'] = 1;
-                $array['error'] = 'Pool Member is Down: ' . $f5_stats['ltmPoolMbrStatusEntryMsg']['1.3.6.1.4.1.3375.2.2.5.6.2.1.8.' . $UID];
+                //truncate to the length of the column
+                $array['error'] = substr('Pool Member Down: ' . $f5_stats['ltmPoolMbrStatusEntryMsg']['1.3.6.1.4.1.3375.2.2.5.6.2.1.8.' . $UID], 0, 255);
             } else {
                 // All is good.
                 $array['status'] = 0;
