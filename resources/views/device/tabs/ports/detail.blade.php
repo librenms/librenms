@@ -31,7 +31,7 @@
                             <div><a class="tw-text-base" href="javascript:popUp('{{ url('ajax/netcmd?cmd=whois&query=' . $ipv4->ipv4_address) }}')">{{ $ipv4->ipv4_address }}/{{ $ipv4->ipv4_prefixlen }}</a></div>
                         @endforeach
                         @foreach($port->ipv6 as $ipv6)
-                            <div><a class="tw-text-base" href="javascript:popUp('{{ url('ajax/netcmd?cmd=whois&query=' . $ipv6->ipv6_address) }}')">{{ $ipv4->ipv6_address }}/{{ $ipv4->ipv6_prefixlen }}</a></div>
+                            <div><a class="tw-text-base" href="javascript:popUp('{{ url('ajax/netcmd?cmd=whois&query=' . $ipv6->ipv6_compressed) }}')">{{ $ipv6->ipv6_compressed }}/{{ $ipv6->ipv6_prefixlen }}</a></div>
                         @endforeach
                     @endif
                 </td>
@@ -112,8 +112,39 @@
                     <div class="tw-text-base">MTU {{ $port->ifMtu }}</div>
                 </td>
                 <td>
-                    @json($data['findPortNeighbors']($port))
-                    links, etc
+                    <div>
+                    @foreach($data['neighbors'][$port->port_id] as $port_id => $neighbor)
+                        <div>
+                            @php
+                                $np = $data['neighbor_ports']->get($neighbor['port_id']);
+                            @endphp
+                            @if($np)
+                                @if(in_array('link', $neighbor['types']))
+                                    <i class='fa fa-link fa-lg' aria-hidden='true'></i>
+                                @elseif(in_array('pseudowire', $neighbor['types']))
+                                    <i class='fa fa-arrows-left-right fa-lg' aria-hidden='true'></i>
+                                @elseif(in_array('stack_low', $neighbor['types']))
+                                    <i class='fa fa-expand fa-lg' aria-hidden='true'></i>
+                                @elseif(in_array('stack_high', $neighbor['types']))
+                                    <i class='fa fa-compress fa-lg' aria-hidden='true'></i>
+                                @elseif(in_array('pagp', $neighbor['types']))
+                                    <i class='fa fa-cube fa-lg' style='color:green' aria-hidden='true'></i>
+                                @else
+                                    <i class='fa fa-arrow-right fa-lg' aria-hidden='true'></i>
+                                @endif
+                                <x-port-link :port="$np"></x-port-link>
+                                on
+                                <x-device-link :device="$np->device"></x-device-link>
+                                @if(in_array('ipv6_network', $neighbor['types']))
+                                    <b style='color: #a10000;'>v6</b>
+                                @endif
+                                @if(in_array('ipv4_network', $neighbor['types']))
+                                    <b style='color: #00a100'>v4</b>
+                                @endif
+                            @endif
+                        </div>
+                    @endforeach
+                    </div>
                 </td>
             </tr>
         @endforeach

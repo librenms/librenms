@@ -29,10 +29,14 @@ use App\Models\Device;
 use App\Models\Link;
 use App\Models\Port;
 use App\Models\Pseudowire;
+use Illuminate\Support\Facades\Auth;
+use LibreNMS\Config;
 use LibreNMS\Interfaces\UI\DeviceTab;
 
 class PortsController implements DeviceTab
 {
+    private bool $detail = false;
+
     public function visible(Device $device): bool
     {
         return $device->ports()->exists();
@@ -56,11 +60,13 @@ class PortsController implements DeviceTab
     public function data(Device $device): array
     {
         $tab = \Request::segment(4);
+        $this->detail = empty($tab) || $tab == 'detail';
         $data = match($tab) {
             'links' => $this->linksData($device),
             'xdsl' => $this->xdslData($device),
-            default => $this->portData($device, $tab == 'detail'),
+            default => $this->portData($device),
         };
+
 
         return array_merge([
             'tab' => $tab,
@@ -77,33 +83,42 @@ class PortsController implements DeviceTab
         ], $data);
     }
 
-    private function portData(Device $device, bool $detail): array
+    private function portData(Device $device): array
     {
         $relationships = ['groups', 'ipv4', 'ipv6', 'vlans', 'adsl', 'vdsl'];
 
-        if ($detail && Config::get('enable_port_relationship')) {
-            $relationships[] = 'pseudowires.endpoints';
+        if ($this->detail && Config::get('enable_port_relationship')) {
             $relationships[] = 'links';
-            $relationships[] = 'ipv4Networks';
+            $relationships[] = 'pseudowires.endpoints';
             $relationships[] = 'ipv4Networks.ipv4';
+            $relationships[] = 'ipv6Networks.ipv6';
         }
 
+        $ports = $device->ports()->isUp()->orderBy('ifIndex')
+            ->hasAccess(Auth::user())->with($relationships)->get(); // TODO paginate
+        $neighbors = $ports->keyBy('port_id')->map(fn($port) => $this->findPortNeighbors($port));
+        $neighbor_ports = Port::with('device')
+            ->hasAccess(Auth::user())
+            ->whereIn('port_id', $neighbors->map(fn($a) => array_keys($a))->flatten())
+            ->get()->keyBy('port_id');
 
         return [
-            'ports' => $device->ports()->isUp()->with($relationships)->get(), // TODO paginate
+            'ports' => $ports,
+            'neighbors' => $neighbors,
+            'neighbor_ports' => $neighbor_ports,
             'graphs' => [
                 'bits' => [['type' => 'port_bits', 'title' => trans('Traffic'), 'vars' => [['from' => '-1d'], ['from' => '-7d'], ['from' => '-30d'], ['from' => '-1y']]]],
                 'upkts' => [['type' => 'port_upkts', 'title' => trans('Packets (Unicast)'), 'vars' => [['from' => '-1d'], ['from' => '-7d'], ['from' => '-30d'], ['from' => '-1y']]]],
                 'errors' => [['type' => 'port_errors', 'title' => trans('Errors'), 'vars' => [['from' => '-1d'], ['from' => '-7d'], ['from' => '-30d'], ['from' => '-1y']]]],
             ],
-            'findPortNeighbors' => fn(Port $port) => $this->findPortNeighbors($port),
+
         ];
     }
 
     public function findPortNeighbors(Port $port): array
     {
         // if Loopback, skip
-        if (str_contains(strtolower($port->getLabel()), 'loopback')) {
+        if (! $this->detail || str_contains(strtolower($port->getLabel()), 'loopback')) {
             return [];
         }
 
@@ -114,27 +129,29 @@ class PortsController implements DeviceTab
         foreach ($port->links as $link) {
             /** @var Link $link */
             if ($link->remote_port_id) {
-                $neighbors[$link->remote_port_id] = [
-                    'type' => 'link',
-                    'port_id' => $link->remote_port_id,
-                    'device_id' => $link->remote_device_id,
-                ];
+                $this->addPortNeighbor($neighbors, 'link', $link->remote_port_id);
             }
         }
 
-        // IPv4 + IPv6 subnet if detailed
-        // fa-arrow-right green portlink on devicelink
-        if ($port->ipv4Networks->isNotEmpty()) {
-            $ids = $port->ipv4Networks->map(fn($net) => $net->ipv4->pluck('port_id'))->flatten();
-            foreach ($ids as $port_id) {
-                if ($port_id == $port->port_id) {
-                    continue;
+        if ($this->detail) {
+            // IPv4 + IPv6 subnet if detailed
+            // fa-arrow-right green portlink on devicelink
+            if ($port->ipv4Networks->isNotEmpty()) {
+                $ids = $port->ipv4Networks->map(fn($net) => $net->ipv4->pluck('port_id'))->flatten();
+                foreach ($ids as $port_id) {
+                    if ($port_id !== $port->port_id) {
+                        $this->addPortNeighbor($neighbors, 'ipv4_network', $port_id);
+                    }
                 }
+            }
 
-                $neighbors[$port_id] = [
-                    'type' => 'ipv4_network',
-                    'port_id' => $port_id,
-                ];
+            if ($port->ipv6Networks->isNotEmpty()) {
+                $ids = $port->ipv6Networks->map(fn($net) => $net->ipv6->pluck('port_id'))->flatten();
+                foreach ($ids as $port_id) {
+                    if ($port_id !== $port->port_id) {
+                        $this->addPortNeighbor($neighbors, 'ipv6_network', $port_id);
+                    }
+                }
             }
         }
 
@@ -142,30 +159,52 @@ class PortsController implements DeviceTab
         // fa-cube green portlink on devicelink: cpwVcID
         /** @var Pseudowire $pseudowire */
         foreach ($port->pseudowires as $pseudowire) {
-//            $pws = Pseudowire::where('cpwVcID', $pseudowire->cpwVcID)
-//                ->whereNot('port_id', $port->port_id)->get();
             foreach ($pseudowire->endpoints as $endpoint) {
-                if ($endpoint->port_id == $port->port_id) {
-                    continue;
+                if ($endpoint->port_id != $port->port_id) {
+                    $this->addPortNeighbor($neighbors, 'pseudowire', $endpoint->port_id);
                 }
+            }
+        }
 
-                $neighbors[$endpoint->port_id] = [
-                    'type' => 'pseudowire',
-                    'port_id' => $endpoint->port_id,
-                    'device_id' => $endpoint->device_id,
-                ];
+        // port stack
+        // fa-expand portlink: local is low port
+        // fa-compress portlink: local is high portPort
+        $stacks = \DB::table('ports_stack')->where('device_id', $port->device_id)
+            ->where(fn($q) => $q->where('port_id_high', $port->port_id)->orWhere('port_id_low', $port->port_id))->get();
+        foreach ($stacks as $stack) {
+            if ($stack->port_id_low) {
+                $this->addPortNeighbor($neighbors, 'stack_low', $stack->port_id_low);
+            }
+            if ($stack->port_id_high) {
+                $this->addPortNeighbor($neighbors, 'stack_high', $stack->port_id_high);
             }
         }
 
         // PAGP members/parent
         // fa-cube portlink: pagpGroupIfIndex = ifIndex parent
         // fa-cube portlink: if (not parent, pagpGroupIfIndex != ifIndex) ifIndex = pagpGroupIfIndex member
+        if ($port->pagpGroupIfIndex) {
+            if ($port->pagpGroupIfIndex == $port->ifIndex) {
+                $this->addPortNeighbor($neighbors, 'pagp', $port->port_id);
+            } else {
+                $this->addPortNeighbor($neighbors, 'pagp', $port->pagpParent->port_id);
+            }
+        }
 
-        // port stack
-        // fa-expand portlink: local is low port
-        // fa-compress portlink: local is high port
 
         return $neighbors;
+    }
+
+    private function addPortNeighbor(array &$neighbors, string $type, int $port_id): void
+    {
+        if (empty($neighbors[$port_id])) {
+            $neighbors[$port_id] = [
+                'port_id' => $port_id,
+                'types' => [],
+            ];
+        }
+
+        $neighbors[$port_id]['types'][] = $type;
     }
 
     private function xdslData(Device $device): array
