@@ -29,6 +29,7 @@ use App\Models\Device;
 use App\Models\Link;
 use App\Models\Port;
 use App\Models\Pseudowire;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use LibreNMS\Config;
 use LibreNMS\Interfaces\UI\DeviceTab;
@@ -57,9 +58,9 @@ class PortsController implements DeviceTab
         return __('Ports');
     }
 
-    public function data(Device $device): array
+    public function data(Device $device, Request $request): array
     {
-        $tab = \Request::segment(4);
+        $tab = $request->segment(4);
         $this->detail = empty($tab) || $tab == 'detail';
         $data = match($tab) {
             'links' => $this->linksData($device),

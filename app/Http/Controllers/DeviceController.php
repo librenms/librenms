@@ -87,7 +87,7 @@ class DeviceController extends Controller
             return app()->make($class);
         }, array_filter($this->tabs, 'class_exists')); // TODO remove filter
         $title = $tabs[$current_tab]->name();
-        $data = $tabs[$current_tab]->data($device);
+        $data = $tabs[$current_tab]->data($device, $request);
 
         // Device Link Menu, select the primary link
         $device_links = $this->deviceLinkMenu($device, $current_tab);

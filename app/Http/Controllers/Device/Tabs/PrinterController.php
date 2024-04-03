@@ -26,6 +26,7 @@
 namespace App\Http\Controllers\Device\Tabs;
 
 use App\Models\Device;
+use Illuminate\Http\Request;
 use LibreNMS\Interfaces\UI\DeviceTab;
 
 class PrinterController implements DeviceTab
@@ -50,7 +51,7 @@ class PrinterController implements DeviceTab
         return __('Printer');
     }
 
-    public function data(Device $device): array
+    public function data(Device $device, Request $request): array
     {
         return [
             'tab' => 'toner',
