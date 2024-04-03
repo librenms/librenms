@@ -200,11 +200,10 @@ class PortsController implements DeviceTab
         if (empty($neighbors[$port_id])) {
             $neighbors[$port_id] = [
                 'port_id' => $port_id,
-                'types' => [],
             ];
         }
 
-        $neighbors[$port_id]['types'][] = $type;
+        $neighbors[$port_id][$type] = 1;
     }
 
     private function xdslData(Device $device): array
