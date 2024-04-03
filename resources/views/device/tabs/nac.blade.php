@@ -19,8 +19,8 @@
                     <th data-column-id="username" data-formatter="tooltip" data-width="250px">{{ __('Username') }}</th>
                     <th data-column-id="authz_by" data-formatter="tooltip">{{ __('Auth By') }}</th>
                     <th data-column-id="timeout" data-formatter="time_interval">{{ __('Timeout') }}</th>
-                    <th data-column-id="time_elapsed" data-formatter="time_interval" >{{ __('Time Elapsed') }}</th>
-                    <th data-column-id="time_left" data-formatter="time_interval" data-visible="false">{{ __('Time Left') }}</th>
+                    <th data-column-id="time_elapsed" data-formatter="time_interval" data-visible="false">{{ __('Time Elapsed') }}</th>
+                    <th data-column-id="time_left" data-formatter="time_interval" data-visible="true">{{ __('Time Left') }}</th>
                     <th data-column-id="authc_status" data-formatter="nac_authc" data-formatter="tooltip">{{ __('NAC Authc') }}</th>
                     <th data-column-id="authz_status" data-formatter="nac_authz">{{ __('NAC Authz') }}</th>
                     <th data-column-id="method" data-formatter="nac_method">{{ __('NAC Method') }}</th>
