@@ -9,7 +9,7 @@
             <table id="nac-grid" data-toggle="bootgrid" class="table table-hover table-condensed table-striped">
                 <thead>
                 <tr>
-                    <th data-column-id="port_id" data-width="100px">{{ __('Ports') }}</th>
+                    <th data-column-id="port_id" data-order="asc" data-width="100px">{{ __('Ports') }}</th>
                     <th data-column-id="mac_address" data-formatter="tooltip" data-width="170px">{{ __('Mac Address') }}</th>
                     <th data-column-id="mac_oui" data-formatter="tooltip" data-sortable="false" data-width="130px">{{ __('Vendor') }}</th>
                     <th data-column-id="ip_address" data-formatter="tooltip" data-width="140px">{{ __('IP Address') }}</th>
