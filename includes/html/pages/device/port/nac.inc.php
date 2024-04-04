@@ -15,8 +15,8 @@ $no_refresh = true;
             <th data-column-id="username" data-formatter="tooltip" data-width="250px">Username</th>
             <th data-column-id="authz_by" data-formatter="tooltip">Auth By</th>
             <th data-column-id="timeout" data-formatter="time_interval">Timeout</th>
-            <th data-column-id="time_elapsed" data-formatter="time_interval" >Time Elapsed</th>
-            <th data-column-id="time_left" data-formatter="time_interval" data-visible="false">Time Left</th>
+            <th data-column-id="time_elapsed" data-formatter="time_interval" data-visible="false">Time Elapsed</th>
+            <th data-column-id="time_left" data-formatter="time_interval" data-visible="true">Time Left</th>
             <th data-column-id="authc_status" data-formatter="nac_authc" data-formatter="tooltip">NAC Authc</th>
             <th data-column-id="authz_status" data-formatter="nac_authz">NAC Authz</th>
             <th data-column-id="method" data-formatter="nac_method">NAC Method</th>
