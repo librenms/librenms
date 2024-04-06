@@ -409,6 +409,18 @@ if (Config::get('enable_ports_poe')) {
                 $port_stats[$if_id] = array_merge($port_stats[$if_id], $p_stats);
             }
         }
+    } elseif ($device['os'] == 'ironware') {
+        echo 'snAgentPoePortEntry';
+
+        $ironware_poe_oids = [
+            'snAgentPoePortControl',
+            'snAgentPoePortWattage',
+            'snAgentPoePortConsumed',
+        ];
+
+        foreach ($ironware_poe_oids as $oid) {
+            $port_stats = snmpwalk_cache_oid($device, $oid, $port_stats, 'FDRY-POE-MIB');
+        }
     }
 }
 
