@@ -6,6 +6,8 @@ if (in_array($device['os'], ['windows', 'hpe-ilo']) || $device['os_group'] == 'u
     if (is_array($ilo_storage)) {
         echo 'HPE ILO4 ';
         foreach ($ilo_storage as $index => $storage) {
+            if( !is_array($storage) ) continue;
+            
             $type = $storage['cpqHoFileSysDesc'];
             preg_match_all('/\[.*?:(.*?)\]/', $type, $matches);
 
