@@ -403,8 +403,8 @@ class Cisco extends OS implements
                     'authz_status' => $portAuthSessionEntryParameters['cafSessionStatus'] ?? '',
                     'authz_by' => $portAuthSessionEntryParameters['cafSessionAuthorizedBy'] ?? '',
                     'timeout' => $portAuthSessionEntryParameters['cafSessionTimeout'] ?? '',
-                    'time_left' => $portAuthSessionEntryParameters['cafSessionTimeLeft'] ?? '',
-                    'vlan' => $portAuthSessionEntryParameters['cafSessionAuthVlan'] ?? '',
+                    'time_left' => $portAuthSessionEntryParameters['cafSessionTimeLeft'] ?? null,
+                    'vlan' => $portAuthSessionEntryParameters['cafSessionAuthVlan'] ?? null,
                     'authc_status' => $session_info['authc_status'] ?? '',
                     'method' => $session_info['method'] ?? '',
                 ]));
