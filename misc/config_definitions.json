@@ -910,7 +910,6 @@
                 "sonet",
                 "atmSubInterface",
                 "aal5",
-                "shdsl",
                 "mpls"
             ]
         },
