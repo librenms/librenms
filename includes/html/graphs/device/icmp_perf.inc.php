@@ -51,7 +51,7 @@ $rrd_options .= ' GPRINT:ping:LAST:%15.2lf GPRINT:min:LAST:%6.2lf';
 $rrd_options .= ' GPRINT:max:LAST:%6.2lf GPRINT:ping:AVERAGE:%6.2lf\\n';
 
 // loss line and legend
-$rrd_options .= ' LINE2:loss#d42e08:Loss';
+$rrd_options .= ' AREA:loss#d42e08:Loss';
 $rrd_options .= ' GPRINT:loss:LAST:%14.2lf GPRINT:loss:MIN:%6.2lf';
 $rrd_options .= ' GPRINT:loss:MAX:%6.2lf GPRINT:loss:AVERAGE:%6.2lf\\n';
 
