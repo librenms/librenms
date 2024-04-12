@@ -58,7 +58,7 @@ class FpingResponse
         public readonly float $max_latency,
         public readonly float $avg_latency,
         public readonly int $duplicates,
-        private int $exit_code,
+        public int $exit_code,
         public readonly ?string $host = null,
         private bool $skipped = false)
     {
