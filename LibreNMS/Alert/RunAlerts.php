@@ -31,6 +31,7 @@
 namespace LibreNMS\Alert;
 
 use App\Facades\DeviceCache;
+use App\Facades\Rrd;
 use App\Models\AlertTransport;
 use App\Models\Eventlog;
 use LibreNMS\Config;
@@ -116,13 +117,15 @@ class RunAlerts
         $obj['status'] = $device->status;
         $obj['status_reason'] = $device->status_reason;
         if ((new ConnectivityHelper($device))->canPing()) {
-            $ping_stats = $device->perf()->latest('timestamp')->first();
-            $obj['ping_timestamp'] = $ping_stats->timestamp;
-            $obj['ping_loss'] = $ping_stats->loss;
-            $obj['ping_min'] = $ping_stats->min;
-            $obj['ping_max'] = $ping_stats->max;
-            $obj['ping_avg'] = $ping_stats->avg;
-            $obj['debug'] = $ping_stats->debug;
+            $last_ping = Rrd::lastUpdate(Rrd::name($device->hostname, 'icmp-perf'));
+            if ($last_ping) {
+                $obj['ping_timestamp'] = $last_ping->timestamp;
+                $obj['ping_loss'] = $last_ping->xmt ? ($last_ping->rcv / $last_ping->xmt) : 'unknown';
+                $obj['ping_min'] = $last_ping->min;
+                $obj['ping_max'] = $last_ping->max;
+                $obj['ping_avg'] = $last_ping->avg;
+                $obj['debug'] = 'unsupported';
+            }
         }
         $extra = $alert['details'];
 
