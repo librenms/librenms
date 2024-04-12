@@ -10,6 +10,7 @@
 
 return [
     'trap_handlers' => [
+        'CIENA-CES-AAA-MIB::cienaCesAAAUserAuthenticationEvent' => \LibreNMS\Snmptrap\Handlers\CienaCesAAAUserAuthenticationEvent::class,
         'ALCATEL-IND1-VLAN-STP-MIB::stpNewRoot' => \LibreNMS\Snmptrap\Handlers\Aos7stpNewRoot::class,
         'ALCATEL-IND1-VLAN-STP-MIB::stpRootPortChange' => \LibreNMS\Snmptrap\Handlers\Aos7stpRootPortChange::class,
         'ALCATEL-IND1-PORT-MIB::portViolationTrap' => \LibreNMS\Snmptrap\Handlers\Aos7portViolation::class,
