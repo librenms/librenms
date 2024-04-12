@@ -192,7 +192,7 @@ class Rrd extends BaseDatastore
                 explode(' ', ltrim($matches[3])),
             );
 
-            return new TimeSeriesPoint($matches[2], $data);
+            return new TimeSeriesPoint((int) $matches[2], $data);
         }
 
         return null;

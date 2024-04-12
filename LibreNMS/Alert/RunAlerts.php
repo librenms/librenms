@@ -39,6 +39,7 @@ use LibreNMS\Enum\AlertState;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
 use LibreNMS\Polling\ConnectivityHelper;
+use LibreNMS\Util\Number;
 use LibreNMS\Util\Time;
 
 class RunAlerts
@@ -120,10 +121,10 @@ class RunAlerts
             $last_ping = Rrd::lastUpdate(Rrd::name($device->hostname, 'icmp-perf'));
             if ($last_ping) {
                 $obj['ping_timestamp'] = $last_ping->timestamp;
-                $obj['ping_loss'] = $last_ping->xmt ? ($last_ping->rcv / $last_ping->xmt) : 'unknown';
-                $obj['ping_min'] = $last_ping->min;
-                $obj['ping_max'] = $last_ping->max;
-                $obj['ping_avg'] = $last_ping->avg;
+                $obj['ping_loss'] = Number::calculatePercent($last_ping->get('xmt') - $last_ping->get('rcv'), $last_ping->get('xmt'));
+                $obj['ping_min'] = $last_ping->get('min');
+                $obj['ping_max'] = $last_ping->get('max');
+                $obj['ping_avg'] = $last_ping->get('avg');
                 $obj['debug'] = 'unsupported';
             }
         }
