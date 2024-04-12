@@ -94,9 +94,9 @@ class Fping
         return $response;
     }
 
-    public function bulkPing($host_list, $callback)
+    public function bulkPing(array $hosts, Callable $callback): void
     {
-        $process = new Process([
+        $process = app()->make(Process::class, ['command' => [
             $this->fping_bin,
             '-f', '-',
             '-e',
@@ -104,12 +104,12 @@ class Fping
             '-r', $this->retries,
             '-O', $this->tos,
             '-c', $this->count,
-        ]);
+        ]]);
 
         // twice polling interval
         $process->setTimeout(Config::get('rrd.step', 300) * 2);
         // send hostnames to stdin to avoid overflowing cli length limits
-        $process->setInput($host_list . PHP_EOL);
+        $process->setInput(implode(PHP_EOL, $hosts) . PHP_EOL);
 
         Log::debug('[FPING] ' . $process->getCommandLine() . PHP_EOL);
 

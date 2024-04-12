@@ -80,8 +80,7 @@ class PingCheck implements ShouldQueue
 
         $ordered_device_list = $this->tiered->get(1, collect())->keys()// root nodes before standalone nodes
         ->merge($this->devices->keys())
-            ->unique()
-            ->implode(PHP_EOL);
+            ->unique()->all();
 
         // bulk ping and send FpingResponse's to recordData as they come in
         app()->make(Fping::class)->bulkPing($ordered_device_list, [$this, 'handleResponse']);

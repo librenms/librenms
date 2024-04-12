@@ -89,7 +89,7 @@ class FpingResponse
 
     public static function parseLine(string $output, int $code = null): FpingResponse
     {
-        if (preg_match('#^(\S+)\s*: (xmt/rcv/%loss = (\d+)/(\d+)/(?:(100)%|(\d+)%, min/avg/max = ([\d.]+)/([\d.]+)/([\d.]+))|Name or service not known|Temporary failure in name resolution)$#', $output, $parsed)) {
+        if (preg_match('#(\S+)\s*: (xmt/rcv/%loss = (\d+)/(\d+)/(?:(100)%|(\d+)%, min/avg/max = ([\d.]+)/([\d.]+)/([\d.]+))|Name or service not known|Temporary failure in name resolution)$#', $output, $parsed)) {
             [, $host, $error, $xmt, $rcv, $loss100, $loss, $min, $avg, $max] = array_pad($parsed, 10, 0);
             $loss = $loss100 ?: $loss;
 
