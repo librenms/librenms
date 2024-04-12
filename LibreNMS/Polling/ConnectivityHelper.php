@@ -119,7 +119,7 @@ class ConnectivityHelper
 
         if ($status->duplicates > 0) {
             Eventlog::log('Duplicate ICMP response detected! This could indicate a network issue.', $this->device, 'icmp', Severity::Warning);
-            $status->exit_code = 0;   // when duplicate is detected fping returns 1. The device is up, but there is another issue. Clue admins in with above event.
+            $status->ignoreFailure(); // when duplicate is detected fping returns 1. The device is up, but there is another issue. Clue admins in with above event.
         }
 
         return $status;

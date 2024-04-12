@@ -29,6 +29,6 @@ class FpingUnparsableLine extends \Exception
 {
     public function __construct(public readonly string $unparsedLine)
     {
-        parent::__construct("Fping unparsable line: $unparsedLine", $code, $previous);
+        parent::__construct("Fping unparsable line: $unparsedLine");
     }
 }

@@ -33,19 +33,13 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Collection;
 use LibreNMS\Alert\AlertRules;
-use LibreNMS\Config;
 use LibreNMS\Data\Source\Fping;
 use LibreNMS\Data\Source\FpingResponse;
-use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Debug;
 
 class PingCheck implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
-
-    private $command;
-    private $wait;
-    private $rrd_tags;
 
     /** @var \Illuminate\Database\Eloquent\Collection<string, Device>|null List of devices keyed by hostname */
     private $devices;
@@ -71,20 +65,6 @@ class PingCheck implements ShouldQueue
         if (is_array($groups)) {
             $this->groups = $groups;
         }
-
-        // define rrd tags
-        $rrd_step = Config::get('ping_rrd_step', Config::get('rrd.step', 300));
-        $rrd_def = RrdDefinition::make()->addDataset('ping', 'GAUGE', 0, 65535, $rrd_step * 2);
-        $this->rrd_tags = ['rrd_def' => $rrd_def, 'rrd_step' => $rrd_step];
-
-        // set up fping process
-        $timeout = Config::get('fping_options.timeout', 500); // must be smaller than period
-        $retries = Config::get('fping_options.retries', 2);  // how many retries on failure
-        $tos = Config::get('fping_options.tos', 0);  // TOS marking
-        $fping = Config::get('fping', 'fping'); // use user defined binary
-
-        $this->command = [$fping, '-f', '-', '-e', '-t', $timeout, '-r', $retries, '-O', $tos];
-        $this->wait = Config::get('rrd.step', 300) * 2;
     }
 
     /**
@@ -179,7 +159,7 @@ class PingCheck implements ShouldQueue
 
         // update and remove devices in the current tier
         foreach ($this->deferred->pull($this->current_tier, []) as $fpingResponse) {
-            $this->recordData($fpingResponse);
+            $this->handleResponse($fpingResponse);
         }
 
         // try to process the new tier in case we took care of all the devices

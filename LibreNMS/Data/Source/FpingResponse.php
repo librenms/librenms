@@ -48,7 +48,7 @@ class FpingResponse
      * @param  float  $avg_latency  Average latency (ms)
      * @param  int  $duplicates  Number of duplicate responses (Indicates network issue)
      * @param  int  $exit_code  Return code from fping
-     * @param  int|null  $host
+     * @param  string|null  $host  Hostname/IP pinged
      */
     private function __construct(
         public readonly int $transmitted,
@@ -58,7 +58,7 @@ class FpingResponse
         public readonly float $max_latency,
         public readonly float $avg_latency,
         public readonly int $duplicates,
-        public readonly int $exit_code,
+        private int $exit_code,
         public readonly ?string $host = null,
         private bool $skipped = false)
     {
@@ -72,6 +72,14 @@ class FpingResponse
     public static function artificialDown(string $host = null): static
     {
         return new static(1, 0, 100, 0, 0, 0, 0, 0, $host, false);
+    }
+
+    /**
+     * Change the exit code to 0, this may be approriate when a non-fatal error was encourtered
+     */
+    public function ignoreFailure(): void
+    {
+        $this->exit_code = 0;
     }
 
     public function wasSkipped(): bool
