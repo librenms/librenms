@@ -30,7 +30,8 @@ class TimeSeriesPoint
     public function __construct(
         public readonly int $timestamp,
         public readonly array $data,
-    ) {}
+    ) {
+    }
 
     public function ds(): array
     {

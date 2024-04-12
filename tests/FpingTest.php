@@ -141,10 +141,10 @@ OUT;
     public function testBulkPing()
     {
         $expected = [
-            '192.168.1.4' => [3,3,0,0.62,0.93,0.71,0,0],
-            'hostname' => [3,0,100,0.0,0.0,0.0,0,1],
-            'invalid:characters!' => [0,0,0,0.0,0.0,0.0,0,2],
-            '1.1.1.1' => [3,2,33,0.024,0.054,0.037,0,0],
+            '192.168.1.4' => [3, 3, 0, 0.62, 0.93, 0.71, 0, 0],
+            'hostname' => [3, 0, 100, 0.0, 0.0, 0.0, 0, 1],
+            'invalid:characters!' => [0, 0, 0, 0.0, 0.0, 0.0, 0, 2],
+            '1.1.1.1' => [3, 2, 33, 0.024, 0.054, 0.037, 0, 0],
         ];
         $hosts = array_keys($expected);
 
@@ -164,7 +164,6 @@ OUT;
         $this->app->bind(Process::class, function ($app, $params) use ($process) {
             return $process;
         });
-
 
         // make call
         $calls = 0;
