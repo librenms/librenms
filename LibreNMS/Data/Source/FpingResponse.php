@@ -48,7 +48,7 @@ class FpingResponse
      * @param  float  $avg_latency  Average latency (ms)
      * @param  int  $duplicates  Number of duplicate responses (Indicates network issue)
      * @param  int  $exit_code  Return code from fping
-     * @param int|null $host
+     * @param  int|null  $host
      */
     private function __construct(
         public readonly int $transmitted,
@@ -61,7 +61,8 @@ class FpingResponse
         public readonly int $exit_code,
         public readonly ?string $host = null,
         private bool $skipped = false)
-    {}
+    {
+    }
 
     public static function artificialUp(string $host = null): static
     {
@@ -91,12 +92,12 @@ class FpingResponse
             }
 
             return new static(
-                (int)$xmt,
-                (int)$rcv,
-                (int)$loss,
-                (float)$min,
-                (float)$max,
-                (float)$avg,
+                (int) $xmt,
+                (int) $rcv,
+                (int) $loss,
+                (float) $min,
+                (float) $max,
+                (float) $avg,
                 substr_count($output, 'duplicate'),
                 $code ?? ($loss100 ? self::UNREACHABLE : self::SUCESS),
                 $host,

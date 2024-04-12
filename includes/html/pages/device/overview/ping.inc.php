@@ -1,7 +1,5 @@
 <?php
 
-
-
 if (Rrd::checkRrdExists(Rrd::name(DeviceCache::getPrimary()->hostname, 'icmp-perf'))) {
     $perf_url = Url('device') . '/device=' . DeviceCache::getPrimary()->device_id . '/tab=graphs/group=poller/';
     echo '

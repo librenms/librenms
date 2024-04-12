@@ -56,7 +56,7 @@ class Fping
     /**
      * Run fping against a hostname/ip in count mode and collect stats.
      *
-     * @param  string  $host hostname or ip
+     * @param  string  $host  hostname or ip
      * @param  string  $address_family  ipv4 or ipv6
      * @return \LibreNMS\Data\Source\FpingResponse
      */

@@ -81,7 +81,7 @@ class RrdDefinition
      */
     public function __toString()
     {
-        return implode(' ', array_map(fn($s) => "--source $s ", $this->sources))
+        return implode(' ', array_map(fn ($s) => "--source $s ", $this->sources))
             . array_reduce($this->dataSets, function ($carry, $ds) {
                 return $carry . 'DS:' . implode(':', $ds) . ' ';
             }, '');
