@@ -89,30 +89,32 @@ class FpingResponse
 
     public static function parseLine(string $output, int $code = null): FpingResponse
     {
-        if (preg_match('#(\S+)\s*: (xmt/rcv/%loss = (\d+)/(\d+)/(?:(100)%|(\d+)%, min/avg/max = ([\d.]+)/([\d.]+)/([\d.]+))|Name or service not known|Temporary failure in name resolution)$#', $output, $parsed)) {
-            [, $host, $error, $xmt, $rcv, $loss100, $loss, $min, $avg, $max] = array_pad($parsed, 10, 0);
-            $loss = $loss100 ?: $loss;
+        $matched = preg_match('#(\S+)\s*: (xmt/rcv/%loss = (\d+)/(\d+)/(?:(100)%|(\d+)%, min/avg/max = ([\d.]+)/([\d.]+)/([\d.]+))|Name or service not known|Temporary failure in name resolution)$#', $output, $parsed);
 
-            if ($error == 'Name or service not known') {
-                return new FpingResponse(0, 0, 0, 0, 0, 0, 0, self::INVALID_HOST, $host);
-            } elseif ($error == 'Temporary failure in name resolution') {
-                return new FpingResponse(0, 0, 0, 0, 0, 0, 0, self::SYS_CALL_FAIL, $host);
-            }
-
-            return new static(
-                (int) $xmt,
-                (int) $rcv,
-                (int) $loss,
-                (float) $min,
-                (float) $max,
-                (float) $avg,
-                substr_count($output, 'duplicate'),
-                $code ?? ($loss100 ? self::UNREACHABLE : self::SUCESS),
-                $host,
-            );
+        if ($code == 0 && ! $matched) {
+            throw new FpingUnparsableLine($output);
         }
 
-        throw new FpingUnparsableLine($output);
+        [, $host, $error, $xmt, $rcv, $loss100, $loss, $min, $avg, $max] = array_pad($parsed, 10, 0);
+        $loss = $loss100 ?: $loss;
+
+        if ($error == 'Name or service not known') {
+            return new FpingResponse(0, 0, 0, 0, 0, 0, 0, self::INVALID_HOST, $host);
+        } elseif ($error == 'Temporary failure in name resolution') {
+            return new FpingResponse(0, 0, 0, 0, 0, 0, 0, self::SYS_CALL_FAIL, $host);
+        }
+
+        return new static(
+            (int) $xmt,
+            (int) $rcv,
+            (int) $loss,
+            (float) $min,
+            (float) $max,
+            (float) $avg,
+            substr_count($output, 'duplicate'),
+            $code ?? ($loss100 ? self::UNREACHABLE : self::SUCESS),
+            $host,
+        );
     }
 
     /**
