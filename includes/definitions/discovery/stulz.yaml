@@ -8,7 +8,7 @@ modules:
                     value: busalarm
                     num_oid: '.1.3.6.1.4.1.29462.10.2.1.4.1.1.1.10.{{ $index }}'
                     index: 'busalarm.{{ $index }}'
-                    descr: 'Unit {{ $index }} bus alarm'
+                    descr: 'Unit {{ $subindex1 }} bus alarm'
                     states:
                         - { descr: Ok, graph: 1, value: 0, generic: 0 }
                         - { descr: Error, graph: 1, value: 1, generic: 2 }
@@ -17,7 +17,7 @@ modules:
                     value: busadrconflict
                     num_oid: '.1.3.6.1.4.1.29462.10.2.1.4.1.1.1.12.{{ $index }}'
                     index: 'busadrconflict.{{ $index }}'
-                    descr: 'Unit {{ $index }} bus conflict'
+                    descr: 'Unit {{ $subindex1 }} bus conflict'
                     states:
                         - { descr: Ok, graph: 1, value: 0, generic: 0 }
                         - { descr: Error, graph: 1, value: 1, generic: 2 }
@@ -26,7 +26,7 @@ modules:
                     value: unitOnOff
                     num_oid: '.1.3.6.1.4.1.29462.10.2.1.4.1.1.1.1013.{{ $index }}'
                     index: 'unitOnOff.{{ $index }}'
-                    descr: 'Unit {{ $index }} running state'
+                    descr: 'Unit {{ $subindex1 }} running state'
                     states:
                         - { descr: Stopped, graph: 1, value: 0, generic: 0 }
                         - { descr: Running, graph: 1, value: 1, generic: 0 }
@@ -35,7 +35,7 @@ modules:
                     value: generalError
                     num_oid: '.1.3.6.1.4.1.29462.10.2.1.4.2.1.1.8.{{ $index }}'
                     index: 'generalError.{{ $index }}'
-                    descr: 'Unit {{ $index }} error state'
+                    descr: 'Unit {{ $subindex1 }} error state'
                     states:
                         - { descr: Ok, graph: 1, value: 0, generic: 0 }
                         - { descr: Error, graph: 1, value: 1, generic: 2 }
@@ -44,7 +44,7 @@ modules:
                     value: compr1Running
                     num_oid: '.1.3.6.1.4.1.29462.10.2.1.1.2.1.1.1.1.4403.{{ $index }}'
                     index: 'compr1Running.{{ $index }}'
-                    descr: 'Unit {{ $index }} compressor state'
+                    descr: 'Unit {{ $subindex1 }} compressor state'
                     states:
                         - { descr: Stopped, graph: 1, value: 0, generic: 0 }
                         - { descr: Running, graph: 1, value: 1, generic: 0 }
@@ -53,7 +53,7 @@ modules:
                     value: humidifier1Running
                     num_oid: '.1.3.6.1.4.1.29462.10.2.1.1.2.3.1.1.6402.{{ $index }}'
                     index: 'humidifier1Running.{{ $index }}'
-                    descr: 'Unit {{ $index }} humidifier state'
+                    descr: 'Unit {{ $subindex1 }} humidifier state'
                     states:
                         - { descr: Stopped, graph: 1, value: 0, generic: 0 }
                         - { descr: Running, graph: 1, value: 1, generic: 0 }
@@ -62,7 +62,7 @@ modules:
                     value: dehumidificationRunning
                     num_oid: '.1.3.6.1.4.1.29462.10.2.1.1.2.3.1.1.6802.{{ $index }}'
                     index: 'dehumidificationRunning.{{ $index }}'
-                    descr: 'Unit {{ $index }} dehumidification'
+                    descr: 'Unit {{ $subindex1 }} dehumidification'
                     states:
                         - { descr: Stopped, graph: 1, value: 0, generic: 0 }
                         - { descr: Running, graph: 1, value: 1, generic: 0 }
@@ -71,7 +71,7 @@ modules:
                     value: fan1Running
                     num_oid: '.1.3.6.1.4.1.29462.10.2.1.1.2.4.1.1.6902.{{ $index }}'
                     index: 'fan1Running.{{ $index }}'
-                    descr: 'Unit {{ $index }} fan state'
+                    descr: 'Unit {{ $subindex1 }} fan state'
                     states:
                         - { descr: Stopped, graph: 1, value: 0, generic: 0 }
                         - { descr: Running, graph: 1, value: 1, generic: 0 }
