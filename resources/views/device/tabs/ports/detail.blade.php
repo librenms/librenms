@@ -151,4 +151,20 @@
             </tr>
         @endforeach
     </table>
+    <div class="tw-flex tw-flex-row-reverse tw-m-3">
+        {{ $data['ports']->links('pagination::tailwind', ['perPage' => $data['perPage']]) }}
+        @isset($data['perPage'])
+            <x-select :options="['10', '25', '100', 'all']"
+                      {{-- location.herf = --}}
+                      x-on:change="
+                      const params = new URLSearchParams(window.location.search);
+                      params.set('perPage', $event.target.value);
+                      window.location.search = params.toString();
+                      " x-data="{}"
+                      :selected="$data['perPage']"
+                      name="perPage"
+                      label="Per Page"
+                      class="tw-mx-4"></x-select>
+        @endisset
+    </div>
 </x-panel>

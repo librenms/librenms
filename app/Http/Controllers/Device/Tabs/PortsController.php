@@ -31,7 +31,7 @@ use App\Models\Port;
 use App\Models\Pseudowire;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use LibreNMS\Config;
+use Illuminate\Support\Facades\Validator;
 use LibreNMS\Interfaces\UI\DeviceTab;
 
 class PortsController implements DeviceTab
@@ -65,9 +65,8 @@ class PortsController implements DeviceTab
         $data = match($tab) {
             'links' => $this->linksData($device),
             'xdsl' => $this->xdslData($device),
-            default => $this->portData($device),
+            default => $this->portData($device, $request),
         };
-
 
         return array_merge([
             'tab' => $tab,
@@ -84,11 +83,13 @@ class PortsController implements DeviceTab
         ], $data);
     }
 
-    private function portData(Device $device): array
+    private function portData(Device $device, Request $request): array
     {
-        $relationships = ['groups', 'ipv4', 'ipv6', 'vlans', 'adsl', 'vdsl'];
+        Validator::validate($request->all(), ['perPage' => 'int']);
+        $perPage = $request->input('perPage', 15);
 
-        if ($this->detail && Config::get('enable_port_relationship')) {
+        $relationships = ['groups', 'ipv4', 'ipv6', 'vlans', 'adsl', 'vdsl'];
+        if ($this->detail) {
             $relationships[] = 'links';
             $relationships[] = 'pseudowires.endpoints';
             $relationships[] = 'ipv4Networks.ipv4';
@@ -96,17 +97,25 @@ class PortsController implements DeviceTab
         }
 
         $ports = $device->ports()->isUp()->orderBy('ifIndex')
-            ->hasAccess(Auth::user())->with($relationships)->get(); // TODO paginate
-        $neighbors = $ports->keyBy('port_id')->map(fn($port) => $this->findPortNeighbors($port));
-        $neighbor_ports = Port::with('device')
-            ->hasAccess(Auth::user())
-            ->whereIn('port_id', $neighbors->map(fn($a) => array_keys($a))->flatten())
-            ->get()->keyBy('port_id');
+            ->hasAccess(Auth::user())->with($relationships)
+            ->paginate($perPage);
+
+//        $p = Port::paginate();
+//        dd($p->links('pagination::simple-tailwind'), ['perPage' => $perPage]);
+
+        if ($this->detail) {
+            $neighbors = $ports->keyBy('port_id')->map(fn($port) => $this->findPortNeighbors($port));
+            $neighbor_ports = Port::with('device')
+                ->hasAccess(Auth::user())
+                ->whereIn('port_id', $neighbors->map(fn($a) => array_keys($a))->flatten())
+                ->get()->keyBy('port_id');
+        }
 
         return [
             'ports' => $ports,
             'neighbors' => $neighbors,
             'neighbor_ports' => $neighbor_ports,
+            'perPage' => $perPage,
             'graphs' => [
                 'bits' => [['type' => 'port_bits', 'title' => trans('Traffic'), 'vars' => [['from' => '-1d'], ['from' => '-7d'], ['from' => '-30d'], ['from' => '-1y']]]],
                 'upkts' => [['type' => 'port_upkts', 'title' => trans('Packets (Unicast)'), 'vars' => [['from' => '-1d'], ['from' => '-7d'], ['from' => '-30d'], ['from' => '-1y']]]],
