@@ -84,7 +84,7 @@ modules:
                     descr: 'Unit {{ $subindex1 }} Water In Primary Temperature'
                     index: 'waterInTemperatu1ChillersPrimary.{{ $index }}'
                     divisor: 10
-                    group: Water Temperature
+                    group: Water In Temperature
 
                 -
                     oid: Stulz-WIB8000-MIB::waterInTemperatuhillersSecondary
@@ -93,7 +93,7 @@ modules:
                     descr: 'Unit {{ $subindex1 }} Water In Secondary Temperature'
                     index: 'waterInTemperatuhillersSecondary.{{ $index }}'
                     divisor: 10
-                    group: Water Temperature
+                    group: Water In Temperature
 
                 -
                     oid: Stulz-WIB8000-MIB::waterOutTemperatChillersPrimary
@@ -102,7 +102,7 @@ modules:
                     descr: 'Unit {{ $subindex1 }} Water Out Primary Temperature'
                     index: 'waterOutTemperatChillersPrimary.{{ $index }}'
                     divisor: 10
-                    group: Water Temperature
+                    group: Water Out Temperature
 
                 -
                     oid: Stulz-WIB8000-MIB::waterOutTemperatillersSecondary
@@ -111,7 +111,7 @@ modules:
                     descr: 'Unit {{ $subindex1 }} Water Out Secondary Temperature'
                     index: 'waterOutTemperatillersSecondary.{{ $index }}'
                     divisor: 10
-                    group: Water Temperature
+                    group: Water Out Temperature
 
                 -
                     oid: Stulz-WIB8000-MIB::unitAirTemperature
@@ -129,7 +129,7 @@ modules:
                     descr: 'Unit {{ $subindex1 }} Return Air Temperature'
                     index: 'unitReturnAirTemperature.{{ $index }}'
                     divisor: 10
-                    group: Air Temperature
+                    group: Return Air Temperature
 
                 -
                     oid: Stulz-WIB8000-MIB::unitSupplyAirTemperature
@@ -138,7 +138,7 @@ modules:
                     descr: 'Unit {{ $subindex1 }} Supply Air Temperature'
                     index: 'unitSupplyAirTemperature.{{ $index }}'
                     divisor: 10
-                    group: Air Temperature
+                    group: Supply Air Temperature
 
         humidity:
             data:
