@@ -234,7 +234,6 @@ function device_by_id_cache($device_id, $refresh = false)
     $device['location'] = $model->location->location ?? null;
     $device['lat'] = $model->location->lat ?? null;
     $device['lng'] = $model->location->lng ?? null;
-    $device['maintenance'] = $model->isUnderMaintenance() ?? false;
 
     return $device;
 }
