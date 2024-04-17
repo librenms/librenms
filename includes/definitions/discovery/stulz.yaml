@@ -213,6 +213,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.29462.10.2.1.1.2.4.1.1.6932.{{ $index }}'
                     index: 'fan1Speed.{{ $index }}'
                     descr: 'Unit {{ $subindex1 }} Fan Speed'
+                    group: Fan Speed
                 -
                     oid: gValveOpeningGrade
                     value: gValveOpeningGrade
@@ -225,18 +226,21 @@ modules:
                     num_oid: '.1.3.6.1.4.1.29462.10.2.1.1.2.1.2.5.1.2238.{{ $index }}'
                     index: 'unitFreecoolingValve.{{ $index }}'
                     descr: 'Unit {{ $subindex1 }} Freecooling Valve Opening'
+                    group: Free Cooling
                 -
                     oid: Stulz-WIB8000-MIB::gECWValveOpeningGrade1
                     value: Stulz-WIB8000-MIB::gECWValveOpeningGrade1
                     num_oid: '.1.3.6.1.4.1.29462.10.2.1.1.2.1.2.2.1.1.5214.{{ $index }}'
                     index: 'gECWValveOpeningGrade1.{{ $index }}'
                     descr: 'Unit {{ $subindex1 }} GE/CW Valve 1 Opening'
+                    group: GE/CW Valve 1
                 -
                     oid: Stulz-WIB8000-MIB::gECWValveOpeningGrade2
                     value: Stulz-WIB8000-MIB::gECWValveOpeningGrade2
                     num_oid: '.1.3.6.1.4.1.29462.10.2.1.1.2.1.2.2.1.1.5224.{{ $index }}'
                     index: 'gECWValveOpeningGrade2.{{ $index }}'
                     descr: 'Unit {{ $subindex1 }} GE/CW Valve 2 Opening'
+                    group: GE/CW Valve 2
         waterflow:
             data:
                 -
