@@ -81,8 +81,8 @@ modules:
                     oid: Stulz-WIB8000-MIB::unitSetpointAirTratureCorrected
                     value: Stulz-WIB8000-MIB::unitSetpointAirTratureCorrected
                     num_oid: '.1.3.6.1.4.1.29462.10.2.1.1.1.1.1.1.1.1175.{{ $index }}'
-                    descr: 'Unit {{ $subindex1 }} Setpoint Air Setpoint Temperature'
-                    index: 'unitSupplyAirTemperature.{{ $index }}'
+                    descr: 'Unit {{ $subindex1 }} Setpoint Air Temperature'
+                    index: 'unitSetpointAirTratureCorrected.{{ $index }}'
                     divisor: 10
                     group: Air Setpoint
                 -
