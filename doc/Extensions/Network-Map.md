@@ -18,7 +18,7 @@ By default, both are are included but you can enable / disable either
 one using the following config option:
 
 ```bash
-lnms config:set 'network_map_items' "('mac','xdp')"
+lnms config:set network_map_items '["mac","xdp"]'
 ```
 
 Either remove mac or xdp depending on which you want.
