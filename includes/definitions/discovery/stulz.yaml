@@ -8,19 +8,21 @@ modules:
                     value: busalarm
                     num_oid: '.1.3.6.1.4.1.29462.10.2.1.4.1.1.1.10.{{ $index }}'
                     index: 'busalarm.{{ $index }}'
-                    descr: 'Unit {{ $subindex1 }} Bus Alarm'
+                    descr: 'Unit {{ $subindex1 }} Bus Alarm State'
                     states:
                         - { descr: Ok, graph: 1, value: 0, generic: 0 }
                         - { descr: Error, graph: 1, value: 1, generic: 2 }
+                    group: Bus Alarm
                 -
                     oid: basadrconflict
                     value: busadrconflict
                     num_oid: '.1.3.6.1.4.1.29462.10.2.1.4.1.1.1.12.{{ $index }}'
                     index: 'busadrconflict.{{ $index }}'
-                    descr: 'Unit {{ $subindex1 }} Bus Conflict'
+                    descr: 'Unit {{ $subindex1 }} Bus Conflict State'
                     states:
                         - { descr: Ok, graph: 1, value: 0, generic: 0 }
                         - { descr: Error, graph: 1, value: 1, generic: 2 }
+                    group: Bus Conflict State
                 -
                     oid: unitOnOff
                     value: unitOnOff
@@ -30,6 +32,7 @@ modules:
                     states:
                         - { descr: Stopped, graph: 1, value: 0, generic: 0 }
                         - { descr: Running, graph: 1, value: 1, generic: 0 }
+                    group: Running State
                 -
                     oid: generalError
                     value: generalError
@@ -39,6 +42,7 @@ modules:
                     states:
                         - { descr: Ok, graph: 1, value: 0, generic: 0 }
                         - { descr: Error, graph: 1, value: 1, generic: 2 }
+                    group: Error State
                 -
                     oid: compr1Running
                     value: compr1Running
@@ -48,6 +52,7 @@ modules:
                     states:
                         - { descr: Stopped, graph: 1, value: 0, generic: 0 }
                         - { descr: Running, graph: 1, value: 1, generic: 0 }
+                    group: Compressor State
                 -
                     oid: humidifier1Running
                     value: humidifier1Running
@@ -57,15 +62,17 @@ modules:
                     states:
                         - { descr: Stopped, graph: 1, value: 0, generic: 0 }
                         - { descr: Running, graph: 1, value: 1, generic: 0 }
+                    group: Humidifier State
                 -
                     oid: dehumidificationRunning
                     value: dehumidificationRunning
                     num_oid: '.1.3.6.1.4.1.29462.10.2.1.1.2.3.1.1.6802.{{ $index }}'
                     index: 'dehumidificationRunning.{{ $index }}'
-                    descr: 'Unit {{ $subindex1 }} Dehumidification'
+                    descr: 'Unit {{ $subindex1 }} Dehumidification State'
                     states:
                         - { descr: Stopped, graph: 1, value: 0, generic: 0 }
                         - { descr: Running, graph: 1, value: 1, generic: 0 }
+                    group: Dehumidifier State
                 -
                     oid: fan1Running
                     value: fan1Running
@@ -75,6 +82,7 @@ modules:
                     states:
                         - { descr: Stopped, graph: 1, value: 0, generic: 0 }
                         - { descr: Running, graph: 1, value: 1, generic: 0 }
+                    group: Fan State
         temperature:
             data:
                 -
