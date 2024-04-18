@@ -78,6 +78,7 @@ class Device extends BaseModel
         'sysObjectID',
         'timeout',
         'transport',
+        'type',
         'version',
         'uptime',
     ];

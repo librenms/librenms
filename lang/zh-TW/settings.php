@@ -725,7 +725,7 @@ return [
             'help' => 'Cleanup done by daily.sh',
         ],
         'ports_purge' => [
-            'description' => '清除端口已刪除',
+            'description' => '清除已刪除的連接埠',
             'help' => 'Cleanup done by daily.sh',
         ],
         'prometheus' => [
