@@ -214,4 +214,5 @@ opcache.memory_consumption=256
 
 If you are having caching issues, you can clear the file based opcache with `rm -rf /tmp/cache`.
 
-
+Debian 12 users, be aware php 8.2 current stable version (8.2.7) creates segmentation faults when opcache uses file cache. Issue should be this one https://github.com/php/php-src/issues/10914 
+Using sury packages or disabling file cache solves the issue

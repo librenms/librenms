@@ -78,6 +78,7 @@ class Device extends BaseModel
         'sysObjectID',
         'timeout',
         'transport',
+        'type',
         'version',
         'uptime',
     ];
@@ -836,11 +837,6 @@ class Device extends BaseModel
     public function parents(): BelongsToMany
     {
         return $this->belongsToMany(self::class, 'device_relationships', 'child_device_id', 'parent_device_id');
-    }
-
-    public function perf(): HasMany
-    {
-        return $this->hasMany(\App\Models\DevicePerf::class, 'device_id');
     }
 
     public function ports(): HasMany

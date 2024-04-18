@@ -1,0 +1,81 @@
+CIENA-6500R-TYPES-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    cienaRls
+        FROM CIENA-SMI
+    Counter64, MODULE-IDENTITY
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC;
+
+cienaRlsTypesMIB MODULE-IDENTITY
+    LAST-UPDATED "202010010000Z"
+    ORGANIZATION 
+        "Ciena Corporation"
+    CONTACT-INFO 
+        "Web: http://www.ciena.com
+         Postal:   7035 Ridge Road
+                   Hanover, Maryland 21076
+                   U.S.A
+         Phone:    +1 800-921-1144
+         Fax:      +1 410-694-5750"
+    DESCRIPTION 
+        "This modules describes Ciena's release object for the 6500r platform."
+    REVISION    "202010010000Z"
+    DESCRIPTION 
+        "Initial Revision."
+    ::= { cienaRls 2 }
+
+
+PecCode ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "16t"
+    STATUS      current
+    DESCRIPTION 
+        "A UTF-8 string with a max length of 16 characters"
+    SYNTAX      OCTET STRING (SIZE(1..16))
+
+MeansurementType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "Flag to indicate if current power is measured, estimated or unknown."
+    SYNTAX      INTEGER { measured(0), estimated(1), unknown(2) }
+
+BandOccupancy ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "Band Type"
+    SYNTAX      BITS { bandC(0), bandL(1), osc(2), telmetry(3), total(4) }
+
+PowerEnum ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "Power supply type"
+    SYNTAX      INTEGER { ac(0), dc(1) }
+
+RamEnum ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        ""
+    SYNTAX      INTEGER { size16G(0), size32G(1) }
+
+RestartType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "Restart type"
+    SYNTAX      INTEGER { warm(1), cold(2) }
+
+OrlState ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "The ORL State."
+    SYNTAX      INTEGER { valid(1), outputOORL(2), reflectOORL(3), 
+                    reflectOORH(4), hssf(5), shutoff(6), unknown(7), 
+                    notApplicable(8) }
+
+AdminState ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "Identify the administrative state"
+    SYNTAX      INTEGER { enabled(1), disabled(2), unassigned(3) }
+
+END -- end of module CIENA-6500R-TYPES-MIB.

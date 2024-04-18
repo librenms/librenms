@@ -748,22 +748,6 @@ device_outages:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     device_outages_device_id_going_down_unique: { Name: device_outages_device_id_going_down_unique, Columns: [device_id, going_down], Unique: true, Type: BTREE }
     device_outages_device_id_index: { Name: device_outages_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
-device_perf:
-  Columns:
-    - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
-    - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
-    - { Field: timestamp, Type: datetime, 'Null': false, Extra: '' }
-    - { Field: xmt, Type: int, 'Null': false, Extra: '' }
-    - { Field: rcv, Type: int, 'Null': false, Extra: '' }
-    - { Field: loss, Type: int, 'Null': false, Extra: '' }
-    - { Field: min, Type: 'double(8,2)', 'Null': false, Extra: '' }
-    - { Field: max, Type: 'double(8,2)', 'Null': false, Extra: '' }
-    - { Field: avg, Type: 'double(8,2)', 'Null': false, Extra: '' }
-    - { Field: debug, Type: text, 'Null': true, Extra: '' }
-  Indexes:
-    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
-    device_perf_device_id_index: { Name: device_perf_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
-    device_perf_device_id_timestamp_index: { Name: device_perf_device_id_timestamp_index, Columns: [device_id, timestamp], Unique: false, Type: BTREE }
 device_relationships:
   Columns:
     - { Field: parent_device_id, Type: 'int unsigned', 'Null': false, Extra: '', Default: '0' }

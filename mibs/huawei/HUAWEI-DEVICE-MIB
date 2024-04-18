@@ -1,9 +1,9 @@
 -- ============================================================================
--- Copyright (C) 2018 by HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2022 by HUAWEI TECHNOLOGIES. All rights reserved.
 -- Description:	The MIB module defines MIB objects which provide device
 --              management NMS interfaces.
 -- Reference:   
--- Version:     V4.92
+-- Version:     V5.38
 -- ============================================================================
 	HUAWEI-DEVICE-MIB DEFINITIONS ::= BEGIN 
 	
@@ -15,6 +15,8 @@
 			FROM SNMPv2-SMI
 		DisplayString, DateAndTime, TruthValue, RowStatus
 			FROM SNMPv2-TC
+		SnmpAdminString
+			FROM SNMP-FRAMEWORK-MIB               -- RFC 3411
 		HWFrameType, HWPCBType, HWSubPCBType, HWPortType
 			FROM HUAWEI-TC-MIB
 		ifIndex
@@ -23,11 +25,13 @@
                         FROM HCNUM-TC   
 		huaweiUtility
                     FROM HUAWEI-MIB
+		entPhysicalIndex
+			FROM ENTITY-MIB
 		InetAddressType, InetAddress, InetAddressPrefixLength
                     FROM INET-ADDRESS-MIB;
 
     hwDev MODULE-IDENTITY
-        LAST-UPDATED "201809050000Z"
+        LAST-UPDATED "202210080000Z"
             ORGANIZATION
                   "Huawei Technologies Co.,Ltd."
             CONTACT-INFO
@@ -44,6 +48,303 @@
                     management NMS interfaces.
                     "
 --  Revision history
+                REVISION "202210080000Z"
+                DESCRIPTION "V5.38,
+                            1. Modified node's DESCRIPTION:
+                            hwDevSnmpProbeNmsDiscMainType
+                            hwDevSnmpProbeNmsDiscSubType
+                            hwDevSnmpDisconnectType
+                            hwDevSnmpProbeNmsDiscCheckResult      
+                            2. Modified node's SYNTAX:
+                            hwDevSnmpProbeNmsDiscMainType
+                            hwDevSnmpDisconnectType
+                            "
+
+                REVISION "202209270000Z"
+                DESCRIPTION "V5.37,
+                            1. Added the following nodes:
+                            hwSingleControlBoardMode
+                            "
+
+                REVISION "202209200000Z"
+                DESCRIPTION "V5.36,
+                            1.Added node hwDevSnmpProbeNmsDiscRecordTable in hwDevSnmpProbeMonitor
+                            "
+
+                REVISION "202209020000Z"
+                DESCRIPTION "V5.35,
+                            1. Added the following nodes:
+                            hwSysEosTime
+                            "
+
+                REVISION "202208310000Z"
+                DESCRIPTION "V5.34,
+                            1. Added the following nodes:
+                            hwDevBoardAddConfigReplaceSuccessTrap
+                            hwDevBoardAddConfigReplaceFailTrap
+                            2. Add one node hwConfigBoardName hwBasicBoardName on HwSlotEntry.
+                            "
+
+                REVISION "202208120000Z"
+                DESCRIPTION "V5.33,
+                            1.Delete hwDevSnmpProbeNmsDiscRowStatus.
+                            2. Modified node's MAX-ACCESS:
+                            hwDevSnmpProbeNmsSeq
+                            hwDevSnmpProbeNmsTime
+                            hwDevSnmpProbeNmsDiscMaxInterval.
+                            3. Changed node's DESCRIPTION: 
+                            hwDevSnmpProbeNmsDiscTable
+                            hwDevSnmpProbeNmsDiscEntry
+                            hwDevSnmpProbeNmsSeq
+                            hwDevSnmpProbeNmsDiscMaxInterval.
+                            4.Modified the INDEX of hwDevSnmpProbeNmsDiscEntry,add 'hwDevSnmpProbeNmsDiscMaxInterval'.
+                            "
+
+                REVISION "202208100000Z"
+                DESCRIPTION "V5.32,
+                            1. Added the following nodes:
+                            hwDevFileIntegrityCheckFailedTrap
+                            hwDevFileIntegrityCheckSuccessTrap
+                            hwDevIntegrityCheckFileType
+                            "
+
+                REVISION "202207010000Z"
+                DESCRIPTION "V5.31,
+                            1. Added the following nodes:
+                            hwDevTlsCertifyFailTrap
+                            hwDevTlsCertifyRestoreTrap
+                            "
+
+				REVISION "202206230000Z"
+                DESCRIPTION "V5.30,
+                             1. Modify node hwDevSnmpProbeNmsSeq and hwDevSnmpProbeNmsDiscMaxInterval type
+                             "
+				
+				REVISION "202206220000Z"
+                DESCRIPTION "V5.29,
+                             1. Added node hwDevSnmpProbeNmsDiscTable in hwDevSnmpProbeMonitor
+                             "
+
+                REVISION "202205280000Z"
+                DESCRIPTION "V5.28,
+                            1. Added node hwMiniSystemSwitch in hwSystemPara table.
+                            "
+
+		REVISION "202204030000Z"
+                DESCRIPTION "V5.27,
+                            1. Added the following nodes:
+                             hwFwdChannelFault
+                             hwFwdChannelFaultResume
+                             hwCheckType
+                            "
+
+		REVISION "202112270000Z"
+                DESCRIPTION "V5.26,
+                            1. Added the following nodes:
+                             hwDevVoiceFileLZMATrap
+                            "
+				REVISION "202112030000Z"
+                DESCRIPTION "V5.25,
+                            1. Added the hwSlotOperStatus:
+                            isolated(20)
+                            "
+
+                REVISION "202112030000Z"
+                DESCRIPTION "V5.24,
+                            1. Added the following nodes:
+                            hwDevBoardIsolatedTrap
+			    hwDevBoardIsolatedRecoverTrap
+                            "
+
+                REVISION "202111120000Z"
+                DESCRIPTION "V5.23,
+                            1. Added the following nodes:
+                            hwSlotItemCode
+                            "
+                REVISION "202106260000Z"
+                DESCRIPTION "V5.22,
+                            1. Added the following nodes:
+                            hwRegisterFrameTypeName
+                            hwDevStandbyFrameTypeInconsistentTrap
+                            "
+
+                REVISION "202106260000Z"
+                DESCRIPTION "V5.21,
+                            1. Added the following nodes:
+                            hwDevStackFrameFaultTrap
+                            hwDevStackFrameRestoreTrap
+                            hwDevStackFrameStateChangeTrap
+                            "
+
+                REVISION "202106230000Z"
+                DESCRIPTION "V5.20,
+                             1.Add enum number stack(5) for hwSlotNetworkRole.
+                             1.Add enum number stack(5) for hwPortNetworkRole.
+                            "
+
+                REVISION "202105240000Z"
+                DESCRIPTION "V5.19,
+                             1.Modify table HwFrameEntry: Add hwLpuSlotNums.
+                            "
+
+                REVISION "202105170000Z"
+                DESCRIPTION "V5.18,
+                             1.Add device role.
+                            "
+
+                REVISION "202104070000Z"
+                DESCRIPTION "V5.17, Modify table hwSystemPara: Add enumerated values (13-14) 
+                             relevant to stack mode in leaf hwSysWorkMode."
+
+
+                REVISION "202103060000Z"
+                DESCRIPTION "V5.16,
+                            1.Modified the value range of hwDevAntiTheftGraceTime and hwDevAntiTheftSlotGraceTime.
+                            "
+
+                REVISION "202103040000Z"
+                DESCRIPTION "V5.15,
+                                          1.Add enum number highpowershutdown(19) for hwSlotOperStatus.
+                                          2.Add hwPowerThreshold.
+                                          3.Add hwRemainingPowerSupplyCapability.
+                                          4.Add hwDevPowerOverThresholdFaultTrap.
+                                          5.Add hwDevPowerOverThresholdRestoreTrap.
+                                         "
+
+                REVISION "202103040000Z"
+                DESCRIPTION "V5.14,
+                            1.Add enum number storage(8) for hwResType.
+                            "
+
+                REVISION "202102030000Z"
+                DESCRIPTION "V5.13,
+                            1.Modified the description of hwDiagResOverloadFaultTrap.
+                            "
+
+                REVISION "202101130000Z"
+                DESCRIPTION "V5.12,
+                            1.Added hwVersionName.
+                            2.Added hwDevLoadLowerVersionTrap.
+                            "
+
+                REVISION "202012150000Z"
+                DESCRIPTION "V5.11,
+                            1.Add the the nodes with correct spellings about hwPortTemperature.
+                            "
+							
+                REVISION "202012070000Z"
+                DESCRIPTION "V5.10,
+                            1.Delete the the nodes with mis-spellings about hwPortTemprature.
+                            "
+							
+                REVISION "202011280000Z"
+                DESCRIPTION "V5.09,
+                            1.Add the the nodes with mis-spellings about Temperature.
+                            "
+
+                REVISION "202011270000Z"
+                DESCRIPTION "V5.08,
+                            1.Delete the the nodes with mis-spellings about Temperature.
+                            "
+                
+                REVISION "202011230000Z"
+                DESCRIPTION "V5.07,
+                            1.Add one node hwSysSecConfig on hwSystemPara.
+                            "
+							
+                REVISION "202007180000Z"
+                DESCRIPTION "V5.06,
+                            1.Modified the SYNTAX from OCTET STRING (SIZE (0 | 12..32)) to OCTET STRING (SIZE (0 | 8..15)) for hwSlotExtendedBiosPassword.
+                            "
+							
+                REVISION "202004290000Z"
+                DESCRIPTION "V5.05,
+                            1.Added hwWarrantyInfoTable.
+                            2.Added HwWarrantyInfoEntry.
+                            3.Added hwWarrantyInfoSubPhysicalIndex.
+                            4.Added hwWarrantyInfoSupport.
+                            5.Added hwWarrantyInfoSerialNum.
+                            6.Added hwWarrantyInfoStartPointDate.
+                            7.Added hwWarrantyInfoServiceSession.
+                            8.Added hwWarrantyInfoFirstActivationDate.
+                            9.Added hwWarrantyInfoMfgDate.
+                            10.Added hwWarrantyInfoProductCapability.
+                            "
+
+                REVISION "202004220000Z"
+                DESCRIPTION "V5.04,
+                            1.Modified the SYNTAX from OCTET STRING (SIZE (12..32)) to OCTET STRING (SIZE (0 | 12..32)) for hwSlotExtendedBiosPassword.
+                            "
+							
+                REVISION "201912230000Z"
+                DESCRIPTION "V5.03,
+                            1.Added hwSlotExtendedBiosPassword.
+                            2.Added hwDevExBiosPasswordFaultTrap.
+                            3.Added hwDevExBiosPasswordRecoverTrap.
+                            "
+
+                REVISION "201911050000Z"
+                DESCRIPTION "V5.02,
+                            1.Modify the hwSlotAdminForceOOSTime status, from current to deprecated.
+                            2.Modify the hwSlotForceOOSTime status, from Unsigned32 to deprecated.
+                            3.Modify the hwSlotAdminForceOOSTimeoutWorkMode status, for current to deprecated.
+                            "
+
+                REVISION "201909260000Z"
+                DESCRIPTION "V5.01, 
+                            1.Added hwDevicePktStatL3EthTypeErr in hwDevicePktStatEntry.
+                            2.Modified the SYNTAX from INTEGER { reset(1) } to Integer32 (0..255) for hwDevicePktStatReset.
+                             "
+							 
+                REVISION "201909180000Z"
+                DESCRIPTION "V5.00,
+	                       1.Modify the hwMemoryDevSize type, from Unsigned32 to Counter64.
+		    2.Modify the hwMemoryDevFree type, from Unsigned32 to Counter64.
+		   "
+
+                REVISION "201907180000Z"
+                DESCRIPTION "V4.99, 
+                             1. Modify the string size of hwDevAntiTheftOperatorName from (1..100) to (0..100).
+                             2. Modify the string size of hwDevAntiTheftPublicKey from (1..1024) to (0..1024).
+                             3. Modify the string size of hwDevAntiTheftPublicKeyFingerprintlength from (1..64) to (0..64).
+                             4. Modify the string size of hwDevAntiTheftRandomValue from (1..32) to (0..32).
+                             5. Modify the string size of hwDevAntiTheftSignature from (1..1024) to (0..1024).
+                             6. Modify the string size of hwDevAntiTheftSlotOperatorName from (1..100) to (0..100).
+                             7. Modify the string size of hwDevAntiTheftSlotPublicKey from (1..1024) to (0..1024).
+                             8. Modify the string size of hwDevAntiTheftSlotPublicKeyFingerprint from (1..64) to (0..64).
+                             "
+
+                REVISION "201907100000Z"
+                DESCRIPTION "V4.98, Added hwDevAntiTheft"
+
+                REVISION "201907040000Z"
+                DESCRIPTION "V4.97, Added the following node: 
+                             hwFrameDesc
+                             "
+
+                REVISION "201905140000Z"
+                DESCRIPTION "V4.96, Added the following node: 
+                             hwSysFtpRemoteOverwrite
+                             hwSysSftpRemoteOverwrite
+                             "
+
+                REVISION "201902250000Z"
+                DESCRIPTION "V4.95, Added the following node: 
+                             hwDevAntiTheftTrapReason
+                             hwDevAntiTheftUnAuthTraps
+                             hwDevAntiTheftUnAuthResumeTraps
+                             "               
+
+                REVISION "201902160000Z"
+                DESCRIPTION "V4.94, Added the following node: 
+                             hwDevAntiTheftLockTraps
+                             "
+
+                REVISION "201902020000Z"
+                DESCRIPTION "V4.93, Added the following nodes: 
+                             hwDevAntiTheftStatus
+                             "
+
                 REVISION "201809050000Z"
                 DESCRIPTION "V4.85, Added the following nodes: 
                              hwDevRtuLicCapacityExceedFaultTrap
@@ -977,6 +1278,8 @@
                 cmsangmsan(10),
                 gmsancmsan(11),
                 gmsanoffline(12),
+                independent(13),
+                stack(14),
                 null(65536)
                 }
             MAX-ACCESS read-only
@@ -1009,7 +1312,9 @@
                                       with the active control board of GMSAN and the standby control board of CMSAN
                 12.gmsanoffline(12)  -indicates that the standby control board is not in position and the active
                                       control board is GMSAN
-                13. null(65536)      -indicates that the system work mode is not set
+                13.independent(13)   -indicates that the working mode of the current subrack is independent
+                14.stack(14)         -indicates that the working mode of the current subrack is stack
+                15. null(65536)      -indicates that the system work mode is not set
                 "
             ::= { hwSystemPara 5 }
 
@@ -1760,7 +2065,134 @@
                 IPV6 Mask of the system.
                 "
             ::= { hwSystemPara 49 }
-			
+
+        -- 1.3.6.1.4.1.2011.6.3.1.50
+        hwSysFtpRemoteOverwrite OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                enable(1),
+                disable(2)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                Ftp overwrite remote file strategy.
+                Options:
+                1. enable(1)   -Overwrite remote file while file with the same name exists on the FTP server.
+                2. disable(2)   -Do not overwrite remote file while file with the same name exists on the FTP server.
+                The default value disable(2).
+                "
+            ::= { hwSystemPara 50 }
+
+        -- 1.3.6.1.4.1.2011.6.3.1.51
+        hwSysSftpRemoteOverwrite OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                enable(1),
+                disable(2)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                Sftp overwrite remote file strategy.
+                Options:
+                1. enable(1)   -Overwrite remote file while file with the same name exists on the SFTP server.
+                2. disable(2)   -Do not overwrite remote file while file with the same name exists on the SFTP server.
+                The default value enable(1).
+                "
+            ::= { hwSystemPara 51 }
+
+        -- 1.3.6.1.4.1.2011.6.3.1.52
+        hwWarrantyInfoProductCapability OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                support(1),
+                notsupport(2)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                Whether the current product supports for warranty information.
+                Options:
+                1.  support(1)      - indicates that the product is support
+                2.  notsupport(2)  - indicates that the product is not support
+                "
+            ::= { hwSystemPara 52 }
+
+        -- 1.3.6.1.4.1.2011.6.3.1.53
+        hwSysSecConfig OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..1))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                Used only for CICM to collect security configuration data.
+                "
+            ::= { hwSystemPara 53 }
+        -- 1.3.6.1.4.1.2011.6.3.1.54
+        hwSystemRole OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The current role in the network.
+                "
+            ::= { hwSystemPara 54 }
+
+        -- 1.3.6.1.4.1.2011.6.3.1.55
+        hwMiniSystemSwitch OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                disable(0),
+                enable(1)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                Mini system switch status.
+                Options:
+                1. disable(0)   -indicates that the mini-system switch is disable.
+                2. enable(1)    -indicates that the mini-system switch is enable.
+                The default value disable(0).
+                "
+            ::= { hwSystemPara 55 }
+
+       -- 1.3.6.1.4.1.2011.6.3.1.56
+        hwSysEosTime OBJECT-TYPE
+            SYNTAX DateAndTime
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                This object is used for getting eos date and time of the system.
+                "
+            ::= { hwSystemPara 56 }
+
+        -- 1.3.6.1.4.1.2011.6.3.1.57
+        hwSingleControlBoardMode OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                disable(0),
+                enable(1)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                Single control board mode switch status.
+                Options:
+                1. disable(0)   -indicates that the single control board mode is disable.
+                2. enable(1)    -indicates that the single control board mode is enable.
+                The default value disable(0).
+                "
+            ::= { hwSystemPara 57 }
+
+
         -- 1.3.6.1.4.1.2011.6.3.1.999
         hwSysVersionVrcb OBJECT-TYPE
             SYNTAX DisplayString
@@ -2071,6 +2503,8 @@
                     BITS,  
                 hwFrameMacAddress
                     OCTET STRING,
+                hwLpuSlotNums
+                    Integer32,
                 hwFrameQueryAssit
                     Integer32
              }
@@ -2101,7 +2535,7 @@
 
         -- 1.3.6.1.4.1.2011.6.3.3.1.1.3
         hwFrameDesc OBJECT-TYPE
-            SYNTAX OCTET STRING (SIZE (0..128))
+            SYNTAX OCTET STRING (SIZE (0..246))
             MAX-ACCESS read-create
             STATUS current
             DESCRIPTION
@@ -2415,7 +2849,18 @@
                 For local frame, the value is invalid.
                 "
             ::= { hwFrameEntry 22 }
-            
+
+        -- 1.3.6.1.4.1.2011.6.3.3.1.1.23
+        hwLpuSlotNums OBJECT-TYPE
+            SYNTAX Integer32 (0..16)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                Number of LPUs supported by the device.
+                "
+            ::= { hwFrameEntry 23 }
+
         -- 1.3.6.1.4.1.2011.6.3.3.1.1.65536
         hwFrameQueryAssit OBJECT-TYPE
             SYNTAX Integer32
@@ -2483,7 +2928,7 @@
                     OCTET STRING,
                 hwSlotShutdownState
                     INTEGER,
-                hwSlotTemprature
+                hwSlotTemperature
                     Integer32,
                 hwSlotUpdateVersion
                     OCTET STRING,
@@ -2508,7 +2953,15 @@
                 hwSlotCreateTime
                     DateAndTime,
                 hwSlotPortNumWorkMode
-                    INTEGER
+                    INTEGER,
+                hwSlotExtendedBiosPassword
+                    OCTET STRING,
+                hwSlotItemCode
+                    OCTET STRING,
+                hwConfigBoardName
+                    OCTET STRING,
+                hwBasicBoardName
+                    OCTET STRING
              }
 
         -- 1.3.6.1.4.1.2011.6.3.3.2.1.1
@@ -2676,7 +3129,9 @@
                 hightempshutdown(15),
                 manualshutdown(16),
                 mismatch(17),
-                acoffshutdown(18)
+                acoffshutdown(18),
+                highpowershutdown(19),
+				isolated(20)
                 }
             MAX-ACCESS read-only
             STATUS current
@@ -2717,8 +3172,11 @@
                 17. mismatch(17)            -when a board inserted in a slot is inconsistent with the configuration saved in the system,
                                              the board is in the mismatch(17) state
                 18. acoffshutdown(18)       -used to protect system when there is no AC Power.
+                19. highpowershutdown(19)   -used to protect system when the current maximum power consumption of the
+                                                                 system exceeds the maximum power supply capability
+				20. isolated(20)            -used to indicates that the board is in isolated state
                 Certain products use the power saving features, energysavingshutdown(14), hightempshutdown(15),
-                manualshutdown(16),acoffshutdown(18) to distinguish the shutdown causes.
+                manualshutdown(16),acoffshutdown(18),highpowershutdown(19) to distinguish the shutdown causes.
                 For outofservice(11), graceful(12), refer to hwSlotEndServiceMode.
                 "
             ::= { hwSlotEntry 8 }
@@ -2827,7 +3285,7 @@
 
 
         -- 1.3.6.1.4.1.2011.6.3.3.2.1.13
-        hwSlotTemprature OBJECT-TYPE
+        hwSlotTemperature OBJECT-TYPE
             SYNTAX Integer32
             UNITS "centigrade"
             MAX-ACCESS read-only
@@ -2863,7 +3321,7 @@
             SYNTAX Integer32 (1..1440)
             UNITS "minutes"
             MAX-ACCESS read-create
-            STATUS current
+            STATUS deprecated
             DESCRIPTION
                 "
                 The timeout time before forcing to quit service of the board, in unit of minutes.
@@ -2879,7 +3337,7 @@
         hwSlotForceOOSTime OBJECT-TYPE
             SYNTAX Integer32 (0..86400)
             MAX-ACCESS read-only
-            STATUS current
+            STATUS deprecated
             DESCRIPTION
                 "
                 The remain time of the forcing to out of service.
@@ -2896,7 +3354,7 @@
                 cancel(2)
                 }
             MAX-ACCESS read-create
-            STATUS current
+            STATUS deprecated
             DESCRIPTION
                 "
                 The handling after the timeout time elapses when a board delays in quitting service.
@@ -2948,6 +3406,7 @@
                 network(2),
                 user(3),
                 extend(4),
+                stack(5),
                 invalid(255)
                 }
             MAX-ACCESS read-write
@@ -2960,7 +3419,8 @@
                 2. network(2)  -indicates the network side, which is used for upstream transmission
                 3. user(3)     -indicates the user side, which is used for creating the service port
                 4. extend(4)   -indicates the extend side, which is used for connecting to the extended frame
-                5. invalid(255)-indicates the invalid value
+                5. stack(5)    -indicates the stack side, which is used for creating the stack port
+                6. invalid(255)-indicates the invalid value
                 "
             ::= { hwSlotEntry 20 }
 
@@ -3091,7 +3551,51 @@
                 Therefore, this node cannot be set concurrently with hwSlotAdminStatus, hwSlotRowStatus, and hwSlotWorkMode nodes.
                 "
             ::= { hwSlotEntry 25 }
+            
+        -- 1.3.6.1.4.1.2011.6.3.3.2.1.26
+        hwSlotExtendedBiosPassword OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0 | 8..15))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                This object is used for setting the password of extended BIOS.
+                "
+            ::= { hwSlotEntry 26 }
 
+        -- 1.3.6.1.4.1.2011.6.3.3.2.1.27
+        hwSlotItemCode OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..32))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The vendor-specific item code string for the board.
+                The preferred value is the item code string actually printed on the component itself.
+                "
+            ::= { hwSlotEntry 27 }
+
+        -- 1.3.6.1.4.1.2011.6.3.3.2.1.28
+        hwConfigBoardName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..64))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                describe config board name information of the slot.
+                "
+            ::= { hwSlotEntry 28 }
+ 
+        -- 1.3.6.1.4.1.2011.6.3.3.2.1.29
+        hwBasicBoardName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..64))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                describe basic board name information of the slot.
+                "
+            ::= { hwSlotEntry 29 }
 
         -- 1.3.6.1.4.1.2011.6.3.3.3
         hwSubslotTable OBJECT-TYPE
@@ -3543,7 +4047,7 @@
                     INTEGER,
                 hwPortNetworkRole
                     INTEGER,
-                hwPortTemprature
+                hwPortTemperature
                     Integer32,
                 hwPortPrimaryStatus
                     INTEGER,
@@ -3743,7 +4247,8 @@
                 uplink(1),
                 cascade(2),
                 access(3),
-                extend(4)
+                extend(4),
+                stack(5)
                 }
             MAX-ACCESS read-write
             STATUS current
@@ -3755,12 +4260,13 @@
                 2. cascade(2) -indicates the subtending port
                 3. access(3)  -indicates the downstream access port
                 4. extend(4)  -indicates connectting to extended frame
+                5. stack(5)   -indicates the stack port
                 "
             ::= { hwPortEntry 7 }
 
 
         -- 1.3.6.1.4.1.2011.6.3.3.4.1.8
-        hwPortTemprature OBJECT-TYPE
+        hwPortTemperature OBJECT-TYPE
             SYNTAX Integer32
             MAX-ACCESS read-only
             STATUS current
@@ -4241,7 +4747,7 @@
                 1.emsan(1) -indicates that the device is on a terminal node or a convergence node
                 2.smsan(2) -indicates that the device is on a terminal node or a convergence node
                 "
-            DEFVAL { 1 }
+            DEFVAL { emsan }
             ::= { hwBoardAttrEntry 4 }
 
 
@@ -4265,7 +4771,7 @@
                                   When the mains supply is cut off, the board automatically cuts off
                                   the power supply of the broadband part
                 "
-            DEFVAL { 1 }
+            DEFVAL { combo }
             ::= { hwBoardAttrEntry 5 }
 
 
@@ -4558,9 +5064,9 @@
                 hwMemoryDevModuleIndex
                     Integer32,
                 hwMemoryDevSize
-                    Unsigned32,
+                    Counter64,
                 hwMemoryDevFree
-                    Unsigned32,
+                    Counter64,
                 hwMemoryDevRawSliceUsed
                     Unsigned32,
                 hwMemoryDevLargestFree
@@ -4589,7 +5095,7 @@
 
         -- 1.3.6.1.4.1.2011.6.3.5.1.1.2
         hwMemoryDevSize OBJECT-TYPE
-            SYNTAX Unsigned32
+            SYNTAX Counter64
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
@@ -4602,7 +5108,7 @@
 
         -- 1.3.6.1.4.1.2011.6.3.5.1.1.3
         hwMemoryDevFree OBJECT-TYPE
-            SYNTAX Unsigned32
+            SYNTAX Counter64
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
@@ -5788,7 +6294,100 @@
                 The run capacity of license.
                 "
             ::= { hwDevTrapVbOids 53 }
-			
+
+        -- 1.3.6.1.4.1.2011.6.3.8.1.54
+        hwDevAntiTheftStatus OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "
+                Anti-theft status of the device.
+                "
+            ::= { hwDevTrapVbOids 54 }
+
+        -- 1.3.6.1.4.1.2011.6.3.8.1.55
+        hwDevAntiTheftTrapReason OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "
+                This object indicates the cause of the trap.
+                "
+            ::= { hwDevTrapVbOids 55}
+
+        -- 1.3.6.1.4.1.2011.6.3.8.1.56
+        hwVersionName OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "
+                The software package version.
+                "
+            ::= { hwDevTrapVbOids 56 }
+	
+        -- 1.3.6.1.4.1.2011.6.3.8.1.57
+        hwPowerThreshold OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "
+                The threshold of power.
+                "
+            ::= { hwDevTrapVbOids 57 }
+
+        -- 1.3.6.1.4.1.2011.6.3.8.1.58
+        hwRemainingPowerSupplyCapability OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "
+                Remaining power supply capability.
+                "
+            ::= { hwDevTrapVbOids 58 }
+
+        -- 1.3.6.1.4.1.2011.6.3.8.1.59
+        hwRegisterFrameTypeName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..64))
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "
+                The actual standby frame type.
+                "
+            ::= { hwDevTrapVbOids 59 }
+
+        -- 1.3.6.1.4.1.2011.6.3.8.1.60
+        hwCheckType OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "
+                This object indicates the type of the trap.
+                "
+            ::= { hwDevTrapVbOids 60}
+
+        -- 1.3.6.1.4.1.2011.6.3.8.1.61
+        hwDevIntegrityCheckFileType OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                configurationFile(1) --configuration file
+            }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                Type of the integrity check fileType.
+                Options:
+                1.configurationFile(1)  -configuration file.
+                "
+            ::= { hwDevTrapVbOids 61 }	
+
         -- 1.3.6.1.4.1.2011.6.3.8.2
         hwDevCommonTraps OBJECT IDENTIFIER ::= { hwDevTraps 2 }
 
@@ -5934,6 +6533,16 @@
                 This trap message is reported when the abnormal record of SNMP probe monitor occurs.
                 "
             ::= { hwDevCommonTrapsPrefix 12 }
+
+        -- 1.3.6.1.4.1.2011.6.3.8.2.0.13
+        hwDevStackFrameStateChangeTrap NOTIFICATION-TYPE
+            OBJECTS { hwFrameIndex, hwFrameType, hwFrameOperStatus }
+            STATUS current
+            DESCRIPTION
+                "
+                This trap message is reported when a frame's state changes.
+                "
+            ::= { hwDevCommonTrapsPrefix 13 }
 
 
 -- 1.3.6.1.4.1.2011.6.3.8.3
@@ -6194,6 +6803,37 @@
 		"
 	    ::= { hwDevFrameTrapsPrefix 13 }
 
+        -- 1.3.6.1.4.1.2011.6.3.8.3.2.0.20
+        hwDevStackFrameFaultTrap NOTIFICATION-TYPE
+            OBJECTS { hwFrameIndex, hwFrameTypeName }
+	    STATUS current
+	    DESCRIPTION
+		"
+        This trap message is reported when the communication of the frame interrupted,
+        the services in the frame fail.
+		"
+	    ::= { hwDevFrameTrapsPrefix 20 }
+
+        -- 1.3.6.1.4.1.2011.6.3.8.3.2.0.21
+        hwDevStackFrameRestoreTrap NOTIFICATION-TYPE
+            OBJECTS { hwFrameIndex, hwFrameTypeName }
+	    STATUS current
+	    DESCRIPTION
+		"
+		This trap message is reported when the communication of the frame restored.
+		"
+	    ::= { hwDevFrameTrapsPrefix 21 }
+
+        -- 1.3.6.1.4.1.2011.6.3.8.3.2.0.22
+        hwDevStandbyFrameTypeInconsistentTrap NOTIFICATION-TYPE
+            OBJECTS { hwFrameIndex, hwFrameTypeName, hwRegisterFrameTypeName }
+        STATUS current
+        DESCRIPTION
+        "
+        This trap message is reported when the standby frame type is inconsistent with the active frame.
+        "
+        ::= { hwDevFrameTrapsPrefix 22 }
+
         -- 1.3.6.1.4.1.2011.6.3.8.3.2.0.14
         hwDeviceHighTemperatureMinorFaultTrap NOTIFICATION-TYPE
             OBJECTS { hwFrameIndex, hwDeviceCurrentTemp, hwDevTempMinorAlmThreshold }
@@ -6254,6 +6894,47 @@
 		"
 	    ::= { hwDevFrameTrapsPrefix 19 } 
 
+        -- 1.3.6.1.4.1.2011.6.3.8.3.2.0.23
+        hwFwdChannelFault NOTIFICATION-TYPE
+            OBJECTS { hwFrameIndex, hwSlotIndex, hwSubslotIndex, hwCheckType }
+	    STATUS current
+	    DESCRIPTION 
+		"
+		This trap message is reported when the forwarding channel detected fault.
+		"
+	    ::= { hwDevFrameTrapsPrefix 23 }
+
+
+        -- 1.3.6.1.4.1.2011.6.3.8.3.2.0.24
+        hwFwdChannelFaultResume NOTIFICATION-TYPE
+            OBJECTS { hwFrameIndex, hwSlotIndex, hwSubslotIndex, hwCheckType }
+	    STATUS current
+	    DESCRIPTION 
+		"
+		This trap message is reported when the forwarding channel fault recovery.
+		"
+	    ::= { hwDevFrameTrapsPrefix 24 }
+
+        -- 1.3.6.1.4.1.2011.6.3.8.3.2.0.26
+        hwDevTlsCertifyFailTrap NOTIFICATION-TYPE
+            OBJECTS { hwFrameIndex, hwFrameTypeName }
+            STATUS current
+            DESCRIPTION
+            "
+                This trap message is reported when the tls certify failed.
+            "
+            ::= { hwDevFrameTrapsPrefix 26 }
+
+        -- 1.3.6.1.4.1.2011.6.3.8.3.2.0.27
+        hwDevTlsCertifyRestoreTrap NOTIFICATION-TYPE
+            OBJECTS { hwFrameIndex, hwFrameTypeName }
+            STATUS current
+            DESCRIPTION
+            "
+                This trap message is reported when the tls certify recovered.
+            "
+            ::= { hwDevFrameTrapsPrefix 27 }
+
         -- 1.3.6.1.4.1.2011.6.3.8.3.3
         hwDevBoardTraps OBJECT IDENTIFIER ::= { hwDevAlarmTraps 3 }
 
@@ -6308,7 +6989,7 @@
 
         -- 1.3.6.1.4.1.2011.6.3.8.3.3.0.6
         hwDevBoardEnterTemperatureProctectModeTrap NOTIFICATION-TYPE
-            OBJECTS { hwFrameIndex, hwSlotIndex, hwSlotTemprature }
+            OBJECTS { hwFrameIndex, hwSlotIndex, hwSlotTemperature }
             STATUS current
             DESCRIPTION
                 "
@@ -6319,7 +7000,7 @@
 
         -- 1.3.6.1.4.1.2011.6.3.8.3.3.0.7
         hwDevBoardExitTemperatureProctectModeTrap NOTIFICATION-TYPE
-            OBJECTS { hwFrameIndex, hwSlotIndex, hwSlotTemprature }
+            OBJECTS { hwFrameIndex, hwSlotIndex, hwSlotTemperature }
             STATUS current
             DESCRIPTION
                 "
@@ -6331,7 +7012,7 @@
 
         -- 1.3.6.1.4.1.2011.6.3.8.3.3.0.8
         hwDevBoardTemperatureTooHighTrap NOTIFICATION-TYPE
-            OBJECTS { hwFrameIndex, hwSlotIndex, hwSlotTemprature }
+            OBJECTS { hwFrameIndex, hwSlotIndex, hwSlotTemperature }
             STATUS current
             DESCRIPTION
                 "
@@ -6343,7 +7024,7 @@
 
         -- 1.3.6.1.4.1.2011.6.3.8.3.3.0.9
         hwDevBoardTemperatureTooHighRecoverTrap NOTIFICATION-TYPE
-            OBJECTS { hwFrameIndex, hwSlotIndex, hwSlotTemprature }
+            OBJECTS { hwFrameIndex, hwSlotIndex, hwSlotTemperature }
             STATUS current
             DESCRIPTION
                 "
@@ -6355,7 +7036,7 @@
 
         -- 1.3.6.1.4.1.2011.6.3.8.3.3.0.10
         hwDevBoardTemperatureTooLowTrap NOTIFICATION-TYPE
-            OBJECTS { hwFrameIndex, hwSlotIndex, hwSlotTemprature }
+            OBJECTS { hwFrameIndex, hwSlotIndex, hwSlotTemperature }
             STATUS current
             DESCRIPTION
                 "
@@ -6366,7 +7047,7 @@
 
         -- 1.3.6.1.4.1.2011.6.3.8.3.3.0.11
         hwDevBoardTemperatureTooLowRecoverTrap NOTIFICATION-TYPE
-            OBJECTS { hwFrameIndex, hwSlotIndex, hwSlotTemprature }
+            OBJECTS { hwFrameIndex, hwSlotIndex, hwSlotTemperature }
             STATUS current
             DESCRIPTION
                 "
@@ -6612,7 +7293,129 @@
                 This trap message is reported when the running Rtu capacity restore to the same the license resource.
                 "
             ::= { hwDevBoardTrapsPrefix 38 }
-			
+        
+        -- 1.3.6.1.4.1.2011.6.3.8.3.3.0.39
+        hwDevExBiosPasswordFaultTrap NOTIFICATION-TYPE
+            OBJECTS { hwFrameIndex, hwSlotIndex}
+            STATUS current
+            DESCRIPTION
+                "
+                 This trap message is reported when the extended BIOS password is not set.
+                "
+            ::= { hwDevBoardTrapsPrefix 39 }
+
+        -- 1.3.6.1.4.1.2011.6.3.8.3.3.0.40
+        hwDevExBiosPasswordRecoverTrap NOTIFICATION-TYPE
+            OBJECTS { hwFrameIndex, hwSlotIndex}
+            STATUS current
+            DESCRIPTION
+                "
+                 This trap message is reported when the extended BIOS password is set.
+                "
+            ::= { hwDevBoardTrapsPrefix 40 }
+
+        -- 1.3.6.1.4.1.2011.6.3.8.3.3.0.41
+        hwDevLoadLowerVersionTrap NOTIFICATION-TYPE
+            OBJECTS { hwFrameIndex, hwSlotIndex, hwVersionName }
+            STATUS current
+            DESCRIPTION
+                "
+                 This trap message is reported when load the lower version package.
+                "
+            ::= { hwDevBoardTrapsPrefix 41 }
+
+	-- 1.3.6.1.4.1.2011.6.3.8.3.3.0.42
+        hwDevPowerOverThresholdFaultTrap NOTIFICATION-TYPE
+            OBJECTS { hwFrameIndex, hwPowerThreshold, hwRemainingPowerSupplyCapability }
+            STATUS current
+            DESCRIPTION
+                "
+                 This trap message is reported when the maximum power consumption of the current system
+                 exceeds the maximum power supply capability threshold.
+                "
+            ::= { hwDevBoardTrapsPrefix 42 }
+
+        -- 1.3.6.1.4.1.2011.6.3.8.3.3.0.43
+        hwDevPowerOverThresholdRestoreTrap NOTIFICATION-TYPE
+            OBJECTS { hwFrameIndex, hwPowerThreshold, hwRemainingPowerSupplyCapability }
+            STATUS current
+            DESCRIPTION
+                "
+                 This trap message is reported when the maximum power consumption of the current system
+                 is cleared from the threshold of the maximum power supply capability.
+                "
+            ::= { hwDevBoardTrapsPrefix 43 }
+
+        -- 1.3.6.1.4.1.2011.6.3.8.3.3.0.44
+        hwDevBoardIsolatedTrap NOTIFICATION-TYPE
+            OBJECTS { hwFrameIndex, hwSlotIndex, hwSlotTypeName }
+            STATUS current
+            DESCRIPTION
+                "
+                    This trap message is reported when the board is isolated.
+                "
+            ::= { hwDevBoardTrapsPrefix 44 }
+
+        -- 1.3.6.1.4.1.2011.6.3.8.3.3.0.45
+        hwDevBoardIsolatedRecoverTrap NOTIFICATION-TYPE
+            OBJECTS { hwFrameIndex, hwSlotIndex, hwSlotTypeName }
+            STATUS current
+            DESCRIPTION
+                "
+                    This trap message is reported when the isolation of board recovered.
+                "
+            ::= { hwDevBoardTrapsPrefix 45 }
+
+	-- 1.3.6.1.4.1.2011.6.3.8.3.3.0.48
+        hwDevVoiceFileLZMATrap NOTIFICATION-TYPE
+            OBJECTS { hwFrameIndex, hwSlotIndex }
+            STATUS current
+            DESCRIPTION
+                "
+                    This trap message is reported when the voice file format does not match the current version.
+                "
+            ::= { hwDevBoardTrapsPrefix 48 }
+
+        -- 1.3.6.1.4.1.2011.6.3.8.3.3.0.49
+        hwDevFileIntegrityCheckFailedTrap NOTIFICATION-TYPE
+            OBJECTS { hwFrameIndex, hwSlotIndex, hwDevIntegrityCheckFileType }
+            STATUS current
+            DESCRIPTION
+                "
+                    This trap message is reported when the file integrity check failed.
+                "
+            ::= { hwDevBoardTrapsPrefix 49 }
+ 
+        -- 1.3.6.1.4.1.2011.6.3.8.3.3.0.50
+        hwDevFileIntegrityCheckSuccessTrap NOTIFICATION-TYPE
+            OBJECTS { hwFrameIndex, hwSlotIndex, hwDevIntegrityCheckFileType }
+            STATUS current
+            DESCRIPTION
+                "
+                    This trap message is reported when the file integrity check success.
+                "
+            ::= { hwDevBoardTrapsPrefix 50 }
+
+        -- 1.3.6.1.4.1.2011.6.3.8.3.3.0.51
+        hwDevBoardAddConfigReplaceSuccessTrap NOTIFICATION-TYPE
+            OBJECTS { hwFrameIndex, hwSlotIndex, hwConfigBoardName, hwBasicBoardName }
+            STATUS current
+            DESCRIPTION
+                "
+                    This trap message is reported when the board add config replace success.
+                "
+            ::= { hwDevBoardTrapsPrefix 51 }
+ 
+        -- 1.3.6.1.4.1.2011.6.3.8.3.3.0.52
+        hwDevBoardAddConfigReplaceFailTrap NOTIFICATION-TYPE
+            OBJECTS { hwFrameIndex, hwSlotIndex, hwConfigBoardName, hwBasicBoardName }
+            STATUS current
+            DESCRIPTION
+                "
+                    This trap message is reported when the board add config replace fail.
+                "
+            ::= { hwDevBoardTrapsPrefix 52 }
+
         -- 1.3.6.1.4.1.2011.6.3.8.3.4
         hwDevSubBoardTraps OBJECT IDENTIFIER ::= { hwDevAlarmTraps 4 }
 
@@ -6658,7 +7461,7 @@
 
         -- 1.3.6.1.4.1.2011.6.3.8.3.4.0.4
         hwDevSubBoardTemperatureTooHighTrap NOTIFICATION-TYPE
-            OBJECTS { hwFrameIndex, hwSlotIndex, hwSubboardID, hwSlotTemprature }
+            OBJECTS { hwFrameIndex, hwSlotIndex, hwSubboardID, hwSlotTemperature }
             STATUS current
             DESCRIPTION
                 "
@@ -6669,7 +7472,7 @@
 
         -- 1.3.6.1.4.1.2011.6.3.8.3.4.0.5
         hwDevSubBoardTemperatureTooHighRecoverTrap NOTIFICATION-TYPE
-            OBJECTS { hwFrameIndex, hwSlotIndex, hwSubboardID, hwSlotTemprature }
+            OBJECTS { hwFrameIndex, hwSlotIndex, hwSubboardID, hwSlotTemperature }
             STATUS current
             DESCRIPTION
                 "
@@ -6733,7 +7536,7 @@
             DESCRIPTION
                 "
                 This trap message is reported when the system resources usage exceeds the threshold
-                The system resources include system CPU, system memory, and system messages.
+                The system resources include system CPU, system memory, system messages, and system storage.
                 "
             ::= { hwDevDiagTrapsPrefix 1 }
 
@@ -6804,6 +7607,44 @@
                 Port administration result Trap report
                 "
             ::= { hwDevGeneralTraps 4 }
+
+
+        -- 1.3.6.1.4.1.2011.6.3.8.6
+        hwDevAntiTheftTraps OBJECT IDENTIFIER ::= { hwDevTraps 6 }
+
+        -- 1.3.6.1.4.1.2011.6.3.8.6.0
+        hwDevAntiTheftTrapsPrefix OBJECT IDENTIFIER ::= { hwDevAntiTheftTraps 0 }
+
+        -- 1.3.6.1.4.1.2011.6.3.8.6.0.1
+        hwDevAntiTheftLockTraps NOTIFICATION-TYPE
+            OBJECTS { hwDevAntiTheftStatus }
+            STATUS current
+            DESCRIPTION
+                "
+                This trap message is reported periodically when device anti-theft is locked.
+                "
+            ::= { hwDevAntiTheftTrapsPrefix 1 }
+
+        -- 1.3.6.1.4.1.2011.6.3.8.6.0.2
+        hwDevAntiTheftUnAuthTraps NOTIFICATION-TYPE
+            OBJECTS { hwDevAntiTheftTrapReason }
+            STATUS current
+            DESCRIPTION
+                "
+                This trap message is reported when the device anti-theft is not authorized.
+                "
+            ::= { hwDevAntiTheftTrapsPrefix 2 }	
+			
+        -- 1.3.6.1.4.1.2011.6.3.8.6.0.3
+        hwDevAntiTheftUnAuthResumeTraps NOTIFICATION-TYPE
+            OBJECTS { hwDevAntiTheftTrapReason }
+            STATUS current
+            DESCRIPTION
+                "
+                This trap message is reported when the device anti-theft is authorized.
+                "
+            ::= { hwDevAntiTheftTrapsPrefix 3 }	
+
 
         -- 1.3.6.1.4.1.2011.6.3.9
         hwAppBoardPara OBJECT IDENTIFIER ::= { hwDev 9 }
@@ -7326,7 +8167,7 @@
 			
 		--  1.3.6.1.4.1.2011.6.3.101.2.9
 		hwDevPacketStatisticsGroup OBJECT-GROUP
-            OBJECTS { hwDevicePktStatReset, hwDevicePktStatVlanMismatch }
+            OBJECTS { hwDevicePktStatReset, hwDevicePktStatVlanMismatch, hwDevicePktStatL3EthTypeErr }
             STATUS current
             DESCRIPTION
                 "hwDevPacketStatisticsGroup."
@@ -7734,7 +8575,8 @@
                 {
                 memory(1),
                 messageUnits(2),
-                cpu(3)
+                cpu(3),
+                storage(8)
                 }
             MAX-ACCESS read-only
             STATUS current
@@ -7745,6 +8587,7 @@
                 1. memory(1)      -indicates the memory resource
                 2. messageUnits(2)-indicates the message resource
                 3. cpu(3)         -indicates the CPU resource
+                4. storage(8)     -indicates the storage resource
                 "
             ::= { hwSystemResEntry 1 }
 
@@ -9245,6 +10088,251 @@
                 "
             ::= { hwDevSnmpProbeRecordEntry 8 }
 
+        -- 1.3.6.1.4.1.2011.6.3.103.4
+        hwDevSnmpProbeNmsDiscTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwDevSnmpProbeNmsDiscEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "
+                The NMS disconnecting monitoring table which supports the function of
+                checking if the NMS is disconnected to the device. The index of this table
+                is hwDevSnmpProbeNmsSeq and hwDevSnmpProbeNmsTime.
+                "
+            ::= { hwDevSnmpProbeMonitor 4 }
+ 
+        -- 1.3.6.1.4.1.2011.6.3.103.4.1
+        hwDevSnmpProbeNmsDiscEntry OBJECT-TYPE
+            SYNTAX HwDevSnmpProbeNmsDiscEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "
+                The NMS disconnecting monitoring table which supports the function
+                of checking if the NMS is disconnected to the device. The index of
+                this table is hwDevSnmpProbeNmsSeq and hwDevSnmpProbeNmsTime.
+                "
+            INDEX { hwDevSnmpProbeNmsSeq,hwDevSnmpProbeNmsTime,hwDevSnmpProbeNmsDiscMaxInterval}
+            ::= { hwDevSnmpProbeNmsDiscTable 1 }
+ 
+        HwDevSnmpProbeNmsDiscEntry ::=
+            SEQUENCE {
+                hwDevSnmpProbeNmsSeq
+                    Unsigned32,
+                hwDevSnmpProbeNmsTime
+                    OCTET STRING,
+                hwDevSnmpProbeNmsDiscMaxInterval
+                    Unsigned32
+             }
+ 
+        -- 1.3.6.1.4.1.2011.6.3.103.4.1.1
+        hwDevSnmpProbeNmsSeq OBJECT-TYPE
+            SYNTAX Unsigned32(0..4294967295)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies the index of NMS disconnecting monitoring table.
+                Device determines whether NMS is disconnected to device based on
+                whether the received sequence number are consecutive.
+                The sequence number starts from 1 and 0 is invalid value.
+                Actively disconnects from the device when the sequence number is 0.
+                "
+            ::= { hwDevSnmpProbeNmsDiscEntry 1 }
+ 
+        -- 1.3.6.1.4.1.2011.6.3.103.4.1.2
+        hwDevSnmpProbeNmsTime OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..19))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies the index of NMS disconnecting monitoring table.
+                The object specifies the time when the set or get operation is performed
+                on this table node on the NMS.
+                "
+            ::= { hwDevSnmpProbeNmsDiscEntry 2 }
+ 
+        -- 1.3.6.1.4.1.2011.6.3.103.4.1.3
+        hwDevSnmpProbeNmsDiscMaxInterval OBJECT-TYPE
+            SYNTAX Unsigned32(10..3600)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies the max interval that device connects to NMS.
+                If the NMS fails to connect to the device within the max interval,
+                the NMS is disconnected to the device.
+                The value ranges from 10 to 3600.
+                The unit of MaxInterval time is second.
+                "
+            ::= { hwDevSnmpProbeNmsDiscEntry 3 }
+
+        -- 1.3.6.1.4.1.2011.6.3.103.5
+        hwDevSnmpProbeNmsDiscRecordTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwDevSnmpProbeNmsDiscRecordEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "
+                The NMS disconnecting monitoring record table which supports the function of
+                querying the record of disconnected reason. The index of this table
+                is hwDevSnmpProbeNmsDiscRecordIndex, hwDevSnmpProbeNmsDiscMainType and hwDevSnmpProbeNmsDiscSubType.
+                "
+            ::= { hwDevSnmpProbeMonitor 5 }
+
+        -- 1.3.6.1.4.1.2011.6.3.103.5.1
+        hwDevSnmpProbeNmsDiscRecordEntry OBJECT-TYPE
+            SYNTAX HwDevSnmpProbeNmsDiscRecordEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "
+                The abnormal record table of SNMP probe monitor, which supports the functions of querying
+                the disconnected reason of SNMP probe monitor. The index of this table
+                is hwDevSnmpProbeNmsDiscRecordIndex, hwDevSnmpProbeNmsDiscMainType, hwDevSnmpProbeNmsDiscSubType.
+                "
+            INDEX { hwDevSnmpProbeNmsDiscRecordIndex, hwDevSnmpProbeNmsDiscMainType, hwDevSnmpProbeNmsDiscSubType }
+            ::= { hwDevSnmpProbeNmsDiscRecordTable 1 }
+
+        HwDevSnmpProbeNmsDiscRecordEntry ::=
+            SEQUENCE {
+                hwDevSnmpProbeNmsDiscRecordIndex
+                    Unsigned32,
+                hwDevSnmpProbeNmsDiscMainType
+                    INTEGER,
+                hwDevSnmpProbeNmsDiscSubType
+                    Unsigned32,
+                hwDevSnmpProbeNmsConnectTime
+                    DateAndTime,
+                hwDevSnmpProbeNmsDisconnectTime
+                    DateAndTime,
+		        hwDevSnmpProbeNmsReconnectTime
+                    DateAndTime,
+                hwDevSnmpDisconnectType
+                    INTEGER,
+                hwDevSnmpProbeNmsDiscCheckResult
+                    Unsigned32
+            }
+
+        -- 1.3.6.1.4.1.2011.6.3.103.5.1.1
+        hwDevSnmpProbeNmsDiscRecordIndex OBJECT-TYPE
+            SYNTAX Unsigned32(0..49)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies the index of disconnection record.
+                "
+            ::= { hwDevSnmpProbeNmsDiscRecordEntry 1 }
+
+        -- 1.3.6.1.4.1.2011.6.3.103.5.1.2
+        hwDevSnmpProbeNmsDiscMainType OBJECT-TYPE
+            SYNTAX INTEGER { environment(1), network(2), hardware(3), software(4) }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies the main type of disconnection.
+                Options:
+                1. environment(1)   - indicates that the main type is environment of equipment.
+                2. network(2)       - indicates that the main type is network of equipment.
+                3. hardware(3)      - indicates that the main type is hardware of equipment.
+                4. software(4)      - indicates that the main type is software of equipment.
+                "
+            ::= { hwDevSnmpProbeNmsDiscRecordEntry 2 }
+
+        -- 1.3.6.1.4.1.2011.6.3.103.5.1.3
+        hwDevSnmpProbeNmsDiscSubType OBJECT-TYPE
+            SYNTAX Unsigned32(1..4294967295)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies the sub type of disconnection. One main type corresponds to multiple sub types.
+                The mapping between main type and sub type is as follows:
+                -----------------------------------------------
+                   Main Type    |        Sub Type
+                -----------------------------------------------
+                                |      uplink port(34)
+                   network(2)    ------------------------------
+                                |      management network(35)
+                -----------------------------------------------
+                                |      optical module(36)
+                                 ------------------------------
+                   hardware(3)  |      uplink board(37)
+                                 ------------------------------
+                                |      main board(38)
+                -----------------------------------------------
+                                |      snmp packet(40)
+                   software(4)   ------------------------------
+                                |      LACP status(41)
+                -----------------------------------------------
+                "
+            ::= { hwDevSnmpProbeNmsDiscRecordEntry 3 }
+
+        -- 1.3.6.1.4.1.2011.6.3.103.5.1.4
+        hwDevSnmpProbeNmsConnectTime OBJECT-TYPE
+            SYNTAX DateAndTime
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies the time of connection.
+                "
+            ::= { hwDevSnmpProbeNmsDiscRecordEntry 4 }
+
+        -- 1.3.6.1.4.1.2011.6.3.103.5.1.5
+        hwDevSnmpProbeNmsDisconnectTime OBJECT-TYPE
+            SYNTAX DateAndTime
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies the time of disconnection.
+                "
+            ::= { hwDevSnmpProbeNmsDiscRecordEntry 5 }
+
+        -- 1.3.6.1.4.1.2011.6.3.103.5.1.6
+        hwDevSnmpProbeNmsReconnectTime OBJECT-TYPE
+            SYNTAX DateAndTime
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies the time of reconnection.
+                "
+            ::= { hwDevSnmpProbeNmsDiscRecordEntry 6 }
+
+        -- 1.3.6.1.4.1.2011.6.3.103.5.1.7
+        hwDevSnmpDisconnectType OBJECT-TYPE
+            SYNTAX INTEGER { timeout(0), repeat(1), reboot(2) }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies the type of disconnection.
+                Options:
+                1. timeout(0)    - indicates that the disconnection type is handshake timed out.
+                2. repeat(1)     - indicates that the disconnection type is repeated handshake.
+                3. reboot(2)     - indicates that the disconnection type is device reboot.
+                "
+            ::= { hwDevSnmpProbeNmsDiscRecordEntry 7 }
+
+        -- 1.3.6.1.4.1.2011.6.3.103.5.1.8
+        hwDevSnmpProbeNmsDiscCheckResult OBJECT-TYPE
+            SYNTAX Unsigned32(0..4294967295)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies the check result of main type and sub type.
+                Options:
+                1. 0                       - indicates that the check result is normal.
+                2. 4294967295              - indicates that the check result is uncompleted.
+                3. other(1..4294967294)    - indicates that the check result is unknown.
+                "
+            ::= { hwDevSnmpProbeNmsDiscRecordEntry 8 }
 
         -- 1.3.6.1.4.1.2011.6.3.34
         hwOntRemoteHttpChnlCfgTable OBJECT-TYPE
@@ -9446,19 +10534,24 @@
             HwDevicePktStatEntry ::=
             SEQUENCE {
                 hwDevicePktStatReset
-                    INTEGER,
+                    Integer32,
                 hwDevicePktStatVlanMismatch
+                    Counter64,
+                hwDevicePktStatL3EthTypeErr
                     Counter64
              }
 
         -- 1.3.6.1.4.1.2011.6.3.35.1.1
         hwDevicePktStatReset OBJECT-TYPE
-            SYNTAX INTEGER { reset(1) }
+            SYNTAX Integer32 (0..255)
             MAX-ACCESS read-create
             STATUS current
             DESCRIPTION
                 "
-                Reset the counter. Statistics can be cleared by setting the object to 1. Reading the value of the object is useless.
+                The object specifies the type of statistics to be cleared.
+                Currently, only the following types are supported:
+                1. vlanMismatch(1)             -  Reset the statistics of packets discarded due to VLAN tag mismatch.        
+                2. l3EthTypeErr(2)             -  Reset the statistics of packets discarded by layer 3 interfaces due to EthType error.                                
                 "
             ::= { hwDevicePktStatEntry 1 }
 
@@ -9472,7 +10565,446 @@
                	Number of packets whose VLAN tag does not match the interface configuration.
                 "
             ::= { hwDevicePktStatEntry 2 }
+			
+        -- 1.3.6.1.4.1.2011.6.3.35.1.3
+	hwDevicePktStatL3EthTypeErr OBJECT-TYPE
+            SYNTAX Counter64 
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+               	Number of packets discarded by layer 3 interfaces due to EthType error.
+                "
+            ::= { hwDevicePktStatEntry 3 }
 
+        -- 1.3.6.1.4.1.2011.6.3.104
+        hwDevAntiTheft OBJECT IDENTIFIER ::= { hwDev 104 }
+
+        -- 1.3.6.1.4.1.2011.6.3.104.1
+        hwDevAntiTheftTable OBJECT IDENTIFIER ::= { hwDevAntiTheft 1 }
+
+        -- 1.3.6.1.4.1.2011.6.3.104.1.1
+        hwDevAntiTheftSwitch OBJECT-TYPE
+            SYNTAX INTEGER { disable(1), enable(2) }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies the anti-theft switch state for the system.
+                Default: disable.                   
+                Options:
+                1. disable(1)   -  indicates that the switch is off.
+                2. enable(2)    -  indicates that the switch is on.
+                "
+            ::= { hwDevAntiTheftTable 1 }
+
+        -- 1.3.6.1.4.1.2011.6.3.104.1.2
+        hwDevAntiTheftAuthorityStatus OBJECT-TYPE
+            SYNTAX INTEGER { init(1), authorized(2), unauthorized(3), tempAuthorized(4), locked(5) }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies the authority state for the system.
+                Default: init.
+                Options:
+                1. init(1)             -  indicates that the system is in the initial state.        
+                2. authorized(2)       -  indicates that the system is authorized successfully.         
+                3. unauthorized(3)     -  indicates that the system is not authorized and the system config is locked.
+                4. tempAuthorized(4)   -  indicates that the system is temporarily authorized successfully. Please pay attention to the remaining authorization time.
+                5. locked(5)           -  indicates that the system has been unauthorized for a long time and some businesses are restricted.                         
+                "
+            ::= { hwDevAntiTheftTable 2 }
+
+        -- 1.3.6.1.4.1.2011.6.3.104.1.3
+        hwDevAntiTheftOperatorName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..100))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies the operator name.
+                "
+            ::= { hwDevAntiTheftTable 3 }
+
+        -- 1.3.6.1.4.1.2011.6.3.104.1.4
+        hwDevAntiTheftPublicKey OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..1024))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies the RSA public key in PEM format.
+                The public key and fingerprint must be set in pair.
+                "
+            ::= { hwDevAntiTheftTable 4 }
+
+        -- 1.3.6.1.4.1.2011.6.3.104.1.5
+        hwDevAntiTheftPublicKeyFingerprint OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..64))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies the public key fingerprint.
+                The public key and fingerprint must be set in pair.
+                "
+            ::= { hwDevAntiTheftTable 5 }
+
+        -- 1.3.6.1.4.1.2011.6.3.104.1.6
+        hwDevAntiTheftStrategy OBJECT-TYPE
+            SYNTAX INTEGER { service(1) }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies the anti-theft strategy for the system.
+                Default: service.
+                Options:
+                1. service(1)   -  indicates that the strategy is locking the configuration and restricting some businesses.
+                "
+            ::= { hwDevAntiTheftTable 6 }
+
+        -- 1.3.6.1.4.1.2011.6.3.104.1.7
+        hwDevAntiTheftGraceTime OBJECT-TYPE
+            SYNTAX Unsigned32 ( 0..100 )
+            UNITS "day"
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies the anti-theft grace time for the system.
+                Default: 7.
+                Unit: day.
+                "
+            ::= { hwDevAntiTheftTable 7 }
+
+        -- 1.3.6.1.4.1.2011.6.3.104.1.8
+        hwDevAntiTheftGraceTimeRemaining OBJECT-TYPE
+            SYNTAX TimeTicks
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies the anti-theft remaining grace time for the system.
+                When the grace time is up, the unauthorized system will be locked.
+                Default: 0.
+                "
+            ::= { hwDevAntiTheftTable 8 }
+
+        -- 1.3.6.1.4.1.2011.6.3.104.1.9
+        hwDevAntiTheftTemporarilyUnlockedTimeRemaining OBJECT-TYPE
+            SYNTAX TimeTicks
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies the remaining temporary authorization time for the system.
+                Default: 0.
+                "
+            ::= { hwDevAntiTheftTable 9 }
+
+        -- 1.3.6.1.4.1.2011.6.3.104.1.10
+        hwDevAntiTheftRandomValue OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..32))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies the random value for the system.
+                The random value will be retained for three minutes.
+                "
+            ::= { hwDevAntiTheftTable 10 }
+
+        -- 1.3.6.1.4.1.2011.6.3.104.1.11
+        hwDevAntiTheftSignature OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..1024))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies the signature of the random value.
+                The signature is used to authorize the system.
+                "
+            ::= { hwDevAntiTheftTable 11 }
+
+        -- 1.3.6.1.4.1.2011.6.3.104.1.12
+        hwDevAntiTheftAdminStatus OBJECT-TYPE
+            SYNTAX INTEGER { nooperation(-1), enable(1), disable(2), authorize(3), revoke(4), update(5), lock(6) }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies the admin status of system anti-theft.
+                Default: nooperation.
+                Options:
+                1. nooperation(-1)   -  Default state of the anti-theft admin status.
+                2. enable(1)         -  Enable the system anti-theft function. It needs to be set with hwDevAntiTheftOperatorName, hwDevAntiTheftPublicKey,
+                                        hwDevAntiTheftPublicKeyFingerprint, hwDevAntiTheftStrategy(optional) and hwDevAntiTheftGraceTime(optional).
+                3. disable(2)        -  Disable the system anti-theft function. It needs to be set with hwDevAntiTheftSignature.
+                4. authorize(3)      -  Authorize the system. It needs to be set with hwDevAntiTheftSignature.
+                5. revoke(4)         -  Unauthorize the system, the system will revert to unauthorized state. It needs to be set with hwDevAntiTheftSignature.
+                6. update(5)         -  Update the configuration of anti-theft. It needs to be set with hwDevAntiTheftSignature and the objects to be updated. 
+                                        The hwDevAntiTheftPublicKey and hwDevAntiTheftPublicKeyFingerprint must be updated in pairs.
+                7. lock(6)           -  Lock the system immediately. It needs to revoke the system to unauthorized first.
+                "
+            ::= { hwDevAntiTheftTable 12 }
+
+        -- 1.3.6.1.4.1.2011.6.3.104.2
+        hwDevAntiTheftSlotTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwDevAntiTheftSlotEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "
+                The anti-theft slot table, which can be used to query the anti-theft infomation for the board.
+                The index of this table is hwFrameIndex and hwSlotIndex. For example, 0.2 indicates that the board is in slot 2, shelf 0.
+                "
+            ::= { hwDevAntiTheft 2 }
+
+        -- 1.3.6.1.4.1.2011.6.3.104.2.1
+        hwDevAntiTheftSlotEntry OBJECT-TYPE
+            SYNTAX HwDevAntiTheftSlotEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "
+                The anti-theft slot table, which can be used to query the anti-theft infomation for the board.
+                The index of this table is hwFrameIndex and hwSlotIndex. For example, 0.2 indicates that the board is in slot 2, shelf 0.
+                "
+            INDEX { hwFrameIndex, hwSlotIndex }
+            ::= { hwDevAntiTheftSlotTable 1 }
+
+        HwDevAntiTheftSlotEntry ::=
+            SEQUENCE {
+                hwDevAntiTheftSlotSwitch
+                    INTEGER,
+                hwDevAntiTheftSlotAuthorityStatus
+                    INTEGER,
+                hwDevAntiTheftSlotOperatorName
+                    OCTET STRING,
+                hwDevAntiTheftSlotPublicKey
+                    OCTET STRING,
+                hwDevAntiTheftSlotPublicKeyFingerprint
+                    OCTET STRING,
+                hwDevAntiTheftSlotStrategy
+                    INTEGER,
+                hwDevAntiTheftSlotGraceTime
+                    Unsigned32,
+                hwDevAntiTheftSlotGraceTimeRemaining
+                    TimeTicks
+             }
+        -- 1.3.6.1.4.1.2011.6.3.104.2.1.1
+        hwDevAntiTheftSlotSwitch OBJECT-TYPE
+            SYNTAX INTEGER { disable(1), enable(2) }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies the anti-theft switch state for the board.
+                Default: disable.
+                Options:
+                1. disable(1)   -  indicates that the switch is off.
+                2. enable(2)    -  indicates that the switch is on.
+                "
+            ::= { hwDevAntiTheftSlotEntry 1 }
+
+        -- 1.3.6.1.4.1.2011.6.3.104.2.1.2
+        hwDevAntiTheftSlotAuthorityStatus OBJECT-TYPE
+            SYNTAX INTEGER { init(1), authorized(2), unauthorized(3), tempAuthorized(4), locked(5) }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies the authority state for the board.
+                Default: init.
+                Options:
+                1. init(1)             -  indicates that the board is in the initial state.
+                2. authorized(2)       -  indicates that the board is authorized successfully.
+                3. unauthorized(3)     -  indicates that the board is not authorized and the system config is locked.
+                4. tempAuthorized(4)   -  indicates that the board is temporarily authorized successfully.
+				                          Please pay attention to the remaining authorization time.
+                5. locked(5)           -  indicates that the board has been unauthorized for a long time and some businesses are restricted.
+                "
+            ::= { hwDevAntiTheftSlotEntry 2 }
+
+        -- 1.3.6.1.4.1.2011.6.3.104.2.1.3
+        hwDevAntiTheftSlotOperatorName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..100))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies the operator name.
+                "
+            ::= { hwDevAntiTheftSlotEntry 3 }
+
+        -- 1.3.6.1.4.1.2011.6.3.104.2.1.4
+        hwDevAntiTheftSlotPublicKey OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..1024))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies the RSA public key in PEM format.
+                "
+            ::= { hwDevAntiTheftSlotEntry 4 }
+
+        -- 1.3.6.1.4.1.2011.6.3.104.2.1.5
+        hwDevAntiTheftSlotPublicKeyFingerprint OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..64))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies the public key fingerprint.
+                "
+            ::= { hwDevAntiTheftSlotEntry 5 }
+
+        -- 1.3.6.1.4.1.2011.6.3.104.2.1.6
+        hwDevAntiTheftSlotStrategy OBJECT-TYPE
+            SYNTAX INTEGER { service(1) }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies the anti-theft strategy for the board.
+                Default: service.
+                Options:
+                1. service(1)    -  indicates that the strategy is locking the configuration and restricting some businesses.
+                "
+            ::= { hwDevAntiTheftSlotEntry 6 }
+
+        -- 1.3.6.1.4.1.2011.6.3.104.2.1.7
+        hwDevAntiTheftSlotGraceTime OBJECT-TYPE
+            SYNTAX Unsigned32 ( 0..100 )
+            UNITS "day"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies the anti-theft grace time for the board.
+                Default: 7.
+                Unit: day.
+                "
+            ::= { hwDevAntiTheftSlotEntry 7 }
+
+        -- 1.3.6.1.4.1.2011.6.3.104.2.1.8
+        hwDevAntiTheftSlotGraceTimeRemaining OBJECT-TYPE
+            SYNTAX TimeTicks
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies the anti-theft remaining grace time for the board.
+                When the grace time is up, the unauthorized board will be locked.
+                Default: 0.
+                "
+            ::= { hwDevAntiTheftSlotEntry 8 }
+
+        -- 1.3.6.1.4.1.2011.6.3.105
+        hwWarrantyInfoTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwWarrantyInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table contains one row per physical warranty information.  There is
+                 always at least one row for an 'overall' physical warranty information."
+            ::= { hwDev 105 }
+
+        -- 1.3.6.1.4.1.2011.6.3.105.1
+        hwWarrantyInfoEntry OBJECT-TYPE
+            SYNTAX HwWarrantyInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                 "Information about a particular physical warranty information."
+            INDEX { entPhysicalIndex, hwWarrantyInfoSubPhysicalIndex }
+            ::= { hwWarrantyInfoTable 1 }
+
+            HwWarrantyInfoEntry ::= SEQUENCE {
+                hwWarrantyInfoSubPhysicalIndex    Integer32,
+                hwWarrantyInfoSupport             INTEGER,
+                hwWarrantyInfoSerialNum           SnmpAdminString,
+                hwWarrantyInfoStartPointDate      DateAndTime,
+                hwWarrantyInfoServiceSession      Integer32,
+                hwWarrantyInfoFirstActivationDate DateAndTime,
+                hwWarrantyInfoMfgDate             DateAndTime
+            }
+
+        -- 1.3.6.1.4.1.2011.6.3.105.1.1
+        hwWarrantyInfoSubPhysicalIndex    OBJECT-TYPE
+            SYNTAX      Integer32 (0..2147483647)
+            MAX-ACCESS  not-accessible
+            STATUS      current
+            DESCRIPTION
+                    "The object specifies the sub-index of warranty information.
+                     Default: 0."
+            ::= { hwWarrantyInfoEntry 1 }
+
+        -- 1.3.6.1.4.1.2011.6.3.105.1.2
+        hwWarrantyInfoSupport    OBJECT-TYPE
+            SYNTAX      INTEGER
+                {
+                support(1),
+                notsupport(2)
+                }
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+                    "
+                    Whether the current object supports for warranty information.
+                    Options:
+                    1.  support(1)      - indicates that the object is support
+                    2.  notsupport(2)  - indicates that the object is not support
+                    "
+            ::= { hwWarrantyInfoEntry 2 }
+
+        -- 1.3.6.1.4.1.2011.6.3.105.1.3
+        hwWarrantyInfoSerialNum OBJECT-TYPE
+            SYNTAX      SnmpAdminString
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+                    "The object specifies the serial number in warranty information."
+            ::= { hwWarrantyInfoEntry 3 }
+
+        -- 1.3.6.1.4.1.2011.6.3.105.1.4
+        hwWarrantyInfoStartPointDate OBJECT-TYPE
+            SYNTAX      DateAndTime
+            MAX-ACCESS  read-write
+            STATUS      current
+            DESCRIPTION
+                    "The object specifies the start point date in warranty information."
+            ::= { hwWarrantyInfoEntry 4 }
+
+        -- 1.3.6.1.4.1.2011.6.3.105.1.5
+        hwWarrantyInfoServiceSession OBJECT-TYPE
+            SYNTAX      Integer32
+            MAX-ACCESS  read-write
+            STATUS      current
+            DESCRIPTION
+                    "The object specifies the service session in warranty information."
+            ::= { hwWarrantyInfoEntry 5 }
+
+        -- 1.3.6.1.4.1.2011.6.3.105.1.6
+        hwWarrantyInfoFirstActivationDate OBJECT-TYPE
+            SYNTAX      DateAndTime
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+                    "The object specifies the first activation date in warranty information."
+            ::= { hwWarrantyInfoEntry 6 }
+
+        -- 1.3.6.1.4.1.2011.6.3.105.1.7
+        hwWarrantyInfoMfgDate OBJECT-TYPE
+            SYNTAX      DateAndTime
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+                    "The object specifies the manufacture date in warranty information."
+            ::= { hwWarrantyInfoEntry 7 }
+            
     END
 
 

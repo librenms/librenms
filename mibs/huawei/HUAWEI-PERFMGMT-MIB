@@ -4,11 +4,11 @@
 --
 
 --    ==================================================================
--- Copyright (C) 2017 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2020 by  HUAWEI TECHNOLOGIES. All rights reserved.
 -- 
 -- Description: HUAWEI PERFMGMT MIB
 -- Reference:
--- Version: V4.14
+-- Version: V4.18
 -- History:  V4.08  huqing, 2015-09-21,Modify nodes 
 -- created 2014-05-05
 -- ==================================================================
@@ -31,7 +31,7 @@
 -- February 27, 2009 at 11:41 GMT
         -- 1.3.6.1.4.1.2011.5.25.190
         hwPerfMgmt MODULE-IDENTITY 
-            LAST-UPDATED "201708210958Z"        --Aug 21, 2017 at 09:58GMT
+            LAST-UPDATED "202012300956Z"        --Dec30, 2020 at 09:56GMT
             ORGANIZATION 
                   "Huawei Technologies Co.,Ltd."
             CONTACT-INFO 
@@ -42,13 +42,33 @@
                      Website: http://www.huawei.com
                      Email: support@huawei.com
                    "
+          DESCRIPTION 
+                "V4.18 modify MIB nodes for mistakes in description ." 
+
+           REVISION "202012300956Z"        --Dec30, 2020 at 09:56GMT
+
+          DESCRIPTION 
+                "V4.17 modify MIB nodes for mistakes in default values." 
+
+           REVISION "201909061530Z"        --Sep 6, 2019 at 15:30GMT
+
+          DESCRIPTION 
+                "V4.16 modify MIB nodes for mistakes in description ." 
+
+           REVISION "201802261510Z"        --Feb26, 2018 at 15:10GMT
+ 
+          DESCRIPTION 
+                "V4.15 add MIB nodes ." 
+
+           REVISION "201712200958Z"        --Dec20, 2017 at 09:58GMT
+
             DESCRIPTION 
-                "V4.13  add MIB nodes ." 
+                "V4.14  add MIB nodes ." 
 
            REVISION "201708210958Z"        --Aug 21, 2017 at 09:58GMT
           
            DESCRIPTION 
-                "V4.14  modify description." 
+                "V4.13  modify description." 
 
                 
             REVISION "201708172119Z"        --Aug 17, 2017 at 15:30GMT
@@ -324,7 +344,7 @@ For a long period, the value ranges from 1 to 3."
             STATUS current
             DESCRIPTION
                 "The interval of task sampling, in minutes."
-            DEFVAL { 3 }
+            DEFVAL { three }
             ::= { hwPMStatisticsTaskEntry 17 }            
         hwPMStatisticsUploadAutoName OBJECT-TYPE
             SYNTAX OCTET STRING (SIZE (0..31))
@@ -348,7 +368,7 @@ For a long period, the value ranges from 1 to 3."
             STATUS current
             DESCRIPTION
                 "The type of statistics task."
-            DEFVAL { pm-statistics }
+            DEFVAL { pmStatistics }
             ::= { hwPMStatisticsTaskEntry 19 }    
            
        	hwPMStatisticsHighPrecisionPeriod OBJECT-TYPE
@@ -370,7 +390,7 @@ For a long period, the value ranges from 1 to 3."
             STATUS current
             DESCRIPTION
                 "The sample level of statistics task."
-            DEFVAL { minute }
+            DEFVAL { default }
             ::= { hwPMStatisticsTaskEntry 21 }    
                  
         hwPMStatisticsTaskInstanceTable OBJECT-TYPE
@@ -1066,7 +1086,7 @@ For a long period, the value ranges from 1 to 3."
             MAX-ACCESS not-accessible
             STATUS current
             DESCRIPTION
-                "The entry of performance statistic history data table."
+                "The entry of performance statistic historical data table."
             INDEX { hwPMStatisticsTaskName, hwPMHistoryDataInstanceType, hwPMHistoryDataInstanceName, hwPMHistoryDataIndicatorID, hwPMHistoryDataIntervalIndex
                  }
             ::= { hwPMHistoryDataTable 1 }
@@ -1096,7 +1116,7 @@ For a long period, the value ranges from 1 to 3."
             MAX-ACCESS not-accessible
             STATUS current
             DESCRIPTION
-                "The instance type of history data."
+                "The instance type of historical data."
             ::= { hwPMHistoryDataEntry 1 }
         
         hwPMHistoryDataInstanceName OBJECT-TYPE
@@ -1104,7 +1124,7 @@ For a long period, the value ranges from 1 to 3."
             MAX-ACCESS not-accessible
             STATUS current
             DESCRIPTION
-                "The instance name of history data."
+                "The instance name of historical data."
             ::= { hwPMHistoryDataEntry 2 }
         
         hwPMHistoryDataIndicatorID OBJECT-TYPE
@@ -1112,7 +1132,7 @@ For a long period, the value ranges from 1 to 3."
             MAX-ACCESS not-accessible
             STATUS current
             DESCRIPTION
-                "The indicator ID of history data."
+                "The indicator ID of historical data."
             ::= { hwPMHistoryDataEntry 3 }
         
         hwPMHistoryDataIntervalIndex OBJECT-TYPE
@@ -1120,7 +1140,7 @@ For a long period, the value ranges from 1 to 3."
             MAX-ACCESS not-accessible
             STATUS current
             DESCRIPTION
-                "The interval index of history data."
+                "The interval index of historical data."
             ::= { hwPMHistoryDataEntry 4 }
         
         hwPMHistoryDataHighValue OBJECT-TYPE
@@ -1128,7 +1148,7 @@ For a long period, the value ranges from 1 to 3."
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "The high 32 bit of history data value."
+                "The high 32 bit of historical data value."
             ::= { hwPMHistoryDataEntry 5 }
         
         hwPMHistoryDataLowValue OBJECT-TYPE
@@ -1136,7 +1156,7 @@ For a long period, the value ranges from 1 to 3."
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "The low 32 bit of history data value."
+                "The low 32 bit of historical data value."
             ::= { hwPMHistoryDataEntry 6 }
         
         hwPMHistoryDataValidFlag OBJECT-TYPE
@@ -1150,7 +1170,7 @@ For a long period, the value ranges from 1 to 3."
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "The valid flag of history data."
+                "The valid flag of historical data."
             ::= { hwPMHistoryDataEntry 7 }
         
         hwPMHistoryDateAndTime OBJECT-TYPE
@@ -1158,7 +1178,7 @@ For a long period, the value ranges from 1 to 3."
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "The date and time of history data."
+                "The date and time of historical data."
             ::= { hwPMHistoryDataEntry 8 }
         
         hwPMCurrentDataTable OBJECT-TYPE

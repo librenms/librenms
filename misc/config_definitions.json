@@ -910,7 +910,6 @@
                 "sonet",
                 "atmSubInterface",
                 "aal5",
-                "shdsl",
                 "mpls"
             ]
         },
@@ -998,10 +997,6 @@
         "dateformat.time": {
             "default": "H:i:s",
             "type": "text"
-        },
-        "debug.run_trace": {
-            "default": false,
-            "type": "boolean"
         },
         "default_port_group": {
             "default": 0,

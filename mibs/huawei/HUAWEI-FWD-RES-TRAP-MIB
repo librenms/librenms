@@ -1,8 +1,8 @@
 --
 -- HUAWEI-FWD-RES-TRAP-MIB.mib
--- Copyright (C) 2017 by HUAWEI TECHNOLOGIES. All rights reserved
+-- Copyright (C) 2022 by HUAWEI TECHNOLOGIES. All rights reserved
 -- Thursday,Oct 28, 2014 at 18:46:56
--- Version: V3.40
+-- Version: V4.66
 
     HUAWEI-FWD-RES-TRAP-MIB DEFINITIONS ::= BEGIN
  
@@ -13,12 +13,13 @@
                 FROM HUAWEI-MIB            
             OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP            
                 FROM SNMPv2-CONF            
-            Counter64, Unsigned32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE            
-                FROM SNMPv2-SMI;
-    
-    
-        hwFwdResTrapMIB MODULE-IDENTITY 
-             LAST-UPDATED  "201708172108Z"        --   Aug 17, 2017 at 21:08 GMT 
+            Counter64, Unsigned32, Integer32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE ,IpAddress              
+                FROM SNMPv2-SMI
+            Ipv6Address
+                FROM IPV6-TC;
+
+           hwFwdResTrapMIB MODULE-IDENTITY 
+            LAST-UPDATED "202210211021Z"        --  Oct 21, 2022 at 10:21 GMT
   
             ORGANIZATION 
                 "Huawei Technologies Co.,Ltd."
@@ -30,9 +31,871 @@
                    Website: http://www.huawei.com
                    Email: support@huawei.com
                  "
+
+        DESCRIPTION   
+            "add 4 reasonid for hwFwdResLackReasonId:
+            fe2UserNumExceed90Threshold(1036),
+            fe2UserNumExceed100Threshold(1037),
+            fe3UserNumExceed90Threshold(1038),
+            fe3UserNumExceed100Threshold(1039)"
+
+        REVISION  "202210211021Z"        --  Oct 21, 2022 at 10:21 GMT
+
+
+            DESCRIPTION 
+                "add OBJECT hwFwmSliceInterfaceName, hwFwmSliceId, hwFwmSliceTrunkInterfaceName,
+                 hwFwmSliceSrcInterfaceName, hwFwmSliceResourceReasonId, hwFwmSliceFwdReasonId.
+                 add NOTIFICATION-TYPE hwBoardNetworkSliceResourceAlarm, hwBoardNetworkSliceResourceAlarmResume,
+                 hwBoardNetworkSliceForwardAlarm, hwBoardNetworkSliceForwardAlarmResume."
+
+            REVISION "202210082145Z"   -- Oct 08, 2022 at 21:45 GMT
+
+            DESCRIPTION
+            " add 6 reasonid for hwLCfwdResourceOverload:
+              bgpflowMReResExceedThresHold(1030),
+              bgpflowMReResExceed90ThresHold(1031),
+              bgpflowNstResExceedThresHold(1032),
+              bgpflowNstResExceed90ThresHold(1033),
+              bgpflowNhpResExceedThresHold(1034),
+              bgpflowNhpResExceed90ThresHold(1035)," 
+
+            REVISION "202209282208Z"        --  Sep 28, 2022 at 22:08GMT 
+
+            DESCRIPTION
+            " add 1 reasonid for hwLCfwdResourceOverload:
+              hqosPortWredIdResLac(1029)" 
+
+            REVISION "202209281145Z"        --  Sep 28, 2022 at 11:00GMT 
+
+            DESCRIPTION 
+            "update hwEcmpMemberLimitOverThresholdAlarm" 
+            REVISION "202209190900Z"        --  Nov 19, 2022 at 09:00 GMT   
+
            DESCRIPTION 
-           "The private mib file includes the alarm  
-           information of fowarding engine resouce overload."
+           "The private mib file includes the alarm information of forwarding engine resouce overload."
+
+            REVISION "202208311600Z"        --  Aug 31, 2022 at 16:00 GMT
+            DESCRIPTION
+            "add a trap info for deterministic-ip shaping exceed."
+
+            REVISION "202208231200Z"        --  Jun 2, 2022 at 14:35 GMT
+	        DESCRIPTION
+            "add 1 reasonid for nativeIfitFlowIdRes(1024)"
+                
+            REVISION "202208181100Z"        --  Aug 18, 2022 at 11:00GMT 
+            DESCRIPTION
+            " add 1 reasonid for hwLCfwdResourceOverload:
+              hqosPortWredIdResLac(1024)" 
+
+            REVISION "202207202130Z"        -- Jun 20, 2022 at 21:30GMT
+            DESCRIPTION 
+                "add OBJECT hwFwmFaultSlotStr, hwFwmFaultCpuStr, hwFwmFaultReasonId, hwFwmFaultReasonDescription.
+                 add NOTIFICATION-TYPE hwFwmFaultAlarm, hwFwmFaultAlarmResume." 
+
+           REVISION "202207161539Z"   -- Jun 16, 2022 at 15:39 GMT
+           DESCRIPTION
+            "add hwNetStreamIPv4OriginalFlowResourceExceeded,
+             hwNetStreamIPv4OriginalFlowResourceExceededClear,
+             hwNetStreamIPv4FlexibleFlowResourceExceeded,
+             hwNetStreamIPv4FlexibleFlowResourceExceededClear"
+
+            REVISION  "202206101652Z"        --  Jun 10, 2022 at 16:53 GMT
+            DESCRIPTION   
+            "add 6 reasonid for hwLCfwdResourceOverload: 
+             hqosBrasSlotSessionCarOverload(1018),
+             hqosBrasNpSessionCarOverload(1019),
+             hqosBrasSlotFamilyCarOverload(1020),
+             hqosBrasNpFamilyCarOverload(1021),
+             hqosBrasSessionCarStatOverload(1022),
+             hqosBrasFamilyCarStatOverload(1023)."
+           
+           REVISION "202206072026Z"   -- Jun 7, 2022 at 20:26 GMT
+           DESCRIPTION
+            "add hwSaidPingPktModifiedAlarm,hwSaidPingDetectInterface"
+            
+
+            REVISION "202206021435Z"        --  Jun 2, 2022 at 14:35 GMT
+            DESCRIPTION
+            "add 1 reasonid for peerGroupRes(1017)"
+
+            REVISION "202205171620Z"        --  May 17, 2022 at 16:20 GMT
+            DESCRIPTION
+            "add 2 reasonid for ifitAclRes(1015),
+              ifitInstanceRes(1016)"
+
+            REVISION "202205131431Z"        --  May 13, 2022 at 14:31 GMT
+            DESCRIPTION
+            "add 10 reasonid for hwLCfwdResourceOverload:
+            l2tpLacSessionExceed90Threshold(1005)
+            l2tpLacSessionExceed100Threshold(1006)
+            l2tpLnsSessionExceed90Threshold(1007)
+            l2tpLnsSessionExceed100Threshold(1008)
+            l2tpLnsTunnelBoardSessionExceed90Threshold(1009)
+            l2tpLnsTunnelBoardSessionExceed100Threshold(1010)
+            l2tpLacTunnelExceed90Threshold(1011)
+            l2tpLacTunnelExceed100Threshold(1012)
+            l2tpLnsTunnelExceed90Threshold(1013)
+            l2tpLnsTunnelExceed100Threshold(1014)" 
+    
+            REVISION "202204221747Z"        -- April 22, 2022 at 17:47GMT 
+            DESCRIPTION 
+            "add  dlbResOverLoad ."
+
+            REVISION "202204020945Z"        -- April 2, 2022 at 09:45GMT 
+            DESCRIPTION 
+                "change OBJECT hwPacketChangeInPort's SYNTAX from InterfaceIndex to Unsigned32,
+                change OBJECT hwPacketChangeOutPort's SYNTAX from InterfaceIndex to Unsigned32." 	
+
+            REVISION "202203141818Z"        --  March 14, 2022 at 18:18 GMT
+            DESCRIPTION
+            "add 10 reasonid for apn6MappingResOverload:
+            apn6TrafficSteeringMapOverLoad(994),
+			apn6InterfaceMapOverLoad(995),
+			apn6VPNPeerMapOverLoad(996),
+			apn6TrafficIsolationMapOverLoad(997),
+			apn6IsolationStatisticsOverLoad(998),
+			apn6TrafficSteeringMapExceedThreshold(999),
+			apn6InterfaceMapExceedThreshold(1000),
+			apn6VPNPeerMapExceedThreshold(1001),
+			apn6TrafficIsolationMapExceedThreshold(1002),
+			apn6IsolationStatisticsExceedThreshold(1003)" 
+			  
+            REVISION "202202281606Z"        --  Feb 28, 2022 at 16:06GMT 
+            DESCRIPTION
+            " add 1 reasonid for hwFwdResLackReasonId:
+              tunnelV6DecapsulationRes(993)" 
+
+            REVISION "202202081606Z"        -- Feb 8, 2022 at 16:06GMT 
+            DESCRIPTION 
+                "add OBJECT hwPacketChange ." 	
+
+            REVISION "202112310900Z"        -- Dec 31, 2021 at 09:00 GMT 
+            DESCRIPTION 
+            " add reasonid oam1agvlanbcResourceOverLoad(992)" 
+
+	    REVISION "202111231400Z"   -- Nov 23, 2021 at 14:00 GMT
+            DESCRIPTION
+	     "modifiy description of REVISION 202111051400Z, change ifitNativeIpFlowRes(71) to ifitNativeIpFlowRes(971) "
+
+	    REVISION "202111191500Z"   -- Nov 19, 2021 at 15:00 GMT
+            DESCRIPTION
+	     "add hwEMDIResLack,hwEMDIResLackResume,hwEMDISlotStr,hwEMDIResUsed,hwEMDIResTotal"
+
+	    REVISION "202111101500Z"        --  Nov 10, 2021 at 15:00 GMT
+            DESCRIPTION
+	     "add 3 reasonid for hwFwdResLackReasonId:
+              vxlanVpiOverThreshold(989),
+              vxlanVpOverThreshold(990),
+              vxlanTunnelOverThreshold(991)"
+
+            REVISION "202111091400Z"        --  Nov 9, 2021 at 14:00 GMT  
+            DESCRIPTION
+            "add hwNvo3VxlanSrcIpDiffAlarm,hwNvo3VxlanSrcIpDiffAlarmResume,hwVxlanTnlPeerIpAddr"
+
+            REVISION "202111051400Z"        -- Nov 05, 2021 at 14:00 GMT 
+            DESCRIPTION 
+            "Delete reasonid ifitDynFlowNumExceedThreshold(989), ifitFlowStatisticsNumExceedThreshold(972). Rename ifitFlowStatisticsNumOverLoad(971) to ifitNativeIpFlowRes(971),  ifitDynFlowNumOverLoad(988) to ifitDynFlowRes(988)" 
+
+            REVISION "202111021500Z"        -- Nov 02, 2021 at 15:00 GMT 
+            DESCRIPTION 
+            "add reasonid ifitDynFlowNumOverLoad(988), ifitDynFlowNumExceedThreshold(989)" 
+
+            REVISION "202111010900Z"            -- Dec 21, 2020 at 15:00 GMT
+            DESCRIPTION
+            "add 4 reasonid for hwLCfwdResourceOverload:
+            srv6Dip90PerNumOverload(984),
+            srv6Dip100PerNumOverload(985),
+            elineSidTblExt90PerNumOverload(986),
+            elineSidTblExt100PerNumOverload(987)"
+
+            REVISION "202108161400Z"        --  Aug 16, 2021 at 14:00 GMT
+            DESCRIPTION 
+            " add reasonid inboundInterfaceCar95PercentOverLoad(982), outboundInterfaceCar95PercentOverLoad(983)" 
+
+           REVISION  "202108051200Z"        --  Aug 05, 2021 at 12:00 GMT
+           DESCRIPTION   
+	      "add 2 reasonid for Srv6TeFlowGroupClassMapResOverload :
+	       srv6TeFlowGroupClassMapOverLoad(980),
+	       srv6TeFlowGroupClassMapExceedThreshold(981)"
+
+           REVISION "202107202300Z"        -- July 20, 2021 at 23:00 GMT
+           DESCRIPTION
+           "add reasonid serviceCarResOverload(979)"
+
+           REVISION "202107161600Z"        -- July 16, 2021 at 16:00 GMT
+           DESCRIPTION
+           " add reasonid fibHardwareNumOverLoad(973), fib6HardwareNumOverLoad(974), fibSoftwareNumOverLoad(975), fib6SoftwareNumOverLoad(976), fibSoftwareExceedThreshold(977), fib6SoftwareNumExceedThreshold(978)" 
+
+           REVISION "202107061600Z"        -- July 06, 2021 at 16:00 GMT 
+           DESCRIPTION 
+            " add reasonid ifitFlowStatisticsNumOverLoad(971), ifitFlowStatisticsNumExceedThreshold(972)" 
+
+            REVISION "202106220900Z"        -- June 22, 2021 at 09:00 GMT 
+            DESCRIPTION 
+            " add reasonid bgoflowRefluenceOverLoad(968), bgoflowIpv6Int90PercentOverLoad(969), bgoflowIpv6IntOverLoad(970)" 
+
+            REVISION "202106150900Z"        -- June 15, 2021 at 09:00 GMT 
+            DESCRIPTION 
+            " add reasonid     fwdLagResourceOverLoad(967)" 
+
+            REVISION "202106051600Z" -- June 5, 2021 at 16:00 GMT
+            DESCRIPTION
+            "add hwBoardResCriticalThresholdExceed, hwBoardResCriticalThresholdExceedResume"
+
+           REVISION  "202104181500Z"        --  April 18, 2021 at 15:00GMT
+           DESCRIPTION  
+           "add hwAclRuleThreshold, hwAclGroupThreshold, hwAclRuleResUsage, hwAclGroupResUsage, hwAclRuleExceed, hwAclRuleExceedClear, hwAclGroupExceed, hwAclGroupExceedClear"
+
+           REVISION  "202104181500Z"        --  April 18, 2021 at 15:00GMT
+           DESCRIPTION
+            "add new alarm hwPingfFail" 
+
+            REVISION "202103251000Z"        --  March 25, 2021 at 10:00 GMT
+            DESCRIPTION
+            "add 23 reasonid for hwSysResChangedAlarm:
+                enpResModeChanged(2)
+                arpResAllocationModeChanged(3)
+                riotResChanged(4)
+                fibv4ResChanged(5)
+                l3ResAllocationModeChanged(6)
+                l3IfResAllocationModeChanged(7)
+                aclExResChanged(8)
+                ipv6LongMaskResChanged(9)
+                l3ForwardHashResChanged(10)
+                uatResAllocationModeChanged(11)
+                ipv6VxlanResChanged(12)
+                srHashResChanged(13)
+                mplsResChanged(14)
+                dot1q8021pResChanged(15)
+                externalTcamResChanged(16)
+                uatHashResModeChanged(17)
+                ethtrunkModeChanged(18)
+                ingressVlanXlateModeChanged(19)
+                egressVlanXlateModeChanged(20)
+                qosaifabricdppModeChanged(21)
+                qosBuffAutoConfigChanged(22)
+                qosLosslessModeChanged(23)
+                incConfigChanged(24)"
+
+            REVISION "202103181500Z"        --  March 18, 2021 at 15:00 GMT
+            DESCRIPTION
+            "add 14 reasonid for hwLCfwdResourceOverload:
+                userdefinedcpaclNumOverLoad(953)
+                userdefinedcpaclNum90PercentOverLoad(954)
+                dlpcpaclNumOverLoad(955)
+                dlpcpaclNum90PercentOverLoad(956)
+                microisoAclNumOverLoad(957)
+                microisoAclNum90PercentOverLoad(958)
+                microisoLpmNumOverLoad(959)
+                microisoLpmNum90PercentOverLoad(960)
+                microisoCarNumOverLoad(961)
+                microisoCarNum90PercentOverLoad(962)
+                microisoCarStatNumOverLoad(963)
+                microisoCarStatNum90PercentOverLoad(964)
+                cpaclNumOverLoad(965)
+                cpaclNum90PercentOverLoad(966)"
+
+          REVISION  "202103111700Z"        -- March 11, 2021 at 17:00 GMT
+          DESCRIPTION   
+	      "add 2 reasonid for Srv6ColorSliceMapResOverload:
+	       srv6ColorSliceMapOverLoad(951),
+	       srv6ColorSliceMapExceedThreshold(952)"
+
+        REVISION  "202103051100Z" -- March 5, 2021 at 11:00 GMT
+        DESCRIPTION  
+           "add hwSessThreshold, hwSessExceed, hwSessExceedClear, hwSessThresholdExceed, hwSessThresholdExceedClear"
+
+        REVISION "202102191600Z" -- February 19, 2021 at 16:00 GMT
+        DESCRIPTION 
+            "Add hwSysResChangedAlarm,hwSysResChgReasonDescription,hwSysResChgSlotStr,hwSysResChgReasonId,hwSysResChgReasonDescription"
+
+        REVISION "202102181600Z" -- February 18, 2021 at 16:00 GMT
+        DESCRIPTION
+           "add 1 reasonid for hwFwdResLackReasonId:
+            bierv6StatCntResOverload(949)"
+
+        REVISION "202102181600Z" -- February 18, 2021 at 16:00 GMT
+        DESCRIPTION
+           "add 1 reasonid for hwFwdResLackReasonId:
+            bierv6StatNseResOverload(950)"
+
+        REVISION "202101131600Z" -- January 13, 2021 at 16:00 GMT
+        DESCRIPTION
+           "add 1 reasonid for hwFwdResLackReasonId:
+            vxlanv6TrunkResOverLoad(658)"
+
+        REVISION "202012231500Z"            -- Dec 23, 2020 at 15:00 GMT
+        DESCRIPTION
+           "add 1 reasonid for hwBoardResThresholdExceed,hwBoardResWarningThresholdExceed:
+           arpFastReplyInterface(630)"
+ 
+        REVISION "202012231500Z"            -- Dec 23, 2020 at 15:00 GMT
+        DESCRIPTION
+           "add 1 reasonid for hwBoardResThresholdExceed:
+               ipv6IgnoreOverLoad(657)"
+
+        REVISION "202012231500Z"            -- Dec 23, 2020 at 15:00 GMT
+        DESCRIPTION
+           "add 6 reasonid for hwBoardResWarningThresholdExceed :
+               pkteventCacheExceedThreshold(942),
+               latencyeventCacheExceedThreshold(943),
+               anyflowOriCacheExceedThreshold(944),
+               anyflowAggreCacheExceedThreshold(945),
+               anyflowFLCCacheExceedThreshold(946),
+               taCacheExceedThreshold(947)"
+
+        REVISION "202012211800Z"            -- Dec 21, 2020 at 18:00 GMT
+        DESCRIPTION
+           "add 5 reasonid for hwBoardResThresholdExceed:
+               icibppTable(581),
+               icibTable(582),
+               isemTable(583),
+               ecibTable(587),
+               ecibextTable(588)"
+
+        REVISION "202012211600Z"            -- Dec 21, 2020 at 15:00 GMT
+        DESCRIPTION
+           "add 4 reasonid for hwBoardResThresholdExceed,hwBoardResWarningThresholdExceed:
+           fibv6NumWarning(624),
+           level-1FEC(633),
+           level-2FEC(634),
+           level-3FEC(636)"
+
+         REVISION "202012161800Z"          --  Dec 16, 2020 at 18:00 GMT
+         DESCRIPTION   
+            "add 1 reasonid for hwLCfwdResourceOverload:
+            ifCarAclOverLoad(941)"
+
+       REVISION  "202010261000Z"        --  Oct 26, 2020 at 10:00 GMT
+       DESCRIPTION   
+            "add 2 reasonid for hwBoardFwdResThresholdExceed, hwLCfwdResourceOverload:
+            segmentlistSliceMapOverLoad(934),
+            segmentlistSliceMapExceedThresHold(935)"
+
+        REVISION "202008261600Z" -- August 26, 2020 at 16:00 GMT
+        DESCRIPTION
+           "add 1reasonid for hwBoardFwdResThresholdExceed:
+           sharedGqResExceed90Threshold(933)"
+
+        REVISION "202008251500Z" -- August 25, 2020 at 15:00 GMT
+        DESCRIPTION
+           "add 6 reasonid for SysfwdResourceOverload, hwWholeFwdResThresholdExceed, hwLCfwdResourceOverload, hwBoardFwdResThresholdExceed:
+           bierv6TmgidOverLoad(927),
+           bierv6TmgidExceedThresHold(928),
+           bierv6VpnOverLoad(929),
+           bierv6Ilmv6OverLoad(930),
+           bierv6VpnExceedThresHold(931),
+           bierv6Ilmv6ExceedThresHold(932)"
+
+         REVISION "202008241900Z" -- August 24, 2020 at 19:00 GMT
+         DESCRIPTION
+           "add 6 reasonid for SysfwdResourceOverload, hwWholeFwdResThresholdExceed, hwLCfwdResourceOverload, hwBoardFwdResThresholdExceed:
+           mcBierv6TmgidOverLoad(831),
+           mcBierv6TmgidExceedThresHold(773),
+           mcBierv6VpnOverLoad(924),
+           mcBierv6Ilmv6OverLoad(925),
+           mcBierv6VpnExceedThresHold(925),
+           mcBierv6Ilmv6ExceedThresHold(926)"
+
+
+         REVISION  "202008201900Z"        --  August 20, 2020 at 19:00 GMT
+         DESCRIPTION   
+            "add 2 reasonid for hwFwdResLackReasonId:
+            inLabelMaplResOverLoad(925),
+            labelTermResOverLoad(926)"
+
+          REVISION  "202008181700Z"        --  August 18, 2020 at 17:00 GMT
+          DESCRIPTION   
+            "add 2 reasonid for Srv6SliceResOverload:
+            srv6SliceOportinfoOverLoad(923),
+            srv6SliceOportinfoExceedThreshold(924)"
+
+         REVISION "202008050900Z"        --  August 05, 2020 at 09:00 GMT
+         DESCRIPTION
+            "add 1 reasonid for hwFwdResLackReasonId:
+             vxlanMcTable(922)"
+
+          REVISION "202007281700Z"        --  July 28, 2020 at 17:00 GMT
+          DESCRIPTION
+           "modify fowarding as forwarding"
+
+          REVISION "202007281000Z"        --  July 28, 2020 at 10:00 GMT 
+          DESCRIPTION
+           "modify fowarding as forwarding"
+
+          REVISION "202007241000Z"        --  July 24, 2020 at 10:00 GMT 
+          DESCRIPTION
+           "delete microIsolationPortCarLPMResOverLoad
+                       microIsolationPortCarResOverLoad
+                       microIsolationPortCarStatResOverLoad
+                       microIsolationPortCarLPMResExceed90ThresHold
+                       microIsolationPortCarResExceed90ThresHold
+                       microIsolationPortCarStatResExceed90ThresHold"
+
+          REVISION "202007201000Z"        --  July 20, 2020 at 10:00 GMT  
+          DESCRIPTION
+            "add node:
+               hwNsOrigFlexFlowExceedAlarm
+               hwNsOrigFlexFlowExceedResume
+               hwNsAggFlowExceedAlarm
+               hwNsAggFlowExceedResume"         
+
+            REVISION "202007171000Z"        --  May 8, 2020 at 10:00 GMT 
+            DESCRIPTION
+           "delete microIsolationProtocalCarLPMResOverLoad
+                    microIsolationProtocalCarIPv4ACLResOverLoad
+                    microIsolationProtocalCarIPv6ACLResOverLoad
+                    microIsolationProtocalCarL2ACLResResOverLoad
+                    microIsolationProtocalIPv4CarResOverLoad
+                    microIsolationProtocalIPv4CarStatResOverLoad
+                    microIsolationProtocalCarLPMResExceed90ThresHold
+                    microIsolationProtocalCarIPv4ACLResExceed90ThresHold
+                    microIsolationProtocalCarIPv6ACLResExceed90ThresHold
+                    microIsolationProtocalCarL2ACLResResExceed90ThresHold
+                    microIsolationProtocalIPv4CarResExceed90ThresHold
+                    microIsolationProtocalIPv4CarStatResExceed90ThresHold
+                    microIsolationProtocalIPv6CarResOverLoad
+                    microIsolationProtocalL2CarResOverLoad
+                    microIsolationProtocalIPv6CarStatResOverLoad
+                    microIsolationProtocalL2CarStatResOverLoad
+                    microIsolationProtocalIPv6CarResExceed90ThresHold
+                    microIsolationProtocalL2CarResExceed90ThresHold
+                    microIsolationProtocalIPv6CarStatResExceed90ThresHold
+                    microIsolationProtocalL2CarStatResExceed90ThresHold"
+
+            REVISION "202006291500Z"        --  June 29, 2020 at 15:00 GMT  
+            DESCRIPTION
+            "modify 2 reasonid for hwLCfwdResourceOverload:
+                cpIPv4AndIPv6AclNum90Overload(920)
+               cpIPv4AndIPv6AclNumOverload(921)"
+ 
+            REVISION "202005261500Z"        --  May 26, 2020 at 15:00 GMT    
+            DESCRIPTION
+            "add 15 reasonid for hwBoardFwdResThresholdExceed, hwLCfwdResourceOverload:
+                microIsolationPortCarLPMResOverLoad(889)
+                microIsolationProtocalCarLPMResOverLoad(890)
+                microIsolationProtocalCarIPv4ACLResOverLoad(891)
+                microIsolationProtocalCarIPv6ACLResOverLoad(892)
+				microIsolationProtocalCarL2ACLResResOverLoad(893)
+				microIsolationPortCarResOverLoad(894)
+				microIsolationProtocalIPv4CarResOverLoad(895)
+				microIsolationPortCarStatResOverLoad(896)
+				microIsolationProtocalIPv4CarStatResOverLoad(897)
+				microIsolationPortCarLPMResExceed90ThresHold(898)
+				microIsolationProtocalCarLPMResExceed90ThresHold(899)
+				microIsolationProtocalCarIPv4ACLResExceed90ThresHold(900)
+				microIsolationProtocalCarIPv6ACLResExceed90ThresHold(901)
+				microIsolationProtocalCarL2ACLResResExceed90ThresHold(902)
+				microIsolationPortCarResExceed90ThresHold(903)
+				microIsolationProtocalIPv4CarResExceed90ThresHold(904)
+				microIsolationPortCarStatResExceed90ThresHold(905)
+				microIsolationProtocalIPv4CarStatResExceed90ThresHold(906)
+				microIsolationProtocalIPv6CarResOverLoad(912)
+				microIsolationProtocalL2CarResOverLoad(913)
+				microIsolationProtocalIPv6CarStatResOverLoad(914)
+				microIsolationProtocalL2CarStatResOverLoad(915)
+				microIsolationProtocalIPv6CarResExceed90ThresHold(916)
+				microIsolationProtocalL2CarResExceed90ThresHold(917)
+				microIsolationProtocalIPv6CarStatResExceed90ThresHold(918)
+				microIsolationProtocalL2CarStatResExceed90ThresHold(919)"
+
+            REVISION "202005251500Z"        --  May 25, 2020 at 15:00 GMT   
+            DESCRIPTION
+            "modify 5 reasonid for hwFwdResLackReasonId:
+                inTM8QueueSqResExhausted(907)
+                inTM8QueueEnhanceSqResExhausted(908)
+                outTM4QueueSqResExhausted(909)
+                outTM8QueueSqResExhausted(910)
+                outTM8QueueEnhanceSqResExhausted(911)" 
+
+           REVISION "202005081000Z"        --  May 8, 2020 at 10:00 GMT  
+           DESCRIPTION
+           "delete hwMlagLinkLocalConflictDetectAlarm"
+
+           REVISION "202004281000Z"        --  April 28, 2020 at 10:00 GMT  
+           DESCRIPTION
+           "add 1 reasonid for hwFwdResLackReasonId:  
+             fibResOverLoad(656)"
+
+
+            REVISION "202004161500Z"        --  April 16, 2020 at 15:00 GMT
+            DESCRIPTION
+            "add 15 reasonid for hwWholeFwdResLack, hwWholeFwdResThresholdExceed, hwBoardFwdResLack, hwBoardFwdResThresholdExceed:
+                mcidResWarning(875)
+                vsiResWarning(876)
+                vpResWarning(877)
+                macResWarning(878)"
+
+
+            REVISION "202004132020Z"        --  April 13, 2020 at 20:20 GMT  
+            DESCRIPTION
+            "modify 15 reasonid for hwFwdResLackReasonId:
+                inSlot8QueueSqResExceed90ThresHold(860)
+                inSlot8QueueEnhanceSqResExceed90ThresHold(861)
+                inTM8QueueSqResExceed90ThresHold(862)
+                inTM8QueueEhanceSqResExceed90ThresHold(863)
+                outSlot4QueueSqResExceed90ThresHold(864)
+                outSlot8QueueSqResExceed90ThresHold(865)
+                outSlot8QueueEnhanceSqResExceed90ThresHold(866)
+                outTM4QueueSqResExceed90ThresHold(867)
+                outTM8QueueSqResExceed90ThresHold(868)
+                outTM8QueueEnhanceSqResExceed90ThresHold(869)
+                in8QueueSqResExhausted(870)
+                in8QueueEnhanceSqResExhausted(871)
+                out4QueueSqResExhausted(872)
+                out8QueueSqResExhausted(873)
+                out8QueueEnhanceSqResExhausted(874)"  
+
+           REVISION "202004071109Z"        -- April 07, 2020 at 11:09 GMT
+           DESCRIPTION 
+           "Add  hwAutoDiagnoseReasonId 3." 
+
+            REVISION "202003241020Z"        --  March 24, 2020 at 10:20 GMT    
+            DESCRIPTION
+            "add 15 reasonid for hwFwdResLackReasonId:
+                inSlot8QueueSqResOverLoad(860)
+                inSlot8QueueEnhanceSqResOverLoad(861)
+                inTM8QueueSqResOverLoad(862)
+                inTM8QueueEhanceSqResOverLoad(863)
+                outSlot4QueueSqResOverLoad(864)
+                outSlot8QueueSqResOverLoad(865)
+                outSlot8QueueEnhanceSqResOverLoad(866)
+                outTM4QueueSqResOverLoad(867)
+                outTM8QueueSqResOverLoad(868)
+                outTM8QueueEnhanceSqResOverLoad(869)
+                in8QueueSqResExceed90ThresHold(870)
+                in8QueueEnhanceSqResExceed90ThresHold(871)
+                out4QueueSqResExceed90ThresHold(872)
+                out8QueueSqResExceed90ThresHold(873)
+                out8QueueEnhanceSqResExceed90ThresHold(874)"
+
+            REVISION "202003180900Z"        --  March 18, 2020 at 09:00 GMT
+            DESCRIPTION
+            "add 1 parameter for hwMlagLinkLocalConflictDetectAlarm:
+             hwMlagConflictLinkLocalVpnName"
+
+            REVISION "202003120900Z"        --  March 12, 2020 at 09:00 GMT
+            DESCRIPTION
+            "add 1 reasonid for hwFwdResLackReasonId:
+             vplsMcTable(859)"
+
+             REVISION "202002240900Z"        --  February 24, 2020 at 09:00 GMT
+             DESCRIPTION 
+             "add 3 reasonid for hwFwdResLackReasonId: 
+              arpResOverLoad(856), 
+              ndResOverLoad(857),
+              fibv4NumPercentOverLoad(858)" 
+
+            REVISION "202002140900Z"        --  February 14, 2020 at 09:00 GMT  
+            DESCRIPTION
+            "update hwFibDeliverFailed,hwFibDeliverFailedResume,hwFibDeliverSlotId"
+
+            REVISION "202002130900Z"        --  February 13, 2020 at 09:00 GMT  		 
+            DESCRIPTION
+            "update hwEthernetRouterDownFailed,hwEthernetRouterDownFailedResume,hwEthernetRouteSlotId"
+
+            REVISION "202001220900Z"        --  January 22, 2020 at 09:00 GMT    
+            DESCRIPTION
+            "update hwMlagLinkLocalConflictDetectAlarm,hwMlagLinkLocalConflictDetectAlarmResume,hwConflictLinkLocalAddress"
+
+            REVISION  "202001211920Z"        --  January 21, 2020 at 19:20 GMT   
+            DESCRIPTION   
+            "update 2 reasonid  for  IpVpnResOverload:
+               ipv4vpnTable(854),
+               ipv6vpnTable(855)"       
+
+            REVISION  "202001031920Z"        --  January 3, 2020 at 19:20 GMT 
+            DESCRIPTION   
+            "add 2 reasonid  for  IpVpnResOverload:
+               ipv4vpnTable(854),
+               ipv6vpnTable(855)"
+
+            REVISION  "201912102110Z"        --  December 10, 2019 at 21:10 GMT 
+            DESCRIPTION   
+            "add 4 reasonid  for  Srv6ServChainResOverload:
+               srv6ServChainL3ReOverLoad(850),
+               srv6ServChainL3ReExceedThreshold(851),
+               srv6ServChainL2ReOverLoad(852),
+               srv6ServChainL2ReExceedThreshold(853)"
+
+            REVISION  "201912051130Z"        --  December 5, 2019 at 11:30 GMT  
+            DESCRIPTION   
+            "add 2 reasonid  for  Vxlanv6ResOverload:
+               vxlanv6DecapOverLoad(848),
+               vxlanv6DecapExceedThreshold(849)"
+
+            REVISION "201910171515Z"        -- Oct 17, 2019 at 15:15GMT 
+            DESCRIPTION 
+                "add OBJECT hwNvo3VxlanNveMacConflict ." 	
+
+            REVISION "201909282229Z"        -- Sep 28, 2019 at 22:29GMT
+            DESCRIPTION 
+            "Add hwEcmpMemberLimitOverThresholdAlarm." 
+
+            REVISION  "201909251050Z"        --  Septempber 25, 2019 at 10:50 GMT  
+            DESCRIPTION   
+            "add 2 reasonid  for  Srv6ResOverload:
+               srv6ListOverLoad(844),
+               srv6ListExceedThreshold(845),
+               srv6PolicyStatResOverLoad(846),
+               srv6PolicyStatResExceedThreshold(847)"
+
+            REVISION  "201909241110Z"        --  Septempber 24, 2019 at 11:10 GMT
+            DESCRIPTION   
+            "del object{} for hwMplsLabelExceedAlarm,hwMplsLabelExceedAlarmResume"
+
+            REVISION  "201909171540Z"        --  Septempber 17, 2019 at 15:40 GMT
+            DESCRIPTION   
+            "add 10 reasonid  for  Srv6ResOverload:
+               localSidOverLoad(653),
+               localSidExceedThreshold(835),
+               remoteSidOverLoad(836),
+               remoteSidExceedThreshold(837),
+               teleScan30sOverLoad(838),
+               teleScan30sExceedThreshold(839),
+               teleScan1sOverLoad(840),
+               teleScan1sExceedThreshold(841),
+               srv6policyRdrREOverLoad(842),
+               srv6policyRdrREExceedThreshold(843)"
+
+            REVISION  "201909171414Z"        --  Septempber 17, 2019 at 14:14 GMT
+            DESCRIPTION   
+            "add 2 reasonid  for  hwBoardMcResLack, hwBoardMcResLackResume, hwBoardMcResFull:
+              l3intflistTable(831),
+              mcpmskTable(832)"
+
+            REVISION  "201909101109Z"        --  Septempber 10, 2019 at 11:09 GMT
+            DESCRIPTION   
+            "add 2 reasonid  for  localArpv6ResOverload:
+              localArpv6OverLoad(831),
+              localArpv6ExceedThreshold(832)"
+
+            REVISION  "201908291109Z"        --  August 29, 2019 at 11:09 GMT
+            DESCRIPTION   
+            "add 17 reasonid  for  tmgidResOverload:
+              l2TrunkLbTmgidResOverLoad(814),
+              vlanL2mcRpTmgidResOverLoad(815),
+              vsiL2mcRpTmgidResOverLoad(816),
+              bdL2mcRpTmgidResOverLoad(817),
+              vsiL2mcBakPwTmgidResOverLoad(818),
+              pimFrrTmgidResOverLoad(819),
+              vlanL2mcv6RpTmgidResOverLoad(820),
+              vsiL2mcv6RpTmgidResOverLoad(821),
+              l2mcStkMapTmgidResOverLoad(822),
+              brasMcHwTmgidResOverLoad(823),
+              mcNatTmgidResOverLoad(824),
+              ucDsvpnGroupOverLoad(825),
+              bdTmgidResOverLoad(826),
+              hwmcTmgidResOverLoad(827),
+              vlanTmgidResOverLoad(828),
+              l2vpnTmgidResOverLoad(829),
+              l2vpnApsTmgidResOverLoad(830)"
+
+            REVISION "201907261109Z"        -- July 21, 2019 at 11:09 GMT
+            DESCRIPTION 
+            "Add  hwAutoDiagnoseReasonId ( 1 , 2 )." 
+
+            REVISION "201907171109Z"        -- July 21, 2019 at 11:09 GMT
+            DESCRIPTION 
+            "Add hwAutoDiagnoseAlarm,hwAutoDiagnoseAlarmResume hwAutoDiagnoseReasonId ." 
+
+           REVISION "201906281410Z"        -- June 28, 2019 at 14:10GMT
+           DESCRIPTION 
+           "Add  srpolicyStatExceedThresHold,srpolicyStatOverLoad."
+
+           REVISION "201906051116Z"        --  June 5, 2019 at 11:16GMT
+           DESCRIPTION 
+           "add 16 reasonid  for hwLCfwdResourceOverload:                
+               inProfSingleCarPre(778),
+               outProfSingleCarPre(779),
+               inProfSingleCarStatPre(780),
+               outProfSingleCarStatPre(781),
+               tlmtActCar100ms(800),
+               tlmtActCar100msPre(801),
+               tlmtActCar1s(802),
+               tlmtActCar1Pre(803),
+               tlmtActCar30s(804),
+               tlmtActCar30Pre(805),
+               tlmtPolicy100ms(806),
+               tlmtPolicy100msPre(807),
+               tlmtPolicy1s(808),
+               tlmtPolicy1Pre(809),
+               tlmtPolicy30s(810),
+               tlmtPolicy30Pre(811)"
+           
+           REVISION "201905081618Z"        --  May 8, 2019 at 16:18GMT
+           DESCRIPTION 
+           "add 1 reasonid : vxlanvpTable(777)."
+
+           REVISION "201905061005Z"        --  May 6, 2019 at 10:05GMT
+           DESCRIPTION 
+           "Add  mcEgressStatOverLoad,mcEgressStatExceedThresHold."
+
+           REVISION "201904191047Z"        --  Apr 19, 2019 at 10:47GMT
+           DESCRIPTION   
+           "add 7 reasonid  for  hwWholeFwdResLack, hwWholeFwdResThresholdExceed, hwBoardFwdResLack, hwBoardFwdResThresholdExceed:
+            mcBierVpnOverLoad(768),
+            mcBierTunnelOverLoad(769),
+            mcBierTmgidOverLoad(770),
+            mcBierVpnExceedThresHold(771),
+            mcBierTmgidExceedThresHold(772),
+            mcBierBitMaskOverLoad(773),
+            mcBierBitMaskExceedThresHold(774)"
+
+            REVISION "201812221247Z"        -- DEC 22, 2018 at 12:47GMT
+            DESCRIPTION 
+            "Modify hwMplsLabelExceedAlarm,hwMplsLabelExceedAlarmResume" 
+			
+            REVISION "201812181137Z"        -- DEC 18, 2018 at 11:37 GMT
+            DESCRIPTION 
+            "Add  hwMplsLabelExceedAlarm,hwMplsLabelExceedAlarmResume" 
+			
+           REVISION  "201812062200Z"        --  DEC 6, 2018 at 22:00GMT
+           DESCRIPTION   
+            "add 1 reasonid : ipv6DefipTable(767) "
+
+
+           REVISION  "201812031600Z"        --  DEC 3, 2018 at 16:00GMT
+           DESCRIPTION   
+           "add hwMcLeafCfcCheck, hwMcLeafCfcCheckTrap, hwMcLeafCfcCheck, hwMcLeafCfcCheckResume" 
+		   
+           REVISION  "201811281500Z"        --  DEC 28, 2018 at 15:00GMT
+           DESCRIPTION   
+           "add 8 reasonid  for hwLCfwdResourceOverload: 
+            hqosSessionCaridOverload(759),
+            hqosFamilyCaridOverload(760),
+            hqosVcpeL2CaridOverload(761),
+            hqosVcpeL3CaridOverload(762),
+            hqosSessionCarStatidOverload(763),
+            hqosFamilyCarStatidOverload(764),
+            hqosVcpeL2CarStatidOverload(765),
+            hqosVcpeL3CarStatidOverload(766)" 
+
+
+           REVISION  "201811271600Z"        --  Nov 27, 2018 at 16:00GMT
+           DESCRIPTION   
+            "add hwBoardMcResLack,hwBoardMcResLackResume"
+
+           REVISION  "201811231500Z"        --  Nov 23, 2018 at 15:00GMT
+           DESCRIPTION   
+            "add hwEMDIIndicatorOverThreshold,hwEMDIIndicatorOverThresholdResume,hwEMDIReceiveDuplicatePackets,hwEMDIReceiveDuplicatePacketsResume,hwEMDIInstanceId,hwEMDIIndicatorType,hwEMDIIndicatorValue,hwEMDIThreshold" 
+
+           REVISION  "201811091500Z"        --  Nov 09, 2018 at 15:00GMT
+           DESCRIPTION   
+           "add hwProducerComponentName,hwConsumerComponentName,hwSmoothFailedReasonId,hwFwdComponentSmoothFailed,hwFwdComponentSmoothFailedClear" 
+
+           REVISION  "201810151500Z"        --  Oct 15, 2018 at 15:00GMT
+           DESCRIPTION   
+           "add 4 reasonid  for hwLCfwdResourceOverload: 
+            secV6sessioncarResOverload(738),
+            secV6sessioncarRes90Overload(739),
+            secV6sessioncarStatOverload(740),
+            secV6sessioncarStat90Overload(741)" 
+
+           REVISION  "201810131500Z"        --  Oct 13, 2018 at 15:00GMT
+           DESCRIPTION   
+           "add new alarm hwBoardMcResFull,hwBoardMplsFwdResFull,hwBoardL3ResFull" 
+
+           REVISION  "201808301530Z"        --  August 30, 2018 at 15:30GMT
+           DESCRIPTION   
+           "modify reasonid for hwLCfwdResourceOverload :l3mcLeafNumberExceed90OverLoad(736),add reasonid for hwLCfwdResourceOverload :l3mcLeafNumberOverLoad(737)" 
+
+           REVISION  "201808271530Z"        --  August 27, 2018 at 15:30GMT
+           DESCRIPTION   
+           "add 1 reasonid for hwLCfwdResourceOverload :l3mcLeafNumberOverLoad(733)"  
+           
+           REVISION  "201808081530Z"        --  August 15, 2018 at 15:30GMT
+           DESCRIPTION   
+           "add new alarm hwSidResourceThresholdExceed, hwSidResourceThresholdExceedClear, hwSidResourceTotalCountExceed, hwSidResourceTotalCountExceedClear to group"   
+
+           REVISION  "201808071530Z"        --  August 07, 2018 at 15:30GMT
+           DESCRIPTION   
+           "add new alarm hwSidResourceThresholdExceed, hwSidResourceThresholdExceedClear, hwSidResourceTotalCountExceed, hwSidResourceTotalCountExceedClear"   
+
+           REVISION  "201807091530Z"        --  July 09, 2018 at 15:30GMT
+           DESCRIPTION   
+           "add 1 reasonid for hwLCfwdResourceOverload and 1 reasonid for hwBoardFwdResThresholdExceed:L3mcV4MreCloneStatResOverLoad(731),
+            L3mcV4MreCloneStatResExceedThresHold(732)"     
+
+           REVISION  "201804281600Z"        --  Apr 28, 2018 at 16:00GMT 
+           DESCRIPTION    
+           "add 3 reasonid for hwLCfwdResourceOverload and 3 reasonid for hwBoardFwdResThresholdExceed: 
+           hqosVirtualSQOverLoad(715),hqosVirtualGQOverLoad(716),hqosVirtualVIOverLoad(717),hqosVirtualSQExceedThresHold(718),
+           hqosVirtualGQExceedThresHold(719),hqosVirtualVIExceedThresHold(720)" 
+           
+           REVISION  "201804251940Z"        --  Apr 25, 2018 at 19:40GMT
+           DESCRIPTION   
+           "add four reasonid for hwLCfwdResourceOverload and four reasonid for hwBoardFwdResThresholdExceed: l3ucVpnSIdIpV6AddrOverLoad(721),
+           l3ucNhrpNetworkIdIndexOverLoad(722),
+           l3ucVpnSIdIpV6AddrExceedThresHold(723),
+           l3ucNhrpNetworkIdIndexExceedThresHold(724)"
+           
+           REVISION  "201803012007Z"        --  Mar 15, 2018 at 09:00GMT
+           DESCRIPTION   
+           "add four reasonid for hwLCfwdResourceOverload and four reasonid for hwBoardFwdResThresholdExceed:L3mcV4MreStatResOverLoad(707),
+           L3mcV6MreStatResOverLoad(708), L3mcV4MREEXTResOverLoad(709), L3mcV6MREEXTResOverLoad(710), L3mcV4MreStatResExceedThresHold(711),
+           L3mcV6MreStatResExceedThresHold(712), L3mcV4MREEXTResExceedThresHold(713), L3mcV6MREEXTResExceedThresHold(714)"
+
+           REVISION  "201803012007Z"        --  Mar 15, 2018 at 09:00GMT
+           DESCRIPTION   
+           "add one reasonid for SysfwdResourceOverload: l2mcTmgidOverThresHold(605)"
+
+           REVISION  "201803012007Z"        --  Mar 1, 2017 at 20:07 GMT 
+           DESCRIPTION   "modify authority for hwTblResInfoTable "
+
+           REVISION  "201802261157Z"        --  Feb 26, 2018 at 11:57GMT
+           DESCRIPTION    
+           "add hwTrunkWeightExceed" 
+		   
+           REVISION  "201802091138Z"        --  Feb 9, 2018 at 11:38GMT
+           DESCRIPTION    
+           "add hwBoardMplsFlowLabelNonSupp" 
+
+           REVISION  "201801040900Z"        --  Jan 15, 2018 at 09:00GMT
+           DESCRIPTION  
+           "add two reasonid for hwLCfwdResourceOverload and hwBoardFwdResThresholdExceed:mcHotstanbyResOverLoad(700),
+           mcHotstanbyResOverLoad(703).
+           add four reasonid for SysfwdResourceOverload and hwWholeFwdResThresholdExceed:l3mcV4TmgidResOverLoad(701),
+           l3mcV6TmgidResOverLoad(702), l3mcV4TmgidResOverLoad(704), l3mcV6TmgidResOverLoad(705)"
+
+           REVISION  "201801040900Z"        --  Jan 4, 2018 at 09:00GMT
+           DESCRIPTION  
+           "add hwFwdSessionResUsage and modify hwFwdSessionResLack, hwFwdSessionResLackResume"
+          
+           REVISION  "201712140900Z"        -- Dec 14, 2017 at 09:00GMT
+           DESCRIPTION  
+           "modify hwResourceOverwrittenAlarmResume"
+
+           REVISION  "201712091300Z"        --  Dec 9, 2017 at 13:00GMT
+           DESCRIPTION  
+           "add hwFwdResCongestReasonId, hwFwdResLackFeNodeId, hwFwdResMsgCongestTrap, 
+           hwBoardFwdMsgCongest , hwBoardFwdMsgCongestResume.
+           add four reasonid for hwFwdResCongestReasonId:FESDetectMsgCongest(1),
+           EUMDetectMsgCongest(2),	RMDetectMsgCongest(3), VSTMDetectMsgCongest(4)"
+
+           REVISION  "201712061130Z"        --  Dec 6, 2017 at 11:30GMT
+           DESCRIPTION 
+           "add reasonid for hwFwdResLackReasonId: NetEapUserResLac(670)"
+
+           REVISION  "201711281650Z"        --  Nov 28, 2017 at 16:50GMT
+           DESCRIPTION 
+           "add reasonid for hwFwdResLackReasonId: vpnVclabelResExceedThresHold(613)"
+
+
+           REVISION  "201711221650Z"        --  Nov 22, 2017 at 16:50GMT
+           DESCRIPTION 
+           "add reasonid for hwFwdResLackReasonId: dsvpnNhrpsulationRes(610), dsvpnResOverLoad(611),dsvpnResExceedThresHold(612)"
+
+           REVISION  "201711161555Z"        --  Nov 16, 2017 at 15:55GMT
+           DESCRIPTION  
+           "add hwResOverwrittenSlot, hwResOverwrittenResType, hwResourceOverwrittenTrap, hwResourceOverwrittenAlarm, hwResourceOverwrittenAlarmResume"
+
+           REVISION  "201711131018Z"        --  Nov 13, 2017 at 10:18GMT
+           DESCRIPTION  
+           "add hwFwdResIncomReasonId, hwFwdResIncompTrap, hwFwdDataSyncIncomplete, hwFwdDataSyncIncompleteResume"
+
+            REVISION  "201711032007Z"        --  Nov 3, 2017 at 20:07 GMT 
+           DESCRIPTION   "add a table for hwTblResInfoTable "
 
             REVISION  "201708172108Z"        --  Aug 17, 2017 at 21:08 GMT 
            DESCRIPTION   "modify english description "
@@ -176,10 +1039,6 @@
            " add some reasonid for hwFwdResLackReasonId : vplspwHqosOverLoad(550)"
 
 
-           REVISION "201610201625Z"        -- Oct 20, 2016 at 16:25GMT
-           DESCRIPTION 
-           "Add  hwFwdSessionResLack,hwFwdSessionResLackResume,hwFwdFastTableResLack,hwFwdFastTableResLackResume." 
-
              REVISION "201611171421Z"        --  Nove  17, 2016 at 14:21GMT
             DESCRIPTION  
            " add some reasonid for hwFwdResLackReasonId : vplspwHqosOverLoad"
@@ -188,6 +1047,10 @@
            REVISION "201611011125Z"        -- Nov 01, 2016 at 11:25GMT  
            DESCRIPTION  
            "add reasonid for hwFwdResLackReasonId: overlayNhpResOverLoad(549) "
+
+           REVISION "201610201625Z"        -- Oct 20, 2016 at 16:25GMT
+           DESCRIPTION 
+           "Add  hwFwdSessionResLack,hwFwdSessionResLackResume,hwFwdFastTableResLack,hwFwdFastTableResLackResume." 
 
            REVISION "201610111125Z"        -- Oct 11, 2016 at 11:25GMT  
            DESCRIPTION  
@@ -205,9 +1068,6 @@
            DESCRIPTION  
            "add reasonid for hwFwdResLackReasonId: e2e1588Res(500) "
 
-            REVISION "201607191633Z"        -- July 19, 2016 at 16:33GMT  
-           DESCRIPTION  
-           "modify alarm hwFwdEntryInconsistent/hwFwdEntryInconsistentResume index: add index hwServiceIndex2, hwServiceIndex3, hwServiceIndex4 "
 
             REVISION "201609241804Z"        -- Sep 24, 2016 at 18:04GMT  
            DESCRIPTION  
@@ -220,6 +1080,10 @@
             REVISION "201609091447Z"        -- Sep 9, 2016 at 14:47GMT  
            DESCRIPTION  
            "add reasonid for hwFwdResLackReasonId: tunnelsourceipindex(420) "
+
+            REVISION "201607191633Z"        -- July 19, 2016 at 16:33GMT  
+           DESCRIPTION  
+           "modify alarm hwFwdEntryInconsistent/hwFwdEntryInconsistentResume index: add index hwServiceIndex2, hwServiceIndex3, hwServiceIndex4 "
 
             REVISION "201607111201Z"        -- July 11, 2016 at 12:01GMT  
            DESCRIPTION  
@@ -1028,7 +1892,6 @@
                pwifResExceed90ThresHold(501),
                insegVrfOverLoad(502),
                dynldbalStatOverLoad(503),
-
                communityeOverLoad(504),
                ipv4TunnelIndexOverLoad(505),
                smaAsIndexOverLoad(506),
@@ -1055,13 +1918,309 @@
                vfiTable(578),
                ecmpreswarning(579),
                nhpreswarning(580),
+               icibppTable(581),
+               icibTable(582),
+               isemTable(583),
+               ecibTable(587),
+               ecibextTable(588),
+               fe0UserNumExceed90Threshold(595),
+               fe0UserNumExceed100Threshold(596),
+               fe1UserNumExceed90Threshold(597),
+               fe1UserNumExceed100Threshold(598),
+               l2mcTmgidOverThresHold(605),
                ipv4O6TnlDecapTblResOverLoad(608),
-               ipv4O6TnlIpv6AddrTblResOverLoad(609)
-               }
+               ipv4O6TnlIpv6AddrTblResOverLoad(609),
+               fibv6NumWarning(624), 
+               arpFastReplyInterface(630),
+               level1FECTable(633),
+               level2FECTable(634),
+               level3FECTable(636),
+               fibResOverLoad(656),
+               ipv6IgnoreOverLoad(657),
+               vxlanv6TrunkResOverLoad(658),
+               dsvpnNhrpsulationRes(664),
+               dsvpnResOverLoad(665),
+               dsvpnResExceedThresHold(666),
+               vpnVclabelResExceedThresHold(613),
+               mcHotstanbyResLack(700),
+               l3mcV4TmgidResLack(701),
+               l3mcV6TmgidResLack(702),
+               mcHotstanbyResOverLoad(703),
+               l3mcV4TmgidResOverLoad(704),
+               l3mcV6TmgidResOverLoad(705),
+               l3mcV4MreStatResOverLoad(707),
+               l3mcV6MreStatResOverLoad(708),
+               l3mcV4MreExtResOverLoad(709),
+               l3mcV6MreExtResOverLoad(710),
+               l3mcV4MreStatResExceedThresHold(711),
+               l3mcV6MreStatResExceedThresHold(712),
+               l3mcV4MreExtResExceedThresHold(713),
+               l3mcV6MreExtResExceedThresHold(714),
+               hqosVirtualSQOverLoad(715),
+               hqosVirtualGQOverLoad(716),
+               hqosVirtualVIOverLoad(717),
+               hqosVirtualSQExceedThresHold(718),
+               hqosVirtualGQExceedThresHold(719),
+               hqosVirtualVIExceedThresHold(720),
+               l3ucVpnSIdIpV6AddrOverLoad(721),
+               l3ucNhrpNetworkIdIndexOverLoad(722),
+               l3ucVpnSIdIpV6AddrExceedThresHold(723),
+               l3ucNhrpNetworkIdIndexExceedThresHold(724),
+               secSessioncarResExceedOverload(725),
+               secSessioncarResExceed90Overload(726),
+               secSessioncarStatExceedOverload(727),
+               secSessioncarStatExceed90Overload(728),
+               l3mcV4MreCloneStatResOverLoad(731),
+               l3mcV4MreCloneStatResExceedThresHold(732),
+               l3mcLeafNumberExceedThresHold(736),
+               l3mcLeafNumberOverLoad(737),
+               secV6sessioncarResExceedOverload(738),
+               secV6sessioncarResExceed90Overload(739),
+               secV6sessioncarStatExceedOverload(740),
+               secV6sessioncarStatExceed90Overload(741),
+               tunnel6EncapsulationTable(742),
+               tunnelEncapsulationTable(743),
+               reTable(744),
+               aibTable(745),
+               nstTable(746),
+               vrrpTable(747),
+               ipv6amTable(748),
+               l2mcTable(749),
+               ipmcTable(750),
+               ipmcVlanTable(751),
+               mlibTable(752),
+               elbTable(753),
+               fdbTable(754),
+               vidxTable(755),
+               tcamTable(756),
+               lttTable(757),
+               mllTable(758),
+               hqosSessionCaridOverload(759),
+               hqosFamilyCaridOverload(760),
+               hqosVcpeL2CaridOverload(761),
+               hqosVcpeL3CaridOverload(762),
+               hqosSessionCarStatidOverload(763),
+               hqosFamilyCarStatidOverload(764),
+               hqosVcpeL2CarStatidOverload(765),
+               hqosVcpeL3CarStatidOverload(766),
+               ipv6DefipTable(767) ,
+               mcBierVpnOverLoad(768),
+               mcBierTunnelOverLoad(769),
+               mcBierTmgidOverLoad(770),
+               mcBierVpnExceedThresHold(771),
+               mcBierTmgidExceedThresHold(772),
+               mcBierBitMaskOverLoad(773),
+               mcBierBitMaskExceedThresHold(774),
+               mcEgressStatOverLoad(775),
+               mcEgressStatExceedThresHold(776),
+               vxlanvpTable(777),
+               inProfSingleCarPre(778),
+               outProfSingleCarPre(779),
+               inProfSingleCarStatPre(780),
+               outProfSingleCarStatPre(781),
+               tlmtActCar100ms(800),
+               tlmtActCar100msPre(801),
+               tlmtActCar1s(802),
+               tlmtActCar1Pre(803),
+               tlmtActCar30s(804),
+               tlmtActCar30Pre(805),
+               tlmtPolicy100ms(806),
+               tlmtPolicy100msPre(807),
+               tlmtPolicy1s(808),
+               tlmtPolicy1Pre(809),
+               tlmtPolicy30s(810),
+               tlmtPolicy30Pre(811),
+               srpolicyStatExceedThresHold(812),
+               srpolicyStatOverLoad(813),
+               l2TrunkLbTmgidResOverLoad(814),
+               vlanL2mcRpTmgidResOverLoad(815),
+               vsiL2mcRpTmgidResOverLoad(816),
+               bdL2mcRpTmgidResOverLoad(817),
+               vsiL2mcBakPwTmgidResOverLoad(818),
+               pimFrrTmgidResOverLoad(819),
+               vlanL2mcv6RpTmgidResOverLoad(820),
+               vsiL2mcv6RpTmgidResOverLoad(821),
+               l2mcStkMapTmgidResOverLoad(822),
+               brasMcHwTmgidResOverLoad(823),
+               mcNatTmgidResOverLoad(824),
+               ucDsvpnGroupOverLoad(825),
+               bdTmgidResOverLoad(826),
+               hwmcTmgidResOverLoad(827),
+               vlanTmgidResOverLoad(828),
+               l2vpnTmgidResOverLoad(829),
+               l2vpnApsTmgidResOverLoad(830),
+               localArpv6OverLoad(831),
+               localArpv6ExceedThreshold(832),
+               l3intflistTable(833),
+               mcpmskTable(834),
+               localSidOverLoad(653),
+               localSidExceedThreshold(835),
+               remoteSidOverLoad(836),
+               remoteSidExceedThreshold(837),
+               teleScan30sOverLoad(838),
+               teleScan30sExceedThreshold(839),
+               teleScan1sOverLoad(840),
+               teleScan1sExceedThreshold(841),
+               srv6policyRdrREOverLoad(842),
+               srv6policyRdrREExceedThreshold(843),
+               srv6ListOverLoad(844),
+               srv6ListExceedThreshold(845),
+               srv6PolicyStatResOverLoad(846),
+               srv6PolicyStatResExceedThreshold(847),
+               vxlanv6DecapOverLoad(848),
+               vxlanv6DecapExceedThreshold(849),
+               srv6ServChainL3ReOverLoad(850),
+               srv6ServChainL3ReExceedThreshold(851),
+               srv6ServChainL2ReOverLoad(852),
+               srv6ServChainL2ReExceedThreshold(853),
+               ipv4vpnTable(854),
+               ipv6vpnTable(855),
+               arpResOverLoad(856),
+               ndResOverLoad(857),
+               fibv4NumPercentOverLoad(858),
+               vplsMcTable(859),
+               inSlot8QueueSqResExceed90ThresHold(860),
+               inSlot8QueueEnhanceSqResExceed90ThresHold(861),
+               inTM8QueueSqResExceed90ThresHold(862),
+               inTM8QueueEhanceSqResExceed90ThresHold(863),
+               outSlot4QueueSqResExceed90ThresHold(864),
+               outSlot8QueueSqResExceed90ThresHold(865),
+               outSlot8QueueEnhanceSqResExceed90ThresHold(866),
+               outTM4QueueSqResExceed90ThresHold(867),
+               outTM8QueueSqResExceed90ThresHold(868),
+               outTM8QueueEnhanceSqResExceed90ThresHold(869),
+               in8QueueSqResExhausted(870),
+               in8QueueEnhanceSqResExhausted(871),
+               out4QueueSqResExhausted(872),
+               out8QueueSqResExhausted(873),
+               out8QueueEnhanceSqResExhausted(874),
+               mcidResWarning(875),
+               vsiResWarning(876),
+               vpResWarning(877),
+               macResWarning(878),               			  		   
+               inTM8QueueSqResExhausted(907),
+               inTM8QueueEnhanceSqResExhausted(908),
+               outTM4QueueSqResExhausted(909),
+               outTM8QueueSqResExhausted(910),
+               outTM8QueueEnhanceSqResExhausted(911),
+               cpIPv4AndIPv6AclNum90Overload(920),
+               cpIPv4AndIPv6AclNumOverload(921),
+               vxlanMcTable(922),
+               srv6SliceOportinfoOverLoad(923),
+               srv6SliceOportinfoExceedThreshold(924),
+               inLabelMaplResOverLoad(925),
+               labelTermResOverLoad(926),
+               bierv6TmgidOverLoad(927),
+               bierv6TmgidExceedThresHold(928),
+               bierv6VpnOverLoad(929),
+               bierv6Ilmv6OverLoad(930),
+               bierv6VpnExceedThresHold(931),
+               bierv6Ilmv6ExceedThresHold(932),
+               sharedGqResExceed90Threshold(933),
+               segmentlistSliceMapOverLoad(934),
+               segmentlistSliceMapExceedThresHold(935),
+               ifCarAclOverLoad(941),
+               pkteventCacheExceedThreshold(942),
+               latencyeventCacheExceedThreshold(943),
+               anyflowOriCacheExceedThreshold(944),
+               anyflowAggreCacheExceedThreshold(945),
+               anyflowFLCCacheExceedThreshold(946),
+               taCacheExceedThreshold(947),
+               bierv6StatCntResOverload(949),
+               bierv6StatNseResOverload(950),
+               srv6ColorSliceMapOverLoad(951),
+               srv6ColorSliceMapExceedThreshold(952),
+               userdefinedcpaclNumOverLoad(953),
+               userdefinedcpaclNum90PercentOverLoad(954),
+               dlpcpaclNumOverLoad(955),
+               dlpcpaclNum90PercentOverLoad(956),
+               microisoAclNumOverLoad(957),
+               microisoAclNum90PercentOverLoad(958),
+               microisoLpmNumOverLoad(959),
+               microisoLpmNum90PercentOverLoad(960),
+               microisoCarNumOverLoad(961),
+               microisoCarNum90PercentOverLoad(962),
+               microisoCarStatNumOverLoad(963),
+               microisoCarStatNum90PercentOverLoad(964),
+               cpaclNumOverLoad(965),
+               cpaclNum90PercentOverLoad(966),
+               fwdLagResourceOverLoad(967),
+               bgoflowRefluenceOverLoad(968),
+               bgoflowIpv6Int90PercentOverLoad(969),
+               bgoflowIpv6IntOverLoad(970),
+               ifitNativeIpFlowRes(971),
+               fibHardwareNumOverLoad(973),
+               fib6HardwareNumOverLoad(974),
+               fibSoftwareNumOverLoad(975),
+               fib6SoftwareNumOverLoad(976), 
+               fibSoftwareExceedThreshold(977), 
+               fib6SoftwareNumExceedThreshold(978),
+               serviceCarResOverload(979),
+               srv6TeFlowGroupClassMapOverLoad(980),
+	       srv6TeFlowGroupClassMapExceedThreshold(981),
+               inboundInterfaceCar95PercentOverLoad(982),
+               outboundInterfaceCar95PercentOverLoad(983),
+               srv6Dip90PerNumOverload(984),
+               srv6Dip100PerNumOverload(985),
+               elineSidTblExt90PerNumOverload(986),
+               elineSidTblExt100PerNumOverload(987),
+               ifitDynFlowRes(988),
+               vxlanVpiOverThreshold(989),
+               vxlanVpOverThreshold(990),
+               vxlanTunnelOverThreshold(991),
+               oam1agvlanbcResourceOverLoad(992),
+               tunnelV6DecapsulationRes(993),
+	       apn6TrafficSteeringMapOverLoad(994),
+       	       apn6InterfaceMapOverLoad(995),
+	       apn6VPNPeerMapOverLoad(996),
+ 	       apn6TrafficIsolationMapOverLoad(997),
+	       apn6IsolationStatisticsOverLoad(998),
+	       apn6TrafficSteeringMapExceedThreshold(999),
+	       apn6InterfaceMapExceedThreshold(1000),
+	       apn6VPNPeerMapExceedThreshold(1001),
+               apn6TrafficIsolationMapExceedThreshold(1002),
+	       apn6IsolationStatisticsExceedThreshold(1003),
+               dlbResOverLoad(1004),
+               l2tpLacSessionExceed90Threshold(1005),
+               l2tpLacSessionExceed100Threshold(1006),
+               l2tpLnsSessionExceed90Threshold(1007),
+               l2tpLnsSessionExceed100Threshold(1008),
+               l2tpLnsTunnelBoardSessionExceed90Threshold(1009),
+               l2tpLnsTunnelBoardSessionExceed100Threshold(1010),
+               l2tpLacTunnelExceed90Threshold(1011),
+               l2tpLacTunnelExceed100Threshold(1012),
+               l2tpLnsTunnelExceed90Threshold(1013),
+               l2tpLnsTunnelExceed100Threshold(1014),
+               ifitAclRes(1015),
+               ifitInstanceRes(1016),
+               peerGroupResWarning(1017),
+               hqosBrasSlotSessionCarOverload(1018),
+              hqosBrasNpSessionCarOverload(1019),
+              hqosBrasSlotFamilyCarOverload(1020),
+              hqosBrasNpFamilyCarOverload(1021),
+              hqosBrasSessionCarStatOverload(1022),
+              hqosBrasFamilyCarStatOverload(1023),
+              nativeIfitFlowIdRes(1024),
+              qosDipShapingOverload(1025),
+              qosDipShapingStatisticsOverload(1026),
+              qosDipShapingExceed90Threshold(1027),
+              qosDipShapingStatisticsExceed90Threshold(1028),
+              hqosPortWredIdResLac(1029),
+              bgpflowMReResExceedThresHold(1030),
+              bgpflowMReResExceed90ThresHold(1031),
+              bgpflowNstResExceedThresHold(1032),
+              bgpflowNstResExceed90ThresHold(1033),
+              bgpflowNhpResExceedThresHold(1034),
+              bgpflowNhpResExceed90ThresHold(1035),
+               fe2UserNumExceed90Threshold(1036),
+               fe2UserNumExceed100Threshold(1037),
+               fe3UserNumExceed90Threshold(1038),
+               fe3UserNumExceed100Threshold(1039)
+            }
             MAX-ACCESS accessible-for-notify
-            STATUS current
+            STATUS current 
             DESCRIPTION
-                "To describe the type of fowarding engine resource."
+                "To describe the type of forwarding engine resource."
             ::= { hwFwdResTrapObject 3 }
 
         -- 1.3.6.1.4.1.2011.5.25.227.1.4
@@ -1361,7 +2520,617 @@
                 "The VRF ID."
             ::= { hwFwdResTrapObject 29 } 
    
-     -- 1.3.6.1.4.1.2011.5.25.227.2
+       -- 1.3.6.1.4.1.2011.5.25.227.1.30
+        hwTblResInfoTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwTblResInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+ 	"This table provides the information of table resource information Table."
+            ::= { hwFwdResTrapObject 30 }
+  	
+       -- 1.3.6.1.4.1.2011.5.25.227.1.30.1
+       hwTblResInfoEntry OBJECT-TYPE
+           SYNTAX HwTblResInfoEntry
+           MAX-ACCESS not-accessible
+           STATUS current
+           DESCRIPTION
+  	"Provides the information of table resource information entry."
+           INDEX { hwTblResInfoSlotId, hwTblResInfoTblName }
+           ::= { hwTblResInfoTable 1 }
+        HwTblResInfoEntry::=
+           SEQUENCE { 
+              hwTblResInfoSlotId
+                  OCTET STRING,
+              hwTblResInfoTblName
+                  OCTET STRING,
+               hwTblResInfoTotalNumber
+                   Unsigned32,
+              hwTblResInfoAllocatedlNumber
+                   Unsigned32,			  
+              hwTblResInfoFreeNumber
+ 	           Unsigned32
+             }
+  	 
+       -- 1.3.6.1.4.1.2011.5.25.227.1.30.1.1
+       hwTblResInfoSlotId OBJECT-TYPE
+         SYNTAX OCTET STRING(SIZE (0..15))
+         MAX-ACCESS read-only
+         STATUS current
+         DESCRIPTION
+  	"The value of this object identifies the slot id."
+         ::= { hwTblResInfoEntry 1 }	
+  
+         -- 1.3.6.1.4.1.2011.5.25.227.1.30.1.2
+         hwTblResInfoTblName OBJECT-TYPE
+           SYNTAX OCTET STRING(SIZE (0..63))
+           MAX-ACCESS read-only
+           STATUS current
+           DESCRIPTION
+  	"The value of this object identifies the table name."
+           ::= { hwTblResInfoEntry 2 }
+  	
+        -- 1.3.6.1.4.1.2011.5.25.227.1.30.1.3
+        hwTblResInfoTotalNumber OBJECT-TYPE
+           SYNTAX Unsigned32
+           MAX-ACCESS read-only
+           STATUS current
+           DESCRIPTION
+  	"The value of this object identifies the number of total resource."
+          ::= { hwTblResInfoEntry 3 }
+		  
+	 -- 1.3.6.1.4.1.2011.5.25.227.1.30.1.4
+        hwTblResInfoAllocatedlNumber OBJECT-TYPE
+           SYNTAX Unsigned32
+           MAX-ACCESS read-only
+           STATUS current
+           DESCRIPTION
+  	"The value of this object identifies the number of allocated resource."
+          ::= { hwTblResInfoEntry 4 }
+		  
+        -- 1.3.6.1.4.1.2011.5.25.227.1.30.1.5
+        hwTblResInfoFreeNumber OBJECT-TYPE
+           SYNTAX Unsigned32
+           MAX-ACCESS read-only
+           STATUS current
+           DESCRIPTION
+  	"The value of this object identifies the number of free resource."
+          ::= { hwTblResInfoEntry 5 }
+
+    -- 1.3.6.1.4.1.2011.5.25.227.1.31
+       hwFwdResIncomReasonId OBJECT-TYPE
+          SYNTAX INTEGER
+               {
+	smoothIncomplete(1)
+               }
+      MAX-ACCESS accessible-for-notify
+      STATUS current
+      DESCRIPTION
+                "To describe the type of data incomplete in forwarding engine resource."
+      ::= { hwFwdResTrapObject 31 }
+
+ -- 1.3.6.1.4.1.2011.5.25.227.1.32
+       hwResOverwrittenSlot OBJECT-TYPE
+           SYNTAX OCTET STRING
+      MAX-ACCESS accessible-for-notify
+      STATUS current
+      DESCRIPTION
+                " the slot id of overwritten resource."
+      ::= { hwFwdResTrapObject 32 }
+
+-- 1.3.6.1.4.1.2011.5.25.227.1.33
+       hwResOverwrittenResType OBJECT-TYPE
+       SYNTAX OCTET STRING
+      MAX-ACCESS accessible-for-notify
+      STATUS current
+      DESCRIPTION
+                "the resource type of overwritten resource."
+      ::= { hwFwdResTrapObject 33 }
+
+     -- 1.3.6.1.4.1.2011.5.25.227.1.34
+        hwFwdResCongestReasonId OBJECT-TYPE
+            SYNTAX INTEGER
+               {
+	fesDetectMsgCongest(1),
+	eumDetectMsgCongest(2),
+	rmDetectMsgCongest(3),
+	vstmDetectMsgCongest(4)
+               }
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "To describe the type of board message congest in forwarding engine resource."
+        ::= { hwFwdResTrapObject 34 }
+
+     -- 1.3.6.1.4.1.2011.5.25.227.1.35
+        hwFwdResLackFeNodeId OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                 "The FeNodeId."
+        ::= { hwFwdResTrapObject 35 }
+
+     -- 1.3.6.1.4.1.2011.5.25.227.1.36
+        hwFwdSessionResUsage OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                 "Usage of the device session resources."
+        ::= { hwFwdResTrapObject 36 }
+
+     -- 1.3.6.1.4.1.2011.5.25.227.1.37
+        hwSIDPoolID OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                 "SID pool ID."
+        ::= { hwFwdResTrapObject 37 }
+		
+     -- 1.3.6.1.4.1.2011.5.25.227.1.38
+        hwSIDResourceCurrentCount OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                 "The value of this object identifies the number of current SID pool."
+        ::= { hwFwdResTrapObject 38 }
+		
+     -- 1.3.6.1.4.1.2011.5.25.227.1.39
+        hwSIDResourceTotalCount OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                 "The value of this object identifies the total number of SID pool."
+        ::= { hwFwdResTrapObject 39 }
+		
+     -- 1.3.6.1.4.1.2011.5.25.227.1.40
+        hwSIDResourceThresholdUpperLimit OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                 "The value of this object identifies the upper threshold for the number of SID pool."
+        ::= { hwFwdResTrapObject 40 }
+		
+     -- 1.3.6.1.4.1.2011.5.25.227.1.41
+        hwSIDResourceThresholdLowerLimit OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                 "UThe value of this object identifies the lower threshold for the number of SID pool."
+        ::= { hwFwdResTrapObject 41 }
+
+     -- 1.3.6.1.4.1.2011.5.25.227.1.42
+        hwProducerComponentName OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                 "the producer component name."
+        ::= { hwFwdResTrapObject 42 }
+		
+     -- 1.3.6.1.4.1.2011.5.25.227.1.43
+        hwConsumerComponentName OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                 "the consumer component name."
+        ::= { hwFwdResTrapObject 43 }
+
+    -- 1.3.6.1.4.1.2011.5.25.227.1.44
+        hwSmoothFailedReasonId OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "the reason id."
+        ::= { hwFwdResTrapObject 44 }
+
+    -- 1.3.6.1.4.1.2011.5.25.227.1.45
+        hwEMDIInstanceId OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "the emdi instance id."
+        ::= { hwFwdResTrapObject 45 }
+           
+    -- 1.3.6.1.4.1.2011.5.25.227.1.46
+        hwEMDIIndicatorType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                    emdiIndicatorRtpLR(1),
+                    emdiIndicatorRtpSER(2),
+                    emdiIndicatorUPLR(3),
+                    emdiIndicatorDPLR(4)
+
+                }
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "the emdi alarm type."
+            ::= { hwFwdResTrapObject 46 }
+
+    -- 1.3.6.1.4.1.2011.5.25.227.1.47
+        hwEMDIIndicatorValue OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "the  value of emdi alarm."
+        ::= { hwFwdResTrapObject 47 }
+        
+    -- 1.3.6.1.4.1.2011.5.25.227.1.48
+        hwEMDIThreshold OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "the  threshold of emdi alarm."
+        ::= { hwFwdResTrapObject 48 }
+
+    -- 1.3.6.1.4.1.2011.5.25.227.1.49
+        hwMcLeafCfcCheckSlot OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "the slot id of mc leaf cfc check error."
+        ::= { hwFwdResTrapObject 49 }
+
+        -- 1.3.6.1.4.1.2011.5.25.227.1.50
+        hwAutoDiagnoseReasonId OBJECT-TYPE
+            SYNTAX INTEGER
+        {
+            sfuInterruptAlarm(1),
+            lpuModifyPacketAlarm(2),
+            sfuLinklossAlarm(3)
+        }
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "Describe the type of faults detected by the AutoDiagnose system."
+            ::= { hwFwdResTrapObject 50 }
+
+        hwVxlanTnlPeerIpAddr OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the Peer IP address."
+            ::= { hwFwdResTrapObject 51 }
+			
+        hwVxlanNveMac OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the NVE MAC address."
+            ::= { hwFwdResTrapObject 52 }       	
+
+		hwFibDeliverSlotId OBJECT-TYPE
+			SYNTAX OCTET STRING
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The information for the slot."
+            ::= { hwFwdResTrapObject 54 } 
+
+         -- 1.3.6.1.4.1.2011.5.25.227.1.55
+        hwSysResChgSlotStr OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The information for the slot."
+            ::= { hwFwdResTrapObject 55 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.227.1.56
+        hwSysResChgReasonId OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                uftResModeChanged(1),
+                enpResModeChanged(2),
+                arpResAllocationModeChanged(3),
+                riotResChanged(4),
+                fibv4ResChanged(5),
+                l3ResAllocationModeChanged(6),
+                l3IfResAllocationModeChanged(7),
+                aclExResChanged(8),
+                ipv6LongMaskResChanged(9),
+                l3ForwardHashResChanged(10),
+                uatResAllocationModeChanged(11),
+                ipv6VxlanResChanged(12),
+                srHashResChanged(13),
+                mplsResChanged(14),
+                dot1q8021pResChanged(15),
+                externalTcamResChanged(16),
+                uatHashResModeChanged(17),
+                ethtrunkModeChanged(18),
+                ingressVlanXlateModeChanged(19),
+                egressVlanXlateModeChanged(20),
+                qosaifabricdppModeChanged(21),
+                qosBuffAutoConfigChanged(22),
+                qosLosslessModeChanged(23),
+                incConfigChanged(24)
+                }
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "To describe the type of fowarding engine resource."
+            ::= { hwFwdResTrapObject 56 }
+
+        -- 1.3.6.1.4.1.2011.5.25.227.1.57
+        hwSysResChgReasonDescription OBJECT-TYPE
+            SYNTAX OCTET STRING(SIZE(0..256))
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The specific description for failed reason."
+            ::= { hwFwdResTrapObject 57 }
+
+     -- 1.3.6.1.4.1.2011.5.25.227.1.58
+		hwSessThreshold OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"The threshold of the device session resources."
+		::= { hwFwdResTrapObject 58 }
+
+    -- 1.3.6.1.4.1.2011.5.25.227.1.59
+        hwAclRuleResUsage OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                 "Usage of the device acl rule resources."
+        ::= { hwFwdResTrapObject 59 }
+
+    -- 1.3.6.1.4.1.2011.5.25.227.1.60
+        hwAclRuleThreshold OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                 "The threshold of the device acl rule resources."
+        ::= { hwFwdResTrapObject 60 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.227.1.61
+        hwAclGroupResUsage OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                 "Usage of the device acl group resources."
+        ::= { hwFwdResTrapObject 61 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.227.1.62
+        hwAclGroupThreshold OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                 "The threshold of the device acl group resources."
+        ::= { hwFwdResTrapObject 62 }
+   
+    -- 1.3.6.1.4.1.2011.5.25.227.1.63
+        hwEMDISlotStr OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                 "The slot of the device emdi resources."
+        ::= { hwFwdResTrapObject 63 }
+
+      -- 1.3.6.1.4.1.2011.5.25.227.1.64
+        hwEMDIResUsed OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                 "The used of the device emdi resources."
+        ::= { hwFwdResTrapObject 64 }  
+     
+     -- 1.3.6.1.4.1.2011.5.25.227.1.65
+        hwEMDIResTotal OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                 "The total of the device emdi resources."
+        ::= { hwFwdResTrapObject 65 }
+
+        hwPacketChangeInPort OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the changed packet's in port."
+            ::= { hwFwdResTrapObject 66 }
+			
+        hwPacketChangeOutPort OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the changed packet's out port."
+            ::= { hwFwdResTrapObject 67 } 
+      	
+      -- 1.3.6.1.4.1.2011.5.25.227.1.68
+        hwSaidPingDetectInterface OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                 "The detect port of the SAID PING node."
+        ::= { hwFwdResTrapObject 68 }
+		
+    -- 1.3.6.1.4.1.2011.5.25.227.1.69
+        hwNetStreamIPv4OriginalFlowUsage OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                 "Usage of the NetStream IPv4 original flows."
+        ::= { hwFwdResTrapObject 69 }
+
+    -- 1.3.6.1.4.1.2011.5.25.227.1.70
+        hwNetStreamIPv4OriginalFlowThreshold OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                 "Threshold of the NetStream IPv4 original flows."
+        ::= { hwFwdResTrapObject 70 }		
+		
+    -- 1.3.6.1.4.1.2011.5.25.227.1.71
+        hwNetStreamIPv4FlexibleFlowUsage OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                 "Usage of the NetStream IPv4 flexible flows."
+        ::= { hwFwdResTrapObject 71 }
+
+    -- 1.3.6.1.4.1.2011.5.25.227.1.72
+        hwNetStreamIPv4FlexibleFlowThreshold OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                 "Threshold of the NetStream IPv4 flexible flows."
+        ::= { hwFwdResTrapObject 72 }
+
+        -- 1.3.6.1.4.1.2011.5.25.227.1.73
+        hwFwmFaultSlotStr OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The information for the slot."
+            ::= { hwFwdResTrapObject 73 }    
+
+        -- 1.3.6.1.4.1.2011.5.25.227.1.74
+        hwFwmFaultCpuStr OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The information for the cpu."
+            ::= { hwFwdResTrapObject 74 }    
+
+        -- 1.3.6.1.4.1.2011.5.25.227.1.75
+        hwFwmFaultReasonId OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                ipv4FibDbNotResponse(1),
+                ipv6FibDbNotResponse(2)
+            }
+            MAX-ACCESS accessible-for-notify
+            STATUS current 
+            DESCRIPTION
+                "To describe the reason id of forwarding manage module fault."
+            ::= { hwFwdResTrapObject 75 }
+
+			
+        -- 1.3.6.1.4.1.2011.5.25.227.1.76
+        hwFwmFaultReasonDescription OBJECT-TYPE
+            SYNTAX OCTET STRING(SIZE(0..256))
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The specific description for failed reason."
+            ::= { hwFwdResTrapObject 76 }
+
+        -- 1.3.6.1.4.1.2011.5.25.227.1.77
+        hwFwmSliceInterfaceName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..64))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The physical interface name."
+            ::= { hwFwdResTrapObject 77 }
+
+        -- 1.3.6.1.4.1.2011.5.25.227.1.78
+        hwFwmSliceId OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "Slice id."
+            ::= { hwFwdResTrapObject 78 }
+
+        -- 1.3.6.1.4.1.2011.5.25.227.1.79
+        hwFwmSliceTrunkInterfaceName OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The trunk interface name."
+            ::= { hwFwdResTrapObject 79 }
+
+        -- 1.3.6.1.4.1.2011.5.25.227.1.80
+        hwFwmSliceSrcInterfaceName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..64))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The source physical interface name."
+            ::= { hwFwdResTrapObject 80 }
+
+        -- 1.3.6.1.4.1.2011.5.25.227.1.81
+        hwFwmSliceResourceReasonId OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                bandwidthInsufficient(1),
+                sliceResourcePerInterfaceInsufficient(2),
+                sliceResourcePerChipInsufficient(3)
+            }
+            MAX-ACCESS accessible-for-notify
+            STATUS current 
+            DESCRIPTION
+                "To describe the reason id of slice resource fault."
+            ::= { hwFwdResTrapObject 81 }
+
+        -- 1.3.6.1.4.1.2011.5.25.227.1.82
+        hwFwmSliceFwdReasonId OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                sliceMapQueueMissMatch(1),
+                sliceMapMissMatch(2)
+            }
+            MAX-ACCESS accessible-for-notify
+            STATUS current 
+            DESCRIPTION
+                "To describe the reason id of slice fowarding fault."
+            ::= { hwFwdResTrapObject 82 }
+
+        -- 1.3.6.1.4.1.2011.5.25.227.1.83
+        hwFwmSliceSlotStr OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The information for the slot."
+            ::= { hwFwdResTrapObject 83 }
+
+        -- 1.3.6.1.4.1.2011.5.25.227.1.84
+        hwFwmSliceReasonDescription OBJECT-TYPE
+            SYNTAX OCTET STRING(SIZE(0..256))
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The specific description for failed reason."
+            ::= { hwFwdResTrapObject 84 }
+
+       -- 1.3.6.1.4.1.2011.5.25.227.2
         hwFwdResTraps OBJECT IDENTIFIER ::= { hwFwdResTrapMIB 2 }
         
         -- 1.3.6.1.4.1.2011.5.25.227.2.1
@@ -1553,7 +3322,7 @@
             DESCRIPTION 
                         "PHP labels added failed because of insufficient resource."
             ::= { hwFwdResLacTrap 23 }
-            
+			
         -- 1.3.6.1.4.1.2011.5.25.227.2.2
         hwFwdProcFailForLCSTrap OBJECT IDENTIFIER ::= { hwFwdResTraps 2 }
 
@@ -1606,7 +3375,189 @@
             STATUS current
             DESCRIPTION 
                 "The service table check inconsistent was removed."
-            ::= { hwFwdEntryConflictTrap 4 }
+            ::= { hwFwdEntryConflictTrap 4 }		
+		
+       -- 1.3.6.1.4.1.2011.5.25.227.2.3.7
+        hwFibDeliverFailed NOTIFICATION-TYPE
+            OBJECTS { hwFibDeliverSlotId }
+            STATUS current
+            DESCRIPTION 
+                        "The route failed to be delivered because of internal error."
+            ::= { hwFwdEntryConflictTrap 7 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.227.2.3.8
+        hwFibDeliverFailedResume NOTIFICATION-TYPE
+            OBJECTS { hwFibDeliverSlotId }
+            STATUS current
+            DESCRIPTION 
+                        "The route success to be delivered in 24hours."
+            ::= { hwFwdEntryConflictTrap 8 }
+			
+       -- 1.3.6.1.4.1.2011.5.25.227.2.4
+       hwFwdResIncompTrap OBJECT IDENTIFIER ::= { hwFwdResTraps 4 }
+
+        -- 1.3.6.1.4.1.2011.5.25.227.2.4.1
+        hwFwdDataSyncIncomplete NOTIFICATION-TYPE
+            OBJECTS { hwFwdResIncomReasonId }
+            STATUS current
+            DESCRIPTION 
+                        "Data synchronization is incomplete."
+            ::= { hwFwdResIncompTrap 1 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.227.2.4.2
+        hwFwdDataSyncIncompleteResume NOTIFICATION-TYPE
+            OBJECTS { hwFwdResIncomReasonId }
+            STATUS current
+            DESCRIPTION 
+                        "Data synchronization is restored."
+            ::= { hwFwdResIncompTrap 2 }
+
+       -- 1.3.6.1.4.1.2011.5.25.227.2.5
+       hwResourceOverwrittenTrap OBJECT IDENTIFIER ::= { hwFwdResTraps 5 }
+        -- 1.3.6.1.4.1.2011.5.25.227.2.5.1
+        hwResourceOverwrittenAlarm NOTIFICATION-TYPE
+            OBJECTS { hwResOverwrittenSlot,  hwResOverwrittenResType}
+            STATUS current
+            DESCRIPTION 
+                        "Chip resources are overwritten."
+            ::= { hwResourceOverwrittenTrap 1 }
+        -- 1.3.6.1.4.1.2011.5.25.227.2.5.2
+        hwResourceOverwrittenAlarmResume NOTIFICATION-TYPE
+            OBJECTS { hwResOverwrittenSlot,  hwResOverwrittenResType}
+            STATUS current
+            DESCRIPTION 
+                        "Overwritten chip resources are recovered."
+            ::= { hwResourceOverwrittenTrap 2}
+
+       -- 1.3.6.1.4.1.2011.5.25.227.2.6
+       hwFwdResMsgCongestTrap OBJECT IDENTIFIER ::= { hwFwdResTraps 6 }
+		
+        -- 1.3.6.1.4.1.2011.5.25.227.2.6.1
+        hwBoardFwdMsgCongest NOTIFICATION-TYPE
+            OBJECTS { hwFwdResLackSlotStr, hwFwdResLackFeNodeId, hwFwdResCongestReasonId }
+            STATUS current
+            DESCRIPTION 
+                        "The message forwarding on the board is congested."
+            ::= { hwFwdResMsgCongestTrap 1 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.227.2.6.2
+        hwBoardFwdMsgCongestResume NOTIFICATION-TYPE
+            OBJECTS { hwFwdResLackSlotStr, hwFwdResLackFeNodeId, hwFwdResCongestReasonId }
+            STATUS current
+            DESCRIPTION 
+                        "The message forwarding congestion is resolved."
+            ::= { hwFwdResMsgCongestTrap 2 }
+			
+       -- 1.3.6.1.4.1.2011.5.25.227.2.7
+       hwMcLeafCfcCheckTrap OBJECT IDENTIFIER ::= { hwFwdResTraps 7 }
+		
+        -- 1.3.6.1.4.1.2011.5.25.227.2.7.1
+        hwMcLeafCfcCheck NOTIFICATION-TYPE
+            OBJECTS {  hwMcLeafCfcCheckSlot }
+            STATUS current
+            DESCRIPTION 
+                        "The multicast leaf count check inconsistent."
+            ::= { hwMcLeafCfcCheckTrap 1 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.227.2.7.2
+        hwMcLeafCfcCheckResume NOTIFICATION-TYPE
+            OBJECTS {  hwMcLeafCfcCheckSlot }
+            STATUS current
+            DESCRIPTION 
+                        "The multicast leaf count check inconsistent was removed."
+            ::= { hwMcLeafCfcCheckTrap 2 }
+    
+       -- 1.3.6.1.4.1.2011.5.25.227.2.8
+       hwMplsLabelExceedTrap OBJECT IDENTIFIER ::= { hwFwdResTraps 8 }
+        -- 1.3.6.1.4.1.2011.5.25.227.2.8.1
+        hwMplsLabelExceedAlarm NOTIFICATION-TYPE
+            STATUS current
+            DESCRIPTION 
+                        "The number of labels exceeds the device's encapsulation capability."
+            ::= { hwMplsLabelExceedTrap 1 }
+        -- 1.3.6.1.4.1.2011.5.25.227.2.8.2
+        hwMplsLabelExceedAlarmResume NOTIFICATION-TYPE
+            STATUS current
+            DESCRIPTION 
+                        "The problem that the number of labels exceeds the device's encapsulation capability has been resolved."
+            ::= { hwMplsLabelExceedTrap 2}
+
+        hwVxlanNveMacConflictTrap OBJECT IDENTIFIER ::= { hwFwdResTraps 9 }
+        hwVxlanNveMacConflict NOTIFICATION-TYPE
+            OBJECTS { hwVxlanNveMac, hwVxlanTnlPeerIpAddr}
+            STATUS current
+            DESCRIPTION
+                "MAC addresses of NVE interfaces on distributed VXLAN gateways conflict."
+            ::= { hwVxlanNveMacConflictTrap 1 }
+        hwVxlanNveMacConflictClear NOTIFICATION-TYPE
+            OBJECTS { hwVxlanNveMac, hwVxlanTnlPeerIpAddr}
+            STATUS current
+            DESCRIPTION
+                "MAC addresses of NVE interfaces on distributed VXLAN gateways conflict resolved."
+            ::= { hwVxlanNveMacConflictTrap 2 }
+
+        -- 1.3.6.1.4.1.2011.5.25.227.2.10
+        hwNsFlowEntryExceedTrap OBJECT IDENTIFIER ::= { hwFwdResTraps 10 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.227.2.10.1
+		hwNsOrigFlexFlowExceedAlarm NOTIFICATION-TYPE
+            OBJECTS { hwFwdResLackSlotStr }
+            STATUS current
+            DESCRIPTION
+                "The usage of NetStream original and flexible flow entries exceeded 80%."
+            ::= { hwNsFlowEntryExceedTrap 1 }
+        -- 1.3.6.1.4.1.2011.5.25.227.2.10.2
+        hwNsOrigFlexFlowExceedResume NOTIFICATION-TYPE
+            OBJECTS { hwFwdResLackSlotStr }
+            STATUS current
+            DESCRIPTION
+                "The usage of NetStream original and flexible flow entries fell below 70%."
+            ::= { hwNsFlowEntryExceedTrap 2 }
+        -- 1.3.6.1.4.1.2011.5.25.227.2.10.3
+        hwNsAggFlowExceedAlarm NOTIFICATION-TYPE
+            OBJECTS { hwFwdResLackSlotStr }
+            STATUS current
+            DESCRIPTION
+                "The usage of NetStream aggregation flow entries exceeded 80%."
+            ::= { hwNsFlowEntryExceedTrap 3 }
+		-- 1.3.6.1.4.1.2011.5.25.227.2.10.4
+        hwNsAggFlowExceedResume NOTIFICATION-TYPE
+            OBJECTS { hwFwdResLackSlotStr }
+            STATUS current
+            DESCRIPTION
+                "The usage of NetStream aggregation flow entries fell below 70%."
+            ::= { hwNsFlowEntryExceedTrap 4 }
+
+        -- 1.3.6.1.4.1.2011.5.25.227.2.11
+        hwNvo3VxlanSrcIpDiffTrap OBJECT IDENTIFIER ::= { hwFwdResTraps 11 }
+        -- 1.3.6.1.4.1.2011.5.25.227.2.11.1
+        hwNvo3VxlanSrcIpDiffAlarm NOTIFICATION-TYPE
+            OBJECTS { hwVxlanTnlPeerIpAddr}
+            STATUS current
+            DESCRIPTION
+                "Multiple VXLAN tunnels have different local IP addresses and the same destination IP address, which may affect traffic forwarding. Change the local IP addresses to be the same."
+            ::= { hwNvo3VxlanSrcIpDiffTrap 1 }
+        -- 1.3.6.1.4.1.2011.5.25.227.2.11.2
+        hwNvo3VxlanSrcIpDiffAlarmResume NOTIFICATION-TYPE
+            OBJECTS { hwVxlanTnlPeerIpAddr}
+            STATUS current
+            DESCRIPTION
+                "The alarm caused by different local IP addresses of multiple VXLAN tunnels is cleared."
+            ::= { hwNvo3VxlanSrcIpDiffTrap 2 }
+
+        hwPacketChangeTrap OBJECT IDENTIFIER ::= { hwFwdResTraps 12 }
+        hwPacketChange NOTIFICATION-TYPE
+            OBJECTS { hwPacketChangeInPort, hwPacketChangeOutPort}
+            STATUS current
+            DESCRIPTION
+                "Packets are changed."
+            ::= { hwPacketChangeTrap 1 }
+        hwPacketChangeClear NOTIFICATION-TYPE
+            OBJECTS { hwPacketChangeInPort, hwPacketChangeOutPort}
+            STATUS current
+            DESCRIPTION
+                "Packets are no longer changed."
+            ::= { hwPacketChangeTrap 2 }
 
         -- 1.3.6.1.4.1.2011.5.25.227.3
         hwFwdResTrapConformance OBJECT IDENTIFIER ::= { hwFwdResTrapMIB 3 }
@@ -1629,7 +3580,7 @@
         -- 1.3.6.1.4.1.2011.5.25.227.3.2.1
         hwFwdResObjectGroup OBJECT-GROUP
             OBJECTS { hwEntPhysicalindex, hwFwdResLackSlotStr, hwFwdResLackReasonId, hwFwdResThreshold, hwL3FailedService, hwCommand, hwViewName, hwReasonDescription,hwFwdResLackVrId, hwFwdProcFailForLCSOperationId,hwFwdLicenseName, hwFwdResDevName, hwFwdResLimit, hwFwdResCurThroughput,hwFpId,hwFpResourceType,hwFpResourceCurrentCount,hwFpResourceTotalCount,
-hwFpResourceThresholdUpperLimit,hwFpResourceThresholdLowerLimit,hwVpFeatureName,hwNoSuppVxlanFragVni,hwNoSuppVxlanFragSourceIp,hwNoSuppVxlanFragPeerIp,hwFwdResLackIPStr,hwFwdResLackVrfId }
+hwFpResourceThresholdUpperLimit,hwFpResourceThresholdLowerLimit,hwVpFeatureName,hwNoSuppVxlanFragVni,hwNoSuppVxlanFragSourceIp,hwNoSuppVxlanFragPeerIp,hwFwdResLackIPStr,hwFwdResLackVrfId, hwFwdResIncomReasonId, hwResOverwrittenSlot, hwResOverwrittenResType, hwFwdResCongestReasonId, hwFwdResLackFeNodeId, hwFwdSessionResUsage,hwEMDIInstanceId,hwEMDIIndicatorType,hwEMDIIndicatorValue,hwEMDIThreshold,hwAutoDiagnoseReasonId,hwFibDeliverSlotId,hwSysResChgSlotStr,hwSysResChgReasonId,hwSysResChgReasonDescription,hwSessThreshold,hwAclRuleResUsage,hwAclRuleThreshold,hwAclGroupResUsage,hwAclGroupThreshold,hwVxlanTnlPeerIpAddr,hwEMDISlotStr,hwEMDIResUsed,hwEMDIResTotal,hwPacketChangeInPort,hwPacketChangeOutPort ,hwSaidPingDetectInterface,hwNetStreamIPv4OriginalFlowUsage,hwNetStreamIPv4OriginalFlowThreshold,hwNetStreamIPv4FlexibleFlowUsage,hwNetStreamIPv4FlexibleFlowThreshold}
             STATUS current
             DESCRIPTION 
                 "Group for base trap objects."
@@ -1643,8 +3594,11 @@ hwFpResourceThresholdUpperLimit,hwFpResourceThresholdLowerLimit,hwVpFeatureName,
             hwBoardResThresholdExceed,hwBoardResThresholdExceedResume,hwBoardResWarningThresholdExceed,hwBoardResWarningThresholdExceedResume,hwBoardIPv6ACLResLack,
             hwFwdProcFailForLCS, hwFwdProcFailForLCSResume,hwFwdEntryConflict,hwFwdEntryConflictResume, hwFwdResOverLimit, hwFwdResOverLimitResume, hwFwdResOverThresh, hwFwdResOverThreshResume,
             hwFpResourceThresholdExceed,hwFpResourceThresholdExceedClear,hwFpResourceTotalCountExceed,hwFpResourceTotalCountExceedClear, hwVpresExceed, hwBoardMplsNonSupport, hwBoardMplsFwdResLack, hwBoardMplsFwdResLackResume,
-            hwFwdSessionResLack, hwFwdSessionResLackResume,hwFwdFastTableResLack, hwFwdFastTableResLackResume,hwNotsuppDecapVxlanFragPackets,hwBoardVbdifResLack,hwVxlanTnlCfgFailed,hwNotsuppDecapVxlanPackets,hwBoardL3NDResLack,hwBoardL3FIBResLack
-            }
+            hwFwdSessionResLack, hwFwdSessionResLackResume,hwFwdFastTableResLack, hwFwdFastTableResLackResume,hwNotsuppDecapVxlanFragPackets,hwBoardVbdifResLack,hwVxlanTnlCfgFailed,hwNotsuppDecapVxlanPackets,hwBoardL3NDResLack,hwBoardL3FIBResLack,
+            hwFwdDataSyncIncomplete, hwFwdDataSyncIncompleteResume, hwResourceOverwrittenAlarm, hwResourceOverwrittenAlarmResume, 
+hwBoardFwdMsgCongest, hwBoardFwdMsgCongestResume , hwBoardMplsFlowLabelNonSupp, hwTrunkWeightExceed, hwTrunkWeightExceedResume,hwSidResourceTotalCountExceed,hwSidResourceTotalCountExceedClear,hwSidResourceThresholdExceed,hwSidResourceThresholdExceedClear,hwBoardMcResFull,hwBoardMplsFwdResFull,hwBoardL3ResFull,hwEMDIIndicatorOverThreshold,hwEMDIIndicatorOverThresholdResume,hwEMDIReceiveDuplicatePackets,hwEMDIReceiveDuplicatePacketsResume,hwBoardMcResLack,hwBoardMcResLackResume, hwMcLeafCfcCheck, hwMcLeafCfcCheckResume,hwMplsLabelExceedAlarm,hwMplsLabelExceedAlarmResume,
+hwAutoDiagnoseAlarm,hwAutoDiagnoseAlarmResume,hwEcmpMemberLimitOverThresholdAlarm,hwFibDeliverFailed,hwFibDeliverFailedResume,hwNsOrigFlexFlowExceedAlarm, hwNsOrigFlexFlowExceedResume, hwNsAggFlowExceedAlarm, hwNsAggFlowExceedResume,hwSysResChangedAlarm,hwSysResChangedAlarmResume,hwSessExceed,hwSessExceedClear,hwSessThresholdExceed,hwSessThresholdExceedClear,hwPingfFail,hwAclRuleExceed,hwAclRuleExceedClear,hwAclGroupExceed,hwAclGroupExceedClear,
+hwBoardResCriticalThresholdExceed, hwBoardResCriticalThresholdExceedResume,hwNvo3VxlanSrcIpDiffAlarm,hwNvo3VxlanSrcIpDiffAlarmResume,hwEMDIResLack,hwEMDIResLackResume,hwPacketChange,hwPacketChangeClear,hwSaidPingPktModifiedAlarm,hwNetStreamIPv4OriginalFlowExceeded,hwNetStreamIPv4OriginalFlowFellBelow,hwNetStreamIPv4FlexibleFlowExceeded,hwNetStreamIPv4FlexibleFlowFellBelow}
             STATUS current
             DESCRIPTION 
                 "Group for all base traps."
@@ -1748,14 +3702,16 @@ hwFpResourceThresholdUpperLimit,hwFpResourceThresholdLowerLimit,hwVpFeatureName,
 
       -- 1.3.6.1.4.1.2011.5.25.227.2.1.36
       hwFwdSessionResLack NOTIFICATION-TYPE
+                     OBJECTS { hwFwdSessionResUsage }
                      STATUS current
                      DESCRIPTION
-		"The device session resources were overloadeds."
+		"The device session resources were overloaded."
 	::= { hwFwdResLacTrap 36 }
 
        -- 1.3.6.1.4.1.2011.5.25.227.2.1.37      
      hwFwdSessionResLackResume NOTIFICATION-TYPE
-                     STATUS current
+                   OBJECTS { hwFwdSessionResUsage }
+                   STATUS current
 	DESCRIPTION
 		"The device session resources were resumed."
 	::= { hwFwdResLacTrap 37 }
@@ -1825,8 +3781,380 @@ hwFpResourceThresholdUpperLimit,hwFpResourceThresholdLowerLimit,hwVpFeatureName,
 	DESCRIPTION
 	    "This object indicates that fail to download FIB entry because of LPM failure."
 	::= { hwFwdResLacTrap 45 }
-    END
 
+      -- 1.3.6.1.4.1.2011.5.25.227.2.1.46
+      hwBoardMplsFlowLabelNonSupp NOTIFICATION-TYPE
+                   OBJECTS { hwFwdResLackSlotStr}
+	STATUS current
+	DESCRIPTION
+	    "The board does not support MPLS flow label."
+	::= { hwFwdResLacTrap 46 }
+
+      -- 1.3.6.1.4.1.2011.5.25.227.2.1.47
+      hwTrunkWeightExceed NOTIFICATION-TYPE
+          OBJECTS { hwEntPhysicalindex, entPhysicalName, hwFwdResLackSlotStr, hwFwdResLackReasonId }
+          STATUS current
+          DESCRIPTION 
+              "The sum of all member interfaces' weights of a trunk interface exceeded the maximum value supported by the board."
+          ::= { hwFwdResLacTrap 47 }
+	 
+      -- 1.3.6.1.4.1.2011.5.25.227.2.1.48
+      hwTrunkWeightExceedResume NOTIFICATION-TYPE
+          OBJECTS { hwEntPhysicalindex, entPhysicalName, hwFwdResLackSlotStr, hwFwdResLackReasonId }
+          STATUS current
+          DESCRIPTION 
+              "The sum of all member interfaces' weights of each trunk interface is less than the maximum value supported by the board."
+          ::= { hwFwdResLacTrap 48 }
+
+      -- 1.3.6.1.4.1.2011.5.25.227.2.1.49
+      hwSidResourceThresholdExceed NOTIFICATION-TYPE
+	OBJECTS {hwSIDPoolID, hwSIDResourceCurrentCount, hwSIDResourceTotalCount, hwSIDResourceThresholdUpperLimit, hwSIDResourceThresholdLowerLimit}
+	STATUS current
+	DESCRIPTION 
+		"This object indicates that the number of SID pool has fallen below the upper threshol."
+	::= { hwFwdResLacTrap 49 }
+
+      -- 1.3.6.1.4.1.2011.5.25.227.2.1.50
+      hwSidResourceThresholdExceedClear NOTIFICATION-TYPE
+	OBJECTS {hwSIDPoolID, hwSIDResourceCurrentCount, hwSIDResourceTotalCount, hwSIDResourceThresholdUpperLimit, hwSIDResourceThresholdLowerLimit}
+	STATUS current
+	DESCRIPTION 
+		"This object indicates that the number of SID pool has fallen below the lower threshol."
+	::= { hwFwdResLacTrap 50 }		  
+	
+      -- 1.3.6.1.4.1.2011.5.25.227.2.1.51
+      hwSidResourceTotalCountExceed  NOTIFICATION-TYPE
+	OBJECTS {hwSIDPoolID, hwSIDResourceCurrentCount, hwSIDResourceTotalCount}
+	STATUS current
+	DESCRIPTION 
+		"This object indicates that the number of SID pool has reached the maximum number."
+	::= { hwFwdResLacTrap 51 }
+
+      -- 1.3.6.1.4.1.2011.5.25.227.2.1.52
+      hwSidResourceTotalCountExceedClear NOTIFICATION-TYPE
+	OBJECTS {hwSIDPoolID, hwSIDResourceCurrentCount, hwSIDResourceTotalCount}
+	STATUS current
+	DESCRIPTION 
+		"This object indicates that the number of SID pool fallen below the clear alarm threshold."
+	::= { hwFwdResLacTrap 52 }			  
+
+      -- 1.3.6.1.4.1.2011.5.25.227.2.1.53
+      hwBoardMcResFull NOTIFICATION-TYPE
+                   OBJECTS {hwFwdResLackSlotStr, hwFwdResLackReasonId }
+	STATUS current
+	DESCRIPTION
+	    "This object indicates that multicast resource is full."
+	::= { hwFwdResLacTrap 53 }
+
+      -- 1.3.6.1.4.1.2011.5.25.227.2.1.54
+      hwBoardMplsFwdResFull NOTIFICATION-TYPE
+                   OBJECTS {hwFwdResLackSlotStr, hwFwdResLackReasonId }
+	STATUS current
+	DESCRIPTION
+	    "This object indicates that MPLS resource is full."
+	::= { hwFwdResLacTrap 54 }
+
+      -- 1.3.6.1.4.1.2011.5.25.227.2.1.55
+      hwBoardL3ResFull NOTIFICATION-TYPE
+                   OBJECTS {hwFwdResLackSlotStr, hwFwdResLackReasonId }
+	STATUS current
+	DESCRIPTION
+	    "This object indicates that l3 resource is full."
+	::= { hwFwdResLacTrap 55 }
+
+      -- 1.3.6.1.4.1.2011.5.25.227.2.1.56
+      hwFwdComponentSmoothFailed NOTIFICATION-TYPE
+                   OBJECTS { entPhysicalName, hwFwdResLackSlotStr, hwProducerComponentName, hwConsumerComponentName, hwSmoothFailedReasonId}
+	STATUS current
+	DESCRIPTION
+	    "This object indicates that component smooth failed to finish."
+	::= { hwFwdResLacTrap 56 }
+
+      -- 1.3.6.1.4.1.2011.5.25.227.2.1.57
+      hwFwdComponentSmoothFailedClear NOTIFICATION-TYPE
+                   OBJECTS { entPhysicalName, hwFwdResLackSlotStr, hwProducerComponentName, hwConsumerComponentName, hwSmoothFailedReasonId}
+	STATUS current
+	DESCRIPTION
+	    "This object indicates that component smooth end."
+	::= { hwFwdResLacTrap 57 }
+
+    -- 1.3.6.1.4.1.2011.5.25.227.2.1.58
+      hwEMDIIndicatorOverThreshold NOTIFICATION-TYPE
+                   OBJECTS { hwEMDIInstanceId,hwEMDIIndicatorType,hwEMDIIndicatorValue,hwEMDIThreshold}
+	STATUS current
+	DESCRIPTION
+	    "The monitor indicator exceeded the threshold."
+	::= { hwFwdResLacTrap 58 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.227.2.1.59
+      hwEMDIIndicatorOverThresholdResume NOTIFICATION-TYPE
+                   OBJECTS { hwEMDIInstanceId,hwEMDIIndicatorType,hwEMDIIndicatorValue,hwEMDIThreshold}
+	STATUS current
+	DESCRIPTION
+	    "The monitor indicator exceeded trap resume."
+	::= { hwFwdResLacTrap 59 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.227.2.1.60
+      hwEMDIReceiveDuplicatePackets NOTIFICATION-TYPE
+                   OBJECTS { hwEMDIThreshold}
+	STATUS current
+	DESCRIPTION
+	    "The device received duplicate packets."
+	::= { hwFwdResLacTrap 60 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.227.2.1.61
+      hwEMDIReceiveDuplicatePacketsResume NOTIFICATION-TYPE
+                   OBJECTS { hwEMDIThreshold}
+	STATUS current
+	DESCRIPTION
+	    "The device didn't received duplicate packets."
+	::= { hwFwdResLacTrap 61 }
+    -- 1.3.6.1.4.1.2011.5.25.227.2.1.62
+      hwBoardMcResLack NOTIFICATION-TYPE
+                   OBJECTS { hwFwdResThreshold, hwFwdResLackSlotStr, hwFwdResLackReasonId}
+	STATUS current
+	DESCRIPTION
+	    "This object indicates that multicast entry resources were overloaded."
+	::= { hwFwdResLacTrap 62 }
+    -- 1.3.6.1.4.1.2011.5.25.227.2.1.63
+      hwBoardMcResLackResume NOTIFICATION-TYPE
+                   OBJECTS { hwFwdResThreshold, hwFwdResLackSlotStr, hwFwdResLackReasonId}
+	STATUS current
+	DESCRIPTION
+	    "This object indicates that multicast entry resources were resumed."
+	::= { hwFwdResLacTrap 63 }
+
+       -- 1.3.6.1.4.1.2011.5.25.227.2.1.64
+        hwAutoDiagnoseAlarm NOTIFICATION-TYPE
+            OBJECTS {hwAutoDiagnoseReasonId, hwReasonDescription}
+            STATUS current
+            DESCRIPTION 
+                        "The AutoDiagnose system detects that the device is faulty."
+            ::= { hwFwdResLacTrap 64}
+            
+        -- 1.3.6.1.4.1.2011.5.25.227.2.1.65
+        hwAutoDiagnoseAlarmResume NOTIFICATION-TYPE
+            OBJECTS {hwAutoDiagnoseReasonId, hwReasonDescription}
+            STATUS current
+            DESCRIPTION 
+                        "The AutoDiagnose system detects that the faulty device recovers."
+            ::= { hwFwdResLacTrap 65 }	
+
+        -- 1.3.6.1.4.1.2011.5.25.227.2.1.66
+        hwEcmpMemberLimitOverThresholdAlarm NOTIFICATION-TYPE
+            OBJECTS {hwFwdResLackSlotStr}
+            STATUS current
+            DESCRIPTION 
+                        "The number of next hops to which routes recurse exceeds the device capability. During route convergence, load balancing may fail on some links."
+            ::= { hwFwdResLacTrap 66}
+
+        -- 1.3.6.1.4.1.2011.5.25.227.2.1.67
+        hwSysResChangedAlarm NOTIFICATION-TYPE
+            OBJECTS { hwSysResChgSlotStr, hwSysResChgReasonId, hwSysResChgReasonDescription }
+            STATUS current
+            DESCRIPTION 
+                        "The mode of forwarding resourecs was changed."
+            ::= { hwFwdResLacTrap 67 }
+            
+        -- 1.3.6.1.4.1.2011.5.25.227.2.1.68
+        hwSysResChangedAlarmResume NOTIFICATION-TYPE
+            OBJECTS { hwSysResChgSlotStr, hwSysResChgReasonId, hwSysResChgReasonDescription }
+            STATUS current
+            DESCRIPTION 
+                        "The mode of forwarding resourecs was resumed."
+            ::= { hwFwdResLacTrap 68 }
+
+     -- 1.3.6.1.4.1.2011.5.25.227.2.1.69
+		hwSessExceed NOTIFICATION-TYPE
+			OBJECTS { hwFwdSessionResUsage, hwSessThreshold }
+			STATUS current
+			DESCRIPTION
+				"The number of session resources exceeds the limit."
+		::= { hwFwdResLacTrap 69 }
+
+     -- 1.3.6.1.4.1.2011.5.25.227.2.1.70
+		hwSessExceedClear NOTIFICATION-TYPE
+			OBJECTS { hwFwdSessionResUsage, hwSessThreshold }
+			STATUS current
+			DESCRIPTION
+				"The number of session resources falls below the limit."
+		::= { hwFwdResLacTrap 70 }
+
+	 -- 1.3.6.1.4.1.2011.5.25.227.2.1.71
+		hwSessThresholdExceed NOTIFICATION-TYPE
+			OBJECTS { hwFwdSessionResUsage, hwSessThreshold }
+			STATUS current
+			DESCRIPTION
+				"The number of session resources exceeds the threshold."
+		::= { hwFwdResLacTrap 71 }
+
+     -- 1.3.6.1.4.1.2011.5.25.227.2.1.72
+		hwSessThresholdExceedClear NOTIFICATION-TYPE
+			OBJECTS { hwFwdSessionResUsage, hwSessThreshold }
+			STATUS current
+			DESCRIPTION
+				" The number of session resources falls below the threshold."
+		::= { hwFwdResLacTrap 72 }
+
+      -- 1.3.6.1.4.1.2011.5.25.227.2.1.73
+              hwPingfFail NOTIFICATION-TYPE
+	           STATUS current
+	           DESCRIPTION
+	                   "This object indicates that pingf fail."
+              ::= { hwFwdResLacTrap 73 }
+
+      -- 1.3.6.1.4.1.2011.5.25.227.2.1.74
+              hwAclRuleExceed NOTIFICATION-TYPE
+              OBJECTS { hwAclRuleResUsage, hwAclRuleThreshold }
+	           STATUS current
+	           DESCRIPTION
+	                   "The number of acl rule resource is full."
+              ::= { hwFwdResLacTrap 74 }
+
+      -- 1.3.6.1.4.1.2011.5.25.227.2.1.75
+              hwAclRuleExceedClear NOTIFICATION-TYPE
+              OBJECTS { hwAclRuleResUsage, hwAclRuleThreshold }
+	           STATUS current
+	           DESCRIPTION
+	                   "The number of acl rule resource falls below the threshold."
+              ::= { hwFwdResLacTrap 75 }
+
+      -- 1.3.6.1.4.1.2011.5.25.227.2.1.76
+              hwAclGroupExceed NOTIFICATION-TYPE
+              OBJECTS { hwAclGroupResUsage, hwAclGroupThreshold }
+	           STATUS current
+	           DESCRIPTION
+	                   "The number of acl group resource is full."
+              ::= { hwFwdResLacTrap 76 }
+
+      -- 1.3.6.1.4.1.2011.5.25.227.2.1.77
+              hwAclGroupExceedClear NOTIFICATION-TYPE
+              OBJECTS { hwAclGroupResUsage, hwAclGroupThreshold }
+	           STATUS current
+	           DESCRIPTION
+	                   "The number of acl group resource falls below the threshold."
+              ::= { hwFwdResLacTrap 77 }
+
+        -- 1.3.6.1.4.1.2011.5.25.227.2.1.78
+        hwBoardResCriticalThresholdExceed NOTIFICATION-TYPE
+            OBJECTS { hwFwdResLackSlotStr, hwFwdResThreshold, hwFwdResLackReasonId , hwReasonDescription}
+            STATUS current
+            DESCRIPTION 
+                        "The number of forwarding resources reaches the alarm threshold."
+            ::= { hwFwdResLacTrap 78 }
+            
+        -- 1.3.6.1.4.1.2011.5.25.227.2.1.79
+        hwBoardResCriticalThresholdExceedResume NOTIFICATION-TYPE
+            OBJECTS { hwFwdResLackSlotStr,hwFwdResThreshold, hwFwdResLackReasonId , hwReasonDescription }
+            STATUS current
+            DESCRIPTION 
+                        "The number of forwarding engine resources is less than the threshold."
+            ::= { hwFwdResLacTrap 79 }
+
+       -- 1.3.6.1.4.1.2011.5.25.227.2.1.80
+        hwEMDIResLack NOTIFICATION-TYPE
+            OBJECTS { hwEMDIThreshold,hwEMDISlotStr, hwEMDIResUsed, hwEMDIResTotal}
+            STATUS current
+            DESCRIPTION 
+                        "The number of emdi resources reaches the alarm threshold.."
+            ::= { hwFwdResLacTrap 80 }
+
+       -- 1.3.6.1.4.1.2011.5.25.227.2.1.81
+        hwEMDIResLackResume NOTIFICATION-TYPE
+            OBJECTS { hwEMDIThreshold,hwEMDISlotStr, hwEMDIResUsed, hwEMDIResTotal}
+            STATUS current
+            DESCRIPTION 
+                        "The number of emdi resources is less than the threshold."
+            ::= { hwFwdResLacTrap 81 }
+       -- 1.3.6.1.4.1.2011.5.25.227.2.1.82
+        hwSaidPingPktModifiedAlarm NOTIFICATION-TYPE
+            OBJECTS { hwSaidPingDetectInterface}
+            STATUS current
+            DESCRIPTION 
+                        "The SAID PING function detected that the packet modification."
+            ::= { hwFwdResLacTrap 82 }
+			
+	   -- 1.3.6.1.4.1.2011.5.25.227.2.1.83
+       hwNetStreamIPv4OriginalFlowExceeded NOTIFICATION-TYPE
+              OBJECTS { hwNetStreamIPv4OriginalFlowUsage, hwNetStreamIPv4OriginalFlowThreshold }
+	           STATUS current
+	           DESCRIPTION
+	                   "The number of used NetStream IPv4 original flows exceeded the threshold."
+              ::= { hwFwdResLacTrap 83 }
+
+	   -- 1.3.6.1.4.1.2011.5.25.227.2.1.84
+       hwNetStreamIPv4OriginalFlowFellBelow NOTIFICATION-TYPE
+              OBJECTS { hwNetStreamIPv4OriginalFlowUsage, hwNetStreamIPv4OriginalFlowThreshold }
+	           STATUS current
+	           DESCRIPTION
+	                   "The number of used NetStream IPv4 original flows fell below the threshold."
+              ::= { hwFwdResLacTrap 84 }
+			  
+       -- 1.3.6.1.4.1.2011.5.25.227.2.1.85
+       hwNetStreamIPv4FlexibleFlowExceeded NOTIFICATION-TYPE
+              OBJECTS { hwNetStreamIPv4FlexibleFlowUsage, hwNetStreamIPv4FlexibleFlowThreshold }
+	           STATUS current
+	           DESCRIPTION
+	                   "The number of used NetStream IPv4 flexible flows exceeded the threshold."
+              ::= { hwFwdResLacTrap 85 }
+
+	   -- 1.3.6.1.4.1.2011.5.25.227.2.1.86
+       hwNetStreamIPv4FlexibleFlowFellBelow NOTIFICATION-TYPE
+              OBJECTS { hwNetStreamIPv4FlexibleFlowUsage, hwNetStreamIPv4FlexibleFlowThreshold }
+	           STATUS current
+	           DESCRIPTION
+	                   "The number of used NetStream IPv4 flexible flows fell below the threshold."
+              ::= { hwFwdResLacTrap 86 }
+
+          -- 1.3.6.1.4.1.2011.5.25.227.2.1.87
+        hwFwmFaultAlarm NOTIFICATION-TYPE
+            OBJECTS { hwFwmFaultSlotStr, hwFwmFaultCpuStr, hwFwmFaultReasonId, hwFwmFaultReasonDescription }
+            STATUS current
+            DESCRIPTION 
+                        "This object indicates that a forwarding manage module encounters a partial failure."
+            ::= { hwFwdResLacTrap 87 }
+           
+          -- 1.3.6.1.4.1.2011.5.25.227.2.1.88
+        hwFwmFaultAlarmResume NOTIFICATION-TYPE
+            OBJECTS { hwFwmFaultSlotStr, hwFwmFaultCpuStr, hwFwmFaultReasonId, hwFwmFaultReasonDescription }
+            STATUS current
+            DESCRIPTION 
+                        "This object indicates that a forwarding manage module recovers from a partial failure."
+            ::= { hwFwdResLacTrap 88 }
+
+          -- 1.3.6.1.4.1.2011.5.25.227.2.1.89
+        hwBoardNetworkSliceResourceAlarm NOTIFICATION-TYPE
+            OBJECTS { hwFwmSliceSlotStr, hwFwmSliceInterfaceName, hwFwmSliceId, hwFwmSliceTrunkInterfaceName, hwFwmSliceResourceReasonId, hwFwmSliceReasonDescription }
+            STATUS current
+            DESCRIPTION 
+                        "This object indicates that the service specifications configured for the system exceeded those of the forwarding engine."
+            ::= { hwFwdResLacTrap 89 }
+
+          -- 1.3.6.1.4.1.2011.5.25.227.2.1.90
+        hwBoardNetworkSliceResourceAlarmResume NOTIFICATION-TYPE
+            OBJECTS { hwFwmSliceSlotStr, hwFwmSliceInterfaceName, hwFwmSliceId, hwFwmSliceTrunkInterfaceName, hwFwmSliceResourceReasonId, hwFwmSliceReasonDescription }
+            STATUS current
+            DESCRIPTION 
+                        "This object indicates that the service specifications configured for the system do not exceed those of the forwarding engine."
+            ::= { hwFwdResLacTrap 90 }
+
+          -- 1.3.6.1.4.1.2011.5.25.227.2.1.91
+        hwBoardNetworkSliceForwardAlarm NOTIFICATION-TYPE
+            OBJECTS { hwFwmSliceSlotStr, hwFwmSliceInterfaceName, hwFwmSliceId, hwFwmSliceTrunkInterfaceName, hwFwmSliceSrcInterfaceName, hwFwmSliceFwdReasonId, hwFwmSliceReasonDescription }
+            STATUS current
+            DESCRIPTION 
+                        "This object indicates that the service configured for the system is wrong."
+            ::= { hwFwdResLacTrap 91 }
+
+          -- 1.3.6.1.4.1.2011.5.25.227.2.1.92
+        hwBoardNetworkSliceForwardAlarmResume NOTIFICATION-TYPE
+            OBJECTS { hwFwmSliceSlotStr, hwFwmSliceInterfaceName, hwFwmSliceId, hwFwmSliceTrunkInterfaceName, hwFwmSliceSrcInterfaceName, hwFwmSliceFwdReasonId, hwFwmSliceReasonDescription }
+            STATUS current
+            DESCRIPTION 
+                        "This object indicates that the service configured for the system has been configured correctly."
+            ::= { hwFwdResLacTrap 92 }
+
+    END
 --
 -- HUAWEI-FWD-RES-TRAP-MIB.mib
 --
