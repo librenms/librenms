@@ -31,6 +31,7 @@
 namespace LibreNMS\Alert;
 
 use App\Facades\DeviceCache;
+use App\Facades\Rrd;
 use App\Models\AlertTransport;
 use App\Models\Eventlog;
 use LibreNMS\Config;
@@ -38,6 +39,7 @@ use LibreNMS\Enum\AlertState;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
 use LibreNMS\Polling\ConnectivityHelper;
+use LibreNMS\Util\Number;
 use LibreNMS\Util\Time;
 
 class RunAlerts
@@ -116,13 +118,15 @@ class RunAlerts
         $obj['status'] = $device->status;
         $obj['status_reason'] = $device->status_reason;
         if ((new ConnectivityHelper($device))->canPing()) {
-            $ping_stats = $device->perf()->latest('timestamp')->first();
-            $obj['ping_timestamp'] = $ping_stats->timestamp;
-            $obj['ping_loss'] = $ping_stats->loss;
-            $obj['ping_min'] = $ping_stats->min;
-            $obj['ping_max'] = $ping_stats->max;
-            $obj['ping_avg'] = $ping_stats->avg;
-            $obj['debug'] = $ping_stats->debug;
+            $last_ping = Rrd::lastUpdate(Rrd::name($device->hostname, 'icmp-perf'));
+            if ($last_ping) {
+                $obj['ping_timestamp'] = $last_ping->timestamp;
+                $obj['ping_loss'] = Number::calculatePercent($last_ping->get('xmt') - $last_ping->get('rcv'), $last_ping->get('xmt'));
+                $obj['ping_min'] = $last_ping->get('min');
+                $obj['ping_max'] = $last_ping->get('max');
+                $obj['ping_avg'] = $last_ping->get('avg');
+                $obj['debug'] = 'unsupported';
+            }
         }
         $extra = $alert['details'];
 

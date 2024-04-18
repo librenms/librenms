@@ -902,7 +902,7 @@ function get_graphs(Illuminate\Http\Request $request)
         ];
         $graphs[] = [
             'desc' => 'Ping Response',
-            'name' => 'device_ping_perf',
+            'name' => 'device_icmp_perf',
         ];
         foreach (dbFetchRows('SELECT * FROM device_graphs WHERE device_id = ? ORDER BY graph', [$device_id]) as $graph) {
             $desc = Config::get("graph_types.device.{$graph['graph']}.descr");

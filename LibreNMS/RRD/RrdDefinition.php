@@ -32,6 +32,7 @@ class RrdDefinition
 {
     private static $types = ['GAUGE', 'DERIVE', 'COUNTER', 'ABSOLUTE', 'DCOUNTER', 'DDERIVE'];
     private $dataSets = [];
+    private $sources = [];
     private $skipNameCheck = false;
 
     /**
@@ -51,9 +52,11 @@ class RrdDefinition
      * @param  int  $min  Minimum allowed value.  null means undefined.
      * @param  int  $max  Maximum allowed value.  null means undefined.
      * @param  int  $heartbeat  Heartbeat for this dataset. Uses the global setting if null.
+     * @param  string  $source_ds  Dataset to copy data from an existing rrd file
+     * @param  string  $source_file  File to copy data from (may be ommitted copy from the current file)
      * @return RrdDefinition
      */
-    public function addDataset($name, $type, $min = null, $max = null, $heartbeat = null)
+    public function addDataset($name, $type, $min = null, $max = null, $heartbeat = null, $source_ds = null, $source_file = null)
     {
         if (empty($name)) {
             d_echo('DS must be set to a non-empty string.');
@@ -61,7 +64,7 @@ class RrdDefinition
 
         $name = $this->escapeName($name);
         $this->dataSets[$name] = [
-            $name,
+            $name . $this->createSource($source_ds, $source_file),
             $this->checkType($type),
             is_null($heartbeat) ? Config::get('rrd.heartbeat') : $heartbeat,
             is_null($min) ? 'U' : $min,
@@ -78,9 +81,10 @@ class RrdDefinition
      */
     public function __toString()
     {
-        return array_reduce($this->dataSets, function ($carry, $ds) {
-            return $carry . 'DS:' . implode(':', $ds) . ' ';
-        }, '');
+        return implode(' ', array_map(fn ($s) => "--source $s ", $this->sources))
+            . array_reduce($this->dataSets, function ($carry, $ds) {
+                return $carry . 'DS:' . implode(':', $ds) . ' ';
+            }, '');
     }
 
     /**
@@ -105,6 +109,29 @@ class RrdDefinition
         $this->skipNameCheck = true;
 
         return $this;
+    }
+
+    private function createSource(?string $ds, ?string $file): string
+    {
+        if (empty($ds)) {
+            return '';
+        }
+
+        $output = '=' . $ds;
+
+        // if is file given, find or add it to the sources list
+        if ($file) {
+            $index = array_search($file, $this->sources);
+            if ($index === false) {
+                $this->sources[] = $file;
+                end($this->sources);
+                $index = key($this->sources);
+            }
+
+            $output .= '[' . ($index + 1) . ']'; // rrdcreate sources are 1 based
+        }
+
+        return $output;
     }
 
     /**

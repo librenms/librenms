@@ -142,7 +142,6 @@ class DeviceObserver
         $device->ospfPorts()->delete();
         $device->outages()->delete();
         $device->packages()->delete();
-        $device->perf()->delete();
         $device->portsFdb()->delete();
         $device->portsNac()->delete();
         \DB::table('ports_stack')->where('device_id', $device->device_id)->delete();
