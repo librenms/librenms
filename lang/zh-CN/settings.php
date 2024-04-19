@@ -322,10 +322,6 @@ return [
             'description' => '指定 URL',
             'help' => 'This should *only* be set if you want to *force* a particular hostname/port. It will prevent the web interface being usable form any other hostname',
         ],
-        'device_perf_purge' => [
-            'description' => '装置效能项目大于',
-            'help' => 'Cleanup done by daily.sh',
-        ],
         'distributed_poller' => [
             'description' => '启用分布式轮询 (需要额外设定)',
             'help' => 'Enable distributed polling system wide. This is intended for load sharing, not remote polling. You must read the documentation for steps to enable: https://docs.librenms.org/Extensions/Distributed-Poller/',
