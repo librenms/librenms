@@ -90,7 +90,7 @@ class RrdDefinition
 
             return $carry . "DS:$name:{$ds['type']}:{$ds['hb']}:{$ds['min']}:{$ds['max']} ";
         }, '');
-        $sources = implode(' ', array_map(fn($s) => "--source $s ", $this->sources));
+        $sources = implode(' ', array_map(fn ($s) => "--source $s ", $this->sources));
 
         return $sources . $def;
     }
