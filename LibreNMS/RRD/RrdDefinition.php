@@ -133,10 +133,9 @@ class RrdDefinition
             if ($index === false) {
                 // check if source rrd exists and cache failures
                 if (isset($this->invalid_source[$file]) || ! Rrd::checkRrdExists($file)) {
-                    $this->invalid_source[$file] = 1;
-                    \Log::debug("File $file does not exist skipping rrd source");
+                    $this->invalid_source[$file] = true;
 
-                    return '';
+                    return ''; // skip source if file does not exist
                 }
 
                 $this->sources[] = $file;
