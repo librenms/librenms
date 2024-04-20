@@ -123,6 +123,7 @@ Route::prefix('v0')->namespace('\App\Api\Controllers')->group(function () {
         Route::get('{hostname}/port_stack', 'LegacyApiController@get_port_stack')->name('get_port_stack');
         Route::get('{hostname}/components', 'LegacyApiController@get_components')->name('get_components');
         Route::get('{hostname}/groups', 'LegacyApiController@get_device_groups')->name('get_device_groups_device');
+        Route::get('{hostname}/maintenance', 'LegacyApiController@device_under_maintenance')->name('device_under_maintenance');
         // consumes the route below, but passes to it when detected
         Route::get('{hostname}/ports/{ifname}', 'LegacyApiController@get_port_stats_by_port_hostname')->name('get_port_stats_by_port_hostname')->where('ifname', '.*');
         Route::get('{hostname}/ports/{ifname}/{type}', 'LegacyApiController@get_graph_by_port_hostname')->name('get_graph_by_port_hostname');
