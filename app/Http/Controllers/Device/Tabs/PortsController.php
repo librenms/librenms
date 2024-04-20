@@ -87,6 +87,7 @@ class PortsController implements DeviceTab
     {
         Validator::validate($request->all(), ['perPage' => 'int']);
         $perPage = $request->input('perPage', 15);
+        $neighbors = null;
 
         $relationships = ['groups', 'ipv4', 'ipv6', 'vlans', 'adsl', 'vdsl'];
         if ($this->detail) {
@@ -103,32 +104,36 @@ class PortsController implements DeviceTab
 //        $p = Port::paginate();
 //        dd($p->links('pagination::simple-tailwind'), ['perPage' => $perPage]);
 
-        if ($this->detail) {
-            $neighbors = $ports->keyBy('port_id')->map(fn($port) => $this->findPortNeighbors($port));
-            $neighbor_ports = Port::with('device')
-                ->hasAccess(Auth::user())
-                ->whereIn('port_id', $neighbors->map(fn($a) => array_keys($a))->flatten())
-                ->get()->keyBy('port_id');
-        }
-
-        return [
+        $data = [
             'ports' => $ports,
-            'neighbors' => $neighbors,
-            'neighbor_ports' => $neighbor_ports,
             'perPage' => $perPage,
             'graphs' => [
                 'bits' => [['type' => 'port_bits', 'title' => trans('Traffic'), 'vars' => [['from' => '-1d'], ['from' => '-7d'], ['from' => '-30d'], ['from' => '-1y']]]],
                 'upkts' => [['type' => 'port_upkts', 'title' => trans('Packets (Unicast)'), 'vars' => [['from' => '-1d'], ['from' => '-7d'], ['from' => '-30d'], ['from' => '-1y']]]],
                 'errors' => [['type' => 'port_errors', 'title' => trans('Errors'), 'vars' => [['from' => '-1d'], ['from' => '-7d'], ['from' => '-30d'], ['from' => '-1y']]]],
             ],
-
         ];
+
+        $data['neighbors'] = $ports->keyBy('port_id')->map(fn($port) => $this->findPortNeighbors($port));
+        if ($this->detail) {
+            $data['neighbor_ports'] = Port::with('device')
+                ->hasAccess(Auth::user())
+                ->whereIn('port_id', $data['neighbors']->map(fn($a) => array_keys($a))->flatten())
+                ->get()->keyBy('port_id');
+        }
+
+        return $data;
     }
 
     public function findPortNeighbors(Port $port): array
     {
-        // if Loopback, skip
-        if (! $this->detail || str_contains(strtolower($port->getLabel()), 'loopback')) {
+        // only do for detail
+        if (! $this->detail) {
+            return [];
+        }
+
+        // skip ports that cannot have neighbors
+        if (in_array($port->ifType, ['softwareLoopback', 'rs232'])) {
             return [];
         }
 

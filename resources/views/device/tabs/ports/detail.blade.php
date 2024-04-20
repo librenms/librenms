@@ -55,19 +55,19 @@
                 </td>
                 <td>
                     <div>
-                        <i class='fa fa-long-arrow-left fa-lg' style='color:green' aria-hidden='true'></i>
-                        <span style='color: {{ \LibreNMS\Util\Color::percent($port->in_rate, $port->ifSpeed) }}'>{{ \LibreNMS\Util\Number::formatSi($port->in_rate, 2, 3, 'bps') }}</span>
+                        <i class="fa fa-long-arrow-left fa-lg tw-text-green-600" aria-hidden="true"></i>
+                        <span style="color: {{ \LibreNMS\Util\Color::percent($port->in_rate, $port->ifSpeed) }}">{{ \LibreNMS\Util\Number::formatSi($port->in_rate, 2, 3, 'bps') }}</span>
                     </div>
                     <div>
-                        <i class='fa fa-long-arrow-right fa-lg' style='color:blue' aria-hidden='true'></i>
-                        <span style='color: {{ \LibreNMS\Util\Color::percent($port->out_rate, $port->ifSpeed) }}'>{{ \LibreNMS\Util\Number::formatSi($port->out_rate, 2, 3, 'bps') }}</span>
+                        <i class="fa fa-long-arrow-right fa-lg" style="color:blue" aria-hidden="true"></i>
+                        <span style="color: {{ \LibreNMS\Util\Color::percent($port->out_rate, $port->ifSpeed) }}">{{ \LibreNMS\Util\Number::formatSi($port->out_rate, 2, 3, 'bps') }}</span>
                     </div>
                     <div>
-                        <i class='fa fa-long-arrow-left fa-lg' style='color:purple' aria-hidden='true'></i>
+                        <i class="fa fa-long-arrow-left fa-lg" style="color:purple" aria-hidden="true"></i>
                         {{ \LibreNMS\Util\Number::formatBi($port->ifInUcastPkts_rate, 2, 3, 'pps') }}
                     </div>
                     <div>
-                        <i class='fa fa-long-arrow-right fa-lg' style='color:darkorange' aria-hidden='true'></i>
+                        <i class="fa fa-long-arrow-right fa-lg" style="color:darkorange" aria-hidden="true"></i>
                         {{ \LibreNMS\Util\Number::formatBi($port->ifOutUcastPkts_rate, 2, 3, 'pps') }}
                     </div>
                 </td>
@@ -112,7 +112,7 @@
                     <div class="tw-text-base">MTU {{ $port->ifMtu }}</div>
                 </td>
                 <td>
-                    <div>
+                    <x-expandable height="4em">
                     @foreach($data['neighbors'][$port->port_id] as $port_id => $neighbor)
                         <div>
                             @php
@@ -120,17 +120,17 @@
                             @endphp
                             @if($np)
                                 @if(isset($neighbor['link']))
-                                    <i class='fa fa-link fa-lg' aria-hidden='true'></i>
+                                    <i class="fa fa-link fa-lg" aria-hidden="true"></i>
                                 @elseif(isset($neighbor['pseudowire']))
-                                    <i class='fa fa-arrows-left-right fa-lg' aria-hidden='true'></i>
+                                    <i class="fa fa-arrows-left-right fa-lg" aria-hidden="true"></i>
                                 @elseif(isset($neighbor['stack_low']))
-                                    <i class='fa fa-expand fa-lg' aria-hidden='true'></i>
+                                    <i class="fa fa-expand fa-lg" aria-hidden="true"></i>
                                 @elseif(isset($neighbor['stack_high']))
-                                    <i class='fa fa-compress fa-lg' aria-hidden='true'></i>
+                                    <i class="fa fa-compress fa-lg" aria-hidden="true"></i>
                                 @elseif(isset($neighbor['pagp']))
-                                    <i class='fa fa-cube fa-lg' style='color:green' aria-hidden='true'></i>
+                                    <i class="fa fa-cube fa-lg tw-text-green-600" aria-hidden="true"></i>
                                 @else
-                                    <i class='fa fa-arrow-right fa-lg' aria-hidden='true'></i>
+                                    <i class="fa fa-arrow-right fa-lg" aria-hidden="true"></i>
                                 @endif
 
                                 <x-port-link :port="$np"></x-port-link>
@@ -138,15 +138,15 @@
                                 <x-device-link :device="$np->device"></x-device-link>
 
                                 @isset($neighbor['ipv6_network'])
-                                    <b style='color: #a10000;'>v6</b>
+                                    <b class="tw-text-red-700">v6</b>
                                 @endisset
                                 @isset($neighbor['ipv4_network'])
-                                    <b style='color: #00a100'>v4</b>
+                                    <b class="tw-text-green-600">v4</b>
                                 @endisset
                             @endif
                         </div>
                     @endforeach
-                    </div>
+                    </x-expandable>
                 </td>
             </tr>
         @endforeach
