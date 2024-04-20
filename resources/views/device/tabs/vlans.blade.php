@@ -16,7 +16,7 @@
                 <td>{{ $vlan_number }}</td>
                 <td>{{ $vlans->first()->vlan_name }}</td>
                 <td>
-                @foreach($vlans->sortBy('port') as $port)
+                @foreach($vlans as $port)
                     @if(!$port->port)
                         @continue;
                     @endif
