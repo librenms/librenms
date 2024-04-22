@@ -246,17 +246,6 @@ lnms config:set icmp_check false
 If you would like to do this on a per device basis then you can do so
 under Device -> Edit -> Misc -> Disable ICMP Test? On
 
-#### traceroute
-
-LibreNMS uses traceroute to record debug information
-when a device is down due to icmp AND you have
-`lnms config:set debug.run_trace true` set.
-
-!!! setting "external/binaries"
-    ```bash
-    lnms config:set traceroute /usr/bin/traceroute
-    ```
-
 #### SNMP
 
 SNMP program locations.
