@@ -35,6 +35,7 @@ class CustomMapMenuGroupController extends SelectController
     {
         return ['menu_group'];
     }
+
     protected function baseQuery(Request $request): Builder
     {
         return CustomMap::query()->hasAccess($request->user())
