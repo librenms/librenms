@@ -162,19 +162,19 @@ if (! empty($entity_oids)) {
                 }
                 $descr = preg_replace('/[T|t]emperature[|s]/', '', $descr);
             }
-            
+
             // Fix for FortiSwitch =< 7.2.3: FortiSwitch output fan speeds as percentages while entPhySensorType is RPM.
             if ($device['os'] == 'fortiswitch' && $entry['entPhySensorType'] == 'rpm' ) {
                 $type = 'percent';
                 $divisor = 1;
                 $current = $current * 10;
             }
-            
+
             // Fix for FortiSwitch => 7.2.4: Missing entPhySensorTable indexes results in empty descriptions
             if ($device['os'] == 'fortiswitch' && $descr == '') {
                 $descr = 'Sensor ' . $index;
             }
-            
+
             if ($device['os'] == 'rittal-lcp') {
                 if ($type == 'voltage') {
                     $divisor = 1000;
