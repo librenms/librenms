@@ -70,7 +70,7 @@ if (! empty($entity_oids)) {
             $entitysensor['other'] = 'dbm';
         }
 
-         // Fix for FortiSwitchOS >= 7.4.3. entPhySensorType is other but is a percentage for fanspeed sensors
+        // Fix for FortiSwitchOS >= 7.4.3. entPhySensorType is other but is a percentage for fanspeed sensors
         if ($device['os'] == 'fortiswitch' && $entry['entPhySensorType'] == 'other' && is_numeric($entry['entPhySensorValue']) && is_numeric($index) && str_starts_with($entity_array[$index]['entPhysicalName'], "Fan")) {
             $entitysensor['other'] = 'percent';
         }
