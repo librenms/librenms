@@ -48,9 +48,11 @@
                                 <li><a href="{{ url('availability-map') }}"><i class="fa fa-arrow-circle-up fa-fw fa-lg"
                                                                                aria-hidden="true"></i> {{ __('Availability') }}
                                     </a></li>
+                                @if($device_dependencies)
                                 <li><a href="{{ url('maps/devicedependency') }}"><i class="fa fa-chain fa-fw fa-lg"
                                                                   aria-hidden="true"></i> {{ __('Device Dependency') }}</a></li>
-                                @if($device_groups->isNotEmpty())
+                                @endif
+                                @if($device_groups->isNotEmpty() && $device_group_dependencies)
                                     <li class="dropdown-submenu"><a><i class="fa fa-chain fa-fw fa-lg"
                                                                                 aria-hidden="true"></i> {{ __('Device Groups Dependencies') }}
                                         </a>
@@ -62,8 +64,10 @@
                                         @endforeach
                                     </ul></li>
                                 @endif
+                                @if($links)
                                 <li><a href="{{ url('map') }}"><i class="fa fa-sitemap fa-fw fa-lg"
                                                                   aria-hidden="true"></i> {{ __('Network') }}</a></li>
+                                @endif
                                 @if($device_groups->isNotEmpty())
                                     <li class="dropdown-submenu"><a><i class="fa fa-th fa-fw fa-lg"
                                                                                 aria-hidden="true"></i> {{ __('Device Groups Maps') }}
