@@ -538,6 +538,33 @@ function maintenance_device(Illuminate\Http\Request $request)
     }
 }
 
+function device_under_maintenance(Illuminate\Http\Request $request)
+{
+    // return whether or not a device is in an active maintenance window
+
+    $hostname = $request->route('hostname');
+
+    if (empty($hostname)) {
+        return api_error(400, 'No hostname has been provided to get maintenance status');
+    }
+
+    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    $model = null;
+    if ($device_id) {
+        $model = DeviceCache::get((int) $device_id);
+    }
+
+    if (! $model) {
+        return api_error(404, "Device $hostname not found");
+    }
+
+    return check_device_permission($device_id, function () use ($model) {
+        $maintenance = $model->isUnderMaintenance() ?? false;
+
+        return api_success($maintenance, 'is_under_maintenance');
+    });
+}
+
 function device_availability(Illuminate\Http\Request $request)
 {
     // return availability per device

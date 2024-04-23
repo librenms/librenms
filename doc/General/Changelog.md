@@ -1,3 +1,87 @@
+## 24.4.0
+*(2024-04-19)*
+
+A big thank you to the following 18 contributors this last month:
+
+  - [murrant](https://github.com/murrant) (8)
+  - [PipoCanaja](https://github.com/PipoCanaja) (4)
+  - [xorrkaz](https://github.com/xorrkaz) (2)
+  - [moisseev](https://github.com/moisseev) (1)
+  - [VVelox](https://github.com/VVelox) (1)
+  - [Taarek](https://github.com/Taarek) (1)
+  - [Melhuig](https://github.com/Melhuig) (1)
+  - [dependabot](https://github.com/apps/dependabot) (1)
+  - [Lollbrant](https://github.com/Lollbrant) (1)
+  - [HolgerHees](https://github.com/HolgerHees) (1)
+  - [voileux](https://github.com/voileux) (1)
+  - [hvanderheide](https://github.com/hvanderheide) (1)
+  - [jasoncheng7115](https://github.com/jasoncheng7115) (1)
+  - [h-barnhart](https://github.com/h-barnhart) (1)
+  - [Jellyfrog](https://github.com/Jellyfrog) (1)
+  - [CTV-2023](https://github.com/CTV-2023) (1)
+  - [fbouynot](https://github.com/fbouynot) (1)
+  - [OSIRIS-REx](https://github.com/OSIRIS-REx) (1)
+
+Thanks to maintainers and others that helped with pull requests this month:
+
+  - [Jellyfrog](https://github.com/Jellyfrog) (13)
+  - [murrant](https://github.com/murrant) (9)
+  - [PipoCanaja](https://github.com/PipoCanaja) (8)
+  - [electrocret](https://github.com/electrocret) (1)
+
+#### Feature
+* Improved Latency graph ([#15940](https://github.com/librenms/librenms/pull/15940)) - [murrant](https://github.com/murrant)
+
+#### Security
+* Fix Graph date selector ([#15956](https://github.com/librenms/librenms/pull/15956)) - [murrant](https://github.com/murrant)
+* Fix JS injection in Service Templates ([#15954](https://github.com/librenms/librenms/pull/15954)) - [murrant](https://github.com/murrant)
+* Fix SQL injection issues in packages search ([#15950](https://github.com/librenms/librenms/pull/15950)) - [murrant](https://github.com/murrant)
+* Improve order validation in list_devices ([#15885](https://github.com/librenms/librenms/pull/15885)) - [Jellyfrog](https://github.com/Jellyfrog)
+
+#### Device
+* ILO storage: fix malformed snmp data parsing ([#15931](https://github.com/librenms/librenms/pull/15931)) - [HolgerHees](https://github.com/HolgerHees)
+* Add Fortigate HA state sensor definition ([#15924](https://github.com/librenms/librenms/pull/15924)) - [hvanderheide](https://github.com/hvanderheide)
+* Devices - Ciena RLS 6500 ([#15909](https://github.com/librenms/librenms/pull/15909)) - [h-barnhart](https://github.com/h-barnhart)
+* Cumulus mellanox discovery ([#15732](https://github.com/librenms/librenms/pull/15732)) - [fbouynot](https://github.com/fbouynot)
+* Added support for new device OS Westermo WeOS ([#15674](https://github.com/librenms/librenms/pull/15674)) - [OSIRIS-REx](https://github.com/OSIRIS-REx)
+
+#### Webui
+* Fix null in services ([#15945](https://github.com/librenms/librenms/pull/15945)) - [murrant](https://github.com/murrant)
+
+#### Alerting
+* Pretty up Slack formatting. ([#15898](https://github.com/librenms/librenms/pull/15898)) - [xorrkaz](https://github.com/xorrkaz)
+
+#### Graphs
+* Fix typo ([#15952](https://github.com/librenms/librenms/pull/15952)) - [Taarek](https://github.com/Taarek)
+* Fix graph selection when to/from missing from url ([#15946](https://github.com/librenms/librenms/pull/15946)) - [murrant](https://github.com/murrant)
+
+#### Applications
+* For gzip+base64 compressed json, don't call stripslashes ([#15953](https://github.com/librenms/librenms/pull/15953)) - [VVelox](https://github.com/VVelox)
+* Fix PDNS recursor error ([#15942](https://github.com/librenms/librenms/pull/15942)) - [murrant](https://github.com/murrant)
+
+#### Api
+* Add type property to Device class to update it by API ([#15930](https://github.com/librenms/librenms/pull/15930)) - [voileux](https://github.com/voileux)
+* Add support for a maintenance boolean in API results. ([#15904](https://github.com/librenms/librenms/pull/15904)) - [xorrkaz](https://github.com/xorrkaz)
+
+#### Bug
+* Skip rrd sources that do not exist ([#15959](https://github.com/librenms/librenms/pull/15959)) - [murrant](https://github.com/murrant)
+* Bug - Cisco NAC key error ([#15934](https://github.com/librenms/librenms/pull/15934)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Bug - typo for request rate + sanity on numerical not_null values ([#15919](https://github.com/librenms/librenms/pull/15919)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Bug - vrp - fix signed-tinyint overloaded with disabled radios ([#15917](https://github.com/librenms/librenms/pull/15917)) - [PipoCanaja](https://github.com/PipoCanaja)
+
+#### Documentation
+* Add missing p5-File-Slurp dependency ([#15955](https://github.com/librenms/librenms/pull/15955)) - [moisseev](https://github.com/moisseev)
+* Fix "lnms config:set" command syntax ([#15949](https://github.com/librenms/librenms/pull/15949)) - [Melhuig](https://github.com/Melhuig)
+* Graylog how to set up non-admin user ([#15938](https://github.com/librenms/librenms/pull/15938)) - [Lollbrant](https://github.com/Lollbrant)
+* Documentation - opcache issue on Debian 12 ([#15870](https://github.com/librenms/librenms/pull/15870)) - [CTV-2023](https://github.com/CTV-2023)
+
+#### Translation
+* Fix wrong terminology ([#15920](https://github.com/librenms/librenms/pull/15920)) - [jasoncheng7115](https://github.com/jasoncheng7115)
+
+#### Dependencies
+* Bump tecnickcom/tcpdf from 6.6.5 to 6.7.4 ([#15948](https://github.com/librenms/librenms/pull/15948)) - [dependabot](https://github.com/apps/dependabot)
+
+
 ## 24.3.0
 *(2024-04-01)*
 

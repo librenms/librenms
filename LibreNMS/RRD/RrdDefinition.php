@@ -25,6 +25,7 @@
 
 namespace LibreNMS\RRD;
 
+use App\Facades\Rrd;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\InvalidRrdTypeException;
 
@@ -33,6 +34,7 @@ class RrdDefinition
     private static $types = ['GAUGE', 'DERIVE', 'COUNTER', 'ABSOLUTE', 'DCOUNTER', 'DDERIVE'];
     private $dataSets = [];
     private $sources = [];
+    private $invalid_source = [];
     private $skipNameCheck = false;
 
     /**
@@ -64,11 +66,13 @@ class RrdDefinition
 
         $name = $this->escapeName($name);
         $this->dataSets[$name] = [
-            $name . $this->createSource($source_ds, $source_file),
-            $this->checkType($type),
-            is_null($heartbeat) ? Config::get('rrd.heartbeat') : $heartbeat,
-            is_null($min) ? 'U' : $min,
-            is_null($max) ? 'U' : $max,
+            'name' => $name,
+            'type' => $this->checkType($type),
+            'hb' => is_null($heartbeat) ? Config::get('rrd.heartbeat') : $heartbeat,
+            'min' => is_null($min) ? 'U' : $min,
+            'max' => is_null($max) ? 'U' : $max,
+            'source_ds' => $source_ds,
+            'source_file' => $source_file,
         ];
 
         return $this;
@@ -81,10 +85,14 @@ class RrdDefinition
      */
     public function __toString()
     {
-        return implode(' ', array_map(fn ($s) => "--source $s ", $this->sources))
-            . array_reduce($this->dataSets, function ($carry, $ds) {
-                return $carry . 'DS:' . implode(':', $ds) . ' ';
-            }, '');
+        $def = array_reduce($this->dataSets, function ($carry, $ds) {
+            $name = $ds['name'] . $this->createSource($ds['source_ds'], $ds['source_file']);
+
+            return $carry . "DS:$name:{$ds['type']}:{$ds['hb']}:{$ds['min']}:{$ds['max']} ";
+        }, '');
+        $sources = implode(' ', array_map(fn ($s) => "--source $s ", $this->sources));
+
+        return $sources . $def;
     }
 
     /**
@@ -123,6 +131,13 @@ class RrdDefinition
         if ($file) {
             $index = array_search($file, $this->sources);
             if ($index === false) {
+                // check if source rrd exists and cache failures
+                if (isset($this->invalid_source[$file]) || ! Rrd::checkRrdExists($file)) {
+                    $this->invalid_source[$file] = true;
+
+                    return ''; // skip source if file does not exist
+                }
+
                 $this->sources[] = $file;
                 end($this->sources);
                 $index = key($this->sources);
