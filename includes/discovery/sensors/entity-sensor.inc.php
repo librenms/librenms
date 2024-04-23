@@ -74,7 +74,7 @@ if (! empty($entity_oids)) {
         if ($device['os'] == 'fortiswitch' && $entry['entPhySensorType'] == 'other') {
             $entitysensor['other'] = 'percent';
         }
-        
+
         if (isset($entitysensor[$entry['entPhySensorType']]) && is_numeric($entry['entPhySensorValue']) && is_numeric($index)) {
             $entPhysicalIndex = $index;
             $oid = '.1.3.6.1.2.1.99.1.1.1.4.' . $index;
@@ -164,7 +164,7 @@ if (! empty($entity_oids)) {
             }
 
             // Fix for FortiSwitch =< 7.2.3: FortiSwitch output fan speeds as percentages while entPhySensorType is RPM.
-            if ($device['os'] == 'fortiswitch' && $entry['entPhySensorType'] == 'rpm' ) {
+            if ($device['os'] == 'fortiswitch' && $entry['entPhySensorType'] == 'rpm') {
                 $type = 'percent';
                 $divisor = 1;
                 $current = $current * 10;
