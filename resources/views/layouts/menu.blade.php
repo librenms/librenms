@@ -41,67 +41,6 @@
                             </ul>
                         </li>
                         <li role="presentation" class="divider"></li>
-                        <li class="dropdown-submenu">
-                            <a><i class="fa fa-map fa-fw fa-lg"
-                                                               aria-hidden="true"></i> {{ __('Maps') }}</a>
-                            <ul class="dropdown-menu">
-                                <li><a href="{{ url('availability-map') }}"><i class="fa fa-arrow-circle-up fa-fw fa-lg"
-                                                                               aria-hidden="true"></i> {{ __('Availability') }}
-                                    </a></li>
-                                @if($device_dependencies)
-                                <li><a href="{{ url('maps/devicedependency') }}"><i class="fa fa-chain fa-fw fa-lg"
-                                                                  aria-hidden="true"></i> {{ __('Device Dependency') }}</a></li>
-                                @endif
-                                @if($device_groups->isNotEmpty() && $device_group_dependencies)
-                                    <li class="dropdown-submenu"><a><i class="fa fa-chain fa-fw fa-lg"
-                                                                                aria-hidden="true"></i> {{ __('Device Groups Dependencies') }}
-                                        </a>
-                                        <ul class="dropdown-menu scrollable-menu">
-                                        @foreach($device_groups as $group)
-                                            <li><a href="{{ url("maps/devicedependency?group=$group->id") }}" title="{{ $group->desc }}"><i class="fa fa-chain fa-fw fa-lg" aria-hidden="true"></i>
-                                                {{ ucfirst($group->name) }}
-                                            </a></li>
-                                        @endforeach
-                                    </ul></li>
-                                @endif
-                                @if($links)
-                                <li><a href="{{ url('map') }}"><i class="fa fa-sitemap fa-fw fa-lg"
-                                                                  aria-hidden="true"></i> {{ __('Network') }}</a></li>
-                                @endif
-                                @if($device_groups->isNotEmpty())
-                                    <li class="dropdown-submenu"><a><i class="fa fa-th fa-fw fa-lg"
-                                                                                aria-hidden="true"></i> {{ __('Device Groups Maps') }}
-                                        </a>
-                                        <ul class="dropdown-menu scrollable-menu">
-                                        @foreach($device_groups as $group)
-                                            <li><a href="{{ url("map/group=$group->id") }}" title="{{ $group->desc }}"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i>
-                                                {{ ucfirst($group->name) }}
-                                            </a></li>
-                                        @endforeach
-                                    </ul></li>
-                                @endif
-                                @admin
-                                <li><a href="{{ route('maps.custom.index') }}"><i class="fa fa-map-marked fa-fw fa-lg"
-                                                                            aria-hidden="true"></i> {{ __('Custom Map Editor') }}
-                                    </a></li>
-                                @endadmin
-                                @if($custommaps->isNotEmpty())
-                                    <li class="dropdown-submenu"><a><i class="fa fa-map-marked fa-fw fa-lg"
-                                                                                aria-hidden="true"></i> {{ __('Custom Maps') }}
-                                        </a>
-                                        <ul class="dropdown-menu scrollable-menu">
-                                        @foreach($custommaps as $map)
-                                            <li><a href="{{ route('maps.custom.show', ['map' => $map->custom_map_id]) }}" title="{{ $map->name }}"><i class="fa fa-map-marked fa-fw fa-lg" aria-hidden="true"></i>
-                                                {{ ucfirst($map->name) }}
-                                            </a></li>
-                                        @endforeach
-                                    </ul></li>
-                                @endif
-                                <li><a href="{{ url('fullscreenmap') }}"><i class="fa fa-expand fa-fw fa-lg"
-                                                                            aria-hidden="true"></i> {{ __('Geographical') }}
-                                    </a></li>
-                            </ul>
-                        </li>
                         @if(auth()->user()->isAdmin() || $has_v1_plugins || $has_v2_plugins)
                         <li class="dropdown-submenu">
                             <a><i class="fa fa-plug fa-fw fa-lg" aria-hidden="true"></i> {{ __('Plugins') }}</a>
@@ -243,6 +182,79 @@
                         <li><a href="{{ url('delhost') }}"><i class="fa fa-trash fa-fw fa-lg"
                                                               aria-hidden="true"></i> {{ __('Delete Device') }}</a></li>
                     @endadmin
+
+                    </ul>
+                </li>
+{{-- Maps --}}
+                <li class="dropdown">
+                    <a href="{{ url('services') }}" class="dropdown-toggle" data-hover="dropdown"
+                       data-toggle="dropdown"><i class="fa fa-map fa-fw fa-lg fa-nav-icons hidden-md"
+                                                 aria-hidden="true"></i> <span
+                            class="hidden-sm">{{ __('Maps') }}</span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="{{ url('availability-map') }}"><i class="fa fa-arrow-circle-up fa-fw fa-lg"
+                                                                       aria-hidden="true"></i> {{ __('Availability') }}
+                            </a></li>
+                        @if($device_dependencies)
+                        <li><a href="{{ url('maps/devicedependency') }}"><i class="fa fa-chain fa-fw fa-lg"
+                                                                            aria-hidden="true"></i> {{ __('Device Dependency') }}</a></li>
+                        @endif
+                        @if($device_group_dependencies)
+                            <li class="dropdown-submenu"><a><i class="fa fa-chain fa-fw fa-lg"
+                                                               aria-hidden="true"></i> {{ __('Device Groups Dependencies') }}
+                                </a>
+                                <ul class="dropdown-menu scrollable-menu">
+                                    @foreach($device_groups as $group)
+                                        <li><a href="{{ url("maps/devicedependency?group=$group->id") }}" title="{{ $group->desc }}"><i class="fa fa-chain fa-fw fa-lg" aria-hidden="true"></i>
+                                                {{ ucfirst($group->name) }}
+                                            </a></li>
+                                    @endforeach
+                                </ul></li>
+                        @endif
+                        @if($links)
+                        <li><a href="{{ url('map') }}"><i class="fa fa-sitemap fa-fw fa-lg"
+                                                          aria-hidden="true"></i> {{ __('Network') }}</a></li>
+                        @endif
+                        <li><a href="{{ url('fullscreenmap') }}"><i class="fa fa-expand fa-fw fa-lg"
+                                                                    aria-hidden="true"></i> {{ __('Geographical') }}
+                            </a></li>
+                        @if($device_groups->isNotEmpty())
+                            <li class="dropdown-submenu"><a><i class="fa fa-th fa-fw fa-lg"
+                                                               aria-hidden="true"></i> {{ __('Device Groups Maps') }}
+                                </a>
+                                <ul class="dropdown-menu scrollable-menu">
+                                    @foreach($device_groups as $group)
+                                        <li><a href="{{ url("map/group=$group->id") }}" title="{{ $group->desc }}"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i>
+                                                {{ ucfirst($group->name) }}
+                                            </a></li>
+                                    @endforeach
+                                </ul></li>
+                        @endif
+
+                        @if($custommaps->isNotEmpty())
+                            <li role="presentation" class="divider"></li>
+                                    @foreach($custommaps as $map_group => $group_maps)
+                                        @if($map_group)
+                                        <li class="dropdown-submenu">
+                                        <a><i class="fa fa-map-marked fa-fw fa-lg"aria-hidden="true"></i> {{ $map_group  }}
+                                        </a>
+                                            <ul class="dropdown-menu scrollable-menu">
+                                        @endif
+                                        @foreach($group_maps as $map)
+                                        <li><a href="{{ route('maps.custom.show', ['map' => $map->custom_map_id]) }}"><i class="fa fa-map-marked fa-fw fa-lg" aria-hidden="true"></i>
+                                                {{ ucfirst($map->name) }}
+                                            </a></li>
+                                        @endforeach
+                                        @if($map_group)</ul>@endif
+                                    @endforeach
+                            </li>
+                        @endif
+                        @admin
+                        <li role="presentation" class="divider"></li>
+                        <li><a href="{{ route('maps.custom.index') }}"><i class="fa fa-map-marked fa-fw fa-lg"
+                                                                          aria-hidden="true"></i> {{ __('Custom Map Editor') }}
+                            </a></li>
+                        @endadmin
 
                     </ul>
                 </li>
