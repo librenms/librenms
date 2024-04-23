@@ -69,6 +69,12 @@ if (! empty($entity_oids)) {
         if ($entry['entPhySensorType'] == 'other' && Str::contains($entity_array[$index]['entPhysicalName'], ['Rx Power Sensor', 'Tx Power Sensor'])) {
             $entitysensor['other'] = 'dbm';
         }
+
+         // Fix for FortiSwitchOS >= 7.4.3. entPhySensorType is other but is a percentage for fanspeed sensors
+        if ($device['os'] == 'fortiswitch' && $entry['entPhySensorType'] == 'other' && is_numeric($entry['entPhySensorValue']) && is_numeric($index) && str_starts_with($entity_array[$index]['entPhysicalName'], "Fan")) {
+            $entitysensor['other'] = 'percent';
+        }
+
         if (isset($entitysensor[$entry['entPhySensorType']]) && is_numeric($entry['entPhySensorValue']) && is_numeric($index)) {
             $entPhysicalIndex = $index;
             $oid = '.1.3.6.1.2.1.99.1.1.1.4.' . $index;
@@ -157,7 +163,8 @@ if (! empty($entity_oids)) {
                 $descr = preg_replace('/[T|t]emperature[|s]/', '', $descr);
             }
 
-            // Fix for FortiSwitch - ALL FortiSwitches as of 14/2/2024 output fan speeds as percentages while entPhySensorType is RPM.
+            // Fix for FortiSwitch. FortiSwitch < 7.4.3 output fan speeds as percentages while entPhySensorType is RPM.
+            // FortiSwitch > 7.4.2 changed entPhySensorType to other and fixed the divisor bug.
             if ($device['os'] == 'fortiswitch' && $entry['entPhySensorType'] == 'rpm') {
                 $type = 'percent';
                 $divisor = 1;
