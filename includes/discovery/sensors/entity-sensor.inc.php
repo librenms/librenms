@@ -70,11 +70,11 @@ if (! empty($entity_oids)) {
             $entitysensor['other'] = 'dbm';
         }
 
-        // Fix for FortiSwitchOS >= 7.4.3. entPhySensorType is other but is a percentage for fanspeed sensors
-        if ($device['os'] == 'fortiswitch' && $entry['entPhySensorType'] == 'other' && is_numeric($entry['entPhySensorValue']) && is_numeric($index) && str_starts_with($entity_array[$index]['entPhysicalName'], 'Fan')) {
+        // Fix for FortiSwitchOS >= 7.4.3. Fanspeed sensor is type other
+        if ($device['os'] == 'fortiswitch' && $entry['entPhySensorType'] == 'other') {
             $entitysensor['other'] = 'percent';
         }
-
+        
         if (isset($entitysensor[$entry['entPhySensorType']]) && is_numeric($entry['entPhySensorValue']) && is_numeric($index)) {
             $entPhysicalIndex = $index;
             $oid = '.1.3.6.1.2.1.99.1.1.1.4.' . $index;
@@ -162,15 +162,19 @@ if (! empty($entity_oids)) {
                 }
                 $descr = preg_replace('/[T|t]emperature[|s]/', '', $descr);
             }
-
-            // Fix for FortiSwitch. FortiSwitch < 7.4.3 output fan speeds as percentages while entPhySensorType is RPM.
-            // FortiSwitch > 7.4.2 changed entPhySensorType to other and fixed the divisor bug.
-            if ($device['os'] == 'fortiswitch' && $entry['entPhySensorType'] == 'rpm') {
+            
+            // Fix for FortiSwitch =< 7.2.3: FortiSwitch output fan speeds as percentages while entPhySensorType is RPM.
+            if ($device['os'] == 'fortiswitch' && $entry['entPhySensorType'] == 'rpm' ) {
                 $type = 'percent';
                 $divisor = 1;
                 $current = $current * 10;
             }
-
+            
+            // Fix for FortiSwitch => 7.2.4: Missing entPhySensorTable indexes results in empty descriptions
+            if ($device['os'] == 'fortiswitch' && $descr == '') {
+                $descr = 'Sensor ' . $index;
+            }
+            
             if ($device['os'] == 'rittal-lcp') {
                 if ($type == 'voltage') {
                     $divisor = 1000;
