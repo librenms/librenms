@@ -20,8 +20,8 @@ modules:
                     skip_values:
                         -
                              oid: pdug5GroupName
-                             op: 'not_contains'
-                             value: 'B'
+                             op: '='
+                             value: '.'
                 -
                     oid: pdug5InputEntry
                     value: pdug5InputPowerWatts
@@ -45,8 +45,8 @@ modules:
                     skip_values:
                         -
                              oid: pdug5GroupName
-                             op: 'not_contains'
-                             value: 'B'
+                             op: '='
+                             value: '.'
                 -
                     oid: pdug5InputEntry
                     value: pdug5InputTotalCurrent
@@ -65,12 +65,16 @@ modules:
                     divisor: 10
                     descr: 'Group {{ $pdug5GroupName }} Voltage'
                     index: 'pdug5GroupVoltage.{{ $index }}'
+                    high_limit: pdug5GroupVoltageThUpperCritical
+                    warn_limit: pdug5GroupVoltageThUpperWarning
+                    low_high_limit: pdug5GroupVoltageThLowerCritical
+                    low_warn_limit: pdug5GroupVoltageThLowerWarning
                     snmp_flags: ['-ObsaQ']
                     skip_values:
                         -
                              oid: pdug5GroupName
-                             op: 'not_contains'
-                             value: 'B'
+                             op: '='
+                             value: '.'
 
         frequency:
               data:
@@ -81,3 +85,37 @@ modules:
                     divisor: 10
                     descr: 'Input frequency'
                     snmp_flags: ['-ObsaQ']
+
+        temperature:
+              data:
+                  -
+                    oid: pdug5TemperatureEntry
+                    value: pdug5TemperatureValue
+                    num_oid: '.1.3.6.1.4.1.19536.10.1.4.2.1.4.{{ $index }}'
+                    multiplier: 1
+                    descr: 'pdug5TemperatureName'
+                    high_limit: pdug5TemperatureThUpperCritical
+                    warn_limit: pdug5TemperatureThUpperWarning
+                    snmp_flags: ['-ObsaQ']
+                    skip_values:
+                        -
+                             oid: pdug5TemperatureProbeStatus
+                             op: '='
+                             value: 'disconnected'
+
+        humidity:
+              data:
+                  -
+                    oid: pdug5HumidityEntry
+                    value: pdug5HumidityValue
+                    num_oid: '.1.3.6.1.4.1.19536.10.1.4.3.1.4.{{ $index }}'
+                    divisor: 1
+                    descr: 'pdug5HumidityName'
+                    high_limit: 'pdug5HumidityThUpperCritical'
+                    warn_limit: 'pdug5HumidityThUpperWarning'
+                    snmp_flags: ['-ObsaQ']
+                    skip_values:
+                        -
+                             oid: pdug5HumidityProbeStatus
+                             op: '='
+                             value: 'disconnected'
