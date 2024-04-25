@@ -31,6 +31,7 @@ use App\Models\CustomMap;
 use App\Models\Dashboard;
 use App\Models\Device;
 use App\Models\DeviceGroup;
+use App\Models\Link;
 use App\Models\Location;
 use App\Models\Notification;
 use App\Models\Package;
@@ -77,7 +78,10 @@ class MenuComposer
         //Dashboards
         $vars['dashboards'] = Dashboard::select('dashboard_id', 'dashboard_name')->allAvailable($user)->orderBy('dashboard_name')->get();
 
-        //Custom Maps
+        //Maps
+        $vars['links'] = Link::exists();
+        $vars['device_dependencies'] = \DB::table('device_relationships')->exists();
+        $vars['device_group_dependencies'] = \DB::table('device_group_device')->exists();
         $vars['custommaps'] = CustomMap::select('custom_map_id', 'name')->hasAccess($user)->orderBy('name')->get();
 
         // Device menu
