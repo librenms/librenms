@@ -20,7 +20,7 @@
     </div>
     <div class="col-md-2">
       <center>
-          <h4 id="title"><a href="{{ route('maps.custom.show', $map_id) }}">{{ $name }}</a></h4>
+          <h4><a id="title" href="{{ route('maps.custom.show', $map_id) }}">{{ $name }}</a></h4>
       </center>
     </div>
     <div class="col-md-5 text-right">
