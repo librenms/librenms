@@ -171,6 +171,7 @@ Route::middleware(['auth'])->group(function () {
         Route::prefix('select')->namespace('Select')->group(function () {
             Route::get('application', 'ApplicationController')->name('ajax.select.application');
             Route::get('bill', 'BillController')->name('ajax.select.bill');
+            Route::get('custom-map-menu-group', 'CustomMapMenuGroupController')->name('ajax.select.custom-map-menu-group');
             Route::get('dashboard', 'DashboardController')->name('ajax.select.dashboard');
             Route::get('device', 'DeviceController')->name('ajax.select.device');
             Route::get('device-field', 'DeviceFieldController')->name('ajax.select.device-field');

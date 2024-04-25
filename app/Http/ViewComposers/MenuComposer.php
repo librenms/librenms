@@ -78,12 +78,6 @@ class MenuComposer
         //Dashboards
         $vars['dashboards'] = Dashboard::select('dashboard_id', 'dashboard_name')->allAvailable($user)->orderBy('dashboard_name')->get();
 
-        //Maps
-        $vars['links'] = Link::exists();
-        $vars['device_dependencies'] = \DB::table('device_relationships')->exists();
-        $vars['device_group_dependencies'] = \DB::table('device_group_device')->exists();
-        $vars['custommaps'] = CustomMap::select('custom_map_id', 'name')->hasAccess($user)->orderBy('name')->get();
-
         // Device menu
         $vars['device_groups'] = DeviceGroup::hasAccess($user)->orderBy('name')->get(['device_groups.id', 'name', 'desc']);
         $vars['package_count'] = Package::hasAccess($user)->count();
@@ -94,6 +88,12 @@ class MenuComposer
             Location::hasAccess($user)->where('location', '!=', '')->orderBy('location')->get(['location', 'id']) :
             new Collection();
         $vars['show_vmwinfo'] = Vminfo::hasAccess($user)->exists();
+
+        //Maps
+        $vars['links'] = Link::exists();
+        $vars['device_dependencies'] = \DB::table('device_relationships')->exists();
+        $vars['device_group_dependencies'] = $vars['device_groups']->isNotEmpty() && \DB::table('device_group_device')->exists();
+        $vars['custommaps'] = CustomMap::select(['custom_map_id', 'name', 'menu_group'])->hasAccess($user)->orderBy('name')->get()->groupBy('menu_group')->sortKeys();
 
         // Service menu
         if (Config::get('show_services')) {

@@ -467,7 +467,6 @@ function init_select2(selector, type, data, selected, placeholder, config) {
     $select.select2(init);
 
     if (selected) {
-        console.log(selected);
         if (typeof selected !== 'object') {
             selected = {id: selected, text: selected};
         }
