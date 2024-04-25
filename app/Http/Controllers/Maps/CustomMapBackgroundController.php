@@ -51,44 +51,74 @@ class CustomMapBackgroundController extends Controller
     public function save(FormRequest $request, CustomMap $map)
     {
         $this->authorize('update', $map);
+        $this->validate($request, [
+            'type' => 'in:image,color,map,none',
+            'image' => 'required_if:type,image|mimes:png,jpg,svg,gif',
+            'color' => 'required_if:type,color|regex:/^#[0-9a-f]{6,8}$/',
+            'lat' => 'required_if:type,map|numeric|between:-90,90',
+            'lng' => 'required_if:type,map|numeric|between:-180,180',
+            'zoom' => 'required_if:type,nap|integer|between:0,19',
+        ]);
 
-        if ($request->bgimage) {
-            $map->background_suffix = $request->bgimage->extension();
-            if (! $map->background) {
-                $background = new CustomMapBackground;
-                $background->background_image = $request->bgimage->getContent();
-                $map->background()->save($background);
-            } else {
-                $map->background->background_image = $request->bgimage->getContent();
-                $map->background->save();
-            }
-            $map->background_version++;
-            $map->save();
-        } elseif ($request->bgclear) {
-            if ($map->background) {
-                $map->background->delete();
-            }
-            $map->background_suffix = null;
-            $map->save();
-        }
+        $map->background_type = $request->type;
+        $this->updateBackgroundImage($map, $request);
+        $map->background_data = array_merge($map->background_data, $request->only([
+            'color',
+            'lat',
+            'lng',
+            'zoom',
+        ]));
+
+        $map->save();
 
         return response()->json([
-            'bgimage' => $map->background_suffix ? true : false,
-            'bgversion' => $map->background_version,
+            'bgtype' => $map->background_type,
+            'bgdata' => $map->getBackgroundConfig(),
         ]);
+    }
+
+    private function clearImageCache(CustomMap $map): void
+    {
+        // if there are multiple web servers, it will only clear from the local.
+        $imageName = $map->bgImageCacheFileName();
+        if ($imageName && Storage::disk('base')->exists('html/images/custommap/background/' . $imageName)) {
+            Storage::disk('base')->delete('html/images/custommap/background/' . $imageName);
+        }
     }
 
     private function checkImageCache(CustomMap $map): ?string
     {
-        if (! $map->background_suffix) {
+        if ($map->background_type !== 'image') {
             return null;
         }
 
-        $imageName = $map->custom_map_id . '_' . $map->background_version . '.' . $map->background_suffix;
-        if (Storage::disk('base')->missing('html/images/custommap/background/' . $imageName)) {
+        $imageName = $map->bgImageCacheFileName();
+        if ($imageName && Storage::disk('base')->missing('html/images/custommap/background/' . $imageName)) {
             Storage::disk('base')->put('html/images/custommap/background/' . $imageName, $map->background->background_image);
         }
 
         return $imageName;
+    }
+
+    private function updateBackgroundImage(CustomMap $map, FormRequest $request): void
+    {
+        if ($map->background_type == 'image') {
+            if ($request->image) {
+                // if image type and we have image data (new image) save it
+                $background = $map->background ?? new CustomMapBackground;
+                $background->background_image = $request->image->getContent();
+                $map->background()->save($background);
+                $map->background_data = array_merge($map->background_data, [
+                    'suffix' => $request->image->extension(),
+                    'version' => md5($background->background_image),
+                    'original_filename' => $request->image->getClientOriginalName(),
+                ]);
+            }
+        } elseif ($map->getOriginal('background_type') == 'image') {
+            // if no longer image, clean up
+            $this->clearImageCache($map);
+            $map->background()->delete();
+            $map->background_data = array_diff_key($map->background_data, ['suffix' => 1, 'version' => 1, 'original_filename' => 1]);
+        }
     }
 }
