@@ -537,6 +537,7 @@ custom_maps:
     - { Field: newedgeconfig, Type: longtext, 'Null': false, Extra: '' }
     - { Field: created_at, Type: timestamp, 'Null': true, Extra: '' }
     - { Field: updated_at, Type: timestamp, 'Null': true, Extra: '' }
+    - { Field: menu_group, Type: varchar(100), 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [custom_map_id], Unique: true, Type: BTREE }
 custom_map_backgrounds:

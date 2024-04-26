@@ -1,6 +1,6 @@
 <?php
 /*
- * PollerGroupController.php
+ * CustomMapMenuGroupController.php
  *
  * -Description-
  *
@@ -19,31 +19,26 @@
  *
  * @package    LibreNMS
  * @link       http://librenms.org
- * @copyright  2021 Tony Murray
+ * @copyright  2024 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
 namespace App\Http\Controllers\Select;
 
-use App\Models\PollerGroup;
+use App\Models\CustomMap;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\Request;
 
-class PollerGroupController extends SelectController
+class CustomMapMenuGroupController extends SelectController
 {
-    protected function searchFields($request)
+    protected function searchFields($request): array
     {
-        return ['group_name', 'descr'];
+        return ['menu_group'];
     }
 
-    protected function baseQuery($request)
+    protected function baseQuery(Request $request): Builder
     {
-        return PollerGroup::query()->select(['id', 'group_name']);
-    }
-
-    protected function prependItem(): array
-    {
-        return [
-            'id' => 0,
-            'text' => __('General'),
-        ];
+        return CustomMap::query()->hasAccess($request->user())
+            ->whereNotNull('menu_group')->select('menu_group')->groupBy('menu_group');
     }
 }

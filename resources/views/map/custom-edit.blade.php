@@ -1173,6 +1173,25 @@
         }
     }
 
+    function observeEditMode() {
+        const targetNode = document.getElementsByClassName("vis-manipulation")[0];
+
+        // Start observing the target node for configured mutations
+        new MutationObserver((mutationList, observer) => {
+            for (const mutation of mutationList) {
+                if (mutation.addedNodes.length) {
+                    if(Array.from(mutation.addedNodes).some(({classList}) => classList.contains("vis-back"))) {
+                        document.getElementById("custom-map").classList.add("tw-cursor-crosshair")
+                    }
+                } else if (mutation.removedNodes.length) {
+                    if(Array.from(mutation.removedNodes).some(({classList}) => classList.contains("vis-back"))) {
+                        document.getElementById("custom-map").classList.remove("tw-cursor-crosshair")
+                    }
+                }
+            }
+        }).observe(targetNode, {attributes: false, childList: true, subtree: false});
+    }
+
     $(document).ready(function () {
         init_select2('#devicesearch', 'device', {limit: 100}, '', '{{ __('map.custom.edit.node.device_select') }}', {dropdownParent: $('#nodeModal')});
         $("#devicesearch").on("select2:select", nodeDeviceSelect);
@@ -1188,7 +1207,9 @@
         $("#portsearch").on("select2:select", edgePortSelect);
 
         refreshMap();
-    });
+
+        // watch for addNode/editNode
+        observeEditMode();    });
 </script>
 @endsection
 

@@ -1,4 +1,4 @@
-<div class="modal fade" id="mapModal" tabindex="-1" role="dialog" aria-labelledby="mapModalLabel" aria-hidden="true">
+<div class="modal fade" id="mapModal" role="dialog" aria-labelledby="mapModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -13,6 +13,12 @@
                                 <label for="mapname" class="col-sm-3 control-label">{{ __('map.custom.edit.map.name') }}</label>
                                 <div class="col-sm-9">
                                     <input type="text" id="mapname" name="mapname" class="form-control input-sm" value="{{ $name ?? '' }}">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="mapmenugroup" class="col-sm-3 control-label">{{ __('map.custom.edit.map.menu_group') }}</label>
+                                <div class="col-sm-9">
+                                    <select id="mapmenugroup" name="mapmenugroup" class="form-control input-sm"></select>
                                 </div>
                             </div>
                             <div class="form-group row">
@@ -106,6 +112,7 @@
         $("#savemap-alert").attr("class", "col-sm-12 alert alert-info");
 
         var name = $("#mapname").val();
+        var group = $("#mapmenugroup").val();
         var width = $("#mapwidth").val();
         var height = $("#mapheight").val();
         var node_align = $("#mapnodealign").val();
@@ -157,6 +164,7 @@
             url: url,
             data: {
                 name: name,
+                menu_group: group,
                 width: width,
                 height: height,
                 node_align: node_align,
@@ -205,5 +213,20 @@
         $("#maplegend").bootstrapSwitch('state', (legend.x >= 0 && legend.y >= 0));
         $("#maplegendhideinvalid").bootstrapSwitch('state', Boolean(legend.hide_invalid));
         $("#maplegendhideoverspeed").bootstrapSwitch('state', Boolean(legend.hide_overspeed));
+        init_select2("#mapmenugroup", "custom-map-menu-group", {}, @json($menu_group ?? null), "{{ __('map.custom.edit.map.no_group') }}", {
+            tags: true,
+            createTag: function (params) {
+                var term = $.trim(params.term);
+
+                if (term === '') {
+                    return null;
+                }
+
+                return {
+                    id: term,
+                    text: term
+                };
+            }
+        });
     });
 </script>

@@ -23,7 +23,8 @@ class CustomMapSettingsRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string',
+            'name' => 'required|string|max:100',
+            'menu_group' => 'nullable|string|max:100',
             'node_align' => 'integer',
             'reverse_arrows' => 'boolean',
             'edge_separation' => 'integer',

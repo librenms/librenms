@@ -33,6 +33,8 @@ return [
             'map' => [
                 'settings_title' => 'Map Settings',
                 'name' => 'Name',
+                'menu_group' => 'Menu Group',
+                'no_group' => 'No Group',
                 'width' => 'Width',
                 'height' => 'Height',
                 'alignment' => 'Node Alignment',
