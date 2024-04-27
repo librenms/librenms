@@ -327,7 +327,7 @@ $graphs['freeradius'] = [
 ];
 $graphs['suricata'] = [
     'alert',
-    'packets',
+    'packets_overview',
     'nasty_delta',
     'nasty_percent',
     'dec_proto',
