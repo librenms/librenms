@@ -26,12 +26,6 @@ jobs:
       -
         name: Checkout
         uses: actions/checkout@v4
-      - 
-        name: Set up Python runtime
-        uses: actions/setup-python@v4
-        with:
-          python-version: 3.x
-      - run: pip install mkdocs-material
       -
         name: Build mkdocs Docker image
         run: |
