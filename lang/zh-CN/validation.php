@@ -4,12 +4,12 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Authentication Language Lines
+    | Validation Language Lines
     |--------------------------------------------------------------------------
     |
-    | The following language lines are used during authentication for various
-    | messages that we need to display to the user. You are free to modify
-    | these language lines according to your application's requirements.
+    | The following language lines contain the default error messages used by
+    | the validator class. Some of these rules have multiple versions such
+    | as the size rules. Feel free to tweak each of these messages here.
     |
     */
 
@@ -116,32 +116,31 @@ return [
     'url' => ':attribute 格式不正确。',
     'uuid' => ':attribute 必须是有效的UUID。',
 
+
     /*
     |--------------------------------------------------------------------------
-    | 自定义验证语言线
+    | Custom Validation Language Lines
     |--------------------------------------------------------------------------
     |
-    | 您可以使用 "attribute.rule" 的约定在此指定属性的自定义验证消息。
-    | 这使得为特定属性规则快速指定一个自定义语言线变得简单。
+    | Here you may specify custom validation messages for attributes using the
+    | convention "attribute.rule" to name the lines. This makes it quick to
+    | specify a specific custom language line for a given attribute rule.
     |
     */
 
     'custom' => [
         'attribute-name' => [
-            'rule-name' => '自定义消息',
+            'rule-name' => 'custom-message',
         ],
     ],
 
     /*
     |--------------------------------------------------------------------------
-    | 自定义验证属性名称
+    | Custom Validation Attributes
     |--------------------------------------------------------------------------
     |
-    | 以下语言行用于将我们的属性占位符替换为更易读的内容，例如用“电子邮件地址”
-    | 替换“email”。这有助于使我们的消息更具表现力。
+    | The following language lines are used to swap our attribute placeholder
+    | with something more reader friendly such as "E-Mail Address" instead
+    | of "email". This simply helps us make our message more expressive.
     |
     */
-
-    'attributes' => [],
-
-];
