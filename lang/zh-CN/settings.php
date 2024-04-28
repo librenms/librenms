@@ -286,7 +286,7 @@ return [
         ],
         'auth_ldap_userdn' => [
             'description' => '使用全名 DN',
-            'help' => "使用用户的完整DN作为群组中成员属性的值，而非采用前缀和后缀的方式（如member: uid=username,ou=groups,dc=domain,dc=com）。",
+            'help' => '使用用户的完整DN作为群组中成员属性的值，而非采用前缀和后缀的方式（如member: uid=username,ou=groups,dc=domain,dc=com）。',
         ],
         'auth_ldap_version' => [
             'description' => 'LDAP 版本',
