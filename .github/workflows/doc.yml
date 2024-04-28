@@ -31,6 +31,7 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: 3.x
+      - run: pip install mkdocs-material
       -
         name: Build mkdocs Docker image
         run: |
@@ -56,4 +57,3 @@ jobs:
           build_dir: out
         env:
           GH_PAT: ${{ secrets.DOCS_TOKEN }}
-      - run: pip install mkdocs-material
