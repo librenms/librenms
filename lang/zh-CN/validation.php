@@ -4,11 +4,12 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | 验证语言线
+    | Authentication Language Lines
     |--------------------------------------------------------------------------
     |
-    | 以下语言线包含验证器类使用的默认错误消息。其中一些规则有多个版本，
-    | 例如大小规则。您可以随意在这里调整每一条消息。
+    | The following language lines are used during authentication for various
+    | messages that we need to display to the user. You are free to modify
+    | these language lines according to your application's requirements.
     |
     */
 
