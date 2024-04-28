@@ -35,6 +35,10 @@ jobs:
         run: |
           docker run --rm -v "$(pwd):/docs" mkdocs build --strict
           sudo chown -R $(id -u):$(id -g) ./out
+      - uses: actions/setup-python@v5
+        with:
+          python-version: 3.x
+      - run: pip install mkdocs-material
       -
         name: Check GitHub Pages status
         uses: crazy-max/ghaction-github-status@v4
@@ -51,7 +55,3 @@ jobs:
           build_dir: out
         env:
           GH_PAT: ${{ secrets.DOCS_TOKEN }}
-      - uses: actions/setup-python@v5
-        with:
-          python-version: 3.x
-      - run: pip install mkdocs-material
