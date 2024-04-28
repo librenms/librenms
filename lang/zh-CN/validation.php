@@ -4,143 +4,140 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Validation Language Lines
+    | 验证语言线
     |--------------------------------------------------------------------------
     |
-    | The following language lines contain the default error messages used by
-    | the validator class. Some of these rules have multiple versions such
-    | as the size rules. Feel free to tweak each of these messages here.
+    | 以下语言线包含验证器类使用的默认错误消息。其中一些规则有多个版本，
+    | 例如大小规则。您可以随意在这里调整每一条消息。
     |
     */
 
-    'accepted' => ':attribute 须同意。',
-    'active_url' => ':attribute 不是有效的 URL。',
-    'after' => ':attribute 须为 :date 之后的日期。',
-    'after_or_equal' => ':attribute 须等于 :date 或之后的日期。',
-    'alpha' => 'The :attribute may only contain letters.',
-    'alpha_dash' => 'The :attribute may only contain letters, numbers, dashes and underscores.',
-    'alpha_num' => 'The :attribute may only contain letters and numbers.',
-    'array' => ':attribute 需为数组。',
-    'before' => ':attribute 须为 :date 之前的日期。',
-    'before_or_equal' => ':attribute 须等于 :date 或之前的日期。',
+    'accepted' => ':attribute 必须被接受。',
+    'active_url' => ':attribute 不是一个有效的网址。',
+    'after' => ':attribute 必须晚于 :date 日期。',
+    'after_or_equal' => ':attribute 必须等于或晚于 :date 日期。',
+    'alpha' => ':attribute 只能包含字母。',
+    'alpha_dash' => ':attribute 只能包含字母、数字、破折号和下划线。',
+    'alpha_num' => ':attribute 只能包含字母和数字。',
+    'array' => ':attribute 必须是一个数组。',
+    'before' => ':attribute 必须早于 :date 日期。',
+    'before_or_equal' => ':attribute 必须等于或早于 :date 日期。',
     'between' => [
-        'numeric' => 'The :attribute must be between :min and :max.',
-        'file' => 'The :attribute must be between :min and :max kilobytes.',
-        'string' => 'The :attribute must be between :min and :max characters.',
-        'array' => 'The :attribute must have between :min and :max items.',
+        'numeric' => ':attribute 必须在 :min 和 :max 之间。',
+        'file' => ':attribute 必须在 :min 到 :max 千字节之间。',
+        'string' => ':attribute 必须在 :min 到 :max 个字符之间。',
+        'array' => ':attribute 必须有 :min 到 :max 项之间。',
     ],
-    'boolean' => 'The :attribute field must be true or false.',
-    'confirmed' => 'The :attribute confirmation does not match.',
-    'date' => 'The :attribute is not a valid date.',
-    'date_equals' => 'The :attribute must be a date equal to :date.',
-    'date_format' => 'The :attribute does not match the format :format.',
-    'different' => 'The :attribute and :other must be different.',
-    'digits' => 'The :attribute must be :digits digits.',
-    'digits_between' => 'The :attribute must be between :min and :max digits.',
-    'dimensions' => 'The :attribute has invalid image dimensions.',
-    'distinct' => 'The :attribute field has a duplicate value.',
-    'email' => 'The :attribute must be a valid email address.',
-    'exists' => 'The selected :attribute is invalid.',
-    'file' => 'The :attribute must be a file.',
-    'filled' => 'The :attribute field must have a value.',
+    'boolean' => ':attribute 字段必须为真或假。',
+    'confirmed' => ':attribute 的确认不匹配。',
+    'date' => ':attribute 不是一个有效的日期。',
+    'date_equals' => ':attribute 必须是一个与 :date 相同的日期。',
+    'date_format' => ':attribute 与格式 :format 不符。',
+    'different' => ':attribute 和 :other 必须不同。',
+    'digits' => ':attribute 必须是 :digits 位数字。',
+    'digits_between' => ':attribute 必须在 :min 和 :max 位数字之间。',
+    'dimensions' => ':attribute 的图片尺寸无效。',
+    'distinct' => ':attribute 字段有重复值。',
+    'email' => ':attribute 必须是一个有效的电子邮件地址。',
+    'exists' => '所选的 :attribute 无效。',
+    'file' => ':attribute 必须是一个文件。',
+    'filled' => ':attribute 字段必须有值。',
     'gt' => [
-        'numeric' => 'The :attribute must be greater than :value.',
-        'file' => 'The :attribute must be greater than :value kilobytes.',
-        'string' => 'The :attribute must be greater than :value characters.',
-        'array' => 'The :attribute must have more than :value items.',
+        'numeric' => ':attribute 必须大于 :value。',
+        'file' => ':attribute 必须大于 :value 千字节。',
+        'string' => ':attribute 必须大于 :value 个字符。',
+        'array' => ':attribute 必须有超过 :value 项。',
     ],
     'gte' => [
-        'numeric' => 'The :attribute must be greater than or equal :value.',
-        'file' => 'The :attribute must be greater than or equal :value kilobytes.',
-        'string' => 'The :attribute must be greater than or equal :value characters.',
-        'array' => 'The :attribute must have :value items or more.',
+        'numeric' => ':attribute 必须大于或等于 :value。',
+        'file' => ':attribute 必须大于或等于 :value 千字节。',
+        'string' => ':attribute 必须大于或等于 :value 个字符。',
+        'array' => ':attribute 必须至少有 :value 项。',
     ],
-    'image' => 'The :attribute must be an image.',
-    'in' => 'The selected :attribute is invalid.',
-    'in_array' => 'The :attribute field does not exist in :other.',
-    'integer' => 'The :attribute must be an integer.',
-    'ip' => 'The :attribute must be a valid IP address.',
-    'ipv4' => 'The :attribute must be a valid IPv4 address.',
-    'ipv6' => 'The :attribute must be a valid IPv6 address.',
-    'json' => 'The :attribute must be a valid JSON string.',
+    'image' => ':attribute 必须是一张图片。',
+    'in' => '所选的 :attribute 无效。',
+    'in_array' => ':attribute 字段不在 :other 中存在。',
+    'integer' => ':attribute 必须是一个整数。',
+    'ip' => ':attribute 必须是一个有效的IP地址。',
+    'ipv4' => ':attribute 必须是一个有效的IPv4地址。',
+    'ipv6' => ':attribute 必须是一个有效的IPv6地址。',
+    'json' => ':attribute 必须是一个有效的JSON字符串。',
     'lt' => [
-        'numeric' => 'The :attribute must be less than :value.',
-        'file' => 'The :attribute must be less than :value kilobytes.',
-        'string' => 'The :attribute must be less than :value characters.',
-        'array' => 'The :attribute must have less than :value items.',
+        'numeric' => ':attribute 必须小于 :value。',
+        'file' => ':attribute 必须小于 :value 千字节。',
+        'string' => ':attribute 必须小于 :value 个字符。',
+        'array' => ':attribute 必须少于 :value 项。',
     ],
     'lte' => [
-        'numeric' => 'The :attribute must be less than or equal :value.',
-        'file' => 'The :attribute must be less than or equal :value kilobytes.',
-        'string' => 'The :attribute must be less than or equal :value characters.',
-        'array' => 'The :attribute must not have more than :value items.',
+        'numeric' => ':attribute 必须小于或等于 :value。',
+        'file' => ':attribute 必须小于或等于 :value 千字节。',
+        'string' => ':attribute 必须小于或等于 :value 个字符。',
+        'array' => ':attribute 不得超过 :value 项。',
     ],
     'max' => [
-        'numeric' => 'The :attribute may not be greater than :max.',
-        'file' => 'The :attribute may not be greater than :max kilobytes.',
-        'string' => 'The :attribute may not be greater than :max characters.',
-        'array' => 'The :attribute may not have more than :max items.',
+        'numeric' => ':attribute 不能大于 :max。',
+        'file' => ':attribute 不能大于 :max 千字节。',
+        'string' => ':attribute 不能大于 :max 个字符。',
+        'array' => ':attribute 不能多于 :max 项。',
     ],
-    'mimes' => 'The :attribute must be a file of type: :values.',
-    'mimetypes' => 'The :attribute must be a file of type: :values.',
+    'mimes' => ':attribute 必须是以下类型文件: :values。',
+    'mimetypes' => ':attribute 必须是以下类型文件: :values。',
     'min' => [
-        'numeric' => 'The :attribute must be at least :min.',
-        'file' => 'The :attribute must be at least :min kilobytes.',
-        'string' => 'The :attribute must be at least :min characters.',
-        'array' => 'The :attribute must have at least :min items.',
+        'numeric' => ':attribute 必须至少为 :min。',
+        'file' => ':attribute 必须至少为 :min 千字节。',
+        'string' => ':attribute 必须至少为 :min 个字符。',
+        'array' => ':attribute 至少必须有 :min 项。',
     ],
-    'not_in' => 'The selected :attribute is invalid.',
-    'not_regex' => 'The :attribute format is invalid.',
-    'numeric' => 'The :attribute must be a number.',
-    'present' => 'The :attribute field must be present.',
-    'regex' => 'The :attribute format is invalid.',
-    'required' => 'The :attribute field is required.',
-    'required_if' => 'The :attribute field is required when :other is :value.',
-    'required_unless' => 'The :attribute field is required unless :other is in :values.',
-    'required_with' => 'The :attribute field is required when :values is present.',
-    'required_with_all' => 'The :attribute field is required when :values are present.',
-    'required_without' => 'The :attribute field is required when :values is not present.',
-    'required_without_all' => 'The :attribute field is required when none of :values are present.',
-    'same' => 'The :attribute and :other must match.',
+    'not_in' => '所选的 :attribute 无效。',
+    'not_regex' => ':attribute 格式不正确。',
+    'numeric' => ':attribute 必须是一个数字。',
+    'present' => ':attribute 字段必须存在。',
+    'regex' => ':attribute 格式不正确。',
+    'required' => ':attribute 字段是必填的。',
+    'required_if' => '当 :other 为 :value 时，:attribute 字段是必填的。',
+    'required_unless' => '除非 :other 在 :values 中，否则 :attribute 字段是必填的。',
+    'required_with' => '当 :values 存在时，:attribute 字段是必填的。',
+    'required_with_all' => '当 :values 全部存在时，:attribute 字段是必填的。',
+    'required_without' => '当 :values 不存在时，:attribute 字段是必填的。',
+    'required_without_all' => '当没有 :values 存在时，:attribute 字段是必填的。',
+    'same' => ':attribute 和 :other 必须一致。',
     'size' => [
-        'numeric' => 'The :attribute must be :size.',
-        'file' => 'The :attribute must be :size kilobytes.',
-        'string' => 'The :attribute must be :size characters.',
-        'array' => 'The :attribute must contain :size items.',
+        'numeric' => ':attribute 必须是 :size。',
+        'file' => ':attribute 必须是 :size 千字节。',
+        'string' => ':attribute 必须是 :size 个字符。',
+        'array' => ':attribute 必须包含 :size 项。',
     ],
-    'starts_with' => 'The :attribute must start with one of the following: :values',
-    'string' => ':attribute 须是字符串。',
-    'timezone' => 'The :attribute must be a valid zone.',
-    'unique' => 'The :attribute has already been taken.',
+    'starts_with' => ':attribute 必须以以下之一开始: :values',
+    'string' => ':attribute 必须是字符串类型。',
+    'timezone' => ':attribute 必须是一个有效的时区。',
+    'unique' => ':attribute 已经被占用。',
     'uploaded' => ':attribute 上传失败。',
-    'url' => ':attribute 格式无效。',
-    'uuid' => ':attribute 须是有效的 UUID。',
+    'url' => ':attribute 格式不正确。',
+    'uuid' => ':attribute 必须是有效的UUID。',
 
     /*
     |--------------------------------------------------------------------------
-    | Custom Validation Language Lines
+    | 自定义验证语言线
     |--------------------------------------------------------------------------
     |
-    | Here you may specify custom validation messages for attributes using the
-    | convention "attribute.rule" to name the lines. This makes it quick to
-    | specify a specific custom language line for a given attribute rule.
+    | 您可以使用 "attribute.rule" 的约定在此指定属性的自定义验证消息。
+    | 这使得为特定属性规则快速指定一个自定义语言线变得简单。
     |
     */
 
     'custom' => [
         'attribute-name' => [
-            'rule-name' => 'custom-message',
+            'rule-name' => '自定义消息',
         ],
     ],
 
     /*
     |--------------------------------------------------------------------------
-    | Custom Validation Attributes
+    | 自定义验证属性名称
     |--------------------------------------------------------------------------
     |
-    | The following language lines are used to swap our attribute placeholder
-    | with something more reader friendly such as "E-Mail Address" instead
-    | of "email". This simply helps us make our message more expressive.
+    | 以下语言行用于将我们的属性占位符替换为更易读的内容，例如用“电子邮件地址”
+    | 替换“email”。这有助于使我们的消息更具表现力。
     |
     */
 
