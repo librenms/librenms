@@ -7,6 +7,7 @@ RUN \
     'mkdocs-exclude' \
     'mkdocs-git-revision-date-localized-plugin' \
     'mkdocs-macros-plugin' \
+    'mkdocs-material' \
     'mkdocs-material-extensions' \
     'pymdown-extensions' \
   && rm -rf /tmp/*
