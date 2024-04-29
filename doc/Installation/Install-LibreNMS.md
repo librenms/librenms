@@ -18,14 +18,14 @@ Connect to the server command line and follow the instructions below.
 
 ## Install Required Packages
 
-=== ":fontawesome-brands-ubuntu: Ubuntu 22.04"
-    === ":simple-nginx: NGINX"
+=== "Ubuntu 22.04"
+    === "NGINX"
         ```
         apt install acl curl fping git graphviz imagemagick mariadb-client mariadb-server mtr-tiny nginx-full nmap php-cli php-curl php-fpm php-gd php-gmp php-json php-mbstring php-mysql php-snmp php-xml php-zip rrdtool snmp snmpd unzip python3-pymysql python3-dotenv python3-redis python3-setuptools python3-systemd python3-pip whois traceroute
         ```
 
-=== ":fontawesome-brands-ubuntu: Ubuntu 20.04"
-    === ":simple-nginx: NGINX"
+=== "Ubuntu 20.04"
+    === "NGINX"
         ```
         apt install software-properties-common
         add-apt-repository universe
@@ -34,7 +34,7 @@ Connect to the server command line and follow the instructions below.
         apt install acl curl fping git graphviz imagemagick mariadb-client mariadb-server mtr-tiny nginx-full nmap php-cli php-curl php-fpm php-gd php-gmp php-json php-mbstring php-mysql php-snmp php-xml php-zip rrdtool snmp snmpd unzip python3-pymysql python3-dotenv python3-redis python3-setuptools python3-systemd python3-pip whois traceroute
         ```
 
-    === ":simple-apache: Apache"
+    === "Apache"
         ```
         apt install software-properties-common
         add-apt-repository universe
@@ -43,8 +43,8 @@ Connect to the server command line and follow the instructions below.
         apt install acl curl apache2 fping git graphviz imagemagick libapache2-mod-fcgid mariadb-client mariadb-server mtr-tiny nmap php-cli php-curl php-fpm php-gd php-gmp php-json php-mbstring php-mysql php-snmp php-xml php-zip rrdtool snmp snmpd whois python3-pymysql python3-dotenv python3-redis python3-setuptools python3-systemd python3-pip unzip traceroute
         ```
 
-=== ":fontawesome-brands-centos: CentOS 8"
-    === ":simple-nginx: NGINX"
+=== "CentOS 8"
+    === "NGINX"
         ```
         dnf -y install epel-release
         dnf -y install dnf-utils http://rpms.remirepo.net/enterprise/remi-release-8.rpm
@@ -53,7 +53,7 @@ Connect to the server command line and follow the instructions below.
         dnf install bash-completion cronie fping git ImageMagick mariadb-server mtr net-snmp net-snmp-utils nginx nmap php-fpm php-cli php-common php-curl php-gd php-gmp php-json php-mbstring php-process php-snmp php-xml php-zip php-mysqlnd python3 python3-PyMySQL python3-redis python3-memcached python3-pip python3-systemd rrdtool unzip
         ```
 
-    === ":simple-apache: Apache"
+    === "Apache"
         ```
         dnf -y install epel-release
         dnf -y install dnf-utils http://rpms.remirepo.net/enterprise/remi-release-8.rpm
@@ -62,8 +62,8 @@ Connect to the server command line and follow the instructions below.
         dnf install bash-completion cronie fping gcc git httpd ImageMagick mariadb-server mtr net-snmp net-snmp-utils nmap php-fpm php-cli php-common php-curl php-gd php-gmp php-json php-mbstring php-process php-snmp php-xml php-zip php-mysqlnd python3 python3-devel python3-PyMySQL python3-redis python3-memcached python3-pip python3-systemd rrdtool unzip 
         ```
 
-=== ":fontawesome-brands-debian: Debian 12"
-    === ":simple-nginx: NGINX"
+=== "Debian 12"
+    === "NGINX"
         ```
         apt install apt-transport-https lsb-release ca-certificates wget acl curl fping git graphviz imagemagick mariadb-client mariadb-server mtr-tiny nginx-full nmap php8.2-cli php8.2-curl php8.2-fpm php8.2-gd php8.2-gmp php8.2-mbstring php8.2-mysql php8.2-snmp php8.2-xml php8.2-zip python3-dotenv python3-pymysql python3-redis python3-setuptools python3-systemd python3-pip rrdtool snmp snmpd unzip whois
         ```
@@ -110,24 +110,24 @@ See <https://php.net/manual/en/timezones.php> for a list of supported
 timezones.  Valid examples are: "America/New_York", "Australia/Brisbane", "Etc/UTC".
 Ensure date.timezone is set in php.ini to your preferred time zone.
 
-=== ":fontawesome-brands-ubuntu: Ubuntu 22.04"
+=== "Ubuntu 22.04"
     ```bash
     vi /etc/php/8.1/fpm/php.ini
     vi /etc/php/8.1/cli/php.ini
     ```
 
-=== ":fontawesome-brands-ubuntu: Ubuntu 20.04"
+=== "Ubuntu 20.04"
     ```bash
     vi /etc/php/8.1/fpm/php.ini
     vi /etc/php/8.1/cli/php.ini
     ```
 
-=== ":fontawesome-brands-centos: CentOS 8"
+=== "CentOS 8"
     ```
     vi /etc/php.ini
     ```
 
-=== ":fontawesome-brands-debian: Debian 12"
+=== "Debian 12"
     ```bash
     vi /etc/php/8.2/fpm/php.ini
     vi /etc/php/8.2/cli/php.ini
@@ -142,22 +142,22 @@ timedatectl set-timezone Etc/UTC
 
 ## Configure MariaDB
 
-=== ":fontawesome-brands-ubuntu: Ubuntu 22.04"
+=== "Ubuntu 22.04"
     ```
     vi /etc/mysql/mariadb.conf.d/50-server.cnf
     ```
 
-=== ":fontawesome-brands-ubuntu: Ubuntu 20.04"
+=== "Ubuntu 20.04"
     ```
     vi /etc/mysql/mariadb.conf.d/50-server.cnf
     ```
 
-=== ":fontawesome-brands-centos: CentOS 8"
+=== "CentOS 8"
     ```
     vi /etc/my.cnf.d/mariadb-server.cnf
     ```
 
-=== ":fontawesome-brands-debian: Debian 12"
+=== "Debian 12"
     ```
     vi /etc/mysql/mariadb.conf.d/50-server.cnf
     ```
@@ -192,25 +192,25 @@ exit
 
 ## Configure PHP-FPM
 
-=== ":fontawesome-brands-ubuntu: Ubuntu 22.04"
+=== "Ubuntu 22.04"
     ```bash
     cp /etc/php/8.1/fpm/pool.d/www.conf /etc/php/8.1/fpm/pool.d/librenms.conf
     vi /etc/php/8.1/fpm/pool.d/librenms.conf
     ```
 
-=== ":fontawesome-brands-ubuntu: Ubuntu 20.04"
+=== "Ubuntu 20.04"
     ```bash
     cp /etc/php/8.1/fpm/pool.d/www.conf /etc/php/8.1/fpm/pool.d/librenms.conf
     vi /etc/php/8.1/fpm/pool.d/librenms.conf
     ```
 
-=== ":fontawesome-brands-centos: CentOS 8"
+=== "CentOS 8"
     ```bash
     cp /etc/php-fpm.d/www.conf /etc/php-fpm.d/librenms.conf
     vi /etc/php-fpm.d/librenms.conf
     ```
 
-=== ":fontawesome-brands-debian: Debian 12"
+=== "Debian 12"
     ```bash
     cp /etc/php/8.2/fpm/pool.d/www.conf /etc/php/8.2/fpm/pool.d/librenms.conf
     vi /etc/php/8.2/fpm/pool.d/librenms.conf
@@ -237,7 +237,7 @@ Feel free to tune the performance settings in librenms.conf to meet your needs.
 
 ## Configure Web Server
 
-=== ":fontawesome-brands-ubuntu: Ubuntu 22.04"
+=== "Ubuntu 22.04"
     === "NGINX"
         ```bash
         vi /etc/nginx/conf.d/librenms.conf
@@ -275,7 +275,7 @@ Feel free to tune the performance settings in librenms.conf to meet your needs.
         systemctl restart php8.1-fpm
         ```
 
-=== ":fontawesome-brands-ubuntu: Ubuntu 20.04"
+=== "Ubuntu 20.04"
     === "NGINX"
         ```bash
         vi /etc/nginx/conf.d/librenms.conf
@@ -313,7 +313,7 @@ Feel free to tune the performance settings in librenms.conf to meet your needs.
         systemctl restart php8.1-fpm
         ```
 
-    === ":simple-apache: Apache"
+    === "Apache"
         ```bash
         vi /etc/apache2/sites-available/librenms.conf
         ```
@@ -351,7 +351,7 @@ Feel free to tune the performance settings in librenms.conf to meet your needs.
         systemctl restart php8.1-fpm
         ```
 
-=== ":fontawesome-brands-centos: CentOS 8"
+=== "CentOS 8"
     === "NGINX"
         ```
         vi /etc/nginx/conf.d/librenms.conf
@@ -393,7 +393,7 @@ Feel free to tune the performance settings in librenms.conf to meet your needs.
         systemctl enable --now php-fpm
         ```
 
-    === ":simple-apache: Apache"
+    === "Apache"
         Create the librenms.conf:
 
         ```
@@ -433,7 +433,7 @@ Feel free to tune the performance settings in librenms.conf to meet your needs.
         systemctl enable --now php-fpm
         ```
 
-=== ":fontawesome-brands-debian: Debian 12"
+=== "Debian 12"
     === "NGINX"
         ```bash
         vi /etc/nginx/sites-enabled/librenms.vhost
@@ -473,13 +473,13 @@ Feel free to tune the performance settings in librenms.conf to meet your needs.
 
 ## SELinux
 
-=== ":fontawesome-brands-ubuntu: Ubuntu 22.04"
+=== "Ubuntu 22.04"
     SELinux not enabled by default
 
-=== ":fontawesome-brands-ubuntu: Ubuntu 20.04"
+=== "Ubuntu 20.04"
     SELinux not enabled by default
 
-=== ":fontawesome-brands-centos: CentOS 8"
+=== "CentOS 8"
     Install the policy tool for SELinux:
 
     ```
@@ -534,25 +534,25 @@ Feel free to tune the performance settings in librenms.conf to meet your needs.
     audit2why < /var/log/audit/audit.log
     ```
 
-=== ":fontawesome-brands-debian: Debian 12"
+=== "Debian 12"
     SELinux not enabled by default
 
 ## Allow access through firewall
 
-=== ":fontawesome-brands-ubuntu: Ubuntu 22.04"
+=== "Ubuntu 22.04"
     Firewall not enabled by default
 
-=== ":fontawesome-brands-ubuntu: Ubuntu 20.04"
+=== "Ubuntu 20.04"
     Firewall not enabled by default
 
-=== ":fontawesome-brands-centos: CentOS 8"
+=== "CentOS 8"
 
     ```
     firewall-cmd --zone public --add-service http --add-service https
     firewall-cmd --permanent --zone public --add-service http --add-service https
     ```
 
-=== ":fontawesome-brands-debian: Debian 12"
+=== "Debian 12"
     Firewall not enabled by default
 
 
