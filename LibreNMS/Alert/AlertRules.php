@@ -77,7 +77,9 @@ class AlertRules
             global $PDO_FETCH_ASSOC;
             $PDO_FETCH_ASSOC = true;
             try {
-                $qry = \DB::select($sql, [$device_id]);
+                $ce = substr_count($sql,'?');
+                $device_id_array = array_fill(0,$ce,$device_id);
+                $qry = \DB::select($sql, $device_id_array);
             } catch (QueryException $e) {
                 c_echo('%RError: %n' . $e->getMessage() . PHP_EOL);
                 Eventlog::log("Error in alert rule {$rule['name']} ({$rule['id']}): " . $e->getMessage(), $device_id, 'alert', Severity::Error);
