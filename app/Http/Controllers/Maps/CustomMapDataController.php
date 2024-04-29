@@ -298,7 +298,7 @@ class CustomMapDataController extends Controller
     private function snmpSpeed(string $speeds): int
     {
         // Only succeed if the string starts with a number optionally followed by a unit, return 0 for non-parsable
-        return (int)Number::toBytes($speeds);
+        return (int) Number::toBytes($speeds);
     }
 
     private function speedColour(float $pct): string

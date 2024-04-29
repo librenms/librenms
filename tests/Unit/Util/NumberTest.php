@@ -29,7 +29,7 @@ class NumberTest extends TestCase
         $this->assertEquals(12288, Number::toBytes('12kiB')); // not technically valid, but allowed
         $this->assertEquals(12, Number::toBytes('12B'));
         $this->assertEquals(1234, Number::toBytes('1234'));
-        $this->assertSame(0, (int)Number::toBytes('garbage')); // NAN cast to int is 0
+        $this->assertSame(0, (int) Number::toBytes('garbage')); // NAN cast to int is 0
         $this->assertNan(Number::toBytes('1m'));
         $this->assertNan(Number::toBytes('1234a'));
         $this->assertNan(Number::toBytes('1234as'));
