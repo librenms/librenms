@@ -94,7 +94,7 @@ class Number
      */
     public static function toBytes(string $formatted): int|float
     {
-        if(preg_match('/^([\d.]+)([kKMGTPEZY]?)(i?)[bB]?$/', $formatted, $matches)) {
+        if(preg_match('/^([\d.]+)\s?([kKMGTPEZY]?)(i?)([bB]\w*)?$/', $formatted, $matches)) {
             [, $number, $magnitude, $baseIndicator] = $matches;
             $base = $baseIndicator == 'i' ? 1024 : 1000;
             $exponent = ['k' => 1, 'K' => 1, 'M' => 2, 'G' => 3, 'T' => 4, 'P' => 5, 'E' => 6, 'Z' => 7, 'Y' => 8];

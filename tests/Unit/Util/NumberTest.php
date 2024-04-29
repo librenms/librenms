@@ -10,8 +10,10 @@ class NumberTest extends TestCase
     public function testToBytes(): void
     {
         $this->assertEquals(2147483648, Number::toBytes('2GiB'));
+        $this->assertEquals(2147483648, Number::toBytes('2GiBytes'));
         $this->assertEquals(2147483648, Number::toBytes('2Gib'));
         $this->assertEquals(2000000000, Number::toBytes('2GB'));
+        $this->assertEquals(2000000000, Number::toBytes('2 Gbps')); // match Number::formatSI() output
         $this->assertEquals(2000000000, Number::toBytes('2Gb'));
         $this->assertEquals(2000000000, Number::toBytes('2G'));
         $this->assertEquals(3145728, Number::toBytes('3MiB'));
