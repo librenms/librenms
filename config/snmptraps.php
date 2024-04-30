@@ -10,7 +10,6 @@
 
 return [
     'trap_handlers' => [
-        'CIENA-CES-AAA-MIB::cienaCesAAAUserAuthenticationEvent' => \LibreNMS\Snmptrap\Handlers\CienaCesAAAUserAuthenticationEvent::class,
         'ALCATEL-IND1-VLAN-STP-MIB::stpNewRoot' => \LibreNMS\Snmptrap\Handlers\Aos7stpNewRoot::class,
         'ALCATEL-IND1-VLAN-STP-MIB::stpRootPortChange' => \LibreNMS\Snmptrap\Handlers\Aos7stpRootPortChange::class,
         'ALCATEL-IND1-PORT-MIB::portViolationTrap' => \LibreNMS\Snmptrap\Handlers\Aos7portViolation::class,
@@ -29,6 +28,7 @@ return [
         'BGP4-V2-MIB-JUNIPER::jnxBgpM2Established' => \LibreNMS\Snmptrap\Handlers\JnxBgpM2Established::class,
         'BRIDGE-MIB::newRoot' => \LibreNMS\Snmptrap\Handlers\BridgeNewRoot::class,
         'BRIDGE-MIB::topologyChange' => \LibreNMS\Snmptrap\Handlers\BridgeTopologyChanged::class,
+        'CIENA-CES-AAA-MIB::cienaCesAAAUserAuthenticationEvent' => \LibreNMS\Snmptrap\Handlers\CienaCesAAAUserAuthenticationEvent::class,
         'CISCO-PORT-SECURITY-MIB::cpsSecureMacAddrViolation' => \LibreNMS\Snmptrap\Handlers\CiscoMacViolation::class,
         'CISCO-ERR-DISABLE-MIB::cErrDisableInterfaceEventRev1' => \LibreNMS\Snmptrap\Handlers\CiscoErrDisableInterfaceEvent::class,
         'CISCO-IETF-DHCP-SERVER-MIB::cDhcpv4ServerStartTime' => \LibreNMS\Snmptrap\Handlers\CiscoDHCPServerStart::class,

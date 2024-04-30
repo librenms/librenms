@@ -46,13 +46,11 @@ class CienaCesAAAUserAuthenticationEvent implements SnmptrapHandler
     public function handle(Device $device, Trap $trap)
     {
         $user = $trap->getOidData($trap->findOid('CIENA-CES-AAA-MIB::cienaCesAAAUserName'));
-        //hostIp has an issue, device is currrently returning octet string instead of IP. Waiting for update to see if fixed. If not, omitt.
-        $hostIp = $trap->getOidData($trap->findOid('CIENA-CES-AAA-MIB::cienaCesAAAHostIp'));
         $message = $trap->getOidData($trap->findOid('CIENA-CES-AAA-MIB::cienaCesAAAUserAuthenticationDescription'));
         $severity = Severity::Notice;
         if ($trap->getOidData($trap->findOid('CIENA-CES-AAA-MIB::cienaCesAAAUserAuthenticationStatus')) == 'failure') {
             $severity = Severity::Warning;
         }
-        $trap->log("Authentication attempt from $hostIp by $user on " . $device->displayName() . ' ' . $message, $severity, 'auth');
+        $trap->log("Authentication attempt by $user. $message", $severity, 'auth');
     }
 }
