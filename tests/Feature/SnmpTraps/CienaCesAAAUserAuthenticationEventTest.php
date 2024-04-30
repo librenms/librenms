@@ -45,11 +45,12 @@ CIENA-CES-AAA-MIB::cienaCesAAAUserAuthenticationServiceType radius
 CIENA-CES-AAA-MIB::cienaCesAAAUserAuthenticationStatus success
 CIENA-CES-AAA-MIB::cienaCesAAAUserAuthenticationDescription User authentication succeeded
 TRAP,
-            'Authentication attempt by cienamcp. User authentication succeeded',
+            'Authentication attempt by lorem. User authentication succeeded',
             'Could not handle CienaCesAAAUserAuthenticationEvent success',
             [Severity::Notice],
         );
     }
+
     public function testAuthFail(): void
     {
         $this->assertTrapLogsMessage(<<<'TRAP'
@@ -71,6 +72,7 @@ TRAP,
             [Severity::Warning],
         );
     }
+
     public function testAuthLogout(): void
     {
         $this->assertTrapLogsMessage(<<<'TRAP'
