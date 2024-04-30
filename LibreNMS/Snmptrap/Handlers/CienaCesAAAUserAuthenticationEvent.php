@@ -51,6 +51,6 @@ class CienaCesAAAUserAuthenticationEvent implements SnmptrapHandler
         if ($trap->getOidData($trap->findOid('CIENA-CES-AAA-MIB::cienaCesAAAUserAuthenticationStatus')) == 'failure') {
             $severity = Severity::Warning;
         }
-        $trap->log("Authentication attempt by $user. $message", $severity, 'auth');
+        $trap->log("Authentication attempt by $user. $message", $severity);
     }
 }
