@@ -306,8 +306,8 @@ class RunAlerts
                 if (empty($alert['query'])) {
                     $alert['query'] = AlertDB::genSQL($alert['rule'], $alert['builder']);
                 }
-                $ce = substr_count($alert['query'],'?');
-                $device_id_array = array_fill(0,$ce,$alert['device_id']);
+                $ce = substr_count($alert['query'], '?');
+                $device_id_array = array_fill(0, $ce, $alert['device_id']);
                 $chk = dbFetchRows($alert['query'], $device_id_array);
                 //make sure we can json_encode all the datas later
                 $cnt = count($chk);
