@@ -20,7 +20,7 @@
         </x-slot>
 
         @foreach($maps as $group_name => $group)
-            <x-panel id="map-group-{{ str_replace(' ', '-', $group_name) }}" body-class="!tw-p-0">
+            <x-panel id="map-group-{{ $group_uuid = uniqid() }}" body-class="!tw-p-0">
                 @if($group_name)
                     <x-slot name="title">{{ $group_name }}</x-slot>
                 @endif
@@ -36,7 +36,7 @@
                                 <button class="btn btn-danger"
                                         onclick="startMapDelete(this)"
                                         data-map-name="{{ $map->name }}"
-                                        data-map-group-id="#map-group-{{ str_replace(' ', '-', $group_name) }}"
+                                        data-map-group-id="#map-group-{{ $group_uuid }}"
                                         data-map-id="{{ $map->custom_map_id }}"
                                 ><i class="fa fa-trash"></i> {{ __('Delete') }}</button>
                             </div>
