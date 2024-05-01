@@ -33,17 +33,19 @@
                                 <i class="fa fa-map-marked fa-fw fa-lg" aria-hidden="true"></i>
                                 <a href="{{ route('maps.custom.show', $map->custom_map_id) }}">{{ $map->name }}</a>
                             </div>
-                            <div class="tw-flex-1">
+                            <div class="tw-flex-none sm:tw-flex-1 tw-flex-shrink tw-whitespace-nowrap">
                                 <a class="btn btn-default" href="{{ route('maps.custom.edit', $map->custom_map_id) }}">
-                                    <i class="fa fa-pencil"></i>
-                                    {{ __('Edit') }}
+                                    <i class="fa fa-pencil" aria-hidden="true"></i>
+                                    <span class="tw-hidden sm:tw-inline" aria-hidden="false">{{ __('Edit') }}</span>
                                 </a>
                                 <button class="btn btn-danger"
                                         onclick="startMapDelete(this)"
                                         data-map-name="{{ $map->name }}"
                                         data-map-group-id="#map-group-{{ $group_uuid }}"
                                         data-map-id="{{ $map->custom_map_id }}"
-                                ><i class="fa fa-trash"></i> {{ __('Delete') }}</button>
+                                ><i class="fa fa-trash" aria-hidden="true"></i>
+                                    <span class="tw-hidden sm:tw-inline" aria-hidden="false">{{ __('Delete') }}</span>
+                                </button>
                             </div>
                         </div>
                     </div>
