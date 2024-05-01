@@ -36,7 +36,7 @@
                                 <button class="btn btn-danger"
                                         onclick="startMapDelete(this)"
                                         data-map-name="{{ $map->name }}"
-                                        data-map-group-id="{{ 'map-group-' . str_replace(' ', '-', $group_name) }}"
+                                        data-map-group-id="#map-group-{{ str_replace(' ', '-', $group_name) }}"
                                         data-map-id="{{ $map->custom_map_id }}"
                                 ><i class="fa fa-trash"></i> {{ __('Delete') }}</button>
                             </div>
@@ -72,7 +72,7 @@
         pendingMapToDelete = {
             id: $target.data('map-id'),
             name: $target.data('map-name'),
-            group_id: '#' + $target.data('map-group-id')
+            group_id: $target.data('map-group-id')
         };
         $('#mapDeleteModal').modal('show');
     }
