@@ -14,7 +14,9 @@
                     {{ __('map.custom.title.manage') }}
                 </div>
                 <div>
-                    <button class="btn btn-primary" onclick="$('#mapModal').modal({backdrop: 'static', keyboard: false}, 'show');">{{ __('map.custom.create_map') }}</button>
+                    <button class="btn btn-primary" onclick="$('#mapModal').modal({backdrop: 'static', keyboard: false}, 'show');">
+                        {{ __('map.custom.create_map') }}
+                    </button>
                 </div>
             </div>
         </x-slot>
@@ -28,11 +30,14 @@
                     <div id="map-{{ $map->custom_map_id }}" class="even:tw-bg-gray-50 dark:even:tw-bg-zinc-900">
                         <div class="tw-flex tw-p-3 tw-items-center hover:tw-bg-gray-100 dark:hover:tw-bg-gray-600">
                             <div class="tw-flex-1">
-                                <i class="fa fa-map-marked fa-fw fa-lg"aria-hidden="true"></i>
+                                <i class="fa fa-map-marked fa-fw fa-lg" aria-hidden="true"></i>
                                 <a href="{{ route('maps.custom.show', $map->custom_map_id) }}">{{ $map->name }}</a>
                             </div>
                             <div class="tw-flex-1">
-                                <a class="btn btn-primary" href="{{ route('maps.custom.edit', $map->custom_map_id) }}"><i class="fa fa-pencil"></i> {{ __('Edit') }}</a>
+                                <a class="btn btn-default" href="{{ route('maps.custom.edit', $map->custom_map_id) }}">
+                                    <i class="fa fa-pencil"></i>
+                                    {{ __('Edit') }}
+                                </a>
                                 <button class="btn btn-danger"
                                         onclick="startMapDelete(this)"
                                         data-map-name="{{ $map->name }}"
