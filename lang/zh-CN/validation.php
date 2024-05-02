@@ -152,6 +152,7 @@ return [
     'uuid' => ':attribute 字段必须是一个有效的UUID。'
 
     // Librenms specific
+    
     'alpha_space' => ':attribute 只能包含字母、数字、下划线和空格。',
     'ip_or_hostname' => ':attribute 必须是一个有效的IP地址/网络或主机名。',
     'is_regex' => ':attribute 不是一个有效的正则表达式',
