@@ -65,7 +65,6 @@ been up for 30344 seconds`.
 - ping max (if icmp enabled): `$alert->ping_max`
 - ping avg (if icmp enabled): `$alert->ping_avg`
 - debug (array) 
-  - poller_name - name of poller (for distributed setups)
 - Title for the Alert: `$alert->title`
 - Time Elapsed, Only available on recovery (`$alert->state == 0`): `$alert->elapsed`
 - Rule Builder (the actual rule) (use `{!! $alert->builder !!}`): `$alert->builder`

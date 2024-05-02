@@ -15,6 +15,7 @@ echo '
     <div class="col-md-6">
 ';
 require 'includes/html/dev-overview-data.inc.php';
+require 'overview/maps.inc.php';
 require 'includes/html/dev-groups-overview-data.inc.php';
 require 'overview/puppet_agent.inc.php';
 

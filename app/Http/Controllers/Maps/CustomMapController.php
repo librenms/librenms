@@ -47,6 +47,7 @@ class CustomMapController extends Controller
         return view('map.custom-manage', [
             'maps' => CustomMap::orderBy('name')->get(['custom_map_id', 'name']),
             'name' => 'New Map',
+            'menu_group' => null,
             'node_align' => 10,
             'edge_separation' => 10,
             'reverse_arrows' => 0,
@@ -101,6 +102,7 @@ class CustomMapController extends Controller
             'edit' => false,
             'map_id' => $map->custom_map_id,
             'name' => $map->name,
+            'menu_group' => $map->menu_group,
             'reverse_arrows' => $map->reverse_arrows,
             'legend' => $this->legendConfig($map),
             'background' => (bool) $map->background_suffix,
@@ -123,6 +125,7 @@ class CustomMapController extends Controller
         $data = [
             'map_id' => $map->custom_map_id,
             'name' => $map->name,
+            'menu_group' => $map->menu_group,
             'node_align' => $map->node_align,
             'edge_separation' => $map->edge_separation,
             'reverse_arrows' => $map->reverse_arrows,
@@ -163,6 +166,7 @@ class CustomMapController extends Controller
         return response()->json([
             'id' => $map->custom_map_id,
             'name' => $map->name,
+            'menu_group' => $map->menu_group,
             'width' => $map->width,
             'height' => $map->height,
             'reverse_arrows' => $map->reverse_arrows,
