@@ -59,12 +59,12 @@ return [
     ],
     'mse' => [
         'short' => 'MSE',
-        'long' => '均方误差',
+        'long' => '平均误差',
         'unit' => 'dB',
     ],
     'noise-floor' => [
-        'short' => '噪声底限',
-        'long' => '噪声底限',
+        'short' => '背景噪声',
+        'long' => '背景噪声',
         'unit' => 'dBm',
     ],
     'power' => [
