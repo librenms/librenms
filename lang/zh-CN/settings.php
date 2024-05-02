@@ -85,7 +85,7 @@ return [
             'style' => ['name' => '样式'],
             'device' => ['name' => '设备设置'],
             'worldmap' => ['name' => '世界地图设置'],
-        ],
+            ],
     ], 
     'settings' => [
         'active_directory' => [
