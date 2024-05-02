@@ -3,7 +3,7 @@
 // https://www.iana.org/assignments/bgp-parameters/bgp-parameters.xhtml#bgp-parameters-3
 return [
     'error_codes' => [
-         0 => '保留',
+        0 => '保留',
         1 => '消息头错误',
         2 => '打开消息错误',
         3 => '更新消息错误',
@@ -59,7 +59,7 @@ return [
             6 => '其他配置变更',
             7 => '连接冲突解决',
             8 => '资源不足',
-            9 => '硬重置', 
+            9 => '硬重置',
         ],
     ],
 ];
