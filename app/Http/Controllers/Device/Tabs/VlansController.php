@@ -84,9 +84,9 @@ class VlansController implements DeviceTab
             })
             ->with(['port.device'])
             ->select('ports_vlans.*', 'vlans.vlan_name')->orderBy('vlan_vlan')->orderBy('ports.ifName')->orderBy('ports.ifDescr')
-            ->get();
+            ->get()->sortBy(['vlan', 'port']);
 
-        $data = $portVlan->sortBy('port')->groupBy('vlan');
+        $data = $portVlan->groupBy('vlan');
 
         return $data;
     }
