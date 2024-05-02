@@ -78,10 +78,15 @@ class Device extends BaseModel
         'sysObjectID',
         'timeout',
         'transport',
+<<<<<<< HEAD
         'type',
         'version',
+=======
+>>>>>>> origin/20240227_ArmorPoint_Epoch
         'uptime',
-    ];
+        'under_maint',
+        'version',
+     ];
 
     protected $casts = [
         'inserted' => 'datetime',

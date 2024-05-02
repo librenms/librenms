@@ -141,6 +141,8 @@ Route::prefix('v0')->namespace('\App\Api\Controllers')->group(function () {
         Route::get('', 'LegacyApiController@get_all_ports')->name('get_all_ports');
         Route::get('{portid}/description', 'LegacyApiController@get_port_description')->name('get_port_description');
         Route::patch('{portid}/description', 'LegacyApiController@update_port_description')->name('update_port_description');
+        Route::post('{hostname}/disable', 'LegacyApiController@disable_port')->name('disable_port');
+        Route::post('{hostname}/enable', 'LegacyApiController@enable_port')->name('enable_port');
     });
 
     Route::prefix('bills')->group(function () {
@@ -171,6 +173,11 @@ Route::prefix('v0')->namespace('\App\Api\Controllers')->group(function () {
 
     Route::get('inventory/{hostname}', 'LegacyApiController@get_inventory')->name('get_inventory');
     Route::get('inventory/{hostname}/all', 'LegacyApiController@get_inventory_for_device')->name('get_inventory_for_device');
+
+    Route::group(['prefix' => 'pollers'], function () {
+        Route::get(null, 'LegacyApiController@list_pollers')->name('list_pollers');
+        Route::get('groups', 'LegacyApiController@list_poller_groups')->name('list_poller_groups');
+     });
 
     // Route not found
     Route::any('/{path?}', 'LegacyApiController@api_not_found')->where('path', '.*');

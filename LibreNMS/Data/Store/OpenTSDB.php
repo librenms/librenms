@@ -87,6 +87,7 @@ class OpenTSDB extends BaseDatastore
         $flag = Config::get('opentsdb.co');
         $timestamp = Carbon::now()->timestamp;
         $tmp_tags = 'hostname=' . $device['hostname'];
+        $tmp_tags = $tmp_tags . ' sysName=' . $device['sysName'];
 
         foreach ($tags as $k => $v) {
             $v = str_replace([' ', ',', '='], '_', $v);
