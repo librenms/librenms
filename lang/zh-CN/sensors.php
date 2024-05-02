@@ -33,7 +33,7 @@ return [
         'short' => '色散',
         'long' => '色散',
         'unit' => 'ps/nm/km',
-        'unit_long' => 'Picoseconds per Nanometer per Kilometer',
+        'unit_long' => '皮秒/纳米/千米',
     ],
     'cooling' => [
         'short' => 'Cooling',
@@ -126,8 +126,8 @@ return [
         'unit_long' => '',
     ],
     'runtime' => [
-        'short' => 'Runtime',
-        'long' => 'Runtime',
+        'short' => '运行时间',
+        'long' => '运行时间',
         'unit' => '分',
         'unit_long' => '分钟',
     ],

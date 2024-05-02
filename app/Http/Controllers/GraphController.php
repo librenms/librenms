@@ -45,7 +45,7 @@ class GraphController extends Controller
                 throw $e;
             }
 
-            return response($e->generateErrorImage(), 500, ['Content-type' => ImageFormat::forGraph()->contentType()]);
+            return response($e->generateErrorImage(), 500, ['Content-type' => ImageFormat::forGraph($vars['graph_type'] ?? null)->contentType()]);
         }
     }
 }

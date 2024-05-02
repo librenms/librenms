@@ -96,9 +96,9 @@ try {
 
     // output the graph
     if (\LibreNMS\Util\Debug::isEnabled()) {
-        echo '<img src="data:' . ImageFormat::forGraph()->contentType() . ';base64,' . base64_encode($image_data) . '" alt="graph" />';
+        echo '<img src="data:' . ImageFormat::forGraph($vars['graph_type'] ?? null)->contentType() . ';base64,' . base64_encode($image_data) . '" alt="graph" />';
     } else {
-        header('Content-type: ' . ImageFormat::forGraph()->contentType());
+        header('Content-type: ' . ImageFormat::forGraph($vars['graph_type'] ?? null)->contentType());
         echo (isset($vars['output']) && $vars['output'] === 'base64') ? base64_encode($image_data) : $image_data;
     }
 } catch (\LibreNMS\Exceptions\RrdGraphException $e) {

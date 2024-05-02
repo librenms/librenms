@@ -34,6 +34,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Config;
+use LibreNMS\Util\Number;
 use LibreNMS\Util\Url;
 
 class CustomMapDataController extends Controller
@@ -291,50 +292,19 @@ class CustomMapDataController extends Controller
 
     private function rateString(int $rate): string
     {
-        if ($rate < 1000) {
-            return $rate . ' bps';
-        } elseif ($rate < 1000000) {
-            return intval($rate / 1000) . ' kbps';
-        } elseif ($rate < 1000000000) {
-            return intval($rate / 1000000) . ' Mbps';
-        } elseif ($rate < 1000000000000) {
-            return intval($rate / 1000000000) . ' Gbps';
-        } elseif ($rate < 1000000000000000) {
-            return intval($rate / 1000000000000) . ' Tbps';
-        } else {
-            return intval($rate / 1000000000000000) . ' Pbps';
-        }
+        return Number::formatSi($rate, 0, 0, 'bps');
     }
 
     private function snmpSpeed(string $speeds): int
     {
-        // Only succeed if the string startes with a number optionally followed by a unit
-        if (preg_match('/^(\d+)([kMGTP])?/', $speeds, $matches)) {
-            $speed = (int) $matches[1];
-            if (count($matches) < 3) {
-                return $speed;
-            } elseif ($matches[2] == 'k') {
-                $speed *= 1000;
-            } elseif ($matches[2] == 'M') {
-                $speed *= 1000000;
-            } elseif ($matches[2] == 'G') {
-                $speed *= 1000000000;
-            } elseif ($matches[2] == 'T') {
-                $speed *= 1000000000000;
-            } elseif ($matches[2] == 'P') {
-                $speed *= 1000000000000000;
-            }
-
-            return $speed;
-        }
-
-        return 0;
+        // Only succeed if the string starts with a number optionally followed by a unit, return 0 for non-parsable
+        return (int) Number::toBytes($speeds);
     }
 
     private function speedColour(float $pct): string
     {
         // For the maths below, the 5.1 is worked out as 255 / 50
-        // (255 being the max colour value and 50 is the max of the $pct calcluation)
+        // (255 being the max colour value and 50 is the max of the $pct calculation)
         if ($pct < 0) {
             // Black if we can't determine the percentage (link down or speed 0)
             return '#000000';

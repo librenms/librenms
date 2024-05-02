@@ -251,7 +251,7 @@
                         @endif
                         @admin
                         <li role="presentation" class="divider"></li>
-                        <li><a href="{{ route('maps.custom.index') }}"><i class="fa fa-map-marked fa-fw fa-lg"
+                        <li><a href="{{ route('maps.custom.index') }}"><i class="fa fa-pen-to-square fa-fw fa-lg"
                                                                           aria-hidden="true"></i> {{ __('Custom Map Editor') }}
                             </a></li>
                         @endadmin

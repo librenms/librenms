@@ -87,7 +87,7 @@ class Graph
                 throw $e;
             }
 
-            return new GraphImage(ImageFormat::forGraph(), 'Error', $e->generateErrorImage());
+            return new GraphImage(ImageFormat::forGraph($vars['graph_type'] ?? null), 'Error', $e->generateErrorImage());
         }
     }
 

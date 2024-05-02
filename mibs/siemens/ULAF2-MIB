@@ -1,0 +1,1055 @@
+          ULAF2-MIB DEFINITIONS ::= BEGIN
+--------------------------------------------------------------------------------  
+-- The lineintegrator MIB
+-- ______________
+--
+-- 1. Introduction
+-- This document defines the enterprise specific MIB for the LineIntegrater,
+-- which provides the management of the ULAF-2 transmission family.
+-- The MIB is divided into three basic MIBs
+--    proxyAgent MIB
+--    device     MIB
+--    links MIB
+--
+-- 2. The proxyAgent MIB
+-- _____________________
+--
+-- The proxyAgent MIB consists of a table with information about the 
+-- supervised serial ports and the connected devices. Either an OMI 
+-- equipment or a NAG-2D.x can be connected.
+--
+--
+-- 3. The device MIB
+-- _________________
+--
+-- The device MIB is a table, where each entry refers to a line card slot.
+-- It contains the name of the inserted cards and a alarm attribute, which
+-- is used to send SNMP traps to the manager, if a link goes down.
+--
+-- 5. The links MIB
+-- _____________________
+--
+-- The links MIB consists of several tables, which contain detailed
+-- management information about the line cards.
+-- The links MIB is divided into three parts
+--    link
+--    near
+--    far
+-- The near part contains only configuration information about the line
+-- card. 
+-- The link part is separated into configuration, performance ,fault
+-- management and alarm management. In addition the performance part contains
+-- a table about attenuation and error estimation of HDSL links (hdslTable).
+--
+-- 16.12.96 Urs Aebersold, Siemens Switzerland Ltd.
+--------------------------------------------------------------------------------  
+
+          IMPORTS
+	          enterprises, NetworkAddress, IpAddress, Counter, Gauge,
+		  TimeTicks
+                          FROM RFC1155-SMI
+		  DisplayString
+                          FROM RFC1213-MIB
+                  OBJECT-TYPE
+                          FROM RFC-1212;
+
+	  siemensCH		OBJECT IDENTIFIER ::= { enterprises 1887 }
+
+	  lineintegrator	OBJECT IDENTIFIER ::= { siemensCH 1 }
+                    
+          ulaf2 		OBJECT IDENTIFIER ::= { lineintegrator 1 }
+
+          proxyAgent		OBJECT IDENTIFIER ::= { ulaf2 1 }
+
+	  proxyAgtVers2		OBJECT IDENTIFIER ::= { proxyAgent 2 }
+
+          device		OBJECT IDENTIFIER ::= { ulaf2 3 }
+
+          links    		OBJECT IDENTIFIER ::= { ulaf2 4 }
+
+	  linksVers2		OBJECT IDENTIFIER ::= { links 2 }
+
+
+--------------------------------------------------------------------------------  
+	  agtSystem OBJECT IDENTIFIER ::= { proxyAgtVers2 1 }
+
+--------------------------------------------------------------------------------  
+agtSWVersion OBJECT-TYPE
+	SYNTAX DisplayString(SIZE(0..255))
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Contains software version of Proxy Subagent."
+	::= { agtSystem 1 }
+
+agtDateLastPortChange OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Contains time when the connected device or the type of link of a device
+                 equipment has changed.(Link Up and Down traps)."
+	::= { agtSystem 2 }
+
+agtProxyFeatureFlag OBJECT-TYPE
+	SYNTAX OCTET STRING(SIZE(33))
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Contains a map of features supported by the local device.
+		Byte 0-31 contain the bit-coded feature flags 0..255
+		Byte 32 contains information about the validity of the
+		previous 32 bytes.
+		1	Ok	The information in bytes 0..31 is valid
+		254		unknown values
+		255		unsupported variable for addressed device"
+	::= { agtSystem 3 }
+
+agtProxyAciSupported OBJECT-TYPE
+	SYNTAX DisplayString
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Identifies this device as Ulaf+ OMI SNMP towards
+		Access Integrator. Always returns 'FullAciSupport'"
+	::= { agtSystem 4 }
+
+--------------------------------------------------------------------------------  
+	  agtSerialPort OBJECT IDENTIFIER ::= { proxyAgtVers2 2 }
+
+--------------------------------------------------------------------------------  
+agtPortNumber OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"This object contains the number of available serial ports"
+	::= { agtSerialPort 1 }
+
+agtPortTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF AgtPortEntry
+	ACCESS not-accessible
+	STATUS mandatory
+	DESCRIPTION
+		""
+	::= { agtSerialPort 2 }
+
+agtPortEntry OBJECT-TYPE
+	SYNTAX AgtPortEntry
+	ACCESS not-accessible
+	STATUS mandatory
+	DESCRIPTION
+		""
+	INDEX { agtPortIndex }
+	::= { agtPortTable 1 }
+
+AgtPortEntry ::=
+   SEQUENCE
+   {
+      agtPortIndex INTEGER,
+      agtPortName DisplayString,
+      agtPortConnected INTEGER,
+      agtConnectedDevice DisplayString,
+      agtPortType INTEGER,
+      agtPortTypeNumber INTEGER,
+      agtPortServerName DisplayString,
+      agtPortState INTEGER,
+      agtPortDeviceFamily INTEGER,
+      agtPortTryingDevice INTEGER
+   }
+
+agtPortIndex OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"This object corresponds to the port number. Ports are 
+                 enumarated beginning with one."
+	::= { agtPortEntry 1 }
+
+agtPortName OBJECT-TYPE
+	SYNTAX DisplayString(SIZE(0..255))
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Contains name of device file"
+	::= { agtPortEntry 2 }
+
+
+agtPortConnected OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+		   no(1),
+		   yes(2)
+		}
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"This object tells the agent, if the appropriate serial port 
+                 is used or not."
+	::= { agtPortEntry 3 }
+
+
+agtConnectedDevice OBJECT-TYPE
+	SYNTAX DisplayString(SIZE(0..255))
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"This object contains the name of the connected device (e.g OMIBG)."
+	::= { agtPortEntry 4 }
+
+agtPortType OBJECT-TYPE
+	SYNTAX INTEGER
+	{
+           local(1),
+           portType(2),
+	   portServer(3)
+        }
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"This object describes if the port is a local RS232 serial port,
+                 a locally installed serial port card or the port is a remote
+                 port of a port server"
+	::= { agtPortEntry 5 }
+
+agtPortTypeNumber OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"This object contains the number of the serial port of the 
+                 appropriate port type defined in agtPortType."
+	::= { agtPortEntry 6 }
+
+agtPortServerName OBJECT-TYPE
+	SYNTAX DisplayString(SIZE(0..255))
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"This object contains a name to identify the port server"
+	::= { agtPortEntry 7 }
+
+agtPortState OBJECT-TYPE
+	------------------------------------
+	-- new in V3.0
+	------------------------------------
+	SYNTAX INTEGER
+	{
+		unopenedSerial(1),
+		openedSerial(2),
+		connectingRemote(3),
+		openedRemote(4),
+		failedRemote(5),
+		disabled(6),
+		invalid(7),
+		unknown(254)
+	}
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"This variable shows in which reconnection state a port is.
+		 The first two states refer to local serial ports or to
+		 PortServer ports using the Digi RealPort drivers, the last
+		 three states refer to PortServer ports using the
+		 proprietory method of LineIntegrator.
+		 1	UnopenedSerial		Serial port, not opened
+		 2	OpenedSerial		Serial port, opened
+		 3	ConnectingRemote	Remote port, waiting for connection
+		 4	OpenedRemote		Remote port, opened
+		 5	FailedRemote		Remote port, connection failed
+		 6	Disabled		Port is disabled
+		 7	Invalid			Port entry is invalid (configuration file problem)
+		 254	Unknown			Unknown value"
+	::= { agtPortEntry 8 }
+
+agtPortDeviceFamily OBJECT-TYPE
+	------------------------------------
+	-- new in V3.0
+	------------------------------------
+	SYNTAX INTEGER
+	{
+		ulaf2(1),
+		ulafPlus(2),
+		ulaf2AndPlus(3),
+		unknown(254)
+	}
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"This variable shows which device family will be tried during
+		 the auto-discovery phase.
+		 1	Ulaf2		Ulaf-2 Devices (OMI, NAG) will be discovered
+		 2	UlafPlus	Ulaf+ Devices (OMI, XTU) will be discovered
+		 3	Ulaf2AndPlus	Ulaf-2 and Ulaf+ devices will be discovered
+		 254	Unknown		Unknown value"
+	::= { agtPortEntry 9 }
+
+
+agtPortTryingDevice OBJECT-TYPE
+	------------------------------------
+	-- new in V3.0
+	------------------------------------
+	SYNTAX INTEGER
+	{
+		disabled(1),
+		invalid(2),
+		none(3),
+		omi(4),
+		nag(5),
+		omiPlus(6),
+		desktopPlus(7),
+		unknown(254)
+	}
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"This variable shows which device is currently being tried on the port.
+		 If no answer is received during 5 seconds, the next device will be tried
+		 1	Disabled	The port has been disabled, no device will be tried
+		 2	Invalid		The port is invalid, no device will be tried
+		 3	None		No device is being tried at the moment
+		 4	Omi		Trying Ulaf-2 OMI
+		 5	Nag		Trying Ulaf-2 NAG Desktop
+		 6	OmiPlus		Trying Ulaf+ OMI
+		 7	DesktopPlus	Trying Ulaf+ Desktop
+		 254	Unknown		Unknown value"
+	::= { agtPortEntry 10 }
+
+
+
+--------------------------------------------------------------------------------  
+	  agtAlarmCountGroup OBJECT IDENTIFIER ::= { proxyAgtVers2 3 }
+
+--------------------------------------------------------------------------------  
+agtAlarmCount OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"This object counts the number of Alarm traps
+		 sent by this proxy since the last time the
+		 variable has been read."
+	::= { agtAlarmCountGroup 1 }
+
+--------------------------------------------------------------------------------  
+--------------------------------------------------------------------------------  
+agtPortServerReset OBJECT-TYPE
+	SYNTAX INTEGER
+	{
+		reset(1),
+		unknown(254)
+	}
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"This variable cannot be read (it returns unknown if read)
+		 If reset(1) is written to it, the proxy tries to reset all
+		 DigiInternational PortServers. It does not reset any other
+		 manufacturer's port servers.
+		 
+		 This step can be necessary, if a router between the proxy 
+		 and a PortServer has crashed and the PortServer keeps open
+		 a stale connection to which the proxy can no longer connect.
+		 
+		 Do not use this feature manually but use the option in the
+		 LineIntegrator Menu in HP OpenView NNM."
+	::= { proxyAgtVers2 4 }
+
+--------------------------------------------------------------------------------  
+
+
+-------------------------------------------------------------------------------
+--
+-- { COMMENTED OUT THIS SECTION, bee, 30-11-2000
+--
+-- This section has been deactivated after having been tested
+-- the proxy supports these variables in principle but as the
+-- OMI SNMP does not yet support them, this section of the
+-- mib has been commented out. furthermore the corresponding
+-- support in the proxy is beeing suppressed in the undefs.h
+-- file.
+--
+-- to reactivate the section, you need to 
+-- - remove the undef lines from ~/work/proxy/src/undefs.h
+-- - remove the minus (-) signs at the beginning of this 
+--   block (the curly bracket on the first comment line
+--   is conveniently matched with a comment block at the
+--   end, so Ctrl-G in Joe should jump between them)
+--
+-------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------
+--	agtOmiSnmpIpData OBJECT IDENTIFIER ::= { proxyAgtVers2 5 }
+--
+-------------------------------------------------------------------------------  
+--agtOmiSnmpIpDataMacAddress OBJECT-TYPE
+--	SYNTAX OCTET STRING (SIZE(6))
+--	ACCESS read-only
+--	STATUS mandatory
+--	DESCRIPTION
+--		"Returns the 6 bytes of the OMI SNMP's or Proxy's
+--		 MAC Address"
+--	::= { agtOmiSnmpIpData 1 }
+--
+--agtOmiSnmpIpDataIpAddress OBJECT-TYPE
+--	SYNTAX IpAddress
+--	ACCESS read-write
+--	STATUS mandatory
+--	DESCRIPTION
+--		"Returns the 4 bytes of the OMI SNMP's or Proxy's
+--		 IP Address"
+--	::= { agtOmiSnmpIpData 2 }
+--
+--agtOmiSnmpIpDataSubnetMask OBJECT-TYPE
+--	SYNTAX IpAddress
+--	ACCESS read-write
+--	STATUS mandatory
+--	DESCRIPTION
+--		"Returns the 4 bytes of the OMI SNMP's or Proxy's
+--		 Subnet Mask"
+--	::= { agtOmiSnmpIpData 3 }
+--
+--agtOmiSnmpIpDataDefaultRouter OBJECT-TYPE
+--	SYNTAX IpAddress
+--	ACCESS read-write
+--	STATUS mandatory
+--	DESCRIPTION
+--		"Returns the 4 bytes of the OMI SNMP's or Proxy's
+--		 Default Router IP Address"
+--	::= { agtOmiSnmpIpData 4 }
+--
+--agtOmiSnmpIpDataTrapDestNumber OBJECT-TYPE
+--	SYNTAX INTEGER
+--	ACCESS read-only
+--	STATUS mandatory
+--	DESCRIPTION
+--		"Contains the number of entries in the
+--		 Trap Destination Table"
+--	::= { agtOmiSnmpIpData 5 }
+--
+--agtOmiSnmpIpDataTrapDestTable OBJECT-TYPE
+--	SYNTAX SEQUENCE OF AgtOmiSnmpIpDataTrapDestEntry
+--	ACCESS not-accessible
+--	STATUS mandatory
+--	DESCRIPTION
+--		"Contains the IP Settings of the OMI SNMP"
+--	::= { agtOmiSnmpIpData 6 }
+--
+--agtOmiSnmpIpDataTrapDestEntry OBJECT-TYPE
+--	SYNTAX AgtOmiSnmpIpDataTrapDestEntry
+--	ACCESS not-accessible
+--	STATUS mandatory
+--	DESCRIPTION
+--		"Contains the IP Settings of the OMI SNMP"
+--	INDEX { agtOmiSnmpIpDataTrapDestIndex }
+--	::= { agtOmiSnmpIpDataTrapDestTable 1 }
+--
+--AgtOmiSnmpIpDataTrapDestEntry ::=
+--   SEQUENCE
+--   {
+--      agtOmiSnmpIpDataTrapDestIndex INTEGER,
+--      agtOmiSnmpIpDataTrapDestAddress OCTET STRING
+--   }
+--
+--agtOmiSnmpIpDataTrapDestIndex OBJECT-TYPE
+--	SYNTAX INTEGER
+--	ACCESS read-only
+--	STATUS mandatory
+--	DESCRIPTION
+--		"Index to the Trap Destinations"
+--	::= { agtOmiSnmpIpDataTrapDestEntry 1 }
+--
+--agtOmiSnmpIpDataTrapDestAddress OBJECT-TYPE
+--	SYNTAX IpAddress
+--	ACCESS read-write
+--	STATUS mandatory
+--	DESCRIPTION
+--		"Returns the 4 bytes of the OMI SNMP's or Proxy's
+--		 Trap Destinations"
+--	::= { agtOmiSnmpIpDataTrapDestEntry 2 }
+--
+------------------------------------------------------------------------------  
+--
+-- END OF COMMENTED OUT SECTION, bee, 30-11-2000 }
+--
+------------------------------------------------------------------------------  
+
+
+
+--------------------------------------------------------------------------------  
+	  deviceVers2    OBJECT IDENTIFIER ::= { device 2 }
+
+--------------------------------------------------------------------------------  
+
+--------------------------------------------------------------------------------  
+	  deviceSystem    OBJECT IDENTIFIER ::= { deviceVers2 1 }
+
+--------------------------------------------------------------------------------  
+
+deviceSystemTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF DeviceSystemEntry
+	ACCESS not-accessible
+	STATUS mandatory
+	DESCRIPTION
+		""
+	::= { deviceSystem 1 }
+
+deviceSystemEntry OBJECT-TYPE
+	SYNTAX DeviceSystemEntry
+	ACCESS not-accessible
+	STATUS mandatory
+	DESCRIPTION
+		""
+	INDEX { deviceSystemPortIndex }
+	::= { deviceSystemTable 1 }
+
+DeviceSystemEntry ::=
+   SEQUENCE
+   {
+      deviceSystemPortIndex INTEGER,
+      deviceLinkNumber INTEGER,
+      deviceSWVersion DisplayString,
+      deviceExtAlarm INTEGER,
+      deviceDateLastLinkChange INTEGER,
+      deviceOmiFeatureFlag OCTET STRING
+   }
+
+deviceSystemPortIndex OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"This object addresses the port of the proxy agent."
+	::= { deviceSystemEntry 1 }
+
+deviceLinkNumber OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"This object contains the maximum number of supported line cards "
+	::= { deviceSystemEntry 2 }
+
+
+deviceSWVersion OBJECT-TYPE
+	SYNTAX DisplayString(SIZE(0..255))
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Contains software version of device."
+	::= { deviceSystemEntry 3 }
+
+deviceExtAlarm OBJECT-TYPE 
+	SYNTAX  INTEGER
+		{
+                   noAlarm(1),
+		   urgent(2),
+		   notUrgent(3)
+                }
+   	ACCESS	read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"This object contains the external alarm of the OMI equipment."
+	::= { deviceSystemEntry 4 }
+
+deviceDateLastLinkChange OBJECT-TYPE 
+	SYNTAX  INTEGER
+   	ACCESS	read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"This object contains the absolute date and time when the type 
+                 of link has changed its configuration. 
+                 (e.g. removing a line card).
+                 (Link Up and Link Down Traps)"
+	::= { deviceSystemEntry 5 }
+
+deviceOmiFeatureFlag OBJECT-TYPE
+	SYNTAX OCTET STRING(SIZE(33))
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Contains a map of features supported by the local device.
+		Byte 0-31 contain the bit-coded feature flags 0..255
+		Byte 32 contains information about the validity of the
+		previous 32 bytes.
+		1	Ok	The information in bytes 0..31 is valid
+		254		unknown values
+		255		unsupported variable for addressed device"
+	::= { deviceSystemEntry 6 }
+
+--------------------------------------------------------------------------------  
+	  deviceLinks    OBJECT IDENTIFIER ::= { deviceVers2 2 }
+
+--------------------------------------------------------------------------------  
+
+
+deviceLinkTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF DeviceLinkEntry
+	ACCESS not-accessible
+	STATUS mandatory
+	DESCRIPTION
+		""
+	::= { deviceLinks 1 }
+
+deviceLinkEntry OBJECT-TYPE
+	SYNTAX DeviceLinkEntry
+	ACCESS not-accessible
+	STATUS mandatory
+	DESCRIPTION
+		""
+	INDEX { devicePortIndex, deviceLinkIndex }
+	::= { deviceLinkTable 1 }
+
+DeviceLinkEntry ::=
+   SEQUENCE
+   {
+      devicePortIndex
+         INTEGER,
+      deviceLinkIndex
+         INTEGER,
+      deviceLinkName
+         DisplayString,
+      deviceLinkAlarm
+         INTEGER,
+      -------------------------------
+      -- added in V3.0
+      -------------------------------
+      deviceLinkLocalLtNt INTEGER,
+      deviceLinkLocalId DisplayString,
+      deviceLinkFarId DisplayString,
+      deviceLinkNumReg1 INTEGER,
+      deviceLinkNumReg2 INTEGER,
+      deviceLinkLocalModules INTEGER,
+      deviceLinkFarModules INTEGER,
+      deviceLinkLocalHwFabData DisplayString,
+      deviceLinkFarHwFabData DisplayString,
+      deviceLinkLocalG703FabData DisplayString,
+      deviceLinkLocalDataFabData DisplayString,
+      -------------------------------
+      -- added in V3.1
+      -------------------------------
+      deviceLinkLocalFeatureFlag OCTET STRING,
+      deviceLinkFarFeatureFlag OCTET STRING,
+      deviceLinkFarFeatureFlagState INTEGER,
+      -------------------------------
+      -- added in V3.4
+      -------------------------------
+      deviceLinkSruFeatureFlag OCTET STRING,
+      
+      deviceLinkNumReg3 INTEGER,
+      deviceLinkNumReg4 INTEGER
+   }
+
+devicePortIndex OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"This object addresses the port of the proxy agent."
+	::= { deviceLinkEntry 1 }
+
+deviceLinkIndex OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"This object addresses the links."
+	::= { deviceLinkEntry 2 }
+
+deviceLinkName OBJECT-TYPE
+	SYNTAX DisplayString(SIZE(0..255))
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"This object contains the name of the inserted line card.
+                 If no line card exists, the name is Unknown."
+	::= { deviceLinkEntry 3 }
+
+deviceLinkAlarm OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS	read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"This object contains the collected alarms 
+                 It is used to convert alarm notifications
+                 to SNMP traps. 
+                 
+                 Bits 0,1 and 2 are used for the Alarm Summary
+                 Bit 5 is used to signify a loop state change of Ulaf-2 Desktop devices
+                 
+                 Bit	Alarm		Description
+
+		 0	UA	        Urgent alarm
+                 1      NUA		Non urgent alarm
+		 2  	AIS		Alarm indication signal
+		 3	unused
+		 4  	unused
+		 5  			loopback change (Ulaf-2)
+
+                "
+
+	::= { deviceLinkEntry 4 }
+
+      -------------------------------
+      -- added in V3.0
+      -------------------------------
+deviceLinkLocalLtNt OBJECT-TYPE
+	SYNTAX INTEGER
+	{
+		lt(1),
+		nt(2),
+		unknown(254),
+		unsupported(255)
+	}
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Indicates whether the management system is connected to
+		an LT or an NT device.
+		1	LT	Device is configured as LT
+		2	NT	Device is configured as NT (NT local)
+		254		unknown value
+		255		unsupported variable for addressed device"
+	::= { deviceLinkEntry 5 }
+
+deviceLinkLocalId OBJECT-TYPE
+	SYNTAX DisplayString
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Contains the Firmware ID of the local device."
+	::= { deviceLinkEntry 6 }
+
+deviceLinkFarId OBJECT-TYPE
+	SYNTAX DisplayString
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Contains the Firmware ID of the far device."
+	::= { deviceLinkEntry 7 }
+
+deviceLinkNumReg1 OBJECT-TYPE
+	SYNTAX INTEGER
+	{
+		none(1),
+		one(2),
+		two(3),
+		three(4),
+		four(5),
+		five(6),
+		six(7),
+		seven(8),
+		eight(9),
+		unknown(254),
+		unsupported(255)
+	}
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Indicates how many regenerators were detected in HDSL path 1.
+		1	None	No regenerator found
+		2	One	One regenerator found (section A or 1)
+		3	Two	Two regenerators found (section B or 2)
+		4	Three	Three regenerators found (section 3)
+		5	Four	Four regenerators found (section 4)
+		6	Five	Five regenerators found (section 5)
+		7	Six	Six regenerators found (section 6)
+		8	Seven	Seven regenerators found (section 7)
+		9	Eight	Eight regenerators found (section 8)
+		254		unknown value
+		255		unsupported value"
+	::= { deviceLinkEntry 8 }
+
+deviceLinkNumReg2 OBJECT-TYPE
+	SYNTAX INTEGER
+	{
+		none(1),
+		one(2),
+		two(3),
+		three(4),
+		four(5),
+		five(6),
+		six(7),
+		seven(8),
+		eight(9),
+		unknown(254),
+		unsupported(255)
+	}
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Indicates how many regenerators were detected in HDSL path 1.
+		1	None	No regenerator found
+		2	One	One regenerator found (section A or 1)
+		3	Two	Two regenerators found (section B or 2)
+		4	Three	Three regenerators found (section 3)
+		5	Four	Four regenerators found (section 4)
+		6	Five	Five regenerators found (section 5)
+		7	Six	Six regenerators found (section 6)
+		8	Seven	Seven regenerators found (section 7)
+		9	Eight	Eight regenerators found (section 8)
+		254		unknown value
+		255		unsupported value"
+	::= { deviceLinkEntry 9 }
+
+deviceLinkLocalModules OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Gives a short summary of which modules are installed in the local
+		device. This variable is bit coded as follows:
+		Bit 0	G.703 Interface installed
+		Bit 1	Data Interface installed
+		Bit 2	Alarm Module installed
+		Bit 3	Clock Module installed
+		Bit 4	Debug Module installed
+		Bit 5	Rps Module installed
+		Bit 6	unknown value (ignore bits 0-5)
+		Bit 7   unsupported value (ignore bits 0-5)"
+	::= { deviceLinkEntry 10 }
+
+deviceLinkFarModules OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Gives a short summary of which modules are installed in the far
+		device. This variable is bit coded as follows:
+		Bit 0	G.703 Interface installed
+		Bit 1	Data Interface installed
+		Bit 2	Alarm Module installed
+		Bit 3	Clock Module installed
+		Bit 4	Debug Module installed
+		Bit 5	Rps Module installed
+		Bit 6	unknown value (ignore bits 0-5)
+		Bit 7   unsupported value (ignore bits 0-5)"
+	::= { deviceLinkEntry 11 }
+
+deviceLinkLocalHwFabData OBJECT-TYPE
+	SYNTAX DisplayString
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Contains the Mainboard fabrication data of the local device."
+	::= { deviceLinkEntry 12 }
+
+deviceLinkFarHwFabData OBJECT-TYPE
+	SYNTAX DisplayString
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Contains the Mainboard fabrication data of the far device."
+	::= { deviceLinkEntry 13 }
+
+deviceLinkLocalG703FabData OBJECT-TYPE
+	SYNTAX DisplayString
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Contains the G703 Module fabrication data of the local device."
+	::= { deviceLinkEntry 14 }
+
+deviceLinkLocalDataFabData OBJECT-TYPE
+	SYNTAX DisplayString
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Contains the Data Module fabrication data of the local device."
+	::= { deviceLinkEntry 15 }
+
+      -------------------------------
+      -- added in V3.0
+      -------------------------------
+
+deviceLinkLocalFeatureFlag OBJECT-TYPE
+	SYNTAX OCTET STRING(SIZE(33))
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Contains a map of features supported by the local device.
+		Byte 0-31 contain the bit-coded feature flags 0..255
+		Byte 32 contains information about the validity of the
+		previous 32 bytes.
+		1	Ok	The information in bytes 0..31 is valid
+		254		unknown values
+		255		unsupported variable for addressed device"
+	::= { deviceLinkEntry 16 }
+	
+deviceLinkFarFeatureFlag OBJECT-TYPE
+	SYNTAX OCTET STRING(SIZE(33))
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Contains a map of features supported by the local device.
+		Byte 0-31 contain the bit-coded feature flags 0..255
+		Byte 32 contains information about the validity of the
+		previous 32 bytes.
+		1	Ok	The information in bytes 0..31 is valid
+		254		unknown values
+		255		unsupported variable for addressed device"
+	::= { deviceLinkEntry 17 }
+
+deviceLinkFarFeatureFlagState OBJECT-TYPE
+	SYNTAX INTEGER
+	{
+		ok(1),
+		tooEarly(2),
+		legacy(3),
+		unknown(254),
+		unsupported(255)
+	}
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Indicates the state and validity of deviceLinkFarFeatureFlag.
+		1	Ok		The values of farFeatureFlag is valid
+		2	TooEarly	The variable was read before the LT could determine the farFeatureFlag values
+		3	Legacy		The far device is an Ulaf-2 device and has no feature flag
+		254			unknown values
+		255			unsupported variable for addressed device"
+	::= { deviceLinkEntry 18 }
+
+      -------------------------------
+      -- added in V3.0
+      -------------------------------
+
+deviceLinkSruFeatureFlag OBJECT-TYPE
+	SYNTAX OCTET STRING(SIZE(33))
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Contains a map of features supported by the local device.
+		Byte 0-31 contain the bit-coded feature flags 0..255
+		Byte 32 contains information about the validity of the
+		previous 32 bytes.
+		1	Ok	The information in bytes 0..31 is valid
+		254		unknown values
+		255		unsupported variable for addressed device"
+	::= { deviceLinkEntry 19 }
+
+deviceLinkNumReg3 OBJECT-TYPE
+	SYNTAX INTEGER
+	{
+		none(1),
+		one(2),
+		two(3),
+		three(4),
+		four(5),
+		five(6),
+		six(7),
+		seven(8),
+		eight(9),
+		unknown(254),
+		unsupported(255)
+	}
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Indicates how many regenerators were detected in xDSL path 3.
+		1	None	No regenerator found
+		2	One	One regenerator found (section A or 1)
+		3	Two	Two regenerators found (section B or 2)
+		4	Three	Three regenerators found (section 3)
+		5	Four	Four regenerators found (section 4)
+		6	Five	Five regenerators found (section 5)
+		7	Six	Six regenerators found (section 6)
+		8	Seven	Seven regenerators found (section 7)
+		9	Eight	Eight regenerators found (section 8)
+		254		unknown value
+		255		unsupported value"
+	::= { deviceLinkEntry 20 }
+
+deviceLinkNumReg4 OBJECT-TYPE
+	SYNTAX INTEGER
+	{
+		none(1),
+		one(2),
+		two(3),
+		three(4),
+		four(5),
+		five(6),
+		six(7),
+		seven(8),
+		eight(9),
+		unknown(254),
+		unsupported(255)
+	}
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Indicates how many regenerators were detected in xDSL path 4.
+		1	None	No regenerator found
+		2	One	One regenerator found (section A or 1)
+		3	Two	Two regenerators found (section B or 2)
+		4	Three	Three regenerators found (section 3)
+		5	Four	Four regenerators found (section 4)
+		6	Five	Five regenerators found (section 5)
+		7	Six	Six regenerators found (section 6)
+		8	Seven	Seven regenerators found (section 7)
+		9	Eight	Eight regenerators found (section 8)
+		254		unknown value
+		255		unsupported value"
+	::= { deviceLinkEntry 21 }
+
+--------------------------------------------------------------------------------  
+	  link    OBJECT IDENTIFIER ::= { linksVers2 1 }
+
+--------------------------------------------------------------------------------    
+linkConfigTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF LinkConfigEntry
+	ACCESS not-accessible
+	STATUS mandatory
+	DESCRIPTION
+		""
+	::= { link 1 }
+
+linkConfigEntry OBJECT-TYPE
+	SYNTAX LinkConfigEntry
+	ACCESS not-accessible
+	STATUS mandatory
+	DESCRIPTION
+		""
+	INDEX { linkConfigPortIndex, linkConfigIndex }
+	::= { linkConfigTable 1 }
+
+LinkConfigEntry ::=
+   SEQUENCE
+   {
+      linkConfigPortIndex INTEGER,
+      linkConfigIndex INTEGER,
+      performance INTEGER
+   }
+
+linkConfigPortIndex OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"This object addresses the port number of the proxy agent"
+	::= { linkConfigEntry 1 }
+
+linkConfigIndex OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"This object addresses the line card number of the OMI
+                 equipment."
+	::= { linkConfigEntry 2 }
+
+performance OBJECT-TYPE
+	SYNTAX  INTEGER
+                {
+                    on(1),
+                    off(2)
+                }
+	ACCESS	read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"This object defines if the performance management is running
+                 or not"
+	::= { linkConfigEntry 4}
+
+END
