@@ -149,7 +149,7 @@ return [
     'uppercase' => ':attribute 字段必须是大写的。',
     'url' => ':attribute 字段必须是一个有效的URL。',
     'ulid' => ':attribute 字段必须是一个有效的ULID。',
-    'uuid' => ':attribute 字段必须是一个有效的UUID。'
+    'uuid' => ':attribute 字段必须是一个有效的UUID。',
 
     // Librenms specific
     
