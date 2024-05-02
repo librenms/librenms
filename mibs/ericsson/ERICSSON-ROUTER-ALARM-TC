@@ -1,0 +1,671 @@
+-- %DNP% $Id: ERICSSON-ROUTER-ALARM-TC.my,v 1.1.2.5.238.20 2012/06/26 09:43:46 epadsih Exp $
+-- %DNP% $Source: /cvsroot/pkt/sw/se/xc/bsd/config/snmp/mibs/Attic/ERICSSON-ROUTER-ALARM-TC.my,v $
+-- *****************************************************************
+-- ERICSSON-ROUTER-ALARM-TC         Alarms Textual Convention MIB
+--
+-- Copyright (c) 2004-2009, 2010-2012, 2014, 2015 Ericsson AB
+-- Copyright (c) 2004-2009, 2010-2012, 2014-2016 Ericsson AB
+-- All rights reserved.
+--
+-- *****************************************************************
+
+   ERICSSON-ROUTER-ALARM-TC DEFINITIONS ::= BEGIN
+
+   IMPORTS
+      MODULE-IDENTITY
+                FROM SNMPv2-SMI
+      TEXTUAL-CONVENTION
+                FROM SNMPv2-TC
+      eriRouterModules
+                FROM ERICSSON-ROUTER-SMI;
+
+     eriRouterAlarmTc MODULE-IDENTITY
+         LAST-UPDATED    "201501141800Z" -- Jan 14, 2016
+         ORGANIZATION "Ericsson Inc."
+         CONTACT-INFO
+                "       Ericsson, Inc.
+
+                Postal: 100 Headquarters Dr
+                        San Jose, CA  95134
+                        USA
+
+                 Phone: +1 408 750 5000
+                   Fax: +1 408 750 5599
+
+                "
+        DESCRIPTION
+            "Added alarms:
+                chassisTodInASignalFail,
+                chassisTodInBSignalFail,
+                chassisTodInAPowerFeed,
+                chassisTodInBPowerFeed,
+            "
+
+        REVISION        "201605030000Z" -- Jun 14, 2016
+        DESCRIPTION
+            "Added alarms:
+                ethLinkDown"
+
+        REVISION        "201604130000Z" -- Apr 13, 2016
+        DESCRIPTION
+            "This MIB module defines the Alarm textual
+            conventions."
+
+
+        REVISION        "201604070000Z" -- Apr 04, 2016
+        DESCRIPTION
+            "Added alarms:
+                rpswExcessiveCPUUtilization,
+                rpswExcessiveMEMUtilization,
+                rpswArbitrationLinkFailure,
+                rpswSlotIdCollision,"
+
+        REVISION        "201501141800Z" -- Jan 14, 2015
+        DESCRIPTION
+                "Updated RBN/rbn/Rbn as ERICSSON-ROUTER/eriRouter/EriRouter
+                to migrate RBN MIB to ERICSSON MIB."
+
+        REVISION        "201406180000Z" -- Jun 18, 2014
+        DESCRIPTION
+                "Added alarms:
+                lcFabricMismatch, rpswFabricMismatch, alswFabricMismatch,
+                swFabricMismatch"
+
+        REVISION        "201407090000Z" -- July 09, 2014
+        DESCRIPTION
+                "Added alarms: rpswDeactivationFailure, lcDeactivationFailure"
+
+        REVISION        "201405230000Z" -- May 23, 2014
+        DESCRIPTION
+                "Added alarms: chassisPtpNoForeignMaster, chassisPtpSyncFail"
+
+        REVISION        "201402190000Z" -- Feb 19, 2014
+        DESCRIPTION
+                "Added alarms:
+                chassisEquipmentClockLostReference5, chassisEquipmentClockLostReference6,
+                chassisEquipmentClockNotLocked, chassisPtpClockQualityLow,
+                chassisPtpLocalClockOos, alswTcmIncompatibleHardware,
+                chassisArchiveConfigFail"
+
+        REVISION        "201402250000Z" -- Feb 25, 2014
+        DESCRIPTION
+                "Added alarms: alswPtpCpuPodFail"
+
+        REVISION        "201402130000Z" -- Feb 13, 2014
+        DESCRIPTION
+                "Added alarms: alswFilesystemFull, chassisArchiveConfigFail,"
+
+        REVISION        "201401240000Z" -- Jan 24, 2014
+        DESCRIPTION
+                "Added alarms: alswInventoryInvalid and swInventoryInvalid"
+
+        REVISION        "201308010000Z" -- Aug 01, 2013
+        DESCRIPTION
+                "Added alarms: alswPtpCpuDown"
+
+        REVISION        "201205160000Z" -- May 16, 2012
+        DESCRIPTION
+                "Added alarms: lcActiveEquipmentClockLoss, alswFrequencyRange,
+                chassisEquipmentClockLostReference1,chassisEquipmentClockLostReference2,
+                chassisEquipmentClockLostReference3, chassisEquipmentClockLostReference4,
+                chassisEquipmentClockNoMoreReference, chassisEquipmentClockQlBelowThreshold"
+
+        REVISION        "201203200000Z" -- Mar 20, 2012
+        DESCRIPTION
+                "Added alarms: compDiskFail."
+
+        REVISION        "201203081800Z" -- Mar 08, 2012
+        DESCRIPTION
+                "Added alarms: rpswDown, alswDown, swDown, lcDown,
+                lcExcessiveCpuUtilization, lcExcessiveMemUtilization,
+                and lcExcessiveEccErrors."
+
+        REVISION        "201110271800Z" -- Oct 27, 2011
+        DESCRIPTION
+                "Added alarms: sscAspDown, sscAspMissingServiceAssoc &
+                sscAspApplicationSoftReset"
+
+        REVISION        "201108151800Z" -- Aug 15, 2011
+        DESCRIPTION
+                "Added alarm Fallback OpenFirmware detected to
+                EriRouterAlarmId, for Controller."
+
+        REVISION        "201105231800Z" -- May 23, 2011
+        DESCRIPTION
+                "Added Smart Service Router(SSR) chassis, line card(LC),
+                route processor switch card(RPSW), alarm switch card(ALSW),
+                and switch card(SW) alarm identifiers to EriRouterAlarmId."
+
+        REVISION        "201103021600Z" -- Mar 02, 2011
+        DESCRIPTION
+                "Added cpbackplanerxerror
+                       cpbackplanetxerror
+                       asp1MissingServiceAssoc
+                       asp2MissingServiceAssoc
+                       cpDimmMismatch to EriRouterAlarmId"
+
+        REVISION        "201102071600Z" -- February 7, 2011
+        DESCRIPTION
+                "Added 'cesPwOutage' and 'cesLossOfConnectivity' to EriRouterAlarmId.
+                Added 'other' and 'pwOutage' to EriRouterAlarmProbableCause."
+
+        REVISION        "201004131600Z" -- Apr 13, 2010
+        DESCRIPTION
+                "Updated ORGANIZATION & CONTACT-INFO. Added
+                 controllerSwNotSupported(84) to EriRouterAlarmId."
+
+        REVISION        "200912150000Z" -- Dec 15, 2009
+        DESCRIPTION
+                "Added aseAsp1Down and aseAsp2Down to EriRouterAlarmId."
+
+        REVISION        "200902050000Z" -- Feb 5, 2009
+        DESCRIPTION
+                "added fsServerDownAlarm to EriRouterAlarmId."
+
+        REVISION        "200812190000Z" -- Dec 19, 2008
+        DESCRIPTION
+                "controllerbsdl2cacheerror and controllervxwl2cacheerror
+                alarm ids included."
+
+        REVISION        "200810200000Z" -- Oct 20, 2008
+        DESCRIPTION
+                "EriRouterAlarmId type from 13 to 78 added"
+
+        REVISION        "200505090000Z" -- May 9, 2005
+        DESCRIPTION
+                "Added the EriRouterAlarmServiceAffecting textual
+                convention."
+
+        REVISION        "200406220000Z" -- Jun 22, 2004
+        DESCRIPTION
+                "Initial version"
+        ::= {eriRouterModules 3}
+
+
+    EriRouterAlarmId ::= TEXTUAL-CONVENTION
+        STATUS  current
+        DESCRIPTION
+                "Alarm Identifier values"
+        SYNTAX  INTEGER {
+                unknown(1),
+                cpFail(2),                      -- circuit pack failure
+                cpBackplaneFail(3),             -- circuit pack backplane failure
+                diagFail(4),                    -- diagnostic failure
+                voltageFail(5),                 -- voltage failure
+                controllerSwitchFail(6),        -- controller switch failure
+                controllerTempCritical(7),      -- controller temp critical
+                controllerFail(8),              -- controller failure
+                controllerDiagFail(9),          -- controller diag test failure
+                cpPowerOnDiagFail(10),          -- circuit pack power-on
+                                                -- diagnostic failure
+                controllerPowerOnDiagFail(11),  -- controller power-on
+                                                -- diagnostic failure
+                cpOverheat(12),                 -- circuit pack overheat
+                controllerOverheat(13),         -- controller overheat
+                backplaneclkfail(14),
+                btciferror(15),
+                btcnotready(16),
+                cpbackplanedegrade(17),
+                cpcardcodemismatch(18),
+                cpmismatch(19),
+                cpmissing(20),
+                cpresetcomplete(21),
+                downloadcompleted(22),
+                downloadfailed(23),
+                syncfail(24),
+                backupfail(25),
+                controllercardcodemismatch(26),
+                controllercardtypemismatch(27),
+                controllermissing(28),
+                controlleroverheat(29),
+                controllerswitchauto(30),
+                controllerswitchcompleted(31),
+                controllerswitchexfailed(32),
+                controllerswitchforced(33),
+                controllerswitchmanual(34),
+                localfantrayinventfail(35),
+                localinventfail(36),
+                localbackplaneinventfail(37),
+                lostm2m(38),
+                nonvolatilememfail(39),
+                peerhwincompatible(40),
+                peerinventfail(41),
+                peermodeincompatible(42),
+                peersharedformatmismatch(43),
+                rtclockfail(44),
+                mic1missing(45),
+                mic2missing(46),
+                mic1mismatch(47),
+                mic2mismatch(48),
+                mic1voltagefailure(49),
+                mic2voltagefailure(50),
+                mic1overheat(51),
+                mic2overheat(52),
+                mic1failure(53),
+                mic2failure(54),
+                mic1podfail(55),
+                mic2podfail(56),
+                mic1diagnosticfail(57),
+                mic2diagnosticfail(58),
+                ethtransceiverrxpowerhialarm(59),
+                ethtransceiverrxpowerloalarm(60),
+                ethtransceivertemphialarm(61),
+                ethtransceivertemploalarm(62),
+                ethtranceivervoltagehi(63),
+                ethtranceivervoltagelo(64),
+                ethtransceiverbiashialarm(65),
+                ethtransceiverbiasloalarm(66),
+                ethtransceivertxpowerhialarm(67),
+                ethtransceivertxpowerloalarm(68),
+                ethtransceiveraux1hialarm(69),
+                ethtransceiveraux1loalarm(70),
+                ethtransceiveraux2hialarm(71),
+                ethtransceiveraux2loalarm(72),
+                ethtransceiverlvcc5hi(73),
+                ethtransceiverlvcc5lo(74),
+                ethtransceiverlvcc3hi(75),
+                ethtransceiverlvcc3lo(76),
+                ethtransceiverlvcc2hi(77),
+                ethtransceiverlvcc2lo(78),
+                controllerbsdl2cacheerror(79), -- L2 cache error (PPC0)
+                controllervxwl2cacheerror(80), -- L2 cache error (PPC1)
+                fsServerDownAlarm(81),         -- NFS server service down
+                aseAsp1Down(82),               -- ASE card ASP 1 down
+                aseAsp2Down(83),               -- ASE card ASP 2 down
+                controllerSwNotSupported(84),  -- Unsupported Controller Software
+                cpbackplanerxerror(85),        -- PMA3 rx error
+                cpbackplanetxerror(86),        -- PMA3 tx error
+                asp1MissingServiceAssoc(87),   -- ASP 1 missing service association
+                asp2MissingServiceAssoc(88),   -- ASP 2 missing service association
+                cpDimmMismatch(89),            -- DIMM revision mismatch
+                cesPwOutage(90),               -- CES pseudo wire outage
+                cesLossOfConnectivity(91),     -- CES loss of connectivity
+                controllerFallbackOfw(92),   -- Fallback OpenFirmware detected
+                ethtransceiverunsupportedinport(93),
+                ethtransceiverspeedmismatch(94),
+                ethtransceiversoabiashi(95),
+                ethtransceiversoabiaslo(96),
+                ethtransceiversynceunsupported(97),
+                ethtransceivermodulefailure(98),
+                ethtransceivermodulemismatch(99),
+                ethtransceiverlanelaserbiashi(100),
+                ethtransceiverlanelaserbiaslo(101),
+                ethtransceiverlanetemphi(102),
+                ethtransceiverlanetemplo(103),
+                ethtransceiverlanetxpowerhi(104),
+                ethtransceiverlanetxpowerlo(105),
+                ethtransceiverlanerxpowerhi(106),
+                ethtransceiverlanerxpowerlo(107),
+                ethrfialarm(108),
+                ethtransceiverrxpowerhiwarn(109),
+                ethtransceiverrxpowerlowarn(110),
+                ethtransceivertemphiwarn(111),
+                ethtransceivertemplowarn(112),
+                ethtransceiverbiashiwarn(113),
+                ethtransceiverbiaslowarn(114),
+                ethtransceivertxpowerhiwarn(115),
+                ethtransceivertxpowerlowarn(116),
+                ethtransceiveraux1hiwarn(117),
+                ethtransceiveraux1lowarn(118),
+                ethtransceiveraux2hiwarn(119),
+                ethtransceiveraux2lowarn(120),
+                resourceMaxPKT(139),
+                resourceThresholdPKT(140),
+
+    -- Values 10100-10199 are reserved for SSR chassis alarms
+                chassisInventoryFail(10100),
+                chassisInsufficientPower(10101),
+                chassisFabricRedundancyLost(10102),
+                chassisSysFabricBandwithDegrade(10103),
+                chassisNoFanTrays(10104),
+                chassisEquipmentClockLostReference1(10105),
+                chassisEquipmentClockLostReference2(10106),
+                chassisEquipmentClockLostReference3(10107),
+                chassisEquipmentClockLostReference4(10108),
+                chassisEquipmentClockNoMoreReference(10109),
+                chassisEquipmentClockQlBelowThreshold(10110),
+                chassisNtpSyncFail(10111),
+                chassisArchiveConfigFail(10112),
+                chassisEquipmentClockLostReference5(10113),
+                chassisEquipmentClockLostReference6(10114),
+                chassisEquipmentClockNotLocked(10115),
+                chassisPtpLocalClockOos(10116),
+                chassisPtpNoForeignMaster(10117),
+                chassisPtpSyncFail(10118),
+                chassisPtpClockQualityLow(10119),
+                chassisPowerRedundancyLost(10120),
+                chassisFantrayIncompatible(10121),
+                chassisTodInASignalFail(10125),
+                chassisTodInBSignalFail(10126),
+                chassisTodInAPowerFeed(10127),
+                chassisTodInBPowerFeed(10128),
+
+    -- Values 10200-10299 are reserved for SSR line card(LC) alarms
+                lcMissing(10200),
+                lcMismatch(10201),
+                lcInventoryFail(10202),
+                lcUnreachable(10203),
+                lcPayloadBootFail(10204),
+                lcHardwareFail(10205),
+                lcOosHardwareFail(10206),
+                lcOosEjectorOpen(10207),
+                lcInsufficientPower(10208),
+                lcOosOverheat(10209),
+                lcOverheatHot(10210),
+                lcVoltageOutOfRange(10211),
+                lcExtremeVoltageOutOfRange(10212),
+                lcSoftwareFail(10213),
+                lcPodFail(10214),
+                lcOsdFail(10215),
+                lcFabricLinkFail(10216),
+                lcFabricBandwidthDegrade(10217),
+                lcFileSystemFull(10218),
+                lcExcessiveCpuUtilization(10219),
+                lcExcessiveMemUtilization(10220),
+                lcExcessiveEccErrors(10221),
+                lcDown(10222),
+                lcNpuFail(10223),
+                lcDataPathCongestion(10224),
+                lcEquipmentClockHardwareFail(10225),
+                lcInsufficientCooling(10226),
+                lcDeactivationFailure(10227),
+                lcFabricDataErr(10228),
+                lcFabricMismatch(10229),
+
+    -- Values 10300-10399 are reserved for SSR route processor switch
+    -- card(RPSW) alarms
+                rpswMissing(10300),
+                rpswMismatch(10301),
+                rpswInventoryFail(10302),
+                rpswUnreachable(10303),
+                rpswPayloadBootFail(10304),
+                rpswHardwareFail(10305),
+                rpswOosHardwareFail(10306),
+                rpswOosEjectorOpen(10307),
+                rpswInsufficientPower(10308),
+                rpswOosOverheat(10309),
+                rpswOverheatHot(10310),
+                rpswVoltageOutOfRange(10311),
+                rpswExtremeVoltageOutOfRange(10312),
+                rpswSoftwareFail(10313),
+                rpswPodFail(10314),
+                rpswOsdFail(10315),
+                rpswSwitchManual(10316),
+                rpswSwitchAuto(10317),
+                rpswSwitchDone(10318),
+                rpswSwitchFail(10319),
+                rpswPeerIncompatible(10320),
+                rpswSyncFail(10321),
+                rpswMgmtLinkDown(10322),
+                rpswFabricLinkFail(10323),
+                rpswFabricFail(10324),
+                rpswFileSystemFull(10325),
+                rpswDown(10326),
+                rpswFabricMismatch(10327),
+                rpswInsufficientCooling(10328),
+                rpswDeactivationFailure(10329),
+                rpswExcessiveCPUUtilization(10330),
+                rpswExcessiveMEMUtilization(10331),
+                rpswArbitrationLinkFailure(10332),
+                rpswSlotIdCollision(10333),
+
+    -- Values 10400-10499 are reserved for SSR alarm switch card(ALSW) alarms
+                alswMissing(10400),
+                alswMismatch(10401),
+                alswInventoryFail(10402),
+                alswUnreachable(10403),
+                alswPayloadBootFail(10404),
+                alswHardwareFail(10405),
+                alswOosHardwareFail(10406),
+                alswOosEjectorOpen(10407),
+                alswInsufficientPower(10408),
+                alswOosOverheat(10409),
+                alswOverheatHot(10410),
+                alswVoltageOutOfRange(10411),
+                alswExtremeVoltageOutOfRange(10412),
+                alswSoftwareFail(10413),
+                alswPodFail(10414),
+                alswOsdFail(10415),
+                alswSwitchManual(10416),
+                alswSwitchAuto(10417),
+                alswSwitchDone(10418),
+                alswSwitchFail(10419),
+                alswPeerIncompatible(10420),
+                alswFabricLinkFail(10421),
+                alswFabricFail(10422),
+                alswDown(10423),
+                alswFrequencyRange(10424),
+                alswPtpCpuDown(10425),
+                alswInventoryInvalid(10426),
+                alswFilesystemFull(10427),
+                alswPtpCpuPodFail(10428),
+                alswTcmIncompatibleHardware(10429),
+                alswFabricMismatch(10430),
+                alswInsufficientCooling(10431),
+
+    -- Values 10500-10599 are reserved for SSR switch card(SW) alarms
+                swMissing(10500),
+                swMismatch(10501),
+                swInventoryFail(10502),
+                swUnreachable(10503),
+                swPayloadBootFail(10504),
+                swHardwareFail(10505),
+                swOosHardwareFail(10506),
+                swOosEjectorOpen(10507),
+                swInsufficientPower(10508),
+                swOosOverheat(10509),
+                swOverheatHot(10510),
+                swVoltageOutOfRange(10511),
+                swExtremeVoltageOutOfRange(10512),
+                swSoftwareFail(10513),
+                swPodFail(10514),
+                swOsdFail(10515),
+                swFabricLinkFail(10516),
+                swFabricFail(10517),
+                swDown(10518),
+                swInventoryInvalid(10519),
+                swFabricMismatch(10520),
+                swInsufficientCooling(10521),
+
+    -- Values 10800-10899 are reserved for SSR Smart Services Card(SSC) alarms
+                sscAspDown(10800),
+                sscAspMissingServiceAssoc(10801),
+                sscAspApplicationSoftReset(10802),
+
+    -- Values 10900-10999 are reserved for SSR Disk Device component alarms
+                compDiskFail(10900)
+              }
+
+   EriRouterAlarmType ::= TEXTUAL-CONVENTION
+       STATUS   current
+       DESCRIPTION
+                "Alarm Type values.
+
+                These values were extracted from the IANAItuEventType
+                textual convention."
+       REFERENCE
+                "IANA-ITU-ALARM-TC-MIB, RFC 3877"
+       SYNTAX   INTEGER {
+                other (1),
+                communicationsAlarm (2),
+                qualityOfServiceAlarm (3),
+                processingErrorAlarm (4),
+                equipmentAlarm (5),
+                environmentalAlarm (6),
+                integrityViolation (7),
+                operationalViolation (8),
+                physicalViolation (9),
+                securityServiceOrMechanismViolation (10),
+                timeDomainViolation (11)
+              }
+
+   EriRouterAlarmPerceivedSeverity ::= TEXTUAL-CONVENTION
+       STATUS   current
+       DESCRIPTION
+                "Perceived severity values. Based on but not
+                the same as ItuPerceivedSeverity."
+       REFERENCE
+                "ITU-ALARM-TC-MIB, RFC 3877"
+       SYNTAX   INTEGER {
+                cleared (1),
+                critical (2),
+                major (3),
+                minor (4),
+                warning (5)
+              }
+
+   EriRouterAlarmProbableCause ::= TEXTUAL-CONVENTION
+       STATUS   current
+       DESCRIPTION
+                "Probable cause values.
+
+                 Most of these values were extracted from the
+                 IANAItuProbableCause textual convention. Values
+                 greater than 1000 are enterprise specific."
+       REFERENCE
+                "IANA-ITU-ALARM-TC-MIB, RFC 3877"
+       SYNTAX   INTEGER {
+               -- The following probable causes were defined in M.3100
+                aIS (1),
+                degradedSignal (3),
+                farEndReceiverFailure (4),
+                framingError (5),
+                lossOfFrame (6),
+                lossOfPointer (7),
+                lossOfSignal (8),
+                payloadTypeMismatch (9),
+                transmissionError (10),
+                excessiveBER (12),
+                pathTraceMismatch (13),
+                unavailable (14),
+                signalLableMismatch (15),
+                receiveFailure (17),
+                transmitFailure (18),
+                modulationFailure (19),
+                demodulationFailure (20),
+                linkFailure (21),
+                configurationMismatch (22),
+                concatenationMismatch (23),
+    --Values 27-50 are reserved for communications alarm related
+    --probable causes
+    -- The following are used with equipment alarm.
+                backplaneFailure (51),
+                equipmentIdDuplication (53),
+                externalIFDeviceProblem (54),
+                lineCardProblem (55),
+                multiplexerProblem (56),
+                nEIdentifierDuplication (57),
+                powerProblem (58),
+                processorProblem (59),
+                protectionPathFailure (60),
+                receiverFailure (61),
+                replaceableUnitMissing (62),
+                replaceableUnitTypeMismatch (63),
+                syncSourceMismatch (64),
+                terminalProblem (65),
+                timingProblem (66),
+                transmitterFailure (67),
+                trunkCardProblem (68),
+                replaceableUnitProblem (69),
+                realTimeClockFailure (70),
+    -- Values 83-100 are reserved for equipment alarm related probable
+    -- causes
+    -- The following are used with environmental alarm.
+                airCompressorFailure (101),
+                airConditioningFailure (102),
+                airDryerFailure (103),
+                batteryDischarging (104),
+                batteryFailure (105),
+                commercialPowerFailure (106),
+                coolingFanFailure (107),
+                engineFailure (108),
+                fireDetectorFailure (109),
+                fuseFailure (110),
+                generatorFailure (111),
+                lowBatteryThreshold (112),
+                pumpFailure (113),
+                rectifierFailure (114),
+                rectifierHighVoltage (115),
+                rectifierLowVoltage (116),
+                ventilationsSystemFailure (117),
+                enclosureDoorOpen (118),
+                explosiveGas (119),
+                fire (120),
+                flood (121),
+                highHumidity (122),
+                highTemperature (123),
+                highWind (124),
+                iceBuildUp (125),
+                intrusionDetection (126),
+                lowFuel (127),
+                lowHumidity (128),
+                lowCablePressure (129),
+                lowTemperature (130),
+                lowWater (131),
+                smoke (132),
+                toxicGas (133),
+    -- Values 137-150 are reserved for environmental alarm related
+    -- probable causes
+                customized (149),
+    -- The following are used with Processing error alarm.
+                storageCapacityProblem (151),
+                memoryMismatch (152),
+                corruptData (153),
+                outOfCPUCycles (154),
+                sfwrEnvironmentProblem (155),
+                sfwrDownloadFailure (156),
+                lossOfRealTime (157),
+    --A processing error alarm to be issued after the system has
+    --reinitialized. This will indicate
+    --to the management systems that the view they have of the managed
+    --system may no longer
+    --be valid. Usage example: The managed
+    --system issues this alarm after a reinitialization with severity
+    --warning to inform the
+    --management system about the event. No clearing notification will
+    --be sent.
+                reinitialized (158),
+                operationNotification (159),
+                operationFailure (160),
+    --Values 168-200 are reserved for processing error alarm related
+    -- probable causes.
+
+    -- Enterprise added values
+                lossOfTimingSource (1001),
+                apsChannelProcessingFailure (1002),
+                apsByteFailure (1003),
+                apsChannelMatchFailure (1004),
+                apsModeMismatch (1005),
+                lossOfTUMultiframeIndicator (1007),
+                pathSelectorFailure (1010),
+                blsrDefaultKBytes (1011),
+                blsrInconsistentAPSCodes (1012),
+                blsrNodeIdMismatch (1013),
+                blsrImproperAPSCodes (1014),
+                blsrSquelching (1015),
+                blsrInvalidNeighbour (1016),
+                blsrInvalidRingMap (1017),
+                blsrInvalidRingId (1018),
+                blsrIncompleteRingConfig (1019),
+                blsrIncompleteETConfig (1020),
+                blsrNodeIncorrectOrientation (1021),
+                hwResourceExhaused (1022),
+                hwResourceThreshold (1023),
+                other (1024),
+                pwOutage (1025),
+                configurationOrCustomizationError(1026)
+              }
+
+   EriRouterAlarmServiceAffecting ::= TEXTUAL-CONVENTION
+       STATUS   current
+       DESCRIPTION
+                "Perceived service affect code.
+
+                Indicates whether the alarm is perceived to be
+                service affecting."
+       SYNTAX   INTEGER {
+                yes (1),
+                no (2)
+              }
+
+END

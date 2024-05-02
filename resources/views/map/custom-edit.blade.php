@@ -20,7 +20,7 @@
     </div>
     <div class="col-md-2">
       <center>
-        <h4 id="title">{{ $name }}</h4>
+          <h4><a id="title" href="{{ route('maps.custom.show', $map_id) }}">{{ $name }}</a></h4>
       </center>
     </div>
     <div class="col-md-5 text-right">
@@ -253,7 +253,7 @@
                 var mid_x = mid_pos.x;
                 var mid_y = mid_pos.y;
 
-                var mid = {id: edgeid + "_mid", shape: "dot", size: 3, x: mid_x, y: mid_y};
+                var mid = {id: edgeid + "_mid", shape: "dot", size: 3, x: mid_x, y: mid_y, label: ''};
 
                 var edge1 = structuredClone(newedgeconf);
                 edge1.id = edgeid + "_from";
@@ -854,6 +854,7 @@
         $("#edgePortReverseRow").hide();
         $("#edgePortSearchRow").hide();
         $("#edgeRecenterRow").hide();
+        $("#edgelabel").hide();
 
         $("#edgestyle").val(newedgeconf.smooth.type);
         $("#edgetextface").val(newedgeconf.font.face);
@@ -923,10 +924,12 @@
         $("#edgetextcolour").val(edgedata.edge1.font.color);
         $("#edgetextshow").bootstrapSwitch('state', (edgedata.edge1.label != null && edgedata.edge1.label.includes('xx%')));
         $("#edgebpsshow").bootstrapSwitch('state', (edgedata.edge1.label != null && edgedata.edge1.label.includes('bps')));
+        $("#edgelabel").val('label' in edgedata.mid ? edgedata.mid.label : '');
 
         $("#edgeRecenterRow").show();
         $("#divEdgeFrom").show();
         $("#divEdgeTo").show();
+        $("#edgelabel").show();
         $("#edge-saveButton").show();
         $("#edge-saveDefaultsButton").hide();
         $("#edge-saveButton").on("click", {data: edgedata}, callback);
@@ -949,7 +952,11 @@
         edgedata.edge1.font.color = edgedata.edge2.font.color = $("#edgetextcolour").val();
         edgedata.edge1.label = edgedata.edge2.label = edgeLabel($("#edgetextshow").prop('checked'), $("#edgebpsshow").prop('checked'), null);
         edgedata.edge1.title = edgedata.edge2.title = $("#port_id").val();
-        edgedata.mid.label = ($("#edgelabel").val() || '');
+	let newlabel = $("#edgelabel").val() || '';
+	if (newlabel == '' && edgedata.mid.label != '') {
+            $("#map-renderButton").show();
+	}
+        edgedata.mid.label = newlabel;
 
         if(edgedata.id) {
             if($("#port_id").val()) {
@@ -1166,6 +1173,25 @@
         }
     }
 
+    function observeEditMode() {
+        const targetNode = document.getElementsByClassName("vis-manipulation")[0];
+
+        // Start observing the target node for configured mutations
+        new MutationObserver((mutationList, observer) => {
+            for (const mutation of mutationList) {
+                if (mutation.addedNodes.length) {
+                    if(Array.from(mutation.addedNodes).some(({classList}) => classList.contains("vis-back"))) {
+                        document.getElementById("custom-map").classList.add("tw-cursor-crosshair")
+                    }
+                } else if (mutation.removedNodes.length) {
+                    if(Array.from(mutation.removedNodes).some(({classList}) => classList.contains("vis-back"))) {
+                        document.getElementById("custom-map").classList.remove("tw-cursor-crosshair")
+                    }
+                }
+            }
+        }).observe(targetNode, {attributes: false, childList: true, subtree: false});
+    }
+
     $(document).ready(function () {
         init_select2('#devicesearch', 'device', {limit: 100}, '', '{{ __('map.custom.edit.node.device_select') }}', {dropdownParent: $('#nodeModal')});
         $("#devicesearch").on("select2:select", nodeDeviceSelect);
@@ -1181,7 +1207,9 @@
         $("#portsearch").on("select2:select", edgePortSelect);
 
         refreshMap();
-    });
+
+        // watch for addNode/editNode
+        observeEditMode();    });
 </script>
 @endsection
 

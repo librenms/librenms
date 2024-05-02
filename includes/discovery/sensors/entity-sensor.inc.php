@@ -156,6 +156,14 @@ if (! empty($entity_oids)) {
                 }
                 $descr = preg_replace('/[T|t]emperature[|s]/', '', $descr);
             }
+
+            // Fix for FortiSwitch - ALL FortiSwitches as of 14/2/2024 output fan speeds as percentages while entPhySensorType is RPM.
+            if ($device['os'] == 'fortiswitch' && $entry['entPhySensorType'] == 'rpm') {
+                $type = 'percent';
+                $divisor = 1;
+                $current = $current * 10;
+            }
+
             if ($device['os'] == 'rittal-lcp') {
                 if ($type == 'voltage') {
                     $divisor = 1000;

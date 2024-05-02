@@ -461,10 +461,6 @@ return [
             'description' => 'Specific URL',
             'help' => 'This should *only* be set if you want to *force* a particular hostname/port. It will prevent the web interface being usable form any other hostname',
         ],
-        'device_perf_purge' => [
-            'description' => 'Device performance entries older than',
-            'help' => 'Cleanup done by daily.sh',
-        ],
         'discovery_modules' => [
             'arp-table' => [
                 'description' => 'ARP Table',

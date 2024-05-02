@@ -1,0 +1,672 @@
+--
+-- CIENA-6500R-INVENTORY-AMPS-MIB.
+--
+
+CIENA-6500R-INVENTORY-AMPS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    rlsInventoryAmps
+		FROM CIENA-6500R-INVENTORY-MIB
+    AdminState, OrlState
+        FROM CIENA-6500R-TYPES-MIB
+    DisplayString32, DisplayString128
+        FROM CIENA-PRO-TYPES-MIB
+    Integer32, MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    TruthValue
+        FROM SNMPv2-TC;
+
+cienaRlsInventoryAmpsMIB MODULE-IDENTITY
+    LAST-UPDATED "202009300000Z"
+    ORGANIZATION 
+        "Ciena Corporation"
+    CONTACT-INFO 
+        "Web URL: http://www.ciena.com/
+         Postal:  7035 Ridge Road
+         Hanover, Maryland 21076
+         U.S.A.
+         Phone:   +1 800-921-1144
+         Fax:    Inventory +1 410-694-5750"
+    DESCRIPTION 
+        "This modules describes Ciena's photonic amplifier object."
+    REVISION    "202009300000Z"
+    DESCRIPTION 
+        "Initial revision."
+    ::= { rlsInventoryAmps 1 }
+
+
+rlsInventoryAmpsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RlsInventoryAmpsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { cienaRlsInventoryAmpsMIB 1 }
+
+rlsInventoryAmpsEntry OBJECT-TYPE
+    SYNTAX      RlsInventoryAmpsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    INDEX       { rlsInventoryAmpsSlotName, rlsInventoryAmpsName}
+    ::= { rlsInventoryAmpsTable 1 }
+
+RlsInventoryAmpsEntry ::= SEQUENCE {
+    rlsInventoryAmpsSlotName                            DisplayString32,
+    rlsInventoryAmpsName                                DisplayString128,
+    rlsInventoryAmpsAmpMode                             INTEGER,
+    rlsInventoryAmpsState                               INTEGER,
+    rlsInventoryAmpsGainMode                            INTEGER,
+    rlsInventoryAmpsForcedShutdown                      INTEGER,
+    rlsInventoryAmpsTargetGain                          DisplayString32,
+    rlsInventoryAmpsBaselineTargetGain                  DisplayString32,
+    rlsInventoryAmpsBaselineTimestamp                   DisplayString32,
+    rlsInventoryAmpsTargetGainRangesLowMin              DisplayString32,
+    rlsInventoryAmpsTargetGainRangesLowMax              DisplayString32,
+    rlsInventoryAmpsTargetGainRangesHighMin             DisplayString32,
+    rlsInventoryAmpsTargetGainRangesHighMax             DisplayString32,
+    rlsInventoryAmpsTargetPower                         DisplayString32,
+    rlsInventoryAmpsTargetPowerRangesMin                DisplayString32,
+    rlsInventoryAmpsTargetPowerRangesMax                DisplayString32,
+    rlsInventoryAmpsTargetGainTilt                      DisplayString32,
+    rlsInventoryAmpsTargetGainTiltRangesMin             DisplayString32,
+    rlsInventoryAmpsTargetGainTiltRangesMax             DisplayString32,
+    rlsInventoryAmpsShutoffThreshold                    DisplayString32,
+    rlsInventoryAmpsShutoffThresholdRangesMin           DisplayString32,
+    rlsInventoryAmpsShutoffThresholdRangesMax           DisplayString32,
+    rlsInventoryAmpsShutoffHysteresis                   DisplayString32,
+    rlsInventoryAmpsInputLosThreshold                   DisplayString32,
+    rlsInventoryAmpsInputLosThresholdRangesMin          DisplayString32,
+    rlsInventoryAmpsInputLosThresholdRangesMax          DisplayString32,
+    rlsInventoryAmpsInputLosHysteresis                  DisplayString32,
+    rlsInventoryAmpsOrlThreshold                        DisplayString32,
+    rlsInventoryAmpsOrlThresholdRangesMin               DisplayString32,
+    rlsInventoryAmpsOrlThresholdRangesMax               DisplayString32,
+    rlsInventoryAmpsLowOrlHysteresis                    DisplayString32,
+    rlsInventoryAmpsOrlState                            OrlState,
+    rlsInventoryAmpsGainOffset                          DisplayString32,
+    rlsInventoryAmpsGainOffsetRangesMin                 DisplayString32,
+    rlsInventoryAmpsGainOffsetRangesMax                 DisplayString32,
+    rlsInventoryAmpsGain                                DisplayString32,
+    rlsInventoryAmpsMaxTargetPower                      DisplayString32,
+    rlsInventoryAmpsMaxTargetPowerRangesMin             DisplayString32,
+    rlsInventoryAmpsMaxTargetPowerRangesMax             DisplayString32,
+    rlsInventoryAmpsAprThreshold                        DisplayString32,
+    rlsInventoryAmpsAprHysteresis                       DisplayString32,
+    rlsInventoryAmpsForceApr                            TruthValue,
+    rlsInventoryAmpsAprPowerLevel                       DisplayString32,
+    rlsInventoryAmpsOverloadThresholdsInputPsdLowGain   DisplayString32,
+    rlsInventoryAmpsOverloadThresholdsInputPsdHighGain  DisplayString32,
+    rlsInventoryAmpsAdminState                          AdminState,
+    rlsInventoryAmpsServiceState                        INTEGER,
+    rlsInventoryAmpsInCurrPower                         DisplayString32,
+    rlsInventoryAmpsInMinPower                          DisplayString32,
+    rlsInventoryAmpsInMaxPower                          DisplayString32,
+    rlsInventoryAmpsOutCurrPower                        DisplayString32,
+    rlsInventoryAmpsOutMinPower                         DisplayString32,
+    rlsInventoryAmpsOutMaxPower                         DisplayString32,
+    rlsInventoryAmpsOpticalReturnLoss                   DisplayString32,
+    rlsInventoryAmpsDiagnosticInputLossSignal           TruthValue,
+    rlsInventoryAmpsDiagnosticShutoffThresholdCrossed   TruthValue,
+    rlsInventoryAmpsDignosticAutomaticShutoff           TruthValue,
+    rlsInventoryAmpsDiagnosticAutomaticPowerReductionActive TruthValue,
+    rlsInventoryAmpsDignosticParentFailed               TruthValue,
+    rlsInventoryAmpsDignosticOpticalLineFailed          TruthValue,
+    rlsInventoryAmpsDignosticLowOpticalReturnLoss       TruthValue,
+    rlsInventoryAmpsDignosticLossOfSignal               TruthValue,
+    rlsInventoryAmpsDignosticInputOpticalOverload       TruthValue
+}
+
+rlsInventoryAmpsSlotName OBJECT-TYPE
+    SYNTAX      DisplayString32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The name of the slot."
+    ::= { rlsInventoryAmpsEntry 1 }
+
+rlsInventoryAmpsName OBJECT-TYPE
+    SYNTAX      DisplayString128
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Amplifier name."
+    ::= { rlsInventoryAmpsEntry 2 }
+
+rlsInventoryAmpsAmpMode OBJECT-TYPE
+    SYNTAX      INTEGER {
+        power(1),
+        gain(2),
+        gainclamp(3)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Control Mode of the AMP."
+    DEFVAL     { 2 }
+    ::= { rlsInventoryAmpsEntry 3 }
+
+rlsInventoryAmpsState OBJECT-TYPE
+    SYNTAX      INTEGER {
+        unkown(0),
+        shutoff(1),
+        apr(2),
+        normal(3),
+        clamped(4)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "State the amp is in reported by the card."
+    ::= { rlsInventoryAmpsEntry 4 }
+
+rlsInventoryAmpsGainMode OBJECT-TYPE
+    SYNTAX      INTEGER {
+        low(1),
+        high(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Gain Mode of the AMP."
+    DEFVAL    { 2 }
+    ::= { rlsInventoryAmpsEntry 5 }
+
+rlsInventoryAmpsForcedShutdown OBJECT-TYPE
+    SYNTAX      INTEGER {
+       disabled(1),
+       enabled(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forced EDFA Shutoff State."
+    DEFVAL     { 2 }
+    ::= { rlsInventoryAmpsEntry 6 }
+
+rlsInventoryAmpsTargetGain OBJECT-TYPE
+    SYNTAX      DisplayString32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Target Gain in dB."
+    ::= { rlsInventoryAmpsEntry 7 }
+
+rlsInventoryAmpsBaselineTargetGain OBJECT-TYPE
+    SYNTAX      DisplayString32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Target Gain baseline in dB."
+    ::= { rlsInventoryAmpsEntry 8 }
+
+rlsInventoryAmpsBaselineTimestamp OBJECT-TYPE
+    SYNTAX      DisplayString32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Time stamp for target gain baseline."
+    ::= { rlsInventoryAmpsEntry 9 }
+
+rlsInventoryAmpsTargetGainRangesLowMin OBJECT-TYPE
+    SYNTAX      DisplayString32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { rlsInventoryAmpsEntry 10 }
+
+rlsInventoryAmpsTargetGainRangesLowMax OBJECT-TYPE
+    SYNTAX      DisplayString32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { rlsInventoryAmpsEntry 11 }
+
+rlsInventoryAmpsTargetGainRangesHighMin OBJECT-TYPE
+    SYNTAX      DisplayString32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { rlsInventoryAmpsEntry 12 }
+
+rlsInventoryAmpsTargetGainRangesHighMax OBJECT-TYPE
+    SYNTAX      DisplayString32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { rlsInventoryAmpsEntry 13 }
+
+rlsInventoryAmpsTargetPower OBJECT-TYPE
+    SYNTAX      DisplayString32
+    UNITS       "dBm"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Target Total Power in dBm."
+    ::= { rlsInventoryAmpsEntry 14 }
+
+rlsInventoryAmpsTargetPowerRangesMin OBJECT-TYPE
+    SYNTAX      DisplayString32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { rlsInventoryAmpsEntry 15 }
+
+rlsInventoryAmpsTargetPowerRangesMax OBJECT-TYPE
+    SYNTAX      DisplayString32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { rlsInventoryAmpsEntry 16 }
+
+rlsInventoryAmpsTargetGainTilt OBJECT-TYPE
+    SYNTAX      DisplayString32
+    UNITS       "dB"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Gain tilt in dB."
+    ::= { rlsInventoryAmpsEntry 17 }
+
+rlsInventoryAmpsTargetGainTiltRangesMin OBJECT-TYPE
+    SYNTAX      DisplayString32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { rlsInventoryAmpsEntry 18 }
+
+rlsInventoryAmpsTargetGainTiltRangesMax OBJECT-TYPE
+    SYNTAX      DisplayString32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { rlsInventoryAmpsEntry 19 }
+
+rlsInventoryAmpsShutoffThreshold OBJECT-TYPE
+    SYNTAX      DisplayString32
+    UNITS       "dBm"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Shutoff Threshold in dBm."
+    ::= { rlsInventoryAmpsEntry 20 }
+
+rlsInventoryAmpsShutoffThresholdRangesMin OBJECT-TYPE
+    SYNTAX      DisplayString32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { rlsInventoryAmpsEntry 21 }
+
+rlsInventoryAmpsShutoffThresholdRangesMax OBJECT-TYPE
+    SYNTAX      DisplayString32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { rlsInventoryAmpsEntry 22 }
+
+rlsInventoryAmpsShutoffHysteresis OBJECT-TYPE
+    SYNTAX      DisplayString32
+    UNITS       "dB"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Shutoff Hysteresis in dBm."
+    ::= { rlsInventoryAmpsEntry 23 }
+
+rlsInventoryAmpsInputLosThreshold OBJECT-TYPE
+    SYNTAX      DisplayString32
+    UNITS       "dBm" 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Threshold at which to declare input loss of signal in dBm."
+    ::= { rlsInventoryAmpsEntry 24 }
+
+rlsInventoryAmpsInputLosThresholdRangesMin OBJECT-TYPE
+    SYNTAX      DisplayString32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { rlsInventoryAmpsEntry 25 }
+
+rlsInventoryAmpsInputLosThresholdRangesMax OBJECT-TYPE
+    SYNTAX      DisplayString32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { rlsInventoryAmpsEntry 26 }
+
+rlsInventoryAmpsInputLosHysteresis OBJECT-TYPE
+    SYNTAX      DisplayString32
+    UNITS       "dB"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hysteresis at which to declare of clear the input loss of signal of signal alarm in dB."
+    DEFVAL      { "3" }
+    ::= { rlsInventoryAmpsEntry 27 }
+
+rlsInventoryAmpsOrlThreshold OBJECT-TYPE
+    SYNTAX      DisplayString32
+    UNITS       "dB"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Threshold at which to declare the optical return loss alarm."
+    ::= { rlsInventoryAmpsEntry 28 }
+
+rlsInventoryAmpsOrlThresholdRangesMin OBJECT-TYPE
+    SYNTAX      DisplayString32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { rlsInventoryAmpsEntry 29 }
+
+rlsInventoryAmpsOrlThresholdRangesMax OBJECT-TYPE
+    SYNTAX      DisplayString32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { rlsInventoryAmpsEntry 30 }
+
+rlsInventoryAmpsLowOrlHysteresis OBJECT-TYPE
+    SYNTAX      DisplayString32
+    UNITS       "dB"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hysteresis at which to declare low optical return loss alarm in dB."
+    DEFVAL      { "3" }
+    ::= { rlsInventoryAmpsEntry 31 }
+
+rlsInventoryAmpsOrlState OBJECT-TYPE
+    SYNTAX      OrlState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The ORL State"
+    ::= { rlsInventoryAmpsEntry 32 }
+
+rlsInventoryAmpsGainOffset OBJECT-TYPE
+    SYNTAX      DisplayString32
+    UNITS       "dB"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Gain Offset of the AMP in dB."
+    ::= { rlsInventoryAmpsEntry 33 }
+
+rlsInventoryAmpsGainOffsetRangesMin OBJECT-TYPE
+    SYNTAX      DisplayString32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { rlsInventoryAmpsEntry 34 }
+
+rlsInventoryAmpsGainOffsetRangesMax OBJECT-TYPE
+    SYNTAX      DisplayString32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { rlsInventoryAmpsEntry 35 }
+
+rlsInventoryAmpsGain OBJECT-TYPE
+    SYNTAX      DisplayString32
+    UNITS       "dB"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The current gain of the amplifier in dB."
+    ::= { rlsInventoryAmpsEntry 36 }
+
+rlsInventoryAmpsMaxTargetPower OBJECT-TYPE
+    SYNTAX      DisplayString32
+    UNITS       "dBm"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Maximum Target Power in dBm."
+    ::= { rlsInventoryAmpsEntry 37 }
+
+rlsInventoryAmpsMaxTargetPowerRangesMin OBJECT-TYPE
+    SYNTAX      DisplayString32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { rlsInventoryAmpsEntry 38 }
+
+rlsInventoryAmpsMaxTargetPowerRangesMax OBJECT-TYPE
+    SYNTAX      DisplayString32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { rlsInventoryAmpsEntry 39 }
+
+rlsInventoryAmpsAprThreshold OBJECT-TYPE
+    SYNTAX      DisplayString32
+    UNITS       "dBm"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Threshold at which the amplifier enters reduced power mode in dBm."
+    ::= { rlsInventoryAmpsEntry 40 }
+
+rlsInventoryAmpsAprHysteresis OBJECT-TYPE
+    SYNTAX      DisplayString32
+    UNITS       "dB"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hysteresis at which the amplifier enters reduced power mode in dB."
+    ::= { rlsInventoryAmpsEntry 41 }
+
+rlsInventoryAmpsForceApr OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forced APR."
+    ::= { rlsInventoryAmpsEntry 42 }
+
+rlsInventoryAmpsAprPowerLevel OBJECT-TYPE
+    SYNTAX      DisplayString32
+    UNITS       "dBm"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Power level of the amplifier when the EDFA is in Automatic Power Reduction mode in dBm."
+    ::= { rlsInventoryAmpsEntry 43 }
+
+rlsInventoryAmpsOverloadThresholdsInputPsdLowGain OBJECT-TYPE
+    SYNTAX      DisplayString32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { rlsInventoryAmpsEntry 44 }
+
+rlsInventoryAmpsOverloadThresholdsInputPsdHighGain OBJECT-TYPE
+    SYNTAX      DisplayString32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { rlsInventoryAmpsEntry 45 }
+
+rlsInventoryAmpsAdminState OBJECT-TYPE
+    SYNTAX      AdminState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Resource administrative state."
+    ::= { rlsInventoryAmpsEntry 46 }
+
+rlsInventoryAmpsServiceState OBJECT-TYPE
+    SYNTAX      INTEGER {
+        active(1),
+        idle(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Service state of the amp."
+    ::= { rlsInventoryAmpsEntry 47 }
+
+rlsInventoryAmpsInCurrPower OBJECT-TYPE
+    SYNTAX      DisplayString32
+    UNITS       "dBm"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Input power to the AMP in dBm."
+    ::= { rlsInventoryAmpsEntry 48 }
+
+rlsInventoryAmpsInMinPower OBJECT-TYPE
+    SYNTAX      DisplayString32
+    UNITS       "dBm"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Minimum tidemarked input power to the AMP in dBm. This should be the min power measured since the last measuremnt request in dBm."
+    ::= { rlsInventoryAmpsEntry 49 }
+
+rlsInventoryAmpsInMaxPower OBJECT-TYPE
+    SYNTAX      DisplayString32
+    UNITS       "dBm"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Maximum tidemarked input power to the AMP in dBm. This should be the max power measured since the last measuremnt request."
+    ::= { rlsInventoryAmpsEntry 50 }
+
+rlsInventoryAmpsOutCurrPower OBJECT-TYPE
+    SYNTAX      DisplayString32
+    UNITS       "dBm"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Output power from the AMP in dBm."
+    ::= { rlsInventoryAmpsEntry 51 }
+
+rlsInventoryAmpsOutMinPower OBJECT-TYPE
+    SYNTAX      DisplayString32
+    UNITS       "dBm"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Minimum tidemarked output power from the AMP in dBm. This should be the min power measured since the last measuremnt request."
+    ::= { rlsInventoryAmpsEntry 52 }
+
+rlsInventoryAmpsOutMaxPower OBJECT-TYPE
+    SYNTAX      DisplayString32
+    UNITS       "dBm"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Maximum tidemarked output power from the AMP in dBm. This should be the max power measured since the last measuremnt request in dBm."
+    ::= { rlsInventoryAmpsEntry 53 }
+
+rlsInventoryAmpsOpticalReturnLoss OBJECT-TYPE
+    SYNTAX      DisplayString32
+    UNITS       "dB"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Optical return loss (ORL) is the amount of light that is reflected back up the fiber toward the source by
+         light reflections off the interface of the polished end surface of the mated connectors and air, you should
+         probably check you connection in dB"
+    ::= { rlsInventoryAmpsEntry 54 }
+
+rlsInventoryAmpsDiagnosticInputLossSignal OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Input Loss of Signal."
+    ::= { rlsInventoryAmpsEntry 55 }
+
+rlsInventoryAmpsDiagnosticShutoffThresholdCrossed OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Shutoff Threshold Crossed."
+    ::= { rlsInventoryAmpsEntry 56 }
+
+rlsInventoryAmpsDignosticAutomaticShutoff OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Automatic Shutoff."
+    ::= { rlsInventoryAmpsEntry 57 }
+
+rlsInventoryAmpsDiagnosticAutomaticPowerReductionActive OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Automatic Power Reduction Active."
+    ::= { rlsInventoryAmpsEntry 58 }
+
+rlsInventoryAmpsDignosticParentFailed OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Parent Object Failed."
+    ::= { rlsInventoryAmpsEntry 59 }
+
+rlsInventoryAmpsDignosticOpticalLineFailed OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Optical Line Failed."
+    ::= { rlsInventoryAmpsEntry 60 }
+
+rlsInventoryAmpsDignosticLowOpticalReturnLoss OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Low Optical Return Loss."
+    ::= { rlsInventoryAmpsEntry 61 }
+
+rlsInventoryAmpsDignosticLossOfSignal OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Loss of Signal."
+    ::= { rlsInventoryAmpsEntry 62 }
+
+rlsInventoryAmpsDignosticInputOpticalOverload OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Input Optical Overload."
+    ::= { rlsInventoryAmpsEntry 63 }
+
+END -- end of module CIENA-6500R-AMPS-MIB.

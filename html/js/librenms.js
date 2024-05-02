@@ -66,8 +66,19 @@ function submitCustomRange(frmdata) {
     var refrom = /from=([0-9a-zA-Z\-])+/g;
     var tsto = $("#dtpickerto").data("DateTimePicker").date().unix();
     var tsfrom = $("#dtpickerfrom").data("DateTimePicker").date().unix();
-    frmdata.selfaction.value = frmdata.selfaction.value.replace(reto, 'to=' + tsto);
-    frmdata.selfaction.value = frmdata.selfaction.value.replace(refrom, 'from=' + tsfrom);
+
+    if (frmdata.selfaction.value.match(reto)) {
+        frmdata.selfaction.value = frmdata.selfaction.value.replace(reto, 'to=' + tsto);
+    } else {
+        frmdata.selfaction.value += '/to=' + tsto;
+    }
+
+    if (frmdata.selfaction.value.match(refrom)) {
+        frmdata.selfaction.value = frmdata.selfaction.value.replace(refrom, 'from=' + tsfrom);
+    } else {
+        frmdata.selfaction.value += '/from=' + tsfrom;
+    }
+
     frmdata.action = frmdata.selfaction.value;
     return true;
 }
@@ -456,7 +467,6 @@ function init_select2(selector, type, data, selected, placeholder, config) {
     $select.select2(init);
 
     if (selected) {
-        console.log(selected);
         if (typeof selected !== 'object') {
             selected = {id: selected, text: selected};
         }

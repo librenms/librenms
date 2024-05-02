@@ -184,6 +184,11 @@ class Vrp extends OS implements
                     $numasoclients = $clientPerRadio[$ap_id][$r_id] ?? 0;
                     $radio['hwWlanRadioType'] = $radio['hwWlanRadioType'] ?? 0;
 
+                    if ($txpow > 127) {
+                        // means the radio is disabled for some reason.
+                        $txpow = 0;
+                    }
+
                     $type = 'dot11';
 
                     if ($radio['hwWlanRadioType'] & 2) {

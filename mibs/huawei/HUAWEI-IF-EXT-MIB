@@ -1,9 +1,9 @@
 -- ==================================================================
--- Copyright (C) 2019 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2022 by  HUAWEI TECHNOLOGIES. All rights reserved.
 -- 
 -- Description: HUAWEI Private Extended Interface MIB
 -- Reference:
--- Version: V3.01
+-- Version: V3.30
 -- History:
 --      V1.0 
 -- ==================================================================
@@ -42,7 +42,7 @@
     
     
         hwIFExtMib MODULE-IDENTITY 
-            LAST-UPDATED "201901090000Z"
+            LAST-UPDATED "202206180000Z"
             ORGANIZATION 
                 "Huawei Technologies Co.,Ltd."
             CONTACT-INFO 
@@ -53,6 +53,99 @@
                    Website: http://www.huawei.com
                    Email: support@huawei.com
                  "
+                DESCRIPTION 
+                "V3.30 Add  hwIPv4StateChangeReason." 
+                 REVISION     "202206180000Z"
+                DESCRIPTION
+                "V3.29 Add  hwIPv4IfStateAlarm and hwIPv4IfStateAlarmResume." 
+                 REVISION     "202205270000Z"
+                DESCRIPTION
+                "V3.28  Add hwFlexeChannelNotSupportAlarm and hwFlexeChannelNotSupportResume."
+                REVISION     "202204150000Z"
+                DESCRIPTION
+                "V3.27  Add hwVirtualEthernetChipMismatchAlarm and hwVirtualEthernetChipMismatchResume."
+                REVISION     "202203250000Z"
+                DESCRIPTION
+                "V3.26  Add hwIfIPConflict and hwIfIPConflictResume."
+                REVISION     "202203120000Z"
+                DESCRIPTION
+                "V3.25  Add hwModeFlexeBandwidth."
+                REVISION     "202202220000Z"
+                 DESCRIPTION 
+                 "V3.24 Add hwIFExtPhyStatusUpTime." 
+                 REVISION     "202112290000Z"
+                 DESCRIPTION 
+                 "V3.23 Update hwTrunkIfModel, add object-type roundRobin(21),resilient(22),dynProfile(23)" 
+                 REVISION     "202107050000Z"
+                 DESCRIPTION 
+                 "V3.22 Add hwLacpStateDown and hwLacpStateDownResume." 
+                 REVISION     "202105240000Z"
+                 DESCRIPTION 
+                 "V3.21 modify the range of hwIFExtFlowStatInterval"
+                 REVISION     "202104141000Z"
+                 DESCRIPTION 
+                 "V3.20 add hwTrunkBandwidthAlarm,hwTrunkBandwidthResume"
+                 REVISION     "202102011000Z"
+                  DESCRIPTION 
+                 "V3.19 Standardized description of hwIFExtTable." 
+                 REVISION     "202101261000Z"
+                  DESCRIPTION 
+                 "V3.18 add hwIfDualStackStatsInPktRate,hwIfDualStackStatsInOctetRate,hwIfDualStackStatsOutPktRate,hwIfDualStackStatsOutOctetRate" 
+                 REVISION     "202011091700Z"
+                  DESCRIPTION 
+                 "V3.17 Text style check." 
+                 REVISION     "202008131000Z"
+                  DESCRIPTION 
+                 "V3.16 add hwTrunkBwChange." 
+                 REVISION     "202008121000Z"
+                  DESCRIPTION 
+                 "V3.15 modiofy 'sended' to 'sent'." 
+                 REVISION     "202007231000Z"
+                  DESCRIPTION 
+                 "V3.14 modiofy 'sended' to 'sent'." 
+                 REVISION     "202007230000Z"
+                  DESCRIPTION 
+                 "V3.13 modiofy 'sended' to 'sent'." 
+                 REVISION     "202007220000Z"
+                  DESCRIPTION 
+                 "V3.12 modiofy hwIFExtLayer." 
+                 REVISION     "202004270000Z"                
+                DESCRIPTION 
+                 "V3.10 modiofy hwTrunkIfTimeoutReceive." 
+                 REVISION     "202003201011Z"
+                 DESCRIPTION 
+                 "V3.09 add hwIfDualStatckStatsInUcastPkts,hwIfDualStatckStatsInUcastOctets,hwIfDualStatckStatsInMcastPkts,hwIfDualStatckStatsInMcastOctets,hwIfDualStatckStatsInBcastPkts,hwIfDualStatckStatsInBcastOctets,hwIfDualStatckStatsOutUcastPkts,hwIfDualStatckStatsOutUcastOctets,hwIfDualStatckStatsOutMcastPkts,
+                 hwIfDualStatckStatsOutMcastOctets,hwIfDualStatckStatsOutBcastPkts,hwIfDualStatckStatsOutBcastOctets." 
+                 REVISION     "202001080000Z"
+
+                 DESCRIPTION 
+                 "V3.08 add hwIFExtDampStatus hwIfDampSuppress hwIfDampResume." 
+                 REVISION     "201910230000Z"
+
+                 DESCRIPTION
+               "V3.07 Modify hwRemoteIfInUcastPkts,hwRemoteIfInMulticastPkts,hwRemoteIfInBroadcastPkts,hwRemoteIfInErrorPkts,hwRemoteIfInDiscardPkts,hwRemoteIfOutUcastPkts,hwRemoteIfOutMulticastPkts,hwRemoteIfOutBroadcastPkts,hwRemoteIfOutErrorPkts,hwRemoteIfOutDiscardPkts DESCRIPTION."
+                REVISION     "201909250000Z"
+
+                 DESCRIPTION
+               "V3.06 Modify hwLicenseEffectServiceAlarm DESCRIPTION."
+                REVISION     "201909090000Z"
+
+                DESCRIPTION
+                "V3.05 Modify hwLogicIfTable hwLogicIfType, add virtualIf."
+                REVISION     "201908090000Z"
+
+                 DESCRIPTION
+                "V3.04 add hwIFExtInputBitRate,hwIFExtOutputBitRate."
+                REVISION     "201907240000Z"
+
+                 DESCRIPTION
+                "V3.03 Add hwTrunkIfStatusChange."
+                REVISION     "201901290000Z"
+
+                 DESCRIPTION
+                "V3.02 remove hwTrunkIfStatus from hwTrunkMemNumberChange."
+                REVISION     "201901280000Z"
+
                  DESCRIPTION
 		 "V3.01 add hwTrunkMemberChange" 
 		 REVISION     "201901090000Z" 
@@ -369,7 +462,8 @@
             MAX-ACCESS not-accessible
             STATUS current
             DESCRIPTION
-                "Interface extended table of private mib."
+                "hwIFExtIndex is the unique identifier of the table. It is written when the table is created and cannot be modified later.
+                 The table describes the extended attributes of an interface, such as the Layer 2/Layer 3 identifier and frame type of the interface."
             ::= { hwIFExtBase 1 }
 
         
@@ -460,7 +554,15 @@
                 hwIFExtInputBroadcastPktRate
                     CounterBasedGauge64,
                 hwIFExtOutputBroadcastPktRate
-                    CounterBasedGauge64
+                    CounterBasedGauge64,
+                hwIFExtInputBitRate
+                    CounterBasedGauge64,
+                hwIFExtOutputBitRate
+                    CounterBasedGauge64,
+                hwIFExtDampStatus
+                    INTEGER,
+                hwIFExtPhyStatusUpTime
+                    Unsigned32
              }
 
         hwIFExtIndex OBJECT-TYPE
@@ -468,7 +570,7 @@
             MAX-ACCESS not-accessible
             STATUS current
             DESCRIPTION
-                "Index of extended table of interface."
+                "This object indicates the interface index."
             ::= { hwIFExtEntry 1 }
 
         
@@ -481,10 +583,9 @@
             MAX-ACCESS read-write
             STATUS current
             DESCRIPTION
-                "Switch the port between Layer3 and Layer2. Corresponding to the 
-                port switch command.Layer2(1) is 1 when the port switch from layer3
-                 to layer2.Layer3(1) is 1 when the port switch from lyaer2 to  
-                layer3."
+                "This object indicates the Layer 2/Layer 3 switching flag of an interface.
+                 According to the switching command, note the following:
+                 When Layer2(1) is 1, the interface switches from Layer 3 mode to Layer 2 mode. When Layer3(2) is 2, the interface switches from Layer 2 mode to Layer 3 mode."
             ::= { hwIFExtEntry 2 }
 
         
@@ -500,20 +601,19 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Frame type is accepted by VLAN virtual interfaces.Frame format 
-                contains ethernetII(1),ethernetII(2),ethernet8022(3),ethernet8023.
-                The type location setting 1 when the ethernetII(1) type is
-                 accepted.Now only surpport the first(ethernetII(1))"
+                "This object indicates the type of frames that a VLAN virtual interface receives. 
+                 Frame formats include ethernetII(1), ethernetII(2), ethernet8022(3), and ethernet8023. 
+                 The value for the ethernetII(1) format is 1. Currently, only ethernetII(1) is supported."
             ::= { hwIFExtEntry 3 }
 
         
 -- metric: second
         hwIFExtFlowStatInterval OBJECT-TYPE
-            SYNTAX Integer32 (10..600)
+            SYNTAX Integer32 (0..600)
             MAX-ACCESS read-write
             STATUS current
             DESCRIPTION
-                "The value of this object identifies the interval for collecting the statistics of the interface traffic. The value ranges from 10 to 600, in seconds. The default interval is 300s.If intervals for collecting traffic statistics are configured both in the interface view and globally, the configuration in the interface view takes effect.If no interval for collecting traffic statistics is configured in the interface view, the global configuration takes effect.The real-time traffic statistics collection rate is affected by the interval for collecting traffic statistics."
+                "This object indicates the interval for collecting traffic statistics for an interface. The value ranges from 0 to 600, in seconds. The default value is 300."
             DEFVAL { 300 }
             ::= { hwIFExtEntry 4 }
 
@@ -559,9 +659,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION 
-           " Current flow status of interface.
-               1:flow up
-               2:flow down"
+                "This object indicates the traffic status of an interface."
             ::= { hwIFExtEntry 8 }            
             
         hwIFExtMtu OBJECT-TYPE
@@ -569,9 +667,9 @@
             MAX-ACCESS read-write
             STATUS current
             DESCRIPTION 
-           "The value of this object identifies the MTU of an interface.
-The MTU value varies according to different interfaces. The default MTU value also varies.
-The MTU value can be modified."
+                "This object indicates the MTU of an interface.
+                 The MTU value varies according to interface types. The default MTU value also varies.
+                 The MTU value can be modified."
             ::= { hwIFExtEntry 9 }  
             
         hwIFExtMacAddr  OBJECT-TYPE
@@ -579,7 +677,7 @@ The MTU value can be modified."
             MAX-ACCESS read-write
             STATUS current
             DESCRIPTION
-                "The MAC address of the interface ."
+                "This object indicates the MAC address of an interface."
             ::= { hwIFExtEntry 10 }
 
         hwIFExtBlockPriority OBJECT-TYPE
@@ -613,9 +711,9 @@ The MTU value can be modified."
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION 
-           "The suppress state of the interface.
-               0:unsuppress
-               1:suppress"
+                "This object indicates the suppression status of an interface.
+                 0: The interface is not suppressed.
+                 1: The interface is suppressed."
             ::= { hwIFExtEntry 13 }  
     
         hwIFExtPoisonReverse OBJECT-TYPE
@@ -633,8 +731,8 @@ The MTU value can be modified."
             STATUS current
             DESCRIPTION
                 "This object indicates the rate of the incoming packets on an interface. 
-                The rate value is 64 bits. hwIFExtInputPktRate indicates the lower 32 bits, 
-                while hwIFExtInputHighPktRate indicates the higher 32 bits. "
+                 The rate value is 64 bits. hwIFExtInputPktRate indicates the lower 32 bits, 
+                 while hwIFExtInputHighPktRate indicates the higher 32 bits. "
             ::= { hwIFExtEntry 15 }
             
         hwIFExtInputHighPktRate OBJECT-TYPE
@@ -643,8 +741,8 @@ The MTU value can be modified."
             STATUS current
             DESCRIPTION
                 "This object indicates the rate of the incoming packets on an interface. 
-                The rate value is 64 bits. hwIFExtInputPktRate indicates the lower 32 bits, 
-                while hwIFExtInputHighPktRate indicates the higher 32 bits. "
+                 The rate value is 64 bits. hwIFExtInputPktRate indicates the lower 32 bits, 
+                 while hwIFExtInputHighPktRate indicates the higher 32 bits. "
             ::= { hwIFExtEntry 16 }            
 
         hwIFExtOutputPktRate OBJECT-TYPE
@@ -653,8 +751,8 @@ The MTU value can be modified."
             STATUS current
             DESCRIPTION
                 "This object indicates the rate of the outgoing packets on an interface. 
-                The rate value is 64 bits. hwIFExtOutputPktRate indicates the lower 32 bits, 
-                while hwIFExtOutputHighPktRate indicates the higher 32 bits. "
+                 The rate value is 64 bits. hwIFExtOutputPktRate indicates the lower 32 bits, 
+                 while hwIFExtOutputHighPktRate indicates the higher 32 bits. "
             ::= { hwIFExtEntry 17 }            
             
         hwIFExtOutputHighPktRate OBJECT-TYPE
@@ -663,8 +761,8 @@ The MTU value can be modified."
             STATUS current
             DESCRIPTION
                 "This object indicates the rate of the outgoing packets on an interface. 
-                The rate value is 64 bits. hwIFExtOutputPktRate indicates the lower 32 bits, 
-                while hwIFExtOutputHighPktRate indicates the higher 32 bits. "
+                 The rate value is 64 bits. hwIFExtOutputPktRate indicates the lower 32 bits, 
+                 while hwIFExtOutputHighPktRate indicates the higher 32 bits. "
             ::= { hwIFExtEntry 18 }            
             
         hwIFExtInputOctetRate OBJECT-TYPE
@@ -673,8 +771,8 @@ The MTU value can be modified."
             STATUS current
             DESCRIPTION
                 "This object indicates the octet rate of the incoming traffic on an interface. 
-                The rate value is 64 bits. hwIFExtInputOctetRate indicates the lower 32 bits, 
-                while hwIFExtInputHighOctetRate indicates the higher 32 bits. "
+                 The rate value is 64 bits. hwIFExtInputOctetRate indicates the lower 32 bits, 
+                 while hwIFExtInputHighOctetRate indicates the higher 32 bits. "
             ::= { hwIFExtEntry 19 }            
             
         hwIFExtInputHighOctetRate OBJECT-TYPE
@@ -683,8 +781,8 @@ The MTU value can be modified."
             STATUS current
             DESCRIPTION
                 "This object indicates the octet rate of the incoming traffic on an interface. 
-                The rate value is 64 bits. hwIFExtInputOctetRate indicates the lower 32 bits, 
-                while hwIFExtInputHighOctetRate indicates the higher 32 bits."
+                 The rate value is 64 bits. hwIFExtInputOctetRate indicates the lower 32 bits, 
+                 while hwIFExtInputHighOctetRate indicates the higher 32 bits."
             ::= { hwIFExtEntry 20 }
             
         hwIFExtOutputOctetRate OBJECT-TYPE
@@ -693,8 +791,8 @@ The MTU value can be modified."
             STATUS current
             DESCRIPTION
                 "This object indicates the octet rate of the outgoing traffic on an interface. 
-                The rate value is 64 bits. hwIFExtOutputOctetRate indicates the lower 32 bits, 
-                while hwIFExtOutputHighOctetRate indicates the higher 32 bits. "
+                 The rate value is 64 bits. hwIFExtOutputOctetRate indicates the lower 32 bits, 
+                 while hwIFExtOutputHighOctetRate indicates the higher 32 bits. "
             ::= { hwIFExtEntry 21 }            
             
         hwIFExtOutputHighOctetRate OBJECT-TYPE
@@ -703,10 +801,10 @@ The MTU value can be modified."
             STATUS current
             DESCRIPTION
                 "This object indicates the octet rate of the outgoing traffic on an interface. 
-                The rate value is 64 bits. hwIFExtOutputOctetRate indicates the lower 32 bits, 
-                while hwIFExtOutputHighOctetRate indicates the higher 32 bits. "
+                 The rate value is 64 bits. hwIFExtOutputOctetRate indicates the lower 32 bits, 
+                 while hwIFExtOutputHighOctetRate indicates the higher 32 bits. "
             ::= { hwIFExtEntry 22 }
-		
+
          hwIFExtSwitchPortIndex OBJECT-TYPE   
             SYNTAX  Integer32
             MAX-ACCESS read-only
@@ -737,7 +835,7 @@ The MTU value can be modified."
             STATUS current
             DESCRIPTION
                 "The total number of packets received on the interface. 
-                The counter value is 64 bits. "
+                 The counter value is 64 bits. "
             ::= { hwIFExtEntry 25 }            
             
         hwIFExtOutputPkts OBJECT-TYPE
@@ -746,7 +844,7 @@ The MTU value can be modified."
             STATUS current
             DESCRIPTION
                 "The total number of packets transmitted out of the interface. 
-                The counter value is 64 bits. "
+                 The counter value is 64 bits. "
             ::= { hwIFExtEntry 26 }
             
         hwIFExtInputUnicastBitRate OBJECT-TYPE
@@ -755,7 +853,7 @@ The MTU value can be modified."
             STATUS current
             DESCRIPTION
                 "This object indicates the bit rate of the incoming unicast traffic on an interface. 
-                The rate value is 64 bits. "
+                 The rate value is 64 bits. "
             ::= { hwIFExtEntry 27 }
             
         hwIFExtOutputUnicastBitRate OBJECT-TYPE
@@ -764,7 +862,7 @@ The MTU value can be modified."
             STATUS current
             DESCRIPTION
                 "This object indicates the bit rate of the outgoing unicast traffic on an interface. 
-                The rate value is 64 bits. "
+                 The rate value is 64 bits. "
             ::= { hwIFExtEntry 28 }
             
         hwIFExtInputMulticastBitRate OBJECT-TYPE
@@ -773,7 +871,7 @@ The MTU value can be modified."
             STATUS current
             DESCRIPTION
                 "This object indicates the bit rate of the incoming multicast traffic on an interface. 
-                The rate value is 64 bits. "
+                 The rate value is 64 bits. "
             ::= { hwIFExtEntry 29 }
             
         hwIFExtOutputMulticastBitRate OBJECT-TYPE
@@ -782,7 +880,7 @@ The MTU value can be modified."
             STATUS current
             DESCRIPTION
                 "This object indicates the bit rate of the outgoing multicast traffic on an interface. 
-                The rate value is 64 bits. "
+                 The rate value is 64 bits. "
             ::= { hwIFExtEntry 30 }
             
         hwIFExtInputBroadcastBitRate OBJECT-TYPE
@@ -791,7 +889,7 @@ The MTU value can be modified."
             STATUS current
             DESCRIPTION
                 "This object indicates the bit rate of the incoming broadcast traffic on an interface. 
-                The rate value is 64 bits. "
+                 The rate value is 64 bits. "
             ::= { hwIFExtEntry 31 }
             
         hwIFExtOutputBroadcastBitRate OBJECT-TYPE
@@ -800,7 +898,7 @@ The MTU value can be modified."
             STATUS current
             DESCRIPTION
                 "This object indicates the bit rate of the outgoing broadcast traffic on an interface. 
-                The rate value is 64 bits. "
+                 The rate value is 64 bits. "
             ::= { hwIFExtEntry 32 }
             
         hwIFExtInputUnicastPktRate OBJECT-TYPE
@@ -809,7 +907,7 @@ The MTU value can be modified."
             STATUS current
             DESCRIPTION
                 "This object indicates the rate of the incoming unicast packets on an interface. 
-                The rate value is 64 bits. "
+                 The rate value is 64 bits. "
             ::= { hwIFExtEntry 33 }
             
         hwIFExtOutputUnicastPktRate OBJECT-TYPE
@@ -818,7 +916,7 @@ The MTU value can be modified."
             STATUS current
             DESCRIPTION
                 "This object indicates the rate of the outgoing unicast packets on an interface. 
-                The rate value is 64 bits. "
+                 The rate value is 64 bits. "
             ::= { hwIFExtEntry 34 }
             
         hwIFExtInputMulticastPktRate OBJECT-TYPE
@@ -827,7 +925,7 @@ The MTU value can be modified."
             STATUS current
             DESCRIPTION
                 "This object indicates the rate of the incoming multicast packets on an interface. 
-                The rate value is 64 bits. "
+                 The rate value is 64 bits. "
             ::= { hwIFExtEntry 35 }
             
         hwIFExtOutputMulticastPktRate OBJECT-TYPE
@@ -836,7 +934,7 @@ The MTU value can be modified."
             STATUS current
             DESCRIPTION
                 "This object indicates the rate of the outgoing multicast packets on an interface. 
-                The rate value is 64 bits. "
+                 The rate value is 64 bits. "
             ::= { hwIFExtEntry 36 }
             
         hwIFExtInputBroadcastPktRate OBJECT-TYPE
@@ -845,7 +943,7 @@ The MTU value can be modified."
             STATUS current
             DESCRIPTION
                 "This object indicates the rate of the incoming broadcast packets on an interface. 
-                The rate value is 64 bits. "
+                 The rate value is 64 bits. "
             ::= { hwIFExtEntry 37 }
             
         hwIFExtOutputBroadcastPktRate OBJECT-TYPE
@@ -856,7 +954,48 @@ The MTU value can be modified."
                 "This object indicates the rate of the outgoing broadcast packets on an interface. 
                 The rate value is 64 bits. "
             ::= { hwIFExtEntry 38 }
-		
+
+        hwIFExtInputBitRate OBJECT-TYPE
+            SYNTAX CounterBasedGauge64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the bit rate of the incoming traffic on an interface. 
+                 The rate value is 64 bits. "
+            ::= { hwIFExtEntry 39 }            
+
+        hwIFExtOutputBitRate OBJECT-TYPE
+            SYNTAX CounterBasedGauge64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the bit rate of the outgoing traffic on an interface. 
+                 The rate value is 64 bits.  "
+            ::= { hwIFExtEntry 40 }            
+
+        hwIFExtDampStatus  OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+              unsuppress(0),
+              suppress(1)
+            }       
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION 
+               "This object indicates the physical suppression status of an interface.
+                0: The interface is not suppressed.
+                1: The interface is suppressed."
+            ::= { hwIFExtEntry 41 }  
+
+        hwIFExtPhyStatusUpTime OBJECT-TYPE
+            SYNTAX Unsigned32
+            UNITS "seconds"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION 
+               "This object indicates the accumulated time in seconds during which the physical status of the interface remains up after its creation."
+            ::= { hwIFExtEntry 42 }
+
         hwIFExtPhyStatus OBJECT-TYPE
             SYNTAX INTEGER { up(1), down(2) }
             MAX-ACCESS accessible-for-notify
@@ -1077,9 +1216,7 @@ The MTU value can be modified."
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-               "The number of packets, delivered by this sub-layer to
-               a higher (sub-)layer, which were not addressed to a
-               multicast or broadcast address at this sub-layer."
+               "Number of unicast packets received on an interface."
             ::= { hwRemoteIfEntry 4 }
             
         hwRemoteIfInMulticastPkts OBJECT-TYPE
@@ -1087,11 +1224,7 @@ The MTU value can be modified."
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-               "The number of packets, delivered by this sub-layer to
-               a higher (sub-)layer, which were addressed to a
-               multicast address at this sub-layer.  For a MAC layer
-               protocol, this includes both Group and Functional
-               addresses."
+               "Number of multicast packets received on an interface."
             ::= { hwRemoteIfEntry 5 }
             
         hwRemoteIfInBroadcastPkts OBJECT-TYPE
@@ -1099,9 +1232,7 @@ The MTU value can be modified."
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-               "The number of packets, delivered by this sub-layer to
-               a higher (sub-)layer, which were addressed to a
-               broadcast address at this sub-layer."
+               "Number of broadcast packets received on an interface."
             ::= { hwRemoteIfEntry 6 }
             
         hwRemoteIfInOctetRate OBJECT-TYPE
@@ -1126,13 +1257,7 @@ The MTU value can be modified."
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-               "For packet-oriented interfaces, the number of inbound
-               packets that contained errors preventing them from
-               being deliverable to a higher-layer protocol.  For
-               character-oriented or fixed-length interfaces, the
-               number of inbound transmission units that contained
-               errors preventing them from being deliverable to a
-               higher-layer protocol."
+               "Number of error packets received on an interface."
             ::= { hwRemoteIfEntry 9 }
             
         hwRemoteIfInDiscardPkts OBJECT-TYPE
@@ -1140,11 +1265,7 @@ The MTU value can be modified."
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-               "The number of inbound packets which were chosen to be
-               discarded even though no errors had been detected to
-               prevent their being deliverable to a higher-layer
-               protocol.  One possible reason for discarding such a
-               packet could be to free up buffer space."
+               "Number of received packets discarded on an interface."
             ::= { hwRemoteIfEntry 10 }
             
         hwRemoteIfOutOctets OBJECT-TYPE
@@ -1168,11 +1289,7 @@ The MTU value can be modified."
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-               "The total number of packets that higher-level
-               protocols requested be transmitted, and which were not
-               addressed to a multicast or broadcast address at this
-               sub-layer, including those that were discarded or not
-               sent."
+               "Number of unicast packets sent on an interface."
             ::= { hwRemoteIfEntry 13 }
             
         hwRemoteIfOutMulticastPkts OBJECT-TYPE
@@ -1180,12 +1297,7 @@ The MTU value can be modified."
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-               "The total number of packets that higher-level
-               protocols requested be transmitted, and which were
-               addressed to a multicast address at this sub-layer,
-               including those that were discarded or not sent.  For
-               a MAC layer protocol, this includes both Group and
-               Functional addresses."
+               "Number of multicast packets sent on an interface."
             ::= { hwRemoteIfEntry 14 }
             
         hwRemoteIfOutBroadcastPkts OBJECT-TYPE
@@ -1193,10 +1305,7 @@ The MTU value can be modified."
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-               "The total number of packets that higher-level
-               protocols requested be transmitted, and which were
-               addressed to a broadcast address at this sub-layer,
-               including those that were discarded or not sent."
+               "Number of broadcast packets sent on an interface."
             ::= { hwRemoteIfEntry 15 }
             
         hwRemoteIfOutOctetRate OBJECT-TYPE
@@ -1220,11 +1329,7 @@ The MTU value can be modified."
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-               "For packet-oriented interfaces, the number of
-               outbound packets that could not be transmitted because
-               of errors.  For character-oriented or fixed-length
-               interfaces, the number of outbound transmission units
-               that could not be transmitted because of errors."
+               "Number of error packets sent on an interface."
             ::= { hwRemoteIfEntry 18 }
             
         hwRemoteIfOutDiscardPkts OBJECT-TYPE
@@ -1232,11 +1337,7 @@ The MTU value can be modified."
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-               "The number of outbound packets which were chosen to
-               be discarded even though no errors had been detected
-               to prevent their being transmitted.  One possible
-               reason for discarding such a packet could be to free
-               up buffer space."
+               "Number of sent packets discarded on an interface."
             ::= { hwRemoteIfEntry 19 }
                     
         hwIFExtDualFlowRateTable OBJECT-TYPE
@@ -1778,7 +1879,7 @@ You can create, delete, and view information about the borrowed IP address of an
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "The nextindex of Trunk interface,that means its position"
+                "The nextindex of Trunk interface, that means its position"
             ::= { hwTrunkAttr 2 }
 
         
@@ -1885,7 +1986,7 @@ You can create, delete, and view information about the borrowed IP address of an
             MAX-ACCESS accessible-for-notify
             STATUS current
             DESCRIPTION
-                " The value of this object identifies the index of a trunk interface.The currently supported value ranges from 0 to 511."
+                " The value of this object identifies the index of a trunk interface. The currently supported value ranges from 0 to 511."
             ::= { hwTrunkIfEntry 1 }
 
         
@@ -1894,7 +1995,7 @@ You can create, delete, and view information about the borrowed IP address of an
             MAX-ACCESS read-create
             STATUS current
             DESCRIPTION
-                " The identification of the Trunk interface.It may identify Trunk
+                " The identification of the Trunk interface. It may identify Trunk
                 and is an index of the interface."
             ::= { hwTrunkIfEntry 2 }
 
@@ -1919,7 +2020,7 @@ You can create, delete, and view information about the borrowed IP address of an
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                " Index number of the Trunk interface,it is consistent with ifIndex
+                " Index number of the Trunk interface, it is consistent with ifIndex
                 of ifTable in IF-MIB."
             ::= { hwTrunkIfEntry 4 }
 
@@ -1946,6 +2047,9 @@ You can create, delete, and view information about the borrowed IP address of an
                 label(18),
                 enhanced(19),
                 l4(20),
+                roundRobin(21),
+                resilient(22),
+                dynProfile(23),
                 invalid(-1)
                 }
             MAX-ACCESS read-create
@@ -2021,10 +2125,10 @@ The currently supported value ranges from 1 to 32. By default, the minimum numbe
             STATUS current
             DESCRIPTION
                 " Current working state of backup-access trunk.
-                1:general mode working state
-                2:initialization 
-                3:master working
-                4:backup working"
+                1: general mode working state
+                2: initialization 
+                3: master working
+                4: backup working"
             ::= { hwTrunkIfEntry 10 }
 
         
@@ -2085,7 +2189,7 @@ The currently supported value ranges from 1 to 32. By default, the minimum numbe
                 "The value of this object identifies the timeout period for receiving LACPDUs on an interface in static LACP mode. The value can be:
                  fast: specifies the timeout period for receiving packets to be 3s. 
                  slow: specifies the timeout period for receiving packets to be 90s. 
-                The default timeout period for receiving packets is 3s.
+                The default timeout period for receiving packets is 90s.
                 fast(1),slow(2). 
                 The return value of -1 indicates invalid."
             ::= { hwTrunkIfEntry 14 }
@@ -2575,7 +2679,7 @@ The currently supported value ranges from 1 to 32. By default, the minimum numbe
             STATUS current
             DESCRIPTION
                 "Status of operation, indicates port status. There are trunk_up(1)
-                and trunk_down(2).It expresses whether port is shutdown."
+                and trunk_down(2). It expresses whether port is shutdown."
             DEFVAL { down }
             ::= { hwTrunkMemEntry 6 }
 
@@ -2685,8 +2789,8 @@ The currently supported value ranges from 1 to 32. By default, the minimum numbe
             STATUS current
             DESCRIPTION
                 "Global interval of interface flow stat.The interface interval is effective,
-                when both interface interval and global interval are config.Globle interval 
-                is only effective in interfaces,which interface interval is not configged.
+                when both interface interval and global interval are config.Global interval 
+                is only effective in interfaces,which interface interval is not configured.
                 Flow stat rate of interface will be affected by the value of interval.
                 The default value is 300s."
             ::= { hwIFFlowStat 1 }
@@ -3061,7 +3165,7 @@ The currently supported value ranges from 1 to 32. By default, the minimum numbe
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                " The number of sended Frames which is purged from the buffer because of long time "
+                " The number of sent Frames which is purged from the buffer because of long time "
             ::= { hwIfEtherStatEntry 33 }       
       
 
@@ -3370,6 +3474,38 @@ hwIfSdhStatTable OBJECT-TYPE
                 hwIfDualStackStatsOutTransmits
                     Counter64,
                 hwIfDualStackStatsOutOctets
+                    Counter64,
+                hwIfDualStatckStatsInUcastPkts
+                    Counter64,
+                hwIfDualStatckStatsInUcastOctets
+                    Counter64,
+                hwIfDualStatckStatsInMcastPkts
+                    Counter64,
+                hwIfDualStatckStatsInMcastOctets
+                    Counter64,
+                hwIfDualStatckStatsInBcastPkts
+                    Counter64,
+                hwIfDualStatckStatsInBcastOctets
+                    Counter64,
+                hwIfDualStatckStatsOutUcastPkts
+                    Counter64,
+                hwIfDualStatckStatsOutUcastOctets
+                    Counter64,
+                hwIfDualStatckStatsOutMcastPkts
+                    Counter64,
+                hwIfDualStatckStatsOutMcastOctets
+                    Counter64,
+                hwIfDualStatckStatsOutBcastPkts
+                    Counter64,
+                hwIfDualStatckStatsOutBcastOctets
+                    Counter64,
+                hwIfDualStackStatsInPktRate
+                    Counter64,
+                hwIfDualStackStatsInOctetRate
+                    Counter64,
+                hwIfDualStackStatsOutPktRate
+                    Counter64,
+                hwIfDualStackStatsOutOctetRate
                     Counter64
              }
 
@@ -3419,7 +3555,135 @@ hwIfSdhStatTable OBJECT-TYPE
             STATUS current
             DESCRIPTION
                 "The total number of octets in IPv4/IPv6 datagrams delivered to the lower layers for transmission, including those transmitted on the interface's sub-interfaces."
-            ::= { hwIfDualStackStatsEntry 6 }                        
+            ::= { hwIfDualStackStatsEntry 6 }
+
+        hwIfDualStatckStatsInUcastPkts OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of IPv4/IPv6 unicast datagrams received, including those received on the interface's sub-interfaces."
+            ::= { hwIfDualStackStatsEntry 7 }
+			
+        hwIfDualStatckStatsInUcastOctets OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of octets received in IPv4/IPv6 unicast datagrams, including those received on the interface's sub-interfaces."
+            ::= { hwIfDualStackStatsEntry 8 }
+			
+        hwIfDualStatckStatsInMcastPkts OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of IPv4/IPv6 multicast datagrams received, including those received on the interface's sub-interfaces."
+            ::= { hwIfDualStackStatsEntry 9 }
+			
+        hwIfDualStatckStatsInMcastOctets OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of octets received in IPv4/IPv6 multicast datagrams, including those received on the interface's sub-interfaces."
+            ::= { hwIfDualStackStatsEntry 10 }
+			
+        hwIfDualStatckStatsInBcastPkts OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of IPv4/IPv6 broadcast datagrams received, including those received on the interface's sub-interfaces."
+            ::= { hwIfDualStackStatsEntry 11 }
+			
+        hwIfDualStatckStatsInBcastOctets OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of octets received in IPv4/IPv6 broadcast datagrams, including those received on the interface's sub-interfaces."
+            ::= { hwIfDualStackStatsEntry 12 }
+			
+        hwIfDualStatckStatsOutUcastPkts OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of IPv4/IPv6 unicast datagrams transmitted, including those received on the interface's sub-interfaces."
+            ::= { hwIfDualStackStatsEntry 13 }
+            
+        hwIfDualStatckStatsOutUcastOctets OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of octets transmitted in IPv4/IPv6 unicast datagrams, including those received on the interface's sub-interfaces."
+            ::= { hwIfDualStackStatsEntry 14 }
+			
+        hwIfDualStatckStatsOutMcastPkts OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of IPv4/IPv6 multicast datagrams transmitted, including those received on the interface's sub-interfaces."
+            ::= { hwIfDualStackStatsEntry 15 }
+			
+        hwIfDualStatckStatsOutMcastOctets OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of octets transmitted in IPv4/IPv6 multicast datagrams, including those received on the interface's sub-interfaces."
+            ::= { hwIfDualStackStatsEntry 16 }
+			
+        hwIfDualStatckStatsOutBcastPkts OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of IPv4/IPv6 broadcast datagrams transmitted, including those received on the interface's sub-interfaces."
+            ::= { hwIfDualStackStatsEntry 17 }
+
+        hwIfDualStatckStatsOutBcastOctets OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of octets transmitted in IPv4/IPv6 broadcast datagrams, including those received on the interface's sub-interfaces."
+            ::= { hwIfDualStackStatsEntry 18 }
+
+        hwIfDualStackStatsInPktRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The rate of IPv4/IPv6 datagrams received, including those received on the interface's sub-interfaces.Unit:packets/s"
+            ::= { hwIfDualStackStatsEntry 19 }
+
+        hwIfDualStackStatsInOctetRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The rate of octets in received IPv4/IPv6 datagrams, including those received on the interface's sub-interfaces.Unit:octets/s"
+            ::= { hwIfDualStackStatsEntry 20 }
+
+        hwIfDualStackStatsOutPktRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The rate of IPv4/IPv6 datagrams delivered to the lower layers for transmission, including those transmitted on the interface's sub-interfaces.Unit:packets/s."
+            ::= { hwIfDualStackStatsEntry 21 }
+
+        hwIfDualStackStatsOutOctetRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The rate of octets in IPv4/IPv6 datagrams delivered to the lower layers for transmission, including those transmitted on the interface's sub-interfaces.Unit:octets/s."
+            ::= { hwIfDualStackStatsEntry 22 }
 
     hwIfMonitorObject OBJECT IDENTIFIER ::= { hwIFExtObjects 7 }
     
@@ -4324,7 +4588,8 @@ hwAdminVrrpMemberIf OBJECT IDENTIFIER ::= { hwIFExtObjects 9 }
                 pwVe(34),
                 subPwVe(35),
                 vbdIf(36),
-                gmplsUni(37)
+                gmplsUni(37),
+                virtualIf(38)
                 }
             MAX-ACCESS read-create
             STATUS current
@@ -5489,6 +5754,32 @@ hwAdminVrrpMemberIf OBJECT IDENTIFIER ::= { hwIFExtObjects 9 }
             DESCRIPTION
                 "eth-trunk member name list, only used for trap."
             ::= { hwIFExtTrapObjects 19 } 
+
+        hwIfBandWidth OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The bandwidth of the interface. 
+                The value is 64 bits. The unit is bit/s."
+            ::= { hwIFExtTrapObjects 20 }
+            
+        hwIPv4StateChangeReason  OBJECT-TYPE
+            SYNTAX      INTEGER {
+                        interfaceIsDown(1),
+                        isL2Interface(2),
+                        protocolIsDown(3),
+                        addressIsConflict(4),
+                        addressIsDeleted(5),
+                        protocolIsUp(6),
+                        interfaceIsDeleted(7),
+                        unnumberedIpIsConflict(8)
+                }
+	         MAX-ACCESS  accessible-for-notify
+	         STATUS      current
+	         DESCRIPTION
+	               "The reason code of IPv4 state changes."
+	         ::= { hwIFExtTrapObjects 21 }  
           			
 --  ===========================================================================
 -- Trunk map table
@@ -5949,6 +6240,43 @@ OBJECTS{
     DESCRIPTION
     "The total bandwidth of the channelized sub-interfaces alarm monitor group."
     ::= { hwIFExtGroups 30 }  
+  hwTrunkBandwidthGroup OBJECT-GROUP
+            OBJECTS{
+                    hwTrunkBandwidthTrunkName,
+                    hwTrunkBandwidthIfName
+                    }
+            STATUS current
+            DESCRIPTION
+            "The total bandwidth of the Trunk interfaces alarm monitor group."
+            ::= { hwIFExtGroups 31 }
+  hwModeFlexeBandwidthGroup OBJECT-GROUP
+    OBJECTS{
+                      hwModeFlexeBandwidthIfIndex,              
+                      hwModeFlexeBandwidthValue,            
+                      hwModeFlexeSubIfBandwidthSum,           
+                      hwModeFlexeIfName                      
+    }
+    STATUS current
+    DESCRIPTION
+    "The total bandwidth of the sliced sub-interfaces alarm monitor group."
+    ::= { hwIFExtGroups 32 }
+    hwVirtualEthernetChipGroup  OBJECT-GROUP
+            OBJECTS{
+                    hwVirtualEthernetChipIfName,
+                    hwVirtualEthernetChipIfIndex
+                    }
+            STATUS current
+            DESCRIPTION
+            "Virtual-Ethernet attribute Group."
+            ::= { hwIFExtGroups 33 } 
+    hwFlexeChannelNotSupportGroup OBJECT-GROUP
+        OBJECTS{
+                        hwFlexeChannelNotSupportIfName                      
+        }
+        STATUS current
+        DESCRIPTION
+        "The interface does not support sliced sub-interface alarm monitor group."
+        ::= { hwIFExtGroups 34 }
 -- =========================================
 -- compliance statements
 -- =========================================            
@@ -5980,11 +6308,11 @@ OBJECTS{
             STATUS current
             DESCRIPTION 
                 "The member of LAG neither can take over PDU nor transmit PDUs. Send this trap when LACP protocol negotiation fails.           
-                1.hwTrunkIfID: The identification of the Trunk interface;
-                2.ifName: It is the name of the trunk in the ifXTable of IF-MIB.
-                3.ifName: It is the name of the port in the ifXTable of IF-MIB.
-                Indexes: 1.hwTrunkIndex;
-                         2.ifIndex. "
+                1. hwTrunkIfID: The identification of the Trunk interface;
+                2. ifName: It is the name of the trunk in the ifXTable of IF-MIB.
+                3. ifName: It is the name of the port in the ifXTable of IF-MIB.
+                Indexes: 1. hwTrunkIndex;
+                         2. ifIndex. "
             ::= { hwIFExtTraps 2 }
 
         
@@ -6007,8 +6335,8 @@ Index: hwTrunkIndex."
                 "Part loss of link bandwidth: it means that some members in the LAG group aren't in the working-state, 
                 making the number of ports in working-state smaller than the hwTrunkIfMinLinkNum. The trap of PLL(Partial Link Loss)
                 will be restrained by the trap of TLL(Total Link Loss).            
-                1.hwTrunkIfID: The identification of the Trunk interface;
-                2.ifName: It is in the ifXTable of IF-MIB.
+                1. hwTrunkIfID: The identification of the Trunk interface;
+                2. ifName: It is in the ifXTable of IF-MIB.
                 Index: hwTrunkIndex."
             ::= { hwIFExtTraps 4 }
 
@@ -6077,11 +6405,11 @@ This object can be bound to two variables:
             STATUS current
             DESCRIPTION 
                 "Negotiation failure alarm is resumed.
-                1.hwTrunkIfID: The identification of the Trunk interface;
-                2.ifName: It is the name of the trunk in the ifXTable of IF-MIB.
-                3.ifName: It is the name of the port in the ifXTable of IF-MIB.
-                Indexes: 1.hwTrunkIndex;
-                         2.ifIndex. "
+                1. hwTrunkIfID: The identification of the Trunk interface;
+                2. ifName: It is the name of the trunk in the ifXTable of IF-MIB.
+                3. ifName: It is the name of the port in the ifXTable of IF-MIB.
+                Indexes: 1. hwTrunkIndex;
+                         2. ifIndex. "
             ::= { hwIFExtTraps 13 }
 
         
@@ -6090,8 +6418,8 @@ This object can be bound to two variables:
             STATUS current
             DESCRIPTION 
                 "Link bandwidth lost totally is resumed.
-                1.hwTrunkIfID: The identification of the Trunk interface;
-                2.ifName: It is in the ifXTable of IF-MIB.
+                1. hwTrunkIfID: The identification of the Trunk interface;
+                2. ifName: It is in the ifXTable of IF-MIB.
                 Index: hwTrunkIndex."
             ::= { hwIFExtTraps 14 }
     
@@ -6101,8 +6429,8 @@ This object can be bound to two variables:
             STATUS current
             DESCRIPTION 
                 "Link bandwidth lost partly is resumed.
-                1.hwTrunkIfID: The identification of the Trunk interface;
-                2.ifName: It is in the ifXTable of IF-MIB.
+                1. hwTrunkIfID: The identification of the Trunk interface;
+                2. ifName: It is in the ifXTable of IF-MIB.
                 Index: hwTrunkIndex."
             ::= { hwIFExtTraps 15 }
 
@@ -6155,7 +6483,7 @@ This object can be bound to two variables:
             ::= { hwIFExtTraps 29 } 
             
        hwTrunkMemNumberChange NOTIFICATION-TYPE
-            OBJECTS { hwTrunkIfDescr, hwTrunkMemIfDescr , hwTrunkActiveMember, hwIfExtTrapReason, hwTrunkIfStatus }
+            OBJECTS { hwTrunkIfDescr, hwTrunkMemIfDescr , hwTrunkActiveMember, hwIfExtTrapReason }
             STATUS current
             DESCRIPTION 
                 " The number of  active trunk members changed. "
@@ -6186,11 +6514,11 @@ This object can be bound to two variables:
             STATUS current
             DESCRIPTION 
                 "The member of LAG receive expired PDU from partner. Send this trap when LACP protocol negotiation fails. 
-				1.hwTrunkIfID: The identification of the Trunk interface; 
-				2.ifName: It is the name of the trunk in the ifXTable of IF-MIB. 
-				3.ifName: It is the name of the port in the ifXTable of IF-MIB. 
-				Indexes: 1.hwTrunkIndex; 
-				         2.ifIndex."
+				1. hwTrunkIfID: The identification of the Trunk interface; 
+				2. ifName: It is the name of the trunk in the ifXTable of IF-MIB. 
+				3. ifName: It is the name of the port in the ifXTable of IF-MIB. 
+				Indexes: 1. hwTrunkIndex; 
+				         2. ifIndex."
             ::= { hwIFExtTraps 34 }
             			
         hwLacpPDUChange NOTIFICATION-TYPE
@@ -6198,14 +6526,14 @@ This object can be bound to two variables:
             STATUS current
             DESCRIPTION 
                 "The LACP member interface's status changed from selected to unselected due to the PDU change. 
-                1.hwTrunkIfID: The identification of the Trunk interface;
-                2.ifName: It is the name of the trunk in the ifXTable of IF-MIB.
-                3.ifName: It is the name of the port in the ifXTable of IF-MIB.
-                4.hwLacpOldPDUInfo: It is the old PDU field of the port in the hwIFExtTrapObjects of hwIFExtMib.
-                5.hwLacpNewPDUInfo: It is the new PDU field of the port in the hwIFExtTrapObjects of hwIFExtMib.
-                6.hwIfExtTrapReason: It is the reason of this trap in the hwIFExtTrapObjects of hwIFExtMib.
-                Indexes: 1.hwTrunkIndex;
-                         2.ifIndex. "
+                1. hwTrunkIfID: The identification of the Trunk interface;
+                2. ifName: It is the name of the trunk in the ifXTable of IF-MIB.
+                3. ifName: It is the name of the port in the ifXTable of IF-MIB.
+                4. hwLacpOldPDUInfo: It is the old PDU field of the port in the hwIFExtTrapObjects of hwIFExtMib.
+                5. hwLacpNewPDUInfo: It is the new PDU field of the port in the hwIFExtTrapObjects of hwIFExtMib.
+                6. hwIfExtTrapReason: It is the reason of this trap in the hwIFExtTrapObjects of hwIFExtMib.
+                Indexes: 1. hwTrunkIndex;
+                         2. ifIndex. "
             ::= { hwIFExtTraps 35 }
             
         hwLacpPDUChangeResume NOTIFICATION-TYPE
@@ -6213,11 +6541,11 @@ This object can be bound to two variables:
             STATUS current
             DESCRIPTION 
                 "The LACP member interface's status changed from unselected to selected.
-                1.hwTrunkIfID: The identification of the Trunk interface;
-                2.ifName: It is the name of the trunk in the ifXTable of IF-MIB.
-                3.ifName: It is the name of the port in the ifXTable of IF-MIB.
-                Indexes: 1.hwTrunkIndex;
-                         2.ifIndex. "
+                1. hwTrunkIfID: The identification of the Trunk interface;
+                2. ifName: It is the name of the trunk in the ifXTable of IF-MIB.
+                3. ifName: It is the name of the port in the ifXTable of IF-MIB.
+                Indexes: 1. hwTrunkIndex;
+                         2. ifIndex. "
             ::= { hwIFExtTraps 36 }                    
 
         hwIfEfmDown NOTIFICATION-TYPE
@@ -6274,12 +6602,12 @@ This object can be bound to two variables:
             STATUS current
             DESCRIPTION 
                 "The LAG member status changes. 
-                1.hwTrunkIfID: The identification of the Trunk interface;
-                2.ifName: It is the name of the trunk in the ifXTable of IF-MIB.
-                3.ifName: It is the name of the port in the ifXTable of IF-MIB.
-                4.hwLagMemberDownReason: It is the down reason of the lag member port in the hwIFExtTrapObjects of hwIFExtMib.
-                Indexes: 1.hwTrunkIndex;
-                         2.ifIndex. "
+                1. hwTrunkIfID: The identification of the Trunk interface;
+                2. ifName: It is the name of the trunk in the ifXTable of IF-MIB.
+                3. ifName: It is the name of the port in the ifXTable of IF-MIB.
+                4. hwLagMemberDownReason: It is the down reason of the lag member port in the hwIFExtTrapObjects of hwIFExtMib.
+                Indexes: 1. hwTrunkIndex;
+                         2. ifIndex. "
             ::= { hwIFExtTraps 44 }
 			
         hwLagMemberDownResume NOTIFICATION-TYPE
@@ -6287,12 +6615,12 @@ This object can be bound to two variables:
             STATUS current
             DESCRIPTION 
                 "The LAG member status resumes. 
-                1.hwTrunkIfID: The identification of the Trunk interface;
-                2.ifName: It is the name of the trunk in the ifXTable of IF-MIB.
-                3.ifName: It is the name of the port in the ifXTable of IF-MIB.
-                4.hwLagMemberDownReason: It is the down reason of the lag member port in the hwIFExtTrapObjects of hwIFExtMib.
-                Indexes: 1.hwTrunkIndex;
-                         2.ifIndex. "
+                1. hwTrunkIfID: The identification of the Trunk interface;
+                2. ifName: It is the name of the trunk in the ifXTable of IF-MIB.
+                3. ifName: It is the name of the port in the ifXTable of IF-MIB.
+                4. hwLagMemberDownReason: It is the down reason of the lag member port in the hwIFExtTrapObjects of hwIFExtMib.
+                Indexes: 1. hwTrunkIndex;
+                         2. ifIndex. "
             ::= { hwIFExtTraps 45 }
 
         -- 1.3.6.1.4.1.2011.5.25.41.3.46
@@ -6300,7 +6628,7 @@ This object can be bound to two variables:
             OBJECTS { hwLicenseItemName, ifName, hwLicenseServiceDesc }
             STATUS current
             DESCRIPTION 
-                "the license was not activated for the physical interface, the service of the corresponding interface or sub-interface is invaild"
+                "the license was not activated for the physical interface, the service of the corresponding interface or sub-interface is invalid"
             ::= { hwIFExtTraps 46 }
             
         -- 1.3.6.1.4.1.2011.5.25.41.3.47
@@ -6338,11 +6666,11 @@ This object can be bound to two variables:
             STATUS current
             DESCRIPTION 
                 "The peer link of the LACP member interface might be incorrectly connected.
-                1.hwTrunkIfID: The identification of the Trunk interface;
-                2.ifName: It is the name of the trunk in the ifXTable of IF-MIB.
-                3.ifName: It is the name of the port in the ifXTable of IF-MIB.
-                Indexes: 1.hwTrunkIndex;
-                         2.ifIndex. "
+                1. hwTrunkIfID: The identification of the Trunk interface;
+                2. ifName: It is the name of the trunk in the ifXTable of IF-MIB.
+                3. ifName: It is the name of the port in the ifXTable of IF-MIB.
+                Indexes: 1. hwTrunkIndex;
+                         2. ifIndex. "
             ::= { hwIFExtTraps 51 }
             
         hwLacpPartnerMisconnectResume NOTIFICATION-TYPE
@@ -6350,11 +6678,11 @@ This object can be bound to two variables:
             STATUS current
             DESCRIPTION 
                 "The peer link of the LACP member interface was correctly connected.
-                1.hwTrunkIfID: The identification of the Trunk interface;
-                2.ifName: It is the name of the trunk in the ifXTable of IF-MIB.
-                3.ifName: It is the name of the port in the ifXTable of IF-MIB.
-                Indexes: 1.hwTrunkIndex;
-                         2.ifIndex. "
+                1. hwTrunkIfID: The identification of the Trunk interface;
+                2. ifName: It is the name of the trunk in the ifXTable of IF-MIB.
+                3. ifName: It is the name of the port in the ifXTable of IF-MIB.
+                Indexes: 1. hwTrunkIndex;
+                         2. ifIndex. "
             ::= { hwIFExtTraps 52 } 
 
         hwTrunkMemberChange NOTIFICATION-TYPE
@@ -6363,7 +6691,87 @@ This object can be bound to two variables:
             DESCRIPTION 
                "Trap message is generated when eth-trunk member changed."
             ::= { hwIFExtTraps 53 }
-			
+
+        hwTrunkStatusChange NOTIFICATION-TYPE
+            OBJECTS { hwTrunkIfDescr, ifAdminStatus , hwTrunkIfStatus }
+            STATUS current
+            DESCRIPTION 
+               "The trunk interface status changes."
+            ::= { hwIFExtTraps 54 }
+        
+        hwIfDampSuppress NOTIFICATION-TYPE
+            OBJECTS { ifName, hwIFExtDampStatus }
+            STATUS current
+            DESCRIPTION 
+                " This notification indicates the time when the interface's physical status changes from unsuppress to suppress. "
+            ::= { hwIFExtTraps 55 }
+            
+        hwIfDampResume NOTIFICATION-TYPE
+            OBJECTS { ifName, hwIFExtDampStatus }
+            STATUS current
+            DESCRIPTION 
+                " This notification indicates the time when the interface's physical status changes from suppress to unsuppress. "
+            ::= { hwIFExtTraps 56 }  
+
+        hwTrunkBwChange NOTIFICATION-TYPE
+            OBJECTS { hwTrunkIfDescr, hwIfBandWidth, hwIfBandWidth }
+            STATUS current
+            DESCRIPTION 
+               "The trunk interface bandwidth changes."
+            ::= { hwIFExtTraps 57 }
+
+        hwLacpStateDown NOTIFICATION-TYPE
+            OBJECTS { hwTrunkIfID, ifName, ifName }
+            STATUS current
+            DESCRIPTION 
+                "he LACP status of the member port changes.           
+                1. hwTrunkIfID: The identification of the Trunk interface;
+                2. ifName: It is the name of the trunk in the ifXTable of IF-MIB.
+                3. ifName: It is the name of the port in the ifXTable of IF-MIB.
+                Indexes: 1. hwTrunkIndex;
+                         2. ifIndex. "
+            ::= { hwIFExtTraps 58 }
+
+        hwLacpStateDownResume NOTIFICATION-TYPE
+            OBJECTS { hwTrunkIfID, ifName, ifName }
+            STATUS current
+            DESCRIPTION 
+                "he LACP status of the member port changes.           
+                1. hwTrunkIfID: The identification of the Trunk interface;
+                2. ifName: It is the name of the trunk in the ifXTable of IF-MIB.
+                3. ifName: It is the name of the port in the ifXTable of IF-MIB.
+                Indexes: 1. hwTrunkIndex;
+                         2. ifIndex. "
+            ::= { hwIFExtTraps 59 }
+
+        hwIfIPConflict NOTIFICATION-TYPE
+            OBJECTS { ifIndex, ifName}
+            STATUS  current
+            DESCRIPTION
+                "This notification is generated when an IPv4 address of the interface conflicts with that of another interface."
+            ::=  {hwIFExtTraps 60}
+
+        hwIfIPConflictResume NOTIFICATION-TYPE
+            OBJECTS { ifIndex, ifName}
+            STATUS  current
+            DESCRIPTION
+                "The IPv4 address conflict is cleared."
+            ::=  {hwIFExtTraps 61}
+
+        hwIPv4IfStateAlarm NOTIFICATION-TYPE
+            OBJECTS { ifIndex, ifName, ifOperStatus, hwIPv4StateChangeReason }
+            STATUS current
+            DESCRIPTION 
+                "The interface IPv4 status changes."
+            ::= { hwIFExtTraps 62 }
+
+		hwIPv4IfStateAlarmResume NOTIFICATION-TYPE
+            OBJECTS { ifIndex, ifName, ifOperStatus, hwIPv4StateChangeReason }
+            STATUS current
+            DESCRIPTION 
+                "The interface IPv4 status changes."
+            ::= { hwIFExtTraps 63 }
+
     hwMonitorNotifications OBJECT IDENTIFIER ::= { hwIFExtMib 4 }        
 
         hwIfMonitorCrcErrorRising NOTIFICATION-TYPE
@@ -6685,6 +7093,68 @@ This object can be bound to two variables:
             DESCRIPTION
                 "The alarm disappear when the total bandwidth of the channelized sub-interfaces on the same physical interface less than the maximum available bandwidth of the physical interface."
             ::= { hwMonitorNotifications 61 }
+        -- 1.3.6.1.4.1.2011.5.25.41.4.62
+        hwTrunkBandwidthAlarm NOTIFICATION-TYPE
+            OBJECTS { hwTrunkBandwidthTrunkName, hwTrunkBandwidthIfName}
+            STATUS current
+            DESCRIPTION
+                "The alarm appear when the bandwidth of the member interfaces of trunk differs greatly."
+            ::= {hwMonitorNotifications 62 }
+
+        -- 1.3.6.1.4.1.2011.5.25.41.4.63
+        hwTrunkBandwidthResume NOTIFICATION-TYPE
+            OBJECTS { hwTrunkBandwidthTrunkName, hwTrunkBandwidthIfName }
+            STATUS current
+            DESCRIPTION
+                "The alarm disappear when the bandwidth ratio between trunk member interfaces is within the normal range."
+            ::= {hwMonitorNotifications 63 }
+
+        -- 1.3.6.1.4.1.2011.5.25.41.4.64
+        hwModeFlexeBandwidthAlarm NOTIFICATION-TYPE
+            OBJECTS { hwModeFlexeBandwidthIfIndex ,hwModeFlexeBandwidthValue, hwModeFlexeSubIfBandwidthSum, hwModeFlexeIfName }
+            STATUS current
+            DESCRIPTION
+                "The alarm appear when the total bandwidth of the sliced sub-interfaces on the same physical interface has exceeded the maximum available bandwidth of the physical interface."
+            ::= { hwMonitorNotifications 64 }
+            
+        -- 1.3.6.1.4.1.2011.5.25.41.4.65
+        hwModeFlexeBandwidthResume NOTIFICATION-TYPE
+            OBJECTS { hwModeFlexeBandwidthIfIndex ,hwModeFlexeBandwidthValue, hwModeFlexeSubIfBandwidthSum, hwModeFlexeIfName }
+            STATUS current
+            DESCRIPTION
+                "The alarm disappear when the total bandwidth of the sliced sub-interfaces on the same physical interface less than the maximum available bandwidth of the physical interface."
+            ::= { hwMonitorNotifications 65 }
+
+        -- 1.3.6.1.4.1.2011.5.25.41.4.66
+        hwVirtualEthernetChipMismatchAlarm NOTIFICATION-TYPE
+            OBJECTS { hwVirtualEthernetChipIfName, hwVirtualEthernetChipIfIndex }
+            STATUS current
+            DESCRIPTION
+                "The alarm appear when the chip of the Virtual-Ethernet port is inconsistent with the chip of the internal binding channel port."
+            ::= {hwMonitorNotifications 66 }
+ 
+        -- 1.3.6.1.4.1.2011.5.25.41.4.67
+        hwVirtualEthernetChipMismatchResume NOTIFICATION-TYPE
+            OBJECTS { hwVirtualEthernetChipIfName, hwVirtualEthernetChipIfIndex }
+            STATUS current
+            DESCRIPTION
+                "The alarm disappear when this Virtual-Ethernet Interface configuration has been deleted."
+            ::= {hwMonitorNotifications 67 }
+        -- 1.3.6.1.4.1.2011.5.25.41.4.68
+        hwFlexeChannelNotSupportAlarm NOTIFICATION-TYPE
+            OBJECTS { hwFlexeChannelNotSupportIfName }
+            STATUS current
+            DESCRIPTION
+                "The alarm appear when the mode flexe enable is configured on the sub-interface, and the main interface is not a GigabitEthernet interface, or the main interface works in non-1GE mode."
+            ::= { hwMonitorNotifications 68 }
+            
+        -- 1.3.6.1.4.1.2011.5.25.41.4.69
+        hwFlexeChannelNotSupportResume NOTIFICATION-TYPE
+            OBJECTS { hwFlexeChannelNotSupportIfName }
+            STATUS current
+            DESCRIPTION
+                "The alarm disappear when the mode flexe enable is not configured on the sub-interface, and the main interface is a GigabitEthernet interface, or the main interface works in 1GE mode."
+            ::= { hwMonitorNotifications 69 }
         hwIFExtTrapConformance OBJECT IDENTIFIER ::= { hwIFExtMib 5 }
 
         
@@ -6698,7 +7168,8 @@ This object can be bound to two variables:
                         hwTrunkSubIfStateToMaster, hwTrunkSubIfStateToSlave, hwEntityExtCfmOverSlot, hwEntityExtCfmOverCard, hwTrunkMemNumberChange, hwLacpPartnerExpiredLoss,
                         hwLacpPDUChange, hwLacpPDUChangeResume, hwIfEfmDown, hwIfEfmUp, hwExtTrunkMemberCountExceedThreshold, hwExtTrunkMemberCountExceedThresholdResume, 
                         hwExtTrunkWorkingStatusChange, hwIfControlFlapSuppressIPv6,hwIfControlFlapResumeIPv6,hwLagMemberDown, hwLagMemberDownResume,hwLicenseEffectServiceAlarm,hwLicenseEffectServiceResume,
-                        hwTrunkAllMemUpNotify,hwPhysicalAdminIfDown,hwPhysicalAdminIfUp,hwLacpPartnerMisconnect,hwLacpPartnerMisconnectResume, hwTrunkMemberChange}
+                        hwTrunkAllMemUpNotify,hwPhysicalAdminIfDown,hwPhysicalAdminIfUp,hwLacpPartnerMisconnect,hwLacpPartnerMisconnectResume, hwTrunkMemberChange,hwTrunkStatusChange,hwIfDampSuppress,hwIfDampResume,
+                        hwLacpStateDown,hwLacpStateDownResume,hwIPv4IfStateAlarm,hwIPv4IfStateAlarmResume}
             STATUS current
             DESCRIPTION 
                 "IF Trap Group."
@@ -6746,7 +7217,15 @@ This object can be bound to two variables:
                     hwModeChannelSendExceedSeriousThreshold,
                     hwModeChannelSendExceedSeriousThresholdResume,
                     hwModeChannelBandwidthAlarm,
-                    hwModeChannelBandwidthResume
+                    hwModeChannelBandwidthResume,  
+                    hwTrunkBandwidthAlarm,
+                    hwTrunkBandwidthResume,
+                    hwModeFlexeBandwidthAlarm,
+                    hwModeFlexeBandwidthResume,
+                    hwVirtualEthernetChipMismatchAlarm,
+                    hwVirtualEthernetChipMismatchResume,
+                    hwFlexeChannelNotSupportAlarm,
+                    hwFlexeChannelNotSupportResume
                  }
             STATUS current
             DESCRIPTION
@@ -7214,6 +7693,211 @@ This object can be bound to two variables:
             DESCRIPTION
                 "Interface name of physical interface."
             ::= { hwModeChannelBandwidthEntry 4 }
+-- ===========================================================================
+--  Trunk Bandwidth Alarm
+-- ===========================================================================
+        -- hwTrunkBandwidth
+        hwTrunkBandWidth OBJECT IDENTIFIER ::= { hwIFExtObjects 26 }
+
+        -- hwTrunkBandwidthTable
+        hwTrunkBandwidthTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwTrunkBandwidthEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                " The total bandwidth of the Trunk sub-interfaces alarm monitor table."
+            ::= { hwTrunkBandWidth 1 }
+
+        -- hwTrunkBandwidthEntry
+        hwTrunkBandwidthEntry OBJECT-TYPE
+            SYNTAX HwTrunkBandwidthEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                " Entry of the total bandwidth of the Trunk sub-interfaces alarm monitor table."
+            INDEX { hwTrunkBandwidthTrunkName}
+            ::= { hwTrunkBandwidthTable 1 }
+
+        HwTrunkBandwidthEntry ::=
+            SEQUENCE { 
+                hwTrunkBandwidthTrunkName       DisplayString,
+                hwTrunkBandwidthIfName          DisplayString
+             }
+
+        -- hwTrunkBandwidthTrunkName
+        hwTrunkBandwidthTrunkName OBJECT-TYPE
+            SYNTAX     DisplayString
+            MAX-ACCESS read-only
+            STATUS     current
+            DESCRIPTION
+                "Interface name of Trunk interface."
+            ::= { hwTrunkBandwidthEntry 1 }
+
+        -- hwTrunkBandwidthIfName
+        hwTrunkBandwidthIfName OBJECT-TYPE
+            SYNTAX     DisplayString
+            MAX-ACCESS read-only
+            STATUS     current
+            DESCRIPTION
+                "Interface name of Trunk member interface."
+            ::= { hwTrunkBandwidthEntry 2 }
+
+-- ===========================================================================
+--  Mode Flexe Bandwidth 
+-- ===========================================================================   
+        -- hwModeFlexeBandwidth 1.3.6.1.4.1.2011.5.25.41.1.27
+        hwModeFlexeBandwidth OBJECT IDENTIFIER ::= { hwIFExtObjects 27 }
+        
+        -- hwModeFlexeBandwidthTable 1.3.6.1.4.1.2011.5.25.41.1.27.1
+        hwModeFlexeBandwidthTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwModeFlexeBandwidthEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                " The total bandwidth of the sliced sub-interfaces alarm monitor table."
+            ::= { hwModeFlexeBandwidth 1 }
+
+        -- hwModeFlexeBandwidthEntry 1.3.6.1.4.1.2011.5.25.41.1.27.1.1      
+        hwModeFlexeBandwidthEntry OBJECT-TYPE
+            SYNTAX HwModeFlexeBandwidthEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                " Entry of the total bandwidth of the sliced sub-interfaces alarm monitor table."
+            INDEX { hwModeFlexeBandwidthIfIndex}
+            ::= { hwModeFlexeBandwidthTable 1 }
+     
+        HwModeFlexeBandwidthEntry ::=
+            SEQUENCE { 
+                hwModeFlexeBandwidthIfIndex              InterfaceIndex,
+                hwModeFlexeBandwidthValue                Integer32,
+                hwModeFlexeSubIfBandwidthSum         Integer32,
+                hwModeFlexeIfName                              DisplayString
+             }
+
+        -- hwModeFlexeBandwidthIfIndex  1.3.6.1.4.1.2011.5.25.41.1.27.1.1.1
+        hwModeFlexeBandwidthIfIndex OBJECT-TYPE
+            SYNTAX     InterfaceIndex
+            MAX-ACCESS accessible-for-notify
+            STATUS     current
+            DESCRIPTION
+                "The Index Value of the total bandwidth of the sliced sub-interfaces alarm monitor table."
+            ::= { hwModeFlexeBandwidthEntry 1 }
+
+        -- hwModeFlexeBandwidthValue 1.3.6.1.4.1.2011.5.25.41.1.27.1.1.2
+        hwModeFlexeBandwidthValue OBJECT-TYPE
+            SYNTAX     Integer32
+            MAX-ACCESS read-only
+            STATUS     current
+            DESCRIPTION
+                "The maximum available bandwidth of the main interface."
+            ::= { hwModeFlexeBandwidthEntry 2 }
+
+    
+        -- hwModeFlexeSubIfBandwidthSum 1.3.6.1.4.1.2011.5.25.41.1.27.1.1.3
+        hwModeFlexeSubIfBandwidthSum OBJECT-TYPE
+            SYNTAX     Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total bandwidth of the sliced sub-interfaces on the main interface."
+            ::= { hwModeFlexeBandwidthEntry 3 } 
+            
+        -- hwModeFlexeIfName 1.3.6.1.4.1.2011.5.25.41.1.27.1.1.4
+        hwModeFlexeIfName OBJECT-TYPE
+            SYNTAX     DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Interface name of main interface."
+            ::= { hwModeFlexeBandwidthEntry 4 }
+
+-- ===========================================================================
+--  Virtual-Ethernet inconsistent chipId alarm
+-- ===========================================================================
+        -- hwVirtualEthernetChip
+        hwVirtualEthernetChip OBJECT IDENTIFIER ::= { hwIFExtObjects 28 }
+        
+        -- hwVirtualEthernetChipTable
+        hwVirtualEthernetChipTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwVirtualEthernetChipEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The inconsistent chipId of this Virtual-Ethernet intefaces alarm monitor table."
+            ::= { hwVirtualEthernetChip 1 }
+ 
+        -- hwVirtualEthernetChipEntry
+        hwVirtualEthernetChipEntry OBJECT-TYPE
+            SYNTAX HwVirtualEthernetChipEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                " Entry of the inconsistent chipId of this Virtual-Ethernet intefaces alarm monitor table."
+            INDEX { hwVirtualEthernetChipIfName}
+            ::= { hwVirtualEthernetChipTable 1 }
+ 
+        HwVirtualEthernetChipEntry ::=
+            SEQUENCE { 
+                hwVirtualEthernetChipIfName               DisplayString,
+                hwVirtualEthernetChipIfIndex              InterfaceIndex
+             }
+ 
+        -- hwVirtualEthernetChipIfName
+        hwVirtualEthernetChipIfName OBJECT-TYPE
+            SYNTAX     DisplayString
+            MAX-ACCESS read-only
+            STATUS     current
+            DESCRIPTION
+                "Interface name of Virtual-Ethernet interface."
+            ::= { hwVirtualEthernetChipEntry 1 }
+ 
+        -- hwVirtualEthernetChipIfIndex
+        hwVirtualEthernetChipIfIndex OBJECT-TYPE
+            SYNTAX     InterfaceIndex
+            MAX-ACCESS read-only
+            STATUS     current
+            DESCRIPTION
+                "The Index Value of Virtual-Ethernet interface."
+            ::= { hwVirtualEthernetChipEntry 2 }
+ -- ===========================================================================
+--  Mode Flexe Not Supported 
+-- ===========================================================================   
+        -- hwModeFlexeNotSupport 1.3.6.1.4.1.2011.5.25.41.1.29
+        hwModeFlexeNotSupport OBJECT IDENTIFIER ::= { hwIFExtObjects 29 }
+        
+        -- hwModeFlexeNotSupportTable 1.3.6.1.4.1.2011.5.25.41.1.29.1
+        hwModeFlexeNotSupportTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwModeFlexeNotSupportEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                " The interface does not support sliced sub-interface alarm monitor table."
+            ::= { hwModeFlexeNotSupport 1 }
+
+        -- hwModeFlexeNotSupportEntry 1.3.6.1.4.1.2011.5.25.41.1.29.1.1      
+        hwModeFlexeNotSupportEntry OBJECT-TYPE
+            SYNTAX HwModeFlexeNotSupportEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                " Entry of the interface does not support sliced sub-interface alarm monitor table."
+            INDEX { hwFlexeChannelNotSupportIfName}
+            ::= { hwModeFlexeNotSupportTable 1 }
+     
+        HwModeFlexeNotSupportEntry::=
+            SEQUENCE {
+                hwFlexeChannelNotSupportIfName                      DisplayString
+             }
+
+        -- hwFlexeChannelNotSupportIfName 1.3.6.1.4.1.2011.5.25.41.1.29.1.1.1
+        hwFlexeChannelNotSupportIfName OBJECT-TYPE
+            SYNTAX     DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Interface name of the interface."
+            ::= { hwModeFlexeNotSupportEntry 1 }
 	
     END
 

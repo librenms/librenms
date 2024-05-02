@@ -136,11 +136,6 @@ if ($options['f'] === 'callback') {
     \LibreNMS\Util\Stats::submit();
 }
 
-if ($options['f'] === 'device_perf') {
-    $ret = lock_and_purge('device_perf', 'timestamp < DATE_SUB(NOW(),INTERVAL ? DAY)');
-    exit($ret);
-}
-
 if ($options['f'] === 'ports_purge') {
     if (Config::get('ports_purge')) {
         $lock = Cache::lock('ports_purge', 86000);

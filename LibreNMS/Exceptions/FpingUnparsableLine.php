@@ -1,6 +1,6 @@
 <?php
 /**
- * tracepath.inc.php
+ * FpingUnparsableLine.php
  *
  * -Description-
  *
@@ -19,25 +19,16 @@
  *
  * @link       https://www.librenms.org
  *
- * @copyright  2018 Neil Lathwood
- * @author     Neil Lathwood <neil@lathwood.co.uk>
+ * @copyright  2024 Tony Murray
+ * @author     Tony Murray <murraytony@gmail.com>
  */
 
-use App\Models\DevicePerf;
+namespace LibreNMS\Exceptions;
 
-$perf_info = DevicePerf::where('device_id', $device['device_id'])->latest('timestamp')->first();
-if (! empty($perf_info['debug']['traceroute'])) {
-    echo "
-<div class='row'>
-     <div class='col-md-12'>
-         <div class='panel panel-default'>
-             <div class='panel-heading'>
-                 <h3 class='panel-title'>Traceroute ({$perf_info['timestamp']})</h3>
-             </div>
-             <div class='panel-body'>
-                 <pre>{$perf_info['debug']['traceroute']}</pre>
-            </div>
-         </div>
-     </div>
- </div>";
+class FpingUnparsableLine extends \Exception
+{
+    public function __construct(public readonly string $unparsedLine)
+    {
+        parent::__construct("Fping unparsable line: $unparsedLine");
+    }
 }

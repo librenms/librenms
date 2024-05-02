@@ -41,6 +41,7 @@ class CustomMap extends BaseModel
     ];
     protected $fillable = [
         'name',
+        'menu_group',
         'width',
         'height',
         'node_align',
