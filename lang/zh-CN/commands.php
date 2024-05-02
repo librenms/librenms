@@ -258,7 +258,7 @@ return [
             'full-name' => '用户的全名',
             'role' => '将用户设置为所需角色 :roles',
         ],
-        'password-request' => "请输入用户的密码",
+        'password-request' => '请输入用户的密码',
         'success' => '成功添加用户: :username',
         'wrong-auth' => '警告！由于您未使用MySQL身份验证，您将无法使用此用户登录',
     ],
