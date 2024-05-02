@@ -1,4 +1,4 @@
-FROM squidfunk/mkdocs-material:9.5.19
+FROM squidfunk/mkdocs-material:9.5.20
 
 RUN \
   pip install --no-cache-dir \
@@ -7,7 +7,4 @@ RUN \
     'mkdocs-exclude' \
     'mkdocs-git-revision-date-localized-plugin' \
     'mkdocs-macros-plugin' \
-    'mkdocs-material' \
-    'mkdocs-material-extensions' \
-    'pymdown-extensions' \
   && rm -rf /tmp/*

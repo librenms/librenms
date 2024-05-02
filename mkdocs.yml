@@ -33,12 +33,8 @@ theme:
 site_dir: out
 site_url: https://docs.librenms.org
 markdown_extensions:
-  - attr_list
   - tables
   - admonition
-  - pymdownx.emoji:
-      emoji_index: !!python/name:material.extensions.emoji.twemoji
-      emoji_generator: !!python/name:material.extensions.emoji.to_svg
   - pymdownx.tasklist
   - pymdownx.tilde
   - pymdownx.superfences
