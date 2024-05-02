@@ -205,7 +205,7 @@ return [
         'options' => [
             'list-fields' => '打印有效字段列表',
             'fields' => '逗号分隔的要显示的字段列表。有效选项：设备数据库列名，关系计数(ports_count)，以及displayName',
-            'output' => '用于显示数据的输出格式:types', 
+            'output' => '用于显示数据的输出格式:types',
         ],
     ],
     'smokeping:generate' => [
