@@ -130,6 +130,7 @@ class SmokepingGenerateCommand extends LnmsCommand
             $smokelist[$device->type][$device->hostname] = [
                 'transport' => $device->transport,
                 'displayname' => $device->displayName(),
+                'overwrite_ip' => $device->overwrite_ip,
             ];
         }
 
@@ -325,7 +326,11 @@ class SmokepingGenerateCommand extends LnmsCommand
                     $lines[] = sprintf('   probe = %s', $this->balanceProbes($config['transport'], $probeCount));
                 }
 
-                $lines[] = sprintf('   host = %s', $hostname);
+                if ($config['overwrite_ip']) {
+                    $lines[] = sprintf('   host = %s', $config['overwrite_ip']);
+                } else {
+                    $lines[] = sprintf('   host = %s', $hostname);
+                }
                 $lines[] = '';
             }
         }
