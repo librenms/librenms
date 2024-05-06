@@ -16,7 +16,7 @@
             </a>
         </div>
 
-        <div class="collapse navbar-collapse" id="navHeaderCollapse">
+        <div class="collapse navbar-collapse" id="navHeaderCollapse" style="max-height: calc(100vh - 50px)">
             <ul class="nav navbar-nav">
 {{-- Overview --}}
                 <li class="dropdown">

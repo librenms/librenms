@@ -28,7 +28,7 @@ namespace App\Models;
 class WirelessSensor extends DeviceRelatedModel
 {
     public $timestamps = false;
-    protected $primaryKey = 'sensors_id';
+    protected $primaryKey = 'sensor_id';
 
     // ---- Helper Functions ----
 

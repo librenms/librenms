@@ -45,7 +45,7 @@ class CustomMapController extends Controller
     public function index(): View
     {
         return view('map.custom-manage', [
-            'maps' => CustomMap::orderBy('name')->get(['custom_map_id', 'name']),
+            'maps' => CustomMap::orderBy('name')->get(['custom_map_id', 'name', 'menu_group'])->groupBy('menu_group')->sortKeys(),
             'name' => 'New Map',
             'menu_group' => null,
             'node_align' => 10,
