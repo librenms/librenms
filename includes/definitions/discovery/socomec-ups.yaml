@@ -1,0 +1,275 @@
+mib: SOCOMECUPS-MIB
+modules:
+    os:
+        hardware: SOCOMECUPS-MIB::upsIdentModel.0
+        version: SOCOMECUPS-MIB::upsIdentAgentSoftwareVersion.0
+        version_regex: '/v(?<version>[0-9]+.[0-9]+)/'
+        serial: SOCOMECUPS-MIB::upsIdentSerialNumber.0
+    sensors:
+        pre-cache:
+            data:
+                -
+                    oid:
+                        - upsAlarm
+                        - upsBattery
+                        - upsBypass
+                        - upsInput
+                        - upsOutput
+        voltage:
+            data:
+                -
+                    oid: upsBattery
+                    value: upsBatteryVoltage
+                    num_oid: '.1.3.6.1.4.1.4555.1.1.7.1.2.5.{{ $index }}'
+                    descr: 'Battery #{{ $index }} Voltage'
+                    index: 'upsBatteryVoltage.{{ $index }}'
+                    divisor: 10
+                    low_limit: 10
+                    low_warn_limit: 11
+                    warn_limit: 55
+                    high_limit: 60
+                -
+                    oid: upsBypass
+                    value: upsBypassVoltage
+                    num_oid: '.1.3.6.1.4.1.4555.1.1.7.1.5.3.1.2.{{ $index }}'
+                    descr: 'Bypass #{{ $index }} Voltage'
+                    index: 'upsBypassVoltage.{{ $index }}'
+                    divisor: 10
+                -
+                    oid: upsInput
+                    value: upsInputVoltage
+                    num_oid: '.1.3.6.1.4.1.4555.1.1.7.1.3.3.1.2.{{ $index }}'
+                    descr: 'Input #{{ $index }} Voltage'
+                    index: 'upsInputVoltage.{{ $index }}'
+                    divisor: 10
+                    low_limit: 200
+                    low_warn_limit: 210
+                    warn_limit: 235
+                    high_limit: 240
+                -
+                    oid: upsOutput
+                    value: upsOutputVoltage
+                    num_oid: '.1.3.6.1.4.1.4555.1.1.7.1.4.4.1.2.{{ $index }}'
+                    descr: 'Output #{{ $index }} Voltage'
+                    index: 'upsOutputVoltage.{{ $index }}'
+                    divisor: 10
+        current:
+            data:
+                -
+                    oid: upsBattery
+                    value: upsBatteryCurrent
+                    num_oid: '.1.3.6.1.4.1.4555.1.1.7.1.2.8.{{ $index }}'
+                    descr: 'Battery #{{ $index }} Current'
+                    index: 'upsBatteryCurrent.{{ $index }}'
+                    divisor: 10
+                    skip_values:
+                        -
+                            oid: upsBatteryCurrent
+                            op: '>'
+                            value: 32767
+                -
+                    oid: upsBypass
+                    value: upsBypassCurrent
+                    num_oid: '.1.3.6.1.4.1.4555.1.1.7.1.5.3.1.3.{{ $index }}'
+                    descr: 'Bypass #{{ $index }} Current'
+                    index: 'upsBypassCurrent.{{ $index }}'
+                    divisor: 10
+                    skip_values:
+                        -
+                            oid: upsBypassCurrent
+                            op: '>'
+                            value: 32767
+                -
+                    oid: upsInput
+                    value: upsInputCurrent
+                    num_oid: '.1.3.6.1.4.1.4555.1.1.7.1.3.3.1.3.{{ $index }}'
+                    descr: 'Input #{{ $index }} Current'
+                    index: 'upsInputCurrent.{{ $index }}'
+                    divisor: 10
+                    skip_values:
+                        -
+                            oid: upsInputCurrent
+                            op: '>'
+                            value: 32767
+                -
+                    oid: upsOutput
+                    value: upsOutputCurrent
+                    num_oid: '.1.3.6.1.4.1.4555.1.1.7.1.4.4.1.3.{{ $index }}'
+                    descr: 'Output #{{ $index }} Current'
+                    index: 'upsOutputCurrent.{{ $index }}'
+                    divisor: 10
+                    skip_values:
+                        -
+                            oid: upsOutputCurrent
+                            op: '>'
+                            value: 32767
+        load:
+            data:
+                -
+                    oid: upsOutput
+                    value: upsOutputPercentLoad
+                    num_oid: '.1.3.6.1.4.1.4555.1.1.7.1.4.4.1.4.{{ $index }}'
+                    descr: 'Output #{{ $index }} Load'
+                    index: 'upsOutputPercentLoad.{{ $index }}'
+        frequency:
+            data:
+                -
+                    oid: upsBypass
+                    value: upsBypassFrequency
+                    num_oid: '.1.3.6.1.4.1.4555.1.1.7.1.5.1.{{ $index }}'
+                    descr: 'Bypass #{{ $index }} Frequency'
+                    index: 'upsBypassFrequency.{{ $index }}'
+                    divisor: 10
+                -
+                    oid: upsInput
+                    value: upsInputFrequency
+                    num_oid: '.1.3.6.1.4.1.4555.1.1.7.1.3.2.{{ $index }}'
+                    descr: 'Input #{{ $index }} Frequency'
+                    index: 'upsInputFrequency.{{ $index }}'
+                    divisor: 10
+                -
+                    oid: upsOutput
+                    value: upsOutputFrequency
+                    num_oid: '.1.3.6.1.4.1.4555.1.1.7.1.4.2.{{ $index }}'
+                    descr: 'Output #{{ $index }} Frequency'
+                    index: 'upsOutputFrequency.{{ $index }}'
+                    divisor: 10
+        temperature:
+            data:
+                -
+                    oid: upsBattery
+                    value: upsBatteryTemperature
+                    num_oid: '.1.3.6.1.4.1.4555.1.1.7.1.2.6.{{ $index }}'
+                    descr: 'Battery #{{ $index }} Temperature'
+                    index: 'upsBatteryTemperature.{{ $index }}'
+                    divisor: 10
+                    skip_values:
+                        -
+                            oid: upsBatteryTemperature
+                            op: '='
+                            value: 0
+                -
+                    oid: upsBattery
+                    value: upsAmbientTemperature
+                    num_oid: '.1.3.6.1.4.1.4555.1.1.7.1.2.7.{{ $index }}'
+                    descr: 'Ambient #{{ $index }} Temperature'
+                    index: 'upsAmbientTemperature.{{ $index }}'
+                    divisor: 10
+                    skip_values:
+                        -
+                            oid: upsAmbientTemperature
+                            op: '='
+                            value: 0
+        runtime:
+            data:
+                -
+                    oid: upsBattery
+                    value: upsEstimatedMinutesRemaining
+                    num_oid: '.1.3.6.1.4.1.4555.1.1.7.1.2.3.{{ $index }}'
+                    descr: 'Battery #{{ $index }} Minutes remaining'
+                    index: 'upsEstimatedMinutesRemaining.{{ $index }}'
+                -
+                    oid: upsBattery
+                    value: upsSecondsOnBattery
+                    num_oid: '.1.3.6.1.4.1.4555.1.1.7.1.2.2.{{ $index }}'
+                    descr: 'Battery #{{ $index }} Runtime seconds'
+                    index: 'upsSecondsOnBattery.{{ $index }}'
+        charge:
+            data:
+                -
+                    oid: upsBatter
+                    value: upsEstimatedChargeRemaining
+                    num_oid: '.1.3.6.1.4.1.4555.1.1.7.1.2.4.{{ $index }}'
+                    descr: 'Battery #{{ $index }} Charge remaining'
+                    index: 'upsEstimatedChargeRemaining.{{ $index }}'
+        state:
+            data:
+                -
+                    oid: upsBattery
+                    value: upsBatteryStatus
+                    num_oid: '.1.3.6.1.4.1.4555.1.1.7.1.2.1.{{ $index }}'
+                    descr: 'Battery #{{ $index }} Status'
+                    index: 'upsBatteryStatus.{{ $index }}'
+                    state_name: upsBatteryStatus
+                    states:
+                        - { value: 1, generic: 3, graph: 1, descr: 'Unknown' }
+                        - { value: 2, generic: 0, graph: 1, descr: 'Normal' }
+                        - { value: 3, generic: 1, graph: 1, descr: 'Charging' }
+                        - { value: 4, generic: 3, graph: 1, descr: 'Test' }
+                        - { value: 5, generic: 1, graph: 1, descr: 'Discharging' }
+                        - { value: 6, generic: 1, graph: 1, descr: 'Low' }
+                        - { value: 7, generic: 2, graph: 1, descr: 'Depleted' }
+                        - { value: 8, generic: 2, graph: 1, descr: 'Failure' }
+                        - { value: 9, generic: 2, graph: 1, descr: 'Disconnected' }
+                -
+                    oid: upsOutput
+                    value: upsOutputSource
+                    num_oid: '.1.3.6.1.4.1.4555.1.1.7.1.2.1.{{ $index }}'
+                    descr: 'Output #{{ $index }} Source'
+                    index: 'upsOutputSource.{{ $index }}'
+                    state_name: upsOutputSource
+                    states:
+                        - { value: 1, generic: 3, graph: 1, descr: 'Unknown' }
+                        - { value: 2, generic: 1, graph: 1, descr: 'on Maintenance Bypass' }
+                        - { value: 3, generic: 1, graph: 1, descr: 'on Inverter' }
+                        - { value: 4, generic: 0, graph: 1, descr: 'Normal mode' }
+                        - { value: 5, generic: 0, graph: 1, descr: 'ECO mode' }
+                        - { value: 6, generic: 1, graph: 1, descr: 'on Bypass' }
+                        - { value: 7, generic: 0, graph: 1, descr: 'on Standby' }
+                        - { value: 8, generic: 2, graph: 1, descr: 'UPS Off' }
+                        - { value: 9, generic: 1, graph: 1, descr: 'line Interactive' }
+                -
+                    oid: upsAlarm
+                    value: upsAlarmOverload
+                    num_oid: '.1.3.6.1.4.1.4555.1.1.7.1.6.3.2.{{ $index }}'
+                    descr: 'Output #{{ $index }} Overload'
+                    index: 'upsAlarmOverload.{{ $index }}'
+                    group: Alarm
+                    state_name: upsAlarmOverload
+                    states:
+                        - { value: 0, generic: 0, graph: 1, descr: 'OK' }
+                        - { value: 1, generic: 2, graph: 1, descr: 'Alarm' }
+                -
+                    oid: upsAlarm
+                    value: upsAlarmTemperature
+                    num_oid: '.1.3.6.1.4.1.4555.1.1.7.1.6.3.3.{{ $index }}'
+                    descr: 'Temperature #{{ $index }} Out of tolerance'
+                    index: 'upsAlarmTemperature.{{ $index }}'
+                    group: Alarm
+                    state_name: upsAlarmTemperature
+                    states:
+                        - { value: 0, generic: 0, graph: 1, descr: 'OK' }
+                        - { value: 1, generic: 2, graph: 1, descr: 'Alarm' }
+                -
+                    oid: upsAlarm
+                    value: upsAlarmRectifierAlarm
+                    num_oid: '.1.3.6.1.4.1.4555.1.1.7.1.6.3.21.{{ $index }}'
+                    descr: 'Rectifier #{{ $index }} Preventive alarm'
+                    index: 'upsAlarmRectifierAlarm.{{ $index }}'
+                    group: Alarm
+                    state_name: upsAlarmRectifierAlarm
+                    states:
+                        - { value: 0, generic: 0, graph: 1, descr: 'OK' }
+                        - { value: 1, generic: 2, graph: 1, descr: 'Alarm' }
+                -
+                    oid: upsAlarm
+                    value: upsAlarmFansFailure
+                    num_oid: '.1.3.6.1.4.1.4555.1.1.7.1.6.3.32.{{ $index }}'
+                    descr: 'Fan #{{ $index }} Alarm'
+                    index: 'upsAlarmFansFailure.{{ $index }}'
+                    group: Alarm
+                    state_name: upsAlarmFansFailure
+                    states:
+                        - { value: 0, generic: 0, graph: 1, descr: 'OK' }
+                        - { value: 1, generic: 2, graph: 1, descr: 'Alarm' }
+                -
+                    oid: upsAlarm
+                    value: upsAlarmGeneralFault
+                    num_oid: '.1.3.6.1.4.1.4555.1.1.7.1.6.3.11.{{ $index }}'
+                    descr: 'General Alarm'
+                    index: 'upsAlarmGeneralFault.{{ $index }}'
+                    group: Alarm
+                    state_name: upsAlarmGeneralFault
+                    states:
+                        - { value: 0, generic: 0, graph: 1, descr: 'OK' }
+                        - { value: 1, generic: 2, graph: 1, descr: 'Alarm' }
