@@ -80,6 +80,7 @@ class CustomMap extends BaseModel
         $config['engine'] = \LibreNMS\Config::get('geoloc.engine');
         $config['api_key'] = \LibreNMS\Config::get('geoloc.api_key');
         $config['tile_url'] = \LibreNMS\Config::get('leaflet.tile_url');
+        /* @phpstan-ignore-next-line seems to think version is not in array 100% of the time... which is wrong */
         $config['image_url'] = route('maps.custom.background', ['map' => $this->custom_map_id]) . '?version=' . ($config['version'] ?? 0);
 
         return $config;
