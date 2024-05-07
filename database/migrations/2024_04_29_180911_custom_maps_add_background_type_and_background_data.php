@@ -28,7 +28,7 @@ return new class extends Migration
                     'background_data' => json_encode([
                         'suffix' => $map->background_suffix,
                         'version' => $map->background_version,
-                    ])
+                    ]),
                 ]);
             }
         });

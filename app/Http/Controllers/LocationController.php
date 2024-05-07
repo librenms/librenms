@@ -15,7 +15,7 @@ class LocationController extends Controller
             'maps_config' => [
                 'engine' => Config::get('geoloc.engine'),
                 'api_key' => Config::get('geoloc.api_key'),
-                'tile_url' => Config::get('leaflet.tile_url', '{s}.tile.openstreetmap.org')
+                'tile_url' => Config::get('leaflet.tile_url', '{s}.tile.openstreetmap.org'),
             ],
             'graph_template' => '',
         ];
