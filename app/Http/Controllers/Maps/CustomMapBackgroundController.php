@@ -29,7 +29,7 @@ use App\Http\Controllers\Controller;
 use App\Models\CustomMap;
 use App\Models\CustomMapBackground;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Cache;
 
 class CustomMapBackgroundController extends Controller
 {
@@ -37,15 +37,26 @@ class CustomMapBackgroundController extends Controller
     {
         $this->authorize('view', $map);
 
-        $background = $this->checkImageCache($map);
-        if ($background) {
-            $path = Storage::disk('base')->path('html/images/custommap/background/' . $background);
-
-            return response()->file($path, [
-                'Content-Type' => Storage::mimeType($background),
-            ]);
+        if ($map->background_type !== 'image') {
+            abort(404);
         }
-        abort(404);
+
+        // explicitly use file cache
+        try {
+            $imageContent = Cache::driver('file')
+                ->remember($this->getCacheKey($map), new \DateInterval('P30D'), fn() => $map->background->background_image);
+        } catch (\ErrorException $e) {
+            // if cache fails, just load from database :(
+            $imageContent = $map->background->background_image;
+        }
+
+        if (empty($imageContent)) {
+            abort(404);
+        }
+
+        return response($imageContent, headers: [
+            'Content-Type' => $map->background_data['mime'] ?? getimagesizefromstring($imageContent)['mime'] ?? 'image/jpeg',
+        ]);
     }
 
     public function save(FormRequest $request, CustomMap $map)
@@ -77,29 +88,6 @@ class CustomMapBackgroundController extends Controller
         ]);
     }
 
-    private function clearImageCache(CustomMap $map): void
-    {
-        // if there are multiple web servers, it will only clear from the local.
-        $imageName = $map->bgImageCacheFileName();
-        if ($imageName && Storage::disk('base')->exists('html/images/custommap/background/' . $imageName)) {
-            Storage::disk('base')->delete('html/images/custommap/background/' . $imageName);
-        }
-    }
-
-    private function checkImageCache(CustomMap $map): ?string
-    {
-        if ($map->background_type !== 'image') {
-            return null;
-        }
-
-        $imageName = $map->bgImageCacheFileName();
-        if ($imageName && Storage::disk('base')->missing('html/images/custommap/background/' . $imageName)) {
-            Storage::disk('base')->put('html/images/custommap/background/' . $imageName, $map->background->background_image);
-        }
-
-        return $imageName;
-    }
-
     private function updateBackgroundImage(CustomMap $map, FormRequest $request): void
     {
         if ($map->background_type == 'image') {
@@ -108,17 +96,28 @@ class CustomMapBackgroundController extends Controller
                 $background = $map->background ?? new CustomMapBackground;
                 $background->background_image = $request->image->getContent();
                 $map->background()->save($background);
+                Cache::driver('file')->forget($this->getCacheKey($map)); // clear old image cache if present
                 $map->background_data = array_merge($map->background_data ?? [], [
-                    'suffix' => $request->image->extension(),
                     'version' => md5($background->background_image),
                     'original_filename' => $request->image->getClientOriginalName(),
+                    'mime' => $request->image->getMimeType(),
                 ]);
             }
         } elseif ($map->getOriginal('background_type') == 'image') {
-            // if no longer image, clean up
-            $this->clearImageCache($map);
+            // if no longer image, clean up. if there are multiple web servers, it will only clear from the local.
+            Cache::driver('file')->forget($this->getCacheKey($map));
             $map->background()->delete();
-            $map->background_data = array_diff_key($map->background_data ?? [], ['suffix' => 1, 'version' => 1, 'original_filename' => 1]);
+            // remove image keys from background data
+            $map->background_data = array_diff_key($map->background_data ?? [], [
+                'version' => 1,
+                'original_filename' => 1,
+                'mime' => 1,
+            ]);
         }
+    }
+
+    private function getCacheKey(CustomMap $map): string
+    {
+        return 'custommap_background_' . $map->custom_map_id . ':' . ($map->background_data['version'] ?? '');
     }
 }

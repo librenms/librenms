@@ -65,15 +65,9 @@ class CustomMap extends BaseModel
         'newedgeconfig' => '{"arrows":{"to":{"enabled":true}},"smooth":{"type":"dynamic"},"font":{"color":"#343434","size":12,"face":"arial"},"label":true}',
     ];
 
-    public function bgImageCacheFileName(): ?string
-    {
-        if (empty($this->background_data['version']) || empty($this->background_data['suffix'])) {
-            return null;
-        }
-
-        return $this->custom_map_id . '_' . $this->background_data['version'] . '.' . $this->background_data['suffix'];
-    }
-
+    /**
+     * Get background data intended to be passed to javascript to configure the background
+     */
     public function getBackgroundConfig(): array
     {
         $config = $this->background_data ?? [];
