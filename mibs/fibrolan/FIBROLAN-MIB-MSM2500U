@@ -1,0 +1,144 @@
+--  ===============================================================================
+--  File              : FIBROLAN-MIB-MSM2500U.mib
+--  Description       : Private MIB file for FIBROLAN MetroStar I system - MSM2500U
+--  By                : Tal Katz-Touaf
+--  MIB Version       : 1.1
+--  MetroStar Version : 1.6.2/build 12
+--  Date              : March 27, 2008
+--  ===============================================================================
+--
+--
+-- Copyright Fibrolan, 2008. All rights reserved.
+--
+-- Reproduction of this document is authorized on condition that this
+-- copyright notice is included.
+--
+FIBROLAN-MIB-MSM2500U     DEFINITIONS ::= BEGIN
+
+	 IMPORTS
+		OBJECT-TYPE, MODULE-IDENTITY, enterprises			  FROM SNMPv2-SMI 
+		--enterprises                                       FROM RFC1155-SMI
+	    DisplayString						              FROM SNMPv2-TC
+		flMsChassisModuleMvEntry						  FROM FIBROLAN-MIB-METRO-STAR-MV;
+
+
+   flMsm2500UMv  MODULE-IDENTITY
+       LAST-UPDATED "0803270000Z"  
+       ORGANIZATION "Fibrolan ltd"
+       CONTACT-INFO
+         "http://www.fibrolan.com"
+       DESCRIPTION
+         "The MIB module to describe MSM2500U interface objects.
+          Copyright (C) Fibrolan Ltd (2008)."
+	::= { enterprises 4467 100 500 10 30 160 }
+      		
+	
+-- ************************************************************
+-- ************************************************************
+-- FibroLan Object Identifier Definition
+-- ************************************************************
+-- ************************************************************
+
+fibrolan            OBJECT IDENTIFIER ::= { enterprises       4467 }
+
+fibrolanSNMP        OBJECT IDENTIFIER ::= { fibrolan           100 }
+
+flMetroStarMv 		OBJECT IDENTIFIER ::=  { fibrolanSNMP      500 }
+
+flMsChassisMv		OBJECT IDENTIFIER ::=  { flMetroStarMv	    10 }
+
+flMsModuleMv		OBJECT IDENTIFIER ::=  { flMsChassisMv	    30 }
+
+--flMsm2500UMv			OBJECT IDENTIFIER ::=  { flMsModuleMv      160 }
+
+flMsm2500UModuleMv	OBJECT IDENTIFIER ::=  { flMsm2500UMv         1 }
+
+
+
+-- ************************************************************
+-- ************************************************************
+--   Module extended table 
+-- ************************************************************
+-- ************************************************************
+     flMsm2500UModuleExtMvTable           OBJECT-TYPE
+         SYNTAX  SEQUENCE OF FlMcm2500UModuleExtMvEntry
+         MAX-ACCESS  not-accessible
+         STATUS  current
+         DESCRIPTION
+         "This table shows the MSM2500U module's status"
+     ::= { flMsm2500UModuleMv  1 }
+
+     flMcm2500UModuleExtMvEntry       OBJECT-TYPE
+         SYNTAX  FlMcm2500UModuleExtMvEntry
+         MAX-ACCESS  not-accessible
+         STATUS  current
+         DESCRIPTION
+         "The entries of the table."
+         AUGMENTS { flMsChassisModuleMvEntry }
+     ::= { flMsm2500UModuleExtMvTable   1 }
+
+		FlMcm2500UModuleExtMvEntry ::= SEQUENCE
+		{
+			 flMsm2500UModuleExtMvSignalDetectP1	        INTEGER,
+			 flMsm2500UModuleExtMvSignalDetectP2	        INTEGER,
+			 flMsm2500UModuleExtMvEnableModeP1				INTEGER,
+			 flMsm2500UModuleExtMvEnableModeP2				INTEGER,
+			 flMsm2500UModuleExtMvDescription			    DisplayString
+		}
+
+    flMsm2500UModuleExtMvSignalDetectP1				   OBJECT-TYPE
+		SYNTAX	  INTEGER {
+                             off	 (1),
+						     on		 (2)
+						  }
+         MAX-ACCESS    read-only
+		 STATUS    current
+		 DESCRIPTION
+	     "MSM2500U P1 signal detect"
+    ::= { flMcm2500UModuleExtMvEntry  1 }
+
+    flMsm2500UModuleExtMvSignalDetectP2				   OBJECT-TYPE
+		SYNTAX	  INTEGER {
+                             off	 (1),
+						     on		 (2)
+						  }
+         MAX-ACCESS    read-only
+		 STATUS    current
+		 DESCRIPTION
+	     "MSM2500U P2 signal detect"
+    ::= { flMcm2500UModuleExtMvEntry  2 }
+
+    flMsm2500UModuleExtMvEnableModeP1				   OBJECT-TYPE
+		SYNTAX	  INTEGER {
+                             off	 (1),
+						     on		 (2)
+						  }
+         MAX-ACCESS    read-write
+		 STATUS    current
+		 DESCRIPTION
+	     "MSM2500U enable mode"
+    ::= { flMcm2500UModuleExtMvEntry  3 }
+
+	flMsm2500UModuleExtMvEnableModeP2				   OBJECT-TYPE
+		SYNTAX	  INTEGER {
+                             off	 (1),
+						     on		 (2)
+						  }
+         MAX-ACCESS    read-write
+		 STATUS    current
+		 DESCRIPTION
+	     "MSM2500U enable mode"
+    ::= { flMcm2500UModuleExtMvEntry  4 }
+    
+    
+    flMsm2500UModuleExtMvDescription		           OBJECT-TYPE
+		SYNTAX    DisplayString
+		 MAX-ACCESS    read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Channel textual description - up to 40 characters" 
+    ::= { flMcm2500UModuleExtMvEntry  5 }
+
+
+
+END
