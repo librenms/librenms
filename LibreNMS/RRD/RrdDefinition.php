@@ -25,7 +25,6 @@
 
 namespace LibreNMS\RRD;
 
-use App\Facades\Rrd;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\InvalidRrdTypeException;
 
@@ -132,7 +131,9 @@ class RrdDefinition
             $index = array_search($file, $this->sources);
             if ($index === false) {
                 // check if source rrd exists and cache failures
-                if (isset($this->invalid_source[$file]) || ! Rrd::checkRrdExists($file)) {
+                // using file_exists because source does not seem to support rrdcached
+                // so this will only work if we have file access to the old rrd file
+                if (isset($this->invalid_source[$file]) || ! file_exists($file)) {
                     $this->invalid_source[$file] = true;
 
                     return ''; // skip source if file does not exist
