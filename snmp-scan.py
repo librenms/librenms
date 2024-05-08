@@ -358,9 +358,11 @@ Example: 192.168.0.1/32 will be treated as a single host address""",
     if stats[Outcome.EXCLUDED]:
         summary += ", {} ips excluded by config".format(stats[Outcome.EXCLUDED])
     if stats[Outcome.NODNS]:
-        summary += ", {} ips excluded due to missing reverse DNS record".format(stats[Outcome.NODNS])
+        summary += (", {} ips excluded due to missing reverse DNS record"
+                    .format(stats[Outcome.NODNS]))
     if stats[Outcome.ERROR]:
-        summary += ", {} errors while checking device (try with -v to see errors)".format(stats[Outcome.ERROR])
+        summary += (", {} errors while checking device (try with -v to see errors)"
+                    .format(stats[Outcome.ERROR]))
 
     print(summary)
     print("Runtime: {:.2f} seconds".format(time() - start_time))
