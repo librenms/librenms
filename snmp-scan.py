@@ -362,8 +362,10 @@ Example: 192.168.0.1/32 will be treated as a single host address""",
             stats[Outcome.NODNS]
         )
     if stats[Outcome.ERROR]:
-        summary += ", {} errors while checking device (try with -v to see errors)".format(
-            stats[Outcome.ERROR]
+        summary += (
+            ", {} errors while checking device (try with -v to see errors)".format(
+                stats[Outcome.ERROR]
+            )
         )
 
     print(summary)
