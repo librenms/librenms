@@ -99,8 +99,9 @@
                     }
 
                     this.type = 'image';
-                    this.image = 'geo-map.png';
-                    canvas.toBlob((blob) => this.image_content = blob, 'image/png');
+                    this.image = 'geo-map.jpg';
+                    canvas.toBlob((blob) => this.image_content = blob, 'image/jpeg', 0.5);
+
                     this.saving_map_as_image = false;
                 });
             },
