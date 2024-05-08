@@ -62,7 +62,7 @@ class CustomMapBackgroundController extends Controller
 
         $map->background_type = $request->type;
         $this->updateBackgroundImage($map, $request);
-        $map->background_data = array_merge($map->background_data, $request->only([
+        $map->background_data = array_merge($map->background_data ?? [], $request->only([
             'color',
             'lat',
             'lng',
@@ -108,7 +108,7 @@ class CustomMapBackgroundController extends Controller
                 $background = $map->background ?? new CustomMapBackground;
                 $background->background_image = $request->image->getContent();
                 $map->background()->save($background);
-                $map->background_data = array_merge($map->background_data, [
+                $map->background_data = array_merge($map->background_data ?? [], [
                     'suffix' => $request->image->extension(),
                     'version' => md5($background->background_image),
                     'original_filename' => $request->image->getClientOriginalName(),
@@ -118,7 +118,7 @@ class CustomMapBackgroundController extends Controller
             // if no longer image, clean up
             $this->clearImageCache($map);
             $map->background()->delete();
-            $map->background_data = array_diff_key($map->background_data, ['suffix' => 1, 'version' => 1, 'original_filename' => 1]);
+            $map->background_data = array_diff_key($map->background_data ?? [], ['suffix' => 1, 'version' => 1, 'original_filename' => 1]);
         }
     }
 }
