@@ -76,7 +76,7 @@ class CustomMap extends BaseModel
 
     public function getBackgroundConfig(): array
     {
-        $config = $this->background_data;
+        $config = $this->background_data ?? [];
         $config['engine'] = \LibreNMS\Config::get('geoloc.engine');
         $config['api_key'] = \LibreNMS\Config::get('geoloc.api_key');
         $config['tile_url'] = \LibreNMS\Config::get('leaflet.tile_url');
