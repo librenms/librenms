@@ -351,34 +351,9 @@ class Device extends BaseModel
             } else {
                 $this->max_depth = 1; // has children
             }
-        } elseif ($count === 1 && $this->parents[0]->parents()->getQuery()->where('device_id', '=', $this->device_id)->count() == 0) {
-            // Shortcut for devices with a single parent and no circular dependency
+        } else {
             $parents_max_depth = $query->max('max_depth');
             $this->max_depth = $parents_max_depth + 1;
-        } else {
-            // Work out the longest path to any root node, avoiding loops
-            $found_parents = [];
-            $max_depth = 1;
-            $this_parents = $this->parents;
-            $next_parents = [];
-            while (count($this_parents) > 0) {
-                $max_depth++;
-                foreach ($this_parents as $parent) {
-                    if (array_key_exists($parent->device_id, $found_parents)) {
-                        continue;
-                    }
-                    $found_parents[$parent->device_id] = true;
-
-                    foreach ($parent->parents as $next_parent) {
-                        if (! array_key_exists($next_parent->device_id, $found_parents)) {
-                            $next_parents[] = $next_parent;
-                        }
-                    }
-                }
-                $this_parents = $next_parents;
-                $next_parents = [];
-            }
-            $this->max_depth = $max_depth;
         }
 
         $this->save();
