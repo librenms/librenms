@@ -44,7 +44,7 @@ class CustomMapBackgroundController extends Controller
         // explicitly use file cache
         try {
             $imageContent = Cache::driver('file')
-                ->remember($this->getCacheKey($map), new \DateInterval('P30D'), fn() => $map->background->background_image);
+                ->remember($this->getCacheKey($map), new \DateInterval('P30D'), fn () => $map->background->background_image);
         } catch (\ErrorException $e) {
             // if cache fails, just load from database :(
             $imageContent = $map->background->background_image;
