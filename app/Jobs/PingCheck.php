@@ -104,7 +104,7 @@ class PingCheck implements ShouldQueue
 
         $query = Device::canPing()
             ->select(['devices.device_id', 'hostname', 'overwrite_ip', 'status', 'status_reason', 'last_ping', 'last_ping_timetaken'])
-            ->with(['parents' => function($q) {
+            ->with(['parents' => function ($q) {
                 $q->canPing()->select('devices.device_id');
             }]);
 
