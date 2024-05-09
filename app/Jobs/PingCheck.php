@@ -48,12 +48,11 @@ class PingCheck implements ShouldQueue
 
     // working data for loop
     /** @var Collection */
-    private $tiered;
-    /** @var Collection */
-    private $current;
-    private $current_tier;
-    /** @var Collection */
     private $deferred;
+    /** @var Collection */
+    private $waiting_on;
+    /** @var Collection */
+    private $processed;
 
     /**
      * Create a new job instance.
@@ -76,19 +75,51 @@ class PingCheck implements ShouldQueue
     {
         $ping_start = microtime(true);
 
-        $this->fetchDevices();
+        $device_collection = $this->fetchDevices();
 
-        $ordered_device_list = $this->tiered->get(1, collect())->keys()// root nodes before standalone nodes
-        ->merge($this->devices->keys())
-            ->unique()->all();
+        $process = new Process($this->command, null, null, null, $this->wait);
 
-        // bulk ping and send FpingResponse's to recordData as they come in
-        app()->make(Fping::class)->bulkPing($ordered_device_list, [$this, 'handleResponse']);
+        d_echo($process->getCommandLine() . PHP_EOL);
+
+        // send hostnames to stdin to avoid overflowing cli length limits
+        $device_list = $device_collection->keys()->implode(PHP_EOL);
+
+        $process->setInput($device_list);
+        $process->start(); // start as early as possible
+
+        foreach ($process as $type => $line) {
+            d_echo($line);
+
+            if (Process::ERR === $type) {
+                // Check for devices we couldn't resolve dns for
+                if (preg_match('/^(?<hostname>[^\s]+): (?:Name or service not known|Temporary failure in name resolution)/', $line, $errored)) {
+                    $this->recordData($errored['hostname'], 'unreachable');
+                }
+                continue;
+            }
+
+            if (preg_match_all(
+                '/^(?<hostname>[^\s]+) is (?<status>alive|unreachable)(?: \((?<rtt>[\d.]+) ms\))?/m',
+                $line,
+                $captured
+            )) {
+                foreach ($captured[0] as $index => $matched) {
+                    $this->recordData(
+                        $captured['hostname'][$index],
+                        $captured['status'][$index],
+                        $captured['rtt'][$index] ?: 0
+                    );
+                }
+            }
+        }
 
         // check for any left over devices
         if ($this->deferred->isNotEmpty()) {
-            d_echo("Leftover devices, this shouldn't happen: " . $this->deferred->flatten(1)->implode('hostname', ', ') . PHP_EOL);
-            d_echo('Devices left in tier: ' . collect($this->current)->implode('hostname', ', ') . PHP_EOL);
+            d_echo("Leftover deferred devices, this shouldn't happen: " . $this->deferred->keys()->implode(', ') . PHP_EOL);
+        }
+
+        if ($this->waiting_on->isNotEmpty()) {
+            d_echo("Leftover waiting on devices, this shouldn't happen: " . $this->waiting_on->keys()->implode(', ') . PHP_EOL);
         }
 
         if (\App::runningInConsole()) {
@@ -103,8 +134,8 @@ class PingCheck implements ShouldQueue
         }
 
         $query = Device::canPing()
-            ->select(['devices.device_id', 'hostname', 'overwrite_ip', 'status', 'status_reason', 'last_ping', 'last_ping_timetaken', 'max_depth'])
-            ->orderBy('max_depth');
+            ->select(['devices.device_id', 'hostname', 'overwrite_ip', 'status', 'status_reason', 'last_ping', 'last_ping_timetaken'])
+            ->with('parents:device_id');
 
         if ($this->groups) {
             $query->whereIntegerInRaw('poller_group', $this->groups);
@@ -115,59 +146,15 @@ class PingCheck implements ShouldQueue
         });
 
         // working collections
-        $this->tiered = $this->devices->groupBy('max_depth', true);
         $this->deferred = new Collection();
-
-        // start with tier 1 (the root nodes, 0 is standalone)
-        $this->current_tier = 1;
-        $this->current = $this->tiered->get($this->current_tier, collect());
-
-        if (Debug::isVerbose()) {
-            $this->tiered->each(function (Collection $tier, $index) {
-                echo "Tier $index (" . $tier->count() . '): ';
-                echo $tier->implode('hostname', ', ');
-                echo PHP_EOL;
-            });
-        }
+        $this->waiting_on = new Collection();
+        $this->processed = new Collection();
 
         return $this->devices;
     }
 
     /**
-     * Check if this tier is complete and move to the next tier
-     * If we moved to the next tier, check if we can report any of our deferred results
-     */
-    private function processTier()
-    {
-        if ($this->current->isNotEmpty()) {
-            return;
-        }
-
-        $this->current_tier++;  // next tier
-
-        if (! $this->tiered->has($this->current_tier)) {
-            // out of devices
-            return;
-        }
-
-        if (Debug::isVerbose()) {
-            echo "Out of devices at this tier, moving to tier $this->current_tier\n";
-        }
-
-        $this->current = $this->tiered->get($this->current_tier);
-
-        // update and remove devices in the current tier
-        foreach ($this->deferred->pull($this->current_tier, []) as $fpingResponse) {
-            $this->handleResponse($fpingResponse);
-        }
-
-        // try to process the new tier in case we took care of all the devices
-        $this->processTier();
-    }
-
-    /**
-     * If the device is on the current tier, record the data and remove it
-     * $data should have keys: hostname, status, and conditionally rtt
+     * Record the data and run alerts if all parents have been processed
      */
     public function handleResponse(FpingResponse $response): void
     {
@@ -177,73 +164,115 @@ class PingCheck implements ShouldQueue
 
         $device = $this->devices->get($response->host);
 
-        // process the data if this is a standalone device or in the current tier
-        if ($device->max_depth === 0 || $this->current->has($device->hostname)) {
-            if (Debug::isVerbose()) {
-                echo "Success\n";
+        $waiting_on = [];
+        foreach ($device->parents as $parent) {
+            if (!$this->processed->has($parent->device_id)) {
+                $waiting_on[] = $parent->device_id;
             }
+        }
 
-            // mark up only if snmp is not down too
-            $device->status = ($response->success() && $device->status_reason != 'snmp');
-            if ($device->isDirty('status')) {
-                // if changed, update reason
-                $device->status_reason = $device->status ? '' : 'icmp';
-                $type = $device->status ? 'up' : 'down';
-            }
+        // process the data
 
-            // save last_ping_timetaken and rrd data
-            $response->saveStats($device);
+        // mark up only if snmp is not down too
+        $device->status = ($status == 'alive' && $device->status_reason != 'snmp');
+        $device->last_ping = Carbon::now();
+        $device->last_ping_timetaken = $rtt;
 
-            if (isset($type)) { // only run alert rules if status changed
+        if ($device->isDirty('status')) {
+            // if changed, update reason
+            $device->status_reason = $device->status ? '' : 'icmp';
+            $type = $device->status ? 'up' : 'down';
+        }
+
+        $device->save(); // save every time because of last_ping
+
+        // add data to rrd
+        app('Datastore')->put($device->toArray(), 'ping-perf', $this->rrd_tags, ['ping' => $device->last_ping_timetaken]);
+
+        // mark as processed
+        $this->processed->put($device->device_id, true);
+        d_echo("Recorded data for $device->hostname\n");
+
+        if (isset($type)) { // only run alert rules if status changed
+            if (Debug::isEnabled()) {
                 echo "Device $device->hostname changed status to $type, running alerts\n";
-                $rules = new AlertRules;
-                $rules->runRules($device->device_id);
             }
+            if (count($waiting_on) === 0) {
+                if (Debug::isVerbose()) {
+                    echo "Success\n";
+                }
 
-            // done with this device
-            $this->complete($device->hostname);
-            d_echo("Recorded data for $device->hostname (tier $device->max_depth)\n");
-        } else {
-            if (Debug::isVerbose()) {
-                echo "Deferred\n";
+                $this->runAlerts($device->device_id);
+            } else {
+                if (Debug::isVerbose()) {
+                    echo "Deferred\n";
+                }
+
+                $this->deferred->put($device->device_id, $device->parents);
+                foreach ($waiting_on as $parent_id) {
+                    if (Debug::isVerbose()) {
+                        echo "Adding $device->device_id to list waiting for $parent_id\n";
+                    }
+
+                    if ($this->waiting_on->has($parent_id)) {
+                        $child_list = $this->waiting_on->get($parent_id);
+                        $child_list->put($device->device_id, true);
+                    } else {
+                        // create a new entry containing this device
+                        $this->waiting_on->put($parent_id, collect([$device->device_id => true]));
+                    }
+                }
             }
-
-            $this->defer($response);
         }
 
-        $this->processTier();
+        $this->runDeferredAlerts($device->device_id);
     }
 
     /**
-     * Done processing $hostname, remove it from our active data
-     *
-     * @param  string  $hostname
+     * Run any deferred alerts
      */
-    private function complete($hostname)
-    {
-        $this->current->offsetUnset($hostname);
-        $this->deferred->each->offsetUnset($hostname);
+    private function runDeferredAlerts(int $device_id) {
+        // check for any devices waiting on this device
+        if ($this->waiting_on->has($device_id)) {
+            $children = $this->waiting_on->get($device_id)->keys();
+
+            // Check each child to see if alerts have been deferred
+            foreach ($children as $child_id) {
+                if ($this->deferred->has($child_id)) {
+                    // run alert if all parents have been processed
+                    $alert_child = true;
+                    $parents = $this->deferred->get($child_id);
+
+                    foreach ($parents as $parent) {
+                        if (!$this->processed->has($parent->device_id)) {
+                            if (Debug::isVerbose()) {
+                                echo "Deferring device $child_id triggered by $device_id still waiting for $parent->device_id\n";
+                            }
+
+                            $alert_child = false;
+                        }
+                    }
+
+                    if ($alert_child) {
+                        if (Debug::isVerbose()) {
+                            echo "Deferred device $child_id triggered by $device_id\n";
+                        }
+
+                        $this->runAlerts($child_id);
+                        $this->deferred->pull($child_id);
+                    }
+                }
+            }
+        }
+
+        $this->waiting_on->pull($device_id);
     }
 
     /**
-     * Defer this data processing until all parent devices are complete
+     * Record the data and run alerts if all parents have been processed
      */
-    private function defer(FpingResponse $response): void
-    {
-        $device = $this->devices->get($response->host);
-        if ($device == null) {
-            dd("could not find $response->host");
-        }
-
-        if ($this->deferred->has($device->max_depth)) {
-            // add this data to the proper tier, unless it already exists...
-            $tier = $this->deferred->get($device->max_depth);
-            if (! $tier->has($device->hostname)) {
-                $tier->put($device->hostname, $response);
-            }
-        } else {
-            // create a new tier containing this data
-            $this->deferred->put($device->max_depth, collect([$device->hostname => $response]));
-        }
+    private function runAlerts(int $device_id) {
+        $rules = new AlertRules;
+        $rules->runRules($device_id);
     }
 }
