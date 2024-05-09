@@ -151,11 +151,6 @@ class PingCheck implements ShouldQueue
         // save last_ping_timetaken and rrd data
         $response->saveStats($device);
 
-        $device->save(); // save every time because of last_ping
-
-        // add data to rrd
-        app('Datastore')->put($device->toArray(), 'ping-perf', $this->rrd_tags, ['ping' => $device->last_ping_timetaken]);
-
         // mark as processed
         $this->processed->put($device->device_id, true);
         d_echo("Recorded data for $device->hostname\n");
