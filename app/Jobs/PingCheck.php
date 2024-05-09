@@ -77,41 +77,10 @@ class PingCheck implements ShouldQueue
 
         $device_collection = $this->fetchDevices();
 
-        $process = new Process($this->command, null, null, null, $this->wait);
+        $device_list = $device_collection->keys();
 
-        d_echo($process->getCommandLine() . PHP_EOL);
-
-        // send hostnames to stdin to avoid overflowing cli length limits
-        $device_list = $device_collection->keys()->implode(PHP_EOL);
-
-        $process->setInput($device_list);
-        $process->start(); // start as early as possible
-
-        foreach ($process as $type => $line) {
-            d_echo($line);
-
-            if (Process::ERR === $type) {
-                // Check for devices we couldn't resolve dns for
-                if (preg_match('/^(?<hostname>[^\s]+): (?:Name or service not known|Temporary failure in name resolution)/', $line, $errored)) {
-                    $this->recordData($errored['hostname'], 'unreachable');
-                }
-                continue;
-            }
-
-            if (preg_match_all(
-                '/^(?<hostname>[^\s]+) is (?<status>alive|unreachable)(?: \((?<rtt>[\d.]+) ms\))?/m',
-                $line,
-                $captured
-            )) {
-                foreach ($captured[0] as $index => $matched) {
-                    $this->recordData(
-                        $captured['hostname'][$index],
-                        $captured['status'][$index],
-                        $captured['rtt'][$index] ?: 0
-                    );
-                }
-            }
-        }
+        // bulk ping and send FpingResponse's to recordData as they come in
+        app()->make(Fping::class)->bulkPing($device_list, [$this, 'handleResponse']);
 
         // check for any left over devices
         if ($this->deferred->isNotEmpty()) {
@@ -166,23 +135,21 @@ class PingCheck implements ShouldQueue
 
         $waiting_on = [];
         foreach ($device->parents as $parent) {
-            if (! $this->processed->has($parent->device_id)) {
+            if (!$this->processed->has($parent->device_id)) {
                 $waiting_on[] = $parent->device_id;
             }
         }
 
-        // process the data
-
         // mark up only if snmp is not down too
-        $device->status = ($status == 'alive' && $device->status_reason != 'snmp');
-        $device->last_ping = Carbon::now();
-        $device->last_ping_timetaken = $rtt;
-
+        $device->status = ($response->success() && $device->status_reason != 'snmp');
         if ($device->isDirty('status')) {
             // if changed, update reason
             $device->status_reason = $device->status ? '' : 'icmp';
             $type = $device->status ? 'up' : 'down';
         }
+
+        // save last_ping_timetaken and rrd data
+        $response->saveStats($device);
 
         $device->save(); // save every time because of last_ping
 
@@ -231,8 +198,7 @@ class PingCheck implements ShouldQueue
     /**
      * Run any deferred alerts
      */
-    private function runDeferredAlerts(int $device_id)
-    {
+    private function runDeferredAlerts(int $device_id) {
         // check for any devices waiting on this device
         if ($this->waiting_on->has($device_id)) {
             $children = $this->waiting_on->get($device_id)->keys();
@@ -245,7 +211,7 @@ class PingCheck implements ShouldQueue
                     $parents = $this->deferred->get($child_id);
 
                     foreach ($parents as $parent) {
-                        if (! $this->processed->has($parent->device_id)) {
+                        if (!$this->processed->has($parent->device_id)) {
                             if (Debug::isVerbose()) {
                                 echo "Deferring device $child_id triggered by $device_id still waiting for $parent->device_id\n";
                             }
@@ -270,10 +236,9 @@ class PingCheck implements ShouldQueue
     }
 
     /**
-     * Record the data and run alerts if all parents have been processed
+     * run alerts for a device
      */
-    private function runAlerts(int $device_id)
-    {
+    private function runAlerts(int $device_id) {
         $rules = new AlertRules;
         $rules->runRules($device_id);
     }
