@@ -104,7 +104,9 @@ class PingCheck implements ShouldQueue
 
         $query = Device::canPing()
             ->select(['devices.device_id', 'hostname', 'overwrite_ip', 'status', 'status_reason', 'last_ping', 'last_ping_timetaken'])
-            ->with('parents:device_id');
+            ->with(['parents' => function($q) {
+                $q->canPing()->select('devices.device_id');
+            }]);
 
         if ($this->groups) {
             $query->whereIntegerInRaw('poller_group', $this->groups);
