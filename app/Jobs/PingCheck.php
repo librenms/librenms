@@ -135,7 +135,7 @@ class PingCheck implements ShouldQueue
 
         $waiting_on = [];
         foreach ($device->parents as $parent) {
-            if (!$this->processed->has($parent->device_id)) {
+            if (! $this->processed->has($parent->device_id)) {
                 $waiting_on[] = $parent->device_id;
             }
         }
@@ -198,7 +198,8 @@ class PingCheck implements ShouldQueue
     /**
      * Run any deferred alerts
      */
-    private function runDeferredAlerts(int $device_id) {
+    private function runDeferredAlerts(int $device_id)
+    {
         // check for any devices waiting on this device
         if ($this->waiting_on->has($device_id)) {
             $children = $this->waiting_on->get($device_id)->keys();
@@ -211,7 +212,7 @@ class PingCheck implements ShouldQueue
                     $parents = $this->deferred->get($child_id);
 
                     foreach ($parents as $parent) {
-                        if (!$this->processed->has($parent->device_id)) {
+                        if (! $this->processed->has($parent->device_id)) {
                             if (Debug::isVerbose()) {
                                 echo "Deferring device $child_id triggered by $device_id still waiting for $parent->device_id\n";
                             }
@@ -238,7 +239,8 @@ class PingCheck implements ShouldQueue
     /**
      * run alerts for a device
      */
-    private function runAlerts(int $device_id) {
+    private function runAlerts(int $device_id)
+    {
         $rules = new AlertRules;
         $rules->runRules($device_id);
     }
