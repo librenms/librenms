@@ -77,7 +77,7 @@ class PingCheck implements ShouldQueue
 
         $device_collection = $this->fetchDevices();
 
-        $device_list = $device_collection->keys();
+        $device_list = $device_collection->keys()->all();
 
         // bulk ping and send FpingResponse's to recordData as they come in
         app()->make(Fping::class)->bulkPing($device_list, [$this, 'handleResponse']);
@@ -128,7 +128,7 @@ class PingCheck implements ShouldQueue
     public function handleResponse(FpingResponse $response): void
     {
         if (Debug::isVerbose()) {
-            echo "Attempting to record data for $response->host... ";
+            echo "Attempting to record data for $response->host... \n";
         }
 
         $device = $this->devices->get($response->host);
