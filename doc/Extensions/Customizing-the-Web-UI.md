@@ -65,7 +65,7 @@ Windows Registry Editor Version 5.00
 [HKEY_CLASSES_ROOT\winbox\shell]
 [HKEY_CLASSES_ROOT\winbox\shell\open]
 [HKEY_CLASSES_ROOT\winbox\shell\open\command]
-@= '@="C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -Command \"$val=\'%l\'; $val = $val.TrimEnd(\'/\');if ($val.StartsWith(\'winbox://\' { $val = $val.SubString(9) }; & \'C:\Program Files\winbox64.exe\' \"$val\"\""' =@
+@= '@="C:\\Windows\\System32\\WindowsPowerShell\v1.0\\powershell.exe -Command \"$val=\'%l\'; $val = $val.TrimEnd(\'/\');if ($val.StartsWith(\'winbox://\' { $val = $val.SubString(9) }; & \'C:\\Program Files\\winbox64.exe\' \"$val\"\""' =@
 ```
 
 Now we can use that in the device menu entry to open winbox.

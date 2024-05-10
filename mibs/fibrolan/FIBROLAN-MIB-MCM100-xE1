@@ -1,0 +1,316 @@
+--  ====================================================================================
+--  File              : FIBROLAN-MIB-MCM100-xE1.mib
+--  Description       : Private MIB file for FIBROLAN MetroStar I system - MCM100-xE1/T1
+--  By                : Shamir Stein
+--  MIB Version       : 1.2
+--  MetroStar Version : 1.6.2/build 12
+--  Date              : March 27, 2008
+--  ====================================================================================
+--
+--
+-- Copyright Fibrolan, 2008. All rights reserved.
+--
+-- Reproduction of this document is authorized on condition that this
+-- copyright notice is included.
+
+
+FIBROLAN-MIB-MCM100-xE1     DEFINITIONS ::= BEGIN
+
+	 IMPORTS
+		enterprises, OBJECT-TYPE, MODULE-IDENTITY			FROM SNMPv2-SMI
+		DisplayString										FROM SNMPv2-TC
+		MODULE-COMPLIANCE, OBJECT-GROUP						FROM SNMPv2-CONF
+		flMsChassisModuleMvEntry,
+			flMsChassisMvIndex, flMsChassisModuleMvIndex	FROM FIBROLAN-MIB-METRO-STAR-MV;
+
+		
+
+  flMcm100xE1  MODULE-IDENTITY
+       LAST-UPDATED "0803270000Z"  
+       ORGANIZATION "Fibrolan ltd"
+       CONTACT-INFO
+         "http://www.fibrolan.com"
+       DESCRIPTION
+         "The MIB module to describe MCM1XX interface objects.
+          Copyright (C) Fibrolan Ltd (2008)."
+	::= { enterprises 4467 100 500 10 30 100 200 }
+
+
+    -- conformance information
+     flMcm100xE1MIBConformance      OBJECT IDENTIFIER ::= { flMcm100xE1  1 }
+
+     flMsMcm100xE1MIBCompliances	OBJECT IDENTIFIER ::= { flMcm100xE1MIBConformance 1 }
+     flMsMcm100xE1MIBGroups			OBJECT IDENTIFIER ::= { flMcm100xE1MIBConformance 2 }
+
+
+	-- compliance statements
+     flMcm100xE1MIBCompliance MODULE-COMPLIANCE
+              STATUS  current
+              DESCRIPTION
+                      "The compliance statement for flMetroStar entities
+                      which implement the flMcm100xE1 MIB."
+			  MODULE FIBROLAN-MIB-MCM1xx
+				  MANDATORY-GROUPS{ flMsMcm1xxMvGroup }
+              MODULE  -- this module
+                  MANDATORY-GROUPS { flMsMcm100xE1Group, flMsMcm100xE1PortsGroup}
+              ::= { flMsMcm100xE1MIBCompliances 1 }
+
+
+     flMsMcm100xE1Group	OBJECT-GROUP
+	        OBJECTS		{ flMsMcm100xE1ResetPorts,
+						  flMsMcm100xE1RestorePortsDef }
+            STATUS  current
+            DESCRIPTION
+                    "A collection of objects providing basic
+                    instrumentation of the MetroStar E1 module entity."
+            ::= { flMsMcm100xE1MIBGroups  1 }
+
+     flMsMcm100xE1PortsGroup	OBJECT-GROUP
+	        OBJECTS		{ flMsMcm100xE1PortIndex,
+						  flMsMcm100xE1Signal,
+						  flMsMcm100xE1RemoteSignal,
+						  flMsMcm100xE1Ais,
+						  flMsMcm100xE1Output,
+						  flMsMcm100xE1Input,
+						  flMsMcm100xE1Taos,
+						  flMsMcm100xE1LocalLoopback,
+						  flMsMcm100xE1UserAnalogLB,
+						  flMsMcm100xE1UserDigitalLB,
+						  flMsMcm100xE1PortDescription }
+            STATUS  current
+            DESCRIPTION
+                    "A collection of objects providing basic
+                    instrumentation of the MetroStar E1 ports entity."
+            ::= { flMsMcm100xE1MIBGroups 2 }
+
+
+-- ************************************************************
+-- ************************************************************
+-- FibroLan Object Identifier Definition
+-- ************************************************************
+-- ************************************************************
+
+fibrolan            OBJECT IDENTIFIER ::= { enterprises       4467 }
+
+fibrolanSNMP        OBJECT IDENTIFIER ::= { fibrolan           100 }
+
+flMetroStarMv 		OBJECT IDENTIFIER ::=  { fibrolanSNMP      500 }
+
+flMsChassisMv		OBJECT IDENTIFIER ::=  { flMetroStarMv	    10 }
+
+flMsModuleMv		OBJECT IDENTIFIER ::=  { flMsChassisMv	    30 }
+
+flMcm1xxMv			OBJECT IDENTIFIER ::=  { flMsModuleMv      100 }
+
+--flMcm100xE1			OBJECT IDENTIFIER ::=  { flMsModuleMv      200 }
+
+flMcm100xE1Ports    OBJECT IDENTIFIER ::= { flMcm100xE1	    10 }
+
+
+-- ************************************************************
+-- ************************************************************
+--   General E1 ports table 
+-- ************************************************************
+-- ************************************************************
+     flMcm100xE1PortsGeneralTable           OBJECT-TYPE
+         SYNTAX  SEQUENCE OF FlMcm100xE1PortsEntry
+         MAX-ACCESS  not-accessible
+         STATUS  current
+         DESCRIPTION
+         "This table shows the module's E1 ports"
+     ::= { flMcm100xE1Ports   1 }
+
+     flMcm100xE1PortsEntry       OBJECT-TYPE
+         SYNTAX  FlMcm100xE1PortsEntry
+         MAX-ACCESS  not-accessible
+         STATUS  current
+         DESCRIPTION
+         "The entries of the table."
+		 AUGMENTS { flMsChassisModuleMvEntry }
+	 ::= { flMcm100xE1PortsGeneralTable   1 }
+
+		FlMcm100xE1PortsEntry ::= SEQUENCE
+		{
+			 flMsMcm100xE1ResetPorts			INTEGER,
+			 flMsMcm100xE1RestorePortsDef		INTEGER
+		}
+
+    flMsMcm100xE1ResetPorts			   OBJECT-TYPE
+		SYNTAX	  INTEGER {
+                             normal	 (1),
+						     reset 	 (2)
+						  }
+         MAX-ACCESS    read-write
+		 STATUS    current
+		 DESCRIPTION
+	     "Reset E1 ports"
+    ::= { flMcm100xE1PortsEntry  1 }
+
+    flMsMcm100xE1RestorePortsDef			   OBJECT-TYPE
+		SYNTAX	  INTEGER {
+                             running	 (1),
+						     restore	 (2)
+						  }
+         MAX-ACCESS    read-write
+		 STATUS    current
+		 DESCRIPTION
+	     "Reset E1 ports"
+    ::= { flMcm100xE1PortsEntry  2 }
+
+
+-- ************************************************************
+-- ************************************************************
+--   E1 Ports status table 
+-- ************************************************************
+-- ************************************************************
+     flMcm100xE1PortsStatusTable           OBJECT-TYPE
+         SYNTAX  SEQUENCE OF FlMcm100xE1PortsStatusEntry
+         MAX-ACCESS  not-accessible
+         STATUS  current
+         DESCRIPTION
+         "This table shows the chassis' channel status"
+     ::= { flMcm100xE1Ports  2 }
+
+     flMcm100xE1PortsStatusEntry       OBJECT-TYPE
+         SYNTAX  FlMcm100xE1PortsStatusEntry
+         MAX-ACCESS  not-accessible
+         STATUS  current
+         DESCRIPTION
+         "The entries of the table."
+         INDEX { flMsChassisMvIndex, 
+				 flMsChassisModuleMvIndex,
+				 flMsMcm100xE1PortIndex  }
+     ::= { flMcm100xE1PortsStatusTable   1 }
+
+		FlMcm100xE1PortsStatusEntry ::= SEQUENCE
+		{
+			 flMsMcm100xE1PortIndex				    INTEGER,
+			 flMsMcm100xE1Signal					INTEGER,
+			 flMsMcm100xE1RemoteSignal				INTEGER,
+			 flMsMcm100xE1Ais						INTEGER,
+			 flMsMcm100xE1Output					INTEGER,
+			 flMsMcm100xE1Input						INTEGER,
+			 flMsMcm100xE1Taos						INTEGER,
+			 flMsMcm100xE1LocalLoopback				INTEGER,
+			 flMsMcm100xE1UserAnalogLB				INTEGER,
+			 flMsMcm100xE1UserDigitalLB				INTEGER, --do NOT use!!!
+			 flMsMcm100xE1PortDescription			DisplayString
+		}
+
+     flMsMcm100xE1PortIndex				   OBJECT-TYPE
+	 	  SYNTAX	  INTEGER (1..2)
+          MAX-ACCESS    read-only
+		  STATUS    current
+		  DESCRIPTION
+	      "Ports' index"
+     ::= { flMcm100xE1PortsStatusEntry  1 }
+
+    flMsMcm100xE1Signal 				   OBJECT-TYPE
+		 SYNTAX	  INTEGER {
+         	                 los     (1),
+							 on      (2)
+						  }
+         MAX-ACCESS    read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "E1 link status"
+    ::= { flMcm100xE1PortsStatusEntry  2 }
+
+    flMsMcm100xE1RemoteSignal 				   OBJECT-TYPE
+		 SYNTAX	  INTEGER {
+         	                 los     (1),
+							 on      (2)
+						  }
+         MAX-ACCESS    read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "E1 remote link status"
+    ::= { flMcm100xE1PortsStatusEntry  3 }
+
+    flMsMcm100xE1Ais				OBJECT-TYPE
+	  	 SYNTAX    INTEGER {
+	  						   no	 (1),
+							   yes	 (2)
+						    }
+         MAX-ACCESS    read-only
+         STATUS    current
+         DESCRIPTION
+         "E1 AIS status"
+    ::= { flMcm100xE1PortsStatusEntry  4 }
+
+    flMsMcm100xE1Output			OBJECT-TYPE
+	 	 SYNTAX	  INTEGER {
+                             disable   (1),
+		   			         enable    (2)
+		    		      }
+         MAX-ACCESS    read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Disable/Enable E1 output"
+    ::= { flMcm100xE1PortsStatusEntry  5 }
+
+    flMsMcm100xE1Input			OBJECT-TYPE
+	 	 SYNTAX	  INTEGER {
+                             disable   (1),
+		   			         enable    (2)
+		    		      }
+         MAX-ACCESS    read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Disable/Enable E1 input"
+    ::= { flMcm100xE1PortsStatusEntry  6 }
+
+    flMsMcm100xE1Taos			    OBJECT-TYPE
+	 	 SYNTAX	  INTEGER {
+		                      off (1),
+							  on  (2)
+						  }
+         MAX-ACCESS    read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "E1 TAOS Mode"
+    ::= { flMcm100xE1PortsStatusEntry  7 }
+
+    flMsMcm100xE1LocalLoopback     		OBJECT-TYPE
+		SYNTAX	  INTEGER {
+		                     off  (1),
+							 on   (2)
+						  }
+         MAX-ACCESS    read-write
+		 STATUS    current
+		 DESCRIPTION
+		"Local Loopback mode"
+    ::= { flMcm100xE1PortsStatusEntry  8 }
+
+	flMsMcm100xE1UserAnalogLB			OBJECT-TYPE
+		SYNTAX	  INTEGER {
+		                      off  (1),
+							  on   (2)
+						  }
+         MAX-ACCESS    read-write
+		 STATUS    current
+		 DESCRIPTION
+		"User Analog Loopback mode"
+    ::= { flMcm100xE1PortsStatusEntry  9 }
+
+	flMsMcm100xE1UserDigitalLB			OBJECT-TYPE
+		SYNTAX	  INTEGER {
+		                      off  (1),
+							  on   (2)
+						  }
+         MAX-ACCESS    read-write
+		 STATUS    current
+		 DESCRIPTION
+		"User Digital Loopback mode"
+    ::= { flMcm100xE1PortsStatusEntry  10 }
+
+    flMsMcm100xE1PortDescription			OBJECT-TYPE
+		 SYNTAX    DisplayString
+		 MAX-ACCESS    read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Port's textual description - up to 40 characters" 
+    ::= { flMcm100xE1PortsStatusEntry  11 }
+
+
+END

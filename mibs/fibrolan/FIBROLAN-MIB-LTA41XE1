@@ -1,0 +1,314 @@
+--  =================================================================================
+--  File              : FIBROLAN-MIB-LTA41XE1.mib
+--  Description       : Private MIB file for FibroLAN MetroStar I system LTA41/MA-xE1
+--  By                : Michal Carmeli
+--  MIB Version       : 2.0
+--  MetroStar Version : 1.6.2/build 12
+--  Date              : February 11, 2008
+--  =================================================================================
+--
+--
+-- Copyright Fibrolan, 2008. All rights reserved.
+--
+-- Reproduction of this document is authorized on condition that this
+-- copyright notice is included.
+
+FIBROLAN-MIB-LTA41xE1-V2   DEFINITIONS ::= BEGIN
+
+	 IMPORTS
+		enterprises, OBJECT-TYPE, MODULE-IDENTITY       FROM SNMPv2-SMI
+		DisplayString					FROM SNMPv2-TC
+		MODULE-COMPLIANCE, OBJECT-GROUP			FROM SNMPv2-CONF
+		flLta41ma-V2GlobalConfigEntry			FROM FIBROLAN-MIB-LTA41MA-V2
+		flMsChassisMvIndex, flMsChassisModuleMvIndex	FROM FIBROLAN-MIB-METRO-STAR-MV
+		flMsModuleMvChannelIndex			FROM FIBROLAN-MIB-MSMODULE;
+
+ flLta41xE1-V2  MODULE-IDENTITY
+       LAST-UPDATED "0802050000Z"  
+       ORGANIZATION "FibroLAN ltd"
+       CONTACT-INFO
+         "http://www.fibrolan.com"
+       DESCRIPTION
+         "The MIB module to describe FibroLAN LTA41/MA-xE1.
+          Copyright (C) Fibrolan Ltd (2008)."
+	::= { enterprises 4467 100 50 21 100 }
+
+
+    -- conformance information
+     flLta41xE1-V2MIBConformance       OBJECT IDENTIFIER ::= { flLta41xE1-V2  1 }
+
+     flLta41xE1-V2MIBCompliances		OBJECT IDENTIFIER ::= { flLta41xE1-V2MIBConformance 1 }
+     flLta41xE1-V2MIBGroups			OBJECT IDENTIFIER ::= { flLta41xE1-V2MIBConformance 2 }
+
+
+	-- compliance statements
+     flLta41xE1-V2MIBCompliance MODULE-COMPLIANCE
+              STATUS  current
+              DESCRIPTION
+                      "The compliance statement for flMetroStar entities
+                      which implement the flLta41xE1-V2 MIB."
+			  --MODULE FIBROLAN-MIB-LTA41MA-V2
+			 	  --MANDATORY-GROUPS{ flLta41maGlobalGroup }
+              MODULE  -- this module
+                  MANDATORY-GROUPS { flLta41xE1-V2Group, flLta41xE1-V2PortsGroup}
+              ::= { flLta41xE1-V2MIBCompliances 1 }
+
+
+     flLta41xE1-V2Group	OBJECT-GROUP
+	        OBJECTS		{ flLta41xE1-V2ResetPorts,
+				  flLta41xE1-V2RestorePortsDef }
+            STATUS  current
+            DESCRIPTION
+                    "A collection of objects providing basic
+                    instrumentation of the MetroStar E1 CPE entity."
+            ::= { flLta41xE1-V2MIBGroups  1 }
+
+     flLta41xE1-V2PortsGroup	OBJECT-GROUP
+	        OBJECTS		{ flLta41xE1-V2PortIndex,
+				  flLta41xE1-V2Signal,
+				  flLta41xE1-V2RemoteSignal,
+				  flLta41xE1-V2Ais,
+				  flLta41xE1-V2Output,
+				  flLta41xE1-V2Input,
+				  flLta41xE1-V2Taos,
+				  flLta41xE1-V2UserLoopback,
+				  flLta41xE1-V2RemoteAnalogLB,
+				  flLta41xE1-V2RemoteDigitalLB,
+				  flLta41xE1-V2PortDescription }
+            STATUS  current
+            DESCRIPTION
+                    "A collection of objects providing basic
+                    instrumentation of the MetroStar E1 ports entity."
+            ::= { flLta41xE1-V2MIBGroups 2 }
+
+
+-- ************************************************************
+-- ************************************************************
+-- FibroLan Object Identifier Definition
+-- ************************************************************
+-- ************************************************************
+
+fibrolan		OBJECT IDENTIFIER ::= { enterprises		4467 }
+
+fibrolanSNMP		OBJECT IDENTIFIER ::= { fibrolan		100 }
+
+flMaRemoteDevice	OBJECT IDENTIFIER ::= { fibrolanSNMP		50 }
+
+flLta41ma-V2		OBJECT IDENTIFIER ::= { flMaRemoteDevice	21 }
+
+--flLta41xE1-V2		OBJECT IDENTIFIER ::= { flLta41ma-V2		100 }
+
+flLta41xE1-V2Ports	OBJECT IDENTIFIER ::= { flLta41xE1-V2		10 }
+
+-- ************************************************************
+-- ************************************************************
+
+
+-- ************************************************************
+-- ************************************************************
+--   General E1 ports table 
+-- ************************************************************
+-- ************************************************************
+     flLta41xE1-V2PortsGeneralTable           OBJECT-TYPE
+         SYNTAX  SEQUENCE OF FlLta41xE1-V2PortsEntry
+         MAX-ACCESS  not-accessible
+         STATUS  current
+         DESCRIPTION
+         "This table shows the CPE's E1 ports"
+     ::= { flLta41xE1-V2Ports   1 }
+
+     flLta41xE1-V2PortsEntry       OBJECT-TYPE
+         SYNTAX  FlLta41xE1-V2PortsEntry
+         MAX-ACCESS  not-accessible
+         STATUS  current
+         DESCRIPTION
+         "The entries of the table."
+		 AUGMENTS { flLta41ma-V2GlobalConfigEntry }
+	 ::= { flLta41xE1-V2PortsGeneralTable   1 }
+
+		FlLta41xE1-V2PortsEntry ::= SEQUENCE
+		{
+			 flLta41xE1-V2ResetPorts	INTEGER,
+			 flLta41xE1-V2RestorePortsDef	INTEGER
+		}
+
+    flLta41xE1-V2ResetPorts			   OBJECT-TYPE
+		SYNTAX	  INTEGER {
+                             normal	 (1),
+			     reset 	 (2)
+				  }
+		MAX-ACCESS	read-write
+		 STATUS		current
+		 DESCRIPTION
+	     "Reset E1 ports"
+    ::= { flLta41xE1-V2PortsEntry  1 }
+
+    flLta41xE1-V2RestorePortsDef		   OBJECT-TYPE
+		SYNTAX	  INTEGER {
+                             running	 (1),
+			     restore	 (2)
+				  }
+		MAX-ACCESS	read-write
+		 STATUS		current
+		 DESCRIPTION
+	     "Reset E1 ports"
+    ::= { flLta41xE1-V2PortsEntry  2 }
+
+
+-- ************************************************************
+-- ************************************************************
+--   E1 Ports status table 
+-- ************************************************************
+-- ************************************************************
+     flLta41xE1-V2PortsStatusTable           OBJECT-TYPE
+         SYNTAX  SEQUENCE OF FlLta41xE1-V2PortsStatusEntry
+         MAX-ACCESS  not-accessible
+         STATUS  current
+         DESCRIPTION
+         "This table shows the chassis' channel status"
+     ::= { flLta41xE1-V2Ports  2 }
+
+     flLta41xE1-V2PortsStatusEntry       OBJECT-TYPE
+         SYNTAX  FlLta41xE1-V2PortsStatusEntry
+         MAX-ACCESS  not-accessible
+         STATUS  current
+         DESCRIPTION
+         "The entries of the table."
+         INDEX { flMsChassisMvIndex,
+		 flMsChassisModuleMvIndex,
+		 flMsModuleMvChannelIndex,
+		 flLta41xE1-V2PortIndex }
+     ::= { flLta41xE1-V2PortsStatusTable   1 }
+
+		FlLta41xE1-V2PortsStatusEntry ::= SEQUENCE
+		{
+			 flLta41xE1-V2PortIndex			INTEGER,
+			 flLta41xE1-V2Signal			INTEGER,
+ 			 flLta41xE1-V2RemoteSignal		INTEGER,
+			 flLta41xE1-V2Ais			INTEGER,
+			 flLta41xE1-V2Output			INTEGER,
+			 flLta41xE1-V2Input			INTEGER,
+			 flLta41xE1-V2Taos			INTEGER,
+			 flLta41xE1-V2UserLoopback		INTEGER,
+			 flLta41xE1-V2RemoteAnalogLB		INTEGER,
+			 flLta41xE1-V2RemoteDigitalLB		INTEGER, --do NOT use!!!
+			 flLta41xE1-V2PortDescription		DisplayString
+		}
+
+     flLta41xE1-V2PortIndex				   OBJECT-TYPE
+	 	  SYNTAX	  INTEGER (1..2)
+          MAX-ACCESS    read-only
+		  STATUS    current
+		  DESCRIPTION
+	      "Ports' index"
+     ::= { flLta41xE1-V2PortsStatusEntry  1 }
+
+    flLta41xE1-V2Signal 				   OBJECT-TYPE
+		 SYNTAX	  INTEGER {
+         	                 los     (1),
+				 on      (2)
+						  }
+         MAX-ACCESS    read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "E1 link status"
+    ::= { flLta41xE1-V2PortsStatusEntry  2 }
+
+    flLta41xE1-V2RemoteSignal 				   OBJECT-TYPE
+		 SYNTAX	  INTEGER {
+         	                 los     (1),
+				 on      (2)
+						  }
+         MAX-ACCESS    read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "E1 remote link status"
+    ::= { flLta41xE1-V2PortsStatusEntry  3 }
+
+    flLta41xE1-V2Ais				OBJECT-TYPE
+	  	 SYNTAX    INTEGER {
+	  						   no	 (1),
+							   yes	 (2)
+						    }
+         MAX-ACCESS    read-only
+         STATUS    current
+         DESCRIPTION
+         "E1 AIS status"
+    ::= { flLta41xE1-V2PortsStatusEntry  4 }
+
+    flLta41xE1-V2Output			OBJECT-TYPE
+	 	 SYNTAX	  INTEGER {
+                             disable   (1),
+		   		enable    (2)
+		    		      }
+         MAX-ACCESS    read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Disable/Enable E1 output"
+    ::= { flLta41xE1-V2PortsStatusEntry  5 }
+
+    flLta41xE1-V2Input			OBJECT-TYPE
+	 	 SYNTAX	  INTEGER {
+                             disable   (1),
+		   		 enable    (2)
+		    		      }
+         MAX-ACCESS    read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Disable/Enable E1 input"
+    ::= { flLta41xE1-V2PortsStatusEntry  6 }
+
+    flLta41xE1-V2Taos			    OBJECT-TYPE
+	 	 SYNTAX	  INTEGER {
+		                      off (1),
+					  on  (2)
+						  }
+         MAX-ACCESS    read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "E1 TAOS Mode"
+    ::= { flLta41xE1-V2PortsStatusEntry  7 }
+
+    flLta41xE1-V2UserLoopback     		OBJECT-TYPE
+		SYNTAX	  INTEGER {
+		                     off  (1),
+					 on   (2)
+						  }
+         MAX-ACCESS    read-write
+		 STATUS    current
+		 DESCRIPTION
+		" User Loopback mode"
+    ::= { flLta41xE1-V2PortsStatusEntry  8 }
+
+	flLta41xE1-V2RemoteAnalogLB			OBJECT-TYPE
+		SYNTAX	  INTEGER {
+		                      off  (1),
+					  on   (2)
+						  }
+         MAX-ACCESS    read-write
+		 STATUS    current
+		 DESCRIPTION
+		"Remote Analog Loopback mode"
+    ::= { flLta41xE1-V2PortsStatusEntry  9 }
+
+	flLta41xE1-V2RemoteDigitalLB			OBJECT-TYPE
+		SYNTAX	  INTEGER {
+		                      off  (1),
+					  on   (2)
+						  }
+         MAX-ACCESS    read-write
+		 STATUS    current
+		 DESCRIPTION
+		"Remote Digital Loopback mode"
+    ::= { flLta41xE1-V2PortsStatusEntry  10 }
+
+    flLta41xE1-V2PortDescription			OBJECT-TYPE
+		 SYNTAX    DisplayString
+		 MAX-ACCESS    read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Port's textual description - up to 40 characters" 
+    ::= { flLta41xE1-V2PortsStatusEntry  11 }
+
+
+END

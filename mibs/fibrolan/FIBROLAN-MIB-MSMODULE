@@ -1,0 +1,394 @@
+--  =======================================================================================
+--  File              : FIBROLAN-MIB-MSMODULE.mib
+--  Description       : Private MIB file for FIBROLAN MetroStar I system - MetroStar module
+--  By                : Tal Katz-Touaf
+--  MIB Version       : 1.4
+--  MetroStar Version : 1.6.2/build 12
+--  Date              : March 27, 2008
+--  =======================================================================================
+--
+--
+-- Copyright Fibrolan, 2008. All rights reserved.
+--
+-- Reproduction of this document is authorized on condition that this
+-- copyright notice is included.
+--
+FIBROLAN-MIB-MSMODULE     DEFINITIONS ::= BEGIN
+
+	 IMPORTS
+		OBJECT-TYPE, MODULE-IDENTITY, enterprises, Integer32			FROM SNMPv2-SMI 
+		DisplayString								FROM SNMPv2-TC
+		MODULE-COMPLIANCE, OBJECT-GROUP						FROM SNMPv2-CONF
+		flMsChassisMvIndex, flMsChassisModuleMvIndex				FROM FIBROLAN-MIB-METRO-STAR-MV;
+
+  flMsModuleMv  MODULE-IDENTITY
+       LAST-UPDATED "0803270000Z"  
+       ORGANIZATION "Fibrolan ltd"
+       CONTACT-INFO
+         "http://www.fibrolan.com"
+       DESCRIPTION
+         "The MIB module to describe MetroStar modules.
+          Copyright (C) Fibrolan Ltd (2008)."
+	::= { enterprises 4467 100 500 10 30}
+
+
+    -- conformance information
+     flMsModuleMIBConformance
+                   OBJECT IDENTIFIER ::= { flMsModuleMv 1 }
+
+     flMsModuleMIBCompliances
+						  OBJECT IDENTIFIER ::= { flMsModuleMIBConformance 1 }
+     flMsModuleMIBGroups  OBJECT IDENTIFIER ::= { flMsModuleMIBConformance 2 }
+
+
+	-- compliance statements
+     flMsModuleMIBCompliance MODULE-COMPLIANCE
+              STATUS  current
+              DESCRIPTION
+                      "The compliance statement for flMetroStar entities
+                      which implement the flMsModuleMv MIB."
+			  MODULE FIBROLAN-MIB-METRO-STAR-MV
+				  MANDATORY-GROUPS{ flMsChassisGroup, flMsChassisModulesGroup }
+              MODULE  -- this module
+                  MANDATORY-GROUPS { flMsModuleMvChannelsGroup,
+									 flMsModuleMvLinksGroup, flMsModuleMvLoopbackGroup }
+              ::= { flMsModuleMIBCompliances 1 }
+
+
+     flMsModuleMvChannelsGroup	OBJECT-GROUP
+	        OBJECTS		{ flMsModuleMvChannelIndex }
+            STATUS  current
+            DESCRIPTION
+                    "A collection of objects providing basic
+                    instrumentation of the MetroStar channel entity."
+            ::= { flMsModuleMIBGroups 1 }
+
+    flMsModuleMvLinksGroup	OBJECT-GROUP
+	        OBJECTS		{	flMsModuleMvLinkIndex,
+					flMsModuleMvLinkRemoteDevice,
+					flMsModuleMvLinkRemoteState,
+					flMsModuleMvLinkRestoreDefaults,
+					flMsModuleMvLinkRemoteSerialNumber,		
+					flMsModuleMvLinkRemoteDeviceType,		
+					flMsModuleMvLinkRemoteHwRevision,		
+					flMsModuleMvLinkRemoteFoDescription1,		
+					flMsModuleMvLinkRemoteFoDescription2	}	
+            STATUS  current
+            DESCRIPTION
+                    "A collection of objects providing basic
+                    instrumentation of the MetroStar link entity."
+            ::= { flMsModuleMIBGroups 2 }
+
+    flMsModuleMvLoopbackGroup	OBJECT-GROUP
+	        OBJECTS		{ flMsModuleMvLinkLoopbackTest,
+						  flMsModuleMvLinkLoopbackCountVal,
+						  flMsModuleMvLinkLoopbackTimeVal,
+			              flMsModuleMvLinkLoopbackRun,
+						  flMsModuleMvLinkLoopbackTstRsSnt,
+						  flMsModuleMvLinkLoopbackTstRsRcv,
+			              flMsModuleMvLinkLoopbackTstRsRat }
+            STATUS  current
+            DESCRIPTION
+                    "A collection of objects providing basic
+                    instrumentation of the MetroStar link entity."
+            ::= { flMsModuleMIBGroups 3 }
+		
+
+-- ************************************************************
+-- ************************************************************
+-- FibroLan Object Identifier Definition
+-- ************************************************************
+-- ************************************************************
+
+fibrolan            OBJECT IDENTIFIER ::= { enterprises       4467 }
+
+fibrolanSNMP        OBJECT IDENTIFIER ::= { fibrolan           100 }
+
+flMetroStarMv		OBJECT IDENTIFIER ::=  { fibrolanSNMP      500 }
+
+flMsChassisMv		OBJECT IDENTIFIER ::=  { flMetroStarMv	    10 }
+
+--flMsModuleMv		OBJECT IDENTIFIER ::=  { flMsChassisMv	    30 }
+
+flMsModuleChannelsMv		    OBJECT IDENTIFIER ::= { flMsModuleMv	    10 }
+flMsModuleLinksMv				OBJECT IDENTIFIER ::= { flMsModuleMv	    20 }
+
+
+-- ************************************************************
+-- ************************************************************
+--   Channel table 
+-- ************************************************************
+-- ************************************************************
+     flMsModuleMvChannelTable              OBJECT-TYPE
+         SYNTAX  SEQUENCE OF FlMsModuleMvChannelEntry
+         MAX-ACCESS  not-accessible
+         STATUS  current
+         DESCRIPTION
+         "This table provides the channel's configuration"
+     ::= { flMsModuleChannelsMv  1 }
+
+     flMsModuleMvChannelEntry				OBJECT-TYPE
+         SYNTAX  FlMsModuleMvChannelEntry
+         MAX-ACCESS  not-accessible
+         STATUS  current
+         DESCRIPTION
+         "The entries of the channel table"
+         INDEX { flMsChassisMvIndex,
+				 flMsChassisModuleMvIndex,
+		         flMsModuleMvChannelIndex }
+     ::= { flMsModuleMvChannelTable 1 }
+
+		FlMsModuleMvChannelEntry ::= SEQUENCE
+		{
+			 flMsModuleMvChannelIndex	    INTEGER
+		}
+
+     flMsModuleMvChannelIndex				OBJECT-TYPE
+		 SYNTAX    INTEGER(1..2)
+		 MAX-ACCESS    read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Table index" 
+    ::= { flMsModuleMvChannelEntry  1 }
+
+
+-- ************************************************************
+-- ************************************************************
+--   Link table 
+-- ************************************************************
+-- ************************************************************
+     flMsModuleMvLinkTable              OBJECT-TYPE
+         SYNTAX  SEQUENCE OF FlMsModuleMvLinkEntry
+         MAX-ACCESS  not-accessible
+         STATUS  current
+         DESCRIPTION
+         "This table provides the link's configuration"
+     ::= { flMsModuleLinksMv  1 }
+
+     flMsModuleMvLinkEntry				OBJECT-TYPE
+         SYNTAX  FlMsModuleMvLinkEntry
+         MAX-ACCESS  not-accessible
+         STATUS  current
+         DESCRIPTION
+         "The entries of the link table"
+         INDEX { flMsChassisMvIndex,
+				 flMsChassisModuleMvIndex,
+		         flMsModuleMvLinkIndex }
+     ::= { flMsModuleMvLinkTable 1 }
+
+		FlMsModuleMvLinkEntry ::= SEQUENCE
+		{
+			 flMsModuleMvLinkIndex					INTEGER,
+ 			 flMsModuleMvLinkRemoteDevice				INTEGER,
+			 flMsModuleMvLinkRemoteState				INTEGER,
+			 flMsModuleMvLinkRestoreDefaults			INTEGER, 
+			 flMsModuleMvLinkRemoteSerialNumber			DisplayString,
+			 flMsModuleMvLinkRemoteDeviceType			DisplayString,
+			 flMsModuleMvLinkRemoteHwRevision			DisplayString,
+			 flMsModuleMvLinkRemoteFoDescription1			DisplayString,
+			 flMsModuleMvLinkRemoteFoDescription2			DisplayString
+		}
+
+	 flMsModuleMvLinkIndex				OBJECT-TYPE
+		 SYNTAX    INTEGER(1..5)
+		 MAX-ACCESS    read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Table index" 
+    ::= { flMsModuleMvLinkEntry  1 }
+
+	 flMsModuleMvLinkRemoteDevice           OBJECT-TYPE
+		 SYNTAX    INTEGER	{
+								none-ma-attached	 (9999),
+								hcon-ma					(1),
+								scon1ma					(2),
+								fcon1ma					(3),
+								lta41ma					(4),
+								gsm1000ma				(5),
+								gsm1010ma				(6),
+								lta41-1e1				(7),
+								lta41-2e1				(8),
+								atara100				(9),
+								atara1000				(10),
+								fcon1f					(11),
+								atara1000rm				(12),
+								gsm1000x				(13),
+								lta41-1t1				(14),
+								lta41-2t1				(15),
+								lta41-4e1				(16),
+								lta41-4t1				(17)
+							}
+		 MAX-ACCESS    read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Channel remote MA device (if present)" 
+	 ::= { flMsModuleMvLinkEntry  2 }
+
+	 flMsModuleMvLinkRemoteState          OBJECT-TYPE
+		 SYNTAX    INTEGER	{
+								none		(1),
+								ok			(2),
+								powerFail	(3)
+							}
+		 MAX-ACCESS    read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Channel remote MA device state (if present)" 
+	 ::= { flMsModuleMvLinkEntry  3 }
+
+	 flMsModuleMvLinkRestoreDefaults   OBJECT-TYPE
+         SYNTAX  INTEGER   {
+								normal		(1),
+								restore		(2)
+						   } 
+         MAX-ACCESS    read-write
+         STATUS    current
+         DESCRIPTION
+         "Restore the link's defaults configuration"
+	 ::= { flMsModuleMvLinkEntry  4 }
+
+	flMsModuleMvLinkRemoteSerialNumber		      OBJECT-TYPE
+		 SYNTAX    DisplayString 
+		 MAX-ACCESS    read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "The remote device's serial number" 
+     ::= { flMsModuleMvLinkEntry  5 }
+
+	flMsModuleMvLinkRemoteDeviceType		      OBJECT-TYPE
+		 SYNTAX    DisplayString 
+		 MAX-ACCESS    read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "The remote device's type full name (including derivative)" 
+     ::= { flMsModuleMvLinkEntry  6 }
+
+	flMsModuleMvLinkRemoteHwRevision		      OBJECT-TYPE
+		 SYNTAX    DisplayString 
+		 MAX-ACCESS    read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "The remote device's HW revision (complete info)" 
+     ::= { flMsModuleMvLinkEntry  7 }
+
+	flMsModuleMvLinkRemoteFoDescription1		      OBJECT-TYPE
+		 SYNTAX    DisplayString 
+		 MAX-ACCESS    read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "The module's FO I/F 1 description (if applicable)" 
+     ::= { flMsModuleMvLinkEntry  8 }
+
+	flMsModuleMvLinkRemoteFoDescription2		      OBJECT-TYPE
+		 SYNTAX    DisplayString 
+		 MAX-ACCESS    read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "The module's FO I/F 2 description (if applicable)" 
+     ::= { flMsModuleMvLinkEntry  9 }
+
+
+-- ************************************************************
+-- ************************************************************
+--   Loopback table 
+-- ************************************************************
+-- ************************************************************
+     flMsModuleMvLoopbackTable              OBJECT-TYPE
+         SYNTAX  SEQUENCE OF FlMsModuleMvLoopbackEntry
+         MAX-ACCESS  not-accessible
+         STATUS  current
+         DESCRIPTION
+         "This table provides the link's configuration"
+     ::= { flMsModuleLinksMv  2 }
+
+     flMsModuleMvLoopbackEntry				OBJECT-TYPE
+         SYNTAX  FlMsModuleMvLoopbackEntry
+         MAX-ACCESS  not-accessible
+         STATUS  current
+         DESCRIPTION
+         "The entries of the link table"
+         INDEX { flMsChassisMvIndex,
+				 flMsChassisModuleMvIndex,
+		         flMsModuleMvLinkIndex }
+     ::= { flMsModuleMvLoopbackTable 1 }
+
+		FlMsModuleMvLoopbackEntry ::= SEQUENCE
+		{
+			 flMsModuleMvLinkLoopbackTest			INTEGER,
+			 flMsModuleMvLinkLoopbackCountVal  		INTEGER,
+			 flMsModuleMvLinkLoopbackTimeVal		INTEGER,
+			 flMsModuleMvLinkLoopbackRun			INTEGER,
+			 flMsModuleMvLinkLoopbackTstRsSnt		Integer32,
+			 flMsModuleMvLinkLoopbackTstRsRcv		Integer32,
+			 flMsModuleMvLinkLoopbackTstRsRat		Integer32
+		}
+
+
+	flMsModuleMvLinkLoopbackTest     OBJECT-TYPE
+         SYNTAX  INTEGER {
+							autoSingle    (1),
+							autoMultiple  (2),
+							manFrameCount (3),
+							manTimed	  (4)
+                         }
+         MAX-ACCESS    read-write
+         STATUS    current
+         DESCRIPTION
+         "Activate MA channel loopback test"
+	 ::= { flMsModuleMvLoopbackEntry  1 }
+
+     flMsModuleMvLinkLoopbackCountVal		OBJECT-TYPE
+         SYNTAX  INTEGER (1..10000)
+         MAX-ACCESS    read-write
+         STATUS    current
+         DESCRIPTION
+         "Set the frame count parameter value for the manual test"
+	 ::= { flMsModuleMvLoopbackEntry  2 }
+
+     flMsModuleMvLinkLoopbackTimeVal		OBJECT-TYPE
+         SYNTAX  INTEGER (1..30)
+         MAX-ACCESS    read-write
+         STATUS    current
+         DESCRIPTION
+         "Set the time (in secs) parameter value for the manual test"
+	 ::= { flMsModuleMvLoopbackEntry  3 }
+
+	flMsModuleMvLinkLoopbackRun     OBJECT-TYPE
+         SYNTAX  INTEGER {
+                           stanby	(1),
+						   run		(2)
+                         }
+         MAX-ACCESS    read-write
+         STATUS    current
+         DESCRIPTION
+         "Run loopback test"
+	 ::= { flMsModuleMvLoopbackEntry  4 }
+
+     flMsModuleMvLinkLoopbackTstRsSnt			OBJECT-TYPE
+         SYNTAX  Integer32 
+         MAX-ACCESS    read-only
+         STATUS    current
+         DESCRIPTION
+         "MA channel loopback test result - frames sent"
+	 ::= { flMsModuleMvLoopbackEntry  5 }
+
+     flMsModuleMvLinkLoopbackTstRsRcv			OBJECT-TYPE
+         SYNTAX  Integer32 
+         MAX-ACCESS    read-only
+         STATUS    current
+         DESCRIPTION
+         "MA channel loopback test result - frames received"
+	 ::= { flMsModuleMvLoopbackEntry  6 }
+
+     flMsModuleMvLinkLoopbackTstRsRat			OBJECT-TYPE
+         SYNTAX  Integer32 
+         MAX-ACCESS    read-only
+         STATUS    current
+         DESCRIPTION
+         "MA channel loopback test result - success rate (in percent)"
+	 ::= { flMsModuleMvLoopbackEntry  7 }
+
+
+END
+
+

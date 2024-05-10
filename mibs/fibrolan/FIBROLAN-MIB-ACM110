@@ -1,0 +1,2231 @@
+--  ===================================================================================
+--  File	      : FIBROLAN-MIB-ACM110.mib
+--  Description       : Private MIB file for FibroLAN MetroStar I system - ACM110-12/14
+--  By                : Shamir Stein
+--  MIB Version       : 1.1
+--  MetroStar Version : 1.6.2/build 12
+--  Date              : March 27, 2008
+--  ===================================================================================
+--
+--
+-- Copyright Fibrolan, 2008. All rights reserved.
+--
+-- Reproduction of this document is authorized on condition that this
+-- copyright notice is included.
+--
+FIBROLAN-MIB-ACM110		   DEFINITIONS ::= BEGIN
+
+	 IMPORTS
+		enterprises, OBJECT-TYPE, MODULE-IDENTITY		  FROM SNMPv2-SMI 
+		DisplayString						              FROM SNMPv2-TC --FROM RFC1213-MIB
+		MODULE-COMPLIANCE, OBJECT-GROUP					  FROM SNMPv2-CONF
+		flMsChassisMvIndex, flMsChassisModuleMvIndex	  FROM FIBROLAN-MIB-METRO-STAR-MV
+		Counter											  FROM RFC1155-SMI;
+
+
+  flAcm110Mv  MODULE-IDENTITY
+       LAST-UPDATED "0803270000Z"  
+       ORGANIZATION "Fibrolan ltd"
+       CONTACT-INFO
+         "http://www.fibrolan.com"
+       DESCRIPTION
+         "The MIB module to describe MCM1XX interface objects.
+          Copyright (C) Fibrolan Ltd (2008)."
+	::= { enterprises 4467 100 500 10 30 120}
+
+
+    -- conformance information
+     flAcm110MIBConformance
+                   OBJECT IDENTIFIER ::= { flAcm110Mv  1 }
+
+     flAcm110MIBCompliances		OBJECT IDENTIFIER ::= { flAcm110MIBConformance 1 }
+     flAcm110MIBGroups			OBJECT IDENTIFIER ::= { flAcm110MIBConformance 2 }
+
+
+	-- compliance statements
+     flAcm110MIBCompliance MODULE-COMPLIANCE
+              STATUS  current
+              DESCRIPTION
+                      "The compliance statement for flMetroStar entities
+                      which implement the flAcm110Mv MIB."
+			  MODULE FIBROLAN-MIB-METRO-STAR-MV
+				  MANDATORY-GROUPS{ flMsChassisGroup, flMsChassisModulesGroup }
+              MODULE  -- this module
+                  MANDATORY-GROUPS { flAcm110MvGlobalGroup,
+									 flAcm110MvPortsGroup, 
+									 flAcm110MvVlansDefGroup,
+									 flAcm110MvVlansTableGroup,
+									 flAcm110MvVlansPortsGroup,
+									 flAcm110MvPrioritiesConfigGroup,
+									 flAcm110MvPriorityDscpGroup,
+									 flAcm110MvPortPriorityTableGroup,
+									 flAcm110MvGlobalMacsGroup,
+									 flAcm110MvDynamicMacsGroup,
+									 flAcm110MvStaticMacsGroup,
+									 flAcm110MvRxErrStatisticsGroup,
+									 flAcm110MvRxGoodStatisticsGroup,
+									 flAcm110MvTxGoodStatisticsGroup,
+									 flAcm110MvRxTotalStatisticsGroup,
+									 flAcm110MvTxTotalStatisticsGroup,
+									 flAcm110MvTxCollisionStatisticsGroup }
+              ::= { flAcm110MIBCompliances 1 }
+
+
+     flAcm110MvGlobalGroup	OBJECT-GROUP
+	        OBJECTS		{ flAcm110MvGlobalConfigIndex,
+						  flAcm110MvGlobalBufferShare,
+			              flAcm110MvGlobalMulticastProtect,
+             			  flAcm110MvGlobalBroadcastRate,
+			              flAcm110MvGlobalMaxPacketSize,
+			              flAcm110MvGlobalSleLogic,
+			              flAcm110MvGlobalSlePort1,
+			              flAcm110MvGlobalSlePort2,
+			              flAcm110MvGlobalSlePort3, --for acm110-14 only
+			              flAcm110MvGlobalSlePort4 } --for acm110-14 only
+            STATUS  current
+            DESCRIPTION
+                    "A collection of objects providing basic
+                    instrumentation of the MetroStar ACM110-12/14 module entity."
+            ::= { flAcm110MIBGroups 1 }
+
+     flAcm110MvPortsGroup	OBJECT-GROUP
+	        OBJECTS		{ flAcm110MvPortNumber,
+				          flAcm110MvPortType,
+			              flAcm110MvPortLink,
+						  flAcm110MvPortDescription,
+						  flAcm110MvPortAutoNego,
+				          flAcm110MvPortDuplex,
+						  flAcm110MvPortDatarate,
+						  flAcm110MvPortEnabled,
+						  flAcm110MvPortAutoCross,
+					      flAcm110MvPortMdix,
+						  flAcm110MvPortFef,
+						  flAcm110MvPortReset,
+						  flAcm110MvPortBroadcastProtect }
+            STATUS  current
+            DESCRIPTION
+                    "A collection of objects providing basic
+                    instrumentation of the MetroStar ACM110-12/14 vlan."
+            ::= { flAcm110MIBGroups 2 }
+
+     flAcm110MvVlansDefGroup	OBJECT-GROUP
+	        OBJECTS		{ flAcm110MvVlanConfigIndex,
+						  flAcm110MvVlan8021q,
+			              flAcm110MvVlanNullVidReplace,
+			              flAcm110MvCreateDefaultVlans,
+			              flAcm110MvDeleteAllVlans }
+            STATUS  current
+            DESCRIPTION
+                    "A collection of objects providing basic
+                    instrumentation of the MetroStar ACM110-12/14 vlans config."
+            ::= { flAcm110MIBGroups 3 }
+
+     flAcm110MvVlansTableGroup	OBJECT-GROUP
+	        OBJECTS		{ flAcm110MvVlanFid,
+						  flAcm110MvVlanVid,
+ 			              flAcm110MvVlanName,
+			              flAcm110MvVlanPort1Member,
+			              flAcm110MvVlanPort2Member,
+			              flAcm110MvVlanPort3Member,
+			              flAcm110MvVlanPort4Member, --only in acm110-14
+ 			              flAcm110MvVlanPort5Member, --only in acm110-14
+ 			              flAcm110MvVlanTableStatus }
+            STATUS  current
+            DESCRIPTION
+                    "A collection of objects providing basic
+                    instrumentation of the MetroStar ACM110-12/14 vlans table."
+            ::= { flAcm110MIBGroups 4 }
+
+     flAcm110MvVlansPortsGroup	OBJECT-GROUP
+	        OBJECTS		{ flAcm110MvPortIngressFilter,
+						  flAcm110MvPortTagInsertion,
+			              flAcm110MvPortTagRemoval,
+			              flAcm110MvPortVid,
+			              flAcm110MvPortDiscardNonPvid }
+            STATUS  current
+            DESCRIPTION
+                    "A collection of objects providing basic
+                    instrumentation of the MetroStar ACM110-12/14 vlans table ports."
+            ::= { flAcm110MIBGroups 5 }
+
+     flAcm110MvPrioritiesConfigGroup	OBJECT-GROUP
+	        OBJECTS		{ flAcm110MvPriorityIndex,
+						  flAcm110Mv8021pBase,
+		                  flAcm110MvPriorityRatio }
+            STATUS  current
+            DESCRIPTION
+                    "A collection of objects providing basic
+                    instrumentation of the MetroStar ACM110-12/14 priority config."
+            ::= { flAcm110MIBGroups 6 }
+
+    flAcm110MvPriorityDscpGroup   OBJECT-GROUP
+	        OBJECTS		{ flAcm110MvDscpCode,
+						  flAcm110MvDscpCodePriority }
+            STATUS  current
+            DESCRIPTION
+                    "A collection of objects providing basic
+                    instrumentation of the MetroStar ACM110-12/14 DSCP priority table."
+            ::= { flAcm110MIBGroups 7 }
+
+    flAcm110MvPortPriorityTableGroup   OBJECT-GROUP
+	        OBJECTS		{ flAcm110MvPortPriority,
+						  flAcm110MvPort8021pClassific,
+						  flAcm110MvPortDiffServClassific,
+						  flAcm110MvPortUserPriority }
+            STATUS  current
+            DESCRIPTION
+                    "A collection of objects providing basic
+                    instrumentation of the MetroStar ACM110-12/14 ports priority table."
+            ::= { flAcm110MIBGroups 8 }
+
+
+    flAcm110MvGlobalMacsGroup   OBJECT-GROUP
+	        OBJECTS		{ flAcm110MvGlobalMacIndex,
+						  flAcm110MvClearDynamicMacTable,
+						  flAcm110MvClearStaticMacTable }
+            STATUS  current
+            DESCRIPTION
+                    "A collection of objects providing basic
+                    instrumentation of the MetroStar ACM110-12/14 global MAC address definitions."
+            ::= { flAcm110MIBGroups 9 }
+
+    flAcm110MvDynamicMacsGroup   OBJECT-GROUP
+	        OBJECTS		{ flAcm110MvDynamicEntryNumber,
+						  flAcm110MvDynamicMacAddress,
+						  flAcm110MvDynamicSrcPort,
+						  flAcm110MvDynamicFid }
+            STATUS  current
+            DESCRIPTION
+                    "A collection of objects providing basic
+                    instrumentation of the MetroStar ACM110-12/14 dynamic MAC address table."
+            ::= { flAcm110MIBGroups 10 }
+
+    flAcm110MvStaticMacsGroup   OBJECT-GROUP
+	        OBJECTS		{ flAcm110MvStaticEntryNumber,
+						  flAcm110MvStaticMacAddress,
+						  flAcm110MvFwdPort1,
+						  flAcm110MvFwdPort2,
+						  flAcm110MvFwdPort3,
+						  flAcm110MvFwdPort4,
+						  flAcm110MvFwdPort5,
+						  flAcm110MvFid,
+						  flAcm110MvStaticUseFid,
+						  flAcm110MvStaticTableStatus }
+            STATUS  current
+            DESCRIPTION
+                    "A collection of objects providing basic
+                    instrumentation of the MetroStar ACM110-12/14 static MAC address table."
+            ::= { flAcm110MIBGroups 11 }
+
+    flAcm110MvRxErrStatisticsGroup   OBJECT-GROUP
+	        OBJECTS		{ flAcm110MvRxUndersizePckt,
+						  flAcm110MvRxFragmentPckt,
+						  flAcm110MvRxOversizePckt,
+						  flAcm110MvRxCrcErrorPckt,
+						  flAcm110MvRxAlignmentErrorPckt,
+						  flAcm110MvRxRefreshCounters,
+						  flAcm110MvRxClearCounters }
+            STATUS  current
+            DESCRIPTION
+                    "A collection of objects providing basic
+                    instrumentation of the MetroStar ACM110-12/14 Rx error packets."
+            ::= { flAcm110MIBGroups 12 }
+
+    flAcm110MvRxGoodStatisticsGroup   OBJECT-GROUP
+	        OBJECTS		{ flAcm110MvRxUnicastPackets,
+						  flAcm110MvRxMulticastPackets,
+			              flAcm110MvRxBroadcastPackets,
+			              flAcm110MvRxMacControlPackets,
+			              flAcm110MvRxPausePackets,
+			              flAcm110MvRxGoodRefreshCounters,
+			              flAcm110MvRxGoodClearCounters }
+            STATUS  current
+            DESCRIPTION
+                    "A collection of objects providing basic
+                    instrumentation of the MetroStar ACM110-12/14 Rx good packets."
+            ::= { flAcm110MIBGroups 13 }
+
+    flAcm110MvTxGoodStatisticsGroup   OBJECT-GROUP
+	        OBJECTS		{ flAcm110MvTxUnicastPackets,
+						  flAcm110MvTxMulticastPackets,
+			              flAcm110MvTxBroadcastPackets,
+			              flAcm110MvTxPausePackets,
+			              flAcm110MvTxGoodRefreshCounters,
+			              flAcm110MvTxGoodClearCounters }
+            STATUS  current
+            DESCRIPTION
+                    "A collection of objects providing basic
+                    instrumentation of the MetroStar ACM110-12/14 Tx good packets."
+            ::= { flAcm110MIBGroups 14 }
+
+    flAcm110MvRxTotalStatisticsGroup   OBJECT-GROUP
+	        OBJECTS		{ flAcm110MvRxDroppedPackets,
+			              flAcm110MvRx64BytesPackets,
+			              flAcm110MvRx65-127BytesPackets,
+			              flAcm110MvRx128-255BytesPackets,
+			              flAcm110MvRx256-511BytesPackets,
+			              flAcm110MvRx512-1023BytesPackets,
+			              flAcm110MvRx1024-MaxBytesPackets,
+			              flAcm110MvRxTotalRefreshCounters,
+			              flAcm110MvRxTotalClearCounters }
+            STATUS  current
+            DESCRIPTION
+                    "A collection of objects providing basic
+                    instrumentation of the MetroStar ACM110-12/14 Rx total packets."
+            ::= { flAcm110MIBGroups 15 }
+
+    flAcm110MvTxTotalStatisticsGroup   OBJECT-GROUP
+	        OBJECTS		{ flAcm110MvTxDroppedPackets,
+						  flAcm110MvTxTotalRefreshCounters,
+						  flAcm110MvTxTotalClearCounters }
+            STATUS  current
+            DESCRIPTION
+                    "A collection of objects providing basic
+                    instrumentation of the MetroStar ACM110-12/14 Tx total packets."
+            ::= { flAcm110MIBGroups 16 }
+
+    flAcm110MvTxCollisionStatisticsGroup   OBJECT-GROUP
+	        OBJECTS		{ flAcm110MvTxTotalCols,
+						  flAcm110MvTxLateCols,
+						  flAcm110MvTxExcessiveCols,
+						  flAcm110MvTxSingleCols,
+						  flAcm110MvTxMultipleCols,
+						  flAcm110MvTxColRefreshCounters,
+						  flAcm110MvTxColClearCounters }
+            STATUS  current
+            DESCRIPTION
+                    "A collection of objects providing basic
+                    instrumentation of the MetroStar ACM110-12/14 Tx collisons."
+            ::= { flAcm110MIBGroups 17 }
+
+
+-- ************************************************************
+-- ************************************************************
+-- FibroLan Object Identifier Definition
+-- ************************************************************
+-- ************************************************************
+
+fibrolan            OBJECT IDENTIFIER ::= { enterprises       4467 }
+
+fibrolanSNMP        OBJECT IDENTIFIER ::= { fibrolan           100 }
+
+flMetroStarMv 		OBJECT IDENTIFIER ::=  { fibrolanSNMP      500 }
+
+flMsChassisMv		OBJECT IDENTIFIER ::=  { flMetroStarMv	    10 }
+
+flMsModuleMv		OBJECT IDENTIFIER ::=  { flMsChassisMv	    30 }
+
+--flAcm110Mv			OBJECT IDENTIFIER ::=  { flMsModuleMv      120 }
+
+
+flAcm110MvGlobal			OBJECT IDENTIFIER ::= { flAcm110Mv	    10 }
+flAcm110MvPorts				OBJECT IDENTIFIER ::= { flAcm110Mv	    20 }
+flAcm110MvVlan			    OBJECT IDENTIFIER ::= { flAcm110Mv	    30 }
+flAcm110MvPriority		    OBJECT IDENTIFIER ::= { flAcm110Mv	    40 }
+flAcm110MvMac			    OBJECT IDENTIFIER ::= { flAcm110Mv	    50 }
+flAcm110MvStatistics		OBJECT IDENTIFIER ::= { flAcm110Mv	    60 }
+
+
+-- ************************************************************
+-- ************************************************************
+
+
+      EntryStatus ::= INTEGER
+                       { 
+						 valid(1),
+                         createRequest(2),
+                         underCreation(3),
+                         invalid(4)
+                       }
+
+
+-- ************************************************************
+-- ************************************************************
+
+-- ************************************************************
+-- ************************************************************
+-- ************************************************************
+-- Global device configuration group
+-- ************************************************************
+-- ************************************************************
+-- ************************************************************
+     flAcm110MvGlobalConfigTable               OBJECT-TYPE
+         SYNTAX  SEQUENCE OF FlAcm110MvGlobalConfigEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "This table provides the device's global configuration"
+     ::= { flAcm110MvGlobal 1 }
+
+     flAcm110MvGlobalConfigEntry				OBJECT-TYPE
+         SYNTAX  FlAcm110MvGlobalConfigEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "The entries of the table"
+         INDEX { flMsChassisMvIndex, 
+		         flMsChassisModuleMvIndex,
+  				 flAcm110MvGlobalConfigIndex }
+     ::= { flAcm110MvGlobalConfigTable 1 }
+
+
+		FlAcm110MvGlobalConfigEntry ::= SEQUENCE
+		{
+			 flAcm110MvGlobalConfigIndex			INTEGER,
+			 flAcm110MvGlobalBufferShare			INTEGER,
+			 flAcm110MvGlobalMulticastProtect		INTEGER,
+			 flAcm110MvGlobalBroadcastRate			INTEGER,
+			 flAcm110MvGlobalMaxPacketSize			INTEGER,
+			 flAcm110MvGlobalSleLogic				INTEGER,
+			 flAcm110MvGlobalSlePort1				INTEGER,
+			 flAcm110MvGlobalSlePort2				INTEGER,
+			 flAcm110MvGlobalSlePort3				INTEGER, --for acm110-14 only
+			 flAcm110MvGlobalSlePort4				INTEGER  --for acm110-14 only
+		}
+
+     flAcm110MvGlobalConfigIndex				OBJECT-TYPE
+		 SYNTAX    INTEGER (1..10)
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Table index" 
+	 ::= { flAcm110MvGlobalConfigEntry 1 }
+
+     flAcm110MvGlobalBufferShare				OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								off		(1),
+								on		(2)
+						   }
+         MAX-ACCESS     read-write
+         STATUS    current
+         DESCRIPTION
+         "Buffer pool sharing mode"
+	 ::= { flAcm110MvGlobalConfigEntry 2 }
+
+     flAcm110MvGlobalMulticastProtect			OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								off		(1),
+								on		(2)
+						   }
+         MAX-ACCESS     read-write
+         STATUS    current
+         DESCRIPTION
+         "Multicast storm protection mode"
+	 ::= { flAcm110MvGlobalConfigEntry 3 }
+
+     flAcm110MvGlobalBroadcastRate			OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								pct5		(1),
+								pct10		(2),
+								pct15		(3),
+								pct20		(4),
+								pct25		(5)
+						   }
+         MAX-ACCESS     read-write
+         STATUS    current
+         DESCRIPTION
+         "Broadcast storm protection rate in percents"
+	 ::= { flAcm110MvGlobalConfigEntry 4 }
+
+     flAcm110MvGlobalMaxPacketSize			OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								bytes1522		(1),
+								bytes1536		(2),
+								bytes1916		(3)
+						   }
+         MAX-ACCESS     read-write
+         STATUS    current
+         DESCRIPTION
+         "Maximum allowed receive packet size in bytes"
+	 ::= { flAcm110MvGlobalConfigEntry 5 }
+
+     flAcm110MvGlobalSleLogic				OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								or		(1),
+								and		(2)
+						   }
+         MAX-ACCESS     read-write
+         STATUS    current
+         DESCRIPTION
+         "SLE logic function: 'AND' or 'OR'"
+	 ::= { flAcm110MvGlobalConfigEntry 6 }
+
+     flAcm110MvGlobalSlePort1				OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								off		(1),
+								on		(2)
+						   }
+         MAX-ACCESS     read-write
+         STATUS    current
+         DESCRIPTION
+         "FO port 1 participation in the SLE function"
+	 ::= { flAcm110MvGlobalConfigEntry 7 }
+
+     flAcm110MvGlobalSlePort2				OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								off		(1),
+								on		(2)
+						   }
+         MAX-ACCESS     read-write
+         STATUS    current
+         DESCRIPTION
+         "FO port 2 participation in the SLE function"
+	 ::= { flAcm110MvGlobalConfigEntry 8 }
+
+     flAcm110MvGlobalSlePort3				OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								off		(1),
+								on		(2)
+						   }
+         MAX-ACCESS     read-write
+         STATUS    current
+         DESCRIPTION
+         "FO port 2 participation in the SLE function"
+	 ::= { flAcm110MvGlobalConfigEntry 9 }
+
+     flAcm110MvGlobalSlePort4				OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								off		(1),
+								on		(2)
+						   }
+         MAX-ACCESS     read-write
+         STATUS    current
+         DESCRIPTION
+         "FO port 2 participation in the SLE function"
+	 ::= { flAcm110MvGlobalConfigEntry 10 }
+
+
+-- ************************************************************
+-- ************************************************************
+-- ************************************************************
+-- Device's ports configuration group
+-- ************************************************************
+-- ************************************************************
+-- ************************************************************
+
+-- ************************************************************
+-- Port configuration table
+-- ************************************************************
+
+	 flAcm110MvPortConfigTable               OBJECT-TYPE
+         SYNTAX  SEQUENCE OF FlAcm110MvPortConfigEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "This table provides the ports' basic configuration"
+     ::= { flAcm110MvPorts 1 }
+
+     flAcm110MvPortConfigEntry				OBJECT-TYPE
+         SYNTAX  FlAcm110MvPortConfigEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "The entries of the table"
+         INDEX { flMsChassisMvIndex,
+				 flMsChassisModuleMvIndex,
+				 flAcm110MvPortNumber }
+     ::= { flAcm110MvPortConfigTable 1 }
+
+		FlAcm110MvPortConfigEntry ::= SEQUENCE
+		{
+			 flAcm110MvPortNumber				INTEGER,
+			 flAcm110MvPortType					INTEGER,
+			 flAcm110MvPortLink					INTEGER,
+--			 flAcm110MvRemoteDeviceType			DisplayString,
+--			 flAcm110MvRemoteDeviceState		INTEGER,     
+			 flAcm110MvPortDescription			DisplayString,
+			 flAcm110MvPortAutoNego				INTEGER,
+			 flAcm110MvPortDuplex				INTEGER,
+			 flAcm110MvPortDatarate				INTEGER,
+			 flAcm110MvPortEnabled				INTEGER,
+			 flAcm110MvPortAutoCross			INTEGER,
+			 flAcm110MvPortMdix					INTEGER,
+			 flAcm110MvPortFef					INTEGER,
+			 flAcm110MvPortReset				INTEGER,
+			 flAcm110MvPortBroadcastProtect		INTEGER
+		}
+
+
+	 flAcm110MvPortNumber				OBJECT-TYPE
+		 SYNTAX    INTEGER (1..5)
+		 MAX-ACCESS     read-only
+         STATUS    current
+        DESCRIPTION
+         "Port number"
+	 ::= { flAcm110MvPortConfigEntry 1 }
+
+     flAcm110MvPortType				OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								tp		(1),
+								fo		(2),
+								other	(9999)
+						   }
+         MAX-ACCESS     read-only
+         STATUS    current
+         DESCRIPTION
+         "Port type"
+	 ::= { flAcm110MvPortConfigEntry  2 }
+
+     flAcm110MvPortLink				OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								off		(1),
+								on		(2),
+								kld     (3)
+						   }
+         MAX-ACCESS     read-only
+         STATUS    current
+         DESCRIPTION
+         "Port's link status"
+	 ::= { flAcm110MvPortConfigEntry  3 }
+
+     flAcm110MvPortDescription			OBJECT-TYPE
+		 SYNTAX    DisplayString
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Port's textual description - up to 40 characters" 
+	 ::= { flAcm110MvPortConfigEntry  4 }
+
+     flAcm110MvPortAutoNego				OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								disabled		(1),
+								enabled			(2)
+						   }
+         MAX-ACCESS     read-write
+         STATUS    current
+         DESCRIPTION
+         "Port's Auto-Negotiation mode"
+	 ::= { flAcm110MvPortConfigEntry  5 }
+
+     flAcm110MvPortDuplex				OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								hdx		(1),
+								fdx		(2),
+								n-a		(3)
+						   }
+         MAX-ACCESS     read-write
+         STATUS    current
+         DESCRIPTION
+         "Port's duplex mode"
+	 ::= { flAcm110MvPortConfigEntry  6 }
+
+     flAcm110MvPortDatarate				OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								m10		(1),
+								m100	(2),
+								n-a		(3)
+						   }
+         MAX-ACCESS     read-write
+         STATUS    current
+         DESCRIPTION
+         "Port's data rate mode - 10/100Mbps"
+	 ::= { flAcm110MvPortConfigEntry  7 }
+
+     flAcm110MvPortEnabled				OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								disabled		(1),
+								enabled			(2)
+						   }
+         MAX-ACCESS     read-write
+         STATUS    current
+         DESCRIPTION
+         "Port enabling or disabling"
+	 ::= { flAcm110MvPortConfigEntry  8 }
+
+     flAcm110MvPortAutoCross				OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								off		(1),
+								on		(2)
+						   }
+         MAX-ACCESS     read-write
+         STATUS    current
+         DESCRIPTION
+         "Port's Auto-cross mode"
+	 ::= { flAcm110MvPortConfigEntry  9 }
+
+     flAcm110MvPortMdix				OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								mdi		(1),
+								mdix	(2)
+						   }
+         MAX-ACCESS     read-write
+         STATUS    current
+         DESCRIPTION
+         "Port's MDI mode - MDI or MDIX"
+	 ::= { flAcm110MvPortConfigEntry  10 }
+
+     flAcm110MvPortFef				OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								off		(1),
+								on		(2)
+						   }
+         MAX-ACCESS     read-write
+         STATUS    current
+         DESCRIPTION
+         "Port's FEF mode (only FO)"
+	 ::= { flAcm110MvPortConfigEntry 11 }
+
+     flAcm110MvPortReset				OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								normal		(1),
+								reset		(2)
+						   }
+         MAX-ACCESS     read-write
+         STATUS    current
+         DESCRIPTION
+         "Port's reset"
+	 ::= { flAcm110MvPortConfigEntry  12 }
+
+     flAcm110MvPortBroadcastProtect				OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								off		(1),
+								on		(2)
+						   }
+         MAX-ACCESS     read-write
+         STATUS    current
+         DESCRIPTION
+         "Port's broadcast storm protection mode"
+	 ::= { flAcm110MvPortConfigEntry  13 }
+
+
+-- ************************************************************
+-- ************************************************************
+-- Port bandwidth configuration table
+-- ************************************************************
+-- ************************************************************
+
+	 flAcm110MvPortBwConfigTable               OBJECT-TYPE
+         SYNTAX  SEQUENCE OF FlAcm110MvPortBwConfigEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "This table provides the ports' bandwidth configuration"
+     ::= { flAcm110MvPorts 2 }
+
+     flAcm110MvPortBwConfigEntry				OBJECT-TYPE
+         SYNTAX  FlAcm110MvPortBwConfigEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "The entries of the table"
+         INDEX { flMsChassisMvIndex,
+				 flMsChassisModuleMvIndex,
+				 flAcm110MvPortNumber }
+     ::= { flAcm110MvPortBwConfigTable 1 }
+
+		FlAcm110MvPortBwConfigEntry ::= SEQUENCE
+		{
+			 flAcm110MvPortRxHighBw				INTEGER,
+			 flAcm110MvPortTxHighBw				INTEGER,
+			 flAcm110MvPortRxLowBw				INTEGER,
+			 flAcm110MvPortTxLowBw				INTEGER,
+			 flAcm110MvPortRxDiffBw				INTEGER,
+			 flAcm110MvPortRxHighFlowControl	INTEGER,
+			 flAcm110MvPortRxLowFlowControl		INTEGER,
+			 flAcm110MvPortTxDiffBw				INTEGER
+		}
+
+
+     flAcm110MvPortRxHighBw			OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								k256		(129),
+								k512		(130),
+								m01			(1),
+								m02			(2),
+								m03			(3),
+								m04			(4),
+								m05			(5),
+								m06			(6),
+								m07			(7),
+								m08			(8),
+								m09			(9),
+								m10			(10),
+								m20			(20),
+								m30			(30),
+								m40			(40),
+								m50			(50),
+								m60			(60),
+								m70			(70),
+								m80			(80),
+								m90			(90),
+								m100		(100)
+						   }
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Port's receive high priority bandwidth" 
+	 ::= { flAcm110MvPortBwConfigEntry 1 }
+
+     flAcm110MvPortTxHighBw			OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								k256		(129),
+								k512		(130),
+								m01			(1),
+								m02			(2),
+								m03			(3),
+								m04			(4),
+								m05			(5),
+								m06			(6),
+								m07			(7),
+								m08			(8),
+								m09			(9),
+								m10			(10),
+								m20			(20),
+								m30			(30),
+								m40			(40),
+								m50			(50),
+								m60			(60),
+								m70			(70),
+								m80			(80),
+								m90			(90),
+								m100		(100)
+						   }
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Port's transmit high priority bandwidth" 
+	 ::= { flAcm110MvPortBwConfigEntry 2 }
+
+     flAcm110MvPortRxLowBw			OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								k256		(129),
+								k512		(130),
+								m01			(1),
+								m02			(2),
+								m03			(3),
+								m04			(4),
+								m05			(5),
+								m06			(6),
+								m07			(7),
+								m08			(8),
+								m09			(9),
+								m10			(10),
+								m20			(20),
+								m30			(30),
+								m40			(40),
+								m50			(50),
+								m60			(60),
+								m70			(70),
+								m80			(80),
+								m90			(90),
+								m100		(100)
+						   }
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Port's receive low priority bandwidth" 
+	 ::= { flAcm110MvPortBwConfigEntry 3 }
+
+     flAcm110MvPortTxLowBw			OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								k256		(129),
+								k512		(130),
+								m01			(1),
+								m02			(2),
+								m03			(3),
+								m04			(4),
+								m05			(5),
+								m06			(6),
+								m07			(7),
+								m08			(8),
+								m09			(9),
+								m10			(10),
+								m20			(20),
+								m30			(30),
+								m40			(40),
+								m50			(50),
+								m60			(60),
+								m70			(70),
+								m80			(80),
+								m90			(90),
+								m100		(100)
+						   }
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Port's transmit low priority bandwidth" 
+	 ::= { flAcm110MvPortBwConfigEntry 4 }
+
+     flAcm110MvPortRxDiffBw			OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								off			(1),
+								on			(2)
+						   }
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Port's differential (priority) receive bandwidth mode" 
+	 ::= { flAcm110MvPortBwConfigEntry 5 }
+
+     flAcm110MvPortRxHighFlowControl			OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								off			(1),
+								on			(2)
+						   }
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Port's high priority receive flow control mode" 
+	 ::= { flAcm110MvPortBwConfigEntry 6 }
+
+     flAcm110MvPortRxLowFlowControl			OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								off			(1),
+								on			(2)
+						   }
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Port's low priority receive flow control mode" 
+	 ::= { flAcm110MvPortBwConfigEntry 7 }
+
+     flAcm110MvPortTxDiffBw			OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								off			(1),
+								on			(2)
+						   }
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Port's differential (priority) transmit bandwidth mode" 
+	 ::= { flAcm110MvPortBwConfigEntry 8 }
+
+
+-- ************************************************************
+-- ************************************************************
+-- ************************************************************
+-- Device's VLAN configuration table
+-- ************************************************************
+-- ************************************************************
+-- ************************************************************
+
+
+	 flAcm110MvGlobalVlanConfigTable               OBJECT-TYPE
+         SYNTAX  SEQUENCE OF FlAcm110MvGlobalVlanConfigEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "This table provides the ports' bandwidth configuration"
+     ::= { flAcm110MvVlan 1 }
+
+     flAcm110MvGlobalVlanConfigEntry				OBJECT-TYPE
+         SYNTAX  FlAcm110MvGlobalVlanConfigEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "The entries of the table"
+         INDEX { flMsChassisMvIndex,
+				 flMsChassisModuleMvIndex,
+				 flAcm110MvVlanConfigIndex }
+     ::= { flAcm110MvGlobalVlanConfigTable  1 }
+
+		FlAcm110MvGlobalVlanConfigEntry ::= SEQUENCE
+		{
+			flAcm110MvVlanConfigIndex			INTEGER,
+			flAcm110MvVlan8021q					INTEGER,
+			flAcm110MvVlanNullVidReplace		INTEGER,
+			flAcm110MvCreateDefaultVlans        INTEGER,
+			flAcm110MvDeleteAllVlans			INTEGER
+		}
+
+
+     flAcm110MvVlanConfigIndex			OBJECT-TYPE
+		 SYNTAX    INTEGER (1..5)
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "vlan global configuration table index" 
+	 ::= { flAcm110MvGlobalVlanConfigEntry  1 }
+
+     flAcm110MvVlan8021q			OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								off			(1),
+								on			(2)
+						   }
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Enable or disable 802.1q VLAN filtering" 
+	 ::= { flAcm110MvGlobalVlanConfigEntry  2 }
+
+     flAcm110MvVlanNullVidReplace			OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								off			(1),
+								on			(2)
+						   }
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Port's null VID replacing mode" 
+	 ::= { flAcm110MvGlobalVlanConfigEntry  3 }
+
+     flAcm110MvCreateDefaultVlans			OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								normal			(1),
+								create			(2)
+						   }
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Create the default VLANs" 
+	 ::= { flAcm110MvGlobalVlanConfigEntry  4 }
+
+     flAcm110MvDeleteAllVlans			OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								normal			(1),
+								delete			(2)
+						   }
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Delete all active VLANs (null the VID)" 
+	 ::= { flAcm110MvGlobalVlanConfigEntry  5 }
+
+
+-- ************************************************************
+-- ************************************************************
+-- VLANs table
+-- ************************************************************
+-- ************************************************************
+
+	 flAcm110MvVlanTable               OBJECT-TYPE
+         SYNTAX  SEQUENCE OF FlAcm110MvVlanEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "This table provides VLANs defined in the device"
+     ::= { flAcm110MvVlan 10 }
+
+     flAcm110MvVlanEntry				OBJECT-TYPE
+         SYNTAX  FlAcm110MvVlanEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "The entries of the table"
+         INDEX { flMsChassisMvIndex,
+				 flMsChassisModuleMvIndex,
+				 flAcm110MvVlanFid }
+     ::= { flAcm110MvVlanTable 1 }
+
+		FlAcm110MvVlanEntry ::= SEQUENCE
+		{
+			 flAcm110MvVlanFid				INTEGER,
+			 flAcm110MvVlanVid				INTEGER,
+			 flAcm110MvVlanName				DisplayString,
+			 flAcm110MvVlanPort1Member		INTEGER,
+			 flAcm110MvVlanPort2Member		INTEGER,
+			 flAcm110MvVlanPort3Member		INTEGER,
+			 flAcm110MvVlanPort4Member		INTEGER, --only in acm110-14
+ 			 flAcm110MvVlanPort5Member		INTEGER, --only in acm110-14
+ 			 flAcm110MvVlanTableStatus		EntryStatus
+		}
+
+     flAcm110MvVlanFid				OBJECT-TYPE
+		 SYNTAX    INTEGER (0..15)
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Table index - VLAN Filter ID" 
+	 ::= { flAcm110MvVlanEntry 1 }
+
+     flAcm110MvVlanVid				OBJECT-TYPE
+		 SYNTAX    INTEGER	(0..4095)
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "VLAN ID" 
+	 ::= { flAcm110MvVlanEntry 2 }
+
+     flAcm110MvVlanName				OBJECT-TYPE
+		 SYNTAX    DisplayString
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "VLAN name - up to 15 characters" 
+	 ::= { flAcm110MvVlanEntry 3 }
+
+     flAcm110MvVlanPort1Member			OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								none		(1),
+								native		(2),
+								tagged		(3)
+						   }
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "FO Port (1) membership type in VLAN" 
+	 ::= { flAcm110MvVlanEntry 4 }
+
+     flAcm110MvVlanPort2Member			OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								none		(1),
+								native		(2),
+								tagged		(3)
+						   }
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "FO Port (2) membership type in VLAN" 
+	 ::= { flAcm110MvVlanEntry 5 }
+
+     flAcm110MvVlanPort3Member			OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								none		(1),
+								native		(2),
+								tagged		(3)
+						   }
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "FO Port (3) membership type in VLAN" 
+	 ::= { flAcm110MvVlanEntry 6 }
+
+     flAcm110MvVlanPort4Member			OBJECT-TYPE  --only in acm110-14
+		 SYNTAX    INTEGER {
+								none		(1),
+								native		(2),
+								tagged		(3)
+						   }
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "FO Port (4) membership type in VLAN" 
+	 ::= { flAcm110MvVlanEntry 7 }
+
+     flAcm110MvVlanPort5Member			OBJECT-TYPE  --only in acm110-14
+		 SYNTAX    INTEGER {
+								none		(1),
+								native		(2),
+								tagged		(3)
+						   }
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "TP Port (5) membership type in VLAN" 
+	 ::= { flAcm110MvVlanEntry 8 }
+
+	 flAcm110MvVlanTableStatus		 OBJECT-TYPE
+		 SYNTAX EntryStatus  
+		 MAX-ACCESS  read-write
+		 STATUS current
+         DESCRIPTION
+           "The status of this table entry.  (Refer to the RFC 1757 definition
+              of 'EntryStatus.)"
+    ::= { flAcm110MvVlanEntry 9 }
+
+
+-- ************************************************************
+-- Port VLAN configuration table
+-- ************************************************************
+	 flAcm110MvPortVlanConfigTable               OBJECT-TYPE
+         SYNTAX  SEQUENCE OF FlAcm110MvPortVlanConfigEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "This table provides the ports' VLAN related configuration"
+     ::= { flAcm110MvVlan 20 }
+
+     flAcm110MvPortVlanConfigEntry				OBJECT-TYPE
+         SYNTAX  FlAcm110MvPortVlanConfigEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "The entries of the table"
+         INDEX { flMsChassisMvIndex,
+				 flMsChassisModuleMvIndex,
+				 flAcm110MvPortNumber }
+     ::= { flAcm110MvPortVlanConfigTable 1 }
+
+		FlAcm110MvPortVlanConfigEntry ::= SEQUENCE
+		{
+			 flAcm110MvPortIngressFilter		INTEGER,
+			 flAcm110MvPortTagInsertion			INTEGER,
+			 flAcm110MvPortTagRemoval			INTEGER,
+			 flAcm110MvPortVid					INTEGER,
+			 flAcm110MvPortDiscardNonPvid		INTEGER
+		}
+
+	 flAcm110MvPortIngressFilter				OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								off		(1),
+								on		(2)
+						   }
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Port's ingress VLAN filtering mode" 
+	 ::= { flAcm110MvPortVlanConfigEntry 1 }
+
+     flAcm110MvPortTagInsertion				OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								off		(1),
+								on		(2)
+						   }
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Port's VLAN tag insertion mode" 
+	 ::= { flAcm110MvPortVlanConfigEntry 2 }
+
+     flAcm110MvPortTagRemoval				OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								off		(1),
+								on		(2)
+						   }
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Port's VLAN tag removal mode" 
+	 ::= { flAcm110MvPortVlanConfigEntry 3 }
+
+     flAcm110MvPortVid				OBJECT-TYPE
+		 SYNTAX    INTEGER (0..4095)
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Default port VID (used in tag insertion)" 
+	 ::= { flAcm110MvPortVlanConfigEntry 4 }
+
+     flAcm110MvPortDiscardNonPvid				OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								off		(1),
+								on		(2)
+						   }
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Port's discard non port VID tagged packets mode" 
+	 ::= { flAcm110MvPortVlanConfigEntry 5 }
+
+
+
+-- ************************************************************
+-- ************************************************************
+-- ************************************************************
+-- Device's priority (QoS) configuration group
+-- ************************************************************
+-- ************************************************************
+-- ************************************************************
+	 flAcm110MvPriorityConfigTable               OBJECT-TYPE
+         SYNTAX  SEQUENCE OF FlAcm110MvPriorityConfigEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "This table provides the ports' VLAN related configuration"
+     ::= { flAcm110MvPriority  1 }
+
+     flAcm110MvPriorityConfigEntry				OBJECT-TYPE
+         SYNTAX  FlAcm110MvPriorityConfigEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "The entries of the table"
+         INDEX { flMsChassisMvIndex,
+				 flMsChassisModuleMvIndex,
+				 flAcm110MvPriorityIndex }
+     ::= { flAcm110MvPriorityConfigTable 1 }
+
+		FlAcm110MvPriorityConfigEntry ::= SEQUENCE
+		{
+			flAcm110MvPriorityIndex				INTEGER,
+			flAcm110Mv8021pBase					INTEGER,
+		    flAcm110MvPriorityRatio		        INTEGER
+		}
+
+     flAcm110MvPriorityIndex			OBJECT-TYPE
+		 SYNTAX    INTEGER (1..3)
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "priority table index" 
+	 ::= { flAcm110MvPriorityConfigEntry  1 }
+
+     flAcm110Mv8021pBase			OBJECT-TYPE
+		 SYNTAX    INTEGER (0..7)
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "802.1p base priority - values below are low priority" 
+	 ::= { flAcm110MvPriorityConfigEntry  2 }
+
+     flAcm110MvPriorityRatio			OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								alwaysHi	(1),
+								ratio10-1	(2),
+								ratio5-1	(3),
+								ratio2-1	(4)
+						   }
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Priority packet transmission policy - ratio is hi:lo" 
+	 ::= { flAcm110MvPriorityConfigEntry 3 }
+
+-- ************************************************************
+-- DSCP table
+-- ************************************************************
+
+	 flAcm110MvDscpTable               OBJECT-TYPE
+         SYNTAX  SEQUENCE OF FlAcm110MvDscpEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "This table provides the DSCP priority settings"
+     ::= { flAcm110MvPriority 10 }
+
+     flAcm110MvDscpEntry				OBJECT-TYPE
+         SYNTAX  FlAcm110MvDscpEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "The entries of the table"
+         INDEX { flMsChassisMvIndex,
+				 flMsChassisModuleMvIndex,
+				 flAcm110MvDscpCode }
+     ::= { flAcm110MvDscpTable 1 }
+
+		FlAcm110MvDscpEntry ::= SEQUENCE
+		{
+			 flAcm110MvDscpCode				INTEGER,
+			 flAcm110MvDscpCodePriority		INTEGER
+		}
+
+     flAcm110MvDscpCode				OBJECT-TYPE
+		 SYNTAX    INTEGER	(1..64)
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Table index - DSCP code" 
+	 ::= { flAcm110MvDscpEntry 1 }
+
+     flAcm110MvDscpCodePriority				OBJECT-TYPE
+		 SYNTAX    INTEGER	{
+								low		(1),
+								high	(2)
+							}
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "DSCP code priority" 
+	 ::= { flAcm110MvDscpEntry 2 }
+
+-- ************************************************************
+-- Port priority configuration table
+-- ************************************************************
+
+	 flAcm110MvPortPriorityTable               OBJECT-TYPE
+         SYNTAX  SEQUENCE OF FlAcm110MvPortPriorityEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "This table provides the ports' priority related configuration"
+     ::= { flAcm110MvPriority 20 }
+
+     flAcm110MvPortPriorityEntry				OBJECT-TYPE
+         SYNTAX  FlAcm110MvPortPriorityEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "The entries of the table"
+         INDEX { flMsChassisMvIndex,
+				 flMsChassisModuleMvIndex,
+				 flAcm110MvPortNumber }
+     ::= { flAcm110MvPortPriorityTable 1 }
+
+		FlAcm110MvPortPriorityEntry ::= SEQUENCE
+		{
+			 flAcm110MvPortPriority					INTEGER,
+			 flAcm110MvPort8021pClassific			INTEGER,
+			 flAcm110MvPortDiffServClassific		INTEGER,
+			 flAcm110MvPortUserPriority				INTEGER
+		}
+
+
+     flAcm110MvPortPriority				OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								low		(1),
+								high	(2)
+						   }
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Port priority mode" 
+	 ::= { flAcm110MvPortPriorityEntry 1 }
+
+     flAcm110MvPort8021pClassific				OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								off		(1),
+								on		(2)
+						   }
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Port's 802.1p packet classification mode" 
+	 ::= { flAcm110MvPortPriorityEntry 2 }
+
+     flAcm110MvPortDiffServClassific				OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								off		(1),
+								on		(2)
+						   }
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Port's DiffServ packet classification mode" 
+	 ::= { flAcm110MvPortPriorityEntry 3 }
+
+     flAcm110MvPortUserPriority				OBJECT-TYPE
+		 SYNTAX    INTEGER (0..7)
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Port's user priority" 
+	 ::= { flAcm110MvPortPriorityEntry 4 }
+
+
+
+-- ************************************************************
+-- ************************************************************
+-- ************************************************************
+-- Device's Global MAC address tables
+-- ************************************************************
+-- ************************************************************
+-- ************************************************************
+	 flAcm110MvGlobalMacTable               OBJECT-TYPE
+         SYNTAX  SEQUENCE OF FlAcm110MvGlobalMacEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "This table provides the device's dynamic MAC address table.
+		  this table is read only"
+     ::= { flAcm110MvMac 1 }
+
+     flAcm110MvGlobalMacEntry				OBJECT-TYPE
+         SYNTAX  FlAcm110MvGlobalMacEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "The entries of the table"
+         INDEX { flMsChassisMvIndex,
+				 flMsChassisModuleMvIndex,
+		         flAcm110MvGlobalMacIndex }
+     ::= { flAcm110MvGlobalMacTable 1 }
+
+		FlAcm110MvGlobalMacEntry ::= SEQUENCE
+		{
+			 flAcm110MvGlobalMacIndex				INTEGER,
+			 flAcm110MvClearDynamicMacTable			INTEGER,
+			 flAcm110MvClearStaticMacTable			INTEGER
+		}
+
+     flAcm110MvGlobalMacIndex				OBJECT-TYPE
+		 SYNTAX    INTEGER (1..3)
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Table index - entry number" 
+	 ::= { flAcm110MvGlobalMacEntry 1 }
+
+     flAcm110MvClearDynamicMacTable			OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								normal			(1),
+								clear			(2)
+						   }
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Clear the device's dynamic MAC address table" 
+	 ::= { flAcm110MvGlobalMacEntry 2 }
+
+     flAcm110MvClearStaticMacTable			OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								normal			(1),
+								clear			(2)
+						   }
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Clear the device's static MAC address table" 
+	 ::= { flAcm110MvGlobalMacEntry 3 }
+
+
+-- ************************************************************
+-- Dynamic MAC table
+-- ************************************************************
+
+	 flAcm110MvDynamicMacTable               OBJECT-TYPE
+         SYNTAX  SEQUENCE OF FlAcm110MvDynamicMacEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "This table provides the device's dynamic MAC address table.
+		  this table is read only"
+     ::= { flAcm110MvMac 10 }
+
+     flAcm110MvDynamicMacEntry				OBJECT-TYPE
+         SYNTAX  FlAcm110MvDynamicMacEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "The entries of the table"
+         INDEX { flMsChassisMvIndex,
+				 flMsChassisModuleMvIndex,
+		         flAcm110MvDynamicEntryNumber }
+     ::= { flAcm110MvDynamicMacTable 1 }
+
+		FlAcm110MvDynamicMacEntry ::= SEQUENCE
+		{
+			 flAcm110MvDynamicEntryNumber			INTEGER,
+			 flAcm110MvDynamicMacAddress			DisplayString,
+			 flAcm110MvDynamicSrcPort				INTEGER,
+			 flAcm110MvDynamicFid					INTEGER
+		}
+
+     flAcm110MvDynamicEntryNumber				OBJECT-TYPE
+		 SYNTAX    INTEGER (1..1000)
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Table index - entry number" 
+	 ::= { flAcm110MvDynamicMacEntry 1 }
+
+     flAcm110MvDynamicMacAddress				OBJECT-TYPE
+		 SYNTAX    DisplayString
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "MAC address" 
+	 ::= { flAcm110MvDynamicMacEntry 2 }
+
+     flAcm110MvDynamicSrcPort					OBJECT-TYPE
+		 SYNTAX    INTEGER
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Address's source port" 
+	 ::= { flAcm110MvDynamicMacEntry 3 }
+
+	 --flAcm110MvDynamicUseFid					OBJECT-TYPE  (changed 21-12-04, Anat)
+	 flAcm110MvDynamicFid					OBJECT-TYPE
+		 SYNTAX    INTEGER	(0..15)
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "VLAN filter ID" 
+	 ::= { flAcm110MvDynamicMacEntry 4 }
+
+-- ************************************************************
+-- Static MAC table
+-- ************************************************************
+
+	 flAcm110MvStaticMacTable               OBJECT-TYPE
+         SYNTAX  SEQUENCE OF FlAcm110MvStaticMacEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "This table provides the device's static MAC address table.
+		  this table is read only"
+     ::= { flAcm110MvMac 20 }
+
+     flAcm110MvStaticMacEntry				OBJECT-TYPE
+         SYNTAX  FlAcm110MvStaticMacEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "The entries of the table"
+         INDEX { flMsChassisMvIndex,
+				 flMsChassisModuleMvIndex,
+		         flAcm110MvStaticEntryNumber }
+     ::= { flAcm110MvStaticMacTable 1 }
+
+		FlAcm110MvStaticMacEntry ::= SEQUENCE
+		{
+			 flAcm110MvStaticEntryNumber	INTEGER,
+			 flAcm110MvStaticMacAddress		DisplayString,
+			 flAcm110MvFwdPort1				INTEGER,
+			 flAcm110MvFwdPort2				INTEGER,
+			 flAcm110MvFwdPort3				INTEGER,
+			 flAcm110MvFwdPort4				INTEGER, --only in acm110-14
+			 flAcm110MvFwdPort5				INTEGER, --only in acm110-14
+			 flAcm110MvFid					INTEGER,
+			 flAcm110MvStaticUseFid			INTEGER,
+			 flAcm110MvStaticTableStatus	EntryStatus
+		}
+
+     flAcm110MvStaticEntryNumber				OBJECT-TYPE
+		 SYNTAX    INTEGER (0..7)
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Table index - entry number" 
+	 ::= { flAcm110MvStaticMacEntry 1 }
+
+     flAcm110MvStaticMacAddress				OBJECT-TYPE
+		 SYNTAX    DisplayString
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "MAC address" 
+	 ::= { flAcm110MvStaticMacEntry 2 }
+
+     flAcm110MvFwdPort1						OBJECT-TYPE
+		 SYNTAX    INTEGER	{
+								no	(1),
+								yes	(2)
+							}
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Forward packets with the MAC address to port 1" 
+	 ::= { flAcm110MvStaticMacEntry 3 }
+
+     flAcm110MvFwdPort2						OBJECT-TYPE
+		 SYNTAX    INTEGER	{
+								no	(1),
+								yes	(2)
+							}
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Forward packets with the MAC address to port 2" 
+	 ::= { flAcm110MvStaticMacEntry 4 }
+
+     flAcm110MvFwdPort3						OBJECT-TYPE
+		 SYNTAX    INTEGER	{
+								no	(1),
+								yes	(2)
+							}
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Forward packets with the MAC address to port 3" 
+	 ::= { flAcm110MvStaticMacEntry 5 }
+
+	-- only in acm110-14
+     flAcm110MvFwdPort4						OBJECT-TYPE 
+		 SYNTAX    INTEGER	{
+								no	(1),
+								yes	(2)
+							}
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Forward packets with the MAC address to port 4" 
+	 ::= { flAcm110MvStaticMacEntry 6 }
+
+	-- only in acm110-14
+     flAcm110MvFwdPort5						OBJECT-TYPE
+		 SYNTAX    INTEGER	{
+								no	(1),
+								yes	(2)
+							}
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Forward packets with the MAC address to port 5" 
+	 ::= { flAcm110MvStaticMacEntry 7 }
+
+	 flAcm110MvFid								OBJECT-TYPE
+		 SYNTAX    INTEGER	(0..15)
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "The VLAN filter to be used (by FID)" 
+	 ::= { flAcm110MvStaticMacEntry 8 }
+
+	 flAcm110MvStaticUseFid					OBJECT-TYPE
+		 SYNTAX    INTEGER	{
+								no	(1),
+								yes	(2)
+							}
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Uses a VLAN filter (by FID)" 
+	 ::= { flAcm110MvStaticMacEntry 9 }
+
+	 flAcm110MvStaticTableStatus		 OBJECT-TYPE
+		 SYNTAX EntryStatus  
+		 MAX-ACCESS  read-write
+		 STATUS current
+         DESCRIPTION
+           "The status of this table entry.  (Refer to the RFC 1757 definition
+              of 'EntryStatus.)"
+    ::= { flAcm110MvStaticMacEntry 10 }
+
+
+-- insert UMA here 
+
+
+-- ************************************************************
+-- ************************************************************
+-- ************************************************************
+-- Device's traffic statistics group
+-- ************************************************************
+-- ************************************************************
+-- ************************************************************
+
+-- ************************************************************
+-- Rx Errors table
+-- ************************************************************
+	 flAcm110MvRxErrorPacketsTable               OBJECT-TYPE
+         SYNTAX  SEQUENCE OF FlAcm110MvRxErrorPacketsEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "This table provides the error packet statistics for all ports.
+		  Table is read only"
+     ::= { flAcm110MvStatistics 10 }
+
+     flAcm110MvRxErrorPacketsEntry				OBJECT-TYPE
+         SYNTAX  FlAcm110MvRxErrorPacketsEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "The entries of the table"
+         INDEX { flMsChassisMvIndex,
+				 flMsChassisModuleMvIndex,
+				 flAcm110MvPortNumber }
+     ::= { flAcm110MvRxErrorPacketsTable 1 }
+
+		FlAcm110MvRxErrorPacketsEntry ::= SEQUENCE
+		{
+			 flAcm110MvRxUndersizePckt				Counter,
+			 flAcm110MvRxFragmentPckt				Counter,
+			 flAcm110MvRxOversizePckt				Counter,
+			 flAcm110MvRxCrcErrorPckt				Counter,
+			 flAcm110MvRxAlignmentErrorPckt			Counter,
+			 flAcm110MvRxRefreshCounters			INTEGER,
+			 flAcm110MvRxClearCounters				INTEGER
+		}
+
+
+     flAcm110MvRxUndersizePckt				OBJECT-TYPE
+		 SYNTAX    Counter
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Number of undersized packets that arrived on the port" 
+	 ::= { flAcm110MvRxErrorPacketsEntry 1 }
+
+     flAcm110MvRxFragmentPckt				OBJECT-TYPE
+		 SYNTAX    Counter
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Number of fragmented packets that arrived on the port" 
+	 ::= { flAcm110MvRxErrorPacketsEntry 2 }
+
+     flAcm110MvRxOversizePckt				OBJECT-TYPE
+		 SYNTAX    Counter
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Number of oversized packets that arrived on the port" 
+	 ::= { flAcm110MvRxErrorPacketsEntry 3 }
+
+     flAcm110MvRxCrcErrorPckt				OBJECT-TYPE
+		 SYNTAX    Counter
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Number of CRC errored packets that arrived on the port" 
+	 ::= { flAcm110MvRxErrorPacketsEntry 4 }
+
+     flAcm110MvRxAlignmentErrorPckt				OBJECT-TYPE
+		 SYNTAX    Counter
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Number of alignment error packets that arrived on the port" 
+	 ::= { flAcm110MvRxErrorPacketsEntry 5 }
+
+     flAcm110MvRxRefreshCounters				OBJECT-TYPE
+		 SYNTAX    INTEGER	{
+								normal		(1),
+								refresh		(2)
+							}
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Refresh the port's counters for this table" 
+	 ::= { flAcm110MvRxErrorPacketsEntry 6 }
+
+     flAcm110MvRxClearCounters				OBJECT-TYPE
+		 SYNTAX    INTEGER	{
+								normal		(1),
+								clear		(2)
+							}
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Clear the port's counters for this table" 
+	 ::= { flAcm110MvRxErrorPacketsEntry 7 }
+
+
+-- ************************************************************
+-- Rx good packets table
+-- ************************************************************
+	 flAcm110MvRxGoodPacketsTable               OBJECT-TYPE
+         SYNTAX  SEQUENCE OF FlAcm110MvRxGoodPacketsEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "This table provides the received good packet statistics for all ports.
+		  Table is read only"
+     ::= { flAcm110MvStatistics 20 }
+
+     flAcm110MvRxGoodPacketsEntry				OBJECT-TYPE
+         SYNTAX  FlAcm110MvRxGoodPacketsEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "The entries of the table"
+         INDEX { flMsChassisMvIndex,
+				 flMsChassisModuleMvIndex,
+				 flAcm110MvPortNumber }
+     ::= { flAcm110MvRxGoodPacketsTable 1 }
+
+		FlAcm110MvRxGoodPacketsEntry ::= SEQUENCE
+		{
+			 flAcm110MvRxUnicastPackets				Counter,
+			 flAcm110MvRxMulticastPackets			Counter,
+			 flAcm110MvRxBroadcastPackets			Counter,
+			 flAcm110MvRxMacControlPackets			Counter,
+			 flAcm110MvRxPausePackets				Counter,
+			 flAcm110MvRxGoodRefreshCounters		INTEGER,
+			 flAcm110MvRxGoodClearCounters			INTEGER
+		}
+
+
+     flAcm110MvRxUnicastPackets				OBJECT-TYPE
+		 SYNTAX    Counter
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Number of good unicast packets that arrived on the port" 
+	 ::= { flAcm110MvRxGoodPacketsEntry 1 }
+
+     flAcm110MvRxMulticastPackets				OBJECT-TYPE
+		 SYNTAX    Counter
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Number of good multicast packets that arrived on the port" 
+	 ::= { flAcm110MvRxGoodPacketsEntry 2 }
+
+     flAcm110MvRxBroadcastPackets				OBJECT-TYPE
+		 SYNTAX    Counter
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Number of good broadcast packets that arrived on the port" 
+	 ::= { flAcm110MvRxGoodPacketsEntry 3 }
+
+     flAcm110MvRxMacControlPackets				OBJECT-TYPE
+		 SYNTAX    Counter
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Number of good MAC control packets that arrived on the port" 
+	 ::= { flAcm110MvRxGoodPacketsEntry 4 }
+
+     flAcm110MvRxPausePackets				OBJECT-TYPE
+		 SYNTAX    Counter
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Number of good Pause packets that arrived on the port" 
+	 ::= { flAcm110MvRxGoodPacketsEntry 5 }
+
+     flAcm110MvRxGoodRefreshCounters				OBJECT-TYPE
+		 SYNTAX    INTEGER	{
+								normal		(1),
+								refresh		(2)
+							}
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Refresh the port's counters for this table" 
+	 ::= { flAcm110MvRxGoodPacketsEntry 6 }
+
+     flAcm110MvRxGoodClearCounters				OBJECT-TYPE
+		 SYNTAX    INTEGER	{
+								normal		(1),
+								clear		(2)
+							}
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Clear the port's counters for this table" 
+	 ::= { flAcm110MvRxGoodPacketsEntry 7 }
+
+
+-- ************************************************************
+-- Tx good packets table
+-- ************************************************************
+	 flAcm110MvTxGoodPacketsTable               OBJECT-TYPE
+         SYNTAX  SEQUENCE OF FlAcm110MvTxGoodPacketsEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "This table provides the transmitted good packet statistics for all ports.
+		  Table is read only"
+     ::= { flAcm110MvStatistics 30 }
+
+     flAcm110MvTxGoodPacketsEntry				OBJECT-TYPE
+         SYNTAX  FlAcm110MvTxGoodPacketsEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "The entries of the table"
+         INDEX { flMsChassisMvIndex,
+				 flMsChassisModuleMvIndex,
+				 flAcm110MvPortNumber }
+     ::= { flAcm110MvTxGoodPacketsTable 1 }
+
+		FlAcm110MvTxGoodPacketsEntry ::= SEQUENCE
+		{
+			 flAcm110MvTxUnicastPackets				Counter,
+			 flAcm110MvTxMulticastPackets			Counter,
+			 flAcm110MvTxBroadcastPackets			Counter,
+			 flAcm110MvTxPausePackets				Counter,
+			 flAcm110MvTxGoodRefreshCounters		INTEGER,
+			 flAcm110MvTxGoodClearCounters			INTEGER
+		}
+
+
+     flAcm110MvTxUnicastPackets					OBJECT-TYPE
+		 SYNTAX    Counter
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Number of good unicast packets that were transmitted on the port" 
+	 ::= { flAcm110MvTxGoodPacketsEntry 1 }
+
+     flAcm110MvTxMulticastPackets					OBJECT-TYPE
+		 SYNTAX    Counter
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Number of good multicast packets that were transmitted on the port" 
+	 ::= { flAcm110MvTxGoodPacketsEntry 2 }
+
+     flAcm110MvTxBroadcastPackets					OBJECT-TYPE
+		 SYNTAX    Counter
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Number of good broadcast packets that were transmitted on the port" 
+	 ::= { flAcm110MvTxGoodPacketsEntry 3 }
+
+     flAcm110MvTxPausePackets						OBJECT-TYPE
+		 SYNTAX    Counter
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Number of good Pause packets that were transmitted on the port" 
+	 ::= { flAcm110MvTxGoodPacketsEntry 4 }
+
+     flAcm110MvTxGoodRefreshCounters				OBJECT-TYPE
+		 SYNTAX    INTEGER	{
+								normal		(1),
+								refresh		(2)
+							}
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Refresh the port's counters for this table" 
+	 ::= { flAcm110MvTxGoodPacketsEntry 5 }
+
+     flAcm110MvTxGoodClearCounters					OBJECT-TYPE
+		 SYNTAX    INTEGER	{
+								normal		(1),
+								clear		(2)
+							}
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Clear the port's counters for this table" 
+	 ::= { flAcm110MvTxGoodPacketsEntry 6 }
+
+
+-- ************************************************************
+-- Rx total packets table
+-- ************************************************************
+	 flAcm110MvRxTotalPacketsTable               OBJECT-TYPE
+         SYNTAX  SEQUENCE OF FlAcm110MvRxTotalPacketsEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "This table provides the total received packet statistics for all ports.
+		  Table is read only"
+     ::= { flAcm110MvStatistics 40 }
+
+     flAcm110MvRxTotalPacketsEntry				OBJECT-TYPE
+         SYNTAX  FlAcm110MvRxTotalPacketsEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "The entries of the table"
+         INDEX { flMsChassisMvIndex,
+				 flMsChassisModuleMvIndex,
+				 flAcm110MvPortNumber }
+     ::= { flAcm110MvRxTotalPacketsTable 1 }
+
+		FlAcm110MvRxTotalPacketsEntry ::= SEQUENCE
+		{
+			 flAcm110MvRxDroppedPackets				Counter,
+			 flAcm110MvRx64BytesPackets				Counter,
+			 flAcm110MvRx65-127BytesPackets			Counter,
+			 flAcm110MvRx128-255BytesPackets		Counter,
+			 flAcm110MvRx256-511BytesPackets		Counter,
+			 flAcm110MvRx512-1023BytesPackets		Counter,
+			 flAcm110MvRx1024-MaxBytesPackets		Counter,
+			 flAcm110MvRxTotalRefreshCounters		INTEGER,
+			 flAcm110MvRxTotalClearCounters			INTEGER
+		}
+
+
+     flAcm110MvRxDroppedPackets				OBJECT-TYPE
+		 SYNTAX    Counter
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Number of dropped received packets" 
+	 ::= { flAcm110MvRxTotalPacketsEntry 1 }
+
+     flAcm110MvRx64BytesPackets				OBJECT-TYPE
+		 SYNTAX    Counter
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Number of packets received in size of 64 bytes" 
+	 ::= { flAcm110MvRxTotalPacketsEntry 2 }
+
+     flAcm110MvRx65-127BytesPackets				OBJECT-TYPE
+		 SYNTAX    Counter
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Number of packets received in size range of 65-127 bytes" 
+	 ::= { flAcm110MvRxTotalPacketsEntry 3 }
+
+     flAcm110MvRx128-255BytesPackets				OBJECT-TYPE
+		 SYNTAX    Counter
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Number of packets received in size range of 128-255 bytes" 
+	 ::= { flAcm110MvRxTotalPacketsEntry 4 }
+
+     flAcm110MvRx256-511BytesPackets				OBJECT-TYPE
+		 SYNTAX    Counter
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Number of packets received in size range of 256-511 bytes" 
+	 ::= { flAcm110MvRxTotalPacketsEntry 5 }
+
+     flAcm110MvRx512-1023BytesPackets				OBJECT-TYPE
+		 SYNTAX    Counter
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Number of packets received in size range of 512-1023 bytes" 
+	 ::= { flAcm110MvRxTotalPacketsEntry 6 }
+
+     flAcm110MvRx1024-MaxBytesPackets				OBJECT-TYPE
+		 SYNTAX    Counter
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Number of packets received in size range of 1024-Max (packet size) bytes" 
+	 ::= { flAcm110MvRxTotalPacketsEntry 7 }
+
+     flAcm110MvRxTotalRefreshCounters				OBJECT-TYPE
+		 SYNTAX    INTEGER	{
+								normal		(1),
+								refresh		(2)
+							}
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Refresh the port's counters for this table" 
+	 ::= { flAcm110MvRxTotalPacketsEntry 8 }
+
+     flAcm110MvRxTotalClearCounters				OBJECT-TYPE
+		 SYNTAX    INTEGER	{
+								normal		(1),
+								clear		(2)
+							}
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Clear the port's counters for this table" 
+	 ::= { flAcm110MvRxTotalPacketsEntry 9 }
+
+
+-- ************************************************************
+-- Tx total packets table
+-- ************************************************************
+	 flAcm110MvTxTotalPacketsTable               OBJECT-TYPE
+         SYNTAX  SEQUENCE OF FlAcm110MvTxTotalPacketsEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "This table provides the total transmitted packet statistics for all ports.
+		  Table is read only"
+     ::= { flAcm110MvStatistics 50 }
+
+     flAcm110MvTxTotalPacketsEntry				OBJECT-TYPE
+         SYNTAX  FlAcm110MvTxTotalPacketsEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "The entries of the table"
+         INDEX { flMsChassisMvIndex,
+				 flMsChassisModuleMvIndex,
+				 flAcm110MvPortNumber }
+     ::= { flAcm110MvTxTotalPacketsTable 1 }
+
+		FlAcm110MvTxTotalPacketsEntry ::= SEQUENCE
+		{
+			 flAcm110MvTxDroppedPackets				Counter,
+			 flAcm110MvTxTotalRefreshCounters		INTEGER,
+			 flAcm110MvTxTotalClearCounters			INTEGER
+		}
+
+
+     flAcm110MvTxDroppedPackets					OBJECT-TYPE
+		 SYNTAX    Counter
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Number of dropped transmitted packets" 
+	 ::= { flAcm110MvTxTotalPacketsEntry 1 }
+
+     flAcm110MvTxTotalRefreshCounters				OBJECT-TYPE
+		 SYNTAX    INTEGER	{
+								normal		(1),
+								refresh		(2)
+							}
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Refresh the port's counters for this table" 
+	 ::= { flAcm110MvTxTotalPacketsEntry 2 }
+
+     flAcm110MvTxTotalClearCounters				OBJECT-TYPE
+		 SYNTAX    INTEGER	{
+								normal		(1),
+								clear		(2)
+							}
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Clear the port's counters for this table" 
+	 ::= { flAcm110MvTxTotalPacketsEntry 3 }
+
+
+
+-- ************************************************************
+-- Tx collisions table
+-- ************************************************************
+	 flAcm110MvTxCollisionsTable               OBJECT-TYPE
+         SYNTAX  SEQUENCE OF FlAcm110MvTxCollisionsEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "This table provides the collision statistics for all ports.
+		  Table is read only"
+     ::= { flAcm110MvStatistics 60 }
+
+     flAcm110MvTxCollisionsEntry				OBJECT-TYPE
+         SYNTAX  FlAcm110MvTxCollisionsEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "The entries of the table"
+         INDEX { flMsChassisMvIndex,
+				 flMsChassisModuleMvIndex,
+				 flAcm110MvPortNumber }
+     ::= { flAcm110MvTxCollisionsTable 1 }
+
+		FlAcm110MvTxCollisionsEntry ::= SEQUENCE
+		{
+			 flAcm110MvTxTotalCols					Counter,
+			 flAcm110MvTxLateCols					Counter,
+			 flAcm110MvTxExcessiveCols				Counter,
+			 flAcm110MvTxSingleCols					Counter,
+			 flAcm110MvTxMultipleCols				Counter,
+			 flAcm110MvTxColRefreshCounters			INTEGER,
+			 flAcm110MvTxColClearCounters			INTEGER
+		}
+
+
+     flAcm110MvTxTotalCols				OBJECT-TYPE
+		 SYNTAX    Counter
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Total number of collisions" 
+	 ::= { flAcm110MvTxCollisionsEntry 1 }
+
+     flAcm110MvTxLateCols				OBJECT-TYPE
+		 SYNTAX    Counter
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Number of late collisions" 
+	 ::= { flAcm110MvTxCollisionsEntry 2 }
+
+     flAcm110MvTxExcessiveCols				OBJECT-TYPE
+		 SYNTAX    Counter
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Number of excessive collisions" 
+	 ::= { flAcm110MvTxCollisionsEntry 3 }
+
+     flAcm110MvTxSingleCols				OBJECT-TYPE
+		 SYNTAX    Counter
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Number of single collisions" 
+	 ::= { flAcm110MvTxCollisionsEntry 4 }
+
+     flAcm110MvTxMultipleCols				OBJECT-TYPE
+		 SYNTAX    Counter
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Number of multiple collisions" 
+	 ::= { flAcm110MvTxCollisionsEntry 5 }
+
+     flAcm110MvTxColRefreshCounters		OBJECT-TYPE
+		 SYNTAX    INTEGER	{
+								normal		(1),
+								refresh		(2)
+							}
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Refresh the port's counters for this table" 
+	 ::= { flAcm110MvTxCollisionsEntry 6 }
+
+     flAcm110MvTxColClearCounters			OBJECT-TYPE
+		 SYNTAX    INTEGER	{
+								normal		(1),
+								clear		(2)
+							}
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Clear the port's counters for this table" 
+	 ::= { flAcm110MvTxCollisionsEntry 7 }
+
+
+END
+

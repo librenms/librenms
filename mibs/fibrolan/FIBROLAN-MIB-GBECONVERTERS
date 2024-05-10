@@ -1,0 +1,772 @@
+--  ==========================================================================================================
+--  File              : FIBROLAN-MIB-GBECONVERTERS.mib
+--  Description       : Private MIB file for FibroLAN MetroStar I system - Gsm1000/MA, Gsm1010/MA and GSM1000X
+--  By                : Tal Katz-Touaf
+--  MIB Version       : 2.0
+--  MetroStar Version : 1.7.0/build 16
+--  Date              : February 9, 2010
+--  ==========================================================================================================
+--
+--
+-- Copyright Fibrolan, 2010. All rights reserved.
+--
+-- Reproduction of this document is authorized on condition that this
+-- copyright notice is included.
+--
+FIBROLAN-MIB-GBECONVERTERS   DEFINITIONS ::= BEGIN
+
+	 IMPORTS
+	    enterprises, OBJECT-TYPE, MODULE-IDENTITY, Counter64	FROM SNMPv2-SMI
+		MODULE-COMPLIANCE, OBJECT-GROUP				FROM SNMPv2-CONF
+		DisplayString						FROM SNMPv2-TC
+		flMsChassisMvIndex, flMsChassisModuleMvIndex		FROM FIBROLAN-MIB-METRO-STAR-MV
+		flMsModuleMvChannelIndex				FROM FIBROLAN-MIB-MSMODULE;
+
+
+ flGbeConverter  MODULE-IDENTITY
+       LAST-UPDATED "1002100000Z"  
+       ORGANIZATION "Fibrolan ltd"
+       CONTACT-INFO
+         "http://www.fibrolan.com"
+       DESCRIPTION
+         "The MIB module to describe FibroLAN GSM1000/MA, 
+		 GSM1010/MA and GSM1000X converters.
+          Copyright (C) Fibrolan Ltd (2010)."
+	::= { enterprises 4467 100 50 30 }
+
+
+    -- conformance information
+     flGbeConverterMIBConformance
+                   OBJECT IDENTIFIER ::= { flGbeConverter  1 }
+
+     flGbeConverterMIBCompliances		OBJECT IDENTIFIER ::= { flGbeConverterMIBConformance 1 }
+     flGbeConverterMIBGroups			OBJECT IDENTIFIER ::= { flGbeConverterMIBConformance 2 }
+
+	-- compliance statements
+     flGbeConverterMIBCompliance MODULE-COMPLIANCE
+              STATUS  current
+              DESCRIPTION
+                      "The compliance statement for flMetroStar entities
+                      which implement the GBE converters MIB."
+              MODULE  -- this module
+                  MANDATORY-GROUPS { flGbeConverterDeviceGroup,
+					flGbeConverterPortsGroup,
+					flGbeConverterStatisticsGroup	-- only in GSM1000X
+				   }
+              ::= { flGbeConverterMIBCompliances 1 }
+
+     flGbeConverterDeviceGroup	OBJECT-GROUP
+	        OBJECTS		{	flGbeConverterRestoreDefaults,
+					flGbeConverterDeviceFirmRevision,
+					flGbeConverterDeviceTemperature		-- only in GSM1000X
+				}
+            STATUS  current
+            DESCRIPTION
+                    "A collection of objects providing basic
+                    instrumentation of the MetroStar GSM1000MA/GSM1010MA/GSM1000X entity."
+            ::= { flGbeConverterMIBGroups 1 }
+
+     flGbeConverterPortsGroup	OBJECT-GROUP
+	        OBJECTS		{	flGbeConverterPortIndex,
+					flGbeConverterP1Link,	-- in GSM1010MA, flGbeConverterTpLink
+					flGbeConverterP2Link,    -- in GSM1010MA, flGbeConverterFoLink
+					flGbeConverterPortDescription,
+					flGbeConverterP1SignalDetect,  -- only in GSM1000MA and GSM1000X
+					flGbeConverterP2SignalDetect,  -- in GSM1010MA, flGbeConverterFoSignalDetect
+					flGbeConverterChannelEnable,   
+					flGbeConverterP2LoopBack,   -- in GSM1000MA should be flGbeConverterFoLoopBack  
+					flGbeConverterLstP1-P2,     -- in GSM1010MA: flGbeConverterLstTp-Fo, n/a in GSM1000X
+					flGbeConverterLstP2-P1,     -- in GSM1010MA: flGbeConverterLstFo-Tp
+					flGbeConverterUpstreamBW,
+					flGbeConverterP1LoopBack,	-- only in GSM1000X
+					flGbeConverterP1Type,		-- only in GSM1000X
+					flGbeConverterP2Type,		-- only in GSM1000X
+					flGbeConverterPause,			-- only in GSM1000X
+					flGbeConverterAutoNego		-- only in GSM1000X
+				}
+            STATUS  current
+            DESCRIPTION
+                    "A collection of objects providing basic
+                    instrumentation of the MetroStar GSM1000MA/GSM1010MA/GSM1000X entity."
+            ::= { flGbeConverterMIBGroups 2 }
+
+     flGbeConverterStatisticsGroup	OBJECT-GROUP
+	        OBJECTS	 {	flGbeConverterRxDropEvents,
+				flGbeConverterRxOctets,
+				flGbeConverterRxPackets,
+				flGbeConverterRxBroadcastPackets,
+				flGbeConverterRxMulticastPackets,
+				flGbeConverterRxCrcAlignmentErrors,
+				flGbeConverterRxUndersizePackets,
+				flGbeConverterRxOversizePackets,
+				flGbeConverterRxFragments,
+				flGbeConverterRxJabbers,
+				flGbeConverterRxCollisions,
+				flGbeConverterRxPackets64Octets,
+				flGbeConverterRxPackets65to127Octets,
+				flGbeConverterRxPackets128to255Octets,
+				flGbeConverterRxPackets256to511Octets,
+				flGbeConverterRxPackets512to1023Octets,
+				flGbeConverterRxPackets1024toMaxOctets,
+				flGbeConverterRxFibroLANProprietryFrames,
+				flGbeConverterClearCounters,
+				flGbeConverterRxOctetsRate,
+				flGbeConverterRxBitsRate,
+				flGbeConverterRxPacketsRate,
+				flGbeConverterRxUtilization,
+				flGbeConverterTxOctets,
+				flGbeConverterTxPackets,
+				flGbeConverterTxBroadcastPackets,
+				flGbeConverterTxMulticastPackets,
+				flGbeConverterTxFibroLANProprietryFrames,
+				flGbeConverterTxOctetsRate,
+				flGbeConverterTxBitsRate,
+				flGbeConverterTxPacketsRate,
+				flGbeConverterTxUtilization}
+            STATUS  current
+            DESCRIPTION
+                    "A collection of objects providing basic
+                    instrumentation of the MetroStar GSM1000MA/GSM1010MA/GSM1000X port statistic coounters entity."
+            ::= { flGbeConverterMIBGroups 3 }
+
+
+-- ************************************************************
+-- ************************************************************
+-- FibroLan Object Identifier Definition
+-- ************************************************************
+-- ************************************************************
+
+fibrolan             OBJECT IDENTIFIER ::= { enterprises        4467 }
+
+fibrolanSNMP         OBJECT IDENTIFIER ::= { fibrolan            100 }
+
+flMaRemoteDevice     OBJECT IDENTIFIER ::= { fibrolanSNMP	      50 }
+
+--flGbeConverter	     OBJECT IDENTIFIER ::= { flMaRemoteDevice     30 }
+
+flGbeConverterDevice		OBJECT IDENTIFIER ::= { flGbeConverter    10 }
+flGbeConverterPorts		OBJECT IDENTIFIER ::= { flGbeConverter    20 }
+flGbeConverterStatistics	OBJECT IDENTIFIER ::= { flGbeConverter	  30 }
+
+
+-- ************************************************************
+-- ************************************************************
+
+-- ************************************************************
+-- ************************************************************
+-- ************************************************************
+-- Global device configuration group
+-- ************************************************************
+-- ************************************************************
+-- ************************************************************
+     flGbeConverterDeviceConfigTable               OBJECT-TYPE
+         SYNTAX  SEQUENCE OF FlGbeConverterDeviceConfigEntry
+         MAX-ACCESS    not-accessible
+         STATUS  current
+         DESCRIPTION
+         "This table provides the device's global configuration"
+     ::= { flGbeConverterDevice 1 }
+
+     flGbeConverterDeviceConfigEntry				OBJECT-TYPE
+         SYNTAX  FlGbeConverterDeviceConfigEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "The entries of the table"
+         INDEX { flMsChassisMvIndex,
+		 flMsChassisModuleMvIndex,
+		 flMsModuleMvChannelIndex }
+     ::= { flGbeConverterDeviceConfigTable 1 }
+
+		FlGbeConverterDeviceConfigEntry ::= SEQUENCE
+		{
+			 flGbeConverterRestoreDefaults			INTEGER,
+			 flGbeConverterDeviceFirmRevision	    DisplayString,
+			 flGbeConverterDeviceTemperature		INTEGER		-- only in GSM1000X
+		}
+
+	 flGbeConverterRestoreDefaults				   OBJECT-TYPE
+		 SYNTAX    INTEGER	{                     
+						  		normal	  (1), 
+						  		restore	  (2)  
+							}                     
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Restore the decive's defaults configurations" 
+     ::= { flGbeConverterDeviceConfigEntry 2 }
+
+     flGbeConverterDeviceFirmRevision				OBJECT-TYPE
+		 SYNTAX    DisplayString
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "The device's Firmware revision" 
+     ::= { flGbeConverterDeviceConfigEntry 3 }
+
+	 -- only in GSM1000X
+	 flGbeConverterDeviceTemperature				OBJECT-TYPE
+		 SYNTAX    INTEGER
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Device temperature"  
+     ::= { flGbeConverterDeviceConfigEntry 4 }
+
+
+
+-- ************************************************************
+-- ************************************************************
+-- ************************************************************
+-- Device's channel's configuration group
+-- ************************************************************
+-- ************************************************************
+-- ************************************************************
+
+-- ************************************************************
+-- Port configuration table
+-- ************************************************************
+
+	 flGbeConverterPortConfigTable               OBJECT-TYPE
+         SYNTAX  SEQUENCE OF FlGbeConverterPortConfigEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "This table provides the ports' basic configuration"
+     ::= { flGbeConverterPorts 1 }
+
+     flGbeConverterPortConfigEntry				OBJECT-TYPE
+         SYNTAX  FlGbeConverterPortConfigEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "The entries of the table"
+         INDEX { flMsChassisMvIndex,
+		 flMsChassisModuleMvIndex,
+		 flMsModuleMvChannelIndex,
+		 flGbeConverterPortIndex }
+     ::= { flGbeConverterPortConfigTable 1 }
+
+		FlGbeConverterPortConfigEntry ::= SEQUENCE
+		{
+			 flGbeConverterPortIndex			INTEGER,
+			 flGbeConverterP1Link				INTEGER,  -- in GSM1010MA, flGbeConverterTpLink  
+			 flGbeConverterP2Link				INTEGER,  -- in GSM1010MA, flGbeConverterFoLink
+			 flGbeConverterPortDescription		DisplayString,
+			 flGbeConverterP1SignalDetect		INTEGER, --	only in GSM1000MA and GSM1000X
+			 flGbeConverterP2SignalDetect		INTEGER, --	in GSM1010MA, flGbeConverterFoSignalDetect
+			 flGbeConverterChannelEnable		INTEGER,
+			 flGbeConverterP2LoopBack			INTEGER, -- in GSM1000MA should be flGbeConverterFoLoopBack
+			 flGbeConverterLstP1-P2			    INTEGER, -- in GSM1010MA: flGbeConverterLstTp-Fo, n/a in GSM1000X
+ 			 flGbeConverterLstP2-P1			    INTEGER,  -- in GSM1010MA: flGbeConverterLstFo-Tp, in GSM1000X: flGbeConverterFpOA-UNI
+			 flGbeConverterUpstreamBW			INTEGER,
+			 flGbeConverterP1LoopBack			INTEGER,	-- only in GSM1000X
+			 flGbeConverterP1Type				INTEGER,	-- only in GSM1000X
+			 flGbeConverterP2Type				INTEGER,	-- only in GSM1000X
+			 flGbeConverterPause				INTEGER,	-- only in GSM1000X
+			 flGbeConverterAutoNego				INTEGER		-- only in GSM1000X
+		}
+
+	flGbeConverterPortIndex			OBJECT-TYPE
+		 SYNTAX    INTEGER
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Table index - port number" 
+	 ::= { flGbeConverterPortConfigEntry 1 }
+
+     flGbeConverterP1Link				OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								off		(1),
+								on		(2),
+								kld		(3)
+						   }
+         MAX-ACCESS     read-only
+         STATUS    current
+         DESCRIPTION
+         "Port #1 (TP) link status"
+	 ::= { flGbeConverterPortConfigEntry 2 }
+
+	flGbeConverterP2Link				OBJECT-TYPE
+		 SYNTAX    INTEGER {
+							  off	(1),
+							  on	(2)
+					       }
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Port #2 (FO) link status" 
+    ::= { flGbeConverterPortConfigEntry 3 }
+
+    flGbeConverterPortDescription		OBJECT-TYPE
+		 SYNTAX    DisplayString
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Port's textual description - up to 40 characters"
+	::= { flGbeConverterPortConfigEntry 4 }
+
+	--only in GSM1000MA!!!!
+	flGbeConverterP1SignalDetect		OBJECT-TYPE
+		 SYNTAX    INTEGER {
+							  off   (1),
+						      on    (2)
+					       }
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Port #1 Signal detect status"
+	::= { flGbeConverterPortConfigEntry 5 }
+
+	flGbeConverterP2SignalDetect		OBJECT-TYPE
+		 SYNTAX    INTEGER {
+							  off   (1),
+						      on    (2)
+					       }
+		 MAX-ACCESS     read-only		
+		 STATUS    current
+		 DESCRIPTION
+		 "Port #2 (FO) Signal detect status" 
+	::= { flGbeConverterPortConfigEntry 6 }
+
+	flGbeConverterChannelEnable			OBJECT-TYPE
+		 SYNTAX    INTEGER {
+							  off   (1),
+							  on    (2)
+					       }
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Channel Enable/Disable" 
+	::= { flGbeConverterPortConfigEntry 7 }
+
+	flGbeConverterP2LoopBack			OBJECT-TYPE
+		 SYNTAX    INTEGER {
+							  off   (1),
+							  on    (2)
+					       }
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Port #2 (FO) loopback status" 
+	::= { flGbeConverterPortConfigEntry 8 }
+
+	flGbeConverterLstP1-P2				OBJECT-TYPE
+		 SYNTAX    INTEGER {
+							  off   (1),
+							  on    (2)
+					       }
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Port#1->Port#2 (TP->FO) LST mode" 
+	::= { flGbeConverterPortConfigEntry 9 }
+
+    flGbeConverterLstP2-P1				OBJECT-TYPE
+		 SYNTAX    INTEGER {
+							  off  (1),
+						      on   (2)
+					       }
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Port#2->Port#1 (F0->TP) LST mode" 
+	::= { flGbeConverterPortConfigEntry 10 }
+
+	flGbeConverterUpstreamBW			OBJECT-TYPE
+		 SYNTAX    INTEGER (1..1000)
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Upstream bandwidth" 
+	::= { flGbeConverterPortConfigEntry 11 }
+
+	--only in GSM1000X!!!!
+	flGbeConverterP1LoopBack			OBJECT-TYPE
+		 SYNTAX    INTEGER {
+							  off   (1),
+							  on    (2)
+					       }
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Port #1 (FO) loopback status" 
+	::= { flGbeConverterPortConfigEntry 12 }
+
+	--only in GSM1000X!!!!
+	flGbeConverterP1Type			OBJECT-TYPE
+		SYNTAX	  INTEGER {
+						tp		(1),
+						fo		(2),
+						n-a		(3)
+				  }
+         MAX-ACCESS    read-only
+		 STATUS    current
+		 DESCRIPTION
+	     "Port 1 SFP type"
+    ::= { flGbeConverterPortConfigEntry  13 }
+
+	--only in GSM1000X!!!!
+	flGbeConverterP2Type			OBJECT-TYPE
+		SYNTAX	  INTEGER {
+						tp		(1),
+						fo		(2),
+						n-a		(3)
+				  }
+         MAX-ACCESS    read-only
+		 STATUS    current
+		 DESCRIPTION
+	     "Port 2 SFP type"
+    ::= { flGbeConverterPortConfigEntry  14 }
+
+	--only in GSM1000X!!!!
+	flGbeConverterPause				OBJECT-TYPE
+		SYNTAX	  INTEGER {
+                             off	(1),
+						     on		(2)
+						  }
+         MAX-ACCESS    read-write
+		 STATUS    current
+		 DESCRIPTION
+	     "Channel pause"
+    ::= { flGbeConverterPortConfigEntry  15 }
+
+	--only in GSM1000X!!!!
+	flGbeConverterAutoNego			OBJECT-TYPE
+		SYNTAX	  INTEGER {
+                             off	(1),
+						     on		(2)
+						  }
+         MAX-ACCESS    read-write
+		 STATUS    current
+		 DESCRIPTION
+	     "Channel auto-negotiation"
+    ::= { flGbeConverterPortConfigEntry  16 }
+
+-- ************************************************************
+-- Port's statistics table
+-- ************************************************************
+	 flGbeConverterStatisticsTable               OBJECT-TYPE
+         SYNTAX  SEQUENCE OF FlGbeConverterStatisticsEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "This table provides the statistics for all ports."
+     ::= { flGbeConverterStatistics 1 }
+
+     flGbeConverterStatisticsEntry				OBJECT-TYPE
+         SYNTAX  FlGbeConverterStatisticsEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "The entries of the table"
+         INDEX { flMsChassisMvIndex,
+		 flMsChassisModuleMvIndex,
+		 flMsModuleMvChannelIndex,
+		 flGbeConverterPortIndex }
+     ::= { flGbeConverterStatisticsTable 1 }
+
+		FlGbeConverterStatisticsEntry ::= SEQUENCE
+		{
+			 flGbeConverterRxDropEvents			Counter64,
+			 flGbeConverterRxOctets			Counter64,
+			 flGbeConverterRxPackets			Counter64,
+			 flGbeConverterRxBroadcastPackets		Counter64,
+			 flGbeConverterRxMulticastPackets		Counter64,
+			 flGbeConverterRxCrcAlignmentErrors		Counter64,
+			 flGbeConverterRxUndersizePackets		Counter64,
+			 flGbeConverterRxOversizePackets		Counter64,
+			 flGbeConverterRxFragments			Counter64,
+			 flGbeConverterRxJabbers			Counter64,
+			 flGbeConverterRxCollisions			Counter64,
+			 flGbeConverterRxPackets64Octets		Counter64,
+			 flGbeConverterRxPackets65to127Octets	Counter64,
+			 flGbeConverterRxPackets128to255Octets	Counter64,
+			 flGbeConverterRxPackets256to511Octets	Counter64,
+			 flGbeConverterRxPackets512to1023Octets	Counter64,
+			 flGbeConverterRxPackets1024toMaxOctets	Counter64,
+			 flGbeConverterRxFibroLANProprietryFrames	Counter64,
+			 flGbeConverterClearCounters		INTEGER,
+			 flGbeConverterRxOctetsRate			Counter64,
+			 flGbeConverterRxBitsRate			Counter64,
+			 flGbeConverterRxPacketsRate		Counter64,
+			 flGbeConverterRxUtilization		DisplayString,
+			 flGbeConverterTxOctets			Counter64,
+			 flGbeConverterTxPackets			Counter64,
+			 flGbeConverterTxBroadcastPackets		Counter64,
+			 flGbeConverterTxMulticastPackets		Counter64,
+			 flGbeConverterTxFibroLANProprietryFrames	Counter64,
+			 flGbeConverterTxOctetsRate			Counter64,
+			 flGbeConverterTxBitsRate			Counter64,
+			 flGbeConverterTxPacketsRate		Counter64,
+			 flGbeConverterTxUtilization		DisplayString
+		}
+
+     flGbeConverterRxDropEvents						OBJECT-TYPE
+		 SYNTAX    Counter64
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Counts number of times a packet is dropped, because of lack of available resources" 
+	 ::= { flGbeConverterStatisticsEntry 1 }
+
+     flGbeConverterRxOctets						OBJECT-TYPE
+		 SYNTAX    Counter64
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Counts the total number of octets (i.e. bytes) in any frames received" 
+	 ::= { flGbeConverterStatisticsEntry 2 }
+
+     flGbeConverterRxPackets						OBJECT-TYPE
+		 SYNTAX    Counter64
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Counts the number of frames received, good or bad" 
+	 ::= { flGbeConverterStatisticsEntry 3 }
+
+     flGbeConverterRxBroadcastPackets						OBJECT-TYPE
+		 SYNTAX    Counter64
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Counts the number of good frames received and forwarded with broadcast address. Does not include non-broadcast multicast frames" 
+	 ::= { flGbeConverterStatisticsEntry 4 }
+
+     flGbeConverterRxMulticastPackets						OBJECT-TYPE
+		 SYNTAX    Counter64
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Counts the number of good frames received and forwarded with multicast address. Does not include broadcast frames" 
+	 ::= { flGbeConverterStatisticsEntry 5 }
+
+     flGbeConverterRxCrcAlignmentErrors					OBJECT-TYPE
+		 SYNTAX    Counter64
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Counts number of frames received with FCS or alignment errors" 
+	 ::= { flGbeConverterStatisticsEntry 6 }
+
+     flGbeConverterRxUndersizePackets				OBJECT-TYPE
+		 SYNTAX    Counter64
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Counts number of frames received with size less than 64 bytes" 
+	 ::= { flGbeConverterStatisticsEntry 7 }
+
+     flGbeConverterRxOversizePackets					OBJECT-TYPE
+		 SYNTAX    Counter64
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Counts number of frames received with size exceeding the maximum allowable frame size" 
+	 ::= { flGbeConverterStatisticsEntry 8 }
+
+     flGbeConverterRxFragments					OBJECT-TYPE
+		 SYNTAX    Counter64
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Counts number of frames received with size less than 64 bytes and with bad FCS" 
+	 ::= { flGbeConverterStatisticsEntry 9 }
+
+     flGbeConverterRxJabbers					OBJECT-TYPE
+		 SYNTAX    Counter64
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Counts number of frames received with size exceeding maximum frame size and with bad FCS" 
+	 ::= { flGbeConverterStatisticsEntry 10 }
+
+     flGbeConverterRxCollisions					OBJECT-TYPE
+		 SYNTAX    Counter64
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Counts number of collision events detected" 
+	 ::= { flGbeConverterStatisticsEntry 11 }
+	 
+     flGbeConverterRxPackets64Octets					OBJECT-TYPE
+		 SYNTAX    Counter64
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Counts good packets with size = 64 bytes" 
+	 ::= { flGbeConverterStatisticsEntry 12 }
+
+     flGbeConverterRxPackets65to127Octets					OBJECT-TYPE
+		 SYNTAX    Counter64
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Counts good packets with size from 65 bytes to 127 bytes" 
+	 ::= { flGbeConverterStatisticsEntry 13 }
+
+     flGbeConverterRxPackets128to255Octets					OBJECT-TYPE
+		 SYNTAX    Counter64
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Counts good packets with size from 128 bytes to 255 bytes" 
+	 ::= { flGbeConverterStatisticsEntry 14 }
+
+     flGbeConverterRxPackets256to511Octets					OBJECT-TYPE
+		 SYNTAX    Counter64
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Counts good packets with size from 256 bytes to 511 bytes" 
+	 ::= { flGbeConverterStatisticsEntry 15 }
+
+     flGbeConverterRxPackets512to1023Octets					OBJECT-TYPE
+		 SYNTAX    Counter64
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Counts good packets with size from 512 bytes to 1023 bytes" 
+	 ::= { flGbeConverterStatisticsEntry 16 }
+
+     flGbeConverterRxPackets1024toMaxOctets					OBJECT-TYPE
+		 SYNTAX    Counter64
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Counts good packets with size from 1024 bytes to max. frame size" 
+	 ::= { flGbeConverterStatisticsEntry 17 }
+
+     flGbeConverterRxFibroLANProprietryFrames					OBJECT-TYPE
+		 SYNTAX    Counter64
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Counts number of FibroLAN's management proprietry frame received" 
+	 ::= { flGbeConverterStatisticsEntry 18 }
+
+     flGbeConverterClearCounters					OBJECT-TYPE
+		 SYNTAX    INTEGER	{
+								normal		(1),
+								clear		(2)
+							}
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Clear the port's counters for this table" 
+	 ::= { flGbeConverterStatisticsEntry 19 }
+
+     flGbeConverterRxOctetsRate						OBJECT-TYPE
+		 SYNTAX    Counter64
+		 UNITS		"bytes/sec"
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Received octets (i.e. bytes) rate in bytes per second" 
+	 ::= { flGbeConverterStatisticsEntry 20 }
+
+     flGbeConverterRxBitsRate						OBJECT-TYPE
+		 SYNTAX    Counter64
+		 UNITS		"bits/sec"
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Received bits rate in bits per second" 
+	 ::= { flGbeConverterStatisticsEntry 21 }
+
+     flGbeConverterRxPacketsRate					OBJECT-TYPE
+		 SYNTAX    Counter64
+		 UNITS		"frames/sec"
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Received packets (i.e frames) rate in frames per second" 
+	 ::= { flGbeConverterStatisticsEntry 22 }
+
+     flGbeConverterRxUtilization					OBJECT-TYPE
+		 SYNTAX    DisplayString
+		 UNITS		"%"
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Received data utilization rate" 
+	 ::= { flGbeConverterStatisticsEntry 23 }
+
+     flGbeConverterTxOctets						OBJECT-TYPE
+		 SYNTAX    Counter64
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Counts the total number of octets (i.e. bytes) in any frames sent" 
+	 ::= { flGbeConverterStatisticsEntry 24 }
+
+     flGbeConverterTxPackets						OBJECT-TYPE
+		 SYNTAX    Counter64
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Counts the number of frames sent, good or bad" 
+	 ::= { flGbeConverterStatisticsEntry 25 }
+
+     flGbeConverterTxBroadcastPackets						OBJECT-TYPE
+		 SYNTAX    Counter64
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Counts the number of good frames sent with broadcast address. Does not include non-broadcast multicast frames" 
+	 ::= { flGbeConverterStatisticsEntry 26 }
+
+     flGbeConverterTxMulticastPackets						OBJECT-TYPE
+		 SYNTAX    Counter64
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Counts the number of good frames sent with multicast address. Does not include broadcast frames" 
+	 ::= { flGbeConverterStatisticsEntry 27 }
+
+     flGbeConverterTxFibroLANProprietryFrames					OBJECT-TYPE
+		 SYNTAX    Counter64
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Counts number of FibroLAN's management proprietry frame sent" 
+	 ::= { flGbeConverterStatisticsEntry 28 }
+
+     flGbeConverterTxOctetsRate						OBJECT-TYPE
+		 SYNTAX    Counter64
+		 UNITS		"bytes/sec"
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Sent octets (i.e. bytes) rate in bytes per second" 
+	 ::= { flGbeConverterStatisticsEntry 29 }
+
+     flGbeConverterTxBitsRate						OBJECT-TYPE
+		 SYNTAX    Counter64
+		 UNITS		"bits/sec"
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Sent bits rate in bits per second" 
+	 ::= { flGbeConverterStatisticsEntry 30 }
+
+     flGbeConverterTxPacketsRate					OBJECT-TYPE
+		 SYNTAX    Counter64
+		 UNITS		"frames/sec"
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Sent packets (i.e frames) rate in frames per second" 
+	 ::= { flGbeConverterStatisticsEntry 31 }
+
+     flGbeConverterTxUtilization					OBJECT-TYPE
+		 SYNTAX    DisplayString
+		 UNITS		"%"
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Sent data utilization rate" 
+	 ::= { flGbeConverterStatisticsEntry 32 }
+
+END

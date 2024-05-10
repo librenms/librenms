@@ -4,19 +4,9 @@ on:
   push:
     branches:
       - 'master'
-    paths-ignore:
-      - '**.md'
-      - '.github/workflows/doc.yml'
-      - 'doc/**'
-      - 'mkdocs.yml'
   pull_request:
     branches:
       - 'master'
-    paths-ignore:
-      - '**.md'
-      - '.github/workflows/doc.yml'
-      - 'doc/**'
-      - 'mkdocs.yml'
 
 permissions:
   contents: read # to fetch code (actions/checkout)
