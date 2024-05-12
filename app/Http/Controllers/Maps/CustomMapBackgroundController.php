@@ -68,7 +68,8 @@ class CustomMapBackgroundController extends Controller
             'color' => 'required_if:type,color|regex:/^#[0-9a-f]{6,8}$/',
             'lat' => 'required_if:type,map|numeric|between:-90,90',
             'lng' => 'required_if:type,map|numeric|between:-180,180',
-            'zoom' => 'required_if:type,nap|integer|between:0,19',
+            'zoom' => 'required_if:type,map|integer|between:0,19',
+            'layer' => 'string|regex:/^[a-zA-Z]*$/',
         ]);
 
         $map->background_type = $request->type;
@@ -78,6 +79,7 @@ class CustomMapBackgroundController extends Controller
             'lat',
             'lng',
             'zoom',
+            'layer',
         ]));
 
         $map->save();

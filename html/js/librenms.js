@@ -316,8 +316,9 @@ function init_map(id, config = {}) {
                     "Streets": roads,
                     "Satellite": satellite
                 };
-                L.control.layers(baseMaps, null, {position: 'bottomleft'}).addTo(leaflet);
-                roads.addTo(leaflet);
+                leaflet.layerControl = L.control.layers(baseMaps, null, {position: 'bottomleft'}).addTo(leaflet);
+                (config.layer in baseMaps ? baseMaps[config.layer] : roads).addTo(leaflet);
+                leaflet.layerControl._container.style.display = (config.readonly ? 'none' : 'block');
             });
         });
     } else if (config.engine === 'bing' && config.api_key) {
@@ -335,8 +336,9 @@ function init_map(id, config = {}) {
                 "Streets": roads,
                 "Satellite": satellite
             };
-            L.control.layers(baseMaps, null, {position: 'bottomleft'}).addTo(leaflet);
-            roads.addTo(leaflet);
+            leaflet.layerControl = L.control.layers(baseMaps, null, {position: 'bottomleft'}).addTo(leaflet);
+            (config.layer in baseMaps ? baseMaps[config.layer] : roads).addTo(leaflet);
+            leaflet.layerControl._container.style.display = (config.readonly ? 'none' : 'block');
         });
     } else if (config.engine === 'mapquest' && config.api_key) {
         loadjs('https://www.mapquestapi.com/sdk/leaflet/v2.2/mq-map.js?key=' + config.api_key, function () {
@@ -347,8 +349,10 @@ function init_map(id, config = {}) {
                 "Streets": roads,
                 "Satellite": satellite
             };
-            L.control.layers(baseMaps, null, {position: 'bottomleft'}).addTo(leaflet);
-            roads.addTo(leaflet);
+            leaflet.layerControl = L.control.layers(baseMaps, null, {position: 'bottomleft'}).addTo(leaflet);
+            (config.layer in baseMaps ? baseMaps[config.layer] : roads).addTo(leaflet);
+            console.log(config);
+            leaflet.layerControl._container.style.display = (config.readonly ? 'none' : 'block');
         });
     } else {
         const tile_url = config.tile_url ? config.tile_url : '{s}.tile.openstreetmap.org';
@@ -365,7 +369,7 @@ function init_map(id, config = {}) {
         //     "OpenStreetMap": osm,
         //     "Satellite": esri
         // };
-        // L.control.layers(baseMaps, null, {position: 'bottomleft'}).addTo(leaflet);
+        // leaflet.layerControl = L.control.layers(baseMaps, null, {position: 'bottomleft'}).addTo(leaflet);
         osm.addTo(leaflet);
     }
 
@@ -402,6 +406,9 @@ function disable_map_interaction(leaflet) {
     leaflet.locateControl?.stop();
     leaflet.locateControl?.remove();
     delete leaflet.locateControl;
+    if (leaflet.layerControl) {
+        leaflet.layerControl._container.style.display = 'none';
+    }
     leaflet.dragging.disable();
     leaflet.touchZoom.disable();
     leaflet.doubleClickZoom.disable();
@@ -419,6 +426,9 @@ function enable_map_interaction(leaflet) {
     if (location.protocol === 'https:' && ! leaflet.locateControl) {
         // can't request location permission without https
         leaflet.locateControl = L.control.locate().addTo(leaflet);
+    }
+    if (leaflet.layerControl) {
+        leaflet.layerControl._container.style.display = 'block';
     }
     leaflet.dragging.enable();
     leaflet.touchZoom.enable();

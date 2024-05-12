@@ -59,6 +59,7 @@
             lat: null,
             lng: null,
             zoom: null,
+            layer: null,
             image: null,
             image_content: null,
             saving_map_as_image: false,
@@ -69,10 +70,12 @@
                 this.lat = 'lat' in this.initial_data ? this.initial_data.lat : 40;
                 this.lng = 'lng' in this.initial_data ? this.initial_data.lng : -20;
                 this.zoom = 'zoom' in this.initial_data ? this.initial_data.zoom : 3;
+                this.layer = 'layer' in this.initial_data ? this.initial_data.layer :  null;
                 this.image = this.initial_data['original_filename'];
                 this.image_content = null;
                 this.error = '';
 
+                setCustomMapBackground('custom-map', this.type, this.initial_data);
                 // stop map interaction
                 document.getElementById('custom-map-bg-geo-map').style.zIndex = '1';
                 const leaflet = get_map('custom-map-bg-geo-map');
@@ -80,9 +83,9 @@
                     disable_map_interaction(leaflet)
                     leaflet.off('zoomend');
                     leaflet.off('moveend');
+                    leaflet.off('baselayerchange');
                     leaflet.setView(L.latLng(this.lat, this.lng), this.zoom);
                 }
-                setCustomMapBackground('custom-map', this.type, this.initial_data);
             },
             setImage(event) {
                 this.image_content = event.target.files[0];
@@ -125,6 +128,7 @@
                     fd.append('lat', this.lat);
                     fd.append('lng', this.lng);
                     fd.append('zoom', this.zoom);
+                    fd.append('layer', this.layer);
                 }
 
                 fetch({{ Js::from(route('maps.custom.background.save', ['map' => $map_id])) }}, {
@@ -172,11 +176,13 @@
                     this.lng = center.lng;
                     this.zoom = leaflet.getZoom();
                 }
+                let layerChange = (event) => {this.layer = event.name};
                 leaflet._container.style.zIndex = '3';
                 enable_map_interaction(leaflet);
                 leaflet.on({
                     zoomend: adjustValues,
                     moveend: adjustValues,
+                    baselayerchange: layerChange,
                 });
                 startBackgroundMapAdjust();
                 $('#bgModal').modal('hide');

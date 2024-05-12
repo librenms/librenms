@@ -48,9 +48,7 @@
                        :init="$background_type == 'map'"
                        :width="$map_conf['width']"
                        :height="$map_conf['height']"
-                       :lat="$background_config['lat'] ?? 0"
-                       :lng="$background_config['lng'] ?? 0"
-                       :zoom="$background_config['zoom'] ?? 5"
+                       :config="$background_config"
                        readonly
             />
     </div>
