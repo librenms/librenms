@@ -95,6 +95,7 @@
                 this.image_content = null;
             },
             setMapAsImage() {
+                setCustomMapBackground('custom-map', this.type, this.initial_data);
                 this.saving_map_as_image = true;
                 leafletImage(get_map('custom-map-bg-geo-map'), (err, canvas) => {
                     if (! canvas) {

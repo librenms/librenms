@@ -351,7 +351,6 @@ function init_map(id, config = {}) {
             };
             leaflet.layerControl = L.control.layers(baseMaps, null, {position: 'bottomleft'}).addTo(leaflet);
             (config.layer in baseMaps ? baseMaps[config.layer] : roads).addTo(leaflet);
-            console.log(config);
             leaflet.layerControl._container.style.display = (config.readonly ? 'none' : 'block');
         });
     } else {
