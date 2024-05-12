@@ -30,7 +30,7 @@
                         <x-input id="bg-lng" label="{{ __('map.custom.edit.bg.lng') }}" x-model="lng"></x-input>
                         <x-input id="bg-zoom" label="{{ __('map.custom.edit.bg.zoom') }}" x-model="zoom"></x-input>
                         <button type="button" class="btn btn-primary tw-mt-2" @click="adjustMap">{{ __('map.custom.edit.bg.adjust_map') }}</button>
-                        <button type="button" class="btn btn-primary tw-mt-2" @click="setMapAsImage" title="{{ __('map.custom.edit.bg.as_image_hint') }}" :disabled="saving_map_as_image">
+                        <button type="button" class="btn btn-primary tw-mt-2" @click="setMapAsImage" title="{{ __('map.custom.edit.bg.as_image_hint') }}" :disabled="saving_map_as_image" x-show="show_image_export">
                             <i class="fa-solid fa-circle-notch fa-spin" x-show="saving_map_as_image"></i>
                             {{ __('map.custom.edit.bg.as_image') }}
                         </button>
@@ -61,6 +61,7 @@
             zoom: null,
             layer: null,
             image: null,
+            show_image_export: true,
             image_content: null,
             saving_map_as_image: false,
             error: '',
@@ -73,6 +74,7 @@
                 this.layer = 'layer' in this.initial_data ? this.initial_data.layer :  null;
                 this.image = this.initial_data['original_filename'];
                 this.image_content = null;
+                this.show_image_export = (! 'engine' in this.initial_data) || ! ['google', 'bing'].includes(this.initial_data['engine']);
                 this.error = '';
 
                 setCustomMapBackground('custom-map', this.type, this.initial_data);
