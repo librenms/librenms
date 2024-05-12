@@ -448,7 +448,6 @@ function init_map_marker(leaflet, latlng) {
 }
 
 function setCustomMapBackground(id, type, data) {
-    const canvas = $(`#${id}`).children()[0].canvas;
     let image = '';
     let color = '';
 
@@ -457,14 +456,14 @@ function setCustomMapBackground(id, type, data) {
     } else if(type === 'color') {
         color = data.color;
     }
-    $(canvas).css('background-image', image)
+    $(`#${id} .vis-network canvas`)
+        .css('background-image', image)
         .css('background-size', 'cover')
         .css('background-color', color);
 
     const mapBackgroundId = `${id}-bg-geo-map`;
-    const mapBackgroundSelector = `#${id}-bg-geo-map`;
     if (type === 'map') {
-        $(mapBackgroundSelector).show();
+        $(`#${id}-bg-geo-map`).show();
         let config = data;
         config['readonly'] = true;
         init_map(mapBackgroundId, config)

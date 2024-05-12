@@ -82,6 +82,7 @@
                     leaflet.off('moveend');
                     leaflet.setView(L.latLng(this.lat, this.lng), this.zoom);
                 }
+                setCustomMapBackground('custom-map', this.type, this.initial_data);
             },
             setImage(event) {
                 this.image_content = event.target.files[0];
