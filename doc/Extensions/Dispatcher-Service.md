@@ -182,7 +182,7 @@ The watchdog scheduler will check that the poller log file has been written to w
 
 ## Cron Scripts
 
-Once the LibreNMS service is installed, the cron scripts used by LibreNMS to start alerting, polling, discovery and maintenance tasks are no longer required and must be disabled either by removing or commenting them out. The service handles these tasks when enabled.
+Once the LibreNMS service is installed, the cron scripts used by LibreNMS to start alerting, polling, discovery and maintenance tasks are no longer required and must be disabled either by removing or commenting them out. The service handles these tasks when enabled. daily.sh, is not a maintenance task run by the scheduler. Don't disable it in the cron job.
 
 ## Service Installation
 
