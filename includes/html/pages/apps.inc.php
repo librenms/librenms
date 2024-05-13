@@ -326,16 +326,16 @@ $graphs['freeradius'] = [
     'queue',
 ];
 $graphs['suricata'] = [
-    'alert',
     'packets_overview',
-    'nasty_delta',
-    'nasty_percent',
-    'dec_proto',
-    'flow_proto',
-    'app_flows',
-    'app_tx',
-    'bytes',
-    'mem_use',
+    'nasty_delta_overview',
+    'nasty_percent_overview',
+    'dec_proto_overview',
+    'flow_proto_overview',
+    'app_flows_overview',
+    'app_tx_overview',
+    'bytes_overview',
+    'mem_use_overview',
+    'alert_overview',
 ];
 $graphs['zfs'] = [
     'arc_misc',
