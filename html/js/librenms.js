@@ -1,3 +1,5 @@
+window.maps = {};
+
 function override_config(event, state, tmp_this) {
     event.preventDefault();
     var $this = tmp_this;
@@ -285,18 +287,28 @@ function loadjs(filename, func){
     }
 }
 
-function init_map(id, engine, api_key, config) {
-    var leaflet = L.map(id);
-    var baseMaps = {};
-    leaflet.setView([0, 0], 15);
+function init_map(id, config = {}) {
+    let leaflet = get_map(id)
+    if (leaflet) {
+        // return existing map
+        return leaflet;
+    }
 
-    if (engine === 'google') {
-        loadjs('https://maps.googleapis.com/maps/api/js?key=' + api_key, function () {
+    leaflet = L.map(id, {
+        preferCanvas: true,
+        zoom: config.zoom !== undefined ? config.zoom : 3,
+        center: (config.lat !== undefined && config.lng !== undefined) ? [config.lat, config.lng] : [40,-20]
+    });
+    window.maps[id] = leaflet;
+    let baseMaps = {};
+
+    if (config.engine === 'google' && config.api_key) {
+        loadjs('https://maps.googleapis.com/maps/api/js?key=' + config.api_key, function () {
             loadjs('js/Leaflet.GoogleMutant.js', function () {
-                var roads = L.gridLayer.googleMutant({
+                const roads = L.gridLayer.googleMutant({
                     type: 'roadmap'	// valid values are 'roadmap', 'satellite', 'terrain' and 'hybrid'
                 });
-                var satellite = L.gridLayer.googleMutant({
+                const satellite = L.gridLayer.googleMutant({
                     type: 'satellite'
                 });
 
@@ -304,18 +316,19 @@ function init_map(id, engine, api_key, config) {
                     "Streets": roads,
                     "Satellite": satellite
                 };
-                L.control.layers(baseMaps, null, {position: 'bottomleft'}).addTo(leaflet);
-                roads.addTo(leaflet);
+                leaflet.layerControl = L.control.layers(baseMaps, null, {position: 'bottomleft'}).addTo(leaflet);
+                (config.layer in baseMaps ? baseMaps[config.layer] : roads).addTo(leaflet);
+                leaflet.layerControl._container.style.display = (config.readonly ? 'none' : 'block');
             });
         });
-    } else if (engine === 'bing') {
+    } else if (config.engine === 'bing' && config.api_key) {
         loadjs('js/leaflet-bing-layer.min.js', function () {
-            var roads = L.tileLayer.bing({
-                bingMapsKey: api_key,
+            const roads = L.tileLayer.bing({
+                bingMapsKey: config.api_key,
                 imagerySet: 'RoadOnDemand'
             });
-            var satellite = L.tileLayer.bing({
-                bingMapsKey: api_key,
+            const satellite = L.tileLayer.bing({
+                bingMapsKey: config.api_key,
                 imagerySet: 'AerialWithLabelsOnDemand'
             });
 
@@ -323,23 +336,26 @@ function init_map(id, engine, api_key, config) {
                 "Streets": roads,
                 "Satellite": satellite
             };
-            L.control.layers(baseMaps, null, {position: 'bottomleft'}).addTo(leaflet);
-            roads.addTo(leaflet);
+            leaflet.layerControl = L.control.layers(baseMaps, null, {position: 'bottomleft'}).addTo(leaflet);
+            (config.layer in baseMaps ? baseMaps[config.layer] : roads).addTo(leaflet);
+            leaflet.layerControl._container.style.display = (config.readonly ? 'none' : 'block');
         });
-    } else if (engine === 'mapquest') {
-        loadjs('https://www.mapquestapi.com/sdk/leaflet/v2.2/mq-map.js?key=' + api_key, function () {
-            var roads = MQ.mapLayer();
-            var satellite = MQ.hybridLayer();
+    } else if (config.engine === 'mapquest' && config.api_key) {
+        loadjs('https://www.mapquestapi.com/sdk/leaflet/v2.2/mq-map.js?key=' + config.api_key, function () {
+            const roads = MQ.mapLayer();
+            const satellite = MQ.hybridLayer();
 
             baseMaps = {
                 "Streets": roads,
                 "Satellite": satellite
             };
-            L.control.layers(baseMaps, null, {position: 'bottomleft'}).addTo(leaflet);
-            roads.addTo(leaflet);
+            leaflet.layerControl = L.control.layers(baseMaps, null, {position: 'bottomleft'}).addTo(leaflet);
+            (config.layer in baseMaps ? baseMaps[config.layer] : roads).addTo(leaflet);
+            leaflet.layerControl._container.style.display = (config.readonly ? 'none' : 'block');
         });
     } else {
-        var osm = L.tileLayer('//' + config.tile_url + '/{z}/{x}/{y}.png', {
+        const tile_url = config.tile_url ? config.tile_url : '{s}.tile.openstreetmap.org';
+        const osm = L.tileLayer('//' + tile_url + '/{z}/{x}/{y}.png', {
             maxZoom: 19,
             attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
         });
@@ -352,20 +368,79 @@ function init_map(id, engine, api_key, config) {
         //     "OpenStreetMap": osm,
         //     "Satellite": esri
         // };
-        // L.control.layers(baseMaps, null, {position: 'bottomleft'}).addTo(leaflet);
+        // leaflet.layerControl = L.control.layers(baseMaps, null, {position: 'bottomleft'}).addTo(leaflet);
         osm.addTo(leaflet);
     }
 
-    if (location.protocol === 'https:') {
+    // disable all interaction
+    if (config.readonly === true) {
+        disable_map_interaction(leaflet)
+    } else if (location.protocol === 'https:') {
         // can't request location permission without https
-        L.control.locate().addTo(leaflet);
+        leaflet.locateControl = L.control.locate().addTo(leaflet);
     }
 
     return leaflet;
 }
 
+function get_map(id) {
+    if (window.maps) {
+        return window.maps[id];
+    }
+}
+
+function destroy_map(id) {
+    const leaflet = get_map(id);
+    if(id in window.maps) {
+        leaflet.off();
+        leaflet._container.classList.remove('leaflet-container', 'leaflet-touch', 'leaflet-retina', 'leaflet-fade-anim');
+        leaflet.remove();
+        delete window.maps[id];
+    }
+}
+
+function disable_map_interaction(leaflet) {
+    leaflet.zoomControl?.remove();
+    delete leaflet.zoomControl;
+    leaflet.locateControl?.stop();
+    leaflet.locateControl?.remove();
+    delete leaflet.locateControl;
+    if (leaflet.layerControl) {
+        leaflet.layerControl._container.style.display = 'none';
+    }
+    leaflet.dragging.disable();
+    leaflet.touchZoom.disable();
+    leaflet.doubleClickZoom.disable();
+    leaflet.scrollWheelZoom.disable();
+    leaflet.boxZoom.disable();
+    leaflet.keyboard.disable();
+    leaflet.tap?.disable();
+    leaflet._container.style.cursor = 'default';
+}
+
+function enable_map_interaction(leaflet) {
+    if (! leaflet.zoomControl) {
+        leaflet.zoomControl = L.control.zoom().addTo(leaflet);
+    }
+    if (location.protocol === 'https:' && ! leaflet.locateControl) {
+        // can't request location permission without https
+        leaflet.locateControl = L.control.locate().addTo(leaflet);
+    }
+    if (leaflet.layerControl) {
+        leaflet.layerControl._container.style.display = 'block';
+    }
+    leaflet.dragging.enable();
+    leaflet.touchZoom.enable();
+    leaflet.doubleClickZoom.enable();
+    leaflet.scrollWheelZoom.enable();
+    leaflet.boxZoom.enable();
+    leaflet.keyboard.enable();
+    leaflet.tap?.enable();
+    leaflet._container.style.cursor = 'pointer';
+}
+
 function init_map_marker(leaflet, latlng) {
-    var marker = L.marker(latlng);
+    let marker = L.marker(latlng);
     marker.addTo(leaflet);
     leaflet.setView(latlng);
 
@@ -379,6 +454,33 @@ function init_map_marker(leaflet, latlng) {
     });
 
     return marker;
+}
+
+function setCustomMapBackground(id, type, data) {
+    let image = '';
+    let color = '';
+
+    if(type === 'image') {
+        image = `url(${data.image_url})`;
+    } else if(type === 'color') {
+        color = data.color;
+    }
+    $(`#${id} .vis-network canvas`)
+        .css('background-image', image)
+        .css('background-size', 'cover')
+        .css('background-color', color);
+
+    const mapBackgroundId = `${id}-bg-geo-map`;
+    if (type === 'map') {
+        $(`#${id}-bg-geo-map`).show();
+        let config = data;
+        config['readonly'] = true;
+        init_map(mapBackgroundId, config)
+            .setView(L.latLng(data.lat, data.lng), data.zoom);
+    } else {
+        // destroy the map if it exists
+        destroy_map(mapBackgroundId)
+    }
 }
 
 function update_location(id, latlng, callback) {
