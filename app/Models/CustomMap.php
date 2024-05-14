@@ -89,18 +89,17 @@ class CustomMap extends BaseModel
             'nodes as device_nodes_allowed_count' => function (Builder $q) use ($user) {
                 $this->hasDeviceAccess($q, $user, 'custom_map_nodes');
             },
-        ])->get();
+        ])
+            ->havingRaw('device_nodes_count = device_nodes_allowed_count')
+            ->having('device_nodes_count', '>', 0)
+            ->get();
 
-        if (count($results) !== 1) {
-            return false; // No access if we didn't get exactly 1 row returned
+        if (count($results) === 1) {
+            // Allow access if the user has access to all devices on the map
+            return true;
         }
 
-        if ($results[0]->device_nodes_count === 0) {
-            return false; // No access if there are no devices
-        }
-
-        // Allow access if the user has access to all devices linked to the map
-        return $results[0]->device_nodes_count === $results[0]->device_nodes_allowed_count;
+        return false;
     }
 
     public function scopeHasAccess($query, User $user)
