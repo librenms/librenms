@@ -43,7 +43,7 @@ if (Rrd::checkRrdExists($capture__kernel_ifdrops_rrd_filename)) {
     if (Rrd::checkRrdExists($error_delta_rrd_filename)) {
         $rrd_list[] = [
             'filename' => $error_delta_rrd_filename,
-            'descr' => 'Error Delta',
+            'descr' => 'Errors',
             'ds' => 'data',
         ];
     } else {

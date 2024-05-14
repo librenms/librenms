@@ -1,7 +1,7 @@
 <?php
 
 $name = 'suricata';
-$unit_text = 'seconds';
+$unit_text = 'per seconds';
 $colours = 'psychedelic';
 $dostack = 0;
 $printtotal = 1;
@@ -18,7 +18,7 @@ $rrd_list = [];
 if (Rrd::checkRrdExists($error_delta_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $error_delta_rrd_filename,
-        'descr' => 'Error Delta',
+        'descr' => 'Errors',
         'ds' => 'data',
     ];
 } else {
