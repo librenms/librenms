@@ -80,9 +80,27 @@ class CustomMap extends BaseModel
         return $config;
     }
 
-    public function hasAccess(): bool
+    public function hasReadAccess(User $user): bool
     {
-        return false; // TODO calculate based on device access
+        $results = $this->query()->where('custom_map_id',$this->custom_map_id)->withCount([
+            'nodes as device_nodes_count' => function (Builder $q) {
+                $q->whereNotNull('device_id');
+            },
+            'nodes as device_nodes_allowed_count' => function (Builder $q) use ($user) {
+                $this->hasDeviceAccess($q, $user, 'custom_map_nodes');
+            },
+        ])->get();
+
+        if (count($results) !== 1) {
+            return false; // No access if we didn't get exactly 1 row returned
+        }
+
+        if ($results[0]->device_nodes_count === 0) {
+            return false; // No access if there are no devices
+        }
+
+        // Allow access if the user has access to all devices linked to the map
+        return ($results[0]->device_nodes_count === $results[0]->device_nodes_allowed_count);
     }
 
     public function scopeHasAccess($query, User $user)
