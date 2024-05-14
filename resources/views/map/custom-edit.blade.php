@@ -659,6 +659,7 @@
                 editExistingEdge(edge, null);
                 return;
             }
+
             // Legend nodes cannot be edited
             if (data.id.startsWith("legend_") ) {
                 return;
