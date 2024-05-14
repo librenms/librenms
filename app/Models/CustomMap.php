@@ -82,7 +82,7 @@ class CustomMap extends BaseModel
 
     public function hasReadAccess(User $user): bool
     {
-        $results = $this->query()->where('custom_map_id',$this->custom_map_id)->withCount([
+        $results = $this->query()->where('custom_map_id', $this->custom_map_id)->withCount([
             'nodes as device_nodes_count' => function (Builder $q) {
                 $q->whereNotNull('device_id');
             },
@@ -100,7 +100,7 @@ class CustomMap extends BaseModel
         }
 
         // Allow access if the user has access to all devices linked to the map
-        return ($results[0]->device_nodes_count === $results[0]->device_nodes_allowed_count);
+        return $results[0]->device_nodes_count === $results[0]->device_nodes_allowed_count;
     }
 
     public function scopeHasAccess($query, User $user)
