@@ -91,19 +91,28 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
         }
 
         // special character handling
-        $group_dn = addcslashes($result[0]['dn'], '()#\\');
+        $group_dn = addcslashes($result[0]['dn'], '\\');
+
+        // LDAP filter to check if user is member of the given group or nested group
+        $group_dn_filter = '(&' . $this->userFilter($username) . "(memberOf:1.2.840.113556.1.4.1941:=$group_dn))";
 
         $search = ldap_search(
             $connection,
             Config::get('auth_ad_base_dn'),
             // add 'LDAP_MATCHING_RULE_IN_CHAIN to the user filter to search for $username in nested $group_dn
             // limiting to "DN" for shorter array
-            '(&' . $this->userFilter($username) . "(memberOf:1.2.840.113556.1.4.1941:=$group_dn))",
+            $group_dn_filter,
             ['DN']
         );
-        $entries = ldap_get_entries($connection, $search);
 
-        return (int) $entries['count'] > 0;
+        // check if the search result is a boolean, if so the LDAP query failed and we return 0 to let procedure continue
+        if (is_bool($search)) {
+            return 0;
+        } else {
+            $entries = ldap_get_entries($connection, $search);
+
+            return (int) $entries['count'] > 0;
+        }
     }
 
     public function userExists($username, $throw_exception = false)
