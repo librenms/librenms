@@ -38,6 +38,7 @@ class CustomMap extends BaseModel
         'options' => 'array',
         'newnodeconfig' => 'array',
         'newedgeconfig' => 'array',
+        'background_data' => 'array',
     ];
     protected $fillable = [
         'name',
@@ -53,8 +54,8 @@ class CustomMap extends BaseModel
         'legend_font_size',
         'legend_hide_invalid',
         'legend_hide_overspeed',
-        'background_suffix',
-        'background_version',
+        'background_type',
+        'background_data',
     ];
 
     // default values for attributes
@@ -62,8 +63,22 @@ class CustomMap extends BaseModel
         'options' => '{"interaction":{"dragNodes":false,"dragView":false,"zoomView":false},"manipulation":{"enabled":false},"physics":{"enabled":false}}',
         'newnodeconfig' => '{"borderWidth":1,"color":{"border":"#2B7CE9","background":"#D2E5FF"},"font":{"color":"#343434","size":14,"face":"arial"},"icon":[],"label":true,"shape":"box","size":25}',
         'newedgeconfig' => '{"arrows":{"to":{"enabled":true}},"smooth":{"type":"dynamic"},"font":{"color":"#343434","size":12,"face":"arial"},"label":true}',
-        'background_version' => 0,
     ];
+
+    /**
+     * Get background data intended to be passed to javascript to configure the background
+     */
+    public function getBackgroundConfig(): array
+    {
+        $config = $this->background_data ?? [];
+        $config['engine'] = \LibreNMS\Config::get('geoloc.engine');
+        $config['api_key'] = \LibreNMS\Config::get('geoloc.api_key');
+        $config['tile_url'] = \LibreNMS\Config::get('leaflet.tile_url');
+        /* @phpstan-ignore-next-line seems to think version is not in array 100% of the time... which is wrong */
+        $config['image_url'] = route('maps.custom.background', ['map' => $this->custom_map_id]) . '?version=' . ($config['version'] ?? 0);
+
+        return $config;
+    }
 
     public function hasAccess(): bool
     {

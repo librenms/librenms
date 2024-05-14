@@ -31,6 +31,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class CustomMapBackground extends BaseModel
 {
     use HasFactory;
+
     protected $primaryKey = 'custom_map_background_id';
 
     public function map(): BelongsTo

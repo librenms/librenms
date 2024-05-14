@@ -13,10 +13,11 @@
 <div class="container-fluid">
   <div class="row" id="control-row">
     <div class="col-md-5">
-      <button type=button value="mapedit" id="map-editButton" class="btn btn-primary" onclick="editMapSettings();">{{ __('map.custom.edit.map.edit') }}</button>
-      <button type=button value="mapbg" id="map-bgButton" class="btn btn-primary" onclick="editMapBackground();">{{ __('map.custom.edit.bg.title') }}</button>
-      <button type=button value="editnodedefaults" id="map-nodeDefaultsButton" class="btn btn-primary" onclick="editNodeDefaults();">{{ __('map.custom.edit.node.edit_defaults') }}</button>
-      <button type=button value="editedgedefaults" id="map-edgeDefaultsButton" class="btn btn-primary" onclick="editEdgeDefaults();">{{ __('map.custom.edit.edge.edit_defaults') }}</button>
+      <button type=button value="mapedit" id="map-editButton" class="btn btn-primary" onclick="editMapSettings()">{{ __('map.custom.edit.map.edit') }}</button>
+      <button type=button value="mapbg" id="map-bgButton" class="btn btn-primary" onclick="editMapBackground()">{{ __('map.custom.edit.bg.title') }}</button>
+      <button type=button value="mapbg" id="map-bgEndAdjustButton" class="btn btn-primary" onclick="endBackgroundMapAdjust()" style="display:none">{{ __('map.custom.edit.bg.adjust_map_finish') }}</button>
+      <button type=button value="editnodedefaults" id="map-nodeDefaultsButton" class="btn btn-primary" onclick="editNodeDefaults()">{{ __('map.custom.edit.node.edit_defaults') }}</button>
+      <button type=button value="editedgedefaults" id="map-edgeDefaultsButton" class="btn btn-primary" onclick="editEdgeDefaults()">{{ __('map.custom.edit.edge.edit_defaults') }}</button>
     </div>
     <div class="col-md-2">
       <center>
@@ -41,9 +42,15 @@
   </div>
   <div class="row">
     <div class="col-md-12">
-      <center>
-        <div id="custom-map"></div>
-      </center>
+        <div id="map-container">
+            <div id="custom-map"></div>
+            <x-geo-map id="custom-map-bg-geo-map"
+                       :init="$background_type == 'map'"
+                       :width="$map_conf['width']"
+                       :height="$map_conf['height']"
+                       :config="$background_config"
+                       readonly
+            />
     </div>
   </div>
 </div>
@@ -51,11 +58,35 @@
 
 @section('javascript')
 <script type="text/javascript" src="{{ asset('js/vis.min.js') }}"></script>
+<script type="text/javascript" src="{{ asset('js/leaflet.js') }}"></script>
+<script type="text/javascript" src="{{ asset('js/L.Control.Locate.min.js') }}"></script>
+<script type="text/javascript" src="{{ asset('js/leaflet-image.js') }}"></script>
 @endsection
+
+@push('styles')
+    <style>
+        #map-container {
+            display: grid;
+            grid-template: 1fr / 1fr;
+            place-items: center;
+        }
+        #custom-map {
+            grid-column: 1 / 1;
+            grid-row: 1 / 1;
+            z-index: 2;
+        }
+        #custom-map-bg-geo-map {
+            grid-column: 1 / 1;
+            grid-row: 1 / 1;
+            z-index: 1;
+        }
+    </style>
+@endpush
 
 @section('scripts')
 <script type="text/javascript">
-    var bgimage = {{ $background ? "true" : "false" }};
+    var bgtype = {{ Js::from($background_type) }};
+    var bgdata = {{ Js::from($background_config) }};
     var network;
     var network_height;
     var network_width;
@@ -64,6 +95,7 @@
     var edge_nodes_map = [];
     var node_device_map = {};
     var custom_image_base = "{{ $base_url }}images/custommap/icons/";
+    var network_options = {{ Js::from($map_conf) }}
 
     function edgeNodesRemove(nm_id, edgeid) {
         // Remove old item from map if it exists
@@ -195,7 +227,7 @@
         network_edges.flush();
 
         var container = document.getElementById('custom-map');
-        var options = {!! json_encode($map_conf) !!};
+        var options = network_options;
 
         // Set up the triggers for adding and editing map items
         options['manipulation']['addNode'] = function (data, callback) {
@@ -280,17 +312,15 @@
         };
 
         network = new vis.Network(container, {nodes: network_nodes, edges: network_edges, stabilize: true}, options);
+
+        // width/height might be % get values in pixels
         network_height = $($(container).children(".vis-network")[0]).height();
         network_width = $($(container).children(".vis-network")[0]).width();
-        var centreY = parseInt(network_height / 2);
-        var centreX = parseInt(network_width / 2);
-
+        var centreY = Math.round(network_height / 2);
+        var centreX = Math.round(network_width / 2);
         network.moveTo({position: {x: centreX, y: centreY}, scale: 1});
 
-        if(bgimage) {
-            canvas = $("#custom-map").children()[0].canvas;
-            $(canvas).css('background-image','url({{ route('maps.custom.background', ['map' => $map_id]) }}?ver={{$bgversion}})').css('background-size', 'cover');
-        }
+        setCustomMapBackground('custom-map', bgtype, bgdata);
 
         network.on('doubleClick', function (properties) {
             edge_id = null;
@@ -453,6 +483,11 @@
         reverse_arrows = parseInt(data.reverse_arrows);
         redrawLegend();
 
+        // update dimensions
+        network_options.width = data.width;
+        network_options.height = data.height;
+        $("#custom-map-bg-geo-map").css('width', data.width).css('height', data.height);
+
         // Re-create the network because network.setSize() blanks out the map
         CreateNetwork();
 
@@ -529,15 +564,7 @@
     }
 
     function editMapBackground() {
-        $("#mapBackgroundCancel").hide();
-        $("#mapBackgroundSelect").val(null);
-
-        if($("#custom-map").children()[0].canvas.style.backgroundImage) {
-            $("#mapBackgroundClearRow").show();
-        } else {
-            $("#mapBackgroundClearRow").hide();
-        }
-        $('#bgModal').modal({backdrop: 'static', keyboard: false}, 'show');
+        $('#bgModal').modal('show');
     }
 
     function nodeStyleChange() {
@@ -1190,6 +1217,23 @@
                 }
             }
         }).observe(targetNode, {attributes: false, childList: true, subtree: false});
+    }
+
+    function startBackgroundMapAdjust() {
+        $('#map-editButton,#map-nodeDefaultsButton,#map-edgeDefaultsButton,#map-bgButton').hide();
+        $('#map-bgEndAdjustButton').show();
+    }
+
+    function endBackgroundMapAdjust() {
+        $('#map-editButton,#map-nodeDefaultsButton,#map-edgeDefaultsButton,#map-bgButton').show();
+        $('#map-bgEndAdjustButton').hide();
+
+        document.getElementById('custom-map-bg-geo-map').style.zIndex = '1';
+        const leaflet = get_map('custom-map-bg-geo-map');
+        if (leaflet) {
+            disable_map_interaction(leaflet)
+        }
+        editMapBackground();
     }
 
     $(document).ready(function () {

@@ -149,7 +149,7 @@
 
                 if (locationMap === null) {
                     config = {{ Js::from($maps_config) }}
-                    locationMap = init_map('location-edit-map', '{{ $maps_engine }}', '{{ $maps_api }}', config);
+                    locationMap = init_map('location-edit-map', config);
                     locationMarker = init_map_marker(locationMap, location);
                 }
 
