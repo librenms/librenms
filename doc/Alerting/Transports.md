@@ -778,7 +778,7 @@ In the configuration for your SIGNL4 alert transport you just need to enter your
 | ------ | ------- |
 | Webhook URL | https://connect.signl4.com/webhook/{team-secret} |
 
-You can find more information about the integration [here](https://docs.signl4.com/integrations/albato/albato.html).
+You can find more information about the integration [here](https://docs.signl4.com/integrations/librenms/librenms.html).
 
 ## Slack
 
