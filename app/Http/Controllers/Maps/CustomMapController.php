@@ -59,7 +59,7 @@ class CustomMapController extends Controller
                 'hide_overspeed' => 0,
                 'font_size' => 14,
             ],
-            'background' => null,
+            'background_type' => null,
             'map_conf' => [
                 'height' => '800px',
                 'width' => '1800px',
@@ -98,15 +98,16 @@ class CustomMapController extends Controller
         $map_conf = $map->options;
         $map_conf['width'] = $map->width;
         $map_conf['height'] = $map->height;
-        $data = [
+
+        return view('map.custom-view', [
             'edit' => false,
             'map_id' => $map->custom_map_id,
             'name' => $map->name,
             'menu_group' => $map->menu_group,
             'reverse_arrows' => $map->reverse_arrows,
             'legend' => $this->legendConfig($map),
-            'background' => (bool) $map->background_suffix,
-            'bgversion' => $map->background_version,
+            'background_type' => $map->background_type,
+            'background_config' => $map->getBackgroundConfig(),
             'page_refresh' => Config::get('page_refresh', 300),
             'map_conf' => $map_conf,
             'base_url' => Config::get('base_url'),
@@ -115,9 +116,7 @@ class CustomMapController extends Controller
             'vmargin' => 20,
             'hmargin' => 20,
             'screenshot' => $screenshot,
-        ];
-
-        return view('map.custom-view', $data);
+        ]);
     }
 
     public function edit(CustomMap $map): View
@@ -133,8 +132,8 @@ class CustomMapController extends Controller
             'newedge_conf' => $map->newedgeconfig,
             'newnode_conf' => $map->newnodeconfig,
             'map_conf' => $map->options,
-            'background' => (bool) $map->background_suffix,
-            'bgversion' => $map->background_version,
+            'background_type' => $map->background_type,
+            'background_config' => $map->getBackgroundConfig(),
             'edit' => true,
             'vmargin' => 20,
             'hmargin' => 20,

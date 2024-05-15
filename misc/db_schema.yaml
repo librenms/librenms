@@ -530,14 +530,14 @@ custom_maps:
     - { Field: legend_font_size, Type: smallint, 'Null': false, Extra: '', Default: '14' }
     - { Field: legend_hide_invalid, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
     - { Field: legend_hide_overspeed, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
-    - { Field: background_suffix, Type: varchar(10), 'Null': true, Extra: '' }
-    - { Field: background_version, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: options, Type: longtext, 'Null': true, Extra: '' }
     - { Field: newnodeconfig, Type: longtext, 'Null': false, Extra: '' }
     - { Field: newedgeconfig, Type: longtext, 'Null': false, Extra: '' }
     - { Field: created_at, Type: timestamp, 'Null': true, Extra: '' }
     - { Field: updated_at, Type: timestamp, 'Null': true, Extra: '' }
     - { Field: menu_group, Type: varchar(100), 'Null': true, Extra: '' }
+    - { Field: background_type, Type: varchar(16), 'Null': false, Extra: '', Default: 'none' }
+    - { Field: background_data, Type: 'text', 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [custom_map_id], Unique: true, Type: BTREE }
 custom_map_backgrounds:
