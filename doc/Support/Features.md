@@ -371,7 +371,6 @@ rg --pcre2 "^text: *([\"']?)(.+)\1" --replace '$2' --no-filename includes/defini
 * Hanwha Techwin
 * HAProxy ALOHA
 * Hardware Appliance
-* Hatteras Overdue DSLAM
 * Helios IP
 * Hikvision Camera
 * Hikvision NVR
@@ -544,6 +543,7 @@ rg --pcre2 "^text: *([\"']?)(.+)\1" --replace '$2' --no-filename includes/defini
 * OPNsense
 * Oracle ILOM
 * Orvaldi UPS
+* Overture Hatteras DSLAM
 
 ### P
 * Packetflux SiteMonitor
