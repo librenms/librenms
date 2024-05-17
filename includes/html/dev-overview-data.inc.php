@@ -162,8 +162,8 @@ if ($device['location_id'] && $location = Location::find($device['location_id'])
                 config = {"tile_url": "' . Config::get('leaflet.tile_url', '{s}.tile.openstreetmap.org') . '"};
                 device_map = init_map("location-map", "' . $maps_engine . '", "' . $maps_api . '", config);
                 device_marker = L.marker(device_location).addTo(device_map);
-                device_map.setView(device_location);
-                device_map.setZoom(18);
+                let zoom = (device_location.lat === 0 && device_location.lng === 0) ? 2 : 17;
+                device_map.setView(device_location, zoom);
                 device_marker.dragging.enable();
 
 

@@ -677,11 +677,22 @@
     function editNode(data, callback) {
         $("#devicesearch").val('');
         $("#devicesearch").trigger('change');
-        if(data.id && isNaN(data.id) && data.id.endsWith("_mid")) {
-            edge = network_edges.get((data.id.split("_")[0]) + "_to");
-            editExistingEdge(edge, null);
-            return;
+
+        // If we have an ID that is non numeric, we can check node type further
+        if(data.id && isNaN(data.id)) {
+            // Editing a mid point node triggers editing the edge
+            if(data.id.endsWith("_mid")) {
+                edge = network_edges.get((data.id.split("_")[0]) + "_to");
+                editExistingEdge(edge, null);
+                return;
+            }
+
+            // Legend nodes cannot be edited
+            if (data.id.startsWith("legend_") ) {
+                return;
+            }
         }
+
         if(data.id in node_device_map) {
             // Nodes is linked to a device
             $("#device_id").val(node_device_map[data.id].device_id);
