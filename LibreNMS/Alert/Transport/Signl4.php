@@ -17,7 +17,7 @@
  * API Transport
  *
  * @author SIGNL4 <hello@signl4.com>
-  * @copyright 2024 SIGNL4
+ * @copyright 2024 SIGNL4
  * @license GPL
  */
 
@@ -42,11 +42,11 @@ class Signl4 extends Transport
             default => 'new'
         };
 
-        $s4_data = array(
+        $s4_data = [
             'X-S4-ExternalID' => (string) $alert_data['alert_id'],
             'X-S4-Status' => $alert_status,
-            'Body' => $alert_data['alert_notes']
-        );
+            'Body' => $alert_data['alert_notes'],
+        ];
 
         $data = array_merge($s4_data, $alert_data);
 
