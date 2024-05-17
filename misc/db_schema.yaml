@@ -908,8 +908,8 @@ ipv6_addresses:
     - { Field: ipv6_address, Type: varchar(128), 'Null': false, Extra: '' }
     - { Field: ipv6_compressed, Type: varchar(128), 'Null': false, Extra: '' }
     - { Field: ipv6_prefixlen, Type: int, 'Null': false, Extra: '' }
-    - { Field: ipv6_origin, Type: varchar(16), 'Null': false, Extra: '' }
     - { Field: ipv6_network, Type: varchar(64), 'Null': false, Extra: '' }
+    - { Field: ipv6_origin, Type: varchar(16), 'Null': false, Extra: '' }
     - { Field: port_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: context_name, Type: varchar(128), 'Null': true, Extra: '' }
   Indexes:
