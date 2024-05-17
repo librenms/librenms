@@ -16,14 +16,7 @@ return new class extends Migration
 
     /**
      * Reverse the migrations.
-     *
-     CREATE TABLE `ipv6_networks` (
-     `ipv6_network_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-     `ipv6_network` varchar(64) NOT NULL,
-     `context_name` varchar(128) DEFAULT NULL,
-     PRIMARY KEY (`ipv6_network_id`)
-    */
-
+     */
     public function down(): void
     {
         Schema::create('ipv6_networks', function (Blueprint $table) {

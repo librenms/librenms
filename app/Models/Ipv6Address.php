@@ -26,13 +26,10 @@
 
 namespace App\Models;
 
-use Log;
-use App\Models\Eventlog;
-use App\Models\Port;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\Models\Keyable;
 use LibreNMS\Util\IPv6;
+use Log;
 
 class Ipv6Address extends PortRelatedModel implements Keyable
 {
@@ -100,11 +97,9 @@ class Ipv6Address extends PortRelatedModel implements Keyable
         }
 
         Log::debug('IPv6 -> Cleanup');
-d_echo($validAddresses);
-        $fromDb = Ipv6Address::where('device_id', $device_id)->orWhere('device_id', NULL)
+        $fromDb = Ipv6Address::where('device_id', $device_id)->orWhere('device_id', null)
             ->select('ipv6_address_id', 'ipv6_compressed', 'ipv6_prefixlen', 'ipv6_network', 'port_id')
             ->get()->toArray();
-d_echo($fromDb);
 
         foreach ($fromDb as $row) {
             if (empty($validAddresses[$row['ipv6_compressed']][$row['ipv6_prefixlen']][$row['ipv6_network']][$row['port_id']])) {

@@ -24,7 +24,6 @@
 namespace LibreNMS\Modules;
 
 use App\Models\Device;
-use App\Models\Eventlog;
 use App\Models\Ipv6Address;
 use LibreNMS\DB\SyncsModels;
 use LibreNMS\Exceptions\InvalidIpException;
@@ -100,8 +99,7 @@ class Ipv6Addresses implements Module
      */
     public function cleanup(Device $device): void
     {
-        $deviceArr['device_id'] = $device->device_id;
-        self::cleanupIpv6($deviceArr, []);
+        $device->ipv6()->delete();
     }
 
     /**
@@ -162,7 +160,7 @@ class Ipv6Addresses implements Module
     }
 
     private function translateAddrType(int $type): string
-    {           
+    {
         $addrTypes = [
             1 => 'stateless',
             2 => 'stateful',

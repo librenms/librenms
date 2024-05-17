@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('ipv6_addresses', function (Blueprint $table) {
-            $table->integer('device_id')->after('ipv6_address_id')->nullable()->unsigned()->index();;
+            $table->integer('device_id')->after('ipv6_address_id')->nullable()->unsigned()->index();
             $table->string('ipv6_network', 64)->after('ipv6_prefixlen');
             $table->dropColumn('ipv6_network_id');
             $table->foreign('device_id')->references('device_id')->on('devices')->onDelete('cascade');
@@ -21,14 +21,7 @@ return new class extends Migration
 
     /**
      * Reverse the migrations.
-     *
-     CREATE TABLE `ipv6_networks` (
-     `ipv6_network_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-     `ipv6_network` varchar(64) NOT NULL,
-     `context_name` varchar(128) DEFAULT NULL,
-     PRIMARY KEY (`ipv6_network_id`)
-    */
-
+     */
     public function down(): void
     {
         Schema::table('ipv6_addresses', function (Blueprint $table) {
