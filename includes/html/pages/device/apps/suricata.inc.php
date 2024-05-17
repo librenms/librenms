@@ -97,6 +97,11 @@ if ($app_data['version'] == 1) {
                 // capture__kernel_drops
                 //capture__kernel_ifdrops
                 'suricata_v2_packets' => 'Packets',
+                // flow__icmpv4
+                // flow__icmpv6
+                // flow__tcp
+                // flow__udp
+                'suricata_v2_flow_proto' => 'Flow Protocols',
                 // decoder not events, decoder__bytes, decoder__avg_pkt_size
                 // decoder__bytes
                 // flow_bypassed__bytes
