@@ -10,182 +10,77 @@ $transparency = 15;
 
 if (isset($vars['sinstance'])) {
     $app_layer__error__bittorrent_dht__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__bittorrent-dht__alloc']);
-} else {
-    $app_layer__error__bittorrent_dht__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__bittorrent-dht__alloc']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__dcerpc_tcp__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__dcerpc_tcp__alloc']);
-} else {
-    $app_layer__error__dcerpc_tcp__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__dcerpc_tcp__alloc']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__dcerpc_udp__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__dcerpc_udp__alloc']);
-} else {
-    $app_layer__error__dcerpc_udp__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__dcerpc_udp__alloc']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__dhcp__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__dhcp__alloc']);
-} else {
-    $app_layer__error__dhcp__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__dhcp__alloc']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__dnp3__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__dnp3__alloc']);
-} else {
-    $app_layer__error__dnp3__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__dnp3__alloc']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__dns_tcp__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__dns_tcp__alloc']);
-} else {
-    $app_layer__error__dns_tcp__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__dns_tcp__alloc']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__dns_udp__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__dns_udp__alloc']);
-} else {
-    $app_layer__error__dns_udp__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__dns_udp__alloc']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__enip_tcp__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__enip_tcp__alloc']);
-} else {
-    $app_layer__error__enip_tcp__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__enip_tcp__alloc']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__enip_udp__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__enip_udp__alloc']);
-} else {
-    $app_layer__error__enip_udp__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__enip_udp__alloc']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__failed_tcp__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__failed_tcp__alloc']);
-} else {
-    $app_layer__error__failed_tcp__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__failed_tcp__alloc']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__failed_udp__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__failed_udp__alloc']);
-} else {
-    $app_layer__error__failed_udp__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__failed_udp__alloc']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__ftp_data__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__ftp-data__alloc']);
-} else {
-    $app_layer__error__ftp_data__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__ftp-data__alloc']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__ftp__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__ftp__alloc']);
-} else {
-    $app_layer__error__ftp__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__ftp__alloc']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__http__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__http__alloc']);
-} else {
-    $app_layer__error__http__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__http__alloc']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__http2__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__http2__alloc']);
-} else {
-    $app_layer__error__http2__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__http2__alloc']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__ike__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__ike__alloc']);
-} else {
-    $app_layer__error__ike__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__ike__alloc']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__imap__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__imap__alloc']);
-} else {
-    $app_layer__error__imap__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__imap__alloc']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__krb5_tcp__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__krb5_tcp__alloc']);
-} else {
-    $app_layer__error__krb5_tcp__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__krb5_tcp__alloc']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__krb5_udp__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__krb5_udp__alloc']);
-} else {
-    $app_layer__error__krb5_udp__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__krb5_udp__alloc']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__modbus__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__modbus__alloc']);
-} else {
-    $app_layer__error__modbus__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__modbus__alloc']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__mqtt__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__mqtt__alloc']);
-} else {
-    $app_layer__error__mqtt__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__mqtt__alloc']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__nfs_tcp__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__nfs_tcp__alloc']);
-} else {
-    $app_layer__error__nfs_tcp__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__nfs_tcp__alloc']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__nfs_udp__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__nfs_udp__alloc']);
-} else {
-    $app_layer__error__nfs_udp__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__nfs_udp__alloc']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__ntp__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__ntp__alloc']);
-} else {
-    $app_layer__error__ntp__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__ntp__alloc']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__pgsql__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__pgsql__alloc']);
-} else {
-    $app_layer__error__pgsql__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__pgsql__alloc']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__quic__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__quic__alloc']);
-} else {
-    $app_layer__error__quic__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__quic__alloc']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__rdp__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__rdp__alloc']);
-} else {
-    $app_layer__error__rdp__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__rdp__alloc']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__rfb__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__rfb__alloc']);
-} else {
-    $app_layer__error__rfb__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__rfb__alloc']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__sip__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__sip__alloc']);
-} else {
-    $app_layer__error__sip__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__sip__alloc']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__smb__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__smb__alloc']);
-} else {
-    $app_layer__error__smb__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__smb__alloc']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__smtp__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__smtp__alloc']);
-} else {
-    $app_layer__error__smtp__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__smtp__alloc']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__snmp__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__snmp__alloc']);
-} else {
-    $app_layer__error__snmp__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__snmp__alloc']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__ssh__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__ssh__alloc']);
-} else {
-    $app_layer__error__ssh__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__ssh__alloc']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__telnet__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__telnet__alloc']);
-} else {
-    $app_layer__error__telnet__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__telnet__alloc']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__tftp__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__tftp__alloc']);
-} else {
-    $app_layer__error__tftp__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__tftp__alloc']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__tls__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__tls__alloc']);
 } else {
+    $app_layer__error__bittorrent_dht__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__bittorrent-dht__alloc']);
+    $app_layer__error__dcerpc_tcp__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__dcerpc_tcp__alloc']);
+    $app_layer__error__dcerpc_udp__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__dcerpc_udp__alloc']);
+    $app_layer__error__dhcp__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__dhcp__alloc']);
+    $app_layer__error__dnp3__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__dnp3__alloc']);
+    $app_layer__error__dns_tcp__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__dns_tcp__alloc']);
+    $app_layer__error__dns_udp__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__dns_udp__alloc']);
+    $app_layer__error__enip_tcp__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__enip_tcp__alloc']);
+    $app_layer__error__enip_udp__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__enip_udp__alloc']);
+    $app_layer__error__failed_tcp__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__failed_tcp__alloc']);
+    $app_layer__error__failed_udp__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__failed_udp__alloc']);
+    $app_layer__error__ftp_data__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__ftp-data__alloc']);
+    $app_layer__error__ftp__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__ftp__alloc']);
+    $app_layer__error__http__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__http__alloc']);
+    $app_layer__error__http2__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__http2__alloc']);
+    $app_layer__error__ike__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__ike__alloc']);
+    $app_layer__error__imap__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__imap__alloc']);
+    $app_layer__error__krb5_tcp__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__krb5_tcp__alloc']);
+    $app_layer__error__krb5_udp__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__krb5_udp__alloc']);
+    $app_layer__error__modbus__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__modbus__alloc']);
+    $app_layer__error__mqtt__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__mqtt__alloc']);
+    $app_layer__error__nfs_tcp__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__nfs_tcp__alloc']);
+    $app_layer__error__nfs_udp__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__nfs_udp__alloc']);
+    $app_layer__error__ntp__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__ntp__alloc']);
+    $app_layer__error__pgsql__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__pgsql__alloc']);
+    $app_layer__error__quic__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__quic__alloc']);
+    $app_layer__error__rdp__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__rdp__alloc']);
+    $app_layer__error__rfb__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__rfb__alloc']);
+    $app_layer__error__sip__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__sip__alloc']);
+    $app_layer__error__smb__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__smb__alloc']);
+    $app_layer__error__smtp__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__smtp__alloc']);
+    $app_layer__error__snmp__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__snmp__alloc']);
+    $app_layer__error__ssh__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__ssh__alloc']);
+    $app_layer__error__telnet__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__telnet__alloc']);
+    $app_layer__error__tftp__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__tftp__alloc']);
     $app_layer__error__tls__alloc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__tls__alloc']);
 }
 
