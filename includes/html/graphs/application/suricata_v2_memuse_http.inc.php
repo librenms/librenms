@@ -10,12 +10,9 @@ $transparency = 15;
 
 if (isset($vars['sinstance'])) {
     $http__memuse_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___http__memuse']);
-} else {
-    $http__memuse_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___http__memuse']);
-}
-if (isset($vars['sinstance'])) {
     $http__memcap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___http__memcap']);
 } else {
+    $http__memuse_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___http__memuse']);
     $http__memcap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___http__memcap']);
 }
 

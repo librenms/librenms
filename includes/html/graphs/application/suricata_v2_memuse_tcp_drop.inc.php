@@ -11,12 +11,9 @@ $descr_len = 18;
 
 if (isset($vars['sinstance'])) {
     $tcp__segment_memcap_drop_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___tcp__segment_memcap_drop']);
-} else {
-    $tcp__segment_memcap_drop_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___tcp__segment_memcap_drop']);
-}
-if (isset($vars['sinstance'])) {
     $tcp__ssn_memcap_drop_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___tcp__ssn_memcap_drop']);
 } else {
+    $tcp__segment_memcap_drop_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___tcp__segment_memcap_drop']);
     $tcp__ssn_memcap_drop_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___tcp__ssn_memcap_drop']);
 }
 

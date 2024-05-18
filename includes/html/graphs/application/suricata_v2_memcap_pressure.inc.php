@@ -10,12 +10,9 @@ $transparency = 15;
 
 if (isset($vars['sinstance'])) {
     $memcap_pressure_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___memcap_pressure']);
-} else {
-    $memcap_pressure_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___memcap_pressure']);
-}
-if (isset($vars['sinstance'])) {
     $memcap_pressure_max_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___memcap_pressure_max']);
 } else {
+    $memcap_pressure_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___memcap_pressure']);
     $memcap_pressure_max_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___memcap_pressure_max']);
 }
 

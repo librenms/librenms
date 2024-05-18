@@ -10,182 +10,77 @@ $transparency = 15;
 
 if (isset($vars['sinstance'])) {
     $app_layer__error__bittorrent_dht__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__bittorrent-dht__gap']);
-} else {
-    $app_layer__error__bittorrent_dht__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__bittorrent-dht__gap']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__dcerpc_tcp__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__dcerpc_tcp__gap']);
-} else {
-    $app_layer__error__dcerpc_tcp__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__dcerpc_tcp__gap']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__dcerpc_udp__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__dcerpc_udp__gap']);
-} else {
-    $app_layer__error__dcerpc_udp__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__dcerpc_udp__gap']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__dhcp__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__dhcp__gap']);
-} else {
-    $app_layer__error__dhcp__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__dhcp__gap']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__dnp3__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__dnp3__gap']);
-} else {
-    $app_layer__error__dnp3__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__dnp3__gap']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__dns_tcp__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__dns_tcp__gap']);
-} else {
-    $app_layer__error__dns_tcp__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__dns_tcp__gap']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__dns_udp__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__dns_udp__gap']);
-} else {
-    $app_layer__error__dns_udp__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__dns_udp__gap']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__enip_tcp__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__enip_tcp__gap']);
-} else {
-    $app_layer__error__enip_tcp__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__enip_tcp__gap']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__enip_udp__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__enip_udp__gap']);
-} else {
-    $app_layer__error__enip_udp__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__enip_udp__gap']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__failed_tcp__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__failed_tcp__gap']);
-} else {
-    $app_layer__error__failed_tcp__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__failed_tcp__gap']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__failed_udp__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__failed_udp__gap']);
-} else {
-    $app_layer__error__failed_udp__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__failed_udp__gap']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__ftp_data__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__ftp-data__gap']);
-} else {
-    $app_layer__error__ftp_data__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__ftp-data__gap']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__ftp__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__ftp__gap']);
-} else {
-    $app_layer__error__ftp__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__ftp__gap']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__http__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__http__gap']);
-} else {
-    $app_layer__error__http__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__http__gap']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__http2__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__http2__gap']);
-} else {
-    $app_layer__error__http2__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__http2__gap']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__ike__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__ike__gap']);
-} else {
-    $app_layer__error__ike__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__ike__gap']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__imap__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__imap__gap']);
-} else {
-    $app_layer__error__imap__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__imap__gap']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__krb5_tcp__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__krb5_tcp__gap']);
-} else {
-    $app_layer__error__krb5_tcp__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__krb5_tcp__gap']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__krb5_udp__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__krb5_udp__gap']);
-} else {
-    $app_layer__error__krb5_udp__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__krb5_udp__gap']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__modbus__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__modbus__gap']);
-} else {
-    $app_layer__error__modbus__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__modbus__gap']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__mqtt__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__mqtt__gap']);
-} else {
-    $app_layer__error__mqtt__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__mqtt__gap']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__nfs_tcp__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__nfs_tcp__gap']);
-} else {
-    $app_layer__error__nfs_tcp__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__nfs_tcp__gap']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__nfs_udp__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__nfs_udp__gap']);
-} else {
-    $app_layer__error__nfs_udp__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__nfs_udp__gap']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__ntp__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__ntp__gap']);
-} else {
-    $app_layer__error__ntp__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__ntp__gap']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__pgsql__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__pgsql__gap']);
-} else {
-    $app_layer__error__pgsql__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__pgsql__gap']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__quic__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__quic__gap']);
-} else {
-    $app_layer__error__quic__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__quic__gap']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__rdp__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__rdp__gap']);
-} else {
-    $app_layer__error__rdp__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__rdp__gap']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__rfb__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__rfb__gap']);
-} else {
-    $app_layer__error__rfb__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__rfb__gap']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__sip__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__sip__gap']);
-} else {
-    $app_layer__error__sip__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__sip__gap']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__smb__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__smb__gap']);
-} else {
-    $app_layer__error__smb__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__smb__gap']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__smtp__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__smtp__gap']);
-} else {
-    $app_layer__error__smtp__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__smtp__gap']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__snmp__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__snmp__gap']);
-} else {
-    $app_layer__error__snmp__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__snmp__gap']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__ssh__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__ssh__gap']);
-} else {
-    $app_layer__error__ssh__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__ssh__gap']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__telnet__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__telnet__gap']);
-} else {
-    $app_layer__error__telnet__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__telnet__gap']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__tftp__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__tftp__gap']);
-} else {
-    $app_layer__error__tftp__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__tftp__gap']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__tls__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__tls__gap']);
 } else {
+    $app_layer__error__bittorrent_dht__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__bittorrent-dht__gap']);
+    $app_layer__error__dcerpc_tcp__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__dcerpc_tcp__gap']);
+    $app_layer__error__dcerpc_udp__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__dcerpc_udp__gap']);
+    $app_layer__error__dhcp__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__dhcp__gap']);
+    $app_layer__error__dnp3__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__dnp3__gap']);
+    $app_layer__error__dns_tcp__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__dns_tcp__gap']);
+    $app_layer__error__dns_udp__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__dns_udp__gap']);
+    $app_layer__error__enip_tcp__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__enip_tcp__gap']);
+    $app_layer__error__enip_udp__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__enip_udp__gap']);
+    $app_layer__error__failed_tcp__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__failed_tcp__gap']);
+    $app_layer__error__failed_udp__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__failed_udp__gap']);
+    $app_layer__error__ftp_data__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__ftp-data__gap']);
+    $app_layer__error__ftp__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__ftp__gap']);
+    $app_layer__error__http__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__http__gap']);
+    $app_layer__error__http2__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__http2__gap']);
+    $app_layer__error__ike__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__ike__gap']);
+    $app_layer__error__imap__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__imap__gap']);
+    $app_layer__error__krb5_tcp__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__krb5_tcp__gap']);
+    $app_layer__error__krb5_udp__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__krb5_udp__gap']);
+    $app_layer__error__modbus__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__modbus__gap']);
+    $app_layer__error__mqtt__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__mqtt__gap']);
+    $app_layer__error__nfs_tcp__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__nfs_tcp__gap']);
+    $app_layer__error__nfs_udp__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__nfs_udp__gap']);
+    $app_layer__error__ntp__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__ntp__gap']);
+    $app_layer__error__pgsql__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__pgsql__gap']);
+    $app_layer__error__quic__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__quic__gap']);
+    $app_layer__error__rdp__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__rdp__gap']);
+    $app_layer__error__rfb__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__rfb__gap']);
+    $app_layer__error__sip__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__sip__gap']);
+    $app_layer__error__smb__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__smb__gap']);
+    $app_layer__error__smtp__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__smtp__gap']);
+    $app_layer__error__snmp__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__snmp__gap']);
+    $app_layer__error__ssh__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__ssh__gap']);
+    $app_layer__error__telnet__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__telnet__gap']);
+    $app_layer__error__tftp__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__tftp__gap']);
     $app_layer__error__tls__gap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__tls__gap']);
 }
 

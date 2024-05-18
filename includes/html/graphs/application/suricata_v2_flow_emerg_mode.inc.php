@@ -10,12 +10,9 @@ $transparency = 15;
 
 if (isset($vars['sinstance'])) {
     $flow__emerg_mode_entered_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___flow__emerg_mode_entered']);
-} else {
-    $flow__emerg_mode_entered_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___flow__emerg_mode_entered']);
-}
-if (isset($vars['sinstance'])) {
     $flow__emerg_mode_over_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___flow__emerg_mode_over']);
 } else {
+    $flow__emerg_mode_entered_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___flow__emerg_mode_entered']);
     $flow__emerg_mode_over_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___flow__emerg_mode_over']);
 }
 

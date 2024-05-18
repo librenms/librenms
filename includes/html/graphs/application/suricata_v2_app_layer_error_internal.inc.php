@@ -10,183 +10,78 @@ $transparency = 15;
 
 if (isset($vars['sinstance'])) {
     $app_layer__error__bittorrent_dht__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__bittorrent-dht__internal']);
-} else {
-    $app_layer__error__bittorrent_dht__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__bittorrent-dht__internal']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__dcerpc_tcp__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__dcerpc_tcp__internal']);
-} else {
-    $app_layer__error__dcerpc_tcp__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__dcerpc_tcp__internal']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__dcerpc_udp__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__dcerpc_udp__internal']);
-} else {
-    $app_layer__error__dcerpc_udp__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__dcerpc_udp__internal']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__dhcp__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__dhcp__internal']);
-} else {
-    $app_layer__error__dhcp__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__dhcp__internal']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__dnp3__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__dnp3__internal']);
-} else {
-    $app_layer__error__dnp3__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__dnp3__internal']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__dns_tcp__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__dns_tcp__internal']);
-} else {
-    $app_layer__error__dns_tcp__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__dns_tcp__internal']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__dns_udp__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__dns_udp__internal']);
-} else {
-    $app_layer__error__dns_udp__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__dns_udp__internal']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__enip_tcp__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__enip_tcp__internal']);
-} else {
-    $app_layer__error__enip_tcp__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__enip_tcp__internal']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__enip_udp__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__enip_udp__internal']);
-} else {
-    $app_layer__error__enip_udp__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__enip_udp__internal']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__failed_tcp__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__failed_tcp__internal']);
-} else {
-    $app_layer__error__failed_tcp__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__failed_tcp__internal']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__failed_udp__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__failed_udp__internal']);
-} else {
-    $app_layer__error__failed_udp__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__failed_udp__internal']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__ftp_data__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__ftp-data__internal']);
-} else {
-    $app_layer__error__ftp_data__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__ftp-data__internal']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__ftp__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__ftp__internal']);
-} else {
-    $app_layer__error__ftp__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__ftp__internal']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__http__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__http__internal']);
-} else {
-    $app_layer__error__http__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__http__internal']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__http2__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__http2__internal']);
-} else {
-    $app_layer__error__http2__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__http2__internal']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__ike__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__ike__internal']);
-} else {
-    $app_layer__error__ike__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__ike__internal']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__imap__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__imap__internal']);
-} else {
-    $app_layer__error__imap__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__imap__internal']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__krb5_tcp__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__krb5_tcp__internal']);
-} else {
-    $app_layer__error__krb5_tcp__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__krb5_tcp__internal']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__krb5_udp__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__krb5_udp__internal']);
-} else {
-    $app_layer__error__krb5_udp__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__krb5_udp__internal']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__modbus__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__modbus__internal']);
-} else {
-    $app_layer__error__modbus__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__modbus__internal']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__mqtt__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__mqtt__internal']);
-} else {
-    $app_layer__error__mqtt__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__mqtt__internal']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__nfs_tcp__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__nfs_tcp__internal']);
-} else {
-    $app_layer__error__nfs_tcp__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__nfs_tcp__internal']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__nfs_udp__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__nfs_udp__internal']);
-} else {
-    $app_layer__error__nfs_udp__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__nfs_udp__internal']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__ntp__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__ntp__internal']);
-} else {
-    $app_layer__error__ntp__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__ntp__internal']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__pgsql__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__pgsql__internal']);
-} else {
-    $app_layer__error__pgsql__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__pgsql__internal']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__quic__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__quic__internal']);
-} else {
-    $app_layer__error__quic__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__quic__internal']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__rdp__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__rdp__internal']);
-} else {
-    $app_layer__error__rdp__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__rdp__internal']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__rfb__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__rfb__internal']);
-} else {
-    $app_layer__error__rfb__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__rfb__internal']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__sip__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__sip__internal']);
-} else {
-    $app_layer__error__sip__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__sip__internal']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__smb__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__smb__internal']);
-} else {
-    $app_layer__error__smb__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__smb__internal']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__smtp__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__smtp__internal']);
-} else {
-    $app_layer__error__smtp__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__smtp__internal']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__snmp__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__snmp__internal']);
-} else {
-    $app_layer__error__snmp__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__snmp__internal']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__ssh__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__ssh__internal']);
-} else {
-    $app_layer__error__ssh__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__ssh__internal']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__telnet__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__telnet__internal']);
-} else {
-    $app_layer__error__telnet__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__telnet__internal']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__tftp__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__tftp__internal']);
-} else {
-    $app_layer__error__tftp__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__tftp__internal']);
-}
-if (isset($vars['sinstance'])) {
     $app_layer__error__tls__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___app_layer__error__tls__internal']);
 } else {
+    $app_layer__error__bittorrent_dht__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__bittorrent-dht__internal']);
+    $app_layer__error__dcerpc_tcp__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__dcerpc_tcp__internal']);
+    $app_layer__error__dcerpc_udp__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__dcerpc_udp__internal']);
+    $app_layer__error__dhcp__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__dhcp__internal']);
+    $app_layer__error__dnp3__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__dnp3__internal']);
+    $app_layer__error__dns_tcp__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__dns_tcp__internal']);
+    $app_layer__error__dns_udp__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__dns_udp__internal']);
+    $app_layer__error__enip_tcp__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__enip_tcp__internal']);
+    $app_layer__error__enip_udp__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__enip_udp__internal']);
+    $app_layer__error__failed_tcp__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__failed_tcp__internal']);
+    $app_layer__error__failed_udp__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__failed_udp__internal']);
+    $app_layer__error__ftp_data__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__ftp-data__internal']);
+    $app_layer__error__ftp__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__ftp__internal']);
+    $app_layer__error__http__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__http__internal']);
+    $app_layer__error__http2__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__http2__internal']);
+    $app_layer__error__ike__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__ike__internal']);
+    $app_layer__error__imap__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__imap__internal']);
+    $app_layer__error__krb5_tcp__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__krb5_tcp__internal']);
+    $app_layer__error__krb5_udp__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__krb5_udp__internal']);
+    $app_layer__error__modbus__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__modbus__internal']);
+    $app_layer__error__mqtt__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__mqtt__internal']);
+    $app_layer__error__nfs_tcp__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__nfs_tcp__internal']);
+    $app_layer__error__nfs_udp__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__nfs_udp__internal']);
+    $app_layer__error__ntp__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__ntp__internal']);
+    $app_layer__error__pgsql__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__pgsql__internal']);
+    $app_layer__error__quic__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__quic__internal']);
+    $app_layer__error__rdp__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__rdp__internal']);
+    $app_layer__error__rfb__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__rfb__internal']);
+    $app_layer__error__sip__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__sip__internal']);
+    $app_layer__error__smb__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__smb__internal']);
+    $app_layer__error__smtp__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__smtp__internal']);
+    $app_layer__error__snmp__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__snmp__internal']);
+    $app_layer__error__ssh__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__ssh__internal']);
+    $app_layer__error__telnet__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__telnet__internal']);
     $app_layer__error__tls__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__tls__internal']);
+    $app_layer__error__tftp__internal_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___app_layer__error__tftp__internal']);
 }
 
 $rrd_list = [];
