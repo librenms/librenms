@@ -28,7 +28,7 @@ if (\LibreNMS\Config::get('applied_site_style') != 'dark') {
 
 $rrd_filename = Rrd::name($device['hostname'], 'icmp-perf');
 
-$rrd_options .= ' --left-axis-format \'%4.0lfms\' --vertical-label Latency --right-axis 1:0 --right-axis-label \'Loss %\'';
+$rrd_options .= ' -X 0 --left-axis-format \'%4.0lfms\' --vertical-label Latency --right-axis 1:0 --right-axis-label \'Loss %\'';
 
 $rrd_options .= ' DEF:ping=' . $rrd_filename . ':avg:AVERAGE';
 $rrd_options .= ' DEF:min=' . $rrd_filename . ':min:MIN';
