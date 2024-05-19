@@ -47,7 +47,7 @@ foreach ($suricata_instances as $index => $sinstance) {
 if ($app_data['version'] == 2) {
     print "<br>\nPages: ";
     $suricata_pages = ['general'=>'General', 'bypassed' => 'By Passed', 'errors' => 'Errors', 'memuse' => 'Memory Usage', '#0' => '(',
-                       'memuse_details' => 'Details', '#1' => '),', 'detect' => ' Detect', 'filestore' => 'File Store', 'tcp' => 'TCP'];
+                       'memuse_details' => 'Details', '#1' => '),', 'detect' => ' Detect', 'filestore' => 'File Store', 'tcp' => 'TCP', 'decoder' => 'Decoder'];
     $suricata_pages_no_comma = [ 'memuse' => 1, 'memuse_details' => 1 ];
 
     $page_count=0;
@@ -322,6 +322,61 @@ if ($app_data['version'] == 1) {
             'suricata_v2_tcp__synack' => 'TCP Syn ACK',
             // flow__end__tcp__*
             'suricata_v2_flow__end__end' => 'TCP Flow Ends',
+        ];
+    } elseif (strcmp($vars['suricata_graph_set'], 'decoder') == 0) {
+        $graphs = [
+            // decoder_* protocol items
+            'suricata_v2_dec_proto' => 'Decoder Protocol Packets',
+            // decoder__event__chdlc_*
+            'suricata_v2_decoder__event__chdlc' => 'Decoder Events, CHDLC',
+            // decoder__event__dce_*
+            'suricata_v2_decoder__event__dce' => 'Decoder Events, DCE',
+            // decoder__event__erspan_*
+            'suricata_v2_decoder__event__erspan' => 'Decoder Events, ERSPAN',
+            // decoder__event__esp_*
+            'suricata_v2_decoder__event__esp' => 'Decoder Events, ESP',
+            // decoder__event__ethernet_*
+            'suricata_v2_decoder__event__ethernet' => 'Decoder Events, Ethernet',
+            // decoder__event__geneve_*
+            'suricata_v2_decoder__event__geneve' => 'Decoder Events, Geneve',
+            // decoder__event__gre_*
+            'suricata_v2_decoder__event__gre' => 'Decoder Events, GRE',
+            // decoder__event__icmpv4_*
+            'suricata_v2_decoder__event__icmpv4' => 'Decoder Events, ICMPv4',
+            // decoder__event__icmpv6_*
+            'suricata_v2_decoder__event__icmpv6' => 'Decoder Events, ICMPv6',
+            // decoder__event__ieee8021ah_*
+            'suricata_v2_decoder__event__ieee8021ah' => 'Decoder Events, IEEE 802.1ah',
+            // decoder__event__ipraw_*
+            'suricata_v2_decoder__event__ipraw' => 'Decoder Events, IP Raw',
+            // decoder__event__ipv4_*
+            'suricata_v2_decoder__event__ipv4' => 'Decoder Events, IPv4',
+            // decoder__event__ipv6_*
+            'suricata_v2_decoder__event__ipv6' => 'Decoder Events, IPv6',
+            // decoder__event__ltnull_*
+            'suricata_v2_decoder__event__ltnull' => 'Decoder Events, LT Null',
+            // decoder__event__mpls_*
+            'suricata_v2_decoder__event__mpls' => 'Decoder Events, MPLS',
+            // decoder__event__nsh_*
+            'suricata_v2_decoder__event__nsh' => 'Decoder Events, NSH',
+            // decoder__event__ppp_*
+            'suricata_v2_decoder__event__ppp' => 'Decoder Events, PPP',
+            // decoder__event__pppoe_*
+            'suricata_v2_decoder__event__pppoe' => 'Decoder Events, PPPoE',
+            // decoder__event__sctp_*
+            'suricata_v2_decoder__event__sctp' => 'Decoder Events, SCTP',
+            // decoder__event__sll_*
+            'suricata_v2_decoder__event__sll' => 'Decoder Events, SLL',
+            // decoder__event__tcp_*
+            'suricata_v2_decoder__event__tcp' => 'Decoder Events, TCP',
+            // decoder__event__udp_*
+            'suricata_v2_decoder__event__udp' => 'Decoder Events, UDP',
+            // decoder__event__vlan_*
+            'suricata_v2_decoder__event__vlan' => 'Decoder Events, VLAN',
+            // decoder__event__vntag_*
+            'suricata_v2_decoder__event__vntag' => 'Decoder Events, VNTag',
+            // decoder__event__vxlan_*
+            'suricata_v2_decoder__event__vxlan' => 'Decoder Events, vxlan',
         ];
     }
 }
