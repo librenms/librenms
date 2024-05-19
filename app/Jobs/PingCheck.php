@@ -75,12 +75,14 @@ class PingCheck implements ShouldQueue
     {
         $ping_start = microtime(true);
 
-        $device_collection = $this->fetchDevices();
+        $ordered_hostname_list = $this->fetchOrderedHostnames();
 
-        $device_list = $device_collection->keys()->all();
+        if (Debug::isVerbose()) {
+            echo "Processing hosts in this order : " . implode(', ', $ordered_hostname_list) . PHP_EOL;
+        }
 
         // bulk ping and send FpingResponse's to recordData as they come in
-        app()->make(Fping::class)->bulkPing($device_list, [$this, 'handleResponse']);
+        app()->make(Fping::class)->bulkPing($ordered_hostname_list, [$this, 'handleResponse']);
 
         // check for any left over devices
         if ($this->deferred->isNotEmpty()) {
@@ -96,6 +98,69 @@ class PingCheck implements ShouldQueue
         }
     }
 
+    /**
+     * Get an ordered list of hostnames that we need to ping starting from devices with no parents
+     */
+    private function fetchOrderedHostnames() : array
+    {
+        $ret = [];
+        $current_hostnames = [];
+        $deferred_device_ids = new Collection();
+
+        $device_list = $this->fetchDevices();
+
+        foreach ($device_list as $hostname => $device) {
+            if ($device->parents->count() === 0) {
+                $current_hostnames[] = $hostname;
+            } else {
+                $deferred_device_ids->put($device->device_id, $hostname);
+            }
+        }
+
+        while (count($current_hostnames) > 0) {
+            if (Debug::isVerbose()) {
+                echo "Adding hosts to ordered list : " . implode(', ', $current_hostnames) . PHP_EOL;
+            }
+
+            $ret = array_merge($ret, $current_hostnames);
+
+            $current_hostnames = $this->getUnprocessedChildren($current_hostnames, $deferred_device_ids);
+        }
+
+        if (count($deferred_device_ids) > 0) {
+            if (Debug::isVerbose()) {
+                echo "Adding unprocessed deferred hosts to ordered list : " . $deferred_device_ids->values()->implode(', ') . PHP_EOL;
+            }
+
+            $ret = array_merge($ret, $deferred_device_ids->values()->toArray());
+        }
+
+        return $ret;
+    }
+
+    /**
+     * For each hostname given, get the device and return any unprocessed child hostnames, removing from the unprocessed list
+     */
+    private function getUnprocessedChildren(array $hostnames, Collection &$unprocessed) : array
+    {
+        $ret = [];
+
+        foreach ($hostnames as $hostname) {
+            $device = $this->devices->get($hostname);
+            foreach ($device->children as $child) {
+                if ($unprocessed->has($child->device_id)) {
+                    $child_id = $unprocessed->pull($child->device_id);
+                    $ret[] = $child_id;
+                }
+            }
+        }
+
+        return $ret;
+    }
+
+    /**
+     * Fetch and cache all devices that we need to process
+     */
     private function fetchDevices()
     {
         if (isset($this->devices)) {
@@ -104,9 +169,15 @@ class PingCheck implements ShouldQueue
 
         $query = Device::canPing()
             ->select(['devices.device_id', 'hostname', 'overwrite_ip', 'status', 'status_reason', 'last_ping', 'last_ping_timetaken'])
-            ->with(['parents' => function ($q) {
-                $q->canPing()->select('devices.device_id');
-            }]);
+            ->with([
+                'parents' => function ($q) {
+                    $q->canPing()->select('devices.device_id');
+                },
+                'children' => function ($q) {
+                    $q->canPing()->select('devices.device_id');
+                },
+            ])
+            ->withCount('parents');
 
         if ($this->groups) {
             $query->whereIntegerInRaw('poller_group', $this->groups);
