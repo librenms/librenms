@@ -6,15 +6,6 @@ modules:
         version_regex: '/v(?<version>[0-9]+.[0-9]+)/'
         serial: SOCOMECUPS-MIB::upsIdentSerialNumber.0
     sensors:
-        pre-cache:
-            data:
-                -
-                    oid:
-                        - upsAlarm
-                        - upsBattery
-                        - upsBypass
-                        - upsInput
-                        - upsOutput
         voltage:
             data:
                 -

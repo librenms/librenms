@@ -34,7 +34,7 @@ class SocomecUps extends OS
     {
         parent::discoverOS($device); // yaml
 
-        $data = intval($this->getCacheTable('SOCOMECUPS-MIB::upsConfigNomKva')['upsConfigNomKva.0']);
+        $data = intval(\SnmpQuery::get('SOCOMECUPS-MIB::upsConfigNomKva.0')->value());
         $device->features = ($data / 10) . ' kVA';
     }
 }
