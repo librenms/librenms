@@ -46,24 +46,28 @@ foreach ($suricata_instances as $index => $sinstance) {
 // only present for v2
 if ($app_data['version'] == 2) {
     print "<br>\nPages: ";
-    $suricata_pages = ['general'=>'General', 'bypassed' => 'By Passed', 'errors' => 'Errors', 'memuse' => 'Memory Usage',
-                       'memuse_details' => '(Details)', 'detect' => ' Detect', 'filestore' => 'File Store', 'tcp' => 'TCP'];
-    $suricata_pages_no_comma = [ 'memuse' => 1 ];
+    $suricata_pages = ['general'=>'General', 'bypassed' => 'By Passed', 'errors' => 'Errors', 'memuse' => 'Memory Usage', '#0' => '(',
+                       'memuse_details' => 'Details', '#1' => '),', 'detect' => ' Detect', 'filestore' => 'File Store', 'tcp' => 'TCP'];
+    $suricata_pages_no_comma = [ 'memuse' => 1, 'memuse_details' => 1 ];
 
     $page_count=0;
     foreach ($suricata_pages as $page => $page_description) {
-        $label = $vars['suricata_graph_set'] == $page
-            ? '<span class="pagemenu-selected">' . $page_description . '</span>'
-            : $page_description;
-
-        if (isset($vars['sinstance'])) {
-            echo generate_link($label, $link_array, ['sinstance' => $vars['sinstance'], 'suricata_graph_set' => $page]);
+        if (preg_match('/^\#/', $page)) {
+            echo $page_description;
         } else {
-            echo generate_link($label, $link_array, ['suricata_graph_set' => $page]);
-        }
+            $label = $vars['suricata_graph_set'] == $page
+                ? '<span class="pagemenu-selected">' . $page_description . '</span>'
+                : $page_description;
 
-        if ($page_count < (count($suricata_pages) - 1) && !isset($suricata_pages_no_comma[$page])) {
-            echo ', ';
+            if (isset($vars['sinstance'])) {
+                echo generate_link($label, $link_array, ['sinstance' => $vars['sinstance'], 'suricata_graph_set' => $page]);
+            } else {
+                echo generate_link($label, $link_array, ['suricata_graph_set' => $page]);
+            }
+
+            if ($page_count < (count($suricata_pages) - 1) && !isset($suricata_pages_no_comma[$page])) {
+                echo ', ';
+            }
         }
         $page_count++;
     }
