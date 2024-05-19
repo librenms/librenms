@@ -9,38 +9,38 @@ $addarea = 0;
 $transparency = 15;
 
 if (isset($vars['sinstance'])) {
-    $decoder__arp_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, $vars['sinstance'] . '___decoder__arp']);
-    $decoder__chdlc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, $vars['sinstance'] . '___decoder__chdlc']);
-    $decoder__erspan_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, $vars['sinstance'] . '___decoder__erspan']);
-    $decoder__esp_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, $vars['sinstance'] . '___decoder__esp']);
-    $decoder__ethernet_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, $vars['sinstance'] . '___decoder__ethernet']);
-    $decoder__geneve_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, $vars['sinstance'] . '___decoder__geneve']);
-    $decoder__gre_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, $vars['sinstance'] . '___decoder__gre']);
-    $decoder__icmpv4_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, $vars['sinstance'] . '___decoder__icmpv4']);
-    $decoder__icmpv6_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, $vars['sinstance'] . '___decoder__icmpv6']);
-    $decoder__ieee8021ah_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, $vars['sinstance'] . '___decoder__ieee8021ah']);
-    $decoder__invalid_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, $vars['sinstance'] . '___decoder__invalid']);
-    $decoder__ipv4_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, $vars['sinstance'] . '___decoder__ipv4']);
-    $decoder__ipv6_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, $vars['sinstance'] . '___decoder__ipv6']);
-    $decoder__ipv4_in_ipv6_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, $vars['sinstance'] . '___decoder__ipv4_in_ipv6']);
-    $decoder__ipv6_in_ipv6_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, $vars['sinstance'] . '___decoder__ipv6_in_ipv6']);
-    $decoder__mpls_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, $vars['sinstance'] . '___decoder__mpls']);
-    $decoder__nsh_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, $vars['sinstance'] . '___decoder__nsh']);
-    $decoder__null_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, $vars['sinstance'] . '___decoder__null']);
-    $decoder__ppp_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, $vars['sinstance'] . '___decoder__ppp']);
-    $decoder__pppoe_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, $vars['sinstance'] . '___decoder__pppoe']);
-    $decoder__raw_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, $vars['sinstance'] . '___decoder__raw']);
-    $decoder__sctp_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, $vars['sinstance'] . '___decoder__sctp']);
-    $decoder__sll_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, $vars['sinstance'] . '___decoder__sll']);
-    $decoder__tcp_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, $vars['sinstance'] . '___decoder__tcp']);
-    $decoder__teredo_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, $vars['sinstance'] . '___decoder__teredo']);
-    $decoder__too_many_layers_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, $vars['sinstance'] . '___decoder__too_many_layers']);
-    $decoder__udp_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, $vars['sinstance'] . '___decoder__udp']);
-    $decoder__vlan_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, $vars['sinstance'] . '___decoder__vlan']);
-    $decoder__vlan_qinq_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, $vars['sinstance'] . '___decoder__vlan_qinq']);
-    $decoder__vlan_qinqinq_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, $vars['sinstance'] . '___decoder__vlan_qinqinq']);
-    $decoder__vntag_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, $vars['sinstance'] . '___decoder__vntag']);
-    $decoder__vxlan_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, $vars['sinstance'] . '___decoder__vxlan']);
+    $decoder__arp_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___decoder__arp']);
+    $decoder__chdlc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___decoder__chdlc']);
+    $decoder__erspan_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___decoder__erspan']);
+    $decoder__esp_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___decoder__esp']);
+    $decoder__ethernet_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___decoder__ethernet']);
+    $decoder__geneve_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___decoder__geneve']);
+    $decoder__gre_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___decoder__gre']);
+    $decoder__icmpv4_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___decoder__icmpv4']);
+    $decoder__icmpv6_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___decoder__icmpv6']);
+    $decoder__ieee8021ah_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___decoder__ieee8021ah']);
+    $decoder__invalid_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___decoder__invalid']);
+    $decoder__ipv4_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___decoder__ipv4']);
+    $decoder__ipv6_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___decoder__ipv6']);
+    $decoder__ipv4_in_ipv6_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___decoder__ipv4_in_ipv6']);
+    $decoder__ipv6_in_ipv6_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___decoder__ipv6_in_ipv6']);
+    $decoder__mpls_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___decoder__mpls']);
+    $decoder__nsh_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___decoder__nsh']);
+    $decoder__null_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___decoder__null']);
+    $decoder__ppp_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___decoder__ppp']);
+    $decoder__pppoe_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___decoder__pppoe']);
+    $decoder__raw_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___decoder__raw']);
+    $decoder__sctp_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___decoder__sctp']);
+    $decoder__sll_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___decoder__sll']);
+    $decoder__tcp_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___decoder__tcp']);
+    $decoder__teredo_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___decoder__teredo']);
+    $decoder__too_many_layers_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___decoder__too_many_layers']);
+    $decoder__udp_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___decoder__udp']);
+    $decoder__vlan_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___decoder__vlan']);
+    $decoder__vlan_qinq_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___decoder__vlan_qinq']);
+    $decoder__vlan_qinqinq_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___decoder__vlan_qinqinq']);
+    $decoder__vntag_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___decoder__vntag']);
+    $decoder__vxlan_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___decoder__vxlan']);
 } else {
     $decoder__arp_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___decoder__arp']);
     $decoder__chdlc_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___decoder__chdlc']);
@@ -77,7 +77,7 @@ if (isset($vars['sinstance'])) {
 }
 
 $rrd_list = [];
-if (Rrd::checkRrdExists($decoder__arp_rrd_filename)) {
+#if (Rrd::checkRrdExists($decoder__arp_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $decoder__arp_rrd_filename,
         'descr' => 'ARP',
@@ -228,8 +228,8 @@ if (Rrd::checkRrdExists($decoder__arp_rrd_filename)) {
         'descr' => 'VXLAN',
         'ds' => 'data',
     ];
-} else {
-    d_echo('RRD "' . $rrd_filename . '" not found');
-}
+#} else {
+#    d_echo('RRD "' . $rrd_filename . '" not found');
+#}
 
 require 'includes/html/graphs/generic_multi_line.inc.php';

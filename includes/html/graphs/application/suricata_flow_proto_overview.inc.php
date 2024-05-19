@@ -8,22 +8,14 @@ $printtotal = 0;
 $addarea = 0;
 $transparency = 15;
 
-if (isset($vars['sinstance'])) {
-    $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, $vars['sinstance']]);
-    $flow__udp_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___flow__udp']);
-    $flow__tcp_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___flow__tcp']);
-    $flow__icmpv4_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___flow__icmpv4']);
-    $flow__icmpv6_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___flow__icmpv6']);
-} else {
-    $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id]);
-    $flow__udp_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___flow__udp']);
-    $flow__tcp_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___flow__tcp']);
-    $flow__icmpv4_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___flow__icmpv4']);
-    $flow__icmpv6_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___flow__icmpv6']);
-}
+$rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id]);
+$flow__udp_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___flow__udp']);
+$flow__tcp_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___flow__tcp']);
+$flow__icmpv4_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___flow__icmpv4']);
+$flow__icmpv6_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___flow__icmpv6']);
 
 $rrd_list = [];
-if (Rrd::checkRrdExists($flow__udp_rrd_filename)){
+if (Rrd::checkRrdExists($flow__udp_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $flow__icmpv4_rrd_filename,
         'descr' => 'ICMPv4',

@@ -106,6 +106,8 @@ if ($app_data['version'] == 1) {
                 // decoder__bytes
                 // flow_bypassed__bytes
                 'suricata_v2_bytes' => 'Bytes',
+                // decoder_* protocol items
+                'suricata_v2_dec_proto' => 'Decoder Protocol Packets',
                 // decoder__avg_pkt_size
                 'suricata_v2_avg_pkg_size' => 'Decoder Average Packet Size',
                 // drop_percent
@@ -118,6 +120,8 @@ if ($app_data['version'] == 1) {
                 'suricata_v2_app_layer__flows' => 'Application Layer Flows',
                 // app_layer__tx__*
                 'suricata_v2_app_layer__tx' => 'Application Layer Packets',
+                // flow__end__*
+                'suricata_v2_flow__end' => 'Flow Ends',
                 // flow__emerg_mode_entered, flow__emerg_mode_over
                 'suricata_v2_flow_emerg_mode' => 'Flow Emergency Mode',
                 // uptime
@@ -132,6 +136,8 @@ if ($app_data['version'] == 1) {
                 // decoder__bytes
                 // flow_bypassed__bytes
                 'suricata_v2_bytes' => 'Bytes',
+                // decoder_* protocol items
+                'suricata_v2_dec_proto' => 'Decoder Protocol Packets',
                 // decoder__avg_pkt_size
                 'suricata_v2_avg_pkg_size' => 'Decoder Average Packet Size',
                 // capture__kernel_ifdrops, capture__kernel_drops
@@ -140,6 +146,8 @@ if ($app_data['version'] == 1) {
                 'suricata_v2_app_layer__flows' => 'Application Layer Flows',
                 // app_layer__tx__*
                 'suricata_v2_app_layer__tx' => 'Application Layer Packets',
+                // flow__end__*
+                'suricata_v2_flow__end' => 'Flow Ends',
                 // flow__emerg_mode_entered, flow__emerg_mode_over
                 'suricata_v2_flow_emerg_mode' => 'Flow Emergency Mode',
                 // uptime
@@ -282,6 +290,8 @@ if ($app_data['version'] == 1) {
             'suricata_v2_tcp__syn' => 'TCP Syn',
             // tcp__synack
             'suricata_v2_tcp__synack' => 'TCP Syn ACK',
+            // flow__end__tcp__*
+            'suricata_v2_flow__end__end' => 'TCP Flow Ends',
         ];
     }
 }

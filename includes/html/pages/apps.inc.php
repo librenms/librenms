@@ -335,7 +335,7 @@ $graphs['suricata'] = [
     'app_tx_overview',
     'bytes_overview',
     'mem_use_overview',
-    'alert_overview',
+    'uptime_overview',
 ];
 $graphs['zfs'] = [
     'arc_misc',

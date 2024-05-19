@@ -4,13 +4,8 @@ $munge = true;
 $name = 'suricata';
 $unit_text = 'days';
 
-if (isset($vars['sinstance'])) {
-    $v1_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, $vars['sinstance']]);
-    $uptime_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___uptime']);
-} else {
-    $v1_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id]);
-    $uptime_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___uptime']);
-}
+$v1_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id]);
+$uptime_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___uptime']);
 
 if (Rrd::checkRrdExists($uptime_rrd_filename)) {
     $ds = 'data';

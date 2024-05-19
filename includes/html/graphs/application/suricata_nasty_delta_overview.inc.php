@@ -8,17 +8,10 @@ $printtotal = 1;
 $addarea = 0;
 $transparency = 15;
 
-if (isset($vars['sinstance'])) {
-    $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, $vars['sinstance']]);
-    $capture__kernel_ifdrops_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___capture__kernel_ifdrops']);
-    $capture__kernel_drops_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___capture__kernel_drops']);
-    $error_delta_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___error_delta']);
-} else {
-    $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id]);
-    $capture__kernel_ifdrops_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___capture__kernel_ifdrops']);
-    $capture__kernel_drops_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___capture__kernel_drops']);
-    $error_delta_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___error_delta']);
-}
+$rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id]);
+$capture__kernel_ifdrops_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___capture__kernel_ifdrops']);
+$capture__kernel_drops_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___capture__kernel_drops']);
+$error_delta_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___error_delta']);
 
 $rrd_list = [];
 if (Rrd::checkRrdExists($capture__kernel_ifdrops_rrd_filename)) {
