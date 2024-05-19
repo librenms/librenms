@@ -16,42 +16,26 @@ $capture__kernel_ifdrops_rrd_filename = Rrd::name($device['hostname'], ['app', $
 
 $rrd_list = [];
 if (Rrd::checkRrdExists($capture__kernel_packets_rrd_filename)) {
-    if (Rrd::checkRrdExists($capture__kernel_packets_rrd_filename)) {
-        $rrd_list[] = [
-            'filename' => $capture__kernel_packets_rrd_filename,
-            'descr' => 'Packets',
-            'ds' => 'data',
-        ];
-    } else {
-        d_echo('RRD "' . $capture__kernel_packets_rrd_filename . '" not found');
-    }
-    if (Rrd::checkRrdExists($capture__kernel_packets_rrd_filename)) {
-        $rrd_list[] = [
-            'filename' => $decoder__ethernet_rrd_filename,
-            'descr' => 'Eth Pkts',
-            'ds' => 'data',
-        ];
-    } else {
-        d_echo('RRD "' . $capture__kernel_packets_rrd_filename . '" not found');
-    }
-    if (Rrd::checkRrdExists($capture__kernel_drops_rrd_filename)) {
-        $rrd_list[] = [
-            'filename' => $capture__kernel_drops_rrd_filename,
-            'descr' => 'Drops',
-            'ds' => 'data',
-        ];
-    } else {
-        d_echo('RRD "' . $capture__kernel_drops_rrd_filename . '" not found');
-    }
-    if (Rrd::checkRrdExists($capture__kernel_ifdrops_rrd_filename)) {
-        $rrd_list[] = [
-            'filename' => $capture__kernel_ifdrops_rrd_filename,
-            'descr' => 'If Dropped',
-            'ds' => 'data',
-        ];
-    } else {
-        d_echo('RRD "' . $capture__kernel_ifdrops_rrd_filename . '" not found');
-    }
+    $rrd_list[] = [
+        'filename' => $capture__kernel_packets_rrd_filename,
+        'descr' => 'Packets',
+        'ds' => 'data',
+    ];
+    $rrd_list[] = [
+        'filename' => $decoder__ethernet_rrd_filename,
+        'descr' => 'Eth Pkts',
+        'ds' => 'data',
+    ];
+    $rrd_list[] = [
+        'filename' => $capture__kernel_drops_rrd_filename,
+        'descr' => 'Drops',
+        'ds' => 'data',
+    ];
+    $rrd_list[] = [
+        'filename' => $capture__kernel_ifdrops_rrd_filename,
+        'descr' => 'If Dropped',
+        'ds' => 'data',
+    ];
 } elseif (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list[] = [
         'filename' => $rrd_filename,
