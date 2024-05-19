@@ -1070,6 +1070,10 @@ function get_port_graphs(Illuminate\Http\Request $request): JsonResponse
     $ports = $device->ports()->isNotDeleted()->hasAccess(Auth::user())
         ->select($columns)->orderBy('ifIndex')->get();
 
+    if ($ports->isEmpty()) {
+        return api_error(404, 'No ports found');
+    }
+
     return api_success($ports, 'ports');
 }
 
