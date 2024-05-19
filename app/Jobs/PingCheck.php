@@ -78,7 +78,7 @@ class PingCheck implements ShouldQueue
         $ordered_hostname_list = $this->fetchOrderedHostnames();
 
         if (Debug::isVerbose()) {
-            echo "Processing hosts in this order : " . implode(', ', $ordered_hostname_list) . PHP_EOL;
+            echo 'Processing hosts in this order : ' . implode(', ', $ordered_hostname_list) . PHP_EOL;
         }
 
         // bulk ping and send FpingResponse's to recordData as they come in
@@ -101,7 +101,7 @@ class PingCheck implements ShouldQueue
     /**
      * Get an ordered list of hostnames that we need to ping starting from devices with no parents
      */
-    private function fetchOrderedHostnames() : array
+    private function fetchOrderedHostnames(): array
     {
         $ret = [];
         $current_hostnames = [];
@@ -119,7 +119,7 @@ class PingCheck implements ShouldQueue
 
         while (count($current_hostnames) > 0) {
             if (Debug::isVerbose()) {
-                echo "Adding hosts to ordered list : " . implode(', ', $current_hostnames) . PHP_EOL;
+                echo 'Adding hosts to ordered list : ' . implode(', ', $current_hostnames) . PHP_EOL;
             }
 
             $ret = array_merge($ret, $current_hostnames);
@@ -129,7 +129,7 @@ class PingCheck implements ShouldQueue
 
         if (count($deferred_device_ids) > 0) {
             if (Debug::isVerbose()) {
-                echo "Adding unprocessed deferred hosts to ordered list : " . $deferred_device_ids->values()->implode(', ') . PHP_EOL;
+                echo 'Adding unprocessed deferred hosts to ordered list : ' . $deferred_device_ids->values()->implode(', ') . PHP_EOL;
             }
 
             $ret = array_merge($ret, $deferred_device_ids->values()->toArray());
@@ -141,7 +141,7 @@ class PingCheck implements ShouldQueue
     /**
      * For each hostname given, get the device and return any unprocessed child hostnames, removing from the unprocessed list
      */
-    private function getUnprocessedChildren(array $hostnames, Collection &$unprocessed) : array
+    private function getUnprocessedChildren(array $hostnames, Collection &$unprocessed): array
     {
         $ret = [];
 
