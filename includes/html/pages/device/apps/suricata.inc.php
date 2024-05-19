@@ -47,7 +47,9 @@ foreach ($suricata_instances as $index => $sinstance) {
 if ($app_data['version'] == 2) {
     print "<br>\nPages: ";
     $suricata_pages = ['general'=>'General', 'bypassed' => 'By Passed', 'errors' => 'Errors', 'memuse' => 'Memory Usage',
-                     'detect' => 'Detect', 'filestore' => 'File Store', 'tcp' => 'TCP'];
+                       'memuse_details' => '(Details)', 'detect' => ' Detect', 'filestore' => 'File Store', 'tcp' => 'TCP'];
+    $suricata_pages_no_comma = [ 'memuse' => 1 ];
+
     $page_count=0;
     foreach ($suricata_pages as $page => $page_description) {
         $label = $vars['suricata_graph_set'] == $page
@@ -60,7 +62,7 @@ if ($app_data['version'] == 2) {
             echo generate_link($label, $link_array, ['suricata_graph_set' => $page]);
         }
 
-        if ($page_count < (count($suricata_pages) - 1)) {
+        if ($page_count < (count($suricata_pages) - 1) && !isset($suricata_pages_no_comma[$page])) {
             echo ', ';
         }
         $page_count++;
@@ -216,6 +218,30 @@ if ($app_data['version'] == 1) {
             // memcap_pressure
             // memcap_pressure_max
             'suricata_v2_memcap_pressure' => 'Memcap Pressure',
+        ];
+    } elseif (strcmp($vars['suricata_graph_set'], 'memuse_details') == 0) {
+        $graphs = [
+            // ftp__memuse
+            // http__memuse
+            // tcp__memuse
+            // tcp__reassembly_memuse
+            'suricata_v2_memuse' => 'Memory Usage',
+            // flow__memuse
+            'suricata_v2_memuse_flow_det' => 'Flow Memory Usage',
+            // ftp__memuse
+            'suricata_v2_memuse_ftp_det' => 'FTP Memory Usage',
+            // http__memuse
+            'suricata_v2_memuse_http_det' => 'HTTP Memory Usage',
+            // tcp__memuse
+            'suricata_v2_memuse_tcp_det' => 'TCP Memory Usage',
+            // tcp__reassembly_memuse
+            'suricata_v2_memuse_tcp_reass' => 'TCP Ressaembly Memory Usage',
+            // tcp__segment_memcap_drop
+            'suricata_v2_memuse_tcp_drop_segment' => 'TCP Segment Memcap Drop',
+            // tcp__ssn_memcap_drop
+            'suricata_v2_memuse_tcp_drop_ssn' => 'TCP Session Memcap Drop',
+            // memcap_pressure_max
+            'suricata_v2_memcap_pressure_det' => 'Memcap Pressure',
         ];
     } elseif (strcmp($vars['suricata_graph_set'], 'detect') == 0) {
         $graphs = [
