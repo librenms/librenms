@@ -376,7 +376,7 @@ if ($app_data['version'] == 1) {
             // decoder__event__vntag_*
             'suricata_v2_decoder__event__vntag' => 'Decoder Events, VNTag',
             // decoder__event__vxlan_*
-            'suricata_v2_decoder__event__vxlan' => 'Decoder Events, vxlan',
+            'suricata_v2_decoder__event__vxlan' => 'Decoder Events, VXLAN',
         ];
     }
 }
