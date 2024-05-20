@@ -741,6 +741,8 @@ if ($app_data['version'] == 1) {
         ];
     } elseif (strcmp($vars['suricata_graph_set'], 'decoder_vntag') == 0) {
         $graphs = [
+            'suricata_v2_decoder__event__vntag__header_too_small' => 'VNTag Header Too Small, packets/second',
+            'suricata_v2_decoder__event__vntag__unknown_type' => 'VNTag Unknown Type, packets/second',
         ];
     }
 }
