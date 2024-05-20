@@ -47,10 +47,13 @@ foreach ($suricata_instances as $index => $sinstance) {
 if ($app_data['version'] == 2) {
     print "<br>\nPages: ";
     $suricata_pages = ['general'=>'General', 'bypassed' => 'By Passed', 'errors' => 'Errors', '#-0' => '(', 'errors_alloc'=>'Alloc', 'errors_gap'=>'Gap', 'errors_internal'=>'Internal',
-                       'errors_parser'=>'Parser', '#-1' => ')', 'memuse' => 'Memory Usage', '#0' => '(', 'memuse_details' => 'Details', '#1' => '),', 'detect' => ' Detect',
-                       'filestore' => 'File Store', 'tcp' => 'TCP', 'decoder' => 'Decoder', 'applayer' => 'App Layer', '#2' => '(', 'applayer_flows' => 'Flows', 'applayer_tx' => 'TX',
-                       '#3' => '),'];
-    $suricata_pages_no_comma = [ 'errors' => 1, 'errors_parser' => 1, 'memuse' => 1, 'memuse_details' => 1, 'applayer' => 1, 'applayer_tx' => 1, ];
+                       'errors_parser'=>'Parser', '#-1' => '),', 'memuse' => 'Memory Usage', '#0' => '(', 'memuse_details' => 'Details', '#1' => '),', 'detect' => ' Detect',
+                       'filestore' => 'File Store', 'tcp' => 'TCP', 'applayer' => 'App Layer', '#2' => '(', 'applayer_flows' => 'Flows', 'applayer_tx' => 'TX', '#2.1' => '), ',
+                       'decoder' => 'Decoder', '#1.1' => '(', 'decoder_erspan' => 'ERSPAN', 'decoder_gre' => 'GRE', 'decoder_icmpv4' => 'ICMPv4', 'decoder_icmpv6' => 'ICMPv6',
+                       'decoder_ipv4' => 'IPv4', 'decoder_ipv6' => 'IPv6', 'decoder_ltnull' => 'LT Null', 'decoder_mpls' => 'MPLS', 'decoder_nsh' => 'NSH', 'decoder_ppp' => 'PPP',
+                       'decoder_pppoe' => 'PPPoE', 'decoder_tcp' => 'TCP', 'decoder_udp' => 'UDP', 'decoder_vlan' => 'VLAN', 'decoder_vntag' => 'VNTag', '#3' => ')'];
+
+    $suricata_pages_no_comma = [ 'errors' => 1, 'errors_parser' => 1, 'memuse' => 1, 'memuse_details' => 1, 'applayer' => 1, 'applayer_tx' => 1, 'decoder' => 1, 'decoder_vntag' => 1];
 
     $page_count=0;
     foreach ($suricata_pages as $page => $page_description) {
@@ -611,6 +614,69 @@ if ($app_data['version'] == 1) {
             'suricata_v2_app_layer__error__telnet__parser' => 'Telnet, parser errors/second',
             'suricata_v2_app_layer__error__tftp__parser' => 'TFTP, parser errors/second',
             'suricata_v2_app_layer__error__tls__parser' => 'TLS, parser errors/second',
+        ];
+    } elseif (strcmp($vars['suricata_graph_set'], 'decoder_erspan') == 0) {
+        $graphs = [
+            'suricata_v2_decoder__event__erspan__header_too_small' => 'ERSPAN Header Too Small, packets/second',
+            'suricata_v2_decoder__event__erspan__too_many_vlan_layers' => 'ERSPAN Too Many VLAN Layers, packets/second',
+            'suricata_v2_decoder__event__erspan__unsupported_version' => 'ERSPAN Unsupported Version, packets/second',
+        ];
+    } elseif (strcmp($vars['suricata_graph_set'], 'decoder_gre') == 0) {
+        $graphs = [
+            'suricata_v2_decoder__event__gre__pkt_too_small' => 'GRE Packet Too Small, packets/second',
+            'suricata_v2_decoder__event__gre__version0_flags' => 'GRE Version0 Flags, packets/second',
+            'suricata_v2_decoder__event__gre__version0_hdr_too_big' => 'GRE Version0 Header Too Big, packets/second',
+            'suricata_v2_decoder__event__gre__version0_malformed_sre_hdr' => 'GRE Version0 Malformed SRE Header, packets/second',
+            'suricata_v2_decoder__event__gre__version0_recur' => 'GRE Version0 Recur, packets/second',
+            'suricata_v2_decoder__event__gre__version1_chksum' => 'GRE Version1 Checksum, packets/second',
+            'suricata_v2_decoder__event__gre__version1_flags' => 'GRE Version1 Flags, packets/second',
+            'suricata_v2_decoder__event__gre__version1_hdr_too_big' => 'GRE Version1 Header Too Big, packets/second',
+            'suricata_v2_decoder__event__gre__version1_malformed_sre_hdr' => 'GRE Version1 Malformed SRE Header, packets/second',
+            'suricata_v2_decoder__event__gre__version1_no_key' => 'GRE Version1 No Key, packets/second',
+            'suricata_v2_decoder__event__gre__version1_recur' => 'GRE Version1 Recur, packets/second',
+            'suricata_v2_decoder__event__gre__version1_route' => 'GRE Version1 Route, packets/second',
+            'suricata_v2_decoder__event__gre__version1_ssr' => 'GRE Version1 SSR, packets/second',
+            'suricata_v2_decoder__event__gre__version1_wrong_protocol' => 'GRE Version1 Wrong Protocol, packets/second',
+            'suricata_v2_decoder__event__gre__wrong_version' => 'GRE Wrong Version, packets/second',
+        ];
+    } elseif (strcmp($vars['suricata_graph_set'], 'decoder_icmpv4') == 0) {
+        $graphs = [
+        ];
+    } elseif (strcmp($vars['suricata_graph_set'], 'decoder_icmpv6') == 0) {
+        $graphs = [
+        ];
+    } elseif (strcmp($vars['suricata_graph_set'], 'decoder_ipv4') == 0) {
+        $graphs = [
+        ];
+    } elseif (strcmp($vars['suricata_graph_set'], 'decoder_ipv6') == 0) {
+        $graphs = [
+        ];
+    } elseif (strcmp($vars['suricata_graph_set'], 'decoder_ltnull') == 0) {
+        $graphs = [
+        ];
+    } elseif (strcmp($vars['suricata_graph_set'], 'decoder_mpls') == 0) {
+        $graphs = [
+        ];
+    } elseif (strcmp($vars['suricata_graph_set'], 'decoder_nsh') == 0) {
+        $graphs = [
+        ];
+    } elseif (strcmp($vars['suricata_graph_set'], 'decoder_ppp') == 0) {
+        $graphs = [
+        ];
+    } elseif (strcmp($vars['suricata_graph_set'], 'decoder_pppoe') == 0) {
+        $graphs = [
+        ];
+    } elseif (strcmp($vars['suricata_graph_set'], 'decoder_tcp') == 0) {
+        $graphs = [
+        ];
+    } elseif (strcmp($vars['suricata_graph_set'], 'decoder_udp') == 0) {
+        $graphs = [
+        ];
+    } elseif (strcmp($vars['suricata_graph_set'], 'decoder_vlan') == 0) {
+        $graphs = [
+        ];
+    } elseif (strcmp($vars['suricata_graph_set'], 'decoder_vntag') == 0) {
+        $graphs = [
         ];
     }
 }
