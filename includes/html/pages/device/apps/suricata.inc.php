@@ -687,6 +687,12 @@ if ($app_data['version'] == 1) {
         ];
     } elseif (strcmp($vars['suricata_graph_set'], 'decoder_mpls') == 0) {
         $graphs = [
+            'suricata_v2_decoder__event__mpls__bad_label_implicit_null' => 'MPLS Bad Label Implicit Null, packets/second',
+            'suricata_v2_decoder__event__mpls__bad_label_reserved' => 'MPLS Bad Label Reserved, packets/second',
+            'suricata_v2_decoder__event__mpls__bad_label_router_alert' => 'MPLS Bad Label Router Alert, packets/second',
+            'suricata_v2_decoder__event__mpls__header_too_small' => 'MPLS Header Too Small, packets/second',
+            'suricata_v2_decoder__event__mpls__pkt_too_small' => 'MPLS Packet Too Small, packets/second',
+            'suricata_v2_decoder__event__mpls__unknown_payload_type' => 'MPLS Unknown Payload, packets/second',
         ];
     } elseif (strcmp($vars['suricata_graph_set'], 'decoder_nsh') == 0) {
         $graphs = [
