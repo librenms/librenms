@@ -735,6 +735,9 @@ if ($app_data['version'] == 1) {
         ];
     } elseif (strcmp($vars['suricata_graph_set'], 'decoder_vlan') == 0) {
         $graphs = [
+            'suricata_v2_decoder__event__vlan__header_too_small' => 'VLAN Header Too Small, packets/second',
+            'suricata_v2_decoder__event__vlan__too_many_layers' => 'VLAN Too Many Layers, packets/second',
+            'suricata_v2_decoder__event__vlan__unknown_type' => 'VLAN Unknown Type, packets/second',
         ];
     } elseif (strcmp($vars['suricata_graph_set'], 'decoder_vntag') == 0) {
         $graphs = [
