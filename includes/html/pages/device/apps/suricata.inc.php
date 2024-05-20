@@ -47,9 +47,10 @@ foreach ($suricata_instances as $index => $sinstance) {
 if ($app_data['version'] == 2) {
     print "<br>\nPages: ";
     $suricata_pages = ['general'=>'General', 'bypassed' => 'By Passed', 'errors' => 'Errors', '#-0' => '(', 'errors_alloc'=>'Alloc', 'errors_gap'=>'Gap', 'errors_internal'=>'Internal',
-                       '#-1' => ')', 'memuse' => 'Memory Usage', '#0' => '(', 'memuse_details' => 'Details', '#1' => '),', 'detect' => ' Detect', 'filestore' => 'File Store',
-                       'tcp' => 'TCP', 'decoder' => 'Decoder', 'applayer' => 'App Layer', '#2' => '(', 'applayer_flows' => 'Flows', 'applayer_tx' => 'TX', '#3' => '),'];
-    $suricata_pages_no_comma = [ 'errors' => 1, 'errors_internal' => 1, 'memuse' => 1, 'memuse_details' => 1, 'applayer' => 1, 'applayer_tx' => 1, ];
+                       'errors_parser'=>'Parser', '#-1' => ')', 'memuse' => 'Memory Usage', '#0' => '(', 'memuse_details' => 'Details', '#1' => '),', 'detect' => ' Detect',
+                       'filestore' => 'File Store', 'tcp' => 'TCP', 'decoder' => 'Decoder', 'applayer' => 'App Layer', '#2' => '(', 'applayer_flows' => 'Flows', 'applayer_tx' => 'TX',
+                       '#3' => '),'];
+    $suricata_pages_no_comma = [ 'errors' => 1, 'errors_parser' => 1, 'memuse' => 1, 'memuse_details' => 1, 'applayer' => 1, 'applayer_tx' => 1, ];
 
     $page_count=0;
     foreach ($suricata_pages as $page => $page_description) {
@@ -572,6 +573,44 @@ if ($app_data['version'] == 1) {
             'suricata_v2_app_layer__error__telnet__internal' => 'Telnet, internal errors/second',
             'suricata_v2_app_layer__error__tftp__internal' => 'TFTP, internal errors/second',
             'suricata_v2_app_layer__error__tls__internal' => 'TLS, internal errors/second',
+        ];
+    } elseif (strcmp($vars['suricata_graph_set'], 'errors_parser') == 0) {
+        $graphs = [
+            // app_layer__error__*__parser
+            'suricata_v2_app_layer__error__bittorrent-dht__parser' => 'Bittorrent-DHT, parser errors/second',
+            'suricata_v2_app_layer__error__dcerpc_tcp__parser' => 'DCE RPC TCP, parser errors/second',
+            'suricata_v2_app_layer__error__dcerpc_udp__parser' => 'DCE RPC UDP, parser errors/second',
+            'suricata_v2_app_layer__error__dhcp__parser' => 'DHCP, parser errors/second',
+            'suricata_v2_app_layer__error__dnp3__parser' => 'DNP3, parser errors/second',
+            'suricata_v2_app_layer__error__dns_tcp__parser' => 'DNS TCP, parser errors/second',
+            'suricata_v2_app_layer__error__dns_udp__parser' => 'DNS UDP, parser errors/second',
+            'suricata_v2_app_layer__error__enip_tcp__parser' => 'ENIP TCP, parser errors/second',
+            'suricata_v2_app_layer__error__enip_udp__parser' => 'ENIP UDP, parser errors/second',
+            'suricata_v2_app_layer__error__ftp__parser' => 'FTP, parser errors/second',
+            'suricata_v2_app_layer__error__ftp-data__parser' => 'FTP-DATA, parser errors/second',
+            'suricata_v2_app_layer__error__http__parser' => 'HTTP, parser errors/second',
+            'suricata_v2_app_layer__error__http2__parser' => 'HTTP2, parser errors/second',
+            'suricata_v2_app_layer__error__ike__parser' => 'IKE, parser errors/second',
+            'suricata_v2_app_layer__error__imap__parser' => 'IMAP, parser errors/second',
+            'suricata_v2_app_layer__error__krb5_tcp__parser' => 'KRB5 TCP, parser errors/second',
+            'suricata_v2_app_layer__error__krb5_udp__parser' => 'KRB5 UDP, parser errors/second',
+            'suricata_v2_app_layer__error__modbus__parser' => 'ModBus, parser errors/second',
+            'suricata_v2_app_layer__error__mqtt__parser' => 'MQTT, parser errors/second',
+            'suricata_v2_app_layer__error__nfs_tcp__parser' => 'NFS TCP, parser errors/second',
+            'suricata_v2_app_layer__error__nfs_udp__parser' => 'NFS UDP, parser errors/second',
+            'suricata_v2_app_layer__error__ntp__parser' => 'NTP, parser errors/second',
+            'suricata_v2_app_layer__error__pgsql__parser' => 'Pgsql, parser errors/second',
+            'suricata_v2_app_layer__error__quic__parser' => 'QUIC, parser errors/second',
+            'suricata_v2_app_layer__error__rdp__parser' => 'RDP, parser errors/second',
+            'suricata_v2_app_layer__error__rfb__parser' => 'RFB, parser errors/second',
+            'suricata_v2_app_layer__error__sip__parser' => 'SIP, parser errors/second',
+            'suricata_v2_app_layer__error__smb__parser' => 'SMB, parser errors/second',
+            'suricata_v2_app_layer__error__smtp__parser' => 'SMTP, parser errors/second',
+            'suricata_v2_app_layer__error__snmp__parser' => 'SNMP, parser errors/second',
+            'suricata_v2_app_layer__error__ssh__parser' => 'SSH, parser errors/second',
+            'suricata_v2_app_layer__error__telnet__parser' => 'Telnet, parser errors/second',
+            'suricata_v2_app_layer__error__tftp__parser' => 'TFTP, parser errors/second',
+            'suricata_v2_app_layer__error__tls__parser' => 'TLS, parser errors/second',
         ];
     }
 }
