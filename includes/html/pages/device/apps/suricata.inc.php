@@ -649,9 +649,33 @@ if ($app_data['version'] == 1) {
         ];
     } elseif (strcmp($vars['suricata_graph_set'], 'decoder_icmpv6') == 0) {
         $graphs = [
+            'suricata_v2_decoder__event__icmpv6__experimentation_type' => 'ICMPv6 Experimentation Type, packets/second',
+            'suricata_v2_decoder__event__icmpv6__ipv6_trunc_pkt' => 'ICMPv6 Truncated Packet, packets/second',
+            'suricata_v2_decoder__event__icmpv6__ipv6_unknown_version' => 'ICMPv6 Unknown Version, packets/second',
+            'suricata_v2_decoder__event__icmpv6__mld_message_with_invalid_hl' => 'ICMPv6 MLD Message With Invalid HL, packets/second',
+            'suricata_v2_decoder__event__icmpv6__pkt_too_small' => 'ICMPv6 Packet Too Small, packets/second',
+            'suricata_v2_decoder__event__icmpv6__unassigned_type' => 'ICMPv6 Unassigned Type, packets/second',
+            'suricata_v2_decoder__event__icmpv6__unknown_code' => 'ICMPv6 Unknown Code, packets/second',
+            'suricata_v2_decoder__event__icmpv6__unknown_type' => 'ICMPv6 Unknown Type, packets/second',
         ];
     } elseif (strcmp($vars['suricata_graph_set'], 'decoder_ipv4') == 0) {
         $graphs = [
+            'suricata_v2_decoder__event__ipv4__frag_ignored' => 'IPv4 Frag Ignored, packets/second',
+            'suricata_v2_decoder__event__ipv4__frag_overlap' => 'IPv4 Frag Overlap, packets/second',
+            'suricata_v2_decoder__event__ipv4__frag_pkt_too_large' => 'IPv4 Frag Packet Too Large, packets/second',
+            'suricata_v2_decoder__event__ipv4__hlen_too_small' => 'IPv4 Hlen To Small, packets/second',
+            'suricata_v2_decoder__event__ipv4__icmpv6' => 'IPv4 ICMPv6, packets/second',
+            'suricata_v2_decoder__event__ipv4__iplen_smaller_than_hlen' => 'IPv4 IPlen < Hlen, packets/second',
+            'suricata_v2_decoder__event__ipv4__opt_duplicate' => 'IPv4 Opt Duplicate, packets/second',
+            'suricata_v2_decoder__event__ipv4__opt_eol_required' => 'IPv4 Opt EOL Required, packets/second',
+            'suricata_v2_decoder__event__ipv4__opt_invalid' => 'IPv4 Opt Invalid, packets/second',
+            'suricata_v2_decoder__event__ipv4__opt_invalid_len' => 'IPv4 Opt Invalid, packets/second',
+            'suricata_v2_decoder__event__ipv4__opt_malformed' => 'IPv4 Opt Malformed, packets/second',
+            'suricata_v2_decoder__event__ipv4__opt_pad_required' => 'IPv4 Pat Required, packets/second',
+            'suricata_v2_decoder__event__ipv4__opt_unknown' => 'IPv4 Opt Unknown, packets/second',
+            'suricata_v2_decoder__event__ipv4__pkt_too_small' => 'IPv4 Packet To Small, packets/second',
+            'suricata_v2_decoder__event__ipv4__trunc_pkt' => 'IPv4 Truncated Packet, packets/second',
+            'suricata_v2_decoder__event__ipv4__wrong_ip_version' => 'IPv4 Wrong IP, packets/second',
         ];
     } elseif (strcmp($vars['suricata_graph_set'], 'decoder_ipv6') == 0) {
         $graphs = [
