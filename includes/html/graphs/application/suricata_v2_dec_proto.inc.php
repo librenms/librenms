@@ -77,7 +77,7 @@ if (isset($vars['sinstance'])) {
 }
 
 $rrd_list = [];
-//if (Rrd::checkRrdExists($decoder__arp_rrd_filename)) {
+if (Rrd::checkRrdExists($decoder__arp_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $decoder__arp_rrd_filename,
         'descr' => 'ARP',
@@ -228,8 +228,8 @@ $rrd_list = [];
         'descr' => 'VXLAN',
         'ds' => 'data',
     ];
-//} else {
-//    d_echo('RRD "' . $rrd_filename . '" not found');
-//}
+} else {
+    d_echo('RRD "' . $rrd_filename . '" not found');
+}
 
 require 'includes/html/graphs/generic_multi_line.inc.php';
