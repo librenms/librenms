@@ -46,8 +46,8 @@ foreach ($suricata_instances as $index => $sinstance) {
 // only present for v2
 if ($app_data['version'] == 2) {
     echo "<br>\nPages: ";
-    $suricata_pages = ['general'=>'General', 'bypassed' => 'By Passed', 'errors' => 'Errors', '#-0' => '(', 'errors_alloc'=>'Alloc', 'errors_gap'=>'Gap', 'errors_internal'=>'Internal',
-        'errors_parser'=>'Parser', '#-1' => '),', 'memuse' => 'Memory Usage', '#0' => '(', 'memuse_details' => 'Details', '#1' => '),', 'detect' => ' Detect',
+    $suricata_pages = ['general' => 'General', 'bypassed' => 'By Passed', 'errors' => 'Errors', '#-0' => '(', 'errors_alloc' => 'Alloc', 'errors_gap' => 'Gap', 'errors_internal' => 'Internal',
+        'errors_parser' => 'Parser', '#-1' => '),', 'memuse' => 'Memory Usage', '#0' => '(', 'memuse_details' => 'Details', '#1' => '),', 'detect' => ' Detect',
         'filestore' => 'File Store', 'tcp' => 'TCP', 'applayer' => 'App Layer', '#2' => '(', 'applayer_flows' => 'Flows', 'applayer_tx' => 'TX', '#2.1' => '), ',
         'decoder' => 'Decoder', '#1.1' => '(', 'decoder_erspan' => 'ERSPAN', 'decoder_gre' => 'GRE', 'decoder_icmpv4' => 'ICMPv4', 'decoder_icmpv6' => 'ICMPv6',
         'decoder_ipv4' => 'IPv4', 'decoder_ipv6' => 'IPv6', 'decoder_ltnull' => 'LT Null', 'decoder_mpls' => 'MPLS', 'decoder_nsh' => 'NSH', 'decoder_ppp' => 'PPP',
