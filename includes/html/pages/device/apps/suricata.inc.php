@@ -696,15 +696,21 @@ if ($app_data['version'] == 1) {
         ];
     } elseif (strcmp($vars['suricata_graph_set'], 'decoder_nsh') == 0) {
         $graphs = [
-            'suricata_v2_decoder__event__nsh__bad_header_length' => 'NSH Bad Header Length, packet/second',
-            'suricata_v2_decoder__event__nsh__header_too_small' => 'NSH Header Too Small, packet/second',
-            'suricata_v2_decoder__event__nsh__reserved_type' => 'NSH Reserved Type, packet/second',
-            'suricata_v2_decoder__event__nsh__unknown_payload' => 'NSH Unknown Payload, packet/second',
-            'suricata_v2_decoder__event__nsh__unsupported_type' => 'NSH Unsupported Type, packet/second',
-            'suricata_v2_decoder__event__nsh__unsupported_version' => 'NSH Unsupported Version, packet/second',
+            'suricata_v2_decoder__event__nsh__bad_header_length' => 'NSH Bad Header Length, packets/second',
+            'suricata_v2_decoder__event__nsh__header_too_small' => 'NSH Header Too Small, packets/second',
+            'suricata_v2_decoder__event__nsh__reserved_type' => 'NSH Reserved Type, packets/second',
+            'suricata_v2_decoder__event__nsh__unknown_payload' => 'NSH Unknown Payload, packets/second',
+            'suricata_v2_decoder__event__nsh__unsupported_type' => 'NSH Unsupported Type, packets/second',
+            'suricata_v2_decoder__event__nsh__unsupported_version' => 'NSH Unsupported Version, packets/second',
         ];
     } elseif (strcmp($vars['suricata_graph_set'], 'decoder_ppp') == 0) {
         $graphs = [
+            'suricata_v2_decoder__event__ppp__ip4_pkt_too_small' => 'PPP IPv4 Packet Too Small, packets/second',
+            'suricata_v2_decoder__event__ppp__ip6_pkt_too_small' => 'PPP IPv6 Packet Too Small, packets/second',
+            'suricata_v2_decoder__event__ppp__pkt_too_small' => 'PPP Packet To Small, packets/second',
+            'suricata_v2_decoder__event__ppp__unsup_proto' => 'PPP Unsup Proto, packets/second',
+            'suricata_v2_decoder__event__ppp__vju_pkt_too_small' => 'PPP Vju Packet Too Small, packets/second',
+            'suricata_v2_decoder__event__ppp__wrong_type' => 'PPP Wrong Type, packets/second',
         ];
     } elseif (strcmp($vars['suricata_graph_set'], 'decoder_pppoe') == 0) {
         $graphs = [
