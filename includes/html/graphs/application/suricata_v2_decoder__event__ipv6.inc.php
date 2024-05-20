@@ -18,8 +18,7 @@ if (isset($vars['sinstance'])) {
     $decoder__event__ipv6__exthdr_dupl_rh_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___decoder__event__ipv6__exthdr_dupl_rh']);
     $decoder__event__ipv6__exthdr_invalid_optlen_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___decoder__event__ipv6__exthdr_invalid_optlen']);
     $decoder__event__ipv6__exthdr_useless_fh_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___decoder__event__ipv6__exthdr_useless_fh']);
-    $decoder__event__ipv6__fh_non_zero_reserved_field_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___decoder__event__ipv6__fh_non_zero_reserved_fiel
-d']);
+    $decoder__event__ipv6__fh_non_zero_reserved_field_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___decoder__event__ipv6__fh_non_zero_reserved_field']);
     $decoder__event__ipv6__frag_ignored_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___decoder__event__ipv6__frag_ignored']);
     $decoder__event__ipv6__frag_invalid_length_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___decoder__event__ipv6__frag_invalid_length']);
     $decoder__event__ipv6__frag_overlap_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___decoder__event__ipv6__frag_overlap']);
@@ -28,11 +27,9 @@ d']);
     $decoder__event__ipv6__hopopts_unknown_opt_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___decoder__event__ipv6__hopopts_unknown_opt']);
     $decoder__event__ipv6__icmpv4_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___decoder__event__ipv6__icmpv4']);
     $decoder__event__ipv6__ipv4_in_ipv6_too_small_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___decoder__event__ipv6__ipv4_in_ipv6_too_small']);
-    $decoder__event__ipv6__ipv4_in_ipv6_wrong_version_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___decoder__event__ipv6__ipv4_in_ipv6_wrong_versio
-n']);
+    $decoder__event__ipv6__ipv4_in_ipv6_wrong_version_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___decoder__event__ipv6__ipv4_in_ipv6_wrong_version']);
     $decoder__event__ipv6__ipv6_in_ipv6_too_small_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___decoder__event__ipv6__ipv6_in_ipv6_too_small']);
-    $decoder__event__ipv6__ipv6_in_ipv6_wrong_version_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___decoder__event__ipv6__ipv6_in_ipv6_wrong_versio
-n']);
+    $decoder__event__ipv6__ipv6_in_ipv6_wrong_version_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___decoder__event__ipv6__ipv6_in_ipv6_wrong_version']);
     $decoder__event__ipv6__pkt_too_small_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___decoder__event__ipv6__pkt_too_small']);
     $decoder__event__ipv6__rh_type_0_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___decoder__event__ipv6__rh_type_0']);
     $decoder__event__ipv6__trunc_exthdr_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___decoder__event__ipv6__trunc_exthdr']);
