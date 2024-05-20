@@ -728,6 +728,10 @@ if ($app_data['version'] == 1) {
         ];
     } elseif (strcmp($vars['suricata_graph_set'], 'decoder_udp') == 0) {
         $graphs = [
+            'suricata_v2_decoder__event__udp__hlen_invalid' => 'UDP Hlen Invalid, packets/second',
+            'suricata_v2_decoder__event__udp__hlen_too_small' => 'UDP Hlen Too Small, packets/second',
+            'suricata_v2_decoder__event__udp__len_invalid' => 'UDP Length Invalid, packets/second',
+            'suricata_v2_decoder__event__udp__pkt_too_small' => 'UDP Packet Too Small, packets/second',
         ];
     } elseif (strcmp($vars['suricata_graph_set'], 'decoder_vlan') == 0) {
         $graphs = [
