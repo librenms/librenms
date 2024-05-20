@@ -714,9 +714,17 @@ if ($app_data['version'] == 1) {
         ];
     } elseif (strcmp($vars['suricata_graph_set'], 'decoder_pppoe') == 0) {
         $graphs = [
+            'suricata_v2_decoder__event__pppoe__malformed_tags' => 'PPPoE Malformed Tags, packets/second',
+            'suricata_v2_decoder__event__pppoe__pkt_too_small' => 'PPPoE Packet Too Small, packets/second',
+            'suricata_v2_decoder__event__pppoe__wrong_code' => 'PPPoE Wrong Code, packets/second',
         ];
     } elseif (strcmp($vars['suricata_graph_set'], 'decoder_tcp') == 0) {
         $graphs = [
+            'suricata_v2_decoder__event__tcp__hlen_too_small' => 'TCP Hlen Too Small, packets/second',
+            'suricata_v2_decoder__event__tcp__invalid_optlen' => 'TCP Invalid Opt Len, packets/second',
+            'suricata_v2_decoder__event__tcp__opt_duplicate' => 'TCP Opt Duplicate, packets/second',
+            'suricata_v2_decoder__event__tcp__opt_invalid_len' => 'TCP Opt Invalid Len, packets/second',
+            'suricata_v2_decoder__event__tcp__pkt_too_small' => 'TCP Packet Too Small, packets/second',
         ];
     } elseif (strcmp($vars['suricata_graph_set'], 'decoder_udp') == 0) {
         $graphs = [
