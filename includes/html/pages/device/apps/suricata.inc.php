@@ -682,6 +682,8 @@ if ($app_data['version'] == 1) {
         ];
     } elseif (strcmp($vars['suricata_graph_set'], 'decoder_ltnull') == 0) {
         $graphs = [
+            'suricata_v2_decoder__event__ltnull__pkt_too_small' => 'LT Null Packet Too Small, packets/second',
+            'suricata_v2_decoder__event__ltnull__unsupported_type' => 'LT Null Unsupported Type, packets/second',
         ];
     } elseif (strcmp($vars['suricata_graph_set'], 'decoder_mpls') == 0) {
         $graphs = [
