@@ -679,6 +679,37 @@ if ($app_data['version'] == 1) {
         ];
     } elseif (strcmp($vars['suricata_graph_set'], 'decoder_ipv6') == 0) {
         $graphs = [
+            'suricata_v2_decoder__event__ipv6__data_after_none_header' => 'IPv6 After None Header, packets/second',
+            'suricata_v2_decoder__event__ipv6__dstopts_only_padding' => 'IPv6 Destination Only Padding, packets/second',
+            'suricata_v2_decoder__event__ipv6__dstopts_unknown_opt' => 'IPv6 Destintation Unknown Option, packets/second',
+            'suricata_v2_decoder__event__ipv6__exthdr_ah_res_not_null' => 'IPv6 Extension Header AH Res Not Null, packets/second',
+            'suricata_v2_decoder__event__ipv6__exthdr_dupl_ah' => 'IPv6 Extention Header Duplicate AH, packets/second',
+            'suricata_v2_decoder__event__ipv6__exthdr_dupl_dh' => 'IPv6 Extension Header Duplicate DH, packets/second',
+            'suricata_v2_decoder__event__ipv6__exthdr_dupl_eh' => 'IPv6 Extension Header Duplicate EH, packets/second',
+            'suricata_v2_decoder__event__ipv6__exthdr_dupl_fh' => 'IPv6 Extension Header Duplicate FH, packets/second',
+            'suricata_v2_decoder__event__ipv6__exthdr_dupl_hh' => 'IPv6 Extension Header Duplicate HH, packets/second',
+            'suricata_v2_decoder__event__ipv6__exthdr_dupl_rh' => 'IPv6 Extension Header Duplicate RH, packets/second',
+            'suricata_v2_decoder__event__ipv6__exthdr_invalid_optlen' => 'IPv6 Extension Header Invalid Option Length, packets/second',
+            'suricata_v2_decoder__event__ipv6__exthdr_useless_fh' => 'IPv6 Extension Header Useless FH, packets/second',
+            'suricata_v2_decoder__event__ipv6__fh_non_zero_reserved_field' => 'IPv6 FH Non-zero Reserved Field, packets/second',
+            'suricata_v2_decoder__event__ipv6__frag_ignored' => 'IPv6 Frag Ignored, packets/second',
+            'suricata_v2_decoder__event__ipv6__frag_invalid_length' => 'IPv6 Frag Invalid Length, packets/second',
+            'suricata_v2_decoder__event__ipv6__frag_overlap' => 'IPv6 Frag Overlap, packets/second',
+            'suricata_v2_decoder__event__ipv6__frag_pkt_too_large' => 'IPv6 Frag Packet Too Large, packets/second',
+            'suricata_v2_decoder__event__ipv6__hopopts_only_padding' => 'IPv6 Hop Options Only Padding, packets/second',
+            'suricata_v2_decoder__event__ipv6__hopopts_unknown_opt' => 'IPv6 Hop Options Unknown Option, packets/second',
+            'suricata_v2_decoder__event__ipv6__icmpv4' => 'IPv6 ICMPv4, packets/second',
+            'suricata_v2_decoder__event__ipv6__ipv4_in_ipv6_too_small' => 'IPv6 IPv4 in IPv6 Too Small, packets/second',
+            'suricata_v2_decoder__event__ipv6__ipv4_in_ipv6_wrong_version' => 'IPv6 IPv4 in IPv6 Wrong Version, packets/second',
+            'suricata_v2_decoder__event__ipv6__ipv6_in_ipv6_too_small' => 'IPv6 IPv6 in IPv6 Too Small, packets/second',
+            'suricata_v2_decoder__event__ipv6__ipv6_in_ipv6_wrong_version' => 'IPv6 IPv6 in IPv6 Wrong Version, packets/second',
+            'suricata_v2_decoder__event__ipv6__pkt_too_small' => 'IPv6 Packet Too Small, packets/second',
+            'suricata_v2_decoder__event__ipv6__rh_type_0' => 'IPv6 RH Type 0, packets/second',
+            'suricata_v2_decoder__event__ipv6__trunc_exthdr' => 'IPv6 Truncated Extension Header, packets/second',
+            'suricata_v2_decoder__event__ipv6__trunc_pkt' => 'IPv6 Truncated Packet, packets/second',
+            'suricata_v2_decoder__event__ipv6__unknown_next_header' => 'IPv6 Unknown Next Header, packets/second',
+            'suricata_v2_decoder__event__ipv6__wrong_ip_version' => 'IPv6 Wrong IP Version, packets/second',
+            'suricata_v2_decoder__event__ipv6__zero_len_padn' => 'IPv6 Zero Length Padn, packets/second',
         ];
     } elseif (strcmp($vars['suricata_graph_set'], 'decoder_ltnull') == 0) {
         $graphs = [
