@@ -46,10 +46,10 @@ foreach ($suricata_instances as $index => $sinstance) {
 // only present for v2
 if ($app_data['version'] == 2) {
     print "<br>\nPages: ";
-    $suricata_pages = ['general'=>'General', 'bypassed' => 'By Passed', 'errors' => 'Errors', 'memuse' => 'Memory Usage', '#0' => '(',
+    $suricata_pages = ['general'=>'General', 'bypassed' => 'By Passed', 'errors' => 'Errors', '#-0' => '(', 'errors_alloc'=>'Alloc', '#-1' => ')', 'memuse' => 'Memory Usage', '#0' => '(',
                        'memuse_details' => 'Details', '#1' => '),', 'detect' => ' Detect', 'filestore' => 'File Store', 'tcp' => 'TCP', 'decoder' => 'Decoder'
                        , 'applayer' => 'App Layer', '#2' => '(', 'applayer_flows' => 'Flows', 'applayer_tx' => 'TX', '#3' => '),'];
-    $suricata_pages_no_comma = [ 'memuse' => 1, 'memuse_details' => 1, 'applayer' => 1, 'applayer_tx' => 1, ];
+    $suricata_pages_no_comma = [ 'errors' => 1, 'errors_alloc' => 1, 'memuse' => 1, 'memuse_details' => 1, 'applayer' => 1, 'applayer_tx' => 1, ];
 
     $page_count=0;
     foreach ($suricata_pages as $page => $page_description) {
@@ -461,6 +461,43 @@ if ($app_data['version'] == 1) {
             'suricata_v2_app_layer__flow__telnet' => 'Telnet, flows/second',
             'suricata_v2_app_layer__flow__tftp' => 'TFTP, flows/second',
             'suricata_v2_app_layer__flow__tls' => 'TLS, flows/second',
+        ];
+    } elseif (strcmp($vars['suricata_graph_set'], 'errors_alloc') == 0) {
+        $graphs = [
+            'suricata_v2_app_layer__error__bittorrent-dht__alloc' => 'Bittorrent-DHT, errors/second',
+            'suricata_v2_app_layer__error__dcerpc_tcp__alloc' => 'DCE RPC TCP, errors/second',
+            'suricata_v2_app_layer__error__dcerpc_udp__alloc' => 'DCE RPC UDP, errors/second',
+            'suricata_v2_app_layer__error__dhcp__alloc' => 'DHCP, errors/second',
+            'suricata_v2_app_layer__error__dnp3__alloc' => 'DNP3, errors/second',
+            'suricata_v2_app_layer__error__dns_tcp__alloc' => 'DNS TCP, errors/second',
+            'suricata_v2_app_layer__error__dns_udp__alloc' => 'DNS UDP, errors/second',
+            'suricata_v2_app_layer__error__enip_tcp__alloc' => 'ENIP TCP, errors/second',
+            'suricata_v2_app_layer__error__enip_udp__alloc' => 'ENIP UDP, errors/second',
+            'suricata_v2_app_layer__error__ftp__alloc' => 'FTP, errors/second',
+            'suricata_v2_app_layer__error__ftp-data__alloc' => 'FTP-DATA, errors/second',
+            'suricata_v2_app_layer__error__http__alloc' => 'HTTP, errors/second',
+            'suricata_v2_app_layer__error__http2__alloc' => 'HTTP2, errors/second',
+            'suricata_v2_app_layer__error__ike__alloc' => 'IKE, errors/second',
+            'suricata_v2_app_layer__error__imap__alloc' => 'IMAP, errors/second',
+            'suricata_v2_app_layer__error__krb5_tcp__alloc' => 'KRB5 TCP, errors/second',
+            'suricata_v2_app_layer__error__krb5_udp__alloc' => 'KRB5 UDP, errors/second',
+            'suricata_v2_app_layer__error__modbus__alloc' => 'ModBus, errors/second',
+            'suricata_v2_app_layer__error__mqtt__alloc' => 'MQTT, errors/second',
+            'suricata_v2_app_layer__error__nfs_tcp__alloc' => 'NFS TCP, errors/second',
+            'suricata_v2_app_layer__error__nfs_udp__alloc' => 'NFS UDP, errors/second',
+            'suricata_v2_app_layer__error__ntp__alloc' => 'NTP, errors/second',
+            'suricata_v2_app_layer__error__pgsql__alloc' => 'Pgsql, errors/second',
+            'suricata_v2_app_layer__error__quic__alloc' => 'QUIC, errors/second',
+            'suricata_v2_app_layer__error__rdp__alloc' => 'RDP, errors/second',
+            'suricata_v2_app_layer__error__rfb__alloc' => 'RFB, errors/second',
+            'suricata_v2_app_layer__error__sip__alloc' => 'SIP, errors/second',
+            'suricata_v2_app_layer__error__smb__alloc' => 'SMB, errors/second',
+            'suricata_v2_app_layer__error__smtp__alloc' => 'SMTP, errors/second',
+            'suricata_v2_app_layer__error__snmp__alloc' => 'SNMP, errors/second',
+            'suricata_v2_app_layer__error__ssh__alloc' => 'SSH, errors/second',
+            'suricata_v2_app_layer__error__telnet__alloc' => 'Telnet, errors/second',
+            'suricata_v2_app_layer__error__tft__alloc' => 'TFTP, errors/second',
+            'suricata_v2_app_layer__error__tls__alloc' => 'TLS, errors/second',
         ];
     }
 }
