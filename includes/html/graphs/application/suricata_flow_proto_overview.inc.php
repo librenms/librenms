@@ -21,22 +21,29 @@ if (Rrd::checkRrdExists($flow__udp_rrd_filename)) {
         'descr' => 'ICMPv4',
         'ds' => 'data',
     ];
+}
+if (Rrd::checkRrdExists($flow__icmpv6_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $flow__icmpv6_rrd_filename,
         'descr' => 'ICMPv6',
         'ds' => 'data',
     ];
+}
+if (Rrd::checkRrdExists($flow__tcp_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $flow__tcp_rrd_filename,
         'descr' => 'TCP',
         'ds' => 'data',
     ];
+}
+if (Rrd::checkRrdExists($flow__udp_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $flow__udp_rrd_filename,
         'descr' => 'UDP',
         'ds' => 'data',
     ];
-} elseif (Rrd::checkRrdExists($rrd_filename)) {
+}
+if (! isset($rrd_list[0]) && Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list[] = [
         'filename' => $rrd_filename,
         'descr' => 'ICMPv4',
@@ -57,8 +64,9 @@ if (Rrd::checkRrdExists($flow__udp_rrd_filename)) {
         'descr' => 'UDP',
         'ds' => 'f_udp',
     ];
-} else {
-    d_echo('RRD "' . $rrd_filename . '" not found');
+}
+if (! isset($rrd_list[0])) {
+    d_echo('No RRDs found');
 }
 
 require 'includes/html/graphs/generic_multi_line.inc.php';

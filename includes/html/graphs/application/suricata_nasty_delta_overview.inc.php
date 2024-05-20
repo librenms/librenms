@@ -15,34 +15,27 @@ $error_delta_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->
 
 $rrd_list = [];
 if (Rrd::checkRrdExists($capture__kernel_ifdrops_rrd_filename)) {
-    if (Rrd::checkRrdExists($capture__kernel_ifdrops_rrd_filename)) {
-        $rrd_list[] = [
-            'filename' => $capture__kernel_ifdrops_rrd_filename,
-            'descr' => 'If Drops',
-            'ds' => 'data',
+    $rrd_list[] = [
+        'filename' => $capture__kernel_ifdrops_rrd_filename,
+        'descr' => 'If Drops',
+        'ds' => 'data',
+    ];
+}
+if (Rrd::checkRrdExists($capture__kernel_drops_rrd_filename)) {
+    $rrd_list[] = [
+        'filename' => $capture__kernel_drops_rrd_filename,
+        'descr' => 'Drops',
+        'ds' => 'data',
+    ];
+}
+if (Rrd::checkRrdExists($error_delta_rrd_filename)) {
+    $rrd_list[] = [
+        'filename' => $error_delta_rrd_filename,
+        'descr' => 'Errors',
+        'ds' => 'data',
         ];
-    } else {
-        d_echo('RRD "' . $capture__kernel_ifdrops_rrd_filename . '" not found');
-    }
-    if (Rrd::checkRrdExists($capture__kernel_drops_rrd_filename)) {
-        $rrd_list[] = [
-            'filename' => $capture__kernel_drops_rrd_filename,
-            'descr' => 'Drops',
-            'ds' => 'data',
-        ];
-    } else {
-        d_echo('RRD "' . $capture__kernel_drops_rrd_filename . '" not found');
-    }
-    if (Rrd::checkRrdExists($error_delta_rrd_filename)) {
-        $rrd_list[] = [
-            'filename' => $error_delta_rrd_filename,
-            'descr' => 'Errors',
-            'ds' => 'data',
-        ];
-    } else {
-        d_echo('RRD "' . $error_delta_rrd_filename . '" not found');
-    }
-} elseif (Rrd::checkRrdExists($rrd_filename)) {
+}
+if (! isset($rrd_list[0]) && Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list[] = [
         'filename' => $rrd_filename,
         'descr' => 'Packets',
@@ -63,8 +56,9 @@ if (Rrd::checkRrdExists($capture__kernel_ifdrops_rrd_filename)) {
         'descr' => 'If Dropped',
         'ds' => 'ifdropped',
     ];
-} else {
-    d_echo('RRD "' . $rrd_filename . '" not found');
+}
+if (! isset($rrd_list[0])) {
+    d_echo('No RRDs found');
 }
 
 require 'includes/html/graphs/generic_multi_line.inc.php';

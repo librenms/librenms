@@ -21,22 +21,29 @@ if (Rrd::checkRrdExists($capture__kernel_packets_rrd_filename)) {
         'descr' => 'Packets',
         'ds' => 'data',
     ];
+}
+if (Rrd::checkRrdExists($decoder__ethernet_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $decoder__ethernet_rrd_filename,
         'descr' => 'Eth Pkts',
         'ds' => 'data',
     ];
+}
+if (Rrd::checkRrdExists($capture__kernel_drops_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $capture__kernel_drops_rrd_filename,
         'descr' => 'Drops',
         'ds' => 'data',
     ];
+}
+if (Rrd::checkRrdExists($capture__kernel_ifdrops_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $capture__kernel_ifdrops_rrd_filename,
         'descr' => 'If Dropped',
         'ds' => 'data',
     ];
-} elseif (Rrd::checkRrdExists($rrd_filename)) {
+}
+if (! isset($rrd_list[0]) && Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list[] = [
         'filename' => $rrd_filename,
         'descr' => 'Packets',
@@ -57,8 +64,9 @@ if (Rrd::checkRrdExists($capture__kernel_packets_rrd_filename)) {
         'descr' => 'If Dropped',
         'ds' => 'ifdropped',
     ];
-} else {
-    d_echo('RRD "' . $rrd_filename . '" not found');
+}
+if (! isset($rrd_list[0])) {
+    d_echo('No RRDs found');
 }
 
 require 'includes/html/graphs/generic_multi_line.inc.php';

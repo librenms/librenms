@@ -22,29 +22,37 @@ if (Rrd::checkRrdExists($decoder__bytes_rrd_filename)) {
         'descr' => 'Decoder',
         'ds' => 'data',
     ];
+}
+if (Rrd::checkRrdExists($flow_bypassed__bytes_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $flow_bypassed__bytes_rrd_filename,
         'descr' => 'Flow Bypassed',
         'ds' => 'data',
     ];
+}
+if (Rrd::checkRrdExists($flow_bypassed__local_bytes_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $flow_bypassed__local_bytes_rrd_filename,
         'descr' => 'Flow Loc Bypassed',
         'ds' => 'data',
     ];
+}
+if (Rrd::checkRrdExists($flow_bypassed__local_capture_bytes_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $flow_bypassed__local_capture_bytes_rrd_filename,
         'descr' => 'Flow Loc Byp Cap',
         'ds' => 'data',
     ];
-} elseif (Rrd::checkRrdExists($rrd_filename)) {
+}
+if (! isset($rrd_files[0]) && Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list[] = [
         'filename' => $rrd_filename,
         'descr' => 'Bytes',
         'ds' => 'bytes',
     ];
-} else {
-    d_echo('RRD "' . $flow_bypassed__bytes_rrd_filename . '" not found');
+}
+if (! isset($rrd_files[0])) {
+    d_echo('No RRDs found');
 }
 
 require 'includes/html/graphs/generic_multi_line.inc.php';

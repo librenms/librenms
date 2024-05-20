@@ -22,27 +22,36 @@ if (Rrd::checkRrdExists($flow__memuse_rrd_filename)) {
         'descr' => 'Flow Memuse',
         'ds' => 'data',
     ];
+}
+if (Rrd::checkRrdExists($ftp__memuse_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $ftp__memuse_rrd_filename,
         'descr' => 'FTP Memuse',
         'ds' => 'data',
     ];
+}
+if (Rrd::checkRrdExists($http__memuse_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $http__memuse_rrd_filename,
         'descr' => 'HTTP Memuse',
         'ds' => 'data',
     ];
+}
+if (Rrd::checkRrdExists($tcp__memuse_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $tcp__memuse_rrd_filename,
         'descr' => 'TCP Memuse',
         'ds' => 'data',
     ];
+}
+if (Rrd::checkRrdExists($tcp__reassembly_memuse_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $tcp__reassembly_memuse_rrd_filename,
         'descr' => 'TCP Reass Memuse',
         'ds' => 'data',
     ];
-} elseif (Rrd::checkRrdExists($rrd_filename)) {
+}
+if (! isset($rrd_file[0]) && Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list[] = [
         'filename' => $rrd_filename,
         'descr' => 'Flow',
@@ -68,8 +77,9 @@ if (Rrd::checkRrdExists($flow__memuse_rrd_filename)) {
         'descr' => 'TCP Reass',
         'ds' => 'tcp_reass_memuse',
     ];
-} else {
-    d_echo('RRD "' . $tcp__reassembly_memuse_rrd_filename . '" not found');
+}
+if (! isset($rrd_file[0])) {
+    d_echo('No RRDs found');
 }
 
 require 'includes/html/graphs/generic_multi_line.inc.php';

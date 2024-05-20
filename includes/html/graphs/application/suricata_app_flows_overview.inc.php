@@ -53,182 +53,253 @@ if (Rrd::checkRrdExists($app_layer__flow__bittorrent_dht_rrd_filename)) {
         'descr' => 'BT DHT',
         'ds' => 'data',
     ];
+}
+if (Rrd::checkRrdExists($app_layer__flow__dcerpc_tcp_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__flow__dcerpc_tcp_rrd_filename,
         'descr' => 'DCERPC, TCP',
         'ds' => 'data',
     ];
+}
+if (Rrd::checkRrdExists($app_layer__flow__dcerpc_udp_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__flow__dcerpc_udp_rrd_filename,
         'descr' => 'DCERPC, UDP',
         'ds' => 'data',
     ];
+}
+if (Rrd::checkRrdExists($app_layer__flow__dhcp_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__flow__dhcp_rrd_filename,
         'descr' => 'DHCP',
         'ds' => 'data',
     ];
+}
+if (Rrd::checkRrdExists($app_layer__flow__dnp3_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__flow__dnp3_rrd_filename,
         'descr' => 'DNP3',
         'ds' => 'data',
     ];
+}
+if (Rrd::checkRrdExists($app_layer__flow__dns_tcp_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__flow__dns_tcp_rrd_filename,
         'descr' => 'DNS, TCP',
         'ds' => 'data',
     ];
+}
+if (Rrd::checkRrdExists($app_layer__flow__dns_udp_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__flow__dns_udp_rrd_filename,
         'descr' => 'DNS, UDP',
         'ds' => 'data',
     ];
+}
+if (Rrd::checkRrdExists($app_layer__flow__enip_tcp_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__flow__enip_tcp_rrd_filename,
         'descr' => 'ENIP, TCP',
         'ds' => 'data',
     ];
+}
+if (Rrd::checkRrdExists($app_layer__flow__enip_udp_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__flow__enip_udp_rrd_filename,
         'descr' => 'ENIP, UDP',
         'ds' => 'data',
     ];
+}
+if (Rrd::checkRrdExists($app_layer__flow__failed_tcp_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__flow__failed_tcp_rrd_filename,
         'descr' => 'Failed TCP',
         'ds' => 'data',
     ];
+}
+if (Rrd::checkRrdExists($app_layer__flow__failed_udp_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__flow__failed_udp_rrd_filename,
         'descr' => 'Failed UDP',
         'ds' => 'data',
     ];
+}
+if (Rrd::checkRrdExists($app_layer__flow__ftp_data_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__flow__ftp_data_rrd_filename,
         'descr' => 'FTP-Data',
         'ds' => 'data',
     ];
+}
+if (Rrd::checkRrdExists($app_layer__flow__ftp_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__flow__ftp_rrd_filename,
         'descr' => 'FTP',
         'ds' => 'data',
     ];
+}
+if (Rrd::checkRrdExists($app_layer__flow__http_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__flow__http_rrd_filename,
         'descr' => 'HTTP',
         'ds' => 'data',
     ];
+}
+if (Rrd::checkRrdExists($app_layer__flow__http2_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__flow__http2_rrd_filename,
         'descr' => 'HTTP2',
         'ds' => 'data',
     ];
+}
+if (Rrd::checkRrdExists($app_layer__flow__ike_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__flow__ike_rrd_filename,
         'descr' => 'IKE',
         'ds' => 'data',
     ];
+}
+if (Rrd::checkRrdExists($app_layer__flow__imap_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__flow__imap_rrd_filename,
         'descr' => 'IMAP',
         'ds' => 'data',
     ];
+}
+if (Rrd::checkRrdExists($app_layer__flow__krb5_tcp_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__flow__krb5_tcp_rrd_filename,
         'descr' => 'KRB5, TCP',
         'ds' => 'data',
     ];
+}
+if (Rrd::checkRrdExists($app_layer__flow__krb5_udp_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__flow__krb5_udp_rrd_filename,
         'descr' => 'KRB5, UDP',
         'ds' => 'data',
     ];
+}
+if (Rrd::checkRrdExists($app_layer__flow__modbus_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__flow__modbus_rrd_filename,
-        'descr' => 'Modbus',
+        'descr' => 'ModBus',
         'ds' => 'data',
     ];
+}
+if (Rrd::checkRrdExists($app_layer__flow__mqtt_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__flow__mqtt_rrd_filename,
         'descr' => 'MQTT',
         'ds' => 'data',
     ];
+}
+if (Rrd::checkRrdExists($app_layer__flow__nfs_tcp_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__flow__nfs_tcp_rrd_filename,
         'descr' => 'NFS, TCP',
         'ds' => 'data',
     ];
+}
+if (Rrd::checkRrdExists($app_layer__flow__nfs_udp_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__flow__nfs_udp_rrd_filename,
         'descr' => 'NFS, UDP',
         'ds' => 'data',
     ];
+}
+if (Rrd::checkRrdExists($app_layer__flow__ntp_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__flow__ntp_rrd_filename,
         'descr' => 'NTP',
         'ds' => 'data',
     ];
+}
+if (Rrd::checkRrdExists($app_layer__flow__pgsql_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__flow__pgsql_rrd_filename,
         'descr' => 'PostgreSQL',
         'ds' => 'data',
     ];
+}
+if (Rrd::checkRrdExists($app_layer__flow__quic_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__flow__quic_rrd_filename,
         'descr' => 'QUIC',
         'ds' => 'data',
     ];
+}
+if (Rrd::checkRrdExists($app_layer__flow__rdp_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__flow__rdp_rrd_filename,
         'descr' => 'RDP',
         'ds' => 'data',
     ];
+}
+if (Rrd::checkRrdExists($app_layer__flow__rfb_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__flow__rfb_rrd_filename,
         'descr' => 'RFB',
         'ds' => 'data',
     ];
+}
+if (Rrd::checkRrdExists($app_layer__flow__sip_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__flow__sip_rrd_filename,
         'descr' => 'SIP',
         'ds' => 'data',
     ];
+}
+if (Rrd::checkRrdExists($app_layer__flow__smb_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__flow__smb_rrd_filename,
         'descr' => 'SMB',
         'ds' => 'data',
     ];
+}
+if (Rrd::checkRrdExists($app_layer__flow__smtp_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__flow__smtp_rrd_filename,
         'descr' => 'SMTP',
         'ds' => 'data',
     ];
+}
+if (Rrd::checkRrdExists($app_layer__flow__snmp_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__flow__snmp_rrd_filename,
         'descr' => 'SNMP',
         'ds' => 'data',
     ];
+}
+if (Rrd::checkRrdExists($app_layer__flow__ssh_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__flow__ssh_rrd_filename,
         'descr' => 'SSH',
         'ds' => 'data',
     ];
+}
+if (Rrd::checkRrdExists($app_layer__flow__telnet_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__flow__telnet_rrd_filename,
         'descr' => 'Telnet',
         'ds' => 'data',
     ];
+}
+if (Rrd::checkRrdExists($app_layer__flow__tftp_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__flow__tftp_rrd_filename,
         'descr' => 'TFTP',
         'ds' => 'data',
     ];
+}
+if (Rrd::checkRrdExists($app_layer__flow__tls_rrd_filename)) {
     $rrd_list[] = [
         'filename' => $app_layer__flow__tls_rrd_filename,
         'descr' => 'TLS',
         'ds' => 'data',
     ];
-} elseif (Rrd::checkRrdExists($rrd_filename)) {
+}
+if (! isset($rrd_list[0]) && Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list[] = [
         'filename' => $rrd_filename,
         'descr' => 'DCERPC TCP',
@@ -359,8 +430,9 @@ if (Rrd::checkRrdExists($app_layer__flow__bittorrent_dht_rrd_filename)) {
         'descr' => 'TLS',
         'ds' => 'af_tls',
     ];
-} else {
-    d_echo('RRD "' . $app_layer__flow__tls_rrd_filename . '" not found');
+}
+if (! isset($rrd_list[0])) {
+    d_echo('No RRDs found');
 }
 
 require 'includes/html/graphs/generic_multi_line.inc.php';
