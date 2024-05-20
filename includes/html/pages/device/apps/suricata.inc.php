@@ -47,8 +47,9 @@ foreach ($suricata_instances as $index => $sinstance) {
 if ($app_data['version'] == 2) {
     print "<br>\nPages: ";
     $suricata_pages = ['general'=>'General', 'bypassed' => 'By Passed', 'errors' => 'Errors', 'memuse' => 'Memory Usage', '#0' => '(',
-                       'memuse_details' => 'Details', '#1' => '),', 'detect' => ' Detect', 'filestore' => 'File Store', 'tcp' => 'TCP', 'decoder' => 'Decoder'];
-    $suricata_pages_no_comma = [ 'memuse' => 1, 'memuse_details' => 1 ];
+                       'memuse_details' => 'Details', '#1' => '),', 'detect' => ' Detect', 'filestore' => 'File Store', 'tcp' => 'TCP', 'decoder' => 'Decoder'
+                       , 'applayer' => 'App Layer', '#2' => '(', 'applayer_tx' => 'TX', '#3' => '),'];
+    $suricata_pages_no_comma = [ 'memuse' => 1, 'memuse_details' => 1, 'applayer' => 1, 'applayer_tx' => 1, ];
 
     $page_count=0;
     foreach ($suricata_pages as $page => $page_description) {
@@ -377,6 +378,51 @@ if ($app_data['version'] == 1) {
             'suricata_v2_decoder__event__vntag' => 'Decoder Events, VNTag',
             // decoder__event__vxlan_*
             'suricata_v2_decoder__event__vxlan' => 'Decoder Events, VXLAN',
+        ];
+    } elseif (strcmp($vars['suricata_graph_set'], 'applayer') == 0) {
+        $graphs = [
+            // app_layer__flow__*
+            'suricata_v2_app_layer__flows' => 'Application Layer Flows',
+            // app_layer__tx__*
+            'suricata_v2_app_layer__tx' => 'Application Layer Packets',
+        ];
+    } elseif (strcmp($vars['suricata_graph_set'], 'applayer_tx') == 0) {
+        // app_layer__tx__*
+        $graphs = [
+            'suricata_v2_app_layer__tx__bittorrent-dht' => 'Bittorrent-DHT, packets/second',
+            'suricata_v2_app_layer__tx__dcerpc_tcp' => 'DCE RPC TCP, packets/second',
+            'suricata_v2_app_layer__tx__dcerpc_udp' => 'DCE RPC UDP, packets/second',
+            'suricata_v2_app_layer__tx__dhcp' => 'DHCP, packets/second',
+            'suricata_v2_app_layer__tx__dnp3' => 'DNP3, packets/second',
+            'suricata_v2_app_layer__tx__dns_tcp' => 'DNS TCP, packets/second',
+            'suricata_v2_app_layer__tx__dns_udp' => 'DNS UDP, packets/second',
+            'suricata_v2_app_layer__tx__enip_tcp' => 'ENIP TCP, packets/second',
+            'suricata_v2_app_layer__tx__enip_udp' => 'ENIP UDP, packets/second',
+            'suricata_v2_app_layer__tx__ftp' => 'FTP, packets/second',
+            'suricata_v2_app_layer__tx__ftp-data' => 'FTP-DATA, packets/second',
+            'suricata_v2_app_layer__tx__http' => 'HTTP, packets/second',
+            'suricata_v2_app_layer__tx__http2' => 'HTTP2, packets/second',
+            'suricata_v2_app_layer__tx__ike' => 'IKE, packets/second',
+            'suricata_v2_app_layer__tx__imap' => 'IMAP, packets/second',
+            'suricata_v2_app_layer__tx__krb5_tcp' => 'KRB5 TCP, packets/second',
+            'suricata_v2_app_layer__tx__krb5_udp' => 'KRB5 UDP, packets/second',
+            'suricata_v2_app_layer__tx__modbus' => 'ModBus, packets/second',
+            'suricata_v2_app_layer__tx__mqtt' => 'MQTT, packets/second',
+            'suricata_v2_app_layer__tx__nfs_tcp' => 'NFS TCP, packets/second',
+            'suricata_v2_app_layer__tx__nfs_udp' => 'NFS UDP, packets/second',
+            'suricata_v2_app_layer__tx__ntp' => 'NTP, packets/second',
+            'suricata_v2_app_layer__tx__pgsql' => 'Pgsql, packets/second',
+            'suricata_v2_app_layer__tx__quic' => 'QUIC, packets/second',
+            'suricata_v2_app_layer__tx__rdp' => 'RDP, packets/second',
+            'suricata_v2_app_layer__tx__rfb' => 'RFB, packets/second',
+            'suricata_v2_app_layer__tx__sip' => 'SIP, packets/second',
+            'suricata_v2_app_layer__tx__smb' => 'SMB, packets/second',
+            'suricata_v2_app_layer__tx__smtp' => 'SMTP, packets/second',
+            'suricata_v2_app_layer__tx__snmp' => 'SNMP, packets/second',
+            'suricata_v2_app_layer__tx__ssh' => 'SSH, packets/second',
+            'suricata_v2_app_layer__tx__telnet' => 'Telnet, packets/second',
+            'suricata_v2_app_layer__tx__tftp' => 'TFTP, packets/second',
+            'suricata_v2_app_layer__tx__tls' => 'TLS, packets/second',
         ];
     }
 }
