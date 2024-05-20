@@ -696,6 +696,12 @@ if ($app_data['version'] == 1) {
         ];
     } elseif (strcmp($vars['suricata_graph_set'], 'decoder_nsh') == 0) {
         $graphs = [
+            'suricata_v2_decoder__event__nsh__bad_header_length' => 'NSH Bad Header Length, packet/second',
+            'suricata_v2_decoder__event__nsh__header_too_small' => 'NSH Header Too Small, packet/second',
+            'suricata_v2_decoder__event__nsh__reserved_type' => 'NSH Reserved Type, packet/second',
+            'suricata_v2_decoder__event__nsh__unknown_payload' => 'NSH Unknown Payload, packet/second',
+            'suricata_v2_decoder__event__nsh__unsupported_type' => 'NSH Unsupported Type, packet/second',
+            'suricata_v2_decoder__event__nsh__unsupported_version' => 'NSH Unsupported Version, packet/second',
         ];
     } elseif (strcmp($vars['suricata_graph_set'], 'decoder_ppp') == 0) {
         $graphs = [
