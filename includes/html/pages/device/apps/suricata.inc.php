@@ -641,6 +641,11 @@ if ($app_data['version'] == 1) {
         ];
     } elseif (strcmp($vars['suricata_graph_set'], 'decoder_icmpv4') == 0) {
         $graphs = [
+            'suricata_v2_decoder__event__icmpv4__ipv4_trunc_pkt' => 'ICMPv4 Truncated Packet, packets/second',
+            'suricata_v2_decoder__event__icmpv4__ipv4_unknown_ver' => 'ICMPv4 Unknown Version, packets/second',
+            'suricata_v2_decoder__event__icmpv4__pkt_too_small' => 'ICMPv4 Packet Too Small, packets/second',
+            'suricata_v2_decoder__event__icmpv4__unknown_code' => 'ICMPv4 Packet Too Small, packets/second',
+            'suricata_v2_decoder__event__icmpv4__unknown_type' => 'ICMPv4 Unknown Type, packets/second',
         ];
     } elseif (strcmp($vars['suricata_graph_set'], 'decoder_icmpv6') == 0) {
         $graphs = [
