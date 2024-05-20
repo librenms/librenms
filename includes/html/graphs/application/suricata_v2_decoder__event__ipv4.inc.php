@@ -13,7 +13,7 @@ if (isset($vars['sinstance'])) {
     $decoder__event__ipv4__icmpv6_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___decoder__event__ipv4__icmpv6']);
     $decoder__event__ipv4__iplen_smaller_than_hlen_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___decoder__event__ipv4__iplen_smaller_than_hlen']);
     $decoder__event__ipv4__opt_duplicate_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___decoder__event__ipv4__opt_duplicate']);
-    $decoder__event__ipv4__opt_eol_required_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___decoder__event__ipv4__opt_eol']);
+    $decoder__event__ipv4__opt_eol_required_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___decoder__event__ipv4__opt_eol_required']);
     $decoder__event__ipv4__opt_invalid_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___decoder__event__ipv4__opt_invalid']);
     $decoder__event__ipv4__opt_invalid_len_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___decoder__event__ipv4__opt_invalid_len']);
     $decoder__event__ipv4__opt_malformed_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___decoder__event__ipv4__opt_malformed']);
@@ -27,7 +27,7 @@ if (isset($vars['sinstance'])) {
     $decoder__event__ipv4__frag_pkt_too_large_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___decoder__event__ipv4__frag_pkt_too_large']);
     $decoder__event__ipv4__hlen_too_small_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___decoder__event__ipv4__hlen_too_small']);
     $decoder__event__ipv4__icmpv6_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___decoder__event__ipv4__icmpv6']);
-    $decoder__event__ipv4__iplen_maller_than_hlen_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___decoder__event__ipv4__iplen_smaller_than_hlen']);
+    $decoder__event__ipv4__iplen_smaller_than_hlen_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___decoder__event__ipv4__iplen_smaller_than_hlen']);
     $decoder__event__ipv4__opt_duplicate_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___decoder__event__ipv4__opt_duplicate']);
     $decoder__event__ipv4__opt_eol_required_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___decoder__event__ipv4__opt_eol_required']);
     $decoder__event__ipv4__opt_invalid_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___decoder__event__ipv4__opt_invalid']);
@@ -66,7 +66,7 @@ if (Rrd::checkRrdExists($decoder__event__ipv4__frag_ignored_rrd_filename)) {
         'ds' => 'data',
     ];
     $rrd_list[] = [
-        'filename' => $decoder__event__ipv4__iplen_maller_than_hlen_rrd_filename,
+        'filename' => $decoder__event__ipv4__iplen_smaller_than_hlen_rrd_filename,
         'descr' => 'IPlen < Hlen',
         'ds' => 'data',
     ];
