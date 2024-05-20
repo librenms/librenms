@@ -46,10 +46,10 @@ foreach ($suricata_instances as $index => $sinstance) {
 // only present for v2
 if ($app_data['version'] == 2) {
     print "<br>\nPages: ";
-    $suricata_pages = ['general'=>'General', 'bypassed' => 'By Passed', 'errors' => 'Errors', '#-0' => '(', 'errors_alloc'=>'Alloc', 'errors_gap'=>'Gap', '#-1' => ')',
-                       'memuse' => 'Memory Usage', '#0' => '(', 'memuse_details' => 'Details', '#1' => '),', 'detect' => ' Detect', 'filestore' => 'File Store',
+    $suricata_pages = ['general'=>'General', 'bypassed' => 'By Passed', 'errors' => 'Errors', '#-0' => '(', 'errors_alloc'=>'Alloc', 'errors_gap'=>'Gap', 'errors_internal'=>'Internal',
+                       '#-1' => ')', 'memuse' => 'Memory Usage', '#0' => '(', 'memuse_details' => 'Details', '#1' => '),', 'detect' => ' Detect', 'filestore' => 'File Store',
                        'tcp' => 'TCP', 'decoder' => 'Decoder', 'applayer' => 'App Layer', '#2' => '(', 'applayer_flows' => 'Flows', 'applayer_tx' => 'TX', '#3' => '),'];
-    $suricata_pages_no_comma = [ 'errors' => 1, 'errors_gap' => 1, 'memuse' => 1, 'memuse_details' => 1, 'applayer' => 1, 'applayer_tx' => 1, ];
+    $suricata_pages_no_comma = [ 'errors' => 1, 'errors_internal' => 1, 'memuse' => 1, 'memuse_details' => 1, 'applayer' => 1, 'applayer_tx' => 1, ];
 
     $page_count=0;
     foreach ($suricata_pages as $page => $page_description) {
@@ -387,8 +387,8 @@ if ($app_data['version'] == 1) {
             'suricata_v2_app_layer__tx' => 'Application Layer Packets',
         ];
     } elseif (strcmp($vars['suricata_graph_set'], 'applayer_tx') == 0) {
-        // app_layer__tx__*
         $graphs = [
+            // app_layer__tx__*
             'suricata_v2_app_layer__tx__bittorrent-dht' => 'Bittorrent-DHT, packets/second',
             'suricata_v2_app_layer__tx__dcerpc_tcp' => 'DCE RPC TCP, packets/second',
             'suricata_v2_app_layer__tx__dcerpc_udp' => 'DCE RPC UDP, packets/second',
@@ -464,6 +464,7 @@ if ($app_data['version'] == 1) {
         ];
     } elseif (strcmp($vars['suricata_graph_set'], 'errors_alloc') == 0) {
         $graphs = [
+            // app_layer__error__*__alloc
             'suricata_v2_app_layer__error__bittorrent-dht__alloc' => 'Bittorrent-DHT, alloc errors/second',
             'suricata_v2_app_layer__error__dcerpc_tcp__alloc' => 'DCE RPC TCP, alloc errors/second',
             'suricata_v2_app_layer__error__dcerpc_udp__alloc' => 'DCE RPC UDP, alloc errors/second',
@@ -501,6 +502,7 @@ if ($app_data['version'] == 1) {
         ];
     } elseif (strcmp($vars['suricata_graph_set'], 'errors_gap') == 0) {
         $graphs = [
+            // app_layer__error__*__gap
             'suricata_v2_app_layer__error__bittorrent-dht__gap' => 'Bittorrent-DHT, gap errors/second',
             'suricata_v2_app_layer__error__dcerpc_tcp__gap' => 'DCE RPC TCP, gap errors/second',
             'suricata_v2_app_layer__error__dhcp__gap' => 'DHCP, gap errors/second',
@@ -533,6 +535,44 @@ if ($app_data['version'] == 1) {
             // tcp__reassembly_gap
             'suricata_v2_tcp__reassembly_gap' => 'TCP Reassembly, gap errors/second',
             ];
+    } elseif (strcmp($vars['suricata_graph_set'], 'errors_internal') == 0) {
+        $graphs = [
+            // app_layer__error__*__alloc
+            'suricata_v2_app_layer__error__bittorrent-dht__internal' => 'Bittorrent-DHT, internal errors/second',
+            'suricata_v2_app_layer__error__dcerpc_tcp__internal' => 'DCE RPC TCP, internal errors/second',
+            'suricata_v2_app_layer__error__dcerpc_udp__internal' => 'DCE RPC UDP, internal errors/second',
+            'suricata_v2_app_layer__error__dhcp__internal' => 'DHCP, internal errors/second',
+            'suricata_v2_app_layer__error__dnp3__internal' => 'DNP3, internal errors/second',
+            'suricata_v2_app_layer__error__dns_tcp__internal' => 'DNS TCP, internal errors/second',
+            'suricata_v2_app_layer__error__dns_udp__internal' => 'DNS UDP, internal errors/second',
+            'suricata_v2_app_layer__error__enip_tcp__internal' => 'ENIP TCP, internal errors/second',
+            'suricata_v2_app_layer__error__enip_udp__internal' => 'ENIP UDP, internal errors/second',
+            'suricata_v2_app_layer__error__ftp__internal' => 'FTP, internal errors/second',
+            'suricata_v2_app_layer__error__ftp-data__internal' => 'FTP-DATA, internal errors/second',
+            'suricata_v2_app_layer__error__http__internal' => 'HTTP, internal errors/second',
+            'suricata_v2_app_layer__error__http2__internal' => 'HTTP2, internal errors/second',
+            'suricata_v2_app_layer__error__ike__internal' => 'IKE, internal errors/second',
+            'suricata_v2_app_layer__error__imap__internal' => 'IMAP, internal errors/second',
+            'suricata_v2_app_layer__error__krb5_tcp__internal' => 'KRB5 TCP, internal errors/second',
+            'suricata_v2_app_layer__error__krb5_udp__internal' => 'KRB5 UDP, internal errors/second',
+            'suricata_v2_app_layer__error__modbus__internal' => 'ModBus, internal errors/second',
+            'suricata_v2_app_layer__error__mqtt__internal' => 'MQTT, internal errors/second',
+            'suricata_v2_app_layer__error__nfs_tcp__internal' => 'NFS TCP, internal errors/second',
+            'suricata_v2_app_layer__error__nfs_udp__internal' => 'NFS UDP, internal errors/second',
+            'suricata_v2_app_layer__error__ntp__internal' => 'NTP, internal errors/second',
+            'suricata_v2_app_layer__error__pgsql__internal' => 'Pgsql, internal errors/second',
+            'suricata_v2_app_layer__error__quic__internal' => 'QUIC, internal errors/second',
+            'suricata_v2_app_layer__error__rdp__internal' => 'RDP, internal errors/second',
+            'suricata_v2_app_layer__error__rfb__internal' => 'RFB, internal errors/second',
+            'suricata_v2_app_layer__error__sip__internal' => 'SIP, internal errors/second',
+            'suricata_v2_app_layer__error__smb__internal' => 'SMB, internal errors/second',
+            'suricata_v2_app_layer__error__smtp__internal' => 'SMTP, internal errors/second',
+            'suricata_v2_app_layer__error__snmp__internal' => 'SNMP, internal errors/second',
+            'suricata_v2_app_layer__error__ssh__internal' => 'SSH, internal errors/second',
+            'suricata_v2_app_layer__error__telnet__internal' => 'Telnet, internal errors/second',
+            'suricata_v2_app_layer__error__tftp__internal' => 'TFTP, internal errors/second',
+            'suricata_v2_app_layer__error__tls__internal' => 'TLS, internal errors/second',
+        ];
     }
 }
 
