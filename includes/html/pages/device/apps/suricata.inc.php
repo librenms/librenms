@@ -48,7 +48,7 @@ if ($app_data['version'] == 2) {
     print "<br>\nPages: ";
     $suricata_pages = ['general'=>'General', 'bypassed' => 'By Passed', 'errors' => 'Errors', 'memuse' => 'Memory Usage', '#0' => '(',
                        'memuse_details' => 'Details', '#1' => '),', 'detect' => ' Detect', 'filestore' => 'File Store', 'tcp' => 'TCP', 'decoder' => 'Decoder'
-                       , 'applayer' => 'App Layer', '#2' => '(', 'applayer_tx' => 'TX', '#3' => '),'];
+                       , 'applayer' => 'App Layer', '#2' => '(', 'applayer_flows' => 'Flows', 'applayer_tx' => 'TX', '#3' => '),'];
     $suricata_pages_no_comma = [ 'memuse' => 1, 'memuse_details' => 1, 'applayer' => 1, 'applayer_tx' => 1, ];
 
     $page_count=0;
@@ -423,6 +423,44 @@ if ($app_data['version'] == 1) {
             'suricata_v2_app_layer__tx__telnet' => 'Telnet, packets/second',
             'suricata_v2_app_layer__tx__tftp' => 'TFTP, packets/second',
             'suricata_v2_app_layer__tx__tls' => 'TLS, packets/second',
+        ];
+    } elseif (strcmp($vars['suricata_graph_set'], 'applayer_flows') == 0) {
+        // app_layer__flows__*
+        $graphs = [
+            'suricata_v2_app_layer__flow__bittorrent-dht' => 'Bittorrent-DHT, flows/second',
+            'suricata_v2_app_layer__flow__dcerpc_tcp' => 'DCE RPC TCP, flows/second',
+            'suricata_v2_app_layer__flow__dcerpc_udp' => 'DCE RPC UDP, flows/second',
+            'suricata_v2_app_layer__flow__dhcp' => 'DHCP, flows/second',
+            'suricata_v2_app_layer__flow__dnp3' => 'DNP3, flows/second',
+            'suricata_v2_app_layer__flow__dns_tcp' => 'DNS TCP, flows/second',
+            'suricata_v2_app_layer__flow__dns_udp' => 'DNS UDP, flows/second',
+            'suricata_v2_app_layer__flow__enip_tcp' => 'ENIP TCP, flows/second',
+            'suricata_v2_app_layer__flow__enip_udp' => 'ENIP UDP, flows/second',
+            'suricata_v2_app_layer__flow__ftp' => 'FTP, flows/second',
+            'suricata_v2_app_layer__flow__ftp-data' => 'FTP-DATA, flows/second',
+            'suricata_v2_app_layer__flow__http' => 'HTTP, flows/second',
+            'suricata_v2_app_layer__flow__http2' => 'HTTP2, flows/second',
+            'suricata_v2_app_layer__flow__ike' => 'IKE, flows/second',
+            'suricata_v2_app_layer__flow__imap' => 'IMAP, flows/second',
+            'suricata_v2_app_layer__flow__krb5_tcp' => 'KRB5 TCP, flows/second',
+            'suricata_v2_app_layer__flow__krb5_udp' => 'KRB5 UDP, flows/second',
+            'suricata_v2_app_layer__flow__modbus' => 'ModBus, flows/second',
+            'suricata_v2_app_layer__flow__mqtt' => 'MQTT, flows/second',
+            'suricata_v2_app_layer__flow__nfs_tcp' => 'NFS TCP, flows/second',
+            'suricata_v2_app_layer__flow__nfs_udp' => 'NFS UDP, flows/second',
+            'suricata_v2_app_layer__flow__ntp' => 'NTP, flows/second',
+            'suricata_v2_app_layer__flow__pgsql' => 'Pgsql, flows/second',
+            'suricata_v2_app_layer__flow__quic' => 'QUIC, flows/second',
+            'suricata_v2_app_layer__flow__rdp' => 'RDP, flows/second',
+            'suricata_v2_app_layer__flow__rfb' => 'RFB, flows/second',
+            'suricata_v2_app_layer__flow__sip' => 'SIP, flows/second',
+            'suricata_v2_app_layer__flow__smb' => 'SMB, flows/second',
+            'suricata_v2_app_layer__flow__smtp' => 'SMTP, flows/second',
+            'suricata_v2_app_layer__flow__snmp' => 'SNMP, flows/second',
+            'suricata_v2_app_layer__flow__ssh' => 'SSH, flows/second',
+            'suricata_v2_app_layer__flow__telnet' => 'Telnet, flows/second',
+            'suricata_v2_app_layer__flow__tftp' => 'TFTP, flows/second',
+            'suricata_v2_app_layer__flow__tls' => 'TLS, flows/second',
         ];
     }
 }
