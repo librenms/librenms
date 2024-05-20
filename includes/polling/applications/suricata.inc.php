@@ -195,7 +195,7 @@ if ($suricata['version'] == 1) {
             $rrd_name = ['app', $name, $app->app_id, 'totals___' . $stat];
             $fields = ['data' => $value];
 
-            $metrics['totals_'.$stat] = $value;
+            $metrics['totals_' . $stat] = $value;
 
             // Check if it is a gauge or counter
             if (isset($suricata_stat_gauges[$stat])) {
@@ -231,7 +231,8 @@ if ($suricata['version'] == 1) {
         }
     }
 } else {
-    echo PHP_EOL . $name . ': ' .$suricata['version']. ' is not a supported extend version'  . PHP_EOL;
+    echo PHP_EOL . $name . ': ' . $suricata['version'] . ' is not a supported extend version' . PHP_EOL;
+
     return;
 }
 

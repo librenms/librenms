@@ -485,7 +485,7 @@ $suricata_stat_keys = [
 ];
 
 // anything not here is a counter
-$suricata_stat_gauges=[
+$suricata_stat_gauges = [
     'decoder__avg_pkt_size' => 1,
     'file_store__open_files' => 1,
     'file_store__open_files_max_hit' => 1,

@@ -36,5 +36,4 @@ if (Rrd::checkRrdExists($flow__memcap_rrd_filename)) {
     d_echo('RRD "' . $flow__memcap_rrd_filename . '" not found');
 }
 
-
 require 'includes/html/graphs/generic_multi_line.inc.php';

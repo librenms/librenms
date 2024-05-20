@@ -13,7 +13,7 @@ if (isset($vars['sinstance'])) {
     $filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___decoder__event__ethernet__pkt_too_small']);
 }
 
-if (!Rrd::checkRrdExists($filename)) {
+if (! Rrd::checkRrdExists($filename)) {
     d_echo('RRD "' . $filename . '" not found');
 }
 

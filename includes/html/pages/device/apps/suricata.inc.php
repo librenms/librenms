@@ -12,8 +12,8 @@ $app_data = $app->data;
 print_optionbar_start();
 
 // set the default graph set page for v2
-if (!isset($vars['suricata_graph_set'])) {
-    $vars['suricata_graph_set']='general';
+if (! isset($vars['suricata_graph_set'])) {
+    $vars['suricata_graph_set'] = 'general';
 }
 
 // print the link to the totals
@@ -45,17 +45,17 @@ foreach ($suricata_instances as $index => $sinstance) {
 // print page information
 // only present for v2
 if ($app_data['version'] == 2) {
-    print "<br>\nPages: ";
+    echo "<br>\nPages: ";
     $suricata_pages = ['general'=>'General', 'bypassed' => 'By Passed', 'errors' => 'Errors', '#-0' => '(', 'errors_alloc'=>'Alloc', 'errors_gap'=>'Gap', 'errors_internal'=>'Internal',
-                       'errors_parser'=>'Parser', '#-1' => '),', 'memuse' => 'Memory Usage', '#0' => '(', 'memuse_details' => 'Details', '#1' => '),', 'detect' => ' Detect',
-                       'filestore' => 'File Store', 'tcp' => 'TCP', 'applayer' => 'App Layer', '#2' => '(', 'applayer_flows' => 'Flows', 'applayer_tx' => 'TX', '#2.1' => '), ',
-                       'decoder' => 'Decoder', '#1.1' => '(', 'decoder_erspan' => 'ERSPAN', 'decoder_gre' => 'GRE', 'decoder_icmpv4' => 'ICMPv4', 'decoder_icmpv6' => 'ICMPv6',
-                       'decoder_ipv4' => 'IPv4', 'decoder_ipv6' => 'IPv6', 'decoder_ltnull' => 'LT Null', 'decoder_mpls' => 'MPLS', 'decoder_nsh' => 'NSH', 'decoder_ppp' => 'PPP',
-                       'decoder_pppoe' => 'PPPoE', 'decoder_tcp' => 'TCP', 'decoder_udp' => 'UDP', 'decoder_vlan' => 'VLAN', 'decoder_vntag' => 'VNTag', '#3' => ')'];
+        'errors_parser'=>'Parser', '#-1' => '),', 'memuse' => 'Memory Usage', '#0' => '(', 'memuse_details' => 'Details', '#1' => '),', 'detect' => ' Detect',
+        'filestore' => 'File Store', 'tcp' => 'TCP', 'applayer' => 'App Layer', '#2' => '(', 'applayer_flows' => 'Flows', 'applayer_tx' => 'TX', '#2.1' => '), ',
+        'decoder' => 'Decoder', '#1.1' => '(', 'decoder_erspan' => 'ERSPAN', 'decoder_gre' => 'GRE', 'decoder_icmpv4' => 'ICMPv4', 'decoder_icmpv6' => 'ICMPv6',
+        'decoder_ipv4' => 'IPv4', 'decoder_ipv6' => 'IPv6', 'decoder_ltnull' => 'LT Null', 'decoder_mpls' => 'MPLS', 'decoder_nsh' => 'NSH', 'decoder_ppp' => 'PPP',
+        'decoder_pppoe' => 'PPPoE', 'decoder_tcp' => 'TCP', 'decoder_udp' => 'UDP', 'decoder_vlan' => 'VLAN', 'decoder_vntag' => 'VNTag', '#3' => ')', ];
 
-    $suricata_pages_no_comma = [ 'errors' => 1, 'errors_parser' => 1, 'memuse' => 1, 'memuse_details' => 1, 'applayer' => 1, 'applayer_tx' => 1, 'decoder' => 1, 'decoder_vntag' => 1];
+    $suricata_pages_no_comma = ['errors' => 1, 'errors_parser' => 1, 'memuse' => 1, 'memuse_details' => 1, 'applayer' => 1, 'applayer_tx' => 1, 'decoder' => 1, 'decoder_vntag' => 1];
 
-    $page_count=0;
+    $page_count = 0;
     foreach ($suricata_pages as $page => $page_description) {
         if (preg_match('/^\#/', $page)) {
             echo $page_description;
@@ -70,7 +70,7 @@ if ($app_data['version'] == 2) {
                 echo generate_link($label, $link_array, ['suricata_graph_set' => $page]);
             }
 
-            if ($page_count < (count($suricata_pages) - 1) && !isset($suricata_pages_no_comma[$page])) {
+            if ($page_count < (count($suricata_pages) - 1) && ! isset($suricata_pages_no_comma[$page])) {
                 echo ', ';
             }
         }
@@ -95,12 +95,12 @@ if ($app_data['version'] == 1) {
         'suricata_alert' => 'Alert Status',
     ];
 } elseif ($app_data['version'] == 2) {
-    if (!isset($vars['suricata_graph_set'])) {
+    if (! isset($vars['suricata_graph_set'])) {
         $vars['suricata_graph_set'] = 'general';
     }
 
     if (strcmp($vars['suricata_graph_set'], 'general') == 0) {
-        if (!isset($vars['sinstance'])) {
+        if (! isset($vars['sinstance'])) {
             // v2 computes drop_percent for total only currently
             $graphs = [
                 // capture__kernel_packets
@@ -538,7 +538,7 @@ if ($app_data['version'] == 1) {
             'suricata_v2_app_layer__error__tls__gap' => 'TLS, gap errors/second',
             // tcp__reassembly_gap
             'suricata_v2_tcp__reassembly_gap' => 'TCP Reassembly, gap errors/second',
-            ];
+        ];
     } elseif (strcmp($vars['suricata_graph_set'], 'errors_internal') == 0) {
         $graphs = [
             // app_layer__error__*__alloc

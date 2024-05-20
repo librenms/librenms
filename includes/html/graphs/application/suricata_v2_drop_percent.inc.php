@@ -9,7 +9,7 @@ $addarea = 0;
 $transparency = 15;
 
 if (isset($vars['sinstance'])) {
-    $drop_percent_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] .'___drop_percent' ]);
+    $drop_percent_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___drop_percent']);
 } else {
     $drop_percent_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___drop_percent']);
 }

@@ -11,7 +11,7 @@ if (isset($vars['sinstance'])) {
     $filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___memcap_pressure']);
 }
 
-if (!Rrd::checkRrdExists($filename)) {
+if (! Rrd::checkRrdExists($filename)) {
     d_echo('RRD "' . $flow__memuse_rrd_filename . '" not found');
 }
 

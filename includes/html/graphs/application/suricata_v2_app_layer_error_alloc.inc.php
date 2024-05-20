@@ -410,5 +410,4 @@ if (Rrd::checkRrdExists($app_layer__error__tls__alloc_rrd_filename)) {
     d_echo('RRD "' . $app_layer__error__tls__alloc_rrd_filename . '" not found');
 }
 
-
 require 'includes/html/graphs/generic_multi_line.inc.php';
