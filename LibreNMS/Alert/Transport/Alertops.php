@@ -52,9 +52,7 @@ class Alertops extends Transport
             'rule' => $alert_data['rule'],
             'name' => $alert_data['name'],
             'proc' => $alert_data['proc'],
-            'timestamp' => $alert_data['timestamp'],
-            'transport' => $alert_data['transport'],
-            'transport_name' => $alert_data['transport_name']
+            'timestamp' => $alert_data['timestamp']
         ];
 
         $res = Http::client()->post($url, ['json' => $data]);
