@@ -1,4 +1,4 @@
-<div id="leaflet-map-{{ $id }}" style="width: {{ $dimensions['x'] }}px; height: {{ $dimensions['y'] }}px;"></div>
+<div id="leaflet-map-{{ $id }}" style="width: {{ $dimensions['x'] }}px; height: {{ $dimensions['y'] }}px;" data-refresh="0"></div>
 
 <script type="application/javascript">
     loadjs('js/leaflet.js', function() {
@@ -39,15 +39,26 @@
             markerColor: 'green', prefix: 'fa', iconColor: 'white'
         });
 
-        @foreach($devices as $device)
-            @if($status != '0' or !$device->isUnderMaintenance())
-                var title = '<a href="@deviceUrl($device)"><img src="{{ $device->icon }}" width="32" height="32" alt=""> {{ $device->displayName() }}</a>';
-                var tooltip = '{{ $device->displayName() }}';
-                var marker = L.marker(new L.LatLng('{{ $device->location->lat }}', '{{ $device->location->lng }}'), {title: tooltip, icon: {{ $device->markerIcon }}, zIndexOffset: {{ $device->zOffset }}});
-                marker.bindPopup(title);
-                markers.addLayer(marker);
-            @endif
-        @endforeach
+        var devices = {{ Js::from($devices) }};
+
+        devices.forEach((device) => {
+            var markerData = {title: device.name};
+            switch (device.status) {
+                case 0: // down
+                    markerData.icon = redMarker;
+                    markerData.zIndexOffset = 5000;
+                case 3: // down + maintenance
+                    markerData.icon = blueMarker;
+                    markerData.zIndexOffset = 10000;
+                default: // up
+                    markerData.icon = greenMarker;
+                    markerData.zIndexOffset = 0;
+            }
+
+            var marker = L.marker(new L.LatLng(device.lat, device.lng), markerData);
+            marker.bindPopup(`<a href="${device.url}"><img src="${device.icon}" width="32" height="32" alt=""> ${device.name}</a>`);
+            markers.addLayer(marker);
+        });
 
         map.addLayer(markers);
         map.scrollWheelZoom.disable();

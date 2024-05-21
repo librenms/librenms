@@ -26,8 +26,10 @@
 namespace App\Http\Controllers\Widgets;
 
 use App\Models\Device;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use LibreNMS\Config;
+use LibreNMS\Util\Url;
 
 class WorldMapController extends WidgetController
 {
@@ -40,7 +42,7 @@ class WorldMapController extends WidgetController
             'title_url' => Config::get('leaflet.tile_url', '{s}.tile.openstreetmap.org'),
             'init_lat' => Config::get('leaflet.default_lat', 51.4800),
             'init_lng' => Config::get('leaflet.default_lng', 0),
-            'init_zoom' => Config::get('leaflet.default_zoom', 2),
+            'init_zoom' => Config::get('leaflet.default_zoom', 2.1),
             'group_radius' => Config::get('leaflet.group_radius', 80),
             'status' => '0,1',
             'device_group' => null,
@@ -50,17 +52,30 @@ class WorldMapController extends WidgetController
     public function getView(Request $request)
     {
         $settings = $this->getSettings();
-        $status = explode(',', $settings['status']);
-
         $settings['dimensions'] = $request->get('dimensions');
+        $settings['devices'] = $this->getMarkerData(array_map('intval', explode(',', $settings['status'])), (int) $settings['device_group']);
 
-        $devices = Device::hasAccess($request->user())
+        return view('widgets.worldmap', $settings);
+    }
+
+    public function getData(Request $request): JsonResponse
+    {
+        $this->validate($request, [
+            'status' => 'required|array',
+            'status.*' => 'int',
+            'group' => 'int',
+        ]);
+
+        return response()->json($this->getMarkerData($request, $request->status, $request->group));
+    }
+
+    public function getMarkerData(Request $request, array $status, int $device_group_id): array
+    {
+        return Device::hasAccess($request->user())
             ->with('location')
             ->isActive()
             ->whereIn('status', $status)
-            ->when($settings['device_group'], function ($query) use ($settings) {
-                $query->inDeviceGroup($settings['device_group']);
-            })
+            ->when($device_group_id, fn ($q) => $q->inDeviceGroup($device_group_id))
             ->get()
             ->filter(function ($device) use ($status) {
                 /** @var Device $device */
@@ -68,31 +83,23 @@ class WorldMapController extends WidgetController
                     return false;
                 }
 
-                // add extra data
-                /** @phpstan-ignore-next-line */
-                $device->markerIcon = 'greenMarker';
-                /** @phpstan-ignore-next-line */
-                $device->zOffset = 0;
-
-                if ($device->status == 0) {
-                    $device->markerIcon = 'redMarker';
-                    $device->zOffset = 10000;
-
-                    if ($device->isUnderMaintenance()) {
-                        if (in_array(0, $status)) {
-                            return false;
-                        }
-                        $device->markerIcon = 'blueMarker';
-                        $device->zOffset = 5000;
-                    }
+                // hide devices under maintenance if only showing down devices
+                if ($status == [0] && $device->isUnderMaintenance()) {
+                    return false;
                 }
 
-                return true;
-            });
-
-        $settings['devices'] = $devices;
-
-        return view('widgets.worldmap', $settings);
+                 return true;
+            })->map(function (Device $device) {
+                return [
+                    'name' => $device->displayName(),
+                    'lat' => $device->location->lat,
+                    'lng' => $device->location->lng,
+                    'icon' => $device->icon,
+                    'url' => Url::deviceUrl($device),
+                    // status: 0 = down, 1 = up, 3 = down + under maintenance
+                    'status' => $device->status || $device->isUnderMaintenance() ? 3 : 0,
+                ];
+            })->values()->all();
     }
 
     public function getSettingsView(Request $request)
