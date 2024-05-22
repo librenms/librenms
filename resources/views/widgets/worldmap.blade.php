@@ -1,5 +1,5 @@
 <div id="leaflet-map-{{ $id }}"
-     style="width: {{ $dimensions['x'] }}px; height: {{ $dimensions['y'] }}px;"
+     style="width: 100%; height: 100%;"
      data-reload="false"
 ></div>
 
@@ -38,7 +38,7 @@
             }
         }
 
-        function populate_markers() {
+        function populate_markers(map) {
             $.ajax({
                 type: "GET",
                 url: '{{ route('widget.worldmap.data') }}',
@@ -79,7 +79,6 @@
                         return marker;
                     });
 
-                    var map = get_map(map_id);
                     map.markerCluster.clearLayers();
                     map.markerCluster.addLayers(markers);
                 },
@@ -90,7 +89,9 @@
         }
 
         $('#leaflet-map-{{ $id }}').on('refresh', function (event) {
-            populate_markers();
+            var map = get_map(map_id);
+            map.invalidateSize();
+            populate_markers(map);
         })
         $('#leaflet-map-{{ $id }}').on('destroy', function (event) {
             destroy_map(map_id);
@@ -102,7 +103,7 @@
                     loadjs('js/L.Control.Locate.min.js', function () {
                         var map = init_map(map_id, map_config);
                         init_marker_cluster(map);
-                        populate_markers();
+                        populate_markers(map);
 
                         map.scrollWheelZoom.disable();
                         $("#leaflet-map-{{ $id }}").on("click", function (event) {
