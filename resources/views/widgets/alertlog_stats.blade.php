@@ -1,16 +1,18 @@
-<div id="alertlog_stats_container-{{ $id }}" class="table-responsive" data-reload="false">
-    <table id="alertlog_stats-{{ $id }}" class="table table-hover table-condensed table-striped">
-        <thead>
-        <tr>
-            <th data-column-id="count">{{ __('Count') }}</th>
-            <th data-column-id="hostname">{{ __('Device') }}</th>
-            <th data-column-id="alert_rule">{{ __('Alert rule') }}</th>
-        </tr>
-        </thead>
-    </table>
+<div id="alertlog_stats_container-{{ $id }}" data-reload="false">
+    <div class="table-responsive">
+        <table id="alertlog_stats-{{ $id }}" class="table table-hover table-condensed table-striped">
+            <thead>
+            <tr>
+                <th data-column-id="count">{{ __('Count') }}</th>
+                <th data-column-id="hostname">{{ __('Device') }}</th>
+                <th data-column-id="alert_rule">{{ __('Alert rule') }}</th>
+            </tr>
+            </thead>
+        </table>
+    </div>
 </div>
 <script>
-    $(function () {
+    (function () {
         var grid = $("#alertlog_stats-{{ $id }}").bootgrid({
             ajax: true,
             rowCount: [50, 100, 250, -1],
@@ -33,5 +35,5 @@
             grid.bootgrid('destroy');
             delete grid;
         });
-    });
+    })();
 </script>

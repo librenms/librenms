@@ -1,22 +1,24 @@
-<div id="alerts_container-{{ $id }}" class="table-responsive" data-reload="false">
-    <table id="alerts-{{ $id }}" class="table table-hover table-condensed alerts">
-        <thead>
-        <tr>
-            <th data-column-id="severity"></th>
-            <th data-column-id="timestamp">{{ __('Timestamp') }}</th>
-            <th data-column-id="rule">{{ __('Rule') }}</th>
-            <th data-column-id="details" data-sortable="false"></th>
-            <th data-column-id="hostname">{{ __('Hostname') }}</th>
-            <th data-column-id="location" data-visible="{{ $location ? 'true' : 'false' }}">{{ __('Location') }}</th>
-            <th data-column-id="ack_ico" data-sortable="false">{{ __('ACK') }}</th>
-            <th data-column-id="notes" data-sortable="false">{{ __('Notes') }}</th>
-            <th data-column-id="proc" data-sortable="false" data-visible="{{ $proc ? 'true' : 'false' }}">URL</th>
-        </tr>
-        </thead>
-    </table>
+<div id="alerts_container-{{ $id }}" data-reload="false">
+    <div class="table-responsive">
+        <table id="alerts-{{ $id }}" class="table table-hover table-condensed alerts">
+            <thead>
+            <tr>
+                <th data-column-id="severity"></th>
+                <th data-column-id="timestamp">{{ __('Timestamp') }}</th>
+                <th data-column-id="rule">{{ __('Rule') }}</th>
+                <th data-column-id="details" data-sortable="false"></th>
+                <th data-column-id="hostname">{{ __('Hostname') }}</th>
+                <th data-column-id="location" data-visible="{{ $location ? 'true' : 'false' }}">{{ __('Location') }}</th>
+                <th data-column-id="ack_ico" data-sortable="false">{{ __('ACK') }}</th>
+                <th data-column-id="notes" data-sortable="false">{{ __('Notes') }}</th>
+                <th data-column-id="proc" data-sortable="false" data-visible="{{ $proc ? 'true' : 'false' }}">URL</th>
+            </tr>
+            </thead>
+        </table>
+    </div>
 </div>
 <script>
-    $(function () {
+    (function () {
         var alerts_grid = $("#alerts-{{ $id }}").bootgrid({
             ajax: true,
             requestHandler: request => ({
@@ -75,11 +77,11 @@
         });
 
         $('#alerts_container-{{ $id }}').on('refresh', function (event) {
-            grid.bootgrid('reload');
+            alerts_grid.bootgrid('reload');
         });
         $('#alerts_container-{{ $id }}').on('destroy', function (event) {
-            grid.bootgrid('destroy');
-            delete grid;
+            alerts_grid.bootgrid('destroy');
+            delete alerts_grid;
         });
-    });
+    })();
 </script>

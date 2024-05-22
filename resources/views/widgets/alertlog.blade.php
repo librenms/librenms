@@ -1,18 +1,20 @@
-<div id="alertlog_container-{{ $id }}" class="table-responsive" data-reload="false">
-    <table id="alertlog_{{ $id }}" class="table table-hover table-condensed alerts">
-        <thead>
-        <tr>
-            <th data-column-id="status" data-sortable="false"></th>
-            <th data-column-id="time_logged" data-order="desc">{{ __('Timestamp') }}</th>
-            <th data-column-id="details" data-sortable="false">&nbsp;</th>
-            <th data-column-id="hostname">{{ __('Device') }}</th>
-            <th data-column-id="alert">{{ __('Alert') }}</th>
-        </tr>
-        </thead>
-    </table>
+<div id="alertlog_container-{{ $id }}" data-reload="false">
+    <div class="table-responsive">
+        <table id="alertlog_{{ $id }}" class="table table-hover table-condensed alerts">
+            <thead>
+            <tr>
+                <th data-column-id="status" data-sortable="false"></th>
+                <th data-column-id="time_logged" data-order="desc">{{ __('Timestamp') }}</th>
+                <th data-column-id="details" data-sortable="false">&nbsp;</th>
+                <th data-column-id="hostname">{{ __('Device') }}</th>
+                <th data-column-id="alert">{{ __('Alert') }}</th>
+            </tr>
+            </thead>
+        </table>
+    </div>
 </div>
 <script>
-    $(function () {
+    (function () {
         var grid = $("#alertlog_{{ $id }}").bootgrid({
             ajax: true,
             rowCount: [50, 100, 250, -1],
@@ -28,13 +30,6 @@
             },
             url: "ajax_table.php"
         }).on("loaded.rs.jquery.bootgrid", function () {
-
-            var results = $("div.infos").text().split(" ");
-            low = results[1] - 1;
-            high = results[3];
-            max = high - low;
-            search = $('.search-field').val();
-
             grid.find(".incident-toggle").each(function () {
                 $(this).parent().addClass('incident-toggle-td');
             }).on("click", function (e) {
@@ -65,5 +60,5 @@
             grid.bootgrid('destroy');
             delete grid;
         });
-    });
+    })();
 </script>
