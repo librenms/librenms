@@ -322,7 +322,7 @@
         } else {
             obj.data('settings','1');
         }
-        widget_reload(obj.attr('id'),obj.data('type'));
+        widget_reload(obj.attr('id'), obj.data('type'), true);
     });
 
 
@@ -582,19 +582,14 @@
     return false;
     }
 
-    function widget_reload(id, data_type, forceDomInject) {
+    function widget_reload(id, data_type, forceDomInject = false) {
         const $widget_body = $('#widget_body_' + id);
-        const settings = $widget_body.parent().data('settings') == 1 ? 1 : 0;
         const $widget = $widget_body.children().first();
-        const reload = $widget.data('reload'); // should this function reload widget html?
 
-        if (settings === 1 || forceDomInject) {
-            $widget.trigger('destroy', $widget); // send destroy event
-        } else {
+        // skip html reload and sned refresh event instead
+        if (!forceDomInject && $widget.data('reload') === false) {
             $widget.trigger('refresh', $widget); // send refresh event
-            if (reload === false) {
-                return; // skip html reload
-            }
+            return; // skip html reload
         }
 
         $.ajax({
@@ -603,13 +598,15 @@
             data: {
                 id: id,
                 dimensions: {x: $widget_body.width(), y: $widget_body.height()},
-                settings: settings
+                settings: $widget_body.parent().data('settings') == 1 ? 1 : 0
             },
             dataType: 'json',
             success: function (data) {
                 if (data.status === 'ok') {
-                    $('#widget_title_' + id).html(data.title);
+                    $widget.trigger('destroy', $widget); // send destroy event
                     $widget_body.children().unbind().html("").remove(); // clear old contents and unbind events
+
+                    $('#widget_title_' + id).html(data.title);
                     $widget_body.html(data.html);
                     $widget_body.parent().data('settings', data.show_settings).data('refresh', data.settings.refresh);
                 } else {
@@ -623,11 +620,7 @@
     }
 
     function grab_data(id, data_type) {
-        const $parent = $('#widget_body_' + id).parent();
-
-        if($parent.data('settings') == 0) {
-            widget_reload(id, data_type);
-        }
+        widget_reload(id, data_type);
 
         setTimeout(function () {
             grab_data(id, data_type);

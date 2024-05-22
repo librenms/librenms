@@ -1,4 +1,4 @@
-<form role="form" class="dashboard-widget-settings" onsubmit="widget_settings(this); return false;">
+<form role="form" class="dashboard-widget-settings" onsubmit="widget_settings(this); return false;" data-reload="false">
     @csrf
     @yield('form')
 
