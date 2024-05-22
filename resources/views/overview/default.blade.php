@@ -609,6 +609,7 @@
             success: function (data) {
                 if (data.status === 'ok') {
                     $('#widget_title_' + id).html(data.title);
+                    $widget_body.children().unbind().html("").remove(); // clear old contents and unbind events
                     $widget_body.html(data.html);
                     $widget_body.parent().data('settings', data.show_settings).data('refresh', data.settings.refresh);
                 } else {
