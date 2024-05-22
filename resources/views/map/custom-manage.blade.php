@@ -33,7 +33,7 @@
                                 <i class="fa fa-map-marked fa-fw fa-lg" aria-hidden="true"></i>
                                 <a href="{{ route('maps.custom.show', $map->custom_map_id) }}">{{ $map->name }}</a>
                             </div>
-                            <div class="tw-flex-none sm:tw-flex-1 tw-flex-shrink tw-whitespace-nowrap">
+                            <div class="tw-flex-auto tw-flex-shrink tw-whitespace-nowrap">
                                 <a class="btn btn-default" href="{{ route('maps.custom.edit', $map->custom_map_id) }}">
                                     <i class="fa fa-pencil" aria-hidden="true"></i>
                                     <span class="tw-hidden sm:tw-inline" aria-hidden="false">{{ __('Edit') }}</span>
