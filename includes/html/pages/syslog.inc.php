@@ -82,6 +82,18 @@ $pagetitle[] = 'Syslog';
         '</select>' +
         '</div>' +
         '&nbsp;&nbsp;<div class="form-group">' +
+        '<select name="tag" id="tag" class="form-control">' +
+        '<option value="">All Tags</option>' +
+        <?php
+        if (! empty($vars['tag'])) {
+            $js_tag = addcslashes(htmlentities($vars['tag']), "'");
+            echo "'<option value=\"$js_tag\">$js_tag</option>' +";
+        }
+        ?>
+        '</select>' +
+        '</div>' +
+
+        '&nbsp;&nbsp;<div class="form-group">' +
         '<input name="from" type="text" class="form-control" id="dtpickerfrom" maxlength="16" value="<?php echo htmlspecialchars($vars['from'] ?? ''); ?>" placeholder="From" data-date-format="YYYY-MM-DD HH:mm">' +
         '</div>' +
         '<div class="form-group">' +
@@ -192,5 +204,25 @@ $pagetitle[] = 'Syslog';
             }
         }
     })<?php echo isset($vars['priority']) ? ".val('" . htmlspecialchars($vars['priority']) . "').trigger('change');" : ''; ?>;
+
+    $("#tag").select2({
+        theme: "bootstrap",
+        dropdownAutoWidth : true,
+        width: "auto",
+        allowClear: true,
+        placeholder: "All Tags",
+        ajax: {
+            url: '<?php echo url('/ajax/select/syslog'); ?>',
+            delay: 200,
+            data: function(params) {
+                return {
+                    field: "tag",
+                    device: $('#device').val(),
+                    term: params.term,
+                    page: params.page || 1
+                }
+            }
+        }
+    })<?php echo isset($vars['tag']) ? ".val('" . htmlspecialchars($vars['tag']) . "').trigger('change');" : ''; ?>;    
 </script>
 
