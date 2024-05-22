@@ -3,11 +3,11 @@
 @section('title', __('map.custom.title.manage'))
 
 @section('content')
-<div class="container-fluid">
+<div class="tw-px-3 sm:tw-px-6 tw-mx-auto">
     @include('map.custom-map-modal')
     @include('map.custom-map-delete-modal')
 
-    <x-panel id="manage-custom-maps" body-class="!tw-pb-0">
+    <x-panel id="manage-custom-maps" body-class="!tw-pb-0" class="tw-mx-auto tw-max-w-screen-lg">
         <x-slot name="title">
             <div class="tw-flex tw-justify-between tw-items-center">
                 <div>
@@ -28,12 +28,12 @@
                 @endif
                 @foreach($group as $map)
                     <div id="map-{{ $map->custom_map_id }}" class="even:tw-bg-gray-50 dark:even:tw-bg-zinc-900">
-                        <div class="tw-flex tw-p-3 tw-items-center hover:tw-bg-gray-100 dark:hover:tw-bg-gray-600">
-                            <div class="tw-flex-1">
+                        <div class="tw-flex tw-justify-between tw-p-3 tw-items-center hover:tw-bg-gray-100 dark:hover:tw-bg-gray-600">
+                            <div>
                                 <i class="fa fa-map-marked fa-fw fa-lg" aria-hidden="true"></i>
                                 <a href="{{ route('maps.custom.show', $map->custom_map_id) }}">{{ $map->name }}</a>
                             </div>
-                            <div class="tw-flex-auto tw-flex-shrink tw-whitespace-nowrap">
+                            <div class="tw-whitespace-nowrap">
                                 <a class="btn btn-default" href="{{ route('maps.custom.edit', $map->custom_map_id) }}">
                                     <i class="fa fa-pencil" aria-hidden="true"></i>
                                     <span class="tw-hidden sm:tw-inline" aria-hidden="false">{{ __('Edit') }}</span>
