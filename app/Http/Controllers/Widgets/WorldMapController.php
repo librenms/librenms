@@ -53,7 +53,8 @@ class WorldMapController extends WidgetController
     {
         $settings = $this->getSettings();
         $settings['dimensions'] = $request->get('dimensions');
-        $settings['devices'] = $this->getMarkerData(array_map('intval', explode(',', $settings['status'])), (int) $settings['device_group']);
+        $settings['status'] = array_map('intval', explode(',', $settings['status']));
+        $settings['group'] = (int) $settings['device_group'];
 
         return view('widgets.worldmap', $settings);
     }
@@ -61,12 +62,12 @@ class WorldMapController extends WidgetController
     public function getData(Request $request): JsonResponse
     {
         $this->validate($request, [
-            'status' => 'required|array',
+            'status' => 'array',
             'status.*' => 'int',
             'group' => 'int',
         ]);
 
-        return response()->json($this->getMarkerData($request, $request->status, $request->group));
+        return response()->json($this->getMarkerData($request, $request->status ?? [0,1], $request->group ?? 0));
     }
 
     public function getMarkerData(Request $request, array $status, int $device_group_id): array
@@ -97,7 +98,7 @@ class WorldMapController extends WidgetController
                     'icon' => $device->icon,
                     'url' => Url::deviceUrl($device),
                     // status: 0 = down, 1 = up, 3 = down + under maintenance
-                    'status' => $device->status || $device->isUnderMaintenance() ? 3 : 0,
+                    'status' => (int) ($device->status ?: ($device->isUnderMaintenance() ? 3 : 0)),
                 ];
             })->values()->all();
     }

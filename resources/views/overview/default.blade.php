@@ -584,16 +584,17 @@
 
     function widget_reload(id, data_type, forceDomInject) {
         const $widget_body = $('#widget_body_' + id);
-        const $widget_bootgrid = $('#widget_body_' + id + ' .bootgrid-table');
         const settings = $widget_body.parent().data('settings') == 1 ? 1 : 0;
+        const $widget = $widget_body.children().first();
+        const reload = $widget.data('reload'); // should this function reload widget html?
 
         if (settings === 1 || forceDomInject) {
-            $widget_bootgrid.bootgrid('destroy');
-            $('#widget_body_' + id + ' *').off();
-        } else if ($widget_bootgrid[0] && $widget_bootgrid.data('ajax') === true) {
-            // Check to see if a bootgrid already exists and has ajax reloading enabled.
-            // If so, use bootgrid to refresh the data instead of injecting the DOM in request.
-            return $widget_bootgrid.bootgrid('reload');
+            $widget.trigger('destroy', $widget); // send destroy event
+        } else {
+            $widget.trigger('refresh', $widget); // send refresh event
+            if (reload === false) {
+                return; // skip html reload
+            }
         }
 
         $.ajax({
