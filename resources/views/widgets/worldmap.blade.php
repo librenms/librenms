@@ -88,6 +88,10 @@
             });
         }
 
+        $('#leaflet-map-{{ $id }}').on('resize', function (event) {
+            get_map(map_id).invalidateSize();
+        })
+
         $('#leaflet-map-{{ $id }}').on('refresh', function (event) {
             var map = get_map(map_id);
             map.invalidateSize();

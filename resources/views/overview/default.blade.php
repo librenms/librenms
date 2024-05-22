@@ -629,7 +629,16 @@
     }
 
     // make sure gridster stays disabled when the window is resized
+    var resizeTrigger = null;
     addEvent(window, "resize", function(event) {
+        // emit resize event, but only once every 100ms
+        if (resizeTrigger === null) {
+            resizeTrigger = setTimeout(() => {
+                resizeTrigger = null;
+                $('.widget_body').children().first().trigger('resize');
+            }, 100);
+        }
+
         setTimeout(function(){
             if(!gridster_state) {
                 gridster.disable();
