@@ -5,11 +5,12 @@
 
 <script type="application/javascript">
     $(function () {
-        var map;
+        var map_id = 'leaflet-map-{{ $id }}';
         var status = {{ Js::from($status) }};
         var group = {{ (int) $group }};
+        var map_config = {{ Js::from($map_config) }};
 
-        function init_marker_cluster() {
+        function init_marker_cluster(map) {
             if (! map.markerCluster) {
                   map.markerCluster = L.markerClusterGroup({
                     maxClusterRadius: '{{ $group_radius }}',
@@ -78,6 +79,7 @@
                         return marker;
                     });
 
+                    var map = get_map(map_id);
                     map.markerCluster.clearLayers();
                     map.markerCluster.addLayers(markers);
                 },
@@ -91,31 +93,22 @@
             populate_markers();
         })
         $('#leaflet-map-{{ $id }}').on('destroy', function (event) {
-            map.off();
-            map.remove();
-            delete map;
+            destroy_map(map_id);
         })
 
         loadjs('js/leaflet.js', function () {
             loadjs('js/leaflet.markercluster.js', function () {
                 loadjs('js/leaflet.awesome-markers.min.js', function () {
-                    map = L.map('leaflet-map-{{ $id }}', {zoomSnap: 0.1}).setView(['{{ $init_lat }}', '{{ $init_lng }}'], '{{ sprintf('%01.1f', $init_zoom) }}');
-                    L.tileLayer('//{{ $title_url }}/{z}/{x}/{y}.png', {
-                        attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-                    }).addTo(map);
-
-                    init_marker_cluster();
+                    var map = init_map(map_id, map_config);
+                    init_marker_cluster(map);
                     populate_markers();
 
                     map.scrollWheelZoom.disable();
-                    $(document).ready(function () {
-                        $("#leaflet-map-{{ $id }}").on("click", function (event) {
-                            map.scrollWheelZoom.enable();
-                        }).on("mouseleave", function (event) {
-                            map.scrollWheelZoom.disable();
-                        });
+                    $("#leaflet-map-{{ $id }}").on("click", function (event) {
+                        map.scrollWheelZoom.enable();
+                    }).on("mouseleave", function (event) {
+                        map.scrollWheelZoom.disable();
                     });
-
                 });
             });
         });

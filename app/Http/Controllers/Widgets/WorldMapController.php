@@ -39,11 +39,11 @@ class WorldMapController extends WidgetController
     {
         $this->defaults = [
             'title' => null,
-            'title_url' => Config::get('leaflet.tile_url', '{s}.tile.openstreetmap.org'),
-            'init_lat' => Config::get('leaflet.default_lat', 51.4800),
-            'init_lng' => Config::get('leaflet.default_lng', 0),
-            'init_zoom' => Config::get('leaflet.default_zoom', 2.1),
-            'group_radius' => Config::get('leaflet.group_radius', 80),
+            'init_lat' => Config::get('leaflet.default_lat'),
+            'init_lng' => Config::get('leaflet.default_lng'),
+            'init_zoom' => Config::get('leaflet.default_zoom'),
+            'init_layer' => Config::get('geoloc.layer'),
+            'group_radius' => Config::get('leaflet.group_radius'),
             'status' => '0,1',
             'device_group' => null,
         ];
@@ -55,6 +55,15 @@ class WorldMapController extends WidgetController
         $settings['dimensions'] = $request->get('dimensions');
         $settings['status'] = array_map('intval', explode(',', $settings['status']));
         $settings['group'] = (int) $settings['device_group'];
+        $settings['map_config'] = [
+            'engine' => Config::get('geoloc.engine'),
+            'api_key' => Config::get('geoloc.api_key'),
+            'tile_url' => Config::get('leaflet.tile_url'),
+            'lat' => $settings['init_lat'],
+            'lng' => $settings['init_lng'],
+            'zoom' => $settings['init_zoom'],
+            'layer' => $settings['init_layer'],
+        ];
 
         return view('widgets.worldmap', $settings);
     }
