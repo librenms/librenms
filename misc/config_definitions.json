@@ -1041,14 +1041,6 @@
                 "{{ $ip }}":  "ip"
             }
         },
-        "device_perf_purge": {
-            "default": 7,
-            "units": "days",
-            "group": "system",
-            "section": "cleanup",
-            "order": 7,
-            "type": "integer"
-        },
         "device_traffic_descr": {
             "default": [
                 "/loopback/",
