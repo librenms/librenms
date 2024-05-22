@@ -67,7 +67,7 @@ class WorldMapController extends WidgetController
             'group' => 'int',
         ]);
 
-        return response()->json($this->getMarkerData($request, $request->status ?? [0,1], $request->group ?? 0));
+        return response()->json($this->getMarkerData($request, $request->status ?? [0, 1], $request->group ?? 0));
     }
 
     public function getMarkerData(Request $request, array $status, int $device_group_id): array
@@ -89,7 +89,7 @@ class WorldMapController extends WidgetController
                     return false;
                 }
 
-                 return true;
+                return true;
             })->map(function (Device $device) {
                 return [
                     'name' => $device->displayName(),
