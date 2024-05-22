@@ -305,6 +305,7 @@ function init_map(id, config = {}) {
     if (config.engine === 'google' && config.api_key) {
         loadjs('https://maps.googleapis.com/maps/api/js?key=' + config.api_key, function () {
             loadjs('js/Leaflet.GoogleMutant.js', function () {
+                leaflet.maxZoom = 21;
                 const roads = L.gridLayer.googleMutant({
                     type: 'roadmap'	// valid values are 'roadmap', 'satellite', 'terrain' and 'hybrid'
                 });
@@ -323,6 +324,7 @@ function init_map(id, config = {}) {
         });
     } else if (config.engine === 'bing' && config.api_key) {
         loadjs('js/leaflet-bing-layer.min.js', function () {
+            leaflet.maxZoom = 18;
             const roads = L.tileLayer.bing({
                 bingMapsKey: config.api_key,
                 imagerySet: 'RoadOnDemand'
@@ -342,6 +344,7 @@ function init_map(id, config = {}) {
         });
     } else if (config.engine === 'mapquest' && config.api_key) {
         loadjs('https://www.mapquestapi.com/sdk/leaflet/v2.2/mq-map.js?key=' + config.api_key, function () {
+            leaflet.maxZoom = 20;
             const roads = MQ.mapLayer();
             const satellite = MQ.hybridLayer();
 

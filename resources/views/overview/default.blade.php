@@ -620,11 +620,12 @@
     }
 
     function grab_data(id, data_type) {
+        const refresh = $('#widget_body_' + id).parent().data('refresh');
         widget_reload(id, data_type);
 
         setTimeout(function () {
             grab_data(id, data_type);
-        }, ($parent.data('refresh') > 0 ? $parent.data('refresh') : 60) * 1000);
+        }, (refresh > 0 ? refresh : 60) * 1000);
     }
 
     // make sure gridster stays disabled when the window is resized
