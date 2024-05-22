@@ -99,15 +99,17 @@
         loadjs('js/leaflet.js', function () {
             loadjs('js/leaflet.markercluster.js', function () {
                 loadjs('js/leaflet.awesome-markers.min.js', function () {
-                    var map = init_map(map_id, map_config);
-                    init_marker_cluster(map);
-                    populate_markers();
+                    loadjs('js/L.Control.Locate.min.js', function () {
+                        var map = init_map(map_id, map_config);
+                        init_marker_cluster(map);
+                        populate_markers();
 
-                    map.scrollWheelZoom.disable();
-                    $("#leaflet-map-{{ $id }}").on("click", function (event) {
-                        map.scrollWheelZoom.enable();
-                    }).on("mouseleave", function (event) {
                         map.scrollWheelZoom.disable();
+                        $("#leaflet-map-{{ $id }}").on("click", function (event) {
+                            map.scrollWheelZoom.enable();
+                        }).on("mouseleave", function (event) {
+                            map.scrollWheelZoom.disable();
+                        });
                     });
                 });
             });
