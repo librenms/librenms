@@ -303,9 +303,9 @@ function init_map(id, config = {}) {
     let baseMaps = {};
 
     if (config.engine === 'google' && config.api_key) {
+        leaflet.setMaxZoom(21);
         loadjs('https://maps.googleapis.com/maps/api/js?key=' + config.api_key, function () {
             loadjs('js/Leaflet.GoogleMutant.js', function () {
-                leaflet.maxZoom = 21;
                 const roads = L.gridLayer.googleMutant({
                     type: 'roadmap'	// valid values are 'roadmap', 'satellite', 'terrain' and 'hybrid'
                 });
@@ -323,8 +323,8 @@ function init_map(id, config = {}) {
             });
         });
     } else if (config.engine === 'bing' && config.api_key) {
+        leaflet.setMaxZoom(18);
         loadjs('js/leaflet-bing-layer.min.js', function () {
-            leaflet.maxZoom = 18;
             const roads = L.tileLayer.bing({
                 bingMapsKey: config.api_key,
                 imagerySet: 'RoadOnDemand'
@@ -343,8 +343,8 @@ function init_map(id, config = {}) {
             leaflet.layerControl._container.style.display = (config.readonly ? 'none' : 'block');
         });
     } else if (config.engine === 'mapquest' && config.api_key) {
+        leaflet.setMaxZoom(20);
         loadjs('https://www.mapquestapi.com/sdk/leaflet/v2.2/mq-map.js?key=' + config.api_key, function () {
-            leaflet.maxZoom = 20;
             const roads = MQ.mapLayer();
             const satellite = MQ.hybridLayer();
 
@@ -357,6 +357,7 @@ function init_map(id, config = {}) {
             leaflet.layerControl._container.style.display = (config.readonly ? 'none' : 'block');
         });
     } else {
+        leaflet.setMaxZoom(20);
         const tile_url = config.tile_url ? config.tile_url : '{s}.tile.openstreetmap.org';
         const osm = L.tileLayer('//' + tile_url + '/{z}/{x}/{y}.png', {
             maxZoom: 19,
