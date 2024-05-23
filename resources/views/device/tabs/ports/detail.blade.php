@@ -2,13 +2,13 @@
     <table id="ports-fdb" class="table table-condensed table-hover table-striped tw-mt-1 !tw-mb-0">
         <thead>
         <tr>
-            <th width="350"><A href="sort">Port</a></th>
+            <th width="350"><a href="{{ request()->fullUrlWithQuery(['sort' => 'port', 'order' => $data['sort'] == 'port' ? $data['next_order'] : 'asc']) }} ">Port</a></th>
             <th width="100">Port Groups</th>
             <th width="100"></th>
-            <th width="120"><a href="sort">Traffic</a></th>
-            <th width="75">Speed</th>
-            <th width="100">Media</th>
-            <th width="100">Mac Address</th>
+            <th width="120"><a href="{{ request()->fullUrlWithQuery(['sort' => 'traffic', 'order' => $data['sort'] == 'traffic' ? $data['next_order'] : 'desc']) }} ">Traffic</a></th>
+            <th width="75"><a href="{{ request()->fullUrlWithQuery(['sort' => 'speed', 'order' => $data['sort'] == 'speed' ? $data['next_order'] : 'desc']) }} ">Speed</a></th>
+            <th width="100"><a href="{{ request()->fullUrlWithQuery(['sort' => 'media', 'order' => $data['sort'] == 'media' ? $data['next_order'] : 'asc']) }} ">Media</a></th>
+            <th width="100"><a href="{{ request()->fullUrlWithQuery(['sort' => 'mac', 'order' => $data['sort'] == 'mac' ? $data['next_order'] : 'asc']) }} ">Mac Address</a></th>
             <th width="375"></th>
         </tr>
         </thead>

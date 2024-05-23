@@ -85,9 +85,21 @@ class PortsController implements DeviceTab
 
     private function portData(Device $device, Request $request): array
     {
-        Validator::validate($request->all(), ['perPage' => 'int']);
+        Validator::validate($request->all(), [
+            'perPage' => 'int',
+            'sort' => 'in:media,mac,port,traffic,speed',
+            'order' => 'in:asc,desc',
+        ]);
         $perPage = $request->input('perPage', 15);
-        $neighbors = null;
+        $sort = $request->input('sort', 'port');
+        $orderBy = match($sort) {
+            'traffic' => \DB::raw('ports.ifInOctets_rate + ports.ifOutOctets_rate'),
+            'speed' => 'ifSpeed',
+            'media' => 'ifType',
+            'mac' => 'ifPhysAddress',
+            default => 'ifIndex',
+        };
+        $order = $request->input('order', 'asc');
 
         $relationships = ['groups', 'ipv4', 'ipv6', 'vlans', 'adsl', 'vdsl'];
         if ($this->detail) {
@@ -97,16 +109,16 @@ class PortsController implements DeviceTab
             $relationships[] = 'ipv6Networks.ipv6';
         }
 
-        $ports = $device->ports()->isUp()->orderBy('ifIndex')
+        $ports = $device->ports()->isUp()
+            ->orderBy($orderBy, $order)
             ->hasAccess(Auth::user())->with($relationships)
             ->paginate($perPage);
-
-//        $p = Port::paginate();
-//        dd($p->links('pagination::simple-tailwind'), ['perPage' => $perPage]);
 
         $data = [
             'ports' => $ports,
             'perPage' => $perPage,
+            'sort' => $sort,
+            'next_order' => $order == 'asc' ? 'desc' : 'asc',
             'graphs' => [
                 'bits' => [['type' => 'port_bits', 'title' => trans('Traffic'), 'vars' => [['from' => '-1d'], ['from' => '-7d'], ['from' => '-30d'], ['from' => '-1y']]]],
                 'upkts' => [['type' => 'port_upkts', 'title' => trans('Packets (Unicast)'), 'vars' => [['from' => '-1d'], ['from' => '-7d'], ['from' => '-30d'], ['from' => '-1y']]]],
