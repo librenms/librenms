@@ -56,11 +56,11 @@
                 <td>
                     <div>
                         <i class="fa fa-long-arrow-left fa-lg tw-text-green-600" aria-hidden="true"></i>
-                        <span style="color: {{ \LibreNMS\Util\Color::percent($port->in_rate, $port->ifSpeed) }}">{{ \LibreNMS\Util\Number::formatSi($port->in_rate, 2, 3, 'bps') }}</span>
+                        <span style="color: {{ \LibreNMS\Util\Color::percent($port->in_rate, $port->ifSpeed) }}">{{ \LibreNMS\Util\Number::formatSi($port->ifInOctets_rate * 8, 2, 3, 'bps') }}</span>
                     </div>
                     <div>
                         <i class="fa fa-long-arrow-right fa-lg" style="color:blue" aria-hidden="true"></i>
-                        <span style="color: {{ \LibreNMS\Util\Color::percent($port->out_rate, $port->ifSpeed) }}">{{ \LibreNMS\Util\Number::formatSi($port->out_rate, 2, 3, 'bps') }}</span>
+                        <span style="color: {{ \LibreNMS\Util\Color::percent($port->out_rate, $port->ifSpeed) }}">{{ \LibreNMS\Util\Number::formatSi($port->ifOutOctets_rate * 8, 2, 3, 'bps') }}</span>
                     </div>
                     <div>
                         <i class="fa fa-long-arrow-left fa-lg" style="color:purple" aria-hidden="true"></i>
