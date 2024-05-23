@@ -1835,7 +1835,8 @@
                 "value": [
                     "google",
                     "mapquest",
-                    "bing"
+                    "bing",
+                    "esri"
                 ]
             }
         },
@@ -1856,7 +1857,8 @@
                 "google": "Google Maps",
                 "openstreetmap": "OpenStreetMap",
                 "mapquest": "MapQuest",
-                "bing": "Bing Maps"
+                "bing": "Bing Maps",
+                "esri": "ESRI ArcGIS"
             }
         },
         "geoloc.latlng": {
@@ -1883,7 +1885,8 @@
             "type": "select",
             "options": {
                 "Streets":  "Streets",
-                "Sattelite": "Sattelite"
+                "Sattelite": "Sattelite",
+                "Topography":  "Topography"
             },
             "when": {
                 "setting": "geoloc.engine",
@@ -1891,7 +1894,8 @@
                 "value": [
                     "google",
                     "mapquest",
-                    "bing"
+                    "bing",
+                    "esri"
                 ]
             }
         },
