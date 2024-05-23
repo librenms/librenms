@@ -1,11 +1,21 @@
-<div id="leaflet-map-{{ $id }}"
-     style="width: 100%; height: 100%;"
-     data-reload="false"
-></div>
+<div id="worldmap_widget-{{ $id }}" class="leaflet-map" data-reload="false"></div>
+
+<style>
+    .leaflet-map {
+        width: 100%;
+        height: 100%;
+        text-align: left;
+        border-bottom-left-radius: 4px;
+        border-bottom-right-radius: 4px;
+    }
+    .leaflet-map a:hover {
+        text-decoration: none;
+    }
+</style>
 
 <script type="application/javascript">
-    $(function () {
-        var map_id = 'leaflet-map-{{ $id }}';
+    (function () {
+        var map_id = 'worldmap_widget-{{ $id }}';
         var status = {{ Js::from($status) }};
         var group = {{ (int) $group }};
         var map_config = {{ Js::from($map_config) }};
@@ -88,18 +98,21 @@
             });
         }
 
-        $('#leaflet-map-{{ $id }}').on('resize', function (event) {
-            get_map(map_id).invalidateSize();
-        })
-
-        $('#leaflet-map-{{ $id }}').on('refresh', function (event) {
-            var map = get_map(map_id);
-            map.invalidateSize();
-            populate_markers(map);
-        })
-        $('#leaflet-map-{{ $id }}').on('destroy', function (event) {
-            destroy_map(map_id);
-        })
+        function register_listeners(map) {
+            map.scrollWheelZoom.disable();
+            $('#' + map_id).on('click', function (event) {
+                map.scrollWheelZoom.enable();
+            }).on('mouseleave', function (event) {
+                map.scrollWheelZoom.disable();
+            }).on('resize', function (event) {
+                map.invalidateSize();
+            }).on('refresh', function (event) {
+                map.invalidateSize();
+                populate_markers(map);
+            }).on('destroy', function (event) {
+                destroy_map(map_id);
+            });
+        }
 
         loadjs('js/leaflet.js', function () {
             loadjs('js/leaflet.markercluster.js', function () {
@@ -108,16 +121,10 @@
                         var map = init_map(map_id, map_config);
                         init_marker_cluster(map);
                         populate_markers(map);
-
-                        map.scrollWheelZoom.disable();
-                        $("#leaflet-map-{{ $id }}").on("click", function (event) {
-                            map.scrollWheelZoom.enable();
-                        }).on("mouseleave", function (event) {
-                            map.scrollWheelZoom.disable();
-                        });
+                        register_listeners(map);
                     });
                 });
             });
         });
-    })
+    })();
 </script>
