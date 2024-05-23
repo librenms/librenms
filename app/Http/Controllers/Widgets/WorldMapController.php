@@ -54,7 +54,6 @@ class WorldMapController extends WidgetController
         $settings = $this->getSettings();
         $settings['dimensions'] = $request->get('dimensions');
         $settings['status'] = array_map('intval', explode(',', $settings['status']));
-        $settings['group'] = (int) $settings['device_group'];
         $settings['map_config'] = [
             'engine' => Config::get('geoloc.engine'),
             'api_key' => Config::get('geoloc.api_key'),
@@ -73,10 +72,10 @@ class WorldMapController extends WidgetController
         $this->validate($request, [
             'status' => 'array',
             'status.*' => 'int',
-            'group' => 'int',
+            'device_group' => 'int',
         ]);
 
-        return response()->json($this->getMarkerData($request, $request->status ?? [0, 1], $request->group ?? 0));
+        return response()->json($this->getMarkerData($request, $request->status ?? [0, 1], $request->device_group ?? 0));
     }
 
     public function getMarkerData(Request $request, array $status, int $device_group_id): array

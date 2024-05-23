@@ -359,21 +359,10 @@ function init_map(id, config = {}) {
     } else {
         leaflet.setMaxZoom(20);
         const tile_url = config.tile_url ? config.tile_url : '{s}.tile.openstreetmap.org';
-        const osm = L.tileLayer('//' + tile_url + '/{z}/{x}/{y}.png', {
+        L.tileLayer('//' + tile_url + '/{z}/{x}/{y}.png', {
             maxZoom: 19,
             attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-        });
-
-        // var esri = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-        //     attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
-        // });
-        //
-        // baseMaps = {
-        //     "OpenStreetMap": osm,
-        //     "Satellite": esri
-        // };
-        // leaflet.layerControl = L.control.layers(baseMaps, null, {position: 'bottomleft'}).addTo(leaflet);
-        osm.addTo(leaflet);
+        }).addTo(leaflet);
     }
 
     // disable all interaction
@@ -401,6 +390,83 @@ function destroy_map(id) {
         leaflet.remove();
         delete window.maps[id];
     }
+}
+
+function populate_map_markers(map_id, group_radius = 10, status = [0,1], device_group = 0) {
+    $.ajax({
+        type: "GET",
+        url: ajax_url + '/dash/worldmap',
+        dataType: "json",
+        data: { status: status, device_group: device_group },
+        success: function (data) {
+            var redMarker = L.AwesomeMarkers.icon({
+                icon: 'server',
+                markerColor: 'red', prefix: 'fa', iconColor: 'white'
+            });
+            var blueMarker = L.AwesomeMarkers.icon({
+                icon: 'server',
+                markerColor: 'blue', prefix: 'fa', iconColor: 'white'
+            });
+            var greenMarker = L.AwesomeMarkers.icon({
+                icon: 'server',
+                markerColor: 'green', prefix: 'fa', iconColor: 'white'
+            });
+
+            var markers = data.map((device) => {
+                var markerData = {title: device.name};
+                switch (device.status) {
+                    case 0: // down
+                        markerData.icon = redMarker;
+                        markerData.zIndexOffset = 5000;
+                        break;
+                    case 3: // down + maintenance
+                        markerData.icon = blueMarker;
+                        markerData.zIndexOffset = 10000;
+                        break;
+                    default: // up
+                        markerData.icon = greenMarker;
+                        markerData.zIndexOffset = 0;
+                }
+
+                var marker = L.marker(new L.LatLng(device.lat, device.lng), markerData);
+                marker.bindPopup(`<a href="${device.url}"><img src="${device.icon}" width="32" height="32" alt=""> ${device.name}</a>`);
+                return marker;
+            });
+
+            var map = get_map(map_id);
+            if (! map.markerCluster) {
+                map.markerCluster = L.markerClusterGroup({
+                    maxClusterRadius: group_radius,
+                    iconCreateFunction: function (cluster) {
+                        var markers = cluster.getAllChildMarkers();
+                        var color = "green";
+                        var newClass = "Cluster marker-cluster marker-cluster-small leaflet-zoom-animated leaflet-clickable";
+                        for (var i = 0; i < markers.length; i++) {
+                            if (markers[i].options.icon.options.markerColor == "blue" && color != "red") {
+                                color = "blue";
+                            }
+                            if (markers[i].options.icon.options.markerColor == "red") {
+                                color = "red";
+                            }
+                        }
+                        return L.divIcon({
+                            html: cluster.getChildCount(),
+                            className: color + newClass,
+                            iconSize: L.point(40, 40)
+                        });
+                    }
+                });
+
+                map.addLayer(map.markerCluster);
+            }
+
+            map.markerCluster.clearLayers();
+            map.markerCluster.addLayers(markers);
+        },
+        error: function(error){
+            toastr.error(error.statusText);
+        }
+    });
 }
 
 function disable_map_interaction(leaflet) {
