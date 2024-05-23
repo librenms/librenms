@@ -1875,6 +1875,26 @@
                 ]
             }
         },
+        "geoloc.layer": {
+            "default": "Streets",
+            "group": "external",
+            "section": "location",
+            "order": 7,
+            "type": "select",
+            "options": {
+                "Streets":  "Streets",
+                "Sattelite": "Sattelite"
+            },
+            "when": {
+                "setting": "geoloc.engine",
+                "operator": "in",
+                "value": [
+                    "google",
+                    "mapquest",
+                    "bing"
+                ]
+            }
+        },
         "github_api": {
             "default": "https://api.github.com/repos/librenms/librenms/",
             "type": "text"
