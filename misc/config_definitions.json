@@ -1735,10 +1735,6 @@
             "default": false,
             "type": "boolean"
         },
-        "enable_ports_poe": {
-            "default": false,
-            "type": "boolean"
-        },
         "enable_pseudowires": {
             "default": true,
             "type": "boolean"
