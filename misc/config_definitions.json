@@ -4548,9 +4548,7 @@
             "type": "array"
         },
         "nfsen_base": {
-            "default": [
-                "/var/nfsen"
-            ],
+            "default": [],
             "group": "external",
             "section": "nfsen",
             "order": 10,
