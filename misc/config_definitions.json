@@ -4547,6 +4547,15 @@
             },
             "type": "array"
         },
+        "nfsen_base": {
+            "default": [
+                "/varnfsen"
+            ],
+            "group": "external",
+            "section": "nfsen",
+            "order": 10,
+            "type": "array"
+        },
         "nfsen_split_char": {
             "group": "external",
             "section": "nfsen",
