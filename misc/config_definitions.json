@@ -4549,7 +4549,7 @@
         },
         "nfsen_base": {
             "default": [
-                "/varnfsen"
+                "/var/nfsen"
             ],
             "group": "external",
             "section": "nfsen",
