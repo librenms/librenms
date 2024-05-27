@@ -1,0 +1,82 @@
+mib: IFT-SNMP-MIB
+modules:
+    sensors:
+        Luns:
+            data:
+                -
+                    oid: extLunTable
+                    value: extLunTable
+                    num_oid: '1.3.6.1.4.1.1714.1.{{ $index }}'
+                    descr: Extended LUN table
+        Logical Luns:
+            data:
+                -
+                    oid: luDevTable
+                    value: luDevValue
+                    num_oid: '1.3.6.1.4.1.1714.1.{{ $index }}'
+                    descr: Logical unit device
+                    multiplier: 1
+                    divisor: 1
+        Logical unit:
+            data:
+                -
+                    oid: luTable
+                    value: luTable
+                    num_oid: '1.3.6.1.4.1.1714.1.{{ $index }}'
+                    descr: Logical unit table
+                    multiplier: 1
+                    divisor: 1
+        fiber-channel:
+            data:
+                -
+                    oid: chlTable
+                    value: chlTable
+                    num_oid: '1.3.6.1.4.1.1714.1.{{ $index }}'
+                    descr: SCSI/Fibre channel table
+                    multiplier: 1
+                    divisor: 1
+        hdd-table:
+            data:
+                -
+                    oid: hddTable
+                    value: hddTable
+                    num_oid: '1.3.6.1.4.1.1714.1.{{ $index }}'
+                    descr: Hard disk drive table
+                    multiplier: 1
+                    divisor: 1
+        ex-lun-table:
+            data:
+                -
+                    oid: lunTable
+                    value: lunTable 
+                    num_oid: '1.3.6.1.4.1.1714.1.{{ $index }}'
+                    descr: Extended LUN table
+                    multiplier: 1
+                    divisor: 1
+        part-table:
+            data:
+                -
+                    oid: partTable
+                    value: partTable
+                    num_oid: '.1.3.6.1.4.1.1714.1.{{ $index }}'
+                    descr: Partition table
+                    multiplier: 1
+                    divisor: 1
+        logical-vol:
+            data:
+                -
+                    oid: lvTable
+                    value: lvTable
+                    num_oid: '1.3.6.1.4.1.1714.1.{{ $index }}'
+                    descr: Logical volume table
+                    multiplier: 1
+                    divisor: 1
+        hdd-ld-table:
+            data:
+                -
+                    oid: ldTable
+                    value: ldTable
+                    num_oid: '1.3.6.1.4.1.1714.1.{{ $index }}'
+                    descr: Logical drive table
+                    multiplier: 1
+                    divisor: 1
