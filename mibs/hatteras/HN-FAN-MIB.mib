@@ -1,0 +1,178 @@
+HN-FAN-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    NOTIFICATION-TYPE, Unsigned32                   FROM SNMPv2-SMI
+
+    TruthValue                                      FROM SNMPv2-TC
+ 
+    HnObjectState                                   FROM HN-TC
+
+    hnSystem                                        FROM HN-SMI
+    
+    hnEventHistoryId, hnEventHistoryType,
+    hnEventHistoryDescr, hnEventHistorySeverity,
+    hnEventHistoryServiceAffected,
+    hnEventHistoryTimeValue                         FROM HN-ALARM-MIB;
+
+
+hnFanMIB  MODULE-IDENTITY
+    LAST-UPDATED "201110100000Z"
+    ORGANIZATION "Overture Networks"
+    CONTACT-INFO "Technical Assistance Center
+
+                  Overture Networks
+                  637 Davis Drive
+                  Morrisville, NC 27560
+
+                  Tel: +1 919 337 4100
+                  Fax: +1 919 337 4149
+
+                  E-mail: support@OvertureNetworks.com
+                  Web   : www.overturenetworks.com"
+
+    DESCRIPTION  "This MIB module describes fan information for
+                 Overture Networks products."
+                
+    REVISION     "201110100000Z"
+    DESCRIPTION  "Convert contact information to Overture Networks"
+
+    REVISION     "200903130000Z"
+    DESCRIPTION  "Updated description of hnFanDeviceId for HN6100."
+    
+    REVISION     "200410130000Z"
+    DESCRIPTION  "This is the initial version of the HN Fan MIB."
+       
+    ::= { hnSystem 4 }
+
+
+--
+-- High-level groups in this mib
+--
+
+
+hnFanGroup OBJECT IDENTIFIER ::= { hnFanMIB 1 }
+
+
+---------------------------------------------------------------------------
+-- Fan Group
+---------------------------------------------------------------------------
+
+
+hnFanScalars OBJECT IDENTIFIER ::= { hnFanGroup 1 }
+
+
+   --
+   -- Fan Table
+   --
+
+
+hnFanTable      OBJECT-TYPE
+    SYNTAX      SEQUENCE OF HnFanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "A table of Fan Entries."
+    ::= { hnFanGroup 2 }
+
+
+hnFanEntry      OBJECT-TYPE
+    SYNTAX      HnFanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Each entry describes the attributes of a Fan Module."
+    INDEX       { hnFanDeviceId }
+    ::= { hnFanTable 1 }
+
+
+HnFanEntry ::=
+    SEQUENCE {
+        hnFanDeviceId      Unsigned32,     -- index
+        hnFanObjectState   HnObjectState
+    }
+
+
+hnFanDeviceId OBJECT-TYPE
+    SYNTAX      Unsigned32(0..65535)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "A unique value identifying each device controlled by this
+                SNMP agent, where each device is defined as a physically
+                separate entity.  Each SNMP agent can manage multiple devices
+                to support integrated management of multiple devices under one
+                control entity.  This multi-system management approach
+                supports:  
+                  - Multiple 'central-office' devices such as two HN4000s in a
+                    stacked configuration managed by a single SNMP agent.
+                  - One or more 'customer premise' devices in addition to the
+                    central-office device(s), providing integrated visibility
+                    into the distributed system.
+                The assignment of the unique identifier is system dependent.
+                For example on an HN4000, the identifiers 1..5 are used to
+                identify central-office HN4000s in a stacked configuration.
+                Identifier 0 is used to specify a local, global object that
+                may span multiple devices in a stacked configuration.
+                Identifiers 1001..1200 are used to indicate customer
+                premise devices."
+    ::= { hnFanEntry 1 }
+
+
+hnFanObjectState OBJECT-TYPE
+    SYNTAX      HnObjectState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Operational state of the Fan."
+    ::= { hnFanEntry 2 }
+
+
+----------------------------------------------------------------------------------
+-- hnFanNotifications
+--
+-- Fan notification enables and definitions.
+----------------------------------------------------------------------------------
+
+
+hnFanNotificationEnables OBJECT IDENTIFIER ::= { hnFanMIB 2 }
+
+
+hnFanEnableFanNotifications OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "When true, the sending of the Fan notifications defined below
+                are enabled. When false, they are disabled."
+    DEFVAL      {true}
+    ::= { hnFanNotificationEnables 1 }
+
+
+-- The following two OBJECT IDENTIFIERS are used to define SNMPv2 Notifications
+-- that are backward compatible with SNMPv1 Traps.
+hnFanNotifications  OBJECT IDENTIFIER ::= { hnFanMIB 3 }
+hnFanNotificationPrefix OBJECT IDENTIFIER ::= { hnFanNotifications 0 }
+
+
+hnFanFailureNotification NOTIFICATION-TYPE
+    OBJECTS     { hnFanObjectState,
+                  hnEventHistoryId,
+                  hnEventHistoryType,
+                  hnEventHistoryDescr,
+                  hnEventHistorySeverity,
+                  hnEventHistoryServiceAffected,
+                  hnEventHistoryTimeValue }
+    STATUS      current
+    DESCRIPTION "A notification indicating that the device fan has
+                failed or recovered from a failure.  This trap is sent
+                whenever the fan failure alarm is raised or cleared.
+                hnFanObjectState is the object (operational) state of the fan.
+                hnEventHistoryId is the index identifying the row in the
+                hnEventHistoryTable (HN-ALARM-MIB) corresponding to the event
+                that generated this notification.  hnHistoryType is the event
+                type.  hnEventHistoryDescr is a string describing the event.
+                hnEventHistorySeverity indicates whether the alarm was raised
+                or cleared, and the severity of the event.
+                hnEventHistoryServiceAffected indicates whether or not the
+                event affects service.  hnEventHistoryTimeValue indicates the
+                time when the event occurred."
+    ::= { hnFanNotificationPrefix 1 }
+       
+
+END

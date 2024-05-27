@@ -1,0 +1,635 @@
+HN-ALARM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32,
+    Counter32, Unsigned32, NOTIFICATION-TYPE       FROM SNMPv2-SMI
+
+    DisplayString, DateAndTime, TruthValue         FROM SNMPv2-TC
+
+    HnAlarmServiceAffected, HnAlarmConditionType,
+    HnAlarmSeverity, HnAlarmEntity,
+    HnDescriptionString                            FROM HN-TC
+
+    hnTrapHostOriginatingIPAddr                    FROM HN-PRIV-MIB
+
+    hnSystem                                       FROM HN-SMI;
+
+
+hnAlarmMIB  MODULE-IDENTITY
+    LAST-UPDATED "201110100000Z"
+    ORGANIZATION "Overture Networks"
+    CONTACT-INFO "Technical Assistance Center
+
+                  Overture Networks
+                  637 Davis Drive
+                  Morrisville, NC 27560
+
+                  Tel: +1 919 337 4100
+                  Fax: +1 919 337 4149
+
+                  E-mail: support@OvertureNetworks.com
+                  Web   : www.overturenetworks.com"
+
+    DESCRIPTION "The module for managing alarms and events."
+
+    REVISION     "201110100000Z"
+    DESCRIPTION  "Convert contact information to Overture Networks"
+
+    REVISION    "200710240000Z"
+    DESCRIPTION "Added scalar objects for alarm status and counts."
+
+    REVISION    "200412170000Z"
+    DESCRIPTION "Deprecated old Alarm Severity Table OIDs. Created new
+                 Alarm Severity Table with new OIDs to include a third
+                 index, hnAlarmSeverityDeviceId, providing Alarm Severity
+                 management capability for CPE devices."
+
+    REVISION    "200409300000Z"
+    DESCRIPTION "Initial version."
+
+    ::= { hnSystem 5 }
+
+
+--
+-- High-level groups in this mib
+--
+
+
+hnAlarmGroup  OBJECT IDENTIFIER ::= { hnAlarmMIB  1 }
+
+
+----------------------------------------------------------------------------------
+-- hnCurrAlarm Group
+--
+-- This table represents active alarms on the Overture Networks device.
+----------------------------------------------------------------------------------
+
+
+hnCurrAlarmTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF HnCurrAlarmEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "A table of active Alarms."
+    ::= { hnAlarmGroup 1 }
+
+
+hnCurrAlarmEntry OBJECT-TYPE
+    SYNTAX      HnCurrAlarmEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "A entry is created for each alarm which is raised.
+                The entry is removed when the alarm is cleared."
+    INDEX       { hnCurrAlarmId }
+    ::= { hnCurrAlarmTable 1 }
+
+
+HnCurrAlarmEntry ::=
+    SEQUENCE {
+         hnCurrAlarmId               Counter32,              --index
+         hnCurrAlarmOriginator       OBJECT IDENTIFIER,      --r/o
+         hnCurrAlarmEntity           HnAlarmEntity,          --r/o
+         hnCurrAlarmType             HnAlarmConditionType,   --r/o
+         hnCurrAlarmSeverity         HnAlarmSeverity,        --r/o
+         hnCurrAlarmServiceAffected  HnAlarmServiceAffected, --r/o
+         hnCurrAlarmTimeValue        DateAndTime,            --r/o
+         hnCurrAlarmTCATimePeriod    INTEGER                 --r/o
+    }
+
+
+hnCurrAlarmId   OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "A unique value identifying this Alarm."
+    ::= { hnCurrAlarmEntry 1 }
+
+
+hnCurrAlarmOriginator OBJECT-TYPE
+    SYNTAX      OBJECT IDENTIFIER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "An object identifying the resource which originated
+                this alarm. The resource identifier is of type hnResource.  If
+                the alarm is attributed to an instance of the resource, the
+                instance is appended to the object."
+    ::= { hnCurrAlarmEntry 2 }
+
+
+hnCurrAlarmEntity OBJECT-TYPE
+    SYNTAX      HnAlarmEntity
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "An identifier that further describes the source of this alarm.
+                If no such entity is identifiable, this value is zero."
+    ::= { hnCurrAlarmEntry 3 }
+
+
+hnCurrAlarmType OBJECT-TYPE
+    SYNTAX      HnAlarmConditionType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The specific condition causing the alarm."
+    ::= { hnCurrAlarmEntry 4 }
+
+
+hnCurrAlarmSeverity OBJECT-TYPE
+    SYNTAX      HnAlarmSeverity
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Severity level of this alarm."
+    ::= { hnCurrAlarmEntry 5 }
+
+
+hnCurrAlarmServiceAffected OBJECT-TYPE
+    SYNTAX      HnAlarmServiceAffected
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "An indication of whether or not the alarm affects service."
+    ::= { hnCurrAlarmEntry 6 }
+
+
+hnCurrAlarmTimeValue OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The time that the alarm was raised."
+    ::= { hnCurrAlarmEntry 7 }
+
+
+hnCurrAlarmTCATimePeriod OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    notApplicable  (0),
+                    fifteenMinute  (1),
+                    oneDay         (2),
+                    userDefined    (3)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "If the alarm is due to a threshold crossing alarm, this
+                object will indicate the interval length where the crossing
+                was detected.  Otherwise, this object has the value
+                notApplicable(0)."
+    ::= { hnCurrAlarmEntry 8 }
+
+
+----------------------------------------------------------------------------------
+-- hnEventHistory
+--
+-- This table represents the most recent events on the Overture Networks device.
+----------------------------------------------------------------------------------
+
+
+hnEventHistoryTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF HnEventHistoryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "A table of event activity ordered from least recent to most
+                recent."
+    ::= { hnAlarmGroup 2 }
+
+
+hnEventHistoryEntry OBJECT-TYPE
+    SYNTAX      HnEventHistoryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "A entry is created for each alarm which is raised or
+                cleared."
+    INDEX       { hnEventHistoryId }
+    ::= { hnEventHistoryTable 1 }
+
+
+HnEventHistoryEntry ::=
+    SEQUENCE {
+        hnEventHistoryId               Counter32,              --index
+        hnEventHistoryOriginator       OBJECT IDENTIFIER,      --r/o
+        hnEventHistoryEntity           HnAlarmEntity,          --r/o
+        hnEventHistoryType             HnAlarmConditionType,   --r/o
+        hnEventHistoryDescr            DisplayString,          --r/o
+        hnEventHistorySeverity         HnAlarmSeverity,        --r/o
+        hnEventHistoryServiceAffected  HnAlarmServiceAffected, --r/o
+        hnEventHistoryTimeValue        DateAndTime,            --r/o
+        hnEventHistoryConditionEffect  INTEGER,                --r/o
+        hnEventHistoryLocation         INTEGER,                --r/o
+        hnEventHistoryDirection        INTEGER,                --r/o
+        hnEventHistoryIsTCAEvent       TruthValue,             --r/o
+        hnEventHistoryTCATimePeriod    INTEGER,                --r/o
+        hnEventHistoryTCAValue         Unsigned32,             --r/o
+        hnEventHistoryTCAThreshold     Unsigned32              --r/o
+    }
+
+
+hnEventHistoryId OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "A unique value identifying this event."
+    ::= { hnEventHistoryEntry 1 }
+
+
+hnEventHistoryOriginator OBJECT-TYPE
+    SYNTAX      OBJECT IDENTIFIER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "An object identifying the resource which originated
+                this alarm. The resource identifier is of type hnResource.  If
+                the alarm is attributed to an instance of the resource, the
+                instance is appended to the object. If no such resource is
+                identifiable, this object's value will be the null object ID."
+    ::= { hnEventHistoryEntry 2 }
+
+
+hnEventHistoryEntity OBJECT-TYPE
+    SYNTAX      HnAlarmEntity
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "An identifier that further describes the source of this alarm.
+                If no such entity is identifiable, this value will be zero."
+    ::= { hnEventHistoryEntry 3 }
+
+
+hnEventHistoryType OBJECT-TYPE
+    SYNTAX      HnAlarmConditionType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The specific condition causing the alarm."
+    ::= { hnEventHistoryEntry 4 }
+
+
+hnEventHistoryDescr OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "A description of the condition causing the alarm."
+    ::= { hnEventHistoryEntry 5 }
+
+
+hnEventHistorySeverity OBJECT-TYPE
+    SYNTAX      HnAlarmSeverity
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Severity level of this alarm."
+    ::= { hnEventHistoryEntry 6 }
+
+
+hnEventHistoryServiceAffected OBJECT-TYPE
+    SYNTAX      HnAlarmServiceAffected
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "An indication of whether or not the alarm affects service."
+    ::= { hnEventHistoryEntry 7 }
+
+
+hnEventHistoryTimeValue OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The time that the alarm was raised or cleared."
+    ::= { hnEventHistoryEntry 8 }
+
+
+hnEventHistoryConditionEffect OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    standing  (0),
+                    transient (1)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The alarm's condition type."
+    ::= { hnEventHistoryEntry 9 }
+
+
+hnEventHistoryLocation OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    notApplicable  (0),
+                    nearEnd        (1),
+                    farEnd         (2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "If the alarm can be associated with a near or
+                far end object, this is its location.  Otherwise,
+                this object has the value notApplicable(0)."
+    ::= { hnEventHistoryEntry 10 }
+
+
+hnEventHistoryDirection OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    notApplicable  (0),
+                    receive        (1),
+                    transmit       (2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "If the alarm can be associated with transmit or
+                receive direction, this object will have the
+                appropriate indicator.  Otherwise, this object
+                has the value notApplicable(0)."
+    ::= { hnEventHistoryEntry 11 }
+
+
+hnEventHistoryIsTCAEvent OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "If the alarm is due to a threshold
+                crossing alarm, this object will be true(1),
+                otherwise false(2)."
+    ::= { hnEventHistoryEntry 12 }
+
+
+hnEventHistoryTCATimePeriod OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    notApplicable  (0),
+                    fifteenMinute  (1),
+                    oneDay         (2),
+                    userDefined    (3)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "If the alarm is due to a threshold
+                crossing alarm, this object will indicate
+                the interval length where the crossing was
+                detected.  Otherwise, this object has the
+                value notApplicable(0)."
+    ::= { hnEventHistoryEntry 13 }
+
+
+hnEventHistoryTCAValue OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "If the alarm is due to a threshold
+                crossing alarm, this object will contain
+                the value that caused the alarm.
+                Otherwise, this object has the value 0."
+    ::= { hnEventHistoryEntry 14 }
+
+
+hnEventHistoryTCAThreshold OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "If the alarm is due to a threshold
+                crossing alarm, this object will contain
+                the threshold value that was reached.
+                Otherwise, this object has the value 0."
+    ::= { hnEventHistoryEntry 15 }
+
+
+----------------------------------------------------------------------------------
+--
+-- hnLastEventHistoryId
+--
+----------------------------------------------------------------------------------
+
+
+hnLastEventHistoryId OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "A unique value identifying the last eventId in the
+                eventHistoryTable.  This value corresponds to the
+                number of events that have occurred since the last
+                boot. If this value is zero, there are no events
+                in the table."
+    ::= { hnAlarmGroup 3  }
+
+
+----------------------------------------------------------------------------------
+-- Alarm Severity Table
+--
+-- This table allows the alarm severity level of alarms to viewed and changed.
+----------------------------------------------------------------------------------
+
+
+hnAlarmSeverityTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF HnAlarmSeverityEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "A table of alarm severity entries."
+    ::= { hnAlarmGroup 5 }
+
+
+hnAlarmSeverityEntry OBJECT-TYPE
+    SYNTAX      HnAlarmSeverityEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "A entry is available for each combination of
+                hnEntity and HnAlarmConditionType in the system."
+    INDEX       { hnAlarmSeverityDeviceId,
+                  hnAlarmSeverityEntity,
+                  hnAlarmSeverityConditionType }
+    ::= { hnAlarmSeverityTable 1 }
+
+
+HnAlarmSeverityEntry ::=
+    SEQUENCE {
+        hnAlarmSeverityDeviceId       Unsigned32,             --index
+        hnAlarmSeverityEntity         HnAlarmEntity,          --index
+        hnAlarmSeverityConditionType  HnAlarmConditionType,   --index
+        hnAlarmSeverityLevel          HnAlarmSeverity,        --r/w
+        hnAlarmSeverityDescr          HnDescriptionString     --r/o
+    }
+
+
+hnAlarmSeverityDeviceId  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "A unique value identifying each device controlled by this
+                SNMP agent, where each device is defined as a physically
+                separate entity.  Each SNMP agent can manage multiple devices
+                to support integrated management of multiple devices under one
+                control entity.  This multi-system management approach
+                supports:
+                  - Multiple 'central-office' devices such as two HN4000s in a
+                    stacked configuration managed by a single SNMP agent.
+                  - One or more 'customer premise' devices in addition to the
+                    central-office device(s), providing integrated visibility
+                    into the distributed system.
+                The assignment of the unique identifier is system dependent.
+                For example on an HN4000, the identifiers 1..5 are used to
+                identify central-office HN4000s in a stacked configuration,
+                while identifiers 1001..1200 are used to indicate customer
+                premise devices. The type and location of the device are
+                indicated by the hnDeviceType and hnDeviceLocation."
+    ::= { hnAlarmSeverityEntry 1 }
+
+
+hnAlarmSeverityEntity OBJECT-TYPE
+    SYNTAX      HnAlarmEntity
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "The entity identifier."
+    ::= { hnAlarmSeverityEntry 2 }
+
+
+hnAlarmSeverityConditionType OBJECT-TYPE
+    SYNTAX      HnAlarmConditionType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "The specific condition."
+    ::= { hnAlarmSeverityEntry 3 }
+
+
+hnAlarmSeverityLevel OBJECT-TYPE
+    SYNTAX      HnAlarmSeverity
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Severity level of the resource, entity and condition."
+    ::= { hnAlarmSeverityEntry 4 }
+
+
+hnAlarmSeverityDescr OBJECT-TYPE
+    SYNTAX      HnDescriptionString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "A description for the alarm."
+    ::= { hnAlarmSeverityEntry 5 }
+
+
+----------------------------------------------------------------------------------
+-- Alarm status and counts
+--
+-- These scalars provide status and counts of currently active alarms.
+----------------------------------------------------------------------------------
+
+
+hnAlarmStatus OBJECT-TYPE
+    SYNTAX      HnAlarmSeverity
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The highest severity of all currently active alarms on the
+                 NE. Alarms with a severity of notAlarmed(2) or notReported(3)
+                 are not considered active, and these values are not applicable
+                 for this object. The value none(0) indicates that the NE
+                 reports no alarms (i.e. no alarm LEDs are lighted)."
+    ::= { hnAlarmGroup 6  }
+
+
+hnAlarmCountMinor OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Count of currently active alarms with a severity of minor."
+    ::= { hnAlarmGroup 7  }
+
+
+hnAlarmCountMajor OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Count of currently active alarms with a severity of major."
+    ::= { hnAlarmGroup 8  }
+
+
+hnAlarmCountCritical OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Count of currently active alarms with a severity of critical."
+    ::= { hnAlarmGroup 9  }
+
+
+----------------------------------------------------------------------------------
+-- hnAlarmMIBNotifications
+--
+-- Alarm notification enables and definitions.
+----------------------------------------------------------------------------------
+
+
+hnAlarmMIBNotificationEnables OBJECT IDENTIFIER ::= { hnAlarmMIB 2 }
+
+
+hnAlarmEnableEventHistoryUpdates OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "When true, the sending of hnEventHistroyUpdate
+                notifications is enabled. When false, the sending of
+                hnEventHistory notifications is disabled."
+    DEFVAL      {true}
+    ::= { hnAlarmMIBNotificationEnables 1 }
+
+
+-- The following two OBJECT IDENTIFIERS are used to define SNMPv2 Notifications
+-- that are backward compatible with SNMPv1 Traps.
+hnAlarmMIBNotifications OBJECT IDENTIFIER ::= { hnAlarmMIB 3 }
+hnAlarmMIBNotificationsPrefix OBJECT IDENTIFIER ::= { hnAlarmMIBNotifications 0 }
+
+
+hnEventHistoryUpdate NOTIFICATION-TYPE
+    OBJECTS     { hnEventHistoryId,
+                  hnEventHistoryDescr,
+                  hnTrapHostOriginatingIPAddr }
+    STATUS      current
+    DESCRIPTION "At least one event has been added to the hnEventHistoryTable.
+                This notification is generated no more often than the interval
+                specified by hnSystemTrapShapingInterval.
+
+                The value of hnEventHistoryId is the index of the most recent
+                entry in the table at the time that the trap was issued.  The
+                value of hnTrapHostOriginatingIPAddr is the IP address of the
+                interface from which the trap originated."
+    ::= { hnAlarmMIBNotificationsPrefix 1 }
+
+
+----------------------------------------------------------------------------------
+-- Old Alarm Severity Table
+--
+-- This table is now deprecated in favor of the Alarm Severity Table above.
+----------------------------------------------------------------------------------
+
+
+hnAlarmSeverityV1Table OBJECT-TYPE
+    SYNTAX      SEQUENCE OF HnAlarmSeverityV1Entry
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION "A table of alarm severity entries."
+    ::= { hnAlarmGroup 4 }
+
+
+hnAlarmSeverityV1Entry OBJECT-TYPE
+    SYNTAX      HnAlarmSeverityV1Entry
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION "A entry is available for each combination of
+                hnEntity and HnAlarmConditionType in the system."
+    INDEX       { hnAlarmSeverityV1Entity,
+                  hnAlarmSeverityV1ConditionType }
+    ::= { hnAlarmSeverityV1Table 1 }
+
+
+HnAlarmSeverityV1Entry ::=
+    SEQUENCE {
+        hnAlarmSeverityV1Entity         HnAlarmEntity,          --index
+        hnAlarmSeverityV1ConditionType  HnAlarmConditionType,   --index
+        hnAlarmSeverityV1Level          HnAlarmSeverity         --r/w
+    }
+
+
+hnAlarmSeverityV1Entity OBJECT-TYPE
+    SYNTAX      HnAlarmEntity
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION "The entity identifier."
+    ::= { hnAlarmSeverityV1Entry 1 }
+
+
+hnAlarmSeverityV1ConditionType OBJECT-TYPE
+    SYNTAX      HnAlarmConditionType
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION "The specific condition."
+    ::= { hnAlarmSeverityV1Entry 2 }
+
+
+hnAlarmSeverityV1Level OBJECT-TYPE
+    SYNTAX      HnAlarmSeverity
+    MAX-ACCESS  read-write
+    STATUS      deprecated
+    DESCRIPTION "Severity level of the resource, entity and condition."
+    ::= { hnAlarmSeverityV1Entry 3 }
+
+
+END

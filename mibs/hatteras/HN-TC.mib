@@ -1,0 +1,2147 @@
+HN-TC DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-IDENTITY,
+    OBJECT-TYPE, Unsigned32                         FROM SNMPv2-SMI
+
+    TEXTUAL-CONVENTION, DisplayString               FROM SNMPv2-TC
+
+    hnDefinitions                                   FROM HN-SMI;
+
+
+hnTC MODULE-IDENTITY
+    LAST-UPDATED "201304020000Z"
+    ORGANIZATION "Overture Networks"
+    CONTACT-INFO "Technical Assistance Center
+
+                  Overture Networks
+                  637 Davis Drive
+                  Morrisville, NC 27560
+
+                  Tel: +1 919 337 4100
+                  Fax: +1 919 337 4149
+
+                  E-mail: support@OvertureNetworks.com
+                  Web   : www.overturenetworks.com"
+
+    DESCRIPTION  "This MIB contains the proprietary textual conventions
+                  for Overture Networks devices." 
+                  
+    REVISION     "201304020000Z"
+    DESCRIPTION  "Added card 8 type to HnBondingRemoteTypeValue."
+
+                  
+    REVISION     "201302050000Z"
+    DESCRIPTION  "Added interval-1hour to HnPerfMonIntervalType."
+
+    REVISION     "201301220000Z"
+    DESCRIPTION  "Added HnVlanLoopbackVlanIdList."
+
+    REVISION     "201210230000Z"
+    DESCRIPTION  "Added HnEvcBindVlanLbTypeValue."                                   
+
+    REVISION     "201207120000Z"
+    DESCRIPTION  "Added vlanLoopbackActive to HnAlarmConditionType."
+
+    REVISION     "201204050000Z"
+    DESCRIPTION  "Added errDisableTimeout to HnRetrainReason."
+
+    REVISION     "201203290000Z"
+    DESCRIPTION  "Added hn4000eCP to HnDeviceType."
+
+    REVISION     "201203010000Z"
+    DESCRIPTION  "Added HnLacpOperState."
+
+    REVISION     "201201250000Z"
+    DESCRIPTION  "Added ctcRetrain to HnRetrainReason."
+
+    REVISION     "201201130000Z"
+    DESCRIPTION  "Added entityAlternateIp"
+
+    REVISION     "201110100000Z"
+    DESCRIPTION  "Convert contact information to Overture Networks"
+
+    REVISION     "201109120000Z"
+    DESCRIPTION  "Added mlpppLcpStateChg, and gsIdleEvent to HnRetrainReason."
+
+    REVISION     "201105210000Z"
+    DESCRIPTION  "Added ppp to HnEthPortTypeValue"
+
+    REVISION     "201104270000Z"
+    DESCRIPTION  "Added ctcDown and ctcPreLearn to HnObjectState."
+
+    REVISION     "201104220000Z"
+    DESCRIPTION  "Added hnResourceCemMef, hnResourcePpp, entityCemMef,
+                  entityPpp, llfPort, and llfCfm."
+
+    REVISION     "201103100000Z"
+    DESCRIPTION  "Added hnResourceFilterChain and entityFilterChain."
+
+    REVISION     "201102280000Z"
+    DESCRIPTION  "Added trafficSamActive, hnResourceTrafficSamTest,
+                  and entityTrafficSamTest."
+
+    REVISION     "201101070000Z"
+    DESCRIPTION  "Added cfmCcLlf."
+
+    REVISION     "201012290000Z"
+    DESCRIPTION  "Updated HnRetrainReason."
+
+    REVISION     "201011170000Z"
+    DESCRIPTION  "Added hnResourcePktCaptureBuffer, entityPktCaptureBuffer,
+                  and packetCaptureBufferActive."
+
+    REVISION     "201010190000Z"
+    DESCRIPTION  "Added hnResourceCfmMip, hnResourceCfmMipList, hnEntityCfmMip, and
+                 hnEntityCfmMipList. Added errDisable to HnAlarmConditionType.
+                 Added several TDM-based values to HnRetrainReason."
+
+    REVISION     "201010180000Z"
+    DESCRIPTION  "Added hn402CP1E, hn404CP1E, hn408CP1E, hn404U2E, hn408U2E,
+                 hn418U2E, hn404S2E, hn408S2E to HnDeviceType."
+
+    REVISION     "201008240000Z"
+    DESCRIPTION  "Updated for Hatteras Networks Software Release 7.4.1.
+                 Added hn444CP4E, hn448CP4E, hn444U4E, hn448U4E, hn444S4E, hn448S4E,
+                 hn414G2E, hn418G2E, hn414S2E, and hn418S2E to HnDeviceType.
+                 Clarifed HnDeviceType TCs pme8E1Sfp1G, and pme8E1Sfp1G to reflect
+                 that these have 2 Ethernet ports (pme8E2Sfp1G, and pme8E2Sfp1G).
+                 Clarified HnBondingRemoteTypeValue TCs pme4E1Sfp1G and pme8E1Sfp1G
+                 to reflect that these have 2 Ethernet ports (pme4E2Sfp1G and
+                 pme8E2Sfp1G)."
+
+    REVISION     "201007160000Z"
+    DESCRIPTION  "Added timingOutput to HnObjectState."
+
+    REVISION     "201006150000Z"
+    DESCRIPTION  "Added pme4E4, pme4E4, pme4E1Sfp1G, and pme8E1Sfp1G to HnBondingRemoteTypeValue."
+
+    REVISION     "201006030000Z"
+    DESCRIPTION  "Added hnbdpLpbk."
+
+    REVISION     "201003310000Z"
+    DESCRIPTION  "Added HnPerfMonIntervalType."
+
+    REVISION     "201001220000Z"
+    DESCRIPTION  "Updated for Hatteras Networks Software Release 7.2.2.
+                 Added hnResourceT1e1Bert, hnResourceT3Bert, entityT1e1Bert,
+                 entityT3Bert, bertIsActive, and bertActive."
+
+    REVISION     "200912010000Z"
+    DESCRIPTION  "Updated for Hatteras Networks Software Release 7.2.1"
+
+    REVISION     "200911170000Z"
+    DESCRIPTION  "Updated HnDeviceType with new HN6100 cards."
+
+    REVISION     "200911120000Z"
+    DESCRIPTION  "Updated for Hatteras Networks Software Release 7.2.0"
+
+    REVISION     "200909230000Z"
+    DESCRIPTION  "Updated HnDeviceType with new HN6100 cards. Added new
+                  HnAlarmConditionTypes."
+
+    REVISION     "200908040000Z"
+    DESCRIPTION  "Updated HnObjectState."
+
+    REVISION     "200907280000Z"
+    DESCRIPTION  "Updated HnDeviceType."
+
+    REVISION     "200905060000Z"
+    DESCRIPTION  "Updated HnEthDuplexModeValue to include 'na'."
+
+    REVISION     "200904230000Z"
+    DESCRIPTION  "Clarified definitions for HnLagLoadBalanceValue and
+                 HnTdrResultValue. Added hnResourceTrace and entityTrace."
+
+    REVISION     "200903030000Z"
+    DESCRIPTION  "Added HnTrafficActionValue, HnTrafficStatusValue,
+                 HnTrafficDurationValue, HnTrafficStreamHeader,
+                 HnEtherType, HnEthPbit, HnEthVlanId, spanProfileMismatch,
+                 trafficGeneratorActive, trafficMonitorActive, and trace.
+                 Added hnResourceServicePolicer, hnResourceServicePolicerMapping,
+                 hnResourceServicePolicerList, hnResourceTrafficStream,
+                 hnResourceTrafficGenerator, hnResourceTrafficMonitor.      
+                 Added entityServicePolicer, entityServicePolicerMapping,
+                 entityServicePolicerList, entityTrafficStream,
+                 entityTrafficGenerator, entityTrafficMonitor."
+                 
+    REVISION     "200902230000Z"
+    DESCRIPTION  "Added t4E2 and t8E2 to HnBondingRemoteTypeValue."
+                 
+    REVISION     "200901290000Z"
+    DESCRIPTION  "Added comments to HnBondingRemoteTypeValue for
+                  unsupported values."
+                 
+    REVISION     "200901260000Z"
+    DESCRIPTION  "Added sftp to HnFsProtocol."
+
+    REVISION     "200810150000Z"
+    DESCRIPTION  "Removed HnCPEType, HnCPEActionType and HnSwitchAction."
+
+    REVISION     "200808250000Z"
+    DESCRIPTION  "Updated for Hatteras Networks Software Release 7.0.0"
+
+    REVISION     "200804180000Z"
+    DESCRIPTION  "Added hn4000e to HnDeviceType."
+
+    REVISION     "200803200000Z"
+    DESCRIPTION  "Added HnSwImageAction support for the syncSelection
+                 action."
+
+    REVISION     "200709050000Z"
+    DESCRIPTION  "Add new entries for hnResource, HnAlarmEntity
+                 HnObjectState, and HnDeviceType. Add HnRetrainReason."
+
+    REVISION     "200704200000Z"
+    DESCRIPTION  "Added maintenance user to HnPrivLevel."
+
+    REVISION     "200703230000Z"
+    DESCRIPTION  "Added new hnResource, HnAlarmEntity, and HnAlarmConditionType
+                 entries to support alarm port multiplexing."
+
+    REVISION     "200702120000Z"
+    DESCRIPTION  "Renamed (pre-release) some of the new HnAlarmConditionType
+                 entries."
+
+    REVISION     "200702060000Z"
+    DESCRIPTION  "Add new entries for hnResource, HnAlarmEntity, and
+                 HnDeviceType."
+
+    REVISION     "200612270000Z"
+    DESCRIPTION  "Add new entries for HnAlarmConditionType, hnResource,
+                 and HnAlarmEntity."
+
+    REVISION     "200611070000Z"
+    DESCRIPTION  "Add new CFM CC session conditions."
+
+    REVISION     "200611010000Z"
+    DESCRIPTION  "Add new entry for HnDirtyBit."
+
+    REVISION     "200608090000Z"
+    DESCRIPTION  "Added new entries in hnResource, HnAlarmEntity,
+                  HnAlarmSeverity, HnAlarmServiceAffected,
+                  HnAlarmConditionType, HnDeviceType, HnSwitchType, and
+                  HnLastResetType. Modified HnHsModuleType labels without
+                  behavioral changes. Added HnProcessorType and HnMemoryType."
+
+    REVISION     "200607050000Z"
+    DESCRIPTION  "Add new entries in hnResource, HnAlarmEntity, and HnObjectState."
+
+    REVISION     "200606050000Z"
+    DESCRIPTION  "Added HnFsProtocol"
+
+    REVISION     "200602010000Z"
+    DESCRIPTION  "Add new entries in hnResource, HnAlarmEntity, and HnAlarmConditionType."
+
+    REVISION     "200507290000Z"
+    DESCRIPTION  "Add new entries in hnResource, HnAlarmEntity, HnAlarmConditionType,
+                  HnObjectState and HnLastResetType."
+
+    REVISION     "200505190000Z"
+    DESCRIPTION  "Add HnSnmpCommunityLevel."
+
+    REVISION     "200503300000Z"
+    DESCRIPTION  "Add cancelScheduledReboot in HnDeviceAction."
+
+    REVISION     "200411300000Z"
+    DESCRIPTION  "Added to list of hnResource objects. Add TCs related
+                  to Devices."
+
+    REVISION     "200409300000Z"
+    DESCRIPTION  "Initial version."
+
+    ::= { hnDefinitions 2 }
+
+
+--------------------------------------------------------------------------
+-- Alarm Related
+--------------------------------------------------------------------------
+
+
+hnResource      OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION "Overture Networks' alarm resources.  These are reported
+                in alarms to identify the resource causing or associated
+                with the alarm."
+    ::= { hnTC 2 }
+
+    hnResource2BaseTL                 OBJECT IDENTIFIER ::= { hnResource   1 }
+    hnResourceClock                   OBJECT IDENTIFIER ::= { hnResource   2 }
+    hnResourceConfigFile              OBJECT IDENTIFIER ::= { hnResource   3 }
+    hnResourceConfigProfile           OBJECT IDENTIFIER ::= { hnResource   4 }
+    hnResourceEthernetPort            OBJECT IDENTIFIER ::= { hnResource   5 }
+    hnResourceEventLog                OBJECT IDENTIFIER ::= { hnResource   6 }
+    hnResourceIpInterface             OBJECT IDENTIFIER ::= { hnResource   7 }
+    hnResourceOamInterface            OBJECT IDENTIFIER ::= { hnResource   8 }
+    hnResourceSealingCurrent          OBJECT IDENTIFIER ::= { hnResource   9 }
+    hnResourceSerialPort              OBJECT IDENTIFIER ::= { hnResource  10 }
+    hnResourceSntp                    OBJECT IDENTIFIER ::= { hnResource  11 }
+    hnResourceSpanAlarmProfile        OBJECT IDENTIFIER ::= { hnResource  12 }
+    hnResourcePMD                     OBJECT IDENTIFIER ::= { hnResource  13 }
+    hnResourceConfigProfileList       OBJECT IDENTIFIER ::= { hnResource  14 }
+    hnResourceSpanAlarmProfileList    OBJECT IDENTIFIER ::= { hnResource  15 }
+    hnResourceSWImage                 OBJECT IDENTIFIER ::= { hnResource  16 }
+    hnResourceSystem                  OBJECT IDENTIFIER ::= { hnResource  17 }
+    hnResourceTrapHost                OBJECT IDENTIFIER ::= { hnResource  18 }
+    hnResourceSession                 OBJECT IDENTIFIER ::= { hnResource  19 }
+    hnResourceUNI                     OBJECT IDENTIFIER ::= { hnResource  20 }
+    hnResourceEVC                     OBJECT IDENTIFIER ::= { hnResource  21 }
+    hnResourceEvcBinding              OBJECT IDENTIFIER ::= { hnResource  22 }
+    hnResourceFlowGrp                 OBJECT IDENTIFIER ::= { hnResource  23 }
+    hnResourceFlow                    OBJECT IDENTIFIER ::= { hnResource  24 }
+    hnResourceLAG                     OBJECT IDENTIFIER ::= { hnResource  25 }
+    hnResourceCPE                     OBJECT IDENTIFIER ::= { hnResource  26 }
+    hnResourceFilterPolicy            OBJECT IDENTIFIER ::= { hnResource  27 }
+    hnResourceFilterMAC               OBJECT IDENTIFIER ::= { hnResource  28 }
+    hnResourceFilterRule              OBJECT IDENTIFIER ::= { hnResource  29 }
+    hnResourceSwitch                  OBJECT IDENTIFIER ::= { hnResource  30 }
+    hnResourceModule                  OBJECT IDENTIFIER ::= { hnResource  31 }
+    hnResourceStackPort               OBJECT IDENTIFIER ::= { hnResource  32 }
+    hnResourceStackLink               OBJECT IDENTIFIER ::= { hnResource  33 }
+    hnResourceENV                     OBJECT IDENTIFIER ::= { hnResource  34 }
+    hnResourcePowerFeed               OBJECT IDENTIFIER ::= { hnResource  35 }
+    hnResourceFanModule               OBJECT IDENTIFIER ::= { hnResource  36 }
+    hnResourceMltIn                   OBJECT IDENTIFIER ::= { hnResource  37 }
+    hnResourceMltOut                  OBJECT IDENTIFIER ::= { hnResource  38 }
+    hnResourceAlarmIn                 OBJECT IDENTIFIER ::= { hnResource  39 }
+    hnResourceAlarmOut                OBJECT IDENTIFIER ::= { hnResource  40 }
+    hnResourceMacAddr                 OBJECT IDENTIFIER ::= { hnResource  41 }
+    hnResourceSTP                     OBJECT IDENTIFIER ::= { hnResource  42 }
+    hnResourceLACP                    OBJECT IDENTIFIER ::= { hnResource  43 }
+    hnResourceUserList                OBJECT IDENTIFIER ::= { hnResource  44 }
+    hnResourceUser                    OBJECT IDENTIFIER ::= { hnResource  45 }
+    hnResourcePing                    OBJECT IDENTIFIER ::= { hnResource  46 }
+    hnResourceTraceRt                 OBJECT IDENTIFIER ::= { hnResource  47 }
+    hnResourceAlarmSeverity           OBJECT IDENTIFIER ::= { hnResource  48 }
+    hnResourceIpArp                   OBJECT IDENTIFIER ::= { hnResource  49 }
+    hnResourceIpRoute                 OBJECT IDENTIFIER ::= { hnResource  50 }
+    hnResourceFileServer              OBJECT IDENTIFIER ::= { hnResource  51 }
+    hnResourceTrapGroups              OBJECT IDENTIFIER ::= { hnResource  52 }
+    hnResourceStormControl            OBJECT IDENTIFIER ::= { hnResource  53 }
+    hnResourcePerfMon                 OBJECT IDENTIFIER ::= { hnResource  54 }
+    hnResourceSvcDrops                OBJECT IDENTIFIER ::= { hnResource  55 }
+    hnResourceSfp                     OBJECT IDENTIFIER ::= { hnResource  56 }
+    hnResourceMacAddrShow             OBJECT IDENTIFIER ::= { hnResource  57 }
+    hnResourceRstp                    OBJECT IDENTIFIER ::= { hnResource  58 }
+    hnResourceRstpUni                 OBJECT IDENTIFIER ::= { hnResource  59 }
+    hnResourceQos                     OBJECT IDENTIFIER ::= { hnResource  60 }
+    hnResourceAlarmSeverityNum        OBJECT IDENTIFIER ::= { hnResource  61 }
+    hnResourceTrapHostList            OBJECT IDENTIFIER ::= { hnResource  62 }
+    hnResourceBootLog                 OBJECT IDENTIFIER ::= { hnResource  63 }
+    hnResourceT3Port                  OBJECT IDENTIFIER ::= { hnResource  64 }
+    hnResourceSnmpCommunity           OBJECT IDENTIFIER ::= { hnResource  65 }
+    hnResourceSnmpCommunityList       OBJECT IDENTIFIER ::= { hnResource  66 }
+    hnResourceAuditlog                OBJECT IDENTIFIER ::= { hnResource  67 }
+    hnResourceRadius                  OBJECT IDENTIFIER ::= { hnResource  68 }
+    hnResourceAaa                     OBJECT IDENTIFIER ::= { hnResource  69 }
+    hnResourceBanner                  OBJECT IDENTIFIER ::= { hnResource  70 }
+    hnResourceIpAcl                   OBJECT IDENTIFIER ::= { hnResource  71 }
+    hnResourceIpAclRule               OBJECT IDENTIFIER ::= { hnResource  72 }
+    hnResourceSla                     OBJECT IDENTIFIER ::= { hnResource  73 }
+    hnResourceSlaTest                 OBJECT IDENTIFIER ::= { hnResource  74 }
+    hnResourceSysLog                  OBJECT IDENTIFIER ::= { hnResource  75 }
+    hnResourceSysLogHost              OBJECT IDENTIFIER ::= { hnResource  76 }
+    hnResourceSysLogHostList          OBJECT IDENTIFIER ::= { hnResource  77 }
+    hnResourceCfm                     OBJECT IDENTIFIER ::= { hnResource  78 }
+    hnResourceCfmMd                   OBJECT IDENTIFIER ::= { hnResource  79 }
+    hnResourceCfmMa                   OBJECT IDENTIFIER ::= { hnResource  80 }
+    hnResourceCfmMhf                  OBJECT IDENTIFIER ::= { hnResource  81 }
+    hnResourceCfmMep                  OBJECT IDENTIFIER ::= { hnResource  82 }
+    hnResourceCfmSession              OBJECT IDENTIFIER ::= { hnResource  83 }
+    hnResourceTdr                     OBJECT IDENTIFIER ::= { hnResource  84 }
+    hnResourceCfmPing                 OBJECT IDENTIFIER ::= { hnResource  85 }
+    hnResourceSlaTestList             OBJECT IDENTIFIER ::= { hnResource  86 }
+    hnResourceCfmMdList               OBJECT IDENTIFIER ::= { hnResource  87 }
+    hnResourceCfmMaList               OBJECT IDENTIFIER ::= { hnResource  88 }
+    hnResourceCfmMepList              OBJECT IDENTIFIER ::= { hnResource  89 }
+    hnResourceCfmSessionList          OBJECT IDENTIFIER ::= { hnResource  90 }
+    hnResourceRadiusList              OBJECT IDENTIFIER ::= { hnResource  91 }
+    hnResourceAlarm                   OBJECT IDENTIFIER ::= { hnResource  92 }
+    hnResourceMasterIp                OBJECT IDENTIFIER ::= { hnResource  93 }
+    hnResourceCfmCcSession            OBJECT IDENTIFIER ::= { hnResource  94 }
+    hnResourceCfmCcSessionList        OBJECT IDENTIFIER ::= { hnResource  95 }
+    hnResourceStatus                  OBJECT IDENTIFIER ::= { hnResource  96 }
+    hnResourceCfmCcMep                OBJECT IDENTIFIER ::= { hnResource  97 }
+    hnResourceCfmCcMepList            OBJECT IDENTIFIER ::= { hnResource  98 }
+    hnResourceTtcp                    OBJECT IDENTIFIER ::= { hnResource  99 }
+    hnResourceCfmCcStatusMep          OBJECT IDENTIFIER ::= { hnResource 100 }
+    hnResourceEvcBindingAlarm         OBJECT IDENTIFIER ::= { hnResource 101 }
+    hnResourceLacpSystem              OBJECT IDENTIFIER ::= { hnResource 102 }
+    hnResourceLacpLag                 OBJECT IDENTIFIER ::= { hnResource 103 }
+    hnResourceLacpPort                OBJECT IDENTIFIER ::= { hnResource 104 }
+    hnResourceTmpltCos                OBJECT IDENTIFIER ::= { hnResource 105 }
+    hnResourceTmpltCpe                OBJECT IDENTIFIER ::= { hnResource 106 }
+    hnResourceTmpltCpeQos             OBJECT IDENTIFIER ::= { hnResource 107 }
+    hnResourceTmpltCpeRate            OBJECT IDENTIFIER ::= { hnResource 108 }
+    hnResourceTmpltCpeCos             OBJECT IDENTIFIER ::= { hnResource 109 }
+    hnResourceMacro                   OBJECT IDENTIFIER ::= { hnResource 110 }
+    hnResourceMacAddrEvcB             OBJECT IDENTIFIER ::= { hnResource 111 }
+    hnResourceMacroList               OBJECT IDENTIFIER ::= { hnResource 112 }
+    hnResourceTdrList                 OBJECT IDENTIFIER ::= { hnResource 113 }
+    hnResourceAlarmMux                OBJECT IDENTIFIER ::= { hnResource 114 }
+    hnResourceCfmTrace                OBJECT IDENTIFIER ::= { hnResource 115 }
+    hnResourceTacacs                  OBJECT IDENTIFIER ::= { hnResource 116 }
+    hnResourceTacacsList              OBJECT IDENTIFIER ::= { hnResource 117 }
+    hnResourceRepeater                OBJECT IDENTIFIER ::= { hnResource 118 }
+    hnResourceCfmSynch                OBJECT IDENTIFIER ::= { hnResource 119 }
+    hnResourceDeployGuideProfile      OBJECT IDENTIFIER ::= { hnResource 120 }
+    hnResourceDeployGuideProfileList  OBJECT IDENTIFIER ::= { hnResource 121 }
+    hnResourceShort                   OBJECT IDENTIFIER ::= { hnResource 122 }
+    hnResourceTone                    OBJECT IDENTIFIER ::= { hnResource 123 }
+    hnResourceChassis                 OBJECT IDENTIFIER ::= { hnResource 124 }
+    hnResourceSlot                    OBJECT IDENTIFIER ::= { hnResource 125 }
+    hnResourceCard                    OBJECT IDENTIFIER ::= { hnResource 126 }
+    hnResourceT1E1Port                OBJECT IDENTIFIER ::= { hnResource 127 }
+    hnResourceTdmUni                  OBJECT IDENTIFIER ::= { hnResource 128 }
+    hnResourceTvc                     OBJECT IDENTIFIER ::= { hnResource 129 }
+    hnResourceTvcBinding              OBJECT IDENTIFIER ::= { hnResource 130 }
+    hnResourceSystemTiming            OBJECT IDENTIFIER ::= { hnResource 131 }
+    hnResourceBitsPort                OBJECT IDENTIFIER ::= { hnResource 132 }
+    hnResourceWred                    OBJECT IDENTIFIER ::= { hnResource 133 }
+    hnResourceShapingQueue            OBJECT IDENTIFIER ::= { hnResource 134 }
+    hnResourceEvcServiceDropsQueue    OBJECT IDENTIFIER ::= { hnResource 135 }
+    hnResourceCongestionQueue         OBJECT IDENTIFIER ::= { hnResource 136 }
+    hnResourceSnmpUser                OBJECT IDENTIFIER ::= { hnResource 137 }
+    hnResourceSnmpUserList            OBJECT IDENTIFIER ::= { hnResource 138 }
+    hnResourceOamSystem               OBJECT IDENTIFIER ::= { hnResource 139 }
+    hnResourceServicePolicer          OBJECT IDENTIFIER ::= { hnResource 140 }
+    hnResourceServicePolicerMapping   OBJECT IDENTIFIER ::= { hnResource 141 }
+    hnResourceServicePolicerList      OBJECT IDENTIFIER ::= { hnResource 142 }
+    hnResourceTrafficStream           OBJECT IDENTIFIER ::= { hnResource 143 }
+    hnResourceTrafficGenerator        OBJECT IDENTIFIER ::= { hnResource 144 }
+    hnResourceTrafficMonitor          OBJECT IDENTIFIER ::= { hnResource 145 }
+    hnResourceTrace                   OBJECT IDENTIFIER ::= { hnResource 146 }
+    hnResourceErrDisable              OBJECT IDENTIFIER ::= { hnResource 147 }
+    hnResourceKey                     OBJECT IDENTIFIER ::= { hnResource 148 }
+    hnResourceIpNatTranslation        OBJECT IDENTIFIER ::= { hnResource 149 }
+    hnResourceIpNatTransList          OBJECT IDENTIFIER ::= { hnResource 150 }
+    hnResourceDhcpPool                OBJECT IDENTIFIER ::= { hnResource 151 }
+    hnResourceDhcpPoolList            OBJECT IDENTIFIER ::= { hnResource 152 }
+    hnResourceDhcpBinding             OBJECT IDENTIFIER ::= { hnResource 153 }
+    hnResourceDhcpBindingList         OBJECT IDENTIFIER ::= { hnResource 154 }
+    hnResourceT1e1Bert                OBJECT IDENTIFIER ::= { hnResource 155 }
+    hnResourceT3Bert                  OBJECT IDENTIFIER ::= { hnResource 156 }
+    hnResourceCfmMip                  OBJECT IDENTIFIER ::= { hnResource 157 }
+    hnResourceCfmMipList              OBJECT IDENTIFIER ::= { hnResource 158 }
+    hnResourcePktCaptureBuffer        OBJECT IDENTIFIER ::= { hnResource 159 }
+    hnResourceTrafficSamTest          OBJECT IDENTIFIER ::= { hnResource 160 }
+    hnResourceFilterChain             OBJECT IDENTIFIER ::= { hnResource 161 }
+    hnResourceCemMef                  OBJECT IDENTIFIER ::= { hnResource 162 }
+    hnResourcePpp                     OBJECT IDENTIFIER ::= { hnResource 163 }
+    hnResourceAlternateIp             OBJECT IDENTIFIER ::= { hnResource 164 }
+    hnResourceCfmSlmSession           OBJECT IDENTIFIER ::= { hnResource 165 }    
+    hnResourceCfmSlmSessionList       OBJECT IDENTIFIER ::= { hnResource 166 }
+
+HnAlarmEntity ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "Overture Networks' alarm entities.  These are used
+                 to identify the resource associated with an alarm."
+    SYNTAX       INTEGER {
+                     entity2BaseTL                (   1 ),
+                     entityClock                  (   2 ),
+                     entityConfigFile             (   3 ),
+                     entityConfigProfile          (   4 ),
+                     entityEthernetPort           (   5 ),
+                     entityEventLog               (   6 ),
+                     entityIpInterface            (   7 ),
+                     entityOamInterface           (   8 ),
+                     entitySealingCurrent         (   9 ),
+                     entitySerialPort             (  10 ),
+                     entitySntp                   (  11 ),
+                     entitySpanAlarmProfile       (  12 ),
+                     entityPMD                    (  13 ),
+                     entityConfigProfileList      (  14 ),
+                     entitySpanAlarmProfileList   (  15 ),
+                     entitySWImage                (  16 ),
+                     entitySystem                 (  17 ),
+                     entityTrapHost               (  18 ),
+                     entitySession                (  19 ),
+                     entityUNI                    (  20 ),
+                     entityEVC                    (  21 ),
+                     entityEvcBinding             (  22 ),
+                     entityFlowGrp                (  23 ),
+                     entityFlow                   (  24 ),
+                     entityLAG                    (  25 ),
+                     entityCPE                    (  26 ),
+                     entityFilterPolicy           (  27 ),
+                     entityFilterMAC              (  28 ),
+                     entityFilterRule             (  29 ),
+                     entitySwitch                 (  30 ),
+                     entityModule                 (  31 ),
+                     entityStackPort              (  32 ),
+                     entityStackLink              (  33 ),
+                     entityENV                    (  34 ),
+                     entityPowerFeed              (  35 ),
+                     entityFanModule              (  36 ),
+                     entityMltIn                  (  37 ),
+                     entityMltOut                 (  38 ),
+                     entityAlarmIn                (  39 ),
+                     entityAlarmOut               (  40 ),
+                     entityMacAddr                (  41 ),
+                     entitySTP                    (  42 ),
+                     entityLACP                   (  43 ),
+                     entityUserList               (  44 ),
+                     entityUser                   (  45 ),
+                     entityPing                   (  46 ),
+                     entityTraceRt                (  47 ),
+                     entityAlarmSeverity          (  48 ),
+                     entityIpArp                  (  49 ),
+                     entityIpRoute                (  50 ),
+                     entityFileServer             (  51 ),
+                     entityTrapGroups             (  52 ),
+                     entityStormControl           (  53 ),
+                     entityPerfMon                (  54 ),
+                     entitySvcDrops               (  55 ),
+                     entitySfp                    (  56 ),
+                     entityMacAddrShow            (  57 ),
+                     entityRstp                   (  58 ),
+                     entityRstpUni                (  59 ),
+                     entityQos                    (  60 ),
+                     entityAlarmSeverityNum       (  61 ),
+                     entityTraphostList           (  62 ),
+                     entityBootlog                (  63 ),
+                     entityT3Port                 (  64 ),
+                     entitySnmpCommunity          (  65 ),
+                     entitySnmpCommunityList      (  66 ),
+                     entityAuditlog               (  67 ),
+                     entityRadius                 (  68 ),
+                     entityAaa                    (  69 ),
+                     entityBanner                 (  70 ),
+                     entityIpAcl                  (  71 ),
+                     entityIpAclRule              (  72 ),
+                     entitySla                    (  73 ),
+                     entitySlaTest                (  74 ),
+                     entitySysLog                 (  75 ),
+                     entitySysLogHost             (  76 ),
+                     entitySysLogHostList         (  77 ),
+                     entityCfm                    (  78 ),
+                     entityCfmMd                  (  79 ),
+                     entityCfmMa                  (  80 ),
+                     entityCfmMhf                 (  81 ),
+                     entityCfmMep                 (  82 ),
+                     entityCfmSession             (  83 ),
+                     entityTdr                    (  84 ),
+                     entityCfmPing                (  85 ),
+                     entitySlaTestList            (  86 ),
+                     entityCfmMdList              (  87 ),
+                     entityCfmMaList              (  88 ),
+                     entityCfmMepList             (  89 ),
+                     entityCfmSessionList         (  90 ),
+                     entityRadiusList             (  91 ),
+                     entityAlarm                  (  92 ),
+                     entityMasterIp               (  93 ),
+                     entityCfmCcSession           (  94 ),
+                     entityCfmCcSessionList       (  95 ),
+                     entityStatus                 (  96 ),
+                     entityCfmCcMep               (  97 ),
+                     entityCfmCcMepList           (  98 ),
+                     entityTtcp                   (  99 ),
+                     entityCfmCcStatusMep         ( 100 ),
+                     entityEvcBindingAlarm        ( 101 ),
+                     entityLacpSystem             ( 102 ),
+                     entityLacpLag                ( 103 ),
+                     entityLacpPort               ( 104 ),
+                     entityTmpltCos               ( 105 ),
+                     entityTmpltCpe               ( 106 ),
+                     entityTmpltCpeQos            ( 107 ),
+                     entityTmpltCpeRate           ( 108 ),
+                     entityTmpltCpeCos            ( 109 ),
+                     entityMacro                  ( 110 ),
+                     entityMacAddrEvcB            ( 111 ),
+                     entityMacroList              ( 112 ),
+                     entityTdrList                ( 113 ),
+                     entityAlarmMux               ( 114 ),
+                     entityCfmTrace               ( 115 ),
+                     entityTacacs                 ( 116 ),
+                     entityTacacsList             ( 117 ),
+                     entityRepeater               ( 118 ),
+                     entityCfmSynch               ( 119 ),
+                     entityDeployGuideProfile     ( 120 ),
+                     entityDeployGuideProfileList ( 121 ),
+                     entityShort                  ( 122 ),
+                     entityTone                   ( 123 ),
+                     entityChassis                ( 124 ),
+                     entitySlot                   ( 125 ),
+                     entityCard                   ( 126 ),
+                     entityT1E1Port               ( 127 ),
+                     entityTdmUni                 ( 128 ),
+                     entityTvc                    ( 129 ),
+                     entityTvcBinding             ( 130 ),
+                     entitySystemTiming           ( 131 ),
+                     entityBitsPort               ( 132 ),
+                     entityWred                   ( 133 ),
+                     entityShapingQueue           ( 134 ),
+                     entityEvcServiceDropsQueue   ( 135 ),
+                     entityCongestionQueue        ( 136 ),
+                     entitySnmpUser               ( 137 ),
+                     entitySnmpUserList           ( 138 ),
+                     entityOamSystem              ( 139 ),
+                     entityServicePolicer         ( 140 ),
+                     entityServicePolicerMapping  ( 141 ),
+                     entityServicePolicerList     ( 142 ),
+                     entityTrafficStream          ( 143 ),
+                     entityTrafficGenerator       ( 144 ),
+                     entityTrafficMonitor         ( 145 ),
+                     entityTrace                  ( 146 ),
+                     entityErrDisable             ( 147 ),
+                     entityKey                    ( 148 ),
+                     entityIpNatTranslation       ( 149 ),
+                     entityIpNatTransList         ( 150 ),
+                     entityDhcpPool               ( 151 ),
+                     entityDhcpPoolList           ( 152 ),
+                     entityDhcpBinding            ( 153 ),
+                     entityDhcpBindingList        ( 154 ),
+                     entityT1e1Bert               ( 155 ),
+                     entityT3Bert                 ( 156 ),
+                     entityCfmMip                 ( 157 ),
+                     entityCfmMipList             ( 158 ),
+                     entityPktCaptureBuffer       ( 159 ),
+                     entityTrafficSamTest         ( 160 ),
+                     entityFilterChain            ( 161 ),
+                     entityCemMef                 ( 162 ),
+                     entityPpp                    ( 163 ),
+                     entityAlternateIp            ( 164 ),
+                     entityCfmSlmSession          ( 165 ),
+                     entityCfmSlmSessionList      ( 166 )
+                 }
+
+
+HnAlarmState ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "Status of the alarm."
+    SYNTAX      INTEGER {
+                    inactive        (1),
+                    active          (2)
+                }
+
+
+HnAlarmSeverity ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "Level of severity of the alarm."
+    SYNTAX      INTEGER {
+                    none            (0),
+                    cleared         (1),
+                    notAlarmed      (2),
+                    notReported     (3),
+                    minor           (4),
+                    major           (5),
+                    critical        (6)
+                }
+
+
+HnAlarmServiceAffected ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "Enumerates whether or not alarmed condition
+                affects service."
+    SYNTAX      INTEGER {
+                    none                    (0),
+                    serviceAffected         (1),
+                    serviceNotAffected      (2)
+                }
+
+
+HnAlarmConditionType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "Alarm condition type."
+    SYNTAX      INTEGER {
+                    equipFail                     ( 1),
+                    highTemp                      ( 2),
+                    pathIntegrityFail             ( 3),
+                    manualReset                   ( 4),
+                    autoReset                     ( 5),
+                    workingMemoryFail             ( 6),
+                    memoryLow                     ( 7),
+                    power                         ( 8),
+                    softwareVersionMismatch       ( 9),
+                    softwareDown                  (10),
+                    controlCommFail               (11),
+                    mismatchEquipment             (12),
+                    facilityTerminationFailure    (13),
+                    margin                        (14),
+                    loopAttenuation               (15),
+                    erroredSecondsLine            (16),
+                    severelyErroredSecondsLine    (17),
+                    unavailableSecondsLine        (18),
+                    crcAnomolies                  (19),
+                    lossOfSyncWordSeconds         (20),
+                    mismatch                      (21),
+                    testAlarm                     (22),
+                    misc                          (23),
+                    improperEquipRemoval          (24),
+                    programFault                  (25),
+                    twoBaseTLSpeedRatioViolation  (26),
+                    maxNumBondedPortsExceeded     (27),
+                    pmeRejected                   (28),
+                    pmeExcluded                   (29),
+                    pmeMisconfigured              (30),
+                    almostFull                    (31),
+                    full                          (32),
+                    autobondDisabled              (33),
+                    bondedPortAggregateRateLow    (34),
+                    dsxAis                        (35),
+                    dsxLof                        (36),
+                    dsxLos                        (37),
+                    dsxRai                        (38),
+                    dsxFramingMismatch            (39),
+                    dsxCvL                        (40),
+                    dsxEsL                        (41),
+                    dsxSesL                       (42),
+                    dsxLossL                      (43),
+                    dsxCvP                        (44),
+                    dsxEsP                        (45),
+                    dsxSasP                       (46),
+                    dsxSesP                       (47),
+                    dsxUasP                       (48),
+                    dsxCvcpP                      (49),
+                    dsxEscpP                      (50),
+                    dsxSascpP                     (51),  -- deprecated
+                    dsxSescpP                     (52),
+                    dsxUascpP                     (53),
+                    dsxAissP                      (54),
+                    dsxCvcpPfe                    (55),  -- deprecated
+                    dsxEscpPfe                    (56),  -- deprecated
+                    dsxSascpPfe                   (57),  -- deprecated
+                    dsxSescpPfe                   (58),  -- deprecated
+                    dsxUascpPfe                   (59),  -- deprecated
+                    syncFail                      (60),
+                    stackPartitioned              (61),
+                    highTempCritical              (62),
+                    switchMasterConflict          (63),
+                    switchNewMaster               (64),
+                    switchElectionNoChange        (65),
+                    switchMasterLost              (66),
+                    switchAutoCreated             (67),
+                    switchAutoDeleted             (68),
+                    sntpFailure                   (69),
+                    cfmCcRdi                      (70),
+                    cfmCcMac                      (71),
+                    cfmCcRemote                   (72),
+                    cfmCcError                    (73),
+                    cfmCcXc                       (74),
+                    localPortInLoopBack           (75),
+                    remotePortInLoopBack          (76),
+                    lacpSysIdMisMatch             (77),
+                    lacpLagKeyMisMatch            (78),
+                    lacpDetectLoopBack            (79),
+                    lacpPortNotInLagCfgList       (80),
+                    lacpPortNotFullDuplex         (81),
+                    evcbMacTableFull              (82),
+                    alarmMux1                     (83),
+                    alarmMux2                     (84),
+                    alarmMux3                     (85),
+                    loopbackLine                  (86),
+                    loopbackNetwork               (87),
+                    cssP                          (88),
+                    ebP                           (89),
+                    bbeP                          (90),
+                    holdover                      (91),
+                    clockfailurePrimary           (92),
+                    clockFailureSecondary         (93),
+                    lockFailurePrimary            (94),
+                    lockFailureSecondary          (95),
+                    tvcBandwidth                  (96),
+                    tvcRemoteTypeMismatch         (97),
+                    noSarResource                 (98),
+                    locMf                         (99),
+                    loopbackPayload               (100),
+                    dataUnderrun                  (101),
+                    syncInitiated                 (102),
+                    syncCompleted                 (103),
+                    miscAux1Acc1                  (104),
+                    miscAux1Acc2                  (105),
+                    miscAux1Acc3                  (106),
+                    miscAux2Acc1                  (107),
+                    miscAux2Acc2                  (108),
+                    miscAux2Acc3                  (109),
+                    farEndDown                    (110),
+                    farEndDisabled                (111),
+                    trafficGeneratorActive        (112),
+                    trafficMonitorActive          (113),
+                    spanProfileMismatch           (114),
+                    trace                         (115),
+                    mcastMacTableAlmostFull       (116),
+                    mcastMacTableFull             (117),
+                    transmitFail                  (118),
+                    cvcpPfe                       (119),
+                    escpPfe                       (120),
+                    sascpPfe                      (121),
+                    sescpPfe                      (122),
+                    uascpPfe                      (123),
+                    l2Loopback                    (124),
+                    framingMismatch6k             (125),
+                    bertActive                    (126),
+                    hnbdpLpbk                     (127),
+                    errDisable                    (128),
+                    packetCaptureBufferActive     (129),
+                    cfmCcLlf                      (130),
+                    trafficSamActive              (131),
+                    vlanLoopbackActive            (132),
+                    inHouseActive                 (133)
+                }
+
+
+---------------------------------------------------------------------------
+-- Device Related TCs
+---------------------------------------------------------------------------
+
+
+HnDeviceType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "An enumeration to identify the type of a
+                Overture Networks device."
+    SYNTAX      INTEGER {
+                    empty                 (1),
+                    unknown               (2),
+                    hn4000                (3),
+                    hn404CP               (4),
+                    hn408CP               (5),
+                    hn4000I               (6),
+                    hn404CO               (7),
+                    hn408CO               (8),
+                    hn404U1EI             (9),
+                    hn404U2EI            (10),
+                    hn408U1EI            (11),
+                    hn408U2EI            (12),
+                    hn404CP1EI           (13),
+                    hn404CP2EI           (14),
+                    hn408CP1EI           (15),
+                    hn408CP2EI           (16),
+                    hn404CO1ELR          (17),
+                    hn408CO1ELR          (18),
+                    hn414U1EI            (19),
+                    hn414U2EI            (20),
+                    hn418U1EI            (21),
+                    hn418U2EI            (22),
+                    hn414CP1EI           (23),
+                    hn414CP2EI           (24),
+                    hn418CP1EI           (25),
+                    hn418CP2EI           (26),
+                    auto                 (27),
+                    pme40E1              (28),
+                    pme4E1               (29),
+                    pme8E1               (30),
+                    pme4E2               (31),
+                    pme8E2               (32),
+                    pme4E1SFP1           (33),
+                    pme4E2SFP1           (34),
+                    pme8E1SFP1           (35),
+                    pme8E2SFP1           (36),
+                    hn402CP1EI           (37),
+                    hn402CP2EI           (38),
+                    pme2E1               (39),
+                    pme2E2               (40),
+                    unmanaged            (41),
+                    hn4000e              (42),
+                    hn6100AuxSt3         (43),
+                    hn6100AuxSt4         (44),
+                    hn6100Switch2eCu     (45),
+                    hn6100Switch2eOpt    (46),
+                    hn610016gs           (47),
+                    hn610016ds1          (48),
+                    hn6100AuxBasic       (49),
+                    hn610016ds1Efm       (50),
+                    pme4Tdm4             (51),
+                    pme4Tdm4E2           (52),
+                    pme4Tdm4E2SFP1       (53),
+                    tdm4E2               (54),
+                    tdm8E2               (55),
+                    hn604U1E             (56),
+                    hn604U2E             (57),
+                    hn604CP1E            (58),
+                    hn604CP2E            (59),
+                    hn614U1E             (60),
+                    hn614U2E             (61),
+                    hn614CP1E            (62),
+                    hn614CP2E            (63),
+                    hn504A2E             (64),
+                    hn504D2E             (65),
+                    hn508A2E             (66),
+                    hn508D2E             (67),
+                    hn404S2EI            (68),
+                    hn408S2EI            (69),
+                    hn604S2E             (70),
+                    hn504SA2E            (71),
+                    hn508SA2E            (72),
+                    hn61001stm1Efm       (73),
+                    hn61003ds3Efm        (74),
+                    hn610016ds1Hd68      (75),
+                    hn610016ds1Hd68Efm   (76),
+                    hn610016ds1Rj45      (77),
+                    hn610016ds1Rj45Efm   (78),
+                    hn504SD2E            (79),
+                    hn508SD2E            (80),
+                    pme4E4               (81),
+                    pme8E4               (82),
+                    pme4E2Sfp1G          (83),
+                    pme8E2Sfp1G          (84),
+                    hn444CP4E            (85),
+                    hn448CP4E            (86),
+                    hn444U4E             (87),
+                    hn448U4E             (88),
+                    hn444S4E             (89),
+                    hn448S4E             (90),
+                    hn414G2E             (91),
+                    hn418G2E             (92),
+                    hn414S2E             (93),
+                    hn418S2E             (94),
+                    hn402CP1E            (95),
+                    hn404CP1E            (96),
+                    hn408CP1E            (97),
+                    hn404U2E             (98),
+                    hn408U2E             (99),
+                    hn418U2E            (100),
+                    hn404S2E            (101),
+                    hn408S2E            (102),
+                    hn4000eCP           (103)
+                }
+
+
+HnDeviceAction ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "An enumeration to identify the type of action
+                performed on a device."
+    SYNTAX      INTEGER {
+                    none                  (1),
+                    reboot                (2),
+                    swapSwImage           (3),
+                    swapDBImage           (4),
+                    cancelScheduledReboot (5)
+                }
+
+
+HnDeviceLocation ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "The location (local/remote) of this device. local(2)
+                devices are co-located with the device hosting the SNMP agent,
+                remote(3) device are physically separated from the device
+                hosting the SNMP agent.  Local devices are also able to share
+                and distribute management functionality amongst themselves (in
+                a non-external controllable manner) to form a resilient
+                management entiry, while remote devices cannot
+                loadshare/distribute management function with the device
+                hosting the SNMP agent."
+    SYNTAX      INTEGER {
+                    unknown    (1),
+                    local      (2),
+                    remote     (3)
+                }
+
+
+HnDeviceMode ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "The operational mode (CO/CP) of this device. Central Office
+                (CO) devices typically manage a set of subordinate Customer
+                Premise (CP) devices. CP devices can never manage other
+                devices."
+    SYNTAX      INTEGER {
+                    unknown    (1),
+                    coMode     (2),
+                    cpMode     (3)
+                }
+
+
+-------------------------------------------------------------------------------
+-- Switch Related TCs
+-------------------------------------------------------------------------------
+
+
+HnSwitchType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "An enumeration to identify the type of a switch."
+    SYNTAX      INTEGER {
+                   empty          (1),
+                   unknown        (2),
+                   hn4000Switch   (3),
+                   hn4000ISwitch  (4)
+                }
+
+
+HnHsModuleType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "An enumeration to identify the type of High Speed Module."
+    SYNTAX      INTEGER {
+                    empty               (1),
+                    unknown             (2),
+                    hsModule1000x2      (3), -- Gigabit fiber.
+                    hsModule1000tx2     (4), -- Gigabit and 10/100 copper.
+                    hsModule100x2       (5), -- 10/100 fiber.
+                    hsModule100tx2      (6), -- 10/100 copper. Not used.
+                                             -- Use hsModule-1000tx-2.
+                    hsModuleTe3         (7)  -- TE3.
+                }
+
+
+-------------------------------------------------------------------------------
+-- Administrative and Operational TCs
+-------------------------------------------------------------------------------
+
+
+HnAdminState ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION "The desired state of the managed object. The enabled(1) state
+                indicates that the object is administratively enabled and may
+                become operational. The disabled(2) state indicates that the
+                object is administratively disabled and not permitted to
+                become operational. The testing(3) state indicates that the
+                object is undergoing testing and may not be operational."
+    SYNTAX      INTEGER {
+                    enabled   (1),
+                    disabled  (2),
+                    testing   (3)
+                }
+
+
+HnOperState ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+            "The current operational state of the managed object.  The
+            testing(3) state indicates that no operational packets can
+            be passed.  If ifAdminStatus is inactive(2) then ifOperStatus
+            should be inactive(2).  If ifAdminStatus is changed to active(1)
+            then ifOperStatus should change to active(1) if the object is
+            ready to transmit and receive network traffic; it should
+            change to dormant(5) if the interface is waiting for
+            external actions (such as a serial line waiting for an
+            incoming connection); it should remain in the inactive(2) state
+            if and only if there is a fault that prevents it from going
+            to the active(1) state; it should remain in the notPresent(6)
+            state if the interface has missing (typically, hardware)
+            components."
+    SYNTAX      INTEGER {
+                   active           (1),
+                   inactive         (2),
+                   testing          (3),
+                   unknown          (4),
+                   dormant          (5),
+                   notPresent       (6),
+                   lowerLayerDown   (7)
+                }
+
+
+HnObjectState ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "An enumeration to identify the state of a managed object."
+    SYNTAX      INTEGER {
+                    unknown                   (1), -- Error case, should never happen.
+                    active                    (2), -- Running at full capacity and passing traffic.
+                    partial                   (3), -- Running at only partial capacity, e.g. 1 out of 2 ports in a LAG.
+                    disabled                  (4), -- Admin Disabled State, assigned by craft.
+                    testing                   (5), -- Admin Test State, assigned by craft.
+                    unequipped                (6), -- Hardware is not equipped (chassis/card/port).
+                    initializing              (7), -- In the process of coming up, not active, but not faulted.
+                    down                      (8), -- Down, no traffic passing.  Possible config mismatch.
+                    lowerLayerDown            (9), -- Lower Layer (or Lower Link) is down. No traffic passing.
+                    supportingEntityDown     (10), -- Supporting entity is down/disabled/etc so no traffic passing.
+                    faulted                  (11), -- Faulted, most likely has an alarm associated with object.
+                    equipmentMismatch        (12), -- Special fault, detected equipment does not match provisioned.
+                    configIncomplete         (13), -- Object not fully provisioned (ie - LAG with no Ports).
+
+                    training                 (14), -- 2bpme port is Training.
+                    handshaking              (15), -- 2bpme port is Handshaking with peer.
+                    optimizing               (16), -- 2bpme port is Optimizing link.
+
+                    bonded                   (17), -- Device detected and in Bonded mode
+                    rsm                      (18), -- Device detected and in RSM mode
+                    nonbonded                (19), -- Device detected and in NonBonded mode
+                    hello                    (20), -- Device is attempting to contact peer
+                    listMismatch             (21), -- Device detected but excluded from configured list
+                    addressMismatch          (22), -- Device detected but does not match configured address
+                    validationFailed         (23), -- Device detected but failed validation
+                    learningDisabled         (24), -- Unknown device detected but learning is disabled
+                    resourceUnavailable      (25), -- Unknown device detected but no more resources are available
+
+                    stpDiscarding            (26), -- STP has placed object into the discarding state
+                    stpLearning              (27), -- STP has placed object into the learning state
+                    evcDisabled              (28), -- Used for EVC binding when its EVC is Admin Disabled
+
+                    peerListMismatch         (29), -- Device detected but excluded from configured list on peer
+                    peerAddressMismatch      (30), -- Device detected but does not match configured address on peer
+                    peerValidationFailed     (31), -- Device detected but failed validation on peer
+                    peerLearningDisabled     (32), -- Unknown device detected but is learning disabled on peer
+                    peerResourceUnavailable  (33), -- Unknown device detected but no more resources are available on peer
+
+                    deviceSoftwareUpgrade    (34), -- Device not operational because it's software is being upgraded
+                    deviceApplyConfig        (35), -- Device not operational because configuration data is being applied
+
+                    oamLoopBackLocal         (36), -- OAM port in local loopback
+                    oamLoopBackRemote        (37), -- OAM port in remote loopback
+
+                    activeSwimageMisMatch    (38), -- Device not manageable because active swImage does not match CO/master's
+                    
+                    sarResrcUnavailable      (39), -- Segmentation and Reassembly (SAR) resource unavailable
+                    peerSarResrcUnavailable  (40), -- Peer Segmentation and Reassembly (SAR) resource unavailable
+   
+                    manualLineLpbkActive     (41), -- Manual Line Loopback Active
+                    manualPayloadLpbkActive  (42), -- Manual Payload Loopback Active
+                    manualNetworkLpbkActive  (43), -- Manual Network Loopback Active
+                    inbandLineLpbkActive     (44), -- In-band Line Loopback Active
+                    bocLineLpbkActive        (45), -- Bit Oriented Code (BOC) Line Loopback Active
+                    bocPayloadLpbkActive     (46), -- Bit Oriented Code (BOC) Payload Loopback Active
+                   
+                    farEndPortAdminDisabled  (47), -- Far-end T1/E1 port has been admin disabled
+                    farEndPortPhyAlarm       (48), -- Far-end T1/E1 port has physical alarm (LOS,etc)
+  
+                    errDisabled              (49), -- System errDisable mechanism is holding interface down
+                    rai                      (50), -- Remote alarm indication
+
+                    manLocalLpbk             (51), -- Manually initiated local loopback
+                    manRemoteLpbk            (52), -- Manually initiated remote loopback
+                    feacRemoteLpbk           (53), -- Remote Loopback initaited by FEAC command
+                    bertIsActive             (54), -- Bit Error Rate Test is active
+                    timingOutput             (55), -- Interface is a timing output
+
+                    llfPort                  (56), -- Interface is down because of LLF (port)
+                    llfCfm                   (57), -- Interface is down because of LLF (CFM)
+   
+                    ctcDown                  (58), -- Interface held down by crosstalk cancellation
+                    ctcPreLearn              (59)  -- Crosstalk cancellation prelearning filter coefficients
+                }
+
+HnLacpOperState ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+            "An enumeration to identify the operational state of the Link Aggregation Control
+            Protocol (LACP) on a port." 
+    SYNTAX      INTEGER {
+                   unknown          (0),
+                   active           (1),
+                   lowerLayerDown   (2),
+                   disabled         (3),
+                   detached         (4),
+                   attached         (5),
+                   waiting          (6),
+                   macMismatch      (7),
+                   keyMismatch      (8),
+                   loopback         (9),
+                   notInCfgList    (10),
+                   notFullDuplex   (11),
+                   na              (12)
+                }
+
+--------------------------------------------------------------------------
+-- User Related TCs
+--------------------------------------------------------------------------
+
+
+HnPrivLevel ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "User's privilege level"
+    SYNTAX      INTEGER {
+                    admin           (1),
+                    provision       (2),
+                --  test            (3),  deprecated
+                    readOnly        (4),
+                    maintenance     (5)
+                }
+
+
+HnLockType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "User lock type"
+    SYNTAX      INTEGER {
+                    unlocked        (1), --read-write
+                    manualLocked    (2), --read-write
+                    autoLocked      (3), --read-only
+                    parentLocked    (4)  --read-only
+                }
+
+
+HnLockOwner ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "Lock owner user ID."
+    SYNTAX      Unsigned32(0..255)
+
+
+--------------------------------------------------------------------------
+-- File Related TCs
+--------------------------------------------------------------------------
+
+
+HnSWStatus ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "Software image status
+                    swActive           - Indentifies the software image
+                                         currently running.
+                    swUpgradeInProcess - Indicates a software image upgrade
+                                         is underway.
+                    swValid            - Indicates that the software image
+                                         has passed basic validation checks
+                                         and is eligible to become active.
+                    swChecksumFailed   - Indicates that the software image
+                                         has failed checksum validation and
+                                         is invalid.
+                    swBootFailed       - Indicates that software image has
+                                         failed to boot and is invalid.
+                    swImageBad         - Indicates that the software image is
+                                         invalid.
+                    swImageEmpty       - Indicates that there is no stored
+                                         software image."
+    SYNTAX      INTEGER {
+                    swActive            (1),
+                    swUpgradeInProcess  (2),
+                    swValid             (3),
+                    swChecksumFailed    (4),
+                    swBootFailed        (5),
+                    swImageBad          (6),
+                    swImageEmpty        (7)
+                 }
+
+
+HnSwImageAction ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "An action to be performed on a software image.
+                   clear    - Causes the specified software image
+                              to be cleared.
+                   swap     - The selected software image becomes the
+                              unselected software image, and visa-versa.
+                   syncSelection - syncrhonizes the selection of s/w images
+                                   on all switches/CPEs.
+                   noAction - No action requested."
+    SYNTAX      INTEGER {
+                    clear         (1),
+                    swap          (2),
+                    syncSelection (4),
+                    noAction      (10)
+                 }
+
+
+HnConfigFileAction ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "An action to be performed on a configuration file.
+                   clear    - Causes all commands in the specified
+                              configuration file to be removed.
+                   swap     - The startup configuration becomes the
+                              backup configuration, and visa-versa.
+                   save     - Saves the running configuration to
+                              the specified file.
+                   noAction - No action requested."
+    SYNTAX      INTEGER {
+                    clear    (1),
+                    swap     (2),
+                    save     (3),
+                    noAction (10)
+                 }
+
+
+HnFsTransferError ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "Reports the reason for a file transfer failure.
+                   none                - No Failure.
+                   operationNotAllowed - The requested operation is not
+                                         allowed or not supported.
+                   serverConnectError  - The FTP server connection could not
+                                         be established.
+                   readFailed          - A read operation failed.
+                   writeFailed         - A write operation failed.
+                   transferAborted     - The FTP transfer was aborted or
+                                         could not be completed.
+                   internalError       - The failure cause is internal
+                                         to the system."
+    SYNTAX      INTEGER {
+                    none                (1),
+                    operationNotAllowed (2),
+                    serverConnectError  (3),
+                    readFailed          (4),
+                    writeFailed         (5),
+                    transferAborted     (6),
+                    internalError       (7)
+                }
+
+
+HnFsProtocol ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "The network protocol employed for a file transfer.
+                   none                - No protocol
+                   ftp                 - File Transfer Protocol
+                   tftp                - Trivial File Transfer Protocol
+                   sftp                - Secure File Transfer Protocol"
+    SYNTAX      INTEGER {
+                    none                (1),
+                    ftp                 (2),
+                    tftp                (3),
+                    sftp                (4)
+                }
+
+
+------------------------------------------------------------------------
+-- Port Related TCs
+------------------------------------------------------------------------
+
+
+HnPortType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION  "The port types found in an HN4000 system."
+    SYNTAX       INTEGER {
+                      unknown        (0),
+                      pmeSwitch      (1), -- switch only
+                      rs232Switch    (2), -- switch only
+                      etherCraft     (3), -- switch only
+                      stack          (4), -- switch only
+                      mltIn          (5), -- switch only
+                      mltOut         (6), -- switch only
+                      alarmIn        (7), -- switch only
+                      alarmOut       (8), -- switch only
+                      sfp100         (9), -- uplink 100 fiber
+                      sfp1000       (10), -- uplink gig fiber
+                      nt100EoCU     (11), -- uplink 100 eth cu
+                      nt1000EoCU    (12), -- uplink gig eth cu
+                      etherSubscr   (13), -- CPE only
+                      rs232Cpe      (14), -- CPE only
+                      pmeCpe        (15), -- CPE only
+                      bonded        (16), -- Logical 2baseTL
+                      ethLogical    (17)  -- Logical Ethernet
+                 }
+
+
+HnBaudRateType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "Baud rate."
+    SYNTAX      INTEGER {
+                    baud2400      (1),
+                    baud4800      (2),
+                    baud9600      (3),
+                    baud19200     (4),
+                    baud38400     (5),
+                    baud57600     (6),
+                    baud115200    (7),
+                    baud230400    (8),
+                    baud460800    (9),
+                    baud921600   (10)
+                }
+
+
+HnRelayState ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "Alarm card relay state"
+    SYNTAX      INTEGER {
+                    open   (1),
+                    close  (2)
+                }
+
+
+HnRetrainReason ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "A value describing the reason for the last retrain
+                 of the PME."
+    SYNTAX      INTEGER {
+                    unknown                   (1),
+                    none                      (2),
+                    gsLossOfFraming           (3),
+                    upSnrMargin               (4),
+                    downSnrMargin             (5),
+                    spanProfileChange         (6),
+                    gsCrcErrors10e5           (7),
+                    gsCrcErrors10e7           (8),
+                    gsActivateTimeout         (9),
+                    gsDriver                 (10),
+                    gsEocTimeout             (11),
+                    adminChange              (12),
+                    createBonding            (13),
+                    deleteBonding            (14),
+                    configBonding            (15),
+                    autoBonding              (16),
+                    hnbdpRemove              (17),
+                    hnbdpStartTimeout        (18),
+                    hnbdpTimeout             (19),
+                    gsAbortRetry             (20),
+                    gsActivateRetry          (21),
+                    gs6465LockError          (22),
+                    pmeFsm                   (23),
+                    failover                 (24),
+                    gsHandshakeFailed        (25),
+                    gsHsModeOrAnnex          (26),
+                    linkLossForward          (27),
+                    dgpProbeRetrain          (28),
+                    dgpConfigChange          (29),
+                    gsShdslMode              (30),
+                    gsLcNotForwarding        (31),
+                    gsRepeaterConfig         (32),
+                    errDisable               (33),
+                    notApplicable            (34),
+                    tdmConfigChange          (35),
+                    tdmUnchannelizedMode     (36),
+                    tdmLossOfSignal          (37),
+                    tdmAlarmIndicationSignal (38),
+                    tdmLossOfFrame           (39),
+                    tdmRemoteAlarmIndication (40),
+                    tdmLoopback              (41),
+                    tdm6465LockFailure       (42),
+                    tdmBertTest              (43),
+                    tdmLineCodeViolations    (44),
+                    tdmPathCodeViolations    (45),
+                    mlpppCreate              (46),
+                    mlpppConfig              (47),
+                    mlpppDelete              (48),
+                    mlpppLcpStateChg         (49),
+                    gsIdleEvent              (50),
+                    ctcRetrain               (51),
+                    errDisableTimeout        (52)
+                }
+
+
+HnShdsl6465LockStateValue ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "An enumeration of possible protocol lock states
+                associated with a PME."
+    SYNTAX      INTEGER {
+                   shdsl6465NoLock       (0),
+                   shdsl6465NoFarEndLock (1),
+                   shdsl6465NoLocalLock  (2),  -- Illegal state
+                   shdsl6465Locked       (3),
+                   shdsl6465NoDataMode   (4)
+                }
+
+
+HnPmeHandshakeModeValue ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "An enumeration of possible handshake algorithms
+                associated with a PME."
+    SYNTAX      INTEGER {
+                   handshakeITU  (1),
+                   handshakeIEEE (2),
+                   handshakeAuto (3)  -- Both ITU and IEEE
+                }
+
+
+HnPmeAnnexValue ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "An enumeration of possible regional settings
+                associated with a PME."
+    SYNTAX      INTEGER {
+                   pmeAnnexA    (1),  -- Annex A ("region 1" in RFC 3276)
+                   pmeAnnexB    (2),  -- Annex B ("region 2" in RFC 3276)
+                   pmeAnnexAuto (3)   -- Negotiate setting with CPE
+                }
+
+
+------------------------------------------------------------------------
+--  Software Related TC's
+------------------------------------------------------------------------
+
+
+HnLastResetType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "This value indicates the reason for the last reset event."
+    SYNTAX      INTEGER {
+                    powerUpReboot       (16),
+                    watchdogReboot      (17),
+                    postFailureReboot   (18),
+                    vxworksReboot       (19),
+                    manualReboot        (20),
+                    faultReboot         (21),
+                    swupgradeReboot     (22),
+                    swwatchdogReboot    (23),
+                    scheduledReboot     (24),
+                    switchIdReboot      (25),
+                    masterSwDownReboot  (26),
+                    newMasterReboot     (27),
+                    frontButtonReboot   (28),
+                    unknownReboot       (254)
+                }
+
+
+HnResult ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "Result of Action"
+    SYNTAX      INTEGER {
+                    noAction  (1),
+                    busy      (2),
+                    complete  (3),
+                    failure   (4)
+                }
+
+
+HnSWVersion ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1d.1d.2d"
+    STATUS       current
+    DESCRIPTION  "A 3-digit software version specifier in the
+                 form major.minor.maintenance."
+    SYNTAX       OCTET STRING (SIZE (4))
+
+
+-------------------------------------------------------------------------------
+-- String Related TCs
+-------------------------------------------------------------------------------
+
+
+HnNameString ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "32a"
+    STATUS       current
+    DESCRIPTION  "A shortened DisplayString. Any object defined using this
+                 syntax may not exceed 32 characters in length."
+    SYNTAX       OCTET STRING (SIZE (0..32))
+
+
+HnDescriptionString ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "64a"
+    STATUS       current
+    DESCRIPTION  "A shortened DisplayString. Any object defined using this
+                 syntax may not exceed 64 characters in length."
+    SYNTAX       OCTET STRING (SIZE (0..64))
+
+
+HnCLLIString ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "14a"
+    STATUS       current
+    DESCRIPTION  "A shortened DisplayString. Any object defined using this
+                 syntax may not exceed 14 characters in length."
+    SYNTAX       OCTET STRING (SIZE (0..14))
+
+
+HnPasswordString ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "14a"
+    STATUS       current
+    DESCRIPTION  "A shortened DisplayString. Any object defined using this
+                 syntax may not exceed 10 characters in length."
+    SYNTAX       OCTET STRING (SIZE (0..10))
+
+
+HnDBChangeValue ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "255a"
+    STATUS       current
+    DESCRIPTION  "The value of the attribute that changed, encoded as an
+                 ASCII string.  For example if the changed object's syntax is
+                 INTEGER and its value is 5, then 0x35 is returned."
+    SYNTAX       OCTET STRING
+
+
+-------------------------------------------------------------------------------
+-- CFM TCs
+-------------------------------------------------------------------------------
+
+
+HnCfmMdId ::= TEXTUAL-CONVENTION
+   STATUS       current
+   DESCRIPTION  "A CFM maintenance domain ID."
+   SYNTAX       Unsigned32 (1..65535)
+
+
+HnCfmMaId ::= TEXTUAL-CONVENTION
+   STATUS       current
+   DESCRIPTION  "A CFM maintenance association ID."
+   SYNTAX       Unsigned32 (1..65535)
+
+
+HnCfmMpId ::= TEXTUAL-CONVENTION
+   STATUS       current
+   DESCRIPTION  "A CFM maintenance point ID."
+   SYNTAX       Unsigned32 (1..65535)
+
+
+-------------------------------------------------------------------------------
+-- SLA TCs
+-------------------------------------------------------------------------------
+
+
+HnSlaTestId ::= TEXTUAL-CONVENTION
+   STATUS       current
+   DESCRIPTION  "A SLA test ID."
+   SYNTAX       Unsigned32 (1..65535)
+
+
+HnSlaTestProtocol ::= TEXTUAL-CONVENTION
+   STATUS       current
+   DESCRIPTION  "A SLA test protocol layer.
+                 L2 tests run over Ethernet/CFM.
+                 L3 tests run over IP/UDP."
+   SYNTAX       INTEGER
+                {
+                   l2 (1),
+                   l3 (2)
+                }
+
+
+HnSlaStatInterval ::= TEXTUAL-CONVENTION
+   STATUS       current
+   DESCRIPTION  "A one-hour interval of cummulative SLA test statistics.
+                 The previous interval is not accessible until after the
+                 current interval has expired for the first time."
+   SYNTAX       INTEGER
+                {
+                   current  (1),
+                   previous (2)
+                }
+
+
+HnPercentage ::= TEXTUAL-CONVENTION
+   DISPLAY-HINT "d-3"
+   STATUS       current
+   DESCRIPTION  "A percentage measure with three decimal places of accuracy."
+   SYNTAX       Unsigned32 (0..100000)
+
+-------------------------------------------------------------------------------
+-- SLM TCs
+-------------------------------------------------------------------------------
+
+
+HnSlmTestId ::= TEXTUAL-CONVENTION
+   STATUS       current
+   DESCRIPTION  "A SLM test ID."
+   SYNTAX       Unsigned32 (1..80)
+
+
+HnSlmStatInterval ::= TEXTUAL-CONVENTION
+   STATUS       current
+   DESCRIPTION  "A one-hour interval of cummulative SLM test statistics.
+                 The previous interval is not accessible until after the
+                 current interval has expired for the first time."
+   SYNTAX       INTEGER
+                {
+                   current  (1),
+                   previous (2)
+                }
+
+-------------------------------------------------------------------------------
+-- Processor Related TCs
+-------------------------------------------------------------------------------
+
+
+HnProcessorType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION "Represents a type of processor running on a managed device.
+                 This can vary based on the number of processors employed by
+                 the device."
+
+    SYNTAX      INTEGER {
+                    cpu (1)
+                }
+
+
+-------------------------------------------------------------------------------
+-- Memory Related TCs
+-------------------------------------------------------------------------------
+
+
+HnMemoryType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION "Represents a type of memory available to a managed device.
+                 This can vary based on the number of processors and the
+                 memory management model employed by the device."
+
+    SYNTAX      INTEGER {
+                    cpuMemory (1)
+                }
+
+
+--------------------------------------------------------------------------
+-- BONDING related TCs
+--------------------------------------------------------------------------
+
+
+HnBondingValidationValue ::= TEXTUAL-CONVENTION
+     STATUS      current
+     DESCRIPTION "Enumerated list of possible validation methods that can be
+                  used to verify that PMEs on the port are connected to the
+                  same CPE."
+     SYNTAX      INTEGER {
+                     hnbdp         (1),
+                     none          (2)
+                 }
+
+HnBondingRemoteTypeValue ::= TEXTUAL-CONVENTION
+     STATUS       current
+     DESCRIPTION  "Enumerated list of remote device types used in configuring
+                   bonding table entries."
+     SYNTAX      INTEGER {
+                     unknown          (0),
+                     notPresent       (1),
+                     auto             (2),
+                     pme40            (3),  -- 40 PME
+                     pme4E1           (4),  -- 4 PME, 1 Ethernet
+                     pme8E1           (5),  -- 8 PME, 1 Ethernet
+                     pme4E2           (6),  -- 4 PME, 2 Ethernet
+                     pme8E2           (7),  -- 8 PME, 2 Ethernet
+                     pme4E2Sfp1       (8),  -- 4 PME, 2 Ethernet one of which is an SFP   (Not currently supported.)
+                     pme8E2Sfp1       (9),  -- 8 PME, 2 Ethernet one of which is an SFP
+                     pme4E1Sfp1       (10), -- 4 PME, 1 Ethernet which is an SFP          (Not currently supported.)
+                     pme8E1Sfp1       (11), -- 8 PME, 1 Ethernet which is an SFP          (Not currently supported.)
+                     pme2E1           (12), -- 2 PME, 1 Ethernet
+                     pme2E2           (13), -- 2 PME, 2 Ethernet                          (Not currently supported.)
+                     unmanaged        (14), -- Device is not locally managed
+                     pme4T4           (15), -- 4 PME, 4 TDM (T1E1), 1 Ethernet
+                     pme4T4E2         (16), -- 4 PME, 4 TDM (T1E1), 2 Ethernet
+                     pme4T4E2Sfp1     (17), -- 4 PME, 4 TDM (T1E1), 2 Ethernet one of which is an SFP
+                     t4E2             (18), -- 4 TDM (T1E1), 2 Ethernet
+                     t8E2             (19), -- 8 TDM (T1E1), 2 Ethernet
+                     pme4E4           (20), -- 4 PME, 4 Ethernet
+                     pme8E4           (21), -- 8 PME, 4 Ethernet
+                     pme4E2Sfp1G      (22), -- 4 PME, 2 Ethernet, one of which is a Gigabit SFP
+                     pme8E2Sfp1G      (23), -- 8 PME, 2 Ethernet, one of which is a Gigabit SFP  
+                     card8            (24)  -- Chassis type
+                 }
+
+HnBondingPmePortListValue ::= TEXTUAL-CONVENTION
+     STATUS       current
+     DESCRIPTION  "A colon-separated ifIndex list with exactly one ifIndex per
+                  token.  List must consist of ifIndices representing PMEs
+                  only.  For example, '100:105:-110:-120' will associate
+                  ifIndices 100 and 105 with the bonding and disassociate
+                  ifIndices 110 and 120.  The '-' prefix is only valid for
+                  sets subsequent to the creation of a bonding object; at
+                  creation the list must specify an explicit list of PME port
+                  ifIndices."
+     SYNTAX       OCTET STRING
+
+
+--------------------------------------------------------------------------
+-- ETHERNET related TCs
+--------------------------------------------------------------------------
+
+
+HnEthPortTypeValue ::= TEXTUAL-CONVENTION
+     STATUS      current
+     DESCRIPTION "Enumerated list of possible port types of an ethernet port."
+     SYNTAX      INTEGER {
+                     ieee2basetl       (1),
+                     ieee100baset      (2),
+                     ieee100basefx     (3),
+                     ieee1000baset     (4),
+                     ieee1000basefx    (5),
+                     lag               (6),
+                     craft             (7),
+                     stack             (8),
+                     switch            (9),
+                     dsx3              (10),
+                     unknown           (11),
+                     ppp               (12)
+                 }
+
+
+HnEthFlowCtlValue ::= TEXTUAL-CONVENTION
+     STATUS      current
+     DESCRIPTION "Enumerated list of possible values for setting or operation
+                 of ethernet port flow control configuration."
+     SYNTAX      INTEGER {
+                     on            (1),
+                     off           (2),
+                     unknown       (3)
+                 }
+
+
+HnEthDuplexModeValue  ::= TEXTUAL-CONVENTION
+     STATUS      current
+     DESCRIPTION "Enumerated list of possible values for setting or operation
+                 of ethernet port duplex configuration."
+     SYNTAX      INTEGER {
+                     unknown       (1),  -- not valid for writes
+                     half          (2),
+                     full          (3),
+                     auto          (4),
+                     na            (5)   -- not valid for writes
+                 }
+
+
+HnEthMdixModeValue  ::= TEXTUAL-CONVENTION
+     STATUS      current
+     DESCRIPTION "Enumerated list of possible values for setting or operation
+                 of MDIX configuration for an ethernet port."
+     SYNTAX      INTEGER {
+                     mdi           (0),
+                     mdix          (1),
+                     auto          (2),
+                     na            (3)
+                 }
+
+
+HnEthSpeedValue  ::= TEXTUAL-CONVENTION
+     STATUS      current
+     DESCRIPTION "Enumerated list of speed settings & operating values for
+                 an ethernet port."
+     SYNTAX      INTEGER {
+                     unknown       (0),
+                     auto          (1),
+                     mode10        (2),
+                     mode100       (3),
+                     mode1000      (4),
+                     variable      (5),
+                     na            (6)
+                 }
+
+
+HnEtherType ::= TEXTUAL-CONVENTION
+     DISPLAY-HINT "1x:"
+     STATUS       current
+     DESCRIPTION  "A value representing the Ether Type field in an Ethernet frame."
+     SYNTAX       OCTET STRING (SIZE (2))
+
+
+HnEthPbit ::= TEXTUAL-CONVENTION
+     STATUS      current
+     DESCRIPTION "A value representing the priority bit field in an Ethernet frame."
+     SYNTAX      Unsigned32 (0..7)
+
+
+HnEthVlanId ::= TEXTUAL-CONVENTION
+     STATUS      current
+     DESCRIPTION "A value representing the VLAN Id field in an Ethernet frame."
+     SYNTAX      Unsigned32 (0..4095)
+
+
+--------------------------------------------------------------------------
+-- EVC related TCs
+--------------------------------------------------------------------------
+
+
+HnEvcTypeValue ::= TEXTUAL-CONVENTION
+     STATUS      current
+     DESCRIPTION "Enumerated list of possible EVC types."
+     SYNTAX      INTEGER {
+                     eline         (0),
+                     elan          (1),
+                     remoteLag     (2)
+                 }
+
+HnEvcLimitActionValue ::= TEXTUAL-CONVENTION
+     STATUS      current
+     DESCRIPTION "Enumerated list of possible Limit actions that may
+                 be taken on an EVC in the event that the MAC address limit
+                 is reached."
+     SYNTAX      INTEGER {
+                     forward       (0),
+                     drop          (1),
+                     unknown       (255)
+                 }
+
+
+-------------------------------------------------------------------------------
+-- UNI related TCs
+-------------------------------------------------------------------------------
+
+
+HnUniPortTypeValue ::= TEXTUAL-CONVENTION
+     STATUS      current
+     DESCRIPTION "Enumerated list of possible UNI bridge port types."
+     SYNTAX      INTEGER {
+                     access        (1),
+                     trunk         (2)
+                 }
+
+HnUniCosMapTypeValue ::= TEXTUAL-CONVENTION
+     STATUS      current
+     DESCRIPTION "Enumerated list of possible UNI ingress VLAN COS mapping
+                 algorithms."
+     SYNTAX      INTEGER {
+                     fixed        (1),
+                     pbit         (2),
+                     dscp         (3),
+                     default      (4)
+                 }
+
+HnUniPbitCosMapList ::= TEXTUAL-CONVENTION
+     STATUS      current
+     DESCRIPTION "comma-separated list of 8 COS values (0-7) used to map a
+                 received tagged packet to a COS, based on the P-bits value
+                 in the packet's tag. Must be formatted 'x,x,x,x,x,x,x,x',
+                 where x is (0-7)."
+     SYNTAX      OCTET STRING(SIZE(15))
+
+
+-------------------------------------------------------------------------------
+-- EVCBIND related TCs
+-------------------------------------------------------------------------------
+
+
+HnEvcBindTypeValue ::= TEXTUAL-CONVENTION
+     STATUS      current
+     DESCRIPTION "Enumerated list of possible EVC Binding types. Traffic
+                 is automatically filtered to prohibit all communication
+                 between two bindings of type spoke."
+     SYNTAX      INTEGER {
+                     standard      (1),
+                     spoke         (2)
+                 }
+
+HnVlanPreservationValue ::= TEXTUAL-CONVENTION
+     STATUS      current
+     DESCRIPTION "Enumerated list of possible VLAN tag preservation values.
+                 If 'on' then always preserve VLAN IDs on the EVC Binding.
+                 If 'auto' then only preserve VLAN IDs if the EVC Binding
+                 is configured to handle unknown VLAN IDs or a VLAN list
+                 consisting of more than one VLAN ID. If 'off' then do not
+                 preserve VLAN IDs on the EVC Binding. Cannot be set to
+                 'off' if the EVC Binding is configured to handle unknown
+                 VLAN IDs or a VLAN list consisting of more than one VLAN
+                 ID."
+     SYNTAX      INTEGER {
+                     auto          (1),
+                     on            (2),
+                     off           (3)
+                 }
+
+HnEvcBindVlanList ::= TEXTUAL-CONVENTION
+     STATUS      current
+     DESCRIPTION "comma-separated list of VLAN IDs (0-4094). Used to set
+                 or change the existing set of VLAN IDs. On a trunk UNI a
+                 VLAN ID of 0 is only allowed if the defVlanId for the UNI
+                 is 0. For example, '300-500,-2,-200' will associate VLAN
+                 IDs 300-500 with the EVC Binding and disassociate VLAN IDs
+                 2 and 200. The prefixes '+' and '-' are only valid for sets
+                 subsequent to the creation of an EVC Binding object; at
+                 creation the list must specify an explicit list of VLAN
+                 IDs."
+     SYNTAX      OCTET STRING(SIZE(0..640))
+
+
+HnEvcBindVlanLbTypeValue ::= TEXTUAL-CONVENTION
+     STATUS      current
+     DESCRIPTION "VLAN loopback type."
+     SYNTAX      INTEGER {
+                     ingress      (1),
+                     egress       (2)
+                 } 
+                 
+HnVlanLoopbackVlanIdList ::= TEXTUAL-CONVENTION
+     STATUS      current
+     DESCRIPTION "Slash-separated list of up to three VLAN IDs (0-4094). 
+                 Used to set or change the existing set of VLAN IDs.  The
+                 star ('*') character is used to indicate a don't care 
+                 value (will match any VlanId). At
+                 creation the list must specify an explicit list of VLAN
+                 IDs."
+     SYNTAX      OCTET STRING(SIZE(0..16))
+
+-------------------------------------------------------------------------------
+-- LAG related TCs
+-------------------------------------------------------------------------------
+
+
+HnLagLoadBalanceValue ::= TEXTUAL-CONVENTION
+     STATUS      current
+     DESCRIPTION "Enumerated list of possible methods for balancing traffic load
+                 among ports in a LAG, one of {srcDstMac*,evcId}."
+     SYNTAX      INTEGER {
+                     invalid      (0),
+                     srcDstMac    (2753),   -- 0x0AC1 hex
+                     evcId        (57538)   -- 0xE0C2 hex
+                 }
+
+HnLagPortListValue ::= TEXTUAL-CONVENTION
+     STATUS      current
+     DESCRIPTION "A colon-separated ifIndex list with exactly one ifIndex per
+                 token.  List must consist of ifIndices representing only one
+                 port type {high-speed module or 2BASE-TL}.  For example,
+                 '100:105:-110:-120' will associate ifIndices 100 and
+                 105 with the LAG and disassociate ifIndices 110 and 120.
+                 The '-' prefix is only valid for sets subsequent to the
+                 creation of a LAG object; at creation the list must specify
+                 an explicit list of Ethernet port ifIndices."
+     SYNTAX      OCTET STRING(SIZE(0..96))
+
+
+-------------------------------------------------------------------------------
+-- TDR & AFDI related TCs
+-------------------------------------------------------------------------------
+
+
+HnTdrGaugeValue ::= TEXTUAL-CONVENTION
+     STATUS      current
+     DESCRIPTION "Enumerated list of wire gauges that can be configured for
+                 TDR testing."
+     SYNTAX      INTEGER {
+                    gaugeNone        (0),
+                    gaugeNA          (1),
+                    englishAwg19    (19),
+                    englishAwg22    (22),
+                    englishAwg24    (24),
+                    englishAwg26    (26),
+                    metricMM032     (32),
+                    metricMM040     (40),
+                    metricMM050     (50),
+                    metricMM063     (63),
+                    metricMM090     (90)
+                 }
+
+
+HnTdrModeValue ::= TEXTUAL-CONVENTION
+     STATUS      current
+     DESCRIPTION "Enumeration of possible TDR test modes."
+     SYNTAX      INTEGER {
+                     none        (0),
+                     na          (1),
+                     diagnostic  (2),
+                     initial     (3),
+                     auto        (4)
+                 }
+
+
+HnTdrResultValue ::= TEXTUAL-CONVENTION
+     STATUS      current
+     DESCRIPTION "Enumeration of possible test outcomes resulting from a TDR
+                 test."
+     SYNTAX      INTEGER {
+                    noResultFound         (0),
+                    resultFoundNA         (1),
+                    noFaultFoundEnglish   (2883840),   -- 0x002c0100 hex
+                    noFaultFoundMetric    (2884096),   -- 0x002c0200 hex
+                    highImpFoundBeginning (2883600),   -- 0x002c0010 hex
+                    highImpFoundEnglish   (2883856),   -- 0x002c0110 hex
+                    highImpFoundMetric    (2884112),   -- 0x002c0210 hex
+                    lowImpFoundBeginning  (2883616),   -- 0x002c0020 hex
+                    lowImpFoundEnglish    (2883872),   -- 0x002c0120 hex
+                    lowImpFoundMetric     (2884128),   -- 0x002c0220 hex
+                    openFoundEnglish      (2883888),   -- 0x002c0130 hex
+                    openFoundMetric       (2884144),   -- 0x002c0230 hex
+                    shortFoundEnglish     (2883904),   -- 0x002c0140 hex
+                    shortFoundMetric      (2884160),   -- 0x002c0240 hex
+                    unpow400FoundEnglish  (2883920),   -- 0x002c0150 hex
+                    unpow400FoundMetric   (2884176),   -- 0x002c0250 hex
+                    pow400FoundEnglish    (2883936),   -- 0x002c0160 hex
+                    pow400FoundMetric     (2884192)    -- 0x002c0260 hex
+                 }
+
+
+HnTdrAfdiFaultValue ::= TEXTUAL-CONVENTION
+     STATUS      current
+     DESCRIPTION "Enumeration of possible AFDI Fault Type values."
+     SYNTAX      INTEGER {
+                     none           (0),
+                     line           (1),
+                     device         (2),
+                     power          (3)
+                 }
+
+
+HnTdrStatusValue ::= TEXTUAL-CONVENTION
+     STATUS      current
+     DESCRIPTION "Enumeration of possible test status values."
+     SYNTAX      INTEGER {
+                     none           (1),
+                     inProgress     (2),
+                     complete       (3)
+                 }
+
+
+HnTdrResultActionValue ::= TEXTUAL-CONVENTION
+     STATUS      current
+     DESCRIPTION "Enumeration of actions that can be requested of the
+                 TDR function."
+     SYNTAX      INTEGER {
+                     none           (1),
+                     saveLastRun    (2),
+                     clearLastRun   (3)
+                 }
+
+
+HnTdrNextTestActionValue ::= TEXTUAL-CONVENTION
+     STATUS      current
+     DESCRIPTION "Enumeration of next-test actions that can be requested
+                 for the TDR test function."
+     SYNTAX      INTEGER {
+                     none           (1),
+                     runTest        (2)
+                 }
+
+
+HnTdrResultIndexValue ::= TEXTUAL-CONVENTION
+     STATUS      current
+     DESCRIPTION "Enumeration of sets of test results available for a given
+                 PME."
+     SYNTAX      INTEGER {
+                     lastRun        (1),
+                     saved          (2)
+                 }
+
+
+-------------------------------------------------------------------------------
+-- ACC TCs
+-------------------------------------------------------------------------------
+
+
+HnAccInIndex ::= TEXTUAL-CONVENTION
+   STATUS        current
+   DESCRIPTION   "An ACC input port index."
+   SYNTAX        Unsigned32 (1..3)
+
+
+-------------------------------------------------------------------------------
+-- Traffic Generation and Monitoring related TCs
+-------------------------------------------------------------------------------
+
+
+HnTrafficActionValue ::= TEXTUAL-CONVENTION
+     STATUS      current
+     DESCRIPTION "An enumerated list of possible actions."
+     SYNTAX      INTEGER {
+                     start         (0),   -- TRAF_ACTION_START
+                     stop          (1),   -- TRAF_ACTION_STOP
+                     none          (2)    -- TRAF_ACTION_NA
+                 }
+
+
+HnTrafficStatusValue ::= TEXTUAL-CONVENTION
+     STATUS      current
+     DESCRIPTION "Enumerated list of possible status values."
+     SYNTAX      INTEGER {
+                     initial       (0),   -- TRAF_STATUS_INITIAL
+                     inProgress    (1),   -- TRAF_STATUS_IN_PROGRESS
+                     aborted       (2),   -- TRAF_STATUS_ABORTED
+                     completed     (3),   -- TRAF_STATUS_COMPLETED
+                     error         (4)    -- TRAF_STATUS_ERROR
+                 }
+
+
+HnTrafficDurationValue ::= TEXTUAL-CONVENTION
+     STATUS      current
+     DESCRIPTION "A time value in seconds. Zero means forever."
+     SYNTAX      Unsigned32 (0..3600)
+
+
+HnTrafficStreamHeader ::= TEXTUAL-CONVENTION
+     DISPLAY-HINT "1x:"
+     STATUS       current
+     DESCRIPTION  "A value used to define the contents of an Ethernet frame."
+     SYNTAX       OCTET STRING (SIZE (0..64))
+
+ 
+-------------------------------------------------------------------------------
+-- Other TCs
+-------------------------------------------------------------------------------
+
+
+HnUDPAddress ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1d.1d.1d.1d/2d"
+    STATUS       current
+    DESCRIPTION "Represents a UDP address:
+                 octets   contents        encoding
+                  1-4     IP-address      network-byte order
+                  5-6     UDP-port        network-byte order "
+    SYNTAX       OCTET STRING (SIZE (6))
+
+
+HnSnmpCommunityLevel ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "SNMP community's privilege level"
+    SYNTAX      INTEGER {
+                    readWriteAll    (1),
+                    readWrite       (2),
+                    readOnly        (3)
+                    }
+
+
+HnDirtyBit ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "Indicates if there exists a difference between two objects.
+                   unknown             - Unknown. Initial value.
+                   noChanges           - No difference.
+                   mayHaveChanged      - There may be a difference.
+                   definitelyChanged   - There definitely is a difference."
+    SYNTAX      INTEGER {
+                    unknown            (1),
+                    noChanges          (2),
+                    mayHaveChanged     (3),
+                    definitelyChanged  (4)
+                }
+
+
+HnPerfMonIntervalType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION "Identifies the Performance Monitoring Interval Type."
+    SYNTAX       INTEGER {
+                   interval-15min (1),
+                   interval-1day  (2),
+                   rollover (3),
+                   interval-1hour (5)
+                 }
+
+END
+

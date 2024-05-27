@@ -1,0 +1,143 @@
+HN-SMI DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-IDENTITY,
+    enterprises                           FROM SNMPv2-SMI;
+
+hnSMI MODULE-IDENTITY
+    LAST-UPDATED "201110100000Z"
+    ORGANIZATION "Overture Networks"
+    CONTACT-INFO "Technical Assistance Center
+
+                  Overture Networks
+                  637 Davis Drive
+                  Morrisville, NC 27560
+
+                  Tel: +1 919 337 4100
+                  Fax: +1 919 337 4149
+
+                  E-mail: support@OvertureNetworks.com
+                  Web   : www.overturenetworks.com"
+
+    DESCRIPTION "This MIB contains the structure of management information
+                for Overture Networks devices."
+
+    REVISION     "201110100000Z"
+    DESCRIPTION  "Convert contact information to Overture Networks"
+
+    REVISION    "200902270000Z"
+    DESCRIPTION "Added hn500Device and hn500 identifiers."
+
+    REVISION    "200901220000Z"
+    DESCRIPTION "Added hn600Device, hn6100Device, and hn600 identifiers."
+
+    REVISION    "200808250000Z"
+    DESCRIPTION "Updated for Hatteras Networks Software Release 7.0.0"
+
+    REVISION    "200804180000Z"
+    DESCRIPTION "Added hn4000e identifier."
+
+    REVISION    "200606110000Z"
+    DESCRIPTION "Added hnPerfMon identifier."
+
+    REVISION    "200409300000Z"
+    DESCRIPTION "Initial version."
+
+    ::= { hnDefinitions 1 }
+
+
+hatterasNetworks        OBJECT IDENTIFIER ::= { enterprises 8550 }
+
+hnDefinitions           OBJECT IDENTIFIER ::= { hatterasNetworks 1 }
+hnCommon                OBJECT IDENTIFIER ::= { hatterasNetworks 2 }
+hnDevices               OBJECT IDENTIFIER ::= { hatterasNetworks 3 }
+hnExperimental          OBJECT IDENTIFIER ::= { hatterasNetworks 99 }
+
+hn400Device             OBJECT IDENTIFIER ::= { hnDevices 1 }
+hn4000Device            OBJECT IDENTIFIER ::= { hnDevices 2 }
+hn600Device             OBJECT IDENTIFIER ::= { hnDevices 3 }
+hn6100Device            OBJECT IDENTIFIER ::= { hnDevices 4 }
+hn500Device             OBJECT IDENTIFIER ::= { hnDevices 5 }
+
+hnSystem                OBJECT IDENTIFIER ::= { hnCommon 1 }
+hnServices              OBJECT IDENTIFIER ::= { hnCommon 2 }
+hnDiagnostics           OBJECT IDENTIFIER ::= { hnCommon 3 }
+hnControls              OBJECT IDENTIFIER ::= { hnCommon 4 }
+hnProfile               OBJECT IDENTIFIER ::= { hnCommon 5 }
+hnProtocols             OBJECT IDENTIFIER ::= { hnCommon 6 }
+hnInterfaces            OBJECT IDENTIFIER ::= { hnCommon 7 }
+hnTunnels               OBJECT IDENTIFIER ::= { hnCommon 8 }
+hnPerfMon               OBJECT IDENTIFIER ::= { hnCommon 9 }
+
+
+--
+-- Overture product definitions
+--
+
+hnProductIdGroup        OBJECT IDENTIFIER ::= { hnSMI 1 }
+
+
+hn400 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION "Overture Networks' authoritative identification
+                of the HN400 product family. The HN400 product
+                family includes the HN408 and the HN404"
+    REFERENCE   "See the HN400 User's Manual."
+    ::= { hnProductIdGroup 1 }
+
+
+hn4000 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION "Overture Networks' authoritative identification
+                of the HN4000 product."
+    REFERENCE   "See the HN4000 User's Manual."
+    ::= { hnProductIdGroup 2 }
+
+
+hn400i OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION "Overture Networks' authoritative identification
+                of the HN400i product family."
+    REFERENCE   "See the HN400i User's Manual."
+    ::= { hnProductIdGroup 3 }
+
+
+hn4000i OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION "Overture Networks' authoritative identification
+                of the HN4000i product."
+    REFERENCE   "See the HN4000i User's Manual."
+    ::= { hnProductIdGroup 4 }
+
+
+hn4000e OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION "Overture Networks' authoritative identification
+                of the HN4000e product."
+    REFERENCE   "See the HN4000e User's Manual."
+    ::= { hnProductIdGroup 5 }
+
+
+hn6100 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION "Overture Networks' authoritative identification
+                of the HN6100 product."
+    REFERENCE   "See the HN6100 User's Manual."
+    ::= { hnProductIdGroup 6 }
+
+
+hn600 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION "Overture Networks' authoritative identification
+                of the HN600 product family."
+    REFERENCE   "See the HN600 User's Manual."
+    ::= { hnProductIdGroup 7 }
+
+hn500 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION "Overture Networks' authoritative identification
+                of the HN500 product family."
+    REFERENCE   "See the HN500 User's Manual."
+    ::= { hnProductIdGroup 8 }
+
+END

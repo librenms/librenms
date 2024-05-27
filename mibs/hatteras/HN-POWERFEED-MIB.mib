@@ -1,0 +1,207 @@
+HN-POWERFEED-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    NOTIFICATION-TYPE, Unsigned32                   FROM SNMPv2-SMI
+
+    TruthValue                                      FROM SNMPv2-TC
+
+    HnObjectState, HnOperState                      FROM HN-TC
+
+    hnSystem                                        FROM HN-SMI
+
+    hnEventHistoryId, hnEventHistoryType,
+    hnEventHistoryDescr, hnEventHistorySeverity,
+    hnEventHistoryServiceAffected,
+    hnEventHistoryTimeValue                         FROM HN-ALARM-MIB;
+
+
+hnPowerFeedMIB  MODULE-IDENTITY
+    LAST-UPDATED "201110100000Z"
+    ORGANIZATION "Overture Networks"
+    CONTACT-INFO "Technical Assistance Center
+
+                  Overture Networks
+                  637 Davis Drive
+                  Morrisville, NC 27560
+
+                  Tel: +1 919 337 4100
+                  Fax: +1 919 337 4149
+
+                  E-mail: support@OvertureNetworks.com
+                  Web   : www.overturenetworks.com"
+
+    DESCRIPTION  "This MIB module describes Power Feed information for
+                 Overture Networks products."
+
+    REVISION     "201110100000Z"
+    DESCRIPTION  "Convert contact information to Overture Networks"
+
+    REVISION     "200810130000Z"
+    DESCRIPTION  "Updated for HN4000 Release 6.2.0 and
+                 HN400 Release 6.2.0"
+
+    REVISION     "200410130000Z"
+    DESCRIPTION  "This is the initial version of the HN Power Feed MIB."
+
+    ::= { hnSystem 3 }
+
+
+
+--
+-- High-level groups in this mib
+--
+
+
+hnPowerFeedGroup OBJECT IDENTIFIER ::= { hnPowerFeedMIB 1 }
+
+
+---------------------------------------------------------------------------
+-- HN Power Feed Group
+---------------------------------------------------------------------------
+
+
+hnPowerFeedScalars OBJECT IDENTIFIER ::= { hnPowerFeedGroup 1 }
+
+   --
+   -- Power Feed Table
+   --
+
+hnPowerFeedTable   OBJECT-TYPE
+    SYNTAX      SEQUENCE OF HnPowerFeedEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "A table of Power Feed entries."
+    ::= { hnPowerFeedGroup 2 }
+
+
+hnPowerFeedEntry OBJECT-TYPE
+    SYNTAX      HnPowerFeedEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Each entry describes the attributes of the Power Feed."
+    INDEX       { hnPowerFeedDeviceId,
+                  hnPowerFeedId }
+    ::= { hnPowerFeedTable 1 }
+
+
+HnPowerFeedEntry ::=
+    SEQUENCE {
+        hnPowerFeedDeviceId        Unsigned32,  -- index
+        hnPowerFeedId              Unsigned32,  -- index
+        hnPowerFeedObjectState     HnObjectState,
+        hnPowerFeedAllowAlarms     TruthValue,
+        hnPowerFeedOperState       HnOperState
+    }
+
+
+hnPowerFeedDeviceId OBJECT-TYPE
+    SYNTAX      Unsigned32(0..65535)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "A unique value identifying each device controlled by this
+                SNMP agent, where each device is defined as a physically
+                separate entity.  Each SNMP agent can manage multiple devices
+                to support integrated management of multiple devices under one
+                control entity.  This multi-system management approach
+                supports:
+                  - Multiple 'central-office' devices such as two HN4000s in a
+                    stacked configuration managed by a single SNMP agent.
+                  - One or more 'customer premise' devices in addition to the
+                    central-office device(s), providing integrated visibility
+                    into the distributed system.
+                The assignment of the unique identifier is system dependent.
+                For example on an HN4000, the identifiers 1..5 are used to
+                identify central-office HN4000s in a stacked configuration,
+                while identifiers 1001..1200 are used to indicate customer
+                premise devices."
+    ::= { hnPowerFeedEntry 1 }
+
+
+hnPowerFeedId OBJECT-TYPE
+    SYNTAX      Unsigned32(0..65535)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "A unique value, larger than zero, identifying each Power
+                Feed in device."
+    ::= { hnPowerFeedEntry 2 }
+
+
+hnPowerFeedObjectState OBJECT-TYPE
+    SYNTAX      HnObjectState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The detailed object state of the Power Feed object."
+    ::= { hnPowerFeedEntry 3 }
+
+
+hnPowerFeedAllowAlarms OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "This attribute allows the alarm associated with a Power
+                Feed to be masked.  This can be used if only one of the
+                Power Feeds will ever be connected."
+    DEFVAL      { 1 }
+    ::= { hnPowerFeedEntry 4 }
+
+
+hnPowerFeedOperState OBJECT-TYPE
+    SYNTAX      HnOperState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The overall operating state of the Power Feed object."
+    ::= { hnPowerFeedEntry 5 }
+
+
+----------------------------------------------------------------------------------
+-- hnPowerFeedNotifications
+--
+-- Power Feed notification enables and definitions.
+----------------------------------------------------------------------------------
+
+
+hnPowerFeedNotificationEnables OBJECT IDENTIFIER ::= { hnPowerFeedMIB 2 }
+
+
+hnPowerFeedEnablePowerFeedNotifications OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "When true, the sending of the Power Feed notifications
+                defined below are enabled. When false, they are disabled."
+    DEFVAL      {true}
+    ::= { hnPowerFeedNotificationEnables 1 }
+
+
+-- The following two OBJECT IDENTIFIERS are used to define SNMPv2 Notifications
+-- that are backward compatible with SNMPv1 Traps.
+hnPowerFeedNotifications  OBJECT IDENTIFIER ::= { hnPowerFeedMIB 3 }
+hnPowerFeedNotificationPrefix OBJECT IDENTIFIER ::= { hnPowerFeedNotifications 0 }
+
+
+hnPowerFeedFailNotification NOTIFICATION-TYPE
+    OBJECTS     { hnPowerFeedObjectState,
+                  hnEventHistoryId,
+                  hnEventHistoryType,
+                  hnEventHistoryDescr,
+                  hnEventHistorySeverity,
+                  hnEventHistoryServiceAffected,
+                  hnEventHistoryTimeValue }
+    STATUS      current
+    DESCRIPTION "A notification indicating that one of the device's power
+                feeds has failed, or recovered from a failure. This trap is
+                sent whenever the power feed alarm is raised or cleared.
+                hnPowerFeedObjectState is the object (operational) state of
+                the power feed.  hnEventHistoryId is the index identifying the
+                row in the hnEventHistoryTable (HN-ALARM-MIB) corresponding to
+                the event that generated this notification.  hnHistoryType is
+                the event type.  hnEventHistoryDescr is a string describing
+                the event.  hnEventHistorySeverity indicates whether the alarm
+                was raised or cleared, and the severity of the event.
+                hnEventHistoryServiceAffected indicates whether or not the
+                event affects service.  hnEventHistoryTimeValue indicates the
+                time when the event occurred."
+    ::= { hnPowerFeedNotificationPrefix 1 }
+
+END
