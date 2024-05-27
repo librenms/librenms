@@ -763,6 +763,10 @@ return [
                 'description' => 'Attempt to Geocode Locations',
                 'help' => 'Try to lookup latitude and longitude via geocoding API during polling',
             ],
+            'layer' => [
+                'description' => 'Initial Map Layer',
+                'help' => 'Initial map layer to display when showing various Geo Maps',
+            ],
         ],
         'graphite' => [
             'enable' => [
