@@ -3468,7 +3468,7 @@ extend wireguard /etc/snmp/wireguard.py
 1: Install the depends.
 ```
 ### FreeBSD
-pkg install p5-JSON p5-MIME-Base64 p5-Gzip-Faster
+pkg install p5-JSON p5-MIME-Base64 p5-Gzip-Faster p5-File-Slurp
 ### Debian
 apt-get install -y cpanminus zlib1g-dev
 cpanm Mime::Base64 JSON Gzip::Faster

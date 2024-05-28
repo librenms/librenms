@@ -363,10 +363,6 @@ return [
             'description' => 'Journaux de connexions plus anciens que',
             'help' => 'Nettoyage effectué par daily.sh',
         ],
-        'device_perf_purge' => [
-            'description' => 'Stats de performances plus anciennes que',
-            'help' => 'Statistiques de performances des équipements. Le nettoyage effectué par daily.sh',
-        ],
         'discovery_modules' => [
             'arp-table' => [
                 'description' => 'Table ARP',

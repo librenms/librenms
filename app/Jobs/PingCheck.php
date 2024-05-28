@@ -26,7 +26,6 @@
 namespace App\Jobs;
 
 use App\Models\Device;
-use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -34,18 +33,13 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Collection;
 use LibreNMS\Alert\AlertRules;
-use LibreNMS\Config;
-use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Data\Source\Fping;
+use LibreNMS\Data\Source\FpingResponse;
 use LibreNMS\Util\Debug;
-use Symfony\Component\Process\Process;
 
 class PingCheck implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
-
-    private $command;
-    private $wait;
-    private $rrd_tags;
 
     /** @var \Illuminate\Database\Eloquent\Collection<string, Device>|null List of devices keyed by hostname */
     private $devices;
@@ -71,20 +65,6 @@ class PingCheck implements ShouldQueue
         if (is_array($groups)) {
             $this->groups = $groups;
         }
-
-        // define rrd tags
-        $rrd_step = Config::get('ping_rrd_step', Config::get('rrd.step', 300));
-        $rrd_def = RrdDefinition::make()->addDataset('ping', 'GAUGE', 0, 65535, $rrd_step * 2);
-        $this->rrd_tags = ['rrd_def' => $rrd_def, 'rrd_step' => $rrd_step];
-
-        // set up fping process
-        $timeout = Config::get('fping_options.timeout', 500); // must be smaller than period
-        $retries = Config::get('fping_options.retries', 2);  // how many retries on failure
-        $tos = Config::get('fping_options.tos', 0);  // TOS marking
-        $fping = Config::get('fping', 'fping'); // use user defined binary
-
-        $this->command = [$fping, '-f', '-', '-e', '-t', $timeout, '-r', $retries, '-O', $tos];
-        $this->wait = Config::get('rrd.step', 300) * 2;
     }
 
     /**
@@ -98,46 +78,12 @@ class PingCheck implements ShouldQueue
 
         $this->fetchDevices();
 
-        $process = new Process($this->command, null, null, null, $this->wait);
-
-        d_echo($process->getCommandLine() . PHP_EOL);
-
-        // send hostnames to stdin to avoid overflowing cli length limits
         $ordered_device_list = $this->tiered->get(1, collect())->keys()// root nodes before standalone nodes
         ->merge($this->devices->keys())
-            ->unique()
-            ->implode(PHP_EOL);
+            ->unique()->all();
 
-        $process->setInput($ordered_device_list);
-        $process->start(); // start as early as possible
-
-        foreach ($process as $type => $line) {
-            d_echo($line);
-
-            if (Process::ERR === $type) {
-                // Check for devices we couldn't resolve dns for
-                if (preg_match('/^(?<hostname>[^\s]+): (?:Name or service not known|Temporary failure in name resolution)/', $line, $errored)) {
-                    $this->recordData($errored['hostname'], 'unreachable');
-                }
-                continue;
-            }
-
-            if (preg_match_all(
-                '/^(?<hostname>[^\s]+) is (?<status>alive|unreachable)(?: \((?<rtt>[\d.]+) ms\))?/m',
-                $line,
-                $captured
-            )) {
-                foreach ($captured[0] as $index => $matched) {
-                    $this->recordData(
-                        $captured['hostname'][$index],
-                        $captured['status'][$index],
-                        $captured['rtt'][$index] ?: 0
-                    );
-                }
-
-                $this->processTier();
-            }
-        }
+        // bulk ping and send FpingResponse's to recordData as they come in
+        app()->make(Fping::class)->bulkPing($ordered_device_list, [$this, 'handleResponse']);
 
         // check for any left over devices
         if ($this->deferred->isNotEmpty()) {
@@ -211,8 +157,8 @@ class PingCheck implements ShouldQueue
         $this->current = $this->tiered->get($this->current_tier);
 
         // update and remove devices in the current tier
-        foreach ($this->deferred->pull($this->current_tier, []) as $data) {
-            $this->recordData(...$data);
+        foreach ($this->deferred->pull($this->current_tier, []) as $fpingResponse) {
+            $this->handleResponse($fpingResponse);
         }
 
         // try to process the new tier in case we took care of all the devices
@@ -223,13 +169,13 @@ class PingCheck implements ShouldQueue
      * If the device is on the current tier, record the data and remove it
      * $data should have keys: hostname, status, and conditionally rtt
      */
-    private function recordData(string $hostname, string $status, float $rtt = 0): void
+    public function handleResponse(FpingResponse $response): void
     {
         if (Debug::isVerbose()) {
-            echo "Attempting to record data for $hostname... ";
+            echo "Attempting to record data for $response->host... ";
         }
 
-        $device = $this->devices->get($hostname);
+        $device = $this->devices->get($response->host);
 
         // process the data if this is a standalone device or in the current tier
         if ($device->max_depth === 0 || $this->current->has($device->hostname)) {
@@ -238,26 +184,21 @@ class PingCheck implements ShouldQueue
             }
 
             // mark up only if snmp is not down too
-            $device->status = ($status == 'alive' && $device->status_reason != 'snmp');
-            $device->last_ping = Carbon::now();
-            $device->last_ping_timetaken = $rtt;
-
+            $device->status = ($response->success() && $device->status_reason != 'snmp');
             if ($device->isDirty('status')) {
                 // if changed, update reason
                 $device->status_reason = $device->status ? '' : 'icmp';
                 $type = $device->status ? 'up' : 'down';
             }
 
-            $device->save(); // only saves if needed (which is every time because of last_ping)
+            // save last_ping_timetaken and rrd data
+            $response->saveStats($device);
 
             if (isset($type)) { // only run alert rules if status changed
                 echo "Device $device->hostname changed status to $type, running alerts\n";
                 $rules = new AlertRules;
                 $rules->runRules($device->device_id);
             }
-
-            // add data to rrd
-            app('Datastore')->put($device->toArray(), 'ping-perf', $this->rrd_tags, ['ping' => $device->last_ping_timetaken]);
 
             // done with this device
             $this->complete($device->hostname);
@@ -267,8 +208,10 @@ class PingCheck implements ShouldQueue
                 echo "Deferred\n";
             }
 
-            $this->defer($hostname, $status, $rtt);
+            $this->defer($response);
         }
+
+        $this->processTier();
     }
 
     /**
@@ -285,19 +228,22 @@ class PingCheck implements ShouldQueue
     /**
      * Defer this data processing until all parent devices are complete
      */
-    private function defer(string $hostname, string $status, float $rtt): void
+    private function defer(FpingResponse $response): void
     {
-        $device = $this->devices->get($hostname);
+        $device = $this->devices->get($response->host);
+        if ($device == null) {
+            dd("could not find $response->host");
+        }
 
         if ($this->deferred->has($device->max_depth)) {
             // add this data to the proper tier, unless it already exists...
             $tier = $this->deferred->get($device->max_depth);
             if (! $tier->has($device->hostname)) {
-                $tier->put($device->hostname, [$hostname, $status, $rtt]);
+                $tier->put($device->hostname, $response);
             }
         } else {
             // create a new tier containing this data
-            $this->deferred->put($device->max_depth, collect([$device->hostname => [$hostname, $status, $rtt]]));
+            $this->deferred->put($device->max_depth, collect([$device->hostname => $response]));
         }
     }
 }

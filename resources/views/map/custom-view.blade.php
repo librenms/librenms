@@ -11,9 +11,16 @@
   </div>
   <div class="row">
     <div class="col-md-12">
-      <center>
+      <div id="map-container">
         <div id="custom-map"></div>
-      </center>
+        <x-geo-map id="custom-map-bg-geo-map"
+           :init="$background_type == 'map'"
+           :width="$map_conf['width']"
+           :height="$map_conf['height']"
+           :config="$background_config"
+           readonly
+        />
+      </div>
     </div>
   </div>
 </div>
@@ -21,11 +28,34 @@
 
 @section('javascript')
 <script type="text/javascript" src="{{ asset('js/vis.min.js') }}"></script>
+<script type="text/javascript" src="{{ asset('js/leaflet.js') }}"></script>
+<script type="text/javascript" src="{{ asset('js/L.Control.Locate.min.js') }}"></script>
 @endsection
+
+@push('styles')
+<style>
+    #map-container {
+        display: grid;
+        grid-template: 1fr / 1fr;
+        place-items: center;
+    }
+    #custom-map {
+        grid-column: 1 / 1;
+        grid-row: 1 / 1;
+        z-index: 2;
+    }
+    #custom-map-bg-geo-map {
+        grid-column: 1 / 1;
+        grid-row: 1 / 1;
+        z-index: 1;
+    }
+</style>
+@endpush
 
 @section('scripts')
 <script type="text/javascript">
-    var bgimage = {{ $background ? "true" : "false" }};
+    var bgtype = {{ Js::from($background_type) }};
+    var bgdata = {{ Js::from($background_config) }};
     var screenshot = {{ $screenshot ? "true" : "false" }};
     var reverse_arrows = {{$reverse_arrows}};
     var legend = @json($legend);
@@ -38,6 +68,7 @@
     var node_device_map = {};
     var node_link_map = {};
     var custom_image_base = "{{ $base_url }}images/custommap/icons/";
+    var network_options = {{ Js::from($map_conf) }};
 
     function legendPctColour(pct) {
         if (pct < 0) {
@@ -99,20 +130,16 @@
         network_edges.flush();
 
         var container = document.getElementById('custom-map');
-        var options = {!! json_encode($map_conf) !!};
+        network = new vis.Network(container, {nodes: network_nodes, edges: network_edges, stabilize: true}, network_options);
 
-        network = new vis.Network(container, {nodes: network_nodes, edges: network_edges, stabilize: true}, options);
+        // width/height might be % get values in pixels
         network_height = $($(container).children(".vis-network")[0]).height();
         network_width = $($(container).children(".vis-network")[0]).width();
-        var centreY = parseInt(network_height / 2);
-        var centreX = parseInt(network_width / 2);
-
+        var centreY = Math.round(network_height / 2);
+        var centreX = Math.round(network_width / 2);
         network.moveTo({position: {x: centreX, y: centreY}, scale: 1});
 
-        if(bgimage) {
-            canvas = $("#custom-map").children()[0].canvas;
-            $(canvas).css('background-image','url({{ route('maps.custom.background', ['map' => $map_id]) }}?ver={{$bgversion}})').css('background-size', 'cover');
-        }
+        setCustomMapBackground('custom-map', bgtype, bgdata);
 
         network.on('doubleClick', function (properties) {
             edge_id = null;

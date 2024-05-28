@@ -1,10 +1,11 @@
 <?php
 
-require_once 'includes/ss-shared.inc.php';
-
+use LibreNMS\Config;
 use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\Exceptions\JsonAppMissingKeysException;
 use LibreNMS\RRD\RrdDefinition;
+
+require_once Config::get('install_dir') . '/includes/ss-shared.inc.php';
 
 $name = 'ss';
 $output_success = 'OK';

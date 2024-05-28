@@ -27,7 +27,6 @@ namespace App\Http\Controllers\Device\Tabs;
 
 use App\Models\Device;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\DB;
 use LibreNMS\Config;
 use LibreNMS\Interfaces\UI\DeviceTab;
 use LibreNMS\Util\Smokeping;
@@ -37,8 +36,7 @@ class LatencyController implements DeviceTab
 {
     public function visible(Device $device): bool
     {
-        return Config::get('smokeping.integration') || DB::table('device_perf')
-            ->where('device_id', $device->device_id)->exists();
+        return Config::get('smokeping.integration') || $device->getAttrib('override_icmp_disable') !== 'true';
     }
 
     public function slug(): string
@@ -61,15 +59,6 @@ class LatencyController implements DeviceTab
         $from = Request::get('dtpickerfrom', Carbon::now(session('preferences.timezone'))->subDays(2)->format(Config::get('dateformat.byminute')));
         $to = Request::get('dtpickerto', Carbon::now(session('preferences.timezone'))->format(Config::get('dateformat.byminute')));
 
-        $dbfrom = Carbon::createFromFormat(Config::get('dateformat.byminute'), $from)->setTimezone(date_default_timezone_get())->format(Config::get('dateformat.byminute'));
-        $dbto = Carbon::createFromFormat(Config::get('dateformat.byminute'), $to)->setTimezone(date_default_timezone_get())->format(Config::get('dateformat.byminute'));
-
-        $perf = $this->fetchPerfData($device, $dbfrom, $dbto);
-
-        $duration = $perf && $perf->isNotEmpty()
-            ? abs(strtotime($perf->first()->date) - strtotime($perf->last()->date)) * 1000
-            : 0;
-
         $smokeping = new Smokeping($device);
         $smokeping_tabs = [];
         if ($smokeping->hasInGraph()) {
@@ -80,39 +69,10 @@ class LatencyController implements DeviceTab
         }
 
         return [
-            'dtpickerfrom' => $from,
-            'dtpickerto' => $to,
-            'duration' => $duration,
-            'perfdata' => $this->formatPerfData($perf),
+            'from' => $from,
+            'to' => $to,
             'smokeping' => $smokeping,
             'smokeping_tabs' => $smokeping_tabs,
         ];
-    }
-
-    private function fetchPerfData(Device $device, $from, $to)
-    {
-        return DB::table('device_perf')
-            ->where('device_id', $device->device_id)
-            ->whereBetween('timestamp', [$from, $to])
-            ->selectRaw("DATE_FORMAT(IFNULL(CONVERT_TZ(timestamp, @@global.time_zone, ?), timestamp), '%Y-%m-%d %H:%i') date,xmt,rcv,loss,min,max,avg", [session('preferences.timezone')])
-            ->get();
-    }
-
-    /**
-     * Data ready for json export
-     *
-     * @param  \Illuminate\Support\Collection  $data
-     * @return array
-     */
-    private function formatPerfData($data)
-    {
-        return $data->reduce(function ($data, $entry) {
-            $data[] = ['x' => $entry->date, 'y' => $entry->loss, 'group' => 0];
-            $data[] = ['x' => $entry->date, 'y' => $entry->min, 'group' => 1];
-            $data[] = ['x' => $entry->date, 'y' => $entry->max, 'group' => 2];
-            $data[] = ['x' => $entry->date, 'y' => $entry->avg, 'group' => 3];
-
-            return $data;
-        }, []);
     }
 }

@@ -47,7 +47,7 @@ class LoadUserPreferences
     {
         if (! $request->session()->has('preferences') && ! is_null($request->user())) {
             $loaded = $request->user()->preferences()->whereIn('pref', $preferences)->pluck('value', 'pref');
-            $request->session()->put('preferences', $loaded);
+            $request->session()->put('preferences', $loaded->toArray());
         }
     }
 
