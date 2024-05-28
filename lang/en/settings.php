@@ -1039,8 +1039,9 @@ return [
             'description' => 'Default Last Options',
         ],
         'nfsen_base' => [
-            'description' => 'Default NFSen Base Directory',
-        ],        
+            'description' => 'NFSen Base Directory',
+            'help' => 'Used to locate device specific graphs',
+        ],
         'nfsen_split_char' => [
             'description' => 'Split Char',
             'help' => 'This value tells us what to replace the full stops `.` in the devices hostname with. Usually: `_`',
