@@ -1,0 +1,679 @@
+--  ===============================================================================
+--  File              : FIBROLAN-MIB-GBE-MCM1000X.mib
+--  Description       : Private MIB file for FIBROLAN MetroStar I system - MCM1000X
+--  By                : Tal Katz-Touaf
+--  MIB Version       : 2.0
+--  MetroStar Version : 1.7.0/build 15
+--  Date              : January 26, 2010
+--  ===============================================================================
+--
+--
+-- Copyright Fibrolan, 2010. All rights reserved.
+--
+-- Reproduction of this document is authorized on condition that this
+-- copyright notice is included.
+
+
+FIBROLAN-MIB-GBE-MCM1000X     DEFINITIONS ::= BEGIN
+
+	 IMPORTS
+		enterprises, OBJECT-TYPE, MODULE-IDENTITY, Counter64		  FROM SNMPv2-SMI 
+		DisplayString						              FROM SNMPv2-TC
+		MODULE-COMPLIANCE, OBJECT-GROUP					  FROM SNMPv2-CONF
+		flMsModuleMvChannelEntry						  FROM FIBROLAN-MIB-MSMODULE;
+
+   flMcm1000x  MODULE-IDENTITY
+       LAST-UPDATED "1001260000Z"  
+       ORGANIZATION "Fibrolan ltd"
+       CONTACT-INFO
+         "http://www.fibrolan.com"
+       DESCRIPTION
+         "The MIB module to describe MCM1000X interface objects.
+          Copyright (C) Fibrolan Ltd (2010)."
+	::= { enterprises 4467 100 500 10 30 150}
+
+			
+    -- conformance information
+     flMcm1000xMIBConformance
+                   OBJECT IDENTIFIER ::= { flMcm1000x  1 }
+
+     flMcm1000xMIBCompliances  OBJECT IDENTIFIER ::= { flMcm1000xMIBConformance 1 }
+     flMcm1000xMIBGroups       OBJECT IDENTIFIER ::= { flMcm1000xMIBConformance 2 }
+
+
+	-- compliance statements
+     flMcm1000xMIBCompliance MODULE-COMPLIANCE
+              STATUS  current
+              DESCRIPTION
+                      "The compliance statement for flMetroStar entities
+                      which implement the flMcm1000x MIB."
+			  MODULE FIBROLAN-MIB-MSMODULE
+				  MANDATORY-GROUPS{ flMsModuleMvChannelsGroup}
+              MODULE  -- this module
+                  MANDATORY-GROUPS { flMcm1000xChannelsGroup,
+				     flMcm1000xStatisticsGroup}
+              ::= { flMcm1000xMIBCompliances 1 }
+
+
+
+     flMcm1000xChannelsGroup	OBJECT-GROUP
+	        OBJECTS		{ flMcm1000xChannelExtDescription,
+						  flMcm1000xChannelExtType,
+						  flMcm1000xChannelExtLink,
+						  flMcm1000xChannelExtSignalDetect,
+			              flMcm1000xChannelExtEnable,
+						  flMcm1000xChannelExtPause,
+						  flMcm1000xChannelExtUpSle,
+			              flMcm1000xChannelExtDownSle,
+						  flMcm1000xChannelExtAutonego,
+			              flMcm1000xChannelExtLoopBack,
+						  flMcm1000xChannelExtUpstreamBw,
+						  flMcm1000xChannelExtDownstreamBw,
+						  flMcm1000xChannelExtP2-P1Fp,
+						  flMcm1000xChannelExtP1-P2Fp,
+						  flMcm1000xChannelExtP2-P1Sle,
+						  flMcm1000xChannelExtP1-P2Sle
+						}
+            STATUS  current
+            DESCRIPTION
+                    "A collection of objects providing basic
+                    instrumentation of the MetroStar extended channel entity."
+            ::= { flMcm1000xMIBGroups 1 }
+
+     flMcm1000xStatisticsGroup	OBJECT-GROUP
+	        OBJECTS	 {	flMcm1000xRxDropEvents,
+				flMcm1000xRxOctets,
+				flMcm1000xRxPackets,
+				flMcm1000xRxBroadcastPackets,
+				flMcm1000xRxMulticastPackets,
+				flMcm1000xRxCrcAlignmentErrors,
+				flMcm1000xRxUndersizePackets,
+				flMcm1000xRxOversizePackets,
+				flMcm1000xRxFragments,
+				flMcm1000xRxJabbers,
+				flMcm1000xRxCollisions,
+				flMcm1000xRxPackets64Octets,
+				flMcm1000xRxPackets65to127Octets,
+				flMcm1000xRxPackets128to255Octets,
+				flMcm1000xRxPackets256to511Octets,
+				flMcm1000xRxPackets512to1023Octets,
+				flMcm1000xRxPackets1024toMaxOctets,
+				flMcm1000xRxFibroLANProprietryFrames,
+				flMcm1000xClearCounters,
+				flMcm1000xRxOctetsRate,
+				flMcm1000xRxBitsRate,
+				flMcm1000xRxPacketsRate,
+				flMcm1000xRxUtilization,
+				flMcm1000xTxOctets,
+				flMcm1000xTxPackets,
+				flMcm1000xTxBroadcastPackets,
+				flMcm1000xTxMulticastPackets,
+				flMcm1000xTxFibroLANProprietryFrames,
+				flMcm1000xTxOctetsRate,
+				flMcm1000xTxBitsRate,
+				flMcm1000xTxPacketsRate,
+				flMcm1000xTxUtilization}
+            STATUS  current
+            DESCRIPTION
+                    "A collection of objects providing basic
+                    instrumentation of the MetroStar port statistic coounters entity."
+            ::= { flMcm1000xMIBGroups 2 }
+	
+-- ************************************************************
+-- ************************************************************
+-- FibroLan Object Identifier Definition
+-- ************************************************************
+-- ************************************************************
+
+fibrolan            OBJECT IDENTIFIER ::= { enterprises       4467 }
+
+fibrolanSNMP        OBJECT IDENTIFIER ::= { fibrolan           100 }
+
+flMetroStarMv 		OBJECT IDENTIFIER ::=  { fibrolanSNMP      500 }
+
+flMsChassisMv		OBJECT IDENTIFIER ::=  { flMetroStarMv	    10 }
+
+flMsModuleMv		OBJECT IDENTIFIER ::=  { flMsChassisMv	    30 }
+
+--flMcm1000x			OBJECT IDENTIFIER ::=  { flMsModuleMv      150 }
+
+
+flMcm1000xModule		    OBJECT IDENTIFIER ::= { flMcm1000x	    10 }
+flMcm1000xChannels		    OBJECT IDENTIFIER ::= { flMcm1000x	    20 }
+flMcm1000xStatistics		    OBJECT IDENTIFIER ::= { flMcm1000x	    30 }
+
+-- ************************************************************
+-- ************************************************************
+--   Channel extended table 
+-- ************************************************************
+-- ************************************************************
+     flMcm1000xChannelExtTable           OBJECT-TYPE
+         SYNTAX  SEQUENCE OF FlMcm1000xChannelExtEntry
+         MAX-ACCESS  not-accessible
+         STATUS  current
+         DESCRIPTION
+         "This table shows the chassis' channel status"
+     ::= { flMcm1000xChannels  1 }
+
+     flMcm1000xChannelExtEntry       OBJECT-TYPE
+         SYNTAX  FlMcm1000xChannelExtEntry
+         MAX-ACCESS  not-accessible
+         STATUS  current
+         DESCRIPTION
+         "The entries of the table."
+         AUGMENTS { flMsModuleMvChannelEntry}
+     ::= { flMcm1000xChannelExtTable   1 }
+
+		FlMcm1000xChannelExtEntry ::= SEQUENCE
+		{
+			 flMcm1000xChannelExtDescription	DisplayString,
+		 	 flMcm1000xChannelExtType			INTEGER,
+			 flMcm1000xChannelExtLink			INTEGER,
+			 flMcm1000xChannelExtSignalDetect	INTEGER,
+			 flMcm1000xChannelExtEnable			INTEGER,
+			 flMcm1000xChannelExtPause			INTEGER,
+			 flMcm1000xChannelExtUpSle			INTEGER,
+			 flMcm1000xChannelExtDownSle		INTEGER,
+			 flMcm1000xChannelExtAutonego		INTEGER,
+	         flMcm1000xChannelExtLoopBack		INTEGER,
+			 flMcm1000xChannelExtUpstreamBw		INTEGER,
+			 flMcm1000xChannelExtDownstreamBw	INTEGER,
+			 flMcm1000xChannelExtP2-P1Fp		INTEGER,
+			 flMcm1000xChannelExtP1-P2Fp		INTEGER,
+			 flMcm1000xChannelExtP2-P1Sle		INTEGER,
+			 flMcm1000xChannelExtP1-P2Sle		INTEGER
+		}
+
+	flMcm1000xChannelExtDescription		OBJECT-TYPE
+		 SYNTAX    DisplayString
+		 MAX-ACCESS    read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Port's textual description - up to 40 characters" 
+    ::= { flMcm1000xChannelExtEntry  1 }
+
+    flMcm1000xChannelExtType			OBJECT-TYPE
+		SYNTAX	  INTEGER {
+					tp		(1),
+					fo		(2),
+					n-a		(3)
+				  }
+         MAX-ACCESS    read-only
+		 STATUS    current
+		 DESCRIPTION
+	     "Port's SFP type"
+    ::= { flMcm1000xChannelExtEntry  2 }
+
+    flMcm1000xChannelExtLink			OBJECT-TYPE
+		SYNTAX	  INTEGER {
+         	                 off     (1),
+							 on      (2),
+							 kld	 (3)
+						  }
+         MAX-ACCESS    read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Port's link status"
+    ::= { flMcm1000xChannelExtEntry  3 }
+
+	flMcm1000xChannelExtSignalDetect	OBJECT-TYPE
+		 SYNTAX    INTEGER {
+							  off	 (1),
+							  on	 (2)
+						   }
+         MAX-ACCESS    read-only
+         STATUS    current
+         DESCRIPTION
+         "Port's signal detect mode"
+    ::= { flMcm1000xChannelExtEntry  4 }
+
+    flMcm1000xChannelExtEnable			    OBJECT-TYPE
+		SYNTAX	  INTEGER {
+		                      disable (1),
+							  enable  (2)
+						  }
+         MAX-ACCESS    read-write
+		 STATUS    current
+		 DESCRIPTION
+		"Port's enable mode"
+    ::= { flMcm1000xChannelExtEntry  5 }
+
+	flMcm1000xChannelExtPause			    OBJECT-TYPE
+		SYNTAX	  INTEGER {
+		                      off	(1),
+							  on	(2)
+						  }
+         MAX-ACCESS    read-write
+		 STATUS    current
+		 DESCRIPTION
+		"Port's pause mode"
+    ::= { flMcm1000xChannelExtEntry  6 }
+
+	flMcm1000xChannelExtUpSle	OBJECT-TYPE
+		 SYNTAX    INTEGER {
+							  off	 (1),
+							  on	 (2)
+						   }
+         MAX-ACCESS    read-write
+         STATUS    current
+         DESCRIPTION
+         "Port's up SLE mode"
+    ::= { flMcm1000xChannelExtEntry  7 }
+
+	flMcm1000xChannelExtDownSle	OBJECT-TYPE
+		 SYNTAX    INTEGER {
+							  off	 (1),
+							  on	 (2)
+						   }
+         MAX-ACCESS    read-write
+         STATUS    current
+         DESCRIPTION
+         "Port's down SLE mode"
+    ::= { flMcm1000xChannelExtEntry  8 }
+
+	flMcm1000xChannelExtAutonego	OBJECT-TYPE
+		 SYNTAX    INTEGER {
+							  off	 (1),
+							  on	 (2)
+						   }
+         MAX-ACCESS    read-write
+         STATUS    current
+         DESCRIPTION
+         "Port's auto negotiation mode"
+    ::= { flMcm1000xChannelExtEntry  9 }
+
+	flMcm1000xChannelExtLoopBack	OBJECT-TYPE
+		 SYNTAX    INTEGER {
+							  off	 (1),
+							  on	 (2)
+						   }
+         MAX-ACCESS    read-write
+         STATUS    current
+         DESCRIPTION
+         "Port's loop back mode"
+    ::= { flMcm1000xChannelExtEntry  10 }
+
+	flMcm1000xChannelExtUpstreamBw	OBJECT-TYPE
+		 SYNTAX	  INTEGER (0..1000)
+         MAX-ACCESS    read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Upstream Bandwidth, from 0 to 1000M in 10M steps"
+    ::= { flMcm1000xChannelExtEntry  11 }
+
+	flMcm1000xChannelExtDownstreamBw	OBJECT-TYPE
+		 SYNTAX	  INTEGER (0..1000)
+         MAX-ACCESS    read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Downstream Bandwidth, from 0 to 1000M in 10M steps"
+    ::= { flMcm1000xChannelExtEntry  12 }
+
+	flMcm1000xChannelExtP2-P1Fp	OBJECT-TYPE
+		 SYNTAX    INTEGER {
+							  off	 (1),
+							  on	 (2)
+						   }
+         MAX-ACCESS    read-write
+         STATUS    current
+         DESCRIPTION
+         "Port2->Port1 Fault Propagation mode"
+    ::= { flMcm1000xChannelExtEntry  13 }
+
+	flMcm1000xChannelExtP1-P2Fp	OBJECT-TYPE
+		 SYNTAX    INTEGER {
+							  off	 (1),
+							  on	 (2)
+						   }
+         MAX-ACCESS    read-write
+         STATUS    current
+         DESCRIPTION
+         "Port1->Port2 Fault Propagation mode"
+    ::= { flMcm1000xChannelExtEntry  14 }
+
+	flMcm1000xChannelExtP2-P1Sle OBJECT-TYPE
+		 SYNTAX    INTEGER {
+							  off	 (1),
+							  on	 (2)
+						   }
+         MAX-ACCESS    read-write
+         STATUS    current
+         DESCRIPTION
+         "Port2->Port1 End-to-End SLE mode"
+    ::= { flMcm1000xChannelExtEntry  15 }
+
+	flMcm1000xChannelExtP1-P2Sle OBJECT-TYPE
+		 SYNTAX    INTEGER {
+							  off	 (1),
+							  on	 (2)
+						   }
+         MAX-ACCESS    read-write
+         STATUS    current
+         DESCRIPTION
+         "Port1->Port2 End-to-End SLE mode"
+    ::= { flMcm1000xChannelExtEntry  16 }
+
+-- ************************************************************
+-- Port's statistics table
+-- ************************************************************
+	 flMcm1000xStatisticsTable               OBJECT-TYPE
+         SYNTAX  SEQUENCE OF FlMcm1000xStatisticsEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "This table provides the statistics for all ports."
+     ::= { flMcm1000xStatistics 1 }
+
+     flMcm1000xStatisticsEntry				OBJECT-TYPE
+         SYNTAX  FlMcm1000xStatisticsEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "The entries of the table"
+         AUGMENTS { flMsModuleMvChannelEntry}
+     ::= { flMcm1000xStatisticsTable 1 }
+
+		FlMcm1000xStatisticsEntry ::= SEQUENCE
+		{
+			 flMcm1000xRxDropEvents			Counter64,
+			 flMcm1000xRxOctets			Counter64,
+			 flMcm1000xRxPackets			Counter64,
+			 flMcm1000xRxBroadcastPackets		Counter64,
+			 flMcm1000xRxMulticastPackets		Counter64,
+			 flMcm1000xRxCrcAlignmentErrors		Counter64,
+			 flMcm1000xRxUndersizePackets		Counter64,
+			 flMcm1000xRxOversizePackets		Counter64,
+			 flMcm1000xRxFragments			Counter64,
+			 flMcm1000xRxJabbers			Counter64,
+			 flMcm1000xRxCollisions			Counter64,
+			 flMcm1000xRxPackets64Octets		Counter64,
+			 flMcm1000xRxPackets65to127Octets	Counter64,
+			 flMcm1000xRxPackets128to255Octets	Counter64,
+			 flMcm1000xRxPackets256to511Octets	Counter64,
+			 flMcm1000xRxPackets512to1023Octets	Counter64,
+			 flMcm1000xRxPackets1024toMaxOctets	Counter64,
+			 flMcm1000xRxFibroLANProprietryFrames	Counter64,
+			 flMcm1000xClearCounters		INTEGER,
+			 flMcm1000xRxOctetsRate			Counter64,
+			 flMcm1000xRxBitsRate			Counter64,
+			 flMcm1000xRxPacketsRate		Counter64,
+			 flMcm1000xRxUtilization		DisplayString,
+			 flMcm1000xTxOctets			Counter64,
+			 flMcm1000xTxPackets			Counter64,
+			 flMcm1000xTxBroadcastPackets		Counter64,
+			 flMcm1000xTxMulticastPackets		Counter64,
+			 flMcm1000xTxFibroLANProprietryFrames	Counter64,
+			 flMcm1000xTxOctetsRate			Counter64,
+			 flMcm1000xTxBitsRate			Counter64,
+			 flMcm1000xTxPacketsRate		Counter64,
+			 flMcm1000xTxUtilization		DisplayString
+		}
+
+     flMcm1000xRxDropEvents						OBJECT-TYPE
+		 SYNTAX    Counter64
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Counts number of times a packet is dropped, because of lack of available resources" 
+	 ::= { flMcm1000xStatisticsEntry 1 }
+
+     flMcm1000xRxOctets						OBJECT-TYPE
+		 SYNTAX    Counter64
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Counts the total number of octets (i.e. bytes) in any frames received" 
+	 ::= { flMcm1000xStatisticsEntry 2 }
+
+     flMcm1000xRxPackets						OBJECT-TYPE
+		 SYNTAX    Counter64
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Counts the number of frames received, good or bad" 
+	 ::= { flMcm1000xStatisticsEntry 3 }
+
+     flMcm1000xRxBroadcastPackets						OBJECT-TYPE
+		 SYNTAX    Counter64
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Counts the number of good frames received and forwarded with broadcast address. Does not include non-broadcast multicast frames" 
+	 ::= { flMcm1000xStatisticsEntry 4 }
+
+     flMcm1000xRxMulticastPackets						OBJECT-TYPE
+		 SYNTAX    Counter64
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Counts the number of good frames received and forwarded with multicast address. Does not include broadcast frames" 
+	 ::= { flMcm1000xStatisticsEntry 5 }
+
+     flMcm1000xRxCrcAlignmentErrors					OBJECT-TYPE
+		 SYNTAX    Counter64
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Counts number of frames received with FCS or alignment errors" 
+	 ::= { flMcm1000xStatisticsEntry 6 }
+
+     flMcm1000xRxUndersizePackets				OBJECT-TYPE
+		 SYNTAX    Counter64
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Counts number of frames received with size less than 64 bytes" 
+	 ::= { flMcm1000xStatisticsEntry 7 }
+
+     flMcm1000xRxOversizePackets					OBJECT-TYPE
+		 SYNTAX    Counter64
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Counts number of frames received with size exceeding the maximum allowable frame size" 
+	 ::= { flMcm1000xStatisticsEntry 8 }
+
+     flMcm1000xRxFragments					OBJECT-TYPE
+		 SYNTAX    Counter64
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Counts number of frames received with size less than 64 bytes and with bad FCS" 
+	 ::= { flMcm1000xStatisticsEntry 9 }
+
+     flMcm1000xRxJabbers					OBJECT-TYPE
+		 SYNTAX    Counter64
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Counts number of frames received with size exceeding maximum frame size and with bad FCS" 
+	 ::= { flMcm1000xStatisticsEntry 10 }
+
+     flMcm1000xRxCollisions					OBJECT-TYPE
+		 SYNTAX    Counter64
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Counts number of collision events detected" 
+	 ::= { flMcm1000xStatisticsEntry 11 }
+	 
+     flMcm1000xRxPackets64Octets					OBJECT-TYPE
+		 SYNTAX    Counter64
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Counts good packets with size = 64 bytes" 
+	 ::= { flMcm1000xStatisticsEntry 12 }
+
+     flMcm1000xRxPackets65to127Octets					OBJECT-TYPE
+		 SYNTAX    Counter64
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Counts good packets with size from 65 bytes to 127 bytes" 
+	 ::= { flMcm1000xStatisticsEntry 13 }
+
+     flMcm1000xRxPackets128to255Octets					OBJECT-TYPE
+		 SYNTAX    Counter64
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Counts good packets with size from 128 bytes to 255 bytes" 
+	 ::= { flMcm1000xStatisticsEntry 14 }
+
+     flMcm1000xRxPackets256to511Octets					OBJECT-TYPE
+		 SYNTAX    Counter64
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Counts good packets with size from 256 bytes to 511 bytes" 
+	 ::= { flMcm1000xStatisticsEntry 15 }
+
+     flMcm1000xRxPackets512to1023Octets					OBJECT-TYPE
+		 SYNTAX    Counter64
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Counts good packets with size from 512 bytes to 1023 bytes" 
+	 ::= { flMcm1000xStatisticsEntry 16 }
+
+     flMcm1000xRxPackets1024toMaxOctets					OBJECT-TYPE
+		 SYNTAX    Counter64
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Counts good packets with size from 1024 bytes to max. frame size" 
+	 ::= { flMcm1000xStatisticsEntry 17 }
+
+     flMcm1000xRxFibroLANProprietryFrames					OBJECT-TYPE
+		 SYNTAX    Counter64
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Counts number of FibroLAN's management proprietry frame received" 
+	 ::= { flMcm1000xStatisticsEntry 18 }
+
+     flMcm1000xClearCounters					OBJECT-TYPE
+		 SYNTAX    INTEGER	{
+								normal		(1),
+								clear		(2)
+							}
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Clear the port's counters for this table" 
+	 ::= { flMcm1000xStatisticsEntry 19 }
+
+     flMcm1000xRxOctetsRate						OBJECT-TYPE
+		 SYNTAX    Counter64
+		 UNITS		"bytes/sec"
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Received octets (i.e. bytes) rate in bytes per second" 
+	 ::= { flMcm1000xStatisticsEntry 20 }
+
+     flMcm1000xRxBitsRate						OBJECT-TYPE
+		 SYNTAX    Counter64
+		 UNITS		"bits/sec"
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Received bits rate in bits per second" 
+	 ::= { flMcm1000xStatisticsEntry 21 }
+
+     flMcm1000xRxPacketsRate					OBJECT-TYPE
+		 SYNTAX    Counter64
+		 UNITS		"frames/sec"
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Received packets (i.e frames) rate in frames per second" 
+	 ::= { flMcm1000xStatisticsEntry 22 }
+
+     flMcm1000xRxUtilization					OBJECT-TYPE
+		 SYNTAX    DisplayString
+		 UNITS		"%"
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Received data utilization rate" 
+	 ::= { flMcm1000xStatisticsEntry 23 }
+
+     flMcm1000xTxOctets						OBJECT-TYPE
+		 SYNTAX    Counter64
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Counts the total number of octets (i.e. bytes) in any frames sent" 
+	 ::= { flMcm1000xStatisticsEntry 24 }
+
+     flMcm1000xTxPackets						OBJECT-TYPE
+		 SYNTAX    Counter64
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Counts the number of frames sent, good or bad" 
+	 ::= { flMcm1000xStatisticsEntry 25 }
+
+     flMcm1000xTxBroadcastPackets						OBJECT-TYPE
+		 SYNTAX    Counter64
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Counts the number of good frames sent with broadcast address. Does not include non-broadcast multicast frames" 
+	 ::= { flMcm1000xStatisticsEntry 26 }
+
+     flMcm1000xTxMulticastPackets						OBJECT-TYPE
+		 SYNTAX    Counter64
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Counts the number of good frames sent with multicast address. Does not include broadcast frames" 
+	 ::= { flMcm1000xStatisticsEntry 27 }
+
+     flMcm1000xTxFibroLANProprietryFrames					OBJECT-TYPE
+		 SYNTAX    Counter64
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Counts number of FibroLAN's management proprietry frame sent" 
+	 ::= { flMcm1000xStatisticsEntry 28 }
+
+     flMcm1000xTxOctetsRate						OBJECT-TYPE
+		 SYNTAX    Counter64
+		 UNITS		"bytes/sec"
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Sent octets (i.e. bytes) rate in bytes per second" 
+	 ::= { flMcm1000xStatisticsEntry 29 }
+
+     flMcm1000xTxBitsRate						OBJECT-TYPE
+		 SYNTAX    Counter64
+		 UNITS		"bits/sec"
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Sent bits rate in bits per second" 
+	 ::= { flMcm1000xStatisticsEntry 30 }
+
+     flMcm1000xTxPacketsRate					OBJECT-TYPE
+		 SYNTAX    Counter64
+		 UNITS		"frames/sec"
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Sent packets (i.e frames) rate in frames per second" 
+	 ::= { flMcm1000xStatisticsEntry 31 }
+
+     flMcm1000xTxUtilization					OBJECT-TYPE
+		 SYNTAX    DisplayString
+		 UNITS		"%"
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Sent data utilization rate" 
+	 ::= { flMcm1000xStatisticsEntry 32 }
+
+END

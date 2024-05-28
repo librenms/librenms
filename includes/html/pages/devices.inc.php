@@ -64,7 +64,7 @@ $menu_options = ['bits' => 'Bits',
     'storage' => 'Storage',
     'diskio' => 'Disk I/O',
     'poller_perf' => 'Poller',
-    'ping_perf' => 'Ping',
+    'icmp_perf' => 'Ping',
     'temperature' => 'Temperature',
 ];
 $sep = '';

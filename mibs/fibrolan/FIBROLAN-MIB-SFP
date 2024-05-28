@@ -1,0 +1,415 @@
+--  =======================================================================
+--  File              : FIBROLAN-MIB-SFP.mib
+--  Description       : Private MIB file for FibroLAN SFP device
+--  By                : Tal Katz-Touaf, Shamir Stein-Ackerman
+--  MIB Version       : 1.1
+--  MetroStar Version : 1.6.2/build 12
+--  Date              : March 27, 2008
+--  =======================================================================
+--
+--
+-- Copyright Fibrolan, 2008. All rights reserved.
+--
+-- Reproduction of this document is authorized on condition that this
+-- copyright notice is included.
+--
+FIBROLAN-MIB-SFP   DEFINITIONS ::= BEGIN
+
+	 IMPORTS
+		enterprises, OBJECT-TYPE, MODULE-IDENTITY		FROM SNMPv2-SMI
+		DisplayString						FROM SNMPv2-TC --FROM RFC1213-MIB
+		MODULE-COMPLIANCE, OBJECT-GROUP				FROM SNMPv2-CONF
+		flMsChassisMvIndex, flMsChassisModuleMvIndex		FROM FIBROLAN-MIB-METRO-STAR-MV
+		flMsModuleMvChannelIndex				FROM FIBROLAN-MIB-MSMODULE;
+
+
+ flSfp  MODULE-IDENTITY
+       LAST-UPDATED "0803270000Z"  
+       ORGANIZATION "FibroLAN ltd"
+       CONTACT-INFO
+         "http://www.fibrolan.com"
+       DESCRIPTION
+         "The MIB module to describe FibroLAN SFP device.
+          Copyright (C) Fibrolan Ltd (2008)."
+	::= { enterprises 4467 100 500 100   }
+
+
+    -- conformance information
+     flSfpMIBConformance        OBJECT IDENTIFIER ::= { flSfp  1 }
+
+	 flSfpMIBCompliances		OBJECT IDENTIFIER ::= { flSfpMIBConformance 1 }
+     flSfpMIBGroups				OBJECT IDENTIFIER ::= { flSfpMIBConformance 2 }
+
+
+	-- compliance statements
+     flSfpMIBCompliance MODULE-COMPLIANCE
+              STATUS  current
+              DESCRIPTION
+                      "The compliance statement for flSfp entities"
+			  MODULE FIBROLAN-MIB-METRO-STAR-MV
+				  MANDATORY-GROUPS{ flMsChassisGroup, flMsChassisModulesGroup }
+			  MODULE FIBROLAN-MIB-MSMODULE
+				  MANDATORY-GROUPS{ flMsModuleMvChannelsGroup }
+              MODULE  -- this module
+                  MANDATORY-GROUPS { flSfpDeviceGroup, flSfpPortsGroup, flSfpMonitoringGroup }
+              ::= { flSfpMIBCompliances 1 }
+
+     flSfpDeviceGroup	OBJECT-GROUP
+	        OBJECTS		{  flSfpDevicePortIndex,
+						   flSfpDeviceLocalRemoteIndex,
+						   flSfpDeviceRemoteChannelIndex,
+						   flSfpDeviceRemotePortIndex,
+						   flSfpDeviceSerialNumber,
+						   flSfpDevicePartNumber,
+						   flSfpDevicePortName,
+						   flSfpDeviceType,
+						   flSfpDeviceRange,
+						   flSfpDeviceTxWl,
+						   flSfpDeviceRxwl,
+						   flSfpDeviceState }
+            STATUS  current
+            DESCRIPTION
+                    "SFP standard status objects."
+            ::= { flSfpMIBGroups 1 }
+
+	flSfpPortsGroup		OBJECT-GROUP
+	        OBJECTS		{  flSfpDevicePortIndex,
+						   flSfpDeviceLocalRemoteIndex,
+						   flSfpDeviceRemoteChannelIndex,
+						   flSfpDeviceRemotePortIndex,
+						   flSfpPortSignalDetect,
+						   flSfpPortLink,
+						   flSfpPortEnable }
+            STATUS  current
+            DESCRIPTION
+                    "SFP port status and configuration objects"
+            ::= { flSfpMIBGroups 2 }
+
+     flSfpMonitoringGroup	OBJECT-GROUP
+	        OBJECTS	{	flSfpDevicePortIndex,
+				flSfpDeviceLocalRemoteIndex,
+				flSfpDeviceRemoteChannelIndex,
+				flSfpDeviceRemotePortIndex,
+				flSfpDeviceMonitoringRxPower,
+				flSfpDeviceMonitoringTxPower,
+				flSfpDeviceMonitoringTemperature,
+				flSfpDeviceMonitoringTxBias,
+				flSfpDeviceMonitoringSupplyVoltage
+			}
+            STATUS  current
+            DESCRIPTION
+                    "SFP monitoring (digital diagnostics) group."
+            ::= { flSfpMIBGroups 3 }
+
+
+-- ************************************************************
+-- ************************************************************
+-- FibroLan Object Identifier Definition
+-- ************************************************************
+-- ************************************************************
+
+fibrolan             OBJECT IDENTIFIER ::= { enterprises       4467 }
+
+fibrolanSNMP         OBJECT IDENTIFIER ::= { fibrolan           100 }
+
+flMetroStarMv		OBJECT IDENTIFIER ::=  { fibrolanSNMP      500 }
+
+--flSfp			OBJECT IDENTIFIER ::= { flMetroStarMv	100 }
+
+flSfpDevice OBJECT IDENTIFIER ::= { flSfp        10 }
+
+
+-- ************************************************************
+-- Device table 
+-- ************************************************************
+     flSfpDeviceTable               OBJECT-TYPE
+         SYNTAX  SEQUENCE OF FlSfpDeviceEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "Table for managing device level parameters"
+     ::= { flSfpDevice 1 }
+
+     flSfpDeviceEntry               OBJECT-TYPE
+         SYNTAX  FlSfpDeviceEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "The entries of the table."
+		 INDEX { flMsChassisMvIndex,
+				 flMsChassisModuleMvIndex,
+				 flMsModuleMvChannelIndex,
+				 flSfpDevicePortIndex,
+				 flSfpDeviceLocalRemoteIndex,
+				 flSfpDeviceRemoteChannelIndex,
+				 flSfpDeviceRemotePortIndex }
+     ::= { flSfpDeviceTable 1 }
+
+		FlSfpDeviceEntry ::= SEQUENCE
+		{
+			 flSfpDevicePortIndex				INTEGER,
+			 flSfpDeviceLocalRemoteIndex		INTEGER,
+			 flSfpDeviceRemoteChannelIndex		INTEGER,
+			 flSfpDeviceRemotePortIndex			INTEGER,
+			 flSfpDeviceSerialNumber			DisplayString,
+			 flSfpDevicePartNumber				DisplayString,
+			 flSfpDevicePortName				DisplayString,
+			 flSfpDeviceType					DisplayString,
+			 flSfpDeviceRange					INTEGER,
+			 flSfpDeviceTxWl					INTEGER,
+			 flSfpDeviceRxwl					INTEGER,
+			 flSfpDeviceState					INTEGER
+		}
+
+	 flSfpDevicePortIndex					OBJECT-TYPE
+		 SYNTAX   INTEGER(1..2)
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Sfp port index" 
+	 ::= { flSfpDeviceEntry 1 }
+
+	flSfpDeviceLocalRemoteIndex				OBJECT-TYPE
+		 SYNTAX    INTEGER {
+					local	(1),
+					remote	(2)
+				   }
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Remote/Local device indicator" 
+	 ::= { flSfpDeviceEntry 2 }
+
+	 flSfpDeviceRemoteChannelIndex			OBJECT-TYPE
+		 SYNTAX   INTEGER(1..2)
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Sfp remote channel index" 
+	 ::= { flSfpDeviceEntry 3 }
+
+	 flSfpDeviceRemotePortIndex				OBJECT-TYPE
+		 SYNTAX   INTEGER(1..2)
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Sfp remote port index" 
+	 ::= { flSfpDeviceEntry 4 }
+
+	 flSfpDeviceSerialNumber				OBJECT-TYPE
+		 SYNTAX    DisplayString
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Device's serial number" 
+    ::= { flSfpDeviceEntry  5 }
+
+	flSfpDevicePartNumber				OBJECT-TYPE
+		 SYNTAX    DisplayString
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Device's part number" 
+    ::= { flSfpDeviceEntry  6 }
+
+	flSfpDevicePortName				OBJECT-TYPE
+		 SYNTAX    DisplayString
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Device's port name" 
+    ::= { flSfpDeviceEntry  7 }
+
+     flSfpDeviceType        OBJECT-TYPE
+		 SYNTAX    DisplayString
+         MAX-ACCESS     read-only
+         STATUS    current
+         DESCRIPTION
+         "Device's type"
+	 ::= { flSfpDeviceEntry 8 }
+
+     flSfpDeviceRange        OBJECT-TYPE
+		 SYNTAX    INTEGER
+         MAX-ACCESS     read-only
+         STATUS    current
+         DESCRIPTION
+         "Device's range in meters"
+	 ::= { flSfpDeviceEntry 9 }
+
+     flSfpDeviceTxWl        OBJECT-TYPE
+		 SYNTAX    INTEGER
+         MAX-ACCESS     read-only
+         STATUS    current
+         DESCRIPTION
+         "Device's Tx wave-length in nano-meters"
+	 ::= { flSfpDeviceEntry 10 }
+
+     flSfpDeviceRxwl        OBJECT-TYPE
+		 SYNTAX    INTEGER
+         MAX-ACCESS     read-only
+         STATUS    current
+         DESCRIPTION
+         "Device's Rx wave-length in nano-meters"
+	 ::= { flSfpDeviceEntry 11 }
+
+	 flSfpDeviceState        OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								unplugged		(1),
+								invalid			(2),
+								authenticated	(3),
+								unknown			(4)
+						   }
+         MAX-ACCESS     read-only
+         STATUS    current
+         DESCRIPTION
+         "Device's state"
+	 ::= { flSfpDeviceEntry 12 }
+
+
+-- ************************************************************
+-- Ports table 
+-- ************************************************************
+     flSfpPortsTable               OBJECT-TYPE
+         SYNTAX  SEQUENCE OF FlSfpPortsEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "Table for managing ports level parameters"
+     ::= { flSfpDevice 2 }
+
+     flSfpPortsEntry               OBJECT-TYPE
+         SYNTAX  FlSfpPortsEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "The entries of the table."
+		 INDEX { flMsChassisMvIndex,
+				 flMsChassisModuleMvIndex,
+				 flMsModuleMvChannelIndex,
+				 flSfpDevicePortIndex,
+				 flSfpDeviceLocalRemoteIndex,
+				 flSfpDeviceRemoteChannelIndex,
+				 flSfpDeviceRemotePortIndex }
+     ::= { flSfpPortsTable 1 }
+
+		FlSfpPortsEntry ::= SEQUENCE
+		{
+			 flSfpPortSignalDetect				INTEGER,
+			 flSfpPortLink						INTEGER,
+			 flSfpPortEnable					INTEGER
+		}
+
+	flSfpPortSignalDetect				OBJECT-TYPE
+		 SYNTAX    INTEGER {
+                             off	 (1),
+						     on		 (2)
+						   }
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Port's Signal Detect status" 
+    ::= { flSfpPortsEntry  5 }
+
+	flSfpPortLink						OBJECT-TYPE
+		 SYNTAX    INTEGER {
+                             off	 (1),
+						     on		 (2),
+							 kld	 (3)
+						   }
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Port's Link status" 
+    ::= { flSfpPortsEntry  6 }
+
+	flSfpPortEnable						OBJECT-TYPE
+		 SYNTAX    INTEGER {
+							off	(1),
+							on	(2),
+							n-a	(3)
+						   }
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Port's Enable mode" 
+    ::= { flSfpPortsEntry  7 }
+
+
+-- ************************************************************
+-- Monitoring table 
+-- ************************************************************
+	flSfpDeviceMonitoringTable               OBJECT-TYPE
+		SYNTAX		SEQUENCE OF FlSfpDeviceMonitoringEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION    "Table for SFP monitoring (digital diagnostics) data"
+	::= { flSfpDevice 3 }
+
+	flSfpDeviceMonitoringEntry               OBJECT-TYPE
+		SYNTAX		FlSfpDeviceMonitoringEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"The entries of the table."
+		INDEX { flMsChassisMvIndex,
+			flMsChassisModuleMvIndex,
+			flMsModuleMvChannelIndex,
+			flSfpDevicePortIndex,
+			flSfpDeviceLocalRemoteIndex,
+			flSfpDeviceRemoteChannelIndex,
+			flSfpDeviceRemotePortIndex }
+	::= { flSfpDeviceMonitoringTable 1 }
+
+	FlSfpDeviceMonitoringEntry ::= SEQUENCE
+	{
+		flSfpDeviceMonitoringRxPower		INTEGER,
+		flSfpDeviceMonitoringTxPower		INTEGER,
+		flSfpDeviceMonitoringTemperature	INTEGER,
+		flSfpDeviceMonitoringTxBias		INTEGER,
+		flSfpDeviceMonitoringSupplyVoltage	INTEGER	
+	}
+
+	flSfpDeviceMonitoringRxPower		OBJECT-TYPE
+		SYNTAX		INTEGER
+		UNITS		"0.01dBm"
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Received average optical power in [0.01dBm]" 
+	::= { flSfpDeviceMonitoringEntry  1 }
+
+	flSfpDeviceMonitoringTxPower		OBJECT-TYPE
+		SYNTAX		INTEGER
+		UNITS		"0.01dBm"
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Transmitted average optical power in [0.01dBm]" 
+	::= { flSfpDeviceMonitoringEntry  2 }
+
+	flSfpDeviceMonitoringTemperature	OBJECT-TYPE
+		SYNTAX		INTEGER
+		UNITS		"0.1 degrees Celsius (oC)"
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Device temperature in [0.1oC]" 
+	::= { flSfpDeviceMonitoringEntry  3 }
+
+	flSfpDeviceMonitoringTxBias		OBJECT-TYPE
+		SYNTAX		INTEGER
+		UNITS		"micro Ampere (uA)"
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Transmitter bias current in [uA]" 
+	::= { flSfpDeviceMonitoringEntry  4 }
+
+	flSfpDeviceMonitoringSupplyVoltage	OBJECT-TYPE
+		SYNTAX		INTEGER
+		UNITS		"100 micro Volt (100uV)"
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Internal supply voltage in [100uV]" 
+	::= { flSfpDeviceMonitoringEntry  5 }
+
+
+
+
+END
+

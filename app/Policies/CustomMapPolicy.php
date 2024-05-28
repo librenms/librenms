@@ -29,7 +29,7 @@ class CustomMapPolicy
      */
     public function view(User $user, CustomMap $customMap): bool
     {
-        return $user->hasGlobalRead() || $customMap->hasAccess();
+        return $user->hasGlobalRead() || $customMap->hasReadAccess($user);
     }
 
     /**
@@ -45,7 +45,7 @@ class CustomMapPolicy
      */
     public function update(User $user, CustomMap $customMap): bool
     {
-        return $user->hasGlobalRead() || $customMap->hasAccess();
+        return false;
     }
 
     /**

@@ -39,16 +39,11 @@ class PollerGroupController extends SelectController
         return PollerGroup::query()->select(['id', 'group_name']);
     }
 
-    protected function formatResponse($paginator)
+    protected function prependItem(): array
     {
-        // prepend the default group, unless filtered out
-        if ($this->includeGeneral()) {
-            $general = new PollerGroup;
-            $general->id = 0;
-            $general->group_name = 'General';
-            $paginator->prepend($general);
-        }
-
-        return parent::formatResponse($paginator);
+        return [
+            'id' => 0,
+            'text' => __('General'),
+        ];
     }
 }

@@ -231,7 +231,7 @@ class TopDevicesController extends WidgetController
 
         $results = $query->get()->map(function ($device) {
             /** @var Device $device */
-            return $this->standardRow($device, 'device_ping_perf', ['tab' => 'graphs', 'group' => 'poller']);
+            return $this->standardRow($device, 'device_icmp_perf', ['tab' => 'graphs', 'group' => 'poller']);
         });
 
         return $this->formatData('Response time', $results);
