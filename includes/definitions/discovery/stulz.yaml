@@ -100,7 +100,7 @@ modules:
                     descr: 'Unit {{ $subindex1 }} Water In Primary Temperature'
                     index: 'waterInTemperatu1ChillersPrimary.{{ $index }}'
                     divisor: 10
-                    group: Water In Temperature
+                    group: Water In Temperature Primary
                 -
                     oid: Stulz-WIB8000-MIB::waterInTemperatuhillersSecondary
                     value: Stulz-WIB8000-MIB::waterInTemperatuhillersSecondary
@@ -108,7 +108,7 @@ modules:
                     descr: 'Unit {{ $subindex1 }} Water In Secondary Temperature'
                     index: 'waterInTemperatuhillersSecondary.{{ $index }}'
                     divisor: 10
-                    group: Water In Temperature
+                    group: Water In Temperature Secondary
                 -
                     oid: Stulz-WIB8000-MIB::waterOutTemperatChillersPrimary
                     value: Stulz-WIB8000-MIB::waterOutTemperatChillersPrimary
@@ -116,7 +116,7 @@ modules:
                     descr: 'Unit {{ $subindex1 }} Water Out Primary Temperature'
                     index: 'waterOutTemperatChillersPrimary.{{ $index }}'
                     divisor: 10
-                    group: Water Out Temperature
+                    group: Water Out Temperature Primary
                 -
                     oid: Stulz-WIB8000-MIB::waterOutTemperatillersSecondary
                     value: Stulz-WIB8000-MIB::waterOutTemperatillersSecondary
@@ -124,7 +124,7 @@ modules:
                     descr: 'Unit {{ $subindex1 }} Water Out Secondary Temperature'
                     index: 'waterOutTemperatillersSecondary.{{ $index }}'
                     divisor: 10
-                    group: Water Out Temperature
+                    group: Water Out Temperature Secondary
                 -
                     oid: Stulz-WIB8000-MIB::unitAirTemperature
                     value: Stulz-WIB8000-MIB::unitAirTemperature
