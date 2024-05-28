@@ -97,7 +97,7 @@ modules:
                     oid: Stulz-WIB8000-MIB::waterInTemperatu1ChillersPrimary
                     value: Stulz-WIB8000-MIB::waterInTemperatu1ChillersPrimary
                     num_oid: '.1.3.6.1.4.1.29462.10.2.1.1.1.2.1.1.1191.{{ $index }}'
-                    descr: 'Unit {{ $subindex1 }} Water In Primary Temperature'
+                    descr: 'Unit {{ $subindex1 }} Water In Temperature Primary'
                     index: 'waterInTemperatu1ChillersPrimary.{{ $index }}'
                     divisor: 10
                     group: Water In Temperature Primary
@@ -105,7 +105,7 @@ modules:
                     oid: Stulz-WIB8000-MIB::waterInTemperatuhillersSecondary
                     value: Stulz-WIB8000-MIB::waterInTemperatuhillersSecondary
                     num_oid: '.1.3.6.1.4.1.29462.10.2.1.1.1.2.1.1.1202.{{ $index }}'
-                    descr: 'Unit {{ $subindex1 }} Water In Secondary Temperature'
+                    descr: 'Unit {{ $subindex1 }} Water In Temperature Secondary'
                     index: 'waterInTemperatuhillersSecondary.{{ $index }}'
                     divisor: 10
                     group: Water In Temperature Secondary
@@ -113,7 +113,7 @@ modules:
                     oid: Stulz-WIB8000-MIB::waterOutTemperatChillersPrimary
                     value: Stulz-WIB8000-MIB::waterOutTemperatChillersPrimary
                     num_oid: '.1.3.6.1.4.1.29462.10.2.1.1.1.2.1.1.1206.{{ $index }}'
-                    descr: 'Unit {{ $subindex1 }} Water Out Primary Temperature'
+                    descr: 'Unit {{ $subindex1 }} Water Out Temperature Primary'
                     index: 'waterOutTemperatChillersPrimary.{{ $index }}'
                     divisor: 10
                     group: Water Out Temperature Primary
@@ -121,7 +121,7 @@ modules:
                     oid: Stulz-WIB8000-MIB::waterOutTemperatillersSecondary
                     value: Stulz-WIB8000-MIB::waterOutTemperatillersSecondary
                     num_oid: '.1.3.6.1.4.1.29462.10.2.1.1.1.2.1.1.1207.{{ $index }}'
-                    descr: 'Unit {{ $subindex1 }} Water Out Secondary Temperature'
+                    descr: 'Unit {{ $subindex1 }} Water Out Temperature Secondary'
                     index: 'waterOutTemperatillersSecondary.{{ $index }}'
                     divisor: 10
                     group: Water Out Temperature Secondary
