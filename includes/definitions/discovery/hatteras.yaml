@@ -14,4 +14,4 @@ modules:
                     state_name: hnFanObjectState
                     states:
                         - { descr: Fafaulted, graph: 0, value: 11, generic: 0 }
-                        - { descr: Active, graph: 0, value: 2, generic: 0 } 
+                        - { descr: Active, graph: 0, value: 2, generic: 0 }
