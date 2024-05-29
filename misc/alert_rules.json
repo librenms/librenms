@@ -794,5 +794,10 @@
     "rule": "(applications.app_type = \"cape\" && application_metrics.metric = \"pending\" && application_metrics.value IS NULL) && (applications.app_type = \"cape\" && application_metrics.metric = \"pending\" && application_metrics.value = \"\")",
     "name": "CAPE metric generation is failing for some reason",
     "severity": "critical"
+  },
+  {
+    "rule": "applications.app_type = \"cape\" AND application_metrics.metric = \"critical\" AND application_metrics.value > 0",
+    "name": "CAPE Criticals > 0",
+    "severity": "critical"
   }
 ]
