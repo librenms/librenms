@@ -786,7 +786,13 @@
   },
   {
     "rule": "(applications.app_type = \"cape\" && application_metrics.metric = \"reported\" && application_metrics.value = 0) && (applications.app_type = \"cape\" && application_metrics.metric = \"completed\" && application_metrics.value = 0)",
-    "name": "CAPE reported = 0 && completed = 0 , nothing is processing",
-    "severity": "warning"
+    "name": "CAPE reported = 0 and completed = 0 , nothing is processing",
+    "severity": "critical",
+    "delay": 21600
+  },
+  {
+    "rule": "(applications.app_type = \"cape\" && application_metrics.metric = \"pending\" && application_metrics.value IS NULL) && (applications.app_type = \"cape\" && application_metrics.metric = \"pending\" && application_metrics.value = \"\")",
+    "name": "CAPE metric generation is failing for some reason",
+    "severity": "critical"
   }
 ]
