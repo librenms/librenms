@@ -1,4 +1,4 @@
-mib: CISCO-HSRP-MIB
+mib: CISCO-HSRP-MIB:CISCO-IETF-BFD-MIB
 modules:
     sensors:
         state:
