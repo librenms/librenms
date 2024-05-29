@@ -1,0 +1,1159 @@
+-- CISCO-IETF-BFD-MIB.my : Bidirectional Forwarding Detection MIB
+--   
+-- May 2007, A S Kiran Koushik
+--   
+-- Copyright (c) 2007-2008 by cisco Systems, Inc.
+-- All rights reserved.
+--   
+-- This MIB module is based on the Internet Draft draft-ietf-bfd-mib-03.txt
+-- and draft-ietf-bfd-mib-04.txt. In terms of object syntax and
+-- semantics, the content of this Cisco MIB is the same as
+-- the corresponding Internet Draft revision. This Cisco MIB was
+-- created due to the "subject to change" nature of Internet Drafts.
+-- This Cisco MIB may later be deprecated, and the stable RFC,
+-- which may replace the Internet Draft, may be implemented in its place
+
+CISCO-IETF-BFD-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    Unsigned32,
+    Counter32,
+    Counter64,
+    NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP,
+    NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+    TEXTUAL-CONVENTION,
+    TruthValue,
+    RowStatus,
+    StorageType,
+    TimeStamp
+        FROM SNMPv2-TC
+    InterfaceIndex
+        FROM IF-MIB
+    InetAddress,
+    InetAddressType,
+    InetPortNumber
+        FROM INET-ADDRESS-MIB
+    ciscoExperiment
+        FROM CISCO-SMI;
+
+
+ciscoIetfBfdMIB MODULE-IDENTITY
+    LAST-UPDATED    "200804240000Z"
+    ORGANIZATION    "IETF"
+    CONTACT-INFO
+            "Zafar Ali
+            Cisco Systems, Inc. 
+            Email:  zali@cisco.com
+
+            A S Kiran Koushik
+            Cisco Systems, Inc.
+            Email: kkoushik@cisco.com
+
+            Nobo Akiya
+            Cisco Systems, G.K.
+            Email: nobo@cisco.com"
+    DESCRIPTION
+        "This document contains the Management information base for
+        Bidirectional Forwarding Detection(BFD) Protocol as defined
+        in draft-ietf-bfd-base-06.txt.
+
+        BFD is a protocol intended to detect faults in the
+        bidirectional path between two forwarding engines, including
+        interfaces, data link(s), and to the extent possible the forwarding
+        engines themselves, with potentially very low latency.  It operates
+        independently of media, data protocols, and routing protocols.
+
+        This MIB module is based on the Internet Draft
+        draft-ietf-bfd-mib-03.txt and draft-ietf-bfd-mib-04.txt"
+    REVISION        "200804240000Z"
+    DESCRIPTION
+        "Revised version includes support for draft-ietf-bfd-mib-03.txt
+        and draft-ietf-bfd-mib-04.txt. In addition to small description
+        changes made throughout this MIB, following changes are made:
+        * ciscoBfdObjects.ciscoBfdSessTable.ciscoBfdSessEntry
+            - ciscoBfdSessState : failing state added
+            - ciscoBfdSessVersionNumber : new object added
+            - ciscoBfdSessType : new object added
+            - ciscoBfdSessInterface : new object added
+        * ciscoBfdObjects
+            - ciscoBfdSessDiscMapTable : new table added
+            - ciscoBfdSessIpMapTable : new table added
+        * ciscoBfdComformance
+            - ciscoBfdSessGroup : object group deprecated
+            - ciscoBfdSess03Group : new object group added
+            - ciscoBfdSess04Group : new object group added
+            - ciscoBfdSess0304Group : new object group added
+        * ciscoBfdCompliances
+            - ciscoBfdModuleFullCompliance : module compliance deprecated
+            - ciscoBfdModuleFullComplianceRev2 : new module compliance added"
+    REVISION        "200706040000Z"
+    DESCRIPTION
+        "Initial version based on draft-ietf-bfd-mib-03.txt"
+    ::= { ciscoExperiment 137 }
+
+
+-- Top level components of this MIB module.
+
+ciscoBfdNotifications  OBJECT IDENTIFIER
+    ::= { ciscoIetfBfdMIB 0 }
+
+ciscoBfdObjects  OBJECT IDENTIFIER
+    ::= { ciscoIetfBfdMIB 1 }
+
+ciscoBfdConformance  OBJECT IDENTIFIER
+    ::= { ciscoIetfBfdMIB 3 }
+
+ciscoBfdScalarObjects  OBJECT IDENTIFIER
+    ::= { ciscoBfdObjects 1 }
+
+
+-- Textual Conventions
+
+CiscoBfdSessIndexTC ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT    "d"
+    STATUS          current
+    DESCRIPTION
+        "An index used to uniquely identify BFD sessions."
+    SYNTAX          Unsigned32 (1..4294967295 )
+
+CiscoBfdInterval ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "The BFD interval delay in microseconds."
+    SYNTAX          Unsigned32 (1..4294967295 )
+
+CiscoBfdDiag ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "A common BFD diagnostic code."
+    SYNTAX          INTEGER  {
+                        noDiagnostic(1),
+                        controlDetectionTimeExpired(2),
+                        echoFunctionFailed(3),
+                        neighborSignaledSessionDown(4),
+                        forwardingPlaneReset(5),
+                        pathDown(6),
+                        concatenatedPathDown(7),
+                        administrativelyDown(8),
+                        reverseConcatenatedPathDown(9)
+                    }
+
+-- BFD General Variables
+--   
+-- These parameters apply globally to the Router's
+-- BFD Process.
+
+ciscoBfdAdminStatus OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        enabled(1),
+                        disabled(2)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The global administrative status of BFD in this router.
+        The value 'enabled' denotes that the BFD Process is 
+        active on at least one interface; 'disabled' disables  
+        it on all interfaces."
+    DEFVAL          { enabled } 
+    ::= { ciscoBfdScalarObjects 1 }
+
+ciscoBfdVersionNumber OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The current version number of the BFD protocol."
+    REFERENCE       "BFD Version 0 (draft-katz-ward-bfd-02.txt)"
+    DEFVAL          { 0 } 
+    ::= { ciscoBfdScalarObjects 3 }
+-- BFD Session Table
+-- The BFD Session Table specifies BFD session specific
+-- information.
+
+ciscoBfdSessTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CiscoBfdSessEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The BFD Session Table describes the BFD sessions."
+    REFERENCE       "BFD Version 0 (draft-katz-ward-ciscoBfd-02.txt)"
+    ::= { ciscoBfdObjects 2 }
+
+ciscoBfdSessEntry OBJECT-TYPE
+    SYNTAX          CiscoBfdSessEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The BFD Session Entry describes BFD session."
+    INDEX           { ciscoBfdSessIndex } 
+    ::= { ciscoBfdSessTable 1 }
+
+CiscoBfdSessEntry ::= SEQUENCE {
+        ciscoBfdSessIndex                   CiscoBfdSessIndexTC,
+        ciscoBfdSessApplicationId           Unsigned32,
+        ciscoBfdSessDiscriminator           Unsigned32,
+        ciscoBfdSessRemoteDiscr             Unsigned32,
+        ciscoBfdSessUdpPort                 InetPortNumber,
+        ciscoBfdSessState                   INTEGER,
+        ciscoBfdSessRemoteHeardFlag         TruthValue,
+        ciscoBfdSessDiag                    CiscoBfdDiag,
+        ciscoBfdSessOperMode                INTEGER,
+        ciscoBfdSessDemandModeDesiredFlag   TruthValue,
+        ciscoBfdSessEchoFuncModeDesiredFlag TruthValue,
+        ciscoBfdSessControlPlanIndepFlag    TruthValue,
+        ciscoBfdSessAddrType                InetAddressType,
+        ciscoBfdSessAddr                    InetAddress,
+        ciscoBfdSessDesiredMinTxInterval    CiscoBfdInterval,
+        ciscoBfdSessReqMinRxInterval        CiscoBfdInterval,
+        ciscoBfdSessReqMinEchoRxInterval    CiscoBfdInterval,
+        ciscoBfdSessDetectMult              Unsigned32,
+        ciscoBfdSessStorType                StorageType,
+        ciscoBfdSessRowStatus               RowStatus,
+        ciscoBfdSessAuthPresFlag            TruthValue,
+        ciscoBfdSessAuthenticationType      INTEGER,
+        ciscoBfdSessVersionNumber           Unsigned32,
+        ciscoBfdSessType                    INTEGER,
+        ciscoBfdSessInterface               InterfaceIndex
+}
+
+ciscoBfdSessIndex OBJECT-TYPE
+    SYNTAX          CiscoBfdSessIndexTC
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object contains an index used to represent a
+        unique BFD session on this device." 
+    ::= { ciscoBfdSessEntry 1 }
+
+ciscoBfdSessApplicationId OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object contains an index used to indicate
+        a local application which owns or maintains this 
+        BFD session. For instance, the MPLS VPN process may 
+        maintain a subset of the total number of BFD 
+        sessions.  This application ID provides a convenient 
+        way to segregate sessions by the applications which 
+        maintain them." 
+    ::= { ciscoBfdSessEntry 2 }
+
+ciscoBfdSessDiscriminator OBJECT-TYPE
+    SYNTAX          Unsigned32 (1..4294967295 )
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the local discriminator for this BFD
+        session, used to uniquely identify it." 
+    ::= { ciscoBfdSessEntry 3 }
+
+ciscoBfdSessRemoteDiscr OBJECT-TYPE
+    SYNTAX          Unsigned32 (1..4294967295 )
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the session discriminator chosen
+        by the remote system for this BFD session." 
+    ::= { ciscoBfdSessEntry 4 }
+
+ciscoBfdSessUdpPort OBJECT-TYPE
+    SYNTAX          InetPortNumber
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The destination UDP Port for BFD. The default value is
+        the well-known value for this port. BFD State failing(5)
+        is only applicable if this BFD session is running
+        version 0"
+    REFERENCE
+        "draft-katz-ward-bfd-02.txt and 
+        draft-raggarwa-mpls-bfd-00.txt"
+    DEFVAL          { 0 } 
+    ::= { ciscoBfdSessEntry 5 }
+
+ciscoBfdSessState OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        adminDown(1),
+                        down(2),
+                        init(3),
+                        up(4),
+                        failing(5)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The perceived state of the BFD session." 
+    ::= { ciscoBfdSessEntry 6 }
+
+ciscoBfdSessRemoteHeardFlag OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies status of BFD packet reception from
+        the remote system. Specifically, it is set to true(1) if 
+        the local system is actively receiving BFD packets from the  
+        remote system, and is set to false(0) if the local system  
+        has not received BFD packets recently (within the detection  
+        time) or if the local system is attempting to tear down 
+        the BFD session." 
+    ::= { ciscoBfdSessEntry 7 }
+
+ciscoBfdSessDiag OBJECT-TYPE
+    SYNTAX          CiscoBfdDiag
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "A diagnostic code specifying the local system's reason
+        for the last transition of the session from up(1)  
+        to some other state." 
+    ::= { ciscoBfdSessEntry 8 }
+
+ciscoBfdSessOperMode OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        asyncModeWEchoFun(1),
+                        asynchModeWOEchoFun(2),
+                        demandModeWEchoFunction(3),
+                        demandModeWOEchoFunction(4)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies current operating mode that BFD
+        session is operating in." 
+    ::= { ciscoBfdSessEntry 9 }
+
+ciscoBfdSessDemandModeDesiredFlag OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object indicates that the local system's
+        desire to use Demand mode. Specifically, it is set  
+        to true(1) if the local system wishes to use  
+        Demand mode or false(0) if not"
+    DEFVAL          { false } 
+    ::= { ciscoBfdSessEntry 10 }
+
+ciscoBfdSessEchoFuncModeDesiredFlag OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object indicates that the local system's
+        desire to use Echo mode. Specifically, it is set  
+        to true(1) if the local system wishes to use  
+        Echo mode or false(0) if not"
+    DEFVAL          { false } 
+    ::= { ciscoBfdSessEntry 11 }
+
+ciscoBfdSessControlPlanIndepFlag OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object indicates that the local system's
+        ability to continue to function through a disruption of  
+        the control plane. Specifically, it is set  
+        to true(1) if the local system BFD implementation is 
+        independent of the control plane. Otherwise, the  
+        value is set to false(0)"
+    DEFVAL          { false } 
+    ::= { ciscoBfdSessEntry 12 }
+
+ciscoBfdSessAddrType OBJECT-TYPE
+    SYNTAX          InetAddressType
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object specifies IP address type of the neighboring IP
+        address which is being monitored with this BFD session.
+
+        Only values unknown(0), ipv4(1) or ipv6(2) 
+        have to be supported.  
+
+        A value of unknown(0) is allowed only when  
+        the outgoing interface is of type point-to-point, or 
+        when the BFD session is not associated with a specific  
+        interface. 
+
+        If any other unsupported values are attempted in a set 
+        operation, the agent MUST return an inconsistentValue  
+        error." 
+    ::= { ciscoBfdSessEntry 13 }
+
+ciscoBfdSessAddr OBJECT-TYPE
+    SYNTAX          InetAddress
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the neighboring IP address which is
+        being monitored with this BFD session.
+        It can also be used to enabled BFD on a specific  
+        interface. The value is set to zero when BFD session is not  
+        associated with a specific interface." 
+    ::= { ciscoBfdSessEntry 14 }
+
+ciscoBfdSessDesiredMinTxInterval OBJECT-TYPE
+    SYNTAX          CiscoBfdInterval
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the minimum interval, in
+        microseconds, that the local system would like to use when 
+             transmitting BFD Control packets." 
+    ::= { ciscoBfdSessEntry 15 }
+
+ciscoBfdSessReqMinRxInterval OBJECT-TYPE
+    SYNTAX          CiscoBfdInterval
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the minimum interval, in
+        microseconds, between received  BFD Control packets the  
+        local system is capable of supporting." 
+    ::= { ciscoBfdSessEntry 16 }
+
+ciscoBfdSessReqMinEchoRxInterval OBJECT-TYPE
+    SYNTAX          CiscoBfdInterval
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the minimum interval, in
+        microseconds, between received BFD Echo packets that this 
+        system is capable of supporting." 
+    ::= { ciscoBfdSessEntry 17 }
+
+ciscoBfdSessDetectMult OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the Detect time multiplier." 
+    ::= { ciscoBfdSessEntry 18 }
+
+ciscoBfdSessStorType OBJECT-TYPE
+    SYNTAX          StorageType
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This variable indicates the storage type for this
+        object. Conceptual rows having the value  
+        'permanent' need not allow write-access to any  
+        columnar objects in the row." 
+    ::= { ciscoBfdSessEntry 19 }
+
+ciscoBfdSessRowStatus OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This variable is used to create, modify, and/or
+        delete a row in this table. When a row in this 
+        table has a row in the active(1) state, no  
+        objects in this row can be modified except the 
+        ciscoBfdSessRowStatus and ciscoBfdSessStorageType." 
+    ::= { ciscoBfdSessEntry 20 }
+
+ciscoBfdSessAuthPresFlag OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object indicates that the local system's
+        desire to use Authentication. Specifically, it is set  
+        to true(1) if the local system wishes the session  
+        to be authenticated or false(0) if not"
+    DEFVAL          { false } 
+    ::= { ciscoBfdSessEntry 21 }
+
+ciscoBfdSessAuthenticationType OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        simplePassword(1),
+                        keyedMD5(2),
+                        meticulousKeyedMD5(3),
+                        keyedSHA1(4),
+                        meticulousKeyedSHA1(5)
+                    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The Authentication Type used for this BFD session. This
+        field is valid only when the Authentication Present bit is set" 
+    ::= { ciscoBfdSessEntry 22 }
+
+ciscoBfdSessVersionNumber OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The version number of the BFD protocol that this session is
+        running in."
+    REFERENCE
+        "BFD Version 0 (draft-katz-ward-bfd-02.txt) and BFD Version
+        1 (draft-ietf-bfd-base-07.txt)"
+    DEFVAL          { 0 } 
+    ::= { ciscoBfdSessEntry 23 }
+
+ciscoBfdSessType OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        singleHop(1),
+                        multiHop(2)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The type of this BFD session." 
+    ::= { ciscoBfdSessEntry 24 }
+
+ciscoBfdSessInterface OBJECT-TYPE
+    SYNTAX          InterfaceIndex
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object contains an interface index used to indicate
+        the interface which this BFD session is running on." 
+    ::= { ciscoBfdSessEntry 25 }
+ 
+
+-- BFD Session Performance Table
+
+ciscoBfdSessPerfTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CiscoBfdSessPerfEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table specifies BFD Session performance counters."
+    ::= { ciscoBfdObjects 3 }
+
+ciscoBfdSessPerfEntry OBJECT-TYPE
+    SYNTAX          CiscoBfdSessPerfEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry in this table is created by a BFD-enabled node for
+        every BFD Session. ciscoBfdCounterDiscontinuityTime is used to  
+        indicate potential discontinuity for all counter objects  
+        in this table."
+    AUGMENTS           { ciscoBfdSessEntry  } 
+ 
+    ::= { ciscoBfdSessPerfTable 1 }
+
+CiscoBfdSessPerfEntry ::= SEQUENCE {
+        ciscoBfdSessPerfPktIn            Counter32,
+        ciscoBfdSessPerfPktOut           Counter32,
+        ciscoBfdSessUpTime               TimeStamp,
+        ciscoBfdSessPerfLastSessDownTime TimeStamp,
+        ciscoBfdSessPerfLastCommLostDiag CiscoBfdDiag,
+        ciscoBfdSessPerfSessUpCount      Counter32,
+        ciscoBfdSessPerfDiscTime         TimeStamp,
+        ciscoBfdSessPerfPktInHC          Counter64,
+        ciscoBfdSessPerfPktOutHC         Counter64
+}
+
+-- Ed Note: should we add per-diag code counts here,
+
+ciscoBfdSessPerfPktIn OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of BFD messages received for this BFD
+        session." 
+    ::= { ciscoBfdSessPerfEntry 1 }
+
+ciscoBfdSessPerfPktOut OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of BFD messages sent for this BFD session." 
+    ::= { ciscoBfdSessPerfEntry 2 }
+
+ciscoBfdSessUpTime OBJECT-TYPE
+    SYNTAX          TimeStamp
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The value of sysUpTime on the most recent occasion at which
+        the session came up. If no such up event exists this object 
+        contains a zero value." 
+    ::= { ciscoBfdSessPerfEntry 3 }
+
+ciscoBfdSessPerfLastSessDownTime OBJECT-TYPE
+    SYNTAX          TimeStamp
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The value of sysUpTime on the most recent occasion at which
+        the last time communication was lost with the neighbor. If  
+        no such down event exist this object contains a zero value." 
+    ::= { ciscoBfdSessPerfEntry 4 }
+
+ciscoBfdSessPerfLastCommLostDiag OBJECT-TYPE
+    SYNTAX          CiscoBfdDiag
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The BFD diag code for the last time communication was lost
+        with the neighbor. If no such down event exists this object  
+        contains a zero value." 
+    ::= { ciscoBfdSessPerfEntry 5 }
+
+ciscoBfdSessPerfSessUpCount OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of times this session has gone into the Up
+        state since the router last rebooted." 
+    ::= { ciscoBfdSessPerfEntry 6 }
+
+ciscoBfdSessPerfDiscTime OBJECT-TYPE
+    SYNTAX          TimeStamp
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The value of sysUpTime on the most recent occasion at
+        which any one or more of the session counters suffered 
+        a discontinuity.  
+
+        The relevant counters are the specific instances associated  
+        with this BFD session of any Counter32 object contained in 
+        the ciscoBfdSessPerfTable. If no such discontinuities have occurred  
+        since the last re-initialization of the local management 
+        subsystem, then this object contains a zero value." 
+    ::= { ciscoBfdSessPerfEntry 7 }
+
+ciscoBfdSessPerfPktInHC OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This value represents the total number of BFD messages
+        received for this BFD session. It MUST be equal to the 
+        least significant 32 bits of ciscoBfdSessPerfPktIn 
+        if ciscoBfdSessPerfPktInHC is supported according to 
+        the rules spelled out in RFC2863." 
+    ::= { ciscoBfdSessPerfEntry 8 }
+
+ciscoBfdSessPerfPktOutHC OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This value represents the total number of
+        total number of BFD messages transmitted for this  
+        BFD session. It MUST be equal to the 
+        least significant 32 bits of ciscoBfdSessPerfPktIn 
+        if ciscoBfdSessPerfPktOutHC is supported according to 
+        the rules spelled out in RFC2863." 
+    ::= { ciscoBfdSessPerfEntry 9 }
+ 
+
+-- BFD Session Mapping Table
+-- Valid only with draft-ietf-bfd-mib-03.txt
+
+ciscoBfdSessMapTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CiscoBfdSessMapEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The BFD Session Mapping Table maps the complex
+        indexing of the BFD sessions to the flat 
+        CiscoBfdSessIndexTC used in the ciscoBfdSessTable."
+    REFERENCE       "BFD Version 0 (draft-katz-ward-bfd-02.txt)"
+    ::= { ciscoBfdObjects 4 }
+
+ciscoBfdSessMapEntry OBJECT-TYPE
+    SYNTAX          CiscoBfdSessMapEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The BFD Session Entry describes BFD session
+        that is mapped to this index."
+    INDEX           {
+                        ciscoBfdSessApplicationId,
+                        ciscoBfdSessDiscriminator,
+                        ciscoBfdSessAddrType,
+                        ciscoBfdSessAddr
+                    } 
+    ::= { ciscoBfdSessMapTable 1 }
+
+CiscoBfdSessMapEntry ::= SEQUENCE {
+        ciscoBfdSessMapBfdIndex CiscoBfdSessIndexTC
+}
+
+ciscoBfdSessMapBfdIndex OBJECT-TYPE
+    SYNTAX          CiscoBfdSessIndexTC
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the CiscoBfdSessIndexTC referred to
+        by the indices of this row. In essence, a mapping is 
+        provided between these indices and the ciscoBfdSessTable." 
+    ::= { ciscoBfdSessMapEntry 1 }
+ 
+
+-- BFD Session Discriminator Mapping Table
+-- Valid only with draft-ietf-bfd-mib-04.txt
+
+ciscoBfdSessDiscMapTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CiscoBfdSessDiscMapEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The BFD Session Discriminator Mapping Table maps a
+        local discriminator value to associated BFD sessions'
+        CiscoBfdSessIndexTC used in the ciscoBfdSessTable."
+    REFERENCE       "BFD Version 0 (draft-katz-ward-bfd-02.txt)"
+    ::= { ciscoBfdObjects 5 }
+
+ciscoBfdSessDiscMapEntry OBJECT-TYPE
+    SYNTAX          CiscoBfdSessDiscMapEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "Each row contains a mapping between a local discriminator
+        value to an entry in ciscoBfdSessTable."
+    INDEX           { ciscoBfdSessDiscriminator } 
+    ::= { ciscoBfdSessDiscMapTable 1 }
+
+CiscoBfdSessDiscMapEntry ::= SEQUENCE {
+        ciscoBfdSessDiscMapIndex CiscoBfdSessIndexTC
+}
+
+ciscoBfdSessDiscMapIndex OBJECT-TYPE
+    SYNTAX          CiscoBfdSessIndexTC
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the CiscoBfdSessIndexTC referred to by
+        the index of this row. In essence, a mapping is 
+        provided between this index and the ciscoBfdSessTable." 
+    ::= { ciscoBfdSessDiscMapEntry 1 }
+ 
+
+-- BFD Session IP Mapping Table
+-- Valid only with draft-ietf-bfd-mib-04.txt
+
+ciscoBfdSessIpMapTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CiscoBfdSessIpMapEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The BFD Session IP Mapping Table maps given
+        ciscoBfdSessInterface, ciscoBfdSessAddrType, and
+        ciscoBbfdSessAddr to an associated BFD sessions'
+        CiscoBfdSessIndexTC used in the ciscoBfdSessTable.
+        This table SHOULD contains those BFD sessions are
+        of IP type: singleHop(1) and multiHop(2)."
+    REFERENCE       "BFD Version 0 (draft-katz-ward-bfd-02.txt)"
+    ::= { ciscoBfdObjects 6 }
+
+ciscoBfdSessIpMapEntry OBJECT-TYPE
+    SYNTAX          CiscoBfdSessIpMapEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "Each row contains a mapping between ciscoBfdSessInterface,
+        ciscoBfdSessAddrType and ciscoBfdSessAddr values to an 
+        entry in ciscoBfdSessTable."
+    INDEX           {
+                        ciscoBfdSessInterface,
+                        ciscoBfdSessAddrType,
+                        ciscoBfdSessAddr
+                    } 
+    ::= { ciscoBfdSessIpMapTable 1 }
+
+CiscoBfdSessIpMapEntry ::= SEQUENCE {
+        ciscoBfdSessIpMapIndex CiscoBfdSessIndexTC
+}
+
+ciscoBfdSessIpMapIndex OBJECT-TYPE
+    SYNTAX          CiscoBfdSessIndexTC
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the CiscoBfdSessIndexTC referred to by
+        the indices of this row. In essence, a mapping is 
+        provided between these indices and an entry in ciscoBfdSessTable." 
+    ::= { ciscoBfdSessIpMapEntry 1 }
+ 
+
+
+-- Notification Configuration
+
+ciscoBfdSessNotificationsEnable OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "If this object is set to true(1), then it enables
+        the emission of ciscoBfdSessUp and ciscoBfdSessDown 
+        notifications; otherwise these notifications are not 
+        emitted."
+    REFERENCE
+        "See also RFC3413 for explanation that  
+           notifications are under the ultimate control of the  
+           MIB modules in this document."
+    DEFVAL          { false } 
+    ::= { ciscoBfdScalarObjects 4 }
+
+ciscoBfdSessUp NOTIFICATION-TYPE
+    OBJECTS         {
+                        ciscoBfdSessDiag,
+                        ciscoBfdSessDiag
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This notification is generated when the
+        ciscoBfdSessState object for one or more contiguous 
+        entries in ciscoBfdSessTable are about to enter the up(4) 
+        state from some other state. The included values of 
+        ciscoBfdSessDiag MUST both be set equal to this 
+        new state (i.e: up(4)).  The two instances of  
+        ciscoBfdSessDiag in this notification indicate the range  
+        of indexes that are affected.  Note that all the indexes  
+        of the two ends of the range can be derived from the 
+        instance identifiers of these two objects.  For the 
+        cases where a contiguous range of sessions 
+        have transitioned into the up(4) state at roughly 
+        the same time, the device SHOULD issue a single 
+        notification for each range of contiguous indexes in 
+        an effort to minimize the emission of a large number 
+        of notifications.  If a notification has to be 
+        issued for just a single ciscoBfdSessEntry, then 
+        the instance identifier (and values) of the two 
+        ciscoBfdSessDiag objects MUST be the identical."
+   ::= { ciscoBfdNotifications 1 }
+
+ciscoBfdSessDown NOTIFICATION-TYPE
+    OBJECTS         {
+                        ciscoBfdSessDiag,
+                        ciscoBfdSessDiag
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This notification is generated when the
+        ciscoBfdSessState object for one or more contiguous 
+        entries in ciscoBfdSessTable are about to enter the down(2) 
+        or adminDown(1) states from some other state. The included  
+        values of ciscoBfdSessDiag MUST both be set equal to this 
+        new state (i.e: down(2) or adminDown(1)).  The two instances  
+        of ciscoBfdSessDiag in this notification indicate the range  
+        of indexes that are affected.  Note that all the indexes  
+        of the two ends of the range can be derived from the 
+        instance identifiers of these two objects.  For 
+        cases where a contiguous range of sessions 
+        have transitioned into the down(2) or adminDown(1) states  
+        at roughly the same time, the device SHOULD issue a single 
+        notification for each range of contiguous indexes in 
+        an effort to minimize the emission of a large number 
+        of notifications.  If a notification has to be 
+        issued for just a single ciscoBfdSessEntry, then 
+        the instance identifier (and values) of the two 
+        ciscoBfdSessDiag objects MUST be the identical."
+   ::= { ciscoBfdNotifications 2 }
+-- Ed Note: We need to add notification for changes
+-- when the two ends automatically negotiate to a new detection time
+-- value or when detection multiplier changes.
+-- Similarly, changes in the operating mode (ciscoBfdSessOperMode)
+-- also need to be notified.
+--   
+-- Module compliance.
+
+ciscoBfdGroups  OBJECT IDENTIFIER
+    ::= { ciscoBfdConformance 1 }
+
+ciscoBfdCompliances  OBJECT IDENTIFIER
+    ::= { ciscoBfdConformance 2 }
+
+
+-- Compliance requirement for fully compliant implementations.
+
+ciscoBfdModuleFullCompliance MODULE-COMPLIANCE
+    STATUS          deprecated
+    DESCRIPTION
+        "Compliance statement for agents that provide full
+        support for CISCO-IETF-BFD-MIB of draft-ietf-bfd-mib-03.txt.
+        Such devices can then be monitored and also be configured
+        using this MIB module. This compliance statement is 
+        superceded by ciscoBfdModuleFullComplianceRev2."
+    MODULE          -- this module
+    MANDATORY-GROUPS {
+                        ciscoBfdSessionGroup,
+                        ciscoBfdSessionPerfGroup,
+                        ciscoBfdSessionPerfHCGroup,
+                        ciscoBfdNotificationGroup
+                    }
+
+    OBJECT          ciscoBfdSessAddrType
+    SYNTAX          INTEGER  {
+                        unknown(0),
+                        ipv4(1),
+                        ipv6(2)
+                    }
+    DESCRIPTION
+        "Only unknown(0), ipv4(1) and ipv6(2) support
+        is required."
+
+    OBJECT          ciscoBfdSessAddr
+    DESCRIPTION
+        "An implementation is only required to support
+        unknown(0), ipv4(1) and ipv6(2) sizes."
+    ::= { ciscoBfdCompliances 1 }
+
+ciscoBfdModuleFullComplianceRev2 MODULE-COMPLIANCE
+    STATUS          current
+    DESCRIPTION
+        "Compliance statement for agents that provide full
+        support for CISCO-IETF-BFD-MIB of draft-ietf-bfd-mib-04.txt.
+        Such devices can then be monitored and also be configured
+        using this MIB module."
+    MODULE          -- this module
+    MANDATORY-GROUPS {
+                        ciscoBfdSession0304Group,
+                        ciscoBfdSessionPerfGroup,
+                        ciscoBfdSessionPerfHCGroup,
+                        ciscoBfdNotificationGroup
+                    }
+
+    GROUP           ciscoBfdSession03Group
+    DESCRIPTION
+        "This group is mandatory only when draft-ietf-bfd-mib-03.txt
+        is implemented on the system."
+
+    GROUP           ciscoBfdSession04Group
+    DESCRIPTION
+        "This group is mandatory only when draft-ietf-bfd-mib-04.txt
+        is implemented on the system."
+
+    OBJECT          ciscoBfdSessAddrType
+    SYNTAX          INTEGER  {
+                        unknown(0),
+                        ipv4(1),
+                        ipv6(2)
+                    }
+    DESCRIPTION
+        "Only unknown(0), ipv4(1) and ipv6(2) support
+        is required."
+
+    OBJECT          ciscoBfdSessAddr
+    DESCRIPTION
+        "An implementation is only required to support
+        unknown(0), ipv4(1) and ipv6(2) sizes."
+    ::= { ciscoBfdCompliances 2 }
+
+-- Read-Only Conformance TBD...
+--   
+-- Units of conformance.
+
+ciscoBfdSessionGroup OBJECT-GROUP
+    OBJECTS         {
+                        ciscoBfdSessNotificationsEnable,
+                        ciscoBfdAdminStatus,
+                        ciscoBfdVersionNumber,
+                        ciscoBfdSessApplicationId,
+                        ciscoBfdSessDiscriminator,
+                        ciscoBfdSessAddrType,
+                        ciscoBfdSessAddr,
+                        ciscoBfdSessRemoteDiscr,
+                        ciscoBfdSessUdpPort,
+                        ciscoBfdSessState,
+                        ciscoBfdSessRemoteHeardFlag,
+                        ciscoBfdSessDiag,
+                        ciscoBfdSessOperMode,
+                        ciscoBfdSessDemandModeDesiredFlag,
+                        ciscoBfdSessEchoFuncModeDesiredFlag,
+                        ciscoBfdSessControlPlanIndepFlag,
+                        ciscoBfdSessDesiredMinTxInterval,
+                        ciscoBfdSessReqMinRxInterval,
+                        ciscoBfdSessReqMinEchoRxInterval,
+                        ciscoBfdSessDetectMult,
+                        ciscoBfdSessStorType,
+                        ciscoBfdSessRowStatus,
+                        ciscoBfdSessMapBfdIndex,
+                        ciscoBfdSessAuthPresFlag,
+                        ciscoBfdSessAuthenticationType
+                    }
+    STATUS          deprecated
+    DESCRIPTION
+        "Collection of objects needed for BFD sessions."
+    ::= { ciscoBfdGroups 1 }
+
+ciscoBfdSessionPerfGroup OBJECT-GROUP
+    OBJECTS         {
+                        ciscoBfdSessPerfPktIn,
+                        ciscoBfdSessPerfPktOut,
+                        ciscoBfdSessUpTime,
+                        ciscoBfdSessPerfLastSessDownTime,
+                        ciscoBfdSessPerfLastCommLostDiag,
+                        ciscoBfdSessPerfSessUpCount,
+                        ciscoBfdSessPerfDiscTime
+                    }
+    STATUS          current
+    DESCRIPTION
+        "Collection of objects needed to monitor the
+        performance of BFD sessions."
+    ::= { ciscoBfdGroups 2 }
+
+ciscoBfdSessionPerfHCGroup OBJECT-GROUP
+    OBJECTS         {
+                        ciscoBfdSessPerfPktInHC,
+                        ciscoBfdSessPerfPktOutHC
+                    }
+    STATUS          current
+    DESCRIPTION
+        "Collection of objects needed to monitor the
+        performance of BFD sessions for which the 
+        values of ciscoBfdSessPerfPktIn, ciscoBfdSessPerfPktOut  
+        wrap around too quickly."
+    ::= { ciscoBfdGroups 3 }
+
+ciscoBfdNotificationGroup NOTIFICATION-GROUP
+   NOTIFICATIONS    {
+                        ciscoBfdSessUp,
+                        ciscoBfdSessDown
+                    }
+    STATUS          current
+    DESCRIPTION
+        "Set of notifications implemented in this
+        module."
+    ::= { ciscoBfdGroups 4 }
+
+ciscoBfdSession0304Group OBJECT-GROUP
+    OBJECTS         {
+                        ciscoBfdSessNotificationsEnable,
+                        ciscoBfdAdminStatus,
+                        ciscoBfdSessDiscriminator,
+                        ciscoBfdSessAddrType,
+                        ciscoBfdSessAddr,
+                        ciscoBfdSessRemoteDiscr,
+                        ciscoBfdSessUdpPort,
+                        ciscoBfdSessState,
+                        ciscoBfdSessRemoteHeardFlag,
+                        ciscoBfdSessDiag,
+                        ciscoBfdSessOperMode,
+                        ciscoBfdSessDemandModeDesiredFlag,
+                        ciscoBfdSessEchoFuncModeDesiredFlag,
+                        ciscoBfdSessControlPlanIndepFlag,
+                        ciscoBfdSessDesiredMinTxInterval,
+                        ciscoBfdSessReqMinRxInterval,
+                        ciscoBfdSessReqMinEchoRxInterval,
+                        ciscoBfdSessDetectMult,
+                        ciscoBfdSessStorType,
+                        ciscoBfdSessRowStatus,
+                        ciscoBfdSessAuthPresFlag,
+                        ciscoBfdSessAuthenticationType
+                    }
+    STATUS          current
+    DESCRIPTION
+        "Collection of objects needed for BFD sessions for both
+        draft-ietf-bfd-mib-03.txt and draft-ietf-bfd-mib-04.txt."
+    ::= { ciscoBfdGroups 5 }
+
+ciscoBfdSession03Group OBJECT-GROUP
+    OBJECTS         {
+                        ciscoBfdVersionNumber,
+                        ciscoBfdSessApplicationId,
+                        ciscoBfdSessMapBfdIndex
+                    }
+    STATUS          current
+    DESCRIPTION
+        "Collection of objects needed for BFD sessions to support
+        draft-ietf-bfd-mib-03.txt."
+    ::= { ciscoBfdGroups 6 }
+
+ciscoBfdSession04Group OBJECT-GROUP
+    OBJECTS         {
+                        ciscoBfdSessVersionNumber,
+                        ciscoBfdSessType,
+                        ciscoBfdSessInterface,
+                        ciscoBfdSessDiscMapIndex,
+                        ciscoBfdSessIpMapIndex
+                    }
+    STATUS          current
+    DESCRIPTION
+        "Collection of objects needed for BFD sessions to support
+        draft-ietf-bfd-mib-04.txt."
+    ::= { ciscoBfdGroups 7 }
+
+END
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
